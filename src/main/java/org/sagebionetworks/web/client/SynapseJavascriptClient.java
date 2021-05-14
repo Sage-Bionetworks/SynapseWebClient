@@ -21,16 +21,17 @@ import static org.sagebionetworks.web.shared.WebConstants.FILE_SERVICE_URL_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.NRGR_SYNAPSE_GLUE_ENDPOINT_PROPERTY;
 import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.SYNAPSE_VERSION_KEY;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.sagebionetworks.client.exceptions.SynapseException;
+
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessRequirement;
@@ -72,7 +73,6 @@ import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.auth.ChangePasswordInterface;
 import org.sagebionetworks.repo.model.auth.LoginRequest;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
-import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.auth.Username;
 import org.sagebionetworks.repo.model.dataaccess.AccessApprovalNotificationRequest;
 import org.sagebionetworks.repo.model.dataaccess.AccessApprovalNotificationResponse;
@@ -165,6 +165,7 @@ import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 import org.sagebionetworks.web.shared.exceptions.TooManyRequestsException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
+
 import com.google.common.base.Joiner;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.gwt.http.client.Request;
@@ -244,7 +245,8 @@ public class SynapseJavascriptClient {
 	public static final String USER = "/user";
 	public static final String BUNDLE_MASK_PATH = "/bundle?mask=";
 	public static final String ACCEPT = "Accept";
-	public static final String SESSION_TOKEN_HEADER = "sessionToken";
+	public static final String AUTHORIZATION_HEADER = "authorization";
+	public static final String BEARER_PREFIX = "Bearer ";
 	public static final String SYNAPSE_ENCODING_CHARSET = "UTF-8";
 	public static final String APPLICATION_JSON_CHARSET_UTF8 = "application/json; charset=" + SYNAPSE_ENCODING_CHARSET;
 	public static final String REPO_SUFFIX_VERSION = "/version";
@@ -407,7 +409,7 @@ public class SynapseJavascriptClient {
 		requestBuilder.configure(DELETE, url);
 		requestBuilder.setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
 		if (authController.isLoggedIn()) {
-			requestBuilder.setHeader(SESSION_TOKEN_HEADER, authController.getCurrentUserAccessToken());
+			requestBuilder.setHeader(AUTHORIZATION_HEADER, BEARER_PREFIX + authController.getCurrentUserAccessToken());
 		}
 		// never cancel a DELETE request
 		boolean canCancel = false;
@@ -429,14 +431,14 @@ public class SynapseJavascriptClient {
 		return doGet(url, responseType, acceptedResponseType, sessionToken, canCancel, callback);
 	}
 	
-	private Request doGet(String url, OBJECT_TYPE responseType, String acceptedResponseType, String sessionToken, boolean canCancel, AsyncCallback callback) {
+	private Request doGet(String url, OBJECT_TYPE responseType, String acceptedResponseType, String accessToken, boolean canCancel, AsyncCallback callback) {
 		RequestBuilderWrapper requestBuilder = ginInjector.getRequestBuilder();
 		requestBuilder.configure(GET, url);
 		if (acceptedResponseType != null) {
 			requestBuilder.setHeader(ACCEPT, acceptedResponseType);
 		}
-		if (sessionToken != null) {
-			requestBuilder.setHeader(SESSION_TOKEN_HEADER, sessionToken);
+		if (accessToken != null) {
+			requestBuilder.setHeader(AUTHORIZATION_HEADER, BEARER_PREFIX + accessToken);
 		}
 		return sendRequest(requestBuilder, null, responseType, INITIAL_RETRY_REQUEST_DELAY_MS, canCancel, callback);
 	}
@@ -458,7 +460,7 @@ public class SynapseJavascriptClient {
 		requestBuilder.setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
 		requestBuilder.setHeader(CONTENT_TYPE, APPLICATION_JSON_CHARSET_UTF8);
 		if (authController.isLoggedIn()) {
-			requestBuilder.setHeader(SESSION_TOKEN_HEADER, authController.getCurrentUserAccessToken());
+			requestBuilder.setHeader(AUTHORIZATION_HEADER, BEARER_PREFIX + authController.getCurrentUserAccessToken());
 		}
 		return sendRequest(requestBuilder, requestData, responseType, INITIAL_RETRY_REQUEST_DELAY_MS, canCancel, callback);
 	}
@@ -1832,7 +1834,7 @@ public class SynapseJavascriptClient {
 		requestBuilder.setHeader(CONTENT_TYPE, "text/plain");
 
 		if (authController.isLoggedIn()) {
-			requestBuilder.setHeader(SESSION_TOKEN_HEADER, authController.getCurrentUserAccessToken());
+			requestBuilder.setHeader(AUTHORIZATION_HEADER, BEARER_PREFIX + authController.getCurrentUserAccessToken());
 		}
 		sendRequest(requestBuilder, token, OBJECT_TYPE.String, INITIAL_RETRY_REQUEST_DELAY_MS, false, cb);
 	}

@@ -26,7 +26,7 @@ public interface AuthenticationController {
 	 * 
 	 * @param callback
 	 */
-	void initializeFromExistingAccessCookie(final AsyncCallback<UserProfile> callback);
+	void initializeFromExistingAccessTokenCookie(final AsyncCallback<UserProfile> callback);
 
 	/**
 	 * Terminates the session of the current user

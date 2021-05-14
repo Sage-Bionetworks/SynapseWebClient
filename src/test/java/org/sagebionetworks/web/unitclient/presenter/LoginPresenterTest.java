@@ -84,7 +84,7 @@ public class LoginPresenterTest {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(userId);
 		AsyncMockStubber.callSuccessWith(mockUserProfile).when(mockAuthenticationController).setNewAccessToken(anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(mockUserProfile).when(mockAuthenticationController).initializeFromExistingAccessCookie(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockUserProfile).when(mockAuthenticationController).initializeFromExistingAccessTokenCookie(any(AsyncCallback.class));
 	}
 
 	@Test
@@ -127,7 +127,7 @@ public class LoginPresenterTest {
 		loginPresenter.onAcceptTermsOfUse();
 
 		verify(mockAuthenticationController).signTermsOfUse(any(AsyncCallback.class));
-		verify(mockAuthenticationController).initializeFromExistingAccessCookie(any(AsyncCallback.class));
+		verify(mockAuthenticationController).initializeFromExistingAccessTokenCookie(any(AsyncCallback.class));
 		// verify we only showed this once:
 		verify(mockView).showTermsOfUse(eq(false));
 		// go to the last place (or the user dashboard Profile place if last place is not set)

@@ -211,7 +211,7 @@ public class AuthenticationControllerImplTest {
 	public void testNoUserChange() {
 		// if we invoke checkForUserChange(), if the user does not change we should update the session
 		// cookie expiration (via the initSession call).
-		authenticationController.initializeFromExistingAccessCookie(mockUserProfileCallback);
+		authenticationController.initializeFromExistingAccessTokenCookie(mockUserProfileCallback);
 		verify(mockJsClient, never()).initSession(anyString(), any(AsyncCallback.class));
 
 		authenticationController.checkForUserChange();
@@ -222,7 +222,7 @@ public class AuthenticationControllerImplTest {
 	@Test
 	public void testCheckForUserChangeWithoutNetwork() {
 		// if we invoke checkForUserChange(), if the user does not change we should update the session
-		authenticationController.initializeFromExistingAccessCookie(mockUserProfileCallback);
+		authenticationController.initializeFromExistingAccessTokenCookie(mockUserProfileCallback);
 		verify(mockJsClient, never()).initSession(anyString(), any(AsyncCallback.class));
 		Exception scEx = new StatusCodeException(0, "0 ");
 		when(mockJsClient.getAccessToken()).thenReturn(getFailedFuture(scEx));

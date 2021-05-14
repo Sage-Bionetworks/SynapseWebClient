@@ -77,7 +77,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 				// Have to get the UserSessionData again,
 				// since it won't contain the UserProfile if the terms haven't been signed
 				synAlert.clear();
-				authenticationController.initializeFromExistingAccessCookie(new AsyncCallback<UserProfile>() {
+				authenticationController.initializeFromExistingAccessTokenCookie(new AsyncCallback<UserProfile>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						synAlert.handleException(caught);

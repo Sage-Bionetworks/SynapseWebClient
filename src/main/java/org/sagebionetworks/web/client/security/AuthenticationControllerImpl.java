@@ -23,12 +23,15 @@ import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Down;
+import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
 import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.common.util.concurrent.FluentFuture;
+import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -122,35 +125,49 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 
 			@Override
 			public void onSuccess(Void result) {
-				initializeFromExistingAccessCookie(callback);
+				initializeFromExistingAccessTokenCookie(callback);
 			}
 		});
 	}
 
 	/**
-	 * Access cookie should be set before this call
+	 * Access token cookie should be set before this call
 	 * 
 	 * @param callback
 	 */
-	public void initializeFromExistingAccessCookie(AsyncCallback<UserProfile> callback) {
-		// ask for these in parallel
-		ListenableFuture<String> accessTokenFuture;
-		ListenableFuture<UserProfile> userProfileFuture;
+	public void initializeFromExistingAccessTokenCookie(AsyncCallback<UserProfile> callback) {
+		// attempt to detect the current access token.  if found, get the associated user profile.  if forbidden (due to ToU), send to ToU page.
+		FluentFuture<String> accessTokenFuture = ginInjector.getSynapseJavascriptClient().getAccessToken();
+		accessTokenFuture.addCallback(new FutureCallback<String>() {
+			@Override
+			public void onSuccess(String accessToken) {
+				cookies.setCookie(CookieKeys.USER_LOGGED_IN_RECENTLY, "true", DateTimeUtilsImpl.getWeekFromNow());
+				currentUserAccessToken = accessToken;
+				FluentFuture<UserProfile> userProfileFuture = ginInjector.getSynapseJavascriptClient().getMyUserProfile();
+				userProfileFuture.addCallback(new FutureCallback<UserProfile>() {
+					@Override
+					public void onSuccess(UserProfile profile) {
+						currentUserProfile = profile;
+						ginInjector.getSessionDetector().initializeAccessTokenState();
+						jsniUtils.setAnalyticsUserId(getCurrentUserPrincipalId());
+						callback.onSuccess(currentUserProfile);
+					}
+					@Override
+					public void onFailure(Throwable t) {
+						if (t instanceof ForbiddenException && ((ForbiddenException)t).getMessage().toLowerCase().contains("terms of use")) {
+							ginInjector.getGlobalApplicationState().getPlaceChanger().goTo(new LoginPlace(LoginPlace.SHOW_TOU));
+						} else {
+							callback.onFailure(t);
+						}
+					}
+				}, directExecutor());
+				
+			}
 
-		accessTokenFuture = ginInjector.getSynapseJavascriptClient().getAccessToken();
-		userProfileFuture = ginInjector.getSynapseJavascriptClient().getMyUserProfile();
-		FluentFuture.from(whenAllComplete(accessTokenFuture, userProfileFuture).call(() -> {
-			cookies.setCookie(CookieKeys.USER_LOGGED_IN_RECENTLY, "true", DateTimeUtilsImpl.getWeekFromNow());
-			// Retrieve the resolved values from the futures
-			currentUserAccessToken = getDone(accessTokenFuture);
-			currentUserProfile = getDone(userProfileFuture);
-			ginInjector.getSessionDetector().initializeAccessTokenState();
-			jsniUtils.setAnalyticsUserId(getCurrentUserPrincipalId());
-			callback.onSuccess(currentUserProfile);
-			return null;
-		}, directExecutor())).catching(Throwable.class, e -> {
-			callback.onFailure(e);
-			return null;
+			@Override
+			public void onFailure(Throwable t) {
+				callback.onFailure(t);
+			}
 		}, directExecutor());
 	}
 
@@ -229,7 +246,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	@Override
 	public void checkForUserChange() {
 		String oldUserAccessToken = currentUserAccessToken;
-		initializeFromExistingAccessCookie(new AsyncCallback<UserProfile>() {
+		initializeFromExistingAccessTokenCookie(new AsyncCallback<UserProfile>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				// if the exception was not due to a network failure, then log the user out
