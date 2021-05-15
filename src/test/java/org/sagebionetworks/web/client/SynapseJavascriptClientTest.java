@@ -236,7 +236,7 @@ public class SynapseJavascriptClientTest {
 		String url = REPO_ENDPOINT + ENTITY + "/" + entityId + BUNDLE2;
 		verify(mockRequestBuilder).configure(POST, url);
 		verify(mockRequestBuilder).setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
-		verify(mockRequestBuilder, never()).setHeader(AUTHORIZATION_HEADER, anyString());
+		verify(mockRequestBuilder, never()).setHeader(eq(AUTHORIZATION_HEADER), anyString());
 
 		verify(mockRequestBuilder).sendRequest(anyString(), requestCallbackCaptor.capture());
 		RequestCallback requestCallback = requestCallbackCaptor.getValue();

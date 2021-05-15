@@ -207,17 +207,7 @@ public class AuthenticationControllerImplTest {
 		verify(loginCallback).onFailure(ex);
 	}
 
-	@Test
-	public void testNoUserChange() {
-		// if we invoke checkForUserChange(), if the user does not change we should update the session
-		// cookie expiration (via the initSession call).
-		authenticationController.initializeFromExistingAccessTokenCookie(mockUserProfileCallback);
-		verify(mockJsClient, never()).initSession(anyString(), any(AsyncCallback.class));
-
-		authenticationController.checkForUserChange();
-		
-		verify(mockJsClient).initSession(eq(ACCESS_TOKEN), any(AsyncCallback.class));
-	}
+	// Note: We do not update the access token cookie expiration (since the access token will expire)
 	
 	@Test
 	public void testCheckForUserChangeWithoutNetwork() {

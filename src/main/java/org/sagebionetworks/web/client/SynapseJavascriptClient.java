@@ -529,8 +529,7 @@ public class SynapseJavascriptClient {
 							ErrorResponseCode responseCode = null;
 							try {
 								// try to get the reason
-								responseText = response.getText();
-								JSONObjectAdapter jsonObject = jsonObjectAdapter.createNew(responseText);
+								JSONObjectAdapter jsonObject = jsonObjectAdapter.createNew(response.getText());
 								if (jsonObject.has("reason")) {
 									responseText = jsonObject.get("reason").toString();
 								}
