@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.security;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
@@ -37,10 +38,12 @@ import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.QuarantinedEmailModal;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -103,8 +106,8 @@ public class AuthenticationControllerImplTest {
 		AsyncMockStubber.callSuccessWith(null).when(mockJsClient).initSession(anyString(), any(AsyncCallback.class));
 		profile = new UserProfile();
 		profile.setOwnerId(USER_ID);
-		when(mockJsClient.getMyUserProfile()).thenReturn(getDoneFuture(profile));
 		when(mockJsClient.getAccessToken()).thenReturn(getDoneFuture(ACCESS_TOKEN));
+		when(mockJsClient.getMyUserProfile()).thenReturn(getDoneFuture(profile));
 		AsyncMockStubber.callSuccessWith(mockNotificationEmail).when(mockJsClient).getNotificationEmail(any(AsyncCallback.class));
 		when(mockGinInjector.getSynapseJavascriptClient()).thenReturn(mockJsClient);
 		authenticationController = new AuthenticationControllerImpl(mockUserAccountService, mockClientCache, mockSessionStorage, mockCookieProvider, mockGinInjector, mockSynapseJSNIUtils);
@@ -191,8 +194,21 @@ public class AuthenticationControllerImplTest {
 		verify(mockSynapseJSNIUtils).setAnalyticsUserId(USER_ID);
 	}
 
-	// if user attempts to log in without accepting the terms of use, then then react component should send you to the Synapse ToU page. 
+	@Test
+	public void testLoginUserNotAcceptedTermsOfUse() {
+		// access token is returned without error (it's set and valid), but getMyProfile() fails with a special ForbiddenException
+		when(mockJsClient.getMyUserProfile()).thenReturn(getFailedFuture(new ForbiddenException("Terms of use have not been signed.")));
+		
+		authenticationController.initializeFromExistingAccessTokenCookie(mockUserProfileCallback);
 
+		assertNull(authenticationController.getCurrentUserProfile());
+		verify(mockSessionDetector).initializeAccessTokenState();
+		verify(mockPlaceChanger).goTo(placeCaptor.capture());
+		Place place = placeCaptor.getValue();
+		assertTrue(place instanceof LoginPlace);
+		assertEquals(LoginPlace.SHOW_TOU, ((LoginPlace) place).toToken());
+	}
+	
 	@Test
 	public void testLoginUserFailure() {
 		Exception ex = new Exception("invalid login");

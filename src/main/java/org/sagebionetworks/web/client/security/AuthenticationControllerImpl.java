@@ -152,6 +152,8 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 					}
 					@Override
 					public void onFailure(Throwable t) {
+						currentUserProfile = null;
+						ginInjector.getSessionDetector().initializeAccessTokenState();
 						if (t instanceof ForbiddenException && ((ForbiddenException)t).getMessage().toLowerCase().contains("terms of use")) {
 							ginInjector.getGlobalApplicationState().getPlaceChanger().goTo(new LoginPlace(LoginPlace.SHOW_TOU));
 						} else {
