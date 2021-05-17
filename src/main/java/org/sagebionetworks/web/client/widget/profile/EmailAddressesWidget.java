@@ -71,18 +71,19 @@ public class EmailAddressesWidget implements EmailAddressesWidgetView.Presenter,
 
 	public void configure(final UserProfile profile) {
 		this.profile = profile;
-		clear();
 		if (authenticationController.isLoggedIn() && authenticationController.getCurrentUserPrincipalId().equals(profile.getOwnerId())) {
 			view.setLoadingVisible(true);
 			jsClient.getNotificationEmail(new AsyncCallback<NotificationEmail>() {
 				@Override
 				public void onFailure(Throwable caught) {
+					clear();
 					view.setLoadingVisible(false);
 					synAlert.handleException(caught);
 				}
 
 				@Override
 				public void onSuccess(NotificationEmail notificationEmail) {
+					clear();
 					view.setLoadingVisible(false);
 					view.addPrimaryEmail(notificationEmail.getEmail(), AuthenticationControllerImpl.isQuarantined(notificationEmail.getQuarantineStatus()));
 					for (String email : profile.getEmails()) {
