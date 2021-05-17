@@ -151,7 +151,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}
 
 	@Override
-	public String getSessionCookieUrl() {
+	public String getAccessTokenCookieUrl() {
 		return GWTWrapperImpl.getRealGWTModuleBaseURL() + WebConstants.SESSION_COOKIE_SERVLET;
 	}
 	

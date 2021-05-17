@@ -93,13 +93,13 @@ public class NewAccountPresenter extends AbstractActivity implements NewAccountV
 		EmailValidationSignedToken emailValidationSignedToken = accountCreationToken.getEmailValidationSignedToken();
 		userAccountService.createUserStep2(userName.trim(), fName.trim(), lName.trim(), password, emailValidationSignedToken, new AsyncCallback<String>() {
 			@Override
-			public void onSuccess(String sessionToken) {
+			public void onSuccess(String accessToken) {
 				view.setLoading(false);
 				// success, send to login place to continue login process (sign terms of use)
 				if (accountCreationToken.getEncodedMembershipInvtnSignedToken() != null) {
 					globalAppState.setLastPlace(new EmailInvitation(accountCreationToken.getEncodedMembershipInvtnSignedToken()));
 				}
-				globalAppState.getPlaceChanger().goTo(new LoginPlace(sessionToken));
+				globalAppState.getPlaceChanger().goTo(new LoginPlace(accessToken));
 			}
 
 			@Override

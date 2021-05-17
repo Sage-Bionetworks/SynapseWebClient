@@ -65,7 +65,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	public void onAcceptTermsOfUse() {
 		synAlert.clear();
 		view.showLoggingInLoader();
-		authenticationController.signTermsOfUse(true, new AsyncCallback<Void>() {
+		authenticationController.signTermsOfUse(new AsyncCallback<Void>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
@@ -77,7 +77,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 				// Have to get the UserSessionData again,
 				// since it won't contain the UserProfile if the terms haven't been signed
 				synAlert.clear();
-				authenticationController.initializeFromExistingSessionCookie(new AsyncCallback<UserProfile>() {
+				authenticationController.initializeFromExistingAccessTokenCookie(new AsyncCallback<UserProfile>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						synAlert.handleException(caught);
@@ -133,9 +133,9 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		} else if (CHANGE_USERNAME.equals(token) && authenticationController.isLoggedIn()) {
 			// go to the change username page
 			gotoChangeUsernamePlace();
-		} else if (SHOW_TOU.equals(token) && authenticationController.getCurrentUserSessionToken() != null) {
+		} else if (SHOW_TOU.equals(token) && authenticationController.getCurrentUserAccessToken() != null) {
 			showTermsOfUse(false);
-		} else if (SHOW_SIGNED_TOU.equals(token) && authenticationController.getCurrentUserSessionToken() != null) {
+		} else if (SHOW_SIGNED_TOU.equals(token) && authenticationController.getCurrentUserAccessToken() != null) {
 			showTermsOfUse(true);
 		} else if (!recognizedTokens.contains(token) && !"".equals(token) && token != null) {
 			revalidateSession(token);
@@ -194,7 +194,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	public void userAuthenticated() {
 		view.hideLoggingInLoader();
 		// the user should be logged in now.
-		if (authenticationController.getCurrentUserSessionToken() == null) {
+		if (authenticationController.getCurrentUserAccessToken() == null) {
 			view.showErrorMessage("An error occurred during login. Please try logging in again.");
 			view.showLogin();
 		} else {
@@ -221,7 +221,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 				}
 			};
 
-			authenticationController.setNewSessionToken(token, callback);
+			authenticationController.setNewAccessToken(token, callback);
 		}
 	}
 }

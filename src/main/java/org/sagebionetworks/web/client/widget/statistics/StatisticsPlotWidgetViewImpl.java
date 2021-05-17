@@ -45,19 +45,19 @@ public class StatisticsPlotWidgetViewImpl implements StatisticsPlotWidgetView, I
 	}
 
 	@Override
-	public void configureAndShow(String projectId, String sessionToken) {
-		_createSRCWidget(srcContainer.getElement(), projectId, sessionToken, endpoint);
+	public void configureAndShow(String projectId, String accessToken) {
+		_createSRCWidget(srcContainer.getElement(), projectId, accessToken, endpoint);
 		statsPlotModal.show();
 	}
 
-	private static native void _createSRCWidget(Element el, String projectId, String sessionToken, String fullRepoEndpoint) /*-{
+	private static native void _createSRCWidget(Element el, String projectId, String accessToken, String fullRepoEndpoint) /*-{
 		try {
 			// URL.host returns the domain (that is the hostname) followed by (if a port was specified) a ':' and the port of the URL
 			var repoURL = new URL(fullRepoEndpoint);
 			var rootRepoEndpoint = repoURL.protocol + '//' + repoURL.host;
 
 			var props = {
-				token : sessionToken,
+				token : accessToken,
 				request : {
 					concreteType : 'org.sagebionetworks.repo.model.statistics.ProjectFilesStatisticsRequest',
 					objectId : projectId,

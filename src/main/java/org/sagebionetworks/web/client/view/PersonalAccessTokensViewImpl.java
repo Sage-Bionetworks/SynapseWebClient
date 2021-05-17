@@ -49,15 +49,15 @@ public class PersonalAccessTokensViewImpl extends Composite implements PersonalA
 	@Override
 	public void render() {
 		Window.scrollTo(0, 0); // scroll user to top of page
-		_showPersonalAccessTokensComponent(container.getElement(), authController.getCurrentUserSessionToken());
+		_showPersonalAccessTokensComponent(container.getElement(), authController.getCurrentUserAccessToken());
 	}
 
-	private static native void _showPersonalAccessTokensComponent(Element el, String sessionToken) /*-{
+	private static native void _showPersonalAccessTokensComponent(Element el, String accessToken) /*-{
 		try {
 			var props = {
 			  	title: "Personal Access Tokens",
 				body: "Issue personal access tokens to access your Synapse resources in the command line clients. A personal access token will expire if it is unused for 180 consecutive days. You may create up to 100 personal access tokens.",
-				token: sessionToken,
+				token: accessToken,
 			};
 			$wnd.ReactDOM.render($wnd.React.createElement(
 					$wnd.SRC.SynapseComponents.AccessTokenPage, props, null),

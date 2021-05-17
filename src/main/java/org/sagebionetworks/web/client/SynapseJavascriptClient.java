@@ -21,16 +21,17 @@ import static org.sagebionetworks.web.shared.WebConstants.FILE_SERVICE_URL_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.NRGR_SYNAPSE_GLUE_ENDPOINT_PROPERTY;
 import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.SYNAPSE_VERSION_KEY;
+import org.sagebionetworks.web.shared.WebConstants;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.sagebionetworks.client.exceptions.SynapseException;
+
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessRequirement;
@@ -72,7 +73,6 @@ import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.auth.ChangePasswordInterface;
 import org.sagebionetworks.repo.model.auth.LoginRequest;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
-import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.auth.Username;
 import org.sagebionetworks.repo.model.dataaccess.AccessApprovalNotificationRequest;
 import org.sagebionetworks.repo.model.dataaccess.AccessApprovalNotificationResponse;
@@ -147,6 +147,7 @@ import org.sagebionetworks.web.client.cache.EntityId2BundleCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
+import org.sagebionetworks.web.shared.AccessTokenWrapper;
 import org.sagebionetworks.web.shared.TeamMemberBundle;
 import org.sagebionetworks.web.shared.TeamMemberPagedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -164,6 +165,7 @@ import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 import org.sagebionetworks.web.shared.exceptions.TooManyRequestsException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
+
 import com.google.common.base.Joiner;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.gwt.http.client.Request;
@@ -184,7 +186,6 @@ import com.google.inject.Inject;
 public class SynapseJavascriptClient {
 	public static final String BUNDLE2 = "/bundle2";
 	public static final String TABLE_SNAPSHOT = "/table/snapshot";
-	public static final String SESSION = "/session";
 	public static final String TYPE_FILTER_PARAMETER = "&typeFilter=";
 	public static final String CHALLENGE = "/challenge";
 	public static final String WIKI = "/wiki/";
@@ -244,7 +245,8 @@ public class SynapseJavascriptClient {
 	public static final String USER = "/user";
 	public static final String BUNDLE_MASK_PATH = "/bundle?mask=";
 	public static final String ACCEPT = "Accept";
-	public static final String SESSION_TOKEN_HEADER = "sessionToken";
+	public static final String AUTHORIZATION_HEADER = "authorization";
+	public static final String BEARER_PREFIX = "Bearer ";
 	public static final String SYNAPSE_ENCODING_CHARSET = "UTF-8";
 	public static final String APPLICATION_JSON_CHARSET_UTF8 = "application/json; charset=" + SYNAPSE_ENCODING_CHARSET;
 	public static final String REPO_SUFFIX_VERSION = "/version";
@@ -361,7 +363,7 @@ public class SynapseJavascriptClient {
 	 * @param forUrl
 	 * @return
 	 */
-	public List<Request> getRequests(String forUrl) {
+	public List<Request> getCancellableRequests(String forUrl) {
 		return requestsMap.get(forUrl);
 	}
 
@@ -407,7 +409,7 @@ public class SynapseJavascriptClient {
 		requestBuilder.configure(DELETE, url);
 		requestBuilder.setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
 		if (authController.isLoggedIn()) {
-			requestBuilder.setHeader(SESSION_TOKEN_HEADER, authController.getCurrentUserSessionToken());
+			requestBuilder.setHeader(AUTHORIZATION_HEADER, BEARER_PREFIX + authController.getCurrentUserAccessToken());
 		}
 		// never cancel a DELETE request
 		boolean canCancel = false;
@@ -415,28 +417,28 @@ public class SynapseJavascriptClient {
 	}
 
 	private Request doGet(String url, OBJECT_TYPE responseType, AsyncCallback callback) {
-		return doGet(url, responseType, APPLICATION_JSON_CHARSET_UTF8, authController.getCurrentUserSessionToken(), callback);
+		return doGet(url, responseType, APPLICATION_JSON_CHARSET_UTF8, authController.getCurrentUserAccessToken(), callback);
 	}
 
 	public Request doGetString(String url, boolean forceAnonymous, AsyncCallback callback) {
-		String sessionToken = forceAnonymous ? null : authController.getCurrentUserSessionToken();
-		return doGet(url, OBJECT_TYPE.String, null, sessionToken, callback);
+		String accessToken = forceAnonymous ? null : authController.getCurrentUserAccessToken();
+		return doGet(url, OBJECT_TYPE.String, null, accessToken, callback);
 	}
 
-	private Request doGet(String url, OBJECT_TYPE responseType, String acceptedResponseType, String sessionToken, AsyncCallback callback) {
+	private Request doGet(String url, OBJECT_TYPE responseType, String acceptedResponseType, String accessToken, AsyncCallback callback) {
 		// can almost always cancel a GET request
 		boolean canCancel = true;
-		return doGet(url, responseType, acceptedResponseType, sessionToken, canCancel, callback);
+		return doGet(url, responseType, acceptedResponseType, accessToken, canCancel, callback);
 	}
 	
-	private Request doGet(String url, OBJECT_TYPE responseType, String acceptedResponseType, String sessionToken, boolean canCancel, AsyncCallback callback) {
+	private Request doGet(String url, OBJECT_TYPE responseType, String acceptedResponseType, String accessToken, boolean canCancel, AsyncCallback callback) {
 		RequestBuilderWrapper requestBuilder = ginInjector.getRequestBuilder();
 		requestBuilder.configure(GET, url);
 		if (acceptedResponseType != null) {
 			requestBuilder.setHeader(ACCEPT, acceptedResponseType);
 		}
-		if (sessionToken != null) {
-			requestBuilder.setHeader(SESSION_TOKEN_HEADER, sessionToken);
+		if (accessToken != null) {
+			requestBuilder.setHeader(AUTHORIZATION_HEADER, BEARER_PREFIX + accessToken);
 		}
 		return sendRequest(requestBuilder, null, responseType, INITIAL_RETRY_REQUEST_DELAY_MS, canCancel, callback);
 	}
@@ -458,7 +460,7 @@ public class SynapseJavascriptClient {
 		requestBuilder.setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
 		requestBuilder.setHeader(CONTENT_TYPE, APPLICATION_JSON_CHARSET_UTF8);
 		if (authController.isLoggedIn()) {
-			requestBuilder.setHeader(SESSION_TOKEN_HEADER, authController.getCurrentUserSessionToken());
+			requestBuilder.setHeader(AUTHORIZATION_HEADER, BEARER_PREFIX + authController.getCurrentUserAccessToken());
 		}
 		return sendRequest(requestBuilder, requestData, responseType, INITIAL_RETRY_REQUEST_DELAY_MS, canCancel, callback);
 	}
@@ -827,6 +829,10 @@ public class SynapseJavascriptClient {
 		}
 	}
 
+	public FluentFuture<UserProfile> getMyUserProfile() {
+		return getUserProfile(null);
+	}
+	
 	public FluentFuture<UserProfile> getUserProfile(String userId) {
 		String url = getRepoServiceUrl() + USER_PROFILE_PATH;
 		// If userId is null, we get the current user's profile.
@@ -1200,12 +1206,12 @@ public class SynapseJavascriptClient {
 	public FluentFuture<List<ColumnModel>> getDefaultColumnsForView(int viewTypeMask) {
 		String url = getRepoServiceUrl() + COLUMN_VIEW_DEFAULT + "?viewTypeMask="+viewTypeMask;
 		boolean canCancel = false;
-		return getFuture(cb -> doGet(url, OBJECT_TYPE.ListWrapperColumnModel, APPLICATION_JSON_CHARSET_UTF8, authController.getCurrentUserSessionToken(), canCancel, cb));
+		return getFuture(cb -> doGet(url, OBJECT_TYPE.ListWrapperColumnModel, APPLICATION_JSON_CHARSET_UTF8, authController.getCurrentUserAccessToken(), canCancel, cb));
 	}
 	public FluentFuture<List<ColumnModel>> getDefaultColumnsForView(ViewEntityType viewEntityType) {
 		String url = getRepoServiceUrl() + COLUMN_VIEW_DEFAULT + "?viewEntityType=" + viewEntityType.name();
 		boolean canCancel = false;
-		return getFuture(cb -> doGet(url, OBJECT_TYPE.ListWrapperColumnModel, APPLICATION_JSON_CHARSET_UTF8, authController.getCurrentUserSessionToken(), canCancel, cb));
+		return getFuture(cb -> doGet(url, OBJECT_TYPE.ListWrapperColumnModel, APPLICATION_JSON_CHARSET_UTF8, authController.getCurrentUserAccessToken(), canCancel, cb));
 	}
 
 
@@ -1258,15 +1264,8 @@ public class SynapseJavascriptClient {
 	}
 
 	public void login(LoginRequest loginRequest, AsyncCallback<LoginResponse> callback) {
-		String url = getAuthServiceUrl() + "/login";
+		String url = getAuthServiceUrl() + "/login2";
 		doPost(url, loginRequest, OBJECT_TYPE.LoginResponse, false, callback);
-	}
-
-	public void logout() {
-		if (authController.isLoggedIn()) {
-			String url = getAuthServiceUrl() + SESSION;
-			doDelete(url, null);
-		}
 	}
 
 	public void getMyProjects(ProjectListType projectListType, int limit, String nextPageToken, ProjectListSortColumn sortBy, SortDirection sortDir, AsyncCallback<ProjectHeaderList> projectHeadersCallback) {
@@ -1534,16 +1533,20 @@ public class SynapseJavascriptClient {
 	}
 
 	/**
-	 * call to ask the server to set the session cookie
+	 * call to ask the server to set the access token cookie
 	 * 
 	 * @param token
 	 * @param callback
 	 */
 	public void initSession(String token, AsyncCallback<Void> callback) {
-		Session s = new Session();
-		s.setSessionToken(token);
-		String url = jsniUtils.getSessionCookieUrl();
-		doPost(url, s, OBJECT_TYPE.None, false, callback);
+		AccessTokenWrapper t = new AccessTokenWrapper();
+		t.setToken(token);
+		String url = jsniUtils.getAccessTokenCookieUrl();
+		doPost(url, t, OBJECT_TYPE.None, false, callback);
+	}
+	
+	public FluentFuture<String> getAccessToken() {
+		return getFuture(cb -> doGet(jsniUtils.getAccessTokenCookieUrl()+"?"+WebConstants.VALIDATE_QUERY_PARAMETER_KEY + "=true", OBJECT_TYPE.String, cb));
 	}
 
 	public void subscribe(Topic topic, AsyncCallback<Subscription> callback) {
@@ -1673,21 +1676,6 @@ public class SynapseJavascriptClient {
 		String signedTokenEndpoint = gwt.encodeQueryString(gwt.getHostPageBaseURL() + SIGNED_TOKEN);
 		String url = getRepoServiceUrl() + TEAM + "/" + teamId + MEMBER + "/" + userId + "?teamEndpoint=" + teamEndpoint + "&notificationUnsubscribeEndpoint=" + signedTokenEndpoint;
 		doPut(url, null, OBJECT_TYPE.None, cb);
-	}
-
-	/**
-	 * If logged in, refresh the current session token to render it usable for another 24 hours
-	 */
-	public void refreshCurrentSessionToken() {
-		if (authController.isLoggedIn()) {
-			String url = getAuthServiceUrl() + SESSION;
-			Session session = new Session();
-			session.setSessionToken(authController.getCurrentUserSessionToken());
-			doPut(url, session, OBJECT_TYPE.None, null);
-
-			// also set the session cookie (to update the expiration)
-			initSession(authController.getCurrentUserSessionToken());
-		}
 	}
 
 	public void getTeamMembers(String teamId, String fragment, TeamMemberTypeFilterOptions memberType, Integer limit, Integer offset, AsyncCallback<TeamMemberPagedResults> callback) {
@@ -1846,7 +1834,7 @@ public class SynapseJavascriptClient {
 		requestBuilder.setHeader(CONTENT_TYPE, "text/plain");
 
 		if (authController.isLoggedIn()) {
-			requestBuilder.setHeader(SESSION_TOKEN_HEADER, authController.getCurrentUserSessionToken());
+			requestBuilder.setHeader(AUTHORIZATION_HEADER, BEARER_PREFIX + authController.getCurrentUserAccessToken());
 		}
 		sendRequest(requestBuilder, token, OBJECT_TYPE.String, INITIAL_RETRY_REQUEST_DELAY_MS, false, cb);
 	}

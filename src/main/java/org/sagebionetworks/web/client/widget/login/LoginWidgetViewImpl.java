@@ -45,7 +45,7 @@ public class LoginWidgetViewImpl implements LoginWidgetView, IsWidget {
 	public void postLogin() {
 		Place defaultPlace = new Profile(Profile.VIEW_PROFILE_TOKEN, ProfileArea.PROJECTS);
 		globalAppState.gotoLastPlace(defaultPlace);
-		authController.checkForUserChange();
+		authController.checkForUserChange(null);
 	}
 
 	private static native void _createSRCLogin(Element el, LoginWidgetViewImpl loginWidgetView,

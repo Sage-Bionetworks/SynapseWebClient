@@ -34,7 +34,7 @@ public class SynapseClientBaseTest {
 	HttpServletRequest mockRequest;
 
 	String userIp = "127.0.0.1";
-	public static final String ENDPOINT_PREFIX = "endpointprefix";
+	public static final String ENDPOINT_PREFIX = "https://repo-test.prod.sagebase.org";
 	public static final String FILE_BASE = ENDPOINT_PREFIX + "/file/v1";
 	public static final String AUTH_BASE = ENDPOINT_PREFIX + "/auth/v1";
 	public static final String REPO_BASE = ENDPOINT_PREFIX + "/repo/v1";
@@ -64,7 +64,7 @@ public class SynapseClientBaseTest {
 		String sessionToken = "fakeSessionToken";
 		SynapseClient createdClient = synapseClientBase.createSynapseClient(sessionToken);
 		assertEquals(mockSynapseClient, createdClient);
-		verify(mockSynapseClient).setSessionToken(sessionToken);
+		verify(mockSynapseClient).setBearerAuthorizationToken(sessionToken);
 		verify(mockSynapseClient).setRepositoryEndpoint(REPO_BASE);
 		verify(mockSynapseClient).setAuthEndpoint(AUTH_BASE);
 		verify(mockSynapseClient).setFileEndpoint(FILE_BASE);

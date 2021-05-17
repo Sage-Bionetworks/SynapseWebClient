@@ -3,7 +3,6 @@ package org.sagebionetworks.web.unitclient.presenter;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
@@ -84,8 +83,8 @@ public class LoginPresenterTest {
 		verify(mockView).setPresenter(loginPresenter);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(userId);
-		AsyncMockStubber.callSuccessWith(mockUserProfile).when(mockAuthenticationController).setNewSessionToken(anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(mockUserProfile).when(mockAuthenticationController).initializeFromExistingSessionCookie(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockUserProfile).when(mockAuthenticationController).setNewAccessToken(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockUserProfile).when(mockAuthenticationController).initializeFromExistingAccessTokenCookie(any(AsyncCallback.class));
 	}
 
 	@Test
@@ -117,18 +116,18 @@ public class LoginPresenterTest {
 	@Test
 	public void testSetPlaceShowAndAcceptToU() {
 		when(mockLoginPlace.toToken()).thenReturn(LoginPlace.SHOW_TOU);
-		when(mockAuthenticationController.getCurrentUserSessionToken()).thenReturn("valid session token");
+		when(mockAuthenticationController.getCurrentUserAccessToken()).thenReturn("valid session token");
 
 		// method under test
 		loginPresenter.setPlace(mockLoginPlace);
 
 		verify(mockView).showTermsOfUse(eq(false));
-		AsyncMockStubber.callSuccessWith(null).when(mockAuthenticationController).signTermsOfUse(anyBoolean(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockAuthenticationController).signTermsOfUse(any(AsyncCallback.class));
 
 		loginPresenter.onAcceptTermsOfUse();
 
-		verify(mockAuthenticationController).signTermsOfUse(eq(true), any(AsyncCallback.class));
-		verify(mockAuthenticationController).initializeFromExistingSessionCookie(any(AsyncCallback.class));
+		verify(mockAuthenticationController).signTermsOfUse(any(AsyncCallback.class));
+		verify(mockAuthenticationController).initializeFromExistingAccessTokenCookie(any(AsyncCallback.class));
 		// verify we only showed this once:
 		verify(mockView).showTermsOfUse(eq(false));
 		// go to the last place (or the user dashboard Profile place if last place is not set)
@@ -138,7 +137,7 @@ public class LoginPresenterTest {
 	@Test
 	public void testCancelToU() {
 		when(mockLoginPlace.toToken()).thenReturn(LoginPlace.SHOW_TOU);
-		when(mockAuthenticationController.getCurrentUserSessionToken()).thenReturn("valid session token");
+		when(mockAuthenticationController.getCurrentUserAccessToken()).thenReturn("valid session token");
 
 		loginPresenter.setPlace(mockLoginPlace);
 		loginPresenter.onCancelAcceptTermsOfUse();
@@ -149,14 +148,14 @@ public class LoginPresenterTest {
 		// simulate confirm
 		callbackCaptor.getValue().invoke();
 		
-		verify(mockAuthenticationController, never()).signTermsOfUse(eq(true), any(AsyncCallback.class));
+		verify(mockAuthenticationController, never()).signTermsOfUse(any(AsyncCallback.class));
 		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
 	}
 	
 	@Test
 	public void testSetPlaceShowAcceptedToU() {
 		when(mockLoginPlace.toToken()).thenReturn(LoginPlace.SHOW_SIGNED_TOU);
-		when(mockAuthenticationController.getCurrentUserSessionToken()).thenReturn("valid session token");
+		when(mockAuthenticationController.getCurrentUserAccessToken()).thenReturn("valid session token");
 
 		// method under test
 		loginPresenter.setPlace(mockLoginPlace);
@@ -171,11 +170,11 @@ public class LoginPresenterTest {
 	public void testSetPlaceSSOLogin() throws JSONObjectAdapterException {
 		String fakeToken = "0e79b99-4bf8-4999-b3a2-5f8c0a9499eb";
 		when(mockLoginPlace.toToken()).thenReturn(fakeToken);
-		when(mockAuthenticationController.getCurrentUserSessionToken()).thenReturn(fakeToken);
+		when(mockAuthenticationController.getCurrentUserAccessToken()).thenReturn(fakeToken);
 
 		loginPresenter.setPlace(mockLoginPlace);
 
-		verify(mockAuthenticationController).setNewSessionToken(eq(fakeToken), any(AsyncCallback.class));
+		verify(mockAuthenticationController).setNewAccessToken(eq(fakeToken), any(AsyncCallback.class));
 		verify(mockGlobalApplicationState).gotoLastPlace(any(Place.class));
 	}
 

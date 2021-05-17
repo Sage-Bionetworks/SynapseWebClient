@@ -30,7 +30,7 @@ public class ProjectAliasServlet extends HttpServlet {
 	private SynapseProvider synapseProvider = new SynapseProviderImpl();
 	private TokenProvider tokenProvider = new TokenProvider() {
 		@Override
-		public String getSessionToken() {
+		public String getToken() {
 			return UserDataProvider.getThreadLocalUserToken(ProjectAliasServlet.perThreadRequest.get());
 		}
 	};
@@ -74,7 +74,7 @@ public class ProjectAliasServlet extends HttpServlet {
 		response.setDateHeader(WebConstants.EXPIRES_KEY, 0L); // Proxy
 		String token = null;
 		try {
-			token = getSessionToken(request);
+			token = getToken(request);
 		} catch (Throwable e) {
 			// unable to get session token, so it's an anonymous request
 		}
@@ -108,8 +108,8 @@ public class ProjectAliasServlet extends HttpServlet {
 	 * @param request
 	 * @return
 	 */
-	public String getSessionToken(final HttpServletRequest request) {
-		return tokenProvider.getSessionToken();
+	public String getToken(final HttpServletRequest request) {
+		return tokenProvider.getToken();
 	}
 
 	/**
@@ -117,13 +117,13 @@ public class ProjectAliasServlet extends HttpServlet {
 	 *
 	 * @return
 	 */
-	private SynapseClient createNewClient(String sessionToken) {
+	private SynapseClient createNewClient(String accessToken) {
 		SynapseClient client = synapseProvider.createNewClient();
 		client.setAuthEndpoint(StackEndpoints.getAuthenticationServicePublicEndpoint());
 		client.setRepositoryEndpoint(StackEndpoints.getRepositoryServiceEndpoint());
 		client.setFileEndpoint(StackEndpoints.getFileServiceEndpoint());
-		if (sessionToken != null)
-			client.setSessionToken(sessionToken);
+		if (accessToken != null)
+			client.setBearerAuthorizationToken(accessToken);
 		return client;
 	}
 }

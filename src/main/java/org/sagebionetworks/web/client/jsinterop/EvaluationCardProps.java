@@ -14,7 +14,7 @@ public class EvaluationCardProps extends ReactComponentProps {
 	}
 
 	public EvaluationJSObject evaluation;
-	public String sessionToken;
+	public String accessToken;
 	public boolean utc;
 
 	public Callback onEdit;
@@ -23,10 +23,10 @@ public class EvaluationCardProps extends ReactComponentProps {
 	public Callback onDeleteSuccess;
 
 	@JsOverlay
-	public static EvaluationCardProps create(EvaluationJSObject evaluation, String sessionToken, boolean utc, Callback onEdit, Callback onModifyAccess, Callback onSubmit, Callback onDeleteSuccess) {
+	public static EvaluationCardProps create(EvaluationJSObject evaluation, String token, boolean utc, Callback onEdit, Callback onModifyAccess, Callback onSubmit, Callback onDeleteSuccess) {
 		EvaluationCardProps props = new EvaluationCardProps();
 		props.evaluation = evaluation;
-		props.sessionToken = sessionToken;
+		props.accessToken = token;
 		props.utc = utc;
 		props.onEdit = onEdit;
 		props.onModifyAccess = onModifyAccess;

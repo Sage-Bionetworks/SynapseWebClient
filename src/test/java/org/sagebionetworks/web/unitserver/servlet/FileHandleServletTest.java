@@ -143,7 +143,7 @@ public class FileHandleServletTest {
 		String sessionToken = "fake";
 		// set up general synapse client configuration test
 
-		when(mockTokenProvider.getSessionToken()).thenReturn(sessionToken);
+		when(mockTokenProvider.getToken()).thenReturn(sessionToken);
 
 		setupFileEntity();
 
@@ -158,7 +158,7 @@ public class FileHandleServletTest {
 		verify(mockSynapse).setAuthEndpoint(SynapseClientBaseTest.AUTH_BASE);
 		verify(mockSynapse).setRepositoryEndpoint(SynapseClientBaseTest.REPO_BASE);
 		verify(mockSynapse).setFileEndpoint(anyString());
-		verify(mockSynapse).setSessionToken(sessionToken);
+		verify(mockSynapse).setBearerAuthorizationToken(sessionToken);
 	}
 
 	@Test

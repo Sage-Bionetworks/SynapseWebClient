@@ -5,30 +5,36 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringReader;
+
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
-import org.sagebionetworks.repo.model.auth.Session;
+import org.sagebionetworks.client.exceptions.SynapseForbiddenException;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.server.servlet.InitSessionServlet;
+import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
+import org.sagebionetworks.web.shared.AccessTokenWrapper;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.unitserver.SynapseClientBaseTest;
 
@@ -40,6 +46,12 @@ public class InitSessionServletTest {
 	HttpServletResponse mockResponse;
 	@Mock
 	ServletOutputStream responseOutputStream;
+	@Mock
+	SynapseProvider mockSynapseProvider;
+	@Mock
+	SynapseClient mockSynapse;
+	@Mock
+	UserProfile mockProfile;
 	@Mock
 	PrintWriter mockPrintWriter;
 	@Captor
@@ -57,20 +69,24 @@ public class InitSessionServletTest {
 		MockitoAnnotations.initMocks(this);
 		servlet = new InitSessionServlet();
 
+		when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
+		when(mockSynapse.getMyProfile()).thenReturn(mockProfile);
+		
 		// Setup output stream and response
 		when(mockResponse.getWriter()).thenReturn(mockPrintWriter);
 		when(mockResponse.getOutputStream()).thenReturn(responseOutputStream);
 		when(mockRequest.getScheme()).thenReturn("https");
 		when(mockRequest.getServerName()).thenReturn("www.synapse.org");
 		servlet.setTokenProvider(mockTokenProvider);
+		servlet.setSynapseProvider(mockSynapseProvider);
 		SynapseClientBaseTest.setupTestEndpoints();
 	}
 
 	private void setupSessionInRequest(String token) throws JSONObjectAdapterException, IOException {
 		JSONObjectAdapter adapter = new JSONObjectAdapterImpl();
-		Session session = new Session();
-		session.setSessionToken(token);
-		session.writeToJSONObject(adapter);
+		AccessTokenWrapper wrapper = new AccessTokenWrapper();
+		wrapper.setToken(token);
+		wrapper.writeToJSONObject(adapter);
 		BufferedReader br = new BufferedReader(new StringReader(adapter.toJSONString()));
 		when(mockRequest.getReader()).thenReturn(br);
 	}
@@ -123,7 +139,7 @@ public class InitSessionServletTest {
 	@Test
 	public void testDoGetSession() throws Exception {
 		String sessionToken = "abc123-fake";
-		when(mockTokenProvider.getSessionToken()).thenReturn(sessionToken);
+		when(mockTokenProvider.getToken()).thenReturn(sessionToken);
 
 		servlet.doGet(mockRequest, mockResponse);
 
@@ -134,13 +150,26 @@ public class InitSessionServletTest {
 	}
 
 	@Test
+	public void testDoAccessTokenValidation() throws Exception {
+		String token = "invalid";
+		when(mockRequest.getParameter(WebConstants.VALIDATE_QUERY_PARAMETER_KEY)).thenReturn("true");
+		when(mockTokenProvider.getToken()).thenReturn(token);
+		when(mockSynapse.getMyProfile()).thenThrow(new SynapseForbiddenException("that access token is not right"));
+		
+		servlet.doGet(mockRequest, mockResponse);
+
+		verify(mockResponse).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+		verify(responseOutputStream).flush();
+	}
+
+	@Test
 	public void testDoGetSessionNull() throws Exception {
-		when(mockTokenProvider.getSessionToken()).thenReturn(null);
+		when(mockTokenProvider.getToken()).thenReturn(null);
 
 		servlet.doGet(mockRequest, mockResponse);
 
 		verify(mockResponse).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-		verifyZeroInteractions(responseOutputStream);
+		verify(responseOutputStream).flush();
 	}
 }
 

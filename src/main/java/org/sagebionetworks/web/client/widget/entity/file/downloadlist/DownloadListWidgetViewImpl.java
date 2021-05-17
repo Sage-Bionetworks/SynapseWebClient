@@ -35,17 +35,17 @@ public class DownloadListWidgetViewImpl implements DownloadListWidgetView, IsWid
 	@Override
 	public void refreshView() {
 		if (authController.isLoggedIn()) {
-			_showDownloadList(downloadListContainer.getElement(), authController.getCurrentUserSessionToken(), this);
+			_showDownloadList(downloadListContainer.getElement(), authController.getCurrentUserAccessToken(), this);
 		}
 	}
 
-	private static native void _showDownloadList(Element el, String sessionToken, DownloadListWidgetViewImpl w) /*-{
+	private static native void _showDownloadList(Element el, String accessToken, DownloadListWidgetViewImpl w) /*-{
 		try {
 			function onUpdateDownloadList() {
 				w.@org.sagebionetworks.web.client.widget.entity.file.downloadlist.DownloadListWidgetViewImpl::fireDownloadListUpdatedEvent()();
 			}
 			var props = {
-				token: sessionToken,
+				token: accessToken,
 				listUpdatedCallback: onUpdateDownloadList
 			};
 			$wnd.ReactDOM.render($wnd.React.createElement(
