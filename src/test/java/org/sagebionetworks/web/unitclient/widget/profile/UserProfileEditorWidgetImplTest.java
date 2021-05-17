@@ -9,6 +9,9 @@ import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
@@ -19,6 +22,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.principal.NotificationEmail;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PopupUtilsView;
@@ -69,6 +73,8 @@ public class UserProfileEditorWidgetImplTest {
 	GlobalApplicationState mockGlobalAppState;
 	@Mock
 	PlaceChanger mockPlaceChanger;
+	@Mock
+	NotificationEmail mockNotificationEmail;
 	@Captor
 	ArgumentCaptor<Profile> profilePlaceCaptor;
 	@Captor
@@ -79,6 +85,9 @@ public class UserProfileEditorWidgetImplTest {
 	UserProfile profile, changes;
 	public static final String ORC_ID = "https://orcid";
 	public static final String USER_PROFILE_ID = "123";
+	public List<String> userEmails; 
+	public static final String EMAIL1 = "007@uk.supersecret.gov";
+	public static final String EMAIL2 = "008@uk.supersecret.gov"; // notification/primary email
 	
 	@Before
 	public void before() {
@@ -100,8 +109,11 @@ public class UserProfileEditorWidgetImplTest {
 		profile.setUrl("http://spys.r.us");
 		profile.setSummary("My live story...");
 		profile.setProfilePicureFileHandleId("45678");
-		profile.setEmails(java.util.Collections.singletonList("007@uk.supersecret.gov"));
-		
+		userEmails = new ArrayList<>();
+		userEmails.add(EMAIL1);
+		userEmails.add(EMAIL2);
+		profile.setEmails(userEmails);
+		when(mockNotificationEmail.getEmail()).thenReturn(EMAIL2);
 		
 		changes = new UserProfile();
 		changes.setOwnerId(USER_PROFILE_ID);
@@ -131,6 +143,7 @@ public class UserProfileEditorWidgetImplTest {
 		
 		when(mockGlobalAppState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		AsyncMockStubber.callSuccessWith(profile).when(mockJsClient).updateMyUserProfile(any(UserProfile.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockNotificationEmail).when(mockJsClient).getNotificationEmail(any(AsyncCallback.class));
 	}
 
 	@Test
@@ -166,7 +179,7 @@ public class UserProfileEditorWidgetImplTest {
 		verify(mockView, times(nCalls)).setLocation(profile.getLocation());
 		verify(mockView, times(nCalls)).setLink(profile.getUrl());
 		verify(mockView, times(nCalls)).setBio(profile.getSummary());
-		verify(mockView, times(nCalls)).setEmail(profile.getEmails().get(0));
+		verify(mockView, times(nCalls)).setEmail(EMAIL2);
 		verify(mockImageWidget, times(nCalls)).configure(profile.getOwnerId(), profile.getProfilePicureFileHandleId());
 		verifyIsEditingMode(false, nCalls);
 	}
