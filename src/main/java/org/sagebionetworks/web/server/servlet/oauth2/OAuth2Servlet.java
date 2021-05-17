@@ -102,10 +102,10 @@ public abstract class OAuth2Servlet extends HttpServlet {
 	/**
 	 * Creates a Synapse client
 	 */
-	protected SynapseClient createSynapseClient(String sessionToken) {
+	protected SynapseClient createSynapseClient(String accessToken) {
 		SynapseClient synapseClient = synapseProvider.createNewClient();
-		if (sessionToken != null) {
-			synapseClient.setSessionToken(sessionToken);
+		if (accessToken != null) {
+			synapseClient.setBearerAuthorizationToken(accessToken);
 		}
 		synapseClient.setAuthEndpoint(StackEndpoints.getAuthenticationServicePublicEndpoint());
 		return synapseClient;

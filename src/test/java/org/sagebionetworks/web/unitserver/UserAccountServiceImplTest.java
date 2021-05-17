@@ -5,6 +5,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -12,9 +13,8 @@ import org.mockito.Mockito;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.repo.model.auth.NewUser;
-import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.principal.AccountSetupInfo;
 import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -31,7 +31,6 @@ public class UserAccountServiceImplTest {
 	TokenProvider mockTokenProvider;
 	SynapseClient mockSynapse;
 	UserAccountServiceImpl userAccountService;
-	UserSessionData mockUserSessionData;
 	String testSessionToken = "12345abcde";
 	UserProfile testProfile;
 
@@ -39,7 +38,6 @@ public class UserAccountServiceImplTest {
 	public void before() throws SynapseException, JSONObjectAdapterException {
 		mockSynapse = Mockito.mock(SynapseClient.class);
 		mockSynapseProvider = Mockito.mock(SynapseProvider.class);
-		mockUserSessionData = Mockito.mock(UserSessionData.class);
 		when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
 		mockTokenProvider = Mockito.mock(TokenProvider.class);
 
@@ -49,13 +47,9 @@ public class UserAccountServiceImplTest {
 		userAccountService = new UserAccountServiceImpl();
 		userAccountService.setSynapseProvider(mockSynapseProvider);
 		userAccountService.setTokenProvider(mockTokenProvider);
-		Session testSession = new Session();
-		testSession.setSessionToken(testSessionToken);
-		testSession.setAcceptsTermsOfUse(true);
-		when(mockSynapse.createNewAccount(any(AccountSetupInfo.class))).thenReturn(testSession);
-		when(mockSynapse.getUserSessionData()).thenReturn(mockUserSessionData);
-		when(mockUserSessionData.getProfile()).thenReturn(testProfile);
-		when(mockUserSessionData.getSession()).thenReturn(testSession);
+		LoginResponse testResponse = new LoginResponse();
+		testResponse.setAccessToken(testSessionToken);
+		when(mockSynapse.createNewAccountForAccessToken(any(AccountSetupInfo.class))).thenReturn(testResponse);
 	}
 
 	@Test
@@ -85,7 +79,7 @@ public class UserAccountServiceImplTest {
 		String returnSessionToken = userAccountService.createUserStep2(username, fName, lName, pw, emailValidationSignedToken);
 		assertEquals(testSessionToken, returnSessionToken);
 		ArgumentCaptor<AccountSetupInfo> arg = ArgumentCaptor.forClass(AccountSetupInfo.class);
-		verify(mockSynapse).createNewAccount(arg.capture());
+		verify(mockSynapse).createNewAccountForAccessToken(arg.capture());
 		AccountSetupInfo capturedSetInfo = arg.getValue();
 		assertEquals(testASI, capturedSetInfo);
 	}

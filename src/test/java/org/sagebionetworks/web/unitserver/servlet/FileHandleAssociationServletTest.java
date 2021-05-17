@@ -73,7 +73,7 @@ public class FileHandleAssociationServletTest {
 		when(mockRequest.getRequestURL()).thenReturn(new StringBuffer("https://www.synapse.org/"));
 		when(mockRequest.getRequestURI()).thenReturn("");
 		when(mockRequest.getContextPath()).thenReturn("");
-		when(mockTokenProvider.getSessionToken()).thenReturn(sessionToken);
+		when(mockTokenProvider.getToken()).thenReturn(sessionToken);
 		Cookie[] cookies = {new Cookie(CookieKeys.USER_LOGIN_TOKEN, sessionToken)};
 		when(mockRequest.getCookies()).thenReturn(cookies);
 
@@ -96,7 +96,7 @@ public class FileHandleAssociationServletTest {
 		verify(mockSynapse).setAuthEndpoint(SynapseClientBaseTest.AUTH_BASE);
 		verify(mockSynapse).setRepositoryEndpoint(SynapseClientBaseTest.REPO_BASE);
 		verify(mockSynapse).setFileEndpoint(anyString());
-		verify(mockSynapse).setSessionToken(sessionToken);
+		verify(mockSynapse).setBearerAuthorizationToken(sessionToken);
 
 		// look for 30 second cache header
 		verify(mockResponse).setHeader(WebConstants.CACHE_CONTROL_KEY, "max-age=" + FileHandleAssociationServlet.CACHE_TIME_SECONDS);

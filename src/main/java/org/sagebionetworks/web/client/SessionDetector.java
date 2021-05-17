@@ -22,7 +22,7 @@ public class SessionDetector {
 		this.authController = authController;
 		this.globalAppState = globalAppState;
 		this.gwt = gwt;
-		initializeSessionTokenState();
+		initializeAccessTokenState();
 	}
 
 	private String getSessionMarker() {
@@ -54,7 +54,7 @@ public class SessionDetector {
 		}, INTERVAL_MS);
 	}
 	
-	public void initializeSessionTokenState() {
+	public void initializeAccessTokenState() {
 		// Re-initialize session token state
 		if (authController.isLoggedIn()) {
 			// when a session is given, keep state until logout (or invalid session token is detected)

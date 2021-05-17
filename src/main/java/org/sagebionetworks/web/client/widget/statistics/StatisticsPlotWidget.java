@@ -22,7 +22,7 @@ public class StatisticsPlotWidget {
 
 	public void configureAndShow(String projectId) {
 		if (authController.isLoggedIn()) {
-			view.configureAndShow(projectId, authController.getCurrentUserSessionToken());
+			view.configureAndShow(projectId, authController.getCurrentUserAccessToken());
 		}
 	}
 

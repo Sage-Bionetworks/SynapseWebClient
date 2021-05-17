@@ -1,8 +1,10 @@
 package org.sagebionetworks.web.server.servlet;
 
 import static org.sagebionetworks.web.client.cookie.CookieKeys.USER_LOGIN_TOKEN;
+
 import java.io.IOException;
 import java.io.PrintWriter;
+
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -10,12 +12,16 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.sagebionetworks.repo.model.auth.Session;
+import org.sagebionetworks.client.SynapseClient;
+import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.client.StackEndpoints;
+import org.sagebionetworks.web.shared.AccessTokenWrapper;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.safehtml.shared.SimpleHtmlSanitizer;
@@ -32,6 +38,10 @@ public class InitSessionServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	protected static final ThreadLocal<HttpServletRequest> perThreadRequest = new ThreadLocal<HttpServletRequest>();
 	public static final int ONE_DAY_IN_SECONDS = 60 * 60 * 24;
+	private SynapseProvider synapseProvider = new SynapseProviderImpl();
+	public void setSynapseProvider(SynapseProvider synapseProvider) {
+		this.synapseProvider = synapseProvider;
+	}
 
 	@Override
 	protected void service(HttpServletRequest arg0, HttpServletResponse arg1) throws ServletException, IOException {
@@ -47,18 +57,18 @@ public class InitSessionServlet extends HttpServlet {
 	@Override
 	public void doPost(final HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-		// return the Set-Cookie response with the session token
+		// return the Set-Cookie response with the access token
 		try {
 			String sessionJson = IOUtils.toString(request.getReader());
 			JSONObjectAdapter adapter = new JSONObjectAdapterImpl(sessionJson);
-			Session s = new Session(adapter);
-			String sessionToken = s.getSessionToken();
-			if (sessionToken == null || sessionToken.isEmpty()) {
-				sessionToken = WebConstants.EXPIRE_SESSION_TOKEN;
+			AccessTokenWrapper s = new AccessTokenWrapper(adapter);
+			String accessToken = s.getToken();
+			if (accessToken == null || accessToken.isEmpty()) {
+				accessToken = WebConstants.EXPIRE_SESSION_TOKEN;
 			}
-			Cookie cookie = new Cookie(USER_LOGIN_TOKEN, sessionToken);
+			Cookie cookie = new Cookie(USER_LOGIN_TOKEN, accessToken);
 
-			if (!WebConstants.EXPIRE_SESSION_TOKEN.equals(sessionToken)) {
+			if (!WebConstants.EXPIRE_SESSION_TOKEN.equals(accessToken)) {
 				cookie.setMaxAge(ONE_DAY_IN_SECONDS);
 			} else {
 				cookie.setMaxAge(0);
@@ -98,13 +108,13 @@ public class InitSessionServlet extends HttpServlet {
 
 	private TokenProvider tokenProvider = new TokenProvider() {
 		@Override
-		public String getSessionToken() {
+		public String getToken() {
 			return UserDataProvider.getThreadLocalUserToken(InitSessionServlet.perThreadRequest.get());
 		}
 	};
 
-	public String getSessionToken(final HttpServletRequest request) {
-		return tokenProvider.getSessionToken();
+	public String getToken(final HttpServletRequest request) {
+		return tokenProvider.getToken();
 	}
 
 	@Override
@@ -114,16 +124,38 @@ public class InitSessionServlet extends HttpServlet {
 		response.setHeader(WebConstants.PRAGMA_KEY, WebConstants.NO_CACHE_VALUE); // Set standard HTTP/1.0 no-cache header.
 		response.setDateHeader(WebConstants.EXPIRES_KEY, 0L); // Proxy
 
-		String token = getSessionToken(request);
+		String token = getToken(request);
+		response.setContentType(WebConstants.TEXT_PLAIN_CHARSET_UTF8);
 		if (token != null) {
 			token = SimpleHtmlSanitizer.sanitizeHtml(token).asString(); // The token should not be HTML, but just in case (SWC-5504)
-			response.setContentType(WebConstants.TEXT_PLAIN_CHARSET_UTF8);
-			response.setHeader(WebConstants.CONTENT_TYPE_OPTIONS, WebConstants.NOSNIFF);
-			response.setStatus(HttpServletResponse.SC_OK);
-			response.getOutputStream().write(token.getBytes("UTF-8"));
-			response.getOutputStream().flush();
+			try {
+				String isValidateToken = request.getParameter(WebConstants.VALIDATE_QUERY_PARAMETER_KEY);
+				if (isValidateToken != null && Boolean.parseBoolean(isValidateToken)) {
+					SynapseClient synapseClient = createNewClient(token);
+					synapseClient.getMyProfile();
+				}
+				response.setHeader(WebConstants.CONTENT_TYPE_OPTIONS, WebConstants.NOSNIFF);
+				response.setStatus(HttpServletResponse.SC_OK);
+				response.getOutputStream().write(token.getBytes("UTF-8"));
+			} catch (SynapseException e) {
+				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+				response.getOutputStream().write(e.getMessage().getBytes("UTF-8"));
+			}
 		} else {
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			response.getOutputStream().write("token unavailable".getBytes("UTF-8"));
 		}
+		response.getOutputStream().flush();
 	}
+	
+	private SynapseClient createNewClient(String accessToken) {
+		SynapseClient client = synapseProvider.createNewClient();
+		client.setAuthEndpoint(StackEndpoints.getAuthenticationServicePublicEndpoint());
+		client.setRepositoryEndpoint(StackEndpoints.getRepositoryServiceEndpoint());
+		client.setFileEndpoint(StackEndpoints.getFileServiceEndpoint());
+		if (accessToken != null)
+			client.setBearerAuthorizationToken(accessToken);
+		return client;
+	}
+
 }

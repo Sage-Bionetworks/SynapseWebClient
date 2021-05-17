@@ -25,7 +25,7 @@ public class EvaluationEditorReactComponentPage extends Composite {
 	ReactComponentDiv evaluationEditorContainer;
 
 	String evaluationId;
-	String sessionToken;
+	String accessToken;
 	String entityId;
 	EvaluationEditorPageProps.Callback onPageBack;
 	boolean utc;
@@ -35,18 +35,18 @@ public class EvaluationEditorReactComponentPage extends Composite {
 		initWidget(binder.createAndBindUi(this));
 	}
 
-	public void configure(String evaluationId, String entityId, String sessionToken, boolean utc, EvaluationEditorPageProps.Callback onPageBack){
+	public void configure(String evaluationId, String entityId, String token, boolean utc, EvaluationEditorPageProps.Callback onPageBack){
 		this.evaluationId = evaluationId;
 		this.entityId = entityId;
 		this.onPageBack = onPageBack;
-		this.sessionToken = sessionToken;
+		this.accessToken = token;
 		this.utc = utc;
 	}
 
 	@Override
 	protected void onLoad() {
 		super.onLoad();
-		EvaluationEditorPageProps editorProps = EvaluationEditorPageProps.create(sessionToken, evaluationId,
+		EvaluationEditorPageProps editorProps = EvaluationEditorPageProps.create(accessToken, evaluationId,
 				entityId, utc, this.onPageBack);
 		ReactDOM.render(React.createElement(SRC.SynapseComponents.EvaluationEditorPage, editorProps),
 				evaluationEditorContainer.getElement());
