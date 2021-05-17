@@ -4,6 +4,7 @@ import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.principal.NotificationEmail;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -99,7 +100,17 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 		view.setLocation(profile.getLocation());
 		view.setLink(profile.getUrl());
 		if (profile.getEmails() != null && profile.getEmails().size() > 0) {
-			view.setEmail(profile.getEmails().get(0));	
+			// find out what the primary (notification) email address is
+			// SWC-5599: the first email is not the notification email address.
+			jsClient.getNotificationEmail(new AsyncCallback<NotificationEmail>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					synAlert.handleException(caught);
+				}
+				public void onSuccess(NotificationEmail notificationEmail) {
+					view.setEmail(notificationEmail.getEmail());
+				};
+			});
 		}
 		view.setOrcIdHref(orcIdHref);
 		view.setOwnerId(profile.getOwnerId());
