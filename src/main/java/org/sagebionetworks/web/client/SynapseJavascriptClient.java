@@ -363,7 +363,7 @@ public class SynapseJavascriptClient {
 	 * @param forUrl
 	 * @return
 	 */
-	public List<Request> getRequests(String forUrl) {
+	public List<Request> getCancellableRequests(String forUrl) {
 		return requestsMap.get(forUrl);
 	}
 

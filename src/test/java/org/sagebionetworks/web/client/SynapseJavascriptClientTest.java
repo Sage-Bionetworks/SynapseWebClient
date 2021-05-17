@@ -835,10 +835,10 @@ public class SynapseJavascriptClientTest {
 
 		verify(mockRequestBuilder, times(2)).sendRequest(eq((String) null), any());
 
-		assertEquals(2, client.getRequests(currentUrl).size());
+		assertEquals(2, client.getCancellableRequests(currentUrl).size());
 		// test cleanup, should remove the first request (since it isn't pending)
 		client.cleanupRequestsMap();
-		List<Request> requests = client.getRequests(currentUrl);
+		List<Request> requests = client.getCancellableRequests(currentUrl);
 		assertEquals(1, requests.size());
 		assertEquals(mockRequest2, requests.get(0));
 
@@ -860,10 +860,10 @@ public class SynapseJavascriptClientTest {
 
 		verify(mockRequestBuilder, times(2)).sendRequest(eq((String) null), any());
 
-		assertEquals(1, client.getRequests(url1).size());
-		assertEquals(mockRequest1, client.getRequests(url1).get(0));
-		assertEquals(1, client.getRequests(url2).size());
-		assertEquals(mockRequest2, client.getRequests(url2).get(0));
+		assertEquals(1, client.getCancellableRequests(url1).size());
+		assertEquals(mockRequest1, client.getCancellableRequests(url1).get(0));
+		assertEquals(1, client.getCancellableRequests(url2).size());
+		assertEquals(mockRequest2, client.getCancellableRequests(url2).get(0));
 
 		// test cancel requests for a url
 		client.cancelPendingRequests(url1);
@@ -887,7 +887,7 @@ public class SynapseJavascriptClientTest {
 		verify(mockRequestBuilder).sendRequest(anyString(), any());
 
 		// verify no requests are associated to the current URL
-		assertNull(client.getRequests(currentUrl));
+		assertNull(client.getCancellableRequests(currentUrl));
 	}
 
 	@Test
@@ -902,6 +902,6 @@ public class SynapseJavascriptClientTest {
 		verify(mockRequestBuilder).sendRequest(anyString(), any());
 
 		// verify no requests are associated to the current URL
-		assertNull(client.getRequests(currentUrl));
+		assertNull(client.getCancellableRequests(currentUrl));
 	}
 }

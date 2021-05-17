@@ -251,14 +251,14 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	}
 	
 	@Override
-	public void checkForUserChange(Callback optionalCallback) {
+	public void checkForUserChange(Callback webAppInitializationCallback) {
 		String oldUserAccessToken = currentUserAccessToken;
 		initializeFromExistingAccessTokenCookie(new AsyncCallback<UserProfile>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				jsniUtils.consoleError(caught);
-				if (optionalCallback != null) {
-					optionalCallback.invoke();
+				if (webAppInitializationCallback != null) {
+					webAppInitializationCallback.invoke();
 				} else {
 					// if the exception was not due to a network failure, then log the user out
 					if (!(caught instanceof UnknownErrorException || caught instanceof StatusCodeException)) {
@@ -272,8 +272,8 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 				// is this a user session change?  if so, refresh the page.
 				if (!Objects.equals(currentUserAccessToken, oldUserAccessToken)) {
 					// we've reinitialized the app with the correct session, refresh the page (do not get rid of js state)!
-					if (optionalCallback != null) {
-						optionalCallback.invoke();
+					if (webAppInitializationCallback != null) {
+						webAppInitializationCallback.invoke();
 					} else {
 						ginInjector.getGlobalApplicationState().refreshPage();	
 					}
@@ -281,8 +281,8 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 				} else {
 					ginInjector.getHeader().refresh();
 					// we've determined that the session has not changed
-					if (optionalCallback != null) {
-						optionalCallback.invoke();
+					if (webAppInitializationCallback != null) {
+						webAppInitializationCallback.invoke();
 					} 
 				}
 			}
