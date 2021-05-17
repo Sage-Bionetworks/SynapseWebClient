@@ -128,9 +128,12 @@ public class InitSessionServlet extends HttpServlet {
 		response.setContentType(WebConstants.TEXT_PLAIN_CHARSET_UTF8);
 		if (token != null) {
 			token = SimpleHtmlSanitizer.sanitizeHtml(token).asString(); // The token should not be HTML, but just in case (SWC-5504)
-			SynapseClient synapseClient = createNewClient(token);
 			try {
-				synapseClient.getMyProfile();
+				String isValidateToken = request.getParameter(WebConstants.VALIDATE_QUERY_PARAMETER_KEY);
+				if (isValidateToken != null && Boolean.parseBoolean(isValidateToken)) {
+					SynapseClient synapseClient = createNewClient(token);
+					synapseClient.getMyProfile();
+				}
 				response.setHeader(WebConstants.CONTENT_TYPE_OPTIONS, WebConstants.NOSNIFF);
 				response.setStatus(HttpServletResponse.SC_OK);
 				response.getOutputStream().write(token.getBytes("UTF-8"));

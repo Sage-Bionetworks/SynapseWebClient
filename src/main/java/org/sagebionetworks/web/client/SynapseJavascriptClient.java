@@ -21,7 +21,7 @@ import static org.sagebionetworks.web.shared.WebConstants.FILE_SERVICE_URL_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.NRGR_SYNAPSE_GLUE_ENDPOINT_PROPERTY;
 import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.SYNAPSE_VERSION_KEY;
-
+import org.sagebionetworks.web.shared.WebConstants;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -1546,7 +1546,7 @@ public class SynapseJavascriptClient {
 	}
 	
 	public FluentFuture<String> getAccessToken() {
-		return getFuture(cb -> doGet(jsniUtils.getAccessTokenCookieUrl(), OBJECT_TYPE.String, cb));
+		return getFuture(cb -> doGet(jsniUtils.getAccessTokenCookieUrl()+"?"+WebConstants.VALIDATE_QUERY_PARAMETER_KEY + "=true", OBJECT_TYPE.String, cb));
 	}
 
 	public void subscribe(Topic topic, AsyncCallback<Subscription> callback) {
