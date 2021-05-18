@@ -39,9 +39,12 @@ import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
+import org.sagebionetworks.repo.model.schema.JsonSchemaObjectBinding;
+import org.sagebionetworks.repo.model.schema.ValidationResults;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PopupUtilsView;
@@ -49,6 +52,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.cache.ClientCache;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -59,6 +63,7 @@ import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
@@ -120,6 +125,8 @@ public class EntityBadgeTest {
 	AuthenticationController mockAuthController;
 	@Mock
 	ClickHandler mockClickHandler;
+	@Mock
+	CookieProvider mockCookies;
 	Set<ResourceAccess> resourceAccessSet;
 
 	@Before
@@ -127,7 +134,8 @@ public class EntityBadgeTest {
 		when(mockPermissions.getCanPublicRead()).thenReturn(true);
 		when(mockBenefactorAcl.getId()).thenReturn("not the current entity id");
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		widget = new EntityBadge(mockView, mockGlobalApplicationState, mockTransformer, mockSynapseJavascriptClient, mockLazyLoadHelper, mockPopupUtils, mockSynapseProperties, mockEventBus, mockAuthController, mockSynapseJSNIUtils);
+		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn(null);
+		widget = new EntityBadge(mockView, mockGlobalApplicationState, mockTransformer, mockSynapseJavascriptClient, mockLazyLoadHelper, mockPopupUtils, mockSynapseProperties, mockEventBus, mockAuthController, mockSynapseJSNIUtils, mockCookies);
 
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		when(mockSynapseProperties.getPublicPrincipalIds()).thenReturn(mockPublicPrincipalIds);
@@ -197,7 +205,7 @@ public class EntityBadgeTest {
 
 		verify(mockSynapseJavascriptClient).getEntityBundleFromCache(anyString(), any(AsyncCallback.class));
 		verify(mockView).showPublicIcon();
-		verify(mockView).setAnnotations(anyString());
+		verify(mockView).setAnnotations(anyString(), eq(false), eq(null));
 		verify(mockView).showHasWikiIcon();
 		verify(mockView, never()).showAddToDownloadList();
 	}
@@ -220,7 +228,7 @@ public class EntityBadgeTest {
 		verify(mockSynapseJavascriptClient).getEntityBundleFromCache(anyString(), any(AsyncCallback.class));
 		verify(mockView).clearIcons();
 		verify(mockView).showPublicIcon();
-		verify(mockView).setAnnotations(anyString());
+		verify(mockView).setAnnotations(anyString(), eq(false), eq(null));
 		verify(mockView).showHasWikiIcon();
 		verify(mockView).showDiscussionThreadIcon();
 		verify(mockView).showAddToDownloadList();
@@ -437,5 +445,55 @@ public class EntityBadgeTest {
 		verify(mockSynapseJavascriptClient).addFileToDownloadList(eq(fileHandleId), eq(entityId), any(AsyncCallback.class));
 		verifyZeroInteractions(mockPopupUtils, mockEventBus);
 		verify(mockView).setError(errorMessage);
+	}
+
+	@Test
+	public void testSetAnnotationsWithSchema() {
+		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("true");
+
+		// verify download button is configured and shown
+		String entityId = "syn12345";
+		FileEntity testFile = new FileEntity();
+		testFile.setEtag("my-etag");
+		testFile.setId(entityId);
+		testFile.setDataFileHandleId("123");
+		when(mockPublicPrincipalIds.isPublic(anyLong())).thenReturn(true);
+		entityThreadCount = 1L;
+		setupEntity(testFile);
+		setupAnnotations();
+
+		ValidationResults validationResult = new ValidationResults();
+
+		AsyncMockStubber.callSuccessWith(new JsonSchemaObjectBinding()).when(mockSynapseJavascriptClient).getSchemaBinding(eq(entityId), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(validationResult).when(mockSynapseJavascriptClient).getSchemaValidationResultsWithMatchingEtag(eq(entityId), eq(testFile.getEtag()), any(AsyncCallback.class));
+
+		configure();
+		widget.getEntityBundle();
+
+		verify(mockView).setAnnotations(anyString(), eq(true), eq(validationResult));
+
+	}
+
+	@Test
+	public void testSetAnnotations_NoSchema() {
+		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("true");
+
+		// verify download button is configured and shown
+		String entityId = "syn12345";
+		FileEntity testFile = new FileEntity();
+		testFile.setEtag("my-etag");
+		testFile.setId(entityId);
+		testFile.setDataFileHandleId("123");
+		when(mockPublicPrincipalIds.isPublic(anyLong())).thenReturn(true);
+		entityThreadCount = 1L;
+		setupEntity(testFile);
+		setupAnnotations();
+
+		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseJavascriptClient).getSchemaBinding(eq(entityId), any(AsyncCallback.class));
+
+		configure();
+		widget.getEntityBundle();
+
+		verify(mockView).setAnnotations(anyString(), eq(false), eq(null));
 	}
 }

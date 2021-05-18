@@ -122,6 +122,8 @@ import org.sagebionetworks.repo.model.principal.PrincipalAliasResponse;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.request.ReferenceList;
+import org.sagebionetworks.repo.model.schema.JsonSchemaObjectBinding;
+import org.sagebionetworks.repo.model.schema.ValidationResults;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.subscription.SortByType;
@@ -295,7 +297,7 @@ public class SynapseJavascriptClient {
 	public static final String VIEW_COLUMN_MODEL_REQUEST = "/column/view/scope";
 	public static final String SCHEMA_TYPE_VALIDATION = "/schema/type/validation/";
 	public static final String DOWNLOAD_LIST_V2 = "/download/list/query/";
-	
+
 	public static final String ASYNC_START = "/async/start";
 	public static final String ASYNC_GET = "/async/get/";
 	public static final String AUTH_OAUTH_2 = "/oauth2";
@@ -359,7 +361,7 @@ public class SynapseJavascriptClient {
 	/**
 	 * For testing purposes only. Returns Requests associated to the given url. Requests are
 	 * periodically removed from this list once they leave the Pending state.
-	 * 
+	 *
 	 * @param forUrl
 	 * @return
 	 */
@@ -392,7 +394,7 @@ public class SynapseJavascriptClient {
 	private String getFileServiceUrl() {
 		return synapseProperties.getSynapseProperty(FILE_SERVICE_URL_KEY);
 	}
-	
+
 	private String getNrgrSynapseGlueEndpoint() {
 		return synapseProperties.getSynapseProperty(NRGR_SYNAPSE_GLUE_ENDPOINT_PROPERTY);
 	}
@@ -611,7 +613,7 @@ public class SynapseJavascriptClient {
 	 * If bundle is found in local js cache, then this will immediately call onSuccess() with the cached
 	 * version. Note that the current entity bundle will still be retrieved, and onSuccess() may be
 	 * called again if there's a newer version (so write your onSuccess accordingly)!
-	 * 
+	 *
 	 * @param entityId
 	 * @param partsMask
 	 * @param callback
@@ -1069,10 +1071,10 @@ public class SynapseJavascriptClient {
 		String url = getFileServiceUrl() + FILE_HANDLE_BATCH;
 		doPost(url, request, OBJECT_TYPE.BatchFileResult, true, callback);
 	}
-	
+
 	/**
 	 * http://rest-docs.synapse.org/rest/GET/fileHandle/handleId/url.html
-	 * 
+	 *
 	 * Note: This call will result in a HTTP temporary redirect (307), to the actual file URL if the caller meets all of the download requirements.
 	 * Note: Only the user that created the FileHandle can use this method for download.
 	 */
@@ -1089,7 +1091,7 @@ public class SynapseJavascriptClient {
 		String url = getRepoServiceUrl() + TEAM + "/" + teamId + "/icon/preview?redirect=false";
 		doGetString(url, false, callback);
 	}
-	
+
 	public void getEntityHeaderBatch(List<String> entityIds, AsyncCallback<ArrayList<EntityHeader>> callback) {
 		List<Reference> list = new ArrayList<Reference>();
 		for (String entityId : entityIds) {
@@ -1126,7 +1128,7 @@ public class SynapseJavascriptClient {
 		String url = getRepoServiceUrl() + MEMBERSHIP_INVITATION + "/" + id;
 		doDelete(url, callback);
 	}
-	
+
 	public void createMembershipInvitation(MembershipInvitation invitation, AsyncCallback<MembershipInvitation> callback) {
 		String url = getRepoServiceUrl() + MEMBERSHIP_INVITATION;
 		String signedTokenEndpoint = gwt.encodeQueryString(gwt.getHostPageBaseURL() + SIGNED_TOKEN);
@@ -1157,7 +1159,7 @@ public class SynapseJavascriptClient {
 
 		doPut(url, toUpdate, OBJECT_TYPE.V2WikiPage, callback);
 	}
-	
+
 	public void updateMyUserProfile(UserProfile profile, AsyncCallback<UserProfile> callback) {
 		String url = getRepoServiceUrl() + "/" + USER_PROFILE_PATH;
 		doPut(url, profile, OBJECT_TYPE.UserProfile, callback);
@@ -1440,7 +1442,7 @@ public class SynapseJavascriptClient {
 		String url = getRepoServiceUrl() + ACCESS_REQUIREMENT + requirementId;
 		doGet(url, OBJECT_TYPE.AccessRequirement, callback);
 	}
-	
+
 	public void getDataAccessSubmissions(String requirementId, String nextPageToken, SubmissionState filter, SubmissionOrder order, boolean isAscending, AsyncCallback<SubmissionPage> callback) {
 		String url = getRepoServiceUrl() + ACCESS_REQUIREMENT + "/" + requirementId + SUBMISSIONS;
 		SubmissionPageRequest request = new SubmissionPageRequest();
@@ -1451,7 +1453,7 @@ public class SynapseJavascriptClient {
 		request.setNextPageToken(nextPageToken);
 		doPost(url, request, OBJECT_TYPE.SubmissionPage, true, callback);
 	}
-	
+
 	public void getUploadDestinations(String parentEntityId, AsyncCallback<List<UploadDestination>> callback) {
 		String url = getFileServiceUrl() + ENTITY + "/" + parentEntityId + UPLOAD_DESTINATIONS;
 		doGet(url, OBJECT_TYPE.ListWrapperUploadDestinations, callback);
@@ -1753,12 +1755,12 @@ public class SynapseJavascriptClient {
 		username.setEmail(emailAddress);
 		doPost(url, username, OBJECT_TYPE.None, false, cb);
 	}
-	
+
 	public void getSynapseVersions(AsyncCallback<String> cb) {
 		// GET versions, cannot cancel
 		doGet(jsniUtils.getVersionsServletUrl(), OBJECT_TYPE.String, null, null, false, cb);
 	}
-	
+
 	public void getAvailableEvaluations(Set<String> targetEvaluationIds, boolean isActiveOnly, Integer limit, Integer offset, AsyncCallback<List<Evaluation>> cb) {
 		String url = getRepoServiceUrl() + EVALUATION_AVAILABLE + "?activeOnly=" + isActiveOnly;
 		if (targetEvaluationIds != null && targetEvaluationIds.size() > 0) {
@@ -1776,7 +1778,7 @@ public class SynapseJavascriptClient {
 
 		doGet(url, OBJECT_TYPE.PaginatedResultsEvaluations, cb);
 	}
-	
+
 	public void getEvaluations(Boolean isActiveOnly, ACCESS_TYPE accessType, List<String> idsList, Integer limit, Integer offset, AsyncCallback<List<Evaluation>> cb) {
 		char sep = '?';
 		String url = getRepoServiceUrl() + EVALUATION;
@@ -1795,7 +1797,7 @@ public class SynapseJavascriptClient {
 			}
 			sep = '&';
 		}
-		
+
 		if (limit != null) {
 			url += sep + LIMIT_PARAMETER + limit;
 			sep = '&';
@@ -1807,7 +1809,7 @@ public class SynapseJavascriptClient {
 
 		doGet(url, OBJECT_TYPE.PaginatedResultsEvaluations, cb);
 	}
-	
+
 	public void getEvaluation(String evaluationId, AsyncCallback<Evaluation> cb) {
 		String url = getRepoServiceUrl() + EVALUATION + "/" + evaluationId;
 		doGet(url, OBJECT_TYPE.Evaluation, cb);
@@ -1817,7 +1819,7 @@ public class SynapseJavascriptClient {
 		String url = getRepoServiceUrl() + EVALUATION + "/" + evaluationId + "/migratequota";
 		doPost(url, null,OBJECT_TYPE.None, false,cb);
 	}
-	
+
 	public void listApprovedSubmissionInfo(String requirementId, String nextPageToken, AsyncCallback<SubmissionInfoPage> cb) {
 		SubmissionInfoPageRequest request = new SubmissionInfoPageRequest();
 		request.setAccessRequirementId(requirementId);
@@ -1825,7 +1827,7 @@ public class SynapseJavascriptClient {
 		String url = getRepoServiceUrl() + ACCESS_REQUIREMENT + "/" + requirementId + "/approvedSubmissionInfo";
 		doPost(url, request, OBJECT_TYPE.SubmissionInfoPage, true, cb);
 	}
-	
+
 	public void submitNRGRDataAccessToken(String token, AsyncCallback<String> cb) {
 		String url = getNrgrSynapseGlueEndpoint();
 		RequestBuilderWrapper requestBuilder = ginInjector.getRequestBuilder();
@@ -1838,7 +1840,7 @@ public class SynapseJavascriptClient {
 		}
 		sendRequest(requestBuilder, token, OBJECT_TYPE.String, INITIAL_RETRY_REQUEST_DELAY_MS, false, cb);
 	}
-	
+
 	public void getAccessApprovalNotifications(String requirementId, List<String> recipientIds, AsyncCallback<AccessApprovalNotificationResponse> cb) {
 		AccessApprovalNotificationRequest request = new AccessApprovalNotificationRequest();
 		List<Long> recipientIdsLongs = recipientIds.stream().map(Long::parseLong).collect(Collectors.toList());
@@ -1847,10 +1849,53 @@ public class SynapseJavascriptClient {
 		String url = getRepoServiceUrl() + ACCESS_APPROVAL + "/notifications";
 		doPost(url, request, OBJECT_TYPE.AccessApprovalNotificationResponse, true, cb);
 	}
-	
+
 	public void getDefaultUploadDestination(String parentEntityId, AsyncCallback<UploadDestination> cb) {
 		String url = getFileServiceUrl() + ENTITY + "/" + parentEntityId + "/uploadDestination";
 		doGet(url, OBJECT_TYPE.UploadDestination, cb);
 	}
+
+	public void getSchemaBinding(String entityId, AsyncCallback<JsonSchemaObjectBinding> cb) {
+		String url = getRepoServiceUrl() + ENTITY + "/" + entityId + "/schema/binding";
+		doGet(url, OBJECT_TYPE.JsonSchemaObjectBinding, cb);
+	}
+
+	public void getSchemaValidationResults(String entityId, AsyncCallback<ValidationResults> cb) {
+		String url = getRepoServiceUrl() + ENTITY + "/" + entityId + "/schema/validation";
+		doGet(url, OBJECT_TYPE.ValidationResults, cb);
+	}
+
+	private void getSchemaValidationResultsWithMatchingEtag(String entityId, String expectedEtag, int delayMs, AsyncCallback<ValidationResults> cb) {
+		gwt.scheduleExecution(
+				() ->
+						getSchemaValidationResults(entityId, new AsyncCallback<ValidationResults>() {
+							@Override
+							public void onSuccess(ValidationResults result) {
+								// If the result eTag and the entity eTag are different, then schema conformance has not been determined yet
+								// re-fetch with back-off until it is consistent
+								if (result.getObjectEtag().equals(expectedEtag)) {
+									cb.onSuccess(result);
+								} else {
+									getSchemaValidationResultsWithMatchingEtag(entityId, expectedEtag, delayMs * 2, cb);
+								}
+							}
+							@Override
+							public void onFailure(Throwable caught) {
+								cb.onFailure(caught);
+							}
+						}),
+				delayMs);
+	}
+
+	/**
+	 * Retries (with exponential backoff) on mismatched eTag or 404
+	 * @param entityId
+	 * @param expectedEtag
+	 * @param cb
+	 */
+	public void getSchemaValidationResultsWithMatchingEtag(String entityId, String expectedEtag, AsyncCallback<ValidationResults> cb) {
+		getSchemaValidationResultsWithMatchingEtag(entityId, expectedEtag, INITIAL_RETRY_REQUEST_DELAY_MS, cb);
+	}
+
 }
 

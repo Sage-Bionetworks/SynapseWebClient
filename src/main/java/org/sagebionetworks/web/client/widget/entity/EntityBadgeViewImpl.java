@@ -10,6 +10,7 @@ import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.schema.ValidationResults;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -216,14 +217,39 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	}
 
 	@Override
-	public void setAnnotations(String html) {
-		Icon icon = new Icon(IconType.TAGS);
-		icon.setFixedWidth(true);
-		icon.setPull(Pull.RIGHT);
-		Tooltip tooltip = new Tooltip(icon);
-		tooltip.setPlacement(Placement.RIGHT);
-		tooltip.setHtml(SafeHtmlUtils.fromTrustedString(html));
-		iconsContainer.add(tooltip);
+	public void setAnnotations(String html, boolean hasSchema, ValidationResults validationResults) {
+		boolean addIcon = false;
+		String className = null;
+
+		if (hasSchema) {
+			addIcon = true;
+			if (html == null) { // does not have annotations
+				className = "MissingAnnotations";
+				html = "Missing annotations required by schema";
+			} else if (validationResults.getIsValid()) {
+				className = "ValidAnnotations";
+			} else {
+				className = "InvalidAnnotations";
+			}
+		} else if (html != null) {
+			// Has annotations, but there is no schema
+			addIcon = true;
+		}
+
+		if (addIcon) {
+			Icon icon = new Icon(IconType.TAGS);
+			if (className != null) {
+				icon.addStyleName(className);
+			}
+			icon.setFixedWidth(true);
+			icon.setPull(Pull.RIGHT);
+			Tooltip tooltip = new Tooltip(icon);
+			tooltip.setPlacement(Placement.RIGHT);
+			if (html != null) {
+				tooltip.setHtml(SafeHtmlUtils.fromTrustedString(html));
+			}
+			iconsContainer.add(tooltip);
+		}
 	}
 
 	@Override
