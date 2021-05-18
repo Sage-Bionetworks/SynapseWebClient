@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.schema.ValidationResults;
 import org.sagebionetworks.web.client.widget.lazyload.SupportsLazyLoadInterface;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -17,7 +18,13 @@ public interface EntityBadgeView extends IsWidget, SupportsLazyLoadInterface {
 
 	void showAddToDownloadList();
 
-	void setAnnotations(String html);
+	/**
+	 *
+	 * @param html may be null iff there are no annotations
+	 * @param hasSchema
+	 * @param validationResults is null iff hasSchema is false
+	 */
+	void setAnnotations(String html, boolean hasSchema, ValidationResults validationResults);
 
 	void setSize(String s);
 

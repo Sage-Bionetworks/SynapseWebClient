@@ -11,6 +11,7 @@ $synapse-orange: #E8762B;
 $synapse-accent-primary: #17a2b8;
 $synapse-dark-text: #515359;
 $synapse-red-error: #eb5757;
+$synapse-gray-med: #dcdcdc;
 
 @mixin border-radius($radius) {
 	-webkit-border-radius: $radius;
@@ -3443,4 +3444,14 @@ div.border {
         width: 600px;
         flex-grow: 1;
     }
+}
+
+.IconMissing {
+    color: $synapse-gray-med;
+}
+.IconValid {
+ color: $synapse-green;
+}
+.IconInvalid {
+  color: $synapse-yellow;
 }
