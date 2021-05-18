@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import java.util.HashMap;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
@@ -16,6 +17,7 @@ public class SynapsePropertiesImpl implements SynapseProperties {
 	@Inject
 	public SynapsePropertiesImpl(StackConfigServiceAsync stackConfigService, SynapseJSNIUtils synapseJSNIUtils) {
 		this.stackConfigService = stackConfigService;
+		fixServiceEntryPoint(stackConfigService);
 		this.synapseJSNIUtils = synapseJSNIUtils;
 	}
 
