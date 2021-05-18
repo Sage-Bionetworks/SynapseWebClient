@@ -3446,12 +3446,12 @@ div.border {
     }
 }
 
-.MissingAnnotations {
+.IconMissing {
     color: $synapse-gray-med;
 }
-.ValidAnnotations {
+.IconValid {
  color: $synapse-green;
 }
-.InvalidAnnotations {
+.IconInvalid {
   color: $synapse-yellow;
 }

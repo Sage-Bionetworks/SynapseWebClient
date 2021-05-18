@@ -224,12 +224,12 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		if (hasSchema) {
 			addIcon = true;
 			if (html == null) { // does not have annotations
-				className = "MissingAnnotations";
+				className = "IconMissing";
 				html = "Missing annotations required by schema";
 			} else if (validationResults.getIsValid()) {
-				className = "ValidAnnotations";
+				className = "IconValid";
 			} else {
-				className = "InvalidAnnotations";
+				className = "IconInvalid";
 			}
 		} else if (html != null) {
 			// Has annotations, but there is no schema
