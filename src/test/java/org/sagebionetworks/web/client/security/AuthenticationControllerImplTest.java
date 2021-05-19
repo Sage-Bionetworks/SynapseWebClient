@@ -107,7 +107,7 @@ public class AuthenticationControllerImplTest {
 		profile = new UserProfile();
 		profile.setOwnerId(USER_ID);
 		when(mockJsClient.getAccessToken()).thenReturn(getDoneFuture(ACCESS_TOKEN));
-		when(mockJsClient.getMyUserProfile()).thenReturn(getDoneFuture(profile));
+		AsyncMockStubber.callSuccessWith(profile).when(mockUserAccountService).getMyProfile(any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(mockNotificationEmail).when(mockJsClient).getNotificationEmail(any(AsyncCallback.class));
 		when(mockGinInjector.getSynapseJavascriptClient()).thenReturn(mockJsClient);
 		authenticationController = new AuthenticationControllerImpl(mockUserAccountService, mockClientCache, mockSessionStorage, mockCookieProvider, mockGinInjector, mockSynapseJSNIUtils);
@@ -197,7 +197,7 @@ public class AuthenticationControllerImplTest {
 	@Test
 	public void testLoginUserNotAcceptedTermsOfUse() {
 		// access token is returned without error (it's set and valid), but getMyProfile() fails with a special ForbiddenException
-		when(mockJsClient.getMyUserProfile()).thenReturn(getFailedFuture(new ForbiddenException("Terms of use have not been signed.")));
+		AsyncMockStubber.callFailureWith(new ForbiddenException("Terms of use have not been signed.")).when(mockUserAccountService).getMyProfile(any(AsyncCallback.class));
 		
 		authenticationController.initializeFromExistingAccessTokenCookie(mockUserProfileCallback);
 

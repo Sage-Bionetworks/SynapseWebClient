@@ -25,7 +25,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
-import org.sagebionetworks.client.exceptions.SynapseForbiddenException;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -146,19 +145,6 @@ public class InitSessionServletTest {
 		verify(mockResponse).setStatus(HttpServletResponse.SC_OK);
 		verify(responseOutputStream).write(byteArrayCaptor.capture());
 		assertEquals(sessionToken, new String(byteArrayCaptor.getValue(), "UTF-8"));
-		verify(responseOutputStream).flush();
-	}
-
-	@Test
-	public void testDoAccessTokenValidation() throws Exception {
-		String token = "invalid";
-		when(mockRequest.getParameter(WebConstants.VALIDATE_QUERY_PARAMETER_KEY)).thenReturn("true");
-		when(mockTokenProvider.getToken()).thenReturn(token);
-		when(mockSynapse.getMyProfile()).thenThrow(new SynapseForbiddenException("that access token is not right"));
-		
-		servlet.doGet(mockRequest, mockResponse);
-
-		verify(mockResponse).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 		verify(responseOutputStream).flush();
 	}
 

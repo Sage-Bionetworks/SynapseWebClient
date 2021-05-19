@@ -69,34 +69,33 @@ public class Portal implements EntryPoint {
 						ginjector.getSynapseJSNIUtils();
 						
 						ginjector.getSynapseProperties().initSynapseProperties(() -> {
+							EventBus eventBus = ginjector.getEventBus();
+							PlaceController placeController = new PlaceController(eventBus);
+
+							// Start ActivityManager for the main widget with our ActivityMapper
+							AppActivityMapper activityMapper = new AppActivityMapper(ginjector, new SynapseJSNIUtilsImpl(), null);
+							ActivityManager activityManager = new ActivityManager(activityMapper, eventBus);
+							activityManager.setDisplay(appWidget);
+
+							// All pages get added to the root panel
+							appWidget.addStyleName("rootPanel");
+
+							// Start PlaceHistoryHandler with our PlaceHistoryMapper
+							AppPlaceHistoryMapper historyMapper = GWT.create(AppPlaceHistoryMapper.class);
+							final PlaceHistoryHandler historyHandler = new PlaceHistoryHandler(historyMapper);
+							historyHandler.register(placeController, eventBus, AppActivityMapper.getDefaultPlace());
+							Header header = ginjector.getHeader();
+							RootPanel.get("headerPanel").add(header);
+							Footer footer = ginjector.getFooter();
+							RootPanel.get("footerPanel").add(footer);
+
+							RootPanel.get("rootPanel").add(appWidget);
+							RootPanel.get("initialLoadingUI").setVisible(false);
+							fullOpacity(RootPanel.get("headerPanel"), RootPanel.get("rootPanel"));
+							final GlobalApplicationState globalApplicationState = ginjector.getGlobalApplicationState();
+							globalApplicationState.setPlaceController(placeController);
+							globalApplicationState.setAppPlaceHistoryMapper(historyMapper);
 							ginjector.getAuthenticationController().checkForUserChange(() -> {
-								EventBus eventBus = ginjector.getEventBus();
-								PlaceController placeController = new PlaceController(eventBus);
-
-								// Start ActivityManager for the main widget with our ActivityMapper
-								AppActivityMapper activityMapper = new AppActivityMapper(ginjector, new SynapseJSNIUtilsImpl(), null);
-								ActivityManager activityManager = new ActivityManager(activityMapper, eventBus);
-								activityManager.setDisplay(appWidget);
-
-								// All pages get added to the root panel
-								appWidget.addStyleName("rootPanel");
-
-								// Start PlaceHistoryHandler with our PlaceHistoryMapper
-								AppPlaceHistoryMapper historyMapper = GWT.create(AppPlaceHistoryMapper.class);
-								final PlaceHistoryHandler historyHandler = new PlaceHistoryHandler(historyMapper);
-								historyHandler.register(placeController, eventBus, AppActivityMapper.getDefaultPlace());
-								Header header = ginjector.getHeader();
-								RootPanel.get("headerPanel").add(header);
-								Footer footer = ginjector.getFooter();
-								RootPanel.get("footerPanel").add(footer);
-
-								RootPanel.get("rootPanel").add(appWidget);
-								RootPanel.get("initialLoadingUI").setVisible(false);
-								fullOpacity(RootPanel.get("headerPanel"), RootPanel.get("rootPanel"));
-								final GlobalApplicationState globalApplicationState = ginjector.getGlobalApplicationState();
-								globalApplicationState.setPlaceController(placeController);
-								globalApplicationState.setAppPlaceHistoryMapper(historyMapper);
-								
 								globalApplicationState.init(new Callback() {
 									@Override
 									public void invoke() {
