@@ -84,23 +84,31 @@ public class NewAccountViewImpl extends Composite implements NewAccountView {
 		password2Field.addKeyDownHandler(register);
 
 		userNameField.addBlurHandler(event -> {
-			checkUsernameFormat();
+			boolean enableNext = checkUsernameFormat();
+			reconfigurePageProgressWidget(enableNext);
 		});
 		password1Field.addBlurHandler(event -> {
-			if (checkPassword1() && checkUsernameFormat());
+			boolean enableNext = (checkPassword1() && checkUsernameFormat());
+			reconfigurePageProgressWidget(enableNext);
 		});
 		password2Field.addBlurHandler(event -> {
-			if (checkPassword2() && checkPasswordMatch() && checkUsernameFormat());			
+			boolean enableNext = (checkPassword2() && checkPasswordMatch() && checkUsernameFormat());
+			reconfigurePageProgressWidget(enableNext);
 		});
 		
 		pageProgressContainer.add(pageProgressWidget);
+		reconfigurePageProgressWidget(false);
+	}
+	
+	public void reconfigurePageProgressWidget(boolean enableNext) {
 		Callback backBtnCallback = () -> {
 			globalAppState.getPlaceChanger().goTo(new RegisterAccount(ClientProperties.DEFAULT_PLACE_TOKEN));
 		};
 		Callback forwardBtnCallback = () -> {
 			onRegisterClick();
 		};
-		pageProgressWidget.configure(WebConstants.SYNAPSE_GREEN, 50, "Back", backBtnCallback, "Next", forwardBtnCallback, true);
+
+		pageProgressWidget.configure(WebConstants.SYNAPSE_GREEN, 50, "Back", backBtnCallback, "Next", forwardBtnCallback, enableNext);
 	}
 
 	private boolean checkUsernameFormat() {
@@ -152,7 +160,8 @@ public class NewAccountViewImpl extends Composite implements NewAccountView {
 
 	@Override
 	public void markUsernameUnavailable() {
-		synAlert.showError(DisplayConstants.ERROR_USERNAME_ALREADY_EXISTS);		
+		synAlert.showError(DisplayConstants.ERROR_USERNAME_ALREADY_EXISTS);
+		reconfigurePageProgressWidget(false);
 	}
 
 	private boolean checkPassword1() {
@@ -167,7 +176,7 @@ public class NewAccountViewImpl extends Composite implements NewAccountView {
 	private boolean checkPassword2() {
 		synAlert.clear();
 		if (!DisplayUtils.isDefined(password2Field.getText())) {
-			synAlert.showError(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);			
+			synAlert.showError(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
 			return false;
 		} else
 			return true;

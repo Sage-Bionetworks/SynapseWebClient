@@ -141,8 +141,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			public void onSuccess(String accessToken) {
 				cookies.setCookie(CookieKeys.USER_LOGGED_IN_RECENTLY, "true", DateTimeUtilsImpl.getWeekFromNow());
 				currentUserAccessToken = accessToken;
-				FluentFuture<UserProfile> userProfileFuture = ginInjector.getSynapseJavascriptClient().getMyUserProfile();
-				userProfileFuture.addCallback(new FutureCallback<UserProfile>() {
+				userAccountService.getMyProfile(new AsyncCallback<UserProfile>() {
 					@Override
 					public void onSuccess(UserProfile profile) {
 						currentUserProfile = profile;
@@ -150,17 +149,20 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 						jsniUtils.setAnalyticsUserId(getCurrentUserPrincipalId());
 						callback.onSuccess(currentUserProfile);
 					}
+
 					@Override
 					public void onFailure(Throwable t) {
 						currentUserProfile = null;
-						ginInjector.getSessionDetector().initializeAccessTokenState();
 						if (t instanceof ForbiddenException && ((ForbiddenException)t).getMessage().toLowerCase().contains("terms of use")) {
+							ginInjector.getSessionDetector().initializeAccessTokenState();
 							ginInjector.getGlobalApplicationState().getPlaceChanger().goTo(new LoginPlace(LoginPlace.SHOW_TOU));
 						} else {
+							logoutUser();
+							ginInjector.getSessionDetector().initializeAccessTokenState();
 							callback.onFailure(t);
 						}
 					}
-				}, directExecutor());
+				});
 			}
 
 			@Override
