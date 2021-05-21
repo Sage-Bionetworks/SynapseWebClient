@@ -26,7 +26,7 @@ import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceSourceEditor;
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceSourceEditorView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidget;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.test.helper.SelfReturningAnswer;
 
@@ -35,8 +35,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public class BiodallianceSourceEditorTest {
 	BiodallianceSourceEditorView mockView;
 	SynapseClientAsync mockSynapseClient;
-	EntityFinder.Builder mockEntityFinderBuilder;
-	EntityFinder mockEntityFinder, mockIndexEntityFinder;
+	EntityFinderWidget.Builder mockEntityFinderBuilder;
+	EntityFinderWidget mockEntityFinder, mockIndexEntityFinder;
 	BiodallianceSource mockSource;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
@@ -62,9 +62,9 @@ public class BiodallianceSourceEditorTest {
 		MockitoAnnotations.initMocks(this);
 		mockView = mock(BiodallianceSourceEditorView.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockEntityFinderBuilder = mock(EntityFinder.Builder.class, new SelfReturningAnswer());
-		mockEntityFinder = mock(EntityFinder.class);
-		mockIndexEntityFinder = mock(EntityFinder.class);
+		mockEntityFinderBuilder = mock(EntityFinderWidget.Builder.class, new SelfReturningAnswer());
+		mockEntityFinder = mock(EntityFinderWidget.class);
+		mockIndexEntityFinder = mock(EntityFinderWidget.class);
 
 		when(mockEntityFinderBuilder.build()).thenReturn(mockEntityFinder, mockIndexEntityFinder);
 
@@ -97,7 +97,7 @@ public class BiodallianceSourceEditorTest {
 		verify(mockEntityFinderBuilder).setMultiSelect(false);
 		verify(mockEntityFinderBuilder).setSelectableTypes(EntityFilter.FILE);
 		verify(mockEntityFinderBuilder).setShowVersions(true);
-		verify(mockEntityFinderBuilder, times(2)).setSelectedHandler(any(EntityFinder.SelectedHandler.class));
+		verify(mockEntityFinderBuilder, times(2)).setSelectedHandler(any(EntityFinderWidget.SelectedHandler.class));
 		verify(mockEntityFinderBuilder, times(2)).build();
 
 		verify(mockView).setSourceName(sourceName);

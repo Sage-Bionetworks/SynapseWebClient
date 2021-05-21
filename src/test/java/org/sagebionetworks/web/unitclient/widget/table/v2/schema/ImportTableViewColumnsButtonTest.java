@@ -29,7 +29,7 @@ import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.Button;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ImportTableViewColumnsButton;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.test.helper.SelfReturningAnswer;
@@ -42,9 +42,9 @@ public class ImportTableViewColumnsButtonTest {
 
 	@Mock
 	Button mockButton;
-	EntityFinder.Builder mockEntityFinderBuilder;
+	EntityFinderWidget.Builder mockEntityFinderBuilder;
 	@Mock
-	EntityFinder mockFinder;
+    EntityFinderWidget mockFinder;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
 
@@ -67,7 +67,7 @@ public class ImportTableViewColumnsButtonTest {
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		mockEntityFinderBuilder = mock(EntityFinder.Builder.class, new SelfReturningAnswer());
+		mockEntityFinderBuilder = mock(EntityFinderWidget.Builder.class, new SelfReturningAnswer());
 		when(mockEntityFinderBuilder.build()).thenReturn(mockFinder);
 		widget = new ImportTableViewColumnsButton(mockButton, mockEntityFinderBuilder, mockSynapseJavascriptClient);
 		AsyncMockStubber.callSuccessWith(mockBundle).when(mockSynapseJavascriptClient).getEntityBundleForVersion(anyString(), anyLong(), any(EntityBundleRequest.class), any(AsyncCallback.class));

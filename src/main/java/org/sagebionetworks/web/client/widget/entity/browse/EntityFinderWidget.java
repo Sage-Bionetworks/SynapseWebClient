@@ -3,8 +3,9 @@ package org.sagebionetworks.web.client.widget.entity.browse;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.web.client.jsinterop.EntityFinderScope;
 
-public interface EntityFinder {
+public interface EntityFinderWidget {
 
 	/**
 	 * Invoked when the user confirms their selection. The Entity Finder is also supplied as a parameter, which
@@ -12,8 +13,8 @@ public interface EntityFinder {
 	 * @param <T>
 	 */
 	@FunctionalInterface
-	public interface SelectedHandler<T> {
-		public void onSelected(T selected, EntityFinder entityFinder);
+	interface SelectedHandler<T> {
+		public void onSelected(T selected, EntityFinderWidget entityFinder);
 	}
 
 	enum InitialContainer {
@@ -25,7 +26,7 @@ public interface EntityFinder {
 
 
 	interface Builder {
-		EntityFinder build();
+		EntityFinderWidget build();
 
 		Builder setSelectedHandler(SelectedHandler<Reference> handler);
 
@@ -33,7 +34,7 @@ public interface EntityFinder {
 
 		Builder setMultiSelect(boolean multiSelect);
 
-		Builder setInitialContainer(InitialContainer initialContainer);
+		Builder setInitialContainer(EntityFinderWidget.InitialContainer initialContainer);
 
 		Builder setSelectableTypes(EntityFilter selectableFilter);
 

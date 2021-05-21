@@ -5,10 +5,10 @@ import java.util.List;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.jsinterop.EntityFinderScope;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderScope;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidget;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -19,13 +19,13 @@ public class ProvenanceListWidget implements ProvenanceListWidgetView.Presenter,
 	ProvenanceListWidgetView view;
 	PortalGinInjector ginInjector;
 	List<ProvenanceEntry> rows;
-	EntityFinder.Builder entityFinderBuilder;
-	EntityFinder entityFinder;
+	EntityFinderWidget.Builder entityFinderBuilder;
+	EntityFinderWidget entityFinder;
 	ProvenanceURLDialogWidget urlDialog;
 	ProvenanceType provenanceType;
 
 	@Inject
-	public ProvenanceListWidget(final ProvenanceListWidgetView view, final PortalGinInjector ginInjector, final EntityFinder.Builder entityFinderBuilder) {
+	public ProvenanceListWidget(final ProvenanceListWidgetView view, final PortalGinInjector ginInjector, final EntityFinderWidget.Builder entityFinderBuilder) {
 		this.view = view;
 		this.ginInjector = ginInjector;
 		rows = new LinkedList<ProvenanceEntry>();
@@ -34,7 +34,7 @@ public class ProvenanceListWidget implements ProvenanceListWidgetView.Presenter,
 		this.entityFinder = entityFinderBuilder
 				.setModalTitle("Find in Synapse")
 				.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
-				.setInitialContainer(EntityFinder.InitialContainer.PROJECT)
+				.setInitialContainer(EntityFinderWidget.InitialContainer.PROJECT)
 				.setShowVersions(true)
 				.setMultiSelect(true)
 				.setSelectableTypes(EntityFilter.ALL)

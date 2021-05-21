@@ -4,10 +4,12 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.SynapseView;
+import org.sagebionetworks.web.client.jsinterop.EntityFinderScope;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 import com.google.gwt.user.client.ui.Widget;
 
-public interface EntityFinderV2View extends SynapseView {
+public interface EntityFinderWidgetView extends SynapseView {
 
 	/**
 	 * Set the presenter.
@@ -18,7 +20,7 @@ public interface EntityFinderV2View extends SynapseView {
 
 	void hide();
 
-	void renderComponent(EntityFinderScope initialScope, EntityFinder.InitialContainer initialContainer, String initialProject, String initialContainerId, boolean showVersions, boolean multiSelect, EntityFilter selectableTypes, EntityFilter visibleTypesInList, EntityFilter visibleTypesInTree, String selectedCopy, boolean treeOnly);
+	void renderComponent(EntityFinderScope initialScope, EntityFinderWidget.InitialContainer initialContainer, String projectId, String initialContainerId, boolean showVersions, boolean multiSelect, EntityFilter selectableEntityTypes, EntityFilter visibleTypesInList, EntityFilter visibleTypesInTree, String selectedCopy, boolean treeOnly);
 
 	void clearError();
 

@@ -50,7 +50,7 @@ import org.sagebionetworks.web.client.plotly.BarMode;
 import org.sagebionetworks.web.client.plotly.GraphType;
 import org.sagebionetworks.web.client.widget.Button;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.entity.editor.PlotlyConfigEditor;
@@ -68,9 +68,9 @@ public class PlotlyConfigEditorTest {
 	@Mock
 	PlotlyConfigView mockView;
 
-	EntityFinder.Builder mockEntityFinderBuilder;
+	EntityFinderWidget.Builder mockEntityFinderBuilder;
 	@Mock
-	EntityFinder mockFinder;
+    EntityFinderWidget mockFinder;
 	@Mock
 	SynapseAlert mockSynAlert;
 	@Mock
@@ -87,7 +87,7 @@ public class PlotlyConfigEditorTest {
 	@Captor
 	ArgumentCaptor<List<String>> availableColumnNamesCaptor;
 	@Captor
-	ArgumentCaptor<EntityFinder.SelectedHandler<Reference>> finderCallbackCaptor;
+	ArgumentCaptor<EntityFinderWidget.SelectedHandler<Reference>> finderCallbackCaptor;
 	public static String X_COLUMN_NAME = "x Column";
 	public static String Y_COLUMN_NAME = "y column";
 	public static String Y2_COLUMN_NAME = "y2 column";
@@ -100,7 +100,7 @@ public class PlotlyConfigEditorTest {
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
-		mockEntityFinderBuilder = mock(EntityFinder.Builder.class, new SelfReturningAnswer());
+		mockEntityFinderBuilder = mock(EntityFinderWidget.Builder.class, new SelfReturningAnswer());
 		when(mockEntityFinderBuilder.build()).thenReturn(mockFinder);
 		editor = new PlotlyConfigEditor(mockView, mockEntityFinderBuilder, mockSynAlert, mockShowHideAdvancedButton, mockSynapseJavascriptClient);
 		columnModels = new ArrayList<ColumnModel>();
@@ -372,7 +372,7 @@ public class PlotlyConfigEditorTest {
 		verify(mockEntityFinderBuilder).setSelectedHandler(finderCallbackCaptor.capture());
 		verify(mockEntityFinderBuilder).build();
 		verify(mockFinder).show();
-		EntityFinder.SelectedHandler<Reference> callback = finderCallbackCaptor.getValue();
+		EntityFinderWidget.SelectedHandler<Reference> callback = finderCallbackCaptor.getValue();
 		String newTableId = "syn222";
 		Reference r = new Reference();
 		r.setTargetId(newTableId);

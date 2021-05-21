@@ -25,7 +25,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SelectableItemList;
 import org.sagebionetworks.web.client.widget.entity.EntityListRowBadge;
 import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalView;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidget;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigView;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidget;
@@ -43,9 +43,9 @@ public class EntityListConfigEditorTest {
 	Map<String, String> descriptor;
 	@Mock
 	EntityListWidget mockEntityListWidget;
-	EntityFinder.Builder mockEntityFinderBuilder;
+	EntityFinderWidget.Builder mockEntityFinderBuilder;
 	@Mock
-	EntityFinder mockEntityFinder;
+    EntityFinderWidget mockEntityFinder;
 	@Mock
 	PromptForValuesModalView mockPromptForNoteModal;
 	SelectableItemList entityListRowWidgets;
@@ -56,11 +56,11 @@ public class EntityListConfigEditorTest {
 	@Captor
 	ArgumentCaptor<CallbackP<String>> promptCallbackCaptor;
 	@Captor
-	ArgumentCaptor<EntityFinder.SelectedHandler<List<Reference>>> entityFinderCaptor;
+	ArgumentCaptor<EntityFinderWidget.SelectedHandler<List<Reference>>> entityFinderCaptor;
 
 	@Before
 	public void setup() throws Exception {
-		mockEntityFinderBuilder = mock(EntityFinder.Builder.class, new SelfReturningAnswer());
+		mockEntityFinderBuilder = mock(EntityFinderWidget.Builder.class, new SelfReturningAnswer());
 		when(mockEntityFinderBuilder.build()).thenReturn(mockEntityFinder);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		entityListRowWidgets = new SelectableItemList();

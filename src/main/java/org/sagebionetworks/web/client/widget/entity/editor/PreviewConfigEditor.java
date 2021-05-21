@@ -5,10 +5,10 @@ import java.util.Map;
 
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.jsinterop.EntityFinderScope;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderScope;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidget;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -20,10 +20,10 @@ public class PreviewConfigEditor implements PreviewConfigView.Presenter, WidgetE
 
 	private PreviewConfigView view;
 	private Map<String, String> descriptor;
-	EntityFinder entityFinder;
+	EntityFinderWidget entityFinder;
 
 	@Inject
-	public PreviewConfigEditor(PreviewConfigView view, EntityFinder.Builder entityFinderBuilder) {
+	public PreviewConfigEditor(PreviewConfigView view, EntityFinderWidget.Builder entityFinderBuilder) {
 		this.view = view;
 		view.setPresenter(this);
 		view.initView();
@@ -34,7 +34,7 @@ public class PreviewConfigEditor implements PreviewConfigView.Presenter, WidgetE
 				.setPromptCopy("Find a File to insert a preview into this Wiki")
 				.setConfirmButtonCopy("Insert")
 				.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
-				.setInitialContainer(EntityFinder.InitialContainer.PROJECT)
+				.setInitialContainer(EntityFinderWidget.InitialContainer.PROJECT)
 				.setSelectableTypes(EntityFilter.FILE)
 				.setShowVersions(true)
 				.setSelectedHandler((selected, finder) -> {

@@ -7,9 +7,9 @@ import org.gwtbootstrap3.client.ui.TabPane;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.jsinterop.EntityFinderScope;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderScope;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidget;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -27,7 +27,7 @@ public class VideoConfigViewImpl implements VideoConfigView {
 	Button button;
 	@UiField
 	Heading videoFormatWarning;
-	EntityFinder entityFinder;
+	EntityFinderWidget entityFinder;
 	@UiField
 	TabListItem synapseTabListItem;
 	@UiField
@@ -48,14 +48,14 @@ public class VideoConfigViewImpl implements VideoConfigView {
 	Widget widget;
 
 	@Inject
-	public VideoConfigViewImpl(VideoConfigViewImplUiBinder binder, EntityFinder.Builder entityFinderBuilder) {
+	public VideoConfigViewImpl(VideoConfigViewImplUiBinder binder, EntityFinderWidget.Builder entityFinderBuilder) {
 		widget = binder.createAndBindUi(this);
 		this.entityFinder = entityFinderBuilder
 				.setModalTitle("Find Video File")
 				.setHelpMarkdown("Search or Browse Synapse to find a Video to insert into this Wiki")
 				.setPromptCopy("Find Video File to insert into this Wiki")
 				.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
-				.setInitialContainer(EntityFinder.InitialContainer.PROJECT)
+				.setInitialContainer(EntityFinderWidget.InitialContainer.PROJECT)
 				.setMultiSelect(false)
 				.setSelectableTypes(EntityFilter.FILE)
 				.setShowVersions(true)

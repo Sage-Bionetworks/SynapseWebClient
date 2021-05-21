@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.web.client.jsinterop.EntityFinderScope;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.CheckBoxState;
@@ -13,8 +14,7 @@ import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityListRowBadge;
 import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderScope;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidget;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListUtil;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidget;
@@ -31,13 +31,13 @@ public class EntityListConfigEditor implements EntityListConfigView.Presenter, W
 	private EntityListConfigView view;
 	private Map<String, String> descriptor;
 	AuthenticationController authenticationController;
-	EntityFinder.Builder entityFinderBuilder;
+	EntityFinderWidget.Builder entityFinderBuilder;
 	EntityListWidget entityListWidget;
 	WikiPageKey wikiKey;
 	PromptForValuesModalView promptForNoteModal;
 
 	@Inject
-	public EntityListConfigEditor(EntityListConfigView view, AuthenticationController authenticationController, EntityListWidget entityListWidget, EntityFinder.Builder entityFinderBuilder, PromptForValuesModalView promptForNoteModal) {
+	public EntityListConfigEditor(EntityListConfigView view, AuthenticationController authenticationController, EntityListWidget entityListWidget, EntityFinderWidget.Builder entityFinderBuilder, PromptForValuesModalView promptForNoteModal) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.entityFinderBuilder = entityFinderBuilder;
@@ -92,7 +92,7 @@ public class EntityListConfigEditor implements EntityListConfigView.Presenter, W
 		entityFinderBuilder
 				.setModalTitle("Insert Item List")
 				.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
-				.setInitialContainer(EntityFinder.InitialContainer.PROJECT)
+				.setInitialContainer(EntityFinderWidget.InitialContainer.PROJECT)
 				.setSelectableTypes(EntityFilter.ALL)
 				.setHelpMarkdown("Search or Browse Synapse to find items and insert them as a list into this Wiki page")
 				.setPromptCopy("Find items in Synapse to insert them as a list into this Wiki")

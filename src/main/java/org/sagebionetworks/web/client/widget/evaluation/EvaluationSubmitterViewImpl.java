@@ -19,6 +19,7 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.jsinterop.EntityFinderScope;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -26,8 +27,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 import org.sagebionetworks.web.client.widget.entity.RegisterTeamDialog;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderScope;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidget;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.FormParams;
 import com.google.gwt.core.client.JavaScriptObject;
@@ -51,8 +51,8 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 
 	private Presenter presenter;
 	private EvaluationList evaluationList;
-	private EntityFinder entityFinder;
-	private EntityFinder.Builder entityFinderBuilder;
+	private EntityFinderWidget entityFinder;
+	private EntityFinderWidget.Builder entityFinderBuilder;
 	private boolean showEntityFinder;
 	private Reference selectedReference;
 	AuthenticationController authController;
@@ -130,7 +130,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	private PortalGinInjector ginInjector;
 	String originalNextButtonText, originalSubmitButtonText;
 	@Inject
-	public EvaluationSubmitterViewImpl(Binder binder, EntityFinder.Builder entityFinderBuilder, EvaluationList evaluationList, PortalGinInjector ginInjector, AuthenticationController authController) {
+	public EvaluationSubmitterViewImpl(Binder binder, EntityFinderWidget.Builder entityFinderBuilder, EvaluationList evaluationList, PortalGinInjector ginInjector, AuthenticationController authController) {
 		widget = binder.createAndBindUi(this);
 		this.entityFinderBuilder = entityFinderBuilder;
 		this.evaluationList = evaluationList;
@@ -187,7 +187,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 		entityFinderButton.addClickHandler(event -> {
 			this.entityFinder = entityFinderBuilder
 					.setInitialScope(EntityFinderScope.ALL_PROJECTS)
-					.setInitialContainer(EntityFinder.InitialContainer.SCOPE)
+					.setInitialContainer(EntityFinderWidget.InitialContainer.SCOPE)
 					.setHelpMarkdown("Search or Browse Synapse to find items to submit to this Challenge")
 					.setPromptCopy("Find items to Submit to this Challenge")
 					.setMultiSelect(false)

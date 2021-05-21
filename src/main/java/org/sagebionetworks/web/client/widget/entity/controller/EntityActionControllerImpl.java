@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.entity.controller;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.CONTAINER;
 import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.PROJECT;
-import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.PROJECT_OR_TABLE;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +46,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
+import org.sagebionetworks.web.client.jsinterop.EntityFinderScope;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -66,8 +66,7 @@ import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
 import org.sagebionetworks.web.client.widget.entity.WikiPageDeleteConfirmationDialog;
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderScope;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidget;
 import org.sagebionetworks.web.client.widget.entity.download.AddFolderDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
@@ -137,7 +136,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	AuthenticationController authenticationController;
 	AccessControlListModalWidget accessControlListModalWidget;
 	RenameEntityModalWidget renameEntityModalWidget;
-	EntityFinder.Builder entityFinderBuilder;
+	EntityFinderWidget.Builder entityFinderBuilder;
 	EvaluationSubmitter submitter;
 	EditFileMetadataModalWidget editFileMetadataModalWidget;
 	EditProjectMetadataModalWidget editProjectMetadataModalWidget;
@@ -347,7 +346,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		return editProjectMetadataModalWidget;
 	}
 
-	private EntityFinder.Builder getEntityFinderBuilder() {
+	private EntityFinderWidget.Builder getEntityFinderBuilder() {
 		if (entityFinderBuilder == null) {
 			entityFinderBuilder = ginInjector.getEntityFinderBuilder();
 		}
@@ -1206,7 +1205,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	private void postCheckLink() {
 		getEntityFinderBuilder()
 				.setInitialScope(EntityFinderScope.ALL_PROJECTS)
-				.setInitialContainer(EntityFinder.InitialContainer.NONE)
+				.setInitialContainer(EntityFinderWidget.InitialContainer.NONE)
 				.setSelectableTypes(CONTAINER)
 				.setShowVersions(false)
 				.setSelectedHandler((selected, entityFinder) -> {
@@ -1227,7 +1226,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	 * 
 	 * @param target
 	 */
-	public void createLink(String target, EntityFinder finder) {
+	public void createLink(String target, EntityFinderWidget finder) {
 		Link link = new Link();
 		link.setParentId(target);
 		Reference ref = new Reference();
@@ -1279,7 +1278,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 
 	private void postCheckMove() {
-		EntityFinder.Builder builder = getEntityFinderBuilder()
+		EntityFinderWidget.Builder builder = getEntityFinderBuilder()
 				.setModalTitle("Move " + entityTypeDisplay)
 				.setHelpMarkdown("Search or Browse Synapse to find a destination to move this " + entityTypeDisplay)
 				.setPromptCopy("Find a destination to move <b>" + SafeHtmlUtils.fromString(entity.getName()).asString() + "</b> (" + entity.getId() + ")")
@@ -1307,12 +1306,12 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 
 		if (entityBundle.getEntity() instanceof Table) {
 			builder.setInitialScope(EntityFinderScope.ALL_PROJECTS)
-					.setInitialContainer(EntityFinder.InitialContainer.NONE)
+					.setInitialContainer(EntityFinderWidget.InitialContainer.NONE)
 					.setVisibleTypesInTree(PROJECT)
 					.setSelectableTypes(PROJECT);
 		} else {
 			builder.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
-					.setInitialContainer(EntityFinder.InitialContainer.PARENT)
+					.setInitialContainer(EntityFinderWidget.InitialContainer.PARENT)
 					.setVisibleTypesInTree(CONTAINER)
 					.setSelectableTypes(CONTAINER);
 		}

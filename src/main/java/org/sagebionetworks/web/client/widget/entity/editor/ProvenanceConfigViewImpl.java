@@ -5,9 +5,9 @@ import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.jsinterop.EntityFinderScope;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderScope;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidget;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -35,12 +35,12 @@ public class ProvenanceConfigViewImpl implements ProvenanceConfigView {
 	Widget widget;
 
 	@Inject
-	public ProvenanceConfigViewImpl(ProvenanceConfigViewImplUiBinder binder, EntityFinder.Builder entityFinderBuilder) {
+	public ProvenanceConfigViewImpl(ProvenanceConfigViewImplUiBinder binder, EntityFinderWidget.Builder entityFinderBuilder) {
 		widget = binder.createAndBindUi(this);
 
 		entityFinderButton.addClickHandler(event -> entityFinderBuilder
 				.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
-				.setInitialContainer(EntityFinder.InitialContainer.PROJECT)
+				.setInitialContainer(EntityFinderWidget.InitialContainer.PROJECT)
 				.setHelpMarkdown("Search or Browse Synapse to find an item and display the Provenance Graph within the Wiki page")
 				.setPromptCopy("Find items to insert a Provenance Graph")
 				.setMultiSelect(true)
