@@ -37,6 +37,7 @@ import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.renderer.HtmlPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.NbConvertPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.PDFPreviewWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.TIFFPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -57,7 +58,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 	public static final int VIDEO_HEIGHT = 180;
 
 	public enum PreviewFileType {
-		PLAINTEXT, CODE, ZIP, CSV, IMAGE, NONE, TAB, HTML, PDF, IPYNB, VIDEO, MARKDOWN
+		PLAINTEXT, CODE, ZIP, CSV, IMAGE, NONE, TAB, HTML, PDF, IPYNB, VIDEO, MARKDOWN, TIFF
 	}
 
 	public static final long MAX_HTML_FILE_SIZE = 5 * new Double(MB).longValue();
@@ -132,6 +133,8 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 				return PreviewFileType.CODE;
 			} else if (fileName != null && (fileName.toLowerCase().endsWith(".md") || fileName.toLowerCase().endsWith(".rmd"))) {
 				return PreviewFileType.MARKDOWN;
+			} else if (contentType != null && contentType.toLowerCase().equals("image/tiff")) {
+				return PreviewFileType.TIFF;
 			}
 		}
 		return PreviewFileType.NONE;
@@ -231,6 +234,13 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 				// create img
 				String fullFileUrl = DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(), ((Versionable) fileEntity).getVersionNumber(), false);
 				view.setImagePreview(fullFileUrl);
+				break;
+				
+			case TIFF:
+				// use UTIF.js to render
+				TIFFPreviewWidget tiffPreviewWidget = ginInjector.getTIFFPreviewWidget();
+				tiffPreviewWidget.configure(bundle.getEntity().getId(), fileHandleToShow);
+				view.setPreviewWidget(tiffPreviewWidget);
 				break;
 			case PDF:
 				// use pdf.js to view
