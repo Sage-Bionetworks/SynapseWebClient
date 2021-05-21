@@ -21,16 +21,17 @@ import static org.sagebionetworks.web.shared.WebConstants.FILE_SERVICE_URL_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.NRGR_SYNAPSE_GLUE_ENDPOINT_PROPERTY;
 import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.SYNAPSE_VERSION_KEY;
+import org.sagebionetworks.web.shared.WebConstants;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.sagebionetworks.client.exceptions.SynapseException;
+
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessRequirement;
@@ -72,7 +73,6 @@ import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.auth.ChangePasswordInterface;
 import org.sagebionetworks.repo.model.auth.LoginRequest;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
-import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.auth.Username;
 import org.sagebionetworks.repo.model.dataaccess.AccessApprovalNotificationRequest;
 import org.sagebionetworks.repo.model.dataaccess.AccessApprovalNotificationResponse;
@@ -122,6 +122,8 @@ import org.sagebionetworks.repo.model.principal.PrincipalAliasResponse;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.request.ReferenceList;
+import org.sagebionetworks.repo.model.schema.JsonSchemaObjectBinding;
+import org.sagebionetworks.repo.model.schema.ValidationResults;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.subscription.SortByType;
@@ -147,6 +149,7 @@ import org.sagebionetworks.web.client.cache.EntityId2BundleCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
+import org.sagebionetworks.web.shared.AccessTokenWrapper;
 import org.sagebionetworks.web.shared.TeamMemberBundle;
 import org.sagebionetworks.web.shared.TeamMemberPagedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -164,6 +167,7 @@ import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 import org.sagebionetworks.web.shared.exceptions.TooManyRequestsException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
+
 import com.google.common.base.Joiner;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.gwt.http.client.Request;
@@ -184,7 +188,6 @@ import com.google.inject.Inject;
 public class SynapseJavascriptClient {
 	public static final String BUNDLE2 = "/bundle2";
 	public static final String TABLE_SNAPSHOT = "/table/snapshot";
-	public static final String SESSION = "/session";
 	public static final String TYPE_FILTER_PARAMETER = "&typeFilter=";
 	public static final String CHALLENGE = "/challenge";
 	public static final String WIKI = "/wiki/";
@@ -244,7 +247,8 @@ public class SynapseJavascriptClient {
 	public static final String USER = "/user";
 	public static final String BUNDLE_MASK_PATH = "/bundle?mask=";
 	public static final String ACCEPT = "Accept";
-	public static final String SESSION_TOKEN_HEADER = "sessionToken";
+	public static final String AUTHORIZATION_HEADER = "authorization";
+	public static final String BEARER_PREFIX = "Bearer ";
 	public static final String SYNAPSE_ENCODING_CHARSET = "UTF-8";
 	public static final String APPLICATION_JSON_CHARSET_UTF8 = "application/json; charset=" + SYNAPSE_ENCODING_CHARSET;
 	public static final String REPO_SUFFIX_VERSION = "/version";
@@ -293,7 +297,7 @@ public class SynapseJavascriptClient {
 	public static final String VIEW_COLUMN_MODEL_REQUEST = "/column/view/scope";
 	public static final String SCHEMA_TYPE_VALIDATION = "/schema/type/validation/";
 	public static final String DOWNLOAD_LIST_V2 = "/download/list/query/";
-	
+
 	public static final String ASYNC_START = "/async/start";
 	public static final String ASYNC_GET = "/async/get/";
 	public static final String AUTH_OAUTH_2 = "/oauth2";
@@ -357,11 +361,11 @@ public class SynapseJavascriptClient {
 	/**
 	 * For testing purposes only. Returns Requests associated to the given url. Requests are
 	 * periodically removed from this list once they leave the Pending state.
-	 * 
+	 *
 	 * @param forUrl
 	 * @return
 	 */
-	public List<Request> getRequests(String forUrl) {
+	public List<Request> getCancellableRequests(String forUrl) {
 		return requestsMap.get(forUrl);
 	}
 
@@ -390,7 +394,7 @@ public class SynapseJavascriptClient {
 	private String getFileServiceUrl() {
 		return synapseProperties.getSynapseProperty(FILE_SERVICE_URL_KEY);
 	}
-	
+
 	private String getNrgrSynapseGlueEndpoint() {
 		return synapseProperties.getSynapseProperty(NRGR_SYNAPSE_GLUE_ENDPOINT_PROPERTY);
 	}
@@ -407,7 +411,7 @@ public class SynapseJavascriptClient {
 		requestBuilder.configure(DELETE, url);
 		requestBuilder.setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
 		if (authController.isLoggedIn()) {
-			requestBuilder.setHeader(SESSION_TOKEN_HEADER, authController.getCurrentUserSessionToken());
+			requestBuilder.setHeader(AUTHORIZATION_HEADER, BEARER_PREFIX + authController.getCurrentUserAccessToken());
 		}
 		// never cancel a DELETE request
 		boolean canCancel = false;
@@ -415,28 +419,28 @@ public class SynapseJavascriptClient {
 	}
 
 	private Request doGet(String url, OBJECT_TYPE responseType, AsyncCallback callback) {
-		return doGet(url, responseType, APPLICATION_JSON_CHARSET_UTF8, authController.getCurrentUserSessionToken(), callback);
+		return doGet(url, responseType, APPLICATION_JSON_CHARSET_UTF8, authController.getCurrentUserAccessToken(), callback);
 	}
 
 	public Request doGetString(String url, boolean forceAnonymous, AsyncCallback callback) {
-		String sessionToken = forceAnonymous ? null : authController.getCurrentUserSessionToken();
-		return doGet(url, OBJECT_TYPE.String, null, sessionToken, callback);
+		String accessToken = forceAnonymous ? null : authController.getCurrentUserAccessToken();
+		return doGet(url, OBJECT_TYPE.String, null, accessToken, callback);
 	}
 
-	private Request doGet(String url, OBJECT_TYPE responseType, String acceptedResponseType, String sessionToken, AsyncCallback callback) {
+	private Request doGet(String url, OBJECT_TYPE responseType, String acceptedResponseType, String accessToken, AsyncCallback callback) {
 		// can almost always cancel a GET request
 		boolean canCancel = true;
-		return doGet(url, responseType, acceptedResponseType, sessionToken, canCancel, callback);
+		return doGet(url, responseType, acceptedResponseType, accessToken, canCancel, callback);
 	}
 	
-	private Request doGet(String url, OBJECT_TYPE responseType, String acceptedResponseType, String sessionToken, boolean canCancel, AsyncCallback callback) {
+	private Request doGet(String url, OBJECT_TYPE responseType, String acceptedResponseType, String accessToken, boolean canCancel, AsyncCallback callback) {
 		RequestBuilderWrapper requestBuilder = ginInjector.getRequestBuilder();
 		requestBuilder.configure(GET, url);
 		if (acceptedResponseType != null) {
 			requestBuilder.setHeader(ACCEPT, acceptedResponseType);
 		}
-		if (sessionToken != null) {
-			requestBuilder.setHeader(SESSION_TOKEN_HEADER, sessionToken);
+		if (accessToken != null) {
+			requestBuilder.setHeader(AUTHORIZATION_HEADER, BEARER_PREFIX + accessToken);
 		}
 		return sendRequest(requestBuilder, null, responseType, INITIAL_RETRY_REQUEST_DELAY_MS, canCancel, callback);
 	}
@@ -458,7 +462,7 @@ public class SynapseJavascriptClient {
 		requestBuilder.setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
 		requestBuilder.setHeader(CONTENT_TYPE, APPLICATION_JSON_CHARSET_UTF8);
 		if (authController.isLoggedIn()) {
-			requestBuilder.setHeader(SESSION_TOKEN_HEADER, authController.getCurrentUserSessionToken());
+			requestBuilder.setHeader(AUTHORIZATION_HEADER, BEARER_PREFIX + authController.getCurrentUserAccessToken());
 		}
 		return sendRequest(requestBuilder, requestData, responseType, INITIAL_RETRY_REQUEST_DELAY_MS, canCancel, callback);
 	}
@@ -609,7 +613,7 @@ public class SynapseJavascriptClient {
 	 * If bundle is found in local js cache, then this will immediately call onSuccess() with the cached
 	 * version. Note that the current entity bundle will still be retrieved, and onSuccess() may be
 	 * called again if there's a newer version (so write your onSuccess accordingly)!
-	 * 
+	 *
 	 * @param entityId
 	 * @param partsMask
 	 * @param callback
@@ -827,6 +831,10 @@ public class SynapseJavascriptClient {
 		}
 	}
 
+	public FluentFuture<UserProfile> getMyUserProfile() {
+		return getUserProfile(null);
+	}
+	
 	public FluentFuture<UserProfile> getUserProfile(String userId) {
 		String url = getRepoServiceUrl() + USER_PROFILE_PATH;
 		// If userId is null, we get the current user's profile.
@@ -1063,10 +1071,10 @@ public class SynapseJavascriptClient {
 		String url = getFileServiceUrl() + FILE_HANDLE_BATCH;
 		doPost(url, request, OBJECT_TYPE.BatchFileResult, true, callback);
 	}
-	
+
 	/**
 	 * http://rest-docs.synapse.org/rest/GET/fileHandle/handleId/url.html
-	 * 
+	 *
 	 * Note: This call will result in a HTTP temporary redirect (307), to the actual file URL if the caller meets all of the download requirements.
 	 * Note: Only the user that created the FileHandle can use this method for download.
 	 */
@@ -1083,7 +1091,7 @@ public class SynapseJavascriptClient {
 		String url = getRepoServiceUrl() + TEAM + "/" + teamId + "/icon/preview?redirect=false";
 		doGetString(url, false, callback);
 	}
-	
+
 	public void getEntityHeaderBatch(List<String> entityIds, AsyncCallback<ArrayList<EntityHeader>> callback) {
 		List<Reference> list = new ArrayList<Reference>();
 		for (String entityId : entityIds) {
@@ -1120,7 +1128,7 @@ public class SynapseJavascriptClient {
 		String url = getRepoServiceUrl() + MEMBERSHIP_INVITATION + "/" + id;
 		doDelete(url, callback);
 	}
-	
+
 	public void createMembershipInvitation(MembershipInvitation invitation, AsyncCallback<MembershipInvitation> callback) {
 		String url = getRepoServiceUrl() + MEMBERSHIP_INVITATION;
 		String signedTokenEndpoint = gwt.encodeQueryString(gwt.getHostPageBaseURL() + SIGNED_TOKEN);
@@ -1151,7 +1159,7 @@ public class SynapseJavascriptClient {
 
 		doPut(url, toUpdate, OBJECT_TYPE.V2WikiPage, callback);
 	}
-	
+
 	public void updateMyUserProfile(UserProfile profile, AsyncCallback<UserProfile> callback) {
 		String url = getRepoServiceUrl() + "/" + USER_PROFILE_PATH;
 		doPut(url, profile, OBJECT_TYPE.UserProfile, callback);
@@ -1200,12 +1208,12 @@ public class SynapseJavascriptClient {
 	public FluentFuture<List<ColumnModel>> getDefaultColumnsForView(int viewTypeMask) {
 		String url = getRepoServiceUrl() + COLUMN_VIEW_DEFAULT + "?viewTypeMask="+viewTypeMask;
 		boolean canCancel = false;
-		return getFuture(cb -> doGet(url, OBJECT_TYPE.ListWrapperColumnModel, APPLICATION_JSON_CHARSET_UTF8, authController.getCurrentUserSessionToken(), canCancel, cb));
+		return getFuture(cb -> doGet(url, OBJECT_TYPE.ListWrapperColumnModel, APPLICATION_JSON_CHARSET_UTF8, authController.getCurrentUserAccessToken(), canCancel, cb));
 	}
 	public FluentFuture<List<ColumnModel>> getDefaultColumnsForView(ViewEntityType viewEntityType) {
 		String url = getRepoServiceUrl() + COLUMN_VIEW_DEFAULT + "?viewEntityType=" + viewEntityType.name();
 		boolean canCancel = false;
-		return getFuture(cb -> doGet(url, OBJECT_TYPE.ListWrapperColumnModel, APPLICATION_JSON_CHARSET_UTF8, authController.getCurrentUserSessionToken(), canCancel, cb));
+		return getFuture(cb -> doGet(url, OBJECT_TYPE.ListWrapperColumnModel, APPLICATION_JSON_CHARSET_UTF8, authController.getCurrentUserAccessToken(), canCancel, cb));
 	}
 
 
@@ -1258,15 +1266,8 @@ public class SynapseJavascriptClient {
 	}
 
 	public void login(LoginRequest loginRequest, AsyncCallback<LoginResponse> callback) {
-		String url = getAuthServiceUrl() + "/login";
+		String url = getAuthServiceUrl() + "/login2";
 		doPost(url, loginRequest, OBJECT_TYPE.LoginResponse, false, callback);
-	}
-
-	public void logout() {
-		if (authController.isLoggedIn()) {
-			String url = getAuthServiceUrl() + SESSION;
-			doDelete(url, null);
-		}
 	}
 
 	public void getMyProjects(ProjectListType projectListType, int limit, String nextPageToken, ProjectListSortColumn sortBy, SortDirection sortDir, AsyncCallback<ProjectHeaderList> projectHeadersCallback) {
@@ -1441,7 +1442,7 @@ public class SynapseJavascriptClient {
 		String url = getRepoServiceUrl() + ACCESS_REQUIREMENT + requirementId;
 		doGet(url, OBJECT_TYPE.AccessRequirement, callback);
 	}
-	
+
 	public void getDataAccessSubmissions(String requirementId, String nextPageToken, SubmissionState filter, SubmissionOrder order, boolean isAscending, AsyncCallback<SubmissionPage> callback) {
 		String url = getRepoServiceUrl() + ACCESS_REQUIREMENT + "/" + requirementId + SUBMISSIONS;
 		SubmissionPageRequest request = new SubmissionPageRequest();
@@ -1452,7 +1453,7 @@ public class SynapseJavascriptClient {
 		request.setNextPageToken(nextPageToken);
 		doPost(url, request, OBJECT_TYPE.SubmissionPage, true, callback);
 	}
-	
+
 	public void getUploadDestinations(String parentEntityId, AsyncCallback<List<UploadDestination>> callback) {
 		String url = getFileServiceUrl() + ENTITY + "/" + parentEntityId + UPLOAD_DESTINATIONS;
 		doGet(url, OBJECT_TYPE.ListWrapperUploadDestinations, callback);
@@ -1534,16 +1535,20 @@ public class SynapseJavascriptClient {
 	}
 
 	/**
-	 * call to ask the server to set the session cookie
+	 * call to ask the server to set the access token cookie
 	 * 
 	 * @param token
 	 * @param callback
 	 */
 	public void initSession(String token, AsyncCallback<Void> callback) {
-		Session s = new Session();
-		s.setSessionToken(token);
-		String url = jsniUtils.getSessionCookieUrl();
-		doPost(url, s, OBJECT_TYPE.None, false, callback);
+		AccessTokenWrapper t = new AccessTokenWrapper();
+		t.setToken(token);
+		String url = jsniUtils.getAccessTokenCookieUrl();
+		doPost(url, t, OBJECT_TYPE.None, false, callback);
+	}
+	
+	public FluentFuture<String> getAccessToken() {
+		return getFuture(cb -> doGet(jsniUtils.getAccessTokenCookieUrl()+"?"+WebConstants.VALIDATE_QUERY_PARAMETER_KEY + "=true", OBJECT_TYPE.String, cb));
 	}
 
 	public void subscribe(Topic topic, AsyncCallback<Subscription> callback) {
@@ -1675,21 +1680,6 @@ public class SynapseJavascriptClient {
 		doPut(url, null, OBJECT_TYPE.None, cb);
 	}
 
-	/**
-	 * If logged in, refresh the current session token to render it usable for another 24 hours
-	 */
-	public void refreshCurrentSessionToken() {
-		if (authController.isLoggedIn()) {
-			String url = getAuthServiceUrl() + SESSION;
-			Session session = new Session();
-			session.setSessionToken(authController.getCurrentUserSessionToken());
-			doPut(url, session, OBJECT_TYPE.None, null);
-
-			// also set the session cookie (to update the expiration)
-			initSession(authController.getCurrentUserSessionToken());
-		}
-	}
-
 	public void getTeamMembers(String teamId, String fragment, TeamMemberTypeFilterOptions memberType, Integer limit, Integer offset, AsyncCallback<TeamMemberPagedResults> callback) {
 		// first gather the team members
 		String url = getRepoServiceUrl() + TEAM_MEMBERS + teamId + "?" + OFFSET_PARAMETER + offset + "&" + LIMIT_PARAMETER + limit;
@@ -1765,12 +1755,12 @@ public class SynapseJavascriptClient {
 		username.setEmail(emailAddress);
 		doPost(url, username, OBJECT_TYPE.None, false, cb);
 	}
-	
+
 	public void getSynapseVersions(AsyncCallback<String> cb) {
 		// GET versions, cannot cancel
 		doGet(jsniUtils.getVersionsServletUrl(), OBJECT_TYPE.String, null, null, false, cb);
 	}
-	
+
 	public void getAvailableEvaluations(Set<String> targetEvaluationIds, boolean isActiveOnly, Integer limit, Integer offset, AsyncCallback<List<Evaluation>> cb) {
 		String url = getRepoServiceUrl() + EVALUATION_AVAILABLE + "?activeOnly=" + isActiveOnly;
 		if (targetEvaluationIds != null && targetEvaluationIds.size() > 0) {
@@ -1788,7 +1778,7 @@ public class SynapseJavascriptClient {
 
 		doGet(url, OBJECT_TYPE.PaginatedResultsEvaluations, cb);
 	}
-	
+
 	public void getEvaluations(Boolean isActiveOnly, ACCESS_TYPE accessType, List<String> idsList, Integer limit, Integer offset, AsyncCallback<List<Evaluation>> cb) {
 		char sep = '?';
 		String url = getRepoServiceUrl() + EVALUATION;
@@ -1807,7 +1797,7 @@ public class SynapseJavascriptClient {
 			}
 			sep = '&';
 		}
-		
+
 		if (limit != null) {
 			url += sep + LIMIT_PARAMETER + limit;
 			sep = '&';
@@ -1819,7 +1809,7 @@ public class SynapseJavascriptClient {
 
 		doGet(url, OBJECT_TYPE.PaginatedResultsEvaluations, cb);
 	}
-	
+
 	public void getEvaluation(String evaluationId, AsyncCallback<Evaluation> cb) {
 		String url = getRepoServiceUrl() + EVALUATION + "/" + evaluationId;
 		doGet(url, OBJECT_TYPE.Evaluation, cb);
@@ -1829,7 +1819,7 @@ public class SynapseJavascriptClient {
 		String url = getRepoServiceUrl() + EVALUATION + "/" + evaluationId + "/migratequota";
 		doPost(url, null,OBJECT_TYPE.None, false,cb);
 	}
-	
+
 	public void listApprovedSubmissionInfo(String requirementId, String nextPageToken, AsyncCallback<SubmissionInfoPage> cb) {
 		SubmissionInfoPageRequest request = new SubmissionInfoPageRequest();
 		request.setAccessRequirementId(requirementId);
@@ -1837,7 +1827,7 @@ public class SynapseJavascriptClient {
 		String url = getRepoServiceUrl() + ACCESS_REQUIREMENT + "/" + requirementId + "/approvedSubmissionInfo";
 		doPost(url, request, OBJECT_TYPE.SubmissionInfoPage, true, cb);
 	}
-	
+
 	public void submitNRGRDataAccessToken(String token, AsyncCallback<String> cb) {
 		String url = getNrgrSynapseGlueEndpoint();
 		RequestBuilderWrapper requestBuilder = ginInjector.getRequestBuilder();
@@ -1846,11 +1836,11 @@ public class SynapseJavascriptClient {
 		requestBuilder.setHeader(CONTENT_TYPE, "text/plain");
 
 		if (authController.isLoggedIn()) {
-			requestBuilder.setHeader(SESSION_TOKEN_HEADER, authController.getCurrentUserSessionToken());
+			requestBuilder.setHeader(AUTHORIZATION_HEADER, BEARER_PREFIX + authController.getCurrentUserAccessToken());
 		}
 		sendRequest(requestBuilder, token, OBJECT_TYPE.String, INITIAL_RETRY_REQUEST_DELAY_MS, false, cb);
 	}
-	
+
 	public void getAccessApprovalNotifications(String requirementId, List<String> recipientIds, AsyncCallback<AccessApprovalNotificationResponse> cb) {
 		AccessApprovalNotificationRequest request = new AccessApprovalNotificationRequest();
 		List<Long> recipientIdsLongs = recipientIds.stream().map(Long::parseLong).collect(Collectors.toList());
@@ -1859,10 +1849,53 @@ public class SynapseJavascriptClient {
 		String url = getRepoServiceUrl() + ACCESS_APPROVAL + "/notifications";
 		doPost(url, request, OBJECT_TYPE.AccessApprovalNotificationResponse, true, cb);
 	}
-	
+
 	public void getDefaultUploadDestination(String parentEntityId, AsyncCallback<UploadDestination> cb) {
 		String url = getFileServiceUrl() + ENTITY + "/" + parentEntityId + "/uploadDestination";
 		doGet(url, OBJECT_TYPE.UploadDestination, cb);
 	}
+
+	public void getSchemaBinding(String entityId, AsyncCallback<JsonSchemaObjectBinding> cb) {
+		String url = getRepoServiceUrl() + ENTITY + "/" + entityId + "/schema/binding";
+		doGet(url, OBJECT_TYPE.JsonSchemaObjectBinding, cb);
+	}
+
+	public void getSchemaValidationResults(String entityId, AsyncCallback<ValidationResults> cb) {
+		String url = getRepoServiceUrl() + ENTITY + "/" + entityId + "/schema/validation";
+		doGet(url, OBJECT_TYPE.ValidationResults, cb);
+	}
+
+	private void getSchemaValidationResultsWithMatchingEtag(String entityId, String expectedEtag, int delayMs, AsyncCallback<ValidationResults> cb) {
+		gwt.scheduleExecution(
+				() ->
+						getSchemaValidationResults(entityId, new AsyncCallback<ValidationResults>() {
+							@Override
+							public void onSuccess(ValidationResults result) {
+								// If the result eTag and the entity eTag are different, then schema conformance has not been determined yet
+								// re-fetch with back-off until it is consistent
+								if (result.getObjectEtag().equals(expectedEtag)) {
+									cb.onSuccess(result);
+								} else {
+									getSchemaValidationResultsWithMatchingEtag(entityId, expectedEtag, delayMs * 2, cb);
+								}
+							}
+							@Override
+							public void onFailure(Throwable caught) {
+								cb.onFailure(caught);
+							}
+						}),
+				delayMs);
+	}
+
+	/**
+	 * Retries (with exponential backoff) on mismatched eTag or 404
+	 * @param entityId
+	 * @param expectedEtag
+	 * @param cb
+	 */
+	public void getSchemaValidationResultsWithMatchingEtag(String entityId, String expectedEtag, AsyncCallback<ValidationResults> cb) {
+		getSchemaValidationResultsWithMatchingEtag(entityId, expectedEtag, INITIAL_RETRY_REQUEST_DELAY_MS, cb);
+	}
+
 }
 

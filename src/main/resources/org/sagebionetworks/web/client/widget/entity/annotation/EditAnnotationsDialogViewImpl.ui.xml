@@ -14,7 +14,7 @@
 				<b:Heading size="H4" addStyleNames="displayInline" text="Edit Annotations" />
 				<w:HelpWidget
 					helpMarkdown="Set metadata annotation fields. Field values are **not** case sensitive."
-					href="https://docs.synapse.org/articles/annotation_and_query.html"
+					href="https://help.synapse.org/docs/Annotations-and-Queries.2011070649.html"
 					addStyleNames="margin-left-5" placement="BOTTOM" />
 			</b:ModalHeader>
 			

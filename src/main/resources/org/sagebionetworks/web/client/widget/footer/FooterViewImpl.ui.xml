@@ -12,7 +12,7 @@
 		<bh:Div>
 			<bh:Div addStyleNames="synapse-dark-blue-bg padding-15">
 				<bh:Div>
-					<bh:Div addStyleNames="flexcontainer-row flexcontainer-justify">						
+					<bh:Div addStyleNames="flexcontainer-row flexcontainer-justify">
 						<bh:Div addStyleNames="flexcontainer-column-fill-width hidden-xs"> <!--Left-aligned logo for desktop view-->
 							<bh:Div>
 							<g:Image url="images/logo.svg"
@@ -35,7 +35,7 @@
 						</bh:Div>
 
 						<bh:Div width="200px" addStyleNames="text-align-right">
-							<bh:Span ui:field="hideACTActionsContainer" />						
+							<bh:Span ui:field="hideACTActionsContainer" />
 							<bh:Div width="100%" addStyleNames="flexcontainer-row">
 								<g:Image ui:field="alphaModeStatusIcon" addStyleNames="flexcontainer-column margin-right-5 margin-top-3" width="18px" height="18px" />
 								<b:Anchor ui:field="debugLink"
@@ -50,7 +50,7 @@
 									helpMarkdown="This mode gives you early access to features that are still in development. Please note that we do not guarantee an absence of errors, and that the data created using these features may be lost during product upgrade."
 									addStyleNames="flexcontainer-column flexcontainer-justify-flex-end margin-left-5" iconStyles="color-white"
 									placement="TOP" />
-							</bh:Div>							
+							</bh:Div>
 						</bh:Div>
 					</bh:Div>
 					<bh:Div addStyleNames="flexcontainer-row margin-bottom-10 hidden-xs">
@@ -67,7 +67,7 @@
 									<bh:Span addStyleNames="dot synapse-green-bg" />
 								</bh:Span>
 								<bh:Span addStyleNames="flexcontainer-column">
-									<b:Anchor href="https://docs.synapse.org"
+									<b:Anchor href="https://help.synapse.org"
 										text="Documentation" addStyleNames="color-white" />
 								</bh:Span>
 								<bh:Span addStyleNames="flexcontainer-column hidden-xs"
@@ -97,7 +97,7 @@
 					<bh:Div>
 						<b:Anchor href="mailto:synapseInfo@sagebionetworks.org"
 							text="Contact Us" addStyleNames="color-white displayBlock margin-top-5 margin-bottom-5" />
-						<b:Anchor href="https://docs.synapse.org"
+						<b:Anchor href="https://help.synapse.org"
 							text="Documentation" addStyleNames="color-white displayBlock margin-top-5 margin-bottom-5" />
 						<b:Anchor
 							href="http://creativecommons.org/licenses/by/4.0/legalcode"

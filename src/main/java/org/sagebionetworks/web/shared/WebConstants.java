@@ -24,9 +24,9 @@ public class WebConstants {
 
 	public static final String INVALID_EMAIL_MESSAGE = "Invalid email address";
 
-	public static final String DOCS_BASE_URL = "http://docs.synapse.org/";
-	public static final String DOCS_URL = DOCS_BASE_URL + "articles/";
-	public static final String PROVENANCE_API_URL = DOCS_URL + "provenance.html";
+	public static final String DOCS_BASE_URL = "https://help.synapse.org/";
+	public static final String DOCS_URL = DOCS_BASE_URL + "docs/";
+	public static final String PROVENANCE_API_URL = DOCS_URL + "Provenance.1972470373.html";
 
 	public static final String PREVIEW_UNAVAILABLE_PATH = "images/blank.png";
 
@@ -329,4 +329,6 @@ public class WebConstants {
 
 	// report Synapse error
 	public static final String SWC_ISSUE_COLLECTOR_URL = "https://sagebionetworks.jira.com/s/d41d8cd98f00b204e9800998ecf8427e-T/-bhcm7i/b/6/e73395c53c3b10fde2303f4bf74ffbf6/_/download/batch/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector-embededjs/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector-embededjs.js?locale=en-US&collectorId=ddc881b3";
+
+	public static final String VALIDATE_QUERY_PARAMETER_KEY = "validate";
 }

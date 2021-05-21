@@ -7,5 +7,5 @@ public interface StatisticsPlotWidgetView extends IsWidget {
 
 	void setVisible(boolean visible);
 
-	void configureAndShow(String projectId, String sessionToken);
+	void configureAndShow(String projectId, String accessToken);
 }

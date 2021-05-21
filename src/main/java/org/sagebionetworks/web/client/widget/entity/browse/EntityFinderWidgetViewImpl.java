@@ -126,7 +126,7 @@ public class EntityFinderWidgetViewImpl implements EntityFinderWidgetView {
 
 		EntityFinderProps props =
 				EntityFinderProps.create(
-						authController.getCurrentUserSessionToken(),
+						authController.getCurrentUserAccessToken(),
 						onSelected,
 						multiSelect,
 						showVersions,

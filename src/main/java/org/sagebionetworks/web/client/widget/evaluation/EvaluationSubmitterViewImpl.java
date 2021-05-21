@@ -320,8 +320,8 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 			// here we go! add the SRC entityform component to the formDiv (and listen for detach for cleanup)
 			// going to need some space
 			modal1.addStyleName("modal-fullscreen");
-			String sessionToken = authController.getCurrentUserSessionToken();
-			_showForm(formDiv.getElement(), sessionToken, formParams.getContainerSynId(), formParams.getJsonSchemaSynId(), formParams.getUiSchemaSynId(), this);
+			String token = authController.getCurrentUserAccessToken();
+			_showForm(formDiv.getElement(), token, formParams.getContainerSynId(), formParams.getJsonSchemaSynId(), formParams.getUiSchemaSynId(), this);
 		} else {
 			modal1.removeStyleName("modal-fullscreen");
 		}
@@ -339,7 +339,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 		formRef.submitForm();
 	}-*/;
 
-	private static native void _showForm(Element el, String sessionToken, String parentContainerSynId, String jsonSchemaSynId, String uiSchemaSynId, EvaluationSubmitterViewImpl view) /*-{
+	private static native void _showForm(Element el, String accessToken, String parentContainerSynId, String jsonSchemaSynId, String uiSchemaSynId, EvaluationSubmitterViewImpl view) /*-{
 		try {
 			view.@org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitterViewImpl::formRef = $wnd.React
 					.createRef();
@@ -354,7 +354,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 			var initializeFormData = false;
 			var props = {
 				parentContainerId : parentContainerSynId,
-				token : sessionToken,
+				token : accessToken,
 				formSchemaEntityId : jsonSchemaSynId,
 				formUiSchemaEntityId : uiSchemaSynId,
 				initFormData : initializeFormData,

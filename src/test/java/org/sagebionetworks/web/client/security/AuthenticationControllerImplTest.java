@@ -9,10 +9,12 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.security.AuthenticationControllerImpl.USER_AUTHENTICATION_RECEIPT;
+import static org.sagebionetworks.web.client.utils.FutureUtils.getDoneFuture;
+import static org.sagebionetworks.web.client.utils.FutureUtils.getFailedFuture;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -20,10 +22,8 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.LoginRequest;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
-import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.principal.EmailQuarantineReason;
 import org.sagebionetworks.repo.model.principal.EmailQuarantineStatus;
 import org.sagebionetworks.repo.model.principal.NotificationEmail;
@@ -43,15 +43,17 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.QuarantinedEmailModal;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
+
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.StatusCodeException;
 
 public class AuthenticationControllerImplTest {
 
-	public static final String SESSION_TOKEN = "1111";
+	public static final String ACCESS_TOKEN = "1111";
 	AuthenticationControllerImpl authenticationController;
 	@Mock
 	CookieProvider mockCookieProvider;
@@ -93,24 +95,19 @@ public class AuthenticationControllerImplTest {
 	Place mockPlace;
 	
 	UserProfile profile;
-	UserSessionData usd;
 	public static final String USER_ID = "98208";
 	public static final String USER_AUTHENTICATION_RECEIPT_VALUE = "abc-def-ghi";
+	
 
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
 		// by default, return a valid user session data if asked
 		AsyncMockStubber.callSuccessWith(null).when(mockJsClient).initSession(anyString(), any(AsyncCallback.class));
-		usd = new UserSessionData();
 		profile = new UserProfile();
 		profile.setOwnerId(USER_ID);
-		usd.setProfile(profile);
-		Session session = new Session();
-		session.setSessionToken(SESSION_TOKEN);
-		session.setAcceptsTermsOfUse(true);
-		usd.setSession(session);
-		AsyncMockStubber.callSuccessWith(usd).when(mockUserAccountService).getCurrentUserSessionData(any(AsyncCallback.class));
+		when(mockJsClient.getAccessToken()).thenReturn(getDoneFuture(ACCESS_TOKEN));
+		when(mockJsClient.getMyUserProfile()).thenReturn(getDoneFuture(profile));
 		AsyncMockStubber.callSuccessWith(mockNotificationEmail).when(mockJsClient).getNotificationEmail(any(AsyncCallback.class));
 		when(mockGinInjector.getSynapseJavascriptClient()).thenReturn(mockJsClient);
 		authenticationController = new AuthenticationControllerImpl(mockUserAccountService, mockClientCache, mockSessionStorage, mockCookieProvider, mockGinInjector, mockSynapseJSNIUtils);
@@ -137,9 +134,8 @@ public class AuthenticationControllerImplTest {
 		verify(mockClientCache).put(eq(USER_AUTHENTICATION_RECEIPT), eq(USER_AUTHENTICATION_RECEIPT_VALUE), anyLong());
 		// verify last place is restored
 		verify(mockGlobalApplicationState).setLastPlace(mockPlace);
-		verify(mockSessionDetector).initializeSessionTokenState();
+		verify(mockSessionDetector).initializeAccessTokenState();
 		verify(mockGlobalApplicationState).refreshPage();
-		verify(mockJsClient).logout();
 		verify(mockSynapseJSNIUtils).setAnalyticsUserId("");
 	}
 
@@ -169,13 +165,13 @@ public class AuthenticationControllerImplTest {
 		String username = "testusername";
 		String password = "pw";
 		String oldAuthReceipt = "1234";
-		String newSessionToken = "abcdzxcvbn";
+		String newAccessToken = "abcdzxcvbn";
 		String newAuthReceipt = "5678";
 		when(mockClientCache.get(USER_AUTHENTICATION_RECEIPT)).thenReturn(oldAuthReceipt);
 		LoginResponse loginResponse = new LoginResponse();
 		loginResponse.setAcceptsTermsOfUse(true);
 		loginResponse.setAuthenticationReceipt(newAuthReceipt);
-		loginResponse.setSessionToken(newSessionToken);
+		loginResponse.setAccessToken(newAccessToken);
 		AsyncMockStubber.callSuccessWith(loginResponse).when(mockJsClient).login(any(LoginRequest.class), any(AsyncCallback.class));
 		AsyncCallback loginCallback = mock(AsyncCallback.class);
 
@@ -194,27 +190,25 @@ public class AuthenticationControllerImplTest {
 		verify(mockClientCache).put(eq(USER_AUTHENTICATION_RECEIPT), eq(newAuthReceipt), anyLong());
 
 		verify(loginCallback).onSuccess(any(UserProfile.class));
-		verify(mockSessionDetector).initializeSessionTokenState();
+		verify(mockSessionDetector).initializeAccessTokenState();
 		verify(mockSynapseJSNIUtils).setAnalyticsUserId(USER_ID);
 	}
 
 	@Test
 	public void testLoginUserNotAcceptedTermsOfUse() {
-		usd.getSession().setAcceptsTermsOfUse(false);
-		usd.setProfile(null); // profile is not returned in this case
+		// access token is returned without error (it's set and valid), but getMyProfile() fails with a special ForbiddenException
+		when(mockJsClient.getMyUserProfile()).thenReturn(getFailedFuture(new ForbiddenException("Terms of use have not been signed.")));
+		
+		authenticationController.initializeFromExistingAccessTokenCookie(mockUserProfileCallback);
 
-		authenticationController.initializeFromExistingSessionCookie(mockUserProfileCallback);
-
-		verify(mockUserAccountService).getCurrentUserSessionData(any(AsyncCallback.class));
-		assertEquals(usd.getSession().getSessionToken(), authenticationController.getCurrentUserSessionToken());
 		assertNull(authenticationController.getCurrentUserProfile());
-		verify(mockSessionDetector).initializeSessionTokenState();
+		verify(mockSessionDetector).initializeAccessTokenState();
 		verify(mockPlaceChanger).goTo(placeCaptor.capture());
 		Place place = placeCaptor.getValue();
 		assertTrue(place instanceof LoginPlace);
 		assertEquals(LoginPlace.SHOW_TOU, ((LoginPlace) place).toToken());
 	}
-
+	
 	@Test
 	public void testLoginUserFailure() {
 		Exception ex = new Exception("invalid login");
@@ -229,41 +223,25 @@ public class AuthenticationControllerImplTest {
 		verify(loginCallback).onFailure(ex);
 	}
 
-	@Test
-	public void testNoUserChange() {
-		// if we invoke checkForUserChange(), if the user does not change we should update the session
-		// cookie expiration (via the initSession call).
-		authenticationController.initializeFromExistingSessionCookie(mockUserProfileCallback);
-		verify(mockUserAccountService).getCurrentUserSessionData(any(AsyncCallback.class));
-		verify(mockJsClient, never()).initSession(anyString(), any(AsyncCallback.class));
-
-		authenticationController.checkForUserChange();
-
-		verify(mockUserAccountService, times(2)).getCurrentUserSessionData(any(AsyncCallback.class));
-		verify(mockJsClient).initSession(eq(SESSION_TOKEN), any(AsyncCallback.class));
-	}
+	// Note: We do not update the access token cookie expiration (since the access token will expire)
 	
 	@Test
 	public void testCheckForUserChangeWithoutNetwork() {
 		// if we invoke checkForUserChange(), if the user does not change we should update the session
-		authenticationController.initializeFromExistingSessionCookie(mockUserProfileCallback);
-		verify(mockUserAccountService).getCurrentUserSessionData(any(AsyncCallback.class));
+		authenticationController.initializeFromExistingAccessTokenCookie(mockUserProfileCallback);
 		verify(mockJsClient, never()).initSession(anyString(), any(AsyncCallback.class));
 		Exception scEx = new StatusCodeException(0, "0 ");
-		AsyncMockStubber.callFailureWith(scEx).when(mockUserAccountService).getCurrentUserSessionData(any(AsyncCallback.class));
+		when(mockJsClient.getAccessToken()).thenReturn(getFailedFuture(scEx));
 		
 		authenticationController.checkForUserChange();
 
-		verify(mockUserAccountService, times(2)).getCurrentUserSessionData(any(AsyncCallback.class));
 		verify(mockSynapseJSNIUtils).consoleError(scEx);
-		verify(mockJsClient, never()).logout();
 		
 		Exception unknownEx = new UnknownErrorException("Unexpected transient error");
-		AsyncMockStubber.callFailureWith(unknownEx).when(mockUserAccountService).getCurrentUserSessionData(any(AsyncCallback.class));
+		when(mockJsClient.getAccessToken()).thenReturn(getFailedFuture(unknownEx));
 		
 		authenticationController.checkForUserChange();
 		verify(mockSynapseJSNIUtils).consoleError(unknownEx);
-		verify(mockJsClient, never()).logout();
 	}
 
 	// Note. If login when the stack is in READ_ONLY mode, then the widgets SynapseAlert should send

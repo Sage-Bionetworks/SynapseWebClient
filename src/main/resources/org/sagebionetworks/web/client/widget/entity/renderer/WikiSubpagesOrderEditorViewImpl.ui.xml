@@ -8,7 +8,7 @@
 		<bh:Div>
 		    <b:Heading size="H4" text="Edit Order">
 			    <w:HelpWidget helpMarkdown="Select a wiki page and use the arrows to move it to the desired position." 
-					href="http://docs.synapse.org/articles/edit_wiki_order.html" addStyleNames="margin-left-5" placement="BOTTOM"/>
+					href="https://help.synapse.org/docs/Wikis.1975746682.html#Wikis-ModifyPageOrder" addStyleNames="margin-left-5" placement="BOTTOM"/>
 		    </b:Heading>
 		</bh:Div>
 		<bh:Div addStyleNames="center center-block margin-top-30">

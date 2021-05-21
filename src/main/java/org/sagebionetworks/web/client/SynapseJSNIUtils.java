@@ -108,7 +108,7 @@ public interface SynapseJSNIUtils {
 
 	String getCdnEndpoint();
 
-	String getSessionCookieUrl();
+	String getAccessTokenCookieUrl();
 
 	void scrollIntoView(Element el);
 

@@ -45,8 +45,8 @@ public class OAuth2AliasServlet extends OAuth2Servlet {
 	 */
 	public void bindOAuthProviderToUser(HttpServletRequest req, HttpServletResponse resp, OAuthProvider provider, String authorizationCode) throws IOException {
 		try {
-			String sessionToken = UserDataProvider.getThreadLocalUserToken(req);
-			SynapseClient client = createSynapseClient(sessionToken);
+			String accessToken = UserDataProvider.getThreadLocalUserToken(req);
+			SynapseClient client = createSynapseClient(accessToken);
 			OAuthValidationRequest request = new OAuthValidationRequest();
 			request.setProvider(provider);
 			request.setAuthenticationCode(authorizationCode);

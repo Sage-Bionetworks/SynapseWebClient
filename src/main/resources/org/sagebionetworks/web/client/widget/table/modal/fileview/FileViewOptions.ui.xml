@@ -13,7 +13,7 @@
 		<b:FormLabel>Include in View</b:FormLabel>
 		<w:HelpWidget
 			helpMarkdown="A view is a type of Synapse Table that queries across metadata (Annotations) for particular items (files, folders, tables) with a particular “scope”."
-			href="http://docs.synapse.org/articles/views.html"
+			href="https://help.synapse.org/docs/Views.2011070739.html"
 			addStyleNames="margin-left-5" />
 		<bh:Div addStyleNames="margin-left-15">
 			<b:CheckBox ui:field="includeFilesCb" text="Files"

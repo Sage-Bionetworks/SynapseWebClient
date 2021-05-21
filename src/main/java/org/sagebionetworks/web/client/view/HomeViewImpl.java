@@ -27,10 +27,10 @@ public class HomeViewImpl extends Composite implements HomeView {
 	private SynapseJSNIUtils jsniUtils;
 	private AuthenticationController authController;
 
-	private static native void _showHomepageComponent(Element el, String sessionToken, String projectViewId) /*-{
+	private static native void _showHomepageComponent(Element el, String accessToken, String projectViewId) /*-{
 		try {
 			var props = {
-				token: sessionToken,
+				token: accessToken,
 				projectViewId: projectViewId,
 			};
 			$wnd.ReactDOM.render($wnd.React.createElement(
@@ -56,7 +56,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 	@Override
 	public void render() {
 		scrollToTop();
-		_showHomepageComponent(container.getElement(), authController.getCurrentUserSessionToken(), PROJECT_VIEW_ID);
+		_showHomepageComponent(container.getElement(), authController.getCurrentUserAccessToken(), PROJECT_VIEW_ID);
 	}
 
 

@@ -12,7 +12,7 @@
 			<b:ModalHeader>
 				<b:Heading size="H4" text="Storage Location" addStyleNames="displayInline" />
 				<w:HelpWidget helpMarkdown="Synapse can access files stored in multiple locations.&#10;By default content is stored in Synapse native storage but can alternatively be setup with other solutions." 
-					href="http://docs.synapse.org/articles/custom_storage_location.html" addStyleNames="margin-left-5" placement="BOTTOM"/>
+					href="https://help.synapse.org/docs/Custom-Storage-Locations.2048327803.html" addStyleNames="margin-left-5" placement="BOTTOM"/>
 			</b:ModalHeader>
 			<b:ModalBody>
 				<b:FormGroup>
@@ -25,7 +25,7 @@
 						<b:Radio ui:field="externalS3Button" name="storageLocationRadio" text="Amazon S3 Bucket" addStyleNames="font-size-18" />
 						<bh:Div addStyleNames="margin-left-20" ui:field="s3Collapse">
 							<bh:Div addStyleNames="margin-bottom-10">
-								<b:Anchor href="http://docs.synapse.org/articles/custom_storage_location.html" icon="QUESTION_CIRCLE" target="_blank" text="More info..." />
+								<b:Anchor href="https://help.synapse.org/docs/Custom-Storage-Locations.2048327803.html" icon="QUESTION_CIRCLE" target="_blank" text="More info..." />
 							</bh:Div>
 							<b:FormLabel for="s3BucketField" >Bucket</b:FormLabel>
 							<b:TextBox ui:field="s3BucketField" addStyleNames="margin-bottom-10 hide-resize "/>
@@ -47,14 +47,14 @@
 								<b:CheckBox ui:field="s3StsField" text="Security Token Service (STS) Enabled" addStyleNames="displayInlineBlock" />
 								<w:HelpWidget
 									helpMarkdown="Using AWS Security Token Service (STS), Synapse can securely grant you temporary AWS credentials with access to data directly in S3.&#10;This can be useful if you want to transfer data in bulk, or allow your compute cluster to read S3 objects using the S3 APIs."
-									addStyleNames="margin-left-5" placement="BOTTOM" href="http://docs.synapse.org/articles/aws_sts_storage_locations.html"/>
+									addStyleNames="margin-left-5" placement="BOTTOM" href="https://help.synapse.org/docs/Compute-Directly-on-Data-in-Synapse-or-S3.2048426057.html"/>
 									
 							</bh:Div>
 						</bh:Div>
 						<b:Radio ui:field="externalGoogleCloudStorageButton" name="storageLocationRadio" text="Google Cloud Storage Bucket" addStyleNames="font-size-18" />
 						<bh:Div addStyleNames="margin-left-20" ui:field="googleCloudCollapse">
 							<bh:Div addStyleNames="margin-bottom-10">
-								<b:Anchor href="http://docs.synapse.org/articles/custom_storage_location.html" icon="QUESTION_CIRCLE" target="_blank" text="More info..." />
+								<b:Anchor href="https://help.synapse.org/docs/Custom-Storage-Locations.2048327803.html" icon="QUESTION_CIRCLE" target="_blank" text="More info..." />
 							</bh:Div>
 							<b:FormLabel for="googleCloudBucketField" >Bucket</b:FormLabel>
 							<b:TextBox ui:field="googleCloudBucketField" addStyleNames="margin-bottom-10 hide-resize "/>
@@ -77,7 +77,7 @@
 						<b:Radio ui:field="externalObjectStoreButton"  name="storageLocationRadio"  text="External Object Store" addStyleNames="font-size-18" />
 						<bh:Div addStyleNames="margin-left-20" ui:field="externalObjectStoreCollapse">
 							<bh:Div addStyleNames="margin-bottom-10">
-								<b:Anchor href="http://docs.synapse.org/articles/custom_storage_location.html" icon="QUESTION_CIRCLE" target="_blank" text="More info..." />
+								<b:Anchor href="https://help.synapse.org/docs/Custom-Storage-Locations.2048327803.html" icon="QUESTION_CIRCLE" target="_blank" text="More info..." />
 							</bh:Div>
 							<b:FormLabel>Bucket</b:FormLabel>
 							<b:TextBox ui:field="externalObjectStoreBucket" addStyleNames="margin-bottom-10 hide-resize "/>

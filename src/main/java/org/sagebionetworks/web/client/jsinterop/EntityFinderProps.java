@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.jsinterop;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityType;
-import org.sagebionetworks.web.client.exceptions.WebClientConfigurationException;
 
 import jsinterop.annotations.JsFunction;
 import jsinterop.annotations.JsNullable;
@@ -19,7 +18,7 @@ public class EntityFinderProps extends ReactComponentProps {
         void run(ReferenceJsObject[] selected);
     }
 
-    String sessionToken;
+    String accessToken;
     OnSelectCallback onSelectedChange;
     boolean selectMultiple;
     boolean showVersionSelection;
@@ -42,7 +41,7 @@ public class EntityFinderProps extends ReactComponentProps {
 
     @JsOverlay
     public static EntityFinderProps create(
-            String sessionToken,
+            String accessToken,
             OnSelectCallback onSelectedChange,
             boolean selectMultiple,
             boolean showVersionSelection,
@@ -56,7 +55,7 @@ public class EntityFinderProps extends ReactComponentProps {
             boolean treeOnly
     ) {
         EntityFinderProps props = new EntityFinderProps();
-        props.sessionToken = sessionToken;
+        props.accessToken = accessToken;
         props.onSelectedChange = onSelectedChange;
         props.selectMultiple = selectMultiple;
         props.showVersionSelection = showVersionSelection;

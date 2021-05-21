@@ -79,7 +79,7 @@ public class SynapseClientBase extends RemoteServiceServlet implements TokenProv
 	}
 
 	@Override
-	public String getSessionToken() {
+	public String getToken() {
 		// By default, we get the token from the request cookies.
 		return UserDataProvider.getThreadLocalUserToken(this.getThreadLocalRequest());
 	}
@@ -89,7 +89,7 @@ public class SynapseClientBase extends RemoteServiceServlet implements TokenProv
 	}
 
 	protected org.sagebionetworks.client.SynapseClient createSynapseClient() {
-		return createSynapseClient(tokenProvider.getSessionToken());
+		return createSynapseClient(tokenProvider.getToken());
 	}
 
 	public org.sagebionetworks.client.SynapseClient createAnonymousSynapseClient() {
@@ -100,10 +100,12 @@ public class SynapseClientBase extends RemoteServiceServlet implements TokenProv
 	 * The org.sagebionetworks.client.SynapseClient client is stateful so we must create a new one for
 	 * each request
 	 */
-	public org.sagebionetworks.client.SynapseClient createSynapseClient(String sessionToken) {
+	public org.sagebionetworks.client.SynapseClient createSynapseClient(String accessToken) {
 		// Create a new syanpse
 		org.sagebionetworks.client.SynapseClient synapseClient = synapseProvider.createNewClient();
-		synapseClient.setSessionToken(sessionToken);
+		if (accessToken != null) {
+			synapseClient.setBearerAuthorizationToken(accessToken);	
+		}
 		synapseClient.setRepositoryEndpoint(StackEndpoints.getRepositoryServiceEndpoint());
 		synapseClient.setAuthEndpoint(StackEndpoints.getAuthenticationServicePublicEndpoint());
 		synapseClient.setFileEndpoint(StackEndpoints.getFileServiceEndpoint());

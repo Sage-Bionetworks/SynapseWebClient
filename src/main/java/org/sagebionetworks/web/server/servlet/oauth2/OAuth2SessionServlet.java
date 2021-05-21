@@ -3,13 +3,15 @@ package org.sagebionetworks.web.server.servlet.oauth2;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
-import org.sagebionetworks.repo.model.auth.Session;
+import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.repo.model.oauth.OAuthAccountCreationRequest;
 import org.sagebionetworks.repo.model.oauth.OAuthProvider;
 import org.sagebionetworks.repo.model.oauth.OAuthValidationRequest;
@@ -61,8 +63,8 @@ public class OAuth2SessionServlet extends OAuth2Servlet {
 			request.setAuthenticationCode(athenticationCode);
 			request.setProvider(provider);
 			request.setRedirectUrl(redirectUrl);
-			Session token = client.validateOAuthAuthenticationCode(request);
-			resp.sendRedirect(LOGIN_PLACE + token.getSessionToken());
+			LoginResponse token = client.validateOAuthAuthenticationCodeForAccessToken(request);
+			resp.sendRedirect(LOGIN_PLACE + token.getAccessToken());
 		} catch (SynapseNotFoundException e) {
 			// used to send the user to register
 			resp.sendRedirect(REGISTER_ACCOUNT);
@@ -89,8 +91,8 @@ public class OAuth2SessionServlet extends OAuth2Servlet {
 			request.setProvider(provider);
 			request.setRedirectUrl(redirectUrl);
 			request.setUserName(username);
-			Session token = client.createAccountViaOAuth2(request);
-			resp.sendRedirect(LOGIN_PLACE + token.getSessionToken());
+			LoginResponse token = client.createAccountViaOAuth2ForAccessToken(request);
+			resp.sendRedirect(LOGIN_PLACE + token.getAccessToken());
 		} catch (Exception e) {
 			resp.sendRedirect(FileHandleAssociationServlet.getBaseUrl(req) + FileHandleAssociationServlet.ERROR_PLACE + URLEncoder.encode(e.getMessage()));
 		} ;

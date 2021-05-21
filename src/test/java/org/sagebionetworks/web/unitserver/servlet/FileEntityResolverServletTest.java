@@ -75,7 +75,7 @@ public class FileEntityResolverServletTest {
 	@Test
 	public void testDoGetLoggedInFileEntity() throws Exception {
 		String sessionToken = "fake";
-		when(mockTokenProvider.getSessionToken()).thenReturn(sessionToken);
+		when(mockTokenProvider.getToken()).thenReturn(sessionToken);
 
 		setupFileEntity();
 		Cookie[] cookies = {new Cookie(CookieKeys.USER_LOGIN_TOKEN, sessionToken)};
@@ -92,7 +92,7 @@ public class FileEntityResolverServletTest {
 		verify(mockSynapse).setAuthEndpoint(SynapseClientBaseTest.AUTH_BASE);
 		verify(mockSynapse).setRepositoryEndpoint(SynapseClientBaseTest.REPO_BASE);
 		verify(mockSynapse).setFileEndpoint(anyString());
-		verify(mockSynapse).setSessionToken(sessionToken);
+		verify(mockSynapse).setBearerAuthorizationToken(sessionToken);
 	}
 
 

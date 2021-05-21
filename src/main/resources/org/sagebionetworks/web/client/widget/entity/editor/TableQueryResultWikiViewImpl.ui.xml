@@ -9,7 +9,7 @@
 			<b:FieldSet>
 				<b:FormGroup>
 					<b:FormLabel for="url" addStyleNames="displayInline">Query</b:FormLabel>
-					<w:HelpWidget text="" helpMarkdown="Provide a Query for any Synapse Table. Only users who have access to the Table being queried will be able to see the Table in the Wiki page." href="http://docs.synapse.org/articles/tables.html" placement="BOTTOM" />
+					<w:HelpWidget text="" helpMarkdown="Provide a Query for any Synapse Table. Only users who have access to the Table being queried will be able to see the Table in the Wiki page." href="https://help.synapse.org/docs/Tables.2011038095.html" placement="BOTTOM" />
 					<g:FlowPanel>
 						<b:TextBox ui:field="queryField" name="query" b:id="query" placeholder="SELECT * FROM syn12345"/>
 					</g:FlowPanel>

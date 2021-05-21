@@ -11,6 +11,8 @@ import org.sagebionetworks.repo.model.annotation.v2.AnnotationsValue;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.DownloadList;
 import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.schema.JsonSchemaObjectBinding;
+import org.sagebionetworks.repo.model.schema.ValidationResults;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -18,6 +20,7 @@ import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -28,6 +31,8 @@ import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransfo
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
+
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -52,10 +57,11 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 	private EventBus eventBus;
 	private String dataFileHandleId;
 	private SynapseJSNIUtils jsniUtils;
+	private CookieProvider cookies;
 	private ClickHandler customClickHandler;
 
 	@Inject
-	public EntityBadge(EntityBadgeView view, GlobalApplicationState globalAppState, AnnotationTransformer transformer, SynapseJavascriptClient jsClient, LazyLoadHelper lazyLoadHelper, PopupUtilsView popupUtils, SynapseProperties synapseProperties, EventBus eventBus, AuthenticationController authController, SynapseJSNIUtils jsniUtils) {
+	public EntityBadge(EntityBadgeView view, GlobalApplicationState globalAppState, AnnotationTransformer transformer, SynapseJavascriptClient jsClient, LazyLoadHelper lazyLoadHelper, PopupUtilsView popupUtils, SynapseProperties synapseProperties, EventBus eventBus, AuthenticationController authController, SynapseJSNIUtils jsniUtils, CookieProvider cookies) {
 		this.view = view;
 		this.globalAppState = globalAppState;
 		this.transformer = transformer;
@@ -67,12 +73,8 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 		this.eventBus = eventBus;
 		this.authController = authController;
 		this.jsniUtils = jsniUtils;
-		Callback loadDataCallback = new Callback() {
-			@Override
-			public void invoke() {
-				getEntityBundle();
-			}
-		};
+		this.cookies = cookies;
+		Callback loadDataCallback = () -> getEntityBundle();
 
 		lazyLoadHelper.configure(loadDataCallback, view);
 		view.setPresenter(this);
@@ -131,12 +133,52 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 			view.showPrivateIcon();
 		}
 
+		String annotationsHtml = null;
 		if (annotations != null) {
 			Map<String, AnnotationsValue> annotationsMap = annotations.getAnnotations();
 			if (!annotationsMap.isEmpty()) {
-				view.setAnnotations(getAnnotationsHTML(annotationsMap));
+				annotationsHtml = getAnnotationsHTML(annotationsMap);
 			}
 		}
+
+		// In experimental mode, check if there's a bound JSON Schema + check validity
+		if (DisplayUtils.isInTestWebsite(cookies)) {
+			final String finalAnnotationsHtml = annotationsHtml;
+			jsClient.getSchemaBinding(eb.getEntity().getId(), new AsyncCallback<JsonSchemaObjectBinding>() {
+				@Override
+				public void onSuccess(JsonSchemaObjectBinding result) {
+					boolean hasSchema = true;
+
+					jsClient.getSchemaValidationResultsWithMatchingEtag(eb.getEntity().getId(), eb.getEntity().getEtag(), new AsyncCallback<ValidationResults>() {
+						@Override
+						public void onSuccess(ValidationResults result) {
+							view.setAnnotations(finalAnnotationsHtml, hasSchema, result);
+						}
+
+						@Override
+						public void onFailure(Throwable caught) {
+							view.setError(caught.getMessage());
+						}
+					});
+
+				}
+
+				@Override
+				public void onFailure(Throwable caught) {
+					if (caught instanceof NotFoundException) { // The entity has no schema.
+						boolean hasSchema = false;
+						if (finalAnnotationsHtml != null) {
+							view.setAnnotations(finalAnnotationsHtml, hasSchema, null);
+						}
+					} else {
+						view.setError(caught.getMessage());
+					}
+				}
+			});
+		} else if (annotationsHtml != null) {
+			view.setAnnotations(annotationsHtml, false, null);
+		}
+
 		if (eb.getEntity() instanceof Link && eb.getPermissions().getCanDelete()) {
 			view.showUnlinkIcon();
 		}

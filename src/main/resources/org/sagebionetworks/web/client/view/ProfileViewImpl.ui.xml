@@ -42,7 +42,7 @@
 											</w:ClickableDiv>
 											<w:HelpWidget
 												helpMarkdown="This tab shows you the Projects you have created, those that have been shared with you and your favorites.&#10;Start creating a project by giving it a name."
-												href="http://docs.synapse.org/articles/making_a_project.html"
+												href="https://help.synapse.org/docs/Projects.2048327716.html"
 												placement="BOTTOM" />
 										</a>
 									</li>
@@ -71,7 +71,7 @@
 											<bh:Span ui:field="teamNotifications" />
 											<w:HelpWidget
 												helpMarkdown="This tab lists Teams you have created and have been invited to join.&#10;Create a Team by providing a name and clicking “Create Team”."
-												href="http://docs.synapse.org/articles/teams.html"
+												href="https://help.synapse.org/docs/Teams.1985446029.html"
 												placement="BOTTOM" />
 										</a>
 									</li>
@@ -105,7 +105,7 @@
 										<bh:Div addStyleNames="padding-15">
 											<g:SimplePanel ui:field="profileSynAlertPanel" />
 											<bh:Div ui:field="userBadgeContainer" addStyleNames="max-width-800"/>
-											<g:SimplePanel ui:field="editUserProfilePanel"/>											
+											<g:SimplePanel ui:field="editUserProfilePanel"/>
 										</bh:Div> 
 									</bh:Div> 
 								</div>
