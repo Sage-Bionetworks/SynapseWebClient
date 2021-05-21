@@ -65,35 +65,31 @@ public class TIFFPreviewWidgetViewImpl extends FlowPanel implements TIFFPreviewW
 	
 	private static native void _setImagePresignedUrl(String url, TIFFPreviewWidgetViewImpl view) /*-{
 		try {
-		var xhr = new XMLHttpRequest();
-        xhr.responseType = 'arraybuffer';
-        xhr.open('GET', url);
-        xhr.onload = function(e) {
-          // Decode image into canvas.
-          var pages = $wnd.UTIF.decode(e.target.response);
-          // console.log('page count: ' + pages.length);
-          $wnd.UTIF.decodeImage(e.target.response, pages[0]);
-          var rgba = $wnd.UTIF.toRGBA8(pages[0]); // Uint8Array with RGBA pixels
-          // console.log(pages[0].width, pages[0].height, pages[0]);
-          if (rgba) {
-            var canvas = document.createElement('canvas');
-            canvas.width = pages[0].width;
-            canvas.height = pages[0].height;
-            var ctx = canvas.getContext('2d');
-            var imageData = ctx.createImageData(pages[0].width, pages[0].height);
-            for (var i = 0; i < rgba.length; i++) {
-              imageData.data[i] = rgba[i];
-            }
-            ctx.putImageData(imageData, 0, 0);
-			
-            // Convert canvas to img; scale img; and add img to DOM.
-            var dataUrl = canvas.toDataURL('image/png');
-            var width = canvas.width * 0.25;
-            var height = canvas.height * 0.25;
-            view.@org.sagebionetworks.web.client.widget.entity.renderer.TIFFPreviewWidgetViewImpl::setPng(Ljava/lang/String;II)(dataUrl, width, height);
-          }
-        };
-        xhr.send();
+			var xhr = new XMLHttpRequest();
+			xhr.responseType = 'arraybuffer';
+			xhr.open('GET', url);
+			xhr.onload = function(e) {
+			// Decode image into canvas.
+			var pages = $wnd.UTIF.decode(e.target.response);
+			// console.log('page count: ' + pages.length);
+			$wnd.UTIF.decodeImage(e.target.response, pages[0]);
+			var rgba = $wnd.UTIF.toRGBA8(pages[0]); // Uint8Array with RGBA pixels
+			if (rgba) {
+				var canvas = document.createElement('canvas');
+				canvas.width = pages[0].width;
+				canvas.height = pages[0].height;
+				var ctx = canvas.getContext('2d');
+				var imageData = ctx.createImageData(pages[0].width, pages[0].height);
+				for (var i = 0; i < rgba.length; i++) {
+					imageData.data[i] = rgba[i];
+				}
+				ctx.putImageData(imageData, 0, 0);
+				// Convert canvas to img
+				var dataUrl = canvas.toDataURL('image/png');
+				view.@org.sagebionetworks.web.client.widget.entity.renderer.TIFFPreviewWidgetViewImpl::setPng(Ljava/lang/String;II)(dataUrl, canvas.width, canvas.height);
+			}
+		};
+		xhr.send();
 		} catch (err) {
 			console.error(err);
 		}
