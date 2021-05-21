@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.view.NewAccountView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 import com.google.gwt.activity.shared.AbstractActivity;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
@@ -105,7 +106,7 @@ public class NewAccountPresenter extends AbstractActivity implements NewAccountV
 			@Override
 			public void onFailure(Throwable caught) {
 				view.setLoading(false);
-				synAlert.handleException(caught);				
+				synAlert.handleException(caught);
 			}
 		});
 	}
