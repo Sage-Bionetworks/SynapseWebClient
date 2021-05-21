@@ -21,7 +21,7 @@ public class TIFFPreviewWidget implements IsWidget {
 	private GWTWrapper gwt;
 	FileHandleAssociation fha;
 	TIFFPreviewWidgetView view;
-	public static final double MAX_TIFF_FILE_SIZE = 30 * MB;
+	public static final double MAX_TIFF_FILE_SIZE = 10 * MB;
 	public static String friendlyMaxFileSize = null;
 	FileHandle fileHandle;
 	AsyncCallback<Void> callback;
