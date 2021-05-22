@@ -51,6 +51,8 @@ public class ClientProperties {
 
 	public static final WebResource DIFF_LIB_JS = new WebResource("js/diff/difflib.js");
 	public static final WebResource DIFF_VIEW_JS = new WebResource("js/diff/diffview.js");
+	
+	public static final WebResource UTIF_JS = new WebResource("js/UTIF.js");
 
 	public static void fixResourceToCdnEndpoint(WebResource resource, String cdnEndpoint) {
 		String currentUrl = resource.getUrl();
