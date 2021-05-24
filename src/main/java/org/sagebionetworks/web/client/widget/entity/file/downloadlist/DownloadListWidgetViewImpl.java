@@ -2,7 +2,9 @@ package org.sagebionetworks.web.client.widget.entity.file.downloadlist;
 
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
+import org.sagebionetworks.web.client.jsni.SynapseContextProviderPropsJSNIObject;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 
@@ -18,12 +20,14 @@ public class DownloadListWidgetViewImpl implements DownloadListWidgetView, IsWid
 	AuthenticationController authController;
 	SynapseJSNIUtils jsniUtils;
 	EventBus eventBus;
+	SynapseContextPropsProvider propsProvider;
 	
 	@Inject
-	public DownloadListWidgetViewImpl(AuthenticationController authController, SynapseJSNIUtils jsniUtils, EventBus eventBus) {
+	public DownloadListWidgetViewImpl(AuthenticationController authController, SynapseJSNIUtils jsniUtils, EventBus eventBus, SynapseContextPropsProvider propsProvider) {
 		this.authController = authController;
 		this.jsniUtils = jsniUtils;
 		this.eventBus = eventBus;
+		this.propsProvider = propsProvider;
 		mainContainer.addStyleName("mainContainer");
 		mainContainer.add(downloadListContainer);
 		downloadListContainer.addStyleName("downloadListContainer");
@@ -35,22 +39,23 @@ public class DownloadListWidgetViewImpl implements DownloadListWidgetView, IsWid
 	@Override
 	public void refreshView() {
 		if (authController.isLoggedIn()) {
-			_showDownloadList(downloadListContainer.getElement(), authController.getCurrentUserAccessToken(), this);
+			_showDownloadList(downloadListContainer.getElement(), this, propsProvider.getJsniContextProps());
 		}
 	}
 
-	private static native void _showDownloadList(Element el, String accessToken, DownloadListWidgetViewImpl w) /*-{
+	private static native void _showDownloadList(Element el, DownloadListWidgetViewImpl w, SynapseContextProviderPropsJSNIObject wrapperProps) /*-{
 		try {
 			function onUpdateDownloadList() {
 				w.@org.sagebionetworks.web.client.widget.entity.file.downloadlist.DownloadListWidgetViewImpl::fireDownloadListUpdatedEvent()();
 			}
 			var props = {
-				token: accessToken,
 				listUpdatedCallback: onUpdateDownloadList
 			};
-			$wnd.ReactDOM.render($wnd.React.createElement(
-					$wnd.SRC.SynapseComponents.DownloadListTable, props, null),
-					el);
+
+			var component = $wnd.React.createElement($wnd.SRC.SynapseComponents.DownloadListTable, props, null);
+			var wrapper = $wnd.React.createElement($wnd.SRC.SynapseComponents.SynapseContextProvider, wrapperProps, component);
+
+			$wnd.ReactDOM.render(wrapper, el);
 		} catch (err) {
 			console.error(err);
 		}

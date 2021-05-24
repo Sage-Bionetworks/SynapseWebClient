@@ -19,7 +19,10 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.EntityFinderScope;
+import org.sagebionetworks.web.client.jsni.SynapseContextProviderPropsJSNIObject;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -56,6 +59,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	private boolean showEntityFinder;
 	private Reference selectedReference;
 	AuthenticationController authController;
+	SynapseContextPropsProvider propsProvider;
 	boolean isForm;
 	JavaScriptObject formRef;
 
@@ -130,12 +134,13 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	private PortalGinInjector ginInjector;
 	String originalNextButtonText, originalSubmitButtonText;
 	@Inject
-	public EvaluationSubmitterViewImpl(Binder binder, EntityFinderWidget.Builder entityFinderBuilder, EvaluationList evaluationList, PortalGinInjector ginInjector, AuthenticationController authController) {
+	public EvaluationSubmitterViewImpl(Binder binder, EntityFinderWidget.Builder entityFinderBuilder, EvaluationList evaluationList, PortalGinInjector ginInjector, AuthenticationController authController, SynapseContextPropsProvider propsProvider) {
 		widget = binder.createAndBindUi(this);
 		this.entityFinderBuilder = entityFinderBuilder;
 		this.evaluationList = evaluationList;
 		this.ginInjector = ginInjector;
 		this.authController = authController;
+		this.propsProvider = propsProvider;
 		evaluationListContainer.setWidget(evaluationList.asWidget());
 		initClickHandlers();
 		originalNextButtonText = nextButton.getText();
@@ -321,7 +326,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 			// going to need some space
 			modal1.addStyleName("modal-fullscreen");
 			String token = authController.getCurrentUserAccessToken();
-			_showForm(formDiv.getElement(), token, formParams.getContainerSynId(), formParams.getJsonSchemaSynId(), formParams.getUiSchemaSynId(), this);
+			_showForm(formDiv.getElement(), token, formParams.getContainerSynId(), formParams.getJsonSchemaSynId(), formParams.getUiSchemaSynId(), this, propsProvider.getJsniContextProps());
 		} else {
 			modal1.removeStyleName("modal-fullscreen");
 		}
@@ -339,7 +344,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 		formRef.submitForm();
 	}-*/;
 
-	private static native void _showForm(Element el, String accessToken, String parentContainerSynId, String jsonSchemaSynId, String uiSchemaSynId, EvaluationSubmitterViewImpl view) /*-{
+	private static native void _showForm(Element el, String accessToken, String parentContainerSynId, String jsonSchemaSynId, String uiSchemaSynId, EvaluationSubmitterViewImpl view, SynapseContextProviderPropsJSNIObject wrapperProps) /*-{
 		try {
 			view.@org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitterViewImpl::formRef = $wnd.React
 					.createRef();
@@ -354,15 +359,17 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 			var initializeFormData = false;
 			var props = {
 				parentContainerId : parentContainerSynId,
-				token : accessToken,
 				formSchemaEntityId : jsonSchemaSynId,
 				formUiSchemaEntityId : uiSchemaSynId,
 				initFormData : initializeFormData,
 				ref : setRefFunction,
 				synIdCallback : synIdCallbackFunction
 			};
-			$wnd.ReactDOM.render($wnd.React.createElement(
-					$wnd.SRC.SynapseComponents.EntityForm, props, null), el);
+
+			var component = $wnd.React.createElement($wnd.SRC.SynapseComponents.EntityForm, props, null);
+			var wrapper = $wnd.React.createElement($wnd.SRC.SynapseComponents.SynapseContextProvider, props, wrapperProps);
+
+			$wnd.ReactDOM.render(wrapper, el);
 		} catch (err) {
 			console.error(err);
 		}

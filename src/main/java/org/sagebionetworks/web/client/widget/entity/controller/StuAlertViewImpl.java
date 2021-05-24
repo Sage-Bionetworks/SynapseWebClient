@@ -2,6 +2,8 @@ package org.sagebionetworks.web.client.widget.entity.controller;
 
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.jsni.SynapseContextProviderPropsJSNIObject;
 import org.sagebionetworks.web.client.view.DownViewImpl;
 import org.sagebionetworks.web.client.view.DownViewImpl.ErrorPageType;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
@@ -18,6 +20,7 @@ public class StuAlertViewImpl implements StuAlertView {
 	}
 
 	Widget widget;
+	SynapseContextPropsProvider propsProvider;
 
 	@UiField
 	ReactComponentDiv errorPageContainer;
@@ -27,7 +30,9 @@ public class StuAlertViewImpl implements StuAlertView {
 	Div container = new Div();
 	boolean is404, is403;
 	@Inject
-	public StuAlertViewImpl() {}
+	public StuAlertViewImpl(SynapseContextPropsProvider propsProvider) {
+		this.propsProvider = propsProvider;
+	}
 
 	@Override
 	public void showInfo(String message) {
@@ -65,11 +70,11 @@ public class StuAlertViewImpl implements StuAlertView {
 
 	private void updateErrorPage() {
 		if (is404) {
-			DownViewImpl._createSRCErrorPage(errorPageContainer.getElement(), ErrorPageType.unavailable.name(), "Sorry, this page isn’t available.", "The link you followed may be broken, or the page may have been removed.");
+			DownViewImpl._createSRCErrorPage(errorPageContainer.getElement(), ErrorPageType.unavailable.name(), "Sorry, this page isn’t available.", "The link you followed may be broken, or the page may have been removed.", propsProvider.getJsniContextProps());
 			errorPageContainer.setVisible(true);
 		}
 		if (is403) {
-			DownViewImpl._createSRCErrorPage(errorPageContainer.getElement(), ErrorPageType.noAccess.name(), "Sorry, no access to this page.", "You are not authorized to access the page requested.");
+			DownViewImpl._createSRCErrorPage(errorPageContainer.getElement(), ErrorPageType.noAccess.name(), "Sorry, no access to this page.", "You are not authorized to access the page requested.", propsProvider.getJsniContextProps());
 			errorPageContainer.setVisible(true);
 		}
 	}

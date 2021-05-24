@@ -2,6 +2,8 @@ package org.sagebionetworks.web.client.widget.login;
 
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.jsni.SynapseContextProviderPropsJSNIObject;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -26,18 +28,21 @@ public class LoginWidgetViewImpl implements LoginWidgetView, IsWidget {
 	SynapseJSNIUtils jsniUtils;
 	GlobalApplicationState globalAppState;
 	AuthenticationController authController;
+	SynapseContextPropsProvider propsProvider;
 
 	@Inject
 	public LoginWidgetViewImpl(LoginWidgetViewImplUiBinder binder, SynapseJSNIUtils jsniUtils,
-			GlobalApplicationState globalAppState, AuthenticationController authController) {
+							   GlobalApplicationState globalAppState, AuthenticationController authController,
+							   SynapseContextPropsProvider propsProvider) {
 		widget = binder.createAndBindUi(this);
 		this.jsniUtils = jsniUtils;
 		this.globalAppState = globalAppState;
 		this.authController = authController;
+		this.propsProvider = propsProvider;
 		widget.addAttachHandler(event -> {
 			if (event.isAttached()) {
 				_createSRCLogin(srcLoginContainer.getElement(), this,
-						RegisterAccountViewImpl.GOOGLE_OAUTH_CALLBACK_URL);
+						RegisterAccountViewImpl.GOOGLE_OAUTH_CALLBACK_URL, propsProvider.getJsniContextProps());
 			}
 		});
 	}
@@ -49,7 +54,7 @@ public class LoginWidgetViewImpl implements LoginWidgetView, IsWidget {
 	}
 
 	private static native void _createSRCLogin(Element el, LoginWidgetViewImpl loginWidgetView,
-			String googleSSORedirectUrl) /*-{
+	   String googleSSORedirectUrl, SynapseContextProviderPropsJSNIObject wrapperProps) /*-{
 		try {
 			function sessionCallback() {
 				loginWidgetView.@org.sagebionetworks.web.client.widget.login.LoginWidgetViewImpl::postLogin()();
@@ -59,8 +64,11 @@ public class LoginWidgetViewImpl implements LoginWidgetView, IsWidget {
 				googleRedirectUrl : googleSSORedirectUrl,
 				sessionCallback : sessionCallback
 			};
-			$wnd.ReactDOM.render($wnd.React.createElement(
-					$wnd.SRC.SynapseComponents.LoginPage, props, null), el);
+
+			var component = $wnd.React.createElement($wnd.SRC.SynapseComponents.LoginPage, props, null)
+			var wrapper = $wnd.React.createElement($wnd.SRC.SynapseComponents.SynapseContextProvider, wrapperProps, component)
+
+			$wnd.ReactDOM.render(wrapper, el);
 		} catch (err) {
 			console.error(err);
 		}

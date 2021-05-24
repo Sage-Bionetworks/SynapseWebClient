@@ -11,6 +11,7 @@ import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.EntityFinderProps;
 import org.sagebionetworks.web.client.jsinterop.EntityFinderScope;
 import org.sagebionetworks.web.client.jsinterop.React;
@@ -22,7 +23,6 @@ import org.sagebionetworks.web.client.widget.HelpWidget;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -31,18 +31,14 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class EntityFinderWidgetViewImpl implements EntityFinderWidgetView {
-
-
-	public interface EntityFinderV2ViewImplUiBinder extends UiBinder<Widget, EntityFinderWidgetViewImpl> {
+	public interface Binder extends UiBinder<Widget, EntityFinderWidgetViewImpl> {
 	}
-
-	private static EntityFinderV2ViewImplUiBinder uiBinder = GWT.create(EntityFinderV2ViewImplUiBinder.class);
 
 	private Presenter presenter;
 
-	private AuthenticationController authController;
 	private SynapseJSNIUtils jsniUtils;
 	private SynapseAlert synAlert;
+	private SynapseContextPropsProvider contextPropsProvider;
 
 	// the modal dialog
 	private Modal modal;
@@ -67,12 +63,12 @@ public class EntityFinderWidgetViewImpl implements EntityFinderWidgetView {
 	SimplePanel synAlertPanel;
 
 	@Inject
-	public EntityFinderWidgetViewImpl(AuthenticationController authenticationController, SynapseJSNIUtils jsniUtils, SynapseAlert synAlert) {
+	public EntityFinderWidgetViewImpl(Binder uiBinder, SynapseJSNIUtils jsniUtils, SynapseAlert synAlert, final SynapseContextPropsProvider propsProvider) {
 		this.modal = (Modal) uiBinder.createAndBindUi(this);
 
-		this.authController = authenticationController;
 		this.jsniUtils = jsniUtils;
 		this.synAlert = synAlert;
+		this.contextPropsProvider = propsProvider;
 
 		synAlertPanel.setWidget(synAlert);
 
@@ -126,7 +122,6 @@ public class EntityFinderWidgetViewImpl implements EntityFinderWidgetView {
 
 		EntityFinderProps props =
 				EntityFinderProps.create(
-						authController.getCurrentUserAccessToken(),
 						onSelected,
 						multiSelect,
 						showVersions,
@@ -141,7 +136,11 @@ public class EntityFinderWidgetViewImpl implements EntityFinderWidgetView {
 				);
 
 		ReactDOM.render(
-				React.createElement(SRC.SynapseComponents.EntityFinder, props),
+				React.createElementWithSynapseContext(
+						SRC.SynapseComponents.EntityFinder,
+						props,
+						contextPropsProvider.getJsInteropContextProps()
+				),
 				entityFinderContainer.getElement(),
 				() -> modal.show()
 		);

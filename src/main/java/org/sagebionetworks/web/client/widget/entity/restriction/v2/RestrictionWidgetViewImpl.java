@@ -5,9 +5,9 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.jsni.SynapseContextProviderPropsJSNIObject;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 
 import com.google.gwt.uibinder.client.UiBinder;
@@ -52,18 +52,14 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	// this UI widget
 	Widget widget;
 	RestrictionWidgetModalsViewImpl modals;
-	AuthenticationController authController;
-	SynapseJSNIUtils jsniUtils;
+	SynapseContextPropsProvider propsProvider;
 	@Inject
 	public RestrictionWidgetViewImpl(Binder binder,
 			RestrictionWidgetModalsViewImpl modals,
-			SynapseJSNIUtils jsniUtils,
-			AuthenticationController authController,
-			GlobalApplicationState globalAppState) {
+            SynapseContextPropsProvider propsProvider) {
 		this.widget = binder.createAndBindUi(this);
 		this.modals = modals;
-		this.authController = authController;
-		this.jsniUtils = jsniUtils;
+		this.propsProvider = propsProvider;
 		modalsContainer.add(modals);
 
 		changeLink.addClickHandler(event -> {
@@ -185,20 +181,19 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	@Override
 	public void configureCurrentAccessComponent(String entityId, Long versionNumber) {
 		String versionNumberString = versionNumber == null ? null : versionNumber.toString();
-		_showHasAccess(hasAccessContainer.getElement(), entityId, versionNumberString, authController.getCurrentUserAccessToken());
+		_showHasAccess(hasAccessContainer.getElement(), entityId, versionNumberString, propsProvider.getJsniContextProps());
 	}
 	
-	private static native void _showHasAccess(Element el, String synapseEntityId, String versionNumber, String accessToken) /*-{
+	private static native void _showHasAccess(Element el, String synapseEntityId, String versionNumber, SynapseContextProviderPropsJSNIObject wrapperProps) /*-{
 		try {
 			var props = {
 				entityId: synapseEntityId,
-				entityVersionNumber: versionNumber,
-				token: accessToken
+				entityVersionNumber: versionNumber
 			};
-	
-			$wnd.ReactDOM.render($wnd.React.createElement(
-					$wnd.SRC.SynapseComponents.HasAccess, props, null),
-					el);
+			var component = $wnd.React.createElement($wnd.SRC.SynapseComponents.HasAccess, props, null)
+			var wrapper = $wnd.React.createElement($wnd.SRC.SynapseComponents.SynapseContextProvider, wrapperProps, component)
+
+			$wnd.ReactDOM.render(wrapper, el);
 		} catch (err) {
 			console.error(err);
 		}

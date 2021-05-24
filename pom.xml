@@ -367,8 +367,8 @@
 								<copy file="${project.basedir}/node_modules/croppie/croppie.min.js" tofile="src/main/webapp/generated/croppie.min.js" />
 								<copy file="${project.basedir}/node_modules/croppie/croppie.css" tofile="src/main/webapp/generated/croppie.css" />
 								<copy file="${project.basedir}/node_modules/synapse-react-client/dist/umd/synapse-react-client.production.min.js" tofile="src/main/webapp/generated/synapse-react-client.production.min.js" />
-								<copy file="${project.basedir}/node_modules/react/umd/react.production.min.js" tofile="src/main/webapp/generated/react.production.min.js" />
-								<copy file="${project.basedir}/node_modules/react-dom/umd/react-dom.production.min.js" tofile="src/main/webapp/generated/react-dom.production.min.js" />
+								<copy file="${project.basedir}/node_modules/react/umd/react.development.js" tofile="src/main/webapp/generated/react.development.js" />
+								<copy file="${project.basedir}/node_modules/react-dom/umd/react-dom.development.js" tofile="src/main/webapp/generated/react-dom.development.js" />
 								<copy file="${project.basedir}/node_modules/react-transition-group/dist/react-transition-group.min.js" tofile="src/main/webapp/generated/react-transition-group.min.js" />
 								<copy file="${project.basedir}/node_modules/react-measure/dist/index.umd.js" tofile="src/main/webapp/generated/react-measure.js" />
 								<copy file="${project.basedir}/node_modules/react-tooltip/standalone/react-tooltip.min.js" tofile="src/main/webapp/generated/react-tooltip.min.js" />

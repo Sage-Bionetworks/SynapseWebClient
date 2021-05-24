@@ -1,10 +1,11 @@
 package org.sagebionetworks.web.client.view;
 
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.jsni.SynapseContextProviderPropsJSNIObject;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 import org.sagebionetworks.web.client.widget.header.Header;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -24,18 +25,18 @@ public class HomeViewImpl extends Composite implements HomeView {
 	private static final String PROJECT_VIEW_ID = "syn23593547.3";
 
 	private Header headerWidget;
-	private SynapseJSNIUtils jsniUtils;
-	private AuthenticationController authController;
+	private SynapseContextPropsProvider propsProvider;
 
-	private static native void _showHomepageComponent(Element el, String accessToken, String projectViewId) /*-{
+	private static native void _showHomepageComponent(Element el, String projectViewId, SynapseContextProviderPropsJSNIObject wrapperProps) /*-{
 		try {
 			var props = {
-				token: accessToken,
 				projectViewId: projectViewId,
 			};
-			$wnd.ReactDOM.render($wnd.React.createElement(
-					$wnd.SRC.SynapseComponents.SynapseHomepage, props, null),
-					el);
+
+			var component = $wnd.React.createElement($wnd.SRC.SynapseComponents.SynapseHomepage, props, null);
+			var wrapper = $wnd.React.createElement($wnd.SRC.SynapseComponents.SynapseContextProvider, wrapperProps, component);
+
+			$wnd.ReactDOM.render(wrapper, el);
 		} catch (err) {
 			console.error(err);
 		}
@@ -43,12 +44,11 @@ public class HomeViewImpl extends Composite implements HomeView {
 
 
 	@Inject
-	public HomeViewImpl(HomeViewImplUiBinder binder, Header headerWidget, final AuthenticationController authController, SynapseJSNIUtils jsniUtils) {
+	public HomeViewImpl(HomeViewImplUiBinder binder, Header headerWidget, final SynapseContextPropsProvider propsProvider) {
 		initWidget(binder.createAndBindUi(this));
 
-		this.jsniUtils = jsniUtils;
 		this.headerWidget = headerWidget;
-		this.authController = authController;
+		this.propsProvider = propsProvider;
 
 		headerWidget.configure();
 	}
@@ -56,7 +56,8 @@ public class HomeViewImpl extends Composite implements HomeView {
 	@Override
 	public void render() {
 		scrollToTop();
-		_showHomepageComponent(container.getElement(), authController.getCurrentUserAccessToken(), PROJECT_VIEW_ID);
+		SynapseContextProviderPropsJSNIObject wrapperProps = propsProvider.getJsniContextProps();
+		_showHomepageComponent(container.getElement(), PROJECT_VIEW_ID, wrapperProps);
 	}
 
 

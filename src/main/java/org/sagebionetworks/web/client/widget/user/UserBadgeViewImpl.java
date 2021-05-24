@@ -13,6 +13,8 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.jsni.SynapseContextProviderPropsJSNIObject;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -40,6 +42,7 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 	boolean showCardOnHover = true;
 	AdapterFactory adapterFactory;
 	SynapseJSNIUtils jsniUtils;
+	SynapseContextPropsProvider propsProvider;
 	BadgeType badgeType = BadgeType.SMALL_CARD;
 	AvatarSize avatarSize = AvatarSize.MEDIUM;
 	CallbackP<String> currentClickHandler = STANDARD_HANDLER;
@@ -50,11 +53,12 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 	boolean isReactHandlingClickEvents = false;
 
 	@Inject
-	public UserBadgeViewImpl(GlobalApplicationState globalAppState, SynapseJSNIUtils jsniUtils, AdapterFactory adapterFactory, AuthenticationController authController) {
+	public UserBadgeViewImpl(GlobalApplicationState globalAppState, SynapseJSNIUtils jsniUtils, AdapterFactory adapterFactory, AuthenticationController authController, final SynapseContextPropsProvider propsProvider) {
 		placeChanger = globalAppState.getPlaceChanger();
 		this.adapterFactory = adapterFactory;
 		this.jsniUtils = jsniUtils;
 		this.authController = authController;
+		this.propsProvider = propsProvider;
 		setMarginRight(2);
 		setMarginLeft(2);
 		addStyleName("UserBadge");
@@ -82,7 +86,7 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 		} catch (Throwable e) {
 			jsniUtils.consoleError(e);
 		}
-		_showBadge(userBadgeReactDiv.getElement(), profileJson, userId, badgeType.getUserCardType(), avatarSize.getAvatarSize(), showCardOnHover, pictureUrl, !authController.isLoggedIn(), showAvatar, isCertified, isValidated, menuActionsArray, this);
+		_showBadge(userBadgeReactDiv.getElement(), profileJson, userId, badgeType.getUserCardType(), avatarSize.getAvatarSize(), showCardOnHover, pictureUrl, !authController.isLoggedIn(), showAvatar, isCertified, isValidated, menuActionsArray, this, propsProvider.getJsniContextProps());
 	}
 
 	public void setClickHandler(ClickHandler clickHandler) {
@@ -183,7 +187,7 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 		_addToMenuActionsArray(commandName, callback, menuActionsArray);
 	}
 
-	private static native void _showBadge(Element el, String userProfileJson, String userId, String userCardType, String avatarSize, boolean showCardOnHover, String pictureUrl, boolean isEmailHidden, boolean showAvatar, Boolean isCertifiedUser, Boolean isValidatedProfile, JsArray<JavaScriptObject> menuActionsArray, UserBadgeViewImpl userBadgeView) /*-{
+	private static native void _showBadge(Element el, String userProfileJson, String userId, String userCardType, String avatarSize, boolean showCardOnHover, String pictureUrl, boolean isEmailHidden, boolean showAvatar, Boolean isCertifiedUser, Boolean isValidatedProfile, JsArray<JavaScriptObject> menuActionsArray, UserBadgeViewImpl userBadgeView, SynapseContextProviderPropsJSNIObject wrapperProps) /*-{
 
 		try {
 			var userProfileObject = JSON.parse(userProfileJson);
@@ -200,10 +204,9 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 				isValidated: isValidatedProfile,
 				withAvatar: showAvatar
 			};
-
-			$wnd.ReactDOM.render($wnd.React.createElement(
-					$wnd.SRC.SynapseComponents.UserCard, userCardProps, null),
-					el);
+			var component = $wnd.React.createElement($wnd.SRC.SynapseComponents.UserCard, userCardProps, null);
+			var wrapper = $wnd.React.createElement($wnd.SRC.SynapseComponents.SynapseContextProvider, wrapperProps, component);
+			$wnd.ReactDOM.render(wrapper, el);
 		} catch (err) {
 			console.error(err);
 		}

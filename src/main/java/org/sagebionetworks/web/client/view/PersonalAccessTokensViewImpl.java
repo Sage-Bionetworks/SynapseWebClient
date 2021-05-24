@@ -1,8 +1,12 @@
 package org.sagebionetworks.web.client.view;
 
 import org.gwtbootstrap3.client.ui.Anchor;
-import org.gwtbootstrap3.client.ui.html.Div;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.jsinterop.AccessTokenPageProps;
+import org.sagebionetworks.web.client.jsinterop.React;
+import org.sagebionetworks.web.client.jsinterop.ReactDOM;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
+import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.presenter.PersonalAccessTokensPresenter;
@@ -10,7 +14,6 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 import org.sagebionetworks.web.client.widget.header.Header;
 
-import com.google.gwt.dom.client.Element;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -19,9 +22,11 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class PersonalAccessTokensViewImpl extends Composite implements PersonalAccessTokensView {
-
 	public interface PersonalAccessTokensViewImplUiBinder extends UiBinder<Widget, PersonalAccessTokensViewImpl> {
 	}
+
+	private static String PAGE_TITLE = "Personal Access Tokens";
+	private static String PAGE_BODY_COPY = "Issue personal access tokens to access your Synapse resources in the command line clients. A personal access token will expire if it is unused for 180 consecutive days. You may create up to 100 personal access tokens.";
 
 	@UiField
 	ReactComponentDiv container;
@@ -29,17 +34,15 @@ public class PersonalAccessTokensViewImpl extends Composite implements PersonalA
 	Anchor backToSettingsAnchor;
 
 	private PersonalAccessTokensPresenter presenter;
-	private AuthenticationController authController;
 	private Header headerWidget;
-	private SynapseJSNIUtils jsniUtils;
+	private SynapseContextPropsProvider propsProvider;
 
 	@Inject
-	public PersonalAccessTokensViewImpl(PersonalAccessTokensViewImplUiBinder uiBinder, AuthenticationController authenticationController, Header headerWidget, SynapseJSNIUtils jsniUtils) {
+	public PersonalAccessTokensViewImpl(PersonalAccessTokensViewImplUiBinder uiBinder, AuthenticationController authenticationController, Header headerWidget, SynapseContextPropsProvider propsProvider) {
 		initWidget(uiBinder.createAndBindUi(this));
 
-		this.jsniUtils = jsniUtils;
-		this.authController = authenticationController;
 		this.headerWidget = headerWidget;
+		this.propsProvider = propsProvider;
 		headerWidget.configure();
 
 		backToSettingsAnchor.addClickHandler(event -> presenter.goTo(new Profile(authenticationController.getCurrentUserPrincipalId(), Synapse.ProfileArea.SETTINGS)));
@@ -49,26 +52,10 @@ public class PersonalAccessTokensViewImpl extends Composite implements PersonalA
 	@Override
 	public void render() {
 		Window.scrollTo(0, 0); // scroll user to top of page
-		_showPersonalAccessTokensComponent(container.getElement(), authController.getCurrentUserAccessToken());
+		AccessTokenPageProps props = AccessTokenPageProps.create(PAGE_TITLE, PAGE_BODY_COPY);
+		ReactElement component = React.createElementWithSynapseContext(SRC.SynapseComponents.AccessTokenPage, props, propsProvider.getJsInteropContextProps());
+		ReactDOM.render(component, container.getElement());
 	}
-
-	private static native void _showPersonalAccessTokensComponent(Element el, String accessToken) /*-{
-		try {
-			var props = {
-			  	title: "Personal Access Tokens",
-				body: "Issue personal access tokens to access your Synapse resources in the command line clients. A personal access token will expire if it is unused for 180 consecutive days. You may create up to 100 personal access tokens.",
-				token: accessToken,
-			};
-			$wnd.ReactDOM.render($wnd.React.createElement(
-					$wnd.SRC.SynapseComponents.AccessTokenPage, props, null),
-					el);
-		} catch (err) {
-			console.error(err);
-		}
-	}-*/;
-
-
-
 
 	@Override
 	public void setPresenter(PersonalAccessTokensPresenter presenter) {

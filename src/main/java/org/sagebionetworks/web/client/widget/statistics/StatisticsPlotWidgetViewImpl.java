@@ -6,6 +6,9 @@ import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseProperties;
+import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.jsinterop.SynapseContextProviderProps;
+import org.sagebionetworks.web.client.jsni.SynapseContextProviderPropsJSNIObject;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 
 import com.google.gwt.uibinder.client.UiBinder;
@@ -32,12 +35,14 @@ public class StatisticsPlotWidgetViewImpl implements StatisticsPlotWidgetView, I
 	Modal statsPlotModal;
 	Widget widget;
 	SynapseJSNIUtils jsniUtils;
+	SynapseContextPropsProvider propsProvider;
 	String endpoint;
 	
 	@Inject
-	public StatisticsPlotWidgetViewImpl(StatisticsPlotWidgetViewImplUiBinder binder, SynapseJSNIUtils jsniUtils, SynapseProperties synapseProperties) {
+	public StatisticsPlotWidgetViewImpl(StatisticsPlotWidgetViewImplUiBinder binder, SynapseJSNIUtils jsniUtils, SynapseProperties synapseProperties, SynapseContextPropsProvider propsProvider) {
 		widget = binder.createAndBindUi(this);
 		this.jsniUtils = jsniUtils;
+		this.propsProvider = propsProvider;
 		endpoint = synapseProperties.getSynapseProperty(REPO_SERVICE_URL_KEY);
 		closeButton.addClickHandler(event -> {
 			statsPlotModal.hide();
@@ -46,18 +51,17 @@ public class StatisticsPlotWidgetViewImpl implements StatisticsPlotWidgetView, I
 
 	@Override
 	public void configureAndShow(String projectId, String accessToken) {
-		_createSRCWidget(srcContainer.getElement(), projectId, accessToken, endpoint);
+		_createSRCWidget(srcContainer.getElement(), projectId, accessToken, endpoint, propsProvider.getJsniContextProps());
 		statsPlotModal.show();
 	}
 
-	private static native void _createSRCWidget(Element el, String projectId, String accessToken, String fullRepoEndpoint) /*-{
+	private static native void _createSRCWidget(Element el, String projectId, String accessToken, String fullRepoEndpoint, SynapseContextProviderPropsJSNIObject wrapperProps) /*-{
 		try {
 			// URL.host returns the domain (that is the hostname) followed by (if a port was specified) a ':' and the port of the URL
 			var repoURL = new URL(fullRepoEndpoint);
 			var rootRepoEndpoint = repoURL.protocol + '//' + repoURL.host;
 
 			var props = {
-				token : accessToken,
 				request : {
 					concreteType : 'org.sagebionetworks.repo.model.statistics.ProjectFilesStatisticsRequest',
 					objectId : projectId,
@@ -67,10 +71,11 @@ public class StatisticsPlotWidgetViewImpl implements StatisticsPlotWidgetView, I
 				endpoint : rootRepoEndpoint,
 				title : 'Project Statistics'
 			}
-			$wnd.ReactDOM
-					.render($wnd.React.createElement(
-							$wnd.SRC.SynapseComponents.StatisticsPlot, props,
-							null), el);
+
+			var component = $wnd.React.createElement($wnd.SRC.SynapseComponents.StatisticsPlot, props, null)
+			var wrapper = $wnd.React.createElement($wnd.SRC.SynapseComponents.SynapseContextProvider, wrapperProps, component)
+
+			$wnd.ReactDOM.render(wrapper, el);
 		} catch (err) {
 			console.error(err);
 		}

@@ -18,7 +18,6 @@ public class EntityFinderProps extends ReactComponentProps {
         void run(ReferenceJsObject[] selected);
     }
 
-    String accessToken;
     OnSelectCallback onSelectedChange;
     boolean selectMultiple;
     boolean showVersionSelection;
@@ -41,7 +40,6 @@ public class EntityFinderProps extends ReactComponentProps {
 
     @JsOverlay
     public static EntityFinderProps create(
-            String accessToken,
             OnSelectCallback onSelectedChange,
             boolean selectMultiple,
             boolean showVersionSelection,
@@ -55,7 +53,6 @@ public class EntityFinderProps extends ReactComponentProps {
             boolean treeOnly
     ) {
         EntityFinderProps props = new EntityFinderProps();
-        props.accessToken = accessToken;
         props.onSelectedChange = onSelectedChange;
         props.selectMultiple = selectMultiple;
         props.showVersionSelection = showVersionSelection;
