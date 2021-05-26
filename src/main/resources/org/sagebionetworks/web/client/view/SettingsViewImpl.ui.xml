@@ -87,7 +87,7 @@
 												text="Create/populate a public ORCID profile or link to your existing one." />
 										</b:ListItem>
 										<b:ListItem>
-											<b:Anchor href="https://docs.synapse.org/assets/other/oath.html"
+											<b:Anchor href="https://help.synapse.org/docs/Synapse-Pledge.2004255236.html"
 												text="Download the Synapse Pledge. Complete the form by typing your name, checking each statement, signing, and dating the document." target="_blank" />
 										</b:ListItem>
 										<b:ListItem>

@@ -137,23 +137,12 @@ public class EmailAddressesWidgetTest {
 	}
 
 	@Test
-	public void testOnAddEmail() {
+	public void testOnAddExistingEmail() {
 		widget.configure(mockUserProfile);
+
 		widget.onAddEmail("    " + EMAIL2 + "   ");
 
-		verify(mockSynapseClient).setNotificationEmail(eq(EMAIL2), any(AsyncCallback.class));
-		// reload profile
-		verify(mockSynapseJavascriptClient).getUserProfile(eq(USER_ID), any(AsyncCallback.class));
-	}
-
-	@Test
-	public void testOnAddEmailFailure() throws JSONObjectAdapterException {
-		Exception caught = new Exception("unexpected exception");
-		AsyncMockStubber.callFailureWith(caught).when(mockSynapseClient).setNotificationEmail(anyString(), any(AsyncCallback.class));
-		widget.configure(mockUserProfile);
-		widget.onAddEmail(EMAIL2);
-		verify(mockSynapseClient).setNotificationEmail(anyString(), any(AsyncCallback.class));
-		verify(mockSynAlert).handleException(caught);
+		verify(mockSynapseJavascriptClient, never()).additionalEmailValidation(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 	}
 
 	@Test
