@@ -328,7 +328,8 @@ public class SynapseClientImpl extends SynapseClientBase implements SynapseClien
 	public void addEmail(EmailValidationSignedToken emailValidationSignedToken) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			synapseClient.addEmail(emailValidationSignedToken, true);
+			boolean setAsNotificationEmail = false; // SWC-5619 (do not auto-set as notification email)
+			synapseClient.addEmail(emailValidationSignedToken, setAsNotificationEmail);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}

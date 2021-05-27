@@ -119,15 +119,14 @@ public class EmailAddressesWidget implements EmailAddressesWidgetView.Presenter,
 	public void onAddEmail(String emailAddress) {
 		emailAddress = emailAddress.trim();
 		// Is this email already in the profile email list?
-		// If so, just update it as the new notification email. Otherwise, kick
+		// If so, this is a no-op. Otherwise, kick
 		// off the verification process.
 		List<String> emailAddresses = profile.getEmails();
 		if (emailAddresses == null || emailAddresses.isEmpty())
 			throw new IllegalStateException("UserProfile email list is empty");
 		for (String email : emailAddresses) {
 			if (email.equalsIgnoreCase(emailAddress)) {
-				// update the notification email
-				onMakePrimary(emailAddress);
+				// SWC-5619 (do not auto-set this as the notification email)
 				return;
 			}
 		}

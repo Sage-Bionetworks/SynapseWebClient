@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Account;
 import org.sagebionetworks.web.client.place.Profile;
+import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.view.AccountView;
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -62,7 +63,7 @@ public class AccountPresenter extends AbstractActivity implements AccountView.Pr
 			public void onSuccess(Void result) {
 				// success, send to Settings to view account state
 				view.showInfo(DisplayConstants.EMAIL_SUCCESS);
-				globalAppState.getPlaceChanger().goTo(new Profile(Profile.EDIT_PROFILE_TOKEN));
+				globalAppState.getPlaceChanger().goTo(new Profile(Profile.VIEW_PROFILE_TOKEN, ProfileArea.SETTINGS));
 			}
 
 			@Override
