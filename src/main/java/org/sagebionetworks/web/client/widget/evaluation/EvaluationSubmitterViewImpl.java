@@ -367,7 +367,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 			};
 
 			var component = $wnd.React.createElement($wnd.SRC.SynapseComponents.EntityForm, props, null);
-			var wrapper = $wnd.React.createElement($wnd.SRC.SynapseComponents.SynapseContextProvider, props, wrapperProps);
+			var wrapper = $wnd.React.createElement($wnd.SRC.SynapseContext.SynapseContextProvider, props, wrapperProps);
 
 			$wnd.ReactDOM.render(wrapper, el);
 		} catch (err) {

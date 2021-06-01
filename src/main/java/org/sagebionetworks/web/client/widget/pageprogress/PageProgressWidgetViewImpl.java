@@ -58,7 +58,7 @@ public class PageProgressWidgetViewImpl implements PageProgressWidgetView, IsWid
 			}
 
 			var component = $wnd.React.createElement($wnd.SRC.SynapseComponents.PageProgress, props, null);
-			var wrapper = $wnd.React.createElement($wnd.SRC.SynapseComponents.SynapseContextProvider, props, component);
+			var wrapper = $wnd.React.createElement($wnd.SRC.SynapseContext.SynapseContextProvider, props, component);
 
 			$wnd.ReactDOM.render(wrapper, el);
 		} catch (err) {

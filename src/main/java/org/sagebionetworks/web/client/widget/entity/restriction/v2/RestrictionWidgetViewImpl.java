@@ -191,7 +191,7 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 				entityVersionNumber: versionNumber
 			};
 			var component = $wnd.React.createElement($wnd.SRC.SynapseComponents.HasAccess, props, null)
-			var wrapper = $wnd.React.createElement($wnd.SRC.SynapseComponents.SynapseContextProvider, wrapperProps, component)
+			var wrapper = $wnd.React.createElement($wnd.SRC.SynapseContext.SynapseContextProvider, wrapperProps, component)
 
 			$wnd.ReactDOM.render(wrapper, el);
 		} catch (err) {

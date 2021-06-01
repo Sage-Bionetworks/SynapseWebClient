@@ -26,6 +26,6 @@ public class React {
 	@JsOverlay
 	public static <P extends ReactComponentProps> ReactElement createElementWithSynapseContext(ReactFunctionComponent<P> component, P props, SynapseContextProviderProps wrapperProps) {
 		ReactElement componentElement = createElement(component, props);
-		return createElement(SRC.SynapseComponents.SynapseContextProvider, wrapperProps, componentElement);
+		return createElement(SRC.SynapseContext.SynapseContextProvider, wrapperProps, componentElement);
 	}
 }

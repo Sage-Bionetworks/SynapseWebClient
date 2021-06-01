@@ -160,7 +160,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 			};
 
 			var component = $wnd.React.createElement($wnd.SRC.SynapseComponents.TermsAndConditions, props, null)
-			var wrapper = $wnd.React.createElement($wnd.SRC.SynapseComponents.SynapseContextProvider, wrapperProps, component)
+			var wrapper = $wnd.React.createElement($wnd.SRC.SynapseContext.SynapseContextProvider, wrapperProps, component)
 
 			$wnd.ReactDOM.render(wrapper, el);
 		} catch (err) {
