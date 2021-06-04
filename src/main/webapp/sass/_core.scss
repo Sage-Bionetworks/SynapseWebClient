@@ -3400,7 +3400,7 @@ div.border {
 	position: absolute;
 	right: 20px;
 	top: -5px;
-	button {
+	> button {
 		border-radius: 50%;
 		&:focus {
 			outline: none;
