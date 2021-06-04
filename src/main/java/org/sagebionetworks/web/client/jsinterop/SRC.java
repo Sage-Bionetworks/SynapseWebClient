@@ -10,6 +10,12 @@ public class SRC {
 		public static ReactFunctionComponent<EntityFinderProps> EntityFinder;
 		public static ReactFunctionComponent<EvaluationCardProps> EvaluationCard;
 		public static ReactFunctionComponent<EvaluationEditorPageProps> EvaluationEditorPage;
+		public static ReactFunctionComponent<AccessTokenPageProps> AccessTokenPage;
+	}
+
+	@JsType(isNative = true)
+	public static class SynapseContext {
+		public static ReactFunctionComponent<SynapseContextProviderProps> SynapseContextProvider;
 	}
 }
 

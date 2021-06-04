@@ -50,8 +50,6 @@ public class AdministerEvaluationsListTest{
 	@Mock
 	SynapseAlert mockSynAlert;
 	@Mock
-	CookieProvider mockCookieProvider;
-	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
 	@Mock
 	AuthenticationController mockAuthenticationController;
@@ -68,7 +66,7 @@ public class AdministerEvaluationsListTest{
 	public void setup() throws Exception {
 		MockitoAnnotations.initMocks(this);
 		evalList = new AdministerEvaluationsList(mockView, mockChallengeClient, mockAclEditor, mockEvalEditor, mockSynAlert,
-				mockCookieProvider, mockGlobalApplicationState, mockAuthenticationController, mockSubmitToEvaluationWidget);
+				mockGlobalApplicationState, mockAuthenticationController, mockSubmitToEvaluationWidget);
 
 		ArrayList<Evaluation> evaluationResults = new ArrayList<Evaluation>();
 
@@ -98,8 +96,6 @@ public class AdministerEvaluationsListTest{
 	@Ignore // Not sure how to stub out GWT Javascript-specific module used in EvaluationJSObject
 	@Test
 	public void testConfigure_useReactComponent() {
-		when(mockCookieProvider.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("true");
-
 		evalList.configure("syn100", mockOnEditEvaluation);
 		verify(mockChallengeClient).getSharableEvaluations(anyString(), any(AsyncCallback.class));
 		verify(mockView).addReactComponent(eq(e1), any());

@@ -12,23 +12,19 @@ public class EvaluationEditorPageProps extends ReactComponentProps  {
 		void run();
 	}
 
-	String accessToken;
 	String evaluationId;
 	String entityId;
-	boolean utc;
 	Callback onDeleteSuccess;
 
 	@JsOverlay
-	public static EvaluationEditorPageProps create(String accessToken, String evaluationId, String entityId, boolean utc, Callback onDeleteSuccess) {
+	public static EvaluationEditorPageProps create(String evaluationId, String entityId, Callback onDeleteSuccess) {
 		if((evaluationId != null && entityId != null) || (evaluationId == null && entityId == null)){
 			throw new IllegalArgumentException("Either evaluationId (non-null means edit existing) or entityId (non-null means create new) must be null, but not both");
 		}
 
 		EvaluationEditorPageProps props = new EvaluationEditorPageProps();
-		props.accessToken = accessToken;
 		props.evaluationId = evaluationId;
 		props.entityId = entityId;
-		props.utc = utc;
 		props.onDeleteSuccess = onDeleteSuccess;
 		return props;
 	}

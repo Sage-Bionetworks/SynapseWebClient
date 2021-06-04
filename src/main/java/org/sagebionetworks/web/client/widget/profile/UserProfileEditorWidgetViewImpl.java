@@ -14,6 +14,8 @@ import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.jsni.SynapseContextProviderPropsJSNIObject;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 import org.sagebionetworks.web.client.widget.search.GooglePlacesSuggestOracle;
@@ -98,12 +100,14 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 	com.google.gwt.user.client.ui.TextBoxBase locationTextBox;
 	boolean isEditing = false;
 	SynapseJSNIUtils jsniUtils;
+	SynapseContextPropsProvider propsProvider;
 	Presenter presenter;
 	String originalButtonText;
 	@Inject
-	public UserProfileEditorWidgetViewImpl(Binder binder, GooglePlacesSuggestOracle locationOracle, GlobalApplicationState globalAppState, AuthenticationController authController, SynapseJSNIUtils jsniUtils) {
+	public UserProfileEditorWidgetViewImpl(Binder binder, GooglePlacesSuggestOracle locationOracle, GlobalApplicationState globalAppState, AuthenticationController authController, SynapseJSNIUtils jsniUtils, SynapseContextPropsProvider propsProvider) {
 		widget = binder.createAndBindUi(this);
 		this.jsniUtils = jsniUtils;
+		this.propsProvider = propsProvider;
 		locationSuggestBox = new SuggestBox(locationOracle);
 		locationSuggestBox.setWidth("100%");
 		locationTextBox = locationSuggestBox.getTextBox();
@@ -319,17 +323,19 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 	
 	@Override
 	public void setOwnerId(String userId) {
-		_showAccountLevelBadge(accountLevelBadgeContainer.getElement(), userId);
+		_showAccountLevelBadge(accountLevelBadgeContainer.getElement(), userId, propsProvider.getJsniContextProps());
 	}
 	
-	private static native void _showAccountLevelBadge(Element el, String userId) /*-{
+	private static native void _showAccountLevelBadge(Element el, String userId, SynapseContextProviderPropsJSNIObject wrapperProps) /*-{
 		try {
 			var props = {
 			  	userId: userId,
 			};
-			$wnd.ReactDOM.render($wnd.React.createElement(
-					$wnd.SRC.SynapseComponents.AccountLevelBadge, props, null),
-					el);
+
+			var component = $wnd.React.createElement($wnd.SRC.SynapseComponents.AccountLevelBadge, props, null);
+			var wrapper = $wnd.React.createElement($wnd.SRC.SynapseContext.SynapseContextProvider, wrapperProps, component);
+
+			$wnd.ReactDOM.render(wrapper, el);
 		} catch (err) {
 			console.error(err);
 		}

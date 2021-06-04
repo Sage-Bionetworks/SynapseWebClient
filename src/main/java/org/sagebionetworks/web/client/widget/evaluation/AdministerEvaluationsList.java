@@ -8,9 +8,7 @@ import java.util.function.Consumer;
 
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.jsinterop.EvaluationCardProps;
 import org.sagebionetworks.web.client.jsinterop.EvaluationJSObject;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -19,15 +17,15 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.renderer.SubmitToEvaluationWidget;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationRowWidget.EvaluationActionHandler;
 import org.sagebionetworks.web.client.widget.sharing.EvaluationAccessControlListModalWidget;
+import org.sagebionetworks.web.shared.WidgetConstants;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import org.sagebionetworks.web.shared.WidgetConstants;
 
 public class AdministerEvaluationsList implements SynapseWidgetPresenter, EvaluationActionHandler {
 
 	private ChallengeClientAsync challengeClient;
-	private CookieProvider cookieProvider;
 	private GlobalApplicationState globalApplicationState;
 	private AdministerEvaluationsListView view;
 	private EvaluationAccessControlListModalWidget aclEditor;
@@ -43,10 +41,9 @@ public class AdministerEvaluationsList implements SynapseWidgetPresenter, Evalua
 	@Inject
 	public AdministerEvaluationsList(AdministerEvaluationsListView view, ChallengeClientAsync challengeClient,
 									 EvaluationAccessControlListModalWidget aclEditor, EvaluationEditorModal evalEditor,
-									 SynapseAlert synAlert, CookieProvider cookieProvider, GlobalApplicationState globalApplicationState,
+									 SynapseAlert synAlert, GlobalApplicationState globalApplicationState,
 									 AuthenticationController authenticationController, SubmitToEvaluationWidget submitToEvaluationWidget) {
 		this.challengeClient = challengeClient;
-		this.cookieProvider = cookieProvider;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		this.submitToEvaluationWidget = submitToEvaluationWidget;
@@ -109,8 +106,6 @@ public class AdministerEvaluationsList implements SynapseWidgetPresenter, Evalua
 
 		EvaluationCardProps props = EvaluationCardProps.create(
 			EvaluationJSObject.fromEvaluation(evaluation),
-				accessToken,
-				timeInUtc,
 				onEdit,
 				onModifyAccess,
 				onSubmit,

@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.evaluation;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.EvaluationCardProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactDOM;
@@ -21,6 +22,7 @@ public class AdministerEvaluationsListViewImpl implements AdministerEvaluationsL
 	}
 
 	private EvaluationActionHandler presenter;
+	private SynapseContextPropsProvider contextPropsProvider;
 	@UiField
 	Div rows;
 	@UiField
@@ -29,9 +31,10 @@ public class AdministerEvaluationsListViewImpl implements AdministerEvaluationsL
 	Widget widget;
 
 	@Inject
-	public AdministerEvaluationsListViewImpl(Binder binder, PortalGinInjector ginInjector) {
+	public AdministerEvaluationsListViewImpl(Binder binder, PortalGinInjector ginInjector, final SynapseContextPropsProvider contextPropsProvider) {
 		this.ginInjector = ginInjector;
 		widget = binder.createAndBindUi(this);
+		this.contextPropsProvider = contextPropsProvider;
 	}
 
 	@Override
@@ -68,7 +71,7 @@ public class AdministerEvaluationsListViewImpl implements AdministerEvaluationsL
 		container.setMarginTop(50);
 		rows.add(container);
 
-		ReactElement element = React.createElement(SRC.SynapseComponents.EvaluationCard, props);
-		ReactDOM.render( element, container.getElement());
+		ReactElement element = React.createElementWithSynapseContext(SRC.SynapseComponents.EvaluationCard, props, contextPropsProvider.getJsInteropContextProps());
+		ReactDOM.render(element, container.getElement());
 	}
 }
