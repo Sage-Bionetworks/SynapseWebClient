@@ -75,7 +75,7 @@ public class DownViewImpl implements DownView {
 				message: message
 			};
 			var component = $wnd.React.createElement($wnd.SRC.SynapseComponents.ErrorPage, props, null)
-			var wrapper = $wnd.React.createElement($wnd.SRC.SynapseComponents.SynapseWrapper, wrapperProps, component)
+			var wrapper = $wnd.React.createElement($wnd.SRC.SynapseContext.SynapseContextProvider, wrapperProps, component)
 			$wnd.ReactDOM.render(wrapper, el);
 		} catch (err) {
 			console.error(err);
