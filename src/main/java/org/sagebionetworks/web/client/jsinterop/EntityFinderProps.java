@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.jsinterop;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityType;
+import org.sagebionetworks.web.client.jsni.ReferenceJSNIObject;
 
 import jsinterop.annotations.JsFunction;
 import jsinterop.annotations.JsNullable;
@@ -15,7 +16,7 @@ public class EntityFinderProps extends ReactComponentProps {
     @FunctionalInterface
     @JsFunction
     public interface OnSelectCallback {
-        void run(ReferenceJsObject[] selected);
+        void run(ReferenceJSNIObject[] selected);
     }
 
     OnSelectCallback onSelectedChange;

@@ -16,9 +16,8 @@ import org.sagebionetworks.web.client.jsinterop.EntityFinderProps;
 import org.sagebionetworks.web.client.jsinterop.EntityFinderScope;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactDOM;
-import org.sagebionetworks.web.client.jsinterop.ReferenceJsObject;
 import org.sagebionetworks.web.client.jsinterop.SRC;
-import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.jsni.ReferenceJSNIObject;
 import org.sagebionetworks.web.client.widget.HelpWidget;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -101,21 +100,18 @@ public class EntityFinderWidgetViewImpl implements EntityFinderWidgetView {
 	public void renderComponent(EntityFinderScope initialScope, EntityFinderWidget.InitialContainer initialContainer, String projectId, String initialContainerId, boolean showVersions, boolean multiSelect, EntityFilter selectableEntityTypes, EntityFilter visibleTypesInList, EntityFilter visibleTypesInTree, String selectedCopy, boolean treeOnly) {
         entityFinderContainer.clear();
 
-        EntityFinderProps.OnSelectCallback onSelected = new EntityFinderProps.OnSelectCallback() {
-			@Override
-			public void run(ReferenceJsObject[] result) {
-				List<Reference> selected = Arrays.stream(result)
-						.map(ReferenceJsObject::toJavaObject)
-						.collect(Collectors.toList());
-				okButton.setEnabled(selected.size() > 0);
-				if (multiSelect) {
-					presenter.setSelectedEntities(selected);
+        EntityFinderProps.OnSelectCallback onSelected = result -> {
+			List<Reference> selected = Arrays.stream(result)
+					.map(ReferenceJSNIObject::getJavaObject)
+					.collect(Collectors.toList());
+			okButton.setEnabled(selected.size() > 0);
+			if (multiSelect) {
+				presenter.setSelectedEntities(selected);
+			} else {
+				if (selected.size() > 0) {
+					presenter.setSelectedEntity(selected.get(0));
 				} else {
-					if (selected.size() > 0) {
-						presenter.setSelectedEntity(selected.get(0));
-					} else {
-						presenter.clearSelectedEntities();
-					}
+					presenter.clearSelectedEntities();
 				}
 			}
 		};
