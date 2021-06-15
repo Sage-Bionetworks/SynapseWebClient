@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.jsinterop;
 
+import org.sagebionetworks.web.client.jsinterop.reactquery.QueryClient;
+
 import jsinterop.annotations.JsOverlay;
 import jsinterop.annotations.JsPackage;
 import jsinterop.annotations.JsType;
@@ -8,11 +10,13 @@ import jsinterop.annotations.JsType;
 public class SynapseContextProviderProps extends ReactComponentProps {
 
 	public SynapseContextJsObject synapseContext;
+	public QueryClient queryClient;
 
 	@JsOverlay
-	public static SynapseContextProviderProps create(SynapseContextJsObject synapseContext) {
+	public static SynapseContextProviderProps create(SynapseContextJsObject synapseContext, QueryClient queryClient) {
 		SynapseContextProviderProps props = new SynapseContextProviderProps();
 		props.synapseContext = synapseContext;
+		props.queryClient = queryClient;
 		return props;
 	}
 }
