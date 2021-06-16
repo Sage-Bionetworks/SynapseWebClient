@@ -34,7 +34,8 @@ public class EvaluationEditorReactComponentPage extends Composite {
 	boolean utc;
 
 	@Inject
-	public EvaluationEditorReactComponentPage(Binder binder) {
+	public EvaluationEditorReactComponentPage(Binder binder, SynapseContextPropsProvider propsProvider) {
+		this.propsProvider = propsProvider;
 		initWidget(binder.createAndBindUi(this));
 	}
 
