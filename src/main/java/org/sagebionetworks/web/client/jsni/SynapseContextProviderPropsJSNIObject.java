@@ -20,5 +20,9 @@ public class SynapseContextProviderPropsJSNIObject extends JavaScriptObject {
         this.synapseContext = context;
     }-*/;
 
+    public final native void setQueryClient(QueryClientJSNIObject queryClient) /*-{
+        this.queryClient = queryClient;
+    }-*/;
+
     // This object also supports setting a react-query query client, but we aren't exposing that for now
 }

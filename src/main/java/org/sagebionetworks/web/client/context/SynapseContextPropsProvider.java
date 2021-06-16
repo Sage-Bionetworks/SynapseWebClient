@@ -11,7 +11,7 @@ import org.sagebionetworks.web.client.jsni.SynapseContextProviderPropsJSNIObject
  */
 public interface SynapseContextPropsProvider {
     /**
-     * Provides props for {@link org.sagebionetworks.web.client.jsinterop.SRC.SynapseComponents#SynapseContextProvider}.
+     * Provides props for {@link org.sagebionetworks.web.client.jsinterop.SRC.SynapseContext#SynapseContextProvider}.
      * Typically, props will be supplied to {@link org.sagebionetworks.web.client.jsinterop.React#createElementWithSynapseContext(ReactFunctionComponent, ReactComponentProps, SynapseContextProviderProps)}
      */
     SynapseContextProviderProps getJsInteropContextProps();
