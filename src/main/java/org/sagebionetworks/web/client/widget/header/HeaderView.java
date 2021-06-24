@@ -68,6 +68,8 @@ public interface HeaderView extends IsWidget {
 	EventBinder<Header> getEventBinder();
 
 	void setDownloadListUIVisible(boolean visible);
+	
+	void setDownloadListV2UIVisible(boolean visible);
 
 	void setDownloadListFileCount(Integer count);
 

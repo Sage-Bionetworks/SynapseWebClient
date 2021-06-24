@@ -19,8 +19,7 @@ public class DownloadCartPageViewImpl implements DownloadCartPageView {
 
 	private Header headerWidget;
 	private SynapseContextPropsProvider propsProvider;
-	private boolean initialized = false;
-
+	
 	@Inject
 	public DownloadCartPageViewImpl(AuthenticationController authenticationController, Header headerWidget, SynapseContextPropsProvider propsProvider) {
 		container = new ReactComponentDiv();
@@ -33,11 +32,9 @@ public class DownloadCartPageViewImpl implements DownloadCartPageView {
 	public void render() {
 		Window.scrollTo(0, 0); // scroll user to top of page
 		headerWidget.configure();
-		if (!initialized) {
-			EmptyProps props = EmptyProps.create();
-			ReactElement component = React.createElementWithSynapseContext(SRC.SynapseComponents.DownloadCartPage, props, propsProvider.getJsInteropContextProps());
-			ReactDOM.render(component, container.getElement());
-		}
+		EmptyProps props = EmptyProps.create();
+		ReactElement component = React.createElementWithSynapseContext(SRC.SynapseComponents.DownloadCartPage, props, propsProvider.getJsInteropContextProps());
+		ReactDOM.render(component, container.getElement());
 	}
 	
 	@Override

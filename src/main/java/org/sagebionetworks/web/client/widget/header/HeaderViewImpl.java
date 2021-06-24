@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.header;
 
 import java.util.List;
+
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
@@ -22,18 +23,26 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.jsinterop.React;
+import org.sagebionetworks.web.client.jsinterop.ReactDOM;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
+import org.sagebionetworks.web.client.jsinterop.SRC;
+import org.sagebionetworks.web.client.jsinterop.ShowDownloadV2Props;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.place.SynapseForumPlace;
 import org.sagebionetworks.web.client.widget.FullWidthAlert;
+import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 import org.sagebionetworks.web.client.widget.search.SearchBox;
 import org.sagebionetworks.web.client.widget.user.AvatarSize;
 import org.sagebionetworks.web.client.widget.user.BadgeType;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -115,6 +124,8 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	@UiField
 	Div downloadListNotificationUI;
 	@UiField
+	ReactComponentDiv downloadListV2NotificationUI;
+	@UiField
 	FocusPanel downloadListLink;
 	@UiField
 	Label downloadListFileCount;
@@ -139,15 +150,17 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	String userId;
 	AnchorListItem defaultItem = new AnchorListItem("Empty");
 	String portalHref = "";
+	SynapseContextPropsProvider propsProvider;
 
 	@Inject
-	public HeaderViewImpl(Binder binder, SageImageBundle sageImageBundle, SearchBox searchBox, CookieProvider cookies, UserBadge userBadge, GlobalApplicationState globalAppState) {
+	public HeaderViewImpl(Binder binder, SageImageBundle sageImageBundle, SearchBox searchBox, CookieProvider cookies, UserBadge userBadge, GlobalApplicationState globalAppState, SynapseContextPropsProvider propsProvider) {
 		this.initWidget(binder.createAndBindUi(this));
 		this.searchBox = searchBox;
 		this.cookies = cookies;
 		this.sageImageBundle = sageImageBundle;
 		this.userBadge = userBadge;
 		this.globalAppState = globalAppState;
+		this.propsProvider = propsProvider;
 		userBadge.setBadgeType(BadgeType.AVATAR);
 		userBadge.setAvatarSize(AvatarSize.MEDIUM);
 		userBadge.setShowCardOnHover(false);
@@ -397,6 +410,15 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		downloadListNotificationUI.setVisible(visible);
 	}
 
+	@Override
+	public void setDownloadListV2UIVisible(boolean visible) {
+		downloadListV2NotificationUI.setVisible(visible);
+		if (visible) {
+			ShowDownloadV2Props props = ShowDownloadV2Props.create("#!DownloadCart:0");
+			ReactElement component = React.createElementWithSynapseContext(SRC.SynapseComponents.ShowDownloadV2, props, propsProvider.getJsInteropContextProps());
+			ReactDOM.render(component, downloadListV2NotificationUI.getElement());
+		}
+	}
 	@Override
 	public void setPortalAlertVisible(boolean visible, JSONObjectAdapter json) {
 		if (visible) {

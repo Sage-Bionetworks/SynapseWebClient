@@ -8,6 +8,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DateTimeUtilsImpl;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -131,6 +132,7 @@ public class Header implements HeaderView.Presenter, IsWidget {
 			onDownloadListUpdatedEvent(null);
 		} else {
 			view.setDownloadListUIVisible(false);
+			view.setDownloadListV2UIVisible(false);
 		}
 	}
 
@@ -182,20 +184,30 @@ public class Header implements HeaderView.Presenter, IsWidget {
 
 	@EventHandler
 	public void onDownloadListUpdatedEvent(DownloadListUpdatedEvent event) {
-		// update Download List count, show if > 0
-		jsClient.getDownloadList(new AsyncCallback<DownloadList>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				view.setDownloadListUIVisible(false);
-				synapseJSNIUtils.consoleError("Unable to get download list! " + caught.getMessage());
-			}
+		boolean isInAlphaMode = DisplayUtils.isInTestWebsite(cookies);
 
-			public void onSuccess(DownloadList downloadList) {
-				int count = downloadList.getFilesToDownload().size();
-				view.setDownloadListUIVisible(count > 0);
-				view.setDownloadListFileCount(count);
-			};
-		});
+		if (!isInAlphaMode) {
+			view.setDownloadListV2UIVisible(false);
+			// update Download List count, show if > 0
+			jsClient.getDownloadList(new AsyncCallback<DownloadList>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					view.setDownloadListUIVisible(false);
+					synapseJSNIUtils.consoleError("Unable to get download list! " + caught.getMessage());
+				}
+
+				public void onSuccess(DownloadList downloadList) {
+					int count = downloadList.getFilesToDownload().size();
+					view.setDownloadListUIVisible(count > 0);
+					view.setDownloadListFileCount(count);
+				};
+			});
+		} else {
+			// show v2 download list UI
+			view.setDownloadListV2UIVisible(true);
+			view.setDownloadListUIVisible(false);
+		}
+		
 	}
 
 	@Override
