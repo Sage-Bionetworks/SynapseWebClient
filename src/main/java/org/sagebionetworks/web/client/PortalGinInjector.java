@@ -15,6 +15,7 @@ import org.sagebionetworks.web.client.presenter.ChangeUsernamePresenter;
 import org.sagebionetworks.web.client.presenter.ComingSoonPresenter;
 import org.sagebionetworks.web.client.presenter.DataAccessApprovalTokenPresenter;
 import org.sagebionetworks.web.client.presenter.DownPresenter;
+import org.sagebionetworks.web.client.presenter.DownloadCartPresenter;
 import org.sagebionetworks.web.client.presenter.EmailInvitationPresenter;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
 import org.sagebionetworks.web.client.presenter.ErrorPresenter;
@@ -335,6 +336,8 @@ public interface PortalGinInjector extends Ginjector {
 	SignedTokenPresenter getSignedTokenPresenter();
 
 	ErrorPresenter getErrorPresenter();
+	
+	DownloadCartPresenter getDownloadCartPresenter();
 
 	ChangeUsernamePresenter getChangeUsernamePresenter();
 
