@@ -415,6 +415,8 @@ import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigViewImpl;
+import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
+import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2Impl;
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListView;
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListViewImpl;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBarView;
@@ -1428,5 +1430,6 @@ public class PortalGinModule extends AbstractGinModule {
 
         bind(EntityFinderWidgetView.class).to(EntityFinderWidgetViewImpl.class);
         bind(SynapseContextPropsProvider.class).to(SynapseContextPropsProviderImpl.class);
+        bind(AddToDownloadListV2.class).to(AddToDownloadListV2Impl.class);
     }
 }

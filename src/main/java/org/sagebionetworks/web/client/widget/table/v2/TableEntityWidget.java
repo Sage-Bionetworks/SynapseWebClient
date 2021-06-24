@@ -12,6 +12,7 @@ import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryFilter;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.TableBundle;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cache.SessionStorage;
@@ -20,6 +21,7 @@ import org.sagebionetworks.web.client.widget.CopyTextModal;
 import org.sagebionetworks.web.client.widget.clienthelp.FileViewClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList;
+import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -107,7 +109,6 @@ public class TableEntityWidget implements IsWidget, QueryResultsListener, QueryI
 		this.sessionStorage = sessionStorage;
 		this.view.setQueryResultsWidget(this.queryResultsWidget);
 		this.view.setQueryInputWidget(this.queryInputWidget);
-		view.setAddToDownloadList(addToDownloadList);
 	}
 
 	public DownloadTableQueryModalWidget getDownloadTableQueryModalWidget() {
@@ -581,6 +582,13 @@ public class TableEntityWidget implements IsWidget, QueryResultsListener, QueryI
 
 	@Override
 	public void onAddToDownloadList() {
-		addToDownloadList.addToDownloadList(entityBundle.getEntity().getId(), currentQuery);
+		if (!DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider())) {
+			addToDownloadList.addToDownloadList(entityBundle.getEntity().getId(), currentQuery);
+			view.setAddToDownloadList(addToDownloadList);
+		} else {
+			AddToDownloadListV2 newAddToDownloadList = ginInjector.getAddToDownloadListV2();
+			view.setAddToDownloadList(newAddToDownloadList);
+			newAddToDownloadList.configure(entityBundle.getEntity().getId(), currentQuery);
+		}
 	}
 }

@@ -146,6 +146,7 @@ import org.sagebionetworks.web.client.widget.entity.editor.TableQueryResultWikiE
 import org.sagebionetworks.web.client.widget.entity.editor.TeamSelectEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.S3DirectLoginDialog;
@@ -876,5 +877,6 @@ public interface PortalGinInjector extends Ginjector {
 	IntendedDataUseGenerator getIntendedDataUseGenerator();
 	IntendedDataUseReportWidget getIntendedDataUseReportWidget();
 	PresignedURLAsyncHandler getPresignedURLAsyncHandler();
+	AddToDownloadListV2 getAddToDownloadListV2();
 	JSONObjectAdapter getJSONObjectAdapter();
 }

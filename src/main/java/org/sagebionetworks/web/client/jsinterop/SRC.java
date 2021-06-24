@@ -13,6 +13,7 @@ public class SRC {
 		public static ReactFunctionComponent<AccessTokenPageProps> AccessTokenPage;
 		public static ReactFunctionComponent<EmptyProps> DownloadCartPage;
 		public static ReactFunctionComponent<ShowDownloadV2Props> ShowDownloadV2;
+		public static ReactFunctionComponent<DownloadConfirmationProps> DownloadConfirmation;
 	}
 
 	@JsType(isNative = true)

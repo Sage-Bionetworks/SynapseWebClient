@@ -30,6 +30,7 @@ import org.sagebionetworks.web.client.jsinterop.ReactDOM;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.jsinterop.ShowDownloadV2Props;
+import org.sagebionetworks.web.client.place.DownloadCartPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -282,8 +283,13 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			globalAppState.getPlaceChanger().goTo(place);
 		});
 		myDownloadsLink.addClickHandler(event -> {
-			Profile place = new Profile(userId, ProfileArea.DOWNLOADS);
-			globalAppState.getPlaceChanger().goTo(place);
+			if (!DisplayUtils.isInTestWebsite(cookies)) {
+				Profile place = new Profile(userId, ProfileArea.DOWNLOADS);
+				globalAppState.getPlaceChanger().goTo(place);
+			} else {
+				DownloadCartPlace place = new DownloadCartPlace("0");
+				globalAppState.getPlaceChanger().goTo(place);
+			}
 		});
 		helpForumLink.addClickHandler(event -> {
 			SynapseForumPlace place = new SynapseForumPlace("default");
