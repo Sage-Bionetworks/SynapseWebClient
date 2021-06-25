@@ -48,6 +48,7 @@ import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cache.SessionStorage;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
@@ -107,6 +108,8 @@ public class TableEntityWidgetTest {
 	SynapseClientAsync mockSynapseClient;
 	@Mock
 	CopyTextModal mockCopyTextModal;
+	@Mock
+	CookieProvider mockCookies;
 
 	@Captor
 	ArgumentCaptor<Callback> callbackCaptor;
@@ -145,6 +148,7 @@ public class TableEntityWidgetTest {
 		when(mockPortalGinInjector.getUploadTableModalWidget()).thenReturn(mockUploadTableModalWidget);
 		when(mockPortalGinInjector.getCopyTextModal()).thenReturn(mockCopyTextModal);
 		when(mockPortalGinInjector.getAuthenticationController()).thenReturn(mockAuthController);
+		when(mockPortalGinInjector.getCookieProvider()).thenReturn(mockCookies);
 
 		widget = new TableEntityWidget(mockView, mockQueryResultsWidget, mockQueryInputWidget, mockPreflightController, mockSynapseClient, mockFileViewClientsHelp, mockAddToDownloadList, mockPortalGinInjector, mockSessionStorage);
 

@@ -428,6 +428,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			ReactDOM.render(component, downloadListV2NotificationUI.getElement());
 		}
 	}
+	
 	@Override
 	public void setPortalAlertVisible(boolean visible, JSONObjectAdapter json) {
 		if (visible) {

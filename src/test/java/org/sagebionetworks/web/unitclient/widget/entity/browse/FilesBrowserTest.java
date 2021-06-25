@@ -17,6 +17,8 @@ import org.sagebionetworks.web.client.widget.clienthelp.ContainerClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowserView;
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList;
+import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
+
 import com.google.gwt.user.client.ui.IsWidget;
 
 public class FilesBrowserTest {
@@ -26,6 +28,7 @@ public class FilesBrowserTest {
 	GlobalApplicationState mockGlobalApplicationState;
 	AuthenticationController mockAuthenticationController;
 	FilesBrowser filesBrowser;
+	@Mock
 	CookieProvider mockCookies;
 	String configuredEntityId = "syn123";
 	@Mock
@@ -34,7 +37,8 @@ public class FilesBrowserTest {
 	ContainerClientsHelp mockContainerClientsHelp;
 	@Mock
 	AddToDownloadList mockAddToDownloadList;
-
+	@Mock
+	AddToDownloadListV2 mockAddToDownloadListV2;
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
@@ -42,13 +46,11 @@ public class FilesBrowserTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
-		mockCookies = mock(CookieProvider.class);
-		filesBrowser = new FilesBrowser(mockView, mockGlobalApplicationState, mockAuthenticationController, mockContainerClientsHelp, mockAddToDownloadList);
+		filesBrowser = new FilesBrowser(mockView, mockGlobalApplicationState, mockAuthenticationController, mockContainerClientsHelp, mockAddToDownloadList, mockAddToDownloadListV2, mockCookies);
 	}
 
 	@Test
 	public void testConstructor() {
-		verify(mockView).setAddToDownloadList(any(IsWidget.class));
 		verify(mockView).setPresenter(filesBrowser);
 	}
 
