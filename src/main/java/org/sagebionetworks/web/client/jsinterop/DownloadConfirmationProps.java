@@ -44,7 +44,6 @@ public class DownloadConfirmationProps extends ReactComponentProps {
 				else return null;
 			}
 		};
-		//	TODO: support adding container children
 		props.folderId = folderId;
 		props.fnClose = onClose;
 		return props;
