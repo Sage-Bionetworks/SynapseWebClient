@@ -1,8 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
 import java.util.List;
+
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.VersionInfo;
+import org.sagebionetworks.repo.model.download.AddBatchOfFilesToDownloadListResponse;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.CloudProviderFileHandleInterface;
 import org.sagebionetworks.repo.model.file.DownloadList;
@@ -14,9 +17,11 @@ import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -41,9 +46,11 @@ public class FileTitleBar implements SynapseWidgetPresenter, FileTitleBarView.Pr
 	private SynapseJSNIUtils jsniUtils;
 	private GlobalApplicationState globalAppState;
 	private AuthenticationController authController;
+	private CookieProvider cookies;
+	private PopupUtilsView popupUtils;
 
 	@Inject
-	public FileTitleBar(FileTitleBarView view, SynapseProperties synapseProperties, FileDownloadMenuItem fileDownloadButton, SynapseJavascriptClient jsClient, FileClientsHelp fileClientsHelp, EventBus eventBus, SynapseJSNIUtils jsniUtils, GlobalApplicationState globalAppState, AuthenticationController authController) {
+	public FileTitleBar(FileTitleBarView view, SynapseProperties synapseProperties, FileDownloadMenuItem fileDownloadButton, SynapseJavascriptClient jsClient, FileClientsHelp fileClientsHelp, EventBus eventBus, SynapseJSNIUtils jsniUtils, GlobalApplicationState globalAppState, AuthenticationController authController, CookieProvider cookies, PopupUtilsView popupUtils) {
 		this.view = view;
 		this.synapseProperties = synapseProperties;
 		this.fileDownloadMenuItem = fileDownloadButton;
@@ -53,6 +60,8 @@ public class FileTitleBar implements SynapseWidgetPresenter, FileTitleBarView.Pr
 		this.jsniUtils = jsniUtils;
 		this.globalAppState = globalAppState;
 		this.authController = authController;
+		this.cookies = cookies;
+		this.popupUtils = popupUtils;
 		view.setFileDownloadMenuItem(fileDownloadButton.asWidget());
 		view.setPresenter(this);
 	}
@@ -185,19 +194,34 @@ public class FileTitleBar implements SynapseWidgetPresenter, FileTitleBarView.Pr
 			// TODO: add special popup to report how many items are in the current download list, and link to
 			// download list.
 			FileEntity entity = (FileEntity) entityBundle.getEntity();
-			jsClient.addFileToDownloadList(entity.getDataFileHandleId(), entity.getId(), new AsyncCallback<DownloadList>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					view.showErrorMessage(caught.getMessage());
-				}
-	
-				@Override
-				public void onSuccess(DownloadList result) {
-					jsniUtils.sendAnalyticsEvent(AddToDownloadList.DOWNLOAD_ACTION_EVENT_NAME, AddToDownloadList.FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME, "1");
-					view.showAddedToDownloadListAlert(entity.getName() + EntityBadge.ADDED_TO_DOWNLOAD_LIST);
-					eventBus.fireEvent(new DownloadListUpdatedEvent());
-				}
-			});
+			if (!DisplayUtils.isInTestWebsite(cookies)) {
+				jsClient.addFileToDownloadList(entity.getDataFileHandleId(), entity.getId(), new AsyncCallback<DownloadList>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						view.showErrorMessage(caught.getMessage());
+					}
+		
+					@Override
+					public void onSuccess(DownloadList result) {
+						jsniUtils.sendAnalyticsEvent(AddToDownloadList.DOWNLOAD_ACTION_EVENT_NAME, AddToDownloadList.FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME, "1");
+						view.showAddedToDownloadListAlert(entity.getName() + EntityBadge.ADDED_TO_DOWNLOAD_LIST);
+						eventBus.fireEvent(new DownloadListUpdatedEvent());
+					}
+				});
+			} else {
+				jsClient.addFileToDownloadListV2(entity.getId(), entity.getVersionNumber(), new AsyncCallback<AddBatchOfFilesToDownloadListResponse>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						view.showErrorMessage(caught.getMessage());
+					}
+					public void onSuccess(AddBatchOfFilesToDownloadListResponse result) {
+						String href = "#!DownloadCart:0";
+						popupUtils.showInfo(entity.getName() + EntityBadge.ADDED_TO_DOWNLOAD_LIST, href, DisplayConstants.VIEW_DOWNLOAD_LIST, IconType.CHECK_CIRCLE);
+						eventBus.fireEvent(new DownloadListUpdatedEvent());
+					};
+				});
+			}
+			
 		}
 	}
 

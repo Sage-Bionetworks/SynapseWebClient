@@ -23,6 +23,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.jsinterop.React;
@@ -420,7 +421,9 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	public void setDownloadListV2UIVisible(boolean visible) {
 		downloadListV2NotificationUI.setVisible(visible);
 		if (visible) {
+			SynapseJSNIUtilsImpl._consoleLog("Calling ReactDOM.render on this again");
 			ShowDownloadV2Props props = ShowDownloadV2Props.create("#!DownloadCart:0");
+			ReactDOM.unmountComponentAtNode(downloadListV2NotificationUI.getElement());
 			ReactElement component = React.createElementWithSynapseContext(SRC.SynapseComponents.ShowDownloadV2, props, propsProvider.getJsInteropContextProps());
 			ReactDOM.render(component, downloadListV2NotificationUI.getElement());
 		}

@@ -1,19 +1,23 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Versionable;
+import org.sagebionetworks.repo.model.download.AddBatchOfFilesToDownloadListResponse;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.repo.model.file.DownloadList;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.web.client.DateTimeUtils;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SelectableListItem;
@@ -41,9 +45,10 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 	PopupUtilsView popupUtils;
 	EventBus eventBus;
 	SynapseJSNIUtils jsniUtils;
+	CookieProvider cookies;
 
 	@Inject
-	public EntityListRowBadge(EntityListRowBadgeView view, UserBadge userBadge, SynapseJavascriptClient jsClient, LazyLoadHelper lazyLoadHelper, DateTimeUtils dateTimeUtils, PopupUtilsView popupUtils, EventBus eventBus, SynapseJSNIUtils jsniUtils) {
+	public EntityListRowBadge(EntityListRowBadgeView view, UserBadge userBadge, SynapseJavascriptClient jsClient, LazyLoadHelper lazyLoadHelper, DateTimeUtils dateTimeUtils, PopupUtilsView popupUtils, EventBus eventBus, SynapseJSNIUtils jsniUtils, CookieProvider cookies) {
 		this.view = view;
 		this.createdByUserBadge = userBadge;
 		this.dateTimeUtils = dateTimeUtils;
@@ -52,6 +57,7 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 		this.popupUtils = popupUtils;
 		this.eventBus = eventBus;
 		this.jsniUtils = jsniUtils;
+		this.cookies = cookies;
 		view.setCreatedByWidget(userBadge.asWidget());
 		view.setPresenter(this);
 		Callback loadDataCallback = new Callback() {
@@ -183,21 +189,36 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 
 	@Override
 	public void onAddToDownloadList() {
-		// TODO: add special popup to report how many items are in the current download list, and link to
-		// download list.
-		jsClient.addFileToDownloadList(dataFileHandle.getId(), entityId, new AsyncCallback<DownloadList>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				view.showErrorIcon(caught.getMessage());
-			}
+		if (!DisplayUtils.isInTestWebsite(cookies)) {
+			// TODO: add special popup to report how many items are in the current download list, and link to
+			// download list.
+			jsClient.addFileToDownloadList(dataFileHandle.getId(), entityId, new AsyncCallback<DownloadList>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					view.showErrorIcon(caught.getMessage());
+				}
+	
+				@Override
+				public void onSuccess(DownloadList result) {
+					jsniUtils.sendAnalyticsEvent(AddToDownloadList.DOWNLOAD_ACTION_EVENT_NAME, AddToDownloadList.FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME, "1");
+					popupUtils.showInfo(entityName + EntityBadge.ADDED_TO_DOWNLOAD_LIST);
+					eventBus.fireEvent(new DownloadListUpdatedEvent());
+				}
+			});
+		} else {
+			jsClient.addFileToDownloadListV2(entityId, version, new AsyncCallback<AddBatchOfFilesToDownloadListResponse>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					view.showErrorIcon(caught.getMessage());
+				}
+				public void onSuccess(AddBatchOfFilesToDownloadListResponse result) {
+					String href = "#!DownloadCart:0";
+					popupUtils.showInfo(entityName + EntityBadge.ADDED_TO_DOWNLOAD_LIST, href, DisplayConstants.VIEW_DOWNLOAD_LIST, IconType.CHECK_CIRCLE);
+					eventBus.fireEvent(new DownloadListUpdatedEvent());
+				};
+			});
 
-			@Override
-			public void onSuccess(DownloadList result) {
-				jsniUtils.sendAnalyticsEvent(AddToDownloadList.DOWNLOAD_ACTION_EVENT_NAME, AddToDownloadList.FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME, "1");
-				popupUtils.showInfo(entityName + EntityBadge.ADDED_TO_DOWNLOAD_LIST);
-				eventBus.fireEvent(new DownloadListUpdatedEvent());
-			}
-		});
+		}
 	}
 
 }
