@@ -26,6 +26,8 @@ public class DownloadConfirmationProps extends ReactComponentProps {
 	@JsNullable
 	GetQueryRequest getLastQueryRequest;
 	@JsNullable
+	String folderId;
+	@JsNullable
 	Callback fnClose;
 	@JsNullable
 	String downloadCartPageUrl;
@@ -34,16 +36,16 @@ public class DownloadConfirmationProps extends ReactComponentProps {
 	public static DownloadConfirmationProps create(String queryBundleRequestJson, String folderId, Callback onClose) {
 		DownloadConfirmationProps props = new DownloadConfirmationProps();
 		props.downloadCartPageUrl = "/#!DownloadCart:0";
-		if (queryBundleRequestJson != null) {
-			props.getLastQueryRequest = new GetQueryRequest() {
-				@Override
-				public JavaScriptObject run() {
+		props.getLastQueryRequest = new GetQueryRequest() {
+			@Override
+			public JavaScriptObject run() {
+				if (queryBundleRequestJson != null)
 					return JsonUtils.safeEval(queryBundleRequestJson);
-				}
-			};
-		}
+				else return null;
+			}
+		};
 		//	TODO: support adding container children
-//		props.folderId = folderId;
+		props.folderId = folderId;
 		props.fnClose = onClose;
 		return props;
 	}

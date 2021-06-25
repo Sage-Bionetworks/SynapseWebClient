@@ -59,6 +59,7 @@ public class AddToDownloadListV2Impl implements AddToDownloadListV2 {
 	}
 	
 	private void init() {
+		container.setVisible(true);
 		DownloadConfirmationProps.Callback onClose = new DownloadConfirmationProps.Callback() {
 			@Override
 			public void run() {
