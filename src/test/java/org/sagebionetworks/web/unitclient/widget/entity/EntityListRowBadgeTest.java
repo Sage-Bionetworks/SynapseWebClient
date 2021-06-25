@@ -26,6 +26,8 @@ import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DateTimeUtils;
+import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -76,6 +78,7 @@ public class EntityListRowBadgeTest {
 		MockitoAnnotations.initMocks(this);
 		widget = new EntityListRowBadge(mockView, mockUserBadge, mockSynapseJavascriptClient, mockLazyLoadHelper, mockDateTimeUtils, mockPopupUtils, mockEventBus, mockSynapseJSNIUtils, mockCookies);
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseJavascriptClient).addFileToDownloadList(anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseJavascriptClient).addFileToDownloadListV2(anyString(), anyLong(), any(AsyncCallback.class));
 	}
 
 	@Test
@@ -205,6 +208,27 @@ public class EntityListRowBadgeTest {
 		verify(mockEventBus).fireEvent(any(DownloadListUpdatedEvent.class));
 		verify(mockSynapseJSNIUtils).sendAnalyticsEvent(AddToDownloadList.DOWNLOAD_ACTION_EVENT_NAME, AddToDownloadList.FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME, Integer.toString(1));
 	}
+	
+	@Test
+	public void testOnAddToDownloadListV2() {
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+		Long version = 2L;
+		when(mockFileEntity.getId()).thenReturn(entityId);
+		when(mockFileEntity.getName()).thenReturn(entityName);
+		when(mockFileEntity.getVersionNumber()).thenReturn(version);
+		setupEntity(mockFileEntity);
+		Reference ref = new Reference();
+		ref.setTargetId(entityId);
+		ref.setTargetVersionNumber(version);
+		widget.configure(ref);
+		widget.getEntityBundle();
+
+		widget.onAddToDownloadList();
+
+		verify(mockSynapseJavascriptClient).addFileToDownloadListV2(eq(entityId), eq(version), any(AsyncCallback.class));
+		verify(mockPopupUtils).showInfo(entityName + EntityBadge.ADDED_TO_DOWNLOAD_LIST, "#!DownloadCart:0", DisplayConstants.VIEW_DOWNLOAD_LIST, IconType.CHECK_CIRCLE);
+		verify(mockEventBus).fireEvent(any(DownloadListUpdatedEvent.class));
+	}
 
 	@Test
 	public void testOnAddToDownloadListError() {
@@ -224,6 +248,29 @@ public class EntityListRowBadgeTest {
 		widget.onAddToDownloadList();
 
 		verify(mockSynapseJavascriptClient).addFileToDownloadList(eq(fileHandleId), eq(entityId), any(AsyncCallback.class));
+		verifyZeroInteractions(mockPopupUtils, mockEventBus);
+		verify(mockView).showErrorIcon(errorMessage);
+	}
+	
+	@Test
+	public void testOnAddToDownloadListV2Error() {
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+		Long version = 2L;
+		String errorMessage = "a simulated error";
+		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseJavascriptClient).addFileToDownloadListV2(anyString(), anyLong(), any(AsyncCallback.class));
+		when(mockFileEntity.getId()).thenReturn(entityId);
+		when(mockFileEntity.getName()).thenReturn(entityName);
+		when(mockFileEntity.getVersionNumber()).thenReturn(version);
+		setupEntity(mockFileEntity);
+		Reference ref = new Reference();
+		ref.setTargetId(entityId);
+		ref.setTargetVersionNumber(version);
+		widget.configure(ref);
+		widget.getEntityBundle();
+
+		widget.onAddToDownloadList();
+
+		verify(mockSynapseJavascriptClient).addFileToDownloadListV2(eq(entityId), eq(version), any(AsyncCallback.class));
 		verifyZeroInteractions(mockPopupUtils, mockEventBus);
 		verify(mockView).showErrorIcon(errorMessage);
 	}

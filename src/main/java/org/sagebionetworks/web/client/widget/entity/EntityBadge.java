@@ -33,6 +33,7 @@ import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransfo
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.event.dom.client.ClickHandler;

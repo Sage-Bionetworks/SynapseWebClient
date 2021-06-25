@@ -45,6 +45,7 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cache.SessionStorage;
@@ -55,6 +56,7 @@ import org.sagebionetworks.web.client.widget.CopyTextModal;
 import org.sagebionetworks.web.client.widget.clienthelp.FileViewClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList;
+import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
@@ -125,6 +127,8 @@ public class TableEntityWidgetTest {
 	@Mock
 	AddToDownloadList mockAddToDownloadList;
 	@Mock
+	AddToDownloadListV2 mockAddToDownloadListV2;
+	@Mock
 	SessionStorage mockSessionStorage;
 	@Mock
 	AuthenticationController mockAuthController;
@@ -149,6 +153,7 @@ public class TableEntityWidgetTest {
 		when(mockPortalGinInjector.getCopyTextModal()).thenReturn(mockCopyTextModal);
 		when(mockPortalGinInjector.getAuthenticationController()).thenReturn(mockAuthController);
 		when(mockPortalGinInjector.getCookieProvider()).thenReturn(mockCookies);
+		when(mockPortalGinInjector.getAddToDownloadListV2()).thenReturn(mockAddToDownloadListV2);
 
 		widget = new TableEntityWidget(mockView, mockQueryResultsWidget, mockQueryInputWidget, mockPreflightController, mockSynapseClient, mockFileViewClientsHelp, mockAddToDownloadList, mockPortalGinInjector, mockSessionStorage);
 
@@ -721,6 +726,23 @@ public class TableEntityWidgetTest {
 	}
 
 	@Test
+	public void testAutoAddToDownloadListV2() throws JSONObjectAdapterException {
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+		when(mockAuthController.isLoggedIn()).thenReturn(true);
+		configureBundleWithView(ViewType.file);
+		when(mockQueryChangeHandler.getQueryString()).thenReturn(new Query());
+		Header.isShowingPortalAlert = true;
+		Header.portalAlertJson = portalJson;
+		portalJson.put(TableEntityWidget.IS_INVOKING_DOWNLOAD_TABLE, true);
+
+		widget.configure(entityBundle, versionNumber, true, mockQueryChangeHandler, mockActionMenu);
+		widget.queryExecutionFinished(true, false);
+
+		verify(mockAddToDownloadListV2).configure(anyString(), any(Query.class));
+		assertFalse(portalJson.getBoolean(TableEntityWidget.IS_INVOKING_DOWNLOAD_TABLE));
+	}
+
+	@Test
 	public void testAutoAddToDownloadListFalse() throws JSONObjectAdapterException {
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		configureBundleWithView(ViewType.file);
@@ -733,6 +755,7 @@ public class TableEntityWidgetTest {
 		widget.queryExecutionFinished(true, false);
 
 		verify(mockAddToDownloadList, never()).addToDownloadList(anyString(), any(Query.class));
+		verify(mockAddToDownloadListV2, never()).configure(anyString(), any(Query.class));
 	}
 
 	@Test
@@ -748,5 +771,6 @@ public class TableEntityWidgetTest {
 		widget.queryExecutionFinished(true, false);
 
 		verify(mockAddToDownloadList, never()).addToDownloadList(anyString(), any(Query.class));
+		verify(mockAddToDownloadListV2, never()).configure(anyString(), any(Query.class));
 	}
 }

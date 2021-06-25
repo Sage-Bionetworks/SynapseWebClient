@@ -24,7 +24,6 @@ public class AddToDownloadListV2Impl implements AddToDownloadListV2 {
 	String queryBundleRequestJson;
 	String folderId;
 	JSONObjectAdapter adapter;
-	
 	@Inject
 	public AddToDownloadListV2Impl(SynapseContextPropsProvider propsProvider, JSONObjectAdapter adapter) {
 		this.propsProvider = propsProvider;

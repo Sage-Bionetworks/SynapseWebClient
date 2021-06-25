@@ -1,13 +1,17 @@
 package org.sagebionetworks.web.unitclient.widget.entity.browse;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -62,9 +66,23 @@ public class FilesBrowserTest {
 
 		filesBrowser.onProgrammaticDownloadOptions();
 		verify(mockContainerClientsHelp).configureAndShow(entityId);
-
+	}
+	
+	@Test
+	public void testAddToDownloadList() {
+		String entityId = "syn123";
+		filesBrowser.configure(entityId);
 		filesBrowser.onAddToDownloadList();
 		verify(mockAddToDownloadList).addToDownloadList(entityId);
+	}
+	@Test
+	public void testAddToDownloadListV2() {
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+		String entityId = "syn123";
+		filesBrowser.configure(entityId);
+		filesBrowser.onAddToDownloadList();
+		verify(mockAddToDownloadListV2).configure(entityId);
+
 	}
 }
 
