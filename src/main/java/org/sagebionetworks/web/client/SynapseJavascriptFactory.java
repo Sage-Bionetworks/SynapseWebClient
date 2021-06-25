@@ -49,6 +49,7 @@ import org.sagebionetworks.repo.model.discussion.ThreadCount;
 import org.sagebionetworks.repo.model.docker.DockerCommit;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.doi.v2.Doi;
+import org.sagebionetworks.repo.model.download.AddBatchOfFilesToDownloadListResponse;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.AddPartResponse;
 import org.sagebionetworks.repo.model.file.BatchFileResult;
@@ -89,7 +90,7 @@ public class SynapseJavascriptFactory {
 	public enum OBJECT_TYPE {
 		ValidationResults, JsonSchemaObjectBinding, PaginatedResultsEvaluations, Evaluation, EntityBundle, Team, RestrictionInformationResponse, EntityChildrenResponse, WikiPageKey, UserGroupHeaderResponsePage, WikiPage, ListWrapperUserProfile, ListWrapperTeam, ListWrapperUploadDestinations, SubscriptionPagedResults, UserGroupHeaderResponse, UserBundle, Count, PaginatedResultsEntityHeader, ProjectHeaderList, PaginatedResultReference, V2WikiPage, V2WikiOrderHint, DockerRepository, PaginatedDockerCommit, FileEntity, Project, Folder, EntityView, TableEntity, Link, Preview, SubmissionPage, Entity, // used for services where we don't know what type of entity is returned (but object has concreteType set)
 		AccessRequirement, EntityId, Forum, DiscussionThreadBundle, DiscussionReplyBundle, MessageURL, ThreadCount, EntityThreadCounts, PaginatedIds, SubscriberPagedResults, SubscriberCount, BatchFileResult, UserProfile, FileHandleResults, AsyncResponse, JSON, MembershipInvitation, TeamMembershipStatus, InviteeVerificationSignedToken, ListWrapperColumnModel, PaginatedTeamIds, AsyncJobId, LoginResponse, ChallengePagedResults, Etag, Activity, Annotations, MultipartUploadStatus, NotificationEmail, BatchPresignedUploadUrlResponse, AddPartResponse, AccessApprovalNotificationResponse, PaginatedResultsTotalNumberOfResults, PrincipalAliasResponse, DownloadList, DownloadOrder, DownloadOrderSummaryResponse, Doi, Subscription, SearchResults, SnapshotResponse, PaginatedColumnModelsResults, 
-		PaginatedResultsVersionInfo, PaginatedResultsDiscussionThreadBundle, PaginatedResultsDiscussionReplyBundle, PaginatedResultsV2WikiHeader, PaginatedResultsTeamMember, SubmissionInfoPage, UploadDestination, None, String
+		PaginatedResultsVersionInfo, PaginatedResultsDiscussionThreadBundle, PaginatedResultsDiscussionReplyBundle, PaginatedResultsV2WikiHeader, PaginatedResultsTeamMember, SubmissionInfoPage, UploadDestination, AddBatchOfFilesToDownloadListResponse, None, String
 	}
 
 	/**
@@ -160,6 +161,8 @@ public class SynapseJavascriptFactory {
 				return new TableEntity(json);
 			case Evaluation:
 				return new Evaluation(json);
+			case AddBatchOfFilesToDownloadListResponse:
+				return new AddBatchOfFilesToDownloadListResponse(json);
 			case Link:
 				return new Link(json);
 			case Preview:

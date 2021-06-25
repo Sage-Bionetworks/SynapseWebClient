@@ -441,6 +441,11 @@ end sticky footer
 }
 
 .downloadLink,.downloadLink:hover,.downloadLink:visited { text-decoration:underline; margin-left:5px;}
+#body .Download-Link {
+	&.v2 .styled-svg-wrapper{
+		color:white;
+	}
+}
 
 /* header links. transition from grey to black on hover, don't underline */
 .headerLink { line-height: 25px; font-size: 13px; font-weight: bold; padding: 0px 2px 0px 4px;
@@ -2902,7 +2907,6 @@ div.border {
 	}
 	div.searchBoxContainer.inactive:hover, div.searchBoxContainer.inactive:focus {
 		background-color: $synapse-green;
-		transition: all 0.3s ease-in;
 	}
 	div.searchBoxContainer.inactive {
 		input {
@@ -2952,7 +2956,6 @@ div.border {
 	}
 	.dropdown {
 		background-color: none;
-		transition: all 0.3s ease-in;
 	}
 	.alert {
 		border-radius: 0px;

@@ -92,6 +92,9 @@ import org.sagebionetworks.repo.model.docker.DockerCommit;
 import org.sagebionetworks.repo.model.docker.DockerCommitSortBy;
 import org.sagebionetworks.repo.model.doi.v2.Doi;
 import org.sagebionetworks.repo.model.doi.v2.DoiAssociation;
+import org.sagebionetworks.repo.model.download.AddBatchOfFilesToDownloadListRequest;
+import org.sagebionetworks.repo.model.download.AddBatchOfFilesToDownloadListResponse;
+import org.sagebionetworks.repo.model.download.DownloadListItem;
 import org.sagebionetworks.repo.model.entity.Direction;
 import org.sagebionetworks.repo.model.entity.EntityLookupRequest;
 import org.sagebionetworks.repo.model.entity.SortBy;
@@ -1475,6 +1478,18 @@ public class SynapseJavascriptClient {
 		doDelete(url, callback);
 	}
 
+	public void addFileToDownloadListV2(String fileEntityId, Long version, AsyncCallback<AddBatchOfFilesToDownloadListResponse> callback) {
+		List<DownloadListItem> toAdd = new ArrayList<DownloadListItem>();
+		DownloadListItem listItem = new DownloadListItem();
+		listItem.setFileEntityId(fileEntityId);
+		listItem.setVersionNumber(version);
+		toAdd.add(listItem);
+		AddBatchOfFilesToDownloadListRequest request = new AddBatchOfFilesToDownloadListRequest();
+		request.setBatchToAdd(toAdd);
+		String url = getRepoServiceUrl() + "/download/list/add";
+		doPost(url, request, OBJECT_TYPE.AddBatchOfFilesToDownloadListResponse, false, callback);
+	}
+
 	public void addFileToDownloadList(String fileHandleId, String fileEntityId, AsyncCallback<DownloadList> callback) {
 		List<FileHandleAssociation> toAdd = new ArrayList<FileHandleAssociation>();
 		FileHandleAssociation fha = new FileHandleAssociation();
@@ -1484,7 +1499,7 @@ public class SynapseJavascriptClient {
 		toAdd.add(fha);
 		addFilesToDownloadList(toAdd, callback);
 	}
-
+	
 	public void addFilesToDownloadList(List<FileHandleAssociation> toAdd, AsyncCallback<DownloadList> callback) {
 		FileHandleAssociationList request = new FileHandleAssociationList();
 		request.setList(toAdd);

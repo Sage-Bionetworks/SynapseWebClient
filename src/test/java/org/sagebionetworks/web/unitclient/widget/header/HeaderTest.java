@@ -31,6 +31,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -307,6 +308,17 @@ public class HeaderTest {
 		verify(mockView, times(2)).setDownloadListUIVisible(true);
 		verify(mockView).setDownloadListFileCount(2);
 	}
+	
+	@Test
+	public void testOnDownloadListV2UpdatedEvent() {
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+		
+		header.onDownloadListUpdatedEvent(new DownloadListUpdatedEvent());
+
+		verify(mockView).setDownloadListUIVisible(false);
+		verify(mockView).setDownloadListV2UIVisible(true);
+	}
+
 
 	@Test
 	public void testOnDownloadListUpdatedFailure() {

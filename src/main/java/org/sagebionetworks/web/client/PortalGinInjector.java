@@ -15,6 +15,7 @@ import org.sagebionetworks.web.client.presenter.ChangeUsernamePresenter;
 import org.sagebionetworks.web.client.presenter.ComingSoonPresenter;
 import org.sagebionetworks.web.client.presenter.DataAccessApprovalTokenPresenter;
 import org.sagebionetworks.web.client.presenter.DownPresenter;
+import org.sagebionetworks.web.client.presenter.DownloadCartPresenter;
 import org.sagebionetworks.web.client.presenter.EmailInvitationPresenter;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
 import org.sagebionetworks.web.client.presenter.ErrorPresenter;
@@ -145,6 +146,7 @@ import org.sagebionetworks.web.client.widget.entity.editor.TableQueryResultWikiE
 import org.sagebionetworks.web.client.widget.entity.editor.TeamSelectEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.S3DirectLoginDialog;
@@ -335,6 +337,8 @@ public interface PortalGinInjector extends Ginjector {
 	SignedTokenPresenter getSignedTokenPresenter();
 
 	ErrorPresenter getErrorPresenter();
+	
+	DownloadCartPresenter getDownloadCartPresenter();
 
 	ChangeUsernamePresenter getChangeUsernamePresenter();
 
@@ -873,5 +877,6 @@ public interface PortalGinInjector extends Ginjector {
 	IntendedDataUseGenerator getIntendedDataUseGenerator();
 	IntendedDataUseReportWidget getIntendedDataUseReportWidget();
 	PresignedURLAsyncHandler getPresignedURLAsyncHandler();
+	AddToDownloadListV2 getAddToDownloadListV2();
 	JSONObjectAdapter getJSONObjectAdapter();
 }

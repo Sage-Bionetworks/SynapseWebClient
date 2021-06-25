@@ -20,6 +20,7 @@ import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.TeamSearch;
@@ -239,10 +240,12 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	AnchorListItem loadingTeamsListItem = new AnchorListItem("Loading...");
 
+	CookieProvider cookies;
 	@Inject
-	public ProfileViewImpl(ProfileViewImplUiBinder binder, Header headerWidget) {
+	public ProfileViewImpl(ProfileViewImplUiBinder binder, Header headerWidget, CookieProvider cookies) {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
+		this.cookies = cookies;
 		headerWidget.configure();
 		initTabs();
 		projectSearchTextBox.getElement().setAttribute("placeholder", "Project name");
@@ -378,7 +381,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		if (isOwner) {
 			resetHighlightBoxes();
 			DisplayUtils.show(settingsListItem);
-			DisplayUtils.show(downloadsListItem);
+			if (!DisplayUtils.isInTestWebsite(cookies))
+				DisplayUtils.show(downloadsListItem);
 			// show create project and team UI
 			DisplayUtils.show(createProjectUI);
 			DisplayUtils.show(createTeamUI);

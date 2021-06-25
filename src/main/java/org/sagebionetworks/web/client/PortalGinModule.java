@@ -51,6 +51,8 @@ import org.sagebionetworks.web.client.view.DivView;
 import org.sagebionetworks.web.client.view.DivViewImpl;
 import org.sagebionetworks.web.client.view.DownView;
 import org.sagebionetworks.web.client.view.DownViewImpl;
+import org.sagebionetworks.web.client.view.DownloadCartPageView;
+import org.sagebionetworks.web.client.view.DownloadCartPageViewImpl;
 import org.sagebionetworks.web.client.view.EmailInvitationView;
 import org.sagebionetworks.web.client.view.EmailInvitationViewImpl;
 import org.sagebionetworks.web.client.view.EntityView;
@@ -413,6 +415,8 @@ import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigViewImpl;
+import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
+import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2Impl;
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListView;
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListViewImpl;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBarView;
@@ -1254,7 +1258,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(ErrorView.class).to(ErrorViewImpl.class);
 		bind(PreviewConfigView.class).to(PreviewConfigViewImpl.class);
 		bind(SynapseFormConfigView.class).to(SynapseFormConfigViewImpl.class);
-
+		bind(DownloadCartPageView.class).to(DownloadCartPageViewImpl.class);
+		
 		bind(EditFileMetadataModalView.class).to(EditFileMetadataModalViewImpl.class);
 		bind(EditFileMetadataModalWidget.class).to(EditFileMetadataModalWidgetImpl.class);
 		bind(EditProjectMetadataModalView.class).to(EditProjectMetadataModalViewImpl.class);
@@ -1425,5 +1430,6 @@ public class PortalGinModule extends AbstractGinModule {
 
         bind(EntityFinderWidgetView.class).to(EntityFinderWidgetViewImpl.class);
         bind(SynapseContextPropsProvider.class).to(SynapseContextPropsProviderImpl.class);
+        bind(AddToDownloadListV2.class).to(AddToDownloadListV2Impl.class);
     }
 }

@@ -2,16 +2,20 @@ package org.sagebionetworks.web.unitclient.widget.entity.file;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,11 +29,15 @@ import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.GoogleCloudFileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
+import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -41,6 +49,7 @@ import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBarView;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
+
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -85,13 +94,17 @@ public class FileTitleBarTest {
 	PlaceChanger mockPlaceChanger;
 	@Mock
 	AuthenticationController mockAuthController;
+	@Mock
+	CookieProvider mockCookies;
+	@Mock
+	PopupUtilsView mockPopupUtils;
 	public static final String DATA_FILE_HANDLE_ID = "872";
 	public static final Long FILE_VERSION = 3L;
 	public static final String FILE_NAME = "afile.txt";
 
 	@Before
 	public void setup() {
-		fileTitleBar = new FileTitleBar(mockView, mockSynapseProperties, mockFileDownloadButton, mockJsClient, mockFileClientsHelp, mockEventBus, mockSynapseJSNIUtils, mockGlobalApplicationState, mockAuthController);
+		fileTitleBar = new FileTitleBar(mockView, mockSynapseProperties, mockFileDownloadButton, mockJsClient, mockFileClientsHelp, mockEventBus, mockSynapseJSNIUtils, mockGlobalApplicationState, mockAuthController, mockCookies, mockPopupUtils);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockFileEntity.getId()).thenReturn(ENTITY_ID);
 		when(mockFileEntity.getName()).thenReturn(FILE_NAME);
@@ -113,6 +126,7 @@ public class FileTitleBarTest {
 		versions = new ArrayList<>();
 		AsyncMockStubber.callSuccessWith(versions).when(mockJsClient).getEntityVersions(anyString(), anyInt(), anyInt(), any());
 		AsyncMockStubber.callSuccessWith(null).when(mockJsClient).addFileToDownloadList(anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockJsClient).addFileToDownloadListV2(anyString(), anyLong(), any(AsyncCallback.class));
 	}
 
 	@Test
@@ -182,6 +196,18 @@ public class FileTitleBarTest {
 	}
 	
 	@Test
+	public void testAddToDownloadListV2() {
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+		when(mockAuthController.isLoggedIn()).thenReturn(true);
+		fileTitleBar.configure(mockBundle, mockActionMenuWidget);
+		fileTitleBar.onAddToDownloadList();
+
+		verify(mockJsClient).addFileToDownloadListV2(eq(ENTITY_ID), eq(FILE_VERSION), any(AsyncCallback.class));
+		verify(mockPopupUtils).showInfo(FILE_NAME + EntityBadge.ADDED_TO_DOWNLOAD_LIST, "#!DownloadCart:0", DisplayConstants.VIEW_DOWNLOAD_LIST, IconType.CHECK_CIRCLE);
+		verify(mockEventBus).fireEvent(any(DownloadListUpdatedEvent.class));
+	}
+	
+	@Test
 	public void testAddToDownloadListFailure() {
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		String errorMessage = "unable to add";
@@ -193,6 +219,20 @@ public class FileTitleBarTest {
 		verify(mockJsClient).addFileToDownloadList(eq(DATA_FILE_HANDLE_ID), eq(ENTITY_ID), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(errorMessage);
 	}
+	
+	@Test
+	public void testAddToDownloadListV2Failure() {
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+		when(mockAuthController.isLoggedIn()).thenReturn(true);
+		String errorMessage = "unable to add";
+		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockJsClient).addFileToDownloadListV2(anyString(), anyLong(), any(AsyncCallback.class));
+
+		fileTitleBar.configure(mockBundle, mockActionMenuWidget);
+		fileTitleBar.onAddToDownloadList();
+
+		verify(mockJsClient).addFileToDownloadListV2(eq(ENTITY_ID), eq(FILE_VERSION), any(AsyncCallback.class));
+		verify(mockView).showErrorMessage(errorMessage);
+	}
 
 	@Test
 	public void testAddToDownloadListAnonymous() {
@@ -201,6 +241,17 @@ public class FileTitleBarTest {
 		fileTitleBar.onAddToDownloadList();
 
 		verify(mockJsClient, never()).addFileToDownloadList(anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
+	}
+	
+	@Test
+	public void testAddToDownloadListV2Anonymous() {
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+		when(mockAuthController.isLoggedIn()).thenReturn(false);
+		fileTitleBar.configure(mockBundle, mockActionMenuWidget);
+		fileTitleBar.onAddToDownloadList();
+
+		verify(mockJsClient, never()).addFileToDownloadListV2(anyString(), anyLong(), any(AsyncCallback.class));
 		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
 	}
 

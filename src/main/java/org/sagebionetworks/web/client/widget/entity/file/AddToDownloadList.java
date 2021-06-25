@@ -48,9 +48,8 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 	AuthenticationController authController;
 	String queryEntityID;
 	int fileCountToAdd;
-	public static final String FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME = "FilesAddedToDownloadList";
 	public static final String DOWNLOAD_ACTION_EVENT_NAME = "Download";
-
+	public static final String FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME = "FilesAddedToDownloadList";
 	@Inject
 	public AddToDownloadList(AddToDownloadListView view, AsynchronousProgressWidget progress, InlineAsynchronousProgressViewImpl inlineProgressView, PopupUtilsView popupUtilsView, EventBus eventBus, SynapseAlert synAlert, PackageSizeSummary packageSizeSummary, SynapseJavascriptClient jsClient, SynapseJSNIUtils jsniUtils, AuthenticationController authController) {
 		this.jsClient = jsClient;

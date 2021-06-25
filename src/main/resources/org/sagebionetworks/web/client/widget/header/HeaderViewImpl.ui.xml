@@ -136,6 +136,9 @@
 					addStyleNames="searchBoxContainer inactive hidden-xs" height="53px">
 					<bh:Div ui:field="searchBoxContainer" />
 				</bh:Div>
+				<bh:Div addStyleNames="greenBackgroundOnHover" pull="RIGHT" height="53px" paddingTop="18" paddingLeft="15">
+					<w:ReactComponentDiv ui:field="downloadListV2NotificationUI" />
+				</bh:Div>
 				<bh:Div pull="RIGHT" height="53px"
 					ui:field="downloadListNotificationUI" visible="false"
 					addStyleNames="greenBackgroundOnHover">

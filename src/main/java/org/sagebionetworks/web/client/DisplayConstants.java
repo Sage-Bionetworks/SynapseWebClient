@@ -246,5 +246,6 @@ public class DisplayConstants {
 	public static final String FINISH = "Finish";
 	public static final String NEXT = "Next";
 	public static final String SUBMIT = "Submit";
+	public static final String VIEW_DOWNLOAD_LIST = "view download list";
 }
 

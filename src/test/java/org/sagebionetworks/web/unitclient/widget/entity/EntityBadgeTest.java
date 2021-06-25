@@ -44,6 +44,7 @@ import org.sagebionetworks.repo.model.schema.ValidationResults;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
@@ -63,6 +64,7 @@ import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -88,6 +90,7 @@ public class EntityBadgeTest {
 	@Mock
 	EntityBadgeView mockView;
 	String entityId = "syn123";
+	Long versionNumber = 5L;
 	String entityName = "An Entity";
 	Long entityThreadCount;
 	EntityBadge widget;
@@ -146,6 +149,7 @@ public class EntityBadgeTest {
 		resourceAccessSet.add(mockResourceAccess);
 		when(mockBenefactorAcl.getResourceAccess()).thenReturn(resourceAccessSet);
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseJavascriptClient).addFileToDownloadList(anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseJavascriptClient).addFileToDownloadListV2(anyString(), anyLong(), any(AsyncCallback.class));
 		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(USER_ID);
 		annotationsMap = new HashMap<String, AnnotationsValue>();
 		when(mockAnnotations.getAnnotations()).thenReturn(annotationsMap);
@@ -170,6 +174,7 @@ public class EntityBadgeTest {
 		EntityHeader header = new EntityHeader();
 		header.setId(entityId);
 		header.setName(entityName);
+		header.setVersionNumber(versionNumber);
 		widget.configure(header);
 		return header;
 	}
@@ -422,9 +427,48 @@ public class EntityBadgeTest {
 		widget.onAddToDownloadList();
 
 		verify(mockSynapseJavascriptClient).addFileToDownloadList(eq(fileHandleId), eq(entityId), any(AsyncCallback.class));
-		verify(mockPopupUtils).showInfo(header.getName() + EntityBadge.ADDED_TO_DOWNLOAD_LIST, "#!Profile:" + USER_ID + "/downloads", EntityBadge.VIEW_DOWNLOAD_LIST, IconType.CHECK_CIRCLE);
+		verify(mockPopupUtils).showInfo(header.getName() + EntityBadge.ADDED_TO_DOWNLOAD_LIST, "#!Profile:" + USER_ID + "/downloads", DisplayConstants.VIEW_DOWNLOAD_LIST, IconType.CHECK_CIRCLE);
 		verify(mockEventBus).fireEvent(any(DownloadListUpdatedEvent.class));
 		verify(mockSynapseJSNIUtils).sendAnalyticsEvent(AddToDownloadList.DOWNLOAD_ACTION_EVENT_NAME, AddToDownloadList.FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME, Integer.toString(1));
+	}
+	
+	@Test
+	public void testOnAddToDownloadListV2() {
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+		FileEntity testFile = new FileEntity();
+		testFile.setId(entityId);
+		testFile.setVersionNumber(versionNumber);
+		setupEntity(testFile);
+		EntityHeader header = configure();
+		
+		widget.getEntityBundle();
+
+		widget.onAddToDownloadList();
+
+		verify(mockSynapseJavascriptClient).addFileToDownloadListV2(eq(header.getId()), eq(header.getVersionNumber()), any(AsyncCallback.class));
+		verify(mockPopupUtils).showInfo(header.getName() + EntityBadge.ADDED_TO_DOWNLOAD_LIST, "#!DownloadCart:0", DisplayConstants.VIEW_DOWNLOAD_LIST, IconType.CHECK_CIRCLE);
+		verify(mockEventBus).fireEvent(any(DownloadListUpdatedEvent.class));
+	}
+	
+	@Test
+	public void testOnAddToDownloadListV2Error() {
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+		String errorMessage = "a simulated error";
+		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseJavascriptClient).addFileToDownloadListV2(anyString(), anyLong(), any(AsyncCallback.class));
+
+		FileEntity testFile = new FileEntity();
+		testFile.setId(entityId);
+		testFile.setVersionNumber(versionNumber);
+		setupEntity(testFile);
+		EntityHeader header = configure();
+		
+		widget.getEntityBundle();
+
+		widget.onAddToDownloadList();
+
+		verify(mockSynapseJavascriptClient).addFileToDownloadListV2(eq(header.getId()), eq(header.getVersionNumber()), any(AsyncCallback.class));
+		verifyZeroInteractions(mockPopupUtils, mockEventBus);
+		verify(mockView).setError(errorMessage);
 	}
 
 	@Test

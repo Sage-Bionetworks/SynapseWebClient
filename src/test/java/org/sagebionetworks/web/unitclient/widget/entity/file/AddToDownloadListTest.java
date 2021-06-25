@@ -151,7 +151,7 @@ public class AddToDownloadListTest {
 
 		verify(mockView, times(5)).hideAll();
 		verify(mockView).showSuccess(queryCount.intValue());
-		verify(mockSynapseJSNIUtils).sendAnalyticsEvent(DOWNLOAD_ACTION_EVENT_NAME, FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME, queryCount.toString());
+		verify(mockSynapseJSNIUtils).sendAnalyticsEvent(AddToDownloadList.DOWNLOAD_ACTION_EVENT_NAME, FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME, queryCount.toString());
 		verify(mockEventBus).fireEvent(any(DownloadListUpdatedEvent.class));
 
 		// verify error handling in query bundle progress handler
