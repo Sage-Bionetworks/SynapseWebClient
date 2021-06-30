@@ -63,6 +63,6 @@
 
 			</g:HTMLPanel>
 		</g:HTMLPanel>
-		<w:FullWidthAlert visible="false" ui:field="addedToDownloadListAlert" icon="CHECK_CIRCLE" message="(filename) was added to your Download List" primaryCTAText="view download list" />
+		<w:FullWidthAlert visible="false" ui:field="addedToDownloadListAlert" alertType="SUCCESS" message="(filename) was added to your Download List" primaryCTAText="view download list" />
 	</g:HTMLPanel>
 </ui:UiBinder>
