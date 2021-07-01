@@ -1,10 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
-import org.gwtbootstrap3.client.ui.Alert;
-import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
-import org.gwtbootstrap3.client.ui.html.Strong;
+import org.sagebionetworks.web.client.widget.FullWidthAlert;
 
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -24,12 +22,7 @@ public class SynapseAlertViewImpl implements SynapseAlertView {
 	Widget widget = null;
 
 	@UiField
-	Button reloadButton;
-
-	@UiField
-	Strong alertText;
-	@UiField
-	Alert alert;
+	FullWidthAlert alert;
 	@UiField
 	Div loginWidgetContainer;
 
@@ -42,12 +35,13 @@ public class SynapseAlertViewImpl implements SynapseAlertView {
 			synapseAlertContainer.setVisible(false);
 			widget = uiBinder.createAndBindUi(this);
 			synapseAlertContainer.add(widget);
-			reloadButton.addClickHandler(new ClickHandler() {
+			alert.addPrimaryCTAClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
 					reload();
 				}
 			});
+
 			clearState();
 		}
 	}
@@ -55,7 +49,7 @@ public class SynapseAlertViewImpl implements SynapseAlertView {
 	@Override
 	public void setRetryButtonVisible(boolean visible) {
 		lazyConstruct();
-		reloadButton.setVisible(visible);
+		alert.setPrimaryCTAText(visible ? "Retry" : null);
 	}
 
 	@Override
@@ -67,9 +61,9 @@ public class SynapseAlertViewImpl implements SynapseAlertView {
 	public void clearState() {
 		if (widget != null) {
 			alert.setVisible(false);
-			alertText.setText("");
+			alert.setMessage("");
 			loginWidgetContainer.setVisible(false);
-			reloadButton.setVisible(false);
+			alert.setPrimaryCTAText(null);
 		}
 	}
 
@@ -84,7 +78,7 @@ public class SynapseAlertViewImpl implements SynapseAlertView {
 	public void showError(String error) {
 		lazyConstruct();
 		synapseAlertContainer.setVisible(true);
-		alertText.setText(error);
+		alert.setMessage(error);
 		alert.setVisible(true);
 	}
 

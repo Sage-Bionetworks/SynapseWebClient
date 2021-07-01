@@ -14,6 +14,7 @@ public class SRC {
 		public static ReactFunctionComponent<EmptyProps> DownloadCartPage;
 		public static ReactFunctionComponent<ShowDownloadV2Props> ShowDownloadV2;
 		public static ReactFunctionComponent<DownloadConfirmationProps> DownloadConfirmation;
+		public static ReactFunctionComponent<FullWidthAlertProps> FullWidthAlert;
 	}
 
 	@JsType(isNative = true)

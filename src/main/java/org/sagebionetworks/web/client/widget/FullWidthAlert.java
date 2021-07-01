@@ -1,165 +1,133 @@
 package org.sagebionetworks.web.client.widget;
 
-import org.gwtbootstrap3.client.ui.Alert;
-import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.constants.AlertType;
-import org.gwtbootstrap3.client.ui.constants.ButtonType;
-import org.gwtbootstrap3.client.ui.constants.IconType;
-import org.gwtbootstrap3.client.ui.html.Span;
-import org.gwtbootstrap3.client.ui.html.Strong;
+import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.context.SynapseContextPropsProviderImpl;
+import org.sagebionetworks.web.client.jsinterop.FullWidthAlertProps;
+import org.sagebionetworks.web.client.jsinterop.React;
+import org.sagebionetworks.web.client.jsinterop.ReactDOM;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
+import org.sagebionetworks.web.client.jsinterop.SRC;
 
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 public class FullWidthAlert implements IsWidget {
-	public interface Binder extends UiBinder<Alert, FullWidthAlert> {
-	}
-
-	private static Binder uiBinder = GWT.create(Binder.class);
-
-	@UiField
-	Icon icon;
-	@UiField
-	Span messageSpan;
-	@UiField
-	Span buttonArea;
-	@UiField
-	Strong messageTitle;
-	@UiField
-	Button primaryButton;
-	@UiField
-	Button secondaryButton;
-	
-	Alert w;
-
+	ReactComponentDiv container;
+	String title, message, primaryButtonText, secondaryButtonText, secondaryButtonHref, alertType;
+	FullWidthAlertProps.Callback onPrimaryClick;
+	FullWidthAlertProps.Callback onClose;
+	Boolean isGlobal = true;
 	/**
 	 * This is a full width info Alert component, with an icon, message and link.
 	 * 
-	 * ## Usage In your ui.xml, how to add the InfoAlert.
-	 * 
-	 * You can customize the icon, the message and the link target. ```
-	 * xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
-	 * <w:InfoAlert icon="CHECK_CIRCLE" message="x files were added to your Download List" linkTarget=""
-	 * linkText="view download list" /> ```
 	 */
 	public FullWidthAlert() {
-		w = uiBinder.createAndBindUi(this);
+		container = new ReactComponentDiv();
+	}
+	
+	private void rerender() {
+		setVisible(true);
+		Double autoCloseAfterDelayInSeconds = null;
+		FullWidthAlertProps props = FullWidthAlertProps.create(title, message, primaryButtonText, onPrimaryClick, secondaryButtonText, secondaryButtonHref, onClose, autoCloseAfterDelayInSeconds, isGlobal, alertType);
+		ReactElement component = React.createElement(SRC.SynapseComponents.FullWidthAlert, props);
+		ReactDOM.render(component, container.getElement());	
 	}
 
 	@Override
 	public Widget asWidget() {
-		return w;
+		return container;
 	}
 
 	public void setVisible(boolean visible) {
-		w.setVisible(visible);
+		container.setVisible(visible);
 	}
 
 	public void setAddStyleNames(String styleNames) {
-		w.addStyleName(styleNames);
+		container.addStyleName(styleNames);
 	}
 
 	public boolean isVisible() {
-		return w.isVisible();
+		return container.isVisible();
 	}
 
 	public boolean isAttached() {
-		return w.isAttached();
-	}
-
-	public void setIcon(IconType type) {
-		icon.setType(type);
+		return container.isAttached();
 	}
 
 	public void setMessageTitle(String title) {
-		messageTitle.setVisible(true);
-		messageTitle.setText(title);
+		this.title = title;
+		rerender();
 	}
 	public void setMessage(String message) {
-		messageSpan.setText(message);
-	}
-
-	public void addPrimaryCTAClickHandler(ClickHandler c) {
-		primaryButton.addClickHandler(c);
-	}
-
-	public void setPrimaryCTAText(String text) {
-		buttonArea.setVisible(true);
-		primaryButton.setVisible(true);
-		primaryButton.setText(text.toUpperCase());
-	}
-	public void setPrimaryCTAButtonType(ButtonType type) {
-		primaryButton.setType(type);
+		this.message = message;
+		rerender();
 	}
 
 	public void setPrimaryCTAHref(String href) {
 		setPrimaryCTAHref(href, "_blank");
 	}
-	
+
 	public void setPrimaryCTAHrefTargetSelf(String href) {
 		setPrimaryCTAHref(href, "_self");
 	}
-	
+
 	private void setPrimaryCTAHref(String href, String target) {
-		primaryButton.setHref(href);
 		addPrimaryCTAClickHandler(event -> {
 			Window.open(href, target, "");
-		});		
+		});
+	}
+	
+	public void addPrimaryCTAClickHandler(ClickHandler c) {
+		this.onPrimaryClick = new FullWidthAlertProps.Callback() {
+			@Override
+			public void run() {
+				c.onClick(null);
+			}
+		};
+		rerender();
 	}
 
-	public void addSecondaryCTAClickHandler(ClickHandler c) {
-		secondaryButton.addClickHandler(c);
+	public void setPrimaryCTAText(String text) {
+		String newText = text != null ? text.toUpperCase() : null;
+		this.primaryButtonText = newText;
+		rerender();
 	}
 
 	public void setSecondaryCTAText(String text) {
-		buttonArea.setVisible(true);
-		secondaryButton.setVisible(true);
-		secondaryButton.setText(text.toUpperCase());
-	}
-	public void setSecondaryCTAButtonType(ButtonType type) {
-		secondaryButton.setType(type);
+		String newText = text != null ? text.toUpperCase() : null;
+		this.secondaryButtonText = newText;
+		rerender();
 	}
 
 	public void setSecondaryCTAHref(String href) {
-		secondaryButton.setHref(href);
-		addSecondaryCTAClickHandler(event -> {
-			Window.open(href, "_blank", "");
-		});
-
+		this.secondaryButtonHref = href;
+		rerender();
 	}
 
 	public void setAlertType(AlertType type) {
-		IconType defaultIcon;		
-		switch(type) {
-			case DANGER: defaultIcon = IconType.EXCLAMATION_CIRCLE;
-				break;
-			case INFO: defaultIcon = IconType.INFO;
-				break;
-			case WARNING: defaultIcon = IconType.BELL;
-				break;
-			case SUCCESS: 
-			case DEFAULT: 
-			default: defaultIcon = IconType.CHECK;
-		}
-		icon.setType(defaultIcon);
-		w.setType(type);
+		this.alertType = type.name().toLowerCase();
+		rerender();
 	}
 
 	public void setGlobal(boolean isGlobal) {
-		if (isGlobal) {
-			w.addStyleName("global");
-		} else {
-			w.removeStyleName("global");
-		}
+		this.isGlobal = isGlobal;
 	}
 	
 	public void setDismissable(boolean dismissable) {
-		w.setDismissable(dismissable);
+		if (dismissable) {
+			this.onClose = new FullWidthAlertProps.Callback() {
+				@Override
+				public void run() {
+					setVisible(false);
+				}
+			};
+		} else {
+			this.onClose = null;
+		}
+		rerender();
 	}
 }
