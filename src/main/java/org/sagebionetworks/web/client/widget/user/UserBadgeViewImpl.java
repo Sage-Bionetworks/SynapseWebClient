@@ -66,6 +66,7 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 		currentClickHandler = STANDARD_HANDLER;
 		userBadgeContainer.addClickHandler(event -> {
 			if (!isReactHandlingClickEvents) {
+				event.stopPropagation();
 				event.preventDefault();
 				currentClickHandler.invoke(userId);
 			}
@@ -104,10 +105,12 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 	public void setCustomClickHandler(final ClickHandler clickHandler) {
 		setClickHandler(event -> {
 			if (event != null) {
+				event.stopPropagation();
 				event.preventDefault();
 			}
 			clickHandler.onClick(event);
 		});
+		isReactHandlingClickEvents = false;
 	}
 
 	@Override
