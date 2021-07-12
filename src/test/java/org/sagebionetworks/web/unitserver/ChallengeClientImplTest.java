@@ -95,7 +95,6 @@ public class ChallengeClientImplTest {
 	V2WikiPage v2Page;
 	S3FileHandle handle;
 	Evaluation mockEvaluation;
-	UserSessionData mockUserSessionData;
 	UserProfile mockUserProfile;
 	MembershipInvitation testInvitation;
 	MessageToUser sentMessage;
@@ -154,10 +153,7 @@ public class ChallengeClientImplTest {
 
 		mockEvaluation = Mockito.mock(Evaluation.class);
 		when(mockSynapse.getEvaluation(anyString())).thenReturn(mockEvaluation);
-		mockUserSessionData = Mockito.mock(UserSessionData.class);
 		mockUserProfile = Mockito.mock(UserProfile.class);
-		when(mockSynapse.getUserSessionData()).thenReturn(mockUserSessionData);
-		when(mockUserSessionData.getProfile()).thenReturn(mockUserProfile);
 		when(mockUserProfile.getOwnerId()).thenReturn(MY_USER_PROFILE_OWNER_ID);
 
 		when(mockSynapse.getMyProfile()).thenReturn(mockUserProfile);
