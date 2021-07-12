@@ -1,12 +1,13 @@
 package org.sagebionetworks.web.unitserver;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.contains;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import javax.servlet.http.HttpServletRequest;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -15,9 +16,6 @@ import org.mockito.internal.util.reflection.Whitebox;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.repo.model.auth.Session;
-import org.sagebionetworks.repo.model.principal.AccountSetupInfo;
 import org.sagebionetworks.repo.model.verification.VerificationSubmission;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
@@ -35,8 +33,6 @@ public class UserProfileClientImplTest {
 	TokenProvider mockTokenProvider;
 	@Mock
 	UserProfileClientImpl userProfileClient;
-	@Mock
-	UserSessionData mockUserSessionData;
 	@Mock
 	VerificationSubmission mockVerificationSubmission;
 	String testSessionToken = "12345abcde";
@@ -65,13 +61,6 @@ public class UserProfileClientImplTest {
 		userProfileClient = new UserProfileClientImpl();
 		userProfileClient.setSynapseProvider(mockSynapseProvider);
 		userProfileClient.setTokenProvider(mockTokenProvider);
-		Session testSession = new Session();
-		testSession.setSessionToken(testSessionToken);
-		testSession.setAcceptsTermsOfUse(true);
-		when(mockSynapse.createNewAccount(any(AccountSetupInfo.class))).thenReturn(testSession);
-		when(mockSynapse.getUserSessionData()).thenReturn(mockUserSessionData);
-		when(mockUserSessionData.getProfile()).thenReturn(testProfile);
-		when(mockUserSessionData.getSession()).thenReturn(testSession);
 		when(mockSynapse.getMyProfile()).thenReturn(testProfile);
 
 		Whitebox.setInternalState(userProfileClient, "perThreadRequest", mockThreadLocal);
