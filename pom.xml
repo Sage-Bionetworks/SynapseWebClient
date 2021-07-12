@@ -16,7 +16,7 @@
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<webappDirectory>${project.build.directory}/${project.build.finalName}</webappDirectory>
-		<synapse.version>364.0</synapse.version>
+		<synapse.version>366.0</synapse.version>
 		<gwtVersion>2.9.0</gwtVersion>
 		<org.springframework.version>5.3.1</org.springframework.version>
 		<guiceVersion>3.0</guiceVersion>
@@ -33,7 +33,6 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<gwtvisualizationwrappers.version>1.6-gwt-2.7.0</gwtvisualizationwrappers.version>
 		<gwt.module.suffix></gwt.module.suffix>
-		<com.amazonaws.version>1.11.751</com.amazonaws.version>
 	</properties>
 
 	<repositories>
@@ -548,13 +547,10 @@
 			<artifactId>csv-utilities</artifactId>
 			<version>1.0.4</version>
 		</dependency>
-		<!-- Import the BOM for AWS sdk dependencies -->
 		<dependency>
 			<groupId>com.amazonaws</groupId>
-			<artifactId>aws-java-sdk-bom</artifactId>
-			<version>${com.amazonaws.version}</version>
-			<type>pom</type>
-			<scope>import</scope>
+			<artifactId>aws-java-sdk-core</artifactId>
+			<version>1.11.751</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
