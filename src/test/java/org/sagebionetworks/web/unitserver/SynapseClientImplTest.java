@@ -191,8 +191,6 @@ public class SynapseClientImplTest {
 	@Mock
 	Evaluation mockEvaluation;
 	@Mock
-	UserSessionData mockUserSessionData;
-	@Mock
 	UserProfile mockUserProfile;
 	MembershipInvitation testInvitation;
 	@Mock
@@ -402,8 +400,6 @@ public class SynapseClientImplTest {
 		when(mockSynapse.getAccessRequirements(any(RestrictableObjectDescriptor.class), anyLong(), anyLong())).thenReturn(ars);
 
 		when(mockSynapse.getEvaluation(anyString())).thenReturn(mockEvaluation);
-		when(mockSynapse.getUserSessionData()).thenReturn(mockUserSessionData);
-		when(mockUserSessionData.getProfile()).thenReturn(mockUserProfile);
 		when(mockUserProfile.getOwnerId()).thenReturn(MY_USER_PROFILE_OWNER_ID);
 		when(mockSynapse.getMyProfile()).thenReturn(mockUserProfile);
 
