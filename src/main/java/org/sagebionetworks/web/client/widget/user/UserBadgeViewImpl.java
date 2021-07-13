@@ -129,6 +129,8 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 			case LARGE_CARD:
 				removeStyleName("vertical-align-middle");
 				removeStyleName("inline-user-badge");
+				// if medium or large, we must rely on the react component
+				clickHandlerRegistration.removeHandler();
 				break;
 			case AVATAR:
 				addStyleName("vertical-align-middle");
