@@ -102,7 +102,6 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 		clickHandlerRegistration.removeHandler();
 		clickHandlerRegistration = userBadgeContainer.addClickHandler(event -> {
 			event.preventDefault();
-			event.stopPropagation();
 			clickHandler.onClick(event);
 		});
 	}
