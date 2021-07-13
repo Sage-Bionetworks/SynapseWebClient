@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.facets;
 
 import static org.sagebionetworks.repo.model.table.TableConstants.NULL_VALUE_KEYWORD;
+import static org.sagebionetworks.web.client.DisplayUtils.DO_NOTHING_CLICKHANDLER;
 import java.util.HashSet;
 import java.util.Set;
 import org.sagebionetworks.repo.model.table.ColumnType;
@@ -29,18 +30,12 @@ public class FacetColumnResultValuesWidget implements IsWidget, FacetColumnResul
 	Set<String> facetValues;
 	public static final int MAX_VISIBLE_FACET_VALUES = 5;
 	PortalGinInjector ginInjector;
-	ClickHandler doNothingClickHandler;
-
 
 	@Inject
 	public FacetColumnResultValuesWidget(FacetColumnResultValuesView view, PortalGinInjector ginInjector) {
 		this.view = view;
 		this.ginInjector = ginInjector;
 		view.setPresenter(this);
-		doNothingClickHandler = new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {}
-		};
 	}
 
 	public void configure(FacetColumnResultValues facet, ColumnType columnType, CallbackP<FacetColumnRequest> onFacetRequest) {
@@ -95,14 +90,14 @@ public class FacetColumnResultValuesWidget implements IsWidget, FacetColumnResul
 
 	public Widget getUserBadge(String userId) {
 		UserIdCellRenderer userBadge = ginInjector.getUserIdCellRenderer();
-		userBadge.setValue(userId, doNothingClickHandler);
+		userBadge.setValue(userId, DO_NOTHING_CLICKHANDLER);
 		return userBadge.asWidget();
 	}
 
 	public Widget getEntityBadge(String entityId) {
 		EntityIdCellRenderer entityBadge = ginInjector.getEntityIdCellRenderer();
 		boolean hideIfLoadError = true;
-		entityBadge.setValue(entityId, doNothingClickHandler, hideIfLoadError);
+		entityBadge.setValue(entityId, DO_NOTHING_CLICKHANDLER, hideIfLoadError);
 		return entityBadge.asWidget();
 	}
 
