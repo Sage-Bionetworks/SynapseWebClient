@@ -24,6 +24,7 @@ import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.inject.Inject;
@@ -45,12 +46,11 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 	SynapseContextPropsProvider propsProvider;
 	BadgeType badgeType = BadgeType.SMALL_CARD;
 	AvatarSize avatarSize = AvatarSize.MEDIUM;
-	CallbackP<String> currentClickHandler = STANDARD_HANDLER;
 	FocusPanel userBadgeContainer = new FocusPanel();
 	ReactComponentDiv userBadgeReactDiv = new ReactComponentDiv();
 	JsArray<JavaScriptObject> menuActionsArray = null;
 	AuthenticationController authController;
-	boolean isReactHandlingClickEvents = false;
+	HandlerRegistration clickHandlerRegistration;
 
 	@Inject
 	public UserBadgeViewImpl(GlobalApplicationState globalAppState, SynapseJSNIUtils jsniUtils, AdapterFactory adapterFactory, AuthenticationController authController, final SynapseContextPropsProvider propsProvider) {
@@ -63,13 +63,10 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 		setMarginLeft(2);
 		addStyleName("UserBadge");
 		addStyleName("vertical-align-middle");
-		currentClickHandler = STANDARD_HANDLER;
-		userBadgeContainer.addClickHandler(event -> {
-			if (!isReactHandlingClickEvents) {
-				event.stopPropagation();
-				event.preventDefault();
-				currentClickHandler.invoke(userId);
-			}
+		clickHandlerRegistration = userBadgeContainer.addClickHandler(event -> {
+			event.preventDefault();
+			event.stopPropagation();
+			STANDARD_HANDLER.invoke(userId);
 		});
 		userBadgeContainer.add(userBadgeReactDiv);
 	}
@@ -90,32 +87,29 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 		_showBadge(userBadgeReactDiv.getElement(), profileJson, userId, badgeType.getUserCardType(), avatarSize.getAvatarSize(), showCardOnHover, pictureUrl, !authController.isLoggedIn(), showAvatar, isCertified, isValidated, menuActionsArray, this, propsProvider.getJsniContextProps());
 	}
 
-	public void setClickHandler(ClickHandler clickHandler) {
-		currentClickHandler = userId -> {
-			clickHandler.onClick(null);
-		};
-	}
-
 	@Override
 	public void setOpenInNewWindow() {
-		currentClickHandler = NEW_WINDOW_HANDLER;
+		clickHandlerRegistration.removeHandler();
+		clickHandlerRegistration =  userBadgeContainer.addClickHandler(event -> {
+			event.preventDefault();
+			event.stopPropagation();
+			NEW_WINDOW_HANDLER.invoke(userId);
+		});
 	}
 
 	@Override
 	public void setCustomClickHandler(final ClickHandler clickHandler) {
-		setClickHandler(event -> {
-			if (event != null) {
-				event.stopPropagation();
-				event.preventDefault();
-			}
+		clickHandlerRegistration.removeHandler();
+		clickHandlerRegistration = userBadgeContainer.addClickHandler(event -> {
+			event.preventDefault();
 			clickHandler.onClick(event);
 		});
-		isReactHandlingClickEvents = false;
 	}
 
 	@Override
 	public void doNothingOnClick() {
-		setClickHandler(DO_NOTHING_CLICKHANDLER);
+		clickHandlerRegistration.removeHandler();
+		clickHandlerRegistration = userBadgeContainer.addClickHandler(DO_NOTHING_CLICKHANDLER);
 	}
 
 	@Override
@@ -128,18 +122,17 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 		this.badgeType = badgeType;
 		switch (this.badgeType) {
 			case SMALL_CARD:
-				isReactHandlingClickEvents = true;
 				removeStyleName("vertical-align-middle");
 				addStyleName("inline-user-badge");
 				break;
 			case MEDIUM_CARD:
 			case LARGE_CARD:
-				isReactHandlingClickEvents = true;
 				removeStyleName("vertical-align-middle");
 				removeStyleName("inline-user-badge");
+				// if medium or large, we must rely on the react component
+				clickHandlerRegistration.removeHandler();
 				break;
 			case AVATAR:
-				isReactHandlingClickEvents = false;
 				addStyleName("vertical-align-middle");
 				addStyleName("inline-user-badge");
 				break;

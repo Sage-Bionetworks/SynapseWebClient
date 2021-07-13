@@ -228,6 +228,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 				UserBadge createdByBadge = ginInjector.getUserBadgeWidget();
 				createdByBadge.configure(facet.getValue());
 				createdByBadge.setCustomClickHandler(event -> {
+					event.stopPropagation();
 					btn.click();
 				});
 				btn.add(new Text(buttonText));
@@ -579,6 +580,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 			@Override
 			public void onClick(ClickEvent event) {
 				Window.scrollTo(0, 0);
+				event.stopPropagation();
 				presenter.addFacet(facet.getName(), constraint.getValue());
 			}
 		};
