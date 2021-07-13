@@ -61,8 +61,6 @@ public class StackConfigServiceTest {
 		Session testSession = new Session();
 		testSession.setSessionToken(testSessionToken);
 		testSession.setAcceptsTermsOfUse(true);
-		when(mockSynapse.createNewAccount(any(AccountSetupInfo.class))).thenReturn(testSession);
-		when(mockSynapse.getUserSessionData()).thenReturn(mockUserSessionData);
 		when(mockUserSessionData.getProfile()).thenReturn(testProfile);
 		when(mockUserSessionData.getSession()).thenReturn(testSession);
 		when(mockSynapse.getMyProfile()).thenReturn(testProfile);
