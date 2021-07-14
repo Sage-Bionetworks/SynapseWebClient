@@ -8,11 +8,11 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList.DOWNLOAD_ACTION_EVENT_NAME;
 import static org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList.FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME;
 import static org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList.FILE_SIZE_QUERY_PART_MASK;
 import static org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList.PLEASE_LOGIN_TO_ADD_TO_DOWNLOAD_LIST;
 import static org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList.ZERO_FILES_IN_FOLDER_MESSAGE;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,6 +22,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
+import org.sagebionetworks.repo.model.download.AddToDownloadListRequest;
 import org.sagebionetworks.repo.model.file.AddFileToDownloadListRequest;
 import org.sagebionetworks.repo.model.file.AddFileToDownloadListResponse;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
@@ -29,9 +30,11 @@ import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.SumFileSizes;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -44,6 +47,7 @@ import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListView;
 import org.sagebionetworks.web.client.widget.entity.file.downloadlist.PackageSizeSummary;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
+
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -82,6 +86,8 @@ public class AddToDownloadListTest {
 	@Captor
 	ArgumentCaptor<AddFileToDownloadListRequest> requestCaptor;
 	@Captor
+	ArgumentCaptor<AddToDownloadListRequest> requestV2Captor;
+	@Captor
 	ArgumentCaptor<QueryBundleRequest> queryBundleRequestCaptor;
 	@Captor
 	ArgumentCaptor<AsynchronousProgressHandler> asyncProgressHandlerCaptor;
@@ -97,10 +103,12 @@ public class AddToDownloadListTest {
 	Long querySumFileSize = 88L;
 	@Mock
 	AuthenticationController mockAuthController;
+	@Mock
+	CookieProvider mockCookies;
 
 	@Before
 	public void setUp() throws Exception {
-		widget = new AddToDownloadList(mockView, mockAsynchronousProgressWidget, mockInlineAsynchronousProgressView, mockPopupUtils, mockEventBus, mockSynAlert, mockPackageSizeSummary, mockJsClient, mockSynapseJSNIUtils, mockAuthController);
+		widget = new AddToDownloadList(mockView, mockAsynchronousProgressWidget, mockInlineAsynchronousProgressView, mockPopupUtils, mockEventBus, mockSynAlert, mockPackageSizeSummary, mockJsClient, mockSynapseJSNIUtils, mockAuthController, mockCookies);
 		when(mockEntityChildrenResponse.getTotalChildCount()).thenReturn(testFolderChildCount);
 		when(mockEntityChildrenResponse.getSumFileSizesBytes()).thenReturn(testFolderSumFileSizesBytes);
 		when(mockQueryResultBundle.getQueryCount()).thenReturn(queryCount);
@@ -111,6 +119,97 @@ public class AddToDownloadListTest {
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 	}
 
+	@Test
+	public void testAddQueryToDownloadListV2() {
+		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("true");
+		verify(mockAsynchronousProgressWidget).setView(mockInlineAsynchronousProgressView);
+		verify(mockInlineAsynchronousProgressView).setProgressMessageVisible(false);
+
+		widget.addToDownloadList(queryEntityId, mockQuery);
+
+		verify(mockAsynchronousProgressWidget).startAndTrackJob(anyString(), eq(false), eq(AsynchType.TableQuery), queryBundleRequestCaptor.capture(), asyncProgressHandlerCaptor.capture());
+
+		// verify query request params
+		QueryBundleRequest queryBundleRequest = queryBundleRequestCaptor.getValue();
+		assertEquals(mockQuery, queryBundleRequest.getQuery());
+		assertEquals(queryEntityId, queryBundleRequest.getEntityId());
+		assertEquals(FILE_SIZE_QUERY_PART_MASK, queryBundleRequest.getPartMask());
+		verify(mockView).showAsynchronousProgressWidget();
+
+		// simulate success
+		AsynchronousProgressHandler queryBundleRequestProgressHandler = asyncProgressHandlerCaptor.getValue();
+		queryBundleRequestProgressHandler.onComplete(mockQueryResultBundle);
+		verify(mockView, times(3)).hideAll();
+		verify(mockPackageSizeSummary).addFiles(queryCount.intValue(), querySumFileSize.doubleValue());
+		verify(mockView).showConfirmAdd();
+
+		// simulate user confirms
+		widget.onConfirmAddToDownloadList();
+
+		verify(mockView, times(4)).hideAll();
+		verify(mockView).setAsynchronousProgressWidget(mockAsynchronousProgressWidget);
+		verify(mockAsynchronousProgressWidget).startAndTrackJob(anyString(), eq(false), eq(AsynchType.AddToDownloadList), requestV2Captor.capture(), asyncProgressHandlerCaptor.capture());
+
+		// verify add file to download list request
+		AddToDownloadListRequest request = requestV2Captor.getValue();
+		assertEquals(mockQuery, request.getQuery());
+
+		// simulate completing job
+		AsynchronousProgressHandler addFileToDownloadListProgressHandler = asyncProgressHandlerCaptor.getValue();
+		addFileToDownloadListProgressHandler.onComplete(mockAddFileToDownloadListResponse);
+
+		verify(mockView, times(5)).hideAll();
+		verify(mockView).showSuccess(queryCount.intValue());
+		verify(mockSynapseJSNIUtils).sendAnalyticsEvent(AddToDownloadList.DOWNLOAD_ACTION_EVENT_NAME, FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME, queryCount.toString());
+		verify(mockEventBus).fireEvent(any(DownloadListUpdatedEvent.class));
+
+		// verify error handling in query bundle progress handler
+		Exception ex = new Exception("unable to get query bundle");
+		queryBundleRequestProgressHandler.onFailure(ex);
+		verify(mockSynAlert).handleException(ex);
+		verify(mockView, times(6)).hideAll();
+	}
+
+	@Test
+	public void testAddFolderToDownloadListV2() {
+		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("true");
+		AsyncMockStubber.callSuccessWith(mockEntityChildrenResponse).when(mockJsClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
+		widget.addToDownloadList(folderId);
+
+		verify(mockJsClient).getEntityChildren(entityChildrenRequestCaptor.capture(), any(AsyncCallback.class));
+		// verify that we're asking for the file size sum and child count
+		EntityChildrenRequest entityChildrenRequest = entityChildrenRequestCaptor.getValue();
+		assertEquals(folderId, entityChildrenRequest.getParentId());
+		assertTrue(entityChildrenRequest.getIncludeTotalChildCount());
+		assertTrue(entityChildrenRequest.getIncludeSumFileSizes());
+
+		verify(mockPackageSizeSummary).addFiles(testFolderChildCount.intValue(), testFolderSumFileSizesBytes.doubleValue());
+		verify(mockView).showConfirmAdd();
+
+		// simulate user confirmation
+		widget.onConfirmAddToDownloadList();
+
+		verify(mockView, times(3)).hideAll();
+		verify(mockView).setAsynchronousProgressWidget(mockAsynchronousProgressWidget);
+		verify(mockAsynchronousProgressWidget).startAndTrackJob(anyString(), eq(false), eq(AsynchType.AddToDownloadList), requestV2Captor.capture(), asyncProgressHandlerCaptor.capture());
+
+		// verify request
+		AddToDownloadListRequest request = requestV2Captor.getValue();
+		assertEquals(folderId, request.getParentId());
+
+		// simulate completing job
+		asyncProgressHandlerCaptor.getValue().onComplete(mockAddFileToDownloadListResponse);
+
+		verify(mockView).showSuccess(testFolderChildCount.intValue());
+
+		// execute job failure code
+		Exception e = new Exception();
+		asyncProgressHandlerCaptor.getValue().onFailure(e);
+
+		verify(mockView, times(5)).hideAll();
+		verify(mockSynAlert).handleException(e);
+	}
+	
 	@Test
 	public void testAddQueryToDownloadList() {
 		verify(mockAsynchronousProgressWidget).setView(mockInlineAsynchronousProgressView);
