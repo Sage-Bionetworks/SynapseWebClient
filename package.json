@@ -14,7 +14,7 @@
     "react-query": "^3.17.0",
     "react-tooltip": "3.11.2",
     "react-transition-group": "2.6.0",
-    "sanitize-html": "2.3.2",
+    "sanitize-html": "^1.18.4",
     "sass": "1.32.5",
     "synapse-react-client": "2.0.14",
     "universal-cookie": "^4.0.3"
