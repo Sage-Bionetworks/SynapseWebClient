@@ -58,7 +58,6 @@ public class TeamListWidgetViewImpl extends FlowPanel implements TeamListWidgetV
 		SimplePanel container = new SimplePanel();
 		container.addStyleName("margin-top-10");
 		TeamBadge teamRenderer = ginInjector.getTeamBadgeWidget();
-		teamRenderer.setIsSecondaryLink();
 		teamRenderer.configure(team);
 		team2Badge.put(team.getId(), teamRenderer);
 		Widget teamRendererWidget = teamRenderer.asWidget();

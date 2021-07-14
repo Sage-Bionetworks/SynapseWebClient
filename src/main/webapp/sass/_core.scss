@@ -143,12 +143,14 @@ end sticky footer
 	.nav-tabs > li > a {
 		text-transform: uppercase;
 		box-shadow: none;
+		border-bottom: none;
 	}
 	.nav-tabs > li.active > a, #rootPanel .nav-tabs > li > a:hover {
 		box-shadow: inset 0 -3px 0 $synapse-green;
 		background-color: unset;
 		border: none;
-		padding-top: 24px; //increase padding on top to account push down (now that border is none)
+		padding-top: 21px; //increase padding on top to account push down (now that border is none)
+		padding-bottom: 26px;
 	}
 	@media (min-width: 768px) {
 		.lead {
@@ -2091,7 +2093,7 @@ ol.lowerroman {
 }
 #body .entity-tab > a, #body .finder-tab > a {
 	text-align: center;
-	padding: 23px 15px;
+	padding: 20px 15px;
 	&:focus, &:hover {
 		background-color: unset;
 	}
