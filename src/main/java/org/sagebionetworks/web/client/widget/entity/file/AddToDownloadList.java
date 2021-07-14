@@ -8,13 +8,16 @@ import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
+import org.sagebionetworks.repo.model.download.AddToDownloadListRequest;
 import org.sagebionetworks.repo.model.file.AddFileToDownloadListRequest;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
@@ -39,6 +42,7 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 	AddToDownloadListView view;
 	PopupUtilsView popupUtilsView;
 	AddFileToDownloadListRequest request;
+	AddToDownloadListRequest requestV2;
 	EventBus eventBus;
 	SynapseAlert synAlert;
 	SynapseJSNIUtils jsniUtils;
@@ -50,12 +54,15 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 	int fileCountToAdd;
 	public static final String DOWNLOAD_ACTION_EVENT_NAME = "Download";
 	public static final String FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME = "FilesAddedToDownloadList";
+	CookieProvider cookies;
+	
 	@Inject
-	public AddToDownloadList(AddToDownloadListView view, AsynchronousProgressWidget progress, InlineAsynchronousProgressViewImpl inlineProgressView, PopupUtilsView popupUtilsView, EventBus eventBus, SynapseAlert synAlert, PackageSizeSummary packageSizeSummary, SynapseJavascriptClient jsClient, SynapseJSNIUtils jsniUtils, AuthenticationController authController) {
+	public AddToDownloadList(AddToDownloadListView view, AsynchronousProgressWidget progress, InlineAsynchronousProgressViewImpl inlineProgressView, PopupUtilsView popupUtilsView, EventBus eventBus, SynapseAlert synAlert, PackageSizeSummary packageSizeSummary, SynapseJavascriptClient jsClient, SynapseJSNIUtils jsniUtils, AuthenticationController authController, CookieProvider cookies) {
 		this.jsClient = jsClient;
 		this.view = view;
 		this.popupUtilsView = popupUtilsView;
 		this.progress = progress;
+		this.cookies = cookies;
 		inlineProgressView.showWhiteSpinner();
 		inlineProgressView.setProgressMessageVisible(false);
 		progress.setView(inlineProgressView);
@@ -76,6 +83,7 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 		fileCountToAdd = 0;
 		view.hideAll();
 		request = new AddFileToDownloadListRequest();
+		requestV2 = new AddToDownloadListRequest();
 		packageSizeSummary.clear();
 		synAlert.clear();
 	}
@@ -84,12 +92,14 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 		queryEntityID = entityID;
 		clear();
 		request.setQuery(query);
+		requestV2.setQuery(query);
 		confirmAddQueryResultsToDownloadList();
 	}
 
 	public void addToDownloadList(String folderId) {
 		clear();
 		request.setFolderId(folderId);
+		requestV2.setParentId(folderId);
 		confirmAddFolderChildrenToDownloadList();
 	}
 
@@ -98,7 +108,7 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 			// run the query, ask for the stats
 			QueryBundleRequest queryBundleRequest = new QueryBundleRequest();
 			queryBundleRequest.setEntityId(queryEntityID);
-			queryBundleRequest.setQuery(request.getQuery());
+			queryBundleRequest.setQuery(requestV2.getQuery());
 			queryBundleRequest.setPartMask(FILE_SIZE_QUERY_PART_MASK);
 			view.showAsynchronousProgressWidget();
 			progress.startAndTrackJob("Calculating the total query result file size", false, AsynchType.TableQuery, queryBundleRequest, new AsynchronousProgressHandler() {
@@ -139,7 +149,7 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 			EntityChildrenRequest entityChildrenRequest = new EntityChildrenRequest();
 			entityChildrenRequest.setIncludeSumFileSizes(true);
 			entityChildrenRequest.setIncludeTotalChildCount(true);
-			entityChildrenRequest.setParentId(request.getFolderId());
+			entityChildrenRequest.setParentId(requestV2.getParentId());
 			List<EntityType> includeTypes = new ArrayList<EntityType>();
 			includeTypes.add(EntityType.file);
 			entityChildrenRequest.setIncludeTypes(includeTypes);
@@ -173,7 +183,7 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 	public void startAddingFiles() {
 		view.hideAll();
 		view.showAsynchronousProgressWidget();
-		progress.startAndTrackJob("Adding files to Download List...", false, AsynchType.AddFileToDownloadList, request, new AsynchronousProgressHandler() {
+		AsynchronousProgressHandler handler = new AsynchronousProgressHandler() {
 			@Override
 			public void onFailure(Throwable failure) {
 				synAlert.handleException(failure);
@@ -194,7 +204,12 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 			public void onCancel() {
 				view.hideAll();
 			}
-		});
+		};
+		if (!DisplayUtils.isInTestWebsite(cookies)) {
+			progress.startAndTrackJob("Adding files to Download List...", false, AsynchType.AddFileToDownloadList, request, handler);	
+		} else {
+			progress.startAndTrackJob("Adding files to your Download Cart...", false, AsynchType.AddToDownloadList, requestV2, handler);
+		}
 	}
 
 	@Override
