@@ -143,4 +143,8 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 	public void setTarget(String target) {
 		anchor.setTarget(target);
 	}
+	@Override
+	public void setIsSecondaryLink() {
+		anchor.addStyleName("secondaryLink");
+	}
 }

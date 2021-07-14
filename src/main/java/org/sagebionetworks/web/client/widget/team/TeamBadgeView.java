@@ -19,4 +19,6 @@ public interface TeamBadgeView extends IsWidget, SynapseView {
 	void addStyleName(String style);
 
 	void setTarget(String target);
+
+	public void setIsSecondaryLink();
 }

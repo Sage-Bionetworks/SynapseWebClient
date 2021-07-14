@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.pagination;
 
 import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.ClearFix;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -21,9 +22,9 @@ public class BasicPaginationViewImpl implements BasicPaginationView {
 	}
 
 	@UiField
-	Anchor previousButton;
+	Button previousButton;
 	@UiField
-	Anchor nextButton;
+	Button nextButton;
 	@UiField
 	ClearFix clearFix;
 	Widget widget;

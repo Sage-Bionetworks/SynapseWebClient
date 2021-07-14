@@ -13,11 +13,10 @@
 		<bh:UnorderedList
 			addStyleNames="pager padding-left-0-imp margin-top-5" pull="LEFT">
 			<b:ListItem addStyleNames="margin-right-5">
-				<b:Anchor ui:field="previousButton" text="Previous"
-					width="90px" />
+				<b:Button ui:field="previousButton" text="Previous" width="90px" />
 			</b:ListItem>
 			<b:ListItem>
-				<b:Anchor ui:field="nextButton" text="Next" width="90px" />
+				<b:Button ui:field="nextButton" width="90px" text="Next"/>
 			</b:ListItem>
 		</bh:UnorderedList>
 		<bh:ClearFix />

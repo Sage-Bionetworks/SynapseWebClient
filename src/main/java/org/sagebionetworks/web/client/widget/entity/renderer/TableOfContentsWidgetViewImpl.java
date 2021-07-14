@@ -109,7 +109,7 @@ public class TableOfContentsWidgetViewImpl extends FlowPanel implements TableOfC
 						newWidgetIndex++;
 					}
 
-					HTML html = new HTML("<a class=\"link " + tocStyle + "\">" + headingHtml + "</a>");
+					HTML html = new HTML("<a class=\"link secondaryLink " + tocStyle + "\">" + headingHtml + "</a>");
 
 					html.addClickHandler(new ClickHandler() {
 						@Override

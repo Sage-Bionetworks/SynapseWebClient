@@ -10,7 +10,7 @@
 		<bh:Text ui:field="errorText"></bh:Text>
 		<b:Tooltip ui:field="tooltip" trigger="HOVER" isHtml="true"
 			placement="BOTTOM">
-			<b:Anchor ui:field="anchor" icon="DOWNLOAD"
+			<b:Anchor ui:field="anchor" icon="DOWNLOAD" addStyleNames="no-border-bottom"
 				iconFixedWidth="true" visible="false" />
 		</b:Tooltip>
 	</g:HTMLPanel>

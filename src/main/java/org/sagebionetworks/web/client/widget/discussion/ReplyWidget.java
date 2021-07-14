@@ -98,6 +98,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter {
 		authorWidget.setBadgeType(BadgeType.SMALL_CARD);
 		authorWidget.setShowAvatar(true);
 		authorWidget.setAvatarSize(AvatarSize.MEDIUM);
+		authorWidget.setIsSecondaryLink();
 		authorWidget.configure(bundle.getCreatedBy());
 		view.setCreatedOn(SingleDiscussionThreadWidget.CREATED_ON_PREFIX + dateTimeUtils.getRelativeTime(bundle.getCreatedOn()));
 		view.setMessageVisible(true);

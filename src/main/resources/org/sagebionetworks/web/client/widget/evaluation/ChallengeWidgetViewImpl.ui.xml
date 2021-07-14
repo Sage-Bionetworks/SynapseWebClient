@@ -36,8 +36,7 @@
 					<bh:Div addStyleNames="displayTableCell">
 						<b:Heading size="H5" text="Registered participant's team"
 								   addStyleNames="displayInlineBlock margin-right-10" />
-						<b:Button ui:field="editTeamButton" type="LINK"
-								  text="Edit Team" size="EXTRA_SMALL" />
+						<b:Anchor ui:field="editTeam" text="Edit Team" />
 						<bh:Div ui:field="teamWidgetContainer" addStyleNames="border-top-6-synapse-blue border-left-1 border-right-1 border-bottom-1"/>
 					</bh:Div>
 				</bh:Div>

@@ -30,4 +30,6 @@ public interface UserBadgeView extends IsWidget, SynapseView {
 	void setOpenInNewWindow();
 
 	void addContextCommand(String commandName, Callback callback);
+
+	void setIsSecondaryLink();
 }

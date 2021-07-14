@@ -191,6 +191,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		authorWidget.setBadgeType(BadgeType.SMALL_CARD);
 		authorWidget.setShowAvatar(true);
 		authorWidget.setAvatarSize(AvatarSize.MEDIUM);
+		authorWidget.setIsSecondaryLink();
 		authorWidget.configure(bundle.getCreatedBy());
 		configureMessage();
 		if (!bundle.getId().equals(ginInjector.getSynapseProperties().getSynapseProperty(ForumWidget.DEFAULT_THREAD_ID_KEY))) {

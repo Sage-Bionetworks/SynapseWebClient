@@ -35,7 +35,7 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 	public static final CallbackP<String> STANDARD_HANDLER = userId -> {
 		placeChanger.goTo(new Profile(userId));
 	};
-
+	private String extraCssClassStrings = "";
 	public static final CallbackP<String> NEW_WINDOW_HANDLER = userId -> {
 		newWindow("#!Profile:" + userId, "_blank", "");
 	};
@@ -72,6 +72,11 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 	}
 
 	@Override
+	public void setIsSecondaryLink() {
+		extraCssClassStrings += "secondaryLink";
+	}
+	
+	@Override
 	public void configure(UserProfile profile, String pictureUrl, Boolean isCertified, Boolean isValidated) {
 		userId = profile.getOwnerId();
 		clear();
@@ -84,7 +89,7 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 		} catch (Throwable e) {
 			jsniUtils.consoleError(e);
 		}
-		_showBadge(userBadgeReactDiv.getElement(), profileJson, userId, badgeType.getUserCardType(), avatarSize.getAvatarSize(), showCardOnHover, pictureUrl, !authController.isLoggedIn(), showAvatar, isCertified, isValidated, menuActionsArray, this, propsProvider.getJsniContextProps());
+		_showBadge(userBadgeReactDiv.getElement(), profileJson, userId, badgeType.getUserCardType(), avatarSize.getAvatarSize(), showCardOnHover, pictureUrl, !authController.isLoggedIn(), showAvatar, isCertified, isValidated, menuActionsArray, extraCssClassStrings, this, propsProvider.getJsniContextProps());
 	}
 
 	@Override
@@ -183,7 +188,7 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 		_addToMenuActionsArray(commandName, callback, menuActionsArray);
 	}
 
-	private static native void _showBadge(Element el, String userProfileJson, String userId, String userCardType, String avatarSize, boolean showCardOnHover, String pictureUrl, boolean isEmailHidden, boolean showAvatar, Boolean isCertifiedUser, Boolean isValidatedProfile, JsArray<JavaScriptObject> menuActionsArray, UserBadgeViewImpl userBadgeView, SynapseContextProviderPropsJSNIObject wrapperProps) /*-{
+	private static native void _showBadge(Element el, String userProfileJson, String userId, String userCardType, String avatarSize, boolean showCardOnHover, String pictureUrl, boolean isEmailHidden, boolean showAvatar, Boolean isCertifiedUser, Boolean isValidatedProfile, JsArray<JavaScriptObject> menuActionsArray, String extraCssClasses, UserBadgeViewImpl userBadgeView, SynapseContextProviderPropsJSNIObject wrapperProps) /*-{
 
 		try {
 			var userProfileObject = JSON.parse(userProfileJson);
@@ -198,7 +203,8 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 				link : '#!Profile:' + userId,
 				isCertified: isCertifiedUser,
 				isValidated: isValidatedProfile,
-				withAvatar: showAvatar
+				withAvatar: showAvatar,
+				className: extraCssClasses
 			};
 			var component = $wnd.React.createElement($wnd.SRC.SynapseComponents.UserCard, userCardProps, null);
 			var wrapper = $wnd.React.createElement($wnd.SRC.SynapseContext.SynapseContextProvider, wrapperProps, component);

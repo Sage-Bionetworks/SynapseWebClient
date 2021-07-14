@@ -145,7 +145,7 @@ end sticky footer
 		box-shadow: none;
 	}
 	.nav-tabs > li.active > a, #rootPanel .nav-tabs > li > a:hover {
-		box-shadow: inset 0 -3px 0 #1e7098;
+		box-shadow: inset 0 -3px 0 $synapse-green;
 		background-color: unset;
 		border: none;
 		padding-top: 24px; //increase padding on top to account push down (now that border is none)
@@ -1757,6 +1757,7 @@ ol.lowerroman {
 	details[open] {
 		position: relative;
 		padding-bottom: 25px;
+		color: $synapse-blue;
 		summary {
 			position: absolute;
 			bottom: 0px;
@@ -2379,6 +2380,7 @@ div.input-group > input.search-textbox {
 			text-decoration:none;
 			background-color: transparent;
 			border-right: 0px;
+			font-weight: bolder;
 		}
 
 		li {

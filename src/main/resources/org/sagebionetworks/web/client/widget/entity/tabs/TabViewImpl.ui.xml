@@ -5,7 +5,7 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<bh:Div>
 		<b:ListItem ui:field="tabListItem" addStyleNames="entity-tab" visible="false">
-			<b:Anchor ui:field="tabItem" addStyleNames="text-align-center link no-background" tabIndex="-1"/>
+			<b:Anchor ui:field="tabItem" addStyleNames="text-align-center link no-background no-border-bottom" tabIndex="-1"/>
 		</b:ListItem>
 		<b:TabPane ui:field="tabPane" active="true" addStyleNames="row tab-background padding-top-15">
 			<bh:Div ui:field="contentDiv" addStyleNames="margin-left-15 margin-right-15"/> 

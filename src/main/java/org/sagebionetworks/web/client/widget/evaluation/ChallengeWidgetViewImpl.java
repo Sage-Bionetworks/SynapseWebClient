@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.evaluation;
 
+import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Panel;
@@ -29,14 +30,14 @@ public class ChallengeWidgetViewImpl implements ChallengeWidgetView {
 	Div selectTeamModalContainer;
 
 	@UiField
-	Button editTeamButton;
+	Anchor editTeam;
 
 	Widget widget;
 
 	@Inject
 	public ChallengeWidgetViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
-		editTeamButton.addClickHandler(event -> {
+		editTeam.addClickHandler(event -> {
 			presenter.onEditTeamClicked();
 		});
 	}

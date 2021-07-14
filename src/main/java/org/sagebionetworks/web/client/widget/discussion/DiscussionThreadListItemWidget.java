@@ -26,7 +26,7 @@ public class DiscussionThreadListItemWidget implements DiscussionThreadListItemW
 		this.view = view;
 		this.dateTimeUtils = dateTimeUtils;
 		this.authorWidget = authorWidget;
-
+		authorWidget.setIsSecondaryLink();
 		view.setPresenter(this);
 		view.setThreadAuthor(authorWidget.asWidget());
 	}
@@ -46,6 +46,7 @@ public class DiscussionThreadListItemWidget implements DiscussionThreadListItemW
 		for (String userId : bundle.getActiveAuthors()) {
 			UserBadge user = ginInjector.getUserBadgeWidget();
 			user.setBadgeType(BadgeType.AVATAR);
+			user.setIsSecondaryLink();
 			user.configure(userId);
 			view.addActiveAuthor(user.asWidget());
 		}

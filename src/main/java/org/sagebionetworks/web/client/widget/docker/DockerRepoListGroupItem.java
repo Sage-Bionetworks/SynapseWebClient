@@ -31,6 +31,7 @@ public class DockerRepoListGroupItem extends ListGroupItem {
 
 		Heading heading = new Heading(size);
 		anchor.setText("Loading...");
+		anchor.addStyleName("secondaryLink");
 		anchor.setHref("#!Synapse:" + entityHeader.getId());
 		anchor.addClickHandler(event -> {
 			if (!DisplayUtils.isAnyModifierKeyDown(event)) {
@@ -45,6 +46,7 @@ public class DockerRepoListGroupItem extends ListGroupItem {
 		text.setText(LAST_UPDATED + DATE_FORMAT.format(entityHeader.getModifiedOn()));
 		Anchor anchor = new Anchor("#!Synapse:" + entityHeader.getId());
 		anchor.setTarget("_blank");
+		anchor.addStyleName("no-border-bottom");
 		anchor.setIcon(IconType.ANGLE_RIGHT);
 		anchor.addStyleName("margin-right-10 moveup-2 pull-right h3");
 

@@ -79,6 +79,7 @@ public class ChallengeTeamsViewImpl implements ChallengeTeamsView {
 		Div div = new Div();
 		div.addStyleName("margin-bottom-5");
 		TeamBadge newTeamBadge = ginInjector.getTeamBadgeWidget();
+		newTeamBadge.setIsSecondaryLink();
 		newTeamBadge.configure(teamId);
 		Span messageSpan = new Span();
 		messageSpan.addStyleName("greyText-imp margin-left-5");
