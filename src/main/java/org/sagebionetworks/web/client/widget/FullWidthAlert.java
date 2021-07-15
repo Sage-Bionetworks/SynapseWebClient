@@ -30,7 +30,6 @@ public class FullWidthAlert implements IsWidget {
 	}
 	
 	private void rerender() {
-		setVisible(true);
 		Double autoCloseAfterDelayInSeconds = null;
 		FullWidthAlertProps props = FullWidthAlertProps.create(title, message, primaryButtonText, onPrimaryClick, secondaryButtonText, secondaryButtonHref, onClose, autoCloseAfterDelayInSeconds, isGlobal, alertType);
 		ReactElement component = React.createElement(SRC.SynapseComponents.FullWidthAlert, props);
