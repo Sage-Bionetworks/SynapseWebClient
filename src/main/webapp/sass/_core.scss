@@ -132,6 +132,7 @@ end sticky footer
 		padding: 15px 0 30px 0;
 	}
 	.nav-tabs {
+		border-bottom: none;
 		box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.05);
 		>li	{
 			margin-bottom: -4px;
@@ -141,16 +142,18 @@ end sticky footer
 		border: none;
 	}	
 	.nav-tabs > li > a {
-		text-transform: uppercase;
 		box-shadow: none;
 		border-bottom: none;
 	}
+	.nav > li > a {
+		padding: 23px 15px 20px 15px;
+	}
 	.nav-tabs > li.active > a, #rootPanel .nav-tabs > li > a:hover {
-		box-shadow: inset 0 -3px 0 $synapse-green;
+		box-shadow: inset 0 -4px 0 $synapse-green;
 		background-color: unset;
 		border: none;
-		padding-top: 21px; //increase padding on top to account push down (now that border is none)
-		padding-bottom: 26px;
+		padding-top: 24px;
+		padding-bottom: 14px;
 	}
 	@media (min-width: 768px) {
 		.lead {
@@ -2054,7 +2057,10 @@ ol.lowerroman {
 }
 
 .entity-tab, .finder-tab {
-	font-size: 16px;	
+	font-size: 16px;
+	font-weight: 700;
+	color:#22252A;
+	letter-spacing: 1px;
 }
 
 @media (max-width: 991px) {
@@ -2093,7 +2099,7 @@ ol.lowerroman {
 }
 #body .entity-tab > a, #body .finder-tab > a {
 	text-align: center;
-	padding: 20px 15px;
+	padding: 23px 15px 20px 15px;
 	&:focus, &:hover {
 		background-color: unset;
 	}
@@ -3057,7 +3063,7 @@ div.border {
 }
 #body {
 	summary { color:$synapse-blue; }
-	summary:hover { text-decoration: underline; cursor:pointer; }
+	summary:hover { cursor:pointer; }
 	.input-group-addon, .input-group-btn {
 		vertical-align: top;
 	}

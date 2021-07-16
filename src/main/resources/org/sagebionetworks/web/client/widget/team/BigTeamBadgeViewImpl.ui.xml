@@ -26,7 +26,7 @@
 				addStyleNames="flexcontainer-column flexcontainer-justify-center"
 				paddingLeft="17">
 				<b:Heading size="H4">
-					<b:Anchor ui:field="nameLink" />
+					<b:Anchor ui:field="nameLink" addStyleNames="highlight-link"/>
 				</b:Heading>
 				<bh:Div addStyleNames="strong">
 					<bh:Span ui:field="memberCountContainer" />
