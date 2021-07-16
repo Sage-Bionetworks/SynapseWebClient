@@ -52,7 +52,6 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 		notificationsPanel = new SimplePanel();
 		notificationsPanel.addStyleName("margin-left-5 displayInline");
 		placeChanger = globalApplicationState.getPlaceChanger();
-		anchor.addStyleName("highlight-link");
 	}
 
 	@Override
