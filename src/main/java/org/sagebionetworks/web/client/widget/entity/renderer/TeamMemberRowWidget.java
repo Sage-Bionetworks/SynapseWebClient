@@ -16,7 +16,6 @@ public class TeamMemberRowWidget implements IsWidget {
 	public TeamMemberRowWidget(TeamMemberRowWidgetView view, UserBadge userBadge) {
 		this.view = view;
 		this.userBadge = userBadge;
-		userBadge.setIsSecondaryLink();
 		view.setUserBadge(userBadge);
 	}
 

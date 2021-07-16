@@ -72,11 +72,6 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 	}
 
 	@Override
-	public void setIsSecondaryLink() {
-		extraCssClassStrings += "secondaryLink";
-	}
-	
-	@Override
 	public void configure(UserProfile profile, String pictureUrl, Boolean isCertified, Boolean isValidated) {
 		userId = profile.getOwnerId();
 		clear();

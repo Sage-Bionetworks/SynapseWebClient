@@ -78,7 +78,6 @@ public class ProvViewUtil {
 				label.add(new HTML(DisplayUtils.stubStrPartialWord(node.getActivityName(), MAX_ACT_CODE_NAME_CHAR)));
 			}
 			UserBadge badge = ginInjector.getUserBadgeWidget();
-			badge.setIsSecondaryLink();
 			badge.configure(node.getModifiedBy());
 			HTML time = new HTML(ginInjector.getDateTimeUtils().getLongFriendlyDate(node.getModifiedOn()));
 			time.addStyleName(PROV_ACTIVITY_TIME_STYLE);

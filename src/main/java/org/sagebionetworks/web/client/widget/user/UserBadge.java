@@ -224,9 +224,6 @@ public class UserBadge implements SynapseWidgetPresenter, WidgetRendererPresente
 	public void addStyleNames(String style) {
 		view.addStyleName(style);
 	}
-	public void setIsSecondaryLink() {
-		view.setIsSecondaryLink();
-	}
 	public void setHeight(String height) {
 		view.setHeight(height);
 	}

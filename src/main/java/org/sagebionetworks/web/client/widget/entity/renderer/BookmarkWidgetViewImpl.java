@@ -24,7 +24,7 @@ public class BookmarkWidgetViewImpl extends FlowPanel implements BookmarkWidgetV
 
 		Anchor a = new Anchor();
 		a.setHTML(SimpleHtmlSanitizer.sanitizeHtml(bookmarkLinkText));
-		a.addStyleName("link secondaryLink");
+		a.addStyleName("link");
 		a.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {

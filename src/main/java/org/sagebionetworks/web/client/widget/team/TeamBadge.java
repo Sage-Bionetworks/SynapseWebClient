@@ -125,10 +125,6 @@ public class TeamBadge implements SynapseWidgetPresenter, HasNotificationUI, IsW
 	public void addStyleName(String style) {
 		view.addStyleName(style);
 	}
-
-	public void setIsSecondaryLink() {
-		view.setIsSecondaryLink();
-	}
 	
 	public void setOpenNewWindow(boolean isNewWindow) {
 		String target = isNewWindow ? "_blank" : "";

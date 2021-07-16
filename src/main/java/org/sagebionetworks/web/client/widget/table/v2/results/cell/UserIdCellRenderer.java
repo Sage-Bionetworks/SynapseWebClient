@@ -49,7 +49,6 @@ public class UserIdCellRenderer implements Cell {
 				public void onSuccess(UserGroupHeader result) {
 					if (result.getIsIndividual()) {
 						UserBadge badge = ginInjector.getUserBadgeWidget();
-						badge.setIsSecondaryLink();
 						if (customClickHandler != null) {
 							badge.setCustomClickHandler(customClickHandler);
 						}
@@ -57,7 +56,6 @@ public class UserIdCellRenderer implements Cell {
 						view.add(badge);
 					} else {
 						TeamBadge badge = ginInjector.getTeamBadgeWidget();
-						badge.setIsSecondaryLink();
 						if (customClickHandler != null) {
 							badge.configure(principalId, customClickHandler);
 						} else {

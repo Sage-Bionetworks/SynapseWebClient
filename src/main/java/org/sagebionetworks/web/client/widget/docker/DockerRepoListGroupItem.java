@@ -31,7 +31,6 @@ public class DockerRepoListGroupItem extends ListGroupItem {
 
 		Heading heading = new Heading(size);
 		anchor.setText("Loading...");
-//		anchor.addStyleName("secondaryLink");
 		anchor.setHref("#!Synapse:" + entityHeader.getId());
 		anchor.addClickHandler(event -> {
 			if (!DisplayUtils.isAnyModifierKeyDown(event)) {

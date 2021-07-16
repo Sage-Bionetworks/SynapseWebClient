@@ -11,6 +11,6 @@
 		<bh:Span ui:field="loadingUI" visible="false"> Loading...</bh:Span>
 		<b:Icon ui:field="entityIcon" visible="false" fixedWidth="true"
 			type="ASTERISK" />
-		<b:Anchor ui:field="entityLink" target="_blank" addStyleNames="secondaryLink" />
+		<b:Anchor ui:field="entityLink" target="_blank" />
 	</bh:Span>
 </ui:UiBinder>

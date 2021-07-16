@@ -52,6 +52,7 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 		notificationsPanel = new SimplePanel();
 		notificationsPanel.addStyleName("margin-left-5 displayInline");
 		placeChanger = globalApplicationState.getPlaceChanger();
+		anchor.addStyleName("highlight-link");
 	}
 
 	@Override
@@ -142,9 +143,5 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 	@Override
 	public void setTarget(String target) {
 		anchor.setTarget(target);
-	}
-	@Override
-	public void setIsSecondaryLink() {
-		anchor.addStyleName("secondaryLink");
 	}
 }
