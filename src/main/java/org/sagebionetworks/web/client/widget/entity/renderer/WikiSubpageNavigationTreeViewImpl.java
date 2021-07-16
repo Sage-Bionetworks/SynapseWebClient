@@ -67,11 +67,9 @@ public class WikiSubpageNavigationTreeViewImpl extends FlowPanel implements Wiki
 			subListContainer.add(subList);
 			ul.add(subListContainer);
 			final org.gwtbootstrap3.client.ui.Anchor collapseAnchor = new org.gwtbootstrap3.client.ui.Anchor();
-			collapseAnchor.addStyleName("no-border-bottom");
 			collapseAnchor.setIcon(IconType.ANGLE_DOWN);
 			collapseAnchor.setPull(Pull.RIGHT);
 			final org.gwtbootstrap3.client.ui.Anchor expandAnchor = new org.gwtbootstrap3.client.ui.Anchor();
-			expandAnchor.addStyleName("no-border-bottom");
 			expandAnchor.setIcon(IconType.ANGLE_RIGHT);
 			expandAnchor.setPull(Pull.RIGHT);
 
