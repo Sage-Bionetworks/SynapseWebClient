@@ -26,7 +26,7 @@
 		<org.json.version>20090211</org.json.version>
 		<jackson.version>2.9.10</jackson.version>
 		<jackson.databind.version>2.9.10.7</jackson.databind.version>
-		<log4j.version>2.8.2</log4j.version>
+		<log4j.version>2.14.0</log4j.version>
 		<markdown.version>2016-01-22-a2731f7-19</markdown.version>
 		<gwtbootstrap3.version>1.5.10</gwtbootstrap3.version>
 		<gwtbootstrap3.extras.version>1.5.2</gwtbootstrap3.extras.version>
