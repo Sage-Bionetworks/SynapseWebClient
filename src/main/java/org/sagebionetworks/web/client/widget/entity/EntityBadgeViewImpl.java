@@ -146,8 +146,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		entityAnchor = new Anchor();
 		clickHandlerRegistration = entityAnchor.addClickHandler(STANDARD_CLICKHANDLER);
 		entityAnchor.setText(entityHeader.getName());
-		entityAnchor.setWidth("100%");
-		entityAnchor.addStyleName("text-align-left text-overflow-ellipsis inline-block whitespace-nowrap overflowHidden");
+		entityAnchor.addStyleName("text-align-left text-overflow-ellipsis inline-block whitespace-nowrap overflowHidden maxWidth100");
 		entityAnchor.setHref("#!Synapse:" + entityHeader.getId());
 		entityAnchor.getElement().setAttribute(ENTITY_ID_ATTRIBUTE, entityHeader.getId());
 		entityAnchor.setPaddingLeft(0);
@@ -161,7 +160,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 			modifiedByBadge.configure(entityHeader.getModifiedBy());
 			if (!modifiedByBadge.asWidget().equals(modifiedByField.getWidget())) {
 				modifiedByField.clear();
-				modifiedByField.add(modifiedByBadge);	
+				modifiedByField.add(modifiedByBadge);
 			}
 		}
 		if (entityHeader.getModifiedOn() != null) {

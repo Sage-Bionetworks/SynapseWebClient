@@ -32,11 +32,11 @@ $synapse-gray-med: #dcdcdc;
 .colored { color:$synapse-blue;}
 .link, details > summary { color:$synapse-blue;}
 .link, .link:visited, .link:hover {  color:$synapse-blue; }
-.link:hover { text-decoration: underline; cursor:pointer;}
+.link:hover { cursor:pointer;}
 a {color:$synapse-blue;text-decoration:none;}
-a:visited{color:$synapse-blue; text-decoration:none;}
-a:hover{color:$synapse-blue; text-decoration:underline;}
-a:focus{color:$synapse-blue; text-decoration:underline;}
+a:visited{color:$synapse-blue;}
+a:hover{color:$synapse-blue;}
+a:focus{color:$synapse-blue;}
 #body a.disabled, .checkbox.disabled, .radio.disabled {
 	color: #AAAAAA;
 	pointer-events: none;
@@ -132,23 +132,28 @@ end sticky footer
 		padding: 15px 0 30px 0;
 	}
 	.nav-tabs {
-		border-bottom: 4px solid #DCDCDC;
+		border-bottom: none;
+		box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.05);
 		>li	{
-			margin-bottom: -4px;
+			margin-bottom: 0px;
 		}
 	}
 	.nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
 		border: none;
 	}	
 	.nav-tabs > li > a {
-		text-transform: uppercase;
 		box-shadow: none;
+		border-bottom: none;
+	}
+	.nav > li > a {
+		padding: 25px 15px 18px 15px;
 	}
 	.nav-tabs > li.active > a, #rootPanel .nav-tabs > li > a:hover {
-		box-shadow: inset 0 -3px 0 #1e7098;
+		box-shadow: inset 0 -4px 0 $synapse-green;
 		background-color: unset;
 		border: none;
-		padding-top: 24px; //increase padding on top to account push down (now that border is none)
+		padding-top: 26px;
+		padding-bottom: 18px;
 	}
 	@media (min-width: 768px) {
 		.lead {
@@ -1757,6 +1762,7 @@ ol.lowerroman {
 	details[open] {
 		position: relative;
 		padding-bottom: 25px;
+		color: $synapse-blue;
 		summary {
 			position: absolute;
 			bottom: 0px;
@@ -2051,7 +2057,10 @@ ol.lowerroman {
 }
 
 .entity-tab, .finder-tab {
-	font-size: 16px;	
+	font-size: 16px;
+	font-weight: 700;
+	color:#22252A;
+	letter-spacing: 1px;
 }
 
 @media (max-width: 991px) {
@@ -2090,7 +2099,7 @@ ol.lowerroman {
 }
 #body .entity-tab > a, #body .finder-tab > a {
 	text-align: center;
-	padding: 23px 15px;
+	padding: 25px 15px 18px 15px;
 	&:focus, &:hover {
 		background-color: unset;
 	}
@@ -2379,6 +2388,7 @@ div.input-group > input.search-textbox {
 			text-decoration:none;
 			background-color: transparent;
 			border-right: 0px;
+			font-weight: bolder;
 		}
 
 		li {
@@ -3053,7 +3063,7 @@ div.border {
 }
 #body {
 	summary { color:$synapse-blue; }
-	summary:hover { text-decoration: underline; cursor:pointer; }
+	summary:hover { cursor:pointer; }
 	.input-group-addon, .input-group-btn {
 		vertical-align: top;
 	}

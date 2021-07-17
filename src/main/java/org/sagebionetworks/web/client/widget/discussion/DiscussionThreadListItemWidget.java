@@ -26,7 +26,6 @@ public class DiscussionThreadListItemWidget implements DiscussionThreadListItemW
 		this.view = view;
 		this.dateTimeUtils = dateTimeUtils;
 		this.authorWidget = authorWidget;
-
 		view.setPresenter(this);
 		view.setThreadAuthor(authorWidget.asWidget());
 	}

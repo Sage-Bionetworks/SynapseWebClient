@@ -61,7 +61,9 @@
 					<b:Column size="SM_6">
 						<b:FormGroup ui:field="linkFormGroup">
 							<b:FormLabel for="link">Website</b:FormLabel>
-							<b:Anchor ui:field="linkRenderer" target="_blank" addStyleNames="displayBlock"></b:Anchor>
+							<bh:Div>
+								<b:Anchor ui:field="linkRenderer" target="_blank"></b:Anchor>
+							</bh:Div>
 							<b:TextBox name="link" ui:field="link" />
 							<b:HelpBlock ui:field="linkHelpBlock" />
 						</b:FormGroup>
@@ -101,10 +103,12 @@
 					<b:Column size="SM_6">
 						<b:FormGroup>
 							<b:FormLabel for="orcId">ORCID</b:FormLabel>
-							<b:Anchor addStyleNames="displayBlock" ui:field="orcIdLink" target="_blank"></b:Anchor>
+							<bh:Div>
+								<b:Anchor ui:field="orcIdLink" target="_blank"></b:Anchor>
+							</bh:Div>
 						</b:FormGroup>
 					</b:Column>
-					<b:Column size="SM_6">						
+					<b:Column size="SM_6">
 					</b:Column>
 				</b:Row>
 				
