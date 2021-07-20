@@ -9,93 +9,17 @@
 	xmlns:tr="urn:import:org.sagebionetworks.web.client.widget.table.v2.results">
 
 	<g:HTMLPanel>
-		<div class="margin-top-10-imp"></div>
 		<g:HTMLPanel>
-			<div class="margin-10">
-				<div class="margin-top-5">
+			<div>
+				<div>
+					<bh:Div addStyleNames="topBanner">
+						<b:Heading ui:field="areaTitle" size="H2" text="TODO"/>
+					</bh:Div>
 					<div ui:field="dashboardUI" class="inline-block" style="width:100%;">
 						<b:Alert ui:field="loginAlert" type="INFO" visible="false"
 							addStyleNames="fullWidthAlert">
 							<bh:Strong text="Please login to access this resource." />
 						</b:Alert>
-						<div>
-							<h3 class="margin-left-30" ui:field="myDashboardHeading" style="display: none;">My Dashboard</h3>
-							<div ui:field="navtabContainer">
-								<ul
-									class="nav nav-tabs entity-tabs margin-top-15">
-									<li class="entity-tab active"
-										ui:field="profileListItem">
-										<a class="text-align-center link no-background">
-											<w:ClickableDiv ui:field="profileTabItemDiv"
-												addStyleNames="displayInline">
-												<b:Anchor ui:field="profileLink"
-													addStyleNames="textDecorationNone">Profile</b:Anchor>
-											</w:ClickableDiv>
-										</a>
-									</li>
-									<li class="entity-tab active" ui:field="projectsListItem">
-										<a class="text-align-center link no-background">
-											<w:ClickableDiv ui:field="projectsTabItemDiv"
-												addStyleNames="displayInline">
-												<b:Anchor ui:field="projectsLink"
-													addStyleNames="textDecorationNone">Projects</b:Anchor>
-											</w:ClickableDiv>
-											<w:HelpWidget
-												helpMarkdown="This tab shows you the Projects you have created, those that have been shared with you and your favorites.&#10;Start creating a project by giving it a name."
-												href="https://help.synapse.org/docs/Projects.2048327716.html"
-												placement="BOTTOM" />
-										</a>
-									</li>
-									<li class="entity-tab" ui:field="challengesListItem">
-										<a class="text-align-center link no-background">
-											<w:ClickableDiv
-												ui:field="challengesTabItemDiv"
-												addStyleNames="displayInline">
-												<b:Anchor ui:field="challengesLink"
-													addStyleNames="textDecorationNone">Challenges</b:Anchor>
-											</w:ClickableDiv>
-											<w:HelpWidget
-												ui:field="challengeHelpWidget"
-												helpMarkdown=""
-												href="http://sagebionetworks.org/platforms/"
-												placement="BOTTOM" />
-										</a>
-									</li>
-									<li class="entity-tab" ui:field="teamsListItem">
-										<a class="text-align-center link no-background">
-											<w:ClickableDiv ui:field="teamsTabItemDiv"
-												addStyleNames="displayInline">
-												<b:Anchor ui:field="teamsLink"
-													addStyleNames="textDecorationNone">Teams</b:Anchor>
-											</w:ClickableDiv>
-											<bh:Span ui:field="teamNotifications" />
-											<w:HelpWidget
-												helpMarkdown="This tab lists Teams you have created and have been invited to join.&#10;Create a Team by providing a name and clicking “Create Team”."
-												href="https://help.synapse.org/docs/Teams.1985446029.html"
-												placement="BOTTOM" />
-										</a>
-									</li>
-									<li class="entity-tab" ui:field="downloadsListItem">
-										<a class="text-align-center link no-background">
-											<w:ClickableDiv ui:field="downloadsTabItemDiv"
-												addStyleNames="displayInline">
-												<b:Anchor ui:field="downloadsLink"
-													addStyleNames="textDecorationNone">Downloads</b:Anchor>
-											</w:ClickableDiv>
-										</a>
-									</li>
-									<li class="entity-tab" ui:field="settingsListItem">
-										<a class="text-align-center link no-background">
-											<w:ClickableDiv ui:field="settingsTabItemDiv"
-												addStyleNames="displayInline">
-												<b:Anchor ui:field="settingsLink"
-													addStyleNames="textDecorationNone">Settings</b:Anchor>
-											</w:ClickableDiv>
-										</a>
-									</li>
-								</ul>
-							</div>
-						</div>
 						<div class="margin-top-40">
 							<div>
 								<div class="tab-background margin-10"

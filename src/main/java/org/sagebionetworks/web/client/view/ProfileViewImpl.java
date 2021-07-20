@@ -1,9 +1,6 @@
 package org.sagebionetworks.web.client.view;
 
-import static org.sagebionetworks.web.client.DisplayUtils.DO_NOTHING_CLICKHANDLER;
-
 import org.gwtbootstrap3.client.ui.Alert;
-import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ButtonGroup;
@@ -14,7 +11,6 @@ import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -26,16 +22,12 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.presenter.ProjectFilterEnum;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.ClickableDiv;
-import org.sagebionetworks.web.client.widget.HelpWidget;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.table.v2.results.SortableTableHeaderImpl;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 
 import com.google.gwt.dom.client.DivElement;
-import com.google.gwt.dom.client.HeadingElement;
-import com.google.gwt.dom.client.LIElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -47,7 +39,6 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.UIObject;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -61,60 +52,14 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	HTML noChallengesHtml = new HTML();
 	public static final String NO_CHALLENGES_HTML = "<p><a href=\"http://sagebionetworks.org/challenges/\" target=\"_blank\">Challenges</a> are open science, collaborative competitions for evaluating and comparing computational algorithms or solutions to problems.</p>";
 	
-	@UiField
-	HelpWidget challengeHelpWidget;
 	public static final String CHALLENGE_TAB_HELP_TEXT ="&#10;Challenges are open science, collaborative competitions for evaluating and comparing computational algorithms or solutions to problems.";
 	public static final String CHALLENGES_THAT = "This tab shows challenges that ";
 	public static final String IS_REGISTERED_FOR = " is registered for.";
 	
-	////// Tabs
-	@UiField
-	LIElement profileListItem;
-	@UiField
-	ClickableDiv profileTabItemDiv;
-	@UiField
-	Anchor profileLink;
-
-	@UiField
-	ClickableDiv projectsTabItemDiv;
-	@UiField
-	Anchor projectsLink;
-	@UiField
-	LIElement projectsListItem;
-	@UiField
-	ClickableDiv teamsTabItemDiv;
-	@UiField
-	Anchor teamsLink;
-	@UiField
-	LIElement teamsListItem;
-
-	@UiField
-	ClickableDiv downloadsTabItemDiv;
-	@UiField
-	Anchor downloadsLink;
-	@UiField
-	LIElement downloadsListItem;
-
-	@UiField
-	ClickableDiv settingsTabItemDiv;
-	@UiField
-	Anchor settingsLink;
-	@UiField
-	LIElement settingsListItem;
-	@UiField
-	ClickableDiv challengesTabItemDiv;
-	@UiField
-	Anchor challengesLink;
-	@UiField
-	LIElement challengesListItem;
-
 	@UiField
 	Div profileUI;
 	@UiField
 	DivElement dashboardUI;
-
-	@UiField
-	DivElement navtabContainer;
 
 	@UiField
 	DivElement profileTabContainer;
@@ -224,11 +169,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	FlowPanel challengeSynAlertPanel;
 	
-	@UiField
-	HeadingElement myDashboardHeading;
 
-	@UiField
-	Span teamNotifications;
 	@UiField
 	Alert loginAlert;
 	private Presenter presenter;
@@ -247,7 +188,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		this.headerWidget = headerWidget;
 		this.cookies = cookies;
 		headerWidget.configure();
-		initTabs();
 		projectSearchTextBox.getElement().setAttribute("placeholder", "Project name");
 		createProjectButton.addClickHandler(event -> presenter.createProject());
 		projectSearchTextBox.addKeyDownHandler(event -> {
@@ -344,22 +284,14 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 
 	@Override
-	public void setTeamNotificationCount(String count) {
-		teamNotifications.setHTML(DisplayUtils.getBadgeHtml(count));
-	}
-
-	@Override
 	public void setProfile(UserProfile profile, boolean isOwner) {
 		String displayName = DisplayUtils.getDisplayName(profile);
-		UIObject.setVisible(myDashboardHeading, isOwner);
 		if (!isOwner) {
 			setHighlightBoxUser(displayName);
 		}
 		
 		String challengesThatUserIsRegisteredFor = CHALLENGES_THAT + displayName + IS_REGISTERED_FOR;
-		challengeHelpWidget.setHelpMarkdown(challengesThatUserIsRegisteredFor + CHALLENGE_TAB_HELP_TEXT);
 		noChallengesHtml.setHTML("<p>" + challengesThatUserIsRegisteredFor + "</p>" + NO_CHALLENGES_HTML);
-		updateHrefs(profile.getOwnerId());
 	}
 
 	@Override
@@ -371,33 +303,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@Override
 	public void setDownloadListWidget(IsWidget w) {
 		downloadsTabContent.add(w);
-	}
-
-	@Override
-	public void showTabs(boolean isOwner) {
-		DisplayUtils.hide(settingsListItem);
-		DisplayUtils.hide(downloadsListItem);
-		openInvitesContainer.setVisible(isOwner);
-		if (isOwner) {
-			resetHighlightBoxes();
-			DisplayUtils.show(settingsListItem);
-			if (!DisplayUtils.isInTestWebsite(cookies))
-				DisplayUtils.show(downloadsListItem);
-			// show create project and team UI
-			DisplayUtils.show(createProjectUI);
-			DisplayUtils.show(createTeamUI);
-		}
-		// Teams
-		DisplayUtils.show(navtabContainer);
-	}
-
-	private void resetHighlightBoxes() {
-		projectsHeading.setText("");
-		teamsHeading.setText("");
-		challengesHeading.setText("");
-		projectsHeading.setVisible(false);
-		teamsHeading.setVisible(false);
-		challengesHeading.setVisible(false);
 	}
 
 	private void setHighlightBoxUser(String displayName) {
@@ -503,7 +408,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 
 	@Override
 	public void clear() {
-		DisplayUtils.hide(navtabContainer);
 		// init with loading widget
 		projectsTabContent.add(DisplayUtils.getSmallLoadingWidget());
 		challengesTabContent.clear();
@@ -514,18 +418,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		teamSearchTextBox.setValue("");
 		projectSearchTextBox.setValue("");
 
-		// reset tab link text (remove any notifications)
-		clearTeamNotificationCount();
 		projectFiltersUI.setVisible(false);
 		teamFiltersDropDownMenu.clear();
 		projectNameColumnHeader.setSortDirection(null);
 		lastActivityOnColumnHeader.setSortDirection(null);
 		loginAlert.setVisible(false);
-	}
-
-	@Override
-	public void clearTeamNotificationCount() {
-		teamNotifications.setHTML("");
 	}
 
 	private void hideTabContainers() {
@@ -537,7 +434,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		DisplayUtils.hide(downloadsTabContainer);
 		DisplayUtils.hide(settingsTabContainer);
 	}
-
 
 	/**
 	 * Used only for setting the view's tab display
@@ -551,77 +447,23 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		if (targetTab == null)
 			targetTab = Synapse.ProfileArea.PROFILE; // select tab, set default if needed
 		hideTabContainers();
-		removeClass("active", profileListItem, projectsListItem, teamsListItem, downloadsListItem, settingsListItem, challengesListItem);
 
 		if (targetTab == Synapse.ProfileArea.PROFILE) {
-			setTabSelected(profileListItem, profileTabContainer);
+			DisplayUtils.show(profileTabContainer);
 		} else if (targetTab == Synapse.ProfileArea.PROJECTS) {
-			setTabSelected(projectsListItem, projectsTabContainer);
+			DisplayUtils.show(projectsTabContainer);
 		} else if (targetTab == Synapse.ProfileArea.TEAMS) {
-			setTabSelected(teamsListItem, teamsTabContainer);
+			DisplayUtils.show(teamsTabContainer);
 		} else if (targetTab == Synapse.ProfileArea.SETTINGS) {
-			setTabSelected(settingsListItem, settingsTabContainer);
+			DisplayUtils.show(settingsTabContainer);
 		} else if (targetTab == Synapse.ProfileArea.DOWNLOADS) {
-			setTabSelected(downloadsListItem, downloadsTabContainer);
+			DisplayUtils.show(downloadsTabContainer);
 		} else if (targetTab == Synapse.ProfileArea.CHALLENGES) {
-			setTabSelected(challengesListItem, challengesTabContainer);
+			DisplayUtils.show(challengesTabContainer);
 		} else {
 			showErrorMessage("Unrecognized profile tab: " + targetTab.name());
 			return;
 		}
-	}
-
-	private void setTabSelected(LIElement listItem, DivElement container) {
-		// only selects if the list item is visible
-		if (UIObject.isVisible(listItem)) {
-			listItem.addClassName("active");
-			DisplayUtils.show(container);
-		} else {
-			// if tab is not visible, select profile tab
-			profileListItem.addClassName("active");
-			DisplayUtils.show(profileTabContainer);
-		}
-	}
-
-	private void removeClass(String cssClassName, LIElement... elements) {
-		for (LIElement liElement : elements) {
-			liElement.removeClassName(cssClassName);
-		}
-	}
-
-	private void initTabs() {
-		profileTabItemDiv.addClickHandler(getTabClickHandler(Synapse.ProfileArea.PROFILE));
-		projectsTabItemDiv.addClickHandler(getTabClickHandler(Synapse.ProfileArea.PROJECTS));
-		teamsTabItemDiv.addClickHandler(getTabClickHandler(Synapse.ProfileArea.TEAMS));
-		downloadsTabItemDiv.addClickHandler(getTabClickHandler(Synapse.ProfileArea.DOWNLOADS));
-		settingsTabItemDiv.addClickHandler(getTabClickHandler(Synapse.ProfileArea.SETTINGS));
-		challengesTabItemDiv.addClickHandler(getTabClickHandler(Synapse.ProfileArea.CHALLENGES));
-
-		profileLink.addClickHandler(DO_NOTHING_CLICKHANDLER);
-		projectsLink.addClickHandler(DO_NOTHING_CLICKHANDLER);
-		teamsLink.addClickHandler(DO_NOTHING_CLICKHANDLER);
-		downloadsLink.addClickHandler(DO_NOTHING_CLICKHANDLER);
-		settingsLink.addClickHandler(DO_NOTHING_CLICKHANDLER);
-		challengesLink.addClickHandler(DO_NOTHING_CLICKHANDLER);
-	}
-
-	private void updateHrefs(String userId) {
-		String place = "#!Profile:" + userId;
-		profileLink.setHref(place + "/" + Synapse.ProfileArea.PROFILE.toString().toLowerCase());
-		projectsLink.setHref(place + "/" + Synapse.ProfileArea.PROJECTS.toString().toLowerCase());
-		teamsLink.setHref(place + "/" + Synapse.ProfileArea.TEAMS.toString().toLowerCase());
-		downloadsLink.setHref(place + "/" + Synapse.ProfileArea.DOWNLOADS.toString().toLowerCase());
-		settingsLink.setHref(place + "/" + Synapse.ProfileArea.SETTINGS.toString().toLowerCase());
-		challengesLink.setHref(place + "/" + Synapse.ProfileArea.CHALLENGES.toString().toLowerCase());
-	}
-
-	private ClickHandler getTabClickHandler(final Synapse.ProfileArea targetTab) {
-		return new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.tabClicked(targetTab);
-			}
-		};
 	}
 
 	@Override
