@@ -29,10 +29,10 @@
 							iconStyles="lightGreyText font-size-18 displayInlineBlock"
 							addStyleNames="margin-top-15 margin-bottom-10" placement="LEFT" />
 						<b:DropDown ui:field="dashboardDropdown"
-							addStyleNames="imageButton SRC-primary-background-color-hover displayInlineBlock"
+							addStyleNames="imageButton displayInlineBlock"
 							marginTop="15" marginRight="10">
 							<b:Anchor ui:field="toolsMenuLink" dataToggle="DROPDOWN"
-								addStyleNames="textDecorationNone" />
+								addStyleNames="textDecorationNone SRC-primary-background-color-hover" />
 							<b:DropDownMenu
 								addStyleNames="dropdown-menu-right">
 								<b:AnchorListItem icon="PLUS_SQUARE_O"
