@@ -13,7 +13,7 @@
 					<b:Icon ui:field="icon" type="FILE" />
 				</g:FocusPanel>
 			</t:TableData>
-			<t:TableData ui:field="entityTableData">
+			<t:TableData ui:field="entityTableData" paddingTop="6" >
 				<g:FlowPanel ui:field="entityContainer"
 					addStyleNames="displayInline margin-right-5" />
 			</t:TableData>
