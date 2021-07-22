@@ -2989,11 +2989,13 @@ div.border {
 	}
 }
 #body {
-	.dropdown-menu>li>a {
-		color: $synapse-dark-text;
+	.dropdown-menu>li {
+		>a:not(.btn), >span {
+			color: $synapse-dark-text;
+		}
 	}
 
-	.dropdown-menu>li>a:focus, .dropdown-menu>li>a:hover {
+	.dropdown-menu>li>a:focus, .dropdown-menu>li>a:hover, .dropdown.open {
 		background-color: $synapse-blue;
 		color: white;
 	}

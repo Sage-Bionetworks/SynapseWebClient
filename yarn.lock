@@ -1759,6 +1759,21 @@
     estree-walker "^1.0.1"
     picomatch "^2.2.2"
 
+"@sage-bionetworks/rjsf-core@^3.1.3":
+  version "3.1.3"
+  resolved "https://registry.yarnpkg.com/@sage-bionetworks/rjsf-core/-/rjsf-core-3.1.3.tgz#d061656dead7997e7322e0f62ca9588321f9d396"
+  integrity sha512-sNR8HIMJG69jyDVKQkqa6AEMxEUTkxZe8JBt569i315ig3ZXKk6eJTErS+/HhiUEPeohChG4sc/BI6176bfSGg==
+  dependencies:
+    "@types/json-schema" "^7.0.7"
+    ajv "^6.7.0"
+    core-js-pure "^3.6.5"
+    json-schema-merge-allof "^0.6.0"
+    jsonpointer "^4.0.1"
+    lodash "^4.17.15"
+    nanoid "^3.1.23"
+    prop-types "^15.7.2"
+    react-is "^16.9.0"
+
 "@sinonjs/commons@^1.7.0":
   version "1.8.3"
   resolved "https://registry.yarnpkg.com/@sinonjs/commons/-/commons-1.8.3.tgz#3802ddd21a50a949b6721ddd72da36e67e7f1b2d"
@@ -11482,10 +11497,10 @@ symbol-tree@^3.2.4:
   resolved "https://registry.yarnpkg.com/symbol-tree/-/symbol-tree-3.2.4.tgz#430637d248ba77e078883951fb9aa0eed7c63fa2"
   integrity sha512-9QNk5KwDF+Bvz+PyObkmSYjI5ksVUYtjW7AU22r2NKcfLJcXp96hkDWU3+XndOsUb+AQ9QhfzfCT2O+CNWT5Tw==
 
-synapse-react-client@2.0.19:
-  version "2.0.19"
-  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-2.0.19.tgz#38beaf8d0e27d84e30bc4834c2d6daa7d9539a95"
-  integrity sha512-vj6pk589lrvpn6UO5+0agFFbGswY/0WNVOtWcaxp5mEdv5B/p8fsSWdy6fbWNN5qKAR8ZuZmQ/6743Tqh0mSBw==
+synapse-react-client@2.0.20:
+  version "2.0.20"
+  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-2.0.20.tgz#4a5d91e0547047e52343dedf0b3daf209be74c14"
+  integrity sha512-qKnsEn3UqUThP5yIrbSySvnThxPozOvLvSL8yKIRW+UUtzzXtpu67GiEhr4idDlp/nDI1X1ZsMKfdw8B7Z2IfA==
   dependencies:
     "@brainhubeu/react-carousel" "1.19.26"
     "@fortawesome/fontawesome-free" "^5.13.0"
@@ -11496,6 +11511,7 @@ synapse-react-client@2.0.19:
     "@material-ui/core" "^4.11.3"
     "@material-ui/icons" "^4.11.2"
     "@rjsf/core" "^3.0.0"
+    "@sage-bionetworks/rjsf-core" "^3.1.3"
     "@upsetjs/react" "^1.6.2"
     bootstrap "^4.6.0"
     column-resizer "^1.3.5"
