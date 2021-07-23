@@ -28,6 +28,10 @@ $synapse-gray-med: #dcdcdc;
 	box-shadow: $boxshadow;
 }
 
+@mixin synapse-blue-triangles-bg() {
+	background: transparent url("https://s3.amazonaws.com/static.synapse.org/images/SynapseLoginPageBackground.svg") no-repeat;
+	background-size: cover;
+}
 
 .colored { color:$synapse-blue;}
 .link, details > summary { color:$synapse-blue;}
@@ -69,6 +73,17 @@ a:focus{color:$synapse-blue;}
 
 	.black-25-percent {
 		color: rgba(0, 0, 0, 0.25);
+	}
+	.pageHeader {
+		padding: 21px 43px;
+		@include synapse-blue-triangles-bg;
+		h3.pageHeaderTitle {
+			font-size: 24px;
+			font-weight: 700;
+			line-height: 28px;
+			letter-spacing: 0.5px;
+			color: white;
+		}
 	}
 }
 
@@ -2972,6 +2987,7 @@ div.border {
 		background-color: none;
 	}
 	.alert {
+		height: 55px;
 		border-radius: 0px;
 		padding: 7px 15px;
 		font-weight: 500;

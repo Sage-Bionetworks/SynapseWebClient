@@ -10,9 +10,10 @@
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 
 	<g:HTMLPanel>
-		<div class="separator margin-top-3"></div>
-		<div class="margin-top-20 margin-right-20 margin-left-20">
-			<b:Heading size="H3" ui:field="teamNameHeading" />
+		<bh:Div addStyleNames="pageHeader">
+			<b:Heading addStyleNames="pageHeaderTitle" ui:field="teamNameHeading" size="H3"/>
+		</bh:Div>
+		<div class="margin-right-20 margin-left-20">
 			<bh:Div
 				addStyleNames="border-top-6-synapse-blue border-left-1 border-right-1 border-bottom-1 flexcontainer-row"
 				marginTop="35">

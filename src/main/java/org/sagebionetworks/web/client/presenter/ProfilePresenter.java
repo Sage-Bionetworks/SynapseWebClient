@@ -46,6 +46,7 @@ import org.sagebionetworks.web.shared.exceptions.ConflictException;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.gwt.activity.shared.AbstractActivity;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -236,7 +237,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		currentSortColumn = ProjectListSortColumn.LAST_ACTIVITY;
 		currentSortDirection = SortDirection.DESC;
 		isOwner = authenticationController.isLoggedIn() && authenticationController.getCurrentUserPrincipalId().equals(userId);
-		if (currentArea == null) {
+		if (currentArea == null || !isOwner) {
 			currentArea = ProfileArea.PROFILE;
 		}
 		view.clear();
@@ -811,30 +812,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		view.setTabSelected(tab);
 	}
 
-	@Override
-	public void tabClicked(final ProfileArea tab) {
-		if (tab == null) {
-			view.showErrorMessage("The selected tab is undefined.");
-			return;
-		}
-		// if we are editing, then pop up a confirm
-		if (globalApplicationState.isEditing()) {
-			Callback yesCallback = new Callback() {
-				@Override
-				public void invoke() {
-					globalApplicationState.setIsEditing(false);
-					getUserProfileEditorWidget().setIsEditingMode(false);
-					boolean pushState = true;
-					showTab(tab, pushState);
-				}
-			};
-			view.showConfirmDialog("", DisplayConstants.NAVIGATE_AWAY_CONFIRMATION_MESSAGE, yesCallback);
-		} else {
-			boolean pushState = true;
-			showTab(tab, pushState);
-		}
-	}
-
 	private void refreshData(ProfileArea tab) {
 		switch (tab) {
 			case PROFILE:
@@ -878,15 +855,18 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 
 	public void initUserFavorites(final Callback callback) {
+		GWT.debugger();
 		jsClient.getFavorites(new AsyncCallback<List<EntityHeader>>() {
 			@Override
 			public void onSuccess(List<EntityHeader> favorites) {
+				GWT.debugger();
 				globalApplicationState.setFavorites(favorites);
 				callback.invoke();
 			}
 
 			@Override
 			public void onFailure(Throwable caught) {
+				GWT.debugger();
 				callback.invoke();
 			}
 		});

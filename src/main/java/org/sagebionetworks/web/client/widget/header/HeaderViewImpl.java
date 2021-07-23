@@ -14,6 +14,7 @@ import org.sagebionetworks.web.client.jsinterop.ReactDOM;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.place.Home;
+import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.widget.FullWidthAlert;
 
 import com.google.gwt.core.client.GWT;
@@ -52,7 +53,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	String portalHref = "";
 	SynapseContextPropsProvider propsProvider;
 	GlobalApplicationState globalAppState;
-
+	
 	@Inject
 	public HeaderViewImpl(Binder binder, SynapseContextPropsProvider propsProvider, GlobalApplicationState globalAppState) {
 		this.initWidget(binder.createAndBindUi(this));
@@ -92,18 +93,21 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		refresh();
 	}
 
+	private void detachNavBar() {
+		synapseNavDrawerContainer.removeFromParent();
+		Document.get().getBody().removeClassName("SynapseNavDrawerIsShowing");
+	}
+	private void attachNavBar() {
+		header.add(synapseNavDrawerContainer);
+		Document.get().getBody().addClassName("SynapseNavDrawerIsShowing");
+	}
+	
 	@Override
 	public void refresh() {
-		// detach nav drawer if we're on the Home page
-		if (globalAppState.getCurrentPlace() == null || globalAppState.getCurrentPlace() instanceof Home) {
-			synapseNavDrawerContainer.removeFromParent();
-			Document.get().getBody().removeClassName("SynapseNavDrawerIsShowing");
-		} else {
-			//otherwise attach it (if not already attached)
-			if (!synapseNavDrawerContainer.isAttached()) {
-				header.add(synapseNavDrawerContainer);
-				Document.get().getBody().addClassName("SynapseNavDrawerIsShowing");
-			}
+		detachNavBar();
+		if (globalAppState.getCurrentPlace() != null && 
+			!(globalAppState.getCurrentPlace() instanceof Home || globalAppState.getCurrentPlace() instanceof LoginPlace)) {
+			attachNavBar();
 		}
 	}
 

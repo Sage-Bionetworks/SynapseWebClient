@@ -80,8 +80,6 @@ public interface ProfileView extends IsWidget, SynapseView {
 
 		void refreshTeams();
 
-		void tabClicked(ProfileArea areaTab);
-
 		void getMoreChallenges();
 
 		void applyFilterClicked(ProjectFilterEnum filterType, Team team);

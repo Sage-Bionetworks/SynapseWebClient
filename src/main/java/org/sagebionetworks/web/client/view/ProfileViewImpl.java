@@ -19,6 +19,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.presenter.ProjectFilterEnum;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -73,7 +74,12 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	DivElement downloadsTabContainer;
 	@UiField
 	DivElement settingsTabContainer;
+	@UiField
+	DivElement favoritesTabContainer;
 
+	@UiField
+	Heading pageHeaderTitle;
+	
 	// Project tab
 	// filters
 	@UiField
@@ -100,15 +106,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	DivElement createProjectUI;
 	@UiField
 	FlowPanel projectsTabContent;
-
-	// Headings
-	@UiField
-	Heading projectsHeading;
-	@UiField
-	Heading teamsHeading;
-	@UiField
-	Heading challengesHeading;
-
 
 	// Project tab
 	@UiField
@@ -142,6 +139,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	Div downloadsTabContent;
 
+	// Favorites
+	@UiField
+	Div favoritesTabContent;
+
 	// Settings
 	@UiField
 	FlowPanel settingsTabContent;
@@ -169,7 +170,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	FlowPanel challengeSynAlertPanel;
 	
-
+	String profileHeaderText = "";
+	Synapse.ProfileArea currentTab;;
 	@UiField
 	Alert loginAlert;
 	private Presenter presenter;
@@ -286,9 +288,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@Override
 	public void setProfile(UserProfile profile, boolean isOwner) {
 		String displayName = DisplayUtils.getDisplayName(profile);
-		if (!isOwner) {
-			setHighlightBoxUser(displayName);
-		}
+		profileHeaderText = isOwner ? "Your Profile" : displayName + "'s Profile";
+		
+		if (currentTab == ProfileArea.PROFILE)
+			pageHeaderTitle.setText(profileHeaderText);
 		
 		String challengesThatUserIsRegisteredFor = CHALLENGES_THAT + displayName + IS_REGISTERED_FOR;
 		noChallengesHtml.setHTML("<p>" + challengesThatUserIsRegisteredFor + "</p>" + NO_CHALLENGES_HTML);
@@ -303,15 +306,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@Override
 	public void setDownloadListWidget(IsWidget w) {
 		downloadsTabContent.add(w);
-	}
-
-	private void setHighlightBoxUser(String displayName) {
-		projectsHeading.setText(displayName + "'s Projects");
-		teamsHeading.setText(displayName + "'s Teams");
-		challengesHeading.setText(displayName + "'s Challenges");
-		projectsHeading.setVisible(true);
-		teamsHeading.setVisible(true);
-		challengesHeading.setVisible(true);
 	}
 
 	@Override
@@ -433,6 +427,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		DisplayUtils.hide(teamsTabContainer);
 		DisplayUtils.hide(downloadsTabContainer);
 		DisplayUtils.hide(settingsTabContainer);
+		DisplayUtils.hide(favoritesTabContainer);
 	}
 
 	/**
@@ -447,19 +442,29 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		if (targetTab == null)
 			targetTab = Synapse.ProfileArea.PROFILE; // select tab, set default if needed
 		hideTabContainers();
+		this.currentTab = targetTab;
 
 		if (targetTab == Synapse.ProfileArea.PROFILE) {
+			pageHeaderTitle.setText(profileHeaderText);
 			DisplayUtils.show(profileTabContainer);
 		} else if (targetTab == Synapse.ProfileArea.PROJECTS) {
+			pageHeaderTitle.setText("Your Projects");
 			DisplayUtils.show(projectsTabContainer);
 		} else if (targetTab == Synapse.ProfileArea.TEAMS) {
+			pageHeaderTitle.setText("Your Teams");
 			DisplayUtils.show(teamsTabContainer);
 		} else if (targetTab == Synapse.ProfileArea.SETTINGS) {
+			pageHeaderTitle.setText("Account Settings");
 			DisplayUtils.show(settingsTabContainer);
 		} else if (targetTab == Synapse.ProfileArea.DOWNLOADS) {
+			pageHeaderTitle.setText("Your Downloads");
 			DisplayUtils.show(downloadsTabContainer);
 		} else if (targetTab == Synapse.ProfileArea.CHALLENGES) {
+			pageHeaderTitle.setText("Your Challenges");
 			DisplayUtils.show(challengesTabContainer);
+		} else if (targetTab == Synapse.ProfileArea.FAVORITES) {
+			pageHeaderTitle.setText("Your Favorites");
+			DisplayUtils.show(favoritesTabContainer);
 		} else {
 			showErrorMessage("Unrecognized profile tab: " + targetTab.name());
 			return;
