@@ -215,7 +215,10 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	public Place getCurrentPlace() {
 		// get the current place based on the current browser window history token
 		String token = gwt.getCurrentHistoryToken();
-		return appPlaceHistoryMapper.getPlace(token);
+		if (appPlaceHistoryMapper != null) {
+			return appPlaceHistoryMapper.getPlace(token);	
+		}
+		return null;
 	}
 
 	@Override

@@ -72,6 +72,10 @@ a:focus{color:$synapse-blue;}
 	}
 }
 
+.SynapseNavDrawerIsShowing {
+	padding-left: 53px;
+}
+
 .pagination>li>a, .pagination>li>span {
 	color: $synapse-blue;
 }
