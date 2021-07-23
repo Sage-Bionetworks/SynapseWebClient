@@ -64,8 +64,7 @@ public class AnnotationsRendererWidgetTest {
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
 		when(mockPortalGinInjector.getEditAnnotationsDialog()).thenReturn(mockEditAnnotationsDialog);
-		when(mockPortalGinInjector.getAnnotationEditorV2()).thenReturn(mockAnnotationEditorV2);
-		widget = new AnnotationsRendererWidget(mockView, mockPreflightController, mockPortalGinInjector, mockCookieProvider);
+		widget = new AnnotationsRendererWidget(mockView, mockPreflightController, mockPortalGinInjector, mockCookieProvider, mockAnnotationEditorV2);
 		annotationMap = new HashMap<String, AnnotationsValue>();
 		AnnotationsValue value = new AnnotationsValue();
 		value.setValue(Collections.EMPTY_LIST);
@@ -152,7 +151,7 @@ public class AnnotationsRendererWidgetTest {
 
 		ArgumentCaptor<String> entityIdCaptor = ArgumentCaptor.forClass(String.class);
 
-		verify(mockView).addEditorToPage(any(Widget.class));
+		verify(mockView, never()).addEditorToPage(any(Widget.class));
 		verify(mockAnnotationEditorV2).configure(entityIdCaptor.capture());
 
 		assertEquals(entityIdCaptor.getValue(), mockBundle.getEntity().getId());

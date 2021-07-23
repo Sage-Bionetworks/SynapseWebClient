@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -33,21 +34,14 @@ public class AnnotationsRendererWidget implements AnnotationsRendererWidgetView.
 	 * @param propertyView
 	 */
 	@Inject
-	public AnnotationsRendererWidget(AnnotationsRendererWidgetView propertyView, PreflightController preflightController, PortalGinInjector ginInjector, CookieProvider cookies) {
+	public AnnotationsRendererWidget(AnnotationsRendererWidgetView propertyView, PreflightController preflightController, PortalGinInjector ginInjector, CookieProvider cookies, AnnotationEditorV2 annotationEditorV2) {
 		super();
 		this.view = propertyView;
 		this.ginInjector = ginInjector;
 		this.preflightController = preflightController;
 		this.view.setPresenter(this);
 		this.cookies = cookies;
-	}
-
-	public AnnotationEditorV2 getAnnotationEditorV2() {
-		if (editorDialogV2 == null) {
-			editorDialogV2 = ginInjector.getAnnotationEditorV2();
-			view.addEditorToPage(editorDialogV2.asWidget());
-		}
-		return editorDialogV2;
+		this.editorDialogV2 = annotationEditorV2;
 	}
 
 	public EditAnnotationsDialog getEditAnnotationsDialog() {
@@ -83,7 +77,7 @@ public class AnnotationsRendererWidget implements AnnotationsRendererWidgetView.
 	public void onEdit() {
 		preflightController.checkUploadToEntity(bundle, () -> {
 			if (DisplayUtils.isInTestWebsite(cookies)) {
-				getAnnotationEditorV2().configure(bundle.getEntity().getId());
+				editorDialogV2.configure(bundle.getEntity().getId());
 			} else {
 				getEditAnnotationsDialog().configure(bundle);
 

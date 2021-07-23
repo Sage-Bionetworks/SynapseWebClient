@@ -44,6 +44,8 @@ public class AnnotationEditorV2ViewImpl implements AnnotationEditorV2View {
 
 	@Override
 	public void configure(String entityId) {
+		reactComponentDiv.clear();
+
 		SchemaDrivenAnnotationEditorProps props =
 				SchemaDrivenAnnotationEditorProps.create(
 						entityId,
