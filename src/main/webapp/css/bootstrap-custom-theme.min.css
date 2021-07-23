@@ -1816,14 +1816,6 @@ input[type="date"] {
 .form-group {
   margin-bottom: 15px;
 }
-.checkbox,
-.radio {
-  display: block;
-  min-height: 21px;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  padding-left: 20px;
-}
 .checkbox label,
 .radio label {
   display: inline;
