@@ -85,19 +85,22 @@ a:focus{color:$synapse-blue;}
 	#rootPanel .pageHeader {
 		padding: 21px 43px;
 		@include synapse-blue-triangles-bg;
-		
-		.projectMetadata .projectTitle {
-			> *, .syn-star-o, .syn-question-circle, .entityIcon {
-				color: white;
+		h3.pageHeaderTitle {
+			color: white;
+		}
+		.projectMetadata {
+			.projectTitle {
+				> *, .syn-star-o, .syn-question-circle, .entityIcon, a:not(.btn) {
+					color: white;
+				}
 			}
-			button {
+			button.toolsMenuButton {
 				background-color: transparent;
 				color: white;
 				&:hover {
 					border-color: white;
 				}
 			}
-			//todo: target anchors, indicate that they should inherit?
 		}
 	}
 }

@@ -28,7 +28,7 @@
 			</b:DropDownMenu>
 		</b:DropDown>
 		<b:DropDown ui:field="dropdown" addStyleNames="displayInlineBlock">
-			<b:Button icon="GEARS" ui:field="toolsMenu" dataToggle="DROPDOWN">Tools</b:Button>
+			<b:Button icon="GEARS" ui:field="toolsMenu" addStyleNames="toolsMenuButton" dataToggle="DROPDOWN">Tools</b:Button>
 			<b:DropDownMenu ui:field="toolsDropDown"
 				addStyleNames="dropdown-menu-right">
 				<b:DropDownHeader ui:field="noActionsAvailable" addStyleNames="font-italic">No actions available</b:DropDownHeader>
