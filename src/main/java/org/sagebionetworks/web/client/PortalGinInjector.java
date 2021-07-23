@@ -108,6 +108,7 @@ import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal;
 import org.sagebionetworks.web.client.widget.entity.act.RejectReasonWidget;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeItem;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationEditor;
+import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationEditorV2;
 import org.sagebionetworks.web.client.widget.entity.annotation.EditAnnotationsDialog;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
@@ -790,6 +791,8 @@ public interface PortalGinInjector extends Ginjector {
 	RequestBuilderWrapper getRequestBuilder();
 
 	EditAnnotationsDialog getEditAnnotationsDialog();
+
+	AnnotationEditorV2 getAnnotationEditorV2();
 
 	CreateTableViewWizard getCreateTableViewWizard();
 
