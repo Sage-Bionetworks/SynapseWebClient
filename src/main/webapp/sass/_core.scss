@@ -74,15 +74,30 @@ a:focus{color:$synapse-blue;}
 	.black-25-percent {
 		color: rgba(0, 0, 0, 0.25);
 	}
-	.pageHeader {
+	
+	h3.pageHeaderTitle {
+		font-size: 24px;
+		font-weight: 700;
+		line-height: 28px;
+		letter-spacing: 0.5px;
+	}
+
+	#rootPanel .pageHeader {
 		padding: 21px 43px;
 		@include synapse-blue-triangles-bg;
-		h3.pageHeaderTitle {
-			font-size: 24px;
-			font-weight: 700;
-			line-height: 28px;
-			letter-spacing: 0.5px;
-			color: white;
+		
+		.projectMetadata .projectTitle {
+			> *, .syn-star-o, .syn-question-circle, .entityIcon {
+				color: white;
+			}
+			button {
+				background-color: transparent;
+				color: white;
+				&:hover {
+					border-color: white;
+				}
+			}
+			//todo: target anchors, indicate that they should inherit?
 		}
 	}
 }
@@ -596,8 +611,8 @@ end sticky footer
 	@include border-radius(3px);
 }
 
-div.favoriteIcon i, button.favoriteIcon>i, i.favoriteIcon, a.favoriteIcon, a.favoriteIcon:visited, a.favoriteIcon:hover, a.favoriteIcon:focus {
-	color:#62ac62;
+#rootPanel .favoriteIcon .syn-star {
+	color: #F1D07E;
 }
 
 .hitdescription {

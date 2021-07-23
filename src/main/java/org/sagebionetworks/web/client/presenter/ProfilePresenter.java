@@ -46,7 +46,6 @@ import org.sagebionetworks.web.shared.exceptions.ConflictException;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.gwt.activity.shared.AbstractActivity;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -855,18 +854,15 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 
 	public void initUserFavorites(final Callback callback) {
-		GWT.debugger();
 		jsClient.getFavorites(new AsyncCallback<List<EntityHeader>>() {
 			@Override
 			public void onSuccess(List<EntityHeader> favorites) {
-				GWT.debugger();
 				globalApplicationState.setFavorites(favorites);
 				callback.invoke();
 			}
 
 			@Override
 			public void onFailure(Throwable caught) {
-				GWT.debugger();
 				callback.invoke();
 			}
 		});

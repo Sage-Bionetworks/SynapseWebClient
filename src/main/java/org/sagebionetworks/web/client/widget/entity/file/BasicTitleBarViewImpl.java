@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
+import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
@@ -16,7 +17,7 @@ import com.google.inject.Inject;
 public class BasicTitleBarViewImpl implements BasicTitleBarView {
 
 	@UiField
-	Span fileName;
+	Heading fileName;
 	@UiField
 	SimplePanel favoritePanel;
 	@UiField
