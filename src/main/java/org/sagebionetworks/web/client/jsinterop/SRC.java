@@ -15,6 +15,7 @@ public class SRC {
 		public static ReactFunctionComponent<ShowDownloadV2Props> ShowDownloadV2;
 		public static ReactFunctionComponent<DownloadConfirmationProps> DownloadConfirmation;
 		public static ReactFunctionComponent<FullWidthAlertProps> FullWidthAlert;
+		public static ReactFunctionComponent<SchemaDrivenAnnotationEditorProps> SchemaDrivenAnnotationEditor;
 		public static ReactFunctionComponent<EmptyProps> SynapseNavDrawer;
 	}
 
