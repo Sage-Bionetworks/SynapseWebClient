@@ -104,9 +104,9 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	
 	@Override
 	public void refresh() {
-		detachNavBar();
-		if (globalAppState.getCurrentPlace() != null && 
-			!(globalAppState.getCurrentPlace() instanceof Home || globalAppState.getCurrentPlace() instanceof LoginPlace)) {
+		if (globalAppState.getCurrentPlace() == null || globalAppState.getCurrentPlace() instanceof Home || globalAppState.getCurrentPlace() instanceof LoginPlace) {
+			detachNavBar();
+		} else {
 			attachNavBar();
 		}
 	}

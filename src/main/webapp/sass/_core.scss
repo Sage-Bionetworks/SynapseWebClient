@@ -88,6 +88,9 @@ a:focus{color:$synapse-blue;}
 		h3.pageHeaderTitle {
 			color: white;
 		}
+		.description {
+			color: white;
+		}
 		.projectMetadata {
 			.projectTitle {
 				> *, .syn-star-o, .syn-question-circle, .entityIcon, a:not(.btn) {
@@ -101,6 +104,12 @@ a:focus{color:$synapse-blue;}
 					border-color: white;
 				}
 			}
+		}
+	}
+	#rootPanel .DownloadCartPage {
+		padding: 0px;
+		.clearDownloadListLink {
+			color: white;
 		}
 	}
 }
