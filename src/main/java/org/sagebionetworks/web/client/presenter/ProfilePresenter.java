@@ -608,10 +608,13 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 						List<String> lastModifiedBy = new ArrayList<String>(result.size());
 						for (EntityHeader header : result) {
 							lastModifiedBy.add(header.getId());
-							ProjectHeader projectHeader = new ProjectHeader();
-							projectHeader.setId(header.getId());
-							projectHeader.setName(header.getName());
-							headers.add(projectHeader);
+							// only show projects
+							if (Project.class.getName().equals(header.getType())) {
+								ProjectHeader projectHeader = new ProjectHeader();
+								projectHeader.setId(header.getId());
+								projectHeader.setName(header.getName());
+								headers.add(projectHeader);	
+							}
 						}
 						addProjectResults(headers);
 						loadMoreProjectsWidgetContainer.setIsMore(false);
