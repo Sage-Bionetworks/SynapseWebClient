@@ -16,7 +16,13 @@ import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.jsinterop.EmptyProps;
+import org.sagebionetworks.web.client.jsinterop.React;
+import org.sagebionetworks.web.client.jsinterop.ReactDOM;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
+import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
@@ -184,11 +190,13 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	AnchorListItem loadingTeamsListItem = new AnchorListItem("Loading...");
 
 	CookieProvider cookies;
+	SynapseContextPropsProvider propsProvider;
 	@Inject
-	public ProfileViewImpl(ProfileViewImplUiBinder binder, Header headerWidget, CookieProvider cookies) {
+	public ProfileViewImpl(ProfileViewImplUiBinder binder, Header headerWidget, CookieProvider cookies, SynapseContextPropsProvider propsProvider) {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.cookies = cookies;
+		this.propsProvider = propsProvider;
 		headerWidget.configure();
 		projectSearchTextBox.getElement().setAttribute("placeholder", "Project name");
 		createProjectButton.addClickHandler(event -> presenter.createProject());
@@ -464,6 +472,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			DisplayUtils.show(challengesTabContainer);
 		} else if (targetTab == Synapse.ProfileArea.FAVORITES) {
 			pageHeaderTitle.setText("Your Favorites");
+			
+			EmptyProps props = EmptyProps.create();
+			ReactElement component = React.createElementWithSynapseContext(SRC.SynapseComponents.FavoritesPage, props, propsProvider.getJsInteropContextProps());
+			ReactDOM.render(component, favoritesTabContainer);
+			
 			DisplayUtils.show(favoritesTabContainer);
 		} else {
 			showErrorMessage("Unrecognized profile tab: " + targetTab.name());

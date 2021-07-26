@@ -17,6 +17,7 @@ public class SRC {
 		public static ReactFunctionComponent<FullWidthAlertProps> FullWidthAlert;
 		public static ReactFunctionComponent<SchemaDrivenAnnotationEditorProps> SchemaDrivenAnnotationEditor;
 		public static ReactFunctionComponent<EmptyProps> SynapseNavDrawer;
+		public static ReactFunctionComponent<EmptyProps> FavoritesPage;
 	}
 
 	@JsType(isNative = true)
