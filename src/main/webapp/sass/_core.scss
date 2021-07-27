@@ -82,6 +82,9 @@ a:focus{color:$synapse-blue;}
 		letter-spacing: 0.5px;
 	}
 
+	#rootPanel .pageContent {
+		padding: 0px 43px;
+	}
 	#rootPanel .pageHeader {
 		padding: 21px 43px;
 		@include synapse-blue-triangles-bg;
@@ -948,6 +951,16 @@ end sticky footer
 
 .tab-background {
 	min-height: 200px;
+}
+
+#body .ProfileViewImpl {
+	.tab-background {
+		padding: .21px 43px;
+	}
+}
+
+#body .DownloadCartPage .nav-tabs {
+	box-shadow: none;
 }
 
 .file-preview {

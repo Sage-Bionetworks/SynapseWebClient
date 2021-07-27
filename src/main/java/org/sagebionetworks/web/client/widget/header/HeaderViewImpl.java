@@ -8,13 +8,14 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
-import org.sagebionetworks.web.client.jsinterop.EmptyProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactDOM;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
+import org.sagebionetworks.web.client.jsinterop.SynapseNavDrawerProps;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.FullWidthAlert;
 
 import com.google.gwt.core.client.GWT;
@@ -53,12 +54,14 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	String portalHref = "";
 	SynapseContextPropsProvider propsProvider;
 	GlobalApplicationState globalAppState;
+	AuthenticationController authController;
 	
 	@Inject
-	public HeaderViewImpl(Binder binder, SynapseContextPropsProvider propsProvider, GlobalApplicationState globalAppState) {
+	public HeaderViewImpl(Binder binder, SynapseContextPropsProvider propsProvider, GlobalApplicationState globalAppState, AuthenticationController authController) {
 		this.initWidget(binder.createAndBindUi(this));
 		this.propsProvider = propsProvider;
 		this.globalAppState = globalAppState;
+		this.authController = authController;
 		cookieNotificationAlert.addPrimaryCTAClickHandler(event -> {
 			presenter.onCookieNotificationDismissed();
 		});
@@ -67,7 +70,9 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		clear();
 		synapseNavDrawerContainer.addAttachHandler(event -> {
 			if (event.isAttached()) {
-				EmptyProps props = EmptyProps.create();
+				SynapseNavDrawerProps props = SynapseNavDrawerProps.create(() -> {
+					authController.logoutUser();
+				});
 				ReactElement component = React.createElementWithSynapseContext(SRC.SynapseComponents.SynapseNavDrawer, props, propsProvider.getJsInteropContextProps());
 				ReactDOM.render(component, synapseNavDrawerContainer.getElement());
 			}
