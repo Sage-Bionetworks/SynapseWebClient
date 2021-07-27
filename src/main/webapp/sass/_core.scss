@@ -33,6 +33,16 @@ $synapse-gray-med: #dcdcdc;
 	background-size: cover;
 }
 
+@mixin transparent-button() {
+	background-color: transparent;
+	color: white;
+	border-color: white;
+	&:hover {
+	  border-color: white;
+	}
+  }
+  
+
 .colored { color:$synapse-blue;}
 .link, details > summary { color:$synapse-blue;}
 .link, .link:visited, .link:hover {  color:$synapse-blue; }
@@ -87,6 +97,7 @@ a:focus{color:$synapse-blue;}
 	}
 	#rootPanel .pageHeader {
 		padding: 21px 43px;
+		min-height: 93px;
 		@include synapse-blue-triangles-bg;
 		h3.pageHeaderTitle {
 			color: white;
@@ -100,15 +111,17 @@ a:focus{color:$synapse-blue;}
 					color: white;
 				}
 			}
-			button.toolsMenuButton {
-				background-color: transparent;
-				color: white;
-				&:hover {
-					border-color: white;
-				}
+			button.toolsMenuButton, .dropdown.open {
+				@include transparent-button();
 			}
 		}
 	}
+	#rootPanel .TeamViewImpl {
+		button.toolsMenuButton, .dropdown.open {
+			@include transparent-button();
+		}
+	}
+
 	#rootPanel .DownloadCartPage {
 		padding: 0px;
 		.clearDownloadListLink {

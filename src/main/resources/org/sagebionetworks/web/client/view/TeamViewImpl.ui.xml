@@ -9,9 +9,37 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 
-	<g:HTMLPanel>
+	<g:HTMLPanel addStyleNames="TeamViewImpl">
 		<bh:Div addStyleNames="pageHeader">
-			<b:Heading addStyleNames="pageHeaderTitle" ui:field="teamNameHeading" size="H3"/>
+			<b:Heading addStyleNames="pageHeaderTitle inline-block" ui:field="teamNameHeading" size="H3"/>
+			<bh:Span addStyleNames="right">
+				<b:DropDown ui:field="dashboardDropdown"
+					addStyleNames="imageButton displayInlineBlock"
+					marginTop="15" marginRight="10">
+					<b:Button ui:field="toolsMenu" addStyleNames="toolsMenuButton" dataToggle="DROPDOWN">Team Actions</b:Button>
+					<b:DropDownMenu
+						addStyleNames="dropdown-menu-right">
+						<b:AnchorListItem icon="PLUS_SQUARE_O"
+							iconFixedWidth="true" ui:field="inviteMemberItem"
+							visible="false" text="Invite User" />
+						<b:AnchorListItem icon="EDIT"
+							iconFixedWidth="true" ui:field="editTeamItem" visible="false"
+							text="Edit Team" />
+						<b:AnchorListItem icon="TIMES_CIRCLE"
+							iconFixedWidth="true" ui:field="deleteTeamItem" visible="false"
+							text="Delete Team" />
+						<b:AnchorListItem icon="ARROW_RIGHT"
+							iconFixedWidth="true" ui:field="leaveTeamItem" visible="false"
+							text="Leave Team" />
+						<b:AnchorListItem icon="FLAG"
+							iconFixedWidth="true" ui:field="manageAccessItem"
+							text="(ACT) Manage Access Requirements" visible="false" />
+						<b:AnchorListItem icon="LIST_ALT"
+							iconFixedWidth="true" ui:field="teamProjectsItem"
+							text="View Associated Projects" visible="false" />
+					</b:DropDownMenu>
+				</b:DropDown>
+			</bh:Span>
 		</bh:Div>
 		<div class="margin-right-20 margin-left-20">
 			<bh:Div
@@ -29,33 +57,6 @@
 							href="https://help.synapse.org/docs/Teams.1985446029.html"
 							iconStyles="lightGreyText font-size-18 displayInlineBlock"
 							addStyleNames="margin-top-15 margin-bottom-10" placement="LEFT" />
-						<b:DropDown ui:field="dashboardDropdown"
-							addStyleNames="imageButton displayInlineBlock"
-							marginTop="15" marginRight="10">
-							<b:Anchor ui:field="toolsMenuLink" dataToggle="DROPDOWN"
-								addStyleNames="textDecorationNone SRC-primary-background-color-hover" />
-							<b:DropDownMenu
-								addStyleNames="dropdown-menu-right">
-								<b:AnchorListItem icon="PLUS_SQUARE_O"
-									iconFixedWidth="true" ui:field="inviteMemberItem"
-									visible="false" text="Invite User" />
-								<b:AnchorListItem icon="EDIT"
-									iconFixedWidth="true" ui:field="editTeamItem" visible="false"
-									text="Edit Team" />
-								<b:AnchorListItem icon="TIMES_CIRCLE"
-									iconFixedWidth="true" ui:field="deleteTeamItem" visible="false"
-									text="Delete Team" />
-								<b:AnchorListItem icon="ARROW_RIGHT"
-									iconFixedWidth="true" ui:field="leaveTeamItem" visible="false"
-									text="Leave Team" />
-								<b:AnchorListItem icon="FLAG"
-									iconFixedWidth="true" ui:field="manageAccessItem"
-									text="(ACT) Manage Access Requirements" visible="false" />
-								<b:AnchorListItem icon="LIST_ALT"
-									iconFixedWidth="true" ui:field="teamProjectsItem"
-									text="View Associated Projects" visible="false" />
-							</b:DropDownMenu>
-						</b:DropDown>
 					</bh:Div>
 				</bh:Div>
 			</bh:Div>
