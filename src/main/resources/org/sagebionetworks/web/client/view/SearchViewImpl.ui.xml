@@ -5,7 +5,10 @@
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<g:HTMLPanel>
-		<div class="margin-top-15 margin-left-35 margin-right-40">
+		<bh:Div addStyleNames="pageHeader">
+			<b:Heading addStyleNames="pageHeaderTitle" size="H3" text="Search"/>
+		</bh:Div>
+		<div class="margin-top-30 margin-left-35 margin-right-40">
 			<div class="row">
 				<div class="col-md-9 col-md-push-3">
 					<div class="row">

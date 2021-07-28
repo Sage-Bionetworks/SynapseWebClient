@@ -7,10 +7,11 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
 	<g:HTMLPanel>
-		<div class="container margin-top-15 min-height-400">
+		<bh:Div addStyleNames="pageHeader">
+			<b:Heading addStyleNames="pageHeaderTitle" size="H3" text="Create Synapse Account"/>
+		</bh:Div>
+		<div class="container margin-top-40 min-height-400">
 			<bh:Div width="365px" addStyleNames="center-in-div" ui:field="createSynapseAccountUI">
-				<b:Heading size="H2" text="Create Synapse Account"
-					addStyleNames="text-align-center margin-top-20" />
 				<bh:Div width="100%"
 					ui:field="googleSynapseAccountCreationUI">
 					<b:Heading size="H4" subText="Choose a username"
