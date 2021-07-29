@@ -4,14 +4,13 @@
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<bh:Div>
+		<bh:Div addStyleNames="pageHeader">
+			<b:Heading addStyleNames="pageHeaderTitle" text="Team Search" size="H3"/>
+		</bh:Div>
+	
 		<bh:Div addStyleNames="SRC-card-grid-row margin-top-20">
-			<bh:Div addStyleNames="SRC-grid-item" marginLeft="15"
-				marginBottom="5" height="50px">
-				<b:Heading size="H3" text="Teams" />
-			</bh:Div>
-			<bh:Div addStyleNames="SRC-grid-item" height="10px" />
 			<bh:Div
-				addStyleNames="SRC-grid-item flexcontainer-align-items-flex-end"
+				addStyleNames="SRC-grid-item"
 				marginTop="10" marginBottom="5" marginRight="15" height="50px">
 				<bh:Div>
 					<b:Icon ui:field="searchButton" type="SEARCH"
