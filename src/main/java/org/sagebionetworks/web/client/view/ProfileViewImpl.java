@@ -297,7 +297,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	public void setProfile(UserProfile profile, boolean isOwner) {
 		String displayName = DisplayUtils.getDisplayName(profile);
 		profileHeaderText = isOwner ? "Your Profile" : displayName + "'s Profile";
-		
 		if (currentTab == ProfileArea.PROFILE)
 			pageHeaderTitle.setText(profileHeaderText);
 		
@@ -415,8 +414,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		challengesTabContent.clear();
 		hideTabContainers();
 
-		DisplayUtils.hide(createProjectUI);
-		DisplayUtils.hide(createTeamUI);
 		teamSearchTextBox.setValue("");
 		projectSearchTextBox.setValue("");
 
