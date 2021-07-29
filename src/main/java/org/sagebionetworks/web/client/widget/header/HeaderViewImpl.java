@@ -1,59 +1,31 @@
 package org.sagebionetworks.web.client.widget.header;
 
-import java.util.List;
-
 import org.gwtbootstrap3.client.ui.Alert;
-import org.gwtbootstrap3.client.ui.Anchor;
-import org.gwtbootstrap3.client.ui.AnchorListItem;
-import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.DropDown;
-import org.gwtbootstrap3.client.ui.DropDownMenu;
-import org.gwtbootstrap3.client.ui.Icon;
-import org.gwtbootstrap3.client.ui.Label;
-import org.gwtbootstrap3.client.ui.constants.IconSize;
-import org.gwtbootstrap3.client.ui.constants.IconType;
-import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
-import org.gwtbootstrap3.client.ui.html.Strong;
-import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactDOM;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
-import org.sagebionetworks.web.client.jsinterop.ShowDownloadV2Props;
-import org.sagebionetworks.web.client.place.DownloadCartPlace;
-import org.sagebionetworks.web.client.place.Profile;
-import org.sagebionetworks.web.client.place.Search;
-import org.sagebionetworks.web.client.place.Synapse;
-import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
-import org.sagebionetworks.web.client.place.SynapseForumPlace;
+import org.sagebionetworks.web.client.jsinterop.SynapseNavDrawerProps;
+import org.sagebionetworks.web.client.place.Home;
+import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.FullWidthAlert;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
-import org.sagebionetworks.web.client.widget.search.SearchBox;
-import org.sagebionetworks.web.client.widget.user.AvatarSize;
-import org.sagebionetworks.web.client.widget.user.BadgeType;
-import org.sagebionetworks.web.client.widget.user.UserBadge;
-import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Document;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.binder.EventBinder;
@@ -61,76 +33,8 @@ import com.google.web.bindery.event.shared.binder.EventBinder;
 public class HeaderViewImpl extends Composite implements HeaderView {
 	public interface Binder extends UiBinder<Widget, HeaderViewImpl> {
 	}
-
 	@UiField
-	Image synapseLogo;
-	@UiField
-	Div headerDiv;
-	@UiField
-	Anchor projectHeadingAnchor;
-	@UiField
-	DropDown headerFavDropdown;
-	@UiField
-	Anchor headerFavAnchor;
-	@UiField
-	DropDownMenu headerFavDropdownMenu;
-	@UiField
-	Strong signedInAsName;
-	@UiField
-	Div projectFavoritePanelUI;
-	@UiField
-	Anchor dashboardDropdownAnchor;
-	@UiField
-	SimplePanel loginLinkUI;
-	@UiField
-	Button loginLink;
-
-	@UiField
-	Span headerButtons;
-
-	@UiField
-	AnchorListItem trashLink;
-	@UiField
-	AnchorListItem logoutLink;
-	@UiField
-	AnchorListItem myProfileLink;
-	@UiField
-	AnchorListItem myDashboardLink;
-	@UiField
-	AnchorListItem myTeamsLink;
-	@UiField
-	AnchorListItem myChallengesLink;
-	@UiField
-	AnchorListItem mySettingsLink;
-	@UiField
-	AnchorListItem myDownloadsLink;
-	@UiField
-	AnchorListItem helpForumLink;
-	@UiField
-	AnchorListItem emailSynapseSupportLink;
-	@UiField
-	AnchorListItem xsFavoritesLink;
-	@UiField
-	AnchorListItem xsSearchLink;
-
-	@UiField
-	DropDown dashboardDropdown;
-	@UiField
-	DropDownMenu dashboardDropdownMenu;
-	@UiField
-	Div searchBoxContainer;
-	@UiField
-	Alert stagingAlert;
-	@UiField
-	AnchorListItem documentationLink;
-	@UiField
-	Div downloadListNotificationUI;
-	@UiField
-	ReactComponentDiv downloadListV2NotificationUI;
-	@UiField
-	FocusPanel downloadListLink;
-	@UiField
-	Label downloadListFileCount;
+	Div header;
 	@UiField
 	FullWidthAlert cookieNotificationAlert;
 
@@ -142,173 +46,45 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	Span portalName;
 	@UiField
 	FocusPanel portalLogoFocusPanel;
-
+	Div synapseNavDrawerContainer = new Div();
+	@UiField
+	Alert stagingAlert;
+	
 	private Presenter presenter;
-	private SearchBox searchBox;
-	private CookieProvider cookies;
-	SageImageBundle sageImageBundle;
-	private GlobalApplicationState globalAppState;
-	UserBadge userBadge;
-	String userId;
-	AnchorListItem defaultItem = new AnchorListItem("Empty");
 	String portalHref = "";
 	SynapseContextPropsProvider propsProvider;
-
+	GlobalApplicationState globalAppState;
+	AuthenticationController authController;
+	
 	@Inject
-	public HeaderViewImpl(Binder binder, SageImageBundle sageImageBundle, SearchBox searchBox, CookieProvider cookies, UserBadge userBadge, GlobalApplicationState globalAppState, SynapseContextPropsProvider propsProvider) {
+	public HeaderViewImpl(Binder binder, SynapseContextPropsProvider propsProvider, GlobalApplicationState globalAppState, AuthenticationController authController) {
 		this.initWidget(binder.createAndBindUi(this));
-		this.searchBox = searchBox;
-		this.cookies = cookies;
-		this.sageImageBundle = sageImageBundle;
-		this.userBadge = userBadge;
-		this.globalAppState = globalAppState;
 		this.propsProvider = propsProvider;
-		userBadge.setBadgeType(BadgeType.AVATAR);
-		userBadge.setAvatarSize(AvatarSize.MEDIUM);
-		userBadge.setShowCardOnHover(false);
-		userBadge.addStyleNames("padding-top-13 padding-left-10");
-		// add search panel first
-		searchBox.setVisible(true);
-		searchBoxContainer.add(searchBox.asWidget());
-		dashboardDropdownAnchor.add(userBadge.asWidget());
-		Icon angleDown = new Icon(IconType.ANGLE_DOWN);
-		angleDown.setPull(Pull.RIGHT);
-		angleDown.setPaddingTop(20);
-		angleDown.setPaddingRight(6);
-		angleDown.setPaddingBottom(19);
-		angleDown.setPaddingLeft(0);
-		angleDown.setMarginLeft(0);
-		dashboardDropdownAnchor.add(angleDown);
-		Icon starIcon = new Icon(IconType.STAR);
-		starIcon.setColor("white");
-		starIcon.setSize(IconSize.TIMES2);
-		starIcon.setPaddingTop(13);
-		starIcon.setPaddingBottom(12);
-		starIcon.setPaddingLeft(5);
-		headerFavAnchor.add(starIcon);
-
-		angleDown = new Icon(IconType.ANGLE_DOWN);
-		angleDown.setColor("white");
-		angleDown.setPull(Pull.RIGHT);
-		angleDown.setPaddingTop(20);
-		angleDown.setPaddingRight(10);
-		angleDown.setPaddingBottom(19);
-		angleDown.setPaddingLeft(1);
-		angleDown.setMarginLeft(0);
-		headerFavAnchor.add(angleDown);
+		this.globalAppState = globalAppState;
+		this.authController = authController;
 		cookieNotificationAlert.addPrimaryCTAClickHandler(event -> {
 			presenter.onCookieNotificationDismissed();
 		});
 
 		initClickHandlers();
 		clear();
+		synapseNavDrawerContainer.addAttachHandler(event -> {
+			if (event.isAttached()) {
+				SynapseNavDrawerProps props = SynapseNavDrawerProps.create(() -> {
+					authController.logoutUser();
+				});
+				ReactElement component = React.createElementWithSynapseContext(SRC.SynapseComponents.SynapseNavDrawer, props, propsProvider.getJsInteropContextProps());
+				ReactDOM.render(component, synapseNavDrawerContainer.getElement());
+			}
+		});
 	}
 
 	@Override
 	public void clear() {
-		setProjectHeaderText("");
 	}
 
-	@Override
-	public void setProjectHeaderText(String text) {
-		boolean isDefault = Header.SYNAPSE.equals(text);
-		if (isDefault) {
-			projectHeadingAnchor.addStyleName("letter-spacing-6");
-		} else {
-			projectHeadingAnchor.removeStyleName("letter-spacing-6");
-		}
-		projectHeadingAnchor.setText(text);
-	}
-
-	@Override
-	public void setProjectHeaderAnchorTarget(String href) {
-		projectHeadingAnchor.setHref(href);
-	}
-
-	@Override
-	public void setProjectFavoriteWidget(IsWidget favWidget) {
-		projectFavoritePanelUI.clear();
-		projectFavoritePanelUI.add(favWidget);
-	}
-
-	@Override
-	public void showProjectFavoriteWidget() {
-		projectFavoritePanelUI.setVisible(true);
-	}
-
-	@Override
-	public void hideProjectFavoriteWidget() {
-		projectFavoritePanelUI.setVisible(false);
-	}
 
 	public void initClickHandlers() {
-		documentationLink.addClickHandler(event -> {
-			event.preventDefault();
-			DisplayUtils.newWindow(WebConstants.DOCS_BASE_URL, "", "");
-		});
-		emailSynapseSupportLink.addClickHandler(event -> {
-			event.preventDefault();
-			DisplayUtils.newWindow("mailto:synapseinfo@sagebionetworks.org", "", "");
-		});
-		trashLink.addClickHandler(event -> {
-			presenter.onTrashClick();
-		});
-		logoutLink.addClickHandler(event -> {
-			presenter.onLogoutClick();
-		});
-		loginLink.addClickHandler(event -> {
-			presenter.onLoginClick();
-		});
-		synapseLogo.addClickHandler(event -> {
-			presenter.onLogoClick();
-		});
-
-		myProfileLink.addClickHandler(event -> {
-			Profile place = new Profile(userId, ProfileArea.PROFILE);
-			globalAppState.getPlaceChanger().goTo(place);
-		});
-		myDashboardLink.addClickHandler(event -> {
-			Profile place = new Profile(userId, ProfileArea.PROJECTS);
-			globalAppState.getPlaceChanger().goTo(place);
-		});
-		myTeamsLink.addClickHandler(event -> {
-			Profile place = new Profile(userId, ProfileArea.TEAMS);
-			globalAppState.getPlaceChanger().goTo(place);
-		});
-		myChallengesLink.addClickHandler(event -> {
-			Profile place = new Profile(userId, ProfileArea.CHALLENGES);
-			globalAppState.getPlaceChanger().goTo(place);
-		});
-		mySettingsLink.addClickHandler(event -> {
-			Profile place = new Profile(userId, ProfileArea.SETTINGS);
-			globalAppState.getPlaceChanger().goTo(place);
-		});
-		myDownloadsLink.addClickHandler(event -> {
-			if (!DisplayUtils.isInTestWebsite(cookies)) {
-				Profile place = new Profile(userId, ProfileArea.DOWNLOADS);
-				globalAppState.getPlaceChanger().goTo(place);
-			} else {
-				DownloadCartPlace place = new DownloadCartPlace("0");
-				globalAppState.getPlaceChanger().goTo(place);
-			}
-		});
-		helpForumLink.addClickHandler(event -> {
-			SynapseForumPlace place = new SynapseForumPlace("default");
-			globalAppState.getPlaceChanger().goTo(place);
-		});
-		xsFavoritesLink.addClickHandler(event -> {
-			Profile place = new Profile(userId + "/projects/favorites");
-			globalAppState.getPlaceChanger().goTo(place);
-		});
-
-		xsSearchLink.addClickHandler(event -> {
-			Search place = new Search("");
-			globalAppState.getPlaceChanger().goTo(place);
-		});
-		downloadListLink.addClickHandler(event -> {
-			Profile place = new Profile(userId + "/downloads");
-			globalAppState.getPlaceChanger().goTo(place);
-		});
 		portalLogoFocusPanel.addClickHandler(event -> {
 			if (DisplayUtils.isDefined(portalHref)) {
 				Window.Location.assign(portalHref);
@@ -322,68 +98,27 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		refresh();
 	}
 
+	private void detachNavBar() {
+		synapseNavDrawerContainer.removeFromParent();
+		Document.get().getBody().removeClassName("SynapseNavDrawerIsShowing");
+	}
+	private void attachNavBar() {
+		header.add(synapseNavDrawerContainer);
+		Document.get().getBody().addClassName("SynapseNavDrawerIsShowing");
+	}
+	
 	@Override
 	public void refresh() {
-		boolean isInTestWebsite = DisplayUtils.isInTestWebsite(cookies);
-		trashLink.setVisible(isInTestWebsite);
-	}
-
-	@Override
-	public void setSearchVisible(boolean searchVisible) {
-		searchBox.setVisible(searchVisible);
+		if (globalAppState.getCurrentPlace() == null || globalAppState.getCurrentPlace() instanceof Home || globalAppState.getCurrentPlace() instanceof LoginPlace) {
+			detachNavBar();
+		} else {
+			attachNavBar();
+		}
 	}
 
 	@Override
 	public void openNewWindow(String url) {
 		DisplayUtils.newWindow(url, "", "");
-	}
-
-	@Override
-	public void setUser(UserProfile profile) {
-		boolean isInTestWebsite = DisplayUtils.isInTestWebsite(cookies);
-		trashLink.setVisible(isInTestWebsite);
-		userBadge.clearState();
-		signedInAsName.setText("");
-		if (profile != null) {
-			// has user data, update the user name and add user commands (and set to the current user name)
-			userBadge.configure(profile);
-			userBadge.setDoNothingOnClick();
-			userId = profile.getOwnerId();
-			loginLinkUI.setVisible(false);
-			logoutLink.setVisible(true);
-			dashboardDropdown.setVisible(true);
-			headerFavDropdown.setVisible(true);
-			signedInAsName.setText(profile.getUserName());
-		} else {
-			userId = null;
-			loginLinkUI.setVisible(true);
-			logoutLink.setVisible(false);
-			dashboardDropdown.setVisible(false);
-			headerFavDropdown.setVisible(false);
-		}
-	}
-
-	@Override
-	public void clearFavorite() {
-		headerFavDropdownMenu.clear();
-	}
-
-	@Override
-	public void setEmptyFavorite() {
-		headerFavDropdownMenu.add(defaultItem);
-	}
-
-	@Override
-	public void addFavorite(List<EntityHeader> headers) {
-		for (final EntityHeader header : headers) {
-			AnchorListItem favItem = new AnchorListItem(header.getName());
-			favItem.addClickHandler(event -> {
-				headerFavDropdownMenu.removeStyleName("hover");
-				Synapse place = new Synapse(header.getId());
-				globalAppState.getPlaceChanger().goTo(place);
-			});
-			headerFavDropdownMenu.add(favItem);
-		}
 	}
 
 	@Override
@@ -407,28 +142,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		return eventBinder;
 	}
 
-	@Override
-	public void setDownloadListFileCount(Integer count) {
-		downloadListFileCount.setText(count.toString());
-	}
-
-	@Override
-	public void setDownloadListUIVisible(boolean visible) {
-		downloadListNotificationUI.setVisible(visible);
-	}
-
-	@Override
-	public void setDownloadListV2UIVisible(boolean visible) {
-		downloadListV2NotificationUI.setVisible(visible);
-		if (visible) {
-			SynapseJSNIUtilsImpl._consoleLog("Calling ReactDOM.render on this again");
-			ShowDownloadV2Props props = ShowDownloadV2Props.create("#!DownloadCart:0");
-			ReactDOM.unmountComponentAtNode(downloadListV2NotificationUI.getElement());
-			ReactElement component = React.createElementWithSynapseContext(SRC.SynapseComponents.ShowDownloadV2, props, propsProvider.getJsInteropContextProps());
-			ReactDOM.render(component, downloadListV2NotificationUI.getElement());
-		}
-	}
-	
 	@Override
 	public void setPortalAlertVisible(boolean visible, JSONObjectAdapter json) {
 		if (visible) {

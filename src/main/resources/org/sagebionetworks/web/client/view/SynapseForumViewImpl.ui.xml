@@ -6,6 +6,10 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
 	<bh:Div>
+		<bh:Div addStyleNames="pageHeader">
+			<b:Heading addStyleNames="pageHeaderTitle" ui:field="pageHeaderTitle" size="H3" text="Help Forum" />
+		</bh:Div>
+
 		<bh:Div addStyleNames="min-height-200 margin-top-30 margin-10">
 			<bh:Div ui:field="forumWidgetContainer" />
 		</bh:Div>

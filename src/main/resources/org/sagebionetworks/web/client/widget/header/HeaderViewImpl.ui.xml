@@ -5,10 +5,7 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
-	<ui:with field='sageImages'
-		type='org.sagebionetworks.web.client.SageImageBundle' />
-
-	<bh:Div addStyleNames="header">
+	<bh:Div addStyleNames="header" ui:field="header" >
 		<bh:Div ui:field="portalAlert" visible="false"
 			addStyleNames="padding-15 flexcontainer-row background-color-white"
 			marginTop="0" marginRight="0" marginBottom="0">
@@ -53,113 +50,6 @@
 					placement="LEFT" />
 			</bh:Div>
 		</b:Alert>
-		<bh:Div ui:field="headerDiv"
-			addStyleNames="notopmargin synapse-blue-bg-gradient" height="53px">
-			<bh:Div
-				addStyleNames="margin-left-15 inline-block maxWidth50 overflowHidden text-overflow-ellipsis whitespace-nowrap color-white"
-				paddingTop="13">
-				<g:Image ui:field="synapseLogo" url="images/logo.svg"
-					addStyleNames="imageButton margin-right-5 moveup-5" width="35px"
-					height="35px" />
-				<b:Heading size="H3"
-					addStyleNames="displayInline color-white">
-					<b:Anchor ui:field="projectHeadingAnchor"
-						addStyleNames="color-white textDecorationNone lato notransition" />
-				</b:Heading>
-			</bh:Div>
-			<bh:Div ui:field="projectFavoritePanelUI"
-				addStyleNames="inline-block favoriteIcon hidden-xs vertical-align-top color-white font-size-24 movedown-7" />
-			<bh:Span ui:field="headerButtons" addStyleNames="right"
-				marginRight="10">
-				<g:SimplePanel ui:field="loginLinkUI"
-					addStyleNames="right margin-left-10 margin-right-10 padding-left-15"
-					visible="false">
-					<b:Button ui:field="loginLink"
-						text="Sign in" type="SUCCESS"
-						marginTop="10" paddingLeft="20" paddingRight="20" />
-				</g:SimplePanel>
-				<b:DropDown ui:field="dashboardDropdown"
-					addStyleNames="right imageButton greenBackgroundOnHover"
-					visible="false" height="53px" width="62px">
-					<b:Anchor dataToggle="DROPDOWN"
-						ui:field="dashboardDropdownAnchor"
-						addStyleNames="color-white textDecorationNone" />
-					<b:DropDownMenu ui:field="dashboardDropdownMenu"
-						addStyleNames="pull-right">
-						<b:ListItem paddingTop="5"
-							addStyleNames="whitespace-nowrap">
-							<bh:Span paddingLeft="20" paddingRight="25"
-								paddingTop="5">
-								Signed in as
-								<bh:Strong ui:field="signedInAsName" />
-							</bh:Span>
-						</b:ListItem>
-						<b:Divider />
-						<b:AnchorListItem ui:field="myProfileLink">Profile</b:AnchorListItem>
-						<b:AnchorListItem ui:field="myDashboardLink">Projects</b:AnchorListItem>
-						<b:AnchorListItem ui:field="myTeamsLink">Teams</b:AnchorListItem>
-						<b:AnchorListItem ui:field="myChallengesLink">Challenges</b:AnchorListItem>
-						<b:AnchorListItem ui:field="myDownloadsLink">Downloads</b:AnchorListItem>
-						<b:AnchorListItem ui:field="trashLink"
-							icon="TRASH_O" visible="false" iconFixedWidth="true"
-							iconPosition="RIGHT">Trash can</b:AnchorListItem>
-						<b:Divider />
-						<b:AnchorListItem ui:field="mySettingsLink">Settings</b:AnchorListItem>
-						<b:Divider />
-						<b:AnchorListItem ui:field="documentationLink"
-							icon="EXTERNAL_LINK" iconFixedWidth="true" iconPosition="RIGHT"
-							href="http://help.synapse.org">Documentation</b:AnchorListItem>
-						<b:AnchorListItem ui:field="helpForumLink">Help Forum</b:AnchorListItem>
-						<b:AnchorListItem
-							ui:field="emailSynapseSupportLink" icon="ENVELOPE_O"
-							href="mailto:synapseinfo@sagebionetworks.org"
-							iconFixedWidth="true" iconPosition="RIGHT">Contact Us</b:AnchorListItem>
-						<b:Divider />
-						<b:AnchorListItem ui:field="xsFavoritesLink"
-							addStyleNames="visible-xs">Favorites</b:AnchorListItem>
-						<b:AnchorListItem ui:field="xsSearchLink"
-							addStyleNames="visible-xs">Search</b:AnchorListItem>
-						<b:Divider addStyleNames="visible-xs" />
-						<b:AnchorListItem ui:field="logoutLink"
-							icon="SIGN_OUT" iconFixedWidth="true" iconPosition="RIGHT">Sign out</b:AnchorListItem>
-					</b:DropDownMenu>
-				</b:DropDown>
-				<b:DropDown ui:field="headerFavDropdown" pull="RIGHT"
-					addStyleNames="imageButton hidden-xs greenBackgroundOnHover color-white textDecorationNone"
-					visible="false" height="53px" paddingLeft="0">
-					<b:Anchor ui:field="headerFavAnchor" dataToggle="DROPDOWN" />
-					<b:DropDownMenu ui:field="headerFavDropdownMenu"
-						addStyleNames="dropdown-menu-right">
-					</b:DropDownMenu>
-				</b:DropDown>
-				<bh:Div pull="RIGHT"
-					addStyleNames="searchBoxContainer inactive hidden-xs" height="53px">
-					<bh:Div ui:field="searchBoxContainer" />
-				</bh:Div>
-				<bh:Div addStyleNames="greenBackgroundOnHover" pull="RIGHT" height="53px" paddingTop="18" paddingLeft="15">
-					<w:ReactComponentDiv ui:field="downloadListV2NotificationUI" />
-				</bh:Div>
-				<bh:Div pull="RIGHT" height="53px"
-					ui:field="downloadListNotificationUI" visible="false"
-					addStyleNames="greenBackgroundOnHover">
-					<b:Tooltip
-						text="Click to view items in your download list."
-						placement="BOTTOM">
-						<g:FocusPanel addStyleNames="displayInlineBlock"
-							ui:field="downloadListLink">
-							<bh:Div height="35px" marginLeft="7" marginTop="9"
-								marginBottom="9" addStyleNames="synapse-green-bg img-circle ">
-								<b:Icon type="DOWNLOAD"
-									addStyleNames="imageButton color-white" size="LARGE"
-									marginTop="9" marginRight="5" marginBottom="5" marginLeft="5" />
-							</bh:Div>
-						</g:FocusPanel>
-					</b:Tooltip>
-					<b:Label text="0" ui:field="downloadListFileCount"
-						addStyleNames="moveup-15 dropshadow" marginLeft="-8" type="INFO" />
-				</bh:Div>
-			</bh:Span>
-		</bh:Div>
 		<w:FullWidthAlert ui:field="cookieNotificationAlert" visible="false" alertType="INFO" messageTitle="Our site uses cookies." 
 			message="Synapse uses cookies to enhance your experience and to analyze our traffic. Using Synapse means that you agree with our cookie policy."
 			secondaryCTAText="Learn More" secondaryCTAHref="https://s3.amazonaws.com/static.synapse.org/governance/SynapsePrivacyPolicy.pdf"

@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -28,14 +29,22 @@ public class BasicTitleBar implements SynapseWidgetPresenter {
 		favWidget.configure(bundle.getEntity().getId());
 		view.setFavoritesWidgetVisible(authenticationController.isLoggedIn());
 		view.setTitle(bundle.getEntity().getName());
-		view.setIconType(EntityTypeUtils.getIconTypeForEntity(bundle.getEntity()));
+		if (!(bundle.getEntity() instanceof Project)) {
+			view.setIconType(EntityTypeUtils.getIconTypeForEntity(bundle.getEntity()));	
+		} else {
+			view.setIconType(null);
+		}
 	}
 
 	public void configure(EntityHeader entityHeader) {
 		favWidget.configure(entityHeader.getId());
 		view.setFavoritesWidgetVisible(authenticationController.isLoggedIn());
 		view.setTitle(entityHeader.getName());
-		view.setIconType(EntityTypeUtils.getIconTypeForEntityClassName(entityHeader.getType()));
+		if (!(Project.class.getName().equals(entityHeader.getType()))) {
+			view.setIconType(EntityTypeUtils.getIconTypeForEntityClassName(entityHeader.getType()));
+		} else {
+			view.setIconType(null);
+		}
 	}
 
 	public void clearState() {

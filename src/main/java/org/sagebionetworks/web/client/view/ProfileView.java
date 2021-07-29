@@ -41,10 +41,6 @@ public interface ProfileView extends IsWidget, SynapseView {
 
 	void setIsMoreChallengesVisible(boolean isVisible);
 
-	void setTeamNotificationCount(String count);
-
-	void clearTeamNotificationCount();
-
 	void setTabSelected(ProfileArea areaTab);
 
 	void showConfirmDialog(String title, String message, Callback yesCallback);
@@ -84,8 +80,6 @@ public interface ProfileView extends IsWidget, SynapseView {
 
 		void refreshTeams();
 
-		void tabClicked(ProfileArea areaTab);
-
 		void getMoreChallenges();
 
 		void applyFilterClicked(ProjectFilterEnum filterType, Team team);
@@ -106,8 +100,6 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void setTeamSynAlertWidget(Widget profileSynAlert);
 
 	void setChallengeSynAlertWidget(Widget challengeSynAlert);
-
-	void showTabs(boolean isOwner);
 
 	void open(String url);
 

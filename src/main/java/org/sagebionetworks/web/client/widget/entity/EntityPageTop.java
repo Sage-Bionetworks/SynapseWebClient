@@ -29,6 +29,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl;
+import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.DiscussionTab;
@@ -66,6 +67,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 	private ChallengeTab challengeTab;
 	private DiscussionTab discussionTab;
 	private DockerTab dockerTab;
+	private BasicTitleBar projectTitleBar;
 	private EntityMetadata projectMetadata;
 	private SynapseClientAsync synapseClient;
 	// how many tabs have been marked as visible
@@ -102,6 +104,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 	public EntityPageTop(EntityPageTopView view, 
 			SynapseClientAsync synapseClient,
 			Tabs tabs,
+			BasicTitleBar projectTitleBar,
 			EntityMetadata projectMetadata,
 			WikiTab wikiTab,
 			FilesTab filesTab,
@@ -126,6 +129,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 		this.challengeTab = challengeTab;
 		this.discussionTab = discussionTab;
 		this.dockerTab = dockerTab;
+		this.projectTitleBar = projectTitleBar;
 		this.projectMetadata = projectMetadata;
 		this.projectActionController = projectActionController;
 		this.projectActionMenu = projectActionMenu;
@@ -138,7 +142,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 		initTabs();
 		view.setTabs(tabs.asWidget());
 		view.setProjectMetadata(projectMetadata.asWidget());
-
+		view.setProjectTitleBar(projectTitleBar.asWidget());
 		projectActionMenu.addControllerWidget(projectActionController.asWidget());
 		view.setProjectActionMenu(projectActionMenu.asWidget());
 
@@ -216,12 +220,10 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 		wikiTab.setTabClickedCallback(tab -> {
 			area = EntityArea.WIKI;
 			configureWikiTab();
-			projectMetadata.setVisible(true);
 		});
 		challengeTab.setTabClickedCallback(tab -> {
 			area = EntityArea.CHALLENGE;
 			configureChallengeTab();
-			projectMetadata.setVisible(true);
 		});
 
 		discussionTab.setTabClickedCallback(tab -> {
@@ -233,7 +235,6 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 
 			area = EntityArea.DISCUSSION;
 			configureDiscussionTab();
-			projectMetadata.setVisible(true);
 		});
 		filesTab.setTabClickedCallback(tab -> {
 			// SWC-4078: if already on tab, reset to project level.
@@ -243,7 +244,6 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 			}
 			area = EntityArea.FILES;
 			configureFilesTab();
-			projectMetadata.setVisible(projectBundle != null && filesEntityBundle.getEntity() instanceof Project);
 		});
 		tablesTab.setTabClickedCallback(tab -> {
 			// SWC-4078: if already on tab, reset to project level.
@@ -254,7 +254,6 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 
 			area = EntityArea.TABLES;
 			configureTablesTab();
-			projectMetadata.setVisible(projectBundle != null && tablesEntityBundle.getEntity() instanceof Project);
 		});
 		dockerTab.setTabClickedCallback(tab -> {
 			// SWC-4078: if already on tab, reset to project level.
@@ -265,7 +264,6 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 
 			area = EntityArea.DOCKER;
 			configureDockerTab();
-			projectMetadata.setVisible(projectBundle != null && dockerEntityBundle.getEntity() instanceof Project);
 		});
 	}
 
@@ -321,13 +319,13 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 		hideTabs();
 		projectBundle = null;
 		projectBundleLoadError = null;
-		projectMetadata.setVisible(false);
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
 				view.setProjectLoadingVisible(false);
 				// by default, all tab entity bundles point to the project entity bundle
 				projectBundle = filesEntityBundle = tablesEntityBundle = dockerEntityBundle = bundle;
+				projectTitleBar.configure(projectBundle);
 				projectMetadata.configure(projectBundle, null, projectActionMenu);
 
 				initAreaToken();
@@ -441,7 +439,6 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 				dockerChanged(bundle);
 			}
 		}
-		projectMetadata.setVisible(bundle.getEntity() instanceof Project);
 		reconfigureCurrentArea();
 	}
 
@@ -562,10 +559,6 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 	}
 
 	public void initAreaToken() {
-		if (entity instanceof Project) {
-			projectMetadata.setVisible(true);
-		}
-
 		// set area, if undefined
 		if (area == null) {
 			area = getAreaForEntity(entity);
@@ -575,7 +568,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 		if (projectBundle != null) {
 			String wikiId = getWikiPageId(wikiAreaToken, projectBundle.getRootWikiId());
 			projectActionController.configure(projectActionMenu, projectBundle, true, wikiId, null);
-			projectActionMenu.setToolsButtonIcon(PROJECT_SETTINGS, IconType.GEAR);
+			projectActionMenu.setToolsButtonIcon(PROJECT_SETTINGS, null);
 		}
 
 		initDefaultTabPlaces();
@@ -679,7 +672,6 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 			wikiTab.configure(projectHeader.getId(), projectHeader.getName(), projectBundle, wikiId, canEdit, callback);
 			if (isWikiTabShown) {
 				tabs.showTab(wikiTab.asTab(), false);
-				projectMetadata.setVisible(true);
 			}
 
 			wikiTab.asTab().setContentStale(false);

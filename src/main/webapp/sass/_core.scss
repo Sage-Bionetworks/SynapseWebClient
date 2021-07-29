@@ -1,8 +1,8 @@
 /***************
 Synapse color scheme
 ****************/
-$synapse-green: #28a745;
-$synapse-blue: #2B688F;
+$synapse-green: #469285;
+$synapse-blue: #2E4761;
 $synapse-dark-blue: #184e71;
 $synapse-blue-end-gradient: #164B6E;
 $synapse-purple: #7772b4;
@@ -28,6 +28,20 @@ $synapse-gray-med: #dcdcdc;
 	box-shadow: $boxshadow;
 }
 
+@mixin synapse-blue-triangles-bg() {
+	background: transparent url("https://s3.amazonaws.com/static.synapse.org/images/SynapseLoginPageBackground.svg") no-repeat;
+	background-size: cover;
+}
+
+@mixin transparent-button() {
+	background-color: transparent;
+	color: white;
+	border-color: white;
+	&:hover {
+	  border-color: white;
+	}
+  }
+  
 
 .colored { color:$synapse-blue;}
 .link, details > summary { color:$synapse-blue;}
@@ -70,6 +84,57 @@ a:focus{color:$synapse-blue;}
 	.black-25-percent {
 		color: rgba(0, 0, 0, 0.25);
 	}
+	
+	h3.pageHeaderTitle {
+		font-size: 24px;
+		font-weight: 700;
+		line-height: 28px;
+		letter-spacing: 0.5px;
+	}
+
+	#rootPanel .pageContent {
+		padding: 0px 43px 40px 43px;
+	}
+	#rootPanel .pageHeader {
+		padding: 21px 43px;
+		min-height: 93px;
+		@include synapse-blue-triangles-bg;
+		h3.pageHeaderTitle {
+			color: white;
+		}
+		.description {
+			color: white;
+		}
+		.projectMetadata {
+			.projectTitle {
+				> *, .syn-star-o, .syn-question-circle, .entityIcon, a:not(.btn) {
+					color: white;
+					table {
+						color: $synapse-dark-text
+					}
+				}
+			}
+			button.toolsMenuButton, .dropdown.open {
+				@include transparent-button();
+			}
+		}
+	}
+	#rootPanel .TeamViewImpl {
+		button.toolsMenuButton, .dropdown.open {
+			@include transparent-button();
+		}
+	}
+
+	#rootPanel .DownloadCartPage {
+		padding: 0px;
+		.clearDownloadListLink {
+			color: white;
+		}
+	}
+}
+
+.SynapseNavDrawerIsShowing {
+	padding-left: 53px;
 }
 
 .pagination>li>a, .pagination>li>span {
@@ -534,8 +599,8 @@ end sticky footer
 	@include border-radius(3px);
 }
 
-div.favoriteIcon i, button.favoriteIcon>i, i.favoriteIcon, a.favoriteIcon, a.favoriteIcon:visited, a.favoriteIcon:hover, a.favoriteIcon:focus {
-	color:#62ac62;
+#rootPanel .favoriteIcon .syn-star {
+	color: #F1D07E;
 }
 
 .hitdescription {
@@ -902,6 +967,10 @@ div.favoriteIcon i, button.favoriteIcon>i, i.favoriteIcon, a.favoriteIcon, a.fav
 
 .tab-background {
 	min-height: 200px;
+}
+
+#body .DownloadCartPage .nav-tabs {
+	box-shadow: none;
 }
 
 .file-preview {
@@ -2925,6 +2994,7 @@ div.border {
 		background-color: none;
 	}
 	.alert {
+		height: 55px;
 		border-radius: 0px;
 		padding: 7px 15px;
 		font-weight: 500;

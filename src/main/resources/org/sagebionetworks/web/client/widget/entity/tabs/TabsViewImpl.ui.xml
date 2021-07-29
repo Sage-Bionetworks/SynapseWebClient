@@ -5,11 +5,11 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<bh:Div>
 		<!-- Tabs -->
-		<b:NavTabs ui:field="navTabs" addStyleNames="lightGreyBackground">
+		<b:NavTabs ui:field="navTabs">
 			<!-- list of b:TabListItem-->
 			<!-- <b:TabListItem ui:field="tabItem1" active="true" dataTarget="#tab1" text="Tab1"/>  -->
 		</b:NavTabs>
-		<b:TabContent ui:field="tabContent" addStyleNames="padding-left-15 padding-right-15" >
+		<b:TabContent ui:field="tabContent" addStyleNames="padding-left-15 padding-right-15" paddingTop="25" >
 			<!-- list of b:TabPane-->
 			<!-- <b:TabPane active="true" addStyleNames="margin-top-15"> -->
 		</b:TabContent>

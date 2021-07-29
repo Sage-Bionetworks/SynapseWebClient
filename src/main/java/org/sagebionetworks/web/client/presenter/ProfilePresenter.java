@@ -73,8 +73,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private UserProfileEditorWidget userProfileEditorWidget;
 	private SettingsPresenter settingsPresenter;
 	private PortalGinInjector ginInjector;
-	private int inviteCount;
-	private int openRequestCount;
 	private String currentUserId;
 	private boolean isOwner;
 	private int currentChallengeOffset;
@@ -237,20 +235,16 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public void updateProfileView(String userId) {
 		currentSortColumn = ProjectListSortColumn.LAST_ACTIVITY;
 		currentSortDirection = SortDirection.DESC;
-		inviteCount = 0;
-		openRequestCount = 0;
 		isOwner = authenticationController.isLoggedIn() && authenticationController.getCurrentUserPrincipalId().equals(userId);
-		if (currentArea == null) {
+		if (currentArea == null || !isOwner) {
 			currentArea = ProfileArea.PROFILE;
 		}
 		view.clear();
 		view.showLoading();
-		view.showTabs(isOwner);
 		if (settingsPresenter != null) {
 			settingsPresenter.clear();
 		}
 		myTeamsWidget.clear();
-		view.clearTeamNotificationCount();
 		currentUserId = userId == null ? authenticationController.getCurrentUserPrincipalId() : userId;
 		if (isOwner) {
 			// make sure we have the user favorites before continuing
@@ -375,8 +369,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 
 	public void refreshTeamsForFilter() {
-		updateMembershipInvitationCount();
-		updateMembershipRequestCount();
 		isRefreshingTeamsTab = false;
 		view.addMyTeamProjectsFilter();
 		getTeamBundles();
@@ -384,8 +376,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 
 	@Override
 	public void refreshTeams() {
-		updateMembershipInvitationCount();
-		updateMembershipRequestCount();
 		refreshTeamInvites();
 		isRefreshingTeamsTab = true;
 		getTeamBundles();
@@ -400,40 +390,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 					refreshTeams();
 				}
 			}, null);
-		}
-	}
-
-	public void updateMembershipRequestCount() {
-		if (isOwner) {
-			openRequestCount = 0;
-			jsClient.getOpenMembershipRequestCount(new AsyncCallback<Long>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					teamSynAlert.handleException(caught);
-				}
-
-				@Override
-				public void onSuccess(Long count) {
-					setMembershipRequestsCount(count.intValue());
-				}
-			});
-		}
-	}
-
-	public void updateMembershipInvitationCount() {
-		if (isOwner) {
-			inviteCount = 0;
-			jsClient.getOpenMembershipInvitationCount(new AsyncCallback<Long>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					teamSynAlert.handleException(caught);
-				}
-
-				@Override
-				public void onSuccess(Long count) {
-					setTeamInvitationsCount(count.intValue());
-				}
-			});
 		}
 	}
 
@@ -652,10 +608,13 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 						List<String> lastModifiedBy = new ArrayList<String>(result.size());
 						for (EntityHeader header : result) {
 							lastModifiedBy.add(header.getId());
-							ProjectHeader projectHeader = new ProjectHeader();
-							projectHeader.setId(header.getId());
-							projectHeader.setName(header.getName());
-							headers.add(projectHeader);
+							// only show projects
+							if (Project.class.getName().equals(header.getType())) {
+								ProjectHeader projectHeader = new ProjectHeader();
+								projectHeader.setId(header.getId());
+								projectHeader.setName(header.getName());
+								headers.add(projectHeader);	
+							}
 						}
 						addProjectResults(headers);
 						loadMoreProjectsWidgetContainer.setIsMore(false);
@@ -810,43 +769,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		});
 	}
 
-	public void setTeamInvitationsCount(int count) {
-		inviteCount = count;
-		refreshTeamNotificationCount();
-	}
-
-	public void setMembershipRequestsCount(int count) {
-		openRequestCount = count;
-		refreshTeamNotificationCount();
-	}
-
-	public void refreshTeamNotificationCount() {
-		if (openRequestCount + inviteCount > 0) {
-			view.setTeamNotificationCount(Integer.toString(openRequestCount + inviteCount));
-		} else {
-			view.clearTeamNotificationCount();
-		}
-	}
-
-	/**
-	 * Exposed for test purposes only
-	 */
-	public int getOpenRequestCount() {
-		return openRequestCount;
-	}
-
-	public int getInviteCount() {
-		return inviteCount;
-	}
-
-	public void setOpenRequestCount(int openRequestCount) {
-		this.openRequestCount = openRequestCount;
-	}
-
-	public void setInviteCount(int inviteCount) {
-		this.inviteCount = inviteCount;
-	}
-
 	/**
 	 * Exposed for unit testing purposes only
 	 * 
@@ -890,30 +812,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			ginInjector.getSynapseJSNIUtils().setPageTitle(currentUserBundle.getUserProfile().getUserName() + " - " + tab.name().toLowerCase());
 		}
 		view.setTabSelected(tab);
-	}
-
-	@Override
-	public void tabClicked(final ProfileArea tab) {
-		if (tab == null) {
-			view.showErrorMessage("The selected tab is undefined.");
-			return;
-		}
-		// if we are editing, then pop up a confirm
-		if (globalApplicationState.isEditing()) {
-			Callback yesCallback = new Callback() {
-				@Override
-				public void invoke() {
-					globalApplicationState.setIsEditing(false);
-					getUserProfileEditorWidget().setIsEditingMode(false);
-					boolean pushState = true;
-					showTab(tab, pushState);
-				}
-			};
-			view.showConfirmDialog("", DisplayConstants.NAVIGATE_AWAY_CONFIRMATION_MESSAGE, yesCallback);
-		} else {
-			boolean pushState = true;
-			showTab(tab, pushState);
-		}
 	}
 
 	private void refreshData(ProfileArea tab) {

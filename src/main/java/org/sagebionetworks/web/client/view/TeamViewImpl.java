@@ -2,10 +2,10 @@ package org.sagebionetworks.web.client.view;
 
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
+import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Modal;
-import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
@@ -15,6 +15,7 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.team.BigTeamBadge;
 import org.sagebionetworks.web.client.widget.team.InviteWidget;
+
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -31,7 +32,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 	}
 
 	@UiField
-	Anchor toolsMenuLink;
+	Button toolsMenu;
 	@UiField
 	Heading teamNameHeading;
 	@UiField
@@ -109,13 +110,6 @@ public class TeamViewImpl extends Composite implements TeamView {
 				presenter.onMemberSearch(memberSearchTextBox.getValue());
 			}
 		});
-		Icon icon = new Icon(IconType.ELLIPSIS_V);
-		icon.addStyleName("SRC-primary-background-color-hover");
-		icon.setPaddingTop(9);
-		icon.setPaddingBottom(9);
-		icon.setPaddingLeft(4);
-		icon.setPaddingRight(4);
-		toolsMenuLink.add(icon);
 	}
 
 	@Override

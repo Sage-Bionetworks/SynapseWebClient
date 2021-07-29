@@ -14,7 +14,7 @@
 				<bh:Div addStyleNames="flexcontainer-column flexcontainer-column-fill-width font-size-30">
 					<bh:Div addStyleNames="flexcontainer-row flexcontainer-align-items-center overflow-x-auto">
 					 	<b:Icon ui:field="entityIcon" addStyleNames="flexcontainer-column lightGreyText margin-right-5" type="FILE"/>
-					 	<bh:Span ui:field="entityName" addStyleNames="flexcontainer-column"/>
+					 	<b:Heading addStyleNames="pageHeaderTitle flexcontainer-column" ui:field="entityName" size="H3"/>
 					 	<g:SimplePanel ui:field="favoritePanel" addStyleNames="flexcontainer-column margin-left-5 margin-right-10"/>
 					</bh:Div>
 				</bh:Div>

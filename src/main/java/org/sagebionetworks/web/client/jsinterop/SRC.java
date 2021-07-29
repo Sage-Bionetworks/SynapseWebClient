@@ -16,6 +16,8 @@ public class SRC {
 		public static ReactFunctionComponent<DownloadConfirmationProps> DownloadConfirmation;
 		public static ReactFunctionComponent<FullWidthAlertProps> FullWidthAlert;
 		public static ReactFunctionComponent<SchemaDrivenAnnotationEditorProps> SchemaDrivenAnnotationEditor;
+		public static ReactFunctionComponent<SynapseNavDrawerProps> SynapseNavDrawer;
+		public static ReactFunctionComponent<EmptyProps> FavoritesPage;
 	}
 
 	@JsType(isNative = true)
