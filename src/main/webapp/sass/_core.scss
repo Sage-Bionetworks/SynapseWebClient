@@ -109,6 +109,9 @@ a:focus{color:$synapse-blue;}
 			.projectTitle {
 				> *, .syn-star-o, .syn-question-circle, .entityIcon, a:not(.btn) {
 					color: white;
+					table {
+						color: $synapse-dark-text
+					}
 				}
 			}
 			button.toolsMenuButton, .dropdown.open {
