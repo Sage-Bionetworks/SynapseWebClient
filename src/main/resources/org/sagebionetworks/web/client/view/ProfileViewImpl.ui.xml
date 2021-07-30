@@ -59,7 +59,7 @@
 									<div class="panel panel-default padding-5 min-height-200"
 										ui:field="projectsHighlightBox">
 										<bh:Div>
-											<bh:Div height="26px">
+											<bh:Div height="26px" marginBottom="25" marginTop="10">
 												<b:ButtonGroup ui:field="projectFiltersUI">
 													<b:Button ui:field="allProjectsFilter"
 														size="SMALL">All</b:Button>
@@ -78,8 +78,7 @@
 													</b:ButtonGroup>
 												</b:ButtonGroup>
 											</bh:Div>
-											<t:Table ui:field="columnHeaders" width="100%"
-												addStyleNames="margin-top-10"> <!-- Project list table headers -->
+											<t:Table ui:field="columnHeaders" width="100%"> <!-- Project list table headers -->
 												<t:TableRow>
 													<tr:SortableTableHeaderImpl
 														ui:field="projectNameColumnHeader" text="Name" />
