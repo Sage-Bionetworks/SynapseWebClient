@@ -127,7 +127,7 @@ public class AuthenticationControllerImplTest {
 		authenticationController.logoutUser();
 
 		// sets session cookie
-		verify(mockJsClient).initSession(eq(WebConstants.EXPIRE_SESSION_TOKEN));
+		verify(mockJsClient).initSession(eq(WebConstants.EXPIRE_SESSION_TOKEN), any(AsyncCallback.class));
 		verify(mockClientCache).clear();
 		verify(mockSessionStorage).clear();
 		// verify that authentication receipt is restored

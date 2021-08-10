@@ -27,6 +27,7 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
 import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
+import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.common.util.concurrent.FluentFuture;
@@ -210,8 +211,21 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		currentUserAccessToken = null;
 		currentUserProfile = null;
 		ginInjector.getSessionDetector().initializeAccessTokenState();
-		ginInjector.getSynapseJavascriptClient().initSession(WebConstants.EXPIRE_SESSION_TOKEN);
-		ginInjector.getGlobalApplicationState().refreshPage();
+		ginInjector.getSynapseJavascriptClient().initSession(WebConstants.EXPIRE_SESSION_TOKEN, new AsyncCallback<Void>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				ginInjector.getSynapseJSNIUtils().consoleError(caught);
+				afterCall();
+			}
+			@Override
+			public void onSuccess(Void result) {
+				afterCall();
+			}
+			
+			private void afterCall() {
+				ginInjector.getGlobalApplicationState().refreshPage();
+			}
+		});
 	}
 
 	@Override
@@ -263,8 +277,10 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 					webAppInitializationCallback.invoke();
 				} else {
 					// if the exception was not due to a network failure, then log the user out
-					if (!(caught instanceof UnknownErrorException || caught instanceof StatusCodeException)) {
-						logoutUser();	
+					boolean isNetworkFailure = caught instanceof UnknownErrorException || caught instanceof StatusCodeException;
+					boolean isAlreadyLoggedOut = oldUserAccessToken == null && currentUserAccessToken == null;
+					if (!isNetworkFailure && !isAlreadyLoggedOut) {
+						logoutUser();
 					}
 				}
 			}
