@@ -6,6 +6,7 @@
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	<bh:Div addStyleNames="header" ui:field="header" >
+		<g:FocusPanel ui:field="editModeNavBarClickBlocker" addStyleNames="editModeNavBarClickBlocker" visible="false"/>
 		<bh:Div ui:field="portalAlert" visible="false"
 			addStyleNames="padding-15 flexcontainer-row background-color-white"
 			marginTop="0" marginRight="0" marginBottom="0">

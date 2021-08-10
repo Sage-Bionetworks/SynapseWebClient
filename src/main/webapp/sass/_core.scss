@@ -3502,3 +3502,13 @@ div.border {
 .IconInvalid {
   color: $synapse-yellow;
 }
+
+#body .editModeNavBarClickBlocker {
+	width: 52px;
+	height: 100vh;
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 1050;
+	background-color: rgba(0, 0, 0, 0.5);
+}

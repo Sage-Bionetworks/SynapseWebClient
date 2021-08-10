@@ -95,7 +95,7 @@
 						<b:FormGroup>
 							<b:FormLabel for="password">Password</b:FormLabel>					
 							<g:PasswordTextBox name="password" readOnly="true" addStyleNames="displayBlock margin-bottom-10">NotThePassword</g:PasswordTextBox>
-							<b:Anchor addStyleNames="displayInlineBlock" ui:field="changePasswordLink" visible="false">Change password</b:Anchor>
+							<b:Anchor addStyleNames="displayInlineBlock" ui:field="changePasswordLink" target="_blank" href="#!Profile:v/settings" visible="false">Change password</b:Anchor>
 						</b:FormGroup>
 					</b:Column>
 				</b:Row>

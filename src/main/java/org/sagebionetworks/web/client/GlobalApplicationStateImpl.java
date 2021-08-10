@@ -3,9 +3,11 @@ package org.sagebionetworks.web.client;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import static org.sagebionetworks.web.client.cookie.CookieKeys.SHOW_DATETIME_IN_UTC;
 import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cache.SessionStorage;
@@ -15,6 +17,8 @@ import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.footer.VersionState;
+import org.sagebionetworks.web.client.widget.header.Header;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Element;
@@ -52,6 +56,8 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private CallbackP<JavaScriptObject> fileListCallback;
 	private SynapseProperties synapseProperties;
 	boolean isDragDropInitialized = false;
+	private PortalGinInjector ginInjector;
+	
 	/**
 	 * Last Place in the app
 	 */
@@ -74,7 +80,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	}
 
 	@Inject
-	public GlobalApplicationStateImpl(GlobalApplicationStateView view, CookieProvider cookieProvider, EventBus eventBus, StackConfigServiceAsync stackConfigService, SynapseJSNIUtils synapseJSNIUtils, ClientCache localStorage, GWTWrapper gwt, DateTimeUtils dateTimeUtils, SynapseJavascriptClient jsClient, SynapseProperties synapseProperties, SessionStorage sessionStorage) {
+	public GlobalApplicationStateImpl(GlobalApplicationStateView view, CookieProvider cookieProvider, EventBus eventBus, StackConfigServiceAsync stackConfigService, SynapseJSNIUtils synapseJSNIUtils, ClientCache localStorage, GWTWrapper gwt, DateTimeUtils dateTimeUtils, SynapseJavascriptClient jsClient, SynapseProperties synapseProperties, SessionStorage sessionStorage, PortalGinInjector ginInjector) {
 		this.cookieProvider = cookieProvider;
 		this.eventBus = eventBus;
 		this.stackConfigService = stackConfigService;
@@ -89,6 +95,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		isShowingVersionAlert = false;
 		this.synapseProperties = synapseProperties;
 		this.sessionStorage = sessionStorage;
+		this.ginInjector = ginInjector;
 		initUncaughtExceptionHandler();
 	}
 
@@ -305,6 +312,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	@Override
 	public void setIsEditing(boolean isEditing) {
 		this.isEditing = isEditing;
+		ginInjector.getHeader().refresh();
 	}
 
 	@Override
