@@ -32,6 +32,7 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationStateImpl;
 import org.sagebionetworks.web.client.GlobalApplicationStateView;
 import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.StackConfigServiceAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -45,6 +46,7 @@ import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.footer.VersionState;
+import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.UmbrellaException;
@@ -76,6 +78,10 @@ public class GlobalApplicationStateImplTest {
 	@Mock
 	Callback mockCallback;
 	@Mock
+	PortalGinInjector mockGinInjector;
+	@Mock
+	Header mockHeader;
+	@Mock
 	SessionStorage mockSessionStorage;
 	public static final String REPO_ENDPOINT = "https://repo-staging.prod.sagebase.org/";
 	public static final String SWC_ENDPOINT = "https://staging.synapse.org/";
@@ -91,7 +97,8 @@ public class GlobalApplicationStateImplTest {
 		mockView = mock(GlobalApplicationStateView.class);
 		AsyncMockStubber.callSuccessWith("v1").when(mockJsClient).getSynapseVersions(any(AsyncCallback.class));
 
-		globalApplicationState = new GlobalApplicationStateImpl(mockView, mockCookieProvider, mockEventBus, mockStackConfigService, mockSynapseJSNIUtils, mockLocalStorage, mockGWT, mockDateTimeUtils, mockJsClient, mockSynapseProperties, mockSessionStorage);
+		globalApplicationState = new GlobalApplicationStateImpl(mockView, mockCookieProvider, mockEventBus, mockStackConfigService, mockSynapseJSNIUtils, mockLocalStorage, mockGWT, mockDateTimeUtils, mockJsClient, mockSynapseProperties, mockSessionStorage, mockGinInjector);
+		when(mockGinInjector.getHeader()).thenReturn(mockHeader);
 		globalApplicationState.setPlaceController(mockPlaceController);
 		globalApplicationState.setAppPlaceHistoryMapper(mockAppPlaceHistoryMapper);
 		when(mockSynapseProperties.getSynapseProperty(REPO_SERVICE_URL_KEY)).thenReturn(REPO_ENDPOINT + "repo/v1");
@@ -130,13 +137,20 @@ public class GlobalApplicationStateImplTest {
 		verify(mockSynapseJSNIUtils).consoleError(errorMessage);
 	}
 
-
 	@Test
 	public void testUncaughtJSExceptions() {
 		Throwable t = new RuntimeException("uncaught");
 		globalApplicationState.handleUncaughtException(t);
 		verify(mockSynapseJSNIUtils).consoleError(t);
 		verify(mockJsClient).logError(eq(t));
+	}
+
+	@Test
+	public void testSetEditing() {
+		globalApplicationState.setIsEditing(true);
+		
+		assertTrue(globalApplicationState.isEditing());
+		verify(mockHeader).refresh();
 	}
 
 	@Test

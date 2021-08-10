@@ -49,17 +49,19 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	Div synapseNavDrawerContainer = new Div();
 	@UiField
 	Alert stagingAlert;
+	@UiField
+	FocusPanel editModeNavBarClickBlocker;
 	
 	private Presenter presenter;
 	String portalHref = "";
 	SynapseContextPropsProvider propsProvider;
-	GlobalApplicationState globalAppState;
+	PortalGinInjector ginInjector;
 	
 	@Inject
-	public HeaderViewImpl(Binder binder, SynapseContextPropsProvider propsProvider, GlobalApplicationState globalAppState, PortalGinInjector ginInjector) {
+	public HeaderViewImpl(Binder binder, SynapseContextPropsProvider propsProvider, PortalGinInjector ginInjector) {
 		this.initWidget(binder.createAndBindUi(this));
+		this.ginInjector = ginInjector;
 		this.propsProvider = propsProvider;
-		this.globalAppState = globalAppState;
 		cookieNotificationAlert.addPrimaryCTAClickHandler(event -> {
 			presenter.onCookieNotificationDismissed();
 		});
@@ -83,6 +85,10 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 
 
 	public void initClickHandlers() {
+		editModeNavBarClickBlocker.addClickHandler(event -> {
+			event.preventDefault();
+			event.stopPropagation();
+		});
 		portalLogoFocusPanel.addClickHandler(event -> {
 			if (DisplayUtils.isDefined(portalHref)) {
 				Window.Location.assign(portalHref);
@@ -107,10 +113,13 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	
 	@Override
 	public void refresh() {
+		GlobalApplicationState globalAppState = ginInjector.getGlobalApplicationState();
 		if (globalAppState.getCurrentPlace() == null || globalAppState.getCurrentPlace() instanceof Home || globalAppState.getCurrentPlace() instanceof LoginPlace) {
 			detachNavBar();
 		} else {
 			attachNavBar();
+			// cover with a click catcher if in editing mode
+			editModeNavBarClickBlocker.setVisible(globalAppState.isEditing());
 		}
 	}
 

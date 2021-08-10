@@ -238,33 +238,6 @@ public class UserProfileEditorWidgetImplTest {
 	}
 	
 	@Test
-	public void testOnChangePassword() {
-		widget.configure(profile, null, mockCallback);
-		widget.onChangePassword();
-		
-		verify(mockPopupUtilsView).showConfirmDialog(eq(UserProfileEditorWidgetImpl.CONFIRM_SAVE_BEFORE_GOTO_SETTINGS_TITLE), eq(UserProfileEditorWidgetImpl.CONFIRM_SAVE_BEFORE_GOTO_SETTINGS_MESSAGE), callbackCaptor.capture());
-		
-		// simulate confirm
-		callbackCaptor.getValue().invoke();
-		
-		// in the case of changing the password, updated values should be saved, and then user should be sent to the Settings tab.
-		verify(mockJsClient).updateMyUserProfile(userProfileCaptor.capture(), any(AsyncCallback.class));
-		assertEquals(changes.getOwnerId(), userProfileCaptor.getValue().getOwnerId());
-		assertEquals(changes.getFirstName(), userProfileCaptor.getValue().getFirstName());
-		assertEquals(changes.getLastName(), userProfileCaptor.getValue().getLastName());
-		assertEquals(changes.getUserName(), userProfileCaptor.getValue().getUserName());
-		
-		verify(mockCallback).invoke();
-		verify(mockClientCache).remove(profile.getOwnerId() + WebConstants.USER_PROFILE_SUFFIX);
-		verify(mockAuthController).updateCachedProfile(profile);
- 
-		verify(mockPlaceChanger).goTo(profilePlaceCaptor.capture());
-		Profile profilePlace = profilePlaceCaptor.getValue();
-		assertEquals(USER_PROFILE_ID, profilePlace.getUserId());
-		assertEquals(ProfileArea.SETTINGS, profilePlace.getArea());
-	}
-	
-	@Test
 	public void testOnSaveFailure() {
 		Exception ex = new Exception("An error");
 		AsyncMockStubber.callFailureWith(ex).when(mockJsClient).updateMyUserProfile(any(UserProfile.class), any(AsyncCallback.class));

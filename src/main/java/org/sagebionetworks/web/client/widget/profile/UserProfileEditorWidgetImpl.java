@@ -230,15 +230,6 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 	}
 	
 	@Override
-	public void onChangePassword() {
-		// confirm user is ok with saving changes before send them to the Settings page
-		popupUtils.showConfirmDialog(CONFIRM_SAVE_BEFORE_GOTO_SETTINGS_TITLE, CONFIRM_SAVE_BEFORE_GOTO_SETTINGS_MESSAGE, () -> {
-			goToAccountSettingsAfterSave = true;
-			onSave();
-		});
-	}
-	
-	@Override
 	public void onCancel() {
 		// revert changes
 		configure(originalProfile, orcIdHref, callback);

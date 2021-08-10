@@ -125,9 +125,6 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 		cancelButton.addClickHandler(event -> {
 			presenter.onCancel();
 		});
-		changePasswordLink.addClickHandler(event -> {
-			presenter.onChangePassword();
-		});
 		linkRenderer.getElement().setAttribute("rel", "noreferrer noopener");
 		originalButtonText = saveProfileButton.getText();
 	}
