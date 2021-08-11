@@ -9,7 +9,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getDoneFuture;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getFailedFuture;
+
 import java.util.Collections;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,7 +26,7 @@ import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
-import org.sagebionetworks.web.client.SynapseFutureClient;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.EmailInvitation;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -37,6 +39,7 @@ import org.sagebionetworks.web.client.view.EmailInvitationView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -48,7 +51,7 @@ public class EmailInvitationPresenterTest {
 	@Mock
 	private SynapseJavascriptClient mockJsClient;
 	@Mock
-	private SynapseFutureClient futureClient;
+	private SynapseClientAsync mockSynapseClient;
 	@Mock
 	private SynapseAlert mockSynapseAlert;
 	@Mock
@@ -80,7 +83,7 @@ public class EmailInvitationPresenterTest {
 	@Before
 	public void before() {
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		presenter = new EmailInvitationPresenter(mockView, mockJsClient, futureClient, mockSynapseAlert, mockAuthController, mockGlobalApplicationState);
+		presenter = new EmailInvitationPresenter(mockView, mockJsClient, mockSynapseClient, mockSynapseAlert, mockAuthController, mockGlobalApplicationState);
 	}
 
 	public void beforeSetPlace(boolean loggedIn) {
@@ -88,7 +91,7 @@ public class EmailInvitationPresenterTest {
 		encodedMISignedToken = "encodedToken";
 		when(place.toToken()).thenReturn(encodedMISignedToken);
 		MembershipInvtnSignedToken decodedToken = new MembershipInvtnSignedToken();
-		when(futureClient.hexDecodeAndDeserialize(eq(encodedMISignedToken))).thenReturn(getDoneFuture(decodedToken));
+		AsyncMockStubber.callSuccessWith(decodedToken).when(mockSynapseClient).hexDecodeAndDeserialize(eq(encodedMISignedToken), any(AsyncCallback.class));
 		when(mockJsClient.getMembershipInvitation(decodedToken)).thenReturn(getDoneFuture(mockMembershipInvitation));
 		when(mockMembershipInvitation.getId()).thenReturn("misId");
 		String email = "invitee@email.com";
@@ -207,7 +210,7 @@ public class EmailInvitationPresenterTest {
 	@Test
 	public void testInvalidSignedToken() {
 		beforeSetPlace(false);
-		when(futureClient.hexDecodeAndDeserialize(eq(encodedMISignedToken))).thenReturn(getFailedFuture());
+		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).hexDecodeAndDeserialize(eq(encodedMISignedToken), any(AsyncCallback.class));
 		presenter.setPlace(place);
 		verify(mockSynapseAlert).handleException(any(Throwable.class));
 		verify(mockJsClient, never()).getMembershipInvitation(any());
