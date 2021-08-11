@@ -4,16 +4,20 @@ import static com.google.common.util.concurrent.Futures.getDone;
 import static com.google.common.util.concurrent.Futures.whenAllComplete;
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 import static org.sagebionetworks.web.client.DisplayUtils.getDisplayName;
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import javax.inject.Inject;
+
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 import org.sagebionetworks.repo.model.InviteeVerificationSignedToken;
 import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.repo.model.MembershipInvtnSignedToken;
+import org.sagebionetworks.repo.model.SignedTokenInterface;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
-import org.sagebionetworks.web.client.SynapseFutureClient;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.EmailInvitation;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -24,6 +28,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.EmailInvitationView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
+
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -36,7 +41,7 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 	private String encodedMISignedToken;
 	private EmailInvitationView view;
 	private SynapseJavascriptClient jsClient;
-	private SynapseFutureClient futureClient;
+	private SynapseClientAsync synapseClient;
 	private SynapseAlert synapseAlert;
 	private AuthenticationController authController;
 	private PlaceChanger placeChanger;
@@ -44,10 +49,11 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 	private MembershipInvitation membershipInvitation;
 
 	@Inject
-	public EmailInvitationPresenter(EmailInvitationView view, SynapseJavascriptClient jsClient, SynapseFutureClient futureClient, SynapseAlert synapseAlert, AuthenticationController authController, GlobalApplicationState globalApplicationState) {
+	public EmailInvitationPresenter(EmailInvitationView view, SynapseJavascriptClient jsClient, SynapseClientAsync synapseClient, SynapseAlert synapseAlert, AuthenticationController authController, GlobalApplicationState globalApplicationState) {
 		this.view = view;
 		this.jsClient = jsClient;
-		this.futureClient = futureClient;
+		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.synapseAlert = synapseAlert;
 		this.view.setSynapseAlertContainer(this.synapseAlert.asWidget());
 		this.authController = authController;
@@ -66,30 +72,43 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 		view.setPresenter(this);
 		encodedMISignedToken = place.toToken();
 
-		futureClient.hexDecodeAndDeserialize(encodedMISignedToken).transformAsync(token -> jsClient.getMembershipInvitation((MembershipInvtnSignedToken) token), directExecutor()).addCallback(new FutureCallback<MembershipInvitation>() {
+		synapseClient.hexDecodeAndDeserialize(encodedMISignedToken, new AsyncCallback<SignedTokenInterface>() {
 			@Override
-			public void onSuccess(MembershipInvitation mis) {
-				membershipInvitation = mis;
-				// check to see if this invitation is associated to the current user
-				if (authController.isLoggedIn()) {
-					if (mis.getInviteeId() != null && authController.getCurrentUserPrincipalId().equals(mis.getInviteeId())) {
-						// user id already bound to invitation. redirect to profile page
-						gotoProfilePageTeamArea();
-						return;
-					} else {
-						verifyEmailAssociatedToAuthenticatedUser();
-					}
-				}
-				initializeView(mis);
-			}
-
-			@Override
-			public void onFailure(Throwable throwable) {
+			public void onFailure(Throwable caught) {
 				view.hideLoading();
-				synapseAlert.handleException(throwable);
+				synapseAlert.handleException(caught);
 			}
-		}, directExecutor());
+			
+			public void onSuccess(SignedTokenInterface token) {
+				
+				FluentFuture<MembershipInvitation> invitationFuture = jsClient.getMembershipInvitation((MembershipInvtnSignedToken) token);
+				invitationFuture.addCallback(new FutureCallback<MembershipInvitation>() {
+					@Override
+					public void onSuccess(MembershipInvitation mis) {
+						membershipInvitation = mis;
+						// check to see if this invitation is associated to the current user
+						if (authController.isLoggedIn()) {
+							if (mis.getInviteeId() != null && authController.getCurrentUserPrincipalId().equals(mis.getInviteeId())) {
+								// user id already bound to invitation. redirect to profile page
+								gotoProfilePageTeamArea();
+								return;
+							} else {
+								verifyEmailAssociatedToAuthenticatedUser();
+							}
+						}
+						initializeView(mis);
+					}
 
+					@Override
+					public void onFailure(Throwable t) {
+						view.hideLoading();
+						synapseAlert.handleException(t);
+					}
+				}, directExecutor());
+				
+				
+			};
+		});
 	}
 
 	private void verifyEmailAssociatedToAuthenticatedUser() {
