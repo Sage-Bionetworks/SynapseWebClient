@@ -22,6 +22,7 @@ public class EntityIdCellRenderer implements Cell, TakesAddressCell {
 	ClickHandler customClickHandler;
 	CellAddress address;
 	boolean hideIfLoadError;
+	boolean showEntityId = false;
 
 	@Inject
 	public EntityIdCellRenderer(EntityIdCellRendererView view, 
@@ -54,8 +55,9 @@ public class EntityIdCellRenderer implements Cell, TakesAddressCell {
 				@Override
 				public void onSuccess(EntityHeader entity) {
 					entityName = entity.getName();
+					String linkText = showEntityId ? entityName + " (" + entity.getId() + ")" : entityName;
 					view.setIcon(EntityTypeUtils.getIconTypeForEntityClassName(entity.getType()));
-					view.setLinkText(entityName);
+					view.setLinkText(linkText);
 				}
 
 				@Override
@@ -77,6 +79,9 @@ public class EntityIdCellRenderer implements Cell, TakesAddressCell {
 		}
 	}
 
+	public void setShowEntityId(boolean showEntityId) {
+		this.showEntityId = showEntityId;
+	}
 	@Override
 	public Widget asWidget() {
 		return this.view.asWidget();
