@@ -29,6 +29,7 @@ public class SubjectWidget implements SubjectWidgetView.Presenter, IsWidget {
 		this.deletedCallback = deletedCallback;
 		if (rod.getType().equals(RestrictableObjectType.ENTITY)) {
 			EntityIdCellRenderer entityRenderer = (EntityIdCellRenderer) ginInjector.createEntityIdCellRenderer();
+			entityRenderer.setShowEntityId(true);
 			entityRenderer.setValue(rod.getId(), false);
 			view.setSubjectRendererWidget(entityRenderer);
 		} else if (rod.getType().equals(RestrictableObjectType.TEAM)) {
