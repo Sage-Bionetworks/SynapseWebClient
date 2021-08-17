@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.List;
+
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Project;
@@ -14,6 +15,7 @@ import org.sagebionetworks.repo.model.file.S3UploadDestination;
 import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.file.UploadType;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -24,8 +26,8 @@ import org.sagebionetworks.web.client.widget.entity.controller.EntityActionContr
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWidget;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -83,6 +85,11 @@ public class EntityMetadata implements Presenter {
 		setAnnotationsVisible(isShowingAnnotations);
 		actionMenu.setActionListener(Action.SHOW_ANNOTATIONS, action -> {
 			isShowingAnnotations = !isShowingAnnotations;
+			if (DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider())) {
+				// In alpha mode, this pops up a modal. We always want to show annotations when this is clicked
+				// Current non-alpha implementation is a toggle, which is why we need to flip the state when not in alpha mode.
+				isShowingAnnotations = true;
+			}
 			setAnnotationsVisible(isShowingAnnotations);
 		});
 

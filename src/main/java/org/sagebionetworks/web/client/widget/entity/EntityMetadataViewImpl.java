@@ -4,7 +4,16 @@ import org.gwtbootstrap3.client.ui.Collapse;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.jsinterop.EntityModalProps;
+import org.sagebionetworks.web.client.jsinterop.React;
+import org.sagebionetworks.web.client.jsinterop.ReactDOM;
+import org.sagebionetworks.web.client.jsinterop.SRC;
+import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -20,125 +29,159 @@ import com.google.inject.Inject;
 
 public class EntityMetadataViewImpl extends Composite implements EntityMetadataView {
 
-	interface EntityMetadataViewImplUiBinder extends UiBinder<Widget, EntityMetadataViewImpl> {
-	}
+    interface EntityMetadataViewImplUiBinder extends UiBinder<Widget, EntityMetadataViewImpl> {
+    }
 
-	private static EntityMetadataViewImplUiBinder uiBinder = GWT.create(EntityMetadataViewImplUiBinder.class);
+    private static EntityMetadataViewImplUiBinder uiBinder = GWT.create(EntityMetadataViewImplUiBinder.class);
 
-	@UiField
-	HTMLPanel detailedMetadata;
-	@UiField
-	HTMLPanel dataUseContainer;
-	@UiField
-	TextBox idField;
-	@UiField
-	Span doiPanel;
-	@UiField
-	Collapse annotationsContent;
-	@UiField
-	SimplePanel annotationsContainer;
-	@UiField
-	Span containerItemCountContainer;
-	@UiField
-	Span restrictionPanelV2;
-	@UiField
-	Div fileHistoryContainer;
-	@UiField
-	Span uploadDestinationPanel;
-	@UiField
-	Span uploadDestinationField;
-	@UiField
-	Text annotationsTitleText;
+    private CookieProvider cookies;
+    private SynapseContextPropsProvider propsProvider;
 
-	@Inject
-	public EntityMetadataViewImpl(final SynapseJSNIUtils jsniUtils) {
-		initWidget(uiBinder.createAndBindUi(this));
-		idField.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				idField.selectAll();
-			}
-		});
-	}
+    @UiField
+    HTMLPanel detailedMetadata;
+    @UiField
+    HTMLPanel dataUseContainer;
+    @UiField
+    TextBox idField;
+    @UiField
+    Span doiPanel;
+    @UiField
+    Collapse annotationsContent;
+    @UiField
+    SimplePanel annotationsContainer;
+    @UiField
+    Span containerItemCountContainer;
+    @UiField
+    Span restrictionPanelV2;
+    @UiField
+    Div fileHistoryContainer;
+    @UiField
+    Span uploadDestinationPanel;
+    @UiField
+    Span uploadDestinationField;
+    @UiField
+    Text annotationsTitleText;
+    @UiField
+    ReactComponentDiv annotationsModalContainer;
 
-	@Override
-	public void setContainerItemCountWidget(IsWidget w) {
-		containerItemCountContainer.clear();
-		containerItemCountContainer.add(w);
-	}
+    @Inject
+    public EntityMetadataViewImpl(final SynapseJSNIUtils jsniUtils, final CookieProvider cookieProvider, final SynapseContextPropsProvider propsProvider) {
+        this.cookies = cookieProvider;
+        this.propsProvider = propsProvider;
+        initWidget(uiBinder.createAndBindUi(this));
+        idField.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                idField.selectAll();
+            }
+        });
+    }
 
-	@Override
-	public void setDoiWidget(IsWidget doiWidget) {
-		doiPanel.clear();
-		doiPanel.add(doiWidget);
-	}
+    @Override
+    public void setContainerItemCountWidget(IsWidget w) {
+        containerItemCountContainer.clear();
+        containerItemCountContainer.add(w);
+    }
 
-	@Override
-	public void setAnnotationsRendererWidget(IsWidget annotationsWidget) {
-		annotationsContainer.setWidget(annotationsWidget);
-	}
+    @Override
+    public void setDoiWidget(IsWidget doiWidget) {
+        doiPanel.clear();
+        doiPanel.add(doiWidget);
+    }
 
-	@Override
-	public void setUploadDestinationPanelVisible(boolean isVisible) {
-		uploadDestinationPanel.setVisible(isVisible);
-	}
+    @Override
+    public void setAnnotationsRendererWidget(IsWidget annotationsWidget) {
+        annotationsContainer.setWidget(annotationsWidget);
+    }
 
-	@Override
-	public void setUploadDestinationText(String text) {
-		uploadDestinationField.setText(text);
-	}
+    @Override
+    public void setUploadDestinationPanelVisible(boolean isVisible) {
+        uploadDestinationPanel.setVisible(isVisible);
+    }
 
-	@Override
-	public void setAnnotationsVisible(boolean visible) {
-		if (visible) {
-			annotationsContent.show();
-		} else {
-			annotationsContent.hide();
-		}
-	}
+    @Override
+    public void setUploadDestinationText(String text) {
+        uploadDestinationField.setText(text);
+    }
 
-	@Override
-	public void setVersionHistoryWidget(IsWidget fileHistoryWidget) {
-		fileHistoryContainer.clear();
-		fileHistoryContainer.add(fileHistoryWidget);
-	}
+    @Override
+    public void setAnnotationsVisible(boolean visible) {
+        if (DisplayUtils.isInTestWebsite(cookies)) {
+            if (visible) {
+                EntityModalProps props =
+                        EntityModalProps.create(idField.getText(), true, () -> setAnnotationsVisible(false), "ANNOTATIONS", false);
 
-	@Override
-	public void clear() {
-		dataUseContainer.setVisible(false);
-		annotationsContent.hide();
-		uploadDestinationField.setText("");
-		uploadDestinationPanel.setVisible(false);
-	}
+                ReactDOM.render(
+                        React.createElementWithSynapseContext(
+                                SRC.SynapseComponents.EntityModal,
+                                props,
+                                propsProvider.getJsInteropContextProps()
+                        ),
+                        annotationsModalContainer.getElement()
+                );
+            } else {
+                EntityModalProps props =
+                        EntityModalProps.create(idField.getText(), false, () -> setAnnotationsVisible(false), "ANNOTATIONS", false);
+                ReactDOM.render(
+                        React.createElementWithSynapseContext(
+                                SRC.SynapseComponents.EntityModal,
+                                props,
+                                propsProvider.getJsInteropContextProps()
+                        ),
+                        annotationsModalContainer.getElement()
+                );
+            }
+        } else {
+            if (visible) {
+                annotationsContent.show();
+            } else {
+                annotationsContent.hide();
+            }
+        }
+    }
 
-	@Override
-	public void setDetailedMetadataVisible(boolean visible) {
-		detailedMetadata.setVisible(visible);
-	}
+    @Override
+    public void setVersionHistoryWidget(IsWidget fileHistoryWidget) {
+        fileHistoryContainer.clear();
+        fileHistoryContainer.add(fileHistoryWidget);
+    }
 
-	@Override
-	public void setEntityId(String text) {
-		idField.setText(text);
-	}
+    @Override
+    public void clear() {
+        dataUseContainer.setVisible(false);
+        annotationsContent.hide();
+        uploadDestinationField.setText("");
+        uploadDestinationPanel.setVisible(false);
+    }
 
-	@Override
-	public void setRestrictionPanelVisible(boolean visible) {
-		dataUseContainer.setVisible(visible);
-	}
+    @Override
+    public void setDetailedMetadataVisible(boolean visible) {
+        detailedMetadata.setVisible(visible);
+    }
 
-	@Override
-	public void setRestrictionWidgetV2(IsWidget restrictionWidget) {
-		restrictionPanelV2.clear();
-		restrictionPanelV2.add(restrictionWidget);
-	}
+    @Override
+    public void setEntityId(String text) {
+        idField.setText(text);
+    }
 
-	@Override
-	public void setRestrictionWidgetV2Visible(boolean visible) {
-		restrictionPanelV2.setVisible(visible);
-	}
+    @Override
+    public void setRestrictionPanelVisible(boolean visible) {
+        dataUseContainer.setVisible(visible);
+    }
 
-	@Override
-	public void setAnnotationsTitleText(String text) {
-		annotationsTitleText.setText(text);
-	}
+    @Override
+    public void setRestrictionWidgetV2(IsWidget restrictionWidget) {
+        restrictionPanelV2.clear();
+        restrictionPanelV2.add(restrictionWidget);
+    }
+
+    @Override
+    public void setRestrictionWidgetV2Visible(boolean visible) {
+        restrictionPanelV2.setVisible(visible);
+    }
+
+    @Override
+    public void setAnnotationsTitleText(String text) {
+        annotationsTitleText.setText(text);
+    }
 }

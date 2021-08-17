@@ -18,6 +18,7 @@ public class SRC {
 		public static ReactFunctionComponent<SchemaDrivenAnnotationEditorProps> SchemaDrivenAnnotationEditor;
 		public static ReactFunctionComponent<SynapseNavDrawerProps> SynapseNavDrawer;
 		public static ReactFunctionComponent<EmptyProps> FavoritesPage;
+		public static ReactFunctionComponent<EntityModalProps> EntityModal;
 	}
 
 	@JsType(isNative = true)
