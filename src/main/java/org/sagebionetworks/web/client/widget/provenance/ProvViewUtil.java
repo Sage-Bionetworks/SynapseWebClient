@@ -86,11 +86,6 @@ public class ProvViewUtil {
 			FlowPanel content = new FlowPanel();
 			label.addStyleName(ACT_MARGIN_NAME);
 			content.add(label);
-			Div badgeContainer = new Div();
-			badgeContainer.addStyleName(ACT_MARGIN_USER);
-			badgeContainer.add(badge.asWidget());
-			content.add(badgeContainer);
-			time.addStyleName(ACT_MARGIN_TIME);
 			if (DisplayUtils.isDefined(node.getActivityDescription())) {
 				Paragraph descriptionParagraph = new Paragraph(DisplayUtils.stubStrPartialWord(node.getActivityDescription(), MAX_ACT_CODE_NAME_CHAR));
 				descriptionParagraph.addStyleName(PROV_ACTIVITY_LABEL_STYLE);
@@ -98,6 +93,11 @@ public class ProvViewUtil {
 				Tooltip description = new Tooltip(descriptionParagraph, node.getActivityDescription());
 				content.add(description);
 			}
+			Div badgeContainer = new Div();
+			badgeContainer.addStyleName(ACT_MARGIN_USER);
+			badgeContainer.add(badge.asWidget());
+			content.add(badgeContainer);
+			time.addStyleName(ACT_MARGIN_TIME);
 			content.add(time);
 			container.addContent(content);
 			badge.configure(node.getModifiedBy());
