@@ -1,11 +1,14 @@
 package org.sagebionetworks.web.client.widget.provenance;
 
 import java.util.Map;
+
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Icon;
+import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.IconSize;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -26,6 +29,7 @@ import org.sagebionetworks.web.shared.provenance.EntityGraphNode;
 import org.sagebionetworks.web.shared.provenance.ExpandGraphNode;
 import org.sagebionetworks.web.shared.provenance.ExternalGraphNode;
 import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
+
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -35,7 +39,6 @@ import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.Widget;
 
 public class ProvViewUtil {
 
@@ -78,19 +81,26 @@ public class ProvViewUtil {
 				label.add(new HTML(DisplayUtils.stubStrPartialWord(node.getActivityName(), MAX_ACT_CODE_NAME_CHAR)));
 			}
 			UserBadge badge = ginInjector.getUserBadgeWidget();
-			badge.configure(node.getModifiedBy());
 			HTML time = new HTML(ginInjector.getDateTimeUtils().getLongFriendlyDate(node.getModifiedOn()));
 			time.addStyleName(PROV_ACTIVITY_TIME_STYLE);
-
 			FlowPanel content = new FlowPanel();
 			label.addStyleName(ACT_MARGIN_NAME);
 			content.add(label);
-			Widget userBadgeWidget = badge.asWidget();
-			userBadgeWidget.addStyleName(ACT_MARGIN_USER);
-			content.add(userBadgeWidget);
+			Div badgeContainer = new Div();
+			badgeContainer.addStyleName(ACT_MARGIN_USER);
+			badgeContainer.add(badge.asWidget());
+			content.add(badgeContainer);
 			time.addStyleName(ACT_MARGIN_TIME);
+			if (DisplayUtils.isDefined(node.getActivityDescription())) {
+				Paragraph descriptionParagraph = new Paragraph(DisplayUtils.stubStrPartialWord(node.getActivityDescription(), MAX_ACT_CODE_NAME_CHAR));
+				descriptionParagraph.addStyleName(PROV_ACTIVITY_LABEL_STYLE);
+				descriptionParagraph.addStyleName(ACT_MARGIN_TIME);
+				Tooltip description = new Tooltip(descriptionParagraph, node.getActivityDescription());
+				content.add(description);
+			}
 			content.add(time);
 			container.addContent(content);
+			badge.configure(node.getModifiedBy());
 		}
 
 		setPosition(node, container);

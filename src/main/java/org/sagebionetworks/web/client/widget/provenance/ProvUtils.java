@@ -60,7 +60,7 @@ public class ProvUtils {
 		// create Expand nodes and add edges to used nodes if requested
 		for (Activity act : processedActivities.values()) {
 			ActivityType type = ActivityTypeUtil.get(act);
-			ActivityGraphNode activityNode = new ActivityGraphNode(createUniqueNodeId(), act.getId(), act.getName(), type, act.getModifiedBy(), act.getModifiedOn(), false);
+			ActivityGraphNode activityNode = new ActivityGraphNode(createUniqueNodeId(), act.getId(), act.getName(), act.getDescription(), type, act.getModifiedBy(), act.getModifiedOn(), false);
 			idToNode.put(activityNode.getId(), activityNode);
 			graph.addNode(activityNode);
 			activityNodes.put(act, activityNode);
