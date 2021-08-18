@@ -55,10 +55,10 @@ public class NChartUtilTest {
 		d4 = new EntityGraphNode("d4", null, null, null, null, null, false, false);
 		d5 = new EntityGraphNode("d5", null, null, null, null, null, false, false);
 		d6 = new EntityGraphNode("d6", null, null, null, null, null, false, false);
-		a = new ActivityGraphNode("A", "1", "Step A", ActivityType.MANUAL, "1", new Date(), false);
-		b = new ActivityGraphNode("B", "2", "Step B", ActivityType.MANUAL, "1", new Date(), false);
-		c = new ActivityGraphNode("C", "2", "Step C", ActivityType.MANUAL, "1", new Date(), false);
-		d = new ActivityGraphNode("D", "4", "Step D", ActivityType.MANUAL, "1", new Date(), false);
+		a = new ActivityGraphNode("A", "1", "Step A", "description a", ActivityType.MANUAL, "1", new Date(), false);
+		b = new ActivityGraphNode("B", "2", "Step B", "description b", ActivityType.MANUAL, "1", new Date(), false);
+		c = new ActivityGraphNode("C", "2", "Step C", "description c", ActivityType.MANUAL, "1", new Date(), false);
+		d = new ActivityGraphNode("D", "4", "Step D", "description d", ActivityType.MANUAL, "1", new Date(), false);
 	}
 
 	/**
@@ -310,7 +310,7 @@ public class NChartUtilTest {
 	public void testCreateNChartCharacters() {
 		EntityGraphNode d1 = new EntityGraphNode("d1", null, null, null, null, null, false, false);
 		EntityGraphNode d2 = new EntityGraphNode("d2", null, null, null, null, null, false, false);
-		ActivityGraphNode a = new ActivityGraphNode("A", "1", "Step A", ActivityType.MANUAL, "1", new Date(), false);
+		ActivityGraphNode a = new ActivityGraphNode("A", "1", "Step A", "description a", ActivityType.MANUAL, "1", new Date(), false);
 		Set<ProvGraphNode> graphNodes = new HashSet<ProvGraphNode>();
 		graphNodes.add(d1);
 		graphNodes.add(d2);
@@ -334,7 +334,7 @@ public class NChartUtilTest {
 	public void testCreateActivityLayerNode() {
 		EntityGraphNode d1 = new EntityGraphNode("d1", null, null, null, null, null, false, false);
 		EntityGraphNode d2 = new EntityGraphNode("d2", null, null, null, null, null, false, false);
-		ActivityGraphNode a = new ActivityGraphNode("A", "1", "Step A", ActivityType.MANUAL, "1", new Date(), false);
+		ActivityGraphNode a = new ActivityGraphNode("A", "1", "Step A", "description a", ActivityType.MANUAL, "1", new Date(), false);
 		List<ProvGraphNode> graphNodes = new ArrayList<ProvGraphNode>();
 		graphNodes.add(d1);
 		graphNodes.add(d2);
