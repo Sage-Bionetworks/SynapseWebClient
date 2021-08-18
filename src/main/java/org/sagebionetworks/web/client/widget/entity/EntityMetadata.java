@@ -1,10 +1,17 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
+
 import java.util.List;
+
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Folder;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.VersionableEntity;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
+import org.sagebionetworks.repo.model.doi.v2.DoiAssociation;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.ExternalGoogleCloudUploadDestination;
 import org.sagebionetworks.repo.model.file.ExternalObjectStoreUploadDestination;
@@ -24,6 +31,8 @@ import org.sagebionetworks.web.client.widget.entity.controller.EntityActionContr
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWidget;
+
+import com.google.common.util.concurrent.FutureCallback;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -90,9 +99,7 @@ public class EntityMetadata implements Presenter {
 			getVersionHistoryWidget().setVisible(!getVersionHistoryWidget().isVisible());
 		});
 
-		// TODO: This is undefined behavior, and differs between files and tables.
-		// Use `isLatestVersion` when PLFM-6583 is complete.
-		boolean isCurrentVersion = versionNumber == null;
+		boolean isCurrentVersion = en instanceof VersionableEntity ? ((VersionableEntity) en).getIsLatestVersion() : true;
 		if (EntityActionControllerImpl.isVersionSupported(bundle.getEntity(), ginInjector.getCookieProvider())) {
 			getVersionHistoryWidget().setVisible(false);
 			getVersionHistoryWidget().setEntityBundle(bundle, versionNumber);
@@ -107,7 +114,25 @@ public class EntityMetadata implements Presenter {
 			containerItemCountWidget.configure(bundle.getEntity().getId());
 		}
 		configureStorageLocation(en);
-		doiWidgetV2.configure(bundle.getDoiAssociation());
+
+		// An unversioned DOI may not have been included in the (versioned) entity bundle, so we should see if one exists
+		if (bundle.getDoiAssociation() == null && // If a versioned DOI exists, we should show that
+				en instanceof VersionableEntity && isCurrentVersion // We only do this for the current/latest version because the unversioned DOI points to that version
+		) {
+			jsClient.getDoiAssociation(en.getId(), ObjectType.ENTITY, null).addCallback(new FutureCallback<DoiAssociation>() {
+				@Override
+				public void onSuccess(@NullableDecl DoiAssociation doiAssociation) {
+					doiWidgetV2.configure(doiAssociation);
+				}
+
+				@Override
+				public void onFailure(Throwable t) {
+					// no op
+				}
+			}, directExecutor());
+		} else if (bundle.getDoiAssociation() != null) {
+			doiWidgetV2.configure(bundle.getDoiAssociation());
+		}
 		annotationsWidget.configure(bundle, canEdit, isCurrentVersion);
 		restrictionWidgetV2.configure(en, bundle.getPermissions().getCanChangePermissions());
 	}
