@@ -26,6 +26,7 @@ import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.place.PeopleSearch;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.presenter.SearchPresenter;
@@ -35,6 +36,8 @@ import org.sagebionetworks.web.client.view.SearchView;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.SearchQueryUtils;
+
+import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -124,6 +127,14 @@ public class SearchPresenterTest {
 		// test for a word with the prefix and is a synapse ID
 		String term = ClientProperties.SYNAPSE_ID_PREFIX + "1234567890"; // # 'syn1234567890'
 		assertEquals(new Synapse(term), SearchUtil.willRedirect(new Search(term)));
+	}
+	
+	@Test
+	public void testSetPlaceUsernamePrefix() throws Exception {
+		String userName = "VaderLabTech";
+		Place redirectPlace = SearchUtil.willRedirect("@" + userName);
+		assertTrue(redirectPlace instanceof PeopleSearch);
+		assertEquals(userName, ((PeopleSearch)redirectPlace).getSearchTerm());
 	}
 
 	private List<KeyValue> getFacet(String facetName) {
