@@ -3,12 +3,14 @@ package org.sagebionetworks.web.client.widget.table.v2.schema;
 import static org.sagebionetworks.web.client.widget.table.v2.schema.ColumnFacetTypeViewEnum.None;
 import static org.sagebionetworks.web.client.widget.table.v2.schema.ColumnFacetTypeViewEnum.Range;
 import static org.sagebionetworks.web.client.widget.table.v2.schema.ColumnFacetTypeViewEnum.Values;
+
 import java.util.List;
+
 import org.sagebionetworks.repo.model.table.ColumnModel;
-import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.web.client.StringUtils;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
+
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -55,7 +57,11 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 	 */
 	public void configureViewForType(ColumnTypeViewEnum newType) {
 		if (canHaveSize(newType)) {
-			view.setMaxSize(getMaxSizeForType(newType));
+			// SWC-5738: Special case.
+			// If the max size is already defined in the view (from a previous column type that supports max size), then use it.
+			if (view.getMaxSize().isEmpty()) {
+				view.setMaxSize(getMaxSizeForType(newType));
+			}
 			view.setSizeFieldVisible(true);
 		} else {
 			view.setMaxSize(null);

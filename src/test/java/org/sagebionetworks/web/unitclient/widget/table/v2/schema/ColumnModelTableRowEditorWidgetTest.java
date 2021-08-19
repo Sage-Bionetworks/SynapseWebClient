@@ -35,6 +35,7 @@ public class ColumnModelTableRowEditorWidgetTest {
 	ColumnModelTableRowEditorWidgetImpl editor;
 	ColumnModel columnModel;
 	CellEditor mockStringEditor;
+	CellEditor mockStringListEditor;
 	CellEditor mockLinkEditor;
 	CellEditor mockBooleanEditor;
 
@@ -43,11 +44,15 @@ public class ColumnModelTableRowEditorWidgetTest {
 		mockView = Mockito.mock(ColumnModelTableRowEditorView.class);
 		mockFactory = Mockito.mock(CellFactory.class);
 		mockStringEditor = Mockito.mock(CellEditor.class);
+		mockStringListEditor = Mockito.mock(CellEditor.class);
 		mockLinkEditor = Mockito.mock(CellEditor.class);
 		mockBooleanEditor = Mockito.mock(CellEditor.class);
 		ColumnModel cm = new ColumnModel();
 		cm.setColumnType(ColumnType.STRING);
 		when(mockFactory.createEditor(cm)).thenReturn(mockStringEditor);
+		cm = new ColumnModel();
+		cm.setColumnType(ColumnType.STRING_LIST);
+		when(mockFactory.createEditor(cm)).thenReturn(mockStringListEditor);
 		cm = new ColumnModel();
 		cm.setColumnType(ColumnType.LINK);
 		when(mockFactory.createEditor(cm)).thenReturn(mockLinkEditor);
@@ -55,7 +60,7 @@ public class ColumnModelTableRowEditorWidgetTest {
 		cm.setColumnType(ColumnType.BOOLEAN);
 		when(mockFactory.createEditor(cm)).thenReturn(mockBooleanEditor);
 		when(mockView.getColumnType()).thenReturn(ColumnTypeViewEnum.String);
-		when(mockView.getMaxSize()).thenReturn("15");
+		when(mockView.getMaxSize()).thenReturn("");
 		editor = new ColumnModelTableRowEditorWidgetImpl(mockView, mockFactory);
 		columnModel = new ColumnModel();
 		columnModel.setColumnType(ColumnType.STRING);
@@ -78,6 +83,7 @@ public class ColumnModelTableRowEditorWidgetTest {
 	public void testTypeChange() {
 		editor.configure(columnModel, null);
 		reset(mockView);
+		when(mockView.getMaxSize()).thenReturn("");
 		// Change from a string to a boolean
 		when(mockView.getColumnType()).thenReturn(ColumnTypeViewEnum.Boolean);
 		editor.onTypeChanged();
@@ -95,11 +101,35 @@ public class ColumnModelTableRowEditorWidgetTest {
 		verify(mockView).setDefaultEditor(mockStringEditor);
 		verify(mockView).setRestrictValuesVisible(true);
 	}
+	
+	@Test
+	public void testChangeStringToStringList() {
+		editor.configure(columnModel, null);
+		reset(mockView);
+		when(mockView.getMaxSize()).thenReturn("200");
+		// Change from a String to a StringList
+		when(mockView.getColumnType()).thenReturn(ColumnTypeViewEnum.StringList);
+		editor.onTypeChanged();
+		verify(mockView, times(1)).setSizeFieldVisible(true);
+		verify(mockView, never()).setMaxSize(anyString());
+		verify(mockView).setDefaultEditor(mockStringListEditor);
+		verify(mockView).setRestrictValuesVisible(false);
+
+		// Now toggle it back to a String
+		when(mockView.getColumnType()).thenReturn(ColumnTypeViewEnum.String);
+		editor.onTypeChanged();
+		verify(mockView, times(2)).setSizeFieldVisible(true);
+		// SWC-5738: max size should not have been changed across types that both support the max size
+		verify(mockView, never()).setMaxSize(anyString());
+		verify(mockView).setDefaultEditor(mockStringEditor);
+		verify(mockView).setRestrictValuesVisible(true);
+	}
 
 	@Test
 	public void testChangeToLink() {
 		editor.configure(columnModel, null);
 		reset(mockView);
+		when(mockView.getMaxSize()).thenReturn("");
 		// Change from a string to a boolean
 		when(mockView.getColumnType()).thenReturn(ColumnTypeViewEnum.Link);
 		editor.onTypeChanged();
