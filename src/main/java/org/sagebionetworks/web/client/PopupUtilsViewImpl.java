@@ -18,7 +18,7 @@ public class PopupUtilsViewImpl implements PopupUtilsView {
 
 	@Override
 	public void showInfo(String message, String href, String buttonText, IconType iconType) {
-		DisplayUtils.showInfo(message, href, buttonText, iconType, null);
+		DisplayUtils.showInfo(message, href, buttonText, iconType, 0);
 	}
 
 	@Override

@@ -120,6 +120,8 @@ public interface GlobalApplicationState {
 
 	void initializeDropZone();
 
+	void initializeToastContainer();
+
 	void setDropZoneHandler(CallbackP<JavaScriptObject> fileListCallback);
 
 	void clearDropZoneHandler();

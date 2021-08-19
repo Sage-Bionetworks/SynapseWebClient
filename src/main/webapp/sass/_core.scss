@@ -134,7 +134,12 @@ a:focus{color:$synapse-blue;}
 }
 
 .SynapseNavDrawerIsShowing {
-	padding-left: 53px;
+    $-nav-drawer-width: 53px;
+	padding-left: $-nav-drawer-width;
+
+	.SynapseToastContainer {
+	    width: calc(100% - #{$-nav-drawer-width});
+	}
 }
 
 .pagination>li>a, .pagination>li>span {

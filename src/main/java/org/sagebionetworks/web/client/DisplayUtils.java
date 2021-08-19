@@ -47,6 +47,7 @@ import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.CloudProviderFileHandleInterface;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.place.PeopleSearch;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -91,6 +92,27 @@ public class DisplayUtils {
 	private static Logger displayUtilsLogger = Logger.getLogger(DisplayUtils.class.getName());
 	public static PublicPrincipalIds publicPrincipalIds = null;
 
+	public enum NotificationVariant {
+		INFO("info"),
+		WARNING("warning"),
+		SUCCESS("success"),
+		DANGER("danger");
+		private final String value;
+
+		NotificationVariant(final String value) {
+			this.value = value;
+		}
+
+		@Override
+		public String toString() {
+			return this.value;
+		}
+
+		public String getValue() {
+			return this.value;
+		}
+
+	}
 	public static enum MessagePopup {
 		INFO, WARNING, QUESTION
 	}
@@ -244,15 +266,33 @@ public class DisplayUtils {
 	}
 
 	public static void showSuccess(String message) {
-		showNotification(message, null, null, NotifyType.SUCCESS, IconType.CHECK_CIRCLE, null);
+		// TODO: Titles for all callers
+		showSuccess("Success", message);
 	}
 
 	public static void showWarning(String message) {
-		showNotification(message, null, null, NotifyType.WARNING, IconType.WARNING, null);
+		// TODO: Titles for all callers
+		showWarning("Warning", message);
 	}
 
 	public static void showDanger(String message) {
-		showNotification(message, null, null, NotifyType.DANGER, IconType.WARNING, null);
+		// TODO: Titles for all callers
+		showDanger("Danger", message);
+	}
+
+	public static void showSuccess(String title, String message) {
+		// TODO: Titles for all callers
+		notify(NotificationVariant.SUCCESS, title, message);
+	}
+
+	public static void showWarning(String title, String message) {
+		// TODO: Titles for all callers
+		notify(NotificationVariant.WARNING, title, message);
+	}
+
+	public static void showDanger(String title, String message) {
+		// TODO: Titles for all callers
+		notify(NotificationVariant.DANGER, title, message);
 	}
 
 	/**
@@ -262,7 +302,7 @@ public class DisplayUtils {
 	 * @param message
 	 */
 	public static void showInfo(String message) {
-		showInfo(message, null, null, IconType.INFO_CIRCLE, null);
+		showInfo(message, null, null, IconType.INFO_CIRCLE, 15000);
 	}
 
 	/**
@@ -276,30 +316,26 @@ public class DisplayUtils {
 	}
 
 	public static void showInfo(String message, String href, String buttonText, IconType iconType, Integer timeout) {
-		showNotification(message, href, buttonText, NotifyType.INFO, iconType, timeout);
-	}
-
-	public static void showNotification(String message, String href, String buttonText, NotifyType notifyType, IconType iconType, Integer timeout) {
-		NotifySettings settings = getDefaultSettings(href, buttonText);
-		settings.setType(notifyType);
-		if (timeout != null) {
-			settings.setDelay(timeout);
-		} else {
-			// By default, notifications stay open for 15s
-			settings.setDelay(15 * 1000);
-		}
-		settings.setZIndex(2001);
-		notify(message, iconType, settings);
+		// TODO: Titles for all callers
+		notify(NotificationVariant.INFO, "Info", message, timeout.longValue(), buttonText, href);
 	}
 
 	public static final Set<String> recentNotificationMessages = new HashSet<>();
 
-	public static void notify(String message, IconType iconType, NotifySettings settings) {
+	public static void notify(NotificationVariant variant, String title, String description) {
+		notify(variant, title, description, 15000L, null, null);
+	}
+
+	public static void notify(NotificationVariant variant, String title, String description, Long autoCloseInMs) {
+		notify(variant, title, description, autoCloseInMs, null, null);
+	}
+
+	public static void notify(NotificationVariant variant, String title, String description, Long autoCloseInMs, String secondaryButtonText, String secondaryButtonHref) {
 		try {
-			String key = message + "/" + iconType.name();
+			String key = variant + "/" + title + "/" + description;
 			if (!recentNotificationMessages.contains(key)) {
 				recentNotificationMessages.add(key);
-				Notify.notify("", message, iconType, settings);
+				SRC.SynapseComponents.displayToast(variant.toString(), title, description, autoCloseInMs, null, null, secondaryButtonText, secondaryButtonHref);
 
 				// in 5 seconds clean up that key (to allow showing the message again)
 				Timer timer = new Timer() {
@@ -315,6 +351,7 @@ public class DisplayUtils {
 		}
 	}
 
+
 	/**
 	 * Shows an warning message to the user in the "Global Alert area".
 	 * 
@@ -322,14 +359,7 @@ public class DisplayUtils {
 	 * @param message
 	 */
 	public static void showError(String message, Integer timeout) {
-		NotifySettings settings = getDefaultSettings();
-		settings.setType(NotifyType.DANGER);
-		settings.setAllowDismiss(true);
-		if (timeout != null) {
-			settings.setDelay(timeout);
-		}
-		settings.setZIndex(2001);
-		notify(message, IconType.EXCLAMATION_CIRCLE, settings);
+		notify(NotificationVariant.DANGER, "Error", message, timeout.longValue());
 	}
 
 	public static void showErrorMessage(String message) {

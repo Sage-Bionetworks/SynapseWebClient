@@ -110,6 +110,7 @@ public class Portal implements EntryPoint {
 										// Goes to place represented on URL or default place
 										historyHandler.handleCurrentHistory();
 										globalApplicationState.initializeDropZone();
+										globalApplicationState.initializeToastContainer();
 										// initialize the view default columns so that they're ready when we need them (do this by constructing that singleton object)
 										ginjector.getViewDefaultColumns();
 										
