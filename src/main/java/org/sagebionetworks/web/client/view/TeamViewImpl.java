@@ -159,6 +159,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 		deleteTeamItem.setVisible(false);
 		leaveTeamItem.setVisible(false);
 		publicJoinField.setVisible(false);
+		toolsMenu.setVisible(false);
 		memberSearchTextBox.setValue("");
 	}
 
@@ -189,6 +190,10 @@ public class TeamViewImpl extends Composite implements TeamView {
 	@Override
 	public void showMemberMenuItems() {
 		leaveTeamItem.setVisible(true);
+		// TODO: remove next line to take out of alpha mode
+		teamProjectsItem.setVisible(DisplayUtils.isInTestWebsite(cookieProvider));
+		
+		toolsMenu.setVisible(true);
 	}
 
 	@Override
@@ -196,6 +201,10 @@ public class TeamViewImpl extends Composite implements TeamView {
 		deleteTeamItem.setVisible(true);
 		editTeamItem.setVisible(true);
 		inviteMemberItem.setVisible(true);
+		// TODO: remove next line to take out of alpha mode
+		teamProjectsItem.setVisible(DisplayUtils.isInTestWebsite(cookieProvider));
+		
+		toolsMenu.setVisible(true);
 	}
 
 	@Override
@@ -208,9 +217,6 @@ public class TeamViewImpl extends Composite implements TeamView {
 		teamNameHeading.setText(team.getName());
 		bigTeamBadge.configure(team, team.getDescription(), status);
 		mapModal.setTitle(team.getName());
-
-		// TODO: remove next line to take out of alpha mode
-		teamProjectsItem.setVisible(DisplayUtils.isInTestWebsite(cookieProvider));
 	}
 
 	@Override
@@ -279,5 +285,8 @@ public class TeamViewImpl extends Composite implements TeamView {
 	@Override
 	public void setManageAccessVisible(boolean visible) {
 		manageAccessItem.setVisible(visible);
+		if (visible) {
+			toolsMenu.setVisible(true);
+		}
 	}
 }
