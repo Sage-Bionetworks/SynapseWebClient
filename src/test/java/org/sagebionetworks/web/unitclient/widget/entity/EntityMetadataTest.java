@@ -7,8 +7,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.client.utils.FutureUtils.getDoneFuture;
+import static org.sagebionetworks.web.client.utils.FutureUtils.getFailedFuture;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,6 +21,7 @@ import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
@@ -42,6 +47,7 @@ import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationsRender
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWidget;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -179,6 +185,7 @@ public class EntityMetadataTest {
 		FileEntity fileEntity = new FileEntity();
 		fileEntity.setName(entityName);
 		fileEntity.setId(entityId);
+		fileEntity.setIsLatestVersion(isCurrentVersion);
 		EntityBundle bundle = new EntityBundle();
 		bundle.setEntity(fileEntity);
 		bundle.setPermissions(permissions);
@@ -204,6 +211,7 @@ public class EntityMetadataTest {
 		fileEntity.setName(entityName);
 		fileEntity.setId(entityId);
 		fileEntity.setVersionNumber(versionNumber);
+		fileEntity.setIsLatestVersion(isCurrentVersion);
 		EntityBundle bundle = new EntityBundle();
 		bundle.setEntity(fileEntity);
 		bundle.setPermissions(permissions);
@@ -211,6 +219,107 @@ public class EntityMetadataTest {
 		widget.configure(bundle, versionNumber, mockActionMenuWidget);
 		verify(mockFileHistoryWidget).setEntityBundle(bundle, versionNumber);
 		verify(mockDoiWidgetV2).configure(mockDoiAssociation);
+		verify(mockAnnotationsWidget).configure(bundle, canCertifiedUserEdit, isCurrentVersion);
+	}
+
+	@Test
+	public void testSetEntityBundle_FetchUnversionedDoiForVersionableEntity() {
+		// SWC-5735
+		// For certain versionable entities, such as files, we may fetch the versioned entity bundle, which will contain a versioned DOI, if it exists.
+		// If no versioned DOI exists, AND this is the current version of the entity, we should show the unversioned DOI, which is not contained in the versioned bundle
+		UserEntityPermissions permissions = mock(UserEntityPermissions.class);
+		boolean canChangePermissions = true;
+		boolean canCertifiedUserEdit = false;
+		boolean isCurrentVersion = true;
+		when(permissions.getCanChangePermissions()).thenReturn(canChangePermissions);
+		when(permissions.getCanCertifiedUserEdit()).thenReturn(canCertifiedUserEdit);
+
+
+		Long versionNumber = 5L;
+		FileEntity fileEntity = new FileEntity();
+		fileEntity.setName(entityName);
+		fileEntity.setId(entityId);
+		fileEntity.setVersionNumber(versionNumber);
+		fileEntity.setIsLatestVersion(isCurrentVersion);
+		EntityBundle bundle = new EntityBundle();
+		bundle.setEntity(fileEntity);
+		bundle.setPermissions(permissions);
+
+		// The bundle did not contain a DOI, which can happen if the version was specified but there is no versioned DOI
+		bundle.setDoiAssociation(null);
+		// The unversioned DOI exists
+		when(mockJsClient.getDoiAssociation(entityId, ObjectType.ENTITY, null)).thenReturn(getDoneFuture(mockDoiAssociation));
+
+
+		widget.configure(bundle, versionNumber, mockActionMenuWidget);
+		verify(mockFileHistoryWidget).setEntityBundle(bundle, versionNumber);
+		verify(mockDoiWidgetV2).configure(mockDoiAssociation); // !
+		verify(mockAnnotationsWidget).configure(bundle, canCertifiedUserEdit, isCurrentVersion);
+	}
+
+	@Test
+	public void testSetEntityBundle_FetchUnversionedDoiForVersionableEntity_NoDoi() {
+		UserEntityPermissions permissions = mock(UserEntityPermissions.class);
+		boolean canChangePermissions = true;
+		boolean canCertifiedUserEdit = false;
+		boolean isCurrentVersion = true;
+		when(permissions.getCanChangePermissions()).thenReturn(canChangePermissions);
+		when(permissions.getCanCertifiedUserEdit()).thenReturn(canCertifiedUserEdit);
+
+
+		Long versionNumber = 5L;
+		FileEntity fileEntity = new FileEntity();
+		fileEntity.setName(entityName);
+		fileEntity.setId(entityId);
+		fileEntity.setVersionNumber(versionNumber);
+		fileEntity.setIsLatestVersion(isCurrentVersion);
+		EntityBundle bundle = new EntityBundle();
+		bundle.setEntity(fileEntity);
+		bundle.setPermissions(permissions);
+
+		// The bundle did not contain a DOI
+		bundle.setDoiAssociation(null);
+		// No unversioned DOI exists (404 will result in failed future)
+		when(mockJsClient.getDoiAssociation(entityId, ObjectType.ENTITY, null)).thenReturn(getFailedFuture());
+
+
+		widget.configure(bundle, versionNumber, mockActionMenuWidget);
+		verify(mockFileHistoryWidget).setEntityBundle(bundle, versionNumber);
+		verify(mockDoiWidgetV2, never()).configure(any()); // !
+		verify(mockAnnotationsWidget).configure(bundle, canCertifiedUserEdit, isCurrentVersion);
+	}
+
+	@Test
+	public void testSetEntityBundle_FetchUnversionedDoiForVersionableEntity_NotLatestVersion() {
+		// If this is not the latest version of the entity, then we shouldn't fetch the unversioned DOI (since it doesn't point to this version)
+		UserEntityPermissions permissions = mock(UserEntityPermissions.class);
+		boolean canChangePermissions = true;
+		boolean canCertifiedUserEdit = false;
+		boolean isCurrentVersion = false; // !
+		when(permissions.getCanChangePermissions()).thenReturn(canChangePermissions);
+		when(permissions.getCanCertifiedUserEdit()).thenReturn(canCertifiedUserEdit);
+
+
+		Long versionNumber = 5L;
+		FileEntity fileEntity = new FileEntity();
+		fileEntity.setName(entityName);
+		fileEntity.setId(entityId);
+		fileEntity.setVersionNumber(versionNumber);
+		fileEntity.setIsLatestVersion(isCurrentVersion);
+		EntityBundle bundle = new EntityBundle();
+		bundle.setEntity(fileEntity);
+		bundle.setPermissions(permissions);
+
+		// The bundle did not contain a DOI
+		bundle.setDoiAssociation(null);
+
+		widget.configure(bundle, versionNumber, mockActionMenuWidget);
+
+		// Because this isn't the latest version, we should have never requested a DOI
+		verify(mockJsClient, never()).getDoiAssociation(any(), any(), any());
+
+		verify(mockFileHistoryWidget).setEntityBundle(bundle, versionNumber);
+		verify(mockDoiWidgetV2, never()).configure(any()); // !
 		verify(mockAnnotationsWidget).configure(bundle, canCertifiedUserEdit, isCurrentVersion);
 	}
 

@@ -8,17 +8,19 @@ public class ActivityGraphNode extends ProvGraphNode implements IsSerializable {
 	private String id;
 	private String activityId;
 	private String activityName;
+	private String activityDescription;
 	private ActivityType type;
 	private String modifiedBy;
 	private Date modifiedOn;
 
 	public ActivityGraphNode() {}
 
-	public ActivityGraphNode(String id, String activityId, String activityName, ActivityType type, String modifiedBy, Date modifiedOn, Boolean startingNode) {
+	public ActivityGraphNode(String id, String activityId, String activityName, String activityDescription, ActivityType type, String modifiedBy, Date modifiedOn, Boolean startingNode) {
 		super();
 		this.id = id;
 		this.activityId = activityId;
 		this.activityName = activityName;
+		this.activityDescription = activityDescription;
 		this.type = type;
 		this.modifiedBy = modifiedBy;
 		this.modifiedOn = modifiedOn;
@@ -44,11 +46,15 @@ public class ActivityGraphNode extends ProvGraphNode implements IsSerializable {
 	public String getActivityName() {
 		return activityName;
 	}
-
 	public void setActivityName(String activityName) {
 		this.activityName = activityName;
 	}
-
+	public String getActivityDescription() {
+		return activityDescription;
+	}
+	public void setActivityDescription(String activityDescription) {
+		this.activityDescription = activityDescription;
+	}
 	public ActivityType getType() {
 		return type;
 	}
@@ -77,6 +83,7 @@ public class ActivityGraphNode extends ProvGraphNode implements IsSerializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
+		result = prime * result + ((activityDescription == null) ? 0 : activityDescription.hashCode());
 		result = prime * result + ((activityId == null) ? 0 : activityId.hashCode());
 		result = prime * result + ((activityName == null) ? 0 : activityName.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
@@ -95,6 +102,11 @@ public class ActivityGraphNode extends ProvGraphNode implements IsSerializable {
 		if (getClass() != obj.getClass())
 			return false;
 		ActivityGraphNode other = (ActivityGraphNode) obj;
+		if (activityDescription == null) {
+			if (other.activityDescription != null)
+				return false;
+		} else if (!activityDescription.equals(other.activityDescription))
+			return false;
 		if (activityId == null) {
 			if (other.activityId != null)
 				return false;
@@ -127,7 +139,9 @@ public class ActivityGraphNode extends ProvGraphNode implements IsSerializable {
 
 	@Override
 	public String toString() {
-		return "ActivityGraphNode [id=" + id + ", activityId=" + activityId + ", activityName=" + activityName + ", type=" + type + ", modifiedBy=" + modifiedBy + ", modifiedOn=" + modifiedOn + "]";
+		return "ActivityGraphNode [id=" + id + ", activityId=" + activityId + ", activityName=" + activityName
+				+ ", activityDescription=" + activityDescription + ", type=" + type + ", modifiedBy=" + modifiedBy
+				+ ", modifiedOn=" + modifiedOn + "]";
 	}
 
 }
