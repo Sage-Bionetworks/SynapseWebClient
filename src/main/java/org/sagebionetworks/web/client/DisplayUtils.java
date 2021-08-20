@@ -22,7 +22,6 @@ import java.util.logging.Logger;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.Tooltip;
-import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.gwtbootstrap3.client.ui.constants.Trigger;
 import org.gwtbootstrap3.client.ui.html.Div;
@@ -32,8 +31,6 @@ import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.SimpleCallback;
 import org.gwtbootstrap3.extras.bootbox.client.options.DialogOptions;
 import org.gwtbootstrap3.extras.notify.client.constants.NotifyPlacement;
-import org.gwtbootstrap3.extras.notify.client.constants.NotifyType;
-import org.gwtbootstrap3.extras.notify.client.ui.Notify;
 import org.gwtbootstrap3.extras.notify.client.ui.NotifySettings;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
@@ -276,7 +273,7 @@ public class DisplayUtils {
 	 * @param message
 	 */
 	public static void showInfo(String message) {
-		showInfo(message, null, null, IconType.INFO_CIRCLE, 15000);
+		showInfo(message, null, null, 15000);
 	}
 
 	/**
@@ -286,10 +283,10 @@ public class DisplayUtils {
 	 * @param message
 	 */
 	public static void showInfo(String message, Integer timeout) {
-		showInfo(message, null, null, IconType.INFO_CIRCLE, timeout);
+		showInfo(message, null, null, timeout);
 	}
 
-	public static void showInfo(String message, String href, String buttonText, IconType iconType, Integer timeout) {
+	public static void showInfo(String message, String href, String buttonText, Integer timeout) {
 		notify(NotificationVariant.INFO, null, message, timeout.longValue(), buttonText, href);
 	}
 
@@ -332,6 +329,9 @@ public class DisplayUtils {
 	 * @param message
 	 */
 	public static void showError(String message, Integer timeout) {
+		if (timeout == null) {
+			timeout = 0;
+		}
 		notify(NotificationVariant.DANGER, "Error", message, timeout.longValue());
 	}
 

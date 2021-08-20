@@ -24,5 +24,5 @@ public interface PopupUtilsView {
 
 	void showConfirmDelete(String message, Callback callback);
 
-	void showInfo(String message, String href, String buttonText, IconType iconType);
+	void showInfo(String message, String href, String buttonText);
 }

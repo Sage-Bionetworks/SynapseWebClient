@@ -217,7 +217,7 @@ public class FileTitleBar implements SynapseWidgetPresenter, FileTitleBarView.Pr
 					}
 					public void onSuccess(AddBatchOfFilesToDownloadListResponse result) {
 						String href = "#!DownloadCart:0";
-						popupUtils.showInfo(entity.getName() + EntityBadge.ADDED_TO_DOWNLOAD_LIST, href, DisplayConstants.VIEW_DOWNLOAD_LIST, IconType.CHECK_CIRCLE);
+						popupUtils.showInfo(entity.getName() + EntityBadge.ADDED_TO_DOWNLOAD_LIST, href, DisplayConstants.VIEW_DOWNLOAD_LIST);
 						eventBus.fireEvent(new DownloadListUpdatedEvent());
 					};
 				});

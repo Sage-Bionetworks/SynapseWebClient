@@ -226,7 +226,7 @@ public class EntityListRowBadgeTest {
 		widget.onAddToDownloadList();
 
 		verify(mockSynapseJavascriptClient).addFileToDownloadListV2(eq(entityId), eq(version), any(AsyncCallback.class));
-		verify(mockPopupUtils).showInfo(entityName + EntityBadge.ADDED_TO_DOWNLOAD_LIST, "#!DownloadCart:0", DisplayConstants.VIEW_DOWNLOAD_LIST, IconType.CHECK_CIRCLE);
+		verify(mockPopupUtils).showInfo(entityName + EntityBadge.ADDED_TO_DOWNLOAD_LIST, "#!DownloadCart:0", DisplayConstants.VIEW_DOWNLOAD_LIST);
 		verify(mockEventBus).fireEvent(any(DownloadListUpdatedEvent.class));
 	}
 
