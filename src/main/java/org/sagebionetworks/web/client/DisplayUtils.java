@@ -266,33 +266,7 @@ public class DisplayUtils {
 	}
 
 	public static void showSuccess(String message) {
-		// TODO: Titles for all callers
-		showSuccess("Success", message);
-	}
-
-	public static void showWarning(String message) {
-		// TODO: Titles for all callers
-		showWarning("Warning", message);
-	}
-
-	public static void showDanger(String message) {
-		// TODO: Titles for all callers
-		showDanger("Danger", message);
-	}
-
-	public static void showSuccess(String title, String message) {
-		// TODO: Titles for all callers
-		notify(NotificationVariant.SUCCESS, title, message);
-	}
-
-	public static void showWarning(String title, String message) {
-		// TODO: Titles for all callers
-		notify(NotificationVariant.WARNING, title, message);
-	}
-
-	public static void showDanger(String title, String message) {
-		// TODO: Titles for all callers
-		notify(NotificationVariant.DANGER, title, message);
+		notify(NotificationVariant.SUCCESS, null, message);
 	}
 
 	/**
@@ -316,8 +290,7 @@ public class DisplayUtils {
 	}
 
 	public static void showInfo(String message, String href, String buttonText, IconType iconType, Integer timeout) {
-		// TODO: Titles for all callers
-		notify(NotificationVariant.INFO, "Info", message, timeout.longValue(), buttonText, href);
+		notify(NotificationVariant.INFO, null, message, timeout.longValue(), buttonText, href);
 	}
 
 	public static final Set<String> recentNotificationMessages = new HashSet<>();
