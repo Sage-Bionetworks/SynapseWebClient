@@ -29,146 +29,146 @@ import com.google.inject.Inject;
 
 public class EntityMetadataViewImpl extends Composite implements EntityMetadataView {
 
-    interface EntityMetadataViewImplUiBinder extends UiBinder<Widget, EntityMetadataViewImpl> {
-    }
+	interface EntityMetadataViewImplUiBinder extends UiBinder<Widget, EntityMetadataViewImpl> {
+	}
 
-    private static EntityMetadataViewImplUiBinder uiBinder = GWT.create(EntityMetadataViewImplUiBinder.class);
+	private static EntityMetadataViewImplUiBinder uiBinder = GWT.create(EntityMetadataViewImplUiBinder.class);
 
-    private CookieProvider cookies;
-    private SynapseContextPropsProvider propsProvider;
+	private CookieProvider cookies;
+	private SynapseContextPropsProvider propsProvider;
 
-    @UiField
-    HTMLPanel detailedMetadata;
-    @UiField
-    HTMLPanel dataUseContainer;
-    @UiField
-    TextBox idField;
-    @UiField
-    Span doiPanel;
-    @UiField
-    Collapse annotationsContent;
-    @UiField
-    SimplePanel annotationsContainer;
-    @UiField
-    Span containerItemCountContainer;
-    @UiField
-    Span restrictionPanelV2;
-    @UiField
-    Div fileHistoryContainer;
-    @UiField
-    Span uploadDestinationPanel;
-    @UiField
-    Span uploadDestinationField;
-    @UiField
-    Text annotationsTitleText;
-    @UiField
-    ReactComponentDiv annotationsModalContainer;
+	@UiField
+	HTMLPanel detailedMetadata;
+	@UiField
+	HTMLPanel dataUseContainer;
+	@UiField
+	TextBox idField;
+	@UiField
+	Span doiPanel;
+	@UiField
+	Collapse annotationsContent;
+	@UiField
+	SimplePanel annotationsContainer;
+	@UiField
+	Span containerItemCountContainer;
+	@UiField
+	Span restrictionPanelV2;
+	@UiField
+	Div fileHistoryContainer;
+	@UiField
+	Span uploadDestinationPanel;
+	@UiField
+	Span uploadDestinationField;
+	@UiField
+	Text annotationsTitleText;
+	@UiField
+	ReactComponentDiv annotationsModalContainer;
 
-    @Inject
-    public EntityMetadataViewImpl(final SynapseJSNIUtils jsniUtils, final CookieProvider cookieProvider, final SynapseContextPropsProvider propsProvider) {
-        this.cookies = cookieProvider;
-        this.propsProvider = propsProvider;
-        initWidget(uiBinder.createAndBindUi(this));
-        idField.addClickHandler(new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-                idField.selectAll();
-            }
-        });
-    }
+	@Inject
+	public EntityMetadataViewImpl(final SynapseJSNIUtils jsniUtils, final CookieProvider cookieProvider, final SynapseContextPropsProvider propsProvider) {
+		this.cookies = cookieProvider;
+		this.propsProvider = propsProvider;
+		initWidget(uiBinder.createAndBindUi(this));
+		idField.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				idField.selectAll();
+			}
+		});
+	}
 
-    @Override
-    public void setContainerItemCountWidget(IsWidget w) {
-        containerItemCountContainer.clear();
-        containerItemCountContainer.add(w);
-    }
+	@Override
+	public void setContainerItemCountWidget(IsWidget w) {
+		containerItemCountContainer.clear();
+		containerItemCountContainer.add(w);
+	}
 
-    @Override
-    public void setDoiWidget(IsWidget doiWidget) {
-        doiPanel.clear();
-        doiPanel.add(doiWidget);
-    }
+	@Override
+	public void setDoiWidget(IsWidget doiWidget) {
+		doiPanel.clear();
+		doiPanel.add(doiWidget);
+	}
 
-    @Override
-    public void setAnnotationsRendererWidget(IsWidget annotationsWidget) {
-        annotationsContainer.setWidget(annotationsWidget);
-    }
+	@Override
+	public void setAnnotationsRendererWidget(IsWidget annotationsWidget) {
+		annotationsContainer.setWidget(annotationsWidget);
+	}
 
-    @Override
-    public void setUploadDestinationPanelVisible(boolean isVisible) {
-        uploadDestinationPanel.setVisible(isVisible);
-    }
+	@Override
+	public void setUploadDestinationPanelVisible(boolean isVisible) {
+		uploadDestinationPanel.setVisible(isVisible);
+	}
 
-    @Override
-    public void setUploadDestinationText(String text) {
-        uploadDestinationField.setText(text);
-    }
+	@Override
+	public void setUploadDestinationText(String text) {
+		uploadDestinationField.setText(text);
+	}
 
-    @Override
-    public void setAnnotationsVisible(boolean visible) {
-        if (DisplayUtils.isInTestWebsite(cookies)) {
-            boolean showTabs = false;
-            EntityModalProps props =
-                    EntityModalProps.create(idField.getText(), visible, () -> setAnnotationsVisible(false), "ANNOTATIONS", showTabs);
-            ReactDOM.render(
-                    React.createElementWithSynapseContext(
-                            SRC.SynapseComponents.EntityModal,
-                            props,
-                            propsProvider.getJsInteropContextProps()
-                    ),
-                    annotationsModalContainer.getElement()
-            );
-        } else {
-            if (visible) {
-                annotationsContent.show();
-            } else {
-                annotationsContent.hide();
-            }
-        }
-    }
+	@Override
+	public void setAnnotationsVisible(boolean visible) {
+		if (DisplayUtils.isInTestWebsite(cookies)) {
+			boolean showTabs = false;
+			EntityModalProps props =
+					EntityModalProps.create(idField.getText(), visible, () -> setAnnotationsVisible(false), "ANNOTATIONS", showTabs);
+			ReactDOM.render(
+					React.createElementWithSynapseContext(
+							SRC.SynapseComponents.EntityModal,
+							props,
+							propsProvider.getJsInteropContextProps()
+					),
+					annotationsModalContainer.getElement()
+			);
+		} else {
+			if (visible) {
+				annotationsContent.show();
+			} else {
+				annotationsContent.hide();
+			}
+		}
+	}
 
-    @Override
-    public void setVersionHistoryWidget(IsWidget fileHistoryWidget) {
-        fileHistoryContainer.clear();
-        fileHistoryContainer.add(fileHistoryWidget);
-    }
+	@Override
+	public void setVersionHistoryWidget(IsWidget fileHistoryWidget) {
+		fileHistoryContainer.clear();
+		fileHistoryContainer.add(fileHistoryWidget);
+	}
 
-    @Override
-    public void clear() {
-        dataUseContainer.setVisible(false);
-        annotationsContent.hide();
-        uploadDestinationField.setText("");
-        uploadDestinationPanel.setVisible(false);
-    }
+	@Override
+	public void clear() {
+		dataUseContainer.setVisible(false);
+		annotationsContent.hide();
+		uploadDestinationField.setText("");
+		uploadDestinationPanel.setVisible(false);
+	}
 
-    @Override
-    public void setDetailedMetadataVisible(boolean visible) {
-        detailedMetadata.setVisible(visible);
-    }
+	@Override
+	public void setDetailedMetadataVisible(boolean visible) {
+		detailedMetadata.setVisible(visible);
+	}
 
-    @Override
-    public void setEntityId(String text) {
-        idField.setText(text);
-    }
+	@Override
+	public void setEntityId(String text) {
+		idField.setText(text);
+	}
 
-    @Override
-    public void setRestrictionPanelVisible(boolean visible) {
-        dataUseContainer.setVisible(visible);
-    }
+	@Override
+	public void setRestrictionPanelVisible(boolean visible) {
+		dataUseContainer.setVisible(visible);
+	}
 
-    @Override
-    public void setRestrictionWidgetV2(IsWidget restrictionWidget) {
-        restrictionPanelV2.clear();
-        restrictionPanelV2.add(restrictionWidget);
-    }
+	@Override
+	public void setRestrictionWidgetV2(IsWidget restrictionWidget) {
+		restrictionPanelV2.clear();
+		restrictionPanelV2.add(restrictionWidget);
+	}
 
-    @Override
-    public void setRestrictionWidgetV2Visible(boolean visible) {
-        restrictionPanelV2.setVisible(visible);
-    }
+	@Override
+	public void setRestrictionWidgetV2Visible(boolean visible) {
+		restrictionPanelV2.setVisible(visible);
+	}
 
-    @Override
-    public void setAnnotationsTitleText(String text) {
-        annotationsTitleText.setText(text);
-    }
+	@Override
+	public void setAnnotationsTitleText(String text) {
+		annotationsTitleText.setText(text);
+	}
 }
