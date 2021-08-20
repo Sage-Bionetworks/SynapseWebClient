@@ -4,7 +4,16 @@ import org.gwtbootstrap3.client.ui.Collapse;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.jsinterop.EntityModalProps;
+import org.sagebionetworks.web.client.jsinterop.React;
+import org.sagebionetworks.web.client.jsinterop.ReactDOM;
+import org.sagebionetworks.web.client.jsinterop.SRC;
+import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -24,6 +33,9 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	}
 
 	private static EntityMetadataViewImplUiBinder uiBinder = GWT.create(EntityMetadataViewImplUiBinder.class);
+
+	private CookieProvider cookies;
+	private SynapseContextPropsProvider propsProvider;
 
 	@UiField
 	HTMLPanel detailedMetadata;
@@ -49,9 +61,13 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	Span uploadDestinationField;
 	@UiField
 	Text annotationsTitleText;
+	@UiField
+	ReactComponentDiv annotationsModalContainer;
 
 	@Inject
-	public EntityMetadataViewImpl(final SynapseJSNIUtils jsniUtils) {
+	public EntityMetadataViewImpl(final SynapseJSNIUtils jsniUtils, final CookieProvider cookieProvider, final SynapseContextPropsProvider propsProvider) {
+		this.cookies = cookieProvider;
+		this.propsProvider = propsProvider;
 		initWidget(uiBinder.createAndBindUi(this));
 		idField.addClickHandler(new ClickHandler() {
 			@Override
@@ -90,10 +106,24 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 	@Override
 	public void setAnnotationsVisible(boolean visible) {
-		if (visible) {
-			annotationsContent.show();
+		if (DisplayUtils.isInTestWebsite(cookies)) {
+			boolean showTabs = false;
+			EntityModalProps props =
+					EntityModalProps.create(idField.getText(), visible, () -> setAnnotationsVisible(false), "ANNOTATIONS", showTabs);
+			ReactDOM.render(
+					React.createElementWithSynapseContext(
+							SRC.SynapseComponents.EntityModal,
+							props,
+							propsProvider.getJsInteropContextProps()
+					),
+					annotationsModalContainer.getElement()
+			);
 		} else {
-			annotationsContent.hide();
+			if (visible) {
+				annotationsContent.show();
+			} else {
+				annotationsContent.hide();
+			}
 		}
 	}
 

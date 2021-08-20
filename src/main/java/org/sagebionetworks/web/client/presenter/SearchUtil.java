@@ -2,8 +2,11 @@ package org.sagebionetworks.web.client.presenter;
 
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.place.PeopleSearch;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
+
+import com.google.gwt.place.shared.Place;
 
 /**
  * This logic was removed from the search presenter so we could make a clean SearchPresenterProxy.
@@ -19,7 +22,7 @@ public class SearchUtil {
 	 * @param place
 	 * @return
 	 */
-	public static Synapse willRedirect(Search place) {
+	public static Place willRedirect(Search place) {
 		String queryTerm = place.getSearchTerm();
 		if (queryTerm == null)
 			queryTerm = "";
@@ -32,24 +35,27 @@ public class SearchUtil {
 	 * @param queryTerm
 	 * @return
 	 */
-	public static Synapse willRedirect(String queryTerm) {
+	public static Place willRedirect(String queryTerm) {
 		if (queryTerm.startsWith(ClientProperties.SYNAPSE_ID_PREFIX)) {
 			String remainder = queryTerm.replaceFirst(ClientProperties.SYNAPSE_ID_PREFIX, "");
 			if (remainder.matches("^[0-9]+$")) {
 				return new Synapse(queryTerm);
 			}
+		} else if (queryTerm.charAt(0) == '@') {
+			return new PeopleSearch(queryTerm.substring(1));
 		}
+			
 		return null;
 	}
 
 	public static void searchForTerm(String queryTerm, final GlobalApplicationState globalApplicationState) {
-		final Synapse synapsePlace = willRedirect(queryTerm);
+		final Place place = willRedirect(queryTerm);
 		final Search searchPlace = new Search(queryTerm);
-		if (synapsePlace == null) {
+		if (place == null) {
 			// no potential redirect, go directly to search!
 			globalApplicationState.getPlaceChanger().goTo(searchPlace);
 		} else {
-			globalApplicationState.getPlaceChanger().goTo(synapsePlace);
+			globalApplicationState.getPlaceChanger().goTo(place);
 
 		}
 	}
