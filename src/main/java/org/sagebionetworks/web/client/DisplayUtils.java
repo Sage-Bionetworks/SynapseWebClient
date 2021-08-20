@@ -114,6 +114,8 @@ public class DisplayUtils {
 		INFO, WARNING, QUESTION
 	}
 
+	public static final Integer DEFAULT_TOAST_TIMEOUT_MS = 15000;
+
 	public static final ClickHandler TEXTBOX_SELECT_ALL_FIELD_CLICKHANDLER = event -> {
 		TextBox source = (TextBox) event.getSource();
 		source.selectAll();
@@ -273,7 +275,7 @@ public class DisplayUtils {
 	 * @param message
 	 */
 	public static void showInfo(String message) {
-		showInfo(message, null, null, 15000);
+		showInfo(message, null, null, DEFAULT_TOAST_TIMEOUT_MS);
 	}
 
 	/**
@@ -293,7 +295,7 @@ public class DisplayUtils {
 	public static final Set<String> recentNotificationMessages = new HashSet<>();
 
 	public static void notify(NotificationVariant variant, String title, String description) {
-		notify(variant, title, description, 15000L, null, null);
+		notify(variant, title, description, DEFAULT_TOAST_TIMEOUT_MS.longValue(), null, null);
 	}
 
 	public static void notify(NotificationVariant variant, String title, String description, Long autoCloseInMs) {
