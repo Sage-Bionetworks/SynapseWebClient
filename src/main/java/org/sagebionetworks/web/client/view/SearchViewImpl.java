@@ -318,11 +318,9 @@ public class SearchViewImpl extends Composite implements SearchView {
 
 	private Panel createSearchResults(List<Hit> hits, int start) {
 		FlowPanel resultsPanel = new FlowPanel();
-		int i = start + 1;
 		for (Hit hit : hits) {
 			if (hit.getId() != null) {
-				resultsPanel.add(getResult(i, hit));
-				i++;
+				resultsPanel.add(getResult(hit));
 			}
 		}
 		return resultsPanel;
@@ -368,7 +366,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 		return createdBy;
 	}
 
-	private Panel getResult(int i, Hit hit) {
+	private Panel getResult(Hit hit) {
 		FlowPanel attributionPanel = new FlowPanel();
 
 		IconType iconType = presenter.getIconForHit(hit);
@@ -377,22 +375,19 @@ public class SearchViewImpl extends Composite implements SearchView {
 		createdByBadge.configure(getSearchUserId(hit.getCreated_by()));
 		UserBadge modifiedByBadge = ginInjector.getUserBadgeWidget();
 		modifiedByBadge.configure(getSearchUserId(hit.getModified_by()));
-
+		attributionPanel.addStyleName("hitattribution");
 		InlineHTML inlineHtml = new InlineHTML("Created by");
-		inlineHtml.addStyleName("hitattribution");
 		attributionPanel.add(inlineHtml);
 		Widget createdByBadgeWidget = createdByBadge.asWidget();
 		attributionPanel.add(createdByBadgeWidget);
 
 		inlineHtml = new InlineHTML(" on " + dateTimeUtils.getDateString(new Date(hit.getCreated_on() * 1000)) + ", Updated by ");
-		inlineHtml.addStyleName("hitattribution");
-
+		
 		attributionPanel.add(inlineHtml);
 		Widget modifiedByBadgeWidget = modifiedByBadge.asWidget();
 		attributionPanel.add(modifiedByBadgeWidget);
 		inlineHtml = new InlineHTML(" on " + dateTimeUtils.getDateString(new Date(hit.getModified_on() * 1000)));
-		inlineHtml.addStyleName("hitattribution");
-
+		
 		attributionPanel.add(inlineHtml);
 
 		FlowPanel hitPanel = new FlowPanel();
@@ -401,7 +396,6 @@ public class SearchViewImpl extends Composite implements SearchView {
 		FlowPanel headingPanel = new FlowPanel();
 		h4.add(headingPanel);
 		org.gwtbootstrap3.client.ui.Anchor link = new org.gwtbootstrap3.client.ui.Anchor(hit.getName(), DisplayUtils.getSynapseHistoryToken(hit.getId()));
-		headingPanel.add(new Text(i + "."));
 		Icon icon = new Icon(iconType);
 		icon.addStyleName("lightGreyText margin-right-5 margin-left-5");
 		headingPanel.add(icon);
