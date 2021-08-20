@@ -12,12 +12,15 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.jsinterop.React;
+import org.sagebionetworks.web.client.jsinterop.ReactDOM;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
+import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.footer.VersionState;
-import org.sagebionetworks.web.client.widget.header.Header;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
@@ -55,9 +58,10 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private SessionStorage sessionStorage;
 	private CallbackP<JavaScriptObject> fileListCallback;
 	private SynapseProperties synapseProperties;
-	boolean isDragDropInitialized = false;
 	private PortalGinInjector ginInjector;
-	
+
+	boolean isDragDropInitialized = false;
+	boolean isToastContainerInitialized = false;
 	/**
 	 * Last Place in the app
 	 */
@@ -223,7 +227,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		// get the current place based on the current browser window history token
 		String token = gwt.getCurrentHistoryToken();
 		if (appPlaceHistoryMapper != null) {
-			return appPlaceHistoryMapper.getPlace(token);	
+			return appPlaceHistoryMapper.getPlace(token);
 		}
 		return null;
 	}
@@ -408,6 +412,17 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	public void onDrop(JavaScriptObject fileList) {
 		if (isDragAndDropListenerSet()) {
 			fileListCallback.invoke(fileList);
+		}
+	}
+
+	@Override
+	public void initializeToastContainer() {
+		if (!isToastContainerInitialized) {
+			isToastContainerInitialized = true;
+
+			Element toastContainer = RootPanel.get("toastContainer").getElement();
+			ReactElement component = React.createElement(SRC.SynapseComponents.SynapseToastContainer, null);
+			ReactDOM.render(component, toastContainer);
 		}
 	}
 

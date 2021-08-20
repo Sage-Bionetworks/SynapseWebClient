@@ -307,7 +307,7 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 				public void onSuccess(DownloadList result) {
 					jsniUtils.sendAnalyticsEvent(AddToDownloadList.DOWNLOAD_ACTION_EVENT_NAME, AddToDownloadList.FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME, "1");
 					String href = "#!Profile:" + authController.getCurrentUserPrincipalId() + "/downloads";
-					popupUtils.showInfo(entityHeader.getName() + EntityBadge.ADDED_TO_DOWNLOAD_LIST, href, DisplayConstants.VIEW_DOWNLOAD_LIST, IconType.CHECK_CIRCLE);
+					popupUtils.showInfo(entityHeader.getName() + EntityBadge.ADDED_TO_DOWNLOAD_LIST, href, DisplayConstants.VIEW_DOWNLOAD_LIST);
 					eventBus.fireEvent(new DownloadListUpdatedEvent());
 				}
 			});
@@ -319,7 +319,7 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 				}
 				public void onSuccess(AddBatchOfFilesToDownloadListResponse result) {
 					String href = "#!DownloadCart:0";
-					popupUtils.showInfo(entityHeader.getName() + EntityBadge.ADDED_TO_DOWNLOAD_LIST, href, DisplayConstants.VIEW_DOWNLOAD_LIST, IconType.CHECK_CIRCLE);
+					popupUtils.showInfo(entityHeader.getName() + EntityBadge.ADDED_TO_DOWNLOAD_LIST, href, DisplayConstants.VIEW_DOWNLOAD_LIST);
 					eventBus.fireEvent(new DownloadListUpdatedEvent());
 				};
 			});

@@ -334,9 +334,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		icon.setPull(Pull.RIGHT);
 		icon.setEmphasis(Emphasis.DANGER);
 		icon.addStyleName("imageButton");
-		icon.addClickHandler(event -> {
-			presenter.onUnlink();
-		});
+		icon.addClickHandler(event -> DisplayUtils.confirmDelete("Are you sure you want to delete this Link?", () -> presenter.onUnlink()));
 		Tooltip tooltip = new Tooltip(icon, "Remove this link");
 		tooltip.setPlacement(Placement.RIGHT);
 		iconsContainer.add(tooltip);

@@ -215,7 +215,7 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 				}
 				public void onSuccess(AddBatchOfFilesToDownloadListResponse result) {
 					String href = "#!DownloadCart:0";
-					popupUtils.showInfo(entityName + EntityBadge.ADDED_TO_DOWNLOAD_LIST, href, DisplayConstants.VIEW_DOWNLOAD_LIST, IconType.CHECK_CIRCLE);
+					popupUtils.showInfo(entityName + EntityBadge.ADDED_TO_DOWNLOAD_LIST, href, DisplayConstants.VIEW_DOWNLOAD_LIST);
 					eventBus.fireEvent(new DownloadListUpdatedEvent());
 				};
 			});
