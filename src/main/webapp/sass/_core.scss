@@ -2999,7 +2999,7 @@ div.border {
 		background-color: none;
 	}
 	.alert {
-		height: 55px;
+		min-height: 55px;
 		border-radius: 0px;
 		padding: 7px 15px;
 		font-weight: 500;
