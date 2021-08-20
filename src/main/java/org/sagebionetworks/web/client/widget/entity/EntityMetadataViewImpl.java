@@ -107,9 +107,11 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
     @Override
     public void setAnnotationsVisible(boolean visible) {
         if (DisplayUtils.isInTestWebsite(cookies)) {
+            boolean showTabs = false;
             if (visible) {
+                boolean showModal = true;
                 EntityModalProps props =
-                        EntityModalProps.create(idField.getText(), true, () -> setAnnotationsVisible(false), "ANNOTATIONS", false);
+                        EntityModalProps.create(idField.getText(), showModal, () -> setAnnotationsVisible(false), "ANNOTATIONS", showTabs);
 
                 ReactDOM.render(
                         React.createElementWithSynapseContext(
@@ -120,8 +122,9 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
                         annotationsModalContainer.getElement()
                 );
             } else {
+                boolean showModal = false;
                 EntityModalProps props =
-                        EntityModalProps.create(idField.getText(), false, () -> setAnnotationsVisible(false), "ANNOTATIONS", false);
+                        EntityModalProps.create(idField.getText(), showModal, () -> setAnnotationsVisible(false), "ANNOTATIONS", showTabs);
                 ReactDOM.render(
                         React.createElementWithSynapseContext(
                                 SRC.SynapseComponents.EntityModal,
