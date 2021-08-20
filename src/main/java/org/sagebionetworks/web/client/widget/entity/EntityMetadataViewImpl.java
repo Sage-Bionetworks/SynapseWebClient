@@ -108,32 +108,16 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
     public void setAnnotationsVisible(boolean visible) {
         if (DisplayUtils.isInTestWebsite(cookies)) {
             boolean showTabs = false;
-            if (visible) {
-                boolean showModal = true;
-                EntityModalProps props =
-                        EntityModalProps.create(idField.getText(), showModal, () -> setAnnotationsVisible(false), "ANNOTATIONS", showTabs);
-
-                ReactDOM.render(
-                        React.createElementWithSynapseContext(
-                                SRC.SynapseComponents.EntityModal,
-                                props,
-                                propsProvider.getJsInteropContextProps()
-                        ),
-                        annotationsModalContainer.getElement()
-                );
-            } else {
-                boolean showModal = false;
-                EntityModalProps props =
-                        EntityModalProps.create(idField.getText(), showModal, () -> setAnnotationsVisible(false), "ANNOTATIONS", showTabs);
-                ReactDOM.render(
-                        React.createElementWithSynapseContext(
-                                SRC.SynapseComponents.EntityModal,
-                                props,
-                                propsProvider.getJsInteropContextProps()
-                        ),
-                        annotationsModalContainer.getElement()
-                );
-            }
+            EntityModalProps props =
+                    EntityModalProps.create(idField.getText(), visible, () -> setAnnotationsVisible(false), "ANNOTATIONS", showTabs);
+            ReactDOM.render(
+                    React.createElementWithSynapseContext(
+                            SRC.SynapseComponents.EntityModal,
+                            props,
+                            propsProvider.getJsInteropContextProps()
+                    ),
+                    annotationsModalContainer.getElement()
+            );
         } else {
             if (visible) {
                 annotationsContent.show();
