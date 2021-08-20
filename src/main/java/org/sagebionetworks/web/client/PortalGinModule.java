@@ -307,8 +307,6 @@ import org.sagebionetworks.web.client.widget.entity.act.UserBadgeListView;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeListViewImpl;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationCellFactory;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationCellFactoryImpl;
-import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationEditorV2View;
-import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationEditorV2ViewImpl;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationEditorView;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationEditorViewImpl;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformer;
@@ -1433,7 +1431,5 @@ public class PortalGinModule extends AbstractGinModule {
         bind(EntityFinderWidgetView.class).to(EntityFinderWidgetViewImpl.class);
         bind(SynapseContextPropsProvider.class).to(SynapseContextPropsProviderImpl.class);
         bind(AddToDownloadListV2.class).to(AddToDownloadListV2Impl.class);
-
-        bind(AnnotationEditorV2View.class).to(AnnotationEditorV2ViewImpl.class);
-    }
+	}
 }
