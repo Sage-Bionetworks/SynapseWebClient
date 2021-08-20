@@ -25,7 +25,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationEditorV2;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformer;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationsRendererWidget;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationsRendererWidgetView;
@@ -45,8 +44,6 @@ public class AnnotationsRendererWidgetTest {
 	@Mock
 	EditAnnotationsDialog mockEditAnnotationsDialog;
 	@Mock
-	AnnotationEditorV2 mockAnnotationEditorV2;
-	@Mock
 	EntityBundle mockBundle;
 	@Mock
 	Entity mockEntity;
@@ -64,7 +61,7 @@ public class AnnotationsRendererWidgetTest {
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
 		when(mockPortalGinInjector.getEditAnnotationsDialog()).thenReturn(mockEditAnnotationsDialog);
-		widget = new AnnotationsRendererWidget(mockView, mockPreflightController, mockPortalGinInjector, mockCookieProvider, mockAnnotationEditorV2);
+		widget = new AnnotationsRendererWidget(mockView, mockPreflightController, mockPortalGinInjector, mockCookieProvider);
 		annotationMap = new HashMap<String, AnnotationsValue>();
 		AnnotationsValue value = new AnnotationsValue();
 		value.setValue(Collections.EMPTY_LIST);
@@ -136,25 +133,6 @@ public class AnnotationsRendererWidgetTest {
 		verify(mockEditAnnotationsDialog).configure(bundleCaptor.capture());
 
 		assertEquals(bundleCaptor.getValue(), mockBundle);
-	}
-
-	@Test
-	public void testOnEdit_AnnotationEditorV2() {
-		// Currently alpha mode only
-		when(mockCookieProvider.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("true");
-
-		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUploadToEntity(any(EntityBundle.class), any(Callback.class));
-		widget.configure(mockBundle, true, true);
-
-		// test that on edit, we pass the bundle and update handler to the edit dialog
-		widget.onEdit();
-
-		ArgumentCaptor<String> entityIdCaptor = ArgumentCaptor.forClass(String.class);
-
-		verify(mockView, never()).addEditorToPage(any(Widget.class));
-		verify(mockAnnotationEditorV2).configure(entityIdCaptor.capture());
-
-		assertEquals(entityIdCaptor.getValue(), mockBundle.getEntity().getId());
 	}
 
 	@Test
