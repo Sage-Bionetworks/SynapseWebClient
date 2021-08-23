@@ -9,7 +9,7 @@ public interface TabView {
 
 	void updateHref(Synapse place);
 
-	void configure(String tabTitle, String helpMarkdown, String helpLink);
+	void configure(String tabTitle, String iconName, String helpMarkdown, String helpLink);
 
 	void setContent(Widget content);
 
