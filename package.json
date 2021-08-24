@@ -16,7 +16,7 @@
     "react-transition-group": "2.6.0",
     "sanitize-html": "^1.18.4",
     "sass": "1.32.5",
-    "synapse-react-client": "2.0.31",
+    "synapse-react-client": "2.0.32",
     "universal-cookie": "^4.0.3"
   }
 }

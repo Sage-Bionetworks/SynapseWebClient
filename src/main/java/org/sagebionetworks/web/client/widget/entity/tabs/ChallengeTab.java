@@ -42,7 +42,7 @@ public class ChallengeTab implements ChallengeTabView.Presenter {
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.cookies = cookies;
-		tab.configure("Challenge", "Challenges are open science, collaborative competitions for evaluating and comparing computational algorithms or solutions to problems.", "http://sagebionetworks.org/platforms/", EntityArea.CHALLENGE);
+		tab.configure("Challenge", "challenge", "Challenges are open science, collaborative competitions for evaluating and comparing computational algorithms or solutions to problems.", "http://sagebionetworks.org/platforms/", EntityArea.CHALLENGE);
 	}
 
 	public void lazyInject() {

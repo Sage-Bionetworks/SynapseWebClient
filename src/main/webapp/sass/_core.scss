@@ -2094,6 +2094,15 @@ ol.lowerroman {
 	letter-spacing: 1px;
 }
 
+.entity-tab svg {
+	color: #878E95;
+	margin-right: 5px;
+	margin-top: -2px;
+}
+.entity-tab.active svg, .entity-tab:hover svg {
+	color: $synapse-green;
+}
+
 @media (max-width: 991px) {
 	.entity-tab, .finder-tab {
 		width: 100%;
@@ -2101,7 +2110,7 @@ ol.lowerroman {
 }
 @media (min-width: 992px) {
 	.entity-tab {
-		width: 170px;
+		width: 180px;
 	}
 	.finder-tab {
 		width: 200px;

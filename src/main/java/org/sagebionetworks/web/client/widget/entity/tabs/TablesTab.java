@@ -68,7 +68,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler {
 	public TablesTab(Tab tab, PortalGinInjector ginInjector) {
 		this.tab = tab;
 		this.ginInjector = ginInjector;
-		tab.configure(DisplayConstants.TABLES, TABLES_HELP, TABLES_HELP_URL, EntityArea.TABLES);
+		tab.configure(DisplayConstants.TABLES, "table", TABLES_HELP, TABLES_HELP_URL, EntityArea.TABLES);
 	}
 
 	public void lazyInject() {

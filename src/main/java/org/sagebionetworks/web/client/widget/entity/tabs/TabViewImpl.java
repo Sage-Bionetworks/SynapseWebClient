@@ -9,6 +9,8 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.widget.ClickableDiv;
 import org.sagebionetworks.web.client.widget.HelpWidget;
+import org.sagebionetworks.web.client.widget.IconSvg;
+
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -69,7 +71,7 @@ public class TabViewImpl implements TabView {
 	}
 
 	@Override
-	public void configure(String tabTitle, String helpMarkdown, String helpLink) {
+	public void configure(String tabTitle, String iconName, String helpMarkdown, String helpLink) {
 		helpWidget.setHelpMarkdown(helpMarkdown);
 		helpWidget.setHref(helpLink);
 		helpWidget.setPlacement(Placement.BOTTOM);
@@ -81,6 +83,9 @@ public class TabViewImpl implements TabView {
 		ClickableDiv fp = new ClickableDiv();
 		fp.addClickHandler(tabClickedHandler);
 		fp.addStyleName("margin-right-5 displayInline");
+		IconSvg icon = new IconSvg();
+		icon.configure(iconName, null, null, null, null);
+		fp.add(icon);
 		fp.add(anchor);
 		tabItem.add(fp);
 		tabItem.add(helpWidget.asWidget());

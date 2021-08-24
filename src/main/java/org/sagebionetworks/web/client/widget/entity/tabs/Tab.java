@@ -63,9 +63,9 @@ public class Tab implements TabView.Presenter {
 		};
 	}
 
-	public void configure(String tabTitle, String helpMarkdown, String helpLink, EntityArea area) {
+	public void configure(String tabTitle, String iconName, String helpMarkdown, String helpLink, EntityArea area) {
 		this.tabTitle = tabTitle;
-		view.configure(tabTitle, helpMarkdown, helpLink);
+		view.configure(tabTitle, iconName, helpMarkdown, helpLink);
 		onClickCallbacks = new ArrayList<CallbackP<Tab>>();
 		this.area = area;
 	}
