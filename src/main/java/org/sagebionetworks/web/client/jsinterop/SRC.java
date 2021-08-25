@@ -22,7 +22,7 @@ public class SRC {
 		public static ReactFunctionComponent<EmptyProps> FavoritesPage;
 		public static ReactFunctionComponent<EntityModalProps> EntityModal;
 		public static ReactFunctionComponent SynapseToastContainer;
-		public static native void displayToast(String variant, String title, String description, Long autoCloseInMs, String primaryButtonText, Callback onPrimaryButtonClick, String secondaryButtonText, String secondaryButtonHref);
+		public static native void displayToast(String variant, String title, String description, int autoCloseInMs, String primaryButtonText, Callback onPrimaryButtonClick, String secondaryButtonText, String secondaryButtonHref);
 	}
 
 	@JsType(isNative = true)

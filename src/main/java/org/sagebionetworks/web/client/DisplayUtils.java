@@ -114,7 +114,7 @@ public class DisplayUtils {
 		INFO, WARNING, QUESTION
 	}
 
-	public static final Integer DEFAULT_TOAST_TIMEOUT_MS = 15000;
+	public static final Integer DEFAULT_TOAST_TIMEOUT_MS = 1000 * 15;
 
 	public static final ClickHandler TEXTBOX_SELECT_ALL_FIELD_CLICKHANDLER = event -> {
 		TextBox source = (TextBox) event.getSource();
@@ -289,20 +289,20 @@ public class DisplayUtils {
 	}
 
 	public static void showInfo(String message, String href, String buttonText, Integer timeout) {
-		notify(NotificationVariant.INFO, null, message, timeout.longValue(), buttonText, href);
+		notify(NotificationVariant.INFO, null, message, timeout, buttonText, href);
 	}
 
 	public static final Set<String> recentNotificationMessages = new HashSet<>();
 
 	public static void notify(NotificationVariant variant, String title, String description) {
-		notify(variant, title, description, DEFAULT_TOAST_TIMEOUT_MS.longValue(), null, null);
+		notify(variant, title, description, DEFAULT_TOAST_TIMEOUT_MS, null, null);
 	}
 
-	public static void notify(NotificationVariant variant, String title, String description, Long autoCloseInMs) {
+	public static void notify(NotificationVariant variant, String title, String description, Integer autoCloseInMs) {
 		notify(variant, title, description, autoCloseInMs, null, null);
 	}
 
-	public static void notify(NotificationVariant variant, String title, String description, Long autoCloseInMs, String secondaryButtonText, String secondaryButtonHref) {
+	public static void notify(NotificationVariant variant, String title, String description, int autoCloseInMs, String secondaryButtonText, String secondaryButtonHref) {
 		try {
 			String key = variant + "/" + title + "/" + description;
 			if (!recentNotificationMessages.contains(key)) {
@@ -334,7 +334,7 @@ public class DisplayUtils {
 		if (timeout == null) {
 			timeout = 0;
 		}
-		notify(NotificationVariant.DANGER, "Error", message, timeout.longValue());
+		notify(NotificationVariant.DANGER, "Error", message, timeout);
 	}
 
 	public static void showErrorMessage(String message) {
