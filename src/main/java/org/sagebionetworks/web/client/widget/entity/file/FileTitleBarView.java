@@ -36,8 +36,6 @@ public interface FileTitleBarView extends IsWidget, SynapseView {
 
 	void setPresenter(Presenter p);
 
-	void showAddedToDownloadListAlert(String message);
-
 	void setCanDownload(boolean canDownload);
 
 	void setActionMenu(IsWidget w);
