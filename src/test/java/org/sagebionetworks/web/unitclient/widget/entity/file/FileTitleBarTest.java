@@ -57,6 +57,7 @@ import com.google.gwt.user.client.ui.Widget;
 @RunWith(MockitoJUnitRunner.class)
 public class FileTitleBarTest {
 	public static final String ENTITY_ID = "syn123";
+	public static final String USER_ID = "12344444";
 	FileTitleBar fileTitleBar;
 	@Mock
 	FileTitleBarView mockView;
@@ -124,6 +125,7 @@ public class FileTitleBarTest {
 		Mockito.when(mockBundle.getFileHandles()).thenReturn(fileHandles);
 		verify(mockView).setFileDownloadMenuItem(any(Widget.class));
 		versions = new ArrayList<>();
+		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(USER_ID);
 		AsyncMockStubber.callSuccessWith(versions).when(mockJsClient).getEntityVersions(anyString(), anyInt(), anyInt(), any());
 		AsyncMockStubber.callSuccessWith(null).when(mockJsClient).addFileToDownloadList(anyString(), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockJsClient).addFileToDownloadListV2(anyString(), anyLong(), any(AsyncCallback.class));
@@ -190,7 +192,7 @@ public class FileTitleBarTest {
 		fileTitleBar.onAddToDownloadList();
 
 		verify(mockJsClient).addFileToDownloadList(eq(DATA_FILE_HANDLE_ID), eq(ENTITY_ID), any(AsyncCallback.class));
-		verify(mockView).showAddedToDownloadListAlert(FILE_NAME + EntityBadge.ADDED_TO_DOWNLOAD_LIST);
+		verify(mockPopupUtils).showInfo(FILE_NAME + EntityBadge.ADDED_TO_DOWNLOAD_LIST, "#!Profile:" + USER_ID + "/downloads", DisplayConstants.VIEW_DOWNLOAD_LIST);
 		verify(mockEventBus).fireEvent(any(DownloadListUpdatedEvent.class));
 		verify(mockSynapseJSNIUtils).sendAnalyticsEvent(AddToDownloadList.DOWNLOAD_ACTION_EVENT_NAME, AddToDownloadList.FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME, Integer.toString(1));
 	}

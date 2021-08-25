@@ -82,8 +82,6 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	@UiField
 	Div versionInfoUI;
 	@UiField
-	FullWidthAlert addedToDownloadListAlert;
-	@UiField
 	HelpWidget viewOnlyHelp;
 	@UiField
 	Button downloadOptionsButton;
@@ -119,10 +117,6 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 		programmaticOptionsLink.addClickHandler(event -> {
 			presenter.onProgrammaticDownloadOptions();
 		});
-		addedToDownloadListAlert.addPrimaryCTAClickHandler(event -> {
-			Profile place = new Profile(authController.getCurrentUserPrincipalId() + "/downloads");
-			globalAppState.getPlaceChanger().goTo(place);
-		});
 	}
 
 	@Override
@@ -132,7 +126,6 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 
 	@Override
 	public void createTitlebar(Entity entity) {
-		addedToDownloadListAlert.setVisible(false);
 		currentEntityId = entity.getId();
 		favoriteWidget.configure(currentEntityId);
 		md5Link.clear();
@@ -229,12 +222,6 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	@Override
 	public void setVersion(Long versionNumber) {
 		version.setText(versionNumber.toString());
-	}
-
-	@Override
-	public void showAddedToDownloadListAlert(String message) {
-		addedToDownloadListAlert.setMessage(message);
-		addedToDownloadListAlert.setVisible(true);
 	}
 
 	@Override
