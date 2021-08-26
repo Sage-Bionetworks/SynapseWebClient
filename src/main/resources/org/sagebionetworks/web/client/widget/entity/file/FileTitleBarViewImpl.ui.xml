@@ -60,9 +60,7 @@
 					<bh:Strong text="File key:" addStyleNames="margin-right-5"/>
 					<bh:Span ui:field="fileKey"/>
 				</bh:Div>
-
 			</g:HTMLPanel>
 		</g:HTMLPanel>
-		<w:FullWidthAlert visible="false" ui:field="addedToDownloadListAlert" alertType="SUCCESS" message="(filename) was added to your Download List" primaryCTAText="view download list" />
 	</g:HTMLPanel>
 </ui:UiBinder>

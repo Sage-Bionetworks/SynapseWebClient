@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.jsinterop;
 
-import org.sagebionetworks.web.client.utils.Callback;
-
 import jsinterop.annotations.JsPackage;
 import jsinterop.annotations.JsType;
 
@@ -23,7 +21,7 @@ public class SRC {
 		public static ReactFunctionComponent<EntityModalProps> EntityModal;
 		public static ReactFunctionComponent<IconSvgProps> IconSvg;
 		public static ReactFunctionComponent SynapseToastContainer;
-		public static native void displayToast(String variant, String title, String description, Long autoCloseInMs, String primaryButtonText, Callback onPrimaryButtonClick, String secondaryButtonText, String secondaryButtonHref);
+		public static native void displayToast(String variant, String title, String description, int autoCloseInMs, String primaryButtonText, FullWidthAlertProps.Callback onPrimaryButtonClick, String secondaryButtonText, String secondaryButtonHref);
 	}
 
 	@JsType(isNative = true)
