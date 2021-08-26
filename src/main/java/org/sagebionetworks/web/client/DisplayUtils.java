@@ -60,6 +60,7 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.NodeList;
@@ -147,7 +148,7 @@ public class DisplayUtils {
 	/**
 	 * This key down handler prevents the user from tabbing forward off of the given Focusable widget.
 	 * User can still shift-tab to go back.
-	 * 
+	 *
 	 * @param lastWidget
 	 * @return
 	 */
@@ -175,7 +176,7 @@ public class DisplayUtils {
 
 	/**
 	 * This key down handler invokes the when ESC is clicked.
-	 * 
+	 *
 	 * @return
 	 */
 	public static KeyDownHandler getESCKeyDownHandler(ClickHandler callback) {
@@ -240,7 +241,7 @@ public class DisplayUtils {
 
 	/**
 	 * Returns a panel used to show a component is loading in the view
-	 * 
+	 *
 	 * @param sageImageBundle
 	 * @return
 	 */
@@ -270,7 +271,7 @@ public class DisplayUtils {
 
 	/**
 	 * Shows an info message to the user in the "Global Alert area".
-	 * 
+	 *
 	 * @param title
 	 * @param message
 	 */
@@ -280,7 +281,7 @@ public class DisplayUtils {
 
 	/**
 	 * Shows an info message to the user in the "Global Alert area" for the given timeout period
-	 * 
+	 *
 	 * @param title
 	 * @param message
 	 */
@@ -302,13 +303,14 @@ public class DisplayUtils {
 		notify(variant, title, description, autoCloseInMs, null, null);
 	}
 
-	public static void notify(NotificationVariant variant, String title, String description, int autoCloseInMs, String secondaryButtonText, String secondaryButtonHref) {
+	public static void notify(NotificationVariant variant, String title, String description, int autoCloseInMs, String primaryButtonText, String primaryButtonHref) {
 		try {
 			String key = variant + "/" + title + "/" + description;
 			if (!recentNotificationMessages.contains(key)) {
 				recentNotificationMessages.add(key);
-				SRC.SynapseComponents.displayToast(variant.toString(), title, description, autoCloseInMs, null, null, secondaryButtonText, secondaryButtonHref);
-
+                SRC.SynapseComponents.displayToast(variant.toString(), title, description, autoCloseInMs, primaryButtonText, () -> {
+                    Window.Location.assign(primaryButtonHref);
+                }, null, null);
 				// in 5 seconds clean up that key (to allow showing the message again)
 				Timer timer = new Timer() {
 					public void run() {
@@ -326,7 +328,7 @@ public class DisplayUtils {
 
 	/**
 	 * Shows an warning message to the user in the "Global Alert area".
-	 * 
+	 *
 	 * @param title
 	 * @param message
 	 */
@@ -564,7 +566,7 @@ public class DisplayUtils {
 
 	/**
 	 * Stub the string removing the last partial word
-	 * 
+	 *
 	 * @param str
 	 * @param length
 	 * @return
@@ -582,7 +584,7 @@ public class DisplayUtils {
 
 	/**
 	 * Stub the string with partial word at end left in
-	 * 
+	 *
 	 * @param contents
 	 * @param maxLength
 	 * @return
@@ -706,7 +708,7 @@ public class DisplayUtils {
 
 	/**
 	 * Create the url to a wiki filehandle.
-	 * 
+	 *
 	 * @param baseURl
 	 * @param id
 	 * @param tokenId
@@ -738,7 +740,7 @@ public class DisplayUtils {
 
 	/**
 	 * Create the url to a FileEntity filehandle.
-	 * 
+	 *
 	 * @param baseURl
 	 * @param entityid
 	 * @return
@@ -750,7 +752,7 @@ public class DisplayUtils {
 
 	/**
 	 * Create the url to a Team icon filehandle.
-	 * 
+	 *
 	 * @param baseURl
 	 * @param teamId
 	 * @return
@@ -793,7 +795,7 @@ public class DisplayUtils {
 
 	/**
 	 * Return a preview filehandle associated with this bundle (or null if unavailable)
-	 * 
+	 *
 	 * @param bundle
 	 * @return
 	 */
@@ -812,7 +814,7 @@ public class DisplayUtils {
 
 	/**
 	 * Return the filehandle associated with this bundle (or null if unavailable)
-	 * 
+	 *
 	 * @param bundle
 	 * @return
 	 */
@@ -870,7 +872,7 @@ public class DisplayUtils {
 	/**
 	 * Surround the selectedText with the given markdown. Or, if the selected text is already surrounded
 	 * by the markdown, then remove it.
-	 * 
+	 *
 	 * @param text
 	 * @param markdown
 	 * @param startPos
@@ -1031,7 +1033,7 @@ public class DisplayUtils {
 	 * This is to work around a Chrome rendering bug, where some containers do not properly calculate
 	 * their relative widths (in the dynamic bootstrap grid layout) when they are initially added. The
 	 * most visible of these cases is the Wiki Subpages panel (see SWC-1450).
-	 * 
+	 *
 	 * @param e
 	 */
 	public static void clearElementWidth(Element e) {
@@ -1053,7 +1055,7 @@ public class DisplayUtils {
 	public static String trim(String s) {
 		return replaceWithEmptyStringIfNull(s).trim();
 	}
-	
+
 	/**
 	 * just return the empty string if input string parameter s is null, otherwise returns s.
 	 */
@@ -1063,7 +1065,7 @@ public class DisplayUtils {
 		else
 			return s;
 	}
-	
+
 	/**
 	 * return null if the input string is empty, otherwise return the input string trimmed.
 	 */
