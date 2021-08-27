@@ -26,12 +26,9 @@ import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.gwtbootstrap3.client.ui.constants.Trigger;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Text;
-import org.gwtbootstrap3.extras.animate.client.ui.constants.Animation;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.SimpleCallback;
 import org.gwtbootstrap3.extras.bootbox.client.options.DialogOptions;
-import org.gwtbootstrap3.extras.notify.client.constants.NotifyPlacement;
-import org.gwtbootstrap3.extras.notify.client.ui.NotifySettings;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -45,6 +42,7 @@ import org.sagebionetworks.repo.model.file.CloudProviderFileHandleInterface;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.jsinterop.SRC;
+import org.sagebionetworks.web.client.jsinterop.ToastMessageOptions;
 import org.sagebionetworks.web.client.place.PeopleSearch;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -60,7 +58,6 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.NodeList;
@@ -188,32 +185,6 @@ public class DisplayUtils {
 		};
 	}
 
-	private static String getNotifyTemplate(String href, String buttonText) {
-		StringBuilder sb = new StringBuilder();
-		sb.append("<div data-notify=\"container\" class=\"alert fullWidthAlert alert-{0}\" role=\"alert\" style=\"height: 60px;\">\n<div class=\"flexcontainer-row\">");
-		sb.append("<span data-notify=\"icon\" class=\"flexcontainer-column black-25-percent font-size-17 margin-top-8 margin-right-5 margin-left-5 \"></span>\n" + "  <span data-notify=\"title\" class=\"flexcontainer-column margin-top-5\"><strong>{1}</strong></span>\n" + "  <span data-notify=\"message\" class=\"flexcontainer-column flexcontainer-column-fill-width margin-top-5\">{2}</span>\n" + "  <a href=\"{3}\" target=\"{4}\" data-notify=\"url\"></a>\n");
-		if (href != null && buttonText != null) {
-			sb.append("<a class=\"flexcontainer-column margin-top-5 flexcontainer-align-items-flex-end margin-right-20\" href=" + href + ">" + buttonText.toUpperCase() + "</a>\n");
-		} else {
-			sb.append("<button type=\"button\" aria-hidden=\"true\" class=\"close margin-top-5\" data-notify=\"dismiss\">x</button>\n");
-		}
-		sb.append("</div></div>");
-		return sb.toString();
-	}
-
-	public static NotifySettings getDefaultSettings() {
-		return getDefaultSettings(null, null);
-	}
-
-	public static NotifySettings getDefaultSettings(String href, String buttonText) {
-		NotifySettings notifySettings = NotifySettings.newSettings();
-		notifySettings.setTemplate(getNotifyTemplate(href, buttonText));
-		notifySettings.setPlacement(NotifyPlacement.BOTTOM_CENTER);
-		notifySettings.setNewestOnTop(true);
-		notifySettings.setAnimation(Animation.FADE_IN_UP, Animation.FADE_OUT_DOWN);
-		return notifySettings;
-	}
-
 	private static NumberFormat fileSizeFormat = null;
 	private static NumberFormat decimalFormat = null;
 
@@ -266,7 +237,7 @@ public class DisplayUtils {
 	}
 
 	public static void showSuccess(String message) {
-		notify(NotificationVariant.SUCCESS, null, message);
+		notify(message, NotificationVariant.SUCCESS);
 	}
 
 	/**
@@ -276,41 +247,29 @@ public class DisplayUtils {
 	 * @param message
 	 */
 	public static void showInfo(String message) {
-		showInfo(message, null, null, DEFAULT_TOAST_TIMEOUT_MS);
-	}
-
-	/**
-	 * Shows an info message to the user in the "Global Alert area" for the given timeout period
-	 *
-	 * @param title
-	 * @param message
-	 */
-	public static void showInfo(String message, Integer timeout) {
-		showInfo(message, null, null, timeout);
-	}
-
-	public static void showInfo(String message, String href, String buttonText, Integer timeout) {
-		notify(NotificationVariant.INFO, null, message, timeout, buttonText, href);
+		notify(message, NotificationVariant.INFO);
 	}
 
 	public static final Set<String> recentNotificationMessages = new HashSet<>();
 
-	public static void notify(NotificationVariant variant, String title, String description) {
-		notify(variant, title, description, DEFAULT_TOAST_TIMEOUT_MS, null, null);
+	public static void notify(String message, NotificationVariant variant) {
+		notify(message, variant, null);
 	}
 
-	public static void notify(NotificationVariant variant, String title, String description, Integer autoCloseInMs) {
-		notify(variant, title, description, autoCloseInMs, null, null);
-	}
-
-	public static void notify(NotificationVariant variant, String title, String description, int autoCloseInMs, String primaryButtonText, String primaryButtonHref) {
+	/**
+	 * Pushes a toast by calling SRC's displayToast method.
+	 *
+	 * In SWC, all toasts should go through here, because it also tracks recent messages to avoid pushing duplicates.
+	 * @param message
+	 * @param variant
+	 * @param options
+	 */
+	public static void notify(String message, NotificationVariant variant, ToastMessageOptions options) {
 		try {
-			String key = variant + "/" + title + "/" + description;
+			String key = variant + "/" + options.title + "/" + message;
 			if (!recentNotificationMessages.contains(key)) {
 				recentNotificationMessages.add(key);
-                SRC.SynapseComponents.displayToast(variant.toString(), title, description, autoCloseInMs, primaryButtonText, () -> {
-                    Window.Location.assign(primaryButtonHref);
-                }, null, null);
+                SRC.SynapseComponents.displayToast(message, variant.toString(), options);
 				// in 5 seconds clean up that key (to allow showing the message again)
 				Timer timer = new Timer() {
 					public void run() {
@@ -332,11 +291,13 @@ public class DisplayUtils {
 	 * @param title
 	 * @param message
 	 */
-	public static void showError(String message, Integer timeout) {
+	public static void showErrorToast(String message, Integer timeout) {
 		if (timeout == null) {
 			timeout = 0;
 		}
-		notify(NotificationVariant.DANGER, "Error", message, timeout);
+		ToastMessageOptions options = new ToastMessageOptions.Builder().setAutoCloseInMs(timeout).build();
+
+		notify(message, NotificationVariant.DANGER, options);
 	}
 
 	public static void showErrorMessage(String message) {

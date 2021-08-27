@@ -1,10 +1,5 @@
 package org.sagebionetworks.web.client;
 
-import java.util.Date;
-import org.gwtbootstrap3.client.ui.constants.IconType;
-import org.gwtbootstrap3.extras.notify.client.constants.NotifyType;
-import org.gwtbootstrap3.extras.notify.client.ui.Notify;
-import org.gwtbootstrap3.extras.notify.client.ui.NotifySettings;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
@@ -12,6 +7,7 @@ import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResultJso;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray;
 import org.sagebionetworks.web.shared.WebConstants;
+
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
@@ -764,10 +760,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	public void copyToClipboard() {
 		try {
 			_copyToClipboard();
-			Notify.hideAll();
-			NotifySettings settings = DisplayUtils.getDefaultSettings();
-			settings.setType(NotifyType.INFO);
-			Notify.notify("", "Copied to clipboard", IconType.CHECK_CIRCLE, settings);
+			DisplayUtils.showInfo("Copied to clipboard");
 		} catch (Throwable t) {
 			consoleError(t.getMessage());
 		}
