@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.client.jsinterop;
 
+import org.sagebionetworks.web.client.DisplayUtils;
+
+import jsinterop.annotations.JsNullable;
 import jsinterop.annotations.JsPackage;
 import jsinterop.annotations.JsType;
 
@@ -21,7 +24,14 @@ public class SRC {
 		public static ReactFunctionComponent<EntityModalProps> EntityModal;
 		public static ReactFunctionComponent<IconSvgProps> IconSvg;
 		public static ReactFunctionComponent SynapseToastContainer;
-		public static native void displayToast(String variant, String title, String description, int autoCloseInMs, String primaryButtonText, FullWidthAlertProps.Callback onPrimaryButtonClick, String secondaryButtonText, String secondaryButtonHref);
+
+		/**
+		 * Pushes a global toast message. In SWC, you should use {@link DisplayUtils#notify}, rather than calling this method directly.
+		 * @param message
+		 * @param variant
+		 * @param options
+		 */
+		public static native void displayToast(String message, String variant, @JsNullable ToastMessageOptions options);
 	}
 
 	@JsType(isNative = true)

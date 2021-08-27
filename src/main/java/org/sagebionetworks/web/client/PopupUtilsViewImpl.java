@@ -1,7 +1,8 @@
 package org.sagebionetworks.web.client;
 
-import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.sagebionetworks.web.client.jsinterop.ToastMessageOptions;
 import org.sagebionetworks.web.client.utils.Callback;
+
 import com.google.gwt.user.client.Window;
 
 public class PopupUtilsViewImpl implements PopupUtilsView {
@@ -13,17 +14,21 @@ public class PopupUtilsViewImpl implements PopupUtilsView {
 
 	@Override
 	public void showInfo(String message, Integer timeout) {
-		DisplayUtils.showInfo(message, timeout);
+		ToastMessageOptions options = new ToastMessageOptions.Builder().setAutoCloseInMs(timeout).build();
+		DisplayUtils.notify(message, DisplayUtils.NotificationVariant.INFO, options);
 	}
 
 	@Override
 	public void showInfo(String message, String href, String buttonText) {
-		DisplayUtils.showInfo(message, href, buttonText, 15000);
+		ToastMessageOptions options = new ToastMessageOptions.Builder()
+				.setPrimaryButton(buttonText, href)
+				.build();
+		DisplayUtils.notify(message, DisplayUtils.NotificationVariant.INFO, options);
 	}
 
 	@Override
 	public void showError(String message, Integer timeout) {
-		DisplayUtils.showError(message, timeout);
+		DisplayUtils.showErrorToast(message, timeout);
 	}
 
 	@Override

@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client;
 
-import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.web.client.utils.Callback;
 
 public interface PopupUtilsView {
