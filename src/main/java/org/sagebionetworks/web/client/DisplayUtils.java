@@ -266,7 +266,12 @@ public class DisplayUtils {
 	 */
 	public static void notify(String message, NotificationVariant variant, ToastMessageOptions options) {
 		try {
-			String key = variant + "/" + options.title + "/" + message;
+			String title = null;
+			if (options != null) {
+				title = options.title;
+			}
+
+			String key = variant + "/" + title + "/" + message;
 			if (!recentNotificationMessages.contains(key)) {
 				recentNotificationMessages.add(key);
                 SRC.SynapseComponents.displayToast(message, variant.toString(), options);
