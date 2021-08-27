@@ -5,10 +5,12 @@ import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
+import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.place.Profile;
+import org.sagebionetworks.web.client.jsinterop.ToastMessageOptions;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.widget.FullWidthAlert;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -32,19 +34,16 @@ public class AddToDownloadListViewImpl implements AddToDownloadListView, IsWidge
 	Anchor cancelLink;
 	@UiField
 	Alert progressContainer;
-	@UiField
-	FullWidthAlert addedToDownloadListAlert;
 
 	Presenter presenter;
 	private static PackageSizeSummaryViewImplUiBinder uiBinder = GWT.create(PackageSizeSummaryViewImplUiBinder.class);
 
+	private AuthenticationController authController;
+
 	@Inject
 	public AddToDownloadListViewImpl(AuthenticationController authController, GlobalApplicationState globalAppState) {
 		w = uiBinder.createAndBindUi(this);
-		addedToDownloadListAlert.addPrimaryCTAClickHandler(event -> {
-			Profile place = new Profile(authController.getCurrentUserPrincipalId() + "/downloads");
-			globalAppState.getPlaceChanger().goTo(place);
-		});
+		this.authController = authController;
 		cancelLink.addClickHandler(event -> {
 			hideAll();
 		});
@@ -67,7 +66,6 @@ public class AddToDownloadListViewImpl implements AddToDownloadListView, IsWidge
 	public void hideAll() {
 		confirmationUI.setVisible(false);
 		progressContainer.setVisible(false);
-		addedToDownloadListAlert.setVisible(false);
 	}
 
 	@Override
@@ -94,8 +92,15 @@ public class AddToDownloadListViewImpl implements AddToDownloadListView, IsWidge
 
 	@Override
 	public void showSuccess(int fileCount) {
-		addedToDownloadListAlert.setMessage(fileCount + " files added to your Downloads List.");
-		addedToDownloadListAlert.setVisible(true);
+		String href = "#!Profile:" + authController.getCurrentUserPrincipalId() + "/downloads";
+		ToastMessageOptions toastOptions = new ToastMessageOptions.Builder()
+				.setPrimaryButton(DisplayConstants.VIEW_DOWNLOAD_LIST, href)
+				.build();
+
+		DisplayUtils.notify(fileCount + " files added to your Downloads List.",
+				DisplayUtils.NotificationVariant.SUCCESS,
+				toastOptions
+		);
 	}
 
 	@Override

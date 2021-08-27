@@ -17,7 +17,6 @@
 			<b:Button ui:field="confirmButton" type="PRIMARY" text="Add" pull="RIGHT" marginLeft="15" marginTop="7" marginRight="10"/>
 			<b:Anchor ui:field="cancelLink" text="Cancel" pull="RIGHT" marginTop="13"/>
 		</b:Alert>
-		<b:Alert ui:field="progressContainer" visible="false" addStyleNames="fullWidthAlert" type="INFO" height="60px" />
-		<w:FullWidthAlert ui:field="addedToDownloadListAlert" alertType="SUCCESS" message="x files were added to your Download List" primaryCTAText="view download list" dismissable="true"/>
+		<b:Alert ui:field="progressContainer" visible="false" addStyleNames="fullWidthAlert" type="INFO" height="75px" />
 	</bh:Div>
 </ui:UiBinder>
