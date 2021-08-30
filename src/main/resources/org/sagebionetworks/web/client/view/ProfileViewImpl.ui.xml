@@ -98,7 +98,7 @@
 													addStyleNames="font-size-90 favoriteIcon" />
 												<b:Heading text="Favorites" size="H4"></b:Heading>
 												<bh:Text
-													text="Save the entity you’d like to revisit by marking it as a favorite. To mark an entity as a favorite, click the star icon next to its name."></bh:Text>
+													text="Save the Project you’d like to revisit by marking it as a favorite. To mark an Project as a favorite, click the star icon next to its name."></bh:Text>
 											</b:BlockQuote>
 										</g:FlowPanel>
 									</div>
