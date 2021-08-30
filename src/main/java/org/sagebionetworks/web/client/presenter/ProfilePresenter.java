@@ -326,6 +326,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		if (isOwner) {
 			view.setLastActivityOnColumnVisible(true);
 			view.showProjectFiltersUI();
+			view.setFavoritesHelpPanelVisible(false);
 			// this depends on the active filter
 			switch (filterType) {
 				case ALL:
@@ -601,24 +602,21 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			public void onSuccess(List<EntityHeader> result) {
 				if (filterType == ProjectFilterEnum.FAVORITES) {
 					// convert to Project Headers
-					if (result.size() == 0) {
-						view.setFavoritesHelpPanelVisible(true);
-					} else {
-						List<ProjectHeader> headers = new ArrayList<ProjectHeader>(result.size());
-						List<String> lastModifiedBy = new ArrayList<String>(result.size());
-						for (EntityHeader header : result) {
-							lastModifiedBy.add(header.getId());
-							// only show projects
-							if (Project.class.getName().equals(header.getType())) {
-								ProjectHeader projectHeader = new ProjectHeader();
-								projectHeader.setId(header.getId());
-								projectHeader.setName(header.getName());
-								headers.add(projectHeader);	
-							}
+					List<ProjectHeader> headers = new ArrayList<ProjectHeader>(result.size());
+					List<String> lastModifiedBy = new ArrayList<String>(result.size());
+					for (EntityHeader header : result) {
+						lastModifiedBy.add(header.getId());
+						// only show projects
+						if (Project.class.getName().equals(header.getType())) {
+							ProjectHeader projectHeader = new ProjectHeader();
+							projectHeader.setId(header.getId());
+							projectHeader.setName(header.getName());
+							headers.add(projectHeader);	
 						}
-						addProjectResults(headers);
-						loadMoreProjectsWidgetContainer.setIsMore(false);
 					}
+					view.setFavoritesHelpPanelVisible(headers.size() == 0);
+					addProjectResults(headers);
+					loadMoreProjectsWidgetContainer.setIsMore(false);
 				}
 			}
 
