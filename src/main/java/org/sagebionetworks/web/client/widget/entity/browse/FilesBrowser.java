@@ -1,13 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.clienthelp.ContainerClientsHelp;
-import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList;
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -20,18 +18,16 @@ public class FilesBrowser implements SynapseWidgetPresenter, FilesBrowserView.Pr
 	GlobalApplicationState globalApplicationState;
 	AuthenticationController authenticationController;
 	ContainerClientsHelp containerClientsHelp;
-	AddToDownloadList addToDownloadList;
 	AddToDownloadListV2 addToDownloadListV2;
 	CookieProvider cookies;
 	String entityId;
 
 	@Inject
-	public FilesBrowser(FilesBrowserView view, GlobalApplicationState globalApplicationState, AuthenticationController authenticationController, ContainerClientsHelp containerClientsHelp, AddToDownloadList addToDownloadList, AddToDownloadListV2 addToDownloadListV2, CookieProvider cookies) {
+	public FilesBrowser(FilesBrowserView view, GlobalApplicationState globalApplicationState, AuthenticationController authenticationController, ContainerClientsHelp containerClientsHelp, AddToDownloadListV2 addToDownloadListV2, CookieProvider cookies) {
 		this.view = view;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		this.containerClientsHelp = containerClientsHelp;
-		this.addToDownloadList = addToDownloadList;
 		this.addToDownloadListV2 = addToDownloadListV2;
 		this.cookies = cookies;
 		view.setPresenter(this);
@@ -45,7 +41,6 @@ public class FilesBrowser implements SynapseWidgetPresenter, FilesBrowserView.Pr
 	public void configure(String entityId) {
 		this.entityId = entityId;
 		view.clear();
-		addToDownloadList.clear();
 		view.configure(entityId);
 	}
 
@@ -69,13 +64,8 @@ public class FilesBrowser implements SynapseWidgetPresenter, FilesBrowserView.Pr
 
 	@Override
 	public void onAddToDownloadList() {
-		if (!DisplayUtils.isInTestWebsite(cookies)) {
-			view.setAddToDownloadList(addToDownloadList);
-			addToDownloadList.addToDownloadList(entityId);
-		} else {
-			view.setAddToDownloadList(addToDownloadListV2);
-			addToDownloadListV2.configure(entityId);
-		}
+		view.setAddToDownloadList(addToDownloadListV2);
+		addToDownloadListV2.configure(entityId);
 	}
 	public void setActionMenu(IsWidget w) {
 		view.setActionMenu(w);

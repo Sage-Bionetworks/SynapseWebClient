@@ -2,7 +2,7 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.List;
 import java.util.Map;
-import org.gwtbootstrap3.client.ui.constants.IconType;
+
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Link;
@@ -10,7 +10,6 @@ import org.sagebionetworks.repo.model.annotation.v2.Annotations;
 import org.sagebionetworks.repo.model.annotation.v2.AnnotationsValue;
 import org.sagebionetworks.repo.model.download.AddBatchOfFilesToDownloadListResponse;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
-import org.sagebionetworks.repo.model.file.DownloadList;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.schema.JsonSchemaObjectBinding;
 import org.sagebionetworks.repo.model.schema.ValidationResults;
@@ -30,10 +29,8 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.FileHandleUtils;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformer;
-import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
-import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -293,37 +290,17 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 			globalAppState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 			return;
 		}
-		
-		if (!DisplayUtils.isInTestWebsite(cookies)) {
-			// TODO: add special popup to report how many items are in the current download list, and link to
-			// download list.
-			jsClient.addFileToDownloadList(dataFileHandleId, entityHeader.getId(), new AsyncCallback<DownloadList>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					view.setError(caught.getMessage());
-				}
-
-				@Override
-				public void onSuccess(DownloadList result) {
-					jsniUtils.sendAnalyticsEvent(AddToDownloadList.DOWNLOAD_ACTION_EVENT_NAME, AddToDownloadList.FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME, "1");
-					String href = "#!Profile:" + authController.getCurrentUserPrincipalId() + "/downloads";
-					popupUtils.showInfo(entityHeader.getName() + EntityBadge.ADDED_TO_DOWNLOAD_LIST, href, DisplayConstants.VIEW_DOWNLOAD_LIST);
-					eventBus.fireEvent(new DownloadListUpdatedEvent());
-				}
-			});
-		} else {
-			jsClient.addFileToDownloadListV2(entityHeader.getId(), entityHeader.getVersionNumber(), new AsyncCallback<AddBatchOfFilesToDownloadListResponse>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					view.setError(caught.getMessage());
-				}
-				public void onSuccess(AddBatchOfFilesToDownloadListResponse result) {
-					String href = "#!DownloadCart:0";
-					popupUtils.showInfo(entityHeader.getName() + EntityBadge.ADDED_TO_DOWNLOAD_LIST, href, DisplayConstants.VIEW_DOWNLOAD_LIST);
-					eventBus.fireEvent(new DownloadListUpdatedEvent());
-				};
-			});
-		}
+		jsClient.addFileToDownloadListV2(entityHeader.getId(), entityHeader.getVersionNumber(), new AsyncCallback<AddBatchOfFilesToDownloadListResponse>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				view.setError(caught.getMessage());
+			}
+			public void onSuccess(AddBatchOfFilesToDownloadListResponse result) {
+				String href = "#!DownloadCart:0";
+				popupUtils.showInfo(entityHeader.getName() + EntityBadge.ADDED_TO_DOWNLOAD_LIST, href, DisplayConstants.VIEW_DOWNLOAD_LIST);
+				eventBus.fireEvent(new DownloadListUpdatedEvent());
+			};
+		});
 	}
 
 	public void showMinimalColumnSet() {

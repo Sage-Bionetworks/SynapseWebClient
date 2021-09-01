@@ -417,8 +417,6 @@ import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2Impl;
-import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListView;
-import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListViewImpl;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBarView;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBarViewImpl;
 import org.sagebionetworks.web.client.widget.entity.file.FileDownloadMenuItemView;
@@ -1411,7 +1409,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(DownloadSpeedTester.class).to(DownloadSpeedTesterImpl.class);
 		bind(PackageSizeSummaryView.class).to(PackageSizeSummaryViewImpl.class);
 		bind(DownloadListWidgetView.class).to(DownloadListWidgetViewImpl.class);
-		bind(AddToDownloadListView.class).to(AddToDownloadListViewImpl.class);
 		bind(EntityPresenterEventBinder.class).to(EntityPresenterEventBinderImpl.class);
 		bind(Linkify.class).to(LinkifyImpl.class);
 		bind(PasswordResetSignedTokenView.class).to(PasswordResetSignedTokenViewImpl.class);

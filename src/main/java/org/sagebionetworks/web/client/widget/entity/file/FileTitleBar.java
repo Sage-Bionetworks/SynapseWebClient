@@ -195,34 +195,18 @@ public class FileTitleBar implements SynapseWidgetPresenter, FileTitleBarView.Pr
 			// TODO: add special popup to report how many items are in the current download list, and link to
 			// download list.
 			FileEntity entity = (FileEntity) entityBundle.getEntity();
-			if (!DisplayUtils.isInTestWebsite(cookies)) {
-				jsClient.addFileToDownloadList(entity.getDataFileHandleId(), entity.getId(), new AsyncCallback<DownloadList>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						view.showErrorMessage(caught.getMessage());
-					}
-		
-					@Override
-					public void onSuccess(DownloadList result) {
-						jsniUtils.sendAnalyticsEvent(AddToDownloadList.DOWNLOAD_ACTION_EVENT_NAME, AddToDownloadList.FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME, "1");
-						popupUtils.showInfo(entity.getName() + EntityBadge.ADDED_TO_DOWNLOAD_LIST, "#!Profile:" + authController.getCurrentUserPrincipalId() + "/downloads", DisplayConstants.VIEW_DOWNLOAD_LIST);
-						eventBus.fireEvent(new DownloadListUpdatedEvent());
-					}
-				});
-			} else {
-				jsClient.addFileToDownloadListV2(entity.getId(), entity.getVersionNumber(), new AsyncCallback<AddBatchOfFilesToDownloadListResponse>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						view.showErrorMessage(caught.getMessage());
-					}
-					public void onSuccess(AddBatchOfFilesToDownloadListResponse result) {
-						String href = "#!DownloadCart:0";
-						popupUtils.showInfo(entity.getName() + EntityBadge.ADDED_TO_DOWNLOAD_LIST, href, DisplayConstants.VIEW_DOWNLOAD_LIST);
-						eventBus.fireEvent(new DownloadListUpdatedEvent());
-					};
-				});
-			}
-			
+
+			jsClient.addFileToDownloadListV2(entity.getId(), entity.getVersionNumber(), new AsyncCallback<AddBatchOfFilesToDownloadListResponse>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					view.showErrorMessage(caught.getMessage());
+				}
+				public void onSuccess(AddBatchOfFilesToDownloadListResponse result) {
+					String href = "#!DownloadCart:0";
+					popupUtils.showInfo(entity.getName() + EntityBadge.ADDED_TO_DOWNLOAD_LIST, href, DisplayConstants.VIEW_DOWNLOAD_LIST);
+					eventBus.fireEvent(new DownloadListUpdatedEvent());
+				};
+			});
 		}
 	}
 
