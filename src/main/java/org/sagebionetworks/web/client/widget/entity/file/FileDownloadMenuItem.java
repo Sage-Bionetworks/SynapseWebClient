@@ -34,6 +34,8 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class FileDownloadMenuItem implements FileDownloadMenuItemView.Presenter, SynapseWidgetPresenter {
+	public static final String DOWNLOAD_ACTION_EVENT_NAME = "Download";
+	public static final String FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME = "FilesAddedToDownloadList";
 	public static final String FILE_DIRECTLY_DOWNLOADED_EVENT_NAME = "FileDirectlyDownloaded";
 	public static final String ACCESS_REQUIREMENTS_LINK = "#!AccessRequirements:ID=";
 	public static final String LOGIN_PLACE_LINK = "#!LoginPlace:0";
@@ -214,6 +216,6 @@ public class FileDownloadMenuItem implements FileDownloadMenuItemView.Presenter,
 	@Override
 	public void onDirectDownloadClicked() {
 		// user already directly sent to download fha, just send the event to analytics
-		jsniUtils.sendAnalyticsEvent(AddToDownloadList.DOWNLOAD_ACTION_EVENT_NAME, FILE_DIRECTLY_DOWNLOADED_EVENT_NAME);
+		jsniUtils.sendAnalyticsEvent(DOWNLOAD_ACTION_EVENT_NAME, FILE_DIRECTLY_DOWNLOADED_EVENT_NAME);
 	}
 }

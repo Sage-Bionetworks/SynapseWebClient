@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.unitclient.widget.entity.browse;
 
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -20,10 +19,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.clienthelp.ContainerClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowserView;
-import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList;
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
-
-import com.google.gwt.user.client.ui.IsWidget;
 
 public class FilesBrowserTest {
 
@@ -40,8 +36,6 @@ public class FilesBrowserTest {
 	@Mock
 	ContainerClientsHelp mockContainerClientsHelp;
 	@Mock
-	AddToDownloadList mockAddToDownloadList;
-	@Mock
 	AddToDownloadListV2 mockAddToDownloadListV2;
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -50,7 +44,7 @@ public class FilesBrowserTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
-		filesBrowser = new FilesBrowser(mockView, mockGlobalApplicationState, mockAuthenticationController, mockContainerClientsHelp, mockAddToDownloadList, mockAddToDownloadListV2, mockCookies);
+		filesBrowser = new FilesBrowser(mockView, mockGlobalApplicationState, mockAuthenticationController, mockContainerClientsHelp, mockAddToDownloadListV2, mockCookies);
 	}
 
 	@Test
@@ -68,13 +62,6 @@ public class FilesBrowserTest {
 		verify(mockContainerClientsHelp).configureAndShow(entityId);
 	}
 	
-	@Test
-	public void testAddToDownloadList() {
-		String entityId = "syn123";
-		filesBrowser.configure(entityId);
-		filesBrowser.onAddToDownloadList();
-		verify(mockAddToDownloadList).addToDownloadList(entityId);
-	}
 	@Test
 	public void testAddToDownloadListV2() {
 		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");

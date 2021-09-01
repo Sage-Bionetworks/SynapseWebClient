@@ -1,8 +1,9 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.ArrayList;
-import java.util.Collections;
+
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityTypeUtils;
@@ -12,7 +13,6 @@ import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryFilter;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.TableBundle;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cache.SessionStorage;
@@ -20,7 +20,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
 import org.sagebionetworks.web.client.widget.clienthelp.FileViewClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
-import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList;
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
@@ -33,6 +32,7 @@ import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidge
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryInputListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultsListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
+
 import com.google.gwt.regexp.shared.MatchResult;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -93,10 +93,9 @@ public class TableEntityWidget implements IsWidget, QueryResultsListener, QueryI
 	public static final String SCHEMA = " Schema";
 	String entityTypeDisplay;
 	PortalGinInjector ginInjector;
-	AddToDownloadList addToDownloadList;
 
 	@Inject
-	public TableEntityWidget(TableEntityWidgetView view, TableQueryResultWidget queryResultsWidget, QueryInputWidget queryInputWidget, PreflightController preflightController, SynapseClientAsync synapseClient, FileViewClientsHelp fileViewClientsHelp, AddToDownloadList addToDownloadList, PortalGinInjector ginInjector, SessionStorage sessionStorage) {
+	public TableEntityWidget(TableEntityWidgetView view, TableQueryResultWidget queryResultsWidget, QueryInputWidget queryInputWidget, PreflightController preflightController, SynapseClientAsync synapseClient, FileViewClientsHelp fileViewClientsHelp, PortalGinInjector ginInjector, SessionStorage sessionStorage) {
 		this.view = view;
 		this.queryResultsWidget = queryResultsWidget;
 		this.queryInputWidget = queryInputWidget;
@@ -104,7 +103,6 @@ public class TableEntityWidget implements IsWidget, QueryResultsListener, QueryI
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
 		this.fileViewClientsHelp = fileViewClientsHelp;
-		this.addToDownloadList = addToDownloadList;
 		this.ginInjector = ginInjector;
 		this.sessionStorage = sessionStorage;
 		this.view.setQueryResultsWidget(this.queryResultsWidget);
@@ -164,7 +162,6 @@ public class TableEntityWidget implements IsWidget, QueryResultsListener, QueryI
 		this.view.configure(bundle, this.canEdit && isCurrentVersion);
 		this.actionMenu = actionMenu;
 		this.entityTypeDisplay = EntityTypeUtils.getDisplayName(EntityTypeUtils.getEntityTypeForClass(entityBundle.getEntity().getClass()));
-		addToDownloadList.clear();
 		configureActions();
 		checkState();
 		initSimpleAdvancedQueryState();
@@ -582,13 +579,8 @@ public class TableEntityWidget implements IsWidget, QueryResultsListener, QueryI
 
 	@Override
 	public void onAddToDownloadList() {
-		if (!DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider())) {
-			addToDownloadList.addToDownloadList(entityBundle.getEntity().getId(), currentQuery);
-			view.setAddToDownloadList(addToDownloadList);
-		} else {
-			AddToDownloadListV2 newAddToDownloadList = ginInjector.getAddToDownloadListV2();
-			view.setAddToDownloadList(newAddToDownloadList);
-			newAddToDownloadList.configure(entityBundle.getEntity().getId(), currentQuery);
-		}
+		AddToDownloadListV2 newAddToDownloadList = ginInjector.getAddToDownloadListV2();
+		view.setAddToDownloadList(newAddToDownloadList);
+		newAddToDownloadList.configure(entityBundle.getEntity().getId(), currentQuery);
 	}
 }

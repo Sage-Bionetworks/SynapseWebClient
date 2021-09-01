@@ -15,7 +15,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,7 +42,6 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.EntityBadge;
-import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList;
 import org.sagebionetworks.web.client.widget.entity.file.FileDownloadMenuItem;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBarView;
@@ -186,18 +184,6 @@ public class FileTitleBarTest {
 	}
 
 	@Test
-	public void testAddToDownloadList() {
-		when(mockAuthController.isLoggedIn()).thenReturn(true);
-		fileTitleBar.configure(mockBundle, mockActionMenuWidget);
-		fileTitleBar.onAddToDownloadList();
-
-		verify(mockJsClient).addFileToDownloadList(eq(DATA_FILE_HANDLE_ID), eq(ENTITY_ID), any(AsyncCallback.class));
-		verify(mockPopupUtils).showInfo(FILE_NAME + EntityBadge.ADDED_TO_DOWNLOAD_LIST, "#!Profile:" + USER_ID + "/downloads", DisplayConstants.VIEW_DOWNLOAD_LIST);
-		verify(mockEventBus).fireEvent(any(DownloadListUpdatedEvent.class));
-		verify(mockSynapseJSNIUtils).sendAnalyticsEvent(AddToDownloadList.DOWNLOAD_ACTION_EVENT_NAME, AddToDownloadList.FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME, Integer.toString(1));
-	}
-	
-	@Test
 	public void testAddToDownloadListV2() {
 		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
@@ -208,20 +194,7 @@ public class FileTitleBarTest {
 		verify(mockPopupUtils).showInfo(FILE_NAME + EntityBadge.ADDED_TO_DOWNLOAD_LIST, "#!DownloadCart:0", DisplayConstants.VIEW_DOWNLOAD_LIST);
 		verify(mockEventBus).fireEvent(any(DownloadListUpdatedEvent.class));
 	}
-	
-	@Test
-	public void testAddToDownloadListFailure() {
-		when(mockAuthController.isLoggedIn()).thenReturn(true);
-		String errorMessage = "unable to add";
-		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockJsClient).addFileToDownloadList(anyString(), anyString(), any(AsyncCallback.class));
 
-		fileTitleBar.configure(mockBundle, mockActionMenuWidget);
-		fileTitleBar.onAddToDownloadList();
-
-		verify(mockJsClient).addFileToDownloadList(eq(DATA_FILE_HANDLE_ID), eq(ENTITY_ID), any(AsyncCallback.class));
-		verify(mockView).showErrorMessage(errorMessage);
-	}
-	
 	@Test
 	public void testAddToDownloadListV2Failure() {
 		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
