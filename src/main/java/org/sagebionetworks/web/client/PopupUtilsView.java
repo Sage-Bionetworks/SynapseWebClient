@@ -1,8 +1,11 @@
 package org.sagebionetworks.web.client;
 
+import org.sagebionetworks.web.client.jsinterop.ToastMessageOptions;
 import org.sagebionetworks.web.client.utils.Callback;
 
 public interface PopupUtilsView {
+	void notify(String message, DisplayUtils.NotificationVariant variant, ToastMessageOptions options);
+
 	void showInfo(String message);
 
 	void showInfo(String message, Integer timeout);
