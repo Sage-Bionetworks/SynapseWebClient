@@ -96,8 +96,22 @@ public class ToastMessageOptions extends ReactComponentProps {
          * @return
          */
         public Builder setPrimaryButton(String text, String href) {
+            return setPrimaryButton(text, href, true);
+        }
+
+        /**
+         * Clicking the primary button opens the provided link in the current window or a new tab.
+         * @param text
+         * @param href
+         * @return
+         */
+        public Builder setPrimaryButton(String text, String href, boolean currentWindow) {
             this.primaryButtonText = text;
-            this.onPrimaryButtonClick = () -> Window.Location.assign(href);
+            if (currentWindow) {
+                this.onPrimaryButtonClick = () -> Window.Location.assign(href);
+            } else {
+                this.onPrimaryButtonClick = () -> Window.open(href, "_blank", "");
+            }
             return this;
         }
 

@@ -8,6 +8,11 @@ import com.google.gwt.user.client.Window;
 public class PopupUtilsViewImpl implements PopupUtilsView {
 
 	@Override
+	public void notify(String message, DisplayUtils.NotificationVariant notificationVariant, ToastMessageOptions toastMessageOptions) {
+		DisplayUtils.notify(message, notificationVariant, toastMessageOptions);
+	}
+
+	@Override
 	public void showInfo(String message) {
 		DisplayUtils.showInfo(message);
 	}
