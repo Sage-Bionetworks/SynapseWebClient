@@ -20,20 +20,20 @@
 							addStyleNames="fullWidthAlert">
 							<bh:Strong text="Please login to access this resource." />
 						</b:Alert>
-						<div class="margin-top-40">
+						<div>
 							<div>
-								<div class="tab-background pageContent"
+								<div class="tab-background"
 									ui:field="profileTabContainer">
 									<bh:Div ui:field="profileUI"
 										addStyleNames="profileUI inline-block vertical-align-top " width="100%">
-										<bh:Div addStyleNames="padding-15">
+										<bh:Div>
 											<g:SimplePanel ui:field="profileSynAlertPanel" />
 											<bh:Div ui:field="userBadgeContainer" addStyleNames="max-width-800"/>
 											<g:SimplePanel ui:field="editUserProfilePanel"/>
 										</bh:Div> 
 									</bh:Div> 
 								</div>
-								<div class="tab-background pageContent"
+								<div class="tab-background pageContent margin-top-40"
 									ui:field="projectsTabContainer">
 									<div ui:field="createProjectUI"
 										class="margin-bottom-10 margin-top-10 row">
@@ -103,7 +103,7 @@
 										</g:FlowPanel>
 									</div>
 								</div>
-								<div class="tab-background pageContent"
+								<div class="tab-background pageContent margin-top-40"
 									ui:field="challengesTabContainer">
 									<div class="panel panel-default padding-5 min-height-200"
 										ui:field="challengesHighlightBox">
@@ -118,7 +118,7 @@
 									</div>
 									<g:FlowPanel ui:field="challengeSynAlertPanel" />
 								</div>
-								<div class="tab-background pageContent"
+								<div class="tab-background pageContent margin-top-40"
 									ui:field="teamsTabContainer">
 									<div ui:field="createTeamUI"
 										class="margin-bottom-10 margin-top-10 row">
@@ -147,16 +147,16 @@
 											addStyleNames="margin-10" />
 									</div>
 								</div>
-								<div class="tab-background pageContent"
+								<div class="tab-background pageContent margin-top-40"
 									ui:field="downloadsTabContainer">
 									<bh:Div ui:field="downloadsTabContent" />
 								</div>
-								<div class="tab-background pageContent"
+								<div class="tab-background pageContent margin-top-40"
 									ui:field="favoritesTabContainer">
 									<bh:Div ui:field="favoritesTabContent" />
 								</div>
 								
-								<div class="tab-background pageContent"
+								<div class="tab-background pageContent margin-top-40"
 									ui:field="settingsTabContainer">
 									<g:FlowPanel ui:field="settingsTabContent" />
 								</div>

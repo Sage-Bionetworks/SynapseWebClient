@@ -15,7 +15,6 @@ public class SRC {
 		public static ReactFunctionComponent<EvaluationEditorPageProps> EvaluationEditorPage;
 		public static ReactFunctionComponent<AccessTokenPageProps> AccessTokenPage;
 		public static ReactFunctionComponent<EmptyProps> DownloadCartPage;
-		public static ReactFunctionComponent<ShowDownloadV2Props> ShowDownloadV2;
 		public static ReactFunctionComponent<DownloadConfirmationProps> DownloadConfirmation;
 		public static ReactFunctionComponent<FullWidthAlertProps> FullWidthAlert;
 		public static ReactFunctionComponent<SchemaDrivenAnnotationEditorProps> SchemaDrivenAnnotationEditor;
@@ -23,6 +22,7 @@ public class SRC {
 		public static ReactFunctionComponent<EmptyProps> FavoritesPage;
 		public static ReactFunctionComponent<EntityModalProps> EntityModal;
 		public static ReactFunctionComponent<IconSvgProps> IconSvg;
+		public static ReactFunctionComponent<UserProfileLinksProps> UserProfileLinks;
 		public static ReactFunctionComponent SynapseToastContainer;
 
 		/**

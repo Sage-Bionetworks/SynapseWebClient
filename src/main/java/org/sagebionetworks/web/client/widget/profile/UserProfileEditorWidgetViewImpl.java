@@ -10,11 +10,15 @@ import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.base.TextBoxBase;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.jsinterop.React;
+import org.sagebionetworks.web.client.jsinterop.ReactDOM;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
+import org.sagebionetworks.web.client.jsinterop.SRC;
+import org.sagebionetworks.web.client.jsinterop.UserProfileLinksProps;
 import org.sagebionetworks.web.client.jsni.SynapseContextProviderPropsJSNIObject;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
@@ -88,6 +92,8 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 	Anchor orcIdLink;
 	@UiField
 	ReactComponentDiv accountLevelBadgeContainer;
+	@UiField
+	ReactComponentDiv userProfileLinksContainer;
 	@UiField
 	Row ownerFieldsContainer;
 	@UiField
@@ -321,6 +327,10 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 	@Override
 	public void setOwnerId(String userId) {
 		_showAccountLevelBadge(accountLevelBadgeContainer.getElement(), userId, propsProvider.getJsniContextProps());
+		UserProfileLinksProps props = UserProfileLinksProps.create(userId);
+		ReactElement component = React.createElementWithSynapseContext(SRC.SynapseComponents.UserProfileLinks, props, propsProvider.getJsInteropContextProps());
+		ReactDOM.render(component, userProfileLinksContainer.getElement());
+
 	}
 	
 	private static native void _showAccountLevelBadge(Element el, String userId, SynapseContextProviderPropsJSNIObject wrapperProps) /*-{

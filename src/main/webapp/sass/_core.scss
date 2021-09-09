@@ -3448,14 +3448,57 @@ div.border {
 .personalAccessTokenWidgetContainer {
 	padding: 20px 30px;
 }
-#body .myProfileImage {
-	position: absolute;
-	right: 40px;
+
+#body .profileContainer {
+	display: grid;
+	@media (min-width: 992px) {
+		grid-template-columns: 290px auto 370px;
+		grid-template-rows: 150px 200px auto;
+		.profileImageContainer {
+			grid-column: 1 / span 1;
+			grid-row: 1 / span 1;
+			justify-self: end;
+		}
+		.accountLevelBadgeContainer {
+			grid-column: 1 / span 1;
+			grid-row: 2 / span 1;
+		}
+		.profileFormContainer {
+			grid-column: 2 / span 1;
+			grid-row: 1 / span 3;
+		}
+		.profileLinksContainer {
+			grid-column: 3 / span 1;
+			grid-row: 1 / span 3;
+		}
+	}
+	@media (max-width: 992px) {
+		grid-template-columns: 120px auto;
+		grid-template-rows: 200px auto auto;
+		.profileImageContainer {
+			grid-column: 1 / span 1;
+			grid-row: 1 / span 1;
+			justify-self: end;
+		}
+		.accountLevelBadgeContainer {
+			grid-column: 2 / span 1;
+			grid-row: 1 / span 1;
+		}
+		.profileFormContainer {
+			grid-column: 1 / span 2;
+			grid-row: 2 / span 1;
+		}
+		.profileLinksContainer {
+			grid-column: 1 / span 2;
+			grid-row: 3 / span 1;
+		}
+
+	}
 }
 #body .editProfileImageButton {
-	position: absolute;
-	right: 20px;
-	top: -5px;
+	position: relative;
+	right: -50px;
+	top: -20px;
 	> button {
 		border-radius: 50%;
 		&:focus {
