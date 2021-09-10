@@ -5,12 +5,13 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	<g:HTMLPanel>
-		<b:Row>
-			<b:Column size="MD_2 XS_12" height="80px">
+		<bh:Div addStyleNames="profileContainer">
+			<bh:Div addStyleNames="profileImageContainer" paddingTop="20" paddingBottom="30">
 				<g:SimplePanel ui:field="imagePanel" addStyleNames="myProfileImage"/>
-				<g:SimplePanel ui:field="fileInputWidgetPanel" />
-			</b:Column>
-			<b:Column size="MD_7 XS_12">
+				<g:SimplePanel ui:field="fileInputWidgetPanel" addStyleNames="imageUploader"/>
+			</bh:Div>
+			<w:ReactComponentDiv ui:field="accountLevelBadgeContainer" addStyleNames="accountLevelBadgeContainer" paddingLeft="15"/>
+			<bh:Div addStyleNames="profileFormContainer max-width-800" paddingTop="40" paddingLeft="40" paddingRight="50">
 				<b:Row>
 					<b:Column size="SM_6">
 						<b:FormGroup>
@@ -78,7 +79,7 @@
 					</b:Column>
 					<b:Column size="SM_6">
 						<b:FormGroup>
-							<b:FormLabel for="location">City, Country</b:FormLabel>					
+							<b:FormLabel for="location">City, Country</b:FormLabel>	
 							<bh:Div ui:field="locationSuggestBoxContainer" />
 						</b:FormGroup>
 					</b:Column>
@@ -116,12 +117,12 @@
 				<bh:Div marginTop="45" marginBottom="50" ui:field="commandsContainer">
 					<b:Button ui:field="cancelButton" type="DEFAULT" visible="false">Cancel</b:Button>
 					<b:Button ui:field="saveProfileButton" type="PRIMARY" visible="false" dataLoadingText="Saving Changes..." marginLeft="5">Save Changes</b:Button>
-					<b:Button ui:field="editProfileButton" type="PRIMARY" visible="false">Edit Profile</b:Button>										
+					<b:Button ui:field="editProfileButton" type="PRIMARY" visible="false">Edit Profile</b:Button>
 				</bh:Div>
-			</b:Column>
-			<b:Column size="MD_3 XS_12">
-				<w:ReactComponentDiv ui:field="accountLevelBadgeContainer" />
-			</b:Column>
-		</b:Row>
+			</bh:Div>
+			<bh:Div addStyleNames="profileLinksContainer">
+				<w:ReactComponentDiv ui:field="userProfileLinksContainer" />
+			</bh:Div>
+		</bh:Div>
 	</g:HTMLPanel>
 </ui:UiBinder> 
