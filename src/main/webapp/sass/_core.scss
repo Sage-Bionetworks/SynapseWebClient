@@ -2617,6 +2617,9 @@ td.datePickerMonth {
 .whitespace-nowrap {
 	white-space: nowrap;
 }
+.whitespace-prewrap {
+	white-space: pre-wrap; //preserve, but wrap when necessary
+}
 /* Provenance graph css */
 .provEntityNode {
 	opacity:0.9; 
@@ -3450,6 +3453,12 @@ div.border {
 }
 
 #body .profileContainer {
+	.profileLinksContainer {
+		// box shadow on the left hand side only.
+		// horizontal offset -12px, vertical offset 0px, and reduce the shadow spread with -15px
+		box-shadow: -12px 0px 20px -15px rgb(74 80 86 / 15%);
+		height: 100%;
+	}
 	display: grid;
 	@media (min-width: 992px) {
 		grid-template-columns: 290px auto 370px;
