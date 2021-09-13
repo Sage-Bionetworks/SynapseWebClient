@@ -10,7 +10,7 @@
 // Load the SCSS build after the minified build so styles with overrides take higher priority
 @use 'node_modules/synapse-react-client/dist/style/main.scss' with (
   $primary-action-color: swc.$synapse-blue,
-  $secondary-action-color: swc.$synapse-blue,
+  $secondary-action-color: swc.$synapse-green,
   $bootstrap-4-danger-bg: swc.$synapse-red-error,
   $bootstrap-4-danger-text-color: white
 );
