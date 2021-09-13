@@ -10,6 +10,7 @@ import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.base.TextBoxBase;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -73,7 +74,9 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 	@UiField
 	HelpBlock linkHelpBlock;
 	@UiField
-	TextArea bio;
+	Paragraph bioRenderer;
+	@UiField
+	TextArea bioEditor;
 	@UiField
 	Div synAlertContainer;
 	@UiField
@@ -120,7 +123,7 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 		locationTextBox.addStyleName("form-control");
 		locationSuggestBoxContainer.add(locationSuggestBox);
 		// note, not adding email since it's not editable here.
-		textBoxes = new TextBoxBase[] {username, firstName, lastName, currentPosition, currentAffiliation, industry, link, bio} ;
+		textBoxes = new TextBoxBase[] {username, firstName, lastName, currentPosition, currentAffiliation, industry, link} ;
 		editProfileButton.addClickHandler(event -> {
 			presenter.setIsEditingMode(true);			
 		});
@@ -177,12 +180,13 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 
 	@Override
 	public void setBio(String summary) {
-		this.bio.setText(summary);
+		this.bioEditor.setText(summary);
+		this.bioRenderer.setText(summary);
 	}
 
 	@Override
 	public String getBio() {
-		return this.bio.getText();
+		return this.bioEditor.getText();
 	}
 
 	@Override
@@ -286,7 +290,7 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 		industry.addKeyDownHandler(keyDownHandler);
 		locationSuggestBox.addKeyDownHandler(keyDownHandler);
 		link.addKeyDownHandler(keyDownHandler);
-		bio.addKeyDownHandler(keyDownHandler);
+		bioEditor.addKeyDownHandler(keyDownHandler);
 	}
 
 	@Override
@@ -296,11 +300,13 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 			tb.setReadOnly(!isEditing);
 		}
 		
+		bioEditor.setVisible(isEditing);
+		bioRenderer.setVisible(!isEditing);
 		locationTextBox.setReadOnly(!isEditing);
 		firstName.setPlaceholder(isEditing ? "Enter first name" : "");
 		lastName.setPlaceholder(isEditing ? "Enter last name" : "");
 		currentAffiliation.setPlaceholder(isEditing ? "Enter current affiliation" : "");
-		bio.setPlaceholder(isEditing ? "Enter bio" : "");
+		bioEditor.setPlaceholder("Enter bio");
 		link.setPlaceholder(isEditing ? "Enter link to more info" : "");
 		locationTextBox.getElement().setAttribute("placeholder", isEditing ? "Enter City, Country" : "");
 		currentPosition.setPlaceholder(isEditing ? "Enter current position" : "");
