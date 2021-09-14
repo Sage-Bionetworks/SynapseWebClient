@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-import org.gwtbootstrap3.client.ui.constants.IconType;
+
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -39,6 +39,7 @@ import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.entity.tabs.TablesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tabs;
 import org.sagebionetworks.web.client.widget.entity.tabs.WikiTab;
+
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -327,7 +328,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 				projectBundle = filesEntityBundle = tablesEntityBundle = dockerEntityBundle = bundle;
 				projectTitleBar.configure(projectBundle);
 				projectMetadata.configure(projectBundle, null, projectActionMenu);
-
+				view.setProjectUIVisible(true);
 				initAreaToken();
 				showSelectedTabs();
 				updateEntityBundle(currentTargetEntityBundle, currentTargetVersionNumber);
@@ -335,10 +336,12 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 
 			@Override
 			public void onFailure(Throwable caught) {
+				projectTitleBar.clearState();
 				view.setProjectLoadingVisible(false);
+				view.setProjectUIVisible(false);
 				projectBundleLoadError = caught;
 				updateEntityBundle(currentTargetEntityBundle, currentTargetVersionNumber);
-				showSelectedTabs();
+				tabs.setNavTabsVisible(false);
 			}
 		};
 		if (projectHeader.getId().equals(currentTargetEntityBundle.getEntity().getId())) {

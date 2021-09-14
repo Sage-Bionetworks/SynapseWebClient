@@ -7,7 +7,7 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
 	<bh:Div>
-		<bh:Div addStyleNames="flexcontainer-row margin-bottom-10">
+		<bh:Div addStyleNames="flexcontainer-row">
 			<bh:Div addStyleNames="flexcontainer-column flexcontainer-column-fill-width font-size-30">
 				<bh:Div addStyleNames="flexcontainer-row flexcontainer-align-items-center overflow-x-auto">
 				 	<b:Icon ui:field="entityIcon" addStyleNames="entityIcon margin-right-5 lightGreyText flexcontainer-column" type="FOLDER"/>

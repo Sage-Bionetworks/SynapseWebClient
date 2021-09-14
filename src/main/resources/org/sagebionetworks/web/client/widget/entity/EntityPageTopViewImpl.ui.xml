@@ -1,3 +1,4 @@
+
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
@@ -8,7 +9,7 @@
 	<g:HTMLPanel>
 		<!--Project level information -->
 		<bh:Div addStyleNames="pageHeader min-height-48 padding-left-15 padding-right-15">
-			<b:Row addStyleNames="projectMetadata">
+			<b:Row addStyleNames="projectMetadata" ui:field="projectUI">
 				<b:Column size="XS_12">
 					<bh:Span ui:field="projectActionMenuContainer"
 						addStyleNames="right" paddingTop="20" />
