@@ -2,7 +2,7 @@
 Synapse color scheme
 ****************/
 $synapse-green: #469285;
-$synapse-blue: #2E4761;
+$synapse-blue: #395979;
 $synapse-dark-blue: #184e71;
 $synapse-blue-end-gradient: #164B6E;
 $synapse-purple: #7772b4;
@@ -2617,6 +2617,9 @@ td.datePickerMonth {
 .whitespace-nowrap {
 	white-space: nowrap;
 }
+.whitespace-prewrap {
+	white-space: pre-wrap; //preserve, but wrap when necessary
+}
 /* Provenance graph css */
 .provEntityNode {
 	opacity:0.9; 
@@ -3450,22 +3453,30 @@ div.border {
 }
 
 #body .profileContainer {
+	.profileLinksContainer {
+		// box shadow on the left hand side only.
+		// horizontal offset -12px, vertical offset 0px, and reduce the shadow spread with -15px
+		box-shadow: -12px 0px 20px -15px rgb(74 80 86 / 15%);
+		.TabContent {
+			max-height: 1000px;
+		}
+	}
 	display: grid;
 	@media (min-width: 992px) {
 		grid-template-columns: 290px auto 370px;
-		grid-template-rows: 150px 200px auto;
+		grid-template-rows: 150px auto 200px;
 		.profileImageContainer {
 			grid-column: 1 / span 1;
 			grid-row: 1 / span 1;
 			justify-self: end;
 		}
 		.accountLevelBadgeContainer {
-			grid-column: 1 / span 1;
-			grid-row: 2 / span 1;
+			grid-column: 2 / span 1;
+			grid-row: 3 / span 1;
 		}
 		.profileFormContainer {
 			grid-column: 2 / span 1;
-			grid-row: 1 / span 3;
+			grid-row: 1 / span 2;
 		}
 		.profileLinksContainer {
 			grid-column: 3 / span 1;

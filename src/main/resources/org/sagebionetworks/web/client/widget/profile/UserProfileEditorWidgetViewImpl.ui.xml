@@ -46,8 +46,9 @@
 					<b:Column size="SM_12">
 						<b:FormGroup>
 							<b:FormLabel for="bio">Bio</b:FormLabel>
-							<b:TextArea name="bio" ui:field="bio"
+							<b:TextArea name="bio" ui:field="bioEditor"
 								height="150px" />
+							<bh:Paragraph ui:field="bioRenderer" addStyleNames="whitespace-prewrap" visible="false"/>
 						</b:FormGroup>
 					</b:Column>
 				</b:Row>
