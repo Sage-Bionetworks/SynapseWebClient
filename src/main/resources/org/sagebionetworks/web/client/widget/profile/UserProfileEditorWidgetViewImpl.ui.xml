@@ -121,8 +121,8 @@
 					<b:Button ui:field="editProfileButton" type="PRIMARY" visible="false">Edit Profile</b:Button>
 				</bh:Div>
 			</bh:Div>
-			<bh:Div addStyleNames="profileLinksContainer">
-				<w:ReactComponentDiv ui:field="userProfileLinksContainer" />
+			<bh:Div addStyleNames="profileLinksContainer" ui:field="userProfileLinksUI">
+				<w:ReactComponentDiv ui:field="userProfileLinksReactComponentContainer" />
 			</bh:Div>
 		</bh:Div>
 	</g:HTMLPanel>
