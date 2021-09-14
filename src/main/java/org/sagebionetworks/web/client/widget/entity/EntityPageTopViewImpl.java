@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -31,6 +32,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	SimplePanel projectMetadataContainer;
 	@UiField
 	Span projectActionMenuContainer;
+	@UiField
+	Row projectUI;
 
 	@Inject
 	public EntityPageTopViewImpl(Binder uiBinder) {
@@ -100,5 +103,9 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	@Override
 	public EventBinder<EntityPageTop> getEventBinder() {
 		return eventBinder;
+	}
+	@Override
+	public void setProjectUIVisible(boolean visible) {
+		projectUI.setVisible(visible);
 	}
 }
