@@ -13,6 +13,8 @@ $synapse-dark-text: #515359;
 $synapse-red-error: #eb5757;
 $synapse-gray-med: #dcdcdc;
 
+$full-root-panel-height: calc(100vh - 93px - 130px);
+
 @mixin border-radius($radius) {
 	-webkit-border-radius: $radius;
 	-moz-border-radius: $radius;
@@ -172,7 +174,7 @@ sticky footer
 **/
 #rootPanel {
   /** set the min height of the root panel to subtract the height of the header and footer **/
-	min-height: calc(100vh - 50px);
+	min-height: $full-root-panel-height;
 }
 /**
 end sticky footer
@@ -3457,35 +3459,36 @@ div.border {
 		// box shadow on the left hand side only.
 		// horizontal offset -12px, vertical offset 0px, and reduce the shadow spread with -15px
 		box-shadow: -12px 0px 20px -15px rgb(74 80 86 / 15%);
+		min-height: $full-root-panel-height;
 		.TabContent {
-			max-height: 1000px;
+			max-height: $full-root-panel-height;
 		}
 	}
 	display: grid;
 	@media (min-width: 992px) {
-		grid-template-columns: 290px auto 370px;
-		grid-template-rows: 150px auto 200px;
+		grid-template-columns: 150px auto 450px;
+		grid-template-rows: 140px auto;
 		.profileImageContainer {
 			grid-column: 1 / span 1;
 			grid-row: 1 / span 1;
-			justify-self: end;
+			justify-self: center;
 		}
 		.accountLevelBadgeContainer {
 			grid-column: 2 / span 1;
-			grid-row: 3 / span 1;
+			grid-row: 1 / span 1;
 		}
 		.profileFormContainer {
 			grid-column: 2 / span 1;
-			grid-row: 1 / span 2;
+			grid-row: 2 / span 1;
 		}
 		.profileLinksContainer {
 			grid-column: 3 / span 1;
-			grid-row: 1 / span 3;
+			grid-row: 1 / span 2;
 		}
 	}
 	@media (max-width: 992px) {
 		grid-template-columns: 120px auto;
-		grid-template-rows: 200px auto auto;
+		grid-template-rows: 140px auto auto;
 		.profileImageContainer {
 			grid-column: 1 / span 1;
 			grid-row: 1 / span 1;
@@ -3494,6 +3497,7 @@ div.border {
 		.accountLevelBadgeContainer {
 			grid-column: 2 / span 1;
 			grid-row: 1 / span 1;
+			justify-self: center;
 		}
 		.profileFormContainer {
 			grid-column: 1 / span 2;
@@ -3503,7 +3507,6 @@ div.border {
 			grid-column: 1 / span 2;
 			grid-row: 3 / span 1;
 		}
-
 	}
 }
 #body .editProfileImageButton {

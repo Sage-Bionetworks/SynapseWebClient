@@ -15,6 +15,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactDOM;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
@@ -96,7 +97,9 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 	@UiField
 	ReactComponentDiv accountLevelBadgeContainer;
 	@UiField
-	ReactComponentDiv userProfileLinksContainer;
+	Div userProfileLinksUI;
+	@UiField
+	ReactComponentDiv userProfileLinksReactComponentContainer;
 	@UiField
 	Row ownerFieldsContainer;
 	@UiField
@@ -112,11 +115,14 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 	SynapseContextPropsProvider propsProvider;
 	Presenter presenter;
 	String originalButtonText;
+	CookieProvider cookies;
+	
 	@Inject
-	public UserProfileEditorWidgetViewImpl(Binder binder, GooglePlacesSuggestOracle locationOracle, GlobalApplicationState globalAppState, AuthenticationController authController, SynapseJSNIUtils jsniUtils, SynapseContextPropsProvider propsProvider) {
+	public UserProfileEditorWidgetViewImpl(Binder binder, GooglePlacesSuggestOracle locationOracle, GlobalApplicationState globalAppState, AuthenticationController authController, SynapseJSNIUtils jsniUtils, SynapseContextPropsProvider propsProvider, CookieProvider cookies) {
 		widget = binder.createAndBindUi(this);
 		this.jsniUtils = jsniUtils;
 		this.propsProvider = propsProvider;
+		this.cookies = cookies;
 		locationSuggestBox = new SuggestBox(locationOracle);
 		locationSuggestBox.setWidth("100%");
 		locationTextBox = locationSuggestBox.getTextBox();
@@ -333,10 +339,13 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 	@Override
 	public void setOwnerId(String userId) {
 		_showAccountLevelBadge(accountLevelBadgeContainer.getElement(), userId, propsProvider.getJsniContextProps());
-		UserProfileLinksProps props = UserProfileLinksProps.create(userId);
-		ReactElement component = React.createElementWithSynapseContext(SRC.SynapseComponents.UserProfileLinks, props, propsProvider.getJsInteropContextProps());
-		ReactDOM.render(component, userProfileLinksContainer.getElement());
-
+		boolean isInTestWebsite = DisplayUtils.isInTestWebsite(cookies);
+		userProfileLinksUI.setVisible(isInTestWebsite);
+		if (isInTestWebsite) {
+			UserProfileLinksProps props = UserProfileLinksProps.create(userId);
+			ReactElement component = React.createElementWithSynapseContext(SRC.SynapseComponents.UserProfileLinks, props, propsProvider.getJsInteropContextProps());
+			ReactDOM.render(component, userProfileLinksReactComponentContainer.getElement());
+		}
 	}
 	
 	private static native void _showAccountLevelBadge(Element el, String userId, SynapseContextProviderPropsJSNIObject wrapperProps) /*-{
