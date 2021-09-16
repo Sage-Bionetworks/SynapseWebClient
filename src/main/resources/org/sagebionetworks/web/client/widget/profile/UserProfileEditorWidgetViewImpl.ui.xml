@@ -10,16 +10,15 @@
 				<g:SimplePanel ui:field="imagePanel" addStyleNames="myProfileImage"/>
 				<g:SimplePanel ui:field="fileInputWidgetPanel" addStyleNames="imageUploader"/>
 			</bh:Div>
-			<w:ReactComponentDiv ui:field="accountLevelBadgeContainer" addStyleNames="accountLevelBadgeContainer" paddingLeft="15"/>
-			<bh:Div addStyleNames="profileFormContainer max-width-800" paddingTop="40" paddingLeft="40" paddingRight="50">
+			<bh:Div addStyleNames="profileFormContainer overflowHidden" paddingTop="40" paddingLeft="40" paddingRight="50">
 				<b:Row>
-					<b:Column size="SM_6">
+					<b:Column size="MD_12,LG_6">
 						<b:FormGroup>
 							<b:FormLabel for="firstName">First Name</b:FormLabel>
 							<b:TextBox name="firstName" ui:field="firstName" />
 						</b:FormGroup>
 					</b:Column>
-					<b:Column size="SM_6">
+					<b:Column size="MD_12,LG_6">
 						<b:FormGroup>
 							<b:FormLabel for="lastName">Last Name</b:FormLabel>
 							<b:TextBox name="lastName" ui:field="lastName"/>
@@ -27,14 +26,14 @@
 					</b:Column>
 				</b:Row>
 				<b:Row>
-					<b:Column size="SM_6">
+					<b:Column size="MD_12,LG_6">
 						<b:FormGroup>
 							<b:FormLabel for="currentPosition">Current Position</b:FormLabel>
 							<b:TextBox name="currentPosition"
 								ui:field="currentPosition" />
 						</b:FormGroup>
 					</b:Column>
-					<b:Column size="SM_6">
+					<b:Column size="MD_12,LG_6">
 						<b:FormGroup>
 							<b:FormLabel for="currentAffiliation">Current Affiliation</b:FormLabel>
 							<b:TextBox name="currentAffiliation"
@@ -43,7 +42,7 @@
 					</b:Column>
 				</b:Row>
 				<b:Row>
-					<b:Column size="SM_12">
+					<b:Column size="XS_12">
 						<b:FormGroup>
 							<b:FormLabel for="bio">Bio</b:FormLabel>
 							<b:TextArea name="bio" ui:field="bioEditor"
@@ -53,14 +52,14 @@
 					</b:Column>
 				</b:Row>
 				<b:Row>
-					<b:Column size="SM_6">
+					<b:Column size="MD_12,LG_6">
 						<b:FormGroup ui:field="usernameFormGroup">
 							<b:FormLabel for="username">Username</b:FormLabel>
 							<b:TextBox name="username" ui:field="username" />
 							<b:HelpBlock ui:field="usernameHelpBlock" />
 						</b:FormGroup>
 					</b:Column>
-					<b:Column size="SM_6">
+					<b:Column size="MD_12,LG_6">
 						<b:FormGroup ui:field="linkFormGroup">
 							<b:FormLabel for="link">Website</b:FormLabel>
 							<bh:Div>
@@ -72,13 +71,13 @@
 					</b:Column>
 				</b:Row>
 				<b:Row>
-					<b:Column size="SM_6">
+					<b:Column size="MD_12,LG_6">
 						<b:FormGroup>
 							<b:FormLabel for="industry">Industry/Discipline</b:FormLabel>
 							<b:TextBox name="industry" ui:field="industry"/>
 						</b:FormGroup>
 					</b:Column>
-					<b:Column size="SM_6">
+					<b:Column size="MD_12,LG_6">
 						<b:FormGroup>
 							<b:FormLabel for="location">City, Country</b:FormLabel>	
 							<bh:Div ui:field="locationSuggestBoxContainer" />
@@ -86,14 +85,14 @@
 					</b:Column>
 				</b:Row>
 				<b:Row ui:field="ownerFieldsContainer">
-					<b:Column size="SM_6">
+					<b:Column size="MD_12,LG_6">
 						<b:FormGroup>
 							<b:FormLabel for="email">Email Address</b:FormLabel>
 							<b:TextBox name="email" ui:field="email" readOnly="true" addStyleNames="margin-bottom-10"/>
 							<b:Anchor addStyleNames="displayInlineBlock" ui:field="changeEmailLink" visible="false" target="_blank" href="#!Profile:v/settings">Change email</b:Anchor>
 						</b:FormGroup>
 					</b:Column>
-					<b:Column size="SM_6">
+					<b:Column size="MD_12,LG_6">
 						<b:FormGroup>
 							<b:FormLabel for="password">Password</b:FormLabel>					
 							<g:PasswordTextBox name="password" readOnly="true" addStyleNames="displayBlock margin-bottom-10">NotThePassword</g:PasswordTextBox>
@@ -102,7 +101,7 @@
 					</b:Column>
 				</b:Row>
 				<b:Row ui:field="orcIDContainer">
-					<b:Column size="SM_6">
+					<b:Column size="MD_12,LG_6">
 						<b:FormGroup>
 							<b:FormLabel for="orcId">ORCID</b:FormLabel>
 							<bh:Div>
@@ -110,7 +109,13 @@
 							</bh:Div>
 						</b:FormGroup>
 					</b:Column>
-					<b:Column size="SM_6">
+					<b:Column size="MD_12,LG_6">
+						<b:FormGroup>
+							<b:FormLabel for="accountType">Account Type</b:FormLabel>
+							<bh:Div>
+								<w:ReactComponentDiv ui:field="accountLevelBadgeContainer" addStyleNames="accountLevelBadgeContainer"/>
+							</bh:Div>
+						</b:FormGroup>
 					</b:Column>
 				</b:Row>
 				
