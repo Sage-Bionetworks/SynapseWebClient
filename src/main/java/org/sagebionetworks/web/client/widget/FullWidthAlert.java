@@ -19,7 +19,12 @@ public class FullWidthAlert implements IsWidget {
 	ReactComponentDiv container;
 	String title, message, primaryButtonText, secondaryButtonText, secondaryButtonHref, alertType;
 	FullWidthAlertProps.Callback onPrimaryClick;
-	FullWidthAlertProps.Callback onClose;
+	FullWidthAlertProps.Callback onClose = new FullWidthAlertProps.Callback() {
+		@Override
+		public void run() {
+			setVisible(false);
+		}
+	};
 	Boolean isGlobal = true;
 	/**
 	 * This is a full width info Alert component, with an icon, message and link.
@@ -114,19 +119,5 @@ public class FullWidthAlert implements IsWidget {
 
 	public void setGlobal(boolean isGlobal) {
 		this.isGlobal = isGlobal;
-	}
-	
-	public void setDismissable(boolean dismissable) {
-		if (dismissable) {
-			this.onClose = new FullWidthAlertProps.Callback() {
-				@Override
-				public void run() {
-					setVisible(false);
-				}
-			};
-		} else {
-			this.onClose = null;
-		}
-		rerender();
 	}
 }
