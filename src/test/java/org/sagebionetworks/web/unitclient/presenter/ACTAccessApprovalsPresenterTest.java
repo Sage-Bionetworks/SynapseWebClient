@@ -130,8 +130,8 @@ public class ACTAccessApprovalsPresenterTest {
 		verify(mockView).setLoadMoreContainer(mockLoadMoreContainer);
 		verify(mockView).setShowHideButton(mockShowHideAccessRequirementButton);
 		verify(mockView).setAccessRequirementWidget(mockAccessRequirementWidget);
-		verify(mockView).setUserPickerWidget(any(Widget.class));
-		verify(mockView).setSelectedUserBadge(any(Widget.class));
+		verify(mockView).setSubmitterPickerWidget(any(Widget.class));
+		verify(mockView).setSelectedSubmitterUserBadge(any(Widget.class));
 		verify(mockView).setPresenter(presenter);
 		verify(mockPeopleSuggestWidget).addItemSelectedHandler(any(CallbackP.class));
 		verify(mockLoadMoreContainer).configure(any(Callback.class));
@@ -183,9 +183,9 @@ public class ACTAccessApprovalsPresenterTest {
 		presenter.setPlace(mockPlace);
 		reset(mockDataAccessClient);
 
-		presenter.onClearUserFilter();
+		presenter.onClearSubmitterFilter();
 
-		verify(mockView).setSelectedUserBadgeVisible(false);
+		verify(mockView).setSelectedSubmitterUserBadgeVisible(false);
 		verify(mockPlace).removeParam(SUBMITTER_ID_PARAM);
 		verify(mockDataAccessClient).listAccessorGroup(accessorGroupRequestCaptor.capture(), any(AsyncCallback.class));
 		AccessorGroupRequest request = accessorGroupRequestCaptor.getValue();
@@ -227,7 +227,7 @@ public class ACTAccessApprovalsPresenterTest {
 		presenter.setPlace(mockPlace);
 		reset(mockDataAccessClient);
 
-		presenter.onUserSelected(mockUserGroupSuggestion);
+		presenter.onSubmitterSelected(mockUserGroupSuggestion);
 
 		verify(mockPlace).putParam(SUBMITTER_ID_PARAM, USER_ID_SELECTED);
 		verify(mockSelectedUserBadge).configure(USER_ID_SELECTED);

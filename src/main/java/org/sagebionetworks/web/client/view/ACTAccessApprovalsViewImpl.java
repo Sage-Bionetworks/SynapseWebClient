@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Panel;
@@ -18,6 +19,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.header.Header;
+
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Element;
@@ -45,15 +47,21 @@ public class ACTAccessApprovalsViewImpl implements ACTAccessApprovalsView {
 	@UiField
 	Button clearDateFilter;
 	@UiField
-	Button clearUserFilter;
+	Button clearSubmitterFilter;
+	@UiField
+	Button clearAccessorFilter;
 	@UiField
 	Button clearAccessRequirementFilter;
 	@UiField
 	Panel accessRequirementUI;
 	@UiField
-	Div userSelectContainer;
+	Div submitterSelectContainer;
 	@UiField
-	Div currentUserContainer;
+	Div accessorSelectContainer;
+	@UiField
+	Div currentSubmitterContainer;
+	@UiField
+	Div currentAccessorContainer;
 	@UiField
 	Button exportButton;
 	@UiField
@@ -71,13 +79,16 @@ public class ACTAccessApprovalsViewImpl implements ACTAccessApprovalsView {
 		this.dateTimeUtils = dateTimeUtils;
 		this.headerWidget = headerWidget;
 		headerWidget.configure();
-
 		clearDateFilter.addClickHandler(event -> {
 			presenter.onClearExpireBeforeFilter();
 		});
-		clearUserFilter.addClickHandler(event -> {
-			presenter.onClearUserFilter();
+		clearSubmitterFilter.addClickHandler(event -> {
+			presenter.onClearSubmitterFilter();
 		});
+		clearAccessorFilter.addClickHandler(event -> {
+			presenter.onClearAccessorFilter();
+		});
+
 		clearAccessRequirementFilter.addClickHandler(event -> {
 			presenter.onClearAccessRequirementFilter();
 		});
@@ -170,20 +181,20 @@ public class ACTAccessApprovalsViewImpl implements ACTAccessApprovalsView {
 	}
 
 	@Override
-	public void setUserPickerWidget(IsWidget w) {
-		userSelectContainer.clear();
-		userSelectContainer.add(w);
+	public void setSubmitterPickerWidget(IsWidget w) {
+		submitterSelectContainer.clear();
+		submitterSelectContainer.add(w);
 	}
 
 	@Override
-	public void setSelectedUserBadge(IsWidget w) {
-		currentUserContainer.clear();
-		currentUserContainer.add(w);
+	public void setSelectedSubmitterUserBadge(IsWidget w) {
+		currentSubmitterContainer.clear();
+		currentSubmitterContainer.add(w);
 	}
 
 	@Override
-	public void setSelectedUserBadgeVisible(boolean visible) {
-		currentUserContainer.setVisible(visible);
+	public void setSelectedSubmitterUserBadgeVisible(boolean visible) {
+		currentSubmitterContainer.setVisible(visible);
 	}
 
 	public void export(ArrayList<AccessorGroup> exportData) {
@@ -231,6 +242,20 @@ public class ACTAccessApprovalsViewImpl implements ACTAccessApprovalsView {
 				downloadLink.setVisible(true);
 			}
 		});
+	}
+	@Override
+	public void setAccessorPickerWidget(IsWidget w) {
+		accessorSelectContainer.clear();
+		accessorSelectContainer.add(w);
+	}
+	@Override
+	public void setSelectedAccessorUserBadge(IsWidget w) {
+		currentAccessorContainer.clear();
+		currentAccessorContainer.add(w);
+	}
+	@Override
+	public void setSelectedAccessorUserBadgeVisible(boolean visible) {
+		currentAccessorContainer.setVisible(visible);
 	}
 
 	private static native String _setDownloadContent(Element anchorElement, String csvContent) /*-{

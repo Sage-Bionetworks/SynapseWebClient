@@ -26,39 +26,54 @@
 			icon="SEARCH">Expand search to all Access Requirements</b:Button>
 		<bh:Div
 			addStyleNames="margin-top-30 margin-left-35 min-height-400 margin-right-10 light-border">
-			<b:Column size="SM_6">
-				<b:Panel
-					addStyleNames="margin-left-10 margin-right-10 margin-bottom-20">
-					<b:PanelHeader>
-						<b:Heading size="H3" text="Submitter Filter" />
-						<bh:Div ui:field="currentUserContainer" />
-						<b:Button ui:field="clearUserFilter" type="DANGER"
-							pull="RIGHT" addStyleNames="moveup-18" size="EXTRA_SMALL">Clear</b:Button>
-					</b:PanelHeader>
-					<b:PanelBody>
-						<bh:Div ui:field="userSelectContainer" />
-					</b:PanelBody>
-				</b:Panel>
-			</b:Column>
-			<b:Column size="SM_6">
-				<b:Panel
-					addStyleNames="margin-left-10 margin-right-10 margin-bottom-20">
-					<b:PanelHeader>
-						<b:Heading size="H3" text="Expires..." />
-						<b:Button ui:field="clearDateFilter" type="DANGER"
-							pull="RIGHT" addStyleNames="moveup-18" size="EXTRA_SMALL"
-							text="Clear" />
-					</b:PanelHeader>
-					<b:PanelBody>
-						<b:FormLabel>before</b:FormLabel>
-						<bd:DateTimePicker
-							ui:field="expiresBeforeDatePicker" autoClose="true"
-							highlightToday="true" showTodayButton="true" showMeridian="false"
-							format="mm/dd/yyyy hh:ii:ss" minView="MONTH"
-							hasKeyboardNavigation="false" />
-					</b:PanelBody>
-				</b:Panel>
-			</b:Column>
+			<b:Row>
+				<b:Column size="SM_4">
+					<b:Panel
+						addStyleNames="margin-left-10 margin-right-10 margin-bottom-20">
+						<b:PanelHeader>
+							<b:Heading size="H3" text="Submitter Filter" />
+							<bh:Div ui:field="currentSubmitterContainer" />
+							<b:Button ui:field="clearSubmitterFilter" icon="TIMES" marginRight="25"
+								addStyleNames="top-right" size="EXTRA_SMALL" />
+						</b:PanelHeader>
+						<b:PanelBody>
+							<bh:Div ui:field="submitterSelectContainer" />
+						</b:PanelBody>
+					</b:Panel>
+				</b:Column>
+				<b:Column size="SM_4">
+					<b:Panel
+						addStyleNames="margin-left-10 margin-right-10 margin-bottom-20">
+						<b:PanelHeader>
+							<b:Heading size="H3" text="Accessor Filter" />
+							<bh:Div ui:field="currentAccessorContainer" />
+							<b:Button ui:field="clearAccessorFilter" icon="TIMES" marginRight="25"
+								addStyleNames="top-right" size="EXTRA_SMALL" />
+						</b:PanelHeader>
+						<b:PanelBody>
+							<bh:Div ui:field="accessorSelectContainer" />
+						</b:PanelBody>
+					</b:Panel>
+				</b:Column>
+				<b:Column size="SM_4">
+					<b:Panel
+						addStyleNames="margin-left-10 margin-right-10 margin-bottom-20">
+						<b:PanelHeader>
+							<b:Heading size="H3" text="Expires..." />
+							<b:Button ui:field="clearDateFilter" icon="TIMES" marginRight="25"
+								addStyleNames="top-right" size="EXTRA_SMALL" />
+						</b:PanelHeader>
+						<b:PanelBody>
+							<b:FormLabel>before</b:FormLabel>
+							<bd:DateTimePicker
+								ui:field="expiresBeforeDatePicker" autoClose="true"
+								highlightToday="true" showTodayButton="true" showMeridian="false"
+								format="mm/dd/yyyy hh:ii:ss" minView="MONTH"
+								hasKeyboardNavigation="false" />
+						</b:PanelBody>
+					</b:Panel>
+				</b:Column>
+			</b:Row>
 			<b:Button ui:field="exportButton"
 				text="Export CSV" size="EXTRA_SMALL" pull="RIGHT" />
 			<b:Anchor ui:field="downloadLink" text="Download CSV"
