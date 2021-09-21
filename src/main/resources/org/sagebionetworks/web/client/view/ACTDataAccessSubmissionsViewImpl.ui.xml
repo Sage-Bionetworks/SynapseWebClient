@@ -6,16 +6,18 @@
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
 	xmlns:bd="urn:import:org.gwtbootstrap3.extras.datetimepicker.client.ui">
 	<bh:Div>
+		<bh:Div addStyleNames="pageHeader">
+			<b:Heading addStyleNames="pageHeaderTitle" size="H3" text="Review requests for access" />
+		</bh:Div>
 		<b:NavPills
 			addStyleNames="margin-left-35 margin-right-10 margin-top-5">
 			<b:AnchorListItem text="ACT data access dashboard"
 				href="#!ACTDataAccessSubmissionDashboard:default" />
 		</b:NavPills>
-		<bh:Div ui:field="showHideAccessRequirementButtonContainer"
+		<bh:Div ui:field="showHideAccessRequirementButtonContainer" marginRight="10"
 			pull="RIGHT" />
 		<b:Heading ui:field="title" size="H3"
 			addStyleNames="margin-top-30 margin-left-35 margin-right-10">
-			<bh:Text>Review requests for access: </bh:Text>
 			<bh:Div ui:field="subjectsContainer" />
 		</b:Heading>
 		<bh:Div ui:field="synAlertContainer" />
@@ -57,50 +59,45 @@
 				ui:field="expirationDate" />
 		</b:Well>
 		<bh:Div
-			addStyleNames="margin-top-30 margin-left-35 min-height-400 margin-right-10 light-border">
-			<bh:Div width="265px">
-				<b:Panel
-					addStyleNames="margin-left-10 margin-right-10 margin-bottom-20 margin-top-10">
-					<b:PanelHeader>
-						<b:Heading size="H3" text="State Filter" />
-						<bh:Span ui:field="currentState" />
-						<b:Button ui:field="clearStateFilter" type="DANGER"
-							pull="RIGHT" addStyleNames="moveup-18" size="EXTRA_SMALL"
-							text="Clear" />
-					</b:PanelHeader>
-					<b:PanelBody>
-						<b:ButtonGroup>
-							<b:Button dataToggle="DROPDOWN"
-								text="Filter by submission state..." />
-							<b:DropDownMenu ui:field="stateDropdownMenu" />
-						</b:ButtonGroup>
-					</b:PanelBody>
-				</b:Panel>
-			</bh:Div>
-			<b:Column size="SM_6" visible="false">
-				<b:Panel
-					addStyleNames="margin-left-10 margin-right-10 margin-bottom-20">
-					<b:PanelHeader>
-						<b:Heading size="H3" text="Date range filter" />
-						<b:Button ui:field="clearDateFilter" type="DANGER"
-							pull="RIGHT" addStyleNames="moveup-18" size="EXTRA_SMALL"
-							text="Clear" />
-					</b:PanelHeader>
-					<b:PanelBody>
-						<b:FormLabel>from</b:FormLabel>
-						<bd:DateTimePicker ui:field="minDatePicker"
-							autoClose="true" highlightToday="true" showTodayButton="true"
-							showMeridian="false" format="mm/dd/yyyy hh:ii:ss" minView="MONTH"
-							hasKeyboardNavigation="false" />
-						<b:FormLabel>to</b:FormLabel>
-						<bd:DateTimePicker ui:field="maxDatePicker"
-							autoClose="true" highlightToday="true" showTodayButton="true"
-							showMeridian="false" format="mm/dd/yyyy hh:ii:ss" minView="MONTH"
-							hasKeyboardNavigation="false" />
-					</b:PanelBody>
-				</b:Panel>
-			</b:Column>
-
+			addStyleNames="margin-top-30 margin-left-35 min-height-400 margin-right-10">
+			<b:Row>
+				<b:Column size="SM_4">
+					<b:Panel
+						addStyleNames="margin-left-10 margin-right-10 margin-bottom-20">
+						<b:PanelHeader>
+							<b:Heading size="H3" text="State Filter" />
+							<bh:Span ui:field="currentState" />
+							<b:Button ui:field="clearStateFilter" icon="TIMES" marginRight="25"
+								addStyleNames="top-right" size="EXTRA_SMALL" />
+						</b:PanelHeader>
+						<b:PanelBody>
+							<b:ButtonGroup>
+								<b:Button dataToggle="DROPDOWN"
+									text="Filter by submission state..." />
+								<b:DropDownMenu ui:field="stateDropdownMenu" />
+							</b:ButtonGroup>
+						</b:PanelBody>
+					</b:Panel>
+					
+				</b:Column>
+				<b:Column size="SM_4">
+					<b:Panel
+						addStyleNames="margin-left-10 margin-right-10 margin-bottom-20">
+						<b:PanelHeader>
+							<b:Heading size="H3" text="Accessor Filter" />
+							<bh:Div ui:field="currentAccessorContainer" />
+							<b:Button ui:field="clearAccessorFilter" icon="TIMES" marginRight="25"
+								addStyleNames="top-right" size="EXTRA_SMALL" />
+						</b:PanelHeader>
+						<b:PanelBody>
+							<bh:Div ui:field="accessorSelectContainer" />
+						</b:PanelBody>
+					</b:Panel>
+				</b:Column>
+				<b:Column size="SM_4">
+				</b:Column>
+			</b:Row>
+			<bh:Hr />
 			<!-- table header -->
 			<t:Table
 				addStyleNames="table-layout-fixed margin-left-10 margin-bottom-20"

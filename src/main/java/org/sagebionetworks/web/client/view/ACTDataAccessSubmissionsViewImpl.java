@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.view;
 
-import java.util.Date;
 import java.util.List;
+
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
@@ -13,11 +13,9 @@ import org.gwtbootstrap3.client.ui.Well;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Strong;
-import org.gwtbootstrap3.extras.datetimepicker.client.ui.DateTimePicker;
-import org.gwtbootstrap3.extras.datetimepicker.client.ui.base.events.ChangeDateEvent;
-import org.gwtbootstrap3.extras.datetimepicker.client.ui.base.events.ChangeDateHandler;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.header.Header;
+
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -34,10 +32,6 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 
 	@UiField
 	DropDownMenu stateDropdownMenu;
-	@UiField
-	DateTimePicker minDatePicker;
-	@UiField
-	DateTimePicker maxDatePicker;
 
 	@UiField
 	Div synAlertContainer;
@@ -50,8 +44,6 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 	Div tableData;
 	@UiField
 	Button clearStateFilter;
-	@UiField
-	Button clearDateFilter;
 
 	@UiField
 	Span currentState;
@@ -83,6 +75,12 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 	Well expirationDateUI;
 	@UiField
 	Strong expirationDate;
+	@UiField
+	Div accessorSelectContainer;
+	@UiField
+	Div currentAccessorContainer;
+	@UiField
+	Button clearAccessorFilter;
 
 	private Presenter presenter;
 	private Header headerWidget;
@@ -94,36 +92,16 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 		widget = binder.createAndBindUi(this);
 		this.headerWidget = headerWidget;
 		headerWidget.configure();
-		clearStateFilter.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onClearStateFilter();
-			}
+		clearStateFilter.addClickHandler(event -> {
+			presenter.onClearStateFilter();
 		});
-		clearDateFilter.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onClearDateFilter();
-			}
+		createdOnColumnHeader.addClickHandler(event -> {
+			presenter.onCreatedOnClick();
 		});
-		minDatePicker.addChangeDateHandler(new ChangeDateHandler() {
-			@Override
-			public void onChangeDate(ChangeDateEvent evt) {
-				presenter.onMinDateSelected(minDatePicker.getValue());;
-			}
+		clearAccessorFilter.addClickHandler(event -> {
+			presenter.onClearAccessorFilter();
 		});
-		maxDatePicker.addChangeDateHandler(new ChangeDateHandler() {
-			@Override
-			public void onChangeDate(ChangeDateEvent evt) {
-				presenter.onMaxDateSelected(maxDatePicker.getValue());;
-			}
-		});
-		createdOnColumnHeader.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onCreatedOnClick();
-			}
-		});
+
 	}
 
 	@Override
@@ -158,16 +136,6 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 	@Override
 	public void setSelectedStateText(String state) {
 		currentState.setText(state);
-	}
-
-	@Override
-	public void setSelectedMaxDate(Date date) {
-		maxDatePicker.setValue(date);
-	}
-
-	@Override
-	public void setSelectedMinDate(Date date) {
-		minDatePicker.setValue(date);
 	}
 
 	@Override
@@ -269,4 +237,19 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 	public void setProjectedExpirationDateVisible(boolean visible) {
 		expirationDateUI.setVisible(visible);
 	}
+	@Override
+	public void setAccessorPickerWidget(IsWidget w) {
+		accessorSelectContainer.clear();
+		accessorSelectContainer.add(w);
+	}
+	@Override
+	public void setSelectedAccessorUserBadge(IsWidget w) {
+		currentAccessorContainer.clear();
+		currentAccessorContainer.add(w);
+	}
+	@Override
+	public void setSelectedAccessorUserBadgeVisible(boolean visible) {
+		currentAccessorContainer.setVisible(visible);
+	}
+
 }

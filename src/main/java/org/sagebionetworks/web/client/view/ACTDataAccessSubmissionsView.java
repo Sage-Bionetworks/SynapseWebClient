@@ -1,8 +1,9 @@
 package org.sagebionetworks.web.client.view;
 
-import java.util.Date;
 import java.util.List;
+
 import org.sagebionetworks.web.client.SynapseView;
+
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface ACTDataAccessSubmissionsView extends IsWidget, SynapseView {
@@ -15,10 +16,6 @@ public interface ACTDataAccessSubmissionsView extends IsWidget, SynapseView {
 	void setSynAlert(IsWidget w);
 
 	void setSelectedStateText(String state);
-
-	void setSelectedMinDate(Date date);
-
-	void setSelectedMaxDate(Date date);
 
 	void setShowHideButton(IsWidget button);
 
@@ -48,17 +45,19 @@ public interface ACTDataAccessSubmissionsView extends IsWidget, SynapseView {
 
 	void setProjectedExpirationDate(String date);
 
-	public interface Presenter {
-		void onClearDateFilter();
+	void setAccessorPickerWidget(IsWidget accessorSuggestWidget);
 
+	void setSelectedAccessorUserBadge(IsWidget selectedAccessorUserBadge);
+
+	void setSelectedAccessorUserBadgeVisible(boolean b);
+
+	public interface Presenter {
 		void onClearStateFilter();
 
 		void onStateSelected(String state);
 
-		void onMinDateSelected(Date date);
-
-		void onMaxDateSelected(Date date);
-
 		void onCreatedOnClick();
+
+		void onClearAccessorFilter();
 	}
 }

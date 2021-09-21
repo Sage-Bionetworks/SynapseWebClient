@@ -63,7 +63,7 @@ public class ACTAccessApprovalsPresenter extends AbstractActivity implements Pre
 	boolean isLoadingAllData;
 	
 	@Inject
-	public ACTAccessApprovalsPresenter(final ACTAccessApprovalsView view, SynapseAlert synAlert, PortalGinInjector ginInjector, LoadMoreWidgetContainer loadMoreContainer, final Button showHideAccessRequirementButton, DataAccessClientAsync dataAccessClient, SynapseSuggestBox accessorSuggestWidget, SynapseSuggestBox submitterSuggestWidget, UserGroupSuggestionProvider provider, UserBadge selectedSubmitterUserBadge,  UserBadge selectedAccessorUserBadge, AccessRequirementWidget accessRequirementWidget, GlobalApplicationState globalAppState) {
+	public ACTAccessApprovalsPresenter(final ACTAccessApprovalsView view, SynapseAlert synAlert, PortalGinInjector ginInjector, LoadMoreWidgetContainer loadMoreContainer, final Button showHideAccessRequirementButton, DataAccessClientAsync dataAccessClient, SynapseSuggestBox accessorSuggestWidget, SynapseSuggestBox submitterSuggestWidget, UserGroupSuggestionProvider provider, UserBadge selectedSubmitterUserBadge, UserBadge selectedAccessorUserBadge, AccessRequirementWidget accessRequirementWidget, GlobalApplicationState globalAppState) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.ginInjector = ginInjector;

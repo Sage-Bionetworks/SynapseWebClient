@@ -1450,10 +1450,11 @@ public class SynapseJavascriptClient {
 		doGet(url, OBJECT_TYPE.AccessRequirement, callback);
 	}
 
-	public void getDataAccessSubmissions(String requirementId, String nextPageToken, SubmissionState filter, SubmissionOrder order, boolean isAscending, AsyncCallback<SubmissionPage> callback) {
+	public void getDataAccessSubmissions(String requirementId, String accessorId, String nextPageToken, SubmissionState filter, SubmissionOrder order, boolean isAscending, AsyncCallback<SubmissionPage> callback) {
 		String url = getRepoServiceUrl() + ACCESS_REQUIREMENT + "/" + requirementId + SUBMISSIONS;
 		SubmissionPageRequest request = new SubmissionPageRequest();
 		request.setAccessRequirementId(requirementId);
+		request.setAccessorId(accessorId);
 		request.setFilterBy(filter);
 		request.setOrderBy(order);
 		request.setIsAscending(isAscending);
