@@ -8,13 +8,16 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.client.place.ACTAccessApprovalsPlace.ACCESSOR_ID_PARAM;
 import static org.sagebionetworks.web.client.place.ACTAccessApprovalsPlace.ACCESS_REQUIREMENT_ID_PARAM;
 import static org.sagebionetworks.web.client.place.ACTAccessApprovalsPlace.EXPIRES_BEFORE_PARAM;
 import static org.sagebionetworks.web.client.place.ACTAccessApprovalsPlace.SUBMITTER_ID_PARAM;
 import static org.sagebionetworks.web.client.presenter.ACTAccessApprovalsPresenter.HIDE_AR_TEXT;
 import static org.sagebionetworks.web.client.presenter.ACTAccessApprovalsPresenter.SHOW_AR_TEXT;
+
 import java.util.Collections;
 import java.util.Date;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -46,6 +49,7 @@ import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
+
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -70,11 +74,15 @@ public class ACTAccessApprovalsPresenterTest {
 	@Mock
 	DataAccessClientAsync mockDataAccessClient;
 	@Mock
-	SynapseSuggestBox mockPeopleSuggestWidget;
+	SynapseSuggestBox mockSubmitterSuggestWidget;
+	@Mock
+	SynapseSuggestBox mockAccessorSuggestWidget;
 	@Mock
 	UserGroupSuggestionProvider mockProvider;
 	@Mock
-	UserBadge mockSelectedUserBadge;
+	UserBadge mockSelectedSubmitterUserBadge;
+	@Mock
+	UserBadge mockSelectedAccessorUserBadge;
 	@Mock
 	AccessRequirementWidget mockAccessRequirementWidget;
 	@Mock
@@ -100,13 +108,14 @@ public class ACTAccessApprovalsPresenterTest {
 
 	public static final String AR_ID = "765";
 	public static final String SUBMITTER_ID = "88888";
+	public static final String ACCESSOR_ID = "999999999";
 	public static final String NEXT_PAGE_TOKEN = "9876789876";
 	public static final String USER_ID_SELECTED = "42";
 
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
-		presenter = new ACTAccessApprovalsPresenter(mockView, mockSynAlert, mockGinInjector, mockLoadMoreContainer, mockShowHideAccessRequirementButton, mockDataAccessClient, mockPeopleSuggestWidget, mockProvider, mockSelectedUserBadge, mockAccessRequirementWidget, mockGlobalAppState);
+		presenter = new ACTAccessApprovalsPresenter(mockView, mockSynAlert, mockGinInjector, mockLoadMoreContainer, mockShowHideAccessRequirementButton, mockDataAccessClient, mockAccessorSuggestWidget, mockSubmitterSuggestWidget, mockProvider, mockSelectedSubmitterUserBadge, mockSelectedAccessorUserBadge, mockAccessRequirementWidget, mockGlobalAppState);
 		AsyncMockStubber.callSuccessWith(mockAccessorGroupResponse).when(mockDataAccessClient).listAccessorGroup(any(AccessorGroupRequest.class), any(AsyncCallback.class));
 		when(mockAccessorGroupResponse.getResults()).thenReturn(Collections.singletonList(mockAccessorGroup));
 		when(mockAccessorGroupResponse.getNextPageToken()).thenReturn(NEXT_PAGE_TOKEN);
@@ -118,8 +127,10 @@ public class ACTAccessApprovalsPresenterTest {
 
 	@Test
 	public void testConstruction() {
-		verify(mockPeopleSuggestWidget).setSuggestionProvider(mockProvider);
-		verify(mockPeopleSuggestWidget).setTypeFilter(TypeFilter.USERS_ONLY);
+		verify(mockSubmitterSuggestWidget).setSuggestionProvider(mockProvider);
+		verify(mockSubmitterSuggestWidget).setTypeFilter(TypeFilter.USERS_ONLY);
+		verify(mockAccessorSuggestWidget).setSuggestionProvider(mockProvider);
+		verify(mockAccessorSuggestWidget).setTypeFilter(TypeFilter.USERS_ONLY);
 		verify(mockShowHideAccessRequirementButton).addClickHandler(clickHandlerCaptor.capture());
 		verify(mockView).setAccessRequirementUIVisible(false);
 		verify(mockShowHideAccessRequirementButton).setText(SHOW_AR_TEXT);
@@ -132,8 +143,10 @@ public class ACTAccessApprovalsPresenterTest {
 		verify(mockView).setAccessRequirementWidget(mockAccessRequirementWidget);
 		verify(mockView).setSubmitterPickerWidget(any(Widget.class));
 		verify(mockView).setSelectedSubmitterUserBadge(any(Widget.class));
+		verify(mockView).setAccessorPickerWidget(any(Widget.class));
+		verify(mockView).setSelectedAccessorUserBadge(any(Widget.class));
 		verify(mockView).setPresenter(presenter);
-		verify(mockPeopleSuggestWidget).addItemSelectedHandler(any(CallbackP.class));
+		verify(mockSubmitterSuggestWidget).addItemSelectedHandler(any(CallbackP.class));
 		verify(mockLoadMoreContainer).configure(any(Callback.class));
 	}
 
@@ -178,7 +191,7 @@ public class ACTAccessApprovalsPresenterTest {
 	}
 
 	@Test
-	public void testClearUserFilter() {
+	public void testClearSubmitterFilter() {
 		when(mockPlace.getParam(SUBMITTER_ID_PARAM)).thenReturn(SUBMITTER_ID);
 		presenter.setPlace(mockPlace);
 		reset(mockDataAccessClient);
@@ -190,6 +203,21 @@ public class ACTAccessApprovalsPresenterTest {
 		verify(mockDataAccessClient).listAccessorGroup(accessorGroupRequestCaptor.capture(), any(AsyncCallback.class));
 		AccessorGroupRequest request = accessorGroupRequestCaptor.getValue();
 		assertNull(request.getSubmitterId());
+	}
+
+	@Test
+	public void testClearAccessorFilter() {
+		when(mockPlace.getParam(ACCESSOR_ID_PARAM)).thenReturn(ACCESSOR_ID);
+		presenter.setPlace(mockPlace);
+		reset(mockDataAccessClient);
+
+		presenter.onClearAccessorFilter();
+
+		verify(mockView).setSelectedAccessorUserBadgeVisible(false);
+		verify(mockPlace).removeParam(ACCESSOR_ID_PARAM);
+		verify(mockDataAccessClient).listAccessorGroup(accessorGroupRequestCaptor.capture(), any(AsyncCallback.class));
+		AccessorGroupRequest request = accessorGroupRequestCaptor.getValue();
+		assertNull(request.getAccessorId());
 	}
 
 	@Test
@@ -223,16 +251,30 @@ public class ACTAccessApprovalsPresenterTest {
 	}
 
 	@Test
-	public void testOnUserSelected() {
+	public void testOnSubmitterSelected() {
 		presenter.setPlace(mockPlace);
 		reset(mockDataAccessClient);
 
 		presenter.onSubmitterSelected(mockUserGroupSuggestion);
 
 		verify(mockPlace).putParam(SUBMITTER_ID_PARAM, USER_ID_SELECTED);
-		verify(mockSelectedUserBadge).configure(USER_ID_SELECTED);
+		verify(mockSelectedSubmitterUserBadge).configure(USER_ID_SELECTED);
 		verify(mockDataAccessClient).listAccessorGroup(accessorGroupRequestCaptor.capture(), any(AsyncCallback.class));
 		AccessorGroupRequest request = accessorGroupRequestCaptor.getValue();
 		assertEquals(USER_ID_SELECTED, request.getSubmitterId());
 	}
+	@Test
+	public void testOnAccessorSelected() {
+		presenter.setPlace(mockPlace);
+		reset(mockDataAccessClient);
+
+		presenter.onAccessorSelected(mockUserGroupSuggestion);
+
+		verify(mockPlace).putParam(ACCESSOR_ID_PARAM, USER_ID_SELECTED);
+		verify(mockSelectedAccessorUserBadge).configure(USER_ID_SELECTED);
+		verify(mockDataAccessClient).listAccessorGroup(accessorGroupRequestCaptor.capture(), any(AsyncCallback.class));
+		AccessorGroupRequest request = accessorGroupRequestCaptor.getValue();
+		assertEquals(USER_ID_SELECTED, request.getAccessorId());
+	}
+
 }
