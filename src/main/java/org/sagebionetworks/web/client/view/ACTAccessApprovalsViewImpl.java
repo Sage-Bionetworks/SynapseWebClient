@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.extras.datetimepicker.client.ui.DateTimePicker;
@@ -18,6 +19,7 @@ import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.widget.header.Header;
 
 import com.google.gwt.uibinder.client.UiBinder;
@@ -66,6 +68,8 @@ public class ACTAccessApprovalsViewImpl implements ACTAccessApprovalsView {
 	Button exportButton;
 	@UiField
 	Anchor downloadLink;
+	@UiField
+	Column accessorUI;
 	private Presenter presenter;
 	private Header headerWidget;
 	DateTimeUtils dateTimeUtils;
@@ -73,12 +77,14 @@ public class ACTAccessApprovalsViewImpl implements ACTAccessApprovalsView {
 	Widget widget;
 
 	@Inject
-	public ACTAccessApprovalsViewImpl(ACTViewImplUiBinder binder, Header headerWidget, SynapseJavascriptClient jsClient, DateTimeUtils dateTimeUtils) {
+	public ACTAccessApprovalsViewImpl(ACTViewImplUiBinder binder, Header headerWidget, SynapseJavascriptClient jsClient, DateTimeUtils dateTimeUtils, CookieProvider cookies) {
 		widget = binder.createAndBindUi(this);
 		this.jsClient = jsClient;
 		this.dateTimeUtils = dateTimeUtils;
 		this.headerWidget = headerWidget;
 		headerWidget.configure();
+		// TODO: Take out of alpha mode once PLFM-6939 is fixed
+		accessorUI.setVisible(DisplayUtils.isInTestWebsite(cookies));
 		clearDateFilter.addClickHandler(event -> {
 			presenter.onClearExpireBeforeFilter();
 		});

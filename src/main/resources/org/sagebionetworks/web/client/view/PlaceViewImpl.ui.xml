@@ -5,7 +5,7 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 	<bh:Div>
-		<bh:Div addStyleNames="pageHeader">
+		<bh:Div addStyleNames="pageHeader" marginBottom="10">
 			<b:Heading ui:field="title" addStyleNames="pageHeaderTitle" size="H3"/>
 		</bh:Div>
 		<bh:Div ui:field="above" />

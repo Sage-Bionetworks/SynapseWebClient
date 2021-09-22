@@ -103,6 +103,9 @@ a:focus{color:$synapse-blue;}
 		@include synapse-blue-triangles-bg;
 		h3.pageHeaderTitle {
 			color: white;
+			a {
+				color:white;
+			}
 		}
 		.description {
 			color: white;

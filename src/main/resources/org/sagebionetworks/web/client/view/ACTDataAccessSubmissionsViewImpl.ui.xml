@@ -7,7 +7,7 @@
 	xmlns:bd="urn:import:org.gwtbootstrap3.extras.datetimepicker.client.ui">
 	<bh:Div>
 		<bh:Div addStyleNames="pageHeader">
-			<b:Heading addStyleNames="pageHeaderTitle" size="H3" text="Review requests for access" />
+			<b:Heading addStyleNames="pageHeaderTitle" size="H3" text="Review Requests For Access" />
 		</bh:Div>
 		<b:NavPills
 			addStyleNames="margin-left-35 margin-right-10 margin-top-5">
@@ -16,7 +16,7 @@
 		</b:NavPills>
 		<bh:Div ui:field="showHideAccessRequirementButtonContainer" marginRight="10"
 			pull="RIGHT" />
-		<b:Heading ui:field="title" size="H3"
+		<b:Heading ui:field="title" size="H5"
 			addStyleNames="margin-top-30 margin-left-35 margin-right-10">
 			<bh:Div ui:field="subjectsContainer" />
 		</b:Heading>
