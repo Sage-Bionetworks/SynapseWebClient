@@ -19,7 +19,6 @@ import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.widget.header.Header;
 
 import com.google.gwt.uibinder.client.UiBinder;
@@ -77,14 +76,12 @@ public class ACTAccessApprovalsViewImpl implements ACTAccessApprovalsView {
 	Widget widget;
 
 	@Inject
-	public ACTAccessApprovalsViewImpl(ACTViewImplUiBinder binder, Header headerWidget, SynapseJavascriptClient jsClient, DateTimeUtils dateTimeUtils, CookieProvider cookies) {
+	public ACTAccessApprovalsViewImpl(ACTViewImplUiBinder binder, Header headerWidget, SynapseJavascriptClient jsClient, DateTimeUtils dateTimeUtils) {
 		widget = binder.createAndBindUi(this);
 		this.jsClient = jsClient;
 		this.dateTimeUtils = dateTimeUtils;
 		this.headerWidget = headerWidget;
 		headerWidget.configure();
-		// TODO: Take out of alpha mode once PLFM-6939 is fixed
-		accessorUI.setVisible(DisplayUtils.isInTestWebsite(cookies));
 		clearDateFilter.addClickHandler(event -> {
 			presenter.onClearExpireBeforeFilter();
 		});
