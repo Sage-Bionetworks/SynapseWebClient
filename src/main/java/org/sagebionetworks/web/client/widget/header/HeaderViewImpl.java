@@ -130,7 +130,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 
 	@Override
 	public void setStagingAlertVisible(boolean visible) {
-		stagingAlert.setVisible(false);
+		stagingAlert.setVisible(visible);
 	}
 
 	@Override
