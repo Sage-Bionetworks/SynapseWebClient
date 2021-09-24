@@ -7,8 +7,7 @@ public class ACTDataAccessSubmissionsPlace extends ParameterizedPlace {
 
 	public static final String ACCESS_REQUIREMENT_ID_PARAM = "AR_ID";
 	public static final String STATE_FILTER_PARAM = "STATE";
-	public static final String MIN_DATE_PARAM = "FROM_DATE";
-	public static final String MAX_DATE_PARAM = "TO_DATE";
+	public static final String ACCESSOR_ID_PARAM = "ACCESSOR_USER_ID";
 
 	public ACTDataAccessSubmissionsPlace(String token) {
 		super(token);

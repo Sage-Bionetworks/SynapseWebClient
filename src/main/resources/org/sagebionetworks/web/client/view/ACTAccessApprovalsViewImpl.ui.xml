@@ -6,14 +6,14 @@
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
 	xmlns:bd="urn:import:org.gwtbootstrap3.extras.datetimepicker.client.ui">
 	<bh:Div>
+		<bh:Div addStyleNames="pageHeader">
+			<b:Heading addStyleNames="pageHeaderTitle" size="H3" text="Review Current Access" />
+		</bh:Div>
 		<b:NavPills
 			addStyleNames="margin-left-35 margin-right-10 margin-top-5">
 			<b:AnchorListItem text="ACT data access dashboard"
 				href="#!ACTDataAccessSubmissionDashboard:default" />
 		</b:NavPills>
-
-		<b:Heading size="H3" text="Review current access"
-			addStyleNames="margin-left-35 margin-right-10 margin-bottom-20" />
 		<bh:Div ui:field="showHideAccessRequirementButtonContainer"
 			pull="RIGHT" addStyleNames="moveup-35 margin-right-10" />
 		<bh:Div ui:field="synAlertContainer" />
@@ -25,44 +25,60 @@
 			type="PRIMARY" addStyleNames="margin-left-35" size="EXTRA_SMALL"
 			icon="SEARCH">Expand search to all Access Requirements</b:Button>
 		<bh:Div
-			addStyleNames="margin-top-30 margin-left-35 min-height-400 margin-right-10 light-border">
-			<b:Column size="SM_6">
-				<b:Panel
-					addStyleNames="margin-left-10 margin-right-10 margin-bottom-20">
-					<b:PanelHeader>
-						<b:Heading size="H3" text="Submitter Filter" />
-						<bh:Div ui:field="currentUserContainer" />
-						<b:Button ui:field="clearUserFilter" type="DANGER"
-							pull="RIGHT" addStyleNames="moveup-18" size="EXTRA_SMALL">Clear</b:Button>
-					</b:PanelHeader>
-					<b:PanelBody>
-						<bh:Div ui:field="userSelectContainer" />
-					</b:PanelBody>
-				</b:Panel>
-			</b:Column>
-			<b:Column size="SM_6">
-				<b:Panel
-					addStyleNames="margin-left-10 margin-right-10 margin-bottom-20">
-					<b:PanelHeader>
-						<b:Heading size="H3" text="Expires..." />
-						<b:Button ui:field="clearDateFilter" type="DANGER"
-							pull="RIGHT" addStyleNames="moveup-18" size="EXTRA_SMALL"
-							text="Clear" />
-					</b:PanelHeader>
-					<b:PanelBody>
-						<b:FormLabel>before</b:FormLabel>
-						<bd:DateTimePicker
-							ui:field="expiresBeforeDatePicker" autoClose="true"
-							highlightToday="true" showTodayButton="true" showMeridian="false"
-							format="mm/dd/yyyy hh:ii:ss" minView="MONTH"
-							hasKeyboardNavigation="false" />
-					</b:PanelBody>
-				</b:Panel>
-			</b:Column>
+			addStyleNames="margin-top-30 margin-left-35 min-height-400 margin-right-10">
+			<b:Row>
+				<b:Column size="SM_4">
+					<b:Panel
+						addStyleNames="margin-left-10 margin-right-10 margin-bottom-20">
+						<b:PanelHeader>
+							<b:Heading size="H3" text="Submitter Filter" />
+							<bh:Div ui:field="currentSubmitterContainer" />
+							<b:Button ui:field="clearSubmitterFilter" icon="TIMES" marginRight="25"
+								addStyleNames="top-right" size="EXTRA_SMALL" />
+						</b:PanelHeader>
+						<b:PanelBody>
+							<bh:Div ui:field="submitterSelectContainer" />
+						</b:PanelBody>
+					</b:Panel>
+				</b:Column>
+				<b:Column size="SM_4" ui:field="accessorUI">
+					<b:Panel
+						addStyleNames="margin-left-10 margin-right-10 margin-bottom-20">
+						<b:PanelHeader>
+							<b:Heading size="H3" text="Accessor Filter" />
+							<bh:Div ui:field="currentAccessorContainer" />
+							<b:Button ui:field="clearAccessorFilter" icon="TIMES" marginRight="25"
+								addStyleNames="top-right" size="EXTRA_SMALL" />
+						</b:PanelHeader>
+						<b:PanelBody>
+							<bh:Div ui:field="accessorSelectContainer" />
+						</b:PanelBody>
+					</b:Panel>
+				</b:Column>
+				<b:Column size="SM_4">
+					<b:Panel
+						addStyleNames="margin-left-10 margin-right-10 margin-bottom-20">
+						<b:PanelHeader>
+							<b:Heading size="H3" text="Expires..." />
+							<b:Button ui:field="clearDateFilter" icon="TIMES" marginRight="25"
+								addStyleNames="top-right" size="EXTRA_SMALL" />
+						</b:PanelHeader>
+						<b:PanelBody>
+							<b:FormLabel>before</b:FormLabel>
+							<bd:DateTimePicker
+								ui:field="expiresBeforeDatePicker" autoClose="true"
+								highlightToday="true" showTodayButton="true" showMeridian="false"
+								format="mm/dd/yyyy hh:ii:ss" minView="MONTH"
+								hasKeyboardNavigation="false" />
+						</b:PanelBody>
+					</b:Panel>
+				</b:Column>
+			</b:Row>
 			<b:Button ui:field="exportButton"
-				text="Export CSV" size="EXTRA_SMALL" pull="RIGHT" />
-			<b:Anchor ui:field="downloadLink" text="Download CSV"
+				text="Export CSV" size="EXTRA_SMALL" pull="RIGHT" marginRight="30"/>
+			<b:Anchor ui:field="downloadLink" text="Download CSV" marginRight="30"
 				visible="false" icon="DOWNLOAD" pull="RIGHT" />
+			<bh:Hr />
 			<bh:Div marginLeft="5" marginRight="5">
 				<!-- table header -->
 				<t:Table

@@ -19,11 +19,17 @@ public interface ACTAccessApprovalsView extends IsWidget, SynapseView {
 
 	void setAccessRequirementUIVisible(boolean visible);
 
-	void setUserPickerWidget(IsWidget w);
+	void setSubmitterPickerWidget(IsWidget w);
+	
+	void setAccessorPickerWidget(IsWidget w);
 
-	void setSelectedUserBadge(IsWidget w);
+	void setSelectedSubmitterUserBadge(IsWidget w);
 
-	void setSelectedUserBadgeVisible(boolean visible);
+	void setSelectedSubmitterUserBadgeVisible(boolean visible);
+
+	void setSelectedAccessorUserBadge(IsWidget w);
+
+	void setSelectedAccessorUserBadgeVisible(boolean visible);
 
 	void setExpiresBeforeDate(Date date);
 
@@ -34,7 +40,9 @@ public interface ACTAccessApprovalsView extends IsWidget, SynapseView {
 	void export(ArrayList<AccessorGroup> exportData);
 
 	public interface Presenter {
-		void onClearUserFilter();
+		void onClearSubmitterFilter();
+		
+		void onClearAccessorFilter();
 
 		void onClearExpireBeforeFilter();
 

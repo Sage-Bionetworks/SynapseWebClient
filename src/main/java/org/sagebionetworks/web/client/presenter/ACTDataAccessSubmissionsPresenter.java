@@ -1,22 +1,25 @@
 package org.sagebionetworks.web.client.presenter;
 
+import static org.sagebionetworks.web.client.place.ACTAccessApprovalsPlace.ACCESSOR_ID_PARAM;
 import static org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace.ACCESS_REQUIREMENT_ID_PARAM;
-import static org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace.MAX_DATE_PARAM;
-import static org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace.MIN_DATE_PARAM;
 import static org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace.STATE_FILTER_PARAM;
 import static org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateManagedACTAccessRequirementStep2.DAY_IN_MS;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
+import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.dataaccess.Submission;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionOrder;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionPage;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionState;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
+import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -30,9 +33,12 @@ import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccess
 import org.sagebionetworks.web.client.widget.accessrequirements.SubjectsWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.ACTDataAccessSubmissionWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
+
 import com.google.gwt.activity.shared.AbstractActivity;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
@@ -53,19 +59,22 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 	public static final String HIDE_AR_TEXT = "Hide Access Requirement";
 	public static final String SHOW_AR_TEXT = "Show Access Requirement";
 	public static final String INVALID_AR_ID = "Invalid Access Requirement ID";
-	Date fromDate, toDate;
 	String actAccessRequirementId;
 	FileHandleWidget ducTemplateFileHandleWidget;
 	List<String> states;
 	boolean isSortedAsc;
 	String nextPageToken;
+	String accessorId;
 	private ManagedACTAccessRequirement actAccessRequirement;
 	private SubjectsWidget subjectsWidget;
 	DateTimeFormat dateFormat;
 	Callback refreshCallback;
+	SynapseSuggestBox accessorSuggestWidget;
+	UserGroupSuggestionProvider provider;
+	UserBadge selectedAccessorUserBadge;
 
 	@Inject
-	public ACTDataAccessSubmissionsPresenter(final ACTDataAccessSubmissionsView view, SynapseAlert synAlert, PortalGinInjector ginInjector, LoadMoreWidgetContainer loadMoreContainer, ManagedACTAccessRequirementWidget actAccessRequirementWidget, final Button showHideAccessRequirementButton, FileHandleWidget ducTemplateFileHandleWidget, SynapseJavascriptClient jsClient,SubjectsWidget subjectsWidget, GWTWrapper gwt) {
+	public ACTDataAccessSubmissionsPresenter(final ACTDataAccessSubmissionsView view, SynapseAlert synAlert, PortalGinInjector ginInjector, LoadMoreWidgetContainer loadMoreContainer, ManagedACTAccessRequirementWidget actAccessRequirementWidget, final Button showHideAccessRequirementButton, FileHandleWidget ducTemplateFileHandleWidget, SynapseJavascriptClient jsClient,SubjectsWidget subjectsWidget, GWTWrapper gwt, SynapseSuggestBox accessorSuggestWidget, UserGroupSuggestionProvider provider, UserBadge selectedAccessorUserBadge) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.ginInjector = ginInjector;
@@ -74,6 +83,8 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 		this.actAccessRequirementWidget = actAccessRequirementWidget;
 		actAccessRequirementWidget.setReviewAccessRequestsVisible(false);
 		this.subjectsWidget = subjectsWidget;
+		this.accessorSuggestWidget = accessorSuggestWidget;
+		this.selectedAccessorUserBadge = selectedAccessorUserBadge;
 		this.ducTemplateFileHandleWidget = ducTemplateFileHandleWidget;
 		dateFormat = gwt.getDateTimeFormat(PredefinedFormat.DATE_FULL);
 		states = new ArrayList<String>();
@@ -81,19 +92,25 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 			states.add(state.toString());
 		}
 		view.setStates(states);
+		accessorSuggestWidget.setSuggestionProvider(provider);
+		accessorSuggestWidget.setTypeFilter(TypeFilter.USERS_ONLY);
+
 		isAccessRequirementVisible = false;
 		showHideAccessRequirementButton.setText(SHOW_AR_TEXT);
 		showHideAccessRequirementButton.setIcon(IconType.TOGGLE_RIGHT);
 		view.setAccessRequirementUIVisible(false);
-		showHideAccessRequirementButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				isAccessRequirementVisible = !isAccessRequirementVisible;
-				String buttonText = isAccessRequirementVisible ? HIDE_AR_TEXT : SHOW_AR_TEXT;
-				showHideAccessRequirementButton.setText(buttonText);
-				showHideAccessRequirementButton.setIcon(isAccessRequirementVisible ? IconType.TOGGLE_DOWN : IconType.TOGGLE_RIGHT);
-				view.setAccessRequirementUIVisible(isAccessRequirementVisible);
-			}
+		view.setAccessorPickerWidget(accessorSuggestWidget);
+		view.setSelectedAccessorUserBadge(selectedAccessorUserBadge);
+		accessorSuggestWidget.addItemSelectedHandler(suggestion -> {
+			onAccessorSelected(suggestion);
+		});
+
+		showHideAccessRequirementButton.addClickHandler(event -> {
+			isAccessRequirementVisible = !isAccessRequirementVisible;
+			String buttonText = isAccessRequirementVisible ? HIDE_AR_TEXT : SHOW_AR_TEXT;
+			showHideAccessRequirementButton.setText(buttonText);
+			showHideAccessRequirementButton.setIcon(isAccessRequirementVisible ? IconType.TOGGLE_DOWN : IconType.TOGGLE_RIGHT);
+			view.setAccessRequirementUIVisible(isAccessRequirementVisible);
 		});
 		view.setSynAlert(synAlert);
 		view.setAccessRequirementWidget(actAccessRequirementWidget);
@@ -127,16 +144,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 		this.place = place;
 		isSortedAsc = true;
 		actAccessRequirementId = place.getParam(ACCESS_REQUIREMENT_ID_PARAM);
-		String fromTime = place.getParam(MIN_DATE_PARAM);
-		if (fromTime != null) {
-			fromDate = new Date(Long.parseLong(fromTime));
-			view.setSelectedMinDate(fromDate);
-		}
-		String toTime = place.getParam(MAX_DATE_PARAM);
-		if (toTime != null) {
-			toDate = new Date(Long.parseLong(toTime));
-			view.setSelectedMaxDate(toDate);
-		}
+		accessorId = place.getParam(ACCESSOR_ID_PARAM);
 		synAlert.clear();
 		view.setProjectedExpirationDateVisible(false);
 		if (actAccessRequirementId != null) {
@@ -150,6 +158,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 				public void onSuccess(AccessRequirement requirement) {
 					if (requirement instanceof ManagedACTAccessRequirement) {
 						actAccessRequirement = (ManagedACTAccessRequirement) requirement;
+						
 						refreshProjectedExpiration();
 						if (actAccessRequirement.getDucTemplateFileHandleId() != null) {
 							FileHandleAssociation fha = new FileHandleAssociation();
@@ -204,7 +213,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 		loadMoreContainer.setIsProcessing(true);
 		synAlert.clear();
 		// ask for data access submissions once call is available, and create a widget to render.
-		jsClient.getDataAccessSubmissions(actAccessRequirementId, nextPageToken, stateFilter, SubmissionOrder.CREATED_ON, isSortedAsc, new AsyncCallback<SubmissionPage>() {
+		jsClient.getDataAccessSubmissions(actAccessRequirementId, accessorId, nextPageToken, stateFilter, SubmissionOrder.CREATED_ON, isSortedAsc, new AsyncCallback<SubmissionPage>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
@@ -230,17 +239,6 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 	}
 
 	@Override
-	public void onClearDateFilter() {
-		fromDate = null;
-		view.setSelectedMinDate(fromDate);
-		place.removeParam(MIN_DATE_PARAM);
-		toDate = null;
-		view.setSelectedMaxDate(toDate);
-		place.removeParam(MAX_DATE_PARAM);
-		loadData();
-	}
-
-	@Override
 	public void onClearStateFilter() {
 		stateFilter = null;
 		place.removeParam(STATE_FILTER_PARAM);
@@ -249,17 +247,26 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 	}
 
 	@Override
-	public void onMaxDateSelected(Date date) {
-		toDate = date;
-		place.putParam(MAX_DATE_PARAM, Long.toString(date.getTime()));
+	public void onClearAccessorFilter() {
+		accessorId = null;
+		place.removeParam(ACCESSOR_ID_PARAM);
+		view.setSelectedAccessorUserBadgeVisible(false);
+		accessorSuggestWidget.clear();
 		loadData();
 	}
-
-	@Override
-	public void onMinDateSelected(Date date) {
-		fromDate = date;
-		place.putParam(MIN_DATE_PARAM, Long.toString(date.getTime()));
-		loadData();
+	
+	public void onAccessorSelected(UserGroupSuggestion suggestion) {
+		if (suggestion != null) {
+			UserGroupHeader header = suggestion.getHeader();
+			accessorId = header.getOwnerId();
+			place.putParam(ACCESSOR_ID_PARAM, header.getOwnerId());
+			selectedAccessorUserBadge.configure(header.getOwnerId());
+			accessorSuggestWidget.clear();
+			view.setSelectedAccessorUserBadgeVisible(true);
+			loadData();
+		} else {
+			onClearAccessorFilter();
+		}
 	}
 
 	public ACTDataAccessSubmissionsPlace getPlace() {

@@ -7,6 +7,7 @@ public class ACTAccessApprovalsPlace extends ParameterizedPlace {
 
 	public static final String ACCESS_REQUIREMENT_ID_PARAM = "AR_ID";
 	public static final String SUBMITTER_ID_PARAM = "SUBMITTER_USER_ID";
+	public static final String ACCESSOR_ID_PARAM = "ACCESSOR_USER_ID";
 	public static final String EXPIRES_BEFORE_PARAM = "EXPIRES_BEFORE";
 
 	public ACTAccessApprovalsPlace(String token) {
