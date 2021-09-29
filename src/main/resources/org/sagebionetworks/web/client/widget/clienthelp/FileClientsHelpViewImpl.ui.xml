@@ -6,7 +6,7 @@
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	<bh:Span>
 		<b:Modal ui:field="modal" closable="true"
-			dataBackdrop="STATIC" dataKeyboard="true">
+			dataBackdrop="STATIC" dataKeyboard="true" size="LARGE">
 			<b:ModalHeader>
 				<b:Heading size="H4" text="Programmatic Download Options"
 					addStyleNames="displayInline" />
@@ -41,21 +41,16 @@
 										# Obtain a pointer and download the data
 										<br />
 										<span ui:field="id2" />
-										= syn.get(entity='
-										<span ui:field="id3" />
-										'
+										= syn.get(entity='<span ui:field="id3" />'
 										<span ui:field="versionUI2">
-											, version=
-											<span ui:field="version2" />
-										</span>
-										)
+											, version=<span ui:field="version2" />
+										</span>)
 										<br />
 										<br />
 										# Get the path to the local copy of the data file
 										<br />
 										filepath =
-										<span ui:field="id4" />
-										.path
+										<span ui:field="id4" />.path
 									</code>
 								</pre>
 							</g:HTMLPanel>
@@ -72,14 +67,10 @@
 										# Obtain a pointer and download the data
 										<br />
 										<span ui:field="id5" />
-										&#60;- synGet(entity='
-										<span ui:field="id6" />
-										'
+										&#60;- synGet(entity='<span ui:field="id6" />'
 										<span ui:field="versionUI3">
-											, version=
-											<span ui:field="version3" />
-										</span>
-										)
+											, version=<span ui:field="version3" />
+										</span>)
 									</code>
 								</pre>
 							</g:HTMLPanel>
