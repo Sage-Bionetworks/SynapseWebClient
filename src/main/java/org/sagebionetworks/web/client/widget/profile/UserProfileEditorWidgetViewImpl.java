@@ -339,13 +339,9 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 	@Override
 	public void setOwnerId(String userId) {
 		_showAccountLevelBadge(accountLevelBadgeContainer.getElement(), userId, propsProvider.getJsniContextProps());
-		boolean isInTestWebsite = DisplayUtils.isInTestWebsite(cookies);
-		userProfileLinksUI.setVisible(isInTestWebsite);
-		if (isInTestWebsite) {
-			UserProfileLinksProps props = UserProfileLinksProps.create(userId);
-			ReactElement component = React.createElementWithSynapseContext(SRC.SynapseComponents.UserProfileLinks, props, propsProvider.getJsInteropContextProps());
-			ReactDOM.render(component, userProfileLinksReactComponentContainer.getElement());
-		}
+		UserProfileLinksProps props = UserProfileLinksProps.create(userId);
+		ReactElement component = React.createElementWithSynapseContext(SRC.SynapseComponents.UserProfileLinks, props, propsProvider.getJsInteropContextProps());
+		ReactDOM.render(component, userProfileLinksReactComponentContainer.getElement());
 	}
 	
 	private static native void _showAccountLevelBadge(Element el, String userId, SynapseContextProviderPropsJSNIObject wrapperProps) /*-{
