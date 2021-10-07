@@ -392,6 +392,9 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 		if (tablesTab.asTab().isTabListItemVisible()) {
 			visibleTabs.add(EntityArea.TABLES);
 		}
+		if (challengeTab.asTab().isTabListItemVisible()) {
+			visibleTabs.add(EntityArea.CHALLENGE);
+		}
 		if (dockerTab.asTab().isTabListItemVisible()) {
 			visibleTabs.add(EntityArea.DOCKER);
 		}
