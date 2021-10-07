@@ -18,6 +18,7 @@ import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
+import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.footer.VersionState;
@@ -25,11 +26,14 @@ import org.sagebionetworks.web.client.widget.footer.VersionState;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.EventTarget;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.UmbrellaException;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceChangeEvent;
 import com.google.gwt.place.shared.PlaceController;
+import com.google.gwt.user.client.Event;
+import com.google.gwt.user.client.Event.NativePreviewEvent;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
@@ -504,6 +508,17 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		}
 		view.initSRCEndpoints(repoUrl, portalUrl);
 
+		// Add a global click handler.
+		Event.addNativePreviewHandler(new Event.NativePreviewHandler() {
+			public void onPreviewNativeEvent(NativePreviewEvent event) {
+				if (event.getTypeInt() == Event.ONCLICK) {
+					Element targetElement = Element.as(event.getNativeEvent().getEventTarget());
+					// SWC-5812: SRC has components that apply this special CSS class, and expect the app to look for these events and handle appropriately.
+					if (targetElement.hasClassName("SRC-SIGN-IN-CLASS")) {
+						getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+					}
+				}
+			}});
 		String showInUTC = cookieProvider.getCookie(SHOW_DATETIME_IN_UTC);
 		if (showInUTC != null) {
 			setShowUTCTime(Boolean.parseBoolean(showInUTC));

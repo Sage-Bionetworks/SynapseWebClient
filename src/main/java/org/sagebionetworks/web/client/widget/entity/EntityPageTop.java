@@ -18,7 +18,6 @@ import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -85,8 +84,9 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 	private EventBus eventBus;
 	private EntityId2BundleCache entityId2BundleCache;
 	public boolean pushTabUrlToBrowserHistory = false;
-	GWTWrapper gwt;
 	public static final EntityBundleRequest ALL_PARTS_REQUEST = new EntityBundleRequest();
+	private int countTabContentChecked;
+	
 	static {
 		ALL_PARTS_REQUEST.setIncludeEntity(true);
 		ALL_PARTS_REQUEST.setIncludeEntityPath(true);
@@ -124,8 +124,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 			SynapseJavascriptClient synapseJavascriptClient,
 			GlobalApplicationState globalAppState,
 			EntityId2BundleCache entityId2BundleCache,
-			EventBus eventBus,
-			GWTWrapper gwt) {
+			EventBus eventBus) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
@@ -145,7 +144,6 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 		this.placeChanger = globalAppState.getPlaceChanger();
 		this.entityId2BundleCache = entityId2BundleCache;
 		this.eventBus = eventBus;
-		this.gwt = gwt;
 
 		initTabs();
 		view.setTabs(tabs.asWidget());
@@ -402,22 +400,18 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 		return visibleTabs;
 	}
 	
-	public void checkForTabVisibilityLater() {
+	public void checkForTabVisibility() {
 		// SWC-5808: Guard against the case where the current area is hidden.  May be hidden because it has no content, and the user does not have permission to create content. 
-		gwt.scheduleExecution(() -> {
-			List<EntityArea> visibleTabs = getVisibleTabs();
-			if (!visibleTabs.contains(area)) {
-				area = visibleTabs.get(0);
-				setCurrentAreaToken(null);
-				pushTabUrlToBrowserHistory = true;
-				reconfigureCurrentArea();
-			}
-		}, 500);
+		List<EntityArea> visibleTabs = getVisibleTabs();
+		if (!visibleTabs.contains(area)) {
+			area = visibleTabs.get(0);
+			setCurrentAreaToken(null);
+			pushTabUrlToBrowserHistory = true;
+			reconfigureCurrentArea();
+		}
 	}
 	
 	public void reconfigureCurrentArea() {
-		checkForTabVisibilityLater();
-		
 		switch (area) {
 			case FILES:
 				configureFilesTab();
@@ -510,6 +504,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 
 	public void showSelectedTabs() {
 		visibleTabCount = 0;
+		countTabContentChecked = 0;
 		// SWC-3137: show all tabs, until project display settings state persists. Challenge is still
 		// dependent on content.
 		// always show the discussion tab
@@ -535,6 +530,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 			@Override
 			public void onFailure(Throwable caught) {
 				view.showErrorMessage(caught.getMessage());
+				tabContentChecked();
 			}
 
 			@Override
@@ -547,6 +543,14 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 				}
 
 				tab.setTabListItemVisible(isContent);
+				tabContentChecked();
+			}
+			
+			private void tabContentChecked() {
+				countTabContentChecked++;
+				if (countTabContentChecked >= EntityArea.values().length) {
+					checkForTabVisibility();
+				}
 			}
 		};
 	}

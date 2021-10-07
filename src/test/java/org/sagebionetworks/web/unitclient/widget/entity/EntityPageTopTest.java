@@ -92,8 +92,6 @@ public class EntityPageTopTest {
 	@Mock
 	FileEntity mockFileEntity;
 	@Mock
-	GWTWrapper mockGWT;
-	@Mock
 	TableEntity mockTableEntity;
 	@Mock
 	DockerRepository mockDockerEntity;
@@ -159,8 +157,6 @@ public class EntityPageTopTest {
 	EventBinder mockEventBinder;
 	@Mock
 	EntityHeader mockProjectEntityHeader;
-	@Captor
-	ArgumentCaptor<Callback> callbackCaptor;
 
 	EntityId2BundleCache entityId2BundleCache;
 	EntityPageTop pageTop;
@@ -182,7 +178,7 @@ public class EntityPageTopTest {
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockView.getEventBinder()).thenReturn(mockEventBinder);
 		entityId2BundleCache = new EntityId2BundleCacheImpl();
-		pageTop = new EntityPageTop(mockView, mockSynapseClientAsync, mockTabs, mockProjectTitleBar, mockProjectMetadata, mockWikiTab, mockFilesTab, mockTablesTab, mockChallengeTab, mockDiscussionTab, mockDockerTab, mockProjectActionController, mockProjectActionMenuWidget, mockCookies, mockSynapseJavascriptClient, mockGlobalApplicationState, entityId2BundleCache, mockEventBus, mockGWT);
+		pageTop = new EntityPageTop(mockView, mockSynapseClientAsync, mockTabs, mockProjectTitleBar, mockProjectMetadata, mockWikiTab, mockFilesTab, mockTablesTab, mockChallengeTab, mockDiscussionTab, mockDockerTab, mockProjectActionController, mockProjectActionMenuWidget, mockCookies, mockSynapseJavascriptClient, mockGlobalApplicationState, entityId2BundleCache, mockEventBus);
 		AsyncMockStubber.callSuccessWith(mockProjectBundle).when(mockSynapseJavascriptClient).getEntityBundleFromCache(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(mockEntityBundle).when(mockSynapseJavascriptClient).getEntityBundleForVersion(anyString(), anyLong(), any(EntityBundleRequest.class), any(AsyncCallback.class));
 
@@ -597,7 +593,7 @@ public class EntityPageTopTest {
 
 	@Test
 	public void testCurrentTabHidden() {
-		when(mockWikiInnerTab.isTabListItemVisible()).thenReturn(false);
+		when(mockWikiInnerTab.isTabListItemVisible()).thenReturn(true);
 		when(mockFilesInnerTab.isTabListItemVisible()).thenReturn(true);
 		when(mockTablesInnerTab.isTabListItemVisible()).thenReturn(false);
 		when(mockDockerInnerTab.isTabListItemVisible()).thenReturn(false);
@@ -607,14 +603,14 @@ public class EntityPageTopTest {
 		Long versionNumber = null;
 		pageTop.configure(mockProjectBundle, versionNumber, mockProjectHeader, area, areaToken);
 
-		// initially the wiki tab is configured.
+		// initially the wiki tab is configured since it's visible.
 		verify(mockWikiTab).configure(anyString(), anyString(), any(EntityBundle.class), anyString(), anyBoolean(), any(WikiPageWidget.Callback.class));
-		verify(mockFilesTab, never()).configure(any(), any());
+		verify(mockFilesTab, never()).configure(mockProjectBundle, versionNumber);
 		
-		//verify that the tab visibility check works
-		verify(mockGWT).scheduleExecution(callbackCaptor.capture(), anyInt());
+		// but if it is not visible, then checking for tab visibility should cause the Files tab to be configured.
+		when(mockWikiInnerTab.isTabListItemVisible()).thenReturn(false);
 		
-		callbackCaptor.getValue().invoke();
+		pageTop.checkForTabVisibility();
 		
 		// we discover that the wiki tab is not visible, so the files tab is configured and shown.
 		verify(mockFilesTab).setProject(projectEntityId, mockProjectBundle, null);
