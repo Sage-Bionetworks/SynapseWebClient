@@ -509,7 +509,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		view.initSRCEndpoints(repoUrl, portalUrl);
 
 		// Add a global click handler.
-		Event.addNativePreviewHandler(new Event.NativePreviewHandler() {
+		view.addNativePreviewHandler(new Event.NativePreviewHandler() {
 			public void onPreviewNativeEvent(NativePreviewEvent event) {
 				if (event.getTypeInt() == Event.ONCLICK) {
 					Element targetElement = Element.as(event.getNativeEvent().getEventTarget());
