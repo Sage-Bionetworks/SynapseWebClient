@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -13,8 +14,9 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import java.util.Collections;
-import org.gwtbootstrap3.client.ui.constants.IconType;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,6 +39,7 @@ import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -48,6 +51,7 @@ import org.sagebionetworks.web.client.events.ChangeSynapsePlaceEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
@@ -65,6 +69,7 @@ import org.sagebionetworks.web.client.widget.entity.tabs.TablesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tabs;
 import org.sagebionetworks.web.client.widget.entity.tabs.WikiTab;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
+
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -584,6 +589,32 @@ public class EntityPageTopTest {
 		// since the project has a root wiki id, it should try to load that instead.
 		verify(mockView).showInfo(anyString());
 		verify(mockWikiTab).configure(eq(projectEntityId), eq(projectName), eq(mockProjectBundle), eq(projectWikiId), eq(canEdit), any(WikiPageWidget.Callback.class));
+	}
+
+	@Test
+	public void testCurrentTabHidden() {
+		when(mockWikiInnerTab.isTabListItemVisible()).thenReturn(true);
+		when(mockFilesInnerTab.isTabListItemVisible()).thenReturn(true);
+		when(mockTablesInnerTab.isTabListItemVisible()).thenReturn(false);
+		when(mockDockerInnerTab.isTabListItemVisible()).thenReturn(false);
+		
+		Synapse.EntityArea area = EntityArea.WIKI;
+		String areaToken = "1234";
+		Long versionNumber = null;
+		pageTop.configure(mockProjectBundle, versionNumber, mockProjectHeader, area, areaToken);
+
+		// initially the wiki tab is configured since it's visible.
+		verify(mockWikiTab).configure(anyString(), anyString(), any(EntityBundle.class), anyString(), anyBoolean(), any(WikiPageWidget.Callback.class));
+		verify(mockFilesTab, never()).configure(mockProjectBundle, versionNumber);
+		
+		// but if it is not visible, then checking for tab visibility should cause the Files tab to be configured.
+		when(mockWikiInnerTab.isTabListItemVisible()).thenReturn(false);
+		
+		pageTop.checkForTabVisibility();
+		
+		// we discover that the wiki tab is not visible, so the files tab is configured and shown.
+		verify(mockFilesTab).setProject(projectEntityId, mockProjectBundle, null);
+		verify(mockFilesTab).configure(mockProjectBundle, versionNumber);
 	}
 
 	@Test

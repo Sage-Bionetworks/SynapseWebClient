@@ -6,6 +6,8 @@ import org.gwtbootstrap3.extras.bootbox.client.options.DialogOptions;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.Event;
+import com.google.gwt.user.client.Event.NativePreviewHandler;
 import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.RootPanel;
 
@@ -70,5 +72,10 @@ public class GlobalApplicationStateViewImpl implements GlobalApplicationStateVie
 	@Override
 	public void back() {
 		History.back();
+	}
+	
+	@Override
+	public void addNativePreviewHandler(NativePreviewHandler handler) {
+		Event.addNativePreviewHandler(handler);
 	}
 }
