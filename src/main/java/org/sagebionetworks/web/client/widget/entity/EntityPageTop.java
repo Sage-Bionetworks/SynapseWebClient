@@ -2,6 +2,9 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -15,6 +18,7 @@ import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -81,6 +85,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 	private EventBus eventBus;
 	private EntityId2BundleCache entityId2BundleCache;
 	public boolean pushTabUrlToBrowserHistory = false;
+	GWTWrapper gwt;
 	public static final EntityBundleRequest ALL_PARTS_REQUEST = new EntityBundleRequest();
 	static {
 		ALL_PARTS_REQUEST.setIncludeEntity(true);
@@ -119,7 +124,8 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 			SynapseJavascriptClient synapseJavascriptClient,
 			GlobalApplicationState globalAppState,
 			EntityId2BundleCache entityId2BundleCache,
-			EventBus eventBus) {
+			EventBus eventBus,
+			GWTWrapper gwt) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
@@ -139,6 +145,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 		this.placeChanger = globalAppState.getPlaceChanger();
 		this.entityId2BundleCache = entityId2BundleCache;
 		this.eventBus = eventBus;
+		this.gwt = gwt;
 
 		initTabs();
 		view.setTabs(tabs.asWidget());
@@ -374,7 +381,40 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 		}
 	}
 
+	private List<EntityArea> getVisibleTabs() {
+		List<EntityArea> visibleTabs = new ArrayList<EntityArea>();
+		if (wikiTab.asTab().isTabListItemVisible()) {
+			visibleTabs.add(EntityArea.WIKI);
+		}
+		if (filesTab.asTab().isTabListItemVisible()) {
+			visibleTabs.add(EntityArea.FILES);
+		}
+		if (tablesTab.asTab().isTabListItemVisible()) {
+			visibleTabs.add(EntityArea.TABLES);
+		}
+		if (dockerTab.asTab().isTabListItemVisible()) {
+			visibleTabs.add(EntityArea.DOCKER);
+		}
+		visibleTabs.add(EntityArea.DISCUSSION);
+		return visibleTabs;
+	}
+	
+	public void checkForTabVisibilityLater() {
+		// SWC-5808: Guard against the case where the current area is hidden.  May be hidden because it has no content, and the user does not have permission to create content. 
+		gwt.scheduleExecution(() -> {
+			List<EntityArea> visibleTabs = getVisibleTabs();
+			if (!visibleTabs.contains(area)) {
+				area = visibleTabs.get(0);
+				setCurrentAreaToken(null);
+				pushTabUrlToBrowserHistory = true;
+				reconfigureCurrentArea();
+			}
+		}, 500);
+	}
+	
 	public void reconfigureCurrentArea() {
+		checkForTabVisibilityLater();
+		
 		switch (area) {
 			case FILES:
 				configureFilesTab();
