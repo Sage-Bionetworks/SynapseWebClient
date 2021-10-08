@@ -97,7 +97,7 @@ public class EntityFinderWidgetViewImpl implements EntityFinderWidgetView {
 	}
 
 	@Override
-	public void renderComponent(EntityFinderScope initialScope, EntityFinderWidget.InitialContainer initialContainer, String projectId, String initialContainerId, boolean showVersions, boolean multiSelect, EntityFilter selectableEntityTypes, EntityFilter visibleTypesInList, EntityFilter visibleTypesInTree, String selectedCopy, boolean treeOnly) {
+	public void renderComponent(EntityFinderScope initialScope, EntityFinderWidget.InitialContainer initialContainer, String projectId, String initialContainerId, boolean showVersions, boolean multiSelect, EntityFilter selectableEntityTypes, EntityFilter visibleTypesInList, EntityFilter visibleTypesInTree, String selectedCopy, boolean treeOnly, boolean mustSelectVersionNumber) {
         entityFinderContainer.clear();
 
         EntityFinderProps.OnSelectCallback onSelected = result -> {
@@ -128,7 +128,8 @@ public class EntityFinderWidgetViewImpl implements EntityFinderWidgetView {
 						visibleTypesInTree.getEntityQueryValues(),
 						selectableEntityTypes.getEntityQueryValues(),
 						selectedCopy,
-						treeOnly
+						treeOnly,
+						mustSelectVersionNumber
 				);
 
 		ReactDOM.render(

@@ -43,7 +43,7 @@ public class EntityFinderWidgetImpl implements EntityFinderWidget, EntityFinderW
     private boolean treeOnly;
     private EntityFinderWidget.SelectedHandler<Reference> selectedHandler;
     private EntityFinderWidget.SelectedHandler<List<Reference>> selectedMultiHandler;
-
+    private boolean mustSelectVersionNumber;
 
     private String modalTitle;
     private String promptCopy;
@@ -99,6 +99,8 @@ public class EntityFinderWidgetImpl implements EntityFinderWidget, EntityFinderW
         showVersions = builder.showVersions;
         initialScope = builder.initialScope;
         visibleTypesInTree = builder.visibleTypesInTree;
+        mustSelectVersionNumber = builder.mustSelectVersionNumber;
+
 
         // Validation
         try {
@@ -132,6 +134,7 @@ public class EntityFinderWidgetImpl implements EntityFinderWidget, EntityFinderW
         private EntityFilter selectableTypes = null;
         private EntityFilter visibleTypesInTree = CONTAINER;
         boolean treeOnly = false;
+        boolean mustSelectVersionNumber = false;
 
         private boolean multiSelect = false;
         private EntityFinderWidget.InitialContainer initialContainer = EntityFinderWidget.InitialContainer.NONE;
@@ -183,6 +186,12 @@ public class EntityFinderWidgetImpl implements EntityFinderWidget, EntityFinderW
         @Override
         public EntityFinderWidget.Builder setSelectableTypes(EntityFilter selectableFilter) {
             this.selectableTypes = selectableFilter;
+            return this;
+        }
+
+        @Override
+        public EntityFinderWidget.Builder setMustSelectVersionNumber(boolean mustSelectVersionNumber) {
+            this.mustSelectVersionNumber = mustSelectVersionNumber;
             return this;
         }
 
@@ -304,11 +313,11 @@ public class EntityFinderWidgetImpl implements EntityFinderWidget, EntityFinderW
                     } else { // otherwise get the project itself
                         parentId = projectId;
                     }
-                    view.renderComponent(initialScope, initialContainer, projectId, parentId, showVersions, multiSelect, selectableTypes, visibleTypesInList, visibleTypesInTree, selectedCopy, treeOnly);
+                    view.renderComponent(initialScope, initialContainer, projectId, parentId, showVersions, multiSelect, selectableTypes, visibleTypesInList, visibleTypesInTree, selectedCopy, treeOnly, mustSelectVersionNumber);
                 }
             });
         } else {
-            view.renderComponent(initialScope, initialContainer,null, null, showVersions, multiSelect, selectableTypes, visibleTypesInList, visibleTypesInTree, selectedCopy, treeOnly);
+            view.renderComponent(initialScope, initialContainer,null, null, showVersions, multiSelect, selectableTypes, visibleTypesInList, visibleTypesInTree, selectedCopy, treeOnly, mustSelectVersionNumber);
         }
     }
 
