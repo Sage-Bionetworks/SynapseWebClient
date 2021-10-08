@@ -80,6 +80,7 @@ public class EntityFinderWidgetImplTest {
         EntityFinderScope scope = EntityFinderScope.ALL_PROJECTS;
         EntityFinderWidget.InitialContainer initialContainer = EntityFinderWidget.InitialContainer.NONE;
         boolean treeOnly = true;
+        boolean mustSelectVersionNumber = false;
 
         String title = "Custom modal title";
         String prompt = "Custom prompt text";
@@ -116,7 +117,7 @@ public class EntityFinderWidgetImplTest {
         // Call under test: show the modal, triggering rendering
         entityFinder.show();
 
-        verify(mockView).renderComponent(scope, EntityFinderWidget.InitialContainer.NONE, null, null, showVersions, multiSelect, selectableTypes, visibleTypesInList, visibleTypesInTree, selected, treeOnly);
+        verify(mockView).renderComponent(scope, EntityFinderWidget.InitialContainer.NONE, null, null, showVersions, multiSelect, selectableTypes, visibleTypesInList, visibleTypesInTree, selected, treeOnly, mustSelectVersionNumber);
     }
 
     @Test
@@ -162,7 +163,7 @@ public class EntityFinderWidgetImplTest {
         getBundleCaptor.getValue().onSuccess(bundle);
 
 
-        verify(mockView).renderComponent(eq(EntityFinderScope.CURRENT_PROJECT), eq(EntityFinderWidget.InitialContainer.PARENT), eq(projectId), eq(containerId), anyBoolean(), anyBoolean(), any(EntityFilter.class), any(EntityFilter.class), any(EntityFilter.class), anyString(), anyBoolean());
+        verify(mockView).renderComponent(eq(EntityFinderScope.CURRENT_PROJECT), eq(EntityFinderWidget.InitialContainer.PARENT), eq(projectId), eq(containerId), anyBoolean(), anyBoolean(), any(EntityFilter.class), any(EntityFilter.class), any(EntityFilter.class), anyString(), anyBoolean(), anyBoolean());
     }
 
     @Test

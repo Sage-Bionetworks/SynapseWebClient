@@ -38,6 +38,8 @@ public interface EntityFinderWidget {
 
 		Builder setSelectableTypes(EntityFilter selectableFilter);
 
+		Builder setMustSelectVersionNumber(boolean mustSelectVersion);
+
 		Builder setVisibleTypesInList(EntityFilter visibleFilter);
 
 		Builder setVisibleTypesInTree(EntityFilter visibleTypesInTree);

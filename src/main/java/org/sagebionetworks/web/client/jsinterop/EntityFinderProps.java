@@ -38,6 +38,8 @@ public class EntityFinderProps extends ReactComponentProps {
     String selectedCopy;
     @JsNullable
     boolean treeOnly;
+    @JsNullable
+    boolean mustSelectVersionNumber;
 
     @JsOverlay
     public static EntityFinderProps create(
@@ -51,7 +53,8 @@ public class EntityFinderProps extends ReactComponentProps {
             List<EntityType> visibleTypesInTree,
             List<EntityType> selectableTypes,
             String selectedCopy,
-            boolean treeOnly
+            boolean treeOnly,
+            boolean mustSelectVersionNumber
     ) {
         EntityFinderProps props = new EntityFinderProps();
         props.onSelectedChange = onSelectedChange;
@@ -74,6 +77,7 @@ public class EntityFinderProps extends ReactComponentProps {
         }
         props.selectedCopy = selectedCopy;
         props.treeOnly = treeOnly;
+        props.mustSelectVersionNumber = mustSelectVersionNumber;
         return props;
     }
 }
