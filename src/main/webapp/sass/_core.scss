@@ -3464,7 +3464,7 @@ div.border {
 		box-shadow: -12px 0px 20px -15px rgb(74 80 86 / 15%);
 		min-height: $full-root-panel-height;
 		.TabContent {
-			max-height: $full-root-panel-height;
+			max-height: 900px;
 		}
 	}
 	display: grid;
