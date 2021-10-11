@@ -194,7 +194,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			@Override
 			public void onCanceled() {}
 		};
-		reconfigureActionsCallback = () -> reconfigureActions();
+		reconfigureActionsCallback = () -> {
+			reconfigureActions();
+		};
 	}
 
 	private void fireEntityUpdatedEvent() {
