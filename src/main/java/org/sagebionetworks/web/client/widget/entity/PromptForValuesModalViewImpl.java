@@ -7,6 +7,7 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.FormLabel;
 import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -16,6 +17,7 @@ import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.ValueBoxBase;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -25,9 +27,24 @@ import com.google.inject.Inject;
  */
 public class PromptForValuesModalViewImpl implements PromptForValuesModalView {
 
+	/**
+	 * We map the enum to a new instance of each class, since we can't use reflection in client side code.
+	 */
+	private ValueBoxBase<String> getNewInstanceOfInputField(InputType type) {
+		switch (type) {
+			case TEXTBOX:
+				return new TextBox();
+			case TEXTAREA:
+				return new TextArea();
+			default:
+				throw new RuntimeException("Invalid input type: " + type.name());
+		}
+	}
+
 	public interface Binder extends UiBinder<Modal, PromptForValuesModalViewImpl> {
 	}
 
+	@UiField
 	Modal modal;
 	@UiField
 	Div form;
@@ -38,7 +55,7 @@ public class PromptForValuesModalViewImpl implements PromptForValuesModalView {
 	@UiField
 	Button defaultButton;
 	CallbackP<List<String>> newValuesCallback;
-	List<TextBox> textBoxes;
+	List<ValueBoxBase<String>> textBoxes;
 	SynapseAlert synAlert;
 	KeyDownHandler handler;
 	String originalButtonText;
@@ -73,8 +90,8 @@ public class PromptForValuesModalViewImpl implements PromptForValuesModalView {
 	private void onPrimary() {
 		// collect values
 		List<String> values = new ArrayList<>();
-		for (TextBox textBox : textBoxes) {
-			values.add(textBox.getValue());
+		for (ValueBoxBase<String> formField : textBoxes) {
+			values.add(formField.getValue());
 		}
 		newValuesCallback.invoke(values);
 	}
@@ -99,6 +116,16 @@ public class PromptForValuesModalViewImpl implements PromptForValuesModalView {
 
 	@Override
 	public void configureAndShow(String title, List<String> prompts, List<String> initialValues, CallbackP<List<String>> newValuesCallback) {
+		// By default, use a TextBox for each field
+		List<InputType> textboxForEach = new ArrayList<>(prompts.size());
+		for (int i = 0; i < prompts.size(); i++) {
+			textboxForEach.add(InputType.TEXTBOX);
+		}
+		configureAndShow(title, prompts, initialValues, textboxForEach, newValuesCallback);
+	}
+
+	@Override
+	public void configureAndShow(String title, List<String> prompts, List<String> initialValues, List<InputType> inputTypes, CallbackP<List<String>> newValuesCallback) {
 		clear();
 		modal.setTitle(title);
 		this.newValuesCallback = newValuesCallback;
@@ -112,19 +139,19 @@ public class PromptForValuesModalViewImpl implements PromptForValuesModalView {
 		for (int i = 0; i < prompts.size(); i++) {
 			FormGroup group = new FormGroup();
 			FormLabel label = new FormLabel();
-			TextBox textBox = new TextBox();
-			textBox.addKeyDownHandler(handler);
+			ValueBoxBase<String> inputBox = getNewInstanceOfInputField(inputTypes.get(i));
+			inputBox.addKeyDownHandler(handler);
 			group.add(label);
-			group.add(textBox);
+			group.add(inputBox);
 			String prompt = prompts.get(i);
 			label.setText(prompt);
 			if (initialValues != null) {
 				String initialValue = initialValues.get(i);
-				textBox.setValue(initialValue);
+				inputBox.setValue(initialValue);
 			}
 
 			form.add(group);
-			textBoxes.add(textBox);
+			textBoxes.add(inputBox);
 		}
 		modal.show();
 	}

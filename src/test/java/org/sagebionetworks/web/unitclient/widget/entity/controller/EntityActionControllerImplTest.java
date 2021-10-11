@@ -23,6 +23,7 @@ import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.ARE_YOU_SURE_YOU_WANT_TO_DELETE;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETE_FOLDER_EXPLANATION;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETE_PREFIX;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.EDIT_NAME_AND_DESCRIPTION;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.EDIT_WIKI_PREFIX;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.MOVE_PREFIX;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.RENAME_PREFIX;
@@ -344,7 +345,7 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionListener(Action.SHARE, controller);
 		// rename
 		verify(mockActionMenu).setActionVisible(Action.CHANGE_ENTITY_NAME, true);
-		verify(mockActionMenu).setActionText(Action.CHANGE_ENTITY_NAME, RENAME_PREFIX + EntityTypeUtils.getDisplayName(EntityType.table));
+		verify(mockActionMenu).setActionText(Action.CHANGE_ENTITY_NAME, EDIT_NAME_AND_DESCRIPTION);
 		verify(mockActionMenu).setActionListener(Action.CHANGE_ENTITY_NAME, controller);
 		// upload
 		verify(mockActionMenu).setActionVisible(Action.UPLOAD_NEW_FILE, false);
@@ -1052,10 +1053,10 @@ public class EntityActionControllerImplTest {
 
 
 	@Test
-	public void testIsRenameOnly() {
-		assertFalse(controller.isRenameOnly(new FileEntity()));
-		assertTrue(controller.isRenameOnly(new TableEntity()));
-		assertFalse(controller.isRenameOnly(new Project()));
+	public void testHasCustomRenameEditor() {
+		assertTrue(controller.hasCustomRenameEditor(new FileEntity()));
+		assertFalse(controller.hasCustomRenameEditor(new TableEntity()));
+		assertTrue(controller.hasCustomRenameEditor(new Project()));
 	}
 
 	@Test

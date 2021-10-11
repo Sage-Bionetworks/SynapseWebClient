@@ -33,6 +33,7 @@ import org.sagebionetworks.repo.model.file.ExternalS3UploadDestination;
 import org.sagebionetworks.repo.model.file.ExternalUploadDestination;
 import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.file.UploadType;
+import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -81,10 +82,12 @@ public class EntityMetadataTest {
 	String entityName = "testEntity";
 	EntityMetadata widget;
 	Folder folderEntity = new Folder();
+	TableEntity tableEntity = new TableEntity();
 
 	@Before
 	public void before() {
 		when(mockGinInjector.getVersionHistoryWidget()).thenReturn(mockFileHistoryWidget);
+		when(mockGinInjector.getCookieProvider()).thenReturn(mockCookies);
 		widget = new EntityMetadata(mockView, mockDoiWidgetV2, mockAnnotationsWidget, mockJsClient, mockJSNI, mockRestrictionWidgetV2, mockItemCountWidget, mockGinInjector);
 	}
 
@@ -450,4 +453,83 @@ public class EntityMetadataTest {
 		verify(mockView, never()).setRestrictionWidgetV2Visible(false);
 		verify(mockItemCountWidget).configure(entityId);
 	}
+
+	@Test
+	public void testSetDescriptionForTable() {
+		// We currently only show the description field for Tables
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+
+
+		String description = "A description for a table";
+
+		EntityBundle bundle = new EntityBundle();
+		bundle.setEntity(tableEntity);
+		tableEntity.setDescription(description);
+		tableEntity.setId(entityId);
+		tableEntity.setIsLatestVersion(true);
+
+		UserEntityPermissions permissions = mock(UserEntityPermissions.class);
+		boolean canChangePermissions = false;
+		boolean canCertifiedUserEdit = true;
+		when(permissions.getCanChangePermissions()).thenReturn(canChangePermissions);
+		when(permissions.getCanCertifiedUserEdit()).thenReturn(canCertifiedUserEdit);
+		bundle.setPermissions(permissions);
+		bundle.setDoiAssociation(mockDoiAssociation);
+
+		widget.configure(bundle, null, mockActionMenuWidget);
+
+		verify(mockView).setDescription(description);
+		verify(mockView).setDescriptionVisible(true);
+	}
+
+	@Test
+	public void testNoDescriptionForNonTables() {
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+
+		String description = "A description for a FOLDER";
+
+		EntityBundle bundle = new EntityBundle();
+		bundle.setEntity(folderEntity);
+		folderEntity.setDescription(description);
+		folderEntity.setId(entityId);
+		tableEntity.setIsLatestVersion(true);
+
+		UserEntityPermissions permissions = mock(UserEntityPermissions.class);
+		boolean canChangePermissions = false;
+		boolean canCertifiedUserEdit = true;
+		when(permissions.getCanChangePermissions()).thenReturn(canChangePermissions);
+		when(permissions.getCanCertifiedUserEdit()).thenReturn(canCertifiedUserEdit);
+		bundle.setPermissions(permissions);
+		bundle.setDoiAssociation(mockDoiAssociation);
+
+		widget.configure(bundle, null, mockActionMenuWidget);
+
+		verify(mockView).setDescriptionVisible(false);
+	}
+
+	@Test
+	public void testNoDescriptionWithoutExperimentalMode() {
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn(null);
+
+		String description = "A description for a table";
+
+		EntityBundle bundle = new EntityBundle();
+		bundle.setEntity(tableEntity);
+		tableEntity.setDescription(description);
+		tableEntity.setId(entityId);
+		tableEntity.setIsLatestVersion(true);
+
+		UserEntityPermissions permissions = mock(UserEntityPermissions.class);
+		boolean canChangePermissions = false;
+		boolean canCertifiedUserEdit = true;
+		when(permissions.getCanChangePermissions()).thenReturn(canChangePermissions);
+		when(permissions.getCanCertifiedUserEdit()).thenReturn(canCertifiedUserEdit);
+		bundle.setPermissions(permissions);
+		bundle.setDoiAssociation(mockDoiAssociation);
+
+		widget.configure(bundle, null, mockActionMenuWidget);
+
+		verify(mockView).setDescriptionVisible(false);
+	}
+
 }

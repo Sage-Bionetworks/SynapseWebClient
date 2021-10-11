@@ -8,6 +8,8 @@ public interface EntityMetadataView extends IsWidget {
 
 	void setAnnotationsVisible(boolean visible);
 
+	void setDescriptionVisible(boolean visible);
+
 	public interface Presenter {
 	}
 
@@ -34,4 +36,6 @@ public interface EntityMetadataView extends IsWidget {
 	void setAnnotationsTitleText(String text);
 
 	void setContainerItemCountWidget(IsWidget w);
+
+	void setDescription(String description);
 }

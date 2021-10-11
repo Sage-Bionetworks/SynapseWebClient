@@ -12,11 +12,15 @@ public interface CreateTableViewWizardStep1View extends IsWidget {
 
 	/**
 	 * Name of entity chosen by the user
-	 * 
+	 *
 	 */
 	String getName();
 
 	void setName(String name);
+
+	String getDescription();
+
+	void setDescription(String description);
 
 	/**
 	 * Add widget to set/get scope.

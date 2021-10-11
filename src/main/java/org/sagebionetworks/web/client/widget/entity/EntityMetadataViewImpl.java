@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.Collapse;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -61,6 +62,10 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	Span uploadDestinationField;
 	@UiField
 	Text annotationsTitleText;
+	@UiField
+	Div descriptionContainer;
+	@UiField
+	Paragraph descriptionText;
 	@UiField
 	ReactComponentDiv annotationsModalContainer;
 
@@ -128,6 +133,11 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	}
 
 	@Override
+	public void setDescriptionVisible(boolean visible) {
+		descriptionContainer.setVisible(visible);
+	}
+
+	@Override
 	public void setVersionHistoryWidget(IsWidget fileHistoryWidget) {
 		fileHistoryContainer.clear();
 		fileHistoryContainer.add(fileHistoryWidget);
@@ -170,5 +180,10 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@Override
 	public void setAnnotationsTitleText(String text) {
 		annotationsTitleText.setText(text);
+	}
+
+	@Override
+	public void setDescription(String description) {
+		descriptionText.setText(description);
 	}
 }
