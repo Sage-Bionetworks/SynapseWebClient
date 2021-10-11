@@ -119,13 +119,18 @@ public class RenameEntityModalWidgetImpl implements RenameEntityModalWidget {
 		prompts.add("Name");
 		List<String> initialValues = new ArrayList<>();
 		initialValues.add(toRename.getName());
+
+		List<PromptForValuesModalView.InputType> inputTypes = new ArrayList<>();
+		inputTypes.add(PromptForValuesModalView.InputType.TEXTBOX);
+
 		// Only surfacing description for Table types (in experimental mode for now)
 		if (toRename instanceof Table && DisplayUtils.isInTestWebsite(cookies)) {
 			prompts.add("Description");
 			initialValues.add(toRename.getDescription());
+			inputTypes.add(PromptForValuesModalView.InputType.TEXTAREA);
 		}
 
-		this.view.configureAndShow(TITLE_PREFIX + typeName, prompts, initialValues, this::onRename);
+		this.view.configureAndShow(TITLE_PREFIX + typeName, prompts, initialValues, inputTypes, this::onRename);
 	}
 
 

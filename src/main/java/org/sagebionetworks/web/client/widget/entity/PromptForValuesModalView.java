@@ -1,7 +1,9 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.List;
+
 import org.sagebionetworks.web.client.utils.CallbackP;
+
 import com.google.gwt.user.client.ui.IsWidget;
 
 /**
@@ -9,6 +11,13 @@ import com.google.gwt.user.client.ui.IsWidget;
  *
  */
 public interface PromptForValuesModalView extends IsWidget {
+
+	/**
+	 * Defining each possible input type we can use in this class
+	 */
+	enum InputType {
+		TEXTBOX, TEXTAREA;
+	}
 
 	public void configureAndShow(String title, String prompt, String initialValue, CallbackP<String> newValueCallback);
 
@@ -21,6 +30,10 @@ public interface PromptForValuesModalView extends IsWidget {
 	 * @param newValuesCallback Call back containing new values
 	 */
 	public void configureAndShow(String title, List<String> prompts, List<String> initialValues, CallbackP<List<String>> newValuesCallback);
+
+
+	public void configureAndShow(String title, List<String> prompts, List<String> initialValues, List<PromptForValuesModalViewImpl.InputType> inputType, CallbackP<List<String>> newValuesCallback);
+
 
 	/**
 	 * Show an error message..
