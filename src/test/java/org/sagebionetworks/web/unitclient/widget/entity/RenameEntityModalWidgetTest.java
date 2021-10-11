@@ -74,14 +74,14 @@ public class RenameEntityModalWidgetTest {
 	public void testOnRename() {
 		widget.onRename(entity, mockCallback);
 
-		verify(mockView).configureAndShow(eq(TITLE_PREFIX + entityDisplayType), eq(Arrays.asList("Name")), eq(Arrays.asList(startName)), any(CallbackP.class));
+		verify(mockView).configureAndShow(eq(TITLE_PREFIX + entityDisplayType), eq(Arrays.asList("Name")), eq(Arrays.asList(startName)), eq(Arrays.asList(PromptForValuesModalView.InputType.TEXTBOX)), any(CallbackP.class));
 	}
 
 	@Test
 	public void testNullName() {
 		widget.onRename(entity, mockCallback);
 
-		verify(mockView).configureAndShow(anyString(), anyList(), anyList(), promptCallbackCaptor.capture());
+		verify(mockView).configureAndShow(anyString(), anyList(), anyList(), anyList(), promptCallbackCaptor.capture());
 		promptCallbackCaptor.getValue().invoke(null);
 		verify(mockView).showError(NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER);
 		verify(mockJsClient, never()).updateEntity(any(Entity.class), anyString(), anyBoolean(), any(AsyncCallback.class));
@@ -92,7 +92,7 @@ public class RenameEntityModalWidgetTest {
 	@Test
 	public void testNameNotChanged() {
 		widget.onRename(entity, mockCallback);
-		verify(mockView).configureAndShow(anyString(), anyList(), anyList(), promptCallbackCaptor.capture());
+		verify(mockView).configureAndShow(anyString(), anyList(), anyList(), anyList(), promptCallbackCaptor.capture());
 		// Calling save with no real change just closes the dialog.
 		promptCallbackCaptor.getValue().invoke(Arrays.asList(startName));
 		verify(mockView, never()).setLoading(true);
@@ -107,7 +107,7 @@ public class RenameEntityModalWidgetTest {
 		String newName = "a new name";
 		widget.onRename(entity, mockCallback);
 		AsyncMockStubber.callSuccessWith(new TableEntity()).when(mockJsClient).updateEntity(entityCaptor.capture(), anyString(), anyBoolean(), any(AsyncCallback.class));
-		verify(mockView).configureAndShow(anyString(), anyList(), anyList(), promptCallbackCaptor.capture());
+		verify(mockView).configureAndShow(anyString(), anyList(), anyList(), anyList(), promptCallbackCaptor.capture());
 		promptCallbackCaptor.getValue().invoke(Arrays.asList(newName));
 
 		assertEquals(entityCaptor.getValue().getName(), newName);
@@ -125,7 +125,7 @@ public class RenameEntityModalWidgetTest {
 		widget.onRename(entity, mockCallback);
 		AsyncMockStubber.callFailureWith(error).when(mockJsClient).updateEntity(any(Entity.class), anyString(), anyBoolean(), any(AsyncCallback.class));
 
-		verify(mockView).configureAndShow(anyString(), anyList(), anyList(), promptCallbackCaptor.capture());
+		verify(mockView).configureAndShow(anyString(), anyList(), anyList(), anyList(), promptCallbackCaptor.capture());
 		promptCallbackCaptor.getValue().invoke(Arrays.asList(newName));
 
 		verify(mockView).setLoading(true);
@@ -145,7 +145,7 @@ public class RenameEntityModalWidgetTest {
 		String newDescription = "a new description";
 
 		widget.onRename(tableEntity, mockCallback);
-		verify(mockView).configureAndShow(anyString(), eq(Arrays.asList("Name", "Description")), eq(Arrays.asList(startName, startDescription)), promptCallbackCaptor.capture());
+		verify(mockView).configureAndShow(anyString(), eq(Arrays.asList("Name", "Description")), eq(Arrays.asList(startName, startDescription)), eq(Arrays.asList(PromptForValuesModalView.InputType.TEXTBOX, PromptForValuesModalView.InputType.TEXTAREA)), promptCallbackCaptor.capture());
 		promptCallbackCaptor.getValue().invoke(Arrays.asList(startName, newDescription));
 
 		assertEquals(entityCaptor.getValue().getName(), startName); // Name should not have changed
@@ -166,7 +166,7 @@ public class RenameEntityModalWidgetTest {
 		String newDescription = null;
 
 		widget.onRename(tableEntity, mockCallback);
-		verify(mockView).configureAndShow(anyString(), eq(Arrays.asList("Name", "Description")), eq(Arrays.asList(startName, startDescription)), promptCallbackCaptor.capture());
+		verify(mockView).configureAndShow(anyString(), eq(Arrays.asList("Name", "Description")), eq(Arrays.asList(startName, startDescription)), eq(Arrays.asList(PromptForValuesModalView.InputType.TEXTBOX, PromptForValuesModalView.InputType.TEXTAREA)), promptCallbackCaptor.capture());
 		promptCallbackCaptor.getValue().invoke(Arrays.asList(startName, newDescription));
 
 		verify(mockJsClient, never()).updateEntity(any(Entity.class), anyString(), anyBoolean(), any(AsyncCallback.class));
