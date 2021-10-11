@@ -20,6 +20,7 @@ import org.sagebionetworks.repo.model.file.ExternalUploadDestination;
 import org.sagebionetworks.repo.model.file.S3UploadDestination;
 import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.file.UploadType;
+import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -87,6 +88,8 @@ public class EntityMetadata implements Presenter {
 		clear();
 		Entity en = bundle.getEntity();
 		view.setEntityId(en.getId());
+		view.setDescriptionVisible(bundle.getEntity() instanceof Table && en.getDescription() != null && DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider()));
+		view.setDescription(en.getDescription());
 		boolean canEdit = bundle.getPermissions().getCanCertifiedUserEdit();
 		isShowingAnnotations = false;
 		setAnnotationsVisible(isShowingAnnotations);

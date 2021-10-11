@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.modal.fileview;
 
 import org.gwtbootstrap3.client.ui.FormGroup;
+import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -9,6 +10,8 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 
 public class CreateTableViewWizardStep1ViewImpl implements CreateTableViewWizardStep1View {
 
@@ -17,6 +20,10 @@ public class CreateTableViewWizardStep1ViewImpl implements CreateTableViewWizard
 
 	@UiField
 	TextBox nameField;
+	@UiField
+	FormGroup descriptionFormGroup;
+	@UiField
+	TextArea descriptionField;
 	@UiField
 	SimplePanel entityViewScopeContainer;
 	@UiField
@@ -32,13 +39,15 @@ public class CreateTableViewWizardStep1ViewImpl implements CreateTableViewWizard
 	FileViewOptions viewOptions;
 
 	@Inject
-	public CreateTableViewWizardStep1ViewImpl(Binder binder, FileViewOptions viewOptions) {
+	public CreateTableViewWizardStep1ViewImpl(Binder binder, FileViewOptions viewOptions, CookieProvider cookies) {
 		widget = binder.createAndBindUi(this);
 		this.viewOptions = viewOptions;
 		viewOptionsContainer.add(viewOptions);
 		viewOptions.addClickHandler(event -> {
 			p.updateViewTypeMask();
 		});
+		// This constructor won't re-run unless the page is refreshed, so the FormGroup won't be visible after enabling Experimental Mode w/o a refresh
+		descriptionFormGroup.setVisible(DisplayUtils.isInTestWebsite(cookies));
 	}
 
 	@Override
@@ -84,6 +93,16 @@ public class CreateTableViewWizardStep1ViewImpl implements CreateTableViewWizard
 	@Override
 	public void setName(String name) {
 		nameField.setText(name);
+	}
+
+	@Override
+	public String getDescription() {
+		return descriptionField.getText();
+	}
+
+	@Override
+	public void setDescription(String description) {
+		descriptionField.setText(description);
 	}
 
 	@Override
