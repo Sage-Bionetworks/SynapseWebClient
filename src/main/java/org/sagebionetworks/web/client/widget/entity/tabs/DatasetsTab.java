@@ -40,12 +40,12 @@ import org.sagebionetworks.web.shared.WidgetConstants;
 import com.google.gwt.place.shared.Place;
 import com.google.inject.Inject;
 
-public class DatasetsTab implements DatasetsTabView.Presenter, QueryChangeHandler {
+public class DatasetsTab implements TablesTabView.Presenter, QueryChangeHandler {
 
 	public static final String TABLE_QUERY_PREFIX = "query/";
 
 	Tab tab;
-	DatasetsTabView view;
+	TablesTabView view;
 	TableListWidget tableListWidget;
 	BasicTitleBar datasetsTitleBar;
 	Breadcrumb breadcrumb;
@@ -76,7 +76,7 @@ public class DatasetsTab implements DatasetsTabView.Presenter, QueryChangeHandle
 
 	public void lazyInject() {
 		if (view == null) {
-			this.view = ginInjector.getDatasetsTabView();
+			this.view = ginInjector.getTablesTabView();
 			this.tableListWidget = ginInjector.getTableListWidget();
 			this.datasetsTitleBar = ginInjector.getBasicTitleBar();
 			this.breadcrumb = ginInjector.getBreadcrumb();

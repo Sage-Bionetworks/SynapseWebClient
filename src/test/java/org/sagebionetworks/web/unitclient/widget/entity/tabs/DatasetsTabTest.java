@@ -54,9 +54,9 @@ import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.tabs.DatasetsTab;
-import org.sagebionetworks.web.client.widget.entity.tabs.DatasetsTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.entity.tabs.TablesTab;
+import org.sagebionetworks.web.client.widget.entity.tabs.TablesTabView;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
@@ -73,7 +73,7 @@ public class DatasetsTabTest {
 	@Mock
 	CallbackP<Tab> mockOnClickCallback;
 	@Mock
-	DatasetsTabView mockView;
+	TablesTabView mockView;
 	@Mock
 	TableListWidget mockTableListWidget;
 	@Mock
@@ -140,7 +140,7 @@ public class DatasetsTabTest {
 		when(mockTab.getEntityActionMenu()).thenReturn(mockActionMenuWidget);
 		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
 		when(mockPortalGinInjector.getCookieProvider()).thenReturn(mockCookies);
-		when(mockPortalGinInjector.getDatasetsTabView()).thenReturn(mockView);
+		when(mockPortalGinInjector.getTablesTabView()).thenReturn(mockView);
 		when(mockPortalGinInjector.getTableListWidget()).thenReturn(mockTableListWidget);
 		when(mockPortalGinInjector.getBasicTitleBar()).thenReturn(mockTitleBar);
 		when(mockPortalGinInjector.getBreadcrumb()).thenReturn(mockBreadcrumb);
