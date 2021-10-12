@@ -121,6 +121,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	public static final String DELETE_PREFIX = "Delete ";
 
 	public static final String RENAME_PREFIX = "Rename ";
+	public static final String EDIT_NAME_AND_DESCRIPTION = "Edit Name and Description";
 
 	public static final int IS_ACT_MEMBER_MASK = 0x20;
 
@@ -842,9 +843,13 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 
 	private void configureRenameAction() {
-		if (isRenameOnly(entityBundle.getEntity()) && !(entityBundle.getEntity() instanceof DockerRepository)) {
+		if (!hasCustomRenameEditor(entityBundle.getEntity()) && !(entityBundle.getEntity() instanceof DockerRepository)) {
 			actionMenu.setActionVisible(Action.CHANGE_ENTITY_NAME, permissions.getCanEdit());
-			actionMenu.setActionText(Action.CHANGE_ENTITY_NAME, RENAME_PREFIX + entityTypeDisplay);
+			String text = RENAME_PREFIX + entityTypeDisplay;
+			if (entityBundle.getEntity() instanceof Table && DisplayUtils.isInTestWebsite(cookies)) {
+				text = EDIT_NAME_AND_DESCRIPTION;
+			}
+			actionMenu.setActionText(Action.CHANGE_ENTITY_NAME, text);
 			actionMenu.setActionListener(Action.CHANGE_ENTITY_NAME, this);
 		} else {
 			actionMenu.setActionVisible(Action.CHANGE_ENTITY_NAME, false);
@@ -963,13 +968,13 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	 * @param entity
 	 * @return
 	 */
-	public boolean isRenameOnly(Entity entity) {
+	public boolean hasCustomRenameEditor(Entity entity) {
 		if (entity instanceof FileEntity) {
-			return false;
+			return true;
 		} else if (entity instanceof Project) {
-			return false;
+			return true;
 		}
-		return true;
+		return false;
 	}
 
 	@Override

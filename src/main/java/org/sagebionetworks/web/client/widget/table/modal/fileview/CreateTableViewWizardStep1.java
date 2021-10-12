@@ -91,6 +91,7 @@ public class CreateTableViewWizardStep1 implements ModalPage, CreateTableViewWiz
 		entityContainerList.configure(new ArrayList<Reference>(), canEdit, type);
 		submissionViewScope.configure(new ArrayList<Evaluation>());
 		view.setName("");
+		view.setDescription("");
 	}
 
 	/**
@@ -98,7 +99,7 @@ public class CreateTableViewWizardStep1 implements ModalPage, CreateTableViewWiz
 	 * 
 	 * @param name
 	 */
-	private void createEntity(final String name) {
+	private void createEntity(final String name, final String description) {
 		modalPresenter.setLoading(true);
 		Table table;
 		if (TableType.table.equals(tableType)) {
@@ -125,6 +126,7 @@ public class CreateTableViewWizardStep1 implements ModalPage, CreateTableViewWiz
 		}
 		table.setName(name);
 		table.setParentId(parentId);
+		table.setDescription(description);
 		createEntity(table);
 	}
 
@@ -149,10 +151,11 @@ public class CreateTableViewWizardStep1 implements ModalPage, CreateTableViewWiz
 	@Override
 	public void onPrimary() {
 		String tableName = view.getName();
+		String tableDescription = view.getDescription();
 		if (tableName == null || "".equals(tableName)) {
 			modalPresenter.setErrorMessage(NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER);
 		} else {
-			createEntity(tableName);
+			createEntity(tableName, tableDescription);
 		}
 	}
 

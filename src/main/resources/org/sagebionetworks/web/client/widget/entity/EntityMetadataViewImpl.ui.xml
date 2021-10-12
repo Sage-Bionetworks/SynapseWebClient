@@ -36,6 +36,11 @@
 				</bh:Span>
 			</bh:Div>
 		</g:HTMLPanel>
+		<bh:Div ui:field="descriptionContainer">
+			<bh:Paragraph addStyleNames="boldText" ui:field="descriptionTitleText">Description</bh:Paragraph>
+			<bh:Paragraph ui:field="descriptionText" />
+		</bh:Div>
+
 		<b:Collapse ui:field="annotationsContent" toggle="false"
 			b:id="annotationContentCollapse">
 			<g:FlowPanel
