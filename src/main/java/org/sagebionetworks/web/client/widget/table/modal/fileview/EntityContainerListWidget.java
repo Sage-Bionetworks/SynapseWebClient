@@ -1,10 +1,8 @@
 package org.sagebionetworks.web.client.widget.table.modal.fileview;
 
-import java.sql.Ref;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityType;
@@ -18,6 +16,7 @@ import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidget.SelectedHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -155,10 +154,9 @@ public class EntityContainerListWidget implements EntityContainerListWidgetView.
 
 	@Override
 	public void onRemoveEntity(String id) {
-		for (int i = 0; i < references.size(); i++) {
+		for (int i = references.size() - 1; i >= 0; i--) {
 			if (references.get(i).getTargetId().equals(id)) {
 				references.remove(i);
-				i--;
 			}
 		}
 	}
