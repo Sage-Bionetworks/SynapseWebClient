@@ -95,7 +95,7 @@ public class EntityContainerListWidgetTest {
 		verify(mockView).addEntity(headerId, headerName, showDeleteButton);
 
 		assertTrue(widget.getEntityIds().contains(headerId));
-		widget.onRemoveProject(headerId);
+		widget.onRemoveEntity(headerId);
 		assertTrue(widget.getEntityIds().isEmpty());
 
 		boolean showVersions = false;
@@ -157,7 +157,7 @@ public class EntityContainerListWidgetTest {
 	@Test
 	public void testOnAddProject() {
 		widget.configure(Collections.singletonList(entityReference), true, TableType.projects);
-		widget.onAddProject();
+		widget.onAddEntity();
 		verify(mockEntityFinder).show();
 	}
 
@@ -168,7 +168,7 @@ public class EntityContainerListWidgetTest {
 		widget.configure(Collections.singletonList(entityReference), true, TableType.projects);
 
 		AsyncMockStubber.callSuccessWith(returnList).when(mockSynapseJavascriptClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
-		widget.onAddProject(headerId);
+		widget.onAddEntity(headerId);
 
 		verify(mockView, times(2)).setNoContainers(false);
 		verify(mockEntityFinder).hide();
@@ -184,7 +184,7 @@ public class EntityContainerListWidgetTest {
 		widget.configure(Collections.singletonList(entityReference), true, TableType.projects);
 
 		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
-		widget.onAddProject(headerId);
+		widget.onAddEntity(headerId);
 
 		verify(mockEntityFinder).showError(error);
 	}
@@ -194,7 +194,7 @@ public class EntityContainerListWidgetTest {
 		widget.configure(Collections.singletonList(entityReference), true, TableType.projects);
 
 		AsyncMockStubber.callSuccessWith(new ArrayList<EntityHeader>()).when(mockSynapseJavascriptClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
-		widget.onAddProject(headerId);
+		widget.onAddEntity(headerId);
 
 		verify(mockEntityFinder).showError(DisplayConstants.ERROR_LOADING);
 	}

@@ -14,9 +14,9 @@ public interface EntityContainerListWidgetView extends IsWidget {
 	void setNoContainers(boolean visible);
 
 	public interface Presenter {
-		void onAddProject();
+		void onAddEntity();
 
-		void onRemoveProject(String id);
+		void onRemoveEntity(String id);
 	}
 
 	void setPresenter(Presenter presenter);

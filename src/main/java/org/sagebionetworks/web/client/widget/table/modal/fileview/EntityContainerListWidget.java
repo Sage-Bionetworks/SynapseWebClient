@@ -1,8 +1,11 @@
 package org.sagebionetworks.web.client.widget.table.modal.fileview;
 
+import java.sql.Ref;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.EntityTypeUtils;
@@ -25,7 +28,6 @@ public class EntityContainerListWidget implements EntityContainerListWidgetView.
 	EntityFinderWidget.Builder entityFinderBuilder;
 	EntityContainerListWidgetView view;
 	SynapseJavascriptClient jsClient;
-	List<String> entityIds;
 	List<Reference> references;
 	SynapseAlert synAlert;
 	boolean canEdit = true;
@@ -39,13 +41,12 @@ public class EntityContainerListWidget implements EntityContainerListWidgetView.
 		this.synAlert = synAlert;
 		view.setPresenter(this);
 
-		entityIds = new ArrayList<String>();
 		references = new ArrayList<Reference>();
 		selectionHandler = new SelectedHandler<List<Reference>>() {
 			@Override
 			public void onSelected(List<Reference> selected, EntityFinderWidget finder) {
 				for (Reference ref : selected) {
-					onAddProject(ref.getTargetId());
+					onAddEntity(ref.getTargetId());
 				}
 			}
 		};
@@ -53,7 +54,6 @@ public class EntityContainerListWidget implements EntityContainerListWidgetView.
 
 	public void configure(List<Reference> entityContainerIds, boolean canEdit, TableType tableType) {
 		view.clear();
-		entityIds.clear();
 		references.clear();
 		this.canEdit = canEdit;
 		view.setAddButtonVisible(canEdit);
@@ -73,7 +73,6 @@ public class EntityContainerListWidget implements EntityContainerListWidgetView.
 						reference.setTargetId(header.getId());
 						reference.setTargetVersionNumber(header.getVersionNumber());
 						references.add(reference);
-						entityIds.add(header.getId());
 						view.addEntity(header.getId(), header.getName(), EntityContainerListWidget.this.canEdit);
 					}
 				}
@@ -119,7 +118,7 @@ public class EntityContainerListWidget implements EntityContainerListWidgetView.
 	}
 
 	@Override
-	public void onAddProject() {
+	public void onAddEntity() {
 		finder.show();
 	}
 
@@ -128,7 +127,8 @@ public class EntityContainerListWidget implements EntityContainerListWidgetView.
 	 * 
 	 * @param id
 	 */
-	public void onAddProject(String id) {
+	public void onAddEntity(String id) {
+		// TODO: Support versions
 		jsClient.getEntityHeaderBatch(Collections.singletonList(id), new AsyncCallback<ArrayList<EntityHeader>>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -139,7 +139,6 @@ public class EntityContainerListWidget implements EntityContainerListWidgetView.
 			public void onSuccess(ArrayList<EntityHeader> entityHeaders) {
 				if (entityHeaders.size() == 1) {
 					EntityHeader entity = entityHeaders.get(0);
-					entityIds.add(entity.getId());
 					Reference reference = new Reference();
 					reference.setTargetId(entity.getId());
 					reference.setTargetVersionNumber(entity.getVersionNumber());
@@ -155,11 +154,20 @@ public class EntityContainerListWidget implements EntityContainerListWidgetView.
 	}
 
 	@Override
-	public void onRemoveProject(String id) {
-		entityIds.remove(id);
+	public void onRemoveEntity(String id) {
+		for (int i = 0; i < references.size(); i++) {
+			if (references.get(i).getTargetId().equals(id)) {
+				references.remove(i);
+				i--;
+			}
+		}
 	}
 
 	public List<String> getEntityIds() {
+		List<String> entityIds = new ArrayList<>(references.size());
+		for (Reference reference : references) {
+			entityIds.add(reference.getTargetId());
+		}
 		return entityIds;
 	}
 
