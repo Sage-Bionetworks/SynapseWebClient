@@ -18,6 +18,7 @@ import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer.RenderOption;
 
 /**
  * Factory for creating table cells.
@@ -35,6 +36,12 @@ public class CellFactory {
 	}
 
 	public Cell createRenderer(ColumnModel model) {
+		// SWC-5806: Special case the "id" column, to only show the Synapse ID.
+		if (model.getName() == "id" && model.getColumnType() == ColumnType.ENTITYID) {
+			EntityIdCellRenderer renderer = ginInjector.createEntityIdCellRenderer();
+			renderer.setRenderOption(RenderOption.ID);
+			return renderer;
+		}
 		return createRenderer(model.getColumnType());
 	}
 

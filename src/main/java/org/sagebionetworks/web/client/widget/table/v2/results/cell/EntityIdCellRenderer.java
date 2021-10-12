@@ -22,13 +22,15 @@ public class EntityIdCellRenderer implements Cell, TakesAddressCell {
 	ClickHandler customClickHandler;
 	CellAddress address;
 	boolean hideIfLoadError;
-	boolean showEntityId = false;
+	RenderOption renderOption = RenderOption.NAME;
+
+	public static enum RenderOption {
+		NAME, ID, NAME_AND_ID
+	}
 
 	@Inject
-	public EntityIdCellRenderer(EntityIdCellRendererView view, 
-			EntityHeaderAsyncHandler entityHeaderAsyncHandler,
-			VersionedEntityHeaderAsyncHandler versionedHeaderAsyncHandler,
-			SynapseJSNIUtils jsniUtils) {
+	public EntityIdCellRenderer(EntityIdCellRendererView view, EntityHeaderAsyncHandler entityHeaderAsyncHandler,
+			VersionedEntityHeaderAsyncHandler versionedHeaderAsyncHandler, SynapseJSNIUtils jsniUtils) {
 		this.view = view;
 		this.entityHeaderAsyncHandler = entityHeaderAsyncHandler;
 		this.versionedHeaderAsyncHandler = versionedHeaderAsyncHandler;
@@ -40,10 +42,11 @@ public class EntityIdCellRenderer implements Cell, TakesAddressCell {
 			view.showLoadingIcon();
 			String requestEntityId = entityId.toLowerCase().startsWith("syn") ? entityId : "syn" + entityId;
 			if (address != null && address.getColumn().getName().equals("id")) {
-				// This Entity type column is named "id". 
-				// if the row matches the synapse ID, set the version based on the cell address row_version 
+				// This Entity type column is named "id".
+				// if the row matches the synapse ID, set the version based on the cell address
+				// row_version
 				if (requestEntityId.equals("syn" + address.getRowId())) {
-					entityVersion = address.getRowVersion();	
+					entityVersion = address.getRowVersion();
 				}
 			}
 			String dotVersionEntityId = entityVersion != null ? requestEntityId + "." + entityVersion : requestEntityId;
@@ -55,7 +58,19 @@ public class EntityIdCellRenderer implements Cell, TakesAddressCell {
 				@Override
 				public void onSuccess(EntityHeader entity) {
 					entityName = entity.getName();
-					String linkText = showEntityId ? entityName + " (" + entity.getId() + ")" : entityName;
+					String linkText;
+					switch (renderOption) {
+					case ID:
+						linkText = entity.getId();
+						break;
+					case NAME_AND_ID:
+						linkText = entityName + " (" + entity.getId() + ")";
+						break;
+					case NAME:
+					default:
+						linkText = entityName;
+						break;
+					}
 					view.setIcon(EntityTypeUtils.getIconTypeForEntityClassName(entity.getType()));
 					view.setLinkText(linkText);
 				}
@@ -72,16 +87,17 @@ public class EntityIdCellRenderer implements Cell, TakesAddressCell {
 				}
 			};
 			if (entityVersion != null) {
-				versionedHeaderAsyncHandler.getEntityHeader(requestEntityId, entityVersion, callback);	
+				versionedHeaderAsyncHandler.getEntityHeader(requestEntityId, entityVersion, callback);
 			} else {
-				entityHeaderAsyncHandler.getEntityHeader(requestEntityId, callback);	
+				entityHeaderAsyncHandler.getEntityHeader(requestEntityId, callback);
 			}
 		}
 	}
 
-	public void setShowEntityId(boolean showEntityId) {
-		this.showEntityId = showEntityId;
+	public void setRenderOption(RenderOption renderOption) {
+		this.renderOption = renderOption;
 	}
+
 	@Override
 	public Widget asWidget() {
 		return this.view.asWidget();
@@ -110,11 +126,10 @@ public class EntityIdCellRenderer implements Cell, TakesAddressCell {
 		return entityId;
 	}
 
-
 	public void setVisible(boolean visible) {
 		view.setVisible(visible);
 	}
-	
+
 	@Override
 	public void setCellAddresss(CellAddress address) {
 		this.address = address;
