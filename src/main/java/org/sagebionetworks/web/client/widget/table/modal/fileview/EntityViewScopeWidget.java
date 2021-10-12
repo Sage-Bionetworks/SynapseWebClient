@@ -22,11 +22,11 @@ import com.google.inject.Inject;
 
 /**
  * All business logic for viewing and editing the EntityView scope.
- *
- *
- *
+ * <p>
+ * <p>
+ * <p>
  * Scope Widget - these are the UI output elements in this widget:
- *
+ * <p>
  * +-------------------------------------------+ |Scope | | | | (EntityContainerListWidget, not
  * editable)| | | | +----+ | | |Edit| (shown if widget set to editable) | | +----+ |
  * +------------------------------------+------+ | ^ | onEdit (show modal) | onSave (update view
@@ -34,9 +34,7 @@ import com.google.inject.Inject;
  * EntityContainerListWidget) | | | | +------+ +----+ | | |Cancel| |Save| | | +------+ +----+ |
  * +-------------------------------------------+
  *
- *
  * @author Jay
- *
  */
 public class EntityViewScopeWidget implements SynapseWidgetPresenter, EntityViewScopeWidgetView.Presenter {
 	boolean isEditable;
@@ -173,7 +171,7 @@ public class EntityViewScopeWidget implements SynapseWidgetPresenter, EntityView
 		List<Reference> references = new ArrayList<>();
 		// configure edit list, and show modal
 		if (currentView instanceof EntityView) {
-            references = getReferencesFromIdList(((EntityView) currentView).getScopeIds());
+			references = getReferencesFromIdList(((EntityView) currentView).getScopeIds());
 		} else if (currentView instanceof Dataset) {
 			references = getReferencesFromDatasetItems(((Dataset) currentView).getItems());
 		}
