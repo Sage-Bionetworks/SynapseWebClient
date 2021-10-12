@@ -2,16 +2,12 @@ package org.sagebionetworks.web.unitclient.widget.table.v2.results.cell;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
-import java.util.function.Consumer;
 
-import org.gwtbootstrap3.client.ui.Button;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -19,12 +15,9 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
-import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanFormCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.Cell;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellRenderer;
@@ -32,6 +25,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateListRende
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DoubleCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer.RenderOption;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdListRendererCellView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumFormCellEditor;
@@ -175,6 +169,16 @@ public class CellFactoryImplTest {
 		ColumnModel cm = new ColumnModel();
 		cm.setColumnType(ColumnType.ENTITYID);
 		assertEquals(mockEntityIdCellRenderer, cellFactory.createRenderer(cm));
+		verify(mockEntityIdCellRenderer, never()).setRenderOption(RenderOption.ID);
+	}
+
+	@Test
+	public void testGetIdColumnEntityIdRenderer() {
+		ColumnModel cm = new ColumnModel();
+		cm.setName("id");
+		cm.setColumnType(ColumnType.ENTITYID);
+		assertEquals(mockEntityIdCellRenderer, cellFactory.createRenderer(cm));
+		verify(mockEntityIdCellRenderer).setRenderOption(RenderOption.ID);
 	}
 
 	@Test
