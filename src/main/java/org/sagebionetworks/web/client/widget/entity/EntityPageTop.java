@@ -15,6 +15,7 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
+import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -35,6 +36,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.EntityActionContr
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTab;
+import org.sagebionetworks.web.client.widget.entity.tabs.DatasetsTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.DiscussionTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.DockerTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.FilesTab;
@@ -53,21 +55,22 @@ import com.google.web.bindery.event.shared.binder.EventHandler;
 public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 	public static final String PROJECT_SETTINGS = "Project Settings";
 	private EntityPageTopView view;
-	private EntityBundle currentTargetEntityBundle, projectBundle, filesEntityBundle, tablesEntityBundle, dockerEntityBundle;
+	private EntityBundle currentTargetEntityBundle, projectBundle, filesEntityBundle, tablesEntityBundle, dockerEntityBundle, datasetsEntityBundle;
 	private Throwable projectBundleLoadError;
 	private Entity entity;
 	private SynapseJavascriptClient synapseJavascriptClient;
 
 	private Synapse.EntityArea area;
 	private String initialAreaToken;
-	private String wikiAreaToken, tablesAreaToken, discussionAreaToken, dockerAreaToken;
-	private Long currentTargetVersionNumber, filesVersionNumber, tablesVersionNumber;
+	private String wikiAreaToken, tablesAreaToken, discussionAreaToken, dockerAreaToken, datasetsAreaToken;
+	private Long currentTargetVersionNumber, filesVersionNumber, tablesVersionNumber, datasetsVersionNumber;
 	private EntityHeader projectHeader;
 
 	private Tabs tabs;
 	private WikiTab wikiTab;
 	private FilesTab filesTab;
 	private TablesTab tablesTab;
+	private DatasetsTab datasetsTab;
 	private ChallengeTab challengeTab;
 	private DiscussionTab discussionTab;
 	private DockerTab dockerTab;
@@ -114,6 +117,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 			EntityMetadata projectMetadata,
 			WikiTab wikiTab,
 			FilesTab filesTab,
+		    DatasetsTab datasetsTab,
 			TablesTab tablesTab,
 			ChallengeTab challengeTab,
 			DiscussionTab discussionTab,
@@ -131,6 +135,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 		this.tabs = tabs;
 		this.wikiTab = wikiTab;
 		this.filesTab = filesTab;
+		this.datasetsTab = datasetsTab;
 		this.tablesTab = tablesTab;
 		this.challengeTab = challengeTab;
 		this.discussionTab = discussionTab;
@@ -205,6 +210,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 
 	private void clearAreaTokens() {
 		tablesAreaToken = null;
+		datasetsAreaToken = null;
 		dockerAreaToken = null;
 		discussionAreaToken = null;
 		wikiAreaToken = null;
@@ -213,6 +219,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 	private void initTabs() {
 		tabs.addTab(wikiTab.asTab());
 		tabs.addTab(filesTab.asTab());
+		tabs.addTab(datasetsTab.asTab());
 		tabs.addTab(tablesTab.asTab());
 		tabs.addTab(challengeTab.asTab());
 		tabs.addTab(discussionTab.asTab());
@@ -220,6 +227,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 
 		filesTab.setEntitySelectedCallback(getEntitySelectedCallback(EntityArea.FILES));
 		tablesTab.setEntitySelectedCallback(getEntitySelectedCallback(EntityArea.TABLES));
+		datasetsTab.setEntitySelectedCallback(getEntitySelectedCallback(EntityArea.DATASETS));
 		dockerTab.setEntitySelectedCallback(getEntitySelectedCallback(EntityArea.DOCKER));
 
 		// lazy init tabs, and show project information (if set)
@@ -251,6 +259,18 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 			area = EntityArea.FILES;
 			configureFilesTab();
 		});
+
+		datasetsTab.setTabClickedCallback(tab -> {
+			// SWC-4078: if already on tab, reset to project level.
+			if (EntityArea.DATASETS.equals(area)) {
+				datasetsEntityBundle = projectBundle;
+				datasetsTab.asTab().setContentStale(true);
+			}
+
+			area = EntityArea.DATASETS;
+			configureDatasetsTab();
+		});
+
 		tablesTab.setTabClickedCallback(tab -> {
 			// SWC-4078: if already on tab, reset to project level.
 			if (EntityArea.TABLES.equals(area)) {
@@ -275,8 +295,6 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 
 	/**
 	 * Update the bundle attached to this EntityPageTop.
-	 *
-	 * @param bundle
 	 */
 	public void configure(EntityBundle targetEntityBundle, Long versionNumber, EntityHeader projectHeader, Synapse.EntityArea initArea, String areaToken) {
 		this.currentTargetEntityBundle = targetEntityBundle;
@@ -285,6 +303,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 		this.area = initArea;
 		this.initialAreaToken = areaToken;
 		wikiAreaToken = null;
+		datasetsAreaToken = null;
 		tablesAreaToken = null;
 		discussionAreaToken = null;
 		dockerAreaToken = null;
@@ -313,6 +332,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 
 			wikiTab.asTab().setEntityNameAndPlace(projectName, new Synapse(projectId, versionNumber, EntityArea.WIKI, wikiAreaToken));
 			filesTab.asTab().setEntityNameAndPlace(projectName, new Synapse(projectId, versionNumber, EntityArea.FILES, null));
+			datasetsTab.asTab().setEntityNameAndPlace(projectName, new Synapse(projectId, versionNumber, EntityArea.DATASETS, datasetsAreaToken));
 			tablesTab.asTab().setEntityNameAndPlace(projectName, new Synapse(projectId, versionNumber, EntityArea.TABLES, tablesAreaToken));
 			challengeTab.asTab().setEntityNameAndPlace(projectName, new Synapse(projectId, versionNumber, EntityArea.CHALLENGE, null));
 			discussionTab.asTab().setEntityNameAndPlace(projectName, new Synapse(projectId, versionNumber, EntityArea.DISCUSSION, discussionAreaToken));
@@ -330,7 +350,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 			public void onSuccess(EntityBundle bundle) {
 				view.setProjectLoadingVisible(false);
 				// by default, all tab entity bundles point to the project entity bundle
-				projectBundle = filesEntityBundle = tablesEntityBundle = dockerEntityBundle = bundle;
+				projectBundle = filesEntityBundle = tablesEntityBundle = datasetsEntityBundle = dockerEntityBundle = bundle;
 				projectTitleBar.configure(projectBundle);
 				projectMetadata.configure(projectBundle, null, projectActionMenu);
 				view.setProjectUIVisible(true);
@@ -387,6 +407,9 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 		if (filesTab.asTab().isTabListItemVisible()) {
 			visibleTabs.add(EntityArea.FILES);
 		}
+		if (datasetsTab.asTab().isTabListItemVisible()) {
+			visibleTabs.add(EntityArea.DATASETS);
+		}
 		if (tablesTab.asTab().isTabListItemVisible()) {
 			visibleTabs.add(EntityArea.TABLES);
 		}
@@ -420,6 +443,10 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 			case WIKI:
 				configureWikiTab();
 				tabs.showTab(wikiTab.asTab(), pushTabUrlToBrowserHistory);
+				break;
+			case DATASETS:
+				configureDatasetsTab();
+				tabs.showTab(datasetsTab.asTab(), pushTabUrlToBrowserHistory);
 				break;
 			case TABLES:
 				configureTablesTab();
@@ -462,6 +489,9 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 				case FILES:
 					fileChanged(bundle, currentTargetVersionNumber);
 					break;
+				case DATASETS:
+					datasetChanged(bundle, currentTargetVersionNumber);
+					break;
 				case TABLES:
 					tableChanged(bundle, currentTargetVersionNumber);
 					break;
@@ -473,6 +503,8 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 		} else {
 			if (entity instanceof FileEntity || entity instanceof Folder) {
 				fileChanged(bundle, currentTargetVersionNumber);
+			} else if (entity instanceof Dataset) {
+				datasetChanged(bundle, currentTargetVersionNumber);
 			} else if (entity instanceof Table) {
 				tableChanged(bundle, currentTargetVersionNumber);
 			} else if (entity instanceof DockerRepository) {
@@ -487,6 +519,14 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 		area = EntityArea.DOCKER;
 		dockerTab.asTab().setContentStale(true);
 	}
+
+	private void datasetChanged(EntityBundle bundle, Long version) {
+		datasetsEntityBundle = bundle;
+		datasetsVersionNumber = version;
+		area = EntityArea.DATASETS;
+		datasetsTab.asTab().setContentStale(true);
+	}
+
 
 	private void tableChanged(EntityBundle bundle, Long version) {
 		tablesEntityBundle = bundle;
@@ -513,12 +553,18 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 			// if user can edit, then show other tabs
 			getTabVisibilityCallback(EntityArea.WIKI, wikiTab.asTab()).onSuccess(true);
 			getTabVisibilityCallback(EntityArea.FILES, filesTab.asTab()).onSuccess(true);
+			if (DisplayUtils.isInTestWebsite(cookies)) {
+				getTabVisibilityCallback(EntityArea.DATASETS, datasetsTab.asTab()).onSuccess(true);
+			}
 			getTabVisibilityCallback(EntityArea.TABLES, tablesTab.asTab()).onSuccess(true);
 			getTabVisibilityCallback(EntityArea.DOCKER, dockerTab.asTab()).onSuccess(true);
 		} else {
 			// otherwise only show the tabs only if content is present.
 			synapseJavascriptClient.isWiki(projectHeader.getId(), getTabVisibilityCallback(EntityArea.WIKI, wikiTab.asTab()));
 			synapseJavascriptClient.isFileOrFolder(projectHeader.getId(), getTabVisibilityCallback(EntityArea.FILES, filesTab.asTab()));
+			if (DisplayUtils.isInTestWebsite(cookies)) {
+				synapseJavascriptClient.isDataset(projectHeader.getId(), getTabVisibilityCallback(EntityArea.DATASETS, datasetsTab.asTab()));
+			}
 			synapseJavascriptClient.isTable(projectHeader.getId(), getTabVisibilityCallback(EntityArea.TABLES, tablesTab.asTab()));
 			synapseJavascriptClient.isDocker(projectHeader.getId(), getTabVisibilityCallback(EntityArea.DOCKER, dockerTab.asTab()));
 		}
@@ -560,6 +606,8 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 		wikiTab.asTab().setTabListItemVisible(false);
 		filesTab.asTab().setTabListItemVisible(false);
 		filesTab.resetView();
+		datasetsTab.asTab().setTabListItemVisible(false);
+		datasetsTab.resetView();
 		tablesTab.asTab().setTabListItemVisible(false);
 		tablesTab.resetView();
 		challengeTab.asTab().setTabListItemVisible(false);
@@ -578,6 +626,9 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 		}
 		if (filesTab.asTab().isTabListItemVisible()) {
 			return EntityArea.FILES;
+		}
+		if (datasetsTab.asTab().isTabListItemVisible()) {
+			return EntityArea.DATASETS;
 		}
 		if (tablesTab.asTab().isTabListItemVisible()) {
 			return EntityArea.TABLES;
@@ -598,6 +649,8 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 		EntityArea area = null;
 		if (entity instanceof Project) {
 			area = getDefaultProjectArea();
+		} else if (entity instanceof Dataset) {
+			area = EntityArea.DATASETS;
 		} else if (entity instanceof Table) {
 			area = EntityArea.TABLES;
 		} else if (entity instanceof DockerRepository) {
@@ -626,6 +679,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 		// set all content stale
 		filesTab.asTab().setContentStale(true);
 		wikiTab.asTab().setContentStale(true);
+		datasetsTab.asTab().setContentStale(true);
 		tablesTab.asTab().setContentStale(true);
 		challengeTab.asTab().setContentStale(true);
 		discussionTab.asTab().setContentStale(true);
@@ -638,6 +692,10 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 			case WIKI:
 				wikiAreaToken = token;
 				wikiTab.asTab().setContentStale(true);
+				break;
+			case DATASETS:
+				datasetsAreaToken = token;
+				datasetsTab.asTab().setContentStale(true);
 				break;
 			case TABLES:
 				tablesAreaToken = token;
@@ -669,6 +727,14 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 			return view.asWidget();
 		}
 		return null;
+	}
+
+	public void configureDatasetsTab() {
+		if (datasetsTab.asTab().isContentStale()) {
+			datasetsTab.setProject(projectHeader.getId(), projectBundle, projectBundleLoadError);
+			datasetsTab.configure(datasetsEntityBundle, datasetsVersionNumber, datasetsAreaToken);
+			datasetsTab.asTab().setContentStale(false);
+		}
 	}
 
 	public void configureTablesTab() {
@@ -773,5 +839,8 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 	// for testing
 	public String getTablesAreaToken() {
 		return tablesAreaToken;
+	}
+	public String getDatasetsAreaToken() {
+		return datasetsAreaToken;
 	}
 }

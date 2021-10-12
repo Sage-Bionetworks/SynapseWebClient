@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.modal.fileview;
 
 import org.gwtbootstrap3.client.ui.ModalSize;
+import org.sagebionetworks.web.client.widget.entity.tabs.DatasetsTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.TablesTab;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
@@ -40,6 +41,9 @@ public class CreateTableViewWizard {
 		} else if (TableType.table.equals(type)) {
 			this.modalWizardWidget.setTitle("Create Table");
 			this.modalWizardWidget.setHelp(TablesTab.TABLES_HELP, TablesTab.TABLES_HELP_URL);
+		} else if (TableType.dataset.equals(type)) {
+			this.modalWizardWidget.setTitle("Create Dataset");
+			this.modalWizardWidget.setHelp(DatasetsTab.DATASETS_HELP, DatasetsTab.DATASETS_HELP_URL);
 		} else if (TableType.submission_view.equals(type)) {
 			this.modalWizardWidget.setTitle("Create Submission View");
 			// TODO: send to submission view docs page (https://github.com/Sage-Bionetworks/synapseDocs/issues/787)

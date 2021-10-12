@@ -54,6 +54,9 @@ public class Breadcrumb implements BreadcrumbView.Presenter, SynapseWidgetPresen
 						// show files as root
 						name = DisplayConstants.FILES;
 						place.setArea(EntityArea.FILES);
+					} else if (optionalArea == EntityArea.DATASETS && Project.class.getName().equals(element.getType())) {
+						name = DisplayConstants.DATASETS;
+						place.setArea(EntityArea.DATASETS);
 					} else if (optionalArea == EntityArea.TABLES && Project.class.getName().equals(element.getType())) {
 						// show tables as root
 						name = DisplayConstants.TABLES;

@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -37,9 +36,9 @@ import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
+import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -51,7 +50,6 @@ import org.sagebionetworks.web.client.events.ChangeSynapsePlaceEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
@@ -61,6 +59,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.EntityActionContr
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTab;
+import org.sagebionetworks.web.client.widget.entity.tabs.DatasetsTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.DiscussionTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.DockerTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.FilesTab;
@@ -94,6 +93,8 @@ public class EntityPageTopTest {
 	@Mock
 	TableEntity mockTableEntity;
 	@Mock
+	Dataset mockDatasetEntity;
+	@Mock
 	DockerRepository mockDockerEntity;
 	@Mock
 	SynapseClientAsync mockSynapseClientAsync;
@@ -110,9 +111,13 @@ public class EntityPageTopTest {
 	@Mock
 	Tab mockFilesInnerTab;
 	@Mock
+	DatasetsTab mockDatasetsTab;
+	@Mock
 	TablesTab mockTablesTab;
 	@Mock
 	Tab mockTablesInnerTab;
+	@Mock
+	Tab mockDatasetsInnerTab;
 	@Mock
 	ChallengeTab mockChallengeTab;
 	@Mock
@@ -172,13 +177,14 @@ public class EntityPageTopTest {
 		when(mockFilesTab.asTab()).thenReturn(mockFilesInnerTab);
 		when(mockWikiTab.asTab()).thenReturn(mockWikiInnerTab);
 		when(mockTablesTab.asTab()).thenReturn(mockTablesInnerTab);
+		when(mockDatasetsTab.asTab()).thenReturn(mockDatasetsInnerTab);
 		when(mockChallengeTab.asTab()).thenReturn(mockChallengeInnerTab);
 		when(mockDiscussionTab.asTab()).thenReturn(mockDiscussionInnerTab);
 		when(mockDockerTab.asTab()).thenReturn(mockDockerInnerTab);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockView.getEventBinder()).thenReturn(mockEventBinder);
 		entityId2BundleCache = new EntityId2BundleCacheImpl();
-		pageTop = new EntityPageTop(mockView, mockSynapseClientAsync, mockTabs, mockProjectTitleBar, mockProjectMetadata, mockWikiTab, mockFilesTab, mockTablesTab, mockChallengeTab, mockDiscussionTab, mockDockerTab, mockProjectActionController, mockProjectActionMenuWidget, mockCookies, mockSynapseJavascriptClient, mockGlobalApplicationState, entityId2BundleCache, mockEventBus);
+		pageTop = new EntityPageTop(mockView, mockSynapseClientAsync, mockTabs, mockProjectTitleBar, mockProjectMetadata, mockWikiTab, mockFilesTab, mockDatasetsTab, mockTablesTab, mockChallengeTab, mockDiscussionTab, mockDockerTab, mockProjectActionController, mockProjectActionMenuWidget, mockCookies, mockSynapseJavascriptClient, mockGlobalApplicationState, entityId2BundleCache, mockEventBus);
 		AsyncMockStubber.callSuccessWith(mockProjectBundle).when(mockSynapseJavascriptClient).getEntityBundleFromCache(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(mockEntityBundle).when(mockSynapseJavascriptClient).getEntityBundleForVersion(anyString(), anyLong(), any(EntityBundleRequest.class), any(AsyncCallback.class));
 
@@ -191,7 +197,7 @@ public class EntityPageTopTest {
 		when(mockPermissions.getCanCertifiedUserEdit()).thenReturn(canEdit);
 		when(mockPermissions.getCanModerate()).thenReturn(canModerate);
 		when(mockProjectBundle.getAccessControlList()).thenReturn(mockACL);
-		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("fake cookie");
+		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("true");
 		EntityPath path = new EntityPath();
 		path.setPath(Collections.singletonList(mockProjectEntityHeader));
 		when(mockProjectEntityHeader.getType()).thenReturn(Project.class.getName());
@@ -200,12 +206,14 @@ public class EntityPageTopTest {
 		AsyncMockStubber.callSuccessWith(true).when(mockSynapseJavascriptClient).isWiki(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(true).when(mockSynapseJavascriptClient).isFileOrFolder(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(true).when(mockSynapseJavascriptClient).isTable(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(true).when(mockSynapseJavascriptClient).isDataset(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClientAsync).isChallenge(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(true).when(mockSynapseJavascriptClient).isDocker(anyString(), any(AsyncCallback.class));
 
 		when(mockWikiInnerTab.isTabListItemVisible()).thenReturn(true);
 		when(mockFilesInnerTab.isTabListItemVisible()).thenReturn(true);
 		when(mockTablesInnerTab.isTabListItemVisible()).thenReturn(true);
+		when(mockDatasetsInnerTab.isTabListItemVisible()).thenReturn(true);
 		when(mockChallengeInnerTab.isTabListItemVisible()).thenReturn(true);
 		when(mockDiscussionInnerTab.isTabListItemVisible()).thenReturn(true);
 		when(mockDockerInnerTab.isTabListItemVisible()).thenReturn(true);
@@ -213,6 +221,7 @@ public class EntityPageTopTest {
 		when(mockWikiInnerTab.isContentStale()).thenReturn(true);
 		when(mockFilesInnerTab.isContentStale()).thenReturn(true);
 		when(mockTablesInnerTab.isContentStale()).thenReturn(true);
+		when(mockDatasetsInnerTab.isContentStale()).thenReturn(true);
 		when(mockDiscussionInnerTab.isContentStale()).thenReturn(true);
 		when(mockDockerInnerTab.isContentStale()).thenReturn(true);
 		when(mockChallengeInnerTab.isContentStale()).thenReturn(true);
@@ -228,6 +237,7 @@ public class EntityPageTopTest {
 		verify(mockTabs).addTab(mockFilesInnerTab);
 		verify(mockTabs).addTab(mockWikiInnerTab);
 		verify(mockTabs).addTab(mockTablesInnerTab);
+		verify(mockTabs).addTab(mockDatasetsInnerTab);
 		verify(mockTabs).addTab(mockChallengeInnerTab);
 		verify(mockTabs).addTab(mockDiscussionInnerTab);
 		verify(mockTabs).addTab(mockDockerInnerTab);
@@ -253,6 +263,10 @@ public class EntityPageTopTest {
 		selectEntityCallback.getValue().invoke(null);
 		verify(mockTabs).showTab(mockTablesInnerTab, true);
 
+		verify(mockDatasetsTab).setEntitySelectedCallback(selectEntityCallback.capture());
+		selectEntityCallback.getValue().invoke(null);
+		verify(mockTabs).showTab(mockDatasetsInnerTab, true);
+
 		verify(mockDockerTab).setEntitySelectedCallback(selectEntityCallback.capture());
 		selectEntityCallback.getValue().invoke(null);
 		verify(mockTabs).showTab(mockDockerInnerTab, true);
@@ -276,6 +290,26 @@ public class EntityPageTopTest {
 		verify(mockTabs).showTab(mockTablesInnerTab, true);
 		assertNull(pageTop.getTablesAreaToken());
 	}
+
+	@Test
+	public void testSelectDatasetListingClearsQueryToken() {
+		EntityArea area = EntityArea.DATASETS;
+		String initialAreaToken = "query/eyJzcWwiOiJzZWxlY3Qg";
+		Long versionNumber = null;
+
+		pageTop.configure(mockProjectBundle, versionNumber, mockProjectHeader, area, initialAreaToken);
+
+		assertEquals(initialAreaToken, pageTop.getDatasetsAreaToken());
+
+		ArgumentCaptor<CallbackP> selectEntityCallback = ArgumentCaptor.forClass(CallbackP.class);
+
+		verify(mockDatasetsTab).setEntitySelectedCallback(selectEntityCallback.capture());
+		// select the project
+		selectEntityCallback.getValue().invoke("syn123");
+		verify(mockTabs).showTab(mockDatasetsInnerTab, true);
+		assertNull(pageTop.getDatasetsAreaToken());
+	}
+
 
 	@Test
 	public void testConfigureWithProject() {
@@ -308,6 +342,8 @@ public class EntityPageTopTest {
 		verify(mockFilesTab, never()).configure(mockProjectBundle, versionNumber);
 		verify(mockTablesTab, never()).setProject(projectEntityId, mockProjectBundle, null);
 		verify(mockTablesTab, never()).configure(mockProjectBundle, versionNumber, areaToken);
+		verify(mockDatasetsTab, never()).setProject(projectEntityId, mockProjectBundle, null);
+		verify(mockDatasetsTab, never()).configure(mockProjectBundle, versionNumber, areaToken);
 		verify(mockChallengeTab, never()).configure(projectEntityId, projectName, mockProjectBundle);
 		verify(mockDiscussionTab, never()).configure(projectEntityId, projectName, mockProjectBundle, areaToken, canModerate);
 		verify(mockDockerTab, never()).configure(mockProjectBundle, areaToken);
@@ -318,6 +354,8 @@ public class EntityPageTopTest {
 		verify(mockFilesTab).configure(mockProjectBundle, versionNumber);
 		verify(mockTablesTab).setProject(projectEntityId, mockProjectBundle, null);
 		verify(mockTablesTab).configure(mockProjectBundle, versionNumber, areaToken);
+		verify(mockDatasetsTab).setProject(projectEntityId, mockProjectBundle, null);
+		verify(mockDatasetsTab).configure(mockProjectBundle, versionNumber, areaToken);
 		verify(mockChallengeTab).configure(projectEntityId, projectName, mockProjectBundle);
 		verify(mockDiscussionTab).configure(projectEntityId, projectName, mockProjectBundle, areaToken, canModerate);
 		verify(mockChallengeTab).updateActionMenuCommands();
@@ -336,6 +374,9 @@ public class EntityPageTopTest {
 
 		// click on the files tab
 		verify(mockFilesTab).setTabClickedCallback(tabCaptor.capture());
+		tabCaptor.getValue().invoke(null);
+		// click on the datasets tab
+		verify(mockDatasetsTab).setTabClickedCallback(tabCaptor.capture());
 		tabCaptor.getValue().invoke(null);
 		// click on the tables tab
 		verify(mockTablesTab).setTabClickedCallback(tabCaptor.capture());
@@ -367,6 +408,7 @@ public class EntityPageTopTest {
 		pageTop.configure(mockEntityBundle, versionNumber, mockProjectHeader, area, areaToken);
 		verify(mockFilesTab).resetView();
 		verify(mockTablesTab).resetView();
+		verify(mockDatasetsTab).resetView();
 
 		verify(mockTabs).showTab(mockFilesInnerTab, false);
 		verify(mockProjectMetadata).configure(mockProjectBundle, null, mockProjectActionMenuWidget);
@@ -378,6 +420,8 @@ public class EntityPageTopTest {
 		verify(mockWikiTab, never()).configure(eq(projectEntityId), eq(projectName), eq(mockProjectBundle), eq(projectWikiId), eq(canEdit), any(WikiPageWidget.Callback.class));
 		verify(mockTablesTab, never()).setProject(projectEntityId, mockProjectBundle, null);
 		verify(mockTablesTab, never()).configure(any(EntityBundle.class), anyLong(), eq(areaToken));
+		verify(mockDatasetsTab, never()).setProject(projectEntityId, mockProjectBundle, null);
+		verify(mockDatasetsTab, never()).configure(any(EntityBundle.class), anyLong(), eq(areaToken));
 		verify(mockChallengeTab, never()).configure(projectEntityId, projectName, mockProjectBundle);
 		verify(mockDiscussionTab, never()).configure(projectEntityId, projectName, mockProjectBundle, null, canModerate);
 		verify(mockDockerTab, never()).configure(mockEntityBundle, null);
@@ -392,6 +436,8 @@ public class EntityPageTopTest {
 		verify(mockWikiInnerTab).setEntityNameAndPlace(projectName, expectedPlace);
 		expectedPlace.setArea(EntityArea.TABLES);
 		verify(mockTablesInnerTab).setEntityNameAndPlace(projectName, expectedPlace);
+		expectedPlace.setArea(EntityArea.DATASETS);
+		verify(mockDatasetsInnerTab).setEntityNameAndPlace(projectName, expectedPlace);
 		expectedPlace.setArea(EntityArea.CHALLENGE);
 		verify(mockChallengeInnerTab).setEntityNameAndPlace(projectName, expectedPlace);
 		expectedPlace.setArea(EntityArea.DISCUSSION);
@@ -423,6 +469,13 @@ public class EntityPageTopTest {
 		verify(mockTablesInnerTab).setContentStale(true);
 		tabCaptor.getValue().invoke(null);
 		verify(mockTablesInnerTab, times(2)).setContentStale(true);
+
+		// click on the datasets tab
+		verify(mockDatasetsTab).setTabClickedCallback(tabCaptor.capture());
+		tabCaptor.getValue().invoke(null);
+		verify(mockDatasetsInnerTab).setContentStale(true);
+		tabCaptor.getValue().invoke(null);
+		verify(mockDatasetsInnerTab, times(2)).setContentStale(true);
 
 		// click on the challenge tab
 		verify(mockChallengeTab).setTabClickedCallback(tabCaptor.capture());
@@ -466,6 +519,8 @@ public class EntityPageTopTest {
 		verify(mockWikiTab).configure(eq(projectEntityId), eq(projectName), eq(null), eq(wikiId), eq(canEdit), any(WikiPageWidget.Callback.class));
 		verify(mockTablesTab).setProject(projectEntityId, null, projectLoadError);
 		verify(mockTablesTab).configure(any(EntityBundle.class), eq(null), eq(areaToken));
+		verify(mockDatasetsTab).setProject(projectEntityId, null, projectLoadError);
+		verify(mockDatasetsTab).configure(any(EntityBundle.class), eq(null), eq(areaToken));
 		verify(mockChallengeTab).configure(projectEntityId, projectName, null);
 		verify(mockDiscussionTab).configure(projectEntityId, projectName, null, null, canModerate);
 		verify(mockDockerTab).configure(null, null);
@@ -489,10 +544,37 @@ public class EntityPageTopTest {
 		verify(mockWikiTab).configure(eq(projectEntityId), eq(projectName), eq(mockProjectBundle), eq(projectWikiId), eq(canEdit), any(WikiPageWidget.Callback.class));
 		verify(mockFilesTab).setProject(projectEntityId, mockProjectBundle, null);
 		verify(mockFilesTab).configure(mockProjectBundle, null);
+		verify(mockDatasetsTab).configure(mockProjectBundle, null, null);
 		verify(mockChallengeTab).configure(projectEntityId, projectName, mockProjectBundle);
 		verify(mockDiscussionTab).configure(projectEntityId, projectName, mockProjectBundle, null, canModerate);
 		verify(mockDockerTab).configure(mockProjectBundle, null);
 	}
+
+
+	@Test
+	public void testConfigureWithDataset() {
+		when(mockEntityBundle.getEntity()).thenReturn(mockDatasetEntity);
+		Synapse.EntityArea area = null;
+		String areaToken = "a table query area token";
+		Long versionNumber = 23L;
+		pageTop.configure(mockEntityBundle, versionNumber, mockProjectHeader, area, areaToken);
+		verify(mockTabs).showTab(mockDatasetsInnerTab, false);
+
+		verify(mockProjectMetadata).configure(mockProjectBundle, null, mockProjectActionMenuWidget);
+
+		verify(mockDatasetsTab).setProject(projectEntityId, mockProjectBundle, null);
+		verify(mockDatasetsTab).configure(mockEntityBundle, versionNumber, areaToken);
+
+		clickAllTabsTable();
+		verify(mockWikiTab).configure(eq(projectEntityId), eq(projectName), eq(mockProjectBundle), eq(projectWikiId), eq(canEdit), any(WikiPageWidget.Callback.class));
+		verify(mockFilesTab).setProject(projectEntityId, mockProjectBundle, null);
+		verify(mockFilesTab).configure(mockProjectBundle, null);
+		verify(mockTablesTab).configure(mockProjectBundle, null, null);
+		verify(mockChallengeTab).configure(projectEntityId, projectName, mockProjectBundle);
+		verify(mockDiscussionTab).configure(projectEntityId, projectName, mockProjectBundle, null, canModerate);
+		verify(mockDockerTab).configure(mockProjectBundle, null);
+	}
+
 
 	private void clickAllTabsTable() {
 		// now go through and click on the tabs, verify project metadata visibility
@@ -507,12 +589,17 @@ public class EntityPageTopTest {
 		reset(mockProjectMetadata);
 		verify(mockFilesTab).setTabClickedCallback(tabCaptor.capture());
 		tabCaptor.getValue().invoke(null);
-		
+
 		// click on the tables tab
 		reset(mockProjectMetadata);
 		verify(mockTablesTab).setTabClickedCallback(tabCaptor.capture());
 		tabCaptor.getValue().invoke(null);
-		
+
+		// click on the datasets tab
+		reset(mockProjectMetadata);
+		verify(mockDatasetsTab).setTabClickedCallback(tabCaptor.capture());
+		tabCaptor.getValue().invoke(null);
+
 		// click on the challenge tab
 		reset(mockProjectMetadata);
 		verify(mockChallengeTab).setTabClickedCallback(tabCaptor.capture());
@@ -596,6 +683,7 @@ public class EntityPageTopTest {
 		when(mockWikiInnerTab.isTabListItemVisible()).thenReturn(true);
 		when(mockFilesInnerTab.isTabListItemVisible()).thenReturn(true);
 		when(mockTablesInnerTab.isTabListItemVisible()).thenReturn(false);
+		when(mockDatasetsInnerTab.isTabListItemVisible()).thenReturn(false);
 		when(mockDockerInnerTab.isTabListItemVisible()).thenReturn(false);
 		
 		Synapse.EntityArea area = EntityArea.WIKI;
@@ -644,6 +732,7 @@ public class EntityPageTopTest {
 		verify(mockWikiInnerTab, atLeastOnce()).setTabListItemVisible(true);
 		verify(mockFilesInnerTab, atLeastOnce()).setTabListItemVisible(true);
 		verify(mockTablesInnerTab, atLeastOnce()).setTabListItemVisible(true);
+		verify(mockDatasetsInnerTab, atLeastOnce()).setTabListItemVisible(true);
 		verify(mockChallengeInnerTab, atLeastOnce()).setTabListItemVisible(true);
 		verify(mockDiscussionInnerTab, atLeastOnce()).setTabListItemVisible(true);
 		verify(mockDockerInnerTab, atLeastOnce()).setTabListItemVisible(true);
@@ -657,6 +746,7 @@ public class EntityPageTopTest {
 		Long versionNumber = null;
 
 		AsyncMockStubber.callSuccessWith(false).when(mockSynapseJavascriptClient).isTable(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(false).when(mockSynapseJavascriptClient).isDataset(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isChallenge(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(false).when(mockSynapseJavascriptClient).isDocker(anyString(), any(AsyncCallback.class));
 
@@ -665,12 +755,14 @@ public class EntityPageTopTest {
 		verify(mockSynapseJavascriptClient, never()).isWiki(anyString(), any(AsyncCallback.class));
 		verify(mockSynapseJavascriptClient, never()).isFileOrFolder(anyString(), any(AsyncCallback.class));
 		verify(mockSynapseJavascriptClient, never()).isTable(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient, never()).isDataset(anyString(), any(AsyncCallback.class));
 		verify(mockSynapseClientAsync).isChallenge(anyString(), any(AsyncCallback.class));
 		verify(mockSynapseJavascriptClient, never()).isDocker(anyString(), any(AsyncCallback.class));
 
 		verify(mockWikiInnerTab).setTabListItemVisible(true);
 		verify(mockFilesInnerTab).setTabListItemVisible(true);
 		verify(mockTablesInnerTab).setTabListItemVisible(true);
+		verify(mockDatasetsInnerTab).setTabListItemVisible(true);
 		verify(mockChallengeInnerTab, atLeastOnce()).setTabListItemVisible(false);
 		verify(mockChallengeInnerTab, never()).setTabListItemVisible(true);
 		verify(mockDiscussionInnerTab).setTabListItemVisible(true);
@@ -685,6 +777,7 @@ public class EntityPageTopTest {
 		Long versionNumber = null;
 
 		AsyncMockStubber.callSuccessWith(false).when(mockSynapseJavascriptClient).isTable(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(false).when(mockSynapseJavascriptClient).isDataset(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isChallenge(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(false).when(mockSynapseJavascriptClient).isDocker(anyString(), any(AsyncCallback.class));
 
@@ -693,6 +786,7 @@ public class EntityPageTopTest {
 		verify(mockSynapseJavascriptClient).isWiki(anyString(), any(AsyncCallback.class));
 		verify(mockSynapseJavascriptClient).isFileOrFolder(anyString(), any(AsyncCallback.class));
 		verify(mockSynapseJavascriptClient).isTable(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).isDataset(anyString(), any(AsyncCallback.class));
 		verify(mockSynapseClientAsync).isChallenge(anyString(), any(AsyncCallback.class));
 		verify(mockSynapseJavascriptClient).isDocker(anyString(), any(AsyncCallback.class));
 
@@ -703,6 +797,10 @@ public class EntityPageTopTest {
 		order = Mockito.inOrder(mockFilesInnerTab);
 		order.verify(mockFilesInnerTab).setTabListItemVisible(false);
 		order.verify(mockFilesInnerTab).setTabListItemVisible(true);
+
+		order = Mockito.inOrder(mockDatasetsInnerTab);
+		order.verify(mockDatasetsInnerTab, atLeastOnce()).setTabListItemVisible(false);
+		order.verify(mockDatasetsInnerTab, never()).setTabListItemVisible(true);
 
 		order = Mockito.inOrder(mockTablesInnerTab);
 		order.verify(mockTablesInnerTab, atLeastOnce()).setTabListItemVisible(false);
@@ -728,6 +826,7 @@ public class EntityPageTopTest {
 		Long versionNumber = null;
 		AsyncMockStubber.callSuccessWith(false).when(mockSynapseJavascriptClient).isFileOrFolder(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(false).when(mockSynapseJavascriptClient).isTable(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(false).when(mockSynapseJavascriptClient).isDataset(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isChallenge(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(false).when(mockSynapseJavascriptClient).isDocker(anyString(), any(AsyncCallback.class));
 
@@ -736,6 +835,7 @@ public class EntityPageTopTest {
 		verify(mockWikiInnerTab, atLeastOnce()).setTabListItemVisible(false);
 		verify(mockFilesInnerTab, atLeastOnce()).setTabListItemVisible(false);
 		verify(mockTablesInnerTab, atLeastOnce()).setTabListItemVisible(false);
+		verify(mockDatasetsInnerTab, atLeastOnce()).setTabListItemVisible(false);
 		verify(mockChallengeInnerTab, atLeastOnce()).setTabListItemVisible(false);
 		verify(mockDiscussionInnerTab, atLeastOnce()).setTabListItemVisible(false);
 		verify(mockDockerInnerTab, atLeastOnce()).setTabListItemVisible(false);
@@ -811,5 +911,19 @@ public class EntityPageTopTest {
 
 		// verify we did not change place, but instead reconfigured for target entity under the same project
 		verify(mockPlaceChanger, never()).goTo(newPlace);
+	}
+
+	@Test
+	public void testNoDatasetsTabIfNotInExperimentalMode() {
+		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn(null);
+
+		Synapse.EntityArea area = null;
+		String areaToken = null;
+		Long versionNumber = null;
+
+		pageTop.configure(mockProjectBundle, versionNumber, mockProjectHeader, area, areaToken);
+		// datasets tab should never be shown
+		verify(mockDatasetsInnerTab, never()).setTabListItemVisible(true);
+		verify(mockSynapseJavascriptClient, never()).isDataset(anyString(), any(AsyncCallback.class));
 	}
 }

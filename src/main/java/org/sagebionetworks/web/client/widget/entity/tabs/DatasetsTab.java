@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -12,8 +13,6 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.Query;
-import org.sagebionetworks.repo.model.table.Table;
-import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
@@ -41,14 +40,14 @@ import org.sagebionetworks.web.shared.WidgetConstants;
 import com.google.gwt.place.shared.Place;
 import com.google.inject.Inject;
 
-public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler {
+public class DatasetsTab implements DatasetsTabView.Presenter, QueryChangeHandler {
 
 	public static final String TABLE_QUERY_PREFIX = "query/";
 
 	Tab tab;
-	TablesTabView view;
+	DatasetsTabView view;
 	TableListWidget tableListWidget;
-	BasicTitleBar tableTitleBar;
+	BasicTitleBar datasetsTitleBar;
 	Breadcrumb breadcrumb;
 	EntityMetadata metadata;
 	boolean annotationsShown;
@@ -64,22 +63,22 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler {
 	TableEntityWidget v2TableWidget;
 	Map<String, String> configMap;
 	CallbackP<String> entitySelectedCallback;
-	public static final String TABLES_HELP = "Build structured queryable data that can be described by a schema using the Tables.";
-	public static final String TABLES_HELP_URL = WebConstants.DOCS_URL + "Tables.2011038095.html";
+	public static final String DATASETS_HELP = "Create and share a collection of File versions using a Dataset.";
+	public static final String DATASETS_HELP_URL =  ""; // WebConstants.DOCS_URL + "Tables.2011038095.html"; // TODO
 	Long version;
 
 	@Inject
-	public TablesTab(Tab tab, PortalGinInjector ginInjector) {
+	public DatasetsTab(Tab tab, PortalGinInjector ginInjector) {
 		this.tab = tab;
 		this.ginInjector = ginInjector;
-		tab.configure(DisplayConstants.TABLES, "table", TABLES_HELP, TABLES_HELP_URL, EntityArea.TABLES);
+		tab.configure(DisplayConstants.DATASETS, "table", DATASETS_HELP, "", EntityArea.DATASETS);
 	}
 
 	public void lazyInject() {
 		if (view == null) {
-			this.view = ginInjector.getTablesTabView();
+			this.view = ginInjector.getDatasetsTabView();
 			this.tableListWidget = ginInjector.getTableListWidget();
-			this.tableTitleBar = ginInjector.getBasicTitleBar();
+			this.datasetsTitleBar = ginInjector.getBasicTitleBar();
 			this.breadcrumb = ginInjector.getBreadcrumb();
 			this.metadata = ginInjector.getEntityMetadata();
 			this.queryTokenProvider = ginInjector.getQueryTokenProvider();
@@ -88,7 +87,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler {
 
 			view.setBreadcrumb(breadcrumb.asWidget());
 			view.setTableList(tableListWidget.asWidget());
-			view.setTitlebar(tableTitleBar.asWidget());
+			view.setTitlebar(datasetsTitleBar.asWidget());
 			view.setEntityMetadata(metadata.asWidget());
 			view.setSynapseAlert(synAlert.asWidget());
 			view.setModifiedCreatedBy(modifiedCreatedBy);
@@ -100,11 +99,11 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler {
 					areaToken = null;
 					entitySelectedCallback.invoke(entityHeader.getId());
 					// selected a table/view, show title info immediately
-					tableTitleBar.configure(entityHeader);
+					datasetsTitleBar.configure(entityHeader);
 
 					List<LinkData> links = new ArrayList<LinkData>();
-					Place projectPlace = new Synapse(projectEntityId, null, EntityArea.TABLES, null);
-					links.add(new LinkData(DisplayConstants.TABLES, EntityTypeUtils.getIconTypeForEntityClassName(TableEntity.class.getName()), projectPlace));
+					Place projectPlace = new Synapse(projectEntityId, null, EntityArea.DATASETS, null);
+					links.add(new LinkData(DisplayConstants.DATASETS, EntityTypeUtils.getIconTypeForEntityClassName(Dataset.class.getName()), projectPlace));
 					breadcrumb.configure(links, entityHeader.getName());
 
 					view.setBreadcrumbVisible(true);
@@ -161,7 +160,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler {
 		} else {
 			showError(projectBundleLoadError);
 		}
-		tab.setEntityNameAndPlace(title, new Synapse(projectEntityId, null, EntityArea.TABLES, null));
+		tab.setEntityNameAndPlace(title, new Synapse(projectEntityId, null, EntityArea.DATASETS, null));
 		tab.showTab(true);
 	}
 
@@ -186,36 +185,32 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler {
 	public void setTargetBundle(EntityBundle bundle, Long versionNumber) {
 		this.entityBundle = bundle;
 		Entity entity = bundle.getEntity();
-		boolean isTable = entity instanceof Table && !(entity instanceof Dataset);
+		boolean isDataset = entity instanceof Dataset;
 		boolean isProject = entity instanceof Project;
 		boolean isVersionSupported = EntityActionControllerImpl.isVersionSupported(entityBundle.getEntity(), ginInjector.getCookieProvider());
 		version = isVersionSupported ? versionNumber : null;
-		view.setEntityMetadataVisible(isTable);
-		view.setBreadcrumbVisible(isTable);
+		view.setEntityMetadataVisible(isDataset);
+		view.setBreadcrumbVisible(isDataset);
 		view.setTableListVisible(isProject);
-		view.setTitlebarVisible(isTable);
+		view.setTitlebarVisible(isDataset);
 		view.clearTableEntityWidget();
 		modifiedCreatedBy.setVisible(false);
-		view.setTableUIVisible(isTable);
+		view.setTableUIVisible(isDataset);
 		view.setActionMenu(tab.getEntityActionMenu());
-		tab.getEntityActionMenu().setTableDownloadOptionsVisible(isTable);
+		tab.getEntityActionMenu().setTableDownloadOptionsVisible(isDataset);
 		boolean isCurrentVersion = version == null;
 		tab.configureEntityActionController(bundle, isCurrentVersion, null);
-		if (isTable) {
+		if (isDataset) {
 			updateVersionAndAreaToken(entity.getId(), version, areaToken);
-			breadcrumb.configure(bundle.getPath(), EntityArea.TABLES);
-			tableTitleBar.configure(bundle);
+			breadcrumb.configure(bundle.getPath(), EntityArea.DATASETS);
+			datasetsTitleBar.configure(bundle);
 			modifiedCreatedBy.configure(entity.getCreatedOn(), entity.getCreatedBy(), entity.getModifiedOn(), entity.getModifiedBy());
 			v2TableWidget = ginInjector.createNewTableEntityWidget();
 			view.setTableEntityWidget(v2TableWidget.asWidget());
 			v2TableWidget.configure(bundle, version, bundle.getPermissions().getCanCertifiedUserEdit(), this, tab.getEntityActionMenu());
 		} else if (isProject) {
 			areaToken = null;
-			List<EntityType> types = new ArrayList<>();
-			types.add(EntityType.table);
-			types.add(EntityType.entityview);
-			types.add(EntityType.submissionview);
-			tableListWidget.configure(bundle, types);
+			tableListWidget.configure(bundle, Arrays.asList(EntityType.dataset));
 			showProjectLevelUI();
 		}
 	}
@@ -242,7 +237,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler {
 	private void updateVersionAndAreaToken(String entityId, Long versionNumber, String areaToken) {
 		boolean isVersionSupported = EntityActionControllerImpl.isVersionSupported(entityBundle.getEntity(), ginInjector.getCookieProvider());
 		Long newVersion = isVersionSupported ? versionNumber : null;
-		Synapse newPlace = new Synapse(entityId, newVersion, EntityArea.TABLES, areaToken);
+		Synapse newPlace = new Synapse(entityId, newVersion, EntityArea.DATASETS, areaToken);
 		// SWC-4942: if versions are supported, and the version has changed (the version in the query does
 		// not match the entity bundle, for example),
 		// then reload the entity bundle (to reconfigure the tools menu and other widgets on the page) by

@@ -202,6 +202,7 @@ public class DisplayConstants {
 	public static final String FORGOT_PASSWORD = "forgot password?";
 	public static final String SIGNING_IN = "Signing in...";
 	public static final String TABLES = "Tables";
+	public static final String DATASETS = "Datasets";
 	public static final String CREATE_ACCOUNT_MESSAGE_SSO = "The email address supplied by Google was not found in our user list. Please check that you are signed in to the proper Google account, or complete registration if you are new to Synapse.";
 	public static final String SSO_ERROR_UNKNOWN = "An unknown error occurred while signing you in with Google account login. Please try again or use your Synapse username and password.";
 

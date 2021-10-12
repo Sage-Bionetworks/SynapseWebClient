@@ -179,6 +179,7 @@ import org.sagebionetworks.web.client.widget.entity.renderer.TeamMembersWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiFilesPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTabView;
+import org.sagebionetworks.web.client.widget.entity.tabs.DatasetsTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.DiscussionTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.DockerTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.FilesTabView;
@@ -713,6 +714,8 @@ public interface PortalGinInjector extends Ginjector {
 	ChallengeWidget getChallengeWidget();
 
 	TablesTabView getTablesTabView();
+
+	DatasetsTabView getDatasetsTabView();
 
 	QueryTokenProvider getQueryTokenProvider();
 
