@@ -53,9 +53,9 @@ import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.entity.tabs.AbstractTablesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.DatasetsTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
-import org.sagebionetworks.web.client.widget.entity.tabs.TablesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.TablesTabView;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
@@ -375,7 +375,7 @@ public class DatasetsTabTest {
 		String encodedToken = "encoded token";
 		when(mockQueryTokenProvider.queryToToken(any(Query.class))).thenReturn(encodedToken);
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
-		tab.configure(mockDatasetBundle, version, TablesTab.TABLE_QUERY_PREFIX + startToken);
+		tab.configure(mockDatasetBundle, version, AbstractTablesTab.TABLE_QUERY_PREFIX + startToken);
 
 		reset(mockTab);
 		when(mockTab.isTabPaneVisible()).thenReturn(true);

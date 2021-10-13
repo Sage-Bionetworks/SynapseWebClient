@@ -2,11 +2,12 @@ package org.sagebionetworks.web.unitclient.place;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.web.client.place.Synapse;
-import org.sagebionetworks.web.client.widget.entity.tabs.TablesTab;
+import org.sagebionetworks.web.client.widget.entity.tabs.AbstractTablesTab;
 
 /**
  * Synapse Place token testing
@@ -98,14 +99,14 @@ public class SynapsePlaceTest {
 	@Test
 	public void testTablesQueryCase() {
 		String queryToken = "abcdef";
-		String testToken = testEntityId + TABLES_DELIMITER + TablesTab.TABLE_QUERY_PREFIX + queryToken;
+		String testToken = testEntityId + TABLES_DELIMITER + AbstractTablesTab.TABLE_QUERY_PREFIX + queryToken;
 		Synapse place = tokenizer.getPlace(testToken);
 
 		Assert.assertEquals(testEntityId, place.getEntityId());
 		Assert.assertEquals(Synapse.EntityArea.TABLES, place.getArea());
 		String areaToken = place.getAreaToken();
-		assertTrue(areaToken.startsWith(TablesTab.TABLE_QUERY_PREFIX));
-		assertEquals(queryToken, areaToken.substring(TablesTab.TABLE_QUERY_PREFIX.length()));
+		assertTrue(areaToken.startsWith(AbstractTablesTab.TABLE_QUERY_PREFIX));
+		assertEquals(queryToken, areaToken.substring(AbstractTablesTab.TABLE_QUERY_PREFIX.length()));
 		Assert.assertEquals(testToken, tokenizer.getToken(place));
 	}
 
