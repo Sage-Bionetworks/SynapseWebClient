@@ -1,10 +1,14 @@
 package org.sagebionetworks.web.client.widget.table.modal.fileview;
 
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.SubmissionView;
 import org.sagebionetworks.repo.model.table.Table;
@@ -12,6 +16,7 @@ import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.evaluation.SubmissionViewScopeEditor;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
+
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -69,11 +74,11 @@ public class CreateTableViewWizardStep1 implements ModalPage, CreateTableViewWiz
 		
 		if (TableType.submission_view.equals(type)) {
 			view.setSubmissionViewScopeWidgetVisible(true);
-		} else if (!TableType.table.equals(type)) {
+		} else if (!TableType.table.equals(type) && !TableType.dataset.equals(type)) {
 			view.setEntityViewScopeWidgetVisible(true);	
 		}
 		
-		if (TableType.table.equals(type) || TableType.projects.equals(type) || TableType.submission_view.equals(type)) {
+		if (TableType.table.equals(type) || TableType.dataset.equals(type) || TableType.projects.equals(type) || TableType.submission_view.equals(type)) {
 			view.setViewTypeOptionsVisible(false);
 		} else {
 			view.setViewTypeOptionsVisible(true);
@@ -83,7 +88,7 @@ public class CreateTableViewWizardStep1 implements ModalPage, CreateTableViewWiz
 			view.setIsTableSelected(type.isIncludeTables());
 		}
 
-		entityContainerList.configure(new ArrayList<String>(), canEdit, type);
+		entityContainerList.configure(new ArrayList<Reference>(), canEdit, type);
 		submissionViewScope.configure(new ArrayList<Evaluation>());
 		view.setName("");
 		view.setDescription("");
@@ -99,6 +104,8 @@ public class CreateTableViewWizardStep1 implements ModalPage, CreateTableViewWiz
 		Table table;
 		if (TableType.table.equals(tableType)) {
 			table = new TableEntity();
+		} else if (TableType.dataset.equals(tableType)) {
+			table = new Dataset();
 		} else if (TableType.submission_view.equals(tableType)) {
 			table = new SubmissionView();
 			List<String> scopeIds = submissionViewScope.getEvaluationIds();

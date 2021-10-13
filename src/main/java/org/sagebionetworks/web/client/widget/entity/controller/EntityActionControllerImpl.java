@@ -27,6 +27,7 @@ import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.SnapshotRequest;
 import org.sagebionetworks.repo.model.table.SnapshotResponse;
@@ -440,6 +441,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		configureACTCommands();
 		configureTableCommands();
 		configureProjectLevelTableCommands();
+		// TODO: configureDatasetCommands()
+		configureProjectLevelDatasetCommands();
 		configureAddFolder();
 		configureUploadNewFileEntity();
 		configureAddExternalDockerRepo();
@@ -488,6 +491,18 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			actionMenu.setActionVisible(Action.ADD_SUBMISSION_VIEW, false);
 		}
 	}
+
+	private void configureProjectLevelDatasetCommands() {
+		if (entityBundle.getEntity() instanceof Project && EntityArea.DATASETS.equals(currentArea)) {
+			// show tables top level commands
+			boolean canEditResults = entityBundle.getPermissions().getCanCertifiedUserEdit();
+			actionMenu.setActionVisible(Action.ADD_DATASET, canEditResults);
+			actionMenu.setActionListener(Action.ADD_DATASET, this);
+		} else {
+			actionMenu.setActionVisible(Action.ADD_DATASET, false);
+		}
+	}
+
 
 	private void configureACTCommands() {
 		// TODO: remove APPROVE_USER_ACCESS command (after new ACT feature is released, where the system
@@ -747,8 +762,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 
 	private void configureCreateTableViewSnapshot() {
 		if (entityBundle.getEntity() instanceof Table && EntityActionControllerImpl.isVersionSupported(entityBundle.getEntity(), cookies)) {
-			String tableOrView = entityBundle.getEntity() instanceof TableEntity ? "Table" : "View";
-			actionMenu.setActionText(Action.CREATE_TABLE_VERSION, "Create a New " + tableOrView + " Version");
+			String tableOrViewOrDataset = entityBundle.getEntity() instanceof TableEntity ? "Table" : entityBundle.getEntity() instanceof Dataset ? "Dataset" : "View";
+			actionMenu.setActionText(Action.CREATE_TABLE_VERSION, "Create a New " + tableOrViewOrDataset + " Version");
 			actionMenu.setActionVisible(Action.CREATE_TABLE_VERSION, permissions.getCanEdit());
 			actionMenu.setActionListener(Action.CREATE_TABLE_VERSION, this);
 
@@ -1043,6 +1058,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			case ADD_FILE_VIEW:
 				onAddFileView();
 				break;
+			case ADD_DATASET:
+				onAddDataset();
+				break;
 			case ADD_PROJECT_VIEW:
 				onAddProjectView();
 				break;
@@ -1100,6 +1118,13 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			postCheckCreateTableOrView(TableType.files);
 		});
 	}
+
+	public void onAddDataset() {
+		preflightController.checkCreateEntity(entityBundle, Dataset.class.getName(), () -> {
+			postCheckCreateTableOrView(TableType.dataset);
+		});
+	}
+
 
 	public void onAddProjectView() {
 		preflightController.checkCreateEntity(entityBundle, EntityView.class.getName(), () -> {
@@ -1598,7 +1623,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		String parentId = entityBundle.getEntity().getParentId();
 		Place gotoPlace = null;
 		if (parentId != null && !(entityBundle.getEntity() instanceof Project)) {
-			if (entityBundle.getEntity() instanceof Table)
+			if (entityBundle.getEntity() instanceof Dataset)
+				gotoPlace = new Synapse(parentId, null, EntityArea.DATASETS, null);
+			else if (entityBundle.getEntity() instanceof Table)
 				gotoPlace = new Synapse(parentId, null, EntityArea.TABLES, null);
 			else if (entityBundle.getEntity() instanceof DockerRepository)
 				gotoPlace = new Synapse(parentId, null, EntityArea.DOCKER, null);

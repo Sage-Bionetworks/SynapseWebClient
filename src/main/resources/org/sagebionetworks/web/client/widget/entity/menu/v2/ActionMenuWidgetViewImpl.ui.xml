@@ -63,6 +63,7 @@
 				<a:ActionMenuItem icon="LINK" iconFixedWidth="true" action="CREATE_LINK">Save Link</a:ActionMenuItem>
 				<a:ActionMenuItem icon="TIMES_CIRCLE" iconFixedWidth="true" action="DELETE_ENTITY">Delete</a:ActionMenuItem>
 				<a:ActionMenuItem icon="UPLOAD" iconFixedWidth="true" action="UPLOAD_TABLE">Upload a Table</a:ActionMenuItem>
+				<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="ADD_DATASET">Add Dataset</a:ActionMenuItem>
 				<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="ADD_TABLE">Add Table</a:ActionMenuItem>
 				<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="ADD_FILE_VIEW">Add File View</a:ActionMenuItem>
 				<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="ADD_PROJECT_VIEW">Add Project View</a:ActionMenuItem>

@@ -1,19 +1,21 @@
 package org.sagebionetworks.web.client.widget.table.modal.fileview;
 
 // Table, or a Project View, or a combination View composed of Files/Folders/Tables
+
 import static org.sagebionetworks.web.shared.WebConstants.FILE;
 import static org.sagebionetworks.web.shared.WebConstants.FOLDER;
 import static org.sagebionetworks.web.shared.WebConstants.PROJECT;
 import static org.sagebionetworks.web.shared.WebConstants.TABLE;
+
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.SubmissionView;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.ViewTypeMask;
 
 public enum TableType {
-	table(null), submission_view(null), projects(PROJECT), tables(TABLE), folders(FOLDER), folders_tables(FOLDER | TABLE), files(FILE), files_tables(FILE | TABLE), files_folders(FILE | FOLDER), files_folders_tables(FILE | FOLDER | TABLE);
-
+	table(null), submission_view(null), projects(PROJECT), tables(TABLE), folders(FOLDER), folders_tables(FOLDER | TABLE), files(FILE), files_tables(FILE | TABLE), files_folders(FILE | FOLDER), files_folders_tables(FILE | FOLDER | TABLE), dataset(FILE);
 	private Integer viewTypeMask;
 
 	TableType(Integer viewTypeMask) {
@@ -84,6 +86,8 @@ public enum TableType {
 	public static TableType getTableType(Entity entity) {
 		if (entity instanceof TableEntity) {
 			return TableType.table;
+		} else if (entity instanceof Dataset) {
+			return TableType.dataset;
 		} else if (entity instanceof SubmissionView) {
 			return TableType.submission_view;
 		} else if (entity instanceof EntityView) {

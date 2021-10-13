@@ -8,6 +8,7 @@ import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
+import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.SubmissionView;
 import org.sagebionetworks.repo.model.table.TableEntity;
@@ -96,6 +97,9 @@ public class EntityTypeUtils {
 			icon = IconType.LIST_ALT;
 		} else if (TableEntity.class.getName().equals(className)) {
 			// TableEntity
+			icon = IconType.TABLE;
+		} else if (Dataset.class.getName().equals(className)) {
+			// Dataset
 			icon = IconType.TABLE;
 		} else if (EntityView.class.getName().equals(className)) {
 			// FileView

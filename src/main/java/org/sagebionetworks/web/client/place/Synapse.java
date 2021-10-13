@@ -144,7 +144,7 @@ public class Synapse extends Place {
 	}
 
 	public static enum EntityArea {
-		WIKI, FILES, TABLES, CHALLENGE, DISCUSSION, DOCKER
+		WIKI, FILES, DATASETS, TABLES, CHALLENGE, DISCUSSION, DOCKER
 	}
 	public static enum ProfileArea {
 		PROFILE, FAVORITES, PROJECTS, CHALLENGES, TEAMS, DOWNLOADS, SETTINGS

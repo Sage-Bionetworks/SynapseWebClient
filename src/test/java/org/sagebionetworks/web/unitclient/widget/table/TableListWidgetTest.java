@@ -10,6 +10,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
@@ -91,6 +92,8 @@ public class TableListWidgetTest {
 	@Test
 	public void testCreateQuery() {
 		String parentId = ENTITY_ID;
+		List<EntityType> typesToShow = Arrays.asList(EntityType.table, EntityType.entityview);
+		widget.configure(parentBundle, typesToShow);
 		EntityChildrenRequest query = widget.createQuery(parentId);
 		assertEquals(parentId, query.getParentId());
 		assertTrue(query.getIncludeTypes().contains(EntityType.entityview));
@@ -101,7 +104,7 @@ public class TableListWidgetTest {
 
 	@Test
 	public void testConfigureUnderPageSize() {
-		widget.configure(parentBundle);
+		widget.configure(parentBundle, Arrays.asList(EntityType.dataset));
 		verify(mockView, times(2)).hideLoading();
 		verify(mockView).clearSortUI();
 		verify(mockLoadMoreWidgetContainer).setIsMore(false);
@@ -110,14 +113,14 @@ public class TableListWidgetTest {
 	@Test
 	public void testConfigureOverPageSize() {
 		when(mockResults.getNextPageToken()).thenReturn("ismore");
-		widget.configure(parentBundle);
+		widget.configure(parentBundle, Arrays.asList(EntityType.dataset));
 		verify(mockView).clearSortUI();
 		verify(mockLoadMoreWidgetContainer).setIsMore(true);
 	}
 
 	@Test
 	public void testOnSort() {
-		widget.configure(parentBundle);
+		widget.configure(parentBundle, Arrays.asList(EntityType.dataset));
 
 		verify(mockView).clearSortUI();
 
@@ -132,7 +135,7 @@ public class TableListWidgetTest {
 		String error = "an error";
 		Throwable th = new Throwable(error);
 		AsyncMockStubber.callFailureWith(th).when(mockSynapseJavascriptClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
-		widget.configure(parentBundle);
+		widget.configure(parentBundle, Arrays.asList(EntityType.dataset));
 		verify(mockSynAlert).handleException(th);
 	}
 
@@ -158,7 +161,7 @@ public class TableListWidgetTest {
 			expectedClipboardValue.append(TEST_RESULT_ID + i + "\n");
 		}
 		// load the data
-		widget.configure(parentBundle);
+		widget.configure(parentBundle, Arrays.asList(EntityType.dataset));
 
 		verify(mockView, times(itemCount)).addTableListItem(any(EntityHeader.class));
 		verify(mockSynapseJavascriptClient, times(itemCount)).populateEntityBundleCache(anyString());
@@ -176,12 +179,12 @@ public class TableListWidgetTest {
 		reset(mockSynapseJavascriptClient);
 		when(mockSynapseJavascriptClient.getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class))).thenReturn(mockRequest);
 
-		widget.configure(parentBundle);
+		widget.configure(parentBundle, Arrays.asList(EntityType.dataset));
 
 		verify(mockSynapseJavascriptClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
 		verify(mockRequest, never()).cancel();
 
-		widget.configure(parentBundle);
+		widget.configure(parentBundle, Arrays.asList(EntityType.dataset));
 
 		verify(mockRequest).cancel();
 		verify(mockSynapseJavascriptClient, times(2)).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));

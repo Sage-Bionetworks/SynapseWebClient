@@ -37,7 +37,7 @@ public class EntityContainerListWidgetViewImpl implements EntityContainerListWid
 		addButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.onAddProject();
+				presenter.onAddEntity();
 			}
 		});
 	}
@@ -71,7 +71,7 @@ public class EntityContainerListWidgetViewImpl implements EntityContainerListWid
 				@Override
 				public void onClick(ClickEvent event) {
 					entitiesContainer.remove(row);
-					presenter.onRemoveProject(id);
+					presenter.onRemoveEntity(id);
 				}
 			});
 			deleteButton.addStyleName("imageButton text-primary");

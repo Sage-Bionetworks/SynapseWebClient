@@ -993,6 +993,11 @@ public class SynapseJavascriptClient {
 		getEntityChildren(request, getEntityChildrenExistCallback(callback));
 	}
 
+	public void isDataset(String projectId, AsyncCallback<Boolean> callback) {
+		EntityChildrenRequest request = getEntityChildrenRequest(projectId, EntityType.dataset);
+		getEntityChildren(request, getEntityChildrenExistCallback(callback));
+	}
+
 	private AsyncCallback<EntityChildrenResponse> getEntityChildrenExistCallback(final AsyncCallback<Boolean> callback) {
 		return new AsyncCallback<EntityChildrenResponse>() {
 			@Override

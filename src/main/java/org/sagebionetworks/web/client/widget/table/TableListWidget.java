@@ -39,6 +39,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, IsWidget 
 	boolean isInitializing = false;
 	Request currentRequest = null;
 	private List<String> idList = null;
+	private List<EntityType> typesToShow = null;
 
 	@Inject
 	public TableListWidget(TableListWidgetView view, SynapseJavascriptClient jsClient, LoadMoreWidgetContainer loadMoreWidget, SynapseAlert synAlert) {
@@ -64,12 +65,13 @@ public class TableListWidget implements TableListWidgetView.Presenter, IsWidget 
 	 * @param canEdit
 	 * @param showAddTable
 	 */
-	public void configure(EntityBundle parentBundle) {
+	public void configure(EntityBundle parentBundle, List<EntityType> typesToShow) {
 		if (currentRequest != null) {
 			currentRequest.cancel();
 		}
 		isInitializing = true;
 		this.parentBundle = parentBundle;
+		this.typesToShow = typesToShow;
 		loadData();
 	}
 
@@ -118,11 +120,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, IsWidget 
 		newQuery.setSortBy(DEFAULT_SORT_BY);
 		newQuery.setSortDirection(DEFAULT_DIRECTION);
 		newQuery.setParentId(parentId);
-		List<EntityType> types = new ArrayList<EntityType>();
-		types.add(EntityType.table);
-		types.add(EntityType.entityview);
-		types.add(EntityType.submissionview);
-		newQuery.setIncludeTypes(types);
+		newQuery.setIncludeTypes(typesToShow);
 		return newQuery;
 	}
 

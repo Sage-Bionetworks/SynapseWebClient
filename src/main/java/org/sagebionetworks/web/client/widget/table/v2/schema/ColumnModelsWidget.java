@@ -1,12 +1,16 @@
 package org.sagebionetworks.web.client.widget.table.v2.schema;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.Dataset;
+import org.sagebionetworks.repo.model.table.DatasetItem;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.SubmissionView;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
@@ -26,6 +30,7 @@ import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.ViewDefaultColumns;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.ViewType;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -100,6 +105,7 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 		this.bundle = bundle;
 		List<ColumnModel> startingModels = bundle.getTableBundle().getColumnModels();
 		viewer.configure(ViewType.VIEWER, this.isEditable);
+		// Certain rows in datasets may not be editable because they reference locked versions.
 		boolean isEditableView = isEditable && (bundle.getEntity() instanceof EntityView || bundle.getEntity() instanceof SubmissionView);
 		tableType = TableType.getTableType(bundle.getEntity());
 		editor.setAddDefaultViewColumnsButtonVisible(isEditableView);
@@ -134,6 +140,13 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 		} else if (entity instanceof SubmissionView) {
 			scopeIds = ((SubmissionView) entity).getScopeIds();
 			scope.setViewEntityType(ViewEntityType.submissionview);
+		} else if (entity instanceof Dataset) {
+			scopeIds = new ArrayList<>();
+			for (DatasetItem item : ((Dataset) entity).getItems()) {
+				scopeIds.add(item.getEntityId());
+			}
+			scope.setViewEntityType(ViewEntityType.dataset);
+			scope.setViewTypeMask(Long.valueOf(TableType.dataset.getViewTypeMask())); // https://sagebionetworks.jira.com/browse/PLFM-6999
 		}
 		scope.setScope(scopeIds);
 		

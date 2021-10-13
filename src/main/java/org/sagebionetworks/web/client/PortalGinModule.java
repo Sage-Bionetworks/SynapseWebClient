@@ -1270,7 +1270,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(TabsView.class).to(TabsViewImpl.class);
 
 		bind(FilesTabView.class).to(FilesTabViewImpl.class);
-		bind(TablesTabView.class).to(TablesTabViewImpl.class);
+        bind(TablesTabView.class).to(TablesTabViewImpl.class);
 		bind(ChallengeTabView.class).to(ChallengeTabViewImpl.class);
 		bind(DiscussionTabView.class).to(DiscussionTabViewImpl.class);
 		bind(DockerTabView.class).to(DockerTabViewImpl.class);
