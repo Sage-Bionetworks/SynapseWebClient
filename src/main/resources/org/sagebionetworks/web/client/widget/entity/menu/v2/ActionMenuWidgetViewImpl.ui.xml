@@ -48,6 +48,7 @@
 				<a:ActionMenuItem icon="HISTORY" iconFixedWidth="true" action="SHOW_VERSION_HISTORY">Version History</a:ActionMenuItem>
 				<a:ActionMenuItem icon="TELEVISION" iconFixedWidth="true" action="PROJECT_DISPLAY">Project Display Settings</a:ActionMenuItem>
 				<a:ActionMenuItem icon="UPLOAD" iconFixedWidth="true" action="UPLOAD_TABLE_DATA">Upload Data to Table</a:ActionMenuItem>
+				<a:ActionMenuItem icon="SEARCH" iconFixedWidth="true" action="TOGGLE_FULL_TEXT_SEARCH">Enable Full Text Search</a:ActionMenuItem>
 				<a:ActionMenuItem icon="EDIT" iconFixedWidth="true" action="EDIT_WIKI_PAGE">Edit Wiki Page</a:ActionMenuItem>
 				<a:ActionMenuItem icon="NEWSPAPER_O" iconFixedWidth="true" action="VIEW_WIKI_SOURCE">View Wiki Source</a:ActionMenuItem>
 				<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="ADD_WIKI_SUBPAGE">Add Wiki Subpage</a:ActionMenuItem>
