@@ -296,6 +296,7 @@ public class EntityActionControllerImplTest {
 		table.setParentId(parentId);
 		table.setVersionNumber(3L);
 		table.setIsLatestVersion(true);
+		table.setIsSearchEnabled(false);
 		permissions = new UserEntityPermissions();
 		permissions.setCanChangePermissions(true);
 		permissions.setCanView(true);
@@ -354,6 +355,21 @@ public class EntityActionControllerImplTest {
 		// create table version (snapshot)
 		verify(mockActionMenu).setActionVisible(Action.CREATE_TABLE_VERSION, true);
 		verify(mockActionMenu).setActionListener(Action.CREATE_TABLE_VERSION, controller);
+		// full text search
+		verify(mockActionMenu).setActionVisible(Action.TOGGLE_FULL_TEXT_SEARCH, true);
+		verify(mockActionMenu).setActionText(Action.TOGGLE_FULL_TEXT_SEARCH, "Enable Full Text Search");
+		verify(mockActionMenu).setActionListener(Action.TOGGLE_FULL_TEXT_SEARCH, controller);
+	}
+	
+	@Test
+	public void testDisableFullTextSearch() {
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+		((TableEntity)entityBundle.getEntity()).setIsSearchEnabled(true);
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
+		
+		verify(mockActionMenu).setActionVisible(Action.TOGGLE_FULL_TEXT_SEARCH, true);
+		verify(mockActionMenu).setActionText(Action.TOGGLE_FULL_TEXT_SEARCH, "Disable Full Text Search");
+		verify(mockActionMenu).setActionListener(Action.TOGGLE_FULL_TEXT_SEARCH, controller);
 	}
 
 	@Test
@@ -364,6 +380,7 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionVisible(Action.CHANGE_ENTITY_NAME, false);
 		verify(mockActionMenu).setActionVisible(Action.MOVE_ENTITY, false);
 		verify(mockActionMenu).setToolsButtonIcon("Docker Repository Tools", IconType.GEAR);
+		verify(mockActionMenu).setActionVisible(Action.TOGGLE_FULL_TEXT_SEARCH, false);
 	}
 
 	private void setPublicCanRead() {
@@ -1582,6 +1599,8 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		verify(mockActionMenu).setActionVisible(Action.CREATE_OR_UPDATE_DOI, false);
 		verify(mockActionMenu).setActionVisible(Action.CREATE_OR_UPDATE_DOI, true);
+		// verify that we currently do not support FTS for EntityViews
+		verify(mockActionMenu).setActionVisible(Action.TOGGLE_FULL_TEXT_SEARCH, false);
 	}
 
 	@Test
@@ -1906,4 +1925,34 @@ public class EntityActionControllerImplTest {
 		verify(mockView).showErrorMessage(error);
 		verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
 	}
+	
+	@Test
+	public void testOnToggleFullTextSearch() {
+		TableEntity tableEntity = (TableEntity)entityBundle.getEntity();
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+		AsyncMockStubber.callSuccessWith(tableEntity).when(mockSynapseJavascriptClient).updateEntity(any(Entity.class), anyString(), anyBoolean(), any(AsyncCallback.class));
+		assertFalse(tableEntity.getIsSearchEnabled());
+		
+		controller.onAction(Action.TOGGLE_FULL_TEXT_SEARCH);
+		
+		assertTrue(tableEntity.getIsSearchEnabled());
+		verify(mockView).showSuccess(anyString());
+	}
+	
+	@Test
+	public void testOnToggleFullTextSearchFailed() {
+		String errorMessage = "error during update";
+		TableEntity tableEntity = (TableEntity)entityBundle.getEntity();
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseJavascriptClient).updateEntity(any(Entity.class), anyString(), anyBoolean(), any(AsyncCallback.class));
+		assertFalse(tableEntity.getIsSearchEnabled());
+		
+		controller.onAction(Action.TOGGLE_FULL_TEXT_SEARCH);
+		
+		assertFalse(tableEntity.getIsSearchEnabled());
+		verify(mockView).showErrorMessage(errorMessage);
+	}
+
 }
