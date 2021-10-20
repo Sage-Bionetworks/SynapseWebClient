@@ -447,6 +447,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		configureUploadNewFileEntity();
 		configureAddExternalDockerRepo();
 		configureStatisticsPlotAction();
+		configureFullTextSearch();
 	}
 
 	private void configureStatisticsPlotAction() {
@@ -460,6 +461,20 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		}
 	}
 
+	private void configureFullTextSearch() {
+		if (entityBundle.getEntity() instanceof TableEntity && DisplayUtils.isInTestWebsite(cookies)) {
+			TableEntity tableEntity = (TableEntity) entityBundle.getEntity();
+			actionMenu.setActionVisible(Action.TOGGLE_FULL_TEXT_SEARCH, true);
+			actionMenu.setActionListener(Action.TOGGLE_FULL_TEXT_SEARCH, this);
+			boolean isFTSEnabled = tableEntity.getIsSearchEnabled() == null ? false : tableEntity.getIsSearchEnabled(); 
+			String actionTextPrefix = isFTSEnabled ? "Disable" : "Enable";
+			actionMenu.setActionText(Action.TOGGLE_FULL_TEXT_SEARCH, actionTextPrefix + " Full Text Search");
+			IconType icon = isFTSEnabled ? IconType.SEARCH_MINUS : IconType.SEARCH_PLUS;
+			actionMenu.setActionIcon(Action.TOGGLE_FULL_TEXT_SEARCH, icon);
+		} else {
+			actionMenu.setActionVisible(Action.TOGGLE_FULL_TEXT_SEARCH, false);
+		}
+	}
 	private void configureAddExternalDockerRepo() {
 		if (entityBundle.getEntity() instanceof Project && EntityArea.DOCKER.equals(currentArea)) {
 			actionMenu.setActionVisible(Action.CREATE_EXTERNAL_DOCKER_REPO, entityBundle.getPermissions().getCanCertifiedUserEdit());
@@ -1073,9 +1088,38 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			case SHOW_PROJECT_STATS:
 				onShowProjectStats();
 				break;
+			case TOGGLE_FULL_TEXT_SEARCH:
+				onToggleFullTextSearch();
+				break;
 			default:
 				break;
 		}
+	}
+
+	public void onToggleFullTextSearch() {
+		checkUpdateEntity(() -> {
+			postCheckToggleFullTextSearch();
+		});
+	}
+
+	private void postCheckToggleFullTextSearch() {
+		TableEntity tableEntity = (TableEntity)entityBundle.getEntity();
+		boolean newIsSearchEnabledValue = tableEntity.getIsSearchEnabled() == null ? true : !tableEntity.getIsSearchEnabled();
+		tableEntity.setIsSearchEnabled(newIsSearchEnabledValue);
+		getSynapseJavascriptClient().updateEntity(tableEntity, null, null, new AsyncCallback<Entity>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				// undo change, as we were unable to update the entity
+				tableEntity.setIsSearchEnabled(!newIsSearchEnabledValue);
+				view.showErrorMessage(caught.getMessage());
+			}
+			@Override
+			public void onSuccess(Entity result) {
+				fireEntityUpdatedEvent();
+				String successTextPrefix = newIsSearchEnabledValue ? "Enabled" : "Disabled";
+				view.showSuccess(successTextPrefix + " full text search for this table.");
+			}
+		});
 	}
 
 	public void onCreateExternalDockerRepo() {
