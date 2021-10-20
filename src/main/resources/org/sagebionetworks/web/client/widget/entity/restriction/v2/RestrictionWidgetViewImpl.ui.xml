@@ -9,7 +9,10 @@
 	<ui:with field='icons' type='org.sagebionetworks.web.client.IconsImageBundle'/>
  	<bh:Span addStyleNames="restrictionWidget">
  		<b:Anchor ui:field="folderViewTermsLink" visible="false" text="View Terms" />
- 		<w:ReactComponentDiv ui:field="hasAccessContainer" addStyleNames="displayInlineBlock min-width-42" height="30px"/>
+ 		<bh:Div ui:field="hasAccessContainerParent" addStyleNames="displayInlineBlock min-width-42">
+ 			<w:ReactComponentDiv ui:field="hasAccessContainer" height="30px"/>
+ 		</bh:Div>
+ 		
  		<bh:Span ui:field="linkUI">
 			<b:Tooltip placement="BOTTOM" title="Click here to add conditions for use">
 				<b:Anchor ui:field="changeLink" text="Add Conditions for Use" />
