@@ -5,7 +5,6 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
 import org.sagebionetworks.web.client.jsni.SynapseContextProviderPropsJSNIObject;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
@@ -45,6 +44,8 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	Paragraph folderUnrestrictedMessage;
 	@UiField
 	Span modalsContainer;
+	@UiField
+	Div hasAccessContainerParent;
 	@UiField
 	ReactComponentDiv hasAccessContainer;
 	
@@ -181,6 +182,9 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	@Override
 	public void configureCurrentAccessComponent(String entityId, Long versionNumber) {
 		String versionNumberString = versionNumber == null ? null : versionNumber.toString();
+		// SWC-5821: force remount
+		hasAccessContainer.removeFromParent();
+		hasAccessContainerParent.add(hasAccessContainer);
 		_showHasAccess(hasAccessContainer.getElement(), entityId, versionNumberString, propsProvider.getJsniContextProps());
 	}
 	
