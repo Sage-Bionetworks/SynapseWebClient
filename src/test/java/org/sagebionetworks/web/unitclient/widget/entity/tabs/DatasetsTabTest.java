@@ -50,6 +50,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
+import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
@@ -118,6 +119,8 @@ public class DatasetsTabTest {
 	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
 	@Mock
+	WikiPageWidget mockWikiPageWidget;
+	@Mock
 	PlaceChanger mockPlaceChanger;
 	String projectEntityId = "syn666666";
 	String projectName = "a test project";
@@ -151,6 +154,7 @@ public class DatasetsTabTest {
 		when(mockPortalGinInjector.getProvenanceRenderer()).thenReturn(mockProvenanceWidget);
 		when(mockPortalGinInjector.getGlobalApplicationState()).thenReturn(mockGlobalApplicationState);
 		when(mockPortalGinInjector.getSynapseJavascriptClient()).thenReturn(mockJsClient);
+		when(mockPortalGinInjector.getWikiPageWidget()).thenReturn(mockWikiPageWidget);
 
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		tab.setEntitySelectedCallback(mockEntitySelectedCallback);
@@ -238,6 +242,8 @@ public class DatasetsTabTest {
 		verify(mockView).setTitlebarVisible(true);
 		verify(mockView).clearTableEntityWidget();
 		verify(mockModifiedCreatedBy).setVisible(false);
+		verify(mockView).setWikiPage(any(Widget.class));
+		verify(mockView).setWikiPageVisible(true);
 
 		ArgumentCaptor<Synapse> captor = ArgumentCaptor.forClass(Synapse.class);
 		verify(mockTab).setEntityNameAndPlace(eq(datasetName), captor.capture());
@@ -273,6 +279,7 @@ public class DatasetsTabTest {
 		verify(mockView).setTableUIVisible(false);
 		verify(mockView, never()).setTableUIVisible(true);
 		verify(mockActionMenuWidget).setTableDownloadOptionsVisible(false);
+		verify(mockView).setWikiPageVisible(false);
 
 		verify(mockTableListWidget).configure(mockProjectEntityBundle, Arrays.asList(EntityType.dataset));
 

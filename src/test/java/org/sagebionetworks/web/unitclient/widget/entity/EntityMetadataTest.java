@@ -479,7 +479,9 @@ public class EntityMetadataTest {
 		widget.configure(bundle, null, mockActionMenuWidget);
 
 		verify(mockView).setDescription(description);
-		verify(mockView).setDescriptionVisible(true);
+		// For now we don't show description in any circumstance. When we do show descriptions, this condition can be flipped
+		verify(mockView).setDescriptionVisible(false);
+		// verify(mockView).setDescriptionVisible(true);
 	}
 
 	@Test

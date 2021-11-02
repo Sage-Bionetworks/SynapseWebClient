@@ -944,7 +944,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	 * @return
 	 */
 	public boolean isWikiableType(Entity entity) {
-		if (entity instanceof Table || entity instanceof Link) {
+		if (entity instanceof Link) {
 			return false;
 		}
 		return true;

@@ -88,8 +88,13 @@ public class EntityMetadata implements Presenter {
 		clear();
 		Entity en = bundle.getEntity();
 		view.setEntityId(en.getId());
-		view.setDescriptionVisible(bundle.getEntity() instanceof Table && en.getDescription() != null && DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider()));
+
+		// See comments on SWC-5763
+		// TL;DR: we plan to show the description at some point, but not until we implement new designs
+		// view.setDescriptionVisible(bundle.getEntity() instanceof Table && en.getDescription() != null && DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider()));
+		view.setDescriptionVisible(false);
 		view.setDescription(en.getDescription());
+
 		boolean canEdit = bundle.getPermissions().getCanCertifiedUserEdit();
 		isShowingAnnotations = false;
 		setAnnotationsVisible(isShowingAnnotations);

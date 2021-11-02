@@ -71,6 +71,7 @@ import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.doi.v2.DoiAssociation;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
@@ -637,21 +638,28 @@ public class EntityActionControllerImplTest {
 	}
 
 	@Test
-	public void testConfigureWikiNoWikiTable() {
+	public void testConfigureWikiTable() {
 		entityBundle.setEntity(new TableEntity());
 		entityBundle.setRootWikiId(null);
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
-		verify(mockActionMenu).setActionVisible(Action.EDIT_WIKI_PAGE, false);
+		verify(mockActionMenu).setActionVisible(Action.EDIT_WIKI_PAGE, true);
 	}
 
 	@Test
-	public void testConfigureWikiNoWikiView() {
+	public void testConfigureWikiView() {
 		entityBundle.setEntity(new EntityView());
 		entityBundle.setRootWikiId(null);
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
-		verify(mockActionMenu).setActionVisible(Action.EDIT_WIKI_PAGE, false);		
+		verify(mockActionMenu).setActionVisible(Action.EDIT_WIKI_PAGE, true);
 	}
 
+	@Test
+	public void testConfigureWikiDataset() {
+		entityBundle.setEntity(new Dataset());
+		entityBundle.setRootWikiId(null);
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
+		verify(mockActionMenu).setActionVisible(Action.EDIT_WIKI_PAGE, true);
+	}
 
 	@Test
 	public void testConfigureViewWikiSource() {
@@ -677,7 +685,7 @@ public class EntityActionControllerImplTest {
 		entityBundle.setEntity(new TableEntity());
 		entityBundle.setRootWikiId("22");
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
-		verify(mockActionMenu).setActionVisible(Action.VIEW_WIKI_SOURCE, false);
+		verify(mockActionMenu).setActionVisible(Action.VIEW_WIKI_SOURCE, true);
 	}
 
 	@Test
@@ -685,7 +693,15 @@ public class EntityActionControllerImplTest {
 		entityBundle.setEntity(new EntityView());
 		entityBundle.setRootWikiId("22");
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
-		verify(mockActionMenu).setActionVisible(Action.VIEW_WIKI_SOURCE, false);
+		verify(mockActionMenu).setActionVisible(Action.VIEW_WIKI_SOURCE, true);
+	}
+
+	@Test
+	public void testConfigureViewWikiSourceDataset() {
+		entityBundle.setEntity(new Dataset());
+		entityBundle.setRootWikiId("22");
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
+		verify(mockActionMenu).setActionVisible(Action.VIEW_WIKI_SOURCE, true);
 	}
 
 	@Test
@@ -1221,14 +1237,16 @@ public class EntityActionControllerImplTest {
 		assertTrue(controller.isWikiableConfig(new Project(), EntityArea.WIKI));
 		assertFalse(controller.isWikiableConfig(new Project(), EntityArea.TABLES));
 		assertFalse(controller.isWikiableConfig(new Project(), EntityArea.FILES));
-		assertFalse(controller.isWikiableConfig(new TableEntity(), null));
+		assertTrue(controller.isWikiableConfig(new TableEntity(), null));
 		assertTrue(controller.isWikiableConfig(new FileEntity(), null));
 	}
 
 	@Test
 	public void testIsWikableType() {
 		assertTrue(controller.isWikiableType(new Project()));
-		assertFalse(controller.isWikiableType(new TableEntity()));
+		assertTrue(controller.isWikiableType(new TableEntity()));
+		assertTrue(controller.isWikiableType(new EntityView()));
+		assertTrue(controller.isWikiableType(new Dataset()));
 		assertTrue(controller.isWikiableType(new FileEntity()));
 		assertTrue(controller.isWikiableType(new Folder()));
 		assertFalse(controller.isWikiableType(new Link()));

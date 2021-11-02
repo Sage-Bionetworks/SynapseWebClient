@@ -9,6 +9,7 @@ import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityType;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.Query;
@@ -22,6 +23,7 @@ import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.breadcrumb.LinkData;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
+import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
@@ -32,6 +34,7 @@ import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
 import org.sagebionetworks.web.shared.WidgetConstants;
+import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.place.shared.Place;
 import com.google.inject.Inject;
@@ -63,6 +66,7 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 	Map<String, String> configMap;
 	CallbackP<String> entitySelectedCallback;
 	Long version;
+	WikiPageWidget wikiPageWidget;
 
 	protected abstract EntityArea getTabArea();
 
@@ -116,6 +120,7 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 			this.queryTokenProvider = ginInjector.getQueryTokenProvider();
 			this.synAlert = ginInjector.getStuAlert();
 			this.modifiedCreatedBy = ginInjector.getModifiedCreatedByWidget();
+			this.wikiPageWidget = ginInjector.getWikiPageWidget();
 
 			view.setTitle(getTabDisplayName());
 			view.setBreadcrumb(breadcrumb.asWidget());
@@ -124,8 +129,8 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 			view.setEntityMetadata(metadata.asWidget());
 			view.setSynapseAlert(synAlert.asWidget());
 			view.setModifiedCreatedBy(modifiedCreatedBy);
+			view.setWikiPage(wikiPageWidget.asWidget());
 			tab.setContent(view.asWidget());
-
 			tableListWidget.setTableClickedCallback(getTableListWidgetClickedCallback());
 			initBreadcrumbLinkClickedHandler();
 			configMap = ProvenanceWidget.getDefaultWidgetDescriptor();
@@ -164,6 +169,7 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 			view.setBreadcrumbVisible(false);
 			view.setTableListVisible(false);
 			view.setTitlebarVisible(false);
+			view.setWikiPageVisible(false);
 			view.clearTableEntityWidget();
 			modifiedCreatedBy.setVisible(false);
 			view.setTableUIVisible(false);
@@ -261,16 +267,42 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 		boolean isCurrentVersion = version == null;
 		tab.configureEntityActionController(bundle, isCurrentVersion, null);
 		if (isShownInTab) {
+			final boolean canEdit = bundle.getPermissions().getCanCertifiedUserEdit();
+
 			updateVersionAndAreaToken(entity.getId(), version, areaToken);
 			breadcrumb.configure(bundle.getPath(), getTabArea());
 			titleBar.configure(bundle);
 			modifiedCreatedBy.configure(entity.getCreatedOn(), entity.getCreatedBy(), entity.getModifiedOn(), entity.getModifiedBy());
 			v2TableWidget = ginInjector.createNewTableEntityWidget();
 			view.setTableEntityWidget(v2TableWidget.asWidget());
-			v2TableWidget.configure(bundle, version, bundle.getPermissions().getCanCertifiedUserEdit(), this, tab.getEntityActionMenu());
+			v2TableWidget.configure(bundle, version, canEdit, this, tab.getEntityActionMenu());
+
+			// Configure wiki
+			view.setWikiPageVisible(true);
+			final WikiPageWidget.Callback wikiCallback = new WikiPageWidget.Callback() {
+				@Override
+				public void pageUpdated() {
+					ginInjector.getEventBus().fireEvent(new EntityUpdatedEvent());
+				}
+
+				@Override
+				public void noWikiFound() {
+					view.setWikiPageVisible(false);
+				}
+			};
+			wikiPageWidget.configure(new WikiPageKey(entity.getId(), ObjectType.ENTITY.toString(), bundle.getRootWikiId(), versionNumber), canEdit, wikiCallback);
+			CallbackP<String> wikiReloadHandler = new CallbackP<String>() {
+				@Override
+				public void invoke(String wikiPageId) {
+					wikiPageWidget.configure(new WikiPageKey(entity.getId(), ObjectType.ENTITY.toString(), wikiPageId, versionNumber), canEdit, wikiCallback);
+				}
+			};
+			wikiPageWidget.setWikiReloadHandler(wikiReloadHandler);
+
 		} else if (isProject) {
 			areaToken = null;
 			tableListWidget.configure(bundle, getTypesShownInList());
+			view.setWikiPageVisible(false);
 			showProjectLevelUI();
 		}
 	}
