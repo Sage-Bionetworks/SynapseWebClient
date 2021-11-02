@@ -37,7 +37,7 @@ public class DatasetsTab extends AbstractTablesTab {
 
 	@Override
 	protected String getTabDisplayName() {
-		return DisplayConstants.TABLES;
+		return DisplayConstants.DATASETS;
 	}
 
 	@Override

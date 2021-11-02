@@ -100,6 +100,7 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 			links.add(new LinkData(getTabDisplayName(), getTabIcon(), projectPlace));
 			breadcrumb.configure(links, entityHeader.getName());
 
+			view.setTitle(getTabDisplayName());
 			view.setBreadcrumbVisible(true);
 			view.setTitlebarVisible(true);
 		};
@@ -116,6 +117,7 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 			this.synAlert = ginInjector.getStuAlert();
 			this.modifiedCreatedBy = ginInjector.getModifiedCreatedByWidget();
 
+			view.setTitle(getTabDisplayName());
 			view.setBreadcrumb(breadcrumb.asWidget());
 			view.setTableList(tableListWidget.asWidget());
 			view.setTitlebar(titleBar.asWidget());
@@ -246,6 +248,7 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 		boolean isProject = entity instanceof Project;
 		boolean isVersionSupported = EntityActionControllerImpl.isVersionSupported(entityBundle.getEntity(), ginInjector.getCookieProvider());
 		version = isVersionSupported ? versionNumber : null;
+		view.setTitle(getTabDisplayName());
 		view.setEntityMetadataVisible(isShownInTab);
 		view.setBreadcrumbVisible(isShownInTab);
 		view.setTableListVisible(isProject);
