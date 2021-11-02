@@ -15,7 +15,7 @@
 		</bh:Div>
 		<bh:Div addStyleNames="margin-left-15 margin-right-15">
 			<g:SimplePanel ui:field="tableMetadataContainer" visible="false"/>
-			<b:Heading size="H3" ui:field="title" text="Tables" addStyleNames="margin-bottom-20"/>
+			<b:Heading size="H3" ui:field="title" addStyleNames="margin-bottom-20"/>
 		</bh:Div>
 		<b:Column size="XS_12">
 			<g:SimplePanel ui:field="tableListWidgetContainer" visible="false"/>

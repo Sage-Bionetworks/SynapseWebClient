@@ -61,6 +61,11 @@ public class TablesTabViewImpl implements TablesTabView {
 	}
 
 	@Override
+	public void setTitle(String s) {
+		title.setText(s);
+	}
+
+	@Override
 	public void setTitlebar(Widget w) {
 		tableTitlebarContainer.setWidget(w);
 	}

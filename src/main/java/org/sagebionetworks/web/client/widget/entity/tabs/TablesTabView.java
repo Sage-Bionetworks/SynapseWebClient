@@ -7,6 +7,8 @@ public interface TablesTabView extends IsWidget {
 	public interface Presenter {
 	}
 
+	void setTitle(String title);
+
 	void setTitlebar(Widget w);
 
 	void setTitlebarVisible(boolean visible);
