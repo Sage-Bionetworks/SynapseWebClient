@@ -36,6 +36,8 @@ public class TablesTabViewImpl implements TablesTabView {
 	Div actionMenuContainer;
 	@UiField
 	Heading title;
+	@UiField
+	SimplePanel tableWikiPageContainer;
 
 	public interface TabsViewImplUiBinder extends UiBinder<Widget, TablesTabViewImpl> {
 	}
@@ -137,6 +139,16 @@ public class TablesTabViewImpl implements TablesTabView {
 		w.asWidget().removeFromParent();
 		actionMenuContainer.clear();
 		actionMenuContainer.add(w);
+	}
+
+	@Override
+	public void setWikiPage(Widget w) {
+		tableWikiPageContainer.setWidget(w);
+	}
+
+	@Override
+	public void setWikiPageVisible(boolean visible) {
+		tableWikiPageContainer.setVisible(visible);
 	}
 }
 

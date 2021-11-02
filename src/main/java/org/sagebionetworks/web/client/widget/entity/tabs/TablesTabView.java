@@ -39,4 +39,8 @@ public interface TablesTabView extends IsWidget {
 
 	void setActionMenu(IsWidget w);
 
+	void setWikiPage(Widget w);
+
+	void setWikiPageVisible(boolean visible);
+
 }

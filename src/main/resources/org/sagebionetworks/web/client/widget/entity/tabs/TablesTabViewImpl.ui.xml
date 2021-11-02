@@ -19,7 +19,8 @@
 		</bh:Div>
 		<b:Column size="XS_12">
 			<g:SimplePanel ui:field="tableListWidgetContainer" visible="false"/>
-			<g:SimplePanel addStyleNames="margin-top-15" ui:field="tableWidgetContainer"/>
+            <g:SimplePanel ui:field="tableWikiPageContainer" addStyleNames="panel panel-default panel-body margin-bottom-0-imp" visible="false"/>
+            <g:SimplePanel addStyleNames="margin-top-15" ui:field="tableWidgetContainer"/>
 			<g:SimplePanel addStyleNames="padding-bottom-15" ui:field="tableModifiedAndCreatedContainer"/>
 			<b:Row>
 				<b:Column size="XS_12" ui:field="provenanceContainer">
