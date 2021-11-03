@@ -100,6 +100,7 @@ import com.google.inject.Inject;
 public class EntityActionControllerImpl implements EntityActionController, ActionListener {
 
 	public static final String CREATING_A_NEW_VIEW_VERSION_MESSAGE = "Creating a new View version...";
+	public static final String CREATING_A_NEW_DATASET_VERSION_MESSAGE = "Creating a new Dataset version...";
 
 	public static final String TOOLS = " Tools";
 
@@ -1462,7 +1463,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 						view.showErrorMessage(caught.getMessage());
 					}
 				});
-			} else if (entity instanceof EntityView) {
+			} else if (entity instanceof EntityView || entity instanceof Dataset) {
 				// create the version via an update table transaction
 				// Start the job.
 				TableUpdateTransactionRequest transactionRequest = new TableUpdateTransactionRequest();
@@ -1474,7 +1475,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 				transactionRequest.setChanges(new ArrayList<>());
 				transactionRequest.setCreateSnapshot(true);
 				view.showCreateVersionDialog();
-				getJobTrackingWidget().startAndTrackJob(CREATING_A_NEW_VIEW_VERSION_MESSAGE, false, AsynchType.TableTransaction, transactionRequest, new AsynchronousProgressHandler() {
+				String message = entity instanceof EntityView ? CREATING_A_NEW_VIEW_VERSION_MESSAGE : CREATING_A_NEW_DATASET_VERSION_MESSAGE;
+				getJobTrackingWidget().startAndTrackJob(message, false, AsynchType.TableTransaction, transactionRequest, new AsynchronousProgressHandler() {
 
 					@Override
 					public void onFailure(Throwable failure) {
