@@ -932,6 +932,57 @@ public class EntityActionControllerImplTest {
 	}
 
 	@Test
+	public void testOnCreateDatasetSnapshot() {
+		Entity dataset = new Dataset();
+		dataset.setId(entityId);
+		dataset.setParentId(parentId);
+		entityBundle.setEntity(dataset);
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
+
+		// the call under test
+		controller.onAction(Action.CREATE_TABLE_VERSION);
+
+		verify(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+		verify(mockView).showMultiplePromptDialog(anyString(), anyList(), anyList(), callbackListStringCaptor.capture());
+		CallbackP<List<String>> valuesCallback = callbackListStringCaptor.getValue();
+		// invoke with a label and comment
+		String label = "my label";
+		String comment = "my comment";
+		List<String> values = new ArrayList<String>();
+		values.add(label);
+		values.add(comment);
+		valuesCallback.invoke(values);
+
+		verify(mockJobTrackingWidget).startAndTrackJob(eq(EntityActionControllerImpl.CREATING_A_NEW_DATASET_VERSION_MESSAGE), eq(false), eq(AsynchType.TableTransaction), tableUpdateTransactionRequestCaptor.capture(), asyncProgressHandlerCaptor.capture());
+		TableUpdateTransactionRequest request = tableUpdateTransactionRequestCaptor.getValue();
+		AsynchronousProgressHandler handler = asyncProgressHandlerCaptor.getValue();
+
+		// verify request
+		assertEquals(entityId, request.getEntityId());
+		assertEquals(label, request.getSnapshotOptions().getSnapshotLabel());
+		assertEquals(comment, request.getSnapshotOptions().getSnapshotComment());
+
+		// verify response handler
+		// on error
+		String errorMessage = "an error";
+		handler.onFailure(new Exception(errorMessage));
+		verify(mockView).hideCreateVersionDialog();
+		verify(mockView).showErrorMessage(errorMessage);
+		reset(mockView);
+
+		// on cancel
+		handler.onCancel();
+		verify(mockView).hideCreateVersionDialog();
+		reset(mockView);
+
+		// on success
+		handler.onComplete(mockAsyncResponseBody);
+		verify(mockView).hideCreateVersionDialog();
+		verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
+	}
+
+	@Test
 	public void testOnDeleteConfirmedPreFlightPassedDeleteFailed() {
 		// confirm the delete
 		AsyncMockStubber.callWithInvoke().when(mockView).showConfirmDeleteDialog(anyString(), any(Callback.class));
