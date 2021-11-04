@@ -31,6 +31,7 @@ import com.google.inject.Inject;
 public class CreateTableViewWizardStep1 implements ModalPage, CreateTableViewWizardStep1View.Presenter {
 	public static final String EMPTY_SCOPE_MESSAGE = "Please define the scope for this view.";
 	private static final String NEXT = "Next";
+	private static final String FINISH = "Finish";
 	public static final String NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER = "Name must include at least one character.";
 
 	CreateTableViewWizardStep1View view;
@@ -134,8 +135,14 @@ public class CreateTableViewWizardStep1 implements ModalPage, CreateTableViewWiz
 		jsClient.createEntity(entity).addCallback(new FutureCallback<Entity>() {
 			@Override
 			public void onSuccess(Entity table) {
-				step2.configure((Table) table, tableType);
-				modalPresenter.setNextActivePage(step2);
+				// For Datasets, this is the only step.
+				if (TableType.dataset.equals(tableType)) {
+					modalPresenter.onFinished();
+				} else {
+					// All other tables go to step 2
+					step2.configure((Table) table, tableType);
+					modalPresenter.setNextActivePage(step2);
+				}
 			}
 
 			@Override
@@ -167,7 +174,7 @@ public class CreateTableViewWizardStep1 implements ModalPage, CreateTableViewWiz
 	@Override
 	public void setModalPresenter(ModalPresenter modalPresenter) {
 		this.modalPresenter = modalPresenter;
-		modalPresenter.setPrimaryButtonText(NEXT);
+		modalPresenter.setPrimaryButtonText(TableType.dataset.equals(tableType) ? FINISH : NEXT);
 	}
 
 
