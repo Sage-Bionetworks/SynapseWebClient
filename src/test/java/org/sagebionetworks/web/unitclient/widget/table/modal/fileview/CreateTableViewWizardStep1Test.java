@@ -18,6 +18,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.SubmissionView;
 import org.sagebionetworks.repo.model.table.TableEntity;
@@ -212,6 +213,28 @@ public class CreateTableViewWizardStep1Test {
 		verify(mockStep2).configure(table, TableType.table);
 		verify(mockWizardPresenter).setNextActivePage(mockStep2);;
 	}
+
+	@Test
+	public void testCreateDataset() {
+		widget.configure(parentId, TableType.dataset);
+		verify(mockView).setEntityViewScopeWidgetVisible(false);
+		verify(mockView).setViewTypeOptionsVisible(false);
+		String tableName = "a name";
+		Dataset dataset = new Dataset();
+		dataset.setName(tableName);
+		dataset.setId("syn57");
+		ArgumentCaptor<Entity> captor = ArgumentCaptor.forClass(Entity.class);
+		when(mockJsClient.createEntity(captor.capture())).thenReturn(getDoneFuture(dataset));
+		when(mockView.getName()).thenReturn(tableName);
+		widget.onPrimary();
+
+		verify(mockWizardPresenter, never()).setErrorMessage(anyString());
+		// We shouldn't go to step 2 for dataseets
+		verify(mockStep2, never()).configure(any(), any());
+		verify(mockWizardPresenter, never()).setNextActivePage(mockStep2);
+		verify(mockWizardPresenter).onFinished();
+	}
+
 
 	@Test
 	public void testCreateFailed() {
