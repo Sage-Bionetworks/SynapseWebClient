@@ -13,6 +13,7 @@ import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryFilter;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.TableBundle;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cache.SessionStorage;
@@ -56,8 +57,13 @@ public class TableEntityWidget implements IsWidget, QueryResultsListener, QueryI
 	public static final String RESET_SEARCH_QUERY = "Reset search query?";
 	public static final long DEFAULT_OFFSET = 0L;
 	public static final String SELECT_FROM = "SELECT * FROM ";
-	public static final String NO_COLUMNS_EDITABLE = "This table does not have any columns.  Select 'Schema' to add columns to the this table.";
-	public static final String NO_COLUMNS_NOT_EDITABLE = "This table does not have any columns.";
+	public static final String getNoColumnsEditableMessage(TableType tableType) {
+		return "This " + tableType.getDisplayName() + " does not have any columns. Edit the Schema to add columns to this " + tableType.getDisplayName() + ".";
+	}
+	public static final String getNoColumnsNotEditableMessage(TableType tableType) {
+		return "This " + tableType.getDisplayName() + " does not have any columns.";
+	}
+
 	public static final long DEFAULT_LIMIT = 25;
 	public static final int MAX_SORT_COLUMNS = 3;
 	// Look for:
@@ -375,9 +381,9 @@ public class TableEntityWidget implements IsWidget, QueryResultsListener, QueryI
 	private void setNoColumnsState() {
 		String message = null;
 		if (this.canEdit) {
-			message = NO_COLUMNS_EDITABLE;
+			message = getNoColumnsEditableMessage(tableType);
 		} else {
-			message = NO_COLUMNS_NOT_EDITABLE;
+			message = getNoColumnsNotEditableMessage(tableType);
 		}
 		// There can be no query when there are no columns
 		if (this.queryChangeHandler.getQueryString() != null) {

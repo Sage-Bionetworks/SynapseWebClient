@@ -248,5 +248,13 @@ public class DisplayConstants {
 	public static final String NEXT = "Next";
 	public static final String SUBMIT = "Submit";
 	public static final String VIEW_DOWNLOAD_LIST = "view download list";
+
+	public static final String TABLE = "Table";
+	public static final String VIEW = "View";
+	public static final String DATASET = "Dataset";
+	public static final String SUBMISSION_VIEW = "Submission View";
+	public static final String PROJECT_VIEW = "Project View";
+	public static final String FILE_VIEW = "File View";
+
 }
 

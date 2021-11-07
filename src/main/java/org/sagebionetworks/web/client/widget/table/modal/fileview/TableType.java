@@ -13,13 +13,28 @@ import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.SubmissionView;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.ViewTypeMask;
+import org.sagebionetworks.web.client.DisplayConstants;
+
 
 public enum TableType {
-	table(null), submission_view(null), projects(PROJECT), tables(TABLE), folders(FOLDER), folders_tables(FOLDER | TABLE), files(FILE), files_tables(FILE | TABLE), files_folders(FILE | FOLDER), files_folders_tables(FILE | FOLDER | TABLE), dataset(FILE);
-	private Integer viewTypeMask;
+	table(null, DisplayConstants.TABLE),
+	submission_view(null, DisplayConstants.SUBMISSION_VIEW),
+	projects(PROJECT, DisplayConstants.PROJECT_VIEW),
+	tables(TABLE, DisplayConstants.VIEW),
+	folders(FOLDER, DisplayConstants.VIEW),
+	folders_tables(FOLDER | TABLE, DisplayConstants.VIEW),
+	files(FILE, DisplayConstants.FILE_VIEW),
+	files_tables(FILE | TABLE, DisplayConstants.VIEW),
+	files_folders(FILE | FOLDER, DisplayConstants.VIEW),
+	files_folders_tables(FILE | FOLDER | TABLE, DisplayConstants.VIEW),
+	dataset(FILE, DisplayConstants.DATASET);
 
-	TableType(Integer viewTypeMask) {
+	private Integer viewTypeMask;
+	private String displayName;
+
+	TableType(Integer viewTypeMask, String displayName) {
 		this.viewTypeMask = viewTypeMask;
+		this.displayName = displayName;
 	}
 
 	public Integer getViewTypeMask() {
@@ -92,7 +107,7 @@ public enum TableType {
 			return TableType.submission_view;
 		} else if (entity instanceof EntityView) {
 			EntityView view = (EntityView) entity;
-			
+
 			Long typeMask = view.getViewTypeMask();
 			if (typeMask == null) {
 				typeMask = ViewTypeMask.getMaskForDepricatedType(view.getType());
@@ -100,5 +115,9 @@ public enum TableType {
 			return getTableType(typeMask);
 		}
 		return null;
+	}
+
+	public String getDisplayName() {
+		return this.displayName;
 	}
 }
