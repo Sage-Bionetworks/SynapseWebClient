@@ -27,7 +27,7 @@ public class DatasetsTab extends AbstractTablesTab {
 		super(tab, ginInjector);
 		this.tab = tab;
 		this.ginInjector = ginInjector;
-		tab.configure(DisplayConstants.DATASETS, "table", DATASETS_HELP, "", EntityArea.DATASETS);
+		tab.configure(DisplayConstants.DATASETS, "dataset", DATASETS_HELP, "", EntityArea.DATASETS);
 	}
 
 	@Override
