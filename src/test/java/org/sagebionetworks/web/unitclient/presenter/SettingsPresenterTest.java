@@ -474,17 +474,6 @@ public class SettingsPresenterTest {
 	}
 
 	@Test
-	public void testNewVerificationSubmissionClickedNotCertified() {
-		when(mockUserBundle.getIsCertified()).thenReturn(false);
-		// view my own profile. submit a new verification submission, verify that modal is shown
-		when(mockVerificationSubmissionModal.configure(any(UserProfile.class), anyString(), anyBoolean(), anyList())).thenReturn(mockVerificationSubmissionModal);
-		presenter.configure();
-		presenter.newVerificationSubmissionClicked();
-		verify(mockView).showErrorMessage(SettingsPresenter.MUST_BE_CERTIFIED_TO_SUBMIT_PROFILE_VALIDATION_MESSAGE);
-		verify(mockVerificationSubmissionModal, never()).show();
-	}
-
-	@Test
 	public void testNewVerificationSubmissionClickedWithExistingAttachments() {
 		// view my own profile. submit a new verification submission, verify that modal is shown
 		when(mockUserBundle.getIsCertified()).thenReturn(true);
