@@ -243,6 +243,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 			icon.setFixedWidth(true);
 			icon.setPull(Pull.RIGHT);
 			Tooltip tooltip = new Tooltip(icon);
+			tooltip.setContainer("body");
 			tooltip.setPlacement(Placement.RIGHT);
 			if (html != null) {
 				tooltip.setHtml(SafeHtmlUtils.fromTrustedString(html));
