@@ -42,7 +42,7 @@ public class LoginWidgetViewImpl implements LoginWidgetView, IsWidget {
 		widget.addAttachHandler(event -> {
 			if (event.isAttached()) {
 				_createSRCLogin(srcLoginContainer.getElement(), this,
-						RegisterAccountViewImpl.GOOGLE_OAUTH_CALLBACK_URL, propsProvider.getJsniContextProps());
+						RegisterAccountViewImpl.OAUTH_CALLBACK_URL, propsProvider.getJsniContextProps());
 			}
 		});
 	}
@@ -54,14 +54,14 @@ public class LoginWidgetViewImpl implements LoginWidgetView, IsWidget {
 	}
 
 	private static native void _createSRCLogin(Element el, LoginWidgetViewImpl loginWidgetView,
-	   String googleSSORedirectUrl, SynapseContextProviderPropsJSNIObject wrapperProps) /*-{
+	   String ssoRedirectUrl, SynapseContextProviderPropsJSNIObject wrapperProps) /*-{
 		try {
 			function sessionCallback() {
 				loginWidgetView.@org.sagebionetworks.web.client.widget.login.LoginWidgetViewImpl::postLogin()();
 			}
 
 			var props = {
-				googleRedirectUrl : googleSSORedirectUrl,
+				ssoRedirectUrl : ssoRedirectUrl,
 				sessionCallback : sessionCallback
 			};
 
