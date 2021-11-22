@@ -21,12 +21,16 @@
 					<t:TableHeader width="20px" />
 					<tr:SortableTableHeaderImpl
 						ui:field="nameColumnHeader" text="Name" />
+					<t:TableHeader width="100px"
+						addStyleNames="visible-md visible-lg">
+						<bh:Span text="Type" />
+					</t:TableHeader>
 					<t:TableHeader width="310px"
 						addStyleNames="visible-xl">
 						<bh:Span text="Modified By" />
 					</t:TableHeader>
 					<tr:SortableTableHeaderImpl width="165px" ui:field="modifiedOnColumnHeader"
-						addStyleNames="visible-md visible-lg" text="Modified On">						
+						addStyleNames="visible-md visible-lg" text="Modified On">
 					</tr:SortableTableHeaderImpl>
 					<tr:SortableTableHeaderImpl
 						width="165px" ui:field="createdOnColumnHeader" text="Created On"
