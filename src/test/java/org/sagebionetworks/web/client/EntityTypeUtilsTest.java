@@ -8,7 +8,9 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.EntityView;
+import org.sagebionetworks.repo.model.table.SubmissionView;
 import org.sagebionetworks.repo.model.table.TableEntity;
 
 public class EntityTypeUtilsTest {
@@ -49,4 +51,11 @@ public class EntityTypeUtilsTest {
 		assertEquals(IconType.FILE, EntityTypeUtils.getIconTypeForEntityClassName("default"));
 	}
 
+	@Test
+	public void testGetFriendlyTableTypeName() {
+		assertEquals(EntityTypeUtils.TABLE_ENTITY_DISPLAY_NAME, EntityTypeUtils.getFriendlyTableTypeName(TableEntity.class.getName()));
+		assertEquals(EntityTypeUtils.ENTITY_VIEW_DISPLAY_NAME, EntityTypeUtils.getFriendlyTableTypeName(EntityView.class.getName()));
+		assertEquals(EntityTypeUtils.SUBMISSION_VIEW_DISPLAY_NAME, EntityTypeUtils.getFriendlyTableTypeName(SubmissionView.class.getName()));
+		assertEquals(EntityTypeUtils.DATASET_DISPLAY_NAME, EntityTypeUtils.getFriendlyTableTypeName(Dataset.class.getName()));
+	}
 }

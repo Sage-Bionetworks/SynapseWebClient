@@ -16,6 +16,12 @@ import org.sagebionetworks.repo.model.table.TableEntity;
 public class EntityTypeUtils {
 
 
+	public static final String SUBMISSION_VIEW_DISPLAY_NAME = "Submissions";
+	public static final String ENTITY_VIEW_DISPLAY_NAME = "View";
+	public static final String DATASET_DISPLAY_NAME = "Dataset";
+	public static final String TABLE_ENTITY_DISPLAY_NAME = "Table";
+	public static final String UNKNOWN_TABLE_TYPE = "Unknown Table Type";
+
 	public static String getEntityClassNameForEntityType(String entityType) {
 		String className = FileEntity.class.getName();
 		if (entityType != null) {
@@ -114,5 +120,19 @@ public class EntityTypeUtils {
 		}
 
 		return icon;
+	}
+	
+	public static String getFriendlyTableTypeName(String className) {
+		String friendlyName = UNKNOWN_TABLE_TYPE;
+		if (TableEntity.class.getName().equals(className)) {
+			friendlyName = TABLE_ENTITY_DISPLAY_NAME;
+		} else if (Dataset.class.getName().equals(className)) {
+			friendlyName = DATASET_DISPLAY_NAME;
+		} else if (EntityView.class.getName().equals(className)) {
+			friendlyName = ENTITY_VIEW_DISPLAY_NAME;
+		} else if (SubmissionView.class.getName().equals(className)) {
+			friendlyName = SUBMISSION_VIEW_DISPLAY_NAME;
+		}
+		return friendlyName;
 	}
 }
