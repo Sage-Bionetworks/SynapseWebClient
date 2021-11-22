@@ -57,5 +57,7 @@ public class EntityTypeUtilsTest {
 		assertEquals(EntityTypeUtils.ENTITY_VIEW_DISPLAY_NAME, EntityTypeUtils.getFriendlyTableTypeName(EntityView.class.getName()));
 		assertEquals(EntityTypeUtils.SUBMISSION_VIEW_DISPLAY_NAME, EntityTypeUtils.getFriendlyTableTypeName(SubmissionView.class.getName()));
 		assertEquals(EntityTypeUtils.DATASET_DISPLAY_NAME, EntityTypeUtils.getFriendlyTableTypeName(Dataset.class.getName()));
+
+		assertEquals(EntityTypeUtils.UNKNOWN_TABLE_TYPE, EntityTypeUtils.getFriendlyTableTypeName("coffee table"));
 	}
 }
