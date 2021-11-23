@@ -37,7 +37,9 @@
 			</bh:Div>
 		</bh:Div>
 
-		<bh:Div ui:field="addToDownloadListContainer" />
+        <w:ReactComponentDiv ui:field="itemsEditorContainer" />
+
+        <bh:Div ui:field="addToDownloadListContainer" />
 		<bh:Div styleName="margin-top-5" />
 		<g:SimplePanel ui:field="queryResultsPanel" />
 
