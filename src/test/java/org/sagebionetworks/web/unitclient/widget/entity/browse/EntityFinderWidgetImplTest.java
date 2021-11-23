@@ -27,6 +27,7 @@ import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.exceptions.WebClientConfigurationException;
+import org.sagebionetworks.web.client.jsinterop.EntityFinderProps;
 import org.sagebionetworks.web.client.jsinterop.EntityFinderScope;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
@@ -84,7 +85,7 @@ public class EntityFinderWidgetImplTest {
 
         String title = "Custom modal title";
         String prompt = "Custom prompt text";
-        String selected = "Custom selected text";
+        EntityFinderProps.SelectedCopyHandler selected = (count) -> "Custom selected text";
         String confirmCopy = "Custom Action";
         String helpText = "Custom Instructions and Guidance";
 
@@ -163,7 +164,7 @@ public class EntityFinderWidgetImplTest {
         getBundleCaptor.getValue().onSuccess(bundle);
 
 
-        verify(mockView).renderComponent(eq(EntityFinderScope.CURRENT_PROJECT), eq(EntityFinderWidget.InitialContainer.PARENT), eq(projectId), eq(containerId), anyBoolean(), anyBoolean(), any(EntityFilter.class), any(EntityFilter.class), any(EntityFilter.class), anyString(), anyBoolean(), anyBoolean());
+        verify(mockView).renderComponent(eq(EntityFinderScope.CURRENT_PROJECT), eq(EntityFinderWidget.InitialContainer.PARENT), eq(projectId), eq(containerId), anyBoolean(), anyBoolean(), any(EntityFilter.class), any(EntityFilter.class), any(EntityFilter.class), any(), anyBoolean(), anyBoolean());
     }
 
     @Test

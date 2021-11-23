@@ -1292,7 +1292,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 				.setModalTitle("Create Link to " + entityTypeDisplay)
 				.setHelpMarkdown("Search or Browse to find a Project or Folder that you have access to, and place a symbolic link for easy access")
 				.setPromptCopy("Find a destination and place a link to <b>" + SafeHtmlUtils.fromString(entity.getName()).asString() + "</b> (" + entity.getId() + ")")
-				.setSelectedCopy("Destination")
+				.setSelectedCopy((count) -> "Destination")
 				.setConfirmButtonCopy("Create Link")
 				.build()
 				.show();
@@ -1359,7 +1359,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 				.setModalTitle("Move " + entityTypeDisplay)
 				.setHelpMarkdown("Search or Browse Synapse to find a destination to move this " + entityTypeDisplay)
 				.setPromptCopy("Find a destination to move <b>" + SafeHtmlUtils.fromString(entity.getName()).asString() + "</b> (" + entity.getId() + ")")
-				.setSelectedCopy("Destination")
+				.setSelectedCopy((count) -> "Destination")
 				.setConfirmButtonCopy("Move")
 				.setShowVersions(false)
 				.setTreeOnly(true)
