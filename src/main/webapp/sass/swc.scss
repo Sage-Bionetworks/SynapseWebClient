@@ -11,6 +11,8 @@
 @use 'node_modules/synapse-react-client/dist/style/main.scss' with (
   $primary-action-color: swc.$synapse-blue,
   $secondary-action-color: swc.$synapse-green,
+  $primary-color-palette: swc.$synapse-primary-color-palette,
+  $secondary-color-palette: swc.$synapse-secondary-color-palette,
   $bootstrap-4-danger-bg: swc.$synapse-red-error,
   $bootstrap-4-danger-text-color: white
 );
