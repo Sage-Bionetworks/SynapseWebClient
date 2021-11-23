@@ -33,6 +33,8 @@ public class TableEntityListGroupItem implements IsWidget {
 	@UiField
 	TextBox idField;
 	@UiField
+	Label typeField;
+	@UiField
 	Div modifiedByField;
 	@UiField
 	Label modifiedOnField;
@@ -82,6 +84,7 @@ public class TableEntityListGroupItem implements IsWidget {
 		}
 
 		icon.setType(EntityTypeUtils.getIconTypeForEntityClassName(header.getType()));
+		typeField.setText(EntityTypeUtils.getFriendlyTableTypeName(header.getType()));
 	}
 
 	@Override

@@ -1339,6 +1339,11 @@ h1, h2, h3, h4, h5, h6 {
 	overflow: auto;
 }
 
+// SWC-5854: Override the margin for paragraphs that are in table cells
+#body td p {
+	margin-bottom: 0px;
+}
+
 .truncate {
 	max-width: 250px;
 	p {

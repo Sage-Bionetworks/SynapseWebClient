@@ -91,6 +91,7 @@ public class ProvViewUtil {
 				descriptionParagraph.addStyleName(PROV_ACTIVITY_LABEL_STYLE);
 				descriptionParagraph.addStyleName(ACT_MARGIN_TIME);
 				Tooltip description = new Tooltip(descriptionParagraph, node.getActivityDescription());
+				description.setContainer("body");
 				content.add(description);
 			}
 			Div badgeContainer = new Div();

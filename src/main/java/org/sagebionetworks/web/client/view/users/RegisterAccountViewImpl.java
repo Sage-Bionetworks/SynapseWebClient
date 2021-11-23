@@ -55,8 +55,8 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 	Presenter presenter;
 	private Header headerWidget;
 	public static final String ROOT_PORTAL_URL = Window.Location.getProtocol() + "//" + Window.Location.getHost() + "/";
-	public static final String GOOGLE_OAUTH_CALLBACK_URL = RegisterAccountViewImpl.ROOT_PORTAL_URL + "Portal/oauth2callback?oauth2provider=GOOGLE_OAUTH_2_0";
-	public static final String GOOGLE_OAUTH_WITH_STATE_CALLBACK_URL = GOOGLE_OAUTH_CALLBACK_URL + "&state=";
+	public static final String OAUTH_CALLBACK_URL = RegisterAccountViewImpl.ROOT_PORTAL_URL + "Portal/oauth2callback?oauth2provider=";
+	public static final String GOOGLE_OAUTH_WITH_STATE_CALLBACK_URL = OAUTH_CALLBACK_URL + "GOOGLE_OAUTH_2_0&state=";
 
 	@Inject
 	public RegisterAccountViewImpl(RegisterAccountViewImplUiBinder binder, GlobalApplicationState globalAppState, Header headerWidget, GWTTimer timer, SageImageBundle sageImageBundle, PageProgressWidget pageProgressWidget) {

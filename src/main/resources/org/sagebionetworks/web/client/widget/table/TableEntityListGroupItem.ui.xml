@@ -22,6 +22,10 @@
 						addStyleNames="displayInline pull-left" />
 				</bh:Div>
 			</t:TableData>
+			<t:TableData width="100px"
+				addStyleNames="visible-md visible-lg overflow-x-hidden">
+				<g:Label ui:field="typeField" />
+			</t:TableData>
 			<t:TableData width="310px"
 				addStyleNames="visible-xl overflow-x-hidden">
 				<bh:Div ui:field="modifiedByField" />

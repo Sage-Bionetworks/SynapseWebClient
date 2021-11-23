@@ -40,8 +40,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class SettingsPresenter implements SettingsView.Presenter {
-
-	public static final String MUST_BE_CERTIFIED_TO_SUBMIT_PROFILE_VALIDATION_MESSAGE = "Only Certified Users can apply to have their user profile validated.  Please get certified and try again.";
 	private SettingsView view;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
@@ -342,10 +340,6 @@ public class SettingsPresenter implements SettingsView.Presenter {
 
 	@Override
 	public void newVerificationSubmissionClicked() {
-		if (!currentUserBundle.getIsCertified()) {
-			view.showErrorMessage(MUST_BE_CERTIFIED_TO_SUBMIT_PROFILE_VALIDATION_MESSAGE);
-			return;
-		}
 		List<AttachmentMetadata> attachments = new ArrayList<AttachmentMetadata>();
 		if (currentUserBundle.getVerificationSubmission() != null) {
 			attachments = currentUserBundle.getVerificationSubmission().getAttachments();

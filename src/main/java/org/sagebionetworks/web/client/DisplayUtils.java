@@ -622,6 +622,7 @@ public class DisplayUtils {
 		t.setIsHtml(true);
 		t.setIsAnimated(false);
 		t.setTrigger(Trigger.HOVER);
+		t.setContainer("body");
 		t.setWidget(widget);
 		return t;
 	}
