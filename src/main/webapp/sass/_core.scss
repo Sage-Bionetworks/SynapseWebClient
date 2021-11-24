@@ -3621,6 +3621,12 @@ div.border {
 	background-color: rgba(0, 0, 0, 0.5);
 }
 
+.DatasetEditorTable {
+  .checkbox {
+    margin-top: -5px;
+  }
+}
+
 // We may want to move this to SRC and apply this style to all sites
 // May also want to apply the style to all buttons, rather than just in this alert
 .FullWidthAlert {
