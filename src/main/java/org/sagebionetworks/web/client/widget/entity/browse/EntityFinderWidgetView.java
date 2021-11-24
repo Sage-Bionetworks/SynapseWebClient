@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.SynapseView;
+import org.sagebionetworks.web.client.jsinterop.EntityFinderProps;
 import org.sagebionetworks.web.client.jsinterop.EntityFinderScope;
-import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 import com.google.gwt.user.client.ui.Widget;
 
@@ -20,7 +20,7 @@ public interface EntityFinderWidgetView extends SynapseView {
 
 	void hide();
 
-	void renderComponent(EntityFinderScope initialScope, EntityFinderWidget.InitialContainer initialContainer, String projectId, String initialContainerId, boolean showVersions, boolean multiSelect, EntityFilter selectableEntityTypes, EntityFilter visibleTypesInList, EntityFilter visibleTypesInTree, String selectedCopy, boolean treeOnly, boolean mustSelectVersionNumber);
+	void renderComponent(EntityFinderScope initialScope, EntityFinderWidget.InitialContainer initialContainer, String projectId, String initialContainerId, boolean showVersions, boolean multiSelect, EntityFilter selectableEntityTypes, EntityFilter visibleTypesInList, EntityFilter visibleTypesInTree, EntityFinderProps.SelectedCopyHandler selectedCopy, boolean treeOnly, boolean mustSelectVersionNumber);
 
 	void clearError();
 

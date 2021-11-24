@@ -79,35 +79,33 @@ public class EntityContainerListWidget implements EntityContainerListWidgetView.
 		}
 
 		if (TableType.projects.equals(tableType)) {
-			String friendlyEntityType = "Project View";
 			entityFinderBuilder
-					.setModalTitle("Set View Containers")
+					.setModalTitle("Set " + tableType.getDisplayName() + " Containers")
 					.setInitialScope(EntityFinderScope.ALL_PROJECTS)
 					.setInitialContainer(EntityFinderWidget.InitialContainer.SCOPE)
 					.setSelectableTypes(EntityFilter.PROJECT)
 					.setShowVersions(false)
-					.setHelpMarkdown("Search or Browse Synapse to find " + EntityTypeUtils.getDisplayName(EntityType.project) + "s to put into this " + friendlyEntityType)
+					.setHelpMarkdown("Search or Browse Synapse to find " + EntityTypeUtils.getDisplayName(EntityType.project) + "s to put into this " + tableType.getDisplayName())
 					.setPromptCopy("Find " + EntityTypeUtils.getDisplayName(EntityType.project) + "s for this View");
 		} else if (TableType.dataset.equals(tableType)) {
-			String friendlyEntityType = "Dataset";
 			entityFinderBuilder
-					.setModalTitle("Add Files to Dataset")
+					.setModalTitle("Add Files to " + tableType.getDisplayName())
 					.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
 					.setInitialContainer(EntityFinderWidget.InitialContainer.PROJECT)
 					.setSelectableTypes(EntityFilter.FILE)
 					.setShowVersions(true)
 					.setMustSelectVersionNumber(true)
-					.setHelpMarkdown("Search or Browse Synapse to find " + EntityTypeUtils.getDisplayName(EntityType.file) + "s to add to this " + friendlyEntityType)
-					.setPromptCopy("Find and select " + EntityTypeUtils.getDisplayName(EntityType.file) + "s to add to the " + EntityTypeUtils.getDisplayName(EntityType.dataset));
+					.setSelectedCopy((count) -> count + " File" + ((count > 1) ? "s" : "") + " Selected")
+					.setHelpMarkdown("Search or Browse Synapse to find " + EntityTypeUtils.getDisplayName(EntityType.file) + "s to add to this " + tableType.getDisplayName())
+					.setPromptCopy("Find and select " + EntityTypeUtils.getDisplayName(EntityType.file) + "s to add to the " + tableType.getDisplayName());
 		} else {
-			String friendlyEntityType = "File View";
 			entityFinderBuilder
-					.setModalTitle("Set View Containers")
+					.setModalTitle("Set " + tableType.getDisplayName() + " Containers")
 					.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
 					.setInitialContainer(EntityFinderWidget.InitialContainer.PROJECT)
 					.setSelectableTypes(EntityFilter.CONTAINER)
 					.setShowVersions(false)
-					.setHelpMarkdown("Search or Browse Synapse to find " + EntityTypeUtils.getDisplayName(EntityType.folder) + "s containing items for this " + friendlyEntityType)
+					.setHelpMarkdown("Search or Browse Synapse to find " + EntityTypeUtils.getDisplayName(EntityType.folder) + "s containing items for this " + tableType.getDisplayName())
 					.setPromptCopy("Find and select " + EntityTypeUtils.getDisplayName(EntityType.folder) + "s to add their contents");
 		}
 		finder = entityFinderBuilder

@@ -6,7 +6,12 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.jsinterop.React;
+import org.sagebionetworks.web.client.jsinterop.ReactDOM;
+import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityViewScopeWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.SubmissionViewScopeWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
@@ -50,13 +55,17 @@ public class TableEntityWidgetViewImpl extends Composite implements TableEntityW
 	Div modalContainer;
 	@UiField
 	Div addToDownloadListContainer;
+	@UiField
+	ReactComponentDiv itemsEditorContainer;
 	PortalGinInjector ginInjector;
 	ColumnModelsWidget columnModelsWidget;
 	EntityViewScopeWidget scopeWidget;
 	SubmissionViewScopeWidget submissionViewScopeWidget;
+	TableEntityWidgetView.Presenter presenter;
+	SynapseContextPropsProvider propsProvider;
 
 	@Inject
-	public TableEntityWidgetViewImpl(final Binder uiBinder, PortalGinInjector ginInjector, EntityViewScopeWidget scopeWidget, SubmissionViewScopeWidget submissionViewScopeWidget) {
+	public TableEntityWidgetViewImpl(final Binder uiBinder, PortalGinInjector ginInjector, EntityViewScopeWidget scopeWidget, SubmissionViewScopeWidget submissionViewScopeWidget, SynapseContextPropsProvider propsProvider) {
 		initWidget(uiBinder.createAndBindUi(this));
 		this.ginInjector = ginInjector;
 		this.columnModelsWidget = ginInjector.createNewColumnModelsWidget();
@@ -65,7 +74,13 @@ public class TableEntityWidgetViewImpl extends Composite implements TableEntityW
 		this.submissionViewScopeWidget = submissionViewScopeWidget;
 		this.scopePanel.add(scopeWidget.asWidget());
 		this.scopePanel.add(submissionViewScopeWidget.asWidget());
+		this.propsProvider = propsProvider;
 		scopePanel.getElement().setAttribute("highlight-box-title", "Scope");
+	}
+
+	@Override
+	public void setPresenter(Presenter presenter) {
+		this.presenter = presenter;
 	}
 
 	@Override
@@ -142,5 +157,21 @@ public class TableEntityWidgetViewImpl extends Composite implements TableEntityW
 	public void setAddToDownloadList(IsWidget w) {
 		addToDownloadListContainer.clear();
 		addToDownloadListContainer.add(w);
+	}
+
+	@Override
+	public void setItemsEditorVisible(boolean visible) {
+		if (visible) {
+			ReactDOM.render(
+					React.createElementWithSynapseContext(
+							SRC.SynapseComponents.DatasetItemsEditor,
+							this.presenter.getItemsEditorProps(),
+							propsProvider.getJsInteropContextProps()
+					),
+					itemsEditorContainer.getElement()
+			);
+		} else {
+			itemsEditorContainer.clear();
+		}
 	}
 }

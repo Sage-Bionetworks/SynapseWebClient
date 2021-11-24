@@ -19,7 +19,14 @@ public class EntityFinderProps extends ReactComponentProps {
         void run(ReferenceJSNIObject[] selected);
     }
 
-    OnSelectCallback onSelectedChange;
+	@FunctionalInterface
+	@JsFunction
+	public interface SelectedCopyHandler {
+		String getSelectedCopy(int count);
+	}
+
+
+	OnSelectCallback onSelectedChange;
     boolean selectMultiple;
     boolean showVersionSelection;
     @JsNullable
@@ -35,7 +42,7 @@ public class EntityFinderProps extends ReactComponentProps {
     @JsNullable
     String[] selectableTypes;
     @JsNullable
-    String selectedCopy;
+	SelectedCopyHandler selectedCopy;
     @JsNullable
     boolean treeOnly;
     @JsNullable
@@ -52,7 +59,7 @@ public class EntityFinderProps extends ReactComponentProps {
             List<EntityType> visibleTypesInList,
             List<EntityType> visibleTypesInTree,
             List<EntityType> selectableTypes,
-            String selectedCopy,
+            SelectedCopyHandler selectedCopy,
             boolean treeOnly,
             boolean mustSelectVersionNumber
     ) {

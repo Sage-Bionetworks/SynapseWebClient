@@ -13,6 +13,44 @@ $synapse-dark-text: #515359;
 $synapse-red-error: #eb5757;
 $synapse-gray-med: #dcdcdc;
 
+// Colors from https://www.figma.com/file/0oPm5lLSUva8kyfVNMS6FA/Synapse-Style-%26-Component-Library?node-id=77%3A1598
+$synapse-primary-color-palette: (
+        100: #D7DEE4,
+        200: #b0bdc9,
+        300: #889baf,
+        400: #617a94,
+        500: $synapse-blue,
+        600: #2e4761,
+        700: #223549,
+        800: #172430,
+        900: #0b1218,
+);
+
+$synapse-secondary-color-palette: (
+        100: #dae9e7,
+        200: #b5d3ce,
+        300: #90beb6,
+        400: #6ba89d,
+        500: $synapse-green,
+        600: #38756a,
+        700: #2a6960,
+        800: #1c3a35,
+        900: #0e1d1b,
+);
+
+$synapse-tertiary-color-palette: (
+        100: #fbf4e0,
+        200: #f8e9c2,
+        300: #f4dda3,
+        400: #f1d285,
+        500: #edc766,
+        600: #be9f52,
+        700: #8e773d,
+        800: #5f5029,
+        900: #2f2814,
+);
+
+
 $full-root-panel-height: calc(100vh - 93px - 130px);
 
 @mixin border-radius($radius) {
@@ -3581,6 +3619,10 @@ div.border {
 	left: 0;
 	z-index: 1050;
 	background-color: rgba(0, 0, 0, 0.5);
+}
+
+#body .DatasetEditorTable .checkbox {
+    margin-top: -5px;
 }
 
 // We may want to move this to SRC and apply this style to all sites

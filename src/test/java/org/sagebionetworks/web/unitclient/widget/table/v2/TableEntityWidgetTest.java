@@ -33,6 +33,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.FacetColumnRequest;
 import org.sagebionetworks.repo.model.table.FacetColumnValuesRequest;
@@ -177,6 +178,13 @@ public class TableEntityWidgetTest {
 		view.setColumnIds(TableModelTestUtils.getColumnModelIds(columns));
 		view.setType(viewType);
 		entityBundle.setEntity(view);
+	}
+
+	private void configureBundleWithDataset() {
+		Dataset dataset = new Dataset();
+		dataset.setId("syn456");
+		dataset.setColumnIds(TableModelTestUtils.getColumnModelIds(columns));
+		entityBundle.setEntity(dataset);
 	}
 
 	@Test
@@ -755,4 +763,27 @@ public class TableEntityWidgetTest {
 
 		verify(mockAddToDownloadListV2, never()).configure(anyString(), any(Query.class));
 	}
+
+	@Test
+	public void testShowAndHideDatasetEditor() throws JSONObjectAdapterException {
+		boolean canEdit = true;
+		configureBundleWithDataset();
+		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
+		verify(mockActionMenu).setActionListener(eq(Action.EDIT_DATASET_ITEMS), actionListenerCaptor.capture());
+		ActionListener listener = actionListenerCaptor.getValue();
+		verify(mockView).setQueryResultsVisible(true);
+
+		listener.onAction(Action.EDIT_DATASET_ITEMS);
+		verify(mockView).setItemsEditorVisible(true);
+		verify(mockView).setQueryResultsVisible(false);
+
+		verify(mockActionMenu).setActionVisible(Action.EDIT_DATASET_ITEMS, false);
+
+		// The React component will trigger the call to closeItemsEditor when we are ready to close
+		widget.closeItemsEditor();
+		verify(mockView).setItemsEditorVisible(false);
+		verify(mockView, times(3)).setQueryResultsVisible(true);
+		verify(mockActionMenu).setActionVisible(Action.EDIT_DATASET_ITEMS, true);
+	}
+
 }

@@ -13,10 +13,10 @@ import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryFilter;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.TableBundle;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cache.SessionStorage;
+import org.sagebionetworks.web.client.jsinterop.DatasetEditorProps;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
 import org.sagebionetworks.web.client.widget.clienthelp.FileViewClientsHelp;
@@ -48,7 +48,7 @@ import com.google.inject.Inject;
  * @author John
  * 
  */
-public class TableEntityWidget implements IsWidget, QueryResultsListener, QueryInputListener {
+public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWidget, QueryResultsListener, QueryInputListener {
 
 	public static final String IS_INVOKING_DOWNLOAD_TABLE = "isInvokingDownloadTable";
 	public static final String NO_FACETS_SIMPLE_SEARCH_UNSUPPORTED = "In order to use simple search, you must first set columns to be facets in the schema editor.";
@@ -92,7 +92,7 @@ public class TableEntityWidget implements IsWidget, QueryResultsListener, QueryI
 	CopyTextModal copyTextModal;
 	SynapseClientAsync synapseClient;
 	FileViewClientsHelp fileViewClientsHelp;
-	boolean isShowingSchema, isShowingScope;
+	boolean isShowingSchema, isShowingScope, isShowingItemsEditor;
 	public static final String SHOW = "Show ";
 	public static final String HIDE = "Hide ";
 	public static final String SCOPE = "Scope of ";
@@ -111,6 +111,7 @@ public class TableEntityWidget implements IsWidget, QueryResultsListener, QueryI
 		this.fileViewClientsHelp = fileViewClientsHelp;
 		this.ginInjector = ginInjector;
 		this.sessionStorage = sessionStorage;
+		this.view.setPresenter(this);
 		this.view.setQueryResultsWidget(this.queryResultsWidget);
 		this.view.setQueryInputWidget(this.queryInputWidget);
 	}
@@ -168,6 +169,10 @@ public class TableEntityWidget implements IsWidget, QueryResultsListener, QueryI
 		this.view.configure(bundle, this.canEdit && isCurrentVersion);
 		this.actionMenu = actionMenu;
 		this.entityTypeDisplay = EntityTypeUtils.getDisplayName(EntityTypeUtils.getEntityTypeForClass(entityBundle.getEntity().getClass()));
+		reconfigureState();
+	}
+
+	private void reconfigureState() {
 		configureActions();
 		checkState();
 		initSimpleAdvancedQueryState();
@@ -184,6 +189,7 @@ public class TableEntityWidget implements IsWidget, QueryResultsListener, QueryI
 		view.setSchemaVisible(false);
 		actionMenu.setActionText(Action.SHOW_TABLE_SCHEMA, SHOW + entityTypeDisplay + SCHEMA);
 		actionMenu.setActionText(Action.SHOW_VIEW_SCOPE, SHOW + SCOPE + entityTypeDisplay);
+		actionMenu.setActionText(Action.EDIT_DATASET_ITEMS, "Edit " + entityTypeDisplay + " Items");
 		this.actionMenu.setActionListener(Action.UPLOAD_TABLE_DATA, action -> {
 			onUploadTableData();
 		});
@@ -206,7 +212,16 @@ public class TableEntityWidget implements IsWidget, QueryResultsListener, QueryI
 			String showHide = isShowingScope ? HIDE : SHOW;
 			actionMenu.setActionText(Action.SHOW_VIEW_SCOPE, showHide + SCOPE + entityTypeDisplay);
 		});
-		
+
+		this.actionMenu.setActionListener(Action.EDIT_DATASET_ITEMS, action -> {
+			if (!isShowingItemsEditor) {
+				actionMenu.setActionVisible(Action.EDIT_DATASET_ITEMS, false);
+				view.setItemsEditorVisible(true);
+				isShowingItemsEditor = true;
+				view.setQueryResultsVisible(false);
+			};
+		});
+
 		this.actionMenu.setActionVisible(Action.ADD_TABLE_RESULTS_TO_DOWNLOAD_LIST, tableType.isIncludeFiles());
 		this.actionMenu.setActionVisible(Action.TABLE_DOWNLOAD_PROGRAMMATIC_OPTIONS, tableType.isIncludeFiles());
 		this.actionMenu.setActionListener(Action.SHOW_ADVANCED_SEARCH, action -> {
@@ -588,5 +603,24 @@ public class TableEntityWidget implements IsWidget, QueryResultsListener, QueryI
 		AddToDownloadListV2 newAddToDownloadList = ginInjector.getAddToDownloadListV2();
 		view.setAddToDownloadList(newAddToDownloadList);
 		newAddToDownloadList.configure(entityBundle.getEntity().getId(), currentQuery);
+	}
+
+	@Override
+	public DatasetEditorProps getItemsEditorProps() {
+		DatasetEditorProps props =
+				DatasetEditorProps.create(
+						entityBundle.getEntity().getId(),
+						() -> closeItemsEditor(),
+						() -> closeItemsEditor()
+				);
+		return props;
+	}
+
+	public void closeItemsEditor() {
+		isShowingItemsEditor = false;
+		actionMenu.setActionVisible(Action.EDIT_DATASET_ITEMS, true);
+		view.setItemsEditorVisible(false);
+		view.setQueryResultsVisible(true);
+		reconfigureState();
 	}
 }

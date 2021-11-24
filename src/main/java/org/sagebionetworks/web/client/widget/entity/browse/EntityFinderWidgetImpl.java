@@ -15,6 +15,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.exceptions.WebClientConfigurationException;
+import org.sagebionetworks.web.client.jsinterop.EntityFinderProps;
 import org.sagebionetworks.web.client.jsinterop.EntityFinderScope;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -47,7 +48,7 @@ public class EntityFinderWidgetImpl implements EntityFinderWidget, EntityFinderW
 
     private String modalTitle;
     private String promptCopy;
-    private String selectedCopy;
+	private EntityFinderProps.SelectedCopyHandler selectedCopy;
     private String confirmButtonCopy;
 
     @Inject
@@ -142,7 +143,7 @@ public class EntityFinderWidgetImpl implements EntityFinderWidget, EntityFinderW
         private EntityFinderScope initialScope = EntityFinderScope.CREATED_BY_ME;
         private String modalTitle = "Find in Synapse";
         private String promptCopy = "";
-        private String selectedCopy = "Selected";
+		private EntityFinderProps.SelectedCopyHandler selectedCopy = (count) -> "Selected";
         private String confirmButtonCopy = "Select";
         private String helpMarkdown = "Finding items in Synapse can be done by either “browsing”, “searching,” or directly entering the Synapse ID.&#10;Alternatively, navigate to the desired location in the current project, favorite projects or projects you own.";
 
@@ -231,11 +232,11 @@ public class EntityFinderWidgetImpl implements EntityFinderWidget, EntityFinderW
             return this;
         }
 
-        @Override
-        public EntityFinderWidget.Builder setSelectedCopy(String selectedCopy) {
-            this.selectedCopy = selectedCopy;
-            return this;
-        }
+		@Override
+		public EntityFinderWidget.Builder setSelectedCopy(EntityFinderProps.SelectedCopyHandler selectedCopy) {
+			this.selectedCopy = selectedCopy;
+			return this;
+		}
 
         @Override
         public EntityFinderWidget.Builder setInitialScope(EntityFinderScope initialScope) {

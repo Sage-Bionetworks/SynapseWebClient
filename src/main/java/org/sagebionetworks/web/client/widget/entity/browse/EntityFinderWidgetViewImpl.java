@@ -97,7 +97,7 @@ public class EntityFinderWidgetViewImpl implements EntityFinderWidgetView {
 	}
 
 	@Override
-	public void renderComponent(EntityFinderScope initialScope, EntityFinderWidget.InitialContainer initialContainer, String projectId, String initialContainerId, boolean showVersions, boolean multiSelect, EntityFilter selectableEntityTypes, EntityFilter visibleTypesInList, EntityFilter visibleTypesInTree, String selectedCopy, boolean treeOnly, boolean mustSelectVersionNumber) {
+	public void renderComponent(EntityFinderScope initialScope, EntityFinderWidget.InitialContainer initialContainer, String projectId, String initialContainerId, boolean showVersions, boolean multiSelect, EntityFilter selectableEntityTypes, EntityFilter visibleTypesInList, EntityFilter visibleTypesInTree, EntityFinderProps.SelectedCopyHandler selectedCopy, boolean treeOnly, boolean mustSelectVersionNumber) {
         entityFinderContainer.clear();
 
         EntityFinderProps.OnSelectCallback onSelected = result -> {

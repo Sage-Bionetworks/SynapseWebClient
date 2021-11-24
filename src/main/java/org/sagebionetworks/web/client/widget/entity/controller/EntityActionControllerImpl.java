@@ -700,13 +700,15 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, canEditResults);
 			actionMenu.setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
 			actionMenu.setActionVisible(Action.SHOW_TABLE_SCHEMA, true);
-			actionMenu.setActionVisible(Action.SHOW_VIEW_SCOPE, !(entityBundle.getEntity() instanceof TableEntity));
+			actionMenu.setActionVisible(Action.SHOW_VIEW_SCOPE, !(entityBundle.getEntity() instanceof TableEntity) && !(entityBundle.getEntity() instanceof Dataset));
+			actionMenu.setActionVisible(Action.EDIT_DATASET_ITEMS, (entityBundle.getEntity() instanceof Dataset));
 		} else {
 			actionMenu.setActionVisible(Action.UPLOAD_TABLE_DATA, false);
 			actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, false);
 			actionMenu.setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, false);
 			actionMenu.setActionVisible(Action.SHOW_TABLE_SCHEMA, false);
 			actionMenu.setActionVisible(Action.SHOW_VIEW_SCOPE, false);
+			actionMenu.setActionVisible(Action.EDIT_DATASET_ITEMS, false);
 		}
 	}
 
@@ -1290,7 +1292,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 				.setModalTitle("Create Link to " + entityTypeDisplay)
 				.setHelpMarkdown("Search or Browse to find a Project or Folder that you have access to, and place a symbolic link for easy access")
 				.setPromptCopy("Find a destination and place a link to <b>" + SafeHtmlUtils.fromString(entity.getName()).asString() + "</b> (" + entity.getId() + ")")
-				.setSelectedCopy("Destination")
+				.setSelectedCopy((count) -> "Destination")
 				.setConfirmButtonCopy("Create Link")
 				.build()
 				.show();
@@ -1357,7 +1359,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 				.setModalTitle("Move " + entityTypeDisplay)
 				.setHelpMarkdown("Search or Browse Synapse to find a destination to move this " + entityTypeDisplay)
 				.setPromptCopy("Find a destination to move <b>" + SafeHtmlUtils.fromString(entity.getName()).asString() + "</b> (" + entity.getId() + ")")
-				.setSelectedCopy("Destination")
+				.setSelectedCopy((count) -> "Destination")
 				.setConfirmButtonCopy("Move")
 				.setShowVersions(false)
 				.setTreeOnly(true)

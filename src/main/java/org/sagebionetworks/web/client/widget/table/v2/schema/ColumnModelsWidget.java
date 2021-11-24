@@ -105,11 +105,11 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 		this.bundle = bundle;
 		List<ColumnModel> startingModels = bundle.getTableBundle().getColumnModels();
 		viewer.configure(ViewType.VIEWER, this.isEditable);
-		// Certain rows in datasets may not be editable because they reference locked versions.
-		boolean isEditableView = isEditable && (bundle.getEntity() instanceof EntityView || bundle.getEntity() instanceof SubmissionView);
+		// We can get the default columns/annotations for views and datasets
+		boolean isEditableViewOrDataset = isEditable && (bundle.getEntity() instanceof EntityView || bundle.getEntity() instanceof SubmissionView || bundle.getEntity() instanceof Dataset);
 		tableType = TableType.getTableType(bundle.getEntity());
-		editor.setAddDefaultViewColumnsButtonVisible(isEditableView);
-		editor.setAddAnnotationColumnsButtonVisible(isEditableView);
+		editor.setAddDefaultViewColumnsButtonVisible(isEditableViewOrDataset);
+		editor.setAddAnnotationColumnsButtonVisible(isEditableViewOrDataset);
 		List<ColumnModelTableRow> rowViewers = new ArrayList<>();
 		for (ColumnModel cm : startingModels) {
 			// Create a viewer

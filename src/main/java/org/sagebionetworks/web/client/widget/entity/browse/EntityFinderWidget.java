@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.browse;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.web.client.jsinterop.EntityFinderProps;
 import org.sagebionetworks.web.client.jsinterop.EntityFinderScope;
 
 public interface EntityFinderWidget {
@@ -52,7 +53,7 @@ public interface EntityFinderWidget {
 
 		Builder setHelpMarkdown(String helpMarkdown);
 
-		Builder setSelectedCopy(String selectedCopy);
+		Builder setSelectedCopy(EntityFinderProps.SelectedCopyHandler selectedCopy);
 
 		Builder setInitialScope(EntityFinderScope initialScope);
 

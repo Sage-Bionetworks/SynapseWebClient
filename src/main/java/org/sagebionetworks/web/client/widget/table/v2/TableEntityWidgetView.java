@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.table.v2;
 
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
+import org.sagebionetworks.web.client.jsinterop.DatasetEditorProps;
 import org.sagebionetworks.web.client.utils.Callback;
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -12,6 +13,13 @@ import com.google.gwt.user.client.ui.IsWidget;
  *
  */
 public interface TableEntityWidgetView extends IsWidget {
+
+	/**
+	 * Set the presenter.
+	 *
+	 * @param presenter
+	 */
+	void setPresenter(TableEntityWidgetView.Presenter presenter);
 
 	/**
 	 * Configure the view with the table data.
@@ -83,4 +91,11 @@ public interface TableEntityWidgetView extends IsWidget {
 	void showConfirmDialog(String title, String confirmationMessage, Callback yesCallback);
 
 	void setAddToDownloadList(IsWidget w);
+
+	void setItemsEditorVisible(boolean visible);
+
+	interface Presenter {
+		DatasetEditorProps getItemsEditorProps();
+	}
+
 }
