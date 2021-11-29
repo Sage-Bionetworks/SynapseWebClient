@@ -142,7 +142,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 	@Override
 	public void setPlace(ACTDataAccessSubmissionsPlace place) {
 		this.place = place;
-		isSortedAsc = true;
+		isSortedAsc = false;
 		actAccessRequirementId = place.getParam(ACCESS_REQUIREMENT_ID_PARAM);
 		accessorId = place.getParam(ACCESSOR_ID_PARAM);
 		synAlert.clear();
