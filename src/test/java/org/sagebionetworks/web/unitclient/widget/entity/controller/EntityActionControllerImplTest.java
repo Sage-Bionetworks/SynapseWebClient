@@ -360,8 +360,85 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionVisible(Action.TOGGLE_FULL_TEXT_SEARCH, true);
 		verify(mockActionMenu).setActionText(Action.TOGGLE_FULL_TEXT_SEARCH, "Enable Full Text Search");
 		verify(mockActionMenu).setActionListener(Action.TOGGLE_FULL_TEXT_SEARCH, controller);
+		// Show scope/items should not be visible for a TableEntity
+		verify(mockActionMenu).setActionVisible(Action.SHOW_VIEW_SCOPE, false);
+		verify(mockActionMenu).setActionVisible(Action.EDIT_DATASET_ITEMS, false);
 	}
-	
+
+	@Test
+	public void testConfigureWithDataset() {
+		Dataset dataset = new Dataset();
+		entityBundle.setEntity(dataset);
+		boolean canCertifiedUserEdit = true;
+		permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
+
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
+		verify(mockGWT).scheduleExecution(any(Callback.class), anyInt());
+		// delete
+		verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, true);
+		verify(mockActionMenu).setActionText(Action.DELETE_ENTITY, DELETE_PREFIX + EntityTypeUtils.getDisplayName(EntityType.dataset));
+		verify(mockActionMenu).setActionListener(Action.DELETE_ENTITY, controller);
+		// share
+		verify(mockActionMenu).setActionVisible(Action.SHARE, true);
+		verify(mockActionMenu).setActionListener(Action.SHARE, controller);
+		// rename
+		verify(mockActionMenu).setActionVisible(Action.CHANGE_ENTITY_NAME, true);
+		verify(mockActionMenu).setActionText(Action.CHANGE_ENTITY_NAME, EDIT_NAME_AND_DESCRIPTION);
+		verify(mockActionMenu).setActionListener(Action.CHANGE_ENTITY_NAME, controller);
+		// upload
+		verify(mockActionMenu).setActionVisible(Action.UPLOAD_NEW_FILE, false);
+		// version history
+		verify(mockActionMenu).setActionVisible(Action.SHOW_VERSION_HISTORY, true);
+		// create table version (snapshot)
+		verify(mockActionMenu).setActionVisible(Action.CREATE_TABLE_VERSION, true);
+		verify(mockActionMenu).setActionListener(Action.CREATE_TABLE_VERSION, controller);
+		// edit actions (should be disabled in the ui, even if user has permission)
+		verify(mockActionMenu).setActionVisible(Action.EDIT_TABLE_DATA, false);
+		verify(mockActionMenu).setActionVisible(Action.UPLOAD_TABLE_DATA, false);
+		// Show scope should not be visible
+		verify(mockActionMenu).setActionVisible(Action.SHOW_VIEW_SCOPE, false);
+		// Edit dataset items should be visible
+		verify(mockActionMenu).setActionVisible(Action.EDIT_DATASET_ITEMS, true);
+	}
+
+	@Test
+	public void testConfigureWithEntityView() {
+		EntityView view = new EntityView();
+		entityBundle.setEntity(view);
+		boolean canCertifiedUserEdit = true;
+		permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
+
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
+		verify(mockGWT).scheduleExecution(any(Callback.class), anyInt());
+		// delete
+		verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, true);
+		verify(mockActionMenu).setActionText(Action.DELETE_ENTITY, DELETE_PREFIX + EntityTypeUtils.getDisplayName(EntityType.entityview));
+		verify(mockActionMenu).setActionListener(Action.DELETE_ENTITY, controller);
+		// share
+		verify(mockActionMenu).setActionVisible(Action.SHARE, true);
+		verify(mockActionMenu).setActionListener(Action.SHARE, controller);
+		// rename
+		verify(mockActionMenu).setActionVisible(Action.CHANGE_ENTITY_NAME, true);
+		verify(mockActionMenu).setActionText(Action.CHANGE_ENTITY_NAME, EDIT_NAME_AND_DESCRIPTION);
+		verify(mockActionMenu).setActionListener(Action.CHANGE_ENTITY_NAME, controller);
+		// upload
+		verify(mockActionMenu).setActionVisible(Action.UPLOAD_NEW_FILE, false);
+		// version history
+		verify(mockActionMenu).setActionVisible(Action.SHOW_VERSION_HISTORY, true);
+		// create table version (snapshot)
+		verify(mockActionMenu).setActionVisible(Action.CREATE_TABLE_VERSION, true);
+		verify(mockActionMenu).setActionListener(Action.CREATE_TABLE_VERSION, controller);
+		// edit actions
+		verify(mockActionMenu).setActionVisible(Action.EDIT_TABLE_DATA, true);
+		verify(mockActionMenu).setActionVisible(Action.UPLOAD_TABLE_DATA, true);
+		// Show scope should be visible
+		verify(mockActionMenu).setActionVisible(Action.SHOW_VIEW_SCOPE, true);
+		// Edit dataset items should be visible
+		verify(mockActionMenu).setActionVisible(Action.EDIT_DATASET_ITEMS, false);
+	}
+
 	@Test
 	public void testDisableFullTextSearch() {
 		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
