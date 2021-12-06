@@ -400,7 +400,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 		h4.add(headingPanel);
 		org.gwtbootstrap3.client.ui.Anchor link = new org.gwtbootstrap3.client.ui.Anchor(hit.getName(), DisplayUtils.getSynapseHistoryToken(hit.getId()));
 		EntityTypeIcon icon = new EntityTypeIcon(entityType);
-		icon.addStyleName("lightGreyText margin-right-5 margin-left-5");
+		icon.addStyleName("lightGreyText margin-right-10 margin-left-5");
 		headingPanel.add(icon);
 		headingPanel.add(link);
 		hitPanel.add(h4);
