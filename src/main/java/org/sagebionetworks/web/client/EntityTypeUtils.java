@@ -41,8 +41,10 @@ public class EntityTypeUtils {
 			} else if (entityType.equalsIgnoreCase(EntityType.dockerrepo.name())) {
 				className = DockerRepository.class.getName();
 			} else if (entityType.equalsIgnoreCase(EntityType.submissionview.name())) {
-			className = SubmissionView.class.getName();
-		}
+				className = SubmissionView.class.getName();
+			} else if (entityType.equalsIgnoreCase(EntityType.dataset.name())) {
+				className = Dataset.class.getName();
+			}
 		}
 		return className;
 	}
@@ -78,6 +80,8 @@ public class EntityTypeUtils {
 		} else if (SubmissionView.class.getName().equals(className)) {
 			// Submission View
 			type = EntityType.submissionview;
+		} else if (Dataset.class.getName().equals(className)) {
+			type = EntityType.dataset;
 		}
 		return type;
 	}
@@ -124,6 +128,8 @@ public class EntityTypeUtils {
 			// DockerRepository
 			// TODO: change to Docker Icon: https://github.com/wesbos/Font-Awesome-Docker-Icon
 			icon = IconType.ARCHIVE;
+		} else if (Dataset.class.getName().equals(className)) {
+			icon = IconType.TH;
 		}
 
 		return icon;

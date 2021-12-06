@@ -25,7 +25,7 @@ public class EntityTypeIcon extends Span {
 	}
 
 	/**
-	 * This is required for XML to work. If you want to call this from Java, prefer {@link #setType(EntityType)} for strong typing.
+	 * This is required for XML setters to work. If you want to call this from Java, prefer {@link #setType(EntityType)} for strong typing.
 	 * @param type
 	 */
 	public void setType(String type) throws IllegalArgumentException {
