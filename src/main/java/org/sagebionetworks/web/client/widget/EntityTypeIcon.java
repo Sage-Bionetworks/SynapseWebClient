@@ -23,6 +23,15 @@ public class EntityTypeIcon extends ReactComponentSpan {
 		configure(type);
 	}
 
+
+	/**
+	 * This is required for XML setters to work. If you want to call this from Java, prefer {@link #EntityTypeIcon(EntityType)} for strong typing.
+	 * @param type
+	 */
+	public EntityTypeIcon(String type) {
+		setType(type);
+	}
+
 	/**
 	 * This is required for XML setters to work. If you want to call this from Java, prefer {@link #setType(EntityType)} for strong typing.
 	 * @param type
