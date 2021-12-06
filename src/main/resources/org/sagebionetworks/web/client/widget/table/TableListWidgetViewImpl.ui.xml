@@ -22,7 +22,7 @@
 					<tr:SortableTableHeaderImpl
 						ui:field="nameColumnHeader" text="Name" />
 					<t:TableHeader width="100px"
-						addStyleNames="visible-md visible-lg">
+						addStyleNames="visible-sm visible-md visible-lg">
 						<bh:Span text="Type" />
 					</t:TableHeader>
 					<t:TableHeader width="310px"

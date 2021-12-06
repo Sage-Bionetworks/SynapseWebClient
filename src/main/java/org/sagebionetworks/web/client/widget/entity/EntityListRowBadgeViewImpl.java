@@ -1,14 +1,15 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.CheckBox;
-import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Tooltip;
-import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
+import org.sagebionetworks.web.client.widget.EntityTypeIcon;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
+
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -30,7 +31,7 @@ public class EntityListRowBadgeViewImpl extends Composite implements EntityListR
 	@UiField
 	TableRow row;
 	@UiField
-	Icon icon;
+	EntityTypeIcon icon;
 	@UiField
 	Anchor entityLink;
 	@UiField
@@ -94,8 +95,8 @@ public class EntityListRowBadgeViewImpl extends Composite implements EntityListR
 	}
 
 	@Override
-	public void setIcon(IconType iconType) {
-		icon.setType(iconType);
+	public void setEntityType(EntityType entityType) {
+		icon.setType(entityType);
 	}
 
 

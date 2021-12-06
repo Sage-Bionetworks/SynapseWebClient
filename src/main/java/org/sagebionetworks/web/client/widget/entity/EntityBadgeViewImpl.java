@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import static org.sagebionetworks.repo.model.EntityTypeUtils.getEntityTypeForClassName;
 import static org.sagebionetworks.web.client.DisplayUtils.TEXTBOX_SELECT_ALL_FIELD_CLICKHANDLER;
+
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Tooltip;
@@ -21,7 +23,9 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
+import org.sagebionetworks.web.client.widget.EntityTypeIcon;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
+
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -48,9 +52,9 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	}
 
 	@UiField
-	FocusPanel iconContainer;
+	FocusPanel entityTypeIconContainer;
 	@UiField
-	Icon icon;
+	EntityTypeIcon entityTypeIcon;
 	@UiField
 	FlowPanel entityContainer;
 	@UiField
@@ -139,7 +143,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 
 	@Override
 	public void setEntity(final EntityHeader entityHeader) {
-		iconContainer.clear();
+		entityTypeIconContainer.clear();
 		if (entityHeader == null)
 			throw new IllegalArgumentException("Entity is required");
 
@@ -153,7 +157,8 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		entityAnchor.setPaddingRight(0);
 		entityAnchor.setPaddingTop(0);
 		entityAnchor.setPaddingBottom(0);
-		iconContainer.setWidget(icon);
+		entityTypeIconContainer.setWidget(entityTypeIcon);
+		entityTypeIcon.setType(getEntityTypeForClassName(entityHeader.getType()));
 		entityContainer.add(entityAnchor);
 		idField.setText(entityHeader.getId());
 		if (entityHeader.getModifiedBy() != null) {
@@ -169,11 +174,6 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		if (entityHeader.getCreatedOn() != null) {
 			createdOnField.setText(dateTimeUtils.getDateTimeString(entityHeader.getCreatedOn()));
 		}
-	}
-
-	@Override
-	public void setIcon(IconType iconType) {
-		icon.setType(iconType);
 	}
 
 	@Override

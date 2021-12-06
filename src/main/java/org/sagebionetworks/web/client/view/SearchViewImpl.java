@@ -5,9 +5,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Heading;
-import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.HeadingSize;
@@ -17,6 +17,7 @@ import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
+import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.search.Facet;
 import org.sagebionetworks.repo.model.search.FacetConstraint;
 import org.sagebionetworks.repo.model.search.FacetTypeNames;
@@ -31,10 +32,12 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.MarkdownIt;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.widget.EntityTypeIcon;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.SearchQueryUtils;
 import org.sagebionetworks.web.shared.WebConstants;
+
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -369,7 +372,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 	private Panel getResult(Hit hit) {
 		FlowPanel attributionPanel = new FlowPanel();
 
-		IconType iconType = presenter.getIconForHit(hit);
+		EntityType entityType = presenter.getEntityTypeForHit(hit);
 
 		UserBadge createdByBadge = ginInjector.getUserBadgeWidget();
 		createdByBadge.configure(getSearchUserId(hit.getCreated_by()));
@@ -396,7 +399,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 		FlowPanel headingPanel = new FlowPanel();
 		h4.add(headingPanel);
 		org.gwtbootstrap3.client.ui.Anchor link = new org.gwtbootstrap3.client.ui.Anchor(hit.getName(), DisplayUtils.getSynapseHistoryToken(hit.getId()));
-		Icon icon = new Icon(iconType);
+		EntityTypeIcon icon = new EntityTypeIcon(entityType);
 		icon.addStyleName("lightGreyText margin-right-5 margin-left-5");
 		headingPanel.add(icon);
 		headingPanel.add(link);

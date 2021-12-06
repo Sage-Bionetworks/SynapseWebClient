@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityType;
@@ -14,6 +13,7 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -72,8 +72,6 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 
 	protected abstract String getTabDisplayName();
 
-	protected abstract IconType getTabIcon();
-
 	protected abstract List<EntityType> getTypesShownInList();
 
 	protected abstract boolean isEntityShownInTab(Entity entity);
@@ -101,7 +99,7 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 
 			List<LinkData> links = new ArrayList<>();
 			Place projectPlace = new Synapse(projectEntityId, null, getTabArea(), null);
-			links.add(new LinkData(getTabDisplayName(), getTabIcon(), projectPlace));
+			links.add(new LinkData(getTabDisplayName(), EntityTypeUtils.getEntityType(entityHeader), projectPlace));
 			breadcrumb.configure(links, entityHeader.getName());
 
 			view.setTitle(getTabDisplayName());

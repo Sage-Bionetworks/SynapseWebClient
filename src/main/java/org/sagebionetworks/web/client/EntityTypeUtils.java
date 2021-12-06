@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
@@ -46,6 +47,10 @@ public class EntityTypeUtils {
 		return className;
 	}
 
+	public static EntityType getEntityType(EntityHeader header) {
+		return getEntityTypeForEntityClassName(header.getType());
+	}
+
 	public static EntityType getEntityTypeForEntityClassName(String className) {
 		// default
 		EntityType type = EntityType.file;
@@ -77,15 +82,17 @@ public class EntityTypeUtils {
 		return type;
 	}
 
-	public static IconType getIconTypeForEntityType(String entityType) {
-		return EntityTypeUtils.getIconTypeForEntityClassName(getEntityClassNameForEntityType(entityType));
-	}
-
-	public static IconType getIconTypeForEntity(Entity entity) {
+	public static EntityType getEntityType(Entity entity) {
 		String className = entity == null ? null : entity.getClass().getName();
-		return EntityTypeUtils.getIconTypeForEntityClassName(className);
+		return EntityTypeUtils.getEntityTypeForEntityClassName(className);
 	}
 
+	/**
+	 * @deprecated use {@link org.sagebionetworks.web.client.widget.EntityTypeIcon}
+	 * @param className
+	 * @return
+	 */
+	@Deprecated
 	public static IconType getIconTypeForEntityClassName(String className) {
 		// default
 		IconType icon = IconType.FILE;
@@ -121,7 +128,7 @@ public class EntityTypeUtils {
 
 		return icon;
 	}
-	
+
 	public static String getFriendlyTableTypeName(String className) {
 		String friendlyName = UNKNOWN_TABLE_TYPE;
 		if (TableEntity.class.getName().equals(className)) {

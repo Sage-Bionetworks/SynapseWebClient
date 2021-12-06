@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.docker;
 
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Heading;
-import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.LinkedGroupItemText;
 import org.gwtbootstrap3.client.ui.ListGroupItem;
 import org.gwtbootstrap3.client.ui.constants.HeadingSize;
@@ -10,8 +9,11 @@ import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.EntityTypeIcon;
+
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 
@@ -25,7 +27,7 @@ public class DockerRepoListGroupItem extends ListGroupItem {
 		addStyleName("padding-10");
 		Heading iconHeading = new Heading(HeadingSize.H3);
 		iconHeading.setPull(Pull.LEFT);
-		Icon icon = new Icon(IconType.ARCHIVE);
+		EntityTypeIcon icon = new EntityTypeIcon(EntityType.dockerrepo);
 		icon.addStyleName("lightGreyText margin-right-10 moveup-10");
 		iconHeading.add(icon);
 

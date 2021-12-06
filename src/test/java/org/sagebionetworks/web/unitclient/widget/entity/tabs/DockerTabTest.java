@@ -18,7 +18,6 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
@@ -211,7 +210,7 @@ public class DockerTabTest {
 		assertEquals(1, list.size());
 		assertEquals(list.get(0).getPlace(), new Synapse(projectEntityId, null, EntityArea.DOCKER, null));
 		assertEquals(list.get(0).getText(), DockerTab.DOCKER);
-		assertEquals(list.get(0).getIconType(), EntityTypeUtils.getIconTypeForEntityClassName(DockerRepository.class.getName()));
+		assertEquals(list.get(0).getEntityType(), EntityTypeUtils.getEntityTypeForEntityClassName(DockerRepository.class.getName()));
 		verify(mockGinInjector).createNewDockerRepoWidget();
 		verify(mockView).setDockerRepoWidget(any(Widget.class));
 		verify(mockDockerRepoListWidget, never()).configure(projectEntityId);

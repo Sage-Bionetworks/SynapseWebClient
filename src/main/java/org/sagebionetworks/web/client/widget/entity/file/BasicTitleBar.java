@@ -30,9 +30,9 @@ public class BasicTitleBar implements SynapseWidgetPresenter {
 		view.setFavoritesWidgetVisible(authenticationController.isLoggedIn());
 		view.setTitle(bundle.getEntity().getName());
 		if (!(bundle.getEntity() instanceof Project)) {
-			view.setIconType(EntityTypeUtils.getIconTypeForEntity(bundle.getEntity()));	
+			view.setEntityType(EntityTypeUtils.getEntityType(bundle.getEntity()));
 		} else {
-			view.setIconType(null);
+			view.setEntityType(null);
 		}
 	}
 
@@ -41,9 +41,9 @@ public class BasicTitleBar implements SynapseWidgetPresenter {
 		view.setFavoritesWidgetVisible(authenticationController.isLoggedIn());
 		view.setTitle(entityHeader.getName());
 		if (!(Project.class.getName().equals(entityHeader.getType()))) {
-			view.setIconType(EntityTypeUtils.getIconTypeForEntityClassName(entityHeader.getType()));
+			view.setEntityType(EntityTypeUtils.getEntityType(entityHeader));
 		} else {
-			view.setIconType(null);
+			view.setEntityType(null);
 		}
 	}
 

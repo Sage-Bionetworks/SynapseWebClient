@@ -26,7 +26,7 @@ public class DockerTitleBar implements SynapseWidgetPresenter {
 		favWidget.configure(repo.getId());
 		view.setFavoritesWidgetVisible(authenticationController.isLoggedIn());
 		view.setTitle(repo.getRepositoryName());
-		view.setIconType(EntityTypeUtils.getIconTypeForEntity(repo));
+		view.setEntityType(EntityTypeUtils.getEntityType(repo));
 	}
 
 	public void clearState() {

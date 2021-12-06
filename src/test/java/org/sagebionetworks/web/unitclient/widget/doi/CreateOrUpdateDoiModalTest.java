@@ -293,7 +293,7 @@ public class CreateOrUpdateDoiModalTest {
 		assertEquals(objectId, result.getObjectId());
 		assertEquals(ObjectType.ENTITY, result.getObjectType());
 		assertEquals(objectVersion.get(), result.getObjectVersion());
-		assertEquals(CreateOrUpdateDoiModal.getSuggestedResourceTypeGeneral(EntityTypeUtils.getEntityTypeForEntityClassName(mockEntity.getClass().getName())), result.getResourceType().getResourceTypeGeneral());
+		assertEquals(CreateOrUpdateDoiModal.getSuggestedResourceTypeGeneral(EntityTypeUtils.getEntityType(mockEntity)), result.getResourceType().getResourceTypeGeneral());
 		assertEquals(expectedCreators, result.getCreators());
 		assertEquals(expectedTitles, result.getTitles());
 		assertEquals(pubYearString, result.getPublicationYear().toString());

@@ -1,9 +1,9 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.schema.ValidationResults;
 import org.sagebionetworks.web.client.widget.lazyload.SupportsLazyLoadInterface;
+
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -13,8 +13,6 @@ public interface EntityBadgeView extends IsWidget, SupportsLazyLoadInterface {
 	void showLoadError(String entityId);
 
 	void setClickHandler(ClickHandler handler);
-
-	void setIcon(IconType iconType);
 
 	void showAddToDownloadList();
 

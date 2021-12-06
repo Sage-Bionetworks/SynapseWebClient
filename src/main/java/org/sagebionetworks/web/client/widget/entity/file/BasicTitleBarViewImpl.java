@@ -1,11 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
 import org.gwtbootstrap3.client.ui.Heading;
-import org.gwtbootstrap3.client.ui.Icon;
-import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Span;
+import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.widget.EntityTypeIcon;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -21,7 +21,7 @@ public class BasicTitleBarViewImpl implements BasicTitleBarView {
 	@UiField
 	SimplePanel favoritePanel;
 	@UiField
-	Icon entityIcon;
+	EntityTypeIcon entityIcon;
 	@UiField
 	Div actionMenuContainer;
 
@@ -57,8 +57,13 @@ public class BasicTitleBarViewImpl implements BasicTitleBarView {
 	}
 
 	@Override
-	public void setIconType(IconType iconType) {
-		entityIcon.setType(iconType);
+	public void setEntityType(EntityType entityType) {
+		if (entityType == null) {
+			entityIcon.setVisible(false);
+		} else {
+			entityIcon.setVisible(true);
+			entityIcon.setType(entityType);
+		}
 	}
 
 	@Override

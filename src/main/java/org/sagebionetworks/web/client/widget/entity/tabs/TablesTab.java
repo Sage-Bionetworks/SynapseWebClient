@@ -3,14 +3,11 @@ package org.sagebionetworks.web.client.widget.entity.tabs;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.Table;
-import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -41,11 +38,6 @@ public class TablesTab extends AbstractTablesTab {
 	@Override
 	protected String getTabDisplayName() {
 		return DisplayConstants.TABLES;
-	}
-
-	@Override
-	protected IconType getTabIcon() {
-		return EntityTypeUtils.getIconTypeForEntityClassName(TableEntity.class.getName());
 	}
 
 	@Override
