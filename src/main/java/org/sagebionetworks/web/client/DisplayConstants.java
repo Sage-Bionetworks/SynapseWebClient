@@ -256,5 +256,8 @@ public class DisplayConstants {
 	public static final String PROJECT_VIEW = "Project View";
 	public static final String FILE_VIEW = "File View";
 
+	public static final String GO_TO_CURRENT_VERSION = "Go to the current version";
+	public static final String GO_TO_DRAFT_VERSION = "Go to the draft version";
+
 }
 
