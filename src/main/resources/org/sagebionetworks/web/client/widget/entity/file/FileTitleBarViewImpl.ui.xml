@@ -3,7 +3,7 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:s="urn:import:org.sagebionetworks.web.client.widget"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
-	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" 
+	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
@@ -13,7 +13,7 @@
 			<bh:Div addStyleNames="flexcontainer-row margin-bottom-10">
 				<bh:Div addStyleNames="flexcontainer-column flexcontainer-column-fill-width font-size-30">
 					<bh:Div addStyleNames="flexcontainer-row flexcontainer-align-items-center overflow-x-auto">
-					 	<w:EntityTypeIcon ui:field="entityIcon" addStyleNames="flexcontainer-column lightGreyText margin-right-5" type="file"/>
+					 	<w:EntityTypeIcon ui:field="entityIcon" addStyleNames="flexcontainer-column lightGreyText margin-right-15" type="file"/>
 					 	<b:Heading addStyleNames="pageHeaderTitle flexcontainer-column" ui:field="entityName" size="H3"/>
 					 	<g:SimplePanel ui:field="favoritePanel" addStyleNames="flexcontainer-column margin-left-5 margin-right-10"/>
 					</bh:Div>
