@@ -36,8 +36,12 @@ public class EntityTypeIcon extends ReactComponentSpan {
 	 * This is required for XML setters to work. If you want to call this from Java, prefer {@link #setType(EntityType)} for strong typing.
 	 * @param type
 	 */
-	public void setType(String type) throws IllegalArgumentException {
-		EntityType enumValue = EntityType.valueOf(type);
+	public void setType(String type) {
+		EntityType enumValue = EntityType.file;
+		try {
+			enumValue = EntityType.valueOf(type);
+		} catch (IllegalArgumentException e) {
+		}
 		setType(enumValue);
 	}
 
