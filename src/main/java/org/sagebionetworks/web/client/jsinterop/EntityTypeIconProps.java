@@ -11,13 +11,6 @@ public class EntityTypeIconProps extends ReactComponentProps {
 	String type;
 
 	@JsOverlay
-	public static EntityTypeIconProps create(String type) {
-		EntityTypeIconProps props = new EntityTypeIconProps();
-		props.type = type;
-		return props;
-	}
-
-	@JsOverlay
 	public static EntityTypeIconProps create(EntityType type) {
 		EntityTypeIconProps props = new EntityTypeIconProps();
 		props.type = type.name();

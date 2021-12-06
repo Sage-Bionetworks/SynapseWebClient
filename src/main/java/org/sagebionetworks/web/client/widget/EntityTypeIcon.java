@@ -25,29 +25,12 @@ public class EntityTypeIcon extends Span {
 	}
 
 	/**
-	 * Prefer {@link #EntityTypeIcon(EntityType)} for strong typing.
+	 * This is required for XML to work. If you want to call this from Java, prefer {@link #setType(EntityType)} for strong typing.
 	 * @param type
 	 */
-	public EntityTypeIcon(String type) {
-		configure(type);
-	}
-
-	/**
-	 * Prefer {@link #configure(EntityType)} for strong typing.
-	 * @param type
-	 */
-	public void configure(String type) {
-		EntityTypeIconProps props = EntityTypeIconProps.create(type);
-		ReactElement component = React.createElement(SRC.SynapseComponents.EntityTypeIcon, props);
-		ReactDOM.render(component, getElement());
-	}
-
-	/**
-	 * Prefer {@link #setType(EntityType)} for strong typing.
-	 * @param type
-	 */
-	public void setType(String type) {
-		configure(type);
+	public void setType(String type) throws IllegalArgumentException {
+		EntityType enumValue = EntityType.valueOf(type);
+		setType(enumValue);
 	}
 
 }
