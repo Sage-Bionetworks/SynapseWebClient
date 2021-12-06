@@ -435,7 +435,8 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionVisible(Action.UPLOAD_TABLE_DATA, true);
 		// Show scope should be visible
 		verify(mockActionMenu).setActionVisible(Action.SHOW_VIEW_SCOPE, true);
-		// Edit dataset items should be visible
+		// Edit dataset items should not be visible
+
 		verify(mockActionMenu).setActionVisible(Action.EDIT_DATASET_ITEMS, false);
 	}
 
