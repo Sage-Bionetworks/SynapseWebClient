@@ -12,18 +12,18 @@
 			<t:TableHeader width="20px" />
 			<t:TableData width="20px">
 				<g:FocusPanel ui:field="iconContainer">
-					<b:Icon ui:field="icon" type="TABLE" />
+                    <w:EntityTypeIcon ui:field="icon" type="table" />
 				</g:FocusPanel>
 			</t:TableData>
 			<t:TableData addStyleNames="overflow-x-hidden ">
-				<bh:Div addStyleNames="margin-right-5"
+				<bh:Div addStyleNames="margin-left-5 margin-right-5"
 					ui:field="nameContainer">
 					<g:FlowPanel ui:field="entityContainer"
 						addStyleNames="displayInline pull-left" />
 				</bh:Div>
 			</t:TableData>
 			<t:TableData width="100px"
-				addStyleNames="visible-md visible-lg overflow-x-hidden">
+				addStyleNames="visible-sm visible-md visible-lg overflow-x-hidden">
 				<g:Label ui:field="typeField" />
 			</t:TableData>
 			<t:TableData width="310px"

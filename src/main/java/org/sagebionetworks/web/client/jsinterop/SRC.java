@@ -23,6 +23,7 @@ public class SRC {
 		public static ReactFunctionComponent<EmptyProps> FavoritesPage;
 		public static ReactFunctionComponent<EntityModalProps> EntityModal;
 		public static ReactFunctionComponent<IconSvgProps> IconSvg;
+		public static ReactFunctionComponent<EntityTypeIconProps> EntityTypeIcon;
 		public static ReactFunctionComponent<UserProfileLinksProps> UserProfileLinks;
 		public static ReactFunctionComponent SynapseToastContainer;
 

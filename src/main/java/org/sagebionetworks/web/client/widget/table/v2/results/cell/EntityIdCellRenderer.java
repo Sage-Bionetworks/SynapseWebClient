@@ -71,7 +71,7 @@ public class EntityIdCellRenderer implements Cell, TakesAddressCell {
 						linkText = entityName;
 						break;
 					}
-					view.setIcon(EntityTypeUtils.getIconTypeForEntityClassName(entity.getType()));
+					view.setEntityType(EntityTypeUtils.getEntityType(entity));
 					view.setLinkText(linkText);
 				}
 

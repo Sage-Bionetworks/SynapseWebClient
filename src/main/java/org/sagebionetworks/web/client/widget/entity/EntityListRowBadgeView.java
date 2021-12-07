@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.web.client.widget.SelectableListItem;
 import org.sagebionetworks.web.client.widget.lazyload.SupportsLazyLoadInterface;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -21,7 +21,7 @@ public interface EntityListRowBadgeView extends IsWidget, SelectableListItem, Su
 
 	void setCreatedByWidget(Widget w);
 
-	void setIcon(IconType iconType);
+	void setEntityType(EntityType entityType);
 
 	void showAddToDownloadList();
 

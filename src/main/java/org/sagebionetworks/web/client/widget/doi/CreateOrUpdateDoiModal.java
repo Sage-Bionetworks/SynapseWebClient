@@ -157,7 +157,7 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
         newDoi.setTitles(titles);
 
         newDoi.setResourceType(new DoiResourceType());
-        newDoi.getResourceType().setResourceTypeGeneral(getSuggestedResourceTypeGeneral(EntityTypeUtils.getEntityTypeForEntityClassName(entity.getClass().getName())));
+        newDoi.getResourceType().setResourceTypeGeneral(getSuggestedResourceTypeGeneral(EntityTypeUtils.getEntityType(entity)));
 
         newDoi.setPublicationYear(Long.valueOf(dateTimeUtils.getYear(new Date())));
         return newDoi;

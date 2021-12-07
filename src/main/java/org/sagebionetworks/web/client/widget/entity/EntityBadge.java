@@ -15,7 +15,6 @@ import org.sagebionetworks.repo.model.schema.JsonSchemaObjectBinding;
 import org.sagebionetworks.repo.model.schema.ValidationResults;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -102,7 +101,6 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 		view.clearEntityInformation();
 		if (entityHeader != null) {
 			view.setEntity(entityHeader);
-			view.setIcon(EntityTypeUtils.getIconTypeForEntityClassName(entityHeader.getType()));
 			if (customClickHandler != null) {
 				view.setClickHandler(customClickHandler);
 			}

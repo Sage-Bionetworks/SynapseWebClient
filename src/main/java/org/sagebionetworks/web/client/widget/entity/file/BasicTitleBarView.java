@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
-import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.web.client.SynapseView;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -13,7 +13,7 @@ public interface BasicTitleBarView extends IsWidget, SynapseView {
 
 	void setTitle(String name);
 
-	void setIconType(IconType iconType);
+	void setEntityType(EntityType entityType);
 
 	void setActionMenu(IsWidget w);
 }

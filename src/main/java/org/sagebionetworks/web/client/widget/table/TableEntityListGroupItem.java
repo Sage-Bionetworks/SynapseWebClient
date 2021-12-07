@@ -1,15 +1,17 @@
 package org.sagebionetworks.web.client.widget.table;
 
 import static org.sagebionetworks.web.client.DisplayUtils.TEXTBOX_SELECT_ALL_FIELD_CLICKHANDLER;
+
 import org.gwtbootstrap3.client.ui.Anchor;
-import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.widget.EntityTypeIcon;
 import org.sagebionetworks.web.client.widget.entity.EntityBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
+
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -43,7 +45,7 @@ public class TableEntityListGroupItem implements IsWidget {
 	@UiField
 	FlowPanel entityContainer;
 	@UiField
-	Icon icon;
+	EntityTypeIcon icon;
 
 	public interface Binder extends UiBinder<IsWidget, TableEntityListGroupItem> {
 	}
@@ -83,7 +85,7 @@ public class TableEntityListGroupItem implements IsWidget {
 			createdOnField.setText(dateTimeUtils.getDateTimeString(header.getCreatedOn()));
 		}
 
-		icon.setType(EntityTypeUtils.getIconTypeForEntityClassName(header.getType()));
+		icon.setType(EntityTypeUtils.getEntityType(header));
 		typeField.setText(EntityTypeUtils.getFriendlyTableTypeName(header.getType()));
 	}
 

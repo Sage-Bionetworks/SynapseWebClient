@@ -10,6 +10,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.TableEntity;
@@ -57,7 +58,7 @@ public class BasicTitleBarTest {
 		titleBar.configure(mockBundle);
 		verify(mockView).setFavoritesWidgetVisible(true);
 		verify(mockView).setTitle(testEntityName);
-		verify(mockView).setIconType(IconType.FOLDER);
+		verify(mockView).setEntityType(EntityType.folder);
 	}
 
 	@Test
@@ -68,6 +69,6 @@ public class BasicTitleBarTest {
 		when(mockBundle.getEntity()).thenReturn(entity);
 		titleBar.configure(mockBundle);
 		verify(mockView).setFavoritesWidgetVisible(false);
-		verify(mockView).setIconType(IconType.TABLE);
+		verify(mockView).setEntityType(EntityType.table);
 	}
 }

@@ -9,8 +9,8 @@
 
 	<bh:Span addStyleNames="whitespace-nowrap">
 		<bh:Span ui:field="loadingUI" visible="false"> Loading...</bh:Span>
-		<b:Icon ui:field="entityIcon" visible="false" fixedWidth="true"
-			type="ASTERISK" />
+        <w:EntityTypeIcon ui:field="entityIcon" visible="false" styleName="margin-right-5" type="file" />
+        <b:Icon ui:field="errorIcon" visible="false" fixedWidth="true"	type="ASTERISK" />
 		<b:Anchor ui:field="entityLink" target="_blank" />
 	</bh:Span>
 </ui:UiBinder>

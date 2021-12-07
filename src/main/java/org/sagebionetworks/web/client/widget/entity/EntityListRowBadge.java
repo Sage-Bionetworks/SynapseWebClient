@@ -125,7 +125,7 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 	}
 
 	public void setEntityBundle(EntityBundle eb) {
-		view.setIcon(EntityTypeUtils.getIconTypeForEntity(eb.getEntity()));
+		view.setEntityType(EntityTypeUtils.getEntityType(eb.getEntity()));
 		entityName = eb.getEntity().getName();
 		view.setEntityLink(entityName, DisplayUtils.getSynapseHistoryToken(entityId, version));
 		if (eb.getEntity().getCreatedBy() != null) {

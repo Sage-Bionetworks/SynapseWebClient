@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
-import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.sagebionetworks.repo.model.EntityType;
+
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -11,7 +12,7 @@ public interface EntityIdCellRendererView extends IsWidget {
 
 	void setClickHandler(ClickHandler clickHandler);
 
-	void setIcon(IconType iconType);
+	void setEntityType(EntityType entityType);
 
 	void showLoadingIcon();
 

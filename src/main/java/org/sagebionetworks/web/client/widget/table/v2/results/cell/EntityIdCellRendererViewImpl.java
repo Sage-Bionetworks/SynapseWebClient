@@ -4,10 +4,13 @@ import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Span;
+import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.widget.EntityTypeIcon;
+
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -23,9 +26,10 @@ public class EntityIdCellRendererViewImpl implements EntityIdCellRendererView {
 
 	@UiField
 	Span loadingUI;
+	@UiField
 	Icon errorIcon;
 	@UiField
-	Icon entityIcon;
+	EntityTypeIcon entityIcon;
 	@UiField
 	Anchor entityLink;
 	String entityId;
@@ -55,9 +59,10 @@ public class EntityIdCellRendererViewImpl implements EntityIdCellRendererView {
 	}
 
 	@Override
-	public void setIcon(IconType iconType) {
+	public void setEntityType(EntityType entityType) {
 		loadingUI.setVisible(false);
-		entityIcon.setType(iconType);
+		entityIcon.setType(entityType);
+		errorIcon.setVisible(false);
 		entityIcon.setVisible(true);
 	}
 
@@ -87,9 +92,10 @@ public class EntityIdCellRendererViewImpl implements EntityIdCellRendererView {
 	@Override
 	public void showErrorIcon(String error) {
 		// lazily construct error UI
-		entityIcon.setType(IconType.EXCLAMATION_CIRCLE);
+		errorIcon.setType(IconType.EXCLAMATION_CIRCLE);
 		loadingUI.setVisible(false);
-		entityIcon.setVisible(true);
+		entityIcon.setVisible(false);
+		errorIcon.setVisible(true);
 	}
 
 	@Override
