@@ -2,12 +2,14 @@ package org.sagebionetworks.web.client.view;
 
 import java.util.Date;
 import java.util.List;
-import org.gwtbootstrap3.client.ui.constants.IconType;
+
+import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.search.Hit;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.KeyRange;
 import org.sagebionetworks.repo.model.search.query.KeyValue;
 import org.sagebionetworks.web.client.SynapseView;
+
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -59,7 +61,7 @@ public interface SearchView extends IsWidget, SynapseView {
 
 		Date getSearchStartTime();
 
-		IconType getIconForHit(Hit hit);
+		EntityType getEntityTypeForHit(Hit hit);
 
 		String getCurrentSearchJSON();
 

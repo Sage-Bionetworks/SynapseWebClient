@@ -1,8 +1,10 @@
 package org.sagebionetworks.web.client;
 
 import static org.junit.Assert.assertEquals;
+
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.junit.Test;
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
@@ -23,6 +25,8 @@ public class EntityTypeUtilsTest {
 		assertEquals(TableEntity.class.getName(), EntityTypeUtils.getEntityClassNameForEntityType(EntityType.table.name()));
 		assertEquals(EntityView.class.getName(), EntityTypeUtils.getEntityClassNameForEntityType(EntityType.entityview.name()));
 		assertEquals(Link.class.getName(), EntityTypeUtils.getEntityClassNameForEntityType(EntityType.link.name()));
+		assertEquals(SubmissionView.class.getName(), EntityTypeUtils.getEntityClassNameForEntityType(EntityType.submissionview.name()));
+		assertEquals(Dataset.class.getName(), EntityTypeUtils.getEntityClassNameForEntityType(EntityType.dataset.name()));
 
 		assertEquals(FileEntity.class.getName(), EntityTypeUtils.getEntityClassNameForEntityType("default"));
 	}
@@ -35,6 +39,8 @@ public class EntityTypeUtilsTest {
 		assertEquals(EntityType.table, EntityTypeUtils.getEntityTypeForEntityClassName(TableEntity.class.getName()));
 		assertEquals(EntityType.entityview, EntityTypeUtils.getEntityTypeForEntityClassName(EntityView.class.getName()));
 		assertEquals(EntityType.link, EntityTypeUtils.getEntityTypeForEntityClassName(Link.class.getName()));
+		assertEquals(EntityType.submissionview, EntityTypeUtils.getEntityTypeForEntityClassName(SubmissionView.class.getName()));
+		assertEquals(EntityType.dataset, EntityTypeUtils.getEntityTypeForEntityClassName(Dataset.class.getName()));
 
 		assertEquals(EntityType.file, EntityTypeUtils.getEntityTypeForEntityClassName("default"));
 	}
@@ -59,5 +65,41 @@ public class EntityTypeUtilsTest {
 		assertEquals(EntityTypeUtils.DATASET_DISPLAY_NAME, EntityTypeUtils.getFriendlyTableTypeName(Dataset.class.getName()));
 
 		assertEquals(EntityTypeUtils.UNKNOWN_TABLE_TYPE, EntityTypeUtils.getFriendlyTableTypeName("coffee table"));
+	}
+
+	@Test
+	public void testGetEntityTypeWithHeader() {
+		// EntityHeader.type field is the class name
+		EntityHeader header = new EntityHeader();
+		header.setType(FileEntity.class.getName());
+		assertEquals(EntityType.file, EntityTypeUtils.getEntityType(header));
+
+		header.setType(Folder.class.getName());
+		assertEquals(EntityType.folder,EntityTypeUtils.getEntityType(header));
+
+		header.setType(Project.class.getName());
+		assertEquals(EntityType.project,EntityTypeUtils.getEntityType(header));
+
+		header.setType(TableEntity.class.getName());
+		assertEquals(EntityType.table, EntityTypeUtils.getEntityType(header));
+
+		header.setType(EntityView.class.getName());
+		assertEquals(EntityType.entityview,EntityTypeUtils.getEntityType(header));
+
+		header.setType(Link.class.getName());
+		assertEquals(EntityType.link, EntityTypeUtils.getEntityType(header));
+
+		header.setType(SubmissionView.class.getName());
+		assertEquals(EntityType.submissionview, EntityTypeUtils.getEntityType(header));
+
+		header.setType(Dataset.class.getName());
+		assertEquals(EntityType.dataset, EntityTypeUtils.getEntityType(header));
+
+		// Default cases
+		header.setType(null);
+		assertEquals(EntityType.file, EntityTypeUtils.getEntityType(header));
+
+		header.setType("");
+		assertEquals(EntityType.file, EntityTypeUtils.getEntityType(header));
 	}
 }

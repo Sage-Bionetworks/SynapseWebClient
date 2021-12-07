@@ -6,9 +6,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.gwtbootstrap3.client.ui.constants.IconType;
+
 import org.sagebionetworks.repo.model.EntityType;
-import org.sagebionetworks.repo.model.EntityTypeUtils;
 import org.sagebionetworks.repo.model.search.Hit;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.KeyRange;
@@ -18,7 +17,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -26,6 +24,7 @@ import org.sagebionetworks.web.client.view.SearchView;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.SearchQueryUtils;
+
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.URL;
@@ -244,11 +243,11 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	}
 
 	@Override
-	public IconType getIconForHit(Hit hit) {
+	public EntityType getEntityTypeForHit(Hit hit) {
 		if (hit == null)
 			return null;
 		EntityType type = EntityType.valueOf(hit.getNode_type());
-		return org.sagebionetworks.web.client.EntityTypeUtils.getIconTypeForEntityClassName(EntityTypeUtils.getEntityTypeClassName(type));
+		return type;
 	}
 
 	@Override

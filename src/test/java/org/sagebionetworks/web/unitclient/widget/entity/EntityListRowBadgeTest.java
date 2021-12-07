@@ -20,6 +20,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
@@ -130,7 +131,7 @@ public class EntityListRowBadgeTest {
 
 		verify(mockSynapseJavascriptClient).getEntityBundle(anyString(), any(EntityBundleRequest.class), any(AsyncCallback.class));
 		verify(mockView).showLoading();
-		verify(mockView).setIcon(IconType.LIST_ALT); // project icon
+		verify(mockView).setEntityType(EntityType.project);
 		verify(mockView).setEntityLink(entityName, "#!Synapse:" + entityId);
 		verify(mockUserBadge).configure(createdByUserId);
 		verify(mockView).setCreatedOn(anyString());
@@ -164,7 +165,7 @@ public class EntityListRowBadgeTest {
 
 		verify(mockSynapseJavascriptClient).getEntityBundleForVersion(anyString(), anyLong(), any(EntityBundleRequest.class), any(AsyncCallback.class));
 		verify(mockView).showLoading();
-		verify(mockView).setIcon(IconType.FILE); // file icon
+		verify(mockView).setEntityType(EntityType.file);
 		verify(mockView).setEntityLink(entityName, "#!Synapse:" + entityId + "." + version);
 		verify(mockUserBadge).configure(createdByUserId);
 		verify(mockView).setCreatedOn(anyString());

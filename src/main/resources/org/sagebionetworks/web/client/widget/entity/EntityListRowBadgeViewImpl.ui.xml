@@ -21,7 +21,7 @@
 					</b:Tooltip>
 				</t:TableData>
 				<t:TableData width="20px" ui:field="iconTableData">
-					<b:Icon ui:field="icon" type="FILE" />
+                    <w:EntityTypeIcon ui:field="icon" type="file" />
 				</t:TableData>
 				<t:TableData
 					addStyleNames="maxWidth50px overflow-x-hidden ">

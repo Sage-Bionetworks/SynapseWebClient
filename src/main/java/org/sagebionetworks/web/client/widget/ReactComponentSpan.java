@@ -1,11 +1,11 @@
 package org.sagebionetworks.web.client.widget;
 
-import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 
 /**
  * Automatically unmounts the ReactComponent (if any) inside this div when this container is detached/unloaded.
  */
-public class ReactComponentDiv extends Div {
+public class ReactComponentSpan extends Span {
 	@Override
 	protected void onUnload() {
 		ReactComponentLifecycleUtils.onUnload(this.getElement());

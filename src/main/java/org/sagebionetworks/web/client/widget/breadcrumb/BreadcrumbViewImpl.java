@@ -1,12 +1,16 @@
 package org.sagebionetworks.web.client.widget.breadcrumb;
 
 import java.util.List;
-import org.gwtbootstrap3.client.ui.Anchor;
+
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.widget.EntityTypeIcon;
+
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Widget;
@@ -48,8 +52,12 @@ public class BreadcrumbViewImpl implements BreadcrumbView {
 			String text = data.getText();
 			text = stubString(text);
 			Anchor anchor = new Anchor();
-			anchor.setText(text);
-			anchor.setIcon(data.getIconType());
+			EntityTypeIcon icon = new EntityTypeIcon(data.getEntityType());
+			icon.setStyleName("margin-right-5");
+			anchor.getElement().appendChild(icon.getElement());
+			Span textContainer = new Span();
+			textContainer.setText(text);
+			anchor.getElement().appendChild(textContainer.getElement());
 			anchor.addStyleName("displayInline");
 			if (data.getPlace() instanceof Synapse) {
 				Synapse synapsePlace = (Synapse) data.getPlace();

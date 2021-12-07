@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.asynch.EntityHeaderAsyncHandler;
 import org.sagebionetworks.web.client.widget.asynch.VersionedEntityHeaderAsyncHandler;
@@ -60,7 +61,7 @@ public class EntityIdCellRendererImplTest {
 
 		verify(mockView).showLoadingIcon();
 		verify(mockEntityHeaderAsyncHandler).getEntityHeader(anyString(), any(AsyncCallback.class));
-		verify(mockView).setIcon(any(IconType.class));
+		verify(mockView).setEntityType(any(EntityType.class));
 		verify(mockView).setLinkText(PROJECT_NAME);
 		verify(mockView).setEntityId("syn" + entityId);
 		verify(mockView, never()).setClickHandler(any(ClickHandler.class));
