@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
+import static org.sagebionetworks.repo.model.EntityType.dataset;
 import static org.sagebionetworks.repo.model.EntityType.dockerrepo;
 import static org.sagebionetworks.repo.model.EntityType.entityview;
 import static org.sagebionetworks.repo.model.EntityType.file;
@@ -20,15 +21,15 @@ import org.sagebionetworks.web.client.EntityTypeUtils;
 
 public enum EntityFilter {
 	ALL(EntityType.values()),
-	ALL_BUT_LINK(project, folder, file, table, entityview, dockerrepo, submissionview),
+	ALL_BUT_LINK(project, folder, file, table, entityview, dockerrepo, submissionview, dataset),
 	PROJECT_FOLDER_FILE_LINK(project, folder, file, link),
 	CONTAINER(project, folder),
 	PROJECT(project),
 	FOLDER(folder),
 	FILE(file),
 	TABLE(table),
-	ALL_TABLES(table, entityview, submissionview),
-	PROJECT_OR_TABLE(project, table, entityview, submissionview);
+	ALL_TABLES(table, entityview, submissionview, dataset),
+	PROJECT_OR_TABLE(project, table, entityview, submissionview, dataset);
 
 	// when browsing (in the entity tree browser), only these types should be shown.
 	private Set<String> entityTypeClassNamesSet;
