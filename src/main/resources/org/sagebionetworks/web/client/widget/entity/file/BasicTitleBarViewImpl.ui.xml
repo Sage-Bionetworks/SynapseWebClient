@@ -11,7 +11,7 @@
 		<bh:Div addStyleNames="flexcontainer-row">
 			<bh:Div addStyleNames="flexcontainer-column flexcontainer-column-fill-width font-size-30">
 				<bh:Div addStyleNames="flexcontainer-row flexcontainer-align-items-center overflow-x-auto">
-                    <w:EntityTypeIcon ui:field="entityIcon" addStyleNames="entityIcon margin-right-5 lightGreyText flexcontainer-column" type="folder" />
+                    <w:EntityTypeIcon ui:field="entityIcon" addStyleNames="entityIcon margin-right-10 lightGreyText flexcontainer-column" type="folder" />
 				 	<b:Heading addStyleNames="pageHeaderTitle flexcontainer-column" ui:field="fileName" size="H3"/>
 				 	<g:SimplePanel ui:field="favoritePanel" addStyleNames="flexcontainer-column margin-left-5"/>
 				 </bh:Div>
