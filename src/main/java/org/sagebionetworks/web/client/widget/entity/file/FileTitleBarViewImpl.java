@@ -134,7 +134,7 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 		md5Link.clear();
 		md5LinkContainer.setWidget(md5Link);
 
-    String currentVersionLinkText;
+   	String currentVersionLinkText;
 		if (entity instanceof Dataset) { // Currently doesn't do anything since this titlebar is only used for Files
 			currentVersionLinkText = GO_TO_DRAFT_VERSION;
 		} else {
