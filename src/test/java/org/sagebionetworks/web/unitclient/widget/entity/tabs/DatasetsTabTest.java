@@ -446,4 +446,47 @@ public class DatasetsTabTest {
 		verify(mockTab).setEntityNameAndPlace(projectEntityId, expectedPlace);
 		verify(mockSynapseAlert).handleException(projectLoadError);
 	}
+
+	@Test
+	public void testEditorCanDownloadLatestVersion() {
+		Long version = null; // this is the current/draft version, not a snapshot
+		String areaToken = null;
+
+		when(mockPermissions.getCanCertifiedUserEdit()).thenReturn(true); // !
+		when(mockPermissions.getIsCertifiedUser()).thenReturn(true);
+
+		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
+		tab.configure(mockDatasetBundle, version, areaToken);
+
+		verify(mockActionMenuWidget).setTableDownloadOptionsEnabled(true);
+	}
+
+	@Test
+	public void testNonEditorCannotDownloadLatestVersion() {
+		Long version = null; // this is the current/draft version, not a snapshot
+		String areaToken = null;
+
+		when(mockPermissions.getCanCertifiedUserEdit()).thenReturn(false); // !
+		when(mockPermissions.getIsCertifiedUser()).thenReturn(true);
+
+		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
+		tab.configure(mockDatasetBundle, version, areaToken);
+
+		verify(mockActionMenuWidget).setTableDownloadOptionsEnabled(false);
+	}
+
+	@Test
+	public void testNonEditorCanDownloadSnapshot() {
+		Long version = 1L; // this is a snapshot
+		String areaToken = null;
+
+		when(mockPermissions.getCanCertifiedUserEdit()).thenReturn(false); // !
+		when(mockPermissions.getIsCertifiedUser()).thenReturn(true);
+
+		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
+		tab.configure(mockDatasetBundle, version, areaToken);
+
+		verify(mockActionMenuWidget).setTableDownloadOptionsEnabled(true);
+
+	}
 }

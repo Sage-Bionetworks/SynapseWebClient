@@ -149,4 +149,9 @@ public class ActionMenuWidgetImpl implements ActionMenuWidget, ActionListener {
 	public void setTableDownloadOptionsVisible(boolean visible) {
 		view.setTableDownloadOptionsVisible(visible);
 	}
+
+	@Override
+	public void setTableDownloadOptionsEnabled(boolean enabled) {
+		view.setDownloadActionsEnabled(enabled);
+	}
 }
