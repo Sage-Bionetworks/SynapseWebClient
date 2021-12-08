@@ -21,3 +21,13 @@ node_modules/*
 # We don't want to commit them because they are compiled or retrieved at build-time
 src/main/webapp/generated/*
 src/main/webapp/fonts/*
+
+# We're using Yarn 2+ for JS dependencies, but we aren't currently using zero-installs
+# https://yarnpkg.com/getting-started/qa#which-files-should-be-gitignored
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
