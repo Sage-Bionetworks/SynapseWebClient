@@ -246,6 +246,7 @@ public class TablesTabTest {
 		verify(mockView).setTableEntityWidget(any(Widget.class));
 		verify(mockModifiedCreatedBy).configure(any(Date.class), anyString(), any(Date.class), anyString());
 		verify(mockActionMenuWidget).setTableDownloadOptionsVisible(true);
+		verify(mockActionMenuWidget).setTableDownloadOptionsEnabled(true);
 		verify(mockProvenanceWidget).configure(mapCaptor.capture());
 		// verify configuration
 		Map<String, String> provConfig = mapCaptor.getValue();

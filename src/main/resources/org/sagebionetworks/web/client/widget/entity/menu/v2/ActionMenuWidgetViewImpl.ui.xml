@@ -22,9 +22,15 @@
 			<b:Button dataToggle="DROPDOWN" type="PRIMARY" text="Download Options" marginRight="5" visible="false" ui:field="tableDownloadOptions"/>
 			<b:DropDownMenu addStyleNames="dropdown-menu-right">
 				<a:ActionMenuItem action="DOWNLOAD_TABLE_QUERY_RESULTS">Export Table</a:ActionMenuItem>
-				<a:ActionMenuItem action="ADD_TABLE_RESULTS_TO_DOWNLOAD_LIST">Add to Download List</a:ActionMenuItem>
+                <b:Tooltip ui:field="addToDownloadListMenuItemTooltip" placement="LEFT" container="body"
+                           text="A draft version of a Dataset cannot be added to the Download List." >
+                    <a:ActionMenuItem ui:field="addToDownloadListMenuItem" action="ADD_TABLE_RESULTS_TO_DOWNLOAD_LIST">Add to Download List</a:ActionMenuItem>
+                </b:Tooltip>
 				<!-- <b:Divider ui:field="downloadOptionsDivider" /> -->
-				<a:ActionMenuItem action="TABLE_DOWNLOAD_PROGRAMMATIC_OPTIONS">Programmatic Options</a:ActionMenuItem>
+                <b:Tooltip ui:field="programmaticOptionsMenuItemTooltip" placement="LEFT" container="body"
+                           text="A draft version of a Dataset cannot be downloaded with a programmatic client." >
+                    <a:ActionMenuItem ui:field="programmaticOptionsMenuItem" action="TABLE_DOWNLOAD_PROGRAMMATIC_OPTIONS">Programmatic Options</a:ActionMenuItem>
+                </b:Tooltip>
 			</b:DropDownMenu>
 		</b:DropDown>
 		<b:DropDown ui:field="dropdown" addStyleNames="displayInlineBlock">
