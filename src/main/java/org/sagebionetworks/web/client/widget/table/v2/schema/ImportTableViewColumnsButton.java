@@ -45,7 +45,7 @@ public class ImportTableViewColumnsButton implements IsWidget {
 				.setPromptCopy("Find Tables to import columns")
 				.setMultiSelect(false)
 				.setVisibleTypesInTree(EntityFilter.PROJECT)
-				.setSelectableTypes(EntityFilter.TABLE)
+				.setSelectableTypes(EntityFilter.ALL_TABLES)
 				.setShowVersions(true)
 				.setSelectedHandler((selected, entityFinder) -> onTableViewSelected(selected.getTargetId(), selected.getTargetVersionNumber()))
 				.build();
