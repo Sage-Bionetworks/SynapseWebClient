@@ -18,7 +18,6 @@
     "synapse-react-client": "2.0.62",
     "universal-cookie": "^4.0.3"
   },
-  "packageManager": "yarn@3.1.1",
   "resolutions": {
     "react": "17.0.2",
     "react-dom": "17.0.2",

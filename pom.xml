@@ -343,7 +343,7 @@
 
 				<configuration>
 					<nodeVersion>v14.15.4</nodeVersion>
-					<yarnVersion>v3.1.1</yarnVersion>
+					<yarnVersion>v1.22.17</yarnVersion>
 				</configuration>
 			</plugin>
 			
