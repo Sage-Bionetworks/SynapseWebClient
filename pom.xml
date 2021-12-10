@@ -335,7 +335,7 @@
 							<goal>yarn</goal>
 						</goals>
 						<configuration>
-							<arguments>sass --no-source-map --style=compressed --unicode --stop-on-error --update --load-path=. src/main/webapp/sass:src/main/webapp/generated</arguments>
+							<arguments>sass --no-source-map --style=compressed --unicode --stop-on-error --update --load-path=node_modules src/main/webapp/sass:src/main/webapp/generated</arguments>
 						</configuration>
 						<phase>compile</phase>
 					</execution>
@@ -343,7 +343,7 @@
 
 				<configuration>
 					<nodeVersion>v14.15.4</nodeVersion>
-					<yarnVersion>v1.22.5</yarnVersion>
+					<yarnVersion>v1.22.17</yarnVersion>
 				</configuration>
 			</plugin>
 			
@@ -367,12 +367,11 @@
 								<copy file="${project.basedir}/node_modules/croppie/croppie.min.js" tofile="src/main/webapp/generated/croppie.min.js" />
 								<copy file="${project.basedir}/node_modules/croppie/croppie.css" tofile="src/main/webapp/generated/croppie.css" />
 								<copy file="${project.basedir}/node_modules/synapse-react-client/dist/umd/synapse-react-client.production.min.js" tofile="src/main/webapp/generated/synapse-react-client.production.min.js" />
-								<copy file="${project.basedir}/node_modules/synapse-react-client/dist/umd/synapse-react-client.production.styles.css" tofile="src/main/webapp/generated/synapse-react-client.production.styles.css" />
+								<copy file="${project.basedir}/node_modules/synapse-react-client/dist/umd/synapse-react-client.production.min.css" tofile="src/main/webapp/generated/synapse-react-client.production.min.css" />
 								<copy file="${project.basedir}/node_modules/react/umd/react.production.min.js" tofile="src/main/webapp/generated/react.production.min.js" />
 								<copy file="${project.basedir}/node_modules/react-dom/umd/react-dom.production.min.js" tofile="src/main/webapp/generated/react-dom.production.min.js" />
 								<copy file="${project.basedir}/node_modules/react-transition-group/dist/react-transition-group.min.js" tofile="src/main/webapp/generated/react-transition-group.min.js" />
 								<copy file="${project.basedir}/node_modules/react-measure/dist/index.umd.js" tofile="src/main/webapp/generated/react-measure.js" />
-								<copy file="${project.basedir}/node_modules/react-tooltip/standalone/react-tooltip.min.js" tofile="src/main/webapp/generated/react-tooltip.min.js" />
 								<copy file="${project.basedir}/node_modules/@rjsf/core/dist/react-jsonschema-form.js" tofile="src/main/webapp/generated/react-jsonschema-form.js" />
 								<copy file="${project.basedir}/node_modules/react-query/dist/react-query.production.min.js" tofile="src/main/webapp/generated/react-query.production.min.js" />
 								<copy file="${project.basedir}/node_modules/universal-cookie/umd/universalCookie.min.js" tofile="src/main/webapp/generated/universalCookie.min.js" />
@@ -387,6 +386,7 @@
 								<copy file="${project.basedir}/node_modules/react/umd/react.development.js" tofile="src/main/webapp/generated/react.development.js" />
 								<copy file="${project.basedir}/node_modules/react-dom/umd/react-dom.development.js" tofile="src/main/webapp/generated/react-dom.development.js" />
 								<copy file="${project.basedir}/node_modules/react-query/dist/react-query.development.js" tofile="src/main/webapp/generated/react-query.development.js" />
+								<copy file="${project.basedir}/node_modules/synapse-react-client/dist/umd/synapse-react-client.development.js" tofile="src/main/webapp/generated/synapse-react-client.development.js" />
 							</target>
 						</configuration>
 					</execution>
