@@ -694,14 +694,16 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 
 	private void configureTableCommands() {
 		if (entityBundle.getEntity() instanceof Table) {
-			boolean canEditResults = entityBundle.getPermissions().getCanCertifiedUserEdit();
+			boolean isDataset = entityBundle.getEntity() instanceof Dataset;
+			// For UX reasons, datasets are not editable, even if the user has permissions
+			boolean canEditResults = entityBundle.getPermissions().getCanCertifiedUserEdit() && !isDataset;
 			actionMenu.setActionVisible(Action.UPLOAD_TABLE_DATA, canEditResults);
 			actionMenu.setActionText(Action.UPLOAD_TABLE_DATA, "Upload Data to " + entityTypeDisplay);
 			actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, canEditResults);
 			actionMenu.setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
 			actionMenu.setActionVisible(Action.SHOW_TABLE_SCHEMA, true);
-			actionMenu.setActionVisible(Action.SHOW_VIEW_SCOPE, !(entityBundle.getEntity() instanceof TableEntity) && !(entityBundle.getEntity() instanceof Dataset));
-			actionMenu.setActionVisible(Action.EDIT_DATASET_ITEMS, (entityBundle.getEntity() instanceof Dataset));
+			actionMenu.setActionVisible(Action.SHOW_VIEW_SCOPE, !(entityBundle.getEntity() instanceof TableEntity) && !isDataset);
+			actionMenu.setActionVisible(Action.EDIT_DATASET_ITEMS, isDataset);
 		} else {
 			actionMenu.setActionVisible(Action.UPLOAD_TABLE_DATA, false);
 			actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, false);

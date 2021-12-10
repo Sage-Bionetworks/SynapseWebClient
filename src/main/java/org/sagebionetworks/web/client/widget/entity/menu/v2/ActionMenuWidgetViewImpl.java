@@ -7,8 +7,11 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Divider;
 import org.gwtbootstrap3.client.ui.DropDown;
 import org.gwtbootstrap3.client.ui.DropDownHeader;
+import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.gwtbootstrap3.client.ui.constants.Trigger;
 import org.gwtbootstrap3.client.ui.html.Div;
+
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.ComplexPanel;
@@ -44,6 +47,14 @@ public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 	DropDownHeader actHeader;
 	@UiField
 	Button tableDownloadOptions;
+	@UiField
+	ActionMenuItem addToDownloadListMenuItem;
+	@UiField
+	ActionMenuItem programmaticOptionsMenuItem;
+	@UiField
+	Tooltip addToDownloadListMenuItemTooltip;
+	@UiField
+	Tooltip programmaticOptionsMenuItemTooltip;
 
 	@Inject
 	public ActionMenuWidgetViewImpl(Binder binder) {
@@ -97,6 +108,26 @@ public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 	@Override
 	public void setTableDownloadOptionsVisible(boolean visible) {
 		tableDownloadOptions.setVisible(visible);
+	}
+
+	@Override
+	public void setDownloadActionsEnabled(boolean enabled) {
+		addToDownloadListMenuItem.setEnabled(enabled);
+		programmaticOptionsMenuItem.setEnabled(enabled);
+		if (enabled) {
+			// The tooltips only show information about why it's disabled, so hide the tooltips if enabled
+			addToDownloadListMenuItemTooltip.setTrigger(Trigger.MANUAL);
+			programmaticOptionsMenuItemTooltip.setTrigger(Trigger.MANUAL);
+			addToDownloadListMenuItemTooltip.hide();
+			programmaticOptionsMenuItemTooltip.hide();
+		} else {
+			addToDownloadListMenuItemTooltip.setTrigger(Trigger.HOVER);
+			programmaticOptionsMenuItemTooltip.setTrigger(Trigger.HOVER);
+		}
+
+		// Commit the changes to the tooltips
+		addToDownloadListMenuItemTooltip.recreate();
+		programmaticOptionsMenuItemTooltip.recreate();
 	}
 	
 	@Override

@@ -11,6 +11,7 @@ import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
+import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
@@ -249,6 +250,7 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 		this.entityBundle = bundle;
 		Entity entity = bundle.getEntity();
 		boolean isShownInTab = isEntityShownInTab(entity);
+		boolean isDataset = entity instanceof Dataset;
 		boolean isProject = entity instanceof Project;
 		boolean isVersionSupported = EntityActionControllerImpl.isVersionSupported(entityBundle.getEntity(), ginInjector.getCookieProvider());
 		version = isVersionSupported ? versionNumber : null;
@@ -263,6 +265,14 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 		view.setActionMenu(tab.getEntityActionMenu());
 		tab.getEntityActionMenu().setTableDownloadOptionsVisible(isShownInTab);
 		boolean isCurrentVersion = version == null;
+
+		if (isDataset && isCurrentVersion) {
+			// SWC-5878 - On the current (non-snapshot) version of a dataset, only editors should be able to download
+			tab.getEntityActionMenu().setTableDownloadOptionsEnabled(bundle.getPermissions().getCanCertifiedUserEdit());
+		} else {
+			tab.getEntityActionMenu().setTableDownloadOptionsEnabled(true);
+		}
+
 		tab.configureEntityActionController(bundle, isCurrentVersion, null);
 		if (isShownInTab) {
 			final boolean canEdit = bundle.getPermissions().getCanCertifiedUserEdit();

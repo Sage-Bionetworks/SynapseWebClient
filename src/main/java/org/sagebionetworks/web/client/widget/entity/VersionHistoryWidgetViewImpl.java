@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import static org.sagebionetworks.web.client.DisplayConstants.GO_TO_CURRENT_VERSION;
+import static org.sagebionetworks.web.client.DisplayConstants.GO_TO_DRAFT_VERSION;
+
 import java.util.ArrayList;
 import java.util.List;
 import org.gwtbootstrap3.client.ui.Button;
@@ -8,6 +11,7 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.VersionInfo;
+import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -94,6 +98,13 @@ public class VersionHistoryWidgetViewImpl extends Composite implements VersionHi
 		md5TableHeader.setVisible(!isTable);
 		currentVersionLink.setTargetHistoryToken(DisplayUtils.getSynapseHistoryTokenNoHash(entity.getId()));
 		currentVersionLink.setVisible(isShowingOlderVersion);
+		String currentVersionLinkText;
+		if (entity instanceof Dataset) {
+			currentVersionLinkText = GO_TO_DRAFT_VERSION;
+		} else {
+			currentVersionLinkText = GO_TO_CURRENT_VERSION;
+		}
+		currentVersionLink.setText(currentVersionLinkText);
 		if (isShowingOlderVersion) {
 			setVisible(true);
 		}

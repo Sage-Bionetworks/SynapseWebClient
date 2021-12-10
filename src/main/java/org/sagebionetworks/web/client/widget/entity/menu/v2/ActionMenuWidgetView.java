@@ -33,4 +33,6 @@ public interface ActionMenuWidgetView extends IsWidget {
 	void setNoActionsAvailableVisible(boolean visible);
 
 	void setTableDownloadOptionsVisible(boolean visible);
+
+	void setDownloadActionsEnabled(boolean enabled);
 }
