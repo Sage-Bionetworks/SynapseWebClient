@@ -37,4 +37,6 @@ public interface ClientCache {
 	 * @return
 	 */
 	boolean contains(String key);
+
+	double getBytesUsed();
 }

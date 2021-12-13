@@ -117,6 +117,10 @@ public class Portal implements EntryPoint {
 										// start timer to check for user session state change (session expired, or user explicitly logged
 										// out).  Backend endpoints must be set before starting this (because it attempts to get "my user profile")
 										ginjector.getSessionDetector().start();
+										
+										// start a timer to check to see if we're approaching the max allowable space in the web storage.
+										// clears out the web storage (cache) if this is the case.
+										ginjector.getWebStorageMaxSizeDetector().start();
 									}
 								});
 							});
