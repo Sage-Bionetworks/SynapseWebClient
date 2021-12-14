@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
-import java.util.List;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.Pre;
 import org.gwtbootstrap3.client.ui.html.Div;
@@ -9,8 +8,8 @@ import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalView;
+
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -112,12 +111,15 @@ public class EntityActionControllerViewImpl implements EntityActionControllerVie
 	}
 
 	@Override
-	public void showMultiplePromptDialog(String title, List<String> prompts, List<String> initialValues, CallbackP<List<String>> newValuesCallback) {
+	public void showMultiplePromptDialog(PromptForValuesModalView.Configuration configuration) {
 		lazyConstruct();
-		promptForValuesDialog.configureAndShow(title, prompts, initialValues, values -> {
-			promptForValuesDialog.hide();
-			newValuesCallback.invoke(values);
-		});
+		promptForValuesDialog.configureAndShow(configuration);
+	}
+
+	@Override
+	public void hideMultiplePromptDialog() {
+		lazyConstruct();
+		promptForValuesDialog.hide();
 	}
 
 	@Override
@@ -125,6 +127,7 @@ public class EntityActionControllerViewImpl implements EntityActionControllerVie
 		lazyConstruct();
 		createVersionJobTrackingWidgetContainer.add(w);
 	}
+
 
 	@Override
 	public void hideCreateVersionDialog() {

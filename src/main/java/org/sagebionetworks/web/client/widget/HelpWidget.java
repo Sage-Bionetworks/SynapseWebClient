@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget;
 
 import java.util.HashSet;
 import java.util.Set;
+
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Popover;
 import org.gwtbootstrap3.client.ui.constants.IconType;
@@ -12,6 +13,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.MarkdownIt;
 import org.sagebionetworks.web.client.MarkdownItImpl;
 import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
+
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -115,6 +117,7 @@ public class HelpWidget implements IsWidget {
 		if (DisplayUtils.isDefined(fullHelpHref)) {
 			this.moreHelpHTML = "<button class=\"btn btn-primary btn-xs right\" onClick=\"window.open('" + SafeHtmlUtils.htmlEscape(fullHelpHref) + "');" + closePopoverJs + "\">More info</button>";
 		}
+		updateContent();
 	}
 
 	public void hidePopover() {

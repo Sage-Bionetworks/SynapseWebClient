@@ -63,6 +63,7 @@ import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModal;
 import org.sagebionetworks.web.client.widget.doi.CreateOrUpdateDoiModal;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
+import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalView;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
 import org.sagebionetworks.web.client.widget.entity.WikiPageDeleteConfirmationDialog;
@@ -99,8 +100,20 @@ import com.google.inject.Inject;
 
 public class EntityActionControllerImpl implements EntityActionController, ActionListener {
 
-	public static final String CREATING_A_NEW_VIEW_VERSION_MESSAGE = "Creating a new View version...";
+	public static final String AVAILABLE_IN_VERSION_HISTORY = "This will be available within your version history.";
+
+	public static final String CREATE_SNAPSHOT = "Create Snapshot";
+	public static final String CREATE_STABLE_VERSION = "Create Stable Version";
+
+	public static final String CREATE_NEW_VIEW_VERSION_PROMPT_BODY = "You're about to create a Snapshot of this View. " + AVAILABLE_IN_VERSION_HISTORY;
+	public static final String CREATE_NEW_DATASET_VERSION_PROMPT_BODY = "You're about to create a Stable Version of this Dataset. " + AVAILABLE_IN_VERSION_HISTORY;
+	public static final String CREATE_NEW_TABLE_ENTITY_VERSION_PROMPT_BODY = "You're about to create a Snapshot of this Table. " + AVAILABLE_IN_VERSION_HISTORY;
+
+	public static final String CREATING_A_NEW_VIEW_VERSION_MESSAGE = "Creating a new View Snapshot...";
 	public static final String CREATING_A_NEW_DATASET_VERSION_MESSAGE = "Creating a new Dataset version...";
+
+	public static final String VERSIONING_HELP_MARKDOWN = "This will create an immutable version, which will be available in your version history.";
+	public static final String VERSIONING_HELP_HREF = "https://help.synapse.org/docs/Versioning.2003730726.html";
 
 	public static final String TOOLS = " Tools";
 
@@ -394,6 +407,10 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		return storageLocationEditor;
 	}
 
+	private PromptForValuesModalView.Configuration.Builder getPromptForValuesModalConfigBuilder() {
+			return ginInjector.getPromptForValuesModalConfigurationBuilder();
+	}
+
 	@Override
 	public void configure(ActionMenuWidget actionMenu, EntityBundle entityBundle, boolean isCurrentVersion, String wikiPageId, EntityArea currentArea) {
 		this.entityBundle = entityBundle;
@@ -467,7 +484,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			TableEntity tableEntity = (TableEntity) entityBundle.getEntity();
 			actionMenu.setActionVisible(Action.TOGGLE_FULL_TEXT_SEARCH, true);
 			actionMenu.setActionListener(Action.TOGGLE_FULL_TEXT_SEARCH, this);
-			boolean isFTSEnabled = tableEntity.getIsSearchEnabled() == null ? false : tableEntity.getIsSearchEnabled(); 
+			boolean isFTSEnabled = tableEntity.getIsSearchEnabled() == null ? false : tableEntity.getIsSearchEnabled();
 			String actionTextPrefix = isFTSEnabled ? "Disable" : "Enable";
 			actionMenu.setActionText(Action.TOGGLE_FULL_TEXT_SEARCH, actionTextPrefix + " Full Text Search");
 			IconType icon = isFTSEnabled ? IconType.SEARCH_MINUS : IconType.SEARCH_PLUS;
@@ -476,6 +493,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			actionMenu.setActionVisible(Action.TOGGLE_FULL_TEXT_SEARCH, false);
 		}
 	}
+
 	private void configureAddExternalDockerRepo() {
 		if (entityBundle.getEntity() instanceof Project && EntityArea.DOCKER.equals(currentArea)) {
 			actionMenu.setActionVisible(Action.CREATE_EXTERNAL_DOCKER_REPO, entityBundle.getPermissions().getCanCertifiedUserEdit());
@@ -617,11 +635,11 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 
 	/**
 	 * Retrieves the version of the entity, if it's not the latest version
-	 *
+	 * <p>
 	 * For versionable entities, the result depends on if the entity is the latest version.
 	 * If the entity is not the latest version, the optional will contain the version number.
 	 * If the entity is the latest version, the optional will be empty.
-	 *
+	 * <p>
 	 * If the entity is not versionable, it returns an empty optional.
 	 */
 	private Optional<Long> getVersionIfNotLatest() {
@@ -931,7 +949,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 
 	/**
 	 * Can an entity of this type be moved?
-	 * 
+	 *
 	 * @param entity
 	 * @return
 	 */
@@ -944,7 +962,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 
 	/**
 	 * Can an entity of this type have a wiki?
-	 * 
+	 *
 	 * @param entity
 	 * @return
 	 */
@@ -957,7 +975,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 
 	/**
 	 * Can a link to this type be created?
-	 * 
+	 *
 	 * @param entity
 	 * @return
 	 */
@@ -970,7 +988,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 
 	/**
 	 * Can an entity of this type be submitted to a challenge?
-	 * 
+	 *
 	 * @param entity
 	 * @return
 	 */
@@ -984,7 +1002,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 
 	/**
 	 * Can this entity be renamed (File and Project will have additional editable fields)?
-	 * 
+	 *
 	 * @param entity
 	 * @return
 	 */
@@ -1191,7 +1209,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		getCreateTableViewWizard().configure(entityBundle.getEntity().getId(), type);
 		getCreateTableViewWizard().showModal(entityUpdatedWizardCallback);
 	}
-	
+
 	public void onAddSubmissionView() {
 		preflightController.checkCreateEntity(entityBundle, SubmissionView.class.getName(), () -> {
 			postCheckCreateTableOrView(TableType.submission_view);
@@ -1302,7 +1320,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 
 	/**
 	 * Create a link with the given target as a parent.
-	 * 
+	 *
 	 * @param target
 	 */
 	public void createLink(String target, EntityFinderWidget finder) {
@@ -1445,29 +1463,34 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		}
 	}
 
-	private void postCheckCreateTableViewSnapshot() {
-		// prompt for new version label and comment
-		List<String> prompts = new ArrayList<>();
-		prompts.add("Label");
-		prompts.add("Comment");
-		view.showMultiplePromptDialog("New Version", prompts, null, values -> {
-			String entityId = entityBundle.getEntity().getId();
-			String label = values.get(0);
-			String comment = values.get(1);
-			String activityId = null;
-			if (entity instanceof TableEntity) {
+	private CallbackP<List<String>> getCreateSnapshotCallback(Entity entity) {
+		if (entity instanceof TableEntity) {
+			return values -> {
+				String entityId = entityBundle.getEntity().getId();
+				String label = values.get(0);
+				String comment = values.get(1);
+				String activityId = null;
+				view.hideMultiplePromptDialog();
+				view.showCreateVersionDialog();
 				getSynapseJavascriptClient().createSnapshot(entityId, comment, label, activityId, new AsyncCallback<SnapshotResponse>() {
 					@Override
 					public void onSuccess(SnapshotResponse result) {
+						view.hideCreateVersionDialog();
 						fireEntityUpdatedEvent();
 					}
 
 					@Override
 					public void onFailure(Throwable caught) {
+						view.hideCreateVersionDialog();
 						view.showErrorMessage(caught.getMessage());
 					}
 				});
-			} else if (entity instanceof EntityView || entity instanceof Dataset) {
+			};
+		} else if (entity instanceof EntityView || entity instanceof Dataset) {
+			return values -> {
+				String entityId = entityBundle.getEntity().getId();
+				String label = values.get(0);
+				String comment = values.get(1);
 				// create the version via an update table transaction
 				// Start the job.
 				TableUpdateTransactionRequest transactionRequest = new TableUpdateTransactionRequest();
@@ -1478,6 +1501,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 				transactionRequest.setSnapshotOptions(snapshotRequest);
 				transactionRequest.setChanges(new ArrayList<>());
 				transactionRequest.setCreateSnapshot(true);
+				view.hideMultiplePromptDialog();
 				view.showCreateVersionDialog();
 				String message = entity instanceof EntityView ? CREATING_A_NEW_VIEW_VERSION_MESSAGE : CREATING_A_NEW_DATASET_VERSION_MESSAGE;
 				getJobTrackingWidget().startAndTrackJob(message, false, AsynchType.TableTransaction, transactionRequest, new AsynchronousProgressHandler() {
@@ -1504,8 +1528,47 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 						view.hideCreateVersionDialog();
 					}
 				});
-			}
-		});
+			};
+		} else {
+			throw new IllegalArgumentException("A snapshot cannot be made of an entity with type: " + entity.getClass().getName());
+		}
+	}
+
+	private String getCreateSnapshotTitleCopy(Entity entity) {
+		if (entity instanceof TableEntity || entity instanceof EntityView) {
+			return CREATE_SNAPSHOT;
+		} else if (entity instanceof Dataset) {
+			return CREATE_STABLE_VERSION;
+		} else {
+			throw new IllegalArgumentException("A snapshot cannot be made of an entity with type: " + entity.getClass().getName());
+		}
+	}
+
+	private String getCreateSnapshotBodyCopy(Entity entity) {
+		if (entity instanceof TableEntity) {
+			return CREATE_NEW_TABLE_ENTITY_VERSION_PROMPT_BODY;
+		} else if (entity instanceof EntityView) {
+			return CREATE_NEW_VIEW_VERSION_PROMPT_BODY;
+		} else if (entity instanceof Dataset) {
+			return CREATE_NEW_DATASET_VERSION_PROMPT_BODY;
+		} else {
+			throw new IllegalArgumentException("A snapshot cannot be made of an entity with type: " + entity.getClass().getName());
+		}
+	}
+
+	private void postCheckCreateTableViewSnapshot() {
+		// prompt for new version label and comment
+		List<String> prompts = new ArrayList<>();
+		prompts.add("Label");
+		prompts.add("Comment");
+		PromptForValuesModalView.Configuration.Builder configBuilder = getPromptForValuesModalConfigBuilder();
+		configBuilder.setTitle(getCreateSnapshotTitleCopy(entity))
+				.addPrompt("Label", "")
+				.addPrompt("Comment", "")
+				.setBodyCopy(getCreateSnapshotBodyCopy(entity))
+				.setCallback(getCreateSnapshotCallback(entity))
+				.addHelpWidget(VERSIONING_HELP_MARKDOWN, VERSIONING_HELP_HREF);
+		view.showMultiplePromptDialog(configBuilder.buildConfiguration());
 	}
 
 	private void onAddWikiSubpage() {
@@ -1666,7 +1729,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 
 	/**
 	 * Create the delete place
-	 * 
+	 *
 	 * @return
 	 */
 	public Place createDeletePlace() {
