@@ -93,8 +93,6 @@ public interface PromptForValuesModalView extends IsWidget {
 
 	void configureAndShow(Configuration configuration);
 
-	public void configureAndShow(String title, String bodyCopy, List<String> prompts, List<String> initialValues, List<PromptForValuesModalViewImpl.InputType> inputType, CallbackP<List<String>> newValuesCallback);
-
 	/**
 	 * Show an error message..
 	 * 

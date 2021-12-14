@@ -109,7 +109,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	public static final String CREATE_NEW_DATASET_VERSION_PROMPT_BODY = "You're about to create a Stable Version of this Dataset. " + AVAILABLE_IN_VERSION_HISTORY;
 	public static final String CREATE_NEW_TABLE_ENTITY_VERSION_PROMPT_BODY = "You're about to create a Snapshot of this Table. " + AVAILABLE_IN_VERSION_HISTORY;
 
-	public static final String CREATING_A_NEW_VIEW_VERSION_MESSAGE = "Creating a new View snapshot...";
+	public static final String CREATING_A_NEW_VIEW_VERSION_MESSAGE = "Creating a new View Snapshot...";
 	public static final String CREATING_A_NEW_DATASET_VERSION_MESSAGE = "Creating a new Dataset version...";
 
 	public static final String VERSIONING_HELP_MARKDOWN = "This will create an immutable version, which will be available in your version history.";

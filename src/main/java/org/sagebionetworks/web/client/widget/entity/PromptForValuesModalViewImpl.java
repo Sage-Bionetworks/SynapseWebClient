@@ -139,14 +139,8 @@ public class PromptForValuesModalViewImpl implements PromptForValuesModalView {
 
 	@Override
 	public void configureAndShow(String title, List<String> prompts, List<String> initialValues, List<InputType> inputTypes, CallbackP<List<String>> newValuesCallback) {
-		configureAndShow(title, null, prompts, initialValues, inputTypes, newValuesCallback);
-	}
-
-	@Override
-	public void configureAndShow(String title, String bodyCopy, List<String> prompts, List<String> initialValues, List<InputType> inputTypes, CallbackP<List<String>> newValuesCallback) {
 		Configuration configuration = new PromptForValuesModalConfigurationImpl();
 		configuration.setTitle(title);
-		configuration.setBodyCopy(bodyCopy);
 		configuration.setPrompts(prompts);
 		configuration.setInitialValues(initialValues);
 		configuration.setInputTypes(inputTypes);
