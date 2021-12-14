@@ -8,7 +8,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isNull;
@@ -26,7 +25,6 @@ import static org.sagebionetworks.web.client.widget.entity.controller.EntityActi
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.EDIT_NAME_AND_DESCRIPTION;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.EDIT_WIKI_PREFIX;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.MOVE_PREFIX;
-import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.RENAME_PREFIX;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.THE;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.UPDATE_DOI_FOR;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.WAS_SUCCESSFULLY_DELETED;
@@ -104,6 +102,8 @@ import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModal;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
+import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalConfigurationImpl;
+import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalView;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal;
@@ -245,6 +245,9 @@ public class EntityActionControllerImplTest {
 	ArgumentCaptor<AsynchronousProgressHandler> asyncProgressHandlerCaptor;
 	@Mock
 	AsynchronousResponseBody mockAsyncResponseBody;
+	@Mock
+	PromptForValuesModalView.Configuration mockPromptModalConfiguration;
+	PromptForValuesModalView.Configuration.Builder mockPromptModalConfigurationBuilder;
 	Set<ResourceAccess> resourceAccessSet;
 
 	public static final String SELECTED_TEAM_ID = "987654";
@@ -255,6 +258,7 @@ public class EntityActionControllerImplTest {
 	@Before
 	public void before() {
 		mockEntityFinderBuilder = mock(EntityFinderWidget.Builder.class, new SelfReturningAnswer());
+		mockPromptModalConfigurationBuilder = mock(PromptForValuesModalView.Configuration.Builder.class, new SelfReturningAnswer());
 
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(currentUserId);
@@ -286,6 +290,7 @@ public class EntityActionControllerImplTest {
 		when(mockPortalGinInjector.getAddExternalRepoModal()).thenReturn(mockAddExternalRepoModal);
 		when(mockPortalGinInjector.getAddFolderDialogWidget()).thenReturn(mockAddFolderDialogWidget);
 		when(mockPortalGinInjector.creatNewAsynchronousProgressWidget()).thenReturn(mockJobTrackingWidget);
+		when(mockPortalGinInjector.getPromptForValuesModalConfigurationBuilder()).thenReturn(mockPromptModalConfigurationBuilder);
 		// The controller under test.
 		controller = new EntityActionControllerImpl(mockView, mockPreflightController, mockPortalGinInjector, mockAuthenticationController, mockCookies, mockIsACTMemberAsyncHandler, mockGWT, mockEventBus);
 
@@ -331,6 +336,8 @@ public class EntityActionControllerImplTest {
 		}).when(mockEntityFinder).show();
 		currentEntityArea = null;
 		CallbackMockStubber.invokeCallback().when(mockGWT).scheduleExecution(any(Callback.class), anyInt());
+
+		when(mockPromptModalConfigurationBuilder.buildConfiguration()).thenReturn(mockPromptModalConfiguration);
 	}
 
 	@Test
@@ -946,7 +953,11 @@ public class EntityActionControllerImplTest {
 		controller.onAction(Action.CREATE_TABLE_VERSION);
 
 		verify(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
-		verify(mockView).showMultiplePromptDialog(anyString(), anyList(), anyList(), callbackListStringCaptor.capture());
+		verify(mockPromptModalConfigurationBuilder).setTitle(anyString());
+		verify(mockPromptModalConfigurationBuilder).setBodyCopy(anyString());
+		verify(mockPromptModalConfigurationBuilder, times(2)).addPrompt(anyString(), anyString());
+		verify(mockPromptModalConfigurationBuilder).setCallback(callbackListStringCaptor.capture());
+		verify(mockView).showMultiplePromptDialog(mockPromptModalConfiguration);
 		CallbackP<List<String>> valuesCallback = callbackListStringCaptor.getValue();
 		// invoke with a label and comment
 		String label = "my label";
@@ -956,6 +967,7 @@ public class EntityActionControllerImplTest {
 		values.add(comment);
 		valuesCallback.invoke(values);
 		verify(mockSynapseJavascriptClient).createSnapshot(eq(entityId), eq(comment), eq(label), isNull(String.class), any(AsyncCallback.class));
+		verify(mockView).hideMultiplePromptDialog();
 	}
 
 	@Test
@@ -971,7 +983,11 @@ public class EntityActionControllerImplTest {
 		controller.onAction(Action.CREATE_TABLE_VERSION);
 
 		verify(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
-		verify(mockView).showMultiplePromptDialog(anyString(), anyList(), anyList(), callbackListStringCaptor.capture());
+		verify(mockPromptModalConfigurationBuilder).setTitle(anyString());
+		verify(mockPromptModalConfigurationBuilder).setBodyCopy(anyString());
+		verify(mockPromptModalConfigurationBuilder, times(2)).addPrompt(anyString(), anyString());
+		verify(mockPromptModalConfigurationBuilder).setCallback(callbackListStringCaptor.capture());
+		verify(mockView).showMultiplePromptDialog(mockPromptModalConfiguration);
 		CallbackP<List<String>> valuesCallback = callbackListStringCaptor.getValue();
 		// invoke with a label and comment
 		String label = "my label";
@@ -989,6 +1005,9 @@ public class EntityActionControllerImplTest {
 		assertEquals(entityId, request.getEntityId());
 		assertEquals(label, request.getSnapshotOptions().getSnapshotLabel());
 		assertEquals(comment, request.getSnapshotOptions().getSnapshotComment());
+
+		// The prompt is hidden after the request is made
+		verify(mockView).hideMultiplePromptDialog();
 
 		// verify response handler
 		// on error
@@ -1022,7 +1041,11 @@ public class EntityActionControllerImplTest {
 		controller.onAction(Action.CREATE_TABLE_VERSION);
 
 		verify(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
-		verify(mockView).showMultiplePromptDialog(anyString(), anyList(), anyList(), callbackListStringCaptor.capture());
+		verify(mockPromptModalConfigurationBuilder).setTitle(anyString());
+		verify(mockPromptModalConfigurationBuilder).setBodyCopy(anyString());
+		verify(mockPromptModalConfigurationBuilder, times(2)).addPrompt(anyString(), anyString());
+		verify(mockPromptModalConfigurationBuilder).setCallback(callbackListStringCaptor.capture());
+		verify(mockView).showMultiplePromptDialog(mockPromptModalConfiguration);
 		CallbackP<List<String>> valuesCallback = callbackListStringCaptor.getValue();
 		// invoke with a label and comment
 		String label = "my label";
@@ -1040,6 +1063,9 @@ public class EntityActionControllerImplTest {
 		assertEquals(entityId, request.getEntityId());
 		assertEquals(label, request.getSnapshotOptions().getSnapshotLabel());
 		assertEquals(comment, request.getSnapshotOptions().getSnapshotComment());
+
+		// The prompt is hidden when the request is initiated
+		verify(mockView).hideMultiplePromptDialog();
 
 		// verify response handler
 		// on error

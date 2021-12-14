@@ -3,16 +3,21 @@ package org.sagebionetworks.web.client.widget.entity;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.FormLabel;
+import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.HelpWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -26,6 +31,8 @@ import com.google.inject.Inject;
  *
  */
 public class PromptForValuesModalViewImpl implements PromptForValuesModalView {
+
+	protected static final InputType DEFAULT_INPUT_TYPE = InputType.TEXTBOX;
 
 	/**
 	 * We map the enum to a new instance of each class, since we can't use reflection in client side code.
@@ -47,13 +54,19 @@ public class PromptForValuesModalViewImpl implements PromptForValuesModalView {
 	@UiField
 	Modal modal;
 	@UiField
+	Heading modalTitle;
+	@UiField
 	Div form;
+	@UiField
+	Paragraph bodyCopy;
 	@UiField
 	Div synAlertContainer;
 	@UiField
 	Button primaryButton;
 	@UiField
 	Button defaultButton;
+	@UiField
+	HelpWidget helpWidget;
 	CallbackP<List<String>> newValuesCallback;
 	List<ValueBoxBase<String>> textBoxes;
 	SynapseAlert synAlert;
@@ -119,34 +132,72 @@ public class PromptForValuesModalViewImpl implements PromptForValuesModalView {
 		// By default, use a TextBox for each field
 		List<InputType> textboxForEach = new ArrayList<>(prompts.size());
 		for (int i = 0; i < prompts.size(); i++) {
-			textboxForEach.add(InputType.TEXTBOX);
+			textboxForEach.add(DEFAULT_INPUT_TYPE);
 		}
 		configureAndShow(title, prompts, initialValues, textboxForEach, newValuesCallback);
 	}
 
 	@Override
 	public void configureAndShow(String title, List<String> prompts, List<String> initialValues, List<InputType> inputTypes, CallbackP<List<String>> newValuesCallback) {
+		configureAndShow(title, null, prompts, initialValues, inputTypes, newValuesCallback);
+	}
+
+	@Override
+	public void configureAndShow(String title, String bodyCopy, List<String> prompts, List<String> initialValues, List<InputType> inputTypes, CallbackP<List<String>> newValuesCallback) {
+		Configuration configuration = new PromptForValuesModalConfigurationImpl();
+		configuration.setTitle(title);
+		configuration.setBodyCopy(bodyCopy);
+		configuration.setPrompts(prompts);
+		configuration.setInitialValues(initialValues);
+		configuration.setInputTypes(inputTypes);
+		configuration.setNewValuesCallback(newValuesCallback);
+		configureAndShow(configuration);
+	}
+
+	@Override
+	public void configureAndShow(PromptForValuesModalView.Configuration configuration) {
 		clear();
-		modal.setTitle(title);
-		this.newValuesCallback = newValuesCallback;
-		if (initialValues != null && prompts.size() != initialValues.size()) {
+
+		modalTitle.setText(configuration.getTitle());
+
+		// Configure the optional body copy
+		if (configuration.getBodyCopy() != null) {
+			this.bodyCopy.setText(configuration.getBodyCopy());
+			this.bodyCopy.setVisible(true);
+		} else {
+			this.bodyCopy.setVisible(false);
+		}
+
+		// Configure the optional HelpWidget
+		if (configuration.getHelpPopoverMarkdown() != null) {
+			this.helpWidget.setHelpMarkdown(configuration.getHelpPopoverMarkdown());
+			if (configuration.getHelpPopoverHref() != null) {
+				this.helpWidget.setHref(configuration.getHelpPopoverHref());
+			}
+			this.helpWidget.setVisible(true);
+		} else {
+			this.helpWidget.setVisible(false);
+		}
+
+		this.newValuesCallback = configuration.getNewValuesCallback();
+		if (configuration.getInitialValues() != null && configuration.getPrompts().size() != configuration.getInitialValues().size()) {
 			throw new IllegalArgumentException("If set, initialValues size must equal prompts size.");
 		}
 		/**
 		 * <b:FormGroup> <b:FormLabel ui:field="label1" for="value1">Label1 goes here</b:FormLabel>
 		 * <b:TextBox b:id="value1" ui:field="valueField1" /> </b:FormGroup>
 		 */
-		for (int i = 0; i < prompts.size(); i++) {
+		for (int i = 0; i < configuration.getPrompts().size(); i++) {
 			FormGroup group = new FormGroup();
 			FormLabel label = new FormLabel();
-			ValueBoxBase<String> inputBox = getNewInstanceOfInputField(inputTypes.get(i));
+			ValueBoxBase<String> inputBox = getNewInstanceOfInputField(configuration.getInputTypes().get(i));
 			inputBox.addKeyDownHandler(handler);
 			group.add(label);
 			group.add(inputBox);
-			String prompt = prompts.get(i);
+			String prompt = configuration.getPrompts().get(i);
 			label.setText(prompt);
-			if (initialValues != null) {
-				String initialValue = initialValues.get(i);
+			if (configuration.getInitialValues() != null) {
+				String initialValue = configuration.getInitialValues().get(i);
 				inputBox.setValue(initialValue);
 			}
 
@@ -156,6 +207,8 @@ public class PromptForValuesModalViewImpl implements PromptForValuesModalView {
 		modal.show();
 	}
 
+
+
 	@Override
 	public void showError(String error) {
 		synAlert.showError(error);
@@ -163,9 +216,11 @@ public class PromptForValuesModalViewImpl implements PromptForValuesModalView {
 
 	@Override
 	public void clear() {
+		bodyCopy.clear();
 		form.clear();
 		textBoxes = new ArrayList<>();
 		synAlert.clear();
+		helpWidget.setVisible(false);
 		setLoading(false);
 	}
 

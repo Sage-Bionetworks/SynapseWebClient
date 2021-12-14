@@ -815,6 +815,8 @@ public interface PortalGinInjector extends Ginjector {
 
 	PromptForValuesModalView getPromptForValuesModal();
 
+	PromptForValuesModalView.Configuration.Builder getPromptForValuesModalConfigurationBuilder();
+
 	CroppedImageUploadViewImpl getCroppedImageUploadView();
 
 	ImageUploadView getImageUploadView();

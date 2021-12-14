@@ -271,6 +271,7 @@ import org.sagebionetworks.web.client.widget.entity.PreviewWidgetView;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadgeView;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadgeViewImpl;
+import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalConfigurationImpl;
 import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalView;
 import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalViewImpl;
 import org.sagebionetworks.web.client.widget.entity.RegisterTeamDialogView;
@@ -953,6 +954,7 @@ public class PortalGinModule extends AbstractGinModule {
 
 		bind(BigPromptModalView.class).to(BigPromptModalViewImpl.class);
 		bind(PromptForValuesModalView.class).to(PromptForValuesModalViewImpl.class);
+		bind(PromptForValuesModalView.Configuration.Builder.class).to(PromptForValuesModalConfigurationImpl.Builder.class);
 		bind(RenameEntityModalWidget.class).to(RenameEntityModalWidgetImpl.class);
 
 		// Rejected Reason
