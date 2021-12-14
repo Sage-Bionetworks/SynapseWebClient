@@ -45,4 +45,30 @@ public class StorageImpl implements StorageWrapper {
 	public boolean isStorageSupported() {
 		return storage != null;
 	}
+	
+	@Override
+	public double getBytesUsed() {
+		return _getBytesUsed();
+	}
+	
+	private static native double _getBytesUsed() /*-{
+		// Based on https://stackoverflow.com/questions/4391575/how-to-find-the-size-of-localstorage
+		try {
+			var total = 0,
+				valueSize, key;
+			for (key in localStorage) {
+				if (!localStorage.hasOwnProperty(key)) {
+					continue;
+				}
+				// multiplied by 2 because the char in javascript stores as UTF-16, which _may_ take up 2 bytes.
+				// so this will return the upper bound.
+				valueSize = ((localStorage[key].length + key.length) * 2);
+				total += valueSize;
+			};
+			return total;
+		} catch (err) {
+			console.error(err);
+		}
+	}-*/;
+
 }

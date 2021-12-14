@@ -62,4 +62,9 @@ public class ClientCacheImpl implements ClientCache {
 	public boolean contains(String key) {
 		return get(key) != null;
 	}
+	
+	@Override
+	public double getBytesUsed() {
+		return storage.getBytesUsed();
+	}
 }

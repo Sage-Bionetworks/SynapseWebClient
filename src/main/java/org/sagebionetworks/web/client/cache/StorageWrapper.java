@@ -29,4 +29,9 @@ public interface StorageWrapper {
 	 * Returns true if the Storage API is supported on the running platform.
 	 */
 	boolean isStorageSupported();
+
+	/**
+	 * Return the amount of data that is currently stored in the cache
+	 */
+	double getBytesUsed();
 }

@@ -498,6 +498,8 @@ public interface PortalGinInjector extends Ginjector {
 	VersionTimer getVersionTimer();
 
 	SessionDetector getSessionDetector();
+	
+	WebStorageMaxSizeDetector getWebStorageMaxSizeDetector();
 
 	SynapseStatusDetector getSynapseStatusDetector();
 
