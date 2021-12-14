@@ -1,8 +1,10 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.List;
 import java.util.Set;
+
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
@@ -26,6 +28,7 @@ import org.sagebionetworks.web.client.widget.discussion.modal.EditDiscussionThre
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionListener;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.refresh.ReplyCountAlert;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
@@ -33,6 +36,7 @@ import org.sagebionetworks.web.client.widget.user.AvatarSize;
 import org.sagebionetworks.web.client.widget.user.BadgeType;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
+
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
@@ -90,7 +94,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	private SubscribersWidget threadSubscribersWidget;
 	Topic threadTopic = new Topic();
 	private ActionMenuWidget actionMenu;
-	ActionMenuWidget.ActionListener editActionListener, unpinActionListener, pinActionListener, deleteActionListener, restoreActionListener;
+	ActionListener editActionListener, unpinActionListener, pinActionListener, deleteActionListener, restoreActionListener;
 	Boolean isPinned;
 	PopupUtilsView popupUtils;
 	ClientCache clientCache;

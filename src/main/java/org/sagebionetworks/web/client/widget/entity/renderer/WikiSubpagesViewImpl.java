@@ -90,12 +90,7 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 		};
 		editOrderButton.addClickHandler(editOrderClickHandler);
 		if (actionMenu != null) {
-			actionMenu.setActionListener(Action.REORDER_WIKI_SUBPAGES, new ActionMenuWidget.ActionListener() {
-				@Override
-				public void onAction(Action action) {
-					editOrderClickHandler.onClick(null);
-				}
-			});
+			actionMenu.setActionListener(Action.REORDER_WIKI_SUBPAGES, action -> editOrderClickHandler.onClick(null));
 		}
 		showHideButton.addClickHandler(new ClickHandler() {
 			@Override

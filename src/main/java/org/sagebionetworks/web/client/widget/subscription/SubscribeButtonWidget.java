@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.subscription;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.sagebionetworks.repo.model.subscription.Subscription;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
@@ -18,7 +19,9 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionListener;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -35,7 +38,7 @@ public class SubscribeButtonWidget implements SubscribeButtonWidgetView.Presente
 	GlobalApplicationState globalApplicationState;
 	Callback onSubscribeCallback, onUnsubscribeCallback;
 	ActionMenuWidget actionMenu;
-	ActionMenuWidget.ActionListener subscribeActionListener, unsubscribeActionListener;
+	ActionListener subscribeActionListener, unsubscribeActionListener;
 	boolean iconOnly;
 
 	@Inject

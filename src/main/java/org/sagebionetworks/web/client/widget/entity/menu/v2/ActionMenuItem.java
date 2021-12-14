@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.menu.v2;
 
 import org.gwtbootstrap3.client.ui.AnchorListItem;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
+
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 
