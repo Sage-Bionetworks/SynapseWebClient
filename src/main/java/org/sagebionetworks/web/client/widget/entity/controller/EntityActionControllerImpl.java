@@ -1494,10 +1494,10 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 
 						Synapse newVersionPlace = new Synapse(entity.getId(), result.getSnapshotVersionNumber(), EntityArea.TABLES, null);
 						ToastMessageOptions.Builder messageBuilder = new ToastMessageOptions.Builder();
+						boolean dismissOnClick = true;
 						messageBuilder
 								.setTitle(SNAPSHOT_CREATED)
-								.setPrimaryButton("View Version History", () -> actionMenu.onAction(Action.SHOW_VERSION_HISTORY))
-								.setSecondaryButton("Go to Latest " + SNAPSHOT, () -> getGlobalApplicationState().getPlaceChanger().goTo(newVersionPlace));
+								.setPrimaryButton("Go to Latest " + SNAPSHOT, () -> getGlobalApplicationState().getPlaceChanger().goTo(newVersionPlace), dismissOnClick);
 						popupUtils.notify(SNAPSHOT_CREATED_DETAILS_TABLE, DisplayUtils.NotificationVariant.SUCCESS, messageBuilder.build());
 					}
 
@@ -1563,10 +1563,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 							}
 							Synapse newVersionPlace = new Synapse(entity.getId(), newVersionNumber, newVersionArea, null);
 
-
+							boolean dismissOnClick = true;
 							messageBuilder
-									.setPrimaryButton("View Version History", () -> actionMenu.onAction(Action.SHOW_VERSION_HISTORY))
-									.setSecondaryButton(secondaryButtonText, () -> getGlobalApplicationState().getPlaceChanger().goTo(newVersionPlace));
+									.setPrimaryButton(secondaryButtonText, () -> getGlobalApplicationState().getPlaceChanger().goTo(newVersionPlace), dismissOnClick);
 							popupUtils.notify(toastMsg, DisplayUtils.NotificationVariant.SUCCESS, messageBuilder.build());
 						}
 					}

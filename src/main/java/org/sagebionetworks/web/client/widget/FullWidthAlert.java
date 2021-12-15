@@ -1,15 +1,12 @@
 package org.sagebionetworks.web.client.widget;
 
 import org.gwtbootstrap3.client.ui.constants.AlertType;
-import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
-import org.sagebionetworks.web.client.context.SynapseContextPropsProviderImpl;
 import org.sagebionetworks.web.client.jsinterop.FullWidthAlertProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactDOM;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -18,6 +15,7 @@ import com.google.gwt.user.client.ui.Widget;
 public class FullWidthAlert implements IsWidget {
 	ReactComponentDiv container;
 	String title, message, primaryButtonText, secondaryButtonText, secondaryButtonHref, alertType;
+	boolean dismissOnPrimaryButtonClick, dismissOnSecondaryButtonClick;
 	FullWidthAlertProps.Callback onPrimaryClick;
 	FullWidthAlertProps.Callback onClose = new FullWidthAlertProps.Callback() {
 		@Override
@@ -36,7 +34,7 @@ public class FullWidthAlert implements IsWidget {
 	
 	private void rerender() {
 		Double autoCloseAfterDelayInSeconds = null;
-		FullWidthAlertProps props = FullWidthAlertProps.create(title, message, primaryButtonText, onPrimaryClick, secondaryButtonText, secondaryButtonHref, onClose, autoCloseAfterDelayInSeconds, isGlobal, alertType);
+		FullWidthAlertProps props = FullWidthAlertProps.create(title, message, primaryButtonText, onPrimaryClick, dismissOnPrimaryButtonClick, secondaryButtonText, secondaryButtonHref, dismissOnSecondaryButtonClick, onClose, autoCloseAfterDelayInSeconds, isGlobal, alertType);
 		ReactElement component = React.createElement(SRC.SynapseComponents.FullWidthAlert, props);
 		ReactDOM.render(component, container.getElement());	
 	}
@@ -119,5 +117,13 @@ public class FullWidthAlert implements IsWidget {
 
 	public void setGlobal(boolean isGlobal) {
 		this.isGlobal = isGlobal;
+	}
+
+	public void setDismissOnPrimaryButtonClick(boolean dismissOnClick) {
+		this.dismissOnPrimaryButtonClick = dismissOnClick;
+	}
+
+	public void setDismissOnSecondaryButtonClick(boolean dismissOnClick) {
+		this.dismissOnSecondaryButtonClick = dismissOnClick;
 	}
 }
