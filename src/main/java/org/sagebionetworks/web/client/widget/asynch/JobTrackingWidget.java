@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.asynch;
 
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
+import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -21,5 +22,5 @@ public interface JobTrackingWidget extends IsWidget {
 	 * @param requestBody The body of the job request.
 	 * @param handler Handles the job results.
 	 */
-	public void startAndTrackJob(String title, boolean isDeterminate, AsynchType type, AsynchronousRequestBody requestBody, AsynchronousProgressHandler handler);
+	public <TRequest extends AsynchronousRequestBody, TResponse extends AsynchronousResponseBody> void startAndTrackJob(String title, boolean isDeterminate, AsynchType type, TRequest requestBody, AsynchronousProgressHandler<TResponse> handler);
 }

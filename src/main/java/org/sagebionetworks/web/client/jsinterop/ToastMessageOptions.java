@@ -30,10 +30,10 @@ public class ToastMessageOptions extends ReactComponentProps {
     @JsNullable
     String secondaryButtonText;
     @JsNullable
-    String secondaryButtonHref;
+	Callback onSecondaryButtonClick;
 
     @JsOverlay
-    public static ToastMessageOptions create(String title, Integer autoCloseInMs, String primaryButtonText, Callback onPrimaryButtonClick, String secondaryButtonText, String secondaryButtonHref) {
+    public static ToastMessageOptions create(String title, Integer autoCloseInMs, String primaryButtonText, Callback onPrimaryButtonClick, String secondaryButtonText, Callback onSecondaryButtonClick) {
         if (autoCloseInMs == null) {
             autoCloseInMs = DEFAULT_TOAST_TIMEOUT_MS;
         }
@@ -44,7 +44,7 @@ public class ToastMessageOptions extends ReactComponentProps {
         options.primaryButtonText = primaryButtonText;
         options.onPrimaryButtonClick = onPrimaryButtonClick;
         options.secondaryButtonText = secondaryButtonText;
-        options.secondaryButtonHref = secondaryButtonHref;
+        options.onSecondaryButtonClick = onSecondaryButtonClick;
         return options;
     }
 
@@ -68,7 +68,7 @@ public class ToastMessageOptions extends ReactComponentProps {
         private String primaryButtonText;
         private Callback onPrimaryButtonClick;
         private String secondaryButtonText;
-        private String secondaryButtonHref;
+        private Callback onSecondaryButtonClick;
 
         public Builder() {
         }
@@ -106,24 +106,34 @@ public class ToastMessageOptions extends ReactComponentProps {
          * @return
          */
         public Builder setPrimaryButton(String text, String href, boolean currentWindow) {
-            this.primaryButtonText = text;
-            if (currentWindow) {
-                this.onPrimaryButtonClick = () -> Window.Location.assign(href);
-            } else {
-                this.onPrimaryButtonClick = () -> Window.open(href, "_blank", "");
-            }
-            return this;
+			return setPrimaryButton(text, getCallbackForHref(href, currentWindow));
         }
 
-        public Builder setSecondaryButton(String text, String href) {
-            this.secondaryButtonText = text;
-            this.secondaryButtonHref = href;
-            return this;
+		public Builder setSecondaryButton(String text, String href) {
+			return setSecondaryButton(text, href, true);
+		}
+
+		public Builder setSecondaryButton(String text, String href, boolean currentWindow) {
+			return setSecondaryButton(text, getCallbackForHref(href, currentWindow));
+		}
+
+		public Builder setSecondaryButton(String text, Callback onClick) {
+			this.secondaryButtonText = text;
+			this.onSecondaryButtonClick = onClick;
+			return this;
+		}
+
+		public ToastMessageOptions build() {
+            return ToastMessageOptions.create(title, autoCloseInMs, primaryButtonText, onPrimaryButtonClick, secondaryButtonText, onSecondaryButtonClick);
         }
 
-        public ToastMessageOptions build() {
-            return ToastMessageOptions.create(title, autoCloseInMs, primaryButtonText, onPrimaryButtonClick, secondaryButtonText, secondaryButtonHref);
-        }
+		private Callback getCallbackForHref(String href, boolean currentWindow) {
+			if (currentWindow) {
+				return () -> Window.Location.assign(href);
+			} else {
+				return () -> Window.open(href, "_blank", "");
+			}
+		}
     }
 
 

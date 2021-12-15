@@ -87,7 +87,7 @@ public class ActionMenuWidgetImpl implements ActionMenuWidget, ActionListener {
 
 	private List<ActionListener> getActionListeners(Action action) {
 		List<ActionListener> list = this.actionListenerMap.get(action);
-		if (list == null || list.size() == 0) {
+		if (list == null) {
 			throw new IllegalArgumentException("No action list found for action: " + action);
 		}
 		return list;
@@ -126,7 +126,11 @@ public class ActionMenuWidgetImpl implements ActionMenuWidget, ActionListener {
 	@Override
 	public void onAction(Action action) {
 		// forward to the listeners
-		for (ActionListener listener : getActionListeners(action)) {
+		List<ActionListener> listeners = getActionListeners(action);
+		if (listeners.size() == 0) {
+			throw new IllegalArgumentException("Attempted to invoke action " + action.name() + " with no listeners present");
+		}
+		for (ActionListener listener : listeners) {
 			listener.onAction(action);
 		}
 	}

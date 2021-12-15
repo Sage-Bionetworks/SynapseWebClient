@@ -25,7 +25,7 @@ public class FullWidthAlertProps extends ReactComponentProps {
 	@JsNullable
 	String secondaryButtonText;
 	@JsNullable
-	String secondaryButtonHref;
+	String onSecondaryButtonClick;
 	@JsNullable
 	String variant;
 	@JsNullable
@@ -37,7 +37,7 @@ public class FullWidthAlertProps extends ReactComponentProps {
 
 	@JsOverlay
 	public static FullWidthAlertProps create(String title, String description, String primaryButtonText,
-			Callback onPrimaryButtonClick, String secondaryButtonText, String secondaryButtonHref, Callback onClose,
+			Callback onPrimaryButtonClick, String secondaryButtonText, String onSecondaryButtonClick, Callback onClose,
 			Double autoCloseAfterDelayInSeconds, Boolean isGlobal, String variant) {
 		FullWidthAlertProps props = new FullWidthAlertProps();
 		props.title = title;
@@ -45,7 +45,7 @@ public class FullWidthAlertProps extends ReactComponentProps {
 		props.primaryButtonText = primaryButtonText;
 		props.onPrimaryButtonClick = onPrimaryButtonClick;
 		props.secondaryButtonText = secondaryButtonText;
-		props.secondaryButtonHref = secondaryButtonHref;
+		props.onSecondaryButtonClick = onSecondaryButtonClick;
 		props.onClose = onClose;
 		props.autoCloseAfterDelayInSeconds = autoCloseAfterDelayInSeconds;
 		props.isGlobal = isGlobal;

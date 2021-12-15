@@ -9,7 +9,7 @@ import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
  * @author John
  *
  */
-public interface AsynchronousProgressHandler {
+public interface AsynchronousProgressHandler<TResponse extends AsynchronousResponseBody> {
 
 	/**
 	 * Called when the user cancels the job.
@@ -23,7 +23,7 @@ public interface AsynchronousProgressHandler {
 	 * 
 	 * @param status
 	 */
-	public void onComplete(AsynchronousResponseBody response);
+	public void onComplete(TResponse response);
 
 	/**
 	 * Called when a job fails or if some other errors occurs.

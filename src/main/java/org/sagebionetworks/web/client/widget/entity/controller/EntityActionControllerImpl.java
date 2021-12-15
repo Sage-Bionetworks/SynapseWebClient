@@ -22,7 +22,6 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.VersionableEntity;
-import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
@@ -35,6 +34,7 @@ import org.sagebionetworks.repo.model.table.SubmissionView;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
+import org.sagebionetworks.repo.model.table.TableUpdateTransactionResponse;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
@@ -42,12 +42,14 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.jsinterop.EntityFinderScope;
+import org.sagebionetworks.web.client.jsinterop.ToastMessageOptions;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -102,15 +104,25 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 
 	public static final String AVAILABLE_IN_VERSION_HISTORY = "This will be available within your version history.";
 
-	public static final String CREATE_SNAPSHOT = "Create Snapshot";
-	public static final String CREATE_STABLE_VERSION = "Create Stable Version";
+	public static final String SNAPSHOT = "Snapshot";
+	public static final String STABLE_VERSION = "Stable Version";
 
-	public static final String CREATE_NEW_VIEW_VERSION_PROMPT_BODY = "You're about to create a Snapshot of this View. " + AVAILABLE_IN_VERSION_HISTORY;
-	public static final String CREATE_NEW_DATASET_VERSION_PROMPT_BODY = "You're about to create a Stable Version of this Dataset. " + AVAILABLE_IN_VERSION_HISTORY;
-	public static final String CREATE_NEW_TABLE_ENTITY_VERSION_PROMPT_BODY = "You're about to create a Snapshot of this Table. " + AVAILABLE_IN_VERSION_HISTORY;
+	public static final String CREATE_SNAPSHOT = "Create " + SNAPSHOT;
+	public static final String CREATE_STABLE_VERSION = "Create " + STABLE_VERSION;
 
-	public static final String CREATING_A_NEW_VIEW_VERSION_MESSAGE = "Creating a new View Snapshot...";
-	public static final String CREATING_A_NEW_DATASET_VERSION_MESSAGE = "Creating a new Dataset version...";
+	public static final String SNAPSHOT_CREATED = SNAPSHOT + " Created";
+	public static final String STABLE_VERSION_CREATED = STABLE_VERSION + " Created";
+
+	public static final String STABLE_VERSION_CREATED_DETAILS = "You created a " + STABLE_VERSION + " of this Dataset";
+	public static final String SNAPSHOT_CREATED_DETAILS_VIEW = "You created a " + SNAPSHOT + " of this View.";
+	public static final String SNAPSHOT_CREATED_DETAILS_TABLE = "You created a " + SNAPSHOT + " of this Table.";
+
+	public static final String CREATE_NEW_VIEW_VERSION_PROMPT_BODY = "You're about to create a " + SNAPSHOT + " of this View. " + AVAILABLE_IN_VERSION_HISTORY;
+	public static final String CREATE_NEW_DATASET_VERSION_PROMPT_BODY = "You're about to create a " + STABLE_VERSION + " of this Dataset. " + AVAILABLE_IN_VERSION_HISTORY;
+	public static final String CREATE_NEW_TABLE_ENTITY_VERSION_PROMPT_BODY = "You're about to create a "  + SNAPSHOT + " of this Table. " + AVAILABLE_IN_VERSION_HISTORY;
+
+	public static final String CREATING_A_NEW_VIEW_VERSION_MESSAGE = "Creating a new View " + SNAPSHOT + "...";
+	public static final String CREATING_A_NEW_DATASET_VERSION_MESSAGE = "Creating a new Dataset " + STABLE_VERSION + "...";
 
 	public static final String VERSIONING_HELP_MARKDOWN = "This will create an immutable version, which will be available in your version history.";
 	public static final String VERSIONING_HELP_HREF = "https://help.synapse.org/docs/Versioning.2003730726.html";
@@ -188,9 +200,10 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	WikiPageDeleteConfirmationDialog wikiPageDeleteConfirmationDialog;
 	StatisticsPlotWidget statisticsPlotWidget;
 	ChallengeTab challengeTab;
+	PopupUtilsView popupUtils;
 
 	@Inject
-	public EntityActionControllerImpl(EntityActionControllerView view, PreflightController preflightController, PortalGinInjector ginInjector, AuthenticationController authenticationController, CookieProvider cookies, IsACTMemberAsyncHandler isACTMemberAsyncHandler, GWTWrapper gwt, EventBus eventBus) {
+	public EntityActionControllerImpl(EntityActionControllerView view, PreflightController preflightController, PortalGinInjector ginInjector, AuthenticationController authenticationController, CookieProvider cookies, IsACTMemberAsyncHandler isACTMemberAsyncHandler, GWTWrapper gwt, EventBus eventBus, PopupUtilsView popupUtilsView) {
 		super();
 		this.view = view;
 		this.ginInjector = ginInjector;
@@ -200,6 +213,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
 		this.gwt = gwt;
 		this.eventBus = eventBus;
+		this.popupUtils = popupUtilsView;
 		entityUpdatedWizardCallback = new WizardCallback() {
 			@Override
 			public void onFinished() {
@@ -1477,6 +1491,14 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 					public void onSuccess(SnapshotResponse result) {
 						view.hideCreateVersionDialog();
 						fireEntityUpdatedEvent();
+
+						Synapse newVersionPlace = new Synapse(entity.getId(), result.getSnapshotVersionNumber(), EntityArea.TABLES, null);
+						ToastMessageOptions.Builder messageBuilder = new ToastMessageOptions.Builder();
+						messageBuilder
+								.setTitle(SNAPSHOT_CREATED)
+								.setPrimaryButton("View Version History", () -> actionMenu.onAction(Action.SHOW_VERSION_HISTORY))
+								.setSecondaryButton("Go to Latest " + SNAPSHOT, () -> getGlobalApplicationState().getPlaceChanger().goTo(newVersionPlace));
+						popupUtils.notify(SNAPSHOT_CREATED_DETAILS_TABLE, DisplayUtils.NotificationVariant.SUCCESS, messageBuilder.build());
 					}
 
 					@Override
@@ -1504,7 +1526,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 				view.hideMultiplePromptDialog();
 				view.showCreateVersionDialog();
 				String message = entity instanceof EntityView ? CREATING_A_NEW_VIEW_VERSION_MESSAGE : CREATING_A_NEW_DATASET_VERSION_MESSAGE;
-				getJobTrackingWidget().startAndTrackJob(message, false, AsynchType.TableTransaction, transactionRequest, new AsynchronousProgressHandler() {
+				getJobTrackingWidget().startAndTrackJob(message, false, AsynchType.TableTransaction, transactionRequest, new AsynchronousProgressHandler<TableUpdateTransactionResponse>() {
 
 					@Override
 					public void onFailure(Throwable failure) {
@@ -1513,13 +1535,39 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 					}
 
 					@Override
-					public void onComplete(AsynchronousResponseBody response) {
+					public void onComplete(TableUpdateTransactionResponse response) {
 						view.hideCreateVersionDialog();
 						String errors = QueryResultEditorWidget.getEntityUpdateResultsFailures(response);
 						if (!errors.isEmpty()) {
 							view.showErrorMessage(errors);
 						} else {
 							fireEntityUpdatedEvent();
+
+							ToastMessageOptions.Builder messageBuilder = new ToastMessageOptions.Builder();
+							EntityArea newVersionArea;
+							String toastMsg;
+							String secondaryButtonText;
+							Long newVersionNumber = response.getSnapshotVersionNumber();
+
+							if (entity instanceof EntityView) {
+								newVersionArea = EntityArea.TABLES;
+								messageBuilder.setTitle(SNAPSHOT_CREATED);
+								toastMsg = SNAPSHOT_CREATED_DETAILS_VIEW;
+								secondaryButtonText = "Go to Latest " + SNAPSHOT;
+							} else {
+								newVersionArea = EntityArea.DATASETS;
+								messageBuilder.setTitle(STABLE_VERSION_CREATED);
+								toastMsg = STABLE_VERSION_CREATED_DETAILS;
+								secondaryButtonText = "Go to Latest " + STABLE_VERSION;
+
+							}
+							Synapse newVersionPlace = new Synapse(entity.getId(), newVersionNumber, newVersionArea, null);
+
+
+							messageBuilder
+									.setPrimaryButton("View Version History", () -> actionMenu.onAction(Action.SHOW_VERSION_HISTORY))
+									.setSecondaryButton(secondaryButtonText, () -> getGlobalApplicationState().getPlaceChanger().goTo(newVersionPlace));
+							popupUtils.notify(toastMsg, DisplayUtils.NotificationVariant.SUCCESS, messageBuilder.build());
 						}
 					}
 
