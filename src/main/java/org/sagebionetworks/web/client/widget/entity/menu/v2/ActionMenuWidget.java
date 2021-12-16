@@ -10,7 +10,7 @@ import com.google.gwt.user.client.ui.IsWidget;
  * @author John
  *
  */
-public interface ActionMenuWidget extends IsWidget {
+public interface ActionMenuWidget extends IsWidget, ActionListener {
 
 	public void hideAllActions();
 
@@ -64,19 +64,6 @@ public interface ActionMenuWidget extends IsWidget {
 	 * @param listner
 	 */
 	public void setActionListener(Action action, ActionListener listner);
-
-	/**
-	 * Listen to action events.
-	 */
-	public interface ActionListener {
-		/**
-		 * Called when the users selects an action.
-		 * 
-		 * @param action The selected action.
-		 */
-		void onAction(Action action);
-
-	}
 
 	/**
 	 * Add a controller widget. These are often hidden modal widgets that need to be on the page.

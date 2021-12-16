@@ -63,7 +63,6 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.Versionable;
-import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.doi.v2.DoiAssociation;
@@ -71,8 +70,10 @@ import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.EntityView;
+import org.sagebionetworks.repo.model.table.SnapshotResponse;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
+import org.sagebionetworks.repo.model.table.TableUpdateTransactionResponse;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
@@ -81,6 +82,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -102,7 +104,6 @@ import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModal;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
-import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalConfigurationImpl;
 import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalView;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
@@ -196,6 +197,8 @@ public class EntityActionControllerImplTest {
 	EvaluationEditorModal mockEvalEditor;
 	@Mock
 	CookieProvider mockCookies;
+	@Mock
+	PopupUtilsView mockPopupUtils;
 
 	@Mock
 	ChallengeClientAsync mockChallengeClient;
@@ -207,6 +210,8 @@ public class EntityActionControllerImplTest {
 	UserProfileClientAsync mockUserProfileClient;
 	@Captor
 	ArgumentCaptor<AsyncCallback<UserBundle>> userBundleCaptor;
+	@Captor
+	ArgumentCaptor<AsyncCallback<SnapshotResponse>> tableSnapshotResponseCaptor;
 	@Mock
 	UserBundle mockUserBundle;
 	@Mock
@@ -244,7 +249,9 @@ public class EntityActionControllerImplTest {
 	@Captor
 	ArgumentCaptor<AsynchronousProgressHandler> asyncProgressHandlerCaptor;
 	@Mock
-	AsynchronousResponseBody mockAsyncResponseBody;
+	TableUpdateTransactionResponse mockTableUpdateTransactionResponse;
+	@Mock
+	SnapshotResponse mockSnapshotResponse;
 	@Mock
 	PromptForValuesModalView.Configuration mockPromptModalConfiguration;
 	PromptForValuesModalView.Configuration.Builder mockPromptModalConfigurationBuilder;
@@ -292,7 +299,7 @@ public class EntityActionControllerImplTest {
 		when(mockPortalGinInjector.creatNewAsynchronousProgressWidget()).thenReturn(mockJobTrackingWidget);
 		when(mockPortalGinInjector.getPromptForValuesModalConfigurationBuilder()).thenReturn(mockPromptModalConfigurationBuilder);
 		// The controller under test.
-		controller = new EntityActionControllerImpl(mockView, mockPreflightController, mockPortalGinInjector, mockAuthenticationController, mockCookies, mockIsACTMemberAsyncHandler, mockGWT, mockEventBus);
+		controller = new EntityActionControllerImpl(mockView, mockPreflightController, mockPortalGinInjector, mockAuthenticationController, mockCookies, mockIsACTMemberAsyncHandler, mockGWT, mockEventBus, mockPopupUtils);
 
 		parentId = "syn456";
 		entityId = "syn123";
@@ -966,8 +973,23 @@ public class EntityActionControllerImplTest {
 		values.add(label);
 		values.add(comment);
 		valuesCallback.invoke(values);
-		verify(mockSynapseJavascriptClient).createSnapshot(eq(entityId), eq(comment), eq(label), isNull(String.class), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).createSnapshot(eq(entityId), eq(comment), eq(label), isNull(String.class), tableSnapshotResponseCaptor.capture());
 		verify(mockView).hideMultiplePromptDialog();
+		verify(mockView).showCreateVersionDialog();
+
+		AsyncCallback<SnapshotResponse> handler = tableSnapshotResponseCaptor.getValue();
+
+		// Failure
+		String errorMsg = "Error message";
+		handler.onFailure(new Exception(errorMsg));
+		verify(mockView).hideCreateVersionDialog();
+		verify(mockView).showErrorMessage(errorMsg);
+
+		// Success
+		handler.onSuccess(mockSnapshotResponse);
+		verify(mockView, times(2)).hideCreateVersionDialog();
+		verify(mockPopupUtils).notify(any(), any(), any());
+		verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
 	}
 
 	@Test
@@ -999,7 +1021,7 @@ public class EntityActionControllerImplTest {
 
 		verify(mockJobTrackingWidget).startAndTrackJob(eq(EntityActionControllerImpl.CREATING_A_NEW_VIEW_VERSION_MESSAGE), eq(false), eq(AsynchType.TableTransaction), tableUpdateTransactionRequestCaptor.capture(), asyncProgressHandlerCaptor.capture());
 		TableUpdateTransactionRequest request = tableUpdateTransactionRequestCaptor.getValue();
-		AsynchronousProgressHandler handler = asyncProgressHandlerCaptor.getValue();
+		AsynchronousProgressHandler<TableUpdateTransactionResponse> handler = asyncProgressHandlerCaptor.getValue();
 
 		// verify request
 		assertEquals(entityId, request.getEntityId());
@@ -1023,9 +1045,10 @@ public class EntityActionControllerImplTest {
 		reset(mockView);
 
 		// on success
-		handler.onComplete(mockAsyncResponseBody);
+		handler.onComplete(mockTableUpdateTransactionResponse);
 		verify(mockView).hideCreateVersionDialog();
 		verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
+		verify(mockPopupUtils).notify(any(), any(), any());
 	}
 
 	@Test
@@ -1081,9 +1104,10 @@ public class EntityActionControllerImplTest {
 		reset(mockView);
 
 		// on success
-		handler.onComplete(mockAsyncResponseBody);
+		handler.onComplete(mockTableUpdateTransactionResponse);
 		verify(mockView).hideCreateVersionDialog();
 		verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
+		verify(mockPopupUtils).notify(any(), any(), any());
 	}
 
 	@Test

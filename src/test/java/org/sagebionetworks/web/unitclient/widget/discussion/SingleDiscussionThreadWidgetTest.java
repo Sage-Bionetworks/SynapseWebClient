@@ -17,10 +17,12 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.widget.discussion.SingleDiscussionThreadWidget.PIN_THREAD_ACTION_TEXT;
 import static org.sagebionetworks.web.client.widget.discussion.SingleDiscussionThreadWidget.UNPIN_THREAD_ACTION_TEXT;
+
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -58,6 +60,7 @@ import org.sagebionetworks.web.client.widget.discussion.modal.EditDiscussionThre
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionListener;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.refresh.ReplyCountAlert;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
@@ -65,6 +68,7 @@ import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.test.helper.RequestBuilderMockStubber;
+
 import com.google.gwt.dev.util.collect.HashSet;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
@@ -128,7 +132,7 @@ public class SingleDiscussionThreadWidgetTest {
 	@Captor
 	ArgumentCaptor<Callback> callbackCaptor;
 	@Captor
-	ArgumentCaptor<ActionMenuWidget.ActionListener> actionListenerCaptor;
+	ArgumentCaptor<ActionListener> actionListenerCaptor;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Mock
@@ -242,7 +246,7 @@ public class SingleDiscussionThreadWidgetTest {
 
 		// verify edit
 		verify(mockActionMenuWidget).setActionListener(eq(Action.EDIT_THREAD), actionListenerCaptor.capture());
-		ActionMenuWidget.ActionListener actionListener = actionListenerCaptor.getValue();
+		ActionListener actionListener = actionListenerCaptor.getValue();
 		actionListener.onAction(Action.EDIT_THREAD);
 		verify(mockEditThreadModal).show();
 
@@ -281,7 +285,7 @@ public class SingleDiscussionThreadWidgetTest {
 		// verify unpin thread
 		verify(mockActionMenuWidget).setActionText(eq(Action.PIN_THREAD), eq(UNPIN_THREAD_ACTION_TEXT));
 		verify(mockActionMenuWidget).setActionListener(eq(Action.PIN_THREAD), actionListenerCaptor.capture());
-		ActionMenuWidget.ActionListener actionListener = actionListenerCaptor.getValue();
+		ActionListener actionListener = actionListenerCaptor.getValue();
 		actionListener.onAction(Action.EDIT_THREAD);
 		verify(mockDiscussionForumClientAsync).unpinThread(anyString(), any(AsyncCallback.class));
 	}

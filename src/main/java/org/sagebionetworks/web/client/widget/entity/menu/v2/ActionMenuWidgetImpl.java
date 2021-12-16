@@ -4,8 +4,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
 import org.gwtbootstrap3.client.ui.constants.IconType;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
+
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -125,7 +126,11 @@ public class ActionMenuWidgetImpl implements ActionMenuWidget, ActionListener {
 	@Override
 	public void onAction(Action action) {
 		// forward to the listeners
-		for (ActionListener listener : getActionListeners(action)) {
+		List<ActionListener> listeners = getActionListeners(action);
+		if (listeners.size() == 0) {
+			throw new IllegalArgumentException("Attempted to invoke action " + action.name() + " with no listeners present");
+		}
+		for (ActionListener listener : listeners) {
 			listener.onAction(action);
 		}
 	}

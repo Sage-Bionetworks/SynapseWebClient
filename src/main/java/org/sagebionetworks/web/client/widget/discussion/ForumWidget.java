@@ -1,10 +1,12 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+
 import org.sagebionetworks.repo.model.PaginatedIds;
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
@@ -24,8 +26,10 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModal;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionListener;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -351,13 +355,13 @@ public class ForumWidget implements ForumWidgetView.Presenter {
 		if (actionMenu != null) {
 			view.setActionMenu(actionMenu);
 			// add listener for forum commands
-			actionMenu.setActionListener(Action.CREATE_THREAD, new ActionMenuWidget.ActionListener() {
+			actionMenu.setActionListener(Action.CREATE_THREAD, new ActionListener() {
 				@Override
 				public void onAction(Action action) {
 					onClickNewThread();
 				}
 			});
-			actionMenu.setActionListener(Action.SHOW_DELETED_THREADS, new ActionMenuWidget.ActionListener() {
+			actionMenu.setActionListener(Action.SHOW_DELETED_THREADS, new ActionListener() {
 				@Override
 				public void onAction(Action action) {
 					onClickDeletedThreadCommand();

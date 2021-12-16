@@ -1,15 +1,12 @@
 package org.sagebionetworks.web.client.widget;
 
 import org.gwtbootstrap3.client.ui.constants.AlertType;
-import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
-import org.sagebionetworks.web.client.context.SynapseContextPropsProviderImpl;
 import org.sagebionetworks.web.client.jsinterop.FullWidthAlertProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactDOM;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.IsWidget;

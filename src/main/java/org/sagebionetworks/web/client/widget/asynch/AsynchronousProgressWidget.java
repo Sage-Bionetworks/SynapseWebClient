@@ -45,17 +45,18 @@ public class AsynchronousProgressWidget implements AsynchronousProgressView.Pres
 
 	/**
 	 * Reset this widget to track the passed status.
-	 * 
-	 * @param startMessage
-	 * @param statusToTrack
+	 * @param title
+	 * @param isDeterminate
+	 * @param type
+	 * @param requestBody
+	 * @param handler
 	 */
-	@Override
-	public void startAndTrackJob(String title, boolean isDeterminate, AsynchType type, AsynchronousRequestBody requestBody, final AsynchronousProgressHandler handler) {
+	public <TRequest extends AsynchronousRequestBody, TResponse extends AsynchronousResponseBody> void startAndTrackJob(String title, boolean isDeterminate, AsynchType type, TRequest requestBody, final AsynchronousProgressHandler<TResponse> handler) {
 		this.isDeterminate = isDeterminate;
 		view.setTitle(title);
 		view.setIsDetermiante(isDeterminate);
 		// Configure this job
-		jobTracker.startAndTrack(type, requestBody, WAIT_MS, new UpdatingAsynchProgressHandler() {
+		jobTracker.startAndTrack(type, requestBody, WAIT_MS, new UpdatingAsynchProgressHandler<TResponse>() {
 			@Override
 			public void onFailure(Throwable failure) {
 				handler.onFailure(failure);
@@ -72,7 +73,7 @@ public class AsynchronousProgressWidget implements AsynchronousProgressView.Pres
 			}
 
 			@Override
-			public void onComplete(AsynchronousResponseBody response) {
+			public void onComplete(TResponse response) {
 				handler.onComplete(response);
 			}
 

@@ -1,12 +1,16 @@
 package org.sagebionetworks.web.unitclient.widget.entity.menu.v2;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import java.util.Arrays;
 import java.util.List;
+
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,7 +18,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionListener;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidgetImpl;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidgetView;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionView;
@@ -92,8 +96,16 @@ public class ActionMenuWidgetImplTest {
 		widget.setActionListener(Action.CHANGE_ENTITY_NAME, mockActionListener);
 		// Now reset the the widget
 		widget.reset();
-		// nothing should happen here.
-		widget.onAction(Action.CHANGE_ENTITY_NAME);
+		// we'll get an exception since there are no actionlisteners.
+		try {
+			widget.onAction(Action.CHANGE_ENTITY_NAME);
+		} catch (IllegalArgumentException e) {
+			// Verify the exception contains the action name (for reproducing the issue) and a helpful portion of the message
+			assertTrue(e.getMessage().contains(Action.CHANGE_ENTITY_NAME.name()));
+			assertTrue(e.getMessage().contains("no listeners present"));
+		} catch (Exception e) {
+			fail("Unexpected exception");
+		}
 		// Should get forwarded to the listener
 		verify(mockActionListener, never()).onAction(any(Action.class));
 	}

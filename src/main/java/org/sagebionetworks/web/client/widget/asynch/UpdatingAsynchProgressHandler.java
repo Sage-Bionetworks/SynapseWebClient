@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.asynch;
 
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
+import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 
 /**
  * An AsynchronousProgressHandler that can also receive updates.
@@ -8,7 +9,7 @@ import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
  * @author jmhill
  *
  */
-public interface UpdatingAsynchProgressHandler extends AsynchronousProgressHandler {
+public interface UpdatingAsynchProgressHandler<TResponse extends AsynchronousResponseBody> extends AsynchronousProgressHandler<TResponse> {
 
 	public void onUpdate(AsynchronousJobStatus status);
 

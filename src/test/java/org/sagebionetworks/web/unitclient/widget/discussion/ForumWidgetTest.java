@@ -57,6 +57,7 @@ import org.sagebionetworks.web.client.widget.discussion.SubscribersWidget;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModal;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionListener;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
@@ -109,7 +110,7 @@ public class ForumWidgetTest {
 	@Captor
 	ArgumentCaptor<Callback> callbackCaptor;
 	@Captor
-	ArgumentCaptor<ActionMenuWidget.ActionListener> actionListenerCaptor;
+	ArgumentCaptor<ActionListener> actionListenerCaptor;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Mock

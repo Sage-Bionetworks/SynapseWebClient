@@ -3,6 +3,10 @@ package org.sagebionetworks.web.client;
 import org.sagebionetworks.web.client.jsinterop.ToastMessageOptions;
 import org.sagebionetworks.web.client.utils.Callback;
 
+/**
+ * PopupUtilsView is a simple interface on top of DisplayUtils for pushing notifications. The primary benefit of this is
+ * that unlike DisplayUtils static methods, PopupUtilsView can be mocked in environments without a JavaScript engine, e.g. in JUnit tests.
+ */
 public interface PopupUtilsView {
 	void notify(String message, DisplayUtils.NotificationVariant variant, ToastMessageOptions options);
 
