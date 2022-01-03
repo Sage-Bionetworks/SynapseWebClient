@@ -227,6 +227,30 @@ public class TableQueryResultWidgetTest {
 	}
 
 	@Test
+	public void testDatasetIsNotEditable() {
+		boolean isEditable = true;
+
+		// Datasets should not editable in the UI, see SWC-5870, SWC-5903
+		tableType = TableType.dataset;
+
+		// Configuration is tested above, but we still have to verify behavior to capture and invoke callbacks.
+		widget.configure(query, isEditable, tableType, mockListner);
+		verify(mockFacetsWidget).configure(eq(query), mockFacetChangedHandlerCaptor.capture(), callbackCaptor.capture());
+		verify(mockJobTrackingWidget).startAndTrackJob(eq(TableQueryResultWidget.RUNNING_QUERY_MESSAGE), eq(false), eq(AsynchType.TableQuery), qbrCaptor.capture(), asyncProgressHandlerCaptor.capture());
+
+		AsynchronousProgressHandler progressHandler1 = asyncProgressHandlerCaptor.getValue();
+		// reconfigure before previous job is done (verify previous job is no longer tracked, it uses a new tracking widget).
+		widget.configure(query, isEditable, tableType, mockListner);
+		verify(mockJobTrackingWidget2).startAndTrackJob(eq(TableQueryResultWidget.RUNNING_QUERY_MESSAGE), eq(false), eq(AsynchType.TableQuery), any(QueryBundleRequest.class), asyncProgressHandlerCaptor.capture());
+		AsynchronousProgressHandler progressHandler2 = asyncProgressHandlerCaptor.getValue();
+		progressHandler1.onComplete(bundle);
+		progressHandler2.onComplete(bundle);
+
+		// Behavior under test -- note results editable is false
+		verify(mockListner).queryExecutionFinished(true, false);
+	}
+
+	@Test
 	public void testOnPageChange() {
 		boolean isEditable = true;
 		widget.configure(query, isEditable, tableType, mockListner);

@@ -306,6 +306,11 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	 * @return
 	 */
 	public boolean isQueryResultEditable() {
+		if (tableType.equals(TableType.dataset)) {
+			// Datasets should not be editable (SWC-5870, SWC-5903)
+			return false;
+		}
+
 		List<SelectColumn> selectColums = QueryBundleUtils.getSelectFromBundle(this.bundle);
 		if (selectColums == null) {
 			return false;

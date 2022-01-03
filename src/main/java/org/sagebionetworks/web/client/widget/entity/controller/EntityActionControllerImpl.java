@@ -727,7 +727,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	private void configureTableCommands() {
 		if (entityBundle.getEntity() instanceof Table) {
 			boolean isDataset = entityBundle.getEntity() instanceof Dataset;
-			// For UX reasons, datasets are not editable, even if the user has permissions
+			// For UX reasons, datasets are not editable, even if the user has permissions (SWC-5870, SWC-5903)
 			boolean canEditResults = entityBundle.getPermissions().getCanCertifiedUserEdit() && !isDataset;
 			actionMenu.setActionVisible(Action.UPLOAD_TABLE_DATA, canEditResults);
 			actionMenu.setActionText(Action.UPLOAD_TABLE_DATA, "Upload Data to " + entityTypeDisplay);
