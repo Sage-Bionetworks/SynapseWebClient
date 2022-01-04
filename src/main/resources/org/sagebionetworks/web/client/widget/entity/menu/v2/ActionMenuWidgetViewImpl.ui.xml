@@ -22,15 +22,15 @@
 			<b:Button dataToggle="DROPDOWN" type="PRIMARY" text="Download Options" marginRight="5" visible="false" ui:field="tableDownloadOptions"/>
 			<b:DropDownMenu addStyleNames="dropdown-menu-right">
 				<a:ActionMenuItem action="DOWNLOAD_TABLE_QUERY_RESULTS">Export Table</a:ActionMenuItem>
-                <b:Tooltip ui:field="addToDownloadListMenuItemTooltip" placement="LEFT" container="body"
-                           text="A draft version of a Dataset cannot be added to the Download List." >
-                    <a:ActionMenuItem ui:field="addToDownloadListMenuItem" action="ADD_TABLE_RESULTS_TO_DOWNLOAD_LIST">Add to Download List</a:ActionMenuItem>
-                </b:Tooltip>
+				<b:Tooltip ui:field="addToDownloadListMenuItemTooltip" placement="LEFT" container="body"
+						   text="A draft version of a Dataset cannot be added to the Download List." >
+					<a:ActionMenuItem ui:field="addToDownloadListMenuItem" action="ADD_TABLE_RESULTS_TO_DOWNLOAD_LIST">Add to Download List</a:ActionMenuItem>
+				</b:Tooltip>
 				<!-- <b:Divider ui:field="downloadOptionsDivider" /> -->
-                <b:Tooltip ui:field="programmaticOptionsMenuItemTooltip" placement="LEFT" container="body"
-                           text="A draft version of a Dataset cannot be downloaded with a programmatic client." >
-                    <a:ActionMenuItem ui:field="programmaticOptionsMenuItem" action="TABLE_DOWNLOAD_PROGRAMMATIC_OPTIONS">Programmatic Options</a:ActionMenuItem>
-                </b:Tooltip>
+				<b:Tooltip ui:field="programmaticOptionsMenuItemTooltip" placement="LEFT" container="body"
+						   text="A draft version of a Dataset cannot be downloaded with a programmatic client." >
+					<a:ActionMenuItem ui:field="programmaticOptionsMenuItem" action="TABLE_DOWNLOAD_PROGRAMMATIC_OPTIONS">Programmatic Options</a:ActionMenuItem>
+				</b:Tooltip>
 			</b:DropDownMenu>
 		</b:DropDown>
 		<b:DropDown ui:field="dropdown" addStyleNames="displayInlineBlock">
@@ -38,6 +38,7 @@
 			<b:DropDownMenu ui:field="toolsDropDown"
 				addStyleNames="dropdown-menu-right">
 				<b:DropDownHeader ui:field="noActionsAvailable" addStyleNames="font-italic">No actions available</b:DropDownHeader>
+				<a:ActionMenuItem icon="HDD_O" iconFixedWidth="true" action="EDIT_DATASET_ITEMS">Edit Dataset Items</a:ActionMenuItem>
 				<a:ActionMenuItem icon="LOCK" iconFixedWidth="true" action="SHARE">Share</a:ActionMenuItem>
 				<a:ActionMenuItem icon="EDIT" iconFixedWidth="true" action="EDIT_PROJECT_METADATA">Edit Project Metadata</a:ActionMenuItem>
 				<a:ActionMenuItem icon="BAR_CHART" iconFixedWidth="true" action="SHOW_PROJECT_STATS">Show Project Statistics</a:ActionMenuItem>
@@ -47,8 +48,7 @@
 				<a:ActionMenuItem icon="UPLOAD" iconFixedWidth="true" action="UPLOAD_FILE">Upload or Link to a File</a:ActionMenuItem>
 				<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="CREATE_FOLDER">Add New Folder</a:ActionMenuItem>
 				<a:ActionMenuItem icon="TABLE" iconFixedWidth="true" action="SHOW_TABLE_SCHEMA">Schema</a:ActionMenuItem>
-                <a:ActionMenuItem icon="HDD_O" iconFixedWidth="true" action="SHOW_VIEW_SCOPE">Scope</a:ActionMenuItem>
-                <a:ActionMenuItem icon="HDD_O" iconFixedWidth="true" action="EDIT_DATASET_ITEMS">Edit Dataset Items</a:ActionMenuItem>
+				<a:ActionMenuItem icon="HDD_O" iconFixedWidth="true" action="SHOW_VIEW_SCOPE">Scope</a:ActionMenuItem>
 				<a:ActionMenuItem icon="DATABASE" iconFixedWidth="true" action="CHANGE_STORAGE_LOCATION">Change Storage Location</a:ActionMenuItem>
 				<a:ActionMenuItem icon="UPLOAD" iconFixedWidth="true" action="UPLOAD_NEW_FILE">Upload a New Version of File</a:ActionMenuItem>
 				<a:ActionMenuItem icon="HISTORY" iconFixedWidth="true" action="CREATE_TABLE_VERSION">Create a New Table/View Version</a:ActionMenuItem>
