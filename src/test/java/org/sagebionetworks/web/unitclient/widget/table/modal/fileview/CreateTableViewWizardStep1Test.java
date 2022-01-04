@@ -3,25 +3,30 @@ package org.sagebionetworks.web.unitclient.widget.table.modal.fileview;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getDoneFuture;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getFailedFuture;
 import static org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep1.EMPTY_SCOPE_MESSAGE;
+
 import java.util.Collections;
 import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.SubmissionView;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.repo.model.table.ViewEntityType;
 import org.sagebionetworks.repo.model.table.ViewTypeMask;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.evaluation.SubmissionViewScopeEditor;
@@ -223,10 +228,24 @@ public class CreateTableViewWizardStep1Test {
 		Dataset dataset = new Dataset();
 		dataset.setName(tableName);
 		dataset.setId("syn57");
-		ArgumentCaptor<Entity> captor = ArgumentCaptor.forClass(Entity.class);
+
+		String defaultColumnId = "999";
+		ColumnModel col = new ColumnModel();
+		col.setId(defaultColumnId);
+		List<ColumnModel> defaultColumns = Collections.singletonList(col);
+
+		ArgumentCaptor<Dataset> captor = ArgumentCaptor.forClass(Dataset.class);
 		when(mockJsClient.createEntity(captor.capture())).thenReturn(getDoneFuture(dataset));
+		when(mockJsClient.getDefaultColumnsForView(ViewEntityType.dataset)).thenReturn(getDoneFuture(defaultColumns));
 		when(mockView.getName()).thenReturn(tableName);
 		widget.onPrimary();
+
+		// Verify that default columns are added
+		assertEquals(captor.getValue().getColumnIds().size(), defaultColumns.size());
+		assertEquals(captor.getValue().getColumnIds().get(0), defaultColumnId);
+
+		// Verify that items is an empty list (not null)
+		assertEquals(captor.getValue().getItems(), Collections.EMPTY_LIST);
 
 		verify(mockWizardPresenter, never()).setErrorMessage(anyString());
 		// We shouldn't go to step 2 for dataseets
