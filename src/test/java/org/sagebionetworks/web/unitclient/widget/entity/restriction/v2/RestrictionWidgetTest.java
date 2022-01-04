@@ -26,6 +26,7 @@ import org.sagebionetworks.repo.model.RestrictionInformationResponse;
 import org.sagebionetworks.repo.model.RestrictionLevel;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.table.Dataset;
+import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -63,6 +64,8 @@ public class RestrictionWidgetTest {
 	@Mock
 	Dataset mockDataset;
 	@Mock
+	EntityView mockEntityView;
+	@Mock
 	IsACTMemberAsyncHandler mockIsACTMemberAsyncHandler;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
@@ -96,6 +99,7 @@ public class RestrictionWidgetTest {
 		AsyncMockStubber.callSuccessWith(mockRestrictionInformation).when(mockSynapseJavascriptClient).getRestrictionInformation(anyString(), any(RestrictableObjectType.class), any(AsyncCallback.class));
 		when(mockEntity.getId()).thenReturn(ENTITY_ID);
 		when(mockDataset.getId()).thenReturn(ENTITY_ID);
+		when(mockEntityView.getId()).thenReturn(ENTITY_ID);
 		when(mockUserProfile.getEmails()).thenReturn(Collections.singletonList(EMAIL));
 		when(mockUserProfile.getFirstName()).thenReturn(FIRST_NAME);
 		when(mockUserProfile.getLastName()).thenReturn(LAST_NAME);
@@ -350,6 +354,17 @@ public class RestrictionWidgetTest {
 		when(mockRestrictionInformation.getRestrictionLevel()).thenReturn(RestrictionLevel.OPEN);
 		boolean canChangePermissions = true;
 		widget.configure(mockDataset, canChangePermissions);
+
+		verify(mockView, never()).showChangeLink();
+	}
+
+	@Test
+	public void testShowChangeLinkNotCalledForEntityView() {
+		// SWC-5909
+		widget.setShowChangeLink(true);
+		when(mockRestrictionInformation.getRestrictionLevel()).thenReturn(RestrictionLevel.OPEN);
+		boolean canChangePermissions = true;
+		widget.configure(mockEntityView, canChangePermissions);
 
 		verify(mockView, never()).showChangeLink();
 	}

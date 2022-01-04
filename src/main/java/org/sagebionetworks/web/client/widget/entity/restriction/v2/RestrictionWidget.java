@@ -13,6 +13,7 @@ import org.sagebionetworks.repo.model.RestrictionLevel;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.table.Dataset;
+import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -151,7 +152,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		}
 
 		// ARs can technically be applied, but they don't work in a useful way, so hide the button (SWC-5909)
-		boolean entityTypeAllowsRestrictions = !(entity instanceof Dataset);
+		boolean entityTypeAllowsRestrictions = !(entity instanceof EntityView) && !(entity instanceof Dataset);
 
 		// show the info link if there are any restrictions, or if we are supposed to show the flag link (to
 		// allow people to flag or admin to "change" the data access level).
