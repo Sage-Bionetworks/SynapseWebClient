@@ -24,10 +24,6 @@
 					addStyleNames="margin-right-5">
 					<bh:Span addStyleNames="margin-right-5 boldText">Access:</bh:Span>
 					<bh:Span ui:field="restrictionPanelV2" />
-					<w:HelpWidget
-						helpMarkdown="Conditions for use describes data use requirements that must be fulfilled before downloading."
-						href="https://help.synapse.org/docs/Conditions-for-Use.2009596938.html"
-						addStyleNames="margin-left-5" />
 				</bh:Span>
 				<bh:Br addStyleNames="visible-xs visible-sm" />
 				<bh:Span ui:field="uploadDestinationPanel" visible="false">

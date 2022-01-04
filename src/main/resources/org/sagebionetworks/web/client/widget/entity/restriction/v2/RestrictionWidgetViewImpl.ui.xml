@@ -17,7 +17,11 @@
 			<b:Tooltip placement="BOTTOM" title="Click here to add conditions for use">
 				<b:Anchor ui:field="changeLink" text="Add Conditions for Use" />
 			</b:Tooltip>
-		</bh:Span>
+            <w:HelpWidget
+                    helpMarkdown="Conditions for use describes data use requirements that must be fulfilled before downloading."
+                    href="https://help.synapse.org/docs/Conditions-for-Use.2009596938.html"
+                    addStyleNames="margin-left-5" />
+        </bh:Span>
 		<bh:Span ui:field="flagUI">
 			<b:Icon type="FLAG" addStyleNames="text-danger margin-left-10"/>
 			<b:Tooltip placement="BOTTOM" title="Click here to learn more about flagging these data for review by the Synapse Access and Compliance Team">
