@@ -1,23 +1,30 @@
 package org.sagebionetworks.web.client.widget.table.modal.fileview;
 
+import static com.google.common.util.concurrent.Futures.whenAllComplete;
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.SubmissionView;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.repo.model.table.ViewEntityType;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.evaluation.SubmissionViewScopeEditor;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
 
+import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -103,10 +110,30 @@ public class CreateTableViewWizardStep1 implements ModalPage, CreateTableViewWiz
 	private void createEntity(final String name, final String description) {
 		modalPresenter.setLoading(true);
 		Table table;
+		List<ListenableFuture<?>> futures = new ArrayList<>();
 		if (TableType.table.equals(tableType)) {
 			table = new TableEntity();
 		} else if (TableType.dataset.equals(tableType)) {
 			table = new Dataset();
+			((Dataset) table).setItems(Collections.EMPTY_LIST); // Workaround for PLFM-7076
+			// For Datasets, automatically add the default columns (SWC-5917)
+			FluentFuture<List<ColumnModel>> defaultColumnsFuture = jsClient.getDefaultColumnsForView(ViewEntityType.dataset);
+			defaultColumnsFuture.addCallback(new FutureCallback<List<ColumnModel>>() {
+				@Override
+				public void onSuccess(@NullableDecl List<ColumnModel> results) {
+					List<String> columnIds = new ArrayList<>();
+					for (ColumnModel col : results) {
+						columnIds.add(col.getId());
+					}
+					table.setColumnIds(columnIds);
+				}
+
+				@Override
+				public void onFailure(Throwable t) {
+					modalPresenter.setErrorMessage("Error fetching columns for the table: " + t.getMessage());
+				}
+			}, directExecutor());
+			futures.add(defaultColumnsFuture);
 		} else if (TableType.submission_view.equals(tableType)) {
 			table = new SubmissionView();
 			List<String> scopeIds = submissionViewScope.getEvaluationIds();
@@ -128,7 +155,11 @@ public class CreateTableViewWizardStep1 implements ModalPage, CreateTableViewWiz
 		table.setName(name);
 		table.setParentId(parentId);
 		table.setDescription(description);
-		createEntity(table);
+		// Wait for all possible requests to complete before creating the entity.
+		FluentFuture.from(whenAllComplete(futures).call(() -> {
+			createEntity(table);
+			return null;
+		}, directExecutor()));
 	}
 
 	private void createEntity(final Entity entity) {
