@@ -19,7 +19,8 @@
 			<b:CheckBox ui:field="includeFilesCb" text="Files"
 				value="true" />
 			<b:CheckBox ui:field="includeFoldersCb" text="Folders" />
-			<b:CheckBox ui:field="includeTablesCb" text="Tables" />
+            <b:CheckBox ui:field="includeTablesCb" text="Tables" />
+            <b:CheckBox ui:field="includeDatasetsCb" text="Datasets" />
 		</bh:Div>
 	</b:FormGroup>
 </ui:UiBinder>

@@ -2,7 +2,6 @@ package org.sagebionetworks.web.unitclient.widget.table.v2.schema;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -12,6 +11,9 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.shared.WebConstants.FILE;
+import static org.sagebionetworks.web.shared.WebConstants.TABLE;
+
 import java.util.Collections;
 import java.util.List;
 import org.junit.Before;
@@ -409,13 +411,13 @@ public class ColumnModelsWidgetTest {
 	@Test
 	public void testGetTableType() {
 		when(mockView.getViewTypeMask()).thenReturn(ViewTypeMask.getMaskForDepricatedType(org.sagebionetworks.repo.model.table.ViewType.file));
-		assertEquals(TableType.files, TableType.getTableType(mockView));
+		assertEquals(TableType.file_view, TableType.getTableType(mockView));
 
 		when(mockView.getViewTypeMask()).thenReturn(ViewTypeMask.getMaskForDepricatedType(org.sagebionetworks.repo.model.table.ViewType.file_and_table));
-		assertEquals(TableType.files_tables, TableType.getTableType(mockView));
+		assertEquals(new TableType(EntityView.class, FILE | TABLE), TableType.getTableType(mockView));
 
 		when(mockView.getViewTypeMask()).thenReturn(ViewTypeMask.getMaskForDepricatedType(org.sagebionetworks.repo.model.table.ViewType.project));
-		assertEquals(TableType.projects, TableType.getTableType(mockView));
+		assertEquals(TableType.project_view, TableType.getTableType(mockView));
 
 		assertEquals(TableType.table, TableType.getTableType(table));
 	}

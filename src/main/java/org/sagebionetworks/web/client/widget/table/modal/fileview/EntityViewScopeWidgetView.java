@@ -22,11 +22,9 @@ public interface EntityViewScopeWidgetView extends IsWidget {
 
 	void hideModal();
 
-	void setEditButtonVisible(boolean visible);
+	void setEditMaskAndScopeButtonVisible(boolean visible);
 
 	void setLoading(boolean loading);
-
-	void setViewTypeOptionsVisible(boolean visible);
 
 	boolean isFileSelected();
 
@@ -40,10 +38,14 @@ public interface EntityViewScopeWidgetView extends IsWidget {
 
 	void setIsFolderSelected(boolean selected);
 
+	boolean isDatasetSelected();
+
+	void setIsDatasetSelected(boolean selected);
+
 	public interface Presenter {
 		void onSave();
 
-		void onEdit();
+		void onEditScopeAndMask();
 
 		void updateViewTypeMask();
 	}

@@ -32,8 +32,8 @@ public class ViewDefaultColumns {
 	}
 
 	public void init() {
-		FluentFuture<List<ColumnModel>> fileViewColumnsFuture = jsClient.getDefaultColumnsForView(TableType.files.getViewTypeMask());
-		FluentFuture<List<ColumnModel>> projectViewColumnsFuture = jsClient.getDefaultColumnsForView(TableType.projects.getViewTypeMask());
+		FluentFuture<List<ColumnModel>> fileViewColumnsFuture = jsClient.getDefaultColumnsForView(TableType.file_view.getViewTypeMask());
+		FluentFuture<List<ColumnModel>> projectViewColumnsFuture = jsClient.getDefaultColumnsForView(TableType.project_view.getViewTypeMask());
 		FluentFuture<List<ColumnModel>> submissionViewColumnsFuture = jsClient.getDefaultColumnsForView(ViewEntityType.submissionview);
 		FluentFuture.from(whenAllComplete(fileViewColumnsFuture, projectViewColumnsFuture, submissionViewColumnsFuture).call(() -> {
 			defaultFileViewColumns = clearIds(fileViewColumnsFuture.get());

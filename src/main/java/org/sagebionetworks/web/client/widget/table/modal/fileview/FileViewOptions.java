@@ -1,6 +1,9 @@
 package org.sagebionetworks.web.client.widget.table.modal.fileview;
 
 import org.gwtbootstrap3.client.ui.CheckBox;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
+
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -13,21 +16,31 @@ public class FileViewOptions implements IsWidget {
 	}
 
 	Widget widget;
+	CookieProvider cookieProvider;
+
 	@UiField
 	CheckBox includeFilesCb;
 	@UiField
 	CheckBox includeFoldersCb;
 	@UiField
 	CheckBox includeTablesCb;
+	@UiField
+	CheckBox includeDatasetsCb;
 
 	@Inject
-	public FileViewOptions(Binder binder) {
+	public FileViewOptions(Binder binder, CookieProvider cookies) {
 		widget = binder.createAndBindUi(this);
+		cookieProvider = cookies;
 	}
 
 	@Override
 	public Widget asWidget() {
 		return widget;
+	}
+
+	// TODO: This method can be removed when Datasets is out of experimental mode.
+	public void configure() {
+		includeDatasetsCb.setVisible(DisplayUtils.isInTestWebsite(cookieProvider));
 	}
 
 	public boolean isIncludeFiles() {
@@ -54,9 +67,18 @@ public class FileViewOptions implements IsWidget {
 		includeTablesCb.setValue(value);
 	}
 
+	public boolean isIncludeDatasets() {
+		return includeDatasetsCb.getValue();
+	}
+
+	public void setIsIncludeDatasets(boolean value) {
+		includeDatasetsCb.setValue(value);
+	}
+
 	public void addClickHandler(ClickHandler handler) {
 		includeFilesCb.addClickHandler(handler);
 		includeFoldersCb.addClickHandler(handler);
 		includeTablesCb.addClickHandler(handler);
+		includeDatasetsCb.addClickHandler(handler);
 	}
 }

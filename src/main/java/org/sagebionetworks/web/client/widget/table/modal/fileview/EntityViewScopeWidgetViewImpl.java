@@ -46,7 +46,7 @@ public class EntityViewScopeWidgetViewImpl implements EntityViewScopeWidgetView 
 		editButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.onEdit();
+				presenter.onEditScopeAndMask();
 			}
 		});
 		saveButton.addClickHandler(new ClickHandler() {
@@ -105,18 +105,13 @@ public class EntityViewScopeWidgetViewImpl implements EntityViewScopeWidgetView 
 	}
 
 	@Override
-	public void setEditButtonVisible(boolean visible) {
+	public void setEditMaskAndScopeButtonVisible(boolean visible) {
 		editButton.setVisible(visible);
 	}
 
 	@Override
 	public void setLoading(boolean loading) {
 		DisplayUtils.showLoading(saveButton, loading, originalButtonText);
-	}
-
-	@Override
-	public void setViewTypeOptionsVisible(boolean visible) {
-		viewOptionsContainer.setVisible(visible);
 	}
 
 	@Override
@@ -137,6 +132,16 @@ public class EntityViewScopeWidgetViewImpl implements EntityViewScopeWidgetView 
 	@Override
 	public void setIsFolderSelected(boolean value) {
 		viewOptions.setIsIncludeFolders(value);
+	}
+
+	@Override
+	public boolean isDatasetSelected() {
+		return viewOptions.isIncludeDatasets();
+	}
+
+	@Override
+	public void setIsDatasetSelected(boolean value) {
+		viewOptions.setIsIncludeDatasets(value);
 	}
 
 	@Override

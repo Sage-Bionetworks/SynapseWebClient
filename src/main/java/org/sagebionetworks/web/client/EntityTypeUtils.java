@@ -12,7 +12,9 @@ import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.SubmissionView;
+import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 
 public class EntityTypeUtils {
 
@@ -148,4 +150,20 @@ public class EntityTypeUtils {
 		}
 		return friendlyName;
 	}
+
+	/**
+	 * Gets the display name of an Entity. For Views, this method can be specific to the type of view based on the mask.
+	 * @param entity
+	 * @return
+	 */
+	public static String getFriendlyEntityTypeName(Entity entity) {
+		if (entity instanceof Table) {
+			return TableType.getTableType(entity).getDisplayName();
+		} else {
+			return org.sagebionetworks.repo.model.EntityTypeUtils.getDisplayName(
+					org.sagebionetworks.repo.model.EntityTypeUtils.getEntityTypeForClass(entity.getClass())
+			);
+		}
+	}
+
 }

@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,8 +19,6 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
-import org.sagebionetworks.repo.model.table.Dataset;
-import org.sagebionetworks.repo.model.table.DatasetItem;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.ViewType;
@@ -33,6 +32,7 @@ import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityViewScop
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
+
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -58,8 +58,6 @@ public class ScopeWidgetTest {
 	@Mock
 	EntityView mockEntityView;
 	@Mock
-	Dataset mockDataset;
-	@Mock
 	EntityView mockUpdatedEntityView;
 	@Mock
 	Table mockTable;
@@ -74,7 +72,6 @@ public class ScopeWidgetTest {
 	Long scopeVersion2 = 2L;
 
 	List<String> mockScopeIds = Arrays.asList(scopeId1, scopeId2);
-	List<DatasetItem> mockDatasetItems;
 	List<Reference> mockReferencesWithoutVersions;
 	List<Reference> mockReferencesWithVersions;
 
@@ -91,18 +88,8 @@ public class ScopeWidgetTest {
 		AsyncMockStubber.callSuccessWith(mockUpdatedEntityView).when(mockJsClient).updateEntity(any(Table.class), anyString(), anyBoolean(), any(AsyncCallback.class));
 		when(mockView.isFileSelected()).thenReturn(false);
 		when(mockView.isFolderSelected()).thenReturn(false);
+		when(mockView.isFolderSelected()).thenReturn(false);
 		when(mockView.isTableSelected()).thenReturn(false);
-
-
-		mockDatasetItems = new ArrayList<>();
-		DatasetItem datasetItem1 = new DatasetItem();
-		datasetItem1.setEntityId(scopeId1);
-		datasetItem1.setVersionNumber(scopeVersion1);
-		DatasetItem datasetItem2 = new DatasetItem();
-		datasetItem2.setEntityId(scopeId2);
-		datasetItem2.setVersionNumber(scopeVersion2);
-		mockDatasetItems.add(datasetItem1);
-		mockDatasetItems.add(datasetItem2);
 
 		mockReferencesWithoutVersions = new ArrayList<>();
 		Reference unversionedRef1 = new Reference();
@@ -122,9 +109,6 @@ public class ScopeWidgetTest {
 		mockReferencesWithVersions.add(versionedRef1);
 		mockReferencesWithVersions.add(versionedRef2);
 
-		when(mockDataset.getId()).thenReturn("syn123");
-		when(mockDataset.getItems()).thenReturn(mockDatasetItems);
-
 	}
 
 	@Test
@@ -143,13 +127,13 @@ public class ScopeWidgetTest {
 
 		// The view scope widget does not allow edit of the scope. That occurs in the modal (with the
 		// editScopeWidget)
-		verify(mockViewScopeWidget).configure(mockReferencesWithoutVersions, false, TableType.files);
-		verify(mockView).setEditButtonVisible(true);
+		verify(mockViewScopeWidget).configure(mockReferencesWithoutVersions, false, TableType.file_view);
+		verify(mockView).setEditMaskAndScopeButtonVisible(true);
 		verify(mockView).setVisible(true);
 
 		// edit
-		widget.onEdit();
-		verify(mockEditScopeWidget).configure(mockReferencesWithoutVersions, true, TableType.files);
+		widget.onEditScopeAndMask();
+		verify(mockEditScopeWidget).configure(mockReferencesWithoutVersions, true, TableType.file_view);
 		verify(mockView).showModal();
 
 		// update file view to file+table view
@@ -173,52 +157,18 @@ public class ScopeWidgetTest {
 	}
 
 	@Test
-	public void testConfigureDatasetHappyCase() {
-		when(mockBundle.getEntity()).thenReturn(mockDataset);
-
-		// configure with an dataset, edit the scope, and save.
-		boolean isEditable = true;
-		widget.configure(mockBundle, isEditable);
-
-		// The view scope widget does not allow edit of the scope. That occurs in the modal (with the
-		// editScopeWidget)
-		verify(mockViewScopeWidget).configure(mockReferencesWithVersions, false, TableType.dataset);
-		verify(mockView).setEditButtonVisible(true);
-		verify(mockView).setVisible(true);
-
-		// edit
-		widget.onEdit();
-		verify(mockEditScopeWidget).configure(mockReferencesWithVersions, true, TableType.dataset);
-		verify(mockView).showModal();
-
-		// update file view to file+table view
-		when(mockView.isFileSelected()).thenReturn(true);
-		when(mockView.isTableSelected()).thenReturn(true);
-		widget.updateViewTypeMask();
-
-		// save new scope
-		widget.onSave();
-
-		verify(mockSynapseAlert).clear();
-		verify(mockView).setLoading(true);
-		verify(mockJsClient).updateEntity(any(Table.class), anyString(), anyBoolean(), any(AsyncCallback.class));
-		verify(mockView).setLoading(false);
-		verify(mockView).hideModal();
-		verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
-	}
-
-
-	@Test
 	public void testConfigureUnsupportedViewTypeMask() {
+		int unsupportedViewTypeMask = WebConstants.PROJECT | WebConstants.FILE;
 		// should be editable, but it isn't because the web client does not support the view type mask
-		when(mockEntityView.getViewTypeMask()).thenReturn(new Long(WebConstants.PROJECT | WebConstants.FILE));
+		when(mockEntityView.getViewTypeMask()).thenReturn(new Long(unsupportedViewTypeMask));
 		boolean isEditable = true;
 		widget.configure(mockBundle, isEditable);
 
-		// The view scope widget does not allow edit of the scope. That occurs in the modal (with the
-		// editScopeWidget)
-		verify(mockViewScopeWidget).configure(mockReferencesWithoutVersions, false, null);
-		verify(mockView).setEditButtonVisible(false);
+		// The view scope widget does allow edit of the scope.
+		verify(mockViewScopeWidget).configure(mockReferencesWithoutVersions, true, new TableType(EntityView.class, unsupportedViewTypeMask));
+
+		// The edit mask + scope modal is not available because the mask cannot be changed in the web client
+		verify(mockView).setEditMaskAndScopeButtonVisible(false);
 		verify(mockView).setVisible(true);
 	}
 
@@ -229,15 +179,11 @@ public class ScopeWidgetTest {
 		boolean isEditable = true;
 		widget.configure(mockBundle, isEditable);
 
-		// The view scope widget does not allow edit of the scope. That occurs in the modal (with the
-		// editScopeWidget)
-		verify(mockViewScopeWidget).configure(mockReferencesWithoutVersions, false, TableType.projects);
+		// Do not show edit mask options for project view
+		verify(mockView).setEditMaskAndScopeButtonVisible(false);
 
-		// edit
-		widget.onEdit();
-		// Do not show File View options for project view
-		verify(mockView).setViewTypeOptionsVisible(false);
-		verify(mockEditScopeWidget).configure(mockReferencesWithoutVersions, true, TableType.projects);
+		// The view scope widget should be editable
+		verify(mockViewScopeWidget).configure(mockReferencesWithoutVersions, true, TableType.project_view);
 	}
 
 	@Test
@@ -246,13 +192,13 @@ public class ScopeWidgetTest {
 		boolean isEditable = true;
 
 		widget.configure(mockBundle, isEditable);
-		widget.onEdit();
+		widget.onEditScopeAndMask();
 
 		// Show File View options for project view
-		verify(mockView).setViewTypeOptionsVisible(true);
 		verify(mockView).setIsFileSelected(true);
 		verify(mockView).setIsFolderSelected(false);
 		verify(mockView).setIsTableSelected(false);
+		verify(mockView).setIsDatasetSelected(false);
 	}
 
 	@Test
@@ -261,13 +207,13 @@ public class ScopeWidgetTest {
 		boolean isEditable = true;
 
 		widget.configure(mockBundle, isEditable);
-		widget.onEdit();
+		widget.onEditScopeAndMask();
 
 		// Show File View options for project view
-		verify(mockView).setViewTypeOptionsVisible(true);
 		verify(mockView).setIsFileSelected(true);
 		verify(mockView).setIsFolderSelected(false);
 		verify(mockView).setIsTableSelected(true);
+		verify(mockView).setIsDatasetSelected(false);
 
 		// verify update view type from file+table to file
 		when(mockView.isFileSelected()).thenReturn(true);
@@ -291,8 +237,8 @@ public class ScopeWidgetTest {
 		boolean isEditable = false;
 		widget.configure(mockBundle, isEditable);
 
-		verify(mockViewScopeWidget).configure(mockReferencesWithoutVersions, false, TableType.files);
-		verify(mockView).setEditButtonVisible(false);
+		verify(mockViewScopeWidget).configure(mockReferencesWithoutVersions, false, TableType.file_view);
+		verify(mockView).setEditMaskAndScopeButtonVisible(false);
 		verify(mockView).setVisible(true);
 	}
 

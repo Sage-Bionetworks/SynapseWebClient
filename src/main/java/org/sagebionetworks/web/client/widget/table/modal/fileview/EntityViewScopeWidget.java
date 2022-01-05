@@ -1,15 +1,15 @@
 package org.sagebionetworks.web.client.widget.table.modal.fileview;
 
+import static org.sagebionetworks.web.shared.WebConstants.PROJECT;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
-import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.DatasetItem;
 import org.sagebionetworks.repo.model.table.EntityView;
-import org.sagebionetworks.repo.model.table.View;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
@@ -43,7 +43,7 @@ public class EntityViewScopeWidget implements SynapseWidgetPresenter, EntityView
 	EntityBundle bundle;
 	EntityContainerListWidget viewScopeWidget, editScopeWidget;
 	SynapseAlert synAlert;
-	View currentView;
+	EntityView currentView;
 	TableType tableType;
 	EventBus eventBus;
 
@@ -97,28 +97,40 @@ public class EntityViewScopeWidget implements SynapseWidgetPresenter, EntityView
 		this.isEditable = isEditable;
 		this.bundle = bundle;
 		boolean isVisible = false;
-		if (bundle.getEntity() instanceof EntityView || bundle.getEntity() instanceof Dataset) {
+		if (bundle.getEntity() instanceof EntityView) {
 			isVisible = true;
-			List<Reference> references = new ArrayList<>();
-			if (bundle.getEntity() instanceof EntityView) {
-				currentView = (EntityView) bundle.getEntity();
-				references = getReferencesFromIdList(((EntityView) currentView).getScopeIds());
-				if (tableType == null) {
-					synAlert.consoleError("View type mask is not supported by web client, blocking edit." + ((EntityView) currentView).getViewTypeMask());
-				}
-			} else if (bundle.getEntity() instanceof Dataset) {
-				currentView = (Dataset) bundle.getEntity();
-				references = getReferencesFromDatasetItems(((Dataset) currentView).getItems());
-			}
+
+			currentView = (EntityView) bundle.getEntity();
 			tableType = TableType.getTableType(currentView);
-			viewScopeWidget.configure(references, false, tableType);
-			view.setEditButtonVisible(isEditable && tableType != null);
+			List<Reference> references = getReferencesFromIdList(currentView.getScopeIds());
+
+			// The mask may not be editable since not all masks are supported in the web client
+			boolean canEditMask = isEditable && isEditMaskSupportedInWebClient(tableType);
+			if (isEditable && !isEditMaskSupportedInWebClient(tableType)) {
+				synAlert.consoleError("View type mask is not supported by web client, blocking edit. Mask value:" + ((EntityView) currentView).getViewTypeMask());
+			}
+			view.setEditMaskAndScopeButtonVisible(canEditMask);
+
+			// The scope and mask are both editable from the 'Edit Mask' dialog
+			// The scope is always editable if the user has access, but the button is unnecessary if the user can edit the mask.
+			boolean showEditScopeButton = isEditable && !canEditMask;
+			viewScopeWidget.configure(references, showEditScopeButton, tableType);
 
 		}
 
 		view.setVisible(isVisible);
 	}
 
+	private static boolean isEditMaskSupportedInWebClient(TableType tableType) {
+		if (tableType.getViewTypeMask() == PROJECT) {
+			// Masks of project Views are not editable
+			return false;
+		} else {
+			// If the entity view isn't a project view, then it can only have any combination of File | Folder | Table | Dataset
+			// If it contains any other type, it's not editable because the editor doesn't display all of the fields required for the user to update this mask.
+			return !(tableType.isIncludeEntityView() || tableType.isIncludeSubmissionView() || tableType.isIncludeDockerRepo() || tableType.isIncludeProject());
+		}
+	}
 
 	@Override
 	public Widget asWidget() {
@@ -127,7 +139,7 @@ public class EntityViewScopeWidget implements SynapseWidgetPresenter, EntityView
 
 	@Override
 	public void updateViewTypeMask() {
-		tableType = TableType.getTableType(view.isFileSelected(), view.isFolderSelected(), view.isTableSelected());
+		tableType = TableType.getEntityViewTableType(view.isFileSelected(), view.isFolderSelected(), view.isTableSelected(), view.isDatasetSelected());
 	}
 
 	@Override
@@ -135,21 +147,9 @@ public class EntityViewScopeWidget implements SynapseWidgetPresenter, EntityView
 		// update scope
 		synAlert.clear();
 		view.setLoading(true);
-		if (currentView instanceof EntityView) {
-			((EntityView) currentView).setScopeIds(editScopeWidget.getEntityIds());
-			((EntityView) currentView).setViewTypeMask(tableType.getViewTypeMask().longValue());
-			((EntityView) currentView).setType(null);
-		} else if (currentView instanceof Dataset) {
-			List<Reference> referenceList = editScopeWidget.getReferences();
-			List<DatasetItem> datasetItems = new ArrayList<>(referenceList.size());
-			for (Reference reference : referenceList) {
-				DatasetItem datasetItem = new DatasetItem();
-				datasetItem.setEntityId(reference.getTargetId());
-				datasetItem.setVersionNumber(reference.getTargetVersionNumber());
-				datasetItems.add(datasetItem);
-			}
-			((Dataset) currentView).setItems(datasetItems);
-		}
+		currentView.setScopeIds(editScopeWidget.getEntityIds());
+		currentView.setViewTypeMask(tableType.getViewTypeMask().longValue());
+		currentView.setType(null);
 		jsClient.updateEntity(currentView, null, null, new AsyncCallback<Entity>() {
 			@Override
 			public void onSuccess(Entity entity) {
@@ -167,25 +167,16 @@ public class EntityViewScopeWidget implements SynapseWidgetPresenter, EntityView
 	}
 
 	@Override
-	public void onEdit() {
-		List<Reference> references = new ArrayList<>();
+	public void onEditScopeAndMask() {
+		List<Reference> references = getReferencesFromIdList(currentView.getScopeIds());
 		// configure edit list, and show modal
-		if (currentView instanceof EntityView) {
-			references = getReferencesFromIdList(((EntityView) currentView).getScopeIds());
-		} else if (currentView instanceof Dataset) {
-			references = getReferencesFromDatasetItems(((Dataset) currentView).getItems());
-		}
 		editScopeWidget.configure(references, true, tableType);
 
-		if (TableType.table.equals(tableType) || TableType.projects.equals(tableType) || TableType.dataset.equals(tableType)) {
-			view.setViewTypeOptionsVisible(false);
-		} else {
-			view.setViewTypeOptionsVisible(true);
-			// update the checkbox state based on the view type mask
-			view.setIsFileSelected(tableType.isIncludeFiles());
-			view.setIsFolderSelected(tableType.isIncludeFolders());
-			view.setIsTableSelected(tableType.isIncludeTables());
-		}
+		// update the checkbox state based on the view type mask
+		view.setIsFileSelected(tableType.isIncludeFiles());
+		view.setIsFolderSelected(tableType.isIncludeFolders());
+		view.setIsTableSelected(tableType.isIncludeTables());
+		view.setIsDatasetSelected(tableType.isIncludeDatasets());
 
 		view.showModal();
 	}

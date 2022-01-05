@@ -125,7 +125,7 @@ public class RowWidgetTest {
 	@Test
 	public void testViewSelectNotVisible() {
 		boolean isEditor = true;
-		tableType = TableType.files;
+		tableType = TableType.file_view;
 		rowWidget.configure(tableId, types, isEditor, tableType, aRow, mockListner);
 		// selection must be shown when given a listener.
 		verify(mockView).setSelectVisible(false);
@@ -152,7 +152,7 @@ public class RowWidgetTest {
 
 	@Test
 	public void testTakesAddressCellIsView() {
-		tableType = TableType.projects;
+		tableType = TableType.project_view;
 		TakesAddressCell mockTakesAddress = Mockito.mock(TakesAddressCell.class);
 		when(mockCellFactory.createRenderer(any(ColumnModel.class))).thenReturn(mockTakesAddress);
 		boolean isEditor = false;
@@ -163,13 +163,13 @@ public class RowWidgetTest {
 
 	@Test
 	public void testEditDefaultColumnModelsIsView() {
-		tableType = TableType.files;
+		tableType = TableType.file_view;
 		boolean isEditor = true;
 		HashSet<String> defaultColumnNames = new HashSet<String>();
 		for (ColumnModel cm : types) {
 			defaultColumnNames.add(cm.getName());
 		}
-		when(mockFileViewDefaultColumns.getDefaultViewColumnNames(TableType.files)).thenReturn(defaultColumnNames);
+		when(mockFileViewDefaultColumns.getDefaultViewColumnNames(TableType.file_view)).thenReturn(defaultColumnNames);
 		rowWidget.configure(tableId, types, isEditor, tableType, aRow, mockListner);
 		verify(mockCellFactory, times(types.size())).createRenderer(any(ColumnModel.class));
 		verify(mockCellFactory, never()).createEditor(any(ColumnModel.class));

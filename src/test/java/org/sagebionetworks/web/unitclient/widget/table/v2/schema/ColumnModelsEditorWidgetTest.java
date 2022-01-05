@@ -161,7 +161,7 @@ public class ColumnModelsEditorWidgetTest {
 	public void testFileView() {
 		// try to add non-editable column
 		when(mockGinInjector.createColumnModelEditorWidget()).thenReturn(mockColumnModelTableRowEditorWidget1, mockColumnModelTableRowEditorWidget2);
-		widget.configure(TableType.files, nonEditableColumns);
+		widget.configure(TableType.file_view, nonEditableColumns);
 		verify(mockGinInjector, times(nonEditableColumns.size())).createColumnModelEditorWidget();
 		verify(mockColumnModelTableRowEditorWidget1).setToBeDefaultFileViewColumn();
 		verify(mockColumnModelTableRowEditorWidget2).setToBeDefaultFileViewColumn();

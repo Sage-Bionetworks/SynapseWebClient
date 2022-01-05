@@ -42,6 +42,7 @@ public class CreateTableViewWizardStep1ViewImpl implements CreateTableViewWizard
 	public CreateTableViewWizardStep1ViewImpl(Binder binder, FileViewOptions viewOptions, CookieProvider cookies) {
 		widget = binder.createAndBindUi(this);
 		this.viewOptions = viewOptions;
+		viewOptions.configure();
 		viewOptionsContainer.add(viewOptions);
 		viewOptions.addClickHandler(event -> {
 			p.updateViewTypeMask();
@@ -68,6 +69,16 @@ public class CreateTableViewWizardStep1ViewImpl implements CreateTableViewWizard
 	@Override
 	public void setIsFolderSelected(boolean value) {
 		viewOptions.setIsIncludeFolders(value);
+	}
+
+	@Override
+	public boolean isDatasetSelected() {
+		return viewOptions.isIncludeDatasets();
+	}
+
+	@Override
+	public void setIsDatasetSelected(boolean value) {
+		viewOptions.setIsIncludeDatasets(value);
 	}
 
 	@Override

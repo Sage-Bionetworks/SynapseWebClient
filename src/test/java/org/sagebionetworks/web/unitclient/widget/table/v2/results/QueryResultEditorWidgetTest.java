@@ -185,7 +185,7 @@ public class QueryResultEditorWidgetTest {
 
 	@Test
 	public void testOnEditView() {
-		tableType = TableType.files;
+		tableType = TableType.file_view;
 		widget.showEditor(bundle, tableType);
 		verify(mockView).setAddRowButtonVisible(false);
 		verify(mockView).setButtonToolbarVisible(false);
@@ -313,7 +313,7 @@ public class QueryResultEditorWidgetTest {
 
 	@Test
 	public void testOnSaveWithChangesValidJobSuccessfulIsView() {
-		tableType = TableType.projects;
+		tableType = TableType.project_view;
 		widget.showEditor(bundle, tableType);
 		reset(mockView);
 		reset(mockGlobalState);
