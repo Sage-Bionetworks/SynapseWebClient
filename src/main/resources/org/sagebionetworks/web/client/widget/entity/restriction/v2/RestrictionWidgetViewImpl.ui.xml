@@ -7,16 +7,20 @@
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	
 	<ui:with field='icons' type='org.sagebionetworks.web.client.IconsImageBundle'/>
- 	<bh:Span addStyleNames="restrictionWidget">
- 		<b:Anchor ui:field="folderViewTermsLink" visible="false" text="View Terms" />
- 		<bh:Div ui:field="hasAccessContainerParent" addStyleNames="displayInlineBlock min-width-42">
- 			<w:ReactComponentDiv ui:field="hasAccessContainer" height="30px"/>
- 		</bh:Div>
- 		
- 		<bh:Span ui:field="linkUI">
+	<bh:Span addStyleNames="restrictionWidget">
+		<b:Anchor ui:field="folderViewTermsLink" visible="false" text="View Terms" />
+		<bh:Div ui:field="hasAccessContainerParent" addStyleNames="displayInlineBlock min-width-42">
+			<w:ReactComponentDiv ui:field="hasAccessContainer" height="30px"/>
+		</bh:Div>
+
+		<bh:Span ui:field="linkUI">
 			<b:Tooltip placement="BOTTOM" title="Click here to add conditions for use">
 				<b:Anchor ui:field="changeLink" text="Add Conditions for Use" />
 			</b:Tooltip>
+			<w:HelpWidget
+					helpMarkdown="Conditions for use describes data use requirements that must be fulfilled before downloading."
+					href="https://help.synapse.org/docs/Conditions-for-Use.2009596938.html"
+					addStyleNames="margin-left-5" />
 		</bh:Span>
 		<bh:Span ui:field="flagUI">
 			<b:Icon type="FLAG" addStyleNames="text-danger margin-left-10"/>
