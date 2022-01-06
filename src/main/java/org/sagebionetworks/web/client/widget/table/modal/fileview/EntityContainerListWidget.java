@@ -51,11 +51,11 @@ public class EntityContainerListWidget implements EntityContainerListWidgetView.
 		};
 	}
 
-	public void configure(List<Reference> entityContainerIds, boolean canEdit, TableType tableType) {
+	public void configure(List<Reference> entityContainerIds, boolean canEditScope, TableType tableType) {
 		view.clear();
 		references.clear();
-		this.canEdit = canEdit;
-		view.setAddButtonVisible(canEdit);
+		this.canEdit = canEditScope;
+		view.setAddButtonVisible(canEditScope);
 		view.setNoContainers(entityContainerIds.isEmpty());
 		synAlert.clear();
 		if (!entityContainerIds.isEmpty()) {
@@ -78,7 +78,7 @@ public class EntityContainerListWidget implements EntityContainerListWidgetView.
 			});
 		}
 
-		if (TableType.projects.equals(tableType)) {
+		if (TableType.project_view.equals(tableType)) {
 			entityFinderBuilder
 					.setModalTitle("Set " + tableType.getDisplayName() + " Containers")
 					.setInitialScope(EntityFinderScope.ALL_PROJECTS)

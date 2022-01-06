@@ -19,6 +19,7 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.client.DisplayConstants.FILE_VIEW;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.ARE_YOU_SURE_YOU_WANT_TO_DELETE;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETE_FOLDER_EXPLANATION;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETE_PREFIX;
@@ -129,6 +130,7 @@ import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidge
 import org.sagebionetworks.web.client.widget.team.SelectTeamModal;
 import org.sagebionetworks.web.shared.FormParams;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
@@ -254,6 +256,8 @@ public class EntityActionControllerImplTest {
 	SnapshotResponse mockSnapshotResponse;
 	@Mock
 	PromptForValuesModalView.Configuration mockPromptModalConfiguration;
+	@Mock
+	EntityView mockEntityView;
 	PromptForValuesModalView.Configuration.Builder mockPromptModalConfigurationBuilder;
 	Set<ResourceAccess> resourceAccessSet;
 
@@ -330,6 +334,10 @@ public class EntityActionControllerImplTest {
 		when(mockPublicPrincipalIds.isPublic(PUBLIC_USER_ID)).thenReturn(true);
 		selected = new Reference();
 		selected.setTargetId("syn9876");
+
+		when(mockEntityView.getId()).thenReturn(entityId);
+		when(mockEntityView.getParentId()).thenReturn(parentId);
+		when(mockEntityView.getViewTypeMask()).thenReturn(new Long(WebConstants.FILE));
 
 		// Setup the mock entity selector to select an entity.
 		Mockito.doAnswer(new Answer<Void>() {
@@ -418,8 +426,7 @@ public class EntityActionControllerImplTest {
 
 	@Test
 	public void testConfigureWithEntityView() {
-		EntityView view = new EntityView();
-		entityBundle.setEntity(view);
+		entityBundle.setEntity(mockEntityView);
 		boolean canCertifiedUserEdit = true;
 		permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
 
@@ -428,7 +435,7 @@ public class EntityActionControllerImplTest {
 		verify(mockGWT).scheduleExecution(any(Callback.class), anyInt());
 		// delete
 		verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, true);
-		verify(mockActionMenu).setActionText(Action.DELETE_ENTITY, DELETE_PREFIX + EntityTypeUtils.getDisplayName(EntityType.entityview));
+		verify(mockActionMenu).setActionText(Action.DELETE_ENTITY, DELETE_PREFIX + FILE_VIEW);
 		verify(mockActionMenu).setActionListener(Action.DELETE_ENTITY, controller);
 		// share
 		verify(mockActionMenu).setActionVisible(Action.SHARE, true);
@@ -739,7 +746,7 @@ public class EntityActionControllerImplTest {
 
 	@Test
 	public void testConfigureWikiView() {
-		entityBundle.setEntity(new EntityView());
+		entityBundle.setEntity(mockEntityView);
 		entityBundle.setRootWikiId(null);
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		verify(mockActionMenu).setActionVisible(Action.EDIT_WIKI_PAGE, true);
@@ -782,7 +789,7 @@ public class EntityActionControllerImplTest {
 
 	@Test
 	public void testConfigureViewWikiSourceWikiView() {
-		entityBundle.setEntity(new EntityView());
+		entityBundle.setEntity(mockEntityView);
 		entityBundle.setRootWikiId("22");
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		verify(mockActionMenu).setActionVisible(Action.VIEW_WIKI_SOURCE, true);
@@ -994,10 +1001,7 @@ public class EntityActionControllerImplTest {
 
 	@Test
 	public void testOnCreateEntityViewSnapshot() {
-		Entity entityView = new EntityView();
-		entityView.setId(entityId);
-		entityView.setParentId(parentId);
-		entityBundle.setEntity(entityView);
+		entityBundle.setEntity(mockEntityView);
 		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 
@@ -1700,7 +1704,7 @@ public class EntityActionControllerImplTest {
 
 	@Test
 	public void testConfigureWikiSubpageView() {
-		entityBundle.setEntity(new EntityView());
+		entityBundle.setEntity(mockEntityView);
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		verify(mockActionMenu).setActionVisible(Action.ADD_WIKI_SUBPAGE, false);
 	}
@@ -1792,7 +1796,7 @@ public class EntityActionControllerImplTest {
 	public void testConfigureCreateOrUpdateDoiView() throws Exception {
 		// Create DOI is now available for Views since they're now versionable (SWC-4062, SWC-5191)
 		entityBundle.setDoiAssociation(null);
-		entityBundle.setEntity(new EntityView());
+		entityBundle.setEntity(mockEntityView);
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		verify(mockActionMenu).setActionVisible(Action.CREATE_OR_UPDATE_DOI, false);
 		verify(mockActionMenu).setActionVisible(Action.CREATE_OR_UPDATE_DOI, true);
@@ -2059,7 +2063,7 @@ public class EntityActionControllerImplTest {
 		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkCreateEntity(any(EntityBundle.class), anyString(), any(Callback.class));
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		controller.onAction(Action.ADD_FILE_VIEW);
-		verify(mockCreateTableViewWizard).configure(entityId, TableType.files);
+		verify(mockCreateTableViewWizard).configure(entityId, TableType.file_view);
 		verify(mockCreateTableViewWizard).showModal(any(WizardCallback.class));
 	}
 
@@ -2068,7 +2072,7 @@ public class EntityActionControllerImplTest {
 		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkCreateEntity(any(EntityBundle.class), anyString(), any(Callback.class));
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		controller.onAction(Action.ADD_PROJECT_VIEW);
-		verify(mockCreateTableViewWizard).configure(entityId, TableType.projects);
+		verify(mockCreateTableViewWizard).configure(entityId, TableType.project_view);
 		verify(mockCreateTableViewWizard).showModal(any(WizardCallback.class));
 	}
 

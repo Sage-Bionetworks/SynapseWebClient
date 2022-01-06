@@ -303,8 +303,8 @@ public class WebConstants {
 	public static final String AUTH_PUBLIC_SERVICE_URL_KEY = "authPublicServiceUrl";
 	public static final String SYNAPSE_VERSION_KEY = "synapseVersionInfo";
 
-	// View mask constants
-	public static final int FILE = 0x01, PROJECT = 0x02, TABLE = 0x04, FOLDER = 0x08, VIEW = 0x10, DOCKER = 0x20;
+	// View mask constants (See https://docs.synapse.org/rest/org/sagebionetworks/repo/model/table/EntityView.html)
+	public static final int FILE = 0x01, PROJECT = 0x02, TABLE = 0x04, FOLDER = 0x08, VIEW = 0x10, DOCKER = 0x20, SUBMISSION_VIEW = 0x40, DATASET = 0x80;
 
 	/**
 	 * Jira Issue Creation constants

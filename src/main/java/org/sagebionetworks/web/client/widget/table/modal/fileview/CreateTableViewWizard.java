@@ -35,7 +35,7 @@ public class CreateTableViewWizard {
 	public void configure(String parentId, TableType type) {
 		this.parentId = parentId;
 		this.type = type;
-		if (TableType.projects.equals(type)) {
+		if (TableType.project_view.equals(type)) {
 			this.modalWizardWidget.setTitle("Create Project View");
 			this.modalWizardWidget.setHelp(PROJECT_VIEW_HELP, VIEW_URL);
 		} else if (TableType.table.equals(type)) {

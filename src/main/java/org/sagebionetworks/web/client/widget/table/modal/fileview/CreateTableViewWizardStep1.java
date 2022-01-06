@@ -65,7 +65,7 @@ public class CreateTableViewWizardStep1 implements ModalPage, CreateTableViewWiz
 
 	@Override
 	public void updateViewTypeMask() {
-		tableType = TableType.getTableType(view.isFileSelected(), view.isFolderSelected(), view.isTableSelected());
+		tableType = TableType.getEntityViewTableType(view.isFileSelected(), view.isFolderSelected(), view.isTableSelected(), view.isDatasetSelected());
 	}
 
 	/**
@@ -86,7 +86,7 @@ public class CreateTableViewWizardStep1 implements ModalPage, CreateTableViewWiz
 			view.setEntityViewScopeWidgetVisible(true);	
 		}
 		
-		if (TableType.table.equals(type) || TableType.dataset.equals(type) || TableType.projects.equals(type) || TableType.submission_view.equals(type)) {
+		if (TableType.table.equals(type) || TableType.dataset.equals(type) || TableType.project_view.equals(type) || TableType.submission_view.equals(type)) {
 			view.setViewTypeOptionsVisible(false);
 		} else {
 			view.setViewTypeOptionsVisible(true);
@@ -94,6 +94,7 @@ public class CreateTableViewWizardStep1 implements ModalPage, CreateTableViewWiz
 			view.setIsFileSelected(type.isIncludeFiles());
 			view.setIsFolderSelected(type.isIncludeFolders());
 			view.setIsTableSelected(type.isIncludeTables());
+			view.setIsDatasetSelected(type.isIncludeDatasets());
 		}
 
 		entityContainerList.configure(new ArrayList<Reference>(), canEdit, type);

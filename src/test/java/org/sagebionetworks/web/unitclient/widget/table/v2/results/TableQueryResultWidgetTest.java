@@ -17,7 +17,6 @@ import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryR
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,7 +39,6 @@ import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.repo.model.table.SelectColumn;
 import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.repo.model.table.SortItem;
-import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -316,7 +314,7 @@ public class TableQueryResultWidgetTest {
 	@Test
 	public void testConfigureSuccessNotEditable() {
 		boolean isEditable = false;
-		tableType = TableType.files;
+		tableType = TableType.file_view;
 		// Make the call that changes it all.
 		widget.configure(query, isEditable, tableType, mockListner);
 		verify(mockJobTrackingWidget).startAndTrackJob(eq(TableQueryResultWidget.RUNNING_QUERY_MESSAGE), eq(false), eq(AsynchType.TableQuery), any(QueryBundleRequest.class), asyncProgressHandlerCaptor.capture());
@@ -339,7 +337,7 @@ public class TableQueryResultWidgetTest {
 	public void testConfigureEmptyResults() {
 		// no rows are returned
 		boolean isEditable = false;
-		tableType = TableType.files;
+		tableType = TableType.file_view;
 		rowSet.setRows(Collections.EMPTY_LIST);
 
 		widget.configure(query, isEditable, tableType, mockListner);
@@ -469,7 +467,7 @@ public class TableQueryResultWidgetTest {
 		String column1 = "col1", column2 = "col2";
 		// initialize with an empty sort
 		boolean isEditable = false;
-		tableType = TableType.files;
+		tableType = TableType.file_view;
 		query.setSort(null);
 
 		widget.configure(query, isEditable, tableType, mockListner);

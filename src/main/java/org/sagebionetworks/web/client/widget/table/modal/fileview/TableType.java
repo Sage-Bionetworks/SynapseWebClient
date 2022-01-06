@@ -2,72 +2,89 @@ package org.sagebionetworks.web.client.widget.table.modal.fileview;
 
 // Table, or a Project View, or a combination View composed of Files/Folders/Tables
 
+import static org.sagebionetworks.web.shared.WebConstants.DATASET;
+import static org.sagebionetworks.web.shared.WebConstants.DOCKER;
 import static org.sagebionetworks.web.shared.WebConstants.FILE;
 import static org.sagebionetworks.web.shared.WebConstants.FOLDER;
 import static org.sagebionetworks.web.shared.WebConstants.PROJECT;
+import static org.sagebionetworks.web.shared.WebConstants.SUBMISSION_VIEW;
 import static org.sagebionetworks.web.shared.WebConstants.TABLE;
+import static org.sagebionetworks.web.shared.WebConstants.VIEW;
+
+import java.util.Objects;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.SubmissionView;
+import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.ViewTypeMask;
 import org.sagebionetworks.web.client.DisplayConstants;
 
 
-public enum TableType {
-	table(null, DisplayConstants.TABLE),
-	submission_view(null, DisplayConstants.SUBMISSION_VIEW),
-	projects(PROJECT, DisplayConstants.PROJECT_VIEW),
-	tables(TABLE, DisplayConstants.VIEW),
-	folders(FOLDER, DisplayConstants.VIEW),
-	folders_tables(FOLDER | TABLE, DisplayConstants.VIEW),
-	files(FILE, DisplayConstants.FILE_VIEW),
-	files_tables(FILE | TABLE, DisplayConstants.VIEW),
-	files_folders(FILE | FOLDER, DisplayConstants.VIEW),
-	files_folders_tables(FILE | FOLDER | TABLE, DisplayConstants.VIEW),
-	dataset(FILE, DisplayConstants.DATASET);
+public class TableType {
 
+	/**
+	 * We specifically enumerate some common TableTypes to use elsewhere, but a TableType object does not have to match one of these
+	 */
+
+	// TableEntity, SubmissionView, and Dataset don't use viewTypeMask
+	public static final TableType table = new TableType(TableEntity.class, null);
+	public static final TableType submission_view = new TableType(SubmissionView.class, null);
+	// We specify a viewTypeMask of 'FILE' for Datasets because they work like file views in many ways
+	public static final TableType dataset = new TableType(Dataset.class, FILE);
+
+	// We define types of EntityViews for convenience/usability, but a user could specify a custom mask.
+	public static final TableType project_view = new TableType(EntityView.class, PROJECT);
+	public static final TableType file_view = new TableType(EntityView.class, FILE);
+
+	private Class<? extends Table> clazz;
 	private Integer viewTypeMask;
-	private String displayName;
 
-	TableType(Integer viewTypeMask, String displayName) {
+	public TableType(Class<? extends Table> clazz, Integer viewTypeMask) {
+		this.clazz = clazz;
 		this.viewTypeMask = viewTypeMask;
-		this.displayName = displayName;
 	}
 
 	public Integer getViewTypeMask() {
-		return viewTypeMask;
+		return this.viewTypeMask;
 	}
 
 	public boolean isIncludeFiles() {
-		if (viewTypeMask == null) {
-			return false;
-		}
-		int fileBit = viewTypeMask.intValue() & FILE;
-		return fileBit > 0;
+		return viewTypeMask != null && (viewTypeMask & FILE) > 0;
 	}
 
 	public boolean isIncludeFolders() {
-		if (viewTypeMask == null) {
-			return false;
-		}
-
-		int fileBit = viewTypeMask.intValue() & FOLDER;
-		return fileBit > 0;
+		return viewTypeMask != null && (viewTypeMask & FOLDER) > 0;
 	}
 
 	public boolean isIncludeTables() {
-		if (viewTypeMask == null) {
-			return false;
-		}
-
-		int fileBit = viewTypeMask.intValue() & TABLE;
-		return fileBit > 0;
+		return viewTypeMask != null && (viewTypeMask & TABLE) > 0;
 	}
 
-	public static TableType getTableType(boolean isFileSelected, boolean isFolderSelected, boolean isTableSelected) {
+	public boolean isIncludeDatasets() {
+		return viewTypeMask != null && (viewTypeMask & DATASET) > 0;
+	}
+
+	public boolean isIncludeDockerRepo() {
+		return viewTypeMask != null && (viewTypeMask & DOCKER) > 0;
+	}
+
+	public boolean isIncludeEntityView() {
+		return viewTypeMask != null && (viewTypeMask & VIEW) > 0;
+	}
+
+	public boolean isIncludeSubmissionView() {
+		return viewTypeMask != null && (viewTypeMask & SUBMISSION_VIEW) > 0;
+	}
+
+	public boolean isIncludeProject() {
+		return viewTypeMask != null && (viewTypeMask & PROJECT) > 0;
+	}
+
+
+	public static TableType getEntityViewTableType(boolean isFileSelected, boolean isFolderSelected, boolean isTableSelected, boolean isDatasetSelected) {
 		int viewTypeMask = 0;
 		if (isFileSelected) {
 			viewTypeMask = FILE;
@@ -78,24 +95,10 @@ public enum TableType {
 		if (isTableSelected) {
 			viewTypeMask = viewTypeMask | TABLE;
 		}
-		return getTableType(new Long(viewTypeMask));
-	}
-
-	public static TableType getTableType(Long viewTypeMask) {
-		if (viewTypeMask == null) {
-			return TableType.table;
+		if (isDatasetSelected) {
+			viewTypeMask = viewTypeMask | DATASET;
 		}
-
-		int viewTypeMaskInt = viewTypeMask.intValue();
-		for (TableType type : TableType.values()) {
-			if (type.getViewTypeMask() == null) {
-				continue;
-			}
-			if (viewTypeMaskInt == type.getViewTypeMask()) {
-				return type;
-			}
-		}
-		return null;
+		return new TableType(EntityView.class, viewTypeMask);
 	}
 
 	public static TableType getTableType(Entity entity) {
@@ -112,12 +115,47 @@ public enum TableType {
 			if (typeMask == null) {
 				typeMask = ViewTypeMask.getMaskForDepricatedType(view.getType());
 			}
-			return getTableType(typeMask);
+			return new TableType(EntityView.class, Math.toIntExact(typeMask));
 		}
 		return null;
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		TableType tableType = (TableType) o;
+		return clazz.equals(tableType.clazz) && this.viewTypeMask == ((TableType) o).viewTypeMask;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(clazz, this.viewTypeMask);
+	}
+
 	public String getDisplayName() {
-		return this.displayName;
+		if (this.clazz == TableEntity.class) {
+			return DisplayConstants.TABLE;
+		}
+		if (this.clazz == SubmissionView.class) {
+			return DisplayConstants.SUBMISSION_VIEW;
+		}
+		if (this.clazz == Dataset.class) {
+			return DisplayConstants.DATASET;
+		}
+		if (this.clazz == EntityView.class) {
+			// For EntityViews, the display name depends on the mask
+			if (this.getViewTypeMask().equals(FILE)) {
+				// Files only -> "File View"
+				return DisplayConstants.FILE_VIEW;
+			} else if (this.getViewTypeMask().equals(PROJECT)) {
+				// Projects only -> "Project View"
+				return DisplayConstants.PROJECT_VIEW;
+			} else {
+				// Otherwise, just "View"
+				return DisplayConstants.VIEW;
+			}
+		}
+		return DisplayConstants.TABLE;
 	}
 }

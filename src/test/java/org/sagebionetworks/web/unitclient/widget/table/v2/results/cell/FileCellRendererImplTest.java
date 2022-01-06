@@ -80,7 +80,7 @@ public class FileCellRendererImplTest {
 
 	@Test
 	public void testCreateAnchorHrefView() {
-		tableType = TableType.projects;
+		tableType = TableType.project_view;
 		address = new CellAddress(tableId, column, rowId, rowVersion, tableType);
 		renderer.setCellAddresss(address);
 		renderer.setValue(fileHandleId);
@@ -90,7 +90,7 @@ public class FileCellRendererImplTest {
 
 	@Test
 	public void testCreateAnchorHrefFileViewMissingRowId() {
-		tableType = TableType.files;
+		tableType = TableType.file_view;
 		rowId = null;
 		address = new CellAddress(tableId, column, rowId, rowVersion, tableType);
 		renderer.setCellAddresss(address);

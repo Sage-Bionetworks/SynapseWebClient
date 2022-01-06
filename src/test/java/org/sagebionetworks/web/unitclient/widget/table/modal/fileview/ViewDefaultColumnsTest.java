@@ -63,16 +63,16 @@ public class ViewDefaultColumnsTest {
 		columns = Collections.singletonList(fileColumn);
 		projectColumns = Collections.singletonList(projectColumn);
 		submissionViewColumns = Collections.singletonList(submissionViewColumn);
-		when(mockJsClient.getDefaultColumnsForView(TableType.files.getViewTypeMask())).thenReturn(getDoneFuture(columns));
-		when(mockJsClient.getDefaultColumnsForView(TableType.projects.getViewTypeMask())).thenReturn(getDoneFuture(projectColumns));
+		when(mockJsClient.getDefaultColumnsForView(TableType.file_view.getViewTypeMask())).thenReturn(getDoneFuture(columns));
+		when(mockJsClient.getDefaultColumnsForView(TableType.project_view.getViewTypeMask())).thenReturn(getDoneFuture(projectColumns));
 		when(mockJsClient.getDefaultColumnsForView(ViewEntityType.submissionview)).thenReturn(getDoneFuture(submissionViewColumns));		
 		fileViewDefaultColumns = new ViewDefaultColumns(mockJsClient, adapterFactory, mockPopupUtils);
 	}
 
 	@Test
 	public void testGetDefaultColumnNames() {
-		Set<String> columnNames = fileViewDefaultColumns.getDefaultViewColumnNames(TableType.files);
-		Set<String> projectColumnNames = fileViewDefaultColumns.getDefaultViewColumnNames(TableType.projects);
+		Set<String> columnNames = fileViewDefaultColumns.getDefaultViewColumnNames(TableType.file_view);
+		Set<String> projectColumnNames = fileViewDefaultColumns.getDefaultViewColumnNames(TableType.project_view);
 		Set<String> submissionViewColumnNames = fileViewDefaultColumns.getDefaultViewColumnNames(TableType.submission_view);
 		assertTrue(columnNames.contains(FILE_COLUMN));
 		assertTrue(projectColumnNames.contains(PROJECT_COLUMN));
@@ -81,19 +81,19 @@ public class ViewDefaultColumnsTest {
 
 	@Test
 	public void testInitFailureFailure() {
-		when(mockJsClient.getDefaultColumnsForView(TableType.files.getViewTypeMask())).thenReturn(getFailedFuture(mockException));
+		when(mockJsClient.getDefaultColumnsForView(TableType.file_view.getViewTypeMask())).thenReturn(getFailedFuture(mockException));
 		fileViewDefaultColumns = new ViewDefaultColumns(mockJsClient, adapterFactory, mockPopupUtils);
 
-		verify(mockJsClient, times(2)).getDefaultColumnsForView(TableType.files.getViewTypeMask());
+		verify(mockJsClient, times(2)).getDefaultColumnsForView(TableType.file_view.getViewTypeMask());
 		verify(mockPopupUtils).showErrorMessage(errorMessage);
 	}
 
 	@Test
 	public void testProjectInitFailure() {
-		when(mockJsClient.getDefaultColumnsForView(TableType.projects.getViewTypeMask())).thenReturn(getFailedFuture(mockException));
+		when(mockJsClient.getDefaultColumnsForView(TableType.project_view.getViewTypeMask())).thenReturn(getFailedFuture(mockException));
 		fileViewDefaultColumns = new ViewDefaultColumns(mockJsClient, adapterFactory, mockPopupUtils);
 
-		verify(mockJsClient, times(2)).getDefaultColumnsForView(TableType.projects.getViewTypeMask());
+		verify(mockJsClient, times(2)).getDefaultColumnsForView(TableType.project_view.getViewTypeMask());
 		verify(mockPopupUtils).showErrorMessage(errorMessage);
 	}
 

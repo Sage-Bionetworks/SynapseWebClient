@@ -45,6 +45,10 @@ public interface CreateTableViewWizardStep1View extends IsWidget {
 
 	void setIsFolderSelected(boolean selected);
 
+	boolean isDatasetSelected();
+
+	void setIsDatasetSelected(boolean selected);
+
 	public interface Presenter {
 		void updateViewTypeMask();
 	}

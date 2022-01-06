@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
+import static org.sagebionetworks.web.client.EntityTypeUtils.getFriendlyEntityTypeName;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.CONTAINER;
 import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.PROJECT;
@@ -434,7 +435,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.entity = entityBundle.getEntity();
 		this.isUserAuthenticated = authenticationController.isLoggedIn();
 		this.isCurrentVersion = isCurrentVersion;
-		this.entityTypeDisplay = EntityTypeUtils.getDisplayName(EntityTypeUtils.getEntityTypeForClass(entityBundle.getEntity().getClass()));
+		this.entityTypeDisplay = getFriendlyEntityTypeName(entityBundle.getEntity());
 		this.currentArea = currentArea;
 
 		// hide all commands by default
@@ -1196,7 +1197,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 
 	public void onAddFileView() {
 		preflightController.checkCreateEntity(entityBundle, EntityView.class.getName(), () -> {
-			postCheckCreateTableOrView(TableType.files);
+			postCheckCreateTableOrView(TableType.file_view);
 		});
 	}
 
@@ -1209,7 +1210,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 
 	public void onAddProjectView() {
 		preflightController.checkCreateEntity(entityBundle, EntityView.class.getName(), () -> {
-			postCheckCreateTableOrView(TableType.projects);
+			postCheckCreateTableOrView(TableType.project_view);
 		});
 	}
 
