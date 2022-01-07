@@ -2129,6 +2129,11 @@
   resolved "https://registry.yarnpkg.com/@types/tapable/-/tapable-1.0.8.tgz#b94a4391c85666c7b73299fd3ad79d4faa435310"
   integrity sha512-ipixuVrh2OdNmauvtT51o3d8z12p6LtFW9in7U79der/kwejjdNchQC5UMn5u/KxNoM7VHHOs/l8KS8uHxhODQ==
 
+"@types/ua-parser-js@^0.7.36":
+  version "0.7.36"
+  resolved "https://registry.yarnpkg.com/@types/ua-parser-js/-/ua-parser-js-0.7.36.tgz#9bd0b47f26b5a3151be21ba4ce9f5fa457c5f190"
+  integrity sha512-N1rW+njavs70y2cApeIw1vLMYXRwfBy+7trgavGuuTfOd7j1Yh7QTRc/yqsPl6ncokt72ZXuxEU0PiCp9bSwNQ==
+
 "@types/uglify-js@*":
   version "3.13.1"
   resolved "https://registry.yarnpkg.com/@types/uglify-js/-/uglify-js-3.13.1.tgz#5e889e9e81e94245c75b6450600e1c5ea2878aea"
@@ -11663,10 +11668,10 @@ symbol-tree@^3.2.4:
   resolved "https://registry.yarnpkg.com/symbol-tree/-/symbol-tree-3.2.4.tgz#430637d248ba77e078883951fb9aa0eed7c63fa2"
   integrity sha512-9QNk5KwDF+Bvz+PyObkmSYjI5ksVUYtjW7AU22r2NKcfLJcXp96hkDWU3+XndOsUb+AQ9QhfzfCT2O+CNWT5Tw==
 
-synapse-react-client@2.1.3:
-  version "2.1.3"
-  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-2.1.3.tgz#1fecdf5a5d7ab165ccb59ab4a0ff9d48ade2d51f"
-  integrity sha512-iG2MRekBuZf+j6ZlYi87zhwp1AoWUCCs/W6kgh1QP/QsgLwB3wy5IWYp5/PggQeVZ5HUGVsa5Yxn6lNCIeC2zw==
+synapse-react-client@2.1.4:
+  version "2.1.4"
+  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-2.1.4.tgz#df359896be584f9cb343ee2b36e7d1173ab46a80"
+  integrity sha512-w5Ko4oYEUrU2dB3WJo1P+FagcP5QrKAabcAJx9s4nidOR52KKwdktMg6+2KAVwOLDzxqnoa4XLMFloWmZf9uqg==
   dependencies:
     "@brainhubeu/react-carousel" "1.19.26"
     "@fortawesome/fontawesome-free" "^5.13.0"
@@ -11681,6 +11686,7 @@ synapse-react-client@2.1.3:
     "@rjsf/core" "^3.0.0"
     "@sage-bionetworks/react-base-table" "^1.12.3"
     "@sage-bionetworks/rjsf-core" "^3.1.4"
+    "@types/ua-parser-js" "^0.7.36"
     "@upsetjs/react" "^1.6.2"
     animate.css "^4.1.1"
     bootstrap "^4.6.1"
@@ -11742,6 +11748,7 @@ synapse-react-client@2.1.3:
     spark-md5 "^3.0.0"
     sql-parser "^0.5.0"
     tslib "^2.3.1"
+    ua-parser-js "^1.0.2"
     universal-cookie "^4.0.3"
     use-deep-compare-effect "^1.3.1"
 
@@ -12097,6 +12104,11 @@ typedarray@^0.0.6:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
+
+ua-parser-js@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/ua-parser-js/-/ua-parser-js-1.0.2.tgz#e2976c34dbfb30b15d2c300b2a53eac87c57a775"
+  integrity sha512-00y/AXhx0/SsnI51fTc0rLRmafiGOM4/O+ny10Ps7f+j/b8p/ZY11ytMgznXkOVo4GQ+KwQG5UQLkLGirsACRg==
 
 uc.micro@^1.0.1, uc.micro@^1.0.5:
   version "1.0.6"
