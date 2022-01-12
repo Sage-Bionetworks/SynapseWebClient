@@ -149,7 +149,7 @@ public class CreateTableViewWizardStep2Test {
 	@Test
 	public void testConfigureTable() {
 		widget.configure(mockTableEntity, TableType.table);
-		verify(mockEditor).setAddDefaultViewColumnsButtonVisible(false);
+		verify(mockEditor).setAddDefaultColumnsButtonVisible(false);
 		verify(mockEditor).setAddAnnotationColumnsButtonVisible(false);
 		verify(mockEditor).configure(TableType.table, new ArrayList<ColumnModel>());
 	}
@@ -161,7 +161,7 @@ public class CreateTableViewWizardStep2Test {
 
 		widget.configure(mockEntityView, TableType.file_view);
 		verify(mockEditor).configure(TableType.file_view, new ArrayList<ColumnModel>());
-		verify(mockEditor).setAddDefaultViewColumnsButtonVisible(true);
+		verify(mockEditor).setAddDefaultColumnsButtonVisible(true);
 		verify(mockEditor).setAddAnnotationColumnsButtonVisible(true);
 		verify(mockEditor).addColumns(mockDefaultColumnModels);
 	}
@@ -171,7 +171,7 @@ public class CreateTableViewWizardStep2Test {
 		widget.configure(mockEntityView, TableType.submission_view);
 		
 		verify(mockEditor).configure(TableType.submission_view, new ArrayList<ColumnModel>());
-		verify(mockEditor).setAddDefaultViewColumnsButtonVisible(true);
+		verify(mockEditor).setAddDefaultColumnsButtonVisible(true);
 		verify(mockEditor).setAddAnnotationColumnsButtonVisible(true);
 		verify(mockEditor).addColumns(mockDefaultSubmissionViewColumnModels);
 	}
@@ -184,7 +184,7 @@ public class CreateTableViewWizardStep2Test {
 
 		widget.configure(mockEntityView, TableType.project_view);
 		verify(mockEditor).configure(TableType.project_view, new ArrayList<ColumnModel>());
-		verify(mockEditor).setAddDefaultViewColumnsButtonVisible(true);
+		verify(mockEditor).setAddDefaultColumnsButtonVisible(true);
 		verify(mockEditor).setAddAnnotationColumnsButtonVisible(true);
 		verify(mockEditor).addColumns(mockDefaultProjectColumnModels);
 	}

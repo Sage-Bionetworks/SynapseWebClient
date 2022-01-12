@@ -173,7 +173,9 @@ public interface ColumnModelsView extends IsWidget {
 	 * 
 	 * @param visible
 	 */
-	void setAddDefaultViewColumnsButtonVisible(boolean visible);
+	void setAddDefaultColumnsButtonVisible(boolean visible);
+
+	void setTableTypeDisplayName(String text);
 
 	/**
 	 * Is the Add Annotation Columns Button visible?
