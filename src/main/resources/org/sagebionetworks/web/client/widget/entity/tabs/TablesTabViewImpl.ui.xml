@@ -6,7 +6,16 @@
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	<b:Row ui:field="tablesTabContainer" addStyleNames="tablesTabContent">
 		<g:SimplePanel ui:field="synapseAlertContainer"/>
-		<bh:Div addStyleNames="margin-left-15 margin-right-15 flexcontainer-row">
+        <w:FullWidthAlert ui:field="versionAlert"
+                          alertType="WARNING"
+                          messageTitle="This is a Draft Version of the Dataset"
+                          message="Administrators can edit this version and create a Stable Version for distribution. Go to the Version History to view the Stable Versions"
+                          primaryCTAText="View Version History"
+                          visible="false"
+                          global="false"
+                          addStyleNames="margin-top-minus-48"
+        />
+        <bh:Div addStyleNames="margin-left-15 margin-right-15 flexcontainer-row">
 			<bh:Div addStyleNames="flexcontainer-column flexcontainer-column-fill-width">
 				<g:SimplePanel ui:field="tableBreadcrumbContainer" visible="false"/>
 				<g:SimplePanel ui:field="tableTitlebarContainer" visible="false"/>

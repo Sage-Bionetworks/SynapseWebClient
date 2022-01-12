@@ -14,8 +14,9 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class FullWidthAlert implements IsWidget {
 	ReactComponentDiv container;
-	String title, message, primaryButtonText, secondaryButtonText, secondaryButtonHref, alertType;
+	String title, message, primaryButtonText, secondaryButtonText, alertType;
 	FullWidthAlertProps.Callback onPrimaryClick;
+	FullWidthAlertProps.Callback onSecondaryClick;
 	FullWidthAlertProps.Callback onClose = new FullWidthAlertProps.Callback() {
 		@Override
 		public void run() {
@@ -33,7 +34,7 @@ public class FullWidthAlert implements IsWidget {
 	
 	private void rerender() {
 		Double autoCloseAfterDelayInSeconds = null;
-		FullWidthAlertProps props = FullWidthAlertProps.create(title, message, primaryButtonText, onPrimaryClick, secondaryButtonText, secondaryButtonHref, onClose, autoCloseAfterDelayInSeconds, isGlobal, alertType);
+		FullWidthAlertProps props = FullWidthAlertProps.create(title, message, primaryButtonText, onPrimaryClick, secondaryButtonText, onSecondaryClick, onClose, autoCloseAfterDelayInSeconds, isGlobal, alertType);
 		ReactElement component = React.createElement(SRC.SynapseComponents.FullWidthAlert, props);
 		ReactDOM.render(component, container.getElement());	
 	}
@@ -92,6 +93,12 @@ public class FullWidthAlert implements IsWidget {
 		rerender();
 	}
 
+	public void addSecondaryCTAClickHandler(ClickHandler c) {
+		this.onSecondaryClick = () -> c.onClick(null);
+		rerender();
+	}
+
+
 	public void setPrimaryCTAText(String text) {
 		String newText = text != null ? text.toUpperCase() : null;
 		this.primaryButtonText = newText;
@@ -105,8 +112,9 @@ public class FullWidthAlert implements IsWidget {
 	}
 
 	public void setSecondaryCTAHref(String href) {
-		this.secondaryButtonHref = href;
-		rerender();
+		addSecondaryCTAClickHandler(event -> {
+			Window.open(href, "_blank", "");
+		});
 	}
 
 	public void setAlertType(AlertType type) {
