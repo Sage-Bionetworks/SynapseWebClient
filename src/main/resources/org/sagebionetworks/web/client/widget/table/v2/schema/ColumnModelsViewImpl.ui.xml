@@ -63,7 +63,7 @@
 		<b:Button ui:field="editColumnsButton" icon="GEAR"
 			type="INFO">Edit
 			Schema</b:Button>
-		<b:Button ui:field="addDefaultViewColumnsButton"
+		<b:Button ui:field="addDefaultColumnsButton"
 			type="DEFAULT" visible="false" addStyleNames="margin-left-5">Add
 			Default View Columns</b:Button>
 		<b:Button ui:field="addAnnotationColumnsButton"

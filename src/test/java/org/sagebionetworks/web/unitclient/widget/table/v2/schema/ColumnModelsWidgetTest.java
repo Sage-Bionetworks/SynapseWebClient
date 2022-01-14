@@ -181,7 +181,7 @@ public class ColumnModelsWidgetTest {
 		// All rows should be added to both the viewer and editor
 		verify(mockViewer).addColumns(columnModelTableRowsCaptor.capture());
 		assertEquals(schema.size(), columnModelTableRowsCaptor.getValue().size());
-		verify(mockEditor).setAddDefaultViewColumnsButtonVisible(false);
+		verify(mockEditor).setAddDefaultColumnsButtonVisible(false);
 	}
 
 	@Test
@@ -195,7 +195,7 @@ public class ColumnModelsWidgetTest {
 		// All rows should be added to both the viewer and editor
 		verify(mockViewer).addColumns(columnModelTableRowsCaptor.capture());
 		assertEquals(schema.size(), columnModelTableRowsCaptor.getValue().size());
-		verify(mockEditor).setAddDefaultViewColumnsButtonVisible(true);
+		verify(mockEditor).setAddDefaultColumnsButtonVisible(true);
 	}
 	
 	@Test
@@ -209,7 +209,7 @@ public class ColumnModelsWidgetTest {
 		// All rows should be added to both the viewer and editor
 		verify(mockViewer).addColumns(columnModelTableRowsCaptor.capture());
 		assertEquals(schema.size(), columnModelTableRowsCaptor.getValue().size());
-		verify(mockEditor).setAddDefaultViewColumnsButtonVisible(true);
+		verify(mockEditor).setAddDefaultColumnsButtonVisible(true);
 	}
 
 	@Test
