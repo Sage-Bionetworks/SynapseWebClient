@@ -25,6 +25,8 @@ public class ActionMenuWidgetImpl implements ActionMenuWidget, ActionListener {
 	Map<Action, ActionView> actionViewMap;
 	Map<Action, List<ActionListener>> actionListenerMap;
 
+	private boolean isLoading = false;
+
 	@Inject
 	public ActionMenuWidgetImpl(ActionMenuWidgetView view) {
 		this.view = view;
@@ -54,9 +56,7 @@ public class ActionMenuWidgetImpl implements ActionMenuWidget, ActionListener {
 	@Override
 	public void setActionVisible(Action action, boolean visible) {
 		getActionView(action).setVisible(visible);
-		if (visible) {
-			view.setNoActionsAvailableVisible(false);
-		}
+		updateViewWithNumberOfActionsVisible();
 	}
 
 	@Override
@@ -120,7 +120,25 @@ public class ActionMenuWidgetImpl implements ActionMenuWidget, ActionListener {
 			getActionView(action).setVisible(false);
 		}
 		setACTDividerVisible(false);
-		view.setNoActionsAvailableVisible(true);
+		updateViewWithNumberOfActionsVisible();
+	}
+
+	private void updateViewWithNumberOfActionsVisible() {
+		int numVisible = 0;
+		Action singleAction = null;
+		for (Action action : this.actionListenerMap.keySet()) {
+			if (getActionView(action).isVisible()) {
+				numVisible++;
+				singleAction = action;
+			}
+		}
+
+		if (numVisible == 1) {
+			final Action finalSingleAction = singleAction;
+			view.setSingleActionButton(actionViewMap.get(singleAction).getText(), clickEvent -> onAction(finalSingleAction));
+		}
+
+		view.setActionsVisible(numVisible, isLoading);
 	}
 
 	@Override
@@ -149,7 +167,7 @@ public class ActionMenuWidgetImpl implements ActionMenuWidget, ActionListener {
 	public void setToolsButtonIcon(String text, IconType icon) {
 		view.setToolsButtonIcon(text, icon);
 	}
-	
+
 	@Override
 	public void setTableDownloadOptionsVisible(boolean visible) {
 		view.setTableDownloadOptionsVisible(visible);
@@ -158,5 +176,11 @@ public class ActionMenuWidgetImpl implements ActionMenuWidget, ActionListener {
 	@Override
 	public void setTableDownloadOptionsEnabled(boolean enabled) {
 		view.setDownloadActionsEnabled(enabled);
+	}
+
+	@Override
+	public void setIsLoading(boolean isLoading) {
+		this.isLoading = isLoading;
+		updateViewWithNumberOfActionsVisible();
 	}
 }

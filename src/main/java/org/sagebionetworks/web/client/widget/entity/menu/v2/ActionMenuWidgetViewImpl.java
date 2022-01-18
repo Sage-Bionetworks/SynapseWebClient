@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.menu.v2;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Divider;
 import org.gwtbootstrap3.client.ui.DropDown;
@@ -11,7 +12,14 @@ import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.Trigger;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.web.client.jsinterop.React;
+import org.sagebionetworks.web.client.jsinterop.ReactDOM;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
+import org.sagebionetworks.web.client.jsinterop.SRC;
+import org.sagebionetworks.web.client.jsinterop.SkeletonButtonProps;
+import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.ComplexPanel;
@@ -38,6 +46,8 @@ public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 	@UiField
 	Button toolsMenu;
 
+	@UiField
+	Button singleActionButton;
 	FlowPanel widget;
 	@UiField
 	Divider actDivider;
@@ -55,6 +65,8 @@ public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 	Tooltip addToDownloadListMenuItemTooltip;
 	@UiField
 	Tooltip programmaticOptionsMenuItemTooltip;
+	@UiField
+	ReactComponentDiv skeletonButton;
 
 	@Inject
 	public ActionMenuWidgetViewImpl(Binder binder) {
@@ -104,7 +116,51 @@ public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 		actDivider.setVisible(visible);
 		actHeader.setVisible(visible);
 	}
-	
+
+	@Override
+	public void setActionsVisible(int numActions, boolean isLoading) {
+		if (isLoading) {
+			ReactElement component = React.createElement(SRC.SynapseComponents.SkeletonButton, SkeletonButtonProps.create("Tools Menu"));
+			ReactDOM.render(component, skeletonButton.getElement());
+			skeletonButton.setVisible(true);
+			dropdown.setVisible(false);
+			singleActionButton.setVisible(false);
+		} else if (numActions == 0) {
+			setNoActionsVisible();
+		} else if (numActions == 1) {
+			setOneActionVisible();
+		} else {
+			setMultipleActionsVisible();
+		}
+	}
+
+	@Override
+	public void setSingleActionButton(String buttonText, ClickHandler handler) {
+		singleActionButton.setText(buttonText);
+		singleActionButton.addClickHandler(handler);
+	}
+
+	private void setNoActionsVisible() {
+		noActionsAvailable.setVisible(true);
+		dropdown.setVisible(true);
+		singleActionButton.setVisible(false);
+		skeletonButton.setVisible(false);
+	}
+
+	private void setOneActionVisible() {
+		noActionsAvailable.setVisible(false);
+		dropdown.setVisible(false);
+		singleActionButton.setVisible(true);
+		skeletonButton.setVisible(false);
+	}
+
+	private void setMultipleActionsVisible() {
+		noActionsAvailable.setVisible(false);
+		dropdown.setVisible(true);
+		singleActionButton.setVisible(false);
+		skeletonButton.setVisible(false);
+	}
+
 	@Override
 	public void setTableDownloadOptionsVisible(boolean visible) {
 		tableDownloadOptions.setVisible(visible);
@@ -129,15 +185,10 @@ public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 		addToDownloadListMenuItemTooltip.recreate();
 		programmaticOptionsMenuItemTooltip.recreate();
 	}
-	
+
 	@Override
 	public void setToolsButtonIcon(String text, IconType icon) {
 		toolsMenu.setText(text);
 		toolsMenu.setIcon(icon);
-	}
-
-	@Override
-	public void setNoActionsAvailableVisible(boolean visible) {
-		noActionsAvailable.setVisible(visible);
 	}
 }

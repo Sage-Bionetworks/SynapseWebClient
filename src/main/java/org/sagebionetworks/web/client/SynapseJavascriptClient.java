@@ -901,6 +901,11 @@ public class SynapseJavascriptClient {
 		doGet(url, OBJECT_TYPE.ChallengePagedResults, callback);
 	}
 
+	public FluentFuture<Challenge> getChallengeForProject(String projectId) {
+		String url = getRepoServiceUrl() + ENTITY + "/" + projectId + "/" + CHALLENGE;
+		return getFuture(cb -> doGet(url, OBJECT_TYPE.Challenge, cb));
+	}
+
 	public void getUserBundle(Long principalId, int mask, AsyncCallback<UserBundle> callback) {
 		String url = getRepoServiceUrl() + USER + "/" + principalId + BUNDLE_MASK_PATH + mask;
 		doGet(url, OBJECT_TYPE.UserBundle, callback);

@@ -20,6 +20,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.DisplayConstants.FILE_VIEW;
+import static org.sagebionetworks.web.client.utils.FutureUtils.getDoneFuture;
+import static org.sagebionetworks.web.client.utils.FutureUtils.getFailedFuture;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.ARE_YOU_SURE_YOU_WANT_TO_DELETE;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETE_FOLDER_EXPLANATION;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETE_PREFIX;
@@ -222,8 +224,6 @@ public class EntityActionControllerImplTest {
 	PortalGinInjector mockPortalGinInjector;
 	@Mock
 	IsACTMemberAsyncHandler mockIsACTMemberAsyncHandler;
-	@Captor
-	ArgumentCaptor<CallbackP<Boolean>> callbackPCaptor;
 	@Mock
 	PublicPrincipalIds mockPublicPrincipalIds;
 	@Mock
@@ -302,6 +302,7 @@ public class EntityActionControllerImplTest {
 		when(mockPortalGinInjector.getAddFolderDialogWidget()).thenReturn(mockAddFolderDialogWidget);
 		when(mockPortalGinInjector.creatNewAsynchronousProgressWidget()).thenReturn(mockJobTrackingWidget);
 		when(mockPortalGinInjector.getPromptForValuesModalConfigurationBuilder()).thenReturn(mockPromptModalConfigurationBuilder);
+		when(mockIsACTMemberAsyncHandler.isACTActionAvailable()).thenReturn(getDoneFuture(false));
 		// The controller under test.
 		controller = new EntityActionControllerImpl(mockView, mockPreflightController, mockPortalGinInjector, mockAuthenticationController, mockCookies, mockIsACTMemberAsyncHandler, mockGWT, mockEventBus, mockPopupUtils);
 
@@ -359,7 +360,6 @@ public class EntityActionControllerImplTest {
 	public void testConfigureWithTableEntity() {
 		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
-		verify(mockGWT).scheduleExecution(any(Callback.class), anyInt());
 		// delete
 		verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, true);
 		verify(mockActionMenu).setActionText(Action.DELETE_ENTITY, DELETE_PREFIX + EntityTypeUtils.getDisplayName(EntityType.table));
@@ -396,7 +396,6 @@ public class EntityActionControllerImplTest {
 
 		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
-		verify(mockGWT).scheduleExecution(any(Callback.class), anyInt());
 		// delete
 		verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, true);
 		verify(mockActionMenu).setActionText(Action.DELETE_ENTITY, DELETE_PREFIX + EntityTypeUtils.getDisplayName(EntityType.dataset));
@@ -432,7 +431,6 @@ public class EntityActionControllerImplTest {
 
 		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
-		verify(mockGWT).scheduleExecution(any(Callback.class), anyInt());
 		// delete
 		verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, true);
 		verify(mockActionMenu).setActionText(Action.DELETE_ENTITY, DELETE_PREFIX + FILE_VIEW);
@@ -1875,7 +1873,7 @@ public class EntityActionControllerImplTest {
 		currentEntityArea = null;
 		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
 		entityBundle.setEntity(new Project());
-		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockChallengeClient).getChallengeForProject(anyString(), any(AsyncCallback.class));
+		when(mockSynapseJavascriptClient.getChallengeForProject(anyString())).thenReturn(getFailedFuture(new NotFoundException()));
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		// initially hide, then show
 		InOrder inOrder = inOrder(mockActionMenu);
@@ -1899,7 +1897,7 @@ public class EntityActionControllerImplTest {
 		// currentArea is on the challenge tab
 		currentEntityArea = EntityArea.CHALLENGE;
 		entityBundle.setEntity(new Project());
-		AsyncMockStubber.callSuccessWith(new Challenge()).when(mockChallengeClient).getChallengeForProject(anyString(), any(AsyncCallback.class));
+		when(mockSynapseJavascriptClient.getChallengeForProject(anyString())).thenReturn(getDoneFuture(new Challenge()));
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		verify(mockActionMenu).setActionVisible(Action.DELETE_CHALLENGE, true);
 	}
@@ -1933,7 +1931,7 @@ public class EntityActionControllerImplTest {
 		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
 		entityBundle.setEntity(new Project());
 		String error = "an error";
-		AsyncMockStubber.callFailureWith(new Exception(error)).when(mockChallengeClient).getChallengeForProject(anyString(), any(AsyncCallback.class));
+		when(mockSynapseJavascriptClient.getChallengeForProject(anyString())).thenReturn(getFailedFuture(new Exception(error)));
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		verify(mockActionMenu).setActionVisible(Action.CREATE_CHALLENGE, false);
 		verify(mockView).showErrorMessage(error);
@@ -1980,31 +1978,33 @@ public class EntityActionControllerImplTest {
 	}
 
 	@Test
-	public void testConfigureManageAccessRequirements() {
+	public void testConfigureManageAccessRequirementsAsACTMember() {
 		entityBundle.setEntity(new Folder());
 		entityBundle.setRootWikiId("7890");
+		when(mockIsACTMemberAsyncHandler.isACTActionAvailable()).thenReturn(getDoneFuture(false));
+
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
+
 		verify(mockActionMenu).setActionVisible(Action.MANAGE_ACCESS_REQUIREMENTS, false);
 		verify(mockActionMenu).setActionVisible(Action.APPROVE_USER_ACCESS, false);
-
 		verify(mockActionMenu, never()).setActionVisible(Action.MANAGE_ACCESS_REQUIREMENTS, true);
-		verify(mockIsACTMemberAsyncHandler, atLeastOnce()).isACTActionAvailable(callbackPCaptor.capture());
-		List<CallbackP<Boolean>> isACTCallbacks = callbackPCaptor.getAllValues();
-		for (CallbackP<Boolean> isACTCallback : isACTCallbacks) {
-			isACTCallback.invoke(false);
-		}
-		verify(mockActionMenu, never()).setActionVisible(Action.MANAGE_ACCESS_REQUIREMENTS, true);
-		verify(mockActionMenu, never()).setActionVisible(Action.APPROVE_USER_ACCESS, true);
+		verify(mockIsACTMemberAsyncHandler, atLeastOnce()).isACTActionAvailable();
+	}
 
-		for (CallbackP<Boolean> isACTCallback : isACTCallbacks) {
-			isACTCallback.invoke(true);
-		}
+	@Test
+	public void testConfigureManageAccessRequirementsAsACTMemberAsNonACTMember() {
+		entityBundle.setEntity(new Folder());
+		entityBundle.setRootWikiId("7890");
+		when(mockIsACTMemberAsyncHandler.isACTActionAvailable()).thenReturn(getDoneFuture(true));
+
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 
 		verify(mockActionMenu).setActionVisible(Action.MANAGE_ACCESS_REQUIREMENTS, true);
 		verify(mockActionMenu).setActionVisible(Action.APPROVE_USER_ACCESS, true);
 		verify(mockActionMenu).setActionListener(Action.MANAGE_ACCESS_REQUIREMENTS, controller);
 		verify(mockActionMenu).setACTDividerVisible(true);
 	}
+
 
 	@Test
 	public void testOnManageAccessRequirements() {

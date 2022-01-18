@@ -3,7 +3,9 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui" xmlns:t="urn:import:org.sagebionetworks.web.client.widget.table.v2"
 	xmlns:a="urn:import:org.sagebionetworks.web.client.widget.entity.menu.v2"
-	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
+	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt"
+    xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+    xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 
 	<g:FlowPanel>
 		<b:Tooltip title="Show advanced search">
@@ -33,6 +35,8 @@
 				</b:Tooltip>
 			</b:DropDownMenu>
 		</b:DropDown>
+        <w:ReactComponentDiv ui:field="skeletonButton"  addStyleNames="displayInlineBlock"></w:ReactComponentDiv>
+        <b:Button ui:field="singleActionButton"  addStyleNames="displayInlineBlock"></b:Button>
 		<b:DropDown ui:field="dropdown" addStyleNames="displayInlineBlock">
 			<b:Button icon="GEARS" ui:field="toolsMenu" addStyleNames="toolsMenuButton" dataToggle="DROPDOWN">Tools</b:Button>
 			<b:DropDownMenu ui:field="toolsDropDown"
