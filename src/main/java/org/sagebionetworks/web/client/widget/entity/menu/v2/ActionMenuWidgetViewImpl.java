@@ -118,7 +118,7 @@ public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 	}
 
 	@Override
-	public void setActionsVisible(int numActions, boolean isLoading) {
+	public void updateVisibleActions(int numActions, boolean isLoading) {
 		if (isLoading) {
 			ReactElement component = React.createElement(SRC.SynapseComponents.SkeletonButton, SkeletonButtonProps.create("Tools Menu"));
 			ReactDOM.render(component, skeletonButton.getElement());

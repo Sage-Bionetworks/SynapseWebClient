@@ -138,7 +138,7 @@ public class ActionMenuWidgetImpl implements ActionMenuWidget, ActionListener {
 			view.setSingleActionButton(actionViewMap.get(singleAction).getText(), clickEvent -> onAction(finalSingleAction));
 		}
 
-		view.setActionsVisible(numVisible, isLoading);
+		view.updateVisibleActions(numVisible, isLoading);
 	}
 
 	@Override

@@ -32,7 +32,7 @@ public interface ActionMenuWidgetView extends IsWidget {
 
 	void setACTDividerVisible(boolean visible);
 
-	void setActionsVisible(int numActions, boolean isLoading);
+	void updateVisibleActions(int numActions, boolean isLoading);
 
 	void setTableDownloadOptionsVisible(boolean visible);
 
