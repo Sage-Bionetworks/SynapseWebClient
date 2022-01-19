@@ -19,13 +19,9 @@ public class FullWidthAlertProps extends ReactComponentProps {
 	@JsNullable
 	String description;
 	@JsNullable
-	String primaryButtonText;
+	AlertButtonConfig primaryButtonConfig;
 	@JsNullable
-	Callback onPrimaryButtonClick;
-	@JsNullable
-	String secondaryButtonText;
-	@JsNullable
-	Callback onSecondaryButtonClickOrHref;
+	AlertButtonConfig secondaryButtonConfig;
 	@JsNullable
 	String variant;
 	@JsNullable
@@ -36,17 +32,14 @@ public class FullWidthAlertProps extends ReactComponentProps {
 	Boolean isGlobal;
 
 	@JsOverlay
-	public static FullWidthAlertProps create(String title, String description, String primaryButtonText,
-			Callback onPrimaryButtonClick, String secondaryButtonText,
-			Callback onSecondaryButtonClickOrHref, Callback onClose,
-			Double autoCloseAfterDelayInSeconds, Boolean isGlobal, String variant) {
+	public static FullWidthAlertProps create(String title, String description, AlertButtonConfig primaryButtonConfig,
+			AlertButtonConfig secondaryButtonConfig, Callback onClose, Double autoCloseAfterDelayInSeconds,
+			Boolean isGlobal, String variant) {
 		FullWidthAlertProps props = new FullWidthAlertProps();
 		props.title = title;
 		props.description = description;
-		props.primaryButtonText = primaryButtonText;
-		props.onPrimaryButtonClick = onPrimaryButtonClick;
-		props.secondaryButtonText = secondaryButtonText;
-		props.onSecondaryButtonClickOrHref = onSecondaryButtonClickOrHref;
+		props.primaryButtonConfig = primaryButtonConfig;
+		props.secondaryButtonConfig = secondaryButtonConfig;
 		props.onClose = onClose;
 		props.autoCloseAfterDelayInSeconds = autoCloseAfterDelayInSeconds;
 		props.isGlobal = isGlobal;

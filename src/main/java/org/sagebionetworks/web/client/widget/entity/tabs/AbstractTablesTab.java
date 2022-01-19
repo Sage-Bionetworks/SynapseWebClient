@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.apache.commons.lang3.ObjectUtils;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -62,6 +61,8 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 
 	private static final String VERSION_ALERT_OLD_SNAPSHOT_DATASET_TITLE = "There is a newer Stable Version of this Dataset";
 	private static final String VERSION_ALERT_OLD_SNAPSHOT_DATASET_MESSAGE = "Go to the latest Stable Version, or view the Version History for all versions.";
+	public static final String GO_TO_LATEST_STABLE_VERSION = "Go to Latest Stable Version";
+	public static final String NO_STABLE_VERSIONS_OF_THIS_DATASET = "There are currently no Stable Versions of this Dataset";
 
 
 	Tab tab;
@@ -356,17 +357,34 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 					// Reconfigure the version alert to update the button text.
 					configureVersionAlert();
 				});
-		this.view.setVersionAlertSecondaryAction("Go to Latest Stable Version",
-				e -> ginInjector.getGlobalApplicationState()
-						.getPlaceChanger()
-						.goTo(new Synapse(entityBundle.getEntity().getId(),
-								latestSnapshotVersionNumber, EntityArea.DATASETS, null)
-						));
 		if (entityBundle.getEntity() instanceof Dataset && ((Dataset) entityBundle.getEntity()).getIsLatestVersion()) {
-			// This is the 'draft' version of the dataset, notify that a stable version exists
+			// This is the 'draft' version of the dataset
 			this.view.setVersionAlertVisible(true);
 			this.view.setVersionAlertCopy(VERSION_ALERT_DRAFT_DATASET_TITLE, VERSION_ALERT_DRAFT_DATASET_MESSAGE);
-		} else if (entityBundle.getEntity() instanceof Dataset && ObjectUtils.compare(version, latestSnapshotVersionNumber) != 0) {
+			if (latestSnapshotVersionNumber == null) {
+				// No stable version exists
+				this.view.setVersionAlertSecondaryAction(GO_TO_LATEST_STABLE_VERSION,
+						e -> ginInjector.getGlobalApplicationState()
+								.getPlaceChanger()
+								.goTo(new Synapse(entityBundle.getEntity().getId(),
+										latestSnapshotVersionNumber, EntityArea.DATASETS, null)
+								),
+						false,
+						NO_STABLE_VERSIONS_OF_THIS_DATASET);
+
+			} else {
+				// Notify that a stable version exists and link to it
+				this.view.setVersionAlertSecondaryAction(GO_TO_LATEST_STABLE_VERSION,
+						e -> ginInjector.getGlobalApplicationState()
+								.getPlaceChanger()
+								.goTo(new Synapse(entityBundle.getEntity().getId(),
+										latestSnapshotVersionNumber, EntityArea.DATASETS, null)
+								),
+						true,
+						null);
+
+			}
+		} else if (entityBundle.getEntity() instanceof Dataset && !version.equals(latestSnapshotVersionNumber)) {
 			// This is a snapshot/stable version but not the latest version. Notify a more recent stable version exists
 			this.view.setVersionAlertVisible(true);
 			this.view.setVersionAlertCopy(VERSION_ALERT_OLD_SNAPSHOT_DATASET_TITLE, VERSION_ALERT_OLD_SNAPSHOT_DATASET_MESSAGE);

@@ -50,6 +50,6 @@ public interface TablesTabView extends IsWidget {
 
 	void setVersionAlertPrimaryAction(String text, ClickHandler handler);
 
-	void setVersionAlertSecondaryAction(String text, ClickHandler handler);
+	void setVersionAlertSecondaryAction(String text, ClickHandler handler, boolean enabled, String tooltipText);
 
 }

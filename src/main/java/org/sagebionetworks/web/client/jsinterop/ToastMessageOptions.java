@@ -23,23 +23,18 @@ public class ToastMessageOptions extends ReactComponentProps {
     public String title;
     @JsNullable
     public int autoCloseInMs;
-    @JsNullable
-    public String primaryButtonText;
 	@JsNullable
-	Callback onPrimaryButtonClick;
+	public AlertButtonConfig primaryButtonConfig;
+	@JsNullable
+	public AlertButtonConfig secondaryButtonConfig;
 	@JsNullable
 	boolean dismissOnPrimaryButtonClick;
-    @JsNullable
-    String secondaryButtonText;
-	@JsNullable
-	Callback onSecondaryButtonClickOrHref;
 	@JsNullable
 	boolean dismissOnSecondaryButtonClick;
 
     @JsOverlay
-    public static ToastMessageOptions create(String title, Integer autoCloseInMs, String primaryButtonText,
-			Callback onPrimaryButtonClick, boolean dismissOnPrimaryButtonClick, String secondaryButtonText,
-			Callback onSecondaryButtonClick, boolean dismissOnSecondaryButtonClick) {
+    public static ToastMessageOptions create(String title, Integer autoCloseInMs, AlertButtonConfig primaryButtonConfig,
+			boolean dismissOnPrimaryButtonClick, AlertButtonConfig secondaryButtonConfig, boolean dismissOnSecondaryButtonClick) {
         if (autoCloseInMs == null) {
             autoCloseInMs = DEFAULT_TOAST_TIMEOUT_MS;
         }
@@ -47,17 +42,15 @@ public class ToastMessageOptions extends ReactComponentProps {
         ToastMessageOptions options = new ToastMessageOptions();
         options.title = title;
         options.autoCloseInMs = autoCloseInMs;
-        options.primaryButtonText = primaryButtonText;
-        options.onPrimaryButtonClick = onPrimaryButtonClick;
+        options.primaryButtonConfig = primaryButtonConfig;
+        options.secondaryButtonConfig = secondaryButtonConfig;
 		options.dismissOnPrimaryButtonClick = dismissOnPrimaryButtonClick;
-        options.secondaryButtonText = secondaryButtonText;
-        options.onSecondaryButtonClickOrHref = onSecondaryButtonClick;
 		options.dismissOnSecondaryButtonClick = dismissOnSecondaryButtonClick;
         return options;
     }
 
     @JsOverlay
-    public static ToastMessageOptions create(String title, Integer autoCloseInMs, String primaryButtonText, Callback onPrimaryButtonClick) {
+    public static ToastMessageOptions create(String title, Integer autoCloseInMs, String primaryButtonText, AlertButtonConfig.Callback onPrimaryButtonClick) {
         if (autoCloseInMs == null) {
             autoCloseInMs = DEFAULT_TOAST_TIMEOUT_MS;
         }
@@ -65,8 +58,7 @@ public class ToastMessageOptions extends ReactComponentProps {
         ToastMessageOptions options = new ToastMessageOptions();
         options.title = title;
         options.autoCloseInMs = autoCloseInMs;
-        options.primaryButtonText = primaryButtonText;
-        options.onPrimaryButtonClick = onPrimaryButtonClick;
+        options.primaryButtonConfig = AlertButtonConfig.create(primaryButtonText, onPrimaryButtonClick);
         return options;
     }
 
@@ -74,10 +66,10 @@ public class ToastMessageOptions extends ReactComponentProps {
         private String title;
         private Integer autoCloseInMs;
         private String primaryButtonText;
-        private Callback onPrimaryButtonClick;
+        private AlertButtonConfig.Callback onPrimaryButtonClick;
 		private boolean dismissOnPrimaryButtonClick;
         private String secondaryButtonText;
-        private Callback onSecondaryButtonClickOrHref;
+        private AlertButtonConfig.Callback onSecondaryButtonClickOrHref;
 		private boolean dismissOnSecondaryButtonClick;
 
 		public Builder() {
@@ -93,14 +85,14 @@ public class ToastMessageOptions extends ReactComponentProps {
             return this;
         }
 
-		public Builder setPrimaryButton(String text, Callback onClick, boolean dismissOnPrimaryButtonClick) {
+		public Builder setPrimaryButton(String text, AlertButtonConfig.Callback onClick, boolean dismissOnPrimaryButtonClick) {
 			this.primaryButtonText = text;
 			this.onPrimaryButtonClick = onClick;
 			this.dismissOnPrimaryButtonClick = dismissOnPrimaryButtonClick;
 			return this;
 		}
 
-		public Builder setPrimaryButton(String text, Callback onClick) {
+		public Builder setPrimaryButton(String text, AlertButtonConfig.Callback onClick) {
 			return setPrimaryButton(text, onClick, false);
 		}
 
@@ -137,22 +129,24 @@ public class ToastMessageOptions extends ReactComponentProps {
 			return setSecondaryButton(text, getCallbackForHref(href, currentWindow));
 		}
 
-		public Builder setSecondaryButton(String text, Callback onClick, boolean dismissOnClick) {
+		public Builder setSecondaryButton(String text, AlertButtonConfig.Callback onClick, boolean dismissOnClick) {
 			this.secondaryButtonText = text;
 			this.onSecondaryButtonClickOrHref = onClick;
 			this.dismissOnSecondaryButtonClick = dismissOnClick;
 			return this;
 		}
 
-		public Builder setSecondaryButton(String text, Callback onClick) {
+		public Builder setSecondaryButton(String text, AlertButtonConfig.Callback onClick) {
 			return setSecondaryButton(text, onClick, false);
 		}
 
 		public ToastMessageOptions build() {
-            return ToastMessageOptions.create(title, autoCloseInMs, primaryButtonText, onPrimaryButtonClick, dismissOnPrimaryButtonClick, secondaryButtonText, onSecondaryButtonClickOrHref, dismissOnSecondaryButtonClick);
+			AlertButtonConfig primaryButtonConfig = AlertButtonConfig.create(primaryButtonText, onPrimaryButtonClick);
+			AlertButtonConfig secondaryButtonConfig = AlertButtonConfig.create(secondaryButtonText, onSecondaryButtonClickOrHref);
+            return ToastMessageOptions.create(title, autoCloseInMs, primaryButtonConfig, dismissOnPrimaryButtonClick, secondaryButtonConfig, dismissOnSecondaryButtonClick);
         }
 
-		private Callback getCallbackForHref(String href, boolean currentWindow) {
+		private AlertButtonConfig.Callback getCallbackForHref(String href, boolean currentWindow) {
 			if (currentWindow) {
 				return () -> Window.Location.assign(href);
 			} else {

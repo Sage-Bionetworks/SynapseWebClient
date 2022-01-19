@@ -174,9 +174,11 @@ public class TablesTabViewImpl implements TablesTabView {
 	}
 
 	@Override
-	public void setVersionAlertSecondaryAction(String text, ClickHandler handler) {
+	public void setVersionAlertSecondaryAction(String text, ClickHandler handler, boolean enabled, String tooltipText) {
 		versionAlert.setSecondaryCTAText(text);
 		versionAlert.addSecondaryCTAClickHandler(handler);
+		versionAlert.setSecondaryButtonEnabled(enabled);
+		versionAlert.setSecondaryButtonTooltipText(tooltipText);
 	}
 
 }
