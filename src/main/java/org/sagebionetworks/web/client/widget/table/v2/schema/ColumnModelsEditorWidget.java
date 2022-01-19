@@ -18,7 +18,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.ViewDefaultColumns;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.ViewType;
-import com.google.gwt.core.client.GWT;
+
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -123,6 +123,7 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 		columnModelIds.clear();
 		this.editorRows.clear();
 		editor.configure(ViewType.EDITOR, true);
+		editor.setTableTypeDisplayName(tableType.getDisplayName());
 		addColumns(this.startingModels);
 	}
 
@@ -319,8 +320,8 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 		return valid;
 	}
 
-	public void setAddDefaultViewColumnsButtonVisible(boolean visible) {
-		editor.setAddDefaultViewColumnsButtonVisible(visible);
+	public void setAddDefaultColumnsButtonVisible(boolean visible) {
+		editor.setAddDefaultColumnsButtonVisible(visible);
 	}
 
 	public void setOnAddDefaultViewColumnsCallback(Callback onAddDefaultViewColumnsCallback) {

@@ -56,7 +56,7 @@ public class ColumnModelsViewImpl extends Composite implements ColumnModelsView 
 	@UiField
 	Button editColumnsButton;
 	@UiField
-	Button addDefaultViewColumnsButton;
+	Button addDefaultColumnsButton;
 	@UiField
 	Button addAnnotationColumnsButton;
 	@UiField
@@ -134,7 +134,7 @@ public class ColumnModelsViewImpl extends Composite implements ColumnModelsView 
 				presenter.deleteSelected();
 			}
 		});
-		addDefaultViewColumnsButton.addClickHandler(new ClickHandler() {
+		addDefaultColumnsButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onAddDefaultViewColumns();
@@ -227,8 +227,13 @@ public class ColumnModelsViewImpl extends Composite implements ColumnModelsView 
 	}
 
 	@Override
-	public void setAddDefaultViewColumnsButtonVisible(boolean visible) {
-		addDefaultViewColumnsButton.setVisible(visible);
+	public void setAddDefaultColumnsButtonVisible(boolean visible) {
+		addDefaultColumnsButton.setVisible(visible);
+	}
+
+	@Override
+	public void setTableTypeDisplayName(String displayName) {
+		addDefaultColumnsButton.setText("Add Default " + displayName + " Columns");
 	}
 
 	@Override

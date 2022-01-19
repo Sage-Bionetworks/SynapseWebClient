@@ -99,7 +99,7 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 		editor.configure(tableType, new ArrayList<ColumnModel>());
 
 		boolean isView = !TableType.table.equals(tableType);
-		this.editor.setAddDefaultViewColumnsButtonVisible(isView);
+		this.editor.setAddDefaultColumnsButtonVisible(isView);
 		this.editor.setAddAnnotationColumnsButtonVisible(isView);
 		if (isView) {
 			// start with the default file columns

@@ -108,7 +108,7 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 		// We can get the default columns/annotations for views and datasets
 		boolean isEditableViewOrDataset = isEditable && (bundle.getEntity() instanceof EntityView || bundle.getEntity() instanceof SubmissionView || bundle.getEntity() instanceof Dataset);
 		tableType = TableType.getTableType(bundle.getEntity());
-		editor.setAddDefaultViewColumnsButtonVisible(isEditableViewOrDataset);
+		editor.setAddDefaultColumnsButtonVisible(isEditableViewOrDataset);
 		editor.setAddAnnotationColumnsButtonVisible(isEditableViewOrDataset);
 		List<ColumnModelTableRow> rowViewers = new ArrayList<>();
 		for (ColumnModel cm : startingModels) {
