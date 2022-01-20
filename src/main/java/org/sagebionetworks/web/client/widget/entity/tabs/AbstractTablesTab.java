@@ -45,6 +45,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import com.google.common.base.Function;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.place.shared.Place;
 import com.google.inject.Inject;
 
@@ -361,29 +362,29 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 			// This is the 'draft' version of the dataset
 			this.view.setVersionAlertVisible(true);
 			this.view.setVersionAlertCopy(VERSION_ALERT_DRAFT_DATASET_TITLE, VERSION_ALERT_DRAFT_DATASET_MESSAGE);
-			if (latestSnapshotVersionNumber == null) {
-				// No stable version exists
-				this.view.setVersionAlertSecondaryAction(GO_TO_LATEST_STABLE_VERSION,
-						e -> ginInjector.getGlobalApplicationState()
-								.getPlaceChanger()
-								.goTo(new Synapse(entityBundle.getEntity().getId(),
-										latestSnapshotVersionNumber, EntityArea.DATASETS, null)
-								),
-						false,
-						NO_STABLE_VERSIONS_OF_THIS_DATASET);
+			ClickHandler goToLatestSnapshot = e -> ginInjector.getGlobalApplicationState()
+					.getPlaceChanger()
+					.goTo(new Synapse(entityBundle.getEntity().getId(),
+							latestSnapshotVersionNumber, EntityArea.DATASETS, null)
+					);
+			boolean isLinkToCurrentSnapshotEnabled;
+			String linkToCurrentSnapshotTooltipText;
 
-			} else {
+			boolean stableVersionExists = !(latestSnapshotVersionNumber == null);
+			if (stableVersionExists) {
 				// Notify that a stable version exists and link to it
-				this.view.setVersionAlertSecondaryAction(GO_TO_LATEST_STABLE_VERSION,
-						e -> ginInjector.getGlobalApplicationState()
-								.getPlaceChanger()
-								.goTo(new Synapse(entityBundle.getEntity().getId(),
-										latestSnapshotVersionNumber, EntityArea.DATASETS, null)
-								),
-						true,
-						null);
-
+				isLinkToCurrentSnapshotEnabled = true;
+				linkToCurrentSnapshotTooltipText = null; // no tooltip
+			} else {
+				// No stable version exists, disable the link and add tooltip text
+				isLinkToCurrentSnapshotEnabled = false;
+				linkToCurrentSnapshotTooltipText = NO_STABLE_VERSIONS_OF_THIS_DATASET;
 			}
+
+			this.view.setVersionAlertSecondaryAction(GO_TO_LATEST_STABLE_VERSION,
+					goToLatestSnapshot,
+					isLinkToCurrentSnapshotEnabled,
+					linkToCurrentSnapshotTooltipText);
 		} else if (entityBundle.getEntity() instanceof Dataset && !version.equals(latestSnapshotVersionNumber)) {
 			// This is a snapshot/stable version but not the latest version. Notify a more recent stable version exists
 			this.view.setVersionAlertVisible(true);
