@@ -1,13 +1,21 @@
 package org.sagebionetworks.web.client.widget.asynch;
 
+import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import static org.sagebionetworks.web.client.presenter.ProfilePresenter.IS_ACT_MEMBER;
+import static org.sagebionetworks.web.client.utils.FutureUtils.getDoneFuture;
+import static org.sagebionetworks.web.client.utils.FutureUtils.getFuture;
+
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
+
+import com.google.common.util.concurrent.FluentFuture;
+import com.google.common.util.concurrent.FutureCallback;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
@@ -47,24 +55,16 @@ public class IsACTMemberAsyncHandlerImpl implements IsACTMemberAsyncHandler {
 	}
 
 	@Override
+	public FluentFuture<Boolean> isACTActionAvailable() {
+		return isACTMember().transform(isActMember -> isActMember && visible, directExecutor());
+	}
+
+	@Override
 	public void isACTMember(final CallbackP<Boolean> callback) {
-		if (!authController.isLoggedIn()) {
-			callback.invoke(false);
-			return;
-		}
-
-		String cachedValue = sessionStorage.getItem(SESSION_KEY_PREFIX + authController.getCurrentUserPrincipalId());
-		if (cachedValue != null) {
-			callback.invoke(Boolean.valueOf(cachedValue));
-			return;
-		}
-
-		// do rpc
-		userProfileClient.getMyOwnUserBundle(IS_ACT_MEMBER, new AsyncCallback<UserBundle>() {
+		this.isACTMember().addCallback(new FutureCallback<Boolean>() {
 			@Override
-			public void onSuccess(UserBundle userBundle) {
-				sessionStorage.setItem(SESSION_KEY_PREFIX + authController.getCurrentUserPrincipalId(), userBundle.getIsACTMember().toString());
-				callback.invoke(userBundle.getIsACTMember());
+			public void onSuccess(@NullableDecl Boolean result) {
+				callback.invoke(result);
 			}
 
 			@Override
@@ -73,8 +73,38 @@ public class IsACTMemberAsyncHandlerImpl implements IsACTMemberAsyncHandler {
 				// look at if something goes wrong for an ACT member)
 				jsniUtils.consoleError(caught.getMessage());
 				callback.invoke(false);
+
 			}
-		});
+		}, directExecutor());
+	}
+
+	@Override
+	public FluentFuture<Boolean> isACTMember() {
+		if (!authController.isLoggedIn()) {
+			return getDoneFuture(false);
+		}
+
+		String cachedValue = sessionStorage.getItem(SESSION_KEY_PREFIX + authController.getCurrentUserPrincipalId());
+		if (cachedValue != null) {
+			return getDoneFuture(Boolean.valueOf(cachedValue));
+		}
+
+		// do rpc
+		return getFuture(cb -> userProfileClient.getMyOwnUserBundle(IS_ACT_MEMBER, new AsyncCallback<UserBundle>() {
+			@Override
+			public void onSuccess(UserBundle userBundle) {
+				sessionStorage.setItem(SESSION_KEY_PREFIX + authController.getCurrentUserPrincipalId(), userBundle.getIsACTMember().toString());
+				cb.onSuccess(userBundle.getIsACTMember());
+			}
+
+			@Override
+			public void onFailure(Throwable caught) {
+				// log the error, and tell client that user is not part of the ACT (give the developer something to
+				// look at if something goes wrong for an ACT member)
+				jsniUtils.consoleError(caught.getMessage());
+				cb.onSuccess(false);
+			}
+		}));
 	}
 
 	@Override

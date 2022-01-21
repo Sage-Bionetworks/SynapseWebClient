@@ -77,4 +77,6 @@ public interface ActionMenuWidget extends IsWidget, ActionListener {
 	void setTableDownloadOptionsVisible(boolean visible);
 
 	void setTableDownloadOptionsEnabled(boolean enabled);
+
+	void setIsLoading(boolean isLoading);
 }

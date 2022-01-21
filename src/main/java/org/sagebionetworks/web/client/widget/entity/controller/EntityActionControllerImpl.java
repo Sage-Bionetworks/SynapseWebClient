@@ -1,7 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
+import static com.google.common.util.concurrent.Futures.whenAllComplete;
+import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 import static org.sagebionetworks.web.client.EntityTypeUtils.getFriendlyEntityTypeName;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+import static org.sagebionetworks.web.client.utils.FutureUtils.getDoneFuture;
+import static org.sagebionetworks.web.client.utils.FutureUtils.getFuture;
 import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.CONTAINER;
 import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.PROJECT;
 
@@ -9,11 +13,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityTypeUtils;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Link;
@@ -94,6 +98,8 @@ import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
+import com.google.common.util.concurrent.FluentFuture;
+import com.google.common.util.concurrent.FutureCallback;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -197,7 +203,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	AddExternalRepoModal addExternalRepoModal;
 	String currentChallengeId;
 	GWTWrapper gwt;
-	Callback reconfigureActionsCallback;
 	WikiPageDeleteConfirmationDialog wikiPageDeleteConfirmationDialog;
 	StatisticsPlotWidget statisticsPlotWidget;
 	ChallengeTab challengeTab;
@@ -223,9 +228,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 
 			@Override
 			public void onCanceled() {}
-		};
-		reconfigureActionsCallback = () -> {
-			reconfigureActions();
 		};
 	}
 
@@ -438,9 +440,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.entityTypeDisplay = getFriendlyEntityTypeName(entityBundle.getEntity());
 		this.currentArea = currentArea;
 
-		// hide all commands by default
-		actionMenu.hideAllActions();
-		gwt.scheduleExecution(reconfigureActionsCallback, 2000);
+		reconfigureActions();
+
 		if (!(entity instanceof Project)) {
 			actionMenu.setToolsButtonIcon(entityTypeDisplay + TOOLS, IconType.GEAR);
 		} else if (currentArea != null) {
@@ -449,6 +450,12 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 
 	private void reconfigureActions() {
+		// make the button a skeleton while we determine what we can show
+		actionMenu.setIsLoading(true);
+
+		// hide all commands by default
+		actionMenu.hideAllActions();
+
 		// Setup the actions
 		configureDeleteAction();
 		configureShareAction();
@@ -457,7 +464,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		configureViewWikiSource();
 		configureAddWikiSubpage();
 		configureCreateTableViewSnapshot();
-		configureReorderWikiSubpages();
 		configureDeleteWikiAction();
 		configureMove();
 		configureLink();
@@ -470,17 +476,25 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		configureCreateOrUpdateDoi();
 		configureEditProjectMetadataAction();
 		configureEditFileMetadataAction();
-		configureCreateChallenge();
-		configureACTCommands();
 		configureTableCommands();
 		configureProjectLevelTableCommands();
-		// TODO: configureDatasetCommands()
 		configureProjectLevelDatasetCommands();
 		configureAddFolder();
 		configureUploadNewFileEntity();
 		configureAddExternalDockerRepo();
 		configureStatisticsPlotAction();
 		configureFullTextSearch();
+
+		// These configuration methods are asynchronous
+		FluentFuture challengeFuture = configureCreateChallenge();
+		FluentFuture actFuture = configureACTCommands();
+		FluentFuture reorderWikiSubpagesFuture = configureReorderWikiSubpages();
+
+		// Show the button
+		FluentFuture.from(whenAllComplete(challengeFuture, actFuture, reorderWikiSubpagesFuture).call(() -> {
+			actionMenu.setIsLoading(false);
+			return null;
+		}, directExecutor()));
 	}
 
 	private void configureStatisticsPlotAction() {
@@ -553,7 +567,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 
 
-	private void configureACTCommands() {
+	private FluentFuture configureACTCommands() {
 		// TODO: remove APPROVE_USER_ACCESS command (after new ACT feature is released, where the system
 		// supports the workflow)
 		actionMenu.setActionVisible(Action.APPROVE_USER_ACCESS, false);
@@ -562,9 +576,10 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		// show ACT commands if this is the Project Settings tools menu, or if the entity is not a project
 		// (looking at a child entity)
 		if (authenticationController.isLoggedIn() && !isTopLevelProjectToolsMenu(entityBundle.getEntity(), currentArea)) {
-			isACTMemberAsyncHandler.isACTActionAvailable(new CallbackP<Boolean>() {
+			FluentFuture future = isACTMemberAsyncHandler.isACTActionAvailable();
+			future.addCallback(new FutureCallback<Boolean>() {
 				@Override
-				public void invoke(Boolean isACT) {
+				public void onSuccess(@NullableDecl Boolean isACT) {
 					if (isACT) {
 						actionMenu.setActionVisible(Action.APPROVE_USER_ACCESS, true);
 						actionMenu.setActionListener(Action.APPROVE_USER_ACCESS, EntityActionControllerImpl.this);
@@ -573,8 +588,15 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 						actionMenu.setACTDividerVisible(true);
 					}
 				}
-			});
+
+				@Override
+				public void onFailure(Throwable caught) {
+					view.showErrorMessage(caught.getMessage());
+				}
+			}, directExecutor());
+			return future;
 		}
+		return getDoneFuture(null);
 	}
 
 	public void onSelectChallengeTeam(String id) {
@@ -617,7 +639,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		}
 	}
 
-	private void configureCreateChallenge() {
+	private FluentFuture configureCreateChallenge() {
 		currentChallengeId = null;
 		actionMenu.setActionVisible(Action.CREATE_CHALLENGE, false);
 		actionMenu.setActionVisible(Action.DELETE_CHALLENGE, false);
@@ -627,7 +649,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			actionMenu.setActionListener(Action.DELETE_CHALLENGE, this);
 
 			// find out if this project has a challenge
-			getChallengeClient().getChallengeForProject(entity.getId(), new AsyncCallback<Challenge>() {
+			FluentFuture<Challenge> future = getSynapseJavascriptClient().getChallengeForProject(entity.getId());
+			future.addCallback(new FutureCallback<Challenge>() {
 				@Override
 				public void onSuccess(Challenge result) {
 					// challenge found
@@ -644,7 +667,11 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 						view.showErrorMessage(caught.getMessage());
 					}
 				}
-			});
+			}, directExecutor());
+			return future;
+		} else {
+			// No need to make a request
+			return getDoneFuture(null);
 		}
 	}
 
@@ -794,23 +821,27 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		}
 	}
 
-	private void configureReorderWikiSubpages() {
+	private FluentFuture configureReorderWikiSubpages() {
 		if (isWikiableConfig(entityBundle.getEntity(), currentArea) && entityBundle.getEntity() instanceof Project && permissions.getCanEdit()) {
 			// shown if there's more than one page
-			getSynapseJavascriptClient().getV2WikiHeaderTree(entityBundle.getEntity().getId(), ObjectType.ENTITY.name(), new AsyncCallback<List<V2WikiHeader>>() {
+			FluentFuture<List<V2WikiHeader>> future = getFuture(cb -> getSynapseJavascriptClient().getV2WikiHeaderTree(entityBundle.getEntity().getId(), ObjectType.ENTITY.name(), cb));
+			future.addCallback(new FutureCallback<List<V2WikiHeader>>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					actionMenu.setActionVisible(Action.REORDER_WIKI_SUBPAGES, false);
 				}
 
+				@Override
 				public void onSuccess(List<V2WikiHeader> wikiHeaders) {
 					boolean isMoreThanOne = wikiHeaders.size() > 1;
 					actionMenu.setActionVisible(Action.REORDER_WIKI_SUBPAGES, isMoreThanOne);
 				};
-			});
+			}, directExecutor());
+			return future;
 		} else {
 			actionMenu.setActionVisible(Action.REORDER_WIKI_SUBPAGES, false);
 		}
+		return getDoneFuture(null);
 	}
 
 	private void configureCreateTableViewSnapshot() {
