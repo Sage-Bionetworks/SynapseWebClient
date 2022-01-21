@@ -1978,7 +1978,7 @@ public class EntityActionControllerImplTest {
 	}
 
 	@Test
-	public void testConfigureManageAccessRequirementsAsACTMember() {
+	public void testConfigureManageAccessRequirementsAsNonACTMember() {
 		entityBundle.setEntity(new Folder());
 		entityBundle.setRootWikiId("7890");
 		when(mockIsACTMemberAsyncHandler.isACTActionAvailable()).thenReturn(getDoneFuture(false));
@@ -1992,7 +1992,7 @@ public class EntityActionControllerImplTest {
 	}
 
 	@Test
-	public void testConfigureManageAccessRequirementsAsACTMemberAsNonACTMember() {
+	public void testConfigureManageAccessRequirementsAsACTMemberAsACTMember() {
 		entityBundle.setEntity(new Folder());
 		entityBundle.setRootWikiId("7890");
 		when(mockIsACTMemberAsyncHandler.isACTActionAvailable()).thenReturn(getDoneFuture(true));
