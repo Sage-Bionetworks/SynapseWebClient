@@ -1,21 +1,26 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
+import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
@@ -37,6 +42,10 @@ import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.common.base.Function;
+import com.google.common.util.concurrent.FluentFuture;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.place.shared.Place;
 import com.google.inject.Inject;
 
@@ -47,6 +56,15 @@ import com.google.inject.Inject;
 public abstract class AbstractTablesTab implements TablesTabView.Presenter, QueryChangeHandler {
 
 	public static final String TABLE_QUERY_PREFIX = "query/";
+
+	private static final String VERSION_ALERT_DRAFT_DATASET_TITLE = "This is a Draft Version of the Dataset";
+	private static final String VERSION_ALERT_DRAFT_DATASET_MESSAGE = "Administrators can edit this version and create a Stable Version for distribution. Go to the Version History to view the Stable Versions";
+
+	private static final String VERSION_ALERT_OLD_SNAPSHOT_DATASET_TITLE = "There is a newer Stable Version of this Dataset";
+	private static final String VERSION_ALERT_OLD_SNAPSHOT_DATASET_MESSAGE = "Go to the latest Stable Version, or view the Version History for all versions.";
+	public static final String GO_TO_LATEST_STABLE_VERSION = "Go to Latest Stable Version";
+	public static final String NO_STABLE_VERSIONS_OF_THIS_DATASET = "There are currently no Stable Versions of this Dataset";
+
 
 	Tab tab;
 	TablesTabView view;
@@ -68,6 +86,8 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 	CallbackP<String> entitySelectedCallback;
 	Long version;
 	WikiPageWidget wikiPageWidget;
+	Long latestSnapshotVersionNumber;
+	SynapseJavascriptClient jsClient;
 
 	protected abstract EntityArea getTabArea();
 
@@ -120,6 +140,7 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 			this.synAlert = ginInjector.getStuAlert();
 			this.modifiedCreatedBy = ginInjector.getModifiedCreatedByWidget();
 			this.wikiPageWidget = ginInjector.getWikiPageWidget();
+			this.jsClient = ginInjector.getSynapseJavascriptClient();
 
 			view.setTitle(getTabDisplayName());
 			view.setBreadcrumb(breadcrumb.asWidget());
@@ -306,14 +327,87 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 				}
 			};
 			wikiPageWidget.setWikiReloadHandler(wikiReloadHandler);
+			getLatestSnapshotVersionNumber()
+					.addCallback(new FutureCallback<Long>() {
+						@Override
+						public void onSuccess(@NullableDecl Long result) {
+							latestSnapshotVersionNumber = result;
+							configureVersionAlert();
+						}
 
+						@Override
+						public void onFailure(Throwable t) {
+							synAlert.showError(t.getMessage());
+						}
+					},
+					directExecutor());
 		} else if (isProject) {
 			areaToken = null;
 			tableListWidget.configure(bundle, getTypesShownInList());
 			view.setWikiPageVisible(false);
 			showProjectLevelUI();
+			configureVersionAlert();
 		}
 	}
 
+	private void configureVersionAlert() {
+		boolean versionHistoryIsVisible = this.metadata.getVersionHistoryWidget().isVisible();
+		this.view.setVersionAlertPrimaryAction((versionHistoryIsVisible ? "Hide" : "Show") + " Version History",
+				e -> {
+					this.metadata.getVersionHistoryWidget().setVisible(!versionHistoryIsVisible);
+					// Reconfigure the version alert to update the button text.
+					configureVersionAlert();
+				});
+		if (entityBundle.getEntity() instanceof Dataset && ((Dataset) entityBundle.getEntity()).getIsLatestVersion()) {
+			// This is the 'draft' version of the dataset
+			this.view.setVersionAlertVisible(true);
+			this.view.setVersionAlertCopy(VERSION_ALERT_DRAFT_DATASET_TITLE, VERSION_ALERT_DRAFT_DATASET_MESSAGE);
+			ClickHandler goToLatestSnapshot = e -> ginInjector.getGlobalApplicationState()
+					.getPlaceChanger()
+					.goTo(new Synapse(entityBundle.getEntity().getId(),
+							latestSnapshotVersionNumber, EntityArea.DATASETS, null)
+					);
+			boolean isLinkToCurrentSnapshotEnabled;
+			String linkToCurrentSnapshotTooltipText;
 
+			boolean stableVersionExists = !(latestSnapshotVersionNumber == null);
+			if (stableVersionExists) {
+				// Notify that a stable version exists and link to it
+				isLinkToCurrentSnapshotEnabled = true;
+				linkToCurrentSnapshotTooltipText = null; // no tooltip
+			} else {
+				// No stable version exists, disable the link and add tooltip text
+				isLinkToCurrentSnapshotEnabled = false;
+				linkToCurrentSnapshotTooltipText = NO_STABLE_VERSIONS_OF_THIS_DATASET;
+			}
+
+			this.view.setVersionAlertSecondaryAction(GO_TO_LATEST_STABLE_VERSION,
+					goToLatestSnapshot,
+					isLinkToCurrentSnapshotEnabled,
+					linkToCurrentSnapshotTooltipText);
+		} else if (entityBundle.getEntity() instanceof Dataset && !version.equals(latestSnapshotVersionNumber)) {
+			// This is a snapshot/stable version but not the latest version. Notify a more recent stable version exists
+			this.view.setVersionAlertVisible(true);
+			this.view.setVersionAlertCopy(VERSION_ALERT_OLD_SNAPSHOT_DATASET_TITLE, VERSION_ALERT_OLD_SNAPSHOT_DATASET_MESSAGE);
+		} else {
+			// Don't show alert on non-datasets
+			// Don't show alert on the latest stable version of a dataset
+			this.view.setVersionAlertVisible(false);
+		}
+	}
+
+	private FluentFuture<Long> getLatestSnapshotVersionNumber() {
+		return jsClient.getEntityVersions(entityBundle.getEntity().getId(), 0, 1)
+				.transform(
+						new Function<List<VersionInfo>, Long>() {
+							@NullableDecl
+							@Override
+							public Long apply(@NullableDecl List<VersionInfo> result) {
+								if (result.size() > 0) {
+									return result.get(0).getVersionNumber();
+								}
+								return null;
+							}
+						}, directExecutor());
+	}
 }

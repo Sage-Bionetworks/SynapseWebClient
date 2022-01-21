@@ -3,6 +3,9 @@ package org.sagebionetworks.web.client.widget.entity.tabs;
 import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.web.client.widget.FullWidthAlert;
+
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -38,6 +41,8 @@ public class TablesTabViewImpl implements TablesTabView {
 	Heading title;
 	@UiField
 	SimplePanel tableWikiPageContainer;
+	@UiField
+	FullWidthAlert versionAlert;
 
 	public interface TabsViewImplUiBinder extends UiBinder<Widget, TablesTabViewImpl> {
 	}
@@ -150,5 +155,31 @@ public class TablesTabViewImpl implements TablesTabView {
 	public void setWikiPageVisible(boolean visible) {
 		tableWikiPageContainer.setVisible(visible);
 	}
+
+	@Override
+	public void setVersionAlertVisible(boolean visible) {
+		versionAlert.setVisible(visible);
+	}
+
+	@Override
+	public void setVersionAlertCopy(String title, String message) {
+		versionAlert.setMessageTitle(title);
+		versionAlert.setMessage(message);
+	}
+
+	@Override
+	public void setVersionAlertPrimaryAction(String text, ClickHandler handler) {
+		versionAlert.setPrimaryCTAText(text);
+		versionAlert.addPrimaryCTAClickHandler(handler);
+	}
+
+	@Override
+	public void setVersionAlertSecondaryAction(String text, ClickHandler handler, boolean enabled, String tooltipText) {
+		versionAlert.setSecondaryCTAText(text);
+		versionAlert.addSecondaryCTAClickHandler(handler);
+		versionAlert.setSecondaryButtonEnabled(enabled);
+		versionAlert.setSecondaryButtonTooltipText(tooltipText);
+	}
+
 }
 

@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
@@ -13,9 +14,12 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.client.utils.FutureUtils.getDoneFuture;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
@@ -31,10 +35,10 @@ import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.Dataset;
-import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.repo.model.table.SortItem;
@@ -50,6 +54,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
+import org.sagebionetworks.web.client.widget.entity.VersionHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
@@ -64,6 +69,7 @@ import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 
+import com.google.common.util.concurrent.FluentFuture;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -84,6 +90,8 @@ public class DatasetsTabTest {
 	@Mock
 	EntityMetadata mockEntityMetadata;
 	@Mock
+	VersionHistoryWidget mockVersionHistoryWidget;
+	@Mock
 	ProvenanceWidget mockProvenanceWidget;
 	@Mock
 	StuAlert mockSynapseAlert;
@@ -96,8 +104,6 @@ public class DatasetsTabTest {
 	EntityBundle mockDatasetBundle;
 	@Mock
 	Dataset mockDataset;
-	@Mock
-	EntityView mockFileViewEntity;
 	@Mock
 	Project mockProjectEntity;
 	@Mock
@@ -126,6 +132,7 @@ public class DatasetsTabTest {
 	String projectName = "a test project";
 	String datasetId = "syn22";
 	String datasetName = "test dataset";
+	Long latestSnapshotVersionNumber = 5L;
 	@Mock
 	QueryTokenProvider mockQueryTokenProvider;
 	@Mock
@@ -170,8 +177,15 @@ public class DatasetsTabTest {
 		when(mockDataset.getName()).thenReturn(datasetName);
 		when(mockDatasetBundle.getPermissions()).thenReturn(mockPermissions);
 
-		when(mockFileViewEntity.getId()).thenReturn(datasetId);
-		when(mockFileViewEntity.getName()).thenReturn(datasetName);
+		VersionInfo latestSnapshot = new VersionInfo();
+		latestSnapshot.setVersionNumber(latestSnapshotVersionNumber);
+
+		List<VersionInfo> versions = Collections.singletonList(latestSnapshot);
+		FluentFuture<List<VersionInfo>> versionsFuture = getDoneFuture(versions);
+		when(mockJsClient.getEntityVersions(anyString(), anyInt(), anyInt())).thenReturn(versionsFuture);
+
+		when(mockEntityMetadata.getVersionHistoryWidget()).thenReturn(mockVersionHistoryWidget);
+		when(mockVersionHistoryWidget.isVisible()).thenReturn(false);
 
 		// setup a complex query.
 		query = new Query();
@@ -280,6 +294,8 @@ public class DatasetsTabTest {
 		verify(mockView, never()).setTableUIVisible(true);
 		verify(mockActionMenuWidget).setTableDownloadOptionsVisible(false);
 		verify(mockView).setWikiPageVisible(false);
+		verify(mockView).setVersionAlertVisible(false);
+		verify(mockView, never()).setVersionAlertVisible(true);
 
 		verify(mockTableListWidget).configure(mockProjectEntityBundle, Arrays.asList(EntityType.dataset));
 
@@ -488,5 +504,50 @@ public class DatasetsTabTest {
 
 		verify(mockActionMenuWidget).setTableDownloadOptionsEnabled(true);
 
+	}
+
+	@Test
+	public void testNoVersionAlertOnLatestSnapshot() {
+		String areaToken = null;
+
+		// The latest snapshot version is 5:
+		Long version = latestSnapshotVersionNumber;
+		when(mockDataset.getIsLatestVersion()).thenReturn(false); // "latest" version is draft only
+
+
+		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
+		tab.configure(mockDatasetBundle, version, areaToken);
+
+		verify(mockView).setVersionAlertVisible(false);
+	}
+
+	@Test // SWC-5872
+	public void testShowAlertOnDraftVersion() {
+		String areaToken = null;
+
+		// Draft version has the following properties:
+		Long version = null;
+		when(mockDataset.getIsLatestVersion()).thenReturn(true);
+
+
+		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
+		tab.configure(mockDatasetBundle, version, areaToken);
+
+		verify(mockView).setVersionAlertVisible(true);
+	}
+
+	@Test // SWC-5877
+	public void testShowAlertOnOldSnapshotVersion() {
+		String areaToken = null;
+
+		Long version = latestSnapshotVersionNumber - 1; // A more recent snapshot exists
+		when(mockDataset.getIsLatestVersion()).thenReturn(false);
+
+
+		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
+		tab.configure(mockDatasetBundle, version, areaToken);
+
+
+		verify(mockView).setVersionAlertVisible(true);
 	}
 }

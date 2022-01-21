@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -42,5 +43,13 @@ public interface TablesTabView extends IsWidget {
 	void setWikiPage(Widget w);
 
 	void setWikiPageVisible(boolean visible);
+
+	void setVersionAlertVisible(boolean visible);
+
+	void setVersionAlertCopy(String title, String message);
+
+	void setVersionAlertPrimaryAction(String text, ClickHandler handler);
+
+	void setVersionAlertSecondaryAction(String text, ClickHandler handler, boolean enabled, String tooltipText);
 
 }

@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
@@ -13,9 +14,12 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.client.utils.FutureUtils.getDoneFuture;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
@@ -31,6 +35,7 @@ import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.EntityView;
@@ -50,6 +55,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
+import org.sagebionetworks.web.client.widget.entity.VersionHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
@@ -64,6 +70,7 @@ import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 
+import com.google.common.util.concurrent.FluentFuture;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -83,6 +90,8 @@ public class TablesTabTest {
 	Breadcrumb mockBreadcrumb;
 	@Mock
 	EntityMetadata mockEntityMetadata;
+	@Mock
+	VersionHistoryWidget mockVersionHistoryWidget;
 	@Mock
 	ProvenanceWidget mockProvenanceWidget;
 	@Mock
@@ -126,6 +135,7 @@ public class TablesTabTest {
 	String projectName = "a test project";
 	String tableEntityId = "syn22";
 	String tableName = "test table";
+	Long latestSnapshotVersionNumber = 5L;
 	@Mock
 	QueryTokenProvider mockQueryTokenProvider;
 	@Mock
@@ -172,6 +182,16 @@ public class TablesTabTest {
 
 		when(mockFileViewEntity.getId()).thenReturn(tableEntityId);
 		when(mockFileViewEntity.getName()).thenReturn(tableName);
+
+		VersionInfo latestSnapshot = new VersionInfo();
+		latestSnapshot.setVersionNumber(latestSnapshotVersionNumber);
+
+		List<VersionInfo> versions = Collections.singletonList(latestSnapshot);
+		FluentFuture<List<VersionInfo>> versionsFuture = getDoneFuture(versions);
+		when(mockJsClient.getEntityVersions(anyString(), anyInt(), anyInt())).thenReturn(versionsFuture);
+
+		when(mockEntityMetadata.getVersionHistoryWidget()).thenReturn(mockVersionHistoryWidget);
+		when(mockVersionHistoryWidget.isVisible()).thenReturn(false);
 
 		// setup a complex query.
 		query = new Query();
@@ -262,6 +282,8 @@ public class TablesTabTest {
 		verify(mockModifiedCreatedBy).setVisible(false);
 		verify(mockView).setWikiPage(any(Widget.class));
 		verify(mockView).setWikiPageVisible(true);
+		verify(mockView).setVersionAlertVisible(false);
+		verify(mockView, never()).setVersionAlertVisible(true);
 
 		ArgumentCaptor<Synapse> captor = ArgumentCaptor.forClass(Synapse.class);
 		verify(mockTab).setEntityNameAndPlace(eq(tableName), captor.capture());

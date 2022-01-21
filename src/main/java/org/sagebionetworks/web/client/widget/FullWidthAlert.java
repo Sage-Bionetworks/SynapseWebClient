@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget;
 
 import org.gwtbootstrap3.client.ui.constants.AlertType;
+import org.sagebionetworks.web.client.jsinterop.AlertButtonConfig;
 import org.sagebionetworks.web.client.jsinterop.FullWidthAlertProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactDOM;
@@ -14,15 +15,12 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class FullWidthAlert implements IsWidget {
 	ReactComponentDiv container;
-	String title, message, primaryButtonText, secondaryButtonText, secondaryButtonHref, alertType;
-	FullWidthAlertProps.Callback onPrimaryClick;
-	FullWidthAlertProps.Callback onClose = new FullWidthAlertProps.Callback() {
-		@Override
-		public void run() {
-			setVisible(false);
-		}
-	};
+	String title, message, primaryButtonText, secondaryButtonText, alertType, secondaryButtonTooltipText;
+	AlertButtonConfig.Callback onPrimaryClick;
+	AlertButtonConfig.Callback onSecondaryClick;
+	FullWidthAlertProps.Callback onClose = () -> setVisible(false);
 	Boolean isGlobal = true;
+	boolean secondaryButtonEnabled = true;
 	/**
 	 * This is a full width info Alert component, with an icon, message and link.
 	 * 
@@ -33,7 +31,9 @@ public class FullWidthAlert implements IsWidget {
 	
 	private void rerender() {
 		Double autoCloseAfterDelayInSeconds = null;
-		FullWidthAlertProps props = FullWidthAlertProps.create(title, message, primaryButtonText, onPrimaryClick, secondaryButtonText, secondaryButtonHref, onClose, autoCloseAfterDelayInSeconds, isGlobal, alertType);
+		AlertButtonConfig primaryButtonConfig = AlertButtonConfig.create(primaryButtonText, onPrimaryClick);
+		AlertButtonConfig secondaryButtonConfig = AlertButtonConfig.create(secondaryButtonText, onSecondaryClick, !secondaryButtonEnabled, secondaryButtonTooltipText);
+		FullWidthAlertProps props = FullWidthAlertProps.create(title, message, primaryButtonConfig, secondaryButtonConfig, onClose, autoCloseAfterDelayInSeconds, isGlobal, alertType);
 		ReactElement component = React.createElement(SRC.SynapseComponents.FullWidthAlert, props);
 		ReactDOM.render(component, container.getElement());	
 	}
@@ -83,14 +83,25 @@ public class FullWidthAlert implements IsWidget {
 	}
 	
 	public void addPrimaryCTAClickHandler(ClickHandler c) {
-		this.onPrimaryClick = new FullWidthAlertProps.Callback() {
-			@Override
-			public void run() {
-				c.onClick(null);
-			}
-		};
+		this.onPrimaryClick = () -> c.onClick(null);
 		rerender();
 	}
+
+	public void setSecondaryButtonEnabled(boolean enabled) {
+		this.secondaryButtonEnabled = enabled;
+		rerender();
+	}
+
+	public void setSecondaryButtonTooltipText(String tooltipText) {
+		this.secondaryButtonTooltipText = tooltipText;
+		rerender();
+	}
+
+	public void addSecondaryCTAClickHandler(ClickHandler c) {
+		this.onSecondaryClick = () -> c.onClick(null);
+		rerender();
+	}
+
 
 	public void setPrimaryCTAText(String text) {
 		String newText = text != null ? text.toUpperCase() : null;
@@ -105,8 +116,9 @@ public class FullWidthAlert implements IsWidget {
 	}
 
 	public void setSecondaryCTAHref(String href) {
-		this.secondaryButtonHref = href;
-		rerender();
+		addSecondaryCTAClickHandler(event -> {
+			Window.open(href, "_blank", "");
+		});
 	}
 
 	public void setAlertType(AlertType type) {

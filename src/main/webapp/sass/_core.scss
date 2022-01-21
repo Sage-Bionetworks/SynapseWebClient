@@ -15,39 +15,39 @@ $synapse-gray-med: #dcdcdc;
 
 // Colors from https://www.figma.com/file/0oPm5lLSUva8kyfVNMS6FA/Synapse-Style-%26-Component-Library?node-id=77%3A1598
 $synapse-primary-color-palette: (
-        100: #D7DEE4,
-        200: #b0bdc9,
-        300: #889baf,
-        400: #617a94,
-        500: $synapse-blue,
-        600: #2e4761,
-        700: #223549,
-        800: #172430,
-        900: #0b1218,
+		100: #D7DEE4,
+		200: #b0bdc9,
+		300: #889baf,
+		400: #617a94,
+		500: $synapse-blue,
+		600: #2e4761,
+		700: #223549,
+		800: #172430,
+		900: #0b1218,
 );
 
 $synapse-secondary-color-palette: (
-        100: #dae9e7,
-        200: #b5d3ce,
-        300: #90beb6,
-        400: #6ba89d,
-        500: $synapse-green,
-        600: #38756a,
-        700: #2a6960,
-        800: #1c3a35,
-        900: #0e1d1b,
+		100: #dae9e7,
+		200: #b5d3ce,
+		300: #90beb6,
+		400: #6ba89d,
+		500: $synapse-green,
+		600: #38756a,
+		700: #2a6960,
+		800: #1c3a35,
+		900: #0e1d1b,
 );
 
 $synapse-tertiary-color-palette: (
-        100: #fbf4e0,
-        200: #f8e9c2,
-        300: #f4dda3,
-        400: #f1d285,
-        500: #edc766,
-        600: #be9f52,
-        700: #8e773d,
-        800: #5f5029,
-        900: #2f2814,
+		100: #fbf4e0,
+		200: #f8e9c2,
+		300: #f4dda3,
+		400: #f1d285,
+		500: #edc766,
+		600: #be9f52,
+		700: #8e773d,
+		800: #5f5029,
+		900: #2f2814,
 );
 
 
@@ -177,11 +177,11 @@ a:focus{color:$synapse-blue;}
 }
 
 .SynapseNavDrawerIsShowing {
-    $-nav-drawer-width: 53px;
+	$-nav-drawer-width: 53px;
 	padding-left: $-nav-drawer-width;
 
 	.SynapseToastContainer {
-	    width: calc(100% - #{$-nav-drawer-width});
+		width: calc(100% - #{$-nav-drawer-width});
 	}
 }
 
@@ -253,6 +253,7 @@ end sticky footer
 	}
 	.nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
 		border: none;
+		text-decoration: none;
 	}	
 	.nav-tabs > li > a {
 		box-shadow: none;
@@ -265,6 +266,7 @@ end sticky footer
 		box-shadow: inset 0 -4px 0 $synapse-green;
 		background-color: unset;
 		border: none;
+		text-decoration: none;
 		padding-top: 26px;
 		padding-bottom: 18px;
 	}
@@ -341,19 +343,19 @@ end sticky footer
 		color: $synapse-red-error;
 	}
 
-    // "Select" implemented as radio buttons
-    // Remove padding for the input element from the label and some styling
-    .btn-group > .btn > input[type="radio"],
-    .btn-group > .btn > input[type="radio"] + span {
-        position: static;
-        color: unset;
-        padding-left: unset;
-    }
-    // Hide the custom input element
+	// "Select" implemented as radio buttons
+	// Remove padding for the input element from the label and some styling
+	.btn-group > .btn > input[type="radio"],
+	.btn-group > .btn > input[type="radio"] + span {
+		position: static;
+		color: unset;
+		padding-left: unset;
+	}
+	// Hide the custom input element
 	.btn-group > .btn > input[type="radio"] + span:before,
-    .btn-group > .btn > input[type="radio"] + span:after {
-        display: none;
-    }
+	.btn-group > .btn > input[type="radio"] + span:after {
+		display: none;
+	}
 
 	.checkbox, .radio {
 		padding-left: 0px;
@@ -568,14 +570,14 @@ end sticky footer
 .ui-autocomplete-loading { background: white url('http://jqueryui.com/demos/autocomplete/images/ui-anim_basic_16x16.gif') right center no-repeat; }
 
 .ui-menu .ui-menu-item a {
-    display: block;
-    line-height: 1.5;
-    padding: 0.2em 0.4em;
-    text-decoration: none;
+	display: block;
+	line-height: 1.5;
+	padding: 0.2em 0.4em;
+	text-decoration: none;
 }
 .ui-widget {
-    font-family: Verdana,Arial,sans-serif;
-    font-size: 0.8em;
+	font-family: Verdana,Arial,sans-serif;
+	font-size: 0.8em;
 }
 
 .gwt-Hyperlink img {
@@ -588,24 +590,24 @@ end sticky footer
 }
 
 .smallGreyText {
-    color: #717171;
+	color: #717171;
 	font-size: 10px;
 }
 
 .codeContent {
-    background-color: #F0F0F0;
-    color: #000000;
-    font: 12px/1.4 arial,FreeSans,Helvetica,sans-serif;
-    font-family: Courier,monospace;
-    overflow: auto;
-    padding: 3px;
-    text-align: left;
-    font-size: 11px;
-    line-height: 13px;
-    text-align: left;
-    
-    border-width: 1px;
-    border: 1px dashed;
+	background-color: #F0F0F0;
+	color: #000000;
+	font: 12px/1.4 arial,FreeSans,Helvetica,sans-serif;
+	font-family: Courier,monospace;
+	overflow: auto;
+	padding: 3px;
+	text-align: left;
+	font-size: 11px;
+	line-height: 13px;
+	text-align: left;
+
+	border-width: 1px;
+	border: 1px dashed;
 	margin: 5px 0 5px 0;
 	padding: 5px 8px 5px 8px;
 	overflow-x: auto;
@@ -614,7 +616,7 @@ end sticky footer
 .suggestSearchTerm {
 	color: #7a0402;
 	font: 12px/1.4 arial,FreeSans,Helvetica,sans-serif;
-    font-family: Courier,monospace;
+	font-family: Courier,monospace;
 }
 
 .suggestSearchOntology {
@@ -940,6 +942,10 @@ end sticky footer
 	margin-top: 300px;
 }
 
+.margin-top-minus-48 {
+  margin-top: -48px;
+}
+
 .margin-left-180 {
 	margin-left: 180px;
 }
@@ -1023,24 +1029,24 @@ end sticky footer
 }
 
 .file-preview {
-    position: relative;
-    margin: 15px 0;
-    padding: 30px 3px 3px 3px;
-    background-color: white;
+	position: relative;
+	margin: 15px 0;
+	padding: 30px 3px 3px 3px;
+	background-color: white;
 	border: 1px solid #DDD;
 	@include border-radius(4px);
-    white-space: pre-wrap;
+	white-space: pre-wrap;
 }
  
 .file-preview::after {
-    content: attr(title);
-    position: absolute;
-    top: -1px;
-    left: -1px;
-    padding: 3px 7px;
-    font-size: 12px;
-    background-color: whiteSmoke;
-    border: 1px solid #DDD;
+	content: attr(title);
+	position: absolute;
+	top: -1px;
+	left: -1px;
+	padding: 3px 7px;
+	font-size: 12px;
+	background-color: whiteSmoke;
+	border: 1px solid #DDD;
 	color: #9DA0A4;
 	@include border-radius(4px 0 4px 0);
 }
@@ -1171,8 +1177,8 @@ end sticky footer
 }
 
 .entity-description-preview-wrapper {
-    background: none repeat scroll 0 0 #FFFFFF;
-    padding: 20px;
+	background: none repeat scroll 0 0 #FFFFFF;
+	padding: 20px;
 }
 #body {
 	.font-italic { font-style: italic; }
@@ -1463,16 +1469,16 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .markdowntable.border {
-    border: 2px solid #dddddd;
+	border: 2px solid #dddddd;
 }
 .markdowntable.noborder {
-    border: 0px;
+	border: 0px;
 }
 .markdowntable.noborder th{
-    border: 0px;
+	border: 0px;
 }
 .markdowntable.noborder td{
-    border: 0px;
+	border: 0px;
 }
 
 .markdowntable.center {
@@ -1481,9 +1487,9 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Wrap styles will apply to short tables */
 .markdowntableWrap {
-    width:100%;
-    height:400px;
-    overflow-y:scroll;
+	width:100%;
+	height:400px;
+	overflow-y:scroll;
 }
 
 /** WikiPage Markdown History Widget **/
@@ -1568,11 +1574,11 @@ h1, h2, h3, h4, h5, h6 {
 
 .sidebarMenu { 
 	font-weight: bold; 	
-    -webkit-transition:.2s;
-    transition:.2s;
-    text-decoration:none;
-    padding: 15px 10px;
-    cursor: pointer;  
+	-webkit-transition:.2s;
+	transition:.2s;
+	text-decoration:none;
+	padding: 15px 10px;
+	cursor: pointer;
 }
 
 .sidebarMenuSelected {
@@ -1619,10 +1625,10 @@ This is the icon table cell (gwt TreeItem exposes very little to the outside, so
 .entityTreeItem-selected a:hover, 
 .entityTreeItem-selected img,
 .entityTreeItem-selected img:hover {
-    color: black !important;
-    cursor: default !important;
-    font-weight: bold;
-    text-decoration: none !important;
+	color: black !important;
+	cursor: default !important;
+	font-weight: bold;
+	text-decoration: none !important;
 }
 
 /**table of contents styling **/
@@ -1676,7 +1682,7 @@ ol.lowerroman {
 }
 
 .greyText-imp {
-    color: #717171 !important;
+	color: #717171 !important;
 }
 
 .lightGreyText {
@@ -1854,11 +1860,11 @@ ol.lowerroman {
 	}
 	.th-resizer {
 		top: 0;
- 		right: 0;
+		right: 0;
 		width: 3px;
 		height: 32px;
 		position: absolute;
- 		cursor: col-resize;
+		cursor: col-resize;
 		user-select: none;
 		&:hover {
 			background-color:$synapse-blue;
@@ -2049,34 +2055,34 @@ ol.lowerroman {
 	left: 5px;
 }
 .highlight-box {
-    position: relative;
-    margin-top: 15px;
-    padding: 47px 10px 10px 10px;
-    background-color: white;
-    border: 1px solid #DDD;
-    @include border-radius(4px);
-    white-space: normal;
+	position: relative;
+	margin-top: 15px;
+	padding: 47px 10px 10px 10px;
+	background-color: white;
+	border: 1px solid #DDD;
+	@include border-radius(4px);
+	white-space: normal;
 }
 
 .highlight-box::after {
-    content: attr(highlight-box-title);
-    position: absolute;
-    top: 6px;
-    left: 6px;
+	content: attr(highlight-box-title);
+	position: absolute;
+	top: 6px;
+	left: 6px;
 		color: $synapse-dark-text;
-    font-size: 18px;
-    font-weight: 200;
-    line-height: 1.4;
-    padding: 3px 7px;
-    position: absolute;    
+	font-size: 18px;
+	font-weight: 200;
+	line-height: 1.4;
+	padding: 3px 7px;
+	position: absolute;
 }
 
 .highlight-title {
 		color: $synapse-dark-text;
-    font-size: 18px;
-    font-weight: 200;
-    line-height: 1.4;
-    padding: 3px 7px;
+	font-size: 18px;
+	font-weight: 200;
+	line-height: 1.4;
+	padding: 3px 7px;
 }
 
 .highlight-title [class*="fa"] {
@@ -2084,12 +2090,12 @@ ol.lowerroman {
 }
 
 .highlight-line-min {
-    padding: 5px;
+	padding: 5px;
 }
 
 .padding-top-5 {
 	margin-top: 5px;
-    position: absolute;
+	position: absolute;
 }
 
 .padding-top-0-imp {
@@ -2181,9 +2187,9 @@ ol.lowerroman {
 	}
 }
 @media (max-width: 500px) {
-    .hidden-xxs {
-        display:none!important
-    }
+	.hidden-xxs {
+		display:none!important
+	}
 }
 #body .entity-tab > a, #body .finder-tab > a {
 	text-align: center;
@@ -2194,11 +2200,11 @@ ol.lowerroman {
 }
 
 .overflowHidden {
-    overflow: hidden;
+	overflow: hidden;
 }
 
 .table-layout-fixed {
-    table-layout: fixed;
+	table-layout: fixed;
 }
 .padding-right-2, #body .padding-right-2 {
 	padding-right: 2px;
@@ -2321,8 +2327,8 @@ Looks for any child element under .modal-fullscreen that has a class that contai
 }
 
 .modal-max-content [class*="modal-dialog"] {
-    width: max-content;
-    max-width: 95%;
+	width: max-content;
+	max-width: 95%;
 }
 
 /*
@@ -2330,8 +2336,8 @@ Looks for any child element under .modal-fullscreen that has a class that contai
   We can simulate the effect with a very large box shadow
 */
 .modal-content {
-    -webkit-box-shadow: 0px 0px 5000px 5000px rgba(0, 0, 0, .5);
-    box-shadow: 0px 0px 5000px 5000px rgba(0, 0, 0, .5);
+	-webkit-box-shadow: 0px 0px 5000px 5000px rgba(0, 0, 0, .5);
+	box-shadow: 0px 0px 5000px 5000px rgba(0, 0, 0, .5);
 }
 
 .gwt-TreeItem-selected [class*="link"] {
@@ -2346,24 +2352,24 @@ Looks for any child element under .modal-fullscreen that has a class that contai
 #body .inline-user-badge {
 	display: inline-flex;
 	div {
-        display: inline;
+		display: inline;
 	}
 	.SRC-userImgSmall,
 	.SRC-userImgMedium,
 	.SRC-userImgLarge,
 	.SRC-centerContentInline {
-	    display: inline-flex;
+		display: inline-flex;
 	}
 }
 
 /* seamless attribute is not yet supported on most browsers, so define the style here for all iframes with this attribute */
 iframe[seamless] {
-    background-color: transparent;
-    border: 0px none transparent;
-    padding: 0px;
-    overflow: hidden;
-    width: 100%;
-    min-height: 300px;
+	background-color: transparent;
+	border: 0px none transparent;
+	padding: 0px;
+	overflow: hidden;
+	width: 100%;
+	min-height: 300px;
 }
 
 .overflow-x-hidden {
@@ -2378,7 +2384,7 @@ iframe[seamless] {
  * Bootstrap Overrides 
  */
 .modal {
-    overflow-y: auto !important;
+	overflow-y: auto !important;
 }
 
 .bootbox {
@@ -2413,38 +2419,38 @@ ul, ol {
  */
 @media screen and (max-width: 768px) {
   .row-offcanvas {
-    position: relative;
-    -webkit-transition: all 0.25s ease-out;
-    transition: all 0.25s ease-out;
+	position: relative;
+	-webkit-transition: all 0.25s ease-out;
+	transition: all 0.25s ease-out;
   }
 
   .row-offcanvas-right
   .sidebar-offcanvas {
-    right: -50%; /* 6 columns */
+	right: -50%; /* 6 columns */
   }
 
   .row-offcanvas-left
   .sidebar-offcanvas {
-    left: -50%; /* 6 columns */
+	left: -50%; /* 6 columns */
   }
 
   .row-offcanvas-right.active {
-    right: 50%; /* 6 columns */
+	right: 50%; /* 6 columns */
   }
 
   .row-offcanvas-left.active {
-    left: 50%; /* 6 columns */
+	left: 50%; /* 6 columns */
   }
 
   .sidebar-offcanvas {
-    position: absolute;
-    top: 0;
-    width: 50%; /* 6 columns */
+	position: absolute;
+	top: 0;
+	width: 50%; /* 6 columns */
   }
 }
 
 .label-as-badge {
-    border-radius: 1em;
+	border-radius: 1em;
 }
 
 /**
@@ -2525,8 +2531,8 @@ table.multi-value-editor-spaced{
 
 /**Override JQuery table styles **/
 table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp, table.tablesorter thead tr .header  {
-    background-color: #FAFAFA !important;
-    background-image: none !important;
+	background-color: #FAFAFA !important;
+	background-image: none !important;
 }
 
 /* --- Date Picker Styles --- */
@@ -2658,9 +2664,9 @@ td.datePickerMonth {
 
 .read-only-box {
 	padding: 5px;
-    border: 1px solid #dddddd;
-    border-radius: .2em;
-    box-shadow: inset 0 -1px 0 #ddd;
+	border: 1px solid #dddddd;
+	border-radius: .2em;
+	box-shadow: inset 0 -1px 0 #ddd;
 }
 .whitespace-nowrap {
 	white-space: nowrap;
@@ -2924,7 +2930,7 @@ div.border {
 	background-image: url(../images/pattern/1w.png);
 	@include box-shadow(0px 1px 2px #aaa);
 	-webkit-transition: background-color 0.4s ease-in-out;
-    transition: background-color 0.4s ease-in-out;
+	transition: background-color 0.4s ease-in-out;
 }
 
 .view:hover .item a { background-color:transparent !important;}
@@ -2940,18 +2946,18 @@ div.border {
 /* SWC-3048: override webkit scrollbar appearance, so that they're shown */
 
 ::-webkit-scrollbar {
-    -webkit-appearance: none;
+	-webkit-appearance: none;
 }
 
 ::-webkit-scrollbar-thumb {
-    border-radius: 8px;
-    border: 2px solid white; /* should match background, can't be transparent */
-    background-color: rgba(0, 0, 0, .5);
+	border-radius: 8px;
+	border: 2px solid white; /* should match background, can't be transparent */
+	background-color: rgba(0, 0, 0, .5);
 }
 
 ::-webkit-scrollbar-track { 
-    background-color: #fff; 
-    border-radius: 8px; 
+	background-color: #fff;
+	border-radius: 8px;
 } 
 
 /*-------------------------------------------------------*/
@@ -3073,11 +3079,11 @@ div.border {
 		padding-bottom: 5px;
 	}
 	.UserBadge {
-        display: inline-flex;
-        .SRC-userImgSmall,
-        .SRC-userImgMedium {
-            padding: 0px;
-        }
+		display: inline-flex;
+		.SRC-userImgSmall,
+		.SRC-userImgMedium {
+			padding: 0px;
+		}
 	}
 }
 #body {
@@ -3313,12 +3319,12 @@ div.border {
 
 #body {
 	.SRC-primary-color-hover:hover * {
-    color: $synapse-blue;
-    fill: $synapse-blue;
+	color: $synapse-blue;
+	fill: $synapse-blue;
 	}
 	.table .SRC-primary-text-color svg, .table .SRC-primary-text-color path {
 		color: $synapse-blue;
-    	fill: $synapse-blue;
+		fill: $synapse-blue;
 	}
 
 	.SRC-primary-text-color {
@@ -3348,43 +3354,43 @@ div.border {
   color: $synapse-dark-text;
 
   &__instruction {
-    font-size: 18px;
-    font-weight: bold;
-    text-transform: uppercase;
-    padding-left: 15px;
+	font-size: 18px;
+	font-weight: bold;
+	text-transform: uppercase;
+	padding-left: 15px;
   }
 
   &__access {
-    margin-top: -10px;
+	margin-top: -10px;
   }
 
   &__title {
-    margin-left: -5px;
-    font-size: 23px;
-    font-weight: bold;
+	margin-left: -5px;
+	font-size: 23px;
+	font-weight: bold;
   }
 
   &__file {
-    margin-right: 10px;
-    color: #bbbbbc;
+	margin-right: 10px;
+	color: #bbbbbc;
   }
 
   .requirement-container {
-    display: flex;
-    align-items: center;
-    margin-top: 15px;
+	display: flex;
+	align-items: center;
+	margin-top: 15px;
   }
 
   &__register-text-link {
-    display: block;
-    color: $synapse-blue;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    padding-left: 25px;
+	display: block;
+	color: $synapse-blue;
+	margin-top: 20px;
+	margin-bottom: 20px;
+	padding-left: 25px;
   }
 
   &__AccessRequirementList__signin .terms-of-use-content {
-    margin-top: 20px;
+	margin-top: 20px;
   }
 	&__signin button {
 		color: $synapse-dark-text;
@@ -3393,70 +3399,70 @@ div.border {
 	}
 	
   .button-container {
-    &.hide {
-      visibility: hidden;
-    }
+	&.hide {
+	  visibility: hidden;
+	}
   }
   .sign-in-btn_access-requirement {
-    margin-left: -7px;
+	margin-left: -7px;
   }
 
   .view-terms-button {
-    color: $synapse-blue;
+	color: $synapse-blue;
 	}
 	.update-request-button {
-    color: $synapse-blue;
+	color: $synapse-blue;
   }
 
   .accept-button-container {
-    margin-top: 30px;
-    align-content: center;
-    justify-content: center;
-    text-align: center;
+	margin-top: 30px;
+	align-content: center;
+	justify-content: center;
+	text-align: center;
   }
 
   .accept-button {
-    background-color: $synapse-blue;
-    padding: 10px 70px 10px 70px;
-    color: white;
+	background-color: $synapse-blue;
+	padding: 10px 70px 10px 70px;
+	color: white;
   }
 
   .not-accept-button-container {
-    margin-top: 15px;
-    margin-bottom: 15px;
-    align-content: center;
-    justify-content: center;
-    text-align: center;
-    color: $synapse-blue;
+	margin-top: 15px;
+	margin-bottom: 15px;
+	align-content: center;
+	justify-content: center;
+	text-align: center;
+	color: $synapse-blue;
   }
 
   .get-access-requirement-button {
-    margin-left: 10px;
-    background-color: $synapse-blue;
-    color: white;
+	margin-left: 10px;
+	background-color: $synapse-blue;
+	color: white;
   }
   .check-mark-container {
-    &.orange {
-      background-color: orange;
-    }
-    &.green {
-      background-color: rgb(39, 167, 69);
-    }
-    color: white;
-    border-radius: 50%;
-    margin-right: 15px;
-    margin-left: 20px;
-    padding: 15px;
-    height: 15px;
-    width: 15px;
-    display: flex;
-    align-self: baseline;
-    align-items: center;
-    text-align: center;
-    justify-content: center;
+	&.orange {
+	  background-color: orange;
+	}
+	&.green {
+	  background-color: rgb(39, 167, 69);
+	}
+	color: white;
+	border-radius: 50%;
+	margin-right: 15px;
+	margin-left: 20px;
+	padding: 15px;
+	height: 15px;
+	width: 15px;
+	display: flex;
+	align-self: baseline;
+	align-items: center;
+	text-align: center;
+	justify-content: center;
   }
   .AcceptRequirementsMarkdown {
-    padding-right: 15px;
+	padding-right: 15px;
 	}
 	.modal-content {
 		padding: 20px 0px 50px 0px;
@@ -3577,32 +3583,32 @@ div.border {
 }
 
 .TeamManagerBadge {
-    margin-left: 2px;
-    margin-right: 2px;
-    padding-left: 15px;
-    position: relative;
-    z-index: 1;
+	margin-left: 2px;
+	margin-right: 2px;
+	padding-left: 15px;
+	position: relative;
+	z-index: 1;
 }
 
 #body .EntityFinderSelectionPane.alert.alert-warning {
-    border-left: none;
+	border-left: none;
 }
 
 #body .EntityFinder .EntityFinderDetailsView .checkbox {
-    margin-top: 0px;
-    height: 25px;
+	margin-top: 0px;
+	height: 25px;
 }
 
 .entityFinder .synAlertPanel {
-    display: flex;
-    > * {
-        width: 600px;
-        flex-grow: 1;
-    }
+	display: flex;
+	> * {
+		width: 600px;
+		flex-grow: 1;
+	}
 }
 
 .IconMissing {
-    color: $synapse-gray-med;
+	color: $synapse-gray-med;
 }
 .IconValid {
  color: $synapse-green;
@@ -3622,13 +3628,13 @@ div.border {
 }
 
 #body .DatasetEditorTable .checkbox {
-    margin-top: -5px;
+	margin-top: -5px;
 }
 
 // We may want to move this to SRC and apply this style to all sites
 // May also want to apply the style to all buttons, rather than just in this alert
 .FullWidthAlert {
-    button.btn {
-        text-transform: capitalize;
-    }
+	button.btn {
+		text-transform: capitalize;
+	}
 }
