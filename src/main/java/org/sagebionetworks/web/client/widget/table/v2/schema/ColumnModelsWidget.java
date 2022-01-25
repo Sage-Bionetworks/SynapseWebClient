@@ -18,9 +18,11 @@ import org.sagebionetworks.repo.model.table.ViewColumnModelRequest;
 import org.sagebionetworks.repo.model.table.ViewColumnModelResponse;
 import org.sagebionetworks.repo.model.table.ViewEntityType;
 import org.sagebionetworks.repo.model.table.ViewScope;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
+import org.sagebionetworks.web.client.jsinterop.ToastMessageOptions;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
@@ -229,6 +231,7 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 	}
 
 	public void finished() {
+		DisplayUtils.notify("You made changes to the columns in this " + tableType.getDisplayName(), DisplayUtils.NotificationVariant.INFO, new ToastMessageOptions.Builder().setTitle("Schema Updated").build());
 		baseView.setJobTrackingWidgetVisible(false);
 		// Hide the dialog
 		baseView.hideEditor();
