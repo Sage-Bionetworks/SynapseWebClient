@@ -92,8 +92,6 @@ public class CreateOrUpdateDoiModalTest {
 	PopupUtilsView mockPopupUtilsView;
 	@Mock
 	DateTimeUtils mockDateTimeUtils;
-	@Mock
-	FluentFuture<Doi> mockDoiFuture;
 
 	@Captor
 	ArgumentCaptor<AsynchronousProgressHandler> asyncProgressHandlerCaptor;
