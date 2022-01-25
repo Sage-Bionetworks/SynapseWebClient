@@ -53,7 +53,6 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
-import com.google.common.util.concurrent.FluentFuture;
 import com.google.gwt.event.shared.EventBus;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -99,19 +98,19 @@ public class CreateOrUpdateDoiModalTest {
 	@Captor
 	ArgumentCaptor<DoiRequest> doiRequestCaptor;
 
-	Project mockProjectEntity;
-	FileEntity mockFileEntity;
+	Project projectEntity;
+	FileEntity fileEntity;
 
 
 	@Before
 	public void setup() {
-		mockProjectEntity = new Project();
-		mockProjectEntity.setId(objectId);
-		mockProjectEntity.setName(entityName);
+		projectEntity = new Project();
+		projectEntity.setId(objectId);
+		projectEntity.setName(entityName);
 
-		mockFileEntity = new FileEntity();
-		mockFileEntity.setId(objectId);
-		mockFileEntity.setName(entityName);
+		fileEntity = new FileEntity();
+		fileEntity.setId(objectId);
+		fileEntity.setName(entityName);
 
 		presenter = new CreateOrUpdateDoiModal(mockView, mockJobTrackingWidget, mockSynapseClient, mockSynAlert, mockPopupUtilsView, mockEventBus, mockDateTimeUtils);
 		creators = new ArrayList<>();
@@ -149,7 +148,7 @@ public class CreateOrUpdateDoiModalTest {
 		when(mockSynapseClient.getDoi(objectId, objectType, objectVersion)).thenReturn(getDoneFuture(doi));
 
 		// Call under test
-		presenter.configureAndShow(mockProjectEntity, objectVersion, mockUserProfile);
+		presenter.configureAndShow(projectEntity, objectVersion, mockUserProfile);
 
 		// Ensure that populateForms() was called
 		verify(mockView).setCreators(anyString());
@@ -187,7 +186,7 @@ public class CreateOrUpdateDoiModalTest {
 		when(mockSynapseClient.getEntityVersions(eq(objectId), anyInt(), anyInt())).thenReturn(getDoneFuture(versions));
 
 		// Call under test
-		presenter.configureAndShow(mockFileEntity, objectVersion, mockUserProfile);
+		presenter.configureAndShow(fileEntity, objectVersion, mockUserProfile);
 
 		// Just check that the versions were set, the previous test method covers the DOI info.
 		verify(mockView).setVersions(versions, objectVersion);
@@ -219,7 +218,7 @@ public class CreateOrUpdateDoiModalTest {
 		expectedDoi.getResourceType().setResourceTypeGeneral(DoiResourceTypeGeneral.Collection);
 
 		// Call under test
-		presenter.configureAndShow(mockProjectEntity, objectVersion, mockUserProfile);
+		presenter.configureAndShow(projectEntity, objectVersion, mockUserProfile);
 
 		// Ensure that populateForms() was called
 		verify(mockView).setCreators(anyString());
@@ -249,7 +248,7 @@ public class CreateOrUpdateDoiModalTest {
 		when(mockSynapseClient.getDoi(objectId, ObjectType.ENTITY, objectVersion)).thenReturn(getFailedFuture(error));
 
 		// Call under test
-		presenter.configureAndShow(mockProjectEntity, objectVersion, mockUserProfile);
+		presenter.configureAndShow(projectEntity, objectVersion, mockUserProfile);
 
 		verify(mockView, never()).show();
 		verify(mockPopupUtilsView).showErrorMessage(error.getMessage());
@@ -262,7 +261,7 @@ public class CreateOrUpdateDoiModalTest {
 		when(mockSynapseClient.getEntityVersions(eq(objectId), anyInt(), anyInt())).thenReturn(getFailedFuture(error));
 
 		// Call under test
-		presenter.configureAndShow(mockFileEntity, objectVersion, mockUserProfile);
+		presenter.configureAndShow(fileEntity, objectVersion, mockUserProfile);
 
 		verify(mockView, never()).show();
 		verify(mockPopupUtilsView).showErrorMessage(error.getMessage());
@@ -286,12 +285,12 @@ public class CreateOrUpdateDoiModalTest {
 		expectedTitles.add(expectedTitle);
 
 		// Call under test
-		Doi result = presenter.createNewDoi(mockProjectEntity, objectVersion, mockUserProfile);
+		Doi result = presenter.createNewDoi(projectEntity, objectVersion, mockUserProfile);
 
 		assertEquals(objectId, result.getObjectId());
 		assertEquals(ObjectType.ENTITY, result.getObjectType());
 		assertEquals(objectVersion.get(), result.getObjectVersion());
-		assertEquals(CreateOrUpdateDoiModal.getSuggestedResourceTypeGeneral(EntityTypeUtils.getEntityType(mockProjectEntity)), result.getResourceType().getResourceTypeGeneral());
+		assertEquals(CreateOrUpdateDoiModal.getSuggestedResourceTypeGeneral(EntityTypeUtils.getEntityType(projectEntity)), result.getResourceType().getResourceTypeGeneral());
 		assertEquals(expectedCreators, result.getCreators());
 		assertEquals(expectedTitles, result.getTitles());
 		assertEquals(pubYearString, result.getPublicationYear().toString());
@@ -312,7 +311,7 @@ public class CreateOrUpdateDoiModalTest {
 		when(mockSynapseClient.getDoi(objectId, objectType, objectVersion)).thenReturn(getDoneFuture(doi));
 
 		// Configure the widget
-		presenter.configureAndShow(mockProjectEntity, objectVersion, mockUserProfile);
+		presenter.configureAndShow(projectEntity, objectVersion, mockUserProfile);
 
 		// Call under test
 		presenter.onSaveDoi();
