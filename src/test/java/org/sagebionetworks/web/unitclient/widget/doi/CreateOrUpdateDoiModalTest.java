@@ -7,6 +7,7 @@ import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getDoneFuture;
@@ -26,10 +27,10 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.doi.v2.Doi;
@@ -86,10 +87,6 @@ public class CreateOrUpdateDoiModalTest {
 	@Mock
 	EventBus mockEventBus;
 	@Mock
-	Entity mockEntity;
-	@Mock
-	FileEntity mockFileEntity;
-	@Mock
 	UserProfile mockUserProfile;
 	@Mock
 	PopupUtilsView mockPopupUtilsView;
@@ -104,9 +101,20 @@ public class CreateOrUpdateDoiModalTest {
 	@Captor
 	ArgumentCaptor<DoiRequest> doiRequestCaptor;
 
+	Project mockProjectEntity;
+	FileEntity mockFileEntity;
+
 
 	@Before
 	public void setup() {
+		mockProjectEntity = new Project();
+		mockProjectEntity.setId(objectId);
+		mockProjectEntity.setName(entityName);
+
+		mockFileEntity = new FileEntity();
+		mockFileEntity.setId(objectId);
+		mockFileEntity.setName(entityName);
+
 		presenter = new CreateOrUpdateDoiModal(mockView, mockJobTrackingWidget, mockSynapseClient, mockSynAlert, mockPopupUtilsView, mockEventBus, mockDateTimeUtils);
 		creators = new ArrayList<>();
 		DoiCreator creator1 = new DoiCreator();
@@ -140,11 +148,10 @@ public class CreateOrUpdateDoiModalTest {
 	public void testConfigureAndShowDoiExists() {
 		boolean doiExists = true;
 		Doi doi = createDoi();
-		when(mockEntity.getId()).thenReturn(objectId);
 		when(mockSynapseClient.getDoi(objectId, objectType, objectVersion)).thenReturn(getDoneFuture(doi));
 
 		// Call under test
-		presenter.configureAndShow(mockEntity, objectVersion, mockUserProfile);
+		presenter.configureAndShow(mockProjectEntity, objectVersion, mockUserProfile);
 
 		// Ensure that populateForms() was called
 		verify(mockView).setCreators(anyString());
@@ -154,7 +161,7 @@ public class CreateOrUpdateDoiModalTest {
 
 		InOrder viewInOrderVerifier = Mockito.inOrder(mockView);
 		viewInOrderVerifier.verify(mockView).reset();
-		viewInOrderVerifier.verify(mockView).showOverwriteWarning(doiExists);
+		viewInOrderVerifier.verify(mockView).setOverwriteWarningVisible(doiExists);
 		viewInOrderVerifier.verify(mockView).show();
 		verify(mockSynAlert).clear();
 
@@ -178,7 +185,6 @@ public class CreateOrUpdateDoiModalTest {
 			versions.add(versionInfo);
 		}
 
-		when(mockFileEntity.getId()).thenReturn(objectId);
 		when(mockSynapseClient.getDoi(objectId, objectType, objectVersion)).thenReturn(getDoneFuture(doi));
 		when(mockSynapseClient.getEntityVersions(eq(objectId), anyInt(), anyInt())).thenReturn(getDoneFuture(versions));
 
@@ -191,8 +197,6 @@ public class CreateOrUpdateDoiModalTest {
 
 	@Test
 	public void testConfigureAndShowNotFoundExceptionFailure() {
-		when(mockEntity.getId()).thenReturn(objectId);
-		when(mockEntity.getName()).thenReturn(entityName);
 		when(mockUserProfile.getLastName()).thenReturn(lastName);
 		when(mockUserProfile.getFirstName()).thenReturn(firstName);
 		when(mockDateTimeUtils.getYear(any(Date.class))).thenReturn(pubYearString);
@@ -214,10 +218,10 @@ public class CreateOrUpdateDoiModalTest {
 		expectedDoi.setTitles(expectedTitles);
 		expectedDoi.setPublicationYear(pubYear);
 		expectedDoi.setResourceType(new DoiResourceType());
-		expectedDoi.getResourceType().setResourceTypeGeneral(DoiResourceTypeGeneral.Dataset);
+		expectedDoi.getResourceType().setResourceTypeGeneral(DoiResourceTypeGeneral.Collection);
 
 		// Call under test
-		presenter.configureAndShow(mockEntity, objectVersion, mockUserProfile);
+		presenter.configureAndShow(mockProjectEntity, objectVersion, mockUserProfile);
 
 		// Ensure that populateForms() was called
 		verify(mockView).setCreators(anyString());
@@ -228,7 +232,7 @@ public class CreateOrUpdateDoiModalTest {
 		boolean doiExists = false;
 		InOrder viewInOrderVerifier = Mockito.inOrder(mockView);
 		viewInOrderVerifier.verify(mockView).reset();
-		viewInOrderVerifier.verify(mockView).showOverwriteWarning(doiExists);
+		viewInOrderVerifier.verify(mockView).setOverwriteWarningVisible(doiExists);
 		viewInOrderVerifier.verify(mockView).show();
 		verify(mockSynAlert).clear();
 
@@ -243,12 +247,11 @@ public class CreateOrUpdateDoiModalTest {
 
 	@Test
 	public void testConfigureAndShowOtherFailure_DoiRequest() {
-		when(mockEntity.getId()).thenReturn(objectId);
 		Throwable error = new Throwable("get doi error message");
 		when(mockSynapseClient.getDoi(objectId, ObjectType.ENTITY, objectVersion)).thenReturn(getFailedFuture(error));
 
 		// Call under test
-		presenter.configureAndShow(mockEntity, objectVersion, mockUserProfile);
+		presenter.configureAndShow(mockProjectEntity, objectVersion, mockUserProfile);
 
 		verify(mockView, never()).show();
 		verify(mockPopupUtilsView).showErrorMessage(error.getMessage());
@@ -256,7 +259,6 @@ public class CreateOrUpdateDoiModalTest {
 
 	@Test
 	public void testConfigureAndShowOtherFailure_VersionRequest() {
-		when(mockFileEntity.getId()).thenReturn(objectId);
 		Throwable error = new Throwable("get versions error message");
 		when(mockSynapseClient.getDoi(objectId, ObjectType.ENTITY, objectVersion)).thenReturn(getDoneFuture(new Doi()));
 		when(mockSynapseClient.getEntityVersions(eq(objectId), anyInt(), anyInt())).thenReturn(getFailedFuture(error));
@@ -271,8 +273,6 @@ public class CreateOrUpdateDoiModalTest {
 
 	@Test
 	public void testCreateNewDoi() {
-		when(mockEntity.getId()).thenReturn(objectId);
-		when(mockEntity.getName()).thenReturn(entityName);
 		when(mockUserProfile.getFirstName()).thenReturn(firstName);
 		when(mockUserProfile.getLastName()).thenReturn(lastName);
 		when(mockDateTimeUtils.getYear(any(Date.class))).thenReturn(pubYearString);
@@ -288,12 +288,12 @@ public class CreateOrUpdateDoiModalTest {
 		expectedTitles.add(expectedTitle);
 
 		// Call under test
-		Doi result = presenter.createNewDoi(mockEntity, objectVersion, mockUserProfile);
+		Doi result = presenter.createNewDoi(mockProjectEntity, objectVersion, mockUserProfile);
 
 		assertEquals(objectId, result.getObjectId());
 		assertEquals(ObjectType.ENTITY, result.getObjectType());
 		assertEquals(objectVersion.get(), result.getObjectVersion());
-		assertEquals(CreateOrUpdateDoiModal.getSuggestedResourceTypeGeneral(EntityTypeUtils.getEntityType(mockEntity)), result.getResourceType().getResourceTypeGeneral());
+		assertEquals(CreateOrUpdateDoiModal.getSuggestedResourceTypeGeneral(EntityTypeUtils.getEntityType(mockProjectEntity)), result.getResourceType().getResourceTypeGeneral());
 		assertEquals(expectedCreators, result.getCreators());
 		assertEquals(expectedTitles, result.getTitles());
 		assertEquals(pubYearString, result.getPublicationYear().toString());
@@ -310,6 +310,12 @@ public class CreateOrUpdateDoiModalTest {
 		doi.setObjectId(objectId);
 		presenter.setDoi(doi);
 
+		when(mockDateTimeUtils.getYear(any(Date.class))).thenReturn(pubYearString);
+		when(mockSynapseClient.getDoi(objectId, objectType, objectVersion)).thenReturn(getDoneFuture(doi));
+
+		// Configure the widget
+		presenter.configureAndShow(mockProjectEntity, objectVersion, mockUserProfile);
+
 		// Call under test
 		presenter.onSaveDoi();
 
@@ -320,7 +326,7 @@ public class CreateOrUpdateDoiModalTest {
 		asyncProgressHandlerCaptor.getValue().onComplete(response);
 
 		verify(mockView).setIsLoading(true);
-		verify(mockView).setIsLoading(false);
+		verify(mockView, times(2)).setIsLoading(false);
 		verify(mockView).hide();
 		verify(mockJobTrackingWidget).startAndTrackJob(eq(""), eq(false), eq(AsynchType.Doi), doiRequestCaptor.capture(), any(AsynchronousProgressHandler.class));
 		verify(mockPopupUtilsView).showInfo(CreateOrUpdateDoiModal.DOI_CREATED_MESSAGE + objectId);

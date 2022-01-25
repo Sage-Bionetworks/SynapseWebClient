@@ -19,10 +19,10 @@ import org.sagebionetworks.repo.model.table.ViewColumnModelResponse;
 import org.sagebionetworks.repo.model.table.ViewEntityType;
 import org.sagebionetworks.repo.model.table.ViewScope;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
-import org.sagebionetworks.web.client.jsinterop.ToastMessageOptions;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
@@ -57,6 +57,7 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 	ViewDefaultColumns fileViewDefaultColumns;
 	TableType tableType;
 	SynapseAlert synAlert;
+	PopupUtilsView popupUtilsView;
 	public static final String UPDATING_SCHEMA = "Updating the table schema...";
 	public static final String RETRIEVING_DATA = "Retrieving data...";
 
@@ -66,12 +67,13 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 	 * @param fileview
 	 */
 	@Inject
-	public ColumnModelsWidget(ColumnModelsViewBase baseView, PortalGinInjector ginInjector, SynapseClientAsync synapseClient, ColumnModelsEditorWidget editor, JobTrackingWidget jobTrackingWidget, ViewDefaultColumns fileViewDefaultColumns, SynapseAlert synAlert) {
+	public ColumnModelsWidget(ColumnModelsViewBase baseView, PortalGinInjector ginInjector, SynapseClientAsync synapseClient, ColumnModelsEditorWidget editor, JobTrackingWidget jobTrackingWidget, ViewDefaultColumns fileViewDefaultColumns, SynapseAlert synAlert, PopupUtilsView popupUtilsView) {
 		this.ginInjector = ginInjector;
 		// we will always have a viewer
 		this.baseView = baseView;
 		this.jobTrackingWidget = jobTrackingWidget;
 		this.synAlert = synAlert;
+		this.popupUtilsView = popupUtilsView;
 		this.baseView.setPresenter(this);
 		// We need two copies of the view, one as an editor, and the other as a viewer.
 		this.viewer = ginInjector.createNewColumnModelsView();
@@ -231,7 +233,7 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 	}
 
 	public void finished() {
-		DisplayUtils.notify("You made changes to the columns in this " + tableType.getDisplayName(), DisplayUtils.NotificationVariant.INFO, new ToastMessageOptions.Builder().setTitle("Schema Updated").build());
+		popupUtilsView.notify("Schema Updated", "You made changes to the columns in this " + tableType.getDisplayName(), DisplayUtils.NotificationVariant.INFO);
 		baseView.setJobTrackingWidgetVisible(false);
 		// Hide the dialog
 		baseView.hideEditor();

@@ -210,8 +210,8 @@ public class CreateOrUpdateDoiModalViewImpl implements CreateOrUpdateDoiModalVie
 	}
 
 	@Override
-	public void showOverwriteWarning(boolean showWarning) {
-		doiOverwriteWarning.setVisible(showWarning);
+	public void setOverwriteWarningVisible(boolean visible) {
+		doiOverwriteWarning.setVisible(visible);
 	}
 
 	@Override
