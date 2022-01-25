@@ -12,11 +12,13 @@ import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryFilter;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.TableBundle;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.jsinterop.DatasetEditorProps;
+import org.sagebionetworks.web.client.jsinterop.ToastMessageOptions;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
 import org.sagebionetworks.web.client.widget.clienthelp.FileViewClientsHelp;
@@ -610,7 +612,14 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 		DatasetEditorProps props =
 				DatasetEditorProps.create(
 						entityBundle.getEntity().getId(),
-						() -> closeItemsEditor(),
+						() -> {
+							ToastMessageOptions toastOptions = new ToastMessageOptions.Builder()
+									.setTitle("Dataset Saved")
+									.setPrimaryButton("Show Schema", () -> this.actionMenu.onAction(Action.SHOW_TABLE_SCHEMA))
+									.build();
+							DisplayUtils.notify("Edit the Dataset Schema to add additional annotation columns to this dataset", DisplayUtils.NotificationVariant.SUCCESS, toastOptions);
+							closeItemsEditor();
+						},
 						() -> closeItemsEditor()
 				);
 		return props;
