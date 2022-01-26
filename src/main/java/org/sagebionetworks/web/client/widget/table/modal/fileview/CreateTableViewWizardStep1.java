@@ -18,7 +18,11 @@ import org.sagebionetworks.repo.model.table.SubmissionView;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.ViewEntityType;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.GlobalApplicationStateImpl;
+import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.widget.evaluation.SubmissionViewScopeEditor;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
 
@@ -49,9 +53,10 @@ public class CreateTableViewWizardStep1 implements ModalPage, CreateTableViewWiz
 	SubmissionViewScopeEditor submissionViewScope;
 	TableType tableType;
 	CreateTableViewWizardStep2 step2;
+	GlobalApplicationState globalAppState;
 
 	@Inject
-	public CreateTableViewWizardStep1(CreateTableViewWizardStep1View view, SynapseJavascriptClient jsClient, EntityContainerListWidget entityContainerList, SubmissionViewScopeEditor submissionViewScope, CreateTableViewWizardStep2 step2) {
+	public CreateTableViewWizardStep1(CreateTableViewWizardStep1View view, SynapseJavascriptClient jsClient, EntityContainerListWidget entityContainerList, SubmissionViewScopeEditor submissionViewScope, CreateTableViewWizardStep2 step2, GlobalApplicationState globalAppState) {
 		super();
 		this.view = view;
 		this.step2 = step2;
@@ -60,6 +65,7 @@ public class CreateTableViewWizardStep1 implements ModalPage, CreateTableViewWiz
 		view.setEntityViewScopeWidget(entityContainerList.asWidget());
 		view.setSubmissionViewScopeWidget(submissionViewScope);
 		this.jsClient = jsClient;
+		this.globalAppState = globalAppState;
 		view.setPresenter(this);
 	}
 
@@ -169,6 +175,8 @@ public class CreateTableViewWizardStep1 implements ModalPage, CreateTableViewWiz
 			public void onSuccess(Entity table) {
 				// For Datasets, this is the only step.
 				if (TableType.dataset.equals(tableType)) {
+					// Go to the dataset page
+					globalAppState.getPlaceChanger().goTo(new Synapse(table.getId()));
 					modalPresenter.onFinished();
 				} else {
 					// All other tables go to step 2

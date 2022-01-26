@@ -13,9 +13,11 @@ import org.sagebionetworks.repo.model.table.ViewColumnModelRequest;
 import org.sagebionetworks.repo.model.table.ViewColumnModelResponse;
 import org.sagebionetworks.repo.model.table.ViewEntityType;
 import org.sagebionetworks.repo.model.table.ViewScope;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
@@ -51,6 +53,7 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 	SynapseJavascriptClient jsClient;
 	CreateTableViewWizardStep2View view;
 	SynapseJSNIUtils jsniUtils;
+	GlobalApplicationState globalAppState;
 
 	/*
 	 * Set to true to indicate that change selections are in progress. This allows selection change
@@ -65,7 +68,7 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 	 * @param view
 	 */
 	@Inject
-	public CreateTableViewWizardStep2(CreateTableViewWizardStep2View view, ColumnModelsEditorWidget editor, SynapseClientAsync synapseClient, JobTrackingWidget jobTrackingWidget, ViewDefaultColumns fileViewDefaultColumns, SynapseJavascriptClient jsClient, SynapseJSNIUtils jsniUtils) {
+	public CreateTableViewWizardStep2(CreateTableViewWizardStep2View view, ColumnModelsEditorWidget editor, SynapseClientAsync synapseClient, JobTrackingWidget jobTrackingWidget, ViewDefaultColumns fileViewDefaultColumns, SynapseJavascriptClient jsClient, SynapseJSNIUtils jsniUtils, GlobalApplicationState globalAppState) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
@@ -74,6 +77,7 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 		this.fileViewDefaultColumns = fileViewDefaultColumns;
 		this.jsClient = jsClient;
 		this.jsniUtils = jsniUtils;
+		this.globalAppState = globalAppState;
 		view.setJobTracker(jobTrackingWidget.asWidget());
 		view.setEditor(editor.asWidget());
 		editor.setOnAddDefaultViewColumnsCallback(new Callback() {
@@ -213,6 +217,7 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 			@Override
 			public void onSuccess(TableUpdateTransactionRequest request) {
 				if (request.getChanges().isEmpty()) {
+					globalAppState.getPlaceChanger().goTo(new Synapse(entity.getId()));
 					finished();
 				} else {
 					startTrackingJob(request);
@@ -241,6 +246,7 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 			@Override
 			public void onComplete(AsynchronousResponseBody response) {
 				view.setJobTrackerVisible(false);
+				globalAppState.getPlaceChanger().goTo(new Synapse(entity.getId()));
 				finished();
 			}
 

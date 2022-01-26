@@ -37,6 +37,8 @@ import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.ViewColumnModelRequest;
 import org.sagebionetworks.repo.model.table.ViewColumnModelResponse;
 import org.sagebionetworks.repo.model.table.ViewScope;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -113,6 +115,10 @@ public class CreateTableViewWizardStep2Test {
 	ViewColumnModelResponse mockViewColumnModelResponsePage1;
 	@Mock
 	ViewColumnModelResponse mockViewColumnModelResponsePage2;
+	@Mock
+	GlobalApplicationState mockGlobalAppState;
+	@Mock
+	PlaceChanger mockPlaceChanger;
 
 	public static final String NEXT_PAGE_TOKEN = "nextPageToken";
 	public static final String ENTITY_ID = "syn109234";
@@ -125,8 +131,9 @@ public class CreateTableViewWizardStep2Test {
 		when(mockTableEntity.getId()).thenReturn(ENTITY_ID);
 		when(mockEntityView.getId()).thenReturn(ENTITY_ID);
 		when(mockSubmissionView.getId()).thenReturn(ENTITY_ID);
+		when(mockGlobalAppState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 
-		widget = new CreateTableViewWizardStep2(mockView, mockEditor, mockSynapseClient, mockJobTrackingWidget, mockFileViewDefaultColumns, mockJsClient, mockJsniUtils);
+		widget = new CreateTableViewWizardStep2(mockView, mockEditor, mockSynapseClient, mockJobTrackingWidget, mockFileViewDefaultColumns, mockJsClient, mockJsniUtils, mockGlobalAppState);
 
 		widget.setModalPresenter(mockWizardPresenter);
 		parentId = "syn123";
@@ -329,6 +336,7 @@ public class CreateTableViewWizardStep2Test {
 
 		verify(mockWizardPresenter, atLeastOnce()).setLoading(true);
 		verify(mockEditor).validate();
+		verify(mockPlaceChanger).goTo(any());
 		verify(mockWizardPresenter).onFinished();
 		verify(mockJsClient, never()).deleteEntityById(anyString(), anyBoolean(), any(AsyncCallback.class));
 	}
@@ -343,6 +351,7 @@ public class CreateTableViewWizardStep2Test {
 		verify(mockWizardPresenter, atLeastOnce()).setLoading(true);
 		verify(mockEditor).validate();
 		verify(mockWizardPresenter).setErrorMessage(CreateTableViewWizardStep2.SCHEMA_UPDATE_CANCELLED);
+		verify(mockPlaceChanger, never()).goTo(any());
 	}
 
 	@Test
@@ -357,6 +366,7 @@ public class CreateTableViewWizardStep2Test {
 		verify(mockWizardPresenter, atLeastOnce()).setLoading(true);
 		verify(mockEditor).validate();
 		verify(mockWizardPresenter).setError(ex);
+		verify(mockPlaceChanger, never()).goTo(any());
 	}
 
 	@Test
@@ -369,5 +379,6 @@ public class CreateTableViewWizardStep2Test {
 		verify(mockWizardPresenter).setLoading(true);
 		verify(mockEditor).validate();
 		verify(mockWizardPresenter).setError(ex);
+		verify(mockPlaceChanger, never()).goTo(any());
 	}
 }
