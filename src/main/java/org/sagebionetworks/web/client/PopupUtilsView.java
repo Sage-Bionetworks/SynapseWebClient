@@ -10,6 +10,8 @@ import org.sagebionetworks.web.client.utils.Callback;
 public interface PopupUtilsView {
 	void notify(String message, DisplayUtils.NotificationVariant variant, ToastMessageOptions options);
 
+	void notify(String title, String message, DisplayUtils.NotificationVariant notificationVariant);
+
 	void showInfo(String message);
 
 	void showInfo(String message, Integer timeout);
