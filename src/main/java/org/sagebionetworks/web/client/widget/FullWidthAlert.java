@@ -31,8 +31,15 @@ public class FullWidthAlert implements IsWidget {
 	
 	private void rerender() {
 		Double autoCloseAfterDelayInSeconds = null;
-		AlertButtonConfig primaryButtonConfig = AlertButtonConfig.create(primaryButtonText, onPrimaryClick);
-		AlertButtonConfig secondaryButtonConfig = AlertButtonConfig.create(secondaryButtonText, onSecondaryClick, !secondaryButtonEnabled, secondaryButtonTooltipText);
+		AlertButtonConfig primaryButtonConfig = null;
+		if (primaryButtonText != null && onPrimaryClick != null) {
+			primaryButtonConfig = AlertButtonConfig.create(primaryButtonText, onPrimaryClick);
+		}
+
+		AlertButtonConfig secondaryButtonConfig = null;
+		if (secondaryButtonText != null && (onSecondaryClick != null || !secondaryButtonEnabled)) { // if button is disabled, it's ok if there's no onClick
+			secondaryButtonConfig = AlertButtonConfig.create(secondaryButtonText, onSecondaryClick, !secondaryButtonEnabled, secondaryButtonTooltipText);
+		}
 		FullWidthAlertProps props = FullWidthAlertProps.create(title, message, primaryButtonConfig, secondaryButtonConfig, onClose, autoCloseAfterDelayInSeconds, isGlobal, alertType);
 		ReactElement component = React.createElement(SRC.SynapseComponents.FullWidthAlert, props);
 		ReactDOM.render(component, container.getElement());	
