@@ -20,6 +20,7 @@ import org.sagebionetworks.web.client.jsinterop.SkeletonButtonProps;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.ComplexPanel;
@@ -67,6 +68,8 @@ public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 	Tooltip programmaticOptionsMenuItemTooltip;
 	@UiField
 	ReactComponentDiv skeletonButton;
+
+	private HandlerRegistration singleActionButtonHandlerRegistration;
 
 	@Inject
 	public ActionMenuWidgetViewImpl(Binder binder) {
@@ -136,8 +139,12 @@ public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 
 	@Override
 	public void setSingleActionButton(String buttonText, ClickHandler handler) {
+		if (singleActionButtonHandlerRegistration != null) {
+			singleActionButtonHandlerRegistration.removeHandler();
+		}
 		singleActionButton.setText(buttonText);
-		singleActionButton.addClickHandler(handler);
+		singleActionButtonHandlerRegistration = singleActionButton.addClickHandler(handler);
+
 	}
 
 	private void setNoActionsVisible() {
