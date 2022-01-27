@@ -256,6 +256,10 @@ public class DisplayUtils {
 		notify(message, variant, null);
 	}
 
+	public static void notify(String title, String message, NotificationVariant variant) {
+		notify(message, variant, new ToastMessageOptions.Builder().setTitle(title).build());
+	}
+
 	/**
 	 * Pushes a toast by calling SRC's displayToast method.
 	 *

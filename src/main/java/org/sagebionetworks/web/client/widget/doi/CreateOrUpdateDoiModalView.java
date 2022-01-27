@@ -32,7 +32,7 @@ public interface CreateOrUpdateDoiModalView extends IsWidget {
 
 	void setPublicationYear(Long publicationYear);
 
-	void showOverwriteWarning(boolean showWarning);
+	void setOverwriteWarningVisible(boolean visible);
 
 	void show();
 
