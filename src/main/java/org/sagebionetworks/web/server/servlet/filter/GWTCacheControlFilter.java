@@ -30,6 +30,7 @@ public class GWTCacheControlFilter implements Filter {
 	public static final long ONE_HOUR_IN_SECONDS = 60 * 60;
 
 	private FilterConfig filterConfig;
+	
 	public static final Set<String> HOUR_EXPIRATION_EXTENSIONS = new HashSet<>();
 	static {
 		String[] extensions = new String[] {".css", ".eot", ".woff2", ".woff", ".ttf", ".svg"};
@@ -49,26 +50,24 @@ public class GWTCacheControlFilter implements Filter {
 		if (lastDotIndex > -1) {
 			extension = requestURI.substring(lastDotIndex).toLowerCase();
 		}
-		if (requestURI.contains(".cache.")) {
-			// safe to cache
-			// https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching#cache-control
-			httpResponse.setHeader("Cache-Control", "max-age=" + EIGHT_HOURS_IN_SECONDS);
-			httpResponse.setHeader("Pragma", "");
-			httpResponse.setDateHeader("Expires", now + EIGHT_HOURS);
-		} else if (requestURI.contains(".nocache.") || requestURI.equals("/") || requestURI.isEmpty()) {
+		if (requestURI.contains(".nocache.") || requestURI.equals("/") || requestURI.isEmpty()) {
 			// do not cache
 			// http://stackoverflow.com/questions/1341089/using-meta-tags-to-turn-off-caching-in-all-browsers
 			httpResponse.setDateHeader("Expires", 0);
 			httpResponse.setHeader("Cache-Control", "no-cache, max-age=0, must-revalidate, pre-check=0, post-check=0");
 			httpResponse.setHeader("Pragma", "no-cache");
-		} else if (HOUR_EXPIRATION_EXTENSIONS.contains(extension)) {
+		} else if (requestURI.contains(".cache.") || extension.equals(".js")) {
+			// safe to cache
+			// https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching#cache-control
+			httpResponse.setHeader("Cache-Control", "max-age=" + EIGHT_HOURS_IN_SECONDS);
+			httpResponse.setHeader("Pragma", "");
+			httpResponse.setDateHeader("Expires", now + EIGHT_HOURS);
+		}  else if (HOUR_EXPIRATION_EXTENSIONS.contains(extension)) {
 			httpResponse.setHeader("Cache-Control", "max-age=" + ONE_HOUR_IN_SECONDS);
 			httpResponse.setHeader("Pragma", "");
 			httpResponse.setDateHeader("Expires", now + ONE_HOUR);
 		} else {
-			// SWC-5940: no-cache: First validate resource is the latest version.
-			// If it is, use the cached version. Otherwise, wait for the updated resource.
-			httpResponse.setHeader("Cache-Control", "no-cache");
+			httpResponse.setHeader("Cache-Control", "");
 			httpResponse.setHeader("Pragma", "");
 		}
 		filterChain.doFilter(request, response);
