@@ -142,7 +142,7 @@ public class VersionHistoryWidgetViewImpl extends Composite implements VersionHi
 		String versionComment = version.getVersionComment();
 		Long versionNumber = version.getVersionNumber();
 		String versionHref = DisplayUtils.getSynapseHistoryToken(version.getId(), version.getVersionNumber());
-		fileHistoryRow.configure(versionNumber, versionHref, "Version " + versionName, modifiedByUserId, modifiedOn, size, md5, versionComment, deleteCallback, doiWidget);
+		fileHistoryRow.configure(versionNumber, versionHref, versionName, modifiedByUserId, modifiedOn, size, md5, versionComment, deleteCallback, doiWidget);
 		previousVersionsTable.add(fileHistoryRow.asWidget());
 		fileHistoryRow.setCanDelete(canEdit);
 		fileHistoryRow.setIsVersionSelected(isVersionSelected);
