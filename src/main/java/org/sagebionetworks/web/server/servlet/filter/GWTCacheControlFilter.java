@@ -66,7 +66,9 @@ public class GWTCacheControlFilter implements Filter {
 			httpResponse.setHeader("Pragma", "");
 			httpResponse.setDateHeader("Expires", now + ONE_HOUR);
 		} else {
-			httpResponse.setHeader("Cache-Control", "");
+			// SWC-5940: no-cache: First validate resource is the latest version.
+			// If it is, use the cached version. Otherwise, wait for the updated resource.
+			httpResponse.setHeader("Cache-Control", "no-cache");
 			httpResponse.setHeader("Pragma", "");
 		}
 		filterChain.doFilter(request, response);
