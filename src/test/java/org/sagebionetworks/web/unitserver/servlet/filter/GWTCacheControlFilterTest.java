@@ -69,7 +69,7 @@ public class GWTCacheControlFilterTest {
 		when(mockRequest.getRequestURI()).thenReturn("image.jpg");
 		filter.doFilter(mockRequest, mockResponse, mockFilterChain);
 
-		verify(mockResponse).setHeader("Cache-Control", "");
+		verify(mockResponse).setHeader("Cache-Control", "no-cache");
 		verify(mockResponse).setHeader("Pragma", "");
 		verify(mockResponse).setDateHeader(eq("Date"), anyLong());
 		verify(mockFilterChain).doFilter(mockRequest, mockResponse);
