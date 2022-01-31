@@ -41,7 +41,7 @@
 			<t:TableData width="130px"
 				addStyleNames="visible-md visible-lg overflow-x-hidden">
 				<g:TextBox ui:field="idField" width="130px"
-					addStyleNames="border-none noBackground font-size-14"
+					addStyleNames="border-none noBackground"
 					readOnly="true" />
 			</t:TableData>
 		</t:TableRow>
