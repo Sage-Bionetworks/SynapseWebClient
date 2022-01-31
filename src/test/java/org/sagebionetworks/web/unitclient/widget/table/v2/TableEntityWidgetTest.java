@@ -34,6 +34,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Dataset;
+import org.sagebionetworks.repo.model.table.DatasetItem;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.FacetColumnRequest;
 import org.sagebionetworks.repo.model.table.FacetColumnValuesRequest;
@@ -149,6 +150,7 @@ public class TableEntityWidgetTest {
 		tableBundle = new TableBundle();
 		tableBundle.setMaxRowsPerPage(4L);
 		tableBundle.setColumnModels(columns);
+		versionNumber = null;
 		when(mockPortalGinInjector.getDownloadTableQueryModalWidget()).thenReturn(mockDownloadTableQueryModalWidget);
 		when(mockPortalGinInjector.getUploadTableModalWidget()).thenReturn(mockUploadTableModalWidget);
 		when(mockPortalGinInjector.getCopyTextModal()).thenReturn(mockCopyTextModal);
@@ -784,6 +786,50 @@ public class TableEntityWidgetTest {
 		verify(mockView).setItemsEditorVisible(false);
 		verify(mockView, times(3)).setQueryResultsVisible(true);
 		verify(mockActionMenu).setActionVisible(Action.EDIT_DATASET_ITEMS, true);
+	}
+
+
+	@Test // SWC-5921
+	public void testShowDatasetEditorIfNoItemsAndEditable() {
+		// The editor should be revealed without user interaction if the user can edit the dataset AND it has no items.
+		boolean canEdit = true;
+		configureBundleWithDataset();
+
+		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
+
+		verify(mockView).setItemsEditorVisible(true);
+		verify(mockView).setQueryResultsVisible(false);
+		verify(mockActionMenu).setActionVisible(Action.EDIT_DATASET_ITEMS, false);
+	}
+
+	@Test // SWC-5921
+	public void testDoNotShowDatasetEditorIfHasItems() {
+		boolean canEdit = true;
+		configureBundleWithDataset();
+
+		// Dataset has items
+		DatasetItem item = new DatasetItem();
+		item.setEntityId("syn123");
+		item.setVersionNumber(1L);
+		((Dataset) entityBundle.getEntity()).setItems(Collections.singletonList(item));
+
+		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
+
+		verify(mockView, never()).setItemsEditorVisible(true);
+		verify(mockView).setQueryResultsVisible(true);
+		verify(mockActionMenu, never()).setActionVisible(Action.EDIT_DATASET_ITEMS, false);
+	}
+
+	@Test // SWC-5921
+	public void testDoNotShowDatasetEditorIfNotEditable() {
+		boolean canEdit = false; // user does not have permission to edit
+		configureBundleWithDataset();
+
+		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
+
+		verify(mockView, never()).setItemsEditorVisible(true);
+		verify(mockView).setQueryResultsVisible(true);
+		verify(mockActionMenu, never()).setActionVisible(Action.EDIT_DATASET_ITEMS, false);
 	}
 
 }

@@ -8,6 +8,7 @@ import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryFilter;
 import org.sagebionetworks.repo.model.table.SortItem;
@@ -172,12 +173,32 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 		this.actionMenu = actionMenu;
 		this.entityTypeDisplay = EntityTypeUtils.getFriendlyEntityTypeName(bundle.getEntity());
 		reconfigureState();
+		showEditorIfEditableAndEmpty();
 	}
 
 	private void reconfigureState() {
 		configureActions();
 		checkState();
 		initSimpleAdvancedQueryState();
+	}
+
+	/**
+	 * For certain table types, if the user has edit permissions and the table doesn't have any data,
+	 *   immediately prompt them with the editor.
+	 *
+	 * The primary scenario for this behavior is when initially creating a table and opening this page.
+	 */
+	private void showEditorIfEditableAndEmpty() {
+		// This currently only applies to Datasets, since other types of tables are editable via the wizard, whereas the
+		// dataset items editor is built-in to this widget.
+		if (canEdit && isCurrentVersion) {
+			if (entityBundle.getEntity() instanceof Dataset) {
+				Dataset dataset = (Dataset) entityBundle.getEntity();
+				if (dataset.getItems() == null || dataset.getItems().size() == 0) {
+					showDatasetItemsEditor();
+				}
+			}
+		}
 	}
 
 	/**
@@ -217,10 +238,7 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 
 		this.actionMenu.setActionListener(Action.EDIT_DATASET_ITEMS, action -> {
 			if (!isShowingItemsEditor) {
-				actionMenu.setActionVisible(Action.EDIT_DATASET_ITEMS, false);
-				view.setItemsEditorVisible(true);
-				isShowingItemsEditor = true;
-				view.setQueryResultsVisible(false);
+				showDatasetItemsEditor();
 			};
 		});
 
@@ -623,6 +641,13 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 						() -> closeItemsEditor()
 				);
 		return props;
+	}
+
+	private void showDatasetItemsEditor() {
+		actionMenu.setActionVisible(Action.EDIT_DATASET_ITEMS, false);
+		view.setItemsEditorVisible(true);
+		isShowingItemsEditor = true;
+		view.setQueryResultsVisible(false);
 	}
 
 	public void closeItemsEditor() {
