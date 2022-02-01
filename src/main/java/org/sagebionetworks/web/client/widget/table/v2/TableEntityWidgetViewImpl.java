@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
-import org.gwtbootstrap3.client.ui.Alert;
+import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
@@ -11,10 +11,12 @@ import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactDOM;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.FullWidthAlert;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityViewScopeWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.SubmissionViewScopeWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
+
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
@@ -46,7 +48,7 @@ public class TableEntityWidgetViewImpl extends Composite implements TableEntityW
 	@UiField
 	Div scopePanel;
 	@UiField
-	Alert tableMessage;
+	FullWidthAlert tableMessage;
 	@UiField
 	SimplePanel queryInputPanel;
 	@UiField
@@ -97,8 +99,8 @@ public class TableEntityWidgetViewImpl extends Composite implements TableEntityW
 
 	@Override
 	public void showTableMessage(AlertType type, String message) {
-		this.tableMessage.setType(type);
-		this.tableMessage.setText(message);
+		this.tableMessage.setAlertType(type);
+		this.tableMessage.setMessage(message);
 	}
 
 	@Override
@@ -134,8 +136,18 @@ public class TableEntityWidgetViewImpl extends Composite implements TableEntityW
 	}
 
 	@Override
+	public boolean isSchemaVisible() {
+		return schemaCollapse.isVisible();
+	}
+
+	@Override
 	public void setScopeVisible(boolean visible) {
 		scopeCollapse.setVisible(visible);
+	}
+
+	@Override
+	public boolean isScopeVisible() {
+		return scopeCollapse.isVisible();
 	}
 
 	@Override
@@ -161,6 +173,7 @@ public class TableEntityWidgetViewImpl extends Composite implements TableEntityW
 
 	@Override
 	public void setItemsEditorVisible(boolean visible) {
+		itemsEditorContainer.setVisible(visible);
 		if (visible) {
 			ReactDOM.render(
 					React.createElementWithSynapseContext(
@@ -173,5 +186,10 @@ public class TableEntityWidgetViewImpl extends Composite implements TableEntityW
 		} else {
 			itemsEditorContainer.clear();
 		}
+	}
+
+	@Override
+	public boolean isItemsEditorVisible() {
+		return itemsEditorContainer.isVisible();
 	}
 }

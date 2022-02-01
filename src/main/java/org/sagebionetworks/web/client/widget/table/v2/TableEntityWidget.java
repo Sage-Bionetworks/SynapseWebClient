@@ -3,16 +3,21 @@ package org.sagebionetworks.web.client.widget.table.v2;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Dataset;
+import org.sagebionetworks.repo.model.table.DatasetItem;
+import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryFilter;
 import org.sagebionetworks.repo.model.table.SortItem;
+import org.sagebionetworks.repo.model.table.SubmissionView;
 import org.sagebionetworks.repo.model.table.TableBundle;
+import org.sagebionetworks.repo.model.table.View;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -67,6 +72,23 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 		return "This " + tableType.getDisplayName() + " does not have any columns.";
 	}
 
+	public static final String noScopeEditableMessage(TableType tableType) {
+		if (TableType.dataset.equals(tableType)) {
+			return "This " + tableType.getDisplayName() + " does not have any items. Select \"Edit " + tableType.getDisplayName() + " Items\" from the Tools Menu to add items to this " + tableType.getDisplayName() + ".";
+		} else {
+			return "This " + tableType.getDisplayName() + " does not have a defined scope. Edit the scope to populate the " + tableType.getDisplayName() + ".";
+		}
+	}
+
+	public static final String noScopeNotEditableMessage(TableType tableType) {
+		if (TableType.dataset.equals(tableType)) {
+			return "This " + tableType.getDisplayName() + " does not have any items.";
+		} else {
+			return "This " + tableType.getDisplayName() + " does not have a defined scope.";
+		}
+
+	}
+
 	public static final long DEFAULT_LIMIT = 25;
 	public static final int MAX_SORT_COLUMNS = 3;
 	// Look for:
@@ -95,7 +117,6 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 	CopyTextModal copyTextModal;
 	SynapseClientAsync synapseClient;
 	FileViewClientsHelp fileViewClientsHelp;
-	boolean isShowingSchema, isShowingScope, isShowingItemsEditor;
 	public static final String SHOW = "Show ";
 	public static final String HIDE = "Hide ";
 	public static final String SCOPE = "Scope of ";
@@ -177,9 +198,8 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 	}
 
 	private void reconfigureState() {
+		initializeQuery(() -> initSimpleAdvancedQueryState());
 		configureActions();
-		checkState();
-		initSimpleAdvancedQueryState();
 	}
 
 	/**
@@ -206,8 +226,6 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 	 */
 	private void configureActions() {
 		// Listen to action events.
-		isShowingScope = false;
-		isShowingSchema = false;
 		view.setScopeVisible(false);
 		view.setSchemaVisible(false);
 		actionMenu.setActionText(Action.SHOW_TABLE_SCHEMA, SHOW + entityTypeDisplay + SCHEMA);
@@ -216,34 +234,52 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 		this.actionMenu.setActionListener(Action.UPLOAD_TABLE_DATA, action -> {
 			onUploadTableData();
 		});
-		this.actionMenu.setActionListener(Action.DOWNLOAD_TABLE_QUERY_RESULTS, action -> {
-			onDownloadResults();
-		});
 		this.actionMenu.setActionListener(Action.EDIT_TABLE_DATA, action -> {
 			onEditResults();
 		});
 		this.actionMenu.setActionListener(Action.SHOW_TABLE_SCHEMA, action -> {
-			isShowingSchema = !isShowingSchema;
-			view.setSchemaVisible(isShowingSchema);
-			String showHide = isShowingSchema ? HIDE : SHOW;
+			boolean isVisible = !view.isSchemaVisible();
+			view.setSchemaVisible(isVisible);
+			String showHide = isVisible ? HIDE : SHOW;
 			actionMenu.setActionText(Action.SHOW_TABLE_SCHEMA, showHide + entityTypeDisplay + SCHEMA);
 		});
 
 		this.actionMenu.setActionListener(Action.SHOW_VIEW_SCOPE, action -> {
-			isShowingScope = !isShowingScope;
-			view.setScopeVisible(isShowingScope);
-			String showHide = isShowingScope ? HIDE : SHOW;
+			boolean isVisible = !view.isScopeVisible();
+			view.setScopeVisible(isVisible);
+			String showHide = isVisible ? HIDE : SHOW;
 			actionMenu.setActionText(Action.SHOW_VIEW_SCOPE, showHide + SCOPE + entityTypeDisplay);
 		});
 
 		this.actionMenu.setActionListener(Action.EDIT_DATASET_ITEMS, action -> {
-			if (!isShowingItemsEditor) {
+			if (!view.isItemsEditorVisible()) {
 				showDatasetItemsEditor();
 			};
 		});
 
+
+		// Download options
+		this.actionMenu.setTableDownloadOptionsVisible(this.currentQuery != null);
+		this.actionMenu.setActionListener(Action.DOWNLOAD_TABLE_QUERY_RESULTS, action -> {
+			onDownloadResults();
+		});
 		this.actionMenu.setActionVisible(Action.ADD_TABLE_RESULTS_TO_DOWNLOAD_LIST, tableType.isIncludeFiles());
 		this.actionMenu.setActionVisible(Action.TABLE_DOWNLOAD_PROGRAMMATIC_OPTIONS, tableType.isIncludeFiles());
+		if (this.entityBundle.getEntity() instanceof Dataset && isCurrentVersion) {
+			// SWC-5878 - On the current (non-snapshot) version of a dataset, only editors should be able to download
+			this.actionMenu.setTableDownloadOptionsEnabled(canEdit);
+		} else {
+			this.actionMenu.setTableDownloadOptionsEnabled(true);
+		}
+		this.actionMenu.setActionListener(Action.TABLE_DOWNLOAD_PROGRAMMATIC_OPTIONS, action -> {
+			onShowDownloadFilesProgrammatically();
+		});
+		this.actionMenu.setActionListener(Action.ADD_TABLE_RESULTS_TO_DOWNLOAD_LIST, action -> {
+			onAddToDownloadList();
+		});
+
+
+		// Query options
 		this.actionMenu.setActionListener(Action.SHOW_ADVANCED_SEARCH, action -> {
 			onShowAdvancedSearch();
 		});
@@ -253,30 +289,53 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 		this.actionMenu.setActionListener(Action.SHOW_QUERY, action -> {
 			onShowQuery();
 		});
-		this.actionMenu.setActionListener(Action.TABLE_DOWNLOAD_PROGRAMMATIC_OPTIONS, action -> {
-			onShowDownloadFilesProgrammatically();
-		});
-		this.actionMenu.setActionListener(Action.ADD_TABLE_RESULTS_TO_DOWNLOAD_LIST, action -> {
-			onAddToDownloadList();
-		});
 	}
 
 	/**
-	 * 
+	 * Initilializes the Table query. This method will not issue a query if we know we will not get results (e.g. if there are no columns)
+	 * @param onQuery a callback that will be invoked if we initiate a query.
 	 */
-	public void checkState() {
-		// If there are no columns, then the first thing to do is ask the user
-		// to create some columns.
-		if (this.tableBundle.getColumnModels().size() < 1) {
+	public void initializeQuery(Callback onQuery) {
+		// Make a few checks to see if we know that we won't get results before submitting the query
+		if (entityBundle.getEntity() instanceof View && hasUndefinedScope((View) entityBundle.getEntity())) {
+			// If the table is a View with no scope or Dataset with no items, there will be no results.
+			// Show a warning or prompt.
+			setNoScopeState();
+		} else if (this.tableBundle.getColumnModels().size() < 1) {
+			// If there are no columns, there will be no results, so ask the user to create some columns.
 			setNoColumnsState();
 		} else {
-			// There are columns.
+			// There are columns, and if this is a view, the scope is defined.
 			Query startQuery = queryChangeHandler.getQueryString();
 			if (startQuery == null) {
 				// use a default query
 				startQuery = getDefaultQuery();
 			}
 			setQuery(startQuery, false);
+			if (onQuery != null) {
+				onQuery.invoke();
+			}
+		}
+	}
+
+	/**
+	 * Check if a View or Dataset has an undefined scope. If the scope is undefined, a query need not be made.
+	 * @param viewOrDataset
+	 * @return true iff we are sure that the scope is undefined.
+	 */
+	private static boolean hasUndefinedScope(View view) {
+		if (view instanceof EntityView) {
+			List<String> scopeIds = ((EntityView) view).getScopeIds();
+			return scopeIds == null || scopeIds.size() == 0;
+		} else if (view instanceof SubmissionView) {
+			List<String> scopeIds = ((SubmissionView) view).getScopeIds();
+			return scopeIds == null || scopeIds.size() == 0;
+		} else if (view instanceof Dataset) {
+			List<DatasetItem> datasetItems = ((Dataset) view).getItems();
+			return datasetItems == null || datasetItems.size() == 0;
+		} else {
+			// if we aren't sure, return false
+			return false;
 		}
 	}
 
@@ -428,6 +487,25 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 		view.setQueryResultsVisible(false);
 		view.showTableMessage(AlertType.INFO, message);
 		view.setTableMessageVisible(true);
+	}
+
+	private void setNoScopeState() {
+		if (this.entityBundle.getEntity() instanceof View) {
+			String message = null;
+			if (this.canEdit) {
+				message = noScopeEditableMessage(tableType);
+			} else {
+				message = noScopeNotEditableMessage(tableType);
+			}
+			// There can be no query when there are no items
+			if (this.queryChangeHandler.getQueryString() != null) {
+				this.queryChangeHandler.onQueryChange(null);
+			}
+			view.setQueryInputVisible(false);
+			view.setQueryResultsVisible(false);
+			view.showTableMessage(AlertType.INFO, message);
+			view.setTableMessageVisible(true);
+		}
 	}
 
 	/**
@@ -646,12 +724,11 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 	private void showDatasetItemsEditor() {
 		actionMenu.setActionVisible(Action.EDIT_DATASET_ITEMS, false);
 		view.setItemsEditorVisible(true);
-		isShowingItemsEditor = true;
 		view.setQueryResultsVisible(false);
+		view.setTableMessageVisible(false);
 	}
 
 	public void closeItemsEditor() {
-		isShowingItemsEditor = false;
 		actionMenu.setActionVisible(Action.EDIT_DATASET_ITEMS, true);
 		view.setItemsEditorVisible(false);
 		view.setQueryResultsVisible(true);

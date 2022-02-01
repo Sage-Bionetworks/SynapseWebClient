@@ -271,7 +271,6 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 		this.entityBundle = bundle;
 		Entity entity = bundle.getEntity();
 		boolean isShownInTab = isEntityShownInTab(entity);
-		boolean isDataset = entity instanceof Dataset;
 		boolean isProject = entity instanceof Project;
 		boolean isVersionSupported = EntityActionControllerImpl.isVersionSupported(entityBundle.getEntity(), ginInjector.getCookieProvider());
 		version = isVersionSupported ? versionNumber : null;
@@ -284,15 +283,10 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 		modifiedCreatedBy.setVisible(false);
 		view.setTableUIVisible(isShownInTab);
 		view.setActionMenu(tab.getEntityActionMenu());
-		tab.getEntityActionMenu().setTableDownloadOptionsVisible(isShownInTab);
-		boolean isCurrentVersion = version == null;
-
-		if (isDataset && isCurrentVersion) {
-			// SWC-5878 - On the current (non-snapshot) version of a dataset, only editors should be able to download
-			tab.getEntityActionMenu().setTableDownloadOptionsEnabled(bundle.getPermissions().getCanCertifiedUserEdit());
-		} else {
-			tab.getEntityActionMenu().setTableDownloadOptionsEnabled(true);
+		if (!isShownInTab) {
+			tab.getEntityActionMenu().setTableDownloadOptionsVisible(false);
 		}
+		boolean isCurrentVersion = version == null;
 
 		tab.configureEntityActionController(bundle, isCurrentVersion, null);
 		if (isShownInTab) {
@@ -385,7 +379,7 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 					goToLatestSnapshot,
 					isLinkToCurrentSnapshotEnabled,
 					linkToCurrentSnapshotTooltipText);
-		} else if (entityBundle.getEntity() instanceof Dataset && !version.equals(latestSnapshotVersionNumber)) {
+		} else if (entityBundle.getEntity() instanceof Dataset && version != null && !version.equals(latestSnapshotVersionNumber)) {
 			// This is a snapshot/stable version but not the latest version. Notify a more recent stable version exists
 			this.view.setVersionAlertVisible(true);
 			this.view.setVersionAlertCopy(VERSION_ALERT_OLD_SNAPSHOT_DATASET_TITLE, VERSION_ALERT_OLD_SNAPSHOT_DATASET_MESSAGE);

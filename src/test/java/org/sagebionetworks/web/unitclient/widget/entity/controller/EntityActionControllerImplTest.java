@@ -451,7 +451,6 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionVisible(Action.CREATE_TABLE_VERSION, true);
 		verify(mockActionMenu).setActionListener(Action.CREATE_TABLE_VERSION, controller);
 		// edit actions
-		verify(mockActionMenu).setActionVisible(Action.EDIT_TABLE_DATA, true);
 		verify(mockActionMenu).setActionVisible(Action.UPLOAD_TABLE_DATA, true);
 		// Show scope should be visible
 		verify(mockActionMenu).setActionVisible(Action.SHOW_VIEW_SCOPE, true);
@@ -601,7 +600,6 @@ public class EntityActionControllerImplTest {
 
 		// verify other table commands. current user canCertifiedUserEdit
 		verify(mockActionMenu).setActionVisible(Action.UPLOAD_TABLE_DATA, true);
-		verify(mockActionMenu).setActionVisible(Action.EDIT_TABLE_DATA, true);
 		verify(mockActionMenu).setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
 		verify(mockActionMenu).setActionVisible(Action.SHOW_TABLE_SCHEMA, true);
 		verify(mockActionMenu).setActionVisible(Action.SHOW_VIEW_SCOPE, false);
