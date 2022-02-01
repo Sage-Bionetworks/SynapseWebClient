@@ -339,8 +339,8 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 	}
 
 	/**
-	 * Check if a View or Dataset has an undefined scope. If the scope is undefined, a query need not be made.
-	 * @param viewOrDataset
+	 * Check if a View has an undefined scope. If the scope is undefined, a query need not be made.
+	 * @param view
 	 * @return true iff we are sure that the scope is undefined.
 	 */
 	private static boolean hasUndefinedScope(View view) {
