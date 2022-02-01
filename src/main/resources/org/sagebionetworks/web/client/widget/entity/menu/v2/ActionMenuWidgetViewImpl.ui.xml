@@ -17,24 +17,22 @@
 		<b:Tooltip title="Show query">
 			<a:ActionButton visible="false" icon="DATABASE" addStyleNames="margin-right-5" action="SHOW_QUERY" />
 		</b:Tooltip>
-		<b:Tooltip title="Edit query results">
-			<a:ActionButton visible="false" icon="EDIT" addStyleNames="margin-right-5" action="EDIT_TABLE_DATA" />
+		<b:Tooltip ui:field="editTableDataTooltip" title="Edit query results">
+            <bh:Span> <!-- Have to wrap the button in a span we get a mouseevent to show the tooltip if the button is disabled -->
+			    <a:ActionButton visible="false" icon="EDIT" addStyleNames="margin-right-5" action="EDIT_TABLE_DATA" />
+            </bh:Span>
 		</b:Tooltip>
-		<b:DropDown addStyleNames="displayInlineBlock">
-			<b:Button dataToggle="DROPDOWN" type="PRIMARY" text="Download Options" marginRight="5" visible="false" ui:field="tableDownloadOptions"/>
-			<b:DropDownMenu addStyleNames="dropdown-menu-right">
-				<a:ActionMenuItem action="DOWNLOAD_TABLE_QUERY_RESULTS">Export Table</a:ActionMenuItem>
-				<b:Tooltip ui:field="addToDownloadListMenuItemTooltip" placement="LEFT" container="body"
-						   text="A draft version of a Dataset cannot be added to the Download List." >
-					<a:ActionMenuItem ui:field="addToDownloadListMenuItem" action="ADD_TABLE_RESULTS_TO_DOWNLOAD_LIST">Add to Download List</a:ActionMenuItem>
-				</b:Tooltip>
-				<!-- <b:Divider ui:field="downloadOptionsDivider" /> -->
-				<b:Tooltip ui:field="programmaticOptionsMenuItemTooltip" placement="LEFT" container="body"
-						   text="A draft version of a Dataset cannot be downloaded with a programmatic client." >
-					<a:ActionMenuItem ui:field="programmaticOptionsMenuItem" action="TABLE_DOWNLOAD_PROGRAMMATIC_OPTIONS">Programmatic Options</a:ActionMenuItem>
-				</b:Tooltip>
-			</b:DropDownMenu>
-		</b:DropDown>
+        <b:Tooltip ui:field="downloadOptionsTooltip" placement="TOP" container="body">
+            <b:DropDown addStyleNames="displayInlineBlock">
+                <b:Button dataToggle="DROPDOWN" type="PRIMARY" text="Download Options" marginRight="5" visible="false" ui:field="tableDownloadOptions"/>
+                <b:DropDownMenu addStyleNames="dropdown-menu-right">
+                    <a:ActionMenuItem ui:field="exportTableMenuItem" action="DOWNLOAD_TABLE_QUERY_RESULTS">Export Table</a:ActionMenuItem>
+                    <a:ActionMenuItem ui:field="addToDownloadListMenuItem" action="ADD_TABLE_RESULTS_TO_DOWNLOAD_LIST">Add to Download List</a:ActionMenuItem>
+                    <!-- <b:Divider ui:field="downloadOptionsDivider" /> -->
+                    <a:ActionMenuItem ui:field="programmaticOptionsMenuItem" action="TABLE_DOWNLOAD_PROGRAMMATIC_OPTIONS">Programmatic Options</a:ActionMenuItem>
+                </b:DropDownMenu>
+            </b:DropDown>
+        </b:Tooltip>
         <w:ReactComponentDiv ui:field="skeletonButton"  addStyleNames="displayInlineBlock"></w:ReactComponentDiv>
         <b:Button ui:field="singleActionButton"  addStyleNames="displayInlineBlock"></b:Button>
 		<b:DropDown ui:field="dropdown" addStyleNames="displayInlineBlock">

@@ -17,6 +17,7 @@ import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.Query;
+import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -286,7 +287,7 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 		if (!isShownInTab) {
 			tab.getEntityActionMenu().setTableDownloadOptionsVisible(false);
 		}
-		boolean isCurrentVersion = version == null;
+		boolean isCurrentVersion = !isProject && ((Table) entity).getIsLatestVersion();
 
 		tab.configureEntityActionController(bundle, isCurrentVersion, null);
 		if (isShownInTab) {
@@ -379,7 +380,7 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 					goToLatestSnapshot,
 					isLinkToCurrentSnapshotEnabled,
 					linkToCurrentSnapshotTooltipText);
-		} else if (entityBundle.getEntity() instanceof Dataset && version != null && !version.equals(latestSnapshotVersionNumber)) {
+		} else if (entityBundle.getEntity() instanceof Dataset && !((Dataset) entityBundle.getEntity()).getIsLatestVersion() && version != latestSnapshotVersionNumber) {
 			// This is a snapshot/stable version but not the latest version. Notify a more recent stable version exists
 			this.view.setVersionAlertVisible(true);
 			this.view.setVersionAlertCopy(VERSION_ALERT_OLD_SNAPSHOT_DATASET_TITLE, VERSION_ALERT_OLD_SNAPSHOT_DATASET_MESSAGE);

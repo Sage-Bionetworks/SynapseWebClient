@@ -23,6 +23,7 @@ import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cache.SessionStorage;
+import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.jsinterop.DatasetEditorProps;
 import org.sagebionetworks.web.client.jsinterop.ToastMessageOptions;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -42,6 +43,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.QueryInputListener
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultsListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.regexp.shared.MatchResult;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -102,6 +104,7 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 	ActionMenuWidget actionMenu;
 	PreflightController preflightController;
 	SessionStorage sessionStorage;
+	EventBus eventBus;
 
 	EntityBundle entityBundle;
 	String tableId;
@@ -124,8 +127,10 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 	String entityTypeDisplay;
 	PortalGinInjector ginInjector;
 
+	boolean hasQueryableData; // if `false`, then a query will never yield data.
+
 	@Inject
-	public TableEntityWidget(TableEntityWidgetView view, TableQueryResultWidget queryResultsWidget, QueryInputWidget queryInputWidget, PreflightController preflightController, SynapseClientAsync synapseClient, FileViewClientsHelp fileViewClientsHelp, PortalGinInjector ginInjector, SessionStorage sessionStorage) {
+	public TableEntityWidget(TableEntityWidgetView view, TableQueryResultWidget queryResultsWidget, QueryInputWidget queryInputWidget, PreflightController preflightController, SynapseClientAsync synapseClient, FileViewClientsHelp fileViewClientsHelp, PortalGinInjector ginInjector, SessionStorage sessionStorage, EventBus eventBus) {
 		this.view = view;
 		this.queryResultsWidget = queryResultsWidget;
 		this.queryInputWidget = queryInputWidget;
@@ -135,6 +140,7 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 		this.fileViewClientsHelp = fileViewClientsHelp;
 		this.ginInjector = ginInjector;
 		this.sessionStorage = sessionStorage;
+		this.eventBus = eventBus;
 		this.view.setPresenter(this);
 		this.view.setQueryResultsWidget(this.queryResultsWidget);
 		this.view.setQueryInputWidget(this.queryInputWidget);
@@ -198,7 +204,10 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 	}
 
 	private void reconfigureState() {
-		initializeQuery(() -> initSimpleAdvancedQueryState());
+		initializeQuery();
+		if (this.hasQueryableData) {
+			initSimpleAdvancedQueryState();
+		}
 		configureActions();
 	}
 
@@ -252,24 +261,35 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 		});
 
 		this.actionMenu.setActionListener(Action.EDIT_DATASET_ITEMS, action -> {
-			if (!view.isItemsEditorVisible()) {
-				showDatasetItemsEditor();
-			};
+			showDatasetItemsEditor();
 		});
 
+		// Edit data
+		this.actionMenu.setActionEnabled(Action.EDIT_TABLE_DATA, hasQueryableData);
+		if (hasQueryableData) {
+			this.actionMenu.setEditTableDataTooltipText("Bulk edit cell values");
+		} else {
+			this.actionMenu.setEditTableDataTooltipText("There is no data to edit");
+		}
 
 		// Download options
-		this.actionMenu.setTableDownloadOptionsVisible(this.currentQuery != null);
+		this.actionMenu.setTableDownloadOptionsVisible(true);
 		this.actionMenu.setActionListener(Action.DOWNLOAD_TABLE_QUERY_RESULTS, action -> {
 			onDownloadResults();
 		});
 		this.actionMenu.setActionVisible(Action.ADD_TABLE_RESULTS_TO_DOWNLOAD_LIST, tableType.isIncludeFiles());
 		this.actionMenu.setActionVisible(Action.TABLE_DOWNLOAD_PROGRAMMATIC_OPTIONS, tableType.isIncludeFiles());
-		if (this.entityBundle.getEntity() instanceof Dataset && isCurrentVersion) {
+		if (this.entityBundle.getEntity() instanceof Dataset && isCurrentVersion && hasQueryableData) {
 			// SWC-5878 - On the current (non-snapshot) version of a dataset, only editors should be able to download
 			this.actionMenu.setTableDownloadOptionsEnabled(canEdit);
+			if (!canEdit) {
+				this.actionMenu.setDownloadActionsDisabledTooltipText("A draft version of a Dataset cannot be downloaded");
+			}
 		} else {
-			this.actionMenu.setTableDownloadOptionsEnabled(true);
+			this.actionMenu.setTableDownloadOptionsEnabled(hasQueryableData);
+			if (!hasQueryableData) {
+				this.actionMenu.setDownloadActionsDisabledTooltipText("There is no data to download");
+			}
 		}
 		this.actionMenu.setActionListener(Action.TABLE_DOWNLOAD_PROGRAMMATIC_OPTIONS, action -> {
 			onShowDownloadFilesProgrammatically();
@@ -295,26 +315,26 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 	 * Initilializes the Table query. This method will not issue a query if we know we will not get results (e.g. if there are no columns)
 	 * @param onQuery a callback that will be invoked if we initiate a query.
 	 */
-	public void initializeQuery(Callback onQuery) {
+	public void initializeQuery() {
 		// Make a few checks to see if we know that we won't get results before submitting the query
 		if (entityBundle.getEntity() instanceof View && hasUndefinedScope((View) entityBundle.getEntity())) {
 			// If the table is a View with no scope or Dataset with no items, there will be no results.
 			// Show a warning or prompt.
 			setNoScopeState();
+			this.hasQueryableData = false;
 		} else if (this.tableBundle.getColumnModels().size() < 1) {
 			// If there are no columns, there will be no results, so ask the user to create some columns.
 			setNoColumnsState();
+			this.hasQueryableData = false;
 		} else {
 			// There are columns, and if this is a view, the scope is defined.
+			this.hasQueryableData = true;
 			Query startQuery = queryChangeHandler.getQueryString();
 			if (startQuery == null) {
 				// use a default query
 				startQuery = getDefaultQuery();
 			}
 			setQuery(startQuery, false);
-			if (onQuery != null) {
-				onQuery.invoke();
-			}
 		}
 	}
 
@@ -714,6 +734,7 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 									.setPrimaryButton("Show Schema", () -> this.actionMenu.onAction(Action.SHOW_TABLE_SCHEMA))
 									.build();
 							DisplayUtils.notify("Edit the Dataset Schema to add additional annotation columns to this dataset", DisplayUtils.NotificationVariant.SUCCESS, toastOptions);
+							eventBus.fireEvent(new EntityUpdatedEvent());
 							closeItemsEditor();
 						},
 						() -> closeItemsEditor()

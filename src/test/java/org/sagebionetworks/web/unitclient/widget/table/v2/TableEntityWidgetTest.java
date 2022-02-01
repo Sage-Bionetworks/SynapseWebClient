@@ -76,6 +76,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultsListen
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
@@ -116,6 +117,8 @@ public class TableEntityWidgetTest {
 	CopyTextModal mockCopyTextModal;
 	@Mock
 	CookieProvider mockCookies;
+	@Mock
+	EventBus mockEventBus;
 
 	@Captor
 	ArgumentCaptor<Callback> callbackCaptor;
@@ -158,7 +161,7 @@ public class TableEntityWidgetTest {
 		when(mockPortalGinInjector.getCookieProvider()).thenReturn(mockCookies);
 		when(mockPortalGinInjector.getAddToDownloadListV2()).thenReturn(mockAddToDownloadListV2);
 
-		widget = new TableEntityWidget(mockView, mockQueryResultsWidget, mockQueryInputWidget, mockPreflightController, mockSynapseClient, mockFileViewClientsHelp, mockPortalGinInjector, mockSessionStorage);
+		widget = new TableEntityWidget(mockView, mockQueryResultsWidget, mockQueryInputWidget, mockPreflightController, mockSynapseClient, mockFileViewClientsHelp, mockPortalGinInjector, mockSessionStorage, mockEventBus);
 
 		AsyncMockStubber.callSuccessWith(FACET_SQL).when(mockSynapseClient).generateSqlWithFacets(anyString(), anyList(), anyList(), any(AsyncCallback.class));
 		// The test bundle
