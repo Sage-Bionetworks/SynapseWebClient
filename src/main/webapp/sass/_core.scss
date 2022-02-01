@@ -3638,3 +3638,26 @@ div.border {
 		text-transform: capitalize;
 	}
 }
+
+.FacetColumnResultValueWidget {
+	display: grid;
+	grid-template-columns: 25px auto 50px;
+	margin-right: 5px;
+	> * {
+		align-self: center;
+	}
+	.checkbox {
+		grid-column: 1 / span 1;
+	}
+	.value {
+		grid-column: 2 / span 1;
+		max-width: 355px;
+		text-overflow: ellipsis;
+		overflow-x: hidden;
+	}
+	.count {
+		grid-column: 3 / span 1;
+		justify-content: end;
+		text-align: end;
+	}
+}
