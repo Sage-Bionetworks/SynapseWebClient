@@ -39,7 +39,7 @@
 							<bh:Div width="100%" addStyleNames="flexcontainer-row">
 								<g:Image ui:field="alphaModeStatusIcon" addStyleNames="flexcontainer-column margin-right-5 margin-top-3" width="18px" height="18px" />
 								<b:Anchor ui:field="debugLink"
-									addStyleNames="flexcontainer-column flexcontainer-justify-flex-end color-white">
+									addStyleNames="flexcontainer-column flexcontainer-justify-flex-end color-white font-size-14">
 									<span>Experimental Mode <strong>Off</strong></span>
 								</b:Anchor>
 								<b:Anchor ui:field="debugOffLink"
