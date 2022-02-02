@@ -39,13 +39,13 @@
 				addStyleNames="visible-lg overflow-x-hidden min-width-150" width="150px">
 				<g:TextBox ui:field="idField"
 					addStyleNames="border-none noBackground"
-					readOnly="true" />
+					readOnly="true" width="100%"/>
 			</t:TableData>
 			<t:TableData ui:field="md5TableData"
 				addStyleNames="visible-xl overflow-x-hidden min-width-165" width="165px">
 				<g:TextBox ui:field="md5Field"
 					addStyleNames="border-none noBackground overflow-x-hidden"
-					readOnly="true" />
+					readOnly="true" width="100%"/>
 			</t:TableData>
 			<t:TableData ui:field="modifiedByTableData"
 				addStyleNames="visible-xl overflow-x-hidden min-width-310 max-width-310"  width="310px">
