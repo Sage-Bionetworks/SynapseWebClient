@@ -33,11 +33,14 @@
 				</bh:Div>
 				<bh:Div addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end" ui:field="actionMenuContainer"/>
 			</bh:Div>
-			<bh:Div ui:field="versionInfoUI" visible="false">
+			<bh:Div ui:field="versionInfoUI">
 				<bh:Span addStyleNames="boldText" text="Version:"/>
 				<bh:Span addStyleNames="margin-left-5" ui:field="version"/>
+                <bh:Span addStyleNames="margin-left-5" ui:field="versionUiCurrent">
+                    (Current)
+                </bh:Span>
 				<bh:Span addStyleNames="margin-left-5">
-					<bh:Text>(</bh:Text><b:Anchor ui:field="currentVersionLink" text="Go to the current version"/><bh:Text>)</bh:Text>
+					<bh:Text> - </bh:Text><b:Anchor addStyleNames="margin-left-5" ui:field="showVersionHistoryLink" text="Show Version History"/>
 				</bh:Span>
 			</bh:Div>
 			<g:HTMLPanel ui:field="fileNameContainer">

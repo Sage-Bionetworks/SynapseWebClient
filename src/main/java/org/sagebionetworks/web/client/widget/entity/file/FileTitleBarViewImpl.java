@@ -1,8 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
-import static org.sagebionetworks.web.client.DisplayConstants.GO_TO_CURRENT_VERSION;
-import static org.sagebionetworks.web.client.DisplayConstants.GO_TO_DRAFT_VERSION;
-
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
@@ -11,11 +8,9 @@ import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.EntityTypeIcon;
 import org.sagebionetworks.web.client.widget.HelpWidget;
@@ -81,9 +76,9 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	@UiField
 	Span version;
 	@UiField
-	Anchor currentVersionLink;
+	Anchor showVersionHistoryLink;
 	@UiField
-	Div versionInfoUI;
+	Span versionUiCurrent;
 	@UiField
 	HelpWidget viewOnlyHelp;
 	@UiField
@@ -108,18 +103,16 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 
 		favoritePanel.addStyleName("inline-block");
 		favoritePanel.setWidget(favoriteWidget.asWidget());
-		currentVersionLink.addClickHandler(event -> {
-			if (!DisplayUtils.isAnyModifierKeyDown(event)) {
-				event.preventDefault();
-				globalAppState.getPlaceChanger().goTo(new Synapse(currentEntityId));
-			}
-		});
 		addToDownloadListLink.addClickHandler(event -> {
 			presenter.onAddToDownloadList();
 		});
 		programmaticOptionsLink.addClickHandler(event -> {
 			presenter.onProgrammaticDownloadOptions();
 		});
+		showVersionHistoryLink.addClickHandler(event -> {
+			presenter.toggleShowVersionHistory();
+		});
+
 	}
 
 	@Override
@@ -133,17 +126,7 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 		favoriteWidget.configure(currentEntityId);
 		md5Link.clear();
 		md5LinkContainer.setWidget(md5Link);
-
-		String currentVersionLinkText;
-		if (entity instanceof Dataset) { // Currently doesn't do anything since this titlebar is only used for Files
-			currentVersionLinkText = GO_TO_DRAFT_VERSION;
-		} else {
-			currentVersionLinkText = GO_TO_CURRENT_VERSION;
-		}
-		currentVersionLink.setText(currentVersionLinkText);
-    
 		entityIcon.setType(EntityTypeUtils.getEntityType(entity));
-		currentVersionLink.setHref("#!Synapse:" + currentEntityId);
 		String viewOnlyHelpText = authController.isLoggedIn() ? "You do not have download access for this item." : "You need to log in to download this file.";
 		viewOnlyHelp.setHelpMarkdown(viewOnlyHelpText);
 	}
@@ -227,8 +210,8 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	}
 
 	@Override
-	public void setVersionUIVisible(boolean visible) {
-		versionInfoUI.setVisible(visible);
+	public void setVersionUICurrentVisible(boolean visible) {
+		versionUiCurrent.setVisible(visible);
 	}
 
 	@Override

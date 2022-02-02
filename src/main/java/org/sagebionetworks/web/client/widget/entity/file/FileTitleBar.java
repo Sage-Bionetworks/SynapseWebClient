@@ -28,6 +28,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.EntityBadge;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 
 import com.google.gwt.event.shared.EventBus;
@@ -49,6 +50,7 @@ public class FileTitleBar implements SynapseWidgetPresenter, FileTitleBarView.Pr
 	private AuthenticationController authController;
 	private CookieProvider cookies;
 	private PopupUtilsView popupUtils;
+	private ActionMenuWidget actionMenuWidget;
 
 	@Inject
 	public FileTitleBar(FileTitleBarView view, SynapseProperties synapseProperties, FileDownloadMenuItem fileDownloadButton, SynapseJavascriptClient jsClient, FileClientsHelp fileClientsHelp, EventBus eventBus, SynapseJSNIUtils jsniUtils, GlobalApplicationState globalAppState, AuthenticationController authController, CookieProvider cookies, PopupUtilsView popupUtils) {
@@ -69,8 +71,8 @@ public class FileTitleBar implements SynapseWidgetPresenter, FileTitleBarView.Pr
 
 	public void configure(EntityBundle bundle, ActionMenuWidget actionMenu) {
 		this.entityBundle = bundle;
+		this.actionMenuWidget = actionMenu;
 		view.setCanDownload(entityBundle.getPermissions().getCanDownload());
-		view.setVersionUIVisible(false);
 		view.setExternalUrlUIVisible(false);
 		view.setExternalObjectStoreUIVisible(false);
 		view.setFileSize("");
@@ -84,7 +86,7 @@ public class FileTitleBar implements SynapseWidgetPresenter, FileTitleBarView.Pr
 		view.setEntityName(bundle.getEntity().getName());
 		view.setVersion(((FileEntity) entityBundle.getEntity()).getVersionNumber());
 		getLatestVersion();
-		view.setActionMenu(actionMenu);
+		view.setActionMenu(actionMenuWidget);
 		if (isFilenamePanelVisible) {
 			if (fileHandle.getContentMd5() != null) {
 				view.setMd5(fileHandle.getContentMd5());
@@ -105,15 +107,14 @@ public class FileTitleBar implements SynapseWidgetPresenter, FileTitleBarView.Pr
 	}
 
 	public void getLatestVersion() {
-		// determine if we should show report the version (only shows if we're looking at an older version
-		// of the file).
+		// determine if we should report the version as "Current"
 		jsClient.getEntityVersions(entityBundle.getEntity().getId(), 0, 1, new AsyncCallback<List<VersionInfo>>() {
 			@Override
 			public void onSuccess(List<VersionInfo> results) {
 				if (!results.isEmpty()) {
 					Long currentVersionNumber = results.get(0).getVersionNumber();
 					Long viewingVersionNumber = ((FileEntity) entityBundle.getEntity()).getVersionNumber();
-					view.setVersionUIVisible(!currentVersionNumber.equals(viewingVersionNumber));
+					view.setVersionUICurrentVisible(currentVersionNumber.equals(viewingVersionNumber));
 				}
 			}
 
@@ -208,6 +209,11 @@ public class FileTitleBar implements SynapseWidgetPresenter, FileTitleBarView.Pr
 				};
 			});
 		}
+	}
+
+	@Override
+	public void toggleShowVersionHistory() {
+		this.actionMenuWidget.onAction(Action.SHOW_VERSION_HISTORY);
 	}
 
 	@Override

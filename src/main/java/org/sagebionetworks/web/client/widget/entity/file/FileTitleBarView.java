@@ -32,7 +32,7 @@ public interface FileTitleBarView extends IsWidget, SynapseView {
 
 	void setVersion(Long version);
 
-	void setVersionUIVisible(boolean visible);
+	void setVersionUICurrentVisible(boolean visible);
 
 	void setPresenter(Presenter p);
 
@@ -47,5 +47,7 @@ public interface FileTitleBarView extends IsWidget, SynapseView {
 		void onProgrammaticDownloadOptions();
 
 		void onAddToDownloadList();
+
+		void toggleShowVersionHistory();
 	}
 }
