@@ -150,6 +150,7 @@ import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.S3DirectLoginDialog;
+import org.sagebionetworks.web.client.widget.entity.file.TableTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.downloadlist.DownloadListWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.AttachmentPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.BookmarkWidget;
@@ -701,6 +702,8 @@ public interface PortalGinInjector extends Ginjector {
 	FileTitleBar getFileTitleBar();
 
 	BasicTitleBar getBasicTitleBar();
+
+	TableTitleBar getTableTitleBar();
 
 	EntityMetadata getEntityMetadata();
 

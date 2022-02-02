@@ -32,7 +32,7 @@ import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
-import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
+import org.sagebionetworks.web.client.widget.entity.file.TableTitleBar;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
@@ -69,7 +69,7 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 	Tab tab;
 	TablesTabView view;
 	TableListWidget tableListWidget;
-	BasicTitleBar titleBar;
+	TableTitleBar titleBar;
 	Breadcrumb breadcrumb;
 	EntityMetadata metadata;
 	QueryTokenProvider queryTokenProvider;
@@ -116,7 +116,7 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 			areaToken = null;
 			entitySelectedCallback.invoke(entityHeader.getId());
 			// selected a table/view, show title info immediately
-			titleBar.configure(entityHeader);
+			titleBar.configure(entityBundle, tab.getEntityActionMenu());
 
 			List<LinkData> links = new ArrayList<>();
 			Place projectPlace = new Synapse(projectEntityId, null, getTabArea(), null);
@@ -133,7 +133,7 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 		if (view == null) {
 			this.view = ginInjector.getTablesTabView();
 			this.tableListWidget = ginInjector.getTableListWidget();
-			this.titleBar = ginInjector.getBasicTitleBar();
+			this.titleBar = ginInjector.getTableTitleBar();
 			this.breadcrumb = ginInjector.getBreadcrumb();
 			this.metadata = ginInjector.getEntityMetadata();
 			this.queryTokenProvider = ginInjector.getQueryTokenProvider();
@@ -300,7 +300,7 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 
 			updateVersionAndAreaToken(entity.getId(), version, areaToken);
 			breadcrumb.configure(bundle.getPath(), getTabArea());
-			titleBar.configure(bundle);
+			titleBar.configure(bundle, tab.getEntityActionMenu());
 			modifiedCreatedBy.configure(entity.getCreatedOn(), entity.getCreatedBy(), entity.getModifiedOn(), entity.getModifiedBy());
 			v2TableWidget = ginInjector.createNewTableEntityWidget();
 			view.setTableEntityWidget(v2TableWidget.asWidget());
