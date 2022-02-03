@@ -356,7 +356,7 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 		if (!(entityBundle.getEntity() instanceof Dataset)) {
 			// Don't show a version alert if this isn't a dataset
 			this.view.setVersionAlertVisible(false);
-		} else if (entityBundle.getEntity() instanceof Dataset && ((Dataset) entityBundle.getEntity()).getIsLatestVersion()) {
+		} else if (((Dataset) entityBundle.getEntity()).getIsLatestVersion()) {
 			// This is the 'draft' version of the dataset
 			// Show an alert pointing to the most recent snapshot (if it exists)
 			this.view.setVersionAlertVisible(true);
@@ -384,7 +384,7 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 					goToLatestSnapshot,
 					isLinkToCurrentSnapshotEnabled,
 					linkToCurrentSnapshotTooltipText);
-		} else if (entityBundle.getEntity() instanceof Dataset && version != latestSnapshotVersionNumber) {
+		} else if (version != latestSnapshotVersionNumber) {
 			// This is a snapshot or "stable version", but a more recent snapshot exists than the one the user is looking at.
 			// Notify that a more recent snapshot exists
 			this.view.setVersionAlertVisible(true);
