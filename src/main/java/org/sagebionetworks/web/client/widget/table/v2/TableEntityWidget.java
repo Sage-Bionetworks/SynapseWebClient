@@ -67,28 +67,16 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 	public static final String RESET_SEARCH_QUERY = "Reset search query?";
 	public static final long DEFAULT_OFFSET = 0L;
 	public static final String SELECT_FROM = "SELECT * FROM ";
-	public static final String getNoColumnsEditableMessage(TableType tableType) {
-		return "This " + tableType.getDisplayName() + " does not have any columns. Edit the Schema to add columns to this " + tableType.getDisplayName() + ".";
-	}
-	public static final String getNoColumnsNotEditableMessage(TableType tableType) {
-		return "This " + tableType.getDisplayName() + " does not have any columns.";
+	public static final String getNoColumnsMessage(TableType tableType, boolean editable) {
+		return "This " + tableType.getDisplayName() + " does not have any columns." + (editable ? " Edit the Schema to add columns to this " + tableType.getDisplayName() + "." : "");
 	}
 
-	public static final String noScopeEditableMessage(TableType tableType) {
+	public static final String noScopeMessage(TableType tableType, boolean editable) {
 		if (TableType.dataset.equals(tableType)) {
-			return "This " + tableType.getDisplayName() + " does not have any items. Select \"Edit " + tableType.getDisplayName() + " Items\" from the Tools Menu to add items to this " + tableType.getDisplayName() + ".";
+			return "This " + tableType.getDisplayName() + " does not have any items." + (editable ? (" Select \"Edit " + tableType.getDisplayName() + " Items\" from the Tools Menu to add items to this " + tableType.getDisplayName() + ".") : "");
 		} else {
-			return "This " + tableType.getDisplayName() + " does not have a defined scope. Edit the scope to populate the " + tableType.getDisplayName() + ".";
+			return "This " + tableType.getDisplayName() + " does not have a defined scope." + (editable ? " Edit the scope to populate the " + tableType.getDisplayName() + "." : "");
 		}
-	}
-
-	public static final String noScopeNotEditableMessage(TableType tableType) {
-		if (TableType.dataset.equals(tableType)) {
-			return "This " + tableType.getDisplayName() + " does not have any items.";
-		} else {
-			return "This " + tableType.getDisplayName() + " does not have a defined scope.";
-		}
-
 	}
 
 	public static final long DEFAULT_LIMIT = 25;
@@ -493,12 +481,7 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 	 * Set the view to show no columns message.
 	 */
 	private void setNoColumnsState() {
-		String message = null;
-		if (this.canEdit) {
-			message = getNoColumnsEditableMessage(tableType);
-		} else {
-			message = getNoColumnsNotEditableMessage(tableType);
-		}
+		String message = getNoColumnsMessage(tableType, this.canEdit);
 		// There can be no query when there are no columns
 		if (this.queryChangeHandler.getQueryString() != null) {
 			this.queryChangeHandler.onQueryChange(null);
@@ -511,12 +494,7 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 
 	private void setNoScopeState() {
 		if (this.entityBundle.getEntity() instanceof View) {
-			String message = null;
-			if (this.canEdit) {
-				message = noScopeEditableMessage(tableType);
-			} else {
-				message = noScopeNotEditableMessage(tableType);
-			}
+			String message = noScopeMessage(tableType, this.canEdit);
 			// There can be no query when there are no items
 			if (this.queryChangeHandler.getQueryString() != null) {
 				this.queryChangeHandler.onQueryChange(null);

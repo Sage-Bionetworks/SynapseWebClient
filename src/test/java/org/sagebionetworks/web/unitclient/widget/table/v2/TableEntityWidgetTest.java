@@ -283,7 +283,7 @@ public class TableEntityWidgetTest {
 		verify(mockView).setQueryInputVisible(false);
 		verify(mockView).setQueryResultsVisible(false);
 		verify(mockView).setTableMessageVisible(true);
-		verify(mockView).showTableMessage(AlertType.INFO, TableEntityWidget.getNoColumnsEditableMessage(TableType.table));
+		verify(mockView).showTableMessage(AlertType.INFO, TableEntityWidget.getNoColumnsMessage(TableType.table, canEdit));
 		// The query should be cleared when there are no columns
 		verify(mockQueryChangeHandler).onQueryChange(null);
 	}
@@ -296,7 +296,7 @@ public class TableEntityWidgetTest {
 		verify(mockView).setQueryInputVisible(false);
 		verify(mockView).setQueryResultsVisible(false);
 		verify(mockView).setTableMessageVisible(true);
-		verify(mockView).showTableMessage(AlertType.INFO, TableEntityWidget.getNoColumnsNotEditableMessage(TableType.table));
+		verify(mockView).showTableMessage(AlertType.INFO, TableEntityWidget.getNoColumnsMessage(TableType.table, canEdit));
 		// The query should be cleared when there are no columns
 		verify(mockQueryChangeHandler).onQueryChange(null);
 	}
