@@ -426,6 +426,8 @@ import org.sagebionetworks.web.client.widget.entity.file.FileTitleBarView;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBarViewImpl;
 import org.sagebionetworks.web.client.widget.entity.file.S3DirectLoginDialog;
 import org.sagebionetworks.web.client.widget.entity.file.S3DirectLoginDialogImpl;
+import org.sagebionetworks.web.client.widget.entity.file.TableTitleBarView;
+import org.sagebionetworks.web.client.widget.entity.file.TableTitleBarViewImpl;
 import org.sagebionetworks.web.client.widget.entity.file.downloadlist.DownloadListWidgetView;
 import org.sagebionetworks.web.client.widget.entity.file.downloadlist.DownloadListWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.file.downloadlist.PackageSizeSummaryView;
@@ -964,6 +966,7 @@ public class PortalGinModule extends AbstractGinModule {
 		// FileBox
 		bind(FileTitleBarView.class).to(FileTitleBarViewImpl.class).in(Singleton.class);
 		bind(BasicTitleBarView.class).to(BasicTitleBarViewImpl.class);
+		bind(TableTitleBarView.class).to(TableTitleBarViewImpl.class);
 
 		// Search Box
 		bind(SearchBoxView.class).to(SearchBoxViewImpl.class).in(Singleton.class);

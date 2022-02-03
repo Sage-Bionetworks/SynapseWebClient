@@ -6,7 +6,6 @@ import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -260,8 +259,8 @@ public class FileTitleBarTest {
 		fileTitleBar.configure(mockBundle, mockActionMenuWidget);
 
 		verify(mockJsClient).getEntityVersions(anyString(), anyInt(), anyInt(), any());
-		verify(mockView, times(2)).setVersionUIVisible(false);
-		verify(mockView, never()).setVersionUIVisible(true);
+		verify(mockView).setVersionUICurrentVisible(true);
+		verify(mockView, never()).setVersionUICurrentVisible(false);
 	}
 
 	@Test
@@ -273,7 +272,7 @@ public class FileTitleBarTest {
 		fileTitleBar.configure(mockBundle, mockActionMenuWidget);
 
 		verify(mockJsClient).getEntityVersions(anyString(), anyInt(), anyInt(), any());
-		verify(mockView).setVersionUIVisible(true);
+		verify(mockView).setVersionUICurrentVisible(false);
 	}
 
 	@Test
@@ -284,8 +283,6 @@ public class FileTitleBarTest {
 		fileTitleBar.configure(mockBundle, mockActionMenuWidget);
 
 		verify(mockJsClient).getEntityVersions(anyString(), anyInt(), anyInt(), any());
-		verify(mockView).setVersionUIVisible(false);
-		verify(mockView, never()).setVersionUIVisible(true);
 		verify(mockView).showErrorMessage(error);
 	}
 
