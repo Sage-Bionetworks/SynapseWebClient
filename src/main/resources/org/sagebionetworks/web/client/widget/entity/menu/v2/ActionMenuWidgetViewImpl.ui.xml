@@ -4,8 +4,8 @@
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui" xmlns:t="urn:import:org.sagebionetworks.web.client.widget.table.v2"
 	xmlns:a="urn:import:org.sagebionetworks.web.client.widget.entity.menu.v2"
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt"
-    xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
-    xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
+	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 
 	<g:FlowPanel>
 		<b:Tooltip title="Show advanced search">
@@ -18,23 +18,23 @@
 			<a:ActionButton visible="false" icon="DATABASE" addStyleNames="margin-right-5" action="SHOW_QUERY" />
 		</b:Tooltip>
 		<b:Tooltip ui:field="editTableDataTooltip" title="Edit query results">
-            <bh:Span> <!-- Have to wrap the button in a span we get a mouseevent to show the tooltip if the button is disabled -->
-			    <a:ActionButton visible="false" icon="EDIT" addStyleNames="margin-right-5" action="EDIT_TABLE_DATA" />
-            </bh:Span>
+			<bh:Span> <!-- Have to wrap the button in a span we get a mouseevent to show the tooltip if the button is disabled -->
+				<a:ActionButton visible="false" icon="EDIT" addStyleNames="margin-right-5" action="EDIT_TABLE_DATA" />
+			</bh:Span>
 		</b:Tooltip>
-        <b:Tooltip ui:field="downloadOptionsTooltip" placement="TOP" container="body">
-            <b:DropDown addStyleNames="displayInlineBlock">
-                <b:Button dataToggle="DROPDOWN" type="PRIMARY" text="Download Options" marginRight="5" visible="false" ui:field="tableDownloadOptions"/>
-                <b:DropDownMenu addStyleNames="dropdown-menu-right">
-                    <a:ActionMenuItem ui:field="exportTableMenuItem" action="DOWNLOAD_TABLE_QUERY_RESULTS">Export Table</a:ActionMenuItem>
-                    <a:ActionMenuItem ui:field="addToDownloadListMenuItem" action="ADD_TABLE_RESULTS_TO_DOWNLOAD_LIST">Add to Download List</a:ActionMenuItem>
-                    <!-- <b:Divider ui:field="downloadOptionsDivider" /> -->
-                    <a:ActionMenuItem ui:field="programmaticOptionsMenuItem" action="TABLE_DOWNLOAD_PROGRAMMATIC_OPTIONS">Programmatic Options</a:ActionMenuItem>
-                </b:DropDownMenu>
-            </b:DropDown>
-        </b:Tooltip>
-        <w:ReactComponentDiv ui:field="skeletonButton"  addStyleNames="displayInlineBlock"></w:ReactComponentDiv>
-        <b:Button ui:field="singleActionButton"  addStyleNames="displayInlineBlock"></b:Button>
+		<b:Tooltip ui:field="downloadOptionsTooltip" placement="TOP" container="body">
+			<b:DropDown addStyleNames="displayInlineBlock">
+				<b:Button dataToggle="DROPDOWN" type="PRIMARY" text="Download Options" marginRight="5" visible="false" ui:field="tableDownloadOptions"/>
+				<b:DropDownMenu addStyleNames="dropdown-menu-right">
+					<a:ActionMenuItem ui:field="exportTableMenuItem" action="DOWNLOAD_TABLE_QUERY_RESULTS">Export Table</a:ActionMenuItem>
+					<a:ActionMenuItem ui:field="addToDownloadListMenuItem" action="ADD_TABLE_RESULTS_TO_DOWNLOAD_LIST">Add to Download List</a:ActionMenuItem>
+					<!-- <b:Divider ui:field="downloadOptionsDivider" /> -->
+					<a:ActionMenuItem ui:field="programmaticOptionsMenuItem" action="TABLE_DOWNLOAD_PROGRAMMATIC_OPTIONS">Programmatic Options</a:ActionMenuItem>
+				</b:DropDownMenu>
+			</b:DropDown>
+		</b:Tooltip>
+		<w:ReactComponentDiv ui:field="skeletonButton"  addStyleNames="displayInlineBlock"></w:ReactComponentDiv>
+		<b:Button ui:field="singleActionButton"  addStyleNames="displayInlineBlock"></b:Button>
 		<b:DropDown ui:field="dropdown" addStyleNames="displayInlineBlock">
 			<b:Button icon="GEARS" ui:field="toolsMenu" addStyleNames="toolsMenuButton" dataToggle="DROPDOWN">Tools</b:Button>
 			<b:DropDownMenu ui:field="toolsDropDown"
