@@ -59,6 +59,7 @@ import org.sagebionetworks.web.client.widget.entity.VersionHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
+import org.sagebionetworks.web.client.widget.entity.file.TableTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.tabs.AbstractTablesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
@@ -85,7 +86,7 @@ public class TablesTabTest {
 	@Mock
 	TableListWidget mockTableListWidget;
 	@Mock
-	BasicTitleBar mockTitleBar;
+	TableTitleBar mockTitleBar;
 	@Mock
 	Breadcrumb mockBreadcrumb;
 	@Mock
@@ -155,7 +156,7 @@ public class TablesTabTest {
 		when(mockPortalGinInjector.getCookieProvider()).thenReturn(mockCookies);
 		when(mockPortalGinInjector.getTablesTabView()).thenReturn(mockView);
 		when(mockPortalGinInjector.getTableListWidget()).thenReturn(mockTableListWidget);
-		when(mockPortalGinInjector.getBasicTitleBar()).thenReturn(mockTitleBar);
+		when(mockPortalGinInjector.getTableTitleBar()).thenReturn(mockTitleBar);
 		when(mockPortalGinInjector.getBreadcrumb()).thenReturn(mockBreadcrumb);
 		when(mockPortalGinInjector.getEntityMetadata()).thenReturn(mockEntityMetadata);
 		when(mockPortalGinInjector.getQueryTokenProvider()).thenReturn(mockQueryTokenProvider);
@@ -260,7 +261,7 @@ public class TablesTabTest {
 
 	private void verifyTableConfiguration(Long version) {
 		verify(mockBreadcrumb).configure(any(EntityPath.class), eq(EntityArea.TABLES));
-		verify(mockTitleBar).configure(mockTableEntityBundle);
+		verify(mockTitleBar).configure(mockTableEntityBundle, mockActionMenuWidget);
 		verify(mockEntityMetadata).configure(mockTableEntityBundle, version, mockActionMenuWidget);
 		verify(mockTableEntityWidget).configure(mockTableEntityBundle, version, true, tab, mockActionMenuWidget);
 		verify(mockView).setTableEntityWidget(any(Widget.class));
