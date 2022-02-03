@@ -348,13 +348,17 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 	private void configureVersionAlert() {
 		boolean versionHistoryIsVisible = this.metadata.getVersionHistoryWidget().isVisible();
 		this.view.setVersionAlertPrimaryAction((versionHistoryIsVisible ? "Hide" : "Show") + " Version History",
-				e -> {
+				event -> {
 					this.metadata.getVersionHistoryWidget().setVisible(!versionHistoryIsVisible);
 					// Reconfigure the version alert to update the button text.
 					configureVersionAlert();
 				});
-		if (entityBundle.getEntity() instanceof Dataset && ((Dataset) entityBundle.getEntity()).getIsLatestVersion()) {
+		if (!(entityBundle.getEntity() instanceof Dataset)) {
+			// Don't show a version alert if this isn't a dataset
+			this.view.setVersionAlertVisible(false);
+		} else if (entityBundle.getEntity() instanceof Dataset && ((Dataset) entityBundle.getEntity()).getIsLatestVersion()) {
 			// This is the 'draft' version of the dataset
+			// Show an alert pointing to the most recent snapshot (if it exists)
 			this.view.setVersionAlertVisible(true);
 			this.view.setVersionAlertCopy(VERSION_ALERT_DRAFT_DATASET_TITLE, VERSION_ALERT_DRAFT_DATASET_MESSAGE);
 			ClickHandler goToLatestSnapshot = e -> ginInjector.getGlobalApplicationState()
@@ -367,7 +371,7 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 
 			boolean stableVersionExists = !(latestSnapshotVersionNumber == null);
 			if (stableVersionExists) {
-				// Notify that a stable version exists and link to it
+				// A stable version exists and link to it
 				isLinkToCurrentSnapshotEnabled = true;
 				linkToCurrentSnapshotTooltipText = null; // no tooltip
 			} else {
@@ -380,13 +384,14 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 					goToLatestSnapshot,
 					isLinkToCurrentSnapshotEnabled,
 					linkToCurrentSnapshotTooltipText);
-		} else if (entityBundle.getEntity() instanceof Dataset && !((Dataset) entityBundle.getEntity()).getIsLatestVersion() && version != latestSnapshotVersionNumber) {
-			// This is a snapshot/stable version but not the latest version. Notify a more recent stable version exists
+		} else if (entityBundle.getEntity() instanceof Dataset && version != latestSnapshotVersionNumber) {
+			// This is a snapshot or "stable version", but a more recent snapshot exists than the one the user is looking at.
+			// Notify that a more recent snapshot exists
 			this.view.setVersionAlertVisible(true);
 			this.view.setVersionAlertCopy(VERSION_ALERT_OLD_SNAPSHOT_DATASET_TITLE, VERSION_ALERT_OLD_SNAPSHOT_DATASET_MESSAGE);
 		} else {
-			// Don't show alert on non-datasets
-			// Don't show alert on the latest stable version of a dataset
+			// The user is looking at the most recent snapshot or "Stable Version" of the dataset
+			// Don't show a version alert
 			this.view.setVersionAlertVisible(false);
 		}
 	}
