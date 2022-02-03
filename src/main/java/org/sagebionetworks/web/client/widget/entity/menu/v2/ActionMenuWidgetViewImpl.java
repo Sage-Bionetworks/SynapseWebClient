@@ -63,9 +63,11 @@ public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 	@UiField
 	ActionMenuItem programmaticOptionsMenuItem;
 	@UiField
-	Tooltip addToDownloadListMenuItemTooltip;
+	ActionMenuItem exportTableMenuItem;
 	@UiField
-	Tooltip programmaticOptionsMenuItemTooltip;
+	Tooltip downloadOptionsTooltip;
+	@UiField
+	Tooltip editTableDataTooltip;
 	@UiField
 	ReactComponentDiv skeletonButton;
 
@@ -174,23 +176,30 @@ public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 	}
 
 	@Override
+	public void setDownloadActionsDisabledTooltipText(String tooltipText) {
+		downloadOptionsTooltip.setTitle(tooltipText);
+		downloadOptionsTooltip.recreate();
+	}
+
+	@Override
+	public void setEditTableDataTooltipText(String tooltipText) {
+		editTableDataTooltip.setTitle(tooltipText);
+		editTableDataTooltip.recreate();
+	}
+
+	@Override
 	public void setDownloadActionsEnabled(boolean enabled) {
-		addToDownloadListMenuItem.setEnabled(enabled);
-		programmaticOptionsMenuItem.setEnabled(enabled);
+		tableDownloadOptions.setEnabled(enabled);
 		if (enabled) {
-			// The tooltips only show information about why it's disabled, so hide the tooltips if enabled
-			addToDownloadListMenuItemTooltip.setTrigger(Trigger.MANUAL);
-			programmaticOptionsMenuItemTooltip.setTrigger(Trigger.MANUAL);
-			addToDownloadListMenuItemTooltip.hide();
-			programmaticOptionsMenuItemTooltip.hide();
+			// The tooltip only shows information about why it's disabled, so hide the tooltips if enabled
+			downloadOptionsTooltip.setTrigger(Trigger.MANUAL);
+			downloadOptionsTooltip.hide();
 		} else {
-			addToDownloadListMenuItemTooltip.setTrigger(Trigger.HOVER);
-			programmaticOptionsMenuItemTooltip.setTrigger(Trigger.HOVER);
+			downloadOptionsTooltip.setTrigger(Trigger.HOVER);
 		}
 
-		// Commit the changes to the tooltips
-		addToDownloadListMenuItemTooltip.recreate();
-		programmaticOptionsMenuItemTooltip.recreate();
+		// Commit the changes to the tooltip
+		downloadOptionsTooltip.recreate();
 	}
 
 	@Override

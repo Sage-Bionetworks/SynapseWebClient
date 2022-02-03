@@ -34,6 +34,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Dataset;
+import org.sagebionetworks.repo.model.table.DatasetItem;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.FacetColumnRequest;
 import org.sagebionetworks.repo.model.table.FacetColumnValuesRequest;
@@ -60,8 +61,8 @@ import org.sagebionetworks.web.client.widget.clienthelp.FileViewClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionListener;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQueryModalWidget;
@@ -75,6 +76,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultsListen
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
@@ -115,6 +117,8 @@ public class TableEntityWidgetTest {
 	CopyTextModal mockCopyTextModal;
 	@Mock
 	CookieProvider mockCookies;
+	@Mock
+	EventBus mockEventBus;
 
 	@Captor
 	ArgumentCaptor<Callback> callbackCaptor;
@@ -149,6 +153,7 @@ public class TableEntityWidgetTest {
 		tableBundle = new TableBundle();
 		tableBundle.setMaxRowsPerPage(4L);
 		tableBundle.setColumnModels(columns);
+		versionNumber = null;
 		when(mockPortalGinInjector.getDownloadTableQueryModalWidget()).thenReturn(mockDownloadTableQueryModalWidget);
 		when(mockPortalGinInjector.getUploadTableModalWidget()).thenReturn(mockUploadTableModalWidget);
 		when(mockPortalGinInjector.getCopyTextModal()).thenReturn(mockCopyTextModal);
@@ -156,7 +161,7 @@ public class TableEntityWidgetTest {
 		when(mockPortalGinInjector.getCookieProvider()).thenReturn(mockCookies);
 		when(mockPortalGinInjector.getAddToDownloadListV2()).thenReturn(mockAddToDownloadListV2);
 
-		widget = new TableEntityWidget(mockView, mockQueryResultsWidget, mockQueryInputWidget, mockPreflightController, mockSynapseClient, mockFileViewClientsHelp, mockPortalGinInjector, mockSessionStorage);
+		widget = new TableEntityWidget(mockView, mockQueryResultsWidget, mockQueryInputWidget, mockPreflightController, mockSynapseClient, mockFileViewClientsHelp, mockPortalGinInjector, mockSessionStorage, mockEventBus);
 
 		AsyncMockStubber.callSuccessWith(FACET_SQL).when(mockSynapseClient).generateSqlWithFacets(anyString(), anyList(), anyList(), any(AsyncCallback.class));
 		// The test bundle
@@ -175,6 +180,7 @@ public class TableEntityWidgetTest {
 	private void configureBundleWithView(ViewType viewType) {
 		EntityView view = new EntityView();
 		view.setId("syn456");
+		view.setScopeIds(Collections.singletonList("syn789"));
 		view.setColumnIds(TableModelTestUtils.getColumnModelIds(columns));
 		view.setType(viewType);
 		entityBundle.setEntity(view);
@@ -184,6 +190,13 @@ public class TableEntityWidgetTest {
 		Dataset dataset = new Dataset();
 		dataset.setId("syn456");
 		dataset.setColumnIds(TableModelTestUtils.getColumnModelIds(columns));
+
+		// Dataset has one item
+		DatasetItem item = new DatasetItem();
+		item.setEntityId("syn123");
+		item.setVersionNumber(1L);
+		dataset.setItems(Collections.singletonList(item));
+
 		entityBundle.setEntity(dataset);
 	}
 
@@ -270,7 +283,7 @@ public class TableEntityWidgetTest {
 		verify(mockView).setQueryInputVisible(false);
 		verify(mockView).setQueryResultsVisible(false);
 		verify(mockView).setTableMessageVisible(true);
-		verify(mockView).showTableMessage(AlertType.INFO, TableEntityWidget.getNoColumnsEditableMessage(TableType.table));
+		verify(mockView).showTableMessage(AlertType.INFO, TableEntityWidget.getNoColumnsMessage(TableType.table, canEdit));
 		// The query should be cleared when there are no columns
 		verify(mockQueryChangeHandler).onQueryChange(null);
 	}
@@ -283,7 +296,7 @@ public class TableEntityWidgetTest {
 		verify(mockView).setQueryInputVisible(false);
 		verify(mockView).setQueryResultsVisible(false);
 		verify(mockView).setTableMessageVisible(true);
-		verify(mockView).showTableMessage(AlertType.INFO, TableEntityWidget.getNoColumnsNotEditableMessage(TableType.table));
+		verify(mockView).showTableMessage(AlertType.INFO, TableEntityWidget.getNoColumnsMessage(TableType.table, canEdit));
 		// The query should be cleared when there are no columns
 		verify(mockQueryChangeHandler).onQueryChange(null);
 	}
@@ -451,8 +464,8 @@ public class TableEntityWidgetTest {
 		verify(mockView).setSchemaVisible(true);
 		verify(mockActionMenu).setActionText(Action.SHOW_TABLE_SCHEMA, HIDE + "Table" + SCHEMA);
 		listener.onAction(Action.SHOW_TABLE_SCHEMA);
-		verify(mockView, times(2)).setSchemaVisible(false);
-		verify(mockActionMenu, times(2)).setActionText(Action.SHOW_TABLE_SCHEMA, SHOW + "Table" + SCHEMA);
+		verify(mockView).setSchemaVisible(false);
+		verify(mockActionMenu).setActionText(Action.SHOW_TABLE_SCHEMA, SHOW + "Table" + SCHEMA);
 	}
 
 	@Test
@@ -466,8 +479,8 @@ public class TableEntityWidgetTest {
 		verify(mockView).setScopeVisible(true);
 		verify(mockActionMenu).setActionText(Action.SHOW_VIEW_SCOPE, HIDE + SCOPE + "Table");
 		listener.onAction(Action.SHOW_VIEW_SCOPE);
-		verify(mockView, times(2)).setScopeVisible(false);
-		verify(mockActionMenu, times(2)).setActionText(Action.SHOW_VIEW_SCOPE, SHOW + SCOPE + "Table");
+		verify(mockView).setScopeVisible(false);
+		verify(mockActionMenu).setActionText(Action.SHOW_VIEW_SCOPE, SHOW + SCOPE + "Table");
 	}
 
 	@Test
@@ -782,8 +795,105 @@ public class TableEntityWidgetTest {
 		// The React component will trigger the call to closeItemsEditor when we are ready to close
 		widget.closeItemsEditor();
 		verify(mockView).setItemsEditorVisible(false);
+		verify(mockActionMenu, times(2)).setTableDownloadOptionsVisible(true);
 		verify(mockView, times(3)).setQueryResultsVisible(true);
 		verify(mockActionMenu).setActionVisible(Action.EDIT_DATASET_ITEMS, true);
+	}
+
+
+	@Test // SWC-5921
+	public void testShowDatasetEditorIfNoItemsAndEditable() {
+		// The editor should be revealed without user interaction if the user can edit the dataset AND it has no items.
+		boolean canEdit = true;
+		configureBundleWithDataset();
+
+		((Dataset) entityBundle.getEntity()).setItems(Collections.emptyList());
+
+		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
+
+		verify(mockView).setItemsEditorVisible(true);
+		verify(mockView, times(2)).setQueryResultsVisible(false);
+		verify(mockActionMenu).setActionVisible(Action.EDIT_DATASET_ITEMS, false);
+	}
+
+	@Test // SWC-5921
+	public void testDoNotShowDatasetEditorIfHasItems() {
+		boolean canEdit = true;
+		configureBundleWithDataset();
+
+		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
+
+		verify(mockView, never()).setItemsEditorVisible(true);
+		verify(mockView).setQueryResultsVisible(true);
+		verify(mockActionMenu, never()).setActionVisible(Action.EDIT_DATASET_ITEMS, false);
+	}
+
+	@Test // SWC-5921
+	public void testDoNotShowDatasetEditorIfNotEditable() {
+		boolean canEdit = false; // user does not have permission to edit
+		configureBundleWithDataset();
+
+		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
+
+		verify(mockView, never()).setItemsEditorVisible(true);
+		verify(mockView).setQueryResultsVisible(true);
+		verify(mockActionMenu, never()).setActionVisible(Action.EDIT_DATASET_ITEMS, false);
+	}
+
+
+	@Test // SWC-5921
+	public void testDoNotShowDownload() {
+		boolean canEdit = false; // user does not have permission to edit
+		configureBundleWithDataset();
+
+		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
+
+		verify(mockView, never()).setItemsEditorVisible(true);
+		verify(mockView).setQueryResultsVisible(true);
+		verify(mockActionMenu, never()).setActionVisible(Action.EDIT_DATASET_ITEMS, false);
+	}
+
+	@Test // SWC-5878
+	public void testDisableDownloadForNonEditorOnCurrentVersionOfDataset() {
+		boolean canEdit = false; // user does not have permission to edit
+		configureBundleWithDataset();
+
+		// This is not a snapshot
+		((Dataset) entityBundle.getEntity()).setIsLatestVersion(true);
+		versionNumber = null;
+
+		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
+
+		verify(mockActionMenu).setTableDownloadOptionsEnabled(false);
+	}
+
+	@Test // SWC-5878
+	public void testEnableDownloadForEditorOnCurrentVersionOfDataset() {
+		boolean canEdit = true; // user has permission to edit
+		configureBundleWithDataset();
+
+		// This is not a snapshot
+		((Dataset) entityBundle.getEntity()).setIsLatestVersion(true);
+		versionNumber = null;
+
+		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
+
+		verify(mockActionMenu).setTableDownloadOptionsEnabled(true);
+	}
+
+	@Test // SWC-5878
+	public void testEnableDownloadForDatasetSnapshot() {
+		boolean canEdit = false; // user does not need to have permission to edit
+		configureBundleWithDataset();
+
+		// This is a snapshot
+		((Dataset) entityBundle.getEntity()).setIsLatestVersion(false);
+		versionNumber = 1L;
+
+		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
+
+		verify(mockActionMenu).setTableDownloadOptionsEnabled(true);
+
 	}
 
 }

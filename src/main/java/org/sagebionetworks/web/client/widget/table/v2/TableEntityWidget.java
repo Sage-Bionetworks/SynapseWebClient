@@ -3,20 +3,27 @@ package org.sagebionetworks.web.client.widget.table.v2;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.Dataset;
+import org.sagebionetworks.repo.model.table.DatasetItem;
+import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryFilter;
 import org.sagebionetworks.repo.model.table.SortItem;
+import org.sagebionetworks.repo.model.table.SubmissionView;
 import org.sagebionetworks.repo.model.table.TableBundle;
+import org.sagebionetworks.repo.model.table.View;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cache.SessionStorage;
+import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.jsinterop.DatasetEditorProps;
 import org.sagebionetworks.web.client.jsinterop.ToastMessageOptions;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -36,6 +43,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.QueryInputListener
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultsListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.regexp.shared.MatchResult;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -59,11 +67,16 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 	public static final String RESET_SEARCH_QUERY = "Reset search query?";
 	public static final long DEFAULT_OFFSET = 0L;
 	public static final String SELECT_FROM = "SELECT * FROM ";
-	public static final String getNoColumnsEditableMessage(TableType tableType) {
-		return "This " + tableType.getDisplayName() + " does not have any columns. Edit the Schema to add columns to this " + tableType.getDisplayName() + ".";
+	public static final String getNoColumnsMessage(TableType tableType, boolean editable) {
+		return "This " + tableType.getDisplayName() + " does not have any columns." + (editable ? " Edit the Schema to add columns to this " + tableType.getDisplayName() + "." : "");
 	}
-	public static final String getNoColumnsNotEditableMessage(TableType tableType) {
-		return "This " + tableType.getDisplayName() + " does not have any columns.";
+
+	public static final String noScopeMessage(TableType tableType, boolean editable) {
+		if (TableType.dataset.equals(tableType)) {
+			return "This " + tableType.getDisplayName() + " does not have any items." + (editable ? (" Select \"Edit " + tableType.getDisplayName() + " Items\" from the Tools Menu to add items to this " + tableType.getDisplayName() + ".") : "");
+		} else {
+			return "This " + tableType.getDisplayName() + " does not have a defined scope." + (editable ? " Edit the scope to populate the " + tableType.getDisplayName() + "." : "");
+		}
 	}
 
 	public static final long DEFAULT_LIMIT = 25;
@@ -79,6 +92,7 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 	ActionMenuWidget actionMenu;
 	PreflightController preflightController;
 	SessionStorage sessionStorage;
+	EventBus eventBus;
 
 	EntityBundle entityBundle;
 	String tableId;
@@ -94,7 +108,6 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 	CopyTextModal copyTextModal;
 	SynapseClientAsync synapseClient;
 	FileViewClientsHelp fileViewClientsHelp;
-	boolean isShowingSchema, isShowingScope, isShowingItemsEditor;
 	public static final String SHOW = "Show ";
 	public static final String HIDE = "Hide ";
 	public static final String SCOPE = "Scope of ";
@@ -102,8 +115,10 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 	String entityTypeDisplay;
 	PortalGinInjector ginInjector;
 
+	boolean hasQueryableData; // if `false`, then a query will never yield data.
+
 	@Inject
-	public TableEntityWidget(TableEntityWidgetView view, TableQueryResultWidget queryResultsWidget, QueryInputWidget queryInputWidget, PreflightController preflightController, SynapseClientAsync synapseClient, FileViewClientsHelp fileViewClientsHelp, PortalGinInjector ginInjector, SessionStorage sessionStorage) {
+	public TableEntityWidget(TableEntityWidgetView view, TableQueryResultWidget queryResultsWidget, QueryInputWidget queryInputWidget, PreflightController preflightController, SynapseClientAsync synapseClient, FileViewClientsHelp fileViewClientsHelp, PortalGinInjector ginInjector, SessionStorage sessionStorage, EventBus eventBus) {
 		this.view = view;
 		this.queryResultsWidget = queryResultsWidget;
 		this.queryInputWidget = queryInputWidget;
@@ -113,6 +128,7 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 		this.fileViewClientsHelp = fileViewClientsHelp;
 		this.ginInjector = ginInjector;
 		this.sessionStorage = sessionStorage;
+		this.eventBus = eventBus;
 		this.view.setPresenter(this);
 		this.view.setQueryResultsWidget(this.queryResultsWidget);
 		this.view.setQueryInputWidget(this.queryInputWidget);
@@ -172,12 +188,34 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 		this.actionMenu = actionMenu;
 		this.entityTypeDisplay = EntityTypeUtils.getFriendlyEntityTypeName(bundle.getEntity());
 		reconfigureState();
+		showEditorIfEditableAndEmpty();
 	}
 
 	private void reconfigureState() {
+		initializeQuery();
+		if (this.hasQueryableData) {
+			initSimpleAdvancedQueryState();
+		}
 		configureActions();
-		checkState();
-		initSimpleAdvancedQueryState();
+	}
+
+	/**
+	 * For certain table types, if the user has edit permissions and the table doesn't have any data,
+	 *   immediately prompt them with the editor.
+	 *
+	 * The primary scenario for this behavior is when initially creating a table and opening this page.
+	 */
+	private void showEditorIfEditableAndEmpty() {
+		// This currently only applies to Datasets, since other types of tables are editable via the wizard, whereas the
+		// dataset items editor is built-in to this widget.
+		if (canEdit && isCurrentVersion) {
+			if (entityBundle.getEntity() instanceof Dataset) {
+				Dataset dataset = (Dataset) entityBundle.getEntity();
+				if (dataset.getItems() == null || dataset.getItems().size() == 0) {
+					showDatasetItemsEditor();
+				}
+			}
+		}
 	}
 
 	/**
@@ -185,8 +223,6 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 	 */
 	private void configureActions() {
 		// Listen to action events.
-		isShowingScope = false;
-		isShowingSchema = false;
 		view.setScopeVisible(false);
 		view.setSchemaVisible(false);
 		actionMenu.setActionText(Action.SHOW_TABLE_SCHEMA, SHOW + entityTypeDisplay + SCHEMA);
@@ -195,37 +231,63 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 		this.actionMenu.setActionListener(Action.UPLOAD_TABLE_DATA, action -> {
 			onUploadTableData();
 		});
-		this.actionMenu.setActionListener(Action.DOWNLOAD_TABLE_QUERY_RESULTS, action -> {
-			onDownloadResults();
-		});
 		this.actionMenu.setActionListener(Action.EDIT_TABLE_DATA, action -> {
 			onEditResults();
 		});
 		this.actionMenu.setActionListener(Action.SHOW_TABLE_SCHEMA, action -> {
-			isShowingSchema = !isShowingSchema;
-			view.setSchemaVisible(isShowingSchema);
-			String showHide = isShowingSchema ? HIDE : SHOW;
+			boolean isVisible = !view.isSchemaVisible();
+			view.setSchemaVisible(isVisible);
+			String showHide = isVisible ? HIDE : SHOW;
 			actionMenu.setActionText(Action.SHOW_TABLE_SCHEMA, showHide + entityTypeDisplay + SCHEMA);
 		});
 
 		this.actionMenu.setActionListener(Action.SHOW_VIEW_SCOPE, action -> {
-			isShowingScope = !isShowingScope;
-			view.setScopeVisible(isShowingScope);
-			String showHide = isShowingScope ? HIDE : SHOW;
+			boolean isVisible = !view.isScopeVisible();
+			view.setScopeVisible(isVisible);
+			String showHide = isVisible ? HIDE : SHOW;
 			actionMenu.setActionText(Action.SHOW_VIEW_SCOPE, showHide + SCOPE + entityTypeDisplay);
 		});
 
 		this.actionMenu.setActionListener(Action.EDIT_DATASET_ITEMS, action -> {
-			if (!isShowingItemsEditor) {
-				actionMenu.setActionVisible(Action.EDIT_DATASET_ITEMS, false);
-				view.setItemsEditorVisible(true);
-				isShowingItemsEditor = true;
-				view.setQueryResultsVisible(false);
-			};
+			showDatasetItemsEditor();
 		});
 
+		// Edit data
+		this.actionMenu.setActionEnabled(Action.EDIT_TABLE_DATA, hasQueryableData);
+		if (hasQueryableData) {
+			this.actionMenu.setEditTableDataTooltipText("Bulk edit cell values");
+		} else {
+			this.actionMenu.setEditTableDataTooltipText("There is no data to edit");
+		}
+
+		// Download options
+		this.actionMenu.setTableDownloadOptionsVisible(true);
+		this.actionMenu.setActionListener(Action.DOWNLOAD_TABLE_QUERY_RESULTS, action -> {
+			onDownloadResults();
+		});
 		this.actionMenu.setActionVisible(Action.ADD_TABLE_RESULTS_TO_DOWNLOAD_LIST, tableType.isIncludeFiles());
 		this.actionMenu.setActionVisible(Action.TABLE_DOWNLOAD_PROGRAMMATIC_OPTIONS, tableType.isIncludeFiles());
+		if (this.entityBundle.getEntity() instanceof Dataset && isCurrentVersion && hasQueryableData) {
+			// SWC-5878 - On the current (non-snapshot) version of a dataset, only editors should be able to download
+			this.actionMenu.setTableDownloadOptionsEnabled(canEdit);
+			if (!canEdit) {
+				this.actionMenu.setDownloadActionsDisabledTooltipText("A draft version of a Dataset cannot be downloaded");
+			}
+		} else {
+			this.actionMenu.setTableDownloadOptionsEnabled(hasQueryableData);
+			if (!hasQueryableData) {
+				this.actionMenu.setDownloadActionsDisabledTooltipText("There is no data to download");
+			}
+		}
+		this.actionMenu.setActionListener(Action.TABLE_DOWNLOAD_PROGRAMMATIC_OPTIONS, action -> {
+			onShowDownloadFilesProgrammatically();
+		});
+		this.actionMenu.setActionListener(Action.ADD_TABLE_RESULTS_TO_DOWNLOAD_LIST, action -> {
+			onAddToDownloadList();
+		});
+
+
+		// Query options
 		this.actionMenu.setActionListener(Action.SHOW_ADVANCED_SEARCH, action -> {
 			onShowAdvancedSearch();
 		});
@@ -235,30 +297,53 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 		this.actionMenu.setActionListener(Action.SHOW_QUERY, action -> {
 			onShowQuery();
 		});
-		this.actionMenu.setActionListener(Action.TABLE_DOWNLOAD_PROGRAMMATIC_OPTIONS, action -> {
-			onShowDownloadFilesProgrammatically();
-		});
-		this.actionMenu.setActionListener(Action.ADD_TABLE_RESULTS_TO_DOWNLOAD_LIST, action -> {
-			onAddToDownloadList();
-		});
 	}
 
 	/**
-	 * 
+	 * Initilializes the Table query. This method will not issue a query if we know we will not get results (e.g. if there are no columns)
+	 * @param onQuery a callback that will be invoked if we initiate a query.
 	 */
-	public void checkState() {
-		// If there are no columns, then the first thing to do is ask the user
-		// to create some columns.
-		if (this.tableBundle.getColumnModels().size() < 1) {
+	public void initializeQuery() {
+		// Make a few checks to see if we know that we won't get results before submitting the query
+		if (entityBundle.getEntity() instanceof View && hasUndefinedScope((View) entityBundle.getEntity())) {
+			// If the table is a View with no scope or Dataset with no items, there will be no results.
+			// Show a warning or prompt.
+			setNoScopeState();
+			this.hasQueryableData = false;
+		} else if (this.tableBundle.getColumnModels().size() < 1) {
+			// If there are no columns, there will be no results, so ask the user to create some columns.
 			setNoColumnsState();
+			this.hasQueryableData = false;
 		} else {
-			// There are columns.
+			// There are columns, and if this is a view, the scope is defined.
+			this.hasQueryableData = true;
 			Query startQuery = queryChangeHandler.getQueryString();
 			if (startQuery == null) {
 				// use a default query
 				startQuery = getDefaultQuery();
 			}
 			setQuery(startQuery, false);
+		}
+	}
+
+	/**
+	 * Check if a View has an undefined scope. If the scope is undefined, a query need not be made.
+	 * @param view
+	 * @return true iff we are sure that the scope is undefined.
+	 */
+	private static boolean hasUndefinedScope(View view) {
+		if (view instanceof EntityView) {
+			List<String> scopeIds = ((EntityView) view).getScopeIds();
+			return scopeIds == null || scopeIds.size() == 0;
+		} else if (view instanceof SubmissionView) {
+			List<String> scopeIds = ((SubmissionView) view).getScopeIds();
+			return scopeIds == null || scopeIds.size() == 0;
+		} else if (view instanceof Dataset) {
+			List<DatasetItem> datasetItems = ((Dataset) view).getItems();
+			return datasetItems == null || datasetItems.size() == 0;
+		} else {
+			// if we aren't sure, return false
+			return false;
 		}
 	}
 
@@ -396,12 +481,7 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 	 * Set the view to show no columns message.
 	 */
 	private void setNoColumnsState() {
-		String message = null;
-		if (this.canEdit) {
-			message = getNoColumnsEditableMessage(tableType);
-		} else {
-			message = getNoColumnsNotEditableMessage(tableType);
-		}
+		String message = getNoColumnsMessage(tableType, this.canEdit);
 		// There can be no query when there are no columns
 		if (this.queryChangeHandler.getQueryString() != null) {
 			this.queryChangeHandler.onQueryChange(null);
@@ -410,6 +490,20 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 		view.setQueryResultsVisible(false);
 		view.showTableMessage(AlertType.INFO, message);
 		view.setTableMessageVisible(true);
+	}
+
+	private void setNoScopeState() {
+		if (this.entityBundle.getEntity() instanceof View) {
+			String message = noScopeMessage(tableType, this.canEdit);
+			// There can be no query when there are no items
+			if (this.queryChangeHandler.getQueryString() != null) {
+				this.queryChangeHandler.onQueryChange(null);
+			}
+			view.setQueryInputVisible(false);
+			view.setQueryResultsVisible(false);
+			view.showTableMessage(AlertType.INFO, message);
+			view.setTableMessageVisible(true);
+		}
 	}
 
 	/**
@@ -618,6 +712,7 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 									.setPrimaryButton("Show Schema", () -> this.actionMenu.onAction(Action.SHOW_TABLE_SCHEMA))
 									.build();
 							DisplayUtils.notify("Edit the Dataset Schema to add additional annotation columns to this dataset", DisplayUtils.NotificationVariant.SUCCESS, toastOptions);
+							eventBus.fireEvent(new EntityUpdatedEvent());
 							closeItemsEditor();
 						},
 						() -> closeItemsEditor()
@@ -625,8 +720,14 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 		return props;
 	}
 
+	private void showDatasetItemsEditor() {
+		actionMenu.setActionVisible(Action.EDIT_DATASET_ITEMS, false);
+		view.setItemsEditorVisible(true);
+		view.setQueryResultsVisible(false);
+		view.setTableMessageVisible(false);
+	}
+
 	public void closeItemsEditor() {
-		isShowingItemsEditor = false;
 		actionMenu.setActionVisible(Action.EDIT_DATASET_ITEMS, true);
 		view.setItemsEditorVisible(false);
 		view.setQueryResultsVisible(true);

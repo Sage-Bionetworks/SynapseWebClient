@@ -29,7 +29,7 @@
 			</g:FlowPanel>
 		</bh:Div>
 
-		<b:Alert ui:field="tableMessage" type="INFO" visible="false" />
+		<w:FullWidthAlert ui:field="tableMessage" alertType="INFO" visible="false" global="false" />
 		<bh:Div ui:field="tableToolbar">
 			<bh:Div>
 				<g:SimplePanel ui:field="queryInputPanel"

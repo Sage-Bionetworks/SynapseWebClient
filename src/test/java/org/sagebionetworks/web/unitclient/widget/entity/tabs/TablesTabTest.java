@@ -265,8 +265,6 @@ public class TablesTabTest {
 		verify(mockTableEntityWidget).configure(mockTableEntityBundle, version, true, tab, mockActionMenuWidget);
 		verify(mockView).setTableEntityWidget(any(Widget.class));
 		verify(mockModifiedCreatedBy).configure(any(Date.class), anyString(), any(Date.class), anyString());
-		verify(mockActionMenuWidget).setTableDownloadOptionsVisible(true);
-		verify(mockActionMenuWidget).setTableDownloadOptionsEnabled(true);
 		verify(mockProvenanceWidget).configure(mapCaptor.capture());
 		// verify configuration
 		Map<String, String> provConfig = mapCaptor.getValue();
@@ -284,6 +282,7 @@ public class TablesTabTest {
 		verify(mockView).setWikiPageVisible(true);
 		verify(mockView).setVersionAlertVisible(false);
 		verify(mockView, never()).setVersionAlertVisible(true);
+		verify(mockActionMenuWidget, never()).setTableDownloadOptionsVisible(anyBoolean());
 
 		ArgumentCaptor<Synapse> captor = ArgumentCaptor.forClass(Synapse.class);
 		verify(mockTab).setEntityNameAndPlace(eq(tableName), captor.capture());

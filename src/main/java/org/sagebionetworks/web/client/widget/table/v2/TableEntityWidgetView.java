@@ -84,7 +84,11 @@ public interface TableEntityWidgetView extends IsWidget {
 
 	void setScopeVisible(boolean visible);
 
+	boolean isScopeVisible();
+
 	void setSchemaVisible(boolean visible);
+
+	boolean isSchemaVisible();
 
 	void showErrorMessage(String message);
 
@@ -93,6 +97,8 @@ public interface TableEntityWidgetView extends IsWidget {
 	void setAddToDownloadList(IsWidget w);
 
 	void setItemsEditorVisible(boolean visible);
+
+	boolean isItemsEditorVisible();
 
 	interface Presenter {
 		DatasetEditorProps getItemsEditorProps();

@@ -60,6 +60,13 @@ public class ActionMenuWidgetImpl implements ActionMenuWidget, ActionListener {
 	}
 
 	@Override
+	public void setActionEnabled(Action action, boolean enabled) {
+		getActionView(action).setEnabled(enabled);
+		updateViewWithNumberOfActionsVisible();
+	}
+
+
+	@Override
 	public void setActionText(Action action, String text) {
 		getActionView(action).setText(text);
 
@@ -176,6 +183,16 @@ public class ActionMenuWidgetImpl implements ActionMenuWidget, ActionListener {
 	@Override
 	public void setTableDownloadOptionsEnabled(boolean enabled) {
 		view.setDownloadActionsEnabled(enabled);
+	}
+
+	@Override
+	public void setDownloadActionsDisabledTooltipText(String tooltipText) {
+		view.setDownloadActionsDisabledTooltipText(tooltipText);
+	}
+
+	@Override
+	public void setEditTableDataTooltipText(String tooltipText) {
+		view.setEditTableDataTooltipText(tooltipText);
 	}
 
 	@Override

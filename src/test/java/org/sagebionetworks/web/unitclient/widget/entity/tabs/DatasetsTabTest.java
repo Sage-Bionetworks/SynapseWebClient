@@ -242,7 +242,6 @@ public class DatasetsTabTest {
 		verify(mockTableEntityWidget).configure(mockDatasetBundle, version, true, tab, mockActionMenuWidget);
 		verify(mockView).setTableEntityWidget(any(Widget.class));
 		verify(mockModifiedCreatedBy).configure(any(Date.class), anyString(), any(Date.class), anyString());
-		verify(mockActionMenuWidget).setTableDownloadOptionsVisible(true);
 		verify(mockProvenanceWidget).configure(mapCaptor.capture());
 		// verify configuration
 		Map<String, String> provConfig = mapCaptor.getValue();
@@ -258,6 +257,7 @@ public class DatasetsTabTest {
 		verify(mockModifiedCreatedBy).setVisible(false);
 		verify(mockView).setWikiPage(any(Widget.class));
 		verify(mockView).setWikiPageVisible(true);
+		verify(mockActionMenuWidget, never()).setTableDownloadOptionsVisible(anyBoolean());
 
 		ArgumentCaptor<Synapse> captor = ArgumentCaptor.forClass(Synapse.class);
 		verify(mockTab).setEntityNameAndPlace(eq(datasetName), captor.capture());
@@ -461,49 +461,6 @@ public class DatasetsTabTest {
 		Synapse expectedPlace = new Synapse(projectEntityId, null, EntityArea.DATASETS, null);
 		verify(mockTab).setEntityNameAndPlace(projectEntityId, expectedPlace);
 		verify(mockSynapseAlert).handleException(projectLoadError);
-	}
-
-	@Test
-	public void testEditorCanDownloadLatestVersion() {
-		Long version = null; // this is the current/draft version, not a snapshot
-		String areaToken = null;
-
-		when(mockPermissions.getCanCertifiedUserEdit()).thenReturn(true); // !
-		when(mockPermissions.getIsCertifiedUser()).thenReturn(true);
-
-		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
-		tab.configure(mockDatasetBundle, version, areaToken);
-
-		verify(mockActionMenuWidget).setTableDownloadOptionsEnabled(true);
-	}
-
-	@Test
-	public void testNonEditorCannotDownloadLatestVersion() {
-		Long version = null; // this is the current/draft version, not a snapshot
-		String areaToken = null;
-
-		when(mockPermissions.getCanCertifiedUserEdit()).thenReturn(false); // !
-		when(mockPermissions.getIsCertifiedUser()).thenReturn(true);
-
-		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
-		tab.configure(mockDatasetBundle, version, areaToken);
-
-		verify(mockActionMenuWidget).setTableDownloadOptionsEnabled(false);
-	}
-
-	@Test
-	public void testNonEditorCanDownloadSnapshot() {
-		Long version = 1L; // this is a snapshot
-		String areaToken = null;
-
-		when(mockPermissions.getCanCertifiedUserEdit()).thenReturn(false); // !
-		when(mockPermissions.getIsCertifiedUser()).thenReturn(true);
-
-		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
-		tab.configure(mockDatasetBundle, version, areaToken);
-
-		verify(mockActionMenuWidget).setTableDownloadOptionsEnabled(true);
-
 	}
 
 	@Test

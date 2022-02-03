@@ -27,6 +27,8 @@ public interface ActionMenuWidget extends IsWidget, ActionListener {
 	 */
 	public void setActionVisible(Action action, boolean visible);
 
+	public void setActionEnabled(Action action, boolean enabled);
+
 	/**
 	 * The text shown for this action.
 	 * 
@@ -77,6 +79,10 @@ public interface ActionMenuWidget extends IsWidget, ActionListener {
 	void setTableDownloadOptionsVisible(boolean visible);
 
 	void setTableDownloadOptionsEnabled(boolean enabled);
+
+	void setDownloadActionsDisabledTooltipText(String tooltipText);
+
+	void setEditTableDataTooltipText(String tooltipText);
 
 	void setIsLoading(boolean isLoading);
 }

@@ -38,5 +38,9 @@ public interface ActionMenuWidgetView extends IsWidget {
 
 	void setDownloadActionsEnabled(boolean enabled);
 
+	void setDownloadActionsDisabledTooltipText(String tooltipText);
+
+	void setEditTableDataTooltipText(String tooltipText);
+
 	void setSingleActionButton(String buttonText, ClickHandler handler);
 }

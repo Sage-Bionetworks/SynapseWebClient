@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -31,6 +32,8 @@ import org.sagebionetworks.repo.model.table.SubmissionView;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.ViewEntityType;
 import org.sagebionetworks.repo.model.table.ViewTypeMask;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.evaluation.SubmissionViewScopeEditor;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep1;
@@ -54,6 +57,10 @@ public class CreateTableViewWizardStep1Test {
 	SubmissionViewScopeEditor mockSubmissionViewScope;
 	@Mock
 	CreateTableViewWizardStep2 mockStep2;
+	@Mock
+	GlobalApplicationState mockGlobalAppState;
+	@Mock
+	PlaceChanger mockPlaceChanger;
 
 	@Mock
 	SynapseJavascriptClient mockJsClient;
@@ -71,7 +78,8 @@ public class CreateTableViewWizardStep1Test {
 		when(mockEntityContainerListWidget.getEntityIds()).thenReturn(entityScopeIds);
 		evaluationScopeIds = Collections.singletonList("8278743");
 		when(mockSubmissionViewScope.getEvaluationIds()).thenReturn(evaluationScopeIds);
-		widget = new CreateTableViewWizardStep1(mockView, mockJsClient, mockEntityContainerListWidget, mockSubmissionViewScope, mockStep2);
+		when(mockGlobalAppState.getPlaceChanger()).thenReturn(mockPlaceChanger);
+		widget = new CreateTableViewWizardStep1(mockView, mockJsClient, mockEntityContainerListWidget, mockSubmissionViewScope, mockStep2, mockGlobalAppState);
 		widget.setModalPresenter(mockWizardPresenter);
 		parentId = "syn123";
 	}
@@ -83,6 +91,7 @@ public class CreateTableViewWizardStep1Test {
 		widget.onPrimary();
 		verify(mockWizardPresenter).setErrorMessage(CreateTableViewWizardStep1.NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER);
 		verify(mockJsClient, never()).createEntity(any(Entity.class));
+		verify(mockPlaceChanger, never()).goTo(any());
 	}
 
 	@Test
@@ -109,7 +118,7 @@ public class CreateTableViewWizardStep1Test {
 		verify(mockWizardPresenter, never()).setErrorMessage(anyString());
 		verify(mockStep2).configure(table, TableType.submission_view);
 		verify(mockWizardPresenter).setNextActivePage(mockStep2);
-
+		verify(mockPlaceChanger, never()).goTo(any());
 	}
 	
 	@Test
@@ -134,6 +143,7 @@ public class CreateTableViewWizardStep1Test {
 		verify(mockWizardPresenter, never()).setErrorMessage(anyString());
 		verify(mockStep2).configure(table, TableType.file_view);
 		verify(mockWizardPresenter).setNextActivePage(mockStep2);
+		verify(mockPlaceChanger, never()).goTo(any());
 	}
 
 	@Test
@@ -166,6 +176,7 @@ public class CreateTableViewWizardStep1Test {
 		verify(mockWizardPresenter, never()).setErrorMessage(anyString());
 		verify(mockStep2).configure(table, filesFoldersTablesView);
 		verify(mockWizardPresenter).setNextActivePage(mockStep2);
+		verify(mockPlaceChanger, never()).goTo(any());
 	}
 
 	@Test
@@ -180,6 +191,7 @@ public class CreateTableViewWizardStep1Test {
 		when(mockEntityContainerListWidget.getEntityIds()).thenReturn(Collections.EMPTY_LIST);
 		widget.onPrimary();
 		verify(mockWizardPresenter).setErrorMessage(EMPTY_SCOPE_MESSAGE);
+		verify(mockPlaceChanger, never()).goTo(any());
 	}
 
 	@Test
@@ -203,6 +215,7 @@ public class CreateTableViewWizardStep1Test {
 		verify(mockWizardPresenter, never()).setErrorMessage(anyString());
 		verify(mockStep2).configure(table, TableType.project_view);
 		verify(mockWizardPresenter).setNextActivePage(mockStep2);
+		verify(mockPlaceChanger, never()).goTo(any());
 	}
 
 	@Test
@@ -222,6 +235,7 @@ public class CreateTableViewWizardStep1Test {
 		verify(mockWizardPresenter, never()).setErrorMessage(anyString());
 		verify(mockStep2).configure(table, TableType.table);
 		verify(mockWizardPresenter).setNextActivePage(mockStep2);;
+		verify(mockPlaceChanger, never()).goTo(any());
 	}
 
 	@Test
@@ -256,6 +270,7 @@ public class CreateTableViewWizardStep1Test {
 		// We shouldn't go to step 2 for dataseets
 		verify(mockStep2, never()).configure(any(), any());
 		verify(mockWizardPresenter, never()).setNextActivePage(mockStep2);
+		verify(mockPlaceChanger).goTo(any());
 		verify(mockWizardPresenter).onFinished();
 	}
 
@@ -272,6 +287,7 @@ public class CreateTableViewWizardStep1Test {
 
 		// TODO: should not go to the next step
 		verify(mockWizardPresenter, never()).onFinished();
+		verify(mockPlaceChanger, never()).goTo(any());
 	}
 
 }
