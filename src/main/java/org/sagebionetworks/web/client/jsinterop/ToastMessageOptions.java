@@ -141,10 +141,16 @@ public class ToastMessageOptions extends ReactComponentProps {
 		}
 
 		public ToastMessageOptions build() {
-			AlertButtonConfig primaryButtonConfig = AlertButtonConfig.create(primaryButtonText, onPrimaryButtonClick);
-			AlertButtonConfig secondaryButtonConfig = AlertButtonConfig.create(secondaryButtonText, onSecondaryButtonClickOrHref);
-            return ToastMessageOptions.create(title, autoCloseInMs, primaryButtonConfig, dismissOnPrimaryButtonClick, secondaryButtonConfig, dismissOnSecondaryButtonClick);
-        }
+			AlertButtonConfig primaryButtonConfig = null;
+			AlertButtonConfig secondaryButtonConfig = null;
+			if (primaryButtonText != null && onPrimaryButtonClick != null) {
+				primaryButtonConfig = AlertButtonConfig.create(primaryButtonText, onPrimaryButtonClick);
+			}
+			if (secondaryButtonText != null && onSecondaryButtonClickOrHref != null) {
+				secondaryButtonConfig = AlertButtonConfig.create(secondaryButtonText, onSecondaryButtonClickOrHref);
+			}
+			return ToastMessageOptions.create(title, autoCloseInMs, primaryButtonConfig, dismissOnPrimaryButtonClick, secondaryButtonConfig, dismissOnSecondaryButtonClick);
+		}
 
 		private AlertButtonConfig.Callback getCallbackForHref(String href, boolean currentWindow) {
 			if (currentWindow) {
