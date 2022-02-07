@@ -43,7 +43,7 @@
 									<span>Experimental Mode <strong>Off</strong></span>
 								</b:Anchor>
 								<b:Anchor ui:field="debugOffLink"
-									addStyleNames="flexcontainer-column flexcontainer-justify-flex-end color-white">
+									addStyleNames="flexcontainer-column flexcontainer-justify-flex-end color-white font-size-14">
 									<span>Experimental Mode <strong>On</strong></span>
 								</b:Anchor>
 								<w:HelpWidget
