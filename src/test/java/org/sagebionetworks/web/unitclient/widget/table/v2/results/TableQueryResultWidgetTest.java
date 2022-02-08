@@ -275,7 +275,7 @@ public class TableQueryResultWidgetTest {
 		// only called once (on previous page load) because sql was in the sql2SortItems cache
 		verify(mockView).scrollTableIntoView();
 		verify(mockJobTrackingWidget2).startAndTrackJob(eq(TableQueryResultWidget.RUNNING_QUERY_MESSAGE), eq(false), eq(AsynchType.TableQuery), qbrCaptor.capture(), asyncProgressHandlerCaptor.capture());
-		// verify we are not asking for the cached result values (column models, select columns, facets, query count)
+		// verify we are not asking for the cached result values (column models, select columns, query count)
 		partsMask = qbrCaptor.getValue().getPartMask();
 		expectedPartsMask = BUNDLE_MASK_QUERY_RESULTS | BUNDLE_MASK_QUERY_LAST_UPDATED;
 		assertEquals(expectedPartsMask, partsMask);

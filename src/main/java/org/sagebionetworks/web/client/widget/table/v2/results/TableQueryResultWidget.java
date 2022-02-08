@@ -302,7 +302,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 			showError("No rows returned.");
 		}
 
-		fireFinishEvent( true, isQueryResultEditable());
+		fireFinishEvent(true, isQueryResultEditable());
 	}
 
 	/**
