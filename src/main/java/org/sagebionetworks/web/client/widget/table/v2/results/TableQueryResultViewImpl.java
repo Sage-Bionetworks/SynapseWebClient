@@ -1,8 +1,10 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
+import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
+
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -33,6 +35,8 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 	Div scrollTarget;
 	@UiField
 	Div facetsWidgetPanel;
+	@UiField
+	Heading resultCountHeader;
 
 	Widget widget;
 
@@ -90,6 +94,22 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 	@Override
 	public void scrollTableIntoView() {
 		jsniUtils.scrollIntoView(scrollTarget.getElement());
+	}
+
+	@Override
+	public void setResultCount(Long resultCount) {
+		if (resultCount == null || new Long(0).equals(resultCount)) {
+			resultCountHeader.setText("No Results");
+		} else if (new Long(1).equals(resultCount)) {
+			resultCountHeader.setText("1 Result");
+		} else {
+			resultCountHeader.setText(resultCount + " Results");
+		}
+	}
+
+	@Override
+	public void setResultCountVisible(boolean visible) {
+		resultCountHeader.setVisible(visible);
 	}
 
 	@Override
