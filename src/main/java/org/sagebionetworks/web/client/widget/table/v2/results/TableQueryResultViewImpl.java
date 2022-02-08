@@ -100,7 +100,7 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 	public void setResultCount(Long resultCount) {
 		if (resultCount == null || new Long(0).equals(resultCount)) {
 			resultCountHeader.setText("No Results");
-		} else if (new Long(0).equals(resultCount)) {
+		} else if (new Long(1).equals(resultCount)) {
 			resultCountHeader.setText("1 Result");
 		} else {
 			resultCountHeader.setText(resultCount + " Results");
