@@ -4,20 +4,25 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget.*;
+import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget.BUNDLE_MASK_QUERY_COLUMN_MODELS;
+import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget.BUNDLE_MASK_QUERY_COUNT;
+import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget.BUNDLE_MASK_QUERY_LAST_UPDATED;
 import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget.BUNDLE_MASK_QUERY_RESULTS;
 import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget.BUNDLE_MASK_QUERY_SELECT_COLUMNS;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -28,7 +33,6 @@ import org.sagebionetworks.repo.model.ErrorResponseCode;
 import org.sagebionetworks.repo.model.UnauthorizedException;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.FacetColumnRequest;
-import org.sagebionetworks.repo.model.table.FacetColumnResult;
 import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryBundleRequest;
@@ -59,6 +63,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWi
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetsWidget;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
+
 import com.google.gwt.user.client.ui.Widget;
 
 public class TableQueryResultWidgetTest {
@@ -110,8 +115,6 @@ public class TableQueryResultWidgetTest {
 	@Captor
 	ArgumentCaptor<QueryBundleRequest> qbrCaptor;
 	@Mock
-	FacetColumnResult mockFacetColumnResult;
-	@Mock
 	ColumnModel mockColumnModel;
 	@Mock
 	SelectColumn mockSelectColumn;
@@ -146,7 +149,6 @@ public class TableQueryResultWidgetTest {
 		bundle.setMaxRowsPerPage(123L);
 		bundle.setQueryCount(QUERY_COUNT);
 		bundle.setQueryResult(results);
-		bundle.setFacets(Collections.singletonList(mockFacetColumnResult));
 		bundle.setColumnModels(Collections.singletonList(mockColumnModel));
 		bundle.setSelectColumns(Collections.singletonList(mockSelectColumn));
 		
@@ -281,8 +283,8 @@ public class TableQueryResultWidgetTest {
 		progressHandler2.onComplete(mockNewPageQueryResultBundle);
 		// verify cached results are set on the new result
 		verify(mockNewPageQueryResultBundle).setColumnModels(bundle.getColumnModels());
-		verify(mockNewPageQueryResultBundle).setFacets(bundle.getFacets());
 		verify(mockNewPageQueryResultBundle).setSelectColumns(bundle.getSelectColumns());
+		verify(mockNewPageQueryResultBundle).setQueryCount(bundle.getQueryCount());
 	}
 
 	@Test

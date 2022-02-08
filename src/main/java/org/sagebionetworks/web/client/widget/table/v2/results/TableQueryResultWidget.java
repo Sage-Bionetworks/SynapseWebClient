@@ -277,7 +277,6 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 			// See CACHED_PARTS_MASK for which parts are cached
 			bundle.setQueryCount(cachedFullQueryResultBundle.getQueryCount());
 			bundle.setColumnModels(cachedFullQueryResultBundle.getColumnModels());
-			bundle.setFacets(cachedFullQueryResultBundle.getFacets());
 			bundle.setSelectColumns(cachedFullQueryResultBundle.getSelectColumns());
 		} else {
 			cachedFullQueryResultBundle = bundle;
