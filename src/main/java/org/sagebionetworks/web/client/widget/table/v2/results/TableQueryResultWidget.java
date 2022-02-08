@@ -62,7 +62,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	public static final long BUNDLE_MASK_QUERY_LAST_UPDATED = 0x80;
 
 	// We cache these parts of the QueryResultBundle
-	public static final long CACHED_PARTS_MASK = BUNDLE_MASK_QUERY_COLUMN_MODELS | BUNDLE_MASK_QUERY_SELECT_COLUMNS | BUNDLE_MASK_QUERY_COUNT;
+	private static final long CACHED_PARTS_MASK = BUNDLE_MASK_QUERY_COLUMN_MODELS | BUNDLE_MASK_QUERY_SELECT_COLUMNS | BUNDLE_MASK_QUERY_COUNT;
 
 	private static final Long ALL_PARTS_MASK = new Long(255);
 	SynapseClientAsync synapseClient;
