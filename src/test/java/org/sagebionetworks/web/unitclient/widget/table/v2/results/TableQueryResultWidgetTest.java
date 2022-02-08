@@ -122,6 +122,7 @@ public class TableQueryResultWidgetTest {
 	@Mock
 	PopupUtilsView mockPopupUtils;
 	public static final String ENTITY_ID = "syn123";
+	public static final Long QUERY_COUNT = 88L;
 
 	@Before
 	public void before() {
@@ -143,7 +144,7 @@ public class TableQueryResultWidgetTest {
 		results.setQueryResults(rowSet);
 		bundle = new QueryResultBundle();
 		bundle.setMaxRowsPerPage(123L);
-		bundle.setQueryCount(88L);
+		bundle.setQueryCount(QUERY_COUNT);
 		bundle.setQueryResult(results);
 		bundle.setFacets(Collections.singletonList(mockFacetColumnResult));
 		bundle.setColumnModels(Collections.singletonList(mockColumnModel));
@@ -195,6 +196,8 @@ public class TableQueryResultWidgetTest {
 		verify(mockListner, times(2)).queryExecutionStarted();
 		// Shown on success.
 		verify(mockPageWidget).setTableVisible(true);
+		verify(mockView).setResultCountVisible(true);
+		verify(mockView).setResultCount(QUERY_COUNT);
 		verify(mockListner).queryExecutionFinished(true, true);
 		verify(mockView).setProgressWidgetVisible(false);
 		verify(mockView).setSynapseAlertWidget(any(Widget.class));
@@ -256,7 +259,7 @@ public class TableQueryResultWidgetTest {
 
 		// verify all parts are initially asked for
 		Long partsMask = qbrCaptor.getValue().getPartMask();
-		Long expectedPartsMask = BUNDLE_MASK_QUERY_RESULTS | BUNDLE_MASK_QUERY_COLUMN_MODELS | BUNDLE_MASK_QUERY_SELECT_COLUMNS | BUNDLE_MASK_QUERY_LAST_UPDATED;
+		Long expectedPartsMask = BUNDLE_MASK_QUERY_RESULTS | BUNDLE_MASK_QUERY_COLUMN_MODELS | BUNDLE_MASK_QUERY_SELECT_COLUMNS | BUNDLE_MASK_QUERY_LAST_UPDATED | BUNDLE_MASK_QUERY_COUNT;
 		assertEquals(expectedPartsMask, partsMask);
 
 		// simulate complete table query async job
@@ -270,7 +273,7 @@ public class TableQueryResultWidgetTest {
 		// only called once (on previous page load) because sql was in the sql2SortItems cache
 		verify(mockView).scrollTableIntoView();
 		verify(mockJobTrackingWidget2).startAndTrackJob(eq(TableQueryResultWidget.RUNNING_QUERY_MESSAGE), eq(false), eq(AsynchType.TableQuery), qbrCaptor.capture(), asyncProgressHandlerCaptor.capture());
-		// verify we are not asking for the cached result values (column models, select columns, facets)
+		// verify we are not asking for the cached result values (column models, select columns, facets, query count)
 		partsMask = qbrCaptor.getValue().getPartMask();
 		expectedPartsMask = BUNDLE_MASK_QUERY_RESULTS | BUNDLE_MASK_QUERY_LAST_UPDATED;
 		assertEquals(expectedPartsMask, partsMask);
@@ -307,7 +310,7 @@ public class TableQueryResultWidgetTest {
 
 		// verify all parts are initially asked for
 		Long partsMask = qbrCaptor.getValue().getPartMask();
-		Long expectedPartsMask = BUNDLE_MASK_QUERY_RESULTS | BUNDLE_MASK_QUERY_COLUMN_MODELS | BUNDLE_MASK_QUERY_SELECT_COLUMNS | BUNDLE_MASK_QUERY_LAST_UPDATED;
+		Long expectedPartsMask = BUNDLE_MASK_QUERY_RESULTS | BUNDLE_MASK_QUERY_COLUMN_MODELS | BUNDLE_MASK_QUERY_SELECT_COLUMNS | BUNDLE_MASK_QUERY_LAST_UPDATED | BUNDLE_MASK_QUERY_COUNT;
 		assertEquals(expectedPartsMask, partsMask);
 	}
 
@@ -329,6 +332,8 @@ public class TableQueryResultWidgetTest {
 		verify(mockListner).queryExecutionStarted();
 		// Shown on success.
 		verify(mockPageWidget).setTableVisible(true);
+		verify(mockView).setResultCountVisible(true);
+		verify(mockView).setResultCount(QUERY_COUNT);
 		verify(mockListner).queryExecutionFinished(true, true);
 		verify(mockView).setProgressWidgetVisible(false);
 	}
@@ -359,6 +364,7 @@ public class TableQueryResultWidgetTest {
 		asyncProgressHandlerCaptor.getValue().onComplete(bundle);
 
 		verify(mockView, times(2)).setErrorVisible(false);
+		verify(mockView).setResultCountVisible(true);
 		verify(mockView).setProgressWidgetVisible(true);
 		// Hidden while running query.
 		verify(mockPageWidget).setTableVisible(false);
@@ -389,6 +395,7 @@ public class TableQueryResultWidgetTest {
 		verify(mockListner).queryExecutionFinished(false, false);
 		verify(mockView).setProgressWidgetVisible(false);
 		verify(mockView).setErrorVisible(true);
+		verify(mockView).setResultCountVisible(false);
 		verify(mockPageWidget, times(2)).setTableVisible(false);
 		verify(mockSynapseAlert).showError(TableQueryResultWidget.QUERY_CANCELED);
 	}
@@ -412,6 +419,7 @@ public class TableQueryResultWidgetTest {
 		verify(mockListner).queryExecutionStarted();
 		// After a cancel
 		verify(mockListner).queryExecutionFinished(false, false);
+		verify(mockView).setResultCountVisible(false);
 		verify(mockView).setProgressWidgetVisible(false);
 		verify(mockView).setErrorVisible(true);
 		verify(mockPageWidget, times(2)).setTableVisible(false);

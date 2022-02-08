@@ -70,4 +70,8 @@ public interface TableQueryResultView extends IsWidget {
 
 	void scrollTableIntoView();
 
+	void setResultCount(Long resultCount);
+
+	void setResultCountVisible(boolean visible);
+
 }

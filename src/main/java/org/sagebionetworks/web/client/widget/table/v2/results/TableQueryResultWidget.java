@@ -61,6 +61,8 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	public static final long BUNDLE_MASK_QUERY_SUM_FILE_SIZES = 0x40;
 	public static final long BUNDLE_MASK_QUERY_LAST_UPDATED = 0x80;
 
+	// We cache these parts of the QueryResultBundle
+	public static final long CACHED_PARTS_MASK = BUNDLE_MASK_QUERY_COLUMN_MODELS | BUNDLE_MASK_QUERY_SELECT_COLUMNS | BUNDLE_MASK_QUERY_COUNT;
 
 	private static final Long ALL_PARTS_MASK = new Long(255);
 	SynapseClientAsync synapseClient;
@@ -174,9 +176,8 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 			// run the job
 			QueryBundleRequest qbr = new QueryBundleRequest();
 			long partMask = BUNDLE_MASK_QUERY_RESULTS | BUNDLE_MASK_QUERY_LAST_UPDATED;
-			// do not ask for query count
 			if (cachedFullQueryResultBundle == null) {
-				partMask = partMask | BUNDLE_MASK_QUERY_COLUMN_MODELS | BUNDLE_MASK_QUERY_SELECT_COLUMNS;
+				partMask = partMask | CACHED_PARTS_MASK;
 			} else {
 				// we can release the old query result
 				cachedFullQueryResultBundle.setQueryResult(null);
@@ -272,6 +273,9 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	 */
 	private void setQueryResults(final QueryResultBundle bundle) {
 		if (cachedFullQueryResultBundle != null) {
+			// Add the cached parts that we didn't request to the new result bundle.
+			// See CACHED_PARTS_MASK for which parts are cached
+			bundle.setQueryCount(cachedFullQueryResultBundle.getQueryCount());
 			bundle.setColumnModels(cachedFullQueryResultBundle.getColumnModels());
 			bundle.setFacets(cachedFullQueryResultBundle.getFacets());
 			bundle.setSelectColumns(cachedFullQueryResultBundle.getSelectColumns());
@@ -284,6 +288,8 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 
 	private void setQueryResultsAndSort(QueryResultBundle bundle, List<SortItem> sortItems) {
 		this.bundle = bundle;
+		this.view.setResultCountVisible(true);
+		this.view.setResultCount(bundle.getQueryCount());
 		this.view.setErrorVisible(false);
 		this.view.setProgressWidgetVisible(false);
 		// configure the page widget
@@ -297,7 +303,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 			showError("No rows returned.");
 		}
 
-		fireFinishEvent(true, isQueryResultEditable());
+		fireFinishEvent( true, isQueryResultEditable());
 	}
 
 	/**
@@ -371,6 +377,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 
 	private void setupErrorState() {
 		pageViewerWidget.setTableVisible(false);
+		this.view.setResultCountVisible(false);
 		this.view.setProgressWidgetVisible(false);
 		fireFinishEvent(false, false);
 		this.view.setErrorVisible(true);
