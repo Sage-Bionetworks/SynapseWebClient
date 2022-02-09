@@ -40,6 +40,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
+import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWikiWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWikiWidgetView;
 import org.sagebionetworks.web.shared.WidgetConstants;
@@ -116,8 +117,8 @@ public class TableQueryResultWikiWidgetTest {
 		verify(mockSynAlert).clear();
 		Query query = widget.getQueryString();
 		assertEquals(sql, query.getSql());
-		assertEquals((Long) TableEntityWidget.DEFAULT_LIMIT, query.getLimit());
-		assertEquals((Long) TableEntityWidget.DEFAULT_OFFSET, query.getOffset());
+		assertEquals((Long) QueryBundleUtils.DEFAULT_LIMIT, query.getLimit());
+		assertEquals((Long) QueryBundleUtils.DEFAULT_OFFSET, query.getOffset());
 		
 		boolean isCurrentVersion = true;
 		String wikiPageRootId = null;
@@ -209,8 +210,8 @@ public class TableQueryResultWikiWidgetTest {
 		Query query = widget.getQueryString();
 		assertEquals(sql, query.getSql());
 		// should have been set to default values
-		assertEquals((Long) TableEntityWidget.DEFAULT_LIMIT, query.getLimit());
-		assertEquals((Long) TableEntityWidget.DEFAULT_OFFSET, query.getOffset());
+		assertEquals((Long) QueryBundleUtils.DEFAULT_LIMIT, query.getLimit());
+		assertEquals((Long) QueryBundleUtils.DEFAULT_OFFSET, query.getOffset());
 
 		// log both errors to the console
 		verify(mockSynapseJSNIUtils, times(2)).consoleError(anyString());

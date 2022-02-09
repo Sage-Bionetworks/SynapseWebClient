@@ -1,10 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import static org.sagebionetworks.repo.model.table.QueryOptions.BUNDLE_MASK_QUERY_MAX_ROWS_PER_PAGE;
+import static org.sagebionetworks.repo.model.table.QueryOptions.BUNDLE_MASK_QUERY_RESULTS;
+import static org.sagebionetworks.repo.model.table.QueryOptions.BUNDLE_MASK_QUERY_SELECT_COLUMNS;
 import static org.sagebionetworks.web.client.place.Synapse.EntityArea.TABLES;
 import static org.sagebionetworks.web.client.widget.entity.tabs.AbstractTablesTab.TABLE_QUERY_PREFIX;
-import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget.BUNDLE_MASK_QUERY_MAX_ROWS_PER_PAGE;
-import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget.BUNDLE_MASK_QUERY_RESULTS;
-import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget.BUNDLE_MASK_QUERY_SELECT_COLUMNS;
 import static org.sagebionetworks.web.shared.WidgetConstants.BAR_MODE;
 import static org.sagebionetworks.web.shared.WidgetConstants.FILL_COLUMN_NAME;
 import static org.sagebionetworks.web.shared.WidgetConstants.IS_HORIZONTAL;
@@ -16,6 +16,7 @@ import static org.sagebionetworks.web.shared.WidgetConstants.X_AXIS_TITLE;
 import static org.sagebionetworks.web.shared.WidgetConstants.X_AXIS_TYPE;
 import static org.sagebionetworks.web.shared.WidgetConstants.Y_AXIS_TITLE;
 import static org.sagebionetworks.web.shared.WidgetConstants.Y_AXIS_TYPE;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.Query;
@@ -42,10 +44,10 @@ import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.asynch.UpdatingAsynchProgressHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
-import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -341,8 +343,8 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 			Query query = new Query();
 			query.setIncludeEntityEtag(true);
 			query.setSql(sql);
-			query.setOffset(TableEntityWidget.DEFAULT_OFFSET);
-			query.setLimit(TableEntityWidget.DEFAULT_LIMIT);
+			query.setOffset(QueryBundleUtils.DEFAULT_OFFSET);
+			query.setLimit(QueryBundleUtils.DEFAULT_LIMIT);
 			String queryToken = queryTokenProvider.queryToToken(query);
 			String url = "#!Synapse:" + qbr.getEntityId() + "/" + TABLES.toString().toLowerCase() + "/" + TABLE_QUERY_PREFIX + queryToken;
 			view.newWindow(url);

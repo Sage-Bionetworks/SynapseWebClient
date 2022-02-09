@@ -13,9 +13,9 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sagebionetworks.repo.model.table.QueryOptions.BUNDLE_MASK_QUERY_RESULTS;
 import static org.sagebionetworks.web.client.widget.entity.renderer.PlotlyWidget.DEFAULT_LIMIT;
 import static org.sagebionetworks.web.client.widget.entity.renderer.PlotlyWidget.DEFAULT_PART_MASK;
-import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget.BUNDLE_MASK_QUERY_RESULTS;
 import static org.sagebionetworks.web.shared.WidgetConstants.BAR_MODE;
 import static org.sagebionetworks.web.shared.WidgetConstants.IS_HORIZONTAL;
 import static org.sagebionetworks.web.shared.WidgetConstants.SHOW_LEGEND;
@@ -26,11 +26,13 @@ import static org.sagebionetworks.web.shared.WidgetConstants.X_AXIS_TITLE;
 import static org.sagebionetworks.web.shared.WidgetConstants.X_AXIS_TYPE;
 import static org.sagebionetworks.web.shared.WidgetConstants.Y_AXIS_TITLE;
 import static org.sagebionetworks.web.shared.WidgetConstants.Y_AXIS_TYPE;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -57,9 +59,10 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.renderer.PlotlyWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.PlotlyWidgetView;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
-import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
+import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 
@@ -240,8 +243,8 @@ public class PlotlyWidgetTest {
 		verify(mockQueryTokenProvider).queryToToken(queryCaptor.capture());
 		Query q = queryCaptor.getValue();
 		assertTrue(q.getIncludeEntityEtag());
-		assertEquals((Long) TableEntityWidget.DEFAULT_OFFSET, q.getOffset());
-		assertEquals((Long) TableEntityWidget.DEFAULT_LIMIT, q.getLimit());
+		assertEquals((Long) QueryBundleUtils.DEFAULT_OFFSET, q.getOffset());
+		assertEquals((Long) QueryBundleUtils.DEFAULT_LIMIT, q.getLimit());
 		String sql = q.getSql();
 		assertTrue(sql.contains("\"" + X_COLUMN_NAME + "\"='" + xValue + "'"));
 		assertTrue(sql.contains(TABLE_ID));

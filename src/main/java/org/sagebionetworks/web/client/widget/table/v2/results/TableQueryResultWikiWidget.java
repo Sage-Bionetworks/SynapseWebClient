@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
 import java.util.Map;
+
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -19,6 +20,7 @@ import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -70,7 +72,7 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 		}
 		isLoading = true;
 
-		Long limit = TableEntityWidget.DEFAULT_LIMIT;
+		Long limit = QueryBundleUtils.DEFAULT_LIMIT;
 		try {
 			if (descriptor.containsKey(WidgetConstants.TABLE_LIMIT_KEY))
 				limit = Long.parseLong(descriptor.get(WidgetConstants.TABLE_LIMIT_KEY));
@@ -78,7 +80,7 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 			synapseJsniUtils.consoleError("Could not set query limit: " + e.getMessage());
 		}
 
-		Long offset = TableEntityWidget.DEFAULT_OFFSET;
+		Long offset = QueryBundleUtils.DEFAULT_OFFSET;
 		try {
 			if (descriptor.containsKey(WidgetConstants.TABLE_OFFSET_KEY))
 				offset = Long.parseLong(descriptor.get(WidgetConstants.TABLE_OFFSET_KEY));

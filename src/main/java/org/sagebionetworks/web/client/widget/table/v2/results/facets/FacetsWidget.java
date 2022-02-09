@@ -1,8 +1,12 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.facets;
 
+import static org.sagebionetworks.repo.model.table.QueryOptions.BUNDLE_MASK_QUERY_COLUMN_MODELS;
+import static org.sagebionetworks.repo.model.table.QueryOptions.BUNDLE_MASK_QUERY_FACETS;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
@@ -25,8 +29,8 @@ import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.renderer.SingleButtonView;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
-import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
+
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -58,7 +62,7 @@ public class FacetsWidget implements IsWidget {
 		view.clear();
 		AsynchronousProgressWidget progress = ginInjector.creatNewAsynchronousProgressWidget();
 		QueryBundleRequest qbr = new QueryBundleRequest();
-		long partMask = TableQueryResultWidget.BUNDLE_MASK_QUERY_FACETS | TableQueryResultWidget.BUNDLE_MASK_QUERY_COLUMN_MODELS;
+		long partMask = BUNDLE_MASK_QUERY_FACETS | BUNDLE_MASK_QUERY_COLUMN_MODELS;
 		qbr.setPartMask(partMask);
 		qbr.setQuery(query);
 		qbr.setEntityId(QueryBundleUtils.getTableId(query));

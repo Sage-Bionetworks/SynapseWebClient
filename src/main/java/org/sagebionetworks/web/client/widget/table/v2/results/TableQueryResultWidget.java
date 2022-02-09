@@ -1,10 +1,17 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
+import static org.sagebionetworks.repo.model.table.QueryOptions.BUNDLE_MASK_LAST_UPDATED_ON;
+import static org.sagebionetworks.repo.model.table.QueryOptions.BUNDLE_MASK_QUERY_COLUMN_MODELS;
+import static org.sagebionetworks.repo.model.table.QueryOptions.BUNDLE_MASK_QUERY_COUNT;
+import static org.sagebionetworks.repo.model.table.QueryOptions.BUNDLE_MASK_QUERY_RESULTS;
+import static org.sagebionetworks.repo.model.table.QueryOptions.BUNDLE_MASK_QUERY_SELECT_COLUMNS;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-import static org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget.DEFAULT_LIMIT;
-import static org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget.DEFAULT_OFFSET;
+import static org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils.DEFAULT_LIMIT;
+import static org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils.DEFAULT_OFFSET;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import org.sagebionetworks.repo.model.ErrorResponseCode;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.FacetColumnRequest;
@@ -31,7 +38,7 @@ import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetsWidget;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
-import com.google.gwt.core.client.GWT;
+
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -49,17 +56,6 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	public static final String VERIFYING_ETAG_MESSAGE = "Verifying that the recent changes have propagated through the system...";
 	public static final String RUNNING_QUERY_MESSAGE = ""; // while running, just show loading spinner (and cancel)
 	public static final String QUERY_CANCELED = "Query canceled";
-	/**
-	 * Masks for requesting what should be included in the query bundle.
-	 */
-	public static final long BUNDLE_MASK_QUERY_RESULTS = 0x1;
-	public static final long BUNDLE_MASK_QUERY_COUNT = 0x2;
-	public static final long BUNDLE_MASK_QUERY_SELECT_COLUMNS = 0x4;
-	public static final long BUNDLE_MASK_QUERY_MAX_ROWS_PER_PAGE = 0x8;
-	public static final long BUNDLE_MASK_QUERY_COLUMN_MODELS = 0x10;
-	public static final long BUNDLE_MASK_QUERY_FACETS = 0x20;
-	public static final long BUNDLE_MASK_QUERY_SUM_FILE_SIZES = 0x40;
-	public static final long BUNDLE_MASK_QUERY_LAST_UPDATED = 0x80;
 
 	// We cache these parts of the QueryResultBundle
 	private static final long CACHED_PARTS_MASK = BUNDLE_MASK_QUERY_COLUMN_MODELS | BUNDLE_MASK_QUERY_SELECT_COLUMNS | BUNDLE_MASK_QUERY_COUNT;
@@ -137,9 +133,8 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	/**
 	 * Configure this widget with a query string.
 	 * 
-	 * @param queryString
+	 * @param query
 	 * @param isEditable Is the user allowed to edit the query results?
-	 * @param is table a file view?
 	 * @param listener Listener for query start and finish events.
 	 */
 	public void configure(Query query, boolean isEditable, TableType tableType, QueryResultsListener listener) {
@@ -175,7 +170,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 
 			// run the job
 			QueryBundleRequest qbr = new QueryBundleRequest();
-			long partMask = BUNDLE_MASK_QUERY_RESULTS | BUNDLE_MASK_QUERY_LAST_UPDATED;
+			long partMask = BUNDLE_MASK_QUERY_RESULTS | BUNDLE_MASK_LAST_UPDATED_ON;
 			if (cachedFullQueryResultBundle == null) {
 				partMask = partMask | CACHED_PARTS_MASK;
 			} else {

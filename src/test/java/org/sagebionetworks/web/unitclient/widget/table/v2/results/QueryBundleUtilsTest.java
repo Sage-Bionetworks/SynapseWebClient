@@ -10,6 +10,8 @@ import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.repo.model.table.SelectColumn;
+import org.sagebionetworks.repo.model.table.Table;
+import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
 
 public class QueryBundleUtilsTest {
@@ -81,5 +83,21 @@ public class QueryBundleUtilsTest {
 		bundle.setQueryResult(null);
 		assertEquals(null, QueryBundleUtils.getSelectFromBundle(bundle));
 		assertEquals(null, QueryBundleUtils.getSelectFromBundle(null));
+	}
+
+	@Test
+	public void testDefaultQueryString() {
+		String synId = "syn123";
+		Table table = new TableEntity();
+		table.setId(synId);
+		table.setIsLatestVersion(true);
+
+		String expected = "SELECT * FROM " + synId;
+		Query query = new Query();
+		query.setSql(expected);
+		query.setIncludeEntityEtag(true);
+		query.setLimit(QueryBundleUtils.DEFAULT_LIMIT);
+		query.setOffset(QueryBundleUtils.DEFAULT_OFFSET);
+		assertEquals(query, QueryBundleUtils.getDefaultQuery(table));
 	}
 }
