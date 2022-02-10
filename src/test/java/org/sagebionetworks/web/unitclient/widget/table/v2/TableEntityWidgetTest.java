@@ -44,6 +44,7 @@ import org.sagebionetworks.repo.model.table.QueryFilter;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.repo.model.table.View;
 import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -72,6 +73,7 @@ import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidge
 import org.sagebionetworks.web.client.widget.table.v2.QueryInputWidget;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidgetView;
+import org.sagebionetworks.web.client.widget.table.v2.TotalVisibleResultsWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultsListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
@@ -140,6 +142,8 @@ public class TableEntityWidgetTest {
 	AuthenticationController mockAuthController;
 	@Captor
 	ArgumentCaptor<ActionListener> actionListenerCaptor;
+	@Mock
+	TotalVisibleResultsWidget mockTotalVisibleResultsWidget;
 
 	JSONObjectAdapterImpl portalJson = new JSONObjectAdapterImpl();
 
@@ -161,6 +165,8 @@ public class TableEntityWidgetTest {
 		when(mockPortalGinInjector.getAuthenticationController()).thenReturn(mockAuthController);
 		when(mockPortalGinInjector.getCookieProvider()).thenReturn(mockCookies);
 		when(mockPortalGinInjector.getAddToDownloadListV2()).thenReturn(mockAddToDownloadListV2);
+
+		when(mockQueryResultsWidget.getTotalVisibleResultsWidget()).thenReturn(mockTotalVisibleResultsWidget);
 
 		widget = new TableEntityWidget(mockView, mockQueryResultsWidget, mockQueryInputWidget, mockPreflightController, mockSynapseClient, mockFileViewClientsHelp, mockPortalGinInjector, mockSessionStorage, mockEventBus);
 
@@ -881,7 +887,24 @@ public class TableEntityWidgetTest {
 		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
 
 		verify(mockActionMenu).setTableDownloadOptionsEnabled(true);
-
 	}
 
+	@Test
+	public void testTotalVisibleResultsConfiguredForViews() {
+		boolean canEdit = true;
+		configureBundleWithView(ViewType.file);
+
+		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
+
+		verify(mockTotalVisibleResultsWidget).configure((View) entityBundle.getEntity());
+	}
+
+	@Test
+	public void testTotalVisibleResultsNotConfiguredForTableEntity() {
+		boolean canEdit = true;
+
+		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
+
+		verify(mockTotalVisibleResultsWidget, never()).configure(any());
+	}
 }

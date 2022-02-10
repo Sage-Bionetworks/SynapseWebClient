@@ -194,6 +194,9 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 
 	private void reconfigureState() {
 		initializeQuery();
+		if (entityBundle.getEntity() instanceof View) {
+			queryResultsWidget.getTotalVisibleResultsWidget().configure((View) entityBundle.getEntity());
+		}
 		if (this.hasQueryableData) {
 			initSimpleAdvancedQueryState();
 		}

@@ -35,6 +35,7 @@ import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
+import org.sagebionetworks.web.client.widget.table.v2.TotalVisibleResultsWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetsWidget;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
@@ -79,11 +80,12 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	int currentJobIndex = 0;
 	QueryResultBundle cachedFullQueryResultBundle = null;
 	FacetsWidget facetsWidget;
+	TotalVisibleResultsWidget totalVisibleResultsWidget;
 	boolean facetsRequireRefresh;
 	PopupUtilsView popupUtils;
 
 	@Inject
-	public TableQueryResultWidget(TableQueryResultView view, SynapseClientAsync synapseClient, PortalGinInjector ginInjector, SynapseAlert synapseAlert, ClientCache clientCache, GWTWrapper gwt, FacetsWidget facetsWidget, PopupUtilsView popupUtils) {
+	public TableQueryResultWidget(TableQueryResultView view, SynapseClientAsync synapseClient, PortalGinInjector ginInjector, SynapseAlert synapseAlert, ClientCache clientCache, GWTWrapper gwt, FacetsWidget facetsWidget, PopupUtilsView popupUtils, TotalVisibleResultsWidget totalVisibleResultsWidget) {
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
 		this.view = view;
@@ -94,10 +96,12 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		this.gwt = gwt;
 		this.facetsWidget = facetsWidget;
 		this.popupUtils = popupUtils;
+		this.totalVisibleResultsWidget = totalVisibleResultsWidget;
 		view.setFacetsWidget(facetsWidget);
 		this.view.setPageWidget(this.pageViewerWidget);
 		this.view.setPresenter(this);
 		this.view.setSynapseAlertWidget(synapseAlert.asWidget());
+		this.view.setTotalVisibleResultsPanel(totalVisibleResultsWidget);
 		resetFacetsHandler = new Callback() {
 			@Override
 			public void invoke() {
@@ -445,6 +449,10 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 
 	public void setFacetsVisible(boolean visible) {
 		view.setFacetsVisible(visible);
+	}
+
+	public TotalVisibleResultsWidget getTotalVisibleResultsWidget() {
+		return this.totalVisibleResultsWidget;
 	}
 
 }
