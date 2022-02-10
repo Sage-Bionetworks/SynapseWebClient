@@ -21,9 +21,9 @@
 			<t:TableData paddingRight="2">
 				<g:FlowPanel ui:field="questionContainer"
 					addStyleNames="margin-bottom-40 margin-left-15">
-					<b:Heading ui:field="questionHeader" size="H5"
+					<bh:Paragraph ui:field="questionHeader"
 						addStyleNames="inline-block control-label margin-right-10">
-					</b:Heading>
+					</bh:Paragraph>
 					<bh:Div ui:field="helpContainer"
 						addStyleNames="margin-left-9" />
 				</g:FlowPanel>
