@@ -82,7 +82,6 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 	}
 
 	public static final int MAX_SORT_COLUMNS = 3;
-
 	// Look for:
 	// beginning of the line, any character, whitespace, "from", whitespace, "syn<number>", optional
 	// "dot notation", optional whitespace, optional order by statement, end of line.
