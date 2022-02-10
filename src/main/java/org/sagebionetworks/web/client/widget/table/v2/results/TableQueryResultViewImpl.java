@@ -5,6 +5,7 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 
+import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -35,6 +36,8 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 	Div scrollTarget;
 	@UiField
 	Div facetsWidgetPanel;
+	@UiField
+	Div totalVisibleResultsPanel;
 	@UiField
 	Heading resultCountHeader;
 
@@ -103,7 +106,7 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 		} else if (new Long(1).equals(resultCount)) {
 			resultCountHeader.setText("1 Result");
 		} else {
-			resultCountHeader.setText(resultCount + " Results");
+			resultCountHeader.setText(NumberFormat.getDecimalFormat().format(resultCount) + " Results");
 		}
 	}
 
@@ -121,5 +124,11 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 	@Override
 	public void setFacetsVisible(boolean visible) {
 		facetsWidgetPanel.setVisible(visible);
+	}
+
+	@Override
+	public void setTotalVisibleResultsPanel(IsWidget w) {
+		totalVisibleResultsPanel.clear();
+		totalVisibleResultsPanel.add(w);
 	}
 }

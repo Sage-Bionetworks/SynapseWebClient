@@ -641,6 +641,8 @@ import org.sagebionetworks.web.client.widget.table.v2.QueryInputView;
 import org.sagebionetworks.web.client.widget.table.v2.QueryInputViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidgetView;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.TotalVisibleResultsWidgetView;
+import org.sagebionetworks.web.client.widget.table.v2.TotalVisibleResultsWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorView;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowFormView;
@@ -1134,6 +1136,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(UploadCSVAppendPageView.class).to(UploadCSVAppendPageViewImpl.class);
 		bind(SortableTableHeader.class).to(SortableTableHeaderImpl.class);
 		bind(StaticTableHeader.class).to(StaticTableHeaderImpl.class);
+		bind(TotalVisibleResultsWidgetView.class).to(TotalVisibleResultsWidgetViewImpl.class);
 
 		bind(CreateDownloadPage.class).to(CreateDownloadPageImpl.class);
 		bind(CreateDownloadPageView.class).to(CreateDownloadPageViewImpl.class);

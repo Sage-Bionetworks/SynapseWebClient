@@ -8,6 +8,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static org.sagebionetworks.repo.model.table.QueryOptions.BUNDLE_MASK_QUERY_COLUMN_MODELS;
+import static org.sagebionetworks.repo.model.table.QueryOptions.BUNDLE_MASK_QUERY_FACETS;
+
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Before;
@@ -144,7 +147,7 @@ public class FacetsWidgetTest {
 		verify(mockJobTrackingWidget).startAndTrackJob(eq(TableQueryResultWidget.RUNNING_QUERY_MESSAGE), eq(false), eq(AsynchType.TableQuery), qbrCaptor.capture(), asyncProgressHandlerCaptor.capture());
 		// verify request
 		QueryBundleRequest request = qbrCaptor.getValue();
-		assertEquals(new Long(TableQueryResultWidget.BUNDLE_MASK_QUERY_FACETS | TableQueryResultWidget.BUNDLE_MASK_QUERY_COLUMN_MODELS), request.getPartMask());
+		assertEquals(new Long(BUNDLE_MASK_QUERY_FACETS | BUNDLE_MASK_QUERY_COLUMN_MODELS), request.getPartMask());
 		assertEquals(mockQuery, request.getQuery());
 
 		// test on complete

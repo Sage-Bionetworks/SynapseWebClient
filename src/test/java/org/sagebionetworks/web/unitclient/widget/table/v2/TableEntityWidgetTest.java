@@ -44,6 +44,7 @@ import org.sagebionetworks.repo.model.table.QueryFilter;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.repo.model.table.View;
 import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -72,6 +73,8 @@ import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidge
 import org.sagebionetworks.web.client.widget.table.v2.QueryInputWidget;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidgetView;
+import org.sagebionetworks.web.client.widget.table.v2.TotalVisibleResultsWidget;
+import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultsListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -139,6 +142,8 @@ public class TableEntityWidgetTest {
 	AuthenticationController mockAuthController;
 	@Captor
 	ArgumentCaptor<ActionListener> actionListenerCaptor;
+	@Mock
+	TotalVisibleResultsWidget mockTotalVisibleResultsWidget;
 
 	JSONObjectAdapterImpl portalJson = new JSONObjectAdapterImpl();
 
@@ -160,6 +165,8 @@ public class TableEntityWidgetTest {
 		when(mockPortalGinInjector.getAuthenticationController()).thenReturn(mockAuthController);
 		when(mockPortalGinInjector.getCookieProvider()).thenReturn(mockCookies);
 		when(mockPortalGinInjector.getAddToDownloadListV2()).thenReturn(mockAddToDownloadListV2);
+
+		when(mockQueryResultsWidget.getTotalVisibleResultsWidget()).thenReturn(mockTotalVisibleResultsWidget);
 
 		widget = new TableEntityWidget(mockView, mockQueryResultsWidget, mockQueryInputWidget, mockPreflightController, mockSynapseClient, mockFileViewClientsHelp, mockPortalGinInjector, mockSessionStorage, mockEventBus);
 
@@ -212,12 +219,12 @@ public class TableEntityWidgetTest {
 
 	@Test
 	public void testGetDefaultPageSizeMaxOver() {
-		tableBundle.setMaxRowsPerPage(TableEntityWidget.DEFAULT_LIMIT * 2L);
+		tableBundle.setMaxRowsPerPage(QueryBundleUtils.DEFAULT_LIMIT * 2L);
 		// Configure with the default values
 		widget.configure(entityBundle, versionNumber, true, mockQueryChangeHandler, mockActionMenu);
 		// since the size from the bundle is greater than the default
 		// the default should be used.
-		assertEquals(TableEntityWidget.DEFAULT_LIMIT, widget.getDefaultPageSize());
+		assertEquals(QueryBundleUtils.DEFAULT_LIMIT, widget.getDefaultPageSize());
 	}
 
 	@Test
@@ -226,20 +233,7 @@ public class TableEntityWidgetTest {
 		// Configure with the default values
 		widget.configure(entityBundle, versionNumber, true, mockQueryChangeHandler, mockActionMenu);
 		// when null the default should be used.
-		assertEquals(TableEntityWidget.DEFAULT_LIMIT, widget.getDefaultPageSize());
-	}
-
-	@Test
-	public void testDefaultQueryString() {
-		tableBundle.setMaxRowsPerPage(4L);
-		widget.configure(entityBundle, versionNumber, true, mockQueryChangeHandler, mockActionMenu);
-		String expected = "SELECT * FROM " + tableEntity.getId();
-		Query query = new Query();
-		query.setSql(expected);
-		query.setIncludeEntityEtag(true);
-		query.setLimit(TableEntityWidget.DEFAULT_LIMIT);
-		query.setOffset(TableEntityWidget.DEFAULT_OFFSET);
-		assertEquals(query, widget.getDefaultQuery());
+		assertEquals(QueryBundleUtils.DEFAULT_LIMIT, widget.getDefaultPageSize());
 	}
 
 	@Test
@@ -401,8 +395,8 @@ public class TableEntityWidgetTest {
 		// Limit and offset should be back to default, and the new SQL included.
 		Query expected = new Query();
 		expected.setSql(newSQL);
-		expected.setLimit(TableEntityWidget.DEFAULT_LIMIT);
-		expected.setOffset(TableEntityWidget.DEFAULT_OFFSET);
+		expected.setLimit(QueryBundleUtils.DEFAULT_LIMIT);
+		expected.setOffset(QueryBundleUtils.DEFAULT_OFFSET);
 		expected.setSort(new ArrayList<SortItem>());
 		expected.setAdditionalFilters(new ArrayList<QueryFilter>());
 		verify(mockQueryResultsWidget).configure(expected, canEdit, tableType, widget);
@@ -893,7 +887,24 @@ public class TableEntityWidgetTest {
 		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
 
 		verify(mockActionMenu).setTableDownloadOptionsEnabled(true);
-
 	}
 
+	@Test
+	public void testTotalVisibleResultsConfiguredForViews() {
+		boolean canEdit = true;
+		configureBundleWithView(ViewType.file);
+
+		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
+
+		verify(mockTotalVisibleResultsWidget).configure((View) entityBundle.getEntity());
+	}
+
+	@Test
+	public void testTotalVisibleResultsNotConfiguredForTableEntity() {
+		boolean canEdit = true;
+
+		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
+
+		verify(mockTotalVisibleResultsWidget, never()).configure(any());
+	}
 }

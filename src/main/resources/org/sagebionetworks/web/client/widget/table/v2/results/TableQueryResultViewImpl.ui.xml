@@ -16,6 +16,7 @@
 				<bh:ClearFix />
 				<bh:Div ui:field="facetsWidgetPanel" />
 				<g:SimplePanel ui:field="progressPanel" />
+				<bh:Div ui:field="totalVisibleResultsPanel" />
 				<b:Heading size="H4" ui:field="resultCountHeader" visible="false" text="0 Results" />
 				<g:SimplePanel ui:field="tablePanel" />
 				<g:SimplePanel ui:field="rowEditorModalPanel" />

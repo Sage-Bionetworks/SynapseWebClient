@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+import static org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils.DEFAULT_LIMIT;
+import static org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils.DEFAULT_OFFSET;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +18,7 @@ import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryFilter;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.SubmissionView;
+import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.repo.model.table.View;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -39,6 +42,7 @@ import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQ
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
+import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryInputListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultsListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
@@ -65,8 +69,6 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 	public static final String RESET_SEARCH_QUERY_MESSAGE = "The search query will be reset. Are you sure that you would like to switch to simple search mode?";
 
 	public static final String RESET_SEARCH_QUERY = "Reset search query?";
-	public static final long DEFAULT_OFFSET = 0L;
-	public static final String SELECT_FROM = "SELECT * FROM ";
 	public static final String getNoColumnsMessage(TableType tableType, boolean editable) {
 		return "This " + tableType.getDisplayName() + " does not have any columns." + (editable ? " Edit the Schema to add columns to this " + tableType.getDisplayName() + "." : "");
 	}
@@ -79,7 +81,6 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 		}
 	}
 
-	public static final long DEFAULT_LIMIT = 25;
 	public static final int MAX_SORT_COLUMNS = 3;
 	// Look for:
 	// beginning of the line, any character, whitespace, "from", whitespace, "syn<number>", optional
@@ -193,6 +194,9 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 
 	private void reconfigureState() {
 		initializeQuery();
+		if (entityBundle.getEntity() instanceof View) {
+			queryResultsWidget.getTotalVisibleResultsWidget().configure((View) entityBundle.getEntity());
+		}
 		if (this.hasQueryableData) {
 			initSimpleAdvancedQueryState();
 		}
@@ -512,18 +516,7 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 	 * @return
 	 */
 	public Query getDefaultQuery() {
-		StringBuilder builder = new StringBuilder();
-		builder.append(SELECT_FROM);
-		builder.append(this.tableId);
-		if (!isCurrentVersion) {
-			builder.append("." + this.tableVersionNumber);
-		}
-		Query query = new Query();
-		query.setIncludeEntityEtag(true);
-		query.setSql(builder.toString());
-		query.setOffset(DEFAULT_OFFSET);
-		query.setLimit(DEFAULT_LIMIT);
-		return query;
+		return QueryBundleUtils.getDefaultQuery(tableId, isCurrentVersion, tableVersionNumber);
 	}
 
 	/**
@@ -638,7 +631,7 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 	 * Called after all pre-flight checks for upload has passed.
 	 */
 	private void postCheckonUploadTableData() {
-		Entity table = entityBundle.getEntity();
+		Table table = (Table) entityBundle.getEntity();
 		getUploadTableModalWidget().configure(table.getParentId(), tableId);
 		getUploadTableModalWidget().showModal(new WizardCallback() {
 			@Override

@@ -6,6 +6,8 @@ import org.sagebionetworks.repo.model.table.QueryResult;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.repo.model.table.SelectColumn;
+import org.sagebionetworks.repo.model.table.Table;
+
 import com.google.gwt.regexp.shared.MatchResult;
 import com.google.gwt.regexp.shared.RegExp;
 
@@ -16,9 +18,32 @@ import com.google.gwt.regexp.shared.RegExp;
  * 
  */
 public class QueryBundleUtils {
+	public static final String SELECT_FROM = "SELECT * FROM ";
+	public static final long DEFAULT_OFFSET = 0L;
+	public static final long DEFAULT_LIMIT = 25;
+
 	private static final String QUERY_TABLE_ID_REG_EX = "from[\\s]+(syn[0-9]+)[.]?([0-9]*)";
 	private static final RegExp TABLE_ID_PATTERN = RegExp.compile(QUERY_TABLE_ID_REG_EX);
 
+
+	public static Query getDefaultQuery(Table table) {
+		return getDefaultQuery(table.getId(), table.getIsLatestVersion(), table.getVersionNumber());
+	}
+
+	public static Query getDefaultQuery(String tableId, boolean isCurrentVersion, Long versionNumber) {
+		StringBuilder builder = new StringBuilder();
+		builder.append(SELECT_FROM);
+		builder.append(tableId);
+		if (!isCurrentVersion) {
+			builder.append("." + versionNumber);
+		}
+		Query query = new Query();
+		query.setIncludeEntityEtag(true);
+		query.setSql(builder.toString());
+		query.setOffset(DEFAULT_OFFSET);
+		query.setLimit(DEFAULT_LIMIT);
+		return query;
+	}
 
 	/**
 	 * Find the select columns in the bundle.
