@@ -12,7 +12,7 @@
 			<b:Column size="XS_12">
 				<!-- Thread header -->
 				<bh:Div ui:field="threadHeader"
-					addStyleNames="padding-10 light-border-bottom">
+					addStyleNames="padding-5 light-border-bottom">
 					<t:Table width="100%">
 						<t:TableRow>
 							<tr:SortableTableHeaderImpl
@@ -21,18 +21,18 @@
 								addStyleNames="visible-lg">
 								<bh:Span text="Author" />
 							</t:TableHeader>
-							<t:TableHeader width="310px"
+							<t:TableHeader width="350px"
 								addStyleNames="visible-lg">
 								<bh:Span text="Active Users" />
 							</t:TableHeader>
 							<tr:SortableTableHeaderImpl
-								ui:field="sortByReplies" width="90px" text="Replies"
+								ui:field="sortByReplies" width="110px" text="Replies"
 								addStyleNames="visible-lg visible-md" />
 							<tr:SortableTableHeaderImpl
-								ui:field="sortByViews" width="90px" text="View"
+								ui:field="sortByViews" width="95px" text="View"
 								addStyleNames="visible-lg visible-md" />
 							<tr:SortableTableHeaderImpl
-								ui:field="sortByActivity" width="90px" text="Activity"
+								ui:field="sortByActivity" width="120px" text="Activity"
 								addStyleNames="visible-lg visible-md" />
 						</t:TableRow>
 					</t:Table>
