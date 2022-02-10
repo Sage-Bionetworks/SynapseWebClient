@@ -8,7 +8,7 @@
 			addStyleNames="whitespace-nowrap" />
 		<t:TableData ui:field="messageTableData"
 			addStyleNames="hidden-xs" />
-		<t:TableData width="150px" ui:field="createdOnTableData"
+		<t:TableData width="180px" ui:field="createdOnTableData"
 			addStyleNames="visible-lg" />
 		<t:TableData width="140px">
 			<b:Button type="PRIMARY" text="Accept Request"
