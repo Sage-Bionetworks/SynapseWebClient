@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.sagebionetworks.repo.model.table.QueryOptions.BUNDLE_MASK_QUERY_COUNT;
@@ -101,7 +102,7 @@ public class TotalVisibleResultsWidgetTest {
 		verify(mockView).setVisible(true);
 		verify(mockView).setTotalNumberOfResults(datasetItems.size());
 		// No hidden results, so should be invisible
-		verify(mockView).setNumberOfHiddenResultsVisible(false);
+		verify(mockView, times(2)).setNumberOfHiddenResultsVisible(false);
 	}
 
 	@Test
@@ -133,7 +134,7 @@ public class TotalVisibleResultsWidgetTest {
 		// The count of all visible items is not related to the number of available items because the snapshot may be out of date
 		widget.configure(datasetSnapshot);
 
-		verify(mockView).setVisible(false);
+		verify(mockView, times(2)).setVisible(false);
 		verifyZeroInteractions(mockAsyncJobTracker);
 	}
 
@@ -142,7 +143,7 @@ public class TotalVisibleResultsWidgetTest {
 		// We have no way to determine the maximum number of items that should be available.
 		widget.configure(entityView);
 
-		verify(mockView).setVisible(false);
+		verify(mockView, times(2)).setVisible(false);
 		verifyZeroInteractions(mockAsyncJobTracker);
 	}
 

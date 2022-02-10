@@ -34,6 +34,9 @@ public class TotalVisibleResultsWidget implements IsWidget {
 		this.view = view;
 		this.popupUtils = popupUtils;
 		this.asyncJobTracker = asyncJobTracker;
+
+		view.setVisible(false);
+		view.setNumberOfHiddenResultsVisible(false);
 	}
 
 	@Override
