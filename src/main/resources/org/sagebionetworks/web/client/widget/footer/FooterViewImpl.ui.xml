@@ -142,7 +142,7 @@
 									addStyleNames="margin-top-5 margin-bottom-5 color-white letter-spacing-1 font-weight-400" />
 							</bh:Div>
 						</bh:Div>
-						<bh:Div addStyleNames="text-align-right" width="180px">
+						<bh:Div addStyleNames="text-align-right font-size-14">
 							<bh:Br />
 							<g:Label
 								addStyleNames="margin-top-5 margin-bottom-5 lightGreyText margin-left-2 displayInline"
