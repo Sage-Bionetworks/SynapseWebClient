@@ -23,15 +23,15 @@
 						<bh:Span ui:field="activeUsers"
 							addStyleNames="imageButton"></bh:Span>
 					</t:TableData>
-					<t:TableData width="90px"
+					<t:TableData width="110px"
 						addStyleNames="visible-lg visible-md">
 						<bh:Span ui:field="numberOfReplies"></bh:Span>
 					</t:TableData>
-					<t:TableData width="90px"
+					<t:TableData width="95px"
 						addStyleNames="visible-lg visible-md">
 						<bh:Span ui:field="numberOfViews"></bh:Span>
 					</t:TableData>
-					<t:TableData width="80px" addStyleNames="hidden-xs">
+					<t:TableData width="120px" addStyleNames="hidden-xs">
 						<bh:Span ui:field="lastActivity"></bh:Span>
 					</t:TableData>
 				</t:TableRow>

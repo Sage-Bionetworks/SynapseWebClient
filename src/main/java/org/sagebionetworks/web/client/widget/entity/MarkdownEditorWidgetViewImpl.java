@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.ModalSize;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -268,6 +269,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 					formattingGuideWidget.removeFromParent();
 				}
 				Dialog formattingGuideModal = new Dialog();
+				formattingGuideModal.setSize(ModalSize.LARGE);
 				formattingGuideModal.configure("Formatting Guide", null, "Close", null, true);
 				formattingGuideModal.add(formattingGuideWidget);
 				formattingGuideModal.show();

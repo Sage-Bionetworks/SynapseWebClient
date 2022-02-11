@@ -7,17 +7,19 @@
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	
  	<bh:Span>
-	    	<b:Modal ui:field="imposeRestrictionModal" title="Conditions for Use" closable="true" dataBackdrop="STATIC" dataKeyboard="true">
+			<b:Modal ui:field="imposeRestrictionModal" title="Conditions for Use" closable="true" dataBackdrop="STATIC" dataKeyboard="true">
 			<b:ModalBody>
-			    <g:InlineLabel styleName="margin-right-10" text="Is this sensitive human data that must be protected?" />
-			    <b:InlineRadio ui:field="yesHumanDataRadio" name="humandata" text="Yes"/>
-	        	<b:InlineRadio ui:field="noHumanDataRadio" name="humandata" text="No"/>
-	        	<bh:Div styleName="margin-top-10">
+				<g:InlineLabel styleName="margin-right-10" text="Is this sensitive human data that must be protected?" />
+				<bh:Div styleName="margin-top-10">
+					<b:InlineRadio ui:field="yesHumanDataRadio" name="humandata" text="Yes"/>
+					<b:InlineRadio ui:field="noHumanDataRadio" name="humandata" text="No"/>
+				</bh:Div>
+				<bh:Div styleName="margin-top-10">
 					<b:Alert ui:field="notSensitiveHumanDataMessage"  type="WARNING" visible="false">
 						<bh:Text text="Sage Bionetworks does not typically impose conditions on use of Folder content containing non-human data unless there is a legal, ethical or regulatory reason to do so.
-	        	        If you want to add conditions to use of this folder content, please contact the Synapse Access and Compliance Team (ACT) to discuss at act@sagebase.org"/>
+						If you want to add conditions to use of this folder content, please contact the Synapse Access and Compliance Team (ACT) to discuss at act@sagebase.org"/>
 					</b:Alert>
-	        	</bh:Div>
+				</bh:Div>
 			</b:ModalBody>
 			<b:ModalFooter>
 				<b:Button ui:field="imposeRestrictionCancelButton" type="LINK">Cancel</b:Button>
@@ -27,7 +29,7 @@
 		
 		<b:Modal ui:field="flagModal" title="Flag Data" closable="true" dataBackdrop="STATIC" dataKeyboard="true">
 			<b:ModalBody>
-			    <bh:Text>If you think this data is posted inappropriately or should have different access conditions, please alert the Synapse Access and Compliance Team (ACT) by clicking below.</bh:Text>
+				<bh:Text>If you think this data is posted inappropriately or should have different access conditions, please alert the Synapse Access and Compliance Team (ACT) by clicking below.</bh:Text>
 			</b:ModalBody>
 			<b:ModalFooter>
 				<b:Button type="LINK" dataDismiss="MODAL">Cancel</b:Button>
@@ -36,7 +38,7 @@
 		</b:Modal>
 		<b:Modal ui:field="anonymousFlagModal" title="Flag Data" closable="true" dataBackdrop="STATIC" dataKeyboard="true">
 			<b:ModalBody>
-			    <bh:Text>If you think this data is posted inappropriately or should have different access conditions, please log in to alert the Synapse Access and Compliance Team (ACT).</bh:Text>
+				<bh:Text>If you think this data is posted inappropriately or should have different access conditions, please log in to alert the Synapse Access and Compliance Team (ACT).</bh:Text>
 			</b:ModalBody>
 			<b:ModalFooter>
 				<b:Button type="LINK" dataDismiss="MODAL">Cancel</b:Button>
