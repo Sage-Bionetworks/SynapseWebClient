@@ -18,6 +18,7 @@ import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.doi.v2.DoiAssociation;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.doi.DoiWidgetV2;
+import static org.sagebionetworks.web.client.widget.doi.DoiWidgetV2.DOI_ORG;
 import org.sagebionetworks.web.client.widget.doi.DoiWidgetV2View;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -46,7 +47,7 @@ public class DoiWidgetV2Test {
 		doiWidget.configure(mockDoi);
 		verify(mockView).hide();
 		verify(mockView).clear();
-		verify(mockView).showDoi(uri);
+		verify(mockView).showDoi(DOI_ORG + uri);
 	}
 
 	@Test
@@ -78,7 +79,7 @@ public class DoiWidgetV2Test {
 		verify(mockJsClient).getDoiAssociation(objectId, objectType, version);
 		verify(mockView, atLeastOnce()).hide();
 		verify(mockView, atLeastOnce()).clear();
-		verify(mockView).showDoi(uri);
+		verify(mockView).showDoi(DOI_ORG + uri);
 	}
 
 	@Test

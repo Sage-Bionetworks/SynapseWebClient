@@ -11,6 +11,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class DoiWidgetV2 implements IsWidget {
+	public static final String DOI_ORG = "https://doi.org/";
 	private DoiWidgetV2View view;
 	private SynapseJavascriptClient jsClient;
 
@@ -43,7 +44,8 @@ public class DoiWidgetV2 implements IsWidget {
 	public void configure(DoiAssociation newDoi) {
 		clear();
 		if (newDoi != null && newDoi.getDoiUri() != null) {
-			view.showDoi(newDoi.getDoiUri());
+			// SWC-5979: make into a valid link (that the user can copy)
+			view.showDoi(DOI_ORG+ newDoi.getDoiUri());
 		}
 	}
 
