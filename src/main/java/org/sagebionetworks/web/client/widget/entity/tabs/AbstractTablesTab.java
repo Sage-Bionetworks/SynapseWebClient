@@ -46,7 +46,6 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import com.google.common.base.Function;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.place.shared.Place;
 import com.google.inject.Inject;
