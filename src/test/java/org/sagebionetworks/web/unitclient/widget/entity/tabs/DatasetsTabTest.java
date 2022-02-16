@@ -469,7 +469,7 @@ public class DatasetsTabTest {
 		String areaToken = null;
 
 		// The latest snapshot version is 5:
-		Long version = latestSnapshotVersionNumber;
+		Long version = new Long(latestSnapshotVersionNumber);
 		when(mockDataset.getIsLatestVersion()).thenReturn(false); // "latest" version is draft only
 
 

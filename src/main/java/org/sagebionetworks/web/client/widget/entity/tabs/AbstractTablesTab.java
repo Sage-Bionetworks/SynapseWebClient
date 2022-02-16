@@ -46,6 +46,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import com.google.common.base.Function;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.place.shared.Place;
 import com.google.inject.Inject;
@@ -384,7 +385,7 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 					goToLatestSnapshot,
 					isLinkToCurrentSnapshotEnabled,
 					linkToCurrentSnapshotTooltipText);
-		} else if (version != latestSnapshotVersionNumber) {
+		} else if (!version.equals(latestSnapshotVersionNumber)) {
 			// This is a snapshot or "stable version", but a more recent snapshot exists than the one the user is looking at.
 			// Notify that a more recent snapshot exists
 			this.view.setVersionAlertVisible(true);
