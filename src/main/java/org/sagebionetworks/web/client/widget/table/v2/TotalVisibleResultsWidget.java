@@ -4,9 +4,12 @@ import static org.sagebionetworks.repo.model.table.QueryOptions.BUNDLE_MASK_QUER
 import static org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget.WAIT_MS;
 import static org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils.getDefaultQuery;
 
+import java.util.List;
+
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.Dataset;
+import org.sagebionetworks.repo.model.table.DatasetItem;
 import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.View;
@@ -48,7 +51,8 @@ public class TotalVisibleResultsWidget implements IsWidget {
 		// Currently, the only case where we can reliably get this info is for the current version of a Dataset.
 		// Other cases will need a new service, tracked by PLFM-7046
 		if (viewEntity instanceof Dataset && viewEntity.getIsLatestVersion()) {
-			this.totalNumberOfResults = ((Dataset) viewEntity).getItems().size();
+			List<DatasetItem> datasetItems = ((Dataset) viewEntity).getItems();
+			this.totalNumberOfResults = datasetItems != null ? datasetItems.size() : 0;
 			view.setTotalNumberOfResults(totalNumberOfResults);
 			view.setHelpMarkdown(DATASETS_HELP);
 			view.setVisible(true);
