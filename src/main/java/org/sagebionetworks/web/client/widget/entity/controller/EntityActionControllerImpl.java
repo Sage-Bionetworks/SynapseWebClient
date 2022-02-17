@@ -1257,7 +1257,16 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 
 	private void postCheckCreateTableOrView(TableType type) {
 		getCreateTableViewWizard().configure(entityBundle.getEntity().getId(), type);
-		getCreateTableViewWizard().showModal(entityUpdatedWizardCallback);
+		getCreateTableViewWizard().showModal(new WizardCallback() {
+			@Override
+			public void onFinished() {
+				// Intentionally empty
+				// The modal will redirect us to the appropriate Place, which will trigger a full page update
+			}
+
+			@Override
+			public void onCanceled() {}
+		});
 	}
 
 	public void onAddSubmissionView() {

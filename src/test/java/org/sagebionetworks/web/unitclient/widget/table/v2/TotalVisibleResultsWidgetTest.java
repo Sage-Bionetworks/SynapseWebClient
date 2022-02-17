@@ -106,6 +106,32 @@ public class TotalVisibleResultsWidgetTest {
 	}
 
 	@Test
+	public void testDatasetWithNullItems() {
+		// It's possible for items to be null.
+		datasetLatestVersion.setItems(null);
+		final Long queryCount = 0L;
+		queryResultBundle.setQueryCount(queryCount);
+
+		widget.configure(datasetLatestVersion);
+
+		verify(mockAsyncJobTracker).startAndTrack(eq(AsynchType.TableQuery), queryBundleRequestCaptor.capture(), anyInt(), asyncJobHandlerCaptor.capture());
+
+		// Verify that the query bundle request is correct
+		assertEquals(queryBundleRequestCaptor.getValue().getEntityId(), TABLE_ID);
+		assertEquals(queryBundleRequestCaptor.getValue().getPartMask().longValue(), BUNDLE_MASK_QUERY_COUNT);
+		assertNotNull(queryBundleRequestCaptor.getValue().getQuery());
+
+
+		// Invoke onSuccess
+		asyncJobHandlerCaptor.getValue().onComplete(queryResultBundle);
+
+		verify(mockView).setVisible(true);
+		verify(mockView).setTotalNumberOfResults(0);
+		// No hidden results, so should be invisible
+		verify(mockView, times(2)).setNumberOfHiddenResultsVisible(false);
+	}
+
+	@Test
 	public void testDatasetWithItemsUnavailable() {
 		// The count of all visible items is less than the size of the items array
 		final Long queryCount = (long) (datasetItems.size() - 1);
