@@ -1,5 +1,9 @@
 package org.sagebionetworks.web.client.view;
 
+import static org.sagebionetworks.web.client.DisplayConstants.AUTOCOMPLETE_ATTRIBUTE;
+import static org.sagebionetworks.web.client.DisplayConstants.AUTOCOMPLETE_VALUE_CURRENT_PASSWORD;
+import static org.sagebionetworks.web.client.DisplayConstants.AUTOCOMPLETE_VALUE_NEW_PASSWORD;
+
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
@@ -14,12 +18,12 @@ import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.PersonalAccessTokenPlace;
 import org.sagebionetworks.web.client.place.Quiz;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.WebConstants;
+
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -234,6 +238,9 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		currentPasswordField.getElement().setAttribute("placeholder", "Enter current password");
 		password1Field.getElement().setAttribute("placeholder", "Enter new password");
 		password2Field.getElement().setAttribute("placeholder", "Confirm new password");
+		currentPasswordField.getElement().setAttribute(AUTOCOMPLETE_ATTRIBUTE, AUTOCOMPLETE_VALUE_CURRENT_PASSWORD);
+		password1Field.getElement().setAttribute(AUTOCOMPLETE_ATTRIBUTE, AUTOCOMPLETE_VALUE_NEW_PASSWORD);
+		password2Field.getElement().setAttribute(AUTOCOMPLETE_ATTRIBUTE, AUTOCOMPLETE_VALUE_NEW_PASSWORD);
 		clear();
 	}
 

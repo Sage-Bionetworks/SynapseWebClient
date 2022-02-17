@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.client.view;
 
+import static org.sagebionetworks.web.client.DisplayConstants.AUTOCOMPLETE_ATTRIBUTE;
+import static org.sagebionetworks.web.client.DisplayConstants.AUTOCOMPLETE_VALUE_NEW_PASSWORD;
+
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Input;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -36,6 +39,10 @@ public class PasswordResetSignedTokenViewImpl implements PasswordResetSignedToke
 		changePasswordBtn.addClickHandler(event -> {
 			presenter.onChangePassword();
 		});
+
+		password1Field.getElement().setAttribute(AUTOCOMPLETE_ATTRIBUTE, AUTOCOMPLETE_VALUE_NEW_PASSWORD);
+		password2Field.getElement().setAttribute(AUTOCOMPLETE_ATTRIBUTE, AUTOCOMPLETE_VALUE_NEW_PASSWORD);
+
 		headerWidget.configure();
 	}
 

@@ -1,5 +1,10 @@
 package org.sagebionetworks.web.client.view.users;
 
+import static org.sagebionetworks.web.client.DisplayConstants.AUTOCOMPLETE_ATTRIBUTE;
+import static org.sagebionetworks.web.client.DisplayConstants.AUTOCOMPLETE_VALUE_CURRENT_PASSWORD;
+import static org.sagebionetworks.web.client.DisplayConstants.AUTOCOMPLETE_VALUE_NEW_PASSWORD;
+import static org.sagebionetworks.web.client.DisplayConstants.AUTOCOMPLETE_VALUE_USERNAME;
+
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Heading;
@@ -181,6 +186,11 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 		emailAddressField.getElement().setAttribute("placeholder", "Email address -or- username");
 		password1Field.getElement().setAttribute("placeholder", "Enter password");
 		password2Field.getElement().setAttribute("placeholder", "Confirm password");
+
+		emailAddressField.getElement().setAttribute(AUTOCOMPLETE_ATTRIBUTE, AUTOCOMPLETE_VALUE_USERNAME);
+		currentPasswordField.getElement().setAttribute(AUTOCOMPLETE_ATTRIBUTE, AUTOCOMPLETE_VALUE_CURRENT_PASSWORD);
+		password1Field.getElement().setAttribute(AUTOCOMPLETE_ATTRIBUTE, AUTOCOMPLETE_VALUE_NEW_PASSWORD);
+		password2Field.getElement().setAttribute(AUTOCOMPLETE_ATTRIBUTE, AUTOCOMPLETE_VALUE_NEW_PASSWORD);
 
 		emailAddressField.addBlurHandler(new BlurHandler() {
 			@Override
