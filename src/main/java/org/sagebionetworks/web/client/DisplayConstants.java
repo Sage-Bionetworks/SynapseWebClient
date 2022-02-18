@@ -260,6 +260,7 @@ public class DisplayConstants {
 	public static final String GO_TO_DRAFT_VERSION = "Go to the draft version";
 
 	public static final String AUTOCOMPLETE_ATTRIBUTE = "autocomplete";
+	// See possible values: https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/autocomplete
 	public static final String AUTOCOMPLETE_VALUE_USERNAME = "username";
 	public static final String AUTOCOMPLETE_VALUE_CURRENT_PASSWORD = "current-password";
 	public static final String AUTOCOMPLETE_VALUE_NEW_PASSWORD = "new-password";
