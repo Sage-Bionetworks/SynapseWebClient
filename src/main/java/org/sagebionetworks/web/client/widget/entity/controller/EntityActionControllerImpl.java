@@ -763,7 +763,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			actionMenu.setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
 			actionMenu.setActionVisible(Action.SHOW_TABLE_SCHEMA, true);
 			actionMenu.setActionVisible(Action.SHOW_VIEW_SCOPE, !(entityBundle.getEntity() instanceof TableEntity) && !isDataset);
-			actionMenu.setActionVisible(Action.EDIT_DATASET_ITEMS, isDataset);
+			actionMenu.setActionVisible(Action.EDIT_DATASET_ITEMS, isDataset && isCurrentVersion);
 		} else {
 			actionMenu.setActionVisible(Action.UPLOAD_TABLE_DATA, false);
 			actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, false);
