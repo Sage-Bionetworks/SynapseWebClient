@@ -392,11 +392,12 @@ public class EntityActionControllerImplTest {
 	public void testConfigureWithDataset() {
 		Dataset dataset = new Dataset();
 		entityBundle.setEntity(dataset);
+		boolean isCurrentVersion = true;
 		boolean canCertifiedUserEdit = true;
 		permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
 
 		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
-		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
+		controller.configure(mockActionMenu, entityBundle, isCurrentVersion, wikiPageId, currentEntityArea);
 		// delete
 		verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, true);
 		verify(mockActionMenu).setActionText(Action.DELETE_ENTITY, DELETE_PREFIX + EntityTypeUtils.getDisplayName(EntityType.dataset));
@@ -422,6 +423,43 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionVisible(Action.SHOW_VIEW_SCOPE, false);
 		// Edit dataset items should be visible
 		verify(mockActionMenu).setActionVisible(Action.EDIT_DATASET_ITEMS, true);
+	}
+
+	@Test
+	public void testConfigureWithDatasetSnapshot() {
+		Dataset dataset = new Dataset();
+		entityBundle.setEntity(dataset);
+		boolean isCurrentVersion = false; // dataset is a snapshot!
+		boolean canCertifiedUserEdit = true;
+		permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
+
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+		controller.configure(mockActionMenu, entityBundle, isCurrentVersion, wikiPageId, currentEntityArea);
+		// delete
+		verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, true);
+		verify(mockActionMenu).setActionText(Action.DELETE_ENTITY, DELETE_PREFIX + EntityTypeUtils.getDisplayName(EntityType.dataset));
+		verify(mockActionMenu).setActionListener(Action.DELETE_ENTITY, controller);
+		// share
+		verify(mockActionMenu).setActionVisible(Action.SHARE, true);
+		verify(mockActionMenu).setActionListener(Action.SHARE, controller);
+		// rename
+		verify(mockActionMenu).setActionVisible(Action.CHANGE_ENTITY_NAME, true);
+		verify(mockActionMenu).setActionText(Action.CHANGE_ENTITY_NAME, EDIT_NAME_AND_DESCRIPTION);
+		verify(mockActionMenu).setActionListener(Action.CHANGE_ENTITY_NAME, controller);
+		// upload
+		verify(mockActionMenu).setActionVisible(Action.UPLOAD_NEW_FILE, false);
+		// version history
+		verify(mockActionMenu).setActionVisible(Action.SHOW_VERSION_HISTORY, true);
+		// create table version (snapshot)
+		verify(mockActionMenu).setActionVisible(Action.CREATE_TABLE_VERSION, true);
+		verify(mockActionMenu).setActionListener(Action.CREATE_TABLE_VERSION, controller);
+		// edit actions (should be disabled in the ui, even if user has permission)
+		verify(mockActionMenu).setActionVisible(Action.EDIT_TABLE_DATA, false);
+		verify(mockActionMenu).setActionVisible(Action.UPLOAD_TABLE_DATA, false);
+		// Show scope should not be visible
+		verify(mockActionMenu).setActionVisible(Action.SHOW_VIEW_SCOPE, false);
+		// Edit dataset items should NOT be visible if not the current version
+		verify(mockActionMenu).setActionVisible(Action.EDIT_DATASET_ITEMS, false);
 	}
 
 	@Test
