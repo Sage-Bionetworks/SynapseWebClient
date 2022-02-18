@@ -138,6 +138,7 @@ public class FileDownloadMenuItem implements FileDownloadMenuItemView.Presenter,
 		return null;
 	}
 
+	
 	public String getDirectDownloadURL(FileEntity fileEntity, FileHandle fileHandle, String fileNameOverride) {
 		String externalUrl = null;
 		if (fileHandle instanceof ExternalFileHandle) {
@@ -145,15 +146,11 @@ public class FileDownloadMenuItem implements FileDownloadMenuItemView.Presenter,
 		}
 
 		String directDownloadURL = null;
-		if (externalUrl == null)
+		if (externalUrl != null && externalUrl.toLowerCase().startsWith(WebConstants.SFTP_PREFIX)) {
+			// point to sftp proxy instead
+			directDownloadURL = Uploader.getSftpProxyLink(fileNameOverride, externalUrl, ginInjector.getSynapseProperties(), gwt);
+		} else {
 			directDownloadURL = jsniUtils.getFileHandleAssociationUrl(fileEntity.getId(), FileHandleAssociateType.FileEntity, fileHandle.getId());
-		else {
-			if (externalUrl.toLowerCase().startsWith(WebConstants.SFTP_PREFIX)) {
-				// point to sftp proxy instead
-				directDownloadURL = Uploader.getSftpProxyLink(fileNameOverride, externalUrl, ginInjector.getSynapseProperties(), gwt);
-			} else {
-				directDownloadURL = externalUrl;
-			}
 		}
 		return directDownloadURL;
 	}
