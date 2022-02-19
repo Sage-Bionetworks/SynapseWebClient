@@ -166,20 +166,19 @@ public class FileDownloadMenuItemTest {
 	public void testLoadFileDownloadUrlExternal() throws RestServiceException {
 		// Success Test: External file
 		String fileHandleId = "22";
-		ExternalFileHandle externalFileHandle = new ExternalFileHandle();
-		externalFileHandle.setFileName("myExternalFileName.png");
-		externalFileHandle.setId(fileHandleId);
 		String url = "http://getbootstrap.com/javascript/";
-		externalFileHandle.setExternalURL(url);
-
 		fileHandles = new ArrayList<FileHandle>();
-		fileHandles.add(externalFileHandle);
+		fileHandles.add(mockFileHandle);
 		when(mockEntityBundle.getFileHandles()).thenReturn(fileHandles);
 		when(mockFileEntity.getDataFileHandleId()).thenReturn(fileHandleId);
+		when(mockFileHandle.getId()).thenReturn(fileHandleId);
+		when(mockFileHandle.getFileName()).thenReturn("myExternalFileName.png");
+		when(mockFileHandle.getExternalURL()).thenReturn(url);
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		widget.configure(mockEntityBundle, mockRestrictionInformation);
 		assertNotNull(widget.getFileHandle());
-		verify(mockView).setIsDirectDownloadLink(url);
+		// SWC-5987: go through the FHA servlet, even if it's an external URL
+		verify(mockView).setIsDirectDownloadLink(fileHandleAssociationUrl);
 	}
 
 	@Test
@@ -189,11 +188,11 @@ public class FileDownloadMenuItemTest {
 		when(mockFileHandle.getId()).thenReturn(dataFileHandleId);
 		fileHandles.add(mockFileHandle);
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
-		String fileUrl = SFTP_ENDPOINT + "/path=mysftpfile.txt";
+		String fileUrl = WebConstants.SFTP_PREFIX + "sftpserver.synapse.org/path=mysftpfile.txt";
 		when(mockFileHandle.getExternalURL()).thenReturn(fileUrl);
 		widget.configure(mockEntityBundle, mockRestrictionInformation);
 		verify(mockView).setIsAuthorizedDirectDownloadLink();
-		verify(mockLoginModalWidget).configure(fileUrl, FormPanel.METHOD_POST, FormPanel.ENCODING_MULTIPART);
+		verify(mockLoginModalWidget).configure(anyString(), eq(FormPanel.METHOD_POST), eq(FormPanel.ENCODING_MULTIPART));
 		verify(mockSynapseClient).getHost(anyString(), any(AsyncCallback.class));
 		verify(mockLoginModalWidget).setInstructionMessage(DisplayConstants.DOWNLOAD_CREDENTIALS_REQUIRED + SFTP_HOST);
 	}
