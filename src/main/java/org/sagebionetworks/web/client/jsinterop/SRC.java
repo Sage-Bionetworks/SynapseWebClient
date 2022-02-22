@@ -26,6 +26,7 @@ public class SRC {
 		public static ReactFunctionComponent<EntityTypeIconProps> EntityTypeIcon;
 		public static ReactFunctionComponent<UserProfileLinksProps> UserProfileLinks;
 		public static ReactFunctionComponent<SkeletonButtonProps> SkeletonButton;
+		public static ReactFunctionComponent<QueryWrapperPlotNavProps> QueryWrapperPlotNav;
 		public static ReactFunctionComponent SynapseToastContainer;
 
 		/**
