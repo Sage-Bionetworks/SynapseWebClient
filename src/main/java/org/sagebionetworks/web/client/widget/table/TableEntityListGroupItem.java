@@ -37,6 +37,8 @@ public class TableEntityListGroupItem implements IsWidget {
 	@UiField
 	Label typeField;
 	@UiField
+	Div createdByField;
+	@UiField
 	Div modifiedByField;
 	@UiField
 	Label modifiedOnField;
@@ -51,12 +53,14 @@ public class TableEntityListGroupItem implements IsWidget {
 	}
 
 	public IsWidget w;
+	private UserBadge createdByBadge;
 	private UserBadge modifiedByBadge;
 	private DateTimeUtils dateTimeUtils;
 
 	@Inject
-	TableEntityListGroupItem(Binder binder, UserBadge modifiedByBadge, DateTimeUtils dateTimeUtils, PortalGinInjector ginInjector) {
+	TableEntityListGroupItem(Binder binder, UserBadge createdByBadge, UserBadge modifiedByBadge, DateTimeUtils dateTimeUtils, PortalGinInjector ginInjector) {
 		w = binder.createAndBindUi(this);
+		this.createdByBadge = createdByBadge;
 		this.modifiedByBadge = modifiedByBadge;
 		this.dateTimeUtils = dateTimeUtils;
 		if (EntityBadgeViewImpl.placeChanger == null) {
@@ -74,6 +78,10 @@ public class TableEntityListGroupItem implements IsWidget {
 		entityAnchor.getElement().setAttribute(EntityBadgeViewImpl.ENTITY_ID_ATTRIBUTE, header.getId());
 		entityContainer.add(entityAnchor);
 		idField.setText(header.getId());
+		if (header.getCreatedBy() != null) {
+			createdByBadge.configure(header.getCreatedBy());
+			createdByField.add(createdByBadge);
+		}
 		if (header.getModifiedBy() != null) {
 			modifiedByBadge.configure(header.getModifiedBy());
 			modifiedByField.add(modifiedByBadge);

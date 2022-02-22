@@ -25,7 +25,11 @@
 						addStyleNames="visible-sm visible-md visible-lg">
 						<bh:Span text="Type" />
 					</t:TableHeader>
-					<t:TableHeader width="310px"
+					<t:TableHeader width="270px"
+						addStyleNames="visible-xl">
+						<bh:Span text="Created By" />
+					</t:TableHeader>
+					<t:TableHeader width="270px"
 						addStyleNames="visible-xl">
 						<bh:Span text="Modified By" />
 					</t:TableHeader>
