@@ -70,7 +70,7 @@ public class TotalVisibleResultsWidgetTest {
 
 		datasetSnapshot = new Dataset();
 		datasetSnapshot.setId(TABLE_ID);
-		datasetLatestVersion.setItems(datasetItems);
+		datasetSnapshot.setItems(datasetItems);
 		datasetSnapshot.setIsLatestVersion(false);
 
 		entityView = new EntityView();
@@ -126,6 +126,7 @@ public class TotalVisibleResultsWidgetTest {
 		asyncJobHandlerCaptor.getValue().onComplete(queryResultBundle);
 
 		verify(mockView).setVisible(true);
+		verify(mockView).setHelpMarkdown(TotalVisibleResultsWidget.DATASETS_CURRENT_VERSION_HELP);
 		verify(mockView).setTotalNumberOfResults(0);
 		// No hidden results, so should be invisible
 		verify(mockView, times(2)).setNumberOfHiddenResultsVisible(false);
@@ -150,18 +151,35 @@ public class TotalVisibleResultsWidgetTest {
 		asyncJobHandlerCaptor.getValue().onComplete(queryResultBundle);
 
 		verify(mockView).setVisible(true);
+		verify(mockView).setHelpMarkdown(TotalVisibleResultsWidget.DATASETS_CURRENT_VERSION_HELP);
 		verify(mockView).setTotalNumberOfResults(datasetItems.size());
 		verify(mockView).setNumberOfHiddenResults(datasetItems.size() - queryCount.intValue());
 		verify(mockView).setNumberOfHiddenResultsVisible(true);
 	}
 
 	@Test
-	public void testDatasetSnapshot() {
-		// The count of all visible items is not related to the number of available items because the snapshot may be out of date
+	public void testDatasetSnapshotItemsUnavailable() {
+		// The count of all visible items is less than the size of the items array
+		final Long queryCount = (long) (datasetItems.size() - 1);
+		queryResultBundle.setQueryCount(queryCount);
+
 		widget.configure(datasetSnapshot);
 
-		verify(mockView, times(2)).setVisible(false);
-		verifyZeroInteractions(mockAsyncJobTracker);
+		verify(mockAsyncJobTracker).startAndTrack(eq(AsynchType.TableQuery), queryBundleRequestCaptor.capture(), anyInt(), asyncJobHandlerCaptor.capture());
+
+		// Verify that the query bundle request is correct
+		assertEquals(queryBundleRequestCaptor.getValue().getEntityId(), TABLE_ID);
+		assertEquals(queryBundleRequestCaptor.getValue().getPartMask().longValue(), BUNDLE_MASK_QUERY_COUNT);
+		assertNotNull(queryBundleRequestCaptor.getValue().getQuery());
+
+		// Invoke onSuccess
+		asyncJobHandlerCaptor.getValue().onComplete(queryResultBundle);
+
+		verify(mockView).setVisible(true);
+		verify(mockView).setHelpMarkdown(TotalVisibleResultsWidget.DATASETS_SNAPSHOT_HELP);
+		verify(mockView).setTotalNumberOfResults(datasetItems.size());
+		verify(mockView).setNumberOfHiddenResults(datasetItems.size() - queryCount.intValue());
+		verify(mockView).setNumberOfHiddenResultsVisible(true);
 	}
 
 	@Test

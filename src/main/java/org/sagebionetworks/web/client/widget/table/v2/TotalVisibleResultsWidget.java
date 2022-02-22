@@ -30,7 +30,8 @@ public class TotalVisibleResultsWidget implements IsWidget {
 	private PopupUtilsView popupUtils;
 	private AsynchronousJobTracker asyncJobTracker;
 
-	private static final String DATASETS_HELP = "Files may be unavailable because you do not have permission to see them, they have been deleted, or the Dataset has been misconfigured.";
+	public static final String DATASETS_CURRENT_VERSION_HELP = "Files may be unavailable because you do not have permission to see them, they have been deleted, or the Dataset has been misconfigured.";
+	public static final String DATASETS_SNAPSHOT_HELP = "Files may be unavailable because you do not have permission to see them, or the Dataset was misconfigured.";
 
 	@Inject
 	public TotalVisibleResultsWidget(TotalVisibleResultsWidgetView view, PopupUtilsView popupUtils, AsynchronousJobTracker asyncJobTracker) {
@@ -48,13 +49,22 @@ public class TotalVisibleResultsWidget implements IsWidget {
 	}
 
 	public void configure(View viewEntity) {
-		// Currently, the only case where we can reliably get this info is for the current version of a Dataset.
+		// Currently, Datasets are the only table type for which we can reliably get this info.
 		// Other cases will need a new service, tracked by PLFM-7046
-		if (viewEntity instanceof Dataset && viewEntity.getIsLatestVersion()) {
+		if (viewEntity instanceof Dataset) {
+
+			// The reasons why you might not be able to see an entity are subtly different if the Dataset is a snapshot, so update the tooltip
+			if (viewEntity.getIsLatestVersion()) {
+				// Rows for deleted entities will not appear in the current/draft Dataset
+				view.setHelpMarkdown(DATASETS_CURRENT_VERSION_HELP);
+			} else {
+				// Deleted entities will appear in the query result if the snapshot was created before the entity was deleted.
+				view.setHelpMarkdown(DATASETS_SNAPSHOT_HELP);
+			}
+
 			List<DatasetItem> datasetItems = ((Dataset) viewEntity).getItems();
 			this.totalNumberOfResults = datasetItems != null ? datasetItems.size() : 0;
 			view.setTotalNumberOfResults(totalNumberOfResults);
-			view.setHelpMarkdown(DATASETS_HELP);
 			view.setVisible(true);
 			// Query to get the total number of visible items
 			QueryBundleRequest qbRequest = new QueryBundleRequest();
