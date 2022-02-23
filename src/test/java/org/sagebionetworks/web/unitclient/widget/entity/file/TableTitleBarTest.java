@@ -12,6 +12,7 @@ import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.web.client.widget.entity.VersionHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.file.TableTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.TableTitleBarView;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
@@ -31,6 +32,8 @@ public class TableTitleBarTest {
 	ActionMenuWidget mockActionMenuWidget;
 	@Mock
 	UserEntityPermissions mockPermissions;
+	@Mock
+	VersionHistoryWidget mockVersionHistoryWidget;
 	public static final String ENTITY_ID = "syn123";
 	public static final Long TABLE_VERSION = 3L;
 	public static final String TABLE_NAME = "My Table";
@@ -67,7 +70,7 @@ public class TableTitleBarTest {
 
 	@Test
 	public void testConfigure() {
-		tableTitleBar.configure(mockBundle, mockActionMenuWidget);
+		tableTitleBar.configure(mockBundle, mockActionMenuWidget, mockVersionHistoryWidget);
 
 		verify(mockView).createTitlebar(mockTable);
 		verify(mockView).setEntityName(TABLE_NAME);
@@ -75,7 +78,7 @@ public class TableTitleBarTest {
 
 	@Test
 	public void testGetTableCurrentVersion() {
-		tableTitleBar.configure(mockBundle, mockActionMenuWidget);
+		tableTitleBar.configure(mockBundle, mockActionMenuWidget, mockVersionHistoryWidget);
 
 		verify(mockView).setVersionLabel("Current");
 	}
@@ -85,7 +88,7 @@ public class TableTitleBarTest {
 	public void testGetTableSnapshotVersion() {
 		when(mockTable.getIsLatestVersion()).thenReturn(false);
 
-		tableTitleBar.configure(mockBundle, mockActionMenuWidget);
+		tableTitleBar.configure(mockBundle, mockActionMenuWidget, mockVersionHistoryWidget);
 
 		verify(mockView).setVersionLabel(TABLE_VERSION + " (Snapshot)");
 	}
@@ -95,7 +98,7 @@ public class TableTitleBarTest {
 	public void testGetDatasetCurrentVersion() {
 		when(mockBundle.getEntity()).thenReturn(mockDataset);
 
-		tableTitleBar.configure(mockBundle, mockActionMenuWidget);
+		tableTitleBar.configure(mockBundle, mockActionMenuWidget, mockVersionHistoryWidget);
 
 		verify(mockView).setVersionLabel("Draft");
 	}
@@ -106,7 +109,7 @@ public class TableTitleBarTest {
 		when(mockBundle.getEntity()).thenReturn(mockDataset);
 		when(mockDataset.getIsLatestVersion()).thenReturn(false);
 
-		tableTitleBar.configure(mockBundle, mockActionMenuWidget);
+		tableTitleBar.configure(mockBundle, mockActionMenuWidget, mockVersionHistoryWidget);
 
 		verify(mockView).setVersionLabel(TABLE_VERSION + " (Stable)");
 	}

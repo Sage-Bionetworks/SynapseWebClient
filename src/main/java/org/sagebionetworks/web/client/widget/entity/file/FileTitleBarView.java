@@ -49,5 +49,7 @@ public interface FileTitleBarView extends IsWidget, SynapseView {
 		void onAddToDownloadList();
 
 		void toggleShowVersionHistory();
+
+		boolean isVersionHistoryVisible();
 	}
 }
