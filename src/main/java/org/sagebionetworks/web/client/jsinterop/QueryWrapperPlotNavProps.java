@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.jsinterop;
 
 import org.sagebionetworks.repo.model.table.Query;
-import org.sagebionetworks.web.client.utils.CallbackP;
 
 import jsinterop.annotations.JsFunction;
 import jsinterop.annotations.JsNullable;
@@ -13,14 +12,23 @@ import jsinterop.annotations.JsType;
 public class QueryWrapperPlotNavProps extends ReactComponentProps {
 	@FunctionalInterface
 	@JsFunction
-	public interface OnQueryRequestBundleCallback {
-		void run(String newQueryRequestBundle);
+	public interface OnQueryCallback {
+		void run(String newQueryJson);
 	}
 
-	Query initQuery;
+	@FunctionalInterface
+	@JsFunction
+	public interface OnQueryResultBundleCallback {
+		void run(String newQueryResultBundleJson);
+	}
+
+	String initQueryJson;
 	String sql;
 	@JsNullable
-	OnQueryRequestBundleCallback onQueryBundleRequestChange;
+	OnQueryCallback onQueryChange;
+	@JsNullable
+	OnQueryResultBundleCallback onQueryResultBundleChange;
+	
 	@JsNullable
 	boolean shouldDeepLink;
 	@JsNullable
@@ -31,15 +39,14 @@ public class QueryWrapperPlotNavProps extends ReactComponentProps {
 	SynapseTableProps tableConfiguration;
 
 	@JsOverlay
-	public static QueryWrapperPlotNavProps create(Query initQuery, CallbackP<String> onQueryBundleRequestChange,
+	public static QueryWrapperPlotNavProps create(String sql, String initQueryJson, OnQueryCallback onQueryChange, OnQueryResultBundleCallback onQueryResultBundleChange,
 			boolean hideSqlEditorControl) {
 		QueryWrapperPlotNavProps props = new QueryWrapperPlotNavProps();
-		props.sql = initQuery.getSql();
-		props.initQuery = initQuery;
+		props.sql = sql;
+		props.initQueryJson = initQueryJson;
 		props.hideSqlEditorControl = hideSqlEditorControl;
-		props.onQueryBundleRequestChange = (newQueryBundleRequest) -> {
-			onQueryBundleRequestChange.invoke(newQueryBundleRequest);
-		};
+		props.onQueryChange = onQueryChange;
+		props.onQueryResultBundleChange = onQueryResultBundleChange;
 		props.tableConfiguration = SynapseTableProps.create();
 		props.shouldDeepLink = true;
 		props.downloadCartPageUrl = "#!DownloadCart:0";

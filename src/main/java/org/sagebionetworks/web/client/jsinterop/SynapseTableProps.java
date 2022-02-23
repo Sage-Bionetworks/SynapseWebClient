@@ -32,6 +32,7 @@ public class SynapseTableProps extends ReactComponentProps {
 		props.isRowSelectionVisible = isRowSelectionVisible;
 		return props;
 	}
+	@JsOverlay
 	public static SynapseTableProps create() {
 		SynapseTableProps props = new SynapseTableProps();
 		return props;

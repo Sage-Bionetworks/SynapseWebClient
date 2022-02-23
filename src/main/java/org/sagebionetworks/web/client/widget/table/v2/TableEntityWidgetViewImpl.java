@@ -1,18 +1,20 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
-import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnQueryCallback;
+import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnQueryResultBundleCallback;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactDOM;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.FullWidthAlert;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.table.explore.QueryWrapperPlotNav;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityViewScopeWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.SubmissionViewScopeWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
@@ -55,6 +57,8 @@ public class TableEntityWidgetViewImpl extends Composite implements TableEntityW
 	SimplePanel queryResultsPanel;
 	@UiField
 	Div modalContainer;
+	@UiField
+	Div plotNavContainer;
 	@UiField
 	Div addToDownloadListContainer;
 	@UiField
@@ -192,4 +196,22 @@ public class TableEntityWidgetViewImpl extends Composite implements TableEntityW
 	public boolean isItemsEditorVisible() {
 		return itemsEditorContainer.isVisible();
 	}
+	
+	@Override
+	public void configureQueryWrapperPlotNav(
+			String sql, 
+			String initQueryJson,
+			OnQueryCallback onQueryChange,
+			OnQueryResultBundleCallback onQueryResultBundleChange,
+			boolean hideSqlEditorControl) {
+		QueryWrapperPlotNav plotNav = new QueryWrapperPlotNav(propsProvider, sql, initQueryJson, onQueryChange, onQueryResultBundleChange, hideSqlEditorControl);
+		plotNavContainer.clear();
+		plotNavContainer.add(plotNav);
+	}
+	
+	@Override
+	public void setQueryWrapperPlotNavVisible(boolean visible) {
+		plotNavContainer.setVisible(visible);
+	}
+
 }

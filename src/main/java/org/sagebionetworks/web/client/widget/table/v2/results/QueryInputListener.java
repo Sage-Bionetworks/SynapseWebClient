@@ -37,5 +37,8 @@ public interface QueryInputListener {
 
 	void onAddToDownloadList();
 	
+	/**
+	 * @deprecated
+	 */
 	void onShowSimpleSearch();
 }
