@@ -22,7 +22,7 @@
 					<b:DropDown addStyleNames="displayInlineBlock">
 						<b:Button dataToggle="DROPDOWN" type="PRIMARY" text="Download Options" ui:field="downloadOptionsButton" marginRight="5" />
 						<b:DropDownMenu ui:field="dropdownMenu">
-							<b:AnchorListItem ui:field="addToDownloadListLink">Add to Download List</b:AnchorListItem>
+							<b:AnchorListItem ui:field="addToDownloadListLink">Add to Download Cart</b:AnchorListItem>
 							<b:Divider/>
 							<b:AnchorListItem ui:field="programmaticOptionsLink">Programmatic Options</b:AnchorListItem>
 						</b:DropDownMenu>
