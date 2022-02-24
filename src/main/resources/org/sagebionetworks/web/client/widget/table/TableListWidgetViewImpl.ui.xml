@@ -25,7 +25,12 @@
 						addStyleNames="visible-sm visible-md visible-lg">
 						<bh:Span text="Type" />
 					</t:TableHeader>
-					<t:TableHeader width="270px"
+                    <t:TableHeader width="60px"
+                        ui:field="itemCountColumnHeader"
+                        addStyleNames="visible-md visible-lg">
+                        <bh:Span text="File Count" />
+                    </t:TableHeader>
+                    <t:TableHeader width="270px"
 						addStyleNames="visible-xl">
 						<bh:Span text="Created By" />
 					</t:TableHeader>
@@ -52,7 +57,7 @@
 			</t:Table>
 			<bh:Hr ui:field="hrUnderTableHeaders"
 				addStyleNames="margin-top-5 margin-bottom-5" />
-			<bh:Div ui:field="tablesList" />
+			<bh:Div ui:field="tablesListDiv" />
 			<bh:Div ui:field="loadMoreWidgetContainer" />
 		</bh:Div>
 	</g:HTMLPanel>

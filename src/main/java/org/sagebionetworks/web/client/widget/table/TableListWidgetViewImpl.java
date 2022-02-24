@@ -1,15 +1,18 @@
 package org.sagebionetworks.web.client.widget.table;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
-import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.entity.Direction;
 import org.sagebionetworks.repo.model.entity.SortBy;
 import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.view.bootstrap.table.TableHeader;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.table.v2.results.SortableTableHeaderImpl;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -27,8 +30,10 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	public interface Binder extends UiBinder<HTMLPanel, TableListWidgetViewImpl> {
 	}
 
+	List<TableEntityListGroupItem> tablesList;
+
 	@UiField
-	Div tablesList;
+	Div tablesListDiv;
 	@UiField
 	Div loadMoreWidgetContainer;
 	@UiField
@@ -50,9 +55,12 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	TextArea copyToClipboardTextbox;
 	@UiField
 	Icon copyIDToClipboardIcon;
+	@UiField
+	TableHeader itemCountColumnHeader;
 
 	@Inject
 	public TableListWidgetViewImpl(Binder binder, PortalGinInjector ginInjector) {
+		this.tablesList = new ArrayList<>();
 		this.panel = binder.createAndBindUi(this);
 		this.ginInjector = ginInjector;
 		nameColumnHeader.setSortingListener(header -> {
@@ -89,18 +97,16 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	}
 
 	@Override
-	public void addTableListItem(final EntityHeader header) {
+	public void addTableListItem(final TableEntityListGroupItem item) {
 		emptyUI.setVisible(false);
-		TableEntityListGroupItem item = ginInjector.getTableEntityListGroupItem();
-		item.configure(header, event -> {
-			presenter.onTableClicked(header);
-		});
 		tablesList.add(item);
+		tablesListDiv.add(item);
 	}
 
 	@Override
 	public void clearTableWidgets() {
 		tablesList.clear();
+		tablesListDiv.clear();
 		emptyUI.setVisible(true);
 	}
 
@@ -143,6 +149,7 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	@Override
 	public void clear() {
 		tablesList.clear();
+		tablesListDiv.clear();
 	}
 
 	@Override
@@ -160,5 +167,18 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 		copyToClipboardTextbox.selectAll();
 		ginInjector.getSynapseJSNIUtils().copyToClipboard();
 		copyToClipboardTextbox.setVisible(false);
+	}
+
+	@Override
+	public void setFileCountVisible(boolean visible) {
+		itemCountColumnHeader.setVisible(visible);
+		if (visible) {
+			itemCountColumnHeader.addStyleName("visible-md visible-lg");
+		} else {
+			itemCountColumnHeader.removeStyleName("visible-md visible-lg");
+		}
+		for (TableEntityListGroupItem item : tablesList) {
+			item.setItemCountVisible(visible);
+		}
 	}
 }
