@@ -28,6 +28,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.EntityBadge;
+import org.sagebionetworks.web.client.widget.entity.VersionHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 
@@ -51,6 +52,7 @@ public class FileTitleBar implements SynapseWidgetPresenter, FileTitleBarView.Pr
 	private CookieProvider cookies;
 	private PopupUtilsView popupUtils;
 	private ActionMenuWidget actionMenuWidget;
+	private VersionHistoryWidget versionHistoryWidget;
 
 	@Inject
 	public FileTitleBar(FileTitleBarView view, SynapseProperties synapseProperties, FileDownloadMenuItem fileDownloadButton, SynapseJavascriptClient jsClient, FileClientsHelp fileClientsHelp, EventBus eventBus, SynapseJSNIUtils jsniUtils, GlobalApplicationState globalAppState, AuthenticationController authController, CookieProvider cookies, PopupUtilsView popupUtils) {
@@ -69,9 +71,10 @@ public class FileTitleBar implements SynapseWidgetPresenter, FileTitleBarView.Pr
 		view.setPresenter(this);
 	}
 
-	public void configure(EntityBundle bundle, ActionMenuWidget actionMenu) {
+	public void configure(EntityBundle bundle, ActionMenuWidget actionMenu, VersionHistoryWidget versionHistoryWidget) {
 		this.entityBundle = bundle;
 		this.actionMenuWidget = actionMenu;
+		this.versionHistoryWidget = versionHistoryWidget;
 		view.setCanDownload(entityBundle.getPermissions().getCanDownload());
 		view.setExternalUrlUIVisible(false);
 		view.setExternalObjectStoreUIVisible(false);
@@ -214,6 +217,11 @@ public class FileTitleBar implements SynapseWidgetPresenter, FileTitleBarView.Pr
 	@Override
 	public void toggleShowVersionHistory() {
 		this.actionMenuWidget.onAction(Action.SHOW_VERSION_HISTORY);
+	}
+
+	@Override
+	public boolean isVersionHistoryVisible() {
+		return this.versionHistoryWidget.isVisible();
 	}
 
 	@Override

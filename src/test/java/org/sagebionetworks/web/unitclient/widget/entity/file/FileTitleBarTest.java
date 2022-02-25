@@ -41,6 +41,7 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.EntityBadge;
+import org.sagebionetworks.web.client.widget.entity.VersionHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.file.FileDownloadMenuItem;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBarView;
@@ -96,6 +97,8 @@ public class FileTitleBarTest {
 	CookieProvider mockCookies;
 	@Mock
 	PopupUtilsView mockPopupUtils;
+	@Mock
+	VersionHistoryWidget mockVersionHistoryWidget;
 	public static final String DATA_FILE_HANDLE_ID = "872";
 	public static final Long FILE_VERSION = 3L;
 	public static final String FILE_NAME = "afile.txt";
@@ -141,14 +144,14 @@ public class FileTitleBarTest {
 
 	@Test
 	public void testSetS3DescriptionForSynapseStorage() {
-		fileTitleBar.configure(mockBundle, mockActionMenuWidget);
+		fileTitleBar.configure(mockBundle, mockActionMenuWidget, mockVersionHistoryWidget);
 		verify(mockView).setFileLocation("| Synapse Storage");
 	}
 
 	@Test
 	public void testSetS3DescriptionForExternalS3() {
 		s3FileHandle.setStorageLocationId(2L);
-		fileTitleBar.configure(mockBundle, mockActionMenuWidget);
+		fileTitleBar.configure(mockBundle, mockActionMenuWidget, mockVersionHistoryWidget);
 		verify(mockView).setFileLocation("| s3://" + s3FileHandle.getBucketName() + "/" + s3FileHandle.getKey());
 	}
 
@@ -161,13 +164,13 @@ public class FileTitleBarTest {
 		googleCloudFileHandle.setStorageLocationId(synStorageLocationId);
 		googleCloudFileHandle.setStorageLocationId(2L);
 		when(mockBundle.getFileHandles()).thenReturn(Collections.singletonList(googleCloudFileHandle));
-		fileTitleBar.configure(mockBundle, mockActionMenuWidget);
+		fileTitleBar.configure(mockBundle, mockActionMenuWidget, mockVersionHistoryWidget);
 		verify(mockView).setFileLocation("| gs://" + googleCloudFileHandle.getBucketName() + "/" + googleCloudFileHandle.getKey());
 	}
 
 	@Test
 	public void testConfigure() {
-		fileTitleBar.configure(mockBundle, mockActionMenuWidget);
+		fileTitleBar.configure(mockBundle, mockActionMenuWidget, mockVersionHistoryWidget);
 		verify(mockFileDownloadButton).configure(mockBundle);
 		verify(mockView).setVersion(FILE_VERSION);
 		verify(mockView).setCanDownload(true); // set up in the Before
@@ -177,7 +180,7 @@ public class FileTitleBarTest {
 	public void testCannotDownload() {
 		when(mockPermissions.getCanDownload()).thenReturn(false);
 
-		fileTitleBar.configure(mockBundle, mockActionMenuWidget);
+		fileTitleBar.configure(mockBundle, mockActionMenuWidget, mockVersionHistoryWidget);
 
 		verify(mockView).setCanDownload(false);
 	}
@@ -186,7 +189,7 @@ public class FileTitleBarTest {
 	public void testAddToDownloadListV2() {
 		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
-		fileTitleBar.configure(mockBundle, mockActionMenuWidget);
+		fileTitleBar.configure(mockBundle, mockActionMenuWidget, mockVersionHistoryWidget);
 		fileTitleBar.onAddToDownloadList();
 
 		verify(mockJsClient).addFileToDownloadListV2(eq(ENTITY_ID), eq(FILE_VERSION), any(AsyncCallback.class));
@@ -201,7 +204,7 @@ public class FileTitleBarTest {
 		String errorMessage = "unable to add";
 		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockJsClient).addFileToDownloadListV2(anyString(), anyLong(), any(AsyncCallback.class));
 
-		fileTitleBar.configure(mockBundle, mockActionMenuWidget);
+		fileTitleBar.configure(mockBundle, mockActionMenuWidget, mockVersionHistoryWidget);
 		fileTitleBar.onAddToDownloadList();
 
 		verify(mockJsClient).addFileToDownloadListV2(eq(ENTITY_ID), eq(FILE_VERSION), any(AsyncCallback.class));
@@ -211,7 +214,7 @@ public class FileTitleBarTest {
 	@Test
 	public void testAddToDownloadListAnonymous() {
 		when(mockAuthController.isLoggedIn()).thenReturn(false);
-		fileTitleBar.configure(mockBundle, mockActionMenuWidget);
+		fileTitleBar.configure(mockBundle, mockActionMenuWidget, mockVersionHistoryWidget);
 		fileTitleBar.onAddToDownloadList();
 
 		verify(mockJsClient, never()).addFileToDownloadList(anyString(), anyString(), any(AsyncCallback.class));
@@ -222,7 +225,7 @@ public class FileTitleBarTest {
 	public void testAddToDownloadListV2Anonymous() {
 		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
 		when(mockAuthController.isLoggedIn()).thenReturn(false);
-		fileTitleBar.configure(mockBundle, mockActionMenuWidget);
+		fileTitleBar.configure(mockBundle, mockActionMenuWidget, mockVersionHistoryWidget);
 		fileTitleBar.onAddToDownloadList();
 
 		verify(mockJsClient, never()).addFileToDownloadListV2(anyString(), anyLong(), any(AsyncCallback.class));
@@ -244,7 +247,7 @@ public class FileTitleBarTest {
 		when(mockExternalObjectStoreFileHandle.getFileKey()).thenReturn(fileKey);
 
 		Mockito.when(mockBundle.getFileHandles()).thenReturn(Collections.singletonList((FileHandle) mockExternalObjectStoreFileHandle));
-		fileTitleBar.configure(mockBundle, mockActionMenuWidget);
+		fileTitleBar.configure(mockBundle, mockActionMenuWidget, mockVersionHistoryWidget);
 		verify(mockFileDownloadButton).configure(mockBundle);
 		verify(mockView).setExternalObjectStoreUIVisible(true);
 		verify(mockView).setExternalObjectStoreInfo(endpoint, bucket, fileKey);
@@ -256,7 +259,7 @@ public class FileTitleBarTest {
 		currentVersion.setVersionNumber(FILE_VERSION);
 		versions.add(currentVersion);
 
-		fileTitleBar.configure(mockBundle, mockActionMenuWidget);
+		fileTitleBar.configure(mockBundle, mockActionMenuWidget, mockVersionHistoryWidget);
 
 		verify(mockJsClient).getEntityVersions(anyString(), anyInt(), anyInt(), any());
 		verify(mockView).setVersionUICurrentVisible(true);
@@ -269,7 +272,7 @@ public class FileTitleBarTest {
 		currentVersion.setVersionNumber(8L);
 		versions.add(currentVersion);
 
-		fileTitleBar.configure(mockBundle, mockActionMenuWidget);
+		fileTitleBar.configure(mockBundle, mockActionMenuWidget, mockVersionHistoryWidget);
 
 		verify(mockJsClient).getEntityVersions(anyString(), anyInt(), anyInt(), any());
 		verify(mockView).setVersionUICurrentVisible(false);
@@ -280,7 +283,7 @@ public class FileTitleBarTest {
 		String error = "unable to get versions";
 		AsyncMockStubber.callFailureWith(new Exception(error)).when(mockJsClient).getEntityVersions(anyString(), anyInt(), anyInt(), any());
 
-		fileTitleBar.configure(mockBundle, mockActionMenuWidget);
+		fileTitleBar.configure(mockBundle, mockActionMenuWidget, mockVersionHistoryWidget);
 
 		verify(mockJsClient).getEntityVersions(anyString(), anyInt(), anyInt(), any());
 		verify(mockView).showErrorMessage(error);
@@ -288,7 +291,7 @@ public class FileTitleBarTest {
 
 	@Test
 	public void testOnProgrammaticDownloadOptions() {
-		fileTitleBar.configure(mockBundle, mockActionMenuWidget);
+		fileTitleBar.configure(mockBundle, mockActionMenuWidget, mockVersionHistoryWidget);
 
 		fileTitleBar.onProgrammaticDownloadOptions();
 

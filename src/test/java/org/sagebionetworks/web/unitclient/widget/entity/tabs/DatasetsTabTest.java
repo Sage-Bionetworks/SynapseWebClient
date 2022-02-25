@@ -238,7 +238,7 @@ public class DatasetsTabTest {
 
 	private void verifyTableConfiguration(Long version) {
 		verify(mockBreadcrumb).configure(any(EntityPath.class), eq(EntityArea.DATASETS));
-		verify(mockTitleBar).configure(mockDatasetBundle, mockActionMenuWidget);
+		verify(mockTitleBar).configure(mockDatasetBundle, mockActionMenuWidget, mockVersionHistoryWidget);
 		verify(mockEntityMetadata).configure(mockDatasetBundle, version, mockActionMenuWidget);
 		verify(mockTableEntityWidget).configure(mockDatasetBundle, version, true, tab, mockActionMenuWidget);
 		verify(mockView).setTableEntityWidget(any(Widget.class));

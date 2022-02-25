@@ -54,7 +54,9 @@ public class TableTitleBarViewImpl extends Composite implements TableTitleBarVie
 		favoritePanel.addStyleName("inline-block");
 		favoritePanel.setWidget(favoriteWidget.asWidget());
 		showVersionHistoryLink.addClickHandler(event -> {
+			boolean isShown = !presenter.isVersionHistoryVisible();
 			presenter.toggleShowVersionHistory();
+			showVersionHistoryLink.setText((isShown ? "Hide" : "Show") + " Version History");
 		});
 
 	}

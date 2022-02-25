@@ -117,7 +117,7 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 			areaToken = null;
 			entitySelectedCallback.invoke(entityHeader.getId());
 			// selected a table/view, show title info immediately
-			titleBar.configure(entityBundle, tab.getEntityActionMenu());
+			titleBar.configure(entityBundle, tab.getEntityActionMenu(), metadata.getVersionHistoryWidget());
 
 			List<LinkData> links = new ArrayList<>();
 			Place projectPlace = new Synapse(projectEntityId, null, getTabArea(), null);
@@ -295,7 +295,7 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 
 			updateVersionAndAreaToken(entity.getId(), version, areaToken);
 			breadcrumb.configure(bundle.getPath(), getTabArea());
-			titleBar.configure(bundle, tab.getEntityActionMenu());
+			titleBar.configure(bundle, tab.getEntityActionMenu(), metadata.getVersionHistoryWidget());
 			modifiedCreatedBy.configure(entity.getCreatedOn(), entity.getCreatedBy(), entity.getModifiedOn(), entity.getModifiedBy());
 			v2TableWidget = ginInjector.createNewTableEntityWidget();
 			view.setTableEntityWidget(v2TableWidget.asWidget());

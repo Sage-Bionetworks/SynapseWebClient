@@ -261,7 +261,7 @@ public class TablesTabTest {
 
 	private void verifyTableConfiguration(Long version) {
 		verify(mockBreadcrumb).configure(any(EntityPath.class), eq(EntityArea.TABLES));
-		verify(mockTitleBar).configure(mockTableEntityBundle, mockActionMenuWidget);
+		verify(mockTitleBar).configure(mockTableEntityBundle, mockActionMenuWidget, mockVersionHistoryWidget);
 		verify(mockEntityMetadata).configure(mockTableEntityBundle, version, mockActionMenuWidget);
 		verify(mockTableEntityWidget).configure(mockTableEntityBundle, version, true, tab, mockActionMenuWidget);
 		verify(mockView).setTableEntityWidget(any(Widget.class));
