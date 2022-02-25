@@ -16,7 +16,6 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -202,8 +201,6 @@ public class TableListWidget implements TableListWidgetView.Presenter, IsWidget 
 	}
 
 	private boolean shouldItemCountBeVisible() {
-		GWT.log(typesToShow.toString());
-		GWT.log("" + this.typesToShow.contains(EntityType.dataset));
 		return this.typesToShow.contains(EntityType.dataset);
 	}
 
