@@ -525,7 +525,6 @@ public class TableEntityPlotsWidget implements TableEntityWidgetView.Presenter, 
 	 * Called only when all pre-flight checks on entity edit have been met.
 	 */
 	public void postCheckEditResults() {
-		// TODO: show row editor here
 		if (this.queryResultEditor == null) {
 			this.queryResultEditor = ginInjector.createNewQueryResultEditorWidget();
 			view.addModalWidget(queryResultEditor);
@@ -658,5 +657,19 @@ public class TableEntityPlotsWidget implements TableEntityWidgetView.Presenter, 
 	@Override
 	public void onShowSimpleSearch() {
 		// TODO: delete from action commands and interface
+	}
+	
+	/**
+	 * Exposed for unit testing purposes only
+	 */
+	public Query getCurrentQuery() {
+		return currentQuery;
+	}
+
+	/**
+	 * Exposed for unit testing purposes only
+	 */
+	public QueryResultBundle getCurrentQueryResultBundle() {
+		return currentQueryResultBundle;
 	}
 }
