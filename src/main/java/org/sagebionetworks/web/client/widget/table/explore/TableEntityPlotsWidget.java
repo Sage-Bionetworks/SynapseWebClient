@@ -63,12 +63,6 @@ import com.google.inject.Inject;
  * TableEntity widget provides viewing and editing of both a table's schema and row data. It also
  * allows a user to execute a query against the table by writing SQL.
  * 
- * Initially copied from TableEntityWidget with the following modifications.
- * Use SRC QueryWrapperPlotNav
- * Removed Query Input widget.  Remove concept of simple and advanced search.
- * Responsible for editing table rows.
- * Copied isQueryResultEditable() from TableQueryResultWidget.
- * 
  * TODO: delete TableEntityWidget when this has been released out of experimental mode.
  */
 public class TableEntityPlotsWidget implements TableEntityWidgetView.Presenter, IsWidget, QueryResultsListener, QueryInputListener {
