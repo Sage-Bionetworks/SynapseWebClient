@@ -26,8 +26,8 @@
 				addStyleNames="visible-sm visible-md visible-lg overflow-x-hidden">
 				<g:Label ui:field="typeField" />
 			</t:TableData>
-			<t:TableData width="60px"
-				 addStyleNames="visible-md visible-lg"
+			<t:TableData width="90px"
+				 addStyleNames="visible-md visible-lg text-align-right padding-right-15"
                  ui:field="itemCountColumn">
 				<g:Label ui:field="itemCountField" />
 			</t:TableData>

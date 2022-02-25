@@ -9,6 +9,7 @@ import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.web.client.DateTimeUtils;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -109,11 +110,11 @@ public class TableEntityListGroupItem implements IsWidget {
 
 		icon.setType(EntityTypeUtils.getEntityType(header));
 		typeField.setText(EntityTypeUtils.getFriendlyTableTypeName(header.getType()));
-		if (header.getType().equals(EntityType.dataset)) {
+		if (EntityType.dataset.equals(EntityTypeUtils.getEntityType(header))) {
 			jsClient.getEntityBundleFromCache(header.getId(), new AsyncCallback<EntityBundle>() {
 				@Override
 				public void onFailure(Throwable caught) {
-
+					DisplayUtils.showErrorMessage(caught.getMessage());
 				}
 
 				@Override

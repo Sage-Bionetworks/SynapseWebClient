@@ -25,7 +25,7 @@
 						addStyleNames="visible-sm visible-md visible-lg">
 						<bh:Span text="Type" />
 					</t:TableHeader>
-                    <t:TableHeader width="60px"
+                    <t:TableHeader width="90px"
                         ui:field="itemCountColumnHeader"
                         addStyleNames="visible-md visible-lg">
                         <bh:Span text="File Count" />
