@@ -115,6 +115,7 @@ public class TableEntityPlotsWidget implements TableEntityWidgetView.Presenter, 
 	String entityTypeDisplay;
 	QueryResultEditorWidget queryResultEditor;
 	PortalGinInjector ginInjector;
+	boolean hideFiltering = false;
 
 	boolean hasQueryableData; // if `false`, then a query will never yield data.
 
@@ -365,15 +366,14 @@ public class TableEntityPlotsWidget implements TableEntityWidgetView.Presenter, 
 					ginInjector.getSynapseJSNIUtils().consoleError(e);
 				}
 			};
-			boolean hideSqlEditorControl = false;
 			JSONObjectAdapter adapter = ginInjector.getJSONObjectAdapter().createNew();
 			try {
 				query.writeToJSONObject(adapter);
+				boolean hideSqlEditorControl = hideFiltering;
 				view.configureQueryWrapperPlotNav(query.getSql(), adapter.toJSONString(), onQueryChange, onQueryResultBundleChange, hideSqlEditorControl);
 			} catch (JSONObjectAdapterException e) {
 				ginInjector.getSynapseJSNIUtils().consoleError(e);
 			}
-			
 		}
 	}
 
@@ -653,7 +653,9 @@ public class TableEntityPlotsWidget implements TableEntityWidgetView.Presenter, 
 		view.setQueryResultsVisible(true);
 		reconfigureState();
 	}
-
+	public void hideFiltering() {
+		hideFiltering = true;
+	}
 	@Override
 	public void onShowSimpleSearch() {
 		// TODO: delete from action commands and interface
