@@ -28,7 +28,7 @@
 			</t:TableData>
 			<t:TableData width="90px"
 				 addStyleNames="visible-md visible-lg text-align-right padding-right-15"
-                 ui:field="itemCountColumn">
+			 ui:field="itemCountColumn">
 				<g:Label ui:field="itemCountField" />
 			</t:TableData>
 			<t:TableData width="270px"

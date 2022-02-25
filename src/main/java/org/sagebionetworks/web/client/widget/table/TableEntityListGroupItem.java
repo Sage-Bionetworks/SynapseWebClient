@@ -139,6 +139,5 @@ public class TableEntityListGroupItem implements IsWidget {
 		} else {
 			itemCountColumn.removeStyleName("visible-md visible-lg");
 		}
-
 	}
 }
