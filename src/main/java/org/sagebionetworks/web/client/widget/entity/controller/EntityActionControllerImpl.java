@@ -1539,11 +1539,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 
 						Synapse newVersionPlace = new Synapse(entity.getId(), result.getSnapshotVersionNumber(), EntityArea.TABLES, null);
 						ToastMessageOptions.Builder messageBuilder = new ToastMessageOptions.Builder();
-						boolean dismissOnClick = true;
-						messageBuilder
-								.setTitle(SNAPSHOT_CREATED)
-								.setPrimaryButton("Go to Latest " + SNAPSHOT, () -> getGlobalApplicationState().getPlaceChanger().goTo(newVersionPlace), dismissOnClick);
+						messageBuilder.setTitle(SNAPSHOT_CREATED);
 						popupUtils.notify(SNAPSHOT_CREATED_DETAILS_TABLE, DisplayUtils.NotificationVariant.SUCCESS, messageBuilder.build());
+						getGlobalApplicationState().getPlaceChanger().goTo(newVersionPlace);
 					}
 
 					@Override
@@ -1591,27 +1589,22 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 							ToastMessageOptions.Builder messageBuilder = new ToastMessageOptions.Builder();
 							EntityArea newVersionArea;
 							String toastMsg;
-							String secondaryButtonText;
 							Long newVersionNumber = response.getSnapshotVersionNumber();
 
 							if (entity instanceof EntityView) {
 								newVersionArea = EntityArea.TABLES;
 								messageBuilder.setTitle(SNAPSHOT_CREATED);
 								toastMsg = SNAPSHOT_CREATED_DETAILS_VIEW;
-								secondaryButtonText = "Go to Latest " + SNAPSHOT;
 							} else {
 								newVersionArea = EntityArea.DATASETS;
 								messageBuilder.setTitle(STABLE_VERSION_CREATED);
 								toastMsg = STABLE_VERSION_CREATED_DETAILS;
-								secondaryButtonText = "Go to Latest " + STABLE_VERSION;
 
 							}
-							Synapse newVersionPlace = new Synapse(entity.getId(), newVersionNumber, newVersionArea, null);
 
-							boolean dismissOnClick = true;
-							messageBuilder
-									.setPrimaryButton(secondaryButtonText, () -> getGlobalApplicationState().getPlaceChanger().goTo(newVersionPlace), dismissOnClick);
 							popupUtils.notify(toastMsg, DisplayUtils.NotificationVariant.SUCCESS, messageBuilder.build());
+							getGlobalApplicationState().getPlaceChanger().goTo(new Synapse(entity.getId(), newVersionNumber, newVersionArea, null));
+
 						}
 					}
 
