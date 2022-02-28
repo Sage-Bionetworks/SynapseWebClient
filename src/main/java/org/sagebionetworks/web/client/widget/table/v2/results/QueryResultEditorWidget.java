@@ -10,6 +10,7 @@ import org.sagebionetworks.repo.model.table.EntityUpdateResults;
 import org.sagebionetworks.repo.model.table.PartialRow;
 import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
+import org.sagebionetworks.repo.model.table.SelectColumn;
 import org.sagebionetworks.repo.model.table.TableUpdateRequest;
 import org.sagebionetworks.repo.model.table.TableUpdateResponse;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
@@ -324,5 +325,31 @@ public class QueryResultEditorWidget implements QueryResultEditorView.Presenter,
 		this.view.hideEditor();
 		this.view.hideProgress();
 	}
+	
+	 /**
+	 * The results are editable if all of the select columns have ID
+	 * 
+	 * @return
+	 */
+	public static boolean isQueryResultEditable(QueryResultBundle bundle, TableType tableType) {
+		if (tableType.equals(TableType.dataset)) {
+			// Datasets should not be editable (SWC-5870, SWC-5903)
+			return false;
+		}
+
+		List<SelectColumn> selectColums = QueryBundleUtils.getSelectFromBundle(bundle);
+		if (selectColums == null) {
+			return false;
+		}
+		// Do all columns have IDs?
+		for (SelectColumn col : selectColums) {
+			if (col.getId() == null) {
+				return false;
+			}
+		}
+		// All of the columns have ID so we can edit
+		return true;
+	}
+
 
 }

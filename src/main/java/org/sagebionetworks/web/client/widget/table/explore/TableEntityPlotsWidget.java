@@ -16,7 +16,6 @@ import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryFilter;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
-import org.sagebionetworks.repo.model.table.SelectColumn;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.SubmissionView;
 import org.sagebionetworks.repo.model.table.Table;
@@ -355,7 +354,7 @@ public class TableEntityPlotsWidget implements TableEntityWidgetView.Presenter, 
 				try {
 					JSONObjectAdapter adapter = ginInjector.getJSONObjectAdapter().createNew(newQueryResultBundleJson);
 					this.currentQueryResultBundle = new QueryResultBundle(adapter);
-					this.queryExecutionFinished(true, isQueryResultEditable(this.currentQueryResultBundle));
+					this.queryExecutionFinished(true, QueryResultEditorWidget.isQueryResultEditable(this.currentQueryResultBundle, tableType));
 				} catch (JSONObjectAdapterException e) {
 					ginInjector.getSynapseJSNIUtils().consoleError(e);
 				}
@@ -434,31 +433,6 @@ public class TableEntityPlotsWidget implements TableEntityWidgetView.Presenter, 
 		// Disabling menu items does not seem to work well so we hide the items instead.
 		this.actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, false);
 		this.actionMenu.setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, false);
-	}
-
-	/**
-	 * The results are editable if all of the select columns have ID
-	 * 
-	 * @return
-	 */
-	public boolean isQueryResultEditable(QueryResultBundle bundle) {
-		if (tableType.equals(TableType.dataset)) {
-			// Datasets should not be editable (SWC-5870, SWC-5903)
-			return false;
-		}
-
-		List<SelectColumn> selectColums = QueryBundleUtils.getSelectFromBundle(bundle);
-		if (selectColums == null) {
-			return false;
-		}
-		// Do all columns have IDs?
-		for (SelectColumn col : selectColums) {
-			if (col.getId() == null) {
-				return false;
-			}
-		}
-		// All of the columns have ID so we can edit
-		return true;
 	}
 
 	@Override

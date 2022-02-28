@@ -213,7 +213,8 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 			String token = queryTokenProvider.queryToToken(newQuery);
 			Long versionNumber = QueryBundleUtils.getTableVersion(newQuery.getSql());
 			String synId = QueryBundleUtils.getTableIdFromSql(newQuery.getSql());
-			if (token != null && !newQuery.equals(plotsTableWidget.getDefaultQuery())) {
+			Query defaultQuery = DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider()) ? plotsTableWidget.getDefaultQuery() : v2TableWidget.getDefaultQuery();
+			if (token != null && !newQuery.equals(defaultQuery)) {
 				areaToken = TABLE_QUERY_PREFIX + token;
 			} else {
 				areaToken = "";

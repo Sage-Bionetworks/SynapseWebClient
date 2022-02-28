@@ -686,13 +686,4 @@ public class TableEntityPlotsWidgetTest {
 
 		verify(mockActionMenu).setTableDownloadOptionsEnabled(true);
 	}
-
-	@Test
-	public void testTotalVisibleResultsNotConfiguredForTableEntity() {
-		boolean canEdit = true;
-
-		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
-
-		verify(mockTotalVisibleResultsWidget, never()).configure(any());
-	}
 }

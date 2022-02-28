@@ -23,7 +23,6 @@ import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -149,12 +148,11 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 		this.actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, false);
 		this.actionMenu.setActionVisible(Action.SHOW_TABLE_SCHEMA, false);
 		this.actionMenu.setActionVisible(Action.SHOW_VERSION_HISTORY, false);
-		GWT.debugger();
 		if (!isQueryVisible) {
-			if (!DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider())) {
-				getTableEntityWidget().hideFiltering();
-			} else {
+			if (DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider())) {
 				getTableEntityPlotsWidget().hideFiltering();
+			} else {
+				getTableEntityWidget().hideFiltering();
 			}
 		}
 	}
