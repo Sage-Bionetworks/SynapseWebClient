@@ -49,6 +49,10 @@
 			}
 		</script>
 		<script>
+			// SWC-5959: Before loading the SRC library, set value so actual column names are shown in Synapse.org
+			window.localStorage.setItem('force-display-original-column-names', 'true')
+		</script>
+		<script>
 			// determine cdn endpoint (staging or prod, do not use a cdn for local or dev builds)
 			var cdnEndpoint = "//cdn-" + location.hostname + "/";
 			var processEnvironment = 'production';
