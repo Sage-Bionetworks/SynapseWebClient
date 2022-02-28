@@ -15,7 +15,7 @@
 			visible="false" marginLeft="15" />
 		<b:TextArea width="1px" ui:field="copyToClipboardTextbox"
 			visible="false" />
-		<bh:Div addStyleNames="highlight-box padding-10" marginTop="0">
+		<bh:Div ui:field="tableArea" addStyleNames="highlight-box padding-10" marginTop="0">
 			<t:Table ui:field="columnHeaders" width="100%">
 				<t:TableRow>
 					<t:TableHeader width="20px" />

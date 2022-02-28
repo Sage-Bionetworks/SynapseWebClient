@@ -9,9 +9,12 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -36,8 +39,8 @@ import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.TableListWidgetView;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
+
 import com.google.gwt.http.client.Request;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -48,8 +51,6 @@ public class TableListWidgetTest {
 	private TableListWidget widget;
 	private EntityBundle parentBundle;
 	private UserEntityPermissions permissions;
-	@Mock
-	CreateTableViewWizard mockCreateTableViewWizard;
 	@Mock
 	CookieProvider mockCookies;
 	@Mock
@@ -69,6 +70,7 @@ public class TableListWidgetTest {
 	@Captor
 	ArgumentCaptor<String> stringCaptor;
 	List<EntityHeader> searchResults;
+	EntityHeader searchResult;
 
 
 	@Before
@@ -84,7 +86,10 @@ public class TableListWidgetTest {
 		mockView = Mockito.mock(TableListWidgetView.class);
 		widget = new TableListWidget(mockView, mockSynapseJavascriptClient, mockLoadMoreWidgetContainer, mockSynAlert);
 		AsyncMockStubber.callSuccessWith(mockResults).when(mockSynapseJavascriptClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
+		searchResult = new EntityHeader();
+		searchResult.setId("syn123");
 		searchResults = new ArrayList<EntityHeader>();
+		searchResults.add(searchResult);
 		when(mockResults.getPage()).thenReturn(searchResults);
 		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("true");
 	}
@@ -104,8 +109,11 @@ public class TableListWidgetTest {
 
 	@Test
 	public void testConfigureUnderPageSize() {
+		when(mockResults.getPage()).thenReturn(Collections.emptyList());
+
 		widget.configure(parentBundle, Arrays.asList(EntityType.dataset));
-		verify(mockView, times(2)).hideLoading();
+		verify(mockView).setState(TableListWidgetView.TableListWidgetViewState.LOADING);
+		verify(mockView).setState(TableListWidgetView.TableListWidgetViewState.EMPTY);
 		verify(mockView).clearSortUI();
 		verify(mockLoadMoreWidgetContainer).setIsMore(false);
 	}
@@ -113,7 +121,10 @@ public class TableListWidgetTest {
 	@Test
 	public void testConfigureOverPageSize() {
 		when(mockResults.getNextPageToken()).thenReturn("ismore");
+
 		widget.configure(parentBundle, Arrays.asList(EntityType.dataset));
+		verify(mockView).setState(TableListWidgetView.TableListWidgetViewState.LOADING);
+		verify(mockView).setState(TableListWidgetView.TableListWidgetViewState.POPULATED);
 		verify(mockView).clearSortUI();
 		verify(mockLoadMoreWidgetContainer).setIsMore(true);
 	}
@@ -152,6 +163,7 @@ public class TableListWidgetTest {
 	@Test
 	public void testCopyToClipboard() {
 		// add search results
+		searchResults.clear();
 		StringBuilder expectedClipboardValue = new StringBuilder();
 		int itemCount = 50;
 		for (int i = 0; i < itemCount; i++) {
