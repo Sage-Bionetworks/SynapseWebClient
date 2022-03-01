@@ -608,6 +608,8 @@ import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContaine
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityViewScopeWidgetView;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityViewScopeWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.MaterializedViewEditorView;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.MaterializedViewEditorViewImpl;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.SubmissionViewScopeWidgetView;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.SubmissionViewScopeWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.ViewDefaultColumns;
@@ -1337,6 +1339,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(ContainerClientsHelp.class).to(ContainerClientsHelpImpl.class);
 		bind(FileDownloadMenuItemView.class).to(FileDownloadMenuItemViewImpl.class);
 		bind(CreateTableViewWizardStep2View.class).to(CreateTableViewWizardStep2ViewImpl.class);
+		bind(MaterializedViewEditorView.class).to(MaterializedViewEditorViewImpl.class);
 		bind(ChallengeWidgetView.class).to(ChallengeWidgetViewImpl.class);
 		bind(SelectTeamModalView.class).to(SelectTeamModalViewImpl.class);
 		bind(ApproveUserAccessModalView.class).to(ApproveUserAccessModalViewImpl.class);

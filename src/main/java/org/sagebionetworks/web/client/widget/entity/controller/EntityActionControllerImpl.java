@@ -33,6 +33,7 @@ import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.EntityView;
+import org.sagebionetworks.repo.model.table.MaterializedView;
 import org.sagebionetworks.repo.model.table.SnapshotRequest;
 import org.sagebionetworks.repo.model.table.SnapshotResponse;
 import org.sagebionetworks.repo.model.table.SubmissionView;
@@ -87,6 +88,7 @@ import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidge
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
 import org.sagebionetworks.web.client.widget.statistics.StatisticsPlotWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.MaterializedViewEditor;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
@@ -197,6 +199,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	IsACTMemberAsyncHandler isACTMemberAsyncHandler;
 	AddFolderDialogWidget addFolderDialogWidget;
 	CreateTableViewWizard createTableViewWizard;
+	MaterializedViewEditor materializedViewEditor;
 	boolean isShowingVersion = false;
 	WizardCallback entityUpdatedWizardCallback;
 	UploadTableModalWidget uploadTableModalWidget;
@@ -334,6 +337,14 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		return accessControlListModalWidget;
 	}
 
+	
+	private MaterializedViewEditor getMaterializedViewEditor() {
+		if (materializedViewEditor == null) {
+			materializedViewEditor = ginInjector.getMaterializedViewEditor();
+			this.view.addWidget(materializedViewEditor.asWidget());
+		}
+		return materializedViewEditor;
+	}
 	private CreateTableViewWizard getCreateTableViewWizard() {
 		if (createTableViewWizard == null) {
 			createTableViewWizard = ginInjector.getCreateTableViewWizard();
@@ -546,12 +557,16 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			actionMenu.setActionListener(Action.ADD_PROJECT_VIEW, this);
 			actionMenu.setActionVisible(Action.ADD_SUBMISSION_VIEW, canEditResults);
 			actionMenu.setActionListener(Action.ADD_SUBMISSION_VIEW, this);
+			actionMenu.setActionVisible(Action.ADD_MATERIALIZED_VIEW, canEditResults && DisplayUtils.isInTestWebsite(cookies));
+			actionMenu.setActionListener(Action.ADD_MATERIALIZED_VIEW, this);
+
 		} else {
 			actionMenu.setActionVisible(Action.UPLOAD_TABLE, false);
 			actionMenu.setActionVisible(Action.ADD_TABLE, false);
 			actionMenu.setActionVisible(Action.ADD_FILE_VIEW, false);
 			actionMenu.setActionVisible(Action.ADD_PROJECT_VIEW, false);
 			actionMenu.setActionVisible(Action.ADD_SUBMISSION_VIEW, false);
+			actionMenu.setActionVisible(Action.ADD_MATERIALIZED_VIEW, false);
 		}
 	}
 
@@ -1155,6 +1170,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			case ADD_SUBMISSION_VIEW:
 				onAddSubmissionView();
 				break;
+			case ADD_MATERIALIZED_VIEW:
+				onAddMaterializedView();
+				break;
 			case CREATE_EXTERNAL_DOCKER_REPO:
 				onCreateExternalDockerRepo();
 				break;
@@ -1252,6 +1270,14 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	public void onAddTable() {
 		preflightController.checkCreateEntity(entityBundle, TableEntity.class.getName(), () -> {
 			postCheckCreateTableOrView(TableType.table);
+		});
+	}
+	
+	public void onAddMaterializedView() {
+		preflightController.checkCreateEntity(entityBundle, MaterializedView.class.getName(), () -> {
+			// to create a MaterializedView, we need to know the definingSQL
+			getMaterializedViewEditor().configure(entityBundle.getEntity().getId());
+			getMaterializedViewEditor().show();
 		});
 	}
 

@@ -78,6 +78,7 @@
 				<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="ADD_FILE_VIEW">Add File View</a:ActionMenuItem>
 				<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="ADD_PROJECT_VIEW">Add Project View</a:ActionMenuItem>
 				<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="ADD_SUBMISSION_VIEW">Add Submission View</a:ActionMenuItem>
+				<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="ADD_MATERIALIZED_VIEW">Add Materialized View</a:ActionMenuItem>
 				<a:ActionMenuItem icon="ENVELOPE_O" iconFixedWidth="true" action="FOLLOW">Follow</a:ActionMenuItem> <!-- text and icon updated by listener -->
 				<a:ActionMenuItem icon="EDIT" iconFixedWidth="true" action="CREATE_THREAD">Create New Thread</a:ActionMenuItem>
 				<a:ActionMenuItem icon="TRASH_O" iconFixedWidth="true" action="SHOW_DELETED_THREADS">Show Deleted Threads</a:ActionMenuItem> <!-- text and icon updated by listener -->
