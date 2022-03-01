@@ -31,7 +31,7 @@ public interface TableListWidgetView extends IsWidget, SynapseView {
 
 	void clearTableWidgets();
 
-	void addTableListItem(EntityHeader header);
+	void addTableListItem(final TableEntityListGroupItem item);
 
 	void setLoadMoreWidget(IsWidget w);
 
@@ -44,4 +44,6 @@ public interface TableListWidgetView extends IsWidget, SynapseView {
 	void hideLoading();
 
 	void copyToClipboard(String ids);
+
+	void setFileCountVisible(boolean visible);
 }
