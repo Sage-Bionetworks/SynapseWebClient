@@ -14,6 +14,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableHeader;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.v2.results.SortableTableHeaderImpl;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -38,6 +39,8 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	Div loadMoreWidgetContainer;
 	@UiField
 	Div synAlertContainer;
+	@UiField
+	Div tableArea;
 	@UiField
 	Span emptyUI;
 	@UiField
@@ -98,7 +101,6 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 
 	@Override
 	public void addTableListItem(final TableEntityListGroupItem item) {
-		emptyUI.setVisible(false);
 		tablesList.add(item);
 		tablesListDiv.add(item);
 	}
@@ -107,7 +109,6 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	public void clearTableWidgets() {
 		tablesList.clear();
 		tablesListDiv.clear();
-		emptyUI.setVisible(true);
 	}
 
 	@Override
@@ -122,13 +123,21 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	}
 
 	@Override
-	public void showLoading() {
-		loadingUI.setVisible(true);
+	public void setTableType(TableType tableType) {
+		String emptyUiCopy = "&#8212; There are no " + tableType.getDisplayName() + "s associated with this project. Any " + tableType.getDisplayName() + "s you create in this project will appear here.";
+		emptyUI.setHTML(emptyUiCopy);
 	}
 
 	@Override
-	public void hideLoading() {
-		loadingUI.setVisible(false);
+	public void setState(TableListWidgetViewState state) {
+		loadingUI.setVisible(TableListWidgetViewState.LOADING.equals(state));
+		emptyUI.setVisible(TableListWidgetViewState.EMPTY.equals(state));
+		tableArea.setVisible(TableListWidgetViewState.POPULATED.equals(state));
+	}
+
+	@Override
+	public void showLoading() {
+		setState(TableListWidgetViewState.LOADING);
 	}
 
 	@Override
