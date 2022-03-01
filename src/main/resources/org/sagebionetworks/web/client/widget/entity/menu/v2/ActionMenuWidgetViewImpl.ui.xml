@@ -8,7 +8,7 @@
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 
 	<g:FlowPanel>
-		<b:Tooltip title="Show advanced search">
+		<b:Tooltip title="Edit view query">
 			<a:ActionButton visible="false" icon="FILTER" addStyleNames="margin-right-5" action="SHOW_ADVANCED_SEARCH" />
 		</b:Tooltip>
 		<b:Tooltip title="Show simple search">
@@ -35,63 +35,65 @@
 		</b:Tooltip>
 		<w:ReactComponentDiv ui:field="skeletonButton"  addStyleNames="displayInlineBlock"></w:ReactComponentDiv>
 		<b:Button ui:field="singleActionButton"  addStyleNames="displayInlineBlock"></b:Button>
-		<b:DropDown ui:field="dropdown" addStyleNames="displayInlineBlock">
-			<b:Button icon="GEARS" ui:field="toolsMenu" addStyleNames="toolsMenuButton" dataToggle="DROPDOWN">Tools</b:Button>
-			<b:DropDownMenu ui:field="toolsDropDown"
-				addStyleNames="dropdown-menu-right">
-				<b:DropDownHeader ui:field="noActionsAvailable" addStyleNames="font-italic">No actions available</b:DropDownHeader>
-				<a:ActionMenuItem icon="HDD_O" iconFixedWidth="true" action="EDIT_DATASET_ITEMS">Edit Dataset Items</a:ActionMenuItem>
-				<a:ActionMenuItem icon="LOCK" iconFixedWidth="true" action="SHARE">Share</a:ActionMenuItem>
-				<a:ActionMenuItem icon="EDIT" iconFixedWidth="true" action="EDIT_PROJECT_METADATA">Edit Project Metadata</a:ActionMenuItem>
-				<a:ActionMenuItem icon="BAR_CHART" iconFixedWidth="true" action="SHOW_PROJECT_STATS">Show Project Statistics</a:ActionMenuItem>
-				<a:ActionMenuItem icon="EDIT" iconFixedWidth="true" action="EDIT_FILE_METADATA">Edit File Metadata</a:ActionMenuItem>
-				<a:ActionMenuItem icon="EDIT" iconFixedWidth="true" action="CHANGE_ENTITY_NAME">Rename</a:ActionMenuItem>
-				<a:ActionMenuItem icon="INFO_CIRCLE" iconFixedWidth="true" action="SHOW_ANNOTATIONS">Annotations</a:ActionMenuItem>
-				<a:ActionMenuItem icon="UPLOAD" iconFixedWidth="true" action="UPLOAD_FILE">Upload or Link to a File</a:ActionMenuItem>
-				<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="CREATE_FOLDER">Add New Folder</a:ActionMenuItem>
-				<a:ActionMenuItem icon="TABLE" iconFixedWidth="true" action="SHOW_TABLE_SCHEMA">Schema</a:ActionMenuItem>
-				<a:ActionMenuItem icon="HDD_O" iconFixedWidth="true" action="SHOW_VIEW_SCOPE">Scope</a:ActionMenuItem>
-				<a:ActionMenuItem icon="DATABASE" iconFixedWidth="true" action="CHANGE_STORAGE_LOCATION">Change Storage Location</a:ActionMenuItem>
-				<a:ActionMenuItem icon="UPLOAD" iconFixedWidth="true" action="UPLOAD_NEW_FILE">Upload a New Version of File</a:ActionMenuItem>
-				<a:ActionMenuItem icon="HISTORY" iconFixedWidth="true" action="CREATE_TABLE_VERSION">Create a New Table/View Version</a:ActionMenuItem>
-				<a:ActionMenuItem icon="HISTORY" iconFixedWidth="true" action="SHOW_VERSION_HISTORY">Version History</a:ActionMenuItem>
-				<a:ActionMenuItem icon="TELEVISION" iconFixedWidth="true" action="PROJECT_DISPLAY">Project Display Settings</a:ActionMenuItem>
-				<a:ActionMenuItem icon="UPLOAD" iconFixedWidth="true" action="UPLOAD_TABLE_DATA">Upload Data to Table</a:ActionMenuItem>
-				<a:ActionMenuItem icon="SEARCH" iconFixedWidth="true" action="TOGGLE_FULL_TEXT_SEARCH">Enable Full Text Search</a:ActionMenuItem>
-				<a:ActionMenuItem icon="EDIT" iconFixedWidth="true" action="EDIT_WIKI_PAGE">Edit Wiki Page</a:ActionMenuItem>
-				<a:ActionMenuItem icon="NEWSPAPER_O" iconFixedWidth="true" action="VIEW_WIKI_SOURCE">View Wiki Source</a:ActionMenuItem>
-				<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="ADD_WIKI_SUBPAGE">Add Wiki Subpage</a:ActionMenuItem>
-				<a:ActionMenuItem icon="ARROWS" iconFixedWidth="true" action="REORDER_WIKI_SUBPAGES">Edit Wiki Page Order</a:ActionMenuItem>
-				<a:ActionMenuItem icon="TIMES_CIRCLE" iconFixedWidth="true" action="DELETE_WIKI_PAGE">Delete Wiki Page</a:ActionMenuItem>
-				<a:ActionMenuItem icon="TROPHY" iconFixedWidth="true" action="CREATE_CHALLENGE">Run Challenge</a:ActionMenuItem>
-				<a:ActionMenuItem icon="TROPHY" iconFixedWidth="true" action="DELETE_CHALLENGE">Delete Challenge</a:ActionMenuItem>
-				<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="ADD_EVALUATION_QUEUE">Add Evaluation Queue</a:ActionMenuItem>
-				<a:ActionMenuItem icon="CODE_FORK" iconFixedWidth="true" action="EDIT_PROVENANCE">Edit Provenance</a:ActionMenuItem>
-				<a:ActionMenuItem icon="TROPHY" iconFixedWidth="true" action="SUBMIT_TO_CHALLENGE">Submit to Challenge</a:ActionMenuItem>
-				<a:ActionMenuItem icon="ARROWS" iconFixedWidth="true" action="MOVE_ENTITY">Move</a:ActionMenuItem>
-				<a:ActionMenuItem icon="EXTERNAL_LINK" iconFixedWidth="true" action="CREATE_OR_UPDATE_DOI">Create or Update DOI</a:ActionMenuItem>
-				<a:ActionMenuItem icon="LINK" iconFixedWidth="true" action="CREATE_LINK">Save Link</a:ActionMenuItem>
-				<a:ActionMenuItem icon="TIMES_CIRCLE" iconFixedWidth="true" action="DELETE_ENTITY">Delete</a:ActionMenuItem>
-				<a:ActionMenuItem icon="UPLOAD" iconFixedWidth="true" action="UPLOAD_TABLE">Upload a Table</a:ActionMenuItem>
-				<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="ADD_DATASET">Add Dataset</a:ActionMenuItem>
-				<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="ADD_TABLE">Add Table</a:ActionMenuItem>
-				<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="ADD_FILE_VIEW">Add File View</a:ActionMenuItem>
-				<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="ADD_PROJECT_VIEW">Add Project View</a:ActionMenuItem>
-				<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="ADD_SUBMISSION_VIEW">Add Submission View</a:ActionMenuItem>
-				<a:ActionMenuItem icon="ENVELOPE_O" iconFixedWidth="true" action="FOLLOW">Follow</a:ActionMenuItem> <!-- text and icon updated by listener -->
-				<a:ActionMenuItem icon="EDIT" iconFixedWidth="true" action="CREATE_THREAD">Create New Thread</a:ActionMenuItem>
-				<a:ActionMenuItem icon="TRASH_O" iconFixedWidth="true" action="SHOW_DELETED_THREADS">Show Deleted Threads</a:ActionMenuItem> <!-- text and icon updated by listener -->
-				<a:ActionMenuItem icon="EDIT" iconFixedWidth="true" action="EDIT_THREAD">Edit Thread</a:ActionMenuItem> <!-- text and icon updated by listener -->
-				<a:ActionMenuItem icon="THUMB_TACK" iconFixedWidth="true" action="PIN_THREAD">Pin Thread</a:ActionMenuItem> <!-- text and icon updated by listener -->
-				<a:ActionMenuItem icon="TIMES_CIRCLE" iconFixedWidth="true" action="DELETE_THREAD">Delete Thread</a:ActionMenuItem> <!-- text and icon updated by listener -->
-				<a:ActionMenuItem iconFixedWidth="true" action="RESTORE_THREAD">Restore Thread</a:ActionMenuItem> <!-- text and icon updated by listener -->
-				<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="CREATE_EXTERNAL_DOCKER_REPO">Add External Repository</a:ActionMenuItem>
-				<b:Divider ui:field="actDivider" visible="false" />
-				<b:DropDownHeader ui:field="actHeader">ACT Tools</b:DropDownHeader>
-				<a:ActionMenuItem icon="FLAG" iconFixedWidth="true" action="APPROVE_USER_ACCESS">Change User Access</a:ActionMenuItem>
-				<a:ActionMenuItem icon="FLAG" iconFixedWidth="true" action="MANAGE_ACCESS_REQUIREMENTS">Manage Access Requirements</a:ActionMenuItem>
-			</b:DropDownMenu>
-		</b:DropDown>
+		<b:Tooltip title="Tools and options">
+			<b:DropDown ui:field="dropdown" addStyleNames="displayInlineBlock">
+				<b:Button icon="GEARS" ui:field="toolsMenu" addStyleNames="toolsMenuButton" dataToggle="DROPDOWN">Tools</b:Button>
+				<b:DropDownMenu ui:field="toolsDropDown"
+								addStyleNames="dropdown-menu-right">
+					<b:DropDownHeader ui:field="noActionsAvailable" addStyleNames="font-italic">No actions available</b:DropDownHeader>
+					<a:ActionMenuItem icon="HDD_O" iconFixedWidth="true" action="EDIT_DATASET_ITEMS">Edit Dataset Items</a:ActionMenuItem>
+					<a:ActionMenuItem icon="LOCK" iconFixedWidth="true" action="SHARE">Share</a:ActionMenuItem>
+					<a:ActionMenuItem icon="EDIT" iconFixedWidth="true" action="EDIT_PROJECT_METADATA">Edit Project Metadata</a:ActionMenuItem>
+					<a:ActionMenuItem icon="BAR_CHART" iconFixedWidth="true" action="SHOW_PROJECT_STATS">Show Project Statistics</a:ActionMenuItem>
+					<a:ActionMenuItem icon="EDIT" iconFixedWidth="true" action="EDIT_FILE_METADATA">Edit File Metadata</a:ActionMenuItem>
+					<a:ActionMenuItem icon="EDIT" iconFixedWidth="true" action="CHANGE_ENTITY_NAME">Rename</a:ActionMenuItem>
+					<a:ActionMenuItem icon="INFO_CIRCLE" iconFixedWidth="true" action="SHOW_ANNOTATIONS">Annotations</a:ActionMenuItem>
+					<a:ActionMenuItem icon="UPLOAD" iconFixedWidth="true" action="UPLOAD_FILE">Upload or Link to a File</a:ActionMenuItem>
+					<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="CREATE_FOLDER">Add New Folder</a:ActionMenuItem>
+					<a:ActionMenuItem icon="TABLE" iconFixedWidth="true" action="SHOW_TABLE_SCHEMA">Schema</a:ActionMenuItem>
+					<a:ActionMenuItem icon="HDD_O" iconFixedWidth="true" action="SHOW_VIEW_SCOPE">Scope</a:ActionMenuItem>
+					<a:ActionMenuItem icon="DATABASE" iconFixedWidth="true" action="CHANGE_STORAGE_LOCATION">Change Storage Location</a:ActionMenuItem>
+					<a:ActionMenuItem icon="UPLOAD" iconFixedWidth="true" action="UPLOAD_NEW_FILE">Upload a New Version of File</a:ActionMenuItem>
+					<a:ActionMenuItem icon="HISTORY" iconFixedWidth="true" action="CREATE_TABLE_VERSION">Create a New Table/View Version</a:ActionMenuItem>
+					<a:ActionMenuItem icon="HISTORY" iconFixedWidth="true" action="SHOW_VERSION_HISTORY">Version History</a:ActionMenuItem>
+					<a:ActionMenuItem icon="TELEVISION" iconFixedWidth="true" action="PROJECT_DISPLAY">Project Display Settings</a:ActionMenuItem>
+					<a:ActionMenuItem icon="UPLOAD" iconFixedWidth="true" action="UPLOAD_TABLE_DATA">Upload Data to Table</a:ActionMenuItem>
+					<a:ActionMenuItem icon="SEARCH" iconFixedWidth="true" action="TOGGLE_FULL_TEXT_SEARCH">Enable Full Text Search</a:ActionMenuItem>
+					<a:ActionMenuItem icon="EDIT" iconFixedWidth="true" action="EDIT_WIKI_PAGE">Edit Wiki Page</a:ActionMenuItem>
+					<a:ActionMenuItem icon="NEWSPAPER_O" iconFixedWidth="true" action="VIEW_WIKI_SOURCE">View Wiki Source</a:ActionMenuItem>
+					<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="ADD_WIKI_SUBPAGE">Add Wiki Subpage</a:ActionMenuItem>
+					<a:ActionMenuItem icon="ARROWS" iconFixedWidth="true" action="REORDER_WIKI_SUBPAGES">Edit Wiki Page Order</a:ActionMenuItem>
+					<a:ActionMenuItem icon="TIMES_CIRCLE" iconFixedWidth="true" action="DELETE_WIKI_PAGE">Delete Wiki Page</a:ActionMenuItem>
+					<a:ActionMenuItem icon="TROPHY" iconFixedWidth="true" action="CREATE_CHALLENGE">Run Challenge</a:ActionMenuItem>
+					<a:ActionMenuItem icon="TROPHY" iconFixedWidth="true" action="DELETE_CHALLENGE">Delete Challenge</a:ActionMenuItem>
+					<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="ADD_EVALUATION_QUEUE">Add Evaluation Queue</a:ActionMenuItem>
+					<a:ActionMenuItem icon="CODE_FORK" iconFixedWidth="true" action="EDIT_PROVENANCE">Edit Provenance</a:ActionMenuItem>
+					<a:ActionMenuItem icon="TROPHY" iconFixedWidth="true" action="SUBMIT_TO_CHALLENGE">Submit to Challenge</a:ActionMenuItem>
+					<a:ActionMenuItem icon="ARROWS" iconFixedWidth="true" action="MOVE_ENTITY">Move</a:ActionMenuItem>
+					<a:ActionMenuItem icon="EXTERNAL_LINK" iconFixedWidth="true" action="CREATE_OR_UPDATE_DOI">Create or Update DOI</a:ActionMenuItem>
+					<a:ActionMenuItem icon="LINK" iconFixedWidth="true" action="CREATE_LINK">Save Link</a:ActionMenuItem>
+					<a:ActionMenuItem icon="TIMES_CIRCLE" iconFixedWidth="true" action="DELETE_ENTITY">Delete</a:ActionMenuItem>
+					<a:ActionMenuItem icon="UPLOAD" iconFixedWidth="true" action="UPLOAD_TABLE">Upload a Table</a:ActionMenuItem>
+					<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="ADD_DATASET">Add Dataset</a:ActionMenuItem>
+					<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="ADD_TABLE">Add Table</a:ActionMenuItem>
+					<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="ADD_FILE_VIEW">Add File View</a:ActionMenuItem>
+					<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="ADD_PROJECT_VIEW">Add Project View</a:ActionMenuItem>
+					<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="ADD_SUBMISSION_VIEW">Add Submission View</a:ActionMenuItem>
+					<a:ActionMenuItem icon="ENVELOPE_O" iconFixedWidth="true" action="FOLLOW">Follow</a:ActionMenuItem> <!-- text and icon updated by listener -->
+					<a:ActionMenuItem icon="EDIT" iconFixedWidth="true" action="CREATE_THREAD">Create New Thread</a:ActionMenuItem>
+					<a:ActionMenuItem icon="TRASH_O" iconFixedWidth="true" action="SHOW_DELETED_THREADS">Show Deleted Threads</a:ActionMenuItem> <!-- text and icon updated by listener -->
+					<a:ActionMenuItem icon="EDIT" iconFixedWidth="true" action="EDIT_THREAD">Edit Thread</a:ActionMenuItem> <!-- text and icon updated by listener -->
+					<a:ActionMenuItem icon="THUMB_TACK" iconFixedWidth="true" action="PIN_THREAD">Pin Thread</a:ActionMenuItem> <!-- text and icon updated by listener -->
+					<a:ActionMenuItem icon="TIMES_CIRCLE" iconFixedWidth="true" action="DELETE_THREAD">Delete Thread</a:ActionMenuItem> <!-- text and icon updated by listener -->
+					<a:ActionMenuItem iconFixedWidth="true" action="RESTORE_THREAD">Restore Thread</a:ActionMenuItem> <!-- text and icon updated by listener -->
+					<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="CREATE_EXTERNAL_DOCKER_REPO">Add External Repository</a:ActionMenuItem>
+					<b:Divider ui:field="actDivider" visible="false" />
+					<b:DropDownHeader ui:field="actHeader">ACT Tools</b:DropDownHeader>
+					<a:ActionMenuItem icon="FLAG" iconFixedWidth="true" action="APPROVE_USER_ACCESS">Change User Access</a:ActionMenuItem>
+					<a:ActionMenuItem icon="FLAG" iconFixedWidth="true" action="MANAGE_ACCESS_REQUIREMENTS">Manage Access Requirements</a:ActionMenuItem>
+				</b:DropDownMenu>
+			</b:DropDown>
+		</b:Tooltip>
 		<bh:Div ui:field="controllerContainer" addStyleNames="displayInlineBlock"/>
 	</g:FlowPanel>
 </ui:UiBinder>

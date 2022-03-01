@@ -14,18 +14,20 @@
 				<b:Heading size="H3" ui:field="title" text="Files" visible="false"/>
 			</bh:Div>
 			<bh:Div addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end">
-				<b:DropDown addStyleNames="displayInlineBlock right">
-					<b:Button ui:field="downloadOptionsButton"
-						dataToggle="DROPDOWN" type="PRIMARY" text="Download Options"
-						marginRight="5" marginLeft="5" />
-					<b:DropDownMenu ui:field="dropdownMenu"
-						addStyleNames="dropdown-menu-right">
-						<b:AnchorListItem ui:field="addToDownloadListLink">Add to Download Cart</b:AnchorListItem>
-						<b:Divider />
-						<b:AnchorListItem
-							ui:field="programmaticOptionsLink">Programmatic Options</b:AnchorListItem>
-					</b:DropDownMenu>
-				</b:DropDown>
+				<b:Tooltip ui:field="downloadTooltip">
+					<b:DropDown addStyleNames="displayInlineBlock right">
+						<b:Button ui:field="downloadOptionsButton"
+								  dataToggle="DROPDOWN" type="PRIMARY" text="Download Options"
+								  marginRight="5" marginLeft="5" />
+						<b:DropDownMenu ui:field="dropdownMenu"
+										addStyleNames="dropdown-menu-right">
+							<b:AnchorListItem ui:field="addToDownloadListLink">Add to Download Cart</b:AnchorListItem>
+							<b:Divider />
+							<b:AnchorListItem
+									ui:field="programmaticOptionsLink">Programmatic Options</b:AnchorListItem>
+						</b:DropDownMenu>
+					</b:DropDown>
+				</b:Tooltip>
 			</bh:Div>
 			<bh:Div addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end">
 				<w:HelpWidget ui:field="downloadHelp"
