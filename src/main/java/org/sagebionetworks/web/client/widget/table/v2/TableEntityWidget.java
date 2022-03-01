@@ -277,6 +277,8 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 			if (!canEdit) {
 				this.actionMenu.setDownloadActionsDisabledTooltipText("A draft version of a Dataset cannot be downloaded");
 			}
+		} else if(!entityBundle.getPermissions().getCanDownload()) {
+			this.actionMenu.setTableDownloadOptionsEnabled(false);
 		} else {
 			this.actionMenu.setTableDownloadOptionsEnabled(hasQueryableData);
 			if (!hasQueryableData) {
@@ -408,7 +410,7 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 		actionMenu.setActionVisible(Action.SHOW_SIMPLE_SEARCH, false);
 		queryInputWidget.setShowSimpleSearchButtonVisible(false);
 		queryResultsWidget.setFacetsVisible(true);
-		actionMenu.setActionVisible(Action.SHOW_QUERY, true);
+		actionMenu.setActionVisible(Action.SHOW_QUERY, false);
 		queryInputWidget.setQueryInputVisible(false);
 	}
 
