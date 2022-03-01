@@ -2,8 +2,13 @@ package org.sagebionetworks.web.client.widget.table.v2;
 
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
+import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.web.client.jsinterop.DatasetEditorProps;
+import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnQueryCallback;
+import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnQueryResultBundleCallback;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget;
+
 import com.google.gwt.user.client.ui.IsWidget;
 
 /**
@@ -48,6 +53,7 @@ public interface TableEntityWidgetView extends IsWidget {
 	 * Show or hide the query results
 	 * 
 	 * @param visible
+	 * @deprecated
 	 */
 	public void setQueryResultsVisible(boolean visible);
 
@@ -55,6 +61,7 @@ public interface TableEntityWidgetView extends IsWidget {
 	 * Set the query results widget.
 	 * 
 	 * @param queryResultsWidget
+	 * @deprecated
 	 */
 	public void setQueryResultsWidget(IsWidget queryResultsWidget);
 
@@ -62,6 +69,7 @@ public interface TableEntityWidgetView extends IsWidget {
 	 * Set the query input widget.
 	 * 
 	 * @param queryInputWidget
+	 * @deprecated
 	 */
 	public void setQueryInputWidget(IsWidget queryInputWidget);
 
@@ -69,9 +77,15 @@ public interface TableEntityWidgetView extends IsWidget {
 	 * Show or hide the query input.
 	 * 
 	 * @param b
+	 * @deprecated
 	 */
 	public void setQueryInputVisible(boolean visible);
 
+	/**
+	 * 
+	 * @param visible
+	 * @deprecated
+	 */
 	public void setTableToolbarVisible(boolean visible);
 
 	/**
@@ -104,4 +118,8 @@ public interface TableEntityWidgetView extends IsWidget {
 		DatasetEditorProps getItemsEditorProps();
 	}
 
+	void configureQueryWrapperPlotNav(String sql, String initQueryJson, OnQueryCallback onQueryBundleRequestChange,
+			OnQueryResultBundleCallback onQueryResultBundleChange, boolean hideSqlEditorControl);
+
+	void setQueryWrapperPlotNavVisible(boolean visible);
 }

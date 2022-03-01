@@ -9,6 +9,7 @@ import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.entity.Direction;
 import org.sagebionetworks.repo.model.entity.SortBy;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -36,6 +37,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, IsWidget 
 	private CallbackP<EntityHeader> onTableClickCallback;
 	private LoadMoreWidgetContainer loadMoreWidget;
 	private SynapseAlert synAlert;
+	private PortalGinInjector ginInjector;
 	public static final SortBy DEFAULT_SORT_BY = SortBy.CREATED_ON;
 	public static final Direction DEFAULT_DIRECTION = Direction.DESC;
 	boolean isInitializing = false;
@@ -44,11 +46,12 @@ public class TableListWidget implements TableListWidgetView.Presenter, IsWidget 
 	private List<EntityType> typesToShow = null;
 
 	@Inject
-	public TableListWidget(TableListWidgetView view, SynapseJavascriptClient jsClient, LoadMoreWidgetContainer loadMoreWidget, SynapseAlert synAlert) {
+	public TableListWidget(TableListWidgetView view, SynapseJavascriptClient jsClient, LoadMoreWidgetContainer loadMoreWidget, SynapseAlert synAlert, PortalGinInjector ginInjector) {
 		this.view = view;
 		this.jsClient = jsClient;
 		this.loadMoreWidget = loadMoreWidget;
 		this.synAlert = synAlert;
+		this.ginInjector = ginInjector;
 		this.view.setPresenter(this);
 		this.view.setLoadMoreWidget(loadMoreWidget);
 		view.setSynAlert(synAlert);
@@ -62,10 +65,6 @@ public class TableListWidget implements TableListWidgetView.Presenter, IsWidget 
 
 	/**
 	 * Configure this widget before use.
-	 * 
-	 * @param projectOwnerId
-	 * @param canEdit
-	 * @param showAddTable
 	 */
 	public void configure(EntityBundle parentBundle, List<EntityType> typesToShow) {
 		if (currentRequest != null) {
@@ -79,6 +78,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, IsWidget 
 		} else {
 			this.view.setTableType(TableType.table);
 		}
+		this.view.setFileCountVisible(shouldItemCountBeVisible());
 		loadData();
 	}
 
@@ -133,8 +133,6 @@ public class TableListWidget implements TableListWidgetView.Presenter, IsWidget 
 
 	/**
 	 * Run a query and populate the page with the results.
-	 * 
-	 * @param offset The offset used by the query.
 	 */
 	private void loadMore() {
 		synAlert.clear();
@@ -167,7 +165,12 @@ public class TableListWidget implements TableListWidgetView.Presenter, IsWidget 
 	private void setResults(List<EntityHeader> results) {
 		for (EntityHeader header : results) {
 			addSynIdToList(header.getId());
-			view.addTableListItem(header);
+			TableEntityListGroupItem item = ginInjector.getTableEntityListGroupItem();
+			item.configure(header, event -> {
+				this.onTableClicked(header);
+			});
+			item.setItemCountVisible(shouldItemCountBeVisible());
+			view.addTableListItem(item);
 		}
 		for (EntityHeader header : results) {
 			jsClient.populateEntityBundleCache(header.getId());
@@ -206,6 +209,10 @@ public class TableListWidget implements TableListWidgetView.Presenter, IsWidget 
 			clipboardValue.append("\n");
 		}
 		view.copyToClipboard(clipboardValue.toString());
+	}
+
+	private boolean shouldItemCountBeVisible() {
+		return this.typesToShow.contains(EntityType.dataset);
 	}
 
 }

@@ -32,11 +32,13 @@ import org.sagebionetworks.repo.model.entity.Direction;
 import org.sagebionetworks.repo.model.entity.SortBy;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.table.TableEntityListGroupItem;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.TableListWidgetView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -69,6 +71,10 @@ public class TableListWidgetTest {
 	Request mockRequest;
 	@Captor
 	ArgumentCaptor<String> stringCaptor;
+	@Mock
+	PortalGinInjector mockGinInjector;
+	@Mock
+	TableEntityListGroupItem mockTableEntityListGroupItem;
 	List<EntityHeader> searchResults;
 	EntityHeader searchResult;
 
@@ -84,7 +90,7 @@ public class TableListWidgetTest {
 		parentBundle.setEntity(project);
 		parentBundle.setPermissions(permissions);
 		mockView = Mockito.mock(TableListWidgetView.class);
-		widget = new TableListWidget(mockView, mockSynapseJavascriptClient, mockLoadMoreWidgetContainer, mockSynAlert);
+		widget = new TableListWidget(mockView, mockSynapseJavascriptClient, mockLoadMoreWidgetContainer, mockSynAlert, mockGinInjector);
 		AsyncMockStubber.callSuccessWith(mockResults).when(mockSynapseJavascriptClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
 		searchResult = new EntityHeader();
 		searchResult.setId("syn123");
@@ -92,6 +98,7 @@ public class TableListWidgetTest {
 		searchResults.add(searchResult);
 		when(mockResults.getPage()).thenReturn(searchResults);
 		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("true");
+		when(mockGinInjector.getTableEntityListGroupItem()).thenReturn(mockTableEntityListGroupItem);
 	}
 
 	@Test
@@ -175,7 +182,7 @@ public class TableListWidgetTest {
 		// load the data
 		widget.configure(parentBundle, Arrays.asList(EntityType.dataset));
 
-		verify(mockView, times(itemCount)).addTableListItem(any(EntityHeader.class));
+		verify(mockView, times(itemCount)).addTableListItem(any(TableEntityListGroupItem.class));
 		verify(mockSynapseJavascriptClient, times(itemCount)).populateEntityBundleCache(anyString());
 
 		widget.copyIDsToClipboard();
