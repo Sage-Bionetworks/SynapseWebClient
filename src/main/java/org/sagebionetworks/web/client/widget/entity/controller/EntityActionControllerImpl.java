@@ -780,6 +780,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			actionMenu.setActionVisible(Action.SHOW_TABLE_SCHEMA, true);
 			actionMenu.setActionVisible(Action.SHOW_VIEW_SCOPE, !(entityBundle.getEntity() instanceof TableEntity) && !isDataset && !isMaterializedView);
 			actionMenu.setActionVisible(Action.EDIT_DATASET_ITEMS, isDataset && isCurrentVersion);
+			actionMenu.setActionVisible(Action.EDIT_DEFINING_SQL, isMaterializedView && isCurrentVersion);
+			actionMenu.setActionListener(Action.EDIT_DEFINING_SQL, this);
 		} else {
 			actionMenu.setActionVisible(Action.UPLOAD_TABLE_DATA, false);
 			actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, false);
@@ -787,6 +789,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			actionMenu.setActionVisible(Action.SHOW_TABLE_SCHEMA, false);
 			actionMenu.setActionVisible(Action.SHOW_VIEW_SCOPE, false);
 			actionMenu.setActionVisible(Action.EDIT_DATASET_ITEMS, false);
+			actionMenu.setActionVisible(Action.EDIT_DEFINING_SQL, false);
 		}
 	}
 
@@ -1113,6 +1116,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 				break;
 			case CREATE_TABLE_VERSION:
 				onCreateTableViewSnapshot();
+				break;
+			case EDIT_DEFINING_SQL:
+				onEditDefiningSql();
 				break;
 			case MOVE_ENTITY:
 				onMove();
@@ -1548,7 +1554,32 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			view.showErrorMessage("Can only create a new version from the current table, not an old version.");
 		}
 	}
+	
+	private void onEditDefiningSql() {
+		if (isCurrentVersion) {
+			checkUpdateEntity(() -> {
+				postCheckEditDefiningSql();
+			});
+		}
+	}
 
+	private PromptCallback getUpdateDefiningSqlCallback() {
+		return value -> {
+			((MaterializedView)entity).setDefiningSQL(value);
+			getSynapseJavascriptClient().updateEntity(entity, null, false, new AsyncCallback<Entity>() {
+				@Override
+				public void onSuccess(Entity result) {
+					fireEntityUpdatedEvent();
+					view.showSuccess("Updated the Synapse SQL query that defines this Materialized View.");
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					view.showErrorMessage(caught.getMessage());
+				}
+			});
+		};
+	}
+	
 	private CallbackP<List<String>> getCreateSnapshotCallback(Entity entity) {
 		if (entity instanceof TableEntity) {
 			return values -> {
@@ -1700,7 +1731,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		if (entityBundle.getRootWikiId() == null) {
 			createWikiPage("Root");
 		} else {
-			view.showPromptDialog(DisplayConstants.ENTER_PAGE_TITLE, new PromptCallback() {
+			view.showPromptDialog(DisplayConstants.ENTER_PAGE_TITLE, "", new PromptCallback() {
 				@Override
 				public void callback(String result) {
 					createWikiPage(result);
@@ -1785,6 +1816,11 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		getEditProjectMetadataModalWidget().configure((Project) entityBundle.getEntity(), canChangeSettings, () -> {
 			fireEntityUpdatedEvent();
 		});
+	}
+	
+	private void postCheckEditDefiningSql() {
+		// prompt for defining sql
+		view.showPromptDialog("Update SQL", ((MaterializedView)entity).getDefiningSQL(), getUpdateDefiningSqlCallback());
 	}
 
 	public void onDeleteWiki() {

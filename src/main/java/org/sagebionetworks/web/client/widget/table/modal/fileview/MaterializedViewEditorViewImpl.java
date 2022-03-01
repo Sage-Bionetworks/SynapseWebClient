@@ -116,6 +116,10 @@ public class MaterializedViewEditorViewImpl implements MaterializedViewEditorVie
 		modal.show();
 	}
 	@Override
+	public void hide() {
+		modal.hide();
+	}
+	@Override
 	public void reset() {
 		nameField.setText("");
 		descriptionField.setText("");

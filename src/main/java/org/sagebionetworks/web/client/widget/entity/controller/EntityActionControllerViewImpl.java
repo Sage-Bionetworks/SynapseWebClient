@@ -81,9 +81,9 @@ public class EntityActionControllerViewImpl implements EntityActionControllerVie
 	}
 
 	@Override
-	public void showPromptDialog(String title, PromptCallback callback) {
+	public void showPromptDialog(String title, String initialValue, PromptCallback callback) {
 		lazyConstruct();
-		promptForValuesDialog.configureAndShow(title, "", "", value -> {
+		promptForValuesDialog.configureAndShow(title, "", initialValue, value -> {
 			promptForValuesDialog.hide();
 			callback.callback(value);
 		});

@@ -11,6 +11,7 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.EntityView;
+import org.sagebionetworks.repo.model.table.MaterializedView;
 import org.sagebionetworks.repo.model.table.SubmissionView;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableEntity;
@@ -21,6 +22,7 @@ public class EntityTypeUtils {
 
 	public static final String SUBMISSION_VIEW_DISPLAY_NAME = "Submissions";
 	public static final String ENTITY_VIEW_DISPLAY_NAME = "View";
+	public static final String MATERIALIZED_VIEW_DISPLAY_NAME = "Materialized View";
 	public static final String DATASET_DISPLAY_NAME = "Dataset";
 	public static final String TABLE_ENTITY_DISPLAY_NAME = "Table";
 	public static final String UNKNOWN_TABLE_TYPE = "Unknown Table Type";
@@ -44,6 +46,8 @@ public class EntityTypeUtils {
 				className = DockerRepository.class.getName();
 			} else if (entityType.equalsIgnoreCase(EntityType.submissionview.name())) {
 				className = SubmissionView.class.getName();
+			} else if (entityType.equalsIgnoreCase(EntityType.materializedview.name())) {
+				className = MaterializedView.class.getName();
 			} else if (entityType.equalsIgnoreCase(EntityType.dataset.name())) {
 				className = Dataset.class.getName();
 			}
@@ -82,6 +86,9 @@ public class EntityTypeUtils {
 		} else if (SubmissionView.class.getName().equals(className)) {
 			// Submission View
 			type = EntityType.submissionview;
+		} else if (MaterializedView.class.getName().equals(className)) {
+			// Materialized View
+			type = EntityType.materializedview;
 		} else if (Dataset.class.getName().equals(className)) {
 			type = EntityType.dataset;
 		}
@@ -145,6 +152,8 @@ public class EntityTypeUtils {
 			friendlyName = DATASET_DISPLAY_NAME;
 		} else if (EntityView.class.getName().equals(className)) {
 			friendlyName = ENTITY_VIEW_DISPLAY_NAME;
+		} else if (MaterializedView.class.getName().equals(className)) {
+			friendlyName = MATERIALIZED_VIEW_DISPLAY_NAME;
 		} else if (SubmissionView.class.getName().equals(className)) {
 			friendlyName = SUBMISSION_VIEW_DISPLAY_NAME;
 		}

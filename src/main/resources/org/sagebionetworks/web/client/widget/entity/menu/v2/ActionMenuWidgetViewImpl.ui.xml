@@ -46,6 +46,7 @@
 				<a:ActionMenuItem icon="BAR_CHART" iconFixedWidth="true" action="SHOW_PROJECT_STATS">Show Project Statistics</a:ActionMenuItem>
 				<a:ActionMenuItem icon="EDIT" iconFixedWidth="true" action="EDIT_FILE_METADATA">Edit File Metadata</a:ActionMenuItem>
 				<a:ActionMenuItem icon="EDIT" iconFixedWidth="true" action="CHANGE_ENTITY_NAME">Rename</a:ActionMenuItem>
+				<a:ActionMenuItem icon="EDIT" iconFixedWidth="true" action="EDIT_DEFINING_SQL">Edit Defining SQL</a:ActionMenuItem>
 				<a:ActionMenuItem icon="INFO_CIRCLE" iconFixedWidth="true" action="SHOW_ANNOTATIONS">Annotations</a:ActionMenuItem>
 				<a:ActionMenuItem icon="UPLOAD" iconFixedWidth="true" action="UPLOAD_FILE">Upload or Link to a File</a:ActionMenuItem>
 				<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="CREATE_FOLDER">Add New Folder</a:ActionMenuItem>

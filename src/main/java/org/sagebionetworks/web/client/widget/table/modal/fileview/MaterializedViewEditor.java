@@ -66,6 +66,7 @@ public class MaterializedViewEditor implements MaterializedViewEditorView.Presen
 		jsClient.createEntity(newEntity).addCallback(new FutureCallback<Entity>() {
 			@Override
 			public void onSuccess(Entity entity) {
+				view.hide();
 				globalAppState.getPlaceChanger().goTo(new Synapse(entity.getId()));
 			}
 

@@ -13,6 +13,7 @@ public interface MaterializedViewEditorView extends IsWidget {
 	void setSynAlert(IsWidget w);
 	void setLoading(boolean loading);
 	void show();
+	void hide();
 	void reset();
 
 	public interface Presenter {
