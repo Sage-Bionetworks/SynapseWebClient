@@ -29,11 +29,6 @@
 					</b:DropDown>
 				</b:Tooltip>
 			</bh:Div>
-			<bh:Div addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end">
-				<w:HelpWidget ui:field="downloadHelp"
-					addStyleNames="margin-left-5 right movedown-5" visible="false"
-					placement="LEFT" />
-			</bh:Div>
 			<bh:Div addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end" ui:field="actionMenuContainer"/>
 		</bh:Div>
 		<bh:Div ui:field="addToDownloadListContainer" />

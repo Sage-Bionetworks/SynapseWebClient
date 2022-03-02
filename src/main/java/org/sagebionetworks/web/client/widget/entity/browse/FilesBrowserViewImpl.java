@@ -38,8 +38,6 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 	@UiField
 	Button downloadOptionsButton;
 	@UiField
-	HelpWidget downloadHelp;
-	@UiField
 	Div actionMenuContainer;
 	@UiField
 	Heading title;
