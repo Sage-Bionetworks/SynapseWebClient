@@ -578,6 +578,7 @@ public class EntityActionControllerImplTest {
 
 	@Test
 	public void testConfigureProjectLevelTableCommandsCanEdit() {
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
 		entityBundle.setEntity(new Project());
 		currentEntityArea = EntityArea.TABLES;
 		boolean canCertifiedUserEdit = true;
@@ -592,6 +593,9 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionListener(Action.ADD_FILE_VIEW, controller);
 		verify(mockActionMenu).setActionVisible(Action.ADD_PROJECT_VIEW, canCertifiedUserEdit);
 		verify(mockActionMenu).setActionListener(Action.ADD_PROJECT_VIEW, controller);
+		verify(mockActionMenu).setActionVisible(Action.ADD_MATERIALIZED_VIEW, canCertifiedUserEdit);
+		verify(mockActionMenu).setActionListener(Action.ADD_MATERIALIZED_VIEW, controller);
+		
 		verify(mockActionMenu).setToolsButtonIcon("Tables Tools", IconType.GEAR);
 	}
 
@@ -607,6 +611,7 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionVisible(Action.ADD_TABLE, canCertifiedUserEdit);
 		verify(mockActionMenu).setActionVisible(Action.ADD_FILE_VIEW, canCertifiedUserEdit);
 		verify(mockActionMenu).setActionVisible(Action.ADD_PROJECT_VIEW, canCertifiedUserEdit);
+		verify(mockActionMenu).setActionVisible(Action.ADD_MATERIALIZED_VIEW, canCertifiedUserEdit);
 	}
 
 	@Test
@@ -2243,5 +2248,36 @@ public class EntityActionControllerImplTest {
 		assertFalse(tableEntity.getIsSearchEnabled());
 		verify(mockView).showErrorMessage(errorMessage);
 	}
+	
+	@Test
+	public void testOnAddMaterializedView() {
+		AsyncMockStubber.callSuccessWith(mockMaterializedView).when(mockSynapseJavascriptClient).createEntity(any(Entity.class), any(AsyncCallback.class));
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkCreateEntity(any(EntityBundle.class), anyString(), any(Callback.class));
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
+		controller.onAction(Action.ADD_MATERIALIZED_VIEW);
+		verify(mockMaterializedViewEditor).configure(entityBundle.getEntity().getId());
+		verify(mockMaterializedViewEditor).show();
+	}
+	
+	@Test
+	public void testOnEditDefiningSql() {
+		String oldSql = "select everything";
+		entityBundle.setEntity(mockMaterializedView);
+		when(mockMaterializedView.getDefiningSQL()).thenReturn(oldSql);
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+		
+		controller.onAction(Action.EDIT_DEFINING_SQL);
 
+		// user is prompted for the new SQL
+		ArgumentCaptor<PromptCallback> callbackCaptor = ArgumentCaptor.forClass(PromptCallback.class);
+		verify(mockView).showPromptDialog(anyString(), anyString(), callbackCaptor.capture());
+		PromptCallback capturedCallback = callbackCaptor.getValue();
+		String newSql = "select nothing";
+		
+		capturedCallback.callback(newSql);
+		
+		verify(mockMaterializedView).setDefiningSQL(newSql);
+		verify(mockSynapseJavascriptClient).updateEntity(eq(mockMaterializedView), anyString(), anyBoolean(), any(AsyncCallback.class));
+	}
 }
