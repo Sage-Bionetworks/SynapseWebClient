@@ -130,6 +130,9 @@ public class EntityTypeUtils {
 		} else if (EntityView.class.getName().equals(className)) {
 			// FileView
 			icon = IconType.TH_LIST;
+		} else if (MaterializedView.class.getName().equals(className)) {
+			// FileView
+			icon = IconType.TH_LIST;
 		} else if (SubmissionView.class.getName().equals(className)) {
 			// Submission View
 			icon = IconType.SERVER;

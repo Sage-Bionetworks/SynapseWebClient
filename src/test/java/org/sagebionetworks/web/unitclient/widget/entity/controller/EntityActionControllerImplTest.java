@@ -20,6 +20,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.DisplayConstants.FILE_VIEW;
+import static org.sagebionetworks.web.client.DisplayConstants.MATERIALIZED_VIEW;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getDoneFuture;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getFailedFuture;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.ARE_YOU_SURE_YOU_WANT_TO_DELETE;
@@ -73,6 +74,7 @@ import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.EntityView;
+import org.sagebionetworks.repo.model.table.MaterializedView;
 import org.sagebionetworks.repo.model.table.SnapshotResponse;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
@@ -127,6 +129,7 @@ import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModal;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.MaterializedViewEditor;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
@@ -169,6 +172,8 @@ public class EntityActionControllerImplTest {
 	EditFileMetadataModalWidget mockEditFileMetadataModalWidget;
 	@Mock
 	EditProjectMetadataModalWidget mockEditProjectMetadataModalWidget;
+	@Mock
+	MaterializedViewEditor mockMaterializedViewEditor;
 	EntityFinderWidget.Builder mockEntityFinderBuilder;
 	@Mock
     EntityFinderWidget mockEntityFinder;
@@ -259,6 +264,8 @@ public class EntityActionControllerImplTest {
 	PromptForValuesModalView.Configuration mockPromptModalConfiguration;
 	@Mock
 	EntityView mockEntityView;
+	@Mock
+	MaterializedView mockMaterializedView;
 	PromptForValuesModalView.Configuration.Builder mockPromptModalConfigurationBuilder;
 	Set<ResourceAccess> resourceAccessSet;
 
@@ -282,6 +289,7 @@ public class EntityActionControllerImplTest {
 		when(mockPortalGinInjector.getEditFileMetadataModalWidget()).thenReturn(mockEditFileMetadataModalWidget);
 		when(mockPortalGinInjector.getEditProjectMetadataModalWidget()).thenReturn(mockEditProjectMetadataModalWidget);
 		when(mockPortalGinInjector.getEntityFinderBuilder()).thenReturn(mockEntityFinderBuilder);
+		when(mockPortalGinInjector.getMaterializedViewEditor()).thenReturn(mockMaterializedViewEditor);
 		when(mockEntityFinderBuilder.build()).thenReturn(mockEntityFinder);
 
 		when(mockPortalGinInjector.getUploadDialogWidget()).thenReturn(mockUploader);
@@ -386,6 +394,7 @@ public class EntityActionControllerImplTest {
 		// Show scope/items should not be visible for a TableEntity
 		verify(mockActionMenu).setActionVisible(Action.SHOW_VIEW_SCOPE, false);
 		verify(mockActionMenu).setActionVisible(Action.EDIT_DATASET_ITEMS, false);
+		verify(mockActionMenu).setActionVisible(Action.EDIT_DEFINING_SQL, false);
 	}
 
 	@Test
@@ -421,6 +430,7 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionVisible(Action.UPLOAD_TABLE_DATA, false);
 		// Show scope should not be visible
 		verify(mockActionMenu).setActionVisible(Action.SHOW_VIEW_SCOPE, false);
+		verify(mockActionMenu).setActionVisible(Action.EDIT_DEFINING_SQL, false);
 		// Edit dataset items should be visible
 		verify(mockActionMenu).setActionVisible(Action.EDIT_DATASET_ITEMS, true);
 	}
@@ -458,6 +468,7 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionVisible(Action.UPLOAD_TABLE_DATA, false);
 		// Show scope should not be visible
 		verify(mockActionMenu).setActionVisible(Action.SHOW_VIEW_SCOPE, false);
+		verify(mockActionMenu).setActionVisible(Action.EDIT_DEFINING_SQL, false);
 		// Edit dataset items should NOT be visible if not the current version
 		verify(mockActionMenu).setActionVisible(Action.EDIT_DATASET_ITEMS, false);
 	}
@@ -493,8 +504,46 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionVisible(Action.UPLOAD_TABLE_DATA, true);
 		// Show scope should be visible
 		verify(mockActionMenu).setActionVisible(Action.SHOW_VIEW_SCOPE, true);
+		verify(mockActionMenu).setActionVisible(Action.EDIT_DEFINING_SQL, false);
 		// Edit dataset items should not be visible
 
+		verify(mockActionMenu).setActionVisible(Action.EDIT_DATASET_ITEMS, false);
+	}
+	
+	@Test
+	public void testConfigureWithMaterializedView() {
+		entityBundle.setEntity(mockMaterializedView);
+		boolean canCertifiedUserEdit = true;
+		permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
+		// delete
+		verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, true);
+		verify(mockActionMenu).setActionText(Action.DELETE_ENTITY, DELETE_PREFIX + MATERIALIZED_VIEW);
+		verify(mockActionMenu).setActionListener(Action.DELETE_ENTITY, controller);
+		// share
+		verify(mockActionMenu).setActionVisible(Action.SHARE, true);
+		verify(mockActionMenu).setActionListener(Action.SHARE, controller);
+		// rename
+		verify(mockActionMenu).setActionVisible(Action.CHANGE_ENTITY_NAME, true);
+		verify(mockActionMenu).setActionText(Action.CHANGE_ENTITY_NAME, EDIT_NAME_AND_DESCRIPTION);
+		verify(mockActionMenu).setActionListener(Action.CHANGE_ENTITY_NAME, controller);
+		// upload
+		verify(mockActionMenu).setActionVisible(Action.UPLOAD_NEW_FILE, false);
+		// version history
+		verify(mockActionMenu).setActionVisible(Action.SHOW_VERSION_HISTORY, true);
+		// create table version (snapshot)
+		verify(mockActionMenu).setActionVisible(Action.CREATE_TABLE_VERSION, true);
+		verify(mockActionMenu).setActionListener(Action.CREATE_TABLE_VERSION, controller);
+		// edit actions, never enabled for Materialized Views
+		verify(mockActionMenu).setActionVisible(Action.EDIT_TABLE_DATA, false);
+		verify(mockActionMenu).setActionVisible(Action.UPLOAD_TABLE_DATA, false);
+		// Show scope should NOT be visible for Materialized Views (it's determined by the definingSQL)
+		verify(mockActionMenu).setActionVisible(Action.SHOW_VIEW_SCOPE, false);
+		// Materialized View has SQL definition that can be edited
+		verify(mockActionMenu).setActionVisible(Action.EDIT_DEFINING_SQL, true);
+		// Edit dataset items should not be visible
 		verify(mockActionMenu).setActionVisible(Action.EDIT_DATASET_ITEMS, false);
 	}
 
@@ -1790,7 +1839,7 @@ public class EntityActionControllerImplTest {
 		verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
 		// it prompts the user for a wiki page name
 		ArgumentCaptor<PromptCallback> callbackCaptor = ArgumentCaptor.forClass(PromptCallback.class);
-		verify(mockView).showPromptDialog(anyString(), callbackCaptor.capture());
+		verify(mockView).showPromptDialog(anyString(), anyString(), callbackCaptor.capture());
 		PromptCallback capturedCallback = callbackCaptor.getValue();
 		// if called back with an undefined value, a wiki page is still not created
 		capturedCallback.callback("");
