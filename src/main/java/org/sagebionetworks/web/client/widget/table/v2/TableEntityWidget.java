@@ -300,9 +300,6 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 		this.actionMenu.setActionListener(Action.SHOW_SIMPLE_SEARCH, action -> {
 			onShowSimpleSearch();
 		});
-		this.actionMenu.setActionListener(Action.SHOW_QUERY, action -> {
-			onShowQuery();
-		});
 	}
 
 	/**
@@ -410,7 +407,6 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 		actionMenu.setActionVisible(Action.SHOW_SIMPLE_SEARCH, false);
 		queryInputWidget.setShowSimpleSearchButtonVisible(false);
 		queryResultsWidget.setFacetsVisible(true);
-		actionMenu.setActionVisible(Action.SHOW_QUERY, false);
 		queryInputWidget.setQueryInputVisible(false);
 	}
 
@@ -429,7 +425,6 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 		actionMenu.setActionVisible(Action.SHOW_SIMPLE_SEARCH, showSimpleSearch);
 		queryInputWidget.setShowSimpleSearchButtonVisible(showSimpleSearch);
 		queryResultsWidget.setFacetsVisible(false);
-		actionMenu.setActionVisible(Action.SHOW_QUERY, false);
 		queryInputWidget.setQueryInputVisible(true);
 	}
 

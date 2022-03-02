@@ -61,17 +61,12 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 		});
 		entityTreeBrowser.setIsEmptyCallback(isEmpty -> {
 			if (isEmpty) {
-				downloadHelp.setHelpMarkdown("There are no downloadable items in this folder.");
-				downloadHelp.setVisible(true);
 				downloadTooltip.setTitle("There are no downloadable items in this folder.");
 				downloadOptionsButton.setEnabled(false);
 			} else if (!authController.isLoggedIn()) {
-				downloadHelp.setHelpMarkdown("You must be logged in to download items in this folder.");
-				downloadHelp.setVisible(true);
 				downloadTooltip.setTitle("You must be logged in to download items in this folder.");
 				downloadOptionsButton.setEnabled(false);
 			} else {
-				downloadHelp.setVisible(false);
 				downloadTooltip.setTitle("Direct and programmatic download options");
 				downloadOptionsButton.setEnabled(true);
 			}

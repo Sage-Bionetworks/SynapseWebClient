@@ -8,14 +8,11 @@
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 
 	<g:FlowPanel>
-		<b:Tooltip title="Edit view query">
+		<b:Tooltip title="Edit query">
 			<a:ActionButton visible="false" icon="FILTER" addStyleNames="margin-right-5" action="SHOW_ADVANCED_SEARCH" />
 		</b:Tooltip>
 		<b:Tooltip title="Show simple search">
 			<a:ActionButton visible="false" icon="FILTER" addStyleNames="margin-right-5" action="SHOW_SIMPLE_SEARCH" />
-		</b:Tooltip>
-		<b:Tooltip title="Show query">
-			<a:ActionButton visible="false" icon="DATABASE" addStyleNames="margin-right-5" action="SHOW_QUERY" />
 		</b:Tooltip>
 		<b:Tooltip ui:field="editTableDataTooltip" title="Edit query results">
 			<bh:Span> <!-- Have to wrap the button in a span we get a mouseevent to show the tooltip if the button is disabled -->
