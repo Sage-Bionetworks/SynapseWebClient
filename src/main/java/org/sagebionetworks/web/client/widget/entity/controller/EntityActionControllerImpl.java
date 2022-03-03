@@ -998,7 +998,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 
 	public static boolean isVersionSupported(Entity entity, CookieProvider cookies) {
-		return entity instanceof Versionable;
+		boolean isMaterializedView = entity instanceof MaterializedView;
+		return entity instanceof Versionable && !isMaterializedView;
 	}
 
 	public boolean isTopLevelProjectToolsMenu(Entity entity, EntityArea area) {

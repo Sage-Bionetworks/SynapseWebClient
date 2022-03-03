@@ -531,11 +531,11 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionListener(Action.CHANGE_ENTITY_NAME, controller);
 		// upload
 		verify(mockActionMenu).setActionVisible(Action.UPLOAD_NEW_FILE, false);
+		// versions not currently supported for Materialized Views
 		// version history
-		verify(mockActionMenu).setActionVisible(Action.SHOW_VERSION_HISTORY, true);
+		verify(mockActionMenu).setActionVisible(Action.SHOW_VERSION_HISTORY, false);
 		// create table version (snapshot)
-		verify(mockActionMenu).setActionVisible(Action.CREATE_TABLE_VERSION, true);
-		verify(mockActionMenu).setActionListener(Action.CREATE_TABLE_VERSION, controller);
+		verify(mockActionMenu).setActionVisible(Action.CREATE_TABLE_VERSION, false);
 		// edit actions, never enabled for Materialized Views
 		verify(mockActionMenu).setActionVisible(Action.EDIT_TABLE_DATA, false);
 		verify(mockActionMenu).setActionVisible(Action.UPLOAD_TABLE_DATA, false);
