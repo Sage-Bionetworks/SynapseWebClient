@@ -76,8 +76,6 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	@UiField
 	Span versionUiCurrent;
 	@UiField
-	HelpWidget viewOnlyHelp;
-	@UiField
 	Button downloadOptionsButton;
 	@UiField
 	Div actionMenuContainer;
@@ -125,9 +123,6 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 		md5Link.clear();
 		md5LinkContainer.setWidget(md5Link);
 		entityIcon.setType(EntityTypeUtils.getEntityType(entity));
-		String viewOnlyHelpText = authController.isLoggedIn() ? "You do not have download access for this item." : "You need to log in to download this file.";
-		viewOnlyHelp.setHelpMarkdown(viewOnlyHelpText);
-		downloadTooltip.setTitle(viewOnlyHelpText);
 	}
 
 	@Override
@@ -221,8 +216,12 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	@Override
 	public void setCanDownload(boolean canDownload) {
 		downloadOptionsButton.setEnabled(canDownload);
-		downloadTooltip.setTitle("Direct and programmatic download options");
-		viewOnlyHelp.setVisible(!canDownload);
+		if(!canDownload){
+			String viewOnlyHelpText = authController.isLoggedIn() ? "You do not have download access for this item." : "You need to log in to download this file.";
+			downloadTooltip.setTitle(viewOnlyHelpText);
+		} else{
+			downloadTooltip.setTitle("Direct and programmatic download options");
+		}
 	}
 	
 	@Override

@@ -30,9 +30,6 @@
 						</b:DropDown>
 					</b:Tooltip>
 				</bh:Div>
-				<bh:Div addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end">
-					<w:HelpWidget ui:field="viewOnlyHelp" helpMarkdown="You do not have download access for this item." addStyleNames="margin-right-10 margin-top-5" visible="false" placement="LEFT"/>
-				</bh:Div>
 				<bh:Div addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end" ui:field="actionMenuContainer"/>
 			</bh:Div>
 			<bh:Div ui:field="versionInfoUI">
