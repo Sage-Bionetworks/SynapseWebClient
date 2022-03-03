@@ -9,11 +9,14 @@ import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.entity.Direction;
 import org.sagebionetworks.repo.model.entity.SortBy;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
+
 import com.google.gwt.http.client.Request;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -34,6 +37,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, IsWidget 
 	private CallbackP<EntityHeader> onTableClickCallback;
 	private LoadMoreWidgetContainer loadMoreWidget;
 	private SynapseAlert synAlert;
+	private PortalGinInjector ginInjector;
 	public static final SortBy DEFAULT_SORT_BY = SortBy.CREATED_ON;
 	public static final Direction DEFAULT_DIRECTION = Direction.DESC;
 	boolean isInitializing = false;
@@ -42,11 +46,12 @@ public class TableListWidget implements TableListWidgetView.Presenter, IsWidget 
 	private List<EntityType> typesToShow = null;
 
 	@Inject
-	public TableListWidget(TableListWidgetView view, SynapseJavascriptClient jsClient, LoadMoreWidgetContainer loadMoreWidget, SynapseAlert synAlert) {
+	public TableListWidget(TableListWidgetView view, SynapseJavascriptClient jsClient, LoadMoreWidgetContainer loadMoreWidget, SynapseAlert synAlert, PortalGinInjector ginInjector) {
 		this.view = view;
 		this.jsClient = jsClient;
 		this.loadMoreWidget = loadMoreWidget;
 		this.synAlert = synAlert;
+		this.ginInjector = ginInjector;
 		this.view.setPresenter(this);
 		this.view.setLoadMoreWidget(loadMoreWidget);
 		view.setSynAlert(synAlert);
@@ -60,10 +65,6 @@ public class TableListWidget implements TableListWidgetView.Presenter, IsWidget 
 
 	/**
 	 * Configure this widget before use.
-	 * 
-	 * @param projectOwnerId
-	 * @param canEdit
-	 * @param showAddTable
 	 */
 	public void configure(EntityBundle parentBundle, List<EntityType> typesToShow) {
 		if (currentRequest != null) {
@@ -72,6 +73,12 @@ public class TableListWidget implements TableListWidgetView.Presenter, IsWidget 
 		isInitializing = true;
 		this.parentBundle = parentBundle;
 		this.typesToShow = typesToShow;
+		if (typesToShow.size() == 1 && typesToShow.contains(EntityType.dataset)) {
+			this.view.setTableType(TableType.dataset);
+		} else {
+			this.view.setTableType(TableType.table);
+		}
+		this.view.setFileCountVisible(shouldItemCountBeVisible());
 		loadData();
 	}
 
@@ -101,10 +108,10 @@ public class TableListWidget implements TableListWidgetView.Presenter, IsWidget 
 	}
 
 	public void loadData() {
+		view.setState(TableListWidgetView.TableListWidgetViewState.LOADING);
 		resetSynIdList();
 		query = createQuery(parentBundle.getEntity().getId());
 		view.clearTableWidgets();
-		view.hideLoading();
 		query.setNextPageToken(null);
 		loadMore();
 	}
@@ -126,8 +133,6 @@ public class TableListWidget implements TableListWidgetView.Presenter, IsWidget 
 
 	/**
 	 * Run a query and populate the page with the results.
-	 * 
-	 * @param offset The offset used by the query.
 	 */
 	private void loadMore() {
 		synAlert.clear();
@@ -141,21 +146,31 @@ public class TableListWidget implements TableListWidgetView.Presenter, IsWidget 
 				query.setNextPageToken(result.getNextPageToken());
 				loadMoreWidget.setIsMore(result.getNextPageToken() != null);
 				setResults(result.getPage());
+				if (idList == null || idList.isEmpty()) {
+					view.setState(TableListWidgetView.TableListWidgetViewState.EMPTY);
+				} else {
+					view.setState(TableListWidgetView.TableListWidgetViewState.POPULATED);
+				}
 				isInitializing = false;
 			};
 
 			@Override
 			public void onFailure(Throwable caught) {
+				view.setState(TableListWidgetView.TableListWidgetViewState.ERROR);
 				synAlert.handleException(caught);
 			}
 		});
 	}
 
 	private void setResults(List<EntityHeader> results) {
-		view.hideLoading();
 		for (EntityHeader header : results) {
 			addSynIdToList(header.getId());
-			view.addTableListItem(header);
+			TableEntityListGroupItem item = ginInjector.getTableEntityListGroupItem();
+			item.configure(header, event -> {
+				this.onTableClicked(header);
+			});
+			item.setItemCountVisible(shouldItemCountBeVisible());
+			view.addTableListItem(item);
 		}
 		for (EntityHeader header : results) {
 			jsClient.populateEntityBundleCache(header.getId());
@@ -194,6 +209,10 @@ public class TableListWidget implements TableListWidgetView.Presenter, IsWidget 
 			clipboardValue.append("\n");
 		}
 		view.copyToClipboard(clipboardValue.toString());
+	}
+
+	private boolean shouldItemCountBeVisible() {
+		return this.typesToShow.contains(EntityType.dataset);
 	}
 
 }

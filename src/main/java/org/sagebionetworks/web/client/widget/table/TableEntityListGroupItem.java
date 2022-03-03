@@ -5,16 +5,24 @@ import static org.sagebionetworks.web.client.DisplayUtils.TEXTBOX_SELECT_ALL_FIE
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.EntityType;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
+import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.web.client.DateTimeUtils;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 import org.sagebionetworks.web.client.widget.EntityTypeIcon;
 import org.sagebionetworks.web.client.widget.entity.EntityBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -41,6 +49,10 @@ public class TableEntityListGroupItem implements IsWidget {
 	@UiField
 	Div modifiedByField;
 	@UiField
+	Label itemCountField;
+	@UiField
+	TableData itemCountColumn;
+	@UiField
 	Label modifiedOnField;
 	@UiField
 	Label createdOnField;
@@ -56,13 +68,16 @@ public class TableEntityListGroupItem implements IsWidget {
 	private UserBadge createdByBadge;
 	private UserBadge modifiedByBadge;
 	private DateTimeUtils dateTimeUtils;
+	private SynapseJavascriptClient jsClient;
+
 
 	@Inject
-	TableEntityListGroupItem(Binder binder, UserBadge createdByBadge, UserBadge modifiedByBadge, DateTimeUtils dateTimeUtils, PortalGinInjector ginInjector) {
+	TableEntityListGroupItem(Binder binder, UserBadge createdByBadge, UserBadge modifiedByBadge, DateTimeUtils dateTimeUtils, PortalGinInjector ginInjector, SynapseJavascriptClient jsClient) {
 		w = binder.createAndBindUi(this);
 		this.createdByBadge = createdByBadge;
 		this.modifiedByBadge = modifiedByBadge;
 		this.dateTimeUtils = dateTimeUtils;
+		this.jsClient = jsClient;
 		if (EntityBadgeViewImpl.placeChanger == null) {
 			EntityBadgeViewImpl.placeChanger = ginInjector.getGlobalApplicationState().getPlaceChanger();
 		}
@@ -95,10 +110,34 @@ public class TableEntityListGroupItem implements IsWidget {
 
 		icon.setType(EntityTypeUtils.getEntityType(header));
 		typeField.setText(EntityTypeUtils.getFriendlyTableTypeName(header.getType()));
+		if (EntityType.dataset.equals(EntityTypeUtils.getEntityType(header))) {
+			jsClient.getEntityBundleFromCache(header.getId(), new AsyncCallback<EntityBundle>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					DisplayUtils.showErrorMessage(caught.getMessage());
+				}
+
+				@Override
+				public void onSuccess(EntityBundle result) {
+					Dataset dataset = (Dataset) result.getEntity();
+					int itemCount = dataset.getItems() == null ? 0 : dataset.getItems().size();
+					itemCountField.setText(NumberFormat.getDecimalFormat().format(itemCount));
+				}
+			});
+		}
 	}
 
 	@Override
 	public Widget asWidget() {
 		return w.asWidget();
+	}
+
+	public void setItemCountVisible(boolean visible) {
+		this.itemCountColumn.setVisible(visible);
+		if (visible) {
+			itemCountColumn.addStyleName("visible-md visible-lg");
+		} else {
+			itemCountColumn.removeStyleName("visible-md visible-lg");
+		}
 	}
 }

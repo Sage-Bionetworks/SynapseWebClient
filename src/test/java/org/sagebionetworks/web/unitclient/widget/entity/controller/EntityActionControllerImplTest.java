@@ -1088,6 +1088,7 @@ public class EntityActionControllerImplTest {
 		verify(mockView, times(2)).hideCreateVersionDialog();
 		verify(mockPopupUtils).notify(any(), any(), any(ToastMessageOptions.class));
 		verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
+		verify(mockPlaceChanger).goTo(any());
 	}
 
 	@Test
@@ -1144,6 +1145,7 @@ public class EntityActionControllerImplTest {
 		verify(mockView).hideCreateVersionDialog();
 		verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
 		verify(mockPopupUtils).notify(any(), any(), any(ToastMessageOptions.class));
+		verify(mockPlaceChanger).goTo(any());
 	}
 
 	@Test
@@ -1203,6 +1205,7 @@ public class EntityActionControllerImplTest {
 		verify(mockView).hideCreateVersionDialog();
 		verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
 		verify(mockPopupUtils).notify(any(), any(), any(ToastMessageOptions.class));
+		verify(mockPlaceChanger).goTo(any());
 	}
 
 	@Test
