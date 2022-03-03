@@ -19,17 +19,16 @@
 					</bh:Div>
 				</bh:Div>
 				<bh:Div addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end">
-					<b:DropDown addStyleNames="displayInlineBlock">
-						<b:Button dataToggle="DROPDOWN" type="PRIMARY" text="Download Options" ui:field="downloadOptionsButton" marginRight="5" />
-						<b:DropDownMenu ui:field="dropdownMenu">
-							<b:AnchorListItem ui:field="addToDownloadListLink">Add to Download Cart</b:AnchorListItem>
-							<b:Divider/>
-							<b:AnchorListItem ui:field="programmaticOptionsLink">Programmatic Options</b:AnchorListItem>
-						</b:DropDownMenu>
-					</b:DropDown>
-				</bh:Div>
-				<bh:Div addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end">
-					<w:HelpWidget ui:field="viewOnlyHelp" helpMarkdown="You do not have download access for this item." addStyleNames="margin-right-10 margin-top-5" visible="false" placement="LEFT"/>
+					<b:Tooltip ui:field="downloadTooltip">
+						<b:DropDown addStyleNames="displayInlineBlock">
+							<b:Button dataToggle="DROPDOWN" type="PRIMARY" text="Download Options" ui:field="downloadOptionsButton" marginRight="5" />
+							<b:DropDownMenu ui:field="dropdownMenu">
+								<b:AnchorListItem ui:field="addToDownloadListLink">Add to Download Cart</b:AnchorListItem>
+								<b:Divider/>
+								<b:AnchorListItem ui:field="programmaticOptionsLink">Programmatic Options</b:AnchorListItem>
+							</b:DropDownMenu>
+						</b:DropDown>
+					</b:Tooltip>
 				</bh:Div>
 				<bh:Div addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end" ui:field="actionMenuContainer"/>
 			</bh:Div>

@@ -192,10 +192,9 @@ public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 		tableDownloadOptions.setEnabled(enabled);
 		if (enabled) {
 			// The tooltip only shows information about why it's disabled, so hide the tooltips if enabled
-			downloadOptionsTooltip.setTrigger(Trigger.MANUAL);
-			downloadOptionsTooltip.hide();
+			downloadOptionsTooltip.setTitle("Direct and programmatic download options.");
 		} else {
-			downloadOptionsTooltip.setTrigger(Trigger.HOVER);
+			downloadOptionsTooltip.setTitle("You must be logged in to download items in this folder.");
 		}
 
 		// Commit the changes to the tooltip

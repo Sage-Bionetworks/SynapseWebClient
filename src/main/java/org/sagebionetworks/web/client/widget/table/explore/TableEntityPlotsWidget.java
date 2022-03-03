@@ -277,10 +277,6 @@ public class TableEntityPlotsWidget implements TableEntityWidgetView.Presenter, 
 		this.actionMenu.setActionListener(Action.ADD_TABLE_RESULTS_TO_DOWNLOAD_LIST, action -> {
 			onAddToDownloadList();
 		});
-
-		this.actionMenu.setActionListener(Action.SHOW_QUERY, action -> {
-			onShowQuery();
-		});
 	}
 
 	/**

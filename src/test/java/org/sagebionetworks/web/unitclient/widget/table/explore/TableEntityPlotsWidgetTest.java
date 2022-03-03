@@ -426,7 +426,6 @@ public class TableEntityPlotsWidgetTest {
 		verify(mockActionMenu).setActionVisible(Action.TABLE_DOWNLOAD_PROGRAMMATIC_OPTIONS, true);
 
 		// also verify other commands have been hooked up
-		verify(mockActionMenu).setActionListener(eq(Action.SHOW_QUERY), any());
 		verify(mockActionMenu).setActionListener(eq(Action.TABLE_DOWNLOAD_PROGRAMMATIC_OPTIONS), any());
 		verify(mockActionMenu).setActionListener(eq(Action.ADD_TABLE_RESULTS_TO_DOWNLOAD_LIST), any());
 	}
