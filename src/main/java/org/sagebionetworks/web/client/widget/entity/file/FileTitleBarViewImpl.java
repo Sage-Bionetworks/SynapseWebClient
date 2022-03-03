@@ -106,7 +106,9 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 			presenter.onProgrammaticDownloadOptions();
 		});
 		showVersionHistoryLink.addClickHandler(event -> {
+			boolean isShown = !presenter.isVersionHistoryVisible();
 			presenter.toggleShowVersionHistory();
+			showVersionHistoryLink.setText((isShown ? "Hide" : "Show") + " Version History");
 		});
 
 	}

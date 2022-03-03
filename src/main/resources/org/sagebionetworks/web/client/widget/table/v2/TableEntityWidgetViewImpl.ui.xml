@@ -37,12 +37,12 @@
 			</bh:Div>
 		</bh:Div>
 
-        <w:ReactComponentDiv ui:field="itemsEditorContainer" />
+		<w:ReactComponentDiv ui:field="itemsEditorContainer" />
 
-        <bh:Div ui:field="addToDownloadListContainer" />
+		<bh:Div ui:field="addToDownloadListContainer" />
 		<bh:Div styleName="margin-top-5" />
 		<g:SimplePanel ui:field="queryResultsPanel" />
-
+		<bh:Div ui:field="plotNavContainer" />
 		<bh:Div ui:field="modalContainer" />
 	</g:HTMLPanel>
 </ui:UiBinder>

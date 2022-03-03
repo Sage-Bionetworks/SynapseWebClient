@@ -109,6 +109,7 @@ public class EntityMetadata implements Presenter {
 		});
 
 		actionMenu.setActionListener(Action.SHOW_VERSION_HISTORY, action -> {
+
 			getVersionHistoryWidget().setVisible(!getVersionHistoryWidget().isVisible());
 		});
 

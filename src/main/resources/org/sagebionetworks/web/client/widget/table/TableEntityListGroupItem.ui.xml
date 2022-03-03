@@ -12,7 +12,7 @@
 			<t:TableHeader width="20px" />
 			<t:TableData width="20px">
 				<g:FocusPanel ui:field="iconContainer">
-                    <w:EntityTypeIcon ui:field="icon" type="table" />
+					<w:EntityTypeIcon ui:field="icon" type="table" />
 				</g:FocusPanel>
 			</t:TableData>
 			<t:TableData addStyleNames="overflow-x-hidden ">
@@ -26,8 +26,17 @@
 				addStyleNames="visible-sm visible-md visible-lg overflow-x-hidden">
 				<g:Label ui:field="typeField" />
 			</t:TableData>
-			<t:TableData width="310px"
+			<t:TableData width="90px"
+				 addStyleNames="visible-md visible-lg text-align-right padding-right-15"
+			 ui:field="itemCountColumn">
+				<g:Label ui:field="itemCountField" />
+			</t:TableData>
+			<t:TableData width="270px"
 				addStyleNames="visible-xl overflow-x-hidden">
+				<bh:Div ui:field="createdByField" />
+			</t:TableData>
+			<t:TableData width="270px"
+                addStyleNames="visible-xl overflow-x-hidden">
 				<bh:Div ui:field="modifiedByField" />
 			</t:TableData>
 			<t:TableData width="165px"

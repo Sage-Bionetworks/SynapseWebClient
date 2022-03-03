@@ -66,6 +66,7 @@ import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.entity.tabs.TablesTabView;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
+import org.sagebionetworks.web.client.widget.table.explore.TableEntityPlotsWidget;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
@@ -116,6 +117,9 @@ public class DatasetsTabTest {
 	@Mock
 	TableEntityWidget mockTableEntityWidget;
 	@Mock
+	TableEntityPlotsWidget mockTableEntityPlotsWidget;
+
+	@Mock
 	ModifiedCreatedByWidget mockModifiedCreatedBy;
 	@Captor
 	ArgumentCaptor<CallbackP> callbackPCaptor;
@@ -149,7 +153,6 @@ public class DatasetsTabTest {
 	public void setUp() {
 		tab = new DatasetsTab(mockTab, mockPortalGinInjector);
 		when(mockTab.getEntityActionMenu()).thenReturn(mockActionMenuWidget);
-		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
 		when(mockPortalGinInjector.getCookieProvider()).thenReturn(mockCookies);
 		when(mockPortalGinInjector.getTablesTabView()).thenReturn(mockView);
 		when(mockPortalGinInjector.getTableListWidget()).thenReturn(mockTableListWidget);
@@ -172,7 +175,8 @@ public class DatasetsTabTest {
 		when(mockProjectEntityBundle.getPermissions()).thenReturn(mockPermissions);
 
 		when(mockPortalGinInjector.createNewTableEntityWidget()).thenReturn(mockTableEntityWidget);
-
+		when(mockPortalGinInjector.createNewTableEntityPlotsWidget()).thenReturn(mockTableEntityPlotsWidget);
+		
 		when(mockDatasetBundle.getEntity()).thenReturn(mockDataset);
 		when(mockDataset.getId()).thenReturn(datasetId);
 		when(mockDataset.getName()).thenReturn(datasetName);
@@ -201,6 +205,8 @@ public class DatasetsTabTest {
 		two.setDirection(SortDirection.DESC);
 		query.setSort(Arrays.asList(one, two));
 		tab.lazyInject();
+		
+		when(mockTableEntityPlotsWidget.getDefaultQuery()).thenReturn(query);
 	}
 
 	@Test
@@ -238,7 +244,7 @@ public class DatasetsTabTest {
 
 	private void verifyTableConfiguration(Long version) {
 		verify(mockBreadcrumb).configure(any(EntityPath.class), eq(EntityArea.DATASETS));
-		verify(mockTitleBar).configure(mockDatasetBundle, mockActionMenuWidget);
+		verify(mockTitleBar).configure(mockDatasetBundle, mockActionMenuWidget, mockVersionHistoryWidget);
 		verify(mockEntityMetadata).configure(mockDatasetBundle, version, mockActionMenuWidget);
 		verify(mockTableEntityWidget).configure(mockDatasetBundle, version, true, tab, mockActionMenuWidget);
 		verify(mockView).setTableEntityWidget(any(Widget.class));

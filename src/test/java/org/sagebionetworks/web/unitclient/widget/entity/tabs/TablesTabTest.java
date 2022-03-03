@@ -67,6 +67,7 @@ import org.sagebionetworks.web.client.widget.entity.tabs.TablesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.TablesTabView;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
+import org.sagebionetworks.web.client.widget.table.explore.TableEntityPlotsWidget;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
@@ -119,6 +120,8 @@ public class TablesTabTest {
 	@Mock
 	TableEntityWidget mockTableEntityWidget;
 	@Mock
+	TableEntityPlotsWidget mockTableEntityPlotsWidget;
+	@Mock
 	WikiPageWidget mockWikiPageWidget;
 	@Mock
 	ModifiedCreatedByWidget mockModifiedCreatedBy;
@@ -152,7 +155,6 @@ public class TablesTabTest {
 	public void setUp() {
 		tab = new TablesTab(mockTab, mockPortalGinInjector);
 		when(mockTab.getEntityActionMenu()).thenReturn(mockActionMenuWidget);
-		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
 		when(mockPortalGinInjector.getCookieProvider()).thenReturn(mockCookies);
 		when(mockPortalGinInjector.getTablesTabView()).thenReturn(mockView);
 		when(mockPortalGinInjector.getTableListWidget()).thenReturn(mockTableListWidget);
@@ -166,6 +168,7 @@ public class TablesTabTest {
 		when(mockPortalGinInjector.getGlobalApplicationState()).thenReturn(mockGlobalApplicationState);
 		when(mockPortalGinInjector.getSynapseJavascriptClient()).thenReturn(mockJsClient);
 		when(mockPortalGinInjector.getWikiPageWidget()).thenReturn(mockWikiPageWidget);
+		when(mockPortalGinInjector.createNewTableEntityPlotsWidget()).thenReturn(mockTableEntityPlotsWidget);
 
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		tab.setEntitySelectedCallback(mockEntitySelectedCallback);
@@ -261,7 +264,7 @@ public class TablesTabTest {
 
 	private void verifyTableConfiguration(Long version) {
 		verify(mockBreadcrumb).configure(any(EntityPath.class), eq(EntityArea.TABLES));
-		verify(mockTitleBar).configure(mockTableEntityBundle, mockActionMenuWidget);
+		verify(mockTitleBar).configure(mockTableEntityBundle, mockActionMenuWidget, mockVersionHistoryWidget);
 		verify(mockEntityMetadata).configure(mockTableEntityBundle, version, mockActionMenuWidget);
 		verify(mockTableEntityWidget).configure(mockTableEntityBundle, version, true, tab, mockActionMenuWidget);
 		verify(mockView).setTableEntityWidget(any(Widget.class));

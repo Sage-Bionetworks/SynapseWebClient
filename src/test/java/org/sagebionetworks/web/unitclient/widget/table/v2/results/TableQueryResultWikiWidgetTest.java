@@ -29,16 +29,19 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.Query;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.table.explore.TableEntityPlotsWidget;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWikiWidget;
@@ -65,6 +68,8 @@ public class TableQueryResultWikiWidgetTest {
 	@Mock
 	TableEntityWidget mockTableEntityWidget;
 	@Mock
+	TableEntityPlotsWidget mockTableEntityPlotsWidget;
+	@Mock
 	ActionMenuWidget mockActionMenu;
 	@Mock
 	EntityActionController mockEntityActionController;
@@ -75,6 +80,8 @@ public class TableQueryResultWikiWidgetTest {
 	PortalGinInjector mockGinInjector;
 	@Mock
 	GWTWrapper mockGWT;
+	@Mock
+	CookieProvider mockCookies;
 	@Captor
 	ArgumentCaptor<AsyncCallback> asyncCallbackCaptor;
 	@Captor
@@ -82,9 +89,11 @@ public class TableQueryResultWikiWidgetTest {
 
 	@Before
 	public void before() {
+		when(mockGinInjector.getCookieProvider()).thenReturn(mockCookies);
 		widget = new TableQueryResultWikiWidget(mockView, mockActionMenu, mockEntityActionController, mockSynapseJSNIUtils, mockSynapseJavascriptClient, mockSynAlert, mockGWT, mockGinInjector);
 		AsyncMockStubber.callSuccessWith(mockEntityBundle).when(mockSynapseJavascriptClient).getEntityBundleFromCache(anyString(), any(AsyncCallback.class));
 		when(mockGinInjector.createNewTableEntityWidget()).thenReturn(mockTableEntityWidget);
+		when(mockGinInjector.createNewTableEntityPlotsWidget()).thenReturn(mockTableEntityPlotsWidget);
 	}
 
 	@Test
@@ -186,7 +195,7 @@ public class TableQueryResultWikiWidgetTest {
 
 		descriptor.put(WidgetConstants.TABLE_QUERY_KEY, sql);
 		descriptor.put(WidgetConstants.QUERY_VISIBLE, Boolean.FALSE.toString());
-
+		
 		widget.configure(wikiKey, descriptor, null, null);
 
 		Query query = widget.getQueryString();

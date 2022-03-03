@@ -19,5 +19,7 @@ public interface TableTitleBarView extends IsWidget, SynapseView {
 	 */
 	interface Presenter {
 		void toggleShowVersionHistory();
+
+		boolean isVersionHistoryVisible();
 	}
 }

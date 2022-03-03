@@ -21,7 +21,6 @@ import org.sagebionetworks.repo.model.table.QueryResult;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.RowSet;
-import org.sagebionetworks.repo.model.table.SelectColumn;
 import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -301,32 +300,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 			showError("No rows returned.");
 		}
 
-		fireFinishEvent(true, isQueryResultEditable());
-	}
-
-	/**
-	 * The results are editable if all of the select columns have ID
-	 * 
-	 * @return
-	 */
-	public boolean isQueryResultEditable() {
-		if (tableType.equals(TableType.dataset)) {
-			// Datasets should not be editable (SWC-5870, SWC-5903)
-			return false;
-		}
-
-		List<SelectColumn> selectColums = QueryBundleUtils.getSelectFromBundle(this.bundle);
-		if (selectColums == null) {
-			return false;
-		}
-		// Do all columns have IDs?
-		for (SelectColumn col : selectColums) {
-			if (col.getId() == null) {
-				return false;
-			}
-		}
-		// All of the columns have ID so we can edit
-		return true;
+		fireFinishEvent(true, QueryResultEditorWidget.isQueryResultEditable(this.bundle, tableType));
 	}
 
 	/**

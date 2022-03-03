@@ -223,7 +223,7 @@ public class FilesTab {
 		// File title bar
 		view.setFileTitlebarVisible(isFile);
 		if (isFile) {
-			fileTitleBar.configure(bundle, tab.getEntityActionMenu());
+			fileTitleBar.configure(bundle, tab.getEntityActionMenu(), metadata.getVersionHistoryWidget());
 			previewWidget.configure(bundle);
 			discussionThreadListWidget.configure(currentEntityId, null, null);
 			view.setDiscussionText(currentEntity.getName());

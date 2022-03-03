@@ -43,6 +43,7 @@ import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidg
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
+import org.sagebionetworks.web.client.widget.entity.VersionHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
@@ -123,6 +124,8 @@ public class FilesTabTest {
 	ActionMenuWidget mockActionMenuWidget;
 	@Mock
 	SynapseJavascriptClient mockJsClient;
+	@Mock
+	VersionHistoryWidget mockVersionHistoryWidget;
 
 	FilesTab tab;
 	String projectEntityId = "syn9";
@@ -268,6 +271,7 @@ public class FilesTabTest {
 		when(mockPermissions.getIsCertifiedUser()).thenReturn(isCertifiedUser);
 		when(mockEntityBundle.getFileHandles()).thenReturn(mockFileHandles);
 		when(mockEntityBundle.getEntity()).thenReturn(mockFileEntity);
+		when(mockEntityMetadata.getVersionHistoryWidget()).thenReturn(mockVersionHistoryWidget);
 
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
 		tab.configure(mockEntityBundle, version);
@@ -282,7 +286,7 @@ public class FilesTabTest {
 		verify(mockView).setWikiPageWidgetVisible(false);
 		verify(mockView).setWikiPageWidgetVisible(true);
 
-		verify(mockFileTitleBar).configure(mockEntityBundle, mockActionMenuWidget);
+		verify(mockFileTitleBar).configure(mockEntityBundle, mockActionMenuWidget, mockVersionHistoryWidget);
 		verify(mockPreviewWidget).configure(mockEntityBundle);
 
 		verify(mockEntityMetadata).configure(mockEntityBundle, version, mockActionMenuWidget);

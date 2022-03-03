@@ -4,6 +4,7 @@ import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.entity.VersionHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 
@@ -20,6 +21,7 @@ public class TableTitleBar implements SynapseWidgetPresenter, TableTitleBarView.
 	private TableTitleBarView view;
 	private EntityBundle entityBundle;
 	private ActionMenuWidget actionMenuWidget;
+	private VersionHistoryWidget versionHistoryWidget;
 
 	@Inject
 	public TableTitleBar(TableTitleBarView view) {
@@ -27,9 +29,10 @@ public class TableTitleBar implements SynapseWidgetPresenter, TableTitleBarView.
 		view.setPresenter(this);
 	}
 
-	public void configure(EntityBundle bundle, ActionMenuWidget actionMenu) {
+	public void configure(EntityBundle bundle, ActionMenuWidget actionMenu, VersionHistoryWidget versionHistoryWidget) {
 		this.entityBundle = bundle;
 		this.actionMenuWidget = actionMenu;
+		this.versionHistoryWidget = versionHistoryWidget;
 
 		view.createTitlebar(bundle.getEntity());
 		view.setEntityName(bundle.getEntity().getName());
@@ -80,5 +83,10 @@ public class TableTitleBar implements SynapseWidgetPresenter, TableTitleBarView.
 	@Override
 	public void toggleShowVersionHistory() {
 		this.actionMenuWidget.onAction(Action.SHOW_VERSION_HISTORY);
+	}
+
+	@Override
+	public boolean isVersionHistoryVisible() {
+		return this.versionHistoryWidget.isVisible();
 	}
 }
