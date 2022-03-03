@@ -2254,6 +2254,7 @@ public class EntityActionControllerImplTest {
 	
 	@Test
 	public void testOnAddMaterializedView() {
+		when(mockMaterializedViewEditor.configure(anyString())).thenReturn(mockMaterializedViewEditor);
 		AsyncMockStubber.callSuccessWith(mockMaterializedView).when(mockSynapseJavascriptClient).createEntity(any(Entity.class), any(AsyncCallback.class));
 		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkCreateEntity(any(EntityBundle.class), anyString(), any(Callback.class));
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
