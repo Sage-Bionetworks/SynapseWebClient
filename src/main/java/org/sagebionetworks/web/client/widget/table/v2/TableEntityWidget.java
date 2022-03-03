@@ -279,6 +279,9 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 			}
 		} else {
 			this.actionMenu.setTableDownloadOptionsEnabled(hasQueryableData);
+			if(!entityBundle.getPermissions().getCanDownload()){
+				this.actionMenu.setTableDownloadOptionsEnabled(false);
+			}
 			if (!hasQueryableData) {
 				this.actionMenu.setDownloadActionsDisabledTooltipText("There is no data to download");
 			}
@@ -297,9 +300,6 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 		});
 		this.actionMenu.setActionListener(Action.SHOW_SIMPLE_SEARCH, action -> {
 			onShowSimpleSearch();
-		});
-		this.actionMenu.setActionListener(Action.SHOW_QUERY, action -> {
-			onShowQuery();
 		});
 	}
 
@@ -408,7 +408,6 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 		actionMenu.setActionVisible(Action.SHOW_SIMPLE_SEARCH, false);
 		queryInputWidget.setShowSimpleSearchButtonVisible(false);
 		queryResultsWidget.setFacetsVisible(true);
-		actionMenu.setActionVisible(Action.SHOW_QUERY, true);
 		queryInputWidget.setQueryInputVisible(false);
 	}
 
@@ -427,7 +426,6 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 		actionMenu.setActionVisible(Action.SHOW_SIMPLE_SEARCH, showSimpleSearch);
 		queryInputWidget.setShowSimpleSearchButtonVisible(showSimpleSearch);
 		queryResultsWidget.setFacetsVisible(false);
-		actionMenu.setActionVisible(Action.SHOW_QUERY, false);
 		queryInputWidget.setQueryInputVisible(true);
 	}
 

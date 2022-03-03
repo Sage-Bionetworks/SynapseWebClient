@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.browse;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Heading;
+import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -37,11 +38,11 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 	@UiField
 	Button downloadOptionsButton;
 	@UiField
-	HelpWidget downloadHelp;
-	@UiField
 	Div actionMenuContainer;
 	@UiField
 	Heading title;
+	@UiField
+	Tooltip downloadTooltip;
 
 	@Inject
 	public FilesBrowserViewImpl(FilesBrowserViewImplUiBinder binder, EntityTreeBrowser entityTreeBrowser, AuthenticationController authController) {
@@ -58,15 +59,13 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 		});
 		entityTreeBrowser.setIsEmptyCallback(isEmpty -> {
 			if (isEmpty) {
-				downloadHelp.setHelpMarkdown("There are no downloadable items in this folder.");
-				downloadHelp.setVisible(true);
+				downloadTooltip.setTitle("There are no downloadable items in this folder.");
 				downloadOptionsButton.setEnabled(false);
 			} else if (!authController.isLoggedIn()) {
-				downloadHelp.setHelpMarkdown("You must be logged in to download items in this folder.");
-				downloadHelp.setVisible(true);
+				downloadTooltip.setTitle("You must be logged in to download items in this folder.");
 				downloadOptionsButton.setEnabled(false);
 			} else {
-				downloadHelp.setVisible(false);
+				downloadTooltip.setTitle("Direct and programmatic download options");
 				downloadOptionsButton.setEnabled(true);
 			}
 		});

@@ -1,10 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
-import org.gwtbootstrap3.client.ui.Anchor;
-import org.gwtbootstrap3.client.ui.AnchorListItem;
-import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.DropDownMenu;
-import org.gwtbootstrap3.client.ui.Heading;
+import org.gwtbootstrap3.client.ui.*;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.Entity;
@@ -80,11 +76,11 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	@UiField
 	Span versionUiCurrent;
 	@UiField
-	HelpWidget viewOnlyHelp;
-	@UiField
 	Button downloadOptionsButton;
 	@UiField
 	Div actionMenuContainer;
+	@UiField
+	Tooltip downloadTooltip;
 
 	interface FileTitleBarViewImplUiBinder extends UiBinder<Widget, FileTitleBarViewImpl> {
 	}
@@ -129,8 +125,6 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 		md5Link.clear();
 		md5LinkContainer.setWidget(md5Link);
 		entityIcon.setType(EntityTypeUtils.getEntityType(entity));
-		String viewOnlyHelpText = authController.isLoggedIn() ? "You do not have download access for this item." : "You need to log in to download this file.";
-		viewOnlyHelp.setHelpMarkdown(viewOnlyHelpText);
 	}
 
 	@Override
@@ -224,7 +218,12 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	@Override
 	public void setCanDownload(boolean canDownload) {
 		downloadOptionsButton.setEnabled(canDownload);
-		viewOnlyHelp.setVisible(!canDownload);
+		if (canDownload) {
+			downloadTooltip.setTitle("Direct and programmatic download options");
+		} else{
+			String viewOnlyHelpText = authController.isLoggedIn() ? "You do not have download access for this item." : "You need to log in to download this file.";
+			downloadTooltip.setTitle(viewOnlyHelpText);
+		}
 	}
 	
 	@Override
