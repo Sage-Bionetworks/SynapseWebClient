@@ -11,6 +11,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.Dataset;
+import org.sagebionetworks.repo.model.table.MaterializedView;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.widget.entity.VersionHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.file.TableTitleBar;
@@ -28,6 +29,8 @@ public class TableTitleBarTest {
 	TableEntity mockTable;
 	@Mock
 	Dataset mockDataset;
+	@Mock
+	MaterializedView mockMaterializedView;
 	@Mock
 	ActionMenuWidget mockActionMenuWidget;
 	@Mock
@@ -74,6 +77,7 @@ public class TableTitleBarTest {
 
 		verify(mockView).createTitlebar(mockTable);
 		verify(mockView).setEntityName(TABLE_NAME);
+		verify(mockView).setVersionUIVisible(true);
 	}
 
 	@Test
@@ -101,6 +105,7 @@ public class TableTitleBarTest {
 		tableTitleBar.configure(mockBundle, mockActionMenuWidget, mockVersionHistoryWidget);
 
 		verify(mockView).setVersionLabel("Draft");
+		verify(mockView).setVersionUIVisible(true);
 	}
 
 
@@ -112,6 +117,15 @@ public class TableTitleBarTest {
 		tableTitleBar.configure(mockBundle, mockActionMenuWidget, mockVersionHistoryWidget);
 
 		verify(mockView).setVersionLabel(TABLE_VERSION + " (Stable)");
+	}
+
+	@Test
+	public void testConfigureMaterializedView() {
+		when(mockBundle.getEntity()).thenReturn(mockMaterializedView);
+
+		tableTitleBar.configure(mockBundle, mockActionMenuWidget, mockVersionHistoryWidget);
+
+		verify(mockView).setVersionUIVisible(false);
 	}
 
 }

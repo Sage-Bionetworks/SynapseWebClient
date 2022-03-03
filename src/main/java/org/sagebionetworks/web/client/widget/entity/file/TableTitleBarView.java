@@ -14,6 +14,8 @@ public interface TableTitleBarView extends IsWidget, SynapseView {
 
 	void setPresenter(Presenter p);
 
+	void setVersionUIVisible(boolean visible);
+	
 	/**
 	 * Presenter interface
 	 */

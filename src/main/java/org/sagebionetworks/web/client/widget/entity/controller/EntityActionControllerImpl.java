@@ -33,6 +33,7 @@ import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.EntityView;
+import org.sagebionetworks.repo.model.table.MaterializedView;
 import org.sagebionetworks.repo.model.table.SnapshotRequest;
 import org.sagebionetworks.repo.model.table.SnapshotResponse;
 import org.sagebionetworks.repo.model.table.SubmissionView;
@@ -87,6 +88,7 @@ import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidge
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
 import org.sagebionetworks.web.client.widget.statistics.StatisticsPlotWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.MaterializedViewEditor;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
@@ -197,6 +199,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	IsACTMemberAsyncHandler isACTMemberAsyncHandler;
 	AddFolderDialogWidget addFolderDialogWidget;
 	CreateTableViewWizard createTableViewWizard;
+	MaterializedViewEditor materializedViewEditor;
 	boolean isShowingVersion = false;
 	WizardCallback entityUpdatedWizardCallback;
 	UploadTableModalWidget uploadTableModalWidget;
@@ -334,6 +337,14 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		return accessControlListModalWidget;
 	}
 
+	
+	private MaterializedViewEditor getMaterializedViewEditor() {
+		if (materializedViewEditor == null) {
+			materializedViewEditor = ginInjector.getMaterializedViewEditor();
+			this.view.addWidget(materializedViewEditor.asWidget());
+		}
+		return materializedViewEditor;
+	}
 	private CreateTableViewWizard getCreateTableViewWizard() {
 		if (createTableViewWizard == null) {
 			createTableViewWizard = ginInjector.getCreateTableViewWizard();
@@ -546,12 +557,16 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			actionMenu.setActionListener(Action.ADD_PROJECT_VIEW, this);
 			actionMenu.setActionVisible(Action.ADD_SUBMISSION_VIEW, canEditResults);
 			actionMenu.setActionListener(Action.ADD_SUBMISSION_VIEW, this);
+			actionMenu.setActionVisible(Action.ADD_MATERIALIZED_VIEW, canEditResults && DisplayUtils.isInTestWebsite(cookies));
+			actionMenu.setActionListener(Action.ADD_MATERIALIZED_VIEW, this);
+
 		} else {
 			actionMenu.setActionVisible(Action.UPLOAD_TABLE, false);
 			actionMenu.setActionVisible(Action.ADD_TABLE, false);
 			actionMenu.setActionVisible(Action.ADD_FILE_VIEW, false);
 			actionMenu.setActionVisible(Action.ADD_PROJECT_VIEW, false);
 			actionMenu.setActionVisible(Action.ADD_SUBMISSION_VIEW, false);
+			actionMenu.setActionVisible(Action.ADD_MATERIALIZED_VIEW, false);
 		}
 	}
 
@@ -755,15 +770,18 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	private void configureTableCommands() {
 		if (entityBundle.getEntity() instanceof Table) {
 			boolean isDataset = entityBundle.getEntity() instanceof Dataset;
+			boolean isMaterializedView = entityBundle.getEntity() instanceof MaterializedView;
 			// For UX reasons, datasets are not editable, even if the user has permissions (SWC-5870, SWC-5903)
-			boolean canEditResults = entityBundle.getPermissions().getCanCertifiedUserEdit() && !isDataset;
+			boolean canEditResults = entityBundle.getPermissions().getCanCertifiedUserEdit() && !isDataset && !isMaterializedView;
 			actionMenu.setActionVisible(Action.UPLOAD_TABLE_DATA, canEditResults);
 			actionMenu.setActionText(Action.UPLOAD_TABLE_DATA, "Upload Data to " + entityTypeDisplay);
 			actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, canEditResults);
 			actionMenu.setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
 			actionMenu.setActionVisible(Action.SHOW_TABLE_SCHEMA, true);
-			actionMenu.setActionVisible(Action.SHOW_VIEW_SCOPE, !(entityBundle.getEntity() instanceof TableEntity) && !isDataset);
+			actionMenu.setActionVisible(Action.SHOW_VIEW_SCOPE, !(entityBundle.getEntity() instanceof TableEntity) && !isDataset && !isMaterializedView);
 			actionMenu.setActionVisible(Action.EDIT_DATASET_ITEMS, isDataset && isCurrentVersion);
+			actionMenu.setActionVisible(Action.EDIT_DEFINING_SQL, isMaterializedView && isCurrentVersion);
+			actionMenu.setActionListener(Action.EDIT_DEFINING_SQL, this);
 		} else {
 			actionMenu.setActionVisible(Action.UPLOAD_TABLE_DATA, false);
 			actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, false);
@@ -771,6 +789,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			actionMenu.setActionVisible(Action.SHOW_TABLE_SCHEMA, false);
 			actionMenu.setActionVisible(Action.SHOW_VIEW_SCOPE, false);
 			actionMenu.setActionVisible(Action.EDIT_DATASET_ITEMS, false);
+			actionMenu.setActionVisible(Action.EDIT_DEFINING_SQL, false);
 		}
 	}
 
@@ -979,7 +998,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 
 	public static boolean isVersionSupported(Entity entity, CookieProvider cookies) {
-		return entity instanceof Versionable;
+		boolean isMaterializedView = entity instanceof MaterializedView;
+		return entity instanceof Versionable && !isMaterializedView;
 	}
 
 	public boolean isTopLevelProjectToolsMenu(Entity entity, EntityArea area) {
@@ -1098,6 +1118,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			case CREATE_TABLE_VERSION:
 				onCreateTableViewSnapshot();
 				break;
+			case EDIT_DEFINING_SQL:
+				onEditDefiningSql();
+				break;
 			case MOVE_ENTITY:
 				onMove();
 				break;
@@ -1154,6 +1177,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 				break;
 			case ADD_SUBMISSION_VIEW:
 				onAddSubmissionView();
+				break;
+			case ADD_MATERIALIZED_VIEW:
+				onAddMaterializedView();
 				break;
 			case CREATE_EXTERNAL_DOCKER_REPO:
 				onCreateExternalDockerRepo();
@@ -1252,6 +1278,13 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	public void onAddTable() {
 		preflightController.checkCreateEntity(entityBundle, TableEntity.class.getName(), () -> {
 			postCheckCreateTableOrView(TableType.table);
+		});
+	}
+	
+	public void onAddMaterializedView() {
+		preflightController.checkCreateEntity(entityBundle, MaterializedView.class.getName(), () -> {
+			// to create a MaterializedView, we need to know the definingSQL
+			getMaterializedViewEditor().configure(entityBundle.getEntity().getId()).show();
 		});
 	}
 
@@ -1521,7 +1554,32 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			view.showErrorMessage("Can only create a new version from the current table, not an old version.");
 		}
 	}
+	
+	private void onEditDefiningSql() {
+		if (isCurrentVersion) {
+			checkUpdateEntity(() -> {
+				postCheckEditDefiningSql();
+			});
+		}
+	}
 
+	private PromptCallback getUpdateDefiningSqlCallback() {
+		return value -> {
+			((MaterializedView)entity).setDefiningSQL(value);
+			getSynapseJavascriptClient().updateEntity(entity, null, false, new AsyncCallback<Entity>() {
+				@Override
+				public void onSuccess(Entity result) {
+					fireEntityUpdatedEvent();
+					view.showSuccess("Updated the Synapse SQL query that defines this Materialized View.");
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					view.showErrorMessage(caught.getMessage());
+				}
+			});
+		};
+	}
+	
 	private CallbackP<List<String>> getCreateSnapshotCallback(Entity entity) {
 		if (entity instanceof TableEntity) {
 			return values -> {
@@ -1666,7 +1724,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		if (entityBundle.getRootWikiId() == null) {
 			createWikiPage("Root");
 		} else {
-			view.showPromptDialog(DisplayConstants.ENTER_PAGE_TITLE, new PromptCallback() {
+			view.showPromptDialog(DisplayConstants.ENTER_PAGE_TITLE, "", new PromptCallback() {
 				@Override
 				public void callback(String result) {
 					createWikiPage(result);
@@ -1751,6 +1809,11 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		getEditProjectMetadataModalWidget().configure((Project) entityBundle.getEntity(), canChangeSettings, () -> {
 			fireEntityUpdatedEvent();
 		});
+	}
+	
+	private void postCheckEditDefiningSql() {
+		// prompt for defining sql
+		view.showPromptDialog("Update SQL", ((MaterializedView)entity).getDefiningSQL(), getUpdateDefiningSqlCallback());
 	}
 
 	public void onDeleteWiki() {

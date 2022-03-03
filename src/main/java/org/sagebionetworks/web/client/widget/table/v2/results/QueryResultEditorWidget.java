@@ -332,7 +332,7 @@ public class QueryResultEditorWidget implements QueryResultEditorView.Presenter,
 	 * @return
 	 */
 	public static boolean isQueryResultEditable(QueryResultBundle bundle, TableType tableType) {
-		if (tableType.equals(TableType.dataset)) {
+		if (tableType.equals(TableType.dataset) || tableType.equals(TableType.materialized_view)) {
 			// Datasets should not be editable (SWC-5870, SWC-5903)
 			return false;
 		}

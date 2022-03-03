@@ -16,6 +16,7 @@ import java.util.Objects;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.EntityView;
+import org.sagebionetworks.repo.model.table.MaterializedView;
 import org.sagebionetworks.repo.model.table.SubmissionView;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableEntity;
@@ -29,9 +30,10 @@ public class TableType {
 	 * We specifically enumerate some common TableTypes to use elsewhere, but a TableType object does not have to match one of these
 	 */
 
-	// TableEntity, SubmissionView, and Dataset don't use viewTypeMask
+	// TableEntity, SubmissionView, MaterializedView, and Dataset don't use viewTypeMask
 	public static final TableType table = new TableType(TableEntity.class, null);
 	public static final TableType submission_view = new TableType(SubmissionView.class, null);
+	public static final TableType materialized_view = new TableType(MaterializedView.class, null);
 	// We specify a viewTypeMask of 'FILE' for Datasets because they work like file views in many ways
 	public static final TableType dataset = new TableType(Dataset.class, FILE);
 
@@ -108,6 +110,8 @@ public class TableType {
 			return TableType.dataset;
 		} else if (entity instanceof SubmissionView) {
 			return TableType.submission_view;
+		} else if (entity instanceof MaterializedView) {
+			return TableType.materialized_view;
 		} else if (entity instanceof EntityView) {
 			EntityView view = (EntityView) entity;
 
@@ -139,6 +143,9 @@ public class TableType {
 		}
 		if (this.clazz == SubmissionView.class) {
 			return DisplayConstants.SUBMISSION_VIEW;
+		}
+		if (this.clazz == MaterializedView.class) {
+			return DisplayConstants.MATERIALIZED_VIEW;
 		}
 		if (this.clazz == Dataset.class) {
 			return DisplayConstants.DATASET;

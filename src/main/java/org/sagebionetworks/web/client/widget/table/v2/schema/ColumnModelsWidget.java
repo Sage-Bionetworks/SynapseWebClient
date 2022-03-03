@@ -12,6 +12,7 @@ import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.DatasetItem;
 import org.sagebionetworks.repo.model.table.EntityView;
+import org.sagebionetworks.repo.model.table.MaterializedView;
 import org.sagebionetworks.repo.model.table.SubmissionView;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.ViewColumnModelRequest;
@@ -105,7 +106,8 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 
 	@Override
 	public void configure(EntityBundle bundle, boolean isEditable) {
-		this.isEditable = isEditable;
+		boolean isMaterializedView = bundle.getEntity() instanceof MaterializedView;
+		this.isEditable = isEditable && !isMaterializedView;
 		this.bundle = bundle;
 		List<ColumnModel> startingModels = bundle.getTableBundle().getColumnModels();
 		viewer.configure(ViewType.VIEWER, this.isEditable);

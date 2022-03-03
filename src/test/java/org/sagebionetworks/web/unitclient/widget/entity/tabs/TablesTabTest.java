@@ -324,7 +324,7 @@ public class TablesTabTest {
 		verify(mockActionMenuWidget).setTableDownloadOptionsVisible(false);
 		verify(mockView).setWikiPageVisible(false);
 
-		verify(mockTableListWidget).configure(mockProjectEntityBundle, Arrays.asList(EntityType.table, EntityType.entityview, EntityType.submissionview));
+		verify(mockTableListWidget).configure(mockProjectEntityBundle, Arrays.asList(EntityType.table, EntityType.entityview, EntityType.submissionview, EntityType.materializedview));
 
 		Synapse place = getNewPlace(projectName);
 		assertEquals(projectEntityId, place.getEntityId());

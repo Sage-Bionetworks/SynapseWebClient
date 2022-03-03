@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.file;
 
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Heading;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -37,6 +38,8 @@ public class TableTitleBarViewImpl extends Composite implements TableTitleBarVie
 	Anchor showVersionHistoryLink;
 	@UiField
 	Span versionUiCurrent;
+	@UiField
+	Div versionInfoUI;
 
 	interface TableTitleBarViewImplUiBinder extends UiBinder<Widget, TableTitleBarViewImpl> {
 	}
@@ -103,5 +106,11 @@ public class TableTitleBarViewImpl extends Composite implements TableTitleBarVie
 	public void setVersionLabel(String label) {
 		versionUiCurrent.setText(label);
 	}
+	
+	@Override
+	public void setVersionUIVisible(boolean visible) {
+		versionInfoUI.setVisible(visible);
+	}
+	
 
 }

@@ -253,6 +253,7 @@ public class DisplayConstants {
 	public static final String VIEW = "View";
 	public static final String DATASET = "Dataset";
 	public static final String SUBMISSION_VIEW = "Submission View";
+	public static final String MATERIALIZED_VIEW = "Materialized View";
 	public static final String PROJECT_VIEW = "Project View";
 	public static final String FILE_VIEW = "File View";
 

@@ -46,6 +46,7 @@ public class TablesTab extends AbstractTablesTab {
 		types.add(EntityType.table);
 		types.add(EntityType.entityview);
 		types.add(EntityType.submissionview);
+		types.add(EntityType.materializedview);
 		return types;
 	}
 

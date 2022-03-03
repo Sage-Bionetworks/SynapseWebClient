@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.file;
 
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.Dataset;
+import org.sagebionetworks.repo.model.table.MaterializedView;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.VersionHistoryWidget;
@@ -36,6 +37,8 @@ public class TableTitleBar implements SynapseWidgetPresenter, TableTitleBarView.
 
 		view.createTitlebar(bundle.getEntity());
 		view.setEntityName(bundle.getEntity().getName());
+		boolean isMaterializedView = bundle.getEntity() instanceof MaterializedView;
+		view.setVersionUIVisible(!isMaterializedView);
 		getLatestVersion();
 	}
 
