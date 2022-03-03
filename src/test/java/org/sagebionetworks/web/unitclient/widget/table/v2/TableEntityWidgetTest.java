@@ -31,6 +31,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Dataset;
@@ -113,6 +114,7 @@ public class TableEntityWidgetTest {
 	QueryInputWidget mockQueryInputWidget;
 	TableEntityWidget widget;
 	EntityBundle entityBundle;
+	UserEntityPermissions permissions;
 	Long versionNumber;
 	@Mock
 	SynapseClientAsync mockSynapseClient;
@@ -171,10 +173,16 @@ public class TableEntityWidgetTest {
 		widget = new TableEntityWidget(mockView, mockQueryResultsWidget, mockQueryInputWidget, mockPreflightController, mockSynapseClient, mockFileViewClientsHelp, mockPortalGinInjector, mockSessionStorage, mockEventBus);
 
 		AsyncMockStubber.callSuccessWith(FACET_SQL).when(mockSynapseClient).generateSqlWithFacets(anyString(), anyList(), anyList(), any(AsyncCallback.class));
+
+		// Set download permissions
+		permissions = new UserEntityPermissions();
+		permissions.setCanDownload(true);
+
 		// The test bundle
 		entityBundle = new EntityBundle();
 		entityBundle.setEntity(tableEntity);
 		entityBundle.setTableBundle(tableBundle);
+		entityBundle.setPermissions(permissions);
 
 		String sql = "SELECT * FROM " + tableEntity.getId() + " LIMIT 3 OFFSET 0";
 		Query query = new Query();
@@ -415,7 +423,6 @@ public class TableEntityWidgetTest {
 		//also verify other commands have been hooked up
 		verify(mockActionMenu).setActionListener(eq(Action.SHOW_ADVANCED_SEARCH), any());
 		verify(mockActionMenu).setActionListener(eq(Action.SHOW_SIMPLE_SEARCH), any());
-		verify(mockActionMenu).setActionListener(eq(Action.SHOW_QUERY), any());
 		verify(mockActionMenu).setActionListener(eq(Action.TABLE_DOWNLOAD_PROGRAMMATIC_OPTIONS), any());
 		verify(mockActionMenu).setActionListener(eq(Action.ADD_TABLE_RESULTS_TO_DOWNLOAD_LIST), any());
 	}
@@ -562,7 +569,6 @@ public class TableEntityWidgetTest {
 		verify(mockActionMenu).setActionVisible(Action.SHOW_SIMPLE_SEARCH, false);
 		verify(mockQueryInputWidget).setShowSimpleSearchButtonVisible(false);
 		verify(mockQueryResultsWidget).setFacetsVisible(true);
-		verify(mockActionMenu).setActionVisible(Action.SHOW_QUERY, true);
 		verify(mockQueryInputWidget).setQueryInputVisible(false);
 	}
 
@@ -571,7 +577,6 @@ public class TableEntityWidgetTest {
 		verify(mockActionMenu).setActionVisible(Action.SHOW_SIMPLE_SEARCH, true);
 		verify(mockQueryInputWidget).setShowSimpleSearchButtonVisible(true);
 		verify(mockQueryResultsWidget).setFacetsVisible(false);
-		verify(mockActionMenu).setActionVisible(Action.SHOW_QUERY, false);
 		verify(mockQueryInputWidget).setQueryInputVisible(true);
 	}
 
@@ -694,7 +699,6 @@ public class TableEntityWidgetTest {
 		verify(mockActionMenu).setActionVisible(Action.SHOW_SIMPLE_SEARCH, false);
 		verify(mockQueryInputWidget).setShowSimpleSearchButtonVisible(false);
 		verify(mockQueryResultsWidget).setFacetsVisible(false);
-		verify(mockActionMenu).setActionVisible(Action.SHOW_QUERY, false);
 		verify(mockQueryInputWidget).setQueryInputVisible(true);
 	}
 
@@ -906,5 +910,14 @@ public class TableEntityWidgetTest {
 		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
 
 		verify(mockTotalVisibleResultsWidget, never()).configure(any());
+	}
+
+	@Test // SWC-5986
+	public void testDownloadButtonForNotLoggedIn(){
+		boolean isLogin = false;
+		boolean canEdit = true;
+		permissions.setCanDownload(isLogin);
+		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
+		verify(mockActionMenu).setTableDownloadOptionsEnabled(false);
 	}
 }

@@ -277,10 +277,11 @@ public class TableEntityWidget implements TableEntityWidgetView.Presenter, IsWid
 			if (!canEdit) {
 				this.actionMenu.setDownloadActionsDisabledTooltipText("A draft version of a Dataset cannot be downloaded");
 			}
-		} else if(!entityBundle.getPermissions().getCanDownload()) {
-			this.actionMenu.setTableDownloadOptionsEnabled(false);
 		} else {
 			this.actionMenu.setTableDownloadOptionsEnabled(hasQueryableData);
+			if(!entityBundle.getPermissions().getCanDownload()){
+				this.actionMenu.setTableDownloadOptionsEnabled(false);
+			}
 			if (!hasQueryableData) {
 				this.actionMenu.setDownloadActionsDisabledTooltipText("There is no data to download");
 			}
