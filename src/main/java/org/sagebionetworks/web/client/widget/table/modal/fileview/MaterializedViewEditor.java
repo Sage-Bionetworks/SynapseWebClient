@@ -39,10 +39,11 @@ public class MaterializedViewEditor implements MaterializedViewEditorView.Presen
 		view.setHelp(MATERIALIZED_VIEW_HELP_MARKDOWN, CreateTableViewWizard.VIEW_URL);
 	}
 
-	public void configure(String parentEntityId) {
+	public MaterializedViewEditor configure(String parentEntityId) {
 		this.parentEntityId = parentEntityId;
 		synAlert.clear();
 		view.reset();
+		return this;
 	}
 	
 	public void show() {

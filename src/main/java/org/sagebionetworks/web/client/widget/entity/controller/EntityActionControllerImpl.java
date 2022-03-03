@@ -1283,8 +1283,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	public void onAddMaterializedView() {
 		preflightController.checkCreateEntity(entityBundle, MaterializedView.class.getName(), () -> {
 			// to create a MaterializedView, we need to know the definingSQL
-			getMaterializedViewEditor().configure(entityBundle.getEntity().getId());
-			getMaterializedViewEditor().show();
+			getMaterializedViewEditor().configure(entityBundle.getEntity().getId()).show();
 		});
 	}
 
