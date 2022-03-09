@@ -238,8 +238,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 						storageLocationId = externalUploadDestination.getStorageLocationId();
 						currentUploadType = externalUploadDestination.getUploadType();
 						if (currentUploadType == UploadType.SFTP) {
-							String message = "This file is hosted on a SFTP server. Please use a SFTP client to access this file.";
-							uploadError(message, new Exception(message));
+							uploadError(DisplayConstants.ERROR_DEPRECATED_SERVICE, new Exception(DisplayConstants.ERROR_DEPRECATED_SERVICE));
 						} else {
 							onFailure(new org.sagebionetworks.web.client.exceptions.IllegalArgumentException("Unsupported external upload type: " + externalUploadDestination.getUploadType()));
 						}

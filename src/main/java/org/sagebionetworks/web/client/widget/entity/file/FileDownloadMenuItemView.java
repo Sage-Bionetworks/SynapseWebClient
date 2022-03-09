@@ -10,9 +10,9 @@ public interface FileDownloadMenuItemView extends IsWidget {
 
 	void setIsDirectDownloadLink(String href);
 
-	void setIsUnauthenticatedS3DirectDownload();
+	void showDownloadError();
 
-	void setIsAuthorizedDirectDownloadLink();
+	void setIsUnauthenticatedS3DirectDownload();
 
 	void showLoginS3DirectDownloadDialog(String endpoint);
 
@@ -25,8 +25,8 @@ public interface FileDownloadMenuItemView extends IsWidget {
 
 		void onUnauthenticatedS3DirectDownloadClicked();
 
-		void onAuthorizedDirectDownloadClicked();
-
 		void onDirectDownloadClicked();
+
+		void onSFTPDownloadErrorClicked();
 	}
 }

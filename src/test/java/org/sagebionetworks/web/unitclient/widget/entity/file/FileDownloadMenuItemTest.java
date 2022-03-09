@@ -40,7 +40,6 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.aws.AwsSdk;
 import org.sagebionetworks.web.client.widget.entity.file.FileDownloadMenuItem;
 import org.sagebionetworks.web.client.widget.entity.file.FileDownloadMenuItemView;
-import org.sagebionetworks.web.client.widget.login.LoginModalWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -53,8 +52,6 @@ public class FileDownloadMenuItemTest {
 	FileDownloadMenuItemView mockView;
 	@Mock
 	SynapseClientAsync mockSynapseClient;
-	@Mock
-	LoginModalWidget mockLoginModalWidget;
 	@Mock
 	SynapseProperties mockSynapseProperties;
 	@Mock
@@ -103,7 +100,7 @@ public class FileDownloadMenuItemTest {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		widget = new FileDownloadMenuItem(mockView, mockSynapseClient, mockLoginModalWidget, mockGinInjector, mockSynapseJavascriptClient, mockAuthController, mockJsniUtils, mockGwt, mockCookies, mockAwsSdk, mockPopupUtilsView);
+		widget = new FileDownloadMenuItem(mockView, mockSynapseClient, mockGinInjector, mockSynapseJavascriptClient, mockAuthController, mockJsniUtils, mockGwt, mockCookies, mockAwsSdk, mockPopupUtilsView);
 		when(mockSynapseProperties.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT)).thenReturn(SFTP_ENDPOINT);
 		when(mockEntityBundle.getEntity()).thenReturn(mockFileEntity);
 		when(mockFileEntity.getId()).thenReturn(ENTITY_ID);
@@ -114,12 +111,6 @@ public class FileDownloadMenuItemTest {
 		AsyncMockStubber.callSuccessWith(SFTP_HOST).when(mockSynapseClient).getHost(anyString(), any(AsyncCallback.class));
 		when(mockJsniUtils.getFileHandleAssociationUrl(anyString(), any(FileHandleAssociateType.class), anyString())).thenReturn(fileHandleAssociationUrl);
 		when(mockRestrictionInformation.getHasUnmetAccessRequirement()).thenReturn(false);
-	}
-
-	@Test
-	public void testConstruction() {
-		verify(mockView).setPresenter(widget);
-		verify(mockLoginModalWidget).setPrimaryButtonText(DisplayConstants.BUTTON_DOWNLOAD);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -232,9 +223,9 @@ public class FileDownloadMenuItemTest {
 		assertNull(widget.getFileHandle());
 	}
 
-	@Test
-	public void testOnAuthorizedDirectDownloadClicked() {
-		widget.onAuthorizedDirectDownloadClicked();
-		verify(mockLoginModalWidget).showModal();
+	@Test //SWC-6024
+	public void testOnErrorDownloadClicked(){
+		widget.onSFTPDownloadErrorClicked();
+		verify(mockPopupUtilsView).showErrorMessage(DisplayConstants.ERROR_SFTP_DOWNLOAD_TITLE, DisplayConstants.ERROR_SFTP_DOWNLOAD_MESSAGE);
 	}
 }

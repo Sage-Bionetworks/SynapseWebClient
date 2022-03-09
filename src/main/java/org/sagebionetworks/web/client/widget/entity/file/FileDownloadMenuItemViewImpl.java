@@ -23,7 +23,7 @@ public class FileDownloadMenuItemViewImpl implements FileDownloadMenuItemView {
 
 	private static FileDownloadMenuItemViewImplUiBinder uiBinder = GWT.create(FileDownloadMenuItemViewImplUiBinder.class);
 	Widget widget;
-	ClickHandler licensedDownloadClickHandler, authorizedDirectDownloadClickHandler, directDownloadClickHandler;
+	ClickHandler licensedDownloadClickHandler, directDownloadClickHandler, errorDownloadClickHandler;
 	HandlerRegistration downloadLinkHandlerRegistration;
 
 	@Inject
@@ -35,17 +35,14 @@ public class FileDownloadMenuItemViewImpl implements FileDownloadMenuItemView {
 			event.preventDefault();
 			presenter.onUnauthenticatedS3DirectDownloadClicked();
 		};
-
-		authorizedDirectDownloadClickHandler = event -> {
-			event.preventDefault();
-			presenter.onAuthorizedDirectDownloadClicked();
-		};
 		directDownloadClickHandler = event -> {
 			presenter.onDirectDownloadClicked();
 		};
+		errorDownloadClickHandler = event -> {
+			presenter.onSFTPDownloadErrorClicked();
+		};
 	}
-
-	@Override
+;
 	public void clear() {}
 
 	private void clearClickHandlers() {
@@ -56,9 +53,8 @@ public class FileDownloadMenuItemViewImpl implements FileDownloadMenuItemView {
 	}
 
 	@Override
-	public void setIsAuthorizedDirectDownloadLink() {
-		clearClickHandlers();
-		downloadLinkHandlerRegistration = downloadLink.addClickHandler(authorizedDirectDownloadClickHandler);
+	public void showDownloadError(){
+		downloadLinkHandlerRegistration = downloadLink.addClickHandler(errorDownloadClickHandler);
 	}
 
 	@Override

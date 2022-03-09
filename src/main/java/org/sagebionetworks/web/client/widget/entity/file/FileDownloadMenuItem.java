@@ -25,11 +25,9 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.aws.AwsSdk;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
-import org.sagebionetworks.web.client.widget.login.LoginModalWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -42,7 +40,6 @@ public class FileDownloadMenuItem implements FileDownloadMenuItemView.Presenter,
 	private FileDownloadMenuItemView view;
 	private EntityBundle entityBundle;
 	private SynapseClientAsync synapseClient;
-	private LoginModalWidget loginModalWidget;
 	private PortalGinInjector ginInjector;
 	SynapseJavascriptClient jsClient;
 	AuthenticationController authController;
@@ -55,11 +52,10 @@ public class FileDownloadMenuItem implements FileDownloadMenuItemView.Presenter,
 	JavaScriptObject s3;
 
 	@Inject
-	public FileDownloadMenuItem(FileDownloadMenuItemView view, SynapseClientAsync synapseClient, LoginModalWidget loginModalWidget, PortalGinInjector ginInjector, SynapseJavascriptClient jsClient, AuthenticationController authController, SynapseJSNIUtils jsniUtils, GWTWrapper gwt, CookieProvider cookies, AwsSdk awsSdk, PopupUtilsView popupUtilsView) {
+	public FileDownloadMenuItem(FileDownloadMenuItemView view, SynapseClientAsync synapseClient, PortalGinInjector ginInjector, SynapseJavascriptClient jsClient, AuthenticationController authController, SynapseJSNIUtils jsniUtils, GWTWrapper gwt, CookieProvider cookies, AwsSdk awsSdk, PopupUtilsView popupUtilsView) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
-		this.loginModalWidget = loginModalWidget;
 		this.ginInjector = ginInjector;
 		this.jsClient = jsClient;
 		this.authController = authController;
@@ -69,7 +65,6 @@ public class FileDownloadMenuItem implements FileDownloadMenuItemView.Presenter,
 		this.awsSdk = awsSdk;
 		this.popupUtilsView = popupUtilsView;
 		view.setPresenter(this);
-		loginModalWidget.setPrimaryButtonText(DisplayConstants.BUTTON_DOWNLOAD);
 	}
 
 	public void configure(final EntityBundle bundle) {
@@ -110,11 +105,7 @@ public class FileDownloadMenuItem implements FileDownloadMenuItemView.Presenter,
 					// special case, if this starts with sftp proxy, then handle
 					String sftpProxy = ginInjector.getSynapseProperties().getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT);
 					if (directDownloadUrl.startsWith(sftpProxy)) {
-						view.setIsAuthorizedDirectDownloadLink();
-						loginModalWidget.configure(directDownloadUrl, FormPanel.METHOD_POST, FormPanel.ENCODING_MULTIPART);
-						String message = "This file is hosted on a SFTP server. Please use a SFTP client to access this file. The address for the SFTP server is " + sftpProxy;
-						loginModalWidget.setInstructionMessage(message);
-						loginModalWidget.setShowInput(false);
+						view.showDownloadError();
 					} else {
 						view.setIsDirectDownloadLink(directDownloadUrl);
 					}
@@ -191,8 +182,8 @@ public class FileDownloadMenuItem implements FileDownloadMenuItemView.Presenter,
 	}
 
 	@Override
-	public void onAuthorizedDirectDownloadClicked() {
-		loginModalWidget.showModal();
+	public void onSFTPDownloadErrorClicked() {
+		popupUtilsView.showErrorMessage(DisplayConstants.ERROR_SFTP_DOWNLOAD_TITLE, DisplayConstants.ERROR_SFTP_DOWNLOAD_MESSAGE);
 	}
 
 	@Override
