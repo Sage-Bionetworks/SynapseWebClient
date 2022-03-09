@@ -182,22 +182,6 @@ public class FileDownloadMenuItemTest {
 	}
 
 	@Test
-	public void testConfigureSftpLink() {
-		String dataFileHandleId = "3333";
-		when(mockFileEntity.getDataFileHandleId()).thenReturn(dataFileHandleId);
-		when(mockFileHandle.getId()).thenReturn(dataFileHandleId);
-		fileHandles.add(mockFileHandle);
-		when(mockAuthController.isLoggedIn()).thenReturn(true);
-		String fileUrl = WebConstants.SFTP_PREFIX + "sftpserver.synapse.org/path=mysftpfile.txt";
-		when(mockFileHandle.getExternalURL()).thenReturn(fileUrl);
-		widget.configure(mockEntityBundle, mockRestrictionInformation);
-		verify(mockView).setIsAuthorizedDirectDownloadLink();
-		verify(mockLoginModalWidget).configure(anyString(), eq(FormPanel.METHOD_POST), eq(FormPanel.ENCODING_MULTIPART));
-		verify(mockSynapseClient).getHost(anyString(), any(AsyncCallback.class));
-		verify(mockLoginModalWidget).setInstructionMessage(DisplayConstants.DOWNLOAD_CREDENTIALS_REQUIRED + SFTP_HOST);
-	}
-
-	@Test
 	public void testConfigureExternalObjectStoreFileHandle() {
 		String dataFileHandleId = "3333";
 		String endpointUrl = "https://test.test.test";
