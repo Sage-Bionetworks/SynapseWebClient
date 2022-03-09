@@ -26,7 +26,6 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
 import org.sagebionetworks.web.client.SynapseProperties;
-import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.events.CancelHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.UploadSuccessHandler;
@@ -198,17 +197,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		this.fileList = fileList;
 		view.setSelectedFilenames(getSelectedFilesText());
 		fileNames = synapseJsniUtils.getMultipleUploadFileNames(fileList);
-		if (currentUploadType == UploadType.SFTP) {
-			// must also have credentials
-			String username = view.getExternalUsername();
-			String password = view.getExternalPassword();
-			if (!DisplayUtils.isDefined(username) || !DisplayUtils.isDefined(password)) {
-				view.hideLoading();
-				view.showErrorMessage(DisplayConstants.CREDENTIALS_REQUIRED_MESSAGE);
-				view.enableUpload();
-				return;
-			}
-		}
 		this.uploadBasedOnConfiguration();
 	}
 
@@ -250,13 +238,11 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 						storageLocationId = externalUploadDestination.getStorageLocationId();
 						currentUploadType = externalUploadDestination.getUploadType();
 						if (currentUploadType == UploadType.SFTP) {
-							currentExternalUploadUrl = externalUploadDestination.getUrl();
-							getSftpHost(currentExternalUploadUrl, externalUploadDestination.getBanner());
-							disableMultipleFileUploads();
+							String message = "This file is hosted on a SFTP server. Please use a SFTP client to access this file.";
+							uploadError(message, new Exception(message));
 						} else {
 							onFailure(new org.sagebionetworks.web.client.exceptions.IllegalArgumentException("Unsupported external upload type: " + externalUploadDestination.getUploadType()));
 						}
-
 					} else if (uploadDestinations.get(0) instanceof ExternalS3UploadDestination) {
 						ExternalS3UploadDestination externalUploadDestination = (ExternalS3UploadDestination) uploadDestinations.get(0);
 						storageLocationId = externalUploadDestination.getStorageLocationId();
@@ -297,20 +283,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		}
 	}
 
-	public void getSftpHost(String url, final String banner) {
-		synapseClient.getHost(url, new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(String host) {
-				view.showUploadingToExternalStorage(host, banner);
-			}
-
-			@Override
-			public void onFailure(Throwable caught) {
-				view.showErrorMessage(caught.getMessage());
-			}
-		});
-	}
-
 	/**
 	 * Get the upload destination (based on the project settings), and continue the upload.
 	 */
@@ -332,7 +304,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			if (currentUploadType == UploadType.S3 || currentUploadType == UploadType.GOOGLECLOUDSTORAGE) {
 				uploadToS3OrGoogleCloud();
 			} else if (currentUploadType == UploadType.SFTP) {
-				uploadToSftpProxy(currentExternalUploadUrl);
+				String message = "This file is hosted on a SFTP server. Please use a SFTP client to access this file.";
+				uploadError(message, new Exception(message));
 			} else {
 				String message = "Unsupported external upload type specified: " + currentUploadType;
 				uploadError(message, new Exception(message));
@@ -434,20 +407,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		} else {
 			// unlikely state
 			throw new IllegalArgumentException("Unable to determine SFTP endpoint");
-		}
-	}
-
-	public void uploadToSftpProxy(final String url) {
-		try {
-			Callback callback = new Callback() {
-				@Override
-				public void invoke() {
-					view.submitForm(getSftpProxyLink("", url, synapseProperties, gwt));
-				}
-			};
-			checkForExistingFileName(fileNames[currIndex], callback);
-		} catch (Exception e) {
-			uploadError(e.getMessage(), e);
 		}
 	}
 
@@ -646,32 +605,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		}
 	}
 
-	public void setSftpExternalFilePath(final String path, final Long storageLocationId) {
-		final JavaScriptObject blob = synapseJsniUtils.getFileBlob(currIndex, fileList);
-
-		synapseJsniUtils.getFileMd5(blob, new MD5Callback() {
-			@Override
-			public void setMD5(String hexValue) {
-				if (hexValue == null) {
-					view.showErrorMessage(DisplayConstants.MD5_CALCULATION_ERROR);
-					return;
-				}
-				boolean isUpdating = entityId != null || entity != null;
-				long fileSize = (long) synapseJsniUtils.getFileSize(blob);
-				String fileName = fileNames[currIndex];
-				String contentType = synapseJsniUtils.getContentType(fileList, currIndex);
-				contentType = ContentTypeUtils.fixDefaultContentType(contentType, fileName);
-				if (isUpdating) {
-					// existing entity
-					updateExternalFileEntity(entityId, path, fileName, fileSize, contentType, hexValue, storageLocationId);
-				} else {
-					// new data, use the appropriate synapse call
-					createNewExternalFileEntity(path, fileName, fileSize, contentType, hexValue, storageLocationId);
-				}
-			}
-		});
-	}
-
 	public AsyncCallback<Entity> getExternalFileUpdatedCallback() {
 		return new AsyncCallback<Entity>() {
 			@Override
@@ -767,10 +700,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 				// upload result has file handle id if successful
 				String fileHandleId = uploadResult.getMessage();
 				setFileEntityFileHandle(fileHandleId);
-			} else if (UploadType.SFTP.equals(currentUploadType)) {
-				// should respond with the new path
-				String path = uploadResult.getMessage();
-				setSftpExternalFilePath(path, storageLocationId);
 			}
 		} else {
 			if (isJschAuthorizationError(uploadResult.getMessage())) {

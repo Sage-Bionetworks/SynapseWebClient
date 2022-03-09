@@ -98,5 +98,11 @@ public interface LoginModalView extends IsWidget {
 	 */
 	public void submitForm(String actionUrl, String method, String encodingType);
 
+	/**
+	 * Set the input and button to show
+	 *
+	 * @param action
+	 */	public  void setShowInput(boolean showInput);
+
 	void clearForm();
 }

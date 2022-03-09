@@ -81,18 +81,6 @@ public interface StorageLocationWidgetView {
 
 	void setExternalGoogleCloudBanner(String banner);
 
-	void selectSFTPStorage();
-
-	boolean isSFTPStorageSelected();
-
-	String getSFTPUrl();
-
-	void setSFTPUrl(String url);
-
-	String getSFTPBanner();
-
-	void setSFTPBanner(String banner);
-
 	void showErrorMessage(String message);
 
 	void setBannerSuggestions(List<String> banners);
@@ -100,8 +88,6 @@ public interface StorageLocationWidgetView {
 	void setBannerDropdownVisible(boolean isVisible);
 
 	void setGoogleCloudVisible(boolean visible);
-
-	void setSFTPVisible(boolean visible);
 
 	void setLoading(boolean isLoading);
 

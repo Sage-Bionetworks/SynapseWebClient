@@ -68,7 +68,6 @@ public class LoginModalWidget implements LoginModalView.Presenter, IsWidget {
 		view.setPrimaryButtonText(text);
 	}
 
-
 	public void setInstructionMessage(String message) {
 		view.setInstructionsMessage(message);
 	}
@@ -91,6 +90,10 @@ public class LoginModalWidget implements LoginModalView.Presenter, IsWidget {
 	public void showModal() {
 		view.clearForm();
 		this.view.showModal();
+	}
+
+	public void setShowInput(boolean canLogin){
+		view.setShowInput(canLogin);
 	}
 
 	public void configure(String action, String method, String encodingType) {

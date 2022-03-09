@@ -2,12 +2,10 @@ package org.sagebionetworks.web.unitclient.widget.entity.controller;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -27,13 +25,11 @@ import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.ExternalGoogleCloudUploadDestination;
 import org.sagebionetworks.repo.model.file.ExternalObjectStoreUploadDestination;
 import org.sagebionetworks.repo.model.file.ExternalS3UploadDestination;
-import org.sagebionetworks.repo.model.file.ExternalUploadDestination;
 import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.file.UploadType;
 import org.sagebionetworks.repo.model.project.ExternalGoogleCloudStorageLocationSetting;
 import org.sagebionetworks.repo.model.project.ExternalObjectStorageLocationSetting;
 import org.sagebionetworks.repo.model.project.ExternalS3StorageLocationSetting;
-import org.sagebionetworks.repo.model.project.ExternalStorageLocationSetting;
 import org.sagebionetworks.repo.model.project.StorageLocationSetting;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -130,7 +126,6 @@ public class StorageLocationWidgetTest {
 		reset(mockView);
 		widget.getStorageLocationSetting();
 		// should remain set to the default config
-		verify(mockView).setSFTPVisible(anyBoolean());
 		verify(mockView).setLoading(false);
 		verify(mockView).setS3StsVisible(false);
 		verifyNoMoreInteractions(mockView);
@@ -179,7 +174,6 @@ public class StorageLocationWidgetTest {
 		verify(mockView).setS3Bucket(bucket.trim());
 		verify(mockView).setExternalS3Banner(banner);
 		verify(mockView).selectExternalS3Storage();
-		verify(mockView).setSFTPVisible(true);
 		verify(mockView).setS3StsVisible(true); //because we're in alpha mode
 		verify(mockView).setS3StsEnabled(isStsEnabled);
 	}
@@ -222,22 +216,6 @@ public class StorageLocationWidgetTest {
 		AsyncMockStubber.callSuccessWith(entityStorageLocationSetting).when(mockJsClient).getDefaultUploadDestination(anyString(), any(AsyncCallback.class));
 		widget.getStorageLocationSetting();
 		verify(mockView).selectExternalS3Storage();
-		verify(mockView, never()).setSFTPVisible(true);
-	}
-
-	@Test
-	public void testGetStorageLocationSettingSFTP() {
-		ExternalUploadDestination entityStorageLocationSetting = new ExternalUploadDestination();
-		String url = "sftp://tcgaftps.nnn.mmm.gov";
-		String banner = "upload to a sftp site";
-		entityStorageLocationSetting.setBanner(banner);
-		entityStorageLocationSetting.setUrl(url);
-		AsyncMockStubber.callSuccessWith(entityStorageLocationSetting).when(mockJsClient).getDefaultUploadDestination(anyString(), any(AsyncCallback.class));
-		widget.getStorageLocationSetting();
-		verify(mockView).setSFTPBanner(banner);
-		verify(mockView).setSFTPUrl(url);
-		verify(mockView).selectSFTPStorage();
-		verify(mockView, atLeast(1)).setSFTPVisible(true);
 	}
 
 	@Test
@@ -291,7 +269,6 @@ public class StorageLocationWidgetTest {
 	@Test
 	public void testOnSaveSynapseStorage() {
 		when(mockView.isExternalS3StorageSelected()).thenReturn(false);
-		when(mockView.isSFTPStorageSelected()).thenReturn(false);
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).createStorageLocationSetting(anyString(), any(StorageLocationSetting.class), any(AsyncCallback.class));
 		widget.onSave();
 
@@ -303,7 +280,6 @@ public class StorageLocationWidgetTest {
 	@Test
 	public void testOnSaveExternalObjectStore() {
 		when(mockView.isExternalS3StorageSelected()).thenReturn(false);
-		when(mockView.isSFTPStorageSelected()).thenReturn(false);
 		when(mockView.isSynapseStorageSelected()).thenReturn(false);
 		when(mockView.isExternalObjectStoreSelected()).thenReturn(true);
 		String banner = "hello object store";
@@ -330,7 +306,6 @@ public class StorageLocationWidgetTest {
 	@Test
 	public void testOnSaveSynapseStorageFailure() {
 		when(mockView.isExternalS3StorageSelected()).thenReturn(false);
-		when(mockView.isSFTPStorageSelected()).thenReturn(false);
 		Exception e = new Exception("oh nos!");
 		AsyncMockStubber.callFailureWith(e).when(mockSynapseClient).createStorageLocationSetting(anyString(), any(StorageLocationSetting.class), any(AsyncCallback.class));
 		widget.onSave();
@@ -342,7 +317,6 @@ public class StorageLocationWidgetTest {
 	@Test
 	public void testOnSaveExternalS3() {
 		when(mockView.isExternalS3StorageSelected()).thenReturn(true);
-		when(mockView.isSFTPStorageSelected()).thenReturn(false);
 		String baseKey = "   key";
 		String bucket = "a.bucket     ";
 		String banner = "  upload to a.bucket";
@@ -362,7 +336,6 @@ public class StorageLocationWidgetTest {
 	@Test
 	public void testOnSaveExternalS3Invalid() {
 		when(mockView.isExternalS3StorageSelected()).thenReturn(true);
-		when(mockView.isSFTPStorageSelected()).thenReturn(false);
 		when(mockView.getExternalS3Banner()).thenReturn("banner");
 		// invalid bucket
 		when(mockView.getS3Bucket()).thenReturn("   ");
@@ -374,7 +347,6 @@ public class StorageLocationWidgetTest {
 	@Test
 	public void testOnSaveExternalGoogleCloud() {
 		when(mockView.isExternalGoogleCloudStorageSelected()).thenReturn(true);
-		when(mockView.isSFTPStorageSelected()).thenReturn(false);
 		String baseKey = "   key";
 		String bucket = "a.bucket     ";
 		String banner = "  upload to a.bucket";
@@ -394,7 +366,6 @@ public class StorageLocationWidgetTest {
 	@Test
 	public void testOnSaveExternalGoogleCloudInvalid() {
 		when(mockView.isExternalGoogleCloudStorageSelected()).thenReturn(true);
-		when(mockView.isSFTPStorageSelected()).thenReturn(false);
 		when(mockView.getExternalGoogleCloudBanner()).thenReturn("banner");
 		// invalid bucket
 		when(mockView.getGoogleCloudBucket()).thenReturn("   ");
@@ -402,45 +373,4 @@ public class StorageLocationWidgetTest {
 		widget.onSave();
 		verify(mockSynAlert).showError(anyString());
 	}
-
-	@Test
-	public void testOnSaveSFTP() {
-		when(mockView.isExternalS3StorageSelected()).thenReturn(false);
-		when(mockView.isSFTPStorageSelected()).thenReturn(true);
-		String url = "sftp://tcgaftps.nnn.mmm.gov";
-		String banner = "a sftp site";
-		when(mockView.getSFTPUrl()).thenReturn(url);
-		when(mockView.getSFTPBanner()).thenReturn(banner);
-		widget.onSave();
-
-		ArgumentCaptor<StorageLocationSetting> captor = ArgumentCaptor.forClass(StorageLocationSetting.class);
-		verify(mockSynapseClient).createStorageLocationSetting(anyString(), captor.capture(), any(AsyncCallback.class));
-
-		ExternalStorageLocationSetting capturedSetting = (ExternalStorageLocationSetting) captor.getValue();
-		assertEquals(url.trim(), capturedSetting.getUrl());
-		assertEquals(banner.trim(), capturedSetting.getBanner());
-	}
-
-	@Test
-	public void testOnSaveSFTPInvalid1() {
-		when(mockView.isExternalS3StorageSelected()).thenReturn(false);
-		when(mockView.isSFTPStorageSelected()).thenReturn(true);
-
-		when(mockView.getSFTPUrl()).thenReturn("https://fjkdsljfdsl");
-		when(mockView.getSFTPBanner()).thenReturn("banner");
-		widget.onSave();
-		verify(mockSynAlert).showError(anyString());
-	}
-
-	@Test
-	public void testOnSaveSFTPInvalid2() {
-		when(mockView.isExternalS3StorageSelected()).thenReturn(false);
-		when(mockView.isSFTPStorageSelected()).thenReturn(true);
-		// empty
-		when(mockView.getSFTPUrl()).thenReturn("   ");
-		when(mockView.getSFTPBanner()).thenReturn("banner");
-		widget.onSave();
-		verify(mockSynAlert).showError(anyString());
-	}
-
 }

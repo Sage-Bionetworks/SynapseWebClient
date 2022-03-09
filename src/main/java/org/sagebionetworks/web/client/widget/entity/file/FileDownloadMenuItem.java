@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
@@ -27,7 +28,6 @@ import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.login.LoginModalWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -112,9 +112,9 @@ public class FileDownloadMenuItem implements FileDownloadMenuItemView.Presenter,
 					if (directDownloadUrl.startsWith(sftpProxy)) {
 						view.setIsAuthorizedDirectDownloadLink();
 						loginModalWidget.configure(directDownloadUrl, FormPanel.METHOD_POST, FormPanel.ENCODING_MULTIPART);
-						FileHandle fileHandle = DisplayUtils.getFileHandle(entityBundle);
-						String url = ((ExternalFileHandle) fileHandle).getExternalURL();
-						queryForSftpLoginInstructions(url);
+						String message = "This file is hosted on a SFTP server. Please use a SFTP client to access this file. The address for the SFTP server is " + sftpProxy;
+						loginModalWidget.setInstructionMessage(message);
+						loginModalWidget.setShowInput(false);
 					} else {
 						view.setIsDirectDownloadLink(directDownloadUrl);
 					}
@@ -158,21 +158,6 @@ public class FileDownloadMenuItem implements FileDownloadMenuItemView.Presenter,
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
-	}
-
-	public void queryForSftpLoginInstructions(String url) {
-		synapseClient.getHost(url, new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(String host) {
-				// update the download login dialog message
-				loginModalWidget.setInstructionMessage(DisplayConstants.DOWNLOAD_CREDENTIALS_REQUIRED + SafeHtmlUtils.htmlEscape(host));
-			}
-
-			@Override
-			public void onFailure(Throwable caught) {
-				handleException(caught);
-			}
-		});
 	}
 
 	@Override

@@ -22,7 +22,6 @@ public interface FileDownloadMenuItemView extends IsWidget {
 	 * Presenter interface
 	 */
 	public interface Presenter extends S3DirectLoginDialog.Presenter {
-		void queryForSftpLoginInstructions(String directDownloadUrl);
 
 		void onUnauthenticatedS3DirectDownloadClicked();
 
