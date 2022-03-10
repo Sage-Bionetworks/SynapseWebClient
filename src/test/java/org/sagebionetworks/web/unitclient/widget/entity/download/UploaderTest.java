@@ -19,8 +19,6 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getDoneFuture;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getFailedFuture;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -221,61 +219,6 @@ public class UploaderTest {
 		uploader.configure(testEntity, null, null, true);
 		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "", storageLocationId);
 		verify(mockSynapseClient).updateExternalFile(anyString(), anyString(), anyString(), anyString(), eq((Long) null), eq((String) null), eq(storageLocationId), any(AsyncCallback.class));
-		verify(mockView).showInfo(anyString());
-	}
-
-	@Test
-	public void testSetNewSftpExternalPath() throws Exception {
-		// this is the full success test
-		// if entity is null, it should call synapseClient.createExternalFile() to create the FileEntity and
-		// associate the path.
-		uploader.setFileNames(new String[] {"test.txt"});
-		uploader.setSftpExternalFilePath("http://fakepath.url/blah.xml", storageLocationId);
-		verify(mockSynapseClient).createExternalFile(anyString(), anyString(), anyString(), anyString(), anyLong(), eq(md5), eq(storageLocationId), any(AsyncCallback.class));
-		verify(mockView).showInfo(anyString());
-	}
-
-	@Test
-	public void testSetSftpExternalPathToFolder() throws Exception {
-		// attempt to uplaod a Folder to sftp external link
-		uploader.setFileNames(new String[] {"testfolder"});
-		doAnswer(new Answer<Void>() {
-			@Override
-			public Void answer(InvocationOnMock invocation) throws Throwable {
-				final Object[] args = invocation.getArguments();
-				((MD5Callback) args[args.length - 1]).setMD5(null);
-				return null;
-			}
-		}).when(mockSynapseJsniUtils).getFileMd5(any(JavaScriptObject.class), any(MD5Callback.class));
-
-		uploader.setSftpExternalFilePath("http://fakepath.url/blah.xml", storageLocationId);
-		verify(mockSynapseClient, never()).createExternalFile(anyString(), anyString(), anyString(), anyString(), anyLong(), eq(md5), eq(storageLocationId), any(AsyncCallback.class));
-		verify(mockView).showErrorMessage(DisplayConstants.MD5_CALCULATION_ERROR);
-	}
-
-	@Test
-	public void testSetSftpExternalPathFailedCreate() throws Exception {
-		uploader.setFileNames(new String[] {"test.txt"});
-		AsyncMockStubber.callFailureWith(new Exception("failed to create")).when(mockSynapseClient).createExternalFile(anyString(), anyString(), anyString(), anyString(), anyLong(), eq(md5), anyLong(), any(AsyncCallback.class));
-		uploader.setSftpExternalFilePath("http://fakepath.url/blah.xml", storageLocationId);
-		verify(mockView).showErrorMessage(anyString());
-	}
-
-	@Test
-	public void testSetSftpExternalPathFailedUpdateFile() throws Exception {
-		uploader.setFileNames(new String[] {"test.txt"});
-		AsyncMockStubber.callFailureWith(new Exception("failed to update path")).when(mockSynapseClient).createExternalFile(anyString(), anyString(), anyString(), anyString(), anyLong(), eq(md5), anyLong(), any(AsyncCallback.class));
-		uploader.setSftpExternalFilePath("http://fakepath.url/blah.xml", storageLocationId);
-		verify(mockView).showErrorMessage(anyString());
-	}
-
-	@Test
-	public void testSetSftpExternalFileEntityPathWithFileEntity() throws Exception {
-		String fileName = "test.txt";
-		uploader.configure(testEntity, null, null, true);
-		uploader.setFileNames(new String[] {fileName});
-		uploader.setSftpExternalFilePath("http://fakepath.url/blah.xml", storageLocationId);
-		verify(mockSynapseClient).updateExternalFile(anyString(), anyString(), eq(fileName), anyString(), anyLong(), eq(md5), eq(storageLocationId), any(AsyncCallback.class));
 		verify(mockView).showInfo(anyString());
 	}
 
@@ -505,40 +448,6 @@ public class UploaderTest {
 	}
 
 	@Test
-	public void testUploadToExternal() {
-		String sftpProxy = "http://mytestproxy.com/sftp";
-		when(mockSynapseProperties.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT)).thenReturn(sftpProxy);
-		String url = "sftp://ok.net";
-		when(mockGwt.encodeQueryString(anyString())).thenReturn(url);
-
-		ExternalUploadDestination d = new ExternalUploadDestination();
-		d.setUploadType(UploadType.SFTP);
-		d.setUrl(url);
-		d.setStorageLocationId(storageLocationId);
-		List<UploadDestination> destinations = new ArrayList<UploadDestination>();
-		destinations.add(d);
-		AsyncMockStubber.callSuccessWith(destinations).when(mockSynapseJavascriptClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith("ok.net").when(mockSynapseClient).getHost(anyString(), any(AsyncCallback.class));
-
-		uploader.queryForUploadDestination();
-		assertEquals(uploader.getStorageLocationId(), storageLocationId);
-		assertEquals(UploadType.SFTP, uploader.getCurrentUploadType());
-		verify(mockView).showUploadingToExternalStorage(anyString(), anyString());
-		verify(mockView).enableMultipleFileUploads(false);
-
-		uploader.setFileNames(new String[] {"test.txt"});
-		uploader.uploadToSftpProxy(url);
-		verify(mockSynapseClient).getFileEntityIdWithSameName(anyString(), anyString(), any(AsyncCallback.class));
-		// capture the value sent to the form to submit
-		ArgumentCaptor<String> c = ArgumentCaptor.forClass(String.class);
-		verify(mockView).submitForm(c.capture());
-		String target = c.getValue();
-		// should point to the sftp proxy, and contain the original url
-		assertTrue(target.startsWith(sftpProxy));
-		assertTrue(target.contains("?url=" + url));
-	}
-
-	@Test
 	public void testQueryForUploadDestinationsWithUploadToS3() {
 		S3UploadDestination d = new S3UploadDestination();
 		d.setUploadType(UploadType.S3);
@@ -626,12 +535,6 @@ public class UploaderTest {
 		uploader.handleUploads();
 
 		verify(mockView, Mockito.never()).showErrorMessage(DisplayConstants.CREDENTIALS_REQUIRED_MESSAGE);
-		reset(mockView);
-		uploader.setCurrentUploadType(UploadType.SFTP);
-		uploader.handleUploads();
-		verify(mockView).showErrorMessage(DisplayConstants.CREDENTIALS_REQUIRED_MESSAGE);
-		verify(mockView).hideLoading();
-		verify(mockView).enableUpload();
 	}
 
 	@Test
@@ -642,39 +545,6 @@ public class UploaderTest {
 		uploader.setCurrentUploadType(UploadType.SFTP);
 		uploader.handleUploads();
 		verify(mockView, Mockito.never()).showErrorMessage(DisplayConstants.CREDENTIALS_REQUIRED_MESSAGE);
-	}
-
-	@Test
-	public void testGetSftpProxyLink() throws UnsupportedEncodingException {
-		String sftpProxy = "http://mytestproxy.com/sftp";
-		String filename = "override that.txt";
-		// test with existing query param
-		when(mockSynapseProperties.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT)).thenReturn(sftpProxy + "?gwt.codesvr=localhost:9999");
-		// and the sftp link contains characters that should be escaped
-		String sftpLink = "sftp://this/and/that.txt?foo=bar";
-		String encodedUrl = URLEncoder.encode(sftpLink, "UTF-8");
-		String encodedFilename = URLEncoder.encode(filename, "UTF-8");
-		when(mockGwt.encodeQueryString(sftpLink)).thenReturn(encodedUrl);
-		when(mockGwt.encodeQueryString(filename)).thenReturn(encodedFilename);
-		String sftpProxyLink = Uploader.getSftpProxyLink(filename, sftpLink, mockSynapseProperties, mockGwt);
-		// verify that the sftp link was encoded
-		assertTrue(sftpProxyLink.contains(encodedUrl));
-		assertTrue(sftpProxyLink.contains(encodedFilename));
-		// and that it did not add another '?' for the url param
-		assertTrue(sftpProxyLink.contains("&url="));
-	}
-
-	@Test
-	public void testHandleSftpSubmitResult() throws RestServiceException {
-		uploader.setCurrentUploadType(UploadType.SFTP);
-		uploader.setFileNames(new String[] {"test.txt"});
-		UploadResult r = new UploadResult();
-		r.setUploadStatus(UploadStatus.SUCCESS);
-		String newUrl = "sftp://bar/test.txt";
-		r.setMessage(newUrl);
-		uploader.handleSubmitResult(r);
-		// should try to create a new external file
-		verify(mockSynapseClient).createExternalFile(anyString(), anyString(), anyString(), anyString(), anyLong(), anyString(), anyLong(), any(AsyncCallback.class));
 	}
 
 	@Test

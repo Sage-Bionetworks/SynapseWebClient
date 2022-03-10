@@ -95,21 +95,7 @@
 								<b:TextBox ui:field="externalObjectStoreBannerField" addStyleNames="margin-bottom-10 hide-resize padding-left-10" />
 							</b:InputGroup>
 						</bh:Div>
-						
-						<b:Radio ui:field="sftpButton" name="storageLocationRadio" text="SFTP Server" addStyleNames="font-size-18"/>
-						<bh:Div addStyleNames="margin-left-20" ui:field="sftpCollapse">
-					    	<b:FormLabel for="sftpUrlField" >URL</b:FormLabel>
-							<b:TextBox ui:field="sftpUrlField" addStyleNames="margin-bottom-10 hide-resize"/>
-							<b:FormLabel for="sftpBannerField" >Banner</b:FormLabel>
-							<b:InputGroup width="100%">
-								<b:InputGroupButton>
-									<b:Button ui:field="sftpBannerDropdownButton" dataToggle="DROPDOWN" />
-									<b:DropDownMenu ui:field="sftpBannerOptions">
-									</b:DropDownMenu>
-								</b:InputGroupButton>
-								<b:TextBox ui:field="sftpBannerField" addStyleNames="margin-bottom-10 hide-resize padding-left-10" />
-							</b:InputGroup>
-					    </bh:Div>
+
 					</bh:Div>
 			    </b:FormGroup>
 			   <g:SimplePanel ui:field="synAlertPanel"/>

@@ -76,6 +76,8 @@ public class DisplayConstants {
 	public static final String TEXT_LINK_FAILED = "An error occurred while creating the link.  ";
 	public static final String TEXT_UPLOAD_SUCCESS = "File successfully uploaded";
 	public static final String ERROR_UPLOAD_TITLE = "Upload Error";
+	public static final String ERROR_SFTP_DOWNLOAD_TITLE = "SFTP Download Error";
+	public static final String ERROR_SFTP_DOWNLOAD_MESSAGE= "This file is hosted on a SFTP server. Please use a SFTP client to access this file.";
 	public static final String LABEL_UPLOADING = "Uploading...";
 	public static final String LABEL_INITIALIZING = "Initializing...";
 	public static final String ANONYMOUS_JOIN_EVALUATION = "Please sign in or register for a free Synapse account to participate in this challenge.";

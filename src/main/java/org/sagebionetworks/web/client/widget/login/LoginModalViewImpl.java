@@ -171,4 +171,9 @@ public class LoginModalViewImpl implements LoginModalView {
 		passwordField.setValue("");
 	}
 
+	@Override
+	public void setShowInput(boolean showInput){
+		formPanel.setVisible(showInput);
+		primaryButton.setVisible(showInput);
+	}
 }

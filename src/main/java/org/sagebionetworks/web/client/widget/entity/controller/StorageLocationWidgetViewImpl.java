@@ -50,23 +50,11 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 	Button externalGoogleCloudBannerDropdownButton;
 
 	@UiField
-	TextBox sftpUrlField;
-
-	@UiField
-	TextBox sftpBannerField;
-	@UiField
-	DropDownMenu sftpBannerOptions;
-	@UiField
-	Button sftpBannerDropdownButton;
-
-	@UiField
 	Radio synapseStorageButton;
 	@UiField
 	Radio externalS3Button;
 	@UiField
 	Radio externalGoogleCloudStorageButton;
-	@UiField
-	Radio sftpButton;
 	@UiField
 	Radio externalObjectStoreButton;
 
@@ -80,8 +68,6 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 	Div s3Collapse;
 	@UiField
 	Div googleCloudCollapse;
-	@UiField
-	Div sftpCollapse;
 	@UiField
 	Div externalObjectStoreCollapse;
 
@@ -123,10 +109,6 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 			hideCollapses();
 			googleCloudCollapse.setVisible(true);
 		});
-		sftpButton.addClickHandler(event -> {
-			hideCollapses();
-			sftpCollapse.setVisible(true);
-		});
 		externalObjectStoreButton.addClickHandler(event -> {
 			hideCollapses();
 			externalObjectStoreCollapse.setVisible(true);
@@ -137,7 +119,6 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 		externalObjectStoreCollapse.setVisible(false);
 		s3Collapse.setVisible(false);
 		googleCloudCollapse.setVisible(false);
-		sftpCollapse.setVisible(false);
 	}
 
 	@Override
@@ -166,16 +147,12 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 		googleCloudBucketField.setText("");
 		googleCloudBaseKeyField.setText("");
 		externalGoogleCloudBannerField.setText("");
-		sftpUrlField.setText("sftp://");
-		sftpBannerField.setText("");
 		selectSynapseStorage();
 		s3Collapse.setVisible(false);
 		googleCloudCollapse.setVisible(false);
-		sftpCollapse.setVisible(false);
 		externalS3BannerOptions.clear();
 		externalGoogleCloudBannerOptions.clear();
 		externalObjectStoreBannerOptions.clear();
-		sftpBannerOptions.clear();
 		s3StsField.setValue(false);
 	}
 
@@ -235,13 +212,6 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 	}
 
 	@Override
-	public void selectSFTPStorage() {
-		hideCollapses();
-		sftpButton.setValue(true);
-		sftpCollapse.setVisible(true);
-	}
-
-	@Override
 	public String getExternalObjectStoreBanner() {
 		return externalObjectStoreBannerField.getValue();
 	}
@@ -284,16 +254,6 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 	}
 
 	@Override
-	public boolean isSFTPStorageSelected() {
-		return sftpButton.getValue();
-	}
-
-	@Override
-	public String getSFTPUrl() {
-		return sftpUrlField.getValue();
-	}
-
-	@Override
 	public String getExternalS3Banner() {
 		return externalS3BannerField.getValue();
 	}
@@ -301,11 +261,6 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 	@Override
 	public String getExternalGoogleCloudBanner() {
 		return externalGoogleCloudBannerField.getValue();
-	}
-
-	@Override
-	public String getSFTPBanner() {
-		return sftpBannerField.getValue();
 	}
 
 	@Override
@@ -362,23 +317,12 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 	}
 
 	@Override
-	public void setSFTPBanner(String banner) {
-		sftpBannerField.setValue(banner);
-	}
-
-	@Override
-	public void setSFTPUrl(String url) {
-		sftpUrlField.setValue(url);
-	}
-
-	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
 	}
 
 	@Override
 	public void setBannerSuggestions(List<String> banners) {
-		addBannerOptions(sftpBannerField, sftpBannerOptions, banners);
 		addBannerOptions(externalS3BannerField, externalS3BannerOptions, banners);
 		addBannerOptions(externalObjectStoreBannerField, externalObjectStoreBannerOptions, banners);
 	}
@@ -397,14 +341,9 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 	public void setBannerDropdownVisible(boolean isVisible) {
 		externalS3BannerDropdownButton.setVisible(isVisible);
 		externalGoogleCloudBannerDropdownButton.setVisible(isVisible);
-		sftpBannerDropdownButton.setVisible(isVisible);
 		externalObjectStoreBannerDropdownButton.setVisible(isVisible);
 	}
 
-	@Override
-	public void setSFTPVisible(boolean visible) {
-		sftpButton.setVisible(visible);
-	}
 
 	@Override
 	public void setGoogleCloudVisible(boolean visible) {

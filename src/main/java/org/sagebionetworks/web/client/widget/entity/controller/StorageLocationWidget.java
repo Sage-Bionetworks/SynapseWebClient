@@ -9,13 +9,11 @@ import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.ExternalGoogleCloudUploadDestination;
 import org.sagebionetworks.repo.model.file.ExternalObjectStoreUploadDestination;
 import org.sagebionetworks.repo.model.file.ExternalS3UploadDestination;
-import org.sagebionetworks.repo.model.file.ExternalUploadDestination;
 import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.file.UploadType;
 import org.sagebionetworks.repo.model.project.ExternalGoogleCloudStorageLocationSetting;
 import org.sagebionetworks.repo.model.project.ExternalObjectStorageLocationSetting;
 import org.sagebionetworks.repo.model.project.ExternalS3StorageLocationSetting;
-import org.sagebionetworks.repo.model.project.ExternalStorageLocationSetting;
 import org.sagebionetworks.repo.model.project.StorageLocationSetting;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -25,8 +23,6 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.shared.WebConstants;
 import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.regexp.shared.MatchResult;
-import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -64,7 +60,6 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 		getStorageLocationSetting();
 		getMyLocationSettingBanners();
 		boolean isInAlpha = DisplayUtils.isInTestWebsite(cookies);
-		view.setSFTPVisible(isInAlpha);
 		view.setExternalObjectStoreVisible(isInAlpha);
 	}
 
@@ -85,7 +80,6 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 
 	public void getStorageLocationSetting() {
 		Entity entity = entityBundle.getEntity();
-		view.setSFTPVisible(DisplayUtils.isInTestWebsite(cookies));
 		jsClient.getDefaultUploadDestination(entity.getId(), new AsyncCallback<UploadDestination>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -127,12 +121,6 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 						view.setExternalObjectStoreBucket(trim(destination.getBucket()));
 						view.setExternalObjectStoreEndpointUrl(trim(destination.getEndpointUrl()));
 						view.selectExternalObjectStore();
-					} else if (uploadDestination instanceof ExternalUploadDestination) {
-						view.setSFTPVisible(true);
-						ExternalUploadDestination destination = (ExternalUploadDestination) uploadDestination;
-						view.setSFTPUrl(trim(destination.getUrl()));
-						view.setSFTPBanner(banner);
-						view.selectSFTPStorage();
 					}
 				}
 				view.setLoading(false);
@@ -219,12 +207,6 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 				setting.setEndpointUrl(replaceWithNullIfEmptyTrimmedString(view.getExternalObjectStoreEndpointUrl()));
 				setting.setUploadType(UploadType.S3);
 				return setting;
-			} else if (view.isSFTPStorageSelected()) {
-				ExternalStorageLocationSetting setting = new ExternalStorageLocationSetting();
-				setting.setUrl(replaceWithNullIfEmptyTrimmedString(view.getSFTPUrl()));
-				setting.setBanner(replaceWithNullIfEmptyTrimmedString(view.getSFTPBanner()));
-				setting.setUploadType(UploadType.SFTP);
-				return setting;
 			} else {
 				// default synapse storage
 				return null;
@@ -255,24 +237,8 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 				if (externalGoogleCloudStorageLocationSetting.getBucket() == null || externalGoogleCloudStorageLocationSetting.getBucket().trim().isEmpty()) {
 					return "Bucket is required.";
 				}
-			} else if (setting instanceof ExternalStorageLocationSetting) {
-				ExternalStorageLocationSetting externalStorageLocationSetting = (ExternalStorageLocationSetting) setting;
-				if (!isValidSftpUrl(externalStorageLocationSetting.getUrl())) {
-					return "A valid SFTP URL is required.";
-				}
 			}
 		}
 		return null;
-	}
-
-
-	public static boolean isValidSftpUrl(String url) {
-		if (url == null || url.trim().length() == 0) {
-			// url is undefined
-			return false;
-		}
-		RegExp regEx = RegExp.compile(WebConstants.VALID_SFTP_URL_REGEX, "gmi");
-		MatchResult matchResult = regEx.exec(url);
-		return (matchResult != null && url.equals(matchResult.getGroup(0)));
 	}
 }
