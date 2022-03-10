@@ -105,7 +105,7 @@ public class FileDownloadMenuItem implements FileDownloadMenuItemView.Presenter,
 					// special case, if this starts with sftp proxy, then handle
 					String sftpProxy = ginInjector.getSynapseProperties().getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT);
 					if (directDownloadUrl.startsWith(sftpProxy)) {
-						view.showDownloadError();
+						view.setIsSFTPDownload();
 					} else {
 						view.setIsDirectDownloadLink(directDownloadUrl);
 					}

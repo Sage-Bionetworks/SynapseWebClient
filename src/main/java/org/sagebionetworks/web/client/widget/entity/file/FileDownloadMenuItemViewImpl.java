@@ -23,7 +23,7 @@ public class FileDownloadMenuItemViewImpl implements FileDownloadMenuItemView {
 
 	private static FileDownloadMenuItemViewImplUiBinder uiBinder = GWT.create(FileDownloadMenuItemViewImplUiBinder.class);
 	Widget widget;
-	ClickHandler licensedDownloadClickHandler, directDownloadClickHandler, errorDownloadClickHandler;
+	ClickHandler licensedDownloadClickHandler, directDownloadClickHandler, sftpDownloadClickHandler;
 	HandlerRegistration downloadLinkHandlerRegistration;
 
 	@Inject
@@ -38,7 +38,7 @@ public class FileDownloadMenuItemViewImpl implements FileDownloadMenuItemView {
 		directDownloadClickHandler = event -> {
 			presenter.onDirectDownloadClicked();
 		};
-		errorDownloadClickHandler = event -> {
+		sftpDownloadClickHandler = event -> {
 			presenter.onSFTPDownloadErrorClicked();
 		};
 	}
@@ -53,8 +53,11 @@ public class FileDownloadMenuItemViewImpl implements FileDownloadMenuItemView {
 	}
 
 	@Override
-	public void showDownloadError(){
-		downloadLinkHandlerRegistration = downloadLink.addClickHandler(errorDownloadClickHandler);
+	public void setIsSFTPDownload(){
+		String href = downloadLink.getHref();
+		clearClickHandlers();
+		downloadLink.setHref(href);
+		downloadLinkHandlerRegistration = downloadLink.addClickHandler(sftpDownloadClickHandler);
 	}
 
 	@Override
