@@ -273,12 +273,14 @@ public class DisplayUtils {
 			String title = null;
 			if (options != null) {
 				title = options.title;
+			} else {
+				options = new ToastMessageOptions.Builder().build();
 			}
 
 			String key = variant + "/" + title + "/" + message;
 			if (!recentNotificationMessages.contains(key)) {
 				recentNotificationMessages.add(key);
-                SRC.SynapseComponents.displayToast(message, variant.toString(), options);
+				SRC.SynapseComponents.displayToast(message, variant.toString(), options);
 				// in 5 seconds clean up that key (to allow showing the message again)
 				Timer timer = new Timer() {
 					public void run() {
