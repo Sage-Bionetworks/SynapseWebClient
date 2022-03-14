@@ -23,6 +23,7 @@ import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -124,10 +125,11 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 				boolean isCurrentVersion = true;
 				entityActionController.configure(actionMenu, bundle, isCurrentVersion, bundle.getRootWikiId(), EntityArea.TABLES);
 				boolean canEdit = false;
-				hideEditActions();
 				if (!DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider())) {
-					getTableEntityWidget().configure(bundle, tableVersionNumber, canEdit, TableQueryResultWikiWidget.this, actionMenu);	
+					getTableEntityWidget().configure(bundle, tableVersionNumber, canEdit, TableQueryResultWikiWidget.this, actionMenu);
+					hideEditActions();
 				} else {
+					hideEditActions();
 					getTableEntityPlotsWidget().configure(bundle, tableVersionNumber, canEdit, TableQueryResultWikiWidget.this, actionMenu);
 				}
 				isLoading = false;
