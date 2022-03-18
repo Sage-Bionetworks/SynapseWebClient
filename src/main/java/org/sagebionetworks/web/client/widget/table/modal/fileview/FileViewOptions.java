@@ -38,11 +38,6 @@ public class FileViewOptions implements IsWidget {
 		return widget;
 	}
 
-	// TODO: This method can be removed when Datasets is out of experimental mode.
-	public void configure() {
-		includeDatasetsCb.setVisible(DisplayUtils.isInTestWebsite(cookieProvider));
-	}
-
 	public boolean isIncludeFiles() {
 		return includeFilesCb.getValue();
 	}
