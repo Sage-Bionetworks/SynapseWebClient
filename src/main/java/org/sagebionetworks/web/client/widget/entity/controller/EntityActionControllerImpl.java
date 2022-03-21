@@ -890,7 +890,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 
 	private void configureMove() {
 		if (isMovableType(entityBundle.getEntity())) {
-			actionMenu.setActionVisible(Action.MOVE_ENTITY, permissions.getCanEdit());
+			actionMenu.setActionVisible(Action.MOVE_ENTITY, permissions.getCanEdit() && permissions.getCanChangePermissions());
 			actionMenu.setActionText(Action.MOVE_ENTITY, MOVE_PREFIX + entityTypeDisplay);
 			actionMenu.setActionListener(Action.MOVE_ENTITY, this);
 		} else {
