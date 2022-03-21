@@ -934,6 +934,14 @@ public class EntityActionControllerImplTest {
 	}
 
 	@Test
+	public void testCannotMoveWithoutChangePermissions() {
+		permissions.setCanChangePermissions(false);
+		entityBundle.setEntity(new Folder());
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
+		verify(mockActionMenu).setActionVisible(Action.MOVE_ENTITY, false);
+	}
+
+	@Test
 	public void testConfigureUploadNewFile() {
 		entityBundle.setEntity(new FileEntity());
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
