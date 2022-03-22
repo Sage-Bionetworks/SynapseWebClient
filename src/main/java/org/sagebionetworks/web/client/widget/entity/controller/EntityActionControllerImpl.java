@@ -1642,8 +1642,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 						if (!errors.isEmpty()) {
 							view.showErrorMessage(errors);
 						} else {
-							fireEntityUpdatedEvent();
-
 							ToastMessageOptions.Builder messageBuilder = new ToastMessageOptions.Builder();
 							EntityArea newVersionArea;
 							String toastMsg;
