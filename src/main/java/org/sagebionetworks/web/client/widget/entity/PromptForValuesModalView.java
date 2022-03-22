@@ -78,6 +78,8 @@ public interface PromptForValuesModalView extends IsWidget {
 
 	public void configureAndShow(String title, String prompt, String initialValue, CallbackP<String> newValueCallback);
 
+	public void configureAndShow(String title, String prompt, String initialValue, PromptForValuesModalView.InputType inputType, CallbackP<String> newValueCallback);
+
 	/**
 	 * Configure this view with starting data.
 	 * 

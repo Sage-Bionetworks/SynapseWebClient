@@ -1729,7 +1729,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 				public void callback(String result) {
 					createWikiPage(result);
 				}
-			});
+			}, PromptForValuesModalView.InputType.TEXTBOX);
 		}
 	}
 
@@ -1813,7 +1813,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	
 	private void postCheckEditDefiningSql() {
 		// prompt for defining sql
-		view.showPromptDialog("Update SQL", ((MaterializedView)entity).getDefiningSQL(), getUpdateDefiningSqlCallback());
+		view.showPromptDialog("Update SQL", ((MaterializedView)entity).getDefiningSQL(), getUpdateDefiningSqlCallback(), PromptForValuesModalView.InputType.TEXTAREA);
 	}
 
 	public void onDeleteWiki() {

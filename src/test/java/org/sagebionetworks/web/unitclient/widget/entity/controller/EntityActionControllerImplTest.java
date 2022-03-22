@@ -1855,7 +1855,7 @@ public class EntityActionControllerImplTest {
 		verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
 		// it prompts the user for a wiki page name
 		ArgumentCaptor<PromptCallback> callbackCaptor = ArgumentCaptor.forClass(PromptCallback.class);
-		verify(mockView).showPromptDialog(anyString(), anyString(), callbackCaptor.capture());
+		verify(mockView).showPromptDialog(anyString(), anyString(), callbackCaptor.capture(), eq(PromptForValuesModalView.InputType.TEXTBOX));
 		PromptCallback capturedCallback = callbackCaptor.getValue();
 		// if called back with an undefined value, a wiki page is still not created
 		capturedCallback.callback("");
@@ -2283,7 +2283,7 @@ public class EntityActionControllerImplTest {
 
 		// user is prompted for the new SQL
 		ArgumentCaptor<PromptCallback> callbackCaptor = ArgumentCaptor.forClass(PromptCallback.class);
-		verify(mockView).showPromptDialog(anyString(), anyString(), callbackCaptor.capture());
+		verify(mockView).showPromptDialog(anyString(), anyString(), callbackCaptor.capture(), eq(PromptForValuesModalView.InputType.TEXTAREA));
 		PromptCallback capturedCallback = callbackCaptor.getValue();
 		String newSql = "select nothing";
 		
