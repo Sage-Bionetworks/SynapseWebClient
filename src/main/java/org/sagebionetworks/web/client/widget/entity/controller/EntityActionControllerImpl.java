@@ -772,15 +772,15 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			boolean isDataset = entityBundle.getEntity() instanceof Dataset;
 			boolean isMaterializedView = entityBundle.getEntity() instanceof MaterializedView;
 			// For UX reasons, datasets are not editable, even if the user has permissions (SWC-5870, SWC-5903)
-			boolean canEditResults = entityBundle.getPermissions().getCanCertifiedUserEdit() && !isDataset && !isMaterializedView;
+			boolean canEditResults = permissions.getCanCertifiedUserEdit() && !isDataset && !isMaterializedView;
 			actionMenu.setActionVisible(Action.UPLOAD_TABLE_DATA, canEditResults);
 			actionMenu.setActionText(Action.UPLOAD_TABLE_DATA, "Upload Data to " + entityTypeDisplay);
 			actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, canEditResults);
 			actionMenu.setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
 			actionMenu.setActionVisible(Action.SHOW_TABLE_SCHEMA, true);
 			actionMenu.setActionVisible(Action.SHOW_VIEW_SCOPE, !(entityBundle.getEntity() instanceof TableEntity) && !isDataset && !isMaterializedView);
-			actionMenu.setActionVisible(Action.EDIT_DATASET_ITEMS, isDataset && isCurrentVersion);
-			actionMenu.setActionVisible(Action.EDIT_DEFINING_SQL, isMaterializedView && isCurrentVersion);
+			actionMenu.setActionVisible(Action.EDIT_DATASET_ITEMS, permissions.getCanCertifiedUserEdit() && isDataset && isCurrentVersion);
+			actionMenu.setActionVisible(Action.EDIT_DEFINING_SQL, permissions.getCanCertifiedUserEdit() && isMaterializedView && isCurrentVersion);
 			actionMenu.setActionListener(Action.EDIT_DEFINING_SQL, this);
 		} else {
 			actionMenu.setActionVisible(Action.UPLOAD_TABLE_DATA, false);
@@ -984,15 +984,15 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 
 	private void configureShareAction() {
 		if (isTopLevelProjectToolsMenu(entityBundle.getEntity(), currentArea)) {
-			actionMenu.setActionVisible(Action.SHARE, false);
+			actionMenu.setActionVisible(Action.VIEW_SHARING_SETTINGS, false);
 		} else {
-			actionMenu.setActionVisible(Action.SHARE, true);
-			actionMenu.setActionListener(Action.SHARE, this);
-			actionMenu.setActionText(Action.SHARE, entityTypeDisplay + " Sharing Settings");
+			actionMenu.setActionVisible(Action.VIEW_SHARING_SETTINGS, true);
+			actionMenu.setActionListener(Action.VIEW_SHARING_SETTINGS, this);
+			actionMenu.setActionText(Action.VIEW_SHARING_SETTINGS, entityTypeDisplay + " Sharing Settings");
 			if (PublicPrivateBadge.isPublic(entityBundle.getBenefactorAcl(), ginInjector.getSynapseProperties().getPublicPrincipalIds())) {
-				actionMenu.setActionIcon(Action.SHARE, IconType.GLOBE);
+				actionMenu.setActionIcon(Action.VIEW_SHARING_SETTINGS, IconType.GLOBE);
 			} else {
-				actionMenu.setActionIcon(Action.SHARE, IconType.LOCK);
+				actionMenu.setActionIcon(Action.VIEW_SHARING_SETTINGS, IconType.LOCK);
 			}
 		}
 	}
@@ -1091,7 +1091,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			case DELETE_ENTITY:
 				onDeleteEntity();
 				break;
-			case SHARE:
+			case VIEW_SHARING_SETTINGS:
 				onShare();
 				break;
 			case CHANGE_ENTITY_NAME:
