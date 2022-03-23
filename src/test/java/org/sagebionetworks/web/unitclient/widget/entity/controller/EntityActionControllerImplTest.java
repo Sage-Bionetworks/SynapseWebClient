@@ -1151,9 +1151,10 @@ public class EntityActionControllerImplTest {
 		// on success
 		handler.onComplete(mockTableUpdateTransactionResponse);
 		verify(mockView).hideCreateVersionDialog();
-		verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
 		verify(mockPopupUtils).notify(any(), any(), any(ToastMessageOptions.class));
 		verify(mockPlaceChanger).goTo(any());
+		// Don't fire an updated event; we used placeChanger to go to a new place.
+		verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
 	}
 
 	@Test
@@ -1211,9 +1212,10 @@ public class EntityActionControllerImplTest {
 		// on success
 		handler.onComplete(mockTableUpdateTransactionResponse);
 		verify(mockView).hideCreateVersionDialog();
-		verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
 		verify(mockPopupUtils).notify(any(), any(), any(ToastMessageOptions.class));
 		verify(mockPlaceChanger).goTo(any());
+		// Don't fire an updated event; we used placeChanger to go to a new place.
+		verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
 	}
 
 	@Test
