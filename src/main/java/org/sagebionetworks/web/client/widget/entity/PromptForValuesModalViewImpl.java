@@ -128,6 +128,21 @@ public class PromptForValuesModalViewImpl implements PromptForValuesModalView {
 	}
 
 	@Override
+	public void configureAndShow(String title, String prompt, String initialValue, InputType inputType, CallbackP<String> newValueCallback) {
+		List<String> promptListWrapper = Collections.singletonList(prompt);
+		List<String> initialValueListWrapper = null;
+		if (initialValue != null) {
+			initialValueListWrapper = Collections.singletonList(initialValue);
+		}
+		CallbackP<List<String>> newValueCallbackWrapper = list -> {
+			newValueCallback.invoke(list.get(0));
+		};
+
+		List<InputType> inputTypeWrapper = Collections.singletonList(inputType);
+		configureAndShow(title, promptListWrapper, initialValueListWrapper, inputTypeWrapper, newValueCallbackWrapper);
+	}
+
+	@Override
 	public void configureAndShow(String title, List<String> prompts, List<String> initialValues, CallbackP<List<String>> newValuesCallback) {
 		// By default, use a TextBox for each field
 		List<InputType> textboxForEach = new ArrayList<>(prompts.size());

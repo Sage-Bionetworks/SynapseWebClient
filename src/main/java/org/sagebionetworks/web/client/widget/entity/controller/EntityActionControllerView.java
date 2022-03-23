@@ -50,7 +50,7 @@ public interface EntityActionControllerView extends ShowsErrors, IsWidget {
 	 * @param title
 	 * @param callback
 	 */
-	void showPromptDialog(String title, String initialValue, PromptCallback callback);
+	void showPromptDialog(String title, String initialValue, PromptCallback callback, PromptForValuesModalView.InputType inputType);
 
 	void setUploadDialogWidget(IsWidget w);
 
