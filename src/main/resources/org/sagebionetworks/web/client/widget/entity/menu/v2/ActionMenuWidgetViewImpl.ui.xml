@@ -39,7 +39,7 @@
 								addStyleNames="dropdown-menu-right">
 					<b:DropDownHeader ui:field="noActionsAvailable" addStyleNames="font-italic">No actions available</b:DropDownHeader>
 					<a:ActionMenuItem icon="HDD_O" iconFixedWidth="true" action="EDIT_DATASET_ITEMS">Edit Dataset Items</a:ActionMenuItem>
-					<a:ActionMenuItem icon="LOCK" iconFixedWidth="true" action="SHARE">Share</a:ActionMenuItem>
+					<a:ActionMenuItem icon="LOCK" iconFixedWidth="true" action="VIEW_SHARING_SETTINGS">Share</a:ActionMenuItem>
 					<a:ActionMenuItem icon="EDIT" iconFixedWidth="true" action="EDIT_PROJECT_METADATA">Edit Project Metadata</a:ActionMenuItem>
 					<a:ActionMenuItem icon="BAR_CHART" iconFixedWidth="true" action="SHOW_PROJECT_STATS">Show Project Statistics</a:ActionMenuItem>
 					<a:ActionMenuItem icon="EDIT" iconFixedWidth="true" action="EDIT_FILE_METADATA">Edit File Metadata</a:ActionMenuItem>
