@@ -42,7 +42,6 @@ public class CreateTableViewWizardStep1ViewImpl implements CreateTableViewWizard
 	public CreateTableViewWizardStep1ViewImpl(Binder binder, FileViewOptions viewOptions, CookieProvider cookies) {
 		widget = binder.createAndBindUi(this);
 		this.viewOptions = viewOptions;
-		viewOptions.configure();
 		viewOptionsContainer.add(viewOptions);
 		viewOptions.addClickHandler(event -> {
 			p.updateViewTypeMask();

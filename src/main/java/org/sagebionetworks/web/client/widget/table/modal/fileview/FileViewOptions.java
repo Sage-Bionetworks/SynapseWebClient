@@ -16,7 +16,6 @@ public class FileViewOptions implements IsWidget {
 	}
 
 	Widget widget;
-	CookieProvider cookieProvider;
 
 	@UiField
 	CheckBox includeFilesCb;
@@ -28,19 +27,13 @@ public class FileViewOptions implements IsWidget {
 	CheckBox includeDatasetsCb;
 
 	@Inject
-	public FileViewOptions(Binder binder, CookieProvider cookies) {
+	public FileViewOptions(Binder binder) {
 		widget = binder.createAndBindUi(this);
-		cookieProvider = cookies;
 	}
 
 	@Override
 	public Widget asWidget() {
 		return widget;
-	}
-
-	// TODO: This method can be removed when Datasets is out of experimental mode.
-	public void configure() {
-		includeDatasetsCb.setVisible(DisplayUtils.isInTestWebsite(cookieProvider));
 	}
 
 	public boolean isIncludeFiles() {

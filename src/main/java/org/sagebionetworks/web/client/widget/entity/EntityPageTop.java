@@ -553,18 +553,14 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 			// if user can edit, then show other tabs
 			getTabVisibilityCallback(EntityArea.WIKI, wikiTab.asTab()).onSuccess(true);
 			getTabVisibilityCallback(EntityArea.FILES, filesTab.asTab()).onSuccess(true);
-			if (DisplayUtils.isInTestWebsite(cookies)) {
-				getTabVisibilityCallback(EntityArea.DATASETS, datasetsTab.asTab()).onSuccess(true);
-			}
+			getTabVisibilityCallback(EntityArea.DATASETS, datasetsTab.asTab()).onSuccess(true);
 			getTabVisibilityCallback(EntityArea.TABLES, tablesTab.asTab()).onSuccess(true);
 			getTabVisibilityCallback(EntityArea.DOCKER, dockerTab.asTab()).onSuccess(true);
 		} else {
 			// otherwise only show the tabs only if content is present.
 			synapseJavascriptClient.isWiki(projectHeader.getId(), getTabVisibilityCallback(EntityArea.WIKI, wikiTab.asTab()));
 			synapseJavascriptClient.isFileOrFolder(projectHeader.getId(), getTabVisibilityCallback(EntityArea.FILES, filesTab.asTab()));
-			if (DisplayUtils.isInTestWebsite(cookies)) {
-				synapseJavascriptClient.isDataset(projectHeader.getId(), getTabVisibilityCallback(EntityArea.DATASETS, datasetsTab.asTab()));
-			}
+			synapseJavascriptClient.isDataset(projectHeader.getId(), getTabVisibilityCallback(EntityArea.DATASETS, datasetsTab.asTab()));
 			synapseJavascriptClient.isTable(projectHeader.getId(), getTabVisibilityCallback(EntityArea.TABLES, tablesTab.asTab()));
 			synapseJavascriptClient.isDocker(projectHeader.getId(), getTabVisibilityCallback(EntityArea.DOCKER, dockerTab.asTab()));
 		}

@@ -912,18 +912,4 @@ public class EntityPageTopTest {
 		// verify we did not change place, but instead reconfigured for target entity under the same project
 		verify(mockPlaceChanger, never()).goTo(newPlace);
 	}
-
-	@Test
-	public void testNoDatasetsTabIfNotInExperimentalMode() {
-		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn(null);
-
-		Synapse.EntityArea area = null;
-		String areaToken = null;
-		Long versionNumber = null;
-
-		pageTop.configure(mockProjectBundle, versionNumber, mockProjectHeader, area, areaToken);
-		// datasets tab should never be shown
-		verify(mockDatasetsInnerTab, never()).setTabListItemVisible(true);
-		verify(mockSynapseJavascriptClient, never()).isDataset(anyString(), any(AsyncCallback.class));
-	}
 }
