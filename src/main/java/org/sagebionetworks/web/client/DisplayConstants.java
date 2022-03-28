@@ -101,7 +101,7 @@ public class DisplayConstants {
 	public static final String ERROR_LOADING_WIKI_FAILED = "Failed to load the wiki page: ";
 	public static final String ERROR_LOADING_WIKI_HISTORY_WIDGET_FAILED = "Failed to load the history of the wiki page.";
 	public static final String WARNING_PROJECT_NAME_EXISTS = "Sorry, a project with that name already exists. Please try another name.";
-	public static final String WARNING_TEAM_NAME_EXISTS = "Sorry, a team with that name already exists. Please try another name.";
+	public static final String WARNING_TEAM_NAME_EXISTS = "Sorry, a team or a user with that name already exists. Please try another name.";
 	public static final String ERROR_FAILURE_PRIVLEDGES = "Sorry, you do not have sufficient privileges for access.";
 	public static final String NETWORK_ERROR = "Network error";
 	public static final String ERROR_RESPONSE_UNAVAILABLE = "The web page is not available. Please check your Internet connection.";
