@@ -1,6 +1,7 @@
 {
   "dependencies": {
-    "@rjsf/core": "^3.0.0",
+    "@rjsf/core": "^4.0.1",
+    "@sage-bionetworks/react-base-table": "^1.12.3",
     "croppie": "2.6.5",
     "font-awesome": "4.7.0",
     "jquery": "3.5.1",
@@ -15,7 +16,7 @@
     "react-transition-group": "2.6.0",
     "sanitize-html": "^1.18.4",
     "sass": "1.36.0",
-    "synapse-react-client": "2.1.23",
+    "synapse-react-client": "3.0.0",
     "universal-cookie": "^4.0.3"
   }
 }
