@@ -1098,7 +1098,7 @@ end sticky footer
 	word-wrap: break-word;
 	overflow-x: auto;
 	overflow-y: hidden;
-	line-height: 1.8em;
+	line-height: 1.5em;
 	color: #000000;
 	ol { 
 		list-style-type: decimal;
@@ -3595,7 +3595,7 @@ div.border {
 }
 
 #body .EntityFinder .EntityFinderDetailsView .checkbox {
-	margin-top: 0px;
+	margin-top: -12px;
 	height: 25px;
 }
 
@@ -3628,7 +3628,7 @@ div.border {
 }
 
 #body .DatasetEditorTable .checkbox {
-	margin-top: -5px;
+	margin-top: -15px;
 }
 
 // We may want to move this to SRC and apply this style to all sites
@@ -3643,9 +3643,6 @@ div.border {
 	display: grid;
 	grid-template-columns: 25px auto 50px;
 	margin-right: 5px;
-	> * {
-		align-self: center;
-	}
 	.checkbox {
 		grid-column: 1 / span 1;
 	}
