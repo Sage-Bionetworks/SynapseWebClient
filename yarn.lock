@@ -1665,10 +1665,10 @@ pinkie@^2.0.0:
   resolved "https://registry.yarnpkg.com/pinkie/-/pinkie-2.0.4.tgz#72556b80cfa0d48a974e80e77248e80ed4f7f870"
   integrity sha1-clVrgM+g1IqXToDnckjoDtT3+HA=
 
-plotly.js-basic-dist@^1.54.7:
-  version "1.58.5"
-  resolved "https://registry.yarnpkg.com/plotly.js-basic-dist/-/plotly.js-basic-dist-1.58.5.tgz#13f52eb93a989899f288dec342048f0dafcb1da1"
-  integrity sha512-Srbt1ACLknY2r655udWwc8cxEan0FvhQUDkX/VW9NATNs5g38mc+OTLmZIRmUrJu2Sr/jDXqZ4EqFnzN9dOXvQ==
+plotly.js-basic-dist@^2.11.1:
+  version "2.11.1"
+  resolved "https://registry.yarnpkg.com/plotly.js-basic-dist/-/plotly.js-basic-dist-2.11.1.tgz#e4488b302524823154a902c0c004db3cc464b7ed"
+  integrity sha512-ZJL/dupVLsNwB1B5IeEQZngZIu3OWDt6BfS5SX031UyjdYa6xbF2wmVVj6amPVsuwENXvvOGrAmhORG08KX8zA==
 
 pluralize@^8.0.0:
   version "8.0.0"
@@ -2311,10 +2311,10 @@ supports-preserve-symlinks-flag@^1.0.0:
   resolved "https://registry.yarnpkg.com/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz#6eda4bd344a3c94aea376d4cc31bc77311039e09"
   integrity sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==
 
-synapse-react-client@3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-3.0.0.tgz#92677b8d9e36838b8ac99cb65c79d504b76c4b83"
-  integrity sha512-5NPz/9lOJJq16H/QAf38aPWxMdRzlUspUyjNOtJFFiUjCqAzjb6CLYqPXGeP+XWBsmYwKScb+/HNl6ezdcbXtw==
+synapse-react-client@3.0.2:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-3.0.2.tgz#80a5ea5d42e5423e9c8ebe613b39f35aae7e0708"
+  integrity sha512-2Z7yFFGIgVJr79lY4XWZt38K5Ye6+dpE9XRjaClCYCabd+XqIkz/Ey4pba4Vci4nvxuA/hZN4RAR3+9aQbLxqQ==
   dependencies:
     "@apidevtools/json-schema-ref-parser" "^9.0.9"
     "@brainhubeu/react-carousel" "1.19.26"
@@ -2356,7 +2356,7 @@ synapse-react-client@3.0.0:
     markdown-it-synapse-table "^1.0.6"
     moment "^2.24.0"
     moment-timezone "^0.5.32"
-    plotly.js-basic-dist "^1.54.7"
+    plotly.js-basic-dist "^2.11.1"
     pluralize "^8.0.0"
     raf "^3.4.1"
     react "16.14.0"
@@ -2375,6 +2375,7 @@ synapse-react-client@3.0.0:
     react-popper "^2.2.5"
     react-query "3.33.1"
     react-reflex "^4.0.0"
+    react-router "5.2.1"
     react-router-dom "5.3.0"
     react-select "^4.3.1"
     react-sizeme "^2.6.12"
