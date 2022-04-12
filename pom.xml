@@ -16,7 +16,7 @@
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<webappDirectory>${project.build.directory}/${project.build.finalName}</webappDirectory>
-		<synapse.version>396.0</synapse.version>
+		<synapse.version>402.0</synapse.version>
 		<gwtVersion>2.9.0</gwtVersion>
 		<org.springframework.version>5.3.18</org.springframework.version>
 		<guiceVersion>3.0</guiceVersion>
@@ -424,27 +424,6 @@
 		<dependency>
 			<groupId>org.sagebionetworks</groupId>
 			<artifactId>lib-stackConfiguration</artifactId>
-			<version>${synapse.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.sagebionetworks</groupId>
-			<artifactId>auth-util</artifactId>
-			<version>${synapse.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.sagebionetworks</groupId>
-			<artifactId>lib-table-query</artifactId>
-			<version>${synapse.version}</version>
-		</dependency>
-		<!-- Provides the S3 log sweeper -->
-		<dependency>
-			<groupId>org.sagebionetworks</groupId>
-			<artifactId>lib-logging</artifactId>
-			<version>${synapse.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.sagebionetworks</groupId>
-			<artifactId>lib-communicationUtilities</artifactId>
 			<version>${synapse.version}</version>
 		</dependency>
 		<dependency>

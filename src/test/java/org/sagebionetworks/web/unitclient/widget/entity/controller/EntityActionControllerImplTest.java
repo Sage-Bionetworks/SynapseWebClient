@@ -334,6 +334,7 @@ public class EntityActionControllerImplTest {
 		permissions.setCanEdit(true);
 		permissions.setCanCertifiedUserEdit(true);
 		permissions.setCanChangeSettings(true);
+		permissions.setCanMove(true);
 		entityBundle = new EntityBundle();
 		entityBundle.setEntity(table);
 		entityBundle.setPermissions(permissions);
@@ -845,6 +846,7 @@ public class EntityActionControllerImplTest {
 		permissions.setCanAddChild(true);
 		permissions.setCanEdit(true);
 		permissions.setCanCertifiedUserEdit(true);
+		permissions.setCanMove(true);
 		entityBundle = new EntityBundle();
 		entityBundle.setEntity(file);
 		entityBundle.setPermissions(permissions);
@@ -1022,8 +1024,8 @@ public class EntityActionControllerImplTest {
 	}
 
 	@Test
-	public void testCannotMoveWithoutChangePermissions() {
-		permissions.setCanChangePermissions(false);
+	public void testCannotMoveWithoutCanMove() {
+		permissions.setCanMove(false);
 		entityBundle.setEntity(new Folder());
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		verify(mockActionMenu).setActionVisible(Action.MOVE_ENTITY, false);
