@@ -296,7 +296,7 @@ public class QueryResultEditorWidget implements QueryResultEditorView.Presenter,
 
 			private void fireEntityUpdatedEvent() {
 				doHideEditor();
-				eventBus.fireEvent(new EntityUpdatedEvent());
+				eventBus.fireEvent(new EntityUpdatedEvent(tableId));
 			}
 		});
 	}

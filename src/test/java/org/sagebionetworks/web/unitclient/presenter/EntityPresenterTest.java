@@ -36,7 +36,9 @@ import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.EntityId2BundleCache;
+import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
+import org.sagebionetworks.web.client.jsinterop.reactquery.QueryClient;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
@@ -102,12 +104,17 @@ public class EntityPresenterTest {
 	Synapse mockPlace;
 	@Mock
 	FileEntity mockFileEntity;
+	@Mock
+	SynapseContextPropsProvider mockSynapseContextPropsProvider;
+	@Mock
+	QueryClient mockQueryClient;
 
 	@Before
 	public void setup() throws Exception {
 		when(mockEntityPresenterEventBinder.getEventBinder()).thenReturn(mockEventBinder);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		entityPresenter = new EntityPresenter(mockView, mockEntityPresenterEventBinder, mockGlobalApplicationState, mockAuthenticationController, mockSynapseJavascriptClient, mockSynAlert, mockEntityPageTop, mockHeaderWidget, mockOpenInviteWidget, mockGwtWrapper, mockEventBus);
+		when(mockSynapseContextPropsProvider.getQueryClient()).thenReturn(mockQueryClient);
+		entityPresenter = new EntityPresenter(mockView, mockEntityPresenterEventBinder, mockGlobalApplicationState, mockAuthenticationController, mockSynapseJavascriptClient, mockSynAlert, mockEntityPageTop, mockHeaderWidget, mockOpenInviteWidget, mockGwtWrapper, mockEventBus, mockSynapseContextPropsProvider);
 		Entity testEntity = new Project();
 		eb = new EntityBundle();
 		eb.setEntity(testEntity);
@@ -223,6 +230,7 @@ public class EntityPresenterTest {
 	public void testEntityUpdatedHandler() {
 		entityPresenter.onEntityUpdatedEvent(new EntityUpdatedEvent());
 
+		verify(mockQueryClient).invalidateQueries(any());
 		verify(mockGlobalApplicationState).refreshPage();
 	}
 

@@ -28,6 +28,10 @@ public class SynapseContextPropsProviderImpl implements SynapseContextPropsProvi
     @JsProperty(namespace = JsPackage.GLOBAL, name="SynapseQueryClient")
     static native void setQueryClient(QueryClient queryClient);
 
+	public QueryClient getQueryClient() {
+		return queryClientSingleton;
+	}
+
     @Inject
     SynapseContextPropsProviderImpl(final AuthenticationController authController, final GlobalApplicationState globalApplicationState, final CookieProvider cookies) {
         this.authController = authController;

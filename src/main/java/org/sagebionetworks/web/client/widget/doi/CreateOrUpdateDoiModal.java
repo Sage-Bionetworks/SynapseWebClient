@@ -238,7 +238,7 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 					toastMessage = "You successfully minted a DOI for this " + EntityTypeUtils.getFriendlyEntityTypeName(entity);
 				}
 				popupUtilsView.notify(toastTitle, toastMessage, DisplayUtils.NotificationVariant.SUCCESS);
-                eventBus.fireEvent(new EntityUpdatedEvent());
+                eventBus.fireEvent(new EntityUpdatedEvent(entity.getId()));
                 view.setIsLoading(false);
                 view.hide();
             }

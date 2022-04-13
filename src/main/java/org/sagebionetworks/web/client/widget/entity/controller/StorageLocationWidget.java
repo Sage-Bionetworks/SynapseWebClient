@@ -171,7 +171,7 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 				@Override
 				public void onSuccess(Void result) {
 					view.hide();
-					eventBus.fireEvent(new EntityUpdatedEvent());
+					eventBus.fireEvent(new EntityUpdatedEvent(entityBundle.getEntity().getId()));
 				}
 			};
 			synapseClient.createStorageLocationSetting(entityBundle.getEntity().getId(), setting, callback);

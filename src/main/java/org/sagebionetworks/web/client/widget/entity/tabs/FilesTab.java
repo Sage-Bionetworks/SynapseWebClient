@@ -277,7 +277,7 @@ public class FilesTab {
 			final WikiPageWidget.Callback wikiCallback = new WikiPageWidget.Callback() {
 				@Override
 				public void pageUpdated() {
-					ginInjector.getEventBus().fireEvent(new EntityUpdatedEvent());
+					ginInjector.getEventBus().fireEvent(new EntityUpdatedEvent(entityBundle.getEntity().getId()));
 				}
 
 				@Override

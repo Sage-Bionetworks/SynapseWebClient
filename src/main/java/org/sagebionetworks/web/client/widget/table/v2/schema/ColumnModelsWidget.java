@@ -239,7 +239,7 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 		baseView.setJobTrackingWidgetVisible(false);
 		// Hide the dialog
 		baseView.hideEditor();
-		ginInjector.getEventBus().fireEvent(new EntityUpdatedEvent());
+		ginInjector.getEventBus().fireEvent(new EntityUpdatedEvent(bundle.getEntity().getId()));
 	}
 
 	public void startTrackingJob(TableUpdateTransactionRequest request) {

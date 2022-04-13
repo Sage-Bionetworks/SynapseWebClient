@@ -315,7 +315,7 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 			final WikiPageWidget.Callback wikiCallback = new WikiPageWidget.Callback() {
 				@Override
 				public void pageUpdated() {
-					ginInjector.getEventBus().fireEvent(new EntityUpdatedEvent());
+					ginInjector.getEventBus().fireEvent(new EntityUpdatedEvent(entity.getId()));
 				}
 
 				@Override
