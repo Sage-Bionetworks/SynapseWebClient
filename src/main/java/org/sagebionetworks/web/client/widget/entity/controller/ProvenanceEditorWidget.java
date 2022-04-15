@@ -165,7 +165,7 @@ public class ProvenanceEditorWidget implements ProvenanceEditorWidgetView.Presen
 				@Override
 				public void onSuccess(Entity result) {
 					view.hide();
-					eventBus.fireEvent(new EntityUpdatedEvent());
+					eventBus.fireEvent(new EntityUpdatedEvent(entity.getId()));
 				}
 			});
 		} else {
@@ -179,7 +179,7 @@ public class ProvenanceEditorWidget implements ProvenanceEditorWidgetView.Presen
 				@Override
 				public void onSuccess(Activity result) {
 					view.hide();
-					eventBus.fireEvent(new EntityUpdatedEvent());
+					eventBus.fireEvent(new EntityUpdatedEvent(entity.getId()));
 				}
 			});
 		}

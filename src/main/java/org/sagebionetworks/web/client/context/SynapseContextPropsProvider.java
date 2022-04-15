@@ -3,7 +3,10 @@ package org.sagebionetworks.web.client.context;
 import org.sagebionetworks.web.client.jsinterop.ReactComponentProps;
 import org.sagebionetworks.web.client.jsinterop.ReactFunctionComponent;
 import org.sagebionetworks.web.client.jsinterop.SynapseContextProviderProps;
+import org.sagebionetworks.web.client.jsinterop.reactquery.QueryClient;
 import org.sagebionetworks.web.client.jsni.SynapseContextProviderPropsJSNIObject;
+
+import jsinterop.annotations.JsOverlay;
 
 /**
  * Synapse React Client components must be wrapped in a SynapseContextProvider. A SynapseContextPropsProvider provides the props for the 
@@ -21,4 +24,9 @@ public interface SynapseContextPropsProvider {
      * using JsInterop before using JSNI.
      */
     SynapseContextProviderPropsJSNIObject getJsniContextProps();
+
+	/**
+	 * Returns the global QueryClient
+	 */
+	QueryClient getQueryClient();
 }

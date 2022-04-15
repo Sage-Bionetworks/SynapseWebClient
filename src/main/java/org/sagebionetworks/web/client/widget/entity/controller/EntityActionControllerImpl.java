@@ -235,7 +235,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 
 	private void fireEntityUpdatedEvent() {
-		eventBus.fireEvent(new EntityUpdatedEvent());
+		eventBus.fireEvent(new EntityUpdatedEvent(entity.getId()));
 	}
 
 	private WikiPageDeleteConfirmationDialog getWikiPageDeleteConfirmationDialog() {

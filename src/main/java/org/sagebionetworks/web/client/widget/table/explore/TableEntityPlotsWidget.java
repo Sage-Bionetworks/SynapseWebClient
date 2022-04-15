@@ -596,7 +596,7 @@ public class TableEntityPlotsWidget implements TableEntityWidgetView.Presenter, 
 									.setPrimaryButton("Show Schema", () -> this.actionMenu.onAction(Action.SHOW_TABLE_SCHEMA))
 									.build();
 							DisplayUtils.notify("Edit the Dataset Schema to add additional annotation columns to this dataset", DisplayUtils.NotificationVariant.SUCCESS, toastOptions);
-							eventBus.fireEvent(new EntityUpdatedEvent());
+							eventBus.fireEvent(new EntityUpdatedEvent(tableId));
 							closeItemsEditor();
 						},
 						() -> closeItemsEditor()

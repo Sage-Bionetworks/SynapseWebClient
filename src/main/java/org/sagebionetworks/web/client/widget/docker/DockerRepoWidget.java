@@ -82,7 +82,7 @@ public class DockerRepoWidget {
 		final WikiPageWidget.Callback wikiCallback = new WikiPageWidget.Callback() {
 			@Override
 			public void pageUpdated() {
-				eventBus.fireEvent(new EntityUpdatedEvent());
+				eventBus.fireEvent(new EntityUpdatedEvent(entityId));
 			}
 
 			@Override

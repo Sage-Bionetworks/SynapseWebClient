@@ -134,7 +134,7 @@ public class EditAnnotationsDialog implements EditAnnotationsDialogView.Presente
 			public void onSuccess(Annotations result) {
 				view.showInfo("Successfully updated the annotations");
 				view.hideEditor();
-				ginInjector.getEventBus().fireEvent(new EntityUpdatedEvent());
+				ginInjector.getEventBus().fireEvent(new EntityUpdatedEvent(entityId));
 			}
 
 			@Override

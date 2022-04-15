@@ -132,7 +132,7 @@ public class SubmissionViewScopeWidget implements SynapseWidgetPresenter, Submis
 			public void onSuccess(Entity entity) {
 				view.setLoading(false);
 				view.hideModal();
-				eventBus.fireEvent(new EntityUpdatedEvent());
+				eventBus.fireEvent(new EntityUpdatedEvent(entity.getId()));
 			}
 
 			@Override
