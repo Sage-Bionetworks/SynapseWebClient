@@ -175,7 +175,7 @@ public class DisplayConstants {
 	public static final String TEST_MODE_WARNING = "<h5>Experimental Mode</h5>This mode gives you early access to features that are still in development. Please note that we do not guarantee an absence of errors, " + "and that the data created using these features may be lost during product upgrade.<br><br><strong>Are you sure you want to switch into this mode?</strong>";
 
 	public static final String ERROR_SAVE_FAVORITE_MESSAGE = "Saving your Favorite change failed. Please try again.";
-	public static final String INVALID_SHINY_SITE = " is not a valid Site URL. Please contact us at " + ClientProperties.HELP_EMAIL_ADDRESS + " if you would like your Server added to our white list.";
+	public static final String INVALID_SHINY_SITE = " is not a valid Site URL. Please contact us at " + ClientProperties.HELP_EMAIL_ADDRESS + " if you would like your Server added to the list of URLs that are allowed.";
 	public static final String MARKDOWN_WIDGET_WARNING = "Markdown Widget Warning";
 	public static final String DOI_REQUEST_SENT_TITLE = "The request to create a new DOI has been sent. ";
 	public static final String DOI_REQUEST_SENT_MESSAGE = "Note that it may take a few minutes for the service to create the new DOI.";
