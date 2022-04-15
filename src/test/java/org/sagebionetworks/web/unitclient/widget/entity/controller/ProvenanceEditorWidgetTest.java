@@ -170,9 +170,14 @@ public class ProvenanceEditorWidgetTest {
 
 	@Test
 	public void onSaveSuccess() {
-		AsyncMockStubber.callSuccessWith(null).when(mockJsClient).updateActivity(eq(mockActivity), any(AsyncCallback.class));
+		// First configure
+		AsyncMockStubber.callSuccessWith(mockActivity).when(mockJsClient).getActivityForEntityVersion(anyString(), anyLong(), any(AsyncCallback.class));
 		presenter.setActivity(mockActivity);
+
+		AsyncMockStubber.callSuccessWith(null).when(mockJsClient).updateActivity(eq(mockActivity), any(AsyncCallback.class));
+		// call under test
 		presenter.onSave();
+
 		verify(mockUrlProvEntry, times(2)).getURL();
 		verify(mockUrlProvEntry, times(2)).getTitle();
 		verify(mockEntityProvEntry, times(2)).getEntryId();
