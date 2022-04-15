@@ -10,10 +10,12 @@ public class EntityUpdatedEvent extends GenericEvent {
 	private String entityId = null;
 
 	public EntityUpdatedEvent() {
+		super();
 	}
 
 
 	public EntityUpdatedEvent(String entityId) {
+		super();
 		this.entityId = entityId;
 	}
 
