@@ -22,6 +22,7 @@ public class QueryWrapperPlotNavProps extends ReactComponentProps {
 		void run(String newQueryResultBundleJson);
 	}
 
+	String name;
 	String initQueryJson;
 	String sql;
 	@JsNullable
@@ -49,6 +50,7 @@ public class QueryWrapperPlotNavProps extends ReactComponentProps {
 		props.onQueryResultBundleChange = onQueryResultBundleChange;
 		props.tableConfiguration = SynapseTableProps.create();
 		props.shouldDeepLink = true;
+		props.name = "Items";
 		props.downloadCartPageUrl = "#!DownloadCart:0";
 		return props;
 	}
