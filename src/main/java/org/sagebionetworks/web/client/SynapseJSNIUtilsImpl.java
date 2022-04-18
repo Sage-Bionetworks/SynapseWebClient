@@ -22,7 +22,6 @@ import com.google.gwt.xhr.client.XMLHttpRequest;
 public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 
 	private static ProgressCallback progressCallback;
-
 	@Override
 	public void setAnalyticsUserId(String userID) {
 		_setAnalyticsUserId(userID);
@@ -30,7 +29,11 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 
 	private static native void _setAnalyticsUserId(String userID) /*-{
 		try {
-			$wnd.ga('set', 'userId', userID);
+			$wnd.gtag('config', 'G-CEKFPZDZX7', {
+				'user_id': userID,
+				// manual page views in a SPA
+				send_page_view: false
+			});
 		} catch (err) {
 			console.error(err);
 		}
@@ -38,44 +41,21 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 
 	@Override
 	public void recordPageVisit(String token) {
-		_recordPageVisit(token);
+		String pageTitle = Document.get().getTitle();
+		_recordPageVisit(pageTitle, token);
 	}
 
-	private static native void _recordPageVisit(String token) /*-{
+	private static native void _recordPageVisit(String pageTitle, String token) /*-{
 		try {
-			$wnd.ga('set', 'page', '/#' + token);
-			$wnd.ga('send', 'pageview');
+			$wnd.gtag('event', 'page_view', {
+				page_title: pageTitle,
+				page_location: '/#'+token,
+				send_to: 'G-CEKFPZDZX7'
+			})
 		} catch (err) {
 			console.error(err);
 		}
 	}-*/;
-
-	@Override
-	public void sendAnalyticsEvent(String eventCategory, String eventAction, String eventLabelValue) {
-		_sendAnalyticsEvent(eventCategory, eventAction, eventLabelValue);
-	}
-
-	@Override
-	public void sendAnalyticsEvent(String eventCategory, String eventAction) {
-		_sendAnalyticsEvent(eventCategory, eventAction, getCurrentURL());
-	}
-
-	private static native void _sendAnalyticsEvent(String eventCategoryValue, String eventActionValue, String eventLabelValue) /*-{
-		try {
-			$wnd.ga('send', {
-				hitType : 'event',
-				eventCategory : eventCategoryValue,
-				eventAction : eventActionValue,
-				eventLabel : eventLabelValue,
-				fieldsObject : {
-					nonInteraction : true
-				}
-			});
-		} catch (err) {
-			console.error(err);
-		}
-	}-*/;
-
 
 	@Override
 	public String getCurrentHistoryToken() {
