@@ -60,7 +60,6 @@ public class LazyLoadWikiWidgetWrapper implements IsWidget {
 				// automated UI testing)
 				String widgetClassName = wikiWidget.getClass().getSimpleName();
 				view.showWidget(wikiWidget.asWidget(), widgetClassName);
-				jsniUtils.sendAnalyticsEvent(widgetClassName, LOADED_EVENT_NAME);
 			}
 
 			@Override

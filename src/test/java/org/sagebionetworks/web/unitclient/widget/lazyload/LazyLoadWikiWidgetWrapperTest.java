@@ -70,7 +70,6 @@ public class LazyLoadWikiWidgetWrapperTest {
 		verify(mockWikiWidget).configure(mockWikiKey, mockWidgetDescriptor, mockWidgetRefreshRequired, wikiVersionInView);
 		String className = mockWikiWidget.getClass().getSimpleName();
 		verify(mockView).showWidget(any(Widget.class), eq(className));
-		verify(mockSynapseJSNIUtils).sendAnalyticsEvent(className, LazyLoadWikiWidgetWrapper.LOADED_EVENT_NAME);
 	}
 
 
