@@ -113,15 +113,17 @@ public class EntityPresenterTest {
 	SynapseContextPropsProvider mockSynapseContextPropsProvider;
 	@Mock
 	QueryClient mockQueryClient;
+	@Mock
+	SynapseJSNIUtils mockJsniUtils;
 	@Captor
-	ArgumentCaptor<Object[]> reactQueryKeyCaptor;
+	ArgumentCaptor<SynapseReactClientQueryKey> reactQueryKeyCaptor;
 
 	@Before
 	public void setup() throws Exception {
 		when(mockEntityPresenterEventBinder.getEventBinder()).thenReturn(mockEventBinder);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockSynapseContextPropsProvider.getQueryClient()).thenReturn(mockQueryClient);
-		entityPresenter = new EntityPresenter(mockView, mockEntityPresenterEventBinder, mockGlobalApplicationState, mockAuthenticationController, mockSynapseJavascriptClient, mockSynAlert, mockEntityPageTop, mockHeaderWidget, mockOpenInviteWidget, mockGwtWrapper, mockEventBus, mockSynapseContextPropsProvider);
+		entityPresenter = new EntityPresenter(mockView, mockEntityPresenterEventBinder, mockGlobalApplicationState, mockAuthenticationController, mockSynapseJavascriptClient, mockSynAlert, mockEntityPageTop, mockHeaderWidget, mockOpenInviteWidget, mockGwtWrapper, mockEventBus, mockSynapseContextPropsProvider, mockJsniUtils);
 		Entity testEntity = new Project();
 		eb = new EntityBundle();
 		eb.setEntity(testEntity);
@@ -237,30 +239,26 @@ public class EntityPresenterTest {
 	public void testEntityUpdatedHandlerWithoutId() {
 		entityPresenter.onEntityUpdatedEvent(new EntityUpdatedEvent());
 
-		verify(mockQueryClient).invalidateQueries(reactQueryKeyCaptor.capture());
+		verify(mockJsniUtils).resetQueriesToUndefined(eq(mockQueryClient), reactQueryKeyCaptor.capture());
 		verify(mockGlobalApplicationState).refreshPage();
 
-		Object[] passedQueryKey = reactQueryKeyCaptor.getValue();
+		SynapseReactClientQueryKey passedQueryKey = reactQueryKeyCaptor.getValue();
 		assertNotNull(passedQueryKey);
-		assertEquals(passedQueryKey.length, 1);
-		SynapseReactClientQueryKey keyObject = (SynapseReactClientQueryKey) passedQueryKey[0];
-		assertEquals(keyObject.objectType, "entity");
-		assertEquals(keyObject.id, null);
+		assertEquals(passedQueryKey.objectType, "entity");
+		assertEquals(passedQueryKey.id, null);
 	}
 
 	@Test
 	public void testEntityUpdatedHandlerWithId() {
 		entityPresenter.onEntityUpdatedEvent(new EntityUpdatedEvent(entityId));
 
-		verify(mockQueryClient).invalidateQueries(reactQueryKeyCaptor.capture());
+		verify(mockJsniUtils).resetQueriesToUndefined(eq(mockQueryClient), reactQueryKeyCaptor.capture());
 		verify(mockGlobalApplicationState).refreshPage();
 
-		Object[] passedQueryKey = reactQueryKeyCaptor.getValue();
+		SynapseReactClientQueryKey passedQueryKey = reactQueryKeyCaptor.getValue();
 		assertNotNull(passedQueryKey);
-		assertEquals(passedQueryKey.length, 1);
-		SynapseReactClientQueryKey keyObject = (SynapseReactClientQueryKey) passedQueryKey[0];
-		assertEquals(keyObject.objectType, "entity");
-		assertEquals(keyObject.id, entityId);
+		assertEquals(passedQueryKey.objectType, "entity");
+		assertEquals(passedQueryKey.id, entityId);
 	}
 
 

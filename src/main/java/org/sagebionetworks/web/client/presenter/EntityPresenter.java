@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -56,9 +57,10 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	private GWTWrapper gwt;
 	private SynapseJavascriptClient jsClient;
 	private QueryClient queryClient;
+	private SynapseJSNIUtils jsniUtils;
 
 	@Inject
-	public EntityPresenter(EntityView view, EntityPresenterEventBinder entityPresenterEventBinder, GlobalApplicationState globalAppState, AuthenticationController authenticationController, SynapseJavascriptClient jsClient, StuAlert synAlert, EntityPageTop entityPageTop, Header headerWidget, OpenTeamInvitationsWidget openTeamInvitesWidget, GWTWrapper gwt, EventBus eventBus, SynapseContextPropsProvider synapseContextPropsProvider) {
+	public EntityPresenter(EntityView view, EntityPresenterEventBinder entityPresenterEventBinder, GlobalApplicationState globalAppState, AuthenticationController authenticationController, SynapseJavascriptClient jsClient, StuAlert synAlert, EntityPageTop entityPageTop, Header headerWidget, OpenTeamInvitationsWidget openTeamInvitesWidget, GWTWrapper gwt, EventBus eventBus, SynapseContextPropsProvider synapseContextPropsProvider, SynapseJSNIUtils jsniUtils) {
 		this.headerWidget = headerWidget;
 		this.entityPageTop = entityPageTop;
 		this.globalAppState = globalAppState;
@@ -68,6 +70,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		this.authenticationController = authenticationController;
 		this.jsClient = jsClient;
 		this.gwt = gwt;
+		this.jsniUtils = jsniUtils;
 		this.queryClient = synapseContextPropsProvider.getQueryClient();
 		clear();
 		entityPresenterEventBinder.getEventBinder().bindEventHandlers(this, eventBus);
@@ -275,7 +278,8 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	public void onEntityUpdatedEvent(EntityUpdatedEvent event) {
 		SynapseReactClientQueryKey queryKey = SynapseReactClientQueryKey.create("entity", event.getEntityId());
 		// The query key is an array where the first element is the object we constructed
-		queryClient.invalidateQueries(new Object[]{queryKey});
+
+		jsniUtils.resetQueriesToUndefined(queryClient, queryKey);
 		globalAppState.refreshPage();
 	}
 

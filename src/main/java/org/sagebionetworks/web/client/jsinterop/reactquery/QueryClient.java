@@ -6,6 +6,4 @@ import jsinterop.annotations.JsType;
 public class QueryClient {
 
     public QueryClient(QueryClientOptions config) {}
-
-	public native void invalidateQueries(Object[] queryKey);
 }
