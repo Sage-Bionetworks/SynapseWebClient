@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.client.jsinterop.reactquery;
 
+import java.util.Arrays;
+import java.util.List;
+
 import jsinterop.annotations.JsNullable;
 import jsinterop.annotations.JsOverlay;
 import jsinterop.annotations.JsPackage;
@@ -14,11 +17,11 @@ public class SynapseReactClientQueryKey {
 	public String id;
 
     @JsOverlay
-    public static SynapseReactClientQueryKey create(String objectType, String id) {
+    public static List<SynapseReactClientQueryKey> create(String objectType, String id) {
         SynapseReactClientQueryKey defaultQueryKey = new SynapseReactClientQueryKey();
 		defaultQueryKey.objectType = objectType;
 		defaultQueryKey.id = id;
-        return defaultQueryKey;
+        return Arrays.asList(defaultQueryKey);
     }
 }
 

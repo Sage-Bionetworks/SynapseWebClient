@@ -2,11 +2,10 @@ package org.sagebionetworks.web.client;
 
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.web.client.callback.MD5Callback;
-import org.sagebionetworks.web.client.jsinterop.reactquery.QueryClient;
-import org.sagebionetworks.web.client.jsinterop.reactquery.SynapseReactClientQueryKey;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray;
+
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.xhr.client.XMLHttpRequest;
@@ -119,11 +118,4 @@ public interface SynapseJSNIUtils {
 	long getLastModified(JavaScriptObject blob);
 
 	void setIsInnerProgrammaticHistoryChange();
-
-	/**
-	 * Resets the React Query queries with matching keys by setting data to undefined and invalidating the state.
-	 * @param queryClient
-	 * @param queryKey
-	 */
-	void resetQueriesToUndefined(QueryClient queryClient, SynapseReactClientQueryKey queryKey);
 }

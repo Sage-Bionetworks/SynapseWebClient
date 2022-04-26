@@ -2,8 +2,6 @@ package org.sagebionetworks.web.client;
 
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.web.client.callback.MD5Callback;
-import org.sagebionetworks.web.client.jsinterop.reactquery.QueryClient;
-import org.sagebionetworks.web.client.jsinterop.reactquery.SynapseReactClientQueryKey;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResultJso;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
@@ -779,21 +777,6 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	public void setIsInnerProgrammaticHistoryChange() {
 		_setIsInnerProgrammaticHistoryChange();
 	}
-
-	@Override
-	public void resetQueriesToUndefined(QueryClient queryClient, SynapseReactClientQueryKey queryKey) {
-		_resetQueriesToUndefined(queryClient, queryKey);
-	}
-
-	public static native void _resetQueriesToUndefined(QueryClient queryClient, SynapseReactClientQueryKey queryKey) /*-{
-        queryClient
-            .getQueryCache()
-            .findAll([queryKey])
-            .forEach(function (query) {
-                query.setData(undefined)
-            });
-        queryClient.invalidateQueries([queryKey], { exact: false });
-    }-*/;
 
 
 	public static native void _setIsInnerProgrammaticHistoryChange()/*-{
