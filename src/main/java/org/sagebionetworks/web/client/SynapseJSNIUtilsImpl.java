@@ -778,7 +778,6 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		_setIsInnerProgrammaticHistoryChange();
 	}
 
-
 	public static native void _setIsInnerProgrammaticHistoryChange()/*-{
 		// see back-forward-nav-handler.js
 		// We don't want the handler to reload the page if we are programmatically changing the history.
