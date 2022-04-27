@@ -273,9 +273,8 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 
 	@EventHandler
 	public void onEntityUpdatedEvent(EntityUpdatedEvent event) {
-		SynapseReactClientQueryKey queryKey = SynapseReactClientQueryKey.create("entity", event.getEntityId());
-		// The query key is an array where the first element is the object we constructed
-		queryClient.invalidateQueries(new Object[]{queryKey});
+		List<SynapseReactClientQueryKey> queryKey = SynapseReactClientQueryKey.create("entity", event.getEntityId());
+		queryClient.resetQueries(queryKey);
 		globalAppState.refreshPage();
 	}
 

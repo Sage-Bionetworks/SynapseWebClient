@@ -16,6 +16,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -114,7 +115,7 @@ public class EntityPresenterTest {
 	@Mock
 	QueryClient mockQueryClient;
 	@Captor
-	ArgumentCaptor<Object[]> reactQueryKeyCaptor;
+	ArgumentCaptor<List<SynapseReactClientQueryKey>> reactQueryKeyCaptor;
 
 	@Before
 	public void setup() throws Exception {
@@ -237,13 +238,13 @@ public class EntityPresenterTest {
 	public void testEntityUpdatedHandlerWithoutId() {
 		entityPresenter.onEntityUpdatedEvent(new EntityUpdatedEvent());
 
-		verify(mockQueryClient).invalidateQueries(reactQueryKeyCaptor.capture());
+		verify(mockQueryClient).resetQueries(reactQueryKeyCaptor.capture());
 		verify(mockGlobalApplicationState).refreshPage();
 
-		Object[] passedQueryKey = reactQueryKeyCaptor.getValue();
+		List<SynapseReactClientQueryKey> passedQueryKey = reactQueryKeyCaptor.getValue();
 		assertNotNull(passedQueryKey);
-		assertEquals(passedQueryKey.length, 1);
-		SynapseReactClientQueryKey keyObject = (SynapseReactClientQueryKey) passedQueryKey[0];
+		assertEquals(passedQueryKey.size(), 1);
+		SynapseReactClientQueryKey keyObject = passedQueryKey.get(0);
 		assertEquals(keyObject.objectType, "entity");
 		assertEquals(keyObject.id, null);
 	}
@@ -252,13 +253,13 @@ public class EntityPresenterTest {
 	public void testEntityUpdatedHandlerWithId() {
 		entityPresenter.onEntityUpdatedEvent(new EntityUpdatedEvent(entityId));
 
-		verify(mockQueryClient).invalidateQueries(reactQueryKeyCaptor.capture());
+		verify(mockQueryClient).resetQueries(reactQueryKeyCaptor.capture());
 		verify(mockGlobalApplicationState).refreshPage();
 
-		Object[] passedQueryKey = reactQueryKeyCaptor.getValue();
+		List<SynapseReactClientQueryKey> passedQueryKey = reactQueryKeyCaptor.getValue();
 		assertNotNull(passedQueryKey);
-		assertEquals(passedQueryKey.length, 1);
-		SynapseReactClientQueryKey keyObject = (SynapseReactClientQueryKey) passedQueryKey[0];
+		assertEquals(passedQueryKey.size(), 1);
+		SynapseReactClientQueryKey keyObject = passedQueryKey.get(0);
 		assertEquals(keyObject.objectType, "entity");
 		assertEquals(keyObject.id, entityId);
 	}
