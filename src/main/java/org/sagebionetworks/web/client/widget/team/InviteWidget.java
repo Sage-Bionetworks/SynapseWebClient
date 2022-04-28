@@ -44,6 +44,7 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 		this.peopleSuggestWidget = peopleSuggestBox;
 		peopleSuggestWidget.setSuggestionProvider(provider);
 		peopleSuggestWidget.setTypeFilter(TypeFilter.USERS_ONLY);
+		peopleSuggestWidget.setPlaceholderText("Enter a name or email address...");
 		view.setSuggestWidget(peopleSuggestBox.asWidget());
 		view.setSynAlertWidget(synAlert.asWidget());
 		peopleSuggestWidget.addKeyDownHandler(event -> {
@@ -127,7 +128,6 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 		inviteEmails = new ArrayList<String>();
 		inviteUsers = new ArrayList<String>();
 		this.team = team;
-		peopleSuggestWidget.setPlaceholderText("Enter a user name...");
 		isCertified = false;
 		
 		ginInjector.getSynapseJavascriptClient().getUserBundle(Long.parseLong(ginInjector.getAuthenticationController().getCurrentUserPrincipalId()), IS_CERTIFIED, new AsyncCallback<UserBundle>() {
