@@ -199,18 +199,19 @@ public class TableEntityWidgetViewImpl extends Composite implements TableEntityW
 	}
 	
 	@Override
+	public void configureTableOnly(String sql) {
+		StandaloneQueryWrapper widget = new StandaloneQueryWrapper(propsProvider, sql);
+		plotNavContainer.clear();
+		plotNavContainer.add(widget);
+	}
+	
+	@Override
 	public void configureQueryWrapperPlotNav(
 			String sql, 
 			String initQueryJson,
 			OnQueryCallback onQueryChange,
 			OnQueryResultBundleCallback onQueryResultBundleChange,
 			boolean hideSqlEditorControl) {
-//		if (tableOnly) {
-//			StandaloneQueryWrapper widget = new StandaloneQueryWrapper(propsProvider, sql);
-//			plotNavContainer.clear();
-//			plotNavContainer.add(widget);
-//		}
-
 		QueryWrapperPlotNav plotNav = new QueryWrapperPlotNav(propsProvider, sql, initQueryJson, onQueryChange, onQueryResultBundleChange, hideSqlEditorControl);
 		plotNavContainer.clear();
 		plotNavContainer.add(plotNav);

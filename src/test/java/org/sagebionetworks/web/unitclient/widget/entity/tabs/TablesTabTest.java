@@ -67,7 +67,7 @@ import org.sagebionetworks.web.client.widget.entity.tabs.TablesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.TablesTabView;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
-import org.sagebionetworks.web.client.widget.table.explore.TableEntityPlotsWidget;
+import org.sagebionetworks.web.client.widget.table.explore.TableEntityWidgetV2;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
@@ -120,7 +120,7 @@ public class TablesTabTest {
 	@Mock
 	TableEntityWidget mockTableEntityWidget;
 	@Mock
-	TableEntityPlotsWidget mockTableEntityPlotsWidget;
+	TableEntityWidgetV2 mockTableEntityPlotsWidget;
 	@Mock
 	WikiPageWidget mockWikiPageWidget;
 	@Mock
@@ -168,7 +168,7 @@ public class TablesTabTest {
 		when(mockPortalGinInjector.getGlobalApplicationState()).thenReturn(mockGlobalApplicationState);
 		when(mockPortalGinInjector.getSynapseJavascriptClient()).thenReturn(mockJsClient);
 		when(mockPortalGinInjector.getWikiPageWidget()).thenReturn(mockWikiPageWidget);
-		when(mockPortalGinInjector.createNewTableEntityPlotsWidget()).thenReturn(mockTableEntityPlotsWidget);
+		when(mockPortalGinInjector.createNewTableEntityWidgetV2()).thenReturn(mockTableEntityPlotsWidget);
 
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		tab.setEntitySelectedCallback(mockEntitySelectedCallback);

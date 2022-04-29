@@ -64,7 +64,7 @@ import com.google.inject.Inject;
  * 
  * TODO: delete TableEntityWidget when this has been released out of experimental mode.
  */
-public class TableEntityPlotsWidget implements TableEntityWidgetView.Presenter, IsWidget, QueryResultsListener, QueryInputListener {
+public class TableEntityWidgetV2 implements TableEntityWidgetView.Presenter, IsWidget, QueryResultsListener, QueryInputListener {
 
 	public static final String IS_INVOKING_DOWNLOAD_TABLE = "isInvokingDownloadTable";
 	
@@ -109,11 +109,11 @@ public class TableEntityPlotsWidget implements TableEntityWidgetView.Presenter, 
 	QueryResultEditorWidget queryResultEditor;
 	PortalGinInjector ginInjector;
 	boolean hideFiltering = false;
-
+	boolean isShowTableOnly = false;
 	boolean hasQueryableData; // if `false`, then a query will never yield data.
 
 	@Inject
-	public TableEntityPlotsWidget(TableEntityWidgetView view, PreflightController preflightController, SynapseClientAsync synapseClient, FileViewClientsHelp fileViewClientsHelp, PortalGinInjector ginInjector, SessionStorage sessionStorage, EventBus eventBus) {
+	public TableEntityWidgetV2(TableEntityWidgetView view, PreflightController preflightController, SynapseClientAsync synapseClient, FileViewClientsHelp fileViewClientsHelp, PortalGinInjector ginInjector, SessionStorage sessionStorage, EventBus eventBus) {
 		this.view = view;
 		this.preflightController = preflightController;
 		this.synapseClient = synapseClient;
@@ -168,7 +168,7 @@ public class TableEntityPlotsWidget implements TableEntityWidgetView.Presenter, 
 	 * @param queryString
 	 * @param qch
 	 */
-	public void configure(EntityBundle bundle, Long versionNumber, boolean canEdit, QueryChangeHandler qch, ActionMenuWidget actionMenu) {
+	public void configure(EntityBundle bundle, Long versionNumber, boolean canEdit, boolean isShowTableOnly, QueryChangeHandler qch, ActionMenuWidget actionMenu) {
 		this.entityBundle = bundle;
 		Entity table = bundle.getEntity();
 		this.tableType = TableType.getTableType(table);
@@ -182,6 +182,7 @@ public class TableEntityPlotsWidget implements TableEntityWidgetView.Presenter, 
 		this.view.configure(bundle, this.canEdit && isCurrentVersion);
 		this.actionMenu = actionMenu;
 		this.entityTypeDisplay = EntityTypeUtils.getFriendlyEntityTypeName(bundle.getEntity());
+		this.isShowTableOnly = isShowTableOnly;
 		reconfigureState();
 		showEditorIfEditableAndEmpty();
 	}
@@ -337,31 +338,35 @@ public class TableEntityPlotsWidget implements TableEntityWidgetView.Presenter, 
 		view.setQueryWrapperPlotNavVisible(true);
 		this.view.setTableMessageVisible(false);
 		if (!isFromResults) {
-			// configure QueryWrapperPlotNav
-			OnQueryCallback onQueryChange = (newQueryJson) -> {
+			if (isShowTableOnly) {
+				view.configureTableOnly(query.getSql());
+			} else {
+				// configure QueryWrapperPlotNav
+				OnQueryCallback onQueryChange = (newQueryJson) -> {
+					try {
+						JSONObjectAdapter adapter = ginInjector.getJSONObjectAdapter().createNew(newQueryJson);
+						this.currentQuery = new Query(adapter);
+					} catch (JSONObjectAdapterException e) {
+						ginInjector.getSynapseJSNIUtils().consoleError(e);
+					}
+				};
+				OnQueryResultBundleCallback onQueryResultBundleChange = (newQueryResultBundleJson) -> {
+					try {
+						JSONObjectAdapter adapter = ginInjector.getJSONObjectAdapter().createNew(newQueryResultBundleJson);
+						this.currentQueryResultBundle = new QueryResultBundle(adapter);
+						this.queryExecutionFinished(true, QueryResultEditorWidget.isQueryResultEditable(this.currentQueryResultBundle, tableType));
+					} catch (JSONObjectAdapterException e) {
+						ginInjector.getSynapseJSNIUtils().consoleError(e);
+					}
+				};
+				JSONObjectAdapter adapter = ginInjector.getJSONObjectAdapter().createNew();
 				try {
-					JSONObjectAdapter adapter = ginInjector.getJSONObjectAdapter().createNew(newQueryJson);
-					this.currentQuery = new Query(adapter);
+					query.writeToJSONObject(adapter);
+					boolean hideSqlEditorControl = hideFiltering;
+					view.configureQueryWrapperPlotNav(query.getSql(), adapter.toJSONString(), onQueryChange, onQueryResultBundleChange, hideSqlEditorControl);
 				} catch (JSONObjectAdapterException e) {
 					ginInjector.getSynapseJSNIUtils().consoleError(e);
 				}
-			};
-			OnQueryResultBundleCallback onQueryResultBundleChange = (newQueryResultBundleJson) -> {
-				try {
-					JSONObjectAdapter adapter = ginInjector.getJSONObjectAdapter().createNew(newQueryResultBundleJson);
-					this.currentQueryResultBundle = new QueryResultBundle(adapter);
-					this.queryExecutionFinished(true, QueryResultEditorWidget.isQueryResultEditable(this.currentQueryResultBundle, tableType));
-				} catch (JSONObjectAdapterException e) {
-					ginInjector.getSynapseJSNIUtils().consoleError(e);
-				}
-			};
-			JSONObjectAdapter adapter = ginInjector.getJSONObjectAdapter().createNew();
-			try {
-				query.writeToJSONObject(adapter);
-				boolean hideSqlEditorControl = hideFiltering;
-				view.configureQueryWrapperPlotNav(query.getSql(), adapter.toJSONString(), onQueryChange, onQueryResultBundleChange, hideSqlEditorControl);
-			} catch (JSONObjectAdapterException e) {
-				ginInjector.getSynapseJSNIUtils().consoleError(e);
 			}
 		}
 	}

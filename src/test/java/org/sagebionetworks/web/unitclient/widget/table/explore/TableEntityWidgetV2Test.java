@@ -61,7 +61,7 @@ import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionListener;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
-import org.sagebionetworks.web.client.widget.table.explore.TableEntityPlotsWidget;
+import org.sagebionetworks.web.client.widget.table.explore.TableEntityWidgetV2;
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQueryModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
@@ -82,7 +82,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  *
  */
 @RunWith(MockitoJUnitRunner.class)
-public class TableEntityPlotsWidgetTest {
+public class TableEntityWidgetV2Test {
 
 	AdapterFactory adapterFactory;
 	List<ColumnModel> columns;
@@ -100,7 +100,7 @@ public class TableEntityPlotsWidgetTest {
 	TableEntityWidgetView mockView;
 	@Mock
 	QueryChangeHandler mockQueryChangeHandler;
-	TableEntityPlotsWidget widget;
+	TableEntityWidgetV2 widget;
 	EntityBundle entityBundle;
 	Long versionNumber;
 	@Mock
@@ -162,7 +162,7 @@ public class TableEntityPlotsWidgetTest {
 		when(mockPortalGinInjector.getAddToDownloadListV2()).thenReturn(mockAddToDownloadListV2);
 		when(mockPortalGinInjector.createNewQueryResultEditorWidget()).thenReturn(mockQueryResultEditorWidget);
 		when(mockPortalGinInjector.getJSONObjectAdapter()).thenReturn(portalJson);
-		widget = new TableEntityPlotsWidget(mockView, mockPreflightController, mockSynapseClient,
+		widget = new TableEntityWidgetV2(mockView, mockPreflightController, mockSynapseClient,
 				mockFileViewClientsHelp, mockPortalGinInjector, mockSessionStorage, mockEventBus);
 
 		AsyncMockStubber.callSuccessWith(FACET_SQL).when(mockSynapseClient).generateSqlWithFacets(anyString(),

@@ -3,6 +3,8 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
+
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
@@ -17,10 +19,15 @@ public class TableQueryResultWikiViewImpl implements TableQueryResultWikiView {
 	TextBox queryField;
 	@UiField
 	CheckBox isQueryVisible;
+	@UiField
+	CheckBox isShowTableOnly;
 
 	@Inject
-	public TableQueryResultWikiViewImpl(TableQueryResultViewUiBinder binder) {
+	public TableQueryResultWikiViewImpl(TableQueryResultViewUiBinder binder, CookieProvider cookies) {
 		widget = binder.createAndBindUi(this);
+		boolean isInTestWebsiteMode = DisplayUtils.isInTestWebsite(cookies);
+		isQueryVisible.setVisible(!isInTestWebsiteMode);
+		isShowTableOnly.setVisible(isInTestWebsiteMode);
 	}
 
 	@Override
@@ -49,6 +56,16 @@ public class TableQueryResultWikiViewImpl implements TableQueryResultWikiView {
 	@Override
 	public void setQueryVisible(boolean value) {
 		isQueryVisible.setValue(value);
+	}
+
+	@Override
+	public Boolean isShowTableOnly() {
+		return isShowTableOnly.getValue();
+	}
+
+	@Override
+	public void setIsShowTableOnly(boolean value) {
+		isShowTableOnly.setValue(value);
 	}
 
 	@Override

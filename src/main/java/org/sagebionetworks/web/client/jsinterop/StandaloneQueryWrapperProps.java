@@ -9,6 +9,8 @@ import jsinterop.annotations.JsType;
 public class StandaloneQueryWrapperProps extends ReactComponentProps {
 	String sql;
 	@JsNullable
+	String unitDescription;
+	@JsNullable
 	int visibleColumnCount;
 	@JsNullable
 	String title;
@@ -25,6 +27,7 @@ public class StandaloneQueryWrapperProps extends ReactComponentProps {
 	public static StandaloneQueryWrapperProps create(String sql) {
 		StandaloneQueryWrapperProps props = new StandaloneQueryWrapperProps();
 		props.sql = sql;
+		props.unitDescription = null;
 		return props;
 	}
 

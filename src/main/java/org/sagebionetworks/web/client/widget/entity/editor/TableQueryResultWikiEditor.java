@@ -33,6 +33,13 @@ public class TableQueryResultWikiEditor implements WidgetEditorPresenter {
 			isQueryVisible = Boolean.parseBoolean(isQueryVisibleString);
 		}
 		view.setQueryVisible(isQueryVisible);
+		
+		boolean isTableOnly = false;
+		String isTableOnlyString = descriptor.get(WidgetConstants.SHOW_TABLE_ONLY);
+		if (isTableOnlyString != null) {
+			isTableOnly = Boolean.parseBoolean(isTableOnlyString);
+		}
+		view.setIsShowTableOnly(isTableOnly);
 	}
 
 	public void clearState() {
@@ -53,6 +60,7 @@ public class TableQueryResultWikiEditor implements WidgetEditorPresenter {
 		}
 		descriptor.put(WidgetConstants.TABLE_QUERY_KEY, sql);
 		descriptor.put(WidgetConstants.QUERY_VISIBLE, view.isQueryVisible().toString());
+		descriptor.put(WidgetConstants.SHOW_TABLE_ONLY, view.isShowTableOnly().toString());
 	}
 
 

@@ -16,6 +16,7 @@
 				</b:FormGroup>
 				<b:FormGroup>
 					<b:CheckBox ui:field="isQueryVisible" text="Show this query in the wiki table"/>
+					<b:CheckBox ui:field="isShowTableOnly" text="Show a basic table only"/>
 				</b:FormGroup>
 			</b:FieldSet>
 		</bh:Div>
