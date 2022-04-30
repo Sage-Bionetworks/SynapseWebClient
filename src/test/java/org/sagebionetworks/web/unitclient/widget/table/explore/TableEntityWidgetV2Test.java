@@ -207,7 +207,7 @@ public class TableEntityWidgetV2Test {
 	public void testGetDefaultPageSizeMaxUnder() {
 		tableBundle.setMaxRowsPerPage(4L);
 		// Configure with the default values
-		widget.configure(entityBundle, versionNumber, true, mockQueryChangeHandler, mockActionMenu);
+		widget.configure(entityBundle, versionNumber, true, false, mockQueryChangeHandler, mockActionMenu);
 		// since the size from the bundle is less than the default,
 		// the value used should be 3/4ths of the max allowed for the schema.
 		assertEquals(3l, widget.getDefaultPageSize());
@@ -217,7 +217,7 @@ public class TableEntityWidgetV2Test {
 	public void testGetDefaultPageSizeMaxOver() {
 		tableBundle.setMaxRowsPerPage(QueryBundleUtils.DEFAULT_LIMIT * 2L);
 		// Configure with the default values
-		widget.configure(entityBundle, versionNumber, true, mockQueryChangeHandler, mockActionMenu);
+		widget.configure(entityBundle, versionNumber, true, false, mockQueryChangeHandler, mockActionMenu);
 		// since the size from the bundle is greater than the default
 		// the default should be used.
 		assertEquals(QueryBundleUtils.DEFAULT_LIMIT, widget.getDefaultPageSize());
@@ -227,7 +227,7 @@ public class TableEntityWidgetV2Test {
 	public void testGetDefaultPageSizeNull() {
 		tableBundle.setMaxRowsPerPage(null);
 		// Configure with the default values
-		widget.configure(entityBundle, versionNumber, true, mockQueryChangeHandler, mockActionMenu);
+		widget.configure(entityBundle, versionNumber, true, false, mockQueryChangeHandler, mockActionMenu);
 		// when null the default should be used.
 		assertEquals(QueryBundleUtils.DEFAULT_LIMIT, widget.getDefaultPageSize());
 	}
@@ -240,7 +240,7 @@ public class TableEntityWidgetV2Test {
 		Query query = new Query();
 		query.setSql(sql);
 		when(mockQueryChangeHandler.getQueryString()).thenReturn(query);
-		widget.configure(entityBundle, versionNumber, true, mockQueryChangeHandler, mockActionMenu);
+		widget.configure(entityBundle, versionNumber, true, false, mockQueryChangeHandler, mockActionMenu);
 		// The widget must not change the query when it is passed in.
 		verify(mockQueryChangeHandler, never()).onQueryChange(any(Query.class));
 	}
@@ -248,7 +248,7 @@ public class TableEntityWidgetV2Test {
 	@Test
 	public void testConfigureEdit() {
 		boolean canEdit = true;
-		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
+		widget.configure(entityBundle, versionNumber, canEdit, false, mockQueryChangeHandler, mockActionMenu);
 
 		// download files help not visible for Table, only Views
 		verify(mockActionMenu).setActionVisible(Action.ADD_TABLE_RESULTS_TO_DOWNLOAD_LIST, false);
@@ -259,7 +259,7 @@ public class TableEntityWidgetV2Test {
 		boolean canEdit = true;
 		configureBundleWithView(ViewType.file);
 
-		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
+		widget.configure(entityBundle, versionNumber, canEdit, false, mockQueryChangeHandler, mockActionMenu);
 
 		// verify download help is shown for file views
 		verify(mockActionMenu).setActionVisible(Action.ADD_TABLE_RESULTS_TO_DOWNLOAD_LIST, true);
@@ -269,7 +269,7 @@ public class TableEntityWidgetV2Test {
 	public void testNoColumnsWithEdit() {
 		entityBundle.getTableBundle().setColumnModels(new LinkedList<ColumnModel>());
 		boolean canEdit = true;
-		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
+		widget.configure(entityBundle, versionNumber, canEdit, false, mockQueryChangeHandler, mockActionMenu);
 
 		verify(mockView).setTableMessageVisible(true);
 		verify(mockView).showTableMessage(AlertType.INFO,
@@ -282,7 +282,7 @@ public class TableEntityWidgetV2Test {
 	public void testNoColumnsWithWihtouEdit() {
 		entityBundle.getTableBundle().setColumnModels(new LinkedList<ColumnModel>());
 		boolean canEdit = false;
-		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
+		widget.configure(entityBundle, versionNumber, canEdit, false, mockQueryChangeHandler, mockActionMenu);
 
 		verify(mockView).setTableMessageVisible(true);
 		verify(mockView).showTableMessage(AlertType.INFO,
@@ -294,7 +294,7 @@ public class TableEntityWidgetV2Test {
 	@Test
 	public void testQueryExecutionStarted() {
 		boolean canEdit = true;
-		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
+		widget.configure(entityBundle, versionNumber, canEdit, false, mockQueryChangeHandler, mockActionMenu);
 		widget.queryExecutionStarted();
 		verify(mockActionMenu).setActionVisible(Action.EDIT_TABLE_DATA, false);
 		verify(mockActionMenu).setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, false);
@@ -308,7 +308,7 @@ public class TableEntityWidgetV2Test {
 		Query startQuery = new Query();
 		startQuery.setSql("select * from syn123");
 		when(mockQueryChangeHandler.getQueryString()).thenReturn(startQuery);
-		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
+		widget.configure(entityBundle, versionNumber, canEdit, false, mockQueryChangeHandler, mockActionMenu);
 		reset(mockActionMenu);
 		widget.queryExecutionFinished(wasExecutionSuccess, resultsEditable);
 		verify(mockQueryChangeHandler).onQueryChange(startQuery);
@@ -325,7 +325,7 @@ public class TableEntityWidgetV2Test {
 		Query startQuery = new Query();
 		startQuery.setSql("select * from syn123");
 		when(mockQueryChangeHandler.getQueryString()).thenReturn(startQuery);
-		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
+		widget.configure(entityBundle, versionNumber, canEdit, false, mockQueryChangeHandler, mockActionMenu);
 		reset(mockActionMenu);
 		widget.queryExecutionFinished(wasExecutionSuccess, resultsEditable);
 		verify(mockQueryChangeHandler).onQueryChange(startQuery);
@@ -341,7 +341,7 @@ public class TableEntityWidgetV2Test {
 		Query startQuery = new Query();
 		startQuery.setSql("select * from syn123");
 		when(mockQueryChangeHandler.getQueryString()).thenReturn(startQuery);
-		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
+		widget.configure(entityBundle, versionNumber, canEdit, false, mockQueryChangeHandler, mockActionMenu);
 		reset(mockActionMenu);
 		widget.queryExecutionFinished(wasExecutionSuccess, resultsEditable);
 		verify(mockQueryChangeHandler).onQueryChange(startQuery);
@@ -358,7 +358,7 @@ public class TableEntityWidgetV2Test {
 		Query startQuery = new Query();
 		startQuery.setSql("select * from syn123");
 		when(mockQueryChangeHandler.getQueryString()).thenReturn(startQuery);
-		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
+		widget.configure(entityBundle, versionNumber, canEdit, false, mockQueryChangeHandler, mockActionMenu);
 		reset(mockActionMenu);
 		widget.queryExecutionFinished(wasExecutionSuccess, resultsEditable);
 		verify(mockQueryChangeHandler, never()).onQueryChange(any(Query.class));
@@ -381,7 +381,7 @@ public class TableEntityWidgetV2Test {
 		JSONObjectAdapterImpl adapter = new JSONObjectAdapterImpl();
 		startQuery.writeToJSONObject(adapter);
 
-		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
+		widget.configure(entityBundle, versionNumber, canEdit, false, mockQueryChangeHandler, mockActionMenu);
 
 		verify(mockView).configureQueryWrapperPlotNav(eq(startingSql), eq(adapter.toJSONString()),
 				onQueryCallbackCaptor.capture(), onQueryResultBundleCallbackCaptor.capture(),
@@ -420,7 +420,7 @@ public class TableEntityWidgetV2Test {
 		configureBundleWithView(ViewType.file);
 		boolean canEdit = true;
 
-		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
+		widget.configure(entityBundle, versionNumber, canEdit, false, mockQueryChangeHandler, mockActionMenu);
 
 		verify(mockActionMenu).setActionVisible(Action.ADD_TABLE_RESULTS_TO_DOWNLOAD_LIST, true);
 		verify(mockActionMenu).setActionVisible(Action.TABLE_DOWNLOAD_PROGRAMMATIC_OPTIONS, true);
@@ -435,7 +435,7 @@ public class TableEntityWidgetV2Test {
 		configureBundleWithView(ViewType.project);
 		boolean canEdit = true;
 
-		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
+		widget.configure(entityBundle, versionNumber, canEdit, false, mockQueryChangeHandler, mockActionMenu);
 
 		verify(mockActionMenu).setActionVisible(Action.ADD_TABLE_RESULTS_TO_DOWNLOAD_LIST, false);
 		verify(mockActionMenu).setActionVisible(Action.TABLE_DOWNLOAD_PROGRAMMATIC_OPTIONS, false);
@@ -444,7 +444,7 @@ public class TableEntityWidgetV2Test {
 	@Test
 	public void testShowSchema() {
 		boolean canEdit = true;
-		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
+		widget.configure(entityBundle, versionNumber, canEdit, false, mockQueryChangeHandler, mockActionMenu);
 		verify(mockActionMenu).setActionListener(eq(Action.SHOW_TABLE_SCHEMA), actionListenerCaptor.capture());
 		ActionListener listener = actionListenerCaptor.getValue();
 		verify(mockView).setSchemaVisible(false);
@@ -459,7 +459,7 @@ public class TableEntityWidgetV2Test {
 	@Test
 	public void testShowViewScope() {
 		boolean canEdit = true;
-		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
+		widget.configure(entityBundle, versionNumber, canEdit, false, mockQueryChangeHandler, mockActionMenu);
 		verify(mockActionMenu).setActionListener(eq(Action.SHOW_VIEW_SCOPE), actionListenerCaptor.capture());
 		ActionListener listener = actionListenerCaptor.getValue();
 		verify(mockView).setScopeVisible(false);
@@ -476,7 +476,7 @@ public class TableEntityWidgetV2Test {
 		AsyncMockStubber.callNoInvovke().when(mockPreflightController).checkUploadToEntity(any(EntityBundle.class),
 				any(Callback.class));
 		boolean canEdit = true;
-		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
+		widget.configure(entityBundle, versionNumber, canEdit, false, mockQueryChangeHandler, mockActionMenu);
 		widget.onUploadTableData();
 		// should not proceed to upload.
 		verify(mockUploadTableModalWidget, never()).showModal(any(WizardCallback.class));
@@ -487,7 +487,7 @@ public class TableEntityWidgetV2Test {
 		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUploadToEntity(any(EntityBundle.class),
 				any(Callback.class));
 		boolean canEdit = true;
-		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
+		widget.configure(entityBundle, versionNumber, canEdit, false, mockQueryChangeHandler, mockActionMenu);
 		widget.onUploadTableData();
 		// proceed to upload
 		verify(mockUploadTableModalWidget).showModal(any(WizardCallback.class));
@@ -498,7 +498,7 @@ public class TableEntityWidgetV2Test {
 		AsyncMockStubber.callNoInvovke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class),
 				any(Callback.class));
 		boolean canEdit = true;
-		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
+		widget.configure(entityBundle, versionNumber, canEdit, false, mockQueryChangeHandler, mockActionMenu);
 		widget.onEditResults();
 		// should not proceed to edit
 		verify(mockQueryResultEditorWidget, never()).showEditor(any(QueryResultBundle.class), any(TableType.class));
@@ -509,7 +509,7 @@ public class TableEntityWidgetV2Test {
 		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUploadToEntity(any(EntityBundle.class),
 				any(Callback.class));
 		boolean canEdit = true;
-		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
+		widget.configure(entityBundle, versionNumber, canEdit, false, mockQueryChangeHandler, mockActionMenu);
 		widget.onEditResults();
 		// proceed to edit
 		verify(mockQueryResultEditorWidget).showEditor(any(QueryResultBundle.class), any(TableType.class));
@@ -520,7 +520,7 @@ public class TableEntityWidgetV2Test {
 		Query startQuery = new Query();
 		startQuery.setSql(FACET_SQL);
 		when(mockQueryChangeHandler.getQueryString()).thenReturn(startQuery);
-		widget.configure(entityBundle, versionNumber, true, mockQueryChangeHandler, mockActionMenu);
+		widget.configure(entityBundle, versionNumber, true, false, mockQueryChangeHandler, mockActionMenu);
 
 		widget.onShowDownloadFilesProgrammatically();
 
@@ -538,7 +538,7 @@ public class TableEntityWidgetV2Test {
 		Header.portalAlertJson = portalJson;
 		portalJson.put(TableEntityWidget.IS_INVOKING_DOWNLOAD_TABLE, true);
 
-		widget.configure(entityBundle, versionNumber, true, mockQueryChangeHandler, mockActionMenu);
+		widget.configure(entityBundle, versionNumber, true, false, mockQueryChangeHandler, mockActionMenu);
 		widget.queryExecutionFinished(true, false);
 
 		verify(mockAddToDownloadListV2).configure(anyString(), any(Query.class));
@@ -554,7 +554,7 @@ public class TableEntityWidgetV2Test {
 		Header.portalAlertJson = portalJson;
 		portalJson.put(TableEntityWidget.IS_INVOKING_DOWNLOAD_TABLE, false);
 
-		widget.configure(entityBundle, versionNumber, true, mockQueryChangeHandler, mockActionMenu);
+		widget.configure(entityBundle, versionNumber, true, false, mockQueryChangeHandler, mockActionMenu);
 		widget.queryExecutionFinished(true, false);
 
 		verify(mockAddToDownloadListV2, never()).configure(anyString(), any(Query.class));
@@ -569,7 +569,7 @@ public class TableEntityWidgetV2Test {
 		Header.portalAlertJson = portalJson;
 		portalJson.put(TableEntityWidget.IS_INVOKING_DOWNLOAD_TABLE, true);
 
-		widget.configure(entityBundle, versionNumber, true, mockQueryChangeHandler, mockActionMenu);
+		widget.configure(entityBundle, versionNumber, true, false, mockQueryChangeHandler, mockActionMenu);
 		widget.queryExecutionFinished(true, false);
 
 		verify(mockAddToDownloadListV2, never()).configure(anyString(), any(Query.class));
@@ -579,7 +579,7 @@ public class TableEntityWidgetV2Test {
 	public void testShowAndHideDatasetEditor() throws JSONObjectAdapterException {
 		boolean canEdit = true;
 		configureBundleWithDataset();
-		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
+		widget.configure(entityBundle, versionNumber, canEdit, false, mockQueryChangeHandler, mockActionMenu);
 		verify(mockActionMenu).setActionListener(eq(Action.EDIT_DATASET_ITEMS), actionListenerCaptor.capture());
 		ActionListener listener = actionListenerCaptor.getValue();
 
@@ -605,7 +605,7 @@ public class TableEntityWidgetV2Test {
 
 		((Dataset) entityBundle.getEntity()).setItems(Collections.emptyList());
 
-		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
+		widget.configure(entityBundle, versionNumber, canEdit, false, mockQueryChangeHandler, mockActionMenu);
 
 		verify(mockView).setItemsEditorVisible(true);
 		verify(mockActionMenu).setActionVisible(Action.EDIT_DATASET_ITEMS, false);
@@ -616,7 +616,7 @@ public class TableEntityWidgetV2Test {
 		boolean canEdit = true;
 		configureBundleWithDataset();
 
-		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
+		widget.configure(entityBundle, versionNumber, canEdit, false, mockQueryChangeHandler, mockActionMenu);
 
 		verify(mockView, never()).setItemsEditorVisible(true);
 		verify(mockActionMenu, never()).setActionVisible(Action.EDIT_DATASET_ITEMS, false);
@@ -627,7 +627,7 @@ public class TableEntityWidgetV2Test {
 		boolean canEdit = false; // user does not have permission to edit
 		configureBundleWithDataset();
 
-		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
+		widget.configure(entityBundle, versionNumber, canEdit, false, mockQueryChangeHandler, mockActionMenu);
 
 		verify(mockView, never()).setItemsEditorVisible(true);
 		verify(mockActionMenu, never()).setActionVisible(Action.EDIT_DATASET_ITEMS, false);
@@ -638,7 +638,7 @@ public class TableEntityWidgetV2Test {
 		boolean canEdit = false; // user does not have permission to edit
 		configureBundleWithDataset();
 
-		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
+		widget.configure(entityBundle, versionNumber, canEdit, false, mockQueryChangeHandler, mockActionMenu);
 
 		verify(mockView, never()).setItemsEditorVisible(true);
 		verify(mockActionMenu, never()).setActionVisible(Action.EDIT_DATASET_ITEMS, false);
@@ -653,7 +653,7 @@ public class TableEntityWidgetV2Test {
 		((Dataset) entityBundle.getEntity()).setIsLatestVersion(true);
 		versionNumber = null;
 
-		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
+		widget.configure(entityBundle, versionNumber, canEdit, false, mockQueryChangeHandler, mockActionMenu);
 
 		verify(mockActionMenu).setTableDownloadOptionsEnabled(false);
 	}
@@ -667,7 +667,7 @@ public class TableEntityWidgetV2Test {
 		((Dataset) entityBundle.getEntity()).setIsLatestVersion(true);
 		versionNumber = null;
 
-		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
+		widget.configure(entityBundle, versionNumber, canEdit, false, mockQueryChangeHandler, mockActionMenu);
 
 		verify(mockActionMenu).setTableDownloadOptionsEnabled(true);
 	}
@@ -681,8 +681,17 @@ public class TableEntityWidgetV2Test {
 		((Dataset) entityBundle.getEntity()).setIsLatestVersion(false);
 		versionNumber = 1L;
 
-		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
+		widget.configure(entityBundle, versionNumber, canEdit, false, mockQueryChangeHandler, mockActionMenu);
 
 		verify(mockActionMenu).setTableDownloadOptionsEnabled(true);
+	}
+	
+	@Test
+	public void testTableOnly() {
+		boolean canEdit = true;
+		boolean showTableOnly = true;
+		widget.configure(entityBundle, versionNumber, canEdit, showTableOnly, mockQueryChangeHandler, mockActionMenu);
+
+		verify(mockView).configureTableOnly(anyString());
 	}
 }

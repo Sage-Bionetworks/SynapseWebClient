@@ -3658,3 +3658,8 @@ div.border {
 		text-align: end;
 	}
 }
+
+// override SynapseTable style when embedded in a wiki
+#body .markdown .SynapseTable {
+	min-height: unset;
+}

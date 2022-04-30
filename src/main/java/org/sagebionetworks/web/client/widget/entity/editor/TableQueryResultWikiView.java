@@ -8,9 +8,7 @@ public interface TableQueryResultWikiView extends IsWidget, WidgetEditorView {
 
 	String getSql();
 
-	@Deprecated
 	Boolean isQueryVisible();
-	@Deprecated
 	void setQueryVisible(boolean isQueryVisible);
 	
 	Boolean isShowTableOnly();
