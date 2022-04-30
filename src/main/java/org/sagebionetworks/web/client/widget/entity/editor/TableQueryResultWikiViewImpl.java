@@ -26,10 +26,15 @@ public class TableQueryResultWikiViewImpl implements TableQueryResultWikiView {
 	public TableQueryResultWikiViewImpl(TableQueryResultViewUiBinder binder, CookieProvider cookies) {
 		widget = binder.createAndBindUi(this);
 		boolean isInTestWebsiteMode = DisplayUtils.isInTestWebsite(cookies);
-		isQueryVisible.setVisible(!isInTestWebsiteMode);
 		isShowTableOnly.setVisible(isInTestWebsiteMode);
+		isShowTableOnly.addClickHandler(event -> {
+			updateIsQueryVisibleEnableState();
+		});
 	}
 
+	private void updateIsQueryVisibleEnableState() {
+		isQueryVisible.setEnabled(!isShowTableOnly.getValue());
+	}
 	@Override
 	public void initView() {
 		queryField.setValue("");
@@ -66,6 +71,7 @@ public class TableQueryResultWikiViewImpl implements TableQueryResultWikiView {
 	@Override
 	public void setIsShowTableOnly(boolean value) {
 		isShowTableOnly.setValue(value);
+		updateIsQueryVisibleEnableState();
 	}
 
 	@Override
