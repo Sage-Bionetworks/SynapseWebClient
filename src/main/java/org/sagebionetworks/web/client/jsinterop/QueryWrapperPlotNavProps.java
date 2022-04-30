@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.jsinterop;
 
-import org.sagebionetworks.repo.model.table.Query;
-
 import jsinterop.annotations.JsFunction;
 import jsinterop.annotations.JsNullable;
 import jsinterop.annotations.JsOverlay;

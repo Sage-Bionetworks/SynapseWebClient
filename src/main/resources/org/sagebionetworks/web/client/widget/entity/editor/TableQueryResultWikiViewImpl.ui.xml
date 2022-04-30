@@ -15,7 +15,8 @@
 					</g:FlowPanel>
 				</b:FormGroup>
 				<b:FormGroup>
-					<b:CheckBox ui:field="isQueryVisible" text="Show this query in the wiki table"/>
+					<b:CheckBox ui:field="isShowTableOnly" text="Show a basic table only"/>
+					<b:CheckBox ui:field="isQueryVisible" text="Allow user to edit this query in the wiki"/>
 				</b:FormGroup>
 			</b:FieldSet>
 		</bh:Div>

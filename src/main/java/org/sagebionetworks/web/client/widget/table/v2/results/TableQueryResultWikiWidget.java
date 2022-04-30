@@ -18,7 +18,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
-import org.sagebionetworks.web.client.widget.table.explore.TableEntityPlotsWidget;
+import org.sagebionetworks.web.client.widget.table.explore.TableEntityWidgetV2;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -30,7 +30,7 @@ import com.google.inject.Inject;
 public class TableQueryResultWikiWidget implements WidgetRendererPresenter, QueryChangeHandler {
 
 	TableEntityWidget tableEntityWidget = null;
-	TableEntityPlotsWidget tableEntityPlotsWidget = null;
+	TableEntityWidgetV2 tableEntityWidgetV2 = null;
 	SynapseJSNIUtils synapseJsniUtils;
 	TableQueryResultWikiWidgetView view;
 	SynapseJavascriptClient jsClient;
@@ -39,6 +39,7 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 	EntityActionController entityActionController;
 	Query query;
 	boolean isQueryVisible;
+	boolean isShowTableOnly;
 	PortalGinInjector ginInjector;
 	GWTWrapper gwt;
 	public static boolean isLoading = false;
@@ -65,14 +66,13 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 		return tableEntityWidget;
 	}
 	
-	private TableEntityPlotsWidget getTableEntityPlotsWidget() {
-		if (tableEntityPlotsWidget == null) {
-			tableEntityPlotsWidget = ginInjector.createNewTableEntityPlotsWidget();
-			view.setTableQueryResultWidget(tableEntityPlotsWidget.asWidget());
+	private TableEntityWidgetV2 getTableEntityWidgetV2() {
+		if (tableEntityWidgetV2 == null) {
+			tableEntityWidgetV2 = ginInjector.createNewTableEntityWidgetV2();
+			view.setTableQueryResultWidget(tableEntityWidgetV2.asWidget());
 		}
-		return tableEntityPlotsWidget;
+		return tableEntityWidgetV2;
 	}
-
 
 	@Override
 	public void configure(WikiPageKey wikiKey, Map<String, String> descriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
@@ -105,6 +105,10 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 			isQueryVisible = Boolean.parseBoolean(descriptor.get(WidgetConstants.QUERY_VISIBLE));
 		}
 
+		isShowTableOnly = false;
+		if (descriptor.containsKey(WidgetConstants.SHOW_TABLE_ONLY)) {
+			isShowTableOnly = Boolean.parseBoolean(descriptor.get(WidgetConstants.SHOW_TABLE_ONLY));
+		}
 		query = new Query();
 		query.setLimit(limit);
 		query.setOffset(offset);
@@ -129,7 +133,7 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 					hideEditActions();
 				} else {
 					hideEditActions();
-					getTableEntityPlotsWidget().configure(bundle, tableVersionNumber, canEdit, TableQueryResultWikiWidget.this, actionMenu);
+					getTableEntityWidgetV2().configure(bundle, tableVersionNumber, canEdit, isShowTableOnly, TableQueryResultWikiWidget.this, actionMenu);
 				}
 				isLoading = false;
 			}
@@ -151,7 +155,7 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 		this.actionMenu.setActionVisible(Action.SHOW_VERSION_HISTORY, false);
 		if (!isQueryVisible) {
 			if (DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider())) {
-				getTableEntityPlotsWidget().hideFiltering();
+				getTableEntityWidgetV2().hideFiltering();
 			} else {
 				getTableEntityWidget().hideFiltering();
 			}

@@ -37,7 +37,7 @@ import org.sagebionetworks.web.client.widget.entity.file.TableTitleBar;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
-import org.sagebionetworks.web.client.widget.table.explore.TableEntityPlotsWidget;
+import org.sagebionetworks.web.client.widget.table.explore.TableEntityWidgetV2;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
@@ -84,7 +84,7 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 	PortalGinInjector ginInjector;
 	ModifiedCreatedByWidget modifiedCreatedBy;
 	TableEntityWidget v2TableWidget;
-	TableEntityPlotsWidget plotsTableWidget;
+	TableEntityWidgetV2 plotsTableWidget;
 	Map<String, String> configMap;
 	CallbackP<String> entitySelectedCallback;
 	Long version;
@@ -306,9 +306,10 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 				view.setTableEntityWidget(v2TableWidget.asWidget());
 				v2TableWidget.configure(bundle, version, canEdit, this, tab.getEntityActionMenu());	
 			} else {
-				plotsTableWidget = ginInjector.createNewTableEntityPlotsWidget();
+				plotsTableWidget = ginInjector.createNewTableEntityWidgetV2();
 				view.setTableEntityWidget(plotsTableWidget.asWidget());
-				plotsTableWidget.configure(bundle, version, canEdit, this, tab.getEntityActionMenu());	
+				boolean isShowTableOnly = false;
+				plotsTableWidget.configure(bundle, version, canEdit, isShowTableOnly, this, tab.getEntityActionMenu());	
 			}
 			// Configure wiki
 			view.setWikiPageVisible(true);

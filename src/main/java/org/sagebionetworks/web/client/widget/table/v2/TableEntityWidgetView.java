@@ -121,5 +121,7 @@ public interface TableEntityWidgetView extends IsWidget {
 	void configureQueryWrapperPlotNav(String sql, String initQueryJson, OnQueryCallback onQueryBundleRequestChange,
 			OnQueryResultBundleCallback onQueryResultBundleChange, boolean hideSqlEditorControl);
 
+	void configureTableOnly(String sql);
+
 	void setQueryWrapperPlotNavVisible(boolean visible);
 }

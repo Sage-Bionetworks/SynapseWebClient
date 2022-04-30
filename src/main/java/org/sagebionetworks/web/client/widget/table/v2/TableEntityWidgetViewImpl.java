@@ -15,6 +15,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.FullWidthAlert;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 import org.sagebionetworks.web.client.widget.table.explore.QueryWrapperPlotNav;
+import org.sagebionetworks.web.client.widget.table.explore.StandaloneQueryWrapper;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityViewScopeWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.SubmissionViewScopeWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
@@ -195,6 +196,13 @@ public class TableEntityWidgetViewImpl extends Composite implements TableEntityW
 	@Override
 	public boolean isItemsEditorVisible() {
 		return itemsEditorContainer.isVisible();
+	}
+	
+	@Override
+	public void configureTableOnly(String sql) {
+		StandaloneQueryWrapper widget = new StandaloneQueryWrapper(propsProvider, sql);
+		plotNavContainer.clear();
+		plotNavContainer.add(widget);
 	}
 	
 	@Override

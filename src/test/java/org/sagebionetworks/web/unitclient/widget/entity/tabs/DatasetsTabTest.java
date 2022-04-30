@@ -66,7 +66,7 @@ import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.entity.tabs.TablesTabView;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
-import org.sagebionetworks.web.client.widget.table.explore.TableEntityPlotsWidget;
+import org.sagebionetworks.web.client.widget.table.explore.TableEntityWidgetV2;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
@@ -117,7 +117,7 @@ public class DatasetsTabTest {
 	@Mock
 	TableEntityWidget mockTableEntityWidget;
 	@Mock
-	TableEntityPlotsWidget mockTableEntityPlotsWidget;
+	TableEntityWidgetV2 mockTableEntityPlotsWidget;
 
 	@Mock
 	ModifiedCreatedByWidget mockModifiedCreatedBy;
@@ -175,7 +175,7 @@ public class DatasetsTabTest {
 		when(mockProjectEntityBundle.getPermissions()).thenReturn(mockPermissions);
 
 		when(mockPortalGinInjector.createNewTableEntityWidget()).thenReturn(mockTableEntityWidget);
-		when(mockPortalGinInjector.createNewTableEntityPlotsWidget()).thenReturn(mockTableEntityPlotsWidget);
+		when(mockPortalGinInjector.createNewTableEntityWidgetV2()).thenReturn(mockTableEntityPlotsWidget);
 		
 		when(mockDatasetBundle.getEntity()).thenReturn(mockDataset);
 		when(mockDataset.getId()).thenReturn(datasetId);

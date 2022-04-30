@@ -9,6 +9,9 @@ public interface TableQueryResultWikiView extends IsWidget, WidgetEditorView {
 	String getSql();
 
 	Boolean isQueryVisible();
-
 	void setQueryVisible(boolean isQueryVisible);
+	
+	Boolean isShowTableOnly();
+	void setIsShowTableOnly(boolean isShowTableOnly);
+
 }

@@ -41,7 +41,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.EntityActionContr
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
-import org.sagebionetworks.web.client.widget.table.explore.TableEntityPlotsWidget;
+import org.sagebionetworks.web.client.widget.table.explore.TableEntityWidgetV2;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWikiWidget;
@@ -68,7 +68,7 @@ public class TableQueryResultWikiWidgetTest {
 	@Mock
 	TableEntityWidget mockTableEntityWidget;
 	@Mock
-	TableEntityPlotsWidget mockTableEntityPlotsWidget;
+	TableEntityWidgetV2 mockTableEntityPlotsWidget;
 	@Mock
 	ActionMenuWidget mockActionMenu;
 	@Mock
@@ -93,7 +93,7 @@ public class TableQueryResultWikiWidgetTest {
 		widget = new TableQueryResultWikiWidget(mockView, mockActionMenu, mockEntityActionController, mockSynapseJSNIUtils, mockSynapseJavascriptClient, mockSynAlert, mockGWT, mockGinInjector);
 		AsyncMockStubber.callSuccessWith(mockEntityBundle).when(mockSynapseJavascriptClient).getEntityBundleFromCache(anyString(), any(AsyncCallback.class));
 		when(mockGinInjector.createNewTableEntityWidget()).thenReturn(mockTableEntityWidget);
-		when(mockGinInjector.createNewTableEntityPlotsWidget()).thenReturn(mockTableEntityPlotsWidget);
+		when(mockGinInjector.createNewTableEntityWidgetV2()).thenReturn(mockTableEntityPlotsWidget);
 	}
 
 	@Test
