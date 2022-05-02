@@ -22,11 +22,16 @@ public class EntityModalProps extends ReactComponentProps {
 	String initialTab; // "METADATA" | "ANNOTATIONS"
 	@JsNullable
 	boolean showTabs;
+	@JsNullable
+	Double versionNumber;
 
 	@JsOverlay
-	public static EntityModalProps create(String entityId, boolean show, Callback onClose, String initialTab, boolean showTabs) {
+	public static EntityModalProps create(String entityId, Long versionNumber, boolean show, Callback onClose, String initialTab, boolean showTabs) {
 		EntityModalProps props = new EntityModalProps();
 		props.entityId = entityId;
+		if (versionNumber != null) {
+			props.versionNumber = versionNumber.doubleValue();
+		}
 		props.show = show;
 		props.onClose = onClose;
 		props.initialTab = initialTab;

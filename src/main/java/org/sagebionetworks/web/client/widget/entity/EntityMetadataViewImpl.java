@@ -35,6 +35,8 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 	private static EntityMetadataViewImplUiBinder uiBinder = GWT.create(EntityMetadataViewImplUiBinder.class);
 
+	private String entityId;
+	private Long versionNumber;
 	private CookieProvider cookies;
 	private SynapseContextPropsProvider propsProvider;
 
@@ -114,7 +116,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		if (DisplayUtils.isInTestWebsite(cookies)) {
 			boolean showTabs = false;
 			EntityModalProps props =
-					EntityModalProps.create(idField.getText(), visible, () -> setAnnotationsVisible(false), "ANNOTATIONS", showTabs);
+					EntityModalProps.create(entityId, versionNumber, visible, () -> setAnnotationsVisible(false), "ANNOTATIONS", showTabs);
 			ReactDOM.render(
 					React.createElementWithSynapseContext(
 							SRC.SynapseComponents.EntityModal,
@@ -157,8 +159,13 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	}
 
 	@Override
-	public void setEntityId(String text) {
-		idField.setText(text);
+	public void setEntityId(String entityId) {
+		this.entityId = entityId;
+		idField.setText(this.entityId);
+	}
+	@Override
+	public void setVersionNumber(Long versionNumber) {
+		this.versionNumber = versionNumber;
 	}
 
 	@Override

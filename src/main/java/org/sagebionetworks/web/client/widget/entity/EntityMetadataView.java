@@ -38,4 +38,6 @@ public interface EntityMetadataView extends IsWidget {
 	void setContainerItemCountWidget(IsWidget w);
 
 	void setDescription(String description);
+
+	void setVersionNumber(Long versionNumber);
 }

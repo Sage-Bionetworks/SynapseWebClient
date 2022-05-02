@@ -88,6 +88,7 @@ public class EntityMetadata implements Presenter {
 		clear();
 		Entity en = bundle.getEntity();
 		view.setEntityId(en.getId());
+		view.setVersionNumber(versionNumber);
 
 		// See comments on SWC-5763
 		// TL;DR: we plan to show the description at some point, but not until we implement new designs
