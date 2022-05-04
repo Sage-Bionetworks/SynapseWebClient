@@ -2,6 +2,8 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
+import org.sagebionetworks.web.client.widget.HelpWidget;
+
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -24,6 +26,8 @@ public class ModifiedCreatedByWidgetViewImpl implements ModifiedCreatedByWidgetV
 	Span createdByUI;
 	@UiField
 	Span modifiedByUI;
+	@UiField
+	HelpWidget createdHelpWidget;
 
 	public interface ModifiedCreatedByWidgetViewImplUiBinder extends UiBinder<Widget, ModifiedCreatedByWidgetViewImpl> {
 	}
@@ -68,12 +72,12 @@ public class ModifiedCreatedByWidgetViewImpl implements ModifiedCreatedByWidgetV
 	}
 
 	@Override
-	public void setCreatedByUIVisible(boolean visible) {
-		createdByUI.setVisible(visible);
+	public void setCreatedHelpWidgetVisible(boolean visible) {
+		createdHelpWidget.setVisible(visible);
 	}
 
 	@Override
-	public void setModifiedByUIVisible(boolean visible) {
-		modifiedByUI.setVisible(visible);
+	public void setCreatedHelpWidgetText(String text) {
+		createdHelpWidget.setHelpMarkdown(text);
 	}
 }
