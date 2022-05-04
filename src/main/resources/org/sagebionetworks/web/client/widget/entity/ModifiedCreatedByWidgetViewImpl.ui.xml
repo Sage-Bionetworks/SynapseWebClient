@@ -11,7 +11,7 @@
 			<bh:Span text="Created by" />
 			<bh:Span ui:field="createdBadgePanel" />
 			<bh:Span ui:field="createdOnText" />
-            <w:HelpWidget ui:field="createdHelpWidget" />
+            <w:HelpWidget ui:field="createdHelpWidget" visible="false" />
 		</bh:Span>
 		<bh:Br />
 		<bh:Span ui:field="modifiedByUI">
