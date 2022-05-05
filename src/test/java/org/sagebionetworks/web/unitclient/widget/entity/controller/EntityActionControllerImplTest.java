@@ -783,7 +783,6 @@ public class EntityActionControllerImplTest {
 		// verify other table commands. current user canCertifiedUserEdit
 		verify(mockActionMenu).setActionVisible(Action.UPLOAD_TABLE_DATA, true);
 		verify(mockActionMenu).setActionVisible(Action.EDIT_TABLE_DATA, true);
-		verify(mockActionMenu).setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
 		verify(mockActionMenu).setActionVisible(Action.SHOW_TABLE_SCHEMA, true);
 		verify(mockActionMenu).setActionVisible(Action.SHOW_VIEW_SCOPE, false);
 	}
@@ -800,7 +799,6 @@ public class EntityActionControllerImplTest {
 		// verify other table commands. the current user cannot edit
 		verify(mockActionMenu).setActionVisible(Action.UPLOAD_TABLE_DATA, false);
 		verify(mockActionMenu).setActionVisible(Action.EDIT_TABLE_DATA, false);
-		verify(mockActionMenu).setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
 		verify(mockActionMenu).setActionVisible(Action.SHOW_TABLE_SCHEMA, true);
 		verify(mockActionMenu).setActionVisible(Action.SHOW_VIEW_SCOPE, false);
 		verify(mockActionMenu).setToolsButtonIcon("Table Tools", IconType.GEAR);
@@ -821,7 +819,6 @@ public class EntityActionControllerImplTest {
 		// table commands not shown for File
 		verify(mockActionMenu).setActionVisible(Action.UPLOAD_TABLE_DATA, false);
 		verify(mockActionMenu).setActionVisible(Action.EDIT_TABLE_DATA, false);
-		verify(mockActionMenu).setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, false);
 		verify(mockActionMenu).setActionVisible(Action.SHOW_TABLE_SCHEMA, false);
 		verify(mockActionMenu).setActionVisible(Action.SHOW_VIEW_SCOPE, false);
 	}

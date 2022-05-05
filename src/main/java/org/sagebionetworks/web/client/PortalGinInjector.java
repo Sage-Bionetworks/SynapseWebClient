@@ -216,7 +216,6 @@ import org.sagebionetworks.web.client.widget.table.modal.fileview.MaterializedVi
 import org.sagebionetworks.web.client.widget.table.modal.fileview.ViewDefaultColumns;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
-import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.client.widget.table.v2.TotalVisibleResultsWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowWidget;
@@ -534,7 +533,6 @@ public interface PortalGinInjector extends Ginjector {
 
 	ColumnModelTableRowEditorWidget createColumnModelEditorWidget();
 
-	TableEntityWidget createNewTableEntityWidget();
 	TableEntityWidgetV2 createNewTableEntityWidgetV2();
 
 	RowWidget createRowWidget();

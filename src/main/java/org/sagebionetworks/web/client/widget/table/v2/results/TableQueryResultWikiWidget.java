@@ -19,7 +19,6 @@ import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.explore.TableEntityWidgetV2;
-import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -29,7 +28,6 @@ import com.google.inject.Inject;
 
 public class TableQueryResultWikiWidget implements WidgetRendererPresenter, QueryChangeHandler {
 
-	TableEntityWidget tableEntityWidget = null;
 	TableEntityWidgetV2 tableEntityWidgetV2 = null;
 	SynapseJSNIUtils synapseJsniUtils;
 	TableQueryResultWikiWidgetView view;
@@ -58,14 +56,6 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 		actionMenu.addControllerWidget(entityActionController.asWidget());
 	}
 
-	private TableEntityWidget getTableEntityWidget() {
-		if (tableEntityWidget == null) {
-			tableEntityWidget = ginInjector.createNewTableEntityWidget();
-			view.setTableQueryResultWidget(tableEntityWidget.asWidget());
-		}
-		return tableEntityWidget;
-	}
-	
 	private TableEntityWidgetV2 getTableEntityWidgetV2() {
 		if (tableEntityWidgetV2 == null) {
 			tableEntityWidgetV2 = ginInjector.createNewTableEntityWidgetV2();
@@ -128,13 +118,8 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 				boolean isCurrentVersion = true;
 				entityActionController.configure(actionMenu, bundle, isCurrentVersion, bundle.getRootWikiId(), EntityArea.TABLES);
 				boolean canEdit = false;
-				if (!DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider())) {
-					getTableEntityWidget().configure(bundle, tableVersionNumber, canEdit, TableQueryResultWikiWidget.this, actionMenu);
-					hideEditActions();
-				} else {
-					hideEditActions();
-					getTableEntityWidgetV2().configure(bundle, tableVersionNumber, canEdit, isShowTableOnly, TableQueryResultWikiWidget.this, actionMenu);
-				}
+				hideEditActions();
+				getTableEntityWidgetV2().configure(bundle, tableVersionNumber, canEdit, isShowTableOnly, TableQueryResultWikiWidget.this, actionMenu);
 				isLoading = false;
 			}
 
@@ -154,11 +139,7 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 		this.actionMenu.setActionVisible(Action.SHOW_TABLE_SCHEMA, false);
 		this.actionMenu.setActionVisible(Action.SHOW_VERSION_HISTORY, false);
 		if (!isQueryVisible) {
-			if (DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider())) {
-				getTableEntityWidgetV2().hideFiltering();
-			} else {
-				getTableEntityWidget().hideFiltering();
-			}
+			getTableEntityWidgetV2().hideFiltering();
 		}
 	}
 

@@ -21,24 +21,9 @@ public interface QueryInputListener {
 	public void onEditResults();
 
 	/**
-	 * Called when the user clicks the download button
-	 */
-	public void onDownloadResults();
-
-	/**
-	 * Called when the user clicks the show query button
-	 */
-	public void onShowQuery();
-
-	/**
 	 * user clicked download files (from view) button.
 	 */
 	public void onShowDownloadFilesProgrammatically();
 
 	void onAddToDownloadList();
-	
-	/**
-	 * @deprecated
-	 */
-	void onShowSimpleSearch();
 }

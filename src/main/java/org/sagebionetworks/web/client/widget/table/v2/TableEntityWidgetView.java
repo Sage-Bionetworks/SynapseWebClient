@@ -2,12 +2,10 @@ package org.sagebionetworks.web.client.widget.table.v2;
 
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
-import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.web.client.jsinterop.DatasetEditorProps;
 import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnQueryCallback;
 import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnQueryResultBundleCallback;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -29,8 +27,7 @@ public interface TableEntityWidgetView extends IsWidget {
 	/**
 	 * Configure the view with the table data.
 	 * 
-	 * @param tableId
-	 * @param tableBundel
+	 * @param bundle
 	 * @param isEditable
 	 */
 	void configure(EntityBundle bundle, boolean isEditable);
@@ -48,45 +45,6 @@ public interface TableEntityWidgetView extends IsWidget {
 	 * @param visible
 	 */
 	public void setTableMessageVisible(boolean visible);
-
-	/**
-	 * Show or hide the query results
-	 * 
-	 * @param visible
-	 * @deprecated
-	 */
-	public void setQueryResultsVisible(boolean visible);
-
-	/**
-	 * Set the query results widget.
-	 * 
-	 * @param queryResultsWidget
-	 * @deprecated
-	 */
-	public void setQueryResultsWidget(IsWidget queryResultsWidget);
-
-	/**
-	 * Set the query input widget.
-	 * 
-	 * @param queryInputWidget
-	 * @deprecated
-	 */
-	public void setQueryInputWidget(IsWidget queryInputWidget);
-
-	/**
-	 * Show or hide the query input.
-	 * 
-	 * @param b
-	 * @deprecated
-	 */
-	public void setQueryInputVisible(boolean visible);
-
-	/**
-	 * 
-	 * @param visible
-	 * @deprecated
-	 */
-	public void setTableToolbarVisible(boolean visible);
 
 	/**
 	 * Add a modal to the page.

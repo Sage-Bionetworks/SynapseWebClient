@@ -39,7 +39,6 @@ import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.explore.TableEntityWidgetV2;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
-import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -83,8 +82,7 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 	StuAlert synAlert;
 	PortalGinInjector ginInjector;
 	ModifiedCreatedByWidget modifiedCreatedBy;
-	TableEntityWidget v2TableWidget;
-	TableEntityWidgetV2 plotsTableWidget;
+	TableEntityWidgetV2 tableEntityWidget;
 	Map<String, String> configMap;
 	CallbackP<String> entitySelectedCallback;
 	Long version;
@@ -213,7 +211,7 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 			String token = queryTokenProvider.queryToToken(newQuery);
 			Long versionNumber = QueryBundleUtils.getTableVersion(newQuery.getSql());
 			String synId = QueryBundleUtils.getTableIdFromSql(newQuery.getSql());
-			Query defaultQuery = DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider()) ? plotsTableWidget.getDefaultQuery() : v2TableWidget.getDefaultQuery();
+			Query defaultQuery = tableEntityWidget.getDefaultQuery();
 			if (token != null && !newQuery.equals(defaultQuery)) {
 				areaToken = TABLE_QUERY_PREFIX + token;
 			} else {
@@ -287,9 +285,6 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 		modifiedCreatedBy.setVisible(false);
 		view.setTableUIVisible(isShownInTab);
 		view.setActionMenu(tab.getEntityActionMenu());
-		if (!isShownInTab) {
-			tab.getEntityActionMenu().setTableDownloadOptionsVisible(false);
-		}
 		boolean isCurrentVersion = !isProject && ((Table) entity).getIsLatestVersion();
 
 		tab.configureEntityActionController(bundle, isCurrentVersion, null);
@@ -301,16 +296,11 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 			titleBar.configure(bundle, tab.getEntityActionMenu(), metadata.getVersionHistoryWidget());
 			modifiedCreatedBy.configure(entity.getCreatedOn(), entity.getCreatedBy(), entity.getModifiedOn(), entity.getModifiedBy());
 			
-			if (!DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider())) {
-				v2TableWidget = ginInjector.createNewTableEntityWidget();
-				view.setTableEntityWidget(v2TableWidget.asWidget());
-				v2TableWidget.configure(bundle, version, canEdit, this, tab.getEntityActionMenu());	
-			} else {
-				plotsTableWidget = ginInjector.createNewTableEntityWidgetV2();
-				view.setTableEntityWidget(plotsTableWidget.asWidget());
-				boolean isShowTableOnly = false;
-				plotsTableWidget.configure(bundle, version, canEdit, isShowTableOnly, this, tab.getEntityActionMenu());	
-			}
+			tableEntityWidget = ginInjector.createNewTableEntityWidgetV2();
+			view.setTableEntityWidget(tableEntityWidget.asWidget());
+			boolean isShowTableOnly = false;
+			tableEntityWidget.configure(bundle, version, canEdit, isShowTableOnly, this, tab.getEntityActionMenu());
+
 			// Configure wiki
 			view.setWikiPageVisible(true);
 			final WikiPageWidget.Callback wikiCallback = new WikiPageWidget.Callback() {

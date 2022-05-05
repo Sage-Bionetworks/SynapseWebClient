@@ -12,10 +12,10 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget.HIDE;
-import static org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget.SCHEMA;
-import static org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget.SCOPE;
-import static org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget.SHOW;
+import static org.sagebionetworks.web.client.widget.table.explore.TableEntityWidgetV2.HIDE;
+import static org.sagebionetworks.web.client.widget.table.explore.TableEntityWidgetV2.SCHEMA;
+import static org.sagebionetworks.web.client.widget.table.explore.TableEntityWidgetV2.SCOPE;
+import static org.sagebionetworks.web.client.widget.table.explore.TableEntityWidgetV2.SHOW;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -66,7 +66,6 @@ import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQ
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
-import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidgetView;
 import org.sagebionetworks.web.client.widget.table.v2.TotalVisibleResultsWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
@@ -245,25 +244,6 @@ public class TableEntityWidgetV2Test {
 		verify(mockQueryChangeHandler, never()).onQueryChange(any(Query.class));
 	}
 
-	@Test
-	public void testConfigureEdit() {
-		boolean canEdit = true;
-		widget.configure(entityBundle, versionNumber, canEdit, false, mockQueryChangeHandler, mockActionMenu);
-
-		// download files help not visible for Table, only Views
-		verify(mockActionMenu).setActionVisible(Action.ADD_TABLE_RESULTS_TO_DOWNLOAD_LIST, false);
-	}
-
-	@Test
-	public void testConfigureViewEdit() {
-		boolean canEdit = true;
-		configureBundleWithView(ViewType.file);
-
-		widget.configure(entityBundle, versionNumber, canEdit, false, mockQueryChangeHandler, mockActionMenu);
-
-		// verify download help is shown for file views
-		verify(mockActionMenu).setActionVisible(Action.ADD_TABLE_RESULTS_TO_DOWNLOAD_LIST, true);
-	}
 
 	@Test
 	public void testNoColumnsWithEdit() {
@@ -273,7 +253,7 @@ public class TableEntityWidgetV2Test {
 
 		verify(mockView).setTableMessageVisible(true);
 		verify(mockView).showTableMessage(AlertType.INFO,
-				TableEntityWidget.getNoColumnsMessage(TableType.table, canEdit));
+				TableEntityWidgetV2.getNoColumnsMessage(TableType.table, canEdit));
 		// The query should be cleared when there are no columns
 		verify(mockQueryChangeHandler).onQueryChange(null);
 	}
@@ -286,7 +266,7 @@ public class TableEntityWidgetV2Test {
 
 		verify(mockView).setTableMessageVisible(true);
 		verify(mockView).showTableMessage(AlertType.INFO,
-				TableEntityWidget.getNoColumnsMessage(TableType.table, canEdit));
+				TableEntityWidgetV2.getNoColumnsMessage(TableType.table, canEdit));
 		// The query should be cleared when there are no columns
 		verify(mockQueryChangeHandler).onQueryChange(null);
 	}
@@ -297,7 +277,6 @@ public class TableEntityWidgetV2Test {
 		widget.configure(entityBundle, versionNumber, canEdit, false, mockQueryChangeHandler, mockActionMenu);
 		widget.queryExecutionStarted();
 		verify(mockActionMenu).setActionVisible(Action.EDIT_TABLE_DATA, false);
-		verify(mockActionMenu).setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, false);
 	}
 
 	@Test
@@ -313,7 +292,6 @@ public class TableEntityWidgetV2Test {
 		widget.queryExecutionFinished(wasExecutionSuccess, resultsEditable);
 		verify(mockQueryChangeHandler).onQueryChange(startQuery);
 		verify(mockActionMenu).setActionVisible(Action.EDIT_TABLE_DATA, true);
-		verify(mockActionMenu).setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
 	}
 
 	@Test
@@ -330,7 +308,6 @@ public class TableEntityWidgetV2Test {
 		widget.queryExecutionFinished(wasExecutionSuccess, resultsEditable);
 		verify(mockQueryChangeHandler).onQueryChange(startQuery);
 		verify(mockActionMenu).setActionVisible(Action.EDIT_TABLE_DATA, true);
-		verify(mockActionMenu).setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
 	}
 
 	@Test
@@ -346,8 +323,6 @@ public class TableEntityWidgetV2Test {
 		widget.queryExecutionFinished(wasExecutionSuccess, resultsEditable);
 		verify(mockQueryChangeHandler).onQueryChange(startQuery);
 		verify(mockActionMenu, never()).setActionVisible(Action.EDIT_TABLE_DATA, true);
-		// do not need edit access to download the query results
-		verify(mockActionMenu).setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
 	}
 
 	@Test
@@ -363,7 +338,6 @@ public class TableEntityWidgetV2Test {
 		widget.queryExecutionFinished(wasExecutionSuccess, resultsEditable);
 		verify(mockQueryChangeHandler, never()).onQueryChange(any(Query.class));
 		verify(mockActionMenu, never()).setActionVisible(Action.EDIT_TABLE_DATA, true);
-		verify(mockActionMenu, never()).setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
 	}
 
 	@Test
@@ -415,31 +389,6 @@ public class TableEntityWidgetV2Test {
 		assertEquals(expectedQueryCount, widget.getCurrentQueryResultBundle().getQueryCount());
 	}
 
-	@Test
-	public void testFileCommands() {
-		configureBundleWithView(ViewType.file);
-		boolean canEdit = true;
-
-		widget.configure(entityBundle, versionNumber, canEdit, false, mockQueryChangeHandler, mockActionMenu);
-
-		verify(mockActionMenu).setActionVisible(Action.ADD_TABLE_RESULTS_TO_DOWNLOAD_LIST, true);
-		verify(mockActionMenu).setActionVisible(Action.TABLE_DOWNLOAD_PROGRAMMATIC_OPTIONS, true);
-
-		// also verify other commands have been hooked up
-		verify(mockActionMenu).setActionListener(eq(Action.TABLE_DOWNLOAD_PROGRAMMATIC_OPTIONS), any());
-		verify(mockActionMenu).setActionListener(eq(Action.ADD_TABLE_RESULTS_TO_DOWNLOAD_LIST), any());
-	}
-
-	@Test
-	public void testFileCommandsHidden() {
-		configureBundleWithView(ViewType.project);
-		boolean canEdit = true;
-
-		widget.configure(entityBundle, versionNumber, canEdit, false, mockQueryChangeHandler, mockActionMenu);
-
-		verify(mockActionMenu).setActionVisible(Action.ADD_TABLE_RESULTS_TO_DOWNLOAD_LIST, false);
-		verify(mockActionMenu).setActionVisible(Action.TABLE_DOWNLOAD_PROGRAMMATIC_OPTIONS, false);
-	}
 
 	@Test
 	public void testShowSchema() {
@@ -536,13 +485,13 @@ public class TableEntityWidgetV2Test {
 		when(mockQueryChangeHandler.getQueryString()).thenReturn(new Query());
 		Header.isShowingPortalAlert = true;
 		Header.portalAlertJson = portalJson;
-		portalJson.put(TableEntityWidget.IS_INVOKING_DOWNLOAD_TABLE, true);
+		portalJson.put(TableEntityWidgetV2.IS_INVOKING_DOWNLOAD_TABLE, true);
 
 		widget.configure(entityBundle, versionNumber, true, false, mockQueryChangeHandler, mockActionMenu);
 		widget.queryExecutionFinished(true, false);
 
 		verify(mockAddToDownloadListV2).configure(anyString(), any(Query.class));
-		assertFalse(portalJson.getBoolean(TableEntityWidget.IS_INVOKING_DOWNLOAD_TABLE));
+		assertFalse(portalJson.getBoolean(TableEntityWidgetV2.IS_INVOKING_DOWNLOAD_TABLE));
 	}
 
 	@Test
@@ -552,7 +501,7 @@ public class TableEntityWidgetV2Test {
 		when(mockQueryChangeHandler.getQueryString()).thenReturn(new Query());
 		Header.isShowingPortalAlert = true;
 		Header.portalAlertJson = portalJson;
-		portalJson.put(TableEntityWidget.IS_INVOKING_DOWNLOAD_TABLE, false);
+		portalJson.put(TableEntityWidgetV2.IS_INVOKING_DOWNLOAD_TABLE, false);
 
 		widget.configure(entityBundle, versionNumber, true, false, mockQueryChangeHandler, mockActionMenu);
 		widget.queryExecutionFinished(true, false);
@@ -567,7 +516,7 @@ public class TableEntityWidgetV2Test {
 		when(mockQueryChangeHandler.getQueryString()).thenReturn(new Query());
 		Header.isShowingPortalAlert = true;
 		Header.portalAlertJson = portalJson;
-		portalJson.put(TableEntityWidget.IS_INVOKING_DOWNLOAD_TABLE, true);
+		portalJson.put(TableEntityWidgetV2.IS_INVOKING_DOWNLOAD_TABLE, true);
 
 		widget.configure(entityBundle, versionNumber, true, false, mockQueryChangeHandler, mockActionMenu);
 		widget.queryExecutionFinished(true, false);
@@ -592,7 +541,6 @@ public class TableEntityWidgetV2Test {
 		// ready to close
 		widget.closeItemsEditor();
 		verify(mockView).setItemsEditorVisible(false);
-		verify(mockActionMenu, times(2)).setTableDownloadOptionsVisible(true);
 		verify(mockActionMenu).setActionVisible(Action.EDIT_DATASET_ITEMS, true);
 	}
 
@@ -633,59 +581,6 @@ public class TableEntityWidgetV2Test {
 		verify(mockActionMenu, never()).setActionVisible(Action.EDIT_DATASET_ITEMS, false);
 	}
 
-	@Test // SWC-5921
-	public void testDoNotShowDownload() {
-		boolean canEdit = false; // user does not have permission to edit
-		configureBundleWithDataset();
-
-		widget.configure(entityBundle, versionNumber, canEdit, false, mockQueryChangeHandler, mockActionMenu);
-
-		verify(mockView, never()).setItemsEditorVisible(true);
-		verify(mockActionMenu, never()).setActionVisible(Action.EDIT_DATASET_ITEMS, false);
-	}
-
-	@Test // SWC-5878
-	public void testDisableDownloadForNonEditorOnCurrentVersionOfDataset() {
-		boolean canEdit = false; // user does not have permission to edit
-		configureBundleWithDataset();
-
-		// This is not a snapshot
-		((Dataset) entityBundle.getEntity()).setIsLatestVersion(true);
-		versionNumber = null;
-
-		widget.configure(entityBundle, versionNumber, canEdit, false, mockQueryChangeHandler, mockActionMenu);
-
-		verify(mockActionMenu).setTableDownloadOptionsEnabled(false);
-	}
-
-	@Test // SWC-5878
-	public void testEnableDownloadForEditorOnCurrentVersionOfDataset() {
-		boolean canEdit = true; // user has permission to edit
-		configureBundleWithDataset();
-
-		// This is not a snapshot
-		((Dataset) entityBundle.getEntity()).setIsLatestVersion(true);
-		versionNumber = null;
-
-		widget.configure(entityBundle, versionNumber, canEdit, false, mockQueryChangeHandler, mockActionMenu);
-
-		verify(mockActionMenu).setTableDownloadOptionsEnabled(true);
-	}
-
-	@Test // SWC-5878
-	public void testEnableDownloadForDatasetSnapshot() {
-		boolean canEdit = false; // user does not need to have permission to edit
-		configureBundleWithDataset();
-
-		// This is a snapshot
-		((Dataset) entityBundle.getEntity()).setIsLatestVersion(false);
-		versionNumber = 1L;
-
-		widget.configure(entityBundle, versionNumber, canEdit, false, mockQueryChangeHandler, mockActionMenu);
-
-		verify(mockActionMenu).setTableDownloadOptionsEnabled(true);
-	}
-	
 	@Test
 	public void testTableOnly() {
 		boolean canEdit = true;

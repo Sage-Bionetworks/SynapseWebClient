@@ -29,7 +29,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.Query;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -42,7 +41,6 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.table.explore.TableEntityWidgetV2;
-import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWikiWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWikiWidgetView;
@@ -66,9 +64,7 @@ public class TableQueryResultWikiWidgetTest {
 	@Mock
 	SynapseAlert mockSynAlert;
 	@Mock
-	TableEntityWidget mockTableEntityWidget;
-	@Mock
-	TableEntityWidgetV2 mockTableEntityPlotsWidget;
+	TableEntityWidgetV2 mockTableEntityWidget;
 	@Mock
 	ActionMenuWidget mockActionMenu;
 	@Mock
@@ -92,8 +88,7 @@ public class TableQueryResultWikiWidgetTest {
 		when(mockGinInjector.getCookieProvider()).thenReturn(mockCookies);
 		widget = new TableQueryResultWikiWidget(mockView, mockActionMenu, mockEntityActionController, mockSynapseJSNIUtils, mockSynapseJavascriptClient, mockSynAlert, mockGWT, mockGinInjector);
 		AsyncMockStubber.callSuccessWith(mockEntityBundle).when(mockSynapseJavascriptClient).getEntityBundleFromCache(anyString(), any(AsyncCallback.class));
-		when(mockGinInjector.createNewTableEntityWidget()).thenReturn(mockTableEntityWidget);
-		when(mockGinInjector.createNewTableEntityWidgetV2()).thenReturn(mockTableEntityPlotsWidget);
+		when(mockGinInjector.createNewTableEntityWidgetV2()).thenReturn(mockTableEntityWidget);
 	}
 
 	@Test
@@ -133,7 +128,7 @@ public class TableQueryResultWikiWidgetTest {
 		String wikiPageRootId = null;
 		verify(mockEntityActionController).configure(mockActionMenu, mockEntityBundle, isCurrentVersion, wikiPageRootId, EntityArea.TABLES);
 		boolean canEdit = false;
-		verify(mockTableEntityWidget).configure(mockEntityBundle, tableVersionNumber, canEdit, widget, mockActionMenu);
+		verify(mockTableEntityWidget).configure(mockEntityBundle, tableVersionNumber, canEdit, false, widget, mockActionMenu);
 
 		verify(mockActionMenu, atLeastOnce()).setActionVisible(Action.UPLOAD_TABLE_DATA, false);
 		verify(mockActionMenu, atLeastOnce()).setActionVisible(Action.EDIT_TABLE_DATA, false);

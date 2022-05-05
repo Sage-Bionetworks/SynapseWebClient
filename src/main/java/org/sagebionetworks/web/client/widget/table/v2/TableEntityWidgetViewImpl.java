@@ -43,8 +43,6 @@ public class TableEntityWidgetViewImpl extends Composite implements TableEntityW
 	Div schemaCollapse;
 	@UiField
 	Div scopeCollapse;
-	@UiField
-	Div tableToolbar;
 
 	@UiField
 	SimplePanel columnDetailsPanel;
@@ -52,10 +50,6 @@ public class TableEntityWidgetViewImpl extends Composite implements TableEntityW
 	Div scopePanel;
 	@UiField
 	FullWidthAlert tableMessage;
-	@UiField
-	SimplePanel queryInputPanel;
-	@UiField
-	SimplePanel queryResultsPanel;
 	@UiField
 	Div modalContainer;
 	@UiField
@@ -98,11 +92,6 @@ public class TableEntityWidgetViewImpl extends Composite implements TableEntityW
 	}
 
 	@Override
-	public void setQueryResultsVisible(boolean visible) {
-		this.queryResultsPanel.setVisible(visible);
-	}
-
-	@Override
 	public void showTableMessage(AlertType type, String message) {
 		this.tableMessage.setAlertType(type);
 		this.tableMessage.setMessage(message);
@@ -113,22 +102,6 @@ public class TableEntityWidgetViewImpl extends Composite implements TableEntityW
 		this.tableMessage.setVisible(visible);
 	}
 
-	@Override
-	public void setQueryResultsWidget(IsWidget queryResultsWidget) {
-		this.queryResultsPanel.add(queryResultsWidget);
-
-	}
-
-	@Override
-	public void setQueryInputWidget(IsWidget queryInputWidget) {
-		this.queryInputPanel.add(queryInputWidget);
-
-	}
-
-	@Override
-	public void setQueryInputVisible(boolean visible) {
-		this.queryInputPanel.setVisible(visible);
-	}
 
 	@Override
 	public void addModalWidget(IsWidget w) {
@@ -163,11 +136,6 @@ public class TableEntityWidgetViewImpl extends Composite implements TableEntityW
 	@Override
 	public void showConfirmDialog(String title, String message, Callback yesCallback) {
 		DisplayUtils.showConfirmDialog(title, message, yesCallback);
-	}
-
-	@Override
-	public void setTableToolbarVisible(boolean visible) {
-		tableToolbar.setVisible(visible);
 	}
 
 	@Override

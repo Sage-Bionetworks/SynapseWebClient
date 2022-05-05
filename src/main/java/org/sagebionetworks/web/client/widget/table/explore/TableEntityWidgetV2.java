@@ -61,8 +61,6 @@ import com.google.inject.Inject;
 /**
  * TableEntity widget provides viewing and editing of both a table's schema and row data. It also
  * allows a user to execute a query against the table by writing SQL.
- * 
- * TODO: delete TableEntityWidget when this has been released out of experimental mode.
  */
 public class TableEntityWidgetV2 implements TableEntityWidgetView.Presenter, IsWidget, QueryResultsListener, QueryInputListener {
 
@@ -123,18 +121,7 @@ public class TableEntityWidgetV2 implements TableEntityWidgetView.Presenter, IsW
 		this.sessionStorage = sessionStorage;
 		this.eventBus = eventBus;
 		this.view.setPresenter(this);
-		// TODO: remove these UI elements from the view once we bring this out of experimental mode
-		view.setQueryInputVisible(false);
-		view.setQueryResultsVisible(false);
 		view.setQueryWrapperPlotNavVisible(true);
-	}
-
-	public DownloadTableQueryModalWidget getDownloadTableQueryModalWidget() {
-		if (downloadTableQueryModalWidget == null) {
-			downloadTableQueryModalWidget = ginInjector.getDownloadTableQueryModalWidget();
-			view.addModalWidget(downloadTableQueryModalWidget);
-		}
-		return downloadTableQueryModalWidget;
 	}
 
 	public UploadTableModalWidget getUploadTableModalWidget() {
@@ -165,7 +152,6 @@ public class TableEntityWidgetV2 implements TableEntityWidgetView.Presenter, IsW
 	 * 
 	 * @param bundle
 	 * @param canEdit
-	 * @param queryString
 	 * @param qch
 	 */
 	public void configure(EntityBundle bundle, Long versionNumber, boolean canEdit, boolean isShowTableOnly, QueryChangeHandler qch, ActionMenuWidget actionMenu) {
@@ -252,37 +238,10 @@ public class TableEntityWidgetV2 implements TableEntityWidgetView.Presenter, IsW
 		} else {
 			this.actionMenu.setEditTableDataTooltipText("There is no data to edit");
 		}
-
-		// Download options
-		this.actionMenu.setTableDownloadOptionsVisible(true);
-		this.actionMenu.setActionListener(Action.DOWNLOAD_TABLE_QUERY_RESULTS, action -> {
-			onDownloadResults();
-		});
-		this.actionMenu.setActionVisible(Action.ADD_TABLE_RESULTS_TO_DOWNLOAD_LIST, tableType.isIncludeFiles());
-		this.actionMenu.setActionVisible(Action.TABLE_DOWNLOAD_PROGRAMMATIC_OPTIONS, tableType.isIncludeFiles());
-		if (this.entityBundle.getEntity() instanceof Dataset && isCurrentVersion && hasQueryableData) {
-			// SWC-5878 - On the current (non-snapshot) version of a dataset, only editors should be able to download
-			this.actionMenu.setTableDownloadOptionsEnabled(canEdit);
-			if (!canEdit) {
-				this.actionMenu.setDownloadActionsDisabledTooltipText("A draft version of a Dataset cannot be downloaded");
-			}
-		} else {
-			this.actionMenu.setTableDownloadOptionsEnabled(hasQueryableData);
-			if (!hasQueryableData) {
-				this.actionMenu.setDownloadActionsDisabledTooltipText("There is no data to download");
-			}
-		}
-		this.actionMenu.setActionListener(Action.TABLE_DOWNLOAD_PROGRAMMATIC_OPTIONS, action -> {
-			onShowDownloadFilesProgrammatically();
-		});
-		this.actionMenu.setActionListener(Action.ADD_TABLE_RESULTS_TO_DOWNLOAD_LIST, action -> {
-			onAddToDownloadList();
-		});
 	}
 
 	/**
 	 * Initilializes the Table query. This method will not issue a query if we know we will not get results (e.g. if there are no columns)
-	 * @param onQuery a callback that will be invoked if we initiate a query.
 	 */
 	public void initializeQuery() {
 		// Make a few checks to see if we know that we won't get results before submitting the query
@@ -330,8 +289,6 @@ public class TableEntityWidgetV2 implements TableEntityWidgetView.Presenter, IsW
 
 	/**
 	 * Set the query used by this widget.
-	 * 
-	 * @param sql
 	 */
 	private void setQuery(Query query, boolean isFromResults) {
 		this.currentQuery = query;
@@ -433,14 +390,12 @@ public class TableEntityWidgetV2 implements TableEntityWidgetView.Presenter, IsW
 	public void queryExecutionStarted() {
 		// Disabling menu items does not seem to work well so we hide the items instead.
 		this.actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, false);
-		this.actionMenu.setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, false);
 	}
 
 	@Override
 	public void queryExecutionFinished(boolean wasSuccessful, boolean resultsEditable) {
 		// Pass this along to the input widget.
 		this.actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, wasSuccessful && canEditResults && resultsEditable);
-		this.actionMenu.setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, wasSuccessful);
 
 		// Set this as the query if it was successful
 		if (wasSuccessful) {
@@ -502,12 +457,6 @@ public class TableEntityWidgetV2 implements TableEntityWidgetView.Presenter, IsW
 
 	}
 
-	@Override
-	public void onDownloadResults() {
-		getDownloadTableQueryModalWidget().configure(this.currentQuery.getSql(), this.tableId, currentQuery.getSelectedFacets());
-		getDownloadTableQueryModalWidget().showModal();
-	}
-
 	public void onUploadTableData() {
 		if (isCurrentVersion) {
 			// proceed as long as the user has meet all upload pre-flight checks
@@ -545,24 +494,6 @@ public class TableEntityWidgetV2 implements TableEntityWidgetView.Presenter, IsW
 	@Override
 	public void onStartingNewQuery(Query newQuery) {
 		setQuery(newQuery, true);
-	}
-
-	@Override
-	public void onShowQuery() {
-		// show the sql executed
-		AsyncCallback<String> callback = new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(String sql) {
-				getCopyTextModal().setText(sql);
-				getCopyTextModal().show();
-			}
-
-			@Override
-			public void onFailure(Throwable caught) {
-				view.showErrorMessage(caught.getMessage());
-			}
-		};
-		generateSqlWithFacets(callback);
 	}
 
 	@Override
@@ -612,22 +543,16 @@ public class TableEntityWidgetV2 implements TableEntityWidgetView.Presenter, IsW
 	private void showDatasetItemsEditor() {
 		actionMenu.setActionVisible(Action.EDIT_DATASET_ITEMS, false);
 		view.setItemsEditorVisible(true);
-		view.setQueryResultsVisible(false);
 		view.setTableMessageVisible(false);
 	}
 
 	public void closeItemsEditor() {
 		actionMenu.setActionVisible(Action.EDIT_DATASET_ITEMS, true);
 		view.setItemsEditorVisible(false);
-		view.setQueryResultsVisible(true);
 		reconfigureState();
 	}
 	public void hideFiltering() {
 		hideFiltering = true;
-	}
-	@Override
-	public void onShowSimpleSearch() {
-		// TODO: delete from action commands and interface
 	}
 	
 	/**
