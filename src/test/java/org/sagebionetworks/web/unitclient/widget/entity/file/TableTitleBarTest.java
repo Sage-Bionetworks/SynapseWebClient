@@ -1,11 +1,16 @@
 package org.sagebionetworks.web.unitclient.widget.entity.file;
 
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.util.function.Consumer;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
@@ -37,6 +42,8 @@ public class TableTitleBarTest {
 	UserEntityPermissions mockPermissions;
 	@Mock
 	VersionHistoryWidget mockVersionHistoryWidget;
+	@Captor
+	ArgumentCaptor<Consumer<Boolean>> versionHistoryVisibilityListenerCaptor;
 	public static final String ENTITY_ID = "syn123";
 	public static final Long TABLE_VERSION = 3L;
 	public static final String TABLE_NAME = "My Table";
@@ -77,7 +84,7 @@ public class TableTitleBarTest {
 
 		verify(mockView).createTitlebar(mockTable);
 		verify(mockView).setEntityName(TABLE_NAME);
-		verify(mockView).setVersionUIVisible(true);
+		verify(mockView).setVersionUIToggleVisible(true);
 	}
 
 	@Test
@@ -105,7 +112,7 @@ public class TableTitleBarTest {
 		tableTitleBar.configure(mockBundle, mockActionMenuWidget, mockVersionHistoryWidget);
 
 		verify(mockView).setVersionLabel("Draft");
-		verify(mockView).setVersionUIVisible(true);
+		verify(mockView).setVersionUIToggleVisible(true);
 	}
 
 
@@ -125,7 +132,22 @@ public class TableTitleBarTest {
 
 		tableTitleBar.configure(mockBundle, mockActionMenuWidget, mockVersionHistoryWidget);
 
-		verify(mockView).setVersionUIVisible(false);
+		verify(mockView).setVersionUIToggleVisible(false);
+	}
+
+	@Test
+	public void testOnVersionHistoryVisibilityUpdate() {
+		tableTitleBar.configure(mockBundle, mockActionMenuWidget, mockVersionHistoryWidget);
+
+		verify(mockVersionHistoryWidget).registerVisibilityChangeListener(versionHistoryVisibilityListenerCaptor.capture());
+
+		// Version history updated to be visible
+		versionHistoryVisibilityListenerCaptor.getValue().accept(true);
+		verify(mockView).setVersionHistoryLinkText(eq("Hide Version History"));
+
+		// Version history updated to not be visible
+		versionHistoryVisibilityListenerCaptor.getValue().accept(false);
+		verify(mockView).setVersionHistoryLinkText(eq("Show Version History"));
 	}
 
 }

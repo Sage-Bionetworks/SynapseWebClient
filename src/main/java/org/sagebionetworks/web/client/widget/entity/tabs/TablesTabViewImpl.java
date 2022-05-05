@@ -168,8 +168,12 @@ public class TablesTabViewImpl implements TablesTabView {
 	}
 
 	@Override
-	public void setVersionAlertPrimaryAction(String text, ClickHandler handler) {
+	public void setVersionAlertPrimaryText(String text) {
 		versionAlert.setPrimaryCTAText(text);
+	}
+
+	@Override
+	public void setVersionAlertPrimaryAction(ClickHandler handler) {
 		versionAlert.addPrimaryCTAClickHandler(handler);
 	}
 

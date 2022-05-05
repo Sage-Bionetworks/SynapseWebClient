@@ -13,10 +13,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -99,6 +102,8 @@ public class FileTitleBarTest {
 	PopupUtilsView mockPopupUtils;
 	@Mock
 	VersionHistoryWidget mockVersionHistoryWidget;
+	@Captor
+	ArgumentCaptor<Consumer<Boolean>> versionHistoryVisibilityListenerCaptor;
 	public static final String DATA_FILE_HANDLE_ID = "872";
 	public static final Long FILE_VERSION = 3L;
 	public static final String FILE_NAME = "afile.txt";
@@ -296,5 +301,20 @@ public class FileTitleBarTest {
 		fileTitleBar.onProgrammaticDownloadOptions();
 
 		verify(mockFileClientsHelp).configureAndShow(ENTITY_ID, FILE_VERSION);
+	}
+
+	@Test
+	public void testOnVersionHistoryVisibilityUpdate() {
+		fileTitleBar.configure(mockBundle, mockActionMenuWidget, mockVersionHistoryWidget);
+
+		verify(mockVersionHistoryWidget).registerVisibilityChangeListener(versionHistoryVisibilityListenerCaptor.capture());
+
+		// Version history updated to be visible
+		versionHistoryVisibilityListenerCaptor.getValue().accept(true);
+		verify(mockView).setVersionHistoryLinkText(eq("Hide Version History"));
+
+		// Version history updated to not be visible
+		versionHistoryVisibilityListenerCaptor.getValue().accept(false);
+		verify(mockView).setVersionHistoryLinkText(eq("Show Version History"));
 	}
 }

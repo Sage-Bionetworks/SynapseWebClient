@@ -34,11 +34,12 @@ public class TableTitleBar implements SynapseWidgetPresenter, TableTitleBarView.
 		this.entityBundle = bundle;
 		this.actionMenuWidget = actionMenu;
 		this.versionHistoryWidget = versionHistoryWidget;
+		this.versionHistoryWidget.registerVisibilityChangeListener((visible) -> view.setVersionHistoryLinkText((visible ? "Hide" : "Show") + " Version History"));
 
 		view.createTitlebar(bundle.getEntity());
 		view.setEntityName(bundle.getEntity().getName());
 		boolean isMaterializedView = bundle.getEntity() instanceof MaterializedView;
-		view.setVersionUIVisible(!isMaterializedView);
+		view.setVersionUIToggleVisible(!isMaterializedView);
 		getLatestVersion();
 	}
 
@@ -86,10 +87,5 @@ public class TableTitleBar implements SynapseWidgetPresenter, TableTitleBarView.
 	@Override
 	public void toggleShowVersionHistory() {
 		this.actionMenuWidget.onAction(Action.SHOW_VERSION_HISTORY);
-	}
-
-	@Override
-	public boolean isVersionHistoryVisible() {
-		return this.versionHistoryWidget.isVisible();
 	}
 }

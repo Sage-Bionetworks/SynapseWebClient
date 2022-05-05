@@ -40,6 +40,8 @@ public interface FileTitleBarView extends IsWidget, SynapseView {
 
 	void setActionMenu(IsWidget w);
 
+	void setVersionHistoryLinkText(String text);
+
 	/**
 	 * Presenter interface
 	 */
@@ -49,7 +51,5 @@ public interface FileTitleBarView extends IsWidget, SynapseView {
 		void onAddToDownloadList();
 
 		void toggleShowVersionHistory();
-
-		boolean isVersionHistoryVisible();
 	}
 }

@@ -60,13 +60,14 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 	public static final String TABLE_QUERY_PREFIX = "query/";
 
 	private static final String VERSION_ALERT_DRAFT_DATASET_TITLE = "This is a Draft Version of the Dataset";
-	private static final String VERSION_ALERT_DRAFT_DATASET_MESSAGE = "Administrators and Editors can edit this version and create a Stable Version for distribution. Go to the Version History to view the Stable Versions.";
+	private static final String VERSION_ALERT_DRAFT_DATASET_MESSAGE = "Administrators can edit this version and create a Stable Version for distribution. Go to the Version History to view the Stable Versions";
 
 	private static final String VERSION_ALERT_OLD_SNAPSHOT_DATASET_TITLE = "There is a newer Stable Version of this Dataset";
 	private static final String VERSION_ALERT_OLD_SNAPSHOT_DATASET_MESSAGE = "Go to the latest Stable Version, or view the Version History for all versions.";
 	public static final String GO_TO_LATEST_STABLE_VERSION = "Go to Latest Stable Version";
 	public static final String NO_STABLE_VERSIONS_OF_THIS_DATASET = "There are currently no Stable Versions of this Dataset";
 
+	private static final String DATASET_CREATED_BY_HELP_TEXT = "This is the user who created this Dataset. This may not be the same person who generated the files in this Dataset, or who originally uploaded these files to Synapse.";
 
 	Tab tab;
 	TablesTabView view;
@@ -300,7 +301,7 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 			breadcrumb.configure(bundle.getPath(), getTabArea());
 			titleBar.configure(bundle, tab.getEntityActionMenu(), metadata.getVersionHistoryWidget());
 			modifiedCreatedBy.configure(entity.getCreatedOn(), entity.getCreatedBy(), entity.getModifiedOn(), entity.getModifiedBy());
-			
+
 			if (!DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider())) {
 				v2TableWidget = ginInjector.createNewTableEntityWidget();
 				view.setTableEntityWidget(v2TableWidget.asWidget());
@@ -357,12 +358,8 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 
 	private void configureVersionAlert() {
 		boolean versionHistoryIsVisible = this.metadata.getVersionHistoryWidget().isVisible();
-		this.view.setVersionAlertPrimaryAction((versionHistoryIsVisible ? "Hide" : "Show") + " Version History",
-				event -> {
-					this.metadata.getVersionHistoryWidget().setVisible(!versionHistoryIsVisible);
-					// Reconfigure the version alert to update the button text.
-					configureVersionAlert();
-				});
+		updateVersionAlertText(versionHistoryIsVisible);
+		this.view.setVersionAlertPrimaryAction(event -> this.metadata.getVersionHistoryWidget().setVisible(!versionHistoryIsVisible));
 		if (!(entityBundle.getEntity() instanceof Dataset)) {
 			// Don't show a version alert if this isn't a dataset
 			this.view.setVersionAlertVisible(false);
@@ -404,6 +401,10 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 			// Don't show a version alert
 			this.view.setVersionAlertVisible(false);
 		}
+	}
+
+	private void updateVersionAlertText(boolean versionHistoryIsVisible) {
+		this.view.setVersionAlertPrimaryText((versionHistoryIsVisible ? "Hide" : "Show") + " Version History");
 	}
 
 	private FluentFuture<Long> getLatestSnapshotVersionNumber() {

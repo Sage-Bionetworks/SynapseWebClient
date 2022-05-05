@@ -48,7 +48,9 @@ public interface TablesTabView extends IsWidget {
 
 	void setVersionAlertCopy(String title, String message);
 
-	void setVersionAlertPrimaryAction(String text, ClickHandler handler);
+	void setVersionAlertPrimaryText(String text);
+
+	void setVersionAlertPrimaryAction(ClickHandler handler);
 
 	void setVersionAlertSecondaryAction(String text, ClickHandler handler, boolean enabled, String tooltipText);
 

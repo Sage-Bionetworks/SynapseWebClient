@@ -2,13 +2,11 @@ package org.sagebionetworks.web.client.widget.entity.file;
 
 import java.util.List;
 
-import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.download.AddBatchOfFilesToDownloadListResponse;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.CloudProviderFileHandleInterface;
-import org.sagebionetworks.repo.model.file.DownloadList;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
@@ -107,6 +105,9 @@ public class FileTitleBar implements SynapseWidgetPresenter, FileTitleBarView.Pr
 				configureExternalObjectStore((ExternalObjectStoreFileHandle) fileHandle);
 			}
 		}
+
+		versionHistoryWidget.registerVisibilityChangeListener(visible ->
+				view.setVersionHistoryLinkText((visible ? "Hide" : "Show") + " Version History"));
 	}
 
 	public void getLatestVersion() {
@@ -217,11 +218,6 @@ public class FileTitleBar implements SynapseWidgetPresenter, FileTitleBarView.Pr
 	@Override
 	public void toggleShowVersionHistory() {
 		this.actionMenuWidget.onAction(Action.SHOW_VERSION_HISTORY);
-	}
-
-	@Override
-	public boolean isVersionHistoryVisible() {
-		return this.versionHistoryWidget.isVisible();
 	}
 
 	@Override
