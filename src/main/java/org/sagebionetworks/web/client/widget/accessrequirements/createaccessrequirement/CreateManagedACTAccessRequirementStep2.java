@@ -39,13 +39,15 @@ public class CreateManagedACTAccessRequirementStep2 implements ModalPage, Create
 	FileHandleUploadWidget ducTemplateUploader;
 	FileHandleWidget ducTemplateFileHandleWidget;
 	public static final int DAY_IN_MS = 1000 * 60 * 60 * 24;
+	CreateManagedACTAccessRequirementStep3 actStep3;
 
 	@Inject
-	public CreateManagedACTAccessRequirementStep2(CreateManagedACTAccessRequirementStep2View view, SynapseClientAsync synapseClient, WikiMarkdownEditor wikiMarkdownEditor, WikiPageWidget wikiPageRenderer, FileHandleUploadWidget ducTemplateUploader, FileHandleWidget ducTemplateFileHandleWidget) {
+	public CreateManagedACTAccessRequirementStep2(CreateManagedACTAccessRequirementStep2View view, CreateManagedACTAccessRequirementStep3 actStep3, SynapseClientAsync synapseClient, WikiMarkdownEditor wikiMarkdownEditor, WikiPageWidget wikiPageRenderer, FileHandleUploadWidget ducTemplateUploader, FileHandleWidget ducTemplateFileHandleWidget) {
 		super();
 		this.view = view;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
+		this.actStep3 = actStep3;
 		this.wikiMarkdownEditor = wikiMarkdownEditor;
 		wikiMarkdownEditor.setDeleteButtonVisible(false);
 		this.wikiPageRenderer = wikiPageRenderer;
@@ -158,7 +160,8 @@ public class CreateManagedACTAccessRequirementStep2 implements ModalPage, Create
 			@Override
 			public void onSuccess(AccessRequirement result) {
 				modalPresenter.setLoading(false);
-				modalPresenter.onFinished();
+				actStep3.configure(accessRequirement);
+				modalPresenter.setNextActivePage(actStep3);
 			}
 		});
 
@@ -172,6 +175,6 @@ public class CreateManagedACTAccessRequirementStep2 implements ModalPage, Create
 	@Override
 	public void setModalPresenter(ModalPresenter modalPresenter) {
 		this.modalPresenter = modalPresenter;
-		modalPresenter.setPrimaryButtonText(DisplayConstants.FINISH);
+		modalPresenter.setPrimaryButtonText(DisplayConstants.NEXT);
 	}
 }
