@@ -245,6 +245,7 @@ public class DatasetsTabTest {
 		verify(mockTableEntityWidget).configure(mockDatasetBundle, version, true, false, tab, mockActionMenuWidget);
 		verify(mockView).setTableEntityWidget(any(Widget.class));
 		verify(mockModifiedCreatedBy).configure(any(Date.class), anyString(), any(Date.class), anyString());
+		verify(mockModifiedCreatedBy).setCreatedHelpWidgetVisible(true);
 		verify(mockProvenanceWidget).configure(mapCaptor.capture());
 		// verify configuration
 		Map<String, String> provConfig = mapCaptor.getValue();
@@ -285,7 +286,10 @@ public class DatasetsTabTest {
 
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
 		tab.configure(mockProjectEntityBundle, version, areaToken);
-		verify(mockModifiedCreatedBy, Mockito.never()).configure(any(Date.class), anyString(), any(Date.class), anyString());
+
+		verify(mockModifiedCreatedBy, never()).configure(any(Date.class), anyString(), any(Date.class), anyString());
+		verify(mockModifiedCreatedBy, never()).setCreatedHelpWidgetVisible(true);
+
 		verify(mockView).setEntityMetadataVisible(false);
 		verify(mockView).setBreadcrumbVisible(false);
 		verify(mockView).setTableListVisible(true);

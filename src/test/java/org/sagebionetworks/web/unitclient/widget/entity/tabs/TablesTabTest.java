@@ -264,6 +264,7 @@ public class TablesTabTest {
 		verify(mockTableEntityWidget).configure(mockTableEntityBundle, version, true, false, tab, mockActionMenuWidget);
 		verify(mockView).setTableEntityWidget(any(Widget.class));
 		verify(mockModifiedCreatedBy).configure(any(Date.class), anyString(), any(Date.class), anyString());
+		verify(mockModifiedCreatedBy, never()).setCreatedHelpWidgetVisible(true);
 		verify(mockProvenanceWidget).configure(mapCaptor.capture());
 		// verify configuration
 		Map<String, String> provConfig = mapCaptor.getValue();
