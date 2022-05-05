@@ -108,9 +108,6 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 		showVersionHistoryLink.addClickHandler(event -> {
 			presenter.toggleShowVersionHistory();
 		});
-
-
-
 	}
 
 	@Override
