@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement;
 
+import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
@@ -18,6 +19,8 @@ public class CreateManagedACTAccessRequirementStep3ViewImpl implements CreateMan
 	Div otherUserTeamContainer;
 	@UiField
 	Div userTeamSearchContainer;
+	@UiField
+	Icon deleteIcon;
 
 	public interface Binder extends UiBinder<Widget, CreateManagedACTAccessRequirementStep3ViewImpl> {
 	}
@@ -32,6 +35,9 @@ public class CreateManagedACTAccessRequirementStep3ViewImpl implements CreateMan
 		
 		actTeamBadge.configure(synapseProperties.getSynapseProperty("org.sagebionetworks.portal.act.team_id"));
 		actTeamContainer.add(actTeamBadge);
+		deleteIcon.addClickHandler(event -> {
+			presenter.onRemoveReviewer();
+		});
 	}
 
 	@Override

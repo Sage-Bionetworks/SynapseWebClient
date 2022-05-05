@@ -1,18 +1,27 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement;
 
-import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 
+import java.util.HashSet;
+
+import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
+import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
 import org.sagebionetworks.web.client.widget.team.UserTeamBadge;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
+import org.sagebionetworks.web.shared.users.AclUtils;
+import org.sagebionetworks.web.shared.users.PermissionLevel;
 
+import com.google.common.util.concurrent.FluentFuture;
+import com.google.common.util.concurrent.FutureCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -26,33 +35,48 @@ public class CreateManagedACTAccessRequirementStep3 implements ModalPage, Create
 	CreateManagedACTAccessRequirementStep3View view;
 	ModalPresenter modalPresenter;
 	ManagedACTAccessRequirement accessRequirement;
-	SynapseClientAsync synapseClient;
-	String originalReviewerPrincipalId, reviewerPrincipalId;
+	SynapseJavascriptClient jsClient;
+	AccessControlList originalAcl;
+	String reviewerPrincipalId;
 	UserTeamBadge reviewerUserTeamBadge;
 
 	@Inject
-	public CreateManagedACTAccessRequirementStep3(CreateManagedACTAccessRequirementStep3View view, SynapseClientAsync synapseClient, SynapseSuggestBox suggestBox, UserGroupSuggestionProvider provider, UserTeamBadge reviewerUserTeamBadge) {
+	public CreateManagedACTAccessRequirementStep3(CreateManagedACTAccessRequirementStep3View view, SynapseJavascriptClient jsClient, SynapseSuggestBox suggestBox, UserGroupSuggestionProvider provider, UserTeamBadge reviewerUserTeamBadge) {
 		super();
 		this.view = view;
-		this.synapseClient = synapseClient;
-		fixServiceEntryPoint(synapseClient);
+		this.jsClient = jsClient;
 		this.reviewerUserTeamBadge = reviewerUserTeamBadge;
 		view.setPresenter(this);
 		suggestBox.setSuggestionProvider(provider);
 		suggestBox.setTypeFilter(TypeFilter.ALL);
+		suggestBox.setPlaceholderText("Username, name (first and last) or team name.");
 		view.setReviewerSearchBox(suggestBox.asWidget());
 		
 		suggestBox.addItemSelectedHandler(new CallbackP<UserGroupSuggestion>() {
 			public void invoke(UserGroupSuggestion suggestion) {
 				onSynapseSuggestSelected(suggestion);
+				suggestBox.clear();
 			};
 		});
 	}
 
 	public void onSynapseSuggestSelected(final UserGroupSuggestion suggestion) {
-		reviewerPrincipalId = suggestion.getId();
-		reviewerUserTeamBadge.configure(reviewerPrincipalId);
-		view.setReviewerUIVisible(true);
+		updateReviewerPrincipalId(suggestion.getHeader().getOwnerId());
+	}
+	
+	@Override
+	public void onRemoveReviewer() {
+		updateReviewerPrincipalId(null);
+	}
+	
+	private void updateReviewerPrincipalId(String principalId) {
+		reviewerPrincipalId = principalId;
+		if (principalId != null) {
+			reviewerUserTeamBadge.configure(reviewerPrincipalId);
+			view.setReviewerUIVisible(true);
+		} else {
+			view.setReviewerUIVisible(false);
+		}
 	}
 
 	/**
@@ -61,7 +85,37 @@ public class CreateManagedACTAccessRequirementStep3 implements ModalPage, Create
 	 */
 	public void configure(ManagedACTAccessRequirement accessRequirement) {
 		this.accessRequirement = accessRequirement;
-		// get the AR ACL
+		// GET the AR ACL
+		modalPresenter.setLoading(true);
+		modalPresenter.clearErrors();
+		FluentFuture<AccessControlList> getAclFuture = jsClient.getAccessRequirementACL(accessRequirement.getId().toString());
+		getAclFuture.addCallback(new FutureCallback<AccessControlList>() {
+			@Override
+			public void onSuccess(AccessControlList accessRequirementACL) {
+				originalAcl = accessRequirementACL;
+				//initialize reviewer principal ID
+				if (originalAcl.getResourceAccess() != null && !originalAcl.getResourceAccess().isEmpty()) {
+					// Edge case detection (user set up this ACL via another client)
+					if (originalAcl.getResourceAccess().size() > 1) {
+						modalPresenter.setErrorMessage("This Access Requirment has an ACL that contains more than one item.  Beware, this dialog will destroy other entries on save.");
+					}
+					ResourceAccess firstRA = originalAcl.getResourceAccess().iterator().next();
+					updateReviewerPrincipalId(firstRA.getPrincipalId().toString());
+				}
+				modalPresenter.setLoading(false);
+			}
+
+			@Override
+			public void onFailure(Throwable t) {
+				if (t instanceof NotFoundException) {
+					originalAcl = null;
+				} else {
+					modalPresenter.setError(t);	
+				}
+				modalPresenter.setLoading(false);
+				
+			}
+		}, directExecutor());
 	}
 
 	@Override
@@ -69,20 +123,76 @@ public class CreateManagedACTAccessRequirementStep3 implements ModalPage, Create
 		// update access requirement ACL
 		modalPresenter.setLoading(true);
 		
-		// if user/team is set, then create or update the ACL.  if empty, then either do nothing or delete the ACL.
+		// if not set, then delete the ACL (if it was originally set) or do nothing (if not set)
 		if (reviewerPrincipalId == null) {
-			if (originalReviewerPrincipalId != null) {
-				// delete
+			if (originalAcl != null) {
+				deleteAcl();
 			}
 		} else {
+			// but if user/team is set, then create (if not originally set) or update the ACL (if previously set).  
 			// reviewer principal ID is set
-			if (originalReviewerPrincipalId == null) {
-				// create
-			} else if (!reviewerPrincipalId.equals(originalReviewerPrincipalId)) {
-				// update
+			if (originalAcl == null) {
+				createAcl();
+			} else {
+				updateAcl();
 			}
 		}
-		modalPresenter.onFinished();
+	}
+
+	private void deleteAcl() {
+		FluentFuture<Void> deleteAclFuture = jsClient.deleteAccessRequirementACL(accessRequirement.getId().toString());
+		deleteAclFuture.addCallback(new FutureCallback<Void>() {
+			@Override
+			public void onSuccess(Void v) {
+				modalPresenter.onFinished();
+			}
+			@Override
+			public void onFailure(Throwable t) {
+				modalPresenter.setError(t);
+			}
+		}, directExecutor());
+	}
+
+	// based on the reviewer shown in the view, get a new ACL resource access set
+	private HashSet<ResourceAccess> getNewResourceAccessSet() {
+		HashSet<ResourceAccess> resourceAccessSet = new HashSet<>();
+		ResourceAccess newRA = new ResourceAccess();
+		newRA.setAccessType(AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_REVIEW_SUBMISSIONS));
+		newRA.setPrincipalId(Long.parseLong(reviewerPrincipalId));
+		resourceAccessSet.add(newRA);
+		return resourceAccessSet;
+	}
+	
+	private void createAcl() {
+		AccessControlList newAcl = new AccessControlList();
+		newAcl.setResourceAccess(getNewResourceAccessSet());
+		
+		FluentFuture<AccessControlList> createAclFuture = jsClient.createAccessRequirementACL(accessRequirement.getId().toString(), newAcl);
+		createAclFuture.addCallback(new FutureCallback<AccessControlList>() {
+			@Override
+			public void onSuccess(AccessControlList acl) {
+				modalPresenter.onFinished();
+			}
+			@Override
+			public void onFailure(Throwable t) {
+				modalPresenter.setError(t);
+			}
+		}, directExecutor());
+	}
+	
+	private void updateAcl() {
+		originalAcl.setResourceAccess(getNewResourceAccessSet());
+		FluentFuture<AccessControlList> updateAclFuture = jsClient.updateAccessRequirementACL(accessRequirement.getId().toString(), originalAcl);
+		updateAclFuture.addCallback(new FutureCallback<AccessControlList>() {
+			@Override
+			public void onSuccess(AccessControlList acl) {
+				modalPresenter.onFinished();
+			}
+			@Override
+			public void onFailure(Throwable t) {
+				modalPresenter.setError(t);
+			}
+		}, directExecutor());
 	}
 
 	@Override

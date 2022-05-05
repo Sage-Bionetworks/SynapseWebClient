@@ -17,12 +17,18 @@
 		<b:FormGroup>
 			<b:FormLabel>Reviewers</b:FormLabel>
 			<bh:Div ui:field="actTeamContainer" />
-			<bh:Div ui:field="otherUserTeamContainer" />
+			<bh:Div>
+				<bh:Div ui:field="otherUserTeamContainer" />
+				<b:Tooltip title="Remove reviewer" placement="LEFT">
+					<b:Icon ui:field="deleteIcon" type="TRASH_O" size="LARGE"
+						pull="RIGHT" addStyleNames="imageButton line-height-1em"/>
+				</b:Tooltip>
+			</bh:Div>
 		</b:FormGroup>
 		<b:FormGroup>
 			<b:FormLabel>Change the reviewer</b:FormLabel>
-			<bh:Italic>Only Certified and Validated Synapse users appear in the list below.</bh:Italic> 
-			<bh:Italic>Search for a user by their username to set them as the reviewer.</bh:Italic>
+			<bh:Italic>Search for a username or team to set them as the reviewer.</bh:Italic> 
+			<bh:Italic>You can search by username, first or last names, or team name.</bh:Italic>
 		</b:FormGroup>
 		<b:FormGroup>
 			<b:FormLabel>Username</b:FormLabel>

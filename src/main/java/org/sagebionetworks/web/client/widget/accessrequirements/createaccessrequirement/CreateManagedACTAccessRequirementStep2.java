@@ -160,7 +160,7 @@ public class CreateManagedACTAccessRequirementStep2 implements ModalPage, Create
 			@Override
 			public void onSuccess(AccessRequirement result) {
 				modalPresenter.setLoading(false);
-				actStep3.configure(accessRequirement);
+				actStep3.configure((ManagedACTAccessRequirement)result);
 				modalPresenter.setNextActivePage(actStep3);
 			}
 		});

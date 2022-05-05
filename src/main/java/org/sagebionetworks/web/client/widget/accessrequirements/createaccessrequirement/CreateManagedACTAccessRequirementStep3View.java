@@ -19,7 +19,6 @@ public interface CreateManagedACTAccessRequirementStep3View extends IsWidget {
 	 * Presenter interface
 	 */
 	public interface Presenter {
-		
+		void onRemoveReviewer();
 	}
-
 }
