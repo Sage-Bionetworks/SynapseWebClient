@@ -12,8 +12,7 @@ public interface ModifiedCreatedByWidgetView extends IsWidget {
 	void setCreatedBadge(IsWidget createdBadge);
 
 	void setVisible(boolean b);
+	void setCreatedHelpWidgetVisible(boolean visible);
 
-	void setCreatedByUIVisible(boolean visible);
-
-	void setModifiedByUIVisible(boolean visible);
+	void setCreatedHelpWidgetText(String text);
 }

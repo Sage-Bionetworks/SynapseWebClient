@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.Date;
 import org.sagebionetworks.web.client.DateTimeUtils;
+import org.sagebionetworks.web.client.help.HelpButton;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -37,12 +38,13 @@ public class ModifiedCreatedByWidget implements IsWidget {
 		return view.asWidget();
 	}
 
-	public void setCreatedByUIVisible(boolean visible) {
-		view.setCreatedByUIVisible(visible);
+
+	public void setCreatedHelpWidgetVisible(boolean visible) {
+		view.setCreatedHelpWidgetVisible(visible);
 	}
 
-	public void setModifiedByUIVisible(boolean visible) {
-		view.setModifiedByUIVisible(visible);
+	public void setCreatedHelpWidgetText(String text) {
+		view.setCreatedHelpWidgetText(text);
 	}
 
 	public void setVisible(boolean isVisible) {

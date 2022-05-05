@@ -67,6 +67,7 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 	public static final String GO_TO_LATEST_STABLE_VERSION = "Go to Latest Stable Version";
 	public static final String NO_STABLE_VERSIONS_OF_THIS_DATASET = "There are currently no Stable Versions of this Dataset";
 
+	private static final String DATASET_CREATED_BY_HELP_TEXT = "This is the user who created this Dataset. This may not be the same person who generated the files in this Dataset, or who originally uploaded these files to Synapse.";
 
 	Tab tab;
 	TablesTabView view;
@@ -300,7 +301,7 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 			breadcrumb.configure(bundle.getPath(), getTabArea());
 			titleBar.configure(bundle, tab.getEntityActionMenu(), metadata.getVersionHistoryWidget());
 			modifiedCreatedBy.configure(entity.getCreatedOn(), entity.getCreatedBy(), entity.getModifiedOn(), entity.getModifiedBy());
-			
+			configureCreatedByHelpWidget();
 			if (!DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider())) {
 				v2TableWidget = ginInjector.createNewTableEntityWidget();
 				view.setTableEntityWidget(v2TableWidget.asWidget());
@@ -404,6 +405,11 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 			// Don't show a version alert
 			this.view.setVersionAlertVisible(false);
 		}
+	}
+
+	private void configureCreatedByHelpWidget() {
+		modifiedCreatedBy.setCreatedHelpWidgetVisible(entityBundle.getEntity() instanceof Dataset);
+		modifiedCreatedBy.setCreatedHelpWidgetText(DATASET_CREATED_BY_HELP_TEXT);
 	}
 
 	private FluentFuture<Long> getLatestSnapshotVersionNumber() {
