@@ -60,7 +60,7 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 	public static final String TABLE_QUERY_PREFIX = "query/";
 
 	private static final String VERSION_ALERT_DRAFT_DATASET_TITLE = "This is a Draft Version of the Dataset";
-	private static final String VERSION_ALERT_DRAFT_DATASET_MESSAGE = "Administrators can edit this version and create a Stable Version for distribution. Go to the Version History to view the Stable Versions";
+	private static final String VERSION_ALERT_DRAFT_DATASET_MESSAGE = "Administrators and Editors can edit this version and create a Stable Version for distribution. Go to the Version History to view the Stable Versions.";
 
 	private static final String VERSION_ALERT_OLD_SNAPSHOT_DATASET_TITLE = "There is a newer Stable Version of this Dataset";
 	private static final String VERSION_ALERT_OLD_SNAPSHOT_DATASET_MESSAGE = "Go to the latest Stable Version, or view the Version History for all versions.";
@@ -301,7 +301,7 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 			breadcrumb.configure(bundle.getPath(), getTabArea());
 			titleBar.configure(bundle, tab.getEntityActionMenu(), metadata.getVersionHistoryWidget());
 			modifiedCreatedBy.configure(entity.getCreatedOn(), entity.getCreatedBy(), entity.getModifiedOn(), entity.getModifiedBy());
-
+			configureCreatedByHelpWidget();
 			if (!DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider())) {
 				v2TableWidget = ginInjector.createNewTableEntityWidget();
 				view.setTableEntityWidget(v2TableWidget.asWidget());
@@ -405,6 +405,11 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 
 	private void updateVersionAlertText(boolean versionHistoryIsVisible) {
 		this.view.setVersionAlertPrimaryText((versionHistoryIsVisible ? "Hide" : "Show") + " Version History");
+	}
+
+	private void configureCreatedByHelpWidget() {
+		modifiedCreatedBy.setCreatedHelpWidgetVisible(entityBundle.getEntity() instanceof Dataset);
+		modifiedCreatedBy.setCreatedHelpWidgetText(DATASET_CREATED_BY_HELP_TEXT);
 	}
 
 	private FluentFuture<Long> getLatestSnapshotVersionNumber() {
