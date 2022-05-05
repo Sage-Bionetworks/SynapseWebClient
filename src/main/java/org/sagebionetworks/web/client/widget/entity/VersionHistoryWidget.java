@@ -211,7 +211,7 @@ public class VersionHistoryWidget implements VersionHistoryWidgetView.Presenter,
 
 	public void setVisible(boolean visible) {
 		view.setVisible(visible);
-		invokeChangeListeners();
+		invokeVisibilityChangeListeners();
 	}
 
 	public boolean isVisible() {
@@ -220,10 +220,10 @@ public class VersionHistoryWidget implements VersionHistoryWidgetView.Presenter,
 
 	public void registerVisibilityChangeListener(Consumer<Boolean> callback) {
 		visibilityChangeListeners.add(callback);
-		invokeChangeListeners();
+		invokeVisibilityChangeListeners();
 	}
 
-	private void invokeChangeListeners() {
+	private void invokeVisibilityChangeListeners() {
 		for (Consumer<Boolean> cb : visibilityChangeListeners) {
 			cb.accept(this.isVisible());
 		}
