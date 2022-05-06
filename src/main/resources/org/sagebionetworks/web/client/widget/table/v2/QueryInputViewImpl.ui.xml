@@ -17,9 +17,6 @@
 				<b:Button ui:field="queryButton" icon="SEARCH"
 					type="INFO" dataLoadingText="Executing...">Query</b:Button>
 			</b:InputGroupButton>
-			<b:Tooltip title="Show simple search">
-				<b:Anchor icon="TIMES" ui:field="simpleModeLink" addStyleNames="font-size-24 moveup-10 displayTableCell" width="25px" paddingLeft="3" />
-			</b:Tooltip>
 			<w:HelpWidget
 				helpMarkdown="The data contained within a Synapse `Table` can be retrieved by using a SQL-like query language either through the web portal or through the analytical clients. Queries are **not** case sensitive."
 				href="https://help.synapse.org/docs/Searching-Tables-and-Views.2009596168.html"

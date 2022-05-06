@@ -58,7 +58,6 @@ import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.VersionHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
-import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.TableTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.tabs.AbstractTablesTab;
@@ -66,10 +65,10 @@ import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.entity.tabs.TablesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.TablesTabView;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
+import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.explore.TableEntityWidgetV2;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
-import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 
 import com.google.common.util.concurrent.FluentFuture;
@@ -118,9 +117,7 @@ public class TablesTabTest {
 	@Mock
 	CallbackP<String> mockEntitySelectedCallback;
 	@Mock
-	TableEntityWidget mockTableEntityWidget;
-	@Mock
-	TableEntityWidgetV2 mockTableEntityPlotsWidget;
+	TableEntityWidgetV2 mockTableEntityWidget;
 	@Mock
 	WikiPageWidget mockWikiPageWidget;
 	@Mock
@@ -168,7 +165,7 @@ public class TablesTabTest {
 		when(mockPortalGinInjector.getGlobalApplicationState()).thenReturn(mockGlobalApplicationState);
 		when(mockPortalGinInjector.getSynapseJavascriptClient()).thenReturn(mockJsClient);
 		when(mockPortalGinInjector.getWikiPageWidget()).thenReturn(mockWikiPageWidget);
-		when(mockPortalGinInjector.createNewTableEntityWidgetV2()).thenReturn(mockTableEntityPlotsWidget);
+		when(mockPortalGinInjector.createNewTableEntityWidgetV2()).thenReturn(mockTableEntityWidget);
 
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		tab.setEntitySelectedCallback(mockEntitySelectedCallback);
@@ -176,8 +173,6 @@ public class TablesTabTest {
 		when(mockProjectEntity.getId()).thenReturn(projectEntityId);
 		when(mockProjectEntity.getName()).thenReturn(projectName);
 		when(mockProjectEntityBundle.getPermissions()).thenReturn(mockPermissions);
-
-		when(mockPortalGinInjector.createNewTableEntityWidget()).thenReturn(mockTableEntityWidget);
 
 		when(mockTableEntityBundle.getEntity()).thenReturn(mockTableEntity);
 		when(mockTableEntity.getId()).thenReturn(tableEntityId);
@@ -266,7 +261,7 @@ public class TablesTabTest {
 		verify(mockBreadcrumb).configure(any(EntityPath.class), eq(EntityArea.TABLES));
 		verify(mockTitleBar).configure(mockTableEntityBundle, mockActionMenuWidget, mockVersionHistoryWidget);
 		verify(mockEntityMetadata).configure(mockTableEntityBundle, version, mockActionMenuWidget);
-		verify(mockTableEntityWidget).configure(mockTableEntityBundle, version, true, tab, mockActionMenuWidget);
+		verify(mockTableEntityWidget).configure(mockTableEntityBundle, version, true, false, tab, mockActionMenuWidget);
 		verify(mockView).setTableEntityWidget(any(Widget.class));
 		verify(mockModifiedCreatedBy).configure(any(Date.class), anyString(), any(Date.class), anyString());
 		verify(mockModifiedCreatedBy, never()).setCreatedHelpWidgetVisible(true);
@@ -287,7 +282,6 @@ public class TablesTabTest {
 		verify(mockView).setWikiPageVisible(true);
 		verify(mockView).setVersionAlertVisible(false);
 		verify(mockView, never()).setVersionAlertVisible(true);
-		verify(mockActionMenuWidget, never()).setTableDownloadOptionsVisible(anyBoolean());
 
 		ArgumentCaptor<Synapse> captor = ArgumentCaptor.forClass(Synapse.class);
 		verify(mockTab).setEntityNameAndPlace(eq(tableName), captor.capture());
@@ -322,7 +316,6 @@ public class TablesTabTest {
 		verify(mockModifiedCreatedBy).setVisible(false);
 		verify(mockView).setTableUIVisible(false);
 		verify(mockView, never()).setTableUIVisible(true);
-		verify(mockActionMenuWidget).setTableDownloadOptionsVisible(false);
 		verify(mockView).setWikiPageVisible(false);
 
 		verify(mockTableListWidget).configure(mockProjectEntityBundle, Arrays.asList(EntityType.table, EntityType.entityview, EntityType.submissionview, EntityType.materializedview));

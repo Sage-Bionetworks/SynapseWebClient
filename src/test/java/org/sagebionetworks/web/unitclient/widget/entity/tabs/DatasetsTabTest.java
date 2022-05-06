@@ -57,7 +57,6 @@ import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.VersionHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
-import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.TableTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.tabs.AbstractTablesTab;
@@ -65,10 +64,10 @@ import org.sagebionetworks.web.client.widget.entity.tabs.DatasetsTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.entity.tabs.TablesTabView;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
+import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.explore.TableEntityWidgetV2;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
-import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 
 import com.google.common.util.concurrent.FluentFuture;
@@ -115,9 +114,7 @@ public class DatasetsTabTest {
 	@Mock
 	CallbackP<String> mockEntitySelectedCallback;
 	@Mock
-	TableEntityWidget mockTableEntityWidget;
-	@Mock
-	TableEntityWidgetV2 mockTableEntityPlotsWidget;
+	TableEntityWidgetV2 mockTableEntityWidget;
 
 	@Mock
 	ModifiedCreatedByWidget mockModifiedCreatedBy;
@@ -174,8 +171,7 @@ public class DatasetsTabTest {
 		when(mockProjectEntity.getName()).thenReturn(projectName);
 		when(mockProjectEntityBundle.getPermissions()).thenReturn(mockPermissions);
 
-		when(mockPortalGinInjector.createNewTableEntityWidget()).thenReturn(mockTableEntityWidget);
-		when(mockPortalGinInjector.createNewTableEntityWidgetV2()).thenReturn(mockTableEntityPlotsWidget);
+		when(mockPortalGinInjector.createNewTableEntityWidgetV2()).thenReturn(mockTableEntityWidget);
 		
 		when(mockDatasetBundle.getEntity()).thenReturn(mockDataset);
 		when(mockDataset.getId()).thenReturn(datasetId);
@@ -206,7 +202,7 @@ public class DatasetsTabTest {
 		query.setSort(Arrays.asList(one, two));
 		tab.lazyInject();
 		
-		when(mockTableEntityPlotsWidget.getDefaultQuery()).thenReturn(query);
+		when(mockTableEntityWidget.getDefaultQuery()).thenReturn(query);
 	}
 
 	@Test
@@ -246,7 +242,7 @@ public class DatasetsTabTest {
 		verify(mockBreadcrumb).configure(any(EntityPath.class), eq(EntityArea.DATASETS));
 		verify(mockTitleBar).configure(mockDatasetBundle, mockActionMenuWidget, mockVersionHistoryWidget);
 		verify(mockEntityMetadata).configure(mockDatasetBundle, version, mockActionMenuWidget);
-		verify(mockTableEntityWidget).configure(mockDatasetBundle, version, true, tab, mockActionMenuWidget);
+		verify(mockTableEntityWidget).configure(mockDatasetBundle, version, true, false, tab, mockActionMenuWidget);
 		verify(mockView).setTableEntityWidget(any(Widget.class));
 		verify(mockModifiedCreatedBy).configure(any(Date.class), anyString(), any(Date.class), anyString());
 		verify(mockModifiedCreatedBy).setCreatedHelpWidgetVisible(true);
@@ -265,7 +261,6 @@ public class DatasetsTabTest {
 		verify(mockModifiedCreatedBy).setVisible(false);
 		verify(mockView).setWikiPage(any(Widget.class));
 		verify(mockView).setWikiPageVisible(true);
-		verify(mockActionMenuWidget, never()).setTableDownloadOptionsVisible(anyBoolean());
 
 		ArgumentCaptor<Synapse> captor = ArgumentCaptor.forClass(Synapse.class);
 		verify(mockTab).setEntityNameAndPlace(eq(datasetName), captor.capture());
@@ -303,7 +298,6 @@ public class DatasetsTabTest {
 		verify(mockModifiedCreatedBy).setVisible(false);
 		verify(mockView).setTableUIVisible(false);
 		verify(mockView, never()).setTableUIVisible(true);
-		verify(mockActionMenuWidget).setTableDownloadOptionsVisible(false);
 		verify(mockView).setWikiPageVisible(false);
 		verify(mockView).setVersionAlertVisible(false);
 		verify(mockView, never()).setVersionAlertVisible(true);

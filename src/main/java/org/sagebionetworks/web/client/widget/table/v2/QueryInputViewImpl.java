@@ -39,8 +39,6 @@ public class QueryInputViewImpl implements QueryInputView {
 	Button queryButton;
 	@UiField
 	FullWidthAlert queryResultsMessage;
-	@UiField
-	Anchor simpleModeLink;
 	HTMLPanel panel;
 	Presenter presenter;
 	String originalButtonText;
@@ -64,9 +62,6 @@ public class QueryInputViewImpl implements QueryInputView {
 			if (KeyCodes.KEY_ENTER == event.getNativeKeyCode()) {
 				presenter.onExecuteQuery();
 			}
-		});
-		simpleModeLink.addClickHandler(event -> {
-			presenter.onShowSimpleSearch();
 		});
 	}
 
@@ -110,9 +105,5 @@ public class QueryInputViewImpl implements QueryInputView {
 	@Override
 	public void setQueryInputVisible(boolean visible) {
 		queryInputGroup.setVisible(visible);
-	}
-	@Override
-	public void setShowSimpleSearchButtonVisible(boolean visible) {
-		simpleModeLink.setVisible(visible);		
 	}
 }

@@ -24,7 +24,6 @@ public interface QueryInputView extends IsWidget {
 		 * Called to rest the query.
 		 */
 		void onReset();
-		void onShowSimpleSearch();
 	}
 
 	/**
@@ -69,5 +68,4 @@ public interface QueryInputView extends IsWidget {
 	public void setInputErrorMessage(String string);
 
 	public void setQueryInputVisible(boolean visible);
-	public void setShowSimpleSearchButtonVisible(boolean visible);
 }

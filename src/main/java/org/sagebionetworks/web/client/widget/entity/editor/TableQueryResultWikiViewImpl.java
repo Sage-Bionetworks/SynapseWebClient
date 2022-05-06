@@ -23,10 +23,8 @@ public class TableQueryResultWikiViewImpl implements TableQueryResultWikiView {
 	CheckBox isShowTableOnly;
 
 	@Inject
-	public TableQueryResultWikiViewImpl(TableQueryResultViewUiBinder binder, CookieProvider cookies) {
+	public TableQueryResultWikiViewImpl(TableQueryResultViewUiBinder binder) {
 		widget = binder.createAndBindUi(this);
-		boolean isInTestWebsiteMode = DisplayUtils.isInTestWebsite(cookies);
-		isShowTableOnly.setVisible(isInTestWebsiteMode);
 		isShowTableOnly.addClickHandler(event -> {
 			updateIsQueryVisibleEnableState();
 		});

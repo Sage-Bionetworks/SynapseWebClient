@@ -30,18 +30,11 @@
 		</bh:Div>
 
 		<w:FullWidthAlert ui:field="tableMessage" alertType="INFO" visible="false" global="false" />
-		<bh:Div ui:field="tableToolbar">
-			<bh:Div>
-				<g:SimplePanel ui:field="queryInputPanel"
-					addStyleNames="displayInline" />
-			</bh:Div>
-		</bh:Div>
 
 		<w:ReactComponentDiv ui:field="itemsEditorContainer" />
 
 		<bh:Div ui:field="addToDownloadListContainer" />
 		<bh:Div styleName="margin-top-5" />
-		<g:SimplePanel ui:field="queryResultsPanel" />
 		<bh:Div ui:field="plotNavContainer" />
 		<bh:Div ui:field="modalContainer" />
 	</g:HTMLPanel>

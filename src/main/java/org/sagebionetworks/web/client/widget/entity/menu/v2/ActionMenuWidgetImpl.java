@@ -176,21 +176,6 @@ public class ActionMenuWidgetImpl implements ActionMenuWidget, ActionListener {
 	}
 
 	@Override
-	public void setTableDownloadOptionsVisible(boolean visible) {
-		view.setTableDownloadOptionsVisible(visible);
-	}
-
-	@Override
-	public void setTableDownloadOptionsEnabled(boolean enabled) {
-		view.setDownloadActionsEnabled(enabled);
-	}
-
-	@Override
-	public void setDownloadActionsDisabledTooltipText(String tooltipText) {
-		view.setDownloadActionsDisabledTooltipText(tooltipText);
-	}
-
-	@Override
 	public void setEditTableDataTooltipText(String tooltipText) {
 		view.setEditTableDataTooltipText(tooltipText);
 	}

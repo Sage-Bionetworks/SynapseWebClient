@@ -76,12 +76,6 @@ public interface ActionMenuWidget extends IsWidget, ActionListener {
 
 	void setACTDividerVisible(boolean visible);
 
-	void setTableDownloadOptionsVisible(boolean visible);
-
-	void setTableDownloadOptionsEnabled(boolean enabled);
-
-	void setDownloadActionsDisabledTooltipText(String tooltipText);
-
 	void setEditTableDataTooltipText(String tooltipText);
 
 	void setIsLoading(boolean isLoading);

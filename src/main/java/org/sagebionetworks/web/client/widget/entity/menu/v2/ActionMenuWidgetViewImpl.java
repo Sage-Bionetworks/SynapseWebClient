@@ -57,16 +57,6 @@ public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 	@UiField
 	DropDownHeader actHeader;
 	@UiField
-	Button tableDownloadOptions;
-	@UiField
-	ActionMenuItem addToDownloadListMenuItem;
-	@UiField
-	ActionMenuItem programmaticOptionsMenuItem;
-	@UiField
-	ActionMenuItem exportTableMenuItem;
-	@UiField
-	Tooltip downloadOptionsTooltip;
-	@UiField
 	Tooltip editTableDataTooltip;
 	@UiField
 	ReactComponentDiv skeletonButton;
@@ -169,36 +159,10 @@ public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 		singleActionButton.setVisible(false);
 		skeletonButton.setVisible(false);
 	}
-
-	@Override
-	public void setTableDownloadOptionsVisible(boolean visible) {
-		tableDownloadOptions.setVisible(visible);
-	}
-
-	@Override
-	public void setDownloadActionsDisabledTooltipText(String tooltipText) {
-		downloadOptionsTooltip.setTitle(tooltipText);
-		downloadOptionsTooltip.recreate();
-	}
-
 	@Override
 	public void setEditTableDataTooltipText(String tooltipText) {
 		editTableDataTooltip.setTitle(tooltipText);
 		editTableDataTooltip.recreate();
-	}
-
-	@Override
-	public void setDownloadActionsEnabled(boolean enabled) {
-		tableDownloadOptions.setEnabled(enabled);
-		if (enabled) {
-			// The tooltip only shows information about why it's disabled, so hide the tooltips if enabled
-			downloadOptionsTooltip.setTitle("Direct and programmatic download options.");
-		} else {
-			downloadOptionsTooltip.setTitle("You must be logged in to download items in this folder.");
-		}
-
-		// Commit the changes to the tooltip
-		downloadOptionsTooltip.recreate();
 	}
 
 	@Override

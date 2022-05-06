@@ -57,14 +57,6 @@ public class QueryInputWidget implements QueryInputView.Presenter, IsWidget, Que
 		validateAndSendQuery(sql);
 	}
 	
-	@Override
-	public void onShowSimpleSearch() {
-			queryInputListener.onShowSimpleSearch();
-	}
-	
-	public void setShowSimpleSearchButtonVisible(boolean visible) {
-		view.setShowSimpleSearchButtonVisible(visible);
-	}
 
 	/**
 	 * Validate the given query.
