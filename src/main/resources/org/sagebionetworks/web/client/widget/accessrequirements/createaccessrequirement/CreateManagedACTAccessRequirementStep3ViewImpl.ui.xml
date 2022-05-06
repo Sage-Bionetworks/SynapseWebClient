@@ -11,27 +11,33 @@
 
 	<bh:Div>
 		<bh:Div>
-			<bh:Italic>You may add a single Synapse user or Synapse team as a reviewer for this Access Requirement.</bh:Italic>
-			<bh:Italic>Note: ACT members always retain the ability to review or modify Access Requirements</bh:Italic>
+			<bh:Div><bh:Italic>You may add a single Synapse user or Synapse team as a reviewer for this Access Requirement.</bh:Italic></bh:Div>
+			<bh:Div><bh:Italic>Note: ACT members always retain the ability to review or modify Access Requirements</bh:Italic></bh:Div>
 		</bh:Div>
-		<b:FormGroup>
+		<b:FormGroup addStyleNames="margin-top-22">
 			<b:FormLabel>Reviewers</b:FormLabel>
-			<bh:Div ui:field="actTeamContainer" />
 			<bh:Div>
-				<bh:Div ui:field="otherUserTeamContainer" />
+				<bh:Div ui:field="actTeamContainer" addStyleNames="displayInlineBlock" />
+				<b:Tooltip title="ACT cannot be removed" placement="LEFT">
+					<b:Icon type="TRASH_O" size="LARGE"
+						pull="RIGHT" addStyleNames="imageButton line-height-1em lightGreyText"/>
+				</b:Tooltip>
+			</bh:Div>
+			<bh:Div ui:field="otherUserTeamUI" visible="false" addStyleNames="margin-top-10">
+				<bh:Div ui:field="otherUserTeamContainer" addStyleNames="displayInlineBlock" />
 				<b:Tooltip title="Remove reviewer" placement="LEFT">
 					<b:Icon ui:field="deleteIcon" type="TRASH_O" size="LARGE"
 						pull="RIGHT" addStyleNames="imageButton line-height-1em"/>
 				</b:Tooltip>
 			</bh:Div>
 		</b:FormGroup>
-		<b:FormGroup>
+		<b:FormGroup addStyleNames="margin-top-22">
 			<b:FormLabel>Change the reviewer</b:FormLabel>
-			<bh:Italic>Search for a username or team to set them as the reviewer.</bh:Italic> 
-			<bh:Italic>You can search by username, first or last names, or team name.</bh:Italic>
+			<bh:Div><bh:Italic>Search for a username or team to set them as the reviewer. 
+			You can search by username, first or last names, or team name.</bh:Italic></bh:Div>
 		</b:FormGroup>
-		<b:FormGroup>
-			<b:FormLabel>Username</b:FormLabel>
+		<b:FormGroup addStyleNames="margin-top-22">
+			<b:FormLabel>Select a reviewer</b:FormLabel>
 			<bh:Div ui:field="userTeamSearchContainer" />
 		</b:FormGroup>
 	</bh:Div>

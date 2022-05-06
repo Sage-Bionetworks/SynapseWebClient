@@ -18,6 +18,8 @@ public class CreateManagedACTAccessRequirementStep3ViewImpl implements CreateMan
 	@UiField
 	Div otherUserTeamContainer;
 	@UiField
+	Div otherUserTeamUI;
+	@UiField
 	Div userTeamSearchContainer;
 	@UiField
 	Icon deleteIcon;
@@ -34,6 +36,7 @@ public class CreateManagedACTAccessRequirementStep3ViewImpl implements CreateMan
 		widget = binder.createAndBindUi(this);
 		
 		actTeamBadge.configure(synapseProperties.getSynapseProperty("org.sagebionetworks.portal.act.team_id"));
+		actTeamBadge.addStyleName("font-size-13 margin-left-2"); // match style with UserTeamBadge
 		actTeamContainer.add(actTeamBadge);
 		deleteIcon.addClickHandler(event -> {
 			presenter.onRemoveReviewer();
@@ -51,7 +54,7 @@ public class CreateManagedACTAccessRequirementStep3ViewImpl implements CreateMan
 	}
 	@Override
 	public void setReviewerUIVisible(boolean visible) {
-		otherUserTeamContainer.setVisible(visible);
+		otherUserTeamUI.setVisible(visible);
 	}
 
 	@Override

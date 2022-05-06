@@ -50,7 +50,8 @@ public class CreateManagedACTAccessRequirementStep3 implements ModalPage, Create
 		suggestBox.setSuggestionProvider(provider);
 		suggestBox.setTypeFilter(TypeFilter.ALL);
 		suggestBox.setPlaceholderText("Username, name (first and last) or team name.");
-		view.setReviewerSearchBox(suggestBox.asWidget());
+		view.setReviewerSearchBox(suggestBox);
+		view.setReviewerBadge(reviewerUserTeamBadge);
 		
 		suggestBox.addItemSelectedHandler(new CallbackP<UserGroupSuggestion>() {
 			public void invoke(UserGroupSuggestion suggestion) {
@@ -109,6 +110,7 @@ public class CreateManagedACTAccessRequirementStep3 implements ModalPage, Create
 			public void onFailure(Throwable t) {
 				if (t instanceof NotFoundException) {
 					originalAcl = null;
+					updateReviewerPrincipalId(null);
 				} else {
 					modalPresenter.setError(t);	
 				}
@@ -122,11 +124,13 @@ public class CreateManagedACTAccessRequirementStep3 implements ModalPage, Create
 	public void onPrimary() {
 		// update access requirement ACL
 		modalPresenter.setLoading(true);
-		
 		// if not set, then delete the ACL (if it was originally set) or do nothing (if not set)
 		if (reviewerPrincipalId == null) {
 			if (originalAcl != null) {
 				deleteAcl();
+			} else {
+				// nothing to do, finish!
+				modalPresenter.onFinished();
 			}
 		} else {
 			// but if user/team is set, then create (if not originally set) or update the ACL (if previously set).  
