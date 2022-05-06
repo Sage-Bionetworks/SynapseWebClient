@@ -25,7 +25,6 @@ public class TableQueryResultWikiViewImpl implements TableQueryResultWikiView {
 	@Inject
 	public TableQueryResultWikiViewImpl(TableQueryResultViewUiBinder binder) {
 		widget = binder.createAndBindUi(this);
-		isShowTableOnly.setVisible(true);
 		isShowTableOnly.addClickHandler(event -> {
 			updateIsQueryVisibleEnableState();
 		});
