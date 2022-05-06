@@ -22,12 +22,14 @@ public class StandaloneQueryWrapperProps extends ReactComponentProps {
 	boolean hideDownload;
 	@JsNullable
 	boolean isRowSelectionVisible;
+	boolean showLastUpdatedOn;
 
 	@JsOverlay
 	public static StandaloneQueryWrapperProps create(String sql) {
 		StandaloneQueryWrapperProps props = new StandaloneQueryWrapperProps();
 		props.sql = sql;
 		props.unitDescription = null;
+		props.showLastUpdatedOn = true;
 		return props;
 	}
 
@@ -42,11 +44,13 @@ public class StandaloneQueryWrapperProps extends ReactComponentProps {
 		props.showDownloadColumn = showDownloadColumn;
 		props.hideDownload = hideDownload;
 		props.isRowSelectionVisible = isRowSelectionVisible;
+		props.showLastUpdatedOn = true;
 		return props;
 	}
 	@JsOverlay
 	public static StandaloneQueryWrapperProps create() {
 		StandaloneQueryWrapperProps props = new StandaloneQueryWrapperProps();
+		props.showLastUpdatedOn = true;
 		return props;
 	}
 }

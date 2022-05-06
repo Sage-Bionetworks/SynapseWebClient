@@ -37,6 +37,8 @@ public class QueryWrapperPlotNavProps extends ReactComponentProps {
 	@JsNullable
 	SynapseTableProps tableConfiguration;
 
+	boolean showLastUpdatedOn;
+
 	@JsOverlay
 	public static QueryWrapperPlotNavProps create(String sql, String initQueryJson, OnQueryCallback onQueryChange, OnQueryResultBundleCallback onQueryResultBundleChange,
 			boolean hideSqlEditorControl) {
@@ -50,6 +52,7 @@ public class QueryWrapperPlotNavProps extends ReactComponentProps {
 		props.shouldDeepLink = true;
 		props.name = "Items";
 		props.downloadCartPageUrl = "#!DownloadCart:0";
+		props.showLastUpdatedOn = true;
 		return props;
 	}
 }
