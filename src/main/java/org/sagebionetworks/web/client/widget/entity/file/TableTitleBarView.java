@@ -14,14 +14,14 @@ public interface TableTitleBarView extends IsWidget, SynapseView {
 
 	void setPresenter(Presenter p);
 
-	void setVersionUIVisible(boolean visible);
-	
+	void setVersionUIToggleVisible(boolean visible);
+
+	void setVersionHistoryLinkText(String text);
+
 	/**
 	 * Presenter interface
 	 */
 	interface Presenter {
 		void toggleShowVersionHistory();
-
-		boolean isVersionHistoryVisible();
 	}
 }

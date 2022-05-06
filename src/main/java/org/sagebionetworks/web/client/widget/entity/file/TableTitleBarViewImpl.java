@@ -56,12 +56,7 @@ public class TableTitleBarViewImpl extends Composite implements TableTitleBarVie
 
 		favoritePanel.addStyleName("inline-block");
 		favoritePanel.setWidget(favoriteWidget.asWidget());
-		showVersionHistoryLink.addClickHandler(event -> {
-			boolean isShown = !presenter.isVersionHistoryVisible();
-			presenter.toggleShowVersionHistory();
-			showVersionHistoryLink.setText((isShown ? "Hide" : "Show") + " Version History");
-		});
-
+		showVersionHistoryLink.addClickHandler(event -> presenter.toggleShowVersionHistory());
 	}
 
 	@Override
@@ -74,6 +69,11 @@ public class TableTitleBarViewImpl extends Composite implements TableTitleBarVie
 		currentEntityId = entity.getId();
 		favoriteWidget.configure(currentEntityId);
 		entityIcon.setType(EntityTypeUtils.getEntityType(entity));
+	}
+
+	@Override
+	public void setVersionHistoryLinkText(String text) {
+		showVersionHistoryLink.setText(text);
 	}
 
 	@Override
@@ -108,7 +108,7 @@ public class TableTitleBarViewImpl extends Composite implements TableTitleBarVie
 	}
 	
 	@Override
-	public void setVersionUIVisible(boolean visible) {
+	public void setVersionUIToggleVisible(boolean visible) {
 		versionInfoUI.setVisible(visible);
 	}
 	

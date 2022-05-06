@@ -12,14 +12,18 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.matches;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -52,6 +56,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
+
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -83,9 +88,18 @@ public class VersionHistoryWidgetTest {
 	ArgumentCaptor<Place> placeCaptor;
 	@Mock
 	SynapseAlert mockSynAlert;
+	@Mock
+	Consumer<Boolean> mockListener;
 
 	@Before
 	public void before() throws JSONObjectAdapterException {
+		when(mockView.isVisible()).thenReturn(true);
+		doAnswer((invocationOnMock) -> {
+			// when setVisible is called, update the isVisible mock to return the last value passed to setVisible
+			return when(mockView.isVisible())
+					.thenReturn(invocationOnMock.getArgumentAt(0, Boolean.class));
+		}).when(mockView).setVisible(anyBoolean());
+
 		versionHistoryWidget = new VersionHistoryWidget(mockView, mockSynapseClient, mockJsClient, mockGlobalApplicationState, mockPreflightController, mockSynAlert);
 
 		vb = new FileEntity();
@@ -365,5 +379,20 @@ public class VersionHistoryWidgetTest {
 		// version history does not represent the latest version for Tables
 		assertNull(versionHistoryWidget.getVersionNumber());
 		verify(mockJsClient).getEntityVersions(anyString(), eq(WebConstants.ZERO_OFFSET.intValue()), anyInt(), any(AsyncCallback.class));
+	}
+
+	@Test
+	public void testVersionHistoryWidgetVisibilityListeners() {
+		versionHistoryWidget.registerVisibilityChangeListener(mockListener);
+
+		// Listener should be invoked on registration
+		verify(mockListener).accept(eq(versionHistoryWidget.isVisible()));
+
+		// Toggle visibility on the widget
+		boolean newVisibility = !versionHistoryWidget.isVisible();
+
+		versionHistoryWidget.setVisible(newVisibility);
+
+		verify(mockListener).accept(eq(newVisibility));
 	}
 }

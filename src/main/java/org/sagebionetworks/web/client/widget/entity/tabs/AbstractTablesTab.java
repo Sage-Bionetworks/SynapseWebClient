@@ -358,12 +358,8 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 
 	private void configureVersionAlert() {
 		boolean versionHistoryIsVisible = this.metadata.getVersionHistoryWidget().isVisible();
-		this.view.setVersionAlertPrimaryAction((versionHistoryIsVisible ? "Hide" : "Show") + " Version History",
-				event -> {
-					this.metadata.getVersionHistoryWidget().setVisible(!versionHistoryIsVisible);
-					// Reconfigure the version alert to update the button text.
-					configureVersionAlert();
-				});
+		updateVersionAlertText(versionHistoryIsVisible);
+		this.view.setVersionAlertPrimaryAction(event -> this.metadata.getVersionHistoryWidget().setVisible(!versionHistoryIsVisible));
 		if (!(entityBundle.getEntity() instanceof Dataset)) {
 			// Don't show a version alert if this isn't a dataset
 			this.view.setVersionAlertVisible(false);
@@ -405,6 +401,10 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 			// Don't show a version alert
 			this.view.setVersionAlertVisible(false);
 		}
+	}
+
+	private void updateVersionAlertText(boolean versionHistoryIsVisible) {
+		this.view.setVersionAlertPrimaryText((versionHistoryIsVisible ? "Hide" : "Show") + " Version History");
 	}
 
 	private void configureCreatedByHelpWidget() {

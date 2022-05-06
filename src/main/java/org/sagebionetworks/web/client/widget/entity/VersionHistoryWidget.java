@@ -1,8 +1,12 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
+
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.VersionableEntity;
@@ -42,6 +46,8 @@ public class VersionHistoryWidget implements VersionHistoryWidgetView.Presenter,
 	private SynapseJavascriptClient jsClient;
 	int currentOffset;
 	private Request currentRequest;
+
+	private List<Consumer<Boolean>> visibilityChangeListeners = new ArrayList<>();
 
 	@Inject
 	public VersionHistoryWidget(VersionHistoryWidgetView view, SynapseClientAsync synapseClient, SynapseJavascriptClient jsClient, GlobalApplicationState globalApplicationState, PreflightController preflightController, SynapseAlert synAlert) {
@@ -204,11 +210,23 @@ public class VersionHistoryWidget implements VersionHistoryWidgetView.Presenter,
 	}
 
 	public void setVisible(boolean visible) {
-		view.asWidget().setVisible(visible);
+		view.setVisible(visible);
+		invokeVisibilityChangeListeners();
 	}
 
 	public boolean isVisible() {
-		return view.asWidget().isVisible();
+		return view.isVisible();
+	}
+
+	public void registerVisibilityChangeListener(Consumer<Boolean> callback) {
+		visibilityChangeListeners.add(callback);
+		invokeVisibilityChangeListeners();
+	}
+
+	private void invokeVisibilityChangeListeners() {
+		for (Consumer<Boolean> cb : visibilityChangeListeners) {
+			cb.accept(this.isVisible());
+		}
 	}
 
 }

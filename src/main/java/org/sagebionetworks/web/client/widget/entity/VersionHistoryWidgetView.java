@@ -42,4 +42,8 @@ public interface VersionHistoryWidgetView extends IsWidget, SynapseView {
 	void setSynAlert(IsWidget w);
 
 	void showNoResults();
+
+	boolean isVisible();
+
+	void setVisible(boolean visible);
 }
