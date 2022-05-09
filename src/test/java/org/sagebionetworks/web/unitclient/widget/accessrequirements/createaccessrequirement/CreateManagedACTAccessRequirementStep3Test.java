@@ -135,7 +135,7 @@ public class CreateManagedACTAccessRequirementStep3Test {
 		when(mockUserGroupHeader.getOwnerId()).thenReturn(RESOURCE_ACCESS_PRINCIPAL_ID2.toString());
 		userSuggestionCallbackCaptor.getValue().invoke(mockUserGroupSuggestion);
 		
-		// on save, an ACL should be updated
+		// on save, the ACL should be updated
 		widget.onPrimary();
 		
 		verify(mockJsClient).updateAccessRequirementACL(AR_ID.toString(), mockACL);
@@ -158,7 +158,7 @@ public class CreateManagedACTAccessRequirementStep3Test {
 		// user removes the reviewer
 		widget.onRemoveReviewer();
 		
-		// on save, an ACL should be created
+		// on save, the ACL should be deleted
 		widget.onPrimary();
 		
 		verify(mockJsClient).deleteAccessRequirementACL(AR_ID.toString());

@@ -123,7 +123,6 @@ public class CreateManagedACTAccessRequirementStep3 implements ModalPage, Create
 
 	@Override
 	public void onPrimary() {
-		// update access requirement ACL
 		modalPresenter.setLoading(true);
 		// if not set, then delete the ACL (if it was originally set) or do nothing (if not set)
 		if (reviewerPrincipalId == null) {
@@ -134,8 +133,7 @@ public class CreateManagedACTAccessRequirementStep3 implements ModalPage, Create
 				modalPresenter.onFinished();
 			}
 		} else {
-			// but if user/team is set, then create (if not originally set) or update the ACL (if previously set).  
-			// reviewer principal ID is set
+			// if user/team is set, then create (if not originally set) or update the ACL (if previously set).  
 			if (originalAcl == null) {
 				createAcl();
 			} else {
