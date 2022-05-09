@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.accessrequirements.createaccessrequirement;
 
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.when;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.*;
@@ -159,4 +159,29 @@ public class CreateManagedACTAccessRequirementStep3Test {
 		verify(mockJsClient).deleteAccessRequirementACL(AR_ID.toString());
 		verify(mockModalPresenter).onFinished();
 	}
+	
+	@Test
+	public void testUndefinedToUndefinedNoOp() {
+		// original not found
+		when(mockJsClient.getAccessRequirementACL(AR_ID.toString())).thenReturn(getFailedFuture(new NotFoundException()));
+		widget.configure(mockACTAccessRequirement);
+		
+		// on save, no-op
+		widget.onPrimary();
+		
+		verify(mockJsClient).getAccessRequirementACL(AR_ID.toString());
+		verifyNoMoreInteractions(mockJsClient);
+		verify(mockModalPresenter).onFinished();
+	}
+
+	@Test
+	public void testErrorGettingACL() {
+		Exception ex = new Exception("an unexpected error occurred");
+		when(mockJsClient.getAccessRequirementACL(AR_ID.toString())).thenReturn(getFailedFuture(ex));
+		
+		widget.configure(mockACTAccessRequirement);
+		
+		verify(mockModalPresenter).setError(ex);
+	}
+	
 }
