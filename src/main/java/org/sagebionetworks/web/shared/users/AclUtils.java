@@ -1,13 +1,15 @@
 package org.sagebionetworks.web.shared.users;
 
 import static org.sagebionetworks.repo.model.ACCESS_TYPE.CREATE;
-import static org.sagebionetworks.repo.model.ACCESS_TYPE.*;
+import static org.sagebionetworks.repo.model.ACCESS_TYPE.DELETE;
 import static org.sagebionetworks.repo.model.ACCESS_TYPE.DOWNLOAD;
 import static org.sagebionetworks.repo.model.ACCESS_TYPE.READ;
 import static org.sagebionetworks.repo.model.ACCESS_TYPE.READ_PRIVATE_SUBMISSION;
+import static org.sagebionetworks.repo.model.ACCESS_TYPE.REVIEW_SUBMISSIONS;
 import static org.sagebionetworks.repo.model.ACCESS_TYPE.SUBMIT;
 import static org.sagebionetworks.repo.model.ACCESS_TYPE.UPDATE;
 import static org.sagebionetworks.repo.model.ACCESS_TYPE.UPDATE_SUBMISSION;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,6 +17,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.ResourceAccess;

@@ -23,6 +23,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateManagedACTAccessRequirementStep2;
 import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateManagedACTAccessRequirementStep2View;
+import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateManagedACTAccessRequirementStep3;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage.ModalPresenter;
@@ -54,6 +55,8 @@ public class CreateManagedACTAccessRequirementStep2Test {
 	FileHandleUploadWidget mockDucTemplateUploader;
 	@Mock
 	FileHandleWidget mockDucTemplateFileHandleWidget;
+	@Mock
+	CreateManagedACTAccessRequirementStep3 mockActStep3;
 
 	@Captor
 	ArgumentCaptor<CallbackP> callbackPCaptor;
@@ -73,7 +76,7 @@ public class CreateManagedACTAccessRequirementStep2Test {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		widget = new CreateManagedACTAccessRequirementStep2(mockView, mockSynapseClient, mockWikiMarkdownEditor, mockWikiPageRenderer, mockDucTemplateUploader, mockDucTemplateFileHandleWidget);
+		widget = new CreateManagedACTAccessRequirementStep2(mockView, mockActStep3, mockSynapseClient, mockWikiMarkdownEditor, mockWikiPageRenderer, mockDucTemplateUploader, mockDucTemplateFileHandleWidget);
 		widget.setModalPresenter(mockModalPresenter);
 		when(mockACTAccessRequirement.getId()).thenReturn(AR_ID);
 		AsyncMockStubber.callSuccessWith(mockACTAccessRequirement).when(mockSynapseClient).createOrUpdateAccessRequirement(any(AccessRequirement.class), any(AsyncCallback.class));
@@ -170,7 +173,8 @@ public class CreateManagedACTAccessRequirementStep2Test {
 		verify(mockACTAccessRequirement).setIsIRBApprovalRequired(false);
 		verify(mockACTAccessRequirement).setIsValidatedProfileRequired(false);
 		verify(mockACTAccessRequirement).setIsIDURequired(true);
-		verify(mockModalPresenter).onFinished();
+		verify(mockModalPresenter).setNextActivePage(mockActStep3);
+		verify(mockActStep3).configure(mockACTAccessRequirement);
 	}
 
 	@Test
