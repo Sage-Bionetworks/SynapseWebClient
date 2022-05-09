@@ -1,9 +1,13 @@
 package org.sagebionetworks.web.unitclient.widget.accessrequirements.createaccessrequirement;
 
-import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.when;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+import static org.sagebionetworks.repo.model.ACCESS_TYPE.REVIEW_SUBMISSIONS;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getDoneFuture;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getFailedFuture;
 
@@ -31,7 +35,6 @@ import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage.ModalPresenter;
 import org.sagebionetworks.web.client.widget.team.UserTeamBadge;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
-import static org.sagebionetworks.repo.model.ACCESS_TYPE.REVIEW_SUBMISSIONS;
 
 public class CreateManagedACTAccessRequirementStep3Test {
 
@@ -61,6 +64,8 @@ public class CreateManagedACTAccessRequirementStep3Test {
 	ArgumentCaptor<Set<ResourceAccess>> resourceAccessSetCaptor;
 	@Mock
 	ResourceAccess mockResourceAccess;
+	@Mock
+	ResourceAccess mockResourceAccess2;
 	@Mock
 	UserGroupSuggestion mockUserGroupSuggestion;
 	@Mock
@@ -183,5 +188,20 @@ public class CreateManagedACTAccessRequirementStep3Test {
 		
 		verify(mockModalPresenter).setError(ex);
 	}
-	
+
+	@Test
+	public void testTooManyEntriesInACL() {
+		when(mockJsClient.getAccessRequirementACL(AR_ID.toString())).thenReturn(getDoneFuture(mockACL));
+		when(mockResourceAccess.getPrincipalId()).thenReturn(RESOURCE_ACCESS_PRINCIPAL_ID1);
+		when(mockResourceAccess2.getPrincipalId()).thenReturn(RESOURCE_ACCESS_PRINCIPAL_ID2);
+		Set<ResourceAccess> originalResourceAccessSet = new HashSet<>();
+		originalResourceAccessSet.add(mockResourceAccess);
+		originalResourceAccessSet.add(mockResourceAccess2);
+		when(mockACL.getResourceAccess()).thenReturn(originalResourceAccessSet);
+		
+		widget.configure(mockACTAccessRequirement);
+		
+		verify(mockModalPresenter).setErrorMessage(CreateManagedACTAccessRequirementStep3.TOO_MANY_ACL_ENTRIES_ERROR);
+	}
+
 }

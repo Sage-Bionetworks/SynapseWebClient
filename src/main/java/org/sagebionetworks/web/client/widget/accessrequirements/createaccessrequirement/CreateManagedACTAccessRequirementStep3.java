@@ -39,6 +39,7 @@ public class CreateManagedACTAccessRequirementStep3 implements ModalPage, Create
 	AccessControlList originalAcl;
 	String reviewerPrincipalId;
 	UserTeamBadge reviewerUserTeamBadge;
+	public static final String TOO_MANY_ACL_ENTRIES_ERROR = "This Access Requirment has an ACL that contains more than one item.  Beware, this dialog will destroy other entries on save.";
 
 	@Inject
 	public CreateManagedACTAccessRequirementStep3(CreateManagedACTAccessRequirementStep3View view, SynapseJavascriptClient jsClient, SynapseSuggestBox suggestBox, UserGroupSuggestionProvider provider, UserTeamBadge reviewerUserTeamBadge) {
@@ -98,7 +99,7 @@ public class CreateManagedACTAccessRequirementStep3 implements ModalPage, Create
 				if (originalAcl.getResourceAccess() != null && !originalAcl.getResourceAccess().isEmpty()) {
 					// Edge case detection (user set up this ACL via another client)
 					if (originalAcl.getResourceAccess().size() > 1) {
-						modalPresenter.setErrorMessage("This Access Requirment has an ACL that contains more than one item.  Beware, this dialog will destroy other entries on save.");
+						modalPresenter.setErrorMessage(TOO_MANY_ACL_ENTRIES_ERROR);
 					}
 					ResourceAccess firstRA = originalAcl.getResourceAccess().iterator().next();
 					updateReviewerPrincipalId(firstRA.getPrincipalId().toString());
