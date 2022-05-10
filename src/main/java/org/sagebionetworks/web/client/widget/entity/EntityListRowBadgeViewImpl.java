@@ -73,6 +73,9 @@ public class EntityListRowBadgeViewImpl extends Composite implements EntityListR
 				presenter.onSelectionChanged();
 			}
 		});
+		addToDownloadListLink.addClickHandler(event -> {
+			presenter.onAddToDownloadList();
+		});
 	}
 
 	@Override
