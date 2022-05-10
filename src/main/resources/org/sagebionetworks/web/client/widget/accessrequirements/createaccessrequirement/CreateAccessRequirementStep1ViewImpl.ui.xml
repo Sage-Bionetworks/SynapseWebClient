@@ -39,13 +39,13 @@
 						addStyleNames="margin-left-5 moveup-10" placement="LEFT" />
 				</b:InputGroup>
 				<bh:Div marginTop="10">
-					<b:FormLabel text="Short description (optional)"></b:FormLabel>
+					<b:FormLabel text="Name"></b:FormLabel>
 					<w:HelpWidget
-						helpMarkdown="Enter access requirement description.  This will also be used when sending notifications for expiring or revoked approval.  For example, 'The approval for the **short_description** access requirement was revoked...'"
+						helpMarkdown="Enter access requirement name. This will also be used when sending notifications for expiring or revoked approval.  For example, 'The approval for the **name** access requirement was revoked...'"
 						addStyleNames="margin-left-5" placement="RIGHT" />
-					<b:TextBox ui:field="descriptionField"
+					<b:TextBox ui:field="nameField"
 						placeholder="" maxLength="50"
-						autoComplete="false" width="100%"/>					
+						autoComplete="false" width="100%"/>
 				</bh:Div>
 			</b:FormGroup>
 			<b:FormGroup ui:field="arTypeUI">
@@ -55,7 +55,8 @@
 					name="accessRequirementType" value="true" />
 				<b:Radio ui:field="actTypeButton"
 					text="Controlled - requests are handled outside of Synapse (Jira/email/spreadsheets, legacy requirement)"
-					name="accessRequirementType" />
+					name="accessRequirementType"
+					visible="false" />
 				<b:Radio ui:field="termsOfUseButton" text="Click wrap"
 					name="accessRequirementType" />
 			</b:FormGroup>

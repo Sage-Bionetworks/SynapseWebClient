@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client;
 import java.util.ArrayList;
 import java.util.List;
 import org.sagebionetworks.evaluation.model.Evaluation;
+import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirementInstanceFactory;
 import org.sagebionetworks.repo.model.Challenge;
@@ -91,7 +92,7 @@ public class SynapseJavascriptFactory {
 	public enum OBJECT_TYPE {
 		ValidationResults, JsonSchemaObjectBinding, PaginatedResultsEvaluations, Evaluation, EntityBundle, Team, RestrictionInformationResponse, EntityChildrenResponse, WikiPageKey, UserGroupHeaderResponsePage, WikiPage, ListWrapperUserProfile, ListWrapperTeam, ListWrapperUploadDestinations, SubscriptionPagedResults, UserGroupHeaderResponse, UserBundle, Count, PaginatedResultsEntityHeader, ProjectHeaderList, PaginatedResultReference, V2WikiPage, V2WikiOrderHint, DockerRepository, PaginatedDockerCommit, FileEntity, Project, Folder, EntityView, TableEntity, Link, Preview, SubmissionPage, Entity, // used for services where we don't know what type of entity is returned (but object has concreteType set)
 		AccessRequirement, EntityId, Forum, DiscussionThreadBundle, DiscussionReplyBundle, MessageURL, ThreadCount, EntityThreadCounts, PaginatedIds, SubscriberPagedResults, SubscriberCount, BatchFileResult, UserProfile, FileHandleResults, AsyncResponse, JSON, MembershipInvitation, TeamMembershipStatus, InviteeVerificationSignedToken, ListWrapperColumnModel, PaginatedTeamIds, AsyncJobId, LoginResponse, Challenge, ChallengePagedResults, Etag, Activity, Annotations, MultipartUploadStatus, NotificationEmail, BatchPresignedUploadUrlResponse, AddPartResponse, AccessApprovalNotificationResponse, PaginatedResultsTotalNumberOfResults, PrincipalAliasResponse, DownloadList, DownloadOrder, DownloadOrderSummaryResponse, Doi, Subscription, SearchResults, SnapshotResponse, PaginatedColumnModelsResults,
-		PaginatedResultsVersionInfo, PaginatedResultsDiscussionThreadBundle, PaginatedResultsDiscussionReplyBundle, PaginatedResultsV2WikiHeader, PaginatedResultsTeamMember, SubmissionInfoPage, UploadDestination, AddBatchOfFilesToDownloadListResponse, None, String
+		PaginatedResultsVersionInfo, PaginatedResultsDiscussionThreadBundle, PaginatedResultsDiscussionReplyBundle, PaginatedResultsV2WikiHeader, PaginatedResultsTeamMember, SubmissionInfoPage, UploadDestination, AddBatchOfFilesToDownloadListResponse, AccessControlList, None, String
 	}
 
 	/**
@@ -220,6 +221,8 @@ public class SynapseJavascriptFactory {
 				return new SubmissionPage(json);
 			case SnapshotResponse:
 				return new SnapshotResponse(json);
+			case AccessControlList:
+				return new AccessControlList(json);
 			case PaginatedColumnModelsResults:
 				return new PaginatedColumnModels(json).getResults();
 			case JSON:

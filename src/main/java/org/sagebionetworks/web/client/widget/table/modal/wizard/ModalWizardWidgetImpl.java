@@ -99,6 +99,7 @@ public class ModalWizardWidgetImpl implements ModalWizardWidget, ModalWizardView
 		for (WizardCallback callback : callbacks) {
 			callback.onFinished();
 		}
+		view.setLoading(false);
 		this.view.hideModal();
 	}
 

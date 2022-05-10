@@ -34,7 +34,7 @@ public class CreateAccessRequirementStep1ViewImpl implements CreateAccessRequire
 	@UiField
 	FormGroup arTypeUI;
 	@UiField
-	TextBox descriptionField;
+	TextBox nameField;
 
 	@UiField
 	Radio managedActTypeButton;
@@ -95,12 +95,12 @@ public class CreateAccessRequirementStep1ViewImpl implements CreateAccessRequire
 	}
 	
 	@Override
-	public String getShortDescription() {
-		return descriptionField.getText();
+	public String getName() {
+		return nameField.getText();
 	}
 	@Override
-	public void setShortDescription(String description) {
-		descriptionField.setText(description);
+	public void setName(String name) {
+		nameField.setText(name);
 	}
 
 	@Override

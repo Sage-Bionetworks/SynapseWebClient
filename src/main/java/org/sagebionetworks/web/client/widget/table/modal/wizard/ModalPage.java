@@ -69,6 +69,14 @@ public interface ModalPage extends IsWidget {
 		 * @param table
 		 */
 		public void onFinished();
+		
+		/**
+		 * Called if the wizard page wants to update the modal title
+		 * 
+		 * @param table
+		 */
+		public void setTitle(String title);
+		
 	}
 
 	/**

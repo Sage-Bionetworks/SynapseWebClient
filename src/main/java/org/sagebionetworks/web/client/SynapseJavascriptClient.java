@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
+import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.Entity;
@@ -314,6 +315,7 @@ public class SynapseJavascriptClient {
 	public static final String DOWNLOAD_LIST_REMOVE = DOWNLOAD_LIST + "/remove";
 	public static final String DOWNLOAD_LIST_CLEAR = DOWNLOAD_LIST + "/clear";
 	public static final String ACCESS_REQUIREMENT = "/accessRequirement/";
+	public static final String ACL = "/acl";
 	public static final String ACCESS_APPROVAL = "/accessApproval";
 	public static final String SUBMISSIONS = "/submissions";
 	public static final String DOWNLOAD_ORDER = "/download/order";
@@ -1926,6 +1928,25 @@ public class SynapseJavascriptClient {
 	public void getSchemaValidationResultsWithMatchingEtag(String entityId, String expectedEtag, AsyncCallback<ValidationResults> cb) {
 		getSchemaValidationResultsWithMatchingEtag(entityId, expectedEtag, INITIAL_RETRY_REQUEST_DELAY_MS, cb);
 	}
+	
+	public FluentFuture<AccessControlList> getAccessRequirementACL(String id) {
+		String url = getRepoServiceUrl() + ACCESS_REQUIREMENT + id + ACL;
+		return getFuture(cb -> doGet(url, OBJECT_TYPE.AccessControlList, cb));
+	}
 
+	public FluentFuture<Void> deleteAccessRequirementACL(String id) {
+		String url = getRepoServiceUrl() + ACCESS_REQUIREMENT + id + ACL;
+		return getFuture(cb -> doDelete(url, cb));
+	}
+
+	public FluentFuture<AccessControlList> createAccessRequirementACL(String id, AccessControlList acl) {
+		String url = getRepoServiceUrl() + ACCESS_REQUIREMENT + id + ACL;
+		return getFuture(cb -> doPost(url, acl, OBJECT_TYPE.AccessControlList, false, cb));
+	}
+
+	public FluentFuture<AccessControlList> updateAccessRequirementACL(String id, AccessControlList acl) {
+		String url = getRepoServiceUrl() + ACCESS_REQUIREMENT + id + ACL;
+		return getFuture(cb -> doPut(url, acl, OBJECT_TYPE.AccessControlList, cb));
+	}
 }
 
