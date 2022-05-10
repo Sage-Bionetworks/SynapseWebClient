@@ -37,6 +37,7 @@ import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage.ModalP
 import org.sagebionetworks.web.client.widget.team.UserTeamBadge;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
+@RunWith(MockitoJUnitRunner.class)
 public class CreateManagedACTAccessRequirementStep3Test {
 
 	CreateManagedACTAccessRequirementStep3 widget;
