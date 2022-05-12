@@ -11,6 +11,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -26,6 +27,10 @@ public class TermsOfUseAccessRequirementWidgetViewImpl implements TermsOfUseAcce
 	SimplePanel wikiContainer;
 	@UiField
 	BlockQuote wikiTermsUI;
+	@UiField
+	InlineLabel accessRequirementIDField;
+	@UiField
+	Div accessRequirementIDUI;
 	@UiField
 	BlockQuote termsUI;
 	@UiField
@@ -93,6 +98,16 @@ public class TermsOfUseAccessRequirementWidgetViewImpl implements TermsOfUseAcce
 	@Override
 	public void setTerms(String arText) {
 		terms.setHTML(arText);
+	}
+
+	@Override
+	public void setAccessRequirementID(String arID) {
+		accessRequirementIDField.setText(arID);
+	}
+
+	@Override
+	public void setAccessRequirementIDVisible() {
+		accessRequirementIDUI.setVisible(true);
 	}
 
 	@Override

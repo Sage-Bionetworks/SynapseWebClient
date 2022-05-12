@@ -90,6 +90,7 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 		});
 		createAccessRequirementButton.configure(ar, refreshCallback);
 		deleteAccessRequirementButton.configure(ar, refreshCallback);
+		view.setAccessRequirementID(ar.getId().toString());
 		subjectsWidget.configure(ar.getSubjectIds());
 		manageAccessButton.configure(ar);
 		lazyLoadHelper.setIsConfigured();
@@ -99,6 +100,7 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 		// set up view based on DataAccessSubmission state
 		if (status.getIsApproved()) {
 			view.showApprovedHeading();
+			view.setAccessRequirementIDVisible();
 		} else {
 			view.showUnapprovedHeading();
 			view.showSignTermsButton();
