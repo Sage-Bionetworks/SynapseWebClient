@@ -9,7 +9,7 @@
 		<b:PanelBody>
 			<bh:Div ui:field="accessRequirementIDUI" visible="false">
 				<g:InlineLabel addStyleNames="boldText margin-right-5"
-							   text="Click Wrap ID:" />
+							   text="Click Wrap Access Requirement ID:" />
 					<g:InlineLabel ui:field="accessRequirementIDField" />
 			</bh:Div>
 			<bh:Div ui:field="approvedHeading" visible="false">

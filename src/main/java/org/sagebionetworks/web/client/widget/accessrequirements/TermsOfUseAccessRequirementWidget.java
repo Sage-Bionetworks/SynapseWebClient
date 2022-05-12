@@ -39,7 +39,7 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 	IsACTMemberAsyncHandler isACTMemberAsyncHandler;
 
 	@Inject
-	public TermsOfUseAccessRequirementWidget(TermsOfUseAccessRequirementWidgetView view, AuthenticationController authController, DataAccessClientAsync dataAccessClient, SynapseClientAsync synapseClient, SynapseJavascriptClient jsClient, WikiPageWidget wikiPageWidget, SynapseAlert synAlert, SubjectsWidget subjectsWidget, CreateAccessRequirementButton createAccessRequirementButton, DeleteAccessRequirementButton deleteAccessRequirementButton, LazyLoadHelper lazyLoadHelper, ReviewAccessorsButton manageAccessButton) {
+	public TermsOfUseAccessRequirementWidget(TermsOfUseAccessRequirementWidgetView view, AuthenticationController authController, DataAccessClientAsync dataAccessClient, SynapseClientAsync synapseClient, SynapseJavascriptClient jsClient, WikiPageWidget wikiPageWidget, SynapseAlert synAlert, SubjectsWidget subjectsWidget, CreateAccessRequirementButton createAccessRequirementButton, DeleteAccessRequirementButton deleteAccessRequirementButton, LazyLoadHelper lazyLoadHelper, ReviewAccessorsButton manageAccessButton, IsACTMemberAsyncHandler isACTMemberAsyncHandler ) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
@@ -54,6 +54,7 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 		this.deleteAccessRequirementButton = deleteAccessRequirementButton;
 		this.lazyLoadHelper = lazyLoadHelper;
 		this.manageAccessButton = manageAccessButton;
+		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
 		wikiPageWidget.setModifiedCreatedByHistoryVisible(false);
 		view.setPresenter(this);
 		view.setWikiTermsWidget(wikiPageWidget.asWidget());
