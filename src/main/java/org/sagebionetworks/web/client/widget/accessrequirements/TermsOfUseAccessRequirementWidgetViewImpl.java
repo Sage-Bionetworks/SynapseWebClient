@@ -106,8 +106,8 @@ public class TermsOfUseAccessRequirementWidgetViewImpl implements TermsOfUseAcce
 	}
 
 	@Override
-	public void setAccessRequirementIDVisible() {
-		accessRequirementIDUI.setVisible(true);
+	public void setAccessRequirementIDVisible(boolean visible) {
+		accessRequirementIDUI.setVisible(visible);
 	}
 
 	@Override

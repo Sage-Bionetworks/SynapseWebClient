@@ -11,6 +11,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
@@ -35,6 +36,7 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 	LazyLoadHelper lazyLoadHelper;
 	Callback refreshCallback;
 	ReviewAccessorsButton manageAccessButton;
+	IsACTMemberAsyncHandler isACTMemberAsyncHandler;
 
 	@Inject
 	public TermsOfUseAccessRequirementWidget(TermsOfUseAccessRequirementWidgetView view, AuthenticationController authController, DataAccessClientAsync dataAccessClient, SynapseClientAsync synapseClient, SynapseJavascriptClient jsClient, WikiPageWidget wikiPageWidget, SynapseAlert synAlert, SubjectsWidget subjectsWidget, CreateAccessRequirementButton createAccessRequirementButton, DeleteAccessRequirementButton deleteAccessRequirementButton, LazyLoadHelper lazyLoadHelper, ReviewAccessorsButton manageAccessButton) {
@@ -91,6 +93,9 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 		createAccessRequirementButton.configure(ar, refreshCallback);
 		deleteAccessRequirementButton.configure(ar, refreshCallback);
 		view.setAccessRequirementID(ar.getId().toString());
+		isACTMemberAsyncHandler.isACTActionAvailable(isACT -> {
+			view.setAccessRequirementIDVisible(isACT);
+		});
 		subjectsWidget.configure(ar.getSubjectIds());
 		manageAccessButton.configure(ar);
 		lazyLoadHelper.setIsConfigured();
@@ -100,7 +105,6 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 		// set up view based on DataAccessSubmission state
 		if (status.getIsApproved()) {
 			view.showApprovedHeading();
-			view.setAccessRequirementIDVisible();
 		} else {
 			view.showUnapprovedHeading();
 			view.showSignTermsButton();
