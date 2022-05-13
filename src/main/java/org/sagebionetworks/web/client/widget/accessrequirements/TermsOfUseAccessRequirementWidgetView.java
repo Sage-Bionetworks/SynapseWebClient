@@ -43,6 +43,9 @@ public interface TermsOfUseAccessRequirementWidgetView extends IsWidget, Support
 
 	void hideControls();
 
+	void setAccessRequirementID(String arID);
+	void setAccessRequirementIDVisible(boolean visible);
+
 	/**
 	 * Presenter interface
 	 */

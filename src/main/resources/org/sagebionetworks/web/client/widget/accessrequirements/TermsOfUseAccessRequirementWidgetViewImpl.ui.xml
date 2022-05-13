@@ -7,6 +7,11 @@
 		type='org.sagebionetworks.web.client.IconsImageBundle' />
 	<b:Panel marginBottom="0">
 		<b:PanelBody>
+			<bh:Div ui:field="accessRequirementIDUI" visible="false">
+				<g:InlineLabel addStyleNames="boldText margin-right-5"
+							   text="Click Wrap Access Requirement ID:" />
+					<g:InlineLabel ui:field="accessRequirementIDField" />
+			</bh:Div>
 			<bh:Div ui:field="approvedHeading" visible="false">
 				<g:InlineLabel styleName="boldText"
 					text="You have accepted the following terms in order to access these data:" />

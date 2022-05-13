@@ -11,6 +11,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
@@ -35,9 +36,10 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 	LazyLoadHelper lazyLoadHelper;
 	Callback refreshCallback;
 	ReviewAccessorsButton manageAccessButton;
+	IsACTMemberAsyncHandler isACTMemberAsyncHandler;
 
 	@Inject
-	public TermsOfUseAccessRequirementWidget(TermsOfUseAccessRequirementWidgetView view, AuthenticationController authController, DataAccessClientAsync dataAccessClient, SynapseClientAsync synapseClient, SynapseJavascriptClient jsClient, WikiPageWidget wikiPageWidget, SynapseAlert synAlert, SubjectsWidget subjectsWidget, CreateAccessRequirementButton createAccessRequirementButton, DeleteAccessRequirementButton deleteAccessRequirementButton, LazyLoadHelper lazyLoadHelper, ReviewAccessorsButton manageAccessButton) {
+	public TermsOfUseAccessRequirementWidget(TermsOfUseAccessRequirementWidgetView view, AuthenticationController authController, DataAccessClientAsync dataAccessClient, SynapseClientAsync synapseClient, SynapseJavascriptClient jsClient, WikiPageWidget wikiPageWidget, SynapseAlert synAlert, SubjectsWidget subjectsWidget, CreateAccessRequirementButton createAccessRequirementButton, DeleteAccessRequirementButton deleteAccessRequirementButton, LazyLoadHelper lazyLoadHelper, ReviewAccessorsButton manageAccessButton, IsACTMemberAsyncHandler isACTMemberAsyncHandler ) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
@@ -52,6 +54,7 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 		this.deleteAccessRequirementButton = deleteAccessRequirementButton;
 		this.lazyLoadHelper = lazyLoadHelper;
 		this.manageAccessButton = manageAccessButton;
+		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
 		wikiPageWidget.setModifiedCreatedByHistoryVisible(false);
 		view.setPresenter(this);
 		view.setWikiTermsWidget(wikiPageWidget.asWidget());
@@ -90,6 +93,10 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 		});
 		createAccessRequirementButton.configure(ar, refreshCallback);
 		deleteAccessRequirementButton.configure(ar, refreshCallback);
+		view.setAccessRequirementID(ar.getId().toString());
+		isACTMemberAsyncHandler.isACTActionAvailable(isACT -> {
+			view.setAccessRequirementIDVisible(isACT);
+		});
 		subjectsWidget.configure(ar.getSubjectIds());
 		manageAccessButton.configure(ar);
 		lazyLoadHelper.setIsConfigured();
