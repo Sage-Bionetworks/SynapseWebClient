@@ -5,6 +5,10 @@ import org.gwtbootstrap3.client.ui.ButtonGroup;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
+import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.jsinterop.ForumSearchProps.OnSearchUIVisibleHandler;
+
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -48,17 +52,20 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 	Div singleThreadAndSortContainer;
 	@UiField
 	Div actionMenuContainer;
+	@UiField
+	Div forumSearchContainer;
 
 	private Presenter presenter;
-
+	private SynapseContextPropsProvider propsProvider;
 	Widget widget;
 
 	public interface Binder extends UiBinder<Widget, ForumWidgetViewImpl> {
 	}
 
 	@Inject
-	public ForumWidgetViewImpl(Binder binder) {
+	public ForumWidgetViewImpl(Binder binder, SynapseContextPropsProvider propsProvider) {
 		widget = binder.createAndBindUi(this);
+		this.propsProvider = propsProvider;
 		newThreadButton.addClickHandler(event -> {
 			presenter.onClickNewThread();
 		});
@@ -201,5 +208,20 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 		w.asWidget().removeFromParent();
 		actionMenuContainer.clear();
 		actionMenuContainer.add(w);
+	}
+	
+	@Override
+	public void setForumSearchVisible(boolean visible) {
+		forumSearchContainer.setVisible(visible);
+	}
+	
+	@Override
+	public void configureForumSearch(String forumId, String projectId) {
+		OnSearchUIVisibleHandler onSearchUIVisible = visible -> {
+			SynapseJSNIUtilsImpl._consoleLog("update results visibility to " + visible);
+		};
+		ForumSearchWrapper widget = new ForumSearchWrapper(propsProvider, forumId, projectId, onSearchUIVisible);
+		forumSearchContainer.clear();
+		forumSearchContainer.add(widget);	
 	}
 }

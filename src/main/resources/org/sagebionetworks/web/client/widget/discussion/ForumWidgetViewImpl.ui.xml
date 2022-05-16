@@ -10,6 +10,7 @@
 				<b:Heading size="H3" ui:field="title" text="Discussion"/>
 				<b:Button ui:field="showAllThreadsButton" type="LINK" icon="ARROW_LEFT" addStyleNames="margin-bottom-10" width="144px" marginLeft="-10"
 						visible="false">Show All Threads</b:Button>
+				<bh:Div ui:field="forumSearchContainer" addStyleNames="movedown-7" />
 			</bh:Div>
 			<bh:Div addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end min-width-70" marginRight="10">
 				<bh:Span ui:field="subscribersContainer" addStyleNames="movedown-7" />

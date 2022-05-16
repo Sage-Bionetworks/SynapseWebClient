@@ -54,6 +54,10 @@ public interface ForumWidgetView extends IsWidget {
 	void setSubscribersWidget(Widget w);
 
 	void setSubscribersWidgetVisible(boolean visible);
+	
+	void setForumSearchVisible(boolean visible);
+	
+	void configureForumSearch(String forumId, String projectId);
 
 	void setActionMenu(IsWidget w);
 }
