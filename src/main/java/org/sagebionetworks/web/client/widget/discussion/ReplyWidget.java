@@ -9,7 +9,10 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.cache.ClientCache;
+import org.sagebionetworks.web.client.place.ParameterizedToken;
+import org.sagebionetworks.web.client.place.SynapseForumPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.TopicUtils;
@@ -56,9 +59,10 @@ public class ReplyWidget implements ReplyWidgetView.Presenter {
 	private DateTimeUtils dateTimeUtils;
 	private ClientCache clientCache;
 	private PopupUtilsView popupUtils;
+	private SynapseProperties synapseProperties;
 
 	@Inject
-	public ReplyWidget(ReplyWidgetView view, UserBadge authorWidget, DateTimeUtils dateTimeUtils, SynapseAlert synAlert, RequestBuilderWrapper requestBuilder, DiscussionForumClientAsync discussionForumClientAsync, AuthenticationController authController, EditReplyModal editReplyModal, MarkdownWidget markdownWidget, GWTWrapper gwt, CopyTextModal copyTextModal, SynapseJavascriptClient jsClient, ClientCache clientCache, PopupUtilsView popupUtils) {
+	public ReplyWidget(ReplyWidgetView view, UserBadge authorWidget, DateTimeUtils dateTimeUtils, SynapseAlert synAlert, RequestBuilderWrapper requestBuilder, DiscussionForumClientAsync discussionForumClientAsync, AuthenticationController authController, EditReplyModal editReplyModal, MarkdownWidget markdownWidget, GWTWrapper gwt, CopyTextModal copyTextModal, SynapseJavascriptClient jsClient, ClientCache clientCache, PopupUtilsView popupUtils, SynapseProperties synapseProperties) {
 		this.view = view;
 		this.authorWidget = authorWidget;
 		this.dateTimeUtils = dateTimeUtils;
@@ -74,6 +78,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter {
 		this.jsClient = jsClient;
 		this.clientCache = clientCache;
 		this.popupUtils = popupUtils;
+		this.synapseProperties = synapseProperties;
 		view.setPresenter(this);
 		view.setAuthor(authorWidget.asWidget());
 		view.setAlert(synAlert.asWidget());
@@ -237,7 +242,14 @@ public class ReplyWidget implements ReplyWidgetView.Presenter {
 
 	@Override
 	public void onClickReplyLink() {
-		String url = gwt.getHostPageBaseURL() + TopicUtils.buildReplyLink(projectId, threadId, replyId).substring(1);
+		// SWC-6129: If project is SynapseForum, then point to that place instead
+		String url;
+		String forumSynapseId = synapseProperties.getSynapseProperty(WebConstants.FORUM_SYNAPSE_ID_PROPERTY);
+		if (projectId == forumSynapseId) {
+			url = gwt.getHostPageBaseURL() + TopicUtils.buildSynapseForumReplyLink(threadId, replyId).substring(1);
+		} else {
+			url = gwt.getHostPageBaseURL() + TopicUtils.buildReplyLink(projectId, threadId, replyId).substring(1);
+		}
 		copyTextModal.setText(url);
 		copyTextModal.show();
 	}

@@ -4,6 +4,7 @@ import static org.sagebionetworks.web.client.place.Synapse.SYNAPSE_ENTITY_PREFIX
 import static org.sagebionetworks.web.client.widget.discussion.ForumWidget.REPLY_ID_KEY;
 import static org.sagebionetworks.web.client.widget.discussion.ForumWidget.THREAD_ID_KEY;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.SynapseForumPlace;
 
 public class TopicUtils {
 
@@ -36,6 +37,10 @@ public class TopicUtils {
 	public static String buildReplyLink(String projectId, String threadId, String replyId) {
 		Synapse place = getReplyPlace(projectId, threadId, replyId);
 		String link = "/" + SYNAPSE_ENTITY_PREFIX + place.toToken();
+		return link;
+	}
+	public static String buildSynapseForumReplyLink(String threadId, String replyId) {
+		String link = "/#!SynapseForum:" + THREAD_ID_KEY + "=" + threadId + "&" + REPLY_ID_KEY + "=" + replyId;
 		return link;
 	}
 }
