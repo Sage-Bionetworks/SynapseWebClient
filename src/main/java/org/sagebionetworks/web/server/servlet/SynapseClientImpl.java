@@ -1259,7 +1259,7 @@ public class SynapseClientImpl extends SynapseClientBase implements SynapseClien
 			MessageToUser message = new MessageToUser();
 			message.setSubject(subject);
 			message.setNotificationUnsubscribeEndpoint(getSignedTokenEndpoint(hostPageBaseURL));
-			String cleanedMessageBody = Jsoup.clean(messageBody, Whitelist.none());
+			String cleanedMessageBody = Jsoup.clean(messageBody, Safelist.none());
 			MessageToUser sentMessage = synapseClient.sendStringMessage(message, entityId, cleanedMessageBody);
 			JSONObjectAdapter sentMessageJson = sentMessage.writeToJSONObject(adapterFactory.createNew());
 			return sentMessageJson.toJSONString();
@@ -1269,7 +1269,6 @@ public class SynapseClientImpl extends SynapseClientBase implements SynapseClien
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-
 
 
 	@Override
