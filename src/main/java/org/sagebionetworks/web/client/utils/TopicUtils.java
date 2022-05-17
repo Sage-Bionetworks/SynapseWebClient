@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.utils;
 import static org.sagebionetworks.web.client.place.Synapse.SYNAPSE_ENTITY_PREFIX;
 import static org.sagebionetworks.web.client.widget.discussion.ForumWidget.REPLY_ID_KEY;
 import static org.sagebionetworks.web.client.widget.discussion.ForumWidget.THREAD_ID_KEY;
+
 import org.sagebionetworks.web.client.place.Synapse;
 
 public class TopicUtils {
