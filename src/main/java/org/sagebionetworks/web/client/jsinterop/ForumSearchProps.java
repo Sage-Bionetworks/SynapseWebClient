@@ -14,18 +14,18 @@ public class ForumSearchProps extends ReactComponentProps {
 	
     @FunctionalInterface
 	@JsFunction
-	public interface OnSearchUIVisibleHandler {
+	public interface OnSearchResultsVisibleHandler {
 		void onUpdate(boolean visible);
 	}
     @JsNullable
-    OnSearchUIVisibleHandler onSearchUIVisible;
+    OnSearchResultsVisibleHandler onSearchResultsVisible;
 
 	@JsOverlay
-	public static ForumSearchProps create(String forumId, String projectId, OnSearchUIVisibleHandler onSearchUIVisible) {
+	public static ForumSearchProps create(String forumId, String projectId, OnSearchResultsVisibleHandler onSearchResultsVisible) {
 		ForumSearchProps props = new ForumSearchProps();
 		props.forumId = forumId;
 		props.projectId = projectId;
-		props.onSearchUIVisible = onSearchUIVisible;
+		props.onSearchResultsVisible = onSearchResultsVisible;
 		return props;
 	}
 }
