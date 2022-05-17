@@ -22,6 +22,7 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -76,18 +77,22 @@ public class ReplyWidgetTest {
 	ClientCache mockClientCache;
 	@Mock
 	PopupUtilsView mockPopupUtils;
+	@Mock
+	SynapseProperties mockSynapseProperties;
 	Set<String> moderatorIds;
 	ReplyWidget replyWidget;
 
 	private static final String CREATED_BY = "123";
 	private static final String NON_AUTHOR = "456";
 
+	private static final String FORUM_SYNAPSE_ID = "syn777777";
 
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		replyWidget = new ReplyWidget(mockView, mockAuthorWidget, mockDateTimeUtils, mockSynAlert, mockRequestBuilder, mockDiscussionForumClientAsync, mockAuthController, mockEditReplyModal, mockMarkdownWidget, mockGwt, mockCopyTextModal, mockSynapseJavascriptClient, mockClientCache, mockPopupUtils);
+		replyWidget = new ReplyWidget(mockView, mockAuthorWidget, mockDateTimeUtils, mockSynAlert, mockRequestBuilder, mockDiscussionForumClientAsync, mockAuthController, mockEditReplyModal, mockMarkdownWidget, mockGwt, mockCopyTextModal, mockSynapseJavascriptClient, mockClientCache, mockPopupUtils, mockSynapseProperties);
 		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(NON_AUTHOR);
+		when(mockSynapseProperties.getSynapseProperty(WebConstants.FORUM_SYNAPSE_ID_PROPERTY)).thenReturn(FORUM_SYNAPSE_ID);
 		moderatorIds = new HashSet<String>();
 	}
 
@@ -405,6 +410,26 @@ public class ReplyWidgetTest {
 		replyWidget.onClickReplyLink();
 
 		verify(mockCopyTextModal).setText("https://www.synapse.org/#!Synapse:syn007/discussion/threadId=321&replyId=123");
+		verify(mockCopyTextModal).show();
+	}
+	
+	@Test
+	public void testReplyClickedForSynapseForumProject() {
+		boolean isDeleted = false;
+		boolean canModerate = false;
+		boolean isEdited = false;
+		boolean isThreadDeleted = false;
+		String projectId = FORUM_SYNAPSE_ID;
+		String threadId = "321";
+		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey", new Date(), isDeleted, CREATED_BY, isEdited);
+		bundle.setProjectId(projectId);
+		bundle.setThreadId(threadId);
+		replyWidget.configure(bundle, canModerate, moderatorIds, mockDeleteCallback, isThreadDeleted);
+		String hostPageBaseURL = "https://www.synapse.org/";
+		when(mockGwt.getHostPageBaseURL()).thenReturn(hostPageBaseURL);
+		replyWidget.onClickReplyLink();
+
+		verify(mockCopyTextModal).setText("https://www.synapse.org/#!SynapseForum:threadId=321&replyId=123");
 		verify(mockCopyTextModal).show();
 	}
 

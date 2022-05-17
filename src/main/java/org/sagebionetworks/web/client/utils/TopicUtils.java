@@ -39,4 +39,8 @@ public class TopicUtils {
 		String link = "/" + SYNAPSE_ENTITY_PREFIX + place.toToken();
 		return link;
 	}
+	public static String buildSynapseForumReplyLink(String threadId, String replyId) {
+		String link = "/#!SynapseForum:" + THREAD_ID_KEY + "=" + threadId + "&" + REPLY_ID_KEY + "=" + replyId;
+		return link;
+	}
 }
