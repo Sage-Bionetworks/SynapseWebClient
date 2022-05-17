@@ -287,6 +287,7 @@ public class ForumWidget implements ForumWidgetView.Presenter {
 		view.setDefaultThreadWidgetVisible(false);
 		view.setDeletedThreadListVisible(false);
 		view.setSubscribersWidgetVisible(false);
+		view.setForumSearchVisible(false);
 	}
 
 	public void showThread(String threadId, final String replyId) {
@@ -341,12 +342,14 @@ public class ForumWidget implements ForumWidgetView.Presenter {
 		view.setNewThreadButtonVisible(true);
 		view.setMainContainerVisible(true);
 		view.setSubscribersWidgetVisible(true);
+		view.setForumSearchVisible(true);
 		if (!isForumConfigured) {
 			isForumConfigured = true;
 			threadListWidget.clear();
 			threadListWidget.configure(forumId, isCurrentUserModerator, moderatorIds, emptyListCallback, DiscussionFilter.EXCLUDE_DELETED);
 			forumTopic.setObjectId(forumId);
 			forumSubscribersWidget.configure(forumTopic);
+			view.configureForumSearch(forumId, entityId);
 		}
 		updateActionMenuCommands();
 	}
