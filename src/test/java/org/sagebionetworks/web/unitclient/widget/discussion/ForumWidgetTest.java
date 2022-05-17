@@ -261,14 +261,17 @@ public class ForumWidgetTest {
 		inOrder.verify(mockView).setDefaultThreadWidgetVisible(false);
 		inOrder.verify(mockView).setDeletedThreadListVisible(false);
 		inOrder.verify(mockView).setSubscribersWidgetVisible(false);
+		inOrder.verify(mockView).setForumSearchVisible(false);
 		inOrder.verify(mockView).setThreadListUIVisible(true);
 		inOrder.verify(mockView).setMainContainerVisible(true);
 		inOrder.verify(mockView).setSubscribersWidgetVisible(true);
+		inOrder.verify(mockView).setForumSearchVisible(true);
 
 		verify(mockSynapseJavascriptClient).getForumByProjectId(anyString(), any(AsyncCallback.class));
 		verify(mockNewDiscussionThreadModal).configure(anyString(), any(Callback.class));
 		verify(mockAvailableThreadListWidget).clear();
 		verify(mockAvailableThreadListWidget).configure(anyString(), eq(canModerate), eq(moderatorIds), any(CallbackP.class), eq(DiscussionFilter.EXCLUDE_DELETED));
+		verify(mockView).configureForumSearch(anyString(), anyString());
 
 		verify(mockSubscribersWidget).configure(topicCaptor.capture());
 		assertEquals(forumId, topicCaptor.getValue().getObjectId());
