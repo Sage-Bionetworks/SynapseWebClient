@@ -43,7 +43,7 @@ public class HtmlPreviewWidget implements IsWidget, HtmlPreviewView.Presenter {
 	protected PopupUtilsView popupUtils;
 	protected GWTWrapper gwt;
 
-	public static final double MAX_HTML_FILE_SIZE = 40 * MB;
+	public static final double MAX_HTML_FILE_SIZE = 10 * MB;
 	public static String friendlyMaxFileSize = null;
 
 	@Inject

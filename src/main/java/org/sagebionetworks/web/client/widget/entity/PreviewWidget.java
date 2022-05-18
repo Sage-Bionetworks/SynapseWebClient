@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import static org.sagebionetworks.repo.model.util.ContentTypeUtils.isRecognizedCodeFileName;
-import static org.sagebionetworks.web.client.ClientProperties.MB;
 import static org.sagebionetworks.web.client.ContentTypeUtils.isCSV;
 import static org.sagebionetworks.web.client.ContentTypeUtils.isHTML;
 import static org.sagebionetworks.web.client.ContentTypeUtils.isPDF;
@@ -10,8 +9,10 @@ import static org.sagebionetworks.web.client.ContentTypeUtils.isTAB;
 import static org.sagebionetworks.web.client.ContentTypeUtils.isTextType;
 import static org.sagebionetworks.web.client.ContentTypeUtils.isWebRecognizedCodeFileName;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.ArrayList;
 import java.util.Map;
+
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Reference;
@@ -41,6 +42,7 @@ import org.sagebionetworks.web.client.widget.entity.renderer.TIFFPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
+
 import com.google.gwt.event.dom.client.ErrorEvent;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
@@ -60,8 +62,6 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 	public enum PreviewFileType {
 		PLAINTEXT, CODE, ZIP, CSV, IMAGE, NONE, TAB, HTML, PDF, IPYNB, VIDEO, MARKDOWN, TIFF
 	}
-
-	public static final long MAX_HTML_FILE_SIZE = 5 * new Double(MB).longValue();
 
 	PreviewWidgetView view;
 	RequestBuilderWrapper requestBuilder;
@@ -259,14 +259,9 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 				view.setPreviewWidget(videoWidget);
 				break;
 			case HTML:
-				if (fileHandleToShow.getContentSize() != null && fileHandleToShow.getContentSize() < MAX_HTML_FILE_SIZE) {
-					HtmlPreviewWidget htmlPreviewWidget = ginInjector.getHtmlPreviewWidget();
-					htmlPreviewWidget.configure(bundle.getEntity().getId(), fileHandleToShow);
-					view.setPreviewWidget(htmlPreviewWidget);
-				} else {
-					view.showNoPreviewAvailable(bundle.getEntity().getId(), ((FileEntity) bundle.getEntity()).getVersionNumber());
-				}
-
+				HtmlPreviewWidget htmlPreviewWidget = ginInjector.getHtmlPreviewWidget();
+				htmlPreviewWidget.configure(bundle.getEntity().getId(), fileHandleToShow);
+				view.setPreviewWidget(htmlPreviewWidget);
 				break;
 			default:
 				view.showLoading();
