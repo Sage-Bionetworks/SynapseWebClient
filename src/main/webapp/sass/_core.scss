@@ -1572,6 +1572,10 @@ h1, h2, h3, h4, h5, h6 {
 	background-color: #F9F9F9;
 }
 
+.highlight-reply, #rootPanel .highlight-reply {
+     background-color: #fcf7e8;
+     border: #edc766 1px solid;
+ }
 .sidebarMenu { 
 	font-weight: bold; 	
 	-webkit-transition:.2s;
