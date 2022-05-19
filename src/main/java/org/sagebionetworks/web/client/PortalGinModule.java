@@ -47,6 +47,8 @@ import org.sagebionetworks.web.client.view.ComingSoonView;
 import org.sagebionetworks.web.client.view.ComingSoonViewImpl;
 import org.sagebionetworks.web.client.view.DataAccessApprovalTokenView;
 import org.sagebionetworks.web.client.view.DataAccessApprovalTokenViewImpl;
+import org.sagebionetworks.web.client.view.DataAccessManagementView;
+import org.sagebionetworks.web.client.view.DataAccessManagementViewImpl;
 import org.sagebionetworks.web.client.view.DivView;
 import org.sagebionetworks.web.client.view.DivViewImpl;
 import org.sagebionetworks.web.client.view.DownView;
@@ -910,6 +912,9 @@ public class PortalGinModule extends AbstractGinModule {
 
 		// EmailInvitation
 		bind(EmailInvitationView.class).to(EmailInvitationViewImpl.class).in(Singleton.class);
+
+        // DataAccessManagement
+        bind(DataAccessManagementView.class).to(DataAccessManagementViewImpl.class).in(Singleton.class);
 
 		/*
 		 * Widgets
