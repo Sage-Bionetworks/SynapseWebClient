@@ -48,7 +48,7 @@
 					readOnly="true" width="100%"/>
 			</t:TableData>
 			<t:TableData ui:field="modifiedByTableData"
-				addStyleNames="visible-xl overflow-x-hidden min-width-310 max-width-310"  width="310px">
+				addStyleNames="visible-xl overflow-x-hidden min-width-165 max-width-165"  width="165px">
 				<g:SimplePanel ui:field="modifiedByField" />
 			</t:TableData>
 			<t:TableData ui:field="downloadTableData"
