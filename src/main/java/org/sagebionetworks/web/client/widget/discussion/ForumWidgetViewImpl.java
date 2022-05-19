@@ -5,6 +5,9 @@ import org.gwtbootstrap3.client.ui.ButtonGroup;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.jsinterop.ForumSearchProps.OnSearchResultsVisibleHandler;
+
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -48,17 +51,32 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 	Div singleThreadAndSortContainer;
 	@UiField
 	Div actionMenuContainer;
-
+	@UiField
+	Div forumSearchContainer;
+	
+	// flex containers
+	@UiField
+	Div headingFlexContainer;
+	@UiField
+	Div subscribersFlexContainer;
+	@UiField
+	Div forumSearchFlexContainer;
+	@UiField
+	Div subscribeButtonFlexContainer;
+	@UiField
+	Div newThreadButtonFlexContainer;
+	
 	private Presenter presenter;
-
+	private SynapseContextPropsProvider propsProvider;
 	Widget widget;
 
 	public interface Binder extends UiBinder<Widget, ForumWidgetViewImpl> {
 	}
 
 	@Inject
-	public ForumWidgetViewImpl(Binder binder) {
+	public ForumWidgetViewImpl(Binder binder, SynapseContextPropsProvider propsProvider) {
 		widget = binder.createAndBindUi(this);
+		this.propsProvider = propsProvider;
 		newThreadButton.addClickHandler(event -> {
 			presenter.onClickNewThread();
 		});
@@ -82,6 +100,24 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 		sortRepliesDescendingButton.setActive(false);
 	}
 
+	private void setSearchResultsVisible(boolean searchResultsVisible) {
+		headingFlexContainer.setVisible(!searchResultsVisible);
+		subscribersFlexContainer.setVisible(!searchResultsVisible);
+		subscribeButtonFlexContainer.setVisible(!searchResultsVisible);
+		newThreadButtonFlexContainer.setVisible(!searchResultsVisible);
+		actionMenuContainer.setVisible(!searchResultsVisible);
+		mainContainer.setVisible(!searchResultsVisible);
+		
+		if (searchResultsVisible) {
+			forumSearchFlexContainer.addStyleName("flexcontainer-column-fill-width");
+			forumSearchFlexContainer.removeStyleName("flexcontainer-align-items-flex-end");
+		} else {
+			forumSearchFlexContainer.removeStyleName("flexcontainer-column-fill-width");
+			forumSearchFlexContainer.addStyleName("flexcontainer-align-items-flex-end");
+		}
+	}
+
+	
 	@Override
 	public void setSingleThread(Widget w) {
 		singleThreadContainer.setWidget(w);
@@ -201,5 +237,23 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 		w.asWidget().removeFromParent();
 		actionMenuContainer.clear();
 		actionMenuContainer.add(w);
+	}
+	
+	@Override
+	public void setForumSearchVisible(boolean visible) {
+		forumSearchContainer.setVisible(visible);
+		if (!visible) {
+			setSearchResultsVisible(false);
+		}
+	}
+	
+	@Override
+	public void configureForumSearch(String forumId, String projectId) {
+		OnSearchResultsVisibleHandler onSearchUIVisible = visible -> {
+			setSearchResultsVisible(visible);
+		};
+		ForumSearchWrapper widget = new ForumSearchWrapper(propsProvider, forumId, projectId, onSearchUIVisible);
+		forumSearchContainer.clear();
+		forumSearchContainer.add(widget);	
 	}
 }
