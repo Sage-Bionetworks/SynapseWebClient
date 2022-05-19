@@ -35,6 +35,7 @@ import org.sagebionetworks.web.client.widget.accessrequirements.ReviewAccessorsB
 import org.sagebionetworks.web.client.widget.accessrequirements.SelfSignAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.SelfSignAccessRequirementWidgetView;
 import org.sagebionetworks.web.client.widget.accessrequirements.SubjectsWidget;
+import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
@@ -90,6 +91,8 @@ public class SelfSignAccessRequirementWidgetTest {
 	@Mock
 	Callback mockRefreshCallback;
 	Callback lazyLoadDataCallback;
+	@Mock
+	IsACTMemberAsyncHandler mockIsACTMemberAsyncHandler;
 
 	public final static String ROOT_WIKI_ID = "777";
 	public final static String CURRENT_USER_ID = "6823";
@@ -99,7 +102,7 @@ public class SelfSignAccessRequirementWidgetTest {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		widget = new SelfSignAccessRequirementWidget(mockView, mockAuthController, mockDataAccessClient, mockSynapseClient, mockWikiPageWidget, mockSynAlert, mockSubjectsWidget, mockCreateAccessRequirementButton, mockDeleteAccessRequirementButton, mockLazyLoadHelper, mockManageAccessButton, mockPopupUtils, mockSynapseJavascriptClient);
+		widget = new SelfSignAccessRequirementWidget(mockView, mockAuthController, mockDataAccessClient, mockSynapseClient, mockWikiPageWidget, mockSynAlert, mockSubjectsWidget, mockCreateAccessRequirementButton, mockDeleteAccessRequirementButton, mockLazyLoadHelper, mockManageAccessButton, mockPopupUtils, mockSynapseJavascriptClient, mockIsACTMemberAsyncHandler);
 		when(mockAccessRequirement.getId()).thenReturn(AR_ID);
 		when(mockAccessRequirement.getVersionNumber()).thenReturn(AR_VERSION);
 		when(mockAccessRequirement.getSubjectIds()).thenReturn(mockSubjectIds);

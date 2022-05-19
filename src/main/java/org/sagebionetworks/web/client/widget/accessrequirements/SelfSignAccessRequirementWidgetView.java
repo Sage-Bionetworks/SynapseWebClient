@@ -41,6 +41,9 @@ public interface SelfSignAccessRequirementWidgetView extends IsWidget, SupportsL
 
 	void hideControls();
 
+	void setAccessRequirementID(String arID);
+	void setAccessRequirementIDVisible(boolean visible);
+
 	/**
 	 * Presenter interface
 	 */

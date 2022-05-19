@@ -15,6 +15,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
@@ -44,9 +45,10 @@ public class SelfSignAccessRequirementWidget implements SelfSignAccessRequiremen
 	ReviewAccessorsButton manageAccessButton;
 	Callback refreshCallback;
 	SynapseJavascriptClient jsClient;
+	IsACTMemberAsyncHandler isACTMemberAsyncHandler;
 
 	@Inject
-	public SelfSignAccessRequirementWidget(SelfSignAccessRequirementWidgetView view, AuthenticationController authController, DataAccessClientAsync dataAccessClient, SynapseClientAsync synapseClient, WikiPageWidget wikiPageWidget, SynapseAlert synAlert, SubjectsWidget subjectsWidget, CreateAccessRequirementButton createAccessRequirementButton, DeleteAccessRequirementButton deleteAccessRequirementButton, LazyLoadHelper lazyLoadHelper, ReviewAccessorsButton manageAccessButton, PopupUtilsView popupUtils, SynapseJavascriptClient jsClient) {
+	public SelfSignAccessRequirementWidget(SelfSignAccessRequirementWidgetView view, AuthenticationController authController, DataAccessClientAsync dataAccessClient, SynapseClientAsync synapseClient, WikiPageWidget wikiPageWidget, SynapseAlert synAlert, SubjectsWidget subjectsWidget, CreateAccessRequirementButton createAccessRequirementButton, DeleteAccessRequirementButton deleteAccessRequirementButton, LazyLoadHelper lazyLoadHelper, ReviewAccessorsButton manageAccessButton, PopupUtilsView popupUtils, SynapseJavascriptClient jsClient, IsACTMemberAsyncHandler isACTMemberAsyncHandler) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
@@ -62,6 +64,7 @@ public class SelfSignAccessRequirementWidget implements SelfSignAccessRequiremen
 		this.manageAccessButton = manageAccessButton;
 		this.popupUtils = popupUtils;
 		this.jsClient = jsClient;
+		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
 		wikiPageWidget.setModifiedCreatedByHistoryVisible(false);
 		view.setPresenter(this);
 		view.setWikiTermsWidget(wikiPageWidget.asWidget());
@@ -103,6 +106,10 @@ public class SelfSignAccessRequirementWidget implements SelfSignAccessRequiremen
 		subjectsWidget.configure(ar.getSubjectIds());
 		manageAccessButton.configure(ar);
 		lazyLoadHelper.setIsConfigured();
+		view.setAccessRequirementID(ar.getId().toString());
+		isACTMemberAsyncHandler.isACTActionAvailable(isACT -> {
+			view.setAccessRequirementIDVisible(isACT);
+		});
 	}
 
 	public void setDataAccessSubmissionStatus(BasicAccessRequirementStatus status) {
