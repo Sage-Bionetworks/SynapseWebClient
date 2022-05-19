@@ -19,7 +19,7 @@ import com.google.inject.Inject;
 
 public class TeamMembersWidget implements WidgetRendererPresenter, PageChangeListener {
 
-	private TeamMembersWidgetView view;
+	private UserListView view;
 	private Map<String, String> descriptor;
 	private SynapseJavascriptClient jsClient;
 	private String teamId;
@@ -30,7 +30,7 @@ public class TeamMembersWidget implements WidgetRendererPresenter, PageChangeLis
 	public static final Long DEFAULT_OFFSET = 0L;
 
 	@Inject
-	public TeamMembersWidget(TeamMembersWidgetView view, BasicPaginationWidget paginationWidget, SynapseJavascriptClient jsClient, SynapseAlert synAlert, PortalGinInjector ginInjector) {
+	public TeamMembersWidget(UserListView view, BasicPaginationWidget paginationWidget, SynapseJavascriptClient jsClient, SynapseAlert synAlert, PortalGinInjector ginInjector) {
 		this.view = view;
 		this.paginationWidget = paginationWidget;
 		this.jsClient = jsClient;
@@ -65,7 +65,7 @@ public class TeamMembersWidget implements WidgetRendererPresenter, PageChangeLis
 				long rowCount = new Integer(results.getResults().size()).longValue();
 				paginationWidget.configure(DEFAULT_USER_LIMIT, newOffset, rowCount, TeamMembersWidget.this);
 				for (TeamMemberBundle bundle : results.getResults()) {
-					TeamMemberRowWidget row = ginInjector.getTeamMemberRowWidget();
+					UserListRowWidget row = ginInjector.getUserListRowWidget();
 					row.configure(bundle.getUserProfile());
 					view.addRow(row);
 				}
