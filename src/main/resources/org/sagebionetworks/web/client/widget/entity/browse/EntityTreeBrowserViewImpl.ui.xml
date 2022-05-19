@@ -58,7 +58,7 @@
 					<bh:Span text="MD5" />
 				</t:TableHeader>
 				<t:TableHeader ui:field="modifiedByColumnHeader"
-					addStyleNames="visible-xl min-width-310" width="310px">
+					addStyleNames="visible-xl min-width-165" width="165px">
 					<bh:Span text="Modified By" />
 				</t:TableHeader>
 				<t:TableHeader ui:field="downloadColumnHeader"
