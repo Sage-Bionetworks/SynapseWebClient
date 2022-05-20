@@ -4,6 +4,7 @@ import org.sagebionetworks.web.client.presenter.DataAccessManagementPresenter;
 import org.sagebionetworks.web.client.widget.header.Header;
 
 import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -26,7 +27,9 @@ public class DataAccessManagementViewImpl implements DataAccessManagementView {
     @Override
     public void setPresenter(DataAccessManagementPresenter presenter) {
         this.presenter = presenter;
+        headerWidget.configure();
         headerWidget.refresh();
+        Window.scrollTo(0,0);
     }
 
     @Override

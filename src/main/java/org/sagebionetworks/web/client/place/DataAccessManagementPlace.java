@@ -1,18 +1,13 @@
 package org.sagebionetworks.web.client.place;
 
-import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceTokenizer;
 import com.google.gwt.place.shared.Prefix;
 
-public class DataAccessManagementPlace extends Place {
+public class DataAccessManagementPlace extends ParameterizedPlace {
 
-    private String token;
+    public static final String ID_PARAM = "ID";
     public DataAccessManagementPlace(String token) {
-        this.token = token;
-    }
-
-    public String toToken() {
-        return token;
+        super(token);
     }
 
     @Prefix("!DataAccessManagement")

@@ -13,22 +13,25 @@ public class DataAccessManagementPresenter extends AbstractActivity implements P
 
     private GlobalApplicationState globalApplicationState;
     private DataAccessManagementView view;
+    private DataAccessManagementPlace place;
 
     @Inject
     public DataAccessManagementPresenter(DataAccessManagementView view, GlobalApplicationState globalApplicationState) {
         this.view = view;
         this.globalApplicationState = globalApplicationState;
-        this.view.setPresenter(this);
-
     }
 
     @Override
-    public void setPlace(DataAccessManagementPlace place) {this.view.setPresenter(this);}
+    public void setPlace(DataAccessManagementPlace place) {
+        this.place = place;
+        String id = place.getParam(DataAccessManagementPlace.ID_PARAM);
+        this.view.setPresenter(this);
+    }
 
     @Override
     public void start(AcceptsOneWidget panel, EventBus eventBus) {
-        this.view.render();
-        panel.setWidget(view.asWidget());
+//        this.view.render();
+        panel.setWidget(view);
     }
 
 }

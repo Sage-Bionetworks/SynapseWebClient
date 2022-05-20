@@ -6,5 +6,6 @@
     <bh:Div width="500px" addStyleNames="center-in-div">
         <b:Heading size="H2" text="Data Access Management"
                    addStyleNames="text-align-center margin-top-20" />
+        <bh:Text>Placeholding text</bh:Text>
     </bh:Div>
 </ui:UiBinder>
