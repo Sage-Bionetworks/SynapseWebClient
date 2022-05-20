@@ -5,7 +5,6 @@ import com.google.gwt.place.shared.Prefix;
 
 public class DataAccessManagementPlace extends ParameterizedPlace {
 
-    public static final String ID_PARAM = "ID";
     public DataAccessManagementPlace(String token) {
         super(token);
     }

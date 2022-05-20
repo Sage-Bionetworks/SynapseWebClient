@@ -27,7 +27,6 @@ public class DataAccessManagementPresenter extends AbstractActivity implements P
     @Override
     public void setPlace(DataAccessManagementPlace place) {
         this.place = place;
-        String id = place.getParam(DataAccessManagementPlace.ID_PARAM);
         this.view.setPresenter(this);
     }
 
