@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -44,6 +45,10 @@ public class SelfSignAccessRequirementWidgetViewImpl implements SelfSignAccessRe
 	Div manageAccessContainer;
 	@UiField
 	Alert approvedAlert;
+	@UiField
+	InlineLabel accessRequirementIDField;
+	@UiField
+	Div accessRequirementIDUI;
 	@UiField
 	Div controlsContainer;
 	Callback onAttachCallback;
@@ -184,5 +189,15 @@ public class SelfSignAccessRequirementWidgetViewImpl implements SelfSignAccessRe
 	@Override
 	public void hideControls() {
 		controlsContainer.setVisible(false);
+	}
+
+	@Override
+	public void setAccessRequirementID(String arID) {
+		accessRequirementIDField.setText(arID);
+	}
+
+	@Override
+	public void setAccessRequirementIDVisible(boolean visible) {
+		accessRequirementIDUI.setVisible(visible);
 	}
 }
