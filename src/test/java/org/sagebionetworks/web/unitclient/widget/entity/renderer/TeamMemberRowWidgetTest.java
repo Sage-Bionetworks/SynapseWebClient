@@ -2,26 +2,26 @@ package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.web.client.widget.entity.renderer.TeamMemberRowWidget.SYNAPSE_ORG;
+import static org.sagebionetworks.web.client.widget.entity.renderer.UserListRowWidget.SYNAPSE_ORG;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.widget.entity.renderer.TeamMemberRowWidget;
-import org.sagebionetworks.web.client.widget.entity.renderer.TeamMemberRowWidgetView;
+import org.sagebionetworks.web.client.widget.entity.renderer.UserListRowWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.UserListRowWidgetView;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 public class TeamMemberRowWidgetTest {
 
 	@Mock
-	TeamMemberRowWidgetView mockView;
+	UserListRowWidgetView mockView;
 	@Mock
 	UserBadge mockUserBadge;
 
-	TeamMemberRowWidget widget;
+	UserListRowWidget widget;
 	@Mock
 	UserProfile mockProfile;
 
@@ -31,7 +31,7 @@ public class TeamMemberRowWidgetTest {
 	@Before
 	public void before() throws RestServiceException, JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
-		widget = new TeamMemberRowWidget(mockView, mockUserBadge);
+		widget = new UserListRowWidget(mockView, mockUserBadge);
 		when(mockProfile.getCompany()).thenReturn(COMPANY);
 		when(mockProfile.getUserName()).thenReturn(USERNAME);
 	}

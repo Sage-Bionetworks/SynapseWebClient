@@ -1,46 +1,55 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.Map;
+
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
-import org.sagebionetworks.web.client.widget.pagination.countbased.BasicPaginationWidget;
 import org.sagebionetworks.web.shared.UserProfilePagedResults;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class ChallengeParticipantsWidget implements UserListView.Presenter, WidgetRendererPresenter, PageChangeListener {
+public class ChallengeParticipantsWidget implements WidgetRendererPresenter, PageChangeListener {
 
+	public static final String NO_CHALLENGE_PARTICIPANTS_FOUND_MESSAGE = "No challenge participants found.";
 	private UserListView view;
 	private Map<String, String> descriptor;
 	private ChallengeClientAsync challengeClient;
 	private String challengeId;
 	private boolean isInTeam;
-	private Callback widgetRefreshRequired;
 	private BasicPaginationWidget paginationWidget;
+	private PortalGinInjector ginInjector;
+	private SynapseAlert synAlert;
 	public static final Long DEFAULT_PARTICIPANT_LIMIT = 50L;
 	public static final Long DEFAULT_OFFSET = 0L;
 
 	@Inject
-	public ChallengeParticipantsWidget(UserListView view, BasicPaginationWidget paginationWidget, ChallengeClientAsync synapseClient) {
+	public ChallengeParticipantsWidget(UserListView view, BasicPaginationWidget paginationWidget, ChallengeClientAsync synapseClient, SynapseAlert synAlert, PortalGinInjector ginInjector) {
 		this.view = view;
 		this.paginationWidget = paginationWidget;
 		this.challengeClient = synapseClient;
+		this.synAlert = synAlert;
+		this.ginInjector = ginInjector;
 		fixServiceEntryPoint(challengeClient);
 		view.setPaginationWidget(paginationWidget.asWidget());
-		view.setPresenter(this);
+		view.setPaginationWidget(paginationWidget);
+		view.setSynapseAlert(synAlert);
 	}
 
 	@Override
 	public void configure(final WikiPageKey wikiKey, final Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
 		this.descriptor = widgetDescriptor;
-		this.widgetRefreshRequired = widgetRefreshRequired;
 		challengeId = descriptor.get(WidgetConstants.CHALLENGE_ID_KEY);
 		isInTeam = false;
 		String isInTeamString = descriptor.get(WidgetConstants.IS_IN_CHALLENGE_TEAM_KEY);
@@ -49,7 +58,7 @@ public class ChallengeParticipantsWidget implements UserListView.Presenter, Widg
 		}
 		descriptor = widgetDescriptor;
 		if (challengeId == null) {
-			view.showErrorMessage(WidgetConstants.CHALLENGE_ID_KEY + " is required.");
+			synAlert.showError(WidgetConstants.CHALLENGE_ID_KEY + " is required.");
 		} else {
 			// get the challenge team summaries
 			onPageChange(DEFAULT_OFFSET);
@@ -58,28 +67,30 @@ public class ChallengeParticipantsWidget implements UserListView.Presenter, Widg
 
 	@Override
 	public void onPageChange(final Long newOffset) {
-		view.hideErrors();
-		view.showLoading();
-		view.clearUsers();
+		synAlert.clear();
+		view.clearRows();
+		view.setLoadingVisible(true);
 		challengeClient.getChallengeParticipants(isInTeam, challengeId, DEFAULT_PARTICIPANT_LIMIT.intValue(), newOffset.intValue(), new AsyncCallback<UserProfilePagedResults>() {
 			@Override
 			public void onSuccess(UserProfilePagedResults results) {
-				view.hideLoading();
+				view.setLoadingVisible(false);
 				if (results.getTotalNumberOfResults() > 0) {
 					// configure the pager, and the participant list
 					paginationWidget.configure(DEFAULT_PARTICIPANT_LIMIT, newOffset, results.getTotalNumberOfResults(), ChallengeParticipantsWidget.this);
 					for (UserProfile userProfile : results.getResults()) {
-						view.addUser(userProfile);
+						UserListRowWidget row = ginInjector.getUserListRowWidget();
+						row.configure(userProfile);
+						view.addRow(row);
 					}
 				} else {
-					view.showNoUsers();
+					synAlert.showError(NO_CHALLENGE_PARTICIPANTS_FOUND_MESSAGE);
 				}
 			}
 
 			@Override
 			public void onFailure(Throwable caught) {
-				view.hideLoading();
-				view.showErrorMessage(caught.getMessage());
+				view.setLoadingVisible(false);
+				synAlert.handleException(caught);
 			}
 		});
 	}

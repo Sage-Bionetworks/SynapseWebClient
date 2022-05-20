@@ -7,7 +7,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class TeamMemberRowWidgetViewImpl implements TeamMemberRowWidgetView {
+public class UserListRowWidgetViewImpl implements UserListRowWidgetView {
 	@UiField
 	Span userBadgeContainer;
 	@UiField
@@ -17,11 +17,11 @@ public class TeamMemberRowWidgetViewImpl implements TeamMemberRowWidgetView {
 
 	private Widget widget;
 
-	public interface Binder extends UiBinder<Widget, TeamMemberRowWidgetViewImpl> {
+	public interface Binder extends UiBinder<Widget, UserListRowWidgetViewImpl> {
 	}
 
 	@Inject
-	public TeamMemberRowWidgetViewImpl(Binder binder) {
+	public UserListRowWidgetViewImpl(Binder binder) {
 		this.widget = binder.createAndBindUi(this);
 	}
 

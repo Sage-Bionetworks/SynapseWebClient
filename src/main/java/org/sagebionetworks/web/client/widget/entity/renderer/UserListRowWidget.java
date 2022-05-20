@@ -6,14 +6,14 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class TeamMemberRowWidget implements IsWidget {
+public class UserListRowWidget implements IsWidget {
 
 	public static final String SYNAPSE_ORG = "@synapse.org";
-	private TeamMemberRowWidgetView view;
+	private UserListRowWidgetView view;
 	private UserBadge userBadge;
 
 	@Inject
-	public TeamMemberRowWidget(TeamMemberRowWidgetView view, UserBadge userBadge) {
+	public UserListRowWidget(UserListRowWidgetView view, UserBadge userBadge) {
 		this.view = view;
 		this.userBadge = userBadge;
 		view.setUserBadge(userBadge);
