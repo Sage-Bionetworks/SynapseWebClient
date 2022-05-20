@@ -472,23 +472,12 @@ public class PreviewWidgetTest {
 	}
 
 	public void testGetHtml() {
-		mainFileHandle.setContentSize(PreviewWidget.MAX_HTML_FILE_SIZE - 1);
 		mainFileHandle.setContentType("text/html");
 		mainFileHandle.setFileName("test.html");
 		previewWidget.configure(testBundle);
 
 		verify(mockHtmlPreviewWidget).configure(TEST_ENTITY_ID, mainFileHandle);
 		verify(mockView).setPreviewWidget(mockHtmlPreviewWidget);
-	}
-
-	@Test
-	public void testGetLargeHtml() {
-		mainFileHandle.setContentSize(PreviewWidget.MAX_HTML_FILE_SIZE);
-		mainFileHandle.setContentType("text/html");
-		mainFileHandle.setFileName("test.html");
-		previewWidget.configure(testBundle);
-
-		verify(mockView).showNoPreviewAvailable(TEST_ENTITY_ID, TEST_ENTITY_VERSION_NUMBER);
 	}
 
 	@Test
