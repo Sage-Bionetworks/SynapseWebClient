@@ -176,7 +176,7 @@ import org.sagebionetworks.web.client.widget.entity.renderer.SynapseTableFormWid
 import org.sagebionetworks.web.client.widget.entity.renderer.TIFFPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.TeamMemberCountWidget;
-import org.sagebionetworks.web.client.widget.entity.renderer.TeamMemberRowWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.UserListRowWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.TeamMembersWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiFilesPreviewWidget;
@@ -797,7 +797,7 @@ public interface PortalGinInjector extends Ginjector {
 
 	SubjectWidget getSubjectWidget();
 
-	TeamMemberRowWidget getTeamMemberRowWidget();
+	UserListRowWidget getUserListRowWidget();
 
 	RequestBuilderWrapper getRequestBuilder();
 

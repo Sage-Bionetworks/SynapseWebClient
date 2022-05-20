@@ -105,11 +105,11 @@ public class SelfSignAccessRequirementWidget implements SelfSignAccessRequiremen
 		deleteAccessRequirementButton.configure(ar, refreshCallback);
 		subjectsWidget.configure(ar.getSubjectIds());
 		manageAccessButton.configure(ar);
-		lazyLoadHelper.setIsConfigured();
 		view.setAccessRequirementID(ar.getId().toString());
 		isACTMemberAsyncHandler.isACTActionAvailable(isACT -> {
 			view.setAccessRequirementIDVisible(isACT);
 		});
+		lazyLoadHelper.setIsConfigured();
 	}
 
 	public void setDataAccessSubmissionStatus(BasicAccessRequirementStatus status) {
