@@ -11,14 +11,17 @@ import com.google.inject.Inject;
 
 public class DataAccessManagementPresenter extends AbstractActivity implements Presenter<DataAccessManagementPlace> {
 
-    private GlobalApplicationState globalApplicationState;
     private DataAccessManagementView view;
     private DataAccessManagementPlace place;
 
     @Inject
     public DataAccessManagementPresenter(DataAccessManagementView view, GlobalApplicationState globalApplicationState) {
         this.view = view;
-        this.globalApplicationState = globalApplicationState;
+    }
+
+    @Override
+    public void start(AcceptsOneWidget panel, EventBus eventBus) {
+        panel.setWidget(view);
     }
 
     @Override
@@ -28,10 +31,11 @@ public class DataAccessManagementPresenter extends AbstractActivity implements P
         this.view.setPresenter(this);
     }
 
+    public DataAccessManagementPlace getPlace() { return place; }
+
     @Override
-    public void start(AcceptsOneWidget panel, EventBus eventBus) {
-//        this.view.render();
-        panel.setWidget(view);
+    public String mayStop() {
+        return null;
     }
 
 }
