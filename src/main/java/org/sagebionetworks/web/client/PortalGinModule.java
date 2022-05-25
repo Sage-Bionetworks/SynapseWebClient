@@ -47,6 +47,8 @@ import org.sagebionetworks.web.client.view.ComingSoonView;
 import org.sagebionetworks.web.client.view.ComingSoonViewImpl;
 import org.sagebionetworks.web.client.view.DataAccessApprovalTokenView;
 import org.sagebionetworks.web.client.view.DataAccessApprovalTokenViewImpl;
+import org.sagebionetworks.web.client.view.DataAccessManagementView;
+import org.sagebionetworks.web.client.view.DataAccessManagementViewImpl;
 import org.sagebionetworks.web.client.view.DivView;
 import org.sagebionetworks.web.client.view.DivViewImpl;
 import org.sagebionetworks.web.client.view.DownView;
@@ -478,10 +480,8 @@ import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidg
 import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.TeamMemberCountView;
 import org.sagebionetworks.web.client.widget.entity.renderer.TeamMemberCountViewImpl;
-import org.sagebionetworks.web.client.widget.entity.renderer.TeamMemberRowWidgetView;
-import org.sagebionetworks.web.client.widget.entity.renderer.TeamMemberRowWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.entity.renderer.TeamMembersWidgetView;
-import org.sagebionetworks.web.client.widget.entity.renderer.TeamMembersWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.UserListRowWidgetView;
+import org.sagebionetworks.web.client.widget.entity.renderer.UserListRowWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.UserListView;
 import org.sagebionetworks.web.client.widget.entity.renderer.UserListViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidgetView;
@@ -911,6 +911,9 @@ public class PortalGinModule extends AbstractGinModule {
 		// EmailInvitation
 		bind(EmailInvitationView.class).to(EmailInvitationViewImpl.class).in(Singleton.class);
 
+        // DataAccessManagement
+        bind(DataAccessManagementView.class).to(DataAccessManagementViewImpl.class).in(Singleton.class);
+
 		/*
 		 * Widgets
 		 */
@@ -1243,8 +1246,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(TableQueryResultWikiWidgetView.class).to(TableQueryResultWikiWidgetViewImpl.class);
 
 		bind(SingleButtonView.class).to(SingleButtonViewImpl.class);
-		bind(UserListView.class).to(UserListViewImpl.class);
-
+		
 		bind(AnnotationTransformer.class).to(AnnotationTransformerImpl.class).in(Singleton.class);
 		bind(AnnotationEditorView.class).to(AnnotationEditorViewImpl.class);
 		bind(EditAnnotationsDialogView.class).to(EditAnnotationsDialogViewImpl.class);
@@ -1405,8 +1407,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(SelfSignAccessRequirementWidgetView.class).to(SelfSignAccessRequirementWidgetViewImpl.class);
 		bind(SubjectWidgetView.class).to(SubjectWidgetViewImpl.class);
 		bind(AwsLoginView.class).to(AwsLoginViewImpl.class);
-		bind(TeamMemberRowWidgetView.class).to(TeamMemberRowWidgetViewImpl.class);
-		bind(TeamMembersWidgetView.class).to(TeamMembersWidgetViewImpl.class);
+		bind(UserListRowWidgetView.class).to(UserListRowWidgetViewImpl.class);
+		bind(UserListView.class).to(UserListViewImpl.class);
 		bind(FileViewClientsHelp.class).to(FileViewClientsHelpImpl.class);
 		bind(EmailAddressesWidgetView.class).to(EmailAddressesWidgetViewImpl.class);
 		bind(SRCDemoWidgetView.class).to(SRCDemoWidgetViewImpl.class);

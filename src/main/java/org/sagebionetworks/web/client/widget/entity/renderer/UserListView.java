@@ -1,36 +1,15 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
-import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.web.client.SynapseView;
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Widget;
 
-public interface UserListView extends IsWidget, SynapseView {
+public interface UserListView extends IsWidget {
+	void clearRows();
 
-	interface Presenter {
-	}
+	void addRow(IsWidget w);
 
-	/**
-	 * Set the pagination widget
-	 * 
-	 * @param string
-	 */
-	void setPaginationWidget(Widget paginationWidget);
+	void setPaginationWidget(IsWidget w);
 
-	void clearUsers();
+	void setSynapseAlert(IsWidget w);
 
-	void addUser(UserProfile profile);
-
-	void showNoUsers();
-
-	void hideErrors();
-
-	void hideLoading();
-
-	/**
-	 * Bind this view to its presenter.
-	 * 
-	 * @param presenter
-	 */
-	public void setPresenter(Presenter presenter);
+	void setLoadingVisible(boolean visible);
 }

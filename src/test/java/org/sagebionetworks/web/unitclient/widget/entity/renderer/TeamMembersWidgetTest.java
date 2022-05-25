@@ -23,9 +23,9 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.entity.renderer.TeamMemberRowWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.UserListRowWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.TeamMembersWidget;
-import org.sagebionetworks.web.client.widget.entity.renderer.TeamMembersWidgetView;
+import org.sagebionetworks.web.client.widget.entity.renderer.UserListView;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
 import org.sagebionetworks.web.shared.TeamMemberBundle;
 import org.sagebionetworks.web.shared.TeamMemberPagedResults;
@@ -38,7 +38,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public class TeamMembersWidgetTest {
 
 	@Mock
-	TeamMembersWidgetView mockView;
+	UserListView mockView;
 	@Mock
 	BasicPaginationWidget mockPaginationWidget;
 	@Mock
@@ -48,7 +48,7 @@ public class TeamMembersWidgetTest {
 	@Mock
 	PortalGinInjector mockGinInjector;
 	@Mock
-	TeamMemberRowWidget mockRow;
+	UserListRowWidget mockRow;
 
 	TeamMembersWidget widget;
 	Map<String, String> descriptor;
@@ -62,7 +62,7 @@ public class TeamMembersWidgetTest {
 		widget = new TeamMembersWidget(mockView, mockPaginationWidget, mockJsClient, mockSynAlert, mockGinInjector);
 		descriptor = new HashMap<String, String>();
 		descriptor.put(WidgetConstants.TEAM_ID_KEY, TEAM_ID);
-		when(mockGinInjector.getTeamMemberRowWidget()).thenReturn(mockRow);
+		when(mockGinInjector.getUserListRowWidget()).thenReturn(mockRow);
 		AsyncMockStubber.callSuccessWith(getTestUserProfilePagedResults()).when(mockJsClient).getTeamMembers(anyString(), anyString(), any(TeamMemberTypeFilterOptions.class), anyInt(), anyInt(), any(AsyncCallback.class));
 	}
 

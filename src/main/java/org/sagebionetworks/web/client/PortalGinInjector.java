@@ -14,6 +14,7 @@ import org.sagebionetworks.web.client.presenter.ChallengeOverviewPresenter;
 import org.sagebionetworks.web.client.presenter.ChangeUsernamePresenter;
 import org.sagebionetworks.web.client.presenter.ComingSoonPresenter;
 import org.sagebionetworks.web.client.presenter.DataAccessApprovalTokenPresenter;
+import org.sagebionetworks.web.client.presenter.DataAccessManagementPresenter;
 import org.sagebionetworks.web.client.presenter.DownPresenter;
 import org.sagebionetworks.web.client.presenter.DownloadCartPresenter;
 import org.sagebionetworks.web.client.presenter.EmailInvitationPresenter;
@@ -175,7 +176,7 @@ import org.sagebionetworks.web.client.widget.entity.renderer.SynapseTableFormWid
 import org.sagebionetworks.web.client.widget.entity.renderer.TIFFPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.TeamMemberCountWidget;
-import org.sagebionetworks.web.client.widget.entity.renderer.TeamMemberRowWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.UserListRowWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.TeamMembersWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiFilesPreviewWidget;
@@ -376,6 +377,8 @@ public interface PortalGinInjector extends Ginjector {
 
 	EmailInvitationPresenter getEmailInvitationPresenter();
 	DataAccessApprovalTokenPresenter getDataAccessApprovalTokenPresenter();
+
+	DataAccessManagementPresenter getDataAccessManagementPresenter();
 
 	/*
 	 * Markdown Widgets
@@ -794,7 +797,7 @@ public interface PortalGinInjector extends Ginjector {
 
 	SubjectWidget getSubjectWidget();
 
-	TeamMemberRowWidget getTeamMemberRowWidget();
+	UserListRowWidget getUserListRowWidget();
 
 	RequestBuilderWrapper getRequestBuilder();
 
