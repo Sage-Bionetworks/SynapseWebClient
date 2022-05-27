@@ -37,6 +37,9 @@ public class QueryWrapperPlotNavProps extends ReactComponentProps {
 	@JsNullable
 	SynapseTableProps tableConfiguration;
 
+	@JsNullable
+	boolean defaultShowFacetVisualization;
+
 	boolean showLastUpdatedOn;
 
 	@JsOverlay
@@ -53,6 +56,8 @@ public class QueryWrapperPlotNavProps extends ReactComponentProps {
 		props.name = "Items";
 		props.downloadCartPageUrl = "#!DownloadCart:0";
 		props.showLastUpdatedOn = true;
+		// SWC-6138 - hide charts by default
+		props.defaultShowFacetVisualization = false;
 		return props;
 	}
 }
