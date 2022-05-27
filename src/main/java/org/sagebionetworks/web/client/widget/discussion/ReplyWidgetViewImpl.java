@@ -18,7 +18,8 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 
 	public interface Binder extends UiBinder<Widget, ReplyWidgetViewImpl> {
 	}
-
+	@UiField
+	Div replyContainer;
 	@UiField
 	Span author;
 	@UiField
@@ -159,5 +160,10 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 	public void setCopyTextModal(Widget widget) {
 		copyTextModalContainer.clear();
 		copyTextModalContainer.add(widget);
+	}
+
+	@Override
+	public void addStyleName(String style) {
+		replyContainer.addStyleName(style);
 	}
 }

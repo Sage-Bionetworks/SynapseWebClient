@@ -1168,6 +1168,10 @@ h6 .wide {
 	background-color: #fff;	
 }
 
+.highlight-reply {
+     background-color: #fcf7e8;
+     border: #edc766 1px solid;
+ }
 
 .portal  .x-portal {
 	 padding: 0px 0px 0px 0px;	 

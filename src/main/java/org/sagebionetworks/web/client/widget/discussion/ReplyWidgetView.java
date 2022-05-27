@@ -4,7 +4,6 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 public interface ReplyWidgetView extends IsWidget {
-
 	public interface Presenter {
 
 		Widget asWidget();
@@ -47,4 +46,6 @@ public interface ReplyWidgetView extends IsWidget {
 	void setCommandsContainerVisible(boolean visible);
 
 	void setCopyTextModal(Widget widget);
+
+	void addStyleName(String style);
 }

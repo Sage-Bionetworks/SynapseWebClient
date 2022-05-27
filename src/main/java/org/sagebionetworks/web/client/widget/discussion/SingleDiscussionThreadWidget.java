@@ -447,6 +447,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 			public void onSuccess(DiscussionReplyBundle bundle) {
 				ReplyWidget replyWidget = ginInjector.createReplyWidget();
 				replyWidget.configure(bundle, isCurrentUserModerator, moderatorIds, refreshCallback, isThreadDeleted);
+				replyWidget.addStyleName("highlight-reply");
 				repliesContainer.add(replyWidget.asWidget());
 			}
 		});

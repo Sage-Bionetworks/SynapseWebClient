@@ -5,7 +5,7 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
-	<bh:Div
+	<bh:Div ui:field="replyContainer"
 		addStyleNames="discussionReply light-border lightGreyBackground padding-5 margin-bottom-5 margin-left-30">
 		<bh:Div addStyleNames="flexcontainer-row flexcontainer-align-items-center">
 			<bh:Span ui:field="author"></bh:Span>
