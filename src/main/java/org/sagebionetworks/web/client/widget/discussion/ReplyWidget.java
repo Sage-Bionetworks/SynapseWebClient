@@ -177,6 +177,10 @@ public class ReplyWidget implements ReplyWidgetView.Presenter {
 		clientCache.put(messageKey + WebConstants.MESSAGE_SUFFIX, message);
 	}
 
+	public void addStyleName(String style) {
+		view.addStyleName(style);
+	}
+
 	private void configureEditReplyModal(String message) {
 		editReplyModal.configure(replyId, message, new Callback() {
 
