@@ -365,6 +365,7 @@ public class EntityActionControllerImplTest {
 		CallbackMockStubber.invokeCallback().when(mockGWT).scheduleExecution(any(Callback.class), anyInt());
 
 		when(mockPromptModalConfigurationBuilder.buildConfiguration()).thenReturn(mockPromptModalConfiguration);
+		when(mockSynapseJavascriptClient.getChallengeForProject(anyString())).thenReturn(getDoneFuture(new Challenge()));
 	}
 
 	@Test
@@ -2065,7 +2066,6 @@ public class EntityActionControllerImplTest {
 	public void testConfigureChallengeNotFound() throws Exception {
 		// note that the currentArea is null (project settings)
 		currentEntityArea = null;
-		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
 		entityBundle.setEntity(new Project());
 		when(mockSynapseJavascriptClient.getChallengeForProject(anyString())).thenReturn(getFailedFuture(new NotFoundException()));
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
@@ -2122,7 +2122,6 @@ public class EntityActionControllerImplTest {
 
 	@Test
 	public void testGetChallengeError() throws Exception {
-		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
 		entityBundle.setEntity(new Project());
 		String error = "an error";
 		when(mockSynapseJavascriptClient.getChallengeForProject(anyString())).thenReturn(getFailedFuture(new Exception(error)));
