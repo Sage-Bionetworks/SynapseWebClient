@@ -1434,7 +1434,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 				Integer autoCloseInMs = null;
 				String primaryButtonText = DisplayConstants.VIEW_LINK_CONTAINER;
 				AlertButtonConfig.Callback onPrimaryButtonClick = () -> {
-					getGlobalApplicationState().getPlaceChanger().goTo(new Synapse(target));
+					Long version = null;
+					String areaToken = "";
+					getGlobalApplicationState().getPlaceChanger().goTo(new Synapse(target, version, EntityArea.FILES, areaToken));
 				};
 				String title = "";
 				ToastMessageOptions options = ToastMessageOptions.create(title, autoCloseInMs, primaryButtonText, onPrimaryButtonClick);
