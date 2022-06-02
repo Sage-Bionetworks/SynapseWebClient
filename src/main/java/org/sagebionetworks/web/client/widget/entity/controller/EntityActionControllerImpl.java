@@ -1432,13 +1432,13 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			@Override
 			public void onSuccess(Entity result) {
 				Integer autoCloseInMs = null;
-				String primaryButtonText = "View link container";
+				String primaryButtonText = DisplayConstants.VIEW_LINK_CONTAINER;
 				AlertButtonConfig.Callback onPrimaryButtonClick = () -> {
 					getGlobalApplicationState().getPlaceChanger().goTo(new Synapse(target));
 				};
-				ToastMessageOptions options = ToastMessageOptions.create(DisplayConstants.TEXT_LINK_SAVED, autoCloseInMs, primaryButtonText, onPrimaryButtonClick);
-				String message = "";
-				popupUtils.notify(message, NotificationVariant.SUCCESS, options);
+				String title = "";
+				ToastMessageOptions options = ToastMessageOptions.create(title, autoCloseInMs, primaryButtonText, onPrimaryButtonClick);
+				popupUtils.notify(DisplayConstants.TEXT_LINK_SAVED, NotificationVariant.SUCCESS, options);
 				finder.hide();
 			}
 

@@ -84,6 +84,7 @@ import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.DisplayUtils.NotificationVariant;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
@@ -1745,7 +1746,7 @@ public class EntityActionControllerImplTest {
 		String target = "syn9876";
 		controller.createLink(target, mockEntityFinder);
 		verify(mockView, never()).showErrorMessage(anyString());
-		verify(mockView).showSuccess(DisplayConstants.TEXT_LINK_SAVED);
+		verify(mockPopupUtils).notify(eq(DisplayConstants.TEXT_LINK_SAVED), eq(NotificationVariant.SUCCESS), any(ToastMessageOptions.class));
 		verify(mockEntityFinder).hide();
 		Entity capture = argument.getValue();
 		assertNotNull(capture);
@@ -1805,7 +1806,7 @@ public class EntityActionControllerImplTest {
 		verify(mockEntityFinderBuilder).build();
 		verify(mockEntityFinder).show();
 		verify(mockEntityFinder).hide();
-		verify(mockView).showSuccess(DisplayConstants.TEXT_LINK_SAVED);
+		verify(mockPopupUtils).notify(eq(DisplayConstants.TEXT_LINK_SAVED), eq(NotificationVariant.SUCCESS), any(ToastMessageOptions.class));
 	}
 
 	@Test

@@ -90,6 +90,7 @@ public class DisplayConstants {
 	public static final String NO_ENTITY_SELECTED = "Please select an entity and try again.";
 	public static final String NO_EVALUATION_SELECTED = "Please select an evaluation and try again.";
 	public static final String TEXT_LINK_SAVED = "Link saved.";
+	public static final String VIEW_LINK_CONTAINER = "View link container";
 	public static final String ERROR_UPDATE_FAILED = "Update failed. Please try again.";
 	public static final String EMPTY = "Empty";
 	public static final String CONFIRM_DELETE_DIALOG_TITLE = "Confirm Deletion";
