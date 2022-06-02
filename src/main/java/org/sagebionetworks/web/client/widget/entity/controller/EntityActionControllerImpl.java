@@ -659,7 +659,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		actionMenu.setActionVisible(Action.CREATE_CHALLENGE, false);
 		actionMenu.setActionVisible(Action.DELETE_CHALLENGE, false);
 		boolean canEdit = permissions.getCanEdit();
-		if (entityBundle.getEntity() instanceof Project && canEdit && ((DisplayUtils.isInTestWebsite(cookies) && currentArea == null) || EntityArea.CHALLENGE.equals(currentArea))) {
+		if (entityBundle.getEntity() instanceof Project && canEdit && (currentArea == null || EntityArea.CHALLENGE.equals(currentArea))) {
 			actionMenu.setActionListener(Action.CREATE_CHALLENGE, this);
 			actionMenu.setActionListener(Action.DELETE_CHALLENGE, this);
 
