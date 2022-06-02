@@ -52,8 +52,10 @@ import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.DisplayUtils.NotificationVariant;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
+import org.sagebionetworks.web.client.jsinterop.AlertButtonConfig;
 import org.sagebionetworks.web.client.jsinterop.EntityFinderScope;
 import org.sagebionetworks.web.client.jsinterop.ToastMessageOptions;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
@@ -1427,10 +1429,16 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		link.setLinksToClassName(entityBundle.getEntity().getClass().getName());
 		link.setName(entityBundle.getEntity().getName()); // copy name of this entity as default
 		getSynapseJavascriptClient().createEntity(link, new AsyncCallback<Entity>() {
-
 			@Override
 			public void onSuccess(Entity result) {
-				view.showSuccess(DisplayConstants.TEXT_LINK_SAVED);
+				Integer autoCloseInMs = null;
+				String primaryButtonText = "View link container";
+				AlertButtonConfig.Callback onPrimaryButtonClick = () -> {
+					getGlobalApplicationState().getPlaceChanger().goTo(new Synapse(target));
+				};
+				ToastMessageOptions options = ToastMessageOptions.create(DisplayConstants.TEXT_LINK_SAVED, autoCloseInMs, primaryButtonText, onPrimaryButtonClick);
+				String message = "";
+				popupUtils.notify(message, NotificationVariant.SUCCESS, options);
 				finder.hide();
 			}
 
