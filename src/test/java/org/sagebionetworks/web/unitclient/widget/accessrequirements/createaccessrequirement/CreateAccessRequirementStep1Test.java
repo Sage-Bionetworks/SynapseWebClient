@@ -150,7 +150,7 @@ public class CreateAccessRequirementStep1Test {
 
 	@Test
 	public void testConfigureWithACTAccessRequirement() {
-		when(mockACTAccessRequirement.getDescription()).thenReturn(NAME);
+		when(mockACTAccessRequirement.getName()).thenReturn(NAME);
 		when(mockACTAccessRequirement.getSubjectIds()).thenReturn(Collections.singletonList(mockEntityRestrictableObjectDescriptor));
 		
 		widget.configure(mockACTAccessRequirement);
@@ -160,7 +160,7 @@ public class CreateAccessRequirementStep1Test {
 		widget.onPrimary();
 		verify(mockACTAccessRequirement).setAccessType(any(ACCESS_TYPE.class));
 		verify(mockACTAccessRequirement).setSubjectIds(anyList());
-		verify(mockACTAccessRequirement).setDescription(MODIFIED_NAME);
+		verify(mockACTAccessRequirement).setName(MODIFIED_NAME);
 		verify(mockSynapseClient).createOrUpdateAccessRequirement(eq(mockACTAccessRequirement), any(AsyncCallback.class));
 	}
 

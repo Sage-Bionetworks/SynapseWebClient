@@ -210,7 +210,7 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 		loginButton.setVisible(true);
 	}
 	@Override
-	public void setAccessRequirementDescription(String description) {
+	public void setAccessRequirementName(String description) {
 		if (DisplayUtils.isDefined(description)) {
 			accessRequirementDescription.setText(description);
 			accessRequirementDescription.addStyleName("boldText");
