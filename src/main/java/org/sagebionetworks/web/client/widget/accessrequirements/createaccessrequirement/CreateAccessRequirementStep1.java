@@ -111,8 +111,7 @@ public class CreateAccessRequirementStep1 implements ModalPage, CreateAccessRequ
 	public void configure(AccessRequirement ar) {
 		accessRequirement = ar;
 		view.setAccessRequirementTypeSelectionVisible(false);
-		// TODO: for SWC-6109 - bump repo version to 406 and change this to getName()
-		view.setName(accessRequirement.getDescription());
+		view.setName(accessRequirement.getName());
 		setSubjects(accessRequirement.getSubjectIds());
 	}
 
@@ -167,8 +166,7 @@ public class CreateAccessRequirementStep1 implements ModalPage, CreateAccessRequ
 		}
 		accessRequirement.setAccessType(currentAccessType);
 		accessRequirement.setSubjectIds(subjects);
-		// TODO: for SWC-6109 - bump repo version to 406 and change this to setName()
-		accessRequirement.setDescription(view.getName());
+		accessRequirement.setName(view.getName());
 
 		modalPresenter.setLoading(true);
 		synapseClient.createOrUpdateAccessRequirement(accessRequirement, new AsyncCallback<AccessRequirement>() {

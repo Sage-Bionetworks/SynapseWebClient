@@ -298,7 +298,7 @@ public class ManagedACTAccessRequirementWidgetViewImpl implements ManagedACTAcce
 		accessRequirementIDUI.setVisible(visible);		
 	}
 	@Override
-	public void setAccessRequirementDescription(String description) {
+	public void setAccessRequirementName(String description) {
 		if (DisplayUtils.isDefined(description)) {
 			accessRequirementDescription.setText(description);
 			accessRequirementDescription.addStyleName("boldText");

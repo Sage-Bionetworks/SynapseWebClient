@@ -123,7 +123,7 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 		isACTMemberAsyncHandler.isACTActionAvailable(isACT -> {
 			view.setAccessRequirementIDVisible(isACT);
 		});
-		view.setAccessRequirementDescription(ar.getDescription());	
+		view.setAccessRequirementName(ar.getName());
 	}
 
 	public void setTargetSubject(RestrictableObjectDescriptor targetSubject) {
