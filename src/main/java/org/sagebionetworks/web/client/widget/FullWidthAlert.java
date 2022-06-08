@@ -111,8 +111,7 @@ public class FullWidthAlert implements IsWidget {
 
 
 	public void setPrimaryCTAText(String text) {
-		String newText = text != null ? text.toUpperCase() : null;
-		this.primaryButtonText = newText;
+		this.primaryButtonText = text;
 		rerender();
 	}
 

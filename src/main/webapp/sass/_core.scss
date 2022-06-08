@@ -316,9 +316,6 @@ end sticky footer
 	.cursor-pointer {
 		cursor: pointer;
 	}
-	.alert-warning {
-		background-color:$synapse-yellow;
-	}
 	.btn-default {
 		$button-color: #ebebeb;
 		background-color: $button-color;
@@ -3271,32 +3268,20 @@ div.border {
 			color: inherit;
 		}
 		&.alert-info {
-			background: #D9ECF2;
+			background: #d9ebf2;
 			border-left: 10px solid #017FA5;
-			.iconBackground {
-				color: #017FA5;
-			}
-		}
-		&.alert-danger {
-			background: #F5DAD9;
-			border-left: 10px solid #CD453F;
-			.iconBackground {
-				color: #CD453F;
-			}
+		  }
+		  &.alert-danger {
+			background: #f7e0dc;
+			border-left: 10px solid #C13415;
 		}
 		&.alert-warning {
-			background: #F7F1D9;
+			background: #f8f1d9;
 			border-left: 10px solid #CC9F00;
-			.iconBackground {
-				color: #CC9F00;
-			}
 		}
 		&.alert-success {
-			background: #DAE7E1;
-			border-left: 10px solid #48896B;
-			.iconBackground {
-				color: #48896B;
-			}
+			background: #e0f1e0;
+			border-left: 10px solid #32A330;
 		}
 		.close {
 			font-size: 0px;
