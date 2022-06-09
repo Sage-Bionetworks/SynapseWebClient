@@ -24,7 +24,7 @@ public interface FooterView extends IsWidget {
 	 * @param portalVersion
 	 * @param repoVersion
 	 */
-	void setVersion(String portalVersion, String repoVersion);
+	void setVersion(String portalVersion, String repoVersion, String srcVersion);
 
 	void open(String url);
 

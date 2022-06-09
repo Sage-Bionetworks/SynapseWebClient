@@ -39,6 +39,10 @@ public class FooterViewImpl implements FooterView {
 	@UiField
 	Span portalVersionSpan;
 	@UiField
+	Span srcVersionSpan;
+	@UiField
+	Span srcVersionSpan2;
+	@UiField
 	Span portalVersionSpan2;
 	@UiField
 	Span repoVersionSpan;
@@ -53,7 +57,7 @@ public class FooterViewImpl implements FooterView {
 	@UiField
 	Image alphaModeStatusIcon;
 	SageImageBundle sageImageBundle;
-	String portalVersion, repoVersion;
+	String portalVersion, repoVersion, srcVersion;
 	private Presenter presenter;
 	private CookieProvider cookies;
 	private GlobalApplicationState globalAppState;
@@ -84,6 +88,8 @@ public class FooterViewImpl implements FooterView {
 				portalVersionSpan2.setText(portalVersion);
 				repoVersionSpan.setText(repoVersion);
 				repoVersionSpan2.setText(repoVersion);
+				srcVersionSpan.setText(srcVersion);
+				srcVersionSpan2.setText(srcVersion);
 			}
 
 			refresh();
@@ -123,18 +129,23 @@ public class FooterViewImpl implements FooterView {
 	}
 
 	@Override
-	public void setVersion(String portalVersion, String repoVersion) {
+	public void setVersion(String portalVersion, String repoVersion, String srcVersion) {
 		if (portalVersion == null)
 			portalVersion = "--";
 		if (repoVersion == null)
 			repoVersion = "--";
+		if (srcVersion == null)
+			srcVersion = "--";
 		this.portalVersion = portalVersion;
 		this.repoVersion = repoVersion;
+		this.srcVersion = srcVersion;
 		if (portalVersionSpan != null) {
 			portalVersionSpan.setText(portalVersion);
 			portalVersionSpan2.setText(portalVersion);
 			repoVersionSpan.setText(repoVersion);
 			repoVersionSpan2.setText(repoVersion);
+			srcVersionSpan.setText(srcVersion);
+			srcVersionSpan2.setText(srcVersion);
 		}
 	}
 

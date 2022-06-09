@@ -4,13 +4,16 @@ import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_COLLECTOR_U
 import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_DESCRIPTION_PART_1;
 import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_PRIORITY;
 import static org.sagebionetworks.web.shared.WebConstants.REVIEW_ABUSIVE_CONTENT_REQUEST_COMPONENT_ID;
+
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.shared.WebConstants;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -47,7 +50,7 @@ public class Footer implements FooterView.Presenter, IsWidget {
 				String versions = state.getVersion();
 				String[] vals = versions.split(",");
 				if (vals.length == 2) {
-					view.setVersion(vals[0], vals[1]);
+					view.setVersion(vals[0], vals[1], SRC.SynapseReactClientVersion);
 				} else {
 					onFailure(null);
 					return;
@@ -56,7 +59,7 @@ public class Footer implements FooterView.Presenter, IsWidget {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				view.setVersion(UNKNOWN, UNKNOWN);
+				view.setVersion(UNKNOWN, UNKNOWN, SRC.SynapseReactClientVersion);
 			}
 		});
 		view.refresh();

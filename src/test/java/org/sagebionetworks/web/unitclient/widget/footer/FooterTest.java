@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.unitclient.widget.footer;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.shared.WebConstants.ANONYMOUS;
@@ -74,7 +76,7 @@ public class FooterTest {
 		VersionState versionState = new VersionState(null, false);
 		AsyncMockStubber.callSuccessWith(versionState).when(mockGlobalAppState).checkVersionCompatibility(any(AsyncCallback.class));
 		footer = new Footer(mockView, mockGlobalAppState, mockAuthController, mockGwt, mockJsniUtils);
-		verify(mockView).setVersion(Footer.UNKNOWN, Footer.UNKNOWN);
+		verify(mockView).setVersion(eq(Footer.UNKNOWN), eq(Footer.UNKNOWN), anyString());
 	}
 
 	@Test
