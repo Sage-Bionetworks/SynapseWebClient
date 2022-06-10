@@ -6,16 +6,15 @@ import com.google.gwt.place.shared.Prefix;
 
 public class DataAccessManagementPlace extends Place {
 
-	String token;
+    String token;
 
     public DataAccessManagementPlace(String token) {
-		this.token = token;
+        this.token = token;
+    }
 
-	}
-
-	public String toToken() {
-		return token;
-	}
+    public String toToken() {
+        return token;
+    }
 
     @Prefix("!DataAccessManagement")
     public static class Tokenizer implements PlaceTokenizer<DataAccessManagementPlace> {

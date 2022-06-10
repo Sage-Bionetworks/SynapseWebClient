@@ -19,11 +19,11 @@ public class DataAccessManagementViewImpl implements DataAccessManagementView {
     }
 
     private DataAccessManagementPresenter presenter;
-	private SynapseContextPropsProvider propsProvider;
+    private SynapseContextPropsProvider propsProvider;
     private Header headerWidget;
 
-	@UiField
-	ReactComponentDiv reactComponent;
+    @UiField
+    ReactComponentDiv reactComponent;
 
     Widget widget;
 
@@ -31,7 +31,7 @@ public class DataAccessManagementViewImpl implements DataAccessManagementView {
     public DataAccessManagementViewImpl(DataAccessManagementViewImplUiBinder binder, Header headerWidget, SynapseContextPropsProvider propsProvider) {
         widget = binder.createAndBindUi(this);
         this.headerWidget = headerWidget;
-		this.propsProvider = propsProvider;
+        this.propsProvider = propsProvider;
         headerWidget.configure();
     }
 
@@ -41,7 +41,7 @@ public class DataAccessManagementViewImpl implements DataAccessManagementView {
         headerWidget.configure();
         headerWidget.refresh();
         Window.scrollTo(0,0);
-		render();
+        render();
     }
 
     @Override
@@ -49,10 +49,10 @@ public class DataAccessManagementViewImpl implements DataAccessManagementView {
 
     @Override
     public void render() {
-		ReactDOM.unmountComponentAtNode(reactComponent.getElement());
-		ReactDOM.render(
-				React.createElementWithSynapseContext(SRC.SynapseComponents.ReviewerDashboard, null, propsProvider.getJsInteropContextProps()),
-				reactComponent.getElement()
-		);
-	}
+        ReactDOM.unmountComponentAtNode(reactComponent.getElement());
+        ReactDOM.render(
+            React.createElementWithSynapseContext(SRC.SynapseComponents.ReviewerDashboard, null, propsProvider.getJsInteropContextProps()),
+            reactComponent.getElement()
+        );
+    }
 }
