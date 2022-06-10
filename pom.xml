@@ -371,8 +371,8 @@
 								<copy file="${project.basedir}/node_modules/react/umd/react.production.min.js" tofile="src/main/webapp/generated/react.production.min.js" />
 								<copy file="${project.basedir}/node_modules/react-dom/umd/react-dom.production.min.js" tofile="src/main/webapp/generated/react-dom.production.min.js" />
 								<copy file="${project.basedir}/node_modules/react-transition-group/dist/react-transition-group.min.js" tofile="src/main/webapp/generated/react-transition-group.min.js" />
-                                <copy file="${project.basedir}/node_modules/react-measure/dist/index.umd.js" tofile="src/main/webapp/generated/react-measure.js" />
-                                <copy file="${project.basedir}/node_modules/react-router-dom/umd/react-router-dom.js" tofile="src/main/webapp/generated/react-router-dom.js" />
+								<copy file="${project.basedir}/node_modules/react-measure/dist/index.umd.js" tofile="src/main/webapp/generated/react-measure.js" />
+								<copy file="${project.basedir}/node_modules/react-router-dom/umd/react-router-dom.js" tofile="src/main/webapp/generated/react-router-dom.js" />
 								<copy file="${project.basedir}/node_modules/@rjsf/core/dist/react-jsonschema-form.js" tofile="src/main/webapp/generated/react-jsonschema-form.js" />
 								<copy file="${project.basedir}/node_modules/react-query/dist/react-query.production.min.js" tofile="src/main/webapp/generated/react-query.production.min.js" />
 								<copy file="${project.basedir}/node_modules/universal-cookie/umd/universalCookie.min.js" tofile="src/main/webapp/generated/universalCookie.min.js" />
