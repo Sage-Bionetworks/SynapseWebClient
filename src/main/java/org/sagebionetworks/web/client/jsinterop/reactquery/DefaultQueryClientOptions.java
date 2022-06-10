@@ -7,12 +7,12 @@ import jsinterop.annotations.JsType;
 
 @JsType(isNative = true, namespace = JsPackage.GLOBAL, name="Object")
 public class DefaultQueryClientOptions {
-    public QueryOptions query;
+    public QueryOptions queries;
 
     @JsOverlay
     public static DefaultQueryClientOptions create() {
         DefaultQueryClientOptions defaultQueryClientOptions = new DefaultQueryClientOptions();
-        defaultQueryClientOptions.query = QueryOptions.create();
+        defaultQueryClientOptions.queries = QueryOptions.create();
         return defaultQueryClientOptions;
     }
 }

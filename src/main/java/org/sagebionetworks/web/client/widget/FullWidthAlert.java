@@ -111,14 +111,13 @@ public class FullWidthAlert implements IsWidget {
 
 
 	public void setPrimaryCTAText(String text) {
-		String newText = text != null ? text.toUpperCase() : null;
-		this.primaryButtonText = newText;
+		this.primaryButtonText = text;
 		rerender();
 	}
 
 	public void setSecondaryCTAText(String text) {
-		String newText = text != null ? text.toUpperCase() : null;
-		this.secondaryButtonText = newText;
+		// SWC-6159: Do not toUpperCase link text
+		this.secondaryButtonText = text;
 		rerender();
 	}
 
