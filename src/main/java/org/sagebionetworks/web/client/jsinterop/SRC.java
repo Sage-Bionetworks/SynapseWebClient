@@ -8,6 +8,8 @@ import jsinterop.annotations.JsType;
 
 @JsType(isNative = true, namespace = JsPackage.GLOBAL)
 public class SRC {
+	public static String SynapseReactClientVersion;
+
 	@JsType(isNative = true)
 	public static class SynapseComponents {
 		public static ReactFunctionComponent<DatasetEditorProps> DatasetItemsEditor;

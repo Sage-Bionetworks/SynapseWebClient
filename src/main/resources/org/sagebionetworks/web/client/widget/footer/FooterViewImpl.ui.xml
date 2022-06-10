@@ -117,7 +117,13 @@
 									text="portal: " />
 							<bh:Span ui:field="portalVersionSpan2"
 									 addStyleNames="margin-top-5 margin-bottom-5 lightGreyText" />
-							<bh:Span addStyleNames="margin-left-10 margin-right-10">|</bh:Span>
+                            <bh:Span addStyleNames="margin-left-10 margin-right-10">|</bh:Span>
+                            <g:Label
+                                    addStyleNames="margin-top-5 margin-bottom-5 lightGreyText margin-left-2 displayInline"
+                                    text="synapse-react-client: " />
+                            <bh:Span ui:field="srcVersionSpan2"
+                                     addStyleNames="margin-top-5 margin-bottom-5 lightGreyText" />
+                            <bh:Span addStyleNames="margin-left-10 margin-right-10">|</bh:Span>
 							<g:Label
 									addStyleNames="margin-top-5 margin-bottom-5 lightGreyText displayInline"
 									text="repo: " />
@@ -144,12 +150,18 @@
 						</bh:Div>
 						<bh:Div addStyleNames="text-align-right font-size-14">
 							<bh:Br />
-							<g:Label
-								addStyleNames="margin-top-5 margin-bottom-5 lightGreyText margin-left-2 displayInline"
-								text="portal: " />
-							<bh:Span ui:field="portalVersionSpan"
-								addStyleNames="margin-top-5 margin-bottom-5 lightGreyText" />
-							<bh:Br />
+                            <g:Label
+                                    addStyleNames="margin-top-5 margin-bottom-5 lightGreyText margin-left-2 displayInline"
+                                    text="portal: " />
+                            <bh:Span ui:field="portalVersionSpan"
+                                     addStyleNames="margin-top-5 margin-bottom-5 lightGreyText" />
+                            <bh:Br />
+                            <g:Label
+                                    addStyleNames="margin-top-5 margin-bottom-5 lightGreyText margin-left-2 displayInline"
+                                    text="synapse-react-client: " />
+                            <bh:Span ui:field="srcVersionSpan"
+                                     addStyleNames="margin-top-5 margin-bottom-5 lightGreyText" />
+                            <bh:Br />
 							<g:Label
 								addStyleNames="margin-top-5 margin-bottom-5 lightGreyText margin-left-10 displayInline"
 								text="repo: " />
