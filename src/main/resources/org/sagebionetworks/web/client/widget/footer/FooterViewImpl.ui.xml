@@ -59,8 +59,9 @@
 								addStyleNames="flexcontainer-row flexcontainer-align-items-center letter-spacing-1">
 								<bh:Span addStyleNames="flexcontainer-column">
 									<b:Anchor
-										href="mailto:synapseInfo@sagebionetworks.org"
-										text="Contact Us" addStyleNames="color-white" />
+										href="https://sagebionetworks.jira.com/servicedesk/customer/portal/9"
+										text="Contact Us" addStyleNames="color-white" 
+										target="_blank" />
 								</bh:Span>
 								<bh:Span addStyleNames="flexcontainer-column hidden-xs"
 									paddingLeft="10" paddingRight="10">
@@ -95,8 +96,8 @@
 				<bh:ClearFix />
 				<bh:Div addStyleNames="visible-xs center">
 					<bh:Div>
-						<b:Anchor href="mailto:synapseInfo@sagebionetworks.org"
-							text="Contact Us" addStyleNames="color-white displayBlock margin-top-5 margin-bottom-5" />
+						<b:Anchor href="https://sagebionetworks.jira.com/servicedesk/customer/portal/9"
+							text="Contact Us" addStyleNames="color-white displayBlock margin-top-5 margin-bottom-5" target="_blank"/>
 						<b:Anchor href="https://help.synapse.org"
 							text="Documentation" addStyleNames="color-white displayBlock margin-top-5 margin-bottom-5" />
 						<b:Anchor
