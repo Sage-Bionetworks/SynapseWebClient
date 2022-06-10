@@ -11,12 +11,13 @@
     "react": "16.13.1",
     "react-bootstrap": "^1.0.0-beta.12",
     "react-dom": "16.13.1",
+    "react-router-dom": "^5.3.3",
     "react-measure": "2.2.2",
     "react-query": "^3.17.0",
     "react-transition-group": "2.6.0",
     "sanitize-html": "^1.18.4",
     "sass": "1.36.0",
-    "synapse-react-client": "3.0.19",
+    "synapse-react-client": "3.0.20",
     "universal-cookie": "^4.0.3"
   }
 }
