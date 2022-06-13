@@ -22,7 +22,7 @@ public class DataAccessManagementViewImpl implements DataAccessManagementView {
 
     private DataAccessManagementPresenter presenter;
 
-	RejectDataAccessRequestModal rejectModal;
+    RejectDataAccessRequestModal rejectModal;
 
     private SynapseContextPropsProvider propsProvider;
     private Header headerWidget;
@@ -37,7 +37,7 @@ public class DataAccessManagementViewImpl implements DataAccessManagementView {
         widget = binder.createAndBindUi(this);
         this.headerWidget = headerWidget;
         this.propsProvider = propsProvider;
-		this.rejectModal = rejectModal;
+        this.rejectModal = rejectModal;
         headerWidget.configure();
     }
 
@@ -55,8 +55,8 @@ public class DataAccessManagementViewImpl implements DataAccessManagementView {
 
     @Override
     public void render() {
-		ReviewerDashboardProps.OnRejectSubmissionClicked onRejectCallback = onReject -> rejectModal.show((reason) -> onReject.onReject(reason));
-		ReviewerDashboardProps props = ReviewerDashboardProps.create(onRejectCallback);
+        ReviewerDashboardProps.OnRejectSubmissionClicked onRejectCallback = onReject -> rejectModal.show((reason) -> onReject.onReject(reason));
+        ReviewerDashboardProps props = ReviewerDashboardProps.create(onRejectCallback);
 
         ReactDOM.unmountComponentAtNode(reactComponent.getElement());
         ReactDOM.render(
