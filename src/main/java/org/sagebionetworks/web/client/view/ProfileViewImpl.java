@@ -77,8 +77,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	DivElement teamsTabContainer;
 	@UiField
-	DivElement downloadsTabContainer;
-	@UiField
 	DivElement settingsTabContainer;
 	@UiField
 	DivElement favoritesTabContainer;
@@ -140,10 +138,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	FlowPanel challengesTabContent;
 	@UiField
 	Button moreChallengesButton;
-
-	// Downloads
-	@UiField
-	Div downloadsTabContent;
 
 	// Favorites
 	@UiField
@@ -311,11 +305,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 
 	@Override
-	public void setDownloadListWidget(IsWidget w) {
-		downloadsTabContent.add(w);
-	}
-
-	@Override
 	public void addTeamsFilterTeam(final Team team) {
 		detachLoadingTeamsListItem();
 		AnchorListItem teamFilter = new AnchorListItem(team.getName());
@@ -430,7 +419,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		DisplayUtils.hide(projectsTabContainer);
 		DisplayUtils.hide(challengesTabContainer);
 		DisplayUtils.hide(teamsTabContainer);
-		DisplayUtils.hide(downloadsTabContainer);
 		DisplayUtils.hide(settingsTabContainer);
 		DisplayUtils.hide(favoritesTabContainer);
 	}
@@ -461,9 +449,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		} else if (targetTab == Synapse.ProfileArea.SETTINGS) {
 			pageHeaderTitle.setText("Account Settings");
 			DisplayUtils.show(settingsTabContainer);
-		} else if (targetTab == Synapse.ProfileArea.DOWNLOADS) {
-			pageHeaderTitle.setText("Your Downloads");
-			DisplayUtils.show(downloadsTabContainer);
 		} else if (targetTab == Synapse.ProfileArea.CHALLENGES) {
 			pageHeaderTitle.setText("Your Challenges");
 			DisplayUtils.show(challengesTabContainer);

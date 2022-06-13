@@ -148,10 +148,6 @@
 									</div>
 								</div>
 								<div class="tab-background pageContent margin-top-40"
-									ui:field="downloadsTabContainer">
-									<bh:Div ui:field="downloadsTabContent" />
-								</div>
-								<div class="tab-background pageContent margin-top-40"
 									ui:field="favoritesTabContainer">
 									<bh:Div ui:field="favoritesTabContent" />
 								</div>

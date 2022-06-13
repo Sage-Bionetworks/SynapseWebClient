@@ -432,8 +432,6 @@ import org.sagebionetworks.web.client.widget.entity.file.S3DirectLoginDialog;
 import org.sagebionetworks.web.client.widget.entity.file.S3DirectLoginDialogImpl;
 import org.sagebionetworks.web.client.widget.entity.file.TableTitleBarView;
 import org.sagebionetworks.web.client.widget.entity.file.TableTitleBarViewImpl;
-import org.sagebionetworks.web.client.widget.entity.file.downloadlist.DownloadListWidgetView;
-import org.sagebionetworks.web.client.widget.entity.file.downloadlist.DownloadListWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.file.downloadlist.PackageSizeSummaryView;
 import org.sagebionetworks.web.client.widget.entity.file.downloadlist.PackageSizeSummaryViewImpl;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
@@ -1425,7 +1423,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(Moment.class).to(MomentImpl.class);
 		bind(DownloadSpeedTester.class).to(DownloadSpeedTesterImpl.class);
 		bind(PackageSizeSummaryView.class).to(PackageSizeSummaryViewImpl.class);
-		bind(DownloadListWidgetView.class).to(DownloadListWidgetViewImpl.class);
 		bind(EntityPresenterEventBinder.class).to(EntityPresenterEventBinderImpl.class);
 		bind(Linkify.class).to(LinkifyImpl.class);
 		bind(PasswordResetSignedTokenView.class).to(PasswordResetSignedTokenViewImpl.class);
