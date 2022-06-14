@@ -223,7 +223,7 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 		if (canDownload) {
 			downloadTooltip.setTitle("Direct and programmatic download options");
 		} else{
-			String viewOnlyHelpText = authController.isLoggedIn() ? "You do not have download access for this item." : "You need to log in to download this file.";
+			String viewOnlyHelpText = authController.isLoggedIn() ? "You don't have download permission. Request access from an administrator, shown under File Tools ➔ File Sharing Settings" : "You need to log in to download this file.";
 			downloadTooltip.setTitle(viewOnlyHelpText);
 		}
 	}
