@@ -17,7 +17,7 @@ public class SRC {
 		public static ReactFunctionComponent<EvaluationCardProps> EvaluationCard;
 		public static ReactFunctionComponent<EvaluationEditorPageProps> EvaluationEditorPage;
 		public static ReactFunctionComponent<AccessTokenPageProps> AccessTokenPage;
-		public static ReactFunctionComponent<EmptyProps> DownloadCartPage;
+		public static ReactFunctionComponent<DownloadCartPageProps> DownloadCartPage;
 		public static ReactFunctionComponent<DownloadConfirmationProps> DownloadConfirmation;
 		public static ReactFunctionComponent<FullWidthAlertProps> FullWidthAlert;
 		public static ReactFunctionComponent<SchemaDrivenAnnotationEditorProps> SchemaDrivenAnnotationEditor;

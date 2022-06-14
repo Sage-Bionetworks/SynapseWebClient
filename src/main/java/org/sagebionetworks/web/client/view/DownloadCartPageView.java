@@ -7,4 +7,9 @@ public interface DownloadCartPageView extends IsWidget {
 	 * Renders the view
 	 */
 	public void render();
+	public void setPresenter(Presenter presenter);
+	public interface Presenter {
+		void onViewSharingSettingsClicked(String benefactorEntityId);
+	}
+
 }
