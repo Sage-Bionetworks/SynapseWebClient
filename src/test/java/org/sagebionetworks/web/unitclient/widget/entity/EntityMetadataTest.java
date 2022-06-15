@@ -534,4 +534,20 @@ public class EntityMetadataTest {
 		verify(mockView).setDescriptionVisible(false);
 	}
 
+	@Test
+	public void testShowAnnotationsNoExperimentalMode() {
+		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn(null);
+		widget.setAnnotationsVisible(true);
+		verify(mockView).setAnnotationsVisible(true);
+		verify(mockView, never()).setAnnotationsModalVisible(true);
+	}
+
+	@Test
+	public void testShowAnnotationModalInExperimentalMode() {
+		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("true");
+		widget.setAnnotationsVisible(true);
+		verify(mockView).setAnnotationsModalVisible(true);
+		verify(mockView, never()).setAnnotationsVisible(true);
+	}
+
 }
