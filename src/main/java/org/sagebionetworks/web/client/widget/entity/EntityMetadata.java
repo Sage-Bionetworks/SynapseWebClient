@@ -20,7 +20,6 @@ import org.sagebionetworks.repo.model.file.ExternalUploadDestination;
 import org.sagebionetworks.repo.model.file.S3UploadDestination;
 import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.file.UploadType;
-import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -157,7 +156,11 @@ public class EntityMetadata implements Presenter {
 	}
 
 	public void setAnnotationsVisible(boolean visible) {
-		view.setAnnotationsVisible(visible);
+		if (DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider())) {
+			view.setAnnotationsModalVisible(visible);
+		} else {
+			view.setAnnotationsVisible(visible);
+		}
 	}
 
 	public void clear() {

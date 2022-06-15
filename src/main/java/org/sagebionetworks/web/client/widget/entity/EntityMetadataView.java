@@ -4,14 +4,17 @@ import com.google.gwt.user.client.ui.IsWidget;
 
 public interface EntityMetadataView extends IsWidget {
 
+	public interface Presenter {
+	}
+
+
 	public void setDetailedMetadataVisible(boolean visible);
+
+	void setAnnotationsModalVisible(boolean visible);
 
 	void setAnnotationsVisible(boolean visible);
 
 	void setDescriptionVisible(boolean visible);
-
-	public interface Presenter {
-	}
 
 	void setVersionHistoryWidget(IsWidget fileHistoryWidget);
 

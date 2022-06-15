@@ -5,7 +5,6 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -16,10 +15,9 @@ import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -53,6 +51,8 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@UiField
 	SimplePanel annotationsContainer;
 	@UiField
+	Button annotationsContentCloseButton;
+	@UiField
 	Span containerItemCountContainer;
 	@UiField
 	Span restrictionPanelV2;
@@ -72,16 +72,11 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	ReactComponentDiv annotationsModalContainer;
 
 	@Inject
-	public EntityMetadataViewImpl(final SynapseJSNIUtils jsniUtils, final CookieProvider cookieProvider, final SynapseContextPropsProvider propsProvider) {
-		this.cookies = cookieProvider;
+	public EntityMetadataViewImpl(final SynapseJSNIUtils jsniUtils, final SynapseContextPropsProvider propsProvider) {
 		this.propsProvider = propsProvider;
 		initWidget(uiBinder.createAndBindUi(this));
-		idField.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				idField.selectAll();
-			}
-		});
+		idField.addClickHandler(event -> idField.selectAll());
+		annotationsContentCloseButton.addClickHandler(event -> setAnnotationsVisible(false));
 	}
 
 	@Override
@@ -112,25 +107,26 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	}
 
 	@Override
+	public void setAnnotationsModalVisible(boolean visible) {
+		boolean showTabs = false;
+		EntityModalProps props =
+				EntityModalProps.create(entityId, versionNumber, visible, () -> setAnnotationsVisible(false), "ANNOTATIONS", showTabs);
+		ReactDOM.render(
+				React.createElementWithSynapseContext(
+						SRC.SynapseComponents.EntityModal,
+						props,
+						propsProvider.getJsInteropContextProps()
+				),
+				annotationsModalContainer.getElement()
+		);
+	}
+
+	@Override
 	public void setAnnotationsVisible(boolean visible) {
-		if (DisplayUtils.isInTestWebsite(cookies)) {
-			boolean showTabs = false;
-			EntityModalProps props =
-					EntityModalProps.create(entityId, versionNumber, visible, () -> setAnnotationsVisible(false), "ANNOTATIONS", showTabs);
-			ReactDOM.render(
-					React.createElementWithSynapseContext(
-							SRC.SynapseComponents.EntityModal,
-							props,
-							propsProvider.getJsInteropContextProps()
-					),
-					annotationsModalContainer.getElement()
-			);
+		if (visible) {
+			annotationsContent.show();
 		} else {
-			if (visible) {
-				annotationsContent.show();
-			} else {
-				annotationsContent.hide();
-			}
+			annotationsContent.hide();
 		}
 	}
 
