@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
+import org.gwtbootstrap3.client.ui.Collapse;
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
@@ -22,6 +23,7 @@ import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -40,9 +42,13 @@ public class TableEntityWidgetViewImpl extends Composite implements TableEntityW
 	}
 
 	@UiField
-	Div schemaCollapse;
+	Collapse schemaCollapse;
 	@UiField
-	Div scopeCollapse;
+	Button schemaCollapseCloseButton;
+	@UiField
+	Collapse scopeCollapse;
+	@UiField
+	Button scopeCollapseCloseButton;
 
 	@UiField
 	SimplePanel columnDetailsPanel;
@@ -76,7 +82,8 @@ public class TableEntityWidgetViewImpl extends Composite implements TableEntityW
 		this.scopePanel.add(scopeWidget.asWidget());
 		this.scopePanel.add(submissionViewScopeWidget.asWidget());
 		this.propsProvider = propsProvider;
-		scopePanel.getElement().setAttribute("highlight-box-title", "Scope");
+		schemaCollapseCloseButton.addClickHandler(event -> this.presenter.toggleSchemaCollapse());
+		scopeCollapseCloseButton.addClickHandler(event -> this.presenter.toggleScopeCollapse());
 	}
 
 	@Override
@@ -110,22 +117,30 @@ public class TableEntityWidgetViewImpl extends Composite implements TableEntityW
 
 	@Override
 	public void setSchemaVisible(boolean visible) {
-		schemaCollapse.setVisible(visible);
+		if (visible) {
+			schemaCollapse.show();
+		} else {
+			schemaCollapse.hide();
+		}
 	}
 
 	@Override
 	public boolean isSchemaVisible() {
-		return schemaCollapse.isVisible();
+		return schemaCollapse.isShown();
 	}
 
 	@Override
 	public void setScopeVisible(boolean visible) {
-		scopeCollapse.setVisible(visible);
+		if (visible) {
+			scopeCollapse.show();
+		} else {
+			scopeCollapse.hide();
+		}
 	}
 
 	@Override
 	public boolean isScopeVisible() {
-		return scopeCollapse.isVisible();
+		return scopeCollapse.isShown();
 	}
 
 	@Override
@@ -161,11 +176,6 @@ public class TableEntityWidgetViewImpl extends Composite implements TableEntityW
 		}
 	}
 
-	@Override
-	public boolean isItemsEditorVisible() {
-		return itemsEditorContainer.isVisible();
-	}
-	
 	@Override
 	public void configureTableOnly(String sql) {
 		StandaloneQueryWrapper widget = new StandaloneQueryWrapper(propsProvider, sql);

@@ -39,6 +39,7 @@ import org.sagebionetworks.web.client.widget.clienthelp.FileViewClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionListener;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
@@ -197,6 +198,20 @@ public class TableEntityWidgetV2 implements TableEntityWidgetView.Presenter, IsW
 		}
 	}
 
+	private ActionListener onSchemaVisibilityUpdate = action -> {
+		boolean isVisible = !view.isSchemaVisible();
+		view.setSchemaVisible(isVisible);
+		String showHide = isVisible ? HIDE : SHOW;
+		actionMenu.setActionText(Action.SHOW_TABLE_SCHEMA, showHide + entityTypeDisplay + SCHEMA);
+	};
+
+	private ActionListener onScopeVisibilityUpdate = action -> {
+		boolean isVisible = !view.isScopeVisible();
+		view.setScopeVisible(isVisible);
+		String showHide = isVisible ? HIDE : SHOW;
+		actionMenu.setActionText(Action.SHOW_VIEW_SCOPE, showHide + SCOPE + entityTypeDisplay);
+	};
+
 	/**
 	 * Setup the actions for this widget.
 	 */
@@ -213,19 +228,9 @@ public class TableEntityWidgetV2 implements TableEntityWidgetView.Presenter, IsW
 		this.actionMenu.setActionListener(Action.EDIT_TABLE_DATA, action -> {
 			onEditResults();
 		});
-		this.actionMenu.setActionListener(Action.SHOW_TABLE_SCHEMA, action -> {
-			boolean isVisible = !view.isSchemaVisible();
-			view.setSchemaVisible(isVisible);
-			String showHide = isVisible ? HIDE : SHOW;
-			actionMenu.setActionText(Action.SHOW_TABLE_SCHEMA, showHide + entityTypeDisplay + SCHEMA);
-		});
+		this.actionMenu.setActionListener(Action.SHOW_TABLE_SCHEMA, onSchemaVisibilityUpdate);
 
-		this.actionMenu.setActionListener(Action.SHOW_VIEW_SCOPE, action -> {
-			boolean isVisible = !view.isScopeVisible();
-			view.setScopeVisible(isVisible);
-			String showHide = isVisible ? HIDE : SHOW;
-			actionMenu.setActionText(Action.SHOW_VIEW_SCOPE, showHide + SCOPE + entityTypeDisplay);
-		});
+		this.actionMenu.setActionListener(Action.SHOW_VIEW_SCOPE, onScopeVisibilityUpdate);
 
 		this.actionMenu.setActionListener(Action.EDIT_DATASET_ITEMS, action -> {
 			showDatasetItemsEditor();
@@ -538,6 +543,16 @@ public class TableEntityWidgetV2 implements TableEntityWidgetView.Presenter, IsW
 						() -> closeItemsEditor()
 				);
 		return props;
+	}
+
+	@Override
+	public void toggleSchemaCollapse() {
+		onSchemaVisibilityUpdate.onAction(Action.SHOW_TABLE_SCHEMA);
+	}
+
+	@Override
+	public void toggleScopeCollapse() {
+		onScopeVisibilityUpdate.onAction(Action.SHOW_VIEW_SCOPE);
 	}
 
 	private void showDatasetItemsEditor() {

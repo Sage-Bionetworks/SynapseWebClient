@@ -70,10 +70,19 @@ public interface TableEntityWidgetView extends IsWidget {
 
 	void setItemsEditorVisible(boolean visible);
 
-	boolean isItemsEditorVisible();
-
 	interface Presenter {
 		DatasetEditorProps getItemsEditorProps();
+
+		/**
+		 * Allows the view to update the state of the collapsible schema panel and keep the copy text in the action menu in sync
+		 */
+		void toggleSchemaCollapse();
+
+
+		/**
+		 * Allows the view to update the state of the collapsible scope panel and keep the copy text in the action menu in sync
+		 */
+		void toggleScopeCollapse();
 	}
 
 	void configureQueryWrapperPlotNav(String sql, String initQueryJson, OnQueryCallback onQueryBundleRequestChange,
