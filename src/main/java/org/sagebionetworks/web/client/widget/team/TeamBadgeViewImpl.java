@@ -60,7 +60,9 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 		teamId = team.getId();
 		this.customClickHandler = customClickHandler;
 		if (customClickHandler == null) {
-			anchor.addClickHandler(STANDARD_CLICKHANDLER);
+			if (!anchor.getTarget().equals("_blank")) {
+				anchor.addClickHandler(STANDARD_CLICKHANDLER);
+			}
 		} else {
 			anchor.addClickHandler(event -> {
 				if (!DisplayUtils.isAnyModifierKeyDown(event)) {
@@ -69,6 +71,7 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 				}
 			});
 		}
+
 		notificationsPanel.clear();
 		anchor.getElement().setAttribute(TEAM_ID_ATTRIBUTE, teamId);
 		if (team != null) {
