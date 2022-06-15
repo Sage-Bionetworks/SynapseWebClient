@@ -589,4 +589,23 @@ public class TableEntityWidgetV2Test {
 
 		verify(mockView).configureTableOnly(anyString());
 	}
+
+	@Test
+	public void testToggleSchemaCollapse() {
+		widget.configure(entityBundle, versionNumber, true, false, mockQueryChangeHandler, mockActionMenu);
+
+		// The handler has already been configured, just verify that it gets invoked
+		widget.toggleSchemaCollapse();
+		verify(mockActionMenu).onAction(Action.SHOW_TABLE_SCHEMA);
+	}
+
+	@Test
+	public void testToggleScopeCollapse() {
+		widget.configure(entityBundle, versionNumber, true, false, mockQueryChangeHandler, mockActionMenu);
+
+		// The handler has already been configured, just verify that it gets invoked
+		widget.toggleScopeCollapse();
+		verify(mockActionMenu).onAction(Action.SHOW_VIEW_SCOPE);
+	}
+
 }
