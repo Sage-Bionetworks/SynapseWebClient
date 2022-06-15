@@ -19,6 +19,8 @@ public interface VersionHistoryWidgetView extends IsWidget, SynapseView {
 		void onEditVersionInfoClicked();
 
 		void onMore();
+
+		void setVisible(boolean visible);
 	}
 
 	void setEntityBundle(Entity entity, boolean autoShowFileHistory);

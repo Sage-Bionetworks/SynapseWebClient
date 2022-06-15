@@ -6,6 +6,7 @@ import static org.sagebionetworks.web.client.DisplayConstants.GO_TO_DRAFT_VERSIO
 import java.util.ArrayList;
 import java.util.List;
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Collapse;
 import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.Entity;
@@ -45,6 +46,10 @@ public class VersionHistoryWidgetViewImpl extends Composite implements VersionHi
 	private PortalGinInjector ginInjector;
 
 	@UiField
+	Collapse collapse;
+	@UiField
+	com.google.gwt.user.client.ui.Button closeButton;
+	@UiField
 	Panel previousVersions;
 	@UiField
 	TBody previousVersionsTable;
@@ -75,7 +80,7 @@ public class VersionHistoryWidgetViewImpl extends Composite implements VersionHi
 		this.ginInjector = ginInjector;
 		this.editVersionInfoModal = editVersionInfoDialog;
 		initWidget(uiBinder.createAndBindUi(this));
-		getElement().setAttribute("highlight-box-title", "Version History");
+		closeButton.addClickHandler(event -> presenter.setVisible(false));
 		versionValuesCallback = values -> {
 			presenter.updateVersionInfo(values.get(0), values.get(1));
 		};
@@ -152,6 +157,20 @@ public class VersionHistoryWidgetViewImpl extends Composite implements VersionHi
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
+	}
+
+	@Override
+	public void setVisible(boolean visible) {
+		if (visible) {
+			collapse.show();
+		} else {
+			collapse.hide();
+		}
+	}
+
+	@Override
+	public boolean isVisible() {
+		return collapse.isShown();
 	}
 
 	@Override
