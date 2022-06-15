@@ -39,6 +39,7 @@ import org.sagebionetworks.web.client.widget.clienthelp.FileViewClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionListener;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
@@ -538,6 +539,16 @@ public class TableEntityWidgetV2 implements TableEntityWidgetView.Presenter, IsW
 						() -> closeItemsEditor()
 				);
 		return props;
+	}
+
+	@Override
+	public void toggleSchemaCollapse() {
+		this.actionMenu.onAction(Action.SHOW_TABLE_SCHEMA);
+	}
+
+	@Override
+	public void toggleScopeCollapse() {
+		this.actionMenu.onAction(Action.SHOW_VIEW_SCOPE);
 	}
 
 	private void showDatasetItemsEditor() {

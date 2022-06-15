@@ -9,13 +9,20 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	<g:HTMLPanel>
-		<bh:Div b:id="editScopeCollapse" ui:field="scopeCollapse"
-			addStyleNames="padding-bottom-15" visible="false">
-			<bh:Div ui:field="scopePanel" addStyleNames="highlight-box" />
-		</bh:Div>
+		<b:Collapse b:id="editScopeCollapse" ui:field="scopeCollapse"
+			addStyleNames="padding-bottom-15" toggle="false">
+			<g:FlowPanel
+					addStyleNames="light-border padding-10 margin-bottom-15">
+				<bh:Div addStyleNames="highlight-title">
+					<bh:Text>Scope</bh:Text>
+					<g:Button ui:field="scopeCollapseCloseButton" addStyleNames="close">×️</g:Button>
+				</bh:Div>
+				<bh:Div ui:field="scopePanel"/>
+			</g:FlowPanel>
 
-		<bh:Div b:id="editSchemaCollapse" ui:field="schemaCollapse"
-			visible="false">
+		</b:Collapse>
+
+		<b:Collapse b:id="editSchemaCollapse" ui:field="schemaCollapse" toggle="false">
 			<g:FlowPanel
 				addStyleNames="light-border padding-10 margin-bottom-15">
 				<bh:Div addStyleNames="highlight-title">
@@ -24,10 +31,11 @@
 						helpMarkdown="Every table has a schema that describes the columns and types of data stored in each column."
 						href="https://help.synapse.org/docs/Tables.2011038095.html"
 						addStyleNames="margin-left-5" />
+                    <w:IconSvg ui:field="schemaCollapseCloseButton" addStyleNames="close" icon="close" />
 				</bh:Div>
 				<g:SimplePanel ui:field="columnDetailsPanel" />
 			</g:FlowPanel>
-		</bh:Div>
+		</b:Collapse>
 
 		<w:FullWidthAlert ui:field="tableMessage" alertType="INFO" visible="false" global="false" />
 

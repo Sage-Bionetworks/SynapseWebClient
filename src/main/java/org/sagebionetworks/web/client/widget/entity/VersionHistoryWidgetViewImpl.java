@@ -5,7 +5,9 @@ import static org.sagebionetworks.web.client.DisplayConstants.GO_TO_DRAFT_VERSIO
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Collapse;
 import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.Entity;
@@ -19,7 +21,9 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableHeader;
+import org.sagebionetworks.web.client.widget.IconSvg;
 import org.sagebionetworks.web.client.widget.doi.DoiWidgetV2;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -44,6 +48,10 @@ public class VersionHistoryWidgetViewImpl extends Composite implements VersionHi
 
 	private PortalGinInjector ginInjector;
 
+	@UiField
+	Collapse collapse;
+	@UiField
+	IconSvg closeButton;
 	@UiField
 	Panel previousVersions;
 	@UiField
@@ -75,7 +83,7 @@ public class VersionHistoryWidgetViewImpl extends Composite implements VersionHi
 		this.ginInjector = ginInjector;
 		this.editVersionInfoModal = editVersionInfoDialog;
 		initWidget(uiBinder.createAndBindUi(this));
-		getElement().setAttribute("highlight-box-title", "Version History");
+		closeButton.addClickHandler(event -> presenter.setVisible(false));
 		versionValuesCallback = values -> {
 			presenter.updateVersionInfo(values.get(0), values.get(1));
 		};
@@ -152,6 +160,20 @@ public class VersionHistoryWidgetViewImpl extends Composite implements VersionHi
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
+	}
+
+	@Override
+	public void setVisible(boolean visible) {
+		if (visible) {
+			collapse.show();
+		} else {
+			collapse.hide();
+		}
+	}
+
+	@Override
+	public boolean isVisible() {
+		return collapse.isShown();
 	}
 
 	@Override
