@@ -73,7 +73,6 @@ import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.entity.file.downloadlist.DownloadListWidget;
 import org.sagebionetworks.web.client.widget.profile.UserProfileEditorWidget;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
@@ -161,8 +160,6 @@ public class ProfilePresenterTest {
 	@Mock
 	PrincipalAliasResponse mockPrincipalAliasResponse;
 	@Mock
-	DownloadListWidget mockDownloadListWidget;
-	@Mock
 	ProjectHeaderList mockProjectHeaderList;
 
 	List<Team> myTeams;
@@ -181,7 +178,6 @@ public class ProfilePresenterTest {
 		when(mockInjector.getProjectBadgeWidget()).thenReturn(mockProjectBadge);
 		when(mockInjector.getChallengeBadgeWidget()).thenReturn(mockChallengeBadge);
 		when(mockInjector.getSettingsPresenter()).thenReturn(mockSettingsPresenter);
-		when(mockInjector.getDownloadListWidget()).thenReturn(mockDownloadListWidget);
 		when(mockInjector.getSynapseJSNIUtils()).thenReturn(mockJSNIUtils);
 		userProfile.setDisplayName("tester");
 		userProfile.setOwnerId("1");
@@ -877,18 +873,6 @@ public class ProfilePresenterTest {
 		verify(mockSynapseJavascriptClient).getUserTeams(anyString(), anyBoolean(), anyString());
 		verify(mockSynapseJavascriptClient).listTeams(anyList());
 		verify(mockTeamListWidget, times(2)).addTeam(any(Team.class));
-	}
-
-	@Test
-	public void testDownloadsTabOwner() {
-		profilePresenter.setPlace(place);
-		profilePresenter.setIsOwner(true);
-		when(place.getArea()).thenReturn(ProfileArea.DOWNLOADS);
-
-		profilePresenter.showTab(ProfileArea.DOWNLOADS, true);
-
-		verify(mockDownloadListWidget).refresh();
-		verify(mockView).setDownloadListWidget(any(IsWidget.class));
 	}
 
 	@Test

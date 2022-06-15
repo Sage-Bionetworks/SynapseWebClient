@@ -67,8 +67,6 @@ public interface ProfileView extends IsWidget, SynapseView {
 
 	void setSettingsWidget(Widget w);
 
-	void setDownloadListWidget(IsWidget w);
-
 	void setSortDirection(ProjectListSortColumn column, SortDirection direction);
 
 	public interface Presenter {
