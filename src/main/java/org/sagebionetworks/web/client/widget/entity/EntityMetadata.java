@@ -49,8 +49,7 @@ public class EntityMetadata implements Presenter {
 	private PortalGinInjector ginInjector;
 	private ContainerItemCountWidget containerItemCountWidget;
 	private org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWidget restrictionWidgetV2;
-
-	boolean isShowingAnnotations;
+	private ActionMenuWidget actionMenu;
 
 	@Inject
 	public EntityMetadata(EntityMetadataView view, DoiWidgetV2 doiWidgetV2, AnnotationsRendererWidget annotationsWidget, SynapseJavascriptClient jsClient, SynapseJSNIUtils jsni, RestrictionWidget restrictionWidgetV2, ContainerItemCountWidget containerItemCountWidget, PortalGinInjector ginInjector) {
@@ -62,6 +61,7 @@ public class EntityMetadata implements Presenter {
 		this.restrictionWidgetV2 = restrictionWidgetV2;
 		this.containerItemCountWidget = containerItemCountWidget;
 		this.ginInjector = ginInjector;
+		this.view.setPresenter(this);
 		this.view.setDoiWidget(doiWidgetV2);
 		this.view.setAnnotationsRendererWidget(annotationsWidget);
 		this.view.setRestrictionWidgetV2(restrictionWidgetV2);
@@ -85,6 +85,7 @@ public class EntityMetadata implements Presenter {
 
 	public void configure(EntityBundle bundle, Long versionNumber, ActionMenuWidget actionMenu) {
 		clear();
+		this.actionMenu = actionMenu;
 		Entity en = bundle.getEntity();
 		view.setEntityId(en.getId());
 		view.setVersionNumber(versionNumber);
@@ -96,16 +97,15 @@ public class EntityMetadata implements Presenter {
 		view.setDescription(en.getDescription());
 
 		boolean canEdit = bundle.getPermissions().getCanCertifiedUserEdit();
-		isShowingAnnotations = false;
-		setAnnotationsVisible(isShowingAnnotations);
+		setAnnotationsVisible(false);
 		actionMenu.setActionListener(Action.SHOW_ANNOTATIONS, action -> {
-			isShowingAnnotations = !isShowingAnnotations;
 			if (DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider())) {
 				// In alpha mode, this pops up a modal. We always want to show annotations when this is clicked
+				setAnnotationsVisible(true);
+			} else {
 				// Current non-alpha implementation is a toggle, which is why we need to flip the state when not in alpha mode.
-				isShowingAnnotations = true;
+				setAnnotationsVisible(!view.getAnnotationsVisible());
 			}
-			setAnnotationsVisible(isShowingAnnotations);
 		});
 
 		actionMenu.setActionListener(Action.SHOW_VERSION_HISTORY, action -> {
@@ -222,4 +222,8 @@ public class EntityMetadata implements Presenter {
 		view.setAnnotationsTitleText(text);
 	}
 
+	@Override
+	public void toggleAnnotationsVisible() {
+		actionMenu.onAction(Action.SHOW_ANNOTATIONS);
+	}
 }

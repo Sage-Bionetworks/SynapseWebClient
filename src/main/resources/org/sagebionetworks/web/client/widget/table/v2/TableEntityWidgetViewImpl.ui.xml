@@ -31,7 +31,7 @@
 						helpMarkdown="Every table has a schema that describes the columns and types of data stored in each column."
 						href="https://help.synapse.org/docs/Tables.2011038095.html"
 						addStyleNames="margin-left-5" />
-					<g:Button ui:field="schemaCollapseCloseButton" addStyleNames="close">×️</g:Button>
+                    <w:IconSvg ui:field="schemaCollapseCloseButton" addStyleNames="close" icon="close" />
 				</bh:Div>
 				<g:SimplePanel ui:field="columnDetailsPanel" />
 			</g:FlowPanel>

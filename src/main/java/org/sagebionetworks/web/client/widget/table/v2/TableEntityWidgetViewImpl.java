@@ -14,6 +14,7 @@ import org.sagebionetworks.web.client.jsinterop.ReactDOM;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.FullWidthAlert;
+import org.sagebionetworks.web.client.widget.IconSvg;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 import org.sagebionetworks.web.client.widget.table.explore.QueryWrapperPlotNav;
 import org.sagebionetworks.web.client.widget.table.explore.StandaloneQueryWrapper;
@@ -44,7 +45,7 @@ public class TableEntityWidgetViewImpl extends Composite implements TableEntityW
 	@UiField
 	Collapse schemaCollapse;
 	@UiField
-	Button schemaCollapseCloseButton;
+	IconSvg schemaCollapseCloseButton;
 	@UiField
 	Collapse scopeCollapse;
 	@UiField

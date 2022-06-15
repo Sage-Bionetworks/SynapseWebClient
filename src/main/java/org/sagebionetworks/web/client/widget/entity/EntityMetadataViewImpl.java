@@ -12,12 +12,12 @@ import org.sagebionetworks.web.client.jsinterop.EntityModalProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactDOM;
 import org.sagebionetworks.web.client.jsinterop.SRC;
+import org.sagebionetworks.web.client.widget.IconSvg;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -33,6 +33,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 	private static EntityMetadataViewImplUiBinder uiBinder = GWT.create(EntityMetadataViewImplUiBinder.class);
 
+	private Presenter presenter;
 	private String entityId;
 	private Long versionNumber;
 	private CookieProvider cookies;
@@ -51,7 +52,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@UiField
 	SimplePanel annotationsContainer;
 	@UiField
-	Button annotationsContentCloseButton;
+	IconSvg annotationsContentCloseButton;
 	@UiField
 	Span containerItemCountContainer;
 	@UiField
@@ -76,7 +77,12 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		this.propsProvider = propsProvider;
 		initWidget(uiBinder.createAndBindUi(this));
 		idField.addClickHandler(event -> idField.selectAll());
-		annotationsContentCloseButton.addClickHandler(event -> setAnnotationsVisible(false));
+		annotationsContentCloseButton.addClickHandler(event -> this.presenter.toggleAnnotationsVisible());
+	}
+
+	@Override
+	public void setPresenter(Presenter presenter) {
+		this.presenter = presenter;
 	}
 
 	@Override
@@ -110,7 +116,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	public void setAnnotationsModalVisible(boolean visible) {
 		boolean showTabs = false;
 		EntityModalProps props =
-				EntityModalProps.create(entityId, versionNumber, visible, () -> setAnnotationsVisible(false), "ANNOTATIONS", showTabs);
+				EntityModalProps.create(entityId, versionNumber, visible, () -> setAnnotationsModalVisible(false), "ANNOTATIONS", showTabs);
 		ReactDOM.render(
 				React.createElementWithSynapseContext(
 						SRC.SynapseComponents.EntityModal,
@@ -128,6 +134,11 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		} else {
 			annotationsContent.hide();
 		}
+	}
+
+	@Override
+	public boolean getAnnotationsVisible() {
+		return annotationsContent.isShown();
 	}
 
 	@Override
