@@ -543,12 +543,14 @@ public class TableEntityWidgetV2 implements TableEntityWidgetView.Presenter, IsW
 	private void showDatasetItemsEditor() {
 		actionMenu.setActionVisible(Action.EDIT_DATASET_ITEMS, false);
 		view.setItemsEditorVisible(true);
+		view.setQueryWrapperPlotNavVisible(false);
 		view.setTableMessageVisible(false);
 	}
 
 	public void closeItemsEditor() {
 		actionMenu.setActionVisible(Action.EDIT_DATASET_ITEMS, true);
 		view.setItemsEditorVisible(false);
+		view.setQueryWrapperPlotNavVisible(true);
 		reconfigureState();
 	}
 	public void hideFiltering() {
