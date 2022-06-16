@@ -608,7 +608,6 @@ public class TableEntityWidgetV2Test {
 		verify(mockActionMenu).onAction(Action.SHOW_VIEW_SCOPE);
 	}
 
-
 	@Test
 	public void testHideQueryDataOnDatasetEdit() {
 		boolean canEdit = true;
