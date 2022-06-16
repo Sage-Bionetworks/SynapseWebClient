@@ -608,4 +608,28 @@ public class TableEntityWidgetV2Test {
 		verify(mockActionMenu).onAction(Action.SHOW_VIEW_SCOPE);
 	}
 
+	@Test
+	public void testHideQueryDataOnDatasetEdit() {
+		boolean canEdit = true;
+		configureBundleWithDataset();
+
+		widget.configure(entityBundle, versionNumber, canEdit, false, mockQueryChangeHandler, mockActionMenu);
+		verify(mockActionMenu).setActionListener(eq(Action.EDIT_DATASET_ITEMS), actionListenerCaptor.capture());
+
+		ActionListener onEditDatasetItems = actionListenerCaptor.getValue();
+
+		// Check that we begin with the items editor closed.
+		verify(mockView, never()).setItemsEditorVisible(true);
+		verify(mockView, times(2)).setQueryWrapperPlotNavVisible(true);
+
+		// Call under test - open the Dataset Items editor
+		onEditDatasetItems.onAction(Action.EDIT_DATASET_ITEMS);
+		verify(mockView).setItemsEditorVisible(true);
+		verify(mockView).setQueryWrapperPlotNavVisible(false);
+
+		// Call under test - close the editor
+		widget.closeItemsEditor();
+		verify(mockView).setItemsEditorVisible(false);
+		verify(mockView, times(4)).setQueryWrapperPlotNavVisible(true);
+	}
 }
