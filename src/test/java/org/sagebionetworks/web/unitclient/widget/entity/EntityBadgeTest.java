@@ -19,6 +19,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.Entity;
@@ -90,6 +91,8 @@ public class EntityBadgeTest {
 	CookieProvider mockCookies;
 	@Mock
 	SynapseContextPropsProvider propsProvider;
+	@Captor
+	ArgumentCaptor<EntityBadgeIconsProps> iconsPropsArgumentCaptor;
 
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -209,12 +212,11 @@ public class EntityBadgeTest {
 	public void testOnUnlink() {
 		configure();
 		EntityBundle bundle = setupEntity(new Link());
-		ArgumentCaptor<EntityBadgeIconsProps> badgeIconsPropsCaptor = ArgumentCaptor.forClass(EntityBadgeIconsProps.class);
 		widget.setEntityBundle(bundle);
 
 		// Simulate successful delete of Link entity by invoking the prop passed to the React component
-		verify(mockView).setIcons(badgeIconsPropsCaptor.capture(), any());
-		badgeIconsPropsCaptor.getValue().getOnUnlinkSuccess().onUnlinkSuccess(bundle.getEntity().getId());
+		verify(mockView).setIcons(iconsPropsArgumentCaptor.capture(), any());
+		iconsPropsArgumentCaptor.getValue().getOnUnlinkSuccess().onUnlinkSuccess(bundle.getEntity().getId());
 
 		verify(mockPopupUtils).showInfo(EntityBadge.LINK_SUCCESSFULLY_DELETED);
 	}
@@ -223,17 +225,16 @@ public class EntityBadgeTest {
 	public void testOnUnlinkFailure() {
 		// simulate failure to delete of Link entity
 		String errorMessage = "error occurred";
-		SynapseClientError jsinteropClientError = mock(SynapseClientError.class);
-		when(jsinteropClientError.getReason()).thenReturn(errorMessage);
-		ArgumentCaptor<EntityBadgeIconsProps> badgeIconsPropsCaptor = ArgumentCaptor.forClass(EntityBadgeIconsProps.class);
+		SynapseClientError clientError = new SynapseClientError();
+		clientError.setReason(errorMessage);
 
 		configure();
 		EntityBundle bundle = setupEntity(new Link());
 		widget.setEntityBundle(bundle);
 
 		// Simulate the error by invoking the prop passed to the React component
-		verify(mockView).setIcons(badgeIconsPropsCaptor.capture(), any());
-		badgeIconsPropsCaptor.getValue().getOnUnlinkError().onUnlinkError(jsinteropClientError);
+		verify(mockView).setIcons(iconsPropsArgumentCaptor.capture(), any());
+		iconsPropsArgumentCaptor.getValue().getOnUnlinkError().onUnlinkError(clientError);
 
 		verify(mockPopupUtils).showErrorMessage(errorMessage);
 	}

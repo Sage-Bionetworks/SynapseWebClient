@@ -14,4 +14,13 @@ public class SynapseClientError {
 	public final String getReason() {
 		return this.reason;
 	}
+
+	/**
+	 * Setter exposed for testing purposes only, because Mockito cannot mock a native object
+	 * @param reason
+	 */
+	@JsOverlay
+	public final void setReason(String reason) {
+		this.reason = reason;
+	}
 }
