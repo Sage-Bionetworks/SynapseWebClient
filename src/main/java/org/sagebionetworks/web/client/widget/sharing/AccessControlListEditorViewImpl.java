@@ -137,7 +137,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	}
 
 	@Override
-	public void buildWindow(boolean isProject, boolean isInherited, String aclEntityId, boolean canEnableInheritance, boolean canChangePermission, PermissionLevel defaultPermissionLevel, boolean isLoggedIn) {
+	public void buildWindow(boolean isProject, boolean isInherited, String aclEntityId, boolean canEnableInheritance, boolean canChangePermission, boolean isOpenData, PermissionLevel defaultPermissionLevel, boolean isLoggedIn) {
 		clear();
 		this.defaultPermissionLevel = defaultPermissionLevel;
 		// Display Permissions grid.
@@ -184,7 +184,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 			}
 		};
 
-		getSharingPermissionsGrid().configure(removeUserCallback, setAccessCallback);
+		getSharingPermissionsGrid().configure(removeUserCallback, setAccessCallback, isOpenData);
 		add(getSharingPermissionsGrid().asWidget());
 
 		if (!canChangePermission) {

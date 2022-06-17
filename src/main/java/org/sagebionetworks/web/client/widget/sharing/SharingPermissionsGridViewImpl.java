@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.sharing;
 
 import java.util.HashSet;
 import java.util.Map;
+
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.ListBox;
 import org.gwtbootstrap3.client.ui.constants.IconType;
@@ -16,9 +17,11 @@ import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditorViewImpl.SetAccessCallback;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
+
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -42,11 +45,14 @@ public class SharingPermissionsGridViewImpl extends Composite implements Sharing
 	TableHeader deleteColumnHeader;
 
 	private PortalGinInjector ginInjector;
+	private String publicAclPrincipalId;
+	private boolean isOpenData;
 
 	@Inject
 	public SharingPermissionsGridViewImpl(SharingPermissionsGridViewImplUiBinder uiBinder, PortalGinInjector ginInjector) {
 		initWidget(uiBinder.createAndBindUi(this));
 		this.ginInjector = ginInjector;
+		publicAclPrincipalId = ginInjector.getSynapseProperties().getSynapseProperty(WebConstants.PUBLIC_ACL_PRINCIPAL_ID);
 	}
 
 	@Override
@@ -55,9 +61,10 @@ public class SharingPermissionsGridViewImpl extends Composite implements Sharing
 	}
 
 	@Override
-	public void configure(CallbackP<Long> deleteButtonCallback, SetAccessCallback setAccessCallback) {
+	public void configure(CallbackP<Long> deleteButtonCallback, SetAccessCallback setAccessCallback, boolean isOpenData) {
 		this.deleteButtonCallback = deleteButtonCallback;
 		this.setAccessCallback = setAccessCallback;
+		this.isOpenData = isOpenData;
 	}
 
 	@Override
@@ -95,7 +102,17 @@ public class SharingPermissionsGridViewImpl extends Composite implements Sharing
 		if (!deleteButtonVisible || deleteButtonCallback == null) {
 			// Don't allow editing the permissions and don't add delete button.
 			String selectedItemText = permListBox.getSelectedItemText();
-			data.add(new Text(selectedItemText));
+			// SWC-6083: If this is the ACL entry of the public group
+			// and this is not editable (deleteButtonCallback == null),
+			// and the ACL entry is set to Can View,
+			// and this entity is set to be OPEN_DATA
+			// then render Can Download instead.
+			String canViewDisplayText = permissionDisplay.get(PermissionLevel.CAN_VIEW);
+			if (aclEntry.getOwnerId().equals(publicAclPrincipalId) && selectedItemText.equals(canViewDisplayText) && isOpenData) {
+				data.add(new Text(permissionDisplay.get(PermissionLevel.CAN_DOWNLOAD)));
+			} else {
+				data.add(new Text(selectedItemText));	
+			}
 			permissionColumnHeader.setStyleName("col-md-3");
 		} else {
 			data.add(permListBox);

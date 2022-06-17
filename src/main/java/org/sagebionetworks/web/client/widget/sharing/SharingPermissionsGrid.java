@@ -34,8 +34,8 @@ public class SharingPermissionsGrid implements SharingPermissionsGridView.Presen
 	 * @param deleteButtonCallback Callback for removing a user from the ACL. If null, the table will
 	 *        not be editable.
 	 */
-	public void configure(CallbackP<Long> deleteButtonCallback, SetAccessCallback setAccessCallback) {
-		view.configure(deleteButtonCallback, setAccessCallback);
+	public void configure(CallbackP<Long> deleteButtonCallback, SetAccessCallback setAccessCallback, boolean isOpenData) {
+		view.configure(deleteButtonCallback, setAccessCallback, isOpenData);
 	}
 
 	public AclEntry getAt(int index) {

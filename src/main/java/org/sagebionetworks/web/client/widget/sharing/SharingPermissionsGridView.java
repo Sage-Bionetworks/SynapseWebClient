@@ -14,7 +14,7 @@ public interface SharingPermissionsGridView extends IsWidget, SynapseView {
 
 	void add(AclEntry aclEntry, PermissionLevel[] permissionLevels, Map<PermissionLevel, String> permissionDisplays, boolean deleteButtonVisible);
 
-	void configure(CallbackP<Long> deleteButtonCallback, SetAccessCallback setAccessCallback);
+	void configure(CallbackP<Long> deleteButtonCallback, SetAccessCallback setAccessCallback, boolean isOpenData);
 
 	public interface Presenter {
 	}

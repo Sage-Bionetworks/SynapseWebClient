@@ -208,7 +208,8 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		view.showLoading();
 		boolean isInherited = !acl.getId().equals(entity.getId());
 		boolean canEnableInheritance = uep.getCanEnableInheritance();
-		view.buildWindow(entity instanceof Project, isInherited, acl.getId(), canEnableInheritance, canChangePermission, PermissionLevel.CAN_DOWNLOAD, authenticationController.isLoggedIn());
+		boolean isOpenData = uep.getIsEntityOpenData();
+		view.buildWindow(entity instanceof Project, isInherited, acl.getId(), canEnableInheritance, canChangePermission, isOpenData, PermissionLevel.CAN_DOWNLOAD, authenticationController.isLoggedIn());
 		populateAclEntries();
 		updateIsPublicAccess();
 	}
