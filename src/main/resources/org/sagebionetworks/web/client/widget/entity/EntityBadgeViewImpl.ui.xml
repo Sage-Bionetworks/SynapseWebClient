@@ -20,7 +20,7 @@
 			</t:TableData>
 			<t:TableData
 				addStyleNames="overflow-x-hidden min-width-140" width="140px">
-				<bh:Div ui:field="iconsContainer" />
+				<w:ReactComponentDiv ui:field="iconsContainer" />
 			</t:TableData>
 			<t:TableData ui:field="sizeTableData"
 				addStyleNames="hidden-xs overflow-x-hidden text-align-right min-width-140" width="140px">
