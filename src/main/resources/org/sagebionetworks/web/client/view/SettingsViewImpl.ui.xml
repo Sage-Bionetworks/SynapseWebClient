@@ -215,8 +215,15 @@
 				</bh:Div>
 				<bh:Div ui:field="subscriptionsContainer" />
 			</g:FlowPanel>
-			<g:HTMLPanel ui:field="apiKeyHighlightBox"
-				addStyleNames="highlight-box">
+
+			<g:HTMLPanel ui:field="personalAccessTokensHighlightBox" addStyleNames="highlight-box">
+				<p>You can issue personal access tokens to authenticate your scripts with scoped access
+					to your account. It is important that you treat personal access tokens with	the same security as your password.</p>
+				<b:Button ui:field="managePersonalAccessTokensButton"
+						  addStyleNames="margin-top-10" text="Manage Personal Access Tokens" />
+			</g:HTMLPanel>
+
+			<g:HTMLPanel ui:field="apiKeyHighlightBox" addStyleNames="highlight-box" visible="false">
 				<p>Using an API key allows you to authenticate your scripts for an
 					indefinite amount of time. It is important that you treat your API
 					key with
@@ -235,14 +242,6 @@
 					addStyleNames="margin-top-10" text="Show API Key" />
 				<b:Button ui:field="changeApiKey"
 					addStyleNames="margin-top-10" text="Change API Key" />
-			</g:HTMLPanel>
-
-			<g:HTMLPanel ui:field="personalAccessTokensHighlightBox"
-						 addStyleNames="highlight-box">
-				<p>You can issue personal access tokens to authenticate your scripts with scoped access
-					to your account. It is important that you treat personal access tokens with	the same security as your password.</p>
-				<b:Button ui:field="managePersonalAccessTokensButton"
-						  addStyleNames="margin-top-10" text="Manage Personal Access Tokens" />
 			</g:HTMLPanel>
 
 			<bh:Div addStyleNames="clear"></bh:Div>

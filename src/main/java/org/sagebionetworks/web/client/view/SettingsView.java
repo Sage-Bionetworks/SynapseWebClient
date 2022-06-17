@@ -61,6 +61,8 @@ public interface SettingsView extends IsWidget, SynapseView {
 		void unbindOrcId();
 	}
 
+	public void setApiKeySettingsVisible(boolean visible);
+
 	public void setApiKey(String apiKey);
 
 	public void setNotificationSynAlertWidget(IsWidget asWidget);
