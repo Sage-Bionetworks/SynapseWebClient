@@ -6,6 +6,7 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.download.AddBatchOfFilesToDownloadListResponse;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -70,7 +71,11 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 	}
 
 	public void getEntityBundle() {
-		jsClient.getEntityBundleFromCache(entityHeader.getId(), new AsyncCallback<EntityBundle>() {
+		EntityBundleRequest request = new EntityBundleRequest();
+		request.setIncludeEntity(true);
+		request.setIncludeFileHandles(true);
+
+		jsClient.getEntityBundle(entityHeader.getId(), request, new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				view.setError(caught.getMessage());
