@@ -11,7 +11,7 @@ public class SynapseClientError {
 	String url;
 
 	@JsOverlay
-	public String getReason() {
+	public final String getReason() {
 		return this.reason;
 	}
 }
