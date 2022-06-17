@@ -1614,15 +1614,14 @@ h1, h2, h3, h4, h5, h6 {
 }
 .entityTreeItem {
 	padding-right: 0px !important; /** Override gwt TreeItem BASE_BARE_ELEM padding of 3px **/
-}
-
-.entityTreeItem table {
-	width: 100%;
-}
-/** Select the td that is the first child under an element with class entityTreeItem.
-This is the icon table cell (gwt TreeItem exposes very little to the outside, so this is how we can style this container) **/
-.entityTreeItem td:first-child {
-	width:16px;
+  > table {
+    width: 100%;
+    /** Select the td that is the first child under an element with class entityTreeItem.
+    This is the icon table cell (gwt TreeItem exposes very little to the outside, so this is how we can style this container) **/
+    > tr > td:first-child {
+      width:16px;
+    }
+  }
 }
 
 .entityTreeItem-selected a,
