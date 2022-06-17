@@ -24,7 +24,8 @@ public interface AccessControlListModalWidget extends IsWidget {
 	 * 
 	 * @param entity
 	 * @param canChangePermission
+	 * @param isEntityOpenData
 	 */
-	public void configure(Entity entity, boolean canChangePermission);
+	public void configure(Entity entity, boolean canChangePermission, boolean isEntityOpenData);
 
 }

@@ -71,4 +71,6 @@ public interface AccessControlListModalWidgetView extends IsWidget {
 
 	void setTitle(String title);
 
+	void setIsEntityOpenData(boolean isEntityOpenData);
+
 }

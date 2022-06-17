@@ -22,6 +22,12 @@
 		</b:ModalHeader>
 		<b:ModalBody>
 			<g:SimplePanel ui:field="editorPanel" />
+			<bh:Div ui:field="openDataUI" marginTop="30">
+				<bh:Paragraph>
+					<w:IconSvg addStyleNames="synapse-green displayInline margin-right-5 moveup-3" icon="checkCircle" />
+					This is <bh:Strong>Open Data</bh:Strong>.&nbsp;&nbsp;Anyone on the web can download it.
+				</bh:Paragraph>
+			</bh:Div>
 		</b:ModalBody>
 		<b:ModalFooter>
 			<b:Button ui:field="defaultButton" type="LINK"

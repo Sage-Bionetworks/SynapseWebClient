@@ -84,8 +84,8 @@ public class AclAddPeoplePanel extends Composite implements SynapseView {
 			makePublicButton.setText("Make Public");
 			makePublicButton.setIcon(IconType.GLOBE);
 		} else {
-			makePublicButton.setText("Make Private");
-			makePublicButton.setIcon(IconType.LOCK);
+			makePublicButton.setText("Remove Public Access");
+			makePublicButton.setIcon(IconType.TIMES);
 		}
 	}
 

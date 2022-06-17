@@ -8,6 +8,7 @@ import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.HeadingSize;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Italic;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -168,14 +169,14 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 			}
 		} else {
 			// is inherited
-			div.add(new Span("The sharing settings shown below are currently being inherited from&nbsp;"));
+			div.add(new Italic("The sharing settings shown below are currently being inherited from&nbsp;"));
 			EntityIdCellRenderer entityRenderer = ginInjector.getEntityIdCellRenderer();
 			ClickHandler customClickHandler = event -> {
 				DisplayUtils.newWindow("#!Synapse:" + aclEntityId, "", "");
 			};
 			entityRenderer.setValue(aclEntityId, customClickHandler, false);
 			div.add(entityRenderer);
-			div.add(new Span("&nbsp;and cannot be modified here."));
+			div.add(new Italic("&nbsp;and cannot be modified here."));
 		}
 		SetAccessCallback setAccessCallback = new SetAccessCallback() {
 			@Override
