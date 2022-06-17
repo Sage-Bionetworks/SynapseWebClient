@@ -417,6 +417,11 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		emailsPanel.add(w);
 	}
 
+	@Override
+	public void setApiKeySettingsVisible(boolean visible) {
+		apiKeyHighlightBox.setVisible(visible);
+	}
+
 
 	@Override
 	public void setOrcIdVisible(boolean isVisible) {
