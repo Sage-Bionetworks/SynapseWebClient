@@ -4,9 +4,9 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.constants.HeadingSize;
-import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
+
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyDownEvent;
@@ -38,7 +38,6 @@ public class AccessControlListModalWidgetViewImpl implements AccessControlListMo
 	Button defaultButton;
 	@UiField
 	Span modalTitleContainer;
-	
 	Modal modal;
 	String originalButtonText;
 	@Inject
