@@ -149,6 +149,9 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 		clear();
 		this.defaultPermissionLevel = defaultPermissionLevel;
 		
+		openDataView.configure(isOpenData, canChangePermission, isPubliclyVisible);
+		add(openDataView);
+		
 		// Display Permissions grid.
 		showEditColumns = canChangePermission && !isInherited;
 		CallbackP<Long> removeUserCallback = null;
@@ -255,8 +258,6 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 				}
 			}
 		}
-		openDataView.configure(isOpenData, canChangePermission, isPubliclyVisible);
-		add(openDataView);
 		add(synAlertWidget);
 	}
 	

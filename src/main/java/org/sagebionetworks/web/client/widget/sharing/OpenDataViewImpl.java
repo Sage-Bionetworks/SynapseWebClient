@@ -27,19 +27,22 @@ public class OpenDataViewImpl implements IsWidget{
 		isPublicAndOpen.setVisible(false);
 		isPublicAndAdmin.setVisible(false);
 		isPrivateAndOpenAndAdmin.setVisible(false);
-		if (isPubliclyVisible) {
-			if (isOpenData) {
-				// This really is open data
-				isPublicAndOpen.setVisible(true);
-			} else if (canChangePermission) {
-				// This is not really open data
-				isPublicAndAdmin.setVisible(true);
-			}
-		} else {
-			if (isOpenData && canChangePermission) {
-				isPrivateAndOpenAndAdmin.setVisible(true);
-			}
+		if (canChangePermission) {
+			if (isPubliclyVisible) {
+				if (isOpenData) {
+					// This really is open data
+					isPublicAndOpen.setVisible(true);
+				} else {
+					// This is not really open data
+					isPublicAndAdmin.setVisible(true);
+				}
+			} else {
+				if (isOpenData) {
+					isPrivateAndOpenAndAdmin.setVisible(true);
+				}
+			}	
 		}
+		
 	}
 	
 	@Override
