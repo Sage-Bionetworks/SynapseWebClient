@@ -74,7 +74,7 @@ public class AclAddPeoplePanel extends Composite implements SynapseView {
 		});
 
 		if (isPubliclyVisible != null) {
-			setMakePublicButtonDisplay(!isPubliclyVisible);
+			setMakePublicButtonDisplay(isPubliclyVisible);
 		}
 
 	}

@@ -1908,7 +1908,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 
 	@Override
 	public void onShare() {
-		getAccessControlListModalWidget().configure(entity, permissions.getCanChangePermissions(), permissions.getIsEntityOpenData());
+		getAccessControlListModalWidget().configure(entity, permissions.getCanChangePermissions());
 		this.getAccessControlListModalWidget().showSharing(() -> {
 			fireEntityUpdatedEvent();
 		});

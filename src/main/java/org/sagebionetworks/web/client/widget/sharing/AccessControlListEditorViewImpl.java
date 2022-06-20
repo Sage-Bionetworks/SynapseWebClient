@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
 import java.util.Map;
+
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
@@ -9,18 +10,21 @@ import org.gwtbootstrap3.client.ui.constants.HeadingSize;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Italic;
-import org.gwtbootstrap3.client.ui.html.Span;
+import org.gwtbootstrap3.client.ui.html.Paragraph;
+import org.gwtbootstrap3.client.ui.html.Strong;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.HelpWidget;
+import org.sagebionetworks.web.client.widget.IconSvg;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
+
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
@@ -51,6 +55,9 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	private HelpWidget helpWidget = new HelpWidget();
 	private IsWidget synAlertWidget;
 	private PortalGinInjector ginInjector;
+	private Div openDataUI;
+	private boolean isOpenData;
+	private boolean canChangePermission;
 
 	@Inject
 	public AccessControlListEditorViewImpl(PortalGinInjector ginInjector) {
@@ -140,7 +147,10 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	@Override
 	public void buildWindow(boolean isProject, boolean isInherited, String aclEntityId, boolean canEnableInheritance, boolean canChangePermission, boolean isOpenData, PermissionLevel defaultPermissionLevel, boolean isLoggedIn) {
 		clear();
+		this.isOpenData = isOpenData;
 		this.defaultPermissionLevel = defaultPermissionLevel;
+		this.canChangePermission = canChangePermission;
+		
 		// Display Permissions grid.
 		showEditColumns = canChangePermission && !isInherited;
 		CallbackP<Long> removeUserCallback = null;
@@ -247,9 +257,40 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 				}
 			}
 		}
+		openDataUI = new Div();
+		refreshOpenDataUI();
+		add(openDataUI);
 		add(synAlertWidget);
 	}
 
+	private void refreshOpenDataUI() {
+		openDataUI.clear();
+		openDataUI.setMarginTop(0);
+		if (isOpenData) {
+			Paragraph p = new Paragraph();
+			IconSvg icon = new IconSvg();
+			icon.setStyleName("synapse-green displayInline margin-right-5 moveup-3");
+			icon.setIcon("checkCircle");
+			p.add(icon);
+			p.add(new Text("This is "));
+			p.add(new Strong("Open Data"));
+			String isPublicDownloadString = isPubliclyVisible ? ".  Anyone on the web can download it." : ".";
+			p.add(new Text(isPublicDownloadString));
+			openDataUI.add(p);
+			openDataUI.setMarginTop(10);
+		} else {
+			if (isPubliclyVisible && canChangePermission) {
+				HelpWidget help = new HelpWidget();
+				help.setText("Note on anonymous download");
+				help.setHelpMarkdown("Contact [act@sagebase.org](mailto://act@sagebase.org) to find out how to make this data downloadable by anyone on the web");
+				openDataUI.add(help);
+				openDataUI.setMarginTop(10);
+			}
+		}
+
+		
+	}
+	
 	@Override
 	public Boolean isNotifyPeople() {
 		return getAclAddPeoplePanel().getNotifyPeopleCheckBox().getValue();

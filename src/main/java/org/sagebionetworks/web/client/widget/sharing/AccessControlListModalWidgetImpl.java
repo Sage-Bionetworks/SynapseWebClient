@@ -33,11 +33,10 @@ public class AccessControlListModalWidgetImpl implements AccessControlListModalW
 	}
 
 	@Override
-	public void configure(Entity entity, boolean canChangePermission, boolean isEntityOpenData) {
+	public void configure(Entity entity, boolean canChangePermission) {
 		editor.configure(entity, canChangePermission, this);
 		String entityTypeName = EntityTypeUtils.getDisplayName(EntityTypeUtils.getEntityTypeForClass(entity.getClass()));
 		view.setTitle(entityTypeName + " Sharing Settings");
-		view.setIsEntityOpenData(isEntityOpenData);
 		if (canChangePermission) {
 			view.setPrimaryButtonVisible(true);
 			view.setDefaultButtonText(CANCEL);

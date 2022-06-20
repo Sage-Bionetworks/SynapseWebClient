@@ -38,8 +38,6 @@ public class AccessControlListModalWidgetViewImpl implements AccessControlListMo
 	Button defaultButton;
 	@UiField
 	Span modalTitleContainer;
-	@UiField
-	Div openDataUI;
 	
 	Modal modal;
 	String originalButtonText;
@@ -108,10 +106,5 @@ public class AccessControlListModalWidgetViewImpl implements AccessControlListMo
 		h.addStyleName("displayInline");
 		h.setText(title);
 		modalTitleContainer.add(h);
-	}
-	
-	@Override
-	public void setIsEntityOpenData(boolean isEntityOpenData) {
-		openDataUI.setVisible(isEntityOpenData);
 	}
 }

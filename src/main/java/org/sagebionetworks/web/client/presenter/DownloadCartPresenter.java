@@ -49,8 +49,7 @@ public class DownloadCartPresenter extends AbstractActivity implements DownloadC
 			@Override
 			public void onSuccess(Entity entity) {
 				boolean canChangePermission = false;
-				boolean isEntityOpenData = false;
-				getAccessControlListModalWidget().configure(entity, canChangePermission, isEntityOpenData);
+				getAccessControlListModalWidget().configure(entity, canChangePermission);
 				getAccessControlListModalWidget().showSharing(() -> {});
 			}
 			
