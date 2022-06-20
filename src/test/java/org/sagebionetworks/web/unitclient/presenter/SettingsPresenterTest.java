@@ -41,6 +41,7 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
@@ -48,6 +49,7 @@ import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.presenter.SettingsPresenter;
@@ -110,6 +112,8 @@ public class SettingsPresenterTest {
 	VerificationSubmission mockVerificationSubmission;
 	@Mock
 	NotificationEmail mockNotificationEmail;
+	@Mock
+	CookieProvider mockCookieProvider;
 
 	@Before
 	public void setup() throws JSONObjectAdapterException {
@@ -121,6 +125,7 @@ public class SettingsPresenterTest {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserProfile()).thenReturn(profile);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
+		when(mockInjector.getCookieProvider()).thenReturn(mockCookieProvider);
 		AsyncMockStubber.callSuccessWith(APIKEY).when(mockSynapseClient).getAPIKey(any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(profile).when(mockSynapseJavascriptClient).getUserProfile(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(mockUserBundle).when(mockSynapseJavascriptClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
@@ -520,5 +525,19 @@ public class SettingsPresenterTest {
 		presenter.unbindOrcIdAfterConfirmation();
 		// error is shown
 		verify(mockSynAlert).handleException(ex);
+	}
+
+	@Test
+	public void testApiKeySettingsHidden() {
+		when(mockCookieProvider.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn(null);
+		presenter.configure();
+		verify(mockView).setApiKeySettingsVisible(false);
+	}
+
+	@Test
+	public void testApiKeySettingsShownInExperimentalMode() {
+		when(mockCookieProvider.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("true");
+		presenter.configure();
+		verify(mockView).setApiKeySettingsVisible(true);
 	}
 }

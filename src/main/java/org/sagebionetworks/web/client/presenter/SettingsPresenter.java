@@ -213,6 +213,8 @@ public class SettingsPresenter implements SettingsView.Presenter {
 				view.setShowingLocalTime();
 			}
 		}
+		// Only show deprecated API key settings if in experimental mode
+		view.setApiKeySettingsVisible(DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider()));
 		this.view.render();
 	}
 

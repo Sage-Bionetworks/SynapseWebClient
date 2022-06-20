@@ -12,6 +12,7 @@ public class SRC {
 
 	@JsType(isNative = true)
 	public static class SynapseComponents {
+		public static ReactFunctionComponent<EntityBadgeIconsProps> EntityBadgeIcons;
 		public static ReactFunctionComponent<DatasetEditorProps> DatasetItemsEditor;
 		public static ReactFunctionComponent<EntityFinderProps> EntityFinder;
 		public static ReactFunctionComponent<EvaluationCardProps> EvaluationCard;

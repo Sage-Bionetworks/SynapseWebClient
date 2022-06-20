@@ -2,6 +2,9 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.schema.ValidationResults;
+import org.sagebionetworks.web.client.jsinterop.EntityBadgeIconsProps;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
+import org.sagebionetworks.web.client.jsinterop.SynapseContextProviderProps;
 import org.sagebionetworks.web.client.widget.lazyload.SupportsLazyLoadInterface;
 
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -16,27 +19,11 @@ public interface EntityBadgeView extends IsWidget, SupportsLazyLoadInterface {
 
 	void showAddToDownloadList();
 
-	/**
-	 *
-	 * @param html may be null iff there are no annotations
-	 * @param hasSchema
-	 * @param validationResults is null iff hasSchema is false
-	 */
-	void setAnnotations(String html, boolean hasSchema, ValidationResults validationResults);
-
 	void setSize(String s);
 
 	void setMd5(String s);
 
-	void showPublicIcon();
-
-	void showPrivateIcon();
-
-	void showSharingSetIcon();
-
-	void showHasWikiIcon();
-
-	void showUnlinkIcon();
+	void setIcons(EntityBadgeIconsProps props, SynapseContextProviderProps contextProps);
 
 	void setError(String error);
 
@@ -46,16 +33,12 @@ public interface EntityBadgeView extends IsWidget, SupportsLazyLoadInterface {
 
 	void setModifiedByUserBadgeClickHandler(ClickHandler handler);
 
-	void showDiscussionThreadIcon();
-
 	void showMinimalColumnSet();
 
 	void clearIcons();
 	void clearEntityInformation();
 
 	public interface Presenter {
-		void onUnlink();
-
 		void onAddToDownloadList();
 	}
 

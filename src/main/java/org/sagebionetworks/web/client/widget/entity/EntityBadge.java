@@ -1,40 +1,29 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.List;
-import java.util.Map;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
-import org.sagebionetworks.repo.model.Link;
-import org.sagebionetworks.repo.model.annotation.v2.Annotations;
-import org.sagebionetworks.repo.model.annotation.v2.AnnotationsValue;
 import org.sagebionetworks.repo.model.download.AddBatchOfFilesToDownloadListResponse;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.repo.model.file.FileHandle;
-import org.sagebionetworks.repo.model.schema.JsonSchemaObjectBinding;
-import org.sagebionetworks.repo.model.schema.ValidationResults;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PopupUtilsView;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.SynapseProperties;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
+import org.sagebionetworks.web.client.jsinterop.EntityBadgeIconsProps;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.FileHandleUtils;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformer;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
-import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
-import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -43,43 +32,50 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 
 	public static final String ADDED_TO_DOWNLOAD_LIST = " has been added to your download list.";
 	public static final String LINK_SUCCESSFULLY_DELETED = "Successfully removed link";
-	private EntityBadgeView view;
-	private GlobalApplicationState globalAppState;
+	private final EntityBadgeView view;
+	private final GlobalApplicationState globalAppState;
 	private EntityHeader entityHeader;
-	private AnnotationTransformer transformer;
-	private SynapseJavascriptClient jsClient;
-	private AuthenticationController authController;
-	private LazyLoadHelper lazyLoadHelper;
-	private PopupUtilsView popupUtils;
-	private SynapseProperties synapseProperties;
-	private EventBus eventBus;
-	private String dataFileHandleId;
-	private SynapseJSNIUtils jsniUtils;
-	private CookieProvider cookies;
+	private final SynapseJavascriptClient jsClient;
+	private final AuthenticationController authController;
+	private final LazyLoadHelper lazyLoadHelper;
+	private final PopupUtilsView popupUtils;
+	private final EventBus eventBus;
 	private ClickHandler customClickHandler;
+	private final SynapseContextPropsProvider propsProvider;
+
+	private final EntityBadgeIconsProps.OnUnlinkSuccess onUnlinkSuccess;
+	private final EntityBadgeIconsProps.OnUnlinkError onUnlinkError;
 
 	@Inject
-	public EntityBadge(EntityBadgeView view, GlobalApplicationState globalAppState, AnnotationTransformer transformer, SynapseJavascriptClient jsClient, LazyLoadHelper lazyLoadHelper, PopupUtilsView popupUtils, SynapseProperties synapseProperties, EventBus eventBus, AuthenticationController authController, SynapseJSNIUtils jsniUtils, CookieProvider cookies) {
+	public EntityBadge(EntityBadgeView view, GlobalApplicationState globalAppState, SynapseJavascriptClient jsClient, LazyLoadHelper lazyLoadHelper, PopupUtilsView popupUtils, EventBus eventBus, AuthenticationController authController, SynapseContextPropsProvider propsProvider) {
 		this.view = view;
 		this.globalAppState = globalAppState;
-		this.transformer = transformer;
-
 		this.jsClient = jsClient;
 		this.lazyLoadHelper = lazyLoadHelper;
 		this.popupUtils = popupUtils;
-		this.synapseProperties = synapseProperties;
 		this.eventBus = eventBus;
 		this.authController = authController;
-		this.jsniUtils = jsniUtils;
-		this.cookies = cookies;
-		Callback loadDataCallback = () -> getEntityBundle();
+		this.propsProvider = propsProvider;
+
+		Callback loadDataCallback = this::getEntityBundle;
 
 		lazyLoadHelper.configure(loadDataCallback, view);
 		view.setPresenter(this);
+
+		onUnlinkSuccess = (id) -> {
+			popupUtils.showInfo(LINK_SUCCESSFULLY_DELETED);
+			globalAppState.refreshPage();
+		};
+
+		onUnlinkError = (error) -> popupUtils.showErrorMessage(error.getReason());
 	}
 
 	public void getEntityBundle() {
-		jsClient.getEntityBundleFromCache(entityHeader.getId(), new AsyncCallback<EntityBundle>() {
+		EntityBundleRequest request = new EntityBundleRequest();
+		request.setIncludeEntity(true);
+		request.setIncludeFileHandles(true);
+
+		jsClient.getEntityBundle(entityHeader.getId(), request, new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				view.setError(caught.getMessage());
@@ -87,7 +83,7 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 
 			public void onSuccess(EntityBundle eb) {
 				setEntityBundle(eb);
-			};
+			}
 		});
 	}
 
@@ -107,8 +103,6 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 		}
 	}
 
-	public void clearState() {}
-
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
@@ -120,84 +114,20 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 		if (customClickHandler != null) {
 			view.setClickHandler(customClickHandler);
 		}
-		Annotations annotations = eb.getAnnotations();
-		String rootWikiId = eb.getRootWikiId();
 		List<FileHandle> handles = eb.getFileHandles();
 		FileHandle dataFileHandle = getDataFileHandle(handles);
-		if (PublicPrivateBadge.isPublic(eb.getBenefactorAcl(), synapseProperties.getPublicPrincipalIds())) {
-			view.showPublicIcon();
-		} else {
-			view.showPrivateIcon();
-		}
 
-		String annotationsHtml = null;
-		if (annotations != null) {
-			Map<String, AnnotationsValue> annotationsMap = annotations.getAnnotations();
-			if (!annotationsMap.isEmpty()) {
-				annotationsHtml = getAnnotationsHTML(annotationsMap);
-			}
-		}
+		EntityBadgeIconsProps iconsProps = EntityBadgeIconsProps.create(eb.getEntity().getId(), onUnlinkSuccess, onUnlinkError);
+
+		view.setIcons(iconsProps, propsProvider.getJsInteropContextProps());
 
 		// In experimental mode, check if there's a bound JSON Schema + check validity
-		if (DisplayUtils.isInTestWebsite(cookies)) {
-			final String finalAnnotationsHtml = annotationsHtml;
-			jsClient.getSchemaBinding(eb.getEntity().getId(), new AsyncCallback<JsonSchemaObjectBinding>() {
-				@Override
-				public void onSuccess(JsonSchemaObjectBinding result) {
-					boolean hasSchema = true;
 
-					jsClient.getSchemaValidationResultsWithMatchingEtag(eb.getEntity().getId(), eb.getEntity().getEtag(), new AsyncCallback<ValidationResults>() {
-						@Override
-						public void onSuccess(ValidationResults result) {
-							view.setAnnotations(finalAnnotationsHtml, hasSchema, result);
-						}
-
-						@Override
-						public void onFailure(Throwable caught) {
-							view.setError(caught.getMessage());
-						}
-					});
-
-				}
-
-				@Override
-				public void onFailure(Throwable caught) {
-					if (caught instanceof NotFoundException) { // The entity has no schema.
-						boolean hasSchema = false;
-						if (finalAnnotationsHtml != null) {
-							view.setAnnotations(finalAnnotationsHtml, hasSchema, null);
-						}
-					} else {
-						view.setError(caught.getMessage());
-					}
-				}
-			});
-		} else if (annotationsHtml != null) {
-			view.setAnnotations(annotationsHtml, false, null);
-		}
-
-		if (eb.getEntity() instanceof Link && eb.getPermissions().getCanDelete()) {
-			view.showUnlinkIcon();
-		}
 		view.setSize(getContentSize(dataFileHandle));
 		view.setMd5(getContentMd5(dataFileHandle));
 
-		boolean hasLocalSharingSettings = eb.getBenefactorAcl().getId().equals(entityHeader.getId());
-		if (hasLocalSharingSettings) {
-			view.showSharingSetIcon();
-		}
-
-		if (DisplayUtils.isDefined(rootWikiId)) {
-			view.showHasWikiIcon();
-		}
-
 		if (eb.getEntity() instanceof FileEntity && ((FileEntity) eb.getEntity()).getDataFileHandleId() != null) {
-			dataFileHandleId = ((FileEntity) eb.getEntity()).getDataFileHandleId();
 			view.showAddToDownloadList();
-		}
-
-		if (eb.getThreadCount() > 0) {
-			view.showDiscussionThreadIcon();
 		}
 	}
 
@@ -230,25 +160,6 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 		return "";
 	}
 
-	/**
-	 * Adds annotations and wiki status values to the given key value display
-	 * 
-	 * @param keyValueDisplay
-	 * @param annotations
-	 */
-	public String getAnnotationsHTML(Map<String, AnnotationsValue> annotations) {
-		StringBuilder sb = new StringBuilder();
-		for (String key : annotations.keySet()) {
-			sb.append("<strong>");
-			sb.append(SafeHtmlUtils.htmlEscapeAllowEntities(key));
-			sb.append("</strong>&nbsp;");
-			AnnotationsValue value = annotations.get(key);
-			sb.append(SafeHtmlUtils.htmlEscapeAllowEntities(transformer.getFriendlyValues(value)));
-			sb.append("<br />");
-		}
-		return sb.toString();
-	}
-
 	public EntityHeader getHeader() {
 		return entityHeader;
 	}
@@ -266,23 +177,6 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 	}
 
 	@Override
-	public void onUnlink() {
-		// delete this Link
-		jsClient.deleteEntityById(getEntityId(), new AsyncCallback<Void>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				popupUtils.showErrorMessage(caught.getMessage());
-			}
-
-			@Override
-			public void onSuccess(Void result) {
-				popupUtils.showInfo(LINK_SUCCESSFULLY_DELETED);
-				globalAppState.refreshPage();
-			}
-		});
-	}
-
-	@Override
 	public void onAddToDownloadList() {
 		if (!authController.isLoggedIn()) {
 			globalAppState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
@@ -297,7 +191,7 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 				String href = "#!DownloadCart:0";
 				popupUtils.showInfo(entityHeader.getName() + EntityBadge.ADDED_TO_DOWNLOAD_LIST, href, DisplayConstants.VIEW_DOWNLOAD_LIST);
 				eventBus.fireEvent(new DownloadListUpdatedEvent());
-			};
+			}
 		});
 	}
 

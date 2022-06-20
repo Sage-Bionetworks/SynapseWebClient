@@ -10,9 +10,7 @@ import org.gwtbootstrap3.client.ui.constants.Emphasis;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.gwtbootstrap3.client.ui.constants.Pull;
-import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.schema.ValidationResults;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -20,15 +18,21 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.jsinterop.EntityBadgeIconsProps;
+import org.sagebionetworks.web.client.jsinterop.React;
+import org.sagebionetworks.web.client.jsinterop.ReactDOM;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
+import org.sagebionetworks.web.client.jsinterop.SRC;
+import org.sagebionetworks.web.client.jsinterop.SynapseContextProviderProps;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 import org.sagebionetworks.web.client.widget.EntityTypeIcon;
+import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
@@ -82,7 +86,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	@UiField
 	TableData modifiedByTableData;
 	@UiField
-	Div iconsContainer;
+	ReactComponentDiv iconsContainer;
 	@UiField
 	TableData downloadTableData;
 	@UiField
@@ -216,43 +220,6 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	}
 
 	@Override
-	public void setAnnotations(String html, boolean hasSchema, ValidationResults validationResults) {
-		boolean addIcon = false;
-		String className = null;
-
-		if (hasSchema) {
-			addIcon = true;
-			if (html == null) { // does not have annotations
-				className = "IconMissing";
-				html = "Missing annotations required by schema";
-			} else if (validationResults.getIsValid()) {
-				className = "IconValid";
-			} else {
-				className = "IconInvalid";
-			}
-		} else if (html != null) {
-			// Has annotations, but there is no schema
-			addIcon = true;
-		}
-
-		if (addIcon) {
-			Icon icon = new Icon(IconType.TAGS);
-			if (className != null) {
-				icon.addStyleName(className);
-			}
-			icon.setFixedWidth(true);
-			icon.setPull(Pull.RIGHT);
-			Tooltip tooltip = new Tooltip(icon);
-			tooltip.setContainer("body");
-			tooltip.setPlacement(Placement.RIGHT);
-			if (html != null) {
-				tooltip.setHtml(SafeHtmlUtils.fromTrustedString(html));
-			}
-			iconsContainer.add(tooltip);
-		}
-	}
-
-	@Override
 	public void setError(String error) {
 		Icon icon = new Icon(IconType.EXCLAMATION_CIRCLE);
 		icon.setFixedWidth(true);
@@ -273,72 +240,21 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		md5Field.setText(s);
 	}
 
-	@Override
-	public void showHasWikiIcon() {
-		Icon icon = new Icon(IconType.NEWSPAPER_O);
-		icon.setFixedWidth(true);
-		icon.setPull(Pull.RIGHT);
-		Tooltip tooltip = new Tooltip(icon, "Has a wiki");
-		tooltip.setPlacement(Placement.RIGHT);
-		iconsContainer.add(tooltip);
-	}
 
 	@Override
-	public void showPrivateIcon() {
-		Icon icon = new Icon(IconType.LOCK);
-		icon.setFixedWidth(true);
-		icon.setPull(Pull.RIGHT);
-		Tooltip tooltip = new Tooltip(icon, "Private");
-		tooltip.setPlacement(Placement.RIGHT);
-		iconsContainer.add(tooltip);
-	}
+	public void setIcons(EntityBadgeIconsProps props, SynapseContextProviderProps providerProps) {
+		ReactElement reactElement = React.createElementWithSynapseContext(
+				SRC.SynapseComponents.EntityBadgeIcons,
+				props,
+				providerProps
+		);
 
-	@Override
-	public void showPublicIcon() {
-		Icon icon = new Icon(IconType.GLOBE);
-		icon.setFixedWidth(true);
-		icon.setPull(Pull.RIGHT);
-		Tooltip tooltip = new Tooltip(icon, "Public");
-		tooltip.setPlacement(Placement.RIGHT);
-		iconsContainer.add(tooltip);
-	}
-
-	@Override
-	public void showSharingSetIcon() {
-		Icon icon = new Icon(IconType.CHECK);
-		icon.setFixedWidth(true);
-		icon.setPull(Pull.RIGHT);
-		Tooltip tooltip = new Tooltip(icon, "Sharing Settings have been set");
-		tooltip.setPlacement(Placement.RIGHT);
-		iconsContainer.add(tooltip);
+		ReactDOM.render(reactElement, iconsContainer.getElement());
 	}
 
 	@Override
 	public boolean isInViewport() {
 		return DisplayUtils.isInViewport(this);
-	}
-
-	@Override
-	public void showDiscussionThreadIcon() {
-		Icon icon = new Icon(IconType.COMMENT);
-		icon.setFixedWidth(true);
-		icon.setPull(Pull.RIGHT);
-		Tooltip tooltip = new Tooltip(icon, "Has been mentioned in discussion");
-		tooltip.setPlacement(Placement.RIGHT);
-		iconsContainer.add(tooltip);
-	}
-
-	@Override
-	public void showUnlinkIcon() {
-		Icon icon = new Icon(IconType.CHAIN_BROKEN);
-		icon.setFixedWidth(true);
-		icon.setPull(Pull.RIGHT);
-		icon.setEmphasis(Emphasis.DANGER);
-		icon.addStyleName("imageButton");
-		icon.addClickHandler(event -> DisplayUtils.confirmDelete("Are you sure you want to delete this Link?", () -> presenter.onUnlink()));
-		Tooltip tooltip = new Tooltip(icon, "Remove this link");
-		tooltip.setPlacement(Placement.RIGHT);
-		iconsContainer.add(tooltip);
 	}
 
 	@Override
