@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.sharing;
 
 import java.util.Map;
 
+import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
@@ -266,29 +267,54 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	private void refreshOpenDataUI() {
 		openDataUI.clear();
 		openDataUI.setMarginTop(0);
-		if (isOpenData) {
-			Paragraph p = new Paragraph();
-			IconSvg icon = new IconSvg();
-			icon.setStyleName("synapse-green displayInline margin-right-5 moveup-3");
-			icon.setIcon("checkCircle");
-			p.add(icon);
-			p.add(new Text("This is "));
-			p.add(new Strong("Open Data"));
-			String isPublicDownloadString = isPubliclyVisible ? ".  Anyone on the web can download it." : ".";
-			p.add(new Text(isPublicDownloadString));
-			openDataUI.add(p);
-			openDataUI.setMarginTop(10);
+		if (isPubliclyVisible) {
+			if (isOpenData) {
+				// This really is open data
+				Paragraph p = new Paragraph();
+				p.addStyleName("margin-bottom-0-imp");
+				IconSvg icon = new IconSvg();
+				icon.setStyleName("synapse-green displayInline margin-right-5 moveup-3");
+				icon.setIcon("checkCircle");
+				p.add(icon);
+				p.add(new Strong("This data is open"));
+				openDataUI.add(p);
+				Paragraph p2 = new Paragraph();
+				p2.addStyleName("lightGreyText margin-left-30");
+				p2.setText("Anyone can download it, even if they aren’t logged in to Synapse.");
+				openDataUI.add(p2);
+			} else if (canChangePermission) {
+				// This is not really open data
+				Paragraph p = new Paragraph();
+				p.addStyleName("margin-bottom-0-imp has-warning");
+				IconSvg icon = new IconSvg();
+				icon.setStyleName("form-control-feedback displayInline margin-right-5 moveup-3");
+				icon.setIcon("warningOutlined");
+				p.add(icon);
+				p.add(new Strong("This data is not open. Users must be logged in to Synapse to download it."));
+				openDataUI.add(p);
+				Paragraph p2 = new Paragraph();
+				p2.addStyleName("lightGreyText margin-left-30");
+				p2.add(new Text("Contact "));
+				p2.add(new Anchor("act@sagebase.org", "mailto://act@sagebase.org"));
+				p2.add(new Text(" to find out how make this data open."));
+				openDataUI.add(p2);
+			}
+			openDataUI.setMarginTop(20);
 		} else {
-			if (isPubliclyVisible && canChangePermission) {
-				HelpWidget help = new HelpWidget();
-				help.setText("Note on anonymous download");
-				help.setHelpMarkdown("Contact [act@sagebase.org](mailto://act@sagebase.org) to find out how to make this data downloadable by anyone on the web");
-				openDataUI.add(help);
-				openDataUI.setMarginTop(10);
+			if (isOpenData && canChangePermission) {
+				// another warning?  Current entity is OPEN_DATA, but public cannot READ.
+				// This is not really open data.
+				Paragraph p = new Paragraph();
+				p.addStyleName("margin-bottom-0-imp has-warning");
+				IconSvg icon = new IconSvg();
+				icon.setStyleName("form-control-feedback displayInline margin-right-5 moveup-3");
+				icon.setIcon("warningOutlined");
+				p.add(icon);
+				p.add(new Strong("This data is not open. You must grant public access for users to be able to download it."));
+				openDataUI.add(p);
+				openDataUI.setMarginTop(20);
 			}
 		}
-
-		
 	}
 	
 	@Override
