@@ -31,15 +31,15 @@ public class OpenDataViewImpl implements OpenDataView {
 	}
 	
 	@Override
-	public void setIsPrivateAndOpenAndAdmin() {
+	public void showMustGivePublicReadToBeOpenData() {
 		isPrivateAndOpenAndAdmin.setVisible(true);
 	}
 	@Override
-	public void setIsPublicAndAdmin() {
+	public void showMustContactACTToBeOpenData() {
 		isPublicAndAdmin.setVisible(true);
 	}
 	@Override
-	public void setIsPublicAndOpenAndAdmin() {
+	public void showIsOpenData() {
 		isPublicAndOpen.setVisible(true);
 	}
 

@@ -19,14 +19,14 @@ public class OpenData implements IsWidget {
 			if (isPubliclyVisible) {
 				if (isOpenData) {
 					// This really is open data
-					view.setIsPublicAndOpenAndAdmin();
+					view.showIsOpenData();
 				} else {
 					// This is not really open data
-					view.setIsPublicAndAdmin();
+					view.showMustContactACTToBeOpenData();
 				}
 			} else {
 				if (isOpenData) {
-					view.setIsPrivateAndOpenAndAdmin();
+					view.showMustGivePublicReadToBeOpenData();
 				}
 			}	
 		}

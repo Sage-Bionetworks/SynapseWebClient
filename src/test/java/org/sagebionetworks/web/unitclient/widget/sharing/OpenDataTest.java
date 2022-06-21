@@ -31,7 +31,7 @@ public class OpenDataTest {
 
 		openData.configure(isOpenData, canChangePermissions, isPublicRead);
 
-		verify(mockView).setIsPublicAndOpenAndAdmin();
+		verify(mockView).showIsOpenData();
 	}
 	
 	@Test
@@ -57,7 +57,7 @@ public class OpenDataTest {
 		openData.configure(isOpenData, canChangePermissions, isPublicRead);
 
 		verify(mockView).reset();
-		verify(mockView).setIsPublicAndAdmin();
+		verify(mockView).showMustContactACTToBeOpenData();
 	}
 	
 	@Test
@@ -81,7 +81,7 @@ public class OpenDataTest {
 		openData.configure(isOpenData, canChangePermissions, isPublicRead);
 
 		verify(mockView).reset();
-		verify(mockView).setIsPrivateAndOpenAndAdmin();
+		verify(mockView).showMustGivePublicReadToBeOpenData();
 	}
 
 	@Test
