@@ -572,6 +572,8 @@ import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidge
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.sharing.EvaluationAccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.sharing.EvaluationAccessControlListModalWidgetImpl;
+import org.sagebionetworks.web.client.widget.sharing.OpenDataView;
+import org.sagebionetworks.web.client.widget.sharing.OpenDataViewImpl;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadgeView;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.sharing.SharingPermissionsGridView;
@@ -1442,5 +1444,6 @@ public class PortalGinModule extends AbstractGinModule {
         bind(EntityFinderWidgetView.class).to(EntityFinderWidgetViewImpl.class);
         bind(SynapseContextPropsProvider.class).to(SynapseContextPropsProviderImpl.class);
         bind(AddToDownloadListV2.class).to(AddToDownloadListV2Impl.class);
+        bind(OpenDataView.class).to(OpenDataViewImpl.class);
 	}
 }

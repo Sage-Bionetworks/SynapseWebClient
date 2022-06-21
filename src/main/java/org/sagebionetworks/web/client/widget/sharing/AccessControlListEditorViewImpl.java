@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
 import java.util.Map;
+
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
@@ -8,7 +9,7 @@ import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.HeadingSize;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Span;
+import org.gwtbootstrap3.client.ui.html.Italic;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -20,6 +21,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellR
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
+
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
@@ -50,11 +52,13 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	private HelpWidget helpWidget = new HelpWidget();
 	private IsWidget synAlertWidget;
 	private PortalGinInjector ginInjector;
+	private OpenData openData;
 
 	@Inject
-	public AccessControlListEditorViewImpl(PortalGinInjector ginInjector) {
+	public AccessControlListEditorViewImpl(PortalGinInjector ginInjector, OpenData openData) {
 		this.ginInjector = ginInjector;
-
+		this.openData = openData;
+		
 		helpWidget.setHelpMarkdown("Learn more about managing access controls and permissions in Synapse.");
 		helpWidget.setHref(WebConstants.DOCS_URL + "Conditions-for-Use.2009596938.html");
 		helpWidget.setAddStyleNames("margin-left-5");
@@ -137,9 +141,13 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	}
 
 	@Override
-	public void buildWindow(boolean isProject, boolean isInherited, String aclEntityId, boolean canEnableInheritance, boolean canChangePermission, PermissionLevel defaultPermissionLevel, boolean isLoggedIn) {
+	public void buildWindow(boolean isProject, boolean isInherited, String aclEntityId, boolean canEnableInheritance, boolean canChangePermission, boolean isOpenData, PermissionLevel defaultPermissionLevel, boolean isLoggedIn) {
 		clear();
 		this.defaultPermissionLevel = defaultPermissionLevel;
+		
+		openData.configure(isOpenData, canChangePermission, isPubliclyVisible);
+		add(openData);
+		
 		// Display Permissions grid.
 		showEditColumns = canChangePermission && !isInherited;
 		CallbackP<Long> removeUserCallback = null;
@@ -168,14 +176,14 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 			}
 		} else {
 			// is inherited
-			div.add(new Span("The sharing settings shown below are currently being inherited from&nbsp;"));
+			div.add(new Italic("The sharing settings shown below are currently being inherited from&nbsp;"));
 			EntityIdCellRenderer entityRenderer = ginInjector.getEntityIdCellRenderer();
 			ClickHandler customClickHandler = event -> {
 				DisplayUtils.newWindow("#!Synapse:" + aclEntityId, "", "");
 			};
 			entityRenderer.setValue(aclEntityId, customClickHandler, false);
 			div.add(entityRenderer);
-			div.add(new Span("&nbsp;and cannot be modified here."));
+			div.add(new Italic("&nbsp;and cannot be modified here."));
 		}
 		SetAccessCallback setAccessCallback = new SetAccessCallback() {
 			@Override
@@ -184,7 +192,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 			}
 		};
 
-		getSharingPermissionsGrid().configure(removeUserCallback, setAccessCallback);
+		getSharingPermissionsGrid().configure(removeUserCallback, setAccessCallback, isOpenData);
 		add(getSharingPermissionsGrid().asWidget());
 
 		if (!canChangePermission) {
@@ -248,7 +256,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 		}
 		add(synAlertWidget);
 	}
-
+	
 	@Override
 	public Boolean isNotifyPeople() {
 		return getAclAddPeoplePanel().getNotifyPeopleCheckBox().getValue();

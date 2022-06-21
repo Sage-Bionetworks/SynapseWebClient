@@ -70,5 +70,4 @@ public interface AccessControlListModalWidgetView extends IsWidget {
 	void setLoading(boolean loading);
 
 	void setTitle(String title);
-
 }

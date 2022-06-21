@@ -22,7 +22,7 @@ public interface AccessControlListEditorView extends IsWidget, SynapseView {
 	 * @param principals the available principals
 	 * @param isEditable
 	 */
-	public void buildWindow(boolean isProject, boolean isInherited, String aclEntityId, boolean canEnableInheritance, boolean canChangePermission, PermissionLevel defaultPermissionLevel, boolean isLoggedIn);
+	public void buildWindow(boolean isProject, boolean isInherited, String aclEntityId, boolean canEnableInheritance, boolean canChangePermission, boolean isOpenData, PermissionLevel defaultPermissionLevel, boolean isLoggedIn);
 
 	/**
 	 * Add an ACL Entry to the permissions dialog

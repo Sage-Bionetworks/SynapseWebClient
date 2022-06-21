@@ -187,6 +187,7 @@ public class AccessControlListEditorTest {
 		uep = new UserEntityPermissions();
 		uep.setCanChangePermissions(true);
 		uep.setCanEnableInheritance(true);
+		uep.setIsEntityOpenData(false);
 		uep.setCanPublicRead(false);
 		uep.setOwnerPrincipalId(OWNER_ID);
 		return uep;
@@ -264,8 +265,8 @@ public class AccessControlListEditorTest {
 		assertEquals("Created ACL is invalid", localACL, returnedACL);
 		verify(mockACLEView, never()).showErrorMessage(anyString());
 		// verify initially inherited acl, then local ACL
-		verify(mockACLEView).buildWindow(anyBoolean(), anyBoolean(), eq(INHERITED_ACL_ID), anyBoolean(), anyBoolean(), eq(PermissionLevel.CAN_DOWNLOAD), anyBoolean());
-		verify(mockACLEView, times(2)).buildWindow(anyBoolean(), anyBoolean(), eq(ENTITY_ID), anyBoolean(), anyBoolean(), eq(PermissionLevel.CAN_DOWNLOAD), anyBoolean());
+		verify(mockACLEView).buildWindow(anyBoolean(), anyBoolean(), eq(INHERITED_ACL_ID), anyBoolean(), anyBoolean(), anyBoolean(), eq(PermissionLevel.CAN_DOWNLOAD), anyBoolean());
+		verify(mockACLEView, times(2)).buildWindow(anyBoolean(), anyBoolean(), eq(ENTITY_ID), anyBoolean(), anyBoolean(), anyBoolean(), eq(PermissionLevel.CAN_DOWNLOAD), anyBoolean());
 
 		verify(mockACLEView).setPublicAclPrincipalId(any(Long.class));
 
@@ -313,7 +314,7 @@ public class AccessControlListEditorTest {
 
 		assertEquals("Updated ACL is invalid", localACL, returnedACL);
 		verify(mockACLEView, never()).showErrorMessage(anyString());
-		verify(mockACLEView, times(6)).buildWindow(anyBoolean(), anyBoolean(), anyString(), anyBoolean(), anyBoolean(), eq(PermissionLevel.CAN_DOWNLOAD), anyBoolean());
+		verify(mockACLEView, times(6)).buildWindow(anyBoolean(), anyBoolean(), anyString(), anyBoolean(), anyBoolean(), anyBoolean(), eq(PermissionLevel.CAN_DOWNLOAD), anyBoolean());
 		verify(mockACLEView).setPublicAclPrincipalId(any(Long.class));
 
 		ArgumentCaptor<Set> recipientSetCaptor = ArgumentCaptor.forClass(Set.class);
@@ -405,7 +406,7 @@ public class AccessControlListEditorTest {
 		returnedACL.setResourceAccess(null);
 		assertTrue(localACL.equals(returnedACL));
 		verify(mockACLEView, never()).showErrorMessage(anyString());
-		verify(mockACLEView, times(3)).buildWindow(anyBoolean(), anyBoolean(), anyString(), anyBoolean(), anyBoolean(), eq(PermissionLevel.CAN_DOWNLOAD), anyBoolean());
+		verify(mockACLEView, times(3)).buildWindow(anyBoolean(), anyBoolean(), anyString(), anyBoolean(), anyBoolean(), anyBoolean(), eq(PermissionLevel.CAN_DOWNLOAD), anyBoolean());
 
 		verify(mockSynapseClient, never()).sendMessage(anySet(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
 	}
@@ -437,7 +438,7 @@ public class AccessControlListEditorTest {
 
 		assertEquals("Updated ACL is invalid", localACL, returnedACL);
 		verify(mockACLEView, never()).showErrorMessage(anyString());
-		verify(mockACLEView, times(3)).buildWindow(anyBoolean(), anyBoolean(), anyString(), anyBoolean(), anyBoolean(), eq(PermissionLevel.CAN_DOWNLOAD), anyBoolean());
+		verify(mockACLEView, times(3)).buildWindow(anyBoolean(), anyBoolean(), anyString(), anyBoolean(), anyBoolean(), anyBoolean(), eq(PermissionLevel.CAN_DOWNLOAD), anyBoolean());
 
 		verify(mockSynapseClient, never()).sendMessage(anySet(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
 	}
@@ -460,7 +461,7 @@ public class AccessControlListEditorTest {
 
 		verify(mockSynapseClient).deleteAcl(eq(ENTITY_ID), any(AsyncCallback.class));
 		verify(mockACLEView, never()).showErrorMessage(anyString());
-		verify(mockACLEView, times(3)).buildWindow(anyBoolean(), anyBoolean(), anyString(), anyBoolean(), anyBoolean(), eq(PermissionLevel.CAN_DOWNLOAD), anyBoolean());
+		verify(mockACLEView, times(3)).buildWindow(anyBoolean(), anyBoolean(), anyString(), anyBoolean(), anyBoolean(), anyBoolean(), eq(PermissionLevel.CAN_DOWNLOAD), anyBoolean());
 
 		verify(mockSynapseClient, never()).sendMessage(anySet(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
 	}
@@ -516,7 +517,7 @@ public class AccessControlListEditorTest {
 
 		assertEquals("Updated ACL is invalid", localACL, returnedACL);
 		verify(mockACLEView, never()).showErrorMessage(anyString());
-		verify(mockACLEView, times(3)).buildWindow(anyBoolean(), anyBoolean(), anyString(), anyBoolean(), anyBoolean(), eq(PermissionLevel.CAN_DOWNLOAD), anyBoolean());
+		verify(mockACLEView, times(3)).buildWindow(anyBoolean(), anyBoolean(), anyString(), anyBoolean(), anyBoolean(), anyBoolean(), eq(PermissionLevel.CAN_DOWNLOAD), anyBoolean());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -536,7 +537,8 @@ public class AccessControlListEditorTest {
 		String aclEntityId = ENTITY_ID;
 		boolean canEnableInheritance = true;
 		boolean canChangePermission = true;
-		verify(mockACLEView, times(2)).buildWindow(eq(isProject), eq(isInherited), eq(aclEntityId), eq(canEnableInheritance), eq(canChangePermission), eq(PermissionLevel.CAN_DOWNLOAD), eq(isLoggedIn));
+		boolean isOpenData = false;
+		verify(mockACLEView, times(2)).buildWindow(eq(isProject), eq(isInherited), eq(aclEntityId), eq(canEnableInheritance), eq(canChangePermission), eq(isOpenData), eq(PermissionLevel.CAN_DOWNLOAD), eq(isLoggedIn));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -549,7 +551,7 @@ public class AccessControlListEditorTest {
 		acle.refresh();
 		acle.pushChangesToSynapse(mockPushToSynapseCallback);
 
-		verify(mockACLEView).buildWindow(anyBoolean(), anyBoolean(), anyString(), anyBoolean(), anyBoolean(), eq(PermissionLevel.CAN_DOWNLOAD), anyBoolean());
+		verify(mockACLEView).buildWindow(anyBoolean(), anyBoolean(), anyString(), anyBoolean(), anyBoolean(), anyBoolean(), eq(PermissionLevel.CAN_DOWNLOAD), anyBoolean());
 	}
 
 	@Test
@@ -577,6 +579,6 @@ public class AccessControlListEditorTest {
 		acle.pushChangesToSynapse(mockPushToSynapseCallback);
 
 		verify(mockSynAlert).showError(anyString());
-		verify(mockACLEView).buildWindow(anyBoolean(), anyBoolean(), anyString(), anyBoolean(), anyBoolean(), eq(PermissionLevel.CAN_DOWNLOAD), anyBoolean());
+		verify(mockACLEView).buildWindow(anyBoolean(), anyBoolean(), anyString(), anyBoolean(), anyBoolean(), anyBoolean(), eq(PermissionLevel.CAN_DOWNLOAD), anyBoolean());
 	}
 }
