@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.sharing;
 
 import java.util.Map;
 
-import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
@@ -11,15 +10,12 @@ import org.gwtbootstrap3.client.ui.constants.HeadingSize;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Italic;
-import org.gwtbootstrap3.client.ui.html.Paragraph;
-import org.gwtbootstrap3.client.ui.html.Strong;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.HelpWidget;
-import org.sagebionetworks.web.client.widget.IconSvg;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -56,12 +52,12 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	private HelpWidget helpWidget = new HelpWidget();
 	private IsWidget synAlertWidget;
 	private PortalGinInjector ginInjector;
-	private OpenDataViewImpl openDataView;
+	private OpenData openData;
 
 	@Inject
-	public AccessControlListEditorViewImpl(PortalGinInjector ginInjector, OpenDataViewImpl openDataView) {
+	public AccessControlListEditorViewImpl(PortalGinInjector ginInjector, OpenData openData) {
 		this.ginInjector = ginInjector;
-		this.openDataView = openDataView;
+		this.openData = openData;
 		
 		helpWidget.setHelpMarkdown("Learn more about managing access controls and permissions in Synapse.");
 		helpWidget.setHref(WebConstants.DOCS_URL + "Conditions-for-Use.2009596938.html");
@@ -149,8 +145,8 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 		clear();
 		this.defaultPermissionLevel = defaultPermissionLevel;
 		
-		openDataView.configure(isOpenData, canChangePermission, isPubliclyVisible);
-		add(openDataView);
+		openData.configure(isOpenData, canChangePermission, isPubliclyVisible);
+		add(openData);
 		
 		// Display Permissions grid.
 		showEditColumns = canChangePermission && !isInherited;

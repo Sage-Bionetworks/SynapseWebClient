@@ -26,7 +26,10 @@
 		<bh:Div ui:field="isPrivateAndOpenAndAdmin" visible="false" marginTop="10" marginBottom="20">
 			<bh:Paragraph marginBottom="0" addStyleNames="has-warning">
 				<w:IconSvg icon="warningOutlined" addStyleNames="form-control-feedback displayInline margin-right-5 moveup-3" />
-				<bh:Strong>This is not anonymous access data. You must grant public access for all users to be able to anonymously download it.</bh:Strong>
+				<bh:Strong>This is not anonymous access data.</bh:Strong>
+			</bh:Paragraph>
+			<bh:Paragraph addStyleNames="lightGreyText" marginLeft="33">
+				You must grant public access for all users to be able to anonymously download it.
 			</bh:Paragraph>
 		</bh:Div>
 	</bh:Div>

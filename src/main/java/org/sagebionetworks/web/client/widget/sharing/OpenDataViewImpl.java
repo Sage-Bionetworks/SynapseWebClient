@@ -8,7 +8,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class OpenDataViewImpl implements IsWidget{
+public class OpenDataViewImpl implements OpenDataView {
 	public interface Binder  extends UiBinder<Div, OpenDataViewImpl> {}
 	private Div widget;
 	@UiField
@@ -23,28 +23,26 @@ public class OpenDataViewImpl implements IsWidget{
 		widget = binder.createAndBindUi(this);
 	}
 	
-	public void configure(boolean isOpenData, boolean canChangePermission, boolean isPubliclyVisible) {
+	@Override
+	public void reset() {
 		isPublicAndOpen.setVisible(false);
 		isPublicAndAdmin.setVisible(false);
 		isPrivateAndOpenAndAdmin.setVisible(false);
-		if (canChangePermission) {
-			if (isPubliclyVisible) {
-				if (isOpenData) {
-					// This really is open data
-					isPublicAndOpen.setVisible(true);
-				} else {
-					// This is not really open data
-					isPublicAndAdmin.setVisible(true);
-				}
-			} else {
-				if (isOpenData) {
-					isPrivateAndOpenAndAdmin.setVisible(true);
-				}
-			}	
-		}
-		
 	}
 	
+	@Override
+	public void setIsPrivateAndOpenAndAdmin() {
+		isPrivateAndOpenAndAdmin.setVisible(true);
+	}
+	@Override
+	public void setIsPublicAndAdmin() {
+		isPublicAndAdmin.setVisible(true);
+	}
+	@Override
+	public void setIsPublicAndOpenAndAdmin() {
+		isPublicAndOpen.setVisible(true);
+	}
+
 	@Override
 	public Widget asWidget() {
 		return widget;
