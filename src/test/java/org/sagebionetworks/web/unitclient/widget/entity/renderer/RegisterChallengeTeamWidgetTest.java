@@ -68,7 +68,6 @@ public class RegisterChallengeTeamWidgetTest {
 		widget.onClick();
 		// add dialog to view
 		verify(mockView).clearWidgets();
-		verify(mockView).addWidget(any(Widget.class));
 		// and configure dialog
 		verify(mockRegisterTeamDialog).configure(eq(CHALLENGE_ID), any(Callback.class));
 	}
