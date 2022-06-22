@@ -3321,9 +3321,11 @@ div.border {
 	.SRC-primary-text-color {
 		color: $synapse-blue;
 	}
-	.SRC-primary-background-color-hover:hover {
-		background: $synapse-blue !important;
-		color: white;
+	.SRC-primary-background-color-hover {
+		&:hover, &[aria-expanded="true"] {
+			background: $synapse-blue !important;
+			color: white;
+		}
 	}
 	.SRC-primary-background-color,
 	.SRC-primary-background-color-hover.SRC-nested-color:hover,
