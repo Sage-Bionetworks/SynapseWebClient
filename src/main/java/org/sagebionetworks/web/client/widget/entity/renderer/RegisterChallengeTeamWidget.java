@@ -57,7 +57,6 @@ public class RegisterChallengeTeamWidget implements SingleButtonView.Presenter, 
 		if (authenticationController.isLoggedIn()) {
 			RegisterTeamDialog dialog = ginInjector.getRegisterTeamDialog();
 			view.clearWidgets();
-			view.addWidget(dialog.asWidget());
 			dialog.configure(challengeId, widgetRefreshRequired);
 		} else {
 			view.showConfirmDialog(DisplayConstants.ANONYMOUS_JOIN, getConfirmCallback());
