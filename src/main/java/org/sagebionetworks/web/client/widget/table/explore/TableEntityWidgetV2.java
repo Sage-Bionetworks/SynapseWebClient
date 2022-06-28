@@ -531,8 +531,9 @@ public class TableEntityWidgetV2 implements TableEntityWidgetView.Presenter, IsW
 							ToastMessageOptions toastOptions = new ToastMessageOptions.Builder()
 									.setTitle("Dataset Saved")
 									.setPrimaryButton("Show Schema", () -> this.actionMenu.onAction(Action.SHOW_TABLE_SCHEMA))
+									.setSecondaryButton("Publish Stable Dataset", () -> this.actionMenu.onAction(Action.CREATE_TABLE_VERSION))
 									.build();
-							DisplayUtils.notify("Edit the Dataset Schema to add additional annotation columns to this dataset", DisplayUtils.NotificationVariant.SUCCESS, toastOptions);
+							DisplayUtils.notify("Edit the Draft Dataset Schema to add additional annotation columns to this dataset, or publish a stable version of the Dataset", DisplayUtils.NotificationVariant.SUCCESS, toastOptions);
 							eventBus.fireEvent(new EntityUpdatedEvent(tableId));
 							closeItemsEditor();
 						},
