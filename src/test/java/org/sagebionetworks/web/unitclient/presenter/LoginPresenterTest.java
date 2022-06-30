@@ -174,8 +174,8 @@ public class LoginPresenterTest {
 
 		loginPresenter.setPlace(mockLoginPlace);
 
-		verify(mockAuthenticationController).setNewAccessToken(eq(fakeToken), any(AsyncCallback.class));
-		verify(mockGlobalApplicationState).gotoLastPlace(any(Place.class));
+		// SWC-6192: We no longer support setting the access token in the URL
+		verify(mockAuthenticationController, never()).setNewAccessToken(eq(fakeToken), any(AsyncCallback.class));
 	}
 
 	@Test

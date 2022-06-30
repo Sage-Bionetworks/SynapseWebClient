@@ -46,9 +46,6 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	private SynapseAlert synAlert;
 	private PopupUtilsView popupUtils;
 	
-	public Set<String> recognizedTokens = new HashSet<>();
-	
-	
 	@Inject
 	public LoginPresenter(LoginView view, AuthenticationController authenticationController, GlobalApplicationState globalApplicationState, SynapseAlert synAlert, PopupUtilsView popupUtils) {
 		this.view = view;
@@ -58,7 +55,6 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		this.popupUtils = popupUtils;
 		view.setSynAlert(synAlert);
 		view.setPresenter(this);
-		Collections.addAll(recognizedTokens, LOGOUT_TOKEN, OPEN_ID_UNKNOWN_USER_ERROR_TOKEN, OPEN_ID_ERROR_TOKEN, CHANGE_USERNAME, SHOW_TOU, SHOW_SIGNED_TOU, DEFAULT_PLACE_TOKEN);			
 	}
 
 	@Override
@@ -137,8 +133,6 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 			showTermsOfUse(false);
 		} else if (SHOW_SIGNED_TOU.equals(token) && authenticationController.getCurrentUserAccessToken() != null) {
 			showTermsOfUse(true);
-		} else if (!recognizedTokens.contains(token) && !"".equals(token) && token != null) {
-			revalidateSession(token);
 		} else {
 			if (authenticationController.isLoggedIn()) {
 				Place defaultPlace = new Profile(authenticationController.getCurrentUserPrincipalId(), ProfileArea.PROJECTS);
@@ -199,29 +193,6 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 			view.showLogin();
 		} else {
 			checkForTempUsername();
-		}
-	}
-
-	private void revalidateSession(String token) {
-		// Single Sign on token. try refreshing the token to see if it is valid. if so, log user in
-		// parse token
-		view.showLoggingInLoader();
-		if (token != null) {
-			synAlert.clear();
-			AsyncCallback<UserProfile> callback = new AsyncCallback<UserProfile>() {
-				@Override
-				public void onSuccess(UserProfile result) {
-					userAuthenticated();
-				}
-
-				@Override
-				public void onFailure(Throwable caught) {
-					synAlert.handleException(caught);
-					view.showLogin();
-				}
-			};
-
-			authenticationController.setNewAccessToken(token, callback);
 		}
 	}
 }
