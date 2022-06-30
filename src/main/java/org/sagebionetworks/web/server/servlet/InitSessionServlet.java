@@ -51,6 +51,27 @@ public class InitSessionServlet extends HttpServlet {
 		super.service(arg0, arg1);
 	}
 
+	public static Cookie getNewAccessTokenCookie(String accessToken, String requestScheme, String requestServerName) {
+		Cookie cookie = new Cookie(USER_LOGIN_TOKEN, accessToken);
+
+		if (!WebConstants.EXPIRE_SESSION_TOKEN.equals(accessToken)) {
+			cookie.setMaxAge(ONE_DAY_IN_SECONDS);
+		} else {
+			cookie.setMaxAge(0);
+		}
+		boolean isSecure = "https".equals(requestScheme.toLowerCase());
+		cookie.setSecure(isSecure);
+		cookie.setHttpOnly(true);
+		cookie.setPath(ROOT_PATH);
+
+		String domain = requestServerName;
+		String lowerCaseDomain = domain.toLowerCase();
+		if (lowerCaseDomain.contains("." + SYNAPSE_ORG)) {
+			cookie.setDomain(SYNAPSE_ORG);
+		}
+		return cookie;
+	}
+	
 	@Override
 	public void doPost(final HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
@@ -63,23 +84,7 @@ public class InitSessionServlet extends HttpServlet {
 			if (accessToken == null || accessToken.isEmpty()) {
 				accessToken = WebConstants.EXPIRE_SESSION_TOKEN;
 			}
-			Cookie cookie = new Cookie(USER_LOGIN_TOKEN, accessToken);
-
-			if (!WebConstants.EXPIRE_SESSION_TOKEN.equals(accessToken)) {
-				cookie.setMaxAge(ONE_DAY_IN_SECONDS);
-			} else {
-				cookie.setMaxAge(0);
-			}
-			boolean isSecure = "https".equals(request.getScheme().toLowerCase());
-			cookie.setSecure(isSecure);
-			cookie.setHttpOnly(true);
-			cookie.setPath(ROOT_PATH);
-
-			String domain = request.getServerName();
-			String lowerCaseDomain = domain.toLowerCase();
-			if (lowerCaseDomain.contains("." + SYNAPSE_ORG)) {
-				cookie.setDomain(SYNAPSE_ORG);
-			}
+			Cookie cookie = getNewAccessTokenCookie(accessToken, request.getScheme(), request.getServerName());
 			response.addCookie(cookie);
 			response.setContentType(JSON_CONTENT_TYPE);
 			PrintWriter out = response.getWriter();

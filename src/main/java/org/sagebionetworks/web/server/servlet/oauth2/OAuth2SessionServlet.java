@@ -5,6 +5,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -15,12 +16,14 @@ import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.repo.model.oauth.OAuthAccountCreationRequest;
 import org.sagebionetworks.repo.model.oauth.OAuthProvider;
 import org.sagebionetworks.repo.model.oauth.OAuthValidationRequest;
+import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.server.servlet.FileHandleAssociationServlet;
+import org.sagebionetworks.web.server.servlet.InitSessionServlet;
 import org.sagebionetworks.web.shared.WebConstants;
 
 public class OAuth2SessionServlet extends OAuth2Servlet {
 	public static final String REGISTER_ACCOUNT = "/#!RegisterAccount:0";
-	public static final String LOGIN_PLACE = "/#!LoginPlace:";
+	public static final String PROFILE_PLACE = "/#!Profile:";
 
 	/**
 	 * 
@@ -64,7 +67,9 @@ public class OAuth2SessionServlet extends OAuth2Servlet {
 			request.setProvider(provider);
 			request.setRedirectUrl(redirectUrl);
 			LoginResponse token = client.validateOAuthAuthenticationCodeForAccessToken(request);
-			resp.sendRedirect(LOGIN_PLACE + token.getAccessToken());
+			Cookie cookie = InitSessionServlet.getNewAccessTokenCookie(token.getAccessToken(), req.getScheme(), req.getServerName());
+			resp.addCookie(cookie);
+			resp.sendRedirect(PROFILE_PLACE + Profile.VIEW_PROFILE_TOKEN);
 		} catch (SynapseNotFoundException e) {
 			// used to send the user to register
 			resp.sendRedirect(REGISTER_ACCOUNT);
@@ -92,7 +97,9 @@ public class OAuth2SessionServlet extends OAuth2Servlet {
 			request.setRedirectUrl(redirectUrl);
 			request.setUserName(username);
 			LoginResponse token = client.createAccountViaOAuth2ForAccessToken(request);
-			resp.sendRedirect(LOGIN_PLACE + token.getAccessToken());
+			Cookie cookie = InitSessionServlet.getNewAccessTokenCookie(token.getAccessToken(), req.getScheme(), req.getServerName());
+			resp.addCookie(cookie);
+			resp.sendRedirect(PROFILE_PLACE + Profile.VIEW_PROFILE_TOKEN);
 		} catch (Exception e) {
 			resp.sendRedirect(FileHandleAssociationServlet.getBaseUrl(req) + FileHandleAssociationServlet.ERROR_PLACE + URLEncoder.encode(e.getMessage()));
 		} ;

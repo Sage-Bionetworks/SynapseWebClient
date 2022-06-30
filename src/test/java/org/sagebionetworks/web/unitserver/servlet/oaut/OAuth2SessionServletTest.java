@@ -2,6 +2,7 @@ package org.sagebionetworks.web.unitserver.servlet.oaut;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.contains;
 import static org.mockito.Mockito.verify;
@@ -11,13 +12,18 @@ import java.io.IOException;
 import java.net.URLEncoder;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseBadRequestException;
 import org.sagebionetworks.client.exceptions.SynapseException;
@@ -28,24 +34,29 @@ import org.sagebionetworks.repo.model.oauth.OAuthProvider;
 import org.sagebionetworks.repo.model.oauth.OAuthUrlRequest;
 import org.sagebionetworks.repo.model.oauth.OAuthUrlResponse;
 import org.sagebionetworks.repo.model.oauth.OAuthValidationRequest;
+import org.sagebionetworks.web.client.cookie.CookieKeys;
+import org.sagebionetworks.web.server.servlet.InitSessionServlet;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.oauth2.OAuth2SessionServlet;
 import org.sagebionetworks.web.shared.WebConstants;
 
+@RunWith(MockitoJUnitRunner.class)
 public class OAuth2SessionServletTest {
+	@Mock
 	HttpServletRequest mockRequest;
+	@Mock
 	HttpServletResponse mockResponse;
+	@Mock
 	SynapseProvider mockSynapseProvider;
+	@Mock
 	SynapseClient mockClient;
 	String url;
 	OAuth2SessionServlet servlet;
+	@Captor
+	ArgumentCaptor<Cookie> cookieCaptor;
 
 	@Before
 	public void before() {
-		mockRequest = Mockito.mock(HttpServletRequest.class);
-		mockResponse = Mockito.mock(HttpServletResponse.class);
-		mockSynapseProvider = Mockito.mock(SynapseProvider.class);
-		mockClient = Mockito.mock(SynapseClient.class);
 		when(mockSynapseProvider.createNewClient()).thenReturn(mockClient);
 		servlet = new OAuth2SessionServlet();
 		servlet.setSynapseProvider(mockSynapseProvider);
@@ -53,6 +64,8 @@ public class OAuth2SessionServletTest {
 		when(mockRequest.getRequestURL()).thenReturn(new StringBuffer(url));
 		when(mockRequest.getRequestURI()).thenReturn("");
 		when(mockRequest.getContextPath()).thenReturn("");
+		when(mockRequest.getScheme()).thenReturn("https");
+		when(mockRequest.getServerName()).thenReturn("www.synapse.org");
 	}
 
 	@Test
@@ -82,7 +95,8 @@ public class OAuth2SessionServletTest {
 	public void testValidate() throws ServletException, IOException, SynapseException {
 		ArgumentCaptor<OAuthValidationRequest> argument = ArgumentCaptor.forClass(OAuthValidationRequest.class);
 		LoginResponse resp = new LoginResponse();
-		resp.setAccessToken("accesstoken");
+		String testAccessToken = "accesstoken";
+		resp.setAccessToken(testAccessToken);
 		when(mockClient.validateOAuthAuthenticationCodeForAccessToken(argument.capture())).thenReturn(resp);
 		when(mockRequest.getParameter(WebConstants.OAUTH2_PROVIDER)).thenReturn(OAuthProvider.GOOGLE_OAUTH_2_0.name());
 		String authCode = "authCode";
@@ -93,15 +107,20 @@ public class OAuth2SessionServletTest {
 		assertEquals("http://127.0.0.1:8888/?oauth2provider=GOOGLE_OAUTH_2_0", request.getRedirectUrl());
 		assertEquals(OAuthProvider.GOOGLE_OAUTH_2_0, request.getProvider());
 		assertEquals(authCode, request.getAuthenticationCode());
-		verify(mockResponse).sendRedirect("/#!LoginPlace:accesstoken");
+		verify(mockResponse).sendRedirect("/#!Profile:v");
+		verify(mockResponse).addCookie(cookieCaptor.capture());
+		Cookie cookie = cookieCaptor.getValue();
+		assertEquals(CookieKeys.USER_LOGIN_TOKEN, cookie.getName());
+		assertEquals(testAccessToken, cookie.getValue());
 	}
 
 	@Test
 	public void testCreateAccountViaOAuth() throws ServletException, IOException, SynapseException {
+		String testAccessToken = "accessToken";
 		ArgumentCaptor<OAuthAccountCreationRequest> argument = ArgumentCaptor.forClass(OAuthAccountCreationRequest.class);
 		LoginResponse resp = new LoginResponse();
 		String state = "my-username";
-		resp.setAccessToken("accesstoken");
+		resp.setAccessToken(testAccessToken);
 		when(mockClient.createAccountViaOAuth2ForAccessToken(argument.capture())).thenReturn(resp);
 		when(mockRequest.getParameter(WebConstants.OAUTH2_PROVIDER)).thenReturn(OAuthProvider.GOOGLE_OAUTH_2_0.name());
 		when(mockRequest.getParameter(WebConstants.OAUTH2_STATE)).thenReturn(state);
@@ -114,7 +133,11 @@ public class OAuth2SessionServletTest {
 		assertEquals(OAuthProvider.GOOGLE_OAUTH_2_0, request.getProvider());
 		assertEquals(authCode, request.getAuthenticationCode());
 		assertEquals(state, request.getUserName());
-		verify(mockResponse).sendRedirect("/#!LoginPlace:accesstoken");
+		verify(mockResponse).addCookie(cookieCaptor.capture());
+		Cookie cookie = cookieCaptor.getValue();
+		assertEquals(CookieKeys.USER_LOGIN_TOKEN, cookie.getName());
+		assertEquals(testAccessToken, cookie.getValue());
+		verify(mockResponse).sendRedirect("/#!Profile:v");
 	}
 
 	@Test
