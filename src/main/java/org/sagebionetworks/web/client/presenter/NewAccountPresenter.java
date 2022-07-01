@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.presenter;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.principal.AccountCreationToken;
 import org.sagebionetworks.repo.model.principal.AliasType;
 import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
@@ -10,14 +11,13 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.place.EmailInvitation;
-import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.NewAccount;
+import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.NewAccountView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 import com.google.gwt.activity.shared.AbstractActivity;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
@@ -100,7 +100,8 @@ public class NewAccountPresenter extends AbstractActivity implements NewAccountV
 				if (accountCreationToken.getEncodedMembershipInvtnSignedToken() != null) {
 					globalAppState.setLastPlace(new EmailInvitation(accountCreationToken.getEncodedMembershipInvtnSignedToken()));
 				}
-				globalAppState.getPlaceChanger().goTo(new LoginPlace(accessToken));
+				// After creating the new user, update the access token
+				authController.setNewAccessToken(accessToken, getSetNewAccessTokenCallback());
 			}
 
 			@Override
@@ -111,6 +112,20 @@ public class NewAccountPresenter extends AbstractActivity implements NewAccountV
 		});
 	}
 
+	public AsyncCallback<UserProfile> getSetNewAccessTokenCallback() {
+		return new AsyncCallback<UserProfile>() {
+			@Override
+			public void onSuccess(UserProfile result) {
+				globalAppState.getPlaceChanger().goTo(new Profile(Profile.VIEW_PROFILE_TOKEN));
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				view.setLoading(false);
+				synAlert.handleException(caught);
+			}
+		};
+	}
 
 	/**
 	 * check that the email is available

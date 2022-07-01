@@ -1,37 +1,38 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
-import static junit.framework.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.principal.AccountCreationToken;
 import org.sagebionetworks.repo.model.principal.AliasType;
 import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
-import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.NewAccount;
+import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.presenter.NewAccountPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.NewAccountView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-import com.google.gwt.place.shared.Place;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class NewAccountPresenterTest {
@@ -136,10 +137,17 @@ public class NewAccountPresenterTest {
 		verify(mockView).setLoading(false);
 		verify(mockUserService).createUserStep2(eq(userName), eq(firstName.trim()), eq(lastName.trim()), eq(password), eq(accountCreationToken.getEmailValidationSignedToken()), any(AsyncCallback.class));
 
-		// should go to the login place with the new session token
-		ArgumentCaptor<Place> placeCaptor = new ArgumentCaptor<Place>();
-		verify(mockPlaceChanger).goTo(placeCaptor.capture());
-		assertEquals(testSessionToken, ((LoginPlace) placeCaptor.getValue()).toToken());
+		ArgumentCaptor<AsyncCallback<UserProfile>> captor = new ArgumentCaptor<AsyncCallback<UserProfile>>();
+		verify(mockAuthController).setNewAccessToken(eq(testSessionToken), captor.capture());
+		AsyncCallback<UserProfile> onSetNewAccessToken = captor.getValue();
+		
+		Throwable ex = new Throwable("test message");
+		onSetNewAccessToken.onFailure(ex);
+		verify(mockView, times(2)).setLoading(false);
+		verify(mockSynAlert).handleException(ex);
+		
+		onSetNewAccessToken.onSuccess(new UserProfile());
+		verify(mockPlaceChanger).goTo(any(Profile.class));
 	}
 
 	@Test
