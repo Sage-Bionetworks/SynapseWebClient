@@ -101,7 +101,7 @@ public class InitSessionServletTest {
 		Cookie cookie = cookieCaptor.getValue();
 		assertEquals(CookieKeys.USER_LOGIN_TOKEN, cookie.getName());
 		assertEquals(TEST_SESSION_TOKEN, cookie.getValue());
-		assertEquals(InitSessionServlet.ONE_DAY_IN_SECONDS, cookie.getMaxAge());
+		assertEquals(InitSessionServlet.DEFAULT_COOKIE_EXPIRATION, cookie.getMaxAge());
 		assertEquals(InitSessionServlet.SYNAPSE_ORG, cookie.getDomain());
 		assertTrue(cookie.isHttpOnly());
 		assertTrue(cookie.getSecure());

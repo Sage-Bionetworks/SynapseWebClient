@@ -34,7 +34,8 @@ public class InitSessionServlet extends HttpServlet {
 	public static final String SYNAPSE_ORG = "synapse.org";
 	private static final long serialVersionUID = 1L;
 	protected static final ThreadLocal<HttpServletRequest> perThreadRequest = new ThreadLocal<HttpServletRequest>();
-	public static final int ONE_DAY_IN_SECONDS = 60 * 60 * 24;
+	// backend expires this token after a day, so this cookie should never last this long (10 days)
+	public static final int DEFAULT_COOKIE_EXPIRATION = 60 * 60 * 24 * 10;  
 	private SynapseProvider synapseProvider = new SynapseProviderImpl();
 	public void setSynapseProvider(SynapseProvider synapseProvider) {
 		this.synapseProvider = synapseProvider;
@@ -55,7 +56,7 @@ public class InitSessionServlet extends HttpServlet {
 		Cookie cookie = new Cookie(USER_LOGIN_TOKEN, accessToken);
 
 		if (!WebConstants.EXPIRE_SESSION_TOKEN.equals(accessToken)) {
-			cookie.setMaxAge(ONE_DAY_IN_SECONDS);
+			cookie.setMaxAge(DEFAULT_COOKIE_EXPIRATION);
 		} else {
 			cookie.setMaxAge(0);
 		}
