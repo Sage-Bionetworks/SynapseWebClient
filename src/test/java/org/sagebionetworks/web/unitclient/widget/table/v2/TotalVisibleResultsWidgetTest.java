@@ -19,8 +19,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.sagebionetworks.repo.model.EntityRef;
 import org.sagebionetworks.repo.model.table.Dataset;
-import org.sagebionetworks.repo.model.table.DatasetItem;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
@@ -53,7 +53,7 @@ public class TotalVisibleResultsWidgetTest {
 
 	QueryResultBundle queryResultBundle;
 
-	List<DatasetItem> datasetItems;
+	List<EntityRef> datasetItems;
 
 	private static final String TABLE_ID = "syn123";
 
@@ -61,7 +61,7 @@ public class TotalVisibleResultsWidgetTest {
 	public void before() {
 		widget = new TotalVisibleResultsWidget(mockView, mockPopupUtils, mockAsyncJobTracker);
 
-		datasetItems = Arrays.asList(new DatasetItem(), new DatasetItem(), new DatasetItem());
+		datasetItems = Arrays.asList(new EntityRef(), new EntityRef(), new EntityRef());
 
 		datasetLatestVersion = new Dataset();
 		datasetLatestVersion.setId(TABLE_ID);

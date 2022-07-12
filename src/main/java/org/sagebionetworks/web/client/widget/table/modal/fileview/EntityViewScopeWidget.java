@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityRef;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
-import org.sagebionetworks.repo.model.table.DatasetItem;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -66,12 +66,12 @@ public class EntityViewScopeWidget implements SynapseWidgetPresenter, EntityView
 		view.setSynAlert(synAlert.asWidget());
 	}
 
-	private List<Reference> getReferencesFromDatasetItems(List<DatasetItem> datasetItems) {
+	private List<Reference> getReferencesFromDatasetItems(List<EntityRef> datasetItems) {
 		if (datasetItems == null) {
 			datasetItems = new ArrayList<>();
 		}
 		List<Reference> references = new ArrayList<>(datasetItems.size());
-		for (DatasetItem datasetItem : datasetItems) {
+		for (EntityRef datasetItem : datasetItems) {
 			Reference reference = new Reference();
 			reference.setTargetId(datasetItem.getEntityId());
 			reference.setTargetVersionNumber(datasetItem.getVersionNumber());
