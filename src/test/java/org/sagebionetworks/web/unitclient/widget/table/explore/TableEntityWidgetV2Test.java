@@ -29,10 +29,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.sagebionetworks.repo.model.EntityRef;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Dataset;
-import org.sagebionetworks.repo.model.table.DatasetItem;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
@@ -194,7 +194,7 @@ public class TableEntityWidgetV2Test {
 		dataset.setColumnIds(TableModelTestUtils.getColumnModelIds(columns));
 
 		// Dataset has one item
-		DatasetItem item = new DatasetItem();
+		EntityRef item = new EntityRef();
 		item.setEntityId("syn123");
 		item.setVersionNumber(1L);
 		dataset.setItems(Collections.singletonList(item));
