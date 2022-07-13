@@ -6,11 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityRef;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Dataset;
-import org.sagebionetworks.repo.model.table.DatasetItem;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.MaterializedView;
 import org.sagebionetworks.repo.model.table.SubmissionView;
@@ -148,7 +148,7 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 			scope.setViewEntityType(ViewEntityType.submissionview);
 		} else if (entity instanceof Dataset) {
 			scopeIds = new ArrayList<>();
-			for (DatasetItem item : ((Dataset) entity).getItems()) {
+			for (EntityRef item : ((Dataset) entity).getItems()) {
 				scopeIds.add(item.getEntityId());
 			}
 			scope.setViewEntityType(ViewEntityType.dataset);

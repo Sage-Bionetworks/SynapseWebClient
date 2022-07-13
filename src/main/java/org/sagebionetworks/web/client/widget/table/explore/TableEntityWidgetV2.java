@@ -9,9 +9,9 @@ import java.util.List;
 
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityRef;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.Dataset;
-import org.sagebionetworks.repo.model.table.DatasetItem;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryFilter;
@@ -39,7 +39,6 @@ import org.sagebionetworks.web.client.widget.clienthelp.FileViewClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionListener;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
@@ -280,7 +279,7 @@ public class TableEntityWidgetV2 implements TableEntityWidgetView.Presenter, IsW
 			List<String> scopeIds = ((SubmissionView) view).getScopeIds();
 			return scopeIds == null || scopeIds.size() == 0;
 		} else if (view instanceof Dataset) {
-			List<DatasetItem> datasetItems = ((Dataset) view).getItems();
+			List<EntityRef> datasetItems = ((Dataset) view).getItems();
 			return datasetItems == null || datasetItems.size() == 0;
 		} else {
 			// if we aren't sure, return false

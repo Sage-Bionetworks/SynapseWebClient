@@ -6,10 +6,10 @@ import static org.sagebionetworks.web.client.widget.table.v2.results.QueryBundle
 
 import java.util.List;
 
+import org.sagebionetworks.repo.model.EntityRef;
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.Dataset;
-import org.sagebionetworks.repo.model.table.DatasetItem;
 import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.View;
@@ -62,7 +62,7 @@ public class TotalVisibleResultsWidget implements IsWidget {
 				view.setHelpMarkdown(DATASETS_SNAPSHOT_HELP);
 			}
 
-			List<DatasetItem> datasetItems = ((Dataset) viewEntity).getItems();
+			List<EntityRef> datasetItems = ((Dataset) viewEntity).getItems();
 			this.totalNumberOfResults = datasetItems != null ? datasetItems.size() : 0;
 			view.setTotalNumberOfResults(totalNumberOfResults);
 			view.setVisible(true);
