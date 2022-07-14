@@ -1872,10 +1872,15 @@ moment-timezone@^0.5.34:
   dependencies:
     moment ">= 2.9.0"
 
-"moment@>= 2.9.0", moment@^2.24.0:
+"moment@>= 2.9.0":
   version "2.29.3"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.29.3.tgz#edd47411c322413999f7a5940d526de183c031f3"
   integrity sha512-c6YRvhEo//6T2Jz/vVtYzqBzwvPT95JBQ+smCytzf7c50oMZRsR/a4w88aD34I+/QVSfnoAnSBFPJHItlOMJVw==
+
+moment@^2.29.4:
+  version "2.29.4"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.29.4.tgz#3dbe052889fe7c1b2ed966fcb3a77328964ef108"
+  integrity sha512-5LC9SOxjSc2HF6vO2CyuTDNivEdoz2IvyJJGj6X8DJ0eFyfszE0QiEd+iXmBvUP3WHxSjFH/vIsA0EN00cgr8w==
 
 ms@2.0.0:
   version "2.0.0"
@@ -2659,10 +2664,10 @@ svg-parser@^2.0.2:
   resolved "https://registry.yarnpkg.com/svg-parser/-/svg-parser-2.0.4.tgz#fdc2e29e13951736140b76cb122c8ee6630eb6b5"
   integrity sha512-e4hG1hRwoOdRb37cIMSgzNsxyzKfayW6VOflrwvR+/bzrkyxY/31WkbgnQpgtrNp1SdpJvpUAGTa/ZoiPNDuRQ==
 
-synapse-react-client@3.0.29:
-  version "3.0.29"
-  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-3.0.29.tgz#885838d379231e174871e01bedab602af382b8f6"
-  integrity sha512-mfdg+2C213MYNHYekaxhcNfElz13fJXO+ZZuRpiUPAJ7qMPtQXK+qzllVxBnpHUNsXIdE6xR+3wvrRcuxZCN1g==
+synapse-react-client@3.0.30:
+  version "3.0.30"
+  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-3.0.30.tgz#ae27103c8729b6e36c9beb4ac78d1508d89f4efb"
+  integrity sha512-X6InRx2goQnKxe9I5fpiGi3HQuIZX8SE2bxjPu3QDLYLs8VlRaPnxrbFm0KS9rmN35fl+ZAIlFqNvl8/vQbM0w==
   dependencies:
     "@apidevtools/json-schema-ref-parser" "^9.0.9"
     "@brainhubeu/react-carousel" "1.19.26"
@@ -2698,7 +2703,7 @@ synapse-react-client@3.0.29:
     markdown-it-synapse-heading "^1.0.1"
     markdown-it-synapse-math "^3.0.4"
     markdown-it-synapse-table "^1.0.6"
-    moment "^2.24.0"
+    moment "^2.29.4"
     moment-timezone "^0.5.34"
     plotly.js-basic-dist "^2.11.1"
     pluralize "^8.0.0"
