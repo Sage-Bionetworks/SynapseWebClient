@@ -2664,10 +2664,10 @@ svg-parser@^2.0.2:
   resolved "https://registry.yarnpkg.com/svg-parser/-/svg-parser-2.0.4.tgz#fdc2e29e13951736140b76cb122c8ee6630eb6b5"
   integrity sha512-e4hG1hRwoOdRb37cIMSgzNsxyzKfayW6VOflrwvR+/bzrkyxY/31WkbgnQpgtrNp1SdpJvpUAGTa/ZoiPNDuRQ==
 
-synapse-react-client@3.0.30:
-  version "3.0.30"
-  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-3.0.30.tgz#ae27103c8729b6e36c9beb4ac78d1508d89f4efb"
-  integrity sha512-X6InRx2goQnKxe9I5fpiGi3HQuIZX8SE2bxjPu3QDLYLs8VlRaPnxrbFm0KS9rmN35fl+ZAIlFqNvl8/vQbM0w==
+synapse-react-client@3.0.31:
+  version "3.0.31"
+  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-3.0.31.tgz#668ae4547b32fd83c89efa3e9720c0dbf7f15025"
+  integrity sha512-KL82+Ndyj0gMTN+08+qsNogAXuBGhRwVzT4CM/8hMfoJY/0qdsGnyHQ8hzjw2KLcyFY0r9nCtnxD1K/m6cQ+Sw==
   dependencies:
     "@apidevtools/json-schema-ref-parser" "^9.0.9"
     "@brainhubeu/react-carousel" "1.19.26"
