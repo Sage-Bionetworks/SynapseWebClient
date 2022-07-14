@@ -184,6 +184,7 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 		String versionNumberString = versionNumber == null ? null : versionNumber.toString();
 		// SWC-5821: force remount
 		hasAccessContainer.removeFromParent();
+		hasAccessContainer.clear();
 		hasAccessContainerParent.add(hasAccessContainer);
 		_showHasAccess(hasAccessContainer.getElement(), entityId, versionNumberString, propsProvider.getJsniContextProps());
 	}
