@@ -1114,6 +1114,9 @@ end sticky footer
 			padding-top: 5px;
 			margin-left: 10px;
 		}
+		&.MuiPagination-ul li::marker {
+			content: none;
+		}
 	}
 
 	strong { font-weight: bold; }
@@ -2491,7 +2494,6 @@ div.input-group > input.search-textbox {
 		li {
 			padding-left: 10px;
 			text-decoration:none;
-			font-size: 1.1em;
 		}
 
 		.nav li {

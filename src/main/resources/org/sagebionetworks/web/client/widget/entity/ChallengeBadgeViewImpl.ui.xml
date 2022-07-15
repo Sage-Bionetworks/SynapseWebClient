@@ -6,6 +6,6 @@
 	<bh:Div visible="false">
 		<b:Icon type="TROPHY" addStyleNames="lightGreyText" />
 		<b:Anchor ui:field="link"
-			addStyleNames="displayInline margin-left-5 font-size-1-1em"></b:Anchor>
+			addStyleNames="displayInline margin-left-5"></b:Anchor>
 	</bh:Div>
 </ui:UiBinder>
