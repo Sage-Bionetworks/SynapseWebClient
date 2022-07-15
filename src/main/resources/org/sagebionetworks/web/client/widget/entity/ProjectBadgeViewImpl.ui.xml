@@ -11,7 +11,7 @@
 		<b:Tooltip isHtml="true" placement="RIGHT"
 			ui:field="tooltip" trigger="HOVER">
 			<g:Anchor ui:field="anchor"
-				addStyleNames="displayInline font-size-1-1em" />
+				addStyleNames="displayInline" />
 		</b:Tooltip>
 		<bh:Span ui:field="favoritesWidgetContainer" />
 		<bh:Span ui:field="additionalTextUI" width="140px"
