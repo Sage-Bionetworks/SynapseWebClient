@@ -37,6 +37,8 @@ public class FilesBrowserTest {
 	ContainerClientsHelp mockContainerClientsHelp;
 	@Mock
 	AddToDownloadListV2 mockAddToDownloadListV2;
+	@Mock
+	SynapseJavascriptClient mockJsClient;
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
@@ -44,7 +46,7 @@ public class FilesBrowserTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
-		filesBrowser = new FilesBrowser(mockView, mockGlobalApplicationState, mockAuthenticationController, mockContainerClientsHelp, mockAddToDownloadListV2, mockCookies);
+		filesBrowser = new FilesBrowser(mockView, mockGlobalApplicationState, mockAuthenticationController, mockContainerClientsHelp, mockAddToDownloadListV2, mockCookies, mockJsClient);
 	}
 
 	@Test

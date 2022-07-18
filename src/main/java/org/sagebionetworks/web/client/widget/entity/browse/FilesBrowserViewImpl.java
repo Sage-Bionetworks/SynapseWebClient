@@ -43,6 +43,8 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 	Heading title;
 	@UiField
 	Tooltip downloadTooltip;
+	@UiField
+	Tooltip addToDownloadCartTooltip;
 
 	@Inject
 	public FilesBrowserViewImpl(FilesBrowserViewImplUiBinder binder, EntityTreeBrowser entityTreeBrowser, AuthenticationController authController) {
@@ -75,6 +77,17 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 	public void configure(String entityId) {
 		title.setVisible(false);
 		entityTreeBrowser.configure(entityId);
+	}
+
+	@Override
+	public void setHasFile(boolean isFile) {
+		if (!isFile) {
+			addToDownloadCartTooltip.setTitle("There are no files in this folder.");
+			addToDownloadListLink.setEnabled(false);
+		} else {
+			addToDownloadCartTooltip.setTitle(null);
+			addToDownloadListLink.setEnabled(true);
+		}
 	}
 
 	@Override

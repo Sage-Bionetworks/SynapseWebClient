@@ -20,6 +20,9 @@ public interface FilesBrowserView extends IsWidget, SynapseView {
 	void setAddToDownloadList(IsWidget w);
 	
 	void setActionMenu(IsWidget w);
+	
+	void setHasFile(boolean isFile);
+	
 	/**
 	 * Presenter interface
 	 */
