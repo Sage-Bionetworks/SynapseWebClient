@@ -2408,14 +2408,6 @@ react-test-renderer@16.14.0:
     react-is "^16.8.6"
     scheduler "^0.19.1"
 
-react-tooltip@^4.2.21:
-  version "4.2.21"
-  resolved "https://registry.yarnpkg.com/react-tooltip/-/react-tooltip-4.2.21.tgz#840123ed86cf33d50ddde8ec8813b2960bfded7f"
-  integrity sha512-zSLprMymBDowknr0KVDiJ05IjZn9mQhhg4PRsqln0OZtURAJ1snt1xi5daZfagsh6vfsziZrc9pErPTDY1ACig==
-  dependencies:
-    prop-types "^15.7.2"
-    uuid "^7.0.3"
-
 react-transition-group@2.6.0:
   version "2.6.0"
   resolved "https://registry.yarnpkg.com/react-transition-group/-/react-transition-group-2.6.0.tgz#3c41cbdd9c044c5f8604d4e8d319e860919c9fae"
@@ -2664,10 +2656,10 @@ svg-parser@^2.0.2:
   resolved "https://registry.yarnpkg.com/svg-parser/-/svg-parser-2.0.4.tgz#fdc2e29e13951736140b76cb122c8ee6630eb6b5"
   integrity sha512-e4hG1hRwoOdRb37cIMSgzNsxyzKfayW6VOflrwvR+/bzrkyxY/31WkbgnQpgtrNp1SdpJvpUAGTa/ZoiPNDuRQ==
 
-synapse-react-client@3.0.31:
-  version "3.0.31"
-  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-3.0.31.tgz#668ae4547b32fd83c89efa3e9720c0dbf7f15025"
-  integrity sha512-KL82+Ndyj0gMTN+08+qsNogAXuBGhRwVzT4CM/8hMfoJY/0qdsGnyHQ8hzjw2KLcyFY0r9nCtnxD1K/m6cQ+Sw==
+synapse-react-client@3.0.32:
+  version "3.0.32"
+  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-3.0.32.tgz#527ad41848544c5cfde093c416972d801e6201a7"
+  integrity sha512-TX8otR6Q3VcMYPJT+c1r/yK00ykdlSv1XCueGKcQytBwDCpmDYkLF2eCUxKbsxQYma2toj3tg6xKre2umXb7Tw==
   dependencies:
     "@apidevtools/json-schema-ref-parser" "^9.0.9"
     "@brainhubeu/react-carousel" "1.19.26"
@@ -2727,7 +2719,6 @@ synapse-react-client@3.0.31:
     react-sizeme "^2.6.12"
     react-switch "^5.0.1"
     react-test-renderer "16.14.0"
-    react-tooltip "^4.2.21"
     react-transition-group "4.4.2"
     react-virtualized-auto-sizer "^1.0.6"
     react-vtree "3.0.0-beta.3"
@@ -2852,11 +2843,6 @@ use-deep-compare-effect@^1.3.1:
   dependencies:
     "@babel/runtime" "^7.12.5"
     dequal "^2.0.2"
-
-uuid@^7.0.3:
-  version "7.0.3"
-  resolved "https://registry.yarnpkg.com/uuid/-/uuid-7.0.3.tgz#c5c9f2c8cf25dc0a372c4df1441c41f5bd0c680b"
-  integrity sha512-DPSke0pXhTZgoF/d+WSt2QaKMCFSfx7QegxEWT+JOuHF5aWrKEn0G+ztjuJg/gG8/ItK+rbPCD/yNv8yyih6Cg==
 
 validate.io-array@^1.0.3:
   version "1.0.6"
