@@ -97,6 +97,13 @@ public class LoginPresenterTest {
 	}
 
 	@Test
+	public void testSetPlaceRedirectToLastPlace() {
+		when(mockLoginPlace.toToken()).thenReturn(WebConstants.REDIRECT_TO_LAST_PLACE);
+		loginPresenter.setPlace(mockLoginPlace);
+		verify(mockGlobalApplicationState).gotoLastPlace();
+	}
+
+	@Test
 	public void testSetPlaceUnknownSSOUser() {
 		when(mockLoginPlace.toToken()).thenReturn(WebConstants.OPEN_ID_UNKNOWN_USER_ERROR_TOKEN);
 		loginPresenter.setPlace(mockLoginPlace);

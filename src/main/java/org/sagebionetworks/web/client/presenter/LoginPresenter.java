@@ -9,10 +9,7 @@ import static org.sagebionetworks.web.client.place.LoginPlace.SHOW_SIGNED_TOU;
 import static org.sagebionetworks.web.client.place.LoginPlace.SHOW_TOU;
 import static org.sagebionetworks.web.shared.WebConstants.OPEN_ID_ERROR_TOKEN;
 import static org.sagebionetworks.web.shared.WebConstants.OPEN_ID_UNKNOWN_USER_ERROR_TOKEN;
-
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import static org.sagebionetworks.web.shared.WebConstants.REDIRECT_TO_LAST_PLACE;
 
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.ClientProperties;
@@ -118,6 +115,8 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 			globalApplicationState.clearLastPlace();
 			view.showInfo(DisplayConstants.LOGOUT_TEXT);
 			globalApplicationState.getPlaceChanger().goTo(new Home(DEFAULT_PLACE_TOKEN));
+		} else if (REDIRECT_TO_LAST_PLACE.equals(token)) {
+			globalApplicationState.gotoLastPlace();
 		} else if (OPEN_ID_UNKNOWN_USER_ERROR_TOKEN.equals(token)) {
 			// User does not exist, redirect to Registration page
 			view.showErrorMessage(CREATE_ACCOUNT_MESSAGE_SSO);
