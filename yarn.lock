@@ -515,6 +515,18 @@
     react-virtualized-auto-sizer "^1.0.2"
     react-window "^1.8.2"
 
+"@sage-bionetworks/react-base-table@^1.13.2":
+  version "1.13.2"
+  resolved "https://registry.yarnpkg.com/@sage-bionetworks/react-base-table/-/react-base-table-1.13.2.tgz#23eda2daca2b4e7387c7b065eb61d880298a1ff0"
+  integrity sha512-qMAk5qdZ25q59yY9GJtmQ/It9nExCDjSAzLltj1x/4DAfZa08bXMPw0NbRla2ibt2KrCf0YqlycLRBR2oV5+tA==
+  dependencies:
+    "@babel/runtime" "^7.0.0"
+    classnames "^2.2.5"
+    memoize-one "^5.0.0"
+    prop-types "^15.7.0"
+    react-virtualized-auto-sizer "^1.0.2"
+    react-window "^1.8.2"
+
 "@sage-bionetworks/rjsf-core@^3.1.4":
   version "3.1.4"
   resolved "https://registry.yarnpkg.com/@sage-bionetworks/rjsf-core/-/rjsf-core-3.1.4.tgz#358c2355c9b0337e26ea327ae3c76a34dc13557e"
