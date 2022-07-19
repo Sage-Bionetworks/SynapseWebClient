@@ -18,7 +18,7 @@ import com.google.inject.Inject;
  */
 public class DatasetsTab extends AbstractTablesTab {
 
- 	public static final String DATASETS_HELP = "Create a Draft Dataset and add File versions. Annotate, Mint DOI’s, and Publish your Dataset to share it with others.";
+	public static final String DATASETS_HELP = "Create a Draft Dataset and add File versions. Annotate, Mint DOI’s, and Publish your Dataset to share it with others.";
 	public static final String DATASETS_HELP_URL = WebConstants.DOCS_URL + "Datasets.2611281979.html";
 
 	@Inject
