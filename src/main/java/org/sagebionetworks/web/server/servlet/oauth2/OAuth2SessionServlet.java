@@ -16,14 +16,13 @@ import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.repo.model.oauth.OAuthAccountCreationRequest;
 import org.sagebionetworks.repo.model.oauth.OAuthProvider;
 import org.sagebionetworks.repo.model.oauth.OAuthValidationRequest;
-import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.server.servlet.FileHandleAssociationServlet;
 import org.sagebionetworks.web.server.servlet.InitSessionServlet;
 import org.sagebionetworks.web.shared.WebConstants;
 
 public class OAuth2SessionServlet extends OAuth2Servlet {
 	public static final String REGISTER_ACCOUNT = "/#!RegisterAccount:0";
-	public static final String PROFILE_PLACE = "/#!Profile:";
+	public static final String LOGIN_PLACE = "/#!LoginPlace:";
 
 	/**
 	 * 
@@ -69,7 +68,7 @@ public class OAuth2SessionServlet extends OAuth2Servlet {
 			LoginResponse token = client.validateOAuthAuthenticationCodeForAccessToken(request);
 			Cookie cookie = InitSessionServlet.getNewAccessTokenCookie(token.getAccessToken(), req.getScheme(), req.getServerName());
 			resp.addCookie(cookie);
-			resp.sendRedirect(PROFILE_PLACE + Profile.VIEW_PROFILE_TOKEN);
+			resp.sendRedirect(LOGIN_PLACE + WebConstants.REDIRECT_TO_LAST_PLACE);
 		} catch (SynapseNotFoundException e) {
 			// used to send the user to register
 			resp.sendRedirect(REGISTER_ACCOUNT);
@@ -99,7 +98,7 @@ public class OAuth2SessionServlet extends OAuth2Servlet {
 			LoginResponse token = client.createAccountViaOAuth2ForAccessToken(request);
 			Cookie cookie = InitSessionServlet.getNewAccessTokenCookie(token.getAccessToken(), req.getScheme(), req.getServerName());
 			resp.addCookie(cookie);
-			resp.sendRedirect(PROFILE_PLACE + Profile.VIEW_PROFILE_TOKEN);
+			resp.sendRedirect(LOGIN_PLACE + WebConstants.REDIRECT_TO_LAST_PLACE);
 		} catch (Exception e) {
 			resp.sendRedirect(FileHandleAssociationServlet.getBaseUrl(req) + FileHandleAssociationServlet.ERROR_PLACE + URLEncoder.encode(e.getMessage()));
 		} ;

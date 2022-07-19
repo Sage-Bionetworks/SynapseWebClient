@@ -107,7 +107,7 @@ public class OAuth2SessionServletTest {
 		assertEquals("http://127.0.0.1:8888/?oauth2provider=GOOGLE_OAUTH_2_0", request.getRedirectUrl());
 		assertEquals(OAuthProvider.GOOGLE_OAUTH_2_0, request.getProvider());
 		assertEquals(authCode, request.getAuthenticationCode());
-		verify(mockResponse).sendRedirect("/#!Profile:v");
+		verify(mockResponse).sendRedirect("/#!LoginPlace:" + WebConstants.REDIRECT_TO_LAST_PLACE);
 		verify(mockResponse).addCookie(cookieCaptor.capture());
 		Cookie cookie = cookieCaptor.getValue();
 		assertEquals(CookieKeys.USER_LOGIN_TOKEN, cookie.getName());
@@ -137,7 +137,7 @@ public class OAuth2SessionServletTest {
 		Cookie cookie = cookieCaptor.getValue();
 		assertEquals(CookieKeys.USER_LOGIN_TOKEN, cookie.getName());
 		assertEquals(testAccessToken, cookie.getValue());
-		verify(mockResponse).sendRedirect("/#!Profile:v");
+		verify(mockResponse).sendRedirect("/#!LoginPlace:" + WebConstants.REDIRECT_TO_LAST_PLACE);
 	}
 
 	@Test
