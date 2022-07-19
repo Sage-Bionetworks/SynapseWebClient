@@ -21,7 +21,9 @@
 								  marginRight="5" marginLeft="5" />
 						<b:DropDownMenu ui:field="dropdownMenu"
 										addStyleNames="dropdown-menu-right">
-							<b:AnchorListItem ui:field="addToDownloadListLink">Add to Download Cart</b:AnchorListItem>
+							<b:Tooltip ui:field="addToDownloadCartTooltip">
+								<b:AnchorListItem ui:field="addToDownloadListLink">Add to Download Cart</b:AnchorListItem>
+							</b:Tooltip>
 							<b:Divider />
 							<b:AnchorListItem
 									ui:field="programmaticOptionsLink">Programmatic Options</b:AnchorListItem>
