@@ -23,7 +23,7 @@ import org.sagebionetworks.web.client.EntityTypeUtils;
 
 public enum EntityFilter {
 	ALL(EntityType.values()),
-	ALL_BUT_LINK(Arrays.stream(EntityType.values()).filter(entityType -> link.equals(entityType)).toArray(EntityType[]::new)),
+	ALL_BUT_LINK(Arrays.stream(EntityType.values()).filter(entityType -> !link.equals(entityType)).toArray(EntityType[]::new)),
 	PROJECT_FOLDER_FILE_LINK(project, folder, file, link),
 	CONTAINER(project, folder),
 	PROJECT(project),
