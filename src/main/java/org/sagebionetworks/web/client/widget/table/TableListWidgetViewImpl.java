@@ -16,6 +16,7 @@ import org.sagebionetworks.web.client.view.bootstrap.table.TableHeader;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.v2.results.SortableTableHeaderImpl;
+
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.HTMLPanel;
@@ -179,7 +180,7 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	}
 
 	@Override
-	public void setFileCountVisible(boolean visible) {
+	public void setItemCountVisible(boolean visible) {
 		itemCountColumnHeader.setVisible(visible);
 		if (visible) {
 			itemCountColumnHeader.addStyleName("visible-md visible-lg");

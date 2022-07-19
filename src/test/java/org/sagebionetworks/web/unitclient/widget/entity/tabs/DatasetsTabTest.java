@@ -28,7 +28,6 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
@@ -64,7 +63,6 @@ import org.sagebionetworks.web.client.widget.entity.tabs.DatasetsTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.entity.tabs.TablesTabView;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
-import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.explore.TableEntityWidgetV2;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
@@ -302,7 +300,7 @@ public class DatasetsTabTest {
 		verify(mockView).setVersionAlertVisible(false);
 		verify(mockView, never()).setVersionAlertVisible(true);
 
-		verify(mockTableListWidget).configure(mockProjectEntityBundle, Arrays.asList(EntityType.dataset));
+		verify(mockTableListWidget).configure(mockProjectEntityBundle, Arrays.asList(EntityType.dataset, EntityType.datasetcollection));
 
 		Synapse place = getNewPlace(projectName);
 		assertEquals(projectEntityId, place.getEntityId());

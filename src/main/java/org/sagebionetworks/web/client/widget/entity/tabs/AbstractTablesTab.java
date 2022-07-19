@@ -380,7 +380,7 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 					goToLatestSnapshot,
 					isLinkToCurrentSnapshotEnabled,
 					linkToCurrentSnapshotTooltipText);
-		} else if (!version.equals(latestSnapshotVersionNumber)) {
+		} else if (version != null && !version.equals(latestSnapshotVersionNumber)) {
 			// This is a snapshot or "stable version", but a more recent snapshot exists than the one the user is looking at.
 			// Notify that a more recent snapshot exists
 			this.view.setVersionAlertVisible(true);

@@ -7,7 +7,7 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
-import org.sagebionetworks.repo.model.table.Dataset;
+import org.sagebionetworks.repo.model.table.EntityRefCollectionView;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
@@ -110,7 +110,7 @@ public class TableEntityListGroupItem implements IsWidget {
 
 		icon.setType(EntityTypeUtils.getEntityType(header));
 		typeField.setText(EntityTypeUtils.getFriendlyTableTypeName(header.getType()));
-		if (EntityType.dataset.equals(EntityTypeUtils.getEntityType(header))) {
+		if (EntityType.dataset.equals(EntityTypeUtils.getEntityType(header)) || EntityType.datasetcollection.equals(EntityTypeUtils.getEntityType(header))) {
 			jsClient.getEntityBundleFromCache(header.getId(), new AsyncCallback<EntityBundle>() {
 				@Override
 				public void onFailure(Throwable caught) {
@@ -119,7 +119,7 @@ public class TableEntityListGroupItem implements IsWidget {
 
 				@Override
 				public void onSuccess(EntityBundle result) {
-					Dataset dataset = (Dataset) result.getEntity();
+					EntityRefCollectionView dataset = (EntityRefCollectionView) result.getEntity();
 					int itemCount = dataset.getItems() == null ? 0 : dataset.getItems().size();
 					itemCountField.setText(NumberFormat.getDecimalFormat().format(itemCount));
 				}

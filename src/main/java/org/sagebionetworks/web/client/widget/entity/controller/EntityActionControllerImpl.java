@@ -32,6 +32,7 @@ import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.Dataset;
+import org.sagebionetworks.repo.model.table.EntityRefCollectionView;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.MaterializedView;
 import org.sagebionetworks.repo.model.table.SnapshotRequest;
@@ -46,13 +47,13 @@ import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.DisplayUtils.NotificationVariant;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.DisplayUtils.NotificationVariant;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.jsinterop.AlertButtonConfig;
@@ -1890,7 +1891,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		String parentId = entityBundle.getEntity().getParentId();
 		Place gotoPlace = null;
 		if (parentId != null && !(entityBundle.getEntity() instanceof Project)) {
-			if (entityBundle.getEntity() instanceof Dataset)
+			if (entityBundle.getEntity() instanceof EntityRefCollectionView)
 				gotoPlace = new Synapse(parentId, null, EntityArea.DATASETS, null);
 			else if (entityBundle.getEntity() instanceof Table)
 				gotoPlace = new Synapse(parentId, null, EntityArea.TABLES, null);

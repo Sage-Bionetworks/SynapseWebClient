@@ -15,7 +15,7 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
-import org.sagebionetworks.repo.model.table.Dataset;
+import org.sagebionetworks.repo.model.table.EntityRefCollectionView;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -503,7 +503,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 		} else {
 			if (entity instanceof FileEntity || entity instanceof Folder) {
 				fileChanged(bundle, currentTargetVersionNumber);
-			} else if (entity instanceof Dataset) {
+			} else if (entity instanceof EntityRefCollectionView) {
 				datasetChanged(bundle, currentTargetVersionNumber);
 			} else if (entity instanceof Table) {
 				tableChanged(bundle, currentTargetVersionNumber);
@@ -560,7 +560,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 			// otherwise only show the tabs only if content is present.
 			synapseJavascriptClient.isWiki(projectHeader.getId(), getTabVisibilityCallback(EntityArea.WIKI, wikiTab.asTab()));
 			synapseJavascriptClient.isFileOrFolder(projectHeader.getId(), getTabVisibilityCallback(EntityArea.FILES, filesTab.asTab()));
-			synapseJavascriptClient.isDataset(projectHeader.getId(), getTabVisibilityCallback(EntityArea.DATASETS, datasetsTab.asTab()));
+			synapseJavascriptClient.isEntityRefCollectionView(projectHeader.getId(), getTabVisibilityCallback(EntityArea.DATASETS, datasetsTab.asTab()));
 			synapseJavascriptClient.isTable(projectHeader.getId(), getTabVisibilityCallback(EntityArea.TABLES, tablesTab.asTab()));
 			synapseJavascriptClient.isDocker(projectHeader.getId(), getTabVisibilityCallback(EntityArea.DOCKER, dockerTab.asTab()));
 		}
@@ -645,7 +645,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 		EntityArea area = null;
 		if (entity instanceof Project) {
 			area = getDefaultProjectArea();
-		} else if (entity instanceof Dataset) {
+		} else if (entity instanceof EntityRefCollectionView) {
 			area = EntityArea.DATASETS;
 		} else if (entity instanceof Table) {
 			area = EntityArea.TABLES;

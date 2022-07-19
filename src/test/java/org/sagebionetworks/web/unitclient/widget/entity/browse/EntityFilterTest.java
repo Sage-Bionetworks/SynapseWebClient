@@ -118,4 +118,16 @@ public class EntityFilterTest {
 		assertTrue(filteredHeaders.contains(fileHeader));
 		assertFalse(filteredHeaders.contains(linkHeader));
 	}
+
+	@Test
+	public void testAllButLink() {
+		EntityFilter filter = EntityFilter.ALL_BUT_LINK;
+		for (EntityType type : EntityType.values()) {
+			if (EntityType.link.equals(type)) {
+				assertFalse(filter.getEntityQueryValues().contains(type));
+			} else {
+				assertTrue(filter.getEntityQueryValues().contains(type));
+			}
+		}
+	}
 }

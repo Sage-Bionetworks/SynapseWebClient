@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.table;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -73,12 +74,12 @@ public class TableListWidget implements TableListWidgetView.Presenter, IsWidget 
 		isInitializing = true;
 		this.parentBundle = parentBundle;
 		this.typesToShow = typesToShow;
-		if (typesToShow.size() == 1 && typesToShow.contains(EntityType.dataset)) {
+		if (typesToShow.contains(EntityType.dataset)) {
 			this.view.setTableType(TableType.dataset);
 		} else {
 			this.view.setTableType(TableType.table);
 		}
-		this.view.setFileCountVisible(shouldItemCountBeVisible());
+		this.view.setItemCountVisible(shouldItemCountBeVisible());
 		loadData();
 	}
 
@@ -212,7 +213,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, IsWidget 
 	}
 
 	private boolean shouldItemCountBeVisible() {
-		return this.typesToShow.contains(EntityType.dataset);
+		return this.typesToShow.contains(EntityType.dataset) || this.typesToShow.contains(EntityType.datasetcollection);
 	}
 
 }

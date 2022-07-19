@@ -1,11 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityType;
-import org.sagebionetworks.repo.model.table.Dataset;
+import org.sagebionetworks.repo.model.table.EntityRefCollectionView;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
@@ -41,12 +41,12 @@ public class DatasetsTab extends AbstractTablesTab {
 
 	@Override
 	protected List<EntityType> getTypesShownInList() {
-		return Collections.singletonList(EntityType.dataset);
+		return Arrays.asList(EntityType.dataset, EntityType.datasetcollection);
 	}
 
 	@Override
 	protected boolean isEntityShownInTab(Entity entity) {
-		return entity instanceof Dataset;
+		return entity instanceof EntityRefCollectionView;
 	}
 
 

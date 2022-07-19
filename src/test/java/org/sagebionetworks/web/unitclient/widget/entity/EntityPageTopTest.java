@@ -206,7 +206,7 @@ public class EntityPageTopTest {
 		AsyncMockStubber.callSuccessWith(true).when(mockSynapseJavascriptClient).isWiki(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(true).when(mockSynapseJavascriptClient).isFileOrFolder(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(true).when(mockSynapseJavascriptClient).isTable(anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(true).when(mockSynapseJavascriptClient).isDataset(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(true).when(mockSynapseJavascriptClient).isEntityRefCollectionView(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClientAsync).isChallenge(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(true).when(mockSynapseJavascriptClient).isDocker(anyString(), any(AsyncCallback.class));
 
@@ -746,7 +746,7 @@ public class EntityPageTopTest {
 		Long versionNumber = null;
 
 		AsyncMockStubber.callSuccessWith(false).when(mockSynapseJavascriptClient).isTable(anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(false).when(mockSynapseJavascriptClient).isDataset(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(false).when(mockSynapseJavascriptClient).isEntityRefCollectionView(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isChallenge(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(false).when(mockSynapseJavascriptClient).isDocker(anyString(), any(AsyncCallback.class));
 
@@ -755,7 +755,7 @@ public class EntityPageTopTest {
 		verify(mockSynapseJavascriptClient, never()).isWiki(anyString(), any(AsyncCallback.class));
 		verify(mockSynapseJavascriptClient, never()).isFileOrFolder(anyString(), any(AsyncCallback.class));
 		verify(mockSynapseJavascriptClient, never()).isTable(anyString(), any(AsyncCallback.class));
-		verify(mockSynapseJavascriptClient, never()).isDataset(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient, never()).isEntityRefCollectionView(anyString(), any(AsyncCallback.class));
 		verify(mockSynapseClientAsync).isChallenge(anyString(), any(AsyncCallback.class));
 		verify(mockSynapseJavascriptClient, never()).isDocker(anyString(), any(AsyncCallback.class));
 
@@ -777,7 +777,7 @@ public class EntityPageTopTest {
 		Long versionNumber = null;
 
 		AsyncMockStubber.callSuccessWith(false).when(mockSynapseJavascriptClient).isTable(anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(false).when(mockSynapseJavascriptClient).isDataset(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(false).when(mockSynapseJavascriptClient).isEntityRefCollectionView(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isChallenge(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(false).when(mockSynapseJavascriptClient).isDocker(anyString(), any(AsyncCallback.class));
 
@@ -786,7 +786,7 @@ public class EntityPageTopTest {
 		verify(mockSynapseJavascriptClient).isWiki(anyString(), any(AsyncCallback.class));
 		verify(mockSynapseJavascriptClient).isFileOrFolder(anyString(), any(AsyncCallback.class));
 		verify(mockSynapseJavascriptClient).isTable(anyString(), any(AsyncCallback.class));
-		verify(mockSynapseJavascriptClient).isDataset(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).isEntityRefCollectionView(anyString(), any(AsyncCallback.class));
 		verify(mockSynapseClientAsync).isChallenge(anyString(), any(AsyncCallback.class));
 		verify(mockSynapseJavascriptClient).isDocker(anyString(), any(AsyncCallback.class));
 
@@ -826,7 +826,7 @@ public class EntityPageTopTest {
 		Long versionNumber = null;
 		AsyncMockStubber.callSuccessWith(false).when(mockSynapseJavascriptClient).isFileOrFolder(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(false).when(mockSynapseJavascriptClient).isTable(anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(false).when(mockSynapseJavascriptClient).isDataset(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(false).when(mockSynapseJavascriptClient).isEntityRefCollectionView(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isChallenge(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(false).when(mockSynapseJavascriptClient).isDocker(anyString(), any(AsyncCallback.class));
 

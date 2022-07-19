@@ -1000,8 +1000,8 @@ public class SynapseJavascriptClient {
 		getEntityChildren(request, getEntityChildrenExistCallback(callback));
 	}
 
-	public void isDataset(String projectId, AsyncCallback<Boolean> callback) {
-		EntityChildrenRequest request = getEntityChildrenRequest(projectId, EntityType.dataset);
+	public void isEntityRefCollectionView(String projectId, AsyncCallback<Boolean> callback) {
+		EntityChildrenRequest request = getEntityChildrenRequest(projectId, EntityType.dataset, EntityType.datasetcollection);
 		getEntityChildren(request, getEntityChildrenExistCallback(callback));
 	}
 
