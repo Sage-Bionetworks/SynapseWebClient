@@ -10,6 +10,7 @@ import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.table.Dataset;
+import org.sagebionetworks.repo.model.table.DatasetCollection;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.MaterializedView;
 import org.sagebionetworks.repo.model.table.SubmissionView;
@@ -24,6 +25,8 @@ public class EntityTypeUtils {
 	public static final String ENTITY_VIEW_DISPLAY_NAME = "View";
 	public static final String MATERIALIZED_VIEW_DISPLAY_NAME = "Materialized View";
 	public static final String DATASET_DISPLAY_NAME = "Dataset";
+
+	public static final String DATASET_COLLECTION_DISPLAY_NAME = "Dataset Collection";
 	public static final String TABLE_ENTITY_DISPLAY_NAME = "Table";
 	public static final String UNKNOWN_TABLE_TYPE = "Unknown Table Type";
 
@@ -50,6 +53,8 @@ public class EntityTypeUtils {
 				className = MaterializedView.class.getName();
 			} else if (entityType.equalsIgnoreCase(EntityType.dataset.name())) {
 				className = Dataset.class.getName();
+			} else if (entityType.equalsIgnoreCase(EntityType.datasetcollection.name())) {
+				className = DatasetCollection.class.getName();
 			}
 		}
 		return className;
@@ -91,6 +96,8 @@ public class EntityTypeUtils {
 			type = EntityType.materializedview;
 		} else if (Dataset.class.getName().equals(className)) {
 			type = EntityType.dataset;
+		} else if (DatasetCollection.class.getName().equals(className)) {
+			type = EntityType.datasetcollection;
 		}
 		return type;
 	}
@@ -127,6 +134,9 @@ public class EntityTypeUtils {
 		} else if (Dataset.class.getName().equals(className)) {
 			// Dataset
 			icon = IconType.TABLE;
+		} else if (DatasetCollection.class.getName().equals(className)) {
+			// Dataset
+			icon = IconType.TABLE;
 		} else if (EntityView.class.getName().equals(className)) {
 			// FileView
 			icon = IconType.TH_LIST;
@@ -159,6 +169,8 @@ public class EntityTypeUtils {
 			friendlyName = MATERIALIZED_VIEW_DISPLAY_NAME;
 		} else if (SubmissionView.class.getName().equals(className)) {
 			friendlyName = SUBMISSION_VIEW_DISPLAY_NAME;
+		} else if (DatasetCollection.class.getName().equals(className)) {
+			friendlyName = DATASET_COLLECTION_DISPLAY_NAME;
 		}
 		return friendlyName;
 	}

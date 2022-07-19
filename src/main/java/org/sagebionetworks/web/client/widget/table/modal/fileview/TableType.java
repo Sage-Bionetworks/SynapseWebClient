@@ -15,6 +15,7 @@ import java.util.Objects;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.table.Dataset;
+import org.sagebionetworks.repo.model.table.DatasetCollection;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.MaterializedView;
 import org.sagebionetworks.repo.model.table.SubmissionView;
@@ -36,6 +37,7 @@ public class TableType {
 	public static final TableType materialized_view = new TableType(MaterializedView.class, null);
 	// We specify a viewTypeMask of 'FILE' for Datasets because they work like file views in many ways
 	public static final TableType dataset = new TableType(Dataset.class, FILE);
+	public static final TableType dataset_collection = new TableType(DatasetCollection.class, DATASET);
 
 	// We define types of EntityViews for convenience/usability, but a user could specify a custom mask.
 	public static final TableType project_view = new TableType(EntityView.class, PROJECT);
@@ -108,6 +110,8 @@ public class TableType {
 			return TableType.table;
 		} else if (entity instanceof Dataset) {
 			return TableType.dataset;
+		} else if (entity instanceof DatasetCollection) {
+			return TableType.dataset_collection;
 		} else if (entity instanceof SubmissionView) {
 			return TableType.submission_view;
 		} else if (entity instanceof MaterializedView) {

@@ -57,5 +57,5 @@ public interface TableListWidgetView extends IsWidget, SynapseView {
 
 	void copyToClipboard(String ids);
 
-	void setFileCountVisible(boolean visible);
+	void setItemCountVisible(boolean visible);
 }

@@ -12,6 +12,7 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityRef;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.Dataset;
+import org.sagebionetworks.repo.model.table.EntityRefCollectionView;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryFilter;
@@ -71,7 +72,7 @@ public class TableEntityWidgetV2 implements TableEntityWidgetView.Presenter, IsW
 	}
 
 	public static final String noScopeMessage(TableType tableType, boolean editable) {
-		if (TableType.dataset.equals(tableType)) {
+		if (TableType.dataset.equals(tableType) || TableType.dataset_collection.equals(tableType)) {
 			return "This " + tableType.getDisplayName() + " does not have any items." + (editable ? (" Select \"Edit " + tableType.getDisplayName() + " Items\" from the Tools Menu to add items to this " + tableType.getDisplayName() + ".") : "");
 		} else {
 			return "This " + tableType.getDisplayName() + " does not have a defined scope." + (editable ? " Edit the scope to populate the " + tableType.getDisplayName() + "." : "");
@@ -278,8 +279,8 @@ public class TableEntityWidgetV2 implements TableEntityWidgetView.Presenter, IsW
 		} else if (view instanceof SubmissionView) {
 			List<String> scopeIds = ((SubmissionView) view).getScopeIds();
 			return scopeIds == null || scopeIds.size() == 0;
-		} else if (view instanceof Dataset) {
-			List<EntityRef> datasetItems = ((Dataset) view).getItems();
+		} else if (view instanceof EntityRefCollectionView) {
+			List<EntityRef> datasetItems = ((EntityRefCollectionView) view).getItems();
 			return datasetItems == null || datasetItems.size() == 0;
 		} else {
 			// if we aren't sure, return false

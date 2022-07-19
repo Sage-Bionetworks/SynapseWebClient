@@ -1,16 +1,18 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
 import static org.sagebionetworks.repo.model.EntityType.dataset;
-import static org.sagebionetworks.repo.model.EntityType.dockerrepo;
+import static org.sagebionetworks.repo.model.EntityType.datasetcollection;
 import static org.sagebionetworks.repo.model.EntityType.entityview;
 import static org.sagebionetworks.repo.model.EntityType.file;
 import static org.sagebionetworks.repo.model.EntityType.folder;
 import static org.sagebionetworks.repo.model.EntityType.link;
+import static org.sagebionetworks.repo.model.EntityType.materializedview;
 import static org.sagebionetworks.repo.model.EntityType.project;
 import static org.sagebionetworks.repo.model.EntityType.submissionview;
 import static org.sagebionetworks.repo.model.EntityType.table;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -21,15 +23,15 @@ import org.sagebionetworks.web.client.EntityTypeUtils;
 
 public enum EntityFilter {
 	ALL(EntityType.values()),
-	ALL_BUT_LINK(project, folder, file, table, entityview, dockerrepo, submissionview, dataset),
+	ALL_BUT_LINK(Arrays.stream(EntityType.values()).filter(entityType -> link.equals(entityType)).toArray(EntityType[]::new)),
 	PROJECT_FOLDER_FILE_LINK(project, folder, file, link),
 	CONTAINER(project, folder),
 	PROJECT(project),
 	FOLDER(folder),
 	FILE(file),
 	TABLE(table),
-	ALL_TABLES(table, entityview, submissionview, dataset),
-	PROJECT_OR_TABLE(project, table, entityview, submissionview, dataset);
+	ALL_TABLES(table, entityview, submissionview, dataset, materializedview, datasetcollection),
+	PROJECT_OR_TABLE(project, table, entityview, submissionview, dataset, materializedview, datasetcollection);
 
 	// when browsing (in the entity tree browser), only these types should be shown.
 	private Set<String> entityTypeClassNamesSet;
