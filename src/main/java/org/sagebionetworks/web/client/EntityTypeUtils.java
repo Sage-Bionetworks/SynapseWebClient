@@ -135,7 +135,6 @@ public class EntityTypeUtils {
 			// Dataset
 			icon = IconType.TABLE;
 		} else if (DatasetCollection.class.getName().equals(className)) {
-			// Dataset
 			icon = IconType.TABLE;
 		} else if (EntityView.class.getName().equals(className)) {
 			// FileView
