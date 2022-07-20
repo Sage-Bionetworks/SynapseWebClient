@@ -519,7 +519,10 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 							getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 						}
 					} catch (Exception e) {
-						// ignore
+						// SWC-6243: log the error if it is not the known problem of finding the className
+						if (!e.getMessage().contains("indexOf")) {
+							synapseJSNIUtils.consoleError(e.getMessage());
+						}
 					}
 				}
 			}});
