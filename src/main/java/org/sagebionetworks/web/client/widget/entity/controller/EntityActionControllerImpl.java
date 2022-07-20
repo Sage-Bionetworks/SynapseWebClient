@@ -276,6 +276,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			selectTeamModal = ginInjector.getSelectTeamModal();
 			view.addWidget(selectTeamModal.asWidget());
 			selectTeamModal.setTitle("Select Participant Team");
+			selectTeamModal.setPrimaryButtonText("Create Challenge");
 			selectTeamModal.configure(new CallbackP<String>() {
 				@Override
 				public void invoke(String selectedTeamId) {
