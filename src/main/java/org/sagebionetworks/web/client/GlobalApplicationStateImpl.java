@@ -26,7 +26,6 @@ import org.sagebionetworks.web.client.widget.footer.VersionState;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Element;
-import com.google.gwt.dom.client.EventTarget;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.UmbrellaException;
 import com.google.gwt.place.shared.Place;
@@ -514,8 +513,16 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 				if (event.getTypeInt() == Event.ONCLICK) {
 					Element targetElement = Element.as(event.getNativeEvent().getEventTarget());
 					// SWC-5812: SRC has components that apply this special CSS class, and expect the app to look for these events and handle appropriately.
-					if (targetElement.hasClassName("SRC-SIGN-IN-CLASS")) {
-						getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+					// When the class name is undefined, targetElement.getClassName() still returns an object where isEmpty is false and is not equal to null.
+					try {
+						if (targetElement.hasClassName("SRC-SIGN-IN-CLASS")) {
+							getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+						}
+					} catch (Exception e) {
+						// SWC-6243: log the error if it is not the known problem of finding the className
+						if (!e.getMessage().contains("indexOf")) {
+							synapseJSNIUtils.consoleError(e.getMessage());
+						}
 					}
 				}
 			}});
