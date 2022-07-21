@@ -2,12 +2,12 @@
     <!--We copy all of the dependencies handled at build-time to the folder that Jetty serves. -->
     <target name="copy">
         <echo message="Copying dependencies" />
-    	<copy todir="src/main/webapp/generated">
-	        <fileset dir="target/portal-develop-SNAPSHOT/generated"/>
+    	<copy todir="target/portal-develop-SNAPSHOT/generated">
+	        <fileset dir="src/main/webapp/generated"/>
 	    </copy>
     	<mkdir dir="target/portal-develop-SNAPSHOT/fonts"/>
-        <copy todir="src/main/webapp/fonts">
-	        <fileset dir="target/portal-develop-SNAPSHOT/fonts"/>
+        <copy todir="target/portal-develop-SNAPSHOT/fonts">
+	        <fileset dir="src/main/webapp/fonts"/>
 	    </copy>
     </target>
 </project>
