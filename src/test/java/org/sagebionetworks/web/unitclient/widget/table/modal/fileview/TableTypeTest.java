@@ -14,6 +14,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.table.Dataset;
+import org.sagebionetworks.repo.model.table.DatasetCollection;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.SubmissionView;
 import org.sagebionetworks.repo.model.table.TableEntity;
@@ -32,6 +33,8 @@ public class TableTypeTest {
 	@Mock
 	Dataset mockDataset;
 	@Mock
+	DatasetCollection mockDatasetCollection;
+	@Mock
 	EntityView mockEntityView;
 
 	@Before
@@ -45,6 +48,7 @@ public class TableTypeTest {
 		assertFalse(TableType.project_view.isIncludeFiles());
 		assertFalse(TableType.submission_view.isIncludeFiles());
 		assertTrue(TableType.dataset.isIncludeFiles());
+		assertFalse(TableType.dataset_collection.isIncludeFiles());
 		assertTrue(TableType.file_view.isIncludeFiles());
 		assertTrue((new TableType(EntityView.class, FILE)).isIncludeFiles());
 	}
@@ -56,6 +60,7 @@ public class TableTypeTest {
 		assertFalse(TableType.submission_view.isIncludeFolders());
 		assertFalse(TableType.file_view.isIncludeFolders());
 		assertFalse(TableType.dataset.isIncludeFolders());
+		assertFalse(TableType.dataset_collection.isIncludeFolders());
 		assertTrue((new TableType(EntityView.class, WebConstants.FOLDER)).isIncludeFolders());
 	}
 
@@ -66,6 +71,7 @@ public class TableTypeTest {
 		assertFalse(TableType.submission_view.isIncludeTables());
 		assertFalse(TableType.file_view.isIncludeTables());
 		assertFalse(TableType.dataset.isIncludeTables());
+		assertFalse(TableType.dataset_collection.isIncludeTables());
 		assertTrue((new TableType(EntityView.class, TABLE)).isIncludeTables());
 	}
 
@@ -76,6 +82,7 @@ public class TableTypeTest {
 		assertFalse(TableType.submission_view.isIncludeDatasets());
 		assertFalse(TableType.file_view.isIncludeDatasets());
 		assertFalse(TableType.dataset.isIncludeDatasets());
+		assertTrue(TableType.dataset_collection.isIncludeDatasets());
 		assertTrue((new TableType(EntityView.class, DATASET)).isIncludeDatasets());
 	}
 
@@ -101,6 +108,7 @@ public class TableTypeTest {
 		assertEquals(TableType.dataset.getDisplayName(), DisplayConstants.DATASET);
 		assertEquals(TableType.file_view.getDisplayName(), DisplayConstants.FILE_VIEW);
 		assertEquals(TableType.project_view.getDisplayName(), DisplayConstants.PROJECT_VIEW);
+		assertEquals(TableType.dataset_collection.getDisplayName(), DisplayConstants.DATASET_COLLECTION);
 		assertEquals(new TableType(EntityView.class, FILE | FOLDER | TABLE).getDisplayName(), DisplayConstants.VIEW);
 	}
 
@@ -112,6 +120,8 @@ public class TableTypeTest {
 		assertEquals(TableType.submission_view, TableType.getTableType(mockSubmissionView));
 
 		assertEquals(TableType.dataset, TableType.getTableType(mockDataset));
+
+		assertEquals(TableType.dataset_collection, TableType.getTableType(mockDatasetCollection));
 
 		// using old type
 		when(mockEntityView.getViewTypeMask()).thenReturn(null);

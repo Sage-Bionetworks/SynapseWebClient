@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.controller;
 
 import static com.google.common.util.concurrent.Futures.whenAllComplete;
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
+import static org.sagebionetworks.web.client.EntityTypeUtils.DATASET_COLLECTION_DISPLAY_NAME;
 import static org.sagebionetworks.web.client.EntityTypeUtils.getFriendlyEntityTypeName;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getDoneFuture;
@@ -32,6 +33,7 @@ import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.Dataset;
+import org.sagebionetworks.repo.model.table.DatasetCollection;
 import org.sagebionetworks.repo.model.table.EntityRefCollectionView;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.MaterializedView;
@@ -130,6 +132,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	public static final String SNAPSHOT_CREATED_DETAILS_TABLE = "You created a " + SNAPSHOT + " of this Table.";
 
 	public static final String CREATE_NEW_VIEW_VERSION_PROMPT_BODY = "You're about to create a " + SNAPSHOT + " of this View. " + AVAILABLE_IN_VERSION_HISTORY;
+
+	public static final String CREATE_NEW_DATASET_COLLECTION_VERSION_PROMPT_BODY = "You're about to create a " + SNAPSHOT + " of this " + DATASET_COLLECTION_DISPLAY_NAME + ". " + AVAILABLE_IN_VERSION_HISTORY;
 	public static final String CREATE_NEW_DATASET_VERSION_PROMPT_BODY = "You're about to create a " + STABLE_VERSION + " of this Dataset. " + AVAILABLE_IN_VERSION_HISTORY;
 	public static final String CREATE_NEW_TABLE_ENTITY_VERSION_PROMPT_BODY = "You're about to create a "  + SNAPSHOT + " of this Table. " + AVAILABLE_IN_VERSION_HISTORY;
 
@@ -772,16 +776,16 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 
 	private void configureTableCommands() {
 		if (entityBundle.getEntity() instanceof Table) {
-			boolean isDataset = entityBundle.getEntity() instanceof Dataset;
+			boolean isEntityRefCollectionView = entityBundle.getEntity() instanceof EntityRefCollectionView;
 			boolean isMaterializedView = entityBundle.getEntity() instanceof MaterializedView;
-			// For UX reasons, datasets are not editable, even if the user has permissions (SWC-5870, SWC-5903)
-			boolean canEditResults = permissions.getCanCertifiedUserEdit() && !isDataset && !isMaterializedView;
+			// EntityRefCollectionView results are not editable, even if the user has permissions, because rows may reference immutable versions (SWC-5870, SWC-5903)
+			boolean canEditResults = permissions.getCanCertifiedUserEdit() && !isEntityRefCollectionView && !isMaterializedView;
 			actionMenu.setActionVisible(Action.UPLOAD_TABLE_DATA, canEditResults);
 			actionMenu.setActionText(Action.UPLOAD_TABLE_DATA, "Upload Data to " + entityTypeDisplay);
 			actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, canEditResults);
 			actionMenu.setActionVisible(Action.SHOW_TABLE_SCHEMA, true);
-			actionMenu.setActionVisible(Action.SHOW_VIEW_SCOPE, !(entityBundle.getEntity() instanceof TableEntity) && !isDataset && !isMaterializedView);
-			actionMenu.setActionVisible(Action.EDIT_DATASET_ITEMS, permissions.getCanCertifiedUserEdit() && isDataset && isCurrentVersion);
+			actionMenu.setActionVisible(Action.SHOW_VIEW_SCOPE, !(entityBundle.getEntity() instanceof TableEntity) && !isEntityRefCollectionView && !isMaterializedView);
+			actionMenu.setActionVisible(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, permissions.getCanCertifiedUserEdit() && isEntityRefCollectionView && isCurrentVersion);
 			actionMenu.setActionVisible(Action.EDIT_DEFINING_SQL, permissions.getCanCertifiedUserEdit() && isMaterializedView && isCurrentVersion);
 			actionMenu.setActionListener(Action.EDIT_DEFINING_SQL, this);
 		} else {
@@ -789,7 +793,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, false);
 			actionMenu.setActionVisible(Action.SHOW_TABLE_SCHEMA, false);
 			actionMenu.setActionVisible(Action.SHOW_VIEW_SCOPE, false);
-			actionMenu.setActionVisible(Action.EDIT_DATASET_ITEMS, false);
+			actionMenu.setActionVisible(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, false);
 			actionMenu.setActionVisible(Action.EDIT_DEFINING_SQL, false);
 		}
 	}
@@ -1618,7 +1622,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 					}
 				});
 			};
-		} else if (entity instanceof EntityView || entity instanceof Dataset) {
+		} else if (entity instanceof EntityView || entity instanceof EntityRefCollectionView) {
 			return values -> {
 				String entityId = entityBundle.getEntity().getId();
 				String label = values.get(0);
@@ -1685,7 +1689,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 
 	private String getCreateSnapshotTitleCopy(Entity entity) {
-		if (entity instanceof TableEntity || entity instanceof EntityView) {
+		if (entity instanceof TableEntity || entity instanceof EntityView || entity instanceof DatasetCollection) {
 			return CREATE_SNAPSHOT;
 		} else if (entity instanceof Dataset) {
 			return CREATE_STABLE_VERSION;
@@ -1699,6 +1703,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			return CREATE_NEW_TABLE_ENTITY_VERSION_PROMPT_BODY;
 		} else if (entity instanceof EntityView) {
 			return CREATE_NEW_VIEW_VERSION_PROMPT_BODY;
+		} else if (entity instanceof DatasetCollection) {
+			return CREATE_NEW_DATASET_COLLECTION_VERSION_PROMPT_BODY;
 		} else if (entity instanceof Dataset) {
 			return CREATE_NEW_DATASET_VERSION_PROMPT_BODY;
 		} else {
