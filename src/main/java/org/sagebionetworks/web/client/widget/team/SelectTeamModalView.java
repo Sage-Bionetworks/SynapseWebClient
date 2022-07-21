@@ -18,4 +18,5 @@ public interface SelectTeamModalView extends IsWidget {
 	void hide();
 
 	void setTitle(String title);
+	void setPrimaryButtonText(String text);
 }

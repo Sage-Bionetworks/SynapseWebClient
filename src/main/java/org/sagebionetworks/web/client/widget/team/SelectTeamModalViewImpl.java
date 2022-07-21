@@ -49,6 +49,10 @@ public class SelectTeamModalViewImpl implements SelectTeamModalView {
 	}
 
 	@Override
+	public void setPrimaryButtonText(String text) {
+		selectTeamButton.setText(text);
+	}
+	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
 	}

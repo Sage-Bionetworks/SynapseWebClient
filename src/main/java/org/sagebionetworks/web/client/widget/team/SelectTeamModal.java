@@ -52,4 +52,8 @@ public class SelectTeamModal implements SelectTeamModalView.Presenter {
 	public void setTitle(String title) {
 		view.setTitle(title);
 	}
+	
+	public void setPrimaryButtonText(String text) {
+		view.setPrimaryButtonText(text);
+	}
 }
