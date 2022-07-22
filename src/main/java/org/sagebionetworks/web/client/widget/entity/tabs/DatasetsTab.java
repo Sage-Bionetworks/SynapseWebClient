@@ -7,6 +7,7 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.table.EntityRefCollectionView;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -19,6 +20,8 @@ import com.google.inject.Inject;
 public class DatasetsTab extends AbstractTablesTab {
 
 	public static final String DATASETS_HELP = "Create a Draft Dataset and add File versions. Annotate, Mint DOI’s, and Publish your Dataset to share it with others.";
+
+	public static final String DATASETS_AND_COLLECTIONS_HELP = "Use Datasets to produce and distribute an immutable set of files found across one or more Projects or Folders. You can also create Dataset Collections which contain multiple Datasets.";
 	public static final String DATASETS_HELP_URL = WebConstants.DOCS_URL + "Datasets.2611281979.html";
 
 	@Inject
@@ -26,7 +29,8 @@ public class DatasetsTab extends AbstractTablesTab {
 		super(tab, ginInjector);
 		this.tab = tab;
 		this.ginInjector = ginInjector;
-		tab.configure(DisplayConstants.DATASETS, "dataset", DATASETS_HELP, DATASETS_HELP_URL, EntityArea.DATASETS);
+		String help = DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider()) ? DATASETS_AND_COLLECTIONS_HELP : DATASETS_HELP;
+		tab.configure(DisplayConstants.DATASETS, "dataset", help, DATASETS_HELP_URL, EntityArea.DATASETS);
 	}
 
 	@Override

@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.sagebionetworks.repo.model.Challenge;
@@ -463,8 +464,15 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 
 		if (!(entity instanceof Project)) {
 			actionMenu.setToolsButtonIcon(entityTypeDisplay + TOOLS, IconType.GEAR);
+			actionMenu.setToolsButtonType(ButtonType.DEFAULT);
 		} else if (currentArea != null) {
-			actionMenu.setToolsButtonIcon(DisplayUtils.capitalize(currentArea.name()) + TOOLS, IconType.GEAR);
+			if (EntityArea.TABLES.equals(currentArea) || EntityArea.DATASETS.equals(currentArea)) {
+				actionMenu.setToolsButtonType(ButtonType.PRIMARY);
+				actionMenu.setToolsButtonIcon("Add New", null);
+			} else {
+				actionMenu.setToolsButtonIcon(DisplayUtils.capitalize(currentArea.name()) + TOOLS, IconType.GEAR);
+				actionMenu.setToolsButtonType(ButtonType.DEFAULT);
+			}
 		}
 	}
 
@@ -584,8 +592,11 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			boolean canEditResults = entityBundle.getPermissions().getCanCertifiedUserEdit();
 			actionMenu.setActionVisible(Action.ADD_DATASET, canEditResults);
 			actionMenu.setActionListener(Action.ADD_DATASET, this);
+			actionMenu.setActionVisible(Action.ADD_DATASET_COLLECTION, canEditResults && DisplayUtils.isInTestWebsite(cookies));
+			actionMenu.setActionListener(Action.ADD_DATASET_COLLECTION, this);
 		} else {
 			actionMenu.setActionVisible(Action.ADD_DATASET, false);
+			actionMenu.setActionVisible(Action.ADD_DATASET_COLLECTION, false);
 		}
 	}
 
@@ -1178,6 +1189,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			case ADD_DATASET:
 				onAddDataset();
 				break;
+			case ADD_DATASET_COLLECTION:
+				onAddDatasetCollection();
+				break;
 			case ADD_PROJECT_VIEW:
 				onAddProjectView();
 				break;
@@ -1274,6 +1288,11 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		});
 	}
 
+	public void onAddDatasetCollection() {
+		preflightController.checkCreateEntity(entityBundle, Dataset.class.getName(), () -> {
+			postCheckCreateTableOrView(TableType.dataset_collection);
+		});
+	}
 
 	public void onAddProjectView() {
 		preflightController.checkCreateEntity(entityBundle, EntityView.class.getName(), () -> {

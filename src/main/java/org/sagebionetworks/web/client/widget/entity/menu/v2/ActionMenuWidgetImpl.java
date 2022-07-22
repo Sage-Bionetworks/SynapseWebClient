@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -173,6 +174,11 @@ public class ActionMenuWidgetImpl implements ActionMenuWidget, ActionListener {
 	@Override
 	public void setToolsButtonIcon(String text, IconType icon) {
 		view.setToolsButtonIcon(text, icon);
+	}
+
+	@Override
+	public void setToolsButtonType(ButtonType type) {
+		view.setToolsButtonType(type);
 	}
 
 	@Override

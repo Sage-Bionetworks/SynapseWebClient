@@ -25,6 +25,8 @@ public class CreateTableViewWizard {
 	public static final String VIEW_URL = WebConstants.DOCS_URL + "Views.2011070739.html";
 	public static final String PROJECT_VIEW_HELP = "A Synapse Project View represents a logical collection of Projects.";
 
+	public static final String DATASET_COLLECTION_HELP = "Dataset Collections allow you to collate Datasets found across one or more Synapse Projects or Folders. In order to add a Dataset to a Dataset Collection, it must be shared with you.";
+
 	@Inject
 	public CreateTableViewWizard(ModalWizardWidget modalWizardWidget, CreateTableViewWizardStep1 step1) {
 		this.modalWizardWidget = modalWizardWidget;
@@ -44,6 +46,9 @@ public class CreateTableViewWizard {
 		} else if (TableType.dataset.equals(type)) {
 			this.modalWizardWidget.setTitle("Create Dataset");
 			this.modalWizardWidget.setHelp(DatasetsTab.DATASETS_HELP, DatasetsTab.DATASETS_HELP_URL);
+		} else if (TableType.dataset_collection.equals(type)) {
+			this.modalWizardWidget.setTitle("Create Dataset Collection");
+			this.modalWizardWidget.setHelp(DATASET_COLLECTION_HELP, DatasetsTab.DATASETS_HELP_URL);
 		} else if (TableType.submission_view.equals(type)) {
 			this.modalWizardWidget.setTitle("Create Submission View");
 			// TODO: send to submission view docs page (https://github.com/Sage-Bionetworks/synapseDocs/issues/787)

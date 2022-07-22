@@ -9,6 +9,7 @@ import org.gwtbootstrap3.client.ui.Divider;
 import org.gwtbootstrap3.client.ui.DropDown;
 import org.gwtbootstrap3.client.ui.DropDownHeader;
 import org.gwtbootstrap3.client.ui.Tooltip;
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.Trigger;
 import org.gwtbootstrap3.client.ui.html.Div;
@@ -169,5 +170,10 @@ public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 	public void setToolsButtonIcon(String text, IconType icon) {
 		toolsMenu.setText(text);
 		toolsMenu.setIcon(icon);
+	}
+
+	@Override
+	public void setToolsButtonType(ButtonType type) {
+		toolsMenu.setType(type);
 	}
 }

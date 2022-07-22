@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.menu.v2;
 
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -46,6 +47,7 @@ public interface ActionMenuWidget extends IsWidget, ActionListener {
 	public void setActionIcon(Action action, IconType icon);
 
 	public void setToolsButtonIcon(String text, IconType icon);
+	public void setToolsButtonType(ButtonType type);
 
 	/**
 	 * Add a new listener to an action.
