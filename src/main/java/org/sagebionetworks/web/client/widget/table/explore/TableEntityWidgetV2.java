@@ -207,7 +207,7 @@ public class TableEntityWidgetV2 implements TableEntityWidgetView.Presenter, IsW
 		view.setSchemaVisible(false);
 		actionMenu.setActionText(Action.SHOW_TABLE_SCHEMA, SHOW + entityTypeDisplay + SCHEMA);
 		actionMenu.setActionText(Action.SHOW_VIEW_SCOPE, SHOW + SCOPE + entityTypeDisplay);
-		actionMenu.setActionText(Action.EDIT_DATASET_ITEMS, "Edit " + entityTypeDisplay + " Items");
+		actionMenu.setActionText(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, "Edit " + entityTypeDisplay + " Items");
 		this.actionMenu.setActionListener(Action.UPLOAD_TABLE_DATA, action -> {
 			onUploadTableData();
 		});
@@ -228,7 +228,7 @@ public class TableEntityWidgetV2 implements TableEntityWidgetView.Presenter, IsW
 			actionMenu.setActionText(Action.SHOW_VIEW_SCOPE, showHide + SCOPE + entityTypeDisplay);
 		});
 
-		this.actionMenu.setActionListener(Action.EDIT_DATASET_ITEMS, action -> {
+		this.actionMenu.setActionListener(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, action -> {
 			showDatasetItemsEditor();
 		});
 
@@ -553,14 +553,14 @@ public class TableEntityWidgetV2 implements TableEntityWidgetView.Presenter, IsW
 	}
 
 	private void showDatasetItemsEditor() {
-		actionMenu.setActionVisible(Action.EDIT_DATASET_ITEMS, false);
+		actionMenu.setActionVisible(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, false);
 		view.setItemsEditorVisible(true);
 		view.setQueryWrapperPlotNavVisible(false);
 		view.setTableMessageVisible(false);
 	}
 
 	public void closeItemsEditor() {
-		actionMenu.setActionVisible(Action.EDIT_DATASET_ITEMS, true);
+		actionMenu.setActionVisible(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, true);
 		view.setItemsEditorVisible(false);
 		view.setQueryWrapperPlotNavVisible(true);
 		reconfigureState();

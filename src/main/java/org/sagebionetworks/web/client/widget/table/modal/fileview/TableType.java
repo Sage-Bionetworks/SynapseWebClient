@@ -154,6 +154,9 @@ public class TableType {
 		if (this.clazz == Dataset.class) {
 			return DisplayConstants.DATASET;
 		}
+		if (this.clazz == DatasetCollection.class) {
+			return DisplayConstants.DATASET_COLLECTION;
+		}
 		if (this.clazz == EntityView.class) {
 			// For EntityViews, the display name depends on the mask
 			if (this.getViewTypeMask().equals(FILE)) {

@@ -21,7 +21,7 @@
 				<b:DropDownMenu ui:field="toolsDropDown"
 								addStyleNames="dropdown-menu-right">
 					<b:DropDownHeader ui:field="noActionsAvailable" addStyleNames="font-italic">No actions available</b:DropDownHeader>
-					<a:ActionMenuItem icon="HDD_O" iconFixedWidth="true" action="EDIT_DATASET_ITEMS">Edit Dataset Files</a:ActionMenuItem>
+					<a:ActionMenuItem icon="EDIT" iconFixedWidth="true" action="EDIT_ENTITYREF_COLLECTION_ITEMS">Edit Items</a:ActionMenuItem>
 					<a:ActionMenuItem icon="LOCK" iconFixedWidth="true" action="VIEW_SHARING_SETTINGS">Share</a:ActionMenuItem>
 					<a:ActionMenuItem icon="EDIT" iconFixedWidth="true" action="EDIT_PROJECT_METADATA">Edit Project Metadata</a:ActionMenuItem>
 					<a:ActionMenuItem icon="BAR_CHART" iconFixedWidth="true" action="SHOW_PROJECT_STATS">Show Project Statistics</a:ActionMenuItem>

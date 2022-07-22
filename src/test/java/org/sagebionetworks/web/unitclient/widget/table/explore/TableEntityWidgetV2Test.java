@@ -33,6 +33,7 @@ import org.sagebionetworks.repo.model.EntityRef;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Dataset;
+import org.sagebionetworks.repo.model.table.DatasetCollection;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
@@ -201,6 +202,21 @@ public class TableEntityWidgetV2Test {
 
 		entityBundle.setEntity(dataset);
 	}
+
+	private void configureBundleWithDatasetCollection() {
+		DatasetCollection datasetCollection = new DatasetCollection();
+		datasetCollection.setId("syn456");
+		datasetCollection.setColumnIds(TableModelTestUtils.getColumnModelIds(columns));
+
+		// Dataset has one item
+		EntityRef item = new EntityRef();
+		item.setEntityId("syn123");
+		item.setVersionNumber(1L);
+		datasetCollection.setItems(Collections.singletonList(item));
+
+		entityBundle.setEntity(datasetCollection);
+	}
+
 
 	@Test
 	public void testGetDefaultPageSizeMaxUnder() {
@@ -529,19 +545,19 @@ public class TableEntityWidgetV2Test {
 		boolean canEdit = true;
 		configureBundleWithDataset();
 		widget.configure(entityBundle, versionNumber, canEdit, false, mockQueryChangeHandler, mockActionMenu);
-		verify(mockActionMenu).setActionListener(eq(Action.EDIT_DATASET_ITEMS), actionListenerCaptor.capture());
+		verify(mockActionMenu).setActionListener(eq(Action.EDIT_ENTITYREF_COLLECTION_ITEMS), actionListenerCaptor.capture());
 		ActionListener listener = actionListenerCaptor.getValue();
 
-		listener.onAction(Action.EDIT_DATASET_ITEMS);
+		listener.onAction(Action.EDIT_ENTITYREF_COLLECTION_ITEMS);
 		verify(mockView).setItemsEditorVisible(true);
 
-		verify(mockActionMenu).setActionVisible(Action.EDIT_DATASET_ITEMS, false);
+		verify(mockActionMenu).setActionVisible(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, false);
 
 		// The React component will trigger the call to closeItemsEditor when we are
 		// ready to close
 		widget.closeItemsEditor();
 		verify(mockView).setItemsEditorVisible(false);
-		verify(mockActionMenu).setActionVisible(Action.EDIT_DATASET_ITEMS, true);
+		verify(mockActionMenu).setActionVisible(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, true);
 	}
 
 	@Test // SWC-5921
@@ -556,7 +572,7 @@ public class TableEntityWidgetV2Test {
 		widget.configure(entityBundle, versionNumber, canEdit, false, mockQueryChangeHandler, mockActionMenu);
 
 		verify(mockView).setItemsEditorVisible(true);
-		verify(mockActionMenu).setActionVisible(Action.EDIT_DATASET_ITEMS, false);
+		verify(mockActionMenu).setActionVisible(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, false);
 	}
 
 	@Test // SWC-5921
@@ -567,7 +583,7 @@ public class TableEntityWidgetV2Test {
 		widget.configure(entityBundle, versionNumber, canEdit, false, mockQueryChangeHandler, mockActionMenu);
 
 		verify(mockView, never()).setItemsEditorVisible(true);
-		verify(mockActionMenu, never()).setActionVisible(Action.EDIT_DATASET_ITEMS, false);
+		verify(mockActionMenu, never()).setActionVisible(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, false);
 	}
 
 	@Test // SWC-5921
@@ -578,7 +594,7 @@ public class TableEntityWidgetV2Test {
 		widget.configure(entityBundle, versionNumber, canEdit, false, mockQueryChangeHandler, mockActionMenu);
 
 		verify(mockView, never()).setItemsEditorVisible(true);
-		verify(mockActionMenu, never()).setActionVisible(Action.EDIT_DATASET_ITEMS, false);
+		verify(mockActionMenu, never()).setActionVisible(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, false);
 	}
 
 	@Test
@@ -614,7 +630,7 @@ public class TableEntityWidgetV2Test {
 		configureBundleWithDataset();
 
 		widget.configure(entityBundle, versionNumber, canEdit, false, mockQueryChangeHandler, mockActionMenu);
-		verify(mockActionMenu).setActionListener(eq(Action.EDIT_DATASET_ITEMS), actionListenerCaptor.capture());
+		verify(mockActionMenu).setActionListener(eq(Action.EDIT_ENTITYREF_COLLECTION_ITEMS), actionListenerCaptor.capture());
 
 		ActionListener onEditDatasetItems = actionListenerCaptor.getValue();
 
@@ -623,7 +639,7 @@ public class TableEntityWidgetV2Test {
 		verify(mockView, times(2)).setQueryWrapperPlotNavVisible(true);
 
 		// Call under test - open the Dataset Items editor
-		onEditDatasetItems.onAction(Action.EDIT_DATASET_ITEMS);
+		onEditDatasetItems.onAction(Action.EDIT_ENTITYREF_COLLECTION_ITEMS);
 		verify(mockView).setItemsEditorVisible(true);
 		verify(mockView).setQueryWrapperPlotNavVisible(false);
 
@@ -631,5 +647,25 @@ public class TableEntityWidgetV2Test {
 		widget.closeItemsEditor();
 		verify(mockView).setItemsEditorVisible(false);
 		verify(mockView, times(4)).setQueryWrapperPlotNavVisible(true);
+	}
+
+	@Test
+	public void testShowAndHideDatasetCollectionEditor() throws JSONObjectAdapterException {
+		boolean canEdit = true;
+		configureBundleWithDatasetCollection();
+		widget.configure(entityBundle, versionNumber, canEdit, false, mockQueryChangeHandler, mockActionMenu);
+		verify(mockActionMenu).setActionListener(eq(Action.EDIT_ENTITYREF_COLLECTION_ITEMS), actionListenerCaptor.capture());
+		ActionListener listener = actionListenerCaptor.getValue();
+
+		listener.onAction(Action.EDIT_ENTITYREF_COLLECTION_ITEMS);
+		verify(mockView).setItemsEditorVisible(true);
+
+		verify(mockActionMenu).setActionVisible(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, false);
+
+		// The React component will trigger the call to closeItemsEditor when we are
+		// ready to close
+		widget.closeItemsEditor();
+		verify(mockView).setItemsEditorVisible(false);
+		verify(mockActionMenu).setActionVisible(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, true);
 	}
 }
