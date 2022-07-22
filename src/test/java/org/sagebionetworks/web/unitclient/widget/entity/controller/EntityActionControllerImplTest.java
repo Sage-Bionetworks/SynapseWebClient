@@ -807,8 +807,8 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionListener(Action.ADD_PROJECT_VIEW, controller);
 		verify(mockActionMenu).setActionVisible(Action.ADD_MATERIALIZED_VIEW, canCertifiedUserEdit);
 		verify(mockActionMenu).setActionListener(Action.ADD_MATERIALIZED_VIEW, controller);
-		
-		verify(mockActionMenu).setToolsButtonIcon("Tables Tools", IconType.GEAR);
+
+		verify(mockActionMenu).setToolsButtonIcon("Add New", null);
 	}
 
 	@Test
@@ -838,6 +838,50 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionVisible(Action.ADD_TABLE, false);
 		verify(mockActionMenu).setActionVisible(Action.ADD_FILE_VIEW, false);
 		verify(mockActionMenu).setActionVisible(Action.ADD_PROJECT_VIEW, false);
+		verify(mockActionMenu).setToolsButtonIcon("Files Tools", IconType.GEAR);
+	}
+
+	@Test
+	public void testConfigureProjectLevelDatasetCommandsCanEdit() {
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+		entityBundle.setEntity(new Project());
+		currentEntityArea = EntityArea.DATASETS;
+		boolean canCertifiedUserEdit = true;
+		permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
+
+		verify(mockActionMenu).setActionVisible(Action.ADD_DATASET, canCertifiedUserEdit);
+		verify(mockActionMenu).setActionListener(Action.ADD_DATASET, controller);
+		verify(mockActionMenu).setActionVisible(Action.ADD_DATASET_COLLECTION, canCertifiedUserEdit);
+		verify(mockActionMenu).setActionListener(Action.ADD_DATASET_COLLECTION, controller);
+
+		verify(mockActionMenu).setToolsButtonIcon("Add New", null);
+	}
+
+	@Test
+	public void testConfigureProjectLevelDatasetCommandsCannotEdit() {
+		entityBundle.setEntity(new Project());
+		currentEntityArea = EntityArea.DATASETS;
+		boolean canCertifiedUserEdit = false;
+		permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
+
+		verify(mockActionMenu).setActionVisible(Action.ADD_DATASET, canCertifiedUserEdit);
+		verify(mockActionMenu).setActionListener(Action.ADD_DATASET, controller);
+		verify(mockActionMenu).setActionVisible(Action.ADD_DATASET_COLLECTION, canCertifiedUserEdit);
+		verify(mockActionMenu).setActionListener(Action.ADD_DATASET_COLLECTION, controller);
+	}
+
+	@Test
+	public void testConfigureProjectLevelDatasetCommandsCanEditNotOnDatasetsTab() {
+		entityBundle.setEntity(new Project());
+		currentEntityArea = EntityArea.FILES;
+		boolean canCertifiedUserEdit = true;
+		permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
+
+		verify(mockActionMenu).setActionVisible(Action.ADD_DATASET, false);
+		verify(mockActionMenu).setActionVisible(Action.ADD_DATASET_COLLECTION, false);
 		verify(mockActionMenu).setToolsButtonIcon("Files Tools", IconType.GEAR);
 	}
 

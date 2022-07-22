@@ -13,14 +13,14 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Dataset;
+import org.sagebionetworks.repo.model.table.DatasetCollection;
+import org.sagebionetworks.repo.model.table.EntityRefCollectionView;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.SubmissionView;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.ViewEntityType;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.GlobalApplicationStateImpl;
-import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.widget.evaluation.SubmissionViewScopeEditor;
@@ -88,11 +88,11 @@ public class CreateTableViewWizardStep1 implements ModalPage, CreateTableViewWiz
 		
 		if (TableType.submission_view.equals(type)) {
 			view.setSubmissionViewScopeWidgetVisible(true);
-		} else if (!TableType.table.equals(type) && !TableType.dataset.equals(type)) {
+		} else if (!TableType.table.equals(type) && !TableType.dataset.equals(type) && !TableType.dataset_collection.equals(type)) {
 			view.setEntityViewScopeWidgetVisible(true);	
 		}
 		
-		if (TableType.table.equals(type) || TableType.dataset.equals(type) || TableType.project_view.equals(type) || TableType.submission_view.equals(type)) {
+		if (TableType.table.equals(type) || TableType.dataset.equals(type) || TableType.dataset_collection.equals(type) || TableType.project_view.equals(type) || TableType.submission_view.equals(type)) {
 			view.setViewTypeOptionsVisible(false);
 		} else {
 			view.setViewTypeOptionsVisible(true);
@@ -120,11 +120,18 @@ public class CreateTableViewWizardStep1 implements ModalPage, CreateTableViewWiz
 		List<ListenableFuture<?>> futures = new ArrayList<>();
 		if (TableType.table.equals(tableType)) {
 			table = new TableEntity();
-		} else if (TableType.dataset.equals(tableType)) {
-			table = new Dataset();
-			((Dataset) table).setItems(Collections.EMPTY_LIST); // Workaround for PLFM-7076
+		} else if (TableType.dataset.equals(tableType) || TableType.dataset_collection.equals(tableType)) {
+			ViewEntityType viewEntityType;
+			if (TableType.dataset.equals(tableType)) {
+				table = new Dataset();
+				viewEntityType = ViewEntityType.dataset;
+			} else {
+				table = new DatasetCollection();
+				viewEntityType = ViewEntityType.datasetcollection;
+			}
+			((EntityRefCollectionView) table).setItems(Collections.EMPTY_LIST); // Workaround for PLFM-7076
 			// For Datasets, automatically add the default columns (SWC-5917)
-			FluentFuture<List<ColumnModel>> defaultColumnsFuture = jsClient.getDefaultColumnsForView(ViewEntityType.dataset);
+			FluentFuture<List<ColumnModel>> defaultColumnsFuture = jsClient.getDefaultColumnsForView(viewEntityType);
 			defaultColumnsFuture.addCallback(new FutureCallback<List<ColumnModel>>() {
 				@Override
 				public void onSuccess(@NullableDecl List<ColumnModel> results) {
@@ -174,7 +181,7 @@ public class CreateTableViewWizardStep1 implements ModalPage, CreateTableViewWiz
 			@Override
 			public void onSuccess(Entity table) {
 				// For Datasets, this is the only step.
-				if (TableType.dataset.equals(tableType)) {
+				if (TableType.dataset.equals(tableType) || TableType.dataset_collection.equals(tableType)) {
 					// Go to the dataset page
 					globalAppState.getPlaceChanger().goTo(new Synapse(table.getId()));
 					modalPresenter.onFinished();

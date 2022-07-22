@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.menu.v2;
 
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -29,6 +30,8 @@ public interface ActionMenuWidgetView extends IsWidget {
 	void addControllerWidget(IsWidget controllerWidget);
 
 	void setToolsButtonIcon(String text, IconType icon);
+
+	public void setToolsButtonType(ButtonType type);
 
 	void setACTDividerVisible(boolean visible);
 

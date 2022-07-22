@@ -17,7 +17,7 @@
 		<b:Button ui:field="singleActionButton"  addStyleNames="displayInlineBlock"></b:Button>
 		<b:Tooltip title="Tools and options">
 			<b:DropDown ui:field="dropdown" addStyleNames="displayInlineBlock">
-				<b:Button icon="GEARS" ui:field="toolsMenu" addStyleNames="toolsMenuButton" dataToggle="DROPDOWN">Tools</b:Button>
+				<b:Button type="DEFAULT" ui:field="toolsMenu" addStyleNames="toolsMenuButton" dataToggle="DROPDOWN">Tools</b:Button>
 				<b:DropDownMenu ui:field="toolsDropDown"
 								addStyleNames="dropdown-menu-right">
 					<b:DropDownHeader ui:field="noActionsAvailable" addStyleNames="font-italic">No actions available</b:DropDownHeader>
@@ -55,7 +55,8 @@
 					<a:ActionMenuItem icon="LINK" iconFixedWidth="true" action="CREATE_LINK">Save Link</a:ActionMenuItem>
 					<a:ActionMenuItem icon="TIMES_CIRCLE" iconFixedWidth="true" action="DELETE_ENTITY">Delete</a:ActionMenuItem>
 					<a:ActionMenuItem icon="UPLOAD" iconFixedWidth="true" action="UPLOAD_TABLE">Upload a Table</a:ActionMenuItem>
-					<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="ADD_DATASET">Add Dataset</a:ActionMenuItem>
+                    <a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="ADD_DATASET">Add Dataset</a:ActionMenuItem>
+                    <a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="ADD_DATASET_COLLECTION">Add Dataset Collection</a:ActionMenuItem>
 					<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="ADD_TABLE">Add Table</a:ActionMenuItem>
 					<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="ADD_FILE_VIEW">Add File View</a:ActionMenuItem>
 					<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="ADD_PROJECT_VIEW">Add Project View</a:ActionMenuItem>
