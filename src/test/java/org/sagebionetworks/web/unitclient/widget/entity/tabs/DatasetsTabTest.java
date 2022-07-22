@@ -146,9 +146,8 @@ public class DatasetsTabTest {
 
 	@Before
 	public void setUp() {
-		tab = new DatasetsTab(mockTab, mockPortalGinInjector);
-		when(mockTab.getEntityActionMenu()).thenReturn(mockActionMenuWidget);
 		when(mockPortalGinInjector.getCookieProvider()).thenReturn(mockCookies);
+		when(mockTab.getEntityActionMenu()).thenReturn(mockActionMenuWidget);
 		when(mockPortalGinInjector.getTablesTabView()).thenReturn(mockView);
 		when(mockPortalGinInjector.getTableListWidget()).thenReturn(mockTableListWidget);
 		when(mockPortalGinInjector.getTableTitleBar()).thenReturn(mockTitleBar);
@@ -161,9 +160,11 @@ public class DatasetsTabTest {
 		when(mockPortalGinInjector.getGlobalApplicationState()).thenReturn(mockGlobalApplicationState);
 		when(mockPortalGinInjector.getSynapseJavascriptClient()).thenReturn(mockJsClient);
 		when(mockPortalGinInjector.getWikiPageWidget()).thenReturn(mockWikiPageWidget);
-
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
+
+		tab = new DatasetsTab(mockTab, mockPortalGinInjector);
 		tab.setEntitySelectedCallback(mockEntitySelectedCallback);
+
 		when(mockProjectEntityBundle.getEntity()).thenReturn(mockProjectEntity);
 		when(mockProjectEntity.getId()).thenReturn(projectEntityId);
 		when(mockProjectEntity.getName()).thenReturn(projectName);
