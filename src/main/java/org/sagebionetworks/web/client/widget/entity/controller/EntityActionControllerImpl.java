@@ -573,7 +573,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			actionMenu.setActionListener(Action.ADD_PROJECT_VIEW, this);
 			actionMenu.setActionVisible(Action.ADD_SUBMISSION_VIEW, canEditResults);
 			actionMenu.setActionListener(Action.ADD_SUBMISSION_VIEW, this);
-			actionMenu.setActionVisible(Action.ADD_MATERIALIZED_VIEW, canEditResults && DisplayUtils.isInTestWebsite(cookies));
+			actionMenu.setActionVisible(Action.ADD_MATERIALIZED_VIEW, canEditResults);
 			actionMenu.setActionListener(Action.ADD_MATERIALIZED_VIEW, this);
 
 		} else {
