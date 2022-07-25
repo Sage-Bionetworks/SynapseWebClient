@@ -13,16 +13,23 @@ public class DatasetEditorProps extends ReactComponentProps {
 		void run();
 	}
 
+	@JsFunction
+	public interface BooleanCallback {
+		void run(boolean arg);
+	}
+
 	String entityId;
 	Callback onSave;
 	Callback onClose;
+	BooleanCallback onUnsavedChangesChange;
 
 	@JsOverlay
-	public static DatasetEditorProps create(String entityId, Callback onSave, Callback onClose) {
+	public static DatasetEditorProps create(String entityId, Callback onSave, Callback onClose, BooleanCallback onUnsavedChangesChange) {
 		DatasetEditorProps props = new DatasetEditorProps();
 		props.entityId = entityId;
 		props.onSave = onSave;
 		props.onClose = onClose;
+		props.onUnsavedChangesChange = onUnsavedChangesChange;
 		return props;
 	}
 }

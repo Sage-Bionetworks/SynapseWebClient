@@ -45,6 +45,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cache.SessionStorage;
@@ -139,6 +140,8 @@ public class TableEntityWidgetV2Test {
 	ArgumentCaptor<OnQueryCallback> onQueryCallbackCaptor;
 	@Captor
 	ArgumentCaptor<OnQueryResultBundleCallback> onQueryResultBundleCallbackCaptor;
+	@Mock
+	GlobalApplicationState mockGlobalState;
 
 	JSONObjectAdapterImpl portalJson = new JSONObjectAdapterImpl();
 
@@ -154,6 +157,7 @@ public class TableEntityWidgetV2Test {
 		tableBundle.setMaxRowsPerPage(4L);
 		tableBundle.setColumnModels(columns);
 		versionNumber = null;
+		when(mockPortalGinInjector.getGlobalApplicationState()).thenReturn(mockGlobalState);
 		when(mockPortalGinInjector.getDownloadTableQueryModalWidget()).thenReturn(mockDownloadTableQueryModalWidget);
 		when(mockPortalGinInjector.getUploadTableModalWidget()).thenReturn(mockUploadTableModalWidget);
 		when(mockPortalGinInjector.getCopyTextModal()).thenReturn(mockCopyTextModal);

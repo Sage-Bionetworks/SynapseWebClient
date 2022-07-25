@@ -26,6 +26,8 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.GlobalApplicationStateImpl;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cache.SessionStorage;
@@ -537,7 +539,8 @@ public class TableEntityWidgetV2 implements TableEntityWidgetView.Presenter, IsW
 							eventBus.fireEvent(new EntityUpdatedEvent(tableId));
 							closeItemsEditor();
 						},
-						() -> closeItemsEditor()
+						() -> closeItemsEditor(),
+						(hasUnsavedChanges) -> ginInjector.getGlobalApplicationState().setIsEditing(hasUnsavedChanges)
 				);
 		return props;
 	}
