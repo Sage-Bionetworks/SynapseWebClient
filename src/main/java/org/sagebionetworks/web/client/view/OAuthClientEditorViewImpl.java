@@ -1,7 +1,13 @@
 package org.sagebionetworks.web.client.view;
 
 import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.jsinterop.EmptyProps;
+import org.sagebionetworks.web.client.jsinterop.React;
+import org.sagebionetworks.web.client.jsinterop.ReactDOM;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
+import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.presenter.OAuthClientEditorPresenter;
+import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 import org.sagebionetworks.web.client.widget.header.Header;
 
 import com.google.gwt.uibinder.client.UiBinder;
@@ -10,17 +16,21 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class OAuthClientEditorViewImpl implements OAuthClientEditorView {
+    ReactComponentDiv container;
     public interface OAuthClientEditorViewImplUiBinder extends UiBinder<Widget, OAuthClientEditorViewImpl>{}
 
     private OAuthClientEditorPresenter presenter;
+    private SynapseContextPropsProvider propsProvider;
     private Header headerWidget;
 
     Widget widget;
 
     @Inject
     public OAuthClientEditorViewImpl(OAuthClientEditorViewImplUiBinder binder, Header headerWidget, SynapseContextPropsProvider propsProvider) {
+        container = new ReactComponentDiv();
         widget = binder.createAndBindUi(this);
         this.headerWidget = headerWidget;
+        this.propsProvider = propsProvider;
         headerWidget.configure();
     }
 
@@ -34,9 +44,12 @@ public class OAuthClientEditorViewImpl implements OAuthClientEditorView {
     }
 
     @Override
-    public Widget asWidget() { return widget; }
+    public Widget asWidget() { return container.asWidget(); }
 
     @Override
     public void render() {
+        EmptyProps props = EmptyProps.create();
+        ReactElement component = React.createElementWithSynapseContext(SRC.SynapseComponents.OAuthManagement, props, propsProvider.getJsInteropContextProps());
+        ReactDOM.render(component, container.getElement());
     }
 }

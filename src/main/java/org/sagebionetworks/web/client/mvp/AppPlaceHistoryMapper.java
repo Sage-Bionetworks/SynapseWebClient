@@ -22,6 +22,7 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.MapPlace;
 import org.sagebionetworks.web.client.place.NewAccount;
 import org.sagebionetworks.web.client.place.DataAccessApprovalTokenPlace;
+import org.sagebionetworks.web.client.place.OAuthClientEditorPlace;
 import org.sagebionetworks.web.client.place.PasswordResetSignedTokenPlace;
 import org.sagebionetworks.web.client.place.PeopleSearch;
 import org.sagebionetworks.web.client.place.PersonalAccessTokenPlace;
@@ -88,7 +89,8 @@ import com.google.gwt.place.shared.WithTokenizers;
 		DataAccessApprovalTokenPlace.Tokenizer.class,
 		PersonalAccessTokenPlace.Tokenizer.class,
 		DownloadCartPlace.Tokenizer.class,
-		DataAccessManagementPlace.Tokenizer.class
+		DataAccessManagementPlace.Tokenizer.class,
+		OAuthClientEditorPlace.Tokenizer.class
 })
 public interface AppPlaceHistoryMapper extends PlaceHistoryMapper {
 }

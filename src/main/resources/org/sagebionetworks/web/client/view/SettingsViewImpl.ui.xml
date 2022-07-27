@@ -222,6 +222,10 @@
 				<b:Button ui:field="managePersonalAccessTokensButton"
 						  addStyleNames="margin-top-10" text="Manage Personal Access Tokens" />
 			</g:HTMLPanel>
+			<g:HTMLPanel ui:field="oAuthClientEditorHighlightBox" addStyleNames="highlight-box">
+				<b:Button ui:field="gotoOAuthClientEditorButton"
+						  addStyleNames="margin-top-10" text="Go to OAuth Client Manager" />
+			</g:HTMLPanel>
 
 			<g:HTMLPanel ui:field="apiKeyHighlightBox" addStyleNames="highlight-box" visible="false">
 				<p>Using an API key allows you to authenticate your scripts for an

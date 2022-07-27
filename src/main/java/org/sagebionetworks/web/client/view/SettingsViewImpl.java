@@ -18,6 +18,7 @@ import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.place.OAuthClientEditorPlace;
 import org.sagebionetworks.web.client.place.PersonalAccessTokenPlace;
 import org.sagebionetworks.web.client.place.Quiz;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
@@ -52,6 +53,10 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	HTMLPanel personalAccessTokensHighlightBox;
 	@UiField
 	Button managePersonalAccessTokensButton;
+	@UiField
+	HTMLPanel oAuthClientEditorHighlightBox;
+	@UiField
+	Button gotoOAuthClientEditorButton;
 	@UiField
 	HTMLPanel apiKeyHighlightBox;
 	@UiField
@@ -225,6 +230,8 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		personalAccessTokensHighlightBox.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Personal Access Tokens");
 		managePersonalAccessTokensButton.addClickHandler(event -> presenter.goTo(new PersonalAccessTokenPlace("")));
 
+		oAuthClientEditorHighlightBox.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "OAuth Client Editor");
+		gotoOAuthClientEditorButton.addClickHandler(event -> presenter.goTo(new OAuthClientEditorPlace(ClientProperties.DEFAULT_PLACE_TOKEN)));
 	}
 
 	@Override
