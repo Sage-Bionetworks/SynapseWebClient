@@ -71,6 +71,8 @@ import org.sagebionetworks.web.client.view.MapView;
 import org.sagebionetworks.web.client.view.MapViewImpl;
 import org.sagebionetworks.web.client.view.NewAccountView;
 import org.sagebionetworks.web.client.view.NewAccountViewImpl;
+import org.sagebionetworks.web.client.view.OAuthClientEditorView;
+import org.sagebionetworks.web.client.view.OAuthClientEditorViewImpl;
 import org.sagebionetworks.web.client.view.PasswordResetSignedTokenView;
 import org.sagebionetworks.web.client.view.PasswordResetSignedTokenViewImpl;
 import org.sagebionetworks.web.client.view.PeopleSearchView;
@@ -913,6 +915,9 @@ public class PortalGinModule extends AbstractGinModule {
 
         // DataAccessManagement
         bind(DataAccessManagementView.class).to(DataAccessManagementViewImpl.class).in(Singleton.class);
+
+        // OAuthClientEditor
+        bind(OAuthClientEditorView.class).to(OAuthClientEditorViewImpl.class).in(Singleton.class);
 
 		/*
 		 * Widgets
