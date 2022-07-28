@@ -10,25 +10,20 @@ import org.sagebionetworks.web.client.presenter.OAuthClientEditorPresenter;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 import org.sagebionetworks.web.client.widget.header.Header;
 
-import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class OAuthClientEditorViewImpl implements OAuthClientEditorView {
     ReactComponentDiv container;
-    public interface OAuthClientEditorViewImplUiBinder extends UiBinder<Widget, OAuthClientEditorViewImpl>{}
 
     private OAuthClientEditorPresenter presenter;
     private SynapseContextPropsProvider propsProvider;
     private Header headerWidget;
 
-    Widget widget;
-
     @Inject
-    public OAuthClientEditorViewImpl(OAuthClientEditorViewImplUiBinder binder, Header headerWidget, SynapseContextPropsProvider propsProvider) {
+    public OAuthClientEditorViewImpl(Header headerWidget, SynapseContextPropsProvider propsProvider) {
         container = new ReactComponentDiv();
-        widget = binder.createAndBindUi(this);
         this.headerWidget = headerWidget;
         this.propsProvider = propsProvider;
         headerWidget.configure();
