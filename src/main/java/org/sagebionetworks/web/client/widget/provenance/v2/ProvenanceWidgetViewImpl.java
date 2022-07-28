@@ -18,7 +18,7 @@ public class ProvenanceWidgetViewImpl extends ReactComponentDiv implements Prove
 
 	List<Reference> refs;
 	String containerHeight;
-	// this view stores the nodes and edges from this instance, and will use these if you ask it to rerender
+	// this view stores the nodes and edges from this instance.  So you can reinitialize the previous state by calling rerender on this instance!
 	JavaScriptObject initialNodes;
 	JavaScriptObject initialEdges;
 	OnUpdateJavaScriptObject nodesListener;
