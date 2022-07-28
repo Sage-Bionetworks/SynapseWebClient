@@ -33,6 +33,7 @@ public class SRC {
 		public static ReactFunctionComponent<StandaloneQueryWrapperProps> StandaloneQueryWrapper;
 		public static ReactFunctionComponent<ForumSearchProps> ForumSearch;
 		public static ReactFunctionComponent<ReviewerDashboardProps> ReviewerDashboard;
+		public static ReactFunctionComponent<ProvenanceGraphProps> ProvenanceGraph;
 		public static ReactFunctionComponent SynapseToastContainer;
 
 		/**

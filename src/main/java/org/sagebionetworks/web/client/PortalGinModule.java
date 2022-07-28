@@ -556,8 +556,8 @@ import org.sagebionetworks.web.client.widget.profile.UserProfileEditorWidget;
 import org.sagebionetworks.web.client.widget.profile.UserProfileEditorWidgetImpl;
 import org.sagebionetworks.web.client.widget.profile.UserProfileEditorWidgetView;
 import org.sagebionetworks.web.client.widget.profile.UserProfileEditorWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView;
-import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.provenance.v2.ProvenanceWidgetView;
+import org.sagebionetworks.web.client.widget.provenance.v2.ProvenanceWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.refresh.RefreshAlertView;
 import org.sagebionetworks.web.client.widget.refresh.RefreshAlertViewImpl;
 import org.sagebionetworks.web.client.widget.search.SearchBoxView;
@@ -1080,6 +1080,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(TIFFPreviewWidgetView.class).to(TIFFPreviewWidgetViewImpl.class);
 
 		// ProvenanceWidget
+		bind(org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView.class).to(org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetViewImpl.class);
 		bind(ProvenanceWidgetView.class).to(ProvenanceWidgetViewImpl.class);
 
 		// MarkdownWidget

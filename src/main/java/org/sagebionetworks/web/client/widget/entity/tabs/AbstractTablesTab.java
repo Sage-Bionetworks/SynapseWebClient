@@ -34,7 +34,7 @@ import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.file.TableTitleBar;
-import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
+import org.sagebionetworks.web.client.widget.provenance.v2.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.explore.TableEntityWidgetV2;
@@ -253,9 +253,15 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 		tab.setEntityNameAndPlace(entityBundle.getEntity().getName(), newPlace);
 		configMap.put(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY, Integer.toString(FilesTab.WIDGET_HEIGHT_PX - 84));
 		configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, DisplayUtils.createEntityVersionString(entityId, newVersion));
-		ProvenanceWidget provWidget = ginInjector.getProvenanceRenderer();
-		view.setProvenance(provWidget);
-		provWidget.configure(configMap);
+		if (DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider())) {
+			ProvenanceWidget provWidget = ginInjector.getProvenanceRendererV2();
+			view.setProvenance(provWidget);
+			provWidget.configure(configMap);
+		} else {
+			org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget provWidget = ginInjector.getProvenanceRenderer();
+			view.setProvenance(provWidget);
+			provWidget.configure(configMap);
+		}
 		version = newVersion;
 	}
 

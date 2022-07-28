@@ -76,6 +76,7 @@ import java.util.Map;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
@@ -261,7 +262,11 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		} else if (contentTypeKey.equals(REFERENCE_CONTENT_TYPE)) {
 			presenter = ginInjector.getReferenceRenderer();
 		} else if (contentTypeKey.equals(PROVENANCE_CONTENT_TYPE)) {
-			presenter = ginInjector.getProvenanceRenderer();
+			if (DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider())) {
+				presenter = ginInjector.getProvenanceRendererV2();
+			} else {
+				presenter = ginInjector.getProvenanceRenderer();
+			}
 		} else if (contentTypeKey.equals(IMAGE_CONTENT_TYPE) || contentTypeKey.equals(IMAGE_LINK_EDITOR_CONTENT_TYPE)) {
 			presenter = ginInjector.getImageRenderer();
 		} else if (contentTypeKey.equals(API_TABLE_CONTENT_TYPE) || contentTypeKey.equals(QUERY_TABLE_CONTENT_TYPE) || contentTypeKey.equals(LEADERBOARD_CONTENT_TYPE)) {

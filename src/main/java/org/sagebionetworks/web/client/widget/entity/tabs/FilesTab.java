@@ -31,7 +31,7 @@ import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
-import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
+import org.sagebionetworks.web.client.widget.provenance.v2.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.refresh.EntityRefreshAlert;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
@@ -262,9 +262,15 @@ public class FilesTab {
 		configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, DisplayUtils.createEntityVersionString(currentEntityId, versionNumber));
 		view.setProvenanceVisible(isFile);
 		if (isFile) {
-			ProvenanceWidget provWidget = ginInjector.getProvenanceRenderer();
-			view.setProvenance(provWidget.asWidget());
-			provWidget.configure(configMap);
+			if (DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider())) {
+				ProvenanceWidget provWidget = ginInjector.getProvenanceRendererV2();
+				view.setProvenance(provWidget.asWidget());
+				provWidget.configure(configMap);
+			} else {
+				org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget provWidget = ginInjector.getProvenanceRenderer();
+				view.setProvenance(provWidget.asWidget());
+				provWidget.configure(configMap);
+			}
 		}
 		// Created By and Modified By
 		modifiedCreatedBy.configure(currentEntity.getCreatedOn(), currentEntity.getCreatedBy(), currentEntity.getModifiedOn(), currentEntity.getModifiedBy());

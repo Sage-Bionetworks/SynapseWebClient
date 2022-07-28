@@ -175,8 +175,8 @@ import org.sagebionetworks.web.client.widget.entity.renderer.SynapseTableFormWid
 import org.sagebionetworks.web.client.widget.entity.renderer.TIFFPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.TeamMemberCountWidget;
-import org.sagebionetworks.web.client.widget.entity.renderer.UserListRowWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.TeamMembersWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.UserListRowWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiFilesPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTabView;
@@ -197,7 +197,7 @@ import org.sagebionetworks.web.client.widget.lazyload.LazyLoadWikiWidgetWrapper;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.client.widget.profile.ProfileCertifiedValidatedWidget;
 import org.sagebionetworks.web.client.widget.profile.UserProfileEditorWidget;
-import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
+import org.sagebionetworks.web.client.widget.provenance.v2.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.refresh.DiscussionThreadCountAlert;
 import org.sagebionetworks.web.client.widget.refresh.EntityRefreshAlert;
 import org.sagebionetworks.web.client.widget.refresh.ReplyCountAlert;
@@ -444,7 +444,8 @@ public interface PortalGinInjector extends Ginjector {
 
 	TutorialWizard getTutorialWidgetRenderer();
 
-	ProvenanceWidget getProvenanceRenderer();
+	org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget getProvenanceRenderer();
+	ProvenanceWidget getProvenanceRendererV2();
 
 	AdministerEvaluationsList getAdministerEvaluationsList();
 
