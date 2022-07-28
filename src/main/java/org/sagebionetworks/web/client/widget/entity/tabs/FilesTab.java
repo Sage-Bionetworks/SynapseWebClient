@@ -114,7 +114,7 @@ public class FilesTab {
 				}
 			});
 
-			configMap = ProvenanceWidget.getDefaultWidgetDescriptor();
+			configMap = org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget.getDefaultWidgetDescriptor();
 			initBreadcrumbLinkClickedHandler();
 		}
 	}

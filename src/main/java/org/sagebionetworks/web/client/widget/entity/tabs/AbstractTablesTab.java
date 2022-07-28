@@ -155,7 +155,7 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 			tab.setContent(view.asWidget());
 			tableListWidget.setTableClickedCallback(getTableListWidgetClickedCallback());
 			initBreadcrumbLinkClickedHandler();
-			configMap = ProvenanceWidget.getDefaultWidgetDescriptor();
+			configMap = org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget.getDefaultWidgetDescriptor();
 		}
 	}
 
@@ -251,7 +251,7 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 		}
 		metadata.configure(entityBundle, newVersion, tab.getEntityActionMenu());
 		tab.setEntityNameAndPlace(entityBundle.getEntity().getName(), newPlace);
-		configMap.put(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY, Integer.toString(FilesTab.WIDGET_HEIGHT_PX - 84));
+		configMap.put(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY, Integer.toString(500));
 		configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, DisplayUtils.createEntityVersionString(entityId, newVersion));
 		if (DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider())) {
 			ProvenanceWidget provWidget = ginInjector.getProvenanceRendererV2();
