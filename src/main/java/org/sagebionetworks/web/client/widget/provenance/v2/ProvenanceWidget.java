@@ -59,7 +59,7 @@ public class ProvenanceWidget implements WidgetRendererPresenter {
 		}
 		view.configure(startRefs, height);
 	}
-
+	
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();

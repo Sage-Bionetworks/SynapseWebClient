@@ -41,10 +41,10 @@ public class ProvenanceWidgetViewImpl extends ReactComponentDiv implements Prove
 	public void configure(List<Reference> refs, String containerHeight) {
 		this.refs = refs;
 		this.containerHeight = containerHeight;
-		rerender();
+		render();
 	}
 
-	public void rerender() {
+	public void render() {
 		ProvenanceGraphProps props = ProvenanceGraphProps.create(refs, containerHeight, initialNodes, initialEdges, nodesListener, edgesListener); 
 		ReactDOM.render(
 			React.createElementWithSynapseContext(

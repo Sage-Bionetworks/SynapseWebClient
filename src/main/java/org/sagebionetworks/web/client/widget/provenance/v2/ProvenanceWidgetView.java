@@ -8,5 +8,4 @@ import com.google.gwt.user.client.ui.IsWidget;
 
 public interface ProvenanceWidgetView extends IsWidget {
 	void configure(List<Reference> refs, String containerHeight);
-	void rerender();
 }

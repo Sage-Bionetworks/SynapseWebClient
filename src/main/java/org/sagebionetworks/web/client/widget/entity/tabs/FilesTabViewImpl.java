@@ -69,6 +69,7 @@ public class FilesTabViewImpl implements FilesTabView {
 	Div modalDialogContainer;
 	Widget provenanceGraphWidget, previewWidget;
 	HandlerRegistration expandPreviewHandlerRegistration, expandProvHandlerRegistration;
+	FilesTab presenter;
 
 	public interface TabsViewImplUiBinder extends UiBinder<Widget, FilesTabViewImpl> {
 	}
@@ -101,6 +102,7 @@ public class FilesTabViewImpl implements FilesTabView {
 				oldParent.add(w);
 				w.setHeight(DEFAULT_WIDGET_HEIGHT);
 				window.hide();
+				presenter.onExpandClosed();
 			};
 			window.addAttachHandler(attachEvent -> {
 				if (!attachEvent.isAttached()) {
@@ -116,6 +118,7 @@ public class FilesTabViewImpl implements FilesTabView {
 			window.add(footer);
 			modalDialogContainer.add(window);
 			window.show();
+			presenter.onExpand();
 		};
 	}
 
@@ -255,5 +258,8 @@ public class FilesTabViewImpl implements FilesTabView {
 	public void showLoading(boolean value) {
 		loading.setVisible(value);
 	}
-
+	@Override
+	public void setFilesTab(FilesTab presenter) {
+		this.presenter = presenter;
+	}
 }
