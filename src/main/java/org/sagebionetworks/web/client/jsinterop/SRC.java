@@ -34,6 +34,7 @@ public class SRC {
 		public static ReactFunctionComponent<ForumSearchProps> ForumSearch;
 		public static ReactFunctionComponent<ReviewerDashboardProps> ReviewerDashboard;
 		public static ReactFunctionComponent SynapseToastContainer;
+		public static ReactFunctionComponent<EmptyProps> OAuthManagement;
 		public static ReactFunctionComponent TrashCanList;
 
 		/**

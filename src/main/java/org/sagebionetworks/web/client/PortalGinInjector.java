@@ -25,6 +25,7 @@ import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
 import org.sagebionetworks.web.client.presenter.MapPresenter;
 import org.sagebionetworks.web.client.presenter.NewAccountPresenter;
+import org.sagebionetworks.web.client.presenter.OAuthClientEditorPresenter;
 import org.sagebionetworks.web.client.presenter.PasswordResetSignedTokenPresenter;
 import org.sagebionetworks.web.client.presenter.PeopleSearchPresenter;
 import org.sagebionetworks.web.client.presenter.PersonalAccessTokensPresenter;
@@ -378,6 +379,8 @@ public interface PortalGinInjector extends Ginjector {
 	DataAccessApprovalTokenPresenter getDataAccessApprovalTokenPresenter();
 
 	DataAccessManagementPresenter getDataAccessManagementPresenter();
+
+	OAuthClientEditorPresenter getOAuthClientEditorPresenter();
 
 	/*
 	 * Markdown Widgets
