@@ -1,24 +1,32 @@
 package org.sagebionetworks.web.unitclient.widget.entity.registration;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.util.HashMap;
 import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrarImpl;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
+
 import junit.framework.Assert;
 
 public class WidgetRegistrarImplTest {
@@ -32,12 +40,15 @@ public class WidgetRegistrarImplTest {
 	AsyncCallback<WidgetEditorPresenter> mockAsyncCallback;
 	@Mock
 	AsyncCallback<WidgetRendererPresenter> mockRendererAsyncCallback;
+	@Mock
+	CookieProvider mockCookies;
 
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
 		widgetRegistrar = new WidgetRegistrarImpl(mockGinInjector, new JSONObjectAdapterImpl());
 		testImageWidgetDescriptor = new HashMap<String, String>();
+		when(mockGinInjector.getCookieProvider()).thenReturn(mockCookies);
 	}
 
 	@Test
@@ -46,15 +57,18 @@ public class WidgetRegistrarImplTest {
 		verify(mockGinInjector).getVideoWidget();
 		widgetRegistrar.getWidgetRendererForWidgetDescriptorAfterLazyLoad(WidgetConstants.IMAGE_CONTENT_TYPE);
 		verify(mockGinInjector).getImageRenderer();
-		reset(mockGinInjector);
 		widgetRegistrar.getWidgetRendererForWidgetDescriptorAfterLazyLoad(WidgetConstants.IMAGE_LINK_EDITOR_CONTENT_TYPE);
-		verify(mockGinInjector).getImageRenderer();
+		verify(mockGinInjector, times(2)).getImageRenderer();
 		widgetRegistrar.getWidgetRendererForWidgetDescriptorAfterLazyLoad(WidgetConstants.PROVENANCE_CONTENT_TYPE);
 		verify(mockGinInjector).getProvenanceRenderer();
 		widgetRegistrar.getWidgetRendererForWidgetDescriptorAfterLazyLoad(WidgetConstants.API_TABLE_CONTENT_TYPE);
 		widgetRegistrar.getWidgetRendererForWidgetDescriptorAfterLazyLoad(WidgetConstants.QUERY_TABLE_CONTENT_TYPE);
 		widgetRegistrar.getWidgetRendererForWidgetDescriptorAfterLazyLoad(WidgetConstants.LEADERBOARD_CONTENT_TYPE);
 		verify(mockGinInjector, times(3)).getSynapseAPICallRenderer();
+		
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+		widgetRegistrar.getWidgetRendererForWidgetDescriptorAfterLazyLoad(WidgetConstants.PROVENANCE_CONTENT_TYPE);
+		verify(mockGinInjector).getProvenanceRendererV2();
 	}
 
 	@Test
