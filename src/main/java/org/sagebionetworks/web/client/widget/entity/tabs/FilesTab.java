@@ -1,7 +1,9 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.Map;
+
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
@@ -31,11 +33,12 @@ import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
-import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
+import org.sagebionetworks.web.client.widget.provenance.v2.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.refresh.EntityRefreshAlert;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
+
 import com.google.gwt.place.shared.Place;
 import com.google.inject.Inject;
 
@@ -64,6 +67,7 @@ public class FilesTab {
 	String projectEntityId;
 	EntityBundle entityBundle;
 	CallbackP<String> entitySelectedCallback;
+	ProvenanceWidget provWidget;
 	
 	@Inject
 	public FilesTab(Tab tab, PortalGinInjector ginInjector) {
@@ -101,6 +105,7 @@ public class FilesTab {
 			view.setSynapseAlert(synAlert.asWidget());
 			view.setModifiedCreatedBy(modifiedCreatedBy);
 			view.setDiscussionThreadListWidget(discussionThreadListWidget.asWidget());
+			view.setFilesTab(this);
 			discussionThreadListWidget.setThreadIdClickedCallback(new CallbackP<DiscussionThreadBundle>() {
 
 				@Override
@@ -109,7 +114,7 @@ public class FilesTab {
 				}
 			});
 
-			configMap = ProvenanceWidget.getDefaultWidgetDescriptor();
+			configMap = org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget.getDefaultWidgetDescriptor();
 			initBreadcrumbLinkClickedHandler();
 		}
 	}
@@ -262,9 +267,15 @@ public class FilesTab {
 		configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, DisplayUtils.createEntityVersionString(currentEntityId, versionNumber));
 		view.setProvenanceVisible(isFile);
 		if (isFile) {
-			ProvenanceWidget provWidget = ginInjector.getProvenanceRenderer();
-			view.setProvenance(provWidget.asWidget());
-			provWidget.configure(configMap);
+			if (DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider())) {
+				provWidget = ginInjector.getProvenanceRendererV2();
+				view.setProvenance(provWidget.asWidget());
+				provWidget.configure(configMap);
+			} else {
+				org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget provWidget = ginInjector.getProvenanceRenderer();
+				view.setProvenance(provWidget.asWidget());
+				provWidget.configure(configMap);
+			}
 		}
 		// Created By and Modified By
 		modifiedCreatedBy.configure(currentEntity.getCreatedOn(), currentEntity.getCreatedBy(), currentEntity.getModifiedOn(), currentEntity.getModifiedBy());
@@ -293,6 +304,19 @@ public class FilesTab {
 				}
 			};
 			wikiPageWidget.setWikiReloadHandler(wikiReloadHandler);
+		}
+	}
+	
+	public void onExpand() {
+		if (provWidget != null) {
+			configMap.put(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY, "600");
+			provWidget.configure(configMap);
+		}
+	}
+	public void onExpandClosed() {
+		if (provWidget != null) {
+			configMap.put(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY, "200");
+			provWidget.configure(configMap);
 		}
 	}
 

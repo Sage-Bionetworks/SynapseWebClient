@@ -34,6 +34,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -53,7 +54,7 @@ import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.tabs.FilesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.FilesTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
-import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
+import org.sagebionetworks.web.client.widget.provenance.v2.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.refresh.EntityRefreshAlert;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.Widget;
@@ -107,7 +108,9 @@ public class FilesTabTest {
 	@Mock
 	UserEntityPermissions mockPermissions;
 	@Mock
-	ProvenanceWidget mockProvenanceWidget;
+	org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget mockProvenanceWidget;
+	@Mock
+	ProvenanceWidget mockProvenanceWidgetV2;
 	@Mock
 	CallbackP<String> mockEntitySelectedCallback;
 	@Mock
@@ -126,6 +129,8 @@ public class FilesTabTest {
 	SynapseJavascriptClient mockJsClient;
 	@Mock
 	VersionHistoryWidget mockVersionHistoryWidget;
+	@Mock
+	CookieProvider mockCookies;
 
 	FilesTab tab;
 	String projectEntityId = "syn9";
@@ -163,6 +168,7 @@ public class FilesTabTest {
 		when(mockPortalGinInjector.getModifiedCreatedByWidget()).thenReturn(mockModifiedCreatedBy);
 		when(mockPortalGinInjector.getDiscussionThreadListWidget()).thenReturn(mockDiscussionThreadListWidget);
 		when(mockPortalGinInjector.getSynapseJavascriptClient()).thenReturn(mockJsClient);
+		when(mockPortalGinInjector.getCookieProvider()).thenReturn(mockCookies);
 
 		tab.setEntitySelectedCallback(mockEntitySelectedCallback);
 
@@ -175,6 +181,7 @@ public class FilesTabTest {
 		when(mockEntityBundle.getPermissions()).thenReturn(mockPermissions);
 
 		when(mockPortalGinInjector.getProvenanceRenderer()).thenReturn(mockProvenanceWidget);
+		when(mockPortalGinInjector.getProvenanceRendererV2()).thenReturn(mockProvenanceWidgetV2);
 		when(mockLinkEntity.getLinksTo()).thenReturn(mockReference);
 		when(mockReference.getTargetId()).thenReturn(linkEntityId);
 		when(mockReference.getTargetVersionNumber()).thenReturn(linkEntityVersion);

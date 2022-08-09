@@ -70,12 +70,15 @@ import static org.sagebionetworks.web.shared.WidgetConstants.WIKI_FILES_PREVIEW_
 import static org.sagebionetworks.web.shared.WidgetConstants.WIKI_SUBPAGES_CONTENT_TYPE;
 import static org.sagebionetworks.web.shared.WidgetConstants.YOUTUBE_CONTENT_TYPE;
 import static org.sagebionetworks.web.shared.WidgetConstants.YOUTUBE_FRIENDLY_NAME;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
@@ -84,6 +87,7 @@ import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadWikiWidgetWrapper;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.RunAsyncCallback;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -261,7 +265,11 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		} else if (contentTypeKey.equals(REFERENCE_CONTENT_TYPE)) {
 			presenter = ginInjector.getReferenceRenderer();
 		} else if (contentTypeKey.equals(PROVENANCE_CONTENT_TYPE)) {
-			presenter = ginInjector.getProvenanceRenderer();
+			if (DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider())) {
+				presenter = ginInjector.getProvenanceRendererV2();
+			} else {
+				presenter = ginInjector.getProvenanceRenderer();
+			}
 		} else if (contentTypeKey.equals(IMAGE_CONTENT_TYPE) || contentTypeKey.equals(IMAGE_LINK_EDITOR_CONTENT_TYPE)) {
 			presenter = ginInjector.getImageRenderer();
 		} else if (contentTypeKey.equals(API_TABLE_CONTENT_TYPE) || contentTypeKey.equals(QUERY_TABLE_CONTENT_TYPE) || contentTypeKey.equals(LEADERBOARD_CONTENT_TYPE)) {

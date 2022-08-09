@@ -49,4 +49,6 @@ public interface FilesTabView extends IsWidget {
 	void setDiscussionText(String entityName);
 
 	void showLoading(boolean value);
+	
+	void setFilesTab(FilesTab presenter);
 }
