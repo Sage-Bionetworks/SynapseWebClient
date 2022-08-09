@@ -36,6 +36,7 @@ public class SRC {
 		public static ReactFunctionComponent<ProvenanceGraphProps> ProvenanceGraph;
 		public static ReactFunctionComponent SynapseToastContainer;
 		public static ReactFunctionComponent<EmptyProps> OAuthManagement;
+		public static ReactFunctionComponent TrashCanList;
 
 		/**
 		 * Pushes a global toast message. In SWC, you should use {@link DisplayUtils#notify}, rather than calling this method directly.
