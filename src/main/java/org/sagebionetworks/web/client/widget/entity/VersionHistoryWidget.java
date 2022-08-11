@@ -156,17 +156,13 @@ public class VersionHistoryWidget implements VersionHistoryWidgetView.Presenter,
 				view.setMoreButtonVisible(results.size() == VERSION_LIMIT);
 				if (currentOffset == 0) {
 					// TODO: Use `isLatestVersion` when PLFM-6583 is complete.
-					boolean isCurrentVersion = versionNumber == null;
-					// we know the current version based on this, unless we're looking at a Table
-					if (!(bundle.getEntity() instanceof Table)) {
-						Long currentVersion = results.get(0).getVersionNumber();
-						isCurrentVersion = isCurrentVersion || currentVersion.equals(versionNumber);
-					}
-
-					view.setEntityBundle(bundle.getEntity(), !isCurrentVersion);
-					view.setEditVersionInfoButtonVisible(isCurrentVersion && canEdit && !(bundle.getEntity() instanceof Table));
-					if (results.size() == 0) {
-						view.showNoResults();
+					if(bundle.getEntity() instanceof VersionableEntity){
+						boolean isCurrentVersion = ((VersionableEntity) bundle.getEntity()).getIsLatestVersion();
+						view.setEntityBundle(bundle.getEntity(), !isCurrentVersion);
+						view.setEditVersionInfoButtonVisible(isCurrentVersion && canEdit && !(bundle.getEntity() instanceof Table));
+						if (results.size() == 0) {
+							view.showNoResults();
+						}
 					}
 				}
 				if (versionNumber == null && currentOffset == 0 && results.size() > 0) {

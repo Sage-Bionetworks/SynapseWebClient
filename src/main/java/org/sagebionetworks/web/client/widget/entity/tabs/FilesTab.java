@@ -10,6 +10,7 @@ import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Versionable;
+import org.sagebionetworks.repo.model.VersionableEntity;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -241,9 +242,9 @@ public class FilesTab {
 		if (isFileOrFolder) {
 			metadata.configure(bundle, versionNumber, tab.getEntityActionMenu());
 		}
-		boolean isCurrentVersion = versionNumber == null;
-		tab.configureEntityActionController(bundle, isCurrentVersion, null);
-		
+		if(bundle.getEntity() instanceof VersionableEntity) {
+			tab.configureEntityActionController(bundle, ((VersionableEntity) bundle.getEntity()).getIsLatestVersion(), null);
+		}
 		EntityArea area = isProject ? EntityArea.FILES : null;
 		tab.setEntityNameAndPlace(bundle.getEntity().getName(), new Synapse(currentEntityId, versionNumber, area, null));
 
