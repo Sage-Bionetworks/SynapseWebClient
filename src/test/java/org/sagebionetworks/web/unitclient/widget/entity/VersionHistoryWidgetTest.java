@@ -107,6 +107,7 @@ public class VersionHistoryWidgetTest {
 		vb.setVersionNumber(new Long(1));
 		vb.setVersionLabel("");
 		vb.setVersionComment("");
+		vb.setIsLatestVersion(true);
 		bundle = mock(EntityBundle.class, RETURNS_DEEP_STUBS);
 		when(bundle.getPermissions().getCanCertifiedUserEdit()).thenReturn(true);
 		when(bundle.getEntity()).thenReturn(vb);
@@ -287,6 +288,7 @@ public class VersionHistoryWidgetTest {
 		// showing a previous version
 		// TODO: fix
 		when(bundle.getPermissions().getCanCertifiedUserEdit()).thenReturn(true);
+		vb.setIsLatestVersion(false);
 		versionHistoryWidget.setEntityBundle(bundle, 24L);
 
 		// auto expand version history = true
@@ -307,8 +309,8 @@ public class VersionHistoryWidgetTest {
 	@Test
 	public void testSetEntityBundleNoEditPrevious() {
 		when(bundle.getPermissions().getCanCertifiedUserEdit()).thenReturn(false);
+		vb.setIsLatestVersion(false);
 		versionHistoryWidget.setEntityBundle(bundle, 24L);
-
 		// auto expand version history = false
 		verify(mockView).setEntityBundle(vb, true);
 		verify(mockView).setEditVersionInfoButtonVisible(false);
@@ -368,6 +370,7 @@ public class VersionHistoryWidgetTest {
 		vb.setVersionNumber(CURRENT_FILE_VERSION);
 		vb.setVersionLabel("");
 		vb.setVersionComment("");
+		vb.setIsLatestVersion(true);
 		when(bundle.getEntity()).thenReturn(vb);
 
 		// with null version
