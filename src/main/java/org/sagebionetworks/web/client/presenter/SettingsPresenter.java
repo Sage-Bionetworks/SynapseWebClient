@@ -215,6 +215,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 		}
 		// Only show deprecated API key settings if in experimental mode
 		view.setApiKeySettingsVisible(DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider()));
+		view.setOauthClientSettingsVisible(DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider()));
 		this.view.render();
 	}
 
