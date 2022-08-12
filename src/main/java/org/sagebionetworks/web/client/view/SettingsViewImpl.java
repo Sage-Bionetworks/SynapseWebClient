@@ -429,6 +429,10 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		apiKeyHighlightBox.setVisible(visible);
 	}
 
+	@Override
+	public void setOauthClientSettingsVisible(boolean visible) {
+		oAuthClientEditorHighlightBox.setVisible(visible);
+	}
 
 	@Override
 	public void setOrcIdVisible(boolean isVisible) {

@@ -540,4 +540,18 @@ public class SettingsPresenterTest {
 		presenter.configure();
 		verify(mockView).setApiKeySettingsVisible(true);
 	}
+
+	@Test
+	public void testOauthClientSettingsHidden() {
+		when(mockCookieProvider.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn(null);
+		presenter.configure();
+		verify(mockView).setOauthClientSettingsVisible(false);
+	}
+
+	@Test
+	public void testOauthClientSettingsShownInExperimentalMode() {
+		when(mockCookieProvider.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("true");
+		presenter.configure();
+		verify(mockView).setOauthClientSettingsVisible(true);
+	}
 }
