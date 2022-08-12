@@ -6,7 +6,8 @@
 	xmlns:t="urn:import:org.sagebionetworks.web.client.widget.table.v2"
 	xmlns:a="urn:import:org.sagebionetworks.web.client.widget.table.v2"
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt"
-	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
+	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 
 	<g:HTMLPanel>
 		<g:SimplePanel ui:field="viewScopeContainer" />
@@ -14,10 +15,19 @@
 			addStyleNames="margin-top-10" visible="false" text="Edit Scope"
 			type="INFO" />
 
-		<b:Modal ui:field="editModal" title="Edit Scope"
+		<b:Modal ui:field="editModal"
 			closable="true" dataBackdrop="STATIC" dataKeyboard="true"
 			b:id="editScopeModal" size="LARGE">
+			<b:ModalHeader>
+				<b:Heading size="H4" text="Edit Scope" addStyleNames="displayInline" />
+				<w:HelpWidget
+						helpMarkdown="Change what items appear in this View, based on the contents of the Scope"
+						href="https://help.synapse.org/docs/Views.2011070739.html#Views-UpdatingtheScopeorContentofaView"
+						addStyleNames="margin-left-5"
+				/>
+			</b:ModalHeader>
 			<b:ModalBody>
+				<bh:Span>Find containers to include in the View scope</bh:Span>
 				<g:SimplePanel ui:field="editScopeContainer"
 					addStyleNames="light-border padding-10" />
 				<g:SimplePanel ui:field="editScopeAlertContainer" />
