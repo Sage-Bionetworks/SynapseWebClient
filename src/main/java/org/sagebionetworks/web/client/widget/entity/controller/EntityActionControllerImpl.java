@@ -884,9 +884,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		if (entityBundle.getEntity() instanceof Table && EntityActionControllerImpl.isVersionSupported(entityBundle.getEntity(), cookies)) {
 			if (entityBundle.getEntity() instanceof Dataset) {
 				// "Stable Version" for datasets (SWC-5919)
-				actionMenu.setActionText(Action.CREATE_TABLE_VERSION, "Create a Stable " + entityTypeDisplay + " Version");
+				actionMenu.setActionText(Action.CREATE_TABLE_VERSION, "Create Stable Version");
 			} else {
-				actionMenu.setActionText(Action.CREATE_TABLE_VERSION, "Create a New " + entityTypeDisplay + " Version");
+				actionMenu.setActionText(Action.CREATE_TABLE_VERSION, "Create Snapshot");
 			}
 			actionMenu.setActionVisible(Action.CREATE_TABLE_VERSION, permissions.getCanEdit());
 			actionMenu.setActionListener(Action.CREATE_TABLE_VERSION, this);
