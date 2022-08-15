@@ -10,6 +10,10 @@
 			<b:ModalHeader>
 				<b:Heading ui:field="title" size="H4"
 					text="Create or Update Doi" addStyleNames="displayInline" />
+				<w:HelpWidget
+					helpMarkdown="Minting a DOI allows you to credit contributors and makes it easy to cite your work."
+					href="https://help.synapse.org/docs/Digital-Object-Identifiers-(DOIs).1972405096.html"
+					addStyleNames="margin-left-5"/>
 				<bh:Span ui:field="modalTitleContainer" />
 			</b:ModalHeader>
 			<b:ModalBody>
