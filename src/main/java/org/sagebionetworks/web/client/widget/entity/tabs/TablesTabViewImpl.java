@@ -3,6 +3,8 @@ package org.sagebionetworks.web.client.widget.entity.tabs;
 import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.widget.FullWidthAlert;
 
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -43,6 +45,10 @@ public class TablesTabViewImpl implements TablesTabView {
 	SimplePanel tableWikiPageContainer;
 	@UiField
 	FullWidthAlert versionAlert;
+	@UiField
+	Span tableDescription;
+	@UiField
+	Anchor helpLink;
 
 	public interface TabsViewImplUiBinder extends UiBinder<Widget, TablesTabViewImpl> {
 	}
@@ -70,6 +76,17 @@ public class TablesTabViewImpl implements TablesTabView {
 	@Override
 	public void setTitle(String s) {
 		title.setText(s);
+	}
+
+	@Override
+	public void setDescription(String s) {
+		tableDescription.setText(s);
+	}
+
+	@Override
+	public void setHelpLink(String s) {
+		helpLink.setHref(s);
+		helpLink.setText(" Learn More");
 	}
 
 	@Override

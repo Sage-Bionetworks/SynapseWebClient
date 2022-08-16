@@ -95,6 +95,10 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 
 	protected abstract String getTabDisplayName();
 
+	protected abstract String getTabDescription();
+
+	protected abstract String getHelpLink();
+
 	protected abstract List<EntityType> getTypesShownInList();
 
 	protected abstract boolean isEntityShownInTab(Entity entity);
@@ -145,6 +149,11 @@ public abstract class AbstractTablesTab implements TablesTabView.Presenter, Quer
 			this.jsClient = ginInjector.getSynapseJavascriptClient();
 
 			view.setTitle(getTabDisplayName());
+			// Have this condition until we have copy for Table description
+			if(getTabDescription().length()>0){
+				view.setDescription(getTabDescription());
+				view.setHelpLink(getHelpLink());
+			}
 			view.setBreadcrumb(breadcrumb.asWidget());
 			view.setTableList(tableListWidget.asWidget());
 			view.setTitlebar(titleBar.asWidget());
