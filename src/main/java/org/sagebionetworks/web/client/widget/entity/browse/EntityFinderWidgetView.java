@@ -43,6 +43,8 @@ public interface EntityFinderWidgetView extends SynapseView {
 
 		void okClicked();
 
+		void cancelClicked();
+
 		void setSelectedEntities(List<Reference> selected);
 
 		void clearSelectedEntities();

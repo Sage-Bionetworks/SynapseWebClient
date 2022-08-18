@@ -25,11 +25,13 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.exceptions.WebClientConfigurationException;
 import org.sagebionetworks.web.client.jsinterop.EntityFinderProps;
 import org.sagebionetworks.web.client.jsinterop.EntityFinderScope;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidgetImpl;
@@ -64,6 +66,12 @@ public class EntityFinderWidgetImplTest {
 
     @Captor
     ArgumentCaptor<AsyncCallback<EntityBundle>> getBundleCaptor;
+
+    @Captor
+    ArgumentCaptor<Callback> callbackCaptor;
+
+    @Mock
+    PopupUtilsView mockPopupUtils;
 
     @InjectMocks
     EntityFinderWidgetImpl.Builder builder;
@@ -256,5 +264,42 @@ public class EntityFinderWidgetImplTest {
         builder.build();
 
         verify(mockSynAlert).handleException(any(WebClientConfigurationException.class));
+    }
+
+    @Test
+    public void testShowWarningOnCancelWithSelection() {
+        builder.setSelectableTypes(EntityFilter.ALL);
+        builder.setMultiSelect(true);
+        builder.setSelectedMultiHandler(multiHandler);
+        entityFinder = builder.build();
+
+        String entityId1 = "syn123";
+        Long entityVersion1 = 5L;
+        Reference selectedEntity1 = new Reference();
+        selectedEntity1.setTargetId(entityId1);
+        selectedEntity1.setTargetVersionNumber(entityVersion1);
+
+        String entityId2 = "syn456";
+        Long entityVersion2 = null;
+        Reference selectedEntity2 = new Reference();
+        selectedEntity2.setTargetId(entityId2);
+        selectedEntity2.setTargetVersionNumber(entityVersion2);
+
+        // Select a couple of entities
+        entityFinder.setSelectedEntities(Arrays.asList(selectedEntity1, selectedEntity2));
+
+        // Call under test: presenter triggers action
+        entityFinder.cancelClicked();
+
+        // The confirmation popup should be shown
+        verify(mockPopupUtils).showConfirmDialog(eq("Unsaved Changes"), anyString(), callbackCaptor.capture());
+
+        // Hide should not have been called
+        verify(mockView, never()).hide();
+
+        // Simulate confirming the warning dialog
+        callbackCaptor.getValue().invoke();
+
+        verify(mockView).hide();
     }
 }

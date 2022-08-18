@@ -10,6 +10,7 @@ import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.EntityFinderProps;
@@ -62,7 +63,7 @@ public class EntityFinderWidgetViewImpl implements EntityFinderWidgetView {
 	SimplePanel synAlertPanel;
 
 	@Inject
-	public EntityFinderWidgetViewImpl(Binder uiBinder, SynapseJSNIUtils jsniUtils, SynapseAlert synAlert, final SynapseContextPropsProvider propsProvider) {
+	public EntityFinderWidgetViewImpl(Binder uiBinder, SynapseJSNIUtils jsniUtils, SynapseAlert synAlert, final SynapseContextPropsProvider propsProvider, final PopupUtilsView popupUtils) {
 		this.modal = (Modal) uiBinder.createAndBindUi(this);
 
 		this.jsniUtils = jsniUtils;
@@ -73,13 +74,9 @@ public class EntityFinderWidgetViewImpl implements EntityFinderWidgetView {
 
 		// Initially, nothing is selected, so we disable the confirm button
 		okButton.setEnabled(false);
-		okButton.addClickHandler(event -> {
-			presenter.okClicked();
-		});
+		okButton.addClickHandler(event -> presenter.okClicked());
 		okButton.addDomHandler(DisplayUtils.getPreventTabHandler(okButton), KeyDownEvent.getType());
-		cancelButton.addClickHandler(event -> {
-			this.hide();
-		});
+		cancelButton.addClickHandler(event -> presenter.cancelClicked());
 	}
 
 	private String getInitialContainerAsString(EntityFinderWidget.InitialContainer initialContainer, String projectId, String containerId) {
