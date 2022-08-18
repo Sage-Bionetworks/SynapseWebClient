@@ -33,7 +33,7 @@ public class EntityFinderWidgetImpl implements EntityFinderWidget, EntityFinderW
     GlobalApplicationState globalApplicationState;
     private SynapseJavascriptClient jsClient;
     private SynapseAlert synAlert;
-	private PopupUtilsView popupUtils;
+    private PopupUtilsView popupUtils;
 
     private boolean multiSelect;
     private EntityFinderWidget.InitialContainer initialContainer;
@@ -50,7 +50,7 @@ public class EntityFinderWidgetImpl implements EntityFinderWidget, EntityFinderW
 
     private String modalTitle;
     private String promptCopy;
-	private EntityFinderProps.SelectedCopyHandler selectedCopy;
+    private EntityFinderProps.SelectedCopyHandler selectedCopy;
     private String confirmButtonCopy;
 
     @Inject
@@ -59,7 +59,7 @@ public class EntityFinderWidgetImpl implements EntityFinderWidget, EntityFinderW
         this.globalApplicationState = globalApplicationState;
         this.jsClient = jsClient;
         this.synAlert = synAlert;
-		this.popupUtils = popupUtils;
+        this.popupUtils = popupUtils;
         this.selectedEntities = new ArrayList<>();
         view.setPresenter(this);
     }
@@ -72,7 +72,7 @@ public class EntityFinderWidgetImpl implements EntityFinderWidget, EntityFinderW
         this.globalApplicationState = builder.globalApplicationState;
         this.jsClient = builder.jsClient;
         this.synAlert = builder.synAlert;
-		this.popupUtils = builder.popupUtils;
+        this.popupUtils = builder.popupUtils;
 
         this.view.setPresenter(this);
 
@@ -128,7 +128,7 @@ public class EntityFinderWidgetImpl implements EntityFinderWidget, EntityFinderW
         GlobalApplicationState globalApplicationState;
         private SynapseJavascriptClient jsClient;
         private SynapseAlert synAlert;
-		private PopupUtilsView popupUtils;
+        private PopupUtilsView popupUtils;
 
         private EntityFinderWidget.SelectedHandler<Reference> selectedHandler = (selected, finder) -> {
         };
@@ -148,7 +148,7 @@ public class EntityFinderWidgetImpl implements EntityFinderWidget, EntityFinderW
         private EntityFinderScope initialScope = EntityFinderScope.CREATED_BY_ME;
         private String modalTitle = "Find in Synapse";
         private String promptCopy = "";
-		private EntityFinderProps.SelectedCopyHandler selectedCopy = (count) -> "Selected";
+        private EntityFinderProps.SelectedCopyHandler selectedCopy = (count) -> "Selected";
         private String confirmButtonCopy = "Select";
         private String helpMarkdown = "Finding items in Synapse can be done by either “browsing”, “searching,” or directly entering the Synapse ID.&#10;Alternatively, navigate to the desired location in the current project, favorite projects or projects you own.";
 
@@ -158,7 +158,7 @@ public class EntityFinderWidgetImpl implements EntityFinderWidget, EntityFinderW
             this.globalApplicationState = globalApplicationState;
             this.jsClient = jsClient;
             this.synAlert = synAlert;
-			this.popupUtils = popupUtils;
+            this.popupUtils = popupUtils;
         }
 
         @Override
@@ -238,11 +238,11 @@ public class EntityFinderWidgetImpl implements EntityFinderWidget, EntityFinderW
             return this;
         }
 
-		@Override
-		public EntityFinderWidget.Builder setSelectedCopy(EntityFinderProps.SelectedCopyHandler selectedCopy) {
-			this.selectedCopy = selectedCopy;
-			return this;
-		}
+        @Override
+        public EntityFinderWidget.Builder setSelectedCopy(EntityFinderProps.SelectedCopyHandler selectedCopy) {
+            this.selectedCopy = selectedCopy;
+            return this;
+        }
 
         @Override
         public EntityFinderWidget.Builder setInitialScope(EntityFinderScope initialScope) {
@@ -283,9 +283,9 @@ public class EntityFinderWidgetImpl implements EntityFinderWidget, EntityFinderW
         selectedEntities.clear();
     }
 
-	private boolean hasUnsavedChanges() {
-		return selectedEntities.size() > 0;
-	}
+    private boolean hasUnsavedChanges() {
+        return selectedEntities.size() > 0;
+    }
 
     @Override
     public void okClicked() {
@@ -298,14 +298,14 @@ public class EntityFinderWidgetImpl implements EntityFinderWidget, EntityFinderW
         }
     }
 
-	@Override
-	public void cancelClicked() {
-		if (hasUnsavedChanges()) {
-			popupUtils.showConfirmDialog("Unsaved Changes", "Any unsaved changes will be lost. Are you sure you want to close the finder?", () -> this.hide());
-		} else {
-			this.hide();
-		}
-	}
+    @Override
+    public void cancelClicked() {
+        if (hasUnsavedChanges()) {
+            popupUtils.showConfirmDialog("Unsaved Changes", "Any unsaved changes will be lost. Are you sure you want to close the finder?", () -> this.hide());
+        } else {
+            this.hide();
+        }
+    }
 
     @Override
     public void renderComponent() {
