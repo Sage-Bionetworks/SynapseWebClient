@@ -247,9 +247,12 @@ public class FilesTab {
 		if (isFileOrFolder) {
 			metadata.configure(bundle, versionNumber, tab.getEntityActionMenu());
 		}
-		if(bundle.getEntity() instanceof VersionableEntity) {
-			tab.configureEntityActionController(bundle, ((VersionableEntity) bundle.getEntity()).getIsLatestVersion(), null);
+		Boolean isCurrentVersion = bundle.getEntity() instanceof VersionableEntity ? ((VersionableEntity) bundle.getEntity()).getIsLatestVersion() : null;
+		if (isCurrentVersion == null) {
+			isCurrentVersion = true;
 		}
+		tab.configureEntityActionController(bundle, isCurrentVersion, null);
+		
 		EntityArea area = isProject ? EntityArea.FILES : null;
 		tab.setEntityNameAndPlace(bundle.getEntity().getName(), new Synapse(currentEntityId, versionNumber, area, null));
 
