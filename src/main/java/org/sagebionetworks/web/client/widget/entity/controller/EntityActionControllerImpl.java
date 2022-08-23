@@ -1236,7 +1236,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			public void onSuccess(Entity result) {
 				fireEntityUpdatedEvent();
 				String successTextPrefix = newIsSearchEnabledValue ? "Enabled" : "Disabled";
-				view.showSuccess(successTextPrefix + " full text search for this table.");
+				view.showSuccess(successTextPrefix + " full text search for this " + entityTypeDisplay);
 			}
 		});
 	}
