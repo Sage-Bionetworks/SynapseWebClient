@@ -110,6 +110,11 @@ public class EntityViewScopeWidgetViewImpl implements EntityViewScopeWidgetView 
 	}
 
 	@Override
+	public void setEditMaskVisible(boolean visible) {
+		viewOptionsContainer.setVisible(visible);
+	}
+
+	@Override
 	public void setLoading(boolean loading) {
 		DisplayUtils.showLoading(saveButton, loading, originalButtonText);
 	}
