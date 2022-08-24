@@ -536,8 +536,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 
 	private void configureFullTextSearch() {
-		if (entityBundle.getEntity() instanceof TableEntity && DisplayUtils.isInTestWebsite(cookies)) {
-			TableEntity tableEntity = (TableEntity) entityBundle.getEntity();
+		if (entityBundle.getEntity() instanceof Table && DisplayUtils.isInTestWebsite(cookies)) {
+			Table tableEntity = (Table) entityBundle.getEntity();
 			actionMenu.setActionVisible(Action.TOGGLE_FULL_TEXT_SEARCH, true);
 			actionMenu.setActionListener(Action.TOGGLE_FULL_TEXT_SEARCH, this);
 			boolean isFTSEnabled = tableEntity.getIsSearchEnabled() == null ? false : tableEntity.getIsSearchEnabled();
@@ -1222,7 +1222,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 
 	private void postCheckToggleFullTextSearch() {
-		TableEntity tableEntity = (TableEntity)entityBundle.getEntity();
+		Table tableEntity = (Table)entityBundle.getEntity();
 		boolean newIsSearchEnabledValue = tableEntity.getIsSearchEnabled() == null ? true : !tableEntity.getIsSearchEnabled();
 		tableEntity.setIsSearchEnabled(newIsSearchEnabledValue);
 		getSynapseJavascriptClient().updateEntity(tableEntity, null, null, new AsyncCallback<Entity>() {
@@ -1236,7 +1236,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			public void onSuccess(Entity result) {
 				fireEntityUpdatedEvent();
 				String successTextPrefix = newIsSearchEnabledValue ? "Enabled" : "Disabled";
-				view.showSuccess(successTextPrefix + " full text search for this table.");
+				view.showSuccess(successTextPrefix + " full text search for this " + entityTypeDisplay);
 			}
 		});
 	}
