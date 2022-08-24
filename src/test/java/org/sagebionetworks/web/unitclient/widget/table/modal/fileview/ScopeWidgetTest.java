@@ -164,12 +164,18 @@ public class ScopeWidgetTest {
 		boolean isEditable = true;
 		widget.configure(mockBundle, isEditable);
 
-		// The view scope widget does allow edit of the scope.
-		verify(mockViewScopeWidget).configure(mockReferencesWithoutVersions, true, new TableType(EntityView.class, unsupportedViewTypeMask));
+		// The view scope widget is configured, but not editable
+		verify(mockViewScopeWidget).configure(mockReferencesWithoutVersions, false, new TableType(EntityView.class, unsupportedViewTypeMask));
 
-		// The edit mask + scope modal is not available because the mask cannot be changed in the web client
-		verify(mockView).setEditMaskAndScopeButtonVisible(false);
+		// The edit mask + scope modal is visible because the mask cannot be changed in the web client
+		verify(mockView).setEditMaskAndScopeButtonVisible(true);
 		verify(mockView).setVisible(true);
+
+		// Simulate clicking the edit button
+		widget.onEditScopeAndMask();
+
+		// The mask editor should not be visible
+		verify(mockView).setEditMaskVisible(false);
 	}
 
 	@Test
@@ -179,11 +185,17 @@ public class ScopeWidgetTest {
 		boolean isEditable = true;
 		widget.configure(mockBundle, isEditable);
 
-		// Do not show edit mask options for project view
-		verify(mockView).setEditMaskAndScopeButtonVisible(false);
+		// The edit button should be visible
+		verify(mockView).setEditMaskAndScopeButtonVisible(true);
 
-		// The view scope widget should be editable
-		verify(mockViewScopeWidget).configure(mockReferencesWithoutVersions, true, TableType.project_view);
+		// The view scope widget should be configured and not be editable
+		verify(mockViewScopeWidget).configure(mockReferencesWithoutVersions, false, TableType.project_view);
+
+		// Simulate clicking the edit button
+		widget.onEditScopeAndMask();
+
+		// The mask editor should not be visible
+		verify(mockView).setEditMaskVisible(false);
 	}
 
 	@Test
@@ -193,6 +205,9 @@ public class ScopeWidgetTest {
 
 		widget.configure(mockBundle, isEditable);
 		widget.onEditScopeAndMask();
+
+		// The mask editor should be visible
+		verify(mockView).setEditMaskVisible(true);
 
 		// Show File View options for project view
 		verify(mockView).setIsFileSelected(true);
@@ -208,6 +223,9 @@ public class ScopeWidgetTest {
 
 		widget.configure(mockBundle, isEditable);
 		widget.onEditScopeAndMask();
+
+		// The mask editor should be visible
+		verify(mockView).setEditMaskVisible(true);
 
 		// Show File View options for project view
 		verify(mockView).setIsFileSelected(true);
