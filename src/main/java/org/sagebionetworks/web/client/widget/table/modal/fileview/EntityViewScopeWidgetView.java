@@ -24,6 +24,8 @@ public interface EntityViewScopeWidgetView extends IsWidget {
 
 	void setEditMaskAndScopeButtonVisible(boolean visible);
 
+	void setEditMaskVisible(boolean visible);
+
 	void setLoading(boolean loading);
 
 	boolean isFileSelected();

@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityRef;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.EntityView;
@@ -66,20 +65,6 @@ public class EntityViewScopeWidget implements SynapseWidgetPresenter, EntityView
 		view.setSynAlert(synAlert.asWidget());
 	}
 
-	private List<Reference> getReferencesFromDatasetItems(List<EntityRef> datasetItems) {
-		if (datasetItems == null) {
-			datasetItems = new ArrayList<>();
-		}
-		List<Reference> references = new ArrayList<>(datasetItems.size());
-		for (EntityRef datasetItem : datasetItems) {
-			Reference reference = new Reference();
-			reference.setTargetId(datasetItem.getEntityId());
-			reference.setTargetVersionNumber(datasetItem.getVersionNumber());
-			references.add(reference);
-		}
-		return references;
-	}
-
 	private List<Reference> getReferencesFromIdList(List<String> ids) {
 		if (ids == null) {
 			ids = new ArrayList<>();
@@ -104,18 +89,8 @@ public class EntityViewScopeWidget implements SynapseWidgetPresenter, EntityView
 			tableType = TableType.getTableType(currentView);
 			List<Reference> references = getReferencesFromIdList(currentView.getScopeIds());
 
-			// The mask may not be editable since not all masks are supported in the web client
-			boolean canEditMask = isEditable && isEditMaskSupportedInWebClient(tableType);
-			if (isEditable && !isEditMaskSupportedInWebClient(tableType)) {
-				synAlert.consoleError("View type mask is not supported by web client, blocking edit. Mask value:" + ((EntityView) currentView).getViewTypeMask());
-			}
-			view.setEditMaskAndScopeButtonVisible(canEditMask);
-
-			// The scope and mask are both editable from the 'Edit Mask' dialog
-			// The scope is always editable if the user has access, but the button is unnecessary if the user can edit the mask.
-			boolean showEditScopeButton = isEditable && !canEditMask;
-			viewScopeWidget.configure(references, showEditScopeButton, tableType);
-
+			view.setEditMaskAndScopeButtonVisible(isEditable);
+			viewScopeWidget.configure(references, false, tableType);
 		}
 
 		view.setVisible(isVisible);
@@ -172,12 +147,20 @@ public class EntityViewScopeWidget implements SynapseWidgetPresenter, EntityView
 		// configure edit list, and show modal
 		editScopeWidget.configure(references, true, tableType);
 
-		// update the checkbox state based on the view type mask
-		view.setIsFileSelected(tableType.isIncludeFiles());
-		view.setIsFolderSelected(tableType.isIncludeFolders());
-		view.setIsTableSelected(tableType.isIncludeTables());
-		view.setIsDatasetSelected(tableType.isIncludeDatasets());
+		// The mask may not be editable since not all masks are supported in the web client
+		boolean isMaskEditable = isEditable && isEditMaskSupportedInWebClient(tableType);
+		if (!isMaskEditable) {
+			synAlert.consoleError("View type mask is not supported by web client, blocking edit. Mask value:" + ((EntityView) currentView).getViewTypeMask());
+		}
 
+		view.setEditMaskVisible(isMaskEditable);
+		if (isMaskEditable) {
+			// update the checkbox state based on the view type mask
+			view.setIsFileSelected(tableType.isIncludeFiles());
+			view.setIsFolderSelected(tableType.isIncludeFolders());
+			view.setIsTableSelected(tableType.isIncludeTables());
+			view.setIsDatasetSelected(tableType.isIncludeDatasets());
+		}
 		view.showModal();
 	}
 }
