@@ -55,10 +55,10 @@ public class SRCDemoWidgetViewImpl implements SRCDemoWidgetView {
 	@Override
 	public void setDemoVisible(boolean visible) {
 		demoContainer.setVisible(visible);
-		_showDemo(demoContainer.getElement());
+		_showDemo(demoContainer);
 	}
 
-	private static native void _showDemo(Element el) /*-{
+	private static native void _showDemo(ReactComponentDiv reactComponentDiv) /*-{
 
 		//		Example for QueryWrapperMenu
 		try {
@@ -83,9 +83,9 @@ public class SRCDemoWidgetViewImpl implements SRCDemoWidgetView {
 			//			loadingScreen: $wnd.React.createElement('div', null, null)
 			}
 
-			$wnd.ReactDOM.render($wnd.React.createElement(
-					$wnd.SRC.SynapseComponents.QueryWrapperMenu,
-					queryWrapperProps, null), el);
+
+            var component = $wnd.React.createElement($wnd.SRC.SynapseComponents.QueryWrapperMenu, queryWrapperProps, null)
+            reactComponentDiv.@org.sagebionetworks.web.client.widget.ReactComponentDiv::render(Lorg/sagebionetworks/web/client/jsinterop/ReactNode;)(component);
 		} catch (err) {
 			console.error(err);
 		}

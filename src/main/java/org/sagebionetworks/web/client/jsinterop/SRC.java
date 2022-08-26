@@ -12,31 +12,39 @@ public class SRC {
 
 	@JsType(isNative = true)
 	public static class SynapseComponents {
-		public static ReactFunctionComponent<EntityBadgeIconsProps> EntityBadgeIcons;
-		public static ReactFunctionComponent<DatasetEditorProps> DatasetItemsEditor;
-		public static ReactFunctionComponent<EntityFinderProps> EntityFinder;
-		public static ReactFunctionComponent<EvaluationCardProps> EvaluationCard;
-		public static ReactFunctionComponent<EvaluationEditorPageProps> EvaluationEditorPage;
-		public static ReactFunctionComponent<AccessTokenPageProps> AccessTokenPage;
-		public static ReactFunctionComponent<DownloadCartPageProps> DownloadCartPage;
-		public static ReactFunctionComponent<DownloadConfirmationProps> DownloadConfirmation;
-		public static ReactFunctionComponent<FullWidthAlertProps> FullWidthAlert;
-		public static ReactFunctionComponent<SchemaDrivenAnnotationEditorProps> SchemaDrivenAnnotationEditor;
-		public static ReactFunctionComponent<SynapseNavDrawerProps> SynapseNavDrawer;
-		public static ReactFunctionComponent<EmptyProps> FavoritesPage;
-		public static ReactFunctionComponent<EntityModalProps> EntityModal;
-		public static ReactFunctionComponent<IconSvgProps> IconSvg;
-		public static ReactFunctionComponent<EntityTypeIconProps> EntityTypeIcon;
-		public static ReactFunctionComponent<UserProfileLinksProps> UserProfileLinks;
-		public static ReactFunctionComponent<SkeletonButtonProps> SkeletonButton;
-		public static ReactFunctionComponent<QueryWrapperPlotNavProps> QueryWrapperPlotNav;
-		public static ReactFunctionComponent<StandaloneQueryWrapperProps> StandaloneQueryWrapper;
-		public static ReactFunctionComponent<ForumSearchProps> ForumSearch;
-		public static ReactFunctionComponent<ReviewerDashboardProps> ReviewerDashboard;
-		public static ReactFunctionComponent<ProvenanceGraphProps> ProvenanceGraph;
-		public static ReactFunctionComponent SynapseToastContainer;
-		public static ReactFunctionComponent<EmptyProps> OAuthManagement;
-		public static ReactFunctionComponent TrashCanList;
+		public static ReactComponentType<EntityBadgeIconsProps> EntityBadgeIcons;
+		public static ReactComponentType<DatasetEditorProps> DatasetItemsEditor;
+		public static ReactComponentType<EntityFinderProps> EntityFinder;
+		public static ReactComponentType<EvaluationCardProps> EvaluationCard;
+		public static ReactComponentType<EvaluationEditorPageProps> EvaluationEditorPage;
+		public static ReactComponentType<AccessTokenPageProps> AccessTokenPage;
+		public static ReactComponentType<DownloadCartPageProps> DownloadCartPage;
+		public static ReactComponentType<DownloadConfirmationProps> DownloadConfirmation;
+		public static ReactComponentType<FullWidthAlertProps> FullWidthAlert;
+		public static ReactComponentType<SchemaDrivenAnnotationEditorProps> SchemaDrivenAnnotationEditor;
+		public static ReactComponentType<SynapseNavDrawerProps> SynapseNavDrawer;
+		public static ReactComponentType<EmptyProps> FavoritesPage;
+		public static ReactComponentType<EntityModalProps> EntityModal;
+		public static ReactComponentType<IconSvgProps> IconSvg;
+		public static ReactComponentType<EntityTypeIconProps> EntityTypeIcon;
+		public static ReactComponentType<UserProfileLinksProps> UserProfileLinks;
+		public static ReactComponentType<SkeletonButtonProps> SkeletonButton;
+		public static ReactComponentType<QueryWrapperPlotNavProps> QueryWrapperPlotNav;
+		public static ReactComponentType<StandaloneQueryWrapperProps> StandaloneQueryWrapper;
+		public static ReactComponentType<ForumSearchProps> ForumSearch;
+		public static ReactComponentType<ReviewerDashboardProps> ReviewerDashboard;
+		public static ReactComponentType<ProvenanceGraphProps> ProvenanceGraph;
+		public static ReactComponentType SynapseToastContainer;
+		public static ReactComponentType<EmptyProps> OAuthManagement;
+		public static ReactComponentType TrashCanList;
+		public static ReactComponentType<SynapseHomepageProps> SynapseHomepage;
+		public static ReactComponentType<ErrorPageProps> ErrorPage;
+		public static ReactComponentType<LoginPageProps> LoginPage;
+		public static ReactComponentType<HasAccessProps> HasAccess;
+		public static ReactComponentType<UserCardProps> UserCard;
+		public static ReactComponentType<AccountLevelBadgeProps> AccountLevelBadge;
+		public static ReactComponentType<PageProgressProps> PageProgress;
+		public static ReactComponentType<TermsAndConditionsProps> TermsAndConditions;
 
 		/**
 		 * Pushes a global toast message. In SWC, you should use {@link DisplayUtils#notify}, rather than calling this method directly.
@@ -49,7 +57,7 @@ public class SRC {
 
 	@JsType(isNative = true)
 	public static class SynapseContext {
-		public static ReactFunctionComponent<SynapseContextProviderProps> SynapseContextProvider;
+		public static ReactComponentType<SynapseContextProviderProps> SynapseContextProvider;
 	}
 }
 

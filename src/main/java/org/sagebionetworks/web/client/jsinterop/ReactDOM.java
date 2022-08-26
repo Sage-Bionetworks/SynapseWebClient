@@ -13,9 +13,6 @@ public class ReactDOM {
 		void run();
 	}
 
-	public static native ReactElement render(ReactElement element, Element container);
-
-	public static native ReactElement render(ReactElement element, Element container, Callback callback);
-
+	public static native ReactDOMRoot createRoot(Element container);
 	public static native boolean unmountComponentAtNode(Element container);
 }

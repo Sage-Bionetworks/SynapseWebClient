@@ -34,6 +34,8 @@ public class TabViewImpl implements TabView {
 	Div contentDiv;
 	boolean isActive = false;
 
+
+
 	public interface TabViewImplUiBinder extends UiBinder<Widget, TabViewImpl> {
 	}
 
@@ -136,5 +138,10 @@ public class TabViewImpl implements TabView {
 	@Override
 	public boolean isActive() {
 		return isActive;
+	}
+
+	@Override
+	public Widget asWidget() {
+		return widget;
 	}
 }

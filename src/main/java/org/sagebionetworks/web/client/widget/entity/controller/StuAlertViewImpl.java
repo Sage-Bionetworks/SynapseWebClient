@@ -3,8 +3,10 @@ package org.sagebionetworks.web.client.widget.entity.controller;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
-import org.sagebionetworks.web.client.jsni.SynapseContextProviderPropsJSNIObject;
-import org.sagebionetworks.web.client.view.DownViewImpl;
+import org.sagebionetworks.web.client.jsinterop.ErrorPageProps;
+import org.sagebionetworks.web.client.jsinterop.React;
+import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.view.DownViewImpl.ErrorPageType;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 
@@ -68,14 +70,31 @@ public class StuAlertViewImpl implements StuAlertView {
 		}
 	}
 
+	private void renderErrorPage(ErrorPageType type, String title, String message) {
+		ErrorPageProps props = ErrorPageProps.create(type.name(), title, message);
+		ReactNode component = React.createElementWithSynapseContext(
+				SRC.SynapseComponents.ErrorPage,
+				props,
+				propsProvider.getJsInteropContextProps()
+		);
+		errorPageContainer.render(component);
+		errorPageContainer.setVisible(true);
+	}
+
 	private void updateErrorPage() {
 		if (is404) {
-			DownViewImpl._createSRCErrorPage(errorPageContainer.getElement(), ErrorPageType.unavailable.name(), "Sorry, this page isn’t available.", "The link you followed may be broken, or the page may have been removed.", propsProvider.getJsniContextProps());
-			errorPageContainer.setVisible(true);
+			renderErrorPage(
+					ErrorPageType.unavailable,
+					"Sorry, this page isn’t available.",
+					"The link you followed may be broken, or the page may have been removed."
+			);
 		}
 		if (is403) {
-			DownViewImpl._createSRCErrorPage(errorPageContainer.getElement(), ErrorPageType.noAccess.name(), "Sorry, no access to this page.", "You are not authorized to access the page requested.", propsProvider.getJsniContextProps());
-			errorPageContainer.setVisible(true);
+			renderErrorPage(
+					ErrorPageType.noAccess,
+					"Sorry, no access to this page.",
+					"You are not authorized to access the page requested."
+			);
 		}
 	}
 	@Override

@@ -6,11 +6,11 @@ import jsinterop.annotations.JsType;
 
 @JsType(isNative = true, namespace = JsPackage.GLOBAL)
 public class React {
-	public static native <P extends ReactComponentProps> ReactElement createElement(ReactFunctionComponent<P> component, P props);
+	public static native <P extends ReactComponentProps> ReactNode createElement(ReactComponentType<P> component, P props);
 
-	public static native <P extends ReactComponentProps> ReactElement createElement(ReactFunctionComponent<P> component, P props, ReactElement child);
+	public static native <P extends ReactComponentProps> ReactNode createElement(ReactComponentType<P> component, P props, ReactNode child);
 
-	public static native <P extends ReactComponentProps> ReactElement createElement(ReactFunctionComponent<P> component, P props, ReactElement[] children);
+	public static native <P extends ReactComponentProps> ReactNode createElement(ReactComponentType<P> component, P props, ReactNode[] children);
 
 	/**
 	 * Wraps a component in SynapseContextProvider. Nearly all Synapse React Client components must be wrapped in this context, so this utility
@@ -24,8 +24,8 @@ public class React {
 	 * @return
 	 */
 	@JsOverlay
-	public static <P extends ReactComponentProps> ReactElement createElementWithSynapseContext(ReactFunctionComponent<P> component, P props, SynapseContextProviderProps wrapperProps) {
-		ReactElement componentElement = createElement(component, props);
+	public static <P extends ReactComponentProps> ReactNode createElementWithSynapseContext(ReactComponentType<P> component, P props, SynapseContextProviderProps wrapperProps) {
+		ReactNode componentElement = createElement(component, props);
 		return createElement(SRC.SynapseContext.SynapseContextProvider, wrapperProps, componentElement);
 	}
 }

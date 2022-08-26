@@ -10,7 +10,7 @@ import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.jsinterop.EntityModalProps;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactDOM;
+import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.widget.IconSvg;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
@@ -117,14 +117,12 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		boolean showTabs = false;
 		EntityModalProps props =
 				EntityModalProps.create(entityId, versionNumber, visible, () -> setAnnotationsModalVisible(false), "ANNOTATIONS", showTabs);
-		ReactDOM.render(
-				React.createElementWithSynapseContext(
-						SRC.SynapseComponents.EntityModal,
-						props,
-						propsProvider.getJsInteropContextProps()
-				),
-				annotationsModalContainer.getElement()
+		ReactNode component = React.createElementWithSynapseContext(
+				SRC.SynapseComponents.EntityModal,
+				props,
+				propsProvider.getJsInteropContextProps()
 		);
+		annotationsModalContainer.render(component);
 	}
 
 	@Override
