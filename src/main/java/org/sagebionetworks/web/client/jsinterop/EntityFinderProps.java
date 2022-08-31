@@ -63,6 +63,7 @@ public class EntityFinderProps extends ReactComponentProps {
         EntityFinderProps props = new EntityFinderProps();
         props.onSelectedChange = onSelectedChange;
         props.selectMultiple = selectMultiple;
+		props.versionSelection = versionSelection;
         props.initialScope = initialScope.getValue();
         props.projectId = projectId;
         props.initialContainer = initialContainer;
