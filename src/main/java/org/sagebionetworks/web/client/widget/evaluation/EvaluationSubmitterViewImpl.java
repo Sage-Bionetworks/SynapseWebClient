@@ -22,7 +22,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.EntityFinderScope;
 import org.sagebionetworks.web.client.jsni.SynapseContextProviderPropsJSNIObject;
-import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -197,7 +196,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 					.setPromptCopy("Find items to Submit to this Challenge")
 					.setMultiSelect(false)
 					.setSelectableTypes(EntityFilter.ALL)
-					.setShowVersions(true)
+					.setVersionSelection(EntityFinderWidget.VersionSelection.UNTRACKED)
 					.setSelectedHandler((selected, finder) -> {
 						if (selected.getTargetId() != null) {
 							selectedReference = selected;

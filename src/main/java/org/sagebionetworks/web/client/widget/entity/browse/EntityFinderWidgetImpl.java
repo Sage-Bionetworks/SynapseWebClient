@@ -39,14 +39,13 @@ public class EntityFinderWidgetImpl implements EntityFinderWidget, EntityFinderW
     private EntityFinderWidget.InitialContainer initialContainer;
     private EntityFinderScope initialScope;
 
-    private boolean showVersions;
+    private VersionSelection versionSelection;
     private EntityFilter visibleTypesInList;
     private EntityFilter selectableTypes;
     private EntityFilter visibleTypesInTree;
     private boolean treeOnly;
     private EntityFinderWidget.SelectedHandler<Reference> selectedHandler;
     private EntityFinderWidget.SelectedHandler<List<Reference>> selectedMultiHandler;
-    private boolean mustSelectVersionNumber;
 
     private String modalTitle;
     private String promptCopy;
@@ -101,10 +100,9 @@ public class EntityFinderWidgetImpl implements EntityFinderWidget, EntityFinderW
         selectedMultiHandler = builder.selectedMultiHandler;
         selectableTypes = builder.selectableTypes;
         visibleTypesInList = builder.visibleTypesInList;
-        showVersions = builder.showVersions;
+        versionSelection = builder.versionSelection;
         initialScope = builder.initialScope;
         visibleTypesInTree = builder.visibleTypesInTree;
-        mustSelectVersionNumber = builder.mustSelectVersionNumber;
 
 
         // Validation
@@ -135,7 +133,7 @@ public class EntityFinderWidgetImpl implements EntityFinderWidget, EntityFinderW
         private EntityFinderWidget.SelectedHandler<List<Reference>> selectedMultiHandler = (selected, finder) -> {
         };
 
-        private boolean showVersions = false;
+        private VersionSelection versionSelection = VersionSelection.TRACKED;
         private EntityFilter visibleTypesInList = ALL;
         private EntityFilter selectableTypes = null;
         private EntityFilter visibleTypesInTree = CONTAINER;
@@ -197,12 +195,6 @@ public class EntityFinderWidgetImpl implements EntityFinderWidget, EntityFinderW
         }
 
         @Override
-        public EntityFinderWidget.Builder setMustSelectVersionNumber(boolean mustSelectVersionNumber) {
-            this.mustSelectVersionNumber = mustSelectVersionNumber;
-            return this;
-        }
-
-        @Override
         public EntityFinderWidget.Builder setVisibleTypesInList(EntityFilter visibleFilter) {
             this.visibleTypesInList = visibleFilter;
             return this;
@@ -215,8 +207,8 @@ public class EntityFinderWidgetImpl implements EntityFinderWidget, EntityFinderW
         }
 
         @Override
-        public EntityFinderWidget.Builder setShowVersions(boolean showVersions) {
-            this.showVersions = showVersions;
+        public EntityFinderWidget.Builder setVersionSelection(VersionSelection versionSelection) {
+            this.versionSelection = versionSelection;
             return this;
         }
 
@@ -333,11 +325,11 @@ public class EntityFinderWidgetImpl implements EntityFinderWidget, EntityFinderW
                     } else { // otherwise get the project itself
                         parentId = projectId;
                     }
-                    view.renderComponent(initialScope, initialContainer, projectId, parentId, showVersions, multiSelect, selectableTypes, visibleTypesInList, visibleTypesInTree, selectedCopy, treeOnly, mustSelectVersionNumber);
+                    view.renderComponent(initialScope, initialContainer, projectId, parentId, versionSelection, multiSelect, selectableTypes, visibleTypesInList, visibleTypesInTree, selectedCopy, treeOnly);
                 }
             });
         } else {
-            view.renderComponent(initialScope, initialContainer,null, null, showVersions, multiSelect, selectableTypes, visibleTypesInList, visibleTypesInTree, selectedCopy, treeOnly, mustSelectVersionNumber);
+            view.renderComponent(initialScope, initialContainer,null, null, versionSelection, multiSelect, selectableTypes, visibleTypesInList, visibleTypesInTree, selectedCopy, treeOnly);
         }
     }
 

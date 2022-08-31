@@ -58,7 +58,7 @@ public class VideoConfigViewImpl implements VideoConfigView {
 				.setInitialContainer(EntityFinderWidget.InitialContainer.PROJECT)
 				.setMultiSelect(false)
 				.setSelectableTypes(EntityFilter.FILE)
-				.setShowVersions(true)
+				.setVersionSelection(EntityFinderWidget.VersionSelection.TRACKED)
 				.setSelectedHandler(((selected, finder) -> presenter.validateSelection(selected)))
 				.build();
 		button.addClickHandler(event -> entityFinder.show());

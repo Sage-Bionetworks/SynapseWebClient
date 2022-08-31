@@ -94,7 +94,7 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 				.setVisibleTypesInTree(EntityFilter.PROJECT)
 				.setMultiSelect(false)
 				.setSelectableTypes(EntityFilter.ALL_TABLES)
-				.setShowVersions(false)
+				.setVersionSelection(EntityFinderWidget.VersionSelection.DISALLOWED)
 				.setSelectedHandler((selected, entityFinder) -> {
 					setTableId(selected.getTargetId());
 					finder.hide();

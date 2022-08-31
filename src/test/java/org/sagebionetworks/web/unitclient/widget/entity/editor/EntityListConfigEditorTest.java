@@ -96,7 +96,7 @@ public class EntityListConfigEditorTest {
 		editor.onAddRecord();
 		boolean showVersions = true;
 		verify(mockEntityFinderBuilder).setMultiSelect(true);
-		verify(mockEntityFinderBuilder).setShowVersions(true);
+		verify(mockEntityFinderBuilder).setVersionSelection(EntityFinderWidget.VersionSelection.TRACKED);
 		verify(mockEntityFinderBuilder).setSelectedMultiHandler(entityFinderCaptor.capture());
 		verify(mockEntityFinderBuilder).build();
 		verify(mockEntityFinder).show();

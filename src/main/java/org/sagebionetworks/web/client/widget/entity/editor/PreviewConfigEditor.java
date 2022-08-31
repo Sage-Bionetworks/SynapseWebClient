@@ -36,7 +36,7 @@ public class PreviewConfigEditor implements PreviewConfigView.Presenter, WidgetE
 				.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
 				.setInitialContainer(EntityFinderWidget.InitialContainer.PROJECT)
 				.setSelectableTypes(EntityFilter.FILE)
-				.setShowVersions(true)
+				.setVersionSelection(EntityFinderWidget.VersionSelection.TRACKED)
 				.setSelectedHandler((selected, finder) -> {
 					view.setEntityId(selected.getTargetId());
 					Long version = selected.getTargetVersionNumber();

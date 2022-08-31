@@ -368,7 +368,7 @@ public class PlotlyConfigEditorTest {
 		editor.onFindTable();
 		verify(mockEntityFinderBuilder).setMultiSelect(false);
 		verify(mockEntityFinderBuilder).setSelectableTypes(EntityFilter.ALL_TABLES);
-		verify(mockEntityFinderBuilder).setShowVersions(false);
+		verify(mockEntityFinderBuilder).setVersionSelection(EntityFinderWidget.VersionSelection.DISALLOWED);
 		verify(mockEntityFinderBuilder).setSelectedHandler(finderCallbackCaptor.capture());
 		verify(mockEntityFinderBuilder).build();
 		verify(mockFinder).show();

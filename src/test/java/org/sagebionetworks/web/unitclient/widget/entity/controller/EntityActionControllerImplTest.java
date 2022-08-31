@@ -1831,7 +1831,7 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		controller.onAction(Action.MOVE_ENTITY);
 		verify(mockEntityFinderBuilder).setSelectableTypes(EntityFilter.PROJECT);
-		verify(mockEntityFinderBuilder).setShowVersions(false);
+		verify(mockEntityFinderBuilder).setVersionSelection(EntityFinderWidget.VersionSelection.DISALLOWED);
 		verify(mockEntityFinderBuilder).build();
 		verify(mockEntityFinder).show();
 		verify(mockEntityFinder, never()).hide();
@@ -1848,7 +1848,7 @@ public class EntityActionControllerImplTest {
 		verify(mockEntityFinderBuilder)
 				.setSelectableTypes(EntityFilter.PROJECT);
 		verify(mockEntityFinderBuilder)
-				.setShowVersions(false);
+				.setVersionSelection(EntityFinderWidget.VersionSelection.DISALLOWED);
 		verify(mockEntityFinderBuilder)
 				.setSelectedHandler(any(EntityFinderWidget.SelectedHandler.class));
 		verify(mockEntityFinderBuilder).build();
@@ -1968,7 +1968,7 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		controller.onAction(Action.CREATE_LINK);
 		verify(mockEntityFinderBuilder).setSelectableTypes(EntityFilter.CONTAINER);
-		verify(mockEntityFinderBuilder).setShowVersions(false);
+		verify(mockEntityFinderBuilder).setVersionSelection(EntityFinderWidget.VersionSelection.DISALLOWED);
 		verify(mockEntityFinderBuilder).build();
 		verify(mockEntityFinder).show();
 		verify(mockEntityFinder).hide();

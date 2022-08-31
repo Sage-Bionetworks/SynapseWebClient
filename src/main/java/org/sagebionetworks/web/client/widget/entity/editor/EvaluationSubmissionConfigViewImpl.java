@@ -78,7 +78,7 @@ public class EvaluationSubmissionConfigViewImpl implements EvaluationSubmissionC
 					.setPromptCopy("Find a Project to create a submission button")
 					.setMultiSelect(false)
 					.setSelectableTypes(EntityFilter.PROJECT)
-					.setShowVersions(false)
+					.setVersionSelection(EntityFinderWidget.VersionSelection.DISALLOWED)
 					.setSelectedHandler(((selected, entityFinder) -> {
 						challengeProjectField.setValue(selected.getTargetId());
 						entityFinder.hide();
@@ -90,7 +90,7 @@ public class EvaluationSubmissionConfigViewImpl implements EvaluationSubmissionC
 		findFormContainerButton.addClickHandler(event -> {
 			entityFinderBuilder.setMultiSelect(false)
 					.setSelectableTypes(EntityFilter.CONTAINER)
-					.setShowVersions(false)
+					.setVersionSelection(EntityFinderWidget.VersionSelection.DISALLOWED)
 					.setSelectedHandler(((selected, entityFinder) -> {
 						formContainerIdField.setValue(selected.getTargetId());
 						entityFinder.hide();
@@ -101,7 +101,7 @@ public class EvaluationSubmissionConfigViewImpl implements EvaluationSubmissionC
 		findSchemaFileButton.addClickHandler(event -> {
 			entityFinderBuilder.setMultiSelect(false)
 					.setSelectableTypes(EntityFilter.FILE)
-					.setShowVersions(false)
+					.setVersionSelection(EntityFinderWidget.VersionSelection.DISALLOWED)
 					.setSelectedHandler(((selected, entityFinder) -> {
 						schemaFileSynIdField.setValue(selected.getTargetId());
 						entityFinder.hide();
@@ -112,7 +112,7 @@ public class EvaluationSubmissionConfigViewImpl implements EvaluationSubmissionC
 		findUiSchemaFileButton.addClickHandler(event -> {
 			entityFinderBuilder.setMultiSelect(false)
 					.setSelectableTypes(EntityFilter.FILE)
-					.setShowVersions(false)
+					.setVersionSelection(EntityFinderWidget.VersionSelection.DISALLOWED)
 					.setSelectedHandler(((selected, entityFinder) -> {
 						uiSchemaFileSynIdField.setValue(selected.getTargetId());
 						entityFinder.hide();
