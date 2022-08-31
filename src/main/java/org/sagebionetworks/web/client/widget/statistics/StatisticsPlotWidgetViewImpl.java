@@ -74,7 +74,7 @@ public class StatisticsPlotWidgetViewImpl implements StatisticsPlotWidgetView, I
 
 			var component = $wnd.React.createElement($wnd.SRC.SynapseComponents.StatisticsPlot, props, null)
 			var wrapper = $wnd.React.createElement($wnd.SRC.SynapseContext.SynapseContextProvider, wrapperProps, component)
-            reactComponentDiv.@org.sagebionetworks.web.client.widget.ReactComponentDiv::render(Lorg/sagebionetworks/web/client/jsinterop/ReactNode;)(wrapper);
+			reactComponentDiv.@org.sagebionetworks.web.client.widget.ReactComponentDiv::render(Lorg/sagebionetworks/web/client/jsinterop/ReactNode;)(wrapper);
 		} catch (err) {
 			console.error(err);
 		}

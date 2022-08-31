@@ -3,22 +3,15 @@ package org.sagebionetworks.web.client.widget;
 import org.sagebionetworks.web.client.jsinterop.ReactDOMRoot;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
 
-import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.FlowPanel;
 
 /**
  * Automatically unmounts the ReactComponent (if any) inside this div when this container is detached/unloaded.
  */
-public class ReactComponentDiv extends HTMLPanel {
+public class ReactComponentDiv extends FlowPanel {
 
 	private ReactDOMRoot root;
 	private ReactNode component;
-
-	public ReactComponentDiv() {
-		super("");
-	}
-	public ReactComponentDiv(String s) {
-		super("");
-	}
 
 	public void render(ReactNode reactNode) {
 		this.setComponent(reactNode);

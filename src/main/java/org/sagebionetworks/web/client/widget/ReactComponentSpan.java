@@ -3,12 +3,12 @@ package org.sagebionetworks.web.client.widget;
 import org.sagebionetworks.web.client.jsinterop.ReactDOMRoot;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
 
-import com.google.gwt.user.client.ui.InlineHTML;
+import com.google.gwt.user.client.ui.InlineLabel;
 
 /**
  * Automatically unmounts the ReactComponent (if any) inside this div when this container is detached/unloaded.
  */
-public class ReactComponentSpan extends InlineHTML {
+public class ReactComponentSpan extends InlineLabel {
 	private ReactDOMRoot root;
 	private ReactNode component;
 

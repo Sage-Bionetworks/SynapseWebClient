@@ -103,11 +103,11 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	}
 
 	private void hideNavBar() {
-		synapseNavDrawerContainer.addStyleName("hidden");
+		synapseNavDrawerContainer.setVisible(false);
 		Document.get().getBody().removeClassName("SynapseNavDrawerIsShowing");
 	}
 	private void showNavBar() {
-		synapseNavDrawerContainer.removeStyleName("hidden");
+		synapseNavDrawerContainer.setVisible(true);
 		Document.get().getBody().addClassName("SynapseNavDrawerIsShowing");
 	}
 	

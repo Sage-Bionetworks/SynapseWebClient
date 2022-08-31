@@ -34,8 +34,6 @@ public class TabViewImpl implements TabView {
 	Div contentDiv;
 	boolean isActive = false;
 
-
-
 	public interface TabViewImplUiBinder extends UiBinder<Widget, TabViewImpl> {
 	}
 

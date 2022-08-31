@@ -19,7 +19,6 @@
 
 	<g:HTMLPanel>
 		<h2>Coming Soon</h2>
-		<bh:Div ui:field="reactWidget" />
 		<b:Button ui:field="testDownloadSpeedButton"
 			text="Test Download Speed" />
 		<b:Heading size="H3" ui:field="downloadSpeedResult" />

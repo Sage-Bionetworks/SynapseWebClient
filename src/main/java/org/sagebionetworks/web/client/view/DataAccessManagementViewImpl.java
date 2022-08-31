@@ -58,7 +58,7 @@ public class DataAccessManagementViewImpl implements DataAccessManagementView {
         ReviewerDashboardProps.OnRejectSubmissionClicked onRejectCallback = onReject -> rejectModal.show((reason) -> onReject.onReject(reason));
         ReviewerDashboardProps props = ReviewerDashboardProps.create(onRejectCallback);
 
-		ReactNode node = React.createElementWithSynapseContext(SRC.SynapseComponents.ReviewerDashboard, props, propsProvider.getJsInteropContextProps());
-		reactComponent.render(node);
+        ReactNode node = React.createElementWithSynapseContext(SRC.SynapseComponents.ReviewerDashboard, props, propsProvider.getJsInteropContextProps());
+        reactComponent.render(node);
     }
 }

@@ -10,7 +10,6 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.DownloadSpeedTester;
 import org.sagebionetworks.web.client.widget.entity.act.RejectReasonWidget;
-import org.sagebionetworks.web.client.widget.entity.renderer.SRCDemoWidget;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.googlemap.GoogleMap;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -32,8 +31,6 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 	@UiField
 	Div chart;
 	@UiField
-	Div reactWidget;
-	@UiField
 	Button testDownloadSpeedButton;
 	@UiField
 	Heading downloadSpeedResult;
@@ -42,17 +39,14 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 
 	private Header headerWidget;
 	JSONObjectAdapter jsonObjectAdapter;
-	SRCDemoWidget srcTableWidget;
 
 	@Inject
-	public ComingSoonViewImpl(ComingSoonViewImplUiBinder binder, Header headerWidget, Footer footerWidget, SynapseJSNIUtils synapseJSNIUtils, PortalGinInjector ginInjector, AuthenticationController authenticationController, GoogleMap map, RejectReasonWidget rejectReasonWidget, JSONObjectAdapter jsonObjectAdapter, DownloadSpeedTester downloadSpeedTester, SRCDemoWidget srcTableWidget) {
+	public ComingSoonViewImpl(ComingSoonViewImplUiBinder binder, Header headerWidget, Footer footerWidget, SynapseJSNIUtils synapseJSNIUtils, PortalGinInjector ginInjector, AuthenticationController authenticationController, GoogleMap map, RejectReasonWidget rejectReasonWidget, JSONObjectAdapter jsonObjectAdapter, DownloadSpeedTester downloadSpeedTester) {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		headerWidget.configure();
 		widgetContainer.add(map.asWidget());
-		this.srcTableWidget = srcTableWidget;
-		reactWidget.add(srcTableWidget);
 		AsyncCallback<Double> downloadSpeedCallback = new AsyncCallback<Double>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -97,8 +91,4 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 	@Override
 	public void clear() {}
 
-	@Override
-	public void showSRCComponent() {
-		srcTableWidget.showDemo();
-	}
 }

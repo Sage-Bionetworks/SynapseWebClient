@@ -38,7 +38,6 @@ public class ComingSoonPresenter extends AbstractActivity implements ComingSoonV
 		this.place = place;
 		this.view.setPresenter(this);
 		final String token = place.toToken();
-		view.showSRCComponent();
 	}
 
 	@Override

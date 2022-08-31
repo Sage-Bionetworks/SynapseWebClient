@@ -44,6 +44,6 @@ public class OAuthClientEditorViewImpl implements OAuthClientEditorView {
     public void render() {
         EmptyProps props = EmptyProps.create();
         ReactNode component = React.createElementWithSynapseContext(SRC.SynapseComponents.OAuthManagement, props, propsProvider.getJsInteropContextProps());
-		container.render(component);
+        container.render(component);
     }
 }

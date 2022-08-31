@@ -1585,8 +1585,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .highlight-reply, #rootPanel .highlight-reply {
-     background-color: #fcf7e8;
-     border: #edc766 1px solid;
+	 background-color: #fcf7e8;
+	 border: #edc766 1px solid;
  }
 .sidebarMenu { 
 	font-weight: bold; 	
@@ -1627,12 +1627,12 @@ h1, h2, h3, h4, h5, h6 {
 .entityTreeItem {
 	padding-right: 0px !important; /** Override gwt TreeItem BASE_BARE_ELEM padding of 3px **/
   > table {
-    width: 100%;
-    /** Select the td that is the first child under an element with class entityTreeItem.
-    This is the icon table cell (gwt TreeItem exposes very little to the outside, so this is how we can style this container) **/
-    > tr > td:first-child {
-      width:16px;
-    }
+	width: 100%;
+	/** Select the td that is the first child under an element with class entityTreeItem.
+	This is the icon table cell (gwt TreeItem exposes very little to the outside, so this is how we can style this container) **/
+	> tr > td:first-child {
+	  width:16px;
+	}
   }
 }
 
