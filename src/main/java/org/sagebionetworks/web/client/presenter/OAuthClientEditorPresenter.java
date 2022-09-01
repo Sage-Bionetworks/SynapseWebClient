@@ -13,12 +13,10 @@ public class OAuthClientEditorPresenter extends AbstractActivity implements Pres
 
     private OAuthClientEditorView view;
     private OAuthClientEditorPlace place;
-    private SynapseContextPropsProvider propsProvider;
 
     @Inject
-    public OAuthClientEditorPresenter(OAuthClientEditorView view, SynapseContextPropsProvider propsProvider) {
+    public OAuthClientEditorPresenter(OAuthClientEditorView view) {
         this.view = view;
-        this.propsProvider = propsProvider;
     }
 
     @Override
