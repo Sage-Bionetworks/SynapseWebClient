@@ -24,7 +24,7 @@ public class OAuthClientEditorPresenter extends AbstractActivity implements Pres
     @Override
     public void start(AcceptsOneWidget panel, EventBus eventBus) {
         panel.setWidget(view);
-        view.createReactComponentWidget(propsProvider);
+        view.createReactComponentWidget();
     }
 
     @Override

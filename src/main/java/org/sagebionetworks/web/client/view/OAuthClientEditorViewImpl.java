@@ -19,18 +19,20 @@ public class OAuthClientEditorViewImpl extends Composite implements OAuthClientE
     @UiField
     SimplePanel componentContainer;
     private Header headerWidget;
+    private SynapseContextPropsProvider propsProvider;
 
     @Inject
-    public OAuthClientEditorViewImpl(OAuthClientEditorViewImplUiBinder binder, Header headerWidget) {
+    public OAuthClientEditorViewImpl(OAuthClientEditorViewImplUiBinder binder, Header headerWidget, SynapseContextPropsProvider propsProvider ) {
         initWidget(binder.createAndBindUi(this));
         this.headerWidget = headerWidget;
+        this.propsProvider = propsProvider;
         headerWidget.configure();
     }
 
 
     @Override
-    public void createReactComponentWidget(SynapseContextPropsProvider propsProvider) {
-        OAuthClientEditor component = new OAuthClientEditor(propsProvider);
+    public void createReactComponentWidget() {
+        OAuthClientEditor component = new OAuthClientEditor(this.propsProvider);
         componentContainer.clear();
         componentContainer.add(component);
     }
