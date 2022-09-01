@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.presenter;
 
-import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
 import org.sagebionetworks.web.client.place.OAuthClientEditorPlace;
 import org.sagebionetworks.web.client.view.OAuthClientEditorView;
 
@@ -13,21 +13,23 @@ public class OAuthClientEditorPresenter extends AbstractActivity implements Pres
 
     private OAuthClientEditorView view;
     private OAuthClientEditorPlace place;
+    private SynapseContextPropsProvider propsProvider;
 
     @Inject
-    public OAuthClientEditorPresenter(OAuthClientEditorView view, GlobalApplicationState globalApplicationState) {
+    public OAuthClientEditorPresenter(OAuthClientEditorView view, SynapseContextPropsProvider propsProvider) {
         this.view = view;
+        this.propsProvider = propsProvider;
     }
 
     @Override
     public void start(AcceptsOneWidget panel, EventBus eventBus) {
         panel.setWidget(view);
+        view.createReactComponentWidget(propsProvider);
     }
 
     @Override
     public void setPlace(OAuthClientEditorPlace place){
         this.place = place;
-        this.view.setPresenter(this);
     }
 
     public OAuthClientEditorPlace getPlace() {return place;}
