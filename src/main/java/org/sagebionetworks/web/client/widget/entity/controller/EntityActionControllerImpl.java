@@ -1421,7 +1421,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 				.setInitialScope(EntityFinderScope.ALL_PROJECTS)
 				.setInitialContainer(EntityFinderWidget.InitialContainer.NONE)
 				.setSelectableTypes(CONTAINER)
-				.setShowVersions(false)
+				.setVersionSelection(EntityFinderWidget.VersionSelection.DISALLOWED)
 				.setSelectedHandler((selected, entityFinder) -> {
 					createLink(selected.getTargetId(), entityFinder);
 				})
@@ -1506,7 +1506,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 				.setPromptCopy("Find a destination to move <b>" + SafeHtmlUtils.fromString(entity.getName()).asString() + "</b> (" + entity.getId() + ")")
 				.setSelectedCopy((count) -> "Destination")
 				.setConfirmButtonCopy("Move")
-				.setShowVersions(false)
+				.setVersionSelection(EntityFinderWidget.VersionSelection.DISALLOWED)
 				.setTreeOnly(true)
 				.setSelectedHandler((selected, finder) -> {
 					String entityId = entityBundle.getEntity().getId();

@@ -97,7 +97,7 @@ public class EntityListConfigEditor implements EntityListConfigView.Presenter, W
 				.setHelpMarkdown("Search or Browse Synapse to find items and insert them as a list into this Wiki page")
 				.setPromptCopy("Find items in Synapse to insert them as a list into this Wiki")
 				.setMultiSelect(true)
-				.setShowVersions(true)
+				.setVersionSelection(EntityFinderWidget.VersionSelection.TRACKED)
 				.setSelectedMultiHandler(((selected, entityFinder) -> {
 					entityFinder.hide();
 					for (Reference ref : selected) {

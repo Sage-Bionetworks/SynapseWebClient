@@ -40,7 +40,7 @@ public class SynapseFormConfigEditor implements SynapseFormConfigView.Presenter,
 				.setInitialContainer(EntityFinderWidget.InitialContainer.PROJECT)
 				.setVisibleTypesInTree(EntityFilter.PROJECT)
 				.setSelectableTypes(EntityFilter.TABLE)
-				.setShowVersions(true)
+				.setVersionSelection(EntityFinderWidget.VersionSelection.TRACKED)
 				.setSelectedHandler((selected, entityFinder) -> {
 					view.setEntityId(selected.getTargetId());
 					entityFinder.hide();

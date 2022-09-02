@@ -82,7 +82,7 @@ public class EntityFinderWidgetImplTest {
     public void testBuildAndRender() {
         // Verify that all of the arguments passed to the builder end up being used
         boolean multiSelect = true;
-        boolean showVersions = true;
+        EntityFinderWidget.VersionSelection versionSelection = EntityFinderWidget.VersionSelection.REQUIRED;
         EntityFilter selectableTypes = EntityFilter.FILE;
         EntityFilter visibleTypesInList = EntityFilter.ALL;
         EntityFilter visibleTypesInTree = EntityFilter.PROJECT;
@@ -99,7 +99,7 @@ public class EntityFinderWidgetImplTest {
 
         // Finder behavior
         builder.setMultiSelect(multiSelect);
-        builder.setShowVersions(showVersions);
+        builder.setVersionSelection(versionSelection);
         builder.setSelectableTypes(selectableTypes);
         builder.setVisibleTypesInList(visibleTypesInList);
         builder.setVisibleTypesInTree(visibleTypesInTree);
@@ -126,7 +126,7 @@ public class EntityFinderWidgetImplTest {
         // Call under test: show the modal, triggering rendering
         entityFinder.show();
 
-        verify(mockView).renderComponent(scope, EntityFinderWidget.InitialContainer.NONE, null, null, showVersions, multiSelect, selectableTypes, visibleTypesInList, visibleTypesInTree, selected, treeOnly, mustSelectVersionNumber);
+        verify(mockView).renderComponent(scope, EntityFinderWidget.InitialContainer.NONE, null, null, versionSelection, multiSelect, selectableTypes, visibleTypesInList, visibleTypesInTree, selected, treeOnly);
     }
 
     @Test
@@ -172,7 +172,7 @@ public class EntityFinderWidgetImplTest {
         getBundleCaptor.getValue().onSuccess(bundle);
 
 
-        verify(mockView).renderComponent(eq(EntityFinderScope.CURRENT_PROJECT), eq(EntityFinderWidget.InitialContainer.PARENT), eq(projectId), eq(containerId), anyBoolean(), anyBoolean(), any(EntityFilter.class), any(EntityFilter.class), any(EntityFilter.class), any(), anyBoolean(), anyBoolean());
+        verify(mockView).renderComponent(eq(EntityFinderScope.CURRENT_PROJECT), eq(EntityFinderWidget.InitialContainer.PARENT), eq(projectId), eq(containerId), any(EntityFinderWidget.VersionSelection.class), anyBoolean(), any(EntityFilter.class), any(EntityFilter.class), any(EntityFilter.class), any(), anyBoolean());
     }
 
     @Test

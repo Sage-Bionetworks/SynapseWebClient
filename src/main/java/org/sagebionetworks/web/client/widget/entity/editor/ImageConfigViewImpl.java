@@ -95,7 +95,7 @@ public class ImageConfigViewImpl implements ImageConfigView {
 				.setInitialContainer(EntityFinderWidget.InitialContainer.PROJECT)
 				.setMultiSelect(false)
 				.setSelectableTypes(EntityFilter.FILE)
-				.setShowVersions(true)
+				.setVersionSelection(EntityFinderWidget.VersionSelection.TRACKED)
 				.setSelectedHandler((selected, entityFinder) -> {
 					entityField.setValue(DisplayUtils.createEntityVersionString(selected));
 					entityFinder.hide();

@@ -25,6 +25,13 @@ public interface EntityFinderWidget {
 		NONE,
 	}
 
+	enum VersionSelection {
+		DISALLOWED,
+		REQUIRED,
+		TRACKED,
+		UNTRACKED
+	}
+
 
 	interface Builder {
 		EntityFinderWidget build();
@@ -39,13 +46,11 @@ public interface EntityFinderWidget {
 
 		Builder setSelectableTypes(EntityFilter selectableFilter);
 
-		Builder setMustSelectVersionNumber(boolean mustSelectVersion);
-
 		Builder setVisibleTypesInList(EntityFilter visibleFilter);
 
 		Builder setVisibleTypesInTree(EntityFilter visibleTypesInTree);
 
-		Builder setShowVersions(boolean showVersions);
+		Builder setVersionSelection(VersionSelection versionSelection);
 
 		Builder setModalTitle(String modalTitle);
 

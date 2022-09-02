@@ -94,7 +94,7 @@ public class EntityFinderWidgetViewImpl implements EntityFinderWidgetView {
 	}
 
 	@Override
-	public void renderComponent(EntityFinderScope initialScope, EntityFinderWidget.InitialContainer initialContainer, String projectId, String initialContainerId, boolean showVersions, boolean multiSelect, EntityFilter selectableEntityTypes, EntityFilter visibleTypesInList, EntityFilter visibleTypesInTree, EntityFinderProps.SelectedCopyHandler selectedCopy, boolean treeOnly, boolean mustSelectVersionNumber) {
+	public void renderComponent(EntityFinderScope initialScope, EntityFinderWidget.InitialContainer initialContainer, String projectId, String initialContainerId, EntityFinderWidget.VersionSelection versionSelection, boolean multiSelect, EntityFilter selectableEntityTypes, EntityFilter visibleTypesInList, EntityFilter visibleTypesInTree, EntityFinderProps.SelectedCopyHandler selectedCopy, boolean treeOnly) {
         entityFinderContainer.clear();
 
         EntityFinderProps.OnSelectCallback onSelected = result -> {
@@ -117,7 +117,7 @@ public class EntityFinderWidgetViewImpl implements EntityFinderWidgetView {
 				EntityFinderProps.create(
 						onSelected,
 						multiSelect,
-						showVersions,
+						versionSelection.name(),
 						initialScope,
 						projectId,
 						getInitialContainerAsString(initialContainer, projectId, initialContainerId),
@@ -125,8 +125,7 @@ public class EntityFinderWidgetViewImpl implements EntityFinderWidgetView {
 						visibleTypesInTree.getEntityQueryValues(),
 						selectableEntityTypes.getEntityQueryValues(),
 						selectedCopy,
-						treeOnly,
-						mustSelectVersionNumber
+						treeOnly
 				);
 
 		ReactNode component = React.createElementWithSynapseContext(

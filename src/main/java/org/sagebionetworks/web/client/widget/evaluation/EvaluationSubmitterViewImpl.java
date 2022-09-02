@@ -197,7 +197,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 					.setPromptCopy("Find items to Submit to this Challenge")
 					.setMultiSelect(false)
 					.setSelectableTypes(EntityFilter.ALL)
-					.setShowVersions(true)
+					.setVersionSelection(EntityFinderWidget.VersionSelection.UNTRACKED)
 					.setSelectedHandler((selected, finder) -> {
 						if (selected.getTargetId() != null) {
 							selectedReference = selected;

@@ -98,7 +98,7 @@ public class ProvenanceListWidgetTest {
 		verify(mockEntityProvEntry).setRemoveCallback(any(Callback.class));
 		verify(mockURLProvEntry).setRemoveCallback(any(Callback.class));
 
-		verify(mockEntityFinderBuilder).setShowVersions(true);
+		verify(mockEntityFinderBuilder).setVersionSelection(EntityFinderWidget.VersionSelection.TRACKED);
 		verify(mockEntityFinderBuilder).setSelectedMultiHandler(captor.capture());
 		captor.getValue().onSelected(Collections.singletonList(mockRef), mockEntityFinder);
 		verify(mockEntityProvEntry).configure(targetId, version.toString());

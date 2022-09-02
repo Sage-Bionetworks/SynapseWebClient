@@ -45,7 +45,7 @@ public class ProvenanceConfigViewImpl implements ProvenanceConfigView {
 				.setPromptCopy("Find items to insert a Provenance Graph")
 				.setMultiSelect(true)
 				.setSelectableTypes(EntityFilter.ALL_BUT_LINK)
-				.setShowVersions(true)
+				.setVersionSelection(EntityFinderWidget.VersionSelection.TRACKED)
 				.setSelectedMultiHandler((selected, finder) -> {
 					for (Reference entity : selected) {
 						appendEntityListValue(entity);
