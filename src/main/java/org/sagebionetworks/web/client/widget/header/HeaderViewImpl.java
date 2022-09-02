@@ -10,13 +10,13 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactDOM;
-import org.sagebionetworks.web.client.jsinterop.ReactElement;
+import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.jsinterop.SynapseNavDrawerProps;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.widget.FullWidthAlert;
+import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Document;
@@ -46,7 +46,8 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	Span portalName;
 	@UiField
 	FocusPanel portalLogoFocusPanel;
-	Div synapseNavDrawerContainer = new Div();
+	@UiField
+	ReactComponentDiv synapseNavDrawerContainer;
 	@UiField
 	Alert stagingAlert;
 	@UiField
@@ -68,21 +69,20 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 
 		initClickHandlers();
 		clear();
-		synapseNavDrawerContainer.addAttachHandler(event -> {
-			if (event.isAttached()) {
-				SynapseNavDrawerProps props = SynapseNavDrawerProps.create(() -> {
-					ginInjector.getAuthenticationController().logoutUser();
-				});
-				ReactElement component = React.createElementWithSynapseContext(SRC.SynapseComponents.SynapseNavDrawer, props, propsProvider.getJsInteropContextProps());
-				ReactDOM.render(component, synapseNavDrawerContainer.getElement());
-			}
-		});
+		rerenderNavBar();
 	}
 
 	@Override
 	public void clear() {
 	}
 
+	public void rerenderNavBar() {
+		SynapseNavDrawerProps props = SynapseNavDrawerProps.create(() -> {
+			ginInjector.getAuthenticationController().logoutUser();
+		});
+		ReactNode component = React.createElementWithSynapseContext(SRC.SynapseComponents.SynapseNavDrawer, props, propsProvider.getJsInteropContextProps());
+		synapseNavDrawerContainer.render(component);
+	}
 
 	public void initClickHandlers() {
 		editModeNavBarClickBlocker.addClickHandler(event -> {
@@ -102,12 +102,12 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		refresh();
 	}
 
-	private void detachNavBar() {
-		synapseNavDrawerContainer.removeFromParent();
+	private void hideNavBar() {
+		synapseNavDrawerContainer.setVisible(false);
 		Document.get().getBody().removeClassName("SynapseNavDrawerIsShowing");
 	}
-	private void attachNavBar() {
-		header.add(synapseNavDrawerContainer);
+	private void showNavBar() {
+		synapseNavDrawerContainer.setVisible(true);
 		Document.get().getBody().addClassName("SynapseNavDrawerIsShowing");
 	}
 	
@@ -115,9 +115,10 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	public void refresh() {
 		GlobalApplicationState globalAppState = ginInjector.getGlobalApplicationState();
 		if (globalAppState.getCurrentPlace() == null || globalAppState.getCurrentPlace() instanceof Home || globalAppState.getCurrentPlace() instanceof LoginPlace) {
-			detachNavBar();
+			hideNavBar();
 		} else {
-			attachNavBar();
+			rerenderNavBar();
+			showNavBar();
 			// cover with a click catcher if in editing mode
 			editModeNavBarClickBlocker.setVisible(globalAppState.isEditing());
 		}

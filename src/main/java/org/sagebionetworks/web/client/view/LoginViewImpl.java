@@ -5,6 +5,10 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.jsinterop.React;
+import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.SRC;
+import org.sagebionetworks.web.client.jsinterop.TermsAndConditionsProps;
 import org.sagebionetworks.web.client.jsni.SynapseContextProviderPropsJSNIObject;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.FullWidthAlert;
@@ -140,7 +144,9 @@ public class LoginViewImpl extends Composite implements LoginView {
 		if (!hasAccepted) {
 			termsOfUseView.setVisible(true);
 			reconfigurePageProgress(false);
-			_showTermsOfUse(termsOfUseContainer.getElement(), this, propsProvider.getJsniContextProps());
+			TermsAndConditionsProps props = TermsAndConditionsProps.create(this::onFormChange);
+			ReactNode component = React.createElementWithSynapseContext(SRC.SynapseComponents.TermsAndConditions, props, propsProvider.getJsInteropContextProps());
+			termsOfUseContainer.render(component);
 		} else {
 			acceptedTermsOfUseView.setVisible(true);
 		}		
@@ -149,24 +155,6 @@ public class LoginViewImpl extends Composite implements LoginView {
 	public void onFormChange(boolean completed) {
 		reconfigurePageProgress(completed);		
 	}
-	
-	private static native void _showTermsOfUse(Element el, LoginViewImpl v, SynapseContextProviderPropsJSNIObject wrapperProps) /*-{
-		try {
-			function cb(completed) {
-				v.@org.sagebionetworks.web.client.view.LoginViewImpl::onFormChange(Z)(completed);
-			}
-			var props = {
-			  	onFormChange: cb,
-			};
-
-			var component = $wnd.React.createElement($wnd.SRC.SynapseComponents.TermsAndConditions, props, null)
-			var wrapper = $wnd.React.createElement($wnd.SRC.SynapseContext.SynapseContextProvider, wrapperProps, component)
-
-			$wnd.ReactDOM.render(wrapper, el);
-		} catch (err) {
-			console.error(err);
-		}
-	}-*/;
 
 	private void hideViews() {
 		loadingUi.setVisible(false);

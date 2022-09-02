@@ -3,6 +3,9 @@ package org.sagebionetworks.web.client.widget.user;
 import static org.sagebionetworks.web.client.DisplayUtils.DO_NOTHING_CLICKHANDLER;
 import static org.sagebionetworks.web.client.DisplayUtils.newWindow;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.gwtbootstrap3.client.ui.constants.Emphasis;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
@@ -14,18 +17,20 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
-import org.sagebionetworks.web.client.jsni.SynapseContextProviderPropsJSNIObject;
+import org.sagebionetworks.web.client.jsinterop.JSON;
+import org.sagebionetworks.web.client.jsinterop.MenuAction;
+import org.sagebionetworks.web.client.jsinterop.React;
+import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.SRC;
+import org.sagebionetworks.web.client.jsinterop.UserCardProps;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 
-import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.inject.Inject;
 
@@ -48,7 +53,7 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 	AvatarSize avatarSize = AvatarSize.MEDIUM;
 	FocusPanel userBadgeContainer = new FocusPanel();
 	ReactComponentDiv userBadgeReactDiv = new ReactComponentDiv();
-	JsArray<JavaScriptObject> menuActionsArray = null;
+	List<MenuAction> menuActionsArray = new ArrayList<>();
 	AuthenticationController authController;
 	HandlerRegistration clickHandlerRegistration;
 
@@ -84,7 +89,28 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 		} catch (Throwable e) {
 			jsniUtils.consoleError(e);
 		}
-		_showBadge(userBadgeReactDiv.getElement(), profileJson, userId, badgeType.getUserCardType(), avatarSize.getAvatarSize(), showCardOnHover, pictureUrl, !authController.isLoggedIn(), showAvatar, isCertified, isValidated, menuActionsArray, extraCssClassStrings, this, propsProvider.getJsniContextProps());
+
+		Object userProfileObject = JSON.parse(profileJson);
+
+		UserCardProps props = UserCardProps.create(
+				userProfileObject,
+				badgeType.getUserCardType(),
+				avatarSize.getAvatarSize(),
+				showCardOnHover,
+				menuActionsArray.toArray(),
+				pictureUrl,
+				!authController.isLoggedIn(),
+				"#!Profile:" + userId,
+				isCertified == null ? false : isCertified.booleanValue(),
+				isValidated == null ? false : isValidated.booleanValue(),
+				showAvatar,
+				extraCssClassStrings
+		);
+
+		ReactNode component = React.createElementWithSynapseContext(SRC.SynapseComponents.UserCard, props, propsProvider.getJsInteropContextProps());
+		userBadgeReactDiv.render(component);
+
+
 	}
 
 	@Override
@@ -176,50 +202,6 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 
 	@Override
 	public void addContextCommand(String commandName, Callback callback) {
-		if (menuActionsArray == null) {
-			menuActionsArray = _initJsArray();
-		}
-		// add to menu actions array
-		_addToMenuActionsArray(commandName, callback, menuActionsArray);
+		menuActionsArray.add(MenuAction.create(commandName, () -> callback.invoke()));
 	}
-
-	private static native void _showBadge(Element el, String userProfileJson, String userId, String userCardType, String avatarSize, boolean showCardOnHover, String pictureUrl, boolean isEmailHidden, boolean showAvatar, Boolean isCertifiedUser, Boolean isValidatedProfile, JsArray<JavaScriptObject> menuActionsArray, String extraCssClasses, UserBadgeViewImpl userBadgeView, SynapseContextProviderPropsJSNIObject wrapperProps) /*-{
-
-		try {
-			var userProfileObject = JSON.parse(userProfileJson);
-			var userCardProps = {
-				userProfile : userProfileObject,
-				size : userCardType,
-				avatarSize: avatarSize,
-				showCardOnHover: showCardOnHover,
-				menuActions : menuActionsArray,
-				preSignedURL : pictureUrl,
-				hideEmail : isEmailHidden,
-				link : '#!Profile:' + userId,
-				isCertified: isCertifiedUser,
-				isValidated: isValidatedProfile,
-				withAvatar: showAvatar,
-				className: extraCssClasses
-			};
-			var component = $wnd.React.createElement($wnd.SRC.SynapseComponents.UserCard, userCardProps, null);
-			var wrapper = $wnd.React.createElement($wnd.SRC.SynapseContext.SynapseContextProvider, wrapperProps, component);
-			$wnd.ReactDOM.render(wrapper, el);
-		} catch (err) {
-			console.error(err);
-		}
-	}-*/;
-
-	private static native JsArray<JavaScriptObject> _initJsArray() /*-{
-		return [];
-	}-*/;
-
-	private static native void _addToMenuActionsArray(String commandName, Callback callback, JsArray<JavaScriptObject> menuActionsArray) /*-{
-		function onMenuActionClick(userProfile) {
-			callback.@org.sagebionetworks.web.client.utils.Callback::invoke()();
-		}
-		menuActionsArray.push({
-			field : commandName,
-			callback : onMenuActionClick
-		});
-	}-*/;
 }

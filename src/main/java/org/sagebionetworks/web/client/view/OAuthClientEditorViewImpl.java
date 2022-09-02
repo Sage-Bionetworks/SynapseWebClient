@@ -29,7 +29,6 @@ public class OAuthClientEditorViewImpl extends Composite implements OAuthClientE
         headerWidget.configure();
     }
 
-
     @Override
     public void createReactComponentWidget() {
         OAuthClientEditor component = new OAuthClientEditor(this.propsProvider);

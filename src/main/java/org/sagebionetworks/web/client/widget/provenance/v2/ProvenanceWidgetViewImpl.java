@@ -7,14 +7,14 @@ import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.ProvenanceGraphProps;
 import org.sagebionetworks.web.client.jsinterop.ProvenanceGraphProps.OnUpdateJavaScriptObject;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactDOM;
+import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.inject.Inject;
 
-public class ProvenanceWidgetViewImpl extends ReactComponentDiv implements ProvenanceWidgetView{
+public class ProvenanceWidgetViewImpl extends ReactComponentDiv implements ProvenanceWidgetView {
 
 	List<Reference> refs;
 	String containerHeight;
@@ -41,18 +41,16 @@ public class ProvenanceWidgetViewImpl extends ReactComponentDiv implements Prove
 	public void configure(List<Reference> refs, String containerHeight) {
 		this.refs = refs;
 		this.containerHeight = containerHeight;
-		render();
+		renderComponent();
 	}
 
-	public void render() {
-		ProvenanceGraphProps props = ProvenanceGraphProps.create(refs, containerHeight, initialNodes, initialEdges, nodesListener, edgesListener); 
-		ReactDOM.render(
-			React.createElementWithSynapseContext(
-					SRC.SynapseComponents.ProvenanceGraph,
-					props,
-					contextPropsProvider.getJsInteropContextProps()
-			),
-			getElement()
+	public void renderComponent() {
+		ProvenanceGraphProps props = ProvenanceGraphProps.create(refs, containerHeight, initialNodes, initialEdges, nodesListener, edgesListener);
+		ReactNode component = React.createElementWithSynapseContext(
+				SRC.SynapseComponents.ProvenanceGraph,
+				props,
+				contextPropsProvider.getJsInteropContextProps()
 		);
+		this.render(component);
 	}
 }

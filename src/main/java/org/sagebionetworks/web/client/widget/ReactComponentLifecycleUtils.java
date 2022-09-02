@@ -1,9 +1,9 @@
 package org.sagebionetworks.web.client.widget;
 
 import org.sagebionetworks.web.client.jsinterop.ReactDOM;
+import org.sagebionetworks.web.client.jsinterop.ReactDOMRoot;
 
 import com.google.gwt.dom.client.Element;
-import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -11,18 +11,23 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class ReactComponentLifecycleUtils {
 	/**
+	 * Should be used to override {@link Widget#onLoad()} ()}
+	 * The calling class should store an instance variable for the returned root.
+	 * @param e
+	 * @return
+	 */
+	protected static ReactDOMRoot onLoad(Element e) {
+		return ReactDOM.createRoot(e);
+	}
+
+
+	/**
 	 * Should be used to override {@link Widget#onUnload()}
 	 * @param e
 	 */
-	protected static void onUnload(Element e) {
-		ReactDOM.unmountComponentAtNode(e);
-	}
-
-	/**
-	 * Should be used to override {@link Panel#clear()}
-	 * @param e
-	 */
-	public static void clear(Element e) {
-		ReactDOM.unmountComponentAtNode(e);
+	protected static void onUnload(ReactDOMRoot root) {
+		if (root != null) {
+			root.unmount();
+		}
 	}
 }

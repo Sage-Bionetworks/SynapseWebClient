@@ -1,9 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.schema.ValidationResults;
 import org.sagebionetworks.web.client.jsinterop.EntityBadgeIconsProps;
-import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SynapseContextProviderProps;
 import org.sagebionetworks.web.client.widget.lazyload.SupportsLazyLoadInterface;
 

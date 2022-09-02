@@ -6,12 +6,14 @@ import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
-import org.sagebionetworks.web.client.jsni.SynapseContextProviderPropsJSNIObject;
+import org.sagebionetworks.web.client.jsinterop.HasAccessProps;
+import org.sagebionetworks.web.client.jsinterop.React;
+import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -185,21 +187,9 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 		// SWC-5821: force remount
 		hasAccessContainer.removeFromParent();
 		hasAccessContainerParent.add(hasAccessContainer);
-		_showHasAccess(hasAccessContainer.getElement(), entityId, versionNumberString, propsProvider.getJsniContextProps());
-	}
-	
-	private static native void _showHasAccess(Element el, String synapseEntityId, String versionNumber, SynapseContextProviderPropsJSNIObject wrapperProps) /*-{
-		try {
-			var props = {
-				entityId: synapseEntityId,
-				entityVersionNumber: versionNumber
-			};
-			var component = $wnd.React.createElement($wnd.SRC.SynapseComponents.HasAccess, props, null)
-			var wrapper = $wnd.React.createElement($wnd.SRC.SynapseContext.SynapseContextProvider, wrapperProps, component)
 
-			$wnd.ReactDOM.render(wrapper, el);
-		} catch (err) {
-			console.error(err);
-		}
-	}-*/;
+		HasAccessProps props = HasAccessProps.create(entityId, versionNumberString, null, null);
+		ReactNode component = React.createElementWithSynapseContext(SRC.SynapseComponents.HasAccess, props, propsProvider.getJsInteropContextProps());
+		hasAccessContainer.render(component);
+	}
 }

@@ -1,11 +1,13 @@
 package org.sagebionetworks.web.client.view;
 
 import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
-import org.sagebionetworks.web.client.jsni.SynapseContextProviderPropsJSNIObject;
+import org.sagebionetworks.web.client.jsinterop.ErrorPageProps;
+import org.sagebionetworks.web.client.jsinterop.React;
+import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 import org.sagebionetworks.web.client.widget.header.Header;
 
-import com.google.gwt.dom.client.Element;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
@@ -38,7 +40,7 @@ public class DownViewImpl implements DownView {
 		headerWidget.configure();
 		widget.addAttachHandler(event -> {
 			if (event.isAttached()) {
-				_createSRCErrorPage(srcDownContainer.getElement(), ErrorPageType.maintenance.name(), SYNAPSE_DOWN_MAINTENANCE_TITLE, message, propsProvider.getJsniContextProps());
+				renderMaintenancePage();
 			}
 		});
 	}
@@ -58,7 +60,7 @@ public class DownViewImpl implements DownView {
 	public void setMessage(String message) {
 		this.message = message;
 		if (widget.isAttached()) {
-			_createSRCErrorPage(srcDownContainer.getElement(), ErrorPageType.maintenance.name(), SYNAPSE_DOWN_MAINTENANCE_TITLE, message, propsProvider.getJsniContextProps());
+			renderMaintenancePage();
 		}
 	}
 
@@ -66,19 +68,10 @@ public class DownViewImpl implements DownView {
 	public boolean isAttached() {
 		return widget.isAttached();
 	}
-	
-	public static native void _createSRCErrorPage(Element el, String type, String title, String message, SynapseContextProviderPropsJSNIObject wrapperProps) /*-{
-		try {
-			var props = {
-				image : type,
-				title : title,
-				message: message
-			};
-			var component = $wnd.React.createElement($wnd.SRC.SynapseComponents.ErrorPage, props, null)
-			var wrapper = $wnd.React.createElement($wnd.SRC.SynapseContext.SynapseContextProvider, wrapperProps, component)
-			$wnd.ReactDOM.render(wrapper, el);
-		} catch (err) {
-			console.error(err);
-		}
-	}-*/;
+
+	public void renderMaintenancePage() {
+		ErrorPageProps props = ErrorPageProps.create(ErrorPageType.maintenance.name(), SYNAPSE_DOWN_MAINTENANCE_TITLE, message);
+		ReactNode component = React.createElementWithSynapseContext(SRC.SynapseComponents.ErrorPage, props, propsProvider.getJsInteropContextProps());
+		srcDownContainer.render(component);
+	}
 }

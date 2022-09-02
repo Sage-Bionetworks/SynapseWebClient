@@ -3,14 +3,16 @@ package org.sagebionetworks.web.client.widget.login;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
-import org.sagebionetworks.web.client.jsni.SynapseContextProviderPropsJSNIObject;
+import org.sagebionetworks.web.client.jsinterop.LoginPageProps;
+import org.sagebionetworks.web.client.jsinterop.React;
+import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.users.RegisterAccountViewImpl;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 
-import com.google.gwt.dom.client.Element;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -41,8 +43,9 @@ public class LoginWidgetViewImpl implements LoginWidgetView, IsWidget {
 		this.propsProvider = propsProvider;
 		widget.addAttachHandler(event -> {
 			if (event.isAttached()) {
-				_createSRCLogin(srcLoginContainer.getElement(), this,
-						RegisterAccountViewImpl.OAUTH_CALLBACK_URL, propsProvider.getJsniContextProps());
+				LoginPageProps props = LoginPageProps.create(RegisterAccountViewImpl.OAUTH_CALLBACK_URL, null, () -> this.postLogin());
+				ReactNode component = React.createElementWithSynapseContext(SRC.SynapseComponents.LoginPage, props, propsProvider.getJsInteropContextProps());
+				srcLoginContainer.render(component);
 			}
 		});
 	}
@@ -52,27 +55,6 @@ public class LoginWidgetViewImpl implements LoginWidgetView, IsWidget {
 		globalAppState.gotoLastPlace(defaultPlace);
 		authController.checkForUserChange(null);
 	}
-
-	private static native void _createSRCLogin(Element el, LoginWidgetViewImpl loginWidgetView,
-	   String ssoRedirectUrl, SynapseContextProviderPropsJSNIObject wrapperProps) /*-{
-		try {
-			function sessionCallback() {
-				loginWidgetView.@org.sagebionetworks.web.client.widget.login.LoginWidgetViewImpl::postLogin()();
-			}
-
-			var props = {
-				ssoRedirectUrl : ssoRedirectUrl,
-				sessionCallback : sessionCallback
-			};
-
-			var component = $wnd.React.createElement($wnd.SRC.SynapseComponents.LoginPage, props, null)
-			var wrapper = $wnd.React.createElement($wnd.SRC.SynapseContext.SynapseContextProvider, wrapperProps, component)
-
-			$wnd.ReactDOM.render(wrapper, el);
-		} catch (err) {
-			console.error(err);
-		}
-	}-*/;
 
 	@Override
 	public Widget asWidget() {

@@ -70,7 +70,7 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 		chartContainer.clear();
 		String xAxisTypeString = AxisType.AUTO.equals(xAxisType) ? "-" : xAxisType.toString().toLowerCase();
 		String yAxisTypeString = AxisType.AUTO.equals(yAxisType) ? "-" : yAxisType.toString().toLowerCase();
-		_showChart(chartContainer.getElement(), getPlotlyTraceArray(xyData), barMode, title, xTitle, yTitle, xAxisTypeString, yAxisTypeString, showLegend);
+		_showChart(chartContainer, getPlotlyTraceArray(xyData), barMode, title, xTitle, yTitle, xAxisTypeString, yAxisTypeString, showLegend);
 	}
 
 	public static JavaScriptObject[] getPlotlyTraceArray(List<PlotlyTraceWrapper> l) {
@@ -84,7 +84,7 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 		return d;
 	}
 
-	private static native void _showChart(Element el, JavaScriptObject[] xyData, String barMode, String plotTitle, String xTitle, String yTitle, String xAxisType, String yAxisType, boolean showLegend) /*-{
+	private static native void _showChart(ReactComponentDiv reactComponentDiv, JavaScriptObject[] xyData, String barMode, String plotTitle, String xTitle, String yTitle, String xAxisType, String yAxisType, boolean showLegend) /*-{
 
 		try {
 			var plot = $wnd.createPlotlyComponent($wnd.Plotly);
@@ -126,7 +126,9 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 					height : "100%"
 				}
 			};
-			$wnd.ReactDOM.render($wnd.React.createElement(plot, props), el);
+
+			var component = $wnd.React.createElement(plot, props)
+			reactComponentDiv.@org.sagebionetworks.web.client.widget.ReactComponentDiv::render(Lorg/sagebionetworks/web/client/jsinterop/ReactNode;)(component);
 		} catch (err) {
 			console.error(err);
 		}

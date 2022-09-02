@@ -4,8 +4,7 @@ import org.gwtbootstrap3.client.ui.Anchor;
 import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.AccessTokenPageProps;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactDOM;
-import org.sagebionetworks.web.client.jsinterop.ReactElement;
+import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -53,8 +52,8 @@ public class PersonalAccessTokensViewImpl extends Composite implements PersonalA
 	public void render() {
 		Window.scrollTo(0, 0); // scroll user to top of page
 		AccessTokenPageProps props = AccessTokenPageProps.create(PAGE_TITLE, PAGE_BODY_COPY);
-		ReactElement component = React.createElementWithSynapseContext(SRC.SynapseComponents.AccessTokenPage, props, propsProvider.getJsInteropContextProps());
-		ReactDOM.render(component, container.getElement());
+		ReactNode component = React.createElementWithSynapseContext(SRC.SynapseComponents.AccessTokenPage, props, propsProvider.getJsInteropContextProps());
+		container.render(component);
 	}
 
 	@Override

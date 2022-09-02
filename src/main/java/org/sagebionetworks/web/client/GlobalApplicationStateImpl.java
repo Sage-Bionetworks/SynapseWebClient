@@ -14,7 +14,7 @@ import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactDOM;
-import org.sagebionetworks.web.client.jsinterop.ReactElement;
+import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
@@ -424,8 +424,8 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			isToastContainerInitialized = true;
 
 			Element toastContainer = RootPanel.get("toastContainer").getElement();
-			ReactElement component = React.createElement(SRC.SynapseComponents.SynapseToastContainer, null);
-			ReactDOM.render(component, toastContainer);
+			ReactNode component = React.createElement(SRC.SynapseComponents.SynapseToastContainer, null);
+			ReactDOM.createRoot(toastContainer).render(component);
 		}
 	}
 

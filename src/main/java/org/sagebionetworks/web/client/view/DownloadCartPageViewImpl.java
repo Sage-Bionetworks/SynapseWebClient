@@ -3,8 +3,7 @@ package org.sagebionetworks.web.client.view;
 import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.DownloadCartPageProps;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactDOM;
-import org.sagebionetworks.web.client.jsinterop.ReactElement;
+import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
@@ -39,8 +38,8 @@ public class DownloadCartPageViewImpl implements DownloadCartPageView {
 		DownloadCartPageProps props = DownloadCartPageProps.create( entityId -> {
 			presenter.onViewSharingSettingsClicked(entityId);
 		});
-		ReactElement component = React.createElementWithSynapseContext(SRC.SynapseComponents.DownloadCartPage, props, propsProvider.getJsInteropContextProps());
-		ReactDOM.render(component, container.getElement());
+		ReactNode component = React.createElementWithSynapseContext(SRC.SynapseComponents.DownloadCartPage, props, propsProvider.getJsInteropContextProps());
+		container.render(component);
 	}
 	
 	@Override
