@@ -3667,3 +3667,9 @@ div.border {
 #body .markdown .SynapseTable {
 	min-height: unset;
 }
+
+// https://stackoverflow.com/a/57599409
+.fit-within-parent {
+  width: 0;
+  min-width: 100%;
+}
