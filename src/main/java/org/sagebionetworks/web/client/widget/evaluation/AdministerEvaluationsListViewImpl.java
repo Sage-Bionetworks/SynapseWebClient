@@ -6,11 +6,11 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.EvaluationCardProps;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactDOM;
-import org.sagebionetworks.web.client.jsinterop.ReactElement;
+import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationRowWidget.EvaluationActionHandler;
+
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -68,10 +68,10 @@ public class AdministerEvaluationsListViewImpl implements AdministerEvaluationsL
 	@Override
 	public void addReactComponent(Evaluation evaluation, EvaluationCardProps props) {
 		ReactComponentDiv container = new ReactComponentDiv();
-		container.setMarginTop(50);
+		container.addStyleName("margin-top-50");
 		rows.add(container);
 
-		ReactElement element = React.createElementWithSynapseContext(SRC.SynapseComponents.EvaluationCard, props, contextPropsProvider.getJsInteropContextProps());
-		ReactDOM.render(element, container.getElement());
+		ReactNode element = React.createElementWithSynapseContext(SRC.SynapseComponents.EvaluationCard, props, contextPropsProvider.getJsInteropContextProps());
+		container.render(element);
 	}
 }

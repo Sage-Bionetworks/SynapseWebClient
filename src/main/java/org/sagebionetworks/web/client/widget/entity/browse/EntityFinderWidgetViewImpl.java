@@ -16,7 +16,7 @@ import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.EntityFinderProps;
 import org.sagebionetworks.web.client.jsinterop.EntityFinderScope;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactDOM;
+import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.jsni.ReferenceJSNIObject;
 import org.sagebionetworks.web.client.widget.HelpWidget;
@@ -128,15 +128,12 @@ public class EntityFinderWidgetViewImpl implements EntityFinderWidgetView {
 						treeOnly
 				);
 
-		ReactDOM.render(
-				React.createElementWithSynapseContext(
-						SRC.SynapseComponents.EntityFinder,
-						props,
-						contextPropsProvider.getJsInteropContextProps()
-				),
-				entityFinderContainer.getElement(),
-				() -> modal.show()
+		ReactNode component = React.createElementWithSynapseContext(
+				SRC.SynapseComponents.EntityFinder,
+				props,
+				contextPropsProvider.getJsInteropContextProps()
 		);
+		entityFinderContainer.render(component);
 		modal.show();
 	}
 

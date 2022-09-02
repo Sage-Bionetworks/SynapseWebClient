@@ -16,17 +16,15 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.jsinterop.AccountLevelBadgeProps;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactDOM;
-import org.sagebionetworks.web.client.jsinterop.ReactElement;
+import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.jsinterop.UserProfileLinksProps;
-import org.sagebionetworks.web.client.jsni.SynapseContextProviderPropsJSNIObject;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 import org.sagebionetworks.web.client.widget.search.GooglePlacesSuggestOracle;
 
-import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -338,26 +336,14 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 	
 	@Override
 	public void setOwnerId(String userId) {
-		_showAccountLevelBadge(accountLevelBadgeContainer.getElement(), userId, propsProvider.getJsniContextProps());
+		ReactNode accountLevelBadgeComponent = React.createElementWithSynapseContext(SRC.SynapseComponents.AccountLevelBadge, AccountLevelBadgeProps.create(userId), propsProvider.getJsInteropContextProps());
+		accountLevelBadgeContainer.render(accountLevelBadgeComponent);
+
 		UserProfileLinksProps props = UserProfileLinksProps.create(userId);
-		ReactElement component = React.createElementWithSynapseContext(SRC.SynapseComponents.UserProfileLinks, props, propsProvider.getJsInteropContextProps());
-		ReactDOM.render(component, userProfileLinksReactComponentContainer.getElement());
+		ReactNode profileLinksComponent = React.createElementWithSynapseContext(SRC.SynapseComponents.UserProfileLinks, props, propsProvider.getJsInteropContextProps());
+		userProfileLinksReactComponentContainer.render(profileLinksComponent);
+
 	}
-	
-	private static native void _showAccountLevelBadge(Element el, String userId, SynapseContextProviderPropsJSNIObject wrapperProps) /*-{
-		try {
-			var props = {
-			  	userId: userId,
-			};
-
-			var component = $wnd.React.createElement($wnd.SRC.SynapseComponents.AccountLevelBadge, props, null);
-			var wrapper = $wnd.React.createElement($wnd.SRC.SynapseContext.SynapseContextProvider, wrapperProps, component);
-
-			$wnd.ReactDOM.render(wrapper, el);
-		} catch (err) {
-			console.error(err);
-		}
-	}-*/;
 
 	@Override
 	public void resetSaveButtonState() {

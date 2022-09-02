@@ -20,8 +20,7 @@ import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.jsinterop.EmptyProps;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactDOM;
-import org.sagebionetworks.web.client.jsinterop.ReactElement;
+import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -30,6 +29,7 @@ import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.presenter.ProjectFilterEnum;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
+import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.table.v2.results.SortableTableHeaderImpl;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
@@ -79,7 +79,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	DivElement settingsTabContainer;
 	@UiField
-	DivElement favoritesTabContainer;
+	ReactComponentDiv favoritesTabContainer;
 
 	@UiField
 	Heading pageHeaderTitle;
@@ -138,10 +138,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	FlowPanel challengesTabContent;
 	@UiField
 	Button moreChallengesButton;
-
-	// Favorites
-	@UiField
-	Div favoritesTabContent;
 
 	// Settings
 	@UiField
@@ -456,9 +452,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			pageHeaderTitle.setText("Your Favorites");
 			
 			EmptyProps props = EmptyProps.create();
-			ReactElement component = React.createElementWithSynapseContext(SRC.SynapseComponents.FavoritesPage, props, propsProvider.getJsInteropContextProps());
-			ReactDOM.render(component, favoritesTabContainer);
-			
+			ReactNode component = React.createElementWithSynapseContext(SRC.SynapseComponents.FavoritesPage, props, propsProvider.getJsInteropContextProps());
+			favoritesTabContainer.render(component);
+
 			DisplayUtils.show(favoritesTabContainer);
 		} else {
 			showErrorMessage("Unrecognized profile tab: " + targetTab.name());

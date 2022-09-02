@@ -12,8 +12,6 @@ public interface ComingSoonView extends IsWidget, SynapseView {
 	 */
 	public void setPresenter(Presenter presenter);
 
-	void showSRCComponent();
-
 	public interface Presenter {
 	}
 }

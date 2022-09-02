@@ -20,8 +20,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.jsinterop.EntityBadgeIconsProps;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactDOM;
-import org.sagebionetworks.web.client.jsinterop.ReactElement;
+import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.jsinterop.SynapseContextProviderProps;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -243,13 +242,13 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 
 	@Override
 	public void setIcons(EntityBadgeIconsProps props, SynapseContextProviderProps providerProps) {
-		ReactElement reactElement = React.createElementWithSynapseContext(
+		ReactNode reactNode = React.createElementWithSynapseContext(
 				SRC.SynapseComponents.EntityBadgeIcons,
 				props,
 				providerProps
 		);
 
-		ReactDOM.render(reactElement, iconsContainer.getElement());
+		iconsContainer.render(reactNode);
 	}
 
 	@Override

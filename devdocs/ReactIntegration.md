@@ -32,30 +32,40 @@ The [SRC class](../src/main/java/org/sagebionetworks/web/client/jsinterop/SRC.ja
 Make sure you specify your prop type in the type parameter, and also make sure that your object name exactly matches the named export in `SynapseComponents`. 
 
 
-### Add a ReactComponentDiv to your View
+### Add a ReactComponentDiv or ReactComponentSpan to your View
 
-While you can append your React component to any element, we have a [ReactComponentDiv](../src/main/java/org/sagebionetworks/web/client/widget/ReactComponentDiv.java) widget that methods specifically for unmounting and rerendering a React component. Add this to your View in code or `*.ui.xml` file, and make sure you can reference it for the next step.
+While you can append your React component to any element, we have [ReactComponentDiv](../src/main/java/org/sagebionetworks/web/client/widget/ReactComponentDiv.java) and [ReactComponentSpan](../src/main/java/org/sagebionetworks/web/client/widget/ReactComponentDiv.java) that contain logic that simplifies managing the lifecycle of a React component. Add this to your View in code or `*.ui.xml` file, and make sure you can reference it for the next step.
+
+### Passing Synapse context
+
+If your application uses Synapse context (e.g. uses authentication to call the Synapse API), then you will also need to pass a context provider.  To do so, you can inject [SynapseContextPropsProvider](../src/main/java/org/sagebionetworks/web/client/context/SynapseContextPropsProvider.java), which will create the wrapping context for you.
 
 ### Render the element
 
 How you manage updating your widget's view will vary based on the scenario, but when you're ready to render the component, this is all you have to do:
 
 ```java
+import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.jsinterop.React;
+
 class MyView {
-    void render() {
-        MyProps props = props.create(/**/);
-        ReactElement reactElement = React.createElement(SRC.SynapseComponents.MyComponent, props);
-        ReactDOM.render(reactElement, reactComponentDiv.getElement());
-    }
+	
+	// Typically injected
+	SynapseContextPropsProvider propsProvider;
+
+	void renderComponent() {
+		MyProps props = props.create(/**/);
+		ReactNode reactNode = React.createElementWithSynapseContext(
+				SRC.SynapseComponents.MyComponent,
+				props,
+				propsProvider.getJsInteropContextProps()
+		);
+		reactComponentDiv.render(reactNode);
+	}
 }
 ```
 
-The React component will render when `MyView.render` is invoked.
-
-If you need to render the component asynchronously, e.g. before a modal is shown, you can use the `ReactDOM.render` overload:
-```
-ReactDOM.render(reactElement, reactComponentDiv.getElement(), () -> modal.show());
-```
+The React component will render when `MyView.renderComponent` is invoked.
 
 ## Notes and Pain Points
 

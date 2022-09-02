@@ -2,13 +2,10 @@ package org.sagebionetworks.web.client.widget;
 
 import org.sagebionetworks.web.client.jsinterop.IconSvgProps;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactDOM;
-import org.sagebionetworks.web.client.jsinterop.ReactElement;
+import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 
-import com.google.gwt.user.client.ui.InlineHTML;
-
-public class IconSvg extends InlineHTML {
+public class IconSvg extends ReactComponentSpan {
 
 	private String icon;
 	private String color;
@@ -25,17 +22,17 @@ public class IconSvg extends InlineHTML {
 		this.size = size;
 		this.padding = padding;
 		this.label = label;
-		render();
+		renderComponent();
 	}
 
-	private void render() {
+	private void renderComponent() {
 		IconSvgProps props = IconSvgProps.create(icon, color, size, padding, label);
-		ReactElement component = React.createElement(SRC.SynapseComponents.IconSvg, props);
-		ReactDOM.render(component, getElement());
+		ReactNode component = React.createElement(SRC.SynapseComponents.IconSvg, props);
+		this.render(component);
 	}
 
 	public void setIcon(String icon) {
 		this.icon = icon;
-		render();
+		renderComponent();
 	}
 }

@@ -51,11 +51,11 @@ public class StatisticsPlotWidgetViewImpl implements StatisticsPlotWidgetView, I
 
 	@Override
 	public void configureAndShow(String projectId, String accessToken) {
-		_createSRCWidget(srcContainer.getElement(), projectId, accessToken, endpoint, propsProvider.getJsniContextProps());
+		_createSRCWidget(srcContainer, projectId, accessToken, endpoint, propsProvider.getJsniContextProps());
 		statsPlotModal.show();
 	}
 
-	private static native void _createSRCWidget(Element el, String projectId, String accessToken, String fullRepoEndpoint, SynapseContextProviderPropsJSNIObject wrapperProps) /*-{
+	private static native void _createSRCWidget(ReactComponentDiv reactComponentDiv, String projectId, String accessToken, String fullRepoEndpoint, SynapseContextProviderPropsJSNIObject wrapperProps) /*-{
 		try {
 			// URL.host returns the domain (that is the hostname) followed by (if a port was specified) a ':' and the port of the URL
 			var repoURL = new URL(fullRepoEndpoint);
@@ -74,8 +74,7 @@ public class StatisticsPlotWidgetViewImpl implements StatisticsPlotWidgetView, I
 
 			var component = $wnd.React.createElement($wnd.SRC.SynapseComponents.StatisticsPlot, props, null)
 			var wrapper = $wnd.React.createElement($wnd.SRC.SynapseContext.SynapseContextProvider, wrapperProps, component)
-
-			$wnd.ReactDOM.render(wrapper, el);
+			reactComponentDiv.@org.sagebionetworks.web.client.widget.ReactComponentDiv::render(Lorg/sagebionetworks/web/client/jsinterop/ReactNode;)(wrapper);
 		} catch (err) {
 			console.error(err);
 		}

@@ -1,50 +1,38 @@
 package org.sagebionetworks.web.client.view;
 
 import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
-import org.sagebionetworks.web.client.jsinterop.EmptyProps;
-import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactDOM;
-import org.sagebionetworks.web.client.jsinterop.ReactElement;
-import org.sagebionetworks.web.client.jsinterop.SRC;
-import org.sagebionetworks.web.client.presenter.OAuthClientEditorPresenter;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 import org.sagebionetworks.web.client.widget.header.Header;
+import org.sagebionetworks.web.client.widget.oauthclient.OAuthClientEditor;
 
-import com.google.gwt.user.client.Window;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class OAuthClientEditorViewImpl implements OAuthClientEditorView {
-    ReactComponentDiv container;
+public class OAuthClientEditorViewImpl extends Composite implements OAuthClientEditorView {
 
-    private OAuthClientEditorPresenter presenter;
-    private SynapseContextPropsProvider propsProvider;
+    public interface OAuthClientEditorViewImplUiBinder extends UiBinder<Widget, OAuthClientEditorViewImpl>{
+    }
+
+    @UiField
+    SimplePanel componentContainer;
     private Header headerWidget;
+    private SynapseContextPropsProvider propsProvider;
 
     @Inject
-    public OAuthClientEditorViewImpl(Header headerWidget, SynapseContextPropsProvider propsProvider) {
-        container = new ReactComponentDiv();
+    public OAuthClientEditorViewImpl(OAuthClientEditorViewImplUiBinder binder, Header headerWidget, SynapseContextPropsProvider propsProvider ) {
+        initWidget(binder.createAndBindUi(this));
         this.headerWidget = headerWidget;
         this.propsProvider = propsProvider;
         headerWidget.configure();
     }
 
     @Override
-    public void setPresenter(OAuthClientEditorPresenter presenter) {
-        this.presenter =presenter;
-        headerWidget.configure();
-        headerWidget.refresh();
-        Window.scrollTo(0,0);
-        render();
-    }
-
-    @Override
-    public Widget asWidget() { return container.asWidget(); }
-
-    @Override
-    public void render() {
-        EmptyProps props = EmptyProps.create();
-        ReactElement component = React.createElementWithSynapseContext(SRC.SynapseComponents.OAuthManagement, props, propsProvider.getJsInteropContextProps());
-        ReactDOM.render(component, container.getElement());
+    public void createReactComponentWidget() {
+        OAuthClientEditor component = new OAuthClientEditor(this.propsProvider);
+        componentContainer.clear();
+        componentContainer.add(component);
     }
 }
