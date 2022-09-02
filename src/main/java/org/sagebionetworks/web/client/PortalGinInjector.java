@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.presenter.AccessRequirementPresenter;
 import org.sagebionetworks.web.client.presenter.AccessRequirementsPresenter;
 import org.sagebionetworks.web.client.presenter.AccountPresenter;
 import org.sagebionetworks.web.client.presenter.BulkPresenterProxy;
+import org.sagebionetworks.web.client.presenter.CertificationQuizPresenter;
 import org.sagebionetworks.web.client.presenter.ChallengeOverviewPresenter;
 import org.sagebionetworks.web.client.presenter.ChangeUsernamePresenter;
 import org.sagebionetworks.web.client.presenter.ComingSoonPresenter;
@@ -381,6 +382,8 @@ public interface PortalGinInjector extends Ginjector {
 	DataAccessManagementPresenter getDataAccessManagementPresenter();
 
 	OAuthClientEditorPresenter getOAuthClientEditorPresenter();
+
+	CertificationQuizPresenter getCertificationQuizPresenter();
 
 	/*
 	 * Markdown Widgets

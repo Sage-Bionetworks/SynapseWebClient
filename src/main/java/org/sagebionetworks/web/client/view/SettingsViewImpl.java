@@ -18,6 +18,7 @@ import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.place.CertificationQuizPlace;
 import org.sagebionetworks.web.client.place.OAuthClientEditorPlace;
 import org.sagebionetworks.web.client.place.PersonalAccessTokenPlace;
 import org.sagebionetworks.web.client.place.Quiz;
@@ -223,7 +224,8 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		resubmitProfileValidationButton.addClickHandler(newVerificationSubmissionCallback);
 
 		unbindButton.addClickHandler(event -> presenter.unbindOrcId());
-		certificationButton.addClickHandler(event -> presenter.goTo(new Quiz("Certification")));
+//		certificationButton.addClickHandler(event -> presenter.goTo(new Quiz("Certification")));
+		certificationButton.addClickHandler(event -> presenter.goTo(new CertificationQuizPlace(ClientProperties.DEFAULT_PLACE_TOKEN)));
 		certificationPassedButton.addClickHandler(event -> DisplayUtils.newWindow("https://help.synapse.org/docs/User-Types.2007072795.html#UserAccountTiers-CertifiedUsers", "_blank", ""));
 		synapseTermsAcceptedButton.addClickHandler(event -> DisplayUtils.newWindow("https://s3.amazonaws.com/static.synapse.org/governance/SageBionetworksSynapseTermsandConditionsofUse.pdf?v=5", "_blank", ""));
 
