@@ -35,7 +35,7 @@ public class ProvenanceListWidget implements ProvenanceListWidgetView.Presenter,
 				.setModalTitle("Find in Synapse")
 				.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
 				.setInitialContainer(EntityFinderWidget.InitialContainer.PROJECT)
-				.setShowVersions(true)
+				.setVersionSelection(EntityFinderWidget.VersionSelection.TRACKED)
 				.setMultiSelect(true)
 				.setSelectableTypes(EntityFilter.ALL)
 				.setSelectedMultiHandler((refs, finder) -> {

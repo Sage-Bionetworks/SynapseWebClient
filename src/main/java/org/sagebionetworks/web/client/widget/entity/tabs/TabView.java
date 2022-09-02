@@ -2,9 +2,11 @@ package org.sagebionetworks.web.client.widget.entity.tabs;
 
 import org.gwtbootstrap3.client.ui.TabPane;
 import org.sagebionetworks.web.client.place.Synapse;
+
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
-public interface TabView {
+public interface TabView extends IsWidget {
 	void setPresenter(Presenter presenter);
 
 	void updateHref(Synapse place);

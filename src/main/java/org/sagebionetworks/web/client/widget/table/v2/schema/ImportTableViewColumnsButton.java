@@ -46,7 +46,7 @@ public class ImportTableViewColumnsButton implements IsWidget {
 				.setMultiSelect(false)
 				.setVisibleTypesInTree(EntityFilter.PROJECT)
 				.setSelectableTypes(EntityFilter.ALL_TABLES)
-				.setShowVersions(true)
+				.setVersionSelection(EntityFinderWidget.VersionSelection.UNTRACKED)
 				.setSelectedHandler((selected, entityFinder) -> onTableViewSelected(selected.getTargetId(), selected.getTargetVersionNumber()))
 				.build();
 		button.addStyleName("margin-left-10");

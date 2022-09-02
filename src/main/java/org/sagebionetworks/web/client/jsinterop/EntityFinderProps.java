@@ -28,7 +28,7 @@ public class EntityFinderProps extends ReactComponentProps {
 
 	OnSelectCallback onSelectedChange;
     boolean selectMultiple;
-    boolean showVersionSelection;
+    String versionSelection;
     @JsNullable
     String initialScope;
     @JsNullable
@@ -45,14 +45,12 @@ public class EntityFinderProps extends ReactComponentProps {
 	SelectedCopyHandler selectedCopy;
     @JsNullable
     boolean treeOnly;
-    @JsNullable
-    boolean mustSelectVersionNumber;
 
     @JsOverlay
     public static EntityFinderProps create(
             OnSelectCallback onSelectedChange,
             boolean selectMultiple,
-            boolean showVersionSelection,
+            String versionSelection,
             EntityFinderScope initialScope,
             String projectId,
             String initialContainer,
@@ -60,13 +58,12 @@ public class EntityFinderProps extends ReactComponentProps {
             List<EntityType> visibleTypesInTree,
             List<EntityType> selectableTypes,
             SelectedCopyHandler selectedCopy,
-            boolean treeOnly,
-            boolean mustSelectVersionNumber
+            boolean treeOnly
     ) {
         EntityFinderProps props = new EntityFinderProps();
         props.onSelectedChange = onSelectedChange;
         props.selectMultiple = selectMultiple;
-        props.showVersionSelection = showVersionSelection;
+		props.versionSelection = versionSelection;
         props.initialScope = initialScope.getValue();
         props.projectId = projectId;
         props.initialContainer = initialContainer;
@@ -84,7 +81,6 @@ public class EntityFinderProps extends ReactComponentProps {
         }
         props.selectedCopy = selectedCopy;
         props.treeOnly = treeOnly;
-        props.mustSelectVersionNumber = mustSelectVersionNumber;
         return props;
     }
 }

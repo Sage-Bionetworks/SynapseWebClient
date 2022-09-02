@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.evaluation;
 
 import java.util.List;
+
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.FormGroup;
@@ -19,20 +20,20 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.EntityFinderScope;
 import org.sagebionetworks.web.client.jsni.SynapseContextProviderPropsJSNIObject;
-import org.sagebionetworks.web.client.place.Synapse;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
-import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 import org.sagebionetworks.web.client.widget.entity.RegisterTeamDialog;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidget;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.FormParams;
+
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -42,7 +43,6 @@ import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -197,7 +197,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 					.setPromptCopy("Find items to Submit to this Challenge")
 					.setMultiSelect(false)
 					.setSelectableTypes(EntityFilter.ALL)
-					.setShowVersions(true)
+					.setVersionSelection(EntityFinderWidget.VersionSelection.UNTRACKED)
 					.setSelectedHandler((selected, finder) -> {
 						if (selected.getTargetId() != null) {
 							selectedReference = selected;
@@ -326,7 +326,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 			// going to need some space
 			modal1.addStyleName("modal-fullscreen");
 			String token = authController.getCurrentUserAccessToken();
-			_showForm(formDiv.getElement(), token, formParams.getContainerSynId(), formParams.getJsonSchemaSynId(), formParams.getUiSchemaSynId(), this, propsProvider.getJsniContextProps());
+			_showForm(formDiv, token, formParams.getContainerSynId(), formParams.getJsonSchemaSynId(), formParams.getUiSchemaSynId(), this, propsProvider.getJsniContextProps());
 		} else {
 			modal1.removeStyleName("modal-fullscreen");
 		}
@@ -344,7 +344,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 		formRef.submitForm();
 	}-*/;
 
-	private static native void _showForm(Element el, String accessToken, String parentContainerSynId, String jsonSchemaSynId, String uiSchemaSynId, EvaluationSubmitterViewImpl view, SynapseContextProviderPropsJSNIObject wrapperProps) /*-{
+	private static native void _showForm(ReactComponentDiv reactComponentDiv, String accessToken, String parentContainerSynId, String jsonSchemaSynId, String uiSchemaSynId, EvaluationSubmitterViewImpl view, SynapseContextProviderPropsJSNIObject wrapperProps) /*-{
 		try {
 			view.@org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitterViewImpl::formRef = $wnd.React
 					.createRef();
@@ -367,9 +367,8 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 			};
 
 			var component = $wnd.React.createElement($wnd.SRC.SynapseComponents.EntityForm, props, null);
-			var wrapper = $wnd.React.createElement($wnd.SRC.SynapseContext.SynapseContextProvider, props, wrapperProps);
-
-			$wnd.ReactDOM.render(wrapper, el);
+			var wrapper = $wnd.React.createElement($wnd.SRC.SynapseContext.SynapseContextProvider, wrapperProps, component);
+            reactComponentDiv.@org.sagebionetworks.web.client.widget.ReactComponentDiv::render(Lorg/sagebionetworks/web/client/jsinterop/ReactNode;)(wrapper);
 		} catch (err) {
 			console.error(err);
 		}

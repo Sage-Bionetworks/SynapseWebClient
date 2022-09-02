@@ -10,7 +10,7 @@ import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnQueryCallback;
 import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnQueryResultBundleCallback;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactDOM;
+import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.FullWidthAlert;
@@ -164,14 +164,12 @@ public class TableEntityWidgetViewImpl extends Composite implements TableEntityW
 	public void setItemsEditorVisible(boolean visible) {
 		itemsEditorContainer.setVisible(visible);
 		if (visible) {
-			ReactDOM.render(
-					React.createElementWithSynapseContext(
-							SRC.SynapseComponents.DatasetItemsEditor,
-							this.presenter.getItemsEditorProps(),
-							propsProvider.getJsInteropContextProps()
-					),
-					itemsEditorContainer.getElement()
+			ReactNode component = React.createElementWithSynapseContext(
+					SRC.SynapseComponents.DatasetItemsEditor,
+					this.presenter.getItemsEditorProps(),
+					propsProvider.getJsInteropContextProps()
 			);
+			itemsEditorContainer.render(component);
 		} else {
 			itemsEditorContainer.clear();
 		}

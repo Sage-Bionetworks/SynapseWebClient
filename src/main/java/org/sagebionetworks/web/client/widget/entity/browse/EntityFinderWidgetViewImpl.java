@@ -16,7 +16,7 @@ import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.EntityFinderProps;
 import org.sagebionetworks.web.client.jsinterop.EntityFinderScope;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactDOM;
+import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.jsni.ReferenceJSNIObject;
 import org.sagebionetworks.web.client.widget.HelpWidget;
@@ -94,7 +94,7 @@ public class EntityFinderWidgetViewImpl implements EntityFinderWidgetView {
 	}
 
 	@Override
-	public void renderComponent(EntityFinderScope initialScope, EntityFinderWidget.InitialContainer initialContainer, String projectId, String initialContainerId, boolean showVersions, boolean multiSelect, EntityFilter selectableEntityTypes, EntityFilter visibleTypesInList, EntityFilter visibleTypesInTree, EntityFinderProps.SelectedCopyHandler selectedCopy, boolean treeOnly, boolean mustSelectVersionNumber) {
+	public void renderComponent(EntityFinderScope initialScope, EntityFinderWidget.InitialContainer initialContainer, String projectId, String initialContainerId, EntityFinderWidget.VersionSelection versionSelection, boolean multiSelect, EntityFilter selectableEntityTypes, EntityFilter visibleTypesInList, EntityFilter visibleTypesInTree, EntityFinderProps.SelectedCopyHandler selectedCopy, boolean treeOnly) {
         entityFinderContainer.clear();
 
         EntityFinderProps.OnSelectCallback onSelected = result -> {
@@ -117,7 +117,7 @@ public class EntityFinderWidgetViewImpl implements EntityFinderWidgetView {
 				EntityFinderProps.create(
 						onSelected,
 						multiSelect,
-						showVersions,
+						versionSelection.name(),
 						initialScope,
 						projectId,
 						getInitialContainerAsString(initialContainer, projectId, initialContainerId),
@@ -125,19 +125,15 @@ public class EntityFinderWidgetViewImpl implements EntityFinderWidgetView {
 						visibleTypesInTree.getEntityQueryValues(),
 						selectableEntityTypes.getEntityQueryValues(),
 						selectedCopy,
-						treeOnly,
-						mustSelectVersionNumber
+						treeOnly
 				);
 
-		ReactDOM.render(
-				React.createElementWithSynapseContext(
-						SRC.SynapseComponents.EntityFinder,
-						props,
-						contextPropsProvider.getJsInteropContextProps()
-				),
-				entityFinderContainer.getElement(),
-				() -> modal.show()
+		ReactNode component = React.createElementWithSynapseContext(
+				SRC.SynapseComponents.EntityFinder,
+				props,
+				contextPropsProvider.getJsInteropContextProps()
 		);
+		entityFinderContainer.render(component);
 		modal.show();
 	}
 

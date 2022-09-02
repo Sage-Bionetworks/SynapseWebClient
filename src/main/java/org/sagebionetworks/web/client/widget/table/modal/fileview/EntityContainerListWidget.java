@@ -84,7 +84,7 @@ public class EntityContainerListWidget implements EntityContainerListWidgetView.
 					.setInitialScope(EntityFinderScope.ALL_PROJECTS)
 					.setInitialContainer(EntityFinderWidget.InitialContainer.SCOPE)
 					.setSelectableTypes(EntityFilter.PROJECT)
-					.setShowVersions(false)
+					.setVersionSelection(EntityFinderWidget.VersionSelection.DISALLOWED)
 					.setHelpMarkdown("Search or Browse Synapse to find " + EntityTypeUtils.getDisplayName(EntityType.project) + "s to put into this " + tableType.getDisplayName())
 					.setPromptCopy("Find " + EntityTypeUtils.getDisplayName(EntityType.project) + "s for this View");
 		} else if (TableType.dataset.equals(tableType)) {
@@ -93,8 +93,7 @@ public class EntityContainerListWidget implements EntityContainerListWidgetView.
 					.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
 					.setInitialContainer(EntityFinderWidget.InitialContainer.PROJECT)
 					.setSelectableTypes(EntityFilter.FILE)
-					.setShowVersions(true)
-					.setMustSelectVersionNumber(true)
+					.setVersionSelection(EntityFinderWidget.VersionSelection.REQUIRED)
 					.setSelectedCopy((count) -> count + " File" + ((count > 1) ? "s" : "") + " Selected")
 					.setHelpMarkdown("Search or Browse Synapse to find " + EntityTypeUtils.getDisplayName(EntityType.file) + "s to add to this " + tableType.getDisplayName())
 					.setPromptCopy("Find and select " + EntityTypeUtils.getDisplayName(EntityType.file) + "s to add to the " + tableType.getDisplayName());
@@ -104,7 +103,7 @@ public class EntityContainerListWidget implements EntityContainerListWidgetView.
 					.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
 					.setInitialContainer(EntityFinderWidget.InitialContainer.PROJECT)
 					.setSelectableTypes(EntityFilter.CONTAINER)
-					.setShowVersions(false)
+					.setVersionSelection(EntityFinderWidget.VersionSelection.DISALLOWED)
 					.setHelpMarkdown("Search or Browse Synapse to find " + EntityTypeUtils.getDisplayName(EntityType.folder) + "s containing items for this " + tableType.getDisplayName())
 					.setPromptCopy("Find and select " + EntityTypeUtils.getDisplayName(EntityType.folder) + "s to add their contents");
 		}

@@ -49,7 +49,7 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 				.setPromptCopy("Find File to add a track")
 				.setMultiSelect(false)
 				.setSelectableTypes(EntityFilter.FILE)
-				.setShowVersions(true)
+				.setVersionSelection(EntityFinderWidget.VersionSelection.TRACKED)
 				.setSelectedHandler((selected, finder) -> entitySelected(selected))
 				.build();
 

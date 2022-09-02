@@ -3,11 +3,12 @@ package org.sagebionetworks.web.client.widget;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.web.client.jsinterop.EntityTypeIconProps;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactDOM;
-import org.sagebionetworks.web.client.jsinterop.ReactElement;
+import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 
 public class EntityTypeIcon extends ReactComponentSpan {
+
+	public EntityTypeIcon() {}
 
 	public EntityTypeIcon(EntityType type) {
 		configure(type);
@@ -15,8 +16,8 @@ public class EntityTypeIcon extends ReactComponentSpan {
 
 	public void configure(EntityType type) {
 		EntityTypeIconProps props = EntityTypeIconProps.create(type);
-		ReactElement component = React.createElement(SRC.SynapseComponents.EntityTypeIcon, props);
-		ReactDOM.render(component, getElement());
+		ReactNode component = React.createElement(SRC.SynapseComponents.EntityTypeIcon, props);
+		this.render(component);
 	}
 
 	public void setType(EntityType type) {

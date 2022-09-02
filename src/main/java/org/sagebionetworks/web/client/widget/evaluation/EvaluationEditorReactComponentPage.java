@@ -1,6 +1,15 @@
 package org.sagebionetworks.web.client.widget.evaluation;
 
 
+import org.gwtbootstrap3.client.ui.Anchor;
+import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.jsinterop.EvaluationEditorPageProps;
+import org.sagebionetworks.web.client.jsinterop.React;
+import org.sagebionetworks.web.client.jsinterop.ReactDOM;
+import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.SRC;
+import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -8,13 +17,6 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import org.gwtbootstrap3.client.ui.Anchor;
-import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
-import org.sagebionetworks.web.client.jsinterop.EvaluationEditorPageProps;
-import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactDOM;
-import org.sagebionetworks.web.client.jsinterop.SRC;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 
 public class EvaluationEditorReactComponentPage extends Composite {
 	public interface Binder extends UiBinder<Widget, EvaluationEditorReactComponentPage> {}
@@ -51,9 +53,8 @@ public class EvaluationEditorReactComponentPage extends Composite {
 	protected void onLoad() {
 		super.onLoad();
 		EvaluationEditorPageProps editorProps = EvaluationEditorPageProps.create(evaluationId, entityId, this.onPageBack);
-		ReactDOM.render(
-				React.createElementWithSynapseContext(SRC.SynapseComponents.EvaluationEditorPage, editorProps, propsProvider.getJsInteropContextProps()),
-				evaluationEditorContainer.getElement());
+		ReactNode component = React.createElementWithSynapseContext(SRC.SynapseComponents.EvaluationEditorPage, editorProps, propsProvider.getJsInteropContextProps());
+		evaluationEditorContainer.render(component);
 	}
 
 	@UiHandler(value={"backToChallenge"})

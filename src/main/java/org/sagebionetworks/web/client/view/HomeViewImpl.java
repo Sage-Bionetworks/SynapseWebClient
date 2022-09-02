@@ -1,12 +1,13 @@
 package org.sagebionetworks.web.client.view;
 
 import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
-import org.sagebionetworks.web.client.jsni.SynapseContextProviderPropsJSNIObject;
+import org.sagebionetworks.web.client.jsinterop.React;
+import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.SRC;
+import org.sagebionetworks.web.client.jsinterop.SynapseHomepageProps;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 import org.sagebionetworks.web.client.widget.header.Header;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.Element;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -27,22 +28,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 	private Header headerWidget;
 	private SynapseContextPropsProvider propsProvider;
 
-	private static native void _showHomepageComponent(Element el, String projectViewId, SynapseContextProviderPropsJSNIObject wrapperProps) /*-{
-		try {
-			var props = {
-				projectViewId: projectViewId,
-			};
-
-			var component = $wnd.React.createElement($wnd.SRC.SynapseComponents.SynapseHomepage, props, null);
-			var wrapper = $wnd.React.createElement($wnd.SRC.SynapseContext.SynapseContextProvider, wrapperProps, component);
-
-			$wnd.ReactDOM.render(wrapper, el);
-		} catch (err) {
-			console.error(err);
-		}
-	}-*/;
-
-
 	@Inject
 	public HomeViewImpl(HomeViewImplUiBinder binder, Header headerWidget, final SynapseContextPropsProvider propsProvider) {
 		initWidget(binder.createAndBindUi(this));
@@ -56,8 +41,13 @@ public class HomeViewImpl extends Composite implements HomeView {
 	@Override
 	public void render() {
 		scrollToTop();
-		SynapseContextProviderPropsJSNIObject wrapperProps = propsProvider.getJsniContextProps();
-		_showHomepageComponent(container.getElement(), PROJECT_VIEW_ID, wrapperProps);
+		SynapseHomepageProps props = SynapseHomepageProps.create(PROJECT_VIEW_ID);
+		ReactNode component = React.createElementWithSynapseContext(
+				SRC.SynapseComponents.SynapseHomepage,
+				props,
+				propsProvider.getJsInteropContextProps()
+		);
+		container.render(component);
 	}
 
 

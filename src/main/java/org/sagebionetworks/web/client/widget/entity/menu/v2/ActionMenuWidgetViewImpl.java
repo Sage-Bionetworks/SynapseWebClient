@@ -11,11 +11,9 @@ import org.gwtbootstrap3.client.ui.DropDownHeader;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
-import org.gwtbootstrap3.client.ui.constants.Trigger;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactDOM;
-import org.sagebionetworks.web.client.jsinterop.ReactElement;
+import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.jsinterop.SkeletonButtonProps;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
@@ -116,8 +114,8 @@ public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 	@Override
 	public void updateVisibleActions(int numActions, boolean isLoading) {
 		if (isLoading) {
-			ReactElement component = React.createElement(SRC.SynapseComponents.SkeletonButton, SkeletonButtonProps.create("Tools Menu"));
-			ReactDOM.render(component, skeletonButton.getElement());
+			ReactNode component = React.createElement(SRC.SynapseComponents.SkeletonButton, SkeletonButtonProps.create("Tools Menu"));
+			skeletonButton.render(component);
 			skeletonButton.setVisible(true);
 			dropdown.setVisible(false);
 			singleActionButton.setVisible(false);

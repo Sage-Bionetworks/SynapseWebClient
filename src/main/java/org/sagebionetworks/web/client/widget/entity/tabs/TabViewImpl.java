@@ -137,4 +137,9 @@ public class TabViewImpl implements TabView {
 	public boolean isActive() {
 		return isActive;
 	}
+
+	@Override
+	public Widget asWidget() {
+		return widget;
+	}
 }
