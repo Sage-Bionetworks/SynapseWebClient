@@ -18,7 +18,6 @@ import org.sagebionetworks.web.client.place.ACTPlace;
 import org.sagebionetworks.web.client.place.AccessRequirementPlace;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.place.Account;
-import org.sagebionetworks.web.client.place.CertificationQuizPlace;
 import org.sagebionetworks.web.client.place.Challenges;
 import org.sagebionetworks.web.client.place.ChangeUsername;
 import org.sagebionetworks.web.client.place.ComingSoon;
@@ -690,20 +689,6 @@ public class BulkPresenterProxy extends AbstractActivity {
 					loadError(caught);
 				}
 			});
-		} else if (place instanceof CertificationQuizPlace) {
-			GWT.runAsync(CertificationQuizPlace.class, new RunAsyncCallback() {
-				@Override
-				public void onSuccess(){
-					CertificationQuizPresenter presenter = ginjector.getCertificationQuizPresenter();
-					presenter.setPlace((CertificationQuizPlace) place);
-					presenter.start(panel, eventBus);
-				}
-				@Override
-				public void onFailure(Throwable caught) {
-					loadError(caught);
-				}
-			});
-
 		} else {
 			// Log that we have an unknown place but send the user to the default
 			log.log(Level.WARNING, "Unknown Place: " + place.getClass().getName());

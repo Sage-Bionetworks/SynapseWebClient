@@ -7,7 +7,6 @@ import org.sagebionetworks.web.client.place.ACTPlace;
 import org.sagebionetworks.web.client.place.AccessRequirementPlace;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.place.Account;
-import org.sagebionetworks.web.client.place.CertificationQuizPlace;
 import org.sagebionetworks.web.client.place.Challenges;
 import org.sagebionetworks.web.client.place.ChangeUsername;
 import org.sagebionetworks.web.client.place.ComingSoon;
@@ -92,7 +91,6 @@ import com.google.gwt.place.shared.WithTokenizers;
 		DownloadCartPlace.Tokenizer.class,
 		DataAccessManagementPlace.Tokenizer.class,
 		OAuthClientEditorPlace.Tokenizer.class,
-		CertificationQuizPlace.Tokenizer.class
 })
 public interface AppPlaceHistoryMapper extends PlaceHistoryMapper {
 }

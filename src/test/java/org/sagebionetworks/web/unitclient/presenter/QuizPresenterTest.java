@@ -37,6 +37,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.presenter.QuestionContainerWidget;
 import org.sagebionetworks.web.client.presenter.QuizPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.view.CertificationQuizView;
 import org.sagebionetworks.web.client.view.QuizView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -47,6 +48,8 @@ public class QuizPresenterTest {
 
 	QuizPresenter presenter;
 	QuizView mockView;
+	CertificationQuizView mockSRCView;
+
 	SynapseClientAsync mockSynapseClient;
 	AuthenticationController mockAuthenticationController;
 	GlobalApplicationState mockGlobalApplicationState;
@@ -71,7 +74,7 @@ public class QuizPresenterTest {
 		mockPassingRecord = mock(PassingRecord.class);
 		mockQuestionResponse = mock(MultichoiceResponse.class);
 		mockSynAlert = mock(SynapseAlert.class);
-		presenter = new QuizPresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseClient, adapterFactory, adapter, mockInjector, mockSynAlert);
+		presenter = new QuizPresenter(mockView, mockSRCView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseClient, adapterFactory, adapter, mockInjector, mockSynAlert);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserProfile()).thenReturn(new UserProfile());
 		when(mockInjector.getQuestionContainerWidget()).thenReturn(mockQuestionContainer);
