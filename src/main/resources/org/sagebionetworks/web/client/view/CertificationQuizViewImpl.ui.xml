@@ -4,7 +4,7 @@
     <g:HTMLPanel>
         <div>
             <div class="pageHeader">
-                <h3 class="pageHeaderTitle">OAuth Client Manager</h3>
+                <h3 class="pageHeaderTitle">Certification Quiz</h3>
                 <g:SimplePanel ui:field="synAlertPanel"
                                addStyleNames="clearright clearfix" />
             </div>
