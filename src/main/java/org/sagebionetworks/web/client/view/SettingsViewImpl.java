@@ -18,7 +18,6 @@ import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.OAuthClientEditorPlace;
 import org.sagebionetworks.web.client.place.PersonalAccessTokenPlace;
 import org.sagebionetworks.web.client.place.Quiz;
@@ -156,11 +155,9 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	Button synapseTermsAcceptedButton;
 	private Presenter presenter;
 
-
 	@Inject
-	public SettingsViewImpl(SettingsViewImplUiBinder binder, final SynapseJSNIUtils jsniUtils, CookieProvider cookies) {
+	public SettingsViewImpl(SettingsViewImplUiBinder binder, final SynapseJSNIUtils jsniUtils) {
 		initWidget(binder.createAndBindUi(this));
-		boolean isInAlpha = DisplayUtils.isInTestWebsite(cookies);
 		ClickHandler notificationsClickHandler = getNotificationsClickHandler();
 		emailNotificationsCheckbox.addClickHandler(notificationsClickHandler);
 
@@ -225,7 +222,6 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		resubmitProfileValidationButton.addClickHandler(newVerificationSubmissionCallback);
 
 		unbindButton.addClickHandler(event -> presenter.unbindOrcId());
-
 		certificationButton.addClickHandler(event -> presenter.goTo(new Quiz("Certification")));
 		certificationPassedButton.addClickHandler(event -> DisplayUtils.newWindow("https://help.synapse.org/docs/User-Types.2007072795.html#UserAccountTiers-CertifiedUsers", "_blank", ""));
 		synapseTermsAcceptedButton.addClickHandler(event -> DisplayUtils.newWindow("https://s3.amazonaws.com/static.synapse.org/governance/SageBionetworksSynapseTermsandConditionsofUse.pdf?v=5", "_blank", ""));

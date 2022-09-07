@@ -90,7 +90,7 @@ import com.google.gwt.place.shared.WithTokenizers;
 		PersonalAccessTokenPlace.Tokenizer.class,
 		DownloadCartPlace.Tokenizer.class,
 		DataAccessManagementPlace.Tokenizer.class,
-		OAuthClientEditorPlace.Tokenizer.class,
+		OAuthClientEditorPlace.Tokenizer.class
 })
 public interface AppPlaceHistoryMapper extends PlaceHistoryMapper {
 }

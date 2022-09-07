@@ -31,9 +31,11 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.presenter.QuestionContainerWidget;
 import org.sagebionetworks.web.client.presenter.QuizPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -49,7 +51,7 @@ public class QuizPresenterTest {
 	QuizPresenter presenter;
 	QuizView mockView;
 	CertificationQuizView mockSRCView;
-
+	CookieProvider mockCookieProvider;
 	SynapseClientAsync mockSynapseClient;
 	AuthenticationController mockAuthenticationController;
 	GlobalApplicationState mockGlobalApplicationState;
@@ -66,6 +68,7 @@ public class QuizPresenterTest {
 	@Before
 	public void setup() throws JSONObjectAdapterException {
 		mockView = mock(QuizView.class);
+		mockSRCView = mock(CertificationQuizView.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
@@ -73,6 +76,8 @@ public class QuizPresenterTest {
 		mockInjector = mock(PortalGinInjector.class);
 		mockPassingRecord = mock(PassingRecord.class);
 		mockQuestionResponse = mock(MultichoiceResponse.class);
+		mockCookieProvider = mock(CookieProvider.class);
+		when(mockInjector.getCookieProvider()).thenReturn(mockCookieProvider);
 		mockSynAlert = mock(SynapseAlert.class);
 		presenter = new QuizPresenter(mockView, mockSRCView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseClient, adapterFactory, adapter, mockInjector, mockSynAlert);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
@@ -186,6 +191,7 @@ public class QuizPresenterTest {
 
 	@Test
 	public void testGetQuiz() {
+		when(mockCookieProvider.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn(null);
 		presenter.getQuiz();
 		verify(mockSynapseClient).getCertificationQuiz(any(AsyncCallback.class));
 		ArgumentCaptor<Quiz> arg = ArgumentCaptor.forClass(Quiz.class);
@@ -197,6 +203,7 @@ public class QuizPresenterTest {
 
 	@Test
 	public void testGetQuizFailure() {
+		when(mockCookieProvider.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn(null);
 		Exception caught = new Exception("unhandled exception");
 		AsyncMockStubber.callFailureWith(caught).when(mockSynapseClient).getCertificationQuiz(any(AsyncCallback.class));
 		presenter.getQuiz();
@@ -208,6 +215,7 @@ public class QuizPresenterTest {
 
 	@Test
 	public void testSubmitAnswersPass() throws JSONObjectAdapterException {
+		when(mockCookieProvider.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn(null);
 		Map<Long, QuestionContainerWidget> questionWidgetMap = new HashMap<Long, QuestionContainerWidget>();
 		// let's say I have 2 answers
 		QuestionContainerWidget mockQuestionOne = mock(QuestionContainerWidget.class);
@@ -243,6 +251,7 @@ public class QuizPresenterTest {
 
 	@Test
 	public void testSubmitAnswersFailed() throws JSONObjectAdapterException {
+		when(mockCookieProvider.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn(null);
 		when(mockPassingRecord.getPassed()).thenReturn(false);
 		setPassingRecordResponse(mockPassingRecord);
 		presenter.submitAnswers();
@@ -253,6 +262,7 @@ public class QuizPresenterTest {
 
 	@Test
 	public void testSubmitAnswersError() throws JSONObjectAdapterException {
+		when(mockCookieProvider.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn(null);
 		Exception caught = new Exception("unhandled");
 		AsyncMockStubber.callFailureWith(caught).when(mockSynapseClient).submitCertificationQuizResponse(any(QuizResponse.class), any(AsyncCallback.class));
 		presenter.submitAnswers();
@@ -261,6 +271,7 @@ public class QuizPresenterTest {
 
 	@Test
 	public void testShowQuizFromPassingRecord() {
+		when(mockCookieProvider.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn(null);
 		configureMockPassingRecord(mockQuiz());
 		presenter.showQuizFromPassingRecord(mockPassingRecord);
 		verify(mockView, Mockito.times(5)).addQuestionContainerWidget(any(Widget.class));
@@ -268,6 +279,7 @@ public class QuizPresenterTest {
 
 	@Test
 	public void testShowQuiz() {
+		when(mockCookieProvider.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn(null);
 		presenter.showQuiz(mockQuiz());
 		verify(mockView, Mockito.times(5)).addQuestionContainerWidget(any(Widget.class));
 	}

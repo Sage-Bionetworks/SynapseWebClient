@@ -51,21 +51,18 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 
 	@Inject
 	public QuizPresenter(QuizView view, CertificationQuizView srcView, AuthenticationController authenticationController, GlobalApplicationState globalApplicationState, SynapseClientAsync synapseClient, AdapterFactory adapterFactory, JSONObjectAdapter jsonObjectAdapter, PortalGinInjector ginInjector, SynapseAlert synAlert) {
-		if(DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider())){
-			this.SRCview = srcView;
-		} else {
-			this.view = view;
-			// Set the presenter on the view
-			this.authenticationController = authenticationController;
-			this.globalApplicationState = globalApplicationState;
-			this.synapseClient = synapseClient;
-			fixServiceEntryPoint(synapseClient);
-			this.adapterFactory = adapterFactory;
-			this.ginInjector = ginInjector;
-			this.synAlert = synAlert;
-			this.view.setPresenter(this);
-			view.setSynAlertWidget(synAlert.asWidget());
-		}
+		// Set the presenter on the view
+		this.authenticationController = authenticationController;
+		this.globalApplicationState = globalApplicationState;
+		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
+		this.adapterFactory = adapterFactory;
+		this.ginInjector = ginInjector;
+		this.synAlert = synAlert;
+		this.SRCview = srcView;
+		this.view = view;
+		this.view.setPresenter(this);
+		view.setSynAlertWidget(synAlert.asWidget());
 	}
 
 	@Override

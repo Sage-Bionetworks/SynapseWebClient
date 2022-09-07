@@ -678,12 +678,11 @@ public class BulkPresenterProxy extends AbstractActivity {
 		} else if (place instanceof OAuthClientEditorPlace) {
 			GWT.runAsync(OAuthClientEditorPlace.class, new RunAsyncCallback() {
 				@Override
-				public void onSuccess() {
+				public void onSuccess(){
 					OAuthClientEditorPresenter presenter = ginjector.getOAuthClientEditorPresenter();
 					presenter.setPlace((OAuthClientEditorPlace) place);
 					presenter.start(panel, eventBus);
 				}
-
 				@Override
 				public void onFailure(Throwable caught) {
 					loadError(caught);
