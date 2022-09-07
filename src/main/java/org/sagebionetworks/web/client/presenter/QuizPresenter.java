@@ -237,12 +237,8 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 
 	@Override
 	public void setPlace(org.sagebionetworks.web.client.place.Quiz place) {
-		if(DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider())){
-			this.place = place;
-		} else {
-			view.setPresenter(this);
-			view.clear();
-		}
+		view.setPresenter(this);
+		view.clear();
 		getIsCertified();
 	}
 
