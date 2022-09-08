@@ -1,0 +1,16 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui">
+    <g:HTMLPanel>
+        <div>
+            <div class="pageHeader">
+                <h3 class="pageHeaderTitle">Certification Quiz</h3>
+                <g:SimplePanel ui:field="synAlertPanel"
+                               addStyleNames="clearright clearfix" />
+            </div>
+            <div class="pageContent margin-top-60">
+                <g:SimplePanel ui:field="quizContainer"></g:SimplePanel>
+            </div>
+        </div>
+    </g:HTMLPanel>
+</ui:UiBinder>

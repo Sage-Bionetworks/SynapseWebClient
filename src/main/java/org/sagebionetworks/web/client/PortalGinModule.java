@@ -39,6 +39,8 @@ import org.sagebionetworks.web.client.view.ACTView;
 import org.sagebionetworks.web.client.view.ACTViewImpl;
 import org.sagebionetworks.web.client.view.AccountView;
 import org.sagebionetworks.web.client.view.AccountViewImpl;
+import org.sagebionetworks.web.client.view.CertificationQuizView;
+import org.sagebionetworks.web.client.view.CertificationQuizViewImpl;
 import org.sagebionetworks.web.client.view.ChallengeOverviewView;
 import org.sagebionetworks.web.client.view.ChallengeOverviewViewImpl;
 import org.sagebionetworks.web.client.view.ChangeUsernameView;
@@ -916,6 +918,9 @@ public class PortalGinModule extends AbstractGinModule {
 
         // OAuthClientEditor
         bind(OAuthClientEditorView.class).to(OAuthClientEditorViewImpl.class).in(Singleton.class);
+
+        // CertificationQuiz
+        bind(CertificationQuizView.class).to(CertificationQuizViewImpl.class).in(Singleton.class);
 
 		/*
 		 * Widgets

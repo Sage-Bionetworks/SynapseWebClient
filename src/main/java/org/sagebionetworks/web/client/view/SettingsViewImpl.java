@@ -158,7 +158,6 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	@Inject
 	public SettingsViewImpl(SettingsViewImplUiBinder binder, final SynapseJSNIUtils jsniUtils) {
 		initWidget(binder.createAndBindUi(this));
-
 		ClickHandler notificationsClickHandler = getNotificationsClickHandler();
 		emailNotificationsCheckbox.addClickHandler(notificationsClickHandler);
 
