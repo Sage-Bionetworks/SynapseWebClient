@@ -52,7 +52,7 @@ public class QueryWrapperPlotNavProps extends ReactComponentProps {
 		props.onQueryChange = onQueryChange;
 		props.onQueryResultBundleChange = onQueryResultBundleChange;
 		props.tableConfiguration = SynapseTableProps.create();
-		props.shouldDeepLink = true;
+		props.shouldDeepLink = false;
 		props.name = "Items";
 		props.downloadCartPageUrl = "#!DownloadCart:0";
 		props.showLastUpdatedOn = true;
