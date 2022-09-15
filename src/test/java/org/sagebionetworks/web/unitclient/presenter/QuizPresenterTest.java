@@ -31,22 +31,30 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.presenter.QuestionContainerWidget;
 import org.sagebionetworks.web.client.presenter.QuizPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.view.CertificationQuizView;
 import org.sagebionetworks.web.client.view.QuizView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
+
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 public class QuizPresenterTest {
 
 	QuizPresenter presenter;
 	QuizView mockView;
+	CertificationQuizView mockSRCView;
+	CookieProvider mockCookieProvider;
 	SynapseClientAsync mockSynapseClient;
 	AuthenticationController mockAuthenticationController;
 	GlobalApplicationState mockGlobalApplicationState;
@@ -58,11 +66,14 @@ public class QuizPresenterTest {
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	JSONObjectAdapter adapter = new JSONObjectAdapterImpl();
 	org.sagebionetworks.web.client.place.Quiz place;
+	AcceptsOneWidget mockPanel;
+	EventBus mockEventBus;
 
 
 	@Before
 	public void setup() throws JSONObjectAdapterException {
 		mockView = mock(QuizView.class);
+		mockSRCView = mock(CertificationQuizView.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
@@ -70,8 +81,13 @@ public class QuizPresenterTest {
 		mockInjector = mock(PortalGinInjector.class);
 		mockPassingRecord = mock(PassingRecord.class);
 		mockQuestionResponse = mock(MultichoiceResponse.class);
+		mockCookieProvider = mock(CookieProvider.class);
+		mockPanel = mock(AcceptsOneWidget.class);
+		mockEventBus = mock(EventBus.class);
+		when(mockInjector.getCookieProvider()).thenReturn(mockCookieProvider);
 		mockSynAlert = mock(SynapseAlert.class);
-		presenter = new QuizPresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseClient, adapterFactory, adapter, mockInjector, mockSynAlert);
+		presenter = new QuizPresenter(mockView, mockSRCView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseClient, adapterFactory, adapter, mockInjector, mockSynAlert);
+		when(mockCookieProvider.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn(null);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserProfile()).thenReturn(new UserProfile());
 		when(mockInjector.getQuestionContainerWidget()).thenReturn(mockQuestionContainer);
@@ -190,6 +206,15 @@ public class QuizPresenterTest {
 		verify(mockView).hideLoading();
 		// mock quiz has 5 questions
 		verify(mockView, Mockito.times(5)).addQuestionContainerWidget(any(Widget.class));
+	}
+
+	@Test
+	public void testAlphaMode() {
+		when(mockCookieProvider.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("true");
+
+		presenter.start(mockPanel, mockEventBus);
+		verify(mockPanel).setWidget(mockSRCView);
+		verify(mockSRCView).createReactComponentWidget();
 	}
 
 	@Test

@@ -16,7 +16,7 @@
 				addStyleNames="margin-left-5" placement="BOTTOM" />
 		</b:ModalHeader>
 		<b:ModalBody>
-			<bh:Paragraph ui:field="promptCopy"></bh:Paragraph>
+			<bh:Paragraph ui:field="promptCopy" addStyleNames="fit-within-parent"></bh:Paragraph>
 			<w:ReactComponentDiv ui:field="entityFinderContainer" />
 			<g:SimplePanel ui:field="synAlertPanel" addStyleNames="synAlertPanel" />
 		</b:ModalBody>

@@ -18,11 +18,13 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.view.CertificationQuizView;
 import org.sagebionetworks.web.client.view.QuizView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -44,10 +46,11 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 	private PortalGinInjector ginInjector;
 	private Map<Long, QuestionContainerWidget> questionNumberToQuestionWidget = new HashMap<Long, QuestionContainerWidget>();
 	private SynapseAlert synAlert;
+	private CertificationQuizView SRCview;
+	private org.sagebionetworks.web.client.place.Quiz place;
 
 	@Inject
-	public QuizPresenter(QuizView view, AuthenticationController authenticationController, GlobalApplicationState globalApplicationState, SynapseClientAsync synapseClient, AdapterFactory adapterFactory, JSONObjectAdapter jsonObjectAdapter, PortalGinInjector ginInjector, SynapseAlert synAlert) {
-		this.view = view;
+	public QuizPresenter(QuizView view, CertificationQuizView srcView, AuthenticationController authenticationController, GlobalApplicationState globalApplicationState, SynapseClientAsync synapseClient, AdapterFactory adapterFactory, JSONObjectAdapter jsonObjectAdapter, PortalGinInjector ginInjector, SynapseAlert synAlert) {
 		// Set the presenter on the view
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
@@ -56,13 +59,20 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 		this.adapterFactory = adapterFactory;
 		this.ginInjector = ginInjector;
 		this.synAlert = synAlert;
+		this.SRCview = srcView;
+		this.view = view;
 		this.view.setPresenter(this);
-		view.setSynAlertWidget(synAlert.asWidget());		
+		view.setSynAlertWidget(synAlert.asWidget());
 	}
 
 	@Override
 	public void start(AcceptsOneWidget panel, EventBus eventBus) {
-		panel.setWidget(this.view.asWidget());
+		if(DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider())){
+			panel.setWidget(SRCview);
+			SRCview.createReactComponentWidget();
+		} else {
+			panel.setWidget(this.view.asWidget());
+		}
 	}
 
 	@Override
@@ -285,4 +295,5 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 		};
 		synapseClient.getCertificationQuiz(callback);
 	}
+
 }
