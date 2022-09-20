@@ -49,7 +49,7 @@ public class WebConstants {
 	// copied from org.sagebionetworks.repo.model.principal.AliasEnum.USER_NAME and USER_EMAIL, added
 	// uppercase support
 	public static final String VALID_USERNAME_REGEX = "^[A-Za-z0-9._-]{3,}";
-	public static final String VALID_EMAIL_REGEX = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}";
+	public static final String VALID_EMAIL_REGEX = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]+";
 	public static final String WIDGET_NAME_REGEX = "[a-z,A-Z,0-9,., ,\\-,\\+,(,)]";
 	public static final String VALID_WIDGET_NAME_REGEX = "^" + WIDGET_NAME_REGEX + "+";
 	public static final String VALID_ENTITY_ID_REGEX = "^[Ss]{1}[Yy]{1}[Nn]{1}\\d+";
