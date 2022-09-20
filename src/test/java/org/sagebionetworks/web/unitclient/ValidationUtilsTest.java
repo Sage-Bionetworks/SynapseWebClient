@@ -35,4 +35,12 @@ public class ValidationUtilsTest {
 		assertFalse(ValidationUtils.isValidUrl(null, false));
 	}
 
+	@Test
+	public void testIsValidEmail() {
+		assertTrue(ValidationUtils.isValidEmail("test@testing.com"));
+		assertTrue(ValidationUtils.isValidEmail("userNAME+123@mail.photography"));
+
+		assertFalse(ValidationUtils.isValidEmail("not-a-valid-email"));
+		assertFalse(ValidationUtils.isValidEmail("Also@NotA@ValidEmail"));
+	}
 }
