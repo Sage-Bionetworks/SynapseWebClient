@@ -41,7 +41,7 @@ import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.EntityId2BundleCache;
-import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.context.QueryClientProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.jsinterop.reactquery.QueryClient;
 import org.sagebionetworks.web.client.jsinterop.reactquery.SynapseReactClientQueryKey;
@@ -111,7 +111,7 @@ public class EntityPresenterTest {
 	@Mock
 	FileEntity mockFileEntity;
 	@Mock
-	SynapseContextPropsProvider mockSynapseContextPropsProvider;
+	QueryClientProvider mockQueryClientProvider;
 	@Mock
 	QueryClient mockQueryClient;
 	@Captor
@@ -121,8 +121,8 @@ public class EntityPresenterTest {
 	public void setup() throws Exception {
 		when(mockEntityPresenterEventBinder.getEventBinder()).thenReturn(mockEventBinder);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		when(mockSynapseContextPropsProvider.getQueryClient()).thenReturn(mockQueryClient);
-		entityPresenter = new EntityPresenter(mockView, mockEntityPresenterEventBinder, mockGlobalApplicationState, mockAuthenticationController, mockSynapseJavascriptClient, mockSynAlert, mockEntityPageTop, mockHeaderWidget, mockOpenInviteWidget, mockGwtWrapper, mockEventBus, mockSynapseContextPropsProvider);
+		when(mockQueryClientProvider.getQueryClient()).thenReturn(mockQueryClient);
+		entityPresenter = new EntityPresenter(mockView, mockEntityPresenterEventBinder, mockGlobalApplicationState, mockAuthenticationController, mockSynapseJavascriptClient, mockSynAlert, mockEntityPageTop, mockHeaderWidget, mockOpenInviteWidget, mockGwtWrapper, mockEventBus, mockQueryClientProvider);
 		Entity testEntity = new Project();
 		eb = new EntityBundle();
 		eb.setEntity(testEntity);

@@ -10,4 +10,6 @@ public class QueryClient {
     public QueryClient(QueryClientOptions config) {}
 
 	public native void resetQueries(List<SynapseReactClientQueryKey> queryKey);
+
+	public native void clear();
 }

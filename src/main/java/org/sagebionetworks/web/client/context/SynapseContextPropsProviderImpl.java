@@ -7,37 +7,24 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.jsinterop.SynapseContextJsObject;
 import org.sagebionetworks.web.client.jsinterop.SynapseContextProviderProps;
-import org.sagebionetworks.web.client.jsinterop.reactquery.QueryClient;
-import org.sagebionetworks.web.client.jsinterop.reactquery.QueryClientOptions;
 import org.sagebionetworks.web.client.jsni.QueryClientJSNIObject;
 import org.sagebionetworks.web.client.jsni.SynapseContextJSNIObject;
 import org.sagebionetworks.web.client.jsni.SynapseContextProviderPropsJSNIObject;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 
-import jsinterop.annotations.JsPackage;
-import jsinterop.annotations.JsProperty;
-
 public class SynapseContextPropsProviderImpl implements SynapseContextPropsProvider {
     private AuthenticationController authController;
     private GlobalApplicationState globalApplicationState;
     private CookieProvider cookies;
+    private QueryClientProvider queryClientProvider;
 
-    private static QueryClient queryClientSingleton = new QueryClient(QueryClientOptions.create());
-
-    // We save the queryClient in a global variable so we can access it from JSNI
-    @JsProperty(namespace = JsPackage.GLOBAL, name="SynapseQueryClient")
-    static native void setQueryClient(QueryClient queryClient);
-
-	public QueryClient getQueryClient() {
-		return queryClientSingleton;
-	}
 
     @Inject
-    SynapseContextPropsProviderImpl(final AuthenticationController authController, final GlobalApplicationState globalApplicationState, final CookieProvider cookies) {
+    SynapseContextPropsProviderImpl(final AuthenticationController authController, final GlobalApplicationState globalApplicationState, final CookieProvider cookies, final QueryClientProvider queryClientProvider) {
         this.authController = authController;
         this.globalApplicationState = globalApplicationState;
         this.cookies = cookies;
-        setQueryClient(queryClientSingleton);
+        this.queryClientProvider = queryClientProvider;
     }
 
     @Override
@@ -48,7 +35,7 @@ public class SynapseContextPropsProviderImpl implements SynapseContextPropsProvi
                     DisplayUtils.isInTestWebsite(cookies),
                     globalApplicationState.isShowingUTCTime()
                 ),
-                queryClientSingleton
+                queryClientProvider.getQueryClient()
         );
     }
 

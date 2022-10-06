@@ -14,6 +14,8 @@ import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cache.SessionStorageImpl;
 import org.sagebionetworks.web.client.cache.StorageImpl;
 import org.sagebionetworks.web.client.cache.StorageWrapper;
+import org.sagebionetworks.web.client.context.QueryClientProvider;
+import org.sagebionetworks.web.client.context.QueryClientProviderImpl;
 import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
 import org.sagebionetworks.web.client.context.SynapseContextPropsProviderImpl;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -1255,7 +1257,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(TableQueryResultWikiWidgetView.class).to(TableQueryResultWikiWidgetViewImpl.class);
 
 		bind(SingleButtonView.class).to(SingleButtonViewImpl.class);
-		
+
 		bind(AnnotationTransformer.class).to(AnnotationTransformerImpl.class).in(Singleton.class);
 		bind(AnnotationEditorView.class).to(AnnotationEditorViewImpl.class);
 		bind(EditAnnotationsDialogView.class).to(EditAnnotationsDialogViewImpl.class);
@@ -1281,7 +1283,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(PreviewConfigView.class).to(PreviewConfigViewImpl.class);
 		bind(SynapseFormConfigView.class).to(SynapseFormConfigViewImpl.class);
 		bind(DownloadCartPageView.class).to(DownloadCartPageViewImpl.class);
-		
+
 		bind(EditFileMetadataModalView.class).to(EditFileMetadataModalViewImpl.class);
 		bind(EditFileMetadataModalWidget.class).to(EditFileMetadataModalWidgetImpl.class);
 		bind(EditProjectMetadataModalView.class).to(EditProjectMetadataModalViewImpl.class);
@@ -1453,5 +1455,7 @@ public class PortalGinModule extends AbstractGinModule {
         bind(SynapseContextPropsProvider.class).to(SynapseContextPropsProviderImpl.class);
         bind(AddToDownloadListV2.class).to(AddToDownloadListV2Impl.class);
         bind(OpenDataView.class).to(OpenDataViewImpl.class);
-	}
+
+        bind(QueryClientProvider.class).to(QueryClientProviderImpl.class).in(Singleton.class);
+    }
 }

@@ -18,8 +18,10 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cache.SessionStorage;
+import org.sagebionetworks.web.client.context.QueryClientProvider;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.jsinterop.reactquery.QueryClient;
 import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -27,7 +29,6 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
 import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
-import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.common.util.concurrent.FluentFuture;
@@ -56,9 +57,10 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	private PortalGinInjector ginInjector;
 	private SynapseJSNIUtils jsniUtils;
 	private CookieProvider cookies;
+	private QueryClient queryClient;
 
 	@Inject
-	public AuthenticationControllerImpl(UserAccountServiceAsync userAccountService, ClientCache localStorage, SessionStorage sessionStorage, CookieProvider cookies, PortalGinInjector ginInjector, SynapseJSNIUtils jsniUtils) {
+	public AuthenticationControllerImpl(UserAccountServiceAsync userAccountService, ClientCache localStorage, SessionStorage sessionStorage, CookieProvider cookies, PortalGinInjector ginInjector, SynapseJSNIUtils jsniUtils, QueryClientProvider queryClientProvider) {
 		this.userAccountService = userAccountService;
 		fixServiceEntryPoint(userAccountService);
 		this.localStorage = localStorage;
@@ -66,6 +68,11 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		this.cookies = cookies;
 		this.ginInjector = ginInjector;
 		this.jsniUtils = jsniUtils;
+		this.queryClient = queryClientProvider.getQueryClient();
+	}
+
+	public void clearQueryClientCache() {
+		queryClient.clear();
 	}
 
 	@Override
@@ -142,6 +149,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			public void onSuccess(String accessToken) {
 				cookies.setCookie(CookieKeys.USER_LOGGED_IN_RECENTLY, "true", DateTimeUtilsImpl.getWeekFromNow());
 				currentUserAccessToken = accessToken;
+				clearQueryClientCache();
 				userAccountService.getMyProfile(new AsyncCallback<UserProfile>() {
 					@Override
 					public void onSuccess(UserProfile profile) {
@@ -223,6 +231,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			}
 			
 			private void afterCall() {
+				clearQueryClientCache();
 				ginInjector.getGlobalApplicationState().refreshPage();
 			}
 		});
@@ -296,6 +305,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 						ginInjector.getGlobalApplicationState().refreshPage();	
 					}
 					checkForQuarantinedEmail();
+					clearQueryClientCache();
 				} else {
 					ginInjector.getHeader().refresh();
 					// we've determined that the session has not changed
