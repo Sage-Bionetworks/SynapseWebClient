@@ -1257,7 +1257,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(TableQueryResultWikiWidgetView.class).to(TableQueryResultWikiWidgetViewImpl.class);
 
 		bind(SingleButtonView.class).to(SingleButtonViewImpl.class);
-		
+
 		bind(AnnotationTransformer.class).to(AnnotationTransformerImpl.class).in(Singleton.class);
 		bind(AnnotationEditorView.class).to(AnnotationEditorViewImpl.class);
 		bind(EditAnnotationsDialogView.class).to(EditAnnotationsDialogViewImpl.class);
@@ -1283,7 +1283,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(PreviewConfigView.class).to(PreviewConfigViewImpl.class);
 		bind(SynapseFormConfigView.class).to(SynapseFormConfigViewImpl.class);
 		bind(DownloadCartPageView.class).to(DownloadCartPageViewImpl.class);
-		
+
 		bind(EditFileMetadataModalView.class).to(EditFileMetadataModalViewImpl.class);
 		bind(EditFileMetadataModalWidget.class).to(EditFileMetadataModalWidgetImpl.class);
 		bind(EditProjectMetadataModalView.class).to(EditProjectMetadataModalViewImpl.class);
@@ -1454,8 +1454,8 @@ public class PortalGinModule extends AbstractGinModule {
         bind(EntityFinderWidgetView.class).to(EntityFinderWidgetViewImpl.class);
         bind(SynapseContextPropsProvider.class).to(SynapseContextPropsProviderImpl.class);
         bind(AddToDownloadListV2.class).to(AddToDownloadListV2Impl.class);
-		bind(OpenDataView.class).to(OpenDataViewImpl.class);
+        bind(OpenDataView.class).to(OpenDataViewImpl.class);
 
-		bind(QueryClientProvider.class).to(QueryClientProviderImpl.class).in(Singleton.class);
-	}
+        bind(QueryClientProvider.class).to(QueryClientProviderImpl.class).in(Singleton.class);
+    }
 }

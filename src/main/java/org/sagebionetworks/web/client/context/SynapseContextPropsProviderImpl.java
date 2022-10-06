@@ -16,7 +16,7 @@ public class SynapseContextPropsProviderImpl implements SynapseContextPropsProvi
     private AuthenticationController authController;
     private GlobalApplicationState globalApplicationState;
     private CookieProvider cookies;
-	private QueryClientProvider queryClientProvider;
+    private QueryClientProvider queryClientProvider;
 
 
     @Inject
@@ -24,7 +24,7 @@ public class SynapseContextPropsProviderImpl implements SynapseContextPropsProvi
         this.authController = authController;
         this.globalApplicationState = globalApplicationState;
         this.cookies = cookies;
-		this.queryClientProvider = queryClientProvider;
+        this.queryClientProvider = queryClientProvider;
     }
 
     @Override
