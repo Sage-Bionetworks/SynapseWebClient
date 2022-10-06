@@ -37,7 +37,9 @@ import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cache.SessionStorage;
+import org.sagebionetworks.web.client.context.QueryClientProvider;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.jsinterop.reactquery.QueryClient;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.QuarantinedEmailModal;
@@ -93,6 +95,10 @@ public class AuthenticationControllerImplTest {
 	EmailQuarantineStatus mockEmailQuarantineStatus;
 	@Mock
 	Place mockPlace;
+	@Mock
+	QueryClientProvider mockQueryClientProvider;
+	@Mock
+	QueryClient mockQueryClient;
 	
 	UserProfile profile;
 	public static final String USER_ID = "98208";
@@ -110,7 +116,8 @@ public class AuthenticationControllerImplTest {
 		AsyncMockStubber.callSuccessWith(profile).when(mockUserAccountService).getMyProfile(any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(mockNotificationEmail).when(mockJsClient).getNotificationEmail(any(AsyncCallback.class));
 		when(mockGinInjector.getSynapseJavascriptClient()).thenReturn(mockJsClient);
-		authenticationController = new AuthenticationControllerImpl(mockUserAccountService, mockClientCache, mockSessionStorage, mockCookieProvider, mockGinInjector, mockSynapseJSNIUtils);
+		when(mockQueryClientProvider.getQueryClient()).thenReturn(mockQueryClient);
+		authenticationController = new AuthenticationControllerImpl(mockUserAccountService, mockClientCache, mockSessionStorage, mockCookieProvider, mockGinInjector, mockSynapseJSNIUtils, mockQueryClientProvider);
 		when(mockGinInjector.getGlobalApplicationState()).thenReturn(mockGlobalApplicationState);
 		when(mockGinInjector.getHeader()).thenReturn(mockHeader);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
@@ -137,6 +144,7 @@ public class AuthenticationControllerImplTest {
 		verify(mockSessionDetector).initializeAccessTokenState();
 		verify(mockGlobalApplicationState).refreshPage();
 		verify(mockSynapseJSNIUtils).setAnalyticsUserId("");
+		verify(mockQueryClient).clear();
 	}
 
 	@Test
@@ -192,6 +200,7 @@ public class AuthenticationControllerImplTest {
 		verify(loginCallback).onSuccess(any(UserProfile.class));
 		verify(mockSessionDetector).initializeAccessTokenState();
 		verify(mockSynapseJSNIUtils).setAnalyticsUserId(USER_ID);
+		verify(mockQueryClient).clear();
 	}
 
 	@Test

@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client;
 
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.web.client.context.QueryClientProvider;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.presenter.ACTAccessApprovalsPresenter;
 import org.sagebionetworks.web.client.presenter.ACTDataAccessSubmissionDashboardPresenter;
@@ -895,4 +896,6 @@ public interface PortalGinInjector extends Ginjector {
 	PresignedURLAsyncHandler getPresignedURLAsyncHandler();
 	AddToDownloadListV2 getAddToDownloadListV2();
 	JSONObjectAdapter getJSONObjectAdapter();
+
+	QueryClientProvider getQueryClientProvider();
 }

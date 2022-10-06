@@ -22,9 +22,4 @@ public interface SynapseContextPropsProvider {
      * using JsInterop before using JSNI.
      */
     SynapseContextProviderPropsJSNIObject getJsniContextProps();
-
-	/**
-	 * Returns the global QueryClient
-	 */
-	QueryClient getQueryClient();
 }
