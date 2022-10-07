@@ -19,6 +19,7 @@ import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequirementWidget;
@@ -48,48 +49,45 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	public static final String REVOKED_USER = "Successfully Revoked User Access. ";
 	public static final String EMAIL_SENT = "An email has been sent to notify them";
 	public static final String MESSAGE_BLANK = "You must enter an email message to approve this user";
-	public static final String NO_APPROVAL_FOUND = "There was no approval found for the specified user and requirement";
+	public static final String NO_COMPATIBLE_ARS_MESSAGE = "No access requirements that support this functionality were found.";
 
 	// Mask to get all parts of a query.
-	private static final Long ALL_PARTS_MASK = new Long(255);
+	private static final Long ALL_PARTS_MASK = 255L;
 
 	private String accessRequirementId;
 	private String userId;
 	private String datasetId;
 	private String message;
-	private EntityBundle entityBundle;
 
-	private ApproveUserAccessModalView view;
-	private SynapseAlert synAlert;
-	private SynapseSuggestBox peopleSuggestWidget;
-	private SynapseClientAsync synapseClient;
-	private SynapseProperties synapseProperties;
-	private JobTrackingWidget progressWidget;
-	private DataAccessClientAsync dataAccessClient;
-	private AccessRequirementWidget arWidget;
-	private RestrictableObjectDescriptor subject;
+	private final ApproveUserAccessModalView view;
+	private final SynapseAlert synAlert;
+	private final SynapseClientAsync synapseClient;
+	private final SynapseProperties synapseProperties;
+	private final JobTrackingWidget progressWidget;
+	private final DataAccessClientAsync dataAccessClient;
+	private final AccessRequirementWidget arWidget;
+	private final RestrictableObjectDescriptor subject;
+	private final PopupUtilsView popupUtils;
 
 	@Inject
-	public ApproveUserAccessModal(ApproveUserAccessModalView view, AccessRequirementWidget arWidget, SynapseAlert synAlert, SynapseSuggestBox peopleSuggestBox, UserGroupSuggestionProvider provider, SynapseClientAsync synapseClient, SynapseProperties synapseProperties, JobTrackingWidget progressWidget, DataAccessClientAsync dataAccessClient) {
+	public ApproveUserAccessModal(ApproveUserAccessModalView view, AccessRequirementWidget arWidget, SynapseAlert synAlert, SynapseSuggestBox peopleSuggestBox, UserGroupSuggestionProvider provider, SynapseClientAsync synapseClient, SynapseProperties synapseProperties, JobTrackingWidget progressWidget, DataAccessClientAsync dataAccessClient, final PopupUtilsView popupUtilsView) {
 		this.view = view;
 		this.synAlert = synAlert;
-		this.peopleSuggestWidget = peopleSuggestBox;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
 		this.synapseProperties = synapseProperties;
 		this.progressWidget = progressWidget;
 		this.dataAccessClient = dataAccessClient;
 		fixServiceEntryPoint(dataAccessClient);
-		peopleSuggestWidget.setSuggestionProvider(provider);
+		this.popupUtils = popupUtilsView;
+		peopleSuggestBox.setSuggestionProvider(provider);
 		this.view.setPresenter(this);
-		this.view.setUserPickerWidget(peopleSuggestWidget.asWidget());
+		this.view.setUserPickerWidget(peopleSuggestBox.asWidget());
 		this.arWidget = arWidget;
 		arWidget.hideControls();
 		this.view.setAccessRequirementWidget(arWidget);
 		view.setLoadingEmailWidget(this.progressWidget.asWidget());
-		peopleSuggestBox.addItemSelectedHandler(suggestion -> {
-				onUserSelected(suggestion);
-		});
+		peopleSuggestBox.addItemSelectedHandler(this::onUserSelected);
 		subject = new RestrictableObjectDescriptor();
 		subject.setType(RestrictableObjectType.ENTITY);
 	}
@@ -105,10 +103,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 
 			@Override
 			public void onSuccess(List<AccessRequirement> result) {
-				List<AccessRequirement> ars = new ArrayList<>();
-				for (AccessRequirement ar : result) {
-					ars.add(ar);
-				}
+				List<AccessRequirement> ars = new ArrayList<>(result);
 				configure(ars, bundle);
 			}
 		});
@@ -117,8 +112,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	public void configure(List<AccessRequirement> accessRequirements, EntityBundle bundle) {
 		subject.setId(bundle.getEntity().getId());
 		view.startLoadingEmail();
-		this.entityBundle = bundle;
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 		for (AccessRequirement ar : accessRequirements) {
 			// approve/revoke for ManagedACTAccessRequirement handled through data access submission (backend does not currently support directly revoking this type)
 			// see PLFM-6209, and SWC-5189
@@ -128,12 +122,15 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 		}
 		view.setSynAlert(synAlert.asWidget());
 		view.setAccessRequirementIDs(list);
-		if (list.size() > 0) {
+		if (!list.isEmpty()) {
 			onAccessRequirementIDSelected(list.get(0));
+			datasetId = bundle.getEntity().getId(); // get synId of dataset we are currently on
+			view.setDatasetTitle(bundle.getEntity().getName());
+			loadEmailMessage();
+		} else {
+			popupUtils.showErrorMessage(NO_COMPATIBLE_ARS_MESSAGE);
+			view.hide();
 		}
-		datasetId = entityBundle.getEntity().getId(); // get synId of dataset we are currently on
-		view.setDatasetTitle(entityBundle.getEntity().getName());
-		loadEmailMessage();
 	}
 
 	private void loadEmailMessage() {
@@ -260,13 +257,13 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 
 			@Override
 			public void onSuccess(AccessApproval result) {
-				sendEmail(result);
+				sendEmail();
 			}
 		});
 	}
 
-	private void sendEmail(AccessApproval result) {
-		Set<String> recipients = new HashSet<String>();
+	private void sendEmail() {
+		Set<String> recipients = new HashSet<>();
 		recipients.add(userId);
 		synapseClient.sendMessage(recipients, EMAIL_SUBJECT, message, null, new AsyncCallback<String>() {
 

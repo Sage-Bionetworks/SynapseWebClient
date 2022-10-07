@@ -14,6 +14,7 @@ import static org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccess
 import static org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal.APPROVE_BUT_FAIL_TO_EMAIL;
 import static org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal.EMAIL_SENT;
 import static org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal.MESSAGE_BLANK;
+import static org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal.NO_COMPATIBLE_ARS_MESSAGE;
 import static org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal.NO_EMAIL_MESSAGE;
 import static org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal.NO_USER_SELECTED;
 import static org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal.QUERY_CANCELLED;
@@ -43,6 +44,7 @@ import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequirementWidget;
@@ -113,8 +115,6 @@ public class ApproveUserAccessModalTest {
 	@Captor
 	ArgumentCaptor<AsyncCallback<String>> sCaptor;
 	@Captor
-	ArgumentCaptor<AsyncCallback<PaginatedResults<AccessApproval>>> prCaptor;
-	@Captor
 	ArgumentCaptor<AsyncCallback<Void>> vCaptor;
 	@Mock
 	ManagedACTAccessRequirement mockManagedACTAccessRequirement;
@@ -122,12 +122,14 @@ public class ApproveUserAccessModalTest {
 	ACTAccessRequirement mockACTAccessRequirement;
 	@Mock
 	SelfSignAccessRequirement mockSelfSignAccessRequirement;
+	@Mock
+	PopupUtilsView mockPopupUtils;
 	
 	RestrictableObjectDescriptor expectedRestrictableObjectDescriptor = new RestrictableObjectDescriptor();
 	Long accessReq;
 	String userId;
 	String message;
-	List<AccessRequirement> actList;
+	List<AccessRequirement> accessRequirementList;
 	Exception ex;
 	public static final String ENTITY_ID = "syn1011938";
 	public static final Long ACT_ACCESS_REQUIREMENT_ID = 51L;
@@ -137,7 +139,7 @@ public class ApproveUserAccessModalTest {
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		dialog = new ApproveUserAccessModal(mockView, mockArWidget, mockSynAlert, mockPeopleSuggestWidget, mockProvider, mockSynapseClient, mockSynapseProperties, mockProgressWidget, mockDataAccessClient);
+		dialog = new ApproveUserAccessModal(mockView, mockArWidget, mockSynAlert, mockPeopleSuggestWidget, mockProvider, mockSynapseClient, mockSynapseProperties, mockProgressWidget, mockDataAccessClient, mockPopupUtils);
 		when(mockSynapseProperties.getSynapseProperty(anyString())).thenReturn("syn7444807");
 
 		message = "Message";
@@ -149,10 +151,10 @@ public class ApproveUserAccessModalTest {
 		when(mockManagedACTAccessRequirement.getId()).thenReturn(MANAGED_ACT_ACCESS_REQUIREMENT_ID);
 		when(mockSelfSignAccessRequirement.getId()).thenReturn(SELF_SIGN_ACCESS_REQUIREMENT_ID);
 		
-		actList = new ArrayList<AccessRequirement>();
-		actList.add(mockACTAccessRequirement);
-		actList.add(mockManagedACTAccessRequirement);
-		actList.add(mockSelfSignAccessRequirement);
+		accessRequirementList = new ArrayList<AccessRequirement>();
+		accessRequirementList.add(mockACTAccessRequirement);
+		accessRequirementList.add(mockManagedACTAccessRequirement);
+		accessRequirementList.add(mockSelfSignAccessRequirement);
 
 		when(mockQrb.getQueryResult()).thenReturn(mockQr);
 		when(mockQr.getQueryResults()).thenReturn(mockRs);
@@ -195,7 +197,7 @@ public class ApproveUserAccessModalTest {
 	
 	@Test
 	public void testConfigureFilterManagedACTAccessRequirements() {
-		dialog.configure(actList, mockEntityBundle);
+		dialog.configure(accessRequirementList, mockEntityBundle);
 		
 		verify(mockView).setAccessRequirementIDs(stringListCaptor.capture());
 		List<String> arIDs = stringListCaptor.getValue();
@@ -207,7 +209,7 @@ public class ApproveUserAccessModalTest {
 
 	@Test
 	public void testLoadEmailMessageOnFailure() {
-		dialog.configure(actList, mockEntityBundle);
+		dialog.configure(accessRequirementList, mockEntityBundle);
 		verify(mockProgressWidget).startAndTrackJob(anyString(), anyBoolean(), any(AsynchType.class), any(QueryBundleRequest.class), phCaptor.capture());
 		phCaptor.getValue().onFailure(ex);
 		verify(mockView).setLoadingEmailVisible(false);
@@ -216,7 +218,7 @@ public class ApproveUserAccessModalTest {
 
 	@Test
 	public void testLoadEmailMessageOnCancel() {
-		dialog.configure(actList, mockEntityBundle);
+		dialog.configure(accessRequirementList, mockEntityBundle);
 		verify(mockProgressWidget).startAndTrackJob(anyString(), anyBoolean(), any(AsynchType.class), any(QueryBundleRequest.class), phCaptor.capture());
 		phCaptor.getValue().onCancel();
 		verify(mockView).setLoadingEmailVisible(false);
@@ -225,7 +227,7 @@ public class ApproveUserAccessModalTest {
 
 	@Test
 	public void testLoadEmailMessageOnComplete() {
-		dialog.configure(actList, mockEntityBundle);
+		dialog.configure(accessRequirementList, mockEntityBundle);
 		verify(mockProgressWidget).startAndTrackJob(anyString(), anyBoolean(), any(AsynchType.class), any(QueryBundleRequest.class), phCaptor.capture());
 		phCaptor.getValue().onComplete(mockQrb);
 		verify(mockView).finishLoadingEmail();
@@ -233,23 +235,23 @@ public class ApproveUserAccessModalTest {
 
 	@Test
 	public void testOnAccessRequirementSelected() {
-		AccessRequirement ar = actList.get(0);
+		AccessRequirement ar = accessRequirementList.get(0);
 		String num = Long.toString(ar.getId());
-		dialog.configure(actList, mockEntityBundle);
+		dialog.configure(accessRequirementList, mockEntityBundle);
 		dialog.onAccessRequirementIDSelected(num);
 		verify(mockView, times(2)).setAccessRequirement(eq(num));
 	}
 
 	@Test
 	public void testOnSubmitNoUserSelected() {
-		dialog.configure(actList, mockEntityBundle);
+		dialog.configure(accessRequirementList, mockEntityBundle);
 		dialog.onSubmit();
 		verify(mockSynAlert).showError(eq(NO_USER_SELECTED));
 	}
 
 	@Test
 	public void testOnSubmitQueryCancelledEditedEmail() {
-		dialog.configure(actList, mockEntityBundle);
+		dialog.configure(accessRequirementList, mockEntityBundle);
 		verify(mockProgressWidget).startAndTrackJob(anyString(), anyBoolean(), any(AsynchType.class), any(QueryBundleRequest.class), phCaptor.capture());
 		phCaptor.getValue().onCancel();
 		verify(mockView).setLoadingEmailVisible(false);
@@ -263,7 +265,7 @@ public class ApproveUserAccessModalTest {
 
 	@Test
 	public void testOnSubmitQueryFailedEditedEmail() {
-		dialog.configure(actList, mockEntityBundle);
+		dialog.configure(accessRequirementList, mockEntityBundle);
 		verify(mockProgressWidget).startAndTrackJob(anyString(), anyBoolean(), any(AsynchType.class), any(QueryBundleRequest.class), phCaptor.capture());
 		phCaptor.getValue().onFailure(ex);
 		verify(mockView).setLoadingEmailVisible(false);
@@ -277,7 +279,7 @@ public class ApproveUserAccessModalTest {
 
 	@Test
 	public void testOnSubmitNoMessage() {
-		dialog.configure(actList, mockEntityBundle);
+		dialog.configure(accessRequirementList, mockEntityBundle);
 		when(mockSynapseProperties.getSynapseProperty(anyString())).thenReturn(null);
 		when(mockView.getEmailMessage()).thenReturn("");
 		dialog.onUserSelected(mockUser);
@@ -288,7 +290,7 @@ public class ApproveUserAccessModalTest {
 
 	@Test
 	public void testOnSubmitNullAccessReq() {
-		dialog.configure(actList, mockEntityBundle);
+		dialog.configure(accessRequirementList, mockEntityBundle);
 
 		verify(mockProgressWidget).startAndTrackJob(anyString(), anyBoolean(), any(AsynchType.class), any(QueryBundleRequest.class), phCaptor.capture());
 		phCaptor.getValue().onComplete(mockQrb);
@@ -302,7 +304,7 @@ public class ApproveUserAccessModalTest {
 
 	@Test
 	public void testOnSubmitOnFailure() {
-		dialog.configure(actList, mockEntityBundle);
+		dialog.configure(accessRequirementList, mockEntityBundle);
 
 		verify(mockProgressWidget).startAndTrackJob(anyString(), anyBoolean(), any(AsynchType.class), any(QueryBundleRequest.class), phCaptor.capture());
 		phCaptor.getValue().onComplete(mockQrb);
@@ -321,7 +323,7 @@ public class ApproveUserAccessModalTest {
 
 	@Test
 	public void testOnSubmitOnSuccess() {
-		dialog.configure(actList, mockEntityBundle);
+		dialog.configure(accessRequirementList, mockEntityBundle);
 
 		verify(mockProgressWidget).startAndTrackJob(anyString(), anyBoolean(), any(AsynchType.class), any(QueryBundleRequest.class), phCaptor.capture());
 		phCaptor.getValue().onComplete(mockQrb);
@@ -339,7 +341,7 @@ public class ApproveUserAccessModalTest {
 
 	@Test
 	public void testOnSubmitSendMessageOnFailure() {
-		dialog.configure(actList, mockEntityBundle);
+		dialog.configure(accessRequirementList, mockEntityBundle);
 
 		verify(mockProgressWidget).startAndTrackJob(anyString(), anyBoolean(), any(AsynchType.class), any(QueryBundleRequest.class), phCaptor.capture());
 		phCaptor.getValue().onComplete(mockQrb);
@@ -364,7 +366,7 @@ public class ApproveUserAccessModalTest {
 
 	@Test
 	public void testOnSubmitSendMessageOnSuccess() {
-		dialog.configure(actList, mockEntityBundle);
+		dialog.configure(accessRequirementList, mockEntityBundle);
 
 		verify(mockProgressWidget).startAndTrackJob(anyString(), anyBoolean(), any(AsynchType.class), any(QueryBundleRequest.class), phCaptor.capture());
 		phCaptor.getValue().onComplete(mockQrb);
@@ -388,14 +390,14 @@ public class ApproveUserAccessModalTest {
 
 	@Test
 	public void testOnRevokeNoUser() {
-		dialog.configure(actList, mockEntityBundle);
+		dialog.configure(accessRequirementList, mockEntityBundle);
 		dialog.onRevoke();
 		verify(mockSynAlert).showError(NO_USER_SELECTED);
 	}
 
 	@Test
 	public void testOnRevokeGetAccessApprovalFailure() {
-		dialog.configure(actList, mockEntityBundle);
+		dialog.configure(accessRequirementList, mockEntityBundle);
 		dialog.onUserSelected(mockUser);
 		dialog.onRevoke();
 
@@ -408,7 +410,7 @@ public class ApproveUserAccessModalTest {
 
 	@Test
 	public void testOnRevokeGetAccessApprovalSuccessNoMatch() {
-		dialog.configure(actList, mockEntityBundle);
+		dialog.configure(accessRequirementList, mockEntityBundle);
 		dialog.onUserSelected(mockUser);
 		dialog.onRevoke();
 
@@ -422,7 +424,7 @@ public class ApproveUserAccessModalTest {
 
 	@Test
 	public void testOnRevokeGetAccessApprovalSuccessMatchFound() {
-		dialog.configure(actList, mockEntityBundle);
+		dialog.configure(accessRequirementList, mockEntityBundle);
 		dialog.onUserSelected(mockUser);
 		dialog.onRevoke();
 
@@ -432,6 +434,16 @@ public class ApproveUserAccessModalTest {
 		verify(mockView).setRevokeProcessing(false);
 		verify(mockView).hide();
 		verify(mockView).showInfo(REVOKED_USER);
+	}
+
+	@Test
+	public void testShowErrorOnNoCompatibleAccessRequirements() {
+		accessRequirementList.clear();
+		accessRequirementList.add(mockManagedACTAccessRequirement);
+		dialog.configure(accessRequirementList, mockEntityBundle);
+
+		verify(mockPopupUtils).showErrorMessage(NO_COMPATIBLE_ARS_MESSAGE);
+		verify(mockView).hide();
 	}
 
 }
