@@ -49,7 +49,6 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	public static final String REVOKED_USER = "Successfully Revoked User Access. ";
 	public static final String EMAIL_SENT = "An email has been sent to notify them";
 	public static final String MESSAGE_BLANK = "You must enter an email message to approve this user";
-
 	public static final String NO_COMPATIBLE_ARS_MESSAGE = "No access requirements that support this functionality were found.";
 
 	// Mask to get all parts of a query.
@@ -68,7 +67,6 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	private final DataAccessClientAsync dataAccessClient;
 	private final AccessRequirementWidget arWidget;
 	private final RestrictableObjectDescriptor subject;
-
 	private final PopupUtilsView popupUtils;
 
 	@Inject
