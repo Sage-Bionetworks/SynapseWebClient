@@ -45,6 +45,7 @@ public class Portal implements EntryPoint {
 	 */
 	public void onModuleLoad() {
 		zeroOpacity(RootPanel.get("headerPanel"), RootPanel.get("rootPanel"));
+		detectProxiedWebsiteAttack();
 		// we might need to reload using the new token scheme (required for SEO)
 		String initToken = History.getToken();
 		if (initToken.length() > 0 && !initToken.startsWith("!")) {
@@ -156,7 +157,17 @@ public class Portal implements EntryPoint {
 		};
 		timer.schedule(delay);
 	}
-
+	
+	/**
+	 * SWC-6294: Block ability to proxy the website for click-jacking
+	 */
+	public void detectProxiedWebsiteAttack() {
+		String hostName = Window.Location.getHostName().toLowerCase();
+		if (!hostName.endsWith(".synapse.org") && !hostName.equals("127.0.0.1") && !hostName.equals("localhost")) {
+			Window.Location.assign("https://www.synapse.org");
+		}
+	}
+	
 	private void registerWindowClosingHandler(final GlobalApplicationState globalApplicationState) {
 		Window.addWindowClosingHandler(new Window.ClosingHandler() {
 			public void onWindowClosing(Window.ClosingEvent closingEvent) {
