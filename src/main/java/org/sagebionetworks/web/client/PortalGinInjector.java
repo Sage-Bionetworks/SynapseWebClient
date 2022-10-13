@@ -113,6 +113,7 @@ import org.sagebionetworks.web.client.widget.entity.act.UserBadgeItem;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationEditor;
 import org.sagebionetworks.web.client.widget.entity.annotation.EditAnnotationsDialog;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidget;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidgetView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityRefProvEntryView;
@@ -747,6 +748,8 @@ public interface PortalGinInjector extends Ginjector {
 
 	EntityFinderWidget.Builder getEntityFinderBuilder();
 
+	EntityFinderWidgetView getEntityFinderWidgetView();
+
 	UploadDialogWidget getUploadDialogWidget();
 
 	WikiMarkdownEditor getWikiMarkdownEditor();
@@ -898,4 +901,5 @@ public interface PortalGinInjector extends Ginjector {
 	JSONObjectAdapter getJSONObjectAdapter();
 
 	QueryClientProvider getQueryClientProvider();
+	PopupUtilsView getPopupUtils();
 }
