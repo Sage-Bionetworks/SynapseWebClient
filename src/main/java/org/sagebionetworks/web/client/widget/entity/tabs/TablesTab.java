@@ -41,6 +41,14 @@ public class TablesTab extends AbstractTablesTab {
 	}
 
 	@Override
+	protected String getTabDescription(){
+		return "";
+	}
+
+	@Override
+	protected String getHelpLink(){return TABLES_HELP_URL;}
+
+	@Override
 	protected List<EntityType> getTypesShownInList() {
 		List<EntityType> types = new ArrayList<>();
 		types.add(EntityType.table);

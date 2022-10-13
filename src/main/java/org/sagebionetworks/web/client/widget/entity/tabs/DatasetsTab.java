@@ -23,6 +23,7 @@ public class DatasetsTab extends AbstractTablesTab {
 
 	public static final String DATASETS_AND_COLLECTIONS_HELP = "Use Datasets to produce and distribute an immutable set of files found across one or more Projects or Folders. You can also create Dataset Collections which contain multiple Datasets.";
 	public static final String DATASETS_HELP_URL = WebConstants.DOCS_URL + "Datasets.2611281979.html";
+	public static final String DATASETS_DESCRIPTION = "Use Datasets to produce and distribute an immutable set of files found across one or more Projects or Folders. ";
 
 	@Inject
 	public DatasetsTab(Tab tab, PortalGinInjector ginInjector) {
@@ -41,6 +42,16 @@ public class DatasetsTab extends AbstractTablesTab {
 	@Override
 	protected String getTabDisplayName() {
 		return DisplayConstants.DATASETS;
+	}
+
+	@Override
+	protected String getTabDescription() {
+		return DATASETS_DESCRIPTION;
+	}
+
+	@Override
+	protected String getHelpLink() {
+		return DATASETS_HELP_URL;
 	}
 
 	@Override

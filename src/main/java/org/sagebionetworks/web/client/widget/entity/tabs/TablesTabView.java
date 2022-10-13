@@ -10,6 +10,10 @@ public interface TablesTabView extends IsWidget {
 
 	void setTitle(String title);
 
+	void setDescription(String s);
+
+	void setHelpLink(String s);
+
 	void setTitlebar(Widget w);
 
 	void setTitlebarVisible(boolean visible);
