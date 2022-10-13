@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -26,6 +27,7 @@ import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PopupUtilsView;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.exceptions.WebClientConfigurationException;
 import org.sagebionetworks.web.client.jsinterop.EntityFinderProps;
@@ -72,11 +74,22 @@ public class EntityFinderWidgetImplTest {
 
     @Mock
     PopupUtilsView mockPopupUtils;
+    @Mock
+    PortalGinInjector mockGinInjector;
 
     @InjectMocks
     EntityFinderWidgetImpl.Builder builder;
 
     EntityFinderWidgetImpl entityFinder;
+
+    @Before
+    public void setUp() {
+        when(mockGinInjector.getEntityFinderWidgetView()).thenReturn(mockView);
+        when(mockGinInjector.getSynapseAlertWidget()).thenReturn(mockSynAlert);
+        when(mockGinInjector.getSynapseJavascriptClient()).thenReturn(mockJsClient);
+        when(mockGinInjector.getGlobalApplicationState()).thenReturn(mockGlobalState);
+        when(mockGinInjector.getPopupUtils()).thenReturn(mockPopupUtils);
+    }
 
     @Test
     public void testBuildAndRender() {
