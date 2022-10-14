@@ -14,6 +14,7 @@ import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PopupUtilsView;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.exceptions.WebClientConfigurationException;
 import org.sagebionetworks.web.client.jsinterop.EntityFinderProps;
@@ -63,15 +64,15 @@ public class EntityFinderWidgetImpl implements EntityFinderWidget, EntityFinderW
         view.setPresenter(this);
     }
 
-    private EntityFinderWidgetImpl(Builder builder) {
+    private EntityFinderWidgetImpl(final Builder builder, final PortalGinInjector ginInjector) {
         this.selectedEntities = new ArrayList<>();
 
-        // Pass along dependencies injected into the builder because they are not injected in this constructor.
-        this.view = builder.view;
-        this.globalApplicationState = builder.globalApplicationState;
-        this.jsClient = builder.jsClient;
-        this.synAlert = builder.synAlert;
-        this.popupUtils = builder.popupUtils;
+        // Since we aren't using constructor injection, get dependencies from a ginInjector passed along by the builder
+        this.view = ginInjector.getEntityFinderWidgetView();
+        this.globalApplicationState = ginInjector.getGlobalApplicationState();
+        this.jsClient = ginInjector.getSynapseJavascriptClient();
+        this.synAlert = ginInjector.getSynapseAlertWidget();
+        this.popupUtils = ginInjector.getPopupUtils();
 
         this.view.setPresenter(this);
 
@@ -122,11 +123,7 @@ public class EntityFinderWidgetImpl implements EntityFinderWidget, EntityFinderW
     }
 
     public static class Builder implements EntityFinderWidget.Builder {
-        private EntityFinderWidgetView view;
-        GlobalApplicationState globalApplicationState;
-        private SynapseJavascriptClient jsClient;
-        private SynapseAlert synAlert;
-        private PopupUtilsView popupUtils;
+        private PortalGinInjector ginInjector;
 
         private EntityFinderWidget.SelectedHandler<Reference> selectedHandler = (selected, finder) -> {
         };
@@ -151,17 +148,13 @@ public class EntityFinderWidgetImpl implements EntityFinderWidget, EntityFinderW
         private String helpMarkdown = "Finding items in Synapse can be done by either “browsing”, “searching,” or directly entering the Synapse ID.&#10;Alternatively, navigate to the desired location in the current project, favorite projects or projects you own.";
 
         @Inject
-        public Builder(EntityFinderWidgetView view, GlobalApplicationState globalApplicationState, SynapseJavascriptClient jsClient, SynapseAlert synAlert, PopupUtilsView popupUtils) {
-            this.view = view;
-            this.globalApplicationState = globalApplicationState;
-            this.jsClient = jsClient;
-            this.synAlert = synAlert;
-            this.popupUtils = popupUtils;
+        public Builder(final PortalGinInjector ginInjector) {
+            this.ginInjector = ginInjector;
         }
 
         @Override
         public EntityFinderWidgetImpl build() {
-            return new EntityFinderWidgetImpl(this);
+            return new EntityFinderWidgetImpl(this, ginInjector);
         }
 
         @Override
