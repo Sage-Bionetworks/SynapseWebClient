@@ -170,7 +170,6 @@ public class EntityFinderWidgetViewImpl implements EntityFinderWidgetView {
 
 	@Override
 	public void hide() {
-		this.jsniUtils.unmountComponentAtNode(entityFinderContainer.getElement());
 		modal.hide();
 	}
 
