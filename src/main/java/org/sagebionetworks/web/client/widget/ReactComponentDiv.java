@@ -42,6 +42,7 @@ public class ReactComponentDiv extends FlowPanel {
 
 	@Override
 	public void clear() {
+		// clear doesn't typically call onUnload, but we want to for this element.
 		this.onUnload();
 		super.clear();
 	}
