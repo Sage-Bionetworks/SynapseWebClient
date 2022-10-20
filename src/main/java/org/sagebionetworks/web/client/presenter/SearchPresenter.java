@@ -24,6 +24,7 @@ import org.sagebionetworks.web.client.view.SearchView;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.SearchQueryUtils;
+import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -331,7 +332,11 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 			public void onFailure(Throwable caught) {
 				view.clear();
 				loadMoreWidgetContainer.setIsMore(false);
-				synAlert.handleException(caught);
+				if (caught instanceof UnknownErrorException && caught.getMessage().contains("AmazonCloudSearchDomain; Status Code: 500; Error Code: SearchException")) {
+					synAlert.showError("The search service is temporarily unavailable. We are currently working hard to fix this issue and we apologize for this inconvenience.");
+				} else {
+					synAlert.handleException(caught);	
+				}
 			}
 		};
 		loadMoreWidgetContainer.setIsProcessing(true);
