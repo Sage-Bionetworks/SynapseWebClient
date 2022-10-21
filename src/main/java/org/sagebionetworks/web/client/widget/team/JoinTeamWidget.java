@@ -1,11 +1,13 @@
 package org.sagebionetworks.web.client.widget.team;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessApproval;
@@ -34,6 +36,7 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -46,7 +49,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	private SynapseClientAsync synapseClient;
 	private MarkdownWidget wikiPage;
 	private WizardProgressWidget progressWidget;
-	private SynapseAlert synAlert;
+	private SynapseAlert synAlert, wizardSynAlert;
 	private GWTWrapper gwt;
 	private String teamId;
 	private boolean isChallengeSignup;
@@ -64,7 +67,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	String accessRequirementsUrl;
 
 	@Inject
-	public JoinTeamWidget(JoinTeamWidgetView view, SynapseClientAsync synapseClient, GlobalApplicationState globalApplicationState, AuthenticationController authenticationController, GWTWrapper gwt, MarkdownWidget wikiPage, WizardProgressWidget progressWidget, SynapseAlert synAlert) {
+	public JoinTeamWidget(JoinTeamWidgetView view, SynapseClientAsync synapseClient, GlobalApplicationState globalApplicationState, AuthenticationController authenticationController, GWTWrapper gwt, MarkdownWidget wikiPage, WizardProgressWidget progressWidget, SynapseAlert synAlert, SynapseAlert wizardSynAlert) {
 		this.view = view;
 		view.setPresenter(this);
 		this.synapseClient = synapseClient;
@@ -75,8 +78,10 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		this.wikiPage = wikiPage;
 		this.progressWidget = progressWidget;
 		this.synAlert = synAlert;
+		this.wizardSynAlert = wizardSynAlert;
 		view.setProgressWidget(progressWidget);
 		view.setSynAlert(synAlert);
+		view.setWizardSynAlert(wizardSynAlert);
 	}
 
 	/**
@@ -185,8 +190,9 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 
 	private void refresh() {
 		boolean isLoggedIn = authenticationController.isLoggedIn();
+		synAlert.clear();
+		wizardSynAlert.clear();
 		if (isLoggedIn) {
-			synAlert.clear();
 			synapseClient.getTeamBundle(authenticationController.getCurrentUserPrincipalId(), teamId, isLoggedIn, new AsyncCallback<TeamBundle>() {
 				@Override
 				public void onSuccess(TeamBundle result) {
@@ -221,6 +227,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		currentAccessRequirement = 0;
 		// initialize the access requirements
 		accessRequirements = new ArrayList<AccessRequirement>();
+		wizardSynAlert.clear();
 		synapseClient.getTeamAccessRequirements(teamId, new AsyncCallback<List<AccessRequirement>>() {
 			@Override
 			public void onSuccess(List<AccessRequirement> results) {
@@ -383,7 +390,8 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 
 			@Override
 			public void onFailure(Throwable t) {
-				synAlert.handleException(t);
+				// SWC-6309: If there's an error when accepting the AR, show error in dialog
+				wizardSynAlert.handleException(t);
 			}
 		};
 		if (ar instanceof ACTAccessRequirement || ar instanceof ManagedACTAccessRequirement) {

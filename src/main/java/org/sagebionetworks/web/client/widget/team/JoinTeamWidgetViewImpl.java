@@ -11,6 +11,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.modal.Dialog;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -62,6 +63,8 @@ public class JoinTeamWidgetViewImpl implements JoinTeamWidgetView {
 	Div synAlertContainer;
 	@UiField
 	Button actRequestAccessButton;
+	@UiField
+	Div wizardSynAlertContainer;
 
 	private JoinTeamWidgetView.Presenter presenter;
 	private MarkdownWidget wikiPage;
@@ -183,6 +186,11 @@ public class JoinTeamWidgetViewImpl implements JoinTeamWidgetView {
 	public void setSynAlert(IsWidget widget) {
 		synAlertContainer.clear();
 		synAlertContainer.add(widget);
+	}
+	@Override
+	public void setWizardSynAlert(IsWidget widget) {
+		wizardSynAlertContainer.clear();
+		wizardSynAlertContainer.add(widget);
 	}
 
 	@Override

@@ -10,6 +10,7 @@
 				addStyleNames="modal-fullscreen">
 				<g:SimplePanel ui:field="progressWidgetPanel" />
 				<g:SimplePanel ui:field="currentWizardContentPanel" />
+				<bh:Div ui:field="wizardSynAlertContainer" />
 				<g:HTML ui:field="accessRequirementHTML" />
 				<b:Button type="INFO" text="How to request access..."
 					addStyleNames="margin-top-10" size="LARGE"
