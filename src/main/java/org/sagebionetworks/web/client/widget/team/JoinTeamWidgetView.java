@@ -62,6 +62,7 @@ public interface JoinTeamWidgetView extends IsWidget {
 	void setCurrentWizardPanelVisible(boolean isVisible);
 
 	void setSynAlert(IsWidget widget);
+	void setWizardSynAlert(IsWidget widget);
 
 	void clear();
 

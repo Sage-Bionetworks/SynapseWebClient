@@ -69,6 +69,9 @@ public class JoinTeamWidgetTest {
 	TeamMembershipStatus status;
 	@Mock
 	SynapseAlert mockSynAlert;
+	@Mock
+	SynapseAlert mockWizardSynAlert;
+
 
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -96,7 +99,7 @@ public class JoinTeamWidgetTest {
 		AsyncMockStubber.callSuccessWith(ars).when(mockSynapseClient).getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
 
 
-		joinWidget = new JoinTeamWidget(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, mockGwt, mockWikiPageWidget, mockWizardProgress, mockSynAlert);
+		joinWidget = new JoinTeamWidget(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, mockGwt, mockWikiPageWidget, mockWizardProgress, mockSynAlert, mockWizardSynAlert);
 		status = new TeamMembershipStatus();
 		status.setHasOpenInvitation(false);
 		status.setCanJoin(false);
