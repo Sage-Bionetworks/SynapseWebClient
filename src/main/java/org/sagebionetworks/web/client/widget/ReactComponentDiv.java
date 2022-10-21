@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget;
 import org.sagebionetworks.web.client.jsinterop.ReactDOMRoot;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.FlowPanel;
 
 /**
@@ -37,6 +38,13 @@ public class ReactComponentDiv extends FlowPanel {
 		ReactComponentLifecycleUtils.onUnload(root);
 		root = null;
 		super.onUnload();
+	}
+
+	@Override
+	public void clear() {
+		// clear doesn't typically call onUnload, but we want to for this element.
+		this.onUnload();
+		super.clear();
 	}
 
 	protected void setComponent(ReactNode component) {
