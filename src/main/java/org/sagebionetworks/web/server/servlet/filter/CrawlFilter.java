@@ -265,9 +265,11 @@ public class CrawlFilter implements Filter {
 		StringBuilder html = new StringBuilder();
 
 		// note: can't set description meta tag, since it might be markdown.
-		html.append("<!DOCTYPE html><html><head><title>" + name + " - " + entity.getId() + "</title></head><body>");
-
-		html.append("<h1>" + name + "</h1>");
+		html.append("<!DOCTYPE html><html><head><title>" + name + " - " + entity.getId() + "</title>");
+		if (annotations.getAnnotations().containsKey("noindex")) {
+			html.append("<meta name=\"robots\" content=\"noindex\">");
+		}
+		html.append("</head><body><h1>" + name + "</h1>");
 		if (description != null) {
 			html.append(description + "<br />");
 		}
