@@ -163,7 +163,7 @@ public class Portal implements EntryPoint {
 	 */
 	public void detectProxiedWebsiteAttack() {
 		String hostName = Window.Location.getHostName().toLowerCase();
-		if (!hostName.endsWith(".synapse.org") && !hostName.equals("127.0.0.1") && !hostName.equals("localhost")) {
+		if (!hostName.endsWith(".synapse.org") && !hostName.equals("127.0.0.1") && !hostName.equals("localhost") && !hostName.endsWith(".sagebase.org")) {
 			Window.Location.assign("https://www.synapse.org");
 		}
 	}
