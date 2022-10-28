@@ -2363,11 +2363,6 @@ spark-md5@^3.0.0:
   resolved "https://registry.yarnpkg.com/spark-md5/-/spark-md5-3.0.2.tgz#7952c4a30784347abcee73268e473b9c0167e3fc"
   integrity sha512-wcFzz9cDfbuqe0FZzfi2or1sgyIrsDwmPwfZC4hiNidPdPINjeUwNfv5kldczoEAcjl9Y1L3SM7Uz2PUEQzxQw==
 
-sql-parser@^0.5.0:
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/sql-parser/-/sql-parser-0.5.0.tgz#a79b6e66452f3d615b211989f006f34033bc436a"
-  integrity sha512-0Lw6wAUF4MGJ5pRKY6W8emkhWB7WmQ/5bioEzVVk0oI7kIvACJxJCdHD/K8EKQb+kniRPOuxhSnmd/kU+gn/9Q==
-
 string-hash@~1.1.3:
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/string-hash/-/string-hash-1.1.3.tgz#e8aafc0ac1855b4666929ed7dd1275df5d6c811b"
@@ -2404,10 +2399,10 @@ supports-preserve-symlinks-flag@^1.0.0:
   resolved "https://registry.yarnpkg.com/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz#6eda4bd344a3c94aea376d4cc31bc77311039e09"
   integrity sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==
 
-synapse-react-client@3.1.6:
-  version "3.1.6"
-  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-3.1.6.tgz#c8029dcefd95e08b3eac27ec47dbdbba0b2a1af6"
-  integrity sha512-fLasVCUwJ+pOp9t9ORiVK+nHE2CxJRyXpeukHN6Ukl1I4ewfysjpHIf42eJ+MpnJxxZAa0uyCkqkx1UuvYp3qw==
+synapse-react-client@3.1.9:
+  version "3.1.9"
+  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-3.1.9.tgz#87e5a50cb1086d0a8c2b8940ee655d0a2875360a"
+  integrity sha512-buTADkCpMFd78q8XHkMhCalb5U2Aki4YS00LI3lLxzKxNtR02aZQirDEoUMNSNa1YaA0uRlSaAqP4fa4lppWzA==
   dependencies:
     "@apidevtools/json-schema-ref-parser" "^9.0.9"
     "@brainhubeu/react-carousel" "1.19.26"
@@ -2481,7 +2476,6 @@ synapse-react-client@3.1.6:
     sass "^1.30.0"
     shortid "^2.2.16"
     spark-md5 "^3.0.0"
-    sql-parser "^0.5.0"
     tslib "^2.3.1"
     ua-parser-js "^1.0.2"
     universal-cookie "^4.0.3"
