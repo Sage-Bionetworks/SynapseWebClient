@@ -461,7 +461,7 @@
 			<artifactId>commonmark</artifactId>
 			<version>0.20.0</version>
 		</dependency>
-				
+
 		<dependency>
 			<groupId>com.fasterxml.jackson.jaxrs</groupId>
 			<artifactId>jackson-jaxrs-json-provider</artifactId>

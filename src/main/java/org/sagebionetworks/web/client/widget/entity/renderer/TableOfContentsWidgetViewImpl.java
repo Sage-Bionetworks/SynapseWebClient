@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
-import static org.sagebionetworks.markdown.constants.WidgetConstants.DIV_ID_WIDGET_PREFIX;
 import java.util.HashMap;
 import java.util.Map;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -20,6 +19,7 @@ import com.google.inject.Inject;
 
 public class TableOfContentsWidgetViewImpl extends FlowPanel implements TableOfContentsWidgetView {
 
+	public static final String DIV_ID_WIDGET_PREFIX = "widget-";
 	private Presenter presenter;
 	private boolean hasLoaded;
 	private Map<String, String> tagName2Style;
