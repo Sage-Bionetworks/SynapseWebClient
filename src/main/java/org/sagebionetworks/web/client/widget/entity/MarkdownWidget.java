@@ -157,7 +157,7 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 		Set<String> contentTypes = new HashSet<String>();
 		// look for every element that has the right format
 		int i = 0;
-		String currentWidgetDiv = org.sagebionetworks.markdown.constants.WidgetConstants.DIV_ID_WIDGET_PREFIX + i + suffix;
+		String currentWidgetDiv = WidgetConstants.DIV_ID_WIDGET_PREFIX + i + suffix;
 		ElementWrapper el = view.getElementById(currentWidgetDiv);
 		while (el != null) {
 			el.removeAllChildren();
@@ -188,7 +188,7 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 			}
 
 			i++;
-			currentWidgetDiv = org.sagebionetworks.markdown.constants.WidgetConstants.DIV_ID_WIDGET_PREFIX + i + suffix;
+			currentWidgetDiv = WidgetConstants.DIV_ID_WIDGET_PREFIX + i + suffix;
 			el = view.getElementById(currentWidgetDiv);
 		}
 		return contentTypes;

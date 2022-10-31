@@ -2,6 +2,7 @@ package org.sagebionetworks.web.shared;
 
 
 public class WidgetConstants {
+	public static final String DIV_ID_WIDGET_PREFIX = "widget-";
 	public static final String DIV_ID_MATHJAX_PREFIX = "mathjax-";
 	public static final String FOOTNOTE_ID_WIDGET_PREFIX = "wikiFootnote";
 

@@ -19,7 +19,6 @@ import com.google.inject.Inject;
 
 public class TableOfContentsWidgetViewImpl extends FlowPanel implements TableOfContentsWidgetView {
 
-	public static final String DIV_ID_WIDGET_PREFIX = "widget-";
 	private Presenter presenter;
 	private boolean hasLoaded;
 	private Map<String, String> tagName2Style;
@@ -64,7 +63,7 @@ public class TableOfContentsWidgetViewImpl extends FlowPanel implements TableOfC
 		Element el = null;
 		do {
 			i++;
-			String currentWidgetDiv = DIV_ID_WIDGET_PREFIX + i + widgetSuffix;
+			String currentWidgetDiv = WidgetConstants.DIV_ID_WIDGET_PREFIX + i + widgetSuffix;
 			el = DOM.getElementById(currentWidgetDiv);
 		} while (el != null);
 		return i;
