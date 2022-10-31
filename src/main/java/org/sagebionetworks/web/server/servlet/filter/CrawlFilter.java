@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.server.servlet.filter;
 
 import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -13,7 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
+
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -23,10 +26,13 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.io.IOUtils;
+import org.commonmark.node.Node;
+import org.commonmark.parser.Parser;
+import org.commonmark.renderer.html.HtmlRenderer;
 import org.jsoup.Jsoup;
 import org.sagebionetworks.client.SynapseClient;
-import org.sagebionetworks.markdown.SynapseMarkdownProcessor;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
@@ -67,6 +73,7 @@ import org.sagebionetworks.web.shared.TeamMemberPagedResults;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+
 import com.google.gwt.thirdparty.guava.common.base.Supplier;
 import com.google.gwt.thirdparty.guava.common.base.Suppliers;
 
@@ -84,6 +91,15 @@ public class CrawlFilter implements Filter {
 	private final Supplier<String> homePageCached = Suppliers.memoizeWithExpiration(homePageSupplier(), 1, TimeUnit.DAYS);
 	public static final int MAX_CHILD_PAGES = 5;
 
+	// Markdown processor
+	Parser parser = Parser.builder().build();
+	String synapseWikiWidgetDefinitionRegex = "[$][{].*[}]";
+	Pattern wikiWidgetPattern = Pattern.compile(synapseWikiWidgetDefinitionRegex, Pattern.CASE_INSENSITIVE);
+	
+	private String removeSynapseWikiWidgets(String markdown) {
+		return wikiWidgetPattern.matcher(markdown).replaceAll("");
+	}
+	
 	public String getCachedHomePageHtml() {
 		return homePageCached.get();
 	}
@@ -278,10 +294,13 @@ public class CrawlFilter implements Filter {
 		}
 		if (markdown != null) {
 			try {
-				String wikiHtml = SynapseMarkdownProcessor.getInstance().markdown2Html(markdown, "", "");
+				Node document = parser.parse(removeSynapseWikiWidgets(markdown));
+				HtmlRenderer renderer = HtmlRenderer.builder().build();
+				String wikiHtml = renderer.render(document);
 				// extract plain text from wiki html
 				markdown = Jsoup.parse(wikiHtml).text();
-			} catch (IOException e) {
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 			html.append(markdown + "<br />");
 		}
