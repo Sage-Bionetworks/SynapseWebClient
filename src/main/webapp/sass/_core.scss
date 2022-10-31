@@ -281,6 +281,12 @@ end sticky footer
 		padding: 20px 0px 0px;
 		//orignally no margin
 		margin: 0px 45px;
+		
+		// if using a react form in a modal, form usually contains the CTA buttons
+		// instead of living in the model-footer.
+		.rjsf {
+			padding-bottom: 15px;
+		}
 	}
 
 	.modal-header {

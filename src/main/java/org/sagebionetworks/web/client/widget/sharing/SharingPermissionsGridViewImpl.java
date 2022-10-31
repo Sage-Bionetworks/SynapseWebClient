@@ -99,37 +99,44 @@ public class SharingPermissionsGridViewImpl extends Composite implements Sharing
 		permListBox.addStyleName("input-xs");
 		data = new TableData();
 		row.add(data);
-		if (!deleteButtonVisible || deleteButtonCallback == null) {
-			// Don't allow editing the permissions and don't add delete button.
-			String selectedItemText = permListBox.getSelectedItemText();
-			// SWC-6083: If this is the ACL entry of the public group
-			// and this is not editable (deleteButtonCallback == null),
-			// and the ACL entry is set to Can View,
-			// and this entity is set to be OPEN_DATA
-			// then render Can Download instead.
-			String canViewDisplayText = permissionDisplay.get(PermissionLevel.CAN_VIEW);
-			if (aclEntry.getOwnerId().equals(publicAclPrincipalId) && selectedItemText.equals(canViewDisplayText) && isOpenData) {
-				data.add(new Text(permissionDisplay.get(PermissionLevel.CAN_DOWNLOAD)));
+		boolean isDeleteButtonAvailable = deleteButtonVisible && deleteButtonCallback != null;
+		Widget permissionWidget;
+		
+		if (aclEntry.getOwnerId().equals(publicAclPrincipalId)) {
+			// SWC-6314 (and SWC-6083): If this is the public group, render Can Download if OPEN_DATA, otherwise Can View.
+			if (isOpenData) {
+				permissionWidget = new Text(permissionDisplay.get(PermissionLevel.CAN_DOWNLOAD));
 			} else {
-				data.add(new Text(selectedItemText));	
+				permissionWidget = new Text(permListBox.getSelectedItemText());
 			}
-			permissionColumnHeader.setStyleName("col-md-3");
+		}
+		else if (isDeleteButtonAvailable) {
+			permissionWidget = permListBox;
 		} else {
-			data.add(permListBox);
+			// Don't allow editing the permissions and don't add delete button.
+			permissionWidget = new Text(permListBox.getSelectedItemText());
+		}
+		
+		data.add(permissionWidget);
+		
+		if (isDeleteButtonAvailable) {
 			// Add delete button and size columns.
-			data = new TableData();
+			TableData deleteButtonContainer = new TableData();
 			Anchor deleteButton = new Anchor();
 			deleteButton.setIcon(IconType.TIMES);
 			deleteButton.addClickHandler(event -> {
 				tableBody.remove(row);
 				deleteButtonCallback.invoke(Long.parseLong(aclEntry.getOwnerId()));
 			});
-			data.add(deleteButton);
-			row.add(data);
+			deleteButtonContainer.add(deleteButton);
+			row.add(deleteButtonContainer);
 
 			permissionColumnHeader.addStyleName("col-md-2");
 			deleteColumnHeader.addStyleName("col-md-1");
+		} else {
+			permissionColumnHeader.setStyleName("col-md-3");
 		}
+		
 		return row;
 	}
 
