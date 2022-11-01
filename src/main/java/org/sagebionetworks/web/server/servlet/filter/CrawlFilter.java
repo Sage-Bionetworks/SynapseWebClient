@@ -80,6 +80,7 @@ import com.google.gwt.thirdparty.guava.common.base.Suppliers;
  */
 public class CrawlFilter extends OncePerRequestFilter {
 
+	public static final String META_ROBOTS_NOINDEX = "<meta name=\"robots\" content=\"noindex\">";
 	SynapseClientImpl synapseClient = null;
 	DiscussionForumClientImpl discussionForumClient = null;
 	JSONObjectAdapter jsonObjectAdapter = null;
@@ -277,7 +278,7 @@ public class CrawlFilter extends OncePerRequestFilter {
 		// note: can't set description meta tag, since it might be markdown.
 		html.append("<!DOCTYPE html><html><head><title>" + name + " - " + entity.getId() + "</title>");
 		if (annotations.getAnnotations().containsKey("noindex")) {
-			html.append("<meta name=\"robots\" content=\"noindex\">");
+			html.append(META_ROBOTS_NOINDEX);
 		}
 		html.append("</head><body><h1>" + name + "</h1>");
 		if (description != null) {
