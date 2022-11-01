@@ -96,7 +96,7 @@ public class MarkdownWidgetTest {
 		// forever but still can be verified
 		when(mockView.getElementById(WidgetConstants.MARKDOWN_TABLE_ID_PREFIX + "0")).thenReturn(mockElementWrapper);
 		when(mockView.getElementById(Mockito.contains(WidgetConstants.DIV_ID_MATHJAX_PREFIX + "0"))).thenReturn(mockElementWrapper);
-		when(mockView.getElementById(Mockito.contains(org.sagebionetworks.markdown.constants.WidgetConstants.DIV_ID_WIDGET_PREFIX + "0"))).thenReturn(mockElementWrapper);
+		when(mockView.getElementById(Mockito.contains(WidgetConstants.DIV_ID_WIDGET_PREFIX + "0"))).thenReturn(mockElementWrapper);
 		when(mockResourceLoader.isLoaded(any(WebResource.class))).thenReturn(true);
 		presenter.configure(testMarkdown, mockWikiPageKey, null);
 		ArgumentCaptor<Callback> callbackCaptor = ArgumentCaptor.forClass(Callback.class);
@@ -124,7 +124,7 @@ public class MarkdownWidgetTest {
 		verify(mockWidgetRegistrar).getWidgetContentType(elementContentType);
 		verify(mockWidgetRegistrar).getWidgetDescriptor(elementContentType);
 		verify(mockWidgetRegistrar).getWidgetRendererForWidgetDescriptor(Mockito.eq(mockWikiPageKey), anyString(), anyMap(), any(Callback.class), any(Long.class));
-		verify(mockView).addWidget(any(Widget.class), Mockito.contains(org.sagebionetworks.markdown.constants.WidgetConstants.DIV_ID_WIDGET_PREFIX + "0"));
+		verify(mockView).addWidget(any(Widget.class), Mockito.contains(WidgetConstants.DIV_ID_WIDGET_PREFIX + "0"));
 		// removes text inserted by markdown processor (usually "<Synapse widget>" text node, but is
 		// username in the case of @username mentions).
 		verify(mockElementWrapper).removeAllChildren();
@@ -139,7 +139,7 @@ public class MarkdownWidgetTest {
 		// forever but still can be verified
 		when(mockView.getElementById(WidgetConstants.MARKDOWN_TABLE_ID_PREFIX + "0")).thenReturn(mockElementWrapper);
 		when(mockView.getElementById(Mockito.contains(WidgetConstants.DIV_ID_MATHJAX_PREFIX + "0"))).thenReturn(mockElementWrapper);
-		when(mockView.getElementById(Mockito.contains(org.sagebionetworks.markdown.constants.WidgetConstants.DIV_ID_WIDGET_PREFIX + "0"))).thenReturn(mockElementWrapper);
+		when(mockView.getElementById(Mockito.contains(WidgetConstants.DIV_ID_WIDGET_PREFIX + "0"))).thenReturn(mockElementWrapper);
 		when(mockResourceLoader.isLoaded(any(WebResource.class))).thenReturn(true);
 
 		presenter.loadMarkdownFromWikiPage(mockWikiPageKey, true);
@@ -165,7 +165,7 @@ public class MarkdownWidgetTest {
 		verify(mockWidgetRegistrar).getWidgetContentType(elementContentType);
 		verify(mockWidgetRegistrar).getWidgetDescriptor(elementContentType);
 		verify(mockWidgetRegistrar).getWidgetRendererForWidgetDescriptor(any(WikiPageKey.class), anyString(), anyMap(), any(Callback.class), any(Long.class));
-		verify(mockView).addWidget(any(Widget.class), Mockito.contains(org.sagebionetworks.markdown.constants.WidgetConstants.DIV_ID_WIDGET_PREFIX + "0"));
+		verify(mockView).addWidget(any(Widget.class), Mockito.contains(WidgetConstants.DIV_ID_WIDGET_PREFIX + "0"));
 	}
 
 	@Test

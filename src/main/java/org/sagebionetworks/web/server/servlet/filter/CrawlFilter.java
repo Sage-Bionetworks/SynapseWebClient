@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.server.servlet.filter;
 
 import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -13,20 +14,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
-import javax.servlet.Filter;
+
 import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.io.IOUtils;
+import org.commonmark.node.Node;
+import org.commonmark.parser.Parser;
+import org.commonmark.renderer.html.HtmlRenderer;
 import org.jsoup.Jsoup;
 import org.sagebionetworks.client.SynapseClient;
-import org.sagebionetworks.markdown.SynapseMarkdownProcessor;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
@@ -67,6 +68,8 @@ import org.sagebionetworks.web.shared.TeamMemberPagedResults;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+import org.springframework.web.filter.OncePerRequestFilter;
+
 import com.google.gwt.thirdparty.guava.common.base.Supplier;
 import com.google.gwt.thirdparty.guava.common.base.Suppliers;
 
@@ -75,15 +78,26 @@ import com.google.gwt.thirdparty.guava.common.base.Suppliers;
  * and handles the response.
  *
  */
-public class CrawlFilter implements Filter {
+public class CrawlFilter extends OncePerRequestFilter {
 
+	public static final String META_ROBOTS_NOINDEX = "<meta name=\"robots\" content=\"noindex\">";
+	SynapseClientImpl synapseClient = null;
+	DiscussionForumClientImpl discussionForumClient = null;
+	JSONObjectAdapter jsonObjectAdapter = null;
 	private static final String DISCUSSION_THREAD_ID = "/discussion/threadId=";
 	public static final String ESCAPED_FRAGMENT = "_escaped_fragment_=";
-	ServletContext sc;
-
 	private final Supplier<String> homePageCached = Suppliers.memoizeWithExpiration(homePageSupplier(), 1, TimeUnit.DAYS);
 	public static final int MAX_CHILD_PAGES = 5;
 
+	// Markdown processor
+	Parser parser = Parser.builder().build();
+	String synapseWikiWidgetDefinitionRegex = "[$][{].*[}]";
+	Pattern wikiWidgetPattern = Pattern.compile(synapseWikiWidgetDefinitionRegex, Pattern.CASE_INSENSITIVE);
+	
+	private String removeSynapseWikiWidgets(String markdown) {
+		return wikiWidgetPattern.matcher(markdown).replaceAll("");
+	}
+	
 	public String getCachedHomePageHtml() {
 		return homePageCached.get();
 	}
@@ -100,25 +114,22 @@ public class CrawlFilter implements Filter {
 		};
 	}
 
-	/**
-	 * Injected with Gin
-	 */
-	private SynapseClientImpl synapseClient;
-	private DiscussionForumClientImpl discussionForumClient;
-	JSONObjectAdapter jsonObjectAdapter;
-
-	@Override
-	public void destroy() {
-		sc = null;
+	public void init(SynapseClientImpl synapseClient, DiscussionForumClientImpl discussionForumClient) {
+		this.synapseClient = synapseClient;
+		this.discussionForumClient = discussionForumClient;
 	}
-
+	
 	@Override
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+		if (synapseClient == null) {
+			init(new SynapseClientImpl(), new DiscussionForumClientImpl());
+		}
 		HttpServletRequest httpRqst = (HttpServletRequest) request;
 		// Is this an ugly url that we need to convert/handle?
 		String queryString = httpRqst.getQueryString();
 		if (queryString != null && queryString.contains(ESCAPED_FRAGMENT)) {
 			try {
+				this.jsonObjectAdapter = new JSONObjectAdapterImpl();
 				String uri = httpRqst.getRequestURI();
 				int port = request.getServerPort();
 				String domain = request.getServerName();
@@ -180,7 +191,7 @@ public class CrawlFilter implements Filter {
 				e.printStackTrace();
 			}
 		} else {
-			chain.doFilter(request, response);
+			filterChain.doFilter(request, response);
 		}
 	}
 
@@ -265,9 +276,11 @@ public class CrawlFilter implements Filter {
 		StringBuilder html = new StringBuilder();
 
 		// note: can't set description meta tag, since it might be markdown.
-		html.append("<!DOCTYPE html><html><head><title>" + name + " - " + entity.getId() + "</title></head><body>");
-
-		html.append("<h1>" + name + "</h1>");
+		html.append("<!DOCTYPE html><html><head><title>" + name + " - " + entity.getId() + "</title>");
+		if (annotations.getAnnotations().containsKey("noindex")) {
+			html.append(META_ROBOTS_NOINDEX);
+		}
+		html.append("</head><body><h1>" + name + "</h1>");
 		if (description != null) {
 			html.append(description + "<br />");
 		}
@@ -276,10 +289,13 @@ public class CrawlFilter implements Filter {
 		}
 		if (markdown != null) {
 			try {
-				String wikiHtml = SynapseMarkdownProcessor.getInstance().markdown2Html(markdown, "", "");
+				Node document = parser.parse(removeSynapseWikiWidgets(markdown));
+				HtmlRenderer renderer = HtmlRenderer.builder().build();
+				String wikiHtml = renderer.render(document);
 				// extract plain text from wiki html
 				markdown = Jsoup.parse(wikiHtml).text();
-			} catch (IOException e) {
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 			html.append(markdown + "<br />");
 		}
@@ -484,7 +500,6 @@ public class CrawlFilter implements Filter {
 		}
 	}
 
-
 	public EntityChildrenRequest createGetChildrenQuery(String parentId) {
 		EntityChildrenRequest newQuery = new EntityChildrenRequest();
 		newQuery.setParentId(parentId);
@@ -495,11 +510,8 @@ public class CrawlFilter implements Filter {
 		return newQuery;
 	}
 
-	@Override
-	public void init(FilterConfig config) throws ServletException {
-		this.sc = config.getServletContext();
-		synapseClient = new SynapseClientImpl();
-		discussionForumClient = new DiscussionForumClientImpl();
-		jsonObjectAdapter = new JSONObjectAdapterImpl();
+	public void testFilter(HttpServletRequest mockRequest, HttpServletResponse mockResponse, FilterChain mockFilterChain) throws ServletException, IOException {
+		doFilterInternal(mockRequest, mockResponse, mockFilterChain);
 	}
+
 }
