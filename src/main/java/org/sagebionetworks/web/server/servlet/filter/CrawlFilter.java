@@ -17,13 +17,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
-import javax.servlet.Filter;
 import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -73,6 +68,7 @@ import org.sagebionetworks.web.shared.TeamMemberPagedResults;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.google.gwt.thirdparty.guava.common.base.Supplier;
 import com.google.gwt.thirdparty.guava.common.base.Suppliers;
@@ -82,12 +78,13 @@ import com.google.gwt.thirdparty.guava.common.base.Suppliers;
  * and handles the response.
  *
  */
-public class CrawlFilter implements Filter {
+public class CrawlFilter extends OncePerRequestFilter {
 
+	SynapseClientImpl synapseClient = null;
+	DiscussionForumClientImpl discussionForumClient = null;
+	JSONObjectAdapter jsonObjectAdapter = null;
 	private static final String DISCUSSION_THREAD_ID = "/discussion/threadId=";
 	public static final String ESCAPED_FRAGMENT = "_escaped_fragment_=";
-	ServletContext sc;
-
 	private final Supplier<String> homePageCached = Suppliers.memoizeWithExpiration(homePageSupplier(), 1, TimeUnit.DAYS);
 	public static final int MAX_CHILD_PAGES = 5;
 
@@ -116,25 +113,22 @@ public class CrawlFilter implements Filter {
 		};
 	}
 
-	/**
-	 * Injected with Gin
-	 */
-	private SynapseClientImpl synapseClient;
-	private DiscussionForumClientImpl discussionForumClient;
-	JSONObjectAdapter jsonObjectAdapter;
-
-	@Override
-	public void destroy() {
-		sc = null;
+	public void init(SynapseClientImpl synapseClient, DiscussionForumClientImpl discussionForumClient) {
+		this.synapseClient = synapseClient;
+		this.discussionForumClient = discussionForumClient;
 	}
-
+	
 	@Override
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+		if (synapseClient == null) {
+			init(new SynapseClientImpl(), new DiscussionForumClientImpl());
+		}
 		HttpServletRequest httpRqst = (HttpServletRequest) request;
 		// Is this an ugly url that we need to convert/handle?
 		String queryString = httpRqst.getQueryString();
 		if (queryString != null && queryString.contains(ESCAPED_FRAGMENT)) {
 			try {
+				this.jsonObjectAdapter = new JSONObjectAdapterImpl();
 				String uri = httpRqst.getRequestURI();
 				int port = request.getServerPort();
 				String domain = request.getServerName();
@@ -196,7 +190,7 @@ public class CrawlFilter implements Filter {
 				e.printStackTrace();
 			}
 		} else {
-			chain.doFilter(request, response);
+			filterChain.doFilter(request, response);
 		}
 	}
 
@@ -505,7 +499,6 @@ public class CrawlFilter implements Filter {
 		}
 	}
 
-
 	public EntityChildrenRequest createGetChildrenQuery(String parentId) {
 		EntityChildrenRequest newQuery = new EntityChildrenRequest();
 		newQuery.setParentId(parentId);
@@ -516,11 +509,8 @@ public class CrawlFilter implements Filter {
 		return newQuery;
 	}
 
-	@Override
-	public void init(FilterConfig config) throws ServletException {
-		this.sc = config.getServletContext();
-		synapseClient = new SynapseClientImpl();
-		discussionForumClient = new DiscussionForumClientImpl();
-		jsonObjectAdapter = new JSONObjectAdapterImpl();
+	public void testFilter(HttpServletRequest mockRequest, HttpServletResponse mockResponse, FilterChain mockFilterChain) throws ServletException, IOException {
+		doFilterInternal(mockRequest, mockResponse, mockFilterChain);
 	}
+
 }
