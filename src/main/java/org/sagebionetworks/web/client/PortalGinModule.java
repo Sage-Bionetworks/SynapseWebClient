@@ -546,6 +546,8 @@ import org.sagebionetworks.web.client.widget.login.LoginModalView;
 import org.sagebionetworks.web.client.widget.login.LoginModalViewImpl;
 import org.sagebionetworks.web.client.widget.login.LoginWidgetView;
 import org.sagebionetworks.web.client.widget.login.LoginWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.modal.Dialog;
+import org.sagebionetworks.web.client.widget.modal.DialogView;
 import org.sagebionetworks.web.client.widget.pageprogress.PageProgressWidgetView;
 import org.sagebionetworks.web.client.widget.pageprogress.PageProgressWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationView;
@@ -1459,5 +1461,6 @@ public class PortalGinModule extends AbstractGinModule {
         bind(OpenDataView.class).to(OpenDataViewImpl.class);
         bind(QueryClientProvider.class).to(QueryClientProviderImpl.class).in(Singleton.class);
         bind(IntendedDataUseReportWidgetView.class).to(IntendedDataUseReportWidgetViewImpl.class);
+        bind(DialogView.class).to(Dialog.class);
     }
 }

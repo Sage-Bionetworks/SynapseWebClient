@@ -24,7 +24,7 @@ import com.google.gwt.user.client.ui.Widget;
  * @author jhodgson
  * 
  */
-public class Dialog extends UIObject implements IsWidget, HasWidgets {
+public class Dialog extends UIObject implements DialogView, IsWidget, HasWidgets {
 
 	public interface DialogUiBinder extends UiBinder<Widget, Dialog> {
 	}
@@ -88,7 +88,7 @@ public class Dialog extends UIObject implements IsWidget, HasWidgets {
 	 * @param callback
 	 * @param autoHide if true, will hide the dialog on primary or default button click.
 	 */
-	public void configure(String title, Widget body, String primaryButtonText, String defaultButtonText, Callback callback, boolean autoHide) {
+	public void configure(String title, IsWidget body, String primaryButtonText, String defaultButtonText, Callback callback, boolean autoHide) {
 		configure(title, primaryButtonText, defaultButtonText, callback, autoHide);
 		mainContent.clear();
 		mainContent.add(body);

@@ -21,7 +21,11 @@ public class IntendedDataUseReportWidget implements WidgetRendererPresenter {
 	@Override
 	public void configure(final WikiPageKey wikiKey, final Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
 		String arId = widgetDescriptor.get(ACCESS_RESTRICTION_ID).trim();
-		view.render(arId);
+		configure(arId);
+	}
+
+	public void configure(String accessRequirementId) {
+		view.render(accessRequirementId);
 	}
 
 	@Override
