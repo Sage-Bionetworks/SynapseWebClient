@@ -85,6 +85,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			public void onSuccess(LoginResponse response) {
 				storeAuthenticationReceipt(response.getAuthenticationReceipt());
 				setNewAccessToken(response.getAccessToken(), callback);
+				clearQueryClientCache();
 			}
 
 			@Override
@@ -149,7 +150,6 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			public void onSuccess(String accessToken) {
 				cookies.setCookie(CookieKeys.USER_LOGGED_IN_RECENTLY, "true", DateTimeUtilsImpl.getWeekFromNow());
 				currentUserAccessToken = accessToken;
-				clearQueryClientCache();
 				userAccountService.getMyProfile(new AsyncCallback<UserProfile>() {
 					@Override
 					public void onSuccess(UserProfile profile) {
