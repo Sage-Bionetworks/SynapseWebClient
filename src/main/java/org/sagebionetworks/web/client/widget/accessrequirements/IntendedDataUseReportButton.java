@@ -24,6 +24,7 @@ public class IntendedDataUseReportButton implements IsWidget {
 	AccessRequirement ar;
 	DialogView dialog;
 	IntendedDataUseReportWidget iduReportWidget;
+	SynapseAlert synAlert;
 	
 	@Inject
 	public IntendedDataUseReportButton(Button button, IsACTMemberAsyncHandler isACTMemberAsyncHandler, DialogView dialog, DivView divView, SynapseAlert synAlert, IntendedDataUseReportWidget iduReportWidget) {
@@ -31,7 +32,7 @@ public class IntendedDataUseReportButton implements IsWidget {
 		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
 		this.dialog = dialog;
 		this.iduReportWidget = iduReportWidget;
-		synAlert.showError("Please use the dynamic IDU Report wiki widget instead of this snapshot. ${iduReport?accessRestrictionId=12345}");
+		this.synAlert = synAlert;
 		divView.add(synAlert);
 		divView.add(iduReportWidget);
 		dialog.configure(IDU_MODAL_TITLE, divView, null, "Cancel", null, true);
@@ -45,6 +46,7 @@ public class IntendedDataUseReportButton implements IsWidget {
 	}
 
 	public void configure(AccessRequirement ar) {
+		synAlert.showError("Please use the dynamic IDU Report wiki widget instead of this snapshot. ${iduReport?accessRestrictionId="+ar.getId()+"}");
 		button.setText(GENERATE_REPORT_BUTTON_TEXT);
 		button.setSize(ButtonSize.DEFAULT);
 		button.setType(ButtonType.DEFAULT);
