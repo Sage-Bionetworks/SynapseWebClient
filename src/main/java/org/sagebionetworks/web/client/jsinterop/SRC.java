@@ -45,6 +45,7 @@ public class SRC {
 		public static ReactComponentType<AccountLevelBadgeProps> AccountLevelBadge;
 		public static ReactComponentType<PageProgressProps> PageProgress;
 		public static ReactComponentType<TermsAndConditionsProps> TermsAndConditions;
+		public static ReactComponentType<IDUReportProps> IDUReport;
 		public static ReactComponentType CertificationQuiz;
 
 		/**

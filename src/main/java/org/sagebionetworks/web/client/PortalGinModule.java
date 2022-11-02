@@ -466,6 +466,8 @@ import org.sagebionetworks.web.client.widget.entity.renderer.IFrameView;
 import org.sagebionetworks.web.client.widget.entity.renderer.IFrameViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.IntendedDataUseReportWidgetView;
+import org.sagebionetworks.web.client.widget.entity.renderer.IntendedDataUseReportWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.PlotlyWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.PlotlyWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.ReferenceWidgetView;
@@ -1455,7 +1457,7 @@ public class PortalGinModule extends AbstractGinModule {
         bind(SynapseContextPropsProvider.class).to(SynapseContextPropsProviderImpl.class);
         bind(AddToDownloadListV2.class).to(AddToDownloadListV2Impl.class);
         bind(OpenDataView.class).to(OpenDataViewImpl.class);
-
         bind(QueryClientProvider.class).to(QueryClientProviderImpl.class).in(Singleton.class);
+        bind(IntendedDataUseReportWidgetView.class).to(IntendedDataUseReportWidgetViewImpl.class);
     }
 }
