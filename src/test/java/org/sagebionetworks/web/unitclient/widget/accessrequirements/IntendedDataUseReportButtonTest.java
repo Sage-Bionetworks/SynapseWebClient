@@ -1,9 +1,9 @@
 package org.sagebionetworks.web.unitclient.widget.accessrequirements;
 
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,11 +14,15 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.view.DivView;
 import org.sagebionetworks.web.client.widget.Button;
-import org.sagebionetworks.web.client.widget.accessrequirements.IntendedDataUseGenerator;
 import org.sagebionetworks.web.client.widget.accessrequirements.IntendedDataUseReportButton;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.BigPromptModalView;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.renderer.IntendedDataUseReportWidget;
+import org.sagebionetworks.web.client.widget.modal.DialogView;
+
 import com.google.gwt.event.dom.client.ClickHandler;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -44,13 +48,18 @@ public class IntendedDataUseReportButtonTest {
 	@Mock
 	DateTimeUtils mockDateTimeUtils;
 	@Mock
-	IntendedDataUseGenerator mockIntendedDataUseGenerator;
-	public static String IDU_REPORT_MD = "Intended Data Use report (md)";
+	DialogView mockDialog;
+	@Mock
+	DivView mockDivView;
+	@Mock
+	SynapseAlert mockSynAlert;
+	@Mock
+	IntendedDataUseReportWidget mockIntendedDataUseReportWidget;
 
 	@Before
 	public void setUp() throws Exception {
 		when(mockAccessRequirement.getId()).thenReturn(AR_ID);
-		widget = new IntendedDataUseReportButton(mockButton, mockIsACTMemberAsyncHandler, mockBigPromptModal, mockIntendedDataUseGenerator);
+		widget = new IntendedDataUseReportButton(mockButton, mockIsACTMemberAsyncHandler, mockDialog, mockDivView, mockSynAlert, mockIntendedDataUseReportWidget);
 		verify(mockButton).addClickHandler(clickHandlerCaptor.capture());
 		onButtonClickHandler = clickHandlerCaptor.getValue();
 	}
@@ -78,11 +87,7 @@ public class IntendedDataUseReportButtonTest {
 		// projects) and show IDUs
 		onButtonClickHandler.onClick(null);
 
-		verify(mockIntendedDataUseGenerator).gatherAllSubmissions(eq(AR_ID.toString()), callbackPCaptor.capture());
-		CallbackP iduGeneratorCallback = callbackPCaptor.getValue();
-		
-		iduGeneratorCallback.invoke(IDU_REPORT_MD);
-		
-		verify(mockBigPromptModal).configure(IntendedDataUseReportButton.IDU_MODAL_TITLE, IntendedDataUseReportButton.IDU_MODAL_FIELD_NAME, IDU_REPORT_MD);
+		verify(mockIntendedDataUseReportWidget).configure(AR_ID.toString());
+		verify(mockDialog).show();
 	}
 }

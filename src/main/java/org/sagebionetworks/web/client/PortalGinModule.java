@@ -466,6 +466,8 @@ import org.sagebionetworks.web.client.widget.entity.renderer.IFrameView;
 import org.sagebionetworks.web.client.widget.entity.renderer.IFrameViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.IntendedDataUseReportWidgetView;
+import org.sagebionetworks.web.client.widget.entity.renderer.IntendedDataUseReportWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.PlotlyWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.PlotlyWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.ReferenceWidgetView;
@@ -544,6 +546,8 @@ import org.sagebionetworks.web.client.widget.login.LoginModalView;
 import org.sagebionetworks.web.client.widget.login.LoginModalViewImpl;
 import org.sagebionetworks.web.client.widget.login.LoginWidgetView;
 import org.sagebionetworks.web.client.widget.login.LoginWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.modal.Dialog;
+import org.sagebionetworks.web.client.widget.modal.DialogView;
 import org.sagebionetworks.web.client.widget.pageprogress.PageProgressWidgetView;
 import org.sagebionetworks.web.client.widget.pageprogress.PageProgressWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationView;
@@ -1455,7 +1459,8 @@ public class PortalGinModule extends AbstractGinModule {
         bind(SynapseContextPropsProvider.class).to(SynapseContextPropsProviderImpl.class);
         bind(AddToDownloadListV2.class).to(AddToDownloadListV2Impl.class);
         bind(OpenDataView.class).to(OpenDataViewImpl.class);
-
         bind(QueryClientProvider.class).to(QueryClientProviderImpl.class).in(Singleton.class);
+        bind(IntendedDataUseReportWidgetView.class).to(IntendedDataUseReportWidgetViewImpl.class);
+        bind(DialogView.class).to(Dialog.class);
     }
 }
