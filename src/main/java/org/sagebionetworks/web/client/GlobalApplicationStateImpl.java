@@ -515,7 +515,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 					// SWC-5812: SRC has components that apply this special CSS class, and expect the app to look for these events and handle appropriately.
 					// When the class name is undefined, targetElement.getClassName() still returns an object where isEmpty is false and is not equal to null.
 					try {
-						if (targetElement.hasClassName("SRC-SIGN-IN-CLASS")) {
+						if (targetElement.hasClassName("SRC-SIGN-IN-CLASS") && !ginInjector.getAuthenticationController().isLoggedIn()) {
 							getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 						}
 					} catch (Exception e) {
