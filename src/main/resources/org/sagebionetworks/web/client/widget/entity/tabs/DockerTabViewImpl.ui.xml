@@ -4,18 +4,16 @@
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
-	<b:Row ui:field="dockerTabContainer" addStyleNames="dockerTabContent">
+	<g:FlowPanel addStyleNames="margin-top-15 margin-left-15 margin-right-15 dockerTabContent">
 		<g:SimplePanel ui:field="synapseAlertContainer"/>
-		<bh:Div addStyleNames="margin-left-15 margin-right-15 flexcontainer-row">
+		<bh:Div addStyleNames="flexcontainer-row">
 			<bh:Div addStyleNames="flexcontainer-column flexcontainer-column-fill-width">
 				<g:SimplePanel ui:field="dockerBreadcrumbContainer" visible="false"/>
 				<b:Heading size="H3" ui:field="title" text="Docker" addStyleNames="margin-bottom-20"/>
 			</bh:Div>
 			<bh:Div addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end min-width-70" ui:field="actionMenuContainer"/>
 		</bh:Div>
-		<b:Column size="XS_12">
-			<g:SimplePanel ui:field="dockerRepoListWidgetContainer"/>
-			<g:SimplePanel ui:field="dockerRepoWidgetContainer"/>
-		</b:Column>
-	</b:Row>
+        <g:SimplePanel ui:field="dockerRepoListWidgetContainer"/>
+        <g:SimplePanel ui:field="dockerRepoWidgetContainer"/>
+	</g:FlowPanel>
 </ui:UiBinder>
