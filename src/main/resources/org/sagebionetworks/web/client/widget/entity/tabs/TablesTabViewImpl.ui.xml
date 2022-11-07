@@ -5,8 +5,8 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	<g:FlowPanel ui:field="tablesTabContainer" addStyleNames="tablesTabContent">
-		<g:SimplePanel ui:field="synapseAlertContainer"/>
 		<g:SimplePanel ui:field="tableBreadcrumbContainer" visible="false"/>
+		<g:SimplePanel ui:field="synapseAlertContainer"/>
 		<w:FullWidthAlert ui:field="versionAlert"
 						  alertType="WARNING"
 						  messageTitle="This is a Draft Version of the Dataset"
