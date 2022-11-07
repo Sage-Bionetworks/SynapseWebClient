@@ -5,13 +5,13 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	
-	<b:Row addStyleNames="filesTabContent">
+	<g:FlowPanel addStyleNames="filesTabContent">
 		<w:LoadingSpinner ui:field="loading" size="31px" addStyleNames="center-block center min-height-400"/>
 		<g:SimplePanel ui:field="refreshAlertContainer"/>
 		<g:SimplePanel ui:field="synapseAlertContainer"/>
 		<bh:Div ui:field="modalDialogContainer" />
-		<bh:Div addStyleNames="margin-left-15 margin-right-15">
-			<g:SimplePanel ui:field="fileBreadcrumbContainer"/>
+        <g:SimplePanel ui:field="fileBreadcrumbContainer"/>
+        <bh:Div addStyleNames="margin-top-15 margin-left-15 margin-right-15">
 			<g:SimplePanel ui:field="folderTitlebarContainer" visible="false"/>
 			<g:SimplePanel ui:field="fileTitlebarContainer" visible="false"/>
 			<g:SimplePanel ui:field="fileMetadataContainer" visible="false"/>
@@ -56,5 +56,5 @@
 			</b:Row>
 			<g:SimplePanel addStyleNames="padding-bottom-15" ui:field="fileModifiedAndCreatedContainer"/>
 		</b:Column>
-	</b:Row>
+	</g:FlowPanel>
 </ui:UiBinder>

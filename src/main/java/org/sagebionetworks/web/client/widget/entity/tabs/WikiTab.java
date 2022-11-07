@@ -29,7 +29,7 @@ public class WikiTab {
 	public void lazyInject() {
 		if (wikiPageWidget == null) {
 			this.wikiPageWidget = ginInjector.getWikiPageWidget();
-			wikiPageWidget.addStyleName("panel panel-default panel-body margin-bottom-0-imp");
+			wikiPageWidget.addStyleName("panel panel-default panel-body margin-top-15 margin-left-15 margin-right-15 margin-bottom-0-imp");
 			wikiPageWidget.setWikiReloadHandler(wikiPageId -> {
 				tab.configureEntityActionController(projectBundle, true, wikiPageId);
 				setEntityNameAndPlace(entityId, entityName, wikiPageId);

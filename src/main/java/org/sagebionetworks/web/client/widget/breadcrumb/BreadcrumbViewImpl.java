@@ -1,37 +1,37 @@
 package org.sagebionetworks.web.client.widget.breadcrumb;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-import org.gwtbootstrap3.client.ui.html.Span;
-import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.jsinterop.BreadcrumbItem;
+import org.sagebionetworks.web.client.jsinterop.EntityPageBreadcrumbsProps;
+import org.sagebionetworks.web.client.jsinterop.React;
+import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.place.Synapse;
-import org.sagebionetworks.web.client.widget.EntityTypeIcon;
+import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class BreadcrumbViewImpl implements BreadcrumbView {
-	private static final int MAX_BREADCRUMB_LENGTH = 25;
 
-	FlowPanel panel;
+public class BreadcrumbViewImpl implements BreadcrumbView {
+	private final SynapseContextPropsProvider propsProvider;
+	ReactComponentDiv container;
 	private Presenter presenter;
 
 
 	@Inject
-	public BreadcrumbViewImpl() {
-		panel = new FlowPanel();
-		panel.addStyleName("font-size-16");
+	public BreadcrumbViewImpl(SynapseContextPropsProvider propsProvider) {
+		this.propsProvider = propsProvider;
+		container = new ReactComponentDiv();
 	}
 
 	@Override
 	public Widget asWidget() {
-		return panel;
+		return container;
 	}
 
 	@Override
@@ -46,41 +46,33 @@ public class BreadcrumbViewImpl implements BreadcrumbView {
 
 	@Override
 	public void setLinksList(List<LinkData> breadcrumbs, String current) {
-		panel.clear();
-		for (int i = 0; i < breadcrumbs.size(); i++) {
-			final LinkData data = breadcrumbs.get(i);
-			String text = data.getText();
-			text = stubString(text);
-			Anchor anchor = new Anchor();
-			EntityTypeIcon icon = new EntityTypeIcon(data.getEntityType());
-			icon.setStyleName("margin-right-5");
-			anchor.getElement().appendChild(icon.getElement());
-			Span textContainer = new Span();
-			textContainer.setText(text);
-			anchor.getElement().appendChild(textContainer.getElement());
-			anchor.addStyleName("displayInline");
+		List<BreadcrumbItem> items = breadcrumbs.stream().map(data -> {
+			String href = null;
 			if (data.getPlace() instanceof Synapse) {
 				Synapse synapsePlace = (Synapse) data.getPlace();
-				anchor.setHref("#" + DisplayUtils.getSynapseHistoryTokenNoHash(synapsePlace.getEntityId(), synapsePlace.getVersionNumber(), synapsePlace.getArea(), synapsePlace.getAreaToken()));
+				href = ("#" + DisplayUtils.getSynapseHistoryTokenNoHash(synapsePlace.getEntityId(), synapsePlace.getVersionNumber(), synapsePlace.getArea(), synapsePlace.getAreaToken()));
 			}
-			anchor.addClickHandler(event -> {
-				if (!(DisplayUtils.isAnyModifierKeyDown(event))) {
-					event.preventDefault();
-					presenter.goTo(data.getPlace());
-				}
-			});
-			if (i > 0) {
-				panel.add(new InlineHTML(SafeHtmlUtils.fromSafeConstant(ClientProperties.BREADCRUMB_SEP)));
+			BreadcrumbItem.OnClick clickHandler = null;
+			if (data.getPlace() != null) {
+				clickHandler = (event) -> {
+					if (!(DisplayUtils.isAnyModifierKeyDown(event))) {
+						event.preventDefault();
+						presenter.goTo(data.getPlace());
+					}
+				};
 			}
-			panel.add(anchor);
-		}
+			return BreadcrumbItem.create(data.getText(), false, href, clickHandler);
+		}).collect(Collectors.toList());
+		// If there's a "current" item, add it to the end of the list
 		if (current != null) {
-			current = stubString(current);
-			SafeHtmlBuilder shb = new SafeHtmlBuilder();
-			shb.appendHtmlConstant(ClientProperties.BREADCRUMB_SEP);
-			shb.appendEscaped(current);
-			panel.add(new InlineHTML(shb.toSafeHtml()));
+			items.add(BreadcrumbItem.create(current, true, null, null));
 		}
+
+		EntityPageBreadcrumbsProps props = EntityPageBreadcrumbsProps.create(items.toArray(new BreadcrumbItem[0]));
+
+		ReactNode element = React.createElementWithSynapseContext(SRC.SynapseComponents.EntityPageBreadcrumbs, props, propsProvider.getJsInteropContextProps());
+
+		container.render(element);
 	}
 
 	@Override
@@ -90,7 +82,7 @@ public class BreadcrumbViewImpl implements BreadcrumbView {
 
 	@Override
 	public void clear() {
-		panel.clear();
+		container.clear();
 	}
 
 	@Override
@@ -102,17 +94,4 @@ public class BreadcrumbViewImpl implements BreadcrumbView {
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
 	}
-
-	/*
-	 * Private Methods
-	 */
-	private String stubString(String text) {
-		if (text.length() > MAX_BREADCRUMB_LENGTH) {
-			text = text.substring(0, MAX_BREADCRUMB_LENGTH - 1) + "...";
-		}
-		return text;
-	}
-
-
-
 }

@@ -424,7 +424,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			isToastContainerInitialized = true;
 
 			Element toastContainer = RootPanel.get("toastContainer").getElement();
-			ReactNode component = React.createElement(SRC.SynapseComponents.SynapseToastContainer, null);
+			ReactNode component = React.createElementWithThemeContext(SRC.SynapseComponents.SynapseToastContainer, null);
 			ReactDOM.createRoot(toastContainer).render(component);
 		}
 	}

@@ -7,7 +7,7 @@
 		<b:ListItem ui:field="tabListItem" addStyleNames="entity-tab" visible="false">
 			<b:Anchor ui:field="tabItem" addStyleNames="text-align-center link no-background" tabIndex="-1"/>
 		</b:ListItem>
-		<b:TabPane ui:field="tabPane" active="true" addStyleNames="row tab-background padding-top-15">
+		<b:TabPane ui:field="tabPane" active="true" addStyleNames="row tab-background">
 			<bh:Div ui:field="contentDiv" addStyleNames="margin-left-15 margin-right-15"/> 
 		</b:TabPane>
 	</bh:Div>

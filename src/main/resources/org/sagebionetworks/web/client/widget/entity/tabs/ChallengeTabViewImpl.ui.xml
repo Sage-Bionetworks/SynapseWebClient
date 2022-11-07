@@ -4,15 +4,15 @@
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<bh:Div>
-		<b:Row ui:field="adminTabContainer" addStyleNames="challengeTabContent" >
-			<b:Column size="XS_12">
+        <b:Column size="XS_12" addStyleNames="margin-top-15">
+		    <b:Row ui:field="adminTabContainer">
 				<bh:Div>
 					<bh:Span ui:field="actionMenuContainer" addStyleNames="right"/>
 				</bh:Div>
 				<b:Container ui:field="challengeWidgetContainer" addStyleNames="align-center"/>
 				<b:Container ui:field="evaluationListContainer" addStyleNames="align-center"/>
-			</b:Column>
-		</b:Row>
+		    </b:Row>
+        </b:Column>
 		<b:Container ui:field="evaluationEditorContainer" addStyleNames="align-center"/>
 	</bh:Div>
 </ui:UiBinder>

@@ -4,8 +4,9 @@
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
-	<b:Row ui:field="tablesTabContainer" addStyleNames="tablesTabContent">
+	<g:FlowPanel ui:field="tablesTabContainer" addStyleNames="tablesTabContent">
 		<g:SimplePanel ui:field="synapseAlertContainer"/>
+        <g:SimplePanel ui:field="tableBreadcrumbContainer" visible="false"/>
         <w:FullWidthAlert ui:field="versionAlert"
                           alertType="WARNING"
                           messageTitle="This is a Draft Version of the Dataset"
@@ -13,11 +14,10 @@
                           primaryCTAText="View Version History"
                           visible="false"
                           global="false"
-                          addStyleNames="margin-top-minus-48"
+                          addStyleNames="moveup-10"
         />
-        <bh:Div addStyleNames="margin-left-15 margin-right-15 flexcontainer-row">
-			<bh:Div addStyleNames="flexcontainer-column flexcontainer-column-fill-width">
-				<g:SimplePanel ui:field="tableBreadcrumbContainer" visible="false"/>
+        <bh:Div addStyleNames="margin-top-15 margin-left-15 margin-right-15 flexcontainer-row">
+            <bh:Div addStyleNames="flexcontainer-column flexcontainer-column-fill-width">
 				<g:SimplePanel ui:field="tableTitlebarContainer" visible="false"/>
 			</bh:Div>
 			<bh:Div addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end min-width-70" ui:field="actionMenuContainer"/>
@@ -47,5 +47,5 @@
 				</b:Column>
 			</b:Row>
 		</b:Column>
-	</b:Row>
+	</g:FlowPanel>
 </ui:UiBinder>
