@@ -4,13 +4,13 @@
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<g:FlowPanel addStyleNames="margin-top-15">
-        <g:FlowPanel ui:field="adminTabContainer">
-            <bh:Div>
-                <bh:Span ui:field="actionMenuContainer" addStyleNames="right"/>
-            </bh:Div>
-            <b:Container ui:field="challengeWidgetContainer" addStyleNames="align-center"/>
-            <b:Container ui:field="evaluationListContainer" addStyleNames="align-center"/>
-        </g:FlowPanel>
+		<g:FlowPanel ui:field="adminTabContainer">
+			<bh:Div>
+				<bh:Span ui:field="actionMenuContainer" addStyleNames="right"/>
+			</bh:Div>
+			<b:Container ui:field="challengeWidgetContainer" addStyleNames="align-center"/>
+			<b:Container ui:field="evaluationListContainer" addStyleNames="align-center"/>
+		</g:FlowPanel>
 		<b:Container ui:field="evaluationEditorContainer" addStyleNames="align-center"/>
 	</g:FlowPanel>
 </ui:UiBinder>
