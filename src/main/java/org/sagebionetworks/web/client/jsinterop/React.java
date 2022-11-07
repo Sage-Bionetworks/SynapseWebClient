@@ -12,8 +12,6 @@ public class React {
 
 	public static native <P extends ReactComponentProps> ReactNode createElement(ReactComponentType<P> component, P props, ReactNode[] children);
 
-	public static native <P extends ReactComponentProps> ReactNode createElement(ReactComponentType<P> component, P props, ReactNode child1, ReactNode child2);
-
 	/**
 	 * Similar to {@link #createElementWithSynapseContext} but only includes the theme. Any components rendered will NOT get the full Synapse context, including
 	 * access token + auth state, experimental mode status, and time display settings.
@@ -23,7 +21,6 @@ public class React {
 		SynapseContextProviderProps emptyContext = SynapseContextProviderProps.create(SynapseContextJsObject.create(null, false, false), null);
 		return createElementWithSynapseContext(component, props, emptyContext);
 	}
-
 
 	/**
 	 * Wraps a component in SynapseContextProvider. Nearly all Synapse React Client components must be wrapped in this context, so this utility

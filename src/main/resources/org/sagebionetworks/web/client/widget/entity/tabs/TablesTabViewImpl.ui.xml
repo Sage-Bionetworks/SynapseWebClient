@@ -6,18 +6,18 @@
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	<g:FlowPanel ui:field="tablesTabContainer" addStyleNames="tablesTabContent">
 		<g:SimplePanel ui:field="synapseAlertContainer"/>
-        <g:SimplePanel ui:field="tableBreadcrumbContainer" visible="false"/>
-        <w:FullWidthAlert ui:field="versionAlert"
-                          alertType="WARNING"
-                          messageTitle="This is a Draft Version of the Dataset"
-                          message="Administrators can edit this version and create a Stable Version for distribution. Go to the Version History to view the Stable Versions"
-                          primaryCTAText="View Version History"
-                          visible="false"
-                          global="false"
-                          addStyleNames="moveup-10"
-        />
-        <bh:Div addStyleNames="margin-top-15 margin-left-15 margin-right-15 flexcontainer-row">
-            <bh:Div addStyleNames="flexcontainer-column flexcontainer-column-fill-width">
+		<g:SimplePanel ui:field="tableBreadcrumbContainer" visible="false"/>
+		<w:FullWidthAlert ui:field="versionAlert"
+						  alertType="WARNING"
+						  messageTitle="This is a Draft Version of the Dataset"
+						  message="Administrators can edit this version and create a Stable Version for distribution. Go to the Version History to view the Stable Versions"
+						  primaryCTAText="View Version History"
+						  visible="false"
+						  global="false"
+						  addStyleNames="moveup-10"
+		/>
+		<bh:Div addStyleNames="margin-top-15 margin-left-15 margin-right-15 flexcontainer-row">
+			<bh:Div addStyleNames="flexcontainer-column flexcontainer-column-fill-width">
 				<g:SimplePanel ui:field="tableTitlebarContainer" visible="false"/>
 			</bh:Div>
 			<bh:Div addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end min-width-70" ui:field="actionMenuContainer"/>
@@ -31,19 +31,19 @@
 		</bh:Div>
 		<b:Column size="XS_12">
 			<g:SimplePanel ui:field="tableListWidgetContainer" visible="false"/>
-            <g:SimplePanel ui:field="tableWikiPageContainer" addStyleNames="panel panel-default panel-body margin-bottom-0-imp" visible="false"/>
-            <g:SimplePanel addStyleNames="margin-top-15" ui:field="tableWidgetContainer"/>
+			<g:SimplePanel ui:field="tableWikiPageContainer" addStyleNames="panel panel-default panel-body margin-bottom-0-imp" visible="false"/>
+			<g:SimplePanel addStyleNames="margin-top-15" ui:field="tableWidgetContainer"/>
 			<g:SimplePanel addStyleNames="padding-bottom-15" ui:field="tableModifiedAndCreatedContainer"/>
 			<b:Row>
 				<b:Column size="XS_12" ui:field="provenanceContainer">
 					<g:FlowPanel addStyleNames="light-border padding-10 margin-bottom-15">
-			    		<bh:Div addStyleNames="highlight-title">
-			    			<bh:Text>Provenance</bh:Text>
-			    			<w:HelpWidget helpMarkdown="Provenance tracks the relationship between data, code and analytical results" 
+						<bh:Div addStyleNames="highlight-title">
+							<bh:Text>Provenance</bh:Text>
+							<w:HelpWidget helpMarkdown="Provenance tracks the relationship between data, code and analytical results"
 								href="https://help.synapse.org/docs/Provenance.1972470373.html" addStyleNames="margin-left-5" placement="BOTTOM"/>
-			    		</bh:Div>
-			    		<bh:Div ui:field="provenanceContainerHighlightBox" />
-			    	</g:FlowPanel>
+						</bh:Div>
+						<bh:Div ui:field="provenanceContainerHighlightBox" />
+					</g:FlowPanel>
 				</b:Column>
 			</b:Row>
 		</b:Column>

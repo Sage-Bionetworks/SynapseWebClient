@@ -1,15 +1,12 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
-import com.google.gwt.user.client.Window;
 import org.gwtbootstrap3.client.ui.Container;
-import org.gwtbootstrap3.client.ui.Row;
-import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorReactComponentPage;
@@ -24,7 +21,7 @@ public class ChallengeTabViewImpl implements ChallengeTabView {
 	Span actionMenuContainer;
 
 	@UiField
-	Row adminTabContainer;
+	FlowPanel adminTabContainer;
 
 	@UiField
 	Container evaluationEditorContainer;
