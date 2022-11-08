@@ -84,7 +84,7 @@ public class TabViewImpl implements TabView {
 		fp.addClickHandler(tabClickedHandler);
 		fp.addStyleName("margin-right-5 displayInline");
 		IconSvg icon = new IconSvg();
-		icon.configure(iconName, null, null, null, null);
+		icon.configure(iconName, null);
 		fp.add(icon);
 		fp.add(anchor);
 		tabItem.add(fp);
