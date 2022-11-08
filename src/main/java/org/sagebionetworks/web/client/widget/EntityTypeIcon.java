@@ -16,7 +16,7 @@ public class EntityTypeIcon extends ReactComponentSpan {
 
 	public void configure(EntityType type) {
 		EntityTypeIconProps props = EntityTypeIconProps.create(type);
-		ReactNode component = React.createElement(SRC.SynapseComponents.EntityTypeIcon, props);
+		ReactNode component = React.createElementWithThemeContext(SRC.SynapseComponents.EntityTypeIcon, props);
 		this.render(component);
 	}
 

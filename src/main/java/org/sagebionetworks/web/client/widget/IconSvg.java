@@ -22,7 +22,7 @@ public class IconSvg extends ReactComponentSpan {
 
 	private void renderComponent() {
 		IconSvgProps props = IconSvgProps.create(icon, label);
-		ReactNode component = React.createElement(SRC.SynapseComponents.IconSvg, props);
+		ReactNode component = React.createElementWithThemeContext(SRC.SynapseComponents.IconSvg, props);
 		this.render(component);
 	}
 

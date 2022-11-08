@@ -6,6 +6,8 @@ import org.sagebionetworks.web.client.jsinterop.FullWidthAlertProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
+import org.sagebionetworks.web.client.jsinterop.SynapseContextJsObject;
+import org.sagebionetworks.web.client.jsinterop.SynapseContextProviderProps;
 
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Window;
@@ -13,6 +15,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 public class FullWidthAlert implements IsWidget {
+
 	ReactComponentDiv container;
 	String title, message, primaryButtonText, secondaryButtonText, alertType, secondaryButtonTooltipText;
 	AlertButtonConfig.Callback onPrimaryClick;
@@ -40,7 +43,7 @@ public class FullWidthAlert implements IsWidget {
 			secondaryButtonConfig = AlertButtonConfig.create(secondaryButtonText, onSecondaryClick, !secondaryButtonEnabled, secondaryButtonTooltipText);
 		}
 		FullWidthAlertProps props = FullWidthAlertProps.create(title, message, primaryButtonConfig, secondaryButtonConfig, onClose, autoCloseAfterDelayInSeconds, isGlobal, alertType);
-		ReactNode component = React.createElement(SRC.SynapseComponents.FullWidthAlert, props);
+		ReactNode component = React.createElementWithThemeContext(SRC.SynapseComponents.FullWidthAlert, props);
 		container.render(component);
 	}
 

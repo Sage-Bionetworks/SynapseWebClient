@@ -41,6 +41,8 @@ import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.CloudProviderFileHandleInterface;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.jsinterop.React;
+import org.sagebionetworks.web.client.jsinterop.ReactMouseEvent;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.jsinterop.ToastMessageOptions;
 import org.sagebionetworks.web.client.place.PeopleSearch;
@@ -1079,6 +1081,13 @@ public class DisplayUtils {
 			return false;
 		}
 		return event.isAltKeyDown() || event.isControlKeyDown() || event.isMetaKeyDown() || event.isShiftKeyDown();
+	}
+
+	public static boolean isAnyModifierKeyDown(ReactMouseEvent event) {
+		if (event == null) {
+			return false;
+		}
+		return event.altKey || event.ctrlKey || event.metaKey || event.shiftKey;
 	}
 
 	public static String capitalize(String s) {

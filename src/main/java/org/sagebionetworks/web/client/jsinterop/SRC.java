@@ -47,6 +47,7 @@ public class SRC {
 		public static ReactComponentType<TermsAndConditionsProps> TermsAndConditions;
 		public static ReactComponentType<IDUReportProps> IDUReport;
 		public static ReactComponentType CertificationQuiz;
+		public static ReactComponentType<EntityPageBreadcrumbsProps> EntityPageBreadcrumbs;
 
 		/**
 		 * Pushes a global toast message. In SWC, you should use {@link DisplayUtils#notify}, rather than calling this method directly.

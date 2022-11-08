@@ -34,12 +34,10 @@ public class Breadcrumb implements BreadcrumbView.Presenter, SynapseWidgetPresen
 
 	/**
 	 * Create Breadcrumbs for an Entity
-	 * 
-	 * @param entity
 	 */
 	public void configure(EntityPath entityPath, EntityArea optionalArea) {
 		view.setPresenter(this);
-		List<LinkData> links = new ArrayList<LinkData>();
+		List<LinkData> links = new ArrayList<>();
 		String currentPageName = null;
 		if (entityPath != null) {
 			List<EntityHeader> path = entityPath.getPath();
@@ -50,7 +48,6 @@ public class Breadcrumb implements BreadcrumbView.Presenter, SynapseWidgetPresen
 					EntityHeader element = path.get(i);
 					String name = element.getName();
 					Synapse place = new Synapse(element.getId());
-					EntityType icon = EntityTypeUtils.getEntityType(element);
 					if (optionalArea == EntityArea.FILES && Project.class.getName().equals(element.getType())) {
 						// show files as root
 						name = DisplayConstants.FILES;
@@ -63,7 +60,7 @@ public class Breadcrumb implements BreadcrumbView.Presenter, SynapseWidgetPresen
 						name = DisplayConstants.TABLES;
 						place.setArea(EntityArea.TABLES);
 					}
-					links.add(new LinkData(name, icon, place));
+					links.add(new LinkData(name, place));
 				}
 				currentPageName = path.get(path.size() - 1).getName();
 			}
