@@ -8,6 +8,11 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.RequestException;
+import com.google.gwt.http.client.Response;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.Before;
@@ -24,87 +29,110 @@ import org.sagebionetworks.web.client.widget.entity.renderer.CytoscapeWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.test.helper.RequestBuilderMockStubber;
-import com.google.gwt.http.client.RequestBuilder;
-import com.google.gwt.http.client.RequestCallback;
-import com.google.gwt.http.client.RequestException;
-import com.google.gwt.http.client.Response;
 
 public class CytoscapeWidgetTest {
 
-	CytoscapeWidget widget;
+  CytoscapeWidget widget;
 
-	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
-	@Mock
-	CytoscapeView mockView;
-	@Mock
-	AuthenticationController mockAuthenticationController;
-	@Mock
-	RequestBuilderWrapper mockRequestBuilder;
-	@Mock
-	SynapseAlert mockSynAlert;
-	@Mock
-	SynapseJSNIUtils mockSynapseJsniUtils;
-	@Mock
-	Response mockResponse;
-	private static final String CYTOSCAPE_JS_ENTITY_ID = "syn7777777";
-	private static final String CYTOSCAPE_JS_JSON_TEST = "{\"contains\" : \"Valid Cytoscape JS json exported from Cytoscape to drive visualization\"}";
-	private static final String CYTOSCAPE_JS_STYLE_ENTITY_ID = "syn88888888";
+  WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
 
-	@Before
-	public void setup() throws RequestException {
-		MockitoAnnotations.initMocks(this);
-		widget = new CytoscapeWidget(mockView, mockAuthenticationController, mockRequestBuilder, mockSynAlert, mockSynapseJsniUtils);
+  @Mock
+  CytoscapeView mockView;
 
-		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK);
-		when(mockResponse.getText()).thenReturn(CYTOSCAPE_JS_JSON_TEST);
-		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse).when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
-	}
+  @Mock
+  AuthenticationController mockAuthenticationController;
 
-	@Test
-	public void testAsWidget() {
-		widget.asWidget();
-		verify(mockView).asWidget();
-		verify(mockView).setPresenter(widget);
-	}
+  @Mock
+  RequestBuilderWrapper mockRequestBuilder;
 
-	@Test
-	public void testConfigure() {
-		Map<String, String> descriptor = new HashMap<String, String>();
-		descriptor.put(WidgetConstants.SYNAPSE_ID_KEY, CYTOSCAPE_JS_ENTITY_ID);
-		widget.configure(wikiKey, descriptor, null, null);
+  @Mock
+  SynapseAlert mockSynAlert;
 
-		verify(mockView).configure(CYTOSCAPE_JS_JSON_TEST, null, CytoscapeWidget.DEFAULT_HEIGHT);
-		verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), contains(CYTOSCAPE_JS_ENTITY_ID));
-		verify(mockView).setGraphVisible(true);
-	}
+  @Mock
+  SynapseJSNIUtils mockSynapseJsniUtils;
 
-	@Test
-	public void testConfigureWithStyle() {
-		String height = "1234";
-		Map<String, String> descriptor = new HashMap<String, String>();
-		descriptor.put(WidgetConstants.SYNAPSE_ID_KEY, CYTOSCAPE_JS_ENTITY_ID);
-		descriptor.put(WidgetConstants.STYLE_SYNAPSE_ID_KEY, CYTOSCAPE_JS_STYLE_ENTITY_ID);
-		descriptor.put(WidgetConstants.HEIGHT_KEY, height);
+  @Mock
+  Response mockResponse;
 
-		widget.configure(wikiKey, descriptor, null, null);
+  private static final String CYTOSCAPE_JS_ENTITY_ID = "syn7777777";
+  private static final String CYTOSCAPE_JS_JSON_TEST =
+    "{\"contains\" : \"Valid Cytoscape JS json exported from Cytoscape to drive visualization\"}";
+  private static final String CYTOSCAPE_JS_STYLE_ENTITY_ID = "syn88888888";
 
-		verify(mockRequestBuilder, times(2)).configure(eq(RequestBuilder.GET), anyString());
-		verify(mockView).configure(CYTOSCAPE_JS_JSON_TEST, CYTOSCAPE_JS_JSON_TEST, height);
-		verify(mockView).setGraphVisible(true);
-	}
+  @Before
+  public void setup() throws RequestException {
+    MockitoAnnotations.initMocks(this);
+    widget =
+      new CytoscapeWidget(
+        mockView,
+        mockAuthenticationController,
+        mockRequestBuilder,
+        mockSynAlert,
+        mockSynapseJsniUtils
+      );
 
-	@Test
-	public void testConfigureFailure() throws RequestException {
-		Exception e = new Exception("Could not retrieve js file");
-		RequestBuilderMockStubber.callOnError(null, e).when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
-		Map<String, String> descriptor = new HashMap<String, String>();
-		descriptor.put(WidgetConstants.SYNAPSE_ID_KEY, CYTOSCAPE_JS_ENTITY_ID);
+    when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK);
+    when(mockResponse.getText()).thenReturn(CYTOSCAPE_JS_JSON_TEST);
+    RequestBuilderMockStubber
+      .callOnResponseReceived(null, mockResponse)
+      .when(mockRequestBuilder)
+      .sendRequest(anyString(), any(RequestCallback.class));
+  }
 
-		widget.configure(wikiKey, descriptor, null, null);
+  @Test
+  public void testAsWidget() {
+    widget.asWidget();
+    verify(mockView).asWidget();
+    verify(mockView).setPresenter(widget);
+  }
 
-		verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), anyString());
-		verify(mockSynAlert).handleException(e);
-		verify(mockView, never()).setGraphVisible(true);
-	}
+  @Test
+  public void testConfigure() {
+    Map<String, String> descriptor = new HashMap<String, String>();
+    descriptor.put(WidgetConstants.SYNAPSE_ID_KEY, CYTOSCAPE_JS_ENTITY_ID);
+    widget.configure(wikiKey, descriptor, null, null);
 
+    verify(mockView)
+      .configure(CYTOSCAPE_JS_JSON_TEST, null, CytoscapeWidget.DEFAULT_HEIGHT);
+    verify(mockRequestBuilder)
+      .configure(eq(RequestBuilder.GET), contains(CYTOSCAPE_JS_ENTITY_ID));
+    verify(mockView).setGraphVisible(true);
+  }
+
+  @Test
+  public void testConfigureWithStyle() {
+    String height = "1234";
+    Map<String, String> descriptor = new HashMap<String, String>();
+    descriptor.put(WidgetConstants.SYNAPSE_ID_KEY, CYTOSCAPE_JS_ENTITY_ID);
+    descriptor.put(
+      WidgetConstants.STYLE_SYNAPSE_ID_KEY,
+      CYTOSCAPE_JS_STYLE_ENTITY_ID
+    );
+    descriptor.put(WidgetConstants.HEIGHT_KEY, height);
+
+    widget.configure(wikiKey, descriptor, null, null);
+
+    verify(mockRequestBuilder, times(2))
+      .configure(eq(RequestBuilder.GET), anyString());
+    verify(mockView)
+      .configure(CYTOSCAPE_JS_JSON_TEST, CYTOSCAPE_JS_JSON_TEST, height);
+    verify(mockView).setGraphVisible(true);
+  }
+
+  @Test
+  public void testConfigureFailure() throws RequestException {
+    Exception e = new Exception("Could not retrieve js file");
+    RequestBuilderMockStubber
+      .callOnError(null, e)
+      .when(mockRequestBuilder)
+      .sendRequest(anyString(), any(RequestCallback.class));
+    Map<String, String> descriptor = new HashMap<String, String>();
+    descriptor.put(WidgetConstants.SYNAPSE_ID_KEY, CYTOSCAPE_JS_ENTITY_ID);
+
+    widget.configure(wikiKey, descriptor, null, null);
+
+    verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), anyString());
+    verify(mockSynAlert).handleException(e);
+    verify(mockView, never()).setGraphVisible(true);
+  }
 }

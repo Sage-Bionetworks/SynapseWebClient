@@ -1,17 +1,17 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
 public interface S3DirectLoginDialog {
-	public interface Presenter {
-		void onUnauthenticatedS3DirectDownloadClicked();
+  public interface Presenter {
+    void onUnauthenticatedS3DirectDownloadClicked();
 
-		void onLoginS3DirectDownloadClicked(String accessKey, String secretKey);
+    void onLoginS3DirectDownloadClicked(String accessKey, String secretKey);
 
-		void onAuthenticatedS3DirectDownloadClicked();
-	}
+    void onAuthenticatedS3DirectDownloadClicked();
+  }
 
-	void setPresenter(Presenter presenter);
+  void setPresenter(Presenter presenter);
 
-	void showLoginS3DirectDownloadDialog(String endpoint);
+  void showLoginS3DirectDownloadDialog(String endpoint);
 
-	void showS3DirectDownloadDialog();
+  void showS3DirectDownloadDialog();
 }

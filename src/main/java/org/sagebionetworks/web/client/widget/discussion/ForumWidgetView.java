@@ -4,60 +4,59 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 public interface ForumWidgetView extends IsWidget {
+  public interface Presenter {
+    void onClickShowAllThreads();
 
-	public interface Presenter {
-		void onClickShowAllThreads();
+    Widget asWidget();
 
-		Widget asWidget();
+    void onSortReplies(boolean ascending);
 
-		void onSortReplies(boolean ascending);
+    void onClickNewThread();
+  }
 
-		void onClickNewThread();
-	}
+  void setPresenter(Presenter presenter);
 
-	void setPresenter(Presenter presenter);
+  void setThreadList(Widget w);
 
-	void setThreadList(Widget w);
+  void setSingleThread(Widget w);
 
-	void setSingleThread(Widget w);
+  void setNewThreadModal(Widget w);
 
-	void setNewThreadModal(Widget w);
+  void setAlert(Widget w);
 
-	void setAlert(Widget w);
+  void setSubscribeButton(Widget w);
 
-	void setSubscribeButton(Widget w);
+  void showErrorMessage(String errorMessage);
 
-	void showErrorMessage(String errorMessage);
+  void setSingleThreadUIVisible(boolean visible);
 
-	void setSingleThreadUIVisible(boolean visible);
+  void setThreadListUIVisible(boolean visible);
 
-	void setThreadListUIVisible(boolean visible);
+  void setNewThreadButtonVisible(boolean visible);
 
-	void setNewThreadButtonVisible(boolean visible);
+  void setShowAllThreadsButtonVisible(boolean visible);
 
-	void setShowAllThreadsButtonVisible(boolean visible);
+  void setSortRepliesButtonVisible(boolean visible);
 
-	void setSortRepliesButtonVisible(boolean visible);
+  void setDefaultThreadWidget(Widget w);
 
-	void setDefaultThreadWidget(Widget w);
+  void setDefaultThreadWidgetVisible(boolean visible);
 
-	void setDefaultThreadWidgetVisible(boolean visible);
+  boolean isDeletedThreadListVisible();
 
-	boolean isDeletedThreadListVisible();
+  void setDeletedThreadListVisible(boolean visible);
 
-	void setDeletedThreadListVisible(boolean visible);
+  void setDeletedThreadList(Widget widget);
 
-	void setDeletedThreadList(Widget widget);
+  void setMainContainerVisible(boolean visible);
 
-	void setMainContainerVisible(boolean visible);
+  void setSubscribersWidget(Widget w);
 
-	void setSubscribersWidget(Widget w);
+  void setSubscribersWidgetVisible(boolean visible);
 
-	void setSubscribersWidgetVisible(boolean visible);
-	
-	void setForumSearchVisible(boolean visible);
-	
-	void configureForumSearch(String forumId, String projectId);
+  void setForumSearchVisible(boolean visible);
 
-	void setActionMenu(IsWidget w);
+  void configureForumSearch(String forumId, String projectId);
+
+  void setActionMenu(IsWidget w);
 }

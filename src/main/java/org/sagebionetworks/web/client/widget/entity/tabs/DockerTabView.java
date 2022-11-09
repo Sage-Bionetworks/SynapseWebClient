@@ -4,28 +4,25 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 public interface DockerTabView extends IsWidget {
+  public interface Presenter {}
 
-	public interface Presenter {
+  void setPresenter(Presenter presenter);
 
-	}
+  void setDockerRepoList(Widget widget);
 
-	void setPresenter(Presenter presenter);
+  void setBreadcrumb(Widget widget);
 
-	void setDockerRepoList(Widget widget);
+  void setSynapseAlert(Widget widget);
 
-	void setBreadcrumb(Widget widget);
+  void setDockerRepoWidget(Widget widget);
 
-	void setSynapseAlert(Widget widget);
+  void setBreadcrumbVisible(boolean visible);
 
-	void setDockerRepoWidget(Widget widget);
+  void setDockerRepoListVisible(boolean visible);
 
-	void setBreadcrumbVisible(boolean visible);
+  void setDockerRepoUIVisible(boolean visible);
 
-	void setDockerRepoListVisible(boolean visible);
+  void clearDockerRepoWidget();
 
-	void setDockerRepoUIVisible(boolean visible);
-
-	void clearDockerRepoWidget();
-
-	void setActionMenu(IsWidget w);
+  void setActionMenu(IsWidget w);
 }

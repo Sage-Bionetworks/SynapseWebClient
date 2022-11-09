@@ -19,108 +19,123 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertView;
 
 public class EditJSONListModalViewImpl implements EditJSONListModalView {
 
-	public interface Binder extends UiBinder<Widget, EditJSONListModalViewImpl> {
-	}
+  public interface Binder extends UiBinder<Widget, EditJSONListModalViewImpl> {}
 
-	@UiField
-	Table editorsPanel;
-	@UiField
-	Modal editModal;
-	@UiField
-	Button saveButton;
-	@UiField
-	Button cancelButton;
+  @UiField
+  Table editorsPanel;
 
-	@UiField
-	Button pasteNewValuesButton;
-	@UiField
-	FlowPanel pasteNewValuesPanel;
+  @UiField
+  Modal editModal;
 
-	@UiField
-	SynapseAlertView alert;
-	Presenter presenter;
-	Button addNewValueButton;
+  @UiField
+  Button saveButton;
 
+  @UiField
+  Button cancelButton;
 
-	Widget widget;
+  @UiField
+  Button pasteNewValuesButton;
 
-	@Inject
-	public EditJSONListModalViewImpl(final Binder uiBinder) {
-		widget = uiBinder.createAndBindUi(this);
-		saveButton.addClickHandler(event -> {
-			presenter.onSave();
-		});
-		pasteNewValuesButton.addClickHandler(clickEvent -> {
-			presenter.onClickPasteNewValues();
-		});
-		saveButton.addDomHandler(DisplayUtils.getPreventTabHandler(saveButton), KeyDownEvent.getType());
-		cancelButton.addClickHandler(clickEvent -> hideEditor());
+  @UiField
+  FlowPanel pasteNewValuesPanel;
 
-		addNewValueButton = new Button("", IconType.PLUS, clickEvent -> presenter.onAddNewEmptyValue());
-		addNewValueButton.addStyleName("center-in-div");
-		addNewValueButton.setType(ButtonType.PRIMARY);
-		addNewValueButton.setSize(ButtonSize.EXTRA_SMALL);
-	}
+  @UiField
+  SynapseAlertView alert;
 
+  Presenter presenter;
+  Button addNewValueButton;
 
-	@Override
-	public void setPresenter(final Presenter presenter) {
-		this.presenter = presenter;
-	}
+  Widget widget;
 
-	@Override
-	public void showError(String message) {
-		alert.showError(message);
-	}
+  @Inject
+  public EditJSONListModalViewImpl(final Binder uiBinder) {
+    widget = uiBinder.createAndBindUi(this);
+    saveButton.addClickHandler(event -> {
+      presenter.onSave();
+    });
+    pasteNewValuesButton.addClickHandler(clickEvent -> {
+      presenter.onClickPasteNewValues();
+    });
+    saveButton.addDomHandler(
+      DisplayUtils.getPreventTabHandler(saveButton),
+      KeyDownEvent.getType()
+    );
+    cancelButton.addClickHandler(clickEvent -> hideEditor());
 
-	@Override
-	public void clearEditors(){
-		editorsPanel.clear();
-	}
+    addNewValueButton =
+      new Button(
+        "",
+        IconType.PLUS,
+        clickEvent -> presenter.onAddNewEmptyValue()
+      );
+    addNewValueButton.addStyleName("center-in-div");
+    addNewValueButton.setType(ButtonType.PRIMARY);
+    addNewValueButton.setSize(ButtonSize.EXTRA_SMALL);
+  }
 
-	@Override
-	public void addCommaSeparatedValuesParser(Widget commaSeparatedValuesParser){
-		pasteNewValuesPanel.add(commaSeparatedValuesParser);
-	}
+  @Override
+  public void setPresenter(final Presenter presenter) {
+    this.presenter = presenter;
+  }
 
-	@Override
-	public void showEditor() {
-		alert.clearState();
-		editModal.show();
-	}
+  @Override
+  public void showError(String message) {
+    alert.showError(message);
+  }
 
-	@Override
-	public void hideEditor(){
-		editModal.hide();
-	}
+  @Override
+  public void clearEditors() {
+    editorsPanel.clear();
+  }
 
-	@Override
-	public void addNewEditor(final CellEditor editor) {
+  @Override
+  public void addCommaSeparatedValuesParser(Widget commaSeparatedValuesParser) {
+    pasteNewValuesPanel.add(commaSeparatedValuesParser);
+  }
 
-		TableRow row = CellFactory.appendDeleteButton(editor, presenter::onValueDeleted);
+  @Override
+  public void showEditor() {
+    alert.clearState();
+    editModal.show();
+  }
 
-		//additional column placeholder for the addNewAnnotationValueButton
-		TableData addButtonTableData = new TableData();
-		row.add(addButtonTableData);
-		addButtonTableData.setWidth("35px");
+  @Override
+  public void hideEditor() {
+    editModal.hide();
+  }
 
-		editorsPanel.add(row);
+  @Override
+  public void addNewEditor(final CellEditor editor) {
+    TableRow row = CellFactory.appendDeleteButton(
+      editor,
+      presenter::onValueDeleted
+    );
 
-		addNewValueButton.removeFromParent();
-		addButtonTableData.add(addNewValueButton);
-	}
+    //additional column placeholder for the addNewAnnotationValueButton
+    TableData addButtonTableData = new TableData();
+    row.add(addButtonTableData);
+    addButtonTableData.setWidth("35px");
 
-	@Override
-	public void moveAddNewAnnotationValueButtonToRowToLastRow(){
-		TableRow lastRow = (TableRow) editorsPanel.getWidget(editorsPanel.getWidgetCount() - 1);
-		addNewValueButton.removeFromParent();
-		//add the button to last cell of last row
-		((TableData)lastRow.getWidget(lastRow.getWidgetCount() - 1)).add(addNewValueButton);
-	}
+    editorsPanel.add(row);
 
-	@Override
-	public Widget asWidget() {
-		return widget;
-	}
+    addNewValueButton.removeFromParent();
+    addButtonTableData.add(addNewValueButton);
+  }
 
+  @Override
+  public void moveAddNewAnnotationValueButtonToRowToLastRow() {
+    TableRow lastRow = (TableRow) editorsPanel.getWidget(
+      editorsPanel.getWidgetCount() - 1
+    );
+    addNewValueButton.removeFromParent();
+    //add the button to last cell of last row
+    ((TableData) lastRow.getWidget(lastRow.getWidgetCount() - 1)).add(
+        addNewValueButton
+      );
+  }
+
+  @Override
+  public Widget asWidget() {
+    return widget;
+  }
 }

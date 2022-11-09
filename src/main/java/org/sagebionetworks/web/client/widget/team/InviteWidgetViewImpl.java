@@ -1,5 +1,11 @@
 package org.sagebionetworks.web.client.widget.team;
 
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextArea;
@@ -12,136 +18,146 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 
-public class InviteWidgetViewImpl extends FlowPanel implements InviteWidgetView {
+public class InviteWidgetViewImpl
+  extends FlowPanel
+  implements InviteWidgetView {
 
-	public interface InviteWidgetViewImplUiBinder extends UiBinder<Widget, InviteWidgetViewImpl> {
-	}
+  public interface InviteWidgetViewImplUiBinder
+    extends UiBinder<Widget, InviteWidgetViewImpl> {}
 
-	@UiField
-	Button sendInviteButton;
+  @UiField
+  Button sendInviteButton;
 
-	@UiField
-	Modal inviteUIModal;
+  @UiField
+  Modal inviteUIModal;
 
-	@UiField
-	TextArea inviteTextArea;
+  @UiField
+  TextArea inviteTextArea;
 
-	@UiField
-	SimplePanel suggestBoxPanel;
+  @UiField
+  SimplePanel suggestBoxPanel;
 
-	@UiField
-	SimplePanel synAlertPanel;
+  @UiField
+  SimplePanel synAlertPanel;
 
-	@UiField
-	Button cancelButton;
-	@UiField
-	Div inviteesContainer;
-	@UiField
-	LoadingSpinner loadingUI;
-	private InviteWidgetView.Presenter presenter;
-	private PortalGinInjector ginInjector;
-	private Widget widget;
+  @UiField
+  Button cancelButton;
 
-	@Inject
-	public InviteWidgetViewImpl(InviteWidgetViewImplUiBinder binder, PortalGinInjector ginInjector) {
-		this.widget = binder.createAndBindUi(this);
-		this.ginInjector = ginInjector;
-		sendInviteButton.addClickHandler(event -> {
-			presenter.doSendInvites(inviteTextArea.getValue());
-		});
-		cancelButton.addClickHandler(event -> {
-			inviteUIModal.hide();
-		});
-	}
+  @UiField
+  Div inviteesContainer;
 
-	@Override
-	public void setSuggestWidget(Widget suggestWidget) {
-		suggestBoxPanel.setWidget(suggestWidget);
-	}
+  @UiField
+  LoadingSpinner loadingUI;
 
-	@Override
-	public void clear() {
-		inviteTextArea.setText("");
-		inviteesContainer.clear();
-	}
+  private InviteWidgetView.Presenter presenter;
+  private PortalGinInjector ginInjector;
+  private Widget widget;
 
-	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-	}
+  @Inject
+  public InviteWidgetViewImpl(
+    InviteWidgetViewImplUiBinder binder,
+    PortalGinInjector ginInjector
+  ) {
+    this.widget = binder.createAndBindUi(this);
+    this.ginInjector = ginInjector;
+    sendInviteButton.addClickHandler(event -> {
+      presenter.doSendInvites(inviteTextArea.getValue());
+    });
+    cancelButton.addClickHandler(event -> {
+      inviteUIModal.hide();
+    });
+  }
 
-	@Override
-	public Widget asWidget() {
-		return widget;
-	}
+  @Override
+  public void setSuggestWidget(Widget suggestWidget) {
+    suggestBoxPanel.setWidget(suggestWidget);
+  }
 
-	@Override
-	public void setSynAlertWidget(Widget synAlert) {
-		synAlertPanel.setWidget(synAlert);
-	}
+  @Override
+  public void clear() {
+    inviteTextArea.setText("");
+    inviteesContainer.clear();
+  }
 
-	@Override
-	public void show() {
-		inviteUIModal.show();
-	}
+  @Override
+  public void setPresenter(Presenter presenter) {
+    this.presenter = presenter;
+  }
 
-	@Override
-	public void hide() {
-		inviteUIModal.hide();
-	}
+  @Override
+  public Widget asWidget() {
+    return widget;
+  }
 
-	@Override
-	public void showInfo(String message) {
-		DisplayUtils.showInfo(message);
-	}
+  @Override
+  public void setSynAlertWidget(Widget synAlert) {
+    synAlertPanel.setWidget(synAlert);
+  }
 
-	@Override
-	public void addEmailToInvite(String emailInvite) {
-		Div d = new Div();
-		d.addStyleName("margin-top-5");
-		d.add(new Span(emailInvite));
-		Button button = new Button("", IconType.TIMES, event -> {
-			inviteesContainer.remove(d);
-			presenter.removeEmailToInvite(emailInvite);
-		});
-		button.setSize(ButtonSize.EXTRA_SMALL);
-		button.setType(ButtonType.LINK);
-		button.addStyleName("displayInline margin-left-5");
+  @Override
+  public void show() {
+    inviteUIModal.show();
+  }
 
-		d.add(button);
-		inviteesContainer.add(d);
-	}
+  @Override
+  public void hide() {
+    inviteUIModal.hide();
+  }
 
-	@Override
-	public void addUserToInvite(String userId) {
-		Div d = new Div();
-		UserBadge badge = ginInjector.getUserBadgeWidget();
-		badge.configure(userId);
-		badge.setOpenInNewWindow();
-		d.add(badge);
-		Button button = new Button("", IconType.TIMES, event -> {
-			inviteesContainer.remove(d);
-			presenter.removeUserToInvite(userId);
-		});
-		button.setSize(ButtonSize.EXTRA_SMALL);
-		button.setType(ButtonType.LINK);
-		button.addStyleName("displayInline margin-left-5");
+  @Override
+  public void showInfo(String message) {
+    DisplayUtils.showInfo(message);
+  }
 
-		d.add(badge);
-		d.add(button);
-		inviteesContainer.add(d);
-	}
+  @Override
+  public void addEmailToInvite(String emailInvite) {
+    Div d = new Div();
+    d.addStyleName("margin-top-5");
+    d.add(new Span(emailInvite));
+    Button button = new Button(
+      "",
+      IconType.TIMES,
+      event -> {
+        inviteesContainer.remove(d);
+        presenter.removeEmailToInvite(emailInvite);
+      }
+    );
+    button.setSize(ButtonSize.EXTRA_SMALL);
+    button.setType(ButtonType.LINK);
+    button.addStyleName("displayInline margin-left-5");
 
-	@Override
-	public void setLoading(boolean isLoading) {
-		loadingUI.setVisible(isLoading);
-		sendInviteButton.setEnabled(!isLoading);
-	}
+    d.add(button);
+    inviteesContainer.add(d);
+  }
+
+  @Override
+  public void addUserToInvite(String userId) {
+    Div d = new Div();
+    UserBadge badge = ginInjector.getUserBadgeWidget();
+    badge.configure(userId);
+    badge.setOpenInNewWindow();
+    d.add(badge);
+    Button button = new Button(
+      "",
+      IconType.TIMES,
+      event -> {
+        inviteesContainer.remove(d);
+        presenter.removeUserToInvite(userId);
+      }
+    );
+    button.setSize(ButtonSize.EXTRA_SMALL);
+    button.setType(ButtonType.LINK);
+    button.addStyleName("displayInline margin-left-5");
+
+    d.add(badge);
+    d.add(button);
+    inviteesContainer.add(d);
+  }
+
+  @Override
+  public void setLoading(boolean isLoading) {
+    loadingUI.setVisible(isLoading);
+    sendInviteButton.setEnabled(!isLoading);
+  }
 }

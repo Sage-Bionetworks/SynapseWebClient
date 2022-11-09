@@ -6,6 +6,8 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Before;
@@ -28,167 +30,253 @@ import org.sagebionetworks.web.client.widget.profile.EmailAddressesWidget;
 import org.sagebionetworks.web.client.widget.profile.EmailAddressesWidgetView;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class EmailAddressesWidgetTest {
-	EmailAddressesWidget widget;
-	@Mock
-	EmailAddressesWidgetView mockView;
-	@Mock
-	SynapseClientAsync mockSynapseClient;
-	@Mock
-	SynapseAlert mockSynAlert;
-	@Mock
-	AuthenticationController mockAuthenticationController;
-	@Mock
-	PopupUtilsView mockPopupUtils;
-	@Mock
-	GWTWrapper mockGwt;
-	@Mock
-	UserProfile mockUserProfile;
-	@Mock
-	SynapseJavascriptClient mockSynapseJavascriptClient;
-	@Mock
-	NotificationEmail mockNotificationEmail;
-	List<String> userEmails;
-	public static final String USER_ID = "982";
-	public static final String EMAIL1 = "one@one.com";
-	public static final String EMAIL2 = "two@two.com";
-	public static final String EMAIL3 = "three@three.com";
-	@Mock
-	EmailQuarantineStatus mockEmailQuarantineStatus;
 
-	@Before
-	public void setUp() {
-		MockitoAnnotations.initMocks(this);
-		widget = new EmailAddressesWidget(mockView, mockSynapseClient, mockSynapseJavascriptClient, mockSynAlert, mockAuthenticationController, mockPopupUtils, mockGwt);
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(USER_ID);
-		userEmails = new ArrayList<>();
-		userEmails.add(EMAIL1);
-		userEmails.add(EMAIL2);
-		when(mockUserProfile.getEmails()).thenReturn(userEmails);
-		when(mockUserProfile.getOwnerId()).thenReturn(USER_ID);
-		when(mockNotificationEmail.getEmail()).thenReturn(EMAIL1);
-		AsyncMockStubber.callSuccessWith(mockNotificationEmail).when(mockSynapseJavascriptClient).getNotificationEmail(any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).setNotificationEmail(anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).removeEmail(anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseJavascriptClient).additionalEmailValidation(anyString(), anyString(), anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(mockUserProfile).when(mockSynapseJavascriptClient).getUserProfile(anyString(), any(AsyncCallback.class));
+  EmailAddressesWidget widget;
 
-	}
+  @Mock
+  EmailAddressesWidgetView mockView;
 
-	@Test
-	public void testConfigure() {
-		when(mockNotificationEmail.getQuarantineStatus()).thenReturn(null);
+  @Mock
+  SynapseClientAsync mockSynapseClient;
 
-		widget.configure(mockUserProfile);
+  @Mock
+  SynapseAlert mockSynAlert;
 
-		verify(mockSynapseJavascriptClient).getNotificationEmail(any(AsyncCallback.class));
-		verify(mockView).clearEmails();
-		verify(mockSynAlert).clear();
-		verify(mockView).setLoadingVisible(true);
-		verify(mockView).setLoadingVisible(false);
-		verify(mockView).addPrimaryEmail(EMAIL1, false);
-		verify(mockView, never()).addSecondaryEmail(EMAIL1);
-		verify(mockView).addSecondaryEmail(EMAIL2);
-		verify(mockView).setVisible(true);
-	}
+  @Mock
+  AuthenticationController mockAuthenticationController;
 
-	@Test
-	public void testConfigureWithQuarantinedEmail() {
-		when(mockEmailQuarantineStatus.getReason()).thenReturn(EmailQuarantineReason.PERMANENT_BOUNCE);
-		when(mockNotificationEmail.getQuarantineStatus()).thenReturn(mockEmailQuarantineStatus);
+  @Mock
+  PopupUtilsView mockPopupUtils;
 
-		widget.configure(mockUserProfile);
+  @Mock
+  GWTWrapper mockGwt;
 
-		verify(mockView).addPrimaryEmail(EMAIL1, true);
-		verify(mockView, never()).addSecondaryEmail(EMAIL1);
-		verify(mockView).addSecondaryEmail(EMAIL2);
-	}
+  @Mock
+  UserProfile mockUserProfile;
 
-	@Test
-	public void testConfigureFailure() {
-		Exception ex = new Exception("failed");
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getNotificationEmail(any(AsyncCallback.class));
-		widget.configure(mockUserProfile);
+  @Mock
+  SynapseJavascriptClient mockSynapseJavascriptClient;
 
-		verify(mockSynapseJavascriptClient).getNotificationEmail(any(AsyncCallback.class));
-		verify(mockView).clearEmails();
-		verify(mockSynAlert).clear();
-		verify(mockView).setLoadingVisible(true);
-		verify(mockView).setLoadingVisible(false);
-		verify(mockView).setVisible(true);
-		verify(mockSynAlert).handleException(ex);
-	}
+  @Mock
+  NotificationEmail mockNotificationEmail;
 
-	@Test
-	public void testConfigureAnonymous() {
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
-		widget.configure(mockUserProfile);
-		verify(mockView).setVisible(false);
-	}
+  List<String> userEmails;
+  public static final String USER_ID = "982";
+  public static final String EMAIL1 = "one@one.com";
+  public static final String EMAIL2 = "two@two.com";
+  public static final String EMAIL3 = "three@three.com";
 
-	@Test
-	public void testConfigureDifferentProfile() {
-		when(mockUserProfile.getOwnerId()).thenReturn("user2");
-		widget.configure(mockUserProfile);
-		verify(mockView).setVisible(false);
-	}
+  @Mock
+  EmailQuarantineStatus mockEmailQuarantineStatus;
 
-	@Test
-	public void testOnAddExistingEmail() {
-		widget.configure(mockUserProfile);
+  @Before
+  public void setUp() {
+    MockitoAnnotations.initMocks(this);
+    widget =
+      new EmailAddressesWidget(
+        mockView,
+        mockSynapseClient,
+        mockSynapseJavascriptClient,
+        mockSynAlert,
+        mockAuthenticationController,
+        mockPopupUtils,
+        mockGwt
+      );
+    when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+    when(mockAuthenticationController.getCurrentUserPrincipalId())
+      .thenReturn(USER_ID);
+    userEmails = new ArrayList<>();
+    userEmails.add(EMAIL1);
+    userEmails.add(EMAIL2);
+    when(mockUserProfile.getEmails()).thenReturn(userEmails);
+    when(mockUserProfile.getOwnerId()).thenReturn(USER_ID);
+    when(mockNotificationEmail.getEmail()).thenReturn(EMAIL1);
+    AsyncMockStubber
+      .callSuccessWith(mockNotificationEmail)
+      .when(mockSynapseJavascriptClient)
+      .getNotificationEmail(any(AsyncCallback.class));
+    AsyncMockStubber
+      .callSuccessWith(null)
+      .when(mockSynapseClient)
+      .setNotificationEmail(anyString(), any(AsyncCallback.class));
+    AsyncMockStubber
+      .callSuccessWith(null)
+      .when(mockSynapseClient)
+      .removeEmail(anyString(), any(AsyncCallback.class));
+    AsyncMockStubber
+      .callSuccessWith(null)
+      .when(mockSynapseJavascriptClient)
+      .additionalEmailValidation(
+        anyString(),
+        anyString(),
+        anyString(),
+        any(AsyncCallback.class)
+      );
+    AsyncMockStubber
+      .callSuccessWith(mockUserProfile)
+      .when(mockSynapseJavascriptClient)
+      .getUserProfile(anyString(), any(AsyncCallback.class));
+  }
 
-		widget.onAddEmail("    " + EMAIL2 + "   ");
+  @Test
+  public void testConfigure() {
+    when(mockNotificationEmail.getQuarantineStatus()).thenReturn(null);
 
-		verify(mockSynapseJavascriptClient, never()).additionalEmailValidation(anyString(), anyString(), anyString(), any(AsyncCallback.class));
-	}
+    widget.configure(mockUserProfile);
 
-	@Test
-	public void testAdditionalEmailValidation() throws JSONObjectAdapterException {
-		widget.configure(mockUserProfile);
-		widget.additionalEmailValidation(EMAIL3 + "    ");
-		verify(mockSynapseJavascriptClient).additionalEmailValidation(eq(USER_ID), eq(EMAIL3), anyString(), any(AsyncCallback.class));
-		verify(mockPopupUtils).showInfo(DisplayConstants.EMAIL_ADDED);
-	}
+    verify(mockSynapseJavascriptClient)
+      .getNotificationEmail(any(AsyncCallback.class));
+    verify(mockView).clearEmails();
+    verify(mockSynAlert).clear();
+    verify(mockView).setLoadingVisible(true);
+    verify(mockView).setLoadingVisible(false);
+    verify(mockView).addPrimaryEmail(EMAIL1, false);
+    verify(mockView, never()).addSecondaryEmail(EMAIL1);
+    verify(mockView).addSecondaryEmail(EMAIL2);
+    verify(mockView).setVisible(true);
+  }
 
-	@Test
-	public void testAdditionalEmailValidationFailure() throws JSONObjectAdapterException {
-		Exception ex = new Exception("unexpected exception");
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).additionalEmailValidation(anyString(), anyString(), anyString(), any(AsyncCallback.class));
-		widget.additionalEmailValidation(EMAIL3);
-		verify(mockSynapseJavascriptClient).additionalEmailValidation(eq(USER_ID), eq(EMAIL3), anyString(), any(AsyncCallback.class));
-		verify(mockSynAlert).handleException(ex);
-	}
+  @Test
+  public void testConfigureWithQuarantinedEmail() {
+    when(mockEmailQuarantineStatus.getReason())
+      .thenReturn(EmailQuarantineReason.PERMANENT_BOUNCE);
+    when(mockNotificationEmail.getQuarantineStatus())
+      .thenReturn(mockEmailQuarantineStatus);
 
-	@Test
-	public void testAdditionalEmailValidationInvalidEmail() throws JSONObjectAdapterException {
-		String email = "invalidEmailAddress";
-		widget.additionalEmailValidation(email);
-		verify(mockSynAlert).showError(WebConstants.INVALID_EMAIL_MESSAGE);
-		verify(mockSynapseJavascriptClient, never()).additionalEmailValidation(anyString(), anyString(), anyString(), any(AsyncCallback.class));
-	}
+    widget.configure(mockUserProfile);
 
-	@Test
-	public void testOnRemoveEmail() {
-		widget.configure(mockUserProfile);
-		widget.onRemoveEmail(EMAIL2);
+    verify(mockView).addPrimaryEmail(EMAIL1, true);
+    verify(mockView, never()).addSecondaryEmail(EMAIL1);
+    verify(mockView).addSecondaryEmail(EMAIL2);
+  }
 
-		verify(mockSynapseClient).removeEmail(eq(EMAIL2), any(AsyncCallback.class));
-		// reload profile
-		verify(mockSynapseJavascriptClient).getUserProfile(eq(USER_ID), any(AsyncCallback.class));
-	}
+  @Test
+  public void testConfigureFailure() {
+    Exception ex = new Exception("failed");
+    AsyncMockStubber
+      .callFailureWith(ex)
+      .when(mockSynapseJavascriptClient)
+      .getNotificationEmail(any(AsyncCallback.class));
+    widget.configure(mockUserProfile);
 
-	@Test
-	public void testOnRemoveEmailFailure() {
-		Exception ex = new Exception("unexpected exception");
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).removeEmail(anyString(), any(AsyncCallback.class));
+    verify(mockSynapseJavascriptClient)
+      .getNotificationEmail(any(AsyncCallback.class));
+    verify(mockView).clearEmails();
+    verify(mockSynAlert).clear();
+    verify(mockView).setLoadingVisible(true);
+    verify(mockView).setLoadingVisible(false);
+    verify(mockView).setVisible(true);
+    verify(mockSynAlert).handleException(ex);
+  }
 
-		widget.configure(mockUserProfile);
-		widget.onRemoveEmail(EMAIL2);
+  @Test
+  public void testConfigureAnonymous() {
+    when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+    widget.configure(mockUserProfile);
+    verify(mockView).setVisible(false);
+  }
 
-		verify(mockSynapseClient).removeEmail(eq(EMAIL2), any(AsyncCallback.class));
-		verify(mockSynAlert).handleException(ex);
-	}
+  @Test
+  public void testConfigureDifferentProfile() {
+    when(mockUserProfile.getOwnerId()).thenReturn("user2");
+    widget.configure(mockUserProfile);
+    verify(mockView).setVisible(false);
+  }
+
+  @Test
+  public void testOnAddExistingEmail() {
+    widget.configure(mockUserProfile);
+
+    widget.onAddEmail("    " + EMAIL2 + "   ");
+
+    verify(mockSynapseJavascriptClient, never())
+      .additionalEmailValidation(
+        anyString(),
+        anyString(),
+        anyString(),
+        any(AsyncCallback.class)
+      );
+  }
+
+  @Test
+  public void testAdditionalEmailValidation()
+    throws JSONObjectAdapterException {
+    widget.configure(mockUserProfile);
+    widget.additionalEmailValidation(EMAIL3 + "    ");
+    verify(mockSynapseJavascriptClient)
+      .additionalEmailValidation(
+        eq(USER_ID),
+        eq(EMAIL3),
+        anyString(),
+        any(AsyncCallback.class)
+      );
+    verify(mockPopupUtils).showInfo(DisplayConstants.EMAIL_ADDED);
+  }
+
+  @Test
+  public void testAdditionalEmailValidationFailure()
+    throws JSONObjectAdapterException {
+    Exception ex = new Exception("unexpected exception");
+    AsyncMockStubber
+      .callFailureWith(ex)
+      .when(mockSynapseJavascriptClient)
+      .additionalEmailValidation(
+        anyString(),
+        anyString(),
+        anyString(),
+        any(AsyncCallback.class)
+      );
+    widget.additionalEmailValidation(EMAIL3);
+    verify(mockSynapseJavascriptClient)
+      .additionalEmailValidation(
+        eq(USER_ID),
+        eq(EMAIL3),
+        anyString(),
+        any(AsyncCallback.class)
+      );
+    verify(mockSynAlert).handleException(ex);
+  }
+
+  @Test
+  public void testAdditionalEmailValidationInvalidEmail()
+    throws JSONObjectAdapterException {
+    String email = "invalidEmailAddress";
+    widget.additionalEmailValidation(email);
+    verify(mockSynAlert).showError(WebConstants.INVALID_EMAIL_MESSAGE);
+    verify(mockSynapseJavascriptClient, never())
+      .additionalEmailValidation(
+        anyString(),
+        anyString(),
+        anyString(),
+        any(AsyncCallback.class)
+      );
+  }
+
+  @Test
+  public void testOnRemoveEmail() {
+    widget.configure(mockUserProfile);
+    widget.onRemoveEmail(EMAIL2);
+
+    verify(mockSynapseClient).removeEmail(eq(EMAIL2), any(AsyncCallback.class));
+    // reload profile
+    verify(mockSynapseJavascriptClient)
+      .getUserProfile(eq(USER_ID), any(AsyncCallback.class));
+  }
+
+  @Test
+  public void testOnRemoveEmailFailure() {
+    Exception ex = new Exception("unexpected exception");
+    AsyncMockStubber
+      .callFailureWith(ex)
+      .when(mockSynapseClient)
+      .removeEmail(anyString(), any(AsyncCallback.class));
+
+    widget.configure(mockUserProfile);
+    widget.onRemoveEmail(EMAIL2);
+
+    verify(mockSynapseClient).removeEmail(eq(EMAIL2), any(AsyncCallback.class));
+    verify(mockSynAlert).handleException(ex);
+  }
 }

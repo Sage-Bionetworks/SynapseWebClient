@@ -1,16 +1,5 @@
 package org.sagebionetworks.web.client.widget.upload;
 
-import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.Form;
-import org.gwtbootstrap3.client.ui.Input;
-import org.gwtbootstrap3.client.ui.Progress;
-import org.gwtbootstrap3.client.ui.ProgressBar;
-import org.gwtbootstrap3.client.ui.constants.ButtonSize;
-import org.gwtbootstrap3.client.ui.constants.ButtonType;
-import org.gwtbootstrap3.client.ui.constants.IconType;
-import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Span;
-import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.CanvasElement;
 import com.google.gwt.dom.client.InputElement;
@@ -26,101 +15,134 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Form;
+import org.gwtbootstrap3.client.ui.Input;
+import org.gwtbootstrap3.client.ui.Progress;
+import org.gwtbootstrap3.client.ui.ProgressBar;
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
+import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
 public class ImageUploadViewImpl implements ImageUploadView {
 
-	private static final String PREFIX_FILE_INPUT_WIDGET = "imageInputWidget";
+  private static final String PREFIX_FILE_INPUT_WIDGET = "imageInputWidget";
 
-	/**
-	 * Used to ensure each new instance of this widget has its own ID. This is important because the ID
-	 * is used when interacting with the actual DOM element.
-	 */
-	private static long ID_SEQUENCE = 0;
+  /**
+   * Used to ensure each new instance of this widget has its own ID. This is important because the ID
+   * is used when interacting with the actual DOM element.
+   */
+  private static long ID_SEQUENCE = 0;
 
-	private Widget widget;
-	private static boolean isLoaded = false;
+  private Widget widget;
+  private static boolean isLoaded = false;
 
-	public interface Binder extends UiBinder<Widget, ImageUploadViewImpl> {
-	}
+  public interface Binder extends UiBinder<Widget, ImageUploadViewImpl> {}
 
-	@UiField
-	Form form;
-	@UiField
-	Input fileInput;
-	@UiField
-	Button uploadbutton;
-	@UiField
-	Progress progressContainer;
-	@UiField
-	ProgressBar progressBar;
-	@UiField
-	Div synAlertContainer;
-	@UiField
-	Span uploadedFileNameField;
-	Presenter presenter;
-	@UiField
-	CanvasElement originalCanvas;
-	@UiField
-	CanvasElement resizedCanvas;
-	@UiField
-	LoadingSpinner loadingUI;
+  @UiField
+  Form form;
 
-	@Inject
-	public ImageUploadViewImpl(Binder binder) {
-		widget = binder.createAndBindUi(this);
-		// Create a unique for each new instance.
-		this.fileInput.getElement().setId(PREFIX_FILE_INPUT_WIDGET + ID_SEQUENCE++);
+  @UiField
+  Input fileInput;
 
-		// when a file is selected notify the presenter
-		this.fileInput.addChangeHandler(new ChangeHandler() {
-			@Override
-			public void onChange(ChangeEvent event) {
-				presenter.onFileSelected();
-			}
-		});
+  @UiField
+  Button uploadbutton;
 
-		this.uploadbutton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				// When they press the button trigger the input box
-				fileInput.getElement().<InputElement>cast().click();
-			}
-		});
-		if (!isLoaded) {
-			_initResizer();
-			isLoaded = true;
-		}
-		
-	}
+  @UiField
+  Progress progressContainer;
 
-	@Override
-	public void processFile() {
-		// load into image
-		loadingUI.setVisible(true);
-		_loadImage(fileInput.getElement().getId(), ImageUploadViewImpl.this, originalCanvas, resizedCanvas);
-	}
-	
-	@Override
-	public void setButtonType(ButtonType type) {
-		uploadbutton.setType(type);
-	}
-	
-	@Override
-	public void setButtonSize(ButtonSize size) {
-		uploadbutton.setSize(size);		
-	}
-	
-	@Override
-	public void setButtonText(String text) {
-		uploadbutton.setText(text);		
-	}
+  @UiField
+  ProgressBar progressBar;
 
-	@Override
-	public void setButtonIcon(IconType iconType) {
-		uploadbutton.setIcon(iconType);		
-	}
+  @UiField
+  Div synAlertContainer;
 
-	private static native void _loadImage(String fileFieldId, ImageUploadViewImpl v, CanvasElement originalCanvas, CanvasElement resizedCanvas) /*-{
+  @UiField
+  Span uploadedFileNameField;
+
+  Presenter presenter;
+
+  @UiField
+  CanvasElement originalCanvas;
+
+  @UiField
+  CanvasElement resizedCanvas;
+
+  @UiField
+  LoadingSpinner loadingUI;
+
+  @Inject
+  public ImageUploadViewImpl(Binder binder) {
+    widget = binder.createAndBindUi(this);
+    // Create a unique for each new instance.
+    this.fileInput.getElement().setId(PREFIX_FILE_INPUT_WIDGET + ID_SEQUENCE++);
+
+    // when a file is selected notify the presenter
+    this.fileInput.addChangeHandler(
+        new ChangeHandler() {
+          @Override
+          public void onChange(ChangeEvent event) {
+            presenter.onFileSelected();
+          }
+        }
+      );
+
+    this.uploadbutton.addClickHandler(
+        new ClickHandler() {
+          @Override
+          public void onClick(ClickEvent event) {
+            // When they press the button trigger the input box
+            fileInput.getElement().<InputElement>cast().click();
+          }
+        }
+      );
+    if (!isLoaded) {
+      _initResizer();
+      isLoaded = true;
+    }
+  }
+
+  @Override
+  public void processFile() {
+    // load into image
+    loadingUI.setVisible(true);
+    _loadImage(
+      fileInput.getElement().getId(),
+      ImageUploadViewImpl.this,
+      originalCanvas,
+      resizedCanvas
+    );
+  }
+
+  @Override
+  public void setButtonType(ButtonType type) {
+    uploadbutton.setType(type);
+  }
+
+  @Override
+  public void setButtonSize(ButtonSize size) {
+    uploadbutton.setSize(size);
+  }
+
+  @Override
+  public void setButtonText(String text) {
+    uploadbutton.setText(text);
+  }
+
+  @Override
+  public void setButtonIcon(IconType iconType) {
+    uploadbutton.setIcon(iconType);
+  }
+
+  private static native void _loadImage(
+    String fileFieldId,
+    ImageUploadViewImpl v,
+    CanvasElement originalCanvas,
+    CanvasElement resizedCanvas
+  ) /*-{
 																																																																							var fileToUploadElement = $doc.getElementById(fileFieldId);
 																																																																							var file;
 																																																																							var canResize = true;
@@ -174,7 +196,7 @@ public class ImageUploadViewImpl implements ImageUploadView {
 																																																																							}
 																																																																							}-*/;
 
-	private static native void _initResizer() /*-{
+  private static native void _initResizer() /*-{
 		console.log('initializing pica resizer');
 		$wnd.resizer = $wnd.pica({
 			features : [ 'js', 'wasm', 'ww' ]
@@ -182,78 +204,76 @@ public class ImageUploadViewImpl implements ImageUploadView {
 		console.log('pica resizer initialized');
 	}-*/;
 
-	public void resizeComplete(JavaScriptObject blob) {
-		loadingUI.setVisible(false);
-		presenter.onFileProcessed(new JavaScriptObjectWrapper(blob), "image/jpeg");
-	}
+  public void resizeComplete(JavaScriptObject blob) {
+    loadingUI.setVisible(false);
+    presenter.onFileProcessed(new JavaScriptObjectWrapper(blob), "image/jpeg");
+  }
 
-	public void noResizeNecessary(JavaScriptObject blob) {
-		loadingUI.setVisible(false);
-		presenter.onFileProcessed(new JavaScriptObjectWrapper(blob), null);
-	}
+  public void noResizeNecessary(JavaScriptObject blob) {
+    loadingUI.setVisible(false);
+    presenter.onFileProcessed(new JavaScriptObjectWrapper(blob), null);
+  }
 
+  @Override
+  public Widget asWidget() {
+    return widget;
+  }
 
-	@Override
-	public Widget asWidget() {
-		return widget;
-	}
+  @Override
+  public HandlerRegistration addAttachHandler(Handler handler) {
+    return widget.addAttachHandler(handler);
+  }
 
-	@Override
-	public HandlerRegistration addAttachHandler(Handler handler) {
-		return widget.addAttachHandler(handler);
-	}
+  @Override
+  public boolean isAttached() {
+    return widget.isAttached();
+  }
 
-	@Override
-	public boolean isAttached() {
-		return widget.isAttached();
-	}
+  @Override
+  public void setPresenter(final Presenter presenter) {
+    this.presenter = presenter;
+  }
 
-	@Override
-	public void setPresenter(final Presenter presenter) {
-		this.presenter = presenter;
-	}
+  @Override
+  public void setUploadedFileText(String text) {
+    uploadedFileNameField.setText(text);
+  }
 
-	@Override
-	public void setUploadedFileText(String text) {
-		uploadedFileNameField.setText(text);
-	}
+  @Override
+  public String getInputId() {
+    return fileInput.getElement().getId();
+  }
 
-	@Override
-	public String getInputId() {
-		return fileInput.getElement().getId();
-	}
+  @Override
+  public void updateProgress(double currentProgress, String progressText) {
+    progressBar.setPercent(currentProgress);
+    progressBar.setText(progressText);
+  }
 
-	@Override
-	public void updateProgress(double currentProgress, String progressText) {
-		progressBar.setPercent(currentProgress);
-		progressBar.setText(progressText);
-	}
+  @Override
+  public void showProgress(boolean visible) {
+    progressContainer.setVisible(visible);
+  }
 
-	@Override
-	public void showProgress(boolean visible) {
-		progressContainer.setVisible(visible);
-	}
+  @Override
+  public void resetForm() {
+    this.form.reset();
+    setUploadedFileText("");
+  }
 
-	@Override
-	public void resetForm() {
-		this.form.reset();
-		setUploadedFileText("");
-	}
+  @Override
+  public void setInputEnabled(boolean enabled) {
+    this.uploadbutton.setEnabled(enabled);
+  }
 
-	@Override
-	public void setInputEnabled(boolean enabled) {
-		this.uploadbutton.setEnabled(enabled);
-	}
+  @Override
+  public void setSynAlert(IsWidget w) {
+    synAlertContainer.clear();
+    synAlertContainer.add(w);
+  }
 
-	@Override
-	public void setSynAlert(IsWidget w) {
-		synAlertContainer.clear();
-		synAlertContainer.add(w);
-	}
-
-	@Override
-	public void fireEvent(GwtEvent<?> event) {
-		widget.fireEvent(event);
-	}
-
+  @Override
+  public void fireEvent(GwtEvent<?> event) {
+    widget.fireEvent(event);
+  }
 }

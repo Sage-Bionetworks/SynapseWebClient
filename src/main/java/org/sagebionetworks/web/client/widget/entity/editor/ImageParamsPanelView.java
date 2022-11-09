@@ -3,35 +3,34 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface ImageParamsPanelView extends IsWidget {
+  void setNoneButtonActive();
 
-	void setNoneButtonActive();
+  void setLeftButtonActive();
 
-	void setLeftButtonActive();
+  void setCenterButtonActive();
 
-	void setCenterButtonActive();
+  void setRightButtonActive();
 
-	void setRightButtonActive();
+  void setPresenter(Presenter presenter);
 
-	void setPresenter(Presenter presenter);
+  void setScale(Integer scale);
 
-	void setScale(Integer scale);
+  Integer getScale();
 
-	Integer getScale();
+  void setAltText(String altText);
 
-	void setAltText(String altText);
+  String getAltText();
 
-	String getAltText();
+  /**
+   * Presenter interface
+   */
+  public interface Presenter {
+    void noneButtonClicked();
 
-	/**
-	 * Presenter interface
-	 */
-	public interface Presenter {
-		void noneButtonClicked();
+    void leftButtonClicked();
 
-		void leftButtonClicked();
+    void centerButtonClicked();
 
-		void centerButtonClicked();
-
-		void rightButtonClicked();
-	}
+    void rightButtonClicked();
+  }
 }

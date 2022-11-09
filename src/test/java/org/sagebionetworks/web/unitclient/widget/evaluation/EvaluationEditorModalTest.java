@@ -6,6 +6,9 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.IsWidget;
 import java.util.Date;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,192 +27,222 @@ import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModal;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModalView;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.IsWidget;
 
 public class EvaluationEditorModalTest {
 
-	EvaluationEditorModal modal;
-	@Mock
-	EvaluationEditorModalView mockView;
-	@Mock
-	ChallengeClientAsync mockChallengeClient;
-	@Mock
-	SynapseAlert mockSynAlert;
-	@Mock
-	Callback mockEvaluationUpdatedCallback;
-	@Mock
-	UserBadge mockUserBadge;
-	@Mock
-	AuthenticationController mockAuthenticationController;
-	@Mock
-	DateTimeUtils mockDateTimeUtils;
-	@Mock
-	SubmissionQuota mockSubmissionQuota;
-	@Captor
-	ArgumentCaptor<Evaluation> evaluationCaptor;
+  EvaluationEditorModal modal;
 
-	Evaluation evaluation;
-	String evaluationName = "my existing evaluation queue";
-	String submissionInstruction = "Please submit your power of attorney to the Synapse developer";
-	String submissionReceiptMessage = "Really?";
-	String description = "a description of the evaluation queue";
-	Date createdOnDate = new Date();
+  @Mock
+  EvaluationEditorModalView mockView;
 
-	Date quotaRoundStart = new Date();
-	Long numberOfRounds = 3L;
-	Long roundDurationMillis = 10000L;
-	Long submissionLimit = 20L;
+  @Mock
+  ChallengeClientAsync mockChallengeClient;
 
-	@Before
-	public void setup() throws Exception {
-		MockitoAnnotations.initMocks(this);
-		modal = new EvaluationEditorModal(mockView, mockChallengeClient, mockSynAlert, mockUserBadge, mockAuthenticationController, mockDateTimeUtils);
-		evaluation = new Evaluation();
-		evaluation.setId("3");
-		evaluation.setName(evaluationName);
-		evaluation.setSubmissionInstructionsMessage(submissionInstruction);
-		evaluation.setSubmissionReceiptMessage(submissionReceiptMessage);
-		evaluation.setDescription(description);
-		evaluation.setCreatedOn(createdOnDate);
-		AsyncMockStubber.callSuccessWith(null).when(mockChallengeClient).updateEvaluation(any(Evaluation.class), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(null).when(mockChallengeClient).createEvaluation(any(Evaluation.class), any(AsyncCallback.class));
+  @Mock
+  SynapseAlert mockSynAlert;
 
-		when(mockView.getSubmissionLimit()).thenReturn(null);
-		when(mockView.getNumberOfRounds()).thenReturn(null);
-		when(mockView.getRoundDuration()).thenReturn(null);
-		when(mockView.getRoundStart()).thenReturn(null);
+  @Mock
+  Callback mockEvaluationUpdatedCallback;
 
-		when(mockSubmissionQuota.getFirstRoundStart()).thenReturn(quotaRoundStart);
-		when(mockSubmissionQuota.getNumberOfRounds()).thenReturn(numberOfRounds);
-		when(mockSubmissionQuota.getRoundDurationMillis()).thenReturn(roundDurationMillis);
-		when(mockSubmissionQuota.getSubmissionLimit()).thenReturn(submissionLimit);
-	}
+  @Mock
+  UserBadge mockUserBadge;
 
-	@Test
-	public void testConstruction() {
-		verify(mockView).setSynAlert(any(IsWidget.class));
-		verify(mockView).setPresenter(modal);
-	}
+  @Mock
+  AuthenticationController mockAuthenticationController;
 
-	@Test
-	public void testConfigureNewEvaluation() {
-		String projectId = "syn983948";
-		modal.configure(projectId, mockEvaluationUpdatedCallback);
-		verify(mockView).clear();
-		verify(mockView).setEvaluationName(null);
-		verify(mockView).setSubmissionInstructionsMessage(null);
-		verify(mockView).setSubmissionReceiptMessage(null);
+  @Mock
+  DateTimeUtils mockDateTimeUtils;
 
+  @Mock
+  SubmissionQuota mockSubmissionQuota;
 
-		// save new evaluation
-		modal.onSave();
-		verify(mockChallengeClient).createEvaluation(any(Evaluation.class), any(AsyncCallback.class));
-		verify(mockView).hide();
-		verify(mockEvaluationUpdatedCallback).invoke();
-	}
+  @Captor
+  ArgumentCaptor<Evaluation> evaluationCaptor;
 
-	@Test
-	public void testConfigureExistingEvaluation() {
-		modal.configure(evaluation, mockEvaluationUpdatedCallback);
-		verify(mockView).clear();
-		verify(mockView).setEvaluationName(evaluationName);
-		verify(mockView).setSubmissionInstructionsMessage(submissionInstruction);
-		verify(mockView).setSubmissionReceiptMessage(submissionReceiptMessage);
-		verify(mockView).setDescription(description);
-		verify(mockView).setCreatedOn(anyString());
-		// verify no quota
-		verify(mockView, never()).setRoundStart(any(Date.class));
-		verify(mockView, never()).setNumberOfRounds(anyLong());
-		verify(mockView, never()).setRoundDuration(anyLong());
-		verify(mockView, never()).setSubmissionLimit(anyLong());
+  Evaluation evaluation;
+  String evaluationName = "my existing evaluation queue";
+  String submissionInstruction =
+    "Please submit your power of attorney to the Synapse developer";
+  String submissionReceiptMessage = "Really?";
+  String description = "a description of the evaluation queue";
+  Date createdOnDate = new Date();
 
-		// save existing evaluation
-		modal.onSave();
-		verify(mockChallengeClient).updateEvaluation(any(Evaluation.class), any(AsyncCallback.class));
-		verify(mockView).hide();
-		verify(mockEvaluationUpdatedCallback).invoke();
-	}
+  Date quotaRoundStart = new Date();
+  Long numberOfRounds = 3L;
+  Long roundDurationMillis = 10000L;
+  Long submissionLimit = 20L;
 
-	@Test
-	public void testConfigureExistingEvaluationWithQuota() {
-		evaluation.setQuota(mockSubmissionQuota);
+  @Before
+  public void setup() throws Exception {
+    MockitoAnnotations.initMocks(this);
+    modal =
+      new EvaluationEditorModal(
+        mockView,
+        mockChallengeClient,
+        mockSynAlert,
+        mockUserBadge,
+        mockAuthenticationController,
+        mockDateTimeUtils
+      );
+    evaluation = new Evaluation();
+    evaluation.setId("3");
+    evaluation.setName(evaluationName);
+    evaluation.setSubmissionInstructionsMessage(submissionInstruction);
+    evaluation.setSubmissionReceiptMessage(submissionReceiptMessage);
+    evaluation.setDescription(description);
+    evaluation.setCreatedOn(createdOnDate);
+    AsyncMockStubber
+      .callSuccessWith(null)
+      .when(mockChallengeClient)
+      .updateEvaluation(any(Evaluation.class), any(AsyncCallback.class));
+    AsyncMockStubber
+      .callSuccessWith(null)
+      .when(mockChallengeClient)
+      .createEvaluation(any(Evaluation.class), any(AsyncCallback.class));
 
-		modal.configure(evaluation, mockEvaluationUpdatedCallback);
+    when(mockView.getSubmissionLimit()).thenReturn(null);
+    when(mockView.getNumberOfRounds()).thenReturn(null);
+    when(mockView.getRoundDuration()).thenReturn(null);
+    when(mockView.getRoundStart()).thenReturn(null);
 
-		verify(mockView).clear();
-		verify(mockView).setEvaluationName(evaluationName);
-		verify(mockView).setSubmissionInstructionsMessage(submissionInstruction);
-		verify(mockView).setSubmissionReceiptMessage(submissionReceiptMessage);
-		verify(mockView).setDescription(description);
-		verify(mockView).setCreatedOn(anyString());
-		// verify quota
-		verify(mockView).setRoundStart(quotaRoundStart);
-		verify(mockView).setNumberOfRounds(numberOfRounds);
-		verify(mockView).setRoundDuration(roundDurationMillis);
-		verify(mockView).setSubmissionLimit(submissionLimit);
-	}
+    when(mockSubmissionQuota.getFirstRoundStart()).thenReturn(quotaRoundStart);
+    when(mockSubmissionQuota.getNumberOfRounds()).thenReturn(numberOfRounds);
+    when(mockSubmissionQuota.getRoundDurationMillis())
+      .thenReturn(roundDurationMillis);
+    when(mockSubmissionQuota.getSubmissionLimit()).thenReturn(submissionLimit);
+  }
 
-	@Test
-	public void testShow() {
-		modal.show();
-		verify(mockView).show();
-	}
+  @Test
+  public void testConstruction() {
+    verify(mockView).setSynAlert(any(IsWidget.class));
+    verify(mockView).setPresenter(modal);
+  }
 
-	@Test
-	public void testSaveFailure() {
-		Exception ex = new Exception("fail");
-		AsyncMockStubber.callFailureWith(ex).when(mockChallengeClient).updateEvaluation(any(Evaluation.class), any(AsyncCallback.class));
-		modal.configure(evaluation, mockEvaluationUpdatedCallback);
+  @Test
+  public void testConfigureNewEvaluation() {
+    String projectId = "syn983948";
+    modal.configure(projectId, mockEvaluationUpdatedCallback);
+    verify(mockView).clear();
+    verify(mockView).setEvaluationName(null);
+    verify(mockView).setSubmissionInstructionsMessage(null);
+    verify(mockView).setSubmissionReceiptMessage(null);
 
-		// save existing evaluation
-		modal.onSave();
-		verify(mockChallengeClient).updateEvaluation(any(Evaluation.class), any(AsyncCallback.class));
-		verify(mockSynAlert).handleException(ex);
-		verify(mockView, never()).hide();
-		verify(mockEvaluationUpdatedCallback, never()).invoke();
-	}
+    // save new evaluation
+    modal.onSave();
+    verify(mockChallengeClient)
+      .createEvaluation(any(Evaluation.class), any(AsyncCallback.class));
+    verify(mockView).hide();
+    verify(mockEvaluationUpdatedCallback).invoke();
+  }
 
-	@Test
-	public void testPartiallyFilledInQuota() {
-		when(mockSubmissionQuota.getFirstRoundStart()).thenReturn(null);
-		when(mockSubmissionQuota.getNumberOfRounds()).thenReturn(null);
-		when(mockSubmissionQuota.getRoundDurationMillis()).thenReturn(null);
-		when(mockSubmissionQuota.getSubmissionLimit()).thenReturn(null);
-		evaluation.setQuota(mockSubmissionQuota);
+  @Test
+  public void testConfigureExistingEvaluation() {
+    modal.configure(evaluation, mockEvaluationUpdatedCallback);
+    verify(mockView).clear();
+    verify(mockView).setEvaluationName(evaluationName);
+    verify(mockView).setSubmissionInstructionsMessage(submissionInstruction);
+    verify(mockView).setSubmissionReceiptMessage(submissionReceiptMessage);
+    verify(mockView).setDescription(description);
+    verify(mockView).setCreatedOn(anyString());
+    // verify no quota
+    verify(mockView, never()).setRoundStart(any(Date.class));
+    verify(mockView, never()).setNumberOfRounds(anyLong());
+    verify(mockView, never()).setRoundDuration(anyLong());
+    verify(mockView, never()).setSubmissionLimit(anyLong());
 
-		modal.configure(evaluation, mockEvaluationUpdatedCallback);
+    // save existing evaluation
+    modal.onSave();
+    verify(mockChallengeClient)
+      .updateEvaluation(any(Evaluation.class), any(AsyncCallback.class));
+    verify(mockView).hide();
+    verify(mockEvaluationUpdatedCallback).invoke();
+  }
 
-		// verify quota
-		verify(mockView, never()).setRoundStart(any(Date.class));
-		verify(mockView, never()).setNumberOfRounds(any(Long.class));
-		verify(mockView, never()).setRoundDuration(any(Long.class));
-		verify(mockView, never()).setSubmissionLimit(any(Long.class));
+  @Test
+  public void testConfigureExistingEvaluationWithQuota() {
+    evaluation.setQuota(mockSubmissionQuota);
 
-		// only the round start is set, no other quota fields
-		when(mockView.getRoundStart()).thenReturn(quotaRoundStart);
+    modal.configure(evaluation, mockEvaluationUpdatedCallback);
 
-		modal.onSave();
+    verify(mockView).clear();
+    verify(mockView).setEvaluationName(evaluationName);
+    verify(mockView).setSubmissionInstructionsMessage(submissionInstruction);
+    verify(mockView).setSubmissionReceiptMessage(submissionReceiptMessage);
+    verify(mockView).setDescription(description);
+    verify(mockView).setCreatedOn(anyString());
+    // verify quota
+    verify(mockView).setRoundStart(quotaRoundStart);
+    verify(mockView).setNumberOfRounds(numberOfRounds);
+    verify(mockView).setRoundDuration(roundDurationMillis);
+    verify(mockView).setSubmissionLimit(submissionLimit);
+  }
 
-		verify(mockChallengeClient).updateEvaluation(any(Evaluation.class), any(AsyncCallback.class));
-		verify(mockView).hide();
-		verify(mockEvaluationUpdatedCallback).invoke();
-	}
+  @Test
+  public void testShow() {
+    modal.show();
+    verify(mockView).show();
+  }
 
-	@Test
-	public void testValidQuota() {
-		modal.configure(evaluation, mockEvaluationUpdatedCallback);
+  @Test
+  public void testSaveFailure() {
+    Exception ex = new Exception("fail");
+    AsyncMockStubber
+      .callFailureWith(ex)
+      .when(mockChallengeClient)
+      .updateEvaluation(any(Evaluation.class), any(AsyncCallback.class));
+    modal.configure(evaluation, mockEvaluationUpdatedCallback);
 
-		// only the round start is set, no other quota fields
-		when(mockView.getRoundStart()).thenReturn(new Date());
-		when(mockView.getSubmissionLimit()).thenReturn(22.0);
-		when(mockView.getNumberOfRounds()).thenReturn(10.0);
-		when(mockView.getRoundDuration()).thenReturn(2000000L);
+    // save existing evaluation
+    modal.onSave();
+    verify(mockChallengeClient)
+      .updateEvaluation(any(Evaluation.class), any(AsyncCallback.class));
+    verify(mockSynAlert).handleException(ex);
+    verify(mockView, never()).hide();
+    verify(mockEvaluationUpdatedCallback, never()).invoke();
+  }
 
-		modal.onSave();
+  @Test
+  public void testPartiallyFilledInQuota() {
+    when(mockSubmissionQuota.getFirstRoundStart()).thenReturn(null);
+    when(mockSubmissionQuota.getNumberOfRounds()).thenReturn(null);
+    when(mockSubmissionQuota.getRoundDurationMillis()).thenReturn(null);
+    when(mockSubmissionQuota.getSubmissionLimit()).thenReturn(null);
+    evaluation.setQuota(mockSubmissionQuota);
 
-		verify(mockChallengeClient).updateEvaluation(any(Evaluation.class), any(AsyncCallback.class));
-		verify(mockView).hide();
-		verify(mockEvaluationUpdatedCallback).invoke();
-	}
+    modal.configure(evaluation, mockEvaluationUpdatedCallback);
+
+    // verify quota
+    verify(mockView, never()).setRoundStart(any(Date.class));
+    verify(mockView, never()).setNumberOfRounds(any(Long.class));
+    verify(mockView, never()).setRoundDuration(any(Long.class));
+    verify(mockView, never()).setSubmissionLimit(any(Long.class));
+
+    // only the round start is set, no other quota fields
+    when(mockView.getRoundStart()).thenReturn(quotaRoundStart);
+
+    modal.onSave();
+
+    verify(mockChallengeClient)
+      .updateEvaluation(any(Evaluation.class), any(AsyncCallback.class));
+    verify(mockView).hide();
+    verify(mockEvaluationUpdatedCallback).invoke();
+  }
+
+  @Test
+  public void testValidQuota() {
+    modal.configure(evaluation, mockEvaluationUpdatedCallback);
+
+    // only the round start is set, no other quota fields
+    when(mockView.getRoundStart()).thenReturn(new Date());
+    when(mockView.getSubmissionLimit()).thenReturn(22.0);
+    when(mockView.getNumberOfRounds()).thenReturn(10.0);
+    when(mockView.getRoundDuration()).thenReturn(2000000L);
+
+    modal.onSave();
+
+    verify(mockChallengeClient)
+      .updateEvaluation(any(Evaluation.class), any(AsyncCallback.class));
+    verify(mockView).hide();
+    verify(mockEvaluationUpdatedCallback).invoke();
+  }
 }

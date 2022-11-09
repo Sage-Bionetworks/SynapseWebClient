@@ -1,146 +1,142 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
-import org.sagebionetworks.web.client.utils.Callback;
 import com.google.gwt.user.client.ui.IsWidget;
+import org.sagebionetworks.web.client.utils.Callback;
 
 /**
  * An abstraction for a view that allows a single query result page to be edited.
- * 
+ *
  * @author John
  *
  */
 public interface QueryResultEditorView extends IsWidget {
+  /**
+   * All business logic for this widget goes here.
+   *
+   */
+  public interface Presenter {
+    /**
+     * Add a row to the table.
+     */
+    void onAddRow();
 
-	/**
-	 * All business logic for this widget goes here.
-	 *
-	 */
-	public interface Presenter {
+    /**
+     * Toggle the selected rows.
+     */
+    void onToggleSelect();
 
-		/**
-		 * Add a row to the table.
-		 */
-		void onAddRow();
+    /**
+     * Select all rows.
+     */
+    void onSelectAll();
 
-		/**
-		 * Toggle the selected rows.
-		 */
-		void onToggleSelect();
+    /**
+     * Select no rows.
+     */
+    void onSelectNone();
 
-		/**
-		 * Select all rows.
-		 */
-		void onSelectAll();
+    /**
+     * Delete the selected rows.
+     */
+    void onDeleteSelected();
 
-		/**
-		 * Select no rows.
-		 */
-		void onSelectNone();
+    /**
+     * Called when the save button is pressed.
+     */
+    void onSave();
 
-		/**
-		 * Delete the selected rows.
-		 */
-		void onDeleteSelected();
+    /**
+     * Called when the user clicks the close button.
+     */
+    void onCancel();
+  }
 
-		/**
-		 * Called when the save button is pressed.
-		 */
-		void onSave();
+  /**
+   * Bind the presenter to the view.
+   *
+   * @param presenter
+   */
+  public void setPresenter(Presenter presenter);
 
-		/**
-		 * Called when the user clicks the close button.
-		 */
-		void onCancel();
+  /**
+   * This widget contains the table of data for the page.
+   *
+   * @param pageWidget
+   */
+  public void setTablePageWidget(TablePageWidget pageWidget);
 
-	}
+  /**
+   * Enable or disable the delete button.
+   *
+   * @param enabled
+   */
+  public void setDeleteButtonEnabled(boolean enabled);
 
-	/**
-	 * Bind the presenter to the view.
-	 * 
-	 * @param presenter
-	 */
-	public void setPresenter(Presenter presenter);
+  /**
+   * Show an error message.
+   *
+   * @param message
+   */
+  public void showErrorMessage(String message);
 
-	/**
-	 * This widget contains the table of data for the page.
-	 * 
-	 * @param pageWidget
-	 */
-	public void setTablePageWidget(TablePageWidget pageWidget);
+  /**
+   * Show or hide the error message alert box.
+   *
+   * @param b
+   */
+  public void setErrorMessageVisible(boolean visible);
 
-	/**
-	 * Enable or disable the delete button.
-	 * 
-	 * @param enabled
-	 */
-	public void setDeleteButtonEnabled(boolean enabled);
+  /**
+   * Widget that displays append progress.
+   *
+   * @param progress
+   */
+  public void setProgressWidget(IsWidget progress);
 
-	/**
-	 * Show an error message.
-	 * 
-	 * @param message
-	 */
-	public void showErrorMessage(String message);
+  /**
+   * Show the progress dialog.
+   *
+   */
+  public void showProgress();
 
-	/**
-	 * Show or hide the error message alert box.
-	 * 
-	 * @param b
-	 */
-	public void setErrorMessageVisible(boolean visible);
+  /**
+   * Hide the progress dialog.
+   *
+   */
+  public void hideProgress();
 
-	/**
-	 * Widget that displays append progress.
-	 * 
-	 * @param progress
-	 */
-	public void setProgressWidget(IsWidget progress);
+  /**
+   * Show a confirm dialog.
+   *
+   * @param title
+   * @param message
+   * @param okayCallback
+   */
+  void showConfirmDialog(String message, Callback callback);
 
-	/**
-	 * Show the progress dialog.
-	 * 
-	 */
-	public void showProgress();
+  /**
+   * Show the editor dialog.
+   *
+   */
+  void showEditor();
 
-	/**
-	 * Hide the progress dialog.
-	 * 
-	 */
-	public void hideProgress();
+  /**
+   * Change the state of the save button while saving.
+   *
+   * @param b
+   */
+  void setSaveButtonLoading(boolean b);
 
-	/**
-	 * Show a confirm dialog.
-	 * 
-	 * @param title
-	 * @param message
-	 * @param okayCallback
-	 */
-	void showConfirmDialog(String message, Callback callback);
+  /**
+   * Hide the editor.
+   */
+  void hideEditor();
 
-	/**
-	 * Show the editor dialog.
-	 * 
-	 */
-	void showEditor();
+  void showErrorDialog(String message);
 
-	/**
-	 * Change the state of the save button while saving.
-	 * 
-	 * @param b
-	 */
-	void setSaveButtonLoading(boolean b);
+  void showMessage(String title, String message);
 
-	/**
-	 * Hide the editor.
-	 */
-	void hideEditor();
+  void setAddRowButtonVisible(boolean visible);
 
-	void showErrorDialog(String message);
-
-	void showMessage(String title, String message);
-
-	void setAddRowButtonVisible(boolean visible);
-
-	void setButtonToolbarVisible(boolean visible);
-
+  void setButtonToolbarVisible(boolean visible);
 }

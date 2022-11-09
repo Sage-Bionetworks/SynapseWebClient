@@ -4,41 +4,39 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 public interface ProvenanceEditorWidgetView {
+  public interface Presenter {
+    Widget asWidget();
 
-	public interface Presenter {
+    void onSave();
 
-		Widget asWidget();
+    void clear();
+  }
 
-		void onSave();
+  Widget asWidget();
 
-		void clear();
-	}
+  void setSynAlertWidget(IsWidget asWidget);
 
-	Widget asWidget();
+  void setName(String name);
 
-	void setSynAlertWidget(IsWidget asWidget);
+  void setDescription(String description);
 
-	void setName(String name);
+  void setUsedProvenanceList(IsWidget widget);
 
-	void setDescription(String description);
+  void setExecutedProvenanceList(IsWidget executedProvenanceList);
 
-	void setUsedProvenanceList(IsWidget widget);
+  void setPresenter(Presenter presenter);
 
-	void setExecutedProvenanceList(IsWidget executedProvenanceList);
+  void clear();
 
-	void setPresenter(Presenter presenter);
+  void hide();
 
-	void clear();
+  void show();
 
-	void hide();
+  String getDescription();
 
-	void show();
+  String getName();
 
-	String getDescription();
+  void setEntityFinder(IsWidget entityFinder);
 
-	String getName();
-
-	void setEntityFinder(IsWidget entityFinder);
-
-	void setURLDialog(IsWidget urlDialog);
+  void setURLDialog(IsWidget urlDialog);
 }

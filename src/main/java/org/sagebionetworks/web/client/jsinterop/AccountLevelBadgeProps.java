@@ -7,12 +7,12 @@ import jsinterop.annotations.JsType;
 @JsType(isNative = true, namespace = JsPackage.GLOBAL, name = "Object")
 public class AccountLevelBadgeProps extends ReactComponentProps {
 
-	String userId;
+  String userId;
 
-	@JsOverlay
-	public static AccountLevelBadgeProps create(String userId) {
-		AccountLevelBadgeProps props = new AccountLevelBadgeProps();
-		props.userId = userId;
-		return props;
-	}
+  @JsOverlay
+  public static AccountLevelBadgeProps create(String userId) {
+    AccountLevelBadgeProps props = new AccountLevelBadgeProps();
+    props.userId = userId;
+    return props;
+  }
 }

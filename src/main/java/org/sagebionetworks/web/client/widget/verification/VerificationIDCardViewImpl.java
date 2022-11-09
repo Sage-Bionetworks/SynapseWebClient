@@ -1,87 +1,92 @@
 package org.sagebionetworks.web.client.widget.verification;
 
-import org.gwtbootstrap3.client.ui.Anchor;
-import org.gwtbootstrap3.client.ui.Heading;
-import org.gwtbootstrap3.client.ui.Modal;
-import org.gwtbootstrap3.client.ui.html.Span;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.Heading;
+import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.html.Span;
 
 public class VerificationIDCardViewImpl implements IsWidget {
 
-	public interface Binder extends UiBinder<Widget, VerificationIDCardViewImpl> {
-	}
+  public interface Binder
+    extends UiBinder<Widget, VerificationIDCardViewImpl> {}
 
-	private static Binder uiBinder = GWT.create(Binder.class);
+  private static Binder uiBinder = GWT.create(Binder.class);
 
-	Widget widget;
+  Widget widget;
 
-	@UiField
-	Heading firstName;
-	@UiField
-	Heading lastName;
-	@UiField
-	Span currentAffiliation;
-	@UiField
-	Span location;
-	@UiField
-	Anchor orcIdAnchor;
-	@UiField
-	Modal modal;
-	@UiField
-	Span dateVerified;
+  @UiField
+  Heading firstName;
 
-	public VerificationIDCardViewImpl() {
-		widget = uiBinder.createAndBindUi(this);
-	}
+  @UiField
+  Heading lastName;
 
+  @UiField
+  Span currentAffiliation;
 
-	public void clear() {
-		firstName.setText("");
-		lastName.setText("");
-		currentAffiliation.setText("");
-		location.setText("");
-		orcIdAnchor.setText("");
-	}
+  @UiField
+  Span location;
 
-	public void setFirstName(String fname) {
-		firstName.setText(fname);
-	}
+  @UiField
+  Anchor orcIdAnchor;
 
-	public void setLastName(String lname) {
-		lastName.setText(lname);
-	}
+  @UiField
+  Modal modal;
 
-	public void setOrganization(String organization) {
-		currentAffiliation.setText(organization);
-	}
+  @UiField
+  Span dateVerified;
 
-	public void setLocation(String l) {
-		location.setText(l);
-	}
+  public VerificationIDCardViewImpl() {
+    widget = uiBinder.createAndBindUi(this);
+  }
 
-	public void setOrcID(String href) {
-		orcIdAnchor.setText(href);
-		orcIdAnchor.setHref(href);
-	}
+  public void clear() {
+    firstName.setText("");
+    lastName.setText("");
+    currentAffiliation.setText("");
+    location.setText("");
+    orcIdAnchor.setText("");
+  }
 
-	public void setDateVerified(String date) {
-		dateVerified.setText(date);
-	}
+  public void setFirstName(String fname) {
+    firstName.setText(fname);
+  }
 
-	@Override
-	public Widget asWidget() {
-		return widget;
-	}
+  public void setLastName(String lname) {
+    lastName.setText(lname);
+  }
 
-	public void show() {
-		modal.show();
-	}
+  public void setOrganization(String organization) {
+    currentAffiliation.setText(organization);
+  }
 
-	public void hide() {
-		modal.hide();
-	}
+  public void setLocation(String l) {
+    location.setText(l);
+  }
+
+  public void setOrcID(String href) {
+    orcIdAnchor.setText(href);
+    orcIdAnchor.setHref(href);
+  }
+
+  public void setDateVerified(String date) {
+    dateVerified.setText(date);
+  }
+
+  @Override
+  public Widget asWidget() {
+    return widget;
+  }
+
+  public void show() {
+    modal.show();
+  }
+
+  public void hide() {
+    modal.hide();
+  }
 }

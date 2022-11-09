@@ -5,6 +5,8 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import com.google.gwt.place.shared.Place;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -19,66 +21,71 @@ import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.widget.search.SearchBox;
 import org.sagebionetworks.web.client.widget.search.SearchBoxView;
-import com.google.gwt.place.shared.Place;
 
 public class SearchBoxTest {
-	@Mock
-	SearchBoxView mockView;
-	@Mock
-	GlobalApplicationState mockGlobalApplicationState;
-	@Mock
-	PlaceChanger mockPlaceChanger;
-	@Captor
-	ArgumentCaptor<Place> placeCaptor;
-	SearchBox presenter;
 
-	@Before
-	public void before() {
-		MockitoAnnotations.initMocks(this);
-		presenter = new SearchBox(mockView, mockGlobalApplicationState);
-		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-	}
+  @Mock
+  SearchBoxView mockView;
 
-	@Test
-	public void testPeopleSearch() {
-		presenter.search("@Tester");
-		verify(mockGlobalApplicationState).getPlaceChanger();
-		verify(mockPlaceChanger).goTo(any(PeopleSearch.class));
-	}
+  @Mock
+  GlobalApplicationState mockGlobalApplicationState;
 
-	@Test
-	public void testSearch() {
-		presenter.search("Test");
-		verify(mockGlobalApplicationState).getPlaceChanger();
-		verify(mockPlaceChanger).goTo(any(Search.class));
-	}
+  @Mock
+  PlaceChanger mockPlaceChanger;
 
-	@Test
-	public void testSearchDoi() {
-		String synId = "syn123.4";
-		presenter.search("10.7303/" + synId);
-		verify(mockGlobalApplicationState).getPlaceChanger();
-		verify(mockPlaceChanger).goTo(placeCaptor.capture());
-		Place place = placeCaptor.getValue();
-		assertTrue(place instanceof Synapse);
-		assertEquals(synId, ((Synapse) place).toToken());
-	}
+  @Captor
+  ArgumentCaptor<Place> placeCaptor;
 
-	@Test
-	public void testSearchEmpty() {
-		presenter.search("");
-		verify(mockGlobalApplicationState, Mockito.never()).getPlaceChanger();
-	}
+  SearchBox presenter;
 
-	@Test
-	public void testTrim() {
-		String synId = "syn111";
+  @Before
+  public void before() {
+    MockitoAnnotations.initMocks(this);
+    presenter = new SearchBox(mockView, mockGlobalApplicationState);
+    when(mockGlobalApplicationState.getPlaceChanger())
+      .thenReturn(mockPlaceChanger);
+  }
 
-		presenter.search("  \t " + synId + " ");
+  @Test
+  public void testPeopleSearch() {
+    presenter.search("@Tester");
+    verify(mockGlobalApplicationState).getPlaceChanger();
+    verify(mockPlaceChanger).goTo(any(PeopleSearch.class));
+  }
 
-		verify(mockPlaceChanger).goTo(placeCaptor.capture());
-		Place place = placeCaptor.getValue();
-		assertTrue(place instanceof Synapse);
-		assertEquals(synId, ((Synapse) place).toToken());
-	}
+  @Test
+  public void testSearch() {
+    presenter.search("Test");
+    verify(mockGlobalApplicationState).getPlaceChanger();
+    verify(mockPlaceChanger).goTo(any(Search.class));
+  }
+
+  @Test
+  public void testSearchDoi() {
+    String synId = "syn123.4";
+    presenter.search("10.7303/" + synId);
+    verify(mockGlobalApplicationState).getPlaceChanger();
+    verify(mockPlaceChanger).goTo(placeCaptor.capture());
+    Place place = placeCaptor.getValue();
+    assertTrue(place instanceof Synapse);
+    assertEquals(synId, ((Synapse) place).toToken());
+  }
+
+  @Test
+  public void testSearchEmpty() {
+    presenter.search("");
+    verify(mockGlobalApplicationState, Mockito.never()).getPlaceChanger();
+  }
+
+  @Test
+  public void testTrim() {
+    String synId = "syn111";
+
+    presenter.search("  \t " + synId + " ");
+
+    verify(mockPlaceChanger).goTo(placeCaptor.capture());
+    Place place = placeCaptor.getValue();
+    assertTrue(place instanceof Synapse);
+    assertEquals(synId, ((Synapse) place).toToken());
+  }
 }

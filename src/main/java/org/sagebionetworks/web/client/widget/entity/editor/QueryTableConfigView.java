@@ -1,34 +1,33 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import com.google.gwt.user.client.ui.IsWidget;
 import java.util.List;
 import org.sagebionetworks.web.client.widget.WidgetEditorView;
-import com.google.gwt.user.client.ui.IsWidget;
 
 public interface QueryTableConfigView extends IsWidget, WidgetEditorView {
+  /**
+   * Set the presenter.
+   *
+   * @param presenter
+   */
+  public void setPresenter(Presenter presenter);
 
-	/**
-	 * Set the presenter.
-	 * 
-	 * @param presenter
-	 */
-	public void setPresenter(Presenter presenter);
+  public String getQueryString();
 
-	public String getQueryString();
+  public Boolean isPaging();
 
-	public Boolean isPaging();
+  public List<APITableColumnConfig> getConfigs();
 
-	public List<APITableColumnConfig> getConfigs();
+  public void configure(APITableConfig tableConfig);
 
-	public void configure(APITableConfig tableConfig);
+  public void setQueryPlaceholder(String placeHolder);
 
-	public void setQueryPlaceholder(String placeHolder);
+  public void setConfigs(List<APITableColumnConfig> newColumnConfigs);
 
-	public void setConfigs(List<APITableColumnConfig> newColumnConfigs);
-
-	/**
-	 * Presenter interface
-	 */
-	public interface Presenter {
-		void autoAddColumns();
-	}
+  /**
+   * Presenter interface
+   */
+  public interface Presenter {
+    void autoAddColumns();
+  }
 }

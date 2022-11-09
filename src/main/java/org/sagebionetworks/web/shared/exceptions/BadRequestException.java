@@ -4,17 +4,17 @@ import org.sagebionetworks.repo.model.ErrorResponseCode;
 
 public class BadRequestException extends RestServiceException {
 
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	public BadRequestException() {
-		super();
-	}
+  public BadRequestException() {
+    super();
+  }
 
-	public BadRequestException(String message) {
-		super(message);
-	}
+  public BadRequestException(String message) {
+    super(message);
+  }
 
-	public BadRequestException(String message, ErrorResponseCode code) {
-		super(message, code);
-	}
+  public BadRequestException(String message, ErrorResponseCode code) {
+    super(message, code);
+  }
 }

@@ -1,63 +1,62 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
-import java.util.List;
 import com.google.gwt.user.client.ui.IsWidget;
+import java.util.List;
 
 /**
- * 
+ *
  * Abstraction for a view of a single page of a table query result.
- * 
+ *
  * @author John
  *
  */
 public interface TablePageView extends IsWidget {
-	/**
-	 * Set the headers for this table. This will be extended to including column sorting data.
-	 * 
-	 * @param headers
-	 */
-	public void setTableHeaders(List<IsWidget> headers);
+  /**
+   * Set the headers for this table. This will be extended to including column sorting data.
+   *
+   * @param headers
+   */
+  public void setTableHeaders(List<IsWidget> headers);
 
-	/**
-	 * Add a row to this table.
-	 * 
-	 * @param rowWidget
-	 */
-	public void addRow(RowWidget rowWidget);
-	
-	/**
-	 * Add rows in bulk to this table.
-	 * 
-	 * @param rowWidget
-	 */
-	public void addRows(List<RowWidget> rowWidgets);
-	
-	
-	/**
-	 * Remove this row from the view.
-	 * 
-	 * @param row
-	 */
-	public void removeRow(RowWidget row);
+  /**
+   * Add a row to this table.
+   *
+   * @param rowWidget
+   */
+  public void addRow(RowWidget rowWidget);
 
-	/**
-	 * Set the pagination widget
-	 * 
-	 * @param paginationWidget
-	 */
-	public void setPaginationWidget(IsWidget paginationWidget);
+  /**
+   * Add rows in bulk to this table.
+   *
+   * @param rowWidget
+   */
+  public void addRows(List<RowWidget> rowWidgets);
 
-	/**
-	 * Show or hide the pagination widgets
-	 * 
-	 * @param visible
-	 */
-	public void setPaginationWidgetVisible(boolean visible);
+  /**
+   * Remove this row from the view.
+   *
+   * @param row
+   */
+  public void removeRow(RowWidget row);
 
-	void setTableVisible(boolean visible);
+  /**
+   * Set the pagination widget
+   *
+   * @param paginationWidget
+   */
+  public void setPaginationWidget(IsWidget paginationWidget);
 
-	void showLoading();
+  /**
+   * Show or hide the pagination widgets
+   *
+   * @param visible
+   */
+  public void setPaginationWidgetVisible(boolean visible);
 
-	void hideLoading();
-	void setLastUpdatedOn(String lastUpdatedOn);
+  void setTableVisible(boolean visible);
+
+  void showLoading();
+
+  void hideLoading();
+  void setLastUpdatedOn(String lastUpdatedOn);
 }

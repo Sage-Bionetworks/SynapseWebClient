@@ -4,54 +4,49 @@ import com.google.gwt.storage.client.Storage;
 
 public class StorageImpl implements StorageWrapper {
 
-	private Storage storage;
+  private Storage storage;
 
-	public StorageImpl() {
-		storage = Storage.getLocalStorageIfSupported();
-	}
+  public StorageImpl() {
+    storage = Storage.getLocalStorageIfSupported();
+  }
 
-	@Override
-	public void clear() {
-		if (isStorageSupported())
-			storage.clear();
-	}
+  @Override
+  public void clear() {
+    if (isStorageSupported()) storage.clear();
+  }
 
-	@Override
-	public String getItem(String key) {
-		if (isStorageSupported())
-			return storage.getItem(key);
-		else
-			return null;
-	}
+  @Override
+  public String getItem(String key) {
+    if (isStorageSupported()) return storage.getItem(key); else return null;
+  }
 
-	@Override
-	public void removeItem(String key) {
-		if (isStorageSupported())
-			storage.removeItem(key);
-	}
+  @Override
+  public void removeItem(String key) {
+    if (isStorageSupported()) storage.removeItem(key);
+  }
 
-	@Override
-	public void setItem(String key, String data) {
-		if (isStorageSupported()) {
-			try {
-				storage.setItem(key, data);
-			} catch (Throwable e) {
-				// unlikely
-			}
-		}
-	}
+  @Override
+  public void setItem(String key, String data) {
+    if (isStorageSupported()) {
+      try {
+        storage.setItem(key, data);
+      } catch (Throwable e) {
+        // unlikely
+      }
+    }
+  }
 
-	@Override
-	public boolean isStorageSupported() {
-		return storage != null;
-	}
-	
-	@Override
-	public double getBytesUsed() {
-		return _getBytesUsed();
-	}
-	
-	private static native double _getBytesUsed() /*-{
+  @Override
+  public boolean isStorageSupported() {
+    return storage != null;
+  }
+
+  @Override
+  public double getBytesUsed() {
+    return _getBytesUsed();
+  }
+
+  private static native double _getBytesUsed() /*-{
 		// Based on https://stackoverflow.com/questions/4391575/how-to-find-the-size-of-localstorage
 		try {
 			var total = 0,
@@ -70,5 +65,4 @@ public class StorageImpl implements StorageWrapper {
 			console.error(err);
 		}
 	}-*/;
-
 }

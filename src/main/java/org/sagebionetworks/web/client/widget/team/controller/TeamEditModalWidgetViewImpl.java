@@ -1,5 +1,15 @@
 package org.sagebionetworks.web.client.widget.team.controller;
 
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.Icon;
@@ -11,197 +21,195 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyDownEvent;
-import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 
-public class TeamEditModalWidgetViewImpl implements IsWidget, TeamEditModalWidgetView {
+public class TeamEditModalWidgetViewImpl
+  implements IsWidget, TeamEditModalWidgetView {
 
-	@UiField
-	TextBox editNameField;
+  @UiField
+  TextBox editNameField;
 
-	@UiField
-	TextArea editDescriptionField;
+  @UiField
+  TextArea editDescriptionField;
 
-	@UiField
-	CheckBox publicJoinCheckbox;
-	@UiField
-	CheckBox authenticatedUsersCanSendCheckbox;
+  @UiField
+  CheckBox publicJoinCheckbox;
 
-	@UiField
-	Button primaryButton;
+  @UiField
+  CheckBox authenticatedUsersCanSendCheckbox;
 
-	@UiField
-	Button secondaryButton;
+  @UiField
+  Button primaryButton;
 
-	@UiField
-	Modal modal;
+  @UiField
+  Button secondaryButton;
 
-	@UiField
-	SimplePanel synAlertPanel;
+  @UiField
+  Modal modal;
 
-	@UiField
-	SimplePanel uploadWidgetPanel;
+  @UiField
+  SimplePanel synAlertPanel;
 
-	@UiField
-	Icon defaultIcon;
+  @UiField
+  SimplePanel uploadWidgetPanel;
 
-	@UiField
-	Image previewImage;
+  @UiField
+  Icon defaultIcon;
 
-	@UiField
-	LoadingSpinner teamImageLoading;
+  @UiField
+  Image previewImage;
 
-	@UiField
-	Div iconContainer;
-	@UiField
-	Button removePicture;
+  @UiField
+  LoadingSpinner teamImageLoading;
 
-	public interface Binder extends UiBinder<Widget, TeamEditModalWidgetViewImpl> {
-	}
+  @UiField
+  Div iconContainer;
 
-	Widget widget;
-	Presenter presenter;
-	Team team;
+  @UiField
+  Button removePicture;
 
-	@Inject
-	public TeamEditModalWidgetViewImpl(Binder uiBinder) {
-		this.widget = uiBinder.createAndBindUi(this);
-		primaryButton.addClickHandler(event -> {
-			presenter.onConfirm();
-		});
-		ClickHandler onCancel = event -> {
-			modal.hide();
-		};
-		secondaryButton.addClickHandler(onCancel);
-		KeyDownHandler saveInfo = event -> {
-			if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
-				primaryButton.click();
-			}
-		};
-		removePicture.addClickHandler(event -> {
-			presenter.onRemovePicture();
-		});
-		editNameField.addKeyDownHandler(saveInfo);
-		modal.addDomHandler(DisplayUtils.getESCKeyDownHandler(onCancel), KeyDownEvent.getType());
-	}
+  public interface Binder
+    extends UiBinder<Widget, TeamEditModalWidgetViewImpl> {}
 
-	@Override
-	public void configure(Team team) {
-		this.team = team;
-		editNameField.setValue(team.getName());
-		editDescriptionField.setValue(team.getDescription());
-		publicJoinCheckbox.setValue(team.getCanPublicJoin());
-	}
+  Widget widget;
+  Presenter presenter;
+  Team team;
 
-	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-	}
+  @Inject
+  public TeamEditModalWidgetViewImpl(Binder uiBinder) {
+    this.widget = uiBinder.createAndBindUi(this);
+    primaryButton.addClickHandler(event -> {
+      presenter.onConfirm();
+    });
+    ClickHandler onCancel = event -> {
+      modal.hide();
+    };
+    secondaryButton.addClickHandler(onCancel);
+    KeyDownHandler saveInfo = event -> {
+      if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
+        primaryButton.click();
+      }
+    };
+    removePicture.addClickHandler(event -> {
+      presenter.onRemovePicture();
+    });
+    editNameField.addKeyDownHandler(saveInfo);
+    modal.addDomHandler(
+      DisplayUtils.getESCKeyDownHandler(onCancel),
+      KeyDownEvent.getType()
+    );
+  }
 
-	@Override
-	public Widget asWidget() {
-		return widget;
-	}
+  @Override
+  public void configure(Team team) {
+    this.team = team;
+    editNameField.setValue(team.getName());
+    editDescriptionField.setValue(team.getDescription());
+    publicJoinCheckbox.setValue(team.getCanPublicJoin());
+  }
 
-	@Override
-	public void setAlertWidget(Widget synAlert) {
-		synAlertPanel.setWidget(synAlert);
-	}
+  @Override
+  public void setPresenter(Presenter presenter) {
+    this.presenter = presenter;
+  }
 
-	@Override
-	public void setUploadWidget(Widget uploader) {
-		uploadWidgetPanel.setWidget(uploader);
-	}
+  @Override
+  public Widget asWidget() {
+    return widget;
+  }
 
-	@Override
-	public void showLoading() {
-		primaryButton.setText("Uploading");
-		primaryButton.setEnabled(false);
-		iconContainer.setVisible(false);
-		teamImageLoading.setVisible(true);
-		removePicture.setVisible(false);
-	}
+  @Override
+  public void setAlertWidget(Widget synAlert) {
+    synAlertPanel.setWidget(synAlert);
+  }
 
-	@Override
-	public void hideLoading() {
-		primaryButton.setText("Save");
-		primaryButton.setEnabled(true);
-		iconContainer.setVisible(true);
-		teamImageLoading.setVisible(false);
-	}
+  @Override
+  public void setUploadWidget(Widget uploader) {
+    uploadWidgetPanel.setWidget(uploader);
+  }
 
-	@Override
-	public String getName() {
-		return editNameField.getValue();
-	}
+  @Override
+  public void showLoading() {
+    primaryButton.setText("Uploading");
+    primaryButton.setEnabled(false);
+    iconContainer.setVisible(false);
+    teamImageLoading.setVisible(true);
+    removePicture.setVisible(false);
+  }
 
-	@Override
-	public String getDescription() {
-		return editDescriptionField.getValue();
-	}
+  @Override
+  public void hideLoading() {
+    primaryButton.setText("Save");
+    primaryButton.setEnabled(true);
+    iconContainer.setVisible(true);
+    teamImageLoading.setVisible(false);
+  }
 
-	@Override
-	public boolean getPublicJoin() {
-		return publicJoinCheckbox.getValue();
-	}
+  @Override
+  public String getName() {
+    return editNameField.getValue();
+  }
 
-	@Override
-	public void show() {
-		modal.show();
-		DisplayUtils.focusOnChildInput(modal);
-	}
+  @Override
+  public String getDescription() {
+    return editDescriptionField.getValue();
+  }
 
-	@Override
-	public void hide() {
-		modal.hide();
-	}
+  @Override
+  public boolean getPublicJoin() {
+    return publicJoinCheckbox.getValue();
+  }
 
-	@Override
-	public void clear() {
-		editNameField.setValue("");
-		editDescriptionField.setValue("");
-		// defaults to the checkbox unchecked, as it's the most common case
-		publicJoinCheckbox.setValue(false);
-		setDefaultIconVisible();
-	}
+  @Override
+  public void show() {
+    modal.show();
+    DisplayUtils.focusOnChildInput(modal);
+  }
 
-	@Override
-	public void setImageURL(String url) {
-		defaultIcon.setVisible(false);
-		previewImage.setVisible(true);
-		teamImageLoading.setVisible(false);
-		previewImage.setUrl(url);
-		removePicture.setVisible(true);
-	}
+  @Override
+  public void hide() {
+    modal.hide();
+  }
 
-	@Override
-	public void setDefaultIconVisible() {
-		defaultIcon.setVisible(true);
-		previewImage.setVisible(false);
-		teamImageLoading.setVisible(false);
-		removePicture.setVisible(false);
-	}
+  @Override
+  public void clear() {
+    editNameField.setValue("");
+    editDescriptionField.setValue("");
+    // defaults to the checkbox unchecked, as it's the most common case
+    publicJoinCheckbox.setValue(false);
+    setDefaultIconVisible();
+  }
 
-	@Override
-	public void showInfo(String message) {
-		DisplayUtils.showInfo(message);
-	}
+  @Override
+  public void setImageURL(String url) {
+    defaultIcon.setVisible(false);
+    previewImage.setVisible(true);
+    teamImageLoading.setVisible(false);
+    previewImage.setUrl(url);
+    removePicture.setVisible(true);
+  }
 
-	@Override
-	public boolean canAuthenticatedUsersSendMessageToTeam() {
-		return authenticatedUsersCanSendCheckbox.getValue();
-	}
+  @Override
+  public void setDefaultIconVisible() {
+    defaultIcon.setVisible(true);
+    previewImage.setVisible(false);
+    teamImageLoading.setVisible(false);
+    removePicture.setVisible(false);
+  }
 
-	@Override
-	public void setAuthenticatedUsersCanSendMessageToTeam(boolean canSendMessage) {
-		authenticatedUsersCanSendCheckbox.setValue(canSendMessage);
-	}
+  @Override
+  public void showInfo(String message) {
+    DisplayUtils.showInfo(message);
+  }
+
+  @Override
+  public boolean canAuthenticatedUsersSendMessageToTeam() {
+    return authenticatedUsersCanSendCheckbox.getValue();
+  }
+
+  @Override
+  public void setAuthenticatedUsersCanSendMessageToTeam(
+    boolean canSendMessage
+  ) {
+    authenticatedUsersCanSendCheckbox.setValue(canSendMessage);
+  }
 }

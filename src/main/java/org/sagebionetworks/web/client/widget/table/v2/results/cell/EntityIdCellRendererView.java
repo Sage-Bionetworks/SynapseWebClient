@@ -1,24 +1,23 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
-import org.sagebionetworks.repo.model.EntityType;
-
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.IsWidget;
+import org.sagebionetworks.repo.model.EntityType;
 
 public interface EntityIdCellRendererView extends IsWidget {
-	void setLinkText(String text);
+  void setLinkText(String text);
 
-	void setEntityId(String entityId);
+  void setEntityId(String entityId);
 
-	void setClickHandler(ClickHandler clickHandler);
+  void setClickHandler(ClickHandler clickHandler);
 
-	void setEntityType(EntityType entityType);
+  void setEntityType(EntityType entityType);
 
-	void showLoadingIcon();
+  void showLoadingIcon();
 
-	void showErrorIcon(String error);
+  void showErrorIcon(String error);
 
-	void hideAllIcons();
+  void hideAllIcons();
 
-	void setVisible(boolean visible);
+  void setVisible(boolean visible);
 }

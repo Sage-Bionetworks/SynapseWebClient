@@ -1,12 +1,19 @@
 package org.sagebionetworks.web.client.view;
 
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Column;
@@ -21,247 +28,278 @@ import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.header.Header;
 
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.Element;
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
-
 public class ACTAccessApprovalsViewImpl implements ACTAccessApprovalsView {
 
-	public interface ACTViewImplUiBinder extends UiBinder<Widget, ACTAccessApprovalsViewImpl> {
-	}
+  public interface ACTViewImplUiBinder
+    extends UiBinder<Widget, ACTAccessApprovalsViewImpl> {}
 
-	@UiField
-	DateTimePicker expiresBeforeDatePicker;
-	@UiField
-	Div synAlertContainer;
-	@UiField
-	Div accessRequirementContainer;
-	@UiField
-	Div showHideAccessRequirementButtonContainer;
-	@UiField
-	Div tableData;
-	@UiField
-	Button clearDateFilter;
-	@UiField
-	Button clearSubmitterFilter;
-	@UiField
-	Button clearAccessorFilter;
-	@UiField
-	Button clearAccessRequirementFilter;
-	@UiField
-	Panel accessRequirementUI;
-	@UiField
-	Div submitterSelectContainer;
-	@UiField
-	Div accessorSelectContainer;
-	@UiField
-	Div currentSubmitterContainer;
-	@UiField
-	Div currentAccessorContainer;
-	@UiField
-	Button exportButton;
-	@UiField
-	Anchor downloadLink;
-	@UiField
-	Column accessorUI;
-	private Presenter presenter;
-	private Header headerWidget;
-	DateTimeUtils dateTimeUtils;
-	SynapseJavascriptClient jsClient;
-	Widget widget;
+  @UiField
+  DateTimePicker expiresBeforeDatePicker;
 
-	@Inject
-	public ACTAccessApprovalsViewImpl(ACTViewImplUiBinder binder, Header headerWidget, SynapseJavascriptClient jsClient, DateTimeUtils dateTimeUtils) {
-		widget = binder.createAndBindUi(this);
-		this.jsClient = jsClient;
-		this.dateTimeUtils = dateTimeUtils;
-		this.headerWidget = headerWidget;
-		headerWidget.configure();
-		clearDateFilter.addClickHandler(event -> {
-			presenter.onClearExpireBeforeFilter();
-		});
-		clearSubmitterFilter.addClickHandler(event -> {
-			presenter.onClearSubmitterFilter();
-		});
-		clearAccessorFilter.addClickHandler(event -> {
-			presenter.onClearAccessorFilter();
-		});
+  @UiField
+  Div synAlertContainer;
 
-		clearAccessRequirementFilter.addClickHandler(event -> {
-			presenter.onClearAccessRequirementFilter();
-		});
+  @UiField
+  Div accessRequirementContainer;
 
-		expiresBeforeDatePicker.addChangeDateHandler(event -> {
-			presenter.onExpiresBeforeDateSelected(expiresBeforeDatePicker.getValue());
-		});
-		exportButton.addClickHandler(event -> {
-			presenter.onExportData();
-		});
-	}
+  @UiField
+  Div showHideAccessRequirementButtonContainer;
 
-	@Override
-	public void setPresenter(final Presenter presenter) {
-		this.presenter = presenter;
-		headerWidget.configure();
-		headerWidget.refresh();
-		Window.scrollTo(0, 0); // scroll user to top of page
-	}
+  @UiField
+  Div tableData;
 
-	@Override
-	public void setAccessRequirementUIVisible(boolean visible) {
-		accessRequirementUI.setVisible(visible);
-	}
+  @UiField
+  Button clearDateFilter;
 
-	@Override
-	public void setClearAccessRequirementFilterButtonVisible(boolean visible) {
-		clearAccessRequirementFilter.setVisible(visible);
-	}
+  @UiField
+  Button clearSubmitterFilter;
 
-	@Override
-	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
-	}
+  @UiField
+  Button clearAccessorFilter;
 
-	@Override
-	public void showLoading() {}
+  @UiField
+  Button clearAccessRequirementFilter;
 
-	@Override
-	public void showInfo(String message) {
-		DisplayUtils.showInfo(message);
-	}
+  @UiField
+  Panel accessRequirementUI;
 
-	@Override
-	public void resetExportButton() {
-		exportButton.setEnabled(true);
-		exportButton.setVisible(true);
-		downloadLink.setHref("");
-		downloadLink.setVisible(false);
-		_revokeObjectUrl(downloadLink.getElement());
-	}
+  @UiField
+  Div submitterSelectContainer;
 
-	@Override
-	public void clear() {
-		resetExportButton();
-	}
+  @UiField
+  Div accessorSelectContainer;
 
-	@Override
-	public void setExpiresBeforeDate(Date date) {
-		expiresBeforeDatePicker.setValue(date);
-	}
+  @UiField
+  Div currentSubmitterContainer;
 
-	@Override
-	public Widget asWidget() {
-		return widget;
-	}
+  @UiField
+  Div currentAccessorContainer;
 
-	@Override
-	public void setLoadMoreContainer(IsWidget w) {
-		tableData.clear();
-		tableData.add(w);
-	}
+  @UiField
+  Button exportButton;
 
-	@Override
-	public void setSynAlert(IsWidget w) {
-		synAlertContainer.clear();
-		synAlertContainer.add(w);
-	}
+  @UiField
+  Anchor downloadLink;
 
-	@Override
-	public void setAccessRequirementWidget(IsWidget w) {
-		accessRequirementContainer.clear();
-		accessRequirementContainer.add(w);
-	}
+  @UiField
+  Column accessorUI;
 
-	@Override
-	public void setShowHideButton(IsWidget button) {
-		showHideAccessRequirementButtonContainer.clear();
-		showHideAccessRequirementButtonContainer.add(button);
-	}
+  private Presenter presenter;
+  private Header headerWidget;
+  DateTimeUtils dateTimeUtils;
+  SynapseJavascriptClient jsClient;
+  Widget widget;
 
-	@Override
-	public void setSubmitterPickerWidget(IsWidget w) {
-		submitterSelectContainer.clear();
-		submitterSelectContainer.add(w);
-	}
+  @Inject
+  public ACTAccessApprovalsViewImpl(
+    ACTViewImplUiBinder binder,
+    Header headerWidget,
+    SynapseJavascriptClient jsClient,
+    DateTimeUtils dateTimeUtils
+  ) {
+    widget = binder.createAndBindUi(this);
+    this.jsClient = jsClient;
+    this.dateTimeUtils = dateTimeUtils;
+    this.headerWidget = headerWidget;
+    headerWidget.configure();
+    clearDateFilter.addClickHandler(event -> {
+      presenter.onClearExpireBeforeFilter();
+    });
+    clearSubmitterFilter.addClickHandler(event -> {
+      presenter.onClearSubmitterFilter();
+    });
+    clearAccessorFilter.addClickHandler(event -> {
+      presenter.onClearAccessorFilter();
+    });
 
-	@Override
-	public void setSelectedSubmitterUserBadge(IsWidget w) {
-		currentSubmitterContainer.clear();
-		currentSubmitterContainer.add(w);
-	}
+    clearAccessRequirementFilter.addClickHandler(event -> {
+      presenter.onClearAccessRequirementFilter();
+    });
 
-	@Override
-	public void setSelectedSubmitterUserBadgeVisible(boolean visible) {
-		currentSubmitterContainer.setVisible(visible);
-	}
+    expiresBeforeDatePicker.addChangeDateHandler(event -> {
+      presenter.onExpiresBeforeDateSelected(expiresBeforeDatePicker.getValue());
+    });
+    exportButton.addClickHandler(event -> {
+      presenter.onExportData();
+    });
+  }
 
-	public void export(ArrayList<AccessorGroup> exportData) {
-		// create the csv content
-		StringBuilder csvContent = new StringBuilder();
-		// get all user profiles
-		HashSet<String> allUserIds = new HashSet<>();
-		for (AccessorGroup accessorGroup : exportData) {
-			allUserIds.add(accessorGroup.getSubmitterId());
-			for (String accessorId : accessorGroup.getAccessorIds()) {
-				allUserIds.add(accessorId);
-			}
-		}
-		ArrayList<String> allUserIdsList = new ArrayList<>(allUserIds);
-		allUserIds = null;
-		jsClient.listUserProfiles(allUserIdsList, new AsyncCallback<List>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				SynapseJSNIUtilsImpl._consoleError(caught.getMessage());
-			}
+  @Override
+  public void setPresenter(final Presenter presenter) {
+    this.presenter = presenter;
+    headerWidget.configure();
+    headerWidget.refresh();
+    Window.scrollTo(0, 0); // scroll user to top of page
+  }
 
-			@Override
-			public void onSuccess(List profiles) {
-				HashMap<String, UserProfile> id2Profile = new HashMap<>();
-				for (Iterator it = profiles.iterator(); it.hasNext();) {
-					UserProfile profile = (UserProfile) it.next();
-					id2Profile.put(profile.getOwnerId(), profile);
-				}
-				csvContent.append("Submitter,Accessors,Expires On\n");
-				for (AccessorGroup accessorGroup : exportData) {
-					UserProfile profile = id2Profile.get(accessorGroup.getSubmitterId());
-					csvContent.append(profile.getUserName() + "@synapse.org,");
-					for (String accessorId : accessorGroup.getAccessorIds()) {
-						UserProfile accessorProfile = id2Profile.get(accessorId);
-						csvContent.append(accessorProfile.getUserName() + "@synapse.org ");
-					}
-					csvContent.append(",");
-					if (accessorGroup.getExpiredOn() != null && accessorGroup.getExpiredOn().getTime() > 0) {
-						csvContent.append(dateTimeUtils.getDateTimeString(accessorGroup.getExpiredOn()));
-					}
-					csvContent.append("\n");
-				}
-				_setDownloadContent(downloadLink.getElement(), csvContent.toString());
-				exportButton.setVisible(false);
-				downloadLink.setVisible(true);
-			}
-		});
-	}
-	@Override
-	public void setAccessorPickerWidget(IsWidget w) {
-		accessorSelectContainer.clear();
-		accessorSelectContainer.add(w);
-	}
-	@Override
-	public void setSelectedAccessorUserBadge(IsWidget w) {
-		currentAccessorContainer.clear();
-		currentAccessorContainer.add(w);
-	}
-	@Override
-	public void setSelectedAccessorUserBadgeVisible(boolean visible) {
-		currentAccessorContainer.setVisible(visible);
-	}
+  @Override
+  public void setAccessRequirementUIVisible(boolean visible) {
+    accessRequirementUI.setVisible(visible);
+  }
 
-	private static native String _setDownloadContent(Element anchorElement, String csvContent) /*-{
+  @Override
+  public void setClearAccessRequirementFilterButtonVisible(boolean visible) {
+    clearAccessRequirementFilter.setVisible(visible);
+  }
+
+  @Override
+  public void showErrorMessage(String message) {
+    DisplayUtils.showErrorMessage(message);
+  }
+
+  @Override
+  public void showLoading() {}
+
+  @Override
+  public void showInfo(String message) {
+    DisplayUtils.showInfo(message);
+  }
+
+  @Override
+  public void resetExportButton() {
+    exportButton.setEnabled(true);
+    exportButton.setVisible(true);
+    downloadLink.setHref("");
+    downloadLink.setVisible(false);
+    _revokeObjectUrl(downloadLink.getElement());
+  }
+
+  @Override
+  public void clear() {
+    resetExportButton();
+  }
+
+  @Override
+  public void setExpiresBeforeDate(Date date) {
+    expiresBeforeDatePicker.setValue(date);
+  }
+
+  @Override
+  public Widget asWidget() {
+    return widget;
+  }
+
+  @Override
+  public void setLoadMoreContainer(IsWidget w) {
+    tableData.clear();
+    tableData.add(w);
+  }
+
+  @Override
+  public void setSynAlert(IsWidget w) {
+    synAlertContainer.clear();
+    synAlertContainer.add(w);
+  }
+
+  @Override
+  public void setAccessRequirementWidget(IsWidget w) {
+    accessRequirementContainer.clear();
+    accessRequirementContainer.add(w);
+  }
+
+  @Override
+  public void setShowHideButton(IsWidget button) {
+    showHideAccessRequirementButtonContainer.clear();
+    showHideAccessRequirementButtonContainer.add(button);
+  }
+
+  @Override
+  public void setSubmitterPickerWidget(IsWidget w) {
+    submitterSelectContainer.clear();
+    submitterSelectContainer.add(w);
+  }
+
+  @Override
+  public void setSelectedSubmitterUserBadge(IsWidget w) {
+    currentSubmitterContainer.clear();
+    currentSubmitterContainer.add(w);
+  }
+
+  @Override
+  public void setSelectedSubmitterUserBadgeVisible(boolean visible) {
+    currentSubmitterContainer.setVisible(visible);
+  }
+
+  public void export(ArrayList<AccessorGroup> exportData) {
+    // create the csv content
+    StringBuilder csvContent = new StringBuilder();
+    // get all user profiles
+    HashSet<String> allUserIds = new HashSet<>();
+    for (AccessorGroup accessorGroup : exportData) {
+      allUserIds.add(accessorGroup.getSubmitterId());
+      for (String accessorId : accessorGroup.getAccessorIds()) {
+        allUserIds.add(accessorId);
+      }
+    }
+    ArrayList<String> allUserIdsList = new ArrayList<>(allUserIds);
+    allUserIds = null;
+    jsClient.listUserProfiles(
+      allUserIdsList,
+      new AsyncCallback<List>() {
+        @Override
+        public void onFailure(Throwable caught) {
+          SynapseJSNIUtilsImpl._consoleError(caught.getMessage());
+        }
+
+        @Override
+        public void onSuccess(List profiles) {
+          HashMap<String, UserProfile> id2Profile = new HashMap<>();
+          for (Iterator it = profiles.iterator(); it.hasNext();) {
+            UserProfile profile = (UserProfile) it.next();
+            id2Profile.put(profile.getOwnerId(), profile);
+          }
+          csvContent.append("Submitter,Accessors,Expires On\n");
+          for (AccessorGroup accessorGroup : exportData) {
+            UserProfile profile = id2Profile.get(
+              accessorGroup.getSubmitterId()
+            );
+            csvContent.append(profile.getUserName() + "@synapse.org,");
+            for (String accessorId : accessorGroup.getAccessorIds()) {
+              UserProfile accessorProfile = id2Profile.get(accessorId);
+              csvContent.append(
+                accessorProfile.getUserName() + "@synapse.org "
+              );
+            }
+            csvContent.append(",");
+            if (
+              accessorGroup.getExpiredOn() != null &&
+              accessorGroup.getExpiredOn().getTime() > 0
+            ) {
+              csvContent.append(
+                dateTimeUtils.getDateTimeString(accessorGroup.getExpiredOn())
+              );
+            }
+            csvContent.append("\n");
+          }
+          _setDownloadContent(downloadLink.getElement(), csvContent.toString());
+          exportButton.setVisible(false);
+          downloadLink.setVisible(true);
+        }
+      }
+    );
+  }
+
+  @Override
+  public void setAccessorPickerWidget(IsWidget w) {
+    accessorSelectContainer.clear();
+    accessorSelectContainer.add(w);
+  }
+
+  @Override
+  public void setSelectedAccessorUserBadge(IsWidget w) {
+    currentAccessorContainer.clear();
+    currentAccessorContainer.add(w);
+  }
+
+  @Override
+  public void setSelectedAccessorUserBadgeVisible(boolean visible) {
+    currentAccessorContainer.setVisible(visible);
+  }
+
+  private static native String _setDownloadContent(
+    Element anchorElement,
+    String csvContent
+  ) /*-{
 		try {
 			var blob = new Blob([ csvContent ], {
 				type : 'text/plain'
@@ -273,7 +311,7 @@ public class ACTAccessApprovalsViewImpl implements ACTAccessApprovalsView {
 		}
 	}-*/;
 
-	private static native String _revokeObjectUrl(Element anchorElement) /*-{
+  private static native String _revokeObjectUrl(Element anchorElement) /*-{
 		try {
 			if (anchorElement.download) {
 				URL.revokeObjectURL(anchorElement.href);
@@ -283,5 +321,4 @@ public class ACTAccessApprovalsViewImpl implements ACTAccessApprovalsView {
 			console.error(err);
 		}
 	}-*/;
-
 }

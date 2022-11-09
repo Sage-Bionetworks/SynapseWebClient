@@ -5,35 +5,33 @@ import com.google.gwt.user.client.ui.Widget;
 import org.sagebionetworks.web.client.widget.CommaSeparatedValuesParser;
 
 public interface EditJSONListModalView extends IsWidget {
+  void setPresenter(Presenter presenter);
 
-	void setPresenter(Presenter presenter);
+  void showError(String message);
 
-	void showError(String message);
+  void clearEditors();
 
-	void clearEditors();
+  void addCommaSeparatedValuesParser(Widget asWidget);
 
-	void addCommaSeparatedValuesParser(Widget asWidget);
+  void showEditor();
 
-	void showEditor();
+  void hideEditor();
 
-	void hideEditor();
+  void addNewEditor(CellEditor editor);
 
-	void addNewEditor(CellEditor editor);
+  void moveAddNewAnnotationValueButtonToRowToLastRow();
 
-	void moveAddNewAnnotationValueButtonToRowToLastRow();
+  public interface Presenter {
+    void onSave();
 
-	public interface Presenter{
+    void onClickPasteNewValues();
 
-		void onSave();
+    void onAddNewEmptyValue();
 
-		void onClickPasteNewValues();
+    void addNewValues(Iterable<String> values);
 
-		void onAddNewEmptyValue();
+    void onValueDeleted(CellEditor editor);
 
-		void addNewValues(Iterable<String> values);
-
-		void onValueDeleted(CellEditor editor);
-
-		Widget asWidget();
-	}
+    Widget asWidget();
+  }
 }

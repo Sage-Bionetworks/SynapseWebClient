@@ -10,6 +10,7 @@ import jsinterop.annotations.JsType;
  */
 @JsType(isNative = true, name = "Object", namespace = JsPackage.GLOBAL)
 class PapaParseConfig {
-	@JsProperty
-	public String delimiter;
+
+  @JsProperty
+  public String delimiter;
 }

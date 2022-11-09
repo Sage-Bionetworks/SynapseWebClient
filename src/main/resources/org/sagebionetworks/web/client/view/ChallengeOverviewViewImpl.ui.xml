@@ -1,28 +1,29 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui"
-	xmlns:c="urn:import:com.google.gwt.user.cellview.client"
-	xmlns:s="urn:import:org.sagebionetworks.web.client.view">
-
-	<ui:style>
-		.important {
+<ui:UiBinder
+  xmlns:ui="urn:ui:com.google.gwt.uibinder"
+  xmlns:g="urn:import:com.google.gwt.user.client.ui"
+  xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+  xmlns:s="urn:import:org.sagebionetworks.web.client.view"
+>
+  <ui:style>
+    .important {
 		font-weight: bold;
 		}
 
 		.rowTop {
 		vertical-align: top;
 		}
-	</ui:style>
+  </ui:style>
 
-	<g:HTMLPanel>
-		<div class="container">
-			<ul class="breadcrumbs">
-				<li>
-					<a href="#">Home</a>
-				</li>
-			</ul>
-			<g:SimplePanel ui:field="content" />
-		</div>
-		<div class="clear"></div>
-	</g:HTMLPanel>
-</ui:UiBinder> 
+  <g:HTMLPanel>
+    <div class="container">
+      <ul class="breadcrumbs">
+        <li>
+          <a href="#">Home</a>
+        </li>
+      </ul>
+      <g:SimplePanel ui:field="content" />
+    </div>
+    <div class="clear" />
+  </g:HTMLPanel>
+</ui:UiBinder>

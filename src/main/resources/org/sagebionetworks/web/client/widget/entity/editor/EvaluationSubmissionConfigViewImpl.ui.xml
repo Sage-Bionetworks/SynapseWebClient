@@ -1,68 +1,140 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui" 
-	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
-	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
-	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
-	
-	<bh:Div>
-		<b:Radio ui:field="challengeRadioOption" name="evaluationQueueType" text="Challenge Queue(s)" value="true" />	
-		<bh:Div ui:field="challengeProjectUi"  marginLeft="30">
-			<b:FormLabel text="Challenge Project" />
-			<b:InputGroup>
-				<b:TextBox ui:field="challengeProjectField" autoComplete="false" enabled="false" />
-				<b:InputGroupButton>
-					<b:Button text="Find Project" ui:field="findProjectButton" icon="SEARCH" width="150px"/>
-				</b:InputGroupButton>
-			</b:InputGroup>
-		</bh:Div>
-		<b:Radio ui:field="evaluationQueueOption" name="evaluationQueueType" text="Single Evaluation Queue" />
-		<bh:Div ui:field="evaluationQueueUi" marginLeft="30" visible="false">
-			<b:FormLabel text="Evaluation Queue ID" />
-			<b:TextBox ui:field="evaluationQueueIdField" value="" placeholder="e.g. 9614271" />
-		</bh:Div>
-		<bh:Div ui:field="submissionTypeOptions">
-			<bh:Hr />
-			<b:Radio ui:field="submitEntityOption" name="submitType" text="User to submit a Synapse Entity (e.g. a File) that they have created" value="true" />	
-			<bh:Div>
-				<b:Radio ui:field="submitForm" name="submitType" text="User to fill out a form and submit their answers" addStyleNames="displayInline" />
-				<w:HelpWidget helpMarkdown="Present a custom HTML form to the user to fill out during submission.  Form is built using a JSON schema." 
-					href="https://react-jsonschema-form.readthedocs.io/en/latest/" addStyleNames="margin-left-5" placement="BOTTOM"/>
-			</bh:Div>
-			<bh:Div ui:field="formUi" marginLeft="30" marginTop="10" visible="false">
-				<b:FormLabel text="Parent Container (Project/Folder)" marginTop="10"/>
-				<w:HelpWidget helpMarkdown="This should contain a subfolder for each submitter.  The subfolder name must match the submitters user_id.
-					Submitter must have permission to create files in their folder (form data files)." addStyleNames="margin-left-5" placement="BOTTOM"/>
-				<b:InputGroup>
-					<b:TextBox ui:field="formContainerIdField" autoComplete="false" enabled="false" />
-					<b:InputGroupButton>
-						<b:Button text="Find Container" ui:field="findFormContainerButton" icon="SEARCH" width="150px"/>
-					</b:InputGroupButton>
-				</b:InputGroup>
-				<b:FormLabel text="JSON Schema file"  marginTop="10"/>
-				<b:InputGroup>
-					<b:TextBox ui:field="schemaFileSynIdField" autoComplete="false" enabled="false" />
-					<b:InputGroupButton>
-						<b:Button text="Find File" ui:field="findSchemaFileButton" icon="SEARCH" width="150px"/>
-					</b:InputGroupButton>
-				</b:InputGroup>
-				<b:FormLabel text="UI Schema file"  marginTop="10"/>
-				<b:InputGroup>
-					<b:TextBox ui:field="uiSchemaFileSynIdField" autoComplete="false" enabled="false" />
-					<b:InputGroupButton>
-						<b:Button text="Find File" ui:field="findUiSchemaFileButton" icon="SEARCH" width="150px"/>
-					</b:InputGroupButton>
-				</b:InputGroup>
-			</bh:Div>
-		</bh:Div>
-		<bh:Hr />
-		<bh:Div addStyleNames="margin-10">
-			<b:FormLabel text="Evaluation Queue unavailable message" />
-			<b:TextBox ui:field="unavailableMessageField" value="Join the team to submit to the challenge" />
-		</bh:Div>
-		<bh:Div addStyleNames="margin-10">
-			<b:FormLabel text="Button text" />
-			<b:TextBox ui:field="buttonTextField" value="Submit to challenge" />
-		</bh:Div>
-	</bh:Div>
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder
+  xmlns:ui="urn:ui:com.google.gwt.uibinder"
+  xmlns:g="urn:import:com.google.gwt.user.client.ui"
+  xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
+  xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+  xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
+>
+  <bh:Div>
+    <b:Radio
+      ui:field="challengeRadioOption"
+      name="evaluationQueueType"
+      text="Challenge Queue(s)"
+      value="true"
+    />
+    <bh:Div ui:field="challengeProjectUi" marginLeft="30">
+      <b:FormLabel text="Challenge Project" />
+      <b:InputGroup>
+        <b:TextBox
+          ui:field="challengeProjectField"
+          autoComplete="false"
+          enabled="false"
+        />
+        <b:InputGroupButton>
+          <b:Button
+            text="Find Project"
+            ui:field="findProjectButton"
+            icon="SEARCH"
+            width="150px"
+          />
+        </b:InputGroupButton>
+      </b:InputGroup>
+    </bh:Div>
+    <b:Radio
+      ui:field="evaluationQueueOption"
+      name="evaluationQueueType"
+      text="Single Evaluation Queue"
+    />
+    <bh:Div ui:field="evaluationQueueUi" marginLeft="30" visible="false">
+      <b:FormLabel text="Evaluation Queue ID" />
+      <b:TextBox
+        ui:field="evaluationQueueIdField"
+        value=""
+        placeholder="e.g. 9614271"
+      />
+    </bh:Div>
+    <bh:Div ui:field="submissionTypeOptions">
+      <bh:Hr />
+      <b:Radio
+        ui:field="submitEntityOption"
+        name="submitType"
+        text="User to submit a Synapse Entity (e.g. a File) that they have created"
+        value="true"
+      />
+      <bh:Div>
+        <b:Radio
+          ui:field="submitForm"
+          name="submitType"
+          text="User to fill out a form and submit their answers"
+          addStyleNames="displayInline"
+        />
+        <w:HelpWidget
+          helpMarkdown="Present a custom HTML form to the user to fill out during submission.  Form is built using a JSON schema."
+          href="https://react-jsonschema-form.readthedocs.io/en/latest/"
+          addStyleNames="margin-left-5"
+          placement="BOTTOM"
+        />
+      </bh:Div>
+      <bh:Div ui:field="formUi" marginLeft="30" marginTop="10" visible="false">
+        <b:FormLabel text="Parent Container (Project/Folder)" marginTop="10" />
+        <w:HelpWidget
+          helpMarkdown="This should contain a subfolder for each submitter.  The subfolder name must match the submitters user_id.
+					Submitter must have permission to create files in their folder (form data files)."
+          addStyleNames="margin-left-5"
+          placement="BOTTOM"
+        />
+        <b:InputGroup>
+          <b:TextBox
+            ui:field="formContainerIdField"
+            autoComplete="false"
+            enabled="false"
+          />
+          <b:InputGroupButton>
+            <b:Button
+              text="Find Container"
+              ui:field="findFormContainerButton"
+              icon="SEARCH"
+              width="150px"
+            />
+          </b:InputGroupButton>
+        </b:InputGroup>
+        <b:FormLabel text="JSON Schema file" marginTop="10" />
+        <b:InputGroup>
+          <b:TextBox
+            ui:field="schemaFileSynIdField"
+            autoComplete="false"
+            enabled="false"
+          />
+          <b:InputGroupButton>
+            <b:Button
+              text="Find File"
+              ui:field="findSchemaFileButton"
+              icon="SEARCH"
+              width="150px"
+            />
+          </b:InputGroupButton>
+        </b:InputGroup>
+        <b:FormLabel text="UI Schema file" marginTop="10" />
+        <b:InputGroup>
+          <b:TextBox
+            ui:field="uiSchemaFileSynIdField"
+            autoComplete="false"
+            enabled="false"
+          />
+          <b:InputGroupButton>
+            <b:Button
+              text="Find File"
+              ui:field="findUiSchemaFileButton"
+              icon="SEARCH"
+              width="150px"
+            />
+          </b:InputGroupButton>
+        </b:InputGroup>
+      </bh:Div>
+    </bh:Div>
+    <bh:Hr />
+    <bh:Div addStyleNames="margin-10">
+      <b:FormLabel text="Evaluation Queue unavailable message" />
+      <b:TextBox
+        ui:field="unavailableMessageField"
+        value="Join the team to submit to the challenge"
+      />
+    </bh:Div>
+    <bh:Div addStyleNames="margin-10">
+      <b:FormLabel text="Button text" />
+      <b:TextBox ui:field="buttonTextField" value="Submit to challenge" />
+    </bh:Div>
+  </bh:Div>
 </ui:UiBinder>

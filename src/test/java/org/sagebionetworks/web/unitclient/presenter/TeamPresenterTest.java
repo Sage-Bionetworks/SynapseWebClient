@@ -8,6 +8,9 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Widget;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,284 +46,435 @@ import org.sagebionetworks.web.client.widget.team.controller.TeamLeaveModalWidge
 import org.sagebionetworks.web.client.widget.team.controller.TeamProjectsModalWidget;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Widget;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TeamPresenterTest {
 
-	TeamPresenter presenter;
-	@Mock
-	TeamView mockView;
-	@Mock
-	AuthenticationController mockAuthenticationController;
-	@Mock
-	GlobalApplicationState mockGlobalAppState;
-	@Mock
-	SynapseClientAsync mockSynClient;
-	@Mock
-	SynapseAlert mockSynAlert;
-	@Mock
-	TeamLeaveModalWidget mockLeaveModal;
-	@Mock
-	TeamDeleteModalWidget mockDeleteModal;
-	@Mock
-	TeamEditModalWidget mockEditModal;
-	@Mock
-	InviteWidget mockInviteModal;
-	@Mock
-	JoinTeamWidget mockJoinWidget;
-	@Mock
-	MemberListWidget mockManagerListWidget;
-	@Mock
-	MemberListWidget mockMemberListWidget;
-	@Mock
-	OpenMembershipRequestsWidget mockOpenMembershipRequestsWidget;
-	@Mock
-	OpenUserInvitationsWidget mockOpenUserInvitationsWidget;
-	@Mock
-	SynapseJSNIUtilsImpl mockJSNIUtils;
-	@Mock
-	Team mockTeam;
-	@Mock
-	TeamBundle mockTeamBundle;
-	@Mock
-	TeamMembershipStatus mockTeamMembershipStatus;
-	@Mock
-	TeamProjectsModalWidget mockTeamProjectsModalWidget;
-	@Mock
-	PortalGinInjector mockGinInjector;
+  TeamPresenter presenter;
 
-	String teamId = "123";
-	String teamName = "testTeam";
-	boolean canPublicJoin = true;
-	String teamIcon = "teamIcon";
-	Long totalMembershipCount = 3L;
-	Exception caught = new Exception("this is an exception");
+  @Mock
+  TeamView mockView;
 
-	String newName = "newName";
-	String newDesc = "newDesc";
-	boolean newPublicJoin = false;
-	String newIcon = "newIcon";
-	@Mock
-	GoogleMap mockGoogleMap;
-	@Mock
-	CookieProvider mockCookies;
-	@Mock
-	IsACTMemberAsyncHandler mockIsACTMemberAsyncHandler;
-	@Captor
-	ArgumentCaptor<CallbackP<Boolean>> callbackPcaptor;
-	@Captor
-	ArgumentCaptor<Callback> callbackCaptor;
+  @Mock
+  AuthenticationController mockAuthenticationController;
 
-	@Before
-	public void setup() {
-		when(mockGinInjector.getTeamDeleteModalWidget()).thenReturn(mockDeleteModal);
-		when(mockGinInjector.getTeamEditModalWidget()).thenReturn(mockEditModal);
-		when(mockGinInjector.getTeamLeaveModalWidget()).thenReturn(mockLeaveModal);
-		when(mockGinInjector.getTeamProjectsModalWidget()).thenReturn(mockTeamProjectsModalWidget);
-		when(mockGinInjector.getSynapseJSNIUtils()).thenReturn(mockJSNIUtils);
+  @Mock
+  GlobalApplicationState mockGlobalAppState;
 
-		presenter = new TeamPresenter(mockView, mockAuthenticationController, mockGlobalAppState, mockSynClient, mockSynAlert, mockInviteModal, mockJoinWidget, mockManagerListWidget, mockMemberListWidget, mockOpenMembershipRequestsWidget, mockOpenUserInvitationsWidget, mockGoogleMap, mockCookies, mockIsACTMemberAsyncHandler, mockGinInjector);
-		when(mockTeam.getName()).thenReturn(teamName);
-		AsyncMockStubber.callSuccessWith(mockTeamBundle).when(mockSynClient).getTeamBundle(anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
+  @Mock
+  SynapseClientAsync mockSynClient;
 
-		// team bundle
-		when(mockTeamBundle.getTeam()).thenReturn(mockTeam);
-		when(mockTeamBundle.getTeamMembershipStatus()).thenReturn(mockTeamMembershipStatus);
-		when(mockTeamBundle.getTotalMemberCount()).thenReturn(totalMembershipCount);
+  @Mock
+  SynapseAlert mockSynAlert;
 
-		// team
-		when(mockTeam.getCanPublicJoin()).thenReturn(canPublicJoin);
-		when(mockTeam.getId()).thenReturn(teamId);
-		when(mockTeam.getIcon()).thenReturn(teamIcon);
-		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("true");
-	}
+  @Mock
+  TeamLeaveModalWidget mockLeaveModal;
 
-	private void setIsACT(boolean isACT) {
-		verify(mockIsACTMemberAsyncHandler).isACTActionAvailable(callbackPcaptor.capture());
-		callbackPcaptor.getValue().invoke(isACT);
-	}
+  @Mock
+  TeamDeleteModalWidget mockDeleteModal;
 
-	@Test
-	public void testConstruction() {
-		verify(mockView).setPresenter(presenter);
-		verify(mockView).setSynAlertWidget(any(Widget.class));
-		verify(mockView).setInviteMemberWidget(any(Widget.class));
-		verify(mockView).setJoinTeamWidget(any(Widget.class));
-		verify(mockView).setOpenMembershipRequestWidget(any(Widget.class));
-		verify(mockView).setOpenUserInvitationsWidget(any(Widget.class));
-		verify(mockView).setManagerListWidget(any(Widget.class));
-		verify(mockView).setMemberListWidget(any(Widget.class));
-		verify(mockView).setMap(any(Widget.class));
-	}
+  @Mock
+  TeamEditModalWidget mockEditModal;
 
-	@Test
-	public void testRefreshFailure() {
-		AsyncMockStubber.callFailureWith(caught).when(mockSynClient).getTeamBundle(anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
-		presenter.refresh(teamId);
-		verify(mockSynAlert).clear();
-		verify(mockSynAlert).handleException(caught);
-	}
+  @Mock
+  InviteWidget mockInviteModal;
 
-	@Test
-	public void testRefreshAdmin() {
-		boolean isAdmin = true;
-		when(mockTeamBundle.isUserAdmin()).thenReturn(isAdmin);
-		when(mockTeamMembershipStatus.getIsMember()).thenReturn(true);
-		presenter.refresh(teamId);
+  @Mock
+  JoinTeamWidget mockJoinWidget;
 
-		// once
-		verify(mockView).setPublicJoinVisible(canPublicJoin);
-		verify(mockView).setTeam(mockTeam, mockTeamMembershipStatus);
-		verify(mockManagerListWidget).configure(eq(teamId), eq(isAdmin), eq(TeamMemberTypeFilterOptions.ADMIN), any(Callback.class));
-		verify(mockMemberListWidget).configure(eq(teamId), eq(isAdmin), eq(TeamMemberTypeFilterOptions.MEMBER), any(Callback.class));
-		verify(mockView).showMemberMenuItems();
-		verify(mockOpenMembershipRequestsWidget).setVisible(true);
-		verify(mockView).showAdminMenuItems();
-		// never
-		verify(mockJoinWidget, never()).configure(eq(teamId), anyBoolean(), eq(mockTeamMembershipStatus), any(Callback.class), anyString(), anyString(), anyString(), anyString(), anyBoolean());
-	}
+  @Mock
+  MemberListWidget mockManagerListWidget;
 
-	@Test
-	public void testIsACT() {
-		presenter.refresh(teamId);
-		setIsACT(true);
-		verify(mockView).setManageAccessVisible(true);
-	}
+  @Mock
+  MemberListWidget mockMemberListWidget;
 
-	@Test
-	public void testIsNotACT() {
-		presenter.refresh(teamId);
-		setIsACT(false);
-		verify(mockView).setManageAccessVisible(false);
-	}
+  @Mock
+  OpenMembershipRequestsWidget mockOpenMembershipRequestsWidget;
 
-	@Test
-	public void testRefreshNotMember() {
-		boolean isAdmin = false;
-		when(mockTeamBundle.isUserAdmin()).thenReturn(isAdmin);
-		when(mockTeamMembershipStatus.getIsMember()).thenReturn(false);
-		// SWC-2655: also test null canPublicJoin
-		when(mockTeam.getCanPublicJoin()).thenReturn(null);
-		presenter.refresh(teamId);
+  @Mock
+  OpenUserInvitationsWidget mockOpenUserInvitationsWidget;
 
-		// once
-		verify(mockView).setPublicJoinVisible(false);
-		verify(mockView).setTeam(mockTeam, mockTeamMembershipStatus);
-		verify(mockManagerListWidget).configure(eq(teamId), eq(isAdmin), eq(TeamMemberTypeFilterOptions.ADMIN), any(Callback.class));
-		verify(mockMemberListWidget).configure(eq(teamId), eq(isAdmin), eq(TeamMemberTypeFilterOptions.MEMBER), any(Callback.class));
-		verify(mockJoinWidget).configure(eq(teamId), anyBoolean(), eq(mockTeamMembershipStatus), any(Callback.class), anyString(), anyString(), anyString(), anyString(), anyBoolean());
-		verify(mockOpenMembershipRequestsWidget).setVisible(false);
-		// never
-		verify(mockView, never()).showMemberMenuItems();
-		verify(mockOpenMembershipRequestsWidget, never()).configure(eq(teamId), any(Callback.class));
-		verify(mockOpenUserInvitationsWidget, never()).configure(eq(teamId), any(Callback.class));
-		verify(mockView, never()).showAdminMenuItems();
-	}
+  @Mock
+  SynapseJSNIUtilsImpl mockJSNIUtils;
 
-	@Test
-	public void testRefreshMember() {
-		boolean isAdmin = false;
-		when(mockTeamBundle.isUserAdmin()).thenReturn(isAdmin);
-		when(mockTeamMembershipStatus.getIsMember()).thenReturn(true);
-		presenter.refresh(teamId);
+  @Mock
+  Team mockTeam;
 
-		// once
-		verify(mockView).setPublicJoinVisible(canPublicJoin);
-		verify(mockView).setTeam(mockTeam, mockTeamMembershipStatus);
-		verify(mockManagerListWidget).configure(eq(teamId), eq(isAdmin), eq(TeamMemberTypeFilterOptions.ADMIN), any(Callback.class));
-		verify(mockMemberListWidget).configure(eq(teamId), eq(isAdmin), eq(TeamMemberTypeFilterOptions.MEMBER), any(Callback.class));
-		verify(mockView).showMemberMenuItems();
+  @Mock
+  TeamBundle mockTeamBundle;
 
-		// never
-		verify(mockJoinWidget, never()).configure(eq(teamId), anyBoolean(), eq(mockTeamMembershipStatus), any(Callback.class), anyString(), anyString(), anyString(), anyString(), anyBoolean());
-		verify(mockOpenMembershipRequestsWidget, never()).configure(eq(teamId), any(Callback.class));
-		verify(mockOpenUserInvitationsWidget, never()).configure(eq(teamId), any(Callback.class));
-		verify(mockView, never()).showAdminMenuItems();
+  @Mock
+  TeamMembershipStatus mockTeamMembershipStatus;
 
-		verify(mockGoogleMap, never()).configure(teamId);
-		verify(mockView).setShowMapVisible(false);
+  @Mock
+  TeamProjectsModalWidget mockTeamProjectsModalWidget;
 
-		// simulate clicking Show Map
-		presenter.onShowMap();
-		verify(mockGoogleMap).setHeight(anyString());
-		verify(mockGoogleMap).configure(teamId);
-		verify(mockView).showMapModal();
-		verify(mockOpenMembershipRequestsWidget).setVisible(false);
-	}
+  @Mock
+  PortalGinInjector mockGinInjector;
 
+  String teamId = "123";
+  String teamName = "testTeam";
+  boolean canPublicJoin = true;
+  String teamIcon = "teamIcon";
+  Long totalMembershipCount = 3L;
+  Exception caught = new Exception("this is an exception");
 
-	@Test
-	public void testRefreshOpenMembershipRequests() {
-		presenter.refreshOpenMembershipRequests();
-		verify(mockOpenMembershipRequestsWidget).clear();
-		verify(mockOpenMembershipRequestsWidget).configure(anyString(), callbackCaptor.capture());
-		Callback callback = callbackCaptor.getValue();
-		callback.invoke();
-		// reconfigured widget, and refreshed
-		verify(mockOpenMembershipRequestsWidget, times(2)).configure(anyString(), eq(callback));
-		verify(mockSynClient).getTeamBundle(anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
-		// never reconfigures open invites (no need to refresh)
-		verify(mockOpenUserInvitationsWidget, never()).configure(anyString(), eq(callback));
-	}
+  String newName = "newName";
+  String newDesc = "newDesc";
+  boolean newPublicJoin = false;
+  String newIcon = "newIcon";
 
-	@Test
-	public void testRefreshOpenUserInvitations() {
-		presenter.refreshOpenUserInvitations();
-		verify(mockOpenUserInvitationsWidget).clear();
-		verify(mockOpenUserInvitationsWidget).configure(anyString(), callbackCaptor.capture());
-		Callback callback = callbackCaptor.getValue();
-		callback.invoke();
-		// reconfigured widget, and refreshed
-		verify(mockOpenUserInvitationsWidget, times(2)).configure(anyString(), eq(callback));
-		verify(mockSynClient).getTeamBundle(anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
-		// never reconfigures open membership requests (no need to refresh)
-		verify(mockOpenMembershipRequestsWidget, never()).configure(anyString(), eq(callback));
-	}
+  @Mock
+  GoogleMap mockGoogleMap;
 
-	@Test
-	public void testShowDeleteModal() {
-		presenter.refresh(teamId);
+  @Mock
+  CookieProvider mockCookies;
 
-		presenter.showDeleteModal();
+  @Mock
+  IsACTMemberAsyncHandler mockIsACTMemberAsyncHandler;
 
-		verify(mockDeleteModal).setRefreshCallback(any(Callback.class));
-		verify(mockView).addWidgets(any(Widget.class));
-		verify(mockDeleteModal).configure(mockTeam);
-		verify(mockDeleteModal).showDialog();
-	}
+  @Captor
+  ArgumentCaptor<CallbackP<Boolean>> callbackPcaptor;
 
-	@Test
-	public void testShowEditModal() {
-		presenter.refresh(teamId);
+  @Captor
+  ArgumentCaptor<Callback> callbackCaptor;
 
-		presenter.showEditModal();
+  @Before
+  public void setup() {
+    when(mockGinInjector.getTeamDeleteModalWidget())
+      .thenReturn(mockDeleteModal);
+    when(mockGinInjector.getTeamEditModalWidget()).thenReturn(mockEditModal);
+    when(mockGinInjector.getTeamLeaveModalWidget()).thenReturn(mockLeaveModal);
+    when(mockGinInjector.getTeamProjectsModalWidget())
+      .thenReturn(mockTeamProjectsModalWidget);
+    when(mockGinInjector.getSynapseJSNIUtils()).thenReturn(mockJSNIUtils);
 
-		verify(mockEditModal).setRefreshCallback(any(Callback.class));
-		verify(mockView).addWidgets(any(Widget.class));
-		verify(mockEditModal).configureAndShow(mockTeam);
-	}
+    presenter =
+      new TeamPresenter(
+        mockView,
+        mockAuthenticationController,
+        mockGlobalAppState,
+        mockSynClient,
+        mockSynAlert,
+        mockInviteModal,
+        mockJoinWidget,
+        mockManagerListWidget,
+        mockMemberListWidget,
+        mockOpenMembershipRequestsWidget,
+        mockOpenUserInvitationsWidget,
+        mockGoogleMap,
+        mockCookies,
+        mockIsACTMemberAsyncHandler,
+        mockGinInjector
+      );
+    when(mockTeam.getName()).thenReturn(teamName);
+    AsyncMockStubber
+      .callSuccessWith(mockTeamBundle)
+      .when(mockSynClient)
+      .getTeamBundle(
+        anyString(),
+        anyString(),
+        anyBoolean(),
+        any(AsyncCallback.class)
+      );
 
-	@Test
-	public void testShowLeaveModal() {
-		presenter.refresh(teamId);
+    // team bundle
+    when(mockTeamBundle.getTeam()).thenReturn(mockTeam);
+    when(mockTeamBundle.getTeamMembershipStatus())
+      .thenReturn(mockTeamMembershipStatus);
+    when(mockTeamBundle.getTotalMemberCount()).thenReturn(totalMembershipCount);
 
-		presenter.showLeaveModal();
+    // team
+    when(mockTeam.getCanPublicJoin()).thenReturn(canPublicJoin);
+    when(mockTeam.getId()).thenReturn(teamId);
+    when(mockTeam.getIcon()).thenReturn(teamIcon);
+    when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+      .thenReturn("true");
+  }
 
-		verify(mockLeaveModal).setRefreshCallback(any(Callback.class));
-		verify(mockView).addWidgets(any(Widget.class));
-		verify(mockLeaveModal).configure(mockTeam);
-		verify(mockLeaveModal).showDialog();
-	}
+  private void setIsACT(boolean isACT) {
+    verify(mockIsACTMemberAsyncHandler)
+      .isACTActionAvailable(callbackPcaptor.capture());
+    callbackPcaptor.getValue().invoke(isACT);
+  }
 
-	@Test
-	public void testShowTeamProjectsModal() {
-		presenter.refresh(teamId);
+  @Test
+  public void testConstruction() {
+    verify(mockView).setPresenter(presenter);
+    verify(mockView).setSynAlertWidget(any(Widget.class));
+    verify(mockView).setInviteMemberWidget(any(Widget.class));
+    verify(mockView).setJoinTeamWidget(any(Widget.class));
+    verify(mockView).setOpenMembershipRequestWidget(any(Widget.class));
+    verify(mockView).setOpenUserInvitationsWidget(any(Widget.class));
+    verify(mockView).setManagerListWidget(any(Widget.class));
+    verify(mockView).setMemberListWidget(any(Widget.class));
+    verify(mockView).setMap(any(Widget.class));
+  }
 
-		presenter.showTeamProjectsModal();
+  @Test
+  public void testRefreshFailure() {
+    AsyncMockStubber
+      .callFailureWith(caught)
+      .when(mockSynClient)
+      .getTeamBundle(
+        anyString(),
+        anyString(),
+        anyBoolean(),
+        any(AsyncCallback.class)
+      );
+    presenter.refresh(teamId);
+    verify(mockSynAlert).clear();
+    verify(mockSynAlert).handleException(caught);
+  }
 
-		verify(mockView).addWidgets(any(Widget.class));
-		verify(mockTeamProjectsModalWidget).configureAndShow(mockTeam);
-	}
+  @Test
+  public void testRefreshAdmin() {
+    boolean isAdmin = true;
+    when(mockTeamBundle.isUserAdmin()).thenReturn(isAdmin);
+    when(mockTeamMembershipStatus.getIsMember()).thenReturn(true);
+    presenter.refresh(teamId);
+
+    // once
+    verify(mockView).setPublicJoinVisible(canPublicJoin);
+    verify(mockView).setTeam(mockTeam, mockTeamMembershipStatus);
+    verify(mockManagerListWidget)
+      .configure(
+        eq(teamId),
+        eq(isAdmin),
+        eq(TeamMemberTypeFilterOptions.ADMIN),
+        any(Callback.class)
+      );
+    verify(mockMemberListWidget)
+      .configure(
+        eq(teamId),
+        eq(isAdmin),
+        eq(TeamMemberTypeFilterOptions.MEMBER),
+        any(Callback.class)
+      );
+    verify(mockView).showMemberMenuItems();
+    verify(mockOpenMembershipRequestsWidget).setVisible(true);
+    verify(mockView).showAdminMenuItems();
+    // never
+    verify(mockJoinWidget, never())
+      .configure(
+        eq(teamId),
+        anyBoolean(),
+        eq(mockTeamMembershipStatus),
+        any(Callback.class),
+        anyString(),
+        anyString(),
+        anyString(),
+        anyString(),
+        anyBoolean()
+      );
+  }
+
+  @Test
+  public void testIsACT() {
+    presenter.refresh(teamId);
+    setIsACT(true);
+    verify(mockView).setManageAccessVisible(true);
+  }
+
+  @Test
+  public void testIsNotACT() {
+    presenter.refresh(teamId);
+    setIsACT(false);
+    verify(mockView).setManageAccessVisible(false);
+  }
+
+  @Test
+  public void testRefreshNotMember() {
+    boolean isAdmin = false;
+    when(mockTeamBundle.isUserAdmin()).thenReturn(isAdmin);
+    when(mockTeamMembershipStatus.getIsMember()).thenReturn(false);
+    // SWC-2655: also test null canPublicJoin
+    when(mockTeam.getCanPublicJoin()).thenReturn(null);
+    presenter.refresh(teamId);
+
+    // once
+    verify(mockView).setPublicJoinVisible(false);
+    verify(mockView).setTeam(mockTeam, mockTeamMembershipStatus);
+    verify(mockManagerListWidget)
+      .configure(
+        eq(teamId),
+        eq(isAdmin),
+        eq(TeamMemberTypeFilterOptions.ADMIN),
+        any(Callback.class)
+      );
+    verify(mockMemberListWidget)
+      .configure(
+        eq(teamId),
+        eq(isAdmin),
+        eq(TeamMemberTypeFilterOptions.MEMBER),
+        any(Callback.class)
+      );
+    verify(mockJoinWidget)
+      .configure(
+        eq(teamId),
+        anyBoolean(),
+        eq(mockTeamMembershipStatus),
+        any(Callback.class),
+        anyString(),
+        anyString(),
+        anyString(),
+        anyString(),
+        anyBoolean()
+      );
+    verify(mockOpenMembershipRequestsWidget).setVisible(false);
+    // never
+    verify(mockView, never()).showMemberMenuItems();
+    verify(mockOpenMembershipRequestsWidget, never())
+      .configure(eq(teamId), any(Callback.class));
+    verify(mockOpenUserInvitationsWidget, never())
+      .configure(eq(teamId), any(Callback.class));
+    verify(mockView, never()).showAdminMenuItems();
+  }
+
+  @Test
+  public void testRefreshMember() {
+    boolean isAdmin = false;
+    when(mockTeamBundle.isUserAdmin()).thenReturn(isAdmin);
+    when(mockTeamMembershipStatus.getIsMember()).thenReturn(true);
+    presenter.refresh(teamId);
+
+    // once
+    verify(mockView).setPublicJoinVisible(canPublicJoin);
+    verify(mockView).setTeam(mockTeam, mockTeamMembershipStatus);
+    verify(mockManagerListWidget)
+      .configure(
+        eq(teamId),
+        eq(isAdmin),
+        eq(TeamMemberTypeFilterOptions.ADMIN),
+        any(Callback.class)
+      );
+    verify(mockMemberListWidget)
+      .configure(
+        eq(teamId),
+        eq(isAdmin),
+        eq(TeamMemberTypeFilterOptions.MEMBER),
+        any(Callback.class)
+      );
+    verify(mockView).showMemberMenuItems();
+
+    // never
+    verify(mockJoinWidget, never())
+      .configure(
+        eq(teamId),
+        anyBoolean(),
+        eq(mockTeamMembershipStatus),
+        any(Callback.class),
+        anyString(),
+        anyString(),
+        anyString(),
+        anyString(),
+        anyBoolean()
+      );
+    verify(mockOpenMembershipRequestsWidget, never())
+      .configure(eq(teamId), any(Callback.class));
+    verify(mockOpenUserInvitationsWidget, never())
+      .configure(eq(teamId), any(Callback.class));
+    verify(mockView, never()).showAdminMenuItems();
+
+    verify(mockGoogleMap, never()).configure(teamId);
+    verify(mockView).setShowMapVisible(false);
+
+    // simulate clicking Show Map
+    presenter.onShowMap();
+    verify(mockGoogleMap).setHeight(anyString());
+    verify(mockGoogleMap).configure(teamId);
+    verify(mockView).showMapModal();
+    verify(mockOpenMembershipRequestsWidget).setVisible(false);
+  }
+
+  @Test
+  public void testRefreshOpenMembershipRequests() {
+    presenter.refreshOpenMembershipRequests();
+    verify(mockOpenMembershipRequestsWidget).clear();
+    verify(mockOpenMembershipRequestsWidget)
+      .configure(anyString(), callbackCaptor.capture());
+    Callback callback = callbackCaptor.getValue();
+    callback.invoke();
+    // reconfigured widget, and refreshed
+    verify(mockOpenMembershipRequestsWidget, times(2))
+      .configure(anyString(), eq(callback));
+    verify(mockSynClient)
+      .getTeamBundle(
+        anyString(),
+        anyString(),
+        anyBoolean(),
+        any(AsyncCallback.class)
+      );
+    // never reconfigures open invites (no need to refresh)
+    verify(mockOpenUserInvitationsWidget, never())
+      .configure(anyString(), eq(callback));
+  }
+
+  @Test
+  public void testRefreshOpenUserInvitations() {
+    presenter.refreshOpenUserInvitations();
+    verify(mockOpenUserInvitationsWidget).clear();
+    verify(mockOpenUserInvitationsWidget)
+      .configure(anyString(), callbackCaptor.capture());
+    Callback callback = callbackCaptor.getValue();
+    callback.invoke();
+    // reconfigured widget, and refreshed
+    verify(mockOpenUserInvitationsWidget, times(2))
+      .configure(anyString(), eq(callback));
+    verify(mockSynClient)
+      .getTeamBundle(
+        anyString(),
+        anyString(),
+        anyBoolean(),
+        any(AsyncCallback.class)
+      );
+    // never reconfigures open membership requests (no need to refresh)
+    verify(mockOpenMembershipRequestsWidget, never())
+      .configure(anyString(), eq(callback));
+  }
+
+  @Test
+  public void testShowDeleteModal() {
+    presenter.refresh(teamId);
+
+    presenter.showDeleteModal();
+
+    verify(mockDeleteModal).setRefreshCallback(any(Callback.class));
+    verify(mockView).addWidgets(any(Widget.class));
+    verify(mockDeleteModal).configure(mockTeam);
+    verify(mockDeleteModal).showDialog();
+  }
+
+  @Test
+  public void testShowEditModal() {
+    presenter.refresh(teamId);
+
+    presenter.showEditModal();
+
+    verify(mockEditModal).setRefreshCallback(any(Callback.class));
+    verify(mockView).addWidgets(any(Widget.class));
+    verify(mockEditModal).configureAndShow(mockTeam);
+  }
+
+  @Test
+  public void testShowLeaveModal() {
+    presenter.refresh(teamId);
+
+    presenter.showLeaveModal();
+
+    verify(mockLeaveModal).setRefreshCallback(any(Callback.class));
+    verify(mockView).addWidgets(any(Widget.class));
+    verify(mockLeaveModal).configure(mockTeam);
+    verify(mockLeaveModal).showDialog();
+  }
+
+  @Test
+  public void testShowTeamProjectsModal() {
+    presenter.refresh(teamId);
+
+    presenter.showTeamProjectsModal();
+
+    verify(mockView).addWidgets(any(Widget.class));
+    verify(mockTeamProjectsModalWidget).configureAndShow(mockTeam);
+  }
 }

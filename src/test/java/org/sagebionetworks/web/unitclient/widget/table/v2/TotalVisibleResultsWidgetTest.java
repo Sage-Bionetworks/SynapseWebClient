@@ -11,7 +11,6 @@ import static org.sagebionetworks.repo.model.table.QueryOptions.BUNDLE_MASK_QUER
 
 import java.util.Arrays;
 import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,162 +32,210 @@ import org.sagebionetworks.web.shared.asynch.AsynchType;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TotalVisibleResultsWidgetTest {
-	TotalVisibleResultsWidget widget;
 
-	@Mock
-	TotalVisibleResultsWidgetView mockView;
-	@Mock
-	PopupUtilsView mockPopupUtils;
-	@Mock
-	AsynchronousJobTracker mockAsyncJobTracker;
-	@Captor
-	ArgumentCaptor<QueryBundleRequest> queryBundleRequestCaptor;
-	@Captor
-	ArgumentCaptor<UpdatingAsynchProgressHandler> asyncJobHandlerCaptor;
+  TotalVisibleResultsWidget widget;
 
+  @Mock
+  TotalVisibleResultsWidgetView mockView;
 
-	Dataset datasetLatestVersion;
-	Dataset datasetSnapshot;
-	EntityView entityView;
+  @Mock
+  PopupUtilsView mockPopupUtils;
 
-	QueryResultBundle queryResultBundle;
+  @Mock
+  AsynchronousJobTracker mockAsyncJobTracker;
 
-	List<EntityRef> datasetItems;
+  @Captor
+  ArgumentCaptor<QueryBundleRequest> queryBundleRequestCaptor;
 
-	private static final String TABLE_ID = "syn123";
+  @Captor
+  ArgumentCaptor<UpdatingAsynchProgressHandler> asyncJobHandlerCaptor;
 
-	@Before
-	public void before() {
-		widget = new TotalVisibleResultsWidget(mockView, mockPopupUtils, mockAsyncJobTracker);
+  Dataset datasetLatestVersion;
+  Dataset datasetSnapshot;
+  EntityView entityView;
 
-		datasetItems = Arrays.asList(new EntityRef(), new EntityRef(), new EntityRef());
+  QueryResultBundle queryResultBundle;
 
-		datasetLatestVersion = new Dataset();
-		datasetLatestVersion.setId(TABLE_ID);
-		datasetLatestVersion.setItems(datasetItems);
-		datasetLatestVersion.setIsLatestVersion(true);
+  List<EntityRef> datasetItems;
 
-		datasetSnapshot = new Dataset();
-		datasetSnapshot.setId(TABLE_ID);
-		datasetSnapshot.setItems(datasetItems);
-		datasetSnapshot.setIsLatestVersion(false);
+  private static final String TABLE_ID = "syn123";
 
-		entityView = new EntityView();
-		entityView.setId(TABLE_ID);
-		entityView.setIsLatestVersion(true);
+  @Before
+  public void before() {
+    widget =
+      new TotalVisibleResultsWidget(
+        mockView,
+        mockPopupUtils,
+        mockAsyncJobTracker
+      );
 
-		queryResultBundle = new QueryResultBundle();
-	}
+    datasetItems =
+      Arrays.asList(new EntityRef(), new EntityRef(), new EntityRef());
 
-	@Test
-	public void testDatasetWithAllItemsVisible() {
-		// The count of all visible items is equal to the size of the items array
-		final Long queryCount = (long) datasetItems.size();
-		queryResultBundle.setQueryCount(queryCount);
+    datasetLatestVersion = new Dataset();
+    datasetLatestVersion.setId(TABLE_ID);
+    datasetLatestVersion.setItems(datasetItems);
+    datasetLatestVersion.setIsLatestVersion(true);
 
-		widget.configure(datasetLatestVersion);
+    datasetSnapshot = new Dataset();
+    datasetSnapshot.setId(TABLE_ID);
+    datasetSnapshot.setItems(datasetItems);
+    datasetSnapshot.setIsLatestVersion(false);
 
-		verify(mockAsyncJobTracker).startAndTrack(eq(AsynchType.TableQuery), queryBundleRequestCaptor.capture(), anyInt(), asyncJobHandlerCaptor.capture());
+    entityView = new EntityView();
+    entityView.setId(TABLE_ID);
+    entityView.setIsLatestVersion(true);
 
-		// Verify that the query bundle request is correct
-		assertEquals(queryBundleRequestCaptor.getValue().getEntityId(), TABLE_ID);
-		assertEquals(queryBundleRequestCaptor.getValue().getPartMask().longValue(), BUNDLE_MASK_QUERY_COUNT);
-		assertNotNull(queryBundleRequestCaptor.getValue().getQuery());
+    queryResultBundle = new QueryResultBundle();
+  }
 
+  @Test
+  public void testDatasetWithAllItemsVisible() {
+    // The count of all visible items is equal to the size of the items array
+    final Long queryCount = (long) datasetItems.size();
+    queryResultBundle.setQueryCount(queryCount);
 
-		// Invoke onSuccess
-		asyncJobHandlerCaptor.getValue().onComplete(queryResultBundle);
+    widget.configure(datasetLatestVersion);
 
-		verify(mockView).setVisible(true);
-		verify(mockView).setTotalNumberOfResults(datasetItems.size());
-		// No hidden results, so should be invisible
-		verify(mockView, times(2)).setNumberOfHiddenResultsVisible(false);
-	}
+    verify(mockAsyncJobTracker)
+      .startAndTrack(
+        eq(AsynchType.TableQuery),
+        queryBundleRequestCaptor.capture(),
+        anyInt(),
+        asyncJobHandlerCaptor.capture()
+      );
 
-	@Test
-	public void testDatasetWithNullItems() {
-		// It's possible for items to be null.
-		datasetLatestVersion.setItems(null);
-		final Long queryCount = 0L;
-		queryResultBundle.setQueryCount(queryCount);
+    // Verify that the query bundle request is correct
+    assertEquals(queryBundleRequestCaptor.getValue().getEntityId(), TABLE_ID);
+    assertEquals(
+      queryBundleRequestCaptor.getValue().getPartMask().longValue(),
+      BUNDLE_MASK_QUERY_COUNT
+    );
+    assertNotNull(queryBundleRequestCaptor.getValue().getQuery());
 
-		widget.configure(datasetLatestVersion);
+    // Invoke onSuccess
+    asyncJobHandlerCaptor.getValue().onComplete(queryResultBundle);
 
-		verify(mockAsyncJobTracker).startAndTrack(eq(AsynchType.TableQuery), queryBundleRequestCaptor.capture(), anyInt(), asyncJobHandlerCaptor.capture());
+    verify(mockView).setVisible(true);
+    verify(mockView).setTotalNumberOfResults(datasetItems.size());
+    // No hidden results, so should be invisible
+    verify(mockView, times(2)).setNumberOfHiddenResultsVisible(false);
+  }
 
-		// Verify that the query bundle request is correct
-		assertEquals(queryBundleRequestCaptor.getValue().getEntityId(), TABLE_ID);
-		assertEquals(queryBundleRequestCaptor.getValue().getPartMask().longValue(), BUNDLE_MASK_QUERY_COUNT);
-		assertNotNull(queryBundleRequestCaptor.getValue().getQuery());
+  @Test
+  public void testDatasetWithNullItems() {
+    // It's possible for items to be null.
+    datasetLatestVersion.setItems(null);
+    final Long queryCount = 0L;
+    queryResultBundle.setQueryCount(queryCount);
 
+    widget.configure(datasetLatestVersion);
 
-		// Invoke onSuccess
-		asyncJobHandlerCaptor.getValue().onComplete(queryResultBundle);
+    verify(mockAsyncJobTracker)
+      .startAndTrack(
+        eq(AsynchType.TableQuery),
+        queryBundleRequestCaptor.capture(),
+        anyInt(),
+        asyncJobHandlerCaptor.capture()
+      );
 
-		verify(mockView).setVisible(true);
-		verify(mockView).setHelpMarkdown(TotalVisibleResultsWidget.DATASETS_CURRENT_VERSION_HELP);
-		verify(mockView).setTotalNumberOfResults(0);
-		// No hidden results, so should be invisible
-		verify(mockView, times(2)).setNumberOfHiddenResultsVisible(false);
-	}
+    // Verify that the query bundle request is correct
+    assertEquals(queryBundleRequestCaptor.getValue().getEntityId(), TABLE_ID);
+    assertEquals(
+      queryBundleRequestCaptor.getValue().getPartMask().longValue(),
+      BUNDLE_MASK_QUERY_COUNT
+    );
+    assertNotNull(queryBundleRequestCaptor.getValue().getQuery());
 
-	@Test
-	public void testDatasetWithItemsUnavailable() {
-		// The count of all visible items is less than the size of the items array
-		final Long queryCount = (long) (datasetItems.size() - 1);
-		queryResultBundle.setQueryCount(queryCount);
+    // Invoke onSuccess
+    asyncJobHandlerCaptor.getValue().onComplete(queryResultBundle);
 
-		widget.configure(datasetLatestVersion);
+    verify(mockView).setVisible(true);
+    verify(mockView)
+      .setHelpMarkdown(TotalVisibleResultsWidget.DATASETS_CURRENT_VERSION_HELP);
+    verify(mockView).setTotalNumberOfResults(0);
+    // No hidden results, so should be invisible
+    verify(mockView, times(2)).setNumberOfHiddenResultsVisible(false);
+  }
 
-		verify(mockAsyncJobTracker).startAndTrack(eq(AsynchType.TableQuery), queryBundleRequestCaptor.capture(), anyInt(), asyncJobHandlerCaptor.capture());
+  @Test
+  public void testDatasetWithItemsUnavailable() {
+    // The count of all visible items is less than the size of the items array
+    final Long queryCount = (long) (datasetItems.size() - 1);
+    queryResultBundle.setQueryCount(queryCount);
 
-		// Verify that the query bundle request is correct
-		assertEquals(queryBundleRequestCaptor.getValue().getEntityId(), TABLE_ID);
-		assertEquals(queryBundleRequestCaptor.getValue().getPartMask().longValue(), BUNDLE_MASK_QUERY_COUNT);
-		assertNotNull(queryBundleRequestCaptor.getValue().getQuery());
+    widget.configure(datasetLatestVersion);
 
-		// Invoke onSuccess
-		asyncJobHandlerCaptor.getValue().onComplete(queryResultBundle);
+    verify(mockAsyncJobTracker)
+      .startAndTrack(
+        eq(AsynchType.TableQuery),
+        queryBundleRequestCaptor.capture(),
+        anyInt(),
+        asyncJobHandlerCaptor.capture()
+      );
 
-		verify(mockView).setVisible(true);
-		verify(mockView).setHelpMarkdown(TotalVisibleResultsWidget.DATASETS_CURRENT_VERSION_HELP);
-		verify(mockView).setTotalNumberOfResults(datasetItems.size());
-		verify(mockView).setNumberOfHiddenResults(datasetItems.size() - queryCount.intValue());
-		verify(mockView).setNumberOfHiddenResultsVisible(true);
-	}
+    // Verify that the query bundle request is correct
+    assertEquals(queryBundleRequestCaptor.getValue().getEntityId(), TABLE_ID);
+    assertEquals(
+      queryBundleRequestCaptor.getValue().getPartMask().longValue(),
+      BUNDLE_MASK_QUERY_COUNT
+    );
+    assertNotNull(queryBundleRequestCaptor.getValue().getQuery());
 
-	@Test
-	public void testDatasetSnapshotItemsUnavailable() {
-		// The count of all visible items is less than the size of the items array
-		final Long queryCount = (long) (datasetItems.size() - 1);
-		queryResultBundle.setQueryCount(queryCount);
+    // Invoke onSuccess
+    asyncJobHandlerCaptor.getValue().onComplete(queryResultBundle);
 
-		widget.configure(datasetSnapshot);
+    verify(mockView).setVisible(true);
+    verify(mockView)
+      .setHelpMarkdown(TotalVisibleResultsWidget.DATASETS_CURRENT_VERSION_HELP);
+    verify(mockView).setTotalNumberOfResults(datasetItems.size());
+    verify(mockView)
+      .setNumberOfHiddenResults(datasetItems.size() - queryCount.intValue());
+    verify(mockView).setNumberOfHiddenResultsVisible(true);
+  }
 
-		verify(mockAsyncJobTracker).startAndTrack(eq(AsynchType.TableQuery), queryBundleRequestCaptor.capture(), anyInt(), asyncJobHandlerCaptor.capture());
+  @Test
+  public void testDatasetSnapshotItemsUnavailable() {
+    // The count of all visible items is less than the size of the items array
+    final Long queryCount = (long) (datasetItems.size() - 1);
+    queryResultBundle.setQueryCount(queryCount);
 
-		// Verify that the query bundle request is correct
-		assertEquals(queryBundleRequestCaptor.getValue().getEntityId(), TABLE_ID);
-		assertEquals(queryBundleRequestCaptor.getValue().getPartMask().longValue(), BUNDLE_MASK_QUERY_COUNT);
-		assertNotNull(queryBundleRequestCaptor.getValue().getQuery());
+    widget.configure(datasetSnapshot);
 
-		// Invoke onSuccess
-		asyncJobHandlerCaptor.getValue().onComplete(queryResultBundle);
+    verify(mockAsyncJobTracker)
+      .startAndTrack(
+        eq(AsynchType.TableQuery),
+        queryBundleRequestCaptor.capture(),
+        anyInt(),
+        asyncJobHandlerCaptor.capture()
+      );
 
-		verify(mockView).setVisible(true);
-		verify(mockView).setHelpMarkdown(TotalVisibleResultsWidget.DATASETS_SNAPSHOT_HELP);
-		verify(mockView).setTotalNumberOfResults(datasetItems.size());
-		verify(mockView).setNumberOfHiddenResults(datasetItems.size() - queryCount.intValue());
-		verify(mockView).setNumberOfHiddenResultsVisible(true);
-	}
+    // Verify that the query bundle request is correct
+    assertEquals(queryBundleRequestCaptor.getValue().getEntityId(), TABLE_ID);
+    assertEquals(
+      queryBundleRequestCaptor.getValue().getPartMask().longValue(),
+      BUNDLE_MASK_QUERY_COUNT
+    );
+    assertNotNull(queryBundleRequestCaptor.getValue().getQuery());
 
-	@Test
-	public void testEntityView() {
-		// We have no way to determine the maximum number of items that should be available.
-		widget.configure(entityView);
+    // Invoke onSuccess
+    asyncJobHandlerCaptor.getValue().onComplete(queryResultBundle);
 
-		verify(mockView, times(2)).setVisible(false);
-		verifyZeroInteractions(mockAsyncJobTracker);
-	}
+    verify(mockView).setVisible(true);
+    verify(mockView)
+      .setHelpMarkdown(TotalVisibleResultsWidget.DATASETS_SNAPSHOT_HELP);
+    verify(mockView).setTotalNumberOfResults(datasetItems.size());
+    verify(mockView)
+      .setNumberOfHiddenResults(datasetItems.size() - queryCount.intValue());
+    verify(mockView).setNumberOfHiddenResultsVisible(true);
+  }
 
+  @Test
+  public void testEntityView() {
+    // We have no way to determine the maximum number of items that should be available.
+    widget.configure(entityView);
+
+    verify(mockView, times(2)).setVisible(false);
+    verifyZeroInteractions(mockAsyncJobTracker);
+  }
 }

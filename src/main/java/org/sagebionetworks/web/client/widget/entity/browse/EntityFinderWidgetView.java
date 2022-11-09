@@ -1,56 +1,62 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
+import com.google.gwt.user.client.ui.Widget;
 import java.util.List;
-
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.jsinterop.EntityFinderProps;
 import org.sagebionetworks.web.client.jsinterop.EntityFinderScope;
 
-import com.google.gwt.user.client.ui.Widget;
-
 public interface EntityFinderWidgetView extends SynapseView {
+  /**
+   * Set the presenter.
+   *
+   * @param presenter
+   */
+  void setPresenter(Presenter presenter);
 
-	/**
-	 * Set the presenter.
-	 * 
-	 * @param presenter
-	 */
-	void setPresenter(Presenter presenter);
+  void hide();
 
-	void hide();
+  void renderComponent(
+    EntityFinderScope initialScope,
+    EntityFinderWidget.InitialContainer initialContainer,
+    String projectId,
+    String initialContainerId,
+    EntityFinderWidget.VersionSelection versionSelection,
+    boolean multiSelect,
+    EntityFilter selectableEntityTypes,
+    EntityFilter visibleTypesInList,
+    EntityFilter visibleTypesInTree,
+    EntityFinderProps.SelectedCopyHandler selectedCopy,
+    boolean treeOnly
+  );
 
-	void renderComponent(EntityFinderScope initialScope, EntityFinderWidget.InitialContainer initialContainer, String projectId, String initialContainerId, EntityFinderWidget.VersionSelection versionSelection, boolean multiSelect, EntityFilter selectableEntityTypes, EntityFilter visibleTypesInList, EntityFilter visibleTypesInTree, EntityFinderProps.SelectedCopyHandler selectedCopy, boolean treeOnly);
+  void clearError();
 
-	void clearError();
+  void setModalTitle(String modalTitle);
 
-    void setModalTitle(String modalTitle);
+  void setPromptCopy(String promptCopy);
 
-	void setPromptCopy(String promptCopy);
+  void setHelpMarkdown(String helpMarkdown);
 
-	void setHelpMarkdown(String helpMarkdown);
+  void setConfirmButtonCopy(String confirmButtonCopy);
 
-	void setConfirmButtonCopy(String confirmButtonCopy);
+  Widget asWidget();
 
-	Widget asWidget();
+  /**
+   * Presenter interface
+   */
+  interface Presenter {
+    void setSelectedEntity(Reference selected);
 
-	/**
-	 * Presenter interface
-	 */
-	interface Presenter {
+    void okClicked();
 
-		void setSelectedEntity(Reference selected);
+    void cancelClicked();
 
-		void okClicked();
+    void setSelectedEntities(List<Reference> selected);
 
-		void cancelClicked();
+    void clearSelectedEntities();
 
-		void setSelectedEntities(List<Reference> selected);
-
-		void clearSelectedEntities();
-
-		void renderComponent();
-	}
-
-
+    void renderComponent();
+  }
 }

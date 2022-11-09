@@ -14,13 +14,13 @@ import org.mockito.stubbing.Answer;
  */
 public class SelfReturningAnswer implements Answer<Object> {
 
-    public static final SelfReturningAnswer RETURNS_SELF = new SelfReturningAnswer();
+  public static final SelfReturningAnswer RETURNS_SELF = new SelfReturningAnswer();
 
-    public Object answer(InvocationOnMock invocation) throws Throwable {
-        Object mock = invocation.getMock();
-        if(invocation.getMethod().getReturnType().isInstance(mock)){
-            return mock;
-        }
-        return RETURNS_DEFAULTS.answer(invocation);
+  public Object answer(InvocationOnMock invocation) throws Throwable {
+    Object mock = invocation.getMock();
+    if (invocation.getMethod().getReturnType().isInstance(mock)) {
+      return mock;
     }
+    return RETURNS_DEFAULTS.answer(invocation);
+  }
 }

@@ -1,34 +1,33 @@
 package org.sagebionetworks.web.client.widget;
 
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 import java.util.List;
 import java.util.function.Consumer;
 
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Widget;
-
 public interface CommaSeparatedValuesParserView extends IsWidget {
-	void hide();
+  void hide();
 
-	void show();
+  void show();
 
-	public interface Presenter {
-		void configure(Consumer<List<String>> onAddCallback);
-		void onCancel();
-		void onAdd();
+  public interface Presenter {
+    void configure(Consumer<List<String>> onAddCallback);
+    void onCancel();
+    void onAdd();
 
-		List<String> parseToStringList();
+    List<String> parseToStringList();
 
-		void show();
+    void show();
 
-		Widget asWidget();
-	}
+    Widget asWidget();
+  }
 
-	String getText();
+  String getText();
 
-	/**
-	 * Clears the text box
-	 */
-	void clearTextBox();
+  /**
+   * Clears the text box
+   */
+  void clearTextBox();
 
-	void setPresenter(Presenter presenter);
+  void setPresenter(Presenter presenter);
 }

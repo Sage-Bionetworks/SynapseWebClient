@@ -9,8 +9,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.gwt.event.shared.EventBus;
+import com.google.web.bindery.event.shared.binder.EventBinder;
 import java.util.Date;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -30,123 +31,171 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.HeaderView;
 
-import com.google.gwt.event.shared.EventBus;
-import com.google.web.bindery.event.shared.binder.EventBinder;
-
 public class HeaderTest {
 
-	Header header;
-	@Mock
-	HeaderView mockView;
-	@Mock
-	SynapseJSNIUtils mockSynapseJSNIUtils;
-	AdapterFactory adapterFactory = new AdapterFactoryImpl();
-	@Mock
-	CookieProvider mockCookies;
-	@Mock
-	UserProfile mockUserProfile;
-	@Mock
-	EventBus mockEventBus;
-	@Mock
-	EventBinder<Header> mockEventBinder;
-	JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
-	@Captor
-	ArgumentCaptor<JSONObjectAdapter> jsonObjectAdapterCaptor;
+  Header header;
 
-	@Before
-	public void setup() {
-		MockitoAnnotations.initMocks(this);
-		when(mockView.getEventBinder()).thenReturn(mockEventBinder);
-		// by default, mock that we are on the production website
-		when(mockSynapseJSNIUtils.getCurrentHostName()).thenReturn(Header.WWW_SYNAPSE_ORG);
-		header = new Header(mockView, mockSynapseJSNIUtils, mockEventBus, mockCookies, jsonObjectAdapter);
-	}
+  @Mock
+  HeaderView mockView;
 
-	@Test
-	public void testConstructor() {
-		verify(mockView).setPresenter(header);
-		verify(mockView).setStagingAlertVisible(false);
-		verify(mockView).setCookieNotificationVisible(true);
-	}
+  @Mock
+  SynapseJSNIUtils mockSynapseJSNIUtils;
 
-	@Test
-	public void testAsWidget() {
-		header.asWidget();
-	}
+  AdapterFactory adapterFactory = new AdapterFactoryImpl();
 
-	@Test
-	public void testInitStagingAlert() {
-		// case insensitive
-		Mockito.reset(mockView);
-		when(mockSynapseJSNIUtils.getCurrentHostName()).thenReturn("WwW.SynapsE.ORG");
-		header.initStagingAlert();
-		verify(mockView).setStagingAlertVisible(false);
+  @Mock
+  CookieProvider mockCookies;
 
-		// staging
-		Mockito.reset(mockView);
-		when(mockSynapseJSNIUtils.getCurrentHostName()).thenReturn("staging.synapse.org");
-		header.initStagingAlert();
-		verify(mockView).setStagingAlertVisible(true);
+  @Mock
+  UserProfile mockUserProfile;
 
-		// local
-		Mockito.reset(mockView);
-		when(mockSynapseJSNIUtils.getCurrentHostName()).thenReturn("localhost");
-		header.initStagingAlert();
-		verify(mockView).setStagingAlertVisible(true);
-	}
+  @Mock
+  EventBus mockEventBus;
 
-	@Test
-	public void testRefresh() {
-		header.refresh();
+  @Mock
+  EventBinder<Header> mockEventBinder;
 
-		verify(mockView).refresh();
-	}
-	
-	@Test
-	public void testInitWithAcceptCookiesCookie() {
-		when(mockCookies.getCookie(CookieKeys.COOKIES_ACCEPTED)).thenReturn("true");
-		reset(mockView);
-		when(mockView.getEventBinder()).thenReturn(mockEventBinder);
+  JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
 
-		header = new Header(mockView, mockSynapseJSNIUtils, mockEventBus, mockCookies, jsonObjectAdapter);
+  @Captor
+  ArgumentCaptor<JSONObjectAdapter> jsonObjectAdapterCaptor;
 
-		verify(mockView).setCookieNotificationVisible(false);
-	}
+  @Before
+  public void setup() {
+    MockitoAnnotations.initMocks(this);
+    when(mockView.getEventBinder()).thenReturn(mockEventBinder);
+    // by default, mock that we are on the production website
+    when(mockSynapseJSNIUtils.getCurrentHostName())
+      .thenReturn(Header.WWW_SYNAPSE_ORG);
+    header =
+      new Header(
+        mockView,
+        mockSynapseJSNIUtils,
+        mockEventBus,
+        mockCookies,
+        jsonObjectAdapter
+      );
+  }
 
-	@Test
-	public void testOnCookieNotificationDismissed() {
-		header.onCookieNotificationDismissed();
+  @Test
+  public void testConstructor() {
+    verify(mockView).setPresenter(header);
+    verify(mockView).setStagingAlertVisible(false);
+    verify(mockView).setCookieNotificationVisible(true);
+  }
 
-		verify(mockCookies).setCookie(eq(CookieKeys.COOKIES_ACCEPTED), eq(Boolean.TRUE.toString()), any(Date.class));
-	}
+  @Test
+  public void testAsWidget() {
+    header.asWidget();
+  }
 
-	@Test
-	public void testRefreshNoPortalBanner() {
-		String cookieValue = null;
-		when(mockCookies.getCookie(CookieKeys.PORTAL_CONFIG)).thenReturn(cookieValue);
+  @Test
+  public void testInitStagingAlert() {
+    // case insensitive
+    Mockito.reset(mockView);
+    when(mockSynapseJSNIUtils.getCurrentHostName())
+      .thenReturn("WwW.SynapsE.ORG");
+    header.initStagingAlert();
+    verify(mockView).setStagingAlertVisible(false);
 
-		header = new Header(mockView, mockSynapseJSNIUtils, mockEventBus, mockCookies, jsonObjectAdapter);
+    // staging
+    Mockito.reset(mockView);
+    when(mockSynapseJSNIUtils.getCurrentHostName())
+      .thenReturn("staging.synapse.org");
+    header.initStagingAlert();
+    verify(mockView).setStagingAlertVisible(true);
 
-		// should be hidden
-		boolean isVisible = false;
-		verify(mockView, times(2)).setPortalAlertVisible(isVisible, null);
-	}
+    // local
+    Mockito.reset(mockView);
+    when(mockSynapseJSNIUtils.getCurrentHostName()).thenReturn("localhost");
+    header.initStagingAlert();
+    verify(mockView).setStagingAlertVisible(true);
+  }
 
-	@Test
-	public void testRefreshWithPortalBanner() throws JSONObjectAdapterException {
-		String cookieValue = "{\"isInvokingDownloadTable\":true,\"foregroundColor\":\"rgb(255, 255, 255)\",\"backgroundColor\":\"rgb(77, 84, 145)\",\"callbackUrl\":\"https://staging.adknowledgeportal.synapse.org/#/Explore/Data\",\"logoUrl\":\"https://staging.adknowledgeportal.synapse.org/static/media/amp-footer-logo.0e5d7cab.svg\",\"portalName\":\"  \"}";
-		when(mockCookies.getCookie(CookieKeys.PORTAL_CONFIG)).thenReturn(cookieValue);
+  @Test
+  public void testRefresh() {
+    header.refresh();
 
-		header = new Header(mockView,mockSynapseJSNIUtils, mockEventBus, mockCookies, jsonObjectAdapter);
+    verify(mockView).refresh();
+  }
 
-		// should be shown
-		boolean isVisible = true;
-		verify(mockView).setPortalAlertVisible(eq(isVisible), jsonObjectAdapterCaptor.capture());
+  @Test
+  public void testInitWithAcceptCookiesCookie() {
+    when(mockCookies.getCookie(CookieKeys.COOKIES_ACCEPTED)).thenReturn("true");
+    reset(mockView);
+    when(mockView.getEventBinder()).thenReturn(mockEventBinder);
 
-		// verify json values
-		JSONObjectAdapter json = jsonObjectAdapterCaptor.getValue();
-		assertTrue(json.getBoolean("isInvokingDownloadTable"));
-		assertEquals("https://staging.adknowledgeportal.synapse.org/static/media/amp-footer-logo.0e5d7cab.svg", json.getString("logoUrl"));
-	}
+    header =
+      new Header(
+        mockView,
+        mockSynapseJSNIUtils,
+        mockEventBus,
+        mockCookies,
+        jsonObjectAdapter
+      );
 
+    verify(mockView).setCookieNotificationVisible(false);
+  }
+
+  @Test
+  public void testOnCookieNotificationDismissed() {
+    header.onCookieNotificationDismissed();
+
+    verify(mockCookies)
+      .setCookie(
+        eq(CookieKeys.COOKIES_ACCEPTED),
+        eq(Boolean.TRUE.toString()),
+        any(Date.class)
+      );
+  }
+
+  @Test
+  public void testRefreshNoPortalBanner() {
+    String cookieValue = null;
+    when(mockCookies.getCookie(CookieKeys.PORTAL_CONFIG))
+      .thenReturn(cookieValue);
+
+    header =
+      new Header(
+        mockView,
+        mockSynapseJSNIUtils,
+        mockEventBus,
+        mockCookies,
+        jsonObjectAdapter
+      );
+
+    // should be hidden
+    boolean isVisible = false;
+    verify(mockView, times(2)).setPortalAlertVisible(isVisible, null);
+  }
+
+  @Test
+  public void testRefreshWithPortalBanner() throws JSONObjectAdapterException {
+    String cookieValue =
+      "{\"isInvokingDownloadTable\":true,\"foregroundColor\":\"rgb(255, 255, 255)\",\"backgroundColor\":\"rgb(77, 84, 145)\",\"callbackUrl\":\"https://staging.adknowledgeportal.synapse.org/#/Explore/Data\",\"logoUrl\":\"https://staging.adknowledgeportal.synapse.org/static/media/amp-footer-logo.0e5d7cab.svg\",\"portalName\":\"  \"}";
+    when(mockCookies.getCookie(CookieKeys.PORTAL_CONFIG))
+      .thenReturn(cookieValue);
+
+    header =
+      new Header(
+        mockView,
+        mockSynapseJSNIUtils,
+        mockEventBus,
+        mockCookies,
+        jsonObjectAdapter
+      );
+
+    // should be shown
+    boolean isVisible = true;
+    verify(mockView)
+      .setPortalAlertVisible(eq(isVisible), jsonObjectAdapterCaptor.capture());
+
+    // verify json values
+    JSONObjectAdapter json = jsonObjectAdapterCaptor.getValue();
+    assertTrue(json.getBoolean("isInvokingDownloadTable"));
+    assertEquals(
+      "https://staging.adknowledgeportal.synapse.org/static/media/amp-footer-logo.0e5d7cab.svg",
+      json.getString("logoUrl")
+    );
+  }
 }

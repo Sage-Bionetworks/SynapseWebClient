@@ -1,82 +1,81 @@
 package org.sagebionetworks.web.client;
 
-import java.util.Date;
-
-import com.google.gwt.json.client.JSONValue;
-import org.sagebionetworks.web.client.utils.Callback;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.i18n.client.NumberFormat;
+import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.rpc.HasRpcToken;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.google.gwt.xhr.client.XMLHttpRequest;
+import java.util.Date;
+import org.sagebionetworks.web.client.utils.Callback;
 
 public interface GWTWrapper {
-	String getHostPageBaseURL();
+  String getHostPageBaseURL();
 
-	String getModuleBaseURL();
+  String getModuleBaseURL();
 
-	void assignThisWindowWith(String url);
+  void assignThisWindowWith(String url);
 
-	String encode(String decodedURL);
+  String encode(String decodedURL);
 
-	String encodeQueryString(String queryString);
+  String encodeQueryString(String queryString);
 
-	String decodeQueryString(String queryString);
+  String decodeQueryString(String queryString);
 
-	XMLHttpRequest createXMLHttpRequest();
+  XMLHttpRequest createXMLHttpRequest();
 
-	NumberFormat getNumberFormat(String pattern);
+  NumberFormat getNumberFormat(String pattern);
 
-	String getHostPrefix();
+  String getHostPrefix();
 
-	String getCurrentURL();
+  String getCurrentURL();
 
-	DateTimeFormat getDateTimeFormat(PredefinedFormat format);
+  DateTimeFormat getDateTimeFormat(PredefinedFormat format);
 
-	void scheduleFixedDelay(final Callback callback, int delayMs);
+  void scheduleFixedDelay(final Callback callback, int delayMs);
 
-	void scheduleExecution(Callback callback, int delayMs);
+  void scheduleExecution(Callback callback, int delayMs);
 
-	void scheduleDeferred(Callback callback);
+  void scheduleDeferred(Callback callback);
 
-	String getUserAgent();
+  String getUserAgent();
 
-	String getAppVersion();
+  String getAppVersion();
 
-	int nextRandomInt();
+  int nextRandomInt();
 
-	void addDaysToDate(Date date, int days);
+  void addDaysToDate(Date date, int days);
 
-	boolean isWhitespace(String text);
+  boolean isWhitespace(String text);
 
-	void newItem(String historyToken, boolean issueEvent);
+  void newItem(String historyToken, boolean issueEvent);
 
-	void replaceItem(String historyToken, boolean issueEvent);
+  void replaceItem(String historyToken, boolean issueEvent);
 
-	String getCurrentHistoryToken();
+  String getCurrentHistoryToken();
 
-	ServiceDefTarget asServiceDefTarget(Object service);
+  ServiceDefTarget asServiceDefTarget(Object service);
 
-	HasRpcToken asHasRpcToken(Object service);
+  HasRpcToken asHasRpcToken(Object service);
 
-	String getUniqueElementId();
+  String getUniqueElementId();
 
-	void saveWindowPosition();
+  void saveWindowPosition();
 
-	void restoreWindowPosition();
+  void restoreWindowPosition();
 
-	int nextInt(int upperBound);
+  int nextInt(int upperBound);
 
-	String getUniqueAliasName(String inputName);
+  String getUniqueAliasName(String inputName);
 
-	String getFriendlySize(double size, boolean abbreviatedUnits);
+  String getFriendlySize(double size, boolean abbreviatedUnits);
 
-	DateTimeFormat getFormat(String formatPattern);
+  DateTimeFormat getFormat(String formatPattern);
 
-	DateTimeFormat getFormat(PredefinedFormat predefinedFormat);
-	
-	boolean isValidJSONArray(String json);
+  DateTimeFormat getFormat(PredefinedFormat predefinedFormat);
 
-	JSONValue parseJSONStrict(String json);
+  boolean isValidJSONArray(String json);
+
+  JSONValue parseJSONStrict(String json);
 }

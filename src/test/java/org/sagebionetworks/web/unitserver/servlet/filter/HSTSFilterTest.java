@@ -5,6 +5,7 @@ import static org.sagebionetworks.web.server.servlet.filter.HSTSFilter.HSTS_PREL
 import static org.sagebionetworks.web.server.servlet.filter.HSTSFilter.MAX_AGE;
 import static org.sagebionetworks.web.server.servlet.filter.HSTSFilter.MAX_AGE_SECONDS;
 import static org.sagebionetworks.web.server.servlet.filter.HSTSFilter.STRICT_TRANSPORT_SECURITY;
+
 import java.io.IOException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -17,24 +18,32 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.web.server.servlet.filter.HSTSFilter;
 
 public class HSTSFilterTest {
-	HSTSFilter filter;
-	@Mock
-	HttpServletRequest mockRequest;
-	@Mock
-	HttpServletResponse mockResponse;
-	@Mock
-	FilterChain mockFilterChain;
 
-	@Before
-	public void setUp() {
-		MockitoAnnotations.initMocks(this);
-		filter = new HSTSFilter();
-	}
+  HSTSFilter filter;
 
-	@Test
-	public void testDoFilter() throws IOException, ServletException {
-		filter.doFilter(mockRequest, mockResponse, mockFilterChain);
-		verify(mockResponse).setHeader(STRICT_TRANSPORT_SECURITY, MAX_AGE + MAX_AGE_SECONDS + HSTS_PRELOAD_SUFFIX);
-		verify(mockFilterChain).doFilter(mockRequest, mockResponse);
-	}
+  @Mock
+  HttpServletRequest mockRequest;
+
+  @Mock
+  HttpServletResponse mockResponse;
+
+  @Mock
+  FilterChain mockFilterChain;
+
+  @Before
+  public void setUp() {
+    MockitoAnnotations.initMocks(this);
+    filter = new HSTSFilter();
+  }
+
+  @Test
+  public void testDoFilter() throws IOException, ServletException {
+    filter.doFilter(mockRequest, mockResponse, mockFilterChain);
+    verify(mockResponse)
+      .setHeader(
+        STRICT_TRANSPORT_SECURITY,
+        MAX_AGE + MAX_AGE_SECONDS + HSTS_PRELOAD_SUFFIX
+      );
+    verify(mockFilterChain).doFilter(mockRequest, mockResponse);
+  }
 }

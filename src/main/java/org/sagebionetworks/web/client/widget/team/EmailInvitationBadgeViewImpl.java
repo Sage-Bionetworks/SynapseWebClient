@@ -1,49 +1,52 @@
 package org.sagebionetworks.web.client.widget.team;
 
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.Widget;
 import javax.inject.Inject;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Strong;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Widget;
 
 public class EmailInvitationBadgeViewImpl implements EmailInvitationBadgeView {
-	public interface Binder extends UiBinder<Widget, EmailInvitationBadgeViewImpl> {
-	}
 
-	@UiField
-	Icon squareIcon;
-	@UiField
-	Strong iconLetter;
-	@UiField
-	Span inviteeEmail;
+  public interface Binder
+    extends UiBinder<Widget, EmailInvitationBadgeViewImpl> {}
 
-	private Widget widget;
+  @UiField
+  Icon squareIcon;
 
-	@Inject
-	public EmailInvitationBadgeViewImpl(Binder uiBinder) {
-		widget = uiBinder.createAndBindUi(this);
-	}
+  @UiField
+  Strong iconLetter;
 
-	@Override
-	public void setEmail(String inviteeEmail) {
-		this.inviteeEmail.setText(inviteeEmail);
-	}
+  @UiField
+  Span inviteeEmail;
 
-	@Override
-	public void setIconColor(String color) {
-		squareIcon.setColor(color);
-		iconLetter.setColor(color);
-	}
+  private Widget widget;
 
-	@Override
-	public void setIconLetter(String letter) {
-		iconLetter.setText(letter);
-	}
+  @Inject
+  public EmailInvitationBadgeViewImpl(Binder uiBinder) {
+    widget = uiBinder.createAndBindUi(this);
+  }
 
-	@Override
-	public Widget asWidget() {
-		return widget;
-	}
+  @Override
+  public void setEmail(String inviteeEmail) {
+    this.inviteeEmail.setText(inviteeEmail);
+  }
+
+  @Override
+  public void setIconColor(String color) {
+    squareIcon.setColor(color);
+    iconLetter.setColor(color);
+  }
+
+  @Override
+  public void setIconLetter(String letter) {
+    iconLetter.setText(letter);
+  }
+
+  @Override
+  public Widget asWidget() {
+    return widget;
+  }
 }

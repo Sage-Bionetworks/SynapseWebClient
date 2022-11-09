@@ -8,6 +8,5 @@ import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
  * @author jhill
  *
  */
-public interface PagingAndSortingListener extends PageChangeListener, SortingListener {
-
-}
+public interface PagingAndSortingListener
+  extends PageChangeListener, SortingListener {}

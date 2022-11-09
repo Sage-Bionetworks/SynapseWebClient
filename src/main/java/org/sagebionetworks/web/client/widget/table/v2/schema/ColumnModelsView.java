@@ -1,198 +1,194 @@
 package org.sagebionetworks.web.client.widget.table.v2.schema;
 
+import com.google.gwt.user.client.ui.IsWidget;
 import java.util.List;
 import org.sagebionetworks.repo.model.table.ColumnModel;
-import com.google.gwt.user.client.ui.IsWidget;
 
 /**
  * An editable widget of a list of ColumnModels
- * 
+ *
  * @author jmhill
- * 
+ *
  */
 public interface ColumnModelsView extends IsWidget {
+  public interface EditHandler {
+    /**
+     * Called when the edit button is pressed
+     */
+    public void onEditColumns();
+  }
 
-	public interface EditHandler {
-		/**
-		 * Called when the edit button is pressed
-		 */
-		public void onEditColumns();
-	}
+  /**
+   * All business logic for this view belongs in the presenter.
+   *
+   */
+  public interface Presenter {
+    /**
+     * Get the current list of ColumnModels.
+     *
+     * @return
+     */
+    public List<ColumnModel> getEditedColumnModels();
 
-	/**
-	 * All business logic for this view belongs in the presenter.
-	 * 
-	 */
-	public interface Presenter {
+    /**
+     * Validate the column models for this view. If there are any errors they will be reflected in the
+     * UI.
+     *
+     * @return return True if the current ColumnModels are valid. False, if there are any errors that
+     *         would prevent the column models from being saved.
+     */
+    public boolean validateModel();
 
-		/**
-		 * Get the current list of ColumnModels.
-		 * 
-		 * @return
-		 */
-		public List<ColumnModel> getEditedColumnModels();
+    /**
+     * Add a new column to the table.
+     *
+     * @return
+     */
+    public ColumnModelTableRowEditorWidget addNewColumn();
 
-		/**
-		 * Validate the column models for this view. If there are any errors they will be reflected in the
-		 * UI.
-		 * 
-		 * @return return True if the current ColumnModels are valid. False, if there are any errors that
-		 *         would prevent the column models from being saved.
-		 */
-		public boolean validateModel();
+    /**
+     * Toggle the selection.
+     */
+    public void toggleSelect();
 
-		/**
-		 * Add a new column to the table.
-		 * 
-		 * @return
-		 */
-		public ColumnModelTableRowEditorWidget addNewColumn();
+    /**
+     * On select all.
+     */
+    public void selectAll();
 
-		/**
-		 * Toggle the selection.
-		 */
-		public void toggleSelect();
+    /**
+     * Select none
+     */
+    public void selectNone();
 
-		/**
-		 * On select all.
-		 */
-		public void selectAll();
+    /**
+     * Move the selected item up.
+     */
+    public void onMoveUp();
 
-		/**
-		 * Select none
-		 */
-		public void selectNone();
+    /**
+     * Move the selected item down.
+     */
+    public void onMoveDown();
 
-		/**
-		 * Move the selected item up.
-		 */
-		public void onMoveUp();
+    /**
+     * Delete the selected columns.
+     */
+    public void deleteSelected();
 
-		/**
-		 * Move the selected item down.
-		 */
-		public void onMoveDown();
+    /**
+     * Add column models based on the default entity view fields
+     */
+    void onAddDefaultViewColumns();
 
-		/**
-		 * Delete the selected columns.
-		 */
-		public void deleteSelected();
+    /**
+     * Add column models based on the annotations found in the view scope
+     */
+    void onAddAnnotationColumns();
+  }
 
-		/**
-		 * Add column models based on the default entity view fields
-		 */
-		void onAddDefaultViewColumns();
+  /**
+   * Connect the view to the presenter.
+   *
+   * @param presenter
+   */
+  public void setPresenter(Presenter presenter);
 
-		/**
-		 * Add column models based on the annotations found in the view scope
-		 */
-		void onAddAnnotationColumns();
+  public void setEditHandler(EditHandler handler);
 
-	}
+  /**
+   * Add a row to the table.
+   *
+   * @param row
+   */
+  void addColumn(ColumnModelTableRow row);
+  /**
+   * bulk add column model table rows to the view (single attach)
+   * @param rows
+   */
+  void addColumns(List<ColumnModelTableRow> rows);
+  /**
+   *
+   * @param row
+   * @param index
+   */
+  void moveColumn(ColumnModelTableRow row, int index);
 
+  /**
+   * Set the view editable
+   *
+   * @param isEditable
+   */
+  void configure(ViewType type, boolean isEditable);
 
-	/**
-	 * Connect the view to the presenter.
-	 * 
-	 * @param presenter
-	 */
-	public void setPresenter(Presenter presenter);
+  /**
+   * Determines the state of the delete button
+   *
+   * @param b
+   */
+  public void setCanDelete(boolean canDelete);
 
-	public void setEditHandler(EditHandler handler);
+  /**
+   * Is the delete button enabled?
+   *
+   * @return
+   */
+  public boolean isDeleteEnabled();
 
-	/**
-	 * Add a row to the table.
-	 * 
-	 * @param row
-	 */
-	void addColumn(ColumnModelTableRow row);
-	/**
-	 * bulk add column model table rows to the view (single attach)
-	 * @param rows
-	 */
-	void addColumns(List<ColumnModelTableRow> rows);
-	/**
-	 * 
-	 * @param row
-	 * @param index
-	 */
-	void moveColumn(ColumnModelTableRow row, int index);
+  /**
+   * Determines the state of the move up button.
+   *
+   * @param b
+   */
+  public void setCanMoveUp(boolean canMoveUp);
 
-	/**
-	 * Set the view editable
-	 * 
-	 * @param isEditable
-	 */
-	void configure(ViewType type, boolean isEditable);
+  /**
+   * Is the move down button enabled.
+   *
+   * @return
+   */
+  public boolean isMoveUpEnabled();
 
+  /**
+   * Determines the state of the move down button.
+   *
+   * @param canMoveDown
+   */
+  public void setCanMoveDown(boolean canMoveDown);
 
-	/**
-	 * Determines the state of the delete button
-	 * 
-	 * @param b
-	 */
-	public void setCanDelete(boolean canDelete);
+  /**
+   * Is the move down button enabled?
+   *
+   * @return
+   */
+  public boolean isMoveDownEnabled();
 
-	/**
-	 * Is the delete button enabled?
-	 * 
-	 * @return
-	 */
-	public boolean isDeleteEnabled();
+  /**
+   * Is the Add Default View Columns Button visible?
+   *
+   * @param visible
+   */
+  void setAddDefaultColumnsButtonVisible(boolean visible);
 
-	/**
-	 * Determines the state of the move up button.
-	 * 
-	 * @param b
-	 */
-	public void setCanMoveUp(boolean canMoveUp);
+  void setTableTypeDisplayName(String text);
 
-	/**
-	 * Is the move down button enabled.
-	 * 
-	 * @return
-	 */
-	public boolean isMoveUpEnabled();
+  /**
+   * Is the Add Annotation Columns Button visible?
+   *
+   * @param visible
+   */
+  void setAddAnnotationColumnsButtonVisible(boolean visible);
 
-	/**
-	 * Determines the state of the move down button.
-	 * 
-	 * @param canMoveDown
-	 */
-	public void setCanMoveDown(boolean canMoveDown);
+  /**
+   * The view can be used as a column viewer or as a column editor.
+   *
+   */
+  public enum ViewType {
+    VIEWER,
+    EDITOR,
+  }
 
-	/**
-	 * Is the move down button enabled?
-	 * 
-	 * @return
-	 */
-	public boolean isMoveDownEnabled();
+  void showErrorMessage(String message);
 
-	/**
-	 * Is the Add Default View Columns Button visible?
-	 * 
-	 * @param visible
-	 */
-	void setAddDefaultColumnsButtonVisible(boolean visible);
-
-	void setTableTypeDisplayName(String text);
-
-	/**
-	 * Is the Add Annotation Columns Button visible?
-	 * 
-	 * @param visible
-	 */
-	void setAddAnnotationColumnsButtonVisible(boolean visible);
-
-	/**
-	 * The view can be used as a column viewer or as a column editor.
-	 *
-	 */
-	public enum ViewType {
-		VIEWER, EDITOR
-	}
-
-	void showErrorMessage(String message);
-
-	void addButton(IsWidget widget);
+  void addButton(IsWidget widget);
 }

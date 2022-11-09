@@ -1,46 +1,45 @@
 package org.sagebionetworks.web.client.widget.biodalliance13.editor;
 
-
+import com.google.gwt.user.client.ui.IsWidget;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.widget.SelectableListItem;
 import org.sagebionetworks.web.client.widget.WidgetEditorView;
-import com.google.gwt.user.client.ui.IsWidget;
 
-public interface BiodallianceSourceEditorView extends IsWidget, WidgetEditorView, SelectableListItem {
+public interface BiodallianceSourceEditorView
+  extends IsWidget, WidgetEditorView, SelectableListItem {
+  /**
+   * Set the presenter.
+   *
+   * @param presenter
+   */
+  void setPresenter(Presenter presenter);
 
-	/**
-	 * Set the presenter.
-	 * 
-	 * @param presenter
-	 */
-	void setPresenter(Presenter presenter);
+  /**
+   * Presenter interface
+   */
+  public interface Presenter extends SelectableListItem.Presenter {
+    void entitySelected(Reference ref);
 
-	/**
-	 * Presenter interface
-	 */
-	public interface Presenter extends SelectableListItem.Presenter {
-		void entitySelected(Reference ref);
+    void indexEntitySelected(Reference ref);
 
-		void indexEntitySelected(Reference ref);
+    void entityPickerClicked();
 
-		void entityPickerClicked();
+    void indexEntityPickerClicked();
+  }
 
-		void indexEntityPickerClicked();
-	}
+  void setEntityFinderText(String text);
 
-	void setEntityFinderText(String text);
+  void setIndexEntityFinderText(String text);
 
-	void setIndexEntityFinderText(String text);
+  String getColor();
 
-	String getColor();
+  void setColor(String color);
 
-	void setColor(String color);
+  String getHeight();
 
-	String getHeight();
+  void setHeight(String height);
 
-	void setHeight(String height);
+  String getSourceName();
 
-	String getSourceName();
-
-	void setSourceName(String sourceName);
+  void setSourceName(String sourceName);
 }

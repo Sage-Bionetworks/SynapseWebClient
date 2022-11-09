@@ -1,54 +1,58 @@
 package org.sagebionetworks.web.client.widget.clienthelp;
 
-import org.gwtbootstrap3.client.ui.Modal;
-import org.gwtbootstrap3.client.ui.TabListItem;
-import org.gwtbootstrap3.client.ui.TabPane;
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.TabListItem;
+import org.gwtbootstrap3.client.ui.TabPane;
 
 public class FileViewClientsHelpImpl implements FileViewClientsHelp {
-	@UiField
-	SpanElement queryElement;
-	@UiField
-	Modal modal;
-	@UiField
-	TabListItem cliTabListItem;
-	// @UiField
-	// TabListItem pythonTabListItem;
-	@UiField
-	TabPane cliTabPane;
-	// @UiField
-	// TabPane pythonTabPane;
 
-	Widget widget;
-	String sql = null;
+  @UiField
+  SpanElement queryElement;
 
-	public interface Binder extends UiBinder<Widget, FileViewClientsHelpImpl> {
-	}
+  @UiField
+  Modal modal;
 
-	@Inject
-	public FileViewClientsHelpImpl(Binder binder) {
-		this.widget = binder.createAndBindUi(this);
-		FileClientsHelpViewImpl.setId(cliTabListItem, cliTabPane);
-		// FileClientsHelpImpl.setId(pythonTabListItem, pythonTabPane);
-	}
+  @UiField
+  TabListItem cliTabListItem;
 
-	@Override
-	public void show() {
-		modal.show();
-	}
+  // @UiField
+  // TabListItem pythonTabListItem;
+  @UiField
+  TabPane cliTabPane;
 
-	@Override
-	public Widget asWidget() {
-		return widget;
-	}
+  // @UiField
+  // TabPane pythonTabPane;
 
-	@Override
-	public void setQuery(String sql) {
-		this.sql = sql;
-		queryElement.setInnerHTML(sql);
-	}
+  Widget widget;
+  String sql = null;
+
+  public interface Binder extends UiBinder<Widget, FileViewClientsHelpImpl> {}
+
+  @Inject
+  public FileViewClientsHelpImpl(Binder binder) {
+    this.widget = binder.createAndBindUi(this);
+    FileClientsHelpViewImpl.setId(cliTabListItem, cliTabPane);
+    // FileClientsHelpImpl.setId(pythonTabListItem, pythonTabPane);
+  }
+
+  @Override
+  public void show() {
+    modal.show();
+  }
+
+  @Override
+  public Widget asWidget() {
+    return widget;
+  }
+
+  @Override
+  public void setQuery(String sql) {
+    this.sql = sql;
+    queryElement.setInnerHTML(sql);
+  }
 }

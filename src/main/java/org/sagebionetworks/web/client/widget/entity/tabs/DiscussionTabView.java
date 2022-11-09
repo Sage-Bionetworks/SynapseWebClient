@@ -4,13 +4,11 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 public interface DiscussionTabView extends IsWidget {
+  public interface Presenter {}
 
-	public interface Presenter {
-	}
+  void setPresenter(Presenter presenter);
 
-	void setPresenter(Presenter presenter);
+  void showErrorMessage(String errorMessage);
 
-	void showErrorMessage(String errorMessage);
-
-	void setForum(Widget w);
+  void setForum(Widget w);
 }

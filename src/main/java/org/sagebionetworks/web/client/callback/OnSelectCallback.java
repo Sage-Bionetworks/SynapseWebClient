@@ -1,9 +1,8 @@
 package org.sagebionetworks.web.client.callback;
 
+import com.google.gwt.core.client.JsArray;
 import org.sagebionetworks.web.client.jsni.ReferenceJSNIObject;
 
-import com.google.gwt.core.client.JsArray;
-
 public interface OnSelectCallback {
-	void onSelect(JsArray<ReferenceJSNIObject> selected);
+  void onSelect(JsArray<ReferenceJSNIObject> selected);
 }

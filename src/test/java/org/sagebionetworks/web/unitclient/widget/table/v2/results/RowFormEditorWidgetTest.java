@@ -9,6 +9,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -30,89 +31,96 @@ import org.sagebionetworks.web.unitclient.widget.table.v2.TableModelTestUtils;
 
 /**
  * Unit tests for RowFormEditorWidget business logic.
- * 
+ *
  * @author Jay
  *
  */
 public class RowFormEditorWidgetTest {
-	@Mock
-	AuthenticationController mockAuthController;
-	@Mock
-	RowFormView mockView;
-	@Mock
-	CellFactory mockCellFactory;
 
-	List<ColumnModel> types;
-	List<CellStub> cellStubs;
-	String tableId;
-	RowFormEditorWidget rowWidget;
+  @Mock
+  AuthenticationController mockAuthController;
 
-	public static final String CURRENT_USER_ID = "12984";
+  @Mock
+  RowFormView mockView;
 
-	@Before
-	public void before() {
-		MockitoAnnotations.initMocks(this);
-		cellStubs = new LinkedList<CellStub>();
-		tableId = "syn123";
-		// Use stubs for all cells.
-		Answer<Cell> answer = new Answer<Cell>() {
-			@Override
-			public Cell answer(InvocationOnMock invocation) throws Throwable {
-				CellStub stub = new CellStub();
-				cellStubs.add(stub);
-				return stub;
-			}
-		};
-		when(mockCellFactory.createFormEditor(any(ColumnModel.class))).thenAnswer(answer);
-		types = TableModelTestUtils.createOneOfEachType();
-		rowWidget = new RowFormEditorWidget(mockAuthController, mockView, mockCellFactory);
-		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(CURRENT_USER_ID);
-	}
+  @Mock
+  CellFactory mockCellFactory;
 
-	@Test
-	public void testConfgureEditor() {
-		rowWidget.configure(tableId, types);
-		Row extracted = rowWidget.getRow();
-		assertEquals(types.size(), extracted.getValues().size());
-		verify(mockView, times(types.size())).addCell(anyString(), any(Cell.class));
-	}
+  List<ColumnModel> types;
+  List<CellStub> cellStubs;
+  String tableId;
+  RowFormEditorWidget rowWidget;
 
-	@Test
-	public void testIsValid() {
-		rowWidget.configure(tableId, types);
-		assertTrue(rowWidget.isValid());
-		cellStubs.get(4).setIsValid(false);
-		assertFalse(rowWidget.isValid());
-	}
+  public static final String CURRENT_USER_ID = "12984";
 
-	@Test
-	public void testSubmitterColumns() {
-		// set the date column name to 'submissionTimestamp' and user column to 'submitterUserId'
-		// verify that these column values are automatically filled in when we get the row!
-		int userIdColIndex = -1, timestampColIndex = -1;
-		for (int i = 0; i < types.size(); i++) {
-			ColumnModel cm = types.get(i);
-			if (ColumnType.USERID.equals(cm.getColumnType())) {
-				userIdColIndex = i;
-				cm.setName(RowFormEditorWidget.SUBMITTER_USER_ID_COLUMN_NAME);
-			} else if (ColumnType.DATE.equals(cm.getColumnType())) {
-				timestampColIndex = i;
-				cm.setName(RowFormEditorWidget.SUBMISSION_TIMESTAMP_COLUMN_NAME);
-			}
-		}
+  @Before
+  public void before() {
+    MockitoAnnotations.initMocks(this);
+    cellStubs = new LinkedList<CellStub>();
+    tableId = "syn123";
+    // Use stubs for all cells.
+    Answer<Cell> answer = new Answer<Cell>() {
+      @Override
+      public Cell answer(InvocationOnMock invocation) throws Throwable {
+        CellStub stub = new CellStub();
+        cellStubs.add(stub);
+        return stub;
+      }
+    };
+    when(mockCellFactory.createFormEditor(any(ColumnModel.class)))
+      .thenAnswer(answer);
+    types = TableModelTestUtils.createOneOfEachType();
+    rowWidget =
+      new RowFormEditorWidget(mockAuthController, mockView, mockCellFactory);
+    when(mockAuthController.getCurrentUserPrincipalId())
+      .thenReturn(CURRENT_USER_ID);
+  }
 
-		rowWidget.configure(tableId, types);
+  @Test
+  public void testConfgureEditor() {
+    rowWidget.configure(tableId, types);
+    Row extracted = rowWidget.getRow();
+    assertEquals(types.size(), extracted.getValues().size());
+    verify(mockView, times(types.size())).addCell(anyString(), any(Cell.class));
+  }
 
-		// verify that the special submitter cells were not added to the view.
-		verify(mockView, times(types.size() - 2)).addCell(anyString(), any(Cell.class));
-		Row extracted = rowWidget.getRow();
-		assertEquals(types.size(), extracted.getValues().size());
+  @Test
+  public void testIsValid() {
+    rowWidget.configure(tableId, types);
+    assertTrue(rowWidget.isValid());
+    cellStubs.get(4).setIsValid(false);
+    assertFalse(rowWidget.isValid());
+  }
 
-		String userIdInRow = extracted.getValues().get(userIdColIndex);
-		assertEquals(CURRENT_USER_ID, userIdInRow);
+  @Test
+  public void testSubmitterColumns() {
+    // set the date column name to 'submissionTimestamp' and user column to 'submitterUserId'
+    // verify that these column values are automatically filled in when we get the row!
+    int userIdColIndex = -1, timestampColIndex = -1;
+    for (int i = 0; i < types.size(); i++) {
+      ColumnModel cm = types.get(i);
+      if (ColumnType.USERID.equals(cm.getColumnType())) {
+        userIdColIndex = i;
+        cm.setName(RowFormEditorWidget.SUBMITTER_USER_ID_COLUMN_NAME);
+      } else if (ColumnType.DATE.equals(cm.getColumnType())) {
+        timestampColIndex = i;
+        cm.setName(RowFormEditorWidget.SUBMISSION_TIMESTAMP_COLUMN_NAME);
+      }
+    }
 
-		String timestamp = extracted.getValues().get(timestampColIndex);
-		assertNotNull(timestamp);
-		new Date(Long.parseLong(timestamp));
-	}
+    rowWidget.configure(tableId, types);
+
+    // verify that the special submitter cells were not added to the view.
+    verify(mockView, times(types.size() - 2))
+      .addCell(anyString(), any(Cell.class));
+    Row extracted = rowWidget.getRow();
+    assertEquals(types.size(), extracted.getValues().size());
+
+    String userIdInRow = extracted.getValues().get(userIdColIndex);
+    assertEquals(CURRENT_USER_ID, userIdInRow);
+
+    String timestamp = extracted.getValues().get(timestampColIndex);
+    assertNotNull(timestamp);
+    new Date(Long.parseLong(timestamp));
+  }
 }

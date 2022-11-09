@@ -7,6 +7,9 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
+
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,96 +23,119 @@ import org.sagebionetworks.web.client.widget.asynch.VersionedEntityHeaderAsyncHa
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class EntityIdCellRendererImplTest {
 
-	EntityIdCellRenderer renderer;
-	@Mock
-	EntityIdCellRendererView mockView;
-	@Mock
-	EntityHeaderAsyncHandler mockEntityHeaderAsyncHandler;
-	@Mock
-	VersionedEntityHeaderAsyncHandler mockVersionedEntityHeaderAsyncHandler;
-	@Mock
-	EntityHeader mockProjectHeader;
-	@Mock
-	ClickHandler mockClickHandler;
-	@Mock
-	SynapseJSNIUtils mockJSNIUtils;
-	private static final String PROJECT_NAME = "Project Win";
+  EntityIdCellRenderer renderer;
 
-	@Before
-	public void before() {
-		MockitoAnnotations.initMocks(this);
-		renderer = new EntityIdCellRenderer(mockView, mockEntityHeaderAsyncHandler, mockVersionedEntityHeaderAsyncHandler, mockJSNIUtils);
-		AsyncMockStubber.callSuccessWith(mockProjectHeader).when(mockEntityHeaderAsyncHandler).getEntityHeader(anyString(), any(AsyncCallback.class));
-		when(mockProjectHeader.getName()).thenReturn(PROJECT_NAME);
-	}
+  @Mock
+  EntityIdCellRendererView mockView;
 
-	@Test
-	public void testAsWidget() {
-		renderer.asWidget();
-		verify(mockView).asWidget();
-	}
+  @Mock
+  EntityHeaderAsyncHandler mockEntityHeaderAsyncHandler;
 
-	@Test
-	public void testSetValue() {
-		String entityId = "987654";
-		renderer.setValue(entityId);
+  @Mock
+  VersionedEntityHeaderAsyncHandler mockVersionedEntityHeaderAsyncHandler;
 
-		verify(mockView).showLoadingIcon();
-		verify(mockEntityHeaderAsyncHandler).getEntityHeader(anyString(), any(AsyncCallback.class));
-		verify(mockView).setEntityType(any(EntityType.class));
-		verify(mockView).setLinkText(PROJECT_NAME);
-		verify(mockView).setEntityId("syn" + entityId);
-		verify(mockView, never()).setClickHandler(any(ClickHandler.class));
+  @Mock
+  EntityHeader mockProjectHeader;
 
-		// verify that attempting to load data again is a no-op
-		reset(mockEntityHeaderAsyncHandler);
-		renderer.loadData();
-		verifyZeroInteractions(mockEntityHeaderAsyncHandler);
-	}
+  @Mock
+  ClickHandler mockClickHandler;
 
-	@Test
-	public void testSetValueAndCallback() {
-		String entityId = "987654";
-		renderer.setValue(entityId, mockClickHandler, true);
-		verify(mockView).showLoadingIcon();
-		verify(mockView).setEntityId("syn" + entityId);
-		verify(mockView).setClickHandler(mockClickHandler);
+  @Mock
+  SynapseJSNIUtils mockJSNIUtils;
 
-		// verify that attempting to load data again is a no-op
-		reset(mockEntityHeaderAsyncHandler);
-		renderer.loadData();
-		verifyZeroInteractions(mockEntityHeaderAsyncHandler);
-	}
+  private static final String PROJECT_NAME = "Project Win";
 
-	@Test
-	public void testSetValueRpcFailure() {
-		String errorMessage = "error";
-		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockEntityHeaderAsyncHandler).getEntityHeader(anyString(), any(AsyncCallback.class));
-		String entityId = "syn987654";
-		renderer.setValue(entityId);
+  @Before
+  public void before() {
+    MockitoAnnotations.initMocks(this);
+    renderer =
+      new EntityIdCellRenderer(
+        mockView,
+        mockEntityHeaderAsyncHandler,
+        mockVersionedEntityHeaderAsyncHandler,
+        mockJSNIUtils
+      );
+    AsyncMockStubber
+      .callSuccessWith(mockProjectHeader)
+      .when(mockEntityHeaderAsyncHandler)
+      .getEntityHeader(anyString(), any(AsyncCallback.class));
+    when(mockProjectHeader.getName()).thenReturn(PROJECT_NAME);
+  }
 
-		verify(mockView).showLoadingIcon();
-		verify(mockEntityHeaderAsyncHandler).getEntityHeader(anyString(), any(AsyncCallback.class));
-		verify(mockView).showErrorIcon(errorMessage);
-		verify(mockView).setLinkText(entityId);
-	}
+  @Test
+  public void testAsWidget() {
+    renderer.asWidget();
+    verify(mockView).asWidget();
+  }
 
-	@Test
-	public void testSetValueRpcFailureHideIfLoadError() {
-		String errorMessage = "error";
-		boolean hideIfLoadError = true;
-		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockEntityHeaderAsyncHandler).getEntityHeader(anyString(), any(AsyncCallback.class));
-		String entityId = "syn987654";
-		renderer.setValue(entityId, hideIfLoadError);
+  @Test
+  public void testSetValue() {
+    String entityId = "987654";
+    renderer.setValue(entityId);
 
-		verify(mockView).showLoadingIcon();
-		verify(mockEntityHeaderAsyncHandler).getEntityHeader(anyString(), any(AsyncCallback.class));
-		verify(mockJSNIUtils).consoleError(errorMessage);
-		verify(mockView).setVisible(false);
-	}
+    verify(mockView).showLoadingIcon();
+    verify(mockEntityHeaderAsyncHandler)
+      .getEntityHeader(anyString(), any(AsyncCallback.class));
+    verify(mockView).setEntityType(any(EntityType.class));
+    verify(mockView).setLinkText(PROJECT_NAME);
+    verify(mockView).setEntityId("syn" + entityId);
+    verify(mockView, never()).setClickHandler(any(ClickHandler.class));
+
+    // verify that attempting to load data again is a no-op
+    reset(mockEntityHeaderAsyncHandler);
+    renderer.loadData();
+    verifyZeroInteractions(mockEntityHeaderAsyncHandler);
+  }
+
+  @Test
+  public void testSetValueAndCallback() {
+    String entityId = "987654";
+    renderer.setValue(entityId, mockClickHandler, true);
+    verify(mockView).showLoadingIcon();
+    verify(mockView).setEntityId("syn" + entityId);
+    verify(mockView).setClickHandler(mockClickHandler);
+
+    // verify that attempting to load data again is a no-op
+    reset(mockEntityHeaderAsyncHandler);
+    renderer.loadData();
+    verifyZeroInteractions(mockEntityHeaderAsyncHandler);
+  }
+
+  @Test
+  public void testSetValueRpcFailure() {
+    String errorMessage = "error";
+    AsyncMockStubber
+      .callFailureWith(new Exception(errorMessage))
+      .when(mockEntityHeaderAsyncHandler)
+      .getEntityHeader(anyString(), any(AsyncCallback.class));
+    String entityId = "syn987654";
+    renderer.setValue(entityId);
+
+    verify(mockView).showLoadingIcon();
+    verify(mockEntityHeaderAsyncHandler)
+      .getEntityHeader(anyString(), any(AsyncCallback.class));
+    verify(mockView).showErrorIcon(errorMessage);
+    verify(mockView).setLinkText(entityId);
+  }
+
+  @Test
+  public void testSetValueRpcFailureHideIfLoadError() {
+    String errorMessage = "error";
+    boolean hideIfLoadError = true;
+    AsyncMockStubber
+      .callFailureWith(new Exception(errorMessage))
+      .when(mockEntityHeaderAsyncHandler)
+      .getEntityHeader(anyString(), any(AsyncCallback.class));
+    String entityId = "syn987654";
+    renderer.setValue(entityId, hideIfLoadError);
+
+    verify(mockView).showLoadingIcon();
+    verify(mockEntityHeaderAsyncHandler)
+      .getEntityHeader(anyString(), any(AsyncCallback.class));
+    verify(mockJSNIUtils).consoleError(errorMessage);
+    verify(mockView).setVisible(false);
+  }
 }

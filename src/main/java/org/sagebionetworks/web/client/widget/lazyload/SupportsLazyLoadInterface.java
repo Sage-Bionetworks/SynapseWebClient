@@ -3,9 +3,9 @@ package org.sagebionetworks.web.client.widget.lazyload;
 import org.sagebionetworks.web.client.utils.Callback;
 
 public interface SupportsLazyLoadInterface {
-	boolean isInViewport();
+  boolean isInViewport();
 
-	boolean isAttached();
+  boolean isAttached();
 
-	void setOnAttachCallback(Callback onAttachCallback);
+  void setOnAttachCallback(Callback onAttachCallback);
 }

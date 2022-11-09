@@ -1,78 +1,77 @@
 package org.sagebionetworks.web.client.view;
 
-import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.repo.model.TeamMembershipStatus;
-import org.sagebionetworks.web.client.SynapseView;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.TeamMembershipStatus;
+import org.sagebionetworks.web.client.SynapseView;
 
 public interface TeamView extends IsWidget, SynapseView {
+  /**
+   * Set this view's presenter
+   *
+   * @param presenter
+   */
+  void setPresenter(Presenter presenter);
 
-	/**
-	 * Set this view's presenter
-	 * 
-	 * @param presenter
-	 */
-	void setPresenter(Presenter presenter);
+  public interface Presenter {
+    void goTo(Place place);
 
-	public interface Presenter {
-		void goTo(Place place);
+    void refresh(String teamId);
 
-		void refresh(String teamId);
+    void showEditModal();
 
-		void showEditModal();
+    void showDeleteModal();
 
-		void showDeleteModal();
+    void showLeaveModal();
 
-		void showLeaveModal();
+    void showInviteModal();
 
-		void showInviteModal();
+    void clear();
 
-		void clear();
+    void onShowMap();
 
-		void onShowMap();
+    void onManageAccess();
 
-		void onManageAccess();
+    void onMemberSearch(String searchTerm);
 
-		void onMemberSearch(String searchTerm);
+    void showTeamProjectsModal();
+  }
 
-		void showTeamProjectsModal();
-	}
+  void setSynAlertWidget(Widget asWidget);
 
-	void setSynAlertWidget(Widget asWidget);
+  void setInviteMemberWidget(Widget inviteWidget);
 
-	void setInviteMemberWidget(Widget inviteWidget);
+  void setJoinTeamWidget(Widget asWidget);
 
-	void setJoinTeamWidget(Widget asWidget);
+  void showMemberMenuItems();
 
-	void showMemberMenuItems();
+  void showAdminMenuItems();
 
-	void showAdminMenuItems();
+  void setOpenMembershipRequestWidget(Widget asWidget);
 
-	void setOpenMembershipRequestWidget(Widget asWidget);
+  void setOpenUserInvitationsWidget(Widget asWidget);
 
-	void setOpenUserInvitationsWidget(Widget asWidget);
+  void setManagerListWidget(Widget asWidget);
 
-	void setManagerListWidget(Widget asWidget);
+  void setMemberListWidget(Widget asWidget);
 
-	void setMemberListWidget(Widget asWidget);
+  void setPublicJoinVisible(Boolean canPublicJoin);
 
-	void setPublicJoinVisible(Boolean canPublicJoin);
+  void setTeam(Team team, TeamMembershipStatus status);
 
-	void setTeam(Team team, TeamMembershipStatus status);
+  void setMap(Widget w);
 
-	void setMap(Widget w);
+  void showMapModal();
 
-	void showMapModal();
+  void setShowMapVisible(boolean visible);
 
-	void setShowMapVisible(boolean visible);
+  void setManageAccessVisible(boolean visible);
 
-	void setManageAccessVisible(boolean visible);
+  void setCommandsVisible(boolean visible);
 
-	void setCommandsVisible(boolean visible);
+  int getClientHeight();
 
-	int getClientHeight();
-
-	void addWidgets(Widget... widgets);
+  void addWidgets(Widget... widgets);
 }

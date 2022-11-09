@@ -1,54 +1,52 @@
 package org.sagebionetworks.web.client.widget.doi;
 
 import com.google.gwt.user.client.ui.IsWidget;
+import java.util.List;
+import java.util.Optional;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.VersionInfo;
 
-import java.util.List;
-import java.util.Optional;
-
 public interface CreateOrUpdateDoiModalView extends IsWidget {
+  void setPresenter(Presenter presenter);
 
-	void setPresenter(Presenter presenter);
+  interface Presenter {
+    void onSaveDoi();
+    void onVersionChange(Optional<Long> version);
+  }
 
-	interface Presenter {
-		void onSaveDoi();
-		void onVersionChange(Optional<Long> version);
-	}
+  String getCreators();
 
-	String getCreators();
+  void setCreators(String creators);
 
-	void setCreators(String creators);
+  String getTitles();
 
-	String getTitles();
+  void setTitles(String titles);
 
-	void setTitles(String titles);
+  String getResourceTypeGeneral();
 
-	String getResourceTypeGeneral();
+  void setResourceTypeGeneral(String resourceTypeGeneral);
 
-	void setResourceTypeGeneral(String resourceTypeGeneral);
+  Long getPublicationYear();
 
-	Long getPublicationYear();
+  void setPublicationYear(Long publicationYear);
 
-	void setPublicationYear(Long publicationYear);
+  void setOverwriteWarningVisible(boolean visible);
 
-	void setOverwriteWarningVisible(boolean visible);
+  void show();
 
-	void show();
+  void hide();
 
-	void hide();
+  void setModalTitle(String title);
 
-	void setModalTitle(String title);
+  void setJobTrackingWidget(IsWidget w);
 
-	void setJobTrackingWidget(IsWidget w);
+  void setSynAlert(IsWidget w);
 
-	void setSynAlert(IsWidget w);
+  void reset();
 
-	void reset();
+  void setIsLoading(boolean isLoading);
 
-	void setIsLoading(boolean isLoading);
+  void setVersions(List<VersionInfo> versions, Optional<Long> selectedVersion);
 
-	void setVersions(List<VersionInfo> versions, Optional<Long> selectedVersion);
-
-	void setEntity(Entity entityType);
+  void setEntity(Entity entityType);
 }

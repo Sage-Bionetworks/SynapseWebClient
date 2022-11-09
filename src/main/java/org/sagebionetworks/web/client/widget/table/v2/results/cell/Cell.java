@@ -5,11 +5,8 @@ import com.google.gwt.user.client.ui.IsWidget;
 
 /**
  * A widget that represents a single cell.
- * 
+ *
  * @author jmhill
  *
  */
-public interface Cell extends IsWidget, TakesValue<String> {
-
-
-}
+public interface Cell extends IsWidget, TakesValue<String> {}

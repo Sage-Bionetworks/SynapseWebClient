@@ -8,17 +8,17 @@ import jsinterop.annotations.JsType;
 @JsType(isNative = true, namespace = JsPackage.GLOBAL, name = "Object")
 public class TermsAndConditionsProps extends ReactComponentProps {
 
-	@JsFunction
-	public interface Callback {
-		void onFormChange(boolean formComplete);
-	}
+  @JsFunction
+  public interface Callback {
+    void onFormChange(boolean formComplete);
+  }
 
-	Callback onFormChange;
+  Callback onFormChange;
 
-	@JsOverlay
-	public static TermsAndConditionsProps create(Callback onFormChange) {
-		TermsAndConditionsProps props = new TermsAndConditionsProps();
-		props.onFormChange = onFormChange;
-		return props;
-	}
+  @JsOverlay
+  public static TermsAndConditionsProps create(Callback onFormChange) {
+    TermsAndConditionsProps props = new TermsAndConditionsProps();
+    props.onFormChange = onFormChange;
+    return props;
+  }
 }

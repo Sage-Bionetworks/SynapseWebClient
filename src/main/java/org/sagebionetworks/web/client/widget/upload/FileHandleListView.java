@@ -1,33 +1,32 @@
 package org.sagebionetworks.web.client.widget.upload;
 
-import java.util.List;
-import org.sagebionetworks.web.client.widget.CheckBoxState;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import java.util.List;
+import org.sagebionetworks.web.client.widget.CheckBoxState;
 
 public interface FileHandleListView extends IsWidget {
+  public interface Presenter {
+    List<String> getFileHandleIds();
 
-	public interface Presenter {
-		List<String> getFileHandleIds();
+    void deleteSelected();
 
-		void deleteSelected();
+    void selectNone();
 
-		void selectNone();
+    void selectAll();
+  }
 
-		void selectAll();
-	}
+  void setPresenter(Presenter presenter);
 
-	void setPresenter(Presenter presenter);
+  void setToolbarVisible(boolean visible);
 
-	void setToolbarVisible(boolean visible);
+  void setUploadWidget(Widget widget);
 
-	void setUploadWidget(Widget widget);
+  void setUploadWidgetVisible(boolean visible);
 
-	void setUploadWidgetVisible(boolean visible);
+  void addFileLink(Widget fileLinkWidget);
 
-	void addFileLink(Widget fileLinkWidget);
+  void clearFileLinks();
 
-	void clearFileLinks();
-
-	void setCanDelete(boolean canDelete);
+  void setCanDelete(boolean canDelete);
 }

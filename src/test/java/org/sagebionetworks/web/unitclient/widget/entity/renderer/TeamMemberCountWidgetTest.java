@@ -4,6 +4,8 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.Before;
@@ -20,63 +22,92 @@ import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class TeamMemberCountWidgetTest {
 
-	@Mock
-	TeamMemberCountView mockView;
-	@Mock
-	SynapseClientAsync mockSynapseClient;
-	@Mock
-	SynapseAlert mockSynAlert;
-	TeamMemberCountWidget widget;
-	Map<String, String> descriptor;
-	public static final String TEAM_ID = "121111";
-	public static final Long TOTAL_COUNT = 44L;
+  @Mock
+  TeamMemberCountView mockView;
 
-	@Before
-	public void before() throws RestServiceException, JSONObjectAdapterException {
-		MockitoAnnotations.initMocks(this);
-		mockView = mock(TeamMemberCountView.class);
-		widget = new TeamMemberCountWidget(mockView, mockSynapseClient, mockSynAlert);
-		descriptor = new HashMap<String, String>();
-		descriptor.put(WidgetConstants.TEAM_ID_KEY, TEAM_ID);
+  @Mock
+  SynapseClientAsync mockSynapseClient;
 
-		AsyncMockStubber.callSuccessWith(TOTAL_COUNT).when(mockSynapseClient).getTeamMemberCount(anyString(), any(AsyncCallback.class));
-	}
+  @Mock
+  SynapseAlert mockSynAlert;
 
-	@Test
-	public void testHappyCaseConfigure() throws Exception {
-		widget.configure(new WikiPageKey("syn123", ObjectType.ENTITY.toString(), null), descriptor, null, null);
-		verify(mockSynAlert).clear();
-		verify(mockSynapseClient).getTeamMemberCount(anyString(), any(AsyncCallback.class));
-		verify(mockView).setCount(TOTAL_COUNT.toString());
-	}
+  TeamMemberCountWidget widget;
+  Map<String, String> descriptor;
+  public static final String TEAM_ID = "121111";
+  public static final Long TOTAL_COUNT = 44L;
 
+  @Before
+  public void before() throws RestServiceException, JSONObjectAdapterException {
+    MockitoAnnotations.initMocks(this);
+    mockView = mock(TeamMemberCountView.class);
+    widget =
+      new TeamMemberCountWidget(mockView, mockSynapseClient, mockSynAlert);
+    descriptor = new HashMap<String, String>();
+    descriptor.put(WidgetConstants.TEAM_ID_KEY, TEAM_ID);
 
-	@Test
-	public void testHappyCaseNoParticipants() throws Exception {
-		AsyncMockStubber.callSuccessWith(0L).when(mockSynapseClient).getTeamMemberCount(anyString(), any(AsyncCallback.class));
-		widget.configure(new WikiPageKey("syn123", ObjectType.ENTITY.toString(), null), descriptor, null, null);
-		verify(mockSynAlert).clear();
-		verify(mockSynapseClient).getTeamMemberCount(anyString(), any(AsyncCallback.class));
-		verify(mockView).setCount("0");
-	}
+    AsyncMockStubber
+      .callSuccessWith(TOTAL_COUNT)
+      .when(mockSynapseClient)
+      .getTeamMemberCount(anyString(), any(AsyncCallback.class));
+  }
 
-	@Test
-	public void testGetChallengeTeamsFailure() throws Exception {
-		Exception ex = new Exception("unhandled");
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getTeamMemberCount(anyString(), any(AsyncCallback.class));
-		widget.configure(new WikiPageKey("syn123", ObjectType.ENTITY.toString(), null), descriptor, null, null);
-		verify(mockSynAlert).clear();
-		verify(mockSynapseClient).getTeamMemberCount(anyString(), any(AsyncCallback.class));
-		verify(mockSynAlert).handleException(ex);
-	}
+  @Test
+  public void testHappyCaseConfigure() throws Exception {
+    widget.configure(
+      new WikiPageKey("syn123", ObjectType.ENTITY.toString(), null),
+      descriptor,
+      null,
+      null
+    );
+    verify(mockSynAlert).clear();
+    verify(mockSynapseClient)
+      .getTeamMemberCount(anyString(), any(AsyncCallback.class));
+    verify(mockView).setCount(TOTAL_COUNT.toString());
+  }
 
-	@Test
-	public void testAsWidget() {
-		widget.asWidget();
-		verify(mockView).asWidget();
-	}
+  @Test
+  public void testHappyCaseNoParticipants() throws Exception {
+    AsyncMockStubber
+      .callSuccessWith(0L)
+      .when(mockSynapseClient)
+      .getTeamMemberCount(anyString(), any(AsyncCallback.class));
+    widget.configure(
+      new WikiPageKey("syn123", ObjectType.ENTITY.toString(), null),
+      descriptor,
+      null,
+      null
+    );
+    verify(mockSynAlert).clear();
+    verify(mockSynapseClient)
+      .getTeamMemberCount(anyString(), any(AsyncCallback.class));
+    verify(mockView).setCount("0");
+  }
+
+  @Test
+  public void testGetChallengeTeamsFailure() throws Exception {
+    Exception ex = new Exception("unhandled");
+    AsyncMockStubber
+      .callFailureWith(ex)
+      .when(mockSynapseClient)
+      .getTeamMemberCount(anyString(), any(AsyncCallback.class));
+    widget.configure(
+      new WikiPageKey("syn123", ObjectType.ENTITY.toString(), null),
+      descriptor,
+      null,
+      null
+    );
+    verify(mockSynAlert).clear();
+    verify(mockSynapseClient)
+      .getTeamMemberCount(anyString(), any(AsyncCallback.class));
+    verify(mockSynAlert).handleException(ex);
+  }
+
+  @Test
+  public void testAsWidget() {
+    widget.asWidget();
+    verify(mockView).asWidget();
+  }
 }

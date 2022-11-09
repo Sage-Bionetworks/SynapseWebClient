@@ -1,93 +1,108 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
-	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
-
-	<bh:Div addStyleNames="margin-top-left-10">
-		<b:FieldSet>
-			<b:FormGroup>
-				<b:FormLabel>Plot Type</b:FormLabel>
-				<bh:Div>
-					<b:ButtonGroup>
-						<b:ListBox ui:field="typeDropdownMenu" width="350px"/>
-					</b:ButtonGroup>
-				</bh:Div>
-			</b:FormGroup>
-			<b:FormGroup ui:field="barChartModeUI">
-				<b:FormLabel>Bar Chart Mode</b:FormLabel>
-				<bh:Div>
-					<b:ButtonGroup>
-						<b:ListBox ui:field="barModeDropdownMenu" width="350px"/>
-					</b:ButtonGroup>
-				</bh:Div>
-			</b:FormGroup>
-			<b:FormGroup>
-				<b:FormLabel>Title</b:FormLabel>
-				<b:TextBox ui:field="titleField" />
-			</b:FormGroup>
-			<!-- The xaxis and yaxis layout params are not being respected in the renderer, so hiding input for now -->
-			<b:FormGroup>
-				<b:FormLabel>X-Axis Label</b:FormLabel>
-				<b:TextBox ui:field="xAxisLabel" />
-			</b:FormGroup>
-			<b:FormGroup>
-				<b:FormLabel>X-Axis Type</b:FormLabel>
-				<b:ListBox ui:field="xAxisTypeDropdownMenu" width="350px"/>
-			</b:FormGroup>
-			<b:FormGroup>
-				<b:FormLabel>Y-Axis Label</b:FormLabel>
-				<b:TextBox ui:field="yAxisLabel" />
-			</b:FormGroup>
-			<b:FormGroup>
-				<b:FormLabel>Y-Axis Type</b:FormLabel>
-				<b:ListBox ui:field="yAxisTypeDropdownMenu" width="350px"/>
-			</b:FormGroup>
-			<b:FormGroup>
-				<b:FormLabel>Table/View</b:FormLabel>
-				<b:InputGroup width="350px">
-					<b:TextBox placeholder="Select a Synapse Table/View" autoComplete="false" ui:field="tableViewSynId" enabled="false" />
-					<b:InputGroupButton>
-						<b:Button ui:field="entityPickerButton" icon="SEARCH" text="" height="35px"/>
-					</b:InputGroupButton>
-				</b:InputGroup>
-			</b:FormGroup>
-			<b:FormGroup>
-				<b:FormLabel>Select X Data Column</b:FormLabel>
-				<b:InputGroup>
-				<bh:Div>
-					<b:ButtonGroup>
-						<b:ListBox ui:field="xColumnNamesMenu" width="350px"/>
-					</b:ButtonGroup>
-				</bh:Div>
-
-				</b:InputGroup>
-			</b:FormGroup>
-			<b:FormGroup>
-				<b:FormLabel>Select Y Data Column(s)</b:FormLabel>
-				<b:InputGroup>
-					<bh:Div ui:field="yAxisColumnsContainer"/>
-					<bh:Div>
-						<b:ButtonGroup>
-							<b:ListBox ui:field="yColumnNamesMenu" width="350px"/>
-						</b:ButtonGroup>
-					</bh:Div>
-				</b:InputGroup>
-			</b:FormGroup>
-			<b:FormGroup>
-				<b:FormLabel>Options</b:FormLabel>
-				<b:CheckBox ui:field="showLegendCb" text="Show legend"/>
-				<b:CheckBox ui:field="isHorizontalBarCb" text="Horizontal bar chart"/>
-			</b:FormGroup>
-			<bh:Div ui:field="showHideAdvancedButtonContainer" />
-			<bh:Div ui:field="advancedUI" visible="false" addStyleNames="margin-top-10">
-				<b:FormGroup>
-					<b:FormLabel>WHERE Clause</b:FormLabel>
-					<b:TextBox placeholder="where x>2" ui:field="advancedClause" />
-				</b:FormGroup>
-			</bh:Div>
-		</b:FieldSet>
-		<bh:Div ui:field="synAlertContainer" />
-		<bh:Div ui:field="extraWidgets"/>
-	</bh:Div>
-
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder
+  xmlns:ui="urn:ui:com.google.gwt.uibinder"
+  xmlns:g="urn:import:com.google.gwt.user.client.ui"
+  xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
+  xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+>
+  <bh:Div addStyleNames="margin-top-left-10">
+    <b:FieldSet>
+      <b:FormGroup>
+        <b:FormLabel>Plot Type</b:FormLabel>
+        <bh:Div>
+          <b:ButtonGroup>
+            <b:ListBox ui:field="typeDropdownMenu" width="350px" />
+          </b:ButtonGroup>
+        </bh:Div>
+      </b:FormGroup>
+      <b:FormGroup ui:field="barChartModeUI">
+        <b:FormLabel>Bar Chart Mode</b:FormLabel>
+        <bh:Div>
+          <b:ButtonGroup>
+            <b:ListBox ui:field="barModeDropdownMenu" width="350px" />
+          </b:ButtonGroup>
+        </bh:Div>
+      </b:FormGroup>
+      <b:FormGroup>
+        <b:FormLabel>Title</b:FormLabel>
+        <b:TextBox ui:field="titleField" />
+      </b:FormGroup>
+      <!-- The xaxis and yaxis layout params are not being respected in the renderer, so hiding input for now -->
+      <b:FormGroup>
+        <b:FormLabel>X-Axis Label</b:FormLabel>
+        <b:TextBox ui:field="xAxisLabel" />
+      </b:FormGroup>
+      <b:FormGroup>
+        <b:FormLabel>X-Axis Type</b:FormLabel>
+        <b:ListBox ui:field="xAxisTypeDropdownMenu" width="350px" />
+      </b:FormGroup>
+      <b:FormGroup>
+        <b:FormLabel>Y-Axis Label</b:FormLabel>
+        <b:TextBox ui:field="yAxisLabel" />
+      </b:FormGroup>
+      <b:FormGroup>
+        <b:FormLabel>Y-Axis Type</b:FormLabel>
+        <b:ListBox ui:field="yAxisTypeDropdownMenu" width="350px" />
+      </b:FormGroup>
+      <b:FormGroup>
+        <b:FormLabel>Table/View</b:FormLabel>
+        <b:InputGroup width="350px">
+          <b:TextBox
+            placeholder="Select a Synapse Table/View"
+            autoComplete="false"
+            ui:field="tableViewSynId"
+            enabled="false"
+          />
+          <b:InputGroupButton>
+            <b:Button
+              ui:field="entityPickerButton"
+              icon="SEARCH"
+              text=""
+              height="35px"
+            />
+          </b:InputGroupButton>
+        </b:InputGroup>
+      </b:FormGroup>
+      <b:FormGroup>
+        <b:FormLabel>Select X Data Column</b:FormLabel>
+        <b:InputGroup>
+          <bh:Div>
+            <b:ButtonGroup>
+              <b:ListBox ui:field="xColumnNamesMenu" width="350px" />
+            </b:ButtonGroup>
+          </bh:Div>
+        </b:InputGroup>
+      </b:FormGroup>
+      <b:FormGroup>
+        <b:FormLabel>Select Y Data Column(s)</b:FormLabel>
+        <b:InputGroup>
+          <bh:Div ui:field="yAxisColumnsContainer" />
+          <bh:Div>
+            <b:ButtonGroup>
+              <b:ListBox ui:field="yColumnNamesMenu" width="350px" />
+            </b:ButtonGroup>
+          </bh:Div>
+        </b:InputGroup>
+      </b:FormGroup>
+      <b:FormGroup>
+        <b:FormLabel>Options</b:FormLabel>
+        <b:CheckBox ui:field="showLegendCb" text="Show legend" />
+        <b:CheckBox ui:field="isHorizontalBarCb" text="Horizontal bar chart" />
+      </b:FormGroup>
+      <bh:Div ui:field="showHideAdvancedButtonContainer" />
+      <bh:Div
+        ui:field="advancedUI"
+        visible="false"
+        addStyleNames="margin-top-10"
+      >
+        <b:FormGroup>
+          <b:FormLabel>WHERE Clause</b:FormLabel>
+          <b:TextBox placeholder="where x>2" ui:field="advancedClause" />
+        </b:FormGroup>
+      </bh:Div>
+    </b:FieldSet>
+    <bh:Div ui:field="synAlertContainer" />
+    <bh:Div ui:field="extraWidgets" />
+  </bh:Div>
 </ui:UiBinder>

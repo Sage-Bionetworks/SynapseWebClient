@@ -1,5 +1,9 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.TabListItem;
@@ -11,176 +15,198 @@ import org.sagebionetworks.web.client.jsinterop.EntityFinderScope;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidget;
 
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
-
 public class VideoConfigViewImpl implements VideoConfigView {
-	public interface VideoConfigViewImplUiBinder extends UiBinder<Widget, VideoConfigViewImpl> {
-	}
 
-	private Presenter presenter;
-	@UiField
-	TextBox entity;
-	@UiField
-	Button button;
-	@UiField
-	Heading videoFormatWarning;
-	EntityFinderWidget entityFinder;
-	@UiField
-	TabListItem synapseTabListItem;
-	@UiField
-	TabListItem youtubeTabListItem;
-	@UiField
-	TabListItem vimeoTabListItem;
-	@UiField
-	TabPane tab1;
-	@UiField
-	TabPane tab2;
-	@UiField
-	TabPane tab3;
+  public interface VideoConfigViewImplUiBinder
+    extends UiBinder<Widget, VideoConfigViewImpl> {}
 
-	@UiField
-	TextBox youtubeUrlField;
-	@UiField
-	TextBox vimeoUrlField;
-	Widget widget;
+  private Presenter presenter;
 
-	@Inject
-	public VideoConfigViewImpl(VideoConfigViewImplUiBinder binder, EntityFinderWidget.Builder entityFinderBuilder) {
-		widget = binder.createAndBindUi(this);
-		this.entityFinder = entityFinderBuilder
-				.setModalTitle("Find Video File")
-				.setHelpMarkdown("Search or Browse Synapse to find a Video to insert into this Wiki")
-				.setPromptCopy("Find Video File to insert into this Wiki")
-				.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
-				.setInitialContainer(EntityFinderWidget.InitialContainer.PROJECT)
-				.setMultiSelect(false)
-				.setSelectableTypes(EntityFilter.FILE)
-				.setVersionSelection(EntityFinderWidget.VersionSelection.TRACKED)
-				.setSelectedHandler(((selected, finder) -> presenter.validateSelection(selected)))
-				.build();
-		button.addClickHandler(event -> entityFinder.show());
-	}
+  @UiField
+  TextBox entity;
 
-	@Override
-	public void initView() {
-		youtubeUrlField.setValue("");
-		vimeoUrlField.setValue("");
-	}
+  @UiField
+  Button button;
 
-	@Override
-	public void hideFinder() {
-		entityFinder.hide();
-	}
+  @UiField
+  Heading videoFormatWarning;
 
-	@Override
-	public void checkParams() throws IllegalArgumentException {
-		if ((isSynapseEntity() && entity.getValue().trim().isEmpty()) || (isYouTubeVideo() && youtubeUrlField.getValue().trim().isEmpty()) || (isVimeoVideo() && vimeoUrlField.getValue().trim().isEmpty())) {
-			throw new IllegalArgumentException(DisplayConstants.ERROR_SELECT_VIDEO_FILE);
-		}
-	}
+  EntityFinderWidget entityFinder;
 
-	@Override
-	public Widget asWidget() {
-		return widget;
-	}
+  @UiField
+  TabListItem synapseTabListItem;
 
-	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-	}
+  @UiField
+  TabListItem youtubeTabListItem;
 
-	@Override
-	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
-	}
+  @UiField
+  TabListItem vimeoTabListItem;
 
-	@Override
-	public void showLoading() {}
+  @UiField
+  TabPane tab1;
 
-	@Override
-	public void showInfo(String message) {
-		DisplayUtils.showInfo(message);
-	}
+  @UiField
+  TabPane tab2;
 
-	@Override
-	public String getEntity() {
-		return entity.getValue();
-	}
+  @UiField
+  TabPane tab3;
 
-	@Override
-	public void setEntity(String entityString) {
-		entity.setValue(entityString);
-	}
+  @UiField
+  TextBox youtubeUrlField;
 
-	@Override
-	public void clear() {
-		entity.setValue("");
-		setVideoFormatWarningVisible(false);
-	}
+  @UiField
+  TextBox vimeoUrlField;
 
-	@Override
-	public void setVideoFormatWarningVisible(boolean visible) {
-		videoFormatWarning.setVisible(visible);
-	}
+  Widget widget;
 
-	@Override
-	public void showFinderError(String error) {
-		entityFinder.showError(error);
-	}
+  @Inject
+  public VideoConfigViewImpl(
+    VideoConfigViewImplUiBinder binder,
+    EntityFinderWidget.Builder entityFinderBuilder
+  ) {
+    widget = binder.createAndBindUi(this);
+    this.entityFinder =
+      entityFinderBuilder
+        .setModalTitle("Find Video File")
+        .setHelpMarkdown(
+          "Search or Browse Synapse to find a Video to insert into this Wiki"
+        )
+        .setPromptCopy("Find Video File to insert into this Wiki")
+        .setInitialScope(EntityFinderScope.CURRENT_PROJECT)
+        .setInitialContainer(EntityFinderWidget.InitialContainer.PROJECT)
+        .setMultiSelect(false)
+        .setSelectableTypes(EntityFilter.FILE)
+        .setVersionSelection(EntityFinderWidget.VersionSelection.TRACKED)
+        .setSelectedHandler(
+          ((selected, finder) -> presenter.validateSelection(selected))
+        )
+        .build();
+    button.addClickHandler(event -> entityFinder.show());
+  }
 
-	@Override
-	public String getVimeoVideoUrl() {
-		return vimeoUrlField.getValue();
-	}
+  @Override
+  public void initView() {
+    youtubeUrlField.setValue("");
+    vimeoUrlField.setValue("");
+  }
 
-	@Override
-	public String getYouTubeVideoUrl() {
-		return youtubeUrlField.getValue();
-	}
+  @Override
+  public void hideFinder() {
+    entityFinder.hide();
+  }
 
-	@Override
-	public boolean isSynapseEntity() {
-		return synapseTabListItem.isActive();
-	}
+  @Override
+  public void checkParams() throws IllegalArgumentException {
+    if (
+      (isSynapseEntity() && entity.getValue().trim().isEmpty()) ||
+      (isYouTubeVideo() && youtubeUrlField.getValue().trim().isEmpty()) ||
+      (isVimeoVideo() && vimeoUrlField.getValue().trim().isEmpty())
+    ) {
+      throw new IllegalArgumentException(
+        DisplayConstants.ERROR_SELECT_VIDEO_FILE
+      );
+    }
+  }
 
-	@Override
-	public boolean isVimeoVideo() {
-		return vimeoTabListItem.isActive();
-	}
+  @Override
+  public Widget asWidget() {
+    return widget;
+  }
 
-	@Override
-	public boolean isYouTubeVideo() {
-		return youtubeTabListItem.isActive();
-	}
+  @Override
+  public void setPresenter(Presenter presenter) {
+    this.presenter = presenter;
+  }
 
-	@Override
-	public void setVimeoVideoUrl(String value) {
-		vimeoUrlField.setValue(value);
-	}
+  @Override
+  public void showErrorMessage(String message) {
+    DisplayUtils.showErrorMessage(message);
+  }
 
-	@Override
-	public void setYouTubeVideoUrl(String value) {
-		youtubeUrlField.setValue(value);
-	}
+  @Override
+  public void showLoading() {}
 
-	@Override
-	public void showSynapseTab() {
-		synapseTabListItem.setActive(true);
-		tab1.setActive(true);
-	}
+  @Override
+  public void showInfo(String message) {
+    DisplayUtils.showInfo(message);
+  }
 
-	@Override
-	public void showYouTubeTab() {
-		youtubeTabListItem.setActive(true);
-		tab2.setActive(true);
-	}
+  @Override
+  public String getEntity() {
+    return entity.getValue();
+  }
 
-	@Override
-	public void showVimeoTab() {
-		vimeoTabListItem.setActive(true);
-		tab3.setActive(true);
-	}
+  @Override
+  public void setEntity(String entityString) {
+    entity.setValue(entityString);
+  }
+
+  @Override
+  public void clear() {
+    entity.setValue("");
+    setVideoFormatWarningVisible(false);
+  }
+
+  @Override
+  public void setVideoFormatWarningVisible(boolean visible) {
+    videoFormatWarning.setVisible(visible);
+  }
+
+  @Override
+  public void showFinderError(String error) {
+    entityFinder.showError(error);
+  }
+
+  @Override
+  public String getVimeoVideoUrl() {
+    return vimeoUrlField.getValue();
+  }
+
+  @Override
+  public String getYouTubeVideoUrl() {
+    return youtubeUrlField.getValue();
+  }
+
+  @Override
+  public boolean isSynapseEntity() {
+    return synapseTabListItem.isActive();
+  }
+
+  @Override
+  public boolean isVimeoVideo() {
+    return vimeoTabListItem.isActive();
+  }
+
+  @Override
+  public boolean isYouTubeVideo() {
+    return youtubeTabListItem.isActive();
+  }
+
+  @Override
+  public void setVimeoVideoUrl(String value) {
+    vimeoUrlField.setValue(value);
+  }
+
+  @Override
+  public void setYouTubeVideoUrl(String value) {
+    youtubeUrlField.setValue(value);
+  }
+
+  @Override
+  public void showSynapseTab() {
+    synapseTabListItem.setActive(true);
+    tab1.setActive(true);
+  }
+
+  @Override
+  public void showYouTubeTab() {
+    youtubeTabListItem.setActive(true);
+    tab2.setActive(true);
+  }
+
+  @Override
+  public void showVimeoTab() {
+    vimeoTabListItem.setActive(true);
+    tab3.setActive(true);
+  }
 }

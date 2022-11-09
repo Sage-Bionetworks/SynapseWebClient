@@ -6,6 +6,8 @@ import static org.mockito.Matchers.anyList;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Before;
@@ -20,72 +22,86 @@ import org.sagebionetworks.web.client.widget.asynch.BaseEntityHeaderAsyncHandler
 import org.sagebionetworks.web.client.widget.asynch.EntityHeaderAsyncHandlerImpl;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class EntityHeaderAsyncHandlerImplTest {
-	EntityHeaderAsyncHandlerImpl entityHeaderAsyncHandler;
-	@Mock
-	SynapseJavascriptClient mockSynapseJavascriptClient;
-	@Mock
-	GWTWrapper mockGwt;
-	String entityId = "syn239";
-	Long entityVersion = 32L;
-	@Mock
-	AsyncCallback mockCallback;
-	@Mock
-	EntityHeader mockEntityHeader;
-	List<EntityHeader> entityHeaderList;
 
-	@Before
-	public void setUp() throws Exception {
-		MockitoAnnotations.initMocks(this);
-		entityHeaderAsyncHandler = new EntityHeaderAsyncHandlerImpl(mockSynapseJavascriptClient, mockGwt);
-		entityHeaderList = new ArrayList<EntityHeader>();
-		AsyncMockStubber.callSuccessWith(entityHeaderList).when(mockSynapseJavascriptClient).getEntityHeaderBatchFromReferences(anyList(), any(AsyncCallback.class));
-		when(mockEntityHeader.getId()).thenReturn(entityId);
-	}
+  EntityHeaderAsyncHandlerImpl entityHeaderAsyncHandler;
 
-	@Test
-	public void testConstructor() {
-		verify(mockGwt).scheduleFixedDelay(any(Callback.class), anyInt());
-	}
+  @Mock
+  SynapseJavascriptClient mockSynapseJavascriptClient;
 
-	@Test
-	public void testSuccess() {
-		// verify no rpc if no entity headers have been requested.
-		entityHeaderAsyncHandler.executeRequests();
-		verifyZeroInteractions(mockSynapseJavascriptClient);
+  @Mock
+  GWTWrapper mockGwt;
 
-		// add one, simulate single entity header response
-		entityHeaderAsyncHandler.getEntityHeader(entityId, mockCallback);
-		entityHeaderList.add(mockEntityHeader);
+  String entityId = "syn239";
+  Long entityVersion = 32L;
 
-		entityHeaderAsyncHandler.executeRequests();
-		verify(mockSynapseJavascriptClient).getEntityHeaderBatchFromReferences(anyList(), any(AsyncCallback.class));
-		verify(mockCallback).onSuccess(mockEntityHeader);
-	}
-	
-	@Test
-	public void testFailure() {
-		// simulate exception response
-		Exception ex = new Exception("problem loading batch of entity headers");
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getEntityHeaderBatchFromReferences(anyList(), any(AsyncCallback.class));
-		entityHeaderAsyncHandler.getEntityHeader(entityId, mockCallback);
-		entityHeaderAsyncHandler.executeRequests();
+  @Mock
+  AsyncCallback mockCallback;
 
-		verify(mockCallback).onFailure(ex);
-	}
+  @Mock
+  EntityHeader mockEntityHeader;
 
-	@Test
-	public void testNotFound() {
-		when(mockEntityHeader.getId()).thenReturn("another entity id");
-		// add one, simulate single entity header response
-		entityHeaderAsyncHandler.getEntityHeader(entityId, mockCallback);
-		entityHeaderList.add(mockEntityHeader);
+  List<EntityHeader> entityHeaderList;
 
-		entityHeaderAsyncHandler.executeRequests();
-		verify(mockSynapseJavascriptClient).getEntityHeaderBatchFromReferences(anyList(), any(AsyncCallback.class));
-		verify(mockCallback).onFailure(any(Throwable.class));
-	}
+  @Before
+  public void setUp() throws Exception {
+    MockitoAnnotations.initMocks(this);
+    entityHeaderAsyncHandler =
+      new EntityHeaderAsyncHandlerImpl(mockSynapseJavascriptClient, mockGwt);
+    entityHeaderList = new ArrayList<EntityHeader>();
+    AsyncMockStubber
+      .callSuccessWith(entityHeaderList)
+      .when(mockSynapseJavascriptClient)
+      .getEntityHeaderBatchFromReferences(anyList(), any(AsyncCallback.class));
+    when(mockEntityHeader.getId()).thenReturn(entityId);
+  }
 
+  @Test
+  public void testConstructor() {
+    verify(mockGwt).scheduleFixedDelay(any(Callback.class), anyInt());
+  }
+
+  @Test
+  public void testSuccess() {
+    // verify no rpc if no entity headers have been requested.
+    entityHeaderAsyncHandler.executeRequests();
+    verifyZeroInteractions(mockSynapseJavascriptClient);
+
+    // add one, simulate single entity header response
+    entityHeaderAsyncHandler.getEntityHeader(entityId, mockCallback);
+    entityHeaderList.add(mockEntityHeader);
+
+    entityHeaderAsyncHandler.executeRequests();
+    verify(mockSynapseJavascriptClient)
+      .getEntityHeaderBatchFromReferences(anyList(), any(AsyncCallback.class));
+    verify(mockCallback).onSuccess(mockEntityHeader);
+  }
+
+  @Test
+  public void testFailure() {
+    // simulate exception response
+    Exception ex = new Exception("problem loading batch of entity headers");
+    AsyncMockStubber
+      .callFailureWith(ex)
+      .when(mockSynapseJavascriptClient)
+      .getEntityHeaderBatchFromReferences(anyList(), any(AsyncCallback.class));
+    entityHeaderAsyncHandler.getEntityHeader(entityId, mockCallback);
+    entityHeaderAsyncHandler.executeRequests();
+
+    verify(mockCallback).onFailure(ex);
+  }
+
+  @Test
+  public void testNotFound() {
+    when(mockEntityHeader.getId()).thenReturn("another entity id");
+    // add one, simulate single entity header response
+    entityHeaderAsyncHandler.getEntityHeader(entityId, mockCallback);
+    entityHeaderList.add(mockEntityHeader);
+
+    entityHeaderAsyncHandler.executeRequests();
+    verify(mockSynapseJavascriptClient)
+      .getEntityHeaderBatchFromReferences(anyList(), any(AsyncCallback.class));
+    verify(mockCallback).onFailure(any(Throwable.class));
+  }
 }

@@ -1,13 +1,16 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.any;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import com.google.gwt.place.shared.Place;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -46,66 +49,77 @@ import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidge
 import org.sagebionetworks.web.shared.SearchQueryUtils;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-import com.google.gwt.place.shared.Place;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-
 @RunWith(MockitoJUnitRunner.class)
 public class DownloadCartPresenterTest {
-	DownloadCartPresenter presenter;
-	@Mock
-	DownloadCartPageView mockView;
-	@Mock
-	PortalGinInjector mockGinInjector;
-	@Mock
-	PopupUtilsView mockPopupUtilsView;
-	@Mock
-	SynapseJavascriptClient mockJsClient;
-	@Mock
-	AccessControlListModalWidget mockACLModalWidget;
-	@Mock
-	Entity mockEntity;
-	
-	@Before
-	public void setup() throws Exception {
-		presenter = new DownloadCartPresenter(mockView, mockGinInjector, mockPopupUtilsView);
-		when(mockGinInjector.getAccessControlListModalWidget()).thenReturn(mockACLModalWidget);
-		when(mockGinInjector.getSynapseJavascriptClient()).thenReturn(mockJsClient);
-		AsyncMockStubber.callSuccessWith(mockEntity).when(mockJsClient).getEntity(anyString(), any(AsyncCallback.class));
-	}
 
-	@Test
-	public void testConstructor() {
-		verify(mockView).setPresenter(presenter);
-	}
+  DownloadCartPresenter presenter;
 
-	@Test
-	public void testSetPlace() {
-		presenter.setPlace(new DownloadCartPlace(""));
-		
-		verify(mockView).render();
-	}
+  @Mock
+  DownloadCartPageView mockView;
 
-	@Test
-	public void testOnViewSharingSettingsClicked() {
-		String testEntityId = "syn1";
-		
-		presenter.onViewSharingSettingsClicked(testEntityId);
-		
-		verify(mockJsClient).getEntity(eq(testEntityId), any(AsyncCallback.class));
-		verify(mockACLModalWidget).configure(mockEntity, false);
-		verify(mockACLModalWidget).showSharing(any(Callback.class));
-	}
-	@Test
-	public void testOnViewSharingSettingsClickedFailure() {
-		String testEntityId = "syn1";
-		String errorMessage = "unable to get the benefactor entity";
-		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockJsClient).getEntity(anyString(), any(AsyncCallback.class));
-		
-		presenter.onViewSharingSettingsClicked(testEntityId);
-		
-		verify(mockJsClient).getEntity(eq(testEntityId), any(AsyncCallback.class));
-		verify(mockPopupUtilsView).showErrorMessage(errorMessage);
-	}
+  @Mock
+  PortalGinInjector mockGinInjector;
 
+  @Mock
+  PopupUtilsView mockPopupUtilsView;
+
+  @Mock
+  SynapseJavascriptClient mockJsClient;
+
+  @Mock
+  AccessControlListModalWidget mockACLModalWidget;
+
+  @Mock
+  Entity mockEntity;
+
+  @Before
+  public void setup() throws Exception {
+    presenter =
+      new DownloadCartPresenter(mockView, mockGinInjector, mockPopupUtilsView);
+    when(mockGinInjector.getAccessControlListModalWidget())
+      .thenReturn(mockACLModalWidget);
+    when(mockGinInjector.getSynapseJavascriptClient()).thenReturn(mockJsClient);
+    AsyncMockStubber
+      .callSuccessWith(mockEntity)
+      .when(mockJsClient)
+      .getEntity(anyString(), any(AsyncCallback.class));
+  }
+
+  @Test
+  public void testConstructor() {
+    verify(mockView).setPresenter(presenter);
+  }
+
+  @Test
+  public void testSetPlace() {
+    presenter.setPlace(new DownloadCartPlace(""));
+
+    verify(mockView).render();
+  }
+
+  @Test
+  public void testOnViewSharingSettingsClicked() {
+    String testEntityId = "syn1";
+
+    presenter.onViewSharingSettingsClicked(testEntityId);
+
+    verify(mockJsClient).getEntity(eq(testEntityId), any(AsyncCallback.class));
+    verify(mockACLModalWidget).configure(mockEntity, false);
+    verify(mockACLModalWidget).showSharing(any(Callback.class));
+  }
+
+  @Test
+  public void testOnViewSharingSettingsClickedFailure() {
+    String testEntityId = "syn1";
+    String errorMessage = "unable to get the benefactor entity";
+    AsyncMockStubber
+      .callFailureWith(new Exception(errorMessage))
+      .when(mockJsClient)
+      .getEntity(anyString(), any(AsyncCallback.class));
+
+    presenter.onViewSharingSettingsClicked(testEntityId);
+
+    verify(mockJsClient).getEntity(eq(testEntityId), any(AsyncCallback.class));
+    verify(mockPopupUtilsView).showErrorMessage(errorMessage);
+  }
 }
-

@@ -5,12 +5,12 @@ package org.sagebionetworks.web.client.exceptions;
  * that should be unreachable, and that something was misconfigured to allow it to happen.
  */
 public class WebClientConfigurationException extends RuntimeException {
-    WebClientConfigurationException() {
-        super();
-    }
 
-    public WebClientConfigurationException(String message) {
-        super(message);
-    }
+  WebClientConfigurationException() {
+    super();
+  }
 
+  public WebClientConfigurationException(String message) {
+    super(message);
+  }
 }

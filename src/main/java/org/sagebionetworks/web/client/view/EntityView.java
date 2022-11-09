@@ -3,41 +3,39 @@ package org.sagebionetworks.web.client.view;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface EntityView extends IsWidget {
+  public interface Presenter {
+    /**
+     * refreshes the entity from the service and redraws the view
+     */
+    void refresh();
 
-	public interface Presenter {
+    void clear();
+  }
 
-		/**
-		 * refreshes the entity from the service and redraws the view
-		 */
-		void refresh();
+  /**
+   * Set entity to display
+   *
+   * @param versionNumber to highlight
+   * @param entity
+   * @param entityMetadata
+   */
+  void setEntityPageTopWidget(IsWidget entityPageTopWidget);
 
-		void clear();
-	}
+  void setOpenTeamInvitesWidget(IsWidget openTeamInvitesWidgetWidget);
 
-	/**
-	 * Set entity to display
-	 * 
-	 * @param versionNumber to highlight
-	 * @param entity
-	 * @param entityMetadata
-	 */
-	void setEntityPageTopWidget(IsWidget entityPageTopWidget);
+  void setSynAlertWidget(IsWidget synAlert);
 
-	void setOpenTeamInvitesWidget(IsWidget openTeamInvitesWidgetWidget);
+  void setAccessDependentMessageVisible(boolean isVisible);
 
-	void setSynAlertWidget(IsWidget synAlert);
+  void clear();
 
-	void setAccessDependentMessageVisible(boolean isVisible);
+  void showInfo(String message);
 
-	void clear();
+  void setLoadingVisible(boolean isVisible);
 
-	void showInfo(String message);
+  void showErrorMessage(String message);
 
-	void setLoadingVisible(boolean isVisible);
+  void setEntityPageTopVisible(boolean isVisible);
 
-	void showErrorMessage(String message);
-
-	void setEntityPageTopVisible(boolean isVisible);
-
-	void setOpenTeamInvitesVisible(boolean isVisible);
+  void setOpenTeamInvitesVisible(boolean isVisible);
 }

@@ -14,59 +14,64 @@ import org.sagebionetworks.web.shared.WebConstants;
  * Handle downloading discussion messages.
  */
 public class DiscussionMessageServlet extends HttpServlet {
-	private static final long serialVersionUID = 1L;
-	protected static final ThreadLocal<HttpServletRequest> perThreadRequest = new ThreadLocal<HttpServletRequest>();
 
-	private SynapseProvider synapseProvider = new SynapseProviderImpl();
-	private TokenProvider tokenProvider = new TokenProvider() {
-		@Override
-		public String getToken() {
-			return UserDataProvider.getThreadLocalUserToken(DiscussionMessageServlet.perThreadRequest.get());
-		}
-	};
+  private static final long serialVersionUID = 1L;
+  protected static final ThreadLocal<HttpServletRequest> perThreadRequest = new ThreadLocal<HttpServletRequest>();
 
-	@Override
-	protected void service(HttpServletRequest arg0, HttpServletResponse arg1) throws ServletException, IOException {
-		DiscussionMessageServlet.perThreadRequest.set(arg0);
-		super.service(arg0, arg1);
-	}
+  private SynapseProvider synapseProvider = new SynapseProviderImpl();
+  private TokenProvider tokenProvider = new TokenProvider() {
+    @Override
+    public String getToken() {
+      return UserDataProvider.getThreadLocalUserToken(
+        DiscussionMessageServlet.perThreadRequest.get()
+      );
+    }
+  };
 
-	@Override
-	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+  @Override
+  protected void service(HttpServletRequest arg0, HttpServletResponse arg1)
+    throws ServletException, IOException {
+    DiscussionMessageServlet.perThreadRequest.set(arg0);
+    super.service(arg0, arg1);
+  }
 
-		String token = tokenProvider.getToken();
-		SynapseClient client = createNewClient(token);
+  @Override
+  public void doGet(HttpServletRequest request, HttpServletResponse response)
+    throws ServletException, IOException {
+    String token = tokenProvider.getToken();
+    SynapseClient client = createNewClient(token);
 
-		String messageKey = request.getParameter(WebConstants.MESSAGE_KEY_PARAM);
-		String type = request.getParameter(WebConstants.TYPE_PARAM);
+    String messageKey = request.getParameter(WebConstants.MESSAGE_KEY_PARAM);
+    String type = request.getParameter(WebConstants.TYPE_PARAM);
 
-		try {
-			URL resolvedUrl = null;
-			if (type.equals(WebConstants.THREAD_TYPE)) {
-				resolvedUrl = client.getThreadUrl(messageKey);
-			} else if (type.equals(WebConstants.REPLY_TYPE)) {
-				resolvedUrl = client.getReplyUrl(messageKey);
-			} else {
-				throw new IllegalArgumentException("Do not support type " + type);
-			}
-			response.sendRedirect(resolvedUrl.toString());
-		} catch (Exception e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
-		}
-	}
+    try {
+      URL resolvedUrl = null;
+      if (type.equals(WebConstants.THREAD_TYPE)) {
+        resolvedUrl = client.getThreadUrl(messageKey);
+      } else if (type.equals(WebConstants.REPLY_TYPE)) {
+        resolvedUrl = client.getReplyUrl(messageKey);
+      } else {
+        throw new IllegalArgumentException("Do not support type " + type);
+      }
+      response.sendRedirect(resolvedUrl.toString());
+    } catch (Exception e) {
+      response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+    }
+  }
 
-	/**
-	 * Create a new Synapse client.
-	 *
-	 * @return
-	 */
-	private SynapseClient createNewClient(String accessToken) {
-		SynapseClient client = synapseProvider.createNewClient();
-		client.setAuthEndpoint(StackEndpoints.getAuthenticationServicePublicEndpoint());
-		client.setRepositoryEndpoint(StackEndpoints.getRepositoryServiceEndpoint());
-		client.setFileEndpoint(StackEndpoints.getFileServiceEndpoint());
-		if (accessToken != null)
-			client.setBearerAuthorizationToken(accessToken);
-		return client;
-	}
+  /**
+   * Create a new Synapse client.
+   *
+   * @return
+   */
+  private SynapseClient createNewClient(String accessToken) {
+    SynapseClient client = synapseProvider.createNewClient();
+    client.setAuthEndpoint(
+      StackEndpoints.getAuthenticationServicePublicEndpoint()
+    );
+    client.setRepositoryEndpoint(StackEndpoints.getRepositoryServiceEndpoint());
+    client.setFileEndpoint(StackEndpoints.getFileServiceEndpoint());
+    if (accessToken != null) client.setBearerAuthorizationToken(accessToken);
+    return client;
+  }
 }

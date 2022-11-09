@@ -1,42 +1,41 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import org.sagebionetworks.web.client.SynapseView;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import org.sagebionetworks.web.client.SynapseView;
 
 public interface WikiMarkdownEditorView extends IsWidget, SynapseView {
+  /**
+   * Set the presenter.
+   *
+   * @param presenter
+   */
+  void setPresenter(Presenter presenter);
 
-	/**
-	 * Set the presenter.
-	 * 
-	 * @param presenter
-	 */
-	void setPresenter(Presenter presenter);
+  void setSaving(boolean isSaving);
 
-	void setSaving(boolean isSaving);
+  void setTitleEditorVisible(boolean visible);
 
-	void setTitleEditorVisible(boolean visible);
+  String getTitle();
 
-	String getTitle();
+  void setTitle(String title);
 
-	void setTitle(String title);
+  void showEditorModal();
 
-	void showEditorModal();
+  void hideEditorModal();
 
-	void hideEditorModal();
+  void setDeleteButtonVisible(boolean visible);
 
-	void setDeleteButtonVisible(boolean visible);
+  /**
+   * Presenter interface
+   */
+  public interface Presenter {
+    void cancelClicked();
 
-	/**
-	 * Presenter interface
-	 */
-	public interface Presenter {
-		void cancelClicked();
+    void deleteClicked();
 
-		void deleteClicked();
+    void saveClicked();
+  }
 
-		void saveClicked();
-	}
-
-	void setMarkdownEditorWidget(Widget markdownEditorWidget);
+  void setMarkdownEditorWidget(Widget markdownEditorWidget);
 }

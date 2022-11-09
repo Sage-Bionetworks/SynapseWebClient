@@ -5,6 +5,8 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -18,59 +20,88 @@ import org.sagebionetworks.web.client.view.users.RegisterWidgetView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class RegisterWidgetTest {
 
-	@Mock
-	RegisterWidgetView mockView;
-	@Mock
-	UserAccountServiceAsync mockUserService;
-	@Mock
-	GWTWrapper mockGWTWrapper;
-	@Mock
-	SynapseAlert mockSynAlert;
+  @Mock
+  RegisterWidgetView mockView;
 
-	RegisterWidget widget;
-	String email = "test@test.com";
-	NewUser newUser;
+  @Mock
+  UserAccountServiceAsync mockUserService;
 
-	@Before
-	public void setup() {
-		newUser = new NewUser();
-		newUser.setEmail(email);
-		MockitoAnnotations.initMocks(this);
-		mockGWTWrapper = mock(GWTWrapper.class);
-		widget = new RegisterWidget(mockView, mockUserService, mockGWTWrapper, mockSynAlert);
-		verify(mockView).setPresenter(widget);
+  @Mock
+  GWTWrapper mockGWTWrapper;
 
-		AsyncMockStubber.callSuccessWith(null).when(mockUserService).createUserStep1(any(NewUser.class), anyString(), any(AsyncCallback.class));
-	}
+  @Mock
+  SynapseAlert mockSynAlert;
 
-	@Test
-	public void testRegisterUser() {
-		widget.registerUser(email);
-		verify(mockView).enableRegisterButton(false);
-		verify(mockView).showInfo(DisplayConstants.ACCOUNT_EMAIL_SENT);
-		verify(mockView).enableRegisterButton(true);
-		verify(mockView).clear();
-		verify(mockUserService).createUserStep1(eq(newUser), anyString(), any(AsyncCallback.class));
-	}
+  RegisterWidget widget;
+  String email = "test@test.com";
+  NewUser newUser;
 
-	@Test
-	public void testRegisterUserUserExists() {
-		AsyncMockStubber.callFailureWith(new ConflictException("user exists")).when(mockUserService).createUserStep1(any(NewUser.class), anyString(), any(AsyncCallback.class));
-		widget.registerUser(email);
-		verify(mockSynAlert).showError(DisplayConstants.ERROR_EMAIL_ALREADY_EXISTS);
-	}
+  @Before
+  public void setup() {
+    newUser = new NewUser();
+    newUser.setEmail(email);
+    MockitoAnnotations.initMocks(this);
+    mockGWTWrapper = mock(GWTWrapper.class);
+    widget =
+      new RegisterWidget(
+        mockView,
+        mockUserService,
+        mockGWTWrapper,
+        mockSynAlert
+      );
+    verify(mockView).setPresenter(widget);
 
-	@Test
-	public void testRegisterUserServiceFailure() {
-		Exception ex = new Exception("unknown");
-		AsyncMockStubber.callFailureWith(ex).when(mockUserService).createUserStep1(any(NewUser.class), anyString(), any(AsyncCallback.class));
-		widget.registerUser(email);
+    AsyncMockStubber
+      .callSuccessWith(null)
+      .when(mockUserService)
+      .createUserStep1(
+        any(NewUser.class),
+        anyString(),
+        any(AsyncCallback.class)
+      );
+  }
 
-		verify(mockSynAlert).handleException(ex);
-	}
+  @Test
+  public void testRegisterUser() {
+    widget.registerUser(email);
+    verify(mockView).enableRegisterButton(false);
+    verify(mockView).showInfo(DisplayConstants.ACCOUNT_EMAIL_SENT);
+    verify(mockView).enableRegisterButton(true);
+    verify(mockView).clear();
+    verify(mockUserService)
+      .createUserStep1(eq(newUser), anyString(), any(AsyncCallback.class));
+  }
 
+  @Test
+  public void testRegisterUserUserExists() {
+    AsyncMockStubber
+      .callFailureWith(new ConflictException("user exists"))
+      .when(mockUserService)
+      .createUserStep1(
+        any(NewUser.class),
+        anyString(),
+        any(AsyncCallback.class)
+      );
+    widget.registerUser(email);
+    verify(mockSynAlert).showError(DisplayConstants.ERROR_EMAIL_ALREADY_EXISTS);
+  }
+
+  @Test
+  public void testRegisterUserServiceFailure() {
+    Exception ex = new Exception("unknown");
+    AsyncMockStubber
+      .callFailureWith(ex)
+      .when(mockUserService)
+      .createUserStep1(
+        any(NewUser.class),
+        anyString(),
+        any(AsyncCallback.class)
+      );
+    widget.registerUser(email);
+
+    verify(mockSynAlert).handleException(ex);
+  }
 }

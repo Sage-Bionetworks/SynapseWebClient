@@ -7,6 +7,7 @@ import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,154 +39,181 @@ import org.sagebionetworks.web.unitserver.SynapseClientBaseTest;
 import org.springframework.test.util.ReflectionTestUtils;
 
 public class SlackServletTest {
-	@Mock
-	HttpServletRequest mockRequest;
-	@Mock
-	HttpServletResponse mockResponse;
-	@Mock
-	SynapseProvider mockSynapseProvider;
-	@Mock
-	SynapseClient mockSynapse;
-	@Mock
-	EntityBundle mockEntityBundle;
-	@Mock
-	Entity mockEntity;
-	SlackServlet servlet;
-	public static final String ENTITY_NAME = "file.png";
-	public static final String ENTITY_PROJECT = "A Project";
-	public static final String ENTITY_STRING_ANNOTATION_KEY = "a string annotation key";
-	public static final String ENTITY_STRING_ANNOTATION_VALUE1 = "value1";
-	public static final String ENTITY_STRING_ANNOTATION_VALUE2 = "value2";
-	public static final Long THREAD_COUNT = 42L;
-	@Mock
-	EntityPath mockEntityPath;
-	@Mock
-	EntityHeader mockRoot;
-	@Mock
-	EntityHeader mockParentProject;
-	@Mock
-	EntityHeader mockCurrentItem;
 
-	@Mock
-	ServletOutputStream mockOutputStream;
-	@Mock
-	Annotations mockAnnotations;
-	@Captor
-	ArgumentCaptor<byte[]> byteArrayCaptor;
-	List<EntityHeader> entityPath;
+  @Mock
+  HttpServletRequest mockRequest;
 
-	@Before
-	public void setup() throws IOException, SynapseException, JSONObjectAdapterException {
-		MockitoAnnotations.initMocks(this);
-		servlet = new SlackServlet();
-		ReflectionTestUtils.setField(servlet, "synapseProvider", mockSynapseProvider);
+  @Mock
+  HttpServletResponse mockResponse;
 
-		when(mockSynapse.getEntityBundleV2(anyString(), any(EntityBundleRequest.class))).thenReturn(mockEntityBundle);
-		when(mockEntityBundle.getEntity()).thenReturn(mockEntity);
-		when(mockEntity.getName()).thenReturn(ENTITY_NAME);
-		entityPath = new ArrayList<EntityHeader>();
-		entityPath.add(mockRoot);
-		entityPath.add(mockParentProject);
-		entityPath.add(mockCurrentItem);
-		when(mockEntityPath.getPath()).thenReturn(entityPath);
-		when(mockEntityBundle.getPath()).thenReturn(mockEntityPath);
-		when(mockParentProject.getName()).thenReturn(ENTITY_PROJECT);
-		when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
-		when(mockResponse.getOutputStream()).thenReturn(mockOutputStream);
-		when(mockEntityBundle.getThreadCount()).thenReturn(THREAD_COUNT);
-		when(mockEntityBundle.getAnnotations()).thenReturn(mockAnnotations);
+  @Mock
+  SynapseProvider mockSynapseProvider;
 
-		Map<String, AnnotationsValue> annotations = new HashMap<String, AnnotationsValue>();
-		List<String> values = new ArrayList<String>();
-		values.add(ENTITY_STRING_ANNOTATION_VALUE1);
-		values.add(ENTITY_STRING_ANNOTATION_VALUE2);
-		AnnotationsValue value = new AnnotationsValue();
-		value.setType(AnnotationsValueType.STRING);
-		value.setValue(values);
-		annotations.put(ENTITY_STRING_ANNOTATION_KEY, value);
-		when(mockAnnotations.getAnnotations()).thenReturn(annotations);
-		SynapseClientBaseTest.setupTestEndpoints();
-	}
+  @Mock
+  SynapseClient mockSynapse;
 
-	@Test
-	public void testDoGet() throws Exception {
-		String requestSynId = "syn1234";
-		when(mockRequest.getParameter("text")).thenReturn(requestSynId);
-		when(mockRequest.getParameter("command")).thenReturn("/synapse");
-		servlet.doGet(mockRequest, mockResponse);
+  @Mock
+  EntityBundle mockEntityBundle;
 
-		verify(mockSynapse).getEntityBundleV2(anyString(), any(EntityBundleRequest.class));
+  @Mock
+  Entity mockEntity;
 
-		verify(mockOutputStream).write(byteArrayCaptor.capture(), anyInt(), anyInt());
-		String outputValue = new String(byteArrayCaptor.getValue());
-		assertTrue(outputValue.contains(ENTITY_NAME));
-		assertTrue(outputValue.contains(ENTITY_PROJECT));
-		assertTrue(outputValue.contains(THREAD_COUNT.toString()));
-		assertTrue(outputValue.contains(ENTITY_STRING_ANNOTATION_KEY));
-		assertTrue(outputValue.contains(ENTITY_STRING_ANNOTATION_VALUE1));
-		assertTrue(outputValue.contains(ENTITY_STRING_ANNOTATION_VALUE2));
+  SlackServlet servlet;
+  public static final String ENTITY_NAME = "file.png";
+  public static final String ENTITY_PROJECT = "A Project";
+  public static final String ENTITY_STRING_ANNOTATION_KEY =
+    "a string annotation key";
+  public static final String ENTITY_STRING_ANNOTATION_VALUE1 = "value1";
+  public static final String ENTITY_STRING_ANNOTATION_VALUE2 = "value2";
+  public static final Long THREAD_COUNT = 42L;
 
-		// as an additional test, verify that synapse client is set up
-		verify(mockSynapse).setAuthEndpoint(SynapseClientBaseTest.AUTH_BASE);
-		verify(mockSynapse).setRepositoryEndpoint(SynapseClientBaseTest.REPO_BASE);
-		verify(mockSynapse).setFileEndpoint(SynapseClientBaseTest.FILE_BASE);
-	}
+  @Mock
+  EntityPath mockEntityPath;
 
-	@Test
-	public void testDoGetStaging() throws Exception {
-		String requestSynId = "syn1234";
-		when(mockRequest.getParameter("text")).thenReturn(requestSynId);
-		when(mockRequest.getParameter("command")).thenReturn("/synapsestaging");
-		servlet.doGet(mockRequest, mockResponse);
+  @Mock
+  EntityHeader mockRoot;
 
-		verify(mockSynapse).getEntityBundleV2(anyString(), any(EntityBundleRequest.class));
+  @Mock
+  EntityHeader mockParentProject;
 
-		verify(mockOutputStream).write(byteArrayCaptor.capture(), anyInt(), anyInt());
-		String outputValue = new String(byteArrayCaptor.getValue());
-		assertTrue(outputValue.contains(ENTITY_NAME));
-		assertTrue(outputValue.contains(ENTITY_PROJECT));
-	}
+  @Mock
+  EntityHeader mockCurrentItem;
 
-	@Test
-	public void testDoGetError() throws Exception {
-		when(mockRequest.getParameter("text")).thenReturn("syn99");
-		when(mockRequest.getParameter("command")).thenReturn("/invalidcommand");
+  @Mock
+  ServletOutputStream mockOutputStream;
 
-		servlet.doGet(mockRequest, mockResponse);
-		verify(mockOutputStream).write(byteArrayCaptor.capture(), anyInt(), anyInt());
-		String outputValue = new String(byteArrayCaptor.getValue());
-		assertTrue(outputValue.contains(SlackServlet.INVALID_COMMAND_MESSAGE));
-		verify(mockResponse).setStatus(HttpServletResponse.SC_BAD_REQUEST);
-	}
+  @Mock
+  Annotations mockAnnotations;
 
-	@Test
-	public void testDoGetInvalidSynIdError() throws Exception {
-		when(mockRequest.getParameter("text")).thenReturn("syn99invalid");
-		when(mockRequest.getParameter("command")).thenReturn("/synapse");
+  @Captor
+  ArgumentCaptor<byte[]> byteArrayCaptor;
 
-		servlet.doGet(mockRequest, mockResponse);
-		verify(mockOutputStream).write(byteArrayCaptor.capture(), anyInt(), anyInt());
-		String outputValue = new String(byteArrayCaptor.getValue());
-		assertTrue(outputValue.contains(SlackServlet.IS_INVALID_SYN_ID));
-		verify(mockResponse).setStatus(HttpServletResponse.SC_BAD_REQUEST);
-	}
+  List<EntityHeader> entityPath;
 
+  @Before
+  public void setup()
+    throws IOException, SynapseException, JSONObjectAdapterException {
+    MockitoAnnotations.initMocks(this);
+    servlet = new SlackServlet();
+    ReflectionTestUtils.setField(
+      servlet,
+      "synapseProvider",
+      mockSynapseProvider
+    );
 
-	@Test
-	public void testJoin() {
-		List list = new ArrayList<String>();
-		assertEquals("", SlackServlet.join(list));
-		list.add("a");
-		assertEquals("a", SlackServlet.join(list));
-		list.add("b");
-		assertEquals("a, b", SlackServlet.join(list));
+    when(
+      mockSynapse.getEntityBundleV2(anyString(), any(EntityBundleRequest.class))
+    )
+      .thenReturn(mockEntityBundle);
+    when(mockEntityBundle.getEntity()).thenReturn(mockEntity);
+    when(mockEntity.getName()).thenReturn(ENTITY_NAME);
+    entityPath = new ArrayList<EntityHeader>();
+    entityPath.add(mockRoot);
+    entityPath.add(mockParentProject);
+    entityPath.add(mockCurrentItem);
+    when(mockEntityPath.getPath()).thenReturn(entityPath);
+    when(mockEntityBundle.getPath()).thenReturn(mockEntityPath);
+    when(mockParentProject.getName()).thenReturn(ENTITY_PROJECT);
+    when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
+    when(mockResponse.getOutputStream()).thenReturn(mockOutputStream);
+    when(mockEntityBundle.getThreadCount()).thenReturn(THREAD_COUNT);
+    when(mockEntityBundle.getAnnotations()).thenReturn(mockAnnotations);
 
-		list = new ArrayList<Integer>();
-		assertEquals("", SlackServlet.join(list));
-		list.add(1);
-		assertEquals("1", SlackServlet.join(list));
-		list.add(2);
-		assertEquals("1, 2", SlackServlet.join(list));
-	}
+    Map<String, AnnotationsValue> annotations = new HashMap<String, AnnotationsValue>();
+    List<String> values = new ArrayList<String>();
+    values.add(ENTITY_STRING_ANNOTATION_VALUE1);
+    values.add(ENTITY_STRING_ANNOTATION_VALUE2);
+    AnnotationsValue value = new AnnotationsValue();
+    value.setType(AnnotationsValueType.STRING);
+    value.setValue(values);
+    annotations.put(ENTITY_STRING_ANNOTATION_KEY, value);
+    when(mockAnnotations.getAnnotations()).thenReturn(annotations);
+    SynapseClientBaseTest.setupTestEndpoints();
+  }
 
+  @Test
+  public void testDoGet() throws Exception {
+    String requestSynId = "syn1234";
+    when(mockRequest.getParameter("text")).thenReturn(requestSynId);
+    when(mockRequest.getParameter("command")).thenReturn("/synapse");
+    servlet.doGet(mockRequest, mockResponse);
+
+    verify(mockSynapse)
+      .getEntityBundleV2(anyString(), any(EntityBundleRequest.class));
+
+    verify(mockOutputStream)
+      .write(byteArrayCaptor.capture(), anyInt(), anyInt());
+    String outputValue = new String(byteArrayCaptor.getValue());
+    assertTrue(outputValue.contains(ENTITY_NAME));
+    assertTrue(outputValue.contains(ENTITY_PROJECT));
+    assertTrue(outputValue.contains(THREAD_COUNT.toString()));
+    assertTrue(outputValue.contains(ENTITY_STRING_ANNOTATION_KEY));
+    assertTrue(outputValue.contains(ENTITY_STRING_ANNOTATION_VALUE1));
+    assertTrue(outputValue.contains(ENTITY_STRING_ANNOTATION_VALUE2));
+
+    // as an additional test, verify that synapse client is set up
+    verify(mockSynapse).setAuthEndpoint(SynapseClientBaseTest.AUTH_BASE);
+    verify(mockSynapse).setRepositoryEndpoint(SynapseClientBaseTest.REPO_BASE);
+    verify(mockSynapse).setFileEndpoint(SynapseClientBaseTest.FILE_BASE);
+  }
+
+  @Test
+  public void testDoGetStaging() throws Exception {
+    String requestSynId = "syn1234";
+    when(mockRequest.getParameter("text")).thenReturn(requestSynId);
+    when(mockRequest.getParameter("command")).thenReturn("/synapsestaging");
+    servlet.doGet(mockRequest, mockResponse);
+
+    verify(mockSynapse)
+      .getEntityBundleV2(anyString(), any(EntityBundleRequest.class));
+
+    verify(mockOutputStream)
+      .write(byteArrayCaptor.capture(), anyInt(), anyInt());
+    String outputValue = new String(byteArrayCaptor.getValue());
+    assertTrue(outputValue.contains(ENTITY_NAME));
+    assertTrue(outputValue.contains(ENTITY_PROJECT));
+  }
+
+  @Test
+  public void testDoGetError() throws Exception {
+    when(mockRequest.getParameter("text")).thenReturn("syn99");
+    when(mockRequest.getParameter("command")).thenReturn("/invalidcommand");
+
+    servlet.doGet(mockRequest, mockResponse);
+    verify(mockOutputStream)
+      .write(byteArrayCaptor.capture(), anyInt(), anyInt());
+    String outputValue = new String(byteArrayCaptor.getValue());
+    assertTrue(outputValue.contains(SlackServlet.INVALID_COMMAND_MESSAGE));
+    verify(mockResponse).setStatus(HttpServletResponse.SC_BAD_REQUEST);
+  }
+
+  @Test
+  public void testDoGetInvalidSynIdError() throws Exception {
+    when(mockRequest.getParameter("text")).thenReturn("syn99invalid");
+    when(mockRequest.getParameter("command")).thenReturn("/synapse");
+
+    servlet.doGet(mockRequest, mockResponse);
+    verify(mockOutputStream)
+      .write(byteArrayCaptor.capture(), anyInt(), anyInt());
+    String outputValue = new String(byteArrayCaptor.getValue());
+    assertTrue(outputValue.contains(SlackServlet.IS_INVALID_SYN_ID));
+    verify(mockResponse).setStatus(HttpServletResponse.SC_BAD_REQUEST);
+  }
+
+  @Test
+  public void testJoin() {
+    List list = new ArrayList<String>();
+    assertEquals("", SlackServlet.join(list));
+    list.add("a");
+    assertEquals("a", SlackServlet.join(list));
+    list.add("b");
+    assertEquals("a, b", SlackServlet.join(list));
+
+    list = new ArrayList<Integer>();
+    assertEquals("", SlackServlet.join(list));
+    list.add(1);
+    assertEquals("1", SlackServlet.join(list));
+    list.add(2);
+    assertEquals("1, 2", SlackServlet.join(list));
+  }
 }

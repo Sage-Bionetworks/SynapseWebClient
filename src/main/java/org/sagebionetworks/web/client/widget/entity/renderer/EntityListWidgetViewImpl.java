@@ -1,62 +1,64 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
-import org.gwtbootstrap3.client.ui.Panel;
-import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Span;
-import org.sagebionetworks.web.client.view.bootstrap.table.TableHeader;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.gwtbootstrap3.client.ui.Panel;
+import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
+import org.sagebionetworks.web.client.view.bootstrap.table.TableHeader;
 
 public class EntityListWidgetViewImpl implements EntityListWidgetView {
 
-	public interface Binder extends UiBinder<Widget, EntityListWidgetViewImpl> {
-	}
+  public interface Binder extends UiBinder<Widget, EntityListWidgetViewImpl> {}
 
-	Widget widget;
-	@UiField
-	Panel table;
-	@UiField
-	Div rows;
-	@UiField
-	Span emptyUI;
-	@UiField
-	TableHeader descriptionHeader;
+  Widget widget;
 
-	@Inject
-	public EntityListWidgetViewImpl(Binder binder) {
-		widget = binder.createAndBindUi(this);
-	}
+  @UiField
+  Panel table;
 
+  @UiField
+  Div rows;
 
-	@Override
-	public Widget asWidget() {
-		return widget;
-	}
+  @UiField
+  Span emptyUI;
 
-	@Override
-	public void addRow(Widget w) {
-		rows.add(w);
-	}
+  @UiField
+  TableHeader descriptionHeader;
 
-	@Override
-	public void clearRows() {
-		rows.clear();
-	}
+  @Inject
+  public EntityListWidgetViewImpl(Binder binder) {
+    widget = binder.createAndBindUi(this);
+  }
 
-	@Override
-	public void setEmptyUiVisible(boolean visible) {
-		emptyUI.setVisible(visible);
-	}
+  @Override
+  public Widget asWidget() {
+    return widget;
+  }
 
-	@Override
-	public void setTableVisible(boolean visible) {
-		table.setVisible(visible);
-	}
+  @Override
+  public void addRow(Widget w) {
+    rows.add(w);
+  }
 
-	@Override
-	public void setDescriptionHeaderVisible(boolean visible) {
-		descriptionHeader.setVisible(visible);
-	}
+  @Override
+  public void clearRows() {
+    rows.clear();
+  }
+
+  @Override
+  public void setEmptyUiVisible(boolean visible) {
+    emptyUI.setVisible(visible);
+  }
+
+  @Override
+  public void setTableVisible(boolean visible) {
+    table.setVisible(visible);
+  }
+
+  @Override
+  public void setDescriptionHeaderVisible(boolean visible) {
+    descriptionHeader.setVisible(visible);
+  }
 }

@@ -1,5 +1,14 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -20,288 +29,301 @@ import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableHeader;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
 import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidget.ActionHandler;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 
-public class WikiHistoryWidgetViewImpl extends FlowPanel implements WikiHistoryWidgetView {
-	Button loadMoreHistoryButton;
-	HTMLPanel inlineErrorMessagePanel;
-	FlowPanel historyPanel;
-	private boolean canEdit;
-	private List<V2WikiHistorySnapshot> historyList;
-	private List<HistoryEntry> historyEntries;
-	private String currentVersion;
-	WikiHistoryWidgetView.Presenter presenter;
-	private ActionHandler actionHandler;
-	private boolean isFirstGetHistory;
-	private int offset;
-	private int resultSize;
-	DateTimeUtils dateTimeUtils;
-	Div loadingUI;
-	Div synAlertContainer = new Div();
+public class WikiHistoryWidgetViewImpl
+  extends FlowPanel
+  implements WikiHistoryWidgetView {
 
-	@Inject
-	public WikiHistoryWidgetViewImpl(DateTimeUtils dateTimeUtils) {
-		this.dateTimeUtils = dateTimeUtils;
-		addStyleName("min-height-200");
-		loadingUI = new Div();
-		loadingUI.add(DisplayUtils.getLoadingWidget("Loading"));
-		add(synAlertContainer);
-	}
+  Button loadMoreHistoryButton;
+  HTMLPanel inlineErrorMessagePanel;
+  FlowPanel historyPanel;
+  private boolean canEdit;
+  private List<V2WikiHistorySnapshot> historyList;
+  private List<HistoryEntry> historyEntries;
+  private String currentVersion;
+  WikiHistoryWidgetView.Presenter presenter;
+  private ActionHandler actionHandler;
+  private boolean isFirstGetHistory;
+  private int offset;
+  private int resultSize;
+  DateTimeUtils dateTimeUtils;
+  Div loadingUI;
+  Div synAlertContainer = new Div();
 
-	private static class HistoryEntry {
-		private final String version;
-		private final Date modifiedOn;
-		private final String user;
+  @Inject
+  public WikiHistoryWidgetViewImpl(DateTimeUtils dateTimeUtils) {
+    this.dateTimeUtils = dateTimeUtils;
+    addStyleName("min-height-200");
+    loadingUI = new Div();
+    loadingUI.add(DisplayUtils.getLoadingWidget("Loading"));
+    add(synAlertContainer);
+  }
 
-		public HistoryEntry(String version, String user, Date modifiedOn) {
-			this.user = user;
-			this.version = version;
-			this.modifiedOn = modifiedOn;
-		}
-	}
+  private static class HistoryEntry {
 
-	@Override
-	public void configure(boolean canEdit, ActionHandler actionHandler) {
-		this.canEdit = canEdit;
-		this.actionHandler = actionHandler;
-		this.isFirstGetHistory = true;
-		this.offset = 0;
-		// Reset history
-		hideHistoryWidget();
-		add(loadingUI);
-		historyList = new ArrayList<V2WikiHistorySnapshot>();
-		historyEntries = new ArrayList<HistoryEntry>();
-		presenter.configureNextPage(new Long(offset), new Long(10));
-	}
+    private final String version;
+    private final Date modifiedOn;
+    private final String user;
 
-	@Override
-	public void updateHistoryList(List<V2WikiHistorySnapshot> historyResults) {
-		for (int i = 0; i < historyResults.size(); i++) {
-			historyList.add(historyResults.get(i));
-		}
-		resultSize = historyResults.size();
-		if (isFirstGetHistory) {
-			currentVersion = historyResults.get(0).getVersion();
-		}
-	}
+    public HistoryEntry(String version, String user, Date modifiedOn) {
+      this.user = user;
+      this.version = version;
+      this.modifiedOn = modifiedOn;
+    }
+  }
 
-	@Override
-	public void buildHistoryWidget() {
-		// We have all the data to create entries for the table
-		createHistoryEntries();
-		// Create or build upon the history widget
-		isFirstGetHistory = false;
-		createHistoryWidget();
-	}
+  @Override
+  public void configure(boolean canEdit, ActionHandler actionHandler) {
+    this.canEdit = canEdit;
+    this.actionHandler = actionHandler;
+    this.isFirstGetHistory = true;
+    this.offset = 0;
+    // Reset history
+    hideHistoryWidget();
+    add(loadingUI);
+    historyList = new ArrayList<V2WikiHistorySnapshot>();
+    historyEntries = new ArrayList<HistoryEntry>();
+    presenter.configureNextPage(new Long(offset), new Long(10));
+  }
 
-	private void createHistoryEntries() {
-		if (historyList != null) {
-			for (int i = offset; i < historyList.size(); i++) {
-				V2WikiHistorySnapshot snapshot = historyList.get(i);
-				// Create an entry
-				String userId = snapshot.getModifiedBy();
-				String modifiedByName = presenter.getNameForUserId(userId);
-				if (modifiedByName == null) {
-					modifiedByName = userId;
-				}
-				HistoryEntry entry = new HistoryEntry(snapshot.getVersion(), modifiedByName, snapshot.getModifiedOn());
-				historyEntries.add(entry);
-			}
-		}
-	}
+  @Override
+  public void updateHistoryList(List<V2WikiHistorySnapshot> historyResults) {
+    for (int i = 0; i < historyResults.size(); i++) {
+      historyList.add(historyResults.get(i));
+    }
+    resultSize = historyResults.size();
+    if (isFirstGetHistory) {
+      currentVersion = historyResults.get(0).getVersion();
+    }
+  }
 
-	private void createHistoryWidget() {
-		// Remove any old table or inline error message first
-		if (historyPanel != null || inlineErrorMessagePanel != null) {
-			hideHistoryWidget();
-		}
+  @Override
+  public void buildHistoryWidget() {
+    // We have all the data to create entries for the table
+    createHistoryEntries();
+    // Create or build upon the history widget
+    isFirstGetHistory = false;
+    createHistoryWidget();
+  }
 
-		Table historyTable = new Table();
-		historyTable.setWidth("100%");
+  private void createHistoryEntries() {
+    if (historyList != null) {
+      for (int i = offset; i < historyList.size(); i++) {
+        V2WikiHistorySnapshot snapshot = historyList.get(i);
+        // Create an entry
+        String userId = snapshot.getModifiedBy();
+        String modifiedByName = presenter.getNameForUserId(userId);
+        if (modifiedByName == null) {
+          modifiedByName = userId;
+        }
+        HistoryEntry entry = new HistoryEntry(
+          snapshot.getVersion(),
+          modifiedByName,
+          snapshot.getModifiedOn()
+        );
+        historyEntries.add(entry);
+      }
+    }
+  }
 
-		loadMoreHistoryButton = new Button("Load more history");
-		loadMoreHistoryButton.addStyleName("margin-top-10");
-		loadMoreHistoryButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				offset += resultSize;
-				presenter.configureNextPage(new Long(offset), new Long(10));
-			}
-		});
+  private void createHistoryWidget() {
+    // Remove any old table or inline error message first
+    if (historyPanel != null || inlineErrorMessagePanel != null) {
+      hideHistoryWidget();
+    }
 
-		// create table header
-		THead thead = new THead();
-		TableRow headerRow = new TableRow();
-		headerRow.setHeight("30px");
-		headerRow.addStyleName("border-bottom-1");
-		if (canEdit) {
-			TableHeader th = new TableHeader();
-			th.setText("Restore");
-			headerRow.add(th);
-		}
+    Table historyTable = new Table();
+    historyTable.setWidth("100%");
 
-		TableHeader th = new TableHeader();
-		th.setText("Preview");
-		headerRow.add(th);
+    loadMoreHistoryButton = new Button("Load more history");
+    loadMoreHistoryButton.addStyleName("margin-top-10");
+    loadMoreHistoryButton.addClickHandler(
+      new ClickHandler() {
+        @Override
+        public void onClick(ClickEvent event) {
+          offset += resultSize;
+          presenter.configureNextPage(new Long(offset), new Long(10));
+        }
+      }
+    );
 
-		th = new TableHeader();
-		th.setText("Version");
-		headerRow.add(th);
+    // create table header
+    THead thead = new THead();
+    TableRow headerRow = new TableRow();
+    headerRow.setHeight("30px");
+    headerRow.addStyleName("border-bottom-1");
+    if (canEdit) {
+      TableHeader th = new TableHeader();
+      th.setText("Restore");
+      headerRow.add(th);
+    }
 
-		th = new TableHeader();
-		th.setText("Modified By");
-		headerRow.add(th);
+    TableHeader th = new TableHeader();
+    th.setText("Preview");
+    headerRow.add(th);
 
-		th = new TableHeader();
-		th.setText("Modified On");
-		headerRow.add(th);
+    th = new TableHeader();
+    th.setText("Version");
+    headerRow.add(th);
 
-		thead.add(headerRow);
-		historyTable.add(thead);
+    th = new TableHeader();
+    th.setText("Modified By");
+    headerRow.add(th);
 
-		TBody tBody = new TBody();
-		for (final HistoryEntry entry : historyEntries) {
-			TableRow row = new TableRow();
-			row.setHeight("30px");
-			row.addStyleName("border-bottom-1");
-			tBody.add(row);
-			TableData td;
+    th = new TableHeader();
+    th.setText("Modified On");
+    headerRow.add(th);
 
-			// Restore if edit permissions granted
-			if (canEdit) {
-				td = new TableData();
-				td.setWidth("100px");
-				if (entry.version.equals(currentVersion)) {
-					td.add(new Span("(Current Wiki)"));
-				} else {
-					Button button = new Button("Restore");
-					button.setSize(ButtonSize.EXTRA_SMALL);
-					button.addClickHandler(new ClickHandler() {
-						@Override
-						public void onClick(ClickEvent event) {
-							showRestorationWarning(new Long(entry.version));
-						}
-					});
-					td.add(button);
-				}
-				row.add(td);
-			}
+    thead.add(headerRow);
+    historyTable.add(thead);
 
-			// Preview
-			td = new TableData();
-			td.setWidth("100px");
-			Button button = new Button("Preview");
-			button.setSize(ButtonSize.EXTRA_SMALL);
-			button.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					actionHandler.previewClicked(new Long(entry.version), new Long(currentVersion));
-				}
-			});
-			td.add(button);
-			row.add(td);
+    TBody tBody = new TBody();
+    for (final HistoryEntry entry : historyEntries) {
+      TableRow row = new TableRow();
+      row.setHeight("30px");
+      row.addStyleName("border-bottom-1");
+      tBody.add(row);
+      TableData td;
 
-			// Version
-			td = new TableData();
-			td.add(new Text(entry.version));
-			row.add(td);
+      // Restore if edit permissions granted
+      if (canEdit) {
+        td = new TableData();
+        td.setWidth("100px");
+        if (entry.version.equals(currentVersion)) {
+          td.add(new Span("(Current Wiki)"));
+        } else {
+          Button button = new Button("Restore");
+          button.setSize(ButtonSize.EXTRA_SMALL);
+          button.addClickHandler(
+            new ClickHandler() {
+              @Override
+              public void onClick(ClickEvent event) {
+                showRestorationWarning(new Long(entry.version));
+              }
+            }
+          );
+          td.add(button);
+        }
+        row.add(td);
+      }
 
-			// Modified by
-			td = new TableData();
-			td.add(new Text(entry.user));
-			row.add(td);
+      // Preview
+      td = new TableData();
+      td.setWidth("100px");
+      Button button = new Button("Preview");
+      button.setSize(ButtonSize.EXTRA_SMALL);
+      button.addClickHandler(
+        new ClickHandler() {
+          @Override
+          public void onClick(ClickEvent event) {
+            actionHandler.previewClicked(
+              new Long(entry.version),
+              new Long(currentVersion)
+            );
+          }
+        }
+      );
+      td.add(button);
+      row.add(td);
 
-			// Modified on
-			td = new TableData();
-			td.add(new Text(dateTimeUtils.getDateTimeString(entry.modifiedOn)));
-			row.add(td);
-		}
-		historyTable.add(tBody);
-		historyTable.setVisible(true);
+      // Version
+      td = new TableData();
+      td.add(new Text(entry.version));
+      row.add(td);
 
-		historyPanel = new FlowPanel();
-		historyPanel.add(wrapWidget(historyTable, "margin-top-5"));
-		historyPanel.add(loadMoreHistoryButton);
-		add(historyPanel);
-		loadingUI.removeFromParent();
-	}
+      // Modified by
+      td = new TableData();
+      td.add(new Text(entry.user));
+      row.add(td);
 
-	@Override
-	public void hideHistoryWidget() {
-		if (historyPanel != null) {
-			historyPanel.removeFromParent();
-		}
-		if (inlineErrorMessagePanel != null) {
-			inlineErrorMessagePanel.removeFromParent();
-		}
-	}
+      // Modified on
+      td = new TableData();
+      td.add(new Text(dateTimeUtils.getDateTimeString(entry.modifiedOn)));
+      row.add(td);
+    }
+    historyTable.add(tBody);
+    historyTable.setVisible(true);
 
-	@Override
-	public void showHistoryWidget() {
-		if (historyPanel != null) {
-			historyPanel.setVisible(true);
-		}
-	}
+    historyPanel = new FlowPanel();
+    historyPanel.add(wrapWidget(historyTable, "margin-top-5"));
+    historyPanel.add(loadMoreHistoryButton);
+    add(historyPanel);
+    loadingUI.removeFromParent();
+  }
 
-	@Override
-	public void hideLoadMoreButton() {
-		loadMoreHistoryButton.setVisible(false);
-	}
+  @Override
+  public void hideHistoryWidget() {
+    if (historyPanel != null) {
+      historyPanel.removeFromParent();
+    }
+    if (inlineErrorMessagePanel != null) {
+      inlineErrorMessagePanel.removeFromParent();
+    }
+  }
 
-	public void showRestorationWarning(final Long wikiVersion) {
-		org.sagebionetworks.web.client.utils.Callback okCallback = () -> {
-			actionHandler.restoreClicked(wikiVersion);
-		};
-		org.sagebionetworks.web.client.utils.Callback cancelCallback = () -> {
-		};
-		DisplayUtils.showPopup(DisplayConstants.RESTORING_WIKI_VERSION_WARNING_TITLE, DisplayConstants.RESTORING_WIKI_VERSION_WARNING_MESSAGE, MessagePopup.WARNING, okCallback, cancelCallback);
-	}
+  @Override
+  public void showHistoryWidget() {
+    if (historyPanel != null) {
+      historyPanel.setVisible(true);
+    }
+  }
 
-	private SimplePanel wrapWidget(Widget widget, String styleNames) {
-		SimplePanel widgetWrapper = new SimplePanel();
-		widgetWrapper.addStyleName(styleNames);
-		widgetWrapper.setWidget(widget);
-		return widgetWrapper;
-	}
+  @Override
+  public void hideLoadMoreButton() {
+    loadMoreHistoryButton.setVisible(false);
+  }
 
-	@Override
-	public Widget asWidget() {
-		return this;
-	}
+  public void showRestorationWarning(final Long wikiVersion) {
+    org.sagebionetworks.web.client.utils.Callback okCallback = () -> {
+      actionHandler.restoreClicked(wikiVersion);
+    };
+    org.sagebionetworks.web.client.utils.Callback cancelCallback = () -> {};
+    DisplayUtils.showPopup(
+      DisplayConstants.RESTORING_WIKI_VERSION_WARNING_TITLE,
+      DisplayConstants.RESTORING_WIKI_VERSION_WARNING_MESSAGE,
+      MessagePopup.WARNING,
+      okCallback,
+      cancelCallback
+    );
+  }
 
-	@Override
-	public void showLoading() {}
+  private SimplePanel wrapWidget(Widget widget, String styleNames) {
+    SimplePanel widgetWrapper = new SimplePanel();
+    widgetWrapper.addStyleName(styleNames);
+    widgetWrapper.setWidget(widget);
+    return widgetWrapper;
+  }
 
-	@Override
-	public void showInfo(String message) {
-		DisplayUtils.showInfo(message);
-	}
+  @Override
+  public Widget asWidget() {
+    return this;
+  }
 
-	@Override
-	public void showErrorMessage(String message) {
-		// Show an inline error message
-		SafeHtmlBuilder builder = new SafeHtmlBuilder();
-		builder.appendHtmlConstant(message);
-		inlineErrorMessagePanel = new HTMLPanel(builder.toSafeHtml());
-		add(inlineErrorMessagePanel);
-	}
+  @Override
+  public void showLoading() {}
 
-	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-	}
+  @Override
+  public void showInfo(String message) {
+    DisplayUtils.showInfo(message);
+  }
 
-	@Override
-	public void setSynAlert(IsWidget w) {
-		synAlertContainer.clear();
-		synAlertContainer.add(w);
-	}
+  @Override
+  public void showErrorMessage(String message) {
+    // Show an inline error message
+    SafeHtmlBuilder builder = new SafeHtmlBuilder();
+    builder.appendHtmlConstant(message);
+    inlineErrorMessagePanel = new HTMLPanel(builder.toSafeHtml());
+    add(inlineErrorMessagePanel);
+  }
+
+  @Override
+  public void setPresenter(Presenter presenter) {
+    this.presenter = presenter;
+  }
+
+  @Override
+  public void setSynAlert(IsWidget w) {
+    synAlertContainer.clear();
+    synAlertContainer.add(w);
+  }
 }

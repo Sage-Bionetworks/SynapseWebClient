@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.server.servlet;
 
 import java.util.HashMap;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sagebionetworks.repo.model.status.StackStatus;
@@ -14,34 +13,49 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 /**
- * 
+ *
  * This class provides access to stack configuration information. It can be extended, as needed,
  * with methods from StackConfiguration.
- * 
+ *
  * @author brucehoff
  *
  */
-public class StackConfigServiceImpl extends SynapseClientBase implements StackConfigService {
-	static private Log log = LogFactory.getLog(StackConfigServiceImpl.class);
-	public static final long serialVersionUID = 46893767375462651L;
+public class StackConfigServiceImpl
+  extends SynapseClientBase
+  implements StackConfigService {
 
-	@Override
-	public StackStatus getCurrentStatus() throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createAnonymousSynapseClient();
-		try {
-			return synapseClient.getCurrentStackStatus();
-		} catch (Exception e) {
-			throw new UnknownErrorException(e.getMessage());
-		}
-	}
+  private static Log log = LogFactory.getLog(StackConfigServiceImpl.class);
+  public static final long serialVersionUID = 46893767375462651L;
 
-	@Override
-	public HashMap<String, String> getSynapseProperties() {
-		HashMap<String, String> properties = PortalPropertiesHolder.getPropertiesMap();
-		properties.put(WebConstants.REPO_SERVICE_URL_KEY, StackEndpoints.getRepositoryServiceEndpoint());
-		properties.put(WebConstants.FILE_SERVICE_URL_KEY, StackEndpoints.getFileServiceEndpoint());
-		properties.put(WebConstants.AUTH_PUBLIC_SERVICE_URL_KEY, StackEndpoints.getAuthenticationServicePublicEndpoint());
-		properties.put(WebConstants.SYNAPSE_VERSION_KEY, PortalVersionHolder.getVersionInfo());
-		return properties;
-	}
+  @Override
+  public StackStatus getCurrentStatus() throws RestServiceException {
+    org.sagebionetworks.client.SynapseClient synapseClient = createAnonymousSynapseClient();
+    try {
+      return synapseClient.getCurrentStackStatus();
+    } catch (Exception e) {
+      throw new UnknownErrorException(e.getMessage());
+    }
+  }
+
+  @Override
+  public HashMap<String, String> getSynapseProperties() {
+    HashMap<String, String> properties = PortalPropertiesHolder.getPropertiesMap();
+    properties.put(
+      WebConstants.REPO_SERVICE_URL_KEY,
+      StackEndpoints.getRepositoryServiceEndpoint()
+    );
+    properties.put(
+      WebConstants.FILE_SERVICE_URL_KEY,
+      StackEndpoints.getFileServiceEndpoint()
+    );
+    properties.put(
+      WebConstants.AUTH_PUBLIC_SERVICE_URL_KEY,
+      StackEndpoints.getAuthenticationServicePublicEndpoint()
+    );
+    properties.put(
+      WebConstants.SYNAPSE_VERSION_KEY,
+      PortalVersionHolder.getVersionInfo()
+    );
+    return properties;
+  }
 }

@@ -1,57 +1,64 @@
 package org.sagebionetworks.web.client.view;
 
-import org.gwtbootstrap3.client.ui.html.Div;
-import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
-import org.sagebionetworks.web.client.widget.header.Header;
-import org.sagebionetworks.web.shared.WikiPageKey;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
+import org.sagebionetworks.web.client.widget.header.Header;
+import org.sagebionetworks.web.shared.WikiPageKey;
 
-public class SynapseStandaloneWikiViewImpl implements SynapseStandaloneWikiView {
+public class SynapseStandaloneWikiViewImpl
+  implements SynapseStandaloneWikiView {
 
-	public interface SynapseStandaloneWikiViewImplUiBinder extends UiBinder<Widget, SynapseStandaloneWikiViewImpl> {
-	}
+  public interface SynapseStandaloneWikiViewImplUiBinder
+    extends UiBinder<Widget, SynapseStandaloneWikiViewImpl> {}
 
-	@UiField
-	Div markdownContainer;
-	@UiField
-	Div synAlertContainer;
-	Widget widget;
+  @UiField
+  Div markdownContainer;
 
-	private Header headerWidget;
-	private MarkdownWidget markdownWidget;
+  @UiField
+  Div synAlertContainer;
 
-	@Inject
-	public SynapseStandaloneWikiViewImpl(SynapseStandaloneWikiViewImplUiBinder binder, MarkdownWidget markdownWidget, Header headerWidget) {
-		widget = binder.createAndBindUi(this);
+  Widget widget;
 
-		this.headerWidget = headerWidget;
-		this.markdownWidget = markdownWidget;
-		headerWidget.configure();
-		markdownContainer.add(markdownWidget.asWidget());
-	}
+  private Header headerWidget;
+  private MarkdownWidget markdownWidget;
 
-	@Override
-	public void configure(String markdown, WikiPageKey wikiKey) {
-		markdownWidget.configure(markdown, wikiKey, null);
-		markdownContainer.setVisible(true);
-		headerWidget.configure();
-		headerWidget.refresh();
-		Window.scrollTo(0, 0); // scroll user to top of page
-	}
+  @Inject
+  public SynapseStandaloneWikiViewImpl(
+    SynapseStandaloneWikiViewImplUiBinder binder,
+    MarkdownWidget markdownWidget,
+    Header headerWidget
+  ) {
+    widget = binder.createAndBindUi(this);
 
-	@Override
-	public void setSynAlert(IsWidget w) {
-		synAlertContainer.clear();
-		synAlertContainer.add(w);
-	}
+    this.headerWidget = headerWidget;
+    this.markdownWidget = markdownWidget;
+    headerWidget.configure();
+    markdownContainer.add(markdownWidget.asWidget());
+  }
 
-	@Override
-	public Widget asWidget() {
-		return widget;
-	}
+  @Override
+  public void configure(String markdown, WikiPageKey wikiKey) {
+    markdownWidget.configure(markdown, wikiKey, null);
+    markdownContainer.setVisible(true);
+    headerWidget.configure();
+    headerWidget.refresh();
+    Window.scrollTo(0, 0); // scroll user to top of page
+  }
+
+  @Override
+  public void setSynAlert(IsWidget w) {
+    synAlertContainer.clear();
+    synAlertContainer.add(w);
+  }
+
+  @Override
+  public Widget asWidget() {
+    return widget;
+  }
 }

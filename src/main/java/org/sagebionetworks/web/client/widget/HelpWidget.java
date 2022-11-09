@@ -1,19 +1,5 @@
 package org.sagebionetworks.web.client.widget;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import org.gwtbootstrap3.client.ui.Anchor;
-import org.gwtbootstrap3.client.ui.Popover;
-import org.gwtbootstrap3.client.ui.constants.IconType;
-import org.gwtbootstrap3.client.ui.constants.Placement;
-import org.gwtbootstrap3.client.ui.constants.Pull;
-import org.gwtbootstrap3.client.ui.html.Span;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.MarkdownIt;
-import org.sagebionetworks.web.client.MarkdownItImpl;
-import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
-
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -25,166 +11,202 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import java.util.HashSet;
+import java.util.Set;
+import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.Popover;
+import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.gwtbootstrap3.client.ui.constants.Placement;
+import org.gwtbootstrap3.client.ui.constants.Pull;
+import org.gwtbootstrap3.client.ui.html.Span;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.MarkdownIt;
+import org.sagebionetworks.web.client.MarkdownItImpl;
+import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 
 /**
  * View only widget used to show a help icon (and help text). When clicked, a popover is shown that
  * contains basic help, and a More Info button. When the More Info button is clicked, the browser
  * will open a new tab to the full help documentation (typically to the help.synapse.org site).
- * 
+ *
  * ## Usage
- * 
+ *
  * In your ui.xml, add the help widget. ```
  * xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
  * <w:HelpWidget text="Optional help link text" help="This contains concise but basic help." href=
  * "http://link/to/more/help" /> ```
- * 
+ *
  * That's it! You can set visibility and placement today, and we can easily extend it to have
  * additional options in the future.
- * 
+ *
  * @author jayhodgson
  *
  */
 public class HelpWidget implements IsWidget {
-	public static final Set<HelpWidget> POPOVERS = new HashSet<HelpWidget>();
-	@UiField
-	SpanElement moreInfoText;
-	@UiField
-	Popover helpPopover;
-	@UiField
-	SpanElement icon;
-	@UiField
-	Anchor anchor;
-	@UiField
-	SpanElement innerIconSpan;
 
-	Span widget;
-	private String popoverElementId;
-	private String closePopoverJs;
-	private IconType iconType = IconType.QUESTION_CIRCLE;
+  public static final Set<HelpWidget> POPOVERS = new HashSet<HelpWidget>();
 
-	private static MarkdownIt markdownIt = new MarkdownItImpl(GWT.create(SynapseJSNIUtilsImpl.class));
+  @UiField
+  SpanElement moreInfoText;
 
-	public interface Binder extends UiBinder<Widget, HelpWidget> {
-	}
+  @UiField
+  Popover helpPopover;
 
-	private static Binder uiBinder = GWT.create(Binder.class);
-	String text = "", basicHelpText = "", moreHelpHTML = "", iconStyles = "lightGreyText", closeHTML = "";
+  @UiField
+  SpanElement icon;
 
-	public HelpWidget() {
-		widget = (Span)uiBinder.createAndBindUi(this);
-		anchor.getElement().setAttribute("tabindex", "0");
-		popoverElementId = HTMLPanel.createUniqueId();
-		helpPopover.getWidget().getElement().setId(popoverElementId);
-		closePopoverJs = "window.jQuery('#" + popoverElementId + "').popover('hide')";
-		closeHTML = "<button class=\"btn btn-default btn-xs right margin-right-5\" onClick=\"" + closePopoverJs + "\">Close</button>";
-		POPOVERS.add(this);
-		anchor.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				hideOtherPopovers(HelpWidget.this);
-				helpPopover.show();
-			}
-		});
-		helpPopover.asWidget().addDomHandler(DisplayUtils.getESCKeyDownHandler(event -> {
-			hidePopover();
-		}), KeyDownEvent.getType());
-	}
+  @UiField
+  Anchor anchor;
 
-	public void setWidth(String width) {
-		widget.setWidth(width);
-	}
-	public void setText(String text) {
-		this.text = text;
-		updateContent();
-	}
+  @UiField
+  SpanElement innerIconSpan;
 
-	public void setIconType(IconType newType) {
-		iconType = newType;
-		updateContent();
-	}
+  Span widget;
+  private String popoverElementId;
+  private String closePopoverJs;
+  private IconType iconType = IconType.QUESTION_CIRCLE;
 
-	public void setIconStyles(String iconStyles) {
-		this.iconStyles = iconStyles;
-		updateContent();
-	}
+  private static MarkdownIt markdownIt = new MarkdownItImpl(
+    GWT.create(SynapseJSNIUtilsImpl.class)
+  );
 
-	public void setHelpMarkdown(String md) {
-		this.basicHelpText = markdownIt.markdown2Html(md, "");
-		updateContent();
-	}
+  public interface Binder extends UiBinder<Widget, HelpWidget> {}
 
-	public void setHref(String fullHelpHref) {
-		if (DisplayUtils.isDefined(fullHelpHref)) {
-			this.moreHelpHTML = "<button class=\"btn btn-primary btn-xs right\" onClick=\"window.open('" + SafeHtmlUtils.htmlEscape(fullHelpHref) + "');" + closePopoverJs + "\">More info</button>";
-		}
-		updateContent();
-	}
+  private static Binder uiBinder = GWT.create(Binder.class);
+  String text = "", basicHelpText = "", moreHelpHTML = "", iconStyles =
+    "lightGreyText", closeHTML = "";
 
-	public void hidePopover() {
-		helpPopover.hide();
-	}
+  public HelpWidget() {
+    widget = (Span) uiBinder.createAndBindUi(this);
+    anchor.getElement().setAttribute("tabindex", "0");
+    popoverElementId = HTMLPanel.createUniqueId();
+    helpPopover.getWidget().getElement().setId(popoverElementId);
+    closePopoverJs =
+      "window.jQuery('#" + popoverElementId + "').popover('hide')";
+    closeHTML =
+      "<button class=\"btn btn-default btn-xs right margin-right-5\" onClick=\"" +
+      closePopoverJs +
+      "\">Close</button>";
+    POPOVERS.add(this);
+    anchor.addClickHandler(
+      new ClickHandler() {
+        @Override
+        public void onClick(ClickEvent event) {
+          hideOtherPopovers(HelpWidget.this);
+          helpPopover.show();
+        }
+      }
+    );
+    helpPopover
+      .asWidget()
+      .addDomHandler(
+        DisplayUtils.getESCKeyDownHandler(event -> {
+          hidePopover();
+        }),
+        KeyDownEvent.getType()
+      );
+  }
 
-	@Override
-	public Widget asWidget() {
-		updateContent();
-		return widget;
-	}
+  public void setWidth(String width) {
+    widget.setWidth(width);
+  }
 
-	public void updateContent() {
-		innerIconSpan.setClassName("fa " + iconType.getCssName());
-		if (DisplayUtils.isDefined(iconStyles))
-			icon.setClassName(iconStyles);
-		moreInfoText.setInnerText(text);
-		helpPopover.setContent(basicHelpText + moreHelpHTML + closeHTML);
-	}
+  public void setText(String text) {
+    this.text = text;
+    updateContent();
+  }
 
-	public void setVisible(boolean visible) {
-		widget.setVisible(visible);
-	}
+  public void setIconType(IconType newType) {
+    iconType = newType;
+    updateContent();
+  }
 
-	public void setPlacement(final Placement placement) {
-		helpPopover.setPlacement(placement);
-	}
+  public void setIconStyles(String iconStyles) {
+    this.iconStyles = iconStyles;
+    updateContent();
+  }
 
-	public void setAddStyleNames(String styleNames) {
-		widget.addStyleName(styleNames);
-	}
+  public void setHelpMarkdown(String md) {
+    this.basicHelpText = markdownIt.markdown2Html(md, "");
+    updateContent();
+  }
 
-	public void setAddMoreInfoStyleNames(String styleNames) {
-		moreInfoText.addClassName(styleNames);
-	}
+  public void setHref(String fullHelpHref) {
+    if (DisplayUtils.isDefined(fullHelpHref)) {
+      this.moreHelpHTML =
+        "<button class=\"btn btn-primary btn-xs right\" onClick=\"window.open('" +
+        SafeHtmlUtils.htmlEscape(fullHelpHref) +
+        "');" +
+        closePopoverJs +
+        "\">More info</button>";
+    }
+    updateContent();
+  }
 
-	public void setAddAnchorStyleNames(String styleNames) {
-		anchor.addStyleName(styleNames);
-	}
+  public void hidePopover() {
+    helpPopover.hide();
+  }
 
-	public void setPull(Pull pull) {
-		widget.addStyleName(pull.getCssName());
-	}
+  @Override
+  public Widget asWidget() {
+    updateContent();
+    return widget;
+  }
 
-	public static void hideOtherPopovers(HelpWidget showingHelpWidget) {
-		for (HelpWidget h : POPOVERS) {
-			if (!showingHelpWidget.equals(h)) {
-				h.getHelpPopover().hide();
-			}
-		}
-	}
+  public void updateContent() {
+    innerIconSpan.setClassName("fa " + iconType.getCssName());
+    if (DisplayUtils.isDefined(iconStyles)) icon.setClassName(iconStyles);
+    moreInfoText.setInnerText(text);
+    helpPopover.setContent(basicHelpText + moreHelpHTML + closeHTML);
+  }
 
-	public Popover getHelpPopover() {
-		return helpPopover;
-	}
+  public void setVisible(boolean visible) {
+    widget.setVisible(visible);
+  }
 
-	public void focus() {
-		anchor.setFocus(true);
-	}
+  public void setPlacement(final Placement placement) {
+    helpPopover.setPlacement(placement);
+  }
 
-	// SWC-4292: On static initialization of class, add a listener for the bootstrap modal close event.
-	// If the event fires, make sure all popovers are hidden.
-	static {
-		_addModalHideListener();
-	}
+  public void setAddStyleNames(String styleNames) {
+    widget.addStyleName(styleNames);
+  }
 
-	private static native void _addModalHideListener() /*-{
+  public void setAddMoreInfoStyleNames(String styleNames) {
+    moreInfoText.addClassName(styleNames);
+  }
+
+  public void setAddAnchorStyleNames(String styleNames) {
+    anchor.addStyleName(styleNames);
+  }
+
+  public void setPull(Pull pull) {
+    widget.addStyleName(pull.getCssName());
+  }
+
+  public static void hideOtherPopovers(HelpWidget showingHelpWidget) {
+    for (HelpWidget h : POPOVERS) {
+      if (!showingHelpWidget.equals(h)) {
+        h.getHelpPopover().hide();
+      }
+    }
+  }
+
+  public Popover getHelpPopover() {
+    return helpPopover;
+  }
+
+  public void focus() {
+    anchor.setFocus(true);
+  }
+
+  // SWC-4292: On static initialization of class, add a listener for the bootstrap modal close event.
+  // If the event fires, make sure all popovers are hidden.
+  static {
+    _addModalHideListener();
+  }
+
+  private static native void _addModalHideListener() /*-{
 		try {
 			$wnd
 					.jQuery($doc.body)
@@ -199,9 +221,9 @@ public class HelpWidget implements IsWidget {
 		}
 	}-*/;
 
-	public static void hideAllPopovers() {
-		for (HelpWidget h : POPOVERS) {
-			h.getHelpPopover().hide();
-		}
-	}
+  public static void hideAllPopovers() {
+    for (HelpWidget h : POPOVERS) {
+      h.getHelpPopover().hide();
+    }
+  }
 }

@@ -1,9 +1,13 @@
 package org.sagebionetworks.web.client.widget.asynch;
 
-import org.sagebionetworks.repo.model.EntityHeader;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import org.sagebionetworks.repo.model.EntityHeader;
 
-// The response always contains the version.  So use this handler if you have an entity version.  Otherwise use EntityHeaderAsyncHandler. 
+// The response always contains the version.  So use this handler if you have an entity version.  Otherwise use EntityHeaderAsyncHandler.
 public interface VersionedEntityHeaderAsyncHandler {
-	void getEntityHeader(String entityId, Long versionNumber, AsyncCallback<EntityHeader> callback);
+  void getEntityHeader(
+    String entityId,
+    Long versionNumber,
+    AsyncCallback<EntityHeader> callback
+  );
 }

@@ -1,35 +1,39 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 import org.gwtbootstrap3.client.ui.TabPane;
 import org.sagebionetworks.web.client.place.Synapse;
 
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Widget;
-
 public interface TabView extends IsWidget {
-	void setPresenter(Presenter presenter);
+  void setPresenter(Presenter presenter);
 
-	void updateHref(Synapse place);
+  void updateHref(Synapse place);
 
-	void configure(String tabTitle, String iconName, String helpMarkdown, String helpLink);
+  void configure(
+    String tabTitle,
+    String iconName,
+    String helpMarkdown,
+    String helpLink
+  );
 
-	void setContent(Widget content);
+  void setContent(Widget content);
 
-	Widget getTabListItem();
+  Widget getTabListItem();
 
-	void setTabListItemVisible(boolean visible);
+  void setTabListItemVisible(boolean visible);
 
-	boolean isTabListItemVisible();
+  boolean isTabListItemVisible();
 
-	void addTabListItemStyle(String style);
+  void addTabListItemStyle(String style);
 
-	TabPane getTabPane();
+  TabPane getTabPane();
 
-	void setActive(boolean isActive);
+  void setActive(boolean isActive);
 
-	boolean isActive();
+  boolean isActive();
 
-	public interface Presenter {
-		void onTabClicked();
-	}
+  public interface Presenter {
+    void onTabClicked();
+  }
 }

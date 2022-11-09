@@ -1,77 +1,79 @@
 package org.sagebionetworks.web.client.widget.table.modal.fileview;
 
-import org.gwtbootstrap3.client.ui.CheckBox;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
-
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.gwtbootstrap3.client.ui.CheckBox;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 
 public class FileViewOptions implements IsWidget {
-	public interface Binder extends UiBinder<Widget, FileViewOptions> {
-	}
 
-	Widget widget;
+  public interface Binder extends UiBinder<Widget, FileViewOptions> {}
 
-	@UiField
-	CheckBox includeFilesCb;
-	@UiField
-	CheckBox includeFoldersCb;
-	@UiField
-	CheckBox includeTablesCb;
-	@UiField
-	CheckBox includeDatasetsCb;
+  Widget widget;
 
-	@Inject
-	public FileViewOptions(Binder binder) {
-		widget = binder.createAndBindUi(this);
-	}
+  @UiField
+  CheckBox includeFilesCb;
 
-	@Override
-	public Widget asWidget() {
-		return widget;
-	}
+  @UiField
+  CheckBox includeFoldersCb;
 
-	public boolean isIncludeFiles() {
-		return includeFilesCb.getValue();
-	}
+  @UiField
+  CheckBox includeTablesCb;
 
-	public void setIsIncludeFiles(boolean value) {
-		includeFilesCb.setValue(value);
-	}
+  @UiField
+  CheckBox includeDatasetsCb;
 
-	public boolean isIncludeFolders() {
-		return includeFoldersCb.getValue();
-	}
+  @Inject
+  public FileViewOptions(Binder binder) {
+    widget = binder.createAndBindUi(this);
+  }
 
-	public void setIsIncludeFolders(boolean value) {
-		includeFoldersCb.setValue(value);
-	}
+  @Override
+  public Widget asWidget() {
+    return widget;
+  }
 
-	public boolean isIncludeTables() {
-		return includeTablesCb.getValue();
-	}
+  public boolean isIncludeFiles() {
+    return includeFilesCb.getValue();
+  }
 
-	public void setIsIncludeTables(boolean value) {
-		includeTablesCb.setValue(value);
-	}
+  public void setIsIncludeFiles(boolean value) {
+    includeFilesCb.setValue(value);
+  }
 
-	public boolean isIncludeDatasets() {
-		return includeDatasetsCb.getValue();
-	}
+  public boolean isIncludeFolders() {
+    return includeFoldersCb.getValue();
+  }
 
-	public void setIsIncludeDatasets(boolean value) {
-		includeDatasetsCb.setValue(value);
-	}
+  public void setIsIncludeFolders(boolean value) {
+    includeFoldersCb.setValue(value);
+  }
 
-	public void addClickHandler(ClickHandler handler) {
-		includeFilesCb.addClickHandler(handler);
-		includeFoldersCb.addClickHandler(handler);
-		includeTablesCb.addClickHandler(handler);
-		includeDatasetsCb.addClickHandler(handler);
-	}
+  public boolean isIncludeTables() {
+    return includeTablesCb.getValue();
+  }
+
+  public void setIsIncludeTables(boolean value) {
+    includeTablesCb.setValue(value);
+  }
+
+  public boolean isIncludeDatasets() {
+    return includeDatasetsCb.getValue();
+  }
+
+  public void setIsIncludeDatasets(boolean value) {
+    includeDatasetsCb.setValue(value);
+  }
+
+  public void addClickHandler(ClickHandler handler) {
+    includeFilesCb.addClickHandler(handler);
+    includeFoldersCb.addClickHandler(handler);
+    includeTablesCb.addClickHandler(handler);
+    includeDatasetsCb.addClickHandler(handler);
+  }
 }

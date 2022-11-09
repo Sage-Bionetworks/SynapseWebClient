@@ -2,6 +2,7 @@ package org.sagebionetworks.web.unitshared.exceptions;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+
 import java.util.Arrays;
 import java.util.Collection;
 import org.json.JSONException;
@@ -34,34 +35,80 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 @RunWith(Parameterized.class)
 public class ExceptionUtilTest {
-	private static String message = "msg";
 
-	@Parameters
-	public static Collection<Object[]> data() {
-		return Arrays.asList(new Object[][] {{ForbiddenException.class, new SynapseForbiddenException(message)}, {BadRequestException.class, new SynapseBadRequestException(message)}, {NotFoundException.class, new SynapseNotFoundException(message)}, {UnauthorizedException.class, new SynapseUnauthorizedException(message)}, {UnknownErrorException.class, new SynapseClientException(message)}, {UnknownErrorException.class, new UnknownSynapseServerException(500, message)}, {SynapseDownException.class, new SynapseServiceUnavailable(message)}, {TooManyRequestsException.class, new SynapseTooManyRequestsException(message)}, {ConflictException.class, new UnknownSynapseServerException(409, "Service Error(409):  FAILURE: Got HTTP status 409 for")}, {ConflictingUpdateException.class, new SynapseConflictingUpdateException(message)}, {DeprecatedServiceException.class, new SynapseDeprecatedServiceException(message)}, {BadRequestException.class, new JSONException(message)}});
-	}
+  private static String message = "msg";
 
-	Class<? extends RestServiceException> restServiceException;
-	Exception synapseException;
+  @Parameters
+  public static Collection<Object[]> data() {
+    return Arrays.asList(
+      new Object[][] {
+        { ForbiddenException.class, new SynapseForbiddenException(message) },
+        { BadRequestException.class, new SynapseBadRequestException(message) },
+        { NotFoundException.class, new SynapseNotFoundException(message) },
+        {
+          UnauthorizedException.class,
+          new SynapseUnauthorizedException(message),
+        },
+        { UnknownErrorException.class, new SynapseClientException(message) },
+        {
+          UnknownErrorException.class,
+          new UnknownSynapseServerException(500, message),
+        },
+        { SynapseDownException.class, new SynapseServiceUnavailable(message) },
+        {
+          TooManyRequestsException.class,
+          new SynapseTooManyRequestsException(message),
+        },
+        {
+          ConflictException.class,
+          new UnknownSynapseServerException(
+            409,
+            "Service Error(409):  FAILURE: Got HTTP status 409 for"
+          ),
+        },
+        {
+          ConflictingUpdateException.class,
+          new SynapseConflictingUpdateException(message),
+        },
+        {
+          DeprecatedServiceException.class,
+          new SynapseDeprecatedServiceException(message),
+        },
+        { BadRequestException.class, new JSONException(message) },
+      }
+    );
+  }
 
-	public ExceptionUtilTest(Class<? extends RestServiceException> restServiceException, Exception synapseException) {
-		super();
-		this.restServiceException = restServiceException;
-		this.synapseException = synapseException;
-	}
+  Class<? extends RestServiceException> restServiceException;
+  Exception synapseException;
 
-	@Test
-	public void testConvertSynapseForbiddenException() {
-		RestServiceException ex = ExceptionUtil.convertSynapseException(synapseException);
-		assertNotNull(ex);
-		assertEquals(restServiceException, ex.getClass());
-	}
+  public ExceptionUtilTest(
+    Class<? extends RestServiceException> restServiceException,
+    Exception synapseException
+  ) {
+    super();
+    this.restServiceException = restServiceException;
+    this.synapseException = synapseException;
+  }
 
-	@Test
-	public void testConvertSynapseClientException() {
-		SynapseClientException synapseClientEx = new SynapseClientException(synapseException);
-		RestServiceException ex = ExceptionUtil.convertSynapseException(synapseClientEx);
-		assertNotNull(ex);
-		assertEquals(restServiceException, ex.getClass());
-	}
+  @Test
+  public void testConvertSynapseForbiddenException() {
+    RestServiceException ex = ExceptionUtil.convertSynapseException(
+      synapseException
+    );
+    assertNotNull(ex);
+    assertEquals(restServiceException, ex.getClass());
+  }
+
+  @Test
+  public void testConvertSynapseClientException() {
+    SynapseClientException synapseClientEx = new SynapseClientException(
+      synapseException
+    );
+    RestServiceException ex = ExceptionUtil.convertSynapseException(
+      synapseClientEx
+    );
+    assertNotNull(ex);
+    assertEquals(restServiceException, ex.getClass());
+  }
 }

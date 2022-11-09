@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import java.util.Arrays;
 import java.util.List;
 import org.junit.Before;
@@ -17,75 +18,74 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.ListCellEdito
 
 public class EnumCellEditorImplTest {
 
-	ListCellEditorView mockView;
-	EnumCellEditor editor;
-	@Mock
-	SynapseJSNIUtils mockSynapseJSNIUtils;
+  ListCellEditorView mockView;
+  EnumCellEditor editor;
 
-	@Before
-	public void before() {
-		MockitoAnnotations.initMocks(this);
-		mockView = Mockito.mock(ListCellEditorView.class);
-		editor = new EnumCellEditor(mockView, mockSynapseJSNIUtils);
-	}
+  @Mock
+  SynapseJSNIUtils mockSynapseJSNIUtils;
 
-	@Test
-	public void testConfigure() {
-		List<String> values = Arrays.asList("one", "two");
-		editor.configure(values);
-		verify(mockView).configure(Arrays.asList(EnumCellEditor.NOTHING_SELECTED, "one", "two"));
-	}
+  @Before
+  public void before() {
+    MockitoAnnotations.initMocks(this);
+    mockView = Mockito.mock(ListCellEditorView.class);
+    editor = new EnumCellEditor(mockView, mockSynapseJSNIUtils);
+  }
 
-	@Test
-	public void testSetNull() {
-		List<String> values = Arrays.asList("one", "two");
-		editor.configure(values);
-		editor.setValue(null);
-		verify(mockView).setValue(0);
-	}
+  @Test
+  public void testConfigure() {
+    List<String> values = Arrays.asList("one", "two");
+    editor.configure(values);
+    verify(mockView)
+      .configure(Arrays.asList(EnumCellEditor.NOTHING_SELECTED, "one", "two"));
+  }
 
-	@Test
-	public void testSetEmpty() {
-		List<String> values = Arrays.asList("one", "two");
-		editor.configure(values);
-		editor.setValue("");
-		verify(mockView).setValue(0);
-	}
+  @Test
+  public void testSetNull() {
+    List<String> values = Arrays.asList("one", "two");
+    editor.configure(values);
+    editor.setValue(null);
+    verify(mockView).setValue(0);
+  }
 
-	@Test
-	public void testSetValue() {
-		List<String> values = Arrays.asList("one", "two");
-		editor.configure(values);
-		editor.setValue("one");
-		// second value (first is 'nothing selected')
-		verify(mockView).setValue(1);
-	}
+  @Test
+  public void testSetEmpty() {
+    List<String> values = Arrays.asList("one", "two");
+    editor.configure(values);
+    editor.setValue("");
+    verify(mockView).setValue(0);
+  }
 
-	@Test
-	public void testSetInvalidValue() {
-		List<String> values = Arrays.asList("one", "two");
-		editor.configure(values);
-		editor.setValue("three");
-		verify(mockView).setValue(0);
-		verify(mockSynapseJSNIUtils).consoleError(anyString());
-	}
+  @Test
+  public void testSetValue() {
+    List<String> values = Arrays.asList("one", "two");
+    editor.configure(values);
+    editor.setValue("one");
+    // second value (first is 'nothing selected')
+    verify(mockView).setValue(1);
+  }
 
+  @Test
+  public void testSetInvalidValue() {
+    List<String> values = Arrays.asList("one", "two");
+    editor.configure(values);
+    editor.setValue("three");
+    verify(mockView).setValue(0);
+    verify(mockSynapseJSNIUtils).consoleError(anyString());
+  }
 
-	@Test
-	public void testGetNull() {
-		when(mockView.getValue()).thenReturn(0);
-		List<String> values = Arrays.asList("one", "two");
-		editor.configure(values);
-		assertEquals(null, editor.getValue());
-	}
+  @Test
+  public void testGetNull() {
+    when(mockView.getValue()).thenReturn(0);
+    List<String> values = Arrays.asList("one", "two");
+    editor.configure(values);
+    assertEquals(null, editor.getValue());
+  }
 
-	@Test
-	public void testGetValue() {
-		when(mockView.getValue()).thenReturn(2);
-		List<String> values = Arrays.asList("one", "two");
-		editor.configure(values);
-		assertEquals("two", editor.getValue());
-	}
-
-
+  @Test
+  public void testGetValue() {
+    when(mockView.getValue()).thenReturn(2);
+    List<String> values = Arrays.asList("one", "two");
+    editor.configure(values);
+    assertEquals("two", editor.getValue());
+  }
 }

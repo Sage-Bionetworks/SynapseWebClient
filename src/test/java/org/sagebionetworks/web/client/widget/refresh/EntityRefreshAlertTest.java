@@ -9,6 +9,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -22,110 +24,131 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class EntityRefreshAlertTest {
-	@Mock
-	RefreshAlertView mockView;
-	@Mock
-	SynapseJavascriptClient mockJsClient;
-	@Mock
-	GWTWrapper mockGWTWrapper;
-	@Mock
-	GlobalApplicationState mockGlobalApplicationState;
-	@Mock
-	SynapseJSNIUtils mockSynapseJSNIUtils;
 
-	EntityRefreshAlert entityRefreshAlert;
+  @Mock
+  RefreshAlertView mockView;
 
-	Entity entity;
-	String entityId;
-	String etag;
+  @Mock
+  SynapseJavascriptClient mockJsClient;
 
-	@Before
-	public void before() {
-		entityId = "syn123";
-		etag = "TEST-ETAG";
-		entity = new FileEntity();
-		entity.setId(entityId);
-		entity.setEtag(etag);
+  @Mock
+  GWTWrapper mockGWTWrapper;
 
-		MockitoAnnotations.initMocks(this);
-		entityRefreshAlert = new EntityRefreshAlert(mockView, mockJsClient, mockGWTWrapper, mockGlobalApplicationState, mockSynapseJSNIUtils);
-		when(mockView.isAttached()).thenAnswer((InvocationOnMock invocation) -> true);
-		AsyncMockStubber.callSuccessWith(entity).when(mockJsClient).getEntity(anyString(), any(AsyncCallback.class));
+  @Mock
+  GlobalApplicationState mockGlobalApplicationState;
 
-	}
+  @Mock
+  SynapseJSNIUtils mockSynapseJSNIUtils;
 
-	@Test
-	public void testConstructor() {
-		verify(mockView).setPresenter(entityRefreshAlert);
-	}
+  EntityRefreshAlert entityRefreshAlert;
 
-	@Test
-	public void testConfigureNotAttached() {
-		when(mockView.isAttached()).thenReturn(false);
-		entityRefreshAlert.configure("123");
-		// not ready to ask for the current etag
-		verify(mockJsClient, never()).getEntity(anyString(), any(AsyncCallback.class));
-	}
+  Entity entity;
+  String entityId;
+  String etag;
 
-	@Test
-	public void testAttachedNotConfigured() {
-		when(mockView.isAttached()).thenReturn(true);
-		entityRefreshAlert.onAttach();
-		// not ready to ask for the current etag
-		verify(mockJsClient, never()).getEntity(anyString(), any(AsyncCallback.class));
-	}
+  @Before
+  public void before() {
+    entityId = "syn123";
+    etag = "TEST-ETAG";
+    entity = new FileEntity();
+    entity.setId(entityId);
+    entity.setEtag(etag);
 
-	@Test
-	public void testConfiguredAndAttached() {
-		when(mockView.isAttached()).thenReturn(true);
-		entityRefreshAlert.configure("123");
+    MockitoAnnotations.initMocks(this);
+    entityRefreshAlert =
+      new EntityRefreshAlert(
+        mockView,
+        mockJsClient,
+        mockGWTWrapper,
+        mockGlobalApplicationState,
+        mockSynapseJSNIUtils
+      );
+    when(mockView.isAttached())
+      .thenAnswer((InvocationOnMock invocation) -> true);
+    AsyncMockStubber
+      .callSuccessWith(entity)
+      .when(mockJsClient)
+      .getEntity(anyString(), any(AsyncCallback.class));
+  }
 
-		verify(mockJsClient).getEntity(anyString(), any(AsyncCallback.class));
-		// and will call this again later
-		verify(mockGWTWrapper).scheduleExecution(any(Callback.class), eq(EntityRefreshAlert.DELAY));
-	}
+  @Test
+  public void testConstructor() {
+    verify(mockView).setPresenter(entityRefreshAlert);
+  }
 
-	@Test
-	public void testOnRefresh() {
-		entityRefreshAlert.onRefresh();
-		verify(mockGlobalApplicationState).refreshPage();
-	}
+  @Test
+  public void testConfigureNotAttached() {
+    when(mockView.isAttached()).thenReturn(false);
+    entityRefreshAlert.configure("123");
+    // not ready to ask for the current etag
+    verify(mockJsClient, never())
+      .getEntity(anyString(), any(AsyncCallback.class));
+  }
 
-	@Test
-	public void testCheckEtag_EtagMatch() {
-		entityRefreshAlert.configure(entityId);
-		// reset mock method call counts
-		reset(mockView, mockGWTWrapper);
-		when(mockView.isAttached()).thenReturn(true);
+  @Test
+  public void testAttachedNotConfigured() {
+    when(mockView.isAttached()).thenReturn(true);
+    entityRefreshAlert.onAttach();
+    // not ready to ask for the current etag
+    verify(mockJsClient, never())
+      .getEntity(anyString(), any(AsyncCallback.class));
+  }
 
-		// method under test
-		entityRefreshAlert.checkEtag();
+  @Test
+  public void testConfiguredAndAttached() {
+    when(mockView.isAttached()).thenReturn(true);
+    entityRefreshAlert.configure("123");
 
-		verify(mockView, never()).setVisible(anyBoolean());
-		verify(mockGWTWrapper).scheduleExecution(entityRefreshAlert.invokeCheckEtag, EntityRefreshAlert.DELAY);
-	}
+    verify(mockJsClient).getEntity(anyString(), any(AsyncCallback.class));
+    // and will call this again later
+    verify(mockGWTWrapper)
+      .scheduleExecution(any(Callback.class), eq(EntityRefreshAlert.DELAY));
+  }
 
-	@Test
-	public void testCheckEtag_EtagMismatch() {
-		entityRefreshAlert.configure(entityId);
-		// first call remembers the old etag
-		entityRefreshAlert.checkEtag();
-		// reset mock method call counts
-		reset(mockView, mockGWTWrapper);
-		when(mockView.isAttached()).thenReturn(true);
+  @Test
+  public void testOnRefresh() {
+    entityRefreshAlert.onRefresh();
+    verify(mockGlobalApplicationState).refreshPage();
+  }
 
+  @Test
+  public void testCheckEtag_EtagMatch() {
+    entityRefreshAlert.configure(entityId);
+    // reset mock method call counts
+    reset(mockView, mockGWTWrapper);
+    when(mockView.isAttached()).thenReturn(true);
 
-		// change etag of entity
-		entity.setEtag("UPDATED-ETAG");
+    // method under test
+    entityRefreshAlert.checkEtag();
 
-		// on second call the etag should be different
-		// method under test
-		entityRefreshAlert.checkEtag();
+    verify(mockView, never()).setVisible(anyBoolean());
+    verify(mockGWTWrapper)
+      .scheduleExecution(
+        entityRefreshAlert.invokeCheckEtag,
+        EntityRefreshAlert.DELAY
+      );
+  }
 
-		verify(mockView).setVisible(true);
-		verify(mockGWTWrapper, never()).scheduleExecution(any(Callback.class), anyInt());
-	}
+  @Test
+  public void testCheckEtag_EtagMismatch() {
+    entityRefreshAlert.configure(entityId);
+    // first call remembers the old etag
+    entityRefreshAlert.checkEtag();
+    // reset mock method call counts
+    reset(mockView, mockGWTWrapper);
+    when(mockView.isAttached()).thenReturn(true);
+
+    // change etag of entity
+    entity.setEtag("UPDATED-ETAG");
+
+    // on second call the etag should be different
+    // method under test
+    entityRefreshAlert.checkEtag();
+
+    verify(mockView).setVisible(true);
+    verify(mockGWTWrapper, never())
+      .scheduleExecution(any(Callback.class), anyInt());
+  }
 }

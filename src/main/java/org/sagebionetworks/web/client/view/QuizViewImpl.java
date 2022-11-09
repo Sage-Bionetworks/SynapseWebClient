@@ -1,14 +1,5 @@
 package org.sagebionetworks.web.client.view;
 
-import org.gwtbootstrap3.client.ui.Heading;
-import org.sagebionetworks.repo.model.quiz.PassingRecord;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.widget.LoadingSpinner;
-import org.sagebionetworks.web.client.widget.entity.download.CertificateWidget;
-import org.sagebionetworks.web.client.widget.header.Header;
-import org.sagebionetworks.web.shared.WebConstants;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -24,182 +15,212 @@ import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.gwtbootstrap3.client.ui.Heading;
+import org.sagebionetworks.repo.model.quiz.PassingRecord;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
+import org.sagebionetworks.web.client.widget.entity.download.CertificateWidget;
+import org.sagebionetworks.web.client.widget.header.Header;
+import org.sagebionetworks.web.shared.WebConstants;
 
 public class QuizViewImpl extends Composite implements QuizView {
-	@UiField
-	HTMLPanel quizContainer;
-	@UiField
-	org.gwtbootstrap3.client.ui.Button tutorialButton1;
-	@UiField
-	HTML quizHeader;
 
-	@UiField
-	DivElement quizSuccessUI;
+  @UiField
+  HTMLPanel quizContainer;
 
-	@UiField
-	DivElement quizFailureUI;
+  @UiField
+  org.gwtbootstrap3.client.ui.Button tutorialButton1;
 
-	@UiField
-	Heading failureScoreContainer;
+  @UiField
+  HTML quizHeader;
 
-	@UiField
-	Heading successScoreContainer;
+  @UiField
+  DivElement quizSuccessUI;
 
-	@UiField
-	FlowPanel testContainer;
-	@UiField
-	Button submitButton;
+  @UiField
+  DivElement quizFailureUI;
 
-	@UiField
-	SimplePanel successContainer;
+  @UiField
+  Heading failureScoreContainer;
 
-	@UiField
-	Anchor tryAgainLink;
+  @UiField
+  Heading successScoreContainer;
 
-	@UiField
-	LoadingSpinner loadingUI;
+  @UiField
+  FlowPanel testContainer;
 
-	@UiField
-	SimplePanel synAlertPanel;
+  @UiField
+  Button submitButton;
 
-	private Presenter presenter;
-	private CertificateWidget certificateWidget;
-	private Header headerWidget;
+  @UiField
+  SimplePanel successContainer;
 
-	public interface Binder extends UiBinder<Widget, QuizViewImpl> {
-	}
+  @UiField
+  Anchor tryAgainLink;
 
-	SynapseJSNIUtils jsniUtils;
+  @UiField
+  LoadingSpinner loadingUI;
 
-	@Inject
-	public QuizViewImpl(Binder uiBinder, Header headerWidget, CertificateWidget certificateWidget, PortalGinInjector ginInjector) {
-		initWidget(uiBinder.createAndBindUi(this));
-		this.headerWidget = headerWidget;
-		this.certificateWidget = certificateWidget;
-		headerWidget.configure();
-		successContainer.setWidget(certificateWidget.asWidget());
-		jsniUtils = ginInjector.getSynapseJSNIUtils();
-		tryAgainLink.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.goTo(new org.sagebionetworks.web.client.place.Quiz(WebConstants.CERTIFICATION));
-			}
-		});
-		tutorialButton1.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent arg0) {
-				DisplayUtils.newWindow(WebConstants.DOCS_URL + "Getting-Started.2055471150.html", "", "");
-			}
-		});
-		submitButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.submitClicked();
-			}
-		});
-	}
+  @UiField
+  SimplePanel synAlertPanel;
 
-	@Override
-	public void setPresenter(Presenter loginPresenter) {
-		this.presenter = loginPresenter;
-		headerWidget.configure();
-		headerWidget.refresh();
-		com.google.gwt.user.client.Window.scrollTo(0, 0); // scroll user to top of page
-	}
+  private Presenter presenter;
+  private CertificateWidget certificateWidget;
+  private Header headerWidget;
 
-	@Override
-	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
-	}
+  public interface Binder extends UiBinder<Widget, QuizViewImpl> {}
 
-	@Override
-	public void showLoading() {
-		loadingUI.setVisible(true);
-	}
+  SynapseJSNIUtils jsniUtils;
 
-	@Override
-	public void showInfo(String message) {
-		DisplayUtils.showInfo(message);
-	}
+  @Inject
+  public QuizViewImpl(
+    Binder uiBinder,
+    Header headerWidget,
+    CertificateWidget certificateWidget,
+    PortalGinInjector ginInjector
+  ) {
+    initWidget(uiBinder.createAndBindUi(this));
+    this.headerWidget = headerWidget;
+    this.certificateWidget = certificateWidget;
+    headerWidget.configure();
+    successContainer.setWidget(certificateWidget.asWidget());
+    jsniUtils = ginInjector.getSynapseJSNIUtils();
+    tryAgainLink.addClickHandler(
+      new ClickHandler() {
+        @Override
+        public void onClick(ClickEvent event) {
+          presenter.goTo(
+            new org.sagebionetworks.web.client.place.Quiz(
+              WebConstants.CERTIFICATION
+            )
+          );
+        }
+      }
+    );
+    tutorialButton1.addClickHandler(
+      new ClickHandler() {
+        @Override
+        public void onClick(ClickEvent arg0) {
+          DisplayUtils.newWindow(
+            WebConstants.DOCS_URL + "Getting-Started.2055471150.html",
+            "",
+            ""
+          );
+        }
+      }
+    );
+    submitButton.addClickHandler(
+      new ClickHandler() {
+        @Override
+        public void onClick(ClickEvent event) {
+          presenter.submitClicked();
+        }
+      }
+    );
+  }
 
-	@Override
-	public void reset() {
-		quizContainer.setVisible(true);
-		submitButton.setVisible(true);
-		submitButton.setEnabled(true);
-	}
+  @Override
+  public void setPresenter(Presenter loginPresenter) {
+    this.presenter = loginPresenter;
+    headerWidget.configure();
+    headerWidget.refresh();
+    com.google.gwt.user.client.Window.scrollTo(0, 0); // scroll user to top of page
+  }
 
+  @Override
+  public void showErrorMessage(String message) {
+    DisplayUtils.showErrorMessage(message);
+  }
 
-	@Override
-	public void clear() {
-		hideAll();
-		testContainer.clear();
+  @Override
+  public void showLoading() {
+    loadingUI.setVisible(true);
+  }
 
-		hideLoading();
-	}
+  @Override
+  public void showInfo(String message) {
+    DisplayUtils.showInfo(message);
+  }
 
-	@Override
-	public void setQuizHeader(String quizHeader) {
-		this.quizHeader.setHTML(SimpleHtmlSanitizer.sanitizeHtml(quizHeader));
-	}
+  @Override
+  public void reset() {
+    quizContainer.setVisible(true);
+    submitButton.setVisible(true);
+    submitButton.setEnabled(true);
+  }
 
-	@Override
-	public void setSynAlertWidget(Widget synAlert) {
-		synAlertPanel.setWidget(synAlert);
-	}
+  @Override
+  public void clear() {
+    hideAll();
+    testContainer.clear();
 
-	@Override
-	public void addQuestionContainerWidget(Widget widget) {
-		testContainer.add(widget);
-	}
+    hideLoading();
+  }
 
-	@Override
-	public void setSubmitEnabled(boolean isEnabled) {
-		submitButton.setEnabled(isEnabled);
-	}
+  @Override
+  public void setQuizHeader(String quizHeader) {
+    this.quizHeader.setHTML(SimpleHtmlSanitizer.sanitizeHtml(quizHeader));
+  }
 
-	@Override
-	public void setSubmitVisible(boolean isVisible) {
-		submitButton.setVisible(isVisible);
-	}
+  @Override
+  public void setSynAlertWidget(Widget synAlert) {
+    synAlertPanel.setWidget(synAlert);
+  }
 
-	@Override
-	public void showScore(String scoreContainerText) {
-		successScoreContainer.setText(scoreContainerText);
-		failureScoreContainer.setText(scoreContainerText);
-	}
+  @Override
+  public void addQuestionContainerWidget(Widget widget) {
+    testContainer.add(widget);
+  }
 
-	@Override
-	public void showSuccess(PassingRecord passingRecord) {
-		hideAll();
-		DisplayUtils.show(quizSuccessUI);
-		DisplayUtils.hide(quizFailureUI);
-		certificateWidget.configure(passingRecord);
-		successContainer.setVisible(true);
-		quizContainer.setVisible(true);
-		DisplayUtils.scrollToTop();
-	}
+  @Override
+  public void setSubmitEnabled(boolean isEnabled) {
+    submitButton.setEnabled(isEnabled);
+  }
 
-	@Override
-	public void showFailure(PassingRecord passingRecord) {
-		hideAll();
-		// show failure message and quiz
-		DisplayUtils.hide(quizSuccessUI);
-		DisplayUtils.show(quizFailureUI);
-		jsniUtils.scrollIntoView(quizFailureUI);
-		quizContainer.setVisible(true);
-	}
+  @Override
+  public void setSubmitVisible(boolean isVisible) {
+    submitButton.setVisible(isVisible);
+  }
 
-	@Override
-	public void hideAll() {
-		quizContainer.setVisible(false);
-		successContainer.setVisible(false);
-		DisplayUtils.hide(quizFailureUI);
-		DisplayUtils.hide(quizSuccessUI);
-	}
+  @Override
+  public void showScore(String scoreContainerText) {
+    successScoreContainer.setText(scoreContainerText);
+    failureScoreContainer.setText(scoreContainerText);
+  }
 
-	@Override
-	public void hideLoading() {
-		loadingUI.setVisible(false);
-	}
+  @Override
+  public void showSuccess(PassingRecord passingRecord) {
+    hideAll();
+    DisplayUtils.show(quizSuccessUI);
+    DisplayUtils.hide(quizFailureUI);
+    certificateWidget.configure(passingRecord);
+    successContainer.setVisible(true);
+    quizContainer.setVisible(true);
+    DisplayUtils.scrollToTop();
+  }
+
+  @Override
+  public void showFailure(PassingRecord passingRecord) {
+    hideAll();
+    // show failure message and quiz
+    DisplayUtils.hide(quizSuccessUI);
+    DisplayUtils.show(quizFailureUI);
+    jsniUtils.scrollIntoView(quizFailureUI);
+    quizContainer.setVisible(true);
+  }
+
+  @Override
+  public void hideAll() {
+    quizContainer.setVisible(false);
+    successContainer.setVisible(false);
+    DisplayUtils.hide(quizFailureUI);
+    DisplayUtils.hide(quizSuccessUI);
+  }
+
+  @Override
+  public void hideLoading() {
+    loadingUI.setVisible(false);
+  }
 }

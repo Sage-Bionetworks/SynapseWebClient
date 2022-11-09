@@ -8,7 +8,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -30,87 +29,112 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 public class FilesBrowserTest {
 
-	FilesBrowserView mockView;
-	SynapseClientAsync mockSynapseClient;
-	GlobalApplicationState mockGlobalApplicationState;
-	AuthenticationController mockAuthenticationController;
-	FilesBrowser filesBrowser;
-	@Mock
-	CookieProvider mockCookies;
-	String configuredEntityId = "syn123";
-	@Mock
-	SynapseJavascriptClient mockSynapseJavascriptClient;
-	@Mock
-	ContainerClientsHelp mockContainerClientsHelp;
-	@Mock
-	AddToDownloadListV2 mockAddToDownloadListV2;
-	@Mock
-	SynapseJavascriptClient mockJsClient;
-	@Mock
-	EntityChildrenResponse mockEntityChildrenResponse;
-	List<EntityHeader> children;
-	@Before
-	public void before() throws JSONObjectAdapterException {
-		MockitoAnnotations.initMocks(this);
-		mockView = mock(FilesBrowserView.class);
-		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockAuthenticationController = mock(AuthenticationController.class);
-		filesBrowser = new FilesBrowser(mockView, mockGlobalApplicationState, mockAuthenticationController, mockContainerClientsHelp, mockAddToDownloadListV2, mockCookies, mockJsClient);
-		AsyncMockStubber.callSuccessWith(mockEntityChildrenResponse).when(mockJsClient).getEntityChildren(any(), any());
-		children = new ArrayList<>();
-		when(mockEntityChildrenResponse.getPage()).thenReturn(children);
-	}
+  FilesBrowserView mockView;
+  SynapseClientAsync mockSynapseClient;
+  GlobalApplicationState mockGlobalApplicationState;
+  AuthenticationController mockAuthenticationController;
+  FilesBrowser filesBrowser;
 
-	@Test
-	public void testConstructor() {
-		verify(mockView).setPresenter(filesBrowser);
-	}
+  @Mock
+  CookieProvider mockCookies;
 
-	@Test
-	public void testConfigure() {
-		String entityId = "syn123";
-		filesBrowser.configure(entityId);
-		verify(mockView).configure(entityId);
+  String configuredEntityId = "syn123";
 
-		filesBrowser.onProgrammaticDownloadOptions();
-		verify(mockContainerClientsHelp).configureAndShow(entityId);
-	}
+  @Mock
+  SynapseJavascriptClient mockSynapseJavascriptClient;
 
-	@Test
-	public void testHasNoFileChildren() {
-		filesBrowser.configure("syn121");
-		
-		verify(mockView).setHasFile(false);
-	}
+  @Mock
+  ContainerClientsHelp mockContainerClientsHelp;
 
-	@Test
-	public void testHasFileChildren() {
-		children.add(new EntityHeader());
-		
-		filesBrowser.configure("syn121");
-		
-		verify(mockView).setHasFile(true);
-	}
+  @Mock
+  AddToDownloadListV2 mockAddToDownloadListV2;
 
-	@Test
-	public void testHasNoFileChildrenError() {
-		String errorMessage = "unable to get the children for some reason";
-		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockJsClient).getEntityChildren(any(), any());
-		
-		filesBrowser.configure("syn121");
-		
-		verify(mockView).showErrorMessage(errorMessage);
-	}
+  @Mock
+  SynapseJavascriptClient mockJsClient;
 
-	@Test
-	public void testAddToDownloadListV2() {
-		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
-		String entityId = "syn123";
-		filesBrowser.configure(entityId);
-		filesBrowser.onAddToDownloadList();
-		verify(mockAddToDownloadListV2).configure(entityId);
+  @Mock
+  EntityChildrenResponse mockEntityChildrenResponse;
 
-	}
+  List<EntityHeader> children;
+
+  @Before
+  public void before() throws JSONObjectAdapterException {
+    MockitoAnnotations.initMocks(this);
+    mockView = mock(FilesBrowserView.class);
+    mockSynapseClient = mock(SynapseClientAsync.class);
+    mockGlobalApplicationState = mock(GlobalApplicationState.class);
+    mockAuthenticationController = mock(AuthenticationController.class);
+    filesBrowser =
+      new FilesBrowser(
+        mockView,
+        mockGlobalApplicationState,
+        mockAuthenticationController,
+        mockContainerClientsHelp,
+        mockAddToDownloadListV2,
+        mockCookies,
+        mockJsClient
+      );
+    AsyncMockStubber
+      .callSuccessWith(mockEntityChildrenResponse)
+      .when(mockJsClient)
+      .getEntityChildren(any(), any());
+    children = new ArrayList<>();
+    when(mockEntityChildrenResponse.getPage()).thenReturn(children);
+  }
+
+  @Test
+  public void testConstructor() {
+    verify(mockView).setPresenter(filesBrowser);
+  }
+
+  @Test
+  public void testConfigure() {
+    String entityId = "syn123";
+    filesBrowser.configure(entityId);
+    verify(mockView).configure(entityId);
+
+    filesBrowser.onProgrammaticDownloadOptions();
+    verify(mockContainerClientsHelp).configureAndShow(entityId);
+  }
+
+  @Test
+  public void testHasNoFileChildren() {
+    filesBrowser.configure("syn121");
+
+    verify(mockView).setHasFile(false);
+  }
+
+  @Test
+  public void testHasFileChildren() {
+    children.add(new EntityHeader());
+
+    filesBrowser.configure("syn121");
+
+    verify(mockView).setHasFile(true);
+  }
+
+  @Test
+  public void testHasNoFileChildrenError() {
+    String errorMessage = "unable to get the children for some reason";
+    AsyncMockStubber
+      .callFailureWith(new Exception(errorMessage))
+      .when(mockJsClient)
+      .getEntityChildren(any(), any());
+
+    filesBrowser.configure("syn121");
+
+    verify(mockView).showErrorMessage(errorMessage);
+  }
+
+  @Test
+  public void testAddToDownloadListV2() {
+    when(
+      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+    )
+      .thenReturn("true");
+    String entityId = "syn123";
+    filesBrowser.configure(entityId);
+    filesBrowser.onAddToDownloadList();
+    verify(mockAddToDownloadListV2).configure(entityId);
+  }
 }
-

@@ -1,5 +1,10 @@
 package org.sagebionetworks.web.client.widget.evaluation;
 
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -11,67 +16,76 @@ import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationRowWidget.EvaluationActionHandler;
 
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+public class AdministerEvaluationsListViewImpl
+  implements AdministerEvaluationsListView {
 
-public class AdministerEvaluationsListViewImpl implements AdministerEvaluationsListView {
-	public interface Binder extends UiBinder<Widget, AdministerEvaluationsListViewImpl> {
-	}
+  public interface Binder
+    extends UiBinder<Widget, AdministerEvaluationsListViewImpl> {}
 
-	private EvaluationActionHandler presenter;
-	private SynapseContextPropsProvider contextPropsProvider;
-	@UiField
-	Div rows;
-	@UiField
-	Div widgetsContainer;
-	PortalGinInjector ginInjector;
-	Widget widget;
+  private EvaluationActionHandler presenter;
+  private SynapseContextPropsProvider contextPropsProvider;
 
-	@Inject
-	public AdministerEvaluationsListViewImpl(Binder binder, PortalGinInjector ginInjector, final SynapseContextPropsProvider contextPropsProvider) {
-		this.ginInjector = ginInjector;
-		widget = binder.createAndBindUi(this);
-		this.contextPropsProvider = contextPropsProvider;
-	}
+  @UiField
+  Div rows;
 
-	@Override
-	public void addRow(Evaluation evaluation) {
-		EvaluationRowWidget newRow = ginInjector.getEvaluationRowWidget();
-		newRow.configure(evaluation, presenter);
-		rows.add(newRow.asWidget());
-	}
+  @UiField
+  Div widgetsContainer;
 
+  PortalGinInjector ginInjector;
+  Widget widget;
 
-	@Override
-	public void setPresenter(EvaluationActionHandler presenter) {
-		this.presenter = presenter;
-	}
+  @Inject
+  public AdministerEvaluationsListViewImpl(
+    Binder binder,
+    PortalGinInjector ginInjector,
+    final SynapseContextPropsProvider contextPropsProvider
+  ) {
+    this.ginInjector = ginInjector;
+    widget = binder.createAndBindUi(this);
+    this.contextPropsProvider = contextPropsProvider;
+  }
 
-	@Override
-	public void clearRows() {
-		rows.clear();
-	}
+  @Override
+  public void addRow(Evaluation evaluation) {
+    EvaluationRowWidget newRow = ginInjector.getEvaluationRowWidget();
+    newRow.configure(evaluation, presenter);
+    rows.add(newRow.asWidget());
+  }
 
-	@Override
-	public Widget asWidget() {
-		return widget;
-	}
+  @Override
+  public void setPresenter(EvaluationActionHandler presenter) {
+    this.presenter = presenter;
+  }
 
-	@Override
-	public void add(IsWidget w) {
-		widgetsContainer.add(w);
-	}
+  @Override
+  public void clearRows() {
+    rows.clear();
+  }
 
-	@Override
-	public void addReactComponent(Evaluation evaluation, EvaluationCardProps props) {
-		ReactComponentDiv container = new ReactComponentDiv();
-		container.addStyleName("margin-top-50");
-		rows.add(container);
+  @Override
+  public Widget asWidget() {
+    return widget;
+  }
 
-		ReactNode element = React.createElementWithSynapseContext(SRC.SynapseComponents.EvaluationCard, props, contextPropsProvider.getJsInteropContextProps());
-		container.render(element);
-	}
+  @Override
+  public void add(IsWidget w) {
+    widgetsContainer.add(w);
+  }
+
+  @Override
+  public void addReactComponent(
+    Evaluation evaluation,
+    EvaluationCardProps props
+  ) {
+    ReactComponentDiv container = new ReactComponentDiv();
+    container.addStyleName("margin-top-50");
+    rows.add(container);
+
+    ReactNode element = React.createElementWithSynapseContext(
+      SRC.SynapseComponents.EvaluationCard,
+      props,
+      contextPropsProvider.getJsInteropContextProps()
+    );
+    container.render(element);
+  }
 }

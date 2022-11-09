@@ -4,25 +4,24 @@ import com.google.gwt.user.client.ui.IsWidget;
 
 /**
  * View shows the first step of the wizard
- * 
+ *
  * @author Jay
  *
  */
 public interface CreateResearchProjectWizardStep1View extends IsWidget {
+  String getProjectLead();
 
-	String getProjectLead();
+  void setProjectLead(String text);
 
-	void setProjectLead(String text);
+  String getInstitution();
 
-	String getInstitution();
+  void setInstitution(String text);
 
-	void setInstitution(String text);
+  String getIntendedDataUseStatement();
 
-	String getIntendedDataUseStatement();
+  void setIntendedDataUseStatement(String text);
 
-	void setIntendedDataUseStatement(String text);
+  void setIDUPublicNoteVisible(boolean visible);
 
-	void setIDUPublicNoteVisible(boolean visible);
-
-	void setIntendedDataUseStatementUIVisible(boolean visible);
+  void setIntendedDataUseStatementUIVisible(boolean visible);
 }

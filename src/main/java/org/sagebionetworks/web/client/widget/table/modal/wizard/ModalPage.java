@@ -4,90 +4,86 @@ import com.google.gwt.user.client.ui.IsWidget;
 
 /**
  * Abstraction for a single page of a multiple page modal dialog.
- * 
+ *
  * @author jhill
  *
  */
 public interface ModalPage extends IsWidget {
+  /**
+   * Abstraction for communicating with the containing modal dialog.
+   */
+  public interface ModalPresenter {
+    /**
+     * Called when a page is finished and the next page should be shown.
+     *
+     * @param next The next page to show.
+     */
+    public void setNextActivePage(ModalPage next);
 
+    /**
+     * Set the primary button's loading state.
+     */
+    public void setLoading(boolean loading);
 
-	/**
-	 * Abstraction for communicating with the containing modal dialog.
-	 */
-	public interface ModalPresenter {
-		/**
-		 * Called when a page is finished and the next page should be shown.
-		 * 
-		 * @param next The next page to show.
-		 */
-		public void setNextActivePage(ModalPage next);
+    /**
+     * Set the text of the primary button.
+     *
+     * @param text
+     */
+    public void setPrimaryButtonText(String text);
 
-		/**
-		 * Set the primary button's loading state.
-		 */
-		public void setLoading(boolean loading);
+    /**
+     * Set the instruction message.
+     *
+     * @param message
+     */
+    public void setInstructionMessage(String message);
 
-		/**
-		 * Set the text of the primary button.
-		 * 
-		 * @param text
-		 */
-		public void setPrimaryButtonText(String text);
+    /**
+     * Set the error message.
+     *
+     * @param message
+     */
+    void setErrorMessage(String message);
 
-		/**
-		 * Set the instruction message.
-		 * 
-		 * @param message
-		 */
-		public void setInstructionMessage(String message);
+    /**
+     * Set the error
+     *
+     * @param message
+     */
+    void setError(Throwable error);
 
-		/**
-		 * Set the error message.
-		 * 
-		 * @param message
-		 */
-		void setErrorMessage(String message);
+    void clearErrors();
 
-		/**
-		 * Set the error
-		 * 
-		 * @param message
-		 */
-		void setError(Throwable error);
+    /**
+     * Uses selected cancel.
+     */
+    public void onCancel();
 
-		void clearErrors();
+    /**
+     * Called when the process is finished.
+     *
+     * @param table
+     */
+    public void onFinished();
 
+    /**
+     * Called if the wizard page wants to update the modal title
+     *
+     * @param table
+     */
+    public void setTitle(String title);
+  }
 
-		/**
-		 * Uses selected cancel.
-		 */
-		public void onCancel();
+  /**
+   * Called when the primary button is clicked.
+   */
+  public void onPrimary();
 
-		/**
-		 * Called when the process is finished.
-		 * 
-		 * @param table
-		 */
-		public void onFinished();
-		
-		/**
-		 * Called if the wizard page wants to update the modal title
-		 * 
-		 * @param table
-		 */
-		public void setTitle(String title);
-		
-	}
-
-	/**
-	 * Called when the primary button is clicked.
-	 */
-	public void onPrimary();
-
-	/**
-	 * Bind this page to its presenter.
-	 * 
-	 * @param presenter
-	 */
-	public void setModalPresenter(ModalPresenter presenter);
+  /**
+   * Bind this page to its presenter.
+   *
+   * @param presenter
+   */
+  public void setModalPresenter(ModalPresenter presenter);
 }

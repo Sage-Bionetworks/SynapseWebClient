@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
-import org.gwtbootstrap3.client.ui.AnchorListItem;
-import org.sagebionetworks.web.client.PortalGinInjector;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -9,91 +7,102 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.gwtbootstrap3.client.ui.AnchorListItem;
+import org.sagebionetworks.web.client.PortalGinInjector;
 
 public class FileDownloadMenuItemViewImpl implements FileDownloadMenuItemView {
 
-	private Presenter presenter;
+  private Presenter presenter;
 
-	@UiField
-	AnchorListItem downloadLink;
-	PortalGinInjector ginInjector;
+  @UiField
+  AnchorListItem downloadLink;
 
-	interface FileDownloadMenuItemViewImplUiBinder extends UiBinder<Widget, FileDownloadMenuItemViewImpl> {
-	}
+  PortalGinInjector ginInjector;
 
-	private static FileDownloadMenuItemViewImplUiBinder uiBinder = GWT.create(FileDownloadMenuItemViewImplUiBinder.class);
-	Widget widget;
-	ClickHandler licensedDownloadClickHandler, directDownloadClickHandler, sftpDownloadClickHandler;
-	HandlerRegistration downloadLinkHandlerRegistration;
+  interface FileDownloadMenuItemViewImplUiBinder
+    extends UiBinder<Widget, FileDownloadMenuItemViewImpl> {}
 
-	@Inject
-	public FileDownloadMenuItemViewImpl(PortalGinInjector ginInjector) {
-		widget = uiBinder.createAndBindUi(this);
-		this.ginInjector = ginInjector;
-		licensedDownloadClickHandler = event -> {
-			// if there is an href, ignore it
-			event.preventDefault();
-			presenter.onUnauthenticatedS3DirectDownloadClicked();
-		};
-		directDownloadClickHandler = event -> {
-			presenter.onDirectDownloadClicked();
-		};
-		sftpDownloadClickHandler = event -> {
-			presenter.onSFTPDownloadErrorClicked();
-		};
-	}
-;
-	public void clear() {}
+  private static FileDownloadMenuItemViewImplUiBinder uiBinder = GWT.create(
+    FileDownloadMenuItemViewImplUiBinder.class
+  );
+  Widget widget;
+  ClickHandler licensedDownloadClickHandler, directDownloadClickHandler, sftpDownloadClickHandler;
+  HandlerRegistration downloadLinkHandlerRegistration;
 
-	private void clearClickHandlers() {
-		if (downloadLinkHandlerRegistration != null) {
-			downloadLinkHandlerRegistration.removeHandler();
-		}
-		downloadLink.setHref("#");
-	}
+  @Inject
+  public FileDownloadMenuItemViewImpl(PortalGinInjector ginInjector) {
+    widget = uiBinder.createAndBindUi(this);
+    this.ginInjector = ginInjector;
+    licensedDownloadClickHandler =
+      event -> {
+        // if there is an href, ignore it
+        event.preventDefault();
+        presenter.onUnauthenticatedS3DirectDownloadClicked();
+      };
+    directDownloadClickHandler =
+      event -> {
+        presenter.onDirectDownloadClicked();
+      };
+    sftpDownloadClickHandler =
+      event -> {
+        presenter.onSFTPDownloadErrorClicked();
+      };
+  }
 
-	@Override
-	public void setIsSFTPDownload(){
-		String href = downloadLink.getHref();
-		clearClickHandlers();
-		downloadLink.setHref(href);
-		downloadLinkHandlerRegistration = downloadLink.addClickHandler(sftpDownloadClickHandler);
-	}
+  public void clear() {}
 
-	@Override
-	public void setIsUnauthenticatedS3DirectDownload() {
-		clearClickHandlers();
-		downloadLinkHandlerRegistration = downloadLink.addClickHandler(licensedDownloadClickHandler);
-	}
+  private void clearClickHandlers() {
+    if (downloadLinkHandlerRegistration != null) {
+      downloadLinkHandlerRegistration.removeHandler();
+    }
+    downloadLink.setHref("#");
+  }
 
-	@Override
-	public void setIsDirectDownloadLink(String href) {
-		clearClickHandlers();
-		downloadLink.setHref(href);
-		downloadLinkHandlerRegistration = downloadLink.addClickHandler(directDownloadClickHandler);
-	}
+  @Override
+  public void setIsSFTPDownload() {
+    String href = downloadLink.getHref();
+    clearClickHandlers();
+    downloadLink.setHref(href);
+    downloadLinkHandlerRegistration =
+      downloadLink.addClickHandler(sftpDownloadClickHandler);
+  }
 
-	@Override
-	public Widget asWidget() {
-		return widget;
-	}
+  @Override
+  public void setIsUnauthenticatedS3DirectDownload() {
+    clearClickHandlers();
+    downloadLinkHandlerRegistration =
+      downloadLink.addClickHandler(licensedDownloadClickHandler);
+  }
 
-	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-	}
+  @Override
+  public void setIsDirectDownloadLink(String href) {
+    clearClickHandlers();
+    downloadLink.setHref(href);
+    downloadLinkHandlerRegistration =
+      downloadLink.addClickHandler(directDownloadClickHandler);
+  }
 
-	@Override
-	public void showLoginS3DirectDownloadDialog(String endpoint) {
-		S3DirectLoginDialog dialog = ginInjector.getS3DirectLoginDialog();
-		dialog.setPresenter(presenter);
-		dialog.showLoginS3DirectDownloadDialog(endpoint);
-	}
+  @Override
+  public Widget asWidget() {
+    return widget;
+  }
 
-	@Override
-	public void showS3DirectDownloadDialog() {
-		S3DirectLoginDialog dialog = ginInjector.getS3DirectLoginDialog();
-		dialog.setPresenter(presenter);
-		dialog.showS3DirectDownloadDialog();
-	}
+  @Override
+  public void setPresenter(Presenter presenter) {
+    this.presenter = presenter;
+  }
+
+  @Override
+  public void showLoginS3DirectDownloadDialog(String endpoint) {
+    S3DirectLoginDialog dialog = ginInjector.getS3DirectLoginDialog();
+    dialog.setPresenter(presenter);
+    dialog.showLoginS3DirectDownloadDialog(endpoint);
+  }
+
+  @Override
+  public void showS3DirectDownloadDialog() {
+    S3DirectLoginDialog dialog = ginInjector.getS3DirectLoginDialog();
+    dialog.setPresenter(presenter);
+    dialog.showS3DirectDownloadDialog();
+  }
 }

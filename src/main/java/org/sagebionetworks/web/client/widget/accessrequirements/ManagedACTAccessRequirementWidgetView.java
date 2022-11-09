@@ -1,82 +1,82 @@
 package org.sagebionetworks.web.client.widget.accessrequirements;
 
-import org.sagebionetworks.web.client.widget.lazyload.SupportsLazyLoadInterface;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import org.sagebionetworks.web.client.widget.lazyload.SupportsLazyLoadInterface;
 
-public interface ManagedACTAccessRequirementWidgetView extends IsWidget, SupportsLazyLoadInterface {
+public interface ManagedACTAccessRequirementWidgetView
+  extends IsWidget, SupportsLazyLoadInterface {
+  /**
+   * Set the presenter.
+   *
+   * @param presenter
+   */
+  void setPresenter(Presenter presenter);
 
-	/**
-	 * Set the presenter.
-	 * 
-	 * @param presenter
-	 */
-	void setPresenter(Presenter presenter);
+  void addStyleNames(String styleNames);
 
-	void addStyleNames(String styleNames);
+  void setWikiTermsWidget(Widget wikiWidget);
 
-	void setWikiTermsWidget(Widget wikiWidget);
+  void setWikiTermsWidgetVisible(boolean visible);
 
-	void setWikiTermsWidgetVisible(boolean visible);
+  void showRequestSubmittedByOtherUser();
 
-	void showRequestSubmittedByOtherUser();
+  void showApprovedHeading();
 
-	void showApprovedHeading();
+  void showUnapprovedHeading();
 
-	void showUnapprovedHeading();
+  void showRequestSubmittedMessage();
 
-	void showRequestSubmittedMessage();
+  void showRequestApprovedMessage();
 
-	void showRequestApprovedMessage();
+  void showRequestRejectedMessage(String reason);
 
-	void showRequestRejectedMessage(String reason);
+  void showCancelRequestButton();
 
-	void showCancelRequestButton();
+  void showUpdateRequestButton();
 
-	void showUpdateRequestButton();
+  void showRequestAccessButton();
 
-	void showRequestAccessButton();
+  void resetState();
 
-	void resetState();
+  void setDataAccessRequestWizard(IsWidget w);
 
-	void setDataAccessRequestWizard(IsWidget w);
+  void setEditAccessRequirementWidget(IsWidget w);
 
-	void setEditAccessRequirementWidget(IsWidget w);
+  void setDeleteAccessRequirementWidget(IsWidget w);
 
-	void setDeleteAccessRequirementWidget(IsWidget w);
+  void setIDUReportButton(IsWidget w);
 
-	void setIDUReportButton(IsWidget w);
+  void setSubmitterUserBadge(IsWidget w);
 
-	void setSubmitterUserBadge(IsWidget w);
+  void setManageAccessWidget(IsWidget w);
 
-	void setManageAccessWidget(IsWidget w);
+  void setReviewAccessRequestsWidget(IsWidget w);
 
-	void setReviewAccessRequestsWidget(IsWidget w);
+  void setSubjectsWidget(IsWidget w);
 
-	void setSubjectsWidget(IsWidget w);
+  void setVisible(boolean visible);
 
-	void setVisible(boolean visible);
+  void setSynAlert(IsWidget w);
 
-	void setSynAlert(IsWidget w);
+  void hideControls();
 
-	void hideControls();
+  void setReviewAccessRequestsWidgetContainerVisible(boolean visible);
 
-	void setReviewAccessRequestsWidgetContainerVisible(boolean visible);
+  void showExpirationDate(String dateString);
 
-	void showExpirationDate(String dateString);
+  void showLoginButton();
 
-	void showLoginButton();
-	
-	void setAccessRequirementIDVisible(boolean visible);
-	void setAccessRequirementID(String arID);
-	void setAccessRequirementName(String description);
+  void setAccessRequirementIDVisible(boolean visible);
+  void setAccessRequirementID(String arID);
+  void setAccessRequirementName(String description);
 
-	/**
-	 * Presenter interface
-	 */
-	public interface Presenter {
-		void onCancelRequest();
+  /**
+   * Presenter interface
+   */
+  public interface Presenter {
+    void onCancelRequest();
 
-		void onRequestAccess();
-	}
+    void onRequestAccess();
+  }
 }

@@ -1,20 +1,17 @@
 package org.sagebionetworks.web.client.widget.docker;
 
-import org.sagebionetworks.repo.model.docker.DockerCommit;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import org.sagebionetworks.repo.model.docker.DockerCommit;
 
 public interface DockerCommitListWidgetView extends IsWidget {
+  public interface Presenter {
+    DockerCommit getCurrentCommit();
+  }
 
-	public interface Presenter {
+  void setCommitsContainer(IsWidget widget);
 
-		DockerCommit getCurrentCommit();
-	}
+  void setPresenter(Presenter presenter);
 
-	void setCommitsContainer(IsWidget widget);
-
-	void setPresenter(Presenter presenter);
-
-	void setSynAlert(Widget widget);
-
+  void setSynAlert(Widget widget);
 }

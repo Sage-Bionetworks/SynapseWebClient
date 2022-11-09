@@ -4,21 +4,21 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 public interface PlaceView extends IsWidget {
-	void add(Widget w);
+  void add(Widget w);
 
-	void clearBody();
+  void clearBody();
 
-	void clearAboveBody();
+  void clearAboveBody();
 
-	void clearBelowBody();
+  void clearBelowBody();
 
-	void addAboveBody(IsWidget w);
+  void addAboveBody(IsWidget w);
 
-	void addBelowBody(IsWidget w);
+  void addBelowBody(IsWidget w);
 
-	void initHeaderAndFooter();
+  void initHeaderAndFooter();
 
-	void addTitle(String text);
+  void addTitle(String text);
 
-	void addTitle(Widget w);
+  void addTitle(Widget w);
 }

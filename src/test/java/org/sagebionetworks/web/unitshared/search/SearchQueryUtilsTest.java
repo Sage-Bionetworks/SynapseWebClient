@@ -12,6 +12,7 @@ import static org.sagebionetworks.repo.model.search.query.SearchFieldName.Tissue
 import static org.sagebionetworks.web.shared.SearchQueryUtils.LIMIT;
 import static org.sagebionetworks.web.shared.SearchQueryUtils.MAX_FACET_VALUES_COUNT;
 import static org.sagebionetworks.web.shared.SearchQueryUtils.getDefaultSearchQuery;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -24,30 +25,44 @@ import org.sagebionetworks.repo.model.search.query.SearchFieldName;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 
 public class SearchQueryUtilsTest {
-	public static final SearchFieldName[] SET_VALUES = new SearchFieldName[] {EntityType, Consortium, ModifiedOn, ModifiedBy, CreatedOn, Tissue, CreatedBy};
-	public static final Set<SearchFieldName> EXPECTED_FACET_FIELDS = new HashSet<>(Arrays.asList(SET_VALUES));
 
-	@Test
-	public void testGetDefaultSearchQuery() {
-		SearchQuery query = getDefaultSearchQuery();
+  public static final SearchFieldName[] SET_VALUES = new SearchFieldName[] {
+    EntityType,
+    Consortium,
+    ModifiedOn,
+    ModifiedBy,
+    CreatedOn,
+    Tissue,
+    CreatedBy,
+  };
+  public static final Set<SearchFieldName> EXPECTED_FACET_FIELDS = new HashSet<>(
+    Arrays.asList(SET_VALUES)
+  );
 
-		// verify query term is unset
-		assertEquals(1, query.getQueryTerm().size());
-		assertEquals("", query.getQueryTerm().get(0));
+  @Test
+  public void testGetDefaultSearchQuery() {
+    SearchQuery query = getDefaultSearchQuery();
 
-		// verify facet options
-		List<SearchFacetOption> options = query.getFacetOptions();
-		for (SearchFacetOption facetOption : options) {
-			assertTrue(EXPECTED_FACET_FIELDS.contains(facetOption.getName()));
-			assertEquals(MAX_FACET_VALUES_COUNT, facetOption.getMaxResultCount().longValue());
-			assertEquals(SearchFacetSort.COUNT, facetOption.getSortType());
-		}
+    // verify query term is unset
+    assertEquals(1, query.getQueryTerm().size());
+    assertEquals("", query.getQueryTerm().get(0));
 
-		// verify limit
-		assertEquals(LIMIT, query.getSize());
+    // verify facet options
+    List<SearchFacetOption> options = query.getFacetOptions();
+    for (SearchFacetOption facetOption : options) {
+      assertTrue(EXPECTED_FACET_FIELDS.contains(facetOption.getName()));
+      assertEquals(
+        MAX_FACET_VALUES_COUNT,
+        facetOption.getMaxResultCount().longValue()
+      );
+      assertEquals(SearchFacetSort.COUNT, facetOption.getSortType());
+    }
 
-		// verify boolean query
-		List<KeyValue> bq = query.getBooleanQuery();
-		assertEquals(0, bq.size());
-	}
+    // verify limit
+    assertEquals(LIMIT, query.getSize());
+
+    // verify boolean query
+    List<KeyValue> bq = query.getBooleanQuery();
+    assertEquals(0, bq.size());
+  }
 }

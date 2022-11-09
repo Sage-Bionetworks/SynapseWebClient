@@ -1,22 +1,21 @@
 package org.sagebionetworks.web.client.view.users;
 
-import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 public interface RegisterAccountView extends IsWidget {
+  void setRegisterWidget(Widget w);
 
-	void setRegisterWidget(Widget w);
+  void setPresenter(Presenter p);
 
-	void setPresenter(Presenter p);
+  void setGoogleSynAlert(SynapseAlert synAlert);
 
-	void setGoogleSynAlert(SynapseAlert synAlert);
+  void setGoogleRegisterButtonEnabled(boolean enabled);
 
-	void setGoogleRegisterButtonEnabled(boolean enabled);
+  void showEmailSentUI(boolean visible);
 
-	void showEmailSentUI(boolean visible);
-	
-	public interface Presenter {
-		void checkUsernameAvailable(String username);
-	}
+  public interface Presenter {
+    void checkUsernameAvailable(String username);
+  }
 }

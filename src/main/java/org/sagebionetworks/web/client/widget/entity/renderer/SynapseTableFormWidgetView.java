@@ -4,30 +4,28 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 public interface SynapseTableFormWidgetView extends IsWidget {
+  void setSynAlertWidget(Widget w);
 
+  void setRowFormWidget(Widget w);
 
-	void setSynAlertWidget(Widget w);
+  void setPresenter(Presenter p);
 
-	void setRowFormWidget(Widget w);
+  void setSubmitButtonLoading(boolean isLoading);
 
-	void setPresenter(Presenter p);
+  void setFormUIVisible(boolean visible);
 
-	void setSubmitButtonLoading(boolean isLoading);
+  void setSuccessMessageVisible(boolean visible);
 
-	void setFormUIVisible(boolean visible);
+  void setUserBadge(Widget w);
 
-	void setSuccessMessageVisible(boolean visible);
+  void setSuccessMessage(String text);
 
-	void setUserBadge(Widget w);
+  /**
+   * Presenter interface
+   */
+  public interface Presenter {
+    void onSubmit();
 
-	void setSuccessMessage(String text);
-
-	/**
-	 * Presenter interface
-	 */
-	public interface Presenter {
-		void onSubmit();
-
-		void onReset();
-	}
+    void onReset();
+  }
 }

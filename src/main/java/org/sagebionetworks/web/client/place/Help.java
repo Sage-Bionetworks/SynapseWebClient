@@ -6,26 +6,27 @@ import com.google.gwt.place.shared.Prefix;
 
 public class Help extends Place {
 
-	private String token;
+  private String token;
 
-	public Help(String token) {
-		this.token = token;
-	}
+  public Help(String token) {
+    this.token = token;
+  }
 
-	public String toToken() {
-		return token;
-	}
+  public String toToken() {
+    return token;
+  }
 
-	@Prefix("!Help")
-	public static class Tokenizer implements PlaceTokenizer<Help> {
-		@Override
-		public String getToken(Help place) {
-			return place.toToken();
-		}
+  @Prefix("!Help")
+  public static class Tokenizer implements PlaceTokenizer<Help> {
 
-		@Override
-		public Help getPlace(String token) {
-			return new Help(token);
-		}
-	}
+    @Override
+    public String getToken(Help place) {
+      return place.toToken();
+    }
+
+    @Override
+    public Help getPlace(String token) {
+      return new Help(token);
+    }
+  }
 }

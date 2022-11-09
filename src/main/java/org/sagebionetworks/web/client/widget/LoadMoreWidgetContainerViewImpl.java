@@ -1,81 +1,84 @@
 package org.sagebionetworks.web.client.widget;
 
-import java.util.Iterator;
-import org.gwtbootstrap3.client.ui.html.Div;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import java.util.Iterator;
+import org.gwtbootstrap3.client.ui.html.Div;
 
-public class LoadMoreWidgetContainerViewImpl implements LoadMoreWidgetContainerView {
+public class LoadMoreWidgetContainerViewImpl
+  implements LoadMoreWidgetContainerView {
 
-	public interface Binder extends UiBinder<Widget, LoadMoreWidgetContainerViewImpl> {
-	}
+  public interface Binder
+    extends UiBinder<Widget, LoadMoreWidgetContainerViewImpl> {}
 
-	Presenter presenter;
+  Presenter presenter;
 
-	@UiField
-	Div container;
-	@UiField
-	LoadingSpinner loadMoreImage;
-	@UiField
-	org.gwtbootstrap3.client.ui.Button loadMoreButton;
+  @UiField
+  Div container;
 
-	Widget widget;
+  @UiField
+  LoadingSpinner loadMoreImage;
 
-	@Inject
-	public LoadMoreWidgetContainerViewImpl(Binder binder) {
-		widget = binder.createAndBindUi(this);
-		loadMoreButton.addClickHandler(event -> {
-			presenter.onLoadMore();
-		});
-	}
+  @UiField
+  org.gwtbootstrap3.client.ui.Button loadMoreButton;
 
-	@Override
-	public void setPresenter(Presenter p) {
-		this.presenter = p;
-	}
+  Widget widget;
 
-	@Override
-	public void setIsProcessing(boolean isProcessing) {
-		loadMoreImage.setVisible(isProcessing);
-		if (isProcessing) {
-			loadMoreButton.setVisible(false);
-		}
-	}
+  @Inject
+  public LoadMoreWidgetContainerViewImpl(Binder binder) {
+    widget = binder.createAndBindUi(this);
+    loadMoreButton.addClickHandler(event -> {
+      presenter.onLoadMore();
+    });
+  }
 
-	@Override
-	public Widget asWidget() {
-		return widget;
-	}
+  @Override
+  public void setPresenter(Presenter p) {
+    this.presenter = p;
+  }
 
-	@Override
-	public void add(Widget w) {
-		container.add(w);
-	}
+  @Override
+  public void setIsProcessing(boolean isProcessing) {
+    loadMoreImage.setVisible(isProcessing);
+    if (isProcessing) {
+      loadMoreButton.setVisible(false);
+    }
+  }
 
-	@Override
-	public Iterator<Widget> iterator() {
-		return container.iterator();
-	}
+  @Override
+  public Widget asWidget() {
+    return widget;
+  }
 
-	@Override
-	public boolean remove(Widget w) {
-		return container.remove(w);
-	}
+  @Override
+  public void add(Widget w) {
+    container.add(w);
+  }
 
-	@Override
-	public void clear() {
-		container.clear();
-	}
+  @Override
+  public Iterator<Widget> iterator() {
+    return container.iterator();
+  }
 
-	@Override
-	public void setLoadMoreVisibility(boolean visible) {
-		loadMoreButton.setVisible(visible);
-	}
+  @Override
+  public boolean remove(Widget w) {
+    return container.remove(w);
+  }
 
-	@Override
-	public void addStyleName(String styles) {
-		container.addStyleName(styles);
-	}
+  @Override
+  public void clear() {
+    container.clear();
+  }
+
+  @Override
+  public void setLoadMoreVisibility(boolean visible) {
+    loadMoreButton.setVisible(visible);
+  }
+
+  @Override
+  public void addStyleName(String styles) {
+    container.addStyleName(styles);
+  }
 }

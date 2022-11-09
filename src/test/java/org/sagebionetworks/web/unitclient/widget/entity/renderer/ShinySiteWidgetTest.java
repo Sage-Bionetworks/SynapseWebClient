@@ -8,6 +8,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.Before;
@@ -25,94 +26,130 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 
 public class ShinySiteWidgetTest {
 
-	ShinySiteWidget widget;
-	@Mock
-	IFrameView mockView;
-	@Mock
-	AuthenticationController mockAuthenticationController;
-	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
-	String validSiteUrl = "https://docs.google.com/a/sagebase.org/forms/myform";
-	String validSiteUrl2 = "https://s3.amazonaws.com/static.synapse.org/rstudio/faithful/";
+  ShinySiteWidget widget;
 
-	String invalidSiteUrl = "http://glimmer.rstudio.com/rstudio/faithful/";
-	@Mock
-	SynapseJSNIUtils mockSynapseJSNIUtils;
+  @Mock
+  IFrameView mockView;
 
-	@Before
-	public void setup() {
-		MockitoAnnotations.initMocks(this);
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
-		widget = new ShinySiteWidget(mockView, mockAuthenticationController, mockSynapseJSNIUtils);
-	}
+  @Mock
+  AuthenticationController mockAuthenticationController;
 
-	@Test
-	public void testAsWidget() {
-		widget.asWidget();
-		verify(mockView).asWidget();
-	}
+  WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
+  String validSiteUrl = "https://docs.google.com/a/sagebase.org/forms/myform";
+  String validSiteUrl2 =
+    "https://s3.amazonaws.com/static.synapse.org/rstudio/faithful/";
 
-	@Test
-	public void testConfigure() {
-		when(mockSynapseJSNIUtils.getHostname(anyString())).thenReturn("test.sagebase.org");
-		Map<String, String> descriptor = new HashMap<String, String>();
-		descriptor.put(WidgetConstants.SHINYSITE_SITE_KEY, validSiteUrl);
-		widget.configure(wikiKey, descriptor, null, null);
-		verify(mockView).configure(eq(validSiteUrl), anyInt());
+  String invalidSiteUrl = "http://glimmer.rstudio.com/rstudio/faithful/";
 
-		descriptor.put(WidgetConstants.SHINYSITE_SITE_KEY, validSiteUrl2);
-		widget.configure(wikiKey, descriptor, null, null);
-		verify(mockView).configure(eq(validSiteUrl2), anyInt());
-	}
+  @Mock
+  SynapseJSNIUtils mockSynapseJSNIUtils;
 
-	@Test
-	public void testConfigureInvalid() {
-		Map<String, String> descriptor = new HashMap<String, String>();
-		descriptor.put(WidgetConstants.SHINYSITE_SITE_KEY, invalidSiteUrl);
-		widget.configure(wikiKey, descriptor, null, null);
-		verify(mockView).showError(invalidSiteUrl + DisplayConstants.INVALID_SHINY_SITE);
-	}
+  @Before
+  public void setup() {
+    MockitoAnnotations.initMocks(this);
+    when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+    widget =
+      new ShinySiteWidget(
+        mockView,
+        mockAuthenticationController,
+        mockSynapseJSNIUtils
+      );
+  }
 
-	@Test
-	public void testGetHeightFromDescriptor() {
-		Map<String, String> descriptor = new HashMap<String, String>();
-		assertEquals(WidgetConstants.SHINYSITE_DEFAULT_HEIGHT_PX, ShinySiteWidget.getHeightFromDescriptor(descriptor));
+  @Test
+  public void testAsWidget() {
+    widget.asWidget();
+    verify(mockView).asWidget();
+  }
 
-		descriptor.put(WidgetConstants.HEIGHT_KEY, "500");
-		assertEquals(500, ShinySiteWidget.getHeightFromDescriptor(descriptor));
-	}
+  @Test
+  public void testConfigure() {
+    when(mockSynapseJSNIUtils.getHostname(anyString()))
+      .thenReturn("test.sagebase.org");
+    Map<String, String> descriptor = new HashMap<String, String>();
+    descriptor.put(WidgetConstants.SHINYSITE_SITE_KEY, validSiteUrl);
+    widget.configure(wikiKey, descriptor, null, null);
+    verify(mockView).configure(eq(validSiteUrl), anyInt());
 
-	@Test
-	public void testIsValidShinySite() {
-		assertTrue(ShinySiteWidget.isValidShinySite(validSiteUrl, mockSynapseJSNIUtils));
-		assertTrue(ShinySiteWidget.isValidShinySite(validSiteUrl.toUpperCase(), mockSynapseJSNIUtils));
-		assertFalse(ShinySiteWidget.isValidShinySite(invalidSiteUrl, mockSynapseJSNIUtils));
-		assertTrue(ShinySiteWidget.isValidShinySite("https://docs.google.com/a/sagebase.org/forms/d/1JmVWhcCAx26Jd94nFY8HhtVBgJSReaBbphZid16T6V4/viewform", mockSynapseJSNIUtils));
-		assertFalse(ShinySiteWidget.isValidShinySite(null, mockSynapseJSNIUtils));
+    descriptor.put(WidgetConstants.SHINYSITE_SITE_KEY, validSiteUrl2);
+    widget.configure(wikiKey, descriptor, null, null);
+    verify(mockView).configure(eq(validSiteUrl2), anyInt());
+  }
 
-		// hostname test
-		when(mockSynapseJSNIUtils.getHostname(anyString())).thenReturn("www.jayhodgson.com");
-		assertFalse(ShinySiteWidget.isValidShinySite(invalidSiteUrl, mockSynapseJSNIUtils));
-		when(mockSynapseJSNIUtils.getHostname(anyString())).thenReturn("anything.synapse.org");
-		assertTrue(ShinySiteWidget.isValidShinySite(invalidSiteUrl, mockSynapseJSNIUtils));
-		when(mockSynapseJSNIUtils.getHostname(anyString())).thenReturn("anything.sagebase.org");
-		assertTrue(ShinySiteWidget.isValidShinySite(invalidSiteUrl, mockSynapseJSNIUtils));
-	}
+  @Test
+  public void testConfigureInvalid() {
+    Map<String, String> descriptor = new HashMap<String, String>();
+    descriptor.put(WidgetConstants.SHINYSITE_SITE_KEY, invalidSiteUrl);
+    widget.configure(wikiKey, descriptor, null, null);
+    verify(mockView)
+      .showError(invalidSiteUrl + DisplayConstants.INVALID_SHINY_SITE);
+  }
 
-	@Test
-	public void testIsIncludePrincipalId() {
-		Map<String, String> descriptor = new HashMap<String, String>();
-		// default false
-		assertFalse(ShinySiteWidget.isIncludePrincipalId(descriptor));
-		// explicitly false
-		descriptor.put(WidgetConstants.INCLUDE_PRINCIPAL_ID_KEY, "false");
-		assertFalse(ShinySiteWidget.isIncludePrincipalId(descriptor));
-		// parse true
-		descriptor.put(WidgetConstants.INCLUDE_PRINCIPAL_ID_KEY, "tRuE");
-		assertTrue(ShinySiteWidget.isIncludePrincipalId(descriptor));
-		// invalid param should default to false
-		descriptor.put(WidgetConstants.INCLUDE_PRINCIPAL_ID_KEY, "invalid");
-		assertFalse(ShinySiteWidget.isIncludePrincipalId(descriptor));
-	}
+  @Test
+  public void testGetHeightFromDescriptor() {
+    Map<String, String> descriptor = new HashMap<String, String>();
+    assertEquals(
+      WidgetConstants.SHINYSITE_DEFAULT_HEIGHT_PX,
+      ShinySiteWidget.getHeightFromDescriptor(descriptor)
+    );
 
+    descriptor.put(WidgetConstants.HEIGHT_KEY, "500");
+    assertEquals(500, ShinySiteWidget.getHeightFromDescriptor(descriptor));
+  }
 
+  @Test
+  public void testIsValidShinySite() {
+    assertTrue(
+      ShinySiteWidget.isValidShinySite(validSiteUrl, mockSynapseJSNIUtils)
+    );
+    assertTrue(
+      ShinySiteWidget.isValidShinySite(
+        validSiteUrl.toUpperCase(),
+        mockSynapseJSNIUtils
+      )
+    );
+    assertFalse(
+      ShinySiteWidget.isValidShinySite(invalidSiteUrl, mockSynapseJSNIUtils)
+    );
+    assertTrue(
+      ShinySiteWidget.isValidShinySite(
+        "https://docs.google.com/a/sagebase.org/forms/d/1JmVWhcCAx26Jd94nFY8HhtVBgJSReaBbphZid16T6V4/viewform",
+        mockSynapseJSNIUtils
+      )
+    );
+    assertFalse(ShinySiteWidget.isValidShinySite(null, mockSynapseJSNIUtils));
+
+    // hostname test
+    when(mockSynapseJSNIUtils.getHostname(anyString()))
+      .thenReturn("www.jayhodgson.com");
+    assertFalse(
+      ShinySiteWidget.isValidShinySite(invalidSiteUrl, mockSynapseJSNIUtils)
+    );
+    when(mockSynapseJSNIUtils.getHostname(anyString()))
+      .thenReturn("anything.synapse.org");
+    assertTrue(
+      ShinySiteWidget.isValidShinySite(invalidSiteUrl, mockSynapseJSNIUtils)
+    );
+    when(mockSynapseJSNIUtils.getHostname(anyString()))
+      .thenReturn("anything.sagebase.org");
+    assertTrue(
+      ShinySiteWidget.isValidShinySite(invalidSiteUrl, mockSynapseJSNIUtils)
+    );
+  }
+
+  @Test
+  public void testIsIncludePrincipalId() {
+    Map<String, String> descriptor = new HashMap<String, String>();
+    // default false
+    assertFalse(ShinySiteWidget.isIncludePrincipalId(descriptor));
+    // explicitly false
+    descriptor.put(WidgetConstants.INCLUDE_PRINCIPAL_ID_KEY, "false");
+    assertFalse(ShinySiteWidget.isIncludePrincipalId(descriptor));
+    // parse true
+    descriptor.put(WidgetConstants.INCLUDE_PRINCIPAL_ID_KEY, "tRuE");
+    assertTrue(ShinySiteWidget.isIncludePrincipalId(descriptor));
+    // invalid param should default to false
+    descriptor.put(WidgetConstants.INCLUDE_PRINCIPAL_ID_KEY, "invalid");
+    assertFalse(ShinySiteWidget.isIncludePrincipalId(descriptor));
+  }
 }

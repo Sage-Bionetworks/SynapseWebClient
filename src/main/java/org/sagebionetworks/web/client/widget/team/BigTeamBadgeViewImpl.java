@@ -1,16 +1,5 @@
 package org.sagebionetworks.web.client.widget.team;
 
-import org.gwtbootstrap3.client.ui.Anchor;
-import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Span;
-import org.gwtbootstrap3.client.ui.html.Text;
-import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.IconsImageBundle;
-import org.sagebionetworks.web.client.Linkify;
-import org.sagebionetworks.web.client.widget.TextBoxWithCopyToClipboardWidget;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -22,119 +11,149 @@ import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
+import org.gwtbootstrap3.client.ui.html.Text;
+import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.Linkify;
+import org.sagebionetworks.web.client.widget.TextBoxWithCopyToClipboardWidget;
 
 public class BigTeamBadgeViewImpl implements BigTeamBadgeView {
-	public interface Binder extends UiBinder<Widget, BigTeamBadgeViewImpl> {
-	}
 
-	@UiField
-	Span pictureSpan;
-	@UiField
-	FocusPanel pictureFocusPanel;
-	@UiField
-	Span defaultPicture;
-	@UiField
-	Image teamPicture;
-	@UiField
-	Anchor nameLink;
-	@UiField
-	Div descriptionContainer;
-	@UiField
-	Span notificationsSpan;
-	@UiField
-	Span memberCountContainer;
-	@UiField
-	TextBoxWithCopyToClipboardWidget synapseEmailField;
+  public interface Binder extends UiBinder<Widget, BigTeamBadgeViewImpl> {}
 
-	GlobalApplicationState globalApplicationState;
-	IconsImageBundle iconsImageBundle;
-	Linkify linkify;
-	Widget widget;
+  @UiField
+  Span pictureSpan;
 
-	@Inject
-	public BigTeamBadgeViewImpl(Binder uiBinder, GlobalApplicationState globalApplicationState, IconsImageBundle iconsImageBundle, Linkify linkify) {
-		widget = uiBinder.createAndBindUi(this);
-		this.globalApplicationState = globalApplicationState;
-		this.iconsImageBundle = iconsImageBundle;
-		this.linkify = linkify;
-		addStyleName("bigTeamBadge");
-	}
+  @UiField
+  FocusPanel pictureFocusPanel;
 
-	@Override
-	public void setTeam(final Team team, String description, String teamIconUrl) {
-		teamPicture.setVisible(false);
-		defaultPicture.setVisible(false);
-		notificationsSpan.clear();
-		if (team == null)
-			throw new IllegalArgumentException("Team is required");
+  @UiField
+  Span defaultPicture;
 
-		String name = team.getName();
-		ClickHandler clickHandler = event -> {
-			event.preventDefault();
-			globalApplicationState.getPlaceChanger().goTo(new org.sagebionetworks.web.client.place.Team(team.getId()));
-		};
-		if (teamIconUrl != null) {
-			teamPicture.setVisible(true);
-			teamPicture.setUrl(teamIconUrl);
-		} else {
-			defaultPicture.setVisible(true);
-		}
-		String descriptionWithoutHtml = SafeHtmlUtils.htmlEscape(description);
-		descriptionContainer.clear();
-		descriptionContainer.add(new HTML(linkify.linkify(descriptionWithoutHtml)));
+  @UiField
+  Image teamPicture;
 
-		nameLink.setText(name);
-		nameLink.setHref("#!Team:" + team.getId());
-		pictureFocusPanel.addClickHandler(clickHandler);
-	}
+  @UiField
+  Anchor nameLink;
 
-	@Override
-	public void showLoadError(String principalId) {
-		descriptionContainer.clear();
-		descriptionContainer.add(new Text(DisplayConstants.ERROR_LOADING));
-	}
+  @UiField
+  Div descriptionContainer;
 
-	@Override
-	public void showLoading() {}
+  @UiField
+  Span notificationsSpan;
 
-	@Override
-	public void showInfo(String message) {}
+  @UiField
+  Span memberCountContainer;
 
-	@Override
-	public void showErrorMessage(String message) {}
+  @UiField
+  TextBoxWithCopyToClipboardWidget synapseEmailField;
 
-	@Override
-	public void setRequestCount(String count) {
-		InlineHTML widget = new InlineHTML(DisplayUtils.getBadgeHtml(count));
-		notificationsSpan.add(DisplayUtils.addTooltip(widget, DisplayConstants.PENDING_JOIN_REQUESTS_TOOLTIP));
-	}
+  GlobalApplicationState globalApplicationState;
+  IconsImageBundle iconsImageBundle;
+  Linkify linkify;
+  Widget widget;
 
-	@Override
-	public Widget asWidget() {
-		return widget;
-	}
+  @Inject
+  public BigTeamBadgeViewImpl(
+    Binder uiBinder,
+    GlobalApplicationState globalApplicationState,
+    IconsImageBundle iconsImageBundle,
+    Linkify linkify
+  ) {
+    widget = uiBinder.createAndBindUi(this);
+    this.globalApplicationState = globalApplicationState;
+    this.iconsImageBundle = iconsImageBundle;
+    this.linkify = linkify;
+    addStyleName("bigTeamBadge");
+  }
 
-	@Override
-	public void clear() {}
+  @Override
+  public void setTeam(final Team team, String description, String teamIconUrl) {
+    teamPicture.setVisible(false);
+    defaultPicture.setVisible(false);
+    notificationsSpan.clear();
+    if (team == null) throw new IllegalArgumentException("Team is required");
 
-	@Override
-	public void addStyleName(String style) {
-		widget.addStyleName(style);
-	}
+    String name = team.getName();
+    ClickHandler clickHandler = event -> {
+      event.preventDefault();
+      globalApplicationState
+        .getPlaceChanger()
+        .goTo(new org.sagebionetworks.web.client.place.Team(team.getId()));
+    };
+    if (teamIconUrl != null) {
+      teamPicture.setVisible(true);
+      teamPicture.setUrl(teamIconUrl);
+    } else {
+      defaultPicture.setVisible(true);
+    }
+    String descriptionWithoutHtml = SafeHtmlUtils.htmlEscape(description);
+    descriptionContainer.clear();
+    descriptionContainer.add(new HTML(linkify.linkify(descriptionWithoutHtml)));
 
-	@Override
-	public void setHeight(String height) {
-		widget.setHeight(height);
-	}
+    nameLink.setText(name);
+    nameLink.setHref("#!Team:" + team.getId());
+    pictureFocusPanel.addClickHandler(clickHandler);
+  }
 
-	@Override
-	public void setMemberCountWidget(IsWidget widget) {
-		memberCountContainer.clear();
-		memberCountContainer.add(widget);
-	}
+  @Override
+  public void showLoadError(String principalId) {
+    descriptionContainer.clear();
+    descriptionContainer.add(new Text(DisplayConstants.ERROR_LOADING));
+  }
 
-	@Override
-	public void setTeamEmailAddress(String teamEmail) {
-		synapseEmailField.setText(teamEmail);
-	}
+  @Override
+  public void showLoading() {}
+
+  @Override
+  public void showInfo(String message) {}
+
+  @Override
+  public void showErrorMessage(String message) {}
+
+  @Override
+  public void setRequestCount(String count) {
+    InlineHTML widget = new InlineHTML(DisplayUtils.getBadgeHtml(count));
+    notificationsSpan.add(
+      DisplayUtils.addTooltip(
+        widget,
+        DisplayConstants.PENDING_JOIN_REQUESTS_TOOLTIP
+      )
+    );
+  }
+
+  @Override
+  public Widget asWidget() {
+    return widget;
+  }
+
+  @Override
+  public void clear() {}
+
+  @Override
+  public void addStyleName(String style) {
+    widget.addStyleName(style);
+  }
+
+  @Override
+  public void setHeight(String height) {
+    widget.setHeight(height);
+  }
+
+  @Override
+  public void setMemberCountWidget(IsWidget widget) {
+    memberCountContainer.clear();
+    memberCountContainer.add(widget);
+  }
+
+  @Override
+  public void setTeamEmailAddress(String teamEmail) {
+    synapseEmailField.setText(teamEmail);
+  }
 }

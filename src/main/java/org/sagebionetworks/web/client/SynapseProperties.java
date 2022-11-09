@@ -4,9 +4,9 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 
 public interface SynapseProperties {
-	void initSynapseProperties(Callback c);
+  void initSynapseProperties(Callback c);
 
-	String getSynapseProperty(String key);
+  String getSynapseProperty(String key);
 
-	PublicPrincipalIds getPublicPrincipalIds();
+  PublicPrincipalIds getPublicPrincipalIds();
 }

@@ -5,15 +5,6 @@ import static org.sagebionetworks.web.client.DisplayConstants.AUTOCOMPLETE_VALUE
 import static org.sagebionetworks.web.client.DisplayConstants.AUTOCOMPLETE_VALUE_NEW_PASSWORD;
 import static org.sagebionetworks.web.client.DisplayConstants.AUTOCOMPLETE_VALUE_USERNAME;
 
-import org.gwtbootstrap3.client.ui.Alert;
-import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.Heading;
-import org.gwtbootstrap3.client.ui.TextBox;
-import org.gwtbootstrap3.client.ui.html.Div;
-import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.widget.FullWidthAlert;
-import org.sagebionetworks.web.client.widget.header.Header;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.BlurEvent;
@@ -30,286 +21,342 @@ import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.gwtbootstrap3.client.ui.Alert;
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Heading;
+import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.widget.FullWidthAlert;
+import org.sagebionetworks.web.client.widget.header.Header;
 
-public class PasswordResetViewImpl extends Composite implements PasswordResetView {
+public class PasswordResetViewImpl
+  extends Composite
+  implements PasswordResetView {
 
-	public interface PasswordResetViewImplUiBinder extends UiBinder<Widget, PasswordResetViewImpl> {
-	}
+  public interface PasswordResetViewImplUiBinder
+    extends UiBinder<Widget, PasswordResetViewImpl> {}
 
-	@UiField
-	DivElement resetPasswordForm;
-	@UiField
-	DivElement sendPasswordChangeForm;
-	@UiField
-	FullWidthAlert passwordResetRequired;
-	@UiField
-	PasswordTextBox currentPasswordField;
-	@UiField
-	PasswordTextBox password1Field;
-	@UiField
-	PasswordTextBox password2Field;
-	@UiField
-	TextBox emailAddressField;
+  @UiField
+  DivElement resetPasswordForm;
 
-	@UiField
-	DivElement currentPassword;
-	@UiField
-	DivElement password1;
-	@UiField
-	DivElement password2;
-	@UiField
-	Div emailAddress;
+  @UiField
+  DivElement sendPasswordChangeForm;
 
-	@UiField
-	DivElement currentPasswordError;
-	@UiField
-	DivElement password1Error;
-	@UiField
-	DivElement password2Error;
-	@UiField
-	Alert emailAddressError;
+  @UiField
+  FullWidthAlert passwordResetRequired;
 
-	@UiField
-	Heading pageTitle;
-	@UiField
-	SimplePanel loadingPanel;
+  @UiField
+  PasswordTextBox currentPasswordField;
 
-	@UiField
-	Button submitBtn;
+  @UiField
+  PasswordTextBox password1Field;
 
-	@UiField
-	SpanElement contentHtml;
+  @UiField
+  PasswordTextBox password2Field;
 
-	@UiField
-	Div synAlertContainer;
+  @UiField
+  TextBox emailAddressField;
 
-	private Presenter presenter;
-	private Header headerWidget;
+  @UiField
+  DivElement currentPassword;
 
-	private boolean isShowingResetUI;
+  @UiField
+  DivElement password1;
 
-	@Inject
-	public PasswordResetViewImpl(PasswordResetViewImplUiBinder binder, Header headerWidget) {
-		initWidget(binder.createAndBindUi(this));
-		this.headerWidget = headerWidget;
+  @UiField
+  DivElement password2;
 
-		headerWidget.configure();
-		init();
+  @UiField
+  Div emailAddress;
 
-		loadingPanel.setVisible(false);
-		showRequestForm();
-	}
+  @UiField
+  DivElement currentPasswordError;
 
-	private boolean checkEmail() {
-		emailAddressError.setVisible(false);
-		if (DisplayUtils.isDefined(emailAddressField.getValue())) {
-			return true;
-		} else {
-			emailAddressError.setText(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
-			emailAddressError.setVisible(true);
-			return false;
-		}
-	}
+  @UiField
+  DivElement password1Error;
 
-	private boolean checkCurrentPassword() {
-		DisplayUtils.hideFormError(currentPassword, currentPasswordError);
-		if (!DisplayUtils.isDefined(currentPasswordField.getText())) {
-			currentPasswordError.setInnerHTML(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
-			DisplayUtils.showFormError(currentPassword, currentPasswordError);
-			return false;
-		} else
-			return true;
-	}
+  @UiField
+  DivElement password2Error;
 
-	private boolean checkPassword1() {
-		DisplayUtils.hideFormError(password1, password1Error);
-		if (!DisplayUtils.isDefined(password1Field.getText())) {
-			password1Error.setInnerHTML(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
-			DisplayUtils.showFormError(password1, password1Error);
-			return false;
-		} else
-			return true;
-	}
+  @UiField
+  Alert emailAddressError;
 
-	private boolean checkPassword2() {
-		DisplayUtils.hideFormError(password2, password2Error);
-		if (!DisplayUtils.isDefined(password2Field.getText())) {
-			password2Error.setInnerHTML(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
-			DisplayUtils.showFormError(password2, password2Error);
-			return false;
-		} else
-			return true;
-	}
+  @UiField
+  Heading pageTitle;
 
-	private boolean checkPasswordMatch() {
-		DisplayUtils.hideFormError(password2, password2Error);
-		if (!password1Field.getValue().equals(password2Field.getValue())) {
-			password2Error.setInnerHTML(DisplayConstants.PASSWORDS_MISMATCH);
-			DisplayUtils.showFormError(password2, password2Error);
-			return false;
-		} else
-			return true;
-	}
+  @UiField
+  SimplePanel loadingPanel;
 
-	public void init() {
-		isShowingResetUI = false;
-		KeyDownHandler submit = new KeyDownHandler() {
-			@Override
-			public void onKeyDown(KeyDownEvent event) {
-				if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
-					submitBtn.click();
-				}
-			}
-		};
-		password1Field.addKeyDownHandler(submit);
-		password2Field.addKeyDownHandler(submit);
-		emailAddressField.addKeyDownHandler(submit);
-		submitBtn.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (isShowingResetUI) {
-					// validate passwords are filled in and match
-					if (checkCurrentPassword() && checkPassword1() && checkPassword2() && checkPasswordMatch()) {
-						submitBtn.setEnabled(false);
-						presenter.resetPassword(currentPasswordField.getValue(), password1Field.getValue());
-					}
-				} else {
-					// validate email address is filled in
-					if (checkEmail()) {
-						submitBtn.setEnabled(false);
-						presenter.requestPasswordReset(emailAddressField.getValue());
-					}
-				}
-			}
-		});
+  @UiField
+  Button submitBtn;
 
-		emailAddressField.getElement().setAttribute("placeholder", "Email address -or- username");
-		password1Field.getElement().setAttribute("placeholder", "Enter password");
-		password2Field.getElement().setAttribute("placeholder", "Confirm password");
+  @UiField
+  SpanElement contentHtml;
 
-		emailAddressField.getElement().setAttribute(AUTOCOMPLETE_ATTRIBUTE, AUTOCOMPLETE_VALUE_USERNAME);
-		currentPasswordField.getElement().setAttribute(AUTOCOMPLETE_ATTRIBUTE, AUTOCOMPLETE_VALUE_CURRENT_PASSWORD);
-		password1Field.getElement().setAttribute(AUTOCOMPLETE_ATTRIBUTE, AUTOCOMPLETE_VALUE_NEW_PASSWORD);
-		password2Field.getElement().setAttribute(AUTOCOMPLETE_ATTRIBUTE, AUTOCOMPLETE_VALUE_NEW_PASSWORD);
+  @UiField
+  Div synAlertContainer;
 
-		emailAddressField.addBlurHandler(new BlurHandler() {
-			@Override
-			public void onBlur(BlurEvent event) {
-				checkEmail();
-			}
-		});
-		password1Field.addBlurHandler(new BlurHandler() {
-			@Override
-			public void onBlur(BlurEvent event) {
-				checkPassword1();
-			}
-		});
+  private Presenter presenter;
+  private Header headerWidget;
 
-		password2Field.addBlurHandler(new BlurHandler() {
-			@Override
-			public void onBlur(BlurEvent event) {
-				checkPassword2();
-			}
-		});
-	}
+  private boolean isShowingResetUI;
 
-	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-		headerWidget.refresh();
-	}
+  @Inject
+  public PasswordResetViewImpl(
+    PasswordResetViewImplUiBinder binder,
+    Header headerWidget
+  ) {
+    initWidget(binder.createAndBindUi(this));
+    this.headerWidget = headerWidget;
 
-	@Override
-	public void showRequestForm() {
-		clear();
-		pageTitle.setText(DisplayConstants.SEND_PASSWORD_CHANGE_REQUEST);
-		submitBtn.setText("Reset my password");
-		DisplayUtils.show(sendPasswordChangeForm);
-		isShowingResetUI = false;
-		submitBtn.setVisible(true);
-	}
+    headerWidget.configure();
+    init();
 
-	@Override
-	public void showResetForm() {
-		clear();
-		pageTitle.setText(DisplayConstants.SET_PASSWORD);
-		submitBtn.setText("Set my password");
-		DisplayUtils.show(resetPasswordForm);
-		isShowingResetUI = true;
-		submitBtn.setVisible(true);
-	}
+    loadingPanel.setVisible(false);
+    showRequestForm();
+  }
 
-	@Override
-	public void clear() {
-		if (contentHtml != null)
-			contentHtml.setInnerHTML("");
-		loadingPanel.setVisible(false);
-		submitBtn.setText("Submit");
-		DisplayUtils.hide(sendPasswordChangeForm);
-		DisplayUtils.hide(resetPasswordForm);
-		submitBtn.setEnabled(true);
-		submitBtn.setVisible(false);
-		password1Field.setValue("");
-		password2Field.setValue("");
-		emailAddressField.setValue("");
-		emailAddressError.setVisible(false);
-		DisplayUtils.hideFormError(password1, password1Error);
-		DisplayUtils.hideFormError(password2, password2Error);
-		headerWidget.configure();
-		passwordResetRequired.setVisible(false);
-	}
+  private boolean checkEmail() {
+    emailAddressError.setVisible(false);
+    if (DisplayUtils.isDefined(emailAddressField.getValue())) {
+      return true;
+    } else {
+      emailAddressError.setText(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
+      emailAddressError.setVisible(true);
+      return false;
+    }
+  }
 
-	@Override
-	public void showPasswordResetSuccess() {
-		clear();
-		pageTitle.setText(DisplayConstants.SUCCESS);
-		contentHtml.setInnerHTML(DisplayUtils.getInfoHtml(DisplayConstants.PASSWORD_HAS_BEEN_CHANGED));
-	}
+  private boolean checkCurrentPassword() {
+    DisplayUtils.hideFormError(currentPassword, currentPasswordError);
+    if (!DisplayUtils.isDefined(currentPasswordField.getText())) {
+      currentPasswordError.setInnerHTML(
+        DisplayConstants.ERROR_ALL_FIELDS_REQUIRED
+      );
+      DisplayUtils.showFormError(currentPassword, currentPasswordError);
+      return false;
+    } else return true;
+  }
 
-	@Override
-	public void showErrorMessage(String errorMessage) {
-		submitBtn.setEnabled(true);
-		DisplayUtils.showErrorMessage(errorMessage);
-	}
+  private boolean checkPassword1() {
+    DisplayUtils.hideFormError(password1, password1Error);
+    if (!DisplayUtils.isDefined(password1Field.getText())) {
+      password1Error.setInnerHTML(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
+      DisplayUtils.showFormError(password1, password1Error);
+      return false;
+    } else return true;
+  }
 
+  private boolean checkPassword2() {
+    DisplayUtils.hideFormError(password2, password2Error);
+    if (!DisplayUtils.isDefined(password2Field.getText())) {
+      password2Error.setInnerHTML(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
+      DisplayUtils.showFormError(password2, password2Error);
+      return false;
+    } else return true;
+  }
 
-	@Override
-	public void showRequestSentSuccess() {
-		clear();
-		pageTitle.setText(DisplayConstants.REQUEST_SENT);
-		contentHtml.setInnerHTML(DisplayUtils.getInfoHtml(DisplayConstants.PASSWORD_RESET_SENT));
-	}
+  private boolean checkPasswordMatch() {
+    DisplayUtils.hideFormError(password2, password2Error);
+    if (!password1Field.getValue().equals(password2Field.getValue())) {
+      password2Error.setInnerHTML(DisplayConstants.PASSWORDS_MISMATCH);
+      DisplayUtils.showFormError(password2, password2Error);
+      return false;
+    } else return true;
+  }
 
-	@Override
-	public void showLoading() {
-		loadingPanel.setWidget(DisplayUtils.getSmallLoadingWidget());
-		loadingPanel.setVisible(true);
-	}
+  public void init() {
+    isShowingResetUI = false;
+    KeyDownHandler submit = new KeyDownHandler() {
+      @Override
+      public void onKeyDown(KeyDownEvent event) {
+        if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
+          submitBtn.click();
+        }
+      }
+    };
+    password1Field.addKeyDownHandler(submit);
+    password2Field.addKeyDownHandler(submit);
+    emailAddressField.addKeyDownHandler(submit);
+    submitBtn.addClickHandler(
+      new ClickHandler() {
+        @Override
+        public void onClick(ClickEvent event) {
+          if (isShowingResetUI) {
+            // validate passwords are filled in and match
+            if (
+              checkCurrentPassword() &&
+              checkPassword1() &&
+              checkPassword2() &&
+              checkPasswordMatch()
+            ) {
+              submitBtn.setEnabled(false);
+              presenter.resetPassword(
+                currentPasswordField.getValue(),
+                password1Field.getValue()
+              );
+            }
+          } else {
+            // validate email address is filled in
+            if (checkEmail()) {
+              submitBtn.setEnabled(false);
+              presenter.requestPasswordReset(emailAddressField.getValue());
+            }
+          }
+        }
+      }
+    );
 
-	@Override
-	public void showInfo(String message) {
-		DisplayUtils.showInfo(message);
-	}
+    emailAddressField
+      .getElement()
+      .setAttribute("placeholder", "Email address -or- username");
+    password1Field.getElement().setAttribute("placeholder", "Enter password");
+    password2Field.getElement().setAttribute("placeholder", "Confirm password");
 
-	@Override
-	public void showExpiredRequest() {
-		loadingPanel.setVisible(false);
-		pageTitle.setText(DisplayConstants.REQUEST_EXPIRED);
-		contentHtml.setInnerHTML(DisplayConstants.SET_PASSWORD_EXPIRED);
-	}
+    emailAddressField
+      .getElement()
+      .setAttribute(AUTOCOMPLETE_ATTRIBUTE, AUTOCOMPLETE_VALUE_USERNAME);
+    currentPasswordField
+      .getElement()
+      .setAttribute(
+        AUTOCOMPLETE_ATTRIBUTE,
+        AUTOCOMPLETE_VALUE_CURRENT_PASSWORD
+      );
+    password1Field
+      .getElement()
+      .setAttribute(AUTOCOMPLETE_ATTRIBUTE, AUTOCOMPLETE_VALUE_NEW_PASSWORD);
+    password2Field
+      .getElement()
+      .setAttribute(AUTOCOMPLETE_ATTRIBUTE, AUTOCOMPLETE_VALUE_NEW_PASSWORD);
 
-	public void setSynAlertWidget(Widget w) {
-		synAlertContainer.clear();
-		synAlertContainer.add(w);
-	};
+    emailAddressField.addBlurHandler(
+      new BlurHandler() {
+        @Override
+        public void onBlur(BlurEvent event) {
+          checkEmail();
+        }
+      }
+    );
+    password1Field.addBlurHandler(
+      new BlurHandler() {
+        @Override
+        public void onBlur(BlurEvent event) {
+          checkPassword1();
+        }
+      }
+    );
 
-	@Override
-	public void setSubmitButtonEnabled(boolean enabled) {
-		submitBtn.setEnabled(enabled);
-	}
+    password2Field.addBlurHandler(
+      new BlurHandler() {
+        @Override
+        public void onBlur(BlurEvent event) {
+          checkPassword2();
+        }
+      }
+    );
+  }
 
-	@Override
-	public void showPasswordResetRequired() {
-		passwordResetRequired.setVisible(true);
-	}
+  @Override
+  public void setPresenter(Presenter presenter) {
+    this.presenter = presenter;
+    headerWidget.refresh();
+  }
+
+  @Override
+  public void showRequestForm() {
+    clear();
+    pageTitle.setText(DisplayConstants.SEND_PASSWORD_CHANGE_REQUEST);
+    submitBtn.setText("Reset my password");
+    DisplayUtils.show(sendPasswordChangeForm);
+    isShowingResetUI = false;
+    submitBtn.setVisible(true);
+  }
+
+  @Override
+  public void showResetForm() {
+    clear();
+    pageTitle.setText(DisplayConstants.SET_PASSWORD);
+    submitBtn.setText("Set my password");
+    DisplayUtils.show(resetPasswordForm);
+    isShowingResetUI = true;
+    submitBtn.setVisible(true);
+  }
+
+  @Override
+  public void clear() {
+    if (contentHtml != null) contentHtml.setInnerHTML("");
+    loadingPanel.setVisible(false);
+    submitBtn.setText("Submit");
+    DisplayUtils.hide(sendPasswordChangeForm);
+    DisplayUtils.hide(resetPasswordForm);
+    submitBtn.setEnabled(true);
+    submitBtn.setVisible(false);
+    password1Field.setValue("");
+    password2Field.setValue("");
+    emailAddressField.setValue("");
+    emailAddressError.setVisible(false);
+    DisplayUtils.hideFormError(password1, password1Error);
+    DisplayUtils.hideFormError(password2, password2Error);
+    headerWidget.configure();
+    passwordResetRequired.setVisible(false);
+  }
+
+  @Override
+  public void showPasswordResetSuccess() {
+    clear();
+    pageTitle.setText(DisplayConstants.SUCCESS);
+    contentHtml.setInnerHTML(
+      DisplayUtils.getInfoHtml(DisplayConstants.PASSWORD_HAS_BEEN_CHANGED)
+    );
+  }
+
+  @Override
+  public void showErrorMessage(String errorMessage) {
+    submitBtn.setEnabled(true);
+    DisplayUtils.showErrorMessage(errorMessage);
+  }
+
+  @Override
+  public void showRequestSentSuccess() {
+    clear();
+    pageTitle.setText(DisplayConstants.REQUEST_SENT);
+    contentHtml.setInnerHTML(
+      DisplayUtils.getInfoHtml(DisplayConstants.PASSWORD_RESET_SENT)
+    );
+  }
+
+  @Override
+  public void showLoading() {
+    loadingPanel.setWidget(DisplayUtils.getSmallLoadingWidget());
+    loadingPanel.setVisible(true);
+  }
+
+  @Override
+  public void showInfo(String message) {
+    DisplayUtils.showInfo(message);
+  }
+
+  @Override
+  public void showExpiredRequest() {
+    loadingPanel.setVisible(false);
+    pageTitle.setText(DisplayConstants.REQUEST_EXPIRED);
+    contentHtml.setInnerHTML(DisplayConstants.SET_PASSWORD_EXPIRED);
+  }
+
+  public void setSynAlertWidget(Widget w) {
+    synAlertContainer.clear();
+    synAlertContainer.add(w);
+  }
+
+  @Override
+  public void setSubmitButtonEnabled(boolean enabled) {
+    submitBtn.setEnabled(enabled);
+  }
+
+  @Override
+  public void showPasswordResetRequired() {
+    passwordResetRequired.setVisible(true);
+  }
 }

@@ -3,9 +3,9 @@ package org.sagebionetworks.web.client.widget.statistics;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface StatisticsPlotWidgetView extends IsWidget {
-	void clear();
+  void clear();
 
-	void setVisible(boolean visible);
+  void setVisible(boolean visible);
 
-	void configureAndShow(String projectId, String accessToken);
+  void configureAndShow(String projectId, String accessToken);
 }

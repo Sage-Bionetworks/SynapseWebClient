@@ -14,7 +14,6 @@ import static org.sagebionetworks.web.client.widget.table.v2.results.cell.JSONLi
 
 import java.util.Arrays;
 import java.util.Collections;
-
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,101 +30,105 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditorVie
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.JSONListCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.JSONListCellEditorView;
 
-
 @RunWith(MockitoJUnitRunner.class)
 public class JSONListCellEditorImplTest {
 
-	@Mock
-	JSONListCellEditorView mockView;
-	@Mock
-	GWTWrapper mockGwt;
-	JSONArrayAdapter jsonArrayAdapter = new JSONArrayAdapterImpl();
-	JSONListCellEditor editor;
-	@Mock
-	PortalGinInjector mockGinInjector;
+  @Mock
+  JSONListCellEditorView mockView;
 
-	ColumnModel columnModel;
-	
-	@Before
-	public void before() {
-		editor = new JSONListCellEditor(mockView, jsonArrayAdapter, mockGinInjector, mockGwt);
-		columnModel = new ColumnModel();
-		columnModel.setColumnType(ColumnType.STRING_LIST);
-		editor.setColumnModel(columnModel);
-		when(mockGwt.isValidJSONArray(anyString())).thenReturn(true);
-	}
+  @Mock
+  GWTWrapper mockGwt;
 
-	@Test
-	public void testNotValidJsonArray() {
-		// there's a difference in behavior between JSONArrayAdapterImpl (java implementation) and GwtAdapterFactory (client-side)
-		// need a special method client-side to check for a valid json array.
-		String testString = "1923";
-		when(mockGwt.isValidJSONArray(anyString())).thenReturn(false);
-		when(mockView.getValue()).thenReturn(testString);
-		
-		assertFalse(editor.isValid());
+  JSONArrayAdapter jsonArrayAdapter = new JSONArrayAdapterImpl();
+  JSONListCellEditor editor;
 
-		verify(mockGwt).isValidJSONArray(testString);
-		verify(mockView).setValidationState(ValidationState.ERROR);
-		verify(mockView).setHelpText(MUST_BE + VALID_JSON_ARRAY);
-	}
-	
-	@Test
-	public void testInvalidSize() {
-		Long maxSize = 3L;
-		columnModel.setMaximumSize(maxSize);
-		when(mockView.getValue()).thenReturn("[\"1234\"]");
-		
-		assertFalse(editor.isValid());
-		
-		verify(mockView).setValidationState(ValidationState.ERROR);
-		verify(mockView).setHelpText(MUST_BE + maxSize + CHARACTERS_OR_LESS);
-	}
-	
+  @Mock
+  PortalGinInjector mockGinInjector;
 
-	@Test
-	public void testInvalidLength() {
-		Long maxListLength = 2L;
-		columnModel.setMaximumListLength(maxListLength);
-		when(mockView.getValue()).thenReturn("[\"a\", \"b\", \"c\"]");
-		
-		assertFalse(editor.isValid());
-		
-		verify(mockView).setValidationState(ValidationState.ERROR);
-		verify(mockView).setHelpText(MUST_BE + maxListLength + ITEMS_OR_LESS);
-	}
+  ColumnModel columnModel;
 
+  @Before
+  public void before() {
+    editor =
+      new JSONListCellEditor(
+        mockView,
+        jsonArrayAdapter,
+        mockGinInjector,
+        mockGwt
+      );
+    columnModel = new ColumnModel();
+    columnModel.setColumnType(ColumnType.STRING_LIST);
+    editor.setColumnModel(columnModel);
+    when(mockGwt.isValidJSONArray(anyString())).thenReturn(true);
+  }
 
-	@Test
-	public void testValidState() {
-		Long maxSize = 3L;
-		columnModel.setMaximumSize(maxSize);
-		Long maxListLength = 3L;
-		columnModel.setMaximumListLength(maxListLength);
-		when(mockView.getValue()).thenReturn("[\"a\", \"b\", \"c\"]");
-		
-		assertTrue(editor.isValid());
-		
-		verify(mockView).setValidationState(ValidationState.NONE);
-		verify(mockView).setHelpText("");
-	}
+  @Test
+  public void testNotValidJsonArray() {
+    // there's a difference in behavior between JSONArrayAdapterImpl (java implementation) and GwtAdapterFactory (client-side)
+    // need a special method client-side to check for a valid json array.
+    String testString = "1923";
+    when(mockGwt.isValidJSONArray(anyString())).thenReturn(false);
+    when(mockView.getValue()).thenReturn(testString);
 
-	@Test
-	public void testJsonArrayString_null(){
-		assertNull(editor.jsonArrayString(null));
-	}
+    assertFalse(editor.isValid());
 
-	@Test
-	public void testJsonArrayString_emptyList() {
-		assertNull(editor.jsonArrayString(Collections.emptyList()));
+    verify(mockGwt).isValidJSONArray(testString);
+    verify(mockView).setValidationState(ValidationState.ERROR);
+    verify(mockView).setHelpText(MUST_BE + VALID_JSON_ARRAY);
+  }
 
-	}
+  @Test
+  public void testInvalidSize() {
+    Long maxSize = 3L;
+    columnModel.setMaximumSize(maxSize);
+    when(mockView.getValue()).thenReturn("[\"1234\"]");
 
-	@Test
-	public void testJsonArrayString_happy(){
-		String arrayString = editor.jsonArrayString(Arrays.asList("a","b","c"));
+    assertFalse(editor.isValid());
 
-		assertEquals("[\"a\",\"b\",\"c\"]", arrayString);
-	}
+    verify(mockView).setValidationState(ValidationState.ERROR);
+    verify(mockView).setHelpText(MUST_BE + maxSize + CHARACTERS_OR_LESS);
+  }
 
+  @Test
+  public void testInvalidLength() {
+    Long maxListLength = 2L;
+    columnModel.setMaximumListLength(maxListLength);
+    when(mockView.getValue()).thenReturn("[\"a\", \"b\", \"c\"]");
+
+    assertFalse(editor.isValid());
+
+    verify(mockView).setValidationState(ValidationState.ERROR);
+    verify(mockView).setHelpText(MUST_BE + maxListLength + ITEMS_OR_LESS);
+  }
+
+  @Test
+  public void testValidState() {
+    Long maxSize = 3L;
+    columnModel.setMaximumSize(maxSize);
+    Long maxListLength = 3L;
+    columnModel.setMaximumListLength(maxListLength);
+    when(mockView.getValue()).thenReturn("[\"a\", \"b\", \"c\"]");
+
+    assertTrue(editor.isValid());
+
+    verify(mockView).setValidationState(ValidationState.NONE);
+    verify(mockView).setHelpText("");
+  }
+
+  @Test
+  public void testJsonArrayString_null() {
+    assertNull(editor.jsonArrayString(null));
+  }
+
+  @Test
+  public void testJsonArrayString_emptyList() {
+    assertNull(editor.jsonArrayString(Collections.emptyList()));
+  }
+
+  @Test
+  public void testJsonArrayString_happy() {
+    String arrayString = editor.jsonArrayString(Arrays.asList("a", "b", "c"));
+
+    assertEquals("[\"a\",\"b\",\"c\"]", arrayString);
+  }
 }

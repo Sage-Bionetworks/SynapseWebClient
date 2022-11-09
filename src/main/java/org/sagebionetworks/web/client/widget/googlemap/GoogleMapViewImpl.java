@@ -1,11 +1,5 @@
 package org.sagebionetworks.web.client.widget.googlemap;
 
-import java.util.ArrayList;
-import java.util.List;
-import org.gwtbootstrap3.client.ui.Heading;
-import org.gwtbootstrap3.client.ui.html.Div;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.utils.Callback;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.logical.shared.AttachEvent;
@@ -17,116 +11,140 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+import org.gwtbootstrap3.client.ui.Heading;
+import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.utils.Callback;
 
 public class GoogleMapViewImpl implements GoogleMapView {
-	public interface GoogleMapViewImplUiBinder extends UiBinder<Widget, GoogleMapViewImpl> {
-	}
 
-	Presenter presenter;
-	@UiField
-	Div synAlertContainer;
-	@UiField
-	Div googleMapCanvas;
-	@UiField
-	Div userBadges;
-	@UiField
-	Div markerPopupContent;
-	@UiField
-	Div googleMapContainer;
-	@UiField
-	Heading locationTitle;
-	Widget widget;
-	Callback onAttachCallback;
-	JavaScriptObject currentInfoWindow;
+  public interface GoogleMapViewImplUiBinder
+    extends UiBinder<Widget, GoogleMapViewImpl> {}
 
-	@Inject
-	public GoogleMapViewImpl(GoogleMapViewImplUiBinder binder) {
-		widget = binder.createAndBindUi(this);
-		widget.addAttachHandler(new AttachEvent.Handler() {
+  Presenter presenter;
 
-			@Override
-			public void onAttachOrDetach(AttachEvent event) {
-				if (event.isAttached()) {
-					onAttach();
-				}
-			}
-		});
-	}
+  @UiField
+  Div synAlertContainer;
 
-	@Override
-	public void setHeight(String height) {
-		googleMapContainer.setHeight(height);
-	}
+  @UiField
+  Div googleMapCanvas;
 
-	@Override
-	public void setVisible(boolean visible) {
-		widget.setVisible(visible);
-	}
+  @UiField
+  Div userBadges;
 
-	@Override
-	public boolean isAttached() {
-		return widget.isAttached();
-	}
+  @UiField
+  Div markerPopupContent;
 
-	@Override
-	public boolean isInViewport() {
-		return DisplayUtils.isInViewport(widget);
-	}
+  @UiField
+  Div googleMapContainer;
 
-	@Override
-	public void setOnAttachCallback(Callback onAttachCallback) {
-		this.onAttachCallback = onAttachCallback;
-	}
+  @UiField
+  Heading locationTitle;
 
-	private void onAttach() {
-		if (onAttachCallback != null) {
-			onAttachCallback.invoke();
-		}
-	}
+  Widget widget;
+  Callback onAttachCallback;
+  JavaScriptObject currentInfoWindow;
 
-	@Override
-	public Widget asWidget() {
-		return widget;
-	}
+  @Inject
+  public GoogleMapViewImpl(GoogleMapViewImplUiBinder binder) {
+    widget = binder.createAndBindUi(this);
+    widget.addAttachHandler(
+      new AttachEvent.Handler() {
+        @Override
+        public void onAttachOrDetach(AttachEvent event) {
+          if (event.isAttached()) {
+            onAttach();
+          }
+        }
+      }
+    );
+  }
 
-	@Override
-	public void setSynAlert(Widget w) {
-		synAlertContainer.clear();
-		synAlertContainer.add(w);
-	}
+  @Override
+  public void setHeight(String height) {
+    googleMapContainer.setHeight(height);
+  }
 
-	@Override
-	public void showMap(String data) {
-		JSONArray jsonArray = (JSONArray) JSONParser.parseStrict(data);
-		Element markerPopupContentEl = markerPopupContent.getElement();
-		Element el = googleMapCanvas.getElement();
-		JavaScriptObject map = _createMap(el);
-		JavaScriptObject bounds = _getBounds();
+  @Override
+  public void setVisible(boolean visible) {
+    widget.setVisible(visible);
+  }
 
-		for (int i = 0; i < jsonArray.size(); i++) {
-			JSONObject markerJson = (JSONObject) jsonArray.get(i);
-			JSONArray latLngArray = (JSONArray) markerJson.get("latLng");
-			double lat = latLngArray.get(0).isNumber().doubleValue();
-			double lng = latLngArray.get(1).isNumber().doubleValue();
+  @Override
+  public boolean isAttached() {
+    return widget.isAttached();
+  }
 
-			JSONArray userIdsArray = (JSONArray) markerJson.get("userIds");
-			List<String> userIdsList = new ArrayList<String>();
-			for (int j = 0; j < userIdsArray.size(); j++) {
-				userIdsList.add(userIdsArray.get(j).isString().stringValue());
-			}
+  @Override
+  public boolean isInViewport() {
+    return DisplayUtils.isInViewport(widget);
+  }
 
-			JSONString title = markerJson.get("location").isString();
-			_addMarker(this, map, title.stringValue(), lat, lng, userIdsList, markerPopupContentEl, bounds);
-		}
-		setVisible(jsonArray.size() > 0);
-		DisplayUtils.scrollToTop();
-	}
+  @Override
+  public void setOnAttachCallback(Callback onAttachCallback) {
+    this.onAttachCallback = onAttachCallback;
+  }
 
-	private static native JavaScriptObject _getBounds() /*-{
+  private void onAttach() {
+    if (onAttachCallback != null) {
+      onAttachCallback.invoke();
+    }
+  }
+
+  @Override
+  public Widget asWidget() {
+    return widget;
+  }
+
+  @Override
+  public void setSynAlert(Widget w) {
+    synAlertContainer.clear();
+    synAlertContainer.add(w);
+  }
+
+  @Override
+  public void showMap(String data) {
+    JSONArray jsonArray = (JSONArray) JSONParser.parseStrict(data);
+    Element markerPopupContentEl = markerPopupContent.getElement();
+    Element el = googleMapCanvas.getElement();
+    JavaScriptObject map = _createMap(el);
+    JavaScriptObject bounds = _getBounds();
+
+    for (int i = 0; i < jsonArray.size(); i++) {
+      JSONObject markerJson = (JSONObject) jsonArray.get(i);
+      JSONArray latLngArray = (JSONArray) markerJson.get("latLng");
+      double lat = latLngArray.get(0).isNumber().doubleValue();
+      double lng = latLngArray.get(1).isNumber().doubleValue();
+
+      JSONArray userIdsArray = (JSONArray) markerJson.get("userIds");
+      List<String> userIdsList = new ArrayList<String>();
+      for (int j = 0; j < userIdsArray.size(); j++) {
+        userIdsList.add(userIdsArray.get(j).isString().stringValue());
+      }
+
+      JSONString title = markerJson.get("location").isString();
+      _addMarker(
+        this,
+        map,
+        title.stringValue(),
+        lat,
+        lng,
+        userIdsList,
+        markerPopupContentEl,
+        bounds
+      );
+    }
+    setVisible(jsonArray.size() > 0);
+    DisplayUtils.scrollToTop();
+  }
+
+  private static native JavaScriptObject _getBounds() /*-{
 		return new google.maps.LatLngBounds();
 	}-*/;
 
-	private static native JavaScriptObject _createMap(Element el) /*-{
+  private static native JavaScriptObject _createMap(Element el) /*-{
 		return new google.maps.Map(el, {
 			scrollwheel : true,
 			mapTypeControl : false,
@@ -137,11 +155,20 @@ public class GoogleMapViewImpl implements GoogleMapView {
 		});
 	}-*/;
 
-	public void markerClicked(String location, List<String> userIdsList) {
-		presenter.markerClicked(location, userIdsList);
-	}
+  public void markerClicked(String location, List<String> userIdsList) {
+    presenter.markerClicked(location, userIdsList);
+  }
 
-	private static native void _addMarker(GoogleMapViewImpl x, JavaScriptObject mapJsObject, String locationString, double lat, double lng, List<String> userIdsList, Element markerPopupContent, JavaScriptObject bounds) /*-{
+  private static native void _addMarker(
+    GoogleMapViewImpl x,
+    JavaScriptObject mapJsObject,
+    String locationString,
+    double lat,
+    double lng,
+    List<String> userIdsList,
+    Element markerPopupContent,
+    JavaScriptObject bounds
+  ) /*-{
 
 		var image = {
 			url : 'images/synapse-map-marker.png',
@@ -175,17 +202,17 @@ public class GoogleMapViewImpl implements GoogleMapView {
 		mapJsObject.setCenter(bounds.getCenter());
 	}-*/;
 
-	@Override
-	public void showUsers(String location, List<Widget> badges) {
-		locationTitle.setText(location);
-		userBadges.clear();
-		for (Widget widget : badges) {
-			userBadges.add(widget);
-		}
-	}
+  @Override
+  public void showUsers(String location, List<Widget> badges) {
+    locationTitle.setText(location);
+    userBadges.clear();
+    for (Widget widget : badges) {
+      userBadges.add(widget);
+    }
+  }
 
-	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-	}
+  @Override
+  public void setPresenter(Presenter presenter) {
+    this.presenter = presenter;
+  }
 }

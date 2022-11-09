@@ -7,58 +7,57 @@ import com.google.gwt.user.client.ui.IsWidget;
  *
  */
 public interface RejectDataAccessRequestModalView extends IsWidget {
+  /**
+   * @return String representation of rejected reason
+   */
+  String getValue();
 
-	/**
-	 * @return String representation of rejected reason
-	 */
-	String getValue();
+  String getSelectedCheckboxText();
 
-	String getSelectedCheckboxText();
+  /**
+   * Show an error message..
+   *
+   * @param error
+   */
+  void showError(String error);
 
-	/**
-	 * Show an error message..
-	 * 
-	 * @param error
-	 */
-	void showError(String error);
+  void setValue(String value);
 
-	void setValue(String value);
+  /**
+   * Show the view
+   */
+  void show();
 
-	/**
-	 * Show the view
-	 */
-	void show();
+  void addReason(String reason);
+  void clearReasons();
+  /**
+   * Hide the dialog.
+   */
+  void hide();
 
-	void addReason(String reason);
-	void clearReasons();
-	/**
-	 * Hide the dialog.
-	 */
-	void hide();
+  /**
+   * Clear name and errors.
+   */
+  void clear();
 
-	/**
-	 * Clear name and errors.
-	 */
-	void clear();
+  /**
+   * clear error state
+   */
+  void clearError();
 
-	/**
-	 * clear error state
-	 */
-	void clearError();
+  /**
+   * Set Presenter
+   *
+   * @param presenter
+   */
+  void setPresenter(Presenter presenter);
 
-	/**
-	 * Set Presenter
-	 * 
-	 * @param presenter
-	 */
-	void setPresenter(Presenter presenter);
+  /**
+   * Presenter interface
+   */
+  public interface Presenter {
+    void updateResponse();
 
-	/**
-	 * Presenter interface
-	 */
-	public interface Presenter {
-		void updateResponse();
-
-		void onSave();
-	}
+    void onSave();
+  }
 }

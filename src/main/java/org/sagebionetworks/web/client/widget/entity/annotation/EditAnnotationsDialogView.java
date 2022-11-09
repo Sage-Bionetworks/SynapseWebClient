@@ -1,81 +1,77 @@
 package org.sagebionetworks.web.client.widget.entity.annotation;
 
-import java.util.List;
-
-import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import java.util.List;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.widget.CommaSeparatedValuesParser;
 
 public interface EditAnnotationsDialogView extends IsWidget {
+  public interface Presenter {
+    /**
+     * Configure the dialog
+     */
+    void configure(EntityBundle bundle);
 
-	public interface Presenter {
+    /**
+     * Called when the save button is clicked in the dialog
+     */
+    void onSave();
 
-		/**
-		 * Configure the dialog
-		 */
-		void configure(EntityBundle bundle);
+    void onClickPasteNewValues();
 
-		/**
-		 * Called when the save button is clicked in the dialog
-		 */
-		void onSave();
+    /**
+     * Called when the cancel button is clicked in the dialog
+     */
+    void onCancel();
 
-		void onClickPasteNewValues();
+    /**
+     * Called when the add button is clicked in the dialog
+     */
+    void onAddNewAnnotation(List<String> values);
 
-		/**
-		 * Called when the cancel button is clicked in the dialog
-		 */
-		void onCancel();
+    /**
+     * From the annotation editor
+     */
+    void onAnnotationDeleted(AnnotationEditor editor);
+  }
 
-		/**
-		 * Called when the add button is clicked in the dialog
-		 */
-		void onAddNewAnnotation(List<String> values);
+  void setPresenter(Presenter presenter);
 
-		/**
-		 * From the annotation editor
-		 */
-		void onAnnotationDeleted(AnnotationEditor editor);
-	}
+  /**
+   * Show the editor.
+   */
+  void showEditor();
 
-	void setPresenter(Presenter presenter);
+  /**
+   * Hide the editor
+   */
+  void hideEditor();
 
-	/**
-	 * Show the editor.
-	 */
-	void showEditor();
+  /**
+   * Called before any service call.
+   */
+  void setLoading();
 
-	/**
-	 * Hide the editor
-	 */
-	void hideEditor();
+  /**
+   * Show error message.
+   *
+   * @param message
+   */
+  void showError(String message);
 
-	/**
-	 * Called before any service call.
-	 */
-	void setLoading();
+  /**
+   * Hide the alert.
+   */
+  void hideErrors();
 
-	/**
-	 * Show error message.
-	 * 
-	 * @param message
-	 */
-	void showError(String message);
+  void addAnnotationEditor(Widget editor);
 
-	/**
-	 * Hide the alert.
-	 */
-	void hideErrors();
+  void removeAnnotationEditor(Widget editor);
 
-	void addAnnotationEditor(Widget editor);
+  void addCommaSeparatedValuesParser(Widget commaSeparatedValuesParser);
 
-	void removeAnnotationEditor(Widget editor);
+  void clearAnnotationEditors();
 
-	void addCommaSeparatedValuesParser(Widget commaSeparatedValuesParser);
-
-	void clearAnnotationEditors();
-
-	void showInfo(String message);
-
+  void showInfo(String message);
 }

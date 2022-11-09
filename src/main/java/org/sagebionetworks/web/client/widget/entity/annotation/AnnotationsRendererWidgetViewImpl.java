@@ -1,5 +1,13 @@
 package org.sagebionetworks.web.client.widget.entity.annotation;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 import java.util.Map;
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
@@ -9,99 +17,102 @@ import org.sagebionetworks.repo.model.annotation.v2.AnnotationsValue;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 
 /**
  * A widget that renders entity annotations.
  *
  */
-public class AnnotationsRendererWidgetViewImpl implements AnnotationsRendererWidgetView {
-	@UiField
-	Button editAnnotationsButton;
-	@UiField
-	TBody tableBody;
-	@UiField
-	Alert noAnnotationsFoundAlert;
-	@UiField
-	Span clickEditText;
+public class AnnotationsRendererWidgetViewImpl
+  implements AnnotationsRendererWidgetView {
 
-	@UiField
-	FlowPanel modalContainer;
+  @UiField
+  Button editAnnotationsButton;
 
-	public interface Binder extends UiBinder<Widget, AnnotationsRendererWidgetViewImpl> {
-	}
+  @UiField
+  TBody tableBody;
 
-	private Presenter presenter;
-	private AnnotationTransformer transformer;
-	private Widget widget;
+  @UiField
+  Alert noAnnotationsFoundAlert;
 
-	@Inject
-	public AnnotationsRendererWidgetViewImpl(final Binder uiBinder, AnnotationTransformer transformer) {
-		widget = uiBinder.createAndBindUi(this);
-		this.transformer = transformer;
-		editAnnotationsButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onEdit();
-			}
-		});
-	}
+  @UiField
+  Span clickEditText;
 
-	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-	}
+  @UiField
+  FlowPanel modalContainer;
 
-	@Override
-	public Widget asWidget() {
-		return widget;
-	}
+  public interface Binder
+    extends UiBinder<Widget, AnnotationsRendererWidgetViewImpl> {}
 
+  private Presenter presenter;
+  private AnnotationTransformer transformer;
+  private Widget widget;
 
-	public void configure(Map<String, AnnotationsValue> annotationsMap) {
-		// add a row for each annotation
-		noAnnotationsFoundAlert.setVisible(false);
-		tableBody.clear();
-		tableBody.setVisible(true);
-		for (final String label : annotationsMap.keySet()) {
-			AnnotationsValue annotationsValue = annotationsMap.get(label);
-			TableRow tableRow = new TableRow();
+  @Inject
+  public AnnotationsRendererWidgetViewImpl(
+    final Binder uiBinder,
+    AnnotationTransformer transformer
+  ) {
+    widget = uiBinder.createAndBindUi(this);
+    this.transformer = transformer;
+    editAnnotationsButton.addClickHandler(
+      new ClickHandler() {
+        @Override
+        public void onClick(ClickEvent event) {
+          presenter.onEdit();
+        }
+      }
+    );
+  }
 
-			TableData labelCell = new TableData();
-			labelCell.add(new Text(label));
-			tableRow.add(labelCell);
+  @Override
+  public void setPresenter(Presenter presenter) {
+    this.presenter = presenter;
+  }
 
-			TableData valueCell = new TableData();
+  @Override
+  public Widget asWidget() {
+    return widget;
+  }
 
-			String value = SafeHtmlUtils.htmlEscapeAllowEntities(transformer.getFriendlyValues(annotationsValue));
-			valueCell.add(new Text(value));
-			tableRow.add(valueCell);
+  public void configure(Map<String, AnnotationsValue> annotationsMap) {
+    // add a row for each annotation
+    noAnnotationsFoundAlert.setVisible(false);
+    tableBody.clear();
+    tableBody.setVisible(true);
+    for (final String label : annotationsMap.keySet()) {
+      AnnotationsValue annotationsValue = annotationsMap.get(label);
+      TableRow tableRow = new TableRow();
 
-			tableBody.add(tableRow);
-		}
-	}
+      TableData labelCell = new TableData();
+      labelCell.add(new Text(label));
+      tableRow.add(labelCell);
 
-	@Override
-	public void setEditUIVisible(boolean isVisible) {
-		editAnnotationsButton.setVisible(isVisible);
-		clickEditText.setVisible(isVisible);
-	}
+      TableData valueCell = new TableData();
 
-	@Override
-	public void showNoAnnotations() {
-		tableBody.setVisible(false);
-		noAnnotationsFoundAlert.setVisible(true);
-	}
+      String value = SafeHtmlUtils.htmlEscapeAllowEntities(
+        transformer.getFriendlyValues(annotationsValue)
+      );
+      valueCell.add(new Text(value));
+      tableRow.add(valueCell);
 
-	@Override
-	public void addEditorToPage(Widget editorWidget) {
-		modalContainer.add(editorWidget);
-	}
+      tableBody.add(tableRow);
+    }
+  }
+
+  @Override
+  public void setEditUIVisible(boolean isVisible) {
+    editAnnotationsButton.setVisible(isVisible);
+    clickEditText.setVisible(isVisible);
+  }
+
+  @Override
+  public void showNoAnnotations() {
+    tableBody.setVisible(false);
+    noAnnotationsFoundAlert.setVisible(true);
+  }
+
+  @Override
+  public void addEditorToPage(Widget editorWidget) {
+    modalContainer.add(editorWidget);
+  }
 }

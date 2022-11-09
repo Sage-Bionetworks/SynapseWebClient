@@ -1,29 +1,28 @@
 package org.sagebionetworks.web.client.view;
 
-import org.sagebionetworks.web.client.SynapseView;
-import org.sagebionetworks.web.client.utils.Callback;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.IsWidget;
+import org.sagebionetworks.web.client.SynapseView;
+import org.sagebionetworks.web.client.utils.Callback;
 
 public interface LoginView extends IsWidget, SynapseView {
+  void setPresenter(Presenter loginPresenter);
 
-	void setPresenter(Presenter loginPresenter);
+  void showLoggingInLoader();
 
-	void showLoggingInLoader();
+  void hideLoggingInLoader();
 
-	void hideLoggingInLoader();
+  void showLogin();
 
-	void showLogin();
+  void showTermsOfUse(boolean hasAccepted);
 
-	void showTermsOfUse(boolean hasAccepted);
+  void setSynAlert(IsWidget w);
 
-	void setSynAlert(IsWidget w);
+  public interface Presenter {
+    void goTo(Place place);
 
-	public interface Presenter {
-		void goTo(Place place);
-
-		void goToLastPlace();
-		void onAcceptTermsOfUse();
-		void onCancelAcceptTermsOfUse();
-	}
+    void goToLastPlace();
+    void onAcceptTermsOfUse();
+    void onCancelAcceptTermsOfUse();
+  }
 }

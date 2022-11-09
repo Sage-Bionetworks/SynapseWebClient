@@ -1,14 +1,14 @@
 package org.sagebionetworks.web.client.widget.evaluation;
 
+import com.google.gwt.user.client.ui.IsWidget;
 import java.util.List;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.web.client.SynapseView;
-import com.google.gwt.user.client.ui.IsWidget;
 
 public interface EvaluationListView extends IsWidget, SynapseView {
-	void configure(List<Evaluation> evaluationList, boolean isSelectable);
+  void configure(List<Evaluation> evaluationList, boolean isSelectable);
 
-	Integer getSelectedEvaluationIndex();
+  Integer getSelectedEvaluationIndex();
 
-	void setSelectedEvaluationIndex(int i);
+  void setSelectedEvaluationIndex(int i);
 }

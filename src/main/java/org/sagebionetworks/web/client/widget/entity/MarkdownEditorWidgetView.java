@@ -1,81 +1,80 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import org.sagebionetworks.web.client.SynapseView;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import org.sagebionetworks.web.client.SynapseView;
 
 public interface MarkdownEditorWidgetView extends IsWidget, SynapseView {
+  /**
+   * Set the presenter.
+   *
+   * @param presenter
+   */
+  void setPresenter(Presenter presenter);
 
-	/**
-	 * Set the presenter.
-	 * 
-	 * @param presenter
-	 */
-	void setPresenter(Presenter presenter);
+  String getMarkdown();
 
-	String getMarkdown();
+  void setMarkdown(String markdown);
 
-	void setMarkdown(String markdown);
+  int getCursorPos();
 
-	int getCursorPos();
+  void setCursorPos(int pos);
 
-	void setCursorPos(int pos);
+  void setMarkdownFocus();
 
-	void setMarkdownFocus();
+  int getSelectionLength();
 
-	int getSelectionLength();
+  void setSelectionRange(int pos, int length);
 
-	void setSelectionRange(int pos, int length);
+  void setEditButtonEnabled(boolean enabled);
 
-	void setEditButtonEnabled(boolean enabled);
+  public void setAttachmentCommandsVisible(boolean visible);
 
-	public void setAttachmentCommandsVisible(boolean visible);
+  void setAlphaCommandsVisible(boolean visible);
 
-	void setAlphaCommandsVisible(boolean visible);
+  boolean isEditorAttachedAndVisible();
 
-	boolean isEditorAttachedAndVisible();
+  int getClientHeight();
 
-	int getClientHeight();
+  void setMarkdownTextAreaHeight(int heightPx);
 
-	void setMarkdownTextAreaHeight(int heightPx);
+  void setFocus(boolean focused);
 
-	void setFocus(boolean focused);
+  void setEditorEnabled(boolean enabled);
 
-	void setEditorEnabled(boolean enabled);
+  void setMarkdownPreviewWidget(Widget markdownPreviewWidget);
 
-	void setMarkdownPreviewWidget(Widget markdownPreviewWidget);
+  void showPreview();
 
-	void showPreview();
+  void showEditMode();
 
-	void showEditMode();
+  void setSelectTeamModal(Widget widget);
 
-	void setSelectTeamModal(Widget widget);
+  /**
+   * Presenter interface
+   */
+  public interface Presenter {
+    void handleCommand(MarkdownEditorAction action);
 
-	/**
-	 * Presenter interface
-	 */
-	public interface Presenter {
-		void handleCommand(MarkdownEditorAction action);
+    void markdownEditorClicked();
 
-		void markdownEditorClicked();
+    void onKeyPress(KeyPressEvent event);
+  }
 
-		void onKeyPress(KeyPressEvent event);
-	}
+  void addTextAreaKeyUpHandler(KeyUpHandler keyUpHandler);
 
-	void addTextAreaKeyUpHandler(KeyUpHandler keyUpHandler);
+  void addTextAreaClickHandler(ClickHandler clickHandler);
 
-	void addTextAreaClickHandler(ClickHandler clickHandler);
+  void setFormattingGuideWidget(Widget formattingGuideWidget);
 
-	void setFormattingGuideWidget(Widget formattingGuideWidget);
+  void configure(String markdown);
 
-	void configure(String markdown);
+  void setImageCommandsVisible(boolean visible);
 
-	void setImageCommandsVisible(boolean visible);
+  void setVideoCommandsVisible(boolean visible);
 
-	void setVideoCommandsVisible(boolean visible);
-
-	void setExternalImageCommandVisible(boolean visible);
+  void setExternalImageCommandVisible(boolean visible);
 }

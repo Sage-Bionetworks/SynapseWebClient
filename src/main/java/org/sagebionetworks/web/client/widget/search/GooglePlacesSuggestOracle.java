@@ -1,53 +1,64 @@
 package org.sagebionetworks.web.client.widget.search;
 
+import com.google.gwt.user.client.ui.SuggestOracle;
+import com.google.inject.Inject;
 import java.util.ArrayList;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTTimer;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.googlemap.GoogleMap;
-import com.google.gwt.user.client.ui.SuggestOracle;
-import com.google.inject.Inject;
 
 public class GooglePlacesSuggestOracle extends SuggestOracle {
-	public static final int DELAY = 500; // milliseconds
-	public SuggestOracle.Request request;
-	public SuggestOracle.Callback callback;
-	public int offset;
-	public boolean isLoading = false;
-	private GWTTimer timer;
-	private SynapseJavascriptClient jsClient;
-	String searchTerm;
-	ArrayList<PlaceSuggestion> suggestions;
 
-	@Inject
-	public GooglePlacesSuggestOracle(GWTTimer timer, SynapseJavascriptClient jsClient) {
-		this.jsClient = jsClient;
-		this.timer = timer;
-		GoogleMap.initGoogleLibrary(jsClient, null);
-		timer.configure(() -> {
-			getSuggestions(offset);
-		});
-	}
+  public static final int DELAY = 500; // milliseconds
+  public SuggestOracle.Request request;
+  public SuggestOracle.Callback callback;
+  public int offset;
+  public boolean isLoading = false;
+  private GWTTimer timer;
+  private SynapseJavascriptClient jsClient;
+  String searchTerm;
+  ArrayList<PlaceSuggestion> suggestions;
 
-	public SuggestOracle.Request getRequest() {
-		return request;
-	}
+  @Inject
+  public GooglePlacesSuggestOracle(
+    GWTTimer timer,
+    SynapseJavascriptClient jsClient
+  ) {
+    this.jsClient = jsClient;
+    this.timer = timer;
+    GoogleMap.initGoogleLibrary(jsClient, null);
+    timer.configure(() -> {
+      getSuggestions(offset);
+    });
+  }
 
-	public SuggestOracle.Callback getCallback() {
-		return callback;
-	}
+  public SuggestOracle.Request getRequest() {
+    return request;
+  }
 
-	public void getSuggestions(final int offset) {
-		if (!isLoading && !request.getQuery().equals(searchTerm) && !request.getQuery().isEmpty()) {
-			DisplayUtils.scrollToTop();
-			isLoading = true;
-			searchTerm = request.getQuery();
-			suggestions = new ArrayList<>();
-			_getPredictions(this, searchTerm);
-		}
-	}
+  public SuggestOracle.Callback getCallback() {
+    return callback;
+  }
 
-	public final static native void _getPredictions(GooglePlacesSuggestOracle oracle, String searchTerm) /*-{
+  public void getSuggestions(final int offset) {
+    if (
+      !isLoading &&
+      !request.getQuery().equals(searchTerm) &&
+      !request.getQuery().isEmpty()
+    ) {
+      DisplayUtils.scrollToTop();
+      isLoading = true;
+      searchTerm = request.getQuery();
+      suggestions = new ArrayList<>();
+      _getPredictions(this, searchTerm);
+    }
+  }
+
+  public static final native void _getPredictions(
+    GooglePlacesSuggestOracle oracle,
+    String searchTerm
+  ) /*-{
 		var displaySuggestions = function(predictions, status) {
 			if (status != google.maps.places.PlacesServiceStatus.OK) {
 				console.error("unable to get place suggestions: " + status);
@@ -68,42 +79,46 @@ public class GooglePlacesSuggestOracle extends SuggestOracle {
 		}, displaySuggestions);
 	}-*/;
 
-	public class PlaceSuggestion implements SuggestOracle.Suggestion {
-		String displayString;
+  public class PlaceSuggestion implements SuggestOracle.Suggestion {
 
-		public PlaceSuggestion(String displayString) {
-			this.displayString = displayString;
-		}
+    String displayString;
 
-		@Override
-		public String getDisplayString() {
-			return displayString;
-		}
+    public PlaceSuggestion(String displayString) {
+      this.displayString = displayString;
+    }
 
-		@Override
-		public String getReplacementString() {
-			return displayString;
-		}
-	}
+    @Override
+    public String getDisplayString() {
+      return displayString;
+    }
 
-	public void addSuggestion(String description) {
-		suggestions.add(new PlaceSuggestion(description));
-	}
+    @Override
+    public String getReplacementString() {
+      return displayString;
+    }
+  }
 
-	public void onSuggestionsReady() {
-		SuggestOracle.Response response = new SuggestOracle.Response();
-		response.setMoreSuggestions(false);
-		response.setMoreSuggestionsCount(0);
-		response.setSuggestions(suggestions);
-		callback.onSuggestionsReady(request, response);
-		isLoading = false;
-	}
+  public void addSuggestion(String description) {
+    suggestions.add(new PlaceSuggestion(description));
+  }
 
-	@Override
-	public void requestSuggestions(SuggestOracle.Request request, SuggestOracle.Callback callback) {
-		this.request = request;
-		this.callback = callback;
-		timer.cancel();
-		timer.schedule(DELAY);
-	}
+  public void onSuggestionsReady() {
+    SuggestOracle.Response response = new SuggestOracle.Response();
+    response.setMoreSuggestions(false);
+    response.setMoreSuggestionsCount(0);
+    response.setSuggestions(suggestions);
+    callback.onSuggestionsReady(request, response);
+    isLoading = false;
+  }
+
+  @Override
+  public void requestSuggestions(
+    SuggestOracle.Request request,
+    SuggestOracle.Callback callback
+  ) {
+    this.request = request;
+    this.callback = callback;
+    timer.cancel();
+    timer.schedule(DELAY);
+  }
 }

@@ -10,7 +10,11 @@ import jsinterop.annotations.JsType;
  * @author jayhodgson
  *
  */
-@JsType(isNative = true, name="Papa", namespace = JsPackage.GLOBAL)
+@JsType(isNative = true, name = "Papa", namespace = JsPackage.GLOBAL)
 class PapaParse {
-	public static native PapaParseResult parse(String string, PapaParseConfig config);
+
+  public static native PapaParseResult parse(
+    String string,
+    PapaParseConfig config
+  );
 }

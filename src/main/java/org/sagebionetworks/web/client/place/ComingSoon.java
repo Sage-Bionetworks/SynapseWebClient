@@ -6,26 +6,27 @@ import com.google.gwt.place.shared.Prefix;
 
 public class ComingSoon extends Place {
 
-	private String token;
+  private String token;
 
-	public ComingSoon(String token) {
-		this.token = token;
-	}
+  public ComingSoon(String token) {
+    this.token = token;
+  }
 
-	public String toToken() {
-		return token;
-	}
+  public String toToken() {
+    return token;
+  }
 
-	@Prefix("!ComingSoon")
-	public static class Tokenizer implements PlaceTokenizer<ComingSoon> {
-		@Override
-		public String getToken(ComingSoon place) {
-			return place.toToken();
-		}
+  @Prefix("!ComingSoon")
+  public static class Tokenizer implements PlaceTokenizer<ComingSoon> {
 
-		@Override
-		public ComingSoon getPlace(String token) {
-			return new ComingSoon(token);
-		}
-	}
+    @Override
+    public String getToken(ComingSoon place) {
+      return place.toToken();
+    }
+
+    @Override
+    public ComingSoon getPlace(String token) {
+      return new ComingSoon(token);
+    }
+  }
 }

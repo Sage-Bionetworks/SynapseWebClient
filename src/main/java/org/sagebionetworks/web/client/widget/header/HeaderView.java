@@ -1,36 +1,35 @@
 package org.sagebionetworks.web.client.widget.header;
 
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.web.bindery.event.shared.binder.EventBinder;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 
 public interface HeaderView extends IsWidget {
-	/**
-	 * Set the presenter.
-	 * 
-	 * @param presenter
-	 */
-	public void setPresenter(Presenter presenter);
+  /**
+   * Set the presenter.
+   *
+   * @param presenter
+   */
+  public void setPresenter(Presenter presenter);
 
-	public void refresh();
+  public void refresh();
 
-	/**
-	 * Presenter interface
-	 */
-	public interface Presenter {
-		void onCookieNotificationDismissed();
-	}
+  /**
+   * Presenter interface
+   */
+  public interface Presenter {
+    void onCookieNotificationDismissed();
+  }
 
-	void setStagingAlertVisible(boolean visible);
+  void setStagingAlertVisible(boolean visible);
 
-	void openNewWindow(String url);
+  void openNewWindow(String url);
 
-	void clear();
+  void clear();
 
-	EventBinder<Header> getEventBinder();
+  EventBinder<Header> getEventBinder();
 
-	void setCookieNotificationVisible(boolean visible);
+  void setCookieNotificationVisible(boolean visible);
 
-	void setPortalAlertVisible(boolean visible, JSONObjectAdapter portalJson);
+  void setPortalAlertVisible(boolean visible, JSONObjectAdapter portalJson);
 }

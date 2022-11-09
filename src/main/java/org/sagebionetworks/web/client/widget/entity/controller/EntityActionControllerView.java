@@ -1,69 +1,71 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
+import com.google.gwt.user.client.ui.IsWidget;
 import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.sagebionetworks.web.client.ShowsErrors;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalView;
 
-import com.google.gwt.user.client.ui.IsWidget;
-
 /**
  * Abstraction for the view
- * 
+ *
  * @author John
  *
  */
 public interface EntityActionControllerView extends ShowsErrors, IsWidget {
+  /**
+   * Show the user a confirm dialog.
+   *
+   * @param message
+   * @param callback
+   */
+  void showConfirmDeleteDialog(String message, Callback callback);
 
+  /**
+   * Show info to the user.
+   *
+   * @param message
+   */
+  void showInfo(String message);
 
-	/**
-	 * Show the user a confirm dialog.
-	 * 
-	 * @param message
-	 * @param callback
-	 */
-	void showConfirmDeleteDialog(String message, Callback callback);
+  /**
+   * Show success notification to the user.
+   *
+   * @param message
+   */
+  void showSuccess(String message);
 
+  /**
+   * Show info dialog to the user.
+   */
+  void showInfoDialog(String header, String message);
 
-	/**
-	 * Show info to the user.
-	 * 
-	 * @param message
-	 */
-	void showInfo(String message);
+  /**
+   * Prompt the user to enter a string value.
+   *
+   * @param title
+   * @param callback
+   */
+  void showPromptDialog(
+    String title,
+    String initialValue,
+    PromptCallback callback,
+    PromptForValuesModalView.InputType inputType
+  );
 
-	/**
-	 * Show success notification to the user.
-	 *
-	 * @param message
-	 */
-	void showSuccess(String message);
+  void setUploadDialogWidget(IsWidget w);
 
-	/**
-	 * Show info dialog to the user.
-	 */
-	void showInfoDialog(String header, String message);
+  void addWidget(IsWidget asWidget);
 
-	/**
-	 * Prompt the user to enter a string value.
-	 * 
-	 * @param title
-	 * @param callback
-	 */
-	void showPromptDialog(String title, String initialValue, PromptCallback callback, PromptForValuesModalView.InputType inputType);
+  void showMultiplePromptDialog(
+    PromptForValuesModalView.Configuration configuration
+  );
 
-	void setUploadDialogWidget(IsWidget w);
+  void hideMultiplePromptDialog();
 
-	void addWidget(IsWidget asWidget);
+  void setCreateVersionDialogJobTrackingWidget(IsWidget w);
 
-	void showMultiplePromptDialog(PromptForValuesModalView.Configuration configuration);
+  void showCreateVersionDialog();
 
-	void hideMultiplePromptDialog();
-
-	void setCreateVersionDialogJobTrackingWidget(IsWidget w);
-
-	void showCreateVersionDialog();
-
-	void hideCreateVersionDialog();
-
+  void hideCreateVersionDialog();
 }

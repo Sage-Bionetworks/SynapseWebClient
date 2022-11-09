@@ -6,31 +6,31 @@ import com.google.gwt.place.shared.Prefix;
 
 public class MapPlace extends Place {
 
-	private String teamId;
+  private String teamId;
 
-	public MapPlace(String token) {
-		this.teamId = token;
-	}
+  public MapPlace(String token) {
+    this.teamId = token;
+  }
 
-	public String toToken() {
-		return teamId;
-	}
+  public String toToken() {
+    return teamId;
+  }
 
-	public String getTeamId() {
-		return teamId;
-	}
+  public String getTeamId() {
+    return teamId;
+  }
 
-	@Prefix("!Map")
-	public static class Tokenizer implements PlaceTokenizer<MapPlace> {
-		@Override
-		public String getToken(MapPlace place) {
-			return place.toToken();
-		}
+  @Prefix("!Map")
+  public static class Tokenizer implements PlaceTokenizer<MapPlace> {
 
-		@Override
-		public MapPlace getPlace(String token) {
-			return new MapPlace(token);
-		}
-	}
+    @Override
+    public String getToken(MapPlace place) {
+      return place.toToken();
+    }
 
+    @Override
+    public MapPlace getPlace(String token) {
+      return new MapPlace(token);
+    }
+  }
 }

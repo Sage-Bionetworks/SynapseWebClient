@@ -1,12 +1,5 @@
 package org.sagebionetworks.web.client.widget.accessrequirements;
 
-import org.gwtbootstrap3.client.ui.Alert;
-import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.html.Div;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.place.LoginPlace;
-import org.sagebionetworks.web.client.utils.Callback;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.InlineLabel;
@@ -14,190 +7,221 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.gwtbootstrap3.client.ui.Alert;
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.utils.Callback;
 
-public class SelfSignAccessRequirementWidgetViewImpl implements SelfSignAccessRequirementWidgetView {
+public class SelfSignAccessRequirementWidgetViewImpl
+  implements SelfSignAccessRequirementWidgetView {
 
-	@UiField
-	Div approvedHeading;
-	@UiField
-	Div unapprovedHeading;
-	@UiField
-	SimplePanel wikiContainer;
-	@UiField
-	Button signTermsButton;
-	@UiField
-	Button loginButton;
-	@UiField
-	Button certifyButton;
-	@UiField
-	Alert certifyNote;
-	@UiField
-	Button validateProfileButton;
-	@UiField
-	Alert validateProfileNote;
-	@UiField
-	Div editAccessRequirementContainer;
-	@UiField
-	Div deleteAccessRequirementContainer;
-	@UiField
-	Div subjectsWidgetContainer;
-	@UiField
-	Div manageAccessContainer;
-	@UiField
-	Alert approvedAlert;
-	@UiField
-	InlineLabel accessRequirementIDField;
-	@UiField
-	Div accessRequirementIDUI;
-	@UiField
-	Div controlsContainer;
-	Callback onAttachCallback;
+  @UiField
+  Div approvedHeading;
 
-	public interface Binder extends UiBinder<Widget, SelfSignAccessRequirementWidgetViewImpl> {
-	}
+  @UiField
+  Div unapprovedHeading;
 
-	Widget w;
-	Presenter presenter;
+  @UiField
+  SimplePanel wikiContainer;
 
-	@Inject
-	public SelfSignAccessRequirementWidgetViewImpl(Binder binder, GlobalApplicationState globalAppState) {
-		this.w = binder.createAndBindUi(this);
-		signTermsButton.addClickHandler(event -> {
-			presenter.onSignTerms();
-		});
-		validateProfileButton.addClickHandler(event -> {
-			presenter.onValidateProfile();
-		});
-		certifyButton.addClickHandler(event -> {
-			presenter.onCertify();
-		});
-		loginButton.addClickHandler(event -> {
-			globalAppState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
-		});
+  @UiField
+  Button signTermsButton;
 
-		w.addAttachHandler(event -> {
-			if (event.isAttached()) {
-				onAttachCallback.invoke();
-			}
-		});
-	}
+  @UiField
+  Button loginButton;
 
-	@Override
-	public void addStyleNames(String styleNames) {
-		w.addStyleName(styleNames);
-	}
+  @UiField
+  Button certifyButton;
 
-	@Override
-	public void setPresenter(final Presenter presenter) {
-		this.presenter = presenter;
-	}
+  @UiField
+  Alert certifyNote;
 
-	@Override
-	public Widget asWidget() {
-		return w;
-	}
+  @UiField
+  Button validateProfileButton;
 
-	@Override
-	public void setWikiTermsWidget(Widget wikiWidget) {
-		wikiContainer.setWidget(wikiWidget);
-	}
+  @UiField
+  Alert validateProfileNote;
 
-	@Override
-	public void showApprovedHeading() {
-		approvedHeading.setVisible(true);
-		approvedAlert.setVisible(true);
-	}
+  @UiField
+  Div editAccessRequirementContainer;
 
-	@Override
-	public void showUnapprovedHeading() {
-		unapprovedHeading.setVisible(true);
-	}
+  @UiField
+  Div deleteAccessRequirementContainer;
 
-	@Override
-	public void showSignTermsButton() {
-		signTermsButton.setVisible(true);
-	}
+  @UiField
+  Div subjectsWidgetContainer;
 
-	@Override
-	public void resetState() {
-		approvedAlert.setVisible(false);
-		approvedHeading.setVisible(false);
-		unapprovedHeading.setVisible(false);
-		signTermsButton.setVisible(false);
-		certifyButton.setVisible(false);
-		certifyNote.setVisible(false);
-		validateProfileButton.setVisible(false);
-		validateProfileNote.setVisible(false);
-		loginButton.setVisible(false);
-	}
+  @UiField
+  Div manageAccessContainer;
 
-	@Override
-	public void showGetCertifiedUI() {
-		certifyButton.setVisible(true);
-		certifyNote.setVisible(true);
-	}
+  @UiField
+  Alert approvedAlert;
 
-	@Override
-	public void showGetProfileValidatedUI() {
-		validateProfileButton.setVisible(true);
-		validateProfileNote.setVisible(true);
-	}
+  @UiField
+  InlineLabel accessRequirementIDField;
 
-	@Override
-	public void setEditAccessRequirementWidget(IsWidget w) {
-		editAccessRequirementContainer.clear();
-		editAccessRequirementContainer.add(w);
-	}
+  @UiField
+  Div accessRequirementIDUI;
 
-	@Override
-	public void setDeleteAccessRequirementWidget(IsWidget w) {
-		deleteAccessRequirementContainer.clear();
-		deleteAccessRequirementContainer.add(w);
-	}
+  @UiField
+  Div controlsContainer;
 
-	@Override
-	public void setSubjectsWidget(IsWidget w) {
-		subjectsWidgetContainer.clear();
-		subjectsWidgetContainer.add(w);
-	}
+  Callback onAttachCallback;
 
-	@Override
-	public void setOnAttachCallback(Callback onAttachCallback) {
-		this.onAttachCallback = onAttachCallback;
-	}
+  public interface Binder
+    extends UiBinder<Widget, SelfSignAccessRequirementWidgetViewImpl> {}
 
-	@Override
-	public boolean isInViewport() {
-		return DisplayUtils.isInViewport(w);
-	}
+  Widget w;
+  Presenter presenter;
 
-	@Override
-	public boolean isAttached() {
-		return w.isAttached();
-	}
+  @Inject
+  public SelfSignAccessRequirementWidgetViewImpl(
+    Binder binder,
+    GlobalApplicationState globalAppState
+  ) {
+    this.w = binder.createAndBindUi(this);
+    signTermsButton.addClickHandler(event -> {
+      presenter.onSignTerms();
+    });
+    validateProfileButton.addClickHandler(event -> {
+      presenter.onValidateProfile();
+    });
+    certifyButton.addClickHandler(event -> {
+      presenter.onCertify();
+    });
+    loginButton.addClickHandler(event -> {
+      globalAppState
+        .getPlaceChanger()
+        .goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+    });
 
-	@Override
-	public void setManageAccessWidget(IsWidget w) {
-		manageAccessContainer.clear();
-		manageAccessContainer.add(w);
-	}
+    w.addAttachHandler(event -> {
+      if (event.isAttached()) {
+        onAttachCallback.invoke();
+      }
+    });
+  }
 
-	@Override
-	public void showLoginButton() {
-		loginButton.setVisible(true);
-	}
-	@Override
-	public void hideControls() {
-		controlsContainer.setVisible(false);
-	}
+  @Override
+  public void addStyleNames(String styleNames) {
+    w.addStyleName(styleNames);
+  }
 
-	@Override
-	public void setAccessRequirementID(String arID) {
-		accessRequirementIDField.setText(arID);
-	}
+  @Override
+  public void setPresenter(final Presenter presenter) {
+    this.presenter = presenter;
+  }
 
-	@Override
-	public void setAccessRequirementIDVisible(boolean visible) {
-		accessRequirementIDUI.setVisible(visible);
-	}
+  @Override
+  public Widget asWidget() {
+    return w;
+  }
+
+  @Override
+  public void setWikiTermsWidget(Widget wikiWidget) {
+    wikiContainer.setWidget(wikiWidget);
+  }
+
+  @Override
+  public void showApprovedHeading() {
+    approvedHeading.setVisible(true);
+    approvedAlert.setVisible(true);
+  }
+
+  @Override
+  public void showUnapprovedHeading() {
+    unapprovedHeading.setVisible(true);
+  }
+
+  @Override
+  public void showSignTermsButton() {
+    signTermsButton.setVisible(true);
+  }
+
+  @Override
+  public void resetState() {
+    approvedAlert.setVisible(false);
+    approvedHeading.setVisible(false);
+    unapprovedHeading.setVisible(false);
+    signTermsButton.setVisible(false);
+    certifyButton.setVisible(false);
+    certifyNote.setVisible(false);
+    validateProfileButton.setVisible(false);
+    validateProfileNote.setVisible(false);
+    loginButton.setVisible(false);
+  }
+
+  @Override
+  public void showGetCertifiedUI() {
+    certifyButton.setVisible(true);
+    certifyNote.setVisible(true);
+  }
+
+  @Override
+  public void showGetProfileValidatedUI() {
+    validateProfileButton.setVisible(true);
+    validateProfileNote.setVisible(true);
+  }
+
+  @Override
+  public void setEditAccessRequirementWidget(IsWidget w) {
+    editAccessRequirementContainer.clear();
+    editAccessRequirementContainer.add(w);
+  }
+
+  @Override
+  public void setDeleteAccessRequirementWidget(IsWidget w) {
+    deleteAccessRequirementContainer.clear();
+    deleteAccessRequirementContainer.add(w);
+  }
+
+  @Override
+  public void setSubjectsWidget(IsWidget w) {
+    subjectsWidgetContainer.clear();
+    subjectsWidgetContainer.add(w);
+  }
+
+  @Override
+  public void setOnAttachCallback(Callback onAttachCallback) {
+    this.onAttachCallback = onAttachCallback;
+  }
+
+  @Override
+  public boolean isInViewport() {
+    return DisplayUtils.isInViewport(w);
+  }
+
+  @Override
+  public boolean isAttached() {
+    return w.isAttached();
+  }
+
+  @Override
+  public void setManageAccessWidget(IsWidget w) {
+    manageAccessContainer.clear();
+    manageAccessContainer.add(w);
+  }
+
+  @Override
+  public void showLoginButton() {
+    loginButton.setVisible(true);
+  }
+
+  @Override
+  public void hideControls() {
+    controlsContainer.setVisible(false);
+  }
+
+  @Override
+  public void setAccessRequirementID(String arID) {
+    accessRequirementIDField.setText(arID);
+  }
+
+  @Override
+  public void setAccessRequirementIDVisible(boolean visible) {
+    accessRequirementIDUI.setVisible(visible);
+  }
 }

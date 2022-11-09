@@ -5,19 +5,19 @@ import com.google.gwt.user.client.ui.Widget;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorReactComponentPage;
 
 public interface ChallengeTabView extends IsWidget {
-	void hideAdminTabContents();
+  void hideAdminTabContents();
 
-	void showAdminTabContents();
+  void showAdminTabContents();
 
-	void addEvaluationEditor(EvaluationEditorReactComponentPage evaluationEditor);
+  void addEvaluationEditor(EvaluationEditorReactComponentPage evaluationEditor);
 
-	public interface Presenter {
-		void showCreateNewEvaluationEditor(String entityId);
-	}
+  public interface Presenter {
+    void showCreateNewEvaluationEditor(String entityId);
+  }
 
-	void setChallengeWidget(Widget w);
+  void setChallengeWidget(Widget w);
 
-	void setEvaluationList(Widget w);
+  void setEvaluationList(Widget w);
 
-	void setActionMenu(IsWidget w);
+  void setActionMenu(IsWidget w);
 }

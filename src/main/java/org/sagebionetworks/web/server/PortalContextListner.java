@@ -6,17 +6,15 @@ import com.google.inject.servlet.GuiceServletContextListener;
 
 /**
  * This is where we register out ServletModule with Guice-servlet.
- * 
+ *
  * @author John
  *
  */
 public class PortalContextListner extends GuiceServletContextListener {
 
-	@Override
-	protected Injector getInjector() {
-		// This is where we get to set the injector for our servlets
-		return Guice.createInjector(new PortalServletModule());
-	}
-
-
+  @Override
+  protected Injector getInjector() {
+    // This is where we get to set the injector for our servlets
+    return Guice.createInjector(new PortalServletModule());
+  }
 }

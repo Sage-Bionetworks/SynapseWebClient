@@ -1,30 +1,28 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
-import org.sagebionetworks.web.client.widget.WidgetEditorView;
 import com.google.gwt.user.client.ui.IsWidget;
+import org.sagebionetworks.web.client.widget.WidgetEditorView;
 
 public interface PreviewConfigView extends IsWidget, WidgetEditorView {
+  /**
+   * Set the presenter.
+   *
+   * @param presenter
+   */
+  void setPresenter(Presenter presenter);
 
-	/**
-	 * Set the presenter.
-	 * 
-	 * @param presenter
-	 */
-	void setPresenter(Presenter presenter);
+  void setEntityId(String entityId);
 
-	void setEntityId(String entityId);
+  String getEntityId();
 
-	String getEntityId();
+  void setVersion(String version);
 
-	void setVersion(String version);
+  String getVersion();
 
-	String getVersion();
-
-	/**
-	 * Presenter interface
-	 */
-	public interface Presenter {
-		void onEntityFinderButtonClicked();
-	}
-
+  /**
+   * Presenter interface
+   */
+  public interface Presenter {
+    void onEntityFinderButtonClicked();
+  }
 }

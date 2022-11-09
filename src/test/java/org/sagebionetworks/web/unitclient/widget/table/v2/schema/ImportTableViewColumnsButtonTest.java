@@ -9,6 +9,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import java.util.Collections;
 import java.util.List;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
@@ -34,108 +37,156 @@ import org.sagebionetworks.web.client.widget.table.v2.schema.ImportTableViewColu
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.test.helper.SelfReturningAnswer;
 
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-
 public class ImportTableViewColumnsButtonTest {
-	ImportTableViewColumnsButton widget;
 
-	@Mock
-	Button mockButton;
-	EntityFinderWidget.Builder mockEntityFinderBuilder;
-	@Mock
-    EntityFinderWidget mockFinder;
-	@Mock
-	SynapseJavascriptClient mockSynapseJavascriptClient;
+  ImportTableViewColumnsButton widget;
 
-	@Mock
-	EntityBundle mockBundle;
-	@Mock
-	Project mockProject;
-	@Mock
-	Table mockTable;
-	@Mock
-	TableBundle mockTableBundle;
-	@Mock
-	ColumnModel mockTableColumnModel;
-	List<ColumnModel> tableColumnModels;
-	@Mock
-	CallbackP<List<ColumnModel>> mockCallback;
-	@Captor
-	ArgumentCaptor<ClickHandler> clickHandlerCaptor;
+  @Mock
+  Button mockButton;
 
-	@Before
-	public void before() {
-		MockitoAnnotations.initMocks(this);
-		mockEntityFinderBuilder = mock(EntityFinderWidget.Builder.class, new SelfReturningAnswer());
-		when(mockEntityFinderBuilder.build()).thenReturn(mockFinder);
-		widget = new ImportTableViewColumnsButton(mockButton, mockEntityFinderBuilder, mockSynapseJavascriptClient);
-		AsyncMockStubber.callSuccessWith(mockBundle).when(mockSynapseJavascriptClient).getEntityBundleForVersion(anyString(), anyLong(), any(EntityBundleRequest.class), any(AsyncCallback.class));
-		when(mockBundle.getEntity()).thenReturn(mockTable);
-		when(mockBundle.getTableBundle()).thenReturn(mockTableBundle);
-		tableColumnModels = Collections.singletonList(mockTableColumnModel);
-		when(mockTableBundle.getColumnModels()).thenReturn(tableColumnModels);
-	}
+  EntityFinderWidget.Builder mockEntityFinderBuilder;
 
-	@Test
-	public void testConstruction() {
-		verify(mockButton).setText(ImportTableViewColumnsButton.BUTTON_TEXT);
-		verify(mockButton).setSize(ButtonSize.DEFAULT);
-		verify(mockButton).setIcon(IconType.ARROW_CIRCLE_O_DOWN);
-		verify(mockButton).setType(ButtonType.DEFAULT);
-	}
+  @Mock
+  EntityFinderWidget mockFinder;
 
-	@Test
-	public void testOnClick() {
-		verify(mockButton).addClickHandler(clickHandlerCaptor.capture());
-		// simulate click
-		clickHandlerCaptor.getValue().onClick(null);
-		verify(mockFinder).show();
-	}
+  @Mock
+  SynapseJavascriptClient mockSynapseJavascriptClient;
 
-	@Test
-	public void testOnTableSelected() {
-		String entityId = "syn100000000";
-		Long versionNumber = 2L;
-		widget.configure(mockCallback);
+  @Mock
+  EntityBundle mockBundle;
 
-		widget.onTableViewSelected(entityId, versionNumber);
+  @Mock
+  Project mockProject;
 
-		verify(mockSynapseJavascriptClient).getEntityBundleForVersion(eq(entityId), eq(versionNumber), any(EntityBundleRequest.class), any(AsyncCallback.class));
-		verify(mockFinder).hide();
-		verify(mockTableColumnModel).setId(null);
-		verify(mockCallback).invoke(tableColumnModels);
-	}
+  @Mock
+  Table mockTable;
 
-	@Test
-	public void testOnProjectSelected() {
-		String entityId = "syn100000000";
-		Long versionNumber = null;
+  @Mock
+  TableBundle mockTableBundle;
 
-		widget.configure(mockCallback);
-		when(mockBundle.getEntity()).thenReturn(mockProject);
+  @Mock
+  ColumnModel mockTableColumnModel;
 
-		widget.onTableViewSelected(entityId, versionNumber);
+  List<ColumnModel> tableColumnModels;
 
-		verify(mockSynapseJavascriptClient).getEntityBundleForVersion(eq(entityId), eq(versionNumber), any(EntityBundleRequest.class), any(AsyncCallback.class));
-		verify(mockFinder).showError(anyString());
-		verify(mockFinder, never()).hide();
-		verify(mockCallback, never()).invoke(anyList());
-	}
+  @Mock
+  CallbackP<List<ColumnModel>> mockCallback;
 
-	@Test
-	public void testOnGetEntityError() {
-		String error = "problem getting entity";
-		AsyncMockStubber.callFailureWith(new Exception(error)).when(mockSynapseJavascriptClient).getEntityBundleForVersion(anyString(), anyLong(), any(EntityBundleRequest.class), any(AsyncCallback.class));
-		String entityId = "syn100000000";
-		Long versionNumber = 3L;
-		widget.configure(mockCallback);
+  @Captor
+  ArgumentCaptor<ClickHandler> clickHandlerCaptor;
 
-		widget.onTableViewSelected(entityId, versionNumber);
+  @Before
+  public void before() {
+    MockitoAnnotations.initMocks(this);
+    mockEntityFinderBuilder =
+      mock(EntityFinderWidget.Builder.class, new SelfReturningAnswer());
+    when(mockEntityFinderBuilder.build()).thenReturn(mockFinder);
+    widget =
+      new ImportTableViewColumnsButton(
+        mockButton,
+        mockEntityFinderBuilder,
+        mockSynapseJavascriptClient
+      );
+    AsyncMockStubber
+      .callSuccessWith(mockBundle)
+      .when(mockSynapseJavascriptClient)
+      .getEntityBundleForVersion(
+        anyString(),
+        anyLong(),
+        any(EntityBundleRequest.class),
+        any(AsyncCallback.class)
+      );
+    when(mockBundle.getEntity()).thenReturn(mockTable);
+    when(mockBundle.getTableBundle()).thenReturn(mockTableBundle);
+    tableColumnModels = Collections.singletonList(mockTableColumnModel);
+    when(mockTableBundle.getColumnModels()).thenReturn(tableColumnModels);
+  }
 
-		verify(mockSynapseJavascriptClient).getEntityBundleForVersion(eq(entityId), eq(versionNumber), any(EntityBundleRequest.class), any(AsyncCallback.class));
-		verify(mockFinder).showError(eq(error));
-		verify(mockFinder, never()).hide();
-		verify(mockCallback, never()).invoke(anyList());
-	}
+  @Test
+  public void testConstruction() {
+    verify(mockButton).setText(ImportTableViewColumnsButton.BUTTON_TEXT);
+    verify(mockButton).setSize(ButtonSize.DEFAULT);
+    verify(mockButton).setIcon(IconType.ARROW_CIRCLE_O_DOWN);
+    verify(mockButton).setType(ButtonType.DEFAULT);
+  }
+
+  @Test
+  public void testOnClick() {
+    verify(mockButton).addClickHandler(clickHandlerCaptor.capture());
+    // simulate click
+    clickHandlerCaptor.getValue().onClick(null);
+    verify(mockFinder).show();
+  }
+
+  @Test
+  public void testOnTableSelected() {
+    String entityId = "syn100000000";
+    Long versionNumber = 2L;
+    widget.configure(mockCallback);
+
+    widget.onTableViewSelected(entityId, versionNumber);
+
+    verify(mockSynapseJavascriptClient)
+      .getEntityBundleForVersion(
+        eq(entityId),
+        eq(versionNumber),
+        any(EntityBundleRequest.class),
+        any(AsyncCallback.class)
+      );
+    verify(mockFinder).hide();
+    verify(mockTableColumnModel).setId(null);
+    verify(mockCallback).invoke(tableColumnModels);
+  }
+
+  @Test
+  public void testOnProjectSelected() {
+    String entityId = "syn100000000";
+    Long versionNumber = null;
+
+    widget.configure(mockCallback);
+    when(mockBundle.getEntity()).thenReturn(mockProject);
+
+    widget.onTableViewSelected(entityId, versionNumber);
+
+    verify(mockSynapseJavascriptClient)
+      .getEntityBundleForVersion(
+        eq(entityId),
+        eq(versionNumber),
+        any(EntityBundleRequest.class),
+        any(AsyncCallback.class)
+      );
+    verify(mockFinder).showError(anyString());
+    verify(mockFinder, never()).hide();
+    verify(mockCallback, never()).invoke(anyList());
+  }
+
+  @Test
+  public void testOnGetEntityError() {
+    String error = "problem getting entity";
+    AsyncMockStubber
+      .callFailureWith(new Exception(error))
+      .when(mockSynapseJavascriptClient)
+      .getEntityBundleForVersion(
+        anyString(),
+        anyLong(),
+        any(EntityBundleRequest.class),
+        any(AsyncCallback.class)
+      );
+    String entityId = "syn100000000";
+    Long versionNumber = 3L;
+    widget.configure(mockCallback);
+
+    widget.onTableViewSelected(entityId, versionNumber);
+
+    verify(mockSynapseJavascriptClient)
+      .getEntityBundleForVersion(
+        eq(entityId),
+        eq(versionNumber),
+        any(EntityBundleRequest.class),
+        any(AsyncCallback.class)
+      );
+    verify(mockFinder).showError(eq(error));
+    verify(mockFinder, never()).hide();
+    verify(mockCallback, never()).invoke(anyList());
+  }
 }

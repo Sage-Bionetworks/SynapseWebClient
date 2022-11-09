@@ -1,12 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
-import java.util.List;
-import org.gwtbootstrap3.client.ui.html.Div;
-import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import com.google.gwt.dom.client.LIElement;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -15,192 +8,242 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.UIObject;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import java.util.List;
+import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 
 public class MyEntitiesBrowserViewImpl implements MyEntitiesBrowserView {
 
-	public interface MyEntitiesBrowserViewImplUiBinder extends UiBinder<Widget, MyEntitiesBrowserViewImpl> {
-	}
+  public interface MyEntitiesBrowserViewImplUiBinder
+    extends UiBinder<Widget, MyEntitiesBrowserViewImpl> {}
 
-	private Presenter presenter;
-	private EntityTreeBrowser currentContextTreeBrowser;
-	private EntityTreeBrowser myTreeBrowser;
-	private EntityTreeBrowser favoritesTreeBrowser;
-	@UiField
-	SimplePanel myProjectsContainer;
-	@UiField
-	SimplePanel myFavoritesContainer;
-	@UiField
-	SimplePanel currentContextContainer;
+  private Presenter presenter;
+  private EntityTreeBrowser currentContextTreeBrowser;
+  private EntityTreeBrowser myTreeBrowser;
+  private EntityTreeBrowser favoritesTreeBrowser;
 
-	@UiField
-	LIElement myProjectsListItem;
-	@UiField
-	LIElement myFavoritesListItem;
-	@UiField
-	LIElement currentContextListItem;
+  @UiField
+  SimplePanel myProjectsContainer;
 
-	@UiField
-	Anchor myProjectsLink;
-	@UiField
-	Anchor myFavoritesLink;
-	@UiField
-	Anchor currentContextLink;
+  @UiField
+  SimplePanel myFavoritesContainer;
 
-	@UiField
-	Div myProjectsTabContents;
-	@UiField
-	Div myFavoritesTabContents;
-	@UiField
-	Div currentContextTabContents;
-	LoadMoreWidgetContainer myProjectsContainerWrapper;
-	private Widget widget;
+  @UiField
+  SimplePanel currentContextContainer;
 
-	@Inject
-	public MyEntitiesBrowserViewImpl(MyEntitiesBrowserViewImplUiBinder binder, PortalGinInjector ginInjector, LoadMoreWidgetContainer myProjectsContainerWrapper) {
-		widget = binder.createAndBindUi(this);
-		this.myTreeBrowser = ginInjector.getEntityTreeBrowser();
-		myTreeBrowser.showMinimalColumnSet();
-		this.favoritesTreeBrowser = ginInjector.getEntityTreeBrowser();
-		favoritesTreeBrowser.showMinimalColumnSet();
-		this.currentContextTreeBrowser = ginInjector.getEntityTreeBrowser();
-		currentContextTreeBrowser.showMinimalColumnSet();
-		this.myProjectsContainerWrapper = myProjectsContainerWrapper;
-		myProjectsContainerWrapper.add(myTreeBrowser.asWidget());
-		myTreeBrowser.setLoadingVisible(false);
-		myProjectsContainer.setWidget(myProjectsContainerWrapper.asWidget());
-		myFavoritesContainer.setWidget(favoritesTreeBrowser.asWidget());
-		currentContextContainer.setWidget(currentContextTreeBrowser.asWidget());
-		myProjectsContainerWrapper.configure(() -> {
-			presenter.loadMoreUserUpdateable();
-		});
-		myProjectsLink.addClickHandler(event -> {
-			setTabSelected(myProjectsLink, myProjectsListItem, myProjectsTabContents);
-		});
+  @UiField
+  LIElement myProjectsListItem;
 
-		myFavoritesLink.addClickHandler(event -> {
-			setTabSelected(myFavoritesLink, myFavoritesListItem, myFavoritesTabContents);
-		});
+  @UiField
+  LIElement myFavoritesListItem;
 
-		currentContextLink.addClickHandler(event -> {
-			setTabSelected(currentContextLink, currentContextListItem, currentContextTabContents);
-		});
+  @UiField
+  LIElement currentContextListItem;
 
-		setTabSelected(myProjectsLink, myProjectsListItem, myProjectsTabContents);
-		initSelectedHandlers();
-	}
+  @UiField
+  Anchor myProjectsLink;
 
-	@Override
-	public void setIsMoreUpdatableEntities(boolean isMore) {
-		myProjectsContainerWrapper.setIsMore(isMore);
-	}
+  @UiField
+  Anchor myFavoritesLink;
 
-	@Override
-	public void addUpdatableEntities(List<EntityHeader> rootEntities) {
-		myTreeBrowser.addHeaders(rootEntities);
-	}
+  @UiField
+  Anchor currentContextLink;
 
-	@Override
-	public void setFavoriteEntities(List<EntityHeader> favoriteEntities) {
-		favoritesTreeBrowser.configure(favoriteEntities);
-	}
+  @UiField
+  Div myProjectsTabContents;
 
-	@Override
-	public Widget asWidget() {
-		return widget;
-	}
+  @UiField
+  Div myFavoritesTabContents;
 
-	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-	}
+  @UiField
+  Div currentContextTabContents;
 
-	@Override
-	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
-	}
+  LoadMoreWidgetContainer myProjectsContainerWrapper;
+  private Widget widget;
 
-	@Override
-	public void showLoading() {}
+  @Inject
+  public MyEntitiesBrowserViewImpl(
+    MyEntitiesBrowserViewImplUiBinder binder,
+    PortalGinInjector ginInjector,
+    LoadMoreWidgetContainer myProjectsContainerWrapper
+  ) {
+    widget = binder.createAndBindUi(this);
+    this.myTreeBrowser = ginInjector.getEntityTreeBrowser();
+    myTreeBrowser.showMinimalColumnSet();
+    this.favoritesTreeBrowser = ginInjector.getEntityTreeBrowser();
+    favoritesTreeBrowser.showMinimalColumnSet();
+    this.currentContextTreeBrowser = ginInjector.getEntityTreeBrowser();
+    currentContextTreeBrowser.showMinimalColumnSet();
+    this.myProjectsContainerWrapper = myProjectsContainerWrapper;
+    myProjectsContainerWrapper.add(myTreeBrowser.asWidget());
+    myTreeBrowser.setLoadingVisible(false);
+    myProjectsContainer.setWidget(myProjectsContainerWrapper.asWidget());
+    myFavoritesContainer.setWidget(favoritesTreeBrowser.asWidget());
+    currentContextContainer.setWidget(currentContextTreeBrowser.asWidget());
+    myProjectsContainerWrapper.configure(() -> {
+      presenter.loadMoreUserUpdateable();
+    });
+    myProjectsLink.addClickHandler(event -> {
+      setTabSelected(myProjectsLink, myProjectsListItem, myProjectsTabContents);
+    });
 
-	@Override
-	public void showInfo(String message) {
-		DisplayUtils.showInfo(message);
-	}
+    myFavoritesLink.addClickHandler(event -> {
+      setTabSelected(
+        myFavoritesLink,
+        myFavoritesListItem,
+        myFavoritesTabContents
+      );
+    });
 
-	@Override
-	public void clearSelection() {
-		myTreeBrowser.clearSelection();
-		favoritesTreeBrowser.clearSelection();
-		currentContextTreeBrowser.clearSelection();
-	}
+    currentContextLink.addClickHandler(event -> {
+      setTabSelected(
+        currentContextLink,
+        currentContextListItem,
+        currentContextTabContents
+      );
+    });
 
-	@Override
-	public void clear() {
-		myTreeBrowser.clear();
-		favoritesTreeBrowser.clear();
-		currentContextTreeBrowser.clear();
-	}
+    setTabSelected(myProjectsLink, myProjectsListItem, myProjectsTabContents);
+    initSelectedHandlers();
+  }
 
-	@Override
-	public EntityTreeBrowser getEntityTreeBrowser() {
-		return myTreeBrowser;
-	}
+  @Override
+  public void setIsMoreUpdatableEntities(boolean isMore) {
+    myProjectsContainerWrapper.setIsMore(isMore);
+  }
 
-	@Override
-	public EntityTreeBrowser getFavoritesTreeBrowser() {
-		return favoritesTreeBrowser;
-	}
+  @Override
+  public void addUpdatableEntities(List<EntityHeader> rootEntities) {
+    myTreeBrowser.addHeaders(rootEntities);
+  }
 
-	/*
-	 * Private Methods
-	 */
-	private void initSelectedHandlers() {
-		CallbackP<String> mySelectedHandler = entityId -> {
-			presenter.entitySelected(entityId);
-		};
-		myTreeBrowser.setEntitySelectedHandler(mySelectedHandler);
+  @Override
+  public void setFavoriteEntities(List<EntityHeader> favoriteEntities) {
+    favoritesTreeBrowser.configure(favoriteEntities);
+  }
 
-		CallbackP<String> favoritesSelectedHandler = entityId -> {
-			presenter.entitySelected(entityId);
-		};
-		favoritesTreeBrowser.setEntitySelectedHandler(favoritesSelectedHandler);
+  @Override
+  public Widget asWidget() {
+    return widget;
+  }
 
-		CallbackP<String> currentContextSelectedHandler = entityId -> {
-			presenter.entitySelected(entityId);
-		};
-		currentContextTreeBrowser.setEntitySelectedHandler(currentContextSelectedHandler);
-	}
+  @Override
+  public void setPresenter(Presenter presenter) {
+    this.presenter = presenter;
+  }
 
+  @Override
+  public void showErrorMessage(String message) {
+    DisplayUtils.showErrorMessage(message);
+  }
 
-	/**
-	 * Used only for setting the view's tab display
-	 */
-	private void setTabSelected(Anchor tabLink, LIElement tabListItem, Div tabContents) {
-		setTabInActive(currentContextLink, currentContextListItem, currentContextTabContents);
-		setTabInActive(myFavoritesLink, myFavoritesListItem, myFavoritesTabContents);
-		setTabInActive(myProjectsLink, myProjectsListItem, myProjectsTabContents);
-		setTabActive(tabLink, tabListItem, tabContents);
-	}
+  @Override
+  public void showLoading() {}
 
-	private void setTabActive(Anchor tabLink, LIElement tabListItem, Div tabContents) {
-		tabContents.setVisible(true);
-		tabListItem.addClassName("active");
-		tabLink.removeStyleName("link");
-	}
+  @Override
+  public void showInfo(String message) {
+    DisplayUtils.showInfo(message);
+  }
 
-	private void setTabInActive(Anchor tabLink, LIElement tabListItem, Div tabContents) {
-		tabContents.setVisible(false);
-		tabListItem.removeClassName("active");
-		tabLink.addStyleName("link");
-	}
+  @Override
+  public void clearSelection() {
+    myTreeBrowser.clearSelection();
+    favoritesTreeBrowser.clearSelection();
+    currentContextTreeBrowser.clearSelection();
+  }
 
-	@Override
-	public EntityTreeBrowser getCurrentContextTreeBrowser() {
-		return currentContextTreeBrowser;
-	}
+  @Override
+  public void clear() {
+    myTreeBrowser.clear();
+    favoritesTreeBrowser.clear();
+    currentContextTreeBrowser.clear();
+  }
 
-	@Override
-	public void setCurrentContextTabVisible(boolean visible) {
-		UIObject.setVisible(currentContextListItem, visible);
-	}
+  @Override
+  public EntityTreeBrowser getEntityTreeBrowser() {
+    return myTreeBrowser;
+  }
+
+  @Override
+  public EntityTreeBrowser getFavoritesTreeBrowser() {
+    return favoritesTreeBrowser;
+  }
+
+  /*
+   * Private Methods
+   */
+  private void initSelectedHandlers() {
+    CallbackP<String> mySelectedHandler = entityId -> {
+      presenter.entitySelected(entityId);
+    };
+    myTreeBrowser.setEntitySelectedHandler(mySelectedHandler);
+
+    CallbackP<String> favoritesSelectedHandler = entityId -> {
+      presenter.entitySelected(entityId);
+    };
+    favoritesTreeBrowser.setEntitySelectedHandler(favoritesSelectedHandler);
+
+    CallbackP<String> currentContextSelectedHandler = entityId -> {
+      presenter.entitySelected(entityId);
+    };
+    currentContextTreeBrowser.setEntitySelectedHandler(
+      currentContextSelectedHandler
+    );
+  }
+
+  /**
+   * Used only for setting the view's tab display
+   */
+  private void setTabSelected(
+    Anchor tabLink,
+    LIElement tabListItem,
+    Div tabContents
+  ) {
+    setTabInActive(
+      currentContextLink,
+      currentContextListItem,
+      currentContextTabContents
+    );
+    setTabInActive(
+      myFavoritesLink,
+      myFavoritesListItem,
+      myFavoritesTabContents
+    );
+    setTabInActive(myProjectsLink, myProjectsListItem, myProjectsTabContents);
+    setTabActive(tabLink, tabListItem, tabContents);
+  }
+
+  private void setTabActive(
+    Anchor tabLink,
+    LIElement tabListItem,
+    Div tabContents
+  ) {
+    tabContents.setVisible(true);
+    tabListItem.addClassName("active");
+    tabLink.removeStyleName("link");
+  }
+
+  private void setTabInActive(
+    Anchor tabLink,
+    LIElement tabListItem,
+    Div tabContents
+  ) {
+    tabContents.setVisible(false);
+    tabListItem.removeClassName("active");
+    tabLink.addStyleName("link");
+  }
+
+  @Override
+  public EntityTreeBrowser getCurrentContextTreeBrowser() {
+    return currentContextTreeBrowser;
+  }
+
+  @Override
+  public void setCurrentContextTabVisible(boolean visible) {
+    UIObject.setVisible(currentContextListItem, visible);
+  }
 }

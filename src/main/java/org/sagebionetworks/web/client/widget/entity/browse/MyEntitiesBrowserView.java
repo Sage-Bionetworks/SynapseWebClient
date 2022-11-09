@@ -1,43 +1,42 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
+import com.google.gwt.user.client.ui.IsWidget;
 import java.util.List;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.SynapseView;
-import com.google.gwt.user.client.ui.IsWidget;
 
 public interface MyEntitiesBrowserView extends IsWidget, SynapseView {
+  /**
+   * Set the presenter.
+   *
+   * @param presenter
+   */
+  public void setPresenter(Presenter presenter);
 
-	/**
-	 * Set the presenter.
-	 * 
-	 * @param presenter
-	 */
-	public void setPresenter(Presenter presenter);
+  void addUpdatableEntities(List<EntityHeader> rootEntities);
 
-	void addUpdatableEntities(List<EntityHeader> rootEntities);
+  void setIsMoreUpdatableEntities(boolean isMore);
 
-	void setIsMoreUpdatableEntities(boolean isMore);
+  public EntityTreeBrowser getEntityTreeBrowser();
 
-	public EntityTreeBrowser getEntityTreeBrowser();
+  void setFavoriteEntities(List<EntityHeader> favoriteEntities);
 
-	void setFavoriteEntities(List<EntityHeader> favoriteEntities);
+  public EntityTreeBrowser getFavoritesTreeBrowser();
 
-	public EntityTreeBrowser getFavoritesTreeBrowser();
+  public EntityTreeBrowser getCurrentContextTreeBrowser();
 
-	public EntityTreeBrowser getCurrentContextTreeBrowser();
+  void setCurrentContextTabVisible(boolean visible);
 
-	void setCurrentContextTabVisible(boolean visible);
+  void clearSelection();
 
-	void clearSelection();
+  /**
+   * Presenter interface
+   */
+  public interface Presenter {
+    void entitySelected(String selectedEntityId);
 
-	/**
-	 * Presenter interface
-	 */
-	public interface Presenter {
-		void entitySelected(String selectedEntityId);
+    void loadMoreUserUpdateable();
 
-		void loadMoreUserUpdateable();
-
-		void loadFavorites();
-	}
+    void loadFavorites();
+  }
 }

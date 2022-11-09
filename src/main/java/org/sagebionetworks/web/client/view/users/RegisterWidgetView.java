@@ -4,34 +4,33 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 public interface RegisterWidgetView extends IsWidget {
+  /**
+   * Set the presenter.
+   *
+   * @param presenter
+   */
+  void setPresenter(Presenter presenter);
 
-	/**
-	 * Set the presenter.
-	 * 
-	 * @param presenter
-	 */
-	void setPresenter(Presenter presenter);
+  void setSynAlert(Widget w);
 
-	void setSynAlert(Widget w);
+  void enableEmailAddressField(boolean enabled);
 
-	void enableEmailAddressField(boolean enabled);
+  /**
+   * Presenter interface
+   */
+  interface Presenter {
+    void registerUser(String email);
 
-	/**
-	 * Presenter interface
-	 */
-	interface Presenter {
-		void registerUser(String email);
+    String getEncodedMembershipInvtnSignedToken();
+  }
 
-		String getEncodedMembershipInvtnSignedToken();
-	}
+  void enableRegisterButton(boolean enable);
 
-	void enableRegisterButton(boolean enable);
+  void setVisible(boolean isVisible);
 
-	void setVisible(boolean isVisible);
+  void setEmail(String email);
 
-	void setEmail(String email);
+  void clear();
 
-	void clear();
-
-	void showInfo(String message);
+  void showInfo(String message);
 }

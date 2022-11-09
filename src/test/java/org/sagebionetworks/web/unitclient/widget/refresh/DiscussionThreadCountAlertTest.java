@@ -6,6 +6,8 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -19,65 +21,102 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.refresh.DiscussionThreadCountAlert;
 import org.sagebionetworks.web.client.widget.refresh.RefreshAlertView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class DiscussionThreadCountAlertTest {
-	@Mock
-	RefreshAlertView mockView;
-	@Mock
-	GWTWrapper mockGWTWrapper;
-	@Mock
-	GlobalApplicationState mockGlobalApplicationState;
-	@Mock
-	SynapseJSNIUtils mockSynapseJSNIUtils;
-	@Mock
-	SynapseJavascriptClient mockSynapseJavascriptClient;
-	Long count = 5L;
-	DiscussionThreadCountAlert refreshAlert;
 
-	@Before
-	public void before() {
-		MockitoAnnotations.initMocks(this);
-		refreshAlert = new DiscussionThreadCountAlert(mockView, mockGWTWrapper, mockGlobalApplicationState, mockSynapseJSNIUtils, mockSynapseJavascriptClient);
-		when(mockView.isAttached()).thenReturn(true);
-		AsyncMockStubber.callSuccessWith(count).when(mockSynapseJavascriptClient).getThreadCountForForum(anyString(), any(DiscussionFilter.class), any(AsyncCallback.class));
+  @Mock
+  RefreshAlertView mockView;
 
-	}
+  @Mock
+  GWTWrapper mockGWTWrapper;
 
-	@Test
-	public void testConstructor() {
-		verify(mockView).setPresenter(refreshAlert);
-	}
+  @Mock
+  GlobalApplicationState mockGlobalApplicationState;
 
-	@Test
-	public void testConfigureNotAttached() {
-		when(mockView.isAttached()).thenReturn(false);
-		refreshAlert.configure("123");
-		// not ready to ask for the current etag
-		verify(mockSynapseJavascriptClient, never()).getThreadCountForForum(anyString(), any(DiscussionFilter.class), any(AsyncCallback.class));
-	}
+  @Mock
+  SynapseJSNIUtils mockSynapseJSNIUtils;
 
-	@Test
-	public void testAttachedNotConfigured() {
-		when(mockView.isAttached()).thenReturn(true);
-		refreshAlert.onAttach();
-		// not ready to ask for the current etag
-		verify(mockSynapseJavascriptClient, never()).getThreadCountForForum(anyString(), any(DiscussionFilter.class), any(AsyncCallback.class));
-	}
+  @Mock
+  SynapseJavascriptClient mockSynapseJavascriptClient;
 
-	@Test
-	public void testConfiguredAndAttached() {
-		when(mockView.isAttached()).thenReturn(true);
-		refreshAlert.configure("123");
+  Long count = 5L;
+  DiscussionThreadCountAlert refreshAlert;
 
-		verify(mockSynapseJavascriptClient).getThreadCountForForum(anyString(), any(DiscussionFilter.class), any(AsyncCallback.class));
-		// and will call this again later
-		verify(mockGWTWrapper).scheduleExecution(any(Callback.class), eq(DiscussionThreadCountAlert.DELAY));
-	}
+  @Before
+  public void before() {
+    MockitoAnnotations.initMocks(this);
+    refreshAlert =
+      new DiscussionThreadCountAlert(
+        mockView,
+        mockGWTWrapper,
+        mockGlobalApplicationState,
+        mockSynapseJSNIUtils,
+        mockSynapseJavascriptClient
+      );
+    when(mockView.isAttached()).thenReturn(true);
+    AsyncMockStubber
+      .callSuccessWith(count)
+      .when(mockSynapseJavascriptClient)
+      .getThreadCountForForum(
+        anyString(),
+        any(DiscussionFilter.class),
+        any(AsyncCallback.class)
+      );
+  }
 
-	@Test
-	public void testOnRefresh() {
-		refreshAlert.onRefresh();
-		verify(mockGlobalApplicationState).refreshPage();
-	}
+  @Test
+  public void testConstructor() {
+    verify(mockView).setPresenter(refreshAlert);
+  }
+
+  @Test
+  public void testConfigureNotAttached() {
+    when(mockView.isAttached()).thenReturn(false);
+    refreshAlert.configure("123");
+    // not ready to ask for the current etag
+    verify(mockSynapseJavascriptClient, never())
+      .getThreadCountForForum(
+        anyString(),
+        any(DiscussionFilter.class),
+        any(AsyncCallback.class)
+      );
+  }
+
+  @Test
+  public void testAttachedNotConfigured() {
+    when(mockView.isAttached()).thenReturn(true);
+    refreshAlert.onAttach();
+    // not ready to ask for the current etag
+    verify(mockSynapseJavascriptClient, never())
+      .getThreadCountForForum(
+        anyString(),
+        any(DiscussionFilter.class),
+        any(AsyncCallback.class)
+      );
+  }
+
+  @Test
+  public void testConfiguredAndAttached() {
+    when(mockView.isAttached()).thenReturn(true);
+    refreshAlert.configure("123");
+
+    verify(mockSynapseJavascriptClient)
+      .getThreadCountForForum(
+        anyString(),
+        any(DiscussionFilter.class),
+        any(AsyncCallback.class)
+      );
+    // and will call this again later
+    verify(mockGWTWrapper)
+      .scheduleExecution(
+        any(Callback.class),
+        eq(DiscussionThreadCountAlert.DELAY)
+      );
+  }
+
+  @Test
+  public void testOnRefresh() {
+    refreshAlert.onRefresh();
+    verify(mockGlobalApplicationState).refreshPage();
+  }
 }

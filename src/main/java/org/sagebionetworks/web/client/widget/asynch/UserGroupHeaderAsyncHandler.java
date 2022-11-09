@@ -1,8 +1,11 @@
 package org.sagebionetworks.web.client.widget.asynch;
 
-import org.sagebionetworks.repo.model.UserGroupHeader;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import org.sagebionetworks.repo.model.UserGroupHeader;
 
 public interface UserGroupHeaderAsyncHandler {
-	void getUserGroupHeader(String principalId, AsyncCallback<UserGroupHeader> callback);
+  void getUserGroupHeader(
+    String principalId,
+    AsyncCallback<UserGroupHeader> callback
+  );
 }

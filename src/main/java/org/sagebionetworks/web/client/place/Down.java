@@ -6,27 +6,27 @@ import com.google.gwt.place.shared.Prefix;
 
 public class Down extends Place {
 
-	private String token;
+  private String token;
 
-	public Down(String token) {
-		this.token = token;
-	}
+  public Down(String token) {
+    this.token = token;
+  }
 
-	public String toToken() {
-		return token;
-	}
+  public String toToken() {
+    return token;
+  }
 
-	@Prefix("!Down")
-	public static class Tokenizer implements PlaceTokenizer<Down> {
-		@Override
-		public String getToken(Down place) {
-			return place.toToken();
-		}
+  @Prefix("!Down")
+  public static class Tokenizer implements PlaceTokenizer<Down> {
 
-		@Override
-		public Down getPlace(String token) {
-			return new Down(token);
-		}
-	}
+    @Override
+    public String getToken(Down place) {
+      return place.toToken();
+    }
 
+    @Override
+    public Down getPlace(String token) {
+      return new Down(token);
+    }
+  }
 }

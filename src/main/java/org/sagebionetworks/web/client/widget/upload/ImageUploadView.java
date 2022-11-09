@@ -1,43 +1,41 @@
 package org.sagebionetworks.web.client.widget.upload;
 
+import com.google.gwt.event.logical.shared.HasAttachHandlers;
+import com.google.gwt.user.client.ui.IsWidget;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 
-import com.google.gwt.event.logical.shared.HasAttachHandlers;
-import com.google.gwt.user.client.ui.IsWidget;
-
 public interface ImageUploadView extends IsWidget, HasAttachHandlers {
+  public interface Presenter {
+    void onFileSelected();
 
-	public interface Presenter {
-		void onFileSelected();
+    void onFileProcessed(JavaScriptObjectWrapper blob, String contentType);
+  }
 
-		void onFileProcessed(JavaScriptObjectWrapper blob, String contentType);
-	}
+  void setPresenter(Presenter presenter);
 
-	void setPresenter(Presenter presenter);
+  void showProgress(boolean b);
 
-	void showProgress(boolean b);
+  void setInputEnabled(boolean b);
 
-	void setInputEnabled(boolean b);
+  String getInputId();
 
-	String getInputId();
+  void updateProgress(double d, String progressText);
 
-	void updateProgress(double d, String progressText);
+  void setSynAlert(IsWidget w);
 
-	void setSynAlert(IsWidget w);
+  void resetForm();
 
-	void resetForm();
+  void setUploadedFileText(String text);
 
-	void setUploadedFileText(String text);
+  void processFile();
 
-	void processFile();
+  void setButtonType(ButtonType type);
 
-	void setButtonType(ButtonType type);
-	
-	void setButtonSize(ButtonSize size);
+  void setButtonSize(ButtonSize size);
 
-	void setButtonText(String text);
+  void setButtonText(String text);
 
-	void setButtonIcon(IconType iconType);
+  void setButtonIcon(IconType iconType);
 }

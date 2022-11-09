@@ -1,50 +1,63 @@
 package org.sagebionetworks.web.client.widget.entity.download;
 
+import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 
-public class UploadDialogWidget implements UploadDialogWidgetView.Presenter, SynapseWidgetPresenter {
-	private UploadDialogWidgetView view;
-	private Uploader uploader;
+public class UploadDialogWidget
+  implements UploadDialogWidgetView.Presenter, SynapseWidgetPresenter {
 
-	@Inject
-	public UploadDialogWidget(UploadDialogWidgetView view, Uploader uploader) {
-		this.view = view;
-		this.uploader = uploader;
-		view.setPresenter(this);
-	}
+  private UploadDialogWidgetView view;
+  private Uploader uploader;
 
-	@Override
-	public Widget asWidget() {
-		return view.asWidget();
-	}
+  @Inject
+  public UploadDialogWidget(UploadDialogWidgetView view, Uploader uploader) {
+    this.view = view;
+    this.uploader = uploader;
+    view.setPresenter(this);
+  }
 
-	public void configure(String title, Entity entity, String parentEntityId, final CallbackP<String> fileHandleIdCallback, boolean isEntity) {
-		Widget body = uploader.configure(entity, parentEntityId, fileHandleIdCallback, isEntity);
-		view.configureDialog(title, body);
+  @Override
+  public Widget asWidget() {
+    return view.asWidget();
+  }
 
-		// add handlers for closing the window
-		uploader.setSuccessHandler(() -> {
-			view.hideDialog();
-		});
+  public void configure(
+    String title,
+    Entity entity,
+    String parentEntityId,
+    final CallbackP<String> fileHandleIdCallback,
+    boolean isEntity
+  ) {
+    Widget body = uploader.configure(
+      entity,
+      parentEntityId,
+      fileHandleIdCallback,
+      isEntity
+    );
+    view.configureDialog(title, body);
 
-		uploader.setCancelHandler(() -> {
-			view.hideDialog();
-		});
-	}
+    // add handlers for closing the window
+    uploader.setSuccessHandler(() -> {
+      view.hideDialog();
+    });
 
-	public void disableMultipleFileUploads() {
-		uploader.disableMultipleFileUploads();
-	}
+    uploader.setCancelHandler(() -> {
+      view.hideDialog();
+    });
+  }
 
-	public void setUploaderLinkNameVisible(boolean visible) {
-		uploader.setUploaderLinkNameVisible(visible);
-	}
+  public void disableMultipleFileUploads() {
+    uploader.disableMultipleFileUploads();
+  }
 
-	public void show() {
-		view.showDialog();
-	}
+  public void setUploaderLinkNameVisible(boolean visible) {
+    uploader.setUploaderLinkNameVisible(visible);
+  }
+
+  public void show() {
+    view.showDialog();
+  }
 }

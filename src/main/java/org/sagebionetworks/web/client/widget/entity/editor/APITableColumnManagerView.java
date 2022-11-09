@@ -1,54 +1,53 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import com.google.gwt.user.client.ui.IsWidget;
 import java.util.List;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.widget.CheckBoxState;
-import com.google.gwt.user.client.ui.IsWidget;
 
 public interface APITableColumnManagerView extends IsWidget, SynapseView {
+  /**
+   * Set the presenter.
+   *
+   * @param presenter
+   */
+  public void setPresenter(Presenter presenter);
 
-	/**
-	 * Set the presenter.
-	 * 
-	 * @param presenter
-	 */
-	public void setPresenter(Presenter presenter);
+  /**
+   * Presenter interface
+   */
+  public interface Presenter {
+    void configure(List<APITableColumnConfig> configs);
 
-	/**
-	 * Presenter interface
-	 */
-	public interface Presenter {
-		void configure(List<APITableColumnConfig> configs);
+    void addColumnConfig();
 
-		void addColumnConfig();
+    void onMoveDown();
 
-		void onMoveDown();
+    void onMoveUp();
 
-		void onMoveUp();
+    void deleteSelected();
 
-		void deleteSelected();
+    void selectNone();
 
-		void selectNone();
+    void selectAll();
+  }
 
-		void selectAll();
-	}
+  void addColumn(IsWidget widget);
 
-	void addColumn(IsWidget widget);
+  void clearColumns();
 
-	void clearColumns();
+  void setHeaderColumnsVisible(boolean visible);
 
-	void setHeaderColumnsVisible(boolean visible);
+  void setNoColumnsUIVisible(boolean visible);
 
-	void setNoColumnsUIVisible(boolean visible);
+  // selection toolbar state
+  void setCanDelete(boolean canDelete);
 
-	// selection toolbar state
-	void setCanDelete(boolean canDelete);
+  void setCanMoveUp(boolean canMoveUp);
 
-	void setCanMoveUp(boolean canMoveUp);
+  void setCanMoveDown(boolean canMoveDown);
 
-	void setCanMoveDown(boolean canMoveDown);
+  void setButtonToolbarVisible(boolean visible);
 
-	void setButtonToolbarVisible(boolean visible);
-
-	void setSelectionState(CheckBoxState selectionState);
+  void setSelectionState(CheckBoxState selectionState);
 }

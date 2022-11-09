@@ -1,12 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import org.gwtbootstrap3.client.shared.event.ModalShownEvent;
-import org.gwtbootstrap3.client.shared.event.ModalShownHandler;
-import org.gwtbootstrap3.client.ui.Alert;
-import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.Modal;
-import org.gwtbootstrap3.client.ui.TextBox;
-import org.sagebionetworks.web.client.DisplayUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -16,117 +9,139 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.gwtbootstrap3.client.shared.event.ModalShownEvent;
+import org.gwtbootstrap3.client.shared.event.ModalShownHandler;
+import org.gwtbootstrap3.client.ui.Alert;
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.TextBox;
+import org.sagebionetworks.web.client.DisplayUtils;
 
-public class EditFileMetadataModalViewImpl implements EditFileMetadataModalView {
+public class EditFileMetadataModalViewImpl
+  implements EditFileMetadataModalView {
 
-	public interface Binder extends UiBinder<Modal, EditFileMetadataModalViewImpl> {
-	}
+  public interface Binder
+    extends UiBinder<Modal, EditFileMetadataModalViewImpl> {}
 
-	@UiField
-	Modal modal;
-	@UiField
-	TextBox entityNameField;
-	@UiField
-	TextBox fileNameField;
-	@UiField
-	TextBox contentTypeField;
+  @UiField
+  Modal modal;
 
-	@UiField
-	Alert alert;
-	@UiField
-	Button primaryButton;
-	String originalButtonText;
+  @UiField
+  TextBox entityNameField;
 
-	@Inject
-	public EditFileMetadataModalViewImpl(Binder binder) {
-		binder.createAndBindUi(this);
-		modal.addShownHandler(new ModalShownHandler() {
+  @UiField
+  TextBox fileNameField;
 
-			@Override
-			public void onShown(ModalShownEvent evt) {
-				entityNameField.setFocus(true);
-				entityNameField.selectAll();
-			}
-		});
-		originalButtonText = primaryButton.getText();
-	}
+  @UiField
+  TextBox contentTypeField;
 
-	@Override
-	public Widget asWidget() {
-		return modal;
-	}
+  @UiField
+  Alert alert;
 
-	@Override
-	public String getEntityName() {
-		return entityNameField.getText();
-	}
+  @UiField
+  Button primaryButton;
 
-	@Override
-	public void showError(String error) {
-		alert.setVisible(true);
-		alert.setText(error);
-	}
+  String originalButtonText;
 
-	@Override
-	public void showErrorPopup(String error) {
-		DisplayUtils.showErrorMessage(error);
-	}
+  @Inject
+  public EditFileMetadataModalViewImpl(Binder binder) {
+    binder.createAndBindUi(this);
+    modal.addShownHandler(
+      new ModalShownHandler() {
+        @Override
+        public void onShown(ModalShownEvent evt) {
+          entityNameField.setFocus(true);
+          entityNameField.selectAll();
+        }
+      }
+    );
+    originalButtonText = primaryButton.getText();
+  }
 
-	@Override
-	public void setPresenter(final Presenter presenter) {
-		this.primaryButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent arg0) {
-				presenter.onPrimary();
-			}
-		});
-		this.entityNameField.addKeyDownHandler(new KeyDownHandler() {
-			@Override
-			public void onKeyDown(KeyDownEvent event) {
-				if (KeyCodes.KEY_ENTER == event.getNativeKeyCode()) {
-					presenter.onPrimary();
-				}
-			}
-		});
-	}
+  @Override
+  public Widget asWidget() {
+    return modal;
+  }
 
-	@Override
-	public void hide() {
-		modal.hide();
-	}
+  @Override
+  public String getEntityName() {
+    return entityNameField.getText();
+  }
 
-	@Override
-	public void show() {
-		modal.show();
-		entityNameField.setFocus(true);
-	}
+  @Override
+  public void showError(String error) {
+    alert.setVisible(true);
+    alert.setText(error);
+  }
 
-	@Override
-	public void clear() {
-		this.alert.setVisible(false);
-		this.entityNameField.clear();
-		setLoading(false);
-	}
+  @Override
+  public void showErrorPopup(String error) {
+    DisplayUtils.showErrorMessage(error);
+  }
 
-	@Override
-	public void setLoading(boolean isLoading) {
-		DisplayUtils.showLoading(primaryButton, isLoading, originalButtonText);
-	}
+  @Override
+  public void setPresenter(final Presenter presenter) {
+    this.primaryButton.addClickHandler(
+        new ClickHandler() {
+          @Override
+          public void onClick(ClickEvent arg0) {
+            presenter.onPrimary();
+          }
+        }
+      );
+    this.entityNameField.addKeyDownHandler(
+        new KeyDownHandler() {
+          @Override
+          public void onKeyDown(KeyDownEvent event) {
+            if (KeyCodes.KEY_ENTER == event.getNativeKeyCode()) {
+              presenter.onPrimary();
+            }
+          }
+        }
+      );
+  }
 
-	@Override
-	public void configure(String entityName, String fileName, String contentType) {
-		this.entityNameField.setText(entityName);
-		this.fileNameField.setText(fileName);
-		this.contentTypeField.setText(contentType);
-	}
+  @Override
+  public void hide() {
+    modal.hide();
+  }
 
-	@Override
-	public String getFileName() {
-		return fileNameField.getText();
-	};
+  @Override
+  public void show() {
+    modal.show();
+    entityNameField.setFocus(true);
+  }
 
-	@Override
-	public String getContentType() {
-		return contentTypeField.getText();
-	}
+  @Override
+  public void clear() {
+    this.alert.setVisible(false);
+    this.entityNameField.clear();
+    setLoading(false);
+  }
+
+  @Override
+  public void setLoading(boolean isLoading) {
+    DisplayUtils.showLoading(primaryButton, isLoading, originalButtonText);
+  }
+
+  @Override
+  public void configure(
+    String entityName,
+    String fileName,
+    String contentType
+  ) {
+    this.entityNameField.setText(entityName);
+    this.fileNameField.setText(fileName);
+    this.contentTypeField.setText(contentType);
+  }
+
+  @Override
+  public String getFileName() {
+    return fileNameField.getText();
+  }
+
+  @Override
+  public String getContentType() {
+    return contentTypeField.getText();
+  }
 }

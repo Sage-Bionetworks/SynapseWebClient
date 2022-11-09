@@ -1,31 +1,29 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
-import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
 
 public interface DiscussionThreadListWidgetView extends IsWidget {
+  public interface Presenter {
+    Widget asWidget();
+  }
 
-	public interface Presenter {
+  void setThreadCountAlert(Widget w);
 
-		Widget asWidget();
-	}
+  void setPresenter(DiscussionThreadListWidget presenter);
 
-	void setThreadCountAlert(Widget w);
+  void setAlert(Widget w);
 
-	void setPresenter(DiscussionThreadListWidget presenter);
+  void setThreadHeaderVisible(boolean visible);
 
-	void setAlert(Widget w);
+  void setNoThreadsFoundVisible(boolean visible);
 
-	void setThreadHeaderVisible(boolean visible);
+  void setThreadsContainer(IsWidget container);
 
-	void setNoThreadsFoundVisible(boolean visible);
+  void scrollIntoView(Widget w);
 
-	void setThreadsContainer(IsWidget container);
+  void setSorted(DiscussionThreadOrder column, boolean ascending);
 
-	void scrollIntoView(Widget w);
-
-	void setSorted(DiscussionThreadOrder column, boolean ascending);
-
-	void clearSort();
+  void clearSort();
 }

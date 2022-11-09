@@ -1,28 +1,29 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import com.google.gwt.user.client.ui.IsWidget;
 import java.util.Map;
 import org.sagebionetworks.web.client.widget.WidgetEditorView;
 import org.sagebionetworks.web.shared.WikiPageKey;
-import com.google.gwt.user.client.ui.IsWidget;
 
-public interface EvaluationSubmissionConfigView extends IsWidget, WidgetEditorView {
-	void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor);
+public interface EvaluationSubmissionConfigView
+  extends IsWidget, WidgetEditorView {
+  void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor);
 
-	String getUnavailableMessage();
+  String getUnavailableMessage();
 
-	String getButtonText();
+  String getButtonText();
 
-	String getChallengeProjectId();
+  String getChallengeProjectId();
 
-	boolean isChallengeProjectIdSelected();
+  boolean isChallengeProjectIdSelected();
 
-	String getEvaluationQueueId();
+  String getEvaluationQueueId();
 
-	boolean isFormSubmission();
+  boolean isFormSubmission();
 
-	String getFormContainerId();
+  String getFormContainerId();
 
-	String getFormJsonSchemaId();
+  String getFormJsonSchemaId();
 
-	String getFormUiSchemaId();
+  String getFormUiSchemaId();
 }

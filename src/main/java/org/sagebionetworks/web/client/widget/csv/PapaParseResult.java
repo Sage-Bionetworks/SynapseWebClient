@@ -18,6 +18,7 @@ import jsinterop.annotations.JsType;
  */
 @JsType(isNative = true, name = "Object", namespace = JsPackage.GLOBAL)
 public class PapaParseResult {
-	//currently the only field we need
-	public String[][] data;
+
+  //currently the only field we need
+  public String[][] data;
 }

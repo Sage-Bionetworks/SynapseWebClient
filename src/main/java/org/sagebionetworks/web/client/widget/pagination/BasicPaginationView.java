@@ -4,50 +4,47 @@ import com.google.gwt.user.client.ui.IsWidget;
 
 /**
  * Contract between the BasicPagination view and presenter.
- * 
+ *
  * @author John
  *
  */
 public interface BasicPaginationView extends IsWidget {
+  public interface Presenter {
+    /**
+     * Called when the next button is pushed
+     */
+    public void onNext();
 
-	public interface Presenter {
+    /**
+     * Called when the previous button is pushed.
+     */
+    public void onPrevious();
+  }
 
-		/**
-		 * Called when the next button is pushed
-		 */
-		public void onNext();
+  /**
+   * Bind this view to its presenter
+   *
+   * @param presenter
+   */
+  public void setPresenter(Presenter presenter);
 
-		/**
-		 * Called when the previous button is pushed.
-		 */
-		public void onPrevious();
+  /**
+   * Enable/disable the next button.
+   *
+   * @param enabled
+   */
+  public void setNextVisible(boolean visible);
 
-	}
+  /**
+   * Enable/disable the previous button.
+   *
+   * @param enabled
+   */
+  public void setPreviousVisible(boolean visible);
 
-	/**
-	 * Bind this view to its presenter
-	 * 
-	 * @param presenter
-	 */
-	public void setPresenter(Presenter presenter);
+  public void setCurrentPage(long currentPageNumber);
 
-	/**
-	 * Enable/disable the next button.
-	 * 
-	 * @param enabled
-	 */
-	public void setNextVisible(boolean visible);
+  void setVisible(boolean visible);
 
-	/**
-	 * Enable/disable the previous button.
-	 * 
-	 * @param enabled
-	 */
-	public void setPreviousVisible(boolean visible);
-
-	public void setCurrentPage(long currentPageNumber);
-
-	void setVisible(boolean visible);
-
-	public void hideClearFix();
+  public void hideClearFix();
 }

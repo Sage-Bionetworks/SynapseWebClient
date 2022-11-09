@@ -1,55 +1,59 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
-import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.web.client.SynapseView;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.web.client.SynapseView;
 
 public interface FileTitleBarView extends IsWidget, SynapseView {
-	void createTitlebar(Entity entity);
+  void createTitlebar(Entity entity);
 
-	void setFileLocation(String location);
+  void setFileLocation(String location);
 
-	void setFileDownloadMenuItem(Widget w);
+  void setFileDownloadMenuItem(Widget w);
 
-	void setFilenameContainerVisible(boolean visible);
+  void setFilenameContainerVisible(boolean visible);
 
-	void setEntityName(String name);
+  void setEntityName(String name);
 
-	void setFilename(String fileName);
+  void setFilename(String fileName);
 
-	void setExternalUrlUIVisible(boolean visible);
+  void setExternalUrlUIVisible(boolean visible);
 
-	void setExternalUrl(String url);
+  void setExternalUrl(String url);
 
-	void setFileSize(String fileSize);
+  void setFileSize(String fileSize);
 
-	void setMd5(String md5);
+  void setMd5(String md5);
 
-	void setExternalObjectStoreUIVisible(boolean visible);
+  void setExternalObjectStoreUIVisible(boolean visible);
 
-	void setExternalObjectStoreInfo(String endpoint, String bucket, String fileKey);
+  void setExternalObjectStoreInfo(
+    String endpoint,
+    String bucket,
+    String fileKey
+  );
 
-	void setVersion(Long version);
+  void setVersion(Long version);
 
-	void setVersionUICurrentVisible(boolean visible);
+  void setVersionUICurrentVisible(boolean visible);
 
-	void setPresenter(Presenter p);
+  void setPresenter(Presenter p);
 
-	void setCanDownload(boolean canDownload);
+  void setCanDownload(boolean canDownload);
 
-	void setActionMenu(IsWidget w);
+  void setActionMenu(IsWidget w);
 
-	void setVersionHistoryLinkText(String text);
+  void setVersionHistoryLinkText(String text);
 
-	/**
-	 * Presenter interface
-	 */
-	public interface Presenter {
-		void onProgrammaticDownloadOptions();
+  /**
+   * Presenter interface
+   */
+  public interface Presenter {
+    void onProgrammaticDownloadOptions();
 
-		void onAddToDownloadList();
+    void onAddToDownloadList();
 
-		void toggleShowVersionHistory();
-	}
+    void toggleShowVersionHistory();
+  }
 }

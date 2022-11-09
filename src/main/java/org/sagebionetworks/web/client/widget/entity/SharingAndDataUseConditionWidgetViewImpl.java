@@ -1,5 +1,12 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.InlineHTML;
+import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 import org.gwtbootstrap3.client.ui.html.Br;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -13,98 +20,132 @@ import org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWi
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
 import org.sagebionetworks.web.shared.WebConstants;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.InlineHTML;
-import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 
-public class SharingAndDataUseConditionWidgetViewImpl extends FlowPanel implements SharingAndDataUseConditionWidgetView {
-	SynapseJSNIUtils synapseJSNIUtils;
-	GlobalApplicationState globalApplicationState;
-	IconsImageBundle iconsImageBundle;
-	FlowPanel container;
-	PublicPrivateBadge publicPrivateBadge;
-	RestrictionWidget restrictionWidgetV2;
-	AccessControlListModalWidget accessControlListModalWidget;
-	CookieProvider cookies;
+public class SharingAndDataUseConditionWidgetViewImpl
+  extends FlowPanel
+  implements SharingAndDataUseConditionWidgetView {
 
-	@Inject
-	public SharingAndDataUseConditionWidgetViewImpl(SynapseJSNIUtils synapseJSNIUtils, GlobalApplicationState globalApplicationState, IconsImageBundle iconsImageBundle, PublicPrivateBadge publicPrivateBadge, AccessControlListModalWidget accessControlListModalWidget, RestrictionWidget restrictionWidgetV2, CookieProvider cookies) {
-		this.synapseJSNIUtils = synapseJSNIUtils;
-		this.globalApplicationState = globalApplicationState;
-		this.iconsImageBundle = iconsImageBundle;
-		this.publicPrivateBadge = publicPrivateBadge;
-		this.restrictionWidgetV2 = restrictionWidgetV2;
-		restrictionWidgetV2.setShowCurrentAccessUI(false);
-		restrictionWidgetV2.showFolderRestrictionUI();
-		this.cookies = cookies;
-		restrictionWidgetV2.setShowFlagLink(false);
-		this.accessControlListModalWidget = accessControlListModalWidget;
-		this.addStyleName("sharingAndDataUseConditions");
-		container = new FlowPanel();
-		container.addStyleName("margin-top-left-10");
-		this.add(container);
-	}
+  SynapseJSNIUtils synapseJSNIUtils;
+  GlobalApplicationState globalApplicationState;
+  IconsImageBundle iconsImageBundle;
+  FlowPanel container;
+  PublicPrivateBadge publicPrivateBadge;
+  RestrictionWidget restrictionWidgetV2;
+  AccessControlListModalWidget accessControlListModalWidget;
+  CookieProvider cookies;
 
-	@Override
-	public void configure(EntityBundle bundle) {
-		container.clear();
+  @Inject
+  public SharingAndDataUseConditionWidgetViewImpl(
+    SynapseJSNIUtils synapseJSNIUtils,
+    GlobalApplicationState globalApplicationState,
+    IconsImageBundle iconsImageBundle,
+    PublicPrivateBadge publicPrivateBadge,
+    AccessControlListModalWidget accessControlListModalWidget,
+    RestrictionWidget restrictionWidgetV2,
+    CookieProvider cookies
+  ) {
+    this.synapseJSNIUtils = synapseJSNIUtils;
+    this.globalApplicationState = globalApplicationState;
+    this.iconsImageBundle = iconsImageBundle;
+    this.publicPrivateBadge = publicPrivateBadge;
+    this.restrictionWidgetV2 = restrictionWidgetV2;
+    restrictionWidgetV2.setShowCurrentAccessUI(false);
+    restrictionWidgetV2.showFolderRestrictionUI();
+    this.cookies = cookies;
+    restrictionWidgetV2.setShowFlagLink(false);
+    this.accessControlListModalWidget = accessControlListModalWidget;
+    this.addStyleName("sharingAndDataUseConditions");
+    container = new FlowPanel();
+    container.addStyleName("margin-top-left-10");
+    this.add(container);
+  }
 
-		HelpWidget helpWidget = new HelpWidget();
-		helpWidget.setHelpMarkdown("##### Sharing Settings: Controls who can view the content.\nBy default, folders and files inherit the Sharing Settings of the parent folder or project.");
-		helpWidget.setHref(WebConstants.DOCS_URL + "Sharing-Settings-and-Permissions.2024276030.html");
-		container.add(helpWidget.asWidget());
+  @Override
+  public void configure(EntityBundle bundle) {
+    container.clear();
 
-		// add share settings
-		container.add(new InlineHTML("<h5 class=\"inline-block\">" + DisplayConstants.SHARING_PUBLIC_TITLE + "</h5>"));
-		final SimplePanel sharingDescriptionContainer = new SimplePanel();
-		publicPrivateBadge.configure(bundle.getEntity(), new AsyncCallback<Boolean>() {
-			@Override
-			public void onSuccess(Boolean isPublic) {
-				// add the proper description into the container
-				String description = isPublic ? DisplayConstants.SHARING_PUBLIC_DESCRIPTION : DisplayConstants.SHARING_PRIVATE_DESCRIPTION;
-				sharingDescriptionContainer.setWidget(new HTML("<p class=\"margin-left-20 nobottommargin\">" + description + "</p>"));
-			}
+    HelpWidget helpWidget = new HelpWidget();
+    helpWidget.setHelpMarkdown(
+      "##### Sharing Settings: Controls who can view the content.\nBy default, folders and files inherit the Sharing Settings of the parent folder or project."
+    );
+    helpWidget.setHref(
+      WebConstants.DOCS_URL + "Sharing-Settings-and-Permissions.2024276030.html"
+    );
+    container.add(helpWidget.asWidget());
 
-			@Override
-			public void onFailure(Throwable caught) {
-				showErrorMessage(caught.getMessage());
-			}
-		});
+    // add share settings
+    container.add(
+      new InlineHTML(
+        "<h5 class=\"inline-block\">" +
+        DisplayConstants.SHARING_PUBLIC_TITLE +
+        "</h5>"
+      )
+    );
+    final SimplePanel sharingDescriptionContainer = new SimplePanel();
+    publicPrivateBadge.configure(
+      bundle.getEntity(),
+      new AsyncCallback<Boolean>() {
+        @Override
+        public void onSuccess(Boolean isPublic) {
+          // add the proper description into the container
+          String description = isPublic
+            ? DisplayConstants.SHARING_PUBLIC_DESCRIPTION
+            : DisplayConstants.SHARING_PRIVATE_DESCRIPTION;
+          sharingDescriptionContainer.setWidget(
+            new HTML(
+              "<p class=\"margin-left-20 nobottommargin\">" +
+              description +
+              "</p>"
+            )
+          );
+        }
 
-		Widget publicPrivateBadgeWidget = publicPrivateBadge.asWidget();
-		publicPrivateBadgeWidget.addStyleName("margin-left-10");
-		container.add(publicPrivateBadgeWidget);
-		container.add(sharingDescriptionContainer);
-		container.add(new Br());
+        @Override
+        public void onFailure(Throwable caught) {
+          showErrorMessage(caught.getMessage());
+        }
+      }
+    );
 
-		helpWidget = new HelpWidget();
-		helpWidget.setHelpMarkdown("##### Conditions For Use: Controls how the data can be used.\nBy default, folders and files inherit the Conditions For Use of the parent folder.");
-		helpWidget.setHref(WebConstants.DOCS_URL + "Conditions-for-Use.2009596938.html");
-		container.add(helpWidget.asWidget());
+    Widget publicPrivateBadgeWidget = publicPrivateBadge.asWidget();
+    publicPrivateBadgeWidget.addStyleName("margin-left-10");
+    container.add(publicPrivateBadgeWidget);
+    container.add(sharingDescriptionContainer);
+    container.add(new Br());
 
-		container.add(new InlineHTML("<h5 class=\"inline-block margin-right-10\">Access</h5>"));
-		restrictionWidgetV2.setShowChangeLink(false);
-		restrictionWidgetV2.configure(bundle.getEntity(), bundle.getPermissions().getCanChangePermissions());
-		container.add(restrictionWidgetV2);
-	}
+    helpWidget = new HelpWidget();
+    helpWidget.setHelpMarkdown(
+      "##### Conditions For Use: Controls how the data can be used.\nBy default, folders and files inherit the Conditions For Use of the parent folder."
+    );
+    helpWidget.setHref(
+      WebConstants.DOCS_URL + "Conditions-for-Use.2009596938.html"
+    );
+    container.add(helpWidget.asWidget());
 
-	@Override
-	public void showLoading() {
-		container.clear();
-		container.add(DisplayUtils.getSmallLoadingWidget());
-	}
+    container.add(
+      new InlineHTML("<h5 class=\"inline-block margin-right-10\">Access</h5>")
+    );
+    restrictionWidgetV2.setShowChangeLink(false);
+    restrictionWidgetV2.configure(
+      bundle.getEntity(),
+      bundle.getPermissions().getCanChangePermissions()
+    );
+    container.add(restrictionWidgetV2);
+  }
 
-	@Override
-	public void showInfo(String message) {
-		DisplayUtils.showInfo(message);
-	}
+  @Override
+  public void showLoading() {
+    container.clear();
+    container.add(DisplayUtils.getSmallLoadingWidget());
+  }
 
-	@Override
-	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
-	}
+  @Override
+  public void showInfo(String message) {
+    DisplayUtils.showInfo(message);
+  }
+
+  @Override
+  public void showErrorMessage(String message) {
+    DisplayUtils.showErrorMessage(message);
+  }
 }

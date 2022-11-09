@@ -5,8 +5,10 @@ import org.sagebionetworks.web.client.place.DataAccessManagementPlace;
 import org.sagebionetworks.web.client.view.DataAccessManagementView;
 
 public class DataAccessManagementPresenterTest {
-    @Mock
-    DataAccessManagementView mockView;
-    @Mock
-    DataAccessManagementPlace mockPlace;
+
+  @Mock
+  DataAccessManagementView mockView;
+
+  @Mock
+  DataAccessManagementPlace mockPlace;
 }

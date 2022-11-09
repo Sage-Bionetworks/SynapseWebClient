@@ -3,34 +3,31 @@ package org.sagebionetworks.web.client.widget.team;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface JoinTeamConfigEditorView extends IsWidget {
+  public interface Presenter extends IsWidget {}
 
-	public interface Presenter extends IsWidget {
+  void setIsChallenge(boolean isChallengeSignup);
 
-	}
+  void setIsSimpleRequest(boolean isSimpleRequest);
 
-	void setIsChallenge(boolean isChallengeSignup);
+  void setIsMemberMessage(String isMemberMessage);
 
-	void setIsSimpleRequest(boolean isSimpleRequest);
+  void setSuccessMessage(String successMessage);
 
-	void setIsMemberMessage(String isMemberMessage);
+  void setButtonText(String buttonText);
 
-	void setSuccessMessage(String successMessage);
+  void setRequestOpenInfotext(String requestOpenInfoText);
 
-	void setButtonText(String buttonText);
+  boolean getIsChallenge();
 
-	void setRequestOpenInfotext(String requestOpenInfoText);
+  boolean getIsSimpleRequest();
 
-	boolean getIsChallenge();
+  String getIsMemberMessage();
 
-	boolean getIsSimpleRequest();
+  String getSuccessMessage();
 
-	String getIsMemberMessage();
+  String getButtonText();
 
-	String getSuccessMessage();
+  String getRequestOpenInfotext();
 
-	String getButtonText();
-
-	String getRequestOpenInfotext();
-
-	void setSuggestWidget(IsWidget teamSuggestBox);
+  void setSuggestWidget(IsWidget teamSuggestBox);
 }

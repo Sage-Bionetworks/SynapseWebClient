@@ -4,29 +4,29 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 public interface EmailInvitationView extends IsWidget {
-	void setInvitationTitle(String title);
+  void setInvitationTitle(String title);
 
-	void setInvitationMessage(String message);
+  void setInvitationMessage(String message);
 
-	void setSynapseAlertContainer(Widget w);
+  void setSynapseAlertContainer(Widget w);
 
-	void setPresenter(Presenter presenter);
+  void setPresenter(Presenter presenter);
 
-	void showLoading();
+  void showLoading();
 
-	void hideLoading();
+  void hideLoading();
 
-	void showInfo(String message);
+  void showInfo(String message);
 
-	void showErrorMessage(String message);
+  void showErrorMessage(String message);
 
-	void clear();
+  void clear();
 
-	void showNotLoggedInUI();
+  void showNotLoggedInUI();
 
-	interface Presenter {
-		void onLoginClick();
+  interface Presenter {
+    void onLoginClick();
 
-		void onRegisterClick();
-	}
+    void onRegisterClick();
+  }
 }

@@ -12,6 +12,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Before;
@@ -38,187 +40,283 @@ import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class MyEntitiesBrowserTest {
-	MyEntitiesBrowser widget;
-	MyEntitiesBrowserView mockView;
-	AuthenticationController mockAuthenticationController;
-	GlobalApplicationState mockGlobalApplicationState;
-	JSONObjectAdapter jsonObjectAdapter;
-	@Mock
-	EntityTreeBrowser mockEntityTreeBrowser;
-	@Mock
-	EntityTreeBrowser mockFavoritesTreeBrowser;
-	@Mock
-	EntityTreeBrowser mockCurrentContextTreeBrowser;
-	@Mock
-	SynapseJavascriptClient mockSynapseJavascriptClient;
-	@Mock
-	ProjectHeaderList mockProjectHeaderList;
-	List<ProjectHeader> entities;
-	String currentUserId = "100042";
 
-	@Before
-	public void before() {
-		MockitoAnnotations.initMocks(this);
-		mockView = mock(MyEntitiesBrowserView.class);
-		mockAuthenticationController = mock(AuthenticationController.class);
-		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		widget = new MyEntitiesBrowser(mockView, mockAuthenticationController, mockGlobalApplicationState, jsonObjectAdapter, mockSynapseJavascriptClient);
-		mockEntityTreeBrowser = mock(EntityTreeBrowser.class);
-		when(mockView.getEntityTreeBrowser()).thenReturn(mockEntityTreeBrowser);
-		when(mockView.getFavoritesTreeBrowser()).thenReturn(mockFavoritesTreeBrowser);
-		when(mockView.getCurrentContextTreeBrowser()).thenReturn(mockCurrentContextTreeBrowser);
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(currentUserId);
+  MyEntitiesBrowser widget;
+  MyEntitiesBrowserView mockView;
+  AuthenticationController mockAuthenticationController;
+  GlobalApplicationState mockGlobalApplicationState;
+  JSONObjectAdapter jsonObjectAdapter;
 
-		entities = new ArrayList<ProjectHeader>();
-		// full page of results in the first response
-		for (int i = 0; i < MyEntitiesBrowser.PROJECT_LIMIT; i++) {
-			ProjectHeader projectHeader = new ProjectHeader();
-			projectHeader.setId("syn" + i);
-			entities.add(projectHeader);
-		}
-		when(mockProjectHeaderList.getResults()).thenReturn(entities);
-		AsyncMockStubber.callSuccessWith(mockProjectHeaderList).when(mockSynapseJavascriptClient).getMyProjects(any(ProjectListType.class), anyInt(), anyString(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
-	}
+  @Mock
+  EntityTreeBrowser mockEntityTreeBrowser;
 
-	@Test
-	public void testLoadUserUpdateable() {
-		when(mockProjectHeaderList.getNextPageToken()).thenReturn("abc", null);
-		widget.loadMoreUserUpdateable();
-		verify(mockSynapseJavascriptClient).getMyProjects(any(ProjectListType.class), anyInt(), anyString(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
-		verify(mockView).addUpdatableEntities(anyList());
-		verify(mockView).setIsMoreUpdatableEntities(true);
+  @Mock
+  EntityTreeBrowser mockFavoritesTreeBrowser;
 
-		entities.clear();
-		widget.loadMoreUserUpdateable();
-		verify(mockSynapseJavascriptClient, times(2)).getMyProjects(any(ProjectListType.class), anyInt(), anyString(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
-		verify(mockView).setIsMoreUpdatableEntities(false);
-	}
+  @Mock
+  EntityTreeBrowser mockCurrentContextTreeBrowser;
 
-	@Test
-	public void testLoadUserUpdateableAnonymous() {
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
-		widget.loadMoreUserUpdateable();
-		verify(mockView, never()).addUpdatableEntities(anyList());
-	}
+  @Mock
+  SynapseJavascriptClient mockSynapseJavascriptClient;
 
-	@Test
-	public void testLoadUserUpdateableFailure() {
-		String errorMessage = "An error occurred.";
-		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseJavascriptClient).getMyProjects(any(ProjectListType.class), anyInt(), anyString(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
-		widget.loadMoreUserUpdateable();
-		verify(mockView, never()).addUpdatableEntities(anyList());
-		verify(mockView).showErrorMessage(errorMessage);
-	}
+  @Mock
+  ProjectHeaderList mockProjectHeaderList;
 
-	@Test
-	public void testIsSameContextNullPlaceAndToken() {
-		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(null);
-		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(null);
-		assertFalse(widget.isSameContext());
-		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(new Synapse("syn123"));
-		assertFalse(widget.isSameContext());
-		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(null);
-		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn("12345");
-		assertFalse(widget.isSameContext());
-	}
+  List<ProjectHeader> entities;
+  String currentUserId = "100042";
 
-	@Test
-	public void testContextChange() {
-		when(mockProjectHeaderList.getNextPageToken()).thenReturn("abc", "def", "null");
-		// first, verify that updateContext does what we expect it to
-		Synapse s = new Synapse("syn123");
-		String userId = "12345";
-		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(s);
-		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(userId);
-		assertNull(widget.getCachedCurrentPlace());
-		assertNull(widget.getCachedUserId());
-		widget.updateContext();
-		assertEquals(s, widget.getCachedCurrentPlace());
-		assertEquals(userId, widget.getCachedUserId());
+  @Before
+  public void before() {
+    MockitoAnnotations.initMocks(this);
+    mockView = mock(MyEntitiesBrowserView.class);
+    mockAuthenticationController = mock(AuthenticationController.class);
+    mockGlobalApplicationState = mock(GlobalApplicationState.class);
+    widget =
+      new MyEntitiesBrowser(
+        mockView,
+        mockAuthenticationController,
+        mockGlobalApplicationState,
+        jsonObjectAdapter,
+        mockSynapseJavascriptClient
+      );
+    mockEntityTreeBrowser = mock(EntityTreeBrowser.class);
+    when(mockView.getEntityTreeBrowser()).thenReturn(mockEntityTreeBrowser);
+    when(mockView.getFavoritesTreeBrowser())
+      .thenReturn(mockFavoritesTreeBrowser);
+    when(mockView.getCurrentContextTreeBrowser())
+      .thenReturn(mockCurrentContextTreeBrowser);
+    when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+    when(mockAuthenticationController.getCurrentUserPrincipalId())
+      .thenReturn(currentUserId);
 
-		// test refresh when the context has not changed
-		widget.refresh();
+    entities = new ArrayList<ProjectHeader>();
+    // full page of results in the first response
+    for (int i = 0; i < MyEntitiesBrowser.PROJECT_LIMIT; i++) {
+      ProjectHeader projectHeader = new ProjectHeader();
+      projectHeader.setId("syn" + i);
+      entities.add(projectHeader);
+    }
+    when(mockProjectHeaderList.getResults()).thenReturn(entities);
+    AsyncMockStubber
+      .callSuccessWith(mockProjectHeaderList)
+      .when(mockSynapseJavascriptClient)
+      .getMyProjects(
+        any(ProjectListType.class),
+        anyInt(),
+        anyString(),
+        any(ProjectListSortColumn.class),
+        any(SortDirection.class),
+        any(AsyncCallback.class)
+      );
+  }
 
-		// test clearState() when context has not changed
-		widget.clearState();
-		verify(mockView).clearSelection();
+  @Test
+  public void testLoadUserUpdateable() {
+    when(mockProjectHeaderList.getNextPageToken()).thenReturn("abc", null);
+    widget.loadMoreUserUpdateable();
+    verify(mockSynapseJavascriptClient)
+      .getMyProjects(
+        any(ProjectListType.class),
+        anyInt(),
+        anyString(),
+        any(ProjectListSortColumn.class),
+        any(SortDirection.class),
+        any(AsyncCallback.class)
+      );
+    verify(mockView).addUpdatableEntities(anyList());
+    verify(mockView).setIsMoreUpdatableEntities(true);
 
-		// now test refresh after a context change
-		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(new Synapse("different place"));
-		widget.refresh();
+    entities.clear();
+    widget.loadMoreUserUpdateable();
+    verify(mockSynapseJavascriptClient, times(2))
+      .getMyProjects(
+        any(ProjectListType.class),
+        anyInt(),
+        anyString(),
+        any(ProjectListSortColumn.class),
+        any(SortDirection.class),
+        any(AsyncCallback.class)
+      );
+    verify(mockView).setIsMoreUpdatableEntities(false);
+  }
 
-		verify(mockEntityTreeBrowser).clear();
-		verify(mockView, times(2)).setIsMoreUpdatableEntities(true);
-		verify(mockSynapseJavascriptClient).getMyProjects(any(ProjectListType.class), anyInt(), anyString(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
+  @Test
+  public void testLoadUserUpdateableAnonymous() {
+    when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+    widget.loadMoreUserUpdateable();
+    verify(mockView, never()).addUpdatableEntities(anyList());
+  }
 
-		// test clearState() when context has changed
-		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(new Synapse("yet another different place"));
-		widget.clearState();
-		verify(mockView).clear();
-	}
+  @Test
+  public void testLoadUserUpdateableFailure() {
+    String errorMessage = "An error occurred.";
+    AsyncMockStubber
+      .callFailureWith(new Exception(errorMessage))
+      .when(mockSynapseJavascriptClient)
+      .getMyProjects(
+        any(ProjectListType.class),
+        anyInt(),
+        anyString(),
+        any(ProjectListSortColumn.class),
+        any(SortDirection.class),
+        any(AsyncCallback.class)
+      );
+    widget.loadMoreUserUpdateable();
+    verify(mockView, never()).addUpdatableEntities(anyList());
+    verify(mockView).showErrorMessage(errorMessage);
+  }
 
-	@Test
-	public void testLoadContextNotSynapsePlace() {
-		// in case the entity finder is used outside of a Synapse place, we don't know how to figure out the
-		// current project
-		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(new Profile(""));
-		widget.loadCurrentContext();
-		verify(mockView).setCurrentContextTabVisible(false);
-	}
+  @Test
+  public void testIsSameContextNullPlaceAndToken() {
+    when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(null);
+    when(mockAuthenticationController.getCurrentUserPrincipalId())
+      .thenReturn(null);
+    assertFalse(widget.isSameContext());
+    when(mockGlobalApplicationState.getCurrentPlace())
+      .thenReturn(new Synapse("syn123"));
+    assertFalse(widget.isSameContext());
+    when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(null);
+    when(mockAuthenticationController.getCurrentUserPrincipalId())
+      .thenReturn("12345");
+    assertFalse(widget.isSameContext());
+  }
 
-	@Test
-	public void testLoadContextSynapsePlaceSuccess() {
-		EntityBundle eb = new EntityBundle();
-		EntityPath path = new EntityPath();
-		path.setPath(new ArrayList<EntityHeader>());
-		eb.setPath(path);
-		AsyncMockStubber.callSuccessWith(eb).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), any(EntityBundleRequest.class), any(AsyncCallback.class));
+  @Test
+  public void testContextChange() {
+    when(mockProjectHeaderList.getNextPageToken())
+      .thenReturn("abc", "def", "null");
+    // first, verify that updateContext does what we expect it to
+    Synapse s = new Synapse("syn123");
+    String userId = "12345";
+    when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(s);
+    when(mockAuthenticationController.getCurrentUserPrincipalId())
+      .thenReturn(userId);
+    assertNull(widget.getCachedCurrentPlace());
+    assertNull(widget.getCachedUserId());
+    widget.updateContext();
+    assertEquals(s, widget.getCachedCurrentPlace());
+    assertEquals(userId, widget.getCachedUserId());
 
-		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(new Synapse("syn123"));
-		widget.loadCurrentContext();
-		verify(mockView).setCurrentContextTabVisible(true);
-		verify(mockSynapseJavascriptClient).getEntityBundle(anyString(), any(EntityBundleRequest.class), any(AsyncCallback.class));
-		verify(mockCurrentContextTreeBrowser).configure(anyList());
-	}
+    // test refresh when the context has not changed
+    widget.refresh();
 
-	@Test
-	public void testLoadContextSynapsePlaceFailure() {
-		String errorMessage = "failure to load entity path";
-		Exception ex = new Exception(errorMessage);
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), any(EntityBundleRequest.class), any(AsyncCallback.class));
+    // test clearState() when context has not changed
+    widget.clearState();
+    verify(mockView).clearSelection();
 
-		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(new Synapse("syn123"));
-		widget.loadCurrentContext();
-		verify(mockView).setCurrentContextTabVisible(true);
-		verify(mockSynapseJavascriptClient).getEntityBundle(anyString(), any(EntityBundleRequest.class), any(AsyncCallback.class));
-		verify(mockView).showErrorMessage(errorMessage);
-	}
+    // now test refresh after a context change
+    when(mockGlobalApplicationState.getCurrentPlace())
+      .thenReturn(new Synapse("different place"));
+    widget.refresh();
 
-	@Test
-	public void testSetEntityFilter() {
-		Synapse s = new Synapse("syn123");
-		String userId = "12345";
-		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(s);
-		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(userId);
-		widget.updateContext();
-		assertEquals(s, widget.getCachedCurrentPlace());
-		assertEquals(userId, widget.getCachedUserId());
+    verify(mockEntityTreeBrowser).clear();
+    verify(mockView, times(2)).setIsMoreUpdatableEntities(true);
+    verify(mockSynapseJavascriptClient)
+      .getMyProjects(
+        any(ProjectListType.class),
+        anyInt(),
+        anyString(),
+        any(ProjectListSortColumn.class),
+        any(SortDirection.class),
+        any(AsyncCallback.class)
+      );
 
-		// verify that context is updated when the filter is set.
-		s = new Synapse("syn321");
-		userId = "54321";
-		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(s);
-		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(userId);
-		EntityFilter filter = EntityFilter.ALL;
-		widget.setEntityFilter(filter);
-		verify(mockEntityTreeBrowser).setEntityFilter(filter);
-		verify(mockFavoritesTreeBrowser).setEntityFilter(filter);
-		verify(mockCurrentContextTreeBrowser).setEntityFilter(filter);
-		assertEquals(s, widget.getCachedCurrentPlace());
-		assertEquals(userId, widget.getCachedUserId());
-	}
+    // test clearState() when context has changed
+    when(mockGlobalApplicationState.getCurrentPlace())
+      .thenReturn(new Synapse("yet another different place"));
+    widget.clearState();
+    verify(mockView).clear();
+  }
+
+  @Test
+  public void testLoadContextNotSynapsePlace() {
+    // in case the entity finder is used outside of a Synapse place, we don't know how to figure out the
+    // current project
+    when(mockGlobalApplicationState.getCurrentPlace())
+      .thenReturn(new Profile(""));
+    widget.loadCurrentContext();
+    verify(mockView).setCurrentContextTabVisible(false);
+  }
+
+  @Test
+  public void testLoadContextSynapsePlaceSuccess() {
+    EntityBundle eb = new EntityBundle();
+    EntityPath path = new EntityPath();
+    path.setPath(new ArrayList<EntityHeader>());
+    eb.setPath(path);
+    AsyncMockStubber
+      .callSuccessWith(eb)
+      .when(mockSynapseJavascriptClient)
+      .getEntityBundle(
+        anyString(),
+        any(EntityBundleRequest.class),
+        any(AsyncCallback.class)
+      );
+
+    when(mockGlobalApplicationState.getCurrentPlace())
+      .thenReturn(new Synapse("syn123"));
+    widget.loadCurrentContext();
+    verify(mockView).setCurrentContextTabVisible(true);
+    verify(mockSynapseJavascriptClient)
+      .getEntityBundle(
+        anyString(),
+        any(EntityBundleRequest.class),
+        any(AsyncCallback.class)
+      );
+    verify(mockCurrentContextTreeBrowser).configure(anyList());
+  }
+
+  @Test
+  public void testLoadContextSynapsePlaceFailure() {
+    String errorMessage = "failure to load entity path";
+    Exception ex = new Exception(errorMessage);
+    AsyncMockStubber
+      .callFailureWith(ex)
+      .when(mockSynapseJavascriptClient)
+      .getEntityBundle(
+        anyString(),
+        any(EntityBundleRequest.class),
+        any(AsyncCallback.class)
+      );
+
+    when(mockGlobalApplicationState.getCurrentPlace())
+      .thenReturn(new Synapse("syn123"));
+    widget.loadCurrentContext();
+    verify(mockView).setCurrentContextTabVisible(true);
+    verify(mockSynapseJavascriptClient)
+      .getEntityBundle(
+        anyString(),
+        any(EntityBundleRequest.class),
+        any(AsyncCallback.class)
+      );
+    verify(mockView).showErrorMessage(errorMessage);
+  }
+
+  @Test
+  public void testSetEntityFilter() {
+    Synapse s = new Synapse("syn123");
+    String userId = "12345";
+    when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(s);
+    when(mockAuthenticationController.getCurrentUserPrincipalId())
+      .thenReturn(userId);
+    widget.updateContext();
+    assertEquals(s, widget.getCachedCurrentPlace());
+    assertEquals(userId, widget.getCachedUserId());
+
+    // verify that context is updated when the filter is set.
+    s = new Synapse("syn321");
+    userId = "54321";
+    when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(s);
+    when(mockAuthenticationController.getCurrentUserPrincipalId())
+      .thenReturn(userId);
+    EntityFilter filter = EntityFilter.ALL;
+    widget.setEntityFilter(filter);
+    verify(mockEntityTreeBrowser).setEntityFilter(filter);
+    verify(mockFavoritesTreeBrowser).setEntityFilter(filter);
+    verify(mockCurrentContextTreeBrowser).setEntityFilter(filter);
+    assertEquals(s, widget.getCachedCurrentPlace());
+    assertEquals(userId, widget.getCachedUserId());
+  }
 }

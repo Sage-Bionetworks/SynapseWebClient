@@ -1,72 +1,75 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
-import org.gwtbootstrap3.client.ui.TextArea;
-import org.sagebionetworks.web.client.DisplayUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.gwtbootstrap3.client.ui.TextArea;
+import org.sagebionetworks.web.client.DisplayUtils;
 
 public class TabbedTableConfigViewImpl implements TabbedTableConfigView {
-	public interface TabbedTableConfigViewImplUiBinder extends UiBinder<Widget, TabbedTableConfigViewImpl> {
-	}
 
-	private Presenter presenter;
+  public interface TabbedTableConfigViewImplUiBinder
+    extends UiBinder<Widget, TabbedTableConfigViewImpl> {}
 
-	@UiField
-	public TextArea tableContents;
+  private Presenter presenter;
 
-	public Widget widget;
+  @UiField
+  public TextArea tableContents;
 
-	@Inject
-	public TabbedTableConfigViewImpl(TabbedTableConfigViewImplUiBinder binder) {
-		widget = binder.createAndBindUi(this);
-	}
+  public Widget widget;
 
-	@Override
-	public void initView() {}
+  @Inject
+  public TabbedTableConfigViewImpl(TabbedTableConfigViewImplUiBinder binder) {
+    widget = binder.createAndBindUi(this);
+  }
 
-	@Override
-	public void checkParams() throws IllegalArgumentException {
-		if (!DisplayUtils.isDefined(tableContents.getValue()))
-			throw new IllegalArgumentException("Please enter the table data and try again.");
-	}
+  @Override
+  public void initView() {}
 
-	@Override
-	public Widget asWidget() {
-		return widget;
-	}
+  @Override
+  public void checkParams() throws IllegalArgumentException {
+    if (
+      !DisplayUtils.isDefined(tableContents.getValue())
+    ) throw new IllegalArgumentException(
+      "Please enter the table data and try again."
+    );
+  }
 
-	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-	}
+  @Override
+  public Widget asWidget() {
+    return widget;
+  }
 
-	@Override
-	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
-	}
+  @Override
+  public void setPresenter(Presenter presenter) {
+    this.presenter = presenter;
+  }
 
-	@Override
-	public void showLoading() {}
+  @Override
+  public void showErrorMessage(String message) {
+    DisplayUtils.showErrorMessage(message);
+  }
 
-	@Override
-	public void showInfo(String message) {
-		DisplayUtils.showInfo(message);
-	}
+  @Override
+  public void showLoading() {}
 
-	@Override
-	public void clear() {
-		tableContents.setValue("");
-	}
+  @Override
+  public void showInfo(String message) {
+    DisplayUtils.showInfo(message);
+  }
 
-	@Override
-	public String getTableContents() {
-		return tableContents.getValue();
-	}
+  @Override
+  public void clear() {
+    tableContents.setValue("");
+  }
 
-	/*
-	 * Private Methods
-	 */
+  @Override
+  public String getTableContents() {
+    return tableContents.getValue();
+  }
+  /*
+   * Private Methods
+   */
 
 }

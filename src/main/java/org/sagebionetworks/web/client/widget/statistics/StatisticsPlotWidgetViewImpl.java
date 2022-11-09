@@ -1,6 +1,14 @@
 package org.sagebionetworks.web.client.widget.statistics;
 
 import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
+
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.html.Div;
@@ -11,51 +19,68 @@ import org.sagebionetworks.web.client.jsinterop.SynapseContextProviderProps;
 import org.sagebionetworks.web.client.jsni.SynapseContextProviderPropsJSNIObject;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.Element;
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+public class StatisticsPlotWidgetViewImpl
+  implements StatisticsPlotWidgetView, IsWidget {
 
-public class StatisticsPlotWidgetViewImpl implements StatisticsPlotWidgetView, IsWidget {
-	public static final String ROOT_PORTAL_URL = Window.Location.getProtocol() + "//" + Window.Location.getHost() + "/";
-	public static final String GOOGLE_OAUTH_CALLBACK_URL = ROOT_PORTAL_URL + "Portal/oauth2callback?oauth2provider=GOOGLE_OAUTH_2_0";
-	public static final String GOOGLE_OAUTH_WITH_STATE_CALLBACK_URL = GOOGLE_OAUTH_CALLBACK_URL + "&state=";
+  public static final String ROOT_PORTAL_URL =
+    Window.Location.getProtocol() + "//" + Window.Location.getHost() + "/";
+  public static final String GOOGLE_OAUTH_CALLBACK_URL =
+    ROOT_PORTAL_URL + "Portal/oauth2callback?oauth2provider=GOOGLE_OAUTH_2_0";
+  public static final String GOOGLE_OAUTH_WITH_STATE_CALLBACK_URL =
+    GOOGLE_OAUTH_CALLBACK_URL + "&state=";
 
-	public interface StatisticsPlotWidgetViewImplUiBinder extends UiBinder<Widget, StatisticsPlotWidgetViewImpl> {
-	}
+  public interface StatisticsPlotWidgetViewImplUiBinder
+    extends UiBinder<Widget, StatisticsPlotWidgetViewImpl> {}
 
-	@UiField
-	ReactComponentDiv srcContainer;
-	@UiField
-	Button closeButton;
-	@UiField
-	Modal statsPlotModal;
-	Widget widget;
-	SynapseJSNIUtils jsniUtils;
-	SynapseContextPropsProvider propsProvider;
-	String endpoint;
-	
-	@Inject
-	public StatisticsPlotWidgetViewImpl(StatisticsPlotWidgetViewImplUiBinder binder, SynapseJSNIUtils jsniUtils, SynapseProperties synapseProperties, SynapseContextPropsProvider propsProvider) {
-		widget = binder.createAndBindUi(this);
-		this.jsniUtils = jsniUtils;
-		this.propsProvider = propsProvider;
-		endpoint = synapseProperties.getSynapseProperty(REPO_SERVICE_URL_KEY);
-		closeButton.addClickHandler(event -> {
-			statsPlotModal.hide();
-		});
-	}
+  @UiField
+  ReactComponentDiv srcContainer;
 
-	@Override
-	public void configureAndShow(String projectId, String accessToken) {
-		_createSRCWidget(srcContainer, projectId, accessToken, endpoint, propsProvider.getJsniContextProps());
-		statsPlotModal.show();
-	}
+  @UiField
+  Button closeButton;
 
-	private static native void _createSRCWidget(ReactComponentDiv reactComponentDiv, String projectId, String accessToken, String fullRepoEndpoint, SynapseContextProviderPropsJSNIObject wrapperProps) /*-{
+  @UiField
+  Modal statsPlotModal;
+
+  Widget widget;
+  SynapseJSNIUtils jsniUtils;
+  SynapseContextPropsProvider propsProvider;
+  String endpoint;
+
+  @Inject
+  public StatisticsPlotWidgetViewImpl(
+    StatisticsPlotWidgetViewImplUiBinder binder,
+    SynapseJSNIUtils jsniUtils,
+    SynapseProperties synapseProperties,
+    SynapseContextPropsProvider propsProvider
+  ) {
+    widget = binder.createAndBindUi(this);
+    this.jsniUtils = jsniUtils;
+    this.propsProvider = propsProvider;
+    endpoint = synapseProperties.getSynapseProperty(REPO_SERVICE_URL_KEY);
+    closeButton.addClickHandler(event -> {
+      statsPlotModal.hide();
+    });
+  }
+
+  @Override
+  public void configureAndShow(String projectId, String accessToken) {
+    _createSRCWidget(
+      srcContainer,
+      projectId,
+      accessToken,
+      endpoint,
+      propsProvider.getJsniContextProps()
+    );
+    statsPlotModal.show();
+  }
+
+  private static native void _createSRCWidget(
+    ReactComponentDiv reactComponentDiv,
+    String projectId,
+    String accessToken,
+    String fullRepoEndpoint,
+    SynapseContextProviderPropsJSNIObject wrapperProps
+  ) /*-{
 		try {
 			// URL.host returns the domain (that is the hostname) followed by (if a port was specified) a ':' and the port of the URL
 			var repoURL = new URL(fullRepoEndpoint);
@@ -80,16 +105,16 @@ public class StatisticsPlotWidgetViewImpl implements StatisticsPlotWidgetView, I
 		}
 	}-*/;
 
-	@Override
-	public Widget asWidget() {
-		return widget;
-	}
+  @Override
+  public Widget asWidget() {
+    return widget;
+  }
 
-	@Override
-	public void clear() {}
+  @Override
+  public void clear() {}
 
-	@Override
-	public void setVisible(boolean visible) {
-		widget.setVisible(visible);
-	}
+  @Override
+  public void setVisible(boolean visible) {
+    widget.setVisible(visible);
+  }
 }

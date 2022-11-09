@@ -1,56 +1,55 @@
 package org.sagebionetworks.web.client.widget.team.controller;
 
+import com.google.gwt.user.client.ui.Widget;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.utils.Callback;
-import com.google.gwt.user.client.ui.Widget;
 
 public interface TeamEditModalWidgetView {
+  public interface Presenter {
+    public Widget asWidget();
 
-	public interface Presenter {
-		public Widget asWidget();
+    void setRefreshCallback(Callback refreshCallback);
 
-		void setRefreshCallback(Callback refreshCallback);
+    void onConfirm();
 
-		void onConfirm();
+    void hide();
 
-		void hide();
+    void onRemovePicture();
+  }
 
-		void onRemovePicture();
-	}
+  public Widget asWidget();
 
-	public Widget asWidget();
+  public void setAlertWidget(Widget asWidget);
 
-	public void setAlertWidget(Widget asWidget);
+  void setPresenter(Presenter presenter);
 
-	void setPresenter(Presenter presenter);
+  String getName();
 
-	String getName();
+  String getDescription();
 
-	String getDescription();
+  boolean getPublicJoin();
 
-	boolean getPublicJoin();
+  void setUploadWidget(Widget uploader);
 
-	void setUploadWidget(Widget uploader);
+  void setImageURL(String fileHandleId);
 
-	void setImageURL(String fileHandleId);
+  void setDefaultIconVisible();
 
-	void setDefaultIconVisible();
+  void setAuthenticatedUsersCanSendMessageToTeam(boolean canSendMessage);
 
-	void setAuthenticatedUsersCanSendMessageToTeam(boolean canSendMessage);
+  boolean canAuthenticatedUsersSendMessageToTeam();
 
-	boolean canAuthenticatedUsersSendMessageToTeam();
+  void showInfo(String message);
 
-	void showInfo(String message);
+  void show();
 
-	void show();
+  void hide();
 
-	void hide();
+  void showLoading();
 
-	void showLoading();
+  void hideLoading();
 
-	void hideLoading();
+  void clear();
 
-	void clear();
-
-	void configure(Team team);
+  void configure(Team team);
 }

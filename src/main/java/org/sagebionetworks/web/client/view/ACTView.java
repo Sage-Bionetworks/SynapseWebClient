@@ -1,32 +1,32 @@
 package org.sagebionetworks.web.client.view;
 
-import java.util.List;
-import org.sagebionetworks.web.client.SynapseView;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import java.util.List;
+import org.sagebionetworks.web.client.SynapseView;
 
 public interface ACTView extends IsWidget, SynapseView {
-	void setPresenter(Presenter presenter);
+  void setPresenter(Presenter presenter);
 
-	void setUserPickerWidget(Widget w);
+  void setUserPickerWidget(Widget w);
 
-	void setLoadMoreContainer(Widget w);
+  void setLoadMoreContainer(Widget w);
 
-	void setStates(List<String> states);
+  void setStates(List<String> states);
 
-	void setSynAlert(Widget w);
+  void setSynAlert(Widget w);
 
-	void setSelectedStateText(String state);
+  void setSelectedStateText(String state);
 
-	void setSelectedUserBadge(Widget w);
+  void setSelectedUserBadge(Widget w);
 
-	void setSelectedUserBadgeVisible(boolean visible);
+  void setSelectedUserBadgeVisible(boolean visible);
 
-	public interface Presenter {
-		void onClearUserFilter();
+  public interface Presenter {
+    void onClearUserFilter();
 
-		void onClearStateFilter();
+    void onClearStateFilter();
 
-		void onStateSelected(String state);
-	}
+    void onStateSelected(String state);
+  }
 }

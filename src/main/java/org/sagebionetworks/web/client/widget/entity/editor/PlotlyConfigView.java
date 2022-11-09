@@ -1,88 +1,87 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import com.google.gwt.user.client.ui.IsWidget;
 import java.util.List;
 import org.sagebionetworks.web.client.plotly.AxisType;
 import org.sagebionetworks.web.client.plotly.BarMode;
 import org.sagebionetworks.web.client.plotly.GraphType;
-import com.google.gwt.user.client.ui.IsWidget;
 
 public interface PlotlyConfigView extends IsWidget {
+  void setPresenter(Presenter presenter);
 
-	void setPresenter(Presenter presenter);
+  String getTitle();
 
-	String getTitle();
+  void setTitle(String title);
 
-	void setTitle(String title);
+  void setGraphType(GraphType graphType);
 
-	void setGraphType(GraphType graphType);
+  GraphType getGraphType();
 
-	GraphType getGraphType();
+  String getXAxisLabel();
 
-	String getXAxisLabel();
+  void setXAxisLabel(String label);
 
-	void setXAxisLabel(String label);
+  String getYAxisLabel();
 
-	String getYAxisLabel();
+  void setYAxisLabel(String label);
 
-	void setYAxisLabel(String label);
+  String getAdvancedClause();
 
-	String getAdvancedClause();
+  void setAdvancedClause(String v);
 
-	void setAdvancedClause(String v);
+  void setBarMode(BarMode barMode);
 
-	void setBarMode(BarMode barMode);
+  BarMode getBarMode();
 
-	BarMode getBarMode();
+  void clearYAxisColumns();
 
-	void clearYAxisColumns();
+  void addYAxisColumn(String yColumnName);
 
-	void addYAxisColumn(String yColumnName);
+  void setTableName(String value);
 
-	void setTableName(String value);
+  void setXAxisColumnName(String value);
 
-	void setXAxisColumnName(String value);
+  String getXAxisColumnName();
 
-	String getXAxisColumnName();
+  void setBarModeVisible(boolean visible);
 
-	void setBarModeVisible(boolean visible);
+  void setBarOrientationVisible(boolean visible);
 
-	void setBarOrientationVisible(boolean visible);
+  boolean isBarOrientationHorizontal();
 
-	boolean isBarOrientationHorizontal();
+  void setBarOrientationHorizontal(boolean isHorizontal);
 
-	void setBarOrientationHorizontal(boolean isHorizontal);
+  void setSynAlert(IsWidget w);
 
-	void setSynAlert(IsWidget w);
+  void add(IsWidget w);
 
-	void add(IsWidget w);
+  void setAvailableColumns(List<String> names);
 
-	void setAvailableColumns(List<String> names);
+  void resetSelectedYColumn();
 
-	void resetSelectedYColumn();
+  void setShowHideButton(IsWidget w);
 
-	void setShowHideButton(IsWidget w);
+  void setAdvancedUIVisible(boolean visible);
 
-	void setAdvancedUIVisible(boolean visible);
+  void setShowLegend(boolean value);
 
-	void setShowLegend(boolean value);
+  boolean isShowLegend();
 
-	boolean isShowLegend();
+  AxisType getXAxisType();
 
-	AxisType getXAxisType();
+  AxisType getYAxisType();
 
-	AxisType getYAxisType();
+  void setXAxisType(AxisType axisType);
 
-	void setXAxisType(AxisType axisType);
+  void setYAxisType(AxisType axisType);
 
-	void setYAxisType(AxisType axisType);
+  public interface Presenter {
+    void onFindTable();
 
-	public interface Presenter {
-		void onFindTable();
+    void onXColumnChanged();
 
-		void onXColumnChanged();
+    void onAddYColumn(String yColumnName);
 
-		void onAddYColumn(String yColumnName);
-
-		void onRemoveYColumn(String yColumnName);
-	}
+    void onRemoveYColumn(String yColumnName);
+  }
 }

@@ -6,26 +6,27 @@ import com.google.gwt.place.shared.Prefix;
 
 public class Challenges extends Place {
 
-	private String token;
+  private String token;
 
-	public Challenges(String token) {
-		this.token = token;
-	}
+  public Challenges(String token) {
+    this.token = token;
+  }
 
-	public String toToken() {
-		return token;
-	}
+  public String toToken() {
+    return token;
+  }
 
-	@Prefix("!Challenges")
-	public static class Tokenizer implements PlaceTokenizer<Challenges> {
-		@Override
-		public String getToken(Challenges place) {
-			return place.toToken();
-		}
+  @Prefix("!Challenges")
+  public static class Tokenizer implements PlaceTokenizer<Challenges> {
 
-		@Override
-		public Challenges getPlace(String token) {
-			return new Challenges(token);
-		}
-	}
+    @Override
+    public String getToken(Challenges place) {
+      return place.toToken();
+    }
+
+    @Override
+    public Challenges getPlace(String token) {
+      return new Challenges(token);
+    }
+  }
 }

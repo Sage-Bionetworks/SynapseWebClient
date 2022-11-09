@@ -1,99 +1,97 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
-import java.util.List;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import java.util.List;
 
 public interface StorageLocationWidgetView {
+  public interface Presenter {
+    Widget asWidget();
 
-	public interface Presenter {
+    void onSave();
 
-		Widget asWidget();
+    void clear();
+  }
 
-		void onSave();
+  Widget asWidget();
 
-		void clear();
-	}
+  void setSynAlertWidget(IsWidget asWidget);
 
-	Widget asWidget();
+  void setPresenter(Presenter presenter);
 
-	void setSynAlertWidget(IsWidget asWidget);
+  void clear();
 
-	void setPresenter(Presenter presenter);
+  void hide();
 
-	void clear();
+  void show();
 
-	void hide();
+  void selectSynapseStorage();
 
-	void show();
+  boolean isSynapseStorageSelected();
 
-	void selectSynapseStorage();
+  void selectExternalS3Storage();
 
-	boolean isSynapseStorageSelected();
+  boolean isExternalS3StorageSelected();
 
-	void selectExternalS3Storage();
+  void selectExternalGoogleCloudStorage();
 
-	boolean isExternalS3StorageSelected();
+  boolean isExternalGoogleCloudStorageSelected();
 
-	void selectExternalGoogleCloudStorage();
+  void selectExternalObjectStore();
 
-	boolean isExternalGoogleCloudStorageSelected();
+  boolean isExternalObjectStoreSelected();
 
-	void selectExternalObjectStore();
+  void setExternalObjectStoreBanner(String banner);
 
-	boolean isExternalObjectStoreSelected();
+  String getExternalObjectStoreBanner();
 
-	void setExternalObjectStoreBanner(String banner);
+  void setExternalObjectStoreBucket(String bucket);
 
-	String getExternalObjectStoreBanner();
+  String getExternalObjectStoreBucket();
 
-	void setExternalObjectStoreBucket(String bucket);
+  void setExternalObjectStoreEndpointUrl(String url);
 
-	String getExternalObjectStoreBucket();
+  String getExternalObjectStoreEndpointUrl();
 
-	void setExternalObjectStoreEndpointUrl(String url);
+  void setExternalObjectStoreVisible(boolean visible);
 
-	String getExternalObjectStoreEndpointUrl();
+  String getS3Bucket();
 
-	void setExternalObjectStoreVisible(boolean visible);
+  void setS3Bucket(String bucket);
 
-	String getS3Bucket();
+  String getGoogleCloudBucket();
 
-	void setS3Bucket(String bucket);
+  void setGoogleCloudBucket(String bucket);
 
-	String getGoogleCloudBucket();
+  String getS3BaseKey();
 
-	void setGoogleCloudBucket(String bucket);
+  String getGoogleCloudBaseKey();
 
-	String getS3BaseKey();
+  void setS3BaseKey(String baseKey);
 
-	String getGoogleCloudBaseKey();
+  void setGoogleCloudBaseKey(String baseKey);
 
-	void setS3BaseKey(String baseKey);
+  String getExternalS3Banner();
 
-	void setGoogleCloudBaseKey(String baseKey);
+  void setExternalS3Banner(String banner);
 
-	String getExternalS3Banner();
+  String getExternalGoogleCloudBanner();
 
-	void setExternalS3Banner(String banner);
+  void setExternalGoogleCloudBanner(String banner);
 
-	String getExternalGoogleCloudBanner();
+  void showErrorMessage(String message);
 
-	void setExternalGoogleCloudBanner(String banner);
+  void setBannerSuggestions(List<String> banners);
 
-	void showErrorMessage(String message);
+  void setBannerDropdownVisible(boolean isVisible);
 
-	void setBannerSuggestions(List<String> banners);
+  void setGoogleCloudVisible(boolean visible);
 
-	void setBannerDropdownVisible(boolean isVisible);
+  void setLoading(boolean isLoading);
 
-	void setGoogleCloudVisible(boolean visible);
+  void setS3StsVisible(boolean visible);
 
-	void setLoading(boolean isLoading);
+  void setS3StsEnabled(boolean stsEnabled);
 
-	void setS3StsVisible(boolean visible);
-
-	void setS3StsEnabled(boolean stsEnabled);
-
-	boolean getS3StsEnabled();
+  boolean getS3StsEnabled();
 }

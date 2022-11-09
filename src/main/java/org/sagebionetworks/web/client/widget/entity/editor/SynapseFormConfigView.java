@@ -1,17 +1,16 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
-import org.sagebionetworks.web.client.widget.WidgetEditorView;
 import com.google.gwt.user.client.ui.IsWidget;
+import org.sagebionetworks.web.client.widget.WidgetEditorView;
 
 public interface SynapseFormConfigView extends IsWidget, WidgetEditorView {
+  void setPresenter(Presenter presenter);
 
-	void setPresenter(Presenter presenter);
+  void setEntityId(String entityId);
 
-	void setEntityId(String entityId);
+  String getEntityId();
 
-	String getEntityId();
-
-	public interface Presenter {
-		void onEntityFinderButtonClicked();
-	}
+  public interface Presenter {
+    void onEntityFinderButtonClicked();
+  }
 }

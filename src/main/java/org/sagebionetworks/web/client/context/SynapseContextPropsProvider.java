@@ -7,19 +7,19 @@ import org.sagebionetworks.web.client.jsinterop.reactquery.QueryClient;
 import org.sagebionetworks.web.client.jsni.SynapseContextProviderPropsJSNIObject;
 
 /**
- * Synapse React Client components must be wrapped in a SynapseContextProvider. A SynapseContextPropsProvider provides the props for the 
+ * Synapse React Client components must be wrapped in a SynapseContextProvider. A SynapseContextPropsProvider provides the props for the
  * SynapseContextProvider.
  */
 public interface SynapseContextPropsProvider {
-    /**
-     * Provides props for {@link org.sagebionetworks.web.client.jsinterop.SRC.SynapseContext#SynapseContextProvider}.
-     * Typically, props will be supplied to {@link org.sagebionetworks.web.client.jsinterop.React#createElementWithSynapseContext(ReactComponentType, ReactComponentProps, SynapseContextProviderProps)}
-     */
-    SynapseContextProviderProps getJsInteropContextProps();
+  /**
+   * Provides props for {@link org.sagebionetworks.web.client.jsinterop.SRC.SynapseContext#SynapseContextProvider}.
+   * Typically, props will be supplied to {@link org.sagebionetworks.web.client.jsinterop.React#createElementWithSynapseContext(ReactComponentType, ReactComponentProps, SynapseContextProviderProps)}
+   */
+  SynapseContextProviderProps getJsInteropContextProps();
 
-    /**
-     * Provides JSNI-compatible props for SynapseContextProvider. If you're porting a new React component, please consider
-     * using JsInterop before using JSNI.
-     */
-    SynapseContextProviderPropsJSNIObject getJsniContextProps();
+  /**
+   * Provides JSNI-compatible props for SynapseContextProvider. If you're porting a new React component, please consider
+   * using JsInterop before using JSNI.
+   */
+  SynapseContextProviderPropsJSNIObject getJsniContextProps();
 }

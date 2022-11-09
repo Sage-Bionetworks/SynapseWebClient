@@ -7,12 +7,12 @@ import jsinterop.annotations.JsType;
 @JsType(isNative = true, namespace = JsPackage.GLOBAL, name = "Object")
 public class SynapseHomepageProps extends ReactComponentProps {
 
-	String projectViewId;
+  String projectViewId;
 
-	@JsOverlay
-	public static SynapseHomepageProps create(String projectViewId) {
-		SynapseHomepageProps props = new SynapseHomepageProps();
-		props.projectViewId = projectViewId;
-		return props;
-	}
+  @JsOverlay
+  public static SynapseHomepageProps create(String projectViewId) {
+    SynapseHomepageProps props = new SynapseHomepageProps();
+    props.projectViewId = projectViewId;
+    return props;
+  }
 }

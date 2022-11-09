@@ -2,28 +2,27 @@ package org.sagebionetworks.web.client.widget.table.v2.results;
 
 /**
  * Abstraction for a listener to input queries.
- * 
+ *
  * @author John
  *
  */
 public interface QueryInputListener {
+  /**
+   * Called when the user explicitly execute a query.
+   *
+   * @param sql
+   */
+  public void onExecuteQuery(String sql);
 
-	/**
-	 * Called when the user explicitly execute a query.
-	 * 
-	 * @param sql
-	 */
-	public void onExecuteQuery(String sql);
+  /**
+   * Called when the user selects the edit button.
+   */
+  public void onEditResults();
 
-	/**
-	 * Called when the user selects the edit button.
-	 */
-	public void onEditResults();
+  /**
+   * user clicked download files (from view) button.
+   */
+  public void onShowDownloadFilesProgrammatically();
 
-	/**
-	 * user clicked download files (from view) button.
-	 */
-	public void onShowDownloadFilesProgrammatically();
-
-	void onAddToDownloadList();
+  void onAddToDownloadList();
 }

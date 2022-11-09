@@ -4,37 +4,37 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 public interface FacetColumnResultRangeView extends IsWidget {
-	public interface Presenter {
-		void onFacetChange();
-	}
+  public interface Presenter {
+    void onFacetChange();
+  }
 
-	void setPresenter(Presenter p);
+  void setPresenter(Presenter p);
 
-	void setColumnName(String columnName);
+  void setColumnName(String columnName);
 
-	void setMin(String min);
+  void setMin(String min);
 
-	String getMin();
+  String getMin();
 
-	void setMax(String max);
+  void setMax(String max);
 
-	String getMax();
+  String getMax();
 
-	void setSynAlert(Widget w);
+  void setSynAlert(Widget w);
 
-	void setIsAnyValue();
+  void setIsAnyValue();
 
-	void setIsRange();
+  void setIsRange();
 
-	void setIsNotSet();
+  void setIsNotSet();
 
-	boolean isAnyValue();
+  boolean isAnyValue();
 
-	boolean isNotSet();
+  boolean isNotSet();
 
-	// slider view requires the lowerbound and upperbound (which it uses to determine the stepsize too).
-	// These are no-ops for other range types
-	void setLowerBound(String lowerbound);
+  // slider view requires the lowerbound and upperbound (which it uses to determine the stepsize too).
+  // These are no-ops for other range types
+  void setLowerBound(String lowerbound);
 
-	void setUpperBound(String upperbound);
+  void setUpperBound(String upperbound);
 }

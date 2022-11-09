@@ -11,12 +11,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringReader;
-
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -39,123 +37,137 @@ import org.sagebionetworks.web.unitserver.SynapseClientBaseTest;
 
 public class InitSessionServletTest {
 
-	@Mock
-	HttpServletRequest mockRequest;
-	@Mock
-	HttpServletResponse mockResponse;
-	@Mock
-	ServletOutputStream responseOutputStream;
-	@Mock
-	SynapseProvider mockSynapseProvider;
-	@Mock
-	SynapseClient mockSynapse;
-	@Mock
-	UserProfile mockProfile;
-	@Mock
-	PrintWriter mockPrintWriter;
-	@Captor
-	ArgumentCaptor<Cookie> cookieCaptor;
-	@Captor
-	ArgumentCaptor<byte[]> byteArrayCaptor;
-	@Mock
-	TokenProvider mockTokenProvider;
+  @Mock
+  HttpServletRequest mockRequest;
 
-	InitSessionServlet servlet;
-	public static final String TEST_SESSION_TOKEN = "abc-123";
+  @Mock
+  HttpServletResponse mockResponse;
 
-	@Before
-	public void setup() throws IOException, SynapseException {
-		MockitoAnnotations.initMocks(this);
-		servlet = new InitSessionServlet();
+  @Mock
+  ServletOutputStream responseOutputStream;
 
-		when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
-		when(mockSynapse.getMyProfile()).thenReturn(mockProfile);
-		
-		// Setup output stream and response
-		when(mockResponse.getWriter()).thenReturn(mockPrintWriter);
-		when(mockResponse.getOutputStream()).thenReturn(responseOutputStream);
-		when(mockRequest.getScheme()).thenReturn("https");
-		when(mockRequest.getServerName()).thenReturn("www.synapse.org");
-		servlet.setTokenProvider(mockTokenProvider);
-		servlet.setSynapseProvider(mockSynapseProvider);
-		SynapseClientBaseTest.setupTestEndpoints();
-	}
+  @Mock
+  SynapseProvider mockSynapseProvider;
 
-	private void setupSessionInRequest(String token) throws JSONObjectAdapterException, IOException {
-		JSONObjectAdapter adapter = new JSONObjectAdapterImpl();
-		AccessTokenWrapper wrapper = new AccessTokenWrapper();
-		wrapper.setToken(token);
-		wrapper.writeToJSONObject(adapter);
-		BufferedReader br = new BufferedReader(new StringReader(adapter.toJSONString()));
-		when(mockRequest.getReader()).thenReturn(br);
-	}
+  @Mock
+  SynapseClient mockSynapse;
 
-	@Test
-	public void testSetSessionCookie() throws Exception {
-		setupSessionInRequest(TEST_SESSION_TOKEN);
+  @Mock
+  UserProfile mockProfile;
 
-		servlet.doPost(mockRequest, mockResponse);
+  @Mock
+  PrintWriter mockPrintWriter;
 
-		// verify the response Set-Cookie values
-		verify(mockResponse).addCookie(cookieCaptor.capture());
-		Cookie cookie = cookieCaptor.getValue();
-		assertEquals(CookieKeys.USER_LOGIN_TOKEN, cookie.getName());
-		assertEquals(TEST_SESSION_TOKEN, cookie.getValue());
-		assertEquals(InitSessionServlet.DEFAULT_COOKIE_EXPIRATION, cookie.getMaxAge());
-		assertEquals(InitSessionServlet.SYNAPSE_ORG, cookie.getDomain());
-		assertTrue(cookie.isHttpOnly());
-		assertTrue(cookie.getSecure());
-		assertEquals(InitSessionServlet.ROOT_PATH, cookie.getPath());
+  @Captor
+  ArgumentCaptor<Cookie> cookieCaptor;
 
-		verify(mockResponse).setContentType(InitSessionServlet.JSON_CONTENT_TYPE);
-		verify(mockPrintWriter).print(InitSessionServlet.EMPTY_JSON);
-		verify(mockPrintWriter).flush();
-	}
+  @Captor
+  ArgumentCaptor<byte[]> byteArrayCaptor;
 
-	@Test
-	public void testClearSessionCookie() throws Exception {
-		setupSessionInRequest(WebConstants.EXPIRE_SESSION_TOKEN);
-		// also verify secure is not set if http
-		when(mockRequest.getScheme()).thenReturn("http");
-		// and verify the cookie is locked down to your domain if not a .synapse.org subdomain.
-		String serverName = "www.mysynapseportal.com";
-		when(mockRequest.getServerName()).thenReturn(serverName);
+  @Mock
+  TokenProvider mockTokenProvider;
 
-		servlet.doPost(mockRequest, mockResponse);
+  InitSessionServlet servlet;
+  public static final String TEST_SESSION_TOKEN = "abc-123";
 
-		// verify the response Set-Cookie values
-		verify(mockResponse).addCookie(cookieCaptor.capture());
-		Cookie cookie = cookieCaptor.getValue();
-		assertEquals(CookieKeys.USER_LOGIN_TOKEN, cookie.getName());
-		assertEquals(WebConstants.EXPIRE_SESSION_TOKEN, cookie.getValue());
-		assertEquals(0, cookie.getMaxAge());
-		assertNull(cookie.getDomain());
-		assertTrue(cookie.isHttpOnly());
-		assertFalse(cookie.getSecure());
-		assertEquals(InitSessionServlet.ROOT_PATH, cookie.getPath());
-	}
+  @Before
+  public void setup() throws IOException, SynapseException {
+    MockitoAnnotations.initMocks(this);
+    servlet = new InitSessionServlet();
 
-	@Test
-	public void testDoGetSession() throws Exception {
-		String sessionToken = "abc123-fake";
-		when(mockTokenProvider.getToken()).thenReturn(sessionToken);
+    when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
+    when(mockSynapse.getMyProfile()).thenReturn(mockProfile);
 
-		servlet.doGet(mockRequest, mockResponse);
+    // Setup output stream and response
+    when(mockResponse.getWriter()).thenReturn(mockPrintWriter);
+    when(mockResponse.getOutputStream()).thenReturn(responseOutputStream);
+    when(mockRequest.getScheme()).thenReturn("https");
+    when(mockRequest.getServerName()).thenReturn("www.synapse.org");
+    servlet.setTokenProvider(mockTokenProvider);
+    servlet.setSynapseProvider(mockSynapseProvider);
+    SynapseClientBaseTest.setupTestEndpoints();
+  }
 
-		verify(mockResponse).setStatus(HttpServletResponse.SC_OK);
-		verify(responseOutputStream).write(byteArrayCaptor.capture());
-		assertEquals(sessionToken, new String(byteArrayCaptor.getValue(), "UTF-8"));
-		verify(responseOutputStream).flush();
-	}
+  private void setupSessionInRequest(String token)
+    throws JSONObjectAdapterException, IOException {
+    JSONObjectAdapter adapter = new JSONObjectAdapterImpl();
+    AccessTokenWrapper wrapper = new AccessTokenWrapper();
+    wrapper.setToken(token);
+    wrapper.writeToJSONObject(adapter);
+    BufferedReader br = new BufferedReader(
+      new StringReader(adapter.toJSONString())
+    );
+    when(mockRequest.getReader()).thenReturn(br);
+  }
 
-	@Test
-	public void testDoGetSessionNull() throws Exception {
-		when(mockTokenProvider.getToken()).thenReturn(null);
+  @Test
+  public void testSetSessionCookie() throws Exception {
+    setupSessionInRequest(TEST_SESSION_TOKEN);
 
-		servlet.doGet(mockRequest, mockResponse);
+    servlet.doPost(mockRequest, mockResponse);
 
-		verify(mockResponse).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-		verify(responseOutputStream).flush();
-	}
+    // verify the response Set-Cookie values
+    verify(mockResponse).addCookie(cookieCaptor.capture());
+    Cookie cookie = cookieCaptor.getValue();
+    assertEquals(CookieKeys.USER_LOGIN_TOKEN, cookie.getName());
+    assertEquals(TEST_SESSION_TOKEN, cookie.getValue());
+    assertEquals(
+      InitSessionServlet.DEFAULT_COOKIE_EXPIRATION,
+      cookie.getMaxAge()
+    );
+    assertEquals(InitSessionServlet.SYNAPSE_ORG, cookie.getDomain());
+    assertTrue(cookie.isHttpOnly());
+    assertTrue(cookie.getSecure());
+    assertEquals(InitSessionServlet.ROOT_PATH, cookie.getPath());
+
+    verify(mockResponse).setContentType(InitSessionServlet.JSON_CONTENT_TYPE);
+    verify(mockPrintWriter).print(InitSessionServlet.EMPTY_JSON);
+    verify(mockPrintWriter).flush();
+  }
+
+  @Test
+  public void testClearSessionCookie() throws Exception {
+    setupSessionInRequest(WebConstants.EXPIRE_SESSION_TOKEN);
+    // also verify secure is not set if http
+    when(mockRequest.getScheme()).thenReturn("http");
+    // and verify the cookie is locked down to your domain if not a .synapse.org subdomain.
+    String serverName = "www.mysynapseportal.com";
+    when(mockRequest.getServerName()).thenReturn(serverName);
+
+    servlet.doPost(mockRequest, mockResponse);
+
+    // verify the response Set-Cookie values
+    verify(mockResponse).addCookie(cookieCaptor.capture());
+    Cookie cookie = cookieCaptor.getValue();
+    assertEquals(CookieKeys.USER_LOGIN_TOKEN, cookie.getName());
+    assertEquals(WebConstants.EXPIRE_SESSION_TOKEN, cookie.getValue());
+    assertEquals(0, cookie.getMaxAge());
+    assertNull(cookie.getDomain());
+    assertTrue(cookie.isHttpOnly());
+    assertFalse(cookie.getSecure());
+    assertEquals(InitSessionServlet.ROOT_PATH, cookie.getPath());
+  }
+
+  @Test
+  public void testDoGetSession() throws Exception {
+    String sessionToken = "abc123-fake";
+    when(mockTokenProvider.getToken()).thenReturn(sessionToken);
+
+    servlet.doGet(mockRequest, mockResponse);
+
+    verify(mockResponse).setStatus(HttpServletResponse.SC_OK);
+    verify(responseOutputStream).write(byteArrayCaptor.capture());
+    assertEquals(sessionToken, new String(byteArrayCaptor.getValue(), "UTF-8"));
+    verify(responseOutputStream).flush();
+  }
+
+  @Test
+  public void testDoGetSessionNull() throws Exception {
+    when(mockTokenProvider.getToken()).thenReturn(null);
+
+    servlet.doGet(mockRequest, mockResponse);
+
+    verify(mockResponse).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+    verify(responseOutputStream).flush();
+  }
 }
-

@@ -6,27 +6,28 @@ import com.google.gwt.place.shared.Prefix;
 
 public class ACTDataAccessSubmissionDashboardPlace extends Place {
 
-	private String token;
+  private String token;
 
-	public ACTDataAccessSubmissionDashboardPlace(String token) {
-		this.token = token;
-	}
+  public ACTDataAccessSubmissionDashboardPlace(String token) {
+    this.token = token;
+  }
 
-	public String toToken() {
-		return token;
-	}
+  public String toToken() {
+    return token;
+  }
 
-	@Prefix("!ACTDataAccessSubmissionDashboard")
-	public static class Tokenizer implements PlaceTokenizer<ACTDataAccessSubmissionDashboardPlace> {
-		@Override
-		public String getToken(ACTDataAccessSubmissionDashboardPlace place) {
-			return place.toToken();
-		}
+  @Prefix("!ACTDataAccessSubmissionDashboard")
+  public static class Tokenizer
+    implements PlaceTokenizer<ACTDataAccessSubmissionDashboardPlace> {
 
-		@Override
-		public ACTDataAccessSubmissionDashboardPlace getPlace(String token) {
-			return new ACTDataAccessSubmissionDashboardPlace(token);
-		}
-	}
+    @Override
+    public String getToken(ACTDataAccessSubmissionDashboardPlace place) {
+      return place.toToken();
+    }
 
+    @Override
+    public ACTDataAccessSubmissionDashboardPlace getPlace(String token) {
+      return new ACTDataAccessSubmissionDashboardPlace(token);
+    }
+  }
 }

@@ -7,42 +7,44 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class CreateTableViewWizardStep2ViewImpl implements CreateTableViewWizardStep2View {
+public class CreateTableViewWizardStep2ViewImpl
+  implements CreateTableViewWizardStep2View {
 
-	public interface Binder extends UiBinder<Widget, CreateTableViewWizardStep2ViewImpl> {
-	}
+  public interface Binder
+    extends UiBinder<Widget, CreateTableViewWizardStep2ViewImpl> {}
 
-	@UiField
-	SimplePanel editorContainer;
-	@UiField
-	SimplePanel jobTrackerContainer;
+  @UiField
+  SimplePanel editorContainer;
 
-	Widget widget;
+  @UiField
+  SimplePanel jobTrackerContainer;
 
-	@Inject
-	public CreateTableViewWizardStep2ViewImpl(Binder binder) {
-		widget = binder.createAndBindUi(this);
-	}
+  Widget widget;
 
-	@Override
-	public Widget asWidget() {
-		return widget;
-	}
+  @Inject
+  public CreateTableViewWizardStep2ViewImpl(Binder binder) {
+    widget = binder.createAndBindUi(this);
+  }
 
-	@Override
-	public void setEditor(IsWidget editorWidget) {
-		editorContainer.clear();
-		editorContainer.setWidget(editorWidget);
-	}
+  @Override
+  public Widget asWidget() {
+    return widget;
+  }
 
-	@Override
-	public void setJobTracker(IsWidget jobTracker) {
-		jobTrackerContainer.clear();
-		jobTrackerContainer.setWidget(jobTracker);
-	}
+  @Override
+  public void setEditor(IsWidget editorWidget) {
+    editorContainer.clear();
+    editorContainer.setWidget(editorWidget);
+  }
 
-	@Override
-	public void setJobTrackerVisible(boolean visible) {
-		jobTrackerContainer.setVisible(visible);
-	}
+  @Override
+  public void setJobTracker(IsWidget jobTracker) {
+    jobTrackerContainer.clear();
+    jobTrackerContainer.setWidget(jobTracker);
+  }
+
+  @Override
+  public void setJobTrackerVisible(boolean visible) {
+    jobTrackerContainer.setVisible(visible);
+  }
 }

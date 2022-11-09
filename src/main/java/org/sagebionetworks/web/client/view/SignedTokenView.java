@@ -1,33 +1,32 @@
 package org.sagebionetworks.web.client.view;
 
-import org.sagebionetworks.repo.model.SignedTokenInterface;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import org.sagebionetworks.repo.model.SignedTokenInterface;
 
 public interface SignedTokenView extends IsWidget {
-	void setSynapseAlert(Widget w);
+  void setSynapseAlert(Widget w);
 
-	void showSuccess(String successMessage);
+  void showSuccess(String successMessage);
 
-	void showConfirmUnsubscribe(SignedTokenInterface signedToken);
+  void showConfirmUnsubscribe(SignedTokenInterface signedToken);
 
-	void clear();
+  void clear();
 
-	void setUnsubscribingUserBadge(Widget w);
+  void setUnsubscribingUserBadge(Widget w);
 
-	void setLoadingVisible(boolean visible);
+  void setLoadingVisible(boolean visible);
 
-	/**
-	 * Set this view's presenter
-	 * 
-	 * @param presenter
-	 */
-	void setPresenter(Presenter presenter);
+  /**
+   * Set this view's presenter
+   *
+   * @param presenter
+   */
+  void setPresenter(Presenter presenter);
 
-	public interface Presenter {
-		void okClicked();
+  public interface Presenter {
+    void okClicked();
 
-		void unsubscribeConfirmed(SignedTokenInterface signedToken);
-	}
-
+    void unsubscribeConfirmed(SignedTokenInterface signedToken);
+  }
 }

@@ -1,15 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import org.gwtbootstrap3.client.ui.CheckBox;
-import org.gwtbootstrap3.client.ui.Tooltip;
-import org.sagebionetworks.repo.model.EntityType;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
-import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
-import org.sagebionetworks.web.client.widget.EntityTypeIcon;
-import org.sagebionetworks.web.client.widget.LoadingSpinner;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -20,175 +10,201 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.gwtbootstrap3.client.ui.CheckBox;
+import org.gwtbootstrap3.client.ui.Tooltip;
+import org.sagebionetworks.repo.model.EntityType;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
+import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
+import org.sagebionetworks.web.client.widget.EntityTypeIcon;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
-public class EntityListRowBadgeViewImpl extends Composite implements EntityListRowBadgeView {
+public class EntityListRowBadgeViewImpl
+  extends Composite
+  implements EntityListRowBadgeView {
 
-	private Presenter presenter;
+  private Presenter presenter;
 
-	public interface Binder extends UiBinder<Widget, EntityListRowBadgeViewImpl> {
-	}
+  public interface Binder
+    extends UiBinder<Widget, EntityListRowBadgeViewImpl> {}
 
-	@UiField
-	TableRow row;
-	@UiField
-	EntityTypeIcon icon;
-	@UiField
-	Anchor entityLink;
-	@UiField
-	SimplePanel createdByField;
-	@UiField
-	Label createdOnField;
+  @UiField
+  TableRow row;
 
-	@UiField
-	org.gwtbootstrap3.client.ui.Anchor addToDownloadListLink;
-	@UiField
-	Label descriptionField;
-	@UiField
-	Label noteField;
-	@UiField
-	Label versionField;
-	@UiField
-	LoadingSpinner loadingUI;
-	@UiField
-	CheckBox select;
-	@UiField
-	TableData selectTableData;
-	@UiField
-	TableData synAlertTableData;
-	@UiField
-	TableData iconTableData;
-	@UiField
-	TableData descriptionTableData;
-	@UiField
-	Tooltip errorTooltip;
+  @UiField
+  EntityTypeIcon icon;
 
-	Callback onAttachCallback;
+  @UiField
+  Anchor entityLink;
 
-	@Inject
-	public EntityListRowBadgeViewImpl(final Binder uiBinder) {
-		initWidget(uiBinder.createAndBindUi(this));
-		select.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onSelectionChanged();
-			}
-		});
-		addToDownloadListLink.addClickHandler(event -> {
-			presenter.onAddToDownloadList();
-		});
-	}
+  @UiField
+  SimplePanel createdByField;
 
-	@Override
-	public void setOnAttachCallback(Callback onAttachCallback) {
-		this.onAttachCallback = onAttachCallback;
-	}
+  @UiField
+  Label createdOnField;
 
-	@Override
-	protected void onAttach() {
-		super.onAttach();
-		if (onAttachCallback != null) {
-			onAttachCallback.invoke();
-		}
-	}
+  @UiField
+  org.gwtbootstrap3.client.ui.Anchor addToDownloadListLink;
 
-	@Override
-	public void setEntityLink(String name, String url) {
-		entityLink.setText(name);
-		entityLink.setHref(url);
-	}
+  @UiField
+  Label descriptionField;
 
-	@Override
-	public void setEntityType(EntityType entityType) {
-		icon.setType(entityType);
-	}
+  @UiField
+  Label noteField;
 
+  @UiField
+  Label versionField;
 
-	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-	}
+  @UiField
+  LoadingSpinner loadingUI;
 
-	@Override
-	public void setCreatedByWidget(Widget w) {
-		createdByField.setWidget(w);
-	}
+  @UiField
+  CheckBox select;
 
-	@Override
-	public void setCreatedOn(String createdOnString) {
-		createdOnField.setText(createdOnString);
-	}
+  @UiField
+  TableData selectTableData;
 
-	@Override
-	public boolean isInViewport() {
-		return DisplayUtils.isInViewport(this);
-	}
+  @UiField
+  TableData synAlertTableData;
 
-	@Override
-	public void showAddToDownloadList() {
-		addToDownloadListLink.setVisible(true);
-	}
+  @UiField
+  TableData iconTableData;
 
-	@Override
-	public void setDescriptionVisible(boolean visible) {
-		descriptionTableData.setVisible(visible);
-	}
+  @UiField
+  TableData descriptionTableData;
 
-	@Override
-	public void setDescription(String description) {
-		descriptionField.setText(description);
-	}
+  @UiField
+  Tooltip errorTooltip;
 
-	@Override
-	public void setNote(String note) {
-		noteField.setText(note);
-	}
+  Callback onAttachCallback;
 
-	@Override
-	public void setVersion(String version) {
-		versionField.setText(version);
-	}
+  @Inject
+  public EntityListRowBadgeViewImpl(final Binder uiBinder) {
+    initWidget(uiBinder.createAndBindUi(this));
+    select.addClickHandler(
+      new ClickHandler() {
+        @Override
+        public void onClick(ClickEvent event) {
+          presenter.onSelectionChanged();
+        }
+      }
+    );
+    addToDownloadListLink.addClickHandler(event -> {
+      presenter.onAddToDownloadList();
+    });
+  }
 
-	@Override
-	public void showLoading() {
-		row.setVisible(false);
-		loadingUI.setVisible(true);
-	}
+  @Override
+  public void setOnAttachCallback(Callback onAttachCallback) {
+    this.onAttachCallback = onAttachCallback;
+  }
 
-	@Override
-	public void showRow() {
-		loadingUI.setVisible(false);
-		synAlertTableData.setVisible(false);
-		row.setVisible(true);
-		iconTableData.setVisible(true);
-	}
+  @Override
+  protected void onAttach() {
+    super.onAttach();
+    if (onAttachCallback != null) {
+      onAttachCallback.invoke();
+    }
+  }
 
-	@Override
-	public void showErrorIcon(String reason) {
-		loadingUI.setVisible(false);
-		row.setVisible(true);
-		iconTableData.setVisible(false);
-		synAlertTableData.setVisible(true);
-		errorTooltip.setTitle(reason);
-		errorTooltip.reconfigure();
-	}
+  @Override
+  public void setEntityLink(String name, String url) {
+    entityLink.setText(name);
+    entityLink.setHref(url);
+  }
 
-	@Override
-	public void setIsSelectable(boolean isSelectable) {
-		selectTableData.setVisible(isSelectable);
-	}
+  @Override
+  public void setEntityType(EntityType entityType) {
+    icon.setType(entityType);
+  }
 
-	@Override
-	public boolean isSelected() {
-		return select.getValue();
-	}
+  @Override
+  public void setPresenter(Presenter presenter) {
+    this.presenter = presenter;
+  }
 
-	@Override
-	public void setSelected(boolean selected) {
-		select.setValue(selected);
-	}
+  @Override
+  public void setCreatedByWidget(Widget w) {
+    createdByField.setWidget(w);
+  }
 
-	@Override
-	public String getNote() {
-		return noteField.getText();
-	}
+  @Override
+  public void setCreatedOn(String createdOnString) {
+    createdOnField.setText(createdOnString);
+  }
+
+  @Override
+  public boolean isInViewport() {
+    return DisplayUtils.isInViewport(this);
+  }
+
+  @Override
+  public void showAddToDownloadList() {
+    addToDownloadListLink.setVisible(true);
+  }
+
+  @Override
+  public void setDescriptionVisible(boolean visible) {
+    descriptionTableData.setVisible(visible);
+  }
+
+  @Override
+  public void setDescription(String description) {
+    descriptionField.setText(description);
+  }
+
+  @Override
+  public void setNote(String note) {
+    noteField.setText(note);
+  }
+
+  @Override
+  public void setVersion(String version) {
+    versionField.setText(version);
+  }
+
+  @Override
+  public void showLoading() {
+    row.setVisible(false);
+    loadingUI.setVisible(true);
+  }
+
+  @Override
+  public void showRow() {
+    loadingUI.setVisible(false);
+    synAlertTableData.setVisible(false);
+    row.setVisible(true);
+    iconTableData.setVisible(true);
+  }
+
+  @Override
+  public void showErrorIcon(String reason) {
+    loadingUI.setVisible(false);
+    row.setVisible(true);
+    iconTableData.setVisible(false);
+    synAlertTableData.setVisible(true);
+    errorTooltip.setTitle(reason);
+    errorTooltip.reconfigure();
+  }
+
+  @Override
+  public void setIsSelectable(boolean isSelectable) {
+    selectTableData.setVisible(isSelectable);
+  }
+
+  @Override
+  public boolean isSelected() {
+    return select.getValue();
+  }
+
+  @Override
+  public void setSelected(boolean selected) {
+    select.setValue(selected);
+  }
+
+  @Override
+  public String getNote() {
+    return noteField.getText();
+  }
 }

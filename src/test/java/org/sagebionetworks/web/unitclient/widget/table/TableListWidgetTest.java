@@ -10,11 +10,12 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.gwt.http.client.Request;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -43,169 +44,222 @@ import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.TableListWidgetView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-import com.google.gwt.http.client.Request;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-
 public class TableListWidgetTest {
-	public static final String TEST_RESULT_ID = "testResultId";
-	private static final String ENTITY_ID = "syn123";
-	private TableListWidgetView mockView;
-	private TableListWidget widget;
-	private EntityBundle parentBundle;
-	private UserEntityPermissions permissions;
-	@Mock
-	CookieProvider mockCookies;
-	@Mock
-	LoadMoreWidgetContainer mockLoadMoreWidgetContainer;
-	@Mock
-	EntityChildrenResponse mockResults;
-	@Mock
-	SynapseJavascriptClient mockSynapseJavascriptClient;
-	@Mock
-	SynapseAlert mockSynAlert;
-	@Mock
-	CallbackP<EntityHeader> mockTableClickedCallback;
-	@Mock
-	EntityHeader mockEntityHeader;
-	@Mock
-	Request mockRequest;
-	@Captor
-	ArgumentCaptor<String> stringCaptor;
-	@Mock
-	PortalGinInjector mockGinInjector;
-	@Mock
-	TableEntityListGroupItem mockTableEntityListGroupItem;
-	List<EntityHeader> searchResults;
-	EntityHeader searchResult;
 
+  public static final String TEST_RESULT_ID = "testResultId";
+  private static final String ENTITY_ID = "syn123";
+  private TableListWidgetView mockView;
+  private TableListWidget widget;
+  private EntityBundle parentBundle;
+  private UserEntityPermissions permissions;
 
-	@Before
-	public void before() {
-		MockitoAnnotations.initMocks(this);
-		permissions = new UserEntityPermissions();
-		permissions.setCanEdit(true);
-		Project project = new Project();
-		project.setId(ENTITY_ID);
-		parentBundle = new EntityBundle();
-		parentBundle.setEntity(project);
-		parentBundle.setPermissions(permissions);
-		mockView = Mockito.mock(TableListWidgetView.class);
-		widget = new TableListWidget(mockView, mockSynapseJavascriptClient, mockLoadMoreWidgetContainer, mockSynAlert, mockGinInjector);
-		AsyncMockStubber.callSuccessWith(mockResults).when(mockSynapseJavascriptClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
-		searchResult = new EntityHeader();
-		searchResult.setId("syn123");
-		searchResults = new ArrayList<EntityHeader>();
-		searchResults.add(searchResult);
-		when(mockResults.getPage()).thenReturn(searchResults);
-		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("true");
-		when(mockGinInjector.getTableEntityListGroupItem()).thenReturn(mockTableEntityListGroupItem);
-	}
+  @Mock
+  CookieProvider mockCookies;
 
-	@Test
-	public void testCreateQuery() {
-		String parentId = ENTITY_ID;
-		List<EntityType> typesToShow = Arrays.asList(EntityType.table, EntityType.entityview);
-		widget.configure(parentBundle, typesToShow);
-		EntityChildrenRequest query = widget.createQuery(parentId);
-		assertEquals(parentId, query.getParentId());
-		assertTrue(query.getIncludeTypes().contains(EntityType.entityview));
-		assertTrue(query.getIncludeTypes().contains(EntityType.table));
-		assertEquals(SortBy.CREATED_ON, query.getSortBy());
-		assertEquals(Direction.DESC, query.getSortDirection());
-	}
+  @Mock
+  LoadMoreWidgetContainer mockLoadMoreWidgetContainer;
 
-	@Test
-	public void testConfigureUnderPageSize() {
-		when(mockResults.getPage()).thenReturn(Collections.emptyList());
+  @Mock
+  EntityChildrenResponse mockResults;
 
-		widget.configure(parentBundle, Arrays.asList(EntityType.dataset));
-		verify(mockView).setState(TableListWidgetView.TableListWidgetViewState.LOADING);
-		verify(mockView).setState(TableListWidgetView.TableListWidgetViewState.EMPTY);
-		verify(mockView).clearSortUI();
-		verify(mockLoadMoreWidgetContainer).setIsMore(false);
-	}
+  @Mock
+  SynapseJavascriptClient mockSynapseJavascriptClient;
 
-	@Test
-	public void testConfigureOverPageSize() {
-		when(mockResults.getNextPageToken()).thenReturn("ismore");
+  @Mock
+  SynapseAlert mockSynAlert;
 
-		widget.configure(parentBundle, Arrays.asList(EntityType.dataset));
-		verify(mockView).setState(TableListWidgetView.TableListWidgetViewState.LOADING);
-		verify(mockView).setState(TableListWidgetView.TableListWidgetViewState.POPULATED);
-		verify(mockView).clearSortUI();
-		verify(mockLoadMoreWidgetContainer).setIsMore(true);
-	}
+  @Mock
+  CallbackP<EntityHeader> mockTableClickedCallback;
 
-	@Test
-	public void testOnSort() {
-		widget.configure(parentBundle, Arrays.asList(EntityType.dataset));
+  @Mock
+  EntityHeader mockEntityHeader;
 
-		verify(mockView).clearSortUI();
+  @Mock
+  Request mockRequest;
 
-		widget.onSort(SortBy.CREATED_ON, Direction.DESC);
+  @Captor
+  ArgumentCaptor<String> stringCaptor;
 
-		verify(mockView).setSortUI(SortBy.CREATED_ON, Direction.DESC);
-	}
+  @Mock
+  PortalGinInjector mockGinInjector;
 
-	@Test
-	public void testConfigureFailure() {
-		parentBundle.getPermissions().setCanEdit(false);
-		String error = "an error";
-		Throwable th = new Throwable(error);
-		AsyncMockStubber.callFailureWith(th).when(mockSynapseJavascriptClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
-		widget.configure(parentBundle, Arrays.asList(EntityType.dataset));
-		verify(mockSynAlert).handleException(th);
-	}
+  @Mock
+  TableEntityListGroupItem mockTableEntityListGroupItem;
 
-	@Test
-	public void testOnTableClicked() {
-		widget.setTableClickedCallback(mockTableClickedCallback);
-		widget.onTableClicked(mockEntityHeader);
+  List<EntityHeader> searchResults;
+  EntityHeader searchResult;
 
-		verify(mockView).showLoading();
-		verify(mockView).clearTableWidgets();
-		verify(mockTableClickedCallback).invoke(mockEntityHeader);
-	}
+  @Before
+  public void before() {
+    MockitoAnnotations.initMocks(this);
+    permissions = new UserEntityPermissions();
+    permissions.setCanEdit(true);
+    Project project = new Project();
+    project.setId(ENTITY_ID);
+    parentBundle = new EntityBundle();
+    parentBundle.setEntity(project);
+    parentBundle.setPermissions(permissions);
+    mockView = Mockito.mock(TableListWidgetView.class);
+    widget =
+      new TableListWidget(
+        mockView,
+        mockSynapseJavascriptClient,
+        mockLoadMoreWidgetContainer,
+        mockSynAlert,
+        mockGinInjector
+      );
+    AsyncMockStubber
+      .callSuccessWith(mockResults)
+      .when(mockSynapseJavascriptClient)
+      .getEntityChildren(
+        any(EntityChildrenRequest.class),
+        any(AsyncCallback.class)
+      );
+    searchResult = new EntityHeader();
+    searchResult.setId("syn123");
+    searchResults = new ArrayList<EntityHeader>();
+    searchResults.add(searchResult);
+    when(mockResults.getPage()).thenReturn(searchResults);
+    when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+      .thenReturn("true");
+    when(mockGinInjector.getTableEntityListGroupItem())
+      .thenReturn(mockTableEntityListGroupItem);
+  }
 
-	@Test
-	public void testCopyToClipboard() {
-		// add search results
-		searchResults.clear();
-		StringBuilder expectedClipboardValue = new StringBuilder();
-		int itemCount = 50;
-		for (int i = 0; i < itemCount; i++) {
-			EntityHeader mockHeader = Mockito.mock(EntityHeader.class);
-			when(mockHeader.getId()).thenReturn(TEST_RESULT_ID + i);
-			searchResults.add(mockHeader);
-			expectedClipboardValue.append(TEST_RESULT_ID + i + "\n");
-		}
-		// load the data
-		widget.configure(parentBundle, Arrays.asList(EntityType.dataset));
+  @Test
+  public void testCreateQuery() {
+    String parentId = ENTITY_ID;
+    List<EntityType> typesToShow = Arrays.asList(
+      EntityType.table,
+      EntityType.entityview
+    );
+    widget.configure(parentBundle, typesToShow);
+    EntityChildrenRequest query = widget.createQuery(parentId);
+    assertEquals(parentId, query.getParentId());
+    assertTrue(query.getIncludeTypes().contains(EntityType.entityview));
+    assertTrue(query.getIncludeTypes().contains(EntityType.table));
+    assertEquals(SortBy.CREATED_ON, query.getSortBy());
+    assertEquals(Direction.DESC, query.getSortDirection());
+  }
 
-		verify(mockView, times(itemCount)).addTableListItem(any(TableEntityListGroupItem.class));
-		verify(mockSynapseJavascriptClient, times(itemCount)).populateEntityBundleCache(anyString());
+  @Test
+  public void testConfigureUnderPageSize() {
+    when(mockResults.getPage()).thenReturn(Collections.emptyList());
 
-		widget.copyIDsToClipboard();
+    widget.configure(parentBundle, Arrays.asList(EntityType.dataset));
+    verify(mockView)
+      .setState(TableListWidgetView.TableListWidgetViewState.LOADING);
+    verify(mockView)
+      .setState(TableListWidgetView.TableListWidgetViewState.EMPTY);
+    verify(mockView).clearSortUI();
+    verify(mockLoadMoreWidgetContainer).setIsMore(false);
+  }
 
-		verify(mockView).copyToClipboard(stringCaptor.capture());
-		String clipboardValue = stringCaptor.getValue();
-		assertEquals(expectedClipboardValue.toString(), clipboardValue);
-	}
+  @Test
+  public void testConfigureOverPageSize() {
+    when(mockResults.getNextPageToken()).thenReturn("ismore");
 
-	@Test
-	public void testReconfigureCancels() {
-		// Do not test async response, only test the Request
-		reset(mockSynapseJavascriptClient);
-		when(mockSynapseJavascriptClient.getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class))).thenReturn(mockRequest);
+    widget.configure(parentBundle, Arrays.asList(EntityType.dataset));
+    verify(mockView)
+      .setState(TableListWidgetView.TableListWidgetViewState.LOADING);
+    verify(mockView)
+      .setState(TableListWidgetView.TableListWidgetViewState.POPULATED);
+    verify(mockView).clearSortUI();
+    verify(mockLoadMoreWidgetContainer).setIsMore(true);
+  }
 
-		widget.configure(parentBundle, Arrays.asList(EntityType.dataset));
+  @Test
+  public void testOnSort() {
+    widget.configure(parentBundle, Arrays.asList(EntityType.dataset));
 
-		verify(mockSynapseJavascriptClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
-		verify(mockRequest, never()).cancel();
+    verify(mockView).clearSortUI();
 
-		widget.configure(parentBundle, Arrays.asList(EntityType.dataset));
+    widget.onSort(SortBy.CREATED_ON, Direction.DESC);
 
-		verify(mockRequest).cancel();
-		verify(mockSynapseJavascriptClient, times(2)).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
-	}
+    verify(mockView).setSortUI(SortBy.CREATED_ON, Direction.DESC);
+  }
+
+  @Test
+  public void testConfigureFailure() {
+    parentBundle.getPermissions().setCanEdit(false);
+    String error = "an error";
+    Throwable th = new Throwable(error);
+    AsyncMockStubber
+      .callFailureWith(th)
+      .when(mockSynapseJavascriptClient)
+      .getEntityChildren(
+        any(EntityChildrenRequest.class),
+        any(AsyncCallback.class)
+      );
+    widget.configure(parentBundle, Arrays.asList(EntityType.dataset));
+    verify(mockSynAlert).handleException(th);
+  }
+
+  @Test
+  public void testOnTableClicked() {
+    widget.setTableClickedCallback(mockTableClickedCallback);
+    widget.onTableClicked(mockEntityHeader);
+
+    verify(mockView).showLoading();
+    verify(mockView).clearTableWidgets();
+    verify(mockTableClickedCallback).invoke(mockEntityHeader);
+  }
+
+  @Test
+  public void testCopyToClipboard() {
+    // add search results
+    searchResults.clear();
+    StringBuilder expectedClipboardValue = new StringBuilder();
+    int itemCount = 50;
+    for (int i = 0; i < itemCount; i++) {
+      EntityHeader mockHeader = Mockito.mock(EntityHeader.class);
+      when(mockHeader.getId()).thenReturn(TEST_RESULT_ID + i);
+      searchResults.add(mockHeader);
+      expectedClipboardValue.append(TEST_RESULT_ID + i + "\n");
+    }
+    // load the data
+    widget.configure(parentBundle, Arrays.asList(EntityType.dataset));
+
+    verify(mockView, times(itemCount))
+      .addTableListItem(any(TableEntityListGroupItem.class));
+    verify(mockSynapseJavascriptClient, times(itemCount))
+      .populateEntityBundleCache(anyString());
+
+    widget.copyIDsToClipboard();
+
+    verify(mockView).copyToClipboard(stringCaptor.capture());
+    String clipboardValue = stringCaptor.getValue();
+    assertEquals(expectedClipboardValue.toString(), clipboardValue);
+  }
+
+  @Test
+  public void testReconfigureCancels() {
+    // Do not test async response, only test the Request
+    reset(mockSynapseJavascriptClient);
+    when(
+      mockSynapseJavascriptClient.getEntityChildren(
+        any(EntityChildrenRequest.class),
+        any(AsyncCallback.class)
+      )
+    )
+      .thenReturn(mockRequest);
+
+    widget.configure(parentBundle, Arrays.asList(EntityType.dataset));
+
+    verify(mockSynapseJavascriptClient)
+      .getEntityChildren(
+        any(EntityChildrenRequest.class),
+        any(AsyncCallback.class)
+      );
+    verify(mockRequest, never()).cancel();
+
+    widget.configure(parentBundle, Arrays.asList(EntityType.dataset));
+
+    verify(mockRequest).cancel();
+    verify(mockSynapseJavascriptClient, times(2))
+      .getEntityChildren(
+        any(EntityChildrenRequest.class),
+        any(AsyncCallback.class)
+      );
+  }
 }

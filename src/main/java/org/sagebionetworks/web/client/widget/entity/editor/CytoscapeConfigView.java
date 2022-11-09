@@ -1,34 +1,30 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
-import org.sagebionetworks.web.client.widget.WidgetEditorView;
 import com.google.gwt.user.client.ui.IsWidget;
+import org.sagebionetworks.web.client.widget.WidgetEditorView;
 
 public interface CytoscapeConfigView extends IsWidget, WidgetEditorView {
+  /**
+   * Set the presenter.
+   *
+   * @param presenter
+   */
+  void setPresenter(Presenter presenter);
 
-	/**
-	 * Set the presenter.
-	 * 
-	 * @param presenter
-	 */
-	void setPresenter(Presenter presenter);
+  void setEntity(String entityId);
 
-	void setEntity(String entityId);
+  String getEntity();
 
-	String getEntity();
+  void setStyleEntity(String entityId);
 
-	void setStyleEntity(String entityId);
+  String getStyleEntity();
 
-	String getStyleEntity();
+  void setHeight(String height);
 
-	void setHeight(String height);
+  String getHeight();
 
-	String getHeight();
-
-	/**
-	 * Presenter interface
-	 */
-	public interface Presenter {
-
-	}
-
+  /**
+   * Presenter interface
+   */
+  public interface Presenter {}
 }

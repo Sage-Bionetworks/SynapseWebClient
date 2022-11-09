@@ -15,12 +15,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,76 +40,98 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CrawlFilterTest {
-	CrawlFilter filter;
-	@Mock
-	HttpServletRequest mockRequest;
-	@Mock
-	HttpServletResponse mockResponse;
-	@Mock
-	FilterChain mockFilterChain;
-	@Captor
-	ArgumentCaptor<String> stringCaptor;
-	@Mock
-	SynapseClientImpl mockSynapseClient;
-	@Mock
-	DiscussionForumClientImpl mockDiscussionForumClient;
-	@Mock
-	EntityBundle mockEntityBundle;
-	@Mock
-	Entity mockEntity;
-	@Mock
-	Annotations mockAnnotations;
-	@Mock
-	EntityChildrenResponse mockEntityChildrenResponse;
-	@Mock
-	PrintWriter mockPrintWriter;
 
-	@Before
-	public void setUp() throws RestServiceException, IOException {
-		filter = new CrawlFilter();
-		filter.init(mockSynapseClient, mockDiscussionForumClient);
-		when(mockRequest.getHeader(ORIGIN_HEADER)).thenReturn("https://www" + SYNAPSE_ORG_SUFFIX);
-		when(mockRequest.getServerName()).thenReturn("www" + SYNAPSE_ORG_SUFFIX);
-		when(mockRequest.getScheme()).thenReturn("https");
-		when(mockSynapseClient.getEntityBundle(anyString(), any(EntityBundleRequest.class))).thenReturn(mockEntityBundle);
-		when(mockEntityBundle.getEntity()).thenReturn(mockEntity);
-		when(mockEntityBundle.getAnnotations()).thenReturn(mockAnnotations);
-		when(mockSynapseClient.getEntityChildren(any(EntityChildrenRequest.class))).thenReturn(mockEntityChildrenResponse);
-		when(mockResponse.getWriter()).thenReturn(mockPrintWriter);
-	}
+  CrawlFilter filter;
 
-	@Test
-	public void testSynapseEntityPage() throws ServletException, IOException {
-		String synapseID = "syn12345";
-		String entityName = "my mock entity";
-		when(mockEntity.getId()).thenReturn(synapseID);
-		when(mockEntity.getName()).thenReturn(entityName);
-		when(mockRequest.getQueryString()).thenReturn(ESCAPED_FRAGMENT + "Synapse:" + synapseID);
+  @Mock
+  HttpServletRequest mockRequest;
 
-		filter.testFilter(mockRequest, mockResponse, mockFilterChain);
+  @Mock
+  HttpServletResponse mockResponse;
 
-		verify(mockPrintWriter).println(stringCaptor.capture());
-		String outputString = stringCaptor.getValue();
-		assertTrue(outputString.contains(synapseID));
-		assertTrue(outputString.contains(entityName));
-		assertFalse(outputString.contains(META_ROBOTS_NOINDEX));
-	}
-	
-	@Test
-	public void testSynapseEntityPageNoIndex() throws ServletException, IOException {
-		String synapseID = "syn12345";
-		when(mockEntity.getId()).thenReturn(synapseID);
-		when(mockRequest.getQueryString()).thenReturn(ESCAPED_FRAGMENT + "Synapse:" + synapseID);
-		Map<String, AnnotationsValue> annotationsMap = new HashMap<String, AnnotationsValue>();
-		when(mockAnnotations.getAnnotations()).thenReturn(annotationsMap);
-		annotationsMap.put("noindex", new AnnotationsValue());
+  @Mock
+  FilterChain mockFilterChain;
 
-		filter.testFilter(mockRequest, mockResponse, mockFilterChain);
+  @Captor
+  ArgumentCaptor<String> stringCaptor;
 
-		verify(mockPrintWriter).println(stringCaptor.capture());
-		String outputString = stringCaptor.getValue();
-		assertTrue(outputString.contains(synapseID));
-		assertTrue(outputString.contains(META_ROBOTS_NOINDEX));
-	}
+  @Mock
+  SynapseClientImpl mockSynapseClient;
 
+  @Mock
+  DiscussionForumClientImpl mockDiscussionForumClient;
+
+  @Mock
+  EntityBundle mockEntityBundle;
+
+  @Mock
+  Entity mockEntity;
+
+  @Mock
+  Annotations mockAnnotations;
+
+  @Mock
+  EntityChildrenResponse mockEntityChildrenResponse;
+
+  @Mock
+  PrintWriter mockPrintWriter;
+
+  @Before
+  public void setUp() throws RestServiceException, IOException {
+    filter = new CrawlFilter();
+    filter.init(mockSynapseClient, mockDiscussionForumClient);
+    when(mockRequest.getHeader(ORIGIN_HEADER))
+      .thenReturn("https://www" + SYNAPSE_ORG_SUFFIX);
+    when(mockRequest.getServerName()).thenReturn("www" + SYNAPSE_ORG_SUFFIX);
+    when(mockRequest.getScheme()).thenReturn("https");
+    when(
+      mockSynapseClient.getEntityBundle(
+        anyString(),
+        any(EntityBundleRequest.class)
+      )
+    )
+      .thenReturn(mockEntityBundle);
+    when(mockEntityBundle.getEntity()).thenReturn(mockEntity);
+    when(mockEntityBundle.getAnnotations()).thenReturn(mockAnnotations);
+    when(mockSynapseClient.getEntityChildren(any(EntityChildrenRequest.class)))
+      .thenReturn(mockEntityChildrenResponse);
+    when(mockResponse.getWriter()).thenReturn(mockPrintWriter);
+  }
+
+  @Test
+  public void testSynapseEntityPage() throws ServletException, IOException {
+    String synapseID = "syn12345";
+    String entityName = "my mock entity";
+    when(mockEntity.getId()).thenReturn(synapseID);
+    when(mockEntity.getName()).thenReturn(entityName);
+    when(mockRequest.getQueryString())
+      .thenReturn(ESCAPED_FRAGMENT + "Synapse:" + synapseID);
+
+    filter.testFilter(mockRequest, mockResponse, mockFilterChain);
+
+    verify(mockPrintWriter).println(stringCaptor.capture());
+    String outputString = stringCaptor.getValue();
+    assertTrue(outputString.contains(synapseID));
+    assertTrue(outputString.contains(entityName));
+    assertFalse(outputString.contains(META_ROBOTS_NOINDEX));
+  }
+
+  @Test
+  public void testSynapseEntityPageNoIndex()
+    throws ServletException, IOException {
+    String synapseID = "syn12345";
+    when(mockEntity.getId()).thenReturn(synapseID);
+    when(mockRequest.getQueryString())
+      .thenReturn(ESCAPED_FRAGMENT + "Synapse:" + synapseID);
+    Map<String, AnnotationsValue> annotationsMap = new HashMap<String, AnnotationsValue>();
+    when(mockAnnotations.getAnnotations()).thenReturn(annotationsMap);
+    annotationsMap.put("noindex", new AnnotationsValue());
+
+    filter.testFilter(mockRequest, mockResponse, mockFilterChain);
+
+    verify(mockPrintWriter).println(stringCaptor.capture());
+    String outputString = stringCaptor.getValue();
+    assertTrue(outputString.contains(synapseID));
+    assertTrue(outputString.contains(META_ROBOTS_NOINDEX));
+  }
 }

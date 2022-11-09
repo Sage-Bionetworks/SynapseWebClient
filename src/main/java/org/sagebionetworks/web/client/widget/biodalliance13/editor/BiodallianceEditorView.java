@@ -1,50 +1,49 @@
 package org.sagebionetworks.web.client.widget.biodalliance13.editor;
 
-
-import org.sagebionetworks.web.client.widget.SelectableListView;
-import org.sagebionetworks.web.client.widget.WidgetEditorView;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import org.sagebionetworks.web.client.widget.SelectableListView;
+import org.sagebionetworks.web.client.widget.WidgetEditorView;
 
-public interface BiodallianceEditorView extends IsWidget, WidgetEditorView, SelectableListView {
+public interface BiodallianceEditorView
+  extends IsWidget, WidgetEditorView, SelectableListView {
+  /**
+   * Set the presenter.
+   *
+   * @param presenter
+   */
+  void setPresenter(Presenter presenter);
 
-	/**
-	 * Set the presenter.
-	 * 
-	 * @param presenter
-	 */
-	void setPresenter(Presenter presenter);
+  void addTrack(Widget w);
 
-	void addTrack(Widget w);
+  void clearTracks();
 
-	void clearTracks();
+  /**
+   * Presenter interface
+   */
+  public interface Presenter {
+    void addTrackClicked();
+  }
 
-	/**
-	 * Presenter interface
-	 */
-	public interface Presenter {
-		void addTrackClicked();
-	}
+  String getChr();
 
-	String getChr();
+  void setChr(String chr);
 
-	void setChr(String chr);
+  String getViewStart();
 
-	String getViewStart();
+  void setViewStart(String viewStart);
 
-	void setViewStart(String viewStart);
+  String getViewEnd();
 
-	String getViewEnd();
+  void setViewEnd(String viewEnd);
 
-	void setViewEnd(String viewEnd);
+  boolean isMouse();
 
-	boolean isMouse();
+  void setMouse();
 
-	void setMouse();
+  boolean isHuman();
 
-	boolean isHuman();
+  void setHuman();
 
-	void setHuman();
-
-	void setTrackHeaderColumnsVisible(boolean visible);
+  void setTrackHeaderColumnsVisible(boolean visible);
 }

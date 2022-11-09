@@ -1,18 +1,18 @@
 package org.sagebionetworks.web.client.widget.evaluation;
 
+import com.google.gwt.user.client.ui.IsWidget;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.web.client.jsinterop.EvaluationCardProps;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationRowWidget.EvaluationActionHandler;
-import com.google.gwt.user.client.ui.IsWidget;
 
 public interface AdministerEvaluationsListView extends IsWidget {
-	void setPresenter(EvaluationActionHandler presenter);
+  void setPresenter(EvaluationActionHandler presenter);
 
-	void addRow(Evaluation ev);
+  void addRow(Evaluation ev);
 
-	void clearRows();
+  void clearRows();
 
-	void add(IsWidget w);
+  void add(IsWidget w);
 
-	void addReactComponent(Evaluation evaluation, EvaluationCardProps props);
+  void addReactComponent(Evaluation evaluation, EvaluationCardProps props);
 }

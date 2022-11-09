@@ -1,9 +1,14 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui"
-	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
-	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
-	<bh:Div ui:field="loadingSpinnerDiv"
-		addStyleNames="spinner margin-right-10 center-in-div" width="40px"
-		height="40px" />
+<ui:UiBinder
+  xmlns:ui="urn:ui:com.google.gwt.uibinder"
+  xmlns:g="urn:import:com.google.gwt.user.client.ui"
+  xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
+  xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+>
+  <bh:Div
+    ui:field="loadingSpinnerDiv"
+    addStyleNames="spinner margin-right-10 center-in-div"
+    width="40px"
+    height="40px"
+  />
 </ui:UiBinder>

@@ -1,33 +1,30 @@
 package org.sagebionetworks.web.client.widget.team.controller;
 
-import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.web.client.utils.Callback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.web.client.utils.Callback;
 
 public interface TeamDeleteModalWidgetView extends IsWidget {
+  public interface Presenter {
+    void setRefreshCallback(Callback refreshCallback);
 
-	public interface Presenter {
+    void onConfirm();
 
-		void setRefreshCallback(Callback refreshCallback);
+    void showDialog();
 
-		void onConfirm();
+    void configure(Team team);
+  }
 
-		void showDialog();
+  void setSynAlertWidget(Widget asWidget);
 
-		void configure(Team team);
+  Widget asWidget();
 
-	}
+  void show();
 
-	void setSynAlertWidget(Widget asWidget);
+  void setPresenter(Presenter presenter);
 
-	Widget asWidget();
+  void showInfo(String message);
 
-	void show();
-
-	void setPresenter(Presenter presenter);
-
-	void showInfo(String message);
-
-	void hide();
+  void hide();
 }

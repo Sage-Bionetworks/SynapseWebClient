@@ -4,6 +4,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -15,45 +16,52 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadCallbackQueueImpl;
 
 public class LazyLoadCallbackQueueTest {
-	LazyLoadCallbackQueueImpl lazyLoadCallbackQueue;
-	@Mock
-	Callback mockCallback;
-	@Mock
-	GWTWrapper mockGWT;
-	@Captor
-	ArgumentCaptor<Callback> checkForMoreWorkCallbackCaptor;
 
-	@Before
-	public void setUp() throws Exception {
-		MockitoAnnotations.initMocks(this);
-		lazyLoadCallbackQueue = new LazyLoadCallbackQueueImpl(mockGWT);
+  LazyLoadCallbackQueueImpl lazyLoadCallbackQueue;
 
-		// verify initial fire (looking for work)
-		verify(mockGWT).scheduleExecution(checkForMoreWorkCallbackCaptor.capture(), eq(LazyLoadCallbackQueueImpl.DELAY));
-	}
+  @Mock
+  Callback mockCallback;
 
-	@Test
-	public void testHappyCase() {
-		lazyLoadCallbackQueue.subscribe(mockCallback);
-		verify(mockCallback, never()).invoke();
+  @Mock
+  GWTWrapper mockGWT;
 
-		// simulate timer event fired
-		checkForMoreWorkCallbackCaptor.getValue().invoke();
+  @Captor
+  ArgumentCaptor<Callback> checkForMoreWorkCallbackCaptor;
 
-		verify(mockCallback).invoke();
+  @Before
+  public void setUp() throws Exception {
+    MockitoAnnotations.initMocks(this);
+    lazyLoadCallbackQueue = new LazyLoadCallbackQueueImpl(mockGWT);
 
-		// again
-		checkForMoreWorkCallbackCaptor.getValue().invoke();
-		verify(mockCallback, times(2)).invoke();
+    // verify initial fire (looking for work)
+    verify(mockGWT)
+      .scheduleExecution(
+        checkForMoreWorkCallbackCaptor.capture(),
+        eq(LazyLoadCallbackQueueImpl.DELAY)
+      );
+  }
 
-		// unsubscribe
-		lazyLoadCallbackQueue.unsubscribe(mockCallback);
+  @Test
+  public void testHappyCase() {
+    lazyLoadCallbackQueue.subscribe(mockCallback);
+    verify(mockCallback, never()).invoke();
 
-		// fire again
-		checkForMoreWorkCallbackCaptor.getValue().invoke();
+    // simulate timer event fired
+    checkForMoreWorkCallbackCaptor.getValue().invoke();
 
-		// verify our callback was not invoked again (after unsubscribing)
-		verify(mockCallback, times(2)).invoke();
-	}
+    verify(mockCallback).invoke();
 
+    // again
+    checkForMoreWorkCallbackCaptor.getValue().invoke();
+    verify(mockCallback, times(2)).invoke();
+
+    // unsubscribe
+    lazyLoadCallbackQueue.unsubscribe(mockCallback);
+
+    // fire again
+    checkForMoreWorkCallbackCaptor.getValue().invoke();
+
+    // verify our callback was not invoked again (after unsubscribing)
+    verify(mockCallback, times(2)).invoke();
+  }
 }

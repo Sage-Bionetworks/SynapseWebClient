@@ -1,1 +1,5 @@
-package org.sagebionetworks.web.client.widget;public interface HasNotificationUI {	void setNotificationValue(String value);}
+package org.sagebionetworks.web.client.widget;
+
+public interface HasNotificationUI {
+  void setNotificationValue(String value);
+}

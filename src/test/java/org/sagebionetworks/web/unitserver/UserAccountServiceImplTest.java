@@ -24,63 +24,77 @@ import org.sagebionetworks.web.server.servlet.UserAccountServiceImpl;
 
 /**
  * Test for the UserAccountServiceImpl
- * 
+ *
  */
 public class UserAccountServiceImplTest {
-	SynapseProvider mockSynapseProvider;
-	TokenProvider mockTokenProvider;
-	SynapseClient mockSynapse;
-	UserAccountServiceImpl userAccountService;
-	String testSessionToken = "12345abcde";
-	UserProfile testProfile;
 
-	@Before
-	public void before() throws SynapseException, JSONObjectAdapterException {
-		mockSynapse = Mockito.mock(SynapseClient.class);
-		mockSynapseProvider = Mockito.mock(SynapseProvider.class);
-		when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
-		mockTokenProvider = Mockito.mock(TokenProvider.class);
+  SynapseProvider mockSynapseProvider;
+  TokenProvider mockTokenProvider;
+  SynapseClient mockSynapse;
+  UserAccountServiceImpl userAccountService;
+  String testSessionToken = "12345abcde";
+  UserProfile testProfile;
 
-		testProfile = new UserProfile();
-		testProfile.setOwnerId("123");
+  @Before
+  public void before() throws SynapseException, JSONObjectAdapterException {
+    mockSynapse = Mockito.mock(SynapseClient.class);
+    mockSynapseProvider = Mockito.mock(SynapseProvider.class);
+    when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
+    mockTokenProvider = Mockito.mock(TokenProvider.class);
 
-		userAccountService = new UserAccountServiceImpl();
-		userAccountService.setSynapseProvider(mockSynapseProvider);
-		userAccountService.setTokenProvider(mockTokenProvider);
-		LoginResponse testResponse = new LoginResponse();
-		testResponse.setAccessToken(testSessionToken);
-		when(mockSynapse.createNewAccountForAccessToken(any(AccountSetupInfo.class))).thenReturn(testResponse);
-	}
+    testProfile = new UserProfile();
+    testProfile.setOwnerId("123");
 
-	@Test
-	public void testCreateUserStep1() throws Exception {
-		String email = "test@jayhodgson.com";
-		NewUser newUser = new NewUser();
-		newUser.setEmail(email);
-		String endpoint = "http://127.0.0.1:8080/Portal.html?gwt.codesvr=127.0.0.1:9321";
-		userAccountService.createUserStep1(newUser, endpoint);
-		verify(mockSynapse).newAccountEmailValidation(any(NewUser.class), eq(endpoint));
-	}
+    userAccountService = new UserAccountServiceImpl();
+    userAccountService.setSynapseProvider(mockSynapseProvider);
+    userAccountService.setTokenProvider(mockTokenProvider);
+    LoginResponse testResponse = new LoginResponse();
+    testResponse.setAccessToken(testSessionToken);
+    when(
+      mockSynapse.createNewAccountForAccessToken(any(AccountSetupInfo.class))
+    )
+      .thenReturn(testResponse);
+  }
 
-	@Test
-	public void testCreateUserStep2() throws Exception {
-		String username = "choochoo";
-		String fName = "ralph";
-		String lName = "wiggum";
-		String pw = "password";
-		EmailValidationSignedToken emailValidationSignedToken = new EmailValidationSignedToken();
-		AccountSetupInfo testASI = new AccountSetupInfo();
-		testASI.setUsername(username);
-		testASI.setFirstName(fName);
-		testASI.setLastName(lName);
-		testASI.setPassword(pw);
-		testASI.setEmailValidationSignedToken(emailValidationSignedToken);
+  @Test
+  public void testCreateUserStep1() throws Exception {
+    String email = "test@jayhodgson.com";
+    NewUser newUser = new NewUser();
+    newUser.setEmail(email);
+    String endpoint =
+      "http://127.0.0.1:8080/Portal.html?gwt.codesvr=127.0.0.1:9321";
+    userAccountService.createUserStep1(newUser, endpoint);
+    verify(mockSynapse)
+      .newAccountEmailValidation(any(NewUser.class), eq(endpoint));
+  }
 
-		String returnSessionToken = userAccountService.createUserStep2(username, fName, lName, pw, emailValidationSignedToken);
-		assertEquals(testSessionToken, returnSessionToken);
-		ArgumentCaptor<AccountSetupInfo> arg = ArgumentCaptor.forClass(AccountSetupInfo.class);
-		verify(mockSynapse).createNewAccountForAccessToken(arg.capture());
-		AccountSetupInfo capturedSetInfo = arg.getValue();
-		assertEquals(testASI, capturedSetInfo);
-	}
+  @Test
+  public void testCreateUserStep2() throws Exception {
+    String username = "choochoo";
+    String fName = "ralph";
+    String lName = "wiggum";
+    String pw = "password";
+    EmailValidationSignedToken emailValidationSignedToken = new EmailValidationSignedToken();
+    AccountSetupInfo testASI = new AccountSetupInfo();
+    testASI.setUsername(username);
+    testASI.setFirstName(fName);
+    testASI.setLastName(lName);
+    testASI.setPassword(pw);
+    testASI.setEmailValidationSignedToken(emailValidationSignedToken);
+
+    String returnSessionToken = userAccountService.createUserStep2(
+      username,
+      fName,
+      lName,
+      pw,
+      emailValidationSignedToken
+    );
+    assertEquals(testSessionToken, returnSessionToken);
+    ArgumentCaptor<AccountSetupInfo> arg = ArgumentCaptor.forClass(
+      AccountSetupInfo.class
+    );
+    verify(mockSynapse).createNewAccountForAccessToken(arg.capture());
+    AccountSetupInfo capturedSetInfo = arg.getValue();
+    assertEquals(testASI, capturedSetInfo);
+  }
 }

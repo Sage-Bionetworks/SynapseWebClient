@@ -2,10 +2,10 @@
 <ui:UiBinder
   xmlns:ui="urn:ui:com.google.gwt.uibinder"
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
-  xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
-  
-  	<bh:Div>
- 		<bh:Div ui:field="synAlertContainer" />
-  		<w:ReactComponentDiv ui:field="errorPageContainer" visible="false" />
-	</bh:Div>
+  xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
+>
+  <bh:Div>
+    <bh:Div ui:field="synAlertContainer" />
+    <w:ReactComponentDiv ui:field="errorPageContainer" visible="false" />
+  </bh:Div>
 </ui:UiBinder>

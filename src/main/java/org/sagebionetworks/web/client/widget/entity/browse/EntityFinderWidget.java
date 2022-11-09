@@ -1,77 +1,76 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
 import java.util.List;
-
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.jsinterop.EntityFinderProps;
 import org.sagebionetworks.web.client.jsinterop.EntityFinderScope;
 
 public interface EntityFinderWidget {
+  /**
+   * Invoked when the user confirms their selection. The Entity Finder is also supplied as a parameter, which
+   * allows the caller to access methods on the EntityFinder in the handler
+   * @param <T>
+   */
+  @FunctionalInterface
+  interface SelectedHandler<T> {
+    public void onSelected(T selected, EntityFinderWidget entityFinder);
+  }
 
-	/**
-	 * Invoked when the user confirms their selection. The Entity Finder is also supplied as a parameter, which
-	 * allows the caller to access methods on the EntityFinder in the handler
-	 * @param <T>
-	 */
-	@FunctionalInterface
-	interface SelectedHandler<T> {
-		public void onSelected(T selected, EntityFinderWidget entityFinder);
-	}
+  enum InitialContainer {
+    PROJECT,
+    PARENT,
+    SCOPE,
+    NONE,
+  }
 
-	enum InitialContainer {
-		PROJECT,
-		PARENT,
-		SCOPE,
-		NONE,
-	}
+  enum VersionSelection {
+    DISALLOWED,
+    REQUIRED,
+    TRACKED,
+    UNTRACKED,
+  }
 
-	enum VersionSelection {
-		DISALLOWED,
-		REQUIRED,
-		TRACKED,
-		UNTRACKED
-	}
+  interface Builder {
+    EntityFinderWidget build();
 
+    Builder setSelectedHandler(SelectedHandler<Reference> handler);
 
-	interface Builder {
-		EntityFinderWidget build();
+    Builder setSelectedMultiHandler(SelectedHandler<List<Reference>> handler);
 
-		Builder setSelectedHandler(SelectedHandler<Reference> handler);
+    Builder setMultiSelect(boolean multiSelect);
 
-		Builder setSelectedMultiHandler(SelectedHandler<List<Reference>> handler);
+    Builder setInitialContainer(
+      EntityFinderWidget.InitialContainer initialContainer
+    );
 
-		Builder setMultiSelect(boolean multiSelect);
+    Builder setSelectableTypes(EntityFilter selectableFilter);
 
-		Builder setInitialContainer(EntityFinderWidget.InitialContainer initialContainer);
+    Builder setVisibleTypesInList(EntityFilter visibleFilter);
 
-		Builder setSelectableTypes(EntityFilter selectableFilter);
+    Builder setVisibleTypesInTree(EntityFilter visibleTypesInTree);
 
-		Builder setVisibleTypesInList(EntityFilter visibleFilter);
+    Builder setVersionSelection(VersionSelection versionSelection);
 
-		Builder setVisibleTypesInTree(EntityFilter visibleTypesInTree);
+    Builder setModalTitle(String modalTitle);
 
-		Builder setVersionSelection(VersionSelection versionSelection);
+    Builder setPromptCopy(String promptCopy);
 
-		Builder setModalTitle(String modalTitle);
+    Builder setHelpMarkdown(String helpMarkdown);
 
-		Builder setPromptCopy(String promptCopy);
+    Builder setSelectedCopy(EntityFinderProps.SelectedCopyHandler selectedCopy);
 
-		Builder setHelpMarkdown(String helpMarkdown);
+    Builder setInitialScope(EntityFinderScope initialScope);
 
-		Builder setSelectedCopy(EntityFinderProps.SelectedCopyHandler selectedCopy);
+    Builder setConfirmButtonCopy(String confirmButtonCopy);
 
-		Builder setInitialScope(EntityFinderScope initialScope);
+    Builder setTreeOnly(boolean treeOnly);
+  }
 
-		Builder setConfirmButtonCopy(String confirmButtonCopy);
+  void showError(String errorMessage);
 
-		Builder setTreeOnly(boolean treeOnly);
-	}
+  void show();
 
-	void showError(String errorMessage);
+  void hide();
 
-	void show();
-
-	void hide();
-
-	void clearState();
+  void clearState();
 }

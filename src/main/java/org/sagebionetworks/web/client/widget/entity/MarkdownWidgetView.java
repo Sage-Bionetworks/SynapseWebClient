@@ -1,36 +1,32 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.shared.WikiPageKey;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.shared.WikiPageKey;
 
 public interface MarkdownWidgetView extends IsWidget {
+  public interface Presenter {
+    void configure(String md, WikiPageKey wikiKey, Long wikiVersionInView);
 
-	public interface Presenter {
+    void clear();
+  }
 
-		void configure(String md, WikiPageKey wikiKey, Long wikiVersionInView);
+  void setSynAlertWidget(Widget synAlert);
 
-		void clear();
+  void setEmptyVisible(boolean b);
 
-	}
+  void setMarkdown(String result);
 
-	void setSynAlertWidget(Widget synAlert);
+  ElementWrapper getElementById(String string);
 
-	void setEmptyVisible(boolean b);
+  void addWidget(Widget widget, String divID);
 
-	void setMarkdown(String result);
+  Widget asWidget();
 
-	ElementWrapper getElementById(String string);
+  void callbackWhenAttached(final Callback callback);
 
-	void addWidget(Widget widget, String divID);
+  void clearMarkdown();
 
-	Widget asWidget();
-
-	void callbackWhenAttached(final Callback callback);
-
-	void clearMarkdown();
-
-	void setLoadingVisible(boolean visible);
-
+  void setLoadingVisible(boolean visible);
 }

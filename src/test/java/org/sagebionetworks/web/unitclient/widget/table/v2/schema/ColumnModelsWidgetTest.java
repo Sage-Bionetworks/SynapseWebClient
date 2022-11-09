@@ -14,6 +14,9 @@ import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.shared.WebConstants.FILE;
 import static org.sagebionetworks.web.shared.WebConstants.TABLE;
 
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.IsWidget;
 import java.util.Collections;
 import java.util.List;
 import org.junit.Before;
@@ -61,371 +64,491 @@ import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.table.v2.TableModelTestUtils;
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.IsWidget;
 
 /**
  * Unit test for ColumnModelsViewWidget
- * 
+ *
  * @author jmhill
  *
  */
 public class ColumnModelsWidgetTest {
 
-	AdapterFactory adapterFactory;
-	@Mock
-	ColumnModelsViewBase mockBaseView;
-	@Mock
-	ColumnModelsView mockViewer;
-	@Mock
-	ColumnModelsEditorWidget mockEditor;
-	@Mock
-	PortalGinInjector mockGinInjector;
-	@Mock
-	SynapseClientAsync mockSynapseClient;
-	ColumnModelsWidget widget;
-	@Mock
-	EntityBundle mockBundle;
-	@Mock
-	EntityView mockView;
-	@Mock
-	SubmissionView mockSubmissionView;
-	@Mock
-	List<ColumnModel> mockDefaultColumnModels;
-	@Mock
-	TableUpdateTransactionRequest mockTableSchemaChangeRequest;
-	@Mock
-	JobTrackingWidget mockJobTrackingWidget;
-	@Mock
-	TableUpdateRequest mockTableUpdateRequest;
-	@Mock
-	ViewDefaultColumns mockFileViewDefaultColumns;
-	@Captor
-	ArgumentCaptor<ViewScope> viewScopeCaptor;
-	@Mock
-	List<String> mockViewScopeIds;
-	@Mock
-	List<ColumnModel> mockAnnotationColumnsPage1;
-	@Mock
-	List<ColumnModel> mockAnnotationColumnsPage2;
-	@Mock
-	EventBus mockEventBus;
-	@Mock
-	SynapseAlert mockSynAlert;
-	@Mock
-	PopupUtilsView mockPopupUtilsView;
-	@Captor
-	ArgumentCaptor<ViewColumnModelRequest> viewColumnModelRequestCaptor;
-	@Captor
-	ArgumentCaptor<List<ColumnModelTableRow>> columnModelTableRowsCaptor;
-	@Mock
-	ViewColumnModelResponse mockViewColumnModelResponsePage1;
-	@Mock
-	ViewColumnModelResponse mockViewColumnModelResponsePage2;
-	
-	public static final String NEXT_PAGE_TOKEN = "nextPageToken";
+  AdapterFactory adapterFactory;
 
-	TableEntity table;
-	TableBundle tableBundle;
+  @Mock
+  ColumnModelsViewBase mockBaseView;
 
-	@Before
-	public void before() {
-		MockitoAnnotations.initMocks(this);
-		adapterFactory = new AdapterFactoryImpl();
-		table = new TableEntity();
-		table.setId("syn123");
-		tableBundle = new TableBundle();
-		when(mockBundle.getEntity()).thenReturn(table);
-		when(mockBundle.getTableBundle()).thenReturn(tableBundle);
-		when(mockGinInjector.createNewColumnModelsView()).thenReturn(mockViewer);
-		when(mockGinInjector.createColumnModelEditorWidget()).thenAnswer(new Answer<ColumnModelTableRowEditorWidget>() {
-			@Override
-			public ColumnModelTableRowEditorWidget answer(InvocationOnMock invocation) throws Throwable {
-				return new ColumnModelTableRowEditorStub();
-			}
-		});
-		when(mockGinInjector.createNewColumnModelTableRowViewer()).thenAnswer(new Answer<ColumnModelTableRowViewer>() {
-			@Override
-			public ColumnModelTableRowViewer answer(InvocationOnMock invocation) throws Throwable {
-				return new ColumnModelTableRowViewerStub();
-			}
-		});
-		widget = new ColumnModelsWidget(mockBaseView, mockGinInjector, mockSynapseClient, mockEditor, mockJobTrackingWidget, mockFileViewDefaultColumns, mockSynAlert, mockPopupUtilsView);
-		when(mockEditor.validate()).thenReturn(true);
-		when(mockTableSchemaChangeRequest.getChanges()).thenReturn(Collections.singletonList(mockTableUpdateRequest));
-		AsyncMockStubber.callSuccessWith(mockTableSchemaChangeRequest).when(mockSynapseClient).getTableUpdateTransactionRequest(anyString(), anyList(), anyList(), any(AsyncCallback.class));
+  @Mock
+  ColumnModelsView mockViewer;
 
-		when(mockView.getScopeIds()).thenReturn(mockViewScopeIds);
-		when(mockView.getType()).thenReturn(org.sagebionetworks.repo.model.table.ViewType.file);
-		when(mockView.getViewTypeMask()).thenReturn(null);
-		when(mockViewColumnModelResponsePage1.getNextPageToken()).thenReturn(NEXT_PAGE_TOKEN);
-		when(mockViewColumnModelResponsePage1.getResults()).thenReturn(mockAnnotationColumnsPage1);
-		when(mockViewColumnModelResponsePage2.getNextPageToken()).thenReturn(null);
-		when(mockViewColumnModelResponsePage2.getResults()).thenReturn(mockAnnotationColumnsPage2);		
-		when(mockGinInjector.getEventBus()).thenReturn(mockEventBus);
-	}
+  @Mock
+  ColumnModelsEditorWidget mockEditor;
 
-	@Test
-	public void testConstruction() {
-		verify(mockBaseView).setViewer(mockViewer);
-		verify(mockBaseView).setEditor(mockEditor);
-		verify(mockBaseView).setJobTrackingWidget(any(IsWidget.class));
-		verify(mockBaseView).setJobTrackingWidgetVisible(false);
-	}
+  @Mock
+  PortalGinInjector mockGinInjector;
 
-	@Test
-	public void testConfigure() {
-		boolean isEditable = true;
-		List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
-		tableBundle.setColumnModels(schema);
-		widget.configure(mockBundle, isEditable);
-		verify(mockViewer).configure(ViewType.VIEWER, isEditable);
-		// All rows should be added to both the viewer and editor
-		verify(mockViewer).addColumns(columnModelTableRowsCaptor.capture());
-		assertEquals(schema.size(), columnModelTableRowsCaptor.getValue().size());
-		verify(mockEditor).setAddDefaultColumnsButtonVisible(false);
-	}
+  @Mock
+  SynapseClientAsync mockSynapseClient;
 
-	@Test
-	public void testConfigureView() {
-		boolean isEditable = true;
-		when(mockBundle.getEntity()).thenReturn(mockView);
-		List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
-		tableBundle.setColumnModels(schema);
-		widget.configure(mockBundle, isEditable);
-		verify(mockViewer).configure(ViewType.VIEWER, isEditable);
-		// All rows should be added to both the viewer and editor
-		verify(mockViewer).addColumns(columnModelTableRowsCaptor.capture());
-		assertEquals(schema.size(), columnModelTableRowsCaptor.getValue().size());
-		verify(mockEditor).setAddDefaultColumnsButtonVisible(true);
-	}
-	
-	@Test
-	public void testConfigureSubmissionView() {
-		boolean isEditable = true;
-		when(mockBundle.getEntity()).thenReturn(mockSubmissionView);
-		List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
-		tableBundle.setColumnModels(schema);
-		widget.configure(mockBundle, isEditable);
-		verify(mockViewer).configure(ViewType.VIEWER, isEditable);
-		// All rows should be added to both the viewer and editor
-		verify(mockViewer).addColumns(columnModelTableRowsCaptor.capture());
-		assertEquals(schema.size(), columnModelTableRowsCaptor.getValue().size());
-		verify(mockEditor).setAddDefaultColumnsButtonVisible(true);
-	}
+  ColumnModelsWidget widget;
 
-	@Test
-	public void testGetDefaultColumnsForView() {
-		boolean isEditable = true;
+  @Mock
+  EntityBundle mockBundle;
 
-		when(mockFileViewDefaultColumns.getDefaultViewColumns(any(TableType.class))).thenReturn(mockDefaultColumnModels);
-		when(mockView.getType()).thenReturn(org.sagebionetworks.repo.model.table.ViewType.file);
-		when(mockBundle.getEntity()).thenReturn(mockView);
-		tableBundle.setColumnModels(TableModelTestUtils.createOneOfEachType(true));
-		widget.configure(mockBundle, isEditable);
-		widget.getDefaultColumnsForView();
-		verify(mockEditor).addColumns(mockDefaultColumnModels);
-	}
+  @Mock
+  EntityView mockView;
 
-	@Test
-	public void testGetDefaultColumnsForProjectView() {
-		boolean isEditable = true;
-		when(mockFileViewDefaultColumns.getDefaultViewColumns(any(TableType.class))).thenReturn(mockDefaultColumnModels);
-		when(mockView.getType()).thenReturn(org.sagebionetworks.repo.model.table.ViewType.project);
-		when(mockBundle.getEntity()).thenReturn(mockView);
-		tableBundle.setColumnModels(TableModelTestUtils.createOneOfEachType(true));
-		widget.configure(mockBundle, isEditable);
-		widget.getDefaultColumnsForView();
-		verify(mockEditor).addColumns(mockDefaultColumnModels);
-	}
+  @Mock
+  SubmissionView mockSubmissionView;
 
-	@Test
-	public void testGetPossibleColumnModelsForViewScope() {
-		// test is set up so that rpc successfully returns 2 pages, and then stops.
-		boolean isEditable = true;
-		when(mockBundle.getEntity()).thenReturn(mockView);
-		List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
-		tableBundle.setColumnModels(schema);
-		when(mockView.getType()).thenReturn(null);
-		Long viewScopeMask = 1234L;
-		when(mockView.getViewTypeMask()).thenReturn(viewScopeMask);
+  @Mock
+  List<ColumnModel> mockDefaultColumnModels;
 
-		widget.configure(mockBundle, isEditable);
+  @Mock
+  TableUpdateTransactionRequest mockTableSchemaChangeRequest;
 
-		String firstPageToken = null;
-		widget.getPossibleColumnModelsForViewScope(firstPageToken);
+  @Mock
+  JobTrackingWidget mockJobTrackingWidget;
 
-		AsynchronousProgressHandler handler = verifyViewColumnModelRequest(mockViewScopeIds, viewScopeMask, firstPageToken);
-		handler.onComplete(mockViewColumnModelResponsePage1);
-		
-		verify(mockEditor).addColumns(mockAnnotationColumnsPage1);
-		handler = verifyViewColumnModelRequest(mockViewScopeIds, viewScopeMask, NEXT_PAGE_TOKEN);
-		handler.onComplete(mockViewColumnModelResponsePage2);
-		verify(mockEditor).addColumns(mockAnnotationColumnsPage2);
-	}
+  @Mock
+  TableUpdateRequest mockTableUpdateRequest;
 
-	@Test
-	public void testGetPossibleColumnModelsForViewScopeFailure() {
-		boolean isEditable = true;
-		when(mockBundle.getEntity()).thenReturn(mockView);
-		List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
-		tableBundle.setColumnModels(schema);
-		widget.configure(mockBundle, isEditable);
+  @Mock
+  ViewDefaultColumns mockFileViewDefaultColumns;
 
-		String error = "error message getting annotation column models";
-		Exception ex = new Exception(error);
-		
-		String firstPageToken = null;
-		widget.getPossibleColumnModelsForViewScope(firstPageToken);
-		
-		AsynchronousProgressHandler handler = verifyViewColumnModelRequest(mockViewScopeIds, null, firstPageToken);
-		handler.onFailure(ex);
-		
-		verify(mockSynAlert).handleException(ex);
-		verify(mockBaseView).resetSaveButton();
-	}
+  @Captor
+  ArgumentCaptor<ViewScope> viewScopeCaptor;
 
-	@Test
-	public void testOnEditColumns() {
-		boolean isEditable = true;
-		List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
-		tableBundle.setColumnModels(schema);
-		widget.configure(mockBundle, isEditable);
-		// show the editor
-		widget.onEditColumns();
-		verify(mockEditor).configure(TableType.table, schema);
-		verify(mockBaseView).showEditor();
-	}
+  @Mock
+  List<String> mockViewScopeIds;
 
-	@Test(expected = IllegalStateException.class)
-	public void testOnEditNonEditable() {
-		boolean isEditable = false;
-		List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
-		tableBundle.setColumnModels(schema);
-		widget.configure(mockBundle, isEditable);
-		// should fail
-		widget.onEditColumns();
-	}
+  @Mock
+  List<ColumnModel> mockAnnotationColumnsPage1;
 
-	private AsynchronousProgressHandler onSave() {
-		boolean isEditable = true;
-		List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
-		tableBundle.setColumnModels(schema);
-		widget.configure(mockBundle, isEditable);
-		// Show the dialog
-		widget.onEditColumns();
-		when(mockEditor.getEditedColumnModels()).thenReturn(TableModelTestUtils.createOneOfEachType(false));
-		// Now call save
-		widget.onSave();
-		boolean isDeterminate = false;
-		ArgumentCaptor<AsynchronousProgressHandler> captor = ArgumentCaptor.forClass(AsynchronousProgressHandler.class);
-		verify(mockJobTrackingWidget).startAndTrackJob(eq(ColumnModelsWidget.UPDATING_SCHEMA), eq(isDeterminate), eq(AsynchType.TableTransaction), eq(mockTableSchemaChangeRequest), captor.capture());
-		return captor.getValue();
-	}
+  @Mock
+  List<ColumnModel> mockAnnotationColumnsPage2;
 
-	private AsynchronousProgressHandler verifyViewColumnModelRequest(List<String> scopeIds, Long viewMask, String nextPageToken) {
-		ArgumentCaptor<AsynchronousProgressHandler> captor = ArgumentCaptor.forClass(AsynchronousProgressHandler.class);
-		boolean isDeterminate = false;
-		verify(mockJobTrackingWidget).startAndTrackJob(eq(ColumnModelsWidget.RETRIEVING_DATA), eq(isDeterminate), eq(AsynchType.ViewColumnModelRequest), viewColumnModelRequestCaptor.capture(), captor.capture());
-		ViewColumnModelRequest capturedRequest = viewColumnModelRequestCaptor.getValue();
-		assertEquals(scopeIds, capturedRequest.getViewScope().getScope());
-		assertEquals(viewMask, capturedRequest.getViewScope().getViewTypeMask());
-		assertEquals(nextPageToken, capturedRequest.getNextPageToken());
-		reset(mockJobTrackingWidget);
-		return captor.getValue();
-	}
-	
-	@Test
-	public void testOnSaveSuccess() throws JSONObjectAdapterException {
-		onSave().onComplete(null);
-		InOrder inOrder = inOrder(mockBaseView);
-		inOrder.verify(mockBaseView).setJobTrackingWidgetVisible(true);
-		inOrder.verify(mockBaseView).setJobTrackingWidgetVisible(false);
+  @Mock
+  EventBus mockEventBus;
 
-		verify(mockBaseView).setLoading();
-		verify(mockBaseView).hideEditor();
-		verify(mockSynAlert).clear();
-		verify(mockPopupUtilsView).notify(anyString(), anyString(), any());
-		verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
-	}
+  @Mock
+  SynapseAlert mockSynAlert;
 
-	@Test
-	public void testOnPrimaryAsyncCancelled() {
-		onSave().onCancel();
-		InOrder inOrder = inOrder(mockBaseView);
-		inOrder.verify(mockBaseView).setJobTrackingWidgetVisible(true);
-		inOrder.verify(mockBaseView).setJobTrackingWidgetVisible(false);
-		verify(mockBaseView, times(2)).showEditor();
-	}
+  @Mock
+  PopupUtilsView mockPopupUtilsView;
 
-	@Test
-	public void testOnPrimaryAsyncFailure() {
-		String errorMessage = "error during schema update";
-		Exception ex = new Exception(errorMessage);
-		onSave().onFailure(ex);
-		InOrder inOrder = inOrder(mockBaseView);
-		inOrder.verify(mockBaseView).setJobTrackingWidgetVisible(true);
-		inOrder.verify(mockBaseView).setJobTrackingWidgetVisible(false);
-		verify(mockSynAlert).handleException(ex);
-		verify(mockBaseView).resetSaveButton();
-	}
+  @Captor
+  ArgumentCaptor<ViewColumnModelRequest> viewColumnModelRequestCaptor;
 
-	@Test
-	public void testOnSaveSuccessValidateFalse() throws JSONObjectAdapterException {
-		boolean isEditable = true;
-		List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
-		tableBundle.setColumnModels(schema);
-		widget.configure(mockBundle, isEditable);
-		// Show the dialog
-		widget.onEditColumns();
-		when(mockEditor.validate()).thenReturn(false);
-		// Now call save
-		widget.onSave();
-		verify(mockBaseView, never()).setLoading();
-		verify(mockBaseView, never()).hideEditor();
-		verify(mockSynAlert, never()).clear();
-		verify(mockPopupUtilsView, never()).notify(anyString(), anyString(), any());
-		// Save success should be called.
-		verify(mockSynAlert).showError(ColumnModelsWidget.SEE_THE_ERROR_S_ABOVE);
-	}
+  @Captor
+  ArgumentCaptor<List<ColumnModelTableRow>> columnModelTableRowsCaptor;
 
-	@Test
-	public void testOnSaveFailure() throws JSONObjectAdapterException {
-		boolean isEditable = true;
-		List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
-		tableBundle.setColumnModels(schema);
-		widget.configure(mockBundle, isEditable);
-		// Show the dialog
-		widget.onEditColumns();
-		String errorMessage = "Something went wrong";
-		RestServiceException ex = new RestServiceException(errorMessage);
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getTableUpdateTransactionRequest(anyString(), anyList(), anyList(), any(AsyncCallback.class));
-		// Now call save
-		widget.onSave();
-		verify(mockBaseView, times(1)).setLoading();
-		// The editor must not be hidden on an error.
-		verify(mockBaseView, never()).hideEditor();
-		verify(mockPopupUtilsView, never()).notify(anyString(), anyString(), any());
-		verify(mockSynAlert).handleException(ex);
-		verify(mockBaseView).resetSaveButton();
-		// only the original columns should be applied to the view.
-		verify(mockViewer).addColumns(columnModelTableRowsCaptor.capture());
-		assertEquals(schema.size(), columnModelTableRowsCaptor.getValue().size());
-	}
+  @Mock
+  ViewColumnModelResponse mockViewColumnModelResponsePage1;
 
-	@Test
-	public void testGetTableType() {
-		when(mockView.getViewTypeMask()).thenReturn(ViewTypeMask.getMaskForDepricatedType(org.sagebionetworks.repo.model.table.ViewType.file));
-		assertEquals(TableType.file_view, TableType.getTableType(mockView));
+  @Mock
+  ViewColumnModelResponse mockViewColumnModelResponsePage2;
 
-		when(mockView.getViewTypeMask()).thenReturn(ViewTypeMask.getMaskForDepricatedType(org.sagebionetworks.repo.model.table.ViewType.file_and_table));
-		assertEquals(new TableType(EntityView.class, FILE | TABLE), TableType.getTableType(mockView));
+  public static final String NEXT_PAGE_TOKEN = "nextPageToken";
 
-		when(mockView.getViewTypeMask()).thenReturn(ViewTypeMask.getMaskForDepricatedType(org.sagebionetworks.repo.model.table.ViewType.project));
-		assertEquals(TableType.project_view, TableType.getTableType(mockView));
+  TableEntity table;
+  TableBundle tableBundle;
 
-		assertEquals(TableType.table, TableType.getTableType(table));
-	}
+  @Before
+  public void before() {
+    MockitoAnnotations.initMocks(this);
+    adapterFactory = new AdapterFactoryImpl();
+    table = new TableEntity();
+    table.setId("syn123");
+    tableBundle = new TableBundle();
+    when(mockBundle.getEntity()).thenReturn(table);
+    when(mockBundle.getTableBundle()).thenReturn(tableBundle);
+    when(mockGinInjector.createNewColumnModelsView()).thenReturn(mockViewer);
+    when(mockGinInjector.createColumnModelEditorWidget())
+      .thenAnswer(
+        new Answer<ColumnModelTableRowEditorWidget>() {
+          @Override
+          public ColumnModelTableRowEditorWidget answer(
+            InvocationOnMock invocation
+          ) throws Throwable {
+            return new ColumnModelTableRowEditorStub();
+          }
+        }
+      );
+    when(mockGinInjector.createNewColumnModelTableRowViewer())
+      .thenAnswer(
+        new Answer<ColumnModelTableRowViewer>() {
+          @Override
+          public ColumnModelTableRowViewer answer(InvocationOnMock invocation)
+            throws Throwable {
+            return new ColumnModelTableRowViewerStub();
+          }
+        }
+      );
+    widget =
+      new ColumnModelsWidget(
+        mockBaseView,
+        mockGinInjector,
+        mockSynapseClient,
+        mockEditor,
+        mockJobTrackingWidget,
+        mockFileViewDefaultColumns,
+        mockSynAlert,
+        mockPopupUtilsView
+      );
+    when(mockEditor.validate()).thenReturn(true);
+    when(mockTableSchemaChangeRequest.getChanges())
+      .thenReturn(Collections.singletonList(mockTableUpdateRequest));
+    AsyncMockStubber
+      .callSuccessWith(mockTableSchemaChangeRequest)
+      .when(mockSynapseClient)
+      .getTableUpdateTransactionRequest(
+        anyString(),
+        anyList(),
+        anyList(),
+        any(AsyncCallback.class)
+      );
 
+    when(mockView.getScopeIds()).thenReturn(mockViewScopeIds);
+    when(mockView.getType())
+      .thenReturn(org.sagebionetworks.repo.model.table.ViewType.file);
+    when(mockView.getViewTypeMask()).thenReturn(null);
+    when(mockViewColumnModelResponsePage1.getNextPageToken())
+      .thenReturn(NEXT_PAGE_TOKEN);
+    when(mockViewColumnModelResponsePage1.getResults())
+      .thenReturn(mockAnnotationColumnsPage1);
+    when(mockViewColumnModelResponsePage2.getNextPageToken()).thenReturn(null);
+    when(mockViewColumnModelResponsePage2.getResults())
+      .thenReturn(mockAnnotationColumnsPage2);
+    when(mockGinInjector.getEventBus()).thenReturn(mockEventBus);
+  }
+
+  @Test
+  public void testConstruction() {
+    verify(mockBaseView).setViewer(mockViewer);
+    verify(mockBaseView).setEditor(mockEditor);
+    verify(mockBaseView).setJobTrackingWidget(any(IsWidget.class));
+    verify(mockBaseView).setJobTrackingWidgetVisible(false);
+  }
+
+  @Test
+  public void testConfigure() {
+    boolean isEditable = true;
+    List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
+    tableBundle.setColumnModels(schema);
+    widget.configure(mockBundle, isEditable);
+    verify(mockViewer).configure(ViewType.VIEWER, isEditable);
+    // All rows should be added to both the viewer and editor
+    verify(mockViewer).addColumns(columnModelTableRowsCaptor.capture());
+    assertEquals(schema.size(), columnModelTableRowsCaptor.getValue().size());
+    verify(mockEditor).setAddDefaultColumnsButtonVisible(false);
+  }
+
+  @Test
+  public void testConfigureView() {
+    boolean isEditable = true;
+    when(mockBundle.getEntity()).thenReturn(mockView);
+    List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
+    tableBundle.setColumnModels(schema);
+    widget.configure(mockBundle, isEditable);
+    verify(mockViewer).configure(ViewType.VIEWER, isEditable);
+    // All rows should be added to both the viewer and editor
+    verify(mockViewer).addColumns(columnModelTableRowsCaptor.capture());
+    assertEquals(schema.size(), columnModelTableRowsCaptor.getValue().size());
+    verify(mockEditor).setAddDefaultColumnsButtonVisible(true);
+  }
+
+  @Test
+  public void testConfigureSubmissionView() {
+    boolean isEditable = true;
+    when(mockBundle.getEntity()).thenReturn(mockSubmissionView);
+    List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
+    tableBundle.setColumnModels(schema);
+    widget.configure(mockBundle, isEditable);
+    verify(mockViewer).configure(ViewType.VIEWER, isEditable);
+    // All rows should be added to both the viewer and editor
+    verify(mockViewer).addColumns(columnModelTableRowsCaptor.capture());
+    assertEquals(schema.size(), columnModelTableRowsCaptor.getValue().size());
+    verify(mockEditor).setAddDefaultColumnsButtonVisible(true);
+  }
+
+  @Test
+  public void testGetDefaultColumnsForView() {
+    boolean isEditable = true;
+
+    when(mockFileViewDefaultColumns.getDefaultViewColumns(any(TableType.class)))
+      .thenReturn(mockDefaultColumnModels);
+    when(mockView.getType())
+      .thenReturn(org.sagebionetworks.repo.model.table.ViewType.file);
+    when(mockBundle.getEntity()).thenReturn(mockView);
+    tableBundle.setColumnModels(TableModelTestUtils.createOneOfEachType(true));
+    widget.configure(mockBundle, isEditable);
+    widget.getDefaultColumnsForView();
+    verify(mockEditor).addColumns(mockDefaultColumnModels);
+  }
+
+  @Test
+  public void testGetDefaultColumnsForProjectView() {
+    boolean isEditable = true;
+    when(mockFileViewDefaultColumns.getDefaultViewColumns(any(TableType.class)))
+      .thenReturn(mockDefaultColumnModels);
+    when(mockView.getType())
+      .thenReturn(org.sagebionetworks.repo.model.table.ViewType.project);
+    when(mockBundle.getEntity()).thenReturn(mockView);
+    tableBundle.setColumnModels(TableModelTestUtils.createOneOfEachType(true));
+    widget.configure(mockBundle, isEditable);
+    widget.getDefaultColumnsForView();
+    verify(mockEditor).addColumns(mockDefaultColumnModels);
+  }
+
+  @Test
+  public void testGetPossibleColumnModelsForViewScope() {
+    // test is set up so that rpc successfully returns 2 pages, and then stops.
+    boolean isEditable = true;
+    when(mockBundle.getEntity()).thenReturn(mockView);
+    List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
+    tableBundle.setColumnModels(schema);
+    when(mockView.getType()).thenReturn(null);
+    Long viewScopeMask = 1234L;
+    when(mockView.getViewTypeMask()).thenReturn(viewScopeMask);
+
+    widget.configure(mockBundle, isEditable);
+
+    String firstPageToken = null;
+    widget.getPossibleColumnModelsForViewScope(firstPageToken);
+
+    AsynchronousProgressHandler handler = verifyViewColumnModelRequest(
+      mockViewScopeIds,
+      viewScopeMask,
+      firstPageToken
+    );
+    handler.onComplete(mockViewColumnModelResponsePage1);
+
+    verify(mockEditor).addColumns(mockAnnotationColumnsPage1);
+    handler =
+      verifyViewColumnModelRequest(
+        mockViewScopeIds,
+        viewScopeMask,
+        NEXT_PAGE_TOKEN
+      );
+    handler.onComplete(mockViewColumnModelResponsePage2);
+    verify(mockEditor).addColumns(mockAnnotationColumnsPage2);
+  }
+
+  @Test
+  public void testGetPossibleColumnModelsForViewScopeFailure() {
+    boolean isEditable = true;
+    when(mockBundle.getEntity()).thenReturn(mockView);
+    List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
+    tableBundle.setColumnModels(schema);
+    widget.configure(mockBundle, isEditable);
+
+    String error = "error message getting annotation column models";
+    Exception ex = new Exception(error);
+
+    String firstPageToken = null;
+    widget.getPossibleColumnModelsForViewScope(firstPageToken);
+
+    AsynchronousProgressHandler handler = verifyViewColumnModelRequest(
+      mockViewScopeIds,
+      null,
+      firstPageToken
+    );
+    handler.onFailure(ex);
+
+    verify(mockSynAlert).handleException(ex);
+    verify(mockBaseView).resetSaveButton();
+  }
+
+  @Test
+  public void testOnEditColumns() {
+    boolean isEditable = true;
+    List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
+    tableBundle.setColumnModels(schema);
+    widget.configure(mockBundle, isEditable);
+    // show the editor
+    widget.onEditColumns();
+    verify(mockEditor).configure(TableType.table, schema);
+    verify(mockBaseView).showEditor();
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void testOnEditNonEditable() {
+    boolean isEditable = false;
+    List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
+    tableBundle.setColumnModels(schema);
+    widget.configure(mockBundle, isEditable);
+    // should fail
+    widget.onEditColumns();
+  }
+
+  private AsynchronousProgressHandler onSave() {
+    boolean isEditable = true;
+    List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
+    tableBundle.setColumnModels(schema);
+    widget.configure(mockBundle, isEditable);
+    // Show the dialog
+    widget.onEditColumns();
+    when(mockEditor.getEditedColumnModels())
+      .thenReturn(TableModelTestUtils.createOneOfEachType(false));
+    // Now call save
+    widget.onSave();
+    boolean isDeterminate = false;
+    ArgumentCaptor<AsynchronousProgressHandler> captor = ArgumentCaptor.forClass(
+      AsynchronousProgressHandler.class
+    );
+    verify(mockJobTrackingWidget)
+      .startAndTrackJob(
+        eq(ColumnModelsWidget.UPDATING_SCHEMA),
+        eq(isDeterminate),
+        eq(AsynchType.TableTransaction),
+        eq(mockTableSchemaChangeRequest),
+        captor.capture()
+      );
+    return captor.getValue();
+  }
+
+  private AsynchronousProgressHandler verifyViewColumnModelRequest(
+    List<String> scopeIds,
+    Long viewMask,
+    String nextPageToken
+  ) {
+    ArgumentCaptor<AsynchronousProgressHandler> captor = ArgumentCaptor.forClass(
+      AsynchronousProgressHandler.class
+    );
+    boolean isDeterminate = false;
+    verify(mockJobTrackingWidget)
+      .startAndTrackJob(
+        eq(ColumnModelsWidget.RETRIEVING_DATA),
+        eq(isDeterminate),
+        eq(AsynchType.ViewColumnModelRequest),
+        viewColumnModelRequestCaptor.capture(),
+        captor.capture()
+      );
+    ViewColumnModelRequest capturedRequest = viewColumnModelRequestCaptor.getValue();
+    assertEquals(scopeIds, capturedRequest.getViewScope().getScope());
+    assertEquals(viewMask, capturedRequest.getViewScope().getViewTypeMask());
+    assertEquals(nextPageToken, capturedRequest.getNextPageToken());
+    reset(mockJobTrackingWidget);
+    return captor.getValue();
+  }
+
+  @Test
+  public void testOnSaveSuccess() throws JSONObjectAdapterException {
+    onSave().onComplete(null);
+    InOrder inOrder = inOrder(mockBaseView);
+    inOrder.verify(mockBaseView).setJobTrackingWidgetVisible(true);
+    inOrder.verify(mockBaseView).setJobTrackingWidgetVisible(false);
+
+    verify(mockBaseView).setLoading();
+    verify(mockBaseView).hideEditor();
+    verify(mockSynAlert).clear();
+    verify(mockPopupUtilsView).notify(anyString(), anyString(), any());
+    verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
+  }
+
+  @Test
+  public void testOnPrimaryAsyncCancelled() {
+    onSave().onCancel();
+    InOrder inOrder = inOrder(mockBaseView);
+    inOrder.verify(mockBaseView).setJobTrackingWidgetVisible(true);
+    inOrder.verify(mockBaseView).setJobTrackingWidgetVisible(false);
+    verify(mockBaseView, times(2)).showEditor();
+  }
+
+  @Test
+  public void testOnPrimaryAsyncFailure() {
+    String errorMessage = "error during schema update";
+    Exception ex = new Exception(errorMessage);
+    onSave().onFailure(ex);
+    InOrder inOrder = inOrder(mockBaseView);
+    inOrder.verify(mockBaseView).setJobTrackingWidgetVisible(true);
+    inOrder.verify(mockBaseView).setJobTrackingWidgetVisible(false);
+    verify(mockSynAlert).handleException(ex);
+    verify(mockBaseView).resetSaveButton();
+  }
+
+  @Test
+  public void testOnSaveSuccessValidateFalse()
+    throws JSONObjectAdapterException {
+    boolean isEditable = true;
+    List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
+    tableBundle.setColumnModels(schema);
+    widget.configure(mockBundle, isEditable);
+    // Show the dialog
+    widget.onEditColumns();
+    when(mockEditor.validate()).thenReturn(false);
+    // Now call save
+    widget.onSave();
+    verify(mockBaseView, never()).setLoading();
+    verify(mockBaseView, never()).hideEditor();
+    verify(mockSynAlert, never()).clear();
+    verify(mockPopupUtilsView, never()).notify(anyString(), anyString(), any());
+    // Save success should be called.
+    verify(mockSynAlert).showError(ColumnModelsWidget.SEE_THE_ERROR_S_ABOVE);
+  }
+
+  @Test
+  public void testOnSaveFailure() throws JSONObjectAdapterException {
+    boolean isEditable = true;
+    List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
+    tableBundle.setColumnModels(schema);
+    widget.configure(mockBundle, isEditable);
+    // Show the dialog
+    widget.onEditColumns();
+    String errorMessage = "Something went wrong";
+    RestServiceException ex = new RestServiceException(errorMessage);
+    AsyncMockStubber
+      .callFailureWith(ex)
+      .when(mockSynapseClient)
+      .getTableUpdateTransactionRequest(
+        anyString(),
+        anyList(),
+        anyList(),
+        any(AsyncCallback.class)
+      );
+    // Now call save
+    widget.onSave();
+    verify(mockBaseView, times(1)).setLoading();
+    // The editor must not be hidden on an error.
+    verify(mockBaseView, never()).hideEditor();
+    verify(mockPopupUtilsView, never()).notify(anyString(), anyString(), any());
+    verify(mockSynAlert).handleException(ex);
+    verify(mockBaseView).resetSaveButton();
+    // only the original columns should be applied to the view.
+    verify(mockViewer).addColumns(columnModelTableRowsCaptor.capture());
+    assertEquals(schema.size(), columnModelTableRowsCaptor.getValue().size());
+  }
+
+  @Test
+  public void testGetTableType() {
+    when(mockView.getViewTypeMask())
+      .thenReturn(
+        ViewTypeMask.getMaskForDepricatedType(
+          org.sagebionetworks.repo.model.table.ViewType.file
+        )
+      );
+    assertEquals(TableType.file_view, TableType.getTableType(mockView));
+
+    when(mockView.getViewTypeMask())
+      .thenReturn(
+        ViewTypeMask.getMaskForDepricatedType(
+          org.sagebionetworks.repo.model.table.ViewType.file_and_table
+        )
+      );
+    assertEquals(
+      new TableType(EntityView.class, FILE | TABLE),
+      TableType.getTableType(mockView)
+    );
+
+    when(mockView.getViewTypeMask())
+      .thenReturn(
+        ViewTypeMask.getMaskForDepricatedType(
+          org.sagebionetworks.repo.model.table.ViewType.project
+        )
+      );
+    assertEquals(TableType.project_view, TableType.getTableType(mockView));
+
+    assertEquals(TableType.table, TableType.getTableType(table));
+  }
 }

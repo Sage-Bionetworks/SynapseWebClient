@@ -3,13 +3,11 @@ package org.sagebionetworks.web.client.widget.upload;
 import org.sagebionetworks.web.client.utils.Callback;
 
 public interface FileValidator {
+  boolean isValid(FileMetadata file);
 
-	boolean isValid(FileMetadata file);
+  void setInvalidFileCallback(Callback invalidCallback);
 
-	void setInvalidFileCallback(Callback invalidCallback);
+  Callback getInvalidFileCallback();
 
-	Callback getInvalidFileCallback();
-
-	String getInvalidMessage();
-
+  String getInvalidMessage();
 }

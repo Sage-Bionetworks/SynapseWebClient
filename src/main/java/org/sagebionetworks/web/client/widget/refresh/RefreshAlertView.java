@@ -3,20 +3,18 @@ package org.sagebionetworks.web.client.widget.refresh;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface RefreshAlertView extends IsWidget {
+  void setPresenter(Presenter presenter);
 
-	void setPresenter(Presenter presenter);
+  void setVisible(boolean visible);
 
-	void setVisible(boolean visible);
+  boolean isAttached();
 
-	boolean isAttached();
+  /**
+   * Presenter interface
+   */
+  public interface Presenter {
+    void onRefresh();
 
-	/**
-	 * Presenter interface
-	 */
-	public interface Presenter {
-		void onRefresh();
-
-		void onAttach();
-	}
-
+    void onAttach();
+  }
 }

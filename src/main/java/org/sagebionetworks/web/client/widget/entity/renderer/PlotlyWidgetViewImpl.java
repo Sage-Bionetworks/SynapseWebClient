@@ -1,6 +1,12 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
-
+import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 import java.util.List;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.html.Div;
@@ -12,79 +18,110 @@ import org.sagebionetworks.web.client.plotly.PlotlyTraceWrapper;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 
-import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.Element;
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
-
 public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 
-	public interface Binder extends UiBinder<Widget, PlotlyWidgetViewImpl> {
-	}
+  public interface Binder extends UiBinder<Widget, PlotlyWidgetViewImpl> {}
 
-	@UiField
-	ReactComponentDiv chartContainer;
-	@UiField
-	Div synAlertContainer;
-	@UiField
-	LoadingSpinner loadingUI;
-	Widget w;
-	Presenter presenter;
-	@UiField
-	Anchor sourceDataAnchor;
-	@UiField
-	Span loadingMessage;
+  @UiField
+  ReactComponentDiv chartContainer;
 
-	@Inject
-	public PlotlyWidgetViewImpl(Binder binder, SynapseJSNIUtils jsniUtils) {
-		w = binder.createAndBindUi(this);
-		_addPlotlyClickEventListener(chartContainer.getElement(), this);
-	}
+  @UiField
+  Div synAlertContainer;
 
-	@Override
-	public void setPresenter(Presenter p) {
-		presenter = p;
-	}
+  @UiField
+  LoadingSpinner loadingUI;
 
-	@Override
-	public Widget asWidget() {
-		return w;
-	}
+  Widget w;
+  Presenter presenter;
 
-	@Override
-	public void setSynAlertWidget(IsWidget w) {
-		synAlertContainer.clear();
-		synAlertContainer.add(w);
-	}
+  @UiField
+  Anchor sourceDataAnchor;
 
-	@Override
-	public void clearChart() {
-		chartContainer.clear();
-	}
+  @UiField
+  Span loadingMessage;
 
-	@Override
-	public void showChart(String title, String xTitle, String yTitle, List<PlotlyTraceWrapper> xyData, String barMode, AxisType xAxisType, AxisType yAxisType, boolean showLegend) {
-		chartContainer.clear();
-		String xAxisTypeString = AxisType.AUTO.equals(xAxisType) ? "-" : xAxisType.toString().toLowerCase();
-		String yAxisTypeString = AxisType.AUTO.equals(yAxisType) ? "-" : yAxisType.toString().toLowerCase();
-		_showChart(chartContainer, getPlotlyTraceArray(xyData), barMode, title, xTitle, yTitle, xAxisTypeString, yAxisTypeString, showLegend);
-	}
+  @Inject
+  public PlotlyWidgetViewImpl(Binder binder, SynapseJSNIUtils jsniUtils) {
+    w = binder.createAndBindUi(this);
+    _addPlotlyClickEventListener(chartContainer.getElement(), this);
+  }
 
-	public static JavaScriptObject[] getPlotlyTraceArray(List<PlotlyTraceWrapper> l) {
-		if (l == null) {
-			return null;
-		}
-		JavaScriptObject[] d = new JavaScriptObject[l.size()];
-		for (int i = 0; i < l.size(); i++) {
-			d[i] = l.get(i).getTrace();
-		}
-		return d;
-	}
+  @Override
+  public void setPresenter(Presenter p) {
+    presenter = p;
+  }
 
-	private static native void _showChart(ReactComponentDiv reactComponentDiv, JavaScriptObject[] xyData, String barMode, String plotTitle, String xTitle, String yTitle, String xAxisType, String yAxisType, boolean showLegend) /*-{
+  @Override
+  public Widget asWidget() {
+    return w;
+  }
+
+  @Override
+  public void setSynAlertWidget(IsWidget w) {
+    synAlertContainer.clear();
+    synAlertContainer.add(w);
+  }
+
+  @Override
+  public void clearChart() {
+    chartContainer.clear();
+  }
+
+  @Override
+  public void showChart(
+    String title,
+    String xTitle,
+    String yTitle,
+    List<PlotlyTraceWrapper> xyData,
+    String barMode,
+    AxisType xAxisType,
+    AxisType yAxisType,
+    boolean showLegend
+  ) {
+    chartContainer.clear();
+    String xAxisTypeString = AxisType.AUTO.equals(xAxisType)
+      ? "-"
+      : xAxisType.toString().toLowerCase();
+    String yAxisTypeString = AxisType.AUTO.equals(yAxisType)
+      ? "-"
+      : yAxisType.toString().toLowerCase();
+    _showChart(
+      chartContainer,
+      getPlotlyTraceArray(xyData),
+      barMode,
+      title,
+      xTitle,
+      yTitle,
+      xAxisTypeString,
+      yAxisTypeString,
+      showLegend
+    );
+  }
+
+  public static JavaScriptObject[] getPlotlyTraceArray(
+    List<PlotlyTraceWrapper> l
+  ) {
+    if (l == null) {
+      return null;
+    }
+    JavaScriptObject[] d = new JavaScriptObject[l.size()];
+    for (int i = 0; i < l.size(); i++) {
+      d[i] = l.get(i).getTrace();
+    }
+    return d;
+  }
+
+  private static native void _showChart(
+    ReactComponentDiv reactComponentDiv,
+    JavaScriptObject[] xyData,
+    String barMode,
+    String plotTitle,
+    String xTitle,
+    String yTitle,
+    String xAxisType,
+    String yAxisType,
+    boolean showLegend
+  ) /*-{
 
 		try {
 			var plot = $wnd.createPlotlyComponent($wnd.Plotly);
@@ -134,7 +171,10 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 		}
 	}-*/;
 
-	private static native void _addPlotlyClickEventListener(Element el, PlotlyWidgetViewImpl thisWidget) /*-{
+  private static native void _addPlotlyClickEventListener(
+    Element el,
+    PlotlyWidgetViewImpl thisWidget
+  ) /*-{
 		try {
 			//after plot is drawn, add handler for click events
 			$wnd
@@ -160,38 +200,38 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 		}
 	}-*/;
 
-	private void onClick(String x, String y) {
-		presenter.onClick(x, y);
-	}
+  private void onClick(String x, String y) {
+    presenter.onClick(x, y);
+  }
 
-	@Override
-	public void setLoadingVisible(boolean visible) {
-		loadingUI.setVisible(visible);
-		loadingMessage.setVisible(visible);
-	}
+  @Override
+  public void setLoadingVisible(boolean visible) {
+    loadingUI.setVisible(visible);
+    loadingMessage.setVisible(visible);
+  }
 
-	@Override
-	public void setLoadingMessage(String message) {
-		loadingMessage.setText(message);
-	}
+  @Override
+  public void setLoadingMessage(String message) {
+    loadingMessage.setText(message);
+  }
 
-	@Override
-	public boolean isAttached() {
-		return w.isAttached();
-	}
+  @Override
+  public boolean isAttached() {
+    return w.isAttached();
+  }
 
-	@Override
-	public void setSourceDataLink(String url) {
-		sourceDataAnchor.setHref(url);
-	}
+  @Override
+  public void setSourceDataLink(String url) {
+    sourceDataAnchor.setHref(url);
+  }
 
-	@Override
-	public void setSourceDataLinkVisible(boolean visible) {
-		sourceDataAnchor.setVisible(visible);
-	}
+  @Override
+  public void setSourceDataLinkVisible(boolean visible) {
+    sourceDataAnchor.setVisible(visible);
+  }
 
-	@Override
-	public void newWindow(String url) {
-		DisplayUtils.newWindow(url, "_blank", "");
-	}
+  @Override
+  public void newWindow(String url) {
+    DisplayUtils.newWindow(url, "_blank", "");
+  }
 }

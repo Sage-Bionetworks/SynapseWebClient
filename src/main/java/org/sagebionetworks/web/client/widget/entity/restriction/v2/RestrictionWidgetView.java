@@ -1,54 +1,53 @@
 package org.sagebionetworks.web.client.widget.entity.restriction.v2;
 
-import org.sagebionetworks.web.client.SynapseView;
 import com.google.gwt.user.client.ui.IsWidget;
+import org.sagebionetworks.web.client.SynapseView;
 
 public interface RestrictionWidgetView extends IsWidget, SynapseView {
+  /**
+   * Set the presenter.
+   *
+   * @param presenter
+   */
+  public void setPresenter(Presenter presenter);
 
-	/**
-	 * Set the presenter.
-	 * 
-	 * @param presenter
-	 */
-	public void setPresenter(Presenter presenter);
-	void configureCurrentAccessComponent(String entityId, Long versionNumber);
-	void showFlagUI();
-	void showFolderRestrictionsLink(String entityId);
-	void showChangeLink();
+  void configureCurrentAccessComponent(String entityId, Long versionNumber);
+  void showFlagUI();
+  void showFolderRestrictionsLink(String entityId);
+  void showChangeLink();
 
-	void showVerifyDataSensitiveDialog();
+  void showVerifyDataSensitiveDialog();
 
-	void setNotSensitiveHumanDataMessageVisible(boolean visible);
+  void setNotSensitiveHumanDataMessageVisible(boolean visible);
 
-	Boolean isYesHumanDataRadioSelected();
+  Boolean isYesHumanDataRadioSelected();
 
-	Boolean isNoHumanDataRadioSelected();
+  Boolean isNoHumanDataRadioSelected();
 
-	void setSynAlert(IsWidget w);
+  void setSynAlert(IsWidget w);
 
-	public void setImposeRestrictionModalVisible(boolean visible);
+  public void setImposeRestrictionModalVisible(boolean visible);
 
-	void showFolderRestrictionUI();
+  void showFolderRestrictionUI();
 
-	void showNoRestrictionsUI();
+  void showNoRestrictionsUI();
 
-	void showControlledUseUI();
+  void showControlledUseUI();
 
+  /**
+   * Presenter interface
+   */
+  public interface Presenter {
+    void changeClicked();
 
-	/**
-	 * Presenter interface
-	 */
-	public interface Presenter {
-		void changeClicked();
+    void reportIssueClicked();
 
-		void reportIssueClicked();
+    void imposeRestrictionOkClicked();
 
-		void imposeRestrictionOkClicked();
+    void imposeRestrictionCancelClicked();
 
-		void imposeRestrictionCancelClicked();
+    void yesHumanDataClicked();
 
-		void yesHumanDataClicked();
-
-		void notHumanDataClicked();
-	}
+    void notHumanDataClicked();
+  }
 }

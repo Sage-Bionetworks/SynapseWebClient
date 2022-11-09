@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
+import com.google.inject.Inject;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -13,90 +14,120 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.discussion.ForumWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.shared.WebConstants;
-import com.google.inject.Inject;
 
 public class DiscussionTab implements DiscussionTabView.Presenter {
-	private final static Long PROJECT_VERSION_NUMBER = null;
-	Tab tab;
-	DiscussionTabView view;
-	// use this token to navigate between threads within the discussion tab
-	ParameterizedToken params;
-	ForumWidget forumWidget;
-	String entityName, entityId;
-	GlobalApplicationState globalAppState;
-	SynapseProperties synapseProperties;
-	PortalGinInjector ginInjector;
 
-	@Inject
-	public DiscussionTab(Tab tab, PortalGinInjector ginInjector) {
-		this.tab = tab;
-		this.ginInjector = ginInjector;
-		tab.configure("Discussion", "discussion", "Engage your collaborators in project specific Discussions.", WebConstants.DOCS_URL + "Discussion-Forums.1985904796.html", EntityArea.DISCUSSION);
-	}
+  private static final Long PROJECT_VERSION_NUMBER = null;
+  Tab tab;
+  DiscussionTabView view;
+  // use this token to navigate between threads within the discussion tab
+  ParameterizedToken params;
+  ForumWidget forumWidget;
+  String entityName, entityId;
+  GlobalApplicationState globalAppState;
+  SynapseProperties synapseProperties;
+  PortalGinInjector ginInjector;
 
-	public void lazyInject() {
-		if (view == null) {
-			this.view = ginInjector.getDiscussionTabView();
-			this.forumWidget = ginInjector.getForumWidget();
-			this.globalAppState = ginInjector.getGlobalApplicationState();
-			this.synapseProperties = ginInjector.getSynapseProperties();
-			view.setPresenter(this);
-			view.setForum(forumWidget.asWidget());
-			tab.setContent(view.asWidget());
-		}
-	}
+  @Inject
+  public DiscussionTab(Tab tab, PortalGinInjector ginInjector) {
+    this.tab = tab;
+    this.ginInjector = ginInjector;
+    tab.configure(
+      "Discussion",
+      "discussion",
+      "Engage your collaborators in project specific Discussions.",
+      WebConstants.DOCS_URL + "Discussion-Forums.1985904796.html",
+      EntityArea.DISCUSSION
+    );
+  }
 
-	public void setTabClickedCallback(CallbackP<Tab> onClickCallback) {
-		tab.addTabClickedCallback(onClickCallback);
-	}
+  public void lazyInject() {
+    if (view == null) {
+      this.view = ginInjector.getDiscussionTabView();
+      this.forumWidget = ginInjector.getForumWidget();
+      this.globalAppState = ginInjector.getGlobalApplicationState();
+      this.synapseProperties = ginInjector.getSynapseProperties();
+      view.setPresenter(this);
+      view.setForum(forumWidget.asWidget());
+      tab.setContent(view.asWidget());
+    }
+  }
 
-	public void configure(final String entityId, String entityName, EntityBundle projectBundle, String areaToken, Boolean isCurrentUserModerator) {
-		lazyInject();
-		this.entityId = entityId;
-		this.entityName = entityName;
-		this.params = new ParameterizedToken(areaToken);
-		checkForSynapseForum();
-		CallbackP<ParameterizedToken> updateParamsCallback = token -> {
-			updatePlace(new Synapse(entityId, PROJECT_VERSION_NUMBER, EntityArea.DISCUSSION, token.toString()));
-		};
-		Callback updateURLCallback = new Callback() {
-			@Override
-			public void invoke() {
-				tab.showTab();
-			}
-		};
-		tab.configureEntityActionController(projectBundle, true, null);
-		forumWidget.configure(entityId, params, isCurrentUserModerator, tab.getEntityActionMenu(), updateParamsCallback, updateURLCallback);
-		// SWC-3994: initialize tab Place to set the initial area token
-		updateParamsCallback.invoke(params);
-	}
+  public void setTabClickedCallback(CallbackP<Tab> onClickCallback) {
+    tab.addTabClickedCallback(onClickCallback);
+  }
 
-	public void updateActionMenuCommands() {
-		forumWidget.updateActionMenuCommands();
-	}
+  public void configure(
+    final String entityId,
+    String entityName,
+    EntityBundle projectBundle,
+    String areaToken,
+    Boolean isCurrentUserModerator
+  ) {
+    lazyInject();
+    this.entityId = entityId;
+    this.entityName = entityName;
+    this.params = new ParameterizedToken(areaToken);
+    checkForSynapseForum();
+    CallbackP<ParameterizedToken> updateParamsCallback = token -> {
+      updatePlace(
+        new Synapse(
+          entityId,
+          PROJECT_VERSION_NUMBER,
+          EntityArea.DISCUSSION,
+          token.toString()
+        )
+      );
+    };
+    Callback updateURLCallback = new Callback() {
+      @Override
+      public void invoke() {
+        tab.showTab();
+      }
+    };
+    tab.configureEntityActionController(projectBundle, true, null);
+    forumWidget.configure(
+      entityId,
+      params,
+      isCurrentUserModerator,
+      tab.getEntityActionMenu(),
+      updateParamsCallback,
+      updateURLCallback
+    );
+    // SWC-3994: initialize tab Place to set the initial area token
+    updateParamsCallback.invoke(params);
+  }
 
-	public void checkForSynapseForum() {
-		String forumSynapseId = synapseProperties.getSynapseProperty(WebConstants.FORUM_SYNAPSE_ID_PROPERTY);
-		if (forumSynapseId.equals(entityId)) {
-			SynapseForumPlace forumPlace = new SynapseForumPlace(ParameterizedToken.DEFAULT_TOKEN);
-			forumPlace.setParameterizedToken(params);
-			globalAppState.getPlaceChanger().goTo(forumPlace);
-		}
-	}
+  public void updateActionMenuCommands() {
+    forumWidget.updateActionMenuCommands();
+  }
 
-	/**
-	 * Based on the current area parameters, update the address bar (push the url in to the browser
-	 * history).
-	 */
-	public void updatePlace(Synapse newPlace) {
-		tab.setEntityNameAndPlace(entityName, newPlace);
-	}
+  public void checkForSynapseForum() {
+    String forumSynapseId = synapseProperties.getSynapseProperty(
+      WebConstants.FORUM_SYNAPSE_ID_PROPERTY
+    );
+    if (forumSynapseId.equals(entityId)) {
+      SynapseForumPlace forumPlace = new SynapseForumPlace(
+        ParameterizedToken.DEFAULT_TOKEN
+      );
+      forumPlace.setParameterizedToken(params);
+      globalAppState.getPlaceChanger().goTo(forumPlace);
+    }
+  }
 
-	public Tab asTab() {
-		return tab;
-	}
+  /**
+   * Based on the current area parameters, update the address bar (push the url in to the browser
+   * history).
+   */
+  public void updatePlace(Synapse newPlace) {
+    tab.setEntityNameAndPlace(entityName, newPlace);
+  }
 
-	public String getCurrentAreaToken() {
-		return params.toString();
-	}
+  public Tab asTab() {
+    return tab;
+  }
+
+  public String getCurrentAreaToken() {
+    return params.toString();
+  }
 }

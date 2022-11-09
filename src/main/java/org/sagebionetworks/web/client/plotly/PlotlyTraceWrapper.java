@@ -4,71 +4,78 @@ import com.google.gwt.core.client.JavaScriptObject;
 import jsinterop.annotations.JsIgnore;
 
 public class PlotlyTraceWrapper {
-	String[] x, y;
-	String name, type;
-	boolean isHorizontal = false;
 
-	public PlotlyTraceWrapper() {}
+  String[] x, y;
+  String name, type;
+  boolean isHorizontal = false;
 
-	public void setType(GraphType newType) {
-		type = newType.name().toLowerCase();
-	}
+  public PlotlyTraceWrapper() {}
 
-	@JsIgnore
-	public void setX(String[] x) {
-		removeNulls(x);
-		this.x = x;
-	}
+  public void setType(GraphType newType) {
+    type = newType.name().toLowerCase();
+  }
 
-	public void setY(String[] y) {
-		removeNulls(y);
-		this.y = y;
-	}
+  @JsIgnore
+  public void setX(String[] x) {
+    removeNulls(x);
+    this.x = x;
+  }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+  public void setY(String[] y) {
+    removeNulls(y);
+    this.y = y;
+  }
 
-	public String getType() {
-		return type;
-	}
+  public void setName(String name) {
+    this.name = name;
+  }
 
-	private static final void removeNulls(String[] a) {
-		for (int i = 0; i < a.length; i++) {
-			if (a[i] == null) {
-				a[i] = "";
-			}
-		}
-	}
+  public String getType() {
+    return type;
+  }
 
-	public String getName() {
-		return name;
-	}
+  private static final void removeNulls(String[] a) {
+    for (int i = 0; i < a.length; i++) {
+      if (a[i] == null) {
+        a[i] = "";
+      }
+    }
+  }
 
-	public String[] getX() {
-		return x;
-	}
+  public String getName() {
+    return name;
+  }
 
-	public String[] getY() {
-		return y;
-	}
+  public String[] getX() {
+    return x;
+  }
 
-	public void setIsHorizontal(boolean isHorizontal) {
-		this.isHorizontal = isHorizontal;
-	}
+  public String[] getY() {
+    return y;
+  }
 
-	public boolean isHorizontal() {
-		return isHorizontal;
-	}
+  public void setIsHorizontal(boolean isHorizontal) {
+    this.isHorizontal = isHorizontal;
+  }
 
-	public JavaScriptObject getTrace() {
-		String orientationValue = isHorizontal ? "h" : "v";
-		String[] xAxis = isHorizontal ? y : x;
-		String[] yAxis = isHorizontal ? x : y;
-		return _getTrace(name, type, xAxis, yAxis, orientationValue);
-	}
+  public boolean isHorizontal() {
+    return isHorizontal;
+  }
 
-	private static native JavaScriptObject _getTrace(String nameValue, String typeValue, String[] xValue, String[] yValue, String orientationValue) /*-{
+  public JavaScriptObject getTrace() {
+    String orientationValue = isHorizontal ? "h" : "v";
+    String[] xAxis = isHorizontal ? y : x;
+    String[] yAxis = isHorizontal ? x : y;
+    return _getTrace(name, type, xAxis, yAxis, orientationValue);
+  }
+
+  private static native JavaScriptObject _getTrace(
+    String nameValue,
+    String typeValue,
+    String[] xValue,
+    String[] yValue,
+    String orientationValue
+  ) /*-{
 		return {
 			type : typeValue,
 			name : nameValue,
@@ -77,5 +84,4 @@ public class PlotlyTraceWrapper {
 			orientation : orientationValue
 		}
 	}-*/;
-
 }

@@ -1,53 +1,52 @@
 package org.sagebionetworks.web.client.view;
 
-import org.sagebionetworks.repo.model.quiz.PassingRecord;
-import org.sagebionetworks.repo.model.quiz.Quiz;
-import org.sagebionetworks.web.client.SynapseView;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import org.sagebionetworks.repo.model.quiz.PassingRecord;
+import org.sagebionetworks.repo.model.quiz.Quiz;
+import org.sagebionetworks.web.client.SynapseView;
 
 public interface QuizView extends IsWidget, SynapseView {
+  void setPresenter(Presenter loginPresenter);
 
-	void setPresenter(Presenter loginPresenter);
+  void hideLoading();
 
-	void hideLoading();
+  void setQuizHeader(String quizHeader);
 
-	void setQuizHeader(String quizHeader);
+  void addQuestionContainerWidget(Widget widget);
 
-	void addQuestionContainerWidget(Widget widget);
+  void setSubmitEnabled(boolean isEnabled);
 
-	void setSubmitEnabled(boolean isEnabled);
+  void reset();
 
-	void reset();
+  void setSubmitVisible(boolean isVisible);
 
-	void setSubmitVisible(boolean isVisible);
+  void showScore(String scoreContainerText);
 
-	void showScore(String scoreContainerText);
+  void hideAll();
 
-	void hideAll();
+  void showSuccess(PassingRecord passingRecord);
 
-	void showSuccess(PassingRecord passingRecord);
+  void showFailure(PassingRecord passingRecord);
 
-	void showFailure(PassingRecord passingRecord);
+  public interface Presenter {
+    void goTo(Place place);
 
-	public interface Presenter {
-		void goTo(Place place);
+    void goToLastPlace();
 
-		void goToLastPlace();
+    void showQuiz(Quiz quiz);
 
-		void showQuiz(Quiz quiz);
+    void submitAnswers();
 
-		void submitAnswers();
+    void showSuccess(PassingRecord passingRecord);
 
-		void showSuccess(PassingRecord passingRecord);
+    void showFailure(PassingRecord passingRecord);
 
-		void showFailure(PassingRecord passingRecord);
+    void submitClicked();
 
-		void submitClicked();
+    void showQuizFromPassingRecord(PassingRecord passingRecord);
+  }
 
-		void showQuizFromPassingRecord(PassingRecord passingRecord);
-	}
-
-	void setSynAlertWidget(Widget synAlert);
+  void setSynAlertWidget(Widget synAlert);
 }

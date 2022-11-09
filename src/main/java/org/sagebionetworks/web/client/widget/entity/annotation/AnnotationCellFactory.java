@@ -8,11 +8,10 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
  *
  */
 public interface AnnotationCellFactory {
-
-	/**
-	 * Crate an editor for a cell.
-	 * 
-	 * @return
-	 */
-	public CellEditor createEditor(AnnotationsValue annotation);
+  /**
+   * Crate an editor for a cell.
+   *
+   * @return
+   */
+  public CellEditor createEditor(AnnotationsValue annotation);
 }

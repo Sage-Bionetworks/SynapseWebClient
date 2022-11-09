@@ -1,48 +1,46 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.approval;
 
+import com.google.gwt.user.client.ui.IsWidget;
 import java.util.List;
 import org.sagebionetworks.repo.model.dataaccess.AccessApprovalNotification;
-import com.google.gwt.user.client.ui.IsWidget;
 
 public interface AccessorGroupView extends IsWidget {
+  /**
+   * Set the presenter.
+   *
+   * @param presenter
+   */
+  void setPresenter(Presenter presenter);
 
-	/**
-	 * Set the presenter.
-	 * 
-	 * @param presenter
-	 */
-	void setPresenter(Presenter presenter);
+  void addStyleNames(String styleNames);
 
-	void addStyleNames(String styleNames);
+  void setVisible(boolean visible);
 
-	void setVisible(boolean visible);
+  void setSynAlert(IsWidget w);
 
-	void setSynAlert(IsWidget w);
+  void clearAccessors();
 
-	void clearAccessors();
+  void addAccessor(IsWidget w);
 
-	void addAccessor(IsWidget w);
+  void setSubmittedBy(IsWidget w);
 
-	void setSubmittedBy(IsWidget w);
+  void setExpiresOn(String expiresOn);
 
-	void setExpiresOn(String expiresOn);
+  void showAccessRequirementDialog(IsWidget w);
 
-	void showAccessRequirementDialog(IsWidget w);
+  void clearEmails();
 
-	void clearEmails();
+  void addEmail(String username);
+  void showNotifications(List<AccessApprovalNotification> notifications);
 
-	void addEmail(String username);
-	void showNotifications(List<AccessApprovalNotification> notifications);
+  /**
+   * Presenter interface
+   */
+  public interface Presenter {
+    void onShowAccessRequirement();
 
-	/**
-	 * Presenter interface
-	 */
-	public interface Presenter {
-		void onShowAccessRequirement();
+    void onRevoke();
 
-		void onRevoke();
-
-		void onShowNotifications();
-	}
-
+    void onShowNotifications();
+  }
 }

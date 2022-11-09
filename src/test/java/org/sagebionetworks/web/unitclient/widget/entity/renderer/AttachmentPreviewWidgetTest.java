@@ -4,6 +4,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.Before;
@@ -17,28 +18,28 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 
 public class AttachmentPreviewWidgetTest {
 
-	AttachmentPreviewWidget widget;
-	AttachmentPreviewWidgetView mockView;
-	Map<String, String> descriptor;
-	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
+  AttachmentPreviewWidget widget;
+  AttachmentPreviewWidgetView mockView;
+  Map<String, String> descriptor;
+  WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
 
-	@Before
-	public void setup() throws JSONObjectAdapterException {
-		mockView = mock(AttachmentPreviewWidgetView.class);
-		widget = new AttachmentPreviewWidget(mockView);
-		descriptor = new HashMap<String, String>();
-		descriptor.put(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY, "test name");
-	}
+  @Before
+  public void setup() throws JSONObjectAdapterException {
+    mockView = mock(AttachmentPreviewWidgetView.class);
+    widget = new AttachmentPreviewWidget(mockView);
+    descriptor = new HashMap<String, String>();
+    descriptor.put(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY, "test name");
+  }
 
-	@Test
-	public void testAsWidget() {
-		widget.asWidget();
-		verify(mockView).asWidget();
-	}
+  @Test
+  public void testAsWidget() {
+    widget.asWidget();
+    verify(mockView).asWidget();
+  }
 
-	@Test
-	public void testConfigure() {
-		widget.configure(wikiKey, descriptor, null, null);
-		verify(mockView).configure(any(WikiPageKey.class), anyString());
-	}
+  @Test
+  public void testConfigure() {
+    widget.configure(wikiKey, descriptor, null, null);
+    verify(mockView).configure(any(WikiPageKey.class), anyString());
+  }
 }
