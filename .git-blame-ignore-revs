@@ -1,0 +1,2 @@
+# Exclude the following commits from the git blame -- see https://stackoverflow.com/a/69118451
+# You may need to run git config blame.ignoreRevsFile .git-blame-ignore-revs

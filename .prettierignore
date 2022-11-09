@@ -1,3 +1,26 @@
+## Prettier-specific
+
+# Ignore all CSS files (source files are scss)
+*.css
+
+# SVG files don't need to be human-readable
+*.svg
+
+# These artifacts were generated and/or pre-minified and then checked in
+src/main/webapp/css/**/*
+src/main/webapp/js/**/*
+src/main/webapp/offline/**/*
+src/main/webapp/pdf.js/**/*
+src/main/webapp/research/**/*
+
+# Other checked-in files that can/should not be formatted.
+yarn.lock
+.prettierignore
+.gitignore
+.git-blame-ignore-revs
+
+## Copied from .gitignore
+
 target
 .maven
 /.classpath
@@ -24,3 +47,5 @@ src/main/webapp/fonts/*
 
 # If using jenv for JDK management
 /.java-version
+
+
