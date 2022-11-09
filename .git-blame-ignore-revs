@@ -1,2 +1,4 @@
 # Exclude the following commits from the git blame -- see https://stackoverflow.com/a/69118451
 # You may need to run git config blame.ignoreRevsFile .git-blame-ignore-revs
+## 2022-11-09 - Ran prettier code-formatter on entire repo after adding lint-staged to enforce code formatting
+53b439d81b4126848ce42514c6b5cc62fe5f5fa8
