@@ -19,10 +19,7 @@
       />
     </b:ListItem>
     <b:TabPane ui:field="tabPane" active="true" addStyleNames="tab-background">
-      <bh:Div
-        ui:field="contentDiv"
-        addStyleNames="margin-left-15 margin-right-15"
-      />
+      <bh:Div ui:field="contentDiv" />
     </b:TabPane>
   </bh:Div>
 </ui:UiBinder>
