@@ -1,9 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
-import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Span;
-import org.sagebionetworks.web.client.widget.FullWidthAlert;
-
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -11,79 +7,84 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Widget;
+import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
+import org.sagebionetworks.web.client.widget.FullWidthAlert;
 
 public class SynapseAlertViewImpl implements SynapseAlertView {
 
-	public interface Binder extends UiBinder<Widget, SynapseAlertViewImpl> {
-	}
+  public interface Binder extends UiBinder<Widget, SynapseAlertViewImpl> {}
 
-	private static Binder uiBinder = GWT.create(Binder.class);
+  private static Binder uiBinder = GWT.create(Binder.class);
 
-	Widget widget = null;
+  Widget widget = null;
 
-	@UiField
-	FullWidthAlert alert;
-	@UiField
-	Div loginWidgetContainer;
+  @UiField
+  FullWidthAlert alert;
 
-	Span synapseAlertContainer = new Span();
+  @UiField
+  Div loginWidgetContainer;
 
-	public SynapseAlertViewImpl() {}
+  Span synapseAlertContainer = new Span();
 
-	private void lazyConstruct() {
-		if (widget == null) {
-			synapseAlertContainer.setVisible(false);
-			widget = uiBinder.createAndBindUi(this);
-			synapseAlertContainer.add(widget);
-			alert.addPrimaryCTAClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					reload();
-				}
-			});
+  public SynapseAlertViewImpl() {}
 
-			clearState();
-		}
-	}
+  private void lazyConstruct() {
+    if (widget == null) {
+      synapseAlertContainer.setVisible(false);
+      widget = uiBinder.createAndBindUi(this);
+      synapseAlertContainer.add(widget);
+      alert.addPrimaryCTAClickHandler(
+        new ClickHandler() {
+          @Override
+          public void onClick(ClickEvent event) {
+            reload();
+          }
+        }
+      );
 
-	@Override
-	public void setRetryButtonVisible(boolean visible) {
-		lazyConstruct();
-		alert.setPrimaryCTAText(visible ? "Retry" : null);
-	}
+      clearState();
+    }
+  }
 
-	@Override
-	public Widget asWidget() {
-		return synapseAlertContainer;
-	}
+  @Override
+  public void setRetryButtonVisible(boolean visible) {
+    lazyConstruct();
+    alert.setPrimaryCTAText(visible ? "Retry" : null);
+  }
 
-	@Override
-	public void clearState() {
-		if (widget != null) {
-			alert.setVisible(false);
-			alert.setMessage("");
-			loginWidgetContainer.setVisible(false);
-			alert.setPrimaryCTAText(null);
-		}
-	}
+  @Override
+  public Widget asWidget() {
+    return synapseAlertContainer;
+  }
 
-	@Override
-	public void showLogin() {
-		lazyConstruct();
-		synapseAlertContainer.setVisible(true);
-		loginWidgetContainer.setVisible(true);
-	}
+  @Override
+  public void clearState() {
+    if (widget != null) {
+      alert.setVisible(false);
+      alert.setMessage("");
+      loginWidgetContainer.setVisible(false);
+      alert.setPrimaryCTAText(null);
+    }
+  }
 
-	@Override
-	public void showError(String error) {
-		lazyConstruct();
-		synapseAlertContainer.setVisible(true);
-		alert.setMessage(error);
-		alert.setVisible(true);
-	}
+  @Override
+  public void showLogin() {
+    lazyConstruct();
+    synapseAlertContainer.setVisible(true);
+    loginWidgetContainer.setVisible(true);
+  }
 
-	@Override
-	public void reload() {
-		Window.Location.reload();
-	}
+  @Override
+  public void showError(String error) {
+    lazyConstruct();
+    synapseAlertContainer.setVisible(true);
+    alert.setMessage(error);
+    alert.setVisible(true);
+  }
+
+  @Override
+  public void reload() {
+    Window.Location.reload();
+  }
 }

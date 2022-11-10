@@ -1,53 +1,51 @@
 package org.sagebionetworks.web.client.widget.table.v2.schema;
 
-import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import com.google.gwt.user.client.ui.IsWidget;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 
 public interface ColumnModelsViewBase extends IsWidget {
+  public interface Presenter {
+    /**
+     * Configure a newly created view.
+     *
+     * @param headerText
+     * @param models
+     * @param isEditabl
+     */
+    public void configure(EntityBundle bundle, boolean isEditable);
 
-	public interface Presenter {
+    /**
+     * Called when the save button is pressed
+     */
+    public void onSave();
+  }
 
-		/**
-		 * Configure a newly created view.
-		 * 
-		 * @param headerText
-		 * @param models
-		 * @param isEditabl
-		 */
-		public void configure(EntityBundle bundle, boolean isEditable);
+  public void setPresenter(Presenter presenter);
 
-		/**
-		 * Called when the save button is pressed
-		 */
-		public void onSave();
-	}
+  public void setViewer(ColumnModelsView viewer);
 
-	public void setPresenter(Presenter presenter);
+  public void setEditor(IsWidget editor);
 
-	public void setViewer(ColumnModelsView viewer);
+  public void setJobTrackingWidget(IsWidget jobTrackingWidget);
 
-	public void setEditor(IsWidget editor);
+  public void setJobTrackingWidgetVisible(boolean visible);
 
-	public void setJobTrackingWidget(IsWidget jobTrackingWidget);
+  /**
+   * Show the editor.
+   */
+  public void showEditor();
 
-	public void setJobTrackingWidgetVisible(boolean visible);
+  /**
+   * Hide the editor
+   */
+  public void hideEditor();
 
-	/**
-	 * Show the editor.
-	 */
-	public void showEditor();
+  /**
+   * Called before any service call.
+   */
+  public void setLoading();
 
-	/**
-	 * Hide the editor
-	 */
-	public void hideEditor();
+  void setSynAlert(IsWidget w);
 
-	/**
-	 * Called before any service call.
-	 */
-	public void setLoading();
-
-	void setSynAlert(IsWidget w);
-
-	void resetSaveButton();
+  void resetSaveButton();
 }

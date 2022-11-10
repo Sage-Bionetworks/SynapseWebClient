@@ -4,22 +4,21 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 public interface SubscribersWidgetView extends IsWidget {
+  public interface Presenter {
+    void onClickSubscribersLink();
+  }
 
-	public interface Presenter {
-		void onClickSubscribersLink();
-	}
+  void setPresenter(SubscribersWidget presenter);
 
-	void setPresenter(SubscribersWidget presenter);
+  void clearSubscriberCount();
 
-	void clearSubscriberCount();
+  void setSubscriberCount(Long count);
 
-	void setSubscriberCount(Long count);
+  void setSubscribersLinkVisible(boolean visible);
 
-	void setSubscribersLinkVisible(boolean visible);
+  void setSynapseAlert(Widget w);
 
-	void setSynapseAlert(Widget w);
+  void setUserListContainer(Widget w);
 
-	void setUserListContainer(Widget w);
-
-	void showDialog();
+  void showDialog();
 }

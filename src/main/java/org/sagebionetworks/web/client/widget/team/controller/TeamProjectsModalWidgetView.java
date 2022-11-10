@@ -1,26 +1,26 @@
 package org.sagebionetworks.web.client.widget.team.controller;
 
-import org.sagebionetworks.repo.model.ProjectListSortColumn;
-import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import org.sagebionetworks.repo.model.ProjectListSortColumn;
+import org.sagebionetworks.repo.model.entity.query.SortDirection;
 
 public interface TeamProjectsModalWidgetView extends IsWidget {
-	public interface Presenter {
-		void sort(ProjectListSortColumn column);
-	}
+  public interface Presenter {
+    void sort(ProjectListSortColumn column);
+  }
 
-	void setSynAlertWidget(Widget asWidget);
+  void setSynAlertWidget(Widget asWidget);
 
-	void setPresenter(Presenter presenter);
+  void setPresenter(Presenter presenter);
 
-	void setTitle(String title);
+  void setTitle(String title);
 
-	void show();
+  void show();
 
-	void hide();
+  void hide();
 
-	void setProjectsContent(IsWidget projectsContent);
+  void setProjectsContent(IsWidget projectsContent);
 
-	void setSortDirection(ProjectListSortColumn column, SortDirection direction);
+  void setSortDirection(ProjectListSortColumn column, SortDirection direction);
 }

@@ -6,39 +6,38 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class QuizInfoViewImpl extends Composite implements QuizInfoWidgetView {
-	private Presenter presenter;
 
-	public interface Binder extends UiBinder<Widget, QuizInfoViewImpl> {
-	}
+  private Presenter presenter;
 
-	@Inject
-	public QuizInfoViewImpl(Binder uiBinder) {
-		initWidget(uiBinder.createAndBindUi(this));
-	}
+  public interface Binder extends UiBinder<Widget, QuizInfoViewImpl> {}
 
-	@Override
-	public void clear() {}
+  @Inject
+  public QuizInfoViewImpl(Binder uiBinder) {
+    initWidget(uiBinder.createAndBindUi(this));
+  }
 
-	@Override
-	public void configure() {}
+  @Override
+  public void clear() {}
 
-	@Override
-	public Widget asWidget() {
-		return this;
-	}
+  @Override
+  public void configure() {}
 
-	@Override
-	public void showLoading() {}
+  @Override
+  public Widget asWidget() {
+    return this;
+  }
 
-	@Override
-	public void showInfo(String message) {}
+  @Override
+  public void showLoading() {}
 
-	@Override
-	public void showErrorMessage(String message) {}
+  @Override
+  public void showInfo(String message) {}
 
-	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-	}
+  @Override
+  public void showErrorMessage(String message) {}
 
+  @Override
+  public void setPresenter(Presenter presenter) {
+    this.presenter = presenter;
+  }
 }

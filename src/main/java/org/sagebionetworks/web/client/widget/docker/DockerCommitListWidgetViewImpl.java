@@ -7,41 +7,44 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class DockerCommitListWidgetViewImpl implements DockerCommitListWidgetView {
-	public interface Binder extends UiBinder<Widget, DockerCommitListWidgetViewImpl> {
-	}
+public class DockerCommitListWidgetViewImpl
+  implements DockerCommitListWidgetView {
 
-	@UiField
-	SimplePanel dockerCommitList;
-	@UiField
-	SimplePanel synAlertContainer;
+  public interface Binder
+    extends UiBinder<Widget, DockerCommitListWidgetViewImpl> {}
 
-	Widget widget;
-	Presenter presenter;
+  @UiField
+  SimplePanel dockerCommitList;
 
-	@Inject
-	public DockerCommitListWidgetViewImpl(Binder binder) {
-		this.widget = binder.createAndBindUi(this);
-	}
+  @UiField
+  SimplePanel synAlertContainer;
 
-	@Override
-	public Widget asWidget() {
-		return widget;
-	}
+  Widget widget;
+  Presenter presenter;
 
-	@Override
-	public void setCommitsContainer(IsWidget widget) {
-		dockerCommitList.clear();
-		dockerCommitList.add(widget);
-	}
+  @Inject
+  public DockerCommitListWidgetViewImpl(Binder binder) {
+    this.widget = binder.createAndBindUi(this);
+  }
 
-	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-	}
+  @Override
+  public Widget asWidget() {
+    return widget;
+  }
 
-	@Override
-	public void setSynAlert(Widget widget) {
-		synAlertContainer.setWidget(widget);
-	}
+  @Override
+  public void setCommitsContainer(IsWidget widget) {
+    dockerCommitList.clear();
+    dockerCommitList.add(widget);
+  }
+
+  @Override
+  public void setPresenter(Presenter presenter) {
+    this.presenter = presenter;
+  }
+
+  @Override
+  public void setSynAlert(Widget widget) {
+    synAlertContainer.setWidget(widget);
+  }
 }

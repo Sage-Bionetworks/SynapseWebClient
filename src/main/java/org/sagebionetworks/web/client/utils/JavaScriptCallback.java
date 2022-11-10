@@ -4,7 +4,7 @@ import com.google.gwt.core.client.JavaScriptObject;
 
 /**
  * A simple interface for passing a method which is to be called by the recipient.
- * 
+ *
  * This is the same as a CallbackP<JavaScriptObject>. GWT was unable to resolve the invoke method
  * for the generic version: [ERROR] Referencing method
  * 'org.sagebionetworks.web.client.utils.CallbackP.invoke(Lcom/google/gwt/core/client/JavaScriptObject;)':
@@ -12,5 +12,5 @@ import com.google.gwt.core.client.JavaScriptObject;
  *
  */
 public interface JavaScriptCallback {
-	void invoke(JavaScriptObject event);
+  void invoke(JavaScriptObject event);
 }

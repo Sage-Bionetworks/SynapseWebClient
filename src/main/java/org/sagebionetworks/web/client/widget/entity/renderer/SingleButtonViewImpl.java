@@ -1,6 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
-
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
@@ -8,114 +13,111 @@ import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.Callback;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 
 /**
  * View that contains a single button.
- * 
+ *
  * @author jayhodgson
  *
  */
 public class SingleButtonViewImpl implements SingleButtonView {
 
-	public interface Binder extends UiBinder<Widget, SingleButtonViewImpl> {
-	}
+  public interface Binder extends UiBinder<Widget, SingleButtonViewImpl> {}
 
-	private Presenter presenter;
+  private Presenter presenter;
 
-	@UiField
-	Button button;
-	Widget widget;
-	@UiField
-	Div extraWidgetsContainer;
-	String originalButtonText;
+  @UiField
+  Button button;
 
-	@Inject
-	public SingleButtonViewImpl(Binder binder) {
-		widget = binder.createAndBindUi(this);
-		button.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onClick();
-			}
-		});
-		originalButtonText = button.getText();
-	}
+  Widget widget;
 
-	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-	}
+  @UiField
+  Div extraWidgetsContainer;
 
-	@Override
-	public void setButtonEnabled(boolean enabled) {
-		button.setEnabled(enabled);
-	}
+  String originalButtonText;
 
-	@Override
-	public Widget asWidget() {
-		return widget;
-	}
+  @Inject
+  public SingleButtonViewImpl(Binder binder) {
+    widget = binder.createAndBindUi(this);
+    button.addClickHandler(
+      new ClickHandler() {
+        @Override
+        public void onClick(ClickEvent event) {
+          presenter.onClick();
+        }
+      }
+    );
+    originalButtonText = button.getText();
+  }
 
-	@Override
-	public void setButtonText(String string) {
-		button.setText(string);
-		originalButtonText = string;
-	}
+  @Override
+  public void setPresenter(Presenter presenter) {
+    this.presenter = presenter;
+  }
 
-	@Override
-	public void setButtonType(ButtonType type) {
-		button.setType(type);
-	}
+  @Override
+  public void setButtonEnabled(boolean enabled) {
+    button.setEnabled(enabled);
+  }
 
-	@Override
-	public void setButtonVisible(boolean visible) {
-		button.setVisible(visible);
-	}
+  @Override
+  public Widget asWidget() {
+    return widget;
+  }
 
-	@Override
-	public void setLoading(boolean isLoading) {
-		DisplayUtils.showLoading(button, isLoading, originalButtonText);
-	}
-	
-	@Override
-	public void setDataLoadingText(String loadingText) {
-		button.setDataLoadingText(loadingText);
-	}
+  @Override
+  public void setButtonText(String string) {
+    button.setText(string);
+    originalButtonText = string;
+  }
 
-	@Override
-	public void showConfirmDialog(String message, Callback callback) {
-		DisplayUtils.confirm(message, callback);
-	}
+  @Override
+  public void setButtonType(ButtonType type) {
+    button.setType(type);
+  }
 
-	@Override
-	public void addWidget(Widget widget) {
-		extraWidgetsContainer.add(widget);
-	}
+  @Override
+  public void setButtonVisible(boolean visible) {
+    button.setVisible(visible);
+  }
 
+  @Override
+  public void setLoading(boolean isLoading) {
+    DisplayUtils.showLoading(button, isLoading, originalButtonText);
+  }
 
-	@Override
-	public void setButtonSize(ButtonSize size) {
-		button.setSize(size);
-	}
+  @Override
+  public void setDataLoadingText(String loadingText) {
+    button.setDataLoadingText(loadingText);
+  }
 
-	@Override
-	public void clearWidgets() {
-		extraWidgetsContainer.clear();
-	}
+  @Override
+  public void showConfirmDialog(String message, Callback callback) {
+    DisplayUtils.confirm(message, callback);
+  }
 
-	@Override
-	public void addStyleNames(String styles) {
-		button.addStyleName(styles);
-	}
+  @Override
+  public void addWidget(Widget widget) {
+    extraWidgetsContainer.add(widget);
+  }
 
-	@Override
-	public void setButtonIcon(IconType icon) {
-		button.setIcon(icon);
-	}
+  @Override
+  public void setButtonSize(ButtonSize size) {
+    button.setSize(size);
+  }
+
+  @Override
+  public void clearWidgets() {
+    extraWidgetsContainer.clear();
+  }
+
+  @Override
+  public void addStyleNames(String styles) {
+    button.addStyleName(styles);
+  }
+
+  @Override
+  public void setButtonIcon(IconType icon) {
+    button.setIcon(icon);
+  }
 }

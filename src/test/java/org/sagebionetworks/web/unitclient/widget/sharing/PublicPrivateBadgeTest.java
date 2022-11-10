@@ -6,6 +6,8 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import java.util.HashSet;
 import java.util.Set;
 import org.junit.Before;
@@ -27,106 +29,136 @@ import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadgeView;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class PublicPrivateBadgeTest {
 
-	private static final Long TEST_PUBLIC_PRINCIPAL_ID = 789l;
-	private static final Long TEST_AUTHENTICATED_PRINCIPAL_ID = 123l;
-	private static final Long TEST_ANONYMOUS_PRINCIPAL_ID = 422l;
-	@Mock
-	SynapseJavascriptClient mockSynapseJavascriptClient;
-	PublicPrivateBadge publicPrivateBadge;
-	@Mock
-	PublicPrivateBadgeView mockView;
-	@Mock
-	UserAccountServiceAsync mockUserService;
-	JSONObjectAdapter adapter = new JSONObjectAdapterImpl();
-	AccessControlList acl;
-	PublicPrincipalIds publicPrincipalIds;
-	Set<ResourceAccess> resourceAccessSet = new HashSet<ResourceAccess>();
-	Entity testEntity;
+  private static final Long TEST_PUBLIC_PRINCIPAL_ID = 789l;
+  private static final Long TEST_AUTHENTICATED_PRINCIPAL_ID = 123l;
+  private static final Long TEST_ANONYMOUS_PRINCIPAL_ID = 422l;
 
-	@Before
-	public void setup() {
-		MockitoAnnotations.initMocks(this);
-		publicPrivateBadge = new PublicPrivateBadge(mockView, mockSynapseJavascriptClient, mockUserService);
-		acl = new AccessControlList();
-		acl.setResourceAccess(resourceAccessSet);
-		testEntity = new FileEntity();
-		testEntity.setId("syn12345");
-		publicPrincipalIds = new PublicPrincipalIds(TEST_PUBLIC_PRINCIPAL_ID, TEST_AUTHENTICATED_PRINCIPAL_ID, TEST_ANONYMOUS_PRINCIPAL_ID);
-		EntityBundle transport = new EntityBundle();
-		transport.setBenefactorAcl(acl);
-		AsyncMockStubber.callSuccessWith(transport).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), any(EntityBundleRequest.class), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(publicPrincipalIds).when(mockUserService).getPublicAndAuthenticatedGroupPrincipalIds(any(AsyncCallback.class));
-		DisplayUtils.publicPrincipalIds = null;
-	}
+  @Mock
+  SynapseJavascriptClient mockSynapseJavascriptClient;
 
-	@Test
-	public void testConfigure() {
-		publicPrivateBadge.configure(testEntity);
-		verify(mockView).setIsPublic(anyBoolean());
-	}
+  PublicPrivateBadge publicPrivateBadge;
 
-	@Test
-	public void testGetACLFailure() {
-		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), any(EntityBundleRequest.class), any(AsyncCallback.class));
-		publicPrivateBadge.configure(testEntity);
-		verify(mockView).showErrorMessage(anyString());
-	}
+  @Mock
+  PublicPrivateBadgeView mockView;
 
-	@Test
-	public void testGetPublicPrincipalIdsFailure() {
-		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(mockUserService).getPublicAndAuthenticatedGroupPrincipalIds(any(AsyncCallback.class));
-		publicPrivateBadge.configure(testEntity);
-		verify(mockView).showErrorMessage(anyString());
-	}
+  @Mock
+  UserAccountServiceAsync mockUserService;
 
-	@Test
-	public void testIsPublic() {
-		// start with an empty acl, verify is not public
-		assertFalse(PublicPrivateBadge.isPublic(acl, publicPrincipalIds));
+  JSONObjectAdapter adapter = new JSONObjectAdapterImpl();
+  AccessControlList acl;
+  PublicPrincipalIds publicPrincipalIds;
+  Set<ResourceAccess> resourceAccessSet = new HashSet<ResourceAccess>();
+  Entity testEntity;
 
-		// add a resourceaccess that is not a public group, and verify it's still not considered public
-		ResourceAccess ra = new ResourceAccess();
-		ra.setPrincipalId(9l);
-		resourceAccessSet.add(ra);
-		assertFalse(PublicPrivateBadge.isPublic(acl, publicPrincipalIds));
+  @Before
+  public void setup() {
+    MockitoAnnotations.initMocks(this);
+    publicPrivateBadge =
+      new PublicPrivateBadge(
+        mockView,
+        mockSynapseJavascriptClient,
+        mockUserService
+      );
+    acl = new AccessControlList();
+    acl.setResourceAccess(resourceAccessSet);
+    testEntity = new FileEntity();
+    testEntity.setId("syn12345");
+    publicPrincipalIds =
+      new PublicPrincipalIds(
+        TEST_PUBLIC_PRINCIPAL_ID,
+        TEST_AUTHENTICATED_PRINCIPAL_ID,
+        TEST_ANONYMOUS_PRINCIPAL_ID
+      );
+    EntityBundle transport = new EntityBundle();
+    transport.setBenefactorAcl(acl);
+    AsyncMockStubber
+      .callSuccessWith(transport)
+      .when(mockSynapseJavascriptClient)
+      .getEntityBundle(
+        anyString(),
+        any(EntityBundleRequest.class),
+        any(AsyncCallback.class)
+      );
+    AsyncMockStubber
+      .callSuccessWith(publicPrincipalIds)
+      .when(mockUserService)
+      .getPublicAndAuthenticatedGroupPrincipalIds(any(AsyncCallback.class));
+    DisplayUtils.publicPrincipalIds = null;
+  }
 
-		// now add a resourceaccess that is considered a public group, and verify it now reports true
-		ra = new ResourceAccess();
-		ra.setPrincipalId(TEST_AUTHENTICATED_PRINCIPAL_ID);
-		resourceAccessSet.add(ra);
-		assertTrue(PublicPrivateBadge.isPublic(acl, publicPrincipalIds));
+  @Test
+  public void testConfigure() {
+    publicPrivateBadge.configure(testEntity);
+    verify(mockView).setIsPublic(anyBoolean());
+  }
 
-		// add both public groups and verify public
-		ra = new ResourceAccess();
-		ra.setPrincipalId(TEST_PUBLIC_PRINCIPAL_ID);
-		resourceAccessSet.add(ra);
-		assertTrue(PublicPrivateBadge.isPublic(acl, publicPrincipalIds));
+  @Test
+  public void testGetACLFailure() {
+    AsyncMockStubber
+      .callFailureWith(new IllegalArgumentException())
+      .when(mockSynapseJavascriptClient)
+      .getEntityBundle(
+        anyString(),
+        any(EntityBundleRequest.class),
+        any(AsyncCallback.class)
+      );
+    publicPrivateBadge.configure(testEntity);
+    verify(mockView).showErrorMessage(anyString());
+  }
 
-		ra = new ResourceAccess();
-		ra.setPrincipalId(TEST_ANONYMOUS_PRINCIPAL_ID);
-		resourceAccessSet.add(ra);
-		assertTrue(PublicPrivateBadge.isPublic(acl, publicPrincipalIds));
+  @Test
+  public void testGetPublicPrincipalIdsFailure() {
+    AsyncMockStubber
+      .callFailureWith(new IllegalArgumentException())
+      .when(mockUserService)
+      .getPublicAndAuthenticatedGroupPrincipalIds(any(AsyncCallback.class));
+    publicPrivateBadge.configure(testEntity);
+    verify(mockView).showErrorMessage(anyString());
+  }
 
-		// add only the other public group, and verify public
-		resourceAccessSet.clear();
-		ra = new ResourceAccess();
-		ra.setPrincipalId(TEST_PUBLIC_PRINCIPAL_ID);
-		resourceAccessSet.add(ra);
-		assertTrue(PublicPrivateBadge.isPublic(acl, publicPrincipalIds));
+  @Test
+  public void testIsPublic() {
+    // start with an empty acl, verify is not public
+    assertFalse(PublicPrivateBadge.isPublic(acl, publicPrincipalIds));
 
-		// add only the other public group, and verify public
-		resourceAccessSet.clear();
-		ra = new ResourceAccess();
-		ra.setPrincipalId(TEST_ANONYMOUS_PRINCIPAL_ID);
-		resourceAccessSet.add(ra);
-		assertTrue(PublicPrivateBadge.isPublic(acl, publicPrincipalIds));
+    // add a resourceaccess that is not a public group, and verify it's still not considered public
+    ResourceAccess ra = new ResourceAccess();
+    ra.setPrincipalId(9l);
+    resourceAccessSet.add(ra);
+    assertFalse(PublicPrivateBadge.isPublic(acl, publicPrincipalIds));
 
-	}
+    // now add a resourceaccess that is considered a public group, and verify it now reports true
+    ra = new ResourceAccess();
+    ra.setPrincipalId(TEST_AUTHENTICATED_PRINCIPAL_ID);
+    resourceAccessSet.add(ra);
+    assertTrue(PublicPrivateBadge.isPublic(acl, publicPrincipalIds));
 
+    // add both public groups and verify public
+    ra = new ResourceAccess();
+    ra.setPrincipalId(TEST_PUBLIC_PRINCIPAL_ID);
+    resourceAccessSet.add(ra);
+    assertTrue(PublicPrivateBadge.isPublic(acl, publicPrincipalIds));
 
+    ra = new ResourceAccess();
+    ra.setPrincipalId(TEST_ANONYMOUS_PRINCIPAL_ID);
+    resourceAccessSet.add(ra);
+    assertTrue(PublicPrivateBadge.isPublic(acl, publicPrincipalIds));
 
+    // add only the other public group, and verify public
+    resourceAccessSet.clear();
+    ra = new ResourceAccess();
+    ra.setPrincipalId(TEST_PUBLIC_PRINCIPAL_ID);
+    resourceAccessSet.add(ra);
+    assertTrue(PublicPrivateBadge.isPublic(acl, publicPrincipalIds));
+
+    // add only the other public group, and verify public
+    resourceAccessSet.clear();
+    ra = new ResourceAccess();
+    ra.setPrincipalId(TEST_ANONYMOUS_PRINCIPAL_ID);
+    resourceAccessSet.add(ra);
+    assertTrue(PublicPrivateBadge.isPublic(acl, publicPrincipalIds));
+  }
 }

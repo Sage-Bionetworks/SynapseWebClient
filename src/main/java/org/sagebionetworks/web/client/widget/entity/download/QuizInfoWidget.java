@@ -1,25 +1,26 @@
 package org.sagebionetworks.web.client.widget.entity.download;
 
-import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.client.widget.entity.download.QuizInfoWidgetView.Presenter;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.entity.download.QuizInfoWidgetView.Presenter;
 
 public class QuizInfoWidget implements Presenter, SynapseWidgetPresenter {
-	private QuizInfoWidgetView view;
 
-	@Inject
-	public QuizInfoWidget(QuizInfoWidgetView view) {
-		this.view = view;
-		view.setPresenter(this);
-	}
+  private QuizInfoWidgetView view;
 
-	@Override
-	public Widget asWidget() {
-		return view.asWidget();
-	}
+  @Inject
+  public QuizInfoWidget(QuizInfoWidgetView view) {
+    this.view = view;
+    view.setPresenter(this);
+  }
 
-	public void configure() {
-		view.configure();
-	}
+  @Override
+  public Widget asWidget() {
+    return view.asWidget();
+  }
+
+  public void configure() {
+    view.configure();
+  }
 }

@@ -1,0 +1,51 @@
+## Prettier-specific
+
+# Ignore all CSS files (source files are scss)
+*.css
+
+# SVG files don't need to be human-readable
+*.svg
+
+# These artifacts were generated and/or pre-minified and then checked in
+src/main/webapp/css/**/*
+src/main/webapp/js/**/*
+src/main/webapp/offline/**/*
+src/main/webapp/pdf.js/**/*
+src/main/webapp/research/**/*
+
+# Other checked-in files that can/should not be formatted.
+yarn.lock
+.prettierignore
+.gitignore
+.git-blame-ignore-revs
+
+## Copied from .gitignore
+
+target
+.maven
+/.classpath
+/.project
+/.settings
+/.gwt
+gwt-unitCache/
+war/
+.DS_Store
+extras/
+/.externalToolBuilders/
+/.sass-cache/
+.idea/*
+
+# We use a maven plugin to download node and required modules.
+# Since these are retrieved at build-time, no need to commit.
+node/*
+node_modules/*
+
+# We copy these files to the webapp folder to serve this folder in Eclipse (dev builds only)
+# We don't want to commit them because they are compiled or retrieved at build-time
+src/main/webapp/generated/*
+src/main/webapp/fonts/*
+
+# If using jenv for JDK management
+/.java-version
+
+

@@ -1,5 +1,13 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.place.shared.Place;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 import java.util.List;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -12,183 +20,203 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.place.shared.Place;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 
-public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView {
-	private WikiSubpagesOrderEditor orderEditor;
-	private Button showHideButton;
-	private Button editOrderButton;
-	private FlowPanel navTreeContainer;
-	boolean isShowingSubpages;
+public class WikiSubpagesViewImpl
+  extends FlowPanel
+  implements WikiSubpagesView {
 
-	private WikiSubpageNavigationTree navTree;
-	private EventBus eventBus;
-	private Presenter presenter;
-	private SynapseJSNIUtils jsniUtils;
-	private SynapseAlert synAlert;
+  private WikiSubpagesOrderEditor orderEditor;
+  private Button showHideButton;
+  private Button editOrderButton;
+  private FlowPanel navTreeContainer;
+  boolean isShowingSubpages;
 
-	@Inject
-	public WikiSubpagesViewImpl(WikiSubpagesOrderEditor orderEditor, WikiSubpageNavigationTree navTree, EventBus eventBus, SynapseJSNIUtils jsniUtils, SynapseAlert synAlert) {
-		this.orderEditor = orderEditor;
-		this.navTree = navTree;
-		this.eventBus = eventBus;
-		this.synAlert = synAlert;
-		this.jsniUtils = jsniUtils;
-		addStyleName("wikiSubpages");
-	}
+  private WikiSubpageNavigationTree navTree;
+  private EventBus eventBus;
+  private Presenter presenter;
+  private SynapseJSNIUtils jsniUtils;
+  private SynapseAlert synAlert;
 
-	@Override
-	public void setPresenter(Presenter p) {
-		this.presenter = p;
-	}
+  @Inject
+  public WikiSubpagesViewImpl(
+    WikiSubpagesOrderEditor orderEditor,
+    WikiSubpageNavigationTree navTree,
+    EventBus eventBus,
+    SynapseJSNIUtils jsniUtils,
+    SynapseAlert synAlert
+  ) {
+    this.orderEditor = orderEditor;
+    this.navTree = navTree;
+    this.eventBus = eventBus;
+    this.synAlert = synAlert;
+    this.jsniUtils = jsniUtils;
+    addStyleName("wikiSubpages");
+  }
 
-	@Override
-	public void clear() {
-		super.clear();
-	}
+  @Override
+  public void setPresenter(Presenter p) {
+    this.presenter = p;
+  }
 
-	@Override
-	public void configure(final List<V2WikiHeader> wikiHeaders, final String ownerObjectName, Place ownerObjectLink, final WikiPageKey curWikiKey, boolean isEmbeddedInOwnerPage, CallbackP<WikiPageKey> wikiPageCallback, ActionMenuWidget actionMenu) {
-		clear();
-		navTreeContainer = new FlowPanel();
-		navTreeContainer.addStyleName("margin-bottom-10");
+  @Override
+  public void clear() {
+    super.clear();
+  }
 
-		// this widget shows nothing if it doesn't have any pages!
-		if (wikiHeaders.size() <= 1)
-			return;
+  @Override
+  public void configure(
+    final List<V2WikiHeader> wikiHeaders,
+    final String ownerObjectName,
+    Place ownerObjectLink,
+    final WikiPageKey curWikiKey,
+    boolean isEmbeddedInOwnerPage,
+    CallbackP<WikiPageKey> wikiPageCallback,
+    ActionMenuWidget actionMenu
+  ) {
+    clear();
+    navTreeContainer = new FlowPanel();
+    navTreeContainer.addStyleName("margin-bottom-10");
 
-		// only show the tree if the root has children
-		navTree.configure(wikiHeaders, ownerObjectName, ownerObjectLink, curWikiKey, isEmbeddedInOwnerPage, wikiPageCallback);
+    // this widget shows nothing if it doesn't have any pages!
+    if (wikiHeaders.size() <= 1) return;
 
-		showHideButton = DisplayUtils.createButton("");
-		editOrderButton = DisplayUtils.createButton("Edit Order");
-		editOrderButton.addStyleName("btn btn-default btn-xs left margin-top-10");
-		final ClickHandler editOrderClickHandler = new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				clear();
-				orderEditor.configure(curWikiKey, ownerObjectName);
-				add(orderEditor.asWidget());
-				Button finishEditingOrderButton = DisplayUtils.createButton("Done");
-				finishEditingOrderButton.addStyleName("btn btn-default margin-top-10 right");
-				add(finishEditingOrderButton);
-				finishEditingOrderButton.addClickHandler(e -> {
-					clear();
-					presenter.clearCachedHeaderTree();
-					presenter.refreshWikiHeaderTree();
-					jsniUtils.scrollIntoView(getElement());
-				});
-				DisplayUtils.scrollToTop();
-			}
-		};
-		editOrderButton.addClickHandler(editOrderClickHandler);
-		if (actionMenu != null) {
-			actionMenu.setActionListener(Action.REORDER_WIKI_SUBPAGES, action -> editOrderClickHandler.onClick(null));
-		}
-		showHideButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (isShowingSubpages)
-					hideSubpages();
-				else
-					showSubpages();
-			}
-		});
+    // only show the tree if the root has children
+    navTree.configure(
+      wikiHeaders,
+      ownerObjectName,
+      ownerObjectLink,
+      curWikiKey,
+      isEmbeddedInOwnerPage,
+      wikiPageCallback
+    );
 
-		navTreeContainer.add(navTree.asWidget());
-		navTreeContainer.add(editOrderButton);
-		add(navTreeContainer);
-		add(showHideButton);
-		showSubpages();
-		clearWidths();
-	}
+    showHideButton = DisplayUtils.createButton("");
+    editOrderButton = DisplayUtils.createButton("Edit Order");
+    editOrderButton.addStyleName("btn btn-default btn-xs left margin-top-10");
+    final ClickHandler editOrderClickHandler = new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        clear();
+        orderEditor.configure(curWikiKey, ownerObjectName);
+        add(orderEditor.asWidget());
+        Button finishEditingOrderButton = DisplayUtils.createButton("Done");
+        finishEditingOrderButton.addStyleName(
+          "btn btn-default margin-top-10 right"
+        );
+        add(finishEditingOrderButton);
+        finishEditingOrderButton.addClickHandler(e -> {
+          clear();
+          presenter.clearCachedHeaderTree();
+          presenter.refreshWikiHeaderTree();
+          jsniUtils.scrollIntoView(getElement());
+        });
+        DisplayUtils.scrollToTop();
+      }
+    };
+    editOrderButton.addClickHandler(editOrderClickHandler);
+    if (actionMenu != null) {
+      actionMenu.setActionListener(
+        Action.REORDER_WIKI_SUBPAGES,
+        action -> editOrderClickHandler.onClick(null)
+      );
+    }
+    showHideButton.addClickHandler(
+      new ClickHandler() {
+        @Override
+        public void onClick(ClickEvent event) {
+          if (isShowingSubpages) hideSubpages(); else showSubpages();
+        }
+      }
+    );
 
-	/**
-	 * Work around the Chrome bug. See DisplayUtils.clearElementWidth() for more info.
-	 */
-	private void clearWidths() {
-		DisplayUtils.clearElementWidth(getElement());
-		if (navTreeContainer != null)
-			DisplayUtils.clearElementWidth(navTreeContainer.getElement());
-	}
+    navTreeContainer.add(navTree.asWidget());
+    navTreeContainer.add(editOrderButton);
+    add(navTreeContainer);
+    add(showHideButton);
+    showSubpages();
+    clearWidths();
+  }
 
-	@Override
-	public void hideSubpages() {
-		isShowingSubpages = false;
+  /**
+   * Work around the Chrome bug. See DisplayUtils.clearElementWidth() for more info.
+   */
+  private void clearWidths() {
+    DisplayUtils.clearElementWidth(getElement());
+    if (navTreeContainer != null) DisplayUtils.clearElementWidth(
+      navTreeContainer.getElement()
+    );
+  }
 
-		if (showHideButton != null) {
-			showHideButton.setText("Show Pages " + DisplayConstants.RIGHT_ARROWS);
-			showHideButton.removeStyleName("right");
-			showHideButton.addStyleName("btn btn-default btn-xs margin-right-40 left");
-		}
+  @Override
+  public void hideSubpages() {
+    isShowingSubpages = false;
 
-		if (navTreeContainer != null)
-			DisplayUtils.hide(navTreeContainer);
+    if (showHideButton != null) {
+      showHideButton.setText("Show Pages " + DisplayConstants.RIGHT_ARROWS);
+      showHideButton.removeStyleName("right");
+      showHideButton.addStyleName(
+        "btn btn-default btn-xs margin-right-40 left"
+      );
+    }
 
-		eventBus.fireEvent(new WikiSubpagesCollapseEvent());
-	}
+    if (navTreeContainer != null) DisplayUtils.hide(navTreeContainer);
 
-	@Override
-	public void showSubpages() {
-		isShowingSubpages = true;
+    eventBus.fireEvent(new WikiSubpagesCollapseEvent());
+  }
 
-		if (showHideButton != null) {
-			showHideButton.setText(DisplayConstants.LEFT_ARROWS);
-			showHideButton.removeStyleName("left");
-			showHideButton.addStyleName("btn btn-default btn-xs right");
-		}
+  @Override
+  public void showSubpages() {
+    isShowingSubpages = true;
 
-		if (navTreeContainer != null)
-			DisplayUtils.show(navTreeContainer);
+    if (showHideButton != null) {
+      showHideButton.setText(DisplayConstants.LEFT_ARROWS);
+      showHideButton.removeStyleName("left");
+      showHideButton.addStyleName("btn btn-default btn-xs right");
+    }
 
-		eventBus.fireEvent(new WikiSubpagesExpandEvent());
-	}
+    if (navTreeContainer != null) DisplayUtils.show(navTreeContainer);
 
-	@Override
-	public Widget asWidget() {
-		return this;
-	}
+    eventBus.fireEvent(new WikiSubpagesExpandEvent());
+  }
 
-	@Override
-	public void showErrorMessage(String message) {
-		clear();
-		add(synAlert);
-		synAlert.showError(message);
-	}
+  @Override
+  public Widget asWidget() {
+    return this;
+  }
 
-	@Override
-	public void showLoading() {}
+  @Override
+  public void showErrorMessage(String message) {
+    clear();
+    add(synAlert);
+    synAlert.showError(message);
+  }
 
-	@Override
-	public void showInfo(String message) {
-		DisplayUtils.showInfo(message);
-	}
+  @Override
+  public void showLoading() {}
 
-	public interface GetOrderHintCallback {
-		public List<String> getCurrentOrderHint();
-	}
+  @Override
+  public void showInfo(String message) {
+    DisplayUtils.showInfo(message);
+  }
 
-	@Override
-	public void setEditOrderButtonVisible(boolean visible) {
-		if (editOrderButton != null) {
-			editOrderButton.setVisible(visible);
-		}
-	}
+  public interface GetOrderHintCallback {
+    public List<String> getCurrentOrderHint();
+  }
 
-	@Override
-	public boolean contains(String wikiPageKey) {
-		return navTree.contains(wikiPageKey);
-	}
+  @Override
+  public void setEditOrderButtonVisible(boolean visible) {
+    if (editOrderButton != null) {
+      editOrderButton.setVisible(visible);
+    }
+  }
 
-	@Override
-	public void setPage(String wikiPageKey) {
-		navTree.setPage(wikiPageKey);
-	}
+  @Override
+  public boolean contains(String wikiPageKey) {
+    return navTree.contains(wikiPageKey);
+  }
+
+  @Override
+  public void setPage(String wikiPageKey) {
+    navTree.setPage(wikiPageKey);
+  }
 }

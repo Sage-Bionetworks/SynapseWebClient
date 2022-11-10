@@ -4,30 +4,30 @@ import com.google.gwt.user.client.Timer;
 
 public class GWTTimerImpl implements GWTTimer {
 
-	Timer timer;
+  Timer timer;
 
-	@Override
-	public void cancel() {
-		if (timer != null) {
-			timer.cancel();
-		}
-	}
+  @Override
+  public void cancel() {
+    if (timer != null) {
+      timer.cancel();
+    }
+  }
 
-	@Override
-	public void schedule(int delayMillis) {
-		if (timer != null) {
-			timer.schedule(delayMillis);
-		}
-	}
+  @Override
+  public void schedule(int delayMillis) {
+    if (timer != null) {
+      timer.schedule(delayMillis);
+    }
+  }
 
-	@Override
-	public void configure(final Runnable runnable) {
-		timer = new Timer() {
-			@Override
-			public void run() {
-				runnable.run();
-			}
-		};
-	}
-
+  @Override
+  public void configure(final Runnable runnable) {
+    timer =
+      new Timer() {
+        @Override
+        public void run() {
+          runnable.run();
+        }
+      };
+  }
 }

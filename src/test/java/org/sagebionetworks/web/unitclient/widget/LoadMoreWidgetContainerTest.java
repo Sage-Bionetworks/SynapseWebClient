@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget;
 
 import static org.mockito.Mockito.verify;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,52 +13,54 @@ import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainerView;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LoadMoreWidgetContainerTest {
-	@Mock
-	LoadMoreWidgetContainerView mockView;
-	@Mock
-	Callback mockLoadMoreCallback;
 
-	LoadMoreWidgetContainer widget;
+  @Mock
+  LoadMoreWidgetContainerView mockView;
 
-	@Before
-	public void before() {
-		widget = new LoadMoreWidgetContainer(mockView);
-		widget.configure(mockLoadMoreCallback);
-	}
+  @Mock
+  Callback mockLoadMoreCallback;
 
-	@Test
-	public void testSetIsMore() {
-		boolean isMore = true;
-		widget.setIsMore(isMore);
-		verify(mockView).setIsProcessing(false);
-		verify(mockView).setLoadMoreVisibility(isMore);
-	}
+  LoadMoreWidgetContainer widget;
 
-	@Test
-	public void testSetIsNoMore() {
-		boolean isMore = false;
-		widget.setIsMore(isMore);
-		verify(mockView).setIsProcessing(false);
-		verify(mockView).setLoadMoreVisibility(isMore);
-	}
+  @Before
+  public void before() {
+    widget = new LoadMoreWidgetContainer(mockView);
+    widget.configure(mockLoadMoreCallback);
+  }
 
-	@Test
-	public void testAsWidget() {
-		widget.asWidget();
-		verify(mockView).asWidget();
-	}
+  @Test
+  public void testSetIsMore() {
+    boolean isMore = true;
+    widget.setIsMore(isMore);
+    verify(mockView).setIsProcessing(false);
+    verify(mockView).setLoadMoreVisibility(isMore);
+  }
 
-	@Test
-	public void testAdd() {
-		widget.add(null);
-		verify(mockView).add(null);
-	}
+  @Test
+  public void testSetIsNoMore() {
+    boolean isMore = false;
+    widget.setIsMore(isMore);
+    verify(mockView).setIsProcessing(false);
+    verify(mockView).setLoadMoreVisibility(isMore);
+  }
 
-	@Test
-	public void testClear() {
-		widget.clear();
-		verify(mockView).clear();
-		verify(mockView).setIsProcessing(false);
-		verify(mockView).setLoadMoreVisibility(false);
-	}
+  @Test
+  public void testAsWidget() {
+    widget.asWidget();
+    verify(mockView).asWidget();
+  }
+
+  @Test
+  public void testAdd() {
+    widget.add(null);
+    verify(mockView).add(null);
+  }
+
+  @Test
+  public void testClear() {
+    widget.clear();
+    verify(mockView).clear();
+    verify(mockView).setIsProcessing(false);
+    verify(mockView).setLoadMoreVisibility(false);
+  }
 }

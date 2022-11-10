@@ -3,68 +3,69 @@ package org.sagebionetworks.web.client.cache;
 import com.google.inject.Inject;
 
 public class ClientCacheImpl implements ClientCache {
-	private StorageWrapper storage;
 
-	// default to an hour
-	public static final Long DEFAULT_CACHE_TIME_MS = 1000L * 60L * 60L;
-	public static final String SUFFIX = "_EXPIRE_TIME";
+  private StorageWrapper storage;
 
-	@Inject
-	public ClientCacheImpl(StorageWrapper storage) {
-		this.storage = storage;
-	}
+  // default to an hour
+  public static final Long DEFAULT_CACHE_TIME_MS = 1000L * 60L * 60L;
+  public static final String SUFFIX = "_EXPIRE_TIME";
 
-	@Override
-	public String get(String key) {
-		String expireTimeString = storage.getItem(key + SUFFIX);
-		if (storage.isStorageSupported() && expireTimeString != null) {
-			Long expireTime = Long.parseLong(expireTimeString);
-			if (System.currentTimeMillis() < expireTime) {
-				return storage.getItem(key);
-			} else {
-				// expired, clean up
-				storage.removeItem(key);
-				storage.removeItem(key + SUFFIX);
-			}
-		}
-		return null;
-	}
+  @Inject
+  public ClientCacheImpl(StorageWrapper storage) {
+    this.storage = storage;
+  }
 
-	@Override
-	public void put(String key, String value) {
-		put(key, value, System.currentTimeMillis() + DEFAULT_CACHE_TIME_MS);
-	}
+  @Override
+  public String get(String key) {
+    String expireTimeString = storage.getItem(key + SUFFIX);
+    if (storage.isStorageSupported() && expireTimeString != null) {
+      Long expireTime = Long.parseLong(expireTimeString);
+      if (System.currentTimeMillis() < expireTime) {
+        return storage.getItem(key);
+      } else {
+        // expired, clean up
+        storage.removeItem(key);
+        storage.removeItem(key + SUFFIX);
+      }
+    }
+    return null;
+  }
 
-	@Override
-	public void put(String key, String value, Long expireTime) {
-		if (storage.isStorageSupported()) {
-			storage.setItem(key + SUFFIX, expireTime.toString());
-			storage.setItem(key, value);
-		}
-	}
+  @Override
+  public void put(String key, String value) {
+    put(key, value, System.currentTimeMillis() + DEFAULT_CACHE_TIME_MS);
+  }
 
-	@Override
-	public void clear() {
-		if (storage.isStorageSupported()) {
-			storage.clear();
-		}
-	}
+  @Override
+  public void put(String key, String value, Long expireTime) {
+    if (storage.isStorageSupported()) {
+      storage.setItem(key + SUFFIX, expireTime.toString());
+      storage.setItem(key, value);
+    }
+  }
 
-	@Override
-	public void remove(String key) {
-		if (storage.isStorageSupported()) {
-			storage.removeItem(key);
-			storage.removeItem(key + SUFFIX);
-		}
-	}
+  @Override
+  public void clear() {
+    if (storage.isStorageSupported()) {
+      storage.clear();
+    }
+  }
 
-	@Override
-	public boolean contains(String key) {
-		return get(key) != null;
-	}
-	
-	@Override
-	public double getBytesUsed() {
-		return storage.getBytesUsed();
-	}
+  @Override
+  public void remove(String key) {
+    if (storage.isStorageSupported()) {
+      storage.removeItem(key);
+      storage.removeItem(key + SUFFIX);
+    }
+  }
+
+  @Override
+  public boolean contains(String key) {
+    return get(key) != null;
+  }
+
+  @Override
+  public double getBytesUsed() {
+    return storage.getBytesUsed();
+  }
 }

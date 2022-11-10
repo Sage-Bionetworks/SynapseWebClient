@@ -1,19 +1,5 @@
 package org.sagebionetworks.web.client.widget.upload;
 
-import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.Form;
-import org.gwtbootstrap3.client.ui.Image;
-import org.gwtbootstrap3.client.ui.Input;
-import org.gwtbootstrap3.client.ui.Modal;
-import org.gwtbootstrap3.client.ui.ModalBody;
-import org.gwtbootstrap3.client.ui.Progress;
-import org.gwtbootstrap3.client.ui.ProgressBar;
-import org.gwtbootstrap3.client.ui.constants.ButtonSize;
-import org.gwtbootstrap3.client.ui.constants.ButtonType;
-import org.gwtbootstrap3.client.ui.constants.IconType;
-import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Span;
-import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.InputElement;
@@ -29,95 +15,136 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Form;
+import org.gwtbootstrap3.client.ui.Image;
+import org.gwtbootstrap3.client.ui.Input;
+import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.ModalBody;
+import org.gwtbootstrap3.client.ui.Progress;
+import org.gwtbootstrap3.client.ui.ProgressBar;
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
+import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
 public class CroppedImageUploadViewImpl implements ImageUploadView {
 
-	private static final String PREFIX_FILE_INPUT_WIDGET = "croppedImageInputWidget";
+  private static final String PREFIX_FILE_INPUT_WIDGET =
+    "croppedImageInputWidget";
 
-	/**
-	 * Used to ensure each new instance of this widget has its own ID. This is important because the ID
-	 * is used when interacting with the actual DOM element.
-	 */
-	private static long ID_SEQUENCE = 0;
+  /**
+   * Used to ensure each new instance of this widget has its own ID. This is important because the ID
+   * is used when interacting with the actual DOM element.
+   */
+  private static long ID_SEQUENCE = 0;
 
-	private Widget widget;
+  private Widget widget;
 
-	public interface Binder extends UiBinder<Widget, CroppedImageUploadViewImpl> {
-	}
+  public interface Binder
+    extends UiBinder<Widget, CroppedImageUploadViewImpl> {}
 
-	@UiField
-	Modal previewModal;
-	@UiField
-	Form form;
-	@UiField
-	Input fileInput;
-	@UiField
-	Button uploadbutton;
-	@UiField
-	Progress progressContainer;
-	@UiField
-	ProgressBar progressBar;
-	@UiField
-	Div synAlertContainer;
-	@UiField
-	Span uploadedFileNameField;
-	Presenter presenter;
-	@UiField
-	LoadingSpinner loadingUI;
-	@UiField
-	Button cancelCropButton;
-	@UiField
-	Button saveCropButton;
-	@UiField
-	ModalBody previewModalBody;
+  @UiField
+  Modal previewModal;
 
-	@Inject
-	public CroppedImageUploadViewImpl(Binder binder) {
-		widget = binder.createAndBindUi(this);
-		// Create a unique for each new instance.
-		this.fileInput.getElement().setId(PREFIX_FILE_INPUT_WIDGET + ID_SEQUENCE++);
+  @UiField
+  Form form;
 
-		// when a file is selected notify the presenter
-		this.fileInput.addChangeHandler(new ChangeHandler() {
-			@Override
-			public void onChange(ChangeEvent event) {
-				presenter.onFileSelected();
-			}
-		});
+  @UiField
+  Input fileInput;
 
-		this.uploadbutton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				// When they press the button trigger the input box
-				fileInput.getElement().<InputElement>cast().click();
-			}
-		});
+  @UiField
+  Button uploadbutton;
 
-		cancelCropButton.addClickHandler(event -> {
-			cancelCropImage();
-		});
+  @UiField
+  Progress progressContainer;
 
-		saveCropButton.addClickHandler(event -> {
-			saveCroppedImage();
-		});
-		previewModal.getElement().setAttribute("style", "z-index: 3000; height: 700px;");
-		previewModal.addShownHandler(event -> {
-			previewModalBody.clear();
-			Image image = new Image();
-			previewModalBody.add(image);
-			_loadImage(fileInput.getElement().getId(), image.getElement(), CroppedImageUploadViewImpl.this);
-		});
-	}
+  @UiField
+  ProgressBar progressBar;
 
-	@Override
-	public void processFile() {
-		// load into image
-		loadingUI.setVisible(true);
-		previewModal.show();
-		loadingUI.setVisible(false);
-	}
+  @UiField
+  Div synAlertContainer;
 
-	private static native void _loadImage(String fileFieldId, Element imagePreviewEl, CroppedImageUploadViewImpl v) /*-{
+  @UiField
+  Span uploadedFileNameField;
+
+  Presenter presenter;
+
+  @UiField
+  LoadingSpinner loadingUI;
+
+  @UiField
+  Button cancelCropButton;
+
+  @UiField
+  Button saveCropButton;
+
+  @UiField
+  ModalBody previewModalBody;
+
+  @Inject
+  public CroppedImageUploadViewImpl(Binder binder) {
+    widget = binder.createAndBindUi(this);
+    // Create a unique for each new instance.
+    this.fileInput.getElement().setId(PREFIX_FILE_INPUT_WIDGET + ID_SEQUENCE++);
+
+    // when a file is selected notify the presenter
+    this.fileInput.addChangeHandler(
+        new ChangeHandler() {
+          @Override
+          public void onChange(ChangeEvent event) {
+            presenter.onFileSelected();
+          }
+        }
+      );
+
+    this.uploadbutton.addClickHandler(
+        new ClickHandler() {
+          @Override
+          public void onClick(ClickEvent event) {
+            // When they press the button trigger the input box
+            fileInput.getElement().<InputElement>cast().click();
+          }
+        }
+      );
+
+    cancelCropButton.addClickHandler(event -> {
+      cancelCropImage();
+    });
+
+    saveCropButton.addClickHandler(event -> {
+      saveCroppedImage();
+    });
+    previewModal
+      .getElement()
+      .setAttribute("style", "z-index: 3000; height: 700px;");
+    previewModal.addShownHandler(event -> {
+      previewModalBody.clear();
+      Image image = new Image();
+      previewModalBody.add(image);
+      _loadImage(
+        fileInput.getElement().getId(),
+        image.getElement(),
+        CroppedImageUploadViewImpl.this
+      );
+    });
+  }
+
+  @Override
+  public void processFile() {
+    // load into image
+    loadingUI.setVisible(true);
+    previewModal.show();
+    loadingUI.setVisible(false);
+  }
+
+  private static native void _loadImage(
+    String fileFieldId,
+    Element imagePreviewEl,
+    CroppedImageUploadViewImpl v
+  ) /*-{
 		var fileToUploadElement = $doc.getElementById(fileFieldId);
 		var file;
 		var canProcess = true;
@@ -154,7 +181,9 @@ public class CroppedImageUploadViewImpl implements ImageUploadView {
 
 	}-*/;
 
-	private static native void _getCroppedImageBlob(CroppedImageUploadViewImpl v) /*-{
+  private static native void _getCroppedImageBlob(
+    CroppedImageUploadViewImpl v
+  ) /*-{
 		try {
 			$wnd.cropping
 					.result({
@@ -172,106 +201,104 @@ public class CroppedImageUploadViewImpl implements ImageUploadView {
 		}
 	}-*/;
 
-	public void saveCroppedImage() {
-		// get the blob from the cropper
-		_getCroppedImageBlob(this);
-	}
+  public void saveCroppedImage() {
+    // get the blob from the cropper
+    _getCroppedImageBlob(this);
+  }
 
-	public void saveCroppedImage(JavaScriptObject blob) {
-		// get the blob from the cropper
-		loadingUI.setVisible(false);
-		previewModal.hide();
-		presenter.onFileProcessed(new JavaScriptObjectWrapper(blob), "image/png");
-	}
+  public void saveCroppedImage(JavaScriptObject blob) {
+    // get the blob from the cropper
+    loadingUI.setVisible(false);
+    previewModal.hide();
+    presenter.onFileProcessed(new JavaScriptObjectWrapper(blob), "image/png");
+  }
 
-	public void cancelCropImage() {
-		loadingUI.setVisible(false);
-		resetForm();
-	}
+  public void cancelCropImage() {
+    loadingUI.setVisible(false);
+    resetForm();
+  }
 
-	@Override
-	public Widget asWidget() {
-		return widget;
-	}
+  @Override
+  public Widget asWidget() {
+    return widget;
+  }
 
-	@Override
-	public HandlerRegistration addAttachHandler(Handler handler) {
-		return widget.addAttachHandler(handler);
-	}
+  @Override
+  public HandlerRegistration addAttachHandler(Handler handler) {
+    return widget.addAttachHandler(handler);
+  }
 
-	@Override
-	public boolean isAttached() {
-		return widget.isAttached();
-	}
+  @Override
+  public boolean isAttached() {
+    return widget.isAttached();
+  }
 
-	@Override
-	public void setPresenter(final Presenter presenter) {
-		this.presenter = presenter;
-	}
+  @Override
+  public void setPresenter(final Presenter presenter) {
+    this.presenter = presenter;
+  }
 
-	@Override
-	public void setUploadedFileText(String text) {
-		uploadedFileNameField.setText(text);
-	}
+  @Override
+  public void setUploadedFileText(String text) {
+    uploadedFileNameField.setText(text);
+  }
 
-	@Override
-	public String getInputId() {
-		return fileInput.getElement().getId();
-	}
+  @Override
+  public String getInputId() {
+    return fileInput.getElement().getId();
+  }
 
-	@Override
-	public void updateProgress(double currentProgress, String progressText) {
-		progressBar.setPercent(currentProgress);
-		progressBar.setText(progressText);
-	}
+  @Override
+  public void updateProgress(double currentProgress, String progressText) {
+    progressBar.setPercent(currentProgress);
+    progressBar.setText(progressText);
+  }
 
-	@Override
-	public void showProgress(boolean visible) {
-		progressContainer.setVisible(visible);
-	}
+  @Override
+  public void showProgress(boolean visible) {
+    progressContainer.setVisible(visible);
+  }
 
-	@Override
-	public void resetForm() {
-		this.form.reset();
-		setUploadedFileText("");
-		previewModal.hide();
-	}
+  @Override
+  public void resetForm() {
+    this.form.reset();
+    setUploadedFileText("");
+    previewModal.hide();
+  }
 
-	@Override
-	public void setInputEnabled(boolean enabled) {
-		this.uploadbutton.setEnabled(enabled);
-	}
+  @Override
+  public void setInputEnabled(boolean enabled) {
+    this.uploadbutton.setEnabled(enabled);
+  }
 
-	@Override
-	public void setSynAlert(IsWidget w) {
-		synAlertContainer.clear();
-		synAlertContainer.add(w);
-	}
-	
-	@Override
-	public void setButtonType(ButtonType type) {
-		uploadbutton.setType(type);
-	}
-	
-	@Override
-	public void setButtonSize(ButtonSize size) {
-		uploadbutton.setSize(size);		
-	}
-	
-	@Override
-	public void setButtonText(String text) {
-		uploadbutton.setText(text);		
-	}
+  @Override
+  public void setSynAlert(IsWidget w) {
+    synAlertContainer.clear();
+    synAlertContainer.add(w);
+  }
 
-	@Override
-	public void setButtonIcon(IconType iconType) {
-		uploadbutton.setIcon(iconType);		
-	}
+  @Override
+  public void setButtonType(ButtonType type) {
+    uploadbutton.setType(type);
+  }
 
+  @Override
+  public void setButtonSize(ButtonSize size) {
+    uploadbutton.setSize(size);
+  }
 
-	@Override
-	public void fireEvent(GwtEvent<?> event) {
-		widget.fireEvent(event);
-	}
+  @Override
+  public void setButtonText(String text) {
+    uploadbutton.setText(text);
+  }
 
+  @Override
+  public void setButtonIcon(IconType iconType) {
+    uploadbutton.setIcon(iconType);
+  }
+
+  @Override
+  public void fireEvent(GwtEvent<?> event) {
+    widget.fireEvent(event);
+  }
 }

@@ -1,55 +1,55 @@
 package org.sagebionetworks.web.client.view;
 
+import com.google.gwt.user.client.ui.IsWidget;
 import java.util.ArrayList;
 import java.util.Date;
 import org.sagebionetworks.repo.model.dataaccess.AccessorGroup;
 import org.sagebionetworks.web.client.SynapseView;
-import com.google.gwt.user.client.ui.IsWidget;
 
 public interface ACTAccessApprovalsView extends IsWidget, SynapseView {
-	void setPresenter(Presenter presenter);
+  void setPresenter(Presenter presenter);
 
-	void setLoadMoreContainer(IsWidget w);
+  void setLoadMoreContainer(IsWidget w);
 
-	void setSynAlert(IsWidget w);
+  void setSynAlert(IsWidget w);
 
-	void setShowHideButton(IsWidget button);
+  void setShowHideButton(IsWidget button);
 
-	void setAccessRequirementWidget(IsWidget w);
+  void setAccessRequirementWidget(IsWidget w);
 
-	void setAccessRequirementUIVisible(boolean visible);
+  void setAccessRequirementUIVisible(boolean visible);
 
-	void setSubmitterPickerWidget(IsWidget w);
-	
-	void setAccessorPickerWidget(IsWidget w);
+  void setSubmitterPickerWidget(IsWidget w);
 
-	void setSelectedSubmitterUserBadge(IsWidget w);
+  void setAccessorPickerWidget(IsWidget w);
 
-	void setSelectedSubmitterUserBadgeVisible(boolean visible);
+  void setSelectedSubmitterUserBadge(IsWidget w);
 
-	void setSelectedAccessorUserBadge(IsWidget w);
+  void setSelectedSubmitterUserBadgeVisible(boolean visible);
 
-	void setSelectedAccessorUserBadgeVisible(boolean visible);
+  void setSelectedAccessorUserBadge(IsWidget w);
 
-	void setExpiresBeforeDate(Date date);
+  void setSelectedAccessorUserBadgeVisible(boolean visible);
 
-	void setClearAccessRequirementFilterButtonVisible(boolean visible);
+  void setExpiresBeforeDate(Date date);
 
-	void resetExportButton();
-	
-	void export(ArrayList<AccessorGroup> exportData);
+  void setClearAccessRequirementFilterButtonVisible(boolean visible);
 
-	public interface Presenter {
-		void onClearSubmitterFilter();
-		
-		void onClearAccessorFilter();
+  void resetExportButton();
 
-		void onClearExpireBeforeFilter();
+  void export(ArrayList<AccessorGroup> exportData);
 
-		void onClearAccessRequirementFilter();
+  public interface Presenter {
+    void onClearSubmitterFilter();
 
-		void onExpiresBeforeDateSelected(Date selectedDate);
+    void onClearAccessorFilter();
 
-		void onExportData();
-	}
+    void onClearExpireBeforeFilter();
+
+    void onClearAccessRequirementFilter();
+
+    void onExpiresBeforeDateSelected(Date selectedDate);
+
+    void onExportData();
+  }
 }

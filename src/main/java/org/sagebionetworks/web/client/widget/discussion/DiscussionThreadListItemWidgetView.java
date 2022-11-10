@@ -4,31 +4,29 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 public interface DiscussionThreadListItemWidgetView extends IsWidget {
+  public interface Presenter {
+    Widget asWidget();
 
-	public interface Presenter {
+    void onClickThread();
+  }
 
-		Widget asWidget();
+  void setPresenter(DiscussionThreadListItemWidget presenter);
 
-		void onClickThread();
-	}
+  void setTitle(String title);
 
-	void setPresenter(DiscussionThreadListItemWidget presenter);
+  void setNumberOfReplies(String numberOfReplies);
 
-	void setTitle(String title);
+  void setNumberOfViews(String numberOfViews);
 
-	void setNumberOfReplies(String numberOfReplies);
+  void setLastActivity(String lastActivity);
 
-	void setNumberOfViews(String numberOfViews);
+  void addActiveAuthor(Widget user);
 
-	void setLastActivity(String lastActivity);
+  void setThreadAuthor(Widget widget);
 
-	void addActiveAuthor(Widget user);
+  void setPinnedIconVisible(boolean visible);
 
-	void setThreadAuthor(Widget widget);
+  void clearActiveAuthors();
 
-	void setPinnedIconVisible(boolean visible);
-
-	void clearActiveAuthors();
-
-	void setThreadUrl(String url);
+  void setThreadUrl(String url);
 }

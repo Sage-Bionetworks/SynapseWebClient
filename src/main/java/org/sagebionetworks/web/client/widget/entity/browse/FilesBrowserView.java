@@ -1,34 +1,33 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
+import com.google.gwt.user.client.ui.IsWidget;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import com.google.gwt.user.client.ui.IsWidget;
 
 public interface FilesBrowserView extends IsWidget, SynapseView {
+  /**
+   * Configure the view with the parent id
+   *
+   * @param entityId
+   */
+  void configure(String entityId);
 
-	/**
-	 * Configure the view with the parent id
-	 * 
-	 * @param entityId
-	 */
-	void configure(String entityId);
+  void setEntityClickedHandler(CallbackP<String> callback);
 
-	void setEntityClickedHandler(CallbackP<String> callback);
+  void setPresenter(Presenter p);
 
-	void setPresenter(Presenter p);
+  void setAddToDownloadList(IsWidget w);
 
-	void setAddToDownloadList(IsWidget w);
-	
-	void setActionMenu(IsWidget w);
-	
-	void setHasFile(boolean isFile);
-	
-	/**
-	 * Presenter interface
-	 */
-	public interface Presenter {
-		void onProgrammaticDownloadOptions();
+  void setActionMenu(IsWidget w);
 
-		void onAddToDownloadList();
-	}
+  void setHasFile(boolean isFile);
+
+  /**
+   * Presenter interface
+   */
+  public interface Presenter {
+    void onProgrammaticDownloadOptions();
+
+    void onAddToDownloadList();
+  }
 }

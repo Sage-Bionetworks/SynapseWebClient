@@ -4,23 +4,21 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 public interface RevokeUserAccessModalView extends IsWidget {
+  void setPresenter(Presenter presenter);
 
-	void setPresenter(Presenter presenter);
+  void setSynAlert(Widget asWidget);
 
-	void setSynAlert(Widget asWidget);
+  void setUserPickerWidget(Widget w);
 
-	void setUserPickerWidget(Widget w);
+  void setRevokeProcessing(boolean processing);
 
-	void setRevokeProcessing(boolean processing);
+  void showInfo(String message);
 
-	void showInfo(String message);
+  void show();
 
-	void show();
+  void hide();
 
-	void hide();
-
-	public interface Presenter {
-		void onRevoke();
-	}
-
+  public interface Presenter {
+    void onRevoke();
+  }
 }

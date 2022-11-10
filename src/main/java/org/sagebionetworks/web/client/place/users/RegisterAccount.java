@@ -6,26 +6,27 @@ import com.google.gwt.place.shared.Prefix;
 
 public class RegisterAccount extends Place {
 
-	private String token;
+  private String token;
 
-	public RegisterAccount(String token) {
-		this.token = token;
-	}
+  public RegisterAccount(String token) {
+    this.token = token;
+  }
 
-	public String toToken() {
-		return token;
-	}
+  public String toToken() {
+    return token;
+  }
 
-	@Prefix("!RegisterAccount")
-	public static class Tokenizer implements PlaceTokenizer<RegisterAccount> {
-		@Override
-		public String getToken(RegisterAccount place) {
-			return place.toToken();
-		}
+  @Prefix("!RegisterAccount")
+  public static class Tokenizer implements PlaceTokenizer<RegisterAccount> {
 
-		@Override
-		public RegisterAccount getPlace(String token) {
-			return new RegisterAccount(token);
-		}
-	}
+    @Override
+    public String getToken(RegisterAccount place) {
+      return place.toToken();
+    }
+
+    @Override
+    public RegisterAccount getPlace(String token) {
+      return new RegisterAccount(token);
+    }
+  }
 }

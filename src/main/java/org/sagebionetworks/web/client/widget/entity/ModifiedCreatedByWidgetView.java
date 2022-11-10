@@ -3,16 +3,16 @@ package org.sagebionetworks.web.client.widget.entity;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface ModifiedCreatedByWidgetView extends IsWidget {
-	void setCreatedOnText(String string);
+  void setCreatedOnText(String string);
 
-	void setModifiedOnText(String string);
+  void setModifiedOnText(String string);
 
-	void setModifiedBadge(IsWidget modifiedBadge);
+  void setModifiedBadge(IsWidget modifiedBadge);
 
-	void setCreatedBadge(IsWidget createdBadge);
+  void setCreatedBadge(IsWidget createdBadge);
 
-	void setVisible(boolean b);
-	void setCreatedHelpWidgetVisible(boolean visible);
+  void setVisible(boolean b);
+  void setCreatedHelpWidgetVisible(boolean visible);
 
-	void setCreatedHelpWidgetText(String text);
+  void setCreatedHelpWidgetText(String text);
 }

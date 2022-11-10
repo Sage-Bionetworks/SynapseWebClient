@@ -4,83 +4,81 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 public interface SingleDiscussionThreadWidgetView extends IsWidget {
+  public interface Presenter {
+    Widget asWidget();
 
-	public interface Presenter {
+    void loadMore();
 
-		Widget asWidget();
+    void onClickDeleteThread();
 
-		void loadMore();
+    void onClickEditThread();
 
-		void onClickDeleteThread();
+    void onClickThread();
 
-		void onClickEditThread();
+    void onClickShowAllReplies();
+  }
 
-		void onClickThread();
+  void setPresenter(SingleDiscussionThreadWidget presenter);
 
-		void onClickShowAllReplies();
-	}
+  void clear();
 
-	void setPresenter(SingleDiscussionThreadWidget presenter);
+  void setTitle(String title);
 
-	void clear();
+  void setSubscribeButtonWidget(Widget widget);
 
-	void setTitle(String title);
+  void setMarkdownWidget(Widget widget);
 
-	void setSubscribeButtonWidget(Widget widget);
+  void setAuthor(Widget author);
 
-	void setMarkdownWidget(Widget widget);
+  void setCreatedOn(String createdOn);
 
-	void setAuthor(Widget author);
+  void setAlert(Widget w);
 
-	void setCreatedOn(String createdOn);
+  void setDeleteIconVisible(boolean visible);
 
-	void setAlert(Widget w);
+  void setShowAllRepliesButtonVisible(boolean visible);
 
-	void setDeleteIconVisible(boolean visible);
+  void setCommandsVisible(boolean visible);
 
-	void setShowAllRepliesButtonVisible(boolean visible);
+  void showErrorMessage(String errorMessage);
 
-	void setCommandsVisible(boolean visible);
+  void setEditIconVisible(boolean visible);
 
-	void showErrorMessage(String errorMessage);
+  void setEditThreadModal(Widget w);
 
-	void setEditIconVisible(boolean visible);
+  void setEditedLabelVisible(Boolean visible);
 
-	void setEditThreadModal(Widget w);
+  void setLoadingMessageVisible(boolean visible);
 
-	void setEditedLabelVisible(Boolean visible);
+  void setRepliesContainer(IsWidget container);
 
-	void setLoadingMessageVisible(boolean visible);
+  void showSuccess(String successTitle, String successMessage);
 
-	void setRepliesContainer(IsWidget container);
+  void setRefreshAlert(Widget w);
 
-	void showSuccess(String successTitle, String successMessage);
+  void removeRefreshAlert();
 
-	void setRefreshAlert(Widget w);
+  void setPinIconVisible(boolean visible);
 
-	void removeRefreshAlert();
+  void setUnpinIconVisible(boolean visible);
 
-	void setPinIconVisible(boolean visible);
+  void setIsAuthorModerator(boolean isModerator);
 
-	void setUnpinIconVisible(boolean visible);
+  void setReplyContainersVisible(boolean visible);
 
-	void setIsAuthorModerator(boolean isModerator);
+  void setDeletedThreadVisible(boolean visible);
 
-	void setReplyContainersVisible(boolean visible);
+  void setReplyListContainerVisible(boolean visible);
 
-	void setDeletedThreadVisible(boolean visible);
+  void setRestoreIconVisible(boolean visible);
 
-	void setReplyListContainerVisible(boolean visible);
+  void setNewReplyContainer(Widget widget);
 
-	void setRestoreIconVisible(boolean visible);
+  void setSecondNewReplyContainer(Widget widget);
 
-	void setNewReplyContainer(Widget widget);
+  void setSecondNewReplyContainerVisible(boolean visible);
 
-	void setSecondNewReplyContainer(Widget widget);
+  void setSubscribersWidget(Widget widget);
 
-	void setSecondNewReplyContainerVisible(boolean visible);
-
-	void setSubscribersWidget(Widget widget);
-
-	void setSubscribersWidgetContainerVisible(boolean visible);
+  void setSubscribersWidgetContainerVisible(boolean visible);
 }

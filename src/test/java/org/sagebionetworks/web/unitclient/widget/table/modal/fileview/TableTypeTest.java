@@ -26,119 +26,170 @@ import org.sagebionetworks.web.shared.WebConstants;
 
 public class TableTypeTest {
 
-	@Mock
-	TableEntity mockTableEntity;
-	@Mock
-	SubmissionView mockSubmissionView;
-	@Mock
-	Dataset mockDataset;
-	@Mock
-	DatasetCollection mockDatasetCollection;
-	@Mock
-	EntityView mockEntityView;
+  @Mock
+  TableEntity mockTableEntity;
 
-	@Before
-	public void before() {
-		MockitoAnnotations.initMocks(this);
-	}
+  @Mock
+  SubmissionView mockSubmissionView;
 
-	@Test
-	public void testIncludeFiles() {
-		assertFalse(TableType.table.isIncludeFiles());
-		assertFalse(TableType.project_view.isIncludeFiles());
-		assertFalse(TableType.submission_view.isIncludeFiles());
-		assertTrue(TableType.dataset.isIncludeFiles());
-		assertFalse(TableType.dataset_collection.isIncludeFiles());
-		assertTrue(TableType.file_view.isIncludeFiles());
-		assertTrue((new TableType(EntityView.class, FILE)).isIncludeFiles());
-	}
+  @Mock
+  Dataset mockDataset;
 
-	@Test
-	public void testIncludeFolders() {
-		assertFalse(TableType.table.isIncludeFolders());
-		assertFalse(TableType.project_view.isIncludeFolders());
-		assertFalse(TableType.submission_view.isIncludeFolders());
-		assertFalse(TableType.file_view.isIncludeFolders());
-		assertFalse(TableType.dataset.isIncludeFolders());
-		assertFalse(TableType.dataset_collection.isIncludeFolders());
-		assertTrue((new TableType(EntityView.class, WebConstants.FOLDER)).isIncludeFolders());
-	}
+  @Mock
+  DatasetCollection mockDatasetCollection;
 
-	@Test
-	public void testIncludeTables() {
-		assertFalse(TableType.table.isIncludeTables());
-		assertFalse(TableType.project_view.isIncludeTables());
-		assertFalse(TableType.submission_view.isIncludeTables());
-		assertFalse(TableType.file_view.isIncludeTables());
-		assertFalse(TableType.dataset.isIncludeTables());
-		assertFalse(TableType.dataset_collection.isIncludeTables());
-		assertTrue((new TableType(EntityView.class, TABLE)).isIncludeTables());
-	}
+  @Mock
+  EntityView mockEntityView;
 
-	@Test
-	public void testIncludeDatasets() {
-		assertFalse(TableType.table.isIncludeDatasets());
-		assertFalse(TableType.project_view.isIncludeDatasets());
-		assertFalse(TableType.submission_view.isIncludeDatasets());
-		assertFalse(TableType.file_view.isIncludeDatasets());
-		assertFalse(TableType.dataset.isIncludeDatasets());
-		assertTrue(TableType.dataset_collection.isIncludeDatasets());
-		assertTrue((new TableType(EntityView.class, DATASET)).isIncludeDatasets());
-	}
+  @Before
+  public void before() {
+    MockitoAnnotations.initMocks(this);
+  }
 
-	@Test
-	public void testGetTableTypeFromCheckboxes() {
-		TableType noneInMask = TableType.getEntityViewTableType(false, false, false, false);
-		assertFalse(noneInMask.isIncludeFiles());
-		assertFalse(noneInMask.isIncludeFolders());
-		assertFalse(noneInMask.isIncludeTables());
-		assertFalse(noneInMask.isIncludeDatasets());
+  @Test
+  public void testIncludeFiles() {
+    assertFalse(TableType.table.isIncludeFiles());
+    assertFalse(TableType.project_view.isIncludeFiles());
+    assertFalse(TableType.submission_view.isIncludeFiles());
+    assertTrue(TableType.dataset.isIncludeFiles());
+    assertFalse(TableType.dataset_collection.isIncludeFiles());
+    assertTrue(TableType.file_view.isIncludeFiles());
+    assertTrue((new TableType(EntityView.class, FILE)).isIncludeFiles());
+  }
 
-		TableType allInMask = TableType.getEntityViewTableType(true, true, true, true);
-		assertTrue(allInMask.isIncludeFiles());
-		assertTrue(allInMask.isIncludeFolders());
-		assertTrue(allInMask.isIncludeTables());
-		assertTrue(allInMask.isIncludeDatasets());
-	}
+  @Test
+  public void testIncludeFolders() {
+    assertFalse(TableType.table.isIncludeFolders());
+    assertFalse(TableType.project_view.isIncludeFolders());
+    assertFalse(TableType.submission_view.isIncludeFolders());
+    assertFalse(TableType.file_view.isIncludeFolders());
+    assertFalse(TableType.dataset.isIncludeFolders());
+    assertFalse(TableType.dataset_collection.isIncludeFolders());
+    assertTrue(
+      (new TableType(EntityView.class, WebConstants.FOLDER)).isIncludeFolders()
+    );
+  }
 
-	@Test
-	public void testGetDisplayName() {
-		assertEquals(TableType.table.getDisplayName(), DisplayConstants.TABLE);
-		assertEquals(TableType.submission_view.getDisplayName(), DisplayConstants.SUBMISSION_VIEW);
-		assertEquals(TableType.dataset.getDisplayName(), DisplayConstants.DATASET);
-		assertEquals(TableType.file_view.getDisplayName(), DisplayConstants.FILE_VIEW);
-		assertEquals(TableType.project_view.getDisplayName(), DisplayConstants.PROJECT_VIEW);
-		assertEquals(TableType.dataset_collection.getDisplayName(), DisplayConstants.DATASET_COLLECTION);
-		assertEquals(new TableType(EntityView.class, FILE | FOLDER | TABLE).getDisplayName(), DisplayConstants.VIEW);
-	}
+  @Test
+  public void testIncludeTables() {
+    assertFalse(TableType.table.isIncludeTables());
+    assertFalse(TableType.project_view.isIncludeTables());
+    assertFalse(TableType.submission_view.isIncludeTables());
+    assertFalse(TableType.file_view.isIncludeTables());
+    assertFalse(TableType.dataset.isIncludeTables());
+    assertFalse(TableType.dataset_collection.isIncludeTables());
+    assertTrue((new TableType(EntityView.class, TABLE)).isIncludeTables());
+  }
 
+  @Test
+  public void testIncludeDatasets() {
+    assertFalse(TableType.table.isIncludeDatasets());
+    assertFalse(TableType.project_view.isIncludeDatasets());
+    assertFalse(TableType.submission_view.isIncludeDatasets());
+    assertFalse(TableType.file_view.isIncludeDatasets());
+    assertFalse(TableType.dataset.isIncludeDatasets());
+    assertTrue(TableType.dataset_collection.isIncludeDatasets());
+    assertTrue((new TableType(EntityView.class, DATASET)).isIncludeDatasets());
+  }
 
-	@Test
-	public void testGetTableTypeFromEntity() {
-		assertEquals(TableType.table, TableType.getTableType(mockTableEntity));
+  @Test
+  public void testGetTableTypeFromCheckboxes() {
+    TableType noneInMask = TableType.getEntityViewTableType(
+      false,
+      false,
+      false,
+      false
+    );
+    assertFalse(noneInMask.isIncludeFiles());
+    assertFalse(noneInMask.isIncludeFolders());
+    assertFalse(noneInMask.isIncludeTables());
+    assertFalse(noneInMask.isIncludeDatasets());
 
-		assertEquals(TableType.submission_view, TableType.getTableType(mockSubmissionView));
+    TableType allInMask = TableType.getEntityViewTableType(
+      true,
+      true,
+      true,
+      true
+    );
+    assertTrue(allInMask.isIncludeFiles());
+    assertTrue(allInMask.isIncludeFolders());
+    assertTrue(allInMask.isIncludeTables());
+    assertTrue(allInMask.isIncludeDatasets());
+  }
 
-		assertEquals(TableType.dataset, TableType.getTableType(mockDataset));
+  @Test
+  public void testGetDisplayName() {
+    assertEquals(TableType.table.getDisplayName(), DisplayConstants.TABLE);
+    assertEquals(
+      TableType.submission_view.getDisplayName(),
+      DisplayConstants.SUBMISSION_VIEW
+    );
+    assertEquals(TableType.dataset.getDisplayName(), DisplayConstants.DATASET);
+    assertEquals(
+      TableType.file_view.getDisplayName(),
+      DisplayConstants.FILE_VIEW
+    );
+    assertEquals(
+      TableType.project_view.getDisplayName(),
+      DisplayConstants.PROJECT_VIEW
+    );
+    assertEquals(
+      TableType.dataset_collection.getDisplayName(),
+      DisplayConstants.DATASET_COLLECTION
+    );
+    assertEquals(
+      new TableType(EntityView.class, FILE | FOLDER | TABLE).getDisplayName(),
+      DisplayConstants.VIEW
+    );
+  }
 
-		assertEquals(TableType.dataset_collection, TableType.getTableType(mockDatasetCollection));
+  @Test
+  public void testGetTableTypeFromEntity() {
+    assertEquals(TableType.table, TableType.getTableType(mockTableEntity));
 
-		// using old type
-		when(mockEntityView.getViewTypeMask()).thenReturn(null);
-		when(mockEntityView.getType()).thenReturn(ViewType.file);
-		assertEquals(TableType.file_view, TableType.getTableType(mockEntityView));
-		when(mockEntityView.getType()).thenReturn(ViewType.file_and_table);
-		assertEquals(new TableType(EntityView.class, FILE | TABLE), TableType.getTableType(mockEntityView));
-		when(mockEntityView.getType()).thenReturn(ViewType.project);
-		assertEquals(TableType.project_view, TableType.getTableType(mockEntityView));
+    assertEquals(
+      TableType.submission_view,
+      TableType.getTableType(mockSubmissionView)
+    );
 
-		// using new mask
-		when(mockEntityView.getType()).thenReturn(null);
-		when(mockEntityView.getViewTypeMask()).thenReturn(ViewTypeMask.File.getMask());
-		assertEquals(TableType.file_view, TableType.getTableType(mockEntityView));
-		when(mockEntityView.getViewTypeMask()).thenReturn(ViewTypeMask.Table.getMask());
-		assertEquals(new TableType(EntityView.class, TABLE), TableType.getTableType(mockEntityView));
-		when(mockEntityView.getViewTypeMask()).thenReturn(ViewTypeMask.File.getMask() | ViewTypeMask.Table.getMask());
-		assertEquals(new TableType(EntityView.class, FILE | TABLE), TableType.getTableType(mockEntityView));
-	}
+    assertEquals(TableType.dataset, TableType.getTableType(mockDataset));
+
+    assertEquals(
+      TableType.dataset_collection,
+      TableType.getTableType(mockDatasetCollection)
+    );
+
+    // using old type
+    when(mockEntityView.getViewTypeMask()).thenReturn(null);
+    when(mockEntityView.getType()).thenReturn(ViewType.file);
+    assertEquals(TableType.file_view, TableType.getTableType(mockEntityView));
+    when(mockEntityView.getType()).thenReturn(ViewType.file_and_table);
+    assertEquals(
+      new TableType(EntityView.class, FILE | TABLE),
+      TableType.getTableType(mockEntityView)
+    );
+    when(mockEntityView.getType()).thenReturn(ViewType.project);
+    assertEquals(
+      TableType.project_view,
+      TableType.getTableType(mockEntityView)
+    );
+
+    // using new mask
+    when(mockEntityView.getType()).thenReturn(null);
+    when(mockEntityView.getViewTypeMask())
+      .thenReturn(ViewTypeMask.File.getMask());
+    assertEquals(TableType.file_view, TableType.getTableType(mockEntityView));
+    when(mockEntityView.getViewTypeMask())
+      .thenReturn(ViewTypeMask.Table.getMask());
+    assertEquals(
+      new TableType(EntityView.class, TABLE),
+      TableType.getTableType(mockEntityView)
+    );
+    when(mockEntityView.getViewTypeMask())
+      .thenReturn(ViewTypeMask.File.getMask() | ViewTypeMask.Table.getMask());
+    assertEquals(
+      new TableType(EntityView.class, FILE | TABLE),
+      TableType.getTableType(mockEntityView)
+    );
+  }
 }

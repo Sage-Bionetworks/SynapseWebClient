@@ -6,27 +6,27 @@ import com.google.gwt.place.shared.Prefix;
 
 public class ErrorPlace extends Place {
 
-	private String token;
+  private String token;
 
-	public ErrorPlace(String token) {
-		this.token = token;
-	}
+  public ErrorPlace(String token) {
+    this.token = token;
+  }
 
-	public String toToken() {
-		return token;
-	}
+  public String toToken() {
+    return token;
+  }
 
-	@Prefix("!Error")
-	public static class Tokenizer implements PlaceTokenizer<ErrorPlace> {
-		@Override
-		public String getToken(ErrorPlace place) {
-			return place.toToken();
-		}
+  @Prefix("!Error")
+  public static class Tokenizer implements PlaceTokenizer<ErrorPlace> {
 
-		@Override
-		public ErrorPlace getPlace(String token) {
-			return new ErrorPlace(token);
-		}
-	}
+    @Override
+    public String getToken(ErrorPlace place) {
+      return place.toToken();
+    }
 
+    @Override
+    public ErrorPlace getPlace(String token) {
+      return new ErrorPlace(token);
+    }
+  }
 }

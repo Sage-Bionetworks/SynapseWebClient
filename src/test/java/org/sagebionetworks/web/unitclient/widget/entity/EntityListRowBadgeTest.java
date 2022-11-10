@@ -10,9 +10,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Widget;
 import java.util.Collections;
 import java.util.Date;
-
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,192 +46,287 @@ import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Widget;
-
 public class EntityListRowBadgeTest {
 
-	EntityListRowBadge widget;
-	String entityId = "syn123";
-	String entityName = "an entity";
-	@Mock
-	EntityListRowBadgeView mockView;
-	@Mock
-	UserBadge mockUserBadge;
-	@Mock
-	DateTimeUtils mockDateTimeUtils;
-	@Mock
-	LazyLoadHelper mockLazyLoadHelper;
-	@Mock
-	SynapseJavascriptClient mockSynapseJavascriptClient;
-	@Mock
-	PopupUtilsView mockPopupUtils;
-	@Mock
-	EventBus mockEventBus;
-	@Mock
-	SynapseJSNIUtils mockSynapseJSNIUtils;
-	@Mock
-	CookieProvider mockCookies;
-	@Mock
-	FileEntity mockFileEntity;
-	@Mock
-	S3FileHandle mockDataFileHandle;
+  EntityListRowBadge widget;
+  String entityId = "syn123";
+  String entityName = "an entity";
 
-	@Before
-	public void before() throws JSONObjectAdapterException {
-		MockitoAnnotations.initMocks(this);
-		widget = new EntityListRowBadge(mockView, mockUserBadge, mockSynapseJavascriptClient, mockLazyLoadHelper, mockDateTimeUtils, mockPopupUtils, mockEventBus, mockSynapseJSNIUtils, mockCookies);
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseJavascriptClient).addFileToDownloadList(anyString(), anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseJavascriptClient).addFileToDownloadListV2(anyString(), anyLong(), any(AsyncCallback.class));
-	}
+  @Mock
+  EntityListRowBadgeView mockView;
 
-	@Test
-	public void testConstruction() {
-		verify(mockView).setPresenter(widget);
-		verify(mockView).setCreatedByWidget(any(Widget.class));
-	}
+  @Mock
+  UserBadge mockUserBadge;
 
-	private EntityBundle setupEntity(Entity entity) {
-		EntityBundle bundle = mock(EntityBundle.class);
-		when(bundle.getEntity()).thenReturn(entity);
-		when(bundle.getFileHandles()).thenReturn(Collections.singletonList(mockDataFileHandle));
+  @Mock
+  DateTimeUtils mockDateTimeUtils;
 
-		AsyncMockStubber.callSuccessWith(bundle).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), any(EntityBundleRequest.class), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(bundle).when(mockSynapseJavascriptClient).getEntityBundleForVersion(anyString(), anyLong(), any(EntityBundleRequest.class), any(AsyncCallback.class));
-		return bundle;
-	}
+  @Mock
+  LazyLoadHelper mockLazyLoadHelper;
 
-	/**
-	 * This tests the standard case when the badge is outside the viewport and scrolled into view.
-	 */
-	@Test
-	public void testCheckForInViewAndLoadData() {
-		// set up entity
-		String entityId = "syn12345";
-		String entityName = "a project";
-		String createdByUserId = "4444";
-		String description = "an old entity description";
-		Project testProject = new Project();
-		testProject.setName(entityName);
-		testProject.setCreatedBy(createdByUserId);
-		testProject.setDescription(description);
-		testProject.setCreatedOn(new Date());
+  @Mock
+  SynapseJavascriptClient mockSynapseJavascriptClient;
 
-		// note: can't test modified on because it format it using the gwt DateUtils (calls GWT.create())
-		testProject.setId(entityId);
-		setupEntity(testProject);
+  @Mock
+  PopupUtilsView mockPopupUtils;
 
-		// configure
-		Reference ref = new Reference();
-		ref.setTargetId(entityId);
-		widget.configure(ref);
+  @Mock
+  EventBus mockEventBus;
 
-		ArgumentCaptor<Callback> captor = ArgumentCaptor.forClass(Callback.class);
-		verify(mockLazyLoadHelper).configure(captor.capture(), eq(mockView));
-		captor.getValue().invoke();
+  @Mock
+  SynapseJSNIUtils mockSynapseJSNIUtils;
 
-		verify(mockSynapseJavascriptClient).getEntityBundle(anyString(), any(EntityBundleRequest.class), any(AsyncCallback.class));
-		verify(mockView).showLoading();
-		verify(mockView).setEntityType(EntityType.project);
-		verify(mockView).setEntityLink(entityName, "#!Synapse:" + entityId);
-		verify(mockUserBadge).configure(createdByUserId);
-		verify(mockView).setCreatedOn(anyString());
-		verify(mockView).setDescription(description);
-		verify(mockView, never()).showAddToDownloadList();
-		verify(mockView).setVersion(EntityListRowBadge.N_A);
-	}
+  @Mock
+  CookieProvider mockCookies;
 
-	@Test
-	public void testGetFileEntityBundle() {
-		// verify download button is configured and shown
-		String entityId = "syn12345";
-		String entityName = "file.txt";
-		String createdByUserId = "4444";
-		String description = "an old entity description";
-		Long version = 4L;
-		FileEntity testFile = new FileEntity();
-		testFile.setName(entityName);
-		testFile.setCreatedBy(createdByUserId);
-		testFile.setVersionNumber(version);
-		testFile.setDescription(description);
-		testFile.setId(entityId);
-		setupEntity(testFile);
+  @Mock
+  FileEntity mockFileEntity;
 
-		Reference ref = new Reference();
-		ref.setTargetId(entityId);
-		ref.setTargetVersionNumber(version);
-		widget.configure(ref);
+  @Mock
+  S3FileHandle mockDataFileHandle;
 
-		widget.getEntityBundle();
+  @Before
+  public void before() throws JSONObjectAdapterException {
+    MockitoAnnotations.initMocks(this);
+    widget =
+      new EntityListRowBadge(
+        mockView,
+        mockUserBadge,
+        mockSynapseJavascriptClient,
+        mockLazyLoadHelper,
+        mockDateTimeUtils,
+        mockPopupUtils,
+        mockEventBus,
+        mockSynapseJSNIUtils,
+        mockCookies
+      );
+    AsyncMockStubber
+      .callSuccessWith(null)
+      .when(mockSynapseJavascriptClient)
+      .addFileToDownloadList(
+        anyString(),
+        anyString(),
+        any(AsyncCallback.class)
+      );
+    AsyncMockStubber
+      .callSuccessWith(null)
+      .when(mockSynapseJavascriptClient)
+      .addFileToDownloadListV2(
+        anyString(),
+        anyLong(),
+        any(AsyncCallback.class)
+      );
+  }
 
-		verify(mockSynapseJavascriptClient).getEntityBundleForVersion(anyString(), anyLong(), any(EntityBundleRequest.class), any(AsyncCallback.class));
-		verify(mockView).showLoading();
-		verify(mockView).setEntityType(EntityType.file);
-		verify(mockView).setEntityLink(entityName, "#!Synapse:" + entityId + "." + version);
-		verify(mockUserBadge).configure(createdByUserId);
-		verify(mockView).setCreatedOn(anyString());
-		verify(mockView).setDescription(description);
-		verify(mockView).showAddToDownloadList();
-		verify(mockView).setVersion(version.toString());
-	}
+  @Test
+  public void testConstruction() {
+    verify(mockView).setPresenter(widget);
+    verify(mockView).setCreatedByWidget(any(Widget.class));
+  }
 
-	@Test
-	public void testCheckForInViewAndLoadDataFailure() {
-		Reference ref = new Reference();
-		ref.setTargetId(entityId);
-		widget.configure(ref);
+  private EntityBundle setupEntity(Entity entity) {
+    EntityBundle bundle = mock(EntityBundle.class);
+    when(bundle.getEntity()).thenReturn(entity);
+    when(bundle.getFileHandles())
+      .thenReturn(Collections.singletonList(mockDataFileHandle));
 
-		// test failure response from getEntityBundle
-		String errorMessage = "problem occurred while asking for entity bundle";
-		Exception ex = new Exception(errorMessage);
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), any(EntityBundleRequest.class), any(AsyncCallback.class));
-		widget.getEntityBundle();
-		verify(mockView).showErrorIcon(errorMessage);
-		verify(mockView).setEntityLink(entityId, "#!Synapse:" + entityId);
-	}
+    AsyncMockStubber
+      .callSuccessWith(bundle)
+      .when(mockSynapseJavascriptClient)
+      .getEntityBundle(
+        anyString(),
+        any(EntityBundleRequest.class),
+        any(AsyncCallback.class)
+      );
+    AsyncMockStubber
+      .callSuccessWith(bundle)
+      .when(mockSynapseJavascriptClient)
+      .getEntityBundleForVersion(
+        anyString(),
+        anyLong(),
+        any(EntityBundleRequest.class),
+        any(AsyncCallback.class)
+      );
+    return bundle;
+  }
 
-	@Test
-	public void testOnAddToDownloadListV2() {
-		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
-		Long version = 2L;
-		when(mockFileEntity.getId()).thenReturn(entityId);
-		when(mockFileEntity.getName()).thenReturn(entityName);
-		when(mockFileEntity.getVersionNumber()).thenReturn(version);
-		setupEntity(mockFileEntity);
-		Reference ref = new Reference();
-		ref.setTargetId(entityId);
-		ref.setTargetVersionNumber(version);
-		widget.configure(ref);
-		widget.getEntityBundle();
+  /**
+   * This tests the standard case when the badge is outside the viewport and scrolled into view.
+   */
+  @Test
+  public void testCheckForInViewAndLoadData() {
+    // set up entity
+    String entityId = "syn12345";
+    String entityName = "a project";
+    String createdByUserId = "4444";
+    String description = "an old entity description";
+    Project testProject = new Project();
+    testProject.setName(entityName);
+    testProject.setCreatedBy(createdByUserId);
+    testProject.setDescription(description);
+    testProject.setCreatedOn(new Date());
 
-		widget.onAddToDownloadList();
+    // note: can't test modified on because it format it using the gwt DateUtils (calls GWT.create())
+    testProject.setId(entityId);
+    setupEntity(testProject);
 
-		verify(mockSynapseJavascriptClient).addFileToDownloadListV2(eq(entityId), eq(version), any(AsyncCallback.class));
-		verify(mockPopupUtils).showInfo(entityName + EntityBadge.ADDED_TO_DOWNLOAD_LIST, "#!DownloadCart:0", DisplayConstants.VIEW_DOWNLOAD_LIST);
-		verify(mockEventBus).fireEvent(any(DownloadListUpdatedEvent.class));
-	}
+    // configure
+    Reference ref = new Reference();
+    ref.setTargetId(entityId);
+    widget.configure(ref);
 
-	@Test
-	public void testOnAddToDownloadListV2Error() {
-		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
-		Long version = 2L;
-		String errorMessage = "a simulated error";
-		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseJavascriptClient).addFileToDownloadListV2(anyString(), anyLong(), any(AsyncCallback.class));
-		when(mockFileEntity.getId()).thenReturn(entityId);
-		when(mockFileEntity.getName()).thenReturn(entityName);
-		when(mockFileEntity.getVersionNumber()).thenReturn(version);
-		setupEntity(mockFileEntity);
-		Reference ref = new Reference();
-		ref.setTargetId(entityId);
-		ref.setTargetVersionNumber(version);
-		widget.configure(ref);
-		widget.getEntityBundle();
+    ArgumentCaptor<Callback> captor = ArgumentCaptor.forClass(Callback.class);
+    verify(mockLazyLoadHelper).configure(captor.capture(), eq(mockView));
+    captor.getValue().invoke();
 
-		widget.onAddToDownloadList();
+    verify(mockSynapseJavascriptClient)
+      .getEntityBundle(
+        anyString(),
+        any(EntityBundleRequest.class),
+        any(AsyncCallback.class)
+      );
+    verify(mockView).showLoading();
+    verify(mockView).setEntityType(EntityType.project);
+    verify(mockView).setEntityLink(entityName, "#!Synapse:" + entityId);
+    verify(mockUserBadge).configure(createdByUserId);
+    verify(mockView).setCreatedOn(anyString());
+    verify(mockView).setDescription(description);
+    verify(mockView, never()).showAddToDownloadList();
+    verify(mockView).setVersion(EntityListRowBadge.N_A);
+  }
 
-		verify(mockSynapseJavascriptClient).addFileToDownloadListV2(eq(entityId), eq(version), any(AsyncCallback.class));
-		verifyZeroInteractions(mockPopupUtils, mockEventBus);
-		verify(mockView).showErrorIcon(errorMessage);
-	}
+  @Test
+  public void testGetFileEntityBundle() {
+    // verify download button is configured and shown
+    String entityId = "syn12345";
+    String entityName = "file.txt";
+    String createdByUserId = "4444";
+    String description = "an old entity description";
+    Long version = 4L;
+    FileEntity testFile = new FileEntity();
+    testFile.setName(entityName);
+    testFile.setCreatedBy(createdByUserId);
+    testFile.setVersionNumber(version);
+    testFile.setDescription(description);
+    testFile.setId(entityId);
+    setupEntity(testFile);
+
+    Reference ref = new Reference();
+    ref.setTargetId(entityId);
+    ref.setTargetVersionNumber(version);
+    widget.configure(ref);
+
+    widget.getEntityBundle();
+
+    verify(mockSynapseJavascriptClient)
+      .getEntityBundleForVersion(
+        anyString(),
+        anyLong(),
+        any(EntityBundleRequest.class),
+        any(AsyncCallback.class)
+      );
+    verify(mockView).showLoading();
+    verify(mockView).setEntityType(EntityType.file);
+    verify(mockView)
+      .setEntityLink(entityName, "#!Synapse:" + entityId + "." + version);
+    verify(mockUserBadge).configure(createdByUserId);
+    verify(mockView).setCreatedOn(anyString());
+    verify(mockView).setDescription(description);
+    verify(mockView).showAddToDownloadList();
+    verify(mockView).setVersion(version.toString());
+  }
+
+  @Test
+  public void testCheckForInViewAndLoadDataFailure() {
+    Reference ref = new Reference();
+    ref.setTargetId(entityId);
+    widget.configure(ref);
+
+    // test failure response from getEntityBundle
+    String errorMessage = "problem occurred while asking for entity bundle";
+    Exception ex = new Exception(errorMessage);
+    AsyncMockStubber
+      .callFailureWith(ex)
+      .when(mockSynapseJavascriptClient)
+      .getEntityBundle(
+        anyString(),
+        any(EntityBundleRequest.class),
+        any(AsyncCallback.class)
+      );
+    widget.getEntityBundle();
+    verify(mockView).showErrorIcon(errorMessage);
+    verify(mockView).setEntityLink(entityId, "#!Synapse:" + entityId);
+  }
+
+  @Test
+  public void testOnAddToDownloadListV2() {
+    when(
+      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+    )
+      .thenReturn("true");
+    Long version = 2L;
+    when(mockFileEntity.getId()).thenReturn(entityId);
+    when(mockFileEntity.getName()).thenReturn(entityName);
+    when(mockFileEntity.getVersionNumber()).thenReturn(version);
+    setupEntity(mockFileEntity);
+    Reference ref = new Reference();
+    ref.setTargetId(entityId);
+    ref.setTargetVersionNumber(version);
+    widget.configure(ref);
+    widget.getEntityBundle();
+
+    widget.onAddToDownloadList();
+
+    verify(mockSynapseJavascriptClient)
+      .addFileToDownloadListV2(
+        eq(entityId),
+        eq(version),
+        any(AsyncCallback.class)
+      );
+    verify(mockPopupUtils)
+      .showInfo(
+        entityName + EntityBadge.ADDED_TO_DOWNLOAD_LIST,
+        "#!DownloadCart:0",
+        DisplayConstants.VIEW_DOWNLOAD_LIST
+      );
+    verify(mockEventBus).fireEvent(any(DownloadListUpdatedEvent.class));
+  }
+
+  @Test
+  public void testOnAddToDownloadListV2Error() {
+    when(
+      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+    )
+      .thenReturn("true");
+    Long version = 2L;
+    String errorMessage = "a simulated error";
+    AsyncMockStubber
+      .callFailureWith(new Exception(errorMessage))
+      .when(mockSynapseJavascriptClient)
+      .addFileToDownloadListV2(
+        anyString(),
+        anyLong(),
+        any(AsyncCallback.class)
+      );
+    when(mockFileEntity.getId()).thenReturn(entityId);
+    when(mockFileEntity.getName()).thenReturn(entityName);
+    when(mockFileEntity.getVersionNumber()).thenReturn(version);
+    setupEntity(mockFileEntity);
+    Reference ref = new Reference();
+    ref.setTargetId(entityId);
+    ref.setTargetVersionNumber(version);
+    widget.configure(ref);
+    widget.getEntityBundle();
+
+    widget.onAddToDownloadList();
+
+    verify(mockSynapseJavascriptClient)
+      .addFileToDownloadListV2(
+        eq(entityId),
+        eq(version),
+        any(AsyncCallback.class)
+      );
+    verifyZeroInteractions(mockPopupUtils, mockEventBus);
+    verify(mockView).showErrorIcon(errorMessage);
+  }
 }

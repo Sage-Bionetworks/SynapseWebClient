@@ -1,8 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
-import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-
 import com.google.gwt.event.dom.client.ErrorEvent;
 import com.google.gwt.event.dom.client.ErrorHandler;
 import com.google.gwt.event.dom.client.LoadEvent;
@@ -11,59 +8,77 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
-public class TIFFPreviewWidgetViewImpl extends FlowPanel implements TIFFPreviewWidgetView {
+public class TIFFPreviewWidgetViewImpl
+  extends FlowPanel
+  implements TIFFPreviewWidgetView {
 
-	private Image image;
-	private SynapseAlert synAlert;
+  private Image image;
+  private SynapseAlert synAlert;
 
-	@Inject
-	public TIFFPreviewWidgetViewImpl(SynapseAlert synAlert) {
-		this.synAlert = synAlert;
-	}
+  @Inject
+  public TIFFPreviewWidgetViewImpl(SynapseAlert synAlert) {
+    this.synAlert = synAlert;
+  }
 
-	@Override
-	public void configure(final String url) {
-		clear();
-		add(synAlert);
-		_setImagePresignedUrl(url, this);
-	}
-	
-	@Override
-	public void showError(String error) {
-		clear();
-		add(synAlert);
-		synAlert.showError(error);
-	}
-	
-	public void setPng(String localPngUrl, int width, int height) {
-		image = new Image();
-		image.addErrorHandler(new ErrorHandler() {
-			@Override
-			public void onError(ErrorEvent event) {
-				synAlert.showError(DisplayConstants.IMAGE_FAILED_TO_LOAD + localPngUrl);
-			}
-		});
-		image.addLoadHandler(new LoadHandler() {
-			@Override
-			public void onLoad(LoadEvent event) {
-				try {
-					image.removeStyleName("blur");
-					image.setWidth(Integer.toString(width));
-					image.setHeight(Integer.toString(height));
-				} catch (Throwable e) {
-					remove(image);
-					synAlert.showError(DisplayConstants.IMAGE_FAILED_TO_LOAD + localPngUrl + ": " + e.getMessage());
-				}
-			}
-		});
+  @Override
+  public void configure(final String url) {
+    clear();
+    add(synAlert);
+    _setImagePresignedUrl(url, this);
+  }
 
-		add(image);
-		image.setUrl(localPngUrl);
-		image.addStyleName("blur");
-	}
-	
-	private static native void _setImagePresignedUrl(String url, TIFFPreviewWidgetViewImpl view) /*-{
+  @Override
+  public void showError(String error) {
+    clear();
+    add(synAlert);
+    synAlert.showError(error);
+  }
+
+  public void setPng(String localPngUrl, int width, int height) {
+    image = new Image();
+    image.addErrorHandler(
+      new ErrorHandler() {
+        @Override
+        public void onError(ErrorEvent event) {
+          synAlert.showError(
+            DisplayConstants.IMAGE_FAILED_TO_LOAD + localPngUrl
+          );
+        }
+      }
+    );
+    image.addLoadHandler(
+      new LoadHandler() {
+        @Override
+        public void onLoad(LoadEvent event) {
+          try {
+            image.removeStyleName("blur");
+            image.setWidth(Integer.toString(width));
+            image.setHeight(Integer.toString(height));
+          } catch (Throwable e) {
+            remove(image);
+            synAlert.showError(
+              DisplayConstants.IMAGE_FAILED_TO_LOAD +
+              localPngUrl +
+              ": " +
+              e.getMessage()
+            );
+          }
+        }
+      }
+    );
+
+    add(image);
+    image.setUrl(localPngUrl);
+    image.addStyleName("blur");
+  }
+
+  private static native void _setImagePresignedUrl(
+    String url,
+    TIFFPreviewWidgetViewImpl view
+  ) /*-{
 		try {
 			var xhr = new XMLHttpRequest();
 			xhr.responseType = 'arraybuffer';
@@ -95,9 +110,8 @@ public class TIFFPreviewWidgetViewImpl extends FlowPanel implements TIFFPreviewW
 		}
 	}-*/;
 
-
-	@Override
-	public Widget asWidget() {
-		return this;
-	}
+  @Override
+  public Widget asWidget() {
+    return this;
+  }
 }

@@ -1,8 +1,5 @@
 package org.sagebionetworks.web.client.widget.docker;
 
-import java.util.Date;
-import org.gwtbootstrap3.client.ui.html.Span;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
@@ -13,66 +10,81 @@ import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import java.util.Date;
+import org.gwtbootstrap3.client.ui.html.Span;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 
-public class DockerCommitRowWidgetViewImpl implements DockerCommitRowWidgetView {
-	public static final DateTimeFormat DATE_FORMAT = DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_SHORT);
+public class DockerCommitRowWidgetViewImpl
+  implements DockerCommitRowWidgetView {
 
-	@UiField
-	Span tag;
-	@UiField
-	TextBox createdOn;
-	@UiField
-	TextBox digest;
-	@UiField
-	FocusPanel row;
+  public static final DateTimeFormat DATE_FORMAT = DateTimeFormat.getFormat(
+    PredefinedFormat.DATE_TIME_SHORT
+  );
 
-	private Widget widget;
-	private Presenter presenter;
+  @UiField
+  Span tag;
 
-	public interface Binder extends UiBinder<Widget, DockerCommitRowWidgetViewImpl> {
-	}
+  @UiField
+  TextBox createdOn;
 
-	@Inject
-	public DockerCommitRowWidgetViewImpl(Binder binder, final SynapseJSNIUtils jsniUtils) {
-		this.widget = binder.createAndBindUi(this);
-		digest.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				digest.selectAll();
-			}
-		});
-		row.addClickHandler(new ClickHandler() {
+  @UiField
+  TextBox digest;
 
-			@Override
-			public void onClick(ClickEvent arg0) {
-				presenter.onClick();
-			}
-		});
-	}
+  @UiField
+  FocusPanel row;
 
-	@Override
-	public Widget asWidget() {
-		return widget;
-	}
+  private Widget widget;
+  private Presenter presenter;
 
-	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-	}
+  public interface Binder
+    extends UiBinder<Widget, DockerCommitRowWidgetViewImpl> {}
 
-	@Override
-	public void setTag(String tag) {
-		this.tag.setText(tag);
-	}
+  @Inject
+  public DockerCommitRowWidgetViewImpl(
+    Binder binder,
+    final SynapseJSNIUtils jsniUtils
+  ) {
+    this.widget = binder.createAndBindUi(this);
+    digest.addClickHandler(
+      new ClickHandler() {
+        @Override
+        public void onClick(ClickEvent event) {
+          digest.selectAll();
+        }
+      }
+    );
+    row.addClickHandler(
+      new ClickHandler() {
+        @Override
+        public void onClick(ClickEvent arg0) {
+          presenter.onClick();
+        }
+      }
+    );
+  }
 
-	@Override
-	public void setDigest(String digest) {
-		this.digest.setText(digest);
-	}
+  @Override
+  public Widget asWidget() {
+    return widget;
+  }
 
-	@Override
-	public void setCreatedOn(Date createdOn) {
-		this.createdOn.setText(DATE_FORMAT.format(createdOn));
-	}
+  @Override
+  public void setPresenter(Presenter presenter) {
+    this.presenter = presenter;
+  }
 
+  @Override
+  public void setTag(String tag) {
+    this.tag.setText(tag);
+  }
+
+  @Override
+  public void setDigest(String digest) {
+    this.digest.setText(digest);
+  }
+
+  @Override
+  public void setCreatedOn(Date createdOn) {
+    this.createdOn.setText(DATE_FORMAT.format(createdOn));
+  }
 }

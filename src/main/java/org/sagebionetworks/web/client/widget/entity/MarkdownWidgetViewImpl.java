@@ -1,12 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-
-import org.gwtbootstrap3.client.ui.html.Italic;
-import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
-import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.AnchorElement;
 import com.google.gwt.dom.client.Element;
@@ -22,111 +15,131 @@ import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.gwtbootstrap3.client.ui.html.Italic;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
+import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
 public class MarkdownWidgetViewImpl implements MarkdownWidgetView {
-	public interface Binder extends UiBinder<Widget, MarkdownWidgetViewImpl> {
-	}
-	Widget widget;
-	SynapseJSNIUtils jsniUtils;
-	@UiField
-	HTMLPanel contentPanel;
-	@UiField
-	SimplePanel synAlertPanel;
-	@UiField
-	LoadingSpinner loading;
-	@UiField
-	Italic emptyPanel;
 
-	public static GlobalApplicationState globalAppState;
-	public static final EventListener relativeLinkClickHandler = event -> {
-		event.preventDefault();
-		if (Event.ONCLICK == event.getTypeInt()) {
-			AnchorElement el = (AnchorElement) event.getCurrentTarget();
-			String href = el.getHref();
-			String placeToken = href.substring(href.indexOf('!'));
-			AppPlaceHistoryMapper appPlaceHistoryMapper = globalAppState.getAppPlaceHistoryMapper();
-			Place newPlace = appPlaceHistoryMapper.getPlace(placeToken);
-			globalAppState.getPlaceChanger().goTo(newPlace);
-		}
-	};
+  public interface Binder extends UiBinder<Widget, MarkdownWidgetViewImpl> {}
 
-	@Inject
-	public MarkdownWidgetViewImpl(final Binder uiBinder, SynapseJSNIUtils jsniUtils, GlobalApplicationState globalAppState) {
-		widget = uiBinder.createAndBindUi(this);
-		this.jsniUtils = jsniUtils;
-		MarkdownWidgetViewImpl.globalAppState = globalAppState;
-	}
+  Widget widget;
+  SynapseJSNIUtils jsniUtils;
 
-	@Override
-	public void setSynAlertWidget(Widget synAlert) {
-		synAlertPanel.setWidget(synAlert);
-	}
+  @UiField
+  HTMLPanel contentPanel;
 
-	@Override
-	public void setEmptyVisible(boolean isVisible) {
-		emptyPanel.setVisible(isVisible);
-		contentPanel.setVisible(!isVisible);
-	}
+  @UiField
+  SimplePanel synAlertPanel;
 
-	@Override
-	public void setMarkdown(final String result) {
-		contentPanel.getElement().setInnerHTML(result);
-		addPlaceChangerEventHandlerToAnchors();
-	}
+  @UiField
+  LoadingSpinner loading;
 
-	private void addPlaceChangerEventHandlerToAnchors() {
-		// Optimization. handle all anchor links via the placechanger instead of page change
-		NodeList<Element> anchors = contentPanel.getElement().getElementsByTagName("a");
-		String hostPageURL = GWT.getHostPageBaseURL();
-		for (int i = 0; i < anchors.getLength(); i++) {
-			AnchorElement anchorElement = (AnchorElement) anchors.getItem(i);
-			if (anchorElement.getHref().startsWith(hostPageURL + "#!")) {
-				DOM.sinkEvents(anchorElement, Event.ONCLICK | Event.ONMOUSEOUT | Event.ONMOUSEOVER);
-				DOM.setEventListener(anchorElement, relativeLinkClickHandler);
-			}
-		}
-	}
+  @UiField
+  Italic emptyPanel;
 
-	@Override
-	public void callbackWhenAttached(final Callback callback) {
-		final Timer t = new Timer() {
-			@Override
-			public void run() {
-				if (contentPanel.isAttached()) {
-					callback.invoke();
-				} else {
-					schedule(100);
-				}
-			}
-		};
+  public static GlobalApplicationState globalAppState;
+  public static final EventListener relativeLinkClickHandler = event -> {
+    event.preventDefault();
+    if (Event.ONCLICK == event.getTypeInt()) {
+      AnchorElement el = (AnchorElement) event.getCurrentTarget();
+      String href = el.getHref();
+      String placeToken = href.substring(href.indexOf('!'));
+      AppPlaceHistoryMapper appPlaceHistoryMapper = globalAppState.getAppPlaceHistoryMapper();
+      Place newPlace = appPlaceHistoryMapper.getPlace(placeToken);
+      globalAppState.getPlaceChanger().goTo(newPlace);
+    }
+  };
 
-		t.schedule(100);
-	}
+  @Inject
+  public MarkdownWidgetViewImpl(
+    final Binder uiBinder,
+    SynapseJSNIUtils jsniUtils,
+    GlobalApplicationState globalAppState
+  ) {
+    widget = uiBinder.createAndBindUi(this);
+    this.jsniUtils = jsniUtils;
+    MarkdownWidgetViewImpl.globalAppState = globalAppState;
+  }
 
-	@Override
-	public ElementWrapper getElementById(String id) {
-		Element ele = contentPanel.getElementById(id);
-		return ele == null ? null : new ElementWrapper(ele);
-	}
+  @Override
+  public void setSynAlertWidget(Widget synAlert) {
+    synAlertPanel.setWidget(synAlert);
+  }
 
-	@Override
-	public void addWidget(Widget widget, String divID) {
-		contentPanel.add(widget, divID);
-	}
+  @Override
+  public void setEmptyVisible(boolean isVisible) {
+    emptyPanel.setVisible(isVisible);
+    contentPanel.setVisible(!isVisible);
+  }
 
-	@Override
-	public Widget asWidget() {
-		return widget;
-	}
+  @Override
+  public void setMarkdown(final String result) {
+    contentPanel.getElement().setInnerHTML(result);
+    addPlaceChangerEventHandlerToAnchors();
+  }
 
-	@Override
-	public void clearMarkdown() {
-		contentPanel.clear();
-		setMarkdown("");
-	}
+  private void addPlaceChangerEventHandlerToAnchors() {
+    // Optimization. handle all anchor links via the placechanger instead of page change
+    NodeList<Element> anchors = contentPanel
+      .getElement()
+      .getElementsByTagName("a");
+    String hostPageURL = GWT.getHostPageBaseURL();
+    for (int i = 0; i < anchors.getLength(); i++) {
+      AnchorElement anchorElement = (AnchorElement) anchors.getItem(i);
+      if (anchorElement.getHref().startsWith(hostPageURL + "#!")) {
+        DOM.sinkEvents(
+          anchorElement,
+          Event.ONCLICK | Event.ONMOUSEOUT | Event.ONMOUSEOVER
+        );
+        DOM.setEventListener(anchorElement, relativeLinkClickHandler);
+      }
+    }
+  }
 
-	@Override
-	public void setLoadingVisible(boolean visible) {
-		loading.setVisible(visible);	
-	}
+  @Override
+  public void callbackWhenAttached(final Callback callback) {
+    final Timer t = new Timer() {
+      @Override
+      public void run() {
+        if (contentPanel.isAttached()) {
+          callback.invoke();
+        } else {
+          schedule(100);
+        }
+      }
+    };
+
+    t.schedule(100);
+  }
+
+  @Override
+  public ElementWrapper getElementById(String id) {
+    Element ele = contentPanel.getElementById(id);
+    return ele == null ? null : new ElementWrapper(ele);
+  }
+
+  @Override
+  public void addWidget(Widget widget, String divID) {
+    contentPanel.add(widget, divID);
+  }
+
+  @Override
+  public Widget asWidget() {
+    return widget;
+  }
+
+  @Override
+  public void clearMarkdown() {
+    contentPanel.clear();
+    setMarkdown("");
+  }
+
+  @Override
+  public void setLoadingVisible(boolean visible) {
+    loading.setVisible(visible);
+  }
 }

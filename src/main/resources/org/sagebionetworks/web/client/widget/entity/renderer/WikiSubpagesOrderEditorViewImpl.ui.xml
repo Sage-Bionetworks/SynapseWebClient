@@ -1,55 +1,61 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui"
-	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
-	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
-	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
-	<g:FlowPanel>
-		<bh:Div>
-		    <b:Heading size="H4" text="Edit Order">
-			    <w:HelpWidget helpMarkdown="Select a wiki page and use the arrows to move it to the desired position." 
-					href="https://help.synapse.org/docs/Wikis.1975746682.html#Wikis-ModifyPageOrder" addStyleNames="margin-left-5" placement="BOTTOM"/>
-		    </b:Heading>
-		</bh:Div>
-		<bh:Div addStyleNames="center center-block margin-top-30">
-			<bh:Div>
-				<b:VerticalButtonGroup>
-				    <b:Button ui:field="upButton" icon="ARROW_UP"/>
-				</b:VerticalButtonGroup>
-			</bh:Div>
-			<bh:Div>
-				<b:ButtonGroup>
-					<b:Button ui:field="leftButton" icon="ARROW_LEFT" />
-				    <b:Button ui:field="rightButton" icon="ARROW_RIGHT" />
-				</b:ButtonGroup>
-			</bh:Div>
-			<bh:Div>
-				<b:VerticalButtonGroup>
-				    <b:Button ui:field="downButton" icon="ARROW_DOWN"/>
-				</b:VerticalButtonGroup>
-			</bh:Div>
-		</bh:Div>
-		<w:LoadingSpinner ui:field="loadingUI" size="31px" visible="false"/>
-		<g:SimplePanel ui:field="synAlertContainer" />
-		<g:SimplePanel ui:field="treePanel" />
-		
-		<bh:Div addStyleNames="center center-block">
-			<bh:Div>
-				<b:VerticalButtonGroup>
-				    <b:Button ui:field="upButton2" icon="ARROW_UP"/>
-				</b:VerticalButtonGroup>
-			</bh:Div>
-			<bh:Div>
-				<b:ButtonGroup>
-					<b:Button ui:field="leftButton2" icon="ARROW_LEFT" />
-				    <b:Button ui:field="rightButton2" icon="ARROW_RIGHT" />
-				</b:ButtonGroup>
-			</bh:Div>
-			<bh:Div>
-				<b:VerticalButtonGroup>
-				    <b:Button ui:field="downButton2" icon="ARROW_DOWN"/>
-				</b:VerticalButtonGroup>
-			</bh:Div>
-		</bh:Div>
-	</g:FlowPanel>
+<ui:UiBinder
+  xmlns:ui="urn:ui:com.google.gwt.uibinder"
+  xmlns:g="urn:import:com.google.gwt.user.client.ui"
+  xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
+  xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+  xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
+>
+  <g:FlowPanel>
+    <bh:Div>
+      <b:Heading size="H4" text="Edit Order">
+        <w:HelpWidget
+          helpMarkdown="Select a wiki page and use the arrows to move it to the desired position."
+          href="https://help.synapse.org/docs/Wikis.1975746682.html#Wikis-ModifyPageOrder"
+          addStyleNames="margin-left-5"
+          placement="BOTTOM"
+        />
+      </b:Heading>
+    </bh:Div>
+    <bh:Div addStyleNames="center center-block margin-top-30">
+      <bh:Div>
+        <b:VerticalButtonGroup>
+          <b:Button ui:field="upButton" icon="ARROW_UP" />
+        </b:VerticalButtonGroup>
+      </bh:Div>
+      <bh:Div>
+        <b:ButtonGroup>
+          <b:Button ui:field="leftButton" icon="ARROW_LEFT" />
+          <b:Button ui:field="rightButton" icon="ARROW_RIGHT" />
+        </b:ButtonGroup>
+      </bh:Div>
+      <bh:Div>
+        <b:VerticalButtonGroup>
+          <b:Button ui:field="downButton" icon="ARROW_DOWN" />
+        </b:VerticalButtonGroup>
+      </bh:Div>
+    </bh:Div>
+    <w:LoadingSpinner ui:field="loadingUI" size="31px" visible="false" />
+    <g:SimplePanel ui:field="synAlertContainer" />
+    <g:SimplePanel ui:field="treePanel" />
+
+    <bh:Div addStyleNames="center center-block">
+      <bh:Div>
+        <b:VerticalButtonGroup>
+          <b:Button ui:field="upButton2" icon="ARROW_UP" />
+        </b:VerticalButtonGroup>
+      </bh:Div>
+      <bh:Div>
+        <b:ButtonGroup>
+          <b:Button ui:field="leftButton2" icon="ARROW_LEFT" />
+          <b:Button ui:field="rightButton2" icon="ARROW_RIGHT" />
+        </b:ButtonGroup>
+      </bh:Div>
+      <bh:Div>
+        <b:VerticalButtonGroup>
+          <b:Button ui:field="downButton2" icon="ARROW_DOWN" />
+        </b:VerticalButtonGroup>
+      </bh:Div>
+    </bh:Div>
+  </g:FlowPanel>
 </ui:UiBinder>

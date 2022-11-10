@@ -6,15 +6,16 @@ import org.sagebionetworks.client.SynapseProfileProxy;
 
 /**
  * Very simple implementation.
- * 
+ *
  * @author John
  *
  */
 public class SynapseProviderImpl implements SynapseProvider {
-	@Override
-	public SynapseClient createNewClient() {
-		return SynapseRetryProxy.createProxy(SynapseProfileProxy.createProfileProxy(new SynapseClientImpl()));
-	}
 
-
+  @Override
+  public SynapseClient createNewClient() {
+    return SynapseRetryProxy.createProxy(
+      SynapseProfileProxy.createProfileProxy(new SynapseClientImpl())
+    );
+  }
 }

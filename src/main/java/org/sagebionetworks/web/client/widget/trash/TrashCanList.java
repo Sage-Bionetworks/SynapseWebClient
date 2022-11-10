@@ -7,12 +7,13 @@ import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 
 public class TrashCanList extends ReactComponentDiv {
-	public TrashCanList(SynapseContextPropsProvider contextPropsProvider) {
-		ReactNode component = React.createElementWithSynapseContext(
-				SRC.SynapseComponents.TrashCanList,
-				null,
-				contextPropsProvider.getJsInteropContextProps()
-		);
-		this.render(component);
-	}
+
+  public TrashCanList(SynapseContextPropsProvider contextPropsProvider) {
+    ReactNode component = React.createElementWithSynapseContext(
+      SRC.SynapseComponents.TrashCanList,
+      null,
+      contextPropsProvider.getJsInteropContextProps()
+    );
+    this.render(component);
+  }
 }

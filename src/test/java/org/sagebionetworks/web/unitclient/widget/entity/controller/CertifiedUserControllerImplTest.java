@@ -4,6 +4,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -23,137 +24,159 @@ import org.sagebionetworks.web.client.widget.entity.download.QuizInfoDialog;
 
 public class CertifiedUserControllerImplTest {
 
-	@Mock
-	QuizInfoDialog mockQuizInfoDialog;
-	CertifiedUserControllerImpl controller;
-	@Mock
-	Callback mockCallback;
-	UserEntityPermissions permissions;
-	EntityBundle bundle;
-	@Mock
-	PortalGinInjector mockGinInjector;
-	@Mock
-	AuthenticationController mockAuthController;
-	@Mock
-	GlobalApplicationState mockGlobalAppState;
-	@Mock
-	PlaceChanger mockPlaceChanger;
+  @Mock
+  QuizInfoDialog mockQuizInfoDialog;
 
-	@Before
-	public void before() {
-		MockitoAnnotations.initMocks(this);
-		when(mockGlobalAppState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		when(mockGinInjector.getQuizInfoDialog()).thenReturn(mockQuizInfoDialog);
-		when(mockAuthController.isLoggedIn()).thenReturn(true);
+  CertifiedUserControllerImpl controller;
 
-		controller = new CertifiedUserControllerImpl(mockGinInjector, mockAuthController, mockGlobalAppState);
-		Project entity = new Project();
-		permissions = new UserEntityPermissions();
-		permissions.setIsCertifiedUser(true);
-		permissions.setIsCertificationRequired(true);
-		bundle = new EntityBundle();
-		bundle.setEntity(entity);
-		bundle.setPermissions(permissions);
-	}
+  @Mock
+  Callback mockCallback;
 
-	@Test
-	public void testCheckUploadCertified() {
-		permissions.setIsCertifiedUser(true);
-		controller.checkUploadToEntity(bundle, mockCallback);
-		verify(mockCallback).invoke();
-		verify(mockQuizInfoDialog, never()).show();
-	}
+  UserEntityPermissions permissions;
+  EntityBundle bundle;
 
-	@Test
-	public void testCheckUploadNotCertified() {
-		permissions.setIsCertifiedUser(false);
-		controller.checkUploadToEntity(bundle, mockCallback);
-		verify(mockCallback, never()).invoke();
-		verify(mockQuizInfoDialog).show();
-	}
-	
-	@Test
-	public void testCheckUploadCertificationNotRequiredNotCertified() {
-		permissions.setIsCertifiedUser(false);
-		permissions.setIsCertificationRequired(false);
-		controller.checkUploadToEntity(bundle, mockCallback);
-		verify(mockCallback).invoke();
-		verify(mockQuizInfoDialog, never()).show();
-	}
+  @Mock
+  PortalGinInjector mockGinInjector;
 
-	@Test
-	public void testCreateProjectNotCertified() {
-		permissions.setIsCertifiedUser(false);
-		controller.checkCreateEntity(bundle, Project.class.getName(), mockCallback);
-		// Do not need to certified to create projects
-		verify(mockCallback).invoke();
-		verify(mockQuizInfoDialog, never()).show();
-	}
+  @Mock
+  AuthenticationController mockAuthController;
 
-	@Test
-	public void testCreateNonProjectNotCertified() {
-		permissions.setIsCertifiedUser(false);
-		controller.checkCreateEntity(bundle, TableEntity.class.getName(), mockCallback);
-		// must be certified to create any non-project
-		verify(mockCallback, never()).invoke();
-		verify(mockQuizInfoDialog).show();
-	}
+  @Mock
+  GlobalApplicationState mockGlobalAppState;
 
-	@Test
-	public void testCreateNonProjectCertified() {
-		permissions.setIsCertifiedUser(true);
-		controller.checkCreateEntity(bundle, TableEntity.class.getName(), mockCallback);
-		// must be certified to create any non-project
-		verify(mockCallback).invoke();
-		verify(mockQuizInfoDialog, never()).show();
-	}
-	
-	@Test
-	public void testCreateNonProjectCertificatinNotRequiredNotCertified() {
-		permissions.setIsCertifiedUser(false);
-		permissions.setIsCertificationRequired(false);
-		controller.checkCreateEntity(bundle, TableEntity.class.getName(), mockCallback);
-		verify(mockCallback).invoke();
-		verify(mockQuizInfoDialog, never()).show();
-	}
+  @Mock
+  PlaceChanger mockPlaceChanger;
 
+  @Before
+  public void before() {
+    MockitoAnnotations.initMocks(this);
+    when(mockGlobalAppState.getPlaceChanger()).thenReturn(mockPlaceChanger);
+    when(mockGinInjector.getQuizInfoDialog()).thenReturn(mockQuizInfoDialog);
+    when(mockAuthController.isLoggedIn()).thenReturn(true);
 
-	@Test
-	public void testUpadateNotCertified() {
-		permissions.setIsCertifiedUser(false);
-		controller.checkUpdateEntity(bundle, mockCallback);
-		verify(mockCallback).invoke();
-		verify(mockQuizInfoDialog, never()).show();
-	}
+    controller =
+      new CertifiedUserControllerImpl(
+        mockGinInjector,
+        mockAuthController,
+        mockGlobalAppState
+      );
+    Project entity = new Project();
+    permissions = new UserEntityPermissions();
+    permissions.setIsCertifiedUser(true);
+    permissions.setIsCertificationRequired(true);
+    bundle = new EntityBundle();
+    bundle.setEntity(entity);
+    bundle.setPermissions(permissions);
+  }
 
-	@Test
-	public void testUpdateCertified() {
-		permissions.setIsCertifiedUser(true);
-		controller.checkUpdateEntity(bundle, mockCallback);
-		verify(mockCallback).invoke();
-		verify(mockQuizInfoDialog, never()).show();
-	}
+  @Test
+  public void testCheckUploadCertified() {
+    permissions.setIsCertifiedUser(true);
+    controller.checkUploadToEntity(bundle, mockCallback);
+    verify(mockCallback).invoke();
+    verify(mockQuizInfoDialog, never()).show();
+  }
 
-	@Test
-	public void testUpdateAnonymous() {
-		when(mockAuthController.isLoggedIn()).thenReturn(false);
+  @Test
+  public void testCheckUploadNotCertified() {
+    permissions.setIsCertifiedUser(false);
+    controller.checkUploadToEntity(bundle, mockCallback);
+    verify(mockCallback, never()).invoke();
+    verify(mockQuizInfoDialog).show();
+  }
 
-		controller.checkUpdateEntity(bundle, mockCallback);
+  @Test
+  public void testCheckUploadCertificationNotRequiredNotCertified() {
+    permissions.setIsCertifiedUser(false);
+    permissions.setIsCertificationRequired(false);
+    controller.checkUploadToEntity(bundle, mockCallback);
+    verify(mockCallback).invoke();
+    verify(mockQuizInfoDialog, never()).show();
+  }
 
-		verify(mockCallback, never()).invoke();
-		verify(mockQuizInfoDialog, never()).show();
-		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
-	}
+  @Test
+  public void testCreateProjectNotCertified() {
+    permissions.setIsCertifiedUser(false);
+    controller.checkCreateEntity(bundle, Project.class.getName(), mockCallback);
+    // Do not need to certified to create projects
+    verify(mockCallback).invoke();
+    verify(mockQuizInfoDialog, never()).show();
+  }
 
-	@Test
-	public void testDeleteAnonymous() {
-		when(mockAuthController.isLoggedIn()).thenReturn(false);
+  @Test
+  public void testCreateNonProjectNotCertified() {
+    permissions.setIsCertifiedUser(false);
+    controller.checkCreateEntity(
+      bundle,
+      TableEntity.class.getName(),
+      mockCallback
+    );
+    // must be certified to create any non-project
+    verify(mockCallback, never()).invoke();
+    verify(mockQuizInfoDialog).show();
+  }
 
-		controller.checkDeleteEntity(bundle, mockCallback);
+  @Test
+  public void testCreateNonProjectCertified() {
+    permissions.setIsCertifiedUser(true);
+    controller.checkCreateEntity(
+      bundle,
+      TableEntity.class.getName(),
+      mockCallback
+    );
+    // must be certified to create any non-project
+    verify(mockCallback).invoke();
+    verify(mockQuizInfoDialog, never()).show();
+  }
 
-		verify(mockCallback, never()).invoke();
-		verify(mockQuizInfoDialog, never()).show();
-		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
-	}
+  @Test
+  public void testCreateNonProjectCertificatinNotRequiredNotCertified() {
+    permissions.setIsCertifiedUser(false);
+    permissions.setIsCertificationRequired(false);
+    controller.checkCreateEntity(
+      bundle,
+      TableEntity.class.getName(),
+      mockCallback
+    );
+    verify(mockCallback).invoke();
+    verify(mockQuizInfoDialog, never()).show();
+  }
 
+  @Test
+  public void testUpadateNotCertified() {
+    permissions.setIsCertifiedUser(false);
+    controller.checkUpdateEntity(bundle, mockCallback);
+    verify(mockCallback).invoke();
+    verify(mockQuizInfoDialog, never()).show();
+  }
+
+  @Test
+  public void testUpdateCertified() {
+    permissions.setIsCertifiedUser(true);
+    controller.checkUpdateEntity(bundle, mockCallback);
+    verify(mockCallback).invoke();
+    verify(mockQuizInfoDialog, never()).show();
+  }
+
+  @Test
+  public void testUpdateAnonymous() {
+    when(mockAuthController.isLoggedIn()).thenReturn(false);
+
+    controller.checkUpdateEntity(bundle, mockCallback);
+
+    verify(mockCallback, never()).invoke();
+    verify(mockQuizInfoDialog, never()).show();
+    verify(mockPlaceChanger).goTo(any(LoginPlace.class));
+  }
+
+  @Test
+  public void testDeleteAnonymous() {
+    when(mockAuthController.isLoggedIn()).thenReturn(false);
+
+    controller.checkDeleteEntity(bundle, mockCallback);
+
+    verify(mockCallback, never()).invoke();
+    verify(mockQuizInfoDialog, never()).show();
+    verify(mockPlaceChanger).goTo(any(LoginPlace.class));
+  }
 }

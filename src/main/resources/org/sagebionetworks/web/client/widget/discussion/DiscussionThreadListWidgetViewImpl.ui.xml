@@ -1,52 +1,61 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui"
-	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
-	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
-	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
-	xmlns:tr="urn:import:org.sagebionetworks.web.client.widget.table.v2.results">
-
-	<bh:Div>
-		<bh:Div ui:field="threadCountAlertContainer" />
-		<b:Row>
-			<b:Column size="XS_12">
-				<!-- Thread header -->
-				<bh:Div ui:field="threadHeader"
-					addStyleNames="padding-5 light-border-bottom">
-					<t:Table width="100%">
-						<t:TableRow>
-							<tr:SortableTableHeaderImpl
-								ui:field="sortByTopic" text="Topic" />
-							<t:TableHeader width="200px"
-								addStyleNames="visible-lg">
-								<bh:Span text="Author" />
-							</t:TableHeader>
-							<t:TableHeader width="350px"
-								addStyleNames="visible-lg">
-								<bh:Span text="Active Users" />
-							</t:TableHeader>
-							<tr:SortableTableHeaderImpl
-								ui:field="sortByReplies" width="110px" text="Replies"
-								addStyleNames="visible-lg visible-md" />
-							<tr:SortableTableHeaderImpl
-								ui:field="sortByViews" width="95px" text="View"
-								addStyleNames="visible-lg visible-md" />
-							<tr:SortableTableHeaderImpl
-								ui:field="sortByActivity" width="120px" text="Activity"
-								addStyleNames="visible-lg visible-md" />
-						</t:TableRow>
-					</t:Table>
-				</bh:Div>
-			</b:Column>
-			<b:Column size="XS_12" ui:field="threadListContainer"
-				paddingLeft="22" />
-		</b:Row>
-		<b:Row>
-			<b:Column size="XS_12">
-				<bh:Span ui:field="noThreadsFound" visible="false"
-					paddingLeft="10"> No threads found.</bh:Span>
-			</b:Column>
-		</b:Row>
-		<bh:Div ui:field="synAlertContainer" />
-	</bh:Div>
+<ui:UiBinder
+  xmlns:ui="urn:ui:com.google.gwt.uibinder"
+  xmlns:g="urn:import:com.google.gwt.user.client.ui"
+  xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
+  xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+  xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
+  xmlns:tr="urn:import:org.sagebionetworks.web.client.widget.table.v2.results"
+>
+  <bh:Div>
+    <bh:Div ui:field="threadCountAlertContainer" />
+    <b:Row>
+      <b:Column size="XS_12">
+        <!-- Thread header -->
+        <bh:Div
+          ui:field="threadHeader"
+          addStyleNames="padding-5 light-border-bottom"
+        >
+          <t:Table width="100%">
+            <t:TableRow>
+              <tr:SortableTableHeaderImpl ui:field="sortByTopic" text="Topic" />
+              <t:TableHeader width="200px" addStyleNames="visible-lg">
+                <bh:Span text="Author" />
+              </t:TableHeader>
+              <t:TableHeader width="350px" addStyleNames="visible-lg">
+                <bh:Span text="Active Users" />
+              </t:TableHeader>
+              <tr:SortableTableHeaderImpl
+                ui:field="sortByReplies"
+                width="110px"
+                text="Replies"
+                addStyleNames="visible-lg visible-md"
+              />
+              <tr:SortableTableHeaderImpl
+                ui:field="sortByViews"
+                width="95px"
+                text="View"
+                addStyleNames="visible-lg visible-md"
+              />
+              <tr:SortableTableHeaderImpl
+                ui:field="sortByActivity"
+                width="120px"
+                text="Activity"
+                addStyleNames="visible-lg visible-md"
+              />
+            </t:TableRow>
+          </t:Table>
+        </bh:Div>
+      </b:Column>
+      <b:Column size="XS_12" ui:field="threadListContainer" paddingLeft="22" />
+    </b:Row>
+    <b:Row>
+      <b:Column size="XS_12">
+        <bh:Span ui:field="noThreadsFound" visible="false" paddingLeft="10">
+          No threads found.
+        </bh:Span>
+      </b:Column>
+    </b:Row>
+    <bh:Div ui:field="synAlertContainer" />
+  </bh:Div>
 </ui:UiBinder>

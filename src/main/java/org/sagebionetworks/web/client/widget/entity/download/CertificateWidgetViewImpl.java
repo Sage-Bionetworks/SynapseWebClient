@@ -1,33 +1,37 @@
 package org.sagebionetworks.web.client.widget.entity.download;
 
-import org.sagebionetworks.web.client.widget.FullWidthAlert;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.sagebionetworks.web.client.widget.FullWidthAlert;
 
-public class CertificateWidgetViewImpl implements CertificateWidgetView, IsWidget {
-	Widget widget;
-	@UiField
-	FullWidthAlert alert;
-	public static final String PASSED_QUIZ_ON = "You passed the Synapse Certification Quiz on ";
+public class CertificateWidgetViewImpl
+  implements CertificateWidgetView, IsWidget {
 
-	public interface Binder extends UiBinder<Widget, CertificateWidgetViewImpl> {
-	}
+  Widget widget;
 
-	@Inject
-	public CertificateWidgetViewImpl(Binder uiBinder) {
-		widget = uiBinder.createAndBindUi(this);
-	}
+  @UiField
+  FullWidthAlert alert;
 
-	@Override
-	public void configure(String dateCertified) {
-		alert.setMessage(PASSED_QUIZ_ON + dateCertified);
-	}
+  public static final String PASSED_QUIZ_ON =
+    "You passed the Synapse Certification Quiz on ";
 
-	@Override
-	public Widget asWidget() {
-		return widget;
-	}
+  public interface Binder extends UiBinder<Widget, CertificateWidgetViewImpl> {}
+
+  @Inject
+  public CertificateWidgetViewImpl(Binder uiBinder) {
+    widget = uiBinder.createAndBindUi(this);
+  }
+
+  @Override
+  public void configure(String dateCertified) {
+    alert.setMessage(PASSED_QUIZ_ON + dateCertified);
+  }
+
+  @Override
+  public Widget asWidget() {
+    return widget;
+  }
 }

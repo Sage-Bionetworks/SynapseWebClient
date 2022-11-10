@@ -1,83 +1,92 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Span;
-import org.sagebionetworks.web.client.widget.HelpWidget;
-
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
+import org.sagebionetworks.web.client.widget.HelpWidget;
 
-public class ModifiedCreatedByWidgetViewImpl implements ModifiedCreatedByWidgetView {
+public class ModifiedCreatedByWidgetViewImpl
+  implements ModifiedCreatedByWidgetView {
 
-	@UiField
-	Span createdBadgePanel;
-	@UiField
-	Span createdOnText;
-	@UiField
-	Span modifiedBadgePanel;
-	@UiField
-	Span modifiedOnText;
-	@UiField
-	Div container;
-	@UiField
-	Span createdByUI;
-	@UiField
-	Span modifiedByUI;
-	@UiField
-	HelpWidget createdHelpWidget;
+  @UiField
+  Span createdBadgePanel;
 
-	public interface ModifiedCreatedByWidgetViewImplUiBinder extends UiBinder<Widget, ModifiedCreatedByWidgetViewImpl> {
-	}
+  @UiField
+  Span createdOnText;
 
-	private Widget widget;
+  @UiField
+  Span modifiedBadgePanel;
 
-	@Inject
-	public ModifiedCreatedByWidgetViewImpl(ModifiedCreatedByWidgetViewImplUiBinder binder) {
-		widget = binder.createAndBindUi(this);
-	}
+  @UiField
+  Span modifiedOnText;
 
-	@Override
-	public Widget asWidget() {
-		return widget;
-	}
+  @UiField
+  Div container;
 
-	@Override
-	public void setCreatedOnText(String text) {
-		createdOnText.setText(text);
-	}
+  @UiField
+  Span createdByUI;
 
-	@Override
-	public void setModifiedOnText(String text) {
-		modifiedOnText.setText(text);
-	}
+  @UiField
+  Span modifiedByUI;
 
-	@Override
-	public void setModifiedBadge(IsWidget modifiedBadge) {
-		modifiedBadgePanel.clear();
-		modifiedBadgePanel.add(modifiedBadge);
-	}
+  @UiField
+  HelpWidget createdHelpWidget;
 
-	@Override
-	public void setCreatedBadge(IsWidget createdBadge) {
-		createdBadgePanel.clear();
-		createdBadgePanel.add(createdBadge);
-	}
+  public interface ModifiedCreatedByWidgetViewImplUiBinder
+    extends UiBinder<Widget, ModifiedCreatedByWidgetViewImpl> {}
 
-	@Override
-	public void setVisible(boolean isVisible) {
-		container.setVisible(isVisible);
-	}
+  private Widget widget;
 
-	@Override
-	public void setCreatedHelpWidgetVisible(boolean visible) {
-		createdHelpWidget.setVisible(visible);
-	}
+  @Inject
+  public ModifiedCreatedByWidgetViewImpl(
+    ModifiedCreatedByWidgetViewImplUiBinder binder
+  ) {
+    widget = binder.createAndBindUi(this);
+  }
 
-	@Override
-	public void setCreatedHelpWidgetText(String text) {
-		createdHelpWidget.setHelpMarkdown(text);
-	}
+  @Override
+  public Widget asWidget() {
+    return widget;
+  }
+
+  @Override
+  public void setCreatedOnText(String text) {
+    createdOnText.setText(text);
+  }
+
+  @Override
+  public void setModifiedOnText(String text) {
+    modifiedOnText.setText(text);
+  }
+
+  @Override
+  public void setModifiedBadge(IsWidget modifiedBadge) {
+    modifiedBadgePanel.clear();
+    modifiedBadgePanel.add(modifiedBadge);
+  }
+
+  @Override
+  public void setCreatedBadge(IsWidget createdBadge) {
+    createdBadgePanel.clear();
+    createdBadgePanel.add(createdBadge);
+  }
+
+  @Override
+  public void setVisible(boolean isVisible) {
+    container.setVisible(isVisible);
+  }
+
+  @Override
+  public void setCreatedHelpWidgetVisible(boolean visible) {
+    createdHelpWidget.setVisible(visible);
+  }
+
+  @Override
+  public void setCreatedHelpWidgetText(String text) {
+    createdHelpWidget.setHelpMarkdown(text);
+  }
 }

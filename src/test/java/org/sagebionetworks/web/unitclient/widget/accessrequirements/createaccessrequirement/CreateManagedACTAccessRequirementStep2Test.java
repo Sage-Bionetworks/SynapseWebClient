@@ -7,6 +7,9 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.IsWidget;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -32,172 +35,221 @@ import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.IsWidget;
 
 public class CreateManagedACTAccessRequirementStep2Test {
 
-	CreateManagedACTAccessRequirementStep2 widget;
-	@Mock
-	ModalPresenter mockModalPresenter;
+  CreateManagedACTAccessRequirementStep2 widget;
 
-	@Mock
-	CreateManagedACTAccessRequirementStep2View mockView;
-	@Mock
-	SynapseClientAsync mockSynapseClient;
-	@Mock
-	WikiMarkdownEditor mockWikiMarkdownEditor;
-	@Mock
-	WikiPageWidget mockWikiPageRenderer;
-	@Mock
-	ManagedACTAccessRequirement mockACTAccessRequirement;
-	@Mock
-	FileHandleUploadWidget mockDucTemplateUploader;
-	@Mock
-	FileHandleWidget mockDucTemplateFileHandleWidget;
-	@Mock
-	CreateManagedACTAccessRequirementStep3 mockActStep3;
+  @Mock
+  ModalPresenter mockModalPresenter;
 
-	@Captor
-	ArgumentCaptor<CallbackP> callbackPCaptor;
-	@Captor
-	ArgumentCaptor<WikiPageKey> wikiPageKeyCaptor;
-	@Captor
-	ArgumentCaptor<FileHandleAssociation> fhaCaptor;
-	@Mock
-	FileUpload mockFileUpload;
-	@Mock
-	FileMetadata mockFileMetadata;
+  @Mock
+  CreateManagedACTAccessRequirementStep2View mockView;
 
-	public static final Long AR_ID = 8765L;
-	public static final String FILENAME = "templatefile.pdf";
-	public static final String FILE_HANDLE_ID = "9999";
+  @Mock
+  SynapseClientAsync mockSynapseClient;
 
-	@Before
-	public void setUp() throws Exception {
-		MockitoAnnotations.initMocks(this);
-		widget = new CreateManagedACTAccessRequirementStep2(mockView, mockActStep3, mockSynapseClient, mockWikiMarkdownEditor, mockWikiPageRenderer, mockDucTemplateUploader, mockDucTemplateFileHandleWidget);
-		widget.setModalPresenter(mockModalPresenter);
-		when(mockACTAccessRequirement.getId()).thenReturn(AR_ID);
-		AsyncMockStubber.callSuccessWith(mockACTAccessRequirement).when(mockSynapseClient).createOrUpdateAccessRequirement(any(AccessRequirement.class), any(AsyncCallback.class));
-		when(mockFileUpload.getFileMeta()).thenReturn(mockFileMetadata);
-		when(mockFileUpload.getFileHandleId()).thenReturn(FILE_HANDLE_ID);
-		when(mockFileMetadata.getFileName()).thenReturn(FILENAME);
-		when(mockView.areOtherAttachmentsRequired()).thenReturn(false);
-		when(mockView.isCertifiedUserRequired()).thenReturn(false);
-		when(mockView.isDUCRequired()).thenReturn(false);
-		when(mockView.isIDUPublic()).thenReturn(false);
-		when(mockView.isIRBApprovalRequired()).thenReturn(false);
-		when(mockView.isValidatedProfileRequired()).thenReturn(false);
-		when(mockView.isIDURequired()).thenReturn(true);
+  @Mock
+  WikiMarkdownEditor mockWikiMarkdownEditor;
 
-	}
+  @Mock
+  WikiPageWidget mockWikiPageRenderer;
 
-	@Test
-	public void testConstruction() {
-		verify(mockView).setWikiPageRenderer(any(IsWidget.class));
-		verify(mockView).setDUCTemplateUploadWidget(any(IsWidget.class));
-		verify(mockView).setDUCTemplateWidget(any(IsWidget.class));
-		verify(mockView).setPresenter(widget);
-		verify(mockWikiPageRenderer).setModifiedCreatedByHistoryVisible(false);
-		verify(mockWikiMarkdownEditor).setDeleteButtonVisible(false);
-	}
+  @Mock
+  ManagedACTAccessRequirement mockACTAccessRequirement;
 
-	@Test
-	public void testDucTemplateUploader() {
-		verify(mockDucTemplateUploader).configure(anyString(), callbackPCaptor.capture());
-		CallbackP<FileUpload> onUploadCallback = callbackPCaptor.getValue();
-		widget.configure(mockACTAccessRequirement);
-		onUploadCallback.invoke(mockFileUpload);
-		verify(mockACTAccessRequirement).setDucTemplateFileHandleId(FILE_HANDLE_ID);
-		verify(mockDucTemplateFileHandleWidget).configure(FILENAME, FILE_HANDLE_ID);
-		verify(mockDucTemplateFileHandleWidget).setVisible(true);
-	}
+  @Mock
+  FileHandleUploadWidget mockDucTemplateUploader;
 
-	@Test
-	public void testConfigureWithWiki() {
-		when(mockACTAccessRequirement.getDucTemplateFileHandleId()).thenReturn(FILE_HANDLE_ID);
-		when(mockACTAccessRequirement.getAreOtherAttachmentsRequired()).thenReturn(true);
-		Long expirationPeriodDays = 5L;
-		Long newExpirationPeriodDays = 365L;
-		String newExpirationPeriodDaysString = newExpirationPeriodDays.toString();
-		when(mockView.getExpirationPeriod()).thenReturn(newExpirationPeriodDaysString);
-		Long expirationPeriodMs = expirationPeriodDays * CreateManagedACTAccessRequirementStep2.DAY_IN_MS;
-		when(mockACTAccessRequirement.getExpirationPeriod()).thenReturn(expirationPeriodMs);
-		when(mockACTAccessRequirement.getIsCertifiedUserRequired()).thenReturn(true);
-		when(mockACTAccessRequirement.getIsDUCRequired()).thenReturn(false);
-		when(mockACTAccessRequirement.getIsIDUPublic()).thenReturn(true);
-		when(mockACTAccessRequirement.getIsIRBApprovalRequired()).thenReturn(false);
-		when(mockACTAccessRequirement.getIsValidatedProfileRequired()).thenReturn(true);
-		when(mockACTAccessRequirement.getIsIDURequired()).thenReturn(true);
-		
-		widget.configure(mockACTAccessRequirement);
-		
-		verify(mockWikiPageRenderer).configure(wikiPageKeyCaptor.capture(), eq(false), eq((WikiPageWidget.Callback) null));
-		WikiPageKey key = wikiPageKeyCaptor.getValue();
-		assertEquals(AR_ID.toString(), key.getOwnerObjectId());
-		assertEquals(ObjectType.ACCESS_REQUIREMENT.toString(), key.getOwnerObjectType());
+  @Mock
+  FileHandleWidget mockDucTemplateFileHandleWidget;
 
-		// verify duc template file handle widget is configured properly (basd on act duc file handle id)
-		verify(mockDucTemplateFileHandleWidget).configure(fhaCaptor.capture());
-		FileHandleAssociation fha = fhaCaptor.getValue();
-		assertEquals(FileHandleAssociateType.AccessRequirementAttachment, fha.getAssociateObjectType());
-		assertEquals(AR_ID.toString(), fha.getAssociateObjectId());
-		assertEquals(FILE_HANDLE_ID, fha.getFileHandleId());
-		verify(mockDucTemplateFileHandleWidget).setVisible(true);
+  @Mock
+  CreateManagedACTAccessRequirementStep3 mockActStep3;
 
-		// validate view is set according to AR values
-		verify(mockView).setAreOtherAttachmentsRequired(true);
-		verify(mockView).setExpirationPeriod(expirationPeriodDays.toString());
-		verify(mockView).setIsCertifiedUserRequired(true);
-		verify(mockView).setIsDUCRequired(false);
-		verify(mockView).setIsIDUPublic(true);
-		verify(mockView).setIsIRBApprovalRequired(false);
-		verify(mockView).setIsValidatedProfileRequired(true);
-		verify(mockView).setIsIDURequired(true);
+  @Captor
+  ArgumentCaptor<CallbackP> callbackPCaptor;
 
-		// on edit of wiki
-		widget.onEditWiki();
-		verify(mockWikiMarkdownEditor).configure(eq(key), any(CallbackP.class));
-		
-		// on finish
-		widget.onPrimary();
+  @Captor
+  ArgumentCaptor<WikiPageKey> wikiPageKeyCaptor;
 
-		// verify access requirement was updated from the view (view value responses configured in the the
-		// test setUp()
-		verify(mockACTAccessRequirement).setAreOtherAttachmentsRequired(false);
-		verify(mockACTAccessRequirement).setExpirationPeriod(newExpirationPeriodDays * CreateManagedACTAccessRequirementStep2.DAY_IN_MS);
-		verify(mockACTAccessRequirement).setIsCertifiedUserRequired(false);
-		verify(mockACTAccessRequirement).setIsDUCRequired(false);
-		verify(mockACTAccessRequirement).setIsIDUPublic(false);
-		verify(mockACTAccessRequirement).setIsIRBApprovalRequired(false);
-		verify(mockACTAccessRequirement).setIsValidatedProfileRequired(false);
-		verify(mockACTAccessRequirement).setIsIDURequired(true);
-		verify(mockModalPresenter).setNextActivePage(mockActStep3);
-		verify(mockActStep3).configure(mockACTAccessRequirement);
-	}
+  @Captor
+  ArgumentCaptor<FileHandleAssociation> fhaCaptor;
 
-	@Test
-	public void testInvalidExpirationPeriod_negative() {
-		String newExpirationPeriodDaysString = "-1";
-		when(mockView.getExpirationPeriod()).thenReturn(newExpirationPeriodDaysString);
-		
-		widget.configure(mockACTAccessRequirement);
-		widget.onPrimary();
+  @Mock
+  FileUpload mockFileUpload;
 
-		verify(mockModalPresenter).setErrorMessage(anyString());
-		verify(mockModalPresenter, never()).onFinished();
-	}
+  @Mock
+  FileMetadata mockFileMetadata;
 
-	@Test
-	public void testInvalidExpirationPeriod_notANumber() {
-		String newExpirationPeriodDaysString = "r2D3";
-		when(mockView.getExpirationPeriod()).thenReturn(newExpirationPeriodDaysString);
-		
-		widget.configure(mockACTAccessRequirement);
-		widget.onPrimary();
+  public static final Long AR_ID = 8765L;
+  public static final String FILENAME = "templatefile.pdf";
+  public static final String FILE_HANDLE_ID = "9999";
 
-		verify(mockModalPresenter).setErrorMessage(anyString());
-		verify(mockModalPresenter, never()).onFinished();
-	}
+  @Before
+  public void setUp() throws Exception {
+    MockitoAnnotations.initMocks(this);
+    widget =
+      new CreateManagedACTAccessRequirementStep2(
+        mockView,
+        mockActStep3,
+        mockSynapseClient,
+        mockWikiMarkdownEditor,
+        mockWikiPageRenderer,
+        mockDucTemplateUploader,
+        mockDucTemplateFileHandleWidget
+      );
+    widget.setModalPresenter(mockModalPresenter);
+    when(mockACTAccessRequirement.getId()).thenReturn(AR_ID);
+    AsyncMockStubber
+      .callSuccessWith(mockACTAccessRequirement)
+      .when(mockSynapseClient)
+      .createOrUpdateAccessRequirement(
+        any(AccessRequirement.class),
+        any(AsyncCallback.class)
+      );
+    when(mockFileUpload.getFileMeta()).thenReturn(mockFileMetadata);
+    when(mockFileUpload.getFileHandleId()).thenReturn(FILE_HANDLE_ID);
+    when(mockFileMetadata.getFileName()).thenReturn(FILENAME);
+    when(mockView.areOtherAttachmentsRequired()).thenReturn(false);
+    when(mockView.isCertifiedUserRequired()).thenReturn(false);
+    when(mockView.isDUCRequired()).thenReturn(false);
+    when(mockView.isIDUPublic()).thenReturn(false);
+    when(mockView.isIRBApprovalRequired()).thenReturn(false);
+    when(mockView.isValidatedProfileRequired()).thenReturn(false);
+    when(mockView.isIDURequired()).thenReturn(true);
+  }
+
+  @Test
+  public void testConstruction() {
+    verify(mockView).setWikiPageRenderer(any(IsWidget.class));
+    verify(mockView).setDUCTemplateUploadWidget(any(IsWidget.class));
+    verify(mockView).setDUCTemplateWidget(any(IsWidget.class));
+    verify(mockView).setPresenter(widget);
+    verify(mockWikiPageRenderer).setModifiedCreatedByHistoryVisible(false);
+    verify(mockWikiMarkdownEditor).setDeleteButtonVisible(false);
+  }
+
+  @Test
+  public void testDucTemplateUploader() {
+    verify(mockDucTemplateUploader)
+      .configure(anyString(), callbackPCaptor.capture());
+    CallbackP<FileUpload> onUploadCallback = callbackPCaptor.getValue();
+    widget.configure(mockACTAccessRequirement);
+    onUploadCallback.invoke(mockFileUpload);
+    verify(mockACTAccessRequirement).setDucTemplateFileHandleId(FILE_HANDLE_ID);
+    verify(mockDucTemplateFileHandleWidget).configure(FILENAME, FILE_HANDLE_ID);
+    verify(mockDucTemplateFileHandleWidget).setVisible(true);
+  }
+
+  @Test
+  public void testConfigureWithWiki() {
+    when(mockACTAccessRequirement.getDucTemplateFileHandleId())
+      .thenReturn(FILE_HANDLE_ID);
+    when(mockACTAccessRequirement.getAreOtherAttachmentsRequired())
+      .thenReturn(true);
+    Long expirationPeriodDays = 5L;
+    Long newExpirationPeriodDays = 365L;
+    String newExpirationPeriodDaysString = newExpirationPeriodDays.toString();
+    when(mockView.getExpirationPeriod())
+      .thenReturn(newExpirationPeriodDaysString);
+    Long expirationPeriodMs =
+      expirationPeriodDays * CreateManagedACTAccessRequirementStep2.DAY_IN_MS;
+    when(mockACTAccessRequirement.getExpirationPeriod())
+      .thenReturn(expirationPeriodMs);
+    when(mockACTAccessRequirement.getIsCertifiedUserRequired())
+      .thenReturn(true);
+    when(mockACTAccessRequirement.getIsDUCRequired()).thenReturn(false);
+    when(mockACTAccessRequirement.getIsIDUPublic()).thenReturn(true);
+    when(mockACTAccessRequirement.getIsIRBApprovalRequired()).thenReturn(false);
+    when(mockACTAccessRequirement.getIsValidatedProfileRequired())
+      .thenReturn(true);
+    when(mockACTAccessRequirement.getIsIDURequired()).thenReturn(true);
+
+    widget.configure(mockACTAccessRequirement);
+
+    verify(mockWikiPageRenderer)
+      .configure(
+        wikiPageKeyCaptor.capture(),
+        eq(false),
+        eq((WikiPageWidget.Callback) null)
+      );
+    WikiPageKey key = wikiPageKeyCaptor.getValue();
+    assertEquals(AR_ID.toString(), key.getOwnerObjectId());
+    assertEquals(
+      ObjectType.ACCESS_REQUIREMENT.toString(),
+      key.getOwnerObjectType()
+    );
+
+    // verify duc template file handle widget is configured properly (basd on act duc file handle id)
+    verify(mockDucTemplateFileHandleWidget).configure(fhaCaptor.capture());
+    FileHandleAssociation fha = fhaCaptor.getValue();
+    assertEquals(
+      FileHandleAssociateType.AccessRequirementAttachment,
+      fha.getAssociateObjectType()
+    );
+    assertEquals(AR_ID.toString(), fha.getAssociateObjectId());
+    assertEquals(FILE_HANDLE_ID, fha.getFileHandleId());
+    verify(mockDucTemplateFileHandleWidget).setVisible(true);
+
+    // validate view is set according to AR values
+    verify(mockView).setAreOtherAttachmentsRequired(true);
+    verify(mockView).setExpirationPeriod(expirationPeriodDays.toString());
+    verify(mockView).setIsCertifiedUserRequired(true);
+    verify(mockView).setIsDUCRequired(false);
+    verify(mockView).setIsIDUPublic(true);
+    verify(mockView).setIsIRBApprovalRequired(false);
+    verify(mockView).setIsValidatedProfileRequired(true);
+    verify(mockView).setIsIDURequired(true);
+
+    // on edit of wiki
+    widget.onEditWiki();
+    verify(mockWikiMarkdownEditor).configure(eq(key), any(CallbackP.class));
+
+    // on finish
+    widget.onPrimary();
+
+    // verify access requirement was updated from the view (view value responses configured in the the
+    // test setUp()
+    verify(mockACTAccessRequirement).setAreOtherAttachmentsRequired(false);
+    verify(mockACTAccessRequirement)
+      .setExpirationPeriod(
+        newExpirationPeriodDays *
+        CreateManagedACTAccessRequirementStep2.DAY_IN_MS
+      );
+    verify(mockACTAccessRequirement).setIsCertifiedUserRequired(false);
+    verify(mockACTAccessRequirement).setIsDUCRequired(false);
+    verify(mockACTAccessRequirement).setIsIDUPublic(false);
+    verify(mockACTAccessRequirement).setIsIRBApprovalRequired(false);
+    verify(mockACTAccessRequirement).setIsValidatedProfileRequired(false);
+    verify(mockACTAccessRequirement).setIsIDURequired(true);
+    verify(mockModalPresenter).setNextActivePage(mockActStep3);
+    verify(mockActStep3).configure(mockACTAccessRequirement);
+  }
+
+  @Test
+  public void testInvalidExpirationPeriod_negative() {
+    String newExpirationPeriodDaysString = "-1";
+    when(mockView.getExpirationPeriod())
+      .thenReturn(newExpirationPeriodDaysString);
+
+    widget.configure(mockACTAccessRequirement);
+    widget.onPrimary();
+
+    verify(mockModalPresenter).setErrorMessage(anyString());
+    verify(mockModalPresenter, never()).onFinished();
+  }
+
+  @Test
+  public void testInvalidExpirationPeriod_notANumber() {
+    String newExpirationPeriodDaysString = "r2D3";
+    when(mockView.getExpirationPeriod())
+      .thenReturn(newExpirationPeriodDaysString);
+
+    widget.configure(mockACTAccessRequirement);
+    widget.onPrimary();
+
+    verify(mockModalPresenter).setErrorMessage(anyString());
+    verify(mockModalPresenter, never()).onFinished();
+  }
 }

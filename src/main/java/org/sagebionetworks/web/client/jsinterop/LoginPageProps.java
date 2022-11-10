@@ -8,21 +8,25 @@ import jsinterop.annotations.JsType;
 @JsType(isNative = true, namespace = JsPackage.GLOBAL, name = "Object")
 public class LoginPageProps extends ReactComponentProps {
 
-	@JsFunction
-	public interface Callback {
-		void run();
-	}
+  @JsFunction
+  public interface Callback {
+    void run();
+  }
 
-	String ssoRedirectUrl;
-	String redirectUrl;
-	Callback sessionCallback;
+  String ssoRedirectUrl;
+  String redirectUrl;
+  Callback sessionCallback;
 
-	@JsOverlay
-	public static LoginPageProps create(String ssoRedirectUrl, String redirectUrl, Callback sessionCallback) {
-		LoginPageProps props = new LoginPageProps();
-		props.ssoRedirectUrl = ssoRedirectUrl;
-		props.redirectUrl = redirectUrl;
-		props.sessionCallback = sessionCallback;
-		return props;
-	}
+  @JsOverlay
+  public static LoginPageProps create(
+    String ssoRedirectUrl,
+    String redirectUrl,
+    Callback sessionCallback
+  ) {
+    LoginPageProps props = new LoginPageProps();
+    props.ssoRedirectUrl = ssoRedirectUrl;
+    props.redirectUrl = redirectUrl;
+    props.sessionCallback = sessionCallback;
+    return props;
+  }
 }

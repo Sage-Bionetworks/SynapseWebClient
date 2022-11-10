@@ -7,11 +7,11 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.gwt.junit.client.GWTTestCase;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.function.Consumer;
-
-import com.google.gwt.junit.client.GWTTestCase;
 import org.apache.tapestry.form.Submit;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -34,126 +34,166 @@ import org.sagebionetworks.web.client.widget.evaluation.AdministerEvaluationsLis
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModal;
 import org.sagebionetworks.web.client.widget.sharing.EvaluationAccessControlListModalWidget;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
-public class AdministerEvaluationsListTest{
+public class AdministerEvaluationsListTest {
 
-	AdministerEvaluationsList evalList;
-	@Mock
-	AdministerEvaluationsListView mockView;
-	@Mock
-	ChallengeClientAsync mockChallengeClient;
-	@Mock
-	EvaluationAccessControlListModalWidget mockAclEditor;
-	@Mock
-	EvaluationEditorModal mockEvalEditor;
-	@Mock
-	SynapseAlert mockSynAlert;
-	@Mock
-	GlobalApplicationState mockGlobalApplicationState;
-	@Mock
-	AuthenticationController mockAuthenticationController;
-	@Mock
-	SubmitToEvaluationWidget mockSubmitToEvaluationWidget;
+  AdministerEvaluationsList evalList;
 
+  @Mock
+  AdministerEvaluationsListView mockView;
 
-	@Mock
-	Consumer<String> mockOnEditEvaluation;
+  @Mock
+  ChallengeClientAsync mockChallengeClient;
 
-	Evaluation e1, e2;
+  @Mock
+  EvaluationAccessControlListModalWidget mockAclEditor;
 
-	@Before
-	public void setup() throws Exception {
-		MockitoAnnotations.initMocks(this);
-		evalList = new AdministerEvaluationsList(mockView, mockChallengeClient, mockAclEditor, mockEvalEditor, mockSynAlert,
-				mockGlobalApplicationState, mockAuthenticationController, mockSubmitToEvaluationWidget);
+  @Mock
+  EvaluationEditorModal mockEvalEditor;
 
-		ArrayList<Evaluation> evaluationResults = new ArrayList<Evaluation>();
+  @Mock
+  SynapseAlert mockSynAlert;
 
-		e1 = new Evaluation();
-		e1.setId("101");
-		e1.setCreatedOn(new Date());
-		evaluationResults.add(e1);
-		e1.setQuota(new SubmissionQuota());
+  @Mock
+  GlobalApplicationState mockGlobalApplicationState;
 
-		e2 = new Evaluation();
-		e2.setQuota(new SubmissionQuota());
+  @Mock
+  AuthenticationController mockAuthenticationController;
 
-		e1.setId("102");
-		e1.setCreatedOn(new Date());
-		evaluationResults.add(e2);
-		AsyncMockStubber.callSuccessWith(evaluationResults).when(mockChallengeClient).getSharableEvaluations(anyString(), any(AsyncCallback.class));
-	}
+  @Mock
+  SubmitToEvaluationWidget mockSubmitToEvaluationWidget;
 
-	@Test
-	public void testConfigure() {
-		evalList.configure("syn100", mockOnEditEvaluation);
-		verify(mockChallengeClient).getSharableEvaluations(anyString(), any(AsyncCallback.class));
-		verify(mockView).addRow(e1);
-		verify(mockView).addRow(e2);
-	}
+  @Mock
+  Consumer<String> mockOnEditEvaluation;
 
-	@Ignore // Not sure how to stub out GWT Javascript-specific module used in EvaluationJSObject
-	@Test
-	public void testConfigure_useReactComponent() {
-		evalList.configure("syn100", mockOnEditEvaluation);
-		verify(mockChallengeClient).getSharableEvaluations(anyString(), any(AsyncCallback.class));
-		verify(mockView).addReactComponent(eq(e1), any());
-		verify(mockView).addReactComponent(eq(e2), any());
-	}
+  Evaluation e1, e2;
 
-	@Test
-	public void testConfigureZeroResults() {
-		AsyncMockStubber.callSuccessWith(new ArrayList<Evaluation>()).when(mockChallengeClient).getSharableEvaluations(anyString(), any(AsyncCallback.class));
-		evalList.configure("syn100", mockOnEditEvaluation);
-		verify(mockChallengeClient).getSharableEvaluations(anyString(), any(AsyncCallback.class));
-		verify(mockView, never()).addRow(e1);
-	}
+  @Before
+  public void setup() throws Exception {
+    MockitoAnnotations.initMocks(this);
+    evalList =
+      new AdministerEvaluationsList(
+        mockView,
+        mockChallengeClient,
+        mockAclEditor,
+        mockEvalEditor,
+        mockSynAlert,
+        mockGlobalApplicationState,
+        mockAuthenticationController,
+        mockSubmitToEvaluationWidget
+      );
 
-	@Test
-	public void testConfigureFailure() throws Exception {
-		Exception ex = new Exception("bad time");
-		AsyncMockStubber.callFailureWith(ex).when(mockChallengeClient).getSharableEvaluations(anyString(), any(AsyncCallback.class));
-		evalList.configure("syn100", mockOnEditEvaluation);
-		verify(mockChallengeClient).getSharableEvaluations(anyString(), any(AsyncCallback.class));
-		verify(mockSynAlert).handleException(ex);
-	}
+    ArrayList<Evaluation> evaluationResults = new ArrayList<Evaluation>();
 
-	@Test
-	public void testOnEditClicked() {
-		evalList.onEditClicked(e1);
-		ArgumentCaptor<Callback> callbackCaptor = ArgumentCaptor.forClass(Callback.class);
-		verify(mockEvalEditor).configure(eq(e1), callbackCaptor.capture());
-		verify(mockEvalEditor).show();
-		callbackCaptor.getValue().invoke();
-		verify(mockChallengeClient).getSharableEvaluations(anyString(), any(AsyncCallback.class));
-	}
+    e1 = new Evaluation();
+    e1.setId("101");
+    e1.setCreatedOn(new Date());
+    evaluationResults.add(e1);
+    e1.setQuota(new SubmissionQuota());
 
-	@Test
-	public void testOnShareClicked() {
-		evalList.onShareClicked(e1);
-		verify(mockAclEditor).configure(eq(e1), any(Callback.class));
-		verify(mockAclEditor).show();
-	}
+    e2 = new Evaluation();
+    e2.setQuota(new SubmissionQuota());
 
-	@Test
-	public void testOnDeleteEvaluationClicked() {
-		AsyncMockStubber.callSuccessWith(null).when(mockChallengeClient).deleteEvaluation(anyString(), any(AsyncCallback.class));
-		evalList.onDeleteClicked(e1);
-		verify(mockChallengeClient).deleteEvaluation(eq(e1.getId()), any(AsyncCallback.class));
-		// refresh
-		verify(mockChallengeClient).getSharableEvaluations(anyString(), any(AsyncCallback.class));
-	}
+    e1.setId("102");
+    e1.setCreatedOn(new Date());
+    evaluationResults.add(e2);
+    AsyncMockStubber
+      .callSuccessWith(evaluationResults)
+      .when(mockChallengeClient)
+      .getSharableEvaluations(anyString(), any(AsyncCallback.class));
+  }
 
-	@Test
-	public void testOnDeleteEvaluationClickedFailure() {
-		Exception ex = new Exception("does not compute");
-		AsyncMockStubber.callFailureWith(ex).when(mockChallengeClient).deleteEvaluation(anyString(), any(AsyncCallback.class));
-		evalList.onDeleteClicked(e1);
-		verify(mockChallengeClient).deleteEvaluation(eq(e1.getId()), any(AsyncCallback.class));
-		verify(mockSynAlert).handleException(ex);
-		// no refresh
-		verify(mockChallengeClient, never()).getSharableEvaluations(anyString(), any(AsyncCallback.class));
-	}
+  @Test
+  public void testConfigure() {
+    evalList.configure("syn100", mockOnEditEvaluation);
+    verify(mockChallengeClient)
+      .getSharableEvaluations(anyString(), any(AsyncCallback.class));
+    verify(mockView).addRow(e1);
+    verify(mockView).addRow(e2);
+  }
 
+  @Ignore // Not sure how to stub out GWT Javascript-specific module used in EvaluationJSObject
+  @Test
+  public void testConfigure_useReactComponent() {
+    evalList.configure("syn100", mockOnEditEvaluation);
+    verify(mockChallengeClient)
+      .getSharableEvaluations(anyString(), any(AsyncCallback.class));
+    verify(mockView).addReactComponent(eq(e1), any());
+    verify(mockView).addReactComponent(eq(e2), any());
+  }
+
+  @Test
+  public void testConfigureZeroResults() {
+    AsyncMockStubber
+      .callSuccessWith(new ArrayList<Evaluation>())
+      .when(mockChallengeClient)
+      .getSharableEvaluations(anyString(), any(AsyncCallback.class));
+    evalList.configure("syn100", mockOnEditEvaluation);
+    verify(mockChallengeClient)
+      .getSharableEvaluations(anyString(), any(AsyncCallback.class));
+    verify(mockView, never()).addRow(e1);
+  }
+
+  @Test
+  public void testConfigureFailure() throws Exception {
+    Exception ex = new Exception("bad time");
+    AsyncMockStubber
+      .callFailureWith(ex)
+      .when(mockChallengeClient)
+      .getSharableEvaluations(anyString(), any(AsyncCallback.class));
+    evalList.configure("syn100", mockOnEditEvaluation);
+    verify(mockChallengeClient)
+      .getSharableEvaluations(anyString(), any(AsyncCallback.class));
+    verify(mockSynAlert).handleException(ex);
+  }
+
+  @Test
+  public void testOnEditClicked() {
+    evalList.onEditClicked(e1);
+    ArgumentCaptor<Callback> callbackCaptor = ArgumentCaptor.forClass(
+      Callback.class
+    );
+    verify(mockEvalEditor).configure(eq(e1), callbackCaptor.capture());
+    verify(mockEvalEditor).show();
+    callbackCaptor.getValue().invoke();
+    verify(mockChallengeClient)
+      .getSharableEvaluations(anyString(), any(AsyncCallback.class));
+  }
+
+  @Test
+  public void testOnShareClicked() {
+    evalList.onShareClicked(e1);
+    verify(mockAclEditor).configure(eq(e1), any(Callback.class));
+    verify(mockAclEditor).show();
+  }
+
+  @Test
+  public void testOnDeleteEvaluationClicked() {
+    AsyncMockStubber
+      .callSuccessWith(null)
+      .when(mockChallengeClient)
+      .deleteEvaluation(anyString(), any(AsyncCallback.class));
+    evalList.onDeleteClicked(e1);
+    verify(mockChallengeClient)
+      .deleteEvaluation(eq(e1.getId()), any(AsyncCallback.class));
+    // refresh
+    verify(mockChallengeClient)
+      .getSharableEvaluations(anyString(), any(AsyncCallback.class));
+  }
+
+  @Test
+  public void testOnDeleteEvaluationClickedFailure() {
+    Exception ex = new Exception("does not compute");
+    AsyncMockStubber
+      .callFailureWith(ex)
+      .when(mockChallengeClient)
+      .deleteEvaluation(anyString(), any(AsyncCallback.class));
+    evalList.onDeleteClicked(e1);
+    verify(mockChallengeClient)
+      .deleteEvaluation(eq(e1.getId()), any(AsyncCallback.class));
+    verify(mockSynAlert).handleException(ex);
+    // no refresh
+    verify(mockChallengeClient, never())
+      .getSharableEvaluations(anyString(), any(AsyncCallback.class));
+  }
 }

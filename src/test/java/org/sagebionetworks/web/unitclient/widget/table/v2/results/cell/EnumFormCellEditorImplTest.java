@@ -9,7 +9,6 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,102 +23,105 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.RadioCellEdit
 @RunWith(MockitoJUnitRunner.class)
 public class EnumFormCellEditorImplTest {
 
-	@Mock
-	DivView mockDivView;
-	@Mock
-	PortalGinInjector mockGinInjector;
-	@Mock
-	ListCellEditorView mockListView;
-	@Mock
-	RadioCellEditorView mockRadioView;
-	EnumFormCellEditor editor;
+  @Mock
+  DivView mockDivView;
 
-	@Before
-	public void before() {
-		when(mockGinInjector.createListCellEditorView()).thenReturn(mockListView);
-		when(mockGinInjector.createRadioCellEditorView()).thenReturn(mockRadioView);
-		editor = new EnumFormCellEditor(mockDivView, mockGinInjector);
-	}
+  @Mock
+  PortalGinInjector mockGinInjector;
 
-	private List<String> getValuesForDropdownList() {
-		List<String> values = new ArrayList<>();
-		for (int i = 0; i <= EnumFormCellEditor.MAX_RADIO_BUTTONS; i++) {
-			values.add(Integer.toString(i));
-		}
-		return values;
-	}
-	
-	@Test
-	public void testConfigureRadios() {
-		List<String> values = new ArrayList<>();
-		for (int i = 0; i < EnumFormCellEditor.MAX_RADIO_BUTTONS; i++) {
-			values.add(Integer.toString(i));
-		}
-		editor.configure(values);
-		verify(mockRadioView).configure(values);
-	}
+  @Mock
+  ListCellEditorView mockListView;
 
-	@Test
-	public void testConfigureDropdownList() {
-		List<String> values = getValuesForDropdownList();
-		editor.configure(values);
-		verify(mockListView).configure(values);
-	}
+  @Mock
+  RadioCellEditorView mockRadioView;
 
-	@Test
-	public void testSetNull() {
-		List<String> values = Arrays.asList("one", "two");
-		editor.configure(values);
-		editor.setValue(null);
-		verify(mockRadioView, never()).setValue(anyInt());
-	}
+  EnumFormCellEditor editor;
 
-	@Test
-	public void testSetEmpty() {
-		List<String> values = Arrays.asList("one", "two");
-		editor.configure(values);
-		editor.setValue("");
-		verify(mockRadioView, never()).setValue(anyInt());
-	}
+  @Before
+  public void before() {
+    when(mockGinInjector.createListCellEditorView()).thenReturn(mockListView);
+    when(mockGinInjector.createRadioCellEditorView()).thenReturn(mockRadioView);
+    editor = new EnumFormCellEditor(mockDivView, mockGinInjector);
+  }
 
-	@Test
-	public void testSetValueRadios() {
-		List<String> values = Arrays.asList("one", "two");
-		editor.configure(values);
-		editor.setValue("one");
-		verify(mockRadioView).setValue(0);
-	}
-	
-	@Test
-	public void testSetValueList() {
-		List<String> values = getValuesForDropdownList();
-		editor.configure(values);
-		editor.setValue("0");
-		verify(mockListView).setValue(0);
-	}
+  private List<String> getValuesForDropdownList() {
+    List<String> values = new ArrayList<>();
+    for (int i = 0; i <= EnumFormCellEditor.MAX_RADIO_BUTTONS; i++) {
+      values.add(Integer.toString(i));
+    }
+    return values;
+  }
 
-	@Test
-	public void testGetNull() {
-		when(mockRadioView.getValue()).thenReturn(null);
-		List<String> values = Arrays.asList("one", "two");
-		editor.configure(values);
-		assertEquals(null, editor.getValue());
-	}
+  @Test
+  public void testConfigureRadios() {
+    List<String> values = new ArrayList<>();
+    for (int i = 0; i < EnumFormCellEditor.MAX_RADIO_BUTTONS; i++) {
+      values.add(Integer.toString(i));
+    }
+    editor.configure(values);
+    verify(mockRadioView).configure(values);
+  }
 
-	@Test
-	public void testGetValueRadio() {
-		when(mockRadioView.getValue()).thenReturn(1);
-		List<String> values = Arrays.asList("one", "two");
-		editor.configure(values);
-		assertEquals("two", editor.getValue());
-	}
+  @Test
+  public void testConfigureDropdownList() {
+    List<String> values = getValuesForDropdownList();
+    editor.configure(values);
+    verify(mockListView).configure(values);
+  }
 
-	@Test
-	public void testGetValueList() {
-		when(mockListView.getValue()).thenReturn(1);
-		List<String> values = getValuesForDropdownList();
-		editor.configure(values);
-		assertEquals("1", editor.getValue());
-	}
+  @Test
+  public void testSetNull() {
+    List<String> values = Arrays.asList("one", "two");
+    editor.configure(values);
+    editor.setValue(null);
+    verify(mockRadioView, never()).setValue(anyInt());
+  }
 
+  @Test
+  public void testSetEmpty() {
+    List<String> values = Arrays.asList("one", "two");
+    editor.configure(values);
+    editor.setValue("");
+    verify(mockRadioView, never()).setValue(anyInt());
+  }
+
+  @Test
+  public void testSetValueRadios() {
+    List<String> values = Arrays.asList("one", "two");
+    editor.configure(values);
+    editor.setValue("one");
+    verify(mockRadioView).setValue(0);
+  }
+
+  @Test
+  public void testSetValueList() {
+    List<String> values = getValuesForDropdownList();
+    editor.configure(values);
+    editor.setValue("0");
+    verify(mockListView).setValue(0);
+  }
+
+  @Test
+  public void testGetNull() {
+    when(mockRadioView.getValue()).thenReturn(null);
+    List<String> values = Arrays.asList("one", "two");
+    editor.configure(values);
+    assertEquals(null, editor.getValue());
+  }
+
+  @Test
+  public void testGetValueRadio() {
+    when(mockRadioView.getValue()).thenReturn(1);
+    List<String> values = Arrays.asList("one", "two");
+    editor.configure(values);
+    assertEquals("two", editor.getValue());
+  }
+
+  @Test
+  public void testGetValueList() {
+    when(mockListView.getValue()).thenReturn(1);
+    List<String> values = getValuesForDropdownList();
+    editor.configure(values);
+    assertEquals("1", editor.getValue());
+  }
 }

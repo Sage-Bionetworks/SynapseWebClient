@@ -1,5 +1,12 @@
 package org.sagebionetworks.web.client.widget.entity.act;
 
+import com.google.gwt.core.shared.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Widget;
 import java.util.List;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
@@ -9,231 +16,264 @@ import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequirementWidget;
-import com.google.gwt.core.shared.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Widget;
 
-public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalView {
+public class ApproveUserAccessModalViewImpl
+  implements ApproveUserAccessModalView {
 
-	public interface Binder extends UiBinder<Widget, ApproveUserAccessModalViewImpl> {
-	}
+  public interface Binder
+    extends UiBinder<Widget, ApproveUserAccessModalViewImpl> {}
 
-	private static Binder uiBinder = GWT.create(Binder.class);
+  private static Binder uiBinder = GWT.create(Binder.class);
 
-	@UiField
-	Modal modal;
-	@UiField
-	Button accessReqNum;
-	@UiField
-	DropDownMenu arDropdownMenu;
-	@UiField
-	Div accessRequirementWidgetContainer;
-	@UiField
-	Div synAlertContainer;
-	@UiField
-	Button submitButton;
-	@UiField
-	Button revokeButton;
-	@UiField
-	Button cancelButton;
-	@UiField
-	Button previewButton;
-	@UiField
-	HTML emailTemplate;
-	@UiField
-	TextArea messageEditArea;
-	@UiField
-	Div userSelectContainer;
-	@UiField
-	Div loadingEmail;
-	@UiField
-	Modal previewModal;
-	@UiField
-	HTML messageBody;
-	@UiField
-	Button closeButton;
+  @UiField
+  Modal modal;
 
-	private Presenter presenter;
+  @UiField
+  Button accessReqNum;
 
-	Widget widget;
-	String originalSubmitButtonText, originalRevokeButtonText;
-	public ApproveUserAccessModalViewImpl() {
-		widget = uiBinder.createAndBindUi(this);
-		submitButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onSubmit();
-			}
-		});
-		cancelButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				modal.hide();
-			}
-		});
-		revokeButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onRevoke();
-			}
-		});
-		previewButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				messageBody.setHTML(messageEditArea.getText());
-				previewModal.show();
-			}
-		});
-		closeButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				previewModal.hide();
-			}
-		});
-		revokeButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onRevoke();
-			}
-		});
-		originalSubmitButtonText = submitButton.getText();
-		originalRevokeButtonText = revokeButton.getText();
-	}
+  @UiField
+  DropDownMenu arDropdownMenu;
 
-	@Override
-	public String getEmailMessage() {
-		return messageEditArea.getText();
-	}
+  @UiField
+  Div accessRequirementWidgetContainer;
 
-	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-	}
+  @UiField
+  Div synAlertContainer;
 
-	@Override
-	public void setAccessRequirementIDs(List<String> states) {
-		arDropdownMenu.clear();
-		for (final String state : states) {
-			AnchorListItem item = new AnchorListItem(state);
-			item.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					presenter.onAccessRequirementIDSelected(state);
-				}
-			});
-			arDropdownMenu.add(item);
-		}
-	}
+  @UiField
+  Button submitButton;
 
-	@Override
-	public void setUserPickerWidget(Widget w) {
-		userSelectContainer.clear();
-		userSelectContainer.add(w);
-	}
+  @UiField
+  Button revokeButton;
 
-	@Override
-	public void setDatasetTitle(String text) {
-		emailTemplate.setText(text);
-	}
+  @UiField
+  Button cancelButton;
 
-	@Override
-	public void setLoadingEmailWidget(Widget w) {
-		loadingEmail.add(w.asWidget());
-	}
+  @UiField
+  Button previewButton;
 
-	@Override
-	public void startLoadingEmail() {
-		emailTemplate.setVisible(false);
-		previewButton.setVisible(false);
-		setLoadingEmailVisible(true);
-	}
+  @UiField
+  HTML emailTemplate;
 
-	@Override
-	public void finishLoadingEmail() {
-		setLoadingEmailVisible(false);
-		emailTemplate.setVisible(true);
-		previewButton.setVisible(true);
-	}
+  @UiField
+  TextArea messageEditArea;
 
-	@Override
-	public void setLoadingEmailVisible(boolean visible) {
-		loadingEmail.clear();
-		loadingEmail.setVisible(visible);
-	}
+  @UiField
+  Div userSelectContainer;
 
-	@Override
-	public Widget asWidget() {
-		return widget;
-	}
+  @UiField
+  Div loadingEmail;
 
-	@Override
-	public void show() {
-		modal.show();
-	}
+  @UiField
+  Modal previewModal;
 
-	@Override
-	public void hide() {
-		modal.hide();
-	}
+  @UiField
+  HTML messageBody;
 
-	@Override
-	public void showInfo(String message) {
-		DisplayUtils.showInfo(message);
-	}
+  @UiField
+  Button closeButton;
 
-	@Override
-	public String getAccessRequirement() {
-		return accessReqNum.getText();
-	}
+  private Presenter presenter;
 
-	@Override
-	public void setApproveProcessing(boolean processing) {
-		DisplayUtils.showLoading(submitButton, processing, originalSubmitButtonText);
-		cancelButton.setEnabled(!processing);
-		revokeButton.setEnabled(!processing);
-	}
+  Widget widget;
+  String originalSubmitButtonText, originalRevokeButtonText;
 
-	@Override
-	public void setAccessRequirement(String num) {
-		accessReqNum.setText(num);
-	}
+  public ApproveUserAccessModalViewImpl() {
+    widget = uiBinder.createAndBindUi(this);
+    submitButton.addClickHandler(
+      new ClickHandler() {
+        @Override
+        public void onClick(ClickEvent event) {
+          presenter.onSubmit();
+        }
+      }
+    );
+    cancelButton.addClickHandler(
+      new ClickHandler() {
+        @Override
+        public void onClick(ClickEvent event) {
+          modal.hide();
+        }
+      }
+    );
+    revokeButton.addClickHandler(
+      new ClickHandler() {
+        @Override
+        public void onClick(ClickEvent event) {
+          presenter.onRevoke();
+        }
+      }
+    );
+    previewButton.addClickHandler(
+      new ClickHandler() {
+        @Override
+        public void onClick(ClickEvent event) {
+          messageBody.setHTML(messageEditArea.getText());
+          previewModal.show();
+        }
+      }
+    );
+    closeButton.addClickHandler(
+      new ClickHandler() {
+        @Override
+        public void onClick(ClickEvent event) {
+          previewModal.hide();
+        }
+      }
+    );
+    revokeButton.addClickHandler(
+      new ClickHandler() {
+        @Override
+        public void onClick(ClickEvent event) {
+          presenter.onRevoke();
+        }
+      }
+    );
+    originalSubmitButtonText = submitButton.getText();
+    originalRevokeButtonText = revokeButton.getText();
+  }
 
-	@Override
-	public void setSynAlert(Widget widget) {
-		synAlertContainer.clear();
-		synAlertContainer.add(widget.asWidget());
-	}
+  @Override
+  public String getEmailMessage() {
+    return messageEditArea.getText();
+  }
 
-	@Override
-	public Widget getEmailBodyWidget(String html) {
-		HTML display = new HTML();
-		display.setHTML(html);
-		return display.asWidget();
-	}
+  @Override
+  public void setPresenter(Presenter presenter) {
+    this.presenter = presenter;
+  }
 
-	@Override
-	public void setMessageBody(String html) {
-		messageBody.getElement().setInnerHTML(html);
-	}
+  @Override
+  public void setAccessRequirementIDs(List<String> states) {
+    arDropdownMenu.clear();
+    for (final String state : states) {
+      AnchorListItem item = new AnchorListItem(state);
+      item.addClickHandler(
+        new ClickHandler() {
+          @Override
+          public void onClick(ClickEvent event) {
+            presenter.onAccessRequirementIDSelected(state);
+          }
+        }
+      );
+      arDropdownMenu.add(item);
+    }
+  }
 
-	@Override
-	public void setMessageEditArea(String html) {
-		messageEditArea.setText(html);
-	}
+  @Override
+  public void setUserPickerWidget(Widget w) {
+    userSelectContainer.clear();
+    userSelectContainer.add(w);
+  }
 
-	@Override
-	public void setRevokeProcessing(boolean processing) {
-		DisplayUtils.showLoading(revokeButton, processing, originalRevokeButtonText);
-		cancelButton.setEnabled(!processing);
-		submitButton.setEnabled(!processing);
-	}
-	@Override
-	public void setAccessRequirementWidget(AccessRequirementWidget arWidget) {
-		accessRequirementWidgetContainer.clear();
-		accessRequirementWidgetContainer.add(arWidget);
-	}
+  @Override
+  public void setDatasetTitle(String text) {
+    emailTemplate.setText(text);
+  }
+
+  @Override
+  public void setLoadingEmailWidget(Widget w) {
+    loadingEmail.add(w.asWidget());
+  }
+
+  @Override
+  public void startLoadingEmail() {
+    emailTemplate.setVisible(false);
+    previewButton.setVisible(false);
+    setLoadingEmailVisible(true);
+  }
+
+  @Override
+  public void finishLoadingEmail() {
+    setLoadingEmailVisible(false);
+    emailTemplate.setVisible(true);
+    previewButton.setVisible(true);
+  }
+
+  @Override
+  public void setLoadingEmailVisible(boolean visible) {
+    loadingEmail.clear();
+    loadingEmail.setVisible(visible);
+  }
+
+  @Override
+  public Widget asWidget() {
+    return widget;
+  }
+
+  @Override
+  public void show() {
+    modal.show();
+  }
+
+  @Override
+  public void hide() {
+    modal.hide();
+  }
+
+  @Override
+  public void showInfo(String message) {
+    DisplayUtils.showInfo(message);
+  }
+
+  @Override
+  public String getAccessRequirement() {
+    return accessReqNum.getText();
+  }
+
+  @Override
+  public void setApproveProcessing(boolean processing) {
+    DisplayUtils.showLoading(
+      submitButton,
+      processing,
+      originalSubmitButtonText
+    );
+    cancelButton.setEnabled(!processing);
+    revokeButton.setEnabled(!processing);
+  }
+
+  @Override
+  public void setAccessRequirement(String num) {
+    accessReqNum.setText(num);
+  }
+
+  @Override
+  public void setSynAlert(Widget widget) {
+    synAlertContainer.clear();
+    synAlertContainer.add(widget.asWidget());
+  }
+
+  @Override
+  public Widget getEmailBodyWidget(String html) {
+    HTML display = new HTML();
+    display.setHTML(html);
+    return display.asWidget();
+  }
+
+  @Override
+  public void setMessageBody(String html) {
+    messageBody.getElement().setInnerHTML(html);
+  }
+
+  @Override
+  public void setMessageEditArea(String html) {
+    messageEditArea.setText(html);
+  }
+
+  @Override
+  public void setRevokeProcessing(boolean processing) {
+    DisplayUtils.showLoading(
+      revokeButton,
+      processing,
+      originalRevokeButtonText
+    );
+    cancelButton.setEnabled(!processing);
+    submitButton.setEnabled(!processing);
+  }
+
+  @Override
+  public void setAccessRequirementWidget(AccessRequirementWidget arWidget) {
+    accessRequirementWidgetContainer.clear();
+    accessRequirementWidgetContainer.add(arWidget);
+  }
 }

@@ -7,6 +7,9 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Widget;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Before;
@@ -29,90 +32,130 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Widget;
 
 public class PeopleSearchPresenterTest {
 
-	PeopleSearchPresenter presenter;
-	@Mock
-	PeopleSearchView mockView;
-	@Mock
-	GlobalApplicationState mockGlobalApplicationState;
-	@Mock
-	SynapseJavascriptClient mockSynapseJavascriptClient;
-	@Mock
-	CookieProvider mockCookies;
-	@Mock
-	SynapseAlert mockSynAlert;
-	UserGroupHeaderResponsePage peopleList = getTestPeople();
-	@Mock
-	LoadMoreWidgetContainer mockLoadMoreWidgetContainer;
-	@Mock
-	PortalGinInjector mockPortalGinInjector;
-	@Mock
-	PeopleSearch mockPlace;
-	@Mock
-	UserBadge mockUserBadge;
+  PeopleSearchPresenter presenter;
 
-	@Before
-	public void setup() throws JSONObjectAdapterException {
-		MockitoAnnotations.initMocks(this);
-		presenter = new PeopleSearchPresenter(mockView, mockGlobalApplicationState, mockSynAlert, mockLoadMoreWidgetContainer, mockPortalGinInjector, mockSynapseJavascriptClient);
-		AsyncMockStubber.callSuccessWith(peopleList).when(mockSynapseJavascriptClient).getUserGroupHeadersByPrefix(anyString(), any(TypeFilter.class), anyLong(), anyLong(), any(AsyncCallback.class));
+  @Mock
+  PeopleSearchView mockView;
 
-		verify(mockView).setPresenter(presenter);
-		when(mockPortalGinInjector.getUserBadgeWidget()).thenReturn(mockUserBadge);
-	}
+  @Mock
+  GlobalApplicationState mockGlobalApplicationState;
 
-	@Test
-	public void testSearch() throws RestServiceException {
-		String searchTerm = "test";
-		when(mockPlace.getSearchTerm()).thenReturn(searchTerm);
-		presenter.setPlace(mockPlace);
-		verify(mockSynapseJavascriptClient).getUserGroupHeadersByPrefix(eq(searchTerm), eq(TypeFilter.USERS_ONLY), anyLong(), anyLong(), any(AsyncCallback.class));
-		verify(mockView).setSearchTerm(searchTerm);
-		verify(mockPortalGinInjector, times(3)).getUserBadgeWidget();
-		verify(mockLoadMoreWidgetContainer, times(3)).add(any(Widget.class));
-	}
+  @Mock
+  SynapseJavascriptClient mockSynapseJavascriptClient;
 
-	@Test
-	public void testSearchFailure() throws RestServiceException {
-		Exception caught = new Exception("unhandled exception");
-		AsyncMockStubber.callFailureWith(caught).when(mockSynapseJavascriptClient).getUserGroupHeadersByPrefix(anyString(), any(TypeFilter.class), anyLong(), anyLong(), any(AsyncCallback.class));
-		presenter.setPlace(mockPlace);
-		verify(mockSynAlert).handleException(caught);
-	}
+  @Mock
+  CookieProvider mockCookies;
 
-	private static UserGroupHeaderResponsePage getTestPeople() {
-		UserGroupHeaderResponsePage people = new UserGroupHeaderResponsePage();
-		List<UserGroupHeader> peopleList = new ArrayList<UserGroupHeader>();
-		UserGroupHeader header = new UserGroupHeader();
-		header.setIsIndividual(true);
-		header.setOwnerId("2112");
-		header.setFirstName("Geddy");
-		header.setLastName("Lee");
-		peopleList.add(header);
-		header = new UserGroupHeader();
-		header.setIsIndividual(true);
-		header.setOwnerId("1221");
-		header.setFirstName("Alex");
-		header.setLastName("Lifeson");
-		peopleList.add(header);
-		header = new UserGroupHeader();
-		header.setIsIndividual(true);
-		header.setOwnerId("1212");
-		header.setFirstName("Neil");
-		header.setLastName("Peart");
-		peopleList.add(header);
-		header = new UserGroupHeader();
-		header.setIsIndividual(false);
-		header.setOwnerId("1212");
-		header.setDisplayName("team gryffindor");
-		peopleList.add(header);
-		people.setChildren(peopleList);
-		people.setTotalNumberOfResults((long) peopleList.size());
-		return people;
-	}
+  @Mock
+  SynapseAlert mockSynAlert;
 
+  UserGroupHeaderResponsePage peopleList = getTestPeople();
+
+  @Mock
+  LoadMoreWidgetContainer mockLoadMoreWidgetContainer;
+
+  @Mock
+  PortalGinInjector mockPortalGinInjector;
+
+  @Mock
+  PeopleSearch mockPlace;
+
+  @Mock
+  UserBadge mockUserBadge;
+
+  @Before
+  public void setup() throws JSONObjectAdapterException {
+    MockitoAnnotations.initMocks(this);
+    presenter =
+      new PeopleSearchPresenter(
+        mockView,
+        mockGlobalApplicationState,
+        mockSynAlert,
+        mockLoadMoreWidgetContainer,
+        mockPortalGinInjector,
+        mockSynapseJavascriptClient
+      );
+    AsyncMockStubber
+      .callSuccessWith(peopleList)
+      .when(mockSynapseJavascriptClient)
+      .getUserGroupHeadersByPrefix(
+        anyString(),
+        any(TypeFilter.class),
+        anyLong(),
+        anyLong(),
+        any(AsyncCallback.class)
+      );
+
+    verify(mockView).setPresenter(presenter);
+    when(mockPortalGinInjector.getUserBadgeWidget()).thenReturn(mockUserBadge);
+  }
+
+  @Test
+  public void testSearch() throws RestServiceException {
+    String searchTerm = "test";
+    when(mockPlace.getSearchTerm()).thenReturn(searchTerm);
+    presenter.setPlace(mockPlace);
+    verify(mockSynapseJavascriptClient)
+      .getUserGroupHeadersByPrefix(
+        eq(searchTerm),
+        eq(TypeFilter.USERS_ONLY),
+        anyLong(),
+        anyLong(),
+        any(AsyncCallback.class)
+      );
+    verify(mockView).setSearchTerm(searchTerm);
+    verify(mockPortalGinInjector, times(3)).getUserBadgeWidget();
+    verify(mockLoadMoreWidgetContainer, times(3)).add(any(Widget.class));
+  }
+
+  @Test
+  public void testSearchFailure() throws RestServiceException {
+    Exception caught = new Exception("unhandled exception");
+    AsyncMockStubber
+      .callFailureWith(caught)
+      .when(mockSynapseJavascriptClient)
+      .getUserGroupHeadersByPrefix(
+        anyString(),
+        any(TypeFilter.class),
+        anyLong(),
+        anyLong(),
+        any(AsyncCallback.class)
+      );
+    presenter.setPlace(mockPlace);
+    verify(mockSynAlert).handleException(caught);
+  }
+
+  private static UserGroupHeaderResponsePage getTestPeople() {
+    UserGroupHeaderResponsePage people = new UserGroupHeaderResponsePage();
+    List<UserGroupHeader> peopleList = new ArrayList<UserGroupHeader>();
+    UserGroupHeader header = new UserGroupHeader();
+    header.setIsIndividual(true);
+    header.setOwnerId("2112");
+    header.setFirstName("Geddy");
+    header.setLastName("Lee");
+    peopleList.add(header);
+    header = new UserGroupHeader();
+    header.setIsIndividual(true);
+    header.setOwnerId("1221");
+    header.setFirstName("Alex");
+    header.setLastName("Lifeson");
+    peopleList.add(header);
+    header = new UserGroupHeader();
+    header.setIsIndividual(true);
+    header.setOwnerId("1212");
+    header.setFirstName("Neil");
+    header.setLastName("Peart");
+    peopleList.add(header);
+    header = new UserGroupHeader();
+    header.setIsIndividual(false);
+    header.setOwnerId("1212");
+    header.setDisplayName("team gryffindor");
+    peopleList.add(header);
+    people.setChildren(peopleList);
+    people.setTotalNumberOfResults((long) peopleList.size());
+    return people;
+  }
 }

@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import com.google.gwt.dev.util.collect.HashMap;
 import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,66 +17,72 @@ import org.sagebionetworks.web.client.widget.entity.editor.ButtonLinkConfigView;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
-import com.google.gwt.dev.util.collect.HashMap;
 
 public class ButtonLinkConfigEditorTest {
 
-	ButtonLinkConfigEditor editor;
-	@Mock
-	ButtonLinkConfigView mockView;
-	@Mock
-	WikiPageKey mockWikiPageKey;
-	@Mock
-	DialogCallback mockDialogCallback;
-	Map<String, String> widgetDescriptor;
+  ButtonLinkConfigEditor editor;
 
-	@Before
-	public void setup() {
-		MockitoAnnotations.initMocks(this);
-		editor = new ButtonLinkConfigEditor(mockView);
-		widgetDescriptor = new HashMap<>();
-		editor.configure(mockWikiPageKey, widgetDescriptor, mockDialogCallback);
-	}
+  @Mock
+  ButtonLinkConfigView mockView;
 
-	@Test
-	public void testAsWidget() {
-		editor.asWidget();
-		verify(mockView).asWidget();
-	}
+  @Mock
+  WikiPageKey mockWikiPageKey;
 
-	@Test
-	public void testConfigure() {
-		verify(mockView).configure(mockWikiPageKey, widgetDescriptor);
-	}
+  @Mock
+  DialogCallback mockDialogCallback;
 
-	@Test
-	public void testUpdateDescriptorFromViewNoHighlight() {
-		String buttonText = "a button";
-		String url = "a url";
-		boolean isHighlight = false;
-		when(mockView.getName()).thenReturn(buttonText);
-		when(mockView.getLinkUrl()).thenReturn(url);
-		when(mockView.isHighlightButtonStyle()).thenReturn(isHighlight);
-		String oldKeyValue = "garbage";
-		widgetDescriptor.put(oldKeyValue, oldKeyValue);
+  Map<String, String> widgetDescriptor;
 
-		editor.updateDescriptorFromView();
+  @Before
+  public void setup() {
+    MockitoAnnotations.initMocks(this);
+    editor = new ButtonLinkConfigEditor(mockView);
+    widgetDescriptor = new HashMap<>();
+    editor.configure(mockWikiPageKey, widgetDescriptor, mockDialogCallback);
+  }
 
-		verify(mockView).checkParams();
-		// verify old key values have been cleared
-		assertFalse(widgetDescriptor.containsKey(oldKeyValue));
-		assertEquals(buttonText, widgetDescriptor.get(WidgetConstants.TEXT_KEY));
-		assertEquals(url, widgetDescriptor.get(WidgetConstants.LINK_URL_KEY));
-		assertFalse(widgetDescriptor.containsKey(WebConstants.HIGHLIGHT_KEY));
-	}
+  @Test
+  public void testAsWidget() {
+    editor.asWidget();
+    verify(mockView).asWidget();
+  }
 
-	@Test
-	public void testUpdateDescriptorFromViewWithButtonHighlight() {
-		boolean isHighlight = true;
-		when(mockView.isHighlightButtonStyle()).thenReturn(isHighlight);
+  @Test
+  public void testConfigure() {
+    verify(mockView).configure(mockWikiPageKey, widgetDescriptor);
+  }
 
-		editor.updateDescriptorFromView();
+  @Test
+  public void testUpdateDescriptorFromViewNoHighlight() {
+    String buttonText = "a button";
+    String url = "a url";
+    boolean isHighlight = false;
+    when(mockView.getName()).thenReturn(buttonText);
+    when(mockView.getLinkUrl()).thenReturn(url);
+    when(mockView.isHighlightButtonStyle()).thenReturn(isHighlight);
+    String oldKeyValue = "garbage";
+    widgetDescriptor.put(oldKeyValue, oldKeyValue);
 
-		assertEquals(Boolean.toString(true), widgetDescriptor.get(WebConstants.HIGHLIGHT_KEY));
-	}
+    editor.updateDescriptorFromView();
+
+    verify(mockView).checkParams();
+    // verify old key values have been cleared
+    assertFalse(widgetDescriptor.containsKey(oldKeyValue));
+    assertEquals(buttonText, widgetDescriptor.get(WidgetConstants.TEXT_KEY));
+    assertEquals(url, widgetDescriptor.get(WidgetConstants.LINK_URL_KEY));
+    assertFalse(widgetDescriptor.containsKey(WebConstants.HIGHLIGHT_KEY));
+  }
+
+  @Test
+  public void testUpdateDescriptorFromViewWithButtonHighlight() {
+    boolean isHighlight = true;
+    when(mockView.isHighlightButtonStyle()).thenReturn(isHighlight);
+
+    editor.updateDescriptorFromView();
+
+    assertEquals(
+      Boolean.toString(true),
+      widgetDescriptor.get(WebConstants.HIGHLIGHT_KEY)
+    );
+  }
 }

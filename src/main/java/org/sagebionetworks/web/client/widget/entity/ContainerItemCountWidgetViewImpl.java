@@ -1,42 +1,45 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import org.gwtbootstrap3.client.ui.html.Span;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.gwtbootstrap3.client.ui.html.Span;
 
-public class ContainerItemCountWidgetViewImpl implements ContainerItemCountWidgetView {
-	@UiField
-	Span itemCountField;
-	Widget widget;
+public class ContainerItemCountWidgetViewImpl
+  implements ContainerItemCountWidgetView {
 
-	public interface Binder extends UiBinder<Widget, ContainerItemCountWidgetViewImpl> {
-	}
+  @UiField
+  Span itemCountField;
 
-	@Inject
-	public ContainerItemCountWidgetViewImpl(Binder uiBinder) {
-		widget = uiBinder.createAndBindUi(this);
-	}
+  Widget widget;
 
-	@Override
-	public void showCount(Long count) {
-		itemCountField.setText(count.toString());
-		widget.setVisible(true);
-	}
+  public interface Binder
+    extends UiBinder<Widget, ContainerItemCountWidgetViewImpl> {}
 
-	@Override
-	public Widget asWidget() {
-		return widget;
-	}
+  @Inject
+  public ContainerItemCountWidgetViewImpl(Binder uiBinder) {
+    widget = uiBinder.createAndBindUi(this);
+  }
 
-	@Override
-	public void clear() {
-		itemCountField.clear();
-	}
+  @Override
+  public void showCount(Long count) {
+    itemCountField.setText(count.toString());
+    widget.setVisible(true);
+  }
 
-	@Override
-	public void hide() {
-		widget.setVisible(false);
-	}
+  @Override
+  public Widget asWidget() {
+    return widget;
+  }
+
+  @Override
+  public void clear() {
+    itemCountField.clear();
+  }
+
+  @Override
+  public void hide() {
+    widget.setVisible(false);
+  }
 }

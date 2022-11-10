@@ -9,20 +9,22 @@ import com.google.gwt.core.client.JavaScriptObject;
  */
 public class SynapseContextProviderPropsJSNIObject extends JavaScriptObject {
 
-    protected SynapseContextProviderPropsJSNIObject() {
-    }
+  protected SynapseContextProviderPropsJSNIObject() {}
 
-    public static native SynapseContextProviderPropsJSNIObject create() /*-{
+  public static native SynapseContextProviderPropsJSNIObject create() /*-{
         return {};
     }-*/;
 
-    public final native void setSynapseContext(SynapseContextJSNIObject context) /*-{
+  public final native void setSynapseContext(
+    SynapseContextJSNIObject context
+  ) /*-{
         this.synapseContext = context;
     }-*/;
 
-    public final native void setQueryClient(QueryClientJSNIObject queryClient) /*-{
+  public final native void setQueryClient(
+    QueryClientJSNIObject queryClient
+  ) /*-{
         this.queryClient = queryClient;
     }-*/;
-
-    // This object also supports setting a react-query query client, but we aren't exposing that for now
+  // This object also supports setting a react-query query client, but we aren't exposing that for now
 }

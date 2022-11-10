@@ -3,11 +3,11 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface WikiSubpagesOrderEditorView extends IsWidget {
-	void configure(WikiSubpageOrderEditorTree subpageTree);
+  void configure(WikiSubpageOrderEditorTree subpageTree);
 
-	void setSynAlert(IsWidget w);
+  void setSynAlert(IsWidget w);
 
-	void initializeState();
+  void initializeState();
 
-	void setLoadingVisible(boolean visible);
+  void setLoadingVisible(boolean visible);
 }

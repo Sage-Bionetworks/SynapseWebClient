@@ -4,42 +4,40 @@ import com.google.gwt.user.client.ui.IsWidget;
 
 /**
  * View shows the first step of the wizard
- * 
+ *
  * @author Jay
  *
  */
 public interface CreateAccessRequirementStep1View extends IsWidget {
+  void setSubjects(IsWidget w);
 
-	void setSubjects(IsWidget w);
+  boolean isManagedACTAccessRequirementType();
 
-	boolean isManagedACTAccessRequirementType();
+  boolean isACTAccessRequirementType();
 
-	boolean isACTAccessRequirementType();
+  boolean isTermsOfUseAccessRequirementType();
 
-	boolean isTermsOfUseAccessRequirementType();
+  void setPresenter(Presenter p);
 
-	void setPresenter(Presenter p);
+  String getEntityIds();
 
-	String getEntityIds();
+  void setEntityIdsString(String ids);
 
-	void setEntityIdsString(String ids);
+  String getTeamIds();
 
-	String getTeamIds();
+  void setTeamIdsString(String ids);
 
-	void setTeamIdsString(String ids);
+  void setAccessRequirementTypeSelectionVisible(boolean visible);
 
-	void setAccessRequirementTypeSelectionVisible(boolean visible);
+  void setName(String name);
+  String getName();
 
-	void setName(String name);
-	String getName();
-	
-	/**
-	 * Presenter interface
-	 */
-	public interface Presenter {
-		void onAddEntities();
+  /**
+   * Presenter interface
+   */
+  public interface Presenter {
+    void onAddEntities();
 
-		void onAddTeams();
-	}
-
+    void onAddTeams();
+  }
 }

@@ -1,9 +1,9 @@
 package org.sagebionetworks.web.client;
 
 public interface GWTTimer {
-	void cancel();
+  void cancel();
 
-	void schedule(int delayMillis);
+  void schedule(int delayMillis);
 
-	void configure(Runnable runnable);
+  void configure(Runnable runnable);
 }

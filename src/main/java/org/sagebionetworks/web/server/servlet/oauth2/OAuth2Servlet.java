@@ -23,91 +23,126 @@ import org.sagebionetworks.web.server.servlet.SynapseProviderImpl;
 import org.sagebionetworks.web.shared.WebConstants;
 
 public abstract class OAuth2Servlet extends HttpServlet {
-	private SynapseProvider synapseProvider = new SynapseProviderImpl();
 
-	/**
-	 * Injected
-	 * 
-	 * @param synapseProvider
-	 */
-	public void setSynapseProvider(SynapseProvider synapseProvider) {
-		this.synapseProvider = synapseProvider;
-	}
+  private SynapseProvider synapseProvider = new SynapseProviderImpl();
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+  /**
+   * Injected
+   *
+   * @param synapseProvider
+   */
+  public void setSynapseProvider(SynapseProvider synapseProvider) {
+    this.synapseProvider = synapseProvider;
+  }
 
-	@Override
-	public abstract void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException;
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
 
-	/**
-	 * Create a redirect URL.
-	 * 
-	 * @param request
-	 * @param provider
-	 * @return
-	 */
-	public String createRedirectUrl(HttpServletRequest request, OAuthProvider provider) {
-		return request.getRequestURL().toString() + "?" + WebConstants.OAUTH2_PROVIDER + "=" + provider.name();
-	}
+  @Override
+  public abstract void doGet(HttpServletRequest req, HttpServletResponse resp)
+    throws ServletException, IOException;
 
-	/**
-	 * Step one, send the user to the OAuth provider for authentication.
-	 * 
-	 * @param req
-	 * @param resp
-	 * @param provider
-	 * @throws IOException
-	 */
-	public void redirectToProvider(HttpServletRequest req, HttpServletResponse resp, OAuthProvider provider, String redirectUrl, String state) throws IOException {
-		HttpServletRequest httpRqst = (HttpServletRequest) req;
-		URL requestURL = new URL(httpRqst.getRequestURL().toString());
+  /**
+   * Create a redirect URL.
+   *
+   * @param request
+   * @param provider
+   * @return
+   */
+  public String createRedirectUrl(
+    HttpServletRequest request,
+    OAuthProvider provider
+  ) {
+    return (
+      request.getRequestURL().toString() +
+      "?" +
+      WebConstants.OAUTH2_PROVIDER +
+      "=" +
+      provider.name()
+    );
+  }
 
-		try {
-			SynapseClient client = createSynapseClient();
-			OAuthUrlRequest request = new OAuthUrlRequest();
-			request.setProvider(provider);
-			request.setRedirectUrl(redirectUrl);
-			if (state != null && !state.isEmpty()) {
-				state = URLDecoder.decode(state);
-				request.setState(state);
-			}
-			OAuthUrlResponse respone = client.getOAuth2AuthenticationUrl(request);
-			resp.sendRedirect(respone.getAuthorizationUrl());
-		} catch (SynapseServerException e) {
-			if (e instanceof SynapseServiceUnavailable) {
-				resp.sendRedirect(new URL(requestURL.getProtocol(), requestURL.getHost(), requestURL.getPort(), "/#!Down:0").toString());
-			} else {
-				sendRedirectToError(req, e, resp);
-			}
-		} catch (SynapseException e) {
-			// 400 error
-			sendRedirectToError(req, e, resp);
-		}
-	}
+  /**
+   * Step one, send the user to the OAuth provider for authentication.
+   *
+   * @param req
+   * @param resp
+   * @param provider
+   * @throws IOException
+   */
+  public void redirectToProvider(
+    HttpServletRequest req,
+    HttpServletResponse resp,
+    OAuthProvider provider,
+    String redirectUrl,
+    String state
+  ) throws IOException {
+    HttpServletRequest httpRqst = (HttpServletRequest) req;
+    URL requestURL = new URL(httpRqst.getRequestURL().toString());
 
-	private void sendRedirectToError(HttpServletRequest request, Exception e, HttpServletResponse resp) throws MalformedURLException, IOException {
-		resp.sendRedirect(FileHandleAssociationServlet.getBaseUrl(request) + FileHandleAssociationServlet.ERROR_PLACE + URLEncoder.encode(e.getMessage()));
-	}
+    try {
+      SynapseClient client = createSynapseClient();
+      OAuthUrlRequest request = new OAuthUrlRequest();
+      request.setProvider(provider);
+      request.setRedirectUrl(redirectUrl);
+      if (state != null && !state.isEmpty()) {
+        state = URLDecoder.decode(state);
+        request.setState(state);
+      }
+      OAuthUrlResponse respone = client.getOAuth2AuthenticationUrl(request);
+      resp.sendRedirect(respone.getAuthorizationUrl());
+    } catch (SynapseServerException e) {
+      if (e instanceof SynapseServiceUnavailable) {
+        resp.sendRedirect(
+          new URL(
+            requestURL.getProtocol(),
+            requestURL.getHost(),
+            requestURL.getPort(),
+            "/#!Down:0"
+          )
+            .toString()
+        );
+      } else {
+        sendRedirectToError(req, e, resp);
+      }
+    } catch (SynapseException e) {
+      // 400 error
+      sendRedirectToError(req, e, resp);
+    }
+  }
 
-	/**
-	 * Creates a Synapse client that can only make anonymous calls
-	 */
-	protected SynapseClient createSynapseClient() {
-		return createSynapseClient(null);
-	}
+  private void sendRedirectToError(
+    HttpServletRequest request,
+    Exception e,
+    HttpServletResponse resp
+  ) throws MalformedURLException, IOException {
+    resp.sendRedirect(
+      FileHandleAssociationServlet.getBaseUrl(request) +
+      FileHandleAssociationServlet.ERROR_PLACE +
+      URLEncoder.encode(e.getMessage())
+    );
+  }
 
-	/**
-	 * Creates a Synapse client
-	 */
-	protected SynapseClient createSynapseClient(String accessToken) {
-		SynapseClient synapseClient = synapseProvider.createNewClient();
-		if (accessToken != null) {
-			synapseClient.setBearerAuthorizationToken(accessToken);
-		}
-		synapseClient.setAuthEndpoint(StackEndpoints.getAuthenticationServicePublicEndpoint());
-		return synapseClient;
-	}
+  /**
+   * Creates a Synapse client that can only make anonymous calls
+   */
+  protected SynapseClient createSynapseClient() {
+    return createSynapseClient(null);
+  }
+
+  /**
+   * Creates a Synapse client
+   */
+  protected SynapseClient createSynapseClient(String accessToken) {
+    SynapseClient synapseClient = synapseProvider.createNewClient();
+    if (accessToken != null) {
+      synapseClient.setBearerAuthorizationToken(accessToken);
+    }
+    synapseClient.setAuthEndpoint(
+      StackEndpoints.getAuthenticationServicePublicEndpoint()
+    );
+    return synapseClient;
+  }
 }

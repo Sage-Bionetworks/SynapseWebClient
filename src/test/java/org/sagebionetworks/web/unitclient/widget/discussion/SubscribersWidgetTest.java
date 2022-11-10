@@ -7,6 +7,9 @@ import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Widget;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Before;
@@ -28,131 +31,158 @@ import org.sagebionetworks.web.client.widget.discussion.SubscribersWidgetView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Widget;
 
 public class SubscribersWidgetTest {
-	@Mock
-	SubscribersWidgetView mockView;
-	@Mock
-	PortalGinInjector mockGinInjector;
-	@Mock
-	SynapseAlert mockSynAlert;
-	@Mock
-	LoadMoreWidgetContainer mockLoadMoreWidgetContainer;
-	@Captor
-	ArgumentCaptor<Callback> callbackCaptor;
-	@Mock
-	SubscriberPagedResults mockSubscriberPagedResults;
-	@Mock
-	Topic mockTopic;
-	@Mock
-	UserBadge mockUserBadge;
-	@Mock
-	SynapseJavascriptClient mockSynapseJavascriptClient;
 
-	SubscribersWidget widget;
-	public static final Long TEST_SUBSCRIBER_COUNT = 44L;
-	public static final String TEST_OBJECT_ID = "98765";
-	public static final String TEST_NEXT_PAGE_TOKEN = "456765456y";
-	List<String> subscribers;
+  @Mock
+  SubscribersWidgetView mockView;
 
+  @Mock
+  PortalGinInjector mockGinInjector;
 
-	@Before
-	public void before() {
-		MockitoAnnotations.initMocks(this);
-		widget = new SubscribersWidget(mockView, mockGinInjector, mockSynAlert, mockLoadMoreWidgetContainer, mockSynapseJavascriptClient);
-		AsyncMockStubber.callSuccessWith(mockSubscriberPagedResults).when(mockSynapseJavascriptClient).getSubscribers(any(Topic.class), anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(TEST_SUBSCRIBER_COUNT).when(mockSynapseJavascriptClient).getSubscribersCount(any(Topic.class), any(AsyncCallback.class));
-		when(mockTopic.getObjectType()).thenReturn(SubscriptionObjectType.FORUM);
-		when(mockTopic.getObjectId()).thenReturn(TEST_OBJECT_ID);
-		subscribers = new ArrayList<String>();
-		when(mockSubscriberPagedResults.getSubscribers()).thenReturn(subscribers);
-		when(mockGinInjector.getUserBadgeWidget()).thenReturn(mockUserBadge);
-	}
+  @Mock
+  SynapseAlert mockSynAlert;
 
-	@Test
-	public void testConstructor() {
-		verify(mockView).setPresenter(widget);
-		verify(mockView).setSynapseAlert(any(Widget.class));
-		verify(mockView).setUserListContainer(any(Widget.class));
-	}
+  @Mock
+  LoadMoreWidgetContainer mockLoadMoreWidgetContainer;
 
-	@Test
-	public void testConfigure() {
-		widget.configure(mockTopic);
+  @Captor
+  ArgumentCaptor<Callback> callbackCaptor;
 
-		InOrder inOrder = inOrder(mockView);
-		inOrder.verify(mockView).setSubscribersLinkVisible(false);
-		inOrder.verify(mockView).setSubscriberCount(TEST_SUBSCRIBER_COUNT);
-		inOrder.verify(mockView).setSubscribersLinkVisible(true);
-	}
+  @Mock
+  SubscriberPagedResults mockSubscriberPagedResults;
 
-	@Test
-	public void testConfigureNullCount() {
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseJavascriptClient).getSubscribersCount(any(Topic.class), any(AsyncCallback.class));
-		widget.configure(mockTopic);
+  @Mock
+  Topic mockTopic;
 
-		InOrder inOrder = inOrder(mockView);
-		inOrder.verify(mockView).setSubscribersLinkVisible(false);
-		inOrder.verify(mockView).clearSubscriberCount();
-		inOrder.verify(mockView).setSubscribersLinkVisible(true);
+  @Mock
+  UserBadge mockUserBadge;
 
-		verify(mockView, never()).setSubscriberCount(anyLong());
-	}
+  @Mock
+  SynapseJavascriptClient mockSynapseJavascriptClient;
 
+  SubscribersWidget widget;
+  public static final Long TEST_SUBSCRIBER_COUNT = 44L;
+  public static final String TEST_OBJECT_ID = "98765";
+  public static final String TEST_NEXT_PAGE_TOKEN = "456765456y";
+  List<String> subscribers;
 
-	@Test
-	public void testConfigureFailure() {
-		Exception ex = new Exception();
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getSubscribersCount(any(Topic.class), any(AsyncCallback.class));
+  @Before
+  public void before() {
+    MockitoAnnotations.initMocks(this);
+    widget =
+      new SubscribersWidget(
+        mockView,
+        mockGinInjector,
+        mockSynAlert,
+        mockLoadMoreWidgetContainer,
+        mockSynapseJavascriptClient
+      );
+    AsyncMockStubber
+      .callSuccessWith(mockSubscriberPagedResults)
+      .when(mockSynapseJavascriptClient)
+      .getSubscribers(any(Topic.class), anyString(), any(AsyncCallback.class));
+    AsyncMockStubber
+      .callSuccessWith(TEST_SUBSCRIBER_COUNT)
+      .when(mockSynapseJavascriptClient)
+      .getSubscribersCount(any(Topic.class), any(AsyncCallback.class));
+    when(mockTopic.getObjectType()).thenReturn(SubscriptionObjectType.FORUM);
+    when(mockTopic.getObjectId()).thenReturn(TEST_OBJECT_ID);
+    subscribers = new ArrayList<String>();
+    when(mockSubscriberPagedResults.getSubscribers()).thenReturn(subscribers);
+    when(mockGinInjector.getUserBadgeWidget()).thenReturn(mockUserBadge);
+  }
 
-		widget.configure(mockTopic);
+  @Test
+  public void testConstructor() {
+    verify(mockView).setPresenter(widget);
+    verify(mockView).setSynapseAlert(any(Widget.class));
+    verify(mockView).setUserListContainer(any(Widget.class));
+  }
 
-		InOrder inOrder = inOrder(mockView);
-		inOrder.verify(mockView).setSubscribersLinkVisible(false);
-		inOrder.verify(mockView).clearSubscriberCount();
-		inOrder.verify(mockView).setSubscribersLinkVisible(true);
+  @Test
+  public void testConfigure() {
+    widget.configure(mockTopic);
 
-		verify(mockView, never()).setSubscriberCount(anyLong());
-	}
+    InOrder inOrder = inOrder(mockView);
+    inOrder.verify(mockView).setSubscribersLinkVisible(false);
+    inOrder.verify(mockView).setSubscriberCount(TEST_SUBSCRIBER_COUNT);
+    inOrder.verify(mockView).setSubscribersLinkVisible(true);
+  }
 
-	@Test
-	public void testOnSubscribersLinkWithMorePages() {
-		when(mockSubscriberPagedResults.getNextPageToken()).thenReturn(TEST_NEXT_PAGE_TOKEN);
+  @Test
+  public void testConfigureNullCount() {
+    AsyncMockStubber
+      .callSuccessWith(null)
+      .when(mockSynapseJavascriptClient)
+      .getSubscribersCount(any(Topic.class), any(AsyncCallback.class));
+    widget.configure(mockTopic);
 
-		String subscriberId = "888888";
-		subscribers.add(subscriberId);
+    InOrder inOrder = inOrder(mockView);
+    inOrder.verify(mockView).setSubscribersLinkVisible(false);
+    inOrder.verify(mockView).clearSubscriberCount();
+    inOrder.verify(mockView).setSubscribersLinkVisible(true);
 
-		widget.onClickSubscribersLink();
-		verify(mockGinInjector).getUserBadgeWidget();
-		verify(mockUserBadge).configure(subscriberId);
-		verify(mockUserBadge).setOpenInNewWindow();
-		verify(mockSynAlert).clear();
-		verify(mockLoadMoreWidgetContainer).clear();
-		verify(mockView).showDialog();
-		verify(mockLoadMoreWidgetContainer).add(any(Widget.class));
-		verify(mockLoadMoreWidgetContainer).setIsMore(true);
-	}
+    verify(mockView, never()).setSubscriberCount(anyLong());
+  }
 
-	@Test
-	public void testLoadMoreSubscribersLastPage() {
-		when(mockSubscriberPagedResults.getNextPageToken()).thenReturn(null);
+  @Test
+  public void testConfigureFailure() {
+    Exception ex = new Exception();
+    AsyncMockStubber
+      .callFailureWith(ex)
+      .when(mockSynapseJavascriptClient)
+      .getSubscribersCount(any(Topic.class), any(AsyncCallback.class));
 
-		widget.loadMoreSubscribers();
-		verify(mockLoadMoreWidgetContainer, never()).clear();
-		verify(mockGinInjector, never()).getUserBadgeWidget();
-		verify(mockLoadMoreWidgetContainer).setIsMore(false);
-	}
+    widget.configure(mockTopic);
 
-	@Test
-	public void testLoadMoreSubscribersFailure() {
-		Exception ex = new Exception();
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getSubscribers(any(Topic.class), anyString(), any(AsyncCallback.class));
+    InOrder inOrder = inOrder(mockView);
+    inOrder.verify(mockView).setSubscribersLinkVisible(false);
+    inOrder.verify(mockView).clearSubscriberCount();
+    inOrder.verify(mockView).setSubscribersLinkVisible(true);
 
-		widget.loadMoreSubscribers();
-		verify(mockSynAlert).handleException(ex);
-		verify(mockLoadMoreWidgetContainer).setIsMore(false);
-	}
+    verify(mockView, never()).setSubscriberCount(anyLong());
+  }
 
+  @Test
+  public void testOnSubscribersLinkWithMorePages() {
+    when(mockSubscriberPagedResults.getNextPageToken())
+      .thenReturn(TEST_NEXT_PAGE_TOKEN);
+
+    String subscriberId = "888888";
+    subscribers.add(subscriberId);
+
+    widget.onClickSubscribersLink();
+    verify(mockGinInjector).getUserBadgeWidget();
+    verify(mockUserBadge).configure(subscriberId);
+    verify(mockUserBadge).setOpenInNewWindow();
+    verify(mockSynAlert).clear();
+    verify(mockLoadMoreWidgetContainer).clear();
+    verify(mockView).showDialog();
+    verify(mockLoadMoreWidgetContainer).add(any(Widget.class));
+    verify(mockLoadMoreWidgetContainer).setIsMore(true);
+  }
+
+  @Test
+  public void testLoadMoreSubscribersLastPage() {
+    when(mockSubscriberPagedResults.getNextPageToken()).thenReturn(null);
+
+    widget.loadMoreSubscribers();
+    verify(mockLoadMoreWidgetContainer, never()).clear();
+    verify(mockGinInjector, never()).getUserBadgeWidget();
+    verify(mockLoadMoreWidgetContainer).setIsMore(false);
+  }
+
+  @Test
+  public void testLoadMoreSubscribersFailure() {
+    Exception ex = new Exception();
+    AsyncMockStubber
+      .callFailureWith(ex)
+      .when(mockSynapseJavascriptClient)
+      .getSubscribers(any(Topic.class), anyString(), any(AsyncCallback.class));
+
+    widget.loadMoreSubscribers();
+    verify(mockSynAlert).handleException(ex);
+    verify(mockLoadMoreWidgetContainer).setIsMore(false);
+  }
 }

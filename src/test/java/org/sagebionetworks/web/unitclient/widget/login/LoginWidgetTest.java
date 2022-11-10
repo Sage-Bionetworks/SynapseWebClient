@@ -2,6 +2,7 @@ package org.sagebionetworks.web.unitclient.widget.login;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -13,42 +14,43 @@ import org.sagebionetworks.web.client.widget.login.LoginWidgetView;
 
 public class LoginWidgetTest {
 
-	LoginWidget loginWidget;
-	@Mock
-	LoginWidgetView mockView;
-	@Mock
-	AuthenticationController mockAuthController;
+  LoginWidget loginWidget;
 
-	@Before
-	public void setup() throws JSONObjectAdapterException {
-		MockitoAnnotations.initMocks(this);
-		loginWidget = new LoginWidget(mockView, mockAuthController);
-		when(mockAuthController.isLoggedIn()).thenReturn(false);
-	}
+  @Mock
+  LoginWidgetView mockView;
 
-	@Test
-	public void testAsWidget() {
-		loginWidget.asWidget();
+  @Mock
+  AuthenticationController mockAuthController;
 
-		verify(mockView).setVisible(true);
-		verify(mockView).asWidget();
-	}
+  @Before
+  public void setup() throws JSONObjectAdapterException {
+    MockitoAnnotations.initMocks(this);
+    loginWidget = new LoginWidget(mockView, mockAuthController);
+    when(mockAuthController.isLoggedIn()).thenReturn(false);
+  }
 
-	@Test
-	public void testAsWidgetLoggedIn() {
-		when(mockAuthController.isLoggedIn()).thenReturn(true);
+  @Test
+  public void testAsWidget() {
+    loginWidget.asWidget();
 
-		loginWidget.asWidget();
+    verify(mockView).setVisible(true);
+    verify(mockView).asWidget();
+  }
 
-		verify(mockView).setVisible(false);
-		verify(mockView).asWidget();
-	}
+  @Test
+  public void testAsWidgetLoggedIn() {
+    when(mockAuthController.isLoggedIn()).thenReturn(true);
 
-	@Test
-	public void testClear() {
-		loginWidget.clear();
+    loginWidget.asWidget();
 
-		verify(mockView).clear();
-	}
+    verify(mockView).setVisible(false);
+    verify(mockView).asWidget();
+  }
 
+  @Test
+  public void testClear() {
+    loginWidget.clear();
+
+    verify(mockView).clear();
+  }
 }

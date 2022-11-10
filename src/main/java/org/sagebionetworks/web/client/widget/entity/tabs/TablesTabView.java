@@ -5,57 +5,60 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 public interface TablesTabView extends IsWidget {
-	public interface Presenter {
-	}
+  public interface Presenter {}
 
-	void setTitle(String title);
+  void setTitle(String title);
 
-	void setDescription(String s);
+  void setDescription(String s);
 
-	void setHelpLink(String s);
+  void setHelpLink(String s);
 
-	void setTitlebar(Widget w);
+  void setTitlebar(Widget w);
 
-	void setTitlebarVisible(boolean visible);
+  void setTitlebarVisible(boolean visible);
 
-	void setBreadcrumb(Widget w);
+  void setBreadcrumb(Widget w);
 
-	void setBreadcrumbVisible(boolean visible);
+  void setBreadcrumbVisible(boolean visible);
 
-	void setTableList(Widget w);
+  void setTableList(Widget w);
 
-	void setTableListVisible(boolean visible);
+  void setTableListVisible(boolean visible);
 
-	void setTableEntityWidget(Widget w);
+  void setTableEntityWidget(Widget w);
 
-	void clearTableEntityWidget();
+  void clearTableEntityWidget();
 
-	void setEntityMetadata(Widget w);
+  void setEntityMetadata(Widget w);
 
-	void setEntityMetadataVisible(boolean visible);
+  void setEntityMetadataVisible(boolean visible);
 
-	void setSynapseAlert(Widget w);
+  void setSynapseAlert(Widget w);
 
-	void setModifiedCreatedBy(IsWidget modifiedCreatedBy);
+  void setModifiedCreatedBy(IsWidget modifiedCreatedBy);
 
-	void setProvenance(IsWidget w);
+  void setProvenance(IsWidget w);
 
-	void setTableUIVisible(boolean visible);
+  void setTableUIVisible(boolean visible);
 
-	void setActionMenu(IsWidget w);
+  void setActionMenu(IsWidget w);
 
-	void setWikiPage(Widget w);
+  void setWikiPage(Widget w);
 
-	void setWikiPageVisible(boolean visible);
+  void setWikiPageVisible(boolean visible);
 
-	void setVersionAlertVisible(boolean visible);
+  void setVersionAlertVisible(boolean visible);
 
-	void setVersionAlertCopy(String title, String message);
+  void setVersionAlertCopy(String title, String message);
 
-	void setVersionAlertPrimaryText(String text);
+  void setVersionAlertPrimaryText(String text);
 
-	void setVersionAlertPrimaryAction(ClickHandler handler);
+  void setVersionAlertPrimaryAction(ClickHandler handler);
 
-	void setVersionAlertSecondaryAction(String text, ClickHandler handler, boolean enabled, String tooltipText);
-
+  void setVersionAlertSecondaryAction(
+    String text,
+    ClickHandler handler,
+    boolean enabled,
+    String tooltipText
+  );
 }

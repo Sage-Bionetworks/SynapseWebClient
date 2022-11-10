@@ -1,121 +1,122 @@
 package org.sagebionetworks.web.client.view;
 
-import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.web.client.SynapseView;
-import org.sagebionetworks.web.client.utils.Callback;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.web.client.SynapseView;
+import org.sagebionetworks.web.client.utils.Callback;
 
 public interface SettingsView extends IsWidget, SynapseView {
+  /**
+   * Set this view's presenter
+   *
+   * @param presenter
+   */
+  public void setPresenter(Presenter presenter);
 
-	/**
-	 * Set this view's presenter
-	 * 
-	 * @param presenter
-	 */
-	public void setPresenter(Presenter presenter);
+  /**
+   * Renders the view for a given presenter
+   */
+  public void render();
 
-	/**
-	 * Renders the view for a given presenter
-	 */
-	public void render();
+  /**
+   * Shows the user that their password change succeeded
+   */
+  public void showPasswordChangeSuccess();
 
-	/**
-	 * Shows the user that their password change succeeded
-	 */
-	public void showPasswordChangeSuccess();
+  public void updateNotificationCheckbox(UserProfile profile);
 
-	public void updateNotificationCheckbox(UserProfile profile);
+  void setSubscriptionsListWidget(Widget w);
 
-	void setSubscriptionsListWidget(Widget w);
+  void setSubscriptionsVisible(boolean visible);
 
-	void setSubscriptionsVisible(boolean visible);
+  void setEmailAddressesWidget(IsWidget w);
 
-	void setEmailAddressesWidget(IsWidget w);
+  public interface Presenter {
+    void resetPassword(String existingPassword, String newPassword);
 
-	public interface Presenter {
+    void goTo(Place place);
 
-		void resetPassword(String existingPassword, String newPassword);
+    void updateMyNotificationSettings(
+      boolean sendEmailNotifications,
+      boolean markEmailedMessagesAsRead
+    );
 
-		void goTo(Place place);
+    void changeApiKey();
 
-		void updateMyNotificationSettings(boolean sendEmailNotifications, boolean markEmailedMessagesAsRead);
+    void onEditProfile();
 
-		void changeApiKey();
+    void getAPIKey();
 
-		void onEditProfile();
+    void changePassword();
 
-		void getAPIKey();
+    void setShowUTCTime(boolean isUTC);
 
-		void changePassword();
+    void newVerificationSubmissionClicked();
 
-		void setShowUTCTime(boolean isUTC);
+    void editVerificationSubmissionClicked();
 
-		void newVerificationSubmissionClicked();
+    void linkOrcIdClicked();
 
-		void editVerificationSubmissionClicked();
+    void unbindOrcId();
+  }
 
-		void linkOrcIdClicked();
+  public void setApiKeySettingsVisible(boolean visible);
 
-		void unbindOrcId();
-	}
+  public void setOauthClientSettingsVisible(boolean visible);
 
-	public void setApiKeySettingsVisible(boolean visible);
+  public void setApiKey(String apiKey);
 
-	public void setOauthClientSettingsVisible(boolean visible);
+  public void setNotificationSynAlertWidget(IsWidget asWidget);
 
-	public void setApiKey(String apiKey);
+  public void setAPISynAlertWidget(IsWidget synAlert);
 
-	public void setNotificationSynAlertWidget(IsWidget asWidget);
+  public void setPasswordSynAlertWidget(IsWidget synAlert);
 
-	public void setAPISynAlertWidget(IsWidget synAlert);
+  void hideAPIKey();
 
-	public void setPasswordSynAlertWidget(IsWidget synAlert);
+  void showConfirm(String message, Callback callback);
 
-	void hideAPIKey();
+  String getPassword1Field();
 
-	void showConfirm(String message, Callback callback);
+  String getCurrentPasswordField();
 
-	String getPassword1Field();
+  String getPassword2Field();
 
-	String getCurrentPasswordField();
+  void setCurrentPasswordInError(boolean inError);
 
-	String getPassword2Field();
+  void setPassword1InError(boolean inError);
 
-	void setCurrentPasswordInError(boolean inError);
+  void setPassword2InError(boolean inError);
 
-	void setPassword1InError(boolean inError);
+  void setChangePasswordEnabled(boolean isEnabled);
 
-	void setPassword2InError(boolean inError);
+  void resetChangePasswordUI();
 
-	void setChangePasswordEnabled(boolean isEnabled);
+  void setShowingUTCTime();
 
-	void resetChangePasswordUI();
+  void setShowingLocalTime();
 
-	void setShowingUTCTime();
+  void setOrcIdVisible(boolean isVisible);
 
-	void setShowingLocalTime();
+  void setOrcIDLinkButtonVisible(boolean isVisible);
 
-	void setOrcIdVisible(boolean isVisible);
+  void setUnbindOrcIdVisible(boolean isVisible);
 
-	void setOrcIDLinkButtonVisible(boolean isVisible);
+  void setOrcId(String href);
 
-	void setUnbindOrcIdVisible(boolean isVisible);
+  void showNotVerified();
 
-	void setOrcId(String href);
+  void setResubmitVerificationButtonVisible(boolean isVisible);
 
-	void showNotVerified();
+  void setVerificationSuspendedButtonVisible(boolean isVisible);
 
-	void setResubmitVerificationButtonVisible(boolean isVisible);
+  void setVerificationRejectedButtonVisible(boolean isVisible);
 
-	void setVerificationSuspendedButtonVisible(boolean isVisible);
+  void setVerificationSubmittedButtonVisible(boolean isVisible);
 
-	void setVerificationRejectedButtonVisible(boolean isVisible);
+  void setVerificationDetailsButtonVisible(boolean isVisible);
 
-	void setVerificationSubmittedButtonVisible(boolean isVisible);
-
-	void setVerificationDetailsButtonVisible(boolean isVisible);
-
-	void setIsCertified(boolean isCertified);
+  void setIsCertified(boolean isCertified);
 }

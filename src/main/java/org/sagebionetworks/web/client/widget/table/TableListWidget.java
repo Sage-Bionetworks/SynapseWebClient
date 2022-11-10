@@ -1,8 +1,12 @@
 package org.sagebionetworks.web.client.widget.table;
 
+import com.google.gwt.http.client.Request;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -18,202 +22,222 @@ import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 
-import com.google.gwt.http.client.Request;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
-
 /**
  * This widget lists the tables of a given project.
- * 
+ *
  * @author John
  *
  */
-public class TableListWidget implements TableListWidgetView.Presenter, IsWidget {
-	private TableListWidgetView view;
-	private SynapseJavascriptClient jsClient;
-	private EntityChildrenRequest query;
-	private EntityBundle parentBundle;
-	private CallbackP<EntityHeader> onTableClickCallback;
-	private LoadMoreWidgetContainer loadMoreWidget;
-	private SynapseAlert synAlert;
-	private PortalGinInjector ginInjector;
-	public static final SortBy DEFAULT_SORT_BY = SortBy.CREATED_ON;
-	public static final Direction DEFAULT_DIRECTION = Direction.DESC;
-	boolean isInitializing = false;
-	Request currentRequest = null;
-	private List<String> idList = null;
-	private List<EntityType> typesToShow = null;
+public class TableListWidget
+  implements TableListWidgetView.Presenter, IsWidget {
 
-	@Inject
-	public TableListWidget(TableListWidgetView view, SynapseJavascriptClient jsClient, LoadMoreWidgetContainer loadMoreWidget, SynapseAlert synAlert, PortalGinInjector ginInjector) {
-		this.view = view;
-		this.jsClient = jsClient;
-		this.loadMoreWidget = loadMoreWidget;
-		this.synAlert = synAlert;
-		this.ginInjector = ginInjector;
-		this.view.setPresenter(this);
-		this.view.setLoadMoreWidget(loadMoreWidget);
-		view.setSynAlert(synAlert);
-		loadMoreWidget.configure(new Callback() {
-			@Override
-			public void invoke() {
-				loadMore();
-			}
-		});
-	}
+  private TableListWidgetView view;
+  private SynapseJavascriptClient jsClient;
+  private EntityChildrenRequest query;
+  private EntityBundle parentBundle;
+  private CallbackP<EntityHeader> onTableClickCallback;
+  private LoadMoreWidgetContainer loadMoreWidget;
+  private SynapseAlert synAlert;
+  private PortalGinInjector ginInjector;
+  public static final SortBy DEFAULT_SORT_BY = SortBy.CREATED_ON;
+  public static final Direction DEFAULT_DIRECTION = Direction.DESC;
+  boolean isInitializing = false;
+  Request currentRequest = null;
+  private List<String> idList = null;
+  private List<EntityType> typesToShow = null;
 
-	/**
-	 * Configure this widget before use.
-	 */
-	public void configure(EntityBundle parentBundle, List<EntityType> typesToShow) {
-		if (currentRequest != null) {
-			currentRequest.cancel();
-		}
-		isInitializing = true;
-		this.parentBundle = parentBundle;
-		this.typesToShow = typesToShow;
-		if (typesToShow.contains(EntityType.dataset)) {
-			this.view.setTableType(TableType.dataset);
-		} else {
-			this.view.setTableType(TableType.table);
-		}
-		this.view.setItemCountVisible(shouldItemCountBeVisible());
-		loadData();
-	}
+  @Inject
+  public TableListWidget(
+    TableListWidgetView view,
+    SynapseJavascriptClient jsClient,
+    LoadMoreWidgetContainer loadMoreWidget,
+    SynapseAlert synAlert,
+    PortalGinInjector ginInjector
+  ) {
+    this.view = view;
+    this.jsClient = jsClient;
+    this.loadMoreWidget = loadMoreWidget;
+    this.synAlert = synAlert;
+    this.ginInjector = ginInjector;
+    this.view.setPresenter(this);
+    this.view.setLoadMoreWidget(loadMoreWidget);
+    view.setSynAlert(synAlert);
+    loadMoreWidget.configure(
+      new Callback() {
+        @Override
+        public void invoke() {
+          loadMore();
+        }
+      }
+    );
+  }
 
-	public void resetSynIdList() {
-		idList = null;
-	}
+  /**
+   * Configure this widget before use.
+   */
+  public void configure(
+    EntityBundle parentBundle,
+    List<EntityType> typesToShow
+  ) {
+    if (currentRequest != null) {
+      currentRequest.cancel();
+    }
+    isInitializing = true;
+    this.parentBundle = parentBundle;
+    this.typesToShow = typesToShow;
+    if (typesToShow.contains(EntityType.dataset)) {
+      this.view.setTableType(TableType.dataset);
+    } else {
+      this.view.setTableType(TableType.table);
+    }
+    this.view.setItemCountVisible(shouldItemCountBeVisible());
+    loadData();
+  }
 
-	public void addSynIdToList(String id) {
-		if (idList == null) {
-			idList = new ArrayList<>();
-		}
-		idList.add(id);
-	}
+  public void resetSynIdList() {
+    idList = null;
+  }
 
-	public void toggleSort(SortBy sortColumn) {
-		Direction newDirection = Direction.ASC.equals(query.getSortDirection()) ? Direction.DESC : Direction.ASC;
-		onSort(sortColumn, newDirection);
-	}
+  public void addSynIdToList(String id) {
+    if (idList == null) {
+      idList = new ArrayList<>();
+    }
+    idList.add(id);
+  }
 
-	public void onSort(SortBy sortColumn, Direction sortDirection) {
-		resetSynIdList();
-		query.setSortBy(sortColumn);
-		query.setSortDirection(sortDirection);
-		query.setNextPageToken(null);
-		view.clearTableWidgets();
-		loadMore();
-	}
+  public void toggleSort(SortBy sortColumn) {
+    Direction newDirection = Direction.ASC.equals(query.getSortDirection())
+      ? Direction.DESC
+      : Direction.ASC;
+    onSort(sortColumn, newDirection);
+  }
 
-	public void loadData() {
-		view.setState(TableListWidgetView.TableListWidgetViewState.LOADING);
-		resetSynIdList();
-		query = createQuery(parentBundle.getEntity().getId());
-		view.clearTableWidgets();
-		query.setNextPageToken(null);
-		loadMore();
-	}
+  public void onSort(SortBy sortColumn, Direction sortDirection) {
+    resetSynIdList();
+    query.setSortBy(sortColumn);
+    query.setSortDirection(sortDirection);
+    query.setNextPageToken(null);
+    view.clearTableWidgets();
+    loadMore();
+  }
 
-	/**
-	 * Create a new query.
-	 * 
-	 * @param parentId
-	 * @return
-	 */
-	public EntityChildrenRequest createQuery(String parentId) {
-		EntityChildrenRequest newQuery = new EntityChildrenRequest();
-		newQuery.setSortBy(DEFAULT_SORT_BY);
-		newQuery.setSortDirection(DEFAULT_DIRECTION);
-		newQuery.setParentId(parentId);
-		newQuery.setIncludeTypes(typesToShow);
-		return newQuery;
-	}
+  public void loadData() {
+    view.setState(TableListWidgetView.TableListWidgetViewState.LOADING);
+    resetSynIdList();
+    query = createQuery(parentBundle.getEntity().getId());
+    view.clearTableWidgets();
+    query.setNextPageToken(null);
+    loadMore();
+  }
 
-	/**
-	 * Run a query and populate the page with the results.
-	 */
-	private void loadMore() {
-		synAlert.clear();
-		if (isInitializing) {
-			view.clearSortUI();
-		} else {
-			view.setSortUI(query.getSortBy(), query.getSortDirection());
-		}
-		currentRequest = jsClient.getEntityChildren(query, new AsyncCallback<EntityChildrenResponse>() {
-			public void onSuccess(EntityChildrenResponse result) {
-				query.setNextPageToken(result.getNextPageToken());
-				loadMoreWidget.setIsMore(result.getNextPageToken() != null);
-				setResults(result.getPage());
-				if (idList == null || idList.isEmpty()) {
-					view.setState(TableListWidgetView.TableListWidgetViewState.EMPTY);
-				} else {
-					view.setState(TableListWidgetView.TableListWidgetViewState.POPULATED);
-				}
-				isInitializing = false;
-			};
+  /**
+   * Create a new query.
+   *
+   * @param parentId
+   * @return
+   */
+  public EntityChildrenRequest createQuery(String parentId) {
+    EntityChildrenRequest newQuery = new EntityChildrenRequest();
+    newQuery.setSortBy(DEFAULT_SORT_BY);
+    newQuery.setSortDirection(DEFAULT_DIRECTION);
+    newQuery.setParentId(parentId);
+    newQuery.setIncludeTypes(typesToShow);
+    return newQuery;
+  }
 
-			@Override
-			public void onFailure(Throwable caught) {
-				view.setState(TableListWidgetView.TableListWidgetViewState.ERROR);
-				synAlert.handleException(caught);
-			}
-		});
-	}
+  /**
+   * Run a query and populate the page with the results.
+   */
+  private void loadMore() {
+    synAlert.clear();
+    if (isInitializing) {
+      view.clearSortUI();
+    } else {
+      view.setSortUI(query.getSortBy(), query.getSortDirection());
+    }
+    currentRequest =
+      jsClient.getEntityChildren(
+        query,
+        new AsyncCallback<EntityChildrenResponse>() {
+          public void onSuccess(EntityChildrenResponse result) {
+            query.setNextPageToken(result.getNextPageToken());
+            loadMoreWidget.setIsMore(result.getNextPageToken() != null);
+            setResults(result.getPage());
+            if (idList == null || idList.isEmpty()) {
+              view.setState(TableListWidgetView.TableListWidgetViewState.EMPTY);
+            } else {
+              view.setState(
+                TableListWidgetView.TableListWidgetViewState.POPULATED
+              );
+            }
+            isInitializing = false;
+          }
 
-	private void setResults(List<EntityHeader> results) {
-		for (EntityHeader header : results) {
-			addSynIdToList(header.getId());
-			TableEntityListGroupItem item = ginInjector.getTableEntityListGroupItem();
-			item.configure(header, event -> {
-				this.onTableClicked(header);
-			});
-			item.setItemCountVisible(shouldItemCountBeVisible());
-			view.addTableListItem(item);
-		}
-		for (EntityHeader header : results) {
-			jsClient.populateEntityBundleCache(header.getId());
-		}
-	}
+          @Override
+          public void onFailure(Throwable caught) {
+            view.setState(TableListWidgetView.TableListWidgetViewState.ERROR);
+            synAlert.handleException(caught);
+          }
+        }
+      );
+  }
 
-	@Override
-	public Widget asWidget() {
-		view.setPresenter(this);
-		return view.asWidget();
-	}
+  private void setResults(List<EntityHeader> results) {
+    for (EntityHeader header : results) {
+      addSynIdToList(header.getId());
+      TableEntityListGroupItem item = ginInjector.getTableEntityListGroupItem();
+      item.configure(
+        header,
+        event -> {
+          this.onTableClicked(header);
+        }
+      );
+      item.setItemCountVisible(shouldItemCountBeVisible());
+      view.addTableListItem(item);
+    }
+    for (EntityHeader header : results) {
+      jsClient.populateEntityBundleCache(header.getId());
+    }
+  }
 
-	/**
-	 * Invokes callback when a table entity is clicked in the table list.
-	 * 
-	 * @param callback
-	 */
-	public void setTableClickedCallback(CallbackP<EntityHeader> callback) {
-		this.onTableClickCallback = callback;
-	}
+  @Override
+  public Widget asWidget() {
+    view.setPresenter(this);
+    return view.asWidget();
+  }
 
-	@Override
-	public void onTableClicked(EntityHeader entityHeader) {
-		if (onTableClickCallback != null) {
-			view.showLoading();
-			view.clearTableWidgets();
-			onTableClickCallback.invoke(entityHeader);
-		}
-	}
+  /**
+   * Invokes callback when a table entity is clicked in the table list.
+   *
+   * @param callback
+   */
+  public void setTableClickedCallback(CallbackP<EntityHeader> callback) {
+    this.onTableClickCallback = callback;
+  }
 
-	@Override
-	public void copyIDsToClipboard() {
-		StringBuilder clipboardValue = new StringBuilder();
-		for (String synId : idList) {
-			clipboardValue.append(synId);
-			clipboardValue.append("\n");
-		}
-		view.copyToClipboard(clipboardValue.toString());
-	}
+  @Override
+  public void onTableClicked(EntityHeader entityHeader) {
+    if (onTableClickCallback != null) {
+      view.showLoading();
+      view.clearTableWidgets();
+      onTableClickCallback.invoke(entityHeader);
+    }
+  }
 
-	private boolean shouldItemCountBeVisible() {
-		return this.typesToShow.contains(EntityType.dataset) || this.typesToShow.contains(EntityType.datasetcollection);
-	}
+  @Override
+  public void copyIDsToClipboard() {
+    StringBuilder clipboardValue = new StringBuilder();
+    for (String synId : idList) {
+      clipboardValue.append(synId);
+      clipboardValue.append("\n");
+    }
+    view.copyToClipboard(clipboardValue.toString());
+  }
 
+  private boolean shouldItemCountBeVisible() {
+    return (
+      this.typesToShow.contains(EntityType.dataset) ||
+      this.typesToShow.contains(EntityType.datasetcollection)
+    );
+  }
 }

@@ -1,36 +1,38 @@
 package org.sagebionetworks.web.client.view;
 
-import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
-import org.sagebionetworks.web.client.widget.header.Header;
-import org.sagebionetworks.web.client.widget.trash.TrashCanList;
-
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.widget.header.Header;
+import org.sagebionetworks.web.client.widget.trash.TrashCanList;
 
 public class TrashViewImpl extends Composite implements TrashView {
 
-	public interface TrashViewImplUiBinder extends UiBinder<Widget, TrashViewImpl> {
-	}
-	@UiField
-	SimplePanel componentContainer;
+  public interface TrashViewImplUiBinder
+    extends UiBinder<Widget, TrashViewImpl> {}
 
-	private Header headerWidget;
+  @UiField
+  SimplePanel componentContainer;
 
-	@Inject
-	public TrashViewImpl(TrashViewImplUiBinder binder, Header headerWidget) {
-		initWidget(binder.createAndBindUi(this));
-		this.headerWidget = headerWidget;
-		headerWidget.configure();
-	}
+  private Header headerWidget;
 
-	@Override
-	public void createReactComponentWidget(SynapseContextPropsProvider propsProvider) {
-		TrashCanList component = new TrashCanList(propsProvider);
-		componentContainer.clear();
-		componentContainer.add(component);
-	}
+  @Inject
+  public TrashViewImpl(TrashViewImplUiBinder binder, Header headerWidget) {
+    initWidget(binder.createAndBindUi(this));
+    this.headerWidget = headerWidget;
+    headerWidget.configure();
+  }
+
+  @Override
+  public void createReactComponentWidget(
+    SynapseContextPropsProvider propsProvider
+  ) {
+    TrashCanList component = new TrashCanList(propsProvider);
+    componentContainer.clear();
+    componentContainer.add(component);
+  }
 }

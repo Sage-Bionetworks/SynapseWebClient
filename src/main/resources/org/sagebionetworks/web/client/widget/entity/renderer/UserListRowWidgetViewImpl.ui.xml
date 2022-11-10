@@ -5,16 +5,17 @@
   xmlns:c="urn:import:com.google.gwt.user.cellview.client"
   xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
-  xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
-	<t:TableRow>
-		<t:TableData addStyleNames="overflow-x-hidden ">
-			<bh:Span ui:field="userBadgeContainer" />
-		</t:TableData>
-		<t:TableData>
-			<bh:Span ui:field="institutionSpan" />
-		</t:TableData>
-		<t:TableData>
-			<bh:Span ui:field="emailSpan" />
-		</t:TableData>
-	</t:TableRow>
+  xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
+>
+  <t:TableRow>
+    <t:TableData addStyleNames="overflow-x-hidden ">
+      <bh:Span ui:field="userBadgeContainer" />
+    </t:TableData>
+    <t:TableData>
+      <bh:Span ui:field="institutionSpan" />
+    </t:TableData>
+    <t:TableData>
+      <bh:Span ui:field="emailSpan" />
+    </t:TableData>
+  </t:TableRow>
 </ui:UiBinder>

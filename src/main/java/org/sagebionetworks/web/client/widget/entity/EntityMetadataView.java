@@ -3,49 +3,47 @@ package org.sagebionetworks.web.client.widget.entity;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface EntityMetadataView extends IsWidget {
+  public interface Presenter {
+    void toggleAnnotationsVisible();
+  }
 
-	public interface Presenter {
-		void toggleAnnotationsVisible();
-	}
+  public void setPresenter(Presenter presenter);
 
+  public void setDetailedMetadataVisible(boolean visible);
 
-	public void setPresenter(Presenter presenter);
+  void setAnnotationsModalVisible(boolean visible);
 
-	public void setDetailedMetadataVisible(boolean visible);
+  boolean getAnnotationsVisible();
 
-	void setAnnotationsModalVisible(boolean visible);
+  void setAnnotationsVisible(boolean visible);
 
-	boolean getAnnotationsVisible();
+  void setDescriptionVisible(boolean visible);
 
-	void setAnnotationsVisible(boolean visible);
+  void setVersionHistoryWidget(IsWidget fileHistoryWidget);
 
-	void setDescriptionVisible(boolean visible);
+  public void setDoiWidget(IsWidget doiWidget);
 
-	void setVersionHistoryWidget(IsWidget fileHistoryWidget);
+  public void setAnnotationsRendererWidget(IsWidget annotationsWidget);
 
-	public void setDoiWidget(IsWidget doiWidget);
+  void clear();
 
-	public void setAnnotationsRendererWidget(IsWidget annotationsWidget);
+  public void setRestrictionPanelVisible(boolean visible);
 
-	void clear();
+  void setRestrictionWidgetV2(IsWidget restrictionWidget);
 
-	public void setRestrictionPanelVisible(boolean visible);
+  void setEntityId(String text);
 
-	void setRestrictionWidgetV2(IsWidget restrictionWidget);
+  void setUploadDestinationPanelVisible(boolean isVisible);
 
-	void setEntityId(String text);
+  void setUploadDestinationText(String text);
 
-	void setUploadDestinationPanelVisible(boolean isVisible);
+  void setRestrictionWidgetV2Visible(boolean visible);
 
-	void setUploadDestinationText(String text);
+  void setAnnotationsTitleText(String text);
 
-	void setRestrictionWidgetV2Visible(boolean visible);
+  void setContainerItemCountWidget(IsWidget w);
 
-	void setAnnotationsTitleText(String text);
+  void setDescription(String description);
 
-	void setContainerItemCountWidget(IsWidget w);
-
-	void setDescription(String description);
-
-	void setVersionNumber(Long versionNumber);
+  void setVersionNumber(Long versionNumber);
 }

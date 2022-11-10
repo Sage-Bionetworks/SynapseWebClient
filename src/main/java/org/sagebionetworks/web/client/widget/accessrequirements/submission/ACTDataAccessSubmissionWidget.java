@@ -1,6 +1,11 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.submission;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 import java.util.List;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.dataaccess.AccessorChange;
@@ -20,192 +25,231 @@ import org.sagebionetworks.web.client.widget.entity.act.UserBadgeItem;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.upload.FileHandleList;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 
-public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWidgetView.Presenter, IsWidget {
+public class ACTDataAccessSubmissionWidget
+  implements ACTDataAccessSubmissionWidgetView.Presenter, IsWidget {
 
-	private ACTDataAccessSubmissionWidgetView view;
-	DataAccessClientAsync dataAccessClient;
-	SynapseAlert synAlert;
-	Submission submission;
-	RejectDataAccessRequestModal promptDialog;
-	FileHandleList otherDocuments;
-	FileHandleWidget ducFileRenderer;
-	FileHandleWidget irbFileRenderer;
-	SynapseJSNIUtils jsniUtils;
-	PortalGinInjector ginInjector;
-	DateTimeUtils dateTimeUtils;
-	UserProfileAsyncHandler userProfileAsyncHandler;
-	CallbackP<String> rejectionCallback;
-	@Inject
-	public ACTDataAccessSubmissionWidget(ACTDataAccessSubmissionWidgetView view, SynapseAlert synAlert, DataAccessClientAsync dataAccessClient, RejectDataAccessRequestModal promptDialog, FileHandleWidget ducFileRenderer, FileHandleWidget irbFileRenderer, FileHandleList otherDocuments, SynapseJSNIUtils jsniUtils, PortalGinInjector ginInjector, DateTimeUtils dateTimeUtils, UserProfileAsyncHandler userProfileAsyncHandler) {
-		this.view = view;
-		this.synAlert = synAlert;
-		this.dataAccessClient = dataAccessClient;
-		fixServiceEntryPoint(dataAccessClient);
-		this.promptDialog = promptDialog;
-		this.jsniUtils = jsniUtils;
-		this.ginInjector = ginInjector;
-		this.dateTimeUtils = dateTimeUtils;
-		this.userProfileAsyncHandler = userProfileAsyncHandler;
+  private ACTDataAccessSubmissionWidgetView view;
+  DataAccessClientAsync dataAccessClient;
+  SynapseAlert synAlert;
+  Submission submission;
+  RejectDataAccessRequestModal promptDialog;
+  FileHandleList otherDocuments;
+  FileHandleWidget ducFileRenderer;
+  FileHandleWidget irbFileRenderer;
+  SynapseJSNIUtils jsniUtils;
+  PortalGinInjector ginInjector;
+  DateTimeUtils dateTimeUtils;
+  UserProfileAsyncHandler userProfileAsyncHandler;
+  CallbackP<String> rejectionCallback;
 
-		otherDocuments.configure().setCanDelete(false).setCanUpload(false);
-		this.ducFileRenderer = ducFileRenderer;
-		this.irbFileRenderer = irbFileRenderer;
-		this.otherDocuments = otherDocuments;
-		view.setPresenter(this);
+  @Inject
+  public ACTDataAccessSubmissionWidget(
+    ACTDataAccessSubmissionWidgetView view,
+    SynapseAlert synAlert,
+    DataAccessClientAsync dataAccessClient,
+    RejectDataAccessRequestModal promptDialog,
+    FileHandleWidget ducFileRenderer,
+    FileHandleWidget irbFileRenderer,
+    FileHandleList otherDocuments,
+    SynapseJSNIUtils jsniUtils,
+    PortalGinInjector ginInjector,
+    DateTimeUtils dateTimeUtils,
+    UserProfileAsyncHandler userProfileAsyncHandler
+  ) {
+    this.view = view;
+    this.synAlert = synAlert;
+    this.dataAccessClient = dataAccessClient;
+    fixServiceEntryPoint(dataAccessClient);
+    this.promptDialog = promptDialog;
+    this.jsniUtils = jsniUtils;
+    this.ginInjector = ginInjector;
+    this.dateTimeUtils = dateTimeUtils;
+    this.userProfileAsyncHandler = userProfileAsyncHandler;
 
-		view.setDucWidget(ducFileRenderer);
-		view.setIrbWidget(irbFileRenderer);
-		view.setPromptModal(promptDialog);
-		view.setOtherAttachmentWidget(otherDocuments);
-		view.setSynAlert(synAlert);
-		
-		rejectionCallback = reason -> {
-			updateDataAccessSubmissionState(SubmissionState.REJECTED, reason);
-		};
-	}
+    otherDocuments.configure().setCanDelete(false).setCanUpload(false);
+    this.ducFileRenderer = ducFileRenderer;
+    this.irbFileRenderer = irbFileRenderer;
+    this.otherDocuments = otherDocuments;
+    view.setPresenter(this);
 
-	public void configure(Submission submission) {
-		this.submission = submission;
-		view.hideActions();
-		// setup the view wrt submission state
-		view.setState(submission.getState().name());
-		view.setRejectedReasonVisible(SubmissionState.REJECTED.equals(submission.getState()));
+    view.setDucWidget(ducFileRenderer);
+    view.setIrbWidget(irbFileRenderer);
+    view.setPromptModal(promptDialog);
+    view.setOtherAttachmentWidget(otherDocuments);
+    view.setSynAlert(synAlert);
 
-		switch (submission.getState()) {
-			case SUBMITTED:
-				view.showApproveButton();
-				view.showRejectButton();
-				break;
-			case REJECTED:
-				String reason = submission.getRejectedReason() == null ? "" : submission.getRejectedReason();
-				view.setRejectedReason(reason);
-				break;
-			case APPROVED:
-			case CANCELLED:
-			default:
-		}
+    rejectionCallback =
+      reason -> {
+        updateDataAccessSubmissionState(SubmissionState.REJECTED, reason);
+      };
+  }
 
-		view.setInstitution(submission.getResearchProjectSnapshot().getInstitution());
-		view.setIntendedDataUse(submission.getResearchProjectSnapshot().getIntendedDataUseStatement());
-		view.setIsRenewal(submission.getIsRenewalSubmission());
-		view.setProjectLead(submission.getResearchProjectSnapshot().getProjectLead());
-		view.setPublications(submission.getPublication());
-		view.setSummaryOfUse(submission.getSummaryOfUse());
-		view.setSubmittedOn(dateTimeUtils.getDateTimeString(submission.getSubmittedOn()));
-		view.setRenewalColumnsVisible(submission.getIsRenewalSubmission());
-		UserBadge badge = ginInjector.getUserBadgeWidget();
-		badge.configure(submission.getSubmittedBy());
-		view.setSubmittedBy(badge);
-	}
+  public void configure(Submission submission) {
+    this.submission = submission;
+    view.hideActions();
+    // setup the view wrt submission state
+    view.setState(submission.getState().name());
+    view.setRejectedReasonVisible(
+      SubmissionState.REJECTED.equals(submission.getState())
+    );
 
-	@Override
-	public void onMoreInfo() {
-		otherDocuments.clear();
-		view.clearAccessors();
-		if (submission.getAccessorChanges() != null) {
-			addAccessorUserBadges(submission.getAccessorChanges());
-		}
-		if (submission.getAttachments() != null) {
-			for (String fileHandleId : submission.getAttachments()) {
-				otherDocuments.addFileLink(getFileHandleAssociation(fileHandleId));
-			}
-		}
+    switch (submission.getState()) {
+      case SUBMITTED:
+        view.showApproveButton();
+        view.showRejectButton();
+        break;
+      case REJECTED:
+        String reason = submission.getRejectedReason() == null
+          ? ""
+          : submission.getRejectedReason();
+        view.setRejectedReason(reason);
+        break;
+      case APPROVED:
+      case CANCELLED:
+      default:
+    }
 
-		if (submission.getDucFileHandleId() != null) {
-			ducFileRenderer.configure(getFileHandleAssociation(submission.getDucFileHandleId()));
-			ducFileRenderer.setVisible(true);
-		} else {
-			ducFileRenderer.setVisible(false);
-		}
-		if (submission.getIrbFileHandleId() != null) {
-			irbFileRenderer.configure(getFileHandleAssociation(submission.getIrbFileHandleId()));
-			irbFileRenderer.setVisible(true);
-		} else {
-			irbFileRenderer.setVisible(false);
-		}
-		view.showMoreInfoDialog();
-	}
+    view.setInstitution(
+      submission.getResearchProjectSnapshot().getInstitution()
+    );
+    view.setIntendedDataUse(
+      submission.getResearchProjectSnapshot().getIntendedDataUseStatement()
+    );
+    view.setIsRenewal(submission.getIsRenewalSubmission());
+    view.setProjectLead(
+      submission.getResearchProjectSnapshot().getProjectLead()
+    );
+    view.setPublications(submission.getPublication());
+    view.setSummaryOfUse(submission.getSummaryOfUse());
+    view.setSubmittedOn(
+      dateTimeUtils.getDateTimeString(submission.getSubmittedOn())
+    );
+    view.setRenewalColumnsVisible(submission.getIsRenewalSubmission());
+    UserBadge badge = ginInjector.getUserBadgeWidget();
+    badge.configure(submission.getSubmittedBy());
+    view.setSubmittedBy(badge);
+  }
 
-	public void addAccessorUserBadges(List<AccessorChange> accessorChanges) {
-		for (AccessorChange change : accessorChanges) {
-			userProfileAsyncHandler.getUserProfile(change.getUserId(), new AsyncCallback<UserProfile>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					synAlert.handleException(caught);
-				}
+  @Override
+  public void onMoreInfo() {
+    otherDocuments.clear();
+    view.clearAccessors();
+    if (submission.getAccessorChanges() != null) {
+      addAccessorUserBadges(submission.getAccessorChanges());
+    }
+    if (submission.getAttachments() != null) {
+      for (String fileHandleId : submission.getAttachments()) {
+        otherDocuments.addFileLink(getFileHandleAssociation(fileHandleId));
+      }
+    }
 
-				public void onSuccess(UserProfile profile) {
-					UserBadgeItem badge = ginInjector.getUserBadgeItem();
-					badge.configure(change, profile);
-					badge.setSelectVisible(false);
-					badge.setAccessTypeDropdownEnabled(false);
-					view.addAccessors(badge, profile.getUserName());
-				};
-			});
+    if (submission.getDucFileHandleId() != null) {
+      ducFileRenderer.configure(
+        getFileHandleAssociation(submission.getDucFileHandleId())
+      );
+      ducFileRenderer.setVisible(true);
+    } else {
+      ducFileRenderer.setVisible(false);
+    }
+    if (submission.getIrbFileHandleId() != null) {
+      irbFileRenderer.configure(
+        getFileHandleAssociation(submission.getIrbFileHandleId())
+      );
+      irbFileRenderer.setVisible(true);
+    } else {
+      irbFileRenderer.setVisible(false);
+    }
+    view.showMoreInfoDialog();
+  }
 
-		}
-	}
+  public void addAccessorUserBadges(List<AccessorChange> accessorChanges) {
+    for (AccessorChange change : accessorChanges) {
+      userProfileAsyncHandler.getUserProfile(
+        change.getUserId(),
+        new AsyncCallback<UserProfile>() {
+          @Override
+          public void onFailure(Throwable caught) {
+            synAlert.handleException(caught);
+          }
 
-	private FileHandleAssociation getFileHandleAssociation(String fileHandleId) {
-		FileHandleAssociation fha = new FileHandleAssociation();
-		fha.setAssociateObjectId(submission.getId());
-		fha.setAssociateObjectType(FileHandleAssociateType.DataAccessSubmissionAttachment);
-		fha.setFileHandleId(fileHandleId);
-		return fha;
-	}
+          public void onSuccess(UserProfile profile) {
+            UserBadgeItem badge = ginInjector.getUserBadgeItem();
+            badge.configure(change, profile);
+            badge.setSelectVisible(false);
+            badge.setAccessTypeDropdownEnabled(false);
+            view.addAccessors(badge, profile.getUserName());
+          }
+        }
+      );
+    }
+  }
 
-	public void updateDataAccessSubmissionState(SubmissionState state, String reason) {
-		dataAccessClient.updateDataAccessSubmissionState(submission.getId(), state, reason, new AsyncCallback<Submission>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
-			}
+  private FileHandleAssociation getFileHandleAssociation(String fileHandleId) {
+    FileHandleAssociation fha = new FileHandleAssociation();
+    fha.setAssociateObjectId(submission.getId());
+    fha.setAssociateObjectType(
+      FileHandleAssociateType.DataAccessSubmissionAttachment
+    );
+    fha.setFileHandleId(fileHandleId);
+    return fha;
+  }
 
-			@Override
-			public void onSuccess(Submission result) {
-				configure(result);
-			}
-		});
-	}
+  public void updateDataAccessSubmissionState(
+    SubmissionState state,
+    String reason
+  ) {
+    dataAccessClient.updateDataAccessSubmissionState(
+      submission.getId(),
+      state,
+      reason,
+      new AsyncCallback<Submission>() {
+        @Override
+        public void onFailure(Throwable caught) {
+          synAlert.handleException(caught);
+        }
 
-	@Override
-	public void onApprove() {
-		updateDataAccessSubmissionState(SubmissionState.APPROVED, null);
-	}
+        @Override
+        public void onSuccess(Submission result) {
+          configure(result);
+        }
+      }
+    );
+  }
 
-	@Override
-	public void onReject() {
-		// prompt for reason
-		promptDialog.show(rejectionCallback);
-	}
+  @Override
+  public void onApprove() {
+    updateDataAccessSubmissionState(SubmissionState.APPROVED, null);
+  }
 
-	public void addStyleNames(String styleNames) {
-		view.addStyleNames(styleNames);
-	}
+  @Override
+  public void onReject() {
+    // prompt for reason
+    promptDialog.show(rejectionCallback);
+  }
 
-	@Override
-	public Widget asWidget() {
-		return view.asWidget();
-	}
+  public void addStyleNames(String styleNames) {
+    view.addStyleNames(styleNames);
+  }
 
-	public void setVisible(boolean visible) {
-		view.setVisible(visible);
-	}
+  @Override
+  public Widget asWidget() {
+    return view.asWidget();
+  }
 
-	public void setDucColumnVisible(boolean visible) {
-		view.setDucColumnVisible(visible);
-	}
+  public void setVisible(boolean visible) {
+    view.setVisible(visible);
+  }
 
-	public void setIrbColumnVisible(boolean visible) {
-		view.setIrbColumnVisible(visible);
-	}
+  public void setDucColumnVisible(boolean visible) {
+    view.setDucColumnVisible(visible);
+  }
 
-	public void setOtherAttachmentsColumnVisible(boolean visible) {
-		view.setOtherAttachmentsColumnVisible(visible);
-	}
+  public void setIrbColumnVisible(boolean visible) {
+    view.setIrbColumnVisible(visible);
+  }
+
+  public void setOtherAttachmentsColumnVisible(boolean visible) {
+    view.setOtherAttachmentsColumnVisible(visible);
+  }
 }

@@ -1,11 +1,5 @@
 package org.sagebionetworks.web.client.widget.biodalliance13;
 
-import java.util.List;
-import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtvisualizationwrappers.client.biodalliance13.Biodalliance013dev;
-import org.gwtvisualizationwrappers.client.biodalliance13.BiodallianceConfigInterface;
-import org.gwtvisualizationwrappers.client.biodalliance13.BiodallianceSource;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.RunAsyncCallback;
 import com.google.gwt.event.logical.shared.AttachEvent;
@@ -14,76 +8,105 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import java.util.List;
+import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtvisualizationwrappers.client.biodalliance13.Biodalliance013dev;
+import org.gwtvisualizationwrappers.client.biodalliance13.BiodallianceConfigInterface;
+import org.gwtvisualizationwrappers.client.biodalliance13.BiodallianceSource;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 
 public class BiodallianceWidgetViewImpl implements BiodallianceWidgetView {
 
-	private Presenter presenter;
+  private Presenter presenter;
 
-	@UiField
-	SimplePanel container;
-	@UiField
-	Div synAlertContainer;
+  @UiField
+  SimplePanel container;
 
-	Widget widget;
-	SynapseJSNIUtils jsniUtils;
+  @UiField
+  Div synAlertContainer;
 
-	interface BiodallianceWidgetViewImplUiBinder extends UiBinder<Widget, BiodallianceWidgetViewImpl> {
-	}
+  Widget widget;
+  SynapseJSNIUtils jsniUtils;
 
-	private static BiodallianceWidgetViewImplUiBinder uiBinder = GWT.create(BiodallianceWidgetViewImplUiBinder.class);
+  interface BiodallianceWidgetViewImplUiBinder
+    extends UiBinder<Widget, BiodallianceWidgetViewImpl> {}
 
-	@Inject
-	public BiodallianceWidgetViewImpl(SynapseJSNIUtils jsniUtils) {
-		this.jsniUtils = jsniUtils;
-		widget = uiBinder.createAndBindUi(this);
-		container.addAttachHandler(new AttachEvent.Handler() {
-			@Override
-			public void onAttachOrDetach(AttachEvent event) {
-				if (event.isAttached()) {
-					presenter.viewAttached();
-				} ;
-			}
-		});
-	}
+  private static BiodallianceWidgetViewImplUiBinder uiBinder = GWT.create(
+    BiodallianceWidgetViewImplUiBinder.class
+  );
 
-	@Override
-	public void setContainerId(String id) {
-		container.getElement().setId(id);
-	}
+  @Inject
+  public BiodallianceWidgetViewImpl(SynapseJSNIUtils jsniUtils) {
+    this.jsniUtils = jsniUtils;
+    widget = uiBinder.createAndBindUi(this);
+    container.addAttachHandler(
+      new AttachEvent.Handler() {
+        @Override
+        public void onAttachOrDetach(AttachEvent event) {
+          if (event.isAttached()) {
+            presenter.viewAttached();
+          }
+        }
+      }
+    );
+  }
 
-	@Override
-	public Widget asWidget() {
-		return widget;
-	}
+  @Override
+  public void setContainerId(String id) {
+    container.getElement().setId(id);
+  }
 
-	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-	}
+  @Override
+  public Widget asWidget() {
+    return widget;
+  }
 
-	@Override
-	public boolean isAttached() {
-		return widget.isAttached();
-	}
+  @Override
+  public void setPresenter(Presenter presenter) {
+    this.presenter = presenter;
+  }
 
-	@Override
-	public void showBiodallianceBrowser(final String urlPrefix, final String containerId, final String initChr, final int initViewStart, final int initViewEnd, final BiodallianceConfigInterface currentConfig, final List<BiodallianceSource> sources) {
-		GWT.runAsync(new RunAsyncCallback() {
-			@Override
-			public void onSuccess() {
-				new Biodalliance013dev().show(urlPrefix, containerId, initChr, initViewStart, initViewEnd, currentConfig, sources);
-			}
+  @Override
+  public boolean isAttached() {
+    return widget.isAttached();
+  }
 
-			@Override
-			public void onFailure(Throwable reason) {
-				jsniUtils.consoleError(reason.getMessage());
-			}
-		});
+  @Override
+  public void showBiodallianceBrowser(
+    final String urlPrefix,
+    final String containerId,
+    final String initChr,
+    final int initViewStart,
+    final int initViewEnd,
+    final BiodallianceConfigInterface currentConfig,
+    final List<BiodallianceSource> sources
+  ) {
+    GWT.runAsync(
+      new RunAsyncCallback() {
+        @Override
+        public void onSuccess() {
+          new Biodalliance013dev()
+            .show(
+              urlPrefix,
+              containerId,
+              initChr,
+              initViewStart,
+              initViewEnd,
+              currentConfig,
+              sources
+            );
+        }
 
-	}
+        @Override
+        public void onFailure(Throwable reason) {
+          jsniUtils.consoleError(reason.getMessage());
+        }
+      }
+    );
+  }
 
-	@Override
-	public void setSynAlert(Widget w) {
-		synAlertContainer.add(w);
-	}
+  @Override
+  public void setSynAlert(Widget w) {
+    synAlertContainer.add(w);
+  }
 }

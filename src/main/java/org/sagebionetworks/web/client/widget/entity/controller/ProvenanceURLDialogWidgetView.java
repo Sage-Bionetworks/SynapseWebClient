@@ -1,38 +1,34 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
-import org.sagebionetworks.web.client.utils.Callback;
 import com.google.gwt.user.client.ui.IsWidget;
+import org.sagebionetworks.web.client.utils.Callback;
 
 public interface ProvenanceURLDialogWidgetView extends IsWidget {
+  public interface Presenter {
+    void onSave();
 
-	public interface Presenter {
+    void configure(Callback confirmCallback);
 
-		void onSave();
+    void show();
 
-		void configure(Callback confirmCallback);
+    void hide();
 
-		void show();
+    String getURLName();
 
-		void hide();
+    String getURLAddress();
+  }
 
-		String getURLName();
+  void setPresenter(Presenter presenter);
 
-		String getURLAddress();
+  void show();
 
-	}
+  void hide();
 
-	void setPresenter(Presenter presenter);
+  void clear();
 
-	void show();
+  String getURLAddress();
 
-	void hide();
+  String getURLName();
 
-	void clear();
-
-	String getURLAddress();
-
-	String getURLName();
-
-	void setSynAlertWidget(IsWidget synAlert);
-
+  void setSynAlertWidget(IsWidget synAlert);
 }

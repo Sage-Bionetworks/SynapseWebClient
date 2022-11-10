@@ -1,76 +1,74 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
-import org.sagebionetworks.web.client.widget.WidgetEditorView;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import org.sagebionetworks.web.client.widget.WidgetEditorView;
 
 public interface ImageConfigView extends IsWidget, WidgetEditorView {
+  /**
+   * Set the presenter.
+   *
+   * @param presenter
+   */
+  public void setPresenter(Presenter presenter);
 
-	/**
-	 * Set the presenter.
-	 * 
-	 * @param presenter
-	 */
-	public void setPresenter(Presenter presenter);
+  /**
+   * True if user just wants to insert a reference to an image from the web
+   *
+   * @return
+   */
+  public boolean isExternal();
 
-	/**
-	 * True if user just wants to insert a reference to an image from the web
-	 * 
-	 * @return
-	 */
-	public boolean isExternal();
+  public boolean isSynapseEntity();
 
-	public boolean isSynapseEntity();
+  public String getImageUrl();
 
-	public String getImageUrl();
+  public String getExternalAltText();
 
-	public String getExternalAltText();
+  public void setImageUrl(String url);
 
-	public void setImageUrl(String url);
+  void setFileInputWidget(Widget fileInputWidget);
 
-	void setFileInputWidget(Widget fileInputWidget);
+  void setWikiAttachmentsWidget(Widget widget);
 
-	void setWikiAttachmentsWidget(Widget widget);
+  void setWikiAttachmentsWidgetVisible(boolean visible);
 
-	void setWikiAttachmentsWidgetVisible(boolean visible);
+  void showUploadFailureUI(String error);
 
-	void showUploadFailureUI(String error);
+  void showUploadSuccessUI(String fileName);
 
-	void showUploadSuccessUI(String fileName);
+  public String getAlignment();
 
-	public String getAlignment();
+  public Integer getScale();
 
-	public Integer getScale();
+  public void setScale(Integer scale);
 
-	public void setScale(Integer scale);
+  String getAltText();
 
-	String getAltText();
+  void setAltText(String altText);
 
-	void setAltText(String altText);
+  public String getSynapseId();
 
-	public String getSynapseId();
+  public Long getVersion();
 
-	public Long getVersion();
+  public void setSynapseId(String synapseId);
 
-	public void setSynapseId(String synapseId);
+  public void setAlignment(String alignment);
 
-	public void setAlignment(String alignment);
+  /**
+   * Presenter interface
+   */
+  public interface Presenter {}
 
-	/**
-	 * Presenter interface
-	 */
-	public interface Presenter {
-	}
+  void setWikiFilesTabVisible(boolean visible);
 
-	void setWikiFilesTabVisible(boolean visible);
+  void setExternalTabVisible(boolean visible);
 
-	void setExternalTabVisible(boolean visible);
+  void setSynapseTabVisible(boolean visible);
 
-	void setSynapseTabVisible(boolean visible);
+  void showWikiFilesTab();
 
-	void showWikiFilesTab();
+  void showExternalTab();
 
-	void showExternalTab();
-
-	void showSynapseTab();
+  void showSynapseTab();
 }

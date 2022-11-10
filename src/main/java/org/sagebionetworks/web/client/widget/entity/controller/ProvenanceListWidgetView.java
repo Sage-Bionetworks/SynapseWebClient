@@ -1,33 +1,34 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
-import java.util.List;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import java.util.List;
 
 public interface ProvenanceListWidgetView {
+  Widget asWidget();
 
-	Widget asWidget();
+  public interface Presenter {
+    Widget asWidget();
 
-	public interface Presenter {
-		Widget asWidget();
+    void addEntityRow();
 
-		void addEntityRow();
+    void addURLRow();
 
-		void addURLRow();
+    void configure(
+      List<ProvenanceEntry> provEntries,
+      ProvenanceType provenanceType
+    );
+  }
 
-		void configure(List<ProvenanceEntry> provEntries, ProvenanceType provenanceType);
-	}
+  void removeRow(IsWidget toRemove);
 
-	void removeRow(IsWidget toRemove);
+  void addRow(IsWidget newRow);
 
-	void addRow(IsWidget newRow);
+  void setPresenter(Presenter presenter);
 
-	void setPresenter(Presenter presenter);
+  void setEntityFinder(IsWidget entityFinder);
 
-	void setEntityFinder(IsWidget entityFinder);
+  void setURLDialog(IsWidget urlDialog);
 
-	void setURLDialog(IsWidget urlDialog);
-
-	void clear();
-
+  void clear();
 }

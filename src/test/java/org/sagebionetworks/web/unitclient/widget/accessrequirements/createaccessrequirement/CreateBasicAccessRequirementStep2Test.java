@@ -6,6 +6,9 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.IsWidget;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -28,130 +31,186 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage.ModalPresenter;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.IsWidget;
 
 public class CreateBasicAccessRequirementStep2Test {
 
-	CreateBasicAccessRequirementStep2 widget;
-	@Mock
-	ModalPresenter mockModalPresenter;
+  CreateBasicAccessRequirementStep2 widget;
 
-	@Mock
-	CreateBasicAccessRequirementStep2View mockView;
-	@Mock
-	WikiMarkdownEditor mockWikiMarkdownEditor;
-	@Mock
-	WikiPageWidget mockWikiPageRenderer;
-	@Mock
-	TermsOfUseAccessRequirement mockTermsOfUseAccessRequirement;
-	@Mock
-	ACTAccessRequirement mockACTAccessRequirement;
-	@Captor
-	ArgumentCaptor<WikiPageKey> wikiPageKeyCaptor;
-	@Mock
-	SynapseAlert mockSynAlert;
-	@Mock
-	SynapseClientAsync mockSynapseClient;
-	@Mock
-	PopupUtilsView mockPopupUtils;
+  @Mock
+  ModalPresenter mockModalPresenter;
 
-	public static final Long AR_ID = 8765L;
+  @Mock
+  CreateBasicAccessRequirementStep2View mockView;
 
-	@Before
-	public void setUp() throws Exception {
-		MockitoAnnotations.initMocks(this);
-		widget = new CreateBasicAccessRequirementStep2(mockView, mockWikiMarkdownEditor, mockWikiPageRenderer, mockSynapseClient, mockSynAlert, mockPopupUtils);
-		widget.setModalPresenter(mockModalPresenter);
-		when(mockTermsOfUseAccessRequirement.getId()).thenReturn(AR_ID);
-		AsyncMockStubber.callSuccessWith(mockTermsOfUseAccessRequirement).when(mockSynapseClient).createOrUpdateAccessRequirement(any(AccessRequirement.class), any(AsyncCallback.class));
-	}
+  @Mock
+  WikiMarkdownEditor mockWikiMarkdownEditor;
 
-	@Test
-	public void testConstruction() {
-		verify(mockView).setWikiPageRenderer(any(IsWidget.class));
-		verify(mockView).setPresenter(widget);
-		verify(mockWikiPageRenderer).setModifiedCreatedByHistoryVisible(false);
-		verify(mockWikiMarkdownEditor).setDeleteButtonVisible(false);
-	}
+  @Mock
+  WikiPageWidget mockWikiPageRenderer;
 
-	@Test
-	public void testConfigureWithWiki() {
-		widget.configure(mockTermsOfUseAccessRequirement);
-		verify(mockView).setOldTermsVisible(false);
-		verify(mockView).setOldTerms("");
-		verify(mockWikiPageRenderer).configure(wikiPageKeyCaptor.capture(), eq(false), eq((WikiPageWidget.Callback) null));
-		WikiPageKey key = wikiPageKeyCaptor.getValue();
-		assertEquals(AR_ID.toString(), key.getOwnerObjectId());
-		assertEquals(ObjectType.ACCESS_REQUIREMENT.toString(), key.getOwnerObjectType());
+  @Mock
+  TermsOfUseAccessRequirement mockTermsOfUseAccessRequirement;
 
-		// on edit of wiki
-		widget.onEditWiki();
-		verify(mockWikiMarkdownEditor).configure(eq(key), any(CallbackP.class));
+  @Mock
+  ACTAccessRequirement mockACTAccessRequirement;
 
-		// on finish
-		widget.onPrimary();
-		verify(mockModalPresenter).onFinished();
-	}
+  @Captor
+  ArgumentCaptor<WikiPageKey> wikiPageKeyCaptor;
 
-	@Test
-	public void testConfigureWithOldTermsOfUse() {
-		String tou = "these are the old conditions";
-		when(mockTermsOfUseAccessRequirement.getTermsOfUse()).thenReturn(tou);
-		widget.configure(mockTermsOfUseAccessRequirement);
-		verify(mockView).setOldTermsVisible(true);
-		verify(mockView).setOldTerms(tou);
-		verify(mockWikiPageRenderer).configure(wikiPageKeyCaptor.capture(), eq(false), eq((WikiPageWidget.Callback) null));
-		WikiPageKey key = wikiPageKeyCaptor.getValue();
-		assertEquals(AR_ID.toString(), key.getOwnerObjectId());
-		assertEquals(ObjectType.ACCESS_REQUIREMENT.toString(), key.getOwnerObjectType());
+  @Mock
+  SynapseAlert mockSynAlert;
 
-		// try clearing the old terms
-		widget.onClearOldInstructionsAfterConfirm();
-		verify(mockTermsOfUseAccessRequirement).setTermsOfUse(null);
-		verify(mockSynapseClient).createOrUpdateAccessRequirement(eq(mockTermsOfUseAccessRequirement), any(AsyncCallback.class));
+  @Mock
+  SynapseClientAsync mockSynapseClient;
 
-		// on edit of wiki
-		widget.onEditWiki();
-		verify(mockWikiMarkdownEditor).configure(eq(key), any(CallbackP.class));
+  @Mock
+  PopupUtilsView mockPopupUtils;
 
-		// on finish
-		widget.onPrimary();
-		verify(mockModalPresenter).onFinished();
-	}
+  public static final Long AR_ID = 8765L;
 
-	@Test
-	public void testConfigureWithOldTermsOfUseACTAccessRequirement() {
-		String tou = "these are the old conditions";
-		when(mockACTAccessRequirement.getActContactInfo()).thenReturn(tou);
-		widget.configure(mockACTAccessRequirement);
-		verify(mockView).setOldTermsVisible(true);
-		verify(mockView).setOldTerms(tou);
+  @Before
+  public void setUp() throws Exception {
+    MockitoAnnotations.initMocks(this);
+    widget =
+      new CreateBasicAccessRequirementStep2(
+        mockView,
+        mockWikiMarkdownEditor,
+        mockWikiPageRenderer,
+        mockSynapseClient,
+        mockSynAlert,
+        mockPopupUtils
+      );
+    widget.setModalPresenter(mockModalPresenter);
+    when(mockTermsOfUseAccessRequirement.getId()).thenReturn(AR_ID);
+    AsyncMockStubber
+      .callSuccessWith(mockTermsOfUseAccessRequirement)
+      .when(mockSynapseClient)
+      .createOrUpdateAccessRequirement(
+        any(AccessRequirement.class),
+        any(AsyncCallback.class)
+      );
+  }
 
-		// try clearing the old terms
-		widget.onClearOldInstructionsAfterConfirm();
-		verify(mockACTAccessRequirement).setActContactInfo(null);
-		verify(mockSynapseClient).createOrUpdateAccessRequirement(eq(mockACTAccessRequirement), any(AsyncCallback.class));
-	}
+  @Test
+  public void testConstruction() {
+    verify(mockView).setWikiPageRenderer(any(IsWidget.class));
+    verify(mockView).setPresenter(widget);
+    verify(mockWikiPageRenderer).setModifiedCreatedByHistoryVisible(false);
+    verify(mockWikiMarkdownEditor).setDeleteButtonVisible(false);
+  }
 
-	@Test
-	public void testClearOldInstructionsFailure() {
-		Exception ex = new Exception();
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).createOrUpdateAccessRequirement(any(AccessRequirement.class), any(AsyncCallback.class));
-		widget.configure(mockACTAccessRequirement);
+  @Test
+  public void testConfigureWithWiki() {
+    widget.configure(mockTermsOfUseAccessRequirement);
+    verify(mockView).setOldTermsVisible(false);
+    verify(mockView).setOldTerms("");
+    verify(mockWikiPageRenderer)
+      .configure(
+        wikiPageKeyCaptor.capture(),
+        eq(false),
+        eq((WikiPageWidget.Callback) null)
+      );
+    WikiPageKey key = wikiPageKeyCaptor.getValue();
+    assertEquals(AR_ID.toString(), key.getOwnerObjectId());
+    assertEquals(
+      ObjectType.ACCESS_REQUIREMENT.toString(),
+      key.getOwnerObjectType()
+    );
 
-		// try clearing the old terms
-		widget.onClearOldInstructionsAfterConfirm();
-		verify(mockSynAlert).clear();
-		verify(mockACTAccessRequirement).setActContactInfo(null);
-		verify(mockSynapseClient).createOrUpdateAccessRequirement(eq(mockACTAccessRequirement), any(AsyncCallback.class));
-		verify(mockSynAlert).handleException(ex);
-	}
+    // on edit of wiki
+    widget.onEditWiki();
+    verify(mockWikiMarkdownEditor).configure(eq(key), any(CallbackP.class));
 
-	@Test
-	public void testOnClearOldInstructions() {
-		// verify action is confirmed
-		widget.onClearOldInstructions();
-		verify(mockPopupUtils).showConfirmDialog(anyString(), anyString(), any(Callback.class));
-	}
+    // on finish
+    widget.onPrimary();
+    verify(mockModalPresenter).onFinished();
+  }
+
+  @Test
+  public void testConfigureWithOldTermsOfUse() {
+    String tou = "these are the old conditions";
+    when(mockTermsOfUseAccessRequirement.getTermsOfUse()).thenReturn(tou);
+    widget.configure(mockTermsOfUseAccessRequirement);
+    verify(mockView).setOldTermsVisible(true);
+    verify(mockView).setOldTerms(tou);
+    verify(mockWikiPageRenderer)
+      .configure(
+        wikiPageKeyCaptor.capture(),
+        eq(false),
+        eq((WikiPageWidget.Callback) null)
+      );
+    WikiPageKey key = wikiPageKeyCaptor.getValue();
+    assertEquals(AR_ID.toString(), key.getOwnerObjectId());
+    assertEquals(
+      ObjectType.ACCESS_REQUIREMENT.toString(),
+      key.getOwnerObjectType()
+    );
+
+    // try clearing the old terms
+    widget.onClearOldInstructionsAfterConfirm();
+    verify(mockTermsOfUseAccessRequirement).setTermsOfUse(null);
+    verify(mockSynapseClient)
+      .createOrUpdateAccessRequirement(
+        eq(mockTermsOfUseAccessRequirement),
+        any(AsyncCallback.class)
+      );
+
+    // on edit of wiki
+    widget.onEditWiki();
+    verify(mockWikiMarkdownEditor).configure(eq(key), any(CallbackP.class));
+
+    // on finish
+    widget.onPrimary();
+    verify(mockModalPresenter).onFinished();
+  }
+
+  @Test
+  public void testConfigureWithOldTermsOfUseACTAccessRequirement() {
+    String tou = "these are the old conditions";
+    when(mockACTAccessRequirement.getActContactInfo()).thenReturn(tou);
+    widget.configure(mockACTAccessRequirement);
+    verify(mockView).setOldTermsVisible(true);
+    verify(mockView).setOldTerms(tou);
+
+    // try clearing the old terms
+    widget.onClearOldInstructionsAfterConfirm();
+    verify(mockACTAccessRequirement).setActContactInfo(null);
+    verify(mockSynapseClient)
+      .createOrUpdateAccessRequirement(
+        eq(mockACTAccessRequirement),
+        any(AsyncCallback.class)
+      );
+  }
+
+  @Test
+  public void testClearOldInstructionsFailure() {
+    Exception ex = new Exception();
+    AsyncMockStubber
+      .callFailureWith(ex)
+      .when(mockSynapseClient)
+      .createOrUpdateAccessRequirement(
+        any(AccessRequirement.class),
+        any(AsyncCallback.class)
+      );
+    widget.configure(mockACTAccessRequirement);
+
+    // try clearing the old terms
+    widget.onClearOldInstructionsAfterConfirm();
+    verify(mockSynAlert).clear();
+    verify(mockACTAccessRequirement).setActContactInfo(null);
+    verify(mockSynapseClient)
+      .createOrUpdateAccessRequirement(
+        eq(mockACTAccessRequirement),
+        any(AsyncCallback.class)
+      );
+    verify(mockSynAlert).handleException(ex);
+  }
+
+  @Test
+  public void testOnClearOldInstructions() {
+    // verify action is confirmed
+    widget.onClearOldInstructions();
+    verify(mockPopupUtils)
+      .showConfirmDialog(anyString(), anyString(), any(Callback.class));
+  }
 }

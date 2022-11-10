@@ -1,61 +1,59 @@
 package org.sagebionetworks.web.client.widget.evaluation;
 
-import java.util.Date;
 import com.google.gwt.user.client.ui.IsWidget;
+import java.util.Date;
 
 public interface EvaluationEditorModalView extends IsWidget {
+  void setPresenter(Presenter presenter);
 
-	void setPresenter(Presenter presenter);
+  void setEvaluationName(String name);
 
-	void setEvaluationName(String name);
+  String getEvaluationName();
 
-	String getEvaluationName();
+  void setSubmissionInstructionsMessage(String message);
 
-	void setSubmissionInstructionsMessage(String message);
+  String getSubmissionInstructionsMessage();
 
-	String getSubmissionInstructionsMessage();
+  void setSubmissionReceiptMessage(String message);
 
-	void setSubmissionReceiptMessage(String message);
+  String getSubmissionReceiptMessage();
 
-	String getSubmissionReceiptMessage();
+  void setSynAlert(IsWidget w);
 
-	void setSynAlert(IsWidget w);
+  void setCreatedByWidget(IsWidget w);
 
-	void setCreatedByWidget(IsWidget w);
+  void setDescription(String description);
 
-	void setDescription(String description);
+  String getDescription();
 
-	String getDescription();
+  void setCreatedOn(String createdOnString);
 
-	void setCreatedOn(String createdOnString);
+  void setRoundStart(Date roundStart);
 
-	void setRoundStart(Date roundStart);
+  Date getRoundStart();
 
-	Date getRoundStart();
+  void setRoundDuration(Long roundDurationMs);
 
-	void setRoundDuration(Long roundDurationMs);
+  Long getRoundDuration();
 
-	Long getRoundDuration();
+  void setNumberOfRounds(Long numberOfRounds);
 
-	void setNumberOfRounds(Long numberOfRounds);
+  Double getNumberOfRounds();
 
-	Double getNumberOfRounds();
+  void setSubmissionLimit(Long submissionLimit);
 
-	void setSubmissionLimit(Long submissionLimit);
+  Double getSubmissionLimit();
 
-	Double getSubmissionLimit();
+  void show();
 
-	void show();
+  void hide();
 
-	void hide();
+  void clear();
 
-	void clear();
-
-	/**
-	 * Presenter interface
-	 */
-	public interface Presenter {
-		void onSave();
-	}
-
+  /**
+   * Presenter interface
+   */
+  public interface Presenter {
+    void onSave();
+  }
 }

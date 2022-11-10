@@ -8,19 +8,19 @@ import jsinterop.annotations.JsType;
 @JsType(isNative = true, namespace = JsPackage.GLOBAL, name = "Object")
 public class MenuAction {
 
-	@JsFunction
-	public interface Callback {
-		void run();
-	}
+  @JsFunction
+  public interface Callback {
+    void run();
+  }
 
-	String field;
-	Callback callback;
+  String field;
+  Callback callback;
 
-	@JsOverlay
-	public static MenuAction create(String field, Callback callback) {
-		MenuAction props = new MenuAction();
-		props.field = field;
-		props.callback = callback;
-		return props;
-	}
+  @JsOverlay
+  public static MenuAction create(String field, Callback callback) {
+    MenuAction props = new MenuAction();
+    props.field = field;
+    props.callback = callback;
+    return props;
+  }
 }

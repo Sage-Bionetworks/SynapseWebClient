@@ -4,30 +4,27 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 public interface AddExternalRepoModalView extends IsWidget {
+  public interface Presenter {
+    void onSave();
+  }
 
-	public interface Presenter {
+  void setPresenter(Presenter presenter);
 
-		void onSave();
+  void showDialog();
 
-	}
+  void hideDialog();
 
-	void setPresenter(Presenter presenter);
+  String getRepoName();
 
-	void showDialog();
+  void clear();
 
-	void hideDialog();
+  void setAlert(Widget widget);
 
-	String getRepoName();
+  void showSuccess(String title, String message);
 
-	void clear();
+  void showSaving();
 
-	void setAlert(Widget widget);
+  void resetButton();
 
-	void showSuccess(String title, String message);
-
-	void showSaving();
-
-	void resetButton();
-
-	void setModalTitle(String title);
+  void setModalTitle(String title);
 }

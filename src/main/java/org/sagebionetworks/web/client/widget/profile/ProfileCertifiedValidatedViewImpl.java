@@ -1,49 +1,52 @@
 package org.sagebionetworks.web.client.widget.profile;
 
-import org.gwtbootstrap3.client.ui.Icon;
-import org.gwtbootstrap3.client.ui.html.Paragraph;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.gwtbootstrap3.client.ui.Icon;
+import org.gwtbootstrap3.client.ui.html.Paragraph;
 
-public class ProfileCertifiedValidatedViewImpl implements ProfileCertifiedValidatedView {
+public class ProfileCertifiedValidatedViewImpl
+  implements ProfileCertifiedValidatedView {
 
-	public interface Binder extends UiBinder<Widget, ProfileCertifiedValidatedViewImpl> {
-	}
+  public interface Binder
+    extends UiBinder<Widget, ProfileCertifiedValidatedViewImpl> {}
 
-	@UiField
-	Image validatedIcon;
-	@UiField
-	Image certifiedIcon;
-	@UiField
-	Paragraph errorMessage;
+  @UiField
+  Image validatedIcon;
 
-	Widget widget;
+  @UiField
+  Image certifiedIcon;
 
-	@Inject
-	public ProfileCertifiedValidatedViewImpl(Binder binder) {
-		widget = binder.createAndBindUi(this);
-	}
+  @UiField
+  Paragraph errorMessage;
 
-	@Override
-	public Widget asWidget() {
-		return widget;
-	}
+  Widget widget;
 
-	@Override
-	public void setCertifiedVisible(boolean visible) {
-		certifiedIcon.setVisible(visible);
-	}
+  @Inject
+  public ProfileCertifiedValidatedViewImpl(Binder binder) {
+    widget = binder.createAndBindUi(this);
+  }
 
-	@Override
-	public void setVerifiedVisible(boolean visible) {
-		validatedIcon.setVisible(visible);
-	}
+  @Override
+  public Widget asWidget() {
+    return widget;
+  }
 
-	@Override
-	public void setError(String error) {
-		errorMessage.setText(error);
-	}
+  @Override
+  public void setCertifiedVisible(boolean visible) {
+    certifiedIcon.setVisible(visible);
+  }
+
+  @Override
+  public void setVerifiedVisible(boolean visible) {
+    validatedIcon.setVisible(visible);
+  }
+
+  @Override
+  public void setError(String error) {
+    errorMessage.setText(error);
+  }
 }

@@ -9,17 +9,23 @@ import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 
 public class ForumSearchWrapper extends ReactComponentDiv {
-	public ForumSearchWrapper(
-			SynapseContextPropsProvider contextPropsProvider,
-			String forumId,
-			String projectId,
-			OnSearchResultsVisibleHandler onSearchResultsVisible) {
-		ForumSearchProps props = ForumSearchProps.create(forumId, projectId, onSearchResultsVisible);
-		ReactNode component = React.createElementWithSynapseContext(
-				SRC.SynapseComponents.ForumSearch,
-				props,
-				contextPropsProvider.getJsInteropContextProps()
-		);
-		this.render(component);
-	}
+
+  public ForumSearchWrapper(
+    SynapseContextPropsProvider contextPropsProvider,
+    String forumId,
+    String projectId,
+    OnSearchResultsVisibleHandler onSearchResultsVisible
+  ) {
+    ForumSearchProps props = ForumSearchProps.create(
+      forumId,
+      projectId,
+      onSearchResultsVisible
+    );
+    ReactNode component = React.createElementWithSynapseContext(
+      SRC.SynapseComponents.ForumSearch,
+      props,
+      contextPropsProvider.getJsInteropContextProps()
+    );
+    this.render(component);
+  }
 }

@@ -5,6 +5,10 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
+
+import com.google.gwt.http.client.RequestException;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Widget;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -19,87 +23,112 @@ import org.sagebionetworks.web.client.widget.googlemap.GoogleMap;
 import org.sagebionetworks.web.client.widget.googlemap.GoogleMapView;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-import com.google.gwt.http.client.RequestException;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Widget;
 
 public class GoogleMapTest {
-	GoogleMap map;
-	@Mock
-	GoogleMapView mockView;
-	@Mock
-	SynapseJSNIUtils mockSynapseJSNIUtils;
-	@Mock
-	SynapseAlert mockSynapseAlert;
-	@Mock
-	PortalGinInjector mockPortalGinInjector;
-	@Mock
-	LazyLoadHelper mockLazyLoadHelper;
-	@Mock
-	SynapseJavascriptClient mockJsClient;
 
-	@Before
-	public void setUp() throws Exception {
-		MockitoAnnotations.initMocks(this);
-		GoogleMap.isLoaded = true;
-		map = new GoogleMap(mockView, mockSynapseJSNIUtils, mockJsClient, mockSynapseAlert, mockPortalGinInjector, mockLazyLoadHelper);
-	}
+  GoogleMap map;
 
-	@Test
-	public void testConstruction() {
-		verify(mockView).setSynAlert(any(Widget.class));
-		verify(mockView).setPresenter(map);
+  @Mock
+  GoogleMapView mockView;
 
-	}
+  @Mock
+  SynapseJSNIUtils mockSynapseJSNIUtils;
 
-	private void simulateInView() {
-		ArgumentCaptor<Callback> captor = ArgumentCaptor.forClass(Callback.class);
-		verify(mockLazyLoadHelper).configure(captor.capture(), eq(mockView));
-		captor.getValue().invoke();
-	}
+  @Mock
+  SynapseAlert mockSynapseAlert;
 
-	@Test
-	public void testConfigureNotLoaded() throws RequestException {
-		GoogleMap.isLoaded = false;
-		map.configure();
-		verify(mockLazyLoadHelper).setIsConfigured();
-		verifyZeroInteractions(mockJsClient);
-		simulateInView();
-		// verify attempt to load
-		verify(mockJsClient).doGetString(eq(GoogleMap.GOOGLE_MAP_URL), eq(true), any(AsyncCallback.class));
-	}
+  @Mock
+  PortalGinInjector mockPortalGinInjector;
 
-	@Test
-	public void testConfigure() throws RequestException {
-		map.configure();
+  @Mock
+  LazyLoadHelper mockLazyLoadHelper;
 
-		String data = "map data";
-		AsyncMockStubber.callSuccessWith(data).when(mockJsClient).doGetString(anyString(), eq(true), any(AsyncCallback.class));
+  @Mock
+  SynapseJavascriptClient mockJsClient;
 
-		simulateInView();
-		// verify attempt to load all data
-		verify(mockView).showMap(data);
-	}
+  @Before
+  public void setUp() throws Exception {
+    MockitoAnnotations.initMocks(this);
+    GoogleMap.isLoaded = true;
+    map =
+      new GoogleMap(
+        mockView,
+        mockSynapseJSNIUtils,
+        mockJsClient,
+        mockSynapseAlert,
+        mockPortalGinInjector,
+        mockLazyLoadHelper
+      );
+  }
 
-	@Test
-	public void testConfigureTeam() throws RequestException {
-		String teamId = "1234987";
-		map.configure(teamId);
+  @Test
+  public void testConstruction() {
+    verify(mockView).setSynAlert(any(Widget.class));
+    verify(mockView).setPresenter(map);
+  }
 
-		String data = "map data";
-		AsyncMockStubber.callSuccessWith(data).when(mockJsClient).doGetString(anyString(), eq(true), any(AsyncCallback.class));
+  private void simulateInView() {
+    ArgumentCaptor<Callback> captor = ArgumentCaptor.forClass(Callback.class);
+    verify(mockLazyLoadHelper).configure(captor.capture(), eq(mockView));
+    captor.getValue().invoke();
+  }
 
-		simulateInView();
-		// verify attempt to load team data
-		verify(mockView).showMap(data);
-	}
+  @Test
+  public void testConfigureNotLoaded() throws RequestException {
+    GoogleMap.isLoaded = false;
+    map.configure();
+    verify(mockLazyLoadHelper).setIsConfigured();
+    verifyZeroInteractions(mockJsClient);
+    simulateInView();
+    // verify attempt to load
+    verify(mockJsClient)
+      .doGetString(
+        eq(GoogleMap.GOOGLE_MAP_URL),
+        eq(true),
+        any(AsyncCallback.class)
+      );
+  }
 
-	@Test
-	public void testFailedRequest() throws RequestException {
-		Exception ex = new Exception("failure to load");
-		AsyncMockStubber.callFailureWith(ex).when(mockJsClient).doGetString(anyString(), eq(true), any(AsyncCallback.class));
-		map.configure();
-		simulateInView();
-		verify(mockSynapseAlert).handleException(ex);
-	}
+  @Test
+  public void testConfigure() throws RequestException {
+    map.configure();
+
+    String data = "map data";
+    AsyncMockStubber
+      .callSuccessWith(data)
+      .when(mockJsClient)
+      .doGetString(anyString(), eq(true), any(AsyncCallback.class));
+
+    simulateInView();
+    // verify attempt to load all data
+    verify(mockView).showMap(data);
+  }
+
+  @Test
+  public void testConfigureTeam() throws RequestException {
+    String teamId = "1234987";
+    map.configure(teamId);
+
+    String data = "map data";
+    AsyncMockStubber
+      .callSuccessWith(data)
+      .when(mockJsClient)
+      .doGetString(anyString(), eq(true), any(AsyncCallback.class));
+
+    simulateInView();
+    // verify attempt to load team data
+    verify(mockView).showMap(data);
+  }
+
+  @Test
+  public void testFailedRequest() throws RequestException {
+    Exception ex = new Exception("failure to load");
+    AsyncMockStubber
+      .callFailureWith(ex)
+      .when(mockJsClient)
+      .doGetString(anyString(), eq(true), any(AsyncCallback.class));
+    map.configure();
+    simulateInView();
+    verify(mockSynapseAlert).handleException(ex);
+  }
 }

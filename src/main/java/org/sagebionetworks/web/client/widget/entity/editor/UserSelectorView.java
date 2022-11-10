@@ -1,24 +1,23 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
-import org.gwtbootstrap3.client.shared.event.ModalShownHandler;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import org.gwtbootstrap3.client.shared.event.ModalShownHandler;
 
 public interface UserSelectorView extends IsWidget {
+  void show();
 
-	void show();
+  void hide();
 
-	void hide();
+  void setSelectBox(Widget w);
 
-	void setSelectBox(Widget w);
+  void setPresenter(Presenter p);
 
-	void setPresenter(Presenter p);
+  void addModalShownHandler(ModalShownHandler modalShownHandler);
 
-	void addModalShownHandler(ModalShownHandler modalShownHandler);
+  public interface Presenter {
+    void onModalShown();
 
-	public interface Presenter {
-		void onModalShown();
-
-		void onModalHidden();
-	}
+    void onModalHidden();
+  }
 }

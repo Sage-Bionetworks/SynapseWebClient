@@ -4,6 +4,9 @@ import static org.sagebionetworks.web.client.ClientProperties.DEFAULT_PLACE_TOKE
 import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_DESCRIPTION_PART_1;
 import static org.sagebionetworks.web.shared.WebConstants.ISSUE_PRIORITY_MINOR;
 
+import com.google.gwt.user.client.rpc.StatusCodeException;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -26,139 +29,177 @@ import org.sagebionetworks.web.shared.exceptions.TooManyRequestsException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
-import com.google.gwt.user.client.rpc.StatusCodeException;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
-
 public class SynapseAlertImpl implements SynapseAlert {
-	public static final String SERVER_STATUS_CODE_MESSAGE = "Server responded with unexpected status code: ";
-	public static final String BROWSE_PATH = "/browse/";
-	GlobalApplicationState globalApplicationState;
-	AuthenticationController authController;
-	SynapseAlertView view;
-	Throwable ex;
-	SynapseJSNIUtils jsniUtils;
-	JSONObjectAdapter jsonObjectAdapter;
-	GWTWrapper gwt;
 
-	@Inject
-	public SynapseAlertImpl(SynapseAlertView view, GlobalApplicationState globalApplicationState, AuthenticationController authController, GWTWrapper gwt, SynapseJSNIUtils jsniUtils, JSONObjectAdapter jsonObjectAdapter) {
-		this.view = view;
-		this.globalApplicationState = globalApplicationState;
-		this.authController = authController;
-		this.jsniUtils = jsniUtils;
-		this.jsonObjectAdapter = jsonObjectAdapter;
-		this.gwt = gwt;
-	}
+  public static final String SERVER_STATUS_CODE_MESSAGE =
+    "Server responded with unexpected status code: ";
+  public static final String BROWSE_PATH = "/browse/";
+  GlobalApplicationState globalApplicationState;
+  AuthenticationController authController;
+  SynapseAlertView view;
+  Throwable ex;
+  SynapseJSNIUtils jsniUtils;
+  JSONObjectAdapter jsonObjectAdapter;
+  GWTWrapper gwt;
 
-	@Override
-	public void handleException(Throwable ex) {
-		clear();
-		this.ex = ex;
-		boolean isLoggedIn = authController.isLoggedIn();
-		String message = ex.getMessage() == null ? "" : ex.getMessage();
-		if (ex instanceof StatusCodeException) {
-			StatusCodeException sce = (StatusCodeException) ex;
-			if (sce.getStatusCode() == 0) {
-				// request failed (network error) or it's been aborted (left the page).
-				view.showError(DisplayConstants.NETWORK_ERROR);
-				view.setRetryButtonVisible(true);
-			} else if (DisplayUtils.isDefined(sce.getStatusText())) {
-				view.showError(sce.getStatusText());
-			} else {
-				view.showError(SERVER_STATUS_CODE_MESSAGE + sce.getStatusCode());
-			}
-		} else if (ex instanceof ReadOnlyModeException || ex instanceof SynapseDownException) {
-			globalApplicationState.getPlaceChanger().goTo(new Down(DEFAULT_PLACE_TOKEN));
-		} else if (ex instanceof UnauthorizedException) {
-			// send user to login page
-			// invalid session token. log out user and send to login place
-			authController.logoutUser();
-			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
-		} else if (ex instanceof ForbiddenException) {
-			if (!isLoggedIn) {
-				showLogin();
-			} else {
-				view.showError(DisplayConstants.ERROR_FAILURE_PRIVLEDGES + " " + message);
-			}
-		} else if (ex instanceof NotFoundException) {
-			view.showError(DisplayConstants.ERROR_NOT_FOUND + " " + message);
-		} else if (ex instanceof TooManyRequestsException) {
-			view.showError(DisplayConstants.ERROR_TOO_MANY_REQUESTS + "\n\n" + message);
-		} else if (ex instanceof ConflictingUpdateException) {
-			view.showError(DisplayConstants.ERROR_CONFLICTING_UPDATE + "\n" + message);
-		} else if (ex instanceof DeprecatedServiceException) {
-			view.showError(DisplayConstants.ERROR_DEPRECATED_SERVICE + "\n" + message);
-		} else if (ex instanceof UnknownErrorException || ex instanceof WebClientConfigurationException) {
-			// An unknown error occurred.
-			// Exception handling on the backend now throws the reason into the exception message. Easy!
-			view.showError(message);
-			if (isLoggedIn) {
-				onCreateJiraIssue(message);
-			}
-		} else {
-			// not recognized
-			if (message == null || message.isEmpty() || message.equals("0")) {
-				message = DisplayConstants.ERROR_RESPONSE_UNAVAILABLE;
-			}
+  @Inject
+  public SynapseAlertImpl(
+    SynapseAlertView view,
+    GlobalApplicationState globalApplicationState,
+    AuthenticationController authController,
+    GWTWrapper gwt,
+    SynapseJSNIUtils jsniUtils,
+    JSONObjectAdapter jsonObjectAdapter
+  ) {
+    this.view = view;
+    this.globalApplicationState = globalApplicationState;
+    this.authController = authController;
+    this.jsniUtils = jsniUtils;
+    this.jsonObjectAdapter = jsonObjectAdapter;
+    this.gwt = gwt;
+  }
 
-			// if this is json, report the reason value (if available)
-			try {
-				JSONObjectAdapter json = jsonObjectAdapter.createNew(message);
-				if (json.has("reason")) {
-					message = json.getString("reason");
-				}
-			} catch (Throwable e) {
-				// was not json
-			}
+  @Override
+  public void handleException(Throwable ex) {
+    clear();
+    this.ex = ex;
+    boolean isLoggedIn = authController.isLoggedIn();
+    String message = ex.getMessage() == null ? "" : ex.getMessage();
+    if (ex instanceof StatusCodeException) {
+      StatusCodeException sce = (StatusCodeException) ex;
+      if (sce.getStatusCode() == 0) {
+        // request failed (network error) or it's been aborted (left the page).
+        view.showError(DisplayConstants.NETWORK_ERROR);
+        view.setRetryButtonVisible(true);
+      } else if (DisplayUtils.isDefined(sce.getStatusText())) {
+        view.showError(sce.getStatusText());
+      } else {
+        view.showError(SERVER_STATUS_CODE_MESSAGE + sce.getStatusCode());
+      }
+    } else if (
+      ex instanceof ReadOnlyModeException || ex instanceof SynapseDownException
+    ) {
+      globalApplicationState
+        .getPlaceChanger()
+        .goTo(new Down(DEFAULT_PLACE_TOKEN));
+    } else if (ex instanceof UnauthorizedException) {
+      // send user to login page
+      // invalid session token. log out user and send to login place
+      authController.logoutUser();
+      globalApplicationState
+        .getPlaceChanger()
+        .goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+    } else if (ex instanceof ForbiddenException) {
+      if (!isLoggedIn) {
+        showLogin();
+      } else {
+        view.showError(
+          DisplayConstants.ERROR_FAILURE_PRIVLEDGES + " " + message
+        );
+      }
+    } else if (ex instanceof NotFoundException) {
+      view.showError(DisplayConstants.ERROR_NOT_FOUND + " " + message);
+    } else if (ex instanceof TooManyRequestsException) {
+      view.showError(
+        DisplayConstants.ERROR_TOO_MANY_REQUESTS + "\n\n" + message
+      );
+    } else if (ex instanceof ConflictingUpdateException) {
+      view.showError(
+        DisplayConstants.ERROR_CONFLICTING_UPDATE + "\n" + message
+      );
+    } else if (ex instanceof DeprecatedServiceException) {
+      view.showError(
+        DisplayConstants.ERROR_DEPRECATED_SERVICE + "\n" + message
+      );
+    } else if (
+      ex instanceof UnknownErrorException ||
+      ex instanceof WebClientConfigurationException
+    ) {
+      // An unknown error occurred.
+      // Exception handling on the backend now throws the reason into the exception message. Easy!
+      view.showError(message);
+      if (isLoggedIn) {
+        onCreateJiraIssue(message);
+      }
+    } else {
+      // not recognized
+      if (message == null || message.isEmpty() || message.equals("0")) {
+        message = DisplayConstants.ERROR_RESPONSE_UNAVAILABLE;
+      }
 
-			view.showError(message);
-		}
-	}
+      // if this is json, report the reason value (if available)
+      try {
+        JSONObjectAdapter json = jsonObjectAdapter.createNew(message);
+        if (json.has("reason")) {
+          message = json.getString("reason");
+        }
+      } catch (Throwable e) {
+        // was not json
+      }
 
-	public void onCreateJiraIssue(String errorMessage) {
-		String userId = WebConstants.ANONYMOUS, email = WebConstants.ANONYMOUS, displayName = WebConstants.ANONYMOUS;
-		UserProfile userProfile = authController.getCurrentUserProfile();
-		if (userProfile != null) {
-			userId = userProfile.getOwnerId();
-			displayName = DisplayUtils.getDisplayName(userProfile);
-		}
-		String description = FLAG_ISSUE_DESCRIPTION_PART_1 + gwt.getCurrentURL() + "\n\n" + errorMessage;
+      view.showError(message);
+    }
+  }
 
-		jsniUtils.showJiraIssueCollector("", description, WebConstants.SWC_ISSUE_COLLECTOR_URL, userId, displayName, email, "", "", "", ISSUE_PRIORITY_MINOR);
-	}
+  public void onCreateJiraIssue(String errorMessage) {
+    String userId = WebConstants.ANONYMOUS, email =
+      WebConstants.ANONYMOUS, displayName = WebConstants.ANONYMOUS;
+    UserProfile userProfile = authController.getCurrentUserProfile();
+    if (userProfile != null) {
+      userId = userProfile.getOwnerId();
+      displayName = DisplayUtils.getDisplayName(userProfile);
+    }
+    String description =
+      FLAG_ISSUE_DESCRIPTION_PART_1 +
+      gwt.getCurrentURL() +
+      "\n\n" +
+      errorMessage;
 
-	@Override
-	public Widget asWidget() {
-		return view.asWidget();
-	}
+    jsniUtils.showJiraIssueCollector(
+      "",
+      description,
+      WebConstants.SWC_ISSUE_COLLECTOR_URL,
+      userId,
+      displayName,
+      email,
+      "",
+      "",
+      "",
+      ISSUE_PRIORITY_MINOR
+    );
+  }
 
-	@Override
-	public void showError(String error) {
-		clear();
-		view.showError(error);
-	}
+  @Override
+  public Widget asWidget() {
+    return view.asWidget();
+  }
 
-	@Override
-	public boolean isUserLoggedIn() {
-		return authController.isLoggedIn();
-	}
+  @Override
+  public void showError(String error) {
+    clear();
+    view.showError(error);
+  }
 
-	@Override
-	public void showLogin() {
-		clear();
-		// show a link to the login page 
-		view.showLogin();
-	}
+  @Override
+  public boolean isUserLoggedIn() {
+    return authController.isLoggedIn();
+  }
 
-	@Override
-	public void clear() {
-		view.clearState();
-		ex = null;
-	}
+  @Override
+  public void showLogin() {
+    clear();
+    // show a link to the login page
+    view.showLogin();
+  }
 
-	@Override
-	public void consoleError(String errorMessage) {
-		jsniUtils.consoleError(errorMessage);
-	}
+  @Override
+  public void clear() {
+    view.clearState();
+    ex = null;
+  }
+
+  @Override
+  public void consoleError(String errorMessage) {
+    jsniUtils.consoleError(errorMessage);
+  }
 }

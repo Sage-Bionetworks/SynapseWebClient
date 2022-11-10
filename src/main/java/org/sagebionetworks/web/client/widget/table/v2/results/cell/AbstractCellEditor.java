@@ -7,60 +7,60 @@ import com.google.gwt.user.client.ui.Widget;
 
 /**
  * Abstract base class for table cell editors.
- * 
+ *
  * @author jhill
  *
  */
 public abstract class AbstractCellEditor implements CellEditor {
 
-	CellEditorView view;
+  CellEditorView view;
 
-	public AbstractCellEditor(CellEditorView view) {
-		this.view = view;
-	}
+  public AbstractCellEditor(CellEditorView view) {
+    this.view = view;
+  }
 
-	@Override
-	public Widget asWidget() {
-		return view.asWidget();
-	}
+  @Override
+  public Widget asWidget() {
+    return view.asWidget();
+  }
 
-	@Override
-	public void setValue(String value) {
-		view.setValue(value);
-	}
+  @Override
+  public void setValue(String value) {
+    view.setValue(value);
+  }
 
-	@Override
-	public String getValue() {
-		return view.getValue();
-	}
+  @Override
+  public String getValue() {
+    return view.getValue();
+  }
 
-	@Override
-	public HandlerRegistration addKeyDownHandler(KeyDownHandler handler) {
-		return view.addKeyDownHandler(handler);
-	}
+  @Override
+  public HandlerRegistration addKeyDownHandler(KeyDownHandler handler) {
+    return view.addKeyDownHandler(handler);
+  }
 
-	@Override
-	public void fireEvent(GwtEvent<?> event) {
-		view.fireEvent(event);
-	}
+  @Override
+  public void fireEvent(GwtEvent<?> event) {
+    view.fireEvent(event);
+  }
 
-	@Override
-	public int getTabIndex() {
-		return view.getTabIndex();
-	}
+  @Override
+  public int getTabIndex() {
+    return view.getTabIndex();
+  }
 
-	@Override
-	public void setAccessKey(char key) {
-		view.setAccessKey(key);
-	}
+  @Override
+  public void setAccessKey(char key) {
+    view.setAccessKey(key);
+  }
 
-	@Override
-	public void setFocus(boolean focused) {
-		view.setFocus(focused);
-	}
+  @Override
+  public void setFocus(boolean focused) {
+    view.setFocus(focused);
+  }
 
-	@Override
-	public void setTabIndex(int index) {
-		view.setTabIndex(index);
-	}
+  @Override
+  public void setTabIndex(int index) {
+    view.setTabIndex(index);
+  }
 }

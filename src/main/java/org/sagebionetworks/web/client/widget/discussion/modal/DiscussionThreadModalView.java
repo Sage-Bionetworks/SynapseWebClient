@@ -1,48 +1,50 @@
 package org.sagebionetworks.web.client.widget.discussion.modal;
 
-import org.sagebionetworks.web.client.utils.Callback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import org.sagebionetworks.web.client.utils.Callback;
 
 public interface DiscussionThreadModalView extends IsWidget {
+  public interface Presenter {
+    public void show();
 
-	public interface Presenter {
+    public void hide();
 
-		public void show();
+    Widget asWidget();
 
-		public void hide();
+    void onSave();
 
-		Widget asWidget();
+    void onCancel();
+  }
 
-		void onSave();
+  void setPresenter(Presenter presenter);
 
-		void onCancel();
-	}
+  void showDialog();
 
-	void setPresenter(Presenter presenter);
+  void hideDialog();
 
-	void showDialog();
+  String getThreadTitle();
 
-	void hideDialog();
+  void clear();
 
-	String getThreadTitle();
+  void setAlert(Widget w);
 
-	void clear();
+  void showSuccess(String title, String message);
 
-	void setAlert(Widget w);
+  void showSaving();
 
-	void showSuccess(String title, String message);
+  void resetButton();
 
-	void showSaving();
+  void setThreadTitle(String currentTitle);
 
-	void resetButton();
+  void setModalTitle(String title);
 
-	void setThreadTitle(String currentTitle);
+  void setMarkdownEditor(Widget widget);
 
-	void setModalTitle(String title);
-
-	void setMarkdownEditor(Widget widget);
-
-	void showConfirmDialog(String restoreTitle, String restoreMessage, Callback yesCallback, Callback noCallback);
-
+  void showConfirmDialog(
+    String restoreTitle,
+    String restoreMessage,
+    Callback yesCallback,
+    Callback noCallback
+  );
 }

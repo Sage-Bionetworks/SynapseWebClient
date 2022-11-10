@@ -1,40 +1,38 @@
 package org.sagebionetworks.web.client.view.users;
 
-import org.sagebionetworks.web.client.SynapseView;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import org.sagebionetworks.web.client.SynapseView;
 
 public interface PasswordResetView extends IsWidget, SynapseView {
+  /**
+   * Set this view's presenter
+   *
+   * @param presenter
+   */
+  public void setPresenter(Presenter presenter);
 
-	/**
-	 * Set this view's presenter
-	 * 
-	 * @param presenter
-	 */
-	public void setPresenter(Presenter presenter);
+  public void showRequestForm();
 
-	public void showRequestForm();
+  public void showResetForm();
 
-	public void showResetForm();
+  public void showPasswordResetRequired();
 
-	public void showPasswordResetRequired();
+  public void showPasswordResetSuccess();
 
-	public void showPasswordResetSuccess();
+  public void showRequestSentSuccess();
 
-	public void showRequestSentSuccess();
+  public void clear();
 
-	public void clear();
+  void setSynAlertWidget(Widget w);
 
-	void setSynAlertWidget(Widget w);
+  void setSubmitButtonEnabled(boolean enabled);
 
-	void setSubmitButtonEnabled(boolean enabled);
+  public interface Presenter {
+    public void requestPasswordReset(String emailAddress);
 
-	public interface Presenter {
-		public void requestPasswordReset(String emailAddress);
+    public void resetPassword(String currentPassword, String newPassword);
+  }
 
-		public void resetPassword(String currentPassword, String newPassword);
-	}
-
-	public void showExpiredRequest();
-
+  public void showExpiredRequest();
 }

@@ -1,5 +1,9 @@
 package org.sagebionetworks.web.client.widget.provenance;
 
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,157 +22,179 @@ import org.sagebionetworks.web.shared.provenance.ExternalGraphNode;
 import org.sagebionetworks.web.shared.provenance.ProvGraph;
 import org.sagebionetworks.web.shared.provenance.ProvGraphEdge;
 import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 
-public class ProvenanceWidgetViewImpl extends FlowPanel implements ProvenanceWidgetView {
-	private Presenter presenter;
-	private SageImageBundle sageImageBundle;
-	private IconsImageBundle iconsImageBundle;
-	private PortalGinInjector ginInjector;
-	private ProvGraph graph;
-	private FlowPanel debug;
-	private SynapseJSNIUtils synapseJSNIUtils;
-	private HashMap<String, String> filledPopoverIds;
-	private Integer height = null;
-	private static final String TOP3_LEFT3 = "margin-left-3 margin-top-3";
-	private Div synAlertContainer = new Div();
-	private FlowPanel container;
-	private FlowPanel thisLayoutContainer;
-	private FlowPanel prov;
-	private IsWidget loadingContainer;
-	private Map<String, ProvNodeContainer> nodeToContainer;
+public class ProvenanceWidgetViewImpl
+  extends FlowPanel
+  implements ProvenanceWidgetView {
 
-	@Inject
-	public ProvenanceWidgetViewImpl(SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle, SynapseJSNIUtils synapseJSNIUtils, PortalGinInjector ginInjector) {
-		this.sageImageBundle = sageImageBundle;
-		this.iconsImageBundle = iconsImageBundle;
-		this.synapseJSNIUtils = synapseJSNIUtils;
-		this.ginInjector = ginInjector;
+  private Presenter presenter;
+  private SageImageBundle sageImageBundle;
+  private IconsImageBundle iconsImageBundle;
+  private PortalGinInjector ginInjector;
+  private ProvGraph graph;
+  private FlowPanel debug;
+  private SynapseJSNIUtils synapseJSNIUtils;
+  private HashMap<String, String> filledPopoverIds;
+  private Integer height = null;
+  private static final String TOP3_LEFT3 = "margin-left-3 margin-top-3";
+  private Div synAlertContainer = new Div();
+  private FlowPanel container;
+  private FlowPanel thisLayoutContainer;
+  private FlowPanel prov;
+  private IsWidget loadingContainer;
+  private Map<String, ProvNodeContainer> nodeToContainer;
 
-		container = new FlowPanel();
-		this.thisLayoutContainer = this;
-		this.add(container);
-		this.add(synAlertContainer);
-		loadingContainer = DisplayUtils.getLoadingWidget("Loading provenance");
-	}
+  @Inject
+  public ProvenanceWidgetViewImpl(
+    SageImageBundle sageImageBundle,
+    IconsImageBundle iconsImageBundle,
+    SynapseJSNIUtils synapseJSNIUtils,
+    PortalGinInjector ginInjector
+  ) {
+    this.sageImageBundle = sageImageBundle;
+    this.iconsImageBundle = iconsImageBundle;
+    this.synapseJSNIUtils = synapseJSNIUtils;
+    this.ginInjector = ginInjector;
 
-	@Override
-	public void setGraph(ProvGraph graph) {
-		this.graph = graph;
-		createGraph();
-	}
+    container = new FlowPanel();
+    this.thisLayoutContainer = this;
+    this.add(container);
+    this.add(synAlertContainer);
+    loadingContainer = DisplayUtils.getLoadingWidget("Loading provenance");
+  }
 
-	@Override
-	public Widget asWidget() {
-		return this;
-	}
+  @Override
+  public void setGraph(ProvGraph graph) {
+    this.graph = graph;
+    createGraph();
+  }
 
-	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-	}
+  @Override
+  public Widget asWidget() {
+    return this;
+  }
 
-	@Override
-	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
-	}
+  @Override
+  public void setPresenter(Presenter presenter) {
+    this.presenter = presenter;
+  }
 
-	@Override
-	public void showLoading() {
-		container.add(loadingContainer);
-		container.addStyleName(TOP3_LEFT3);
-	}
+  @Override
+  public void showErrorMessage(String message) {
+    DisplayUtils.showErrorMessage(message);
+  }
 
-	@Override
-	public void showInfo(String message) {
-		DisplayUtils.showInfo(message);
-	}
+  @Override
+  public void showLoading() {
+    container.add(loadingContainer);
+    container.addStyleName(TOP3_LEFT3);
+  }
 
-	@Override
-	public void clear() {
-		container.clear();
-	}
+  @Override
+  public void showInfo(String message) {
+    DisplayUtils.showInfo(message);
+  }
 
-	@Override
-	public void setHeight(int height) {
-		this.height = height;
-	}
+  @Override
+  public void clear() {
+    container.clear();
+  }
 
-	/*
-	 * Private Methods
-	 */
-	private void createGraph() {
-		nodeToContainer = new HashMap<String, ProvNodeContainer>();
-		this.filledPopoverIds = new HashMap<String, String>();
-		prov = new FlowPanel();
-		if (height != null) {
-			prov.setHeight(height + "px");
-		}
-		prov.addStyleName("position-relative margin-5");
-		ProvNodeContainer startingNodeContainer = null;
-		if (graph != null) {
-			container.clear();
-			// add nodes to graph
-			Set<ProvGraphNode> nodes = graph.getNodes();
-			for (ProvGraphNode node : nodes) {
-				ProvNodeContainer container = getNodeContainer(node);
-				nodeToContainer.put(node.getId(), container);
-				prov.add(container);
-				if (node.isStartingNode()) {
-					startingNodeContainer = container;
-				}
-			}
-		}
+  @Override
+  public void setHeight(int height) {
+    this.height = height;
+  }
 
-		container.add(prov);
-		this.addStyleName("scroll-auto");
+  /*
+   * Private Methods
+   */
+  private void createGraph() {
+    nodeToContainer = new HashMap<String, ProvNodeContainer>();
+    this.filledPopoverIds = new HashMap<String, String>();
+    prov = new FlowPanel();
+    if (height != null) {
+      prov.setHeight(height + "px");
+    }
+    prov.addStyleName("position-relative margin-5");
+    ProvNodeContainer startingNodeContainer = null;
+    if (graph != null) {
+      container.clear();
+      // add nodes to graph
+      Set<ProvGraphNode> nodes = graph.getNodes();
+      for (ProvGraphNode node : nodes) {
+        ProvNodeContainer container = getNodeContainer(node);
+        nodeToContainer.put(node.getId(), container);
+        prov.add(container);
+        if (node.isStartingNode()) {
+          startingNodeContainer = container;
+        }
+      }
+    }
 
-		if (graph != null) {
-			// make connections (assure DOM elements are in before asking jsPlumb to connect
-			// them)
-			beforeJSPlumbLoad(prov.getElement().getId());
-			Set<ProvGraphEdge> edges = graph.getEdges();
-			for (ProvGraphEdge edge : edges) {
-				connect(edge.getSink().getId(), edge.getSource().getId());
-			}
+    container.add(prov);
+    this.addStyleName("scroll-auto");
 
-			// look for old versions
-			presenter.findOldVersions();
-			afterJSPlumbLoad();
-		}
+    if (graph != null) {
+      // make connections (assure DOM elements are in before asking jsPlumb to connect
+      // them)
+      beforeJSPlumbLoad(prov.getElement().getId());
+      Set<ProvGraphEdge> edges = graph.getEdges();
+      for (ProvGraphEdge edge : edges) {
+        connect(edge.getSink().getId(), edge.getSource().getId());
+      }
 
-		if (startingNodeContainer != null && graph.getNodes().size() > 3 && DisplayUtils.isInViewport(startingNodeContainer)) {
-			startingNodeContainer.getElement().scrollIntoView();
-		}
-	}
+      // look for old versions
+      presenter.findOldVersions();
+      afterJSPlumbLoad();
+    }
 
-	/**
-	 * Create an actual LayoutContainer rendering of the node
-	 * 
-	 * @param node
-	 * @return
-	 */
-	private ProvNodeContainer getNodeContainer(final ProvGraphNode node) {
-		if (node instanceof EntityGraphNode) {
-			ProvNodeContainer container = ProvViewUtil.createEntityContainer((EntityGraphNode) node, iconsImageBundle);
-			return container;
-		} else if (node instanceof ActivityGraphNode) {
-			ProvNodeContainer container = ProvViewUtil.createActivityContainer((ActivityGraphNode) node, iconsImageBundle, ginInjector);
-			// create tool tip for defined activities only
-			return container;
-		} else if (node instanceof ExpandGraphNode) {
-			return ProvViewUtil.createExpandContainer((ExpandGraphNode) node, presenter, this);
-		} else if (node instanceof ExternalGraphNode) {
-			ProvNodeContainer container = ProvViewUtil.createExternalUrlContainer((ExternalGraphNode) node, iconsImageBundle);
-			return container;
-		}
-		return null;
-	}
+    if (
+      startingNodeContainer != null &&
+      graph.getNodes().size() > 3 &&
+      DisplayUtils.isInViewport(startingNodeContainer)
+    ) {
+      startingNodeContainer.getElement().scrollIntoView();
+    }
+  }
 
-	private static native void connect(String parentId, String childId) /*-{
+  /**
+   * Create an actual LayoutContainer rendering of the node
+   *
+   * @param node
+   * @return
+   */
+  private ProvNodeContainer getNodeContainer(final ProvGraphNode node) {
+    if (node instanceof EntityGraphNode) {
+      ProvNodeContainer container = ProvViewUtil.createEntityContainer(
+        (EntityGraphNode) node,
+        iconsImageBundle
+      );
+      return container;
+    } else if (node instanceof ActivityGraphNode) {
+      ProvNodeContainer container = ProvViewUtil.createActivityContainer(
+        (ActivityGraphNode) node,
+        iconsImageBundle,
+        ginInjector
+      );
+      // create tool tip for defined activities only
+      return container;
+    } else if (node instanceof ExpandGraphNode) {
+      return ProvViewUtil.createExpandContainer(
+        (ExpandGraphNode) node,
+        presenter,
+        this
+      );
+    } else if (node instanceof ExternalGraphNode) {
+      ProvNodeContainer container = ProvViewUtil.createExternalUrlContainer(
+        (ExternalGraphNode) node,
+        iconsImageBundle
+      );
+      return container;
+    }
+    return null;
+  }
+
+  private static native void connect(String parentId, String childId) /*-{
 		try {
 			jsPlumbInstance.connect({
 				source : parentId,
@@ -180,13 +206,13 @@ public class ProvenanceWidgetViewImpl extends FlowPanel implements ProvenanceWid
 		}
 	}-*/;
 
-	/**
-	 * Call before connecting divs. Suspends drawing graph until bulk operation is complete (call
-	 * afterJSPlumbLoad)
-	 * 
-	 * @param parentContainerId
-	 */
-	private static native void beforeJSPlumbLoad(String containerId) /*-{
+  /**
+   * Call before connecting divs. Suspends drawing graph until bulk operation is complete (call
+   * afterJSPlumbLoad)
+   *
+   * @param parentContainerId
+   */
+  private static native void beforeJSPlumbLoad(String containerId) /*-{
 		;
 		(function() {
 			$wnd.jsPlumbDemo = {
@@ -257,10 +283,10 @@ public class ProvenanceWidgetViewImpl extends FlowPanel implements ProvenanceWid
 		}
 	}-*/;
 
-	/**
-	 * Call after connecting divs.
-	 */
-	private static native void afterJSPlumbLoad() /*-{
+  /**
+   * Call after connecting divs.
+   */
+  private static native void afterJSPlumbLoad() /*-{
 		try {
 			jsPlumbInstance.setSuspendDrawing(false, true);
 		} catch (err) {
@@ -268,19 +294,23 @@ public class ProvenanceWidgetViewImpl extends FlowPanel implements ProvenanceWid
 		}
 	}-*/;
 
-	@Override
-	public void markOldVersions(List<String> notCurrentNodeIds) {
-		for (String nodeId : notCurrentNodeIds) {
-			ProvNodeContainer container = nodeToContainer.get(nodeId);
-			if (container != null) {
-				container.showMessage("<span class=\"small moveup-5\">(" + DisplayConstants.OLD_VERSION + ")</span>");
-			}
-		}
-	}
+  @Override
+  public void markOldVersions(List<String> notCurrentNodeIds) {
+    for (String nodeId : notCurrentNodeIds) {
+      ProvNodeContainer container = nodeToContainer.get(nodeId);
+      if (container != null) {
+        container.showMessage(
+          "<span class=\"small moveup-5\">(" +
+          DisplayConstants.OLD_VERSION +
+          ")</span>"
+        );
+      }
+    }
+  }
 
-	@Override
-	public void setSynAlert(IsWidget w) {
-		synAlertContainer.clear();
-		synAlertContainer.add(w);
-	}
+  @Override
+  public void setSynAlert(IsWidget w) {
+    synAlertContainer.clear();
+    synAlertContainer.add(w);
+  }
 }

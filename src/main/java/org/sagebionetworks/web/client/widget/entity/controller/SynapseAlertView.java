@@ -8,24 +8,24 @@ import com.google.gwt.user.client.ui.Widget;
  *
  */
 public interface SynapseAlertView extends IsWidget {
-	/**
-	 * Clears all state in the view (makes all components invisible).
-	 */
-	void clearState();
+  /**
+   * Clears all state in the view (makes all components invisible).
+   */
+  void clearState();
 
-	/**
-	 * Show the error in an alert.
-	 * 
-	 * @param error
-	 */
-	void showError(String error);
+  /**
+   * Show the error in an alert.
+   *
+   * @param error
+   */
+  void showError(String error);
 
-	/**
-	 * Show a special login alert, that includes a link to the login page.
-	 */
-	void showLogin();
+  /**
+   * Show a special login alert, that includes a link to the login page.
+   */
+  void showLogin();
 
-	void reload();
+  void reload();
 
-	void setRetryButtonVisible(boolean visible);
+  void setRetryButtonVisible(boolean visible);
 }

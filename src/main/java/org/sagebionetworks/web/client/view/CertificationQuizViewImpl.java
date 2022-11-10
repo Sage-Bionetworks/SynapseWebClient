@@ -1,36 +1,44 @@
 package org.sagebionetworks.web.client.view;
 
-import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
-import org.sagebionetworks.web.client.widget.certificationquiz.CertificationQuiz;
-import org.sagebionetworks.web.client.widget.header.Header;
-
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.widget.certificationquiz.CertificationQuiz;
+import org.sagebionetworks.web.client.widget.header.Header;
 
-public class CertificationQuizViewImpl extends Composite implements CertificationQuizView {
+public class CertificationQuizViewImpl
+  extends Composite
+  implements CertificationQuizView {
 
-    public interface CertificationViewImplUiBinder extends UiBinder<Widget, CertificationQuizViewImpl>{}
-    @UiField
-    SimplePanel quizContainer;
-    private Header headerWidget;
-    private SynapseContextPropsProvider propsProvider;
+  public interface CertificationViewImplUiBinder
+    extends UiBinder<Widget, CertificationQuizViewImpl> {}
 
-    @Inject
-    public CertificationQuizViewImpl(CertificationViewImplUiBinder binder, Header headerWidget, SynapseContextPropsProvider propsProvider){
-        initWidget(binder.createAndBindUi(this));
-        this.headerWidget = headerWidget;
-        this.propsProvider = propsProvider;
-        headerWidget.configure();
-    }
+  @UiField
+  SimplePanel quizContainer;
 
-    @Override
-    public void createReactComponentWidget(){
-        CertificationQuiz component = new CertificationQuiz(this.propsProvider);
-        quizContainer.clear();
-        quizContainer.add(component);
-    }
+  private Header headerWidget;
+  private SynapseContextPropsProvider propsProvider;
+
+  @Inject
+  public CertificationQuizViewImpl(
+    CertificationViewImplUiBinder binder,
+    Header headerWidget,
+    SynapseContextPropsProvider propsProvider
+  ) {
+    initWidget(binder.createAndBindUi(this));
+    this.headerWidget = headerWidget;
+    this.propsProvider = propsProvider;
+    headerWidget.configure();
+  }
+
+  @Override
+  public void createReactComponentWidget() {
+    CertificationQuiz component = new CertificationQuiz(this.propsProvider);
+    quizContainer.clear();
+    quizContainer.add(component);
+  }
 }

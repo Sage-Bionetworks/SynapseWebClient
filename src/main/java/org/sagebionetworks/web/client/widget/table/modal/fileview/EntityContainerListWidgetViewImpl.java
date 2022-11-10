@@ -1,5 +1,12 @@
 package org.sagebionetworks.web.client.widget.table.modal.fileview;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Icon;
@@ -8,95 +15,105 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.DisplayUtils;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 
-public class EntityContainerListWidgetViewImpl implements EntityContainerListWidgetView {
-	public interface Binder extends UiBinder<Widget, EntityContainerListWidgetViewImpl> {
-	}
+public class EntityContainerListWidgetViewImpl
+  implements EntityContainerListWidgetView {
 
-	Widget widget;
-	Presenter presenter;
-	@UiField
-	Div synAlertContainer;
-	@UiField
-	Div entitiesContainer;
-	@UiField
-	Span noContainers;
-	@UiField
-	Button addButton;
+  public interface Binder
+    extends UiBinder<Widget, EntityContainerListWidgetViewImpl> {}
 
-	@Inject
-	public EntityContainerListWidgetViewImpl(Binder binder) {
-		widget = binder.createAndBindUi(this);
-		addButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onAddEntity();
-			}
-		});
-	}
+  Widget widget;
+  Presenter presenter;
 
-	@Override
-	public void clear() {
-		entitiesContainer.clear();
-	}
+  @UiField
+  Div synAlertContainer;
 
-	@Override
-	public Widget asWidget() {
-		return widget;
-	}
+  @UiField
+  Div entitiesContainer;
 
-	@Override
-	public void addEntity(final String id, String name, boolean showDeleteButton) {
-		final Div row = new Div();
-		row.addStyleName("padding-5 light-border-bottom");
-		Anchor entityLink = new Anchor(name, DisplayUtils.getSynapseHistoryToken(id));
-		entityLink.setTarget("_blank");
-		row.add(entityLink);
-		Span entityIdSpan = new Span();
-		entityIdSpan.setMarginLeft(3);
-		entityIdSpan.setMarginRight(6);
-		entityIdSpan.add(new Text("(" + id + ")"));
-		row.add(entityIdSpan);
+  @UiField
+  Span noContainers;
 
-		if (showDeleteButton) {
-			Icon deleteButton = new Icon(IconType.TIMES);
-			deleteButton.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					entitiesContainer.remove(row);
-					presenter.onRemoveEntity(id);
-				}
-			});
-			deleteButton.addStyleName("imageButton text-primary");
-			row.add(deleteButton);
-		}
-		entitiesContainer.add(row);
-	}
+  @UiField
+  Button addButton;
 
-	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-	}
+  @Inject
+  public EntityContainerListWidgetViewImpl(Binder binder) {
+    widget = binder.createAndBindUi(this);
+    addButton.addClickHandler(
+      new ClickHandler() {
+        @Override
+        public void onClick(ClickEvent event) {
+          presenter.onAddEntity();
+        }
+      }
+    );
+  }
 
-	@Override
-	public void setSynAlert(IsWidget w) {
-		synAlertContainer.add(w);
-	}
+  @Override
+  public void clear() {
+    entitiesContainer.clear();
+  }
 
-	@Override
-	public void setAddButtonVisible(boolean visible) {
-		addButton.setVisible(visible);
-	}
+  @Override
+  public Widget asWidget() {
+    return widget;
+  }
 
-	@Override
-	public void setNoContainers(boolean visible) {
-		noContainers.setVisible(visible);
-	}
+  @Override
+  public void addEntity(
+    final String id,
+    String name,
+    boolean showDeleteButton
+  ) {
+    final Div row = new Div();
+    row.addStyleName("padding-5 light-border-bottom");
+    Anchor entityLink = new Anchor(
+      name,
+      DisplayUtils.getSynapseHistoryToken(id)
+    );
+    entityLink.setTarget("_blank");
+    row.add(entityLink);
+    Span entityIdSpan = new Span();
+    entityIdSpan.setMarginLeft(3);
+    entityIdSpan.setMarginRight(6);
+    entityIdSpan.add(new Text("(" + id + ")"));
+    row.add(entityIdSpan);
+
+    if (showDeleteButton) {
+      Icon deleteButton = new Icon(IconType.TIMES);
+      deleteButton.addClickHandler(
+        new ClickHandler() {
+          @Override
+          public void onClick(ClickEvent event) {
+            entitiesContainer.remove(row);
+            presenter.onRemoveEntity(id);
+          }
+        }
+      );
+      deleteButton.addStyleName("imageButton text-primary");
+      row.add(deleteButton);
+    }
+    entitiesContainer.add(row);
+  }
+
+  @Override
+  public void setPresenter(Presenter presenter) {
+    this.presenter = presenter;
+  }
+
+  @Override
+  public void setSynAlert(IsWidget w) {
+    synAlertContainer.add(w);
+  }
+
+  @Override
+  public void setAddButtonVisible(boolean visible) {
+    addButton.setVisible(visible);
+  }
+
+  @Override
+  public void setNoContainers(boolean visible) {
+    noContainers.setVisible(visible);
+  }
 }

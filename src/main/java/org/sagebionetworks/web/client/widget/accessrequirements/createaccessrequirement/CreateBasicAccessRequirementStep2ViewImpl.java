@@ -1,10 +1,5 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement;
 
-import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.CheckBox;
-import org.gwtbootstrap3.client.ui.FormGroup;
-import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Paragraph;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -12,105 +7,124 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.CheckBox;
+import org.gwtbootstrap3.client.ui.FormGroup;
+import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Paragraph;
 
-public class CreateBasicAccessRequirementStep2ViewImpl implements CreateBasicAccessRequirementStep2View {
+public class CreateBasicAccessRequirementStep2ViewImpl
+  implements CreateBasicAccessRequirementStep2View {
 
-	public interface Binder extends UiBinder<Widget, CreateBasicAccessRequirementStep2ViewImpl> {
-	}
+  public interface Binder
+    extends UiBinder<Widget, CreateBasicAccessRequirementStep2ViewImpl> {}
 
-	Widget widget;
-	@UiField
-	FormGroup oldInstructionsUI;
-	@UiField
-	Paragraph oldInstructions;
-	@UiField
-	Div wikiPageContainer;
-	@UiField
-	Button editWikiButton;
-	@UiField
-	Button clearOldTermsButton;
-	@UiField
-	Div synAlertContainer;
-	@UiField
-	Div hasAccessorRequirementUI;
-	@UiField
-	CheckBox validatedCheckbox;
-	@UiField
-	CheckBox certifiedCheckbox;
-	Presenter presenter;
+  Widget widget;
 
-	@Inject
-	public CreateBasicAccessRequirementStep2ViewImpl(Binder binder) {
-		widget = binder.createAndBindUi(this);
-		editWikiButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onEditWiki();
-			}
-		});
-		clearOldTermsButton.addClickHandler(new ClickHandler() {
+  @UiField
+  FormGroup oldInstructionsUI;
 
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onClearOldInstructions();
-			}
-		});
-	}
+  @UiField
+  Paragraph oldInstructions;
 
-	@Override
-	public Widget asWidget() {
-		return widget;
-	}
+  @UiField
+  Div wikiPageContainer;
 
-	@Override
-	public void setPresenter(Presenter p) {
-		this.presenter = p;
-	}
+  @UiField
+  Button editWikiButton;
 
-	@Override
-	public void setOldTermsVisible(boolean visible) {
-		oldInstructionsUI.setVisible(visible);
-	}
+  @UiField
+  Button clearOldTermsButton;
 
-	@Override
-	public void setOldTerms(String terms) {
-		oldInstructions.setText(terms);
-	}
+  @UiField
+  Div synAlertContainer;
 
-	@Override
-	public void setWikiPageRenderer(IsWidget w) {
-		wikiPageContainer.clear();
-		wikiPageContainer.add(w);
-	}
+  @UiField
+  Div hasAccessorRequirementUI;
 
-	@Override
-	public void setSynAlert(IsWidget w) {
-		synAlertContainer.clear();
-		synAlertContainer.add(w);
-	}
+  @UiField
+  CheckBox validatedCheckbox;
 
-	@Override
-	public boolean isCertifiedUserRequired() {
-		return certifiedCheckbox.getValue();
-	}
+  @UiField
+  CheckBox certifiedCheckbox;
 
-	@Override
-	public void setIsCertifiedUserRequired(boolean value) {
-		certifiedCheckbox.setValue(value);
-	}
+  Presenter presenter;
 
-	@Override
-	public boolean isValidatedProfileRequired() {
-		return validatedCheckbox.getValue();
-	}
+  @Inject
+  public CreateBasicAccessRequirementStep2ViewImpl(Binder binder) {
+    widget = binder.createAndBindUi(this);
+    editWikiButton.addClickHandler(
+      new ClickHandler() {
+        @Override
+        public void onClick(ClickEvent event) {
+          presenter.onEditWiki();
+        }
+      }
+    );
+    clearOldTermsButton.addClickHandler(
+      new ClickHandler() {
+        @Override
+        public void onClick(ClickEvent event) {
+          presenter.onClearOldInstructions();
+        }
+      }
+    );
+  }
 
-	@Override
-	public void setIsValidatedProfileRequired(boolean value) {
-		validatedCheckbox.setValue(value);
-	}
+  @Override
+  public Widget asWidget() {
+    return widget;
+  }
 
-	@Override
-	public void setHasAccessorRequirementUIVisible(boolean visible) {
-		hasAccessorRequirementUI.setVisible(visible);
-	}
+  @Override
+  public void setPresenter(Presenter p) {
+    this.presenter = p;
+  }
+
+  @Override
+  public void setOldTermsVisible(boolean visible) {
+    oldInstructionsUI.setVisible(visible);
+  }
+
+  @Override
+  public void setOldTerms(String terms) {
+    oldInstructions.setText(terms);
+  }
+
+  @Override
+  public void setWikiPageRenderer(IsWidget w) {
+    wikiPageContainer.clear();
+    wikiPageContainer.add(w);
+  }
+
+  @Override
+  public void setSynAlert(IsWidget w) {
+    synAlertContainer.clear();
+    synAlertContainer.add(w);
+  }
+
+  @Override
+  public boolean isCertifiedUserRequired() {
+    return certifiedCheckbox.getValue();
+  }
+
+  @Override
+  public void setIsCertifiedUserRequired(boolean value) {
+    certifiedCheckbox.setValue(value);
+  }
+
+  @Override
+  public boolean isValidatedProfileRequired() {
+    return validatedCheckbox.getValue();
+  }
+
+  @Override
+  public void setIsValidatedProfileRequired(boolean value) {
+    validatedCheckbox.setValue(value);
+  }
+
+  @Override
+  public void setHasAccessorRequirementUIVisible(boolean visible) {
+    hasAccessorRequirementUI.setVisible(visible);
+  }
 }

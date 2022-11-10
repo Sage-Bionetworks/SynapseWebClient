@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -14,345 +17,384 @@ import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesOrderEditorViewImpl.TreeItemMovabilityCallback;
 import org.sagebionetworks.web.shared.WikiPageKey;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 
-public class WikiSubpageOrderEditorTree implements WikiSubpageOrderEditorTreeView.Presenter, SynapseWidgetPresenter {
+public class WikiSubpageOrderEditorTree
+  implements WikiSubpageOrderEditorTreeView.Presenter, SynapseWidgetPresenter {
 
-	public static final String MOVE_DOWN_ERROR = "Selected item cannot be moved down.";
+  public static final String MOVE_DOWN_ERROR =
+    "Selected item cannot be moved down.";
 
-	public static final String MOVE_UP_ERROR = "Selected item cannot be moved up.";
+  public static final String MOVE_UP_ERROR =
+    "Selected item cannot be moved up.";
 
-	public static final String MOVE_RIGHT_ERROR = "Selected item cannot be moved right.";
+  public static final String MOVE_RIGHT_ERROR =
+    "Selected item cannot be moved right.";
 
-	public static final String MOVE_LEFT_ERROR = "Selected item cannot be moved left.";
+  public static final String MOVE_LEFT_ERROR =
+    "Selected item cannot be moved left.";
 
-	private WikiSubpageOrderEditorTreeView view;
+  private WikiSubpageOrderEditorTreeView view;
 
-	private Map<V2WikiHeader, SubpageOrderEditorTreeNode> header2node;
-	private Map<String, SubpageOrderEditorTreeNode> id2node;
+  private Map<V2WikiHeader, SubpageOrderEditorTreeNode> header2node;
+  private Map<String, SubpageOrderEditorTreeNode> id2node;
 
-	private SubpageOrderEditorTreeNode overallRoot;
-	private SubpageOrderEditorTreeNode selectedNode;
+  private SubpageOrderEditorTreeNode overallRoot;
+  private SubpageOrderEditorTreeNode selectedNode;
 
-	private TreeItemMovabilityCallback movabilityCallback;
-	CallbackP<String> refreshCallback;
-	SynapseAlert synAlert;
-	SynapseJavascriptClient jsClient;
-	WikiPageKey wikiKey;
-	V2WikiOrderHint hint;
-	boolean updatingHint = false;
+  private TreeItemMovabilityCallback movabilityCallback;
+  CallbackP<String> refreshCallback;
+  SynapseAlert synAlert;
+  SynapseJavascriptClient jsClient;
+  WikiPageKey wikiKey;
+  V2WikiOrderHint hint;
+  boolean updatingHint = false;
 
-	@Inject
-	public WikiSubpageOrderEditorTree(WikiSubpageOrderEditorTreeView view, SynapseAlert synAlert, SynapseJavascriptClient jsClient) {
-		this.view = view;
-		this.jsClient = jsClient;
-		this.synAlert = synAlert;
-		header2node = new HashMap<V2WikiHeader, SubpageOrderEditorTreeNode>();
-		id2node = new HashMap<String, SubpageOrderEditorTreeNode>();
-		view.setSynAlert(synAlert);
-		view.setPresenter(this);
-	}
+  @Inject
+  public WikiSubpageOrderEditorTree(
+    WikiSubpageOrderEditorTreeView view,
+    SynapseAlert synAlert,
+    SynapseJavascriptClient jsClient
+  ) {
+    this.view = view;
+    this.jsClient = jsClient;
+    this.synAlert = synAlert;
+    header2node = new HashMap<V2WikiHeader, SubpageOrderEditorTreeNode>();
+    id2node = new HashMap<String, SubpageOrderEditorTreeNode>();
+    view.setSynAlert(synAlert);
+    view.setPresenter(this);
+  }
 
-	public void configure(String selectWikiPageId, WikiPageKey wikiKey, List<V2WikiHeader> wikiHeaders, String ownerObjectName, V2WikiOrderHint hint, CallbackP<String> refreshCallback) {
-		this.refreshCallback = refreshCallback;
-		this.wikiKey = wikiKey;
-		this.hint = hint;
-		updatingHint = false;
-		view.clear();
-		// Make nodes for each header. Populate id2node map and header2node map.
-		for (V2WikiHeader header : wikiHeaders) {
+  public void configure(
+    String selectWikiPageId,
+    WikiPageKey wikiKey,
+    List<V2WikiHeader> wikiHeaders,
+    String ownerObjectName,
+    V2WikiOrderHint hint,
+    CallbackP<String> refreshCallback
+  ) {
+    this.refreshCallback = refreshCallback;
+    this.wikiKey = wikiKey;
+    this.hint = hint;
+    updatingHint = false;
+    view.clear();
+    // Make nodes for each header. Populate id2node map and header2node map.
+    for (V2WikiHeader header : wikiHeaders) {
+      String text;
+      if (header.getParentId() == null) {
+        text = ownerObjectName;
+      } else {
+        text = header.getTitle();
+      }
 
-			String text;
-			if (header.getParentId() == null) {
-				text = ownerObjectName;
-			} else {
-				text = header.getTitle();
-			}
+      SubpageOrderEditorTreeNode node = new SubpageOrderEditorTreeNode(
+        header,
+        text
+      );
+      header2node.put(header, node);
+      id2node.put(header.getId(), node);
+    }
 
-			SubpageOrderEditorTreeNode node = new SubpageOrderEditorTreeNode(header, text);
-			header2node.put(header, node);
-			id2node.put(header.getId(), node);
-		}
+    // Assign child references.
+    for (V2WikiHeader header : wikiHeaders) {
+      if (header.getParentId() == null) {
+        overallRoot = header2node.get(header);
+      } else {
+        SubpageOrderEditorTreeNode child = header2node.get(header);
+        SubpageOrderEditorTreeNode parent = id2node.get(header.getParentId());
+        parent.getChildren().add(child);
+      }
+    }
 
-		// Assign child references.
-		for (V2WikiHeader header : wikiHeaders) {
+    view.configure(overallRoot, wikiKey.getOwnerObjectId());
 
-			if (header.getParentId() == null) {
-				overallRoot = header2node.get(header);
-			} else {
-				SubpageOrderEditorTreeNode child = header2node.get(header);
-				SubpageOrderEditorTreeNode parent = id2node.get(header.getParentId());
-				parent.getChildren().add(child);
-			}
-		}
+    SubpageOrderEditorTreeNode selectNode = id2node.get(selectWikiPageId);
+    if (selectNode != null) {
+      selectTreeItem(selectNode);
+    }
+  }
 
-		view.configure(overallRoot, wikiKey.getOwnerObjectId());
+  public List<String> getIdListOrderHint() {
+    List<String> idList = new LinkedList<String>();
+    addIdsToListRecurse(overallRoot, idList);
+    return idList;
+  }
 
-		SubpageOrderEditorTreeNode selectNode = id2node.get(selectWikiPageId);
-		if (selectNode != null) {
-			selectTreeItem(selectNode);
-		}
-	}
+  private void addIdsToListRecurse(
+    SubpageOrderEditorTreeNode root,
+    List<String> idList
+  ) {
+    idList.add(root.getHeader().getId());
+    for (SubpageOrderEditorTreeNode child : root.getChildren()) {
+      addIdsToListRecurse(child, idList);
+    }
+  }
 
-	public List<String> getIdListOrderHint() {
-		List<String> idList = new LinkedList<String>();
-		addIdsToListRecurse(overallRoot, idList);
-		return idList;
-	}
+  public void setMovabilityCallback(
+    TreeItemMovabilityCallback movabilityCallback
+  ) {
+    this.movabilityCallback = movabilityCallback;
+  }
 
-	private void addIdsToListRecurse(SubpageOrderEditorTreeNode root, List<String> idList) {
-		idList.add(root.getHeader().getId());
-		for (SubpageOrderEditorTreeNode child : root.getChildren()) {
-			addIdsToListRecurse(child, idList);
-		}
-	}
+  @Override
+  public Widget asWidget() {
+    return view.asWidget();
+  }
 
-	public void setMovabilityCallback(TreeItemMovabilityCallback movabilityCallback) {
-		this.movabilityCallback = movabilityCallback;
-	}
+  @Override
+  public void selectTreeItem(SubpageOrderEditorTreeNode node) {
+    view.selectTreeItem(node);
+    selectedNode = node;
+    if (movabilityCallback != null) {
+      movabilityCallback.invoke(
+        selectedCanMoveUpOrRight(),
+        selectedCanMoveDown(),
+        selectedCanMoveLeft()
+      );
+    }
+  }
 
-	@Override
-	public Widget asWidget() {
-		return view.asWidget();
-	}
+  private int getSelectedChildIndex() {
+    SubpageOrderEditorTreeNode parent = getSelectedParent();
+    if (parent == null) {
+      return 0;
+    }
+    return parent.getChildren().indexOf(selectedNode);
+  }
 
-	@Override
-	public void selectTreeItem(SubpageOrderEditorTreeNode node) {
-		view.selectTreeItem(node);
-		selectedNode = node;
-		if (movabilityCallback != null) {
-			movabilityCallback.invoke(selectedCanMoveUpOrRight(), selectedCanMoveDown(), selectedCanMoveLeft());
-		}
-	}
+  private boolean selectedCanMoveUpOrRight() {
+    if (selectedNode == null) return false;
 
-	private int getSelectedChildIndex() {
-		SubpageOrderEditorTreeNode parent = getSelectedParent();
-		if (parent == null) {
-			return 0;
-		}
-		return parent.getChildren().indexOf(selectedNode);
+    if (selectedNode.getHeader().getParentId() == null) {
+      // Overall Root.
+      return false;
+    }
 
-	}
+    int childIndex = getSelectedChildIndex();
+    if (childIndex <= 0) {
+      return false;
+    } else {
+      return true;
+    }
+  }
 
-	private boolean selectedCanMoveUpOrRight() {
-		if (selectedNode == null)
-			return false;
+  private boolean selectedCanMoveLeft() {
+    if (selectedNode == null) return false;
 
-		if (selectedNode.getHeader().getParentId() == null) {
-			// Overall Root.
-			return false;
-		}
+    if (
+      selectedNode.getHeader().getParentId() == null ||
+      getSelectedParent().getHeader().getParentId() == null
+    ) {
+      // Overall Root.
+      return false;
+    } else {
+      return true;
+    }
+  }
 
-		int childIndex = getSelectedChildIndex();
-		if (childIndex <= 0) {
-			return false;
-		} else {
-			return true;
-		}
-	}
+  private boolean selectedCanMoveDown() {
+    if (selectedNode == null) return false;
 
-	private boolean selectedCanMoveLeft() {
-		if (selectedNode == null)
-			return false;
+    if (selectedNode.getHeader().getParentId() == null) {
+      // Overall Root.
+      return false;
+    }
 
-		if (selectedNode.getHeader().getParentId() == null || getSelectedParent().getHeader().getParentId() == null) {
-			// Overall Root.
-			return false;
-		} else {
-			return true;
-		}
-	}
+    SubpageOrderEditorTreeNode parent = getSelectedParent();
+    int childIndex = getSelectedChildIndex();
+    if (childIndex == parent.getChildren().size() - 1 || childIndex < 0) {
+      return false;
+    } else {
+      return true;
+    }
+  }
 
-	private boolean selectedCanMoveDown() {
-		if (selectedNode == null)
-			return false;
+  public void moveUp() {
+    moveSelectedItem(true);
+  }
 
-		if (selectedNode.getHeader().getParentId() == null) {
-			// Overall Root.
-			return false;
-		}
+  public void moveDown() {
+    moveSelectedItem(false);
+  }
 
-		SubpageOrderEditorTreeNode parent = getSelectedParent();
-		int childIndex = getSelectedChildIndex();
-		if (childIndex == parent.getChildren().size() - 1 || childIndex < 0) {
-			return false;
-		} else {
-			return true;
-		}
-	}
+  private void updateOrderHint() {
+    updatingHint = true;
+    List<String> newOrderHint = getIdListOrderHint();
+    hint.setIdList(newOrderHint);
+    synAlert.clear();
+    jsClient.updateV2WikiOrderHint(
+      wikiKey,
+      hint,
+      new AsyncCallback<V2WikiOrderHint>() {
+        @Override
+        public void onSuccess(V2WikiOrderHint newHint) {
+          hint = newHint;
+          updatingHint = false;
+        }
 
-	public void moveUp() {
-		moveSelectedItem(true);
-	}
+        @Override
+        public void onFailure(Throwable caught) {
+          synAlert.handleException(caught);
+          updatingHint = false;
+        }
+      }
+    );
+  }
 
-	public void moveDown() {
-		moveSelectedItem(false);
-	}
+  public void moveLeft() {
+    synAlert.clear();
+    if (!selectedCanMoveLeft()) {
+      synAlert.showError(MOVE_LEFT_ERROR);
+      return;
+    }
+    String newParentId = getSelectedParent().getHeader().getParentId();
+    updateSelectedParent(newParentId);
+  }
 
-	private void updateOrderHint() {
-		updatingHint = true;
-		List<String> newOrderHint = getIdListOrderHint();
-		hint.setIdList(newOrderHint);
-		synAlert.clear();
-		jsClient.updateV2WikiOrderHint(wikiKey, hint, new AsyncCallback<V2WikiOrderHint>() {
-			@Override
-			public void onSuccess(V2WikiOrderHint newHint) {
-				hint = newHint;
-				updatingHint = false;
-			}
+  public void moveRight() {
+    synAlert.clear();
+    if (!selectedCanMoveUpOrRight()) {
+      synAlert.showError(MOVE_RIGHT_ERROR);
+      return;
+    }
 
-			@Override
-			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
-				updatingHint = false;
-			}
-		});
-	}
+    SubpageOrderEditorTreeNode parent = getSelectedParent();
+    int selectedChildIndex = getSelectedChildIndex();
+    SubpageOrderEditorTreeNode siblingAboveSelected = parent
+      .getChildren()
+      .get(selectedChildIndex - 1);
+    // siblingAboveSelected is the new parent
+    String newParentId = siblingAboveSelected.getHeader().getId();
+    updateSelectedParent(newParentId);
+  }
 
-	public void moveLeft() {
-		synAlert.clear();
-		if (!selectedCanMoveLeft()) {
-			synAlert.showError(MOVE_LEFT_ERROR);
-			return;
-		}
-		String newParentId = getSelectedParent().getHeader().getParentId();
-		updateSelectedParent(newParentId);
-	}
+  public void updateSelectedParent(final String newParentId) {
+    V2WikiHeader selectedNodeHeader = selectedNode.getHeader();
+    final WikiPageKey key = new WikiPageKey();
+    key.setOwnerObjectId(wikiKey.getOwnerObjectId());
+    key.setOwnerObjectType(wikiKey.getOwnerObjectType());
+    key.setWikiPageId(selectedNodeHeader.getId());
+    // get the v2 wiki page, set the new parent, and update the v2 wiki page. then refresh.
+    jsClient.getV2WikiPage(
+      key,
+      new AsyncCallback<V2WikiPage>() {
+        @Override
+        public void onSuccess(V2WikiPage selectedPage) {
+          selectedPage.setParentWikiId(newParentId);
+          updateWikiPage(key, selectedPage);
+        }
 
-	public void moveRight() {
-		synAlert.clear();
-		if (!selectedCanMoveUpOrRight()) {
-			synAlert.showError(MOVE_RIGHT_ERROR);
-			return;
-		}
+        @Override
+        public void onFailure(Throwable caught) {
+          synAlert.handleException(caught);
+        }
+      }
+    );
+  }
 
-		SubpageOrderEditorTreeNode parent = getSelectedParent();
-		int selectedChildIndex = getSelectedChildIndex();
-		SubpageOrderEditorTreeNode siblingAboveSelected = parent.getChildren().get(selectedChildIndex - 1);
-		// siblingAboveSelected is the new parent
-		String newParentId = siblingAboveSelected.getHeader().getId();
-		updateSelectedParent(newParentId);
-	}
+  public void updateWikiPage(WikiPageKey key, V2WikiPage page) {
+    jsClient.updateV2WikiPage(
+      key,
+      page,
+      new AsyncCallback<V2WikiPage>() {
+        @Override
+        public void onSuccess(V2WikiPage result) {
+          refreshCallback.invoke(result.getId());
+        }
 
-	public void updateSelectedParent(final String newParentId) {
-		V2WikiHeader selectedNodeHeader = selectedNode.getHeader();
-		final WikiPageKey key = new WikiPageKey();
-		key.setOwnerObjectId(wikiKey.getOwnerObjectId());
-		key.setOwnerObjectType(wikiKey.getOwnerObjectType());
-		key.setWikiPageId(selectedNodeHeader.getId());
-		// get the v2 wiki page, set the new parent, and update the v2 wiki page. then refresh.
-		jsClient.getV2WikiPage(key, new AsyncCallback<V2WikiPage>() {
-			@Override
-			public void onSuccess(V2WikiPage selectedPage) {
-				selectedPage.setParentWikiId(newParentId);
-				updateWikiPage(key, selectedPage);
-			}
+        @Override
+        public void onFailure(Throwable caught) {
+          synAlert.handleException(caught);
+        }
+      }
+    );
+  }
 
-			@Override
-			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
-			}
-		});
-	}
+  public void moveSelectedItem(boolean moveUp) {
+    if (updatingHint) {
+      // ignore fast click
+      return;
+    }
+    synAlert.clear();
+    if (moveUp && !selectedCanMoveUpOrRight()) {
+      synAlert.showError(MOVE_UP_ERROR);
+      return;
+    } else if (!moveUp && !selectedCanMoveDown()) {
+      synAlert.showError(MOVE_DOWN_ERROR);
+      return;
+    }
 
-	public void updateWikiPage(WikiPageKey key, V2WikiPage page) {
-		jsClient.updateV2WikiPage(key, page, new AsyncCallback<V2WikiPage>() {
-			@Override
-			public void onSuccess(V2WikiPage result) {
-				refreshCallback.invoke(result.getId());
-			}
+    view.moveTreeItem(selectedNode, moveUp);
 
-			@Override
-			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
-			}
-		});
-	}
+    int insertIndex;
+    if (moveUp) {
+      insertIndex = getSelectedChildIndex() - 1;
+    } else {
+      insertIndex = getSelectedChildIndex() + 1;
+    }
 
-	public void moveSelectedItem(boolean moveUp) {
-		if (updatingHint) {
-			// ignore fast click
-			return;
-		}
-		synAlert.clear();
-		if (moveUp && !selectedCanMoveUpOrRight()) {
-			synAlert.showError(MOVE_UP_ERROR);
-			return;
-		} else if (!moveUp && !selectedCanMoveDown()) {
-			synAlert.showError(MOVE_DOWN_ERROR);
-			return;
-		}
+    SubpageOrderEditorTreeNode parent = getSelectedParent();
 
-		view.moveTreeItem(selectedNode, moveUp);
+    parent.getChildren().remove(selectedNode);
+    parent.getChildren().add(insertIndex, selectedNode);
 
-		int insertIndex;
-		if (moveUp) {
-			insertIndex = getSelectedChildIndex() - 1;
-		} else {
-			insertIndex = getSelectedChildIndex() + 1;
-		}
+    selectTreeItem(selectedNode);
 
-		SubpageOrderEditorTreeNode parent = getSelectedParent();
+    updateOrderHint();
+  }
 
-		parent.getChildren().remove(selectedNode);
-		parent.getChildren().add(insertIndex, selectedNode);
+  private SubpageOrderEditorTreeNode getSelectedParent() {
+    return id2node.get(selectedNode.getHeader().getParentId());
+  }
 
-		selectTreeItem(selectedNode);
+  @Override
+  public SubpageOrderEditorTreeNode getSelectedTreeItem() {
+    return selectedNode;
+  }
 
-		updateOrderHint();
-	}
+  @Override
+  public SubpageOrderEditorTreeNode getParent(
+    SubpageOrderEditorTreeNode child
+  ) {
+    if (child.getHeader().getParentId() == null) return null;
 
-	private SubpageOrderEditorTreeNode getSelectedParent() {
-		return id2node.get(selectedNode.getHeader().getParentId());
-	}
+    return id2node.get(child.getHeader().getParentId());
+  }
 
-	@Override
-	public SubpageOrderEditorTreeNode getSelectedTreeItem() {
-		return selectedNode;
-	}
+  public SubpageOrderEditorTreeNode getSubpageOrderEditorTreeNode(
+    V2WikiHeader header
+  ) {
+    return header2node.get(header);
+  }
 
-	@Override
-	public SubpageOrderEditorTreeNode getParent(SubpageOrderEditorTreeNode child) {
-		if (child.getHeader().getParentId() == null)
-			return null;
+  public SubpageOrderEditorTreeNode getOverallRoot() {
+    return overallRoot;
+  }
 
-		return id2node.get(child.getHeader().getParentId());
-	}
+  public class SubpageOrderEditorTreeNode {
 
-	public SubpageOrderEditorTreeNode getSubpageOrderEditorTreeNode(V2WikiHeader header) {
-		return header2node.get(header);
-	}
+    private V2WikiHeader header;
+    private List<SubpageOrderEditorTreeNode> children;
+    private String text;
 
-	public SubpageOrderEditorTreeNode getOverallRoot() {
-		return overallRoot;
-	}
+    public SubpageOrderEditorTreeNode(V2WikiHeader header, String text) {
+      this.header = header;
+      this.text = text;
+      children = new ArrayList<SubpageOrderEditorTreeNode>();
+    }
 
-	public class SubpageOrderEditorTreeNode {
-		private V2WikiHeader header;
-		private List<SubpageOrderEditorTreeNode> children;
-		private String text;
+    /*
+     * Getters
+     */
+    public V2WikiHeader getHeader() {
+      return header;
+    }
 
-		public SubpageOrderEditorTreeNode(V2WikiHeader header, String text) {
-			this.header = header;
-			this.text = text;
-			children = new ArrayList<SubpageOrderEditorTreeNode>();
-		}
+    public List<SubpageOrderEditorTreeNode> getChildren() {
+      return children;
+    }
 
-		/*
-		 * Getters
-		 */
-		public V2WikiHeader getHeader() {
-			return header;
-		}
-
-		public List<SubpageOrderEditorTreeNode> getChildren() {
-			return children;
-		}
-
-		public String getText() {
-			return this.text;
-		}
-	}
+    public String getText() {
+      return this.text;
+    }
+  }
 }

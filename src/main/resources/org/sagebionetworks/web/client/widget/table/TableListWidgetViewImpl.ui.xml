@@ -1,64 +1,87 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui"
-	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
-	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt"
-	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
-	xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
-	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
-	xmlns:tr="urn:import:org.sagebionetworks.web.client.widget.table.v2.results">
-	<g:HTMLPanel>
-		<bh:Div ui:field="synAlertContainer" />
-		<w:LoadingSpinner size="40px" ui:field="loadingUI"
-			addStyleNames="center-block center" visible="false" />
-		<bh:Span ui:field="emptyUI" text="&#8212; Empty"
-			visible="false" marginLeft="15" />
-		<b:TextArea width="1px" ui:field="copyToClipboardTextbox"
-			visible="false" />
-		<bh:Div ui:field="tableArea" addStyleNames="highlight-box padding-10" marginTop="0">
-			<t:Table ui:field="columnHeaders" width="100%">
-				<t:TableRow>
-					<t:TableHeader width="20px" />
-					<tr:SortableTableHeaderImpl
-						ui:field="nameColumnHeader" text="Name" />
-					<t:TableHeader width="150px"
-						addStyleNames="visible-sm visible-md visible-lg">
-						<bh:Span text="Type" />
-					</t:TableHeader>
-			<t:TableHeader width="90px"
-				 ui:field="itemCountColumnHeader"
-					 addStyleNames="visible-md visible-lg">
-			<bh:Span text="Item Count" />
-			</t:TableHeader>
-			<t:TableHeader width="270px"
-						addStyleNames="visible-xl">
-						<bh:Span text="Created By" />
-					</t:TableHeader>
-					<t:TableHeader width="270px"
-						addStyleNames="visible-xl">
-						<bh:Span text="Modified By" />
-					</t:TableHeader>
-					<tr:SortableTableHeaderImpl width="165px" ui:field="modifiedOnColumnHeader"
-						addStyleNames="visible-md visible-lg" text="Modified On">
-					</tr:SortableTableHeaderImpl>
-					<tr:SortableTableHeaderImpl
-						width="165px" ui:field="createdOnColumnHeader" text="Created On"
-						addStyleNames="visible-md visible-lg" />
-					<t:TableHeader width="130px"
-						addStyleNames="visible-md visible-lg">
-						<bh:Span text="ID" />
-						<b:Tooltip title="Copy IDs to the clipboard"
-							placement="BOTTOM">
-							<b:Icon ui:field="copyIDToClipboardIcon"
-								addStyleNames="imageButton margin-left-5 link" type="CLIPBOARD" />
-						</b:Tooltip>
-					</t:TableHeader>
-				</t:TableRow>
-			</t:Table>
-			<bh:Hr ui:field="hrUnderTableHeaders"
-				addStyleNames="margin-top-5 margin-bottom-5" />
-			<bh:Div ui:field="tablesListDiv" />
-			<bh:Div ui:field="loadMoreWidgetContainer" />
-		</bh:Div>
-	</g:HTMLPanel>
+<ui:UiBinder
+  xmlns:ui="urn:ui:com.google.gwt.uibinder"
+  xmlns:g="urn:import:com.google.gwt.user.client.ui"
+  xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
+  xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt"
+  xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+  xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
+  xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
+  xmlns:tr="urn:import:org.sagebionetworks.web.client.widget.table.v2.results"
+>
+  <g:HTMLPanel>
+    <bh:Div ui:field="synAlertContainer" />
+    <w:LoadingSpinner
+      size="40px"
+      ui:field="loadingUI"
+      addStyleNames="center-block center"
+      visible="false"
+    />
+    <bh:Span
+      ui:field="emptyUI"
+      text="&#8212; Empty"
+      visible="false"
+      marginLeft="15"
+    />
+    <b:TextArea width="1px" ui:field="copyToClipboardTextbox" visible="false" />
+    <bh:Div
+      ui:field="tableArea"
+      addStyleNames="highlight-box padding-10"
+      marginTop="0"
+    >
+      <t:Table ui:field="columnHeaders" width="100%">
+        <t:TableRow>
+          <t:TableHeader width="20px" />
+          <tr:SortableTableHeaderImpl ui:field="nameColumnHeader" text="Name" />
+          <t:TableHeader
+            width="150px"
+            addStyleNames="visible-sm visible-md visible-lg"
+          >
+            <bh:Span text="Type" />
+          </t:TableHeader>
+          <t:TableHeader
+            width="90px"
+            ui:field="itemCountColumnHeader"
+            addStyleNames="visible-md visible-lg"
+          >
+            <bh:Span text="Item Count" />
+          </t:TableHeader>
+          <t:TableHeader width="270px" addStyleNames="visible-xl">
+            <bh:Span text="Created By" />
+          </t:TableHeader>
+          <t:TableHeader width="270px" addStyleNames="visible-xl">
+            <bh:Span text="Modified By" />
+          </t:TableHeader>
+          <tr:SortableTableHeaderImpl
+            width="165px"
+            ui:field="modifiedOnColumnHeader"
+            addStyleNames="visible-md visible-lg"
+            text="Modified On"
+          />
+          <tr:SortableTableHeaderImpl
+            width="165px"
+            ui:field="createdOnColumnHeader"
+            text="Created On"
+            addStyleNames="visible-md visible-lg"
+          />
+          <t:TableHeader width="130px" addStyleNames="visible-md visible-lg">
+            <bh:Span text="ID" />
+            <b:Tooltip title="Copy IDs to the clipboard" placement="BOTTOM">
+              <b:Icon
+                ui:field="copyIDToClipboardIcon"
+                addStyleNames="imageButton margin-left-5 link"
+                type="CLIPBOARD"
+              />
+            </b:Tooltip>
+          </t:TableHeader>
+        </t:TableRow>
+      </t:Table>
+      <bh:Hr
+        ui:field="hrUnderTableHeaders"
+        addStyleNames="margin-top-5 margin-bottom-5"
+      />
+      <bh:Div ui:field="tablesListDiv" />
+      <bh:Div ui:field="loadMoreWidgetContainer" />
+    </bh:Div>
+  </g:HTMLPanel>
 </ui:UiBinder>

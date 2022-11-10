@@ -3,15 +3,15 @@ package org.sagebionetworks.web.client.widget.entity.file.downloadlist;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface PackageSizeSummaryView extends IsWidget {
-	void setFileCount(String fileCount);
+  void setFileCount(String fileCount);
 
-	void setSize(String friendlyFileSize);
+  void setSize(String friendlyFileSize);
 
-	void setEstimatedDownloadTimeLoadingVisible(boolean visible);
+  void setEstimatedDownloadTimeLoadingVisible(boolean visible);
 
-	void setEstimatedDownloadTime(String time);
+  void setEstimatedDownloadTime(String time);
 
-	void showWhiteSpinner();
+  void showWhiteSpinner();
 
-	void addTextStyle(String style);
+  void addTextStyle(String style);
 }

@@ -5,6 +5,9 @@ import static org.mockito.Mockito.verify;
 import static org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModal.ADD_EXTERNAL_REPO_MODAL_TITLE;
 import static org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModal.SUCCESS_MESSAGE;
 import static org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModal.SUCCESS_TITLE;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Widget;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -16,81 +19,91 @@ import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModal;
 import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModalView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Widget;
 
 public class AddExternalRepositoryModalTest {
-	@Mock
-	private AddExternalRepoModalView mockView;
-	@Mock
-	private SynapseAlert mockSynAlert;
-	@Mock
-	private SynapseJavascriptClient mockJsClient;
-	@Mock
-	private DockerRepository mockDockerEntity;
-	@Mock
-	private Callback mockCallback;
 
-	AddExternalRepoModal modal;
+  @Mock
+  private AddExternalRepoModalView mockView;
 
-	@Before
-	public void before() {
-		MockitoAnnotations.initMocks(this);
-		modal = new AddExternalRepoModal(mockView, mockSynAlert, mockJsClient);
-	}
+  @Mock
+  private SynapseAlert mockSynAlert;
 
-	@Test
-	public void testConstructor() {
-		verify(mockView).setPresenter(modal);
-		verify(mockView).setAlert(any(Widget.class));
-		verify(mockView).setModalTitle(ADD_EXTERNAL_REPO_MODAL_TITLE);
-	}
+  @Mock
+  private SynapseJavascriptClient mockJsClient;
 
-	@SuppressWarnings("unchecked")
-	@Test
-	public void testOnSave() {
-		modal.onSave();
-		verify(mockView).getRepoName();
-		verify(mockJsClient).createEntity(any(DockerRepository.class), any(AsyncCallback.class));
-	}
+  @Mock
+  private DockerRepository mockDockerEntity;
 
-	@SuppressWarnings("unchecked")
-	@Test
-	public void testOnSaveSuccess() {
-		AsyncMockStubber.callSuccessWith(mockDockerEntity).when(mockJsClient).createEntity(any(DockerRepository.class), any(AsyncCallback.class));
-		modal.configuration("syn123", mockCallback);
-		modal.onSave();
-		verify(mockView).hideDialog();
-		verify(mockView).showSuccess(SUCCESS_TITLE, SUCCESS_MESSAGE);
-		verify(mockCallback).invoke();
-	}
+  @Mock
+  private Callback mockCallback;
 
-	@SuppressWarnings("unchecked")
-	@Test
-	public void testOnSaveFailure() {
-		AsyncMockStubber.callFailureWith(new Exception()).when(mockJsClient).createEntity(any(DockerRepository.class), any(AsyncCallback.class));
-		modal.onSave();
-		verify(mockView).resetButton();
-		verify(mockSynAlert).handleException(any(Throwable.class));
-	}
+  AddExternalRepoModal modal;
 
-	@Test
-	public void testShowDialog() {
-		modal.show();
-		verify(mockView).clear();
-		verify(mockView).showDialog();
-		verify(mockSynAlert).clear();
-	}
+  @Before
+  public void before() {
+    MockitoAnnotations.initMocks(this);
+    modal = new AddExternalRepoModal(mockView, mockSynAlert, mockJsClient);
+  }
 
-	@Test
-	public void testHideDialog() {
-		modal.hide();
-		verify(mockView).hideDialog();
-	}
+  @Test
+  public void testConstructor() {
+    verify(mockView).setPresenter(modal);
+    verify(mockView).setAlert(any(Widget.class));
+    verify(mockView).setModalTitle(ADD_EXTERNAL_REPO_MODAL_TITLE);
+  }
 
-	@Test
-	public void asWidgetTest() {
-		modal.asWidget();
-		verify(mockView).asWidget();
-	}
+  @SuppressWarnings("unchecked")
+  @Test
+  public void testOnSave() {
+    modal.onSave();
+    verify(mockView).getRepoName();
+    verify(mockJsClient)
+      .createEntity(any(DockerRepository.class), any(AsyncCallback.class));
+  }
+
+  @SuppressWarnings("unchecked")
+  @Test
+  public void testOnSaveSuccess() {
+    AsyncMockStubber
+      .callSuccessWith(mockDockerEntity)
+      .when(mockJsClient)
+      .createEntity(any(DockerRepository.class), any(AsyncCallback.class));
+    modal.configuration("syn123", mockCallback);
+    modal.onSave();
+    verify(mockView).hideDialog();
+    verify(mockView).showSuccess(SUCCESS_TITLE, SUCCESS_MESSAGE);
+    verify(mockCallback).invoke();
+  }
+
+  @SuppressWarnings("unchecked")
+  @Test
+  public void testOnSaveFailure() {
+    AsyncMockStubber
+      .callFailureWith(new Exception())
+      .when(mockJsClient)
+      .createEntity(any(DockerRepository.class), any(AsyncCallback.class));
+    modal.onSave();
+    verify(mockView).resetButton();
+    verify(mockSynAlert).handleException(any(Throwable.class));
+  }
+
+  @Test
+  public void testShowDialog() {
+    modal.show();
+    verify(mockView).clear();
+    verify(mockView).showDialog();
+    verify(mockSynAlert).clear();
+  }
+
+  @Test
+  public void testHideDialog() {
+    modal.hide();
+    verify(mockView).hideDialog();
+  }
+
+  @Test
+  public void asWidgetTest() {
+    modal.asWidget();
+    verify(mockView).asWidget();
+  }
 }

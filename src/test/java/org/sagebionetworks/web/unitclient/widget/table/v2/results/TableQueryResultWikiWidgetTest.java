@@ -15,6 +15,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Widget;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.Before;
@@ -48,214 +51,287 @@ import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Widget;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TableQueryResultWikiWidgetTest {
-	TableQueryResultWikiWidget widget;
-	@Mock
-	SynapseJavascriptClient mockSynapseJavascriptClient;
-	@Mock
-	TableQueryResultWikiWidgetView mockView;
-	@Mock
-	SynapseJSNIUtils mockSynapseJSNIUtils;
-	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
-	@Mock
-	SynapseAlert mockSynAlert;
-	@Mock
-	TableEntityWidgetV2 mockTableEntityWidget;
-	@Mock
-	ActionMenuWidget mockActionMenu;
-	@Mock
-	EntityActionController mockEntityActionController;
-	@Mock
-	EntityBundle mockEntityBundle;
-	Long versionNumber;
-	@Mock
-	PortalGinInjector mockGinInjector;
-	@Mock
-	GWTWrapper mockGWT;
-	@Mock
-	CookieProvider mockCookies;
-	@Captor
-	ArgumentCaptor<AsyncCallback> asyncCallbackCaptor;
-	@Captor
-	ArgumentCaptor<Callback> callbackCaptor;
 
-	@Before
-	public void before() {
-		when(mockGinInjector.getCookieProvider()).thenReturn(mockCookies);
-		widget = new TableQueryResultWikiWidget(mockView, mockActionMenu, mockEntityActionController, mockSynapseJSNIUtils, mockSynapseJavascriptClient, mockSynAlert, mockGWT, mockGinInjector);
-		AsyncMockStubber.callSuccessWith(mockEntityBundle).when(mockSynapseJavascriptClient).getEntityBundleFromCache(anyString(), any(AsyncCallback.class));
-		when(mockGinInjector.createNewTableEntityWidgetV2()).thenReturn(mockTableEntityWidget);
-	}
+  TableQueryResultWikiWidget widget;
 
-	@Test
-	public void testConstruction() {
-		// lazily loaded table query result widget
-		verify(mockView, never()).setTableQueryResultWidget(any(Widget.class));
-		verify(mockView).setSynAlert(any(Widget.class));
-		verify(mockActionMenu).addControllerWidget(any(Widget.class));
-	}
+  @Mock
+  SynapseJavascriptClient mockSynapseJavascriptClient;
 
-	@Test
-	public void testAsWidget() {
-		widget.asWidget();
-		verify(mockView).asWidget();
-	}
+  @Mock
+  TableQueryResultWikiWidgetView mockView;
 
-	@Test
-	public void testConfigure() {
-		Map<String, String> descriptor = new HashMap<String, String>();
-		String tableId = "syn12345";
-		Long tableVersionNumber = 22L;
-		String sql = "select * from " + tableId + "." + tableVersionNumber;
-		descriptor.put(WidgetConstants.TABLE_QUERY_KEY, sql);
+  @Mock
+  SynapseJSNIUtils mockSynapseJSNIUtils;
 
-		widget.configure(wikiKey, descriptor, null, null);
+  WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
 
-		verifyZeroInteractions(mockGWT);
-		verify(mockView).setTableQueryResultWidget(any(Widget.class));
-		verify(mockSynapseJavascriptClient).getEntityBundleFromCache(eq(tableId), any(AsyncCallback.class));
-		verify(mockSynAlert).clear();
-		Query query = widget.getQueryString();
-		assertEquals(sql, query.getSql());
-		assertEquals((Long) QueryBundleUtils.DEFAULT_LIMIT, query.getLimit());
-		assertEquals((Long) QueryBundleUtils.DEFAULT_OFFSET, query.getOffset());
-		
-		boolean isCurrentVersion = true;
-		String wikiPageRootId = null;
-		verify(mockEntityActionController).configure(mockActionMenu, mockEntityBundle, isCurrentVersion, wikiPageRootId, EntityArea.TABLES);
-		boolean canEdit = false;
-		verify(mockTableEntityWidget).configure(mockEntityBundle, tableVersionNumber, canEdit, false, widget, mockActionMenu);
+  @Mock
+  SynapseAlert mockSynAlert;
 
-		verify(mockActionMenu, atLeastOnce()).setActionVisible(Action.UPLOAD_TABLE_DATA, false);
-		verify(mockActionMenu, atLeastOnce()).setActionVisible(Action.EDIT_TABLE_DATA, false);
-		verify(mockActionMenu, atLeastOnce()).setActionVisible(Action.SHOW_TABLE_SCHEMA, false);
-		verify(mockActionMenu, atLeastOnce()).setActionVisible(Action.SHOW_TABLE_SCHEMA, false);
-		verify(mockTableEntityWidget, never()).hideFiltering();
-	}
+  @Mock
+  TableEntityWidgetV2 mockTableEntityWidget;
 
-	@Test
-	public void testConfigureNotFound() {
-		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseJavascriptClient).getEntityBundleFromCache(anyString(), any(AsyncCallback.class));
-		Map<String, String> descriptor = new HashMap<String, String>();
-		String sql = "my query string";
-		descriptor.put(WidgetConstants.TABLE_QUERY_KEY, sql);
-		widget.configure(wikiKey, descriptor, null, null);
-		InOrder inOrder = Mockito.inOrder(mockSynAlert);
-		inOrder.verify(mockSynAlert).clear();
-		inOrder.verify(mockSynAlert).handleException(isA(NotFoundException.class));
-	}
+  @Mock
+  ActionMenuWidget mockActionMenu;
 
-	@Test
-	public void testConfigureNonDefaultLimitOffset() {
-		Map<String, String> descriptor = new HashMap<String, String>();
-		String sql = "my query string";
-		String limit = "8080";
-		String offset = "333";
+  @Mock
+  EntityActionController mockEntityActionController;
 
-		descriptor.put(WidgetConstants.TABLE_QUERY_KEY, sql);
-		descriptor.put(WidgetConstants.TABLE_OFFSET_KEY, offset);
-		descriptor.put(WidgetConstants.TABLE_LIMIT_KEY, limit);
+  @Mock
+  EntityBundle mockEntityBundle;
 
-		widget.configure(wikiKey, descriptor, null, null);
+  Long versionNumber;
 
-		Query query = widget.getQueryString();
-		assertEquals(sql, query.getSql());
-		assertEquals(Long.valueOf(8080L), query.getLimit());
-		assertEquals(Long.valueOf(333L), query.getOffset());
-	}
+  @Mock
+  PortalGinInjector mockGinInjector;
 
-	@Test
-	public void testConfigureQueryVisible() {
-		Map<String, String> descriptor = new HashMap<String, String>();
-		String sql = "my query string";
+  @Mock
+  GWTWrapper mockGWT;
 
-		descriptor.put(WidgetConstants.TABLE_QUERY_KEY, sql);
-		descriptor.put(WidgetConstants.QUERY_VISIBLE, Boolean.TRUE.toString());
+  @Mock
+  CookieProvider mockCookies;
 
-		widget.configure(wikiKey, descriptor, null, null);
+  @Captor
+  ArgumentCaptor<AsyncCallback> asyncCallbackCaptor;
 
-		Query query = widget.getQueryString();
-		assertEquals(sql, query.getSql());
-		verify(mockTableEntityWidget, never()).hideFiltering();
-	}
+  @Captor
+  ArgumentCaptor<Callback> callbackCaptor;
 
-	@Test
-	public void testConfigureQueryNotVisible() {
-		Map<String, String> descriptor = new HashMap<String, String>();
-		String sql = "my query string";
+  @Before
+  public void before() {
+    when(mockGinInjector.getCookieProvider()).thenReturn(mockCookies);
+    widget =
+      new TableQueryResultWikiWidget(
+        mockView,
+        mockActionMenu,
+        mockEntityActionController,
+        mockSynapseJSNIUtils,
+        mockSynapseJavascriptClient,
+        mockSynAlert,
+        mockGWT,
+        mockGinInjector
+      );
+    AsyncMockStubber
+      .callSuccessWith(mockEntityBundle)
+      .when(mockSynapseJavascriptClient)
+      .getEntityBundleFromCache(anyString(), any(AsyncCallback.class));
+    when(mockGinInjector.createNewTableEntityWidgetV2())
+      .thenReturn(mockTableEntityWidget);
+  }
 
-		descriptor.put(WidgetConstants.TABLE_QUERY_KEY, sql);
-		descriptor.put(WidgetConstants.QUERY_VISIBLE, Boolean.FALSE.toString());
-		
-		widget.configure(wikiKey, descriptor, null, null);
+  @Test
+  public void testConstruction() {
+    // lazily loaded table query result widget
+    verify(mockView, never()).setTableQueryResultWidget(any(Widget.class));
+    verify(mockView).setSynAlert(any(Widget.class));
+    verify(mockActionMenu).addControllerWidget(any(Widget.class));
+  }
 
-		Query query = widget.getQueryString();
-		assertEquals(sql, query.getSql());
-		verify(mockTableEntityWidget).hideFiltering();
-	}
+  @Test
+  public void testAsWidget() {
+    widget.asWidget();
+    verify(mockView).asWidget();
+  }
 
-	@Test
-	public void testInvalidLimitOffset() {
-		Map<String, String> descriptor = new HashMap<String, String>();
-		String sql = "my query string";
-		String limit = "abc";
-		String offset = "def";
+  @Test
+  public void testConfigure() {
+    Map<String, String> descriptor = new HashMap<String, String>();
+    String tableId = "syn12345";
+    Long tableVersionNumber = 22L;
+    String sql = "select * from " + tableId + "." + tableVersionNumber;
+    descriptor.put(WidgetConstants.TABLE_QUERY_KEY, sql);
 
-		descriptor.put(WidgetConstants.TABLE_QUERY_KEY, sql);
-		descriptor.put(WidgetConstants.TABLE_OFFSET_KEY, offset);
-		descriptor.put(WidgetConstants.TABLE_LIMIT_KEY, limit);
+    widget.configure(wikiKey, descriptor, null, null);
 
-		widget.configure(wikiKey, descriptor, null, null);
+    verifyZeroInteractions(mockGWT);
+    verify(mockView).setTableQueryResultWidget(any(Widget.class));
+    verify(mockSynapseJavascriptClient)
+      .getEntityBundleFromCache(eq(tableId), any(AsyncCallback.class));
+    verify(mockSynAlert).clear();
+    Query query = widget.getQueryString();
+    assertEquals(sql, query.getSql());
+    assertEquals((Long) QueryBundleUtils.DEFAULT_LIMIT, query.getLimit());
+    assertEquals((Long) QueryBundleUtils.DEFAULT_OFFSET, query.getOffset());
 
-		Query query = widget.getQueryString();
-		assertEquals(sql, query.getSql());
-		// should have been set to default values
-		assertEquals((Long) QueryBundleUtils.DEFAULT_LIMIT, query.getLimit());
-		assertEquals((Long) QueryBundleUtils.DEFAULT_OFFSET, query.getOffset());
+    boolean isCurrentVersion = true;
+    String wikiPageRootId = null;
+    verify(mockEntityActionController)
+      .configure(
+        mockActionMenu,
+        mockEntityBundle,
+        isCurrentVersion,
+        wikiPageRootId,
+        EntityArea.TABLES
+      );
+    boolean canEdit = false;
+    verify(mockTableEntityWidget)
+      .configure(
+        mockEntityBundle,
+        tableVersionNumber,
+        canEdit,
+        false,
+        widget,
+        mockActionMenu
+      );
 
-		// log both errors to the console
-		verify(mockSynapseJSNIUtils, times(2)).consoleError(anyString());
-	}
+    verify(mockActionMenu, atLeastOnce())
+      .setActionVisible(Action.UPLOAD_TABLE_DATA, false);
+    verify(mockActionMenu, atLeastOnce())
+      .setActionVisible(Action.EDIT_TABLE_DATA, false);
+    verify(mockActionMenu, atLeastOnce())
+      .setActionVisible(Action.SHOW_TABLE_SCHEMA, false);
+    verify(mockActionMenu, atLeastOnce())
+      .setActionVisible(Action.SHOW_TABLE_SCHEMA, false);
+    verify(mockTableEntityWidget, never()).hideFiltering();
+  }
 
-	@Test
-	public void testLoadMultipleTables() {
-		// do not typically use reset(), but other tests need mockSynapseJavascriptClient response. in this
-		// test, we do not want it to respond (until we manually invoke)
-		reset(mockSynapseJavascriptClient);
-		TableQueryResultWikiWidget widget1 = new TableQueryResultWikiWidget(mockView, mockActionMenu, mockEntityActionController, mockSynapseJSNIUtils, mockSynapseJavascriptClient, mockSynAlert, mockGWT, mockGinInjector);
-		TableQueryResultWikiWidget widget2 = new TableQueryResultWikiWidget(mockView, mockActionMenu, mockEntityActionController, mockSynapseJSNIUtils, mockSynapseJavascriptClient, mockSynAlert, mockGWT, mockGinInjector);
+  @Test
+  public void testConfigureNotFound() {
+    AsyncMockStubber
+      .callFailureWith(new NotFoundException())
+      .when(mockSynapseJavascriptClient)
+      .getEntityBundleFromCache(anyString(), any(AsyncCallback.class));
+    Map<String, String> descriptor = new HashMap<String, String>();
+    String sql = "my query string";
+    descriptor.put(WidgetConstants.TABLE_QUERY_KEY, sql);
+    widget.configure(wikiKey, descriptor, null, null);
+    InOrder inOrder = Mockito.inOrder(mockSynAlert);
+    inOrder.verify(mockSynAlert).clear();
+    inOrder.verify(mockSynAlert).handleException(isA(NotFoundException.class));
+  }
 
+  @Test
+  public void testConfigureNonDefaultLimitOffset() {
+    Map<String, String> descriptor = new HashMap<String, String>();
+    String sql = "my query string";
+    String limit = "8080";
+    String offset = "333";
 
-		Map<String, String> descriptor = new HashMap<String, String>();
-		descriptor.put(WidgetConstants.TABLE_QUERY_KEY, "select * from syn12345");
+    descriptor.put(WidgetConstants.TABLE_QUERY_KEY, sql);
+    descriptor.put(WidgetConstants.TABLE_OFFSET_KEY, offset);
+    descriptor.put(WidgetConstants.TABLE_LIMIT_KEY, limit);
 
-		widget1.configure(wikiKey, descriptor, null, null);
+    widget.configure(wikiKey, descriptor, null, null);
 
-		verifyZeroInteractions(mockGWT);
-		verify(mockSynapseJavascriptClient).getEntityBundleFromCache(anyString(), asyncCallbackCaptor.capture());
-		assertTrue(TableQueryResultWikiWidget.isLoading);
+    Query query = widget.getQueryString();
+    assertEquals(sql, query.getSql());
+    assertEquals(Long.valueOf(8080L), query.getLimit());
+    assertEquals(Long.valueOf(333L), query.getOffset());
+  }
 
-		widget2.configure(wikiKey, descriptor, null, null);
+  @Test
+  public void testConfigureQueryVisible() {
+    Map<String, String> descriptor = new HashMap<String, String>();
+    String sql = "my query string";
 
-		verify(mockGWT).scheduleExecution(callbackCaptor.capture(), anyInt());
-		// verify that it's still only attempted to get the entity bundle once
-		verify(mockSynapseJavascriptClient).getEntityBundleFromCache(anyString(), any(AsyncCallback.class));
+    descriptor.put(WidgetConstants.TABLE_QUERY_KEY, sql);
+    descriptor.put(WidgetConstants.QUERY_VISIBLE, Boolean.TRUE.toString());
 
-		// invoke the async callback to complete widget1 load, and verify that widget2 would begin to load
-		// (on callback execution).
-		asyncCallbackCaptor.getValue().onSuccess(mockEntityBundle);
-		assertFalse(TableQueryResultWikiWidget.isLoading);
+    widget.configure(wikiKey, descriptor, null, null);
 
-		callbackCaptor.getValue().invoke();
+    Query query = widget.getQueryString();
+    assertEquals(sql, query.getSql());
+    verify(mockTableEntityWidget, never()).hideFiltering();
+  }
 
-		assertTrue(TableQueryResultWikiWidget.isLoading);
-		verify(mockSynapseJavascriptClient, times(2)).getEntityBundleFromCache(anyString(), any(AsyncCallback.class));
-		// verify error of call also results in load complete
-		asyncCallbackCaptor.getValue().onFailure(new Exception("failed to load second widget"));
-		assertFalse(TableQueryResultWikiWidget.isLoading);
-	}
+  @Test
+  public void testConfigureQueryNotVisible() {
+    Map<String, String> descriptor = new HashMap<String, String>();
+    String sql = "my query string";
+
+    descriptor.put(WidgetConstants.TABLE_QUERY_KEY, sql);
+    descriptor.put(WidgetConstants.QUERY_VISIBLE, Boolean.FALSE.toString());
+
+    widget.configure(wikiKey, descriptor, null, null);
+
+    Query query = widget.getQueryString();
+    assertEquals(sql, query.getSql());
+    verify(mockTableEntityWidget).hideFiltering();
+  }
+
+  @Test
+  public void testInvalidLimitOffset() {
+    Map<String, String> descriptor = new HashMap<String, String>();
+    String sql = "my query string";
+    String limit = "abc";
+    String offset = "def";
+
+    descriptor.put(WidgetConstants.TABLE_QUERY_KEY, sql);
+    descriptor.put(WidgetConstants.TABLE_OFFSET_KEY, offset);
+    descriptor.put(WidgetConstants.TABLE_LIMIT_KEY, limit);
+
+    widget.configure(wikiKey, descriptor, null, null);
+
+    Query query = widget.getQueryString();
+    assertEquals(sql, query.getSql());
+    // should have been set to default values
+    assertEquals((Long) QueryBundleUtils.DEFAULT_LIMIT, query.getLimit());
+    assertEquals((Long) QueryBundleUtils.DEFAULT_OFFSET, query.getOffset());
+
+    // log both errors to the console
+    verify(mockSynapseJSNIUtils, times(2)).consoleError(anyString());
+  }
+
+  @Test
+  public void testLoadMultipleTables() {
+    // do not typically use reset(), but other tests need mockSynapseJavascriptClient response. in this
+    // test, we do not want it to respond (until we manually invoke)
+    reset(mockSynapseJavascriptClient);
+    TableQueryResultWikiWidget widget1 = new TableQueryResultWikiWidget(
+      mockView,
+      mockActionMenu,
+      mockEntityActionController,
+      mockSynapseJSNIUtils,
+      mockSynapseJavascriptClient,
+      mockSynAlert,
+      mockGWT,
+      mockGinInjector
+    );
+    TableQueryResultWikiWidget widget2 = new TableQueryResultWikiWidget(
+      mockView,
+      mockActionMenu,
+      mockEntityActionController,
+      mockSynapseJSNIUtils,
+      mockSynapseJavascriptClient,
+      mockSynAlert,
+      mockGWT,
+      mockGinInjector
+    );
+
+    Map<String, String> descriptor = new HashMap<String, String>();
+    descriptor.put(WidgetConstants.TABLE_QUERY_KEY, "select * from syn12345");
+
+    widget1.configure(wikiKey, descriptor, null, null);
+
+    verifyZeroInteractions(mockGWT);
+    verify(mockSynapseJavascriptClient)
+      .getEntityBundleFromCache(anyString(), asyncCallbackCaptor.capture());
+    assertTrue(TableQueryResultWikiWidget.isLoading);
+
+    widget2.configure(wikiKey, descriptor, null, null);
+
+    verify(mockGWT).scheduleExecution(callbackCaptor.capture(), anyInt());
+    // verify that it's still only attempted to get the entity bundle once
+    verify(mockSynapseJavascriptClient)
+      .getEntityBundleFromCache(anyString(), any(AsyncCallback.class));
+
+    // invoke the async callback to complete widget1 load, and verify that widget2 would begin to load
+    // (on callback execution).
+    asyncCallbackCaptor.getValue().onSuccess(mockEntityBundle);
+    assertFalse(TableQueryResultWikiWidget.isLoading);
+
+    callbackCaptor.getValue().invoke();
+
+    assertTrue(TableQueryResultWikiWidget.isLoading);
+    verify(mockSynapseJavascriptClient, times(2))
+      .getEntityBundleFromCache(anyString(), any(AsyncCallback.class));
+    // verify error of call also results in load complete
+    asyncCallbackCaptor
+      .getValue()
+      .onFailure(new Exception("failed to load second widget"));
+    assertFalse(TableQueryResultWikiWidget.isLoading);
+  }
 }

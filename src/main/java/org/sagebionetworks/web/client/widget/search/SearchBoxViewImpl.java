@@ -1,9 +1,5 @@
 package org.sagebionetworks.web.client.widget.search;
 
-import org.gwtbootstrap3.client.ui.Icon;
-import org.gwtbootstrap3.client.ui.TextBox;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GWTWrapper;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
@@ -12,115 +8,129 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.gwtbootstrap3.client.ui.Icon;
+import org.gwtbootstrap3.client.ui.TextBox;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
 
 public class SearchBoxViewImpl implements SearchBoxView {
-	public interface Binder extends UiBinder<Widget, SearchBoxViewImpl> {
-	}
 
-	private Presenter presenter;
-	Widget widget;
-	@UiField
-	Icon searchButton;
-	@UiField
-	TextBox searchField;
-	GWTWrapper gwt;
-	public static final String INACTIVE_STYLE = "inactive";
-	public static final String ACTIVE_STYLE = "active";
+  public interface Binder extends UiBinder<Widget, SearchBoxViewImpl> {}
 
-	@Inject
-	public SearchBoxViewImpl(Binder binder, GWTWrapper gwt) {
-		widget = binder.createAndBindUi(this);
-		this.gwt = gwt;
-		searchField.getElement().setAttribute("placeholder", " Search all of Synapse");
-		initClickHandlers();
-	}
+  private Presenter presenter;
+  Widget widget;
 
-	private void initClickHandlers() {
-		searchField.addKeyDownHandler(new KeyDownHandler() {
-			@Override
-			public void onKeyDown(KeyDownEvent event) {
-				if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
-					executeSearch();
-				}
-			}
-		});
-		searchField.addBlurHandler(event -> {
-			// delay auto-hiding the search box (on focus loss) for .4s so that the search can execute on search
-			// button click (when active).
-			gwt.scheduleExecution(() -> {
-				searchFieldInactive();
-			}, 400);
-		});
-		searchButton.addClickHandler(event -> {
-			if (isSearchFieldActive()) {
-				executeSearch();
-			} else {
-				searchFieldActive();
-			}
-		});
-	}
+  @UiField
+  Icon searchButton;
 
-	private void executeSearch() {
-		if (!"".equals(searchField.getValue())) {
-			presenter.search(searchField.getValue());
-			searchField.setValue("");
-			searchFieldInactive();
-		}
-	}
+  @UiField
+  TextBox searchField;
 
-	@Override
-	public Widget asWidget() {
-		return widget;
-	}
+  GWTWrapper gwt;
+  public static final String INACTIVE_STYLE = "inactive";
+  public static final String ACTIVE_STYLE = "active";
 
-	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-	}
+  @Inject
+  public SearchBoxViewImpl(Binder binder, GWTWrapper gwt) {
+    widget = binder.createAndBindUi(this);
+    this.gwt = gwt;
+    searchField
+      .getElement()
+      .setAttribute("placeholder", " Search all of Synapse");
+    initClickHandlers();
+  }
 
-	@Override
-	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
-	}
+  private void initClickHandlers() {
+    searchField.addKeyDownHandler(
+      new KeyDownHandler() {
+        @Override
+        public void onKeyDown(KeyDownEvent event) {
+          if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
+            executeSearch();
+          }
+        }
+      }
+    );
+    searchField.addBlurHandler(event -> {
+      // delay auto-hiding the search box (on focus loss) for .4s so that the search can execute on search
+      // button click (when active).
+      gwt.scheduleExecution(
+        () -> {
+          searchFieldInactive();
+        },
+        400
+      );
+    });
+    searchButton.addClickHandler(event -> {
+      if (isSearchFieldActive()) {
+        executeSearch();
+      } else {
+        searchFieldActive();
+      }
+    });
+  }
 
-	@Override
-	public void showLoading() {}
+  private void executeSearch() {
+    if (!"".equals(searchField.getValue())) {
+      presenter.search(searchField.getValue());
+      searchField.setValue("");
+      searchFieldInactive();
+    }
+  }
 
-	@Override
-	public void showInfo(String message) {
-		DisplayUtils.showInfo(message);
-	}
+  @Override
+  public Widget asWidget() {
+    return widget;
+  }
 
-	@Override
-	public void setVisible(boolean isVisible) {
-		widget.setVisible(isVisible);
-	}
+  @Override
+  public void setPresenter(Presenter presenter) {
+    this.presenter = presenter;
+  }
 
-	@Override
-	public void clear() {
-		// searchField.setText("");
-	}
+  @Override
+  public void showErrorMessage(String message) {
+    DisplayUtils.showErrorMessage(message);
+  }
 
-	private void searchFieldInactive() {
-		Element searchBoxContainer = _getSearchBoxContainer();
-		searchBoxContainer.removeClassName(ACTIVE_STYLE);
-		searchBoxContainer.addClassName(INACTIVE_STYLE);
-		searchField.setFocus(false);
-	}
+  @Override
+  public void showLoading() {}
 
-	private void searchFieldActive() {
-		Element searchBoxContainer = _getSearchBoxContainer();
-		searchBoxContainer.addClassName(ACTIVE_STYLE);
-		searchBoxContainer.removeClassName(INACTIVE_STYLE);
-		searchField.setFocus(true);
-	}
+  @Override
+  public void showInfo(String message) {
+    DisplayUtils.showInfo(message);
+  }
 
-	private boolean isSearchFieldActive() {
-		Element searchBoxContainer = _getSearchBoxContainer();
-		return searchBoxContainer.hasClassName(ACTIVE_STYLE);
-	}
+  @Override
+  public void setVisible(boolean isVisible) {
+    widget.setVisible(isVisible);
+  }
 
-	public static native Element _getSearchBoxContainer() /*-{
+  @Override
+  public void clear() {
+    // searchField.setText("");
+  }
+
+  private void searchFieldInactive() {
+    Element searchBoxContainer = _getSearchBoxContainer();
+    searchBoxContainer.removeClassName(ACTIVE_STYLE);
+    searchBoxContainer.addClassName(INACTIVE_STYLE);
+    searchField.setFocus(false);
+  }
+
+  private void searchFieldActive() {
+    Element searchBoxContainer = _getSearchBoxContainer();
+    searchBoxContainer.addClassName(ACTIVE_STYLE);
+    searchBoxContainer.removeClassName(INACTIVE_STYLE);
+    searchField.setFocus(true);
+  }
+
+  private boolean isSearchFieldActive() {
+    Element searchBoxContainer = _getSearchBoxContainer();
+    return searchBoxContainer.hasClassName(ACTIVE_STYLE);
+  }
+
+  public static native Element _getSearchBoxContainer() /*-{
 		try {
 			return $wnd.jQuery('#headerPanel .searchBoxContainer')[0];
 		} catch (err) {

@@ -1,23 +1,20 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
-import org.sagebionetworks.web.client.widget.WidgetEditorView;
 import com.google.gwt.user.client.ui.IsWidget;
+import org.sagebionetworks.web.client.widget.WidgetEditorView;
 
 public interface TabbedTableConfigView extends IsWidget, WidgetEditorView {
+  /**
+   * Set the presenter.
+   *
+   * @param presenter
+   */
+  public void setPresenter(Presenter presenter);
 
-	/**
-	 * Set the presenter.
-	 * 
-	 * @param presenter
-	 */
-	public void setPresenter(Presenter presenter);
+  public String getTableContents();
 
-	public String getTableContents();
-
-	/**
-	 * Presenter interface
-	 */
-	public interface Presenter {
-
-	}
+  /**
+   * Presenter interface
+   */
+  public interface Presenter {}
 }

@@ -1,47 +1,46 @@
 package org.sagebionetworks.web.client.widget.team;
 
-import org.sagebionetworks.repo.model.Team;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import org.sagebionetworks.repo.model.Team;
 
 public interface InviteWidgetView extends IsWidget {
+  /**
+   * Set this view's presenter
+   *
+   * @param presenter
+   */
+  public void setPresenter(Presenter presenter);
 
-	/**
-	 * Set this view's presenter
-	 * 
-	 * @param presenter
-	 */
-	public void setPresenter(Presenter presenter);
+  public interface Presenter {
+    void doSendInvites(String invitationMessage);
 
-	public interface Presenter {
-		void doSendInvites(String invitationMessage);
+    void configure(Team team);
 
-		void configure(Team team);
+    void show();
 
-		void show();
+    void hide();
 
-		void hide();
+    void removeEmailToInvite(String email);
 
-		void removeEmailToInvite(String email);
+    void removeUserToInvite(String userId);
+  }
 
-		void removeUserToInvite(String userId);
-	}
+  void addEmailToInvite(String emailInvite);
 
-	void addEmailToInvite(String emailInvite);
+  void addUserToInvite(String userId);
 
-	void addUserToInvite(String userId);
+  public void setSynAlertWidget(Widget asWidget);
 
-	public void setSynAlertWidget(Widget asWidget);
+  void setSuggestWidget(Widget suggestWidget);
 
-	void setSuggestWidget(Widget suggestWidget);
+  public void clear();
 
-	public void clear();
+  public void showInfo(String string);
 
-	public void showInfo(String string);
+  void show();
 
-	void show();
+  void hide();
 
-	void hide();
-
-	void setLoading(boolean isLoading);
+  void setLoading(boolean isLoading);
 }

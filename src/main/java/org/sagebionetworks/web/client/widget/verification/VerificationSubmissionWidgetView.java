@@ -1,103 +1,104 @@
 package org.sagebionetworks.web.client.widget.verification;
 
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 import java.util.List;
 import org.sagebionetworks.repo.model.verification.VerificationState;
 import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
 import org.sagebionetworks.web.client.SynapseView;
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Widget;
 
-public interface VerificationSubmissionWidgetView extends SynapseView, IsWidget {
-	void clear();
+public interface VerificationSubmissionWidgetView
+  extends SynapseView, IsWidget {
+  void clear();
 
-	void show();
+  void show();
 
-	void hide();
+  void hide();
 
-	void setSynAlert(Widget w);
+  void setSynAlert(Widget w);
 
-	void setFileHandleList(Widget w);
+  void setFileHandleList(Widget w);
 
-	void setPresenter(Presenter presenter);
+  void setPresenter(Presenter presenter);
 
-	void setTitle(String title);
+  void setTitle(String title);
 
-	void setEmails(List<String> emails);
+  void setEmails(List<String> emails);
 
-	void setFirstName(String fname);
+  void setFirstName(String fname);
 
-	String getFirstName();
+  String getFirstName();
 
-	void setLastName(String lname);
+  void setLastName(String lname);
 
-	String getLastName();
+  String getLastName();
 
-	void setOrganization(String organization);
+  void setOrganization(String organization);
 
-	String getOrganization();
+  String getOrganization();
 
-	void setLocation(String location);
+  void setLocation(String location);
 
-	String getLocation();
+  String getLocation();
 
-	void setOrcID(String href);
+  void setOrcID(String href);
 
-	void setProfileLink(String profileId, String href);
+  void setProfileLink(String profileId, String href);
 
-	void setSubmitButtonVisible(boolean visible);
+  void setSubmitButtonVisible(boolean visible);
 
-	void setCancelButtonVisible(boolean visible);
+  void setCancelButtonVisible(boolean visible);
 
-	void setOKButtonVisible(boolean visible);
+  void setOKButtonVisible(boolean visible);
 
-	void setDeleteButtonVisible(boolean visible);
+  void setDeleteButtonVisible(boolean visible);
 
-	void setApproveButtonVisible(boolean visible);
+  void setApproveButtonVisible(boolean visible);
 
-	void setRejectButtonVisible(boolean visible);
+  void setRejectButtonVisible(boolean visible);
 
-	void setSuspendButtonVisible(boolean visible);
+  void setSuspendButtonVisible(boolean visible);
 
-	void setResubmitButtonVisible(boolean visible);
+  void setResubmitButtonVisible(boolean visible);
 
-	void setCloseButtonVisible(boolean visible);
+  void setCloseButtonVisible(boolean visible);
 
-	void setSuspendedReason(String reason);
+  void setSuspendedReason(String reason);
 
-	void setSuspendedAlertVisible(boolean visible);
+  void setSuspendedAlertVisible(boolean visible);
 
-	void setState(VerificationStateEnum state);
-	
-	void setACTStateHistoryVisible(boolean visible);
-	void setACTStateHistory(List<VerificationState> stateHistory);
-	void setShowSubmissionInModalButtonVisible(boolean visible);
-	
-	void setUploadedFilesUIVisible(boolean visible);
+  void setState(VerificationStateEnum state);
 
-	void popupError(String message);
+  void setACTStateHistoryVisible(boolean visible);
+  void setACTStateHistory(List<VerificationState> stateHistory);
+  void setShowSubmissionInModalButtonVisible(boolean visible);
 
-	void openWindow(String url);
+  void setUploadedFilesUIVisible(boolean visible);
 
-	void setPromptModal(Widget w);
+  void popupError(String message);
 
-	void setProfileFieldsEditable(boolean editable);
+  void openWindow(String url);
 
-	/**
-	 * Presenter interface
-	 */
-	public interface Presenter {
-		void submitVerification();
+  void setPromptModal(Widget w);
 
-		void approveVerification();
+  void setProfileFieldsEditable(boolean editable);
 
-		void rejectVerification();
+  /**
+   * Presenter interface
+   */
+  public interface Presenter {
+    void submitVerification();
 
-		void suspendVerification();
+    void approveVerification();
 
-		void deleteVerification();
+    void rejectVerification();
 
-		void recreateVerification();
-		
-		void showSubmissionInModal();
-	}
+    void suspendVerification();
+
+    void deleteVerification();
+
+    void recreateVerification();
+
+    void showSubmissionInModal();
+  }
 }

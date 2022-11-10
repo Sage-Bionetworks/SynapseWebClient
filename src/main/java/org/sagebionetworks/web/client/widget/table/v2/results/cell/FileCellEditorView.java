@@ -4,76 +4,74 @@ import com.google.gwt.user.client.TakesValue;
 import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface FileCellEditorView extends IsWidget, TakesValue<String>, Focusable {
+public interface FileCellEditorView
+  extends IsWidget, TakesValue<String>, Focusable {
+  /**
+   * Contract between the view and presenter business logic.
+   *
+   */
+  interface Presenter {
+    /**
+     * Show/hide the collapse panel
+     */
+    public void onToggleCollapse();
 
-	/**
-	 * Contract between the view and presenter business logic.
-	 * 
-	 */
-	interface Presenter {
+    /**
+     * Cancel the upload.
+     */
+    public void onCancelUpload();
+  }
 
-		/**
-		 * Show/hide the collapse panel
-		 */
-		public void onToggleCollapse();
+  /**
+   * Bind the view to its presenter.
+   *
+   * @param presenter
+   */
+  public void setPresenter(Presenter presenter);
 
-		/**
-		 * Cancel the upload.
-		 */
-		public void onCancelUpload();
-	}
+  /**
+   * Show the upload modal dialog.
+   */
+  public void showCollapse();
 
-	/**
-	 * Bind the view to its presenter.
-	 * 
-	 * @param presenter
-	 */
-	public void setPresenter(Presenter presenter);
+  /**
+   * Hide the upload modal dialog.
+   */
+  public void hideCollapse();
 
-	/**
-	 * Show the upload modal dialog.
-	 */
-	public void showCollapse();
+  /**
+   * Add the file input widget
+   *
+   * @param fileInputWidget
+   */
+  public void addFileInputWidget(IsWidget fileInputWidget);
 
-	/**
-	 * Hide the upload modal dialog.
-	 */
-	public void hideCollapse();
+  /**
+   * Set an error message.
+   *
+   * @param string
+   */
+  public void showErrorMessage(String message);
 
-	/**
-	 * Add the file input widget
-	 * 
-	 * @param fileInputWidget
-	 */
-	public void addFileInputWidget(IsWidget fileInputWidget);
+  /**
+   * Hide the error message.
+   */
+  public void hideErrorMessage();
 
-	/**
-	 * Set an error message.
-	 * 
-	 * @param string
-	 */
-	public void showErrorMessage(String message);
+  /**
+   * Set an error message for a value.
+   *
+   * @param string
+   */
+  public void setValueError(String string);
 
-	/**
-	 * Hide the error message.
-	 */
-	public void hideErrorMessage();
+  /**
+   * Clear the help and state of the value.
+   */
+  public void clearValueError();
 
-	/**
-	 * Set an error message for a value.
-	 * 
-	 * @param string
-	 */
-	public void setValueError(String string);
-
-	/**
-	 * Clear the help and state of the value.
-	 */
-	public void clearValueError();
-
-	/**
-	 * Toggle the collapse
-	 */
-	public void toggleCollapse();
-
+  /**
+   * Toggle the collapse
+   */
+  public void toggleCollapse();
 }

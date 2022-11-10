@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.server.servlet;
 
+import com.google.gwt.thirdparty.guava.common.base.Supplier;
+import com.google.gwt.thirdparty.guava.common.base.Suppliers;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.concurrent.TimeUnit;
@@ -18,79 +20,98 @@ import org.sagebionetworks.web.client.StackEndpoints;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl.PortalVersionHolder;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
-import com.google.gwt.thirdparty.guava.common.base.Supplier;
-import com.google.gwt.thirdparty.guava.common.base.Suppliers;
 
 /**
  * Servlet for getting the current repo and portal version
  */
 public class VersionsServlet extends HttpServlet {
-	public static final String TEXT_CONTENT_TYPE = "text/plain";
-	static private Log log = LogFactory.getLog(VersionsServlet.class);
-	private static final long serialVersionUID = 1L;
-	protected static final ThreadLocal<HttpServletRequest> perThreadRequest = new ThreadLocal<HttpServletRequest>();
 
-	private final Supplier<SynapseVersionInfo> synapseVersionCache = Suppliers.memoizeWithExpiration(versionSupplier(), 5, TimeUnit.MINUTES);
+  public static final String TEXT_CONTENT_TYPE = "text/plain";
+  private static Log log = LogFactory.getLog(VersionsServlet.class);
+  private static final long serialVersionUID = 1L;
+  protected static final ThreadLocal<HttpServletRequest> perThreadRequest = new ThreadLocal<HttpServletRequest>();
 
-	public SynapseVersionInfo getSynapseVersionInfo() {
-		return synapseVersionCache.get();
-	}
+  private final Supplier<SynapseVersionInfo> synapseVersionCache = Suppliers.memoizeWithExpiration(
+    versionSupplier(),
+    5,
+    TimeUnit.MINUTES
+  );
 
-	private SynapseProvider synapseProvider = new SynapseProviderImpl();
+  public SynapseVersionInfo getSynapseVersionInfo() {
+    return synapseVersionCache.get();
+  }
 
-	private SynapseClient createNewClient() {
-		SynapseClient client = synapseProvider.createNewClient();
-		client.setAuthEndpoint(StackEndpoints.getAuthenticationServicePublicEndpoint());
-		client.setRepositoryEndpoint(StackEndpoints.getRepositoryServiceEndpoint());
-		client.setFileEndpoint(StackEndpoints.getFileServiceEndpoint());
-		return client;
-	}
+  private SynapseProvider synapseProvider = new SynapseProviderImpl();
 
-	private Supplier<SynapseVersionInfo> versionSupplier() {
-		return new Supplier<SynapseVersionInfo>() {
-			public SynapseVersionInfo get() {
-				try {
-					org.sagebionetworks.client.SynapseClient synapseClient = createNewClient();
-					return synapseClient.getVersionInfo();
-				} catch (SynapseException e) {
-					log.error(e);
-					return null;
-				}
-			}
-		};
-	}
+  private SynapseClient createNewClient() {
+    SynapseClient client = synapseProvider.createNewClient();
+    client.setAuthEndpoint(
+      StackEndpoints.getAuthenticationServicePublicEndpoint()
+    );
+    client.setRepositoryEndpoint(StackEndpoints.getRepositoryServiceEndpoint());
+    client.setFileEndpoint(StackEndpoints.getFileServiceEndpoint());
+    return client;
+  }
 
-	public String getSynapseVersions() throws RestServiceException {
-		return PortalVersionHolder.getVersionInfo() + "," + getSynapseVersionInfo().getVersion();
-	}
+  private Supplier<SynapseVersionInfo> versionSupplier() {
+    return new Supplier<SynapseVersionInfo>() {
+      public SynapseVersionInfo get() {
+        try {
+          org.sagebionetworks.client.SynapseClient synapseClient = createNewClient();
+          return synapseClient.getVersionInfo();
+        } catch (SynapseException e) {
+          log.error(e);
+          return null;
+        }
+      }
+    };
+  }
 
-	@Override
-	protected void service(HttpServletRequest arg0, HttpServletResponse arg1) throws ServletException, IOException {
-		VersionsServlet.perThreadRequest.set(arg0);
-		super.service(arg0, arg1);
-	}
+  public String getSynapseVersions() throws RestServiceException {
+    return (
+      PortalVersionHolder.getVersionInfo() +
+      "," +
+      getSynapseVersionInfo().getVersion()
+    );
+  }
 
-	@Override
-	public void service(ServletRequest arg0, ServletResponse arg1) throws ServletException, IOException {
-		super.service(arg0, arg1);
-	}
+  @Override
+  protected void service(HttpServletRequest arg0, HttpServletResponse arg1)
+    throws ServletException, IOException {
+    VersionsServlet.perThreadRequest.set(arg0);
+    super.service(arg0, arg1);
+  }
 
-	@Override
-	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// instruct not to cache
-		response.setHeader(WebConstants.CACHE_CONTROL_KEY, WebConstants.CACHE_CONTROL_VALUE_NO_CACHE); // Set standard HTTP/1.1 no-cache headers.
-		response.setHeader(WebConstants.PRAGMA_KEY, WebConstants.NO_CACHE_VALUE); // Set standard HTTP/1.0 no-cache header.
-		response.setContentType(WebConstants.TEXT_PLAIN_CHARSET_UTF8);
-		response.setDateHeader(WebConstants.EXPIRES_KEY, 0L); // Proxy
+  @Override
+  public void service(ServletRequest arg0, ServletResponse arg1)
+    throws ServletException, IOException {
+    super.service(arg0, arg1);
+  }
 
-		response.setStatus(HttpServletResponse.SC_OK);
+  @Override
+  public void doGet(HttpServletRequest request, HttpServletResponse response)
+    throws ServletException, IOException {
+    // instruct not to cache
+    response.setHeader(
+      WebConstants.CACHE_CONTROL_KEY,
+      WebConstants.CACHE_CONTROL_VALUE_NO_CACHE
+    ); // Set standard HTTP/1.1 no-cache headers.
+    response.setHeader(WebConstants.PRAGMA_KEY, WebConstants.NO_CACHE_VALUE); // Set standard HTTP/1.0 no-cache header.
+    response.setContentType(WebConstants.TEXT_PLAIN_CHARSET_UTF8);
+    response.setDateHeader(WebConstants.EXPIRES_KEY, 0L); // Proxy
 
-		try {
-			response.getOutputStream().write(getSynapseVersions().getBytes("UTF-8"));
-			response.getOutputStream().flush();
-		} catch (RestServiceException e) {
-			// redirect to error place with an entry
-			response.sendRedirect(FileHandleAssociationServlet.getBaseUrl(request) + FileHandleAssociationServlet.ERROR_PLACE + URLEncoder.encode(e.getMessage()));
-		}
-	}
+    response.setStatus(HttpServletResponse.SC_OK);
+
+    try {
+      response.getOutputStream().write(getSynapseVersions().getBytes("UTF-8"));
+      response.getOutputStream().flush();
+    } catch (RestServiceException e) {
+      // redirect to error place with an entry
+      response.sendRedirect(
+        FileHandleAssociationServlet.getBaseUrl(request) +
+        FileHandleAssociationServlet.ERROR_PLACE +
+        URLEncoder.encode(e.getMessage())
+      );
+    }
+  }
 }

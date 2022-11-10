@@ -21,3 +21,6 @@ node_modules/*
 # We don't want to commit them because they are compiled or retrieved at build-time
 src/main/webapp/generated/*
 src/main/webapp/fonts/*
+
+# If using jenv for JDK management
+/.java-version

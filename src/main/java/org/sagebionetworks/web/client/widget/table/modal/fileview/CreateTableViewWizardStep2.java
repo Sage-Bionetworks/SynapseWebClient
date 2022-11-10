@@ -1,6 +1,11 @@
 package org.sagebionetworks.web.client.widget.table.modal.fileview;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
@@ -26,235 +31,280 @@ import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidge
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 
 /**
  * Wizard page to edit column schema
- * 
+ *
  * @author Jay
  *
  */
 public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
-	public static final String DELETE_PLACEHOLDER_FAILURE_MESSAGE = "Unable to delete table/view ";
-	public static final String DELETE_PLACEHOLDER_SUCCESS_MESSAGE = "User cancelled creation of table/view.  Deleted placeholder: ";
-	public static final String SCHEMA_UPDATE_CANCELLED = "Schema update cancelled";
-	public static final String FINISH = "Finish";
-	ColumnModelsEditorWidget editor;
-	String tableId;
-	ModalPresenter presenter;
-	// the TableEntity or View
-	Table entity;
-	TableType tableType;
-	SynapseClientAsync synapseClient;
-	JobTrackingWidget jobTrackingWidget;
-	SynapseJavascriptClient jsClient;
-	CreateTableViewWizardStep2View view;
-	SynapseJSNIUtils jsniUtils;
-	GlobalApplicationState globalAppState;
 
-	/*
-	 * Set to true to indicate that change selections are in progress. This allows selection change
-	 * events to be ignored during this period.
-	 */
-	boolean changingSelection = false;
-	ViewDefaultColumns fileViewDefaultColumns;
+  public static final String DELETE_PLACEHOLDER_FAILURE_MESSAGE =
+    "Unable to delete table/view ";
+  public static final String DELETE_PLACEHOLDER_SUCCESS_MESSAGE =
+    "User cancelled creation of table/view.  Deleted placeholder: ";
+  public static final String SCHEMA_UPDATE_CANCELLED =
+    "Schema update cancelled";
+  public static final String FINISH = "Finish";
+  ColumnModelsEditorWidget editor;
+  String tableId;
+  ModalPresenter presenter;
+  // the TableEntity or View
+  Table entity;
+  TableType tableType;
+  SynapseClientAsync synapseClient;
+  JobTrackingWidget jobTrackingWidget;
+  SynapseJavascriptClient jsClient;
+  CreateTableViewWizardStep2View view;
+  SynapseJSNIUtils jsniUtils;
+  GlobalApplicationState globalAppState;
 
-	/**
-	 * New presenter with its view.
-	 * 
-	 * @param view
-	 */
-	@Inject
-	public CreateTableViewWizardStep2(CreateTableViewWizardStep2View view, ColumnModelsEditorWidget editor, SynapseClientAsync synapseClient, JobTrackingWidget jobTrackingWidget, ViewDefaultColumns fileViewDefaultColumns, SynapseJavascriptClient jsClient, SynapseJSNIUtils jsniUtils, GlobalApplicationState globalAppState) {
-		this.view = view;
-		this.synapseClient = synapseClient;
-		fixServiceEntryPoint(synapseClient);
-		this.editor = editor;
-		this.jobTrackingWidget = jobTrackingWidget;
-		this.fileViewDefaultColumns = fileViewDefaultColumns;
-		this.jsClient = jsClient;
-		this.jsniUtils = jsniUtils;
-		this.globalAppState = globalAppState;
-		view.setJobTracker(jobTrackingWidget.asWidget());
-		view.setEditor(editor.asWidget());
-		editor.setOnAddDefaultViewColumnsCallback(new Callback() {
-			@Override
-			public void invoke() {
-				getDefaultColumnsForView();
-			}
-		});
-		editor.setOnAddAnnotationColumnsCallback(new Callback() {
-			@Override
-			public void invoke() {
-				getPossibleColumnModelsForViewScope(null);
-			}
-		});
-	}
+  /*
+   * Set to true to indicate that change selections are in progress. This allows selection change
+   * events to be ignored during this period.
+   */
+  boolean changingSelection = false;
+  ViewDefaultColumns fileViewDefaultColumns;
 
-	public void configure(Table entity, TableType tableType) {
-		view.setJobTrackerVisible(false);
-		this.changingSelection = false;
-		this.entity = entity;
-		this.tableType = tableType;
+  /**
+   * New presenter with its view.
+   *
+   * @param view
+   */
+  @Inject
+  public CreateTableViewWizardStep2(
+    CreateTableViewWizardStep2View view,
+    ColumnModelsEditorWidget editor,
+    SynapseClientAsync synapseClient,
+    JobTrackingWidget jobTrackingWidget,
+    ViewDefaultColumns fileViewDefaultColumns,
+    SynapseJavascriptClient jsClient,
+    SynapseJSNIUtils jsniUtils,
+    GlobalApplicationState globalAppState
+  ) {
+    this.view = view;
+    this.synapseClient = synapseClient;
+    fixServiceEntryPoint(synapseClient);
+    this.editor = editor;
+    this.jobTrackingWidget = jobTrackingWidget;
+    this.fileViewDefaultColumns = fileViewDefaultColumns;
+    this.jsClient = jsClient;
+    this.jsniUtils = jsniUtils;
+    this.globalAppState = globalAppState;
+    view.setJobTracker(jobTrackingWidget.asWidget());
+    view.setEditor(editor.asWidget());
+    editor.setOnAddDefaultViewColumnsCallback(
+      new Callback() {
+        @Override
+        public void invoke() {
+          getDefaultColumnsForView();
+        }
+      }
+    );
+    editor.setOnAddAnnotationColumnsCallback(
+      new Callback() {
+        @Override
+        public void invoke() {
+          getPossibleColumnModelsForViewScope(null);
+        }
+      }
+    );
+  }
 
-		editor.configure(tableType, new ArrayList<ColumnModel>());
+  public void configure(Table entity, TableType tableType) {
+    view.setJobTrackerVisible(false);
+    this.changingSelection = false;
+    this.entity = entity;
+    this.tableType = tableType;
 
-		boolean isView = !TableType.table.equals(tableType);
-		this.editor.setAddDefaultColumnsButtonVisible(isView);
-		this.editor.setAddAnnotationColumnsButtonVisible(isView);
-		if (isView) {
-			// start with the default file columns
-			getDefaultColumnsForView();
-		}
-	}
+    editor.configure(tableType, new ArrayList<ColumnModel>());
 
-	public void getDefaultColumnsForView() {
-		List<ColumnModel> defaultColumns = fileViewDefaultColumns.getDefaultViewColumns(tableType);
-		editor.addColumns(defaultColumns);
-	}
+    boolean isView = !TableType.table.equals(tableType);
+    this.editor.setAddDefaultColumnsButtonVisible(isView);
+    this.editor.setAddAnnotationColumnsButtonVisible(isView);
+    if (isView) {
+      // start with the default file columns
+      getDefaultColumnsForView();
+    }
+  }
 
-	public void getPossibleColumnModelsForViewScope(String nextPageToken) {
-		view.setJobTrackerVisible(true);
-		presenter.clearErrors();
-		ViewScope scope = new ViewScope();
-		List<String> scopeIds = null;
-		if (entity instanceof EntityView) {
-			scopeIds = ((EntityView) entity).getScopeIds();
-			scope.setViewTypeMask(tableType.getViewTypeMask().longValue());
-			scope.setViewEntityType(ViewEntityType.entityview);
-		} else if (entity instanceof SubmissionView) {
-			scopeIds = ((SubmissionView) entity).getScopeIds();
-			scope.setViewEntityType(ViewEntityType.submissionview);
-		}
-		scope.setScope(scopeIds);
-		
-		ViewColumnModelRequest request = new ViewColumnModelRequest();
-		request.setViewScope(scope);
-		request.setNextPageToken(nextPageToken);
-		
-		this.jobTrackingWidget.startAndTrackJob(ColumnModelsWidget.RETRIEVING_DATA, false, AsynchType.ViewColumnModelRequest, request, new AsynchronousProgressHandler() {
-			@Override
-			public void onFailure(Throwable failure) {
-				view.setJobTrackerVisible(false);
-				presenter.setError(failure);
-			}
+  public void getDefaultColumnsForView() {
+    List<ColumnModel> defaultColumns = fileViewDefaultColumns.getDefaultViewColumns(
+      tableType
+    );
+    editor.addColumns(defaultColumns);
+  }
 
-			@Override
-			public void onComplete(AsynchronousResponseBody response) {
-				ViewColumnModelResponse viewColumnModelResponse = (ViewColumnModelResponse) response;
-				editor.addColumns(viewColumnModelResponse.getResults());
-				if (viewColumnModelResponse.getNextPageToken() != null) {
-					getPossibleColumnModelsForViewScope(viewColumnModelResponse.getNextPageToken());
-				} else {
-					view.setJobTrackerVisible(false);
-				}
-			}
+  public void getPossibleColumnModelsForViewScope(String nextPageToken) {
+    view.setJobTrackerVisible(true);
+    presenter.clearErrors();
+    ViewScope scope = new ViewScope();
+    List<String> scopeIds = null;
+    if (entity instanceof EntityView) {
+      scopeIds = ((EntityView) entity).getScopeIds();
+      scope.setViewTypeMask(tableType.getViewTypeMask().longValue());
+      scope.setViewEntityType(ViewEntityType.entityview);
+    } else if (entity instanceof SubmissionView) {
+      scopeIds = ((SubmissionView) entity).getScopeIds();
+      scope.setViewEntityType(ViewEntityType.submissionview);
+    }
+    scope.setScope(scopeIds);
 
-			@Override
-			public void onCancel() {
-				view.setJobTrackerVisible(false);
-			}
-		});		
-	}
+    ViewColumnModelRequest request = new ViewColumnModelRequest();
+    request.setViewScope(scope);
+    request.setNextPageToken(nextPageToken);
 
-	@Override
-	public Widget asWidget() {
-		return view.asWidget();
-	}
+    this.jobTrackingWidget.startAndTrackJob(
+        ColumnModelsWidget.RETRIEVING_DATA,
+        false,
+        AsynchType.ViewColumnModelRequest,
+        request,
+        new AsynchronousProgressHandler() {
+          @Override
+          public void onFailure(Throwable failure) {
+            view.setJobTrackerVisible(false);
+            presenter.setError(failure);
+          }
 
-	@Override
-	public void setModalPresenter(ModalPresenter presenter) {
-		this.presenter = presenter;
-		presenter.setPrimaryButtonText(FINISH);
+          @Override
+          public void onComplete(AsynchronousResponseBody response) {
+            ViewColumnModelResponse viewColumnModelResponse = (ViewColumnModelResponse) response;
+            editor.addColumns(viewColumnModelResponse.getResults());
+            if (viewColumnModelResponse.getNextPageToken() != null) {
+              getPossibleColumnModelsForViewScope(
+                viewColumnModelResponse.getNextPageToken()
+              );
+            } else {
+              view.setJobTrackerVisible(false);
+            }
+          }
 
-		((ModalWizardWidget) presenter).addCallback(new ModalWizardWidget.WizardCallback() {
-			@Override
-			public void onFinished() {}
+          @Override
+          public void onCancel() {
+            view.setJobTrackerVisible(false);
+          }
+        }
+      );
+  }
 
-			@Override
-			public void onCanceled() {
-				onCancel();
-			}
-		});
-	}
+  @Override
+  public Widget asWidget() {
+    return view.asWidget();
+  }
 
-	public void onCancel() {
-		// user decided not to create the table/view. clean it up.
-		String entityId = entity.getId();
-		jsClient.deleteEntityById(entityId, true, new AsyncCallback<Void>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				jsniUtils.consoleError(DELETE_PLACEHOLDER_FAILURE_MESSAGE + entityId + ": " + caught.getMessage());
-			}
+  @Override
+  public void setModalPresenter(ModalPresenter presenter) {
+    this.presenter = presenter;
+    presenter.setPrimaryButtonText(FINISH);
 
-			@Override
-			public void onSuccess(Void result) {
-				jsniUtils.consoleLog(DELETE_PLACEHOLDER_SUCCESS_MESSAGE + entityId);
-			}
-		});
-	}
+    ((ModalWizardWidget) presenter).addCallback(
+        new ModalWizardWidget.WizardCallback() {
+          @Override
+          public void onFinished() {}
 
-	@Override
-	public void onPrimary() {
-		presenter.setLoading(true);
-		// Save it the data is valid
-		if (!editor.validate()) {
-			presenter.setErrorMessage(ColumnModelsWidget.SEE_THE_ERROR_S_ABOVE);
-			return;
-		}
-		// Get the models from the view and save them
-		List<ColumnModel> newSchema = editor.getEditedColumnModels();
-		presenter.clearErrors();
-		synapseClient.getTableUpdateTransactionRequest(entity.getId(), new ArrayList<ColumnModel>(), newSchema, new AsyncCallback<TableUpdateTransactionRequest>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				presenter.setError(caught);
-			}
+          @Override
+          public void onCanceled() {
+            onCancel();
+          }
+        }
+      );
+  }
 
-			@Override
-			public void onSuccess(TableUpdateTransactionRequest request) {
-				if (request.getChanges().isEmpty()) {
-					globalAppState.getPlaceChanger().goTo(new Synapse(entity.getId()));
-					finished();
-				} else {
-					startTrackingJob(request);
-				}
-			}
-		});
-	}
+  public void onCancel() {
+    // user decided not to create the table/view. clean it up.
+    String entityId = entity.getId();
+    jsClient.deleteEntityById(
+      entityId,
+      true,
+      new AsyncCallback<Void>() {
+        @Override
+        public void onFailure(Throwable caught) {
+          jsniUtils.consoleError(
+            DELETE_PLACEHOLDER_FAILURE_MESSAGE +
+            entityId +
+            ": " +
+            caught.getMessage()
+          );
+        }
 
-	public void finished() {
-		// Hide the dialog
-		presenter.setLoading(false);
-		presenter.onFinished();
-	}
+        @Override
+        public void onSuccess(Void result) {
+          jsniUtils.consoleLog(DELETE_PLACEHOLDER_SUCCESS_MESSAGE + entityId);
+        }
+      }
+    );
+  }
 
-	public void startTrackingJob(TableUpdateTransactionRequest request) {
-		view.setJobTrackerVisible(true);
-		presenter.setLoading(true);
-		presenter.clearErrors();
-		this.jobTrackingWidget.startAndTrackJob(ColumnModelsWidget.UPDATING_SCHEMA, false, AsynchType.TableTransaction, request, new AsynchronousProgressHandler() {
-			@Override
-			public void onFailure(Throwable failure) {
-				view.setJobTrackerVisible(false);
-				presenter.setError(failure);
-			}
+  @Override
+  public void onPrimary() {
+    presenter.setLoading(true);
+    // Save it the data is valid
+    if (!editor.validate()) {
+      presenter.setErrorMessage(ColumnModelsWidget.SEE_THE_ERROR_S_ABOVE);
+      return;
+    }
+    // Get the models from the view and save them
+    List<ColumnModel> newSchema = editor.getEditedColumnModels();
+    presenter.clearErrors();
+    synapseClient.getTableUpdateTransactionRequest(
+      entity.getId(),
+      new ArrayList<ColumnModel>(),
+      newSchema,
+      new AsyncCallback<TableUpdateTransactionRequest>() {
+        @Override
+        public void onFailure(Throwable caught) {
+          presenter.setError(caught);
+        }
 
-			@Override
-			public void onComplete(AsynchronousResponseBody response) {
-				view.setJobTrackerVisible(false);
-				globalAppState.getPlaceChanger().goTo(new Synapse(entity.getId()));
-				finished();
-			}
+        @Override
+        public void onSuccess(TableUpdateTransactionRequest request) {
+          if (request.getChanges().isEmpty()) {
+            globalAppState.getPlaceChanger().goTo(new Synapse(entity.getId()));
+            finished();
+          } else {
+            startTrackingJob(request);
+          }
+        }
+      }
+    );
+  }
 
-			@Override
-			public void onCancel() {
-				view.setJobTrackerVisible(false);
-				presenter.setErrorMessage(SCHEMA_UPDATE_CANCELLED);
-			}
-		});
-	}
+  public void finished() {
+    // Hide the dialog
+    presenter.setLoading(false);
+    presenter.onFinished();
+  }
+
+  public void startTrackingJob(TableUpdateTransactionRequest request) {
+    view.setJobTrackerVisible(true);
+    presenter.setLoading(true);
+    presenter.clearErrors();
+    this.jobTrackingWidget.startAndTrackJob(
+        ColumnModelsWidget.UPDATING_SCHEMA,
+        false,
+        AsynchType.TableTransaction,
+        request,
+        new AsynchronousProgressHandler() {
+          @Override
+          public void onFailure(Throwable failure) {
+            view.setJobTrackerVisible(false);
+            presenter.setError(failure);
+          }
+
+          @Override
+          public void onComplete(AsynchronousResponseBody response) {
+            view.setJobTrackerVisible(false);
+            globalAppState.getPlaceChanger().goTo(new Synapse(entity.getId()));
+            finished();
+          }
+
+          @Override
+          public void onCancel() {
+            view.setJobTrackerVisible(false);
+            presenter.setErrorMessage(SCHEMA_UPDATE_CANCELLED);
+          }
+        }
+      );
+  }
 }

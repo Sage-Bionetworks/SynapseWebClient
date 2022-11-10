@@ -1,53 +1,51 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import com.google.gwt.user.client.ui.IsWidget;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.widget.WidgetEditorView;
-import com.google.gwt.user.client.ui.IsWidget;
 
 public interface VideoConfigView extends IsWidget, WidgetEditorView {
+  /**
+   * Set the presenter.
+   *
+   * @param presenter
+   */
+  void setPresenter(Presenter presenter);
 
-	/**
-	 * Set the presenter.
-	 * 
-	 * @param presenter
-	 */
-	void setPresenter(Presenter presenter);
+  void setEntity(String entity);
 
-	void setEntity(String entity);
+  String getEntity();
 
-	String getEntity();
+  void hideFinder();
 
-	void hideFinder();
+  void setVideoFormatWarningVisible(boolean visible);
 
-	void setVideoFormatWarningVisible(boolean visible);
+  void showFinderError(String error);
 
-	void showFinderError(String error);
+  void showSynapseTab();
 
-	void showSynapseTab();
+  void showYouTubeTab();
 
-	void showYouTubeTab();
+  void showVimeoTab();
 
-	void showVimeoTab();
+  void setVimeoVideoUrl(String url);
 
-	void setVimeoVideoUrl(String url);
+  void setYouTubeVideoUrl(String url);
 
-	void setYouTubeVideoUrl(String url);
+  boolean isSynapseEntity();
 
-	boolean isSynapseEntity();
+  boolean isYouTubeVideo();
 
-	boolean isYouTubeVideo();
+  boolean isVimeoVideo();
 
-	boolean isVimeoVideo();
+  String getYouTubeVideoUrl();
 
-	String getYouTubeVideoUrl();
+  String getVimeoVideoUrl();
 
-	String getVimeoVideoUrl();
-
-	/**
-	 * Presenter interface
-	 */
-	public interface Presenter {
-		void validateSelection(Reference ref);
-	}
-
+  /**
+   * Presenter interface
+   */
+  public interface Presenter {
+    void validateSelection(Reference ref);
+  }
 }

@@ -4,55 +4,53 @@ import com.google.gwt.user.client.ui.IsWidget;
 
 /**
  * View shows the first step of the wizard
- * 
+ *
  * @author Jay
  *
  */
 public interface CreateTableViewWizardStep1View extends IsWidget {
+  /**
+   * Name of entity chosen by the user
+   *
+   */
+  String getName();
 
-	/**
-	 * Name of entity chosen by the user
-	 *
-	 */
-	String getName();
+  void setName(String name);
 
-	void setName(String name);
+  String getDescription();
 
-	String getDescription();
+  void setDescription(String description);
 
-	void setDescription(String description);
+  /**
+   * Add widget to set/get scope.
+   */
+  void setEntityViewScopeWidget(IsWidget scopeWidget);
+  void setSubmissionViewScopeWidget(IsWidget scopeWidget);
 
-	/**
-	 * Add widget to set/get scope.
-	 */
-	void setEntityViewScopeWidget(IsWidget scopeWidget);
-	void setSubmissionViewScopeWidget(IsWidget scopeWidget);
+  void setEntityViewScopeWidgetVisible(boolean visible);
+  void setSubmissionViewScopeWidgetVisible(boolean visible);
 
-	void setEntityViewScopeWidgetVisible(boolean visible);
-	void setSubmissionViewScopeWidgetVisible(boolean visible);
+  void setViewTypeOptionsVisible(boolean visible);
 
-	void setViewTypeOptionsVisible(boolean visible);
+  boolean isFileSelected();
 
-	boolean isFileSelected();
+  void setIsFileSelected(boolean selected);
 
-	void setIsFileSelected(boolean selected);
+  boolean isTableSelected();
 
-	boolean isTableSelected();
+  void setIsTableSelected(boolean selected);
 
-	void setIsTableSelected(boolean selected);
+  boolean isFolderSelected();
 
-	boolean isFolderSelected();
+  void setIsFolderSelected(boolean selected);
 
-	void setIsFolderSelected(boolean selected);
+  boolean isDatasetSelected();
 
-	boolean isDatasetSelected();
+  void setIsDatasetSelected(boolean selected);
 
-	void setIsDatasetSelected(boolean selected);
+  public interface Presenter {
+    void updateViewTypeMask();
+  }
 
-	public interface Presenter {
-		void updateViewTypeMask();
-	}
-
-	void setPresenter(Presenter presenter);
-
+  void setPresenter(Presenter presenter);
 }

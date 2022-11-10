@@ -8,23 +8,27 @@ package org.sagebionetworks.web.client.cookie;
  */
 public class CookieKeys {
 
-	public static String USER_LOGGED_IN_RECENTLY = "org.sagebionetworks.security.user.login.recently";
+  public static String USER_LOGGED_IN_RECENTLY =
+    "org.sagebionetworks.security.user.login.recently";
 
-	/**
-	 * Login token
-	 */
-	public static String USER_LOGIN_TOKEN = "org.sagebionetworks.security.user.login.token";
+  /**
+   * Login token
+   */
+  public static String USER_LOGIN_TOKEN =
+    "org.sagebionetworks.security.user.login.token";
 
-	/**
-	 * LinkedIn requestToken key
-	 */
-	public static String LINKEDIN = "org.sagebionetworks.synapse.linkedin";
+  /**
+   * LinkedIn requestToken key
+   */
+  public static String LINKEDIN = "org.sagebionetworks.synapse.linkedin";
 
-	/**
-	 * Showing UTC?
-	 */
-	public static String SHOW_DATETIME_IN_UTC = "org.sagebionetworks.synapse.datetime.utc";
-	public static String COOKIES_ACCEPTED = "org.sagebionetworks.security.cookies.notification.okclicked";
-	public static String PORTAL_CONFIG = "org.sagebionetworks.security.cookies.portal.config";
-
+  /**
+   * Showing UTC?
+   */
+  public static String SHOW_DATETIME_IN_UTC =
+    "org.sagebionetworks.synapse.datetime.utc";
+  public static String COOKIES_ACCEPTED =
+    "org.sagebionetworks.security.cookies.notification.okclicked";
+  public static String PORTAL_CONFIG =
+    "org.sagebionetworks.security.cookies.portal.config";
 }

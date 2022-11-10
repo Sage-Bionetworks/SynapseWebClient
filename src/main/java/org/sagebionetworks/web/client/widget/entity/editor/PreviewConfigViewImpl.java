@@ -1,99 +1,102 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
-import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.TextBox;
-import org.sagebionetworks.web.client.DisplayUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.TextBox;
+import org.sagebionetworks.web.client.DisplayUtils;
 
 public class PreviewConfigViewImpl implements PreviewConfigView {
-	public interface PreviewConfigViewImplUiBinder extends UiBinder<Widget, PreviewConfigViewImpl> {
-	}
 
-	private Presenter presenter;
+  public interface PreviewConfigViewImplUiBinder
+    extends UiBinder<Widget, PreviewConfigViewImpl> {}
 
-	@UiField
-	TextBox entityIdField;
-	@UiField
-	TextBox versionField;
-	@UiField
-	Button entityFinderButton;
+  private Presenter presenter;
 
-	Widget widget;
+  @UiField
+  TextBox entityIdField;
 
-	@Inject
-	public PreviewConfigViewImpl(PreviewConfigViewImplUiBinder binder) {
-		widget = binder.createAndBindUi(this);
-		initClickHandlers();
-	}
+  @UiField
+  TextBox versionField;
 
-	private void initClickHandlers() {
-		entityFinderButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onEntityFinderButtonClicked();
-			}
-		});
-	}
+  @UiField
+  Button entityFinderButton;
 
-	@Override
-	public void initView() {
-		entityIdField.setValue("");
-		versionField.setValue("");
-	}
+  Widget widget;
 
-	@Override
-	public void checkParams() throws IllegalArgumentException {}
+  @Inject
+  public PreviewConfigViewImpl(PreviewConfigViewImplUiBinder binder) {
+    widget = binder.createAndBindUi(this);
+    initClickHandlers();
+  }
 
-	@Override
-	public Widget asWidget() {
-		return widget;
-	}
+  private void initClickHandlers() {
+    entityFinderButton.addClickHandler(
+      new ClickHandler() {
+        @Override
+        public void onClick(ClickEvent event) {
+          presenter.onEntityFinderButtonClicked();
+        }
+      }
+    );
+  }
 
-	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-	}
+  @Override
+  public void initView() {
+    entityIdField.setValue("");
+    versionField.setValue("");
+  }
 
-	@Override
-	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
-	}
+  @Override
+  public void checkParams() throws IllegalArgumentException {}
 
-	@Override
-	public void showLoading() {}
+  @Override
+  public Widget asWidget() {
+    return widget;
+  }
 
-	@Override
-	public void showInfo(String message) {
-		DisplayUtils.showInfo(message);
-	}
+  @Override
+  public void setPresenter(Presenter presenter) {
+    this.presenter = presenter;
+  }
 
-	@Override
-	public void clear() {}
+  @Override
+  public void showErrorMessage(String message) {
+    DisplayUtils.showErrorMessage(message);
+  }
 
+  @Override
+  public void showLoading() {}
 
-	@Override
-	public String getEntityId() {
-		return entityIdField.getValue();
-	}
+  @Override
+  public void showInfo(String message) {
+    DisplayUtils.showInfo(message);
+  }
 
-	@Override
-	public void setEntityId(String entityId) {
-		entityIdField.setValue(entityId);
-	}
+  @Override
+  public void clear() {}
 
-	@Override
-	public String getVersion() {
-		return versionField.getValue();
-	}
+  @Override
+  public String getEntityId() {
+    return entityIdField.getValue();
+  }
 
-	@Override
-	public void setVersion(String version) {
-		versionField.setValue(version);
-	}
+  @Override
+  public void setEntityId(String entityId) {
+    entityIdField.setValue(entityId);
+  }
 
+  @Override
+  public String getVersion() {
+    return versionField.getValue();
+  }
+
+  @Override
+  public void setVersion(String version) {
+    versionField.setValue(version);
+  }
 }

@@ -1,52 +1,52 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.web.client.widget.SelectableListItem;
 import org.sagebionetworks.web.client.widget.lazyload.SupportsLazyLoadInterface;
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Widget;
 
-public interface EntityListRowBadgeView extends IsWidget, SelectableListItem, SupportsLazyLoadInterface {
+public interface EntityListRowBadgeView
+  extends IsWidget, SelectableListItem, SupportsLazyLoadInterface {
+  /**
+   * Set the presenter.
+   *
+   * @param presenter
+   */
+  void setPresenter(Presenter presenter);
 
-	/**
-	 * Set the presenter.
-	 * 
-	 * @param presenter
-	 */
-	void setPresenter(Presenter presenter);
+  void setEntityLink(String name, String url);
 
-	void setEntityLink(String name, String url);
+  void setCreatedOn(String modifiedOnString);
 
-	void setCreatedOn(String modifiedOnString);
+  void setCreatedByWidget(Widget w);
 
-	void setCreatedByWidget(Widget w);
+  void setEntityType(EntityType entityType);
 
-	void setEntityType(EntityType entityType);
+  void showAddToDownloadList();
 
-	void showAddToDownloadList();
+  void setNote(String note);
 
-	void setNote(String note);
+  String getNote();
 
-	String getNote();
+  void setDescription(String description);
 
-	void setDescription(String description);
+  void setDescriptionVisible(boolean visible);
 
-	void setDescriptionVisible(boolean visible);
+  void setVersion(String version);
 
-	void setVersion(String version);
+  void setIsSelectable(boolean isSelectable);
 
-	void setIsSelectable(boolean isSelectable);
+  void showErrorIcon(String reason);
 
-	void showErrorIcon(String reason);
+  void showRow();
 
-	void showRow();
+  void showLoading();
 
-	void showLoading();
-
-	/**
-	 * Presenter interface
-	 */
-	public interface Presenter extends SelectableListItem.Presenter {
-		void onAddToDownloadList();
-	}
+  /**
+   * Presenter interface
+   */
+  public interface Presenter extends SelectableListItem.Presenter {
+    void onAddToDownloadList();
+  }
 }

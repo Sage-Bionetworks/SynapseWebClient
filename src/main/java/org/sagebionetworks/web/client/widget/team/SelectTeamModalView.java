@@ -4,19 +4,18 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 public interface SelectTeamModalView extends IsWidget {
+  public void setPresenter(Presenter presenter);
 
-	public void setPresenter(Presenter presenter);
+  public interface Presenter {
+    void onSelectTeam();
+  }
 
-	public interface Presenter {
-		void onSelectTeam();
-	}
+  void setSuggestWidget(Widget suggestWidget);
 
-	void setSuggestWidget(Widget suggestWidget);
+  void show();
 
-	void show();
+  void hide();
 
-	void hide();
-
-	void setTitle(String title);
-	void setPrimaryButtonText(String text);
+  void setTitle(String title);
+  void setPrimaryButtonText(String text);
 }

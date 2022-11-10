@@ -1,20 +1,18 @@
 package org.sagebionetworks.web.client.widget.docker;
 
-import java.util.Date;
 import com.google.gwt.user.client.ui.IsWidget;
+import java.util.Date;
 
 public interface DockerCommitRowWidgetView extends IsWidget {
+  public interface Presenter {
+    void onClick();
+  }
 
-	public interface Presenter {
+  void setPresenter(Presenter dockerCommitRowWidget);
 
-		void onClick();
-	}
+  void setTag(String tag);
 
-	void setPresenter(Presenter dockerCommitRowWidget);
+  void setCreatedOn(Date date);
 
-	void setTag(String tag);
-
-	void setCreatedOn(Date date);
-
-	void setDigest(String widget);
+  void setDigest(String widget);
 }

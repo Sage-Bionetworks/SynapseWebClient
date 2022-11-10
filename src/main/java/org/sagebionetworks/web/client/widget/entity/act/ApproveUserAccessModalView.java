@@ -1,63 +1,61 @@
 package org.sagebionetworks.web.client.widget.entity.act;
 
-import java.util.List;
-import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequirementWidget;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import java.util.List;
+import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequirementWidget;
 
 public interface ApproveUserAccessModalView extends IsWidget {
+  void setPresenter(Presenter presenter);
 
-	void setPresenter(Presenter presenter);
+  void setSynAlert(Widget asWidget);
 
-	void setSynAlert(Widget asWidget);
+  void setAccessRequirementIDs(List<String> states);
 
-	void setAccessRequirementIDs(List<String> states);
+  void setUserPickerWidget(Widget w);
 
-	void setUserPickerWidget(Widget w);
+  void setLoadingEmailWidget(Widget w);
 
-	void setLoadingEmailWidget(Widget w);
+  String getAccessRequirement();
 
-	String getAccessRequirement();
+  String getEmailMessage();
 
-	String getEmailMessage();
+  Widget getEmailBodyWidget(String html);
 
-	Widget getEmailBodyWidget(String html);
+  void setAccessRequirement(String num);
 
-	void setAccessRequirement(String num);
+  void setApproveProcessing(boolean processing);
 
-	void setApproveProcessing(boolean processing);
+  void setRevokeProcessing(boolean processing);
 
-	void setRevokeProcessing(boolean processing);
+  void setDatasetTitle(String text);
 
-	void setDatasetTitle(String text);
+  void setMessageBody(String html);
 
-	void setMessageBody(String html);
+  void setMessageEditArea(String html);
 
-	void setMessageEditArea(String html);
+  void startLoadingEmail();
 
-	void startLoadingEmail();
+  void finishLoadingEmail();
 
-	void finishLoadingEmail();
+  void showInfo(String message);
 
-	void showInfo(String message);
+  void setLoadingEmailVisible(boolean visible);
 
-	void setLoadingEmailVisible(boolean visible);
+  void show();
 
-	void show();
+  void hide();
 
-	void hide();
+  /**
+   * Presenter interface
+   */
+  public interface Presenter {
+    void onSubmit();
 
-	/**
-	 * Presenter interface
-	 */
-	public interface Presenter {
-		void onSubmit();
+    void onAccessRequirementIDSelected(String state);
 
-		void onAccessRequirementIDSelected(String state);
+    void onRevoke();
+  }
 
-		void onRevoke();
-	}
-
-	void setAccessRequirementWidget(AccessRequirementWidget arWidget);
-
+  void setAccessRequirementWidget(AccessRequirementWidget arWidget);
 }

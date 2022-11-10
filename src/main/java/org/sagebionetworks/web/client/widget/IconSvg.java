@@ -7,27 +7,29 @@ import org.sagebionetworks.web.client.jsinterop.SRC;
 
 public class IconSvg extends ReactComponentSpan {
 
-	private String icon;
+  private String icon;
 
-	private String label;
+  private String label;
 
-	public IconSvg() {
-	}
-	
-	public void configure(String icon, String label) {
-		this.icon = icon;
-		this.label = label;
-		renderComponent();
-	}
+  public IconSvg() {}
 
-	private void renderComponent() {
-		IconSvgProps props = IconSvgProps.create(icon, label);
-		ReactNode component = React.createElementWithThemeContext(SRC.SynapseComponents.IconSvg, props);
-		this.render(component);
-	}
+  public void configure(String icon, String label) {
+    this.icon = icon;
+    this.label = label;
+    renderComponent();
+  }
 
-	public void setIcon(String icon) {
-		this.icon = icon;
-		renderComponent();
-	}
+  private void renderComponent() {
+    IconSvgProps props = IconSvgProps.create(icon, label);
+    ReactNode component = React.createElementWithThemeContext(
+      SRC.SynapseComponents.IconSvg,
+      props
+    );
+    this.render(component);
+  }
+
+  public void setIcon(String icon) {
+    this.icon = icon;
+    renderComponent();
+  }
 }

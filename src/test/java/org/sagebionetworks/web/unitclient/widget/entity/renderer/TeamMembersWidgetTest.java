@@ -8,6 +8,8 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -23,8 +25,8 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.entity.renderer.UserListRowWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.TeamMembersWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.UserListRowWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.UserListView;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
 import org.sagebionetworks.web.shared.TeamMemberBundle;
@@ -33,103 +35,180 @@ import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class TeamMembersWidgetTest {
 
-	@Mock
-	UserListView mockView;
-	@Mock
-	BasicPaginationWidget mockPaginationWidget;
-	@Mock
-	SynapseJavascriptClient mockJsClient;
-	@Mock
-	SynapseAlert mockSynAlert;
-	@Mock
-	PortalGinInjector mockGinInjector;
-	@Mock
-	UserListRowWidget mockRow;
+  @Mock
+  UserListView mockView;
 
-	TeamMembersWidget widget;
-	Map<String, String> descriptor;
-	public static final String TEAM_ID = "121111";
-	String entityId = "syn22";
-	UserProfile testProfile;
+  @Mock
+  BasicPaginationWidget mockPaginationWidget;
 
-	@Before
-	public void before() throws RestServiceException, JSONObjectAdapterException {
-		MockitoAnnotations.initMocks(this);
-		widget = new TeamMembersWidget(mockView, mockPaginationWidget, mockJsClient, mockSynAlert, mockGinInjector);
-		descriptor = new HashMap<String, String>();
-		descriptor.put(WidgetConstants.TEAM_ID_KEY, TEAM_ID);
-		when(mockGinInjector.getUserListRowWidget()).thenReturn(mockRow);
-		AsyncMockStubber.callSuccessWith(getTestUserProfilePagedResults()).when(mockJsClient).getTeamMembers(anyString(), anyString(), any(TeamMemberTypeFilterOptions.class), anyInt(), anyInt(), any(AsyncCallback.class));
-	}
+  @Mock
+  SynapseJavascriptClient mockJsClient;
 
-	public TeamMemberPagedResults getTestUserProfilePagedResults() {
-		TeamMemberPagedResults results = new TeamMemberPagedResults();
-		testProfile = new UserProfile();
-		testProfile.setOwnerId("9837");
-		TeamMemberBundle bundle = new TeamMemberBundle(testProfile, false, TEAM_ID);
-		results.setResults(Collections.singletonList(bundle));
-		results.setTotalNumberOfResults(1L);
-		return results;
-	}
+  @Mock
+  SynapseAlert mockSynAlert;
 
-	public TeamMemberPagedResults getEmptyUserProfilePagedResults() {
-		TeamMemberPagedResults results = new TeamMemberPagedResults();
-		List<TeamMemberBundle> emptyList = Collections.emptyList();
-		results.setResults(emptyList);
-		results.setTotalNumberOfResults(0L);
-		return results;
-	}
+  @Mock
+  PortalGinInjector mockGinInjector;
 
+  @Mock
+  UserListRowWidget mockRow;
 
-	@Test
-	public void testHappyCaseConfigure() throws Exception {
-		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null);
+  TeamMembersWidget widget;
+  Map<String, String> descriptor;
+  public static final String TEAM_ID = "121111";
+  String entityId = "syn22";
+  UserProfile testProfile;
 
-		verify(mockSynAlert).clear();
-		verify(mockView).setLoadingVisible(true);
-		verify(mockView).clearRows();
-		verify(mockJsClient).getTeamMembers(anyString(), anyString(), eq(TeamMemberTypeFilterOptions.ALL), anyInt(), anyInt(), any(AsyncCallback.class));
-		verify(mockView).setLoadingVisible(false);
-		verify(mockPaginationWidget).configure(anyLong(), anyLong(), anyLong(), eq(widget));
+  @Before
+  public void before() throws RestServiceException, JSONObjectAdapterException {
+    MockitoAnnotations.initMocks(this);
+    widget =
+      new TeamMembersWidget(
+        mockView,
+        mockPaginationWidget,
+        mockJsClient,
+        mockSynAlert,
+        mockGinInjector
+      );
+    descriptor = new HashMap<String, String>();
+    descriptor.put(WidgetConstants.TEAM_ID_KEY, TEAM_ID);
+    when(mockGinInjector.getUserListRowWidget()).thenReturn(mockRow);
+    AsyncMockStubber
+      .callSuccessWith(getTestUserProfilePagedResults())
+      .when(mockJsClient)
+      .getTeamMembers(
+        anyString(),
+        anyString(),
+        any(TeamMemberTypeFilterOptions.class),
+        anyInt(),
+        anyInt(),
+        any(AsyncCallback.class)
+      );
+  }
 
-		verify(mockView).addRow(mockRow);
-		verify(mockRow).configure(testProfile);
-	}
+  public TeamMemberPagedResults getTestUserProfilePagedResults() {
+    TeamMemberPagedResults results = new TeamMemberPagedResults();
+    testProfile = new UserProfile();
+    testProfile.setOwnerId("9837");
+    TeamMemberBundle bundle = new TeamMemberBundle(testProfile, false, TEAM_ID);
+    results.setResults(Collections.singletonList(bundle));
+    results.setTotalNumberOfResults(1L);
+    return results;
+  }
 
+  public TeamMemberPagedResults getEmptyUserProfilePagedResults() {
+    TeamMemberPagedResults results = new TeamMemberPagedResults();
+    List<TeamMemberBundle> emptyList = Collections.emptyList();
+    results.setResults(emptyList);
+    results.setTotalNumberOfResults(0L);
+    return results;
+  }
 
-	@Test
-	public void testHappyCaseNoParticipants() throws Exception {
-		AsyncMockStubber.callSuccessWith(getEmptyUserProfilePagedResults()).when(mockJsClient).getTeamMembers(anyString(), anyString(), any(TeamMemberTypeFilterOptions.class), anyInt(), anyInt(), any(AsyncCallback.class));
-		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null);
+  @Test
+  public void testHappyCaseConfigure() throws Exception {
+    widget.configure(
+      new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null),
+      descriptor,
+      null,
+      null
+    );
 
-		verify(mockView).clearRows();
-		verify(mockJsClient).getTeamMembers(anyString(), anyString(), eq(TeamMemberTypeFilterOptions.ALL), anyInt(), anyInt(), any(AsyncCallback.class));
-		verify(mockView, never()).addRow(mockRow);
-	}
+    verify(mockSynAlert).clear();
+    verify(mockView).setLoadingVisible(true);
+    verify(mockView).clearRows();
+    verify(mockJsClient)
+      .getTeamMembers(
+        anyString(),
+        anyString(),
+        eq(TeamMemberTypeFilterOptions.ALL),
+        anyInt(),
+        anyInt(),
+        any(AsyncCallback.class)
+      );
+    verify(mockView).setLoadingVisible(false);
+    verify(mockPaginationWidget)
+      .configure(anyLong(), anyLong(), anyLong(), eq(widget));
 
-	@Test
-	public void testGetTeamMembersFailure() throws Exception {
-		Exception ex = new Exception("unhandled");
-		AsyncMockStubber.callFailureWith(ex).when(mockJsClient).getTeamMembers(anyString(), anyString(), any(TeamMemberTypeFilterOptions.class), anyInt(), anyInt(), any(AsyncCallback.class));
-		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null);
-		verify(mockSynAlert).clear();
-		verify(mockView).setLoadingVisible(true);
-		verify(mockView).clearRows();
-		verify(mockJsClient).getTeamMembers(anyString(), anyString(), eq(TeamMemberTypeFilterOptions.ALL), anyInt(), anyInt(), any(AsyncCallback.class));
-		verify(mockView).setLoadingVisible(false);
+    verify(mockView).addRow(mockRow);
+    verify(mockRow).configure(testProfile);
+  }
 
-		verify(mockSynAlert).handleException(ex);
-	}
+  @Test
+  public void testHappyCaseNoParticipants() throws Exception {
+    AsyncMockStubber
+      .callSuccessWith(getEmptyUserProfilePagedResults())
+      .when(mockJsClient)
+      .getTeamMembers(
+        anyString(),
+        anyString(),
+        any(TeamMemberTypeFilterOptions.class),
+        anyInt(),
+        anyInt(),
+        any(AsyncCallback.class)
+      );
+    widget.configure(
+      new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null),
+      descriptor,
+      null,
+      null
+    );
 
-	@Test
-	public void testAsWidget() {
-		widget.asWidget();
-		verify(mockView).asWidget();
-	}
+    verify(mockView).clearRows();
+    verify(mockJsClient)
+      .getTeamMembers(
+        anyString(),
+        anyString(),
+        eq(TeamMemberTypeFilterOptions.ALL),
+        anyInt(),
+        anyInt(),
+        any(AsyncCallback.class)
+      );
+    verify(mockView, never()).addRow(mockRow);
+  }
+
+  @Test
+  public void testGetTeamMembersFailure() throws Exception {
+    Exception ex = new Exception("unhandled");
+    AsyncMockStubber
+      .callFailureWith(ex)
+      .when(mockJsClient)
+      .getTeamMembers(
+        anyString(),
+        anyString(),
+        any(TeamMemberTypeFilterOptions.class),
+        anyInt(),
+        anyInt(),
+        any(AsyncCallback.class)
+      );
+    widget.configure(
+      new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null),
+      descriptor,
+      null,
+      null
+    );
+    verify(mockSynAlert).clear();
+    verify(mockView).setLoadingVisible(true);
+    verify(mockView).clearRows();
+    verify(mockJsClient)
+      .getTeamMembers(
+        anyString(),
+        anyString(),
+        eq(TeamMemberTypeFilterOptions.ALL),
+        anyInt(),
+        anyInt(),
+        any(AsyncCallback.class)
+      );
+    verify(mockView).setLoadingVisible(false);
+
+    verify(mockSynAlert).handleException(ex);
+  }
+
+  @Test
+  public void testAsWidget() {
+    widget.asWidget();
+    verify(mockView).asWidget();
+  }
 }
-
-

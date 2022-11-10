@@ -3,9 +3,19 @@ package org.sagebionetworks.web.client.widget.entity;
 import static org.sagebionetworks.web.client.DisplayConstants.GO_TO_CURRENT_VERSION;
 import static org.sagebionetworks.web.client.DisplayConstants.GO_TO_DRAFT_VERSION;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.Hyperlink;
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Collapse;
 import org.gwtbootstrap3.client.ui.Panel;
@@ -24,218 +34,253 @@ import org.sagebionetworks.web.client.view.bootstrap.table.TableHeader;
 import org.sagebionetworks.web.client.widget.IconSvg;
 import org.sagebionetworks.web.client.widget.doi.DoiWidgetV2;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Hyperlink;
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
-
 /**
  * @author jayhodgson
  */
-public class VersionHistoryWidgetViewImpl extends Composite implements VersionHistoryWidgetView, IsWidget {
+public class VersionHistoryWidgetViewImpl
+  extends Composite
+  implements VersionHistoryWidgetView, IsWidget {
 
-	interface VersionHistoryWidgetViewImplUiBinder extends UiBinder<Widget, VersionHistoryWidgetViewImpl> {
-	}
+  interface VersionHistoryWidgetViewImplUiBinder
+    extends UiBinder<Widget, VersionHistoryWidgetViewImpl> {}
 
-	private static VersionHistoryWidgetViewImplUiBinder uiBinder = GWT.create(VersionHistoryWidgetViewImplUiBinder.class);
+  private static VersionHistoryWidgetViewImplUiBinder uiBinder = GWT.create(
+    VersionHistoryWidgetViewImplUiBinder.class
+  );
 
-	private PortalGinInjector ginInjector;
+  private PortalGinInjector ginInjector;
 
-	@UiField
-	Collapse collapse;
-	@UiField
-	IconSvg closeButton;
-	@UiField
-	Panel previousVersions;
-	@UiField
-	TBody previousVersionsTable;
-	@UiField
-	Hyperlink currentVersionLink;
-	@UiField
-	Button editInfoButton;
-	@UiField
-	Button moreButton;
-	@UiField
-	Div synAlertContainer;
-	@UiField
-	TableHeader sizeTableHeader;
-	@UiField
-	TableHeader md5TableHeader;
-	@UiField
-	org.sagebionetworks.web.client.view.bootstrap.table.Table versionTable;
-	@UiField
-	Div emptyUI;
-	CallbackP<List<String>> versionValuesCallback;
-	PromptForValuesModalView editVersionInfoModal;
-	boolean isTable = false;
-	private static DateTimeFormat shortDateFormat = DateTimeFormat.getShortDateFormat();
-	private Presenter presenter;
+  @UiField
+  Collapse collapse;
 
-	@Inject
-	public VersionHistoryWidgetViewImpl(PortalGinInjector ginInjector, PromptForValuesModalView editVersionInfoDialog) {
-		this.ginInjector = ginInjector;
-		this.editVersionInfoModal = editVersionInfoDialog;
-		initWidget(uiBinder.createAndBindUi(this));
-		closeButton.addClickHandler(event -> presenter.setVisible(false));
-		versionValuesCallback = values -> {
-			presenter.updateVersionInfo(values.get(0), values.get(1));
-		};
-		editInfoButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onEditVersionInfoClicked();
-			}
-		});
-		moreButton.addClickHandler(event -> {
-			presenter.onMore();
-		});
-	}
+  @UiField
+  IconSvg closeButton;
 
-	@Override
-	public void setEntityBundle(Entity entity, boolean isShowingOlderVersion) {
-		clear();
-		isTable = entity instanceof Table;
-		sizeTableHeader.setVisible(!isTable);
-		md5TableHeader.setVisible(!isTable);
-		currentVersionLink.setTargetHistoryToken(DisplayUtils.getSynapseHistoryTokenNoHash(entity.getId()));
-		currentVersionLink.setVisible(isShowingOlderVersion);
-		String currentVersionLinkText;
-		if (entity instanceof Dataset) {
-			currentVersionLinkText = GO_TO_DRAFT_VERSION;
-		} else {
-			currentVersionLinkText = GO_TO_CURRENT_VERSION;
-		}
-		currentVersionLink.setText(currentVersionLinkText);
-		if (isShowingOlderVersion) {
-			setVisible(true);
-		}
-	}
+  @UiField
+  Panel previousVersions;
 
-	@Override
-	public void clearVersions() {
-		previousVersionsTable.clear();
-		emptyUI.setVisible(false);
-		versionTable.setVisible(true);
-	}
+  @UiField
+  TBody previousVersionsTable;
 
-	@Override
-	public void addVersion(String entityId, final VersionInfo version, boolean canEdit, boolean isVersionSelected) {
-		VersionHistoryRowView fileHistoryRow = ginInjector.getFileHistoryRow();
-		fileHistoryRow.setMd5TableDataVisible(!isTable);
-		fileHistoryRow.setSizeTableDataVisible(!isTable);
-		fileHistoryRow.setIsUnlinked(isVersionSelected);
-		DoiWidgetV2 doiWidget = ginInjector.getDoiWidget();
-		doiWidget.setLabelVisible(false);
-		String versionName = version.getVersionLabel();
-		String modifiedByUserId = version.getModifiedByPrincipalId();
-		String modifiedOn = shortDateFormat.format(version.getModifiedOn());
-		String size = "";
-		try {
-			double sizeDouble = Double.parseDouble(version.getContentSize());
-			size = DisplayUtils.getFriendlySize(sizeDouble, true);
-		} catch (Throwable t) {
-		}
-		String md5 = version.getContentMd5();
-		Callback deleteCallback = () -> {
-			presenter.deleteVersion(version.getVersionNumber());
-		};
+  @UiField
+  Hyperlink currentVersionLink;
 
-		String versionComment = version.getVersionComment();
-		Long versionNumber = version.getVersionNumber();
-		String versionHref = DisplayUtils.getSynapseHistoryToken(version.getId(), version.getVersionNumber());
-		fileHistoryRow.configure(versionNumber, versionHref, versionName, modifiedByUserId, modifiedOn, size, md5, versionComment, deleteCallback, doiWidget);
-		previousVersionsTable.add(fileHistoryRow.asWidget());
-		fileHistoryRow.setCanDelete(canEdit);
-		fileHistoryRow.setIsVersionSelected(isVersionSelected);
-		doiWidget.configure(entityId, ObjectType.ENTITY, versionNumber);
-	}
+  @UiField
+  Button editInfoButton;
 
-	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-	}
+  @UiField
+  Button moreButton;
 
-	@Override
-	public void setVisible(boolean visible) {
-		if (visible) {
-			collapse.show();
-		} else {
-			collapse.hide();
-		}
-	}
+  @UiField
+  Div synAlertContainer;
 
-	@Override
-	public boolean isVisible() {
-		return collapse.isShown();
-	}
+  @UiField
+  TableHeader sizeTableHeader;
 
-	@Override
-	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
-	}
+  @UiField
+  TableHeader md5TableHeader;
 
-	@Override
-	public void showLoading() {}
+  @UiField
+  org.sagebionetworks.web.client.view.bootstrap.table.Table versionTable;
 
-	@Override
-	public void showInfo(String message) {
-		DisplayUtils.showInfo(message);
-	}
+  @UiField
+  Div emptyUI;
 
-	@Override
-	public void clear() {
-		// reset versions ui
-		clearVersions();
-		currentVersionLink.setVisible(false);
-	}
+  CallbackP<List<String>> versionValuesCallback;
+  PromptForValuesModalView editVersionInfoModal;
+  boolean isTable = false;
+  private static DateTimeFormat shortDateFormat = DateTimeFormat.getShortDateFormat();
+  private Presenter presenter;
 
-	@Override
-	public void setMoreButtonVisible(boolean visible) {
-		moreButton.setVisible(visible);
-	}
+  @Inject
+  public VersionHistoryWidgetViewImpl(
+    PortalGinInjector ginInjector,
+    PromptForValuesModalView editVersionInfoDialog
+  ) {
+    this.ginInjector = ginInjector;
+    this.editVersionInfoModal = editVersionInfoDialog;
+    initWidget(uiBinder.createAndBindUi(this));
+    closeButton.addClickHandler(event -> presenter.setVisible(false));
+    versionValuesCallback =
+      values -> {
+        presenter.updateVersionInfo(values.get(0), values.get(1));
+      };
+    editInfoButton.addClickHandler(
+      new ClickHandler() {
+        @Override
+        public void onClick(ClickEvent event) {
+          presenter.onEditVersionInfoClicked();
+        }
+      }
+    );
+    moreButton.addClickHandler(event -> {
+      presenter.onMore();
+    });
+  }
 
-	@Override
-	public void setEditVersionInfoButtonVisible(boolean isVisible) {
-		editInfoButton.setVisible(isVisible);
-	}
+  @Override
+  public void setEntityBundle(Entity entity, boolean isShowingOlderVersion) {
+    clear();
+    isTable = entity instanceof Table;
+    sizeTableHeader.setVisible(!isTable);
+    md5TableHeader.setVisible(!isTable);
+    currentVersionLink.setTargetHistoryToken(
+      DisplayUtils.getSynapseHistoryTokenNoHash(entity.getId())
+    );
+    currentVersionLink.setVisible(isShowingOlderVersion);
+    String currentVersionLinkText;
+    if (entity instanceof Dataset) {
+      currentVersionLinkText = GO_TO_DRAFT_VERSION;
+    } else {
+      currentVersionLinkText = GO_TO_CURRENT_VERSION;
+    }
+    currentVersionLink.setText(currentVersionLinkText);
+    if (isShowingOlderVersion) {
+      setVisible(true);
+    }
+  }
 
-	@Override
-	public void showEditVersionInfo(String oldLabel, String oldComment) {
-		List<String> prompts = new ArrayList<>();
-		prompts.add("Version label");
-		prompts.add("Version comment");
-		List<String> initialValues = new ArrayList<>();
-		initialValues.add(oldLabel);
-		initialValues.add(oldComment);
-		editVersionInfoModal.configureAndShow("Edit Version Info", prompts, initialValues, versionValuesCallback);
-	}
+  @Override
+  public void clearVersions() {
+    previousVersionsTable.clear();
+    emptyUI.setVisible(false);
+    versionTable.setVisible(true);
+  }
 
-	@Override
-	public void showEditVersionInfoError(String error) {
-		editVersionInfoModal.showError(error);
-	}
+  @Override
+  public void addVersion(
+    String entityId,
+    final VersionInfo version,
+    boolean canEdit,
+    boolean isVersionSelected
+  ) {
+    VersionHistoryRowView fileHistoryRow = ginInjector.getFileHistoryRow();
+    fileHistoryRow.setMd5TableDataVisible(!isTable);
+    fileHistoryRow.setSizeTableDataVisible(!isTable);
+    fileHistoryRow.setIsUnlinked(isVersionSelected);
+    DoiWidgetV2 doiWidget = ginInjector.getDoiWidget();
+    doiWidget.setLabelVisible(false);
+    String versionName = version.getVersionLabel();
+    String modifiedByUserId = version.getModifiedByPrincipalId();
+    String modifiedOn = shortDateFormat.format(version.getModifiedOn());
+    String size = "";
+    try {
+      double sizeDouble = Double.parseDouble(version.getContentSize());
+      size = DisplayUtils.getFriendlySize(sizeDouble, true);
+    } catch (Throwable t) {}
+    String md5 = version.getContentMd5();
+    Callback deleteCallback = () -> {
+      presenter.deleteVersion(version.getVersionNumber());
+    };
 
-	@Override
-	public void hideEditVersionInfo() {
-		editVersionInfoModal.hide();
-	}
+    String versionComment = version.getVersionComment();
+    Long versionNumber = version.getVersionNumber();
+    String versionHref = DisplayUtils.getSynapseHistoryToken(
+      version.getId(),
+      version.getVersionNumber()
+    );
+    fileHistoryRow.configure(
+      versionNumber,
+      versionHref,
+      versionName,
+      modifiedByUserId,
+      modifiedOn,
+      size,
+      md5,
+      versionComment,
+      deleteCallback,
+      doiWidget
+    );
+    previousVersionsTable.add(fileHistoryRow.asWidget());
+    fileHistoryRow.setCanDelete(canEdit);
+    fileHistoryRow.setIsVersionSelected(isVersionSelected);
+    doiWidget.configure(entityId, ObjectType.ENTITY, versionNumber);
+  }
 
-	@Override
-	public void setSynAlert(IsWidget w) {
-		synAlertContainer.clear();
-		synAlertContainer.add(w);
-	}
+  @Override
+  public void setPresenter(Presenter presenter) {
+    this.presenter = presenter;
+  }
 
-	@Override
-	public void showNoResults() {
-		emptyUI.setVisible(true);
-		versionTable.setVisible(false);
-	}
+  @Override
+  public void setVisible(boolean visible) {
+    if (visible) {
+      collapse.show();
+    } else {
+      collapse.hide();
+    }
+  }
+
+  @Override
+  public boolean isVisible() {
+    return collapse.isShown();
+  }
+
+  @Override
+  public void showErrorMessage(String message) {
+    DisplayUtils.showErrorMessage(message);
+  }
+
+  @Override
+  public void showLoading() {}
+
+  @Override
+  public void showInfo(String message) {
+    DisplayUtils.showInfo(message);
+  }
+
+  @Override
+  public void clear() {
+    // reset versions ui
+    clearVersions();
+    currentVersionLink.setVisible(false);
+  }
+
+  @Override
+  public void setMoreButtonVisible(boolean visible) {
+    moreButton.setVisible(visible);
+  }
+
+  @Override
+  public void setEditVersionInfoButtonVisible(boolean isVisible) {
+    editInfoButton.setVisible(isVisible);
+  }
+
+  @Override
+  public void showEditVersionInfo(String oldLabel, String oldComment) {
+    List<String> prompts = new ArrayList<>();
+    prompts.add("Version label");
+    prompts.add("Version comment");
+    List<String> initialValues = new ArrayList<>();
+    initialValues.add(oldLabel);
+    initialValues.add(oldComment);
+    editVersionInfoModal.configureAndShow(
+      "Edit Version Info",
+      prompts,
+      initialValues,
+      versionValuesCallback
+    );
+  }
+
+  @Override
+  public void showEditVersionInfoError(String error) {
+    editVersionInfoModal.showError(error);
+  }
+
+  @Override
+  public void hideEditVersionInfo() {
+    editVersionInfoModal.hide();
+  }
+
+  @Override
+  public void setSynAlert(IsWidget w) {
+    synAlertContainer.clear();
+    synAlertContainer.add(w);
+  }
+
+  @Override
+  public void showNoResults() {
+    emptyUI.setVisible(true);
+    versionTable.setVisible(false);
+  }
 }

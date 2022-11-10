@@ -8,25 +8,23 @@ import com.google.gwt.user.client.ui.Widget;
  *
  */
 public interface StuAlertView extends IsWidget {
+  /**
+   * Show info to the user.
+   *
+   * @param string
+   */
+  void showInfo(String message);
 
-	/**
-	 * Show info to the user.
-	 * 
-	 * @param string
-	 */
-	void showInfo(String message);
+  /**
+   * Clears all state in the view (makes all components invisible).
+   */
+  void clearState();
 
-	/**
-	 * Clears all state in the view (makes all components invisible).
-	 */
-	void clearState();
+  void show403();
 
-	void show403();
+  void show404();
 
-	void show404();
+  void setSynAlert(Widget w);
 
-	void setSynAlert(Widget w);
-
-	void setVisible(boolean visible);
-
+  void setVisible(boolean visible);
 }

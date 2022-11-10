@@ -1,43 +1,45 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
-import org.sagebionetworks.web.client.utils.Callback;
 import com.google.gwt.user.client.ui.Widget;
+import org.sagebionetworks.web.client.utils.Callback;
 
 public interface NewReplyWidgetView {
+  public interface Presenter {
+    void onSave();
 
-	public interface Presenter {
+    void onCancel();
 
-		void onSave();
+    Widget asWidget();
 
-		void onCancel();
+    void onClickNewReply();
+  }
 
-		Widget asWidget();
+  void setPresenter(Presenter newReplyWidget);
 
-		void onClickNewReply();
+  void setAlert(Widget widget);
 
-	}
+  void setMarkdownEditor(Widget widget);
 
-	void setPresenter(Presenter newReplyWidget);
+  void showSaving();
 
-	void setAlert(Widget widget);
+  void resetButton();
 
-	void setMarkdownEditor(Widget widget);
+  void showSuccess(String successTitle, String successMessage);
 
-	void showSaving();
+  void setReplyTextBoxVisible(boolean visible);
 
-	void resetButton();
+  void setNewReplyContainerVisible(boolean visible);
 
-	void showSuccess(String successTitle, String successMessage);
+  Widget asWidget();
 
-	void setReplyTextBoxVisible(boolean visible);
+  void showErrorMessage(String error);
 
-	void setNewReplyContainerVisible(boolean visible);
+  void showConfirmDialog(
+    String restoreTitle,
+    String restoreMessage,
+    Callback yesCallback,
+    Callback noCallback
+  );
 
-	Widget asWidget();
-
-	void showErrorMessage(String error);
-
-	void showConfirmDialog(String restoreTitle, String restoreMessage, Callback yesCallback, Callback noCallback);
-
-	void scrollIntoView();
+  void scrollIntoView();
 }

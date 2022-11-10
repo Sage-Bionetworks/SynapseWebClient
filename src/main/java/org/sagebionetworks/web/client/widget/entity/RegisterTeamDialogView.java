@@ -1,46 +1,45 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import com.google.gwt.user.client.ui.IsWidget;
 import java.util.List;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.ShowsErrors;
 import org.sagebionetworks.web.client.utils.Callback;
-import com.google.gwt.user.client.ui.IsWidget;
 
 public interface RegisterTeamDialogView extends IsWidget, ShowsErrors {
-	/**
-	 * Set the presenter.
-	 * 
-	 * @param presenter
-	 */
-	void setPresenter(Presenter presenter);
+  /**
+   * Set the presenter.
+   *
+   * @param presenter
+   */
+  void setPresenter(Presenter presenter);
 
-	void setRecruitmentMessage(String message);
+  void setRecruitmentMessage(String message);
 
-	String getRecruitmentMessage();
+  String getRecruitmentMessage();
 
-	void setTeams(List<Team> teams);
+  void setTeams(List<Team> teams);
 
-	void showModal();
+  void showModal();
 
-	void hideModal();
+  void hideModal();
 
-	void setNoTeamsFoundVisible(boolean isVisible);
+  void setNoTeamsFoundVisible(boolean isVisible);
 
-	void showConfirmDialog(String message, Callback okCallback);
+  void showConfirmDialog(String message, Callback okCallback);
 
-	void showInfo(String message);
+  void showInfo(String message);
 
-	void setNewTeamLink(String url);
+  void setNewTeamLink(String url);
 
-	/**
-	 * Presenter interface
-	 */
-	public interface Presenter {
-		void teamSelected(int selectedIndex);
+  /**
+   * Presenter interface
+   */
+  public interface Presenter {
+    void teamSelected(int selectedIndex);
 
-		void onOk();
+    void onOk();
 
-		void refreshRegistratableTeams();
-	}
-
+    void refreshRegistratableTeams();
+  }
 }

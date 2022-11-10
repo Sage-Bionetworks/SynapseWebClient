@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
+import com.google.inject.Inject;
 import java.util.function.Consumer;
-
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -18,112 +18,137 @@ import org.sagebionetworks.web.client.widget.evaluation.ChallengeWidget;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModal;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorReactComponentPage;
 
-import com.google.inject.Inject;
-
 public class ChallengeTab implements ChallengeTabView.Presenter {
-	Tab tab;
-	ChallengeTabView view;
-	AdministerEvaluationsList evaluationList;
-	ChallengeWidget challengeWidget;
-	PortalGinInjector ginInjector;
-	AuthenticationController authenticationController;
-	GlobalApplicationState globalApplicationState;
-	CookieProvider cookies;
-	ActionMenuWidget actionMenuWidget;
 
-	String entityId;
-	EvaluationEditorModal evalEditor;
-	UserEntityPermissions permissions;
+  Tab tab;
+  ChallengeTabView view;
+  AdministerEvaluationsList evaluationList;
+  ChallengeWidget challengeWidget;
+  PortalGinInjector ginInjector;
+  AuthenticationController authenticationController;
+  GlobalApplicationState globalApplicationState;
+  CookieProvider cookies;
+  ActionMenuWidget actionMenuWidget;
 
-	@Inject
-	public ChallengeTab(Tab tab, PortalGinInjector ginInjector, AuthenticationController authenticationController, GlobalApplicationState globalApplicationState, CookieProvider cookies) {
-		this.tab = tab;
-		this.ginInjector = ginInjector;
-		this.authenticationController = authenticationController;
-		this.globalApplicationState = globalApplicationState;
-		this.cookies = cookies;
-		tab.configure("Challenge", "challenge", "Challenges are open science, collaborative competitions for evaluating and comparing computational algorithms or solutions to problems.", "http://sagebionetworks.org/platforms/", EntityArea.CHALLENGE);
-	}
+  String entityId;
+  EvaluationEditorModal evalEditor;
+  UserEntityPermissions permissions;
 
-	public void lazyInject() {
-		if (view == null) {
-			this.view = ginInjector.getChallengeTabView();
-			this.evaluationList = ginInjector.getAdministerEvaluationsList();
-			this.challengeWidget = ginInjector.getChallengeWidget();
-			this.actionMenuWidget = tab.getEntityActionMenu();
-			view.setEvaluationList(evaluationList.asWidget());
-			view.setChallengeWidget(challengeWidget.asWidget());
-			tab.setContent(view.asWidget());
-			view.setActionMenu(actionMenuWidget);
-		}
-	}
+  @Inject
+  public ChallengeTab(
+    Tab tab,
+    PortalGinInjector ginInjector,
+    AuthenticationController authenticationController,
+    GlobalApplicationState globalApplicationState,
+    CookieProvider cookies
+  ) {
+    this.tab = tab;
+    this.ginInjector = ginInjector;
+    this.authenticationController = authenticationController;
+    this.globalApplicationState = globalApplicationState;
+    this.cookies = cookies;
+    tab.configure(
+      "Challenge",
+      "challenge",
+      "Challenges are open science, collaborative competitions for evaluating and comparing computational algorithms or solutions to problems.",
+      "http://sagebionetworks.org/platforms/",
+      EntityArea.CHALLENGE
+    );
+  }
 
-	public void setTabClickedCallback(CallbackP<Tab> onClickCallback) {
-		tab.addTabClickedCallback(onClickCallback);
-	}
+  public void lazyInject() {
+    if (view == null) {
+      this.view = ginInjector.getChallengeTabView();
+      this.evaluationList = ginInjector.getAdministerEvaluationsList();
+      this.challengeWidget = ginInjector.getChallengeWidget();
+      this.actionMenuWidget = tab.getEntityActionMenu();
+      view.setEvaluationList(evaluationList.asWidget());
+      view.setChallengeWidget(challengeWidget.asWidget());
+      tab.setContent(view.asWidget());
+      view.setActionMenu(actionMenuWidget);
+    }
+  }
 
-	public void configure(String entityId, String entityName, EntityBundle projectBundle) {
-		lazyInject();
-		this.entityId = entityId;
-		this.permissions = projectBundle.getPermissions();
+  public void setTabClickedCallback(CallbackP<Tab> onClickCallback) {
+    tab.addTabClickedCallback(onClickCallback);
+  }
 
-		tab.setEntityNameAndPlace(entityName, new Synapse(entityId, null, EntityArea.CHALLENGE, null));
-		challengeWidget.configure(entityId, entityName);
+  public void configure(
+    String entityId,
+    String entityName,
+    EntityBundle projectBundle
+  ) {
+    lazyInject();
+    this.entityId = entityId;
+    this.permissions = projectBundle.getPermissions();
 
-		//This is currently only used in the "alpha" test mode where a React component is using
-		// a different Evaluation editor
-		Consumer<String> editEvaluationCallback = (String evaluationId) ->{
-			showEvaluationEditor(null, evaluationId);
-		};
+    tab.setEntityNameAndPlace(
+      entityName,
+      new Synapse(entityId, null, EntityArea.CHALLENGE, null)
+    );
+    challengeWidget.configure(entityId, entityName);
 
-		evaluationList.configure(entityId, editEvaluationCallback);
+    //This is currently only used in the "alpha" test mode where a React component is using
+    // a different Evaluation editor
+    Consumer<String> editEvaluationCallback = (String evaluationId) -> {
+      showEvaluationEditor(null, evaluationId);
+    };
 
-		tab.configureEntityActionController(projectBundle, true, null);
-	}
+    evaluationList.configure(entityId, editEvaluationCallback);
 
-	/**
-	 * Set only one of entityId or evaluationId to be non-null
-	 * @param entityId non-null if creating new evaluation
-	 * @param evaluationId non-null if updating existing evaluation
-	 */
-	private void showEvaluationEditor(String entityId, String evaluationId){
-		//This is currently only used in the "alpha" test mode where a React component is using
-		// a different Evaluation editor
+    tab.configureEntityActionController(projectBundle, true, null);
+  }
 
-		EvaluationEditorReactComponentPage evaluationEditor = ginInjector.createEvaluationEditorReactComponentPage();
-		globalApplicationState.setIsEditing(true);
-		evaluationEditor.configure(evaluationId,
-				entityId, authenticationController.getCurrentUserAccessToken(),
-				globalApplicationState.isShowingUTCTime(),
-				// onPageBack() callback
-				() ->{
-					evaluationEditor.removeFromParent();
-					view.showAdminTabContents();
-					evaluationList.refresh();
-					globalApplicationState.setIsEditing(false);
-				}
-		);
-		view.hideAdminTabContents();
-		view.addEvaluationEditor(evaluationEditor);
-	}
+  /**
+   * Set only one of entityId or evaluationId to be non-null
+   * @param entityId non-null if creating new evaluation
+   * @param evaluationId non-null if updating existing evaluation
+   */
+  private void showEvaluationEditor(String entityId, String evaluationId) {
+    //This is currently only used in the "alpha" test mode where a React component is using
+    // a different Evaluation editor
 
-	@Override
-	public void showCreateNewEvaluationEditor(String entityId){
-		//This is currently only used in the "alpha" test mode where a React component is using
-		// a different Evaluation editor
+    EvaluationEditorReactComponentPage evaluationEditor = ginInjector.createEvaluationEditorReactComponentPage();
+    globalApplicationState.setIsEditing(true);
+    evaluationEditor.configure(
+      evaluationId,
+      entityId,
+      authenticationController.getCurrentUserAccessToken(),
+      globalApplicationState.isShowingUTCTime(),
+      // onPageBack() callback
+      () -> {
+        evaluationEditor.removeFromParent();
+        view.showAdminTabContents();
+        evaluationList.refresh();
+        globalApplicationState.setIsEditing(false);
+      }
+    );
+    view.hideAdminTabContents();
+    view.addEvaluationEditor(evaluationEditor);
+  }
 
-		showEvaluationEditor(entityId, null);
-	}
+  @Override
+  public void showCreateNewEvaluationEditor(String entityId) {
+    //This is currently only used in the "alpha" test mode where a React component is using
+    // a different Evaluation editor
 
+    showEvaluationEditor(entityId, null);
+  }
 
-	public void updateActionMenuCommands(){
-		actionMenuWidget.setActionVisible(Action.ADD_EVALUATION_QUEUE, permissions.getCanEdit());
-		actionMenuWidget.setActionListener(Action.ADD_EVALUATION_QUEUE, (Action action) -> {
-			showCreateNewEvaluationEditor(entityId);
-		});
-	}
+  public void updateActionMenuCommands() {
+    actionMenuWidget.setActionVisible(
+      Action.ADD_EVALUATION_QUEUE,
+      permissions.getCanEdit()
+    );
+    actionMenuWidget.setActionListener(
+      Action.ADD_EVALUATION_QUEUE,
+      (Action action) -> {
+        showCreateNewEvaluationEditor(entityId);
+      }
+    );
+  }
 
-	public Tab asTab() {
-		return tab;
-	}
+  public Tab asTab() {
+    return tab;
+  }
 }

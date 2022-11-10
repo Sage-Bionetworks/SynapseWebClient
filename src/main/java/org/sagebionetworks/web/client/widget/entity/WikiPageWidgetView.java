@@ -1,93 +1,98 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
-import org.sagebionetworks.web.shared.WikiPageKey;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.web.bindery.event.shared.binder.EventBinder;
+import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
+import org.sagebionetworks.web.shared.WikiPageKey;
 
 public interface WikiPageWidgetView extends IsWidget {
+  /**
+   * Set the presenter.
+   *
+   * @param presenter
+   */
+  public void setPresenter(Presenter presenter);
 
-	/**
-	 * Set the presenter.
-	 * 
-	 * @param presenter
-	 */
-	public void setPresenter(Presenter presenter);
+  /**
+   * Presenter interface
+   */
+  public interface Presenter {
+    public void showPreview(final Long versionToPreview, Long currentVersion);
 
-	/**
-	 * Presenter interface
-	 */
-	public interface Presenter {
-		public void showPreview(final Long versionToPreview, Long currentVersion);
+    void restoreConfirmed();
 
-		void restoreConfirmed();
+    void resetWikiMarkdown(String markdown);
 
-		void resetWikiMarkdown(String markdown);
+    void reloadWikiPage();
 
-		void reloadWikiPage();
+    void showRestoreWarning(Long versionToRestore);
 
-		void showRestoreWarning(Long versionToRestore);
+    public void restoreClicked();
 
-		public void restoreClicked();
+    void configureHistoryWidget(boolean canEdit);
 
-		void configureHistoryWidget(boolean canEdit);
+    void showWikiHistory();
+  }
 
-		void showWikiHistory();
-	}
+  void setWikiHistoryWidget(IsWidget historyWidget);
 
-	void setWikiHistoryWidget(IsWidget historyWidget);
+  void setWikiSubpagesWidget(IsWidget historyWidget);
 
-	void setWikiSubpagesWidget(IsWidget historyWidget);
+  void setWikiSubpagesWidgetVisible(boolean isVisible);
 
-	void setWikiSubpagesWidgetVisible(boolean isVisible);
+  void showPopup(
+    String title,
+    String message,
+    MessagePopup popupType,
+    org.sagebionetworks.web.client.utils.Callback okCallback,
+    org.sagebionetworks.web.client.utils.Callback cancelCallback
+  );
 
-	void showPopup(String title, String message, MessagePopup popupType, org.sagebionetworks.web.client.utils.Callback okCallback, org.sagebionetworks.web.client.utils.Callback cancelCallback);
+  void setMarkdownWidget(IsWidget markdownWidget);
 
-	void setMarkdownWidget(IsWidget markdownWidget);
+  void setSynapseAlertWidget(IsWidget synapseAlert);
 
-	void setSynapseAlertWidget(IsWidget synapseAlert);
+  void setWikiHeadingText(String title);
 
-	void setWikiHeadingText(String title);
+  void scrollWikiHeadingIntoView();
 
-	void scrollWikiHeadingIntoView();
+  public void setRestoreButtonVisible(boolean isVisible);
 
-	public void setRestoreButtonVisible(boolean isVisible);
+  public void setDiffVersionAlertVisible(boolean isVisible);
 
-	public void setDiffVersionAlertVisible(boolean isVisible);
+  public void setModifiedCreatedByHistoryPanelVisible(boolean isVisible);
 
-	public void setModifiedCreatedByHistoryPanelVisible(boolean isVisible);
+  void setCreatedOn(String date);
 
-	void setCreatedOn(String date);
+  void setModifiedOn(String date);
 
-	void setModifiedOn(String date);
+  public void setNoWikiCannotEditMessageVisible(boolean isVisible);
 
-	public void setNoWikiCannotEditMessageVisible(boolean isVisible);
+  public void setMarkdownVisible(boolean isVisible);
 
-	public void setMarkdownVisible(boolean isVisible);
+  public void setMainPanelVisible(boolean isVisible);
 
-	public void setMainPanelVisible(boolean isVisible);
+  public void setWikiHistoryVisible(boolean isVisible);
 
-	public void setWikiHistoryVisible(boolean isVisible);
+  public void setNoWikiCanEditMessageVisible(boolean b);
 
-	public void setNoWikiCanEditMessageVisible(boolean b);
+  void setLoadingVisible(boolean isVisible);
 
-	void setLoadingVisible(boolean isVisible);
+  public void showErrorMessage(String message);
 
-	public void showErrorMessage(String message);
+  void showInfo(String message);
 
-	void showInfo(String message);
+  public void clear();
 
-	public void clear();
+  void addStyleName(String style);
 
-	void addStyleName(String style);
+  void setWikiHistoryDiffToolButtonVisible(boolean visible, WikiPageKey key);
 
-	void setWikiHistoryDiffToolButtonVisible(boolean visible, WikiPageKey key);
+  void expandWikiSubpages();
 
-	void expandWikiSubpages();
+  void collapseWikiSubpages();
 
-	void collapseWikiSubpages();
-	
-	void setActionMenu(IsWidget w);
+  void setActionMenu(IsWidget w);
 
-	EventBinder<WikiPageWidget> getEventBinder();
+  EventBinder<WikiPageWidget> getEventBinder();
 }

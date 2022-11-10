@@ -1,11 +1,5 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
-import org.gwtbootstrap3.client.ui.Icon;
-import org.gwtbootstrap3.client.ui.Label;
-import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Span;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -13,157 +7,179 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.gwtbootstrap3.client.ui.Icon;
+import org.gwtbootstrap3.client.ui.Label;
+import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
 public class ReplyWidgetViewImpl implements ReplyWidgetView {
 
-	public interface Binder extends UiBinder<Widget, ReplyWidgetViewImpl> {
-	}
-	@UiField
-	Div replyContainer;
-	@UiField
-	Span author;
-	@UiField
-	Span createdOn;
-	@UiField
-	Div replyMessage;
-	@UiField
-	Div synAlertContainer;
-	@UiField
-	Div copyTextModalContainer;
+  public interface Binder extends UiBinder<Widget, ReplyWidgetViewImpl> {}
 
-	@UiField
-	Icon deleteIcon;
-	@UiField
-	Icon editIcon;
-	@UiField
-	Icon linkIcon;
+  @UiField
+  Div replyContainer;
 
-	@UiField
-	SimplePanel editReplyModalContainer;
-	@UiField
-	Label edited;
-	@UiField
-	LoadingSpinner loadingMessage;
-	@UiField
-	Label moderatorBadge;
-	@UiField
-	Div commandsContainer;
+  @UiField
+  Span author;
 
-	private Widget widget;
-	private ReplyWidget presenter;
+  @UiField
+  Span createdOn;
 
-	@Inject
-	public ReplyWidgetViewImpl(Binder binder) {
-		widget = binder.createAndBindUi(this);
-		deleteIcon.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onClickDeleteReply();
-			}
-		});
-		editIcon.addClickHandler(new ClickHandler() {
+  @UiField
+  Div replyMessage;
 
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onClickEditReply();
-			}
-		});
-		linkIcon.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onClickReplyLink();
-			}
-		});
-	}
+  @UiField
+  Div synAlertContainer;
 
-	@Override
-	public Widget asWidget() {
-		return widget;
-	}
+  @UiField
+  Div copyTextModalContainer;
 
-	@Override
-	public void setPresenter(ReplyWidget presenter) {
-		this.presenter = presenter;
-	}
+  @UiField
+  Icon deleteIcon;
 
-	@Override
-	public void setAuthor(Widget author) {
-		this.author.add(author);
-	}
+  @UiField
+  Icon editIcon;
 
-	@Override
-	public void setCreatedOn(String createdOn) {
-		this.createdOn.setText(createdOn);
-	}
+  @UiField
+  Icon linkIcon;
 
-	@Override
-	public void setMarkdownWidget(Widget widget) {
-		this.replyMessage.add(widget);
-	}
+  @UiField
+  SimplePanel editReplyModalContainer;
 
-	@Override
-	public void clear() {
-		this.createdOn.clear();
-	}
+  @UiField
+  Label edited;
 
-	@Override
-	public void setAlert(Widget w) {
-		synAlertContainer.add(w);
-	}
+  @UiField
+  LoadingSpinner loadingMessage;
 
-	@Override
-	public void setDeleteIconVisibility(Boolean visible) {
-		deleteIcon.setVisible(visible);
-	}
+  @UiField
+  Label moderatorBadge;
 
-	@Override
-	public void setEditIconVisible(boolean visible) {
-		editIcon.setVisible(visible);
-	}
+  @UiField
+  Div commandsContainer;
 
-	@Override
-	public void setEditReplyModal(Widget widget) {
-		editReplyModalContainer.setWidget(widget);
-	}
+  private Widget widget;
+  private ReplyWidget presenter;
 
-	@Override
-	public void setEditedVisible(Boolean visible) {
-		edited.setVisible(visible);
-	}
+  @Inject
+  public ReplyWidgetViewImpl(Binder binder) {
+    widget = binder.createAndBindUi(this);
+    deleteIcon.addClickHandler(
+      new ClickHandler() {
+        @Override
+        public void onClick(ClickEvent event) {
+          presenter.onClickDeleteReply();
+        }
+      }
+    );
+    editIcon.addClickHandler(
+      new ClickHandler() {
+        @Override
+        public void onClick(ClickEvent event) {
+          presenter.onClickEditReply();
+        }
+      }
+    );
+    linkIcon.addClickHandler(
+      new ClickHandler() {
+        @Override
+        public void onClick(ClickEvent event) {
+          presenter.onClickReplyLink();
+        }
+      }
+    );
+  }
 
-	@Override
-	public void setLoadingMessageVisible(Boolean visible) {
-		loadingMessage.setVisible(visible);
-	}
+  @Override
+  public Widget asWidget() {
+    return widget;
+  }
 
-	@Override
-	public void setMessageVisible(boolean visible) {
-		replyMessage.setVisible(visible);
-	}
+  @Override
+  public void setPresenter(ReplyWidget presenter) {
+    this.presenter = presenter;
+  }
 
-	@Override
-	public void showSuccess(String title, String message) {
-		DisplayUtils.showInfo(message);
-	}
+  @Override
+  public void setAuthor(Widget author) {
+    this.author.add(author);
+  }
 
-	@Override
-	public void setIsAuthorModerator(boolean isModerator) {
-		moderatorBadge.setVisible(isModerator);
-	}
+  @Override
+  public void setCreatedOn(String createdOn) {
+    this.createdOn.setText(createdOn);
+  }
 
-	@Override
-	public void setCommandsContainerVisible(boolean visible) {
-		commandsContainer.setVisible(visible);
-	}
+  @Override
+  public void setMarkdownWidget(Widget widget) {
+    this.replyMessage.add(widget);
+  }
 
-	@Override
-	public void setCopyTextModal(Widget widget) {
-		copyTextModalContainer.clear();
-		copyTextModalContainer.add(widget);
-	}
+  @Override
+  public void clear() {
+    this.createdOn.clear();
+  }
 
-	@Override
-	public void addStyleName(String style) {
-		replyContainer.addStyleName(style);
-	}
+  @Override
+  public void setAlert(Widget w) {
+    synAlertContainer.add(w);
+  }
+
+  @Override
+  public void setDeleteIconVisibility(Boolean visible) {
+    deleteIcon.setVisible(visible);
+  }
+
+  @Override
+  public void setEditIconVisible(boolean visible) {
+    editIcon.setVisible(visible);
+  }
+
+  @Override
+  public void setEditReplyModal(Widget widget) {
+    editReplyModalContainer.setWidget(widget);
+  }
+
+  @Override
+  public void setEditedVisible(Boolean visible) {
+    edited.setVisible(visible);
+  }
+
+  @Override
+  public void setLoadingMessageVisible(Boolean visible) {
+    loadingMessage.setVisible(visible);
+  }
+
+  @Override
+  public void setMessageVisible(boolean visible) {
+    replyMessage.setVisible(visible);
+  }
+
+  @Override
+  public void showSuccess(String title, String message) {
+    DisplayUtils.showInfo(message);
+  }
+
+  @Override
+  public void setIsAuthorModerator(boolean isModerator) {
+    moderatorBadge.setVisible(isModerator);
+  }
+
+  @Override
+  public void setCommandsContainerVisible(boolean visible) {
+    commandsContainer.setVisible(visible);
+  }
+
+  @Override
+  public void setCopyTextModal(Widget widget) {
+    copyTextModalContainer.clear();
+    copyTextModalContainer.add(widget);
+  }
+
+  @Override
+  public void addStyleName(String style) {
+    replyContainer.addStyleName(style);
+  }
 }

@@ -1,9 +1,14 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Modal;
@@ -23,180 +28,203 @@ import org.sagebionetworks.web.client.widget.HelpWidget;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
-import com.google.gwt.event.dom.client.KeyDownEvent;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
-
 public class EntityFinderWidgetViewImpl implements EntityFinderWidgetView {
-	public interface Binder extends UiBinder<Widget, EntityFinderWidgetViewImpl> {
-	}
 
-	private Presenter presenter;
+  public interface Binder
+    extends UiBinder<Widget, EntityFinderWidgetViewImpl> {}
 
-	private SynapseJSNIUtils jsniUtils;
-	private SynapseAlert synAlert;
-	private SynapseContextPropsProvider contextPropsProvider;
+  private Presenter presenter;
 
-	// the modal dialog
-	private Modal modal;
+  private SynapseJSNIUtils jsniUtils;
+  private SynapseAlert synAlert;
+  private SynapseContextPropsProvider contextPropsProvider;
 
-	@UiField
-	ReactComponentDiv entityFinderContainer;
+  // the modal dialog
+  private Modal modal;
 
-	@UiField
-	Heading modalTitle;
-	@UiField
-	Paragraph promptCopy;
+  @UiField
+  ReactComponentDiv entityFinderContainer;
 
+  @UiField
+  Heading modalTitle;
 
-	@UiField
-	Button okButton;
-	@UiField
-	Button cancelButton;
-	@UiField
-	HelpWidget helpWidget;
+  @UiField
+  Paragraph promptCopy;
 
-	@UiField
-	SimplePanel synAlertPanel;
+  @UiField
+  Button okButton;
 
-	@Inject
-	public EntityFinderWidgetViewImpl(Binder uiBinder, SynapseJSNIUtils jsniUtils, SynapseAlert synAlert, final SynapseContextPropsProvider propsProvider, final PopupUtilsView popupUtils) {
-		this.modal = (Modal) uiBinder.createAndBindUi(this);
+  @UiField
+  Button cancelButton;
 
-		this.jsniUtils = jsniUtils;
-		this.synAlert = synAlert;
-		this.contextPropsProvider = propsProvider;
+  @UiField
+  HelpWidget helpWidget;
 
-		synAlertPanel.setWidget(synAlert);
+  @UiField
+  SimplePanel synAlertPanel;
 
-		// Initially, nothing is selected, so we disable the confirm button
-		okButton.setEnabled(false);
-		okButton.addClickHandler(event -> presenter.okClicked());
-		okButton.addDomHandler(DisplayUtils.getPreventTabHandler(okButton), KeyDownEvent.getType());
-		cancelButton.addClickHandler(event -> presenter.cancelClicked());
-	}
+  @Inject
+  public EntityFinderWidgetViewImpl(
+    Binder uiBinder,
+    SynapseJSNIUtils jsniUtils,
+    SynapseAlert synAlert,
+    final SynapseContextPropsProvider propsProvider,
+    final PopupUtilsView popupUtils
+  ) {
+    this.modal = (Modal) uiBinder.createAndBindUi(this);
 
-	private String getInitialContainerAsString(EntityFinderWidget.InitialContainer initialContainer, String projectId, String containerId) {
-		switch (initialContainer) {
-			case PROJECT:
-				return projectId;
-			case PARENT:
-				return containerId;
-			case SCOPE:
-				return "root";
-			case NONE:
-			default:
-				return null;
-		}
-	}
+    this.jsniUtils = jsniUtils;
+    this.synAlert = synAlert;
+    this.contextPropsProvider = propsProvider;
 
-	@Override
-	public void renderComponent(EntityFinderScope initialScope, EntityFinderWidget.InitialContainer initialContainer, String projectId, String initialContainerId, EntityFinderWidget.VersionSelection versionSelection, boolean multiSelect, EntityFilter selectableEntityTypes, EntityFilter visibleTypesInList, EntityFilter visibleTypesInTree, EntityFinderProps.SelectedCopyHandler selectedCopy, boolean treeOnly) {
-        entityFinderContainer.clear();
+    synAlertPanel.setWidget(synAlert);
 
-        EntityFinderProps.OnSelectCallback onSelected = result -> {
-			List<Reference> selected = Arrays.stream(result)
-					.map(ReferenceJSNIObject::getJavaObject)
-					.collect(Collectors.toList());
-			okButton.setEnabled(selected.size() > 0);
-			if (multiSelect) {
-				presenter.setSelectedEntities(selected);
-			} else {
-				if (selected.size() > 0) {
-					presenter.setSelectedEntity(selected.get(0));
-				} else {
-					presenter.clearSelectedEntities();
-				}
-			}
-		};
+    // Initially, nothing is selected, so we disable the confirm button
+    okButton.setEnabled(false);
+    okButton.addClickHandler(event -> presenter.okClicked());
+    okButton.addDomHandler(
+      DisplayUtils.getPreventTabHandler(okButton),
+      KeyDownEvent.getType()
+    );
+    cancelButton.addClickHandler(event -> presenter.cancelClicked());
+  }
 
-		EntityFinderProps props =
-				EntityFinderProps.create(
-						onSelected,
-						multiSelect,
-						versionSelection.name(),
-						initialScope,
-						projectId,
-						getInitialContainerAsString(initialContainer, projectId, initialContainerId),
-						visibleTypesInList.getEntityQueryValues(),
-						visibleTypesInTree.getEntityQueryValues(),
-						selectableEntityTypes.getEntityQueryValues(),
-						selectedCopy,
-						treeOnly
-				);
+  private String getInitialContainerAsString(
+    EntityFinderWidget.InitialContainer initialContainer,
+    String projectId,
+    String containerId
+  ) {
+    switch (initialContainer) {
+      case PROJECT:
+        return projectId;
+      case PARENT:
+        return containerId;
+      case SCOPE:
+        return "root";
+      case NONE:
+      default:
+        return null;
+    }
+  }
 
-		ReactNode component = React.createElementWithSynapseContext(
-				SRC.SynapseComponents.EntityFinder,
-				props,
-				contextPropsProvider.getJsInteropContextProps()
-		);
-		entityFinderContainer.render(component);
-		modal.show();
-	}
+  @Override
+  public void renderComponent(
+    EntityFinderScope initialScope,
+    EntityFinderWidget.InitialContainer initialContainer,
+    String projectId,
+    String initialContainerId,
+    EntityFinderWidget.VersionSelection versionSelection,
+    boolean multiSelect,
+    EntityFilter selectableEntityTypes,
+    EntityFilter visibleTypesInList,
+    EntityFilter visibleTypesInTree,
+    EntityFinderProps.SelectedCopyHandler selectedCopy,
+    boolean treeOnly
+  ) {
+    entityFinderContainer.clear();
 
-	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-	}
+    EntityFinderProps.OnSelectCallback onSelected = result -> {
+      List<Reference> selected = Arrays
+        .stream(result)
+        .map(ReferenceJSNIObject::getJavaObject)
+        .collect(Collectors.toList());
+      okButton.setEnabled(selected.size() > 0);
+      if (multiSelect) {
+        presenter.setSelectedEntities(selected);
+      } else {
+        if (selected.size() > 0) {
+          presenter.setSelectedEntity(selected.get(0));
+        } else {
+          presenter.clearSelectedEntities();
+        }
+      }
+    };
 
-	@Override
-	public void showErrorMessage(String message) {
-		synAlert.showError(message);
-	}
+    EntityFinderProps props = EntityFinderProps.create(
+      onSelected,
+      multiSelect,
+      versionSelection.name(),
+      initialScope,
+      projectId,
+      getInitialContainerAsString(
+        initialContainer,
+        projectId,
+        initialContainerId
+      ),
+      visibleTypesInList.getEntityQueryValues(),
+      visibleTypesInTree.getEntityQueryValues(),
+      selectableEntityTypes.getEntityQueryValues(),
+      selectedCopy,
+      treeOnly
+    );
 
-	@Override
-	public void showLoading() {}
+    ReactNode component = React.createElementWithSynapseContext(
+      SRC.SynapseComponents.EntityFinder,
+      props,
+      contextPropsProvider.getJsInteropContextProps()
+    );
+    entityFinderContainer.render(component);
+    modal.show();
+  }
 
-	@Override
-	public void showInfo(String message) {
-		DisplayUtils.showInfo(message);
-	}
+  @Override
+  public void setPresenter(Presenter presenter) {
+    this.presenter = presenter;
+  }
 
-	@Override
-	public void clear() {
-		synAlert.clear();
-		entityFinderContainer.clear();
-		presenter.clearSelectedEntities();
-		okButton.setEnabled(false);
-	}
+  @Override
+  public void showErrorMessage(String message) {
+    synAlert.showError(message);
+  }
 
-	@Override
-	public void clearError() {
-		synAlert.clear();
-	}
+  @Override
+  public void showLoading() {}
 
-	@Override
-	public void hide() {
-		modal.hide();
-	}
+  @Override
+  public void showInfo(String message) {
+    DisplayUtils.showInfo(message);
+  }
 
-	@Override
-	public Widget asWidget() {
-		return modal;
-	}
+  @Override
+  public void clear() {
+    synAlert.clear();
+    entityFinderContainer.clear();
+    presenter.clearSelectedEntities();
+    okButton.setEnabled(false);
+  }
 
-	@Override
-	public void setModalTitle(String modalTitle) {
-		this.modalTitle.setText(modalTitle);
-	}
+  @Override
+  public void clearError() {
+    synAlert.clear();
+  }
 
-	@Override
-	public void setPromptCopy(String promptCopy) {
-		this.promptCopy.setHTML(promptCopy);
-	}
+  @Override
+  public void hide() {
+    modal.hide();
+  }
 
-	@Override
-	public void setHelpMarkdown(String helpMarkdown) {
-		this.helpWidget.setHelpMarkdown(helpMarkdown);
-	}
+  @Override
+  public Widget asWidget() {
+    return modal;
+  }
 
-	@Override
-	public void setConfirmButtonCopy(String confirmButtonCopy) {
-		this.okButton.setText(confirmButtonCopy);
-	}
+  @Override
+  public void setModalTitle(String modalTitle) {
+    this.modalTitle.setText(modalTitle);
+  }
+
+  @Override
+  public void setPromptCopy(String promptCopy) {
+    this.promptCopy.setHTML(promptCopy);
+  }
+
+  @Override
+  public void setHelpMarkdown(String helpMarkdown) {
+    this.helpWidget.setHelpMarkdown(helpMarkdown);
+  }
+
+  @Override
+  public void setConfirmButtonCopy(String confirmButtonCopy) {
+    this.okButton.setText(confirmButtonCopy);
+  }
 }
-
-

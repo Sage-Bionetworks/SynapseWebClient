@@ -1,34 +1,33 @@
 package org.sagebionetworks.web.client.widget.subscription;
 
-import org.sagebionetworks.repo.model.subscription.SortDirection;
-import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import org.sagebionetworks.repo.model.subscription.SortDirection;
+import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
 
 public interface SubscriptionListWidgetView extends IsWidget {
+  void setPresenter(Presenter presenter);
 
-	void setPresenter(Presenter presenter);
+  void addNewSubscription(Widget topicRow);
 
-	void addNewSubscription(Widget topicRow);
+  void setSynAlert(Widget w);
 
-	void setSynAlert(Widget w);
+  void clearSubscriptions();
 
-	void clearSubscriptions();
+  void clearFilter();
 
-	void clearFilter();
+  void setNoItemsMessageVisible(boolean visible);
 
-	void setNoItemsMessageVisible(boolean visible);
+  void setPagination(Widget w);
 
-	void setPagination(Widget w);
+  void setLoadingVisible(boolean visible);
 
-	void setLoadingVisible(boolean visible);
+  /**
+   * Presenter interface
+   */
+  public interface Presenter {
+    void onFilter(SubscriptionObjectType type);
 
-	/**
-	 * Presenter interface
-	 */
-	public interface Presenter {
-		void onFilter(SubscriptionObjectType type);
-
-		void onSort(SortDirection sortDirection);
-	}
+    void onSort(SortDirection sortDirection);
+  }
 }

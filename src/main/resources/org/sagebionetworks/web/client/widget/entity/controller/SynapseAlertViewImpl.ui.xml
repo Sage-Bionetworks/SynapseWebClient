@@ -3,25 +3,21 @@
   xmlns:ui="urn:ui:com.google.gwt.uibinder"
   xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
-  xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
+  xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
+>
+  <bh:Div>
+    <bh:Div ui:field="loginWidgetContainer">
+      <w:FullWidthAlert
+        message="You will need to sign in to access this resource."
+        primaryCTAText="Sign In"
+        primaryCTAHrefTargetSelf="/#!LoginPlace:0"
+        alertType="INFO"
+        global="false"
+      />
+    </bh:Div>
 
-	<bh:Div>
-		<bh:Div ui:field="loginWidgetContainer" >
-			<w:FullWidthAlert
-				message="You will need to sign in to access this resource."
-				primaryCTAText="Sign In"
-				primaryCTAHrefTargetSelf="/#!LoginPlace:0"
-				alertType="INFO"
-				global="false"
-				/>
-		</bh:Div>
-		
-		<w:FullWidthAlert
-			ui:field="alert"
-			alertType="DANGER"
-			global="false"
-		/>
-		
-		<bh:Div ui:field="jiraDialogContainer"/>
-	</bh:Div>
+    <w:FullWidthAlert ui:field="alert" alertType="DANGER" global="false" />
+
+    <bh:Div ui:field="jiraDialogContainer" />
+  </bh:Div>
 </ui:UiBinder>

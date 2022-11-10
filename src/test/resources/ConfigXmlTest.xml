@@ -12,8 +12,8 @@
       <description>Some Description Two</description>
     </column>
     <link-column id="linkIdOne">
-      <display reference="keyTwo"/>
-      <url reference="keyZero"/>
+      <display reference="keyTwo" />
+      <url reference="keyZero" />
     </link-column>
   </columns>
 </configuration>

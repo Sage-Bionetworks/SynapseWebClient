@@ -3,30 +3,28 @@ package org.sagebionetworks.web.client.widget.footer;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface FooterView extends IsWidget {
+  /**
+   * Set the presenter.
+   *
+   * @param presenter
+   */
+  public void setPresenter(Presenter presenter);
 
-	/**
-	 * Set the presenter.
-	 * 
-	 * @param presenter
-	 */
-	public void setPresenter(Presenter presenter);
+  /**
+   * Presenter interface
+   */
+  public interface Presenter {
+    void onReportAbuseClicked();
+  }
 
+  /**
+   *
+   * @param portalVersion
+   * @param repoVersion
+   */
+  void setVersion(String portalVersion, String repoVersion, String srcVersion);
 
-	/**
-	 * Presenter interface
-	 */
-	public interface Presenter {
-		void onReportAbuseClicked();
-	}
+  void open(String url);
 
-	/**
-	 * 
-	 * @param portalVersion
-	 * @param repoVersion
-	 */
-	void setVersion(String portalVersion, String repoVersion, String srcVersion);
-
-	void open(String url);
-
-	void refresh();
+  void refresh();
 }

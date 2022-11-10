@@ -4,68 +4,66 @@ import com.google.gwt.user.client.ui.IsWidget;
 
 /**
  * Abstraction for a view that includes a query text box and execution button.
- * 
+ *
  * @author John
  *
  */
 public interface QueryInputView extends IsWidget {
+  /**
+   * Business logic for this widget.
+   */
+  public interface Presenter {
+    /**
+     * Called when the users presses the execute query button.
+     */
+    void onExecuteQuery();
 
-	/**
-	 * Business logic for this widget.
-	 */
-	public interface Presenter {
+    /**
+     * Called to rest the query.
+     */
+    void onReset();
+  }
 
-		/**
-		 * Called when the users presses the execute query button.
-		 */
-		void onExecuteQuery();
+  /**
+   * Bind this view to its presenter.
+   *
+   * @param presenter
+   */
+  public void setPresenter(Presenter presenter);
 
-		/**
-		 * Called to rest the query.
-		 */
-		void onReset();
-	}
+  /**
+   * Set an accepted and validated query string.
+   *
+   * @param startQuery
+   */
+  void setInputQueryString(String startQuery);
 
-	/**
-	 * Bind this view to its presenter.
-	 * 
-	 * @param presenter
-	 */
-	public void setPresenter(Presenter presenter);
+  /**
+   *
+   * @param loading
+   */
+  void setQueryInputLoading(boolean loading);
 
-	/**
-	 * Set an accepted and validated query string.
-	 * 
-	 * @param startQuery
-	 */
-	void setInputQueryString(String startQuery);
+  /**
+   * The the SQL string from the input box.
+   *
+   * @return
+   */
+  public String getInputQueryString();
 
-	/**
-	 * 
-	 * @param loading
-	 */
-	void setQueryInputLoading(boolean loading);
+  /**
+   * Show or hide the input error message.
+   *
+   * @param b
+   */
+  public void showInputError(boolean visible);
 
-	/**
-	 * The the SQL string from the input box.
-	 * 
-	 * @return
-	 */
-	public String getInputQueryString();
+  /**
+   * Set the error message.
+   *
+   * @param string
+   */
+  public void setInputErrorMessage(String string);
 
-	/**
-	 * Show or hide the input error message.
-	 * 
-	 * @param b
-	 */
-	public void showInputError(boolean visible);
-
-	/**
-	 * Set the error message.
-	 * 
-	 * @param string
-	 */
-	public void setInputErrorMessage(String string);
-
-	public void setQueryInputVisible(boolean visible);
+  public void setQueryInputVisible(boolean visible);
 }

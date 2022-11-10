@@ -5,5 +5,6 @@ import jsinterop.annotations.JsType;
 
 @JsType(isNative = true, namespace = JsPackage.GLOBAL)
 public class JSON {
-	public static native Object parse(String json);
+
+  public static native Object parse(String json);
 }

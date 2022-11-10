@@ -6,52 +6,56 @@ import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelUtils;
 
 /**
  * Stub for ColumnModelTableRowEditor
- * 
+ *
  * @author jmhill
  *
  */
-public class ColumnModelTableRowEditorStub extends ColumnModelTableRowStub implements ColumnModelTableRowEditorWidget {
+public class ColumnModelTableRowEditorStub
+  extends ColumnModelTableRowStub
+  implements ColumnModelTableRowEditorWidget {
 
-	private boolean isValid = true;
-	private boolean isSetToBeDefaultFileViewColumn = false;
-	private boolean canHaveDefault = true;
+  private boolean isValid = true;
+  private boolean isSetToBeDefaultFileViewColumn = false;
+  private boolean canHaveDefault = true;
 
-	@Override
-	public void configure(ColumnModel model, SelectionPresenter selectionPresenter) {
-		ColumnModelUtils.applyColumnModelToRow(model, this);
-		setSelectionPresenter(selectionPresenter);
-	}
+  @Override
+  public void configure(
+    ColumnModel model,
+    SelectionPresenter selectionPresenter
+  ) {
+    ColumnModelUtils.applyColumnModelToRow(model, this);
+    setSelectionPresenter(selectionPresenter);
+  }
 
-	@Override
-	public boolean validate() {
-		return isValid;
-	}
+  @Override
+  public boolean validate() {
+    return isValid;
+  }
 
-	/**
-	 * Override the is valid
-	 * 
-	 * @param isValid
-	 */
-	public void setValid(boolean isValid) {
-		this.isValid = isValid;
-	}
+  /**
+   * Override the is valid
+   *
+   * @param isValid
+   */
+  public void setValid(boolean isValid) {
+    this.isValid = isValid;
+  }
 
-	@Override
-	public void setToBeDefaultFileViewColumn() {
-		isSetToBeDefaultFileViewColumn = true;
-	}
+  @Override
+  public void setToBeDefaultFileViewColumn() {
+    isSetToBeDefaultFileViewColumn = true;
+  }
 
-	public boolean isSetToBeDefaultFileViewColumn() {
-		return isSetToBeDefaultFileViewColumn;
-	}
+  public boolean isSetToBeDefaultFileViewColumn() {
+    return isSetToBeDefaultFileViewColumn;
+  }
 
-	@Override
-	public void setCanHaveDefault(boolean canHaveDefault) {
-		this.canHaveDefault = canHaveDefault;
-	}
+  @Override
+  public void setCanHaveDefault(boolean canHaveDefault) {
+    this.canHaveDefault = canHaveDefault;
+  }
 
-	public boolean canHaveDefault() {
-		return canHaveDefault;
-	}
-
+  public boolean canHaveDefault() {
+    return canHaveDefault;
+  }
 }

@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client;
 
-import java.util.Date;
-import org.sagebionetworks.web.client.utils.Callback;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.http.client.URL;
@@ -22,241 +20,254 @@ import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.gwt.xhr.client.XMLHttpRequest;
+import java.util.Date;
+import org.sagebionetworks.web.client.utils.Callback;
 
 public class GWTWrapperImpl implements GWTWrapper {
 
-	private final static RegExp PATTERN_WHITE_SPACE = RegExp.compile("^\\s+$");
-	// Used to replace all characters expect letters and numbers.
-	private final static RegExp PRINICPAL_UNIQUENESS_REPLACE_PATTERN = RegExp.compile("[^a-z0-9]", "gi");
+  private static final RegExp PATTERN_WHITE_SPACE = RegExp.compile("^\\s+$");
+  // Used to replace all characters expect letters and numbers.
+  private static final RegExp PRINICPAL_UNIQUENESS_REPLACE_PATTERN = RegExp.compile(
+    "[^a-z0-9]",
+    "gi"
+  );
 
-	public int scrollTop = -1;
+  public int scrollTop = -1;
 
-	@Override
-	public String getHostPageBaseURL() {
-		return GWT.getHostPageBaseURL();
-	}
+  @Override
+  public String getHostPageBaseURL() {
+    return GWT.getHostPageBaseURL();
+  }
 
-	@Override
-	public String getModuleBaseURL() {
-		return GWTWrapperImpl.getRealGWTModuleBaseURL();
-	}
+  @Override
+  public String getModuleBaseURL() {
+    return GWTWrapperImpl.getRealGWTModuleBaseURL();
+  }
 
-	@Override
-	public void assignThisWindowWith(String url) {
-		Window.Location.assign(url);
-	}
+  @Override
+  public void assignThisWindowWith(String url) {
+    Window.Location.assign(url);
+  }
 
-	@Override
-	public String encode(String decodedURL) {
-		return URL.encode(decodedURL);
-	}
+  @Override
+  public String encode(String decodedURL) {
+    return URL.encode(decodedURL);
+  }
 
-	@Override
-	public String encodeQueryString(String queryString) {
-		if (queryString == null)
-			return "";
+  @Override
+  public String encodeQueryString(String queryString) {
+    if (queryString == null) return "";
 
-		return URL.encodeQueryString(queryString);
-	}
+    return URL.encodeQueryString(queryString);
+  }
 
-	@Override
-	public String decodeQueryString(String queryString) {
-		if (queryString == null)
-			return "";
+  @Override
+  public String decodeQueryString(String queryString) {
+    if (queryString == null) return "";
 
-		return URL.decodeQueryString(queryString);
-	}
+    return URL.decodeQueryString(queryString);
+  }
 
+  @Override
+  public XMLHttpRequest createXMLHttpRequest() {
+    return XMLHttpRequest.create();
+  }
 
-	@Override
-	public XMLHttpRequest createXMLHttpRequest() {
-		return XMLHttpRequest.create();
-	}
+  @Override
+  public NumberFormat getNumberFormat(String pattern) {
+    return NumberFormat.getFormat(pattern);
+  }
 
-	@Override
-	public NumberFormat getNumberFormat(String pattern) {
-		return NumberFormat.getFormat(pattern);
-	}
+  @Override
+  public String getHostPrefix() {
+    return (
+      com.google.gwt.user.client.Window.Location.getProtocol() +
+      "//" +
+      com.google.gwt.user.client.Window.Location.getHost()
+    );
+  }
 
-	@Override
-	public String getHostPrefix() {
-		return com.google.gwt.user.client.Window.Location.getProtocol() + "//" + com.google.gwt.user.client.Window.Location.getHost();
-	}
+  @Override
+  public String getCurrentURL() {
+    return Window.Location.getHref();
+  }
 
-	@Override
-	public String getCurrentURL() {
-		return Window.Location.getHref();
-	}
+  @Override
+  public DateTimeFormat getDateTimeFormat(PredefinedFormat format) {
+    return DateTimeFormat.getFormat(format);
+  }
 
-	@Override
-	public DateTimeFormat getDateTimeFormat(PredefinedFormat format) {
-		return DateTimeFormat.getFormat(format);
-	}
+  @Override
+  public void scheduleExecution(final Callback callback, int delayMillis) {
+    Timer timer = new Timer() {
+      public void run() {
+        callback.invoke();
+      }
+    };
+    timer.schedule(delayMillis);
+  }
 
-	@Override
-	public void scheduleExecution(final Callback callback, int delayMillis) {
-		Timer timer = new Timer() {
-			public void run() {
-				callback.invoke();
-			}
-		};
-		timer.schedule(delayMillis);
-	}
+  @Override
+  public void scheduleFixedDelay(final Callback callback, int delayMs) {
+    Scheduler
+      .get()
+      .scheduleFixedDelay(
+        new Scheduler.RepeatingCommand() {
+          @Override
+          public boolean execute() {
+            callback.invoke();
+            return true;
+          }
+        },
+        delayMs
+      );
+  }
 
-	@Override
-	public void scheduleFixedDelay(final Callback callback, int delayMs) {
-		Scheduler.get().scheduleFixedDelay(new Scheduler.RepeatingCommand() {
-			@Override
-			public boolean execute() {
-				callback.invoke();
-				return true;
-			}
-		}, delayMs);
+  @Override
+  public void scheduleDeferred(final Callback callback) {
+    Scheduler
+      .get()
+      .scheduleDeferred(
+        new Command() {
+          @Override
+          public void execute() {
+            callback.invoke();
+          }
+        }
+      );
+  }
 
-	}
+  @Override
+  public String getUserAgent() {
+    return Navigator.getUserAgent();
+  }
 
-	@Override
-	public void scheduleDeferred(final Callback callback) {
-		Scheduler.get().scheduleDeferred(new Command() {
-			@Override
-			public void execute() {
-				callback.invoke();
-			}
-		});
-	}
+  @Override
+  public String getAppVersion() {
+    return Navigator.getAppVersion();
+  }
 
-	@Override
-	public String getUserAgent() {
-		return Navigator.getUserAgent();
-	}
+  @Override
+  public int nextRandomInt() {
+    return Random.nextInt();
+  }
 
-	@Override
-	public String getAppVersion() {
-		return Navigator.getAppVersion();
-	}
+  @Override
+  public void addDaysToDate(Date date, int days) {
+    CalendarUtil.addDaysToDate(date, days);
+  }
 
-	@Override
-	public int nextRandomInt() {
-		return Random.nextInt();
-	}
+  @Override
+  public boolean isWhitespace(String text) {
+    return PATTERN_WHITE_SPACE.test(text);
+  }
 
-	@Override
-	public void addDaysToDate(Date date, int days) {
-		CalendarUtil.addDaysToDate(date, days);
-	}
+  @Override
+  public void newItem(String historyToken, boolean issueEvent) {
+    SynapseJSNIUtilsImpl._setIsInnerProgrammaticHistoryChange();
+    History.newItem(historyToken, issueEvent);
+  }
 
-	@Override
-	public boolean isWhitespace(String text) {
-		return PATTERN_WHITE_SPACE.test(text);
-	}
+  @Override
+  public void replaceItem(String historyToken, boolean issueEvent) {
+    SynapseJSNIUtilsImpl._setIsInnerProgrammaticHistoryChange();
+    History.replaceItem(historyToken, issueEvent);
+  }
 
-	@Override
-	public void newItem(String historyToken, boolean issueEvent) {
-		SynapseJSNIUtilsImpl._setIsInnerProgrammaticHistoryChange();
-		History.newItem(historyToken, issueEvent);
-	}
+  @Override
+  public String getCurrentHistoryToken() {
+    return History.getToken();
+  }
 
-	@Override
-	public void replaceItem(String historyToken, boolean issueEvent) {
-		SynapseJSNIUtilsImpl._setIsInnerProgrammaticHistoryChange();
-		History.replaceItem(historyToken, issueEvent);
-	}
+  @Override
+  public ServiceDefTarget asServiceDefTarget(Object serviceAsync) {
+    return (ServiceDefTarget) serviceAsync;
+  }
 
-	@Override
-	public String getCurrentHistoryToken() {
-		return History.getToken();
-	}
+  @Override
+  public HasRpcToken asHasRpcToken(Object service) {
+    return (HasRpcToken) service;
+  }
 
-	@Override
-	public ServiceDefTarget asServiceDefTarget(Object serviceAsync) {
-		return (ServiceDefTarget) serviceAsync;
-	}
+  @Override
+  public String getUniqueElementId() {
+    return HTMLPanel.createUniqueId();
+  }
 
-	@Override
-	public HasRpcToken asHasRpcToken(Object service) {
-		return (HasRpcToken) service;
-	}
+  @Override
+  public void saveWindowPosition() {
+    scrollTop = Window.getScrollTop();
+  }
 
-	@Override
-	public String getUniqueElementId() {
-		return HTMLPanel.createUniqueId();
-	}
+  @Override
+  public void restoreWindowPosition() {
+    if (scrollTop >= 0) {
+      Window.scrollTo(0, scrollTop);
+      scrollTop = -1;
+    }
+  }
 
-	@Override
-	public void saveWindowPosition() {
-		scrollTop = Window.getScrollTop();
-	}
+  @Override
+  public int nextInt(int upperBound) {
+    return Random.nextInt(upperBound);
+  }
 
-	@Override
-	public void restoreWindowPosition() {
-		if (scrollTop >= 0) {
-			Window.scrollTo(0, scrollTop);
-			scrollTop = -1;
-		}
-	}
+  /**
+   * Get the string that will be used for a uniqueness check for alias names. Only lower case letters
+   * and numbers contribute to the uniqueness of a principal name. All other characters (-,., ,_) are
+   * ignored.
+   *
+   * @param inputName
+   * @return
+   */
+  @Override
+  public String getUniqueAliasName(String inputName) {
+    if (inputName == null) {
+      throw new IllegalArgumentException("Name cannot be null");
+    }
+    // Only letters and numbers contribute to the uniqueness.
+    // Replace all non-letters and numbers with empty strings
+    return PRINICPAL_UNIQUENESS_REPLACE_PATTERN.replace(inputName, "");
+  }
 
-	@Override
-	public int nextInt(int upperBound) {
-		return Random.nextInt(upperBound);
-	}
-
-
-	/**
-	 * Get the string that will be used for a uniqueness check for alias names. Only lower case letters
-	 * and numbers contribute to the uniqueness of a principal name. All other characters (-,., ,_) are
-	 * ignored.
-	 * 
-	 * @param inputName
-	 * @return
-	 */
-	@Override
-	public String getUniqueAliasName(String inputName) {
-		if (inputName == null) {
-			throw new IllegalArgumentException("Name cannot be null");
-		}
-		// Only letters and numbers contribute to the uniqueness.
-		// Replace all non-letters and numbers with empty strings
-		return PRINICPAL_UNIQUENESS_REPLACE_PATTERN.replace(inputName, "");
-	}
-
-	public static native String getHostpageUrl()/*-{
+  public static native String getHostpageUrl() /*-{
 		return $wnd.location.protocol + "//" + $wnd.location.host + "/";
 	}-*/;
 
-	public static String getRealGWTModuleBaseURL() {
-		return getHostpageUrl() + GWT.getModuleName() + "/";
-	}
+  public static String getRealGWTModuleBaseURL() {
+    return getHostpageUrl() + GWT.getModuleName() + "/";
+  }
 
-	@Override
-	public String getFriendlySize(double size, boolean abbreviatedUnits) {
-		return DisplayUtils.getFriendlySize(size, abbreviatedUnits);
-	}
+  @Override
+  public String getFriendlySize(double size, boolean abbreviatedUnits) {
+    return DisplayUtils.getFriendlySize(size, abbreviatedUnits);
+  }
 
-	@Override
-	public DateTimeFormat getFormat(String formatPattern) {
-		return DateTimeFormat.getFormat(formatPattern);
-	}
+  @Override
+  public DateTimeFormat getFormat(String formatPattern) {
+    return DateTimeFormat.getFormat(formatPattern);
+  }
 
-	@Override
-	public DateTimeFormat getFormat(PredefinedFormat predefinedFormat) {
-		return DateTimeFormat.getFormat(predefinedFormat);
-	}
+  @Override
+  public DateTimeFormat getFormat(PredefinedFormat predefinedFormat) {
+    return DateTimeFormat.getFormat(predefinedFormat);
+  }
 
-	@Override
-	public boolean isValidJSONArray(String json) {
-		if (json == null || json.trim().length() == 0) {
-			return true;
-		}
-		try {
-			JSONValue jsonValue = JSONParser.parseStrict(json);
-			return jsonValue.isArray() != null;
-		} catch (Exception e) {
-			return false;
-		}
-	}
+  @Override
+  public boolean isValidJSONArray(String json) {
+    if (json == null || json.trim().length() == 0) {
+      return true;
+    }
+    try {
+      JSONValue jsonValue = JSONParser.parseStrict(json);
+      return jsonValue.isArray() != null;
+    } catch (Exception e) {
+      return false;
+    }
+  }
 
-	@Override
-	public JSONValue parseJSONStrict(String json){
-		return JSONParser.parseStrict(json);
-	}
+  @Override
+  public JSONValue parseJSONStrict(String json) {
+    return JSONParser.parseStrict(json);
+  }
 }

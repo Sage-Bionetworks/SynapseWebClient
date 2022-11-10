@@ -1,118 +1,142 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import java.util.List;
-
-import org.sagebionetworks.web.client.utils.CallbackP;
-
 import com.google.gwt.user.client.ui.IsWidget;
-
+import java.util.List;
+import org.sagebionetworks.web.client.utils.CallbackP;
 
 /**
  * A simple model dialog prompting for multiple string values
  *
  */
 public interface PromptForValuesModalView extends IsWidget {
+  interface Configuration {
+    String getTitle();
 
-	interface Configuration {
-		String getTitle();
+    void setTitle(String title);
 
-		void setTitle(String title);
+    String getBodyCopy();
 
-		String getBodyCopy();
+    void setBodyCopy(String bodyCopy);
 
-		void setBodyCopy(String bodyCopy);
+    List<String> getPrompts();
 
-		List<String> getPrompts();
+    void setPrompts(List<String> prompts);
 
-		void setPrompts(List<String> prompts);
+    List<String> getInitialValues();
 
-		List<String> getInitialValues();
+    void setInitialValues(List<String> initialValues);
 
-		void setInitialValues(List<String> initialValues);
+    List<InputType> getInputTypes();
 
-		List<InputType> getInputTypes();
+    void setInputTypes(List<InputType> inputTypes);
 
-		void setInputTypes(List<InputType> inputTypes);
+    CallbackP<List<String>> getNewValuesCallback();
 
-		CallbackP<List<String>> getNewValuesCallback();
+    void setNewValuesCallback(CallbackP<List<String>> newValueCallbacks);
 
-		void setNewValuesCallback(CallbackP<List<String>> newValueCallbacks);
+    String getHelpPopoverMarkdown();
 
-		String getHelpPopoverMarkdown();
+    void setHelpPopoverMarkdown(String markdown);
 
-		void setHelpPopoverMarkdown(String markdown);
+    String getHelpPopoverHref();
 
-		String getHelpPopoverHref();
+    void setHelpPopoverHref(String href);
 
-		void setHelpPopoverHref(String href);
+    interface Builder {
+      Builder setTitle(String title);
 
-		interface Builder {
+      Builder setBodyCopy(String bodyCopy);
 
-			Builder setTitle(String title);
+      Builder setCallback(CallbackP<List<String>> callback);
 
-			Builder setBodyCopy(String bodyCopy);
+      Builder addPrompt(String prompt, String initialValue);
 
-			Builder setCallback(CallbackP<List<String>> callback);
+      Builder addPrompt(
+        String prompt,
+        String initialValue,
+        InputType inputType
+      );
 
-			Builder addPrompt(String prompt, String initialValue);
+      Builder addPrompts(List<String> prompts, List<String> initialValues);
 
-			Builder addPrompt(String prompt, String initialValue, InputType inputType);
+      Builder addPrompts(
+        List<String> prompts,
+        List<String> initialValues,
+        List<InputType> inputTypes
+      );
 
-			Builder addPrompts(List<String> prompts, List<String> initialValues);
+      Builder addHelpWidget(String markdown, String href);
 
-			Builder addPrompts(List<String> prompts, List<String> initialValues, List<InputType> inputTypes);
+      Configuration buildConfiguration();
+    }
+  }
 
-			Builder addHelpWidget(String markdown, String href);
+  /**
+   * Defining each possible input type we can use in this class
+   */
+  enum InputType {
+    TEXTBOX,
+    TEXTAREA,
+  }
 
-			Configuration buildConfiguration();
-		}
-	}
+  public void configureAndShow(
+    String title,
+    String prompt,
+    String initialValue,
+    CallbackP<String> newValueCallback
+  );
 
+  public void configureAndShow(
+    String title,
+    String prompt,
+    String initialValue,
+    PromptForValuesModalView.InputType inputType,
+    CallbackP<String> newValueCallback
+  );
 
-	/**
-	 * Defining each possible input type we can use in this class
-	 */
-	enum InputType {
-		TEXTBOX, TEXTAREA;
-	}
+  /**
+   * Configure this view with starting data.
+   *
+   * @param title The modal title
+   * @param prompts Prompt values
+   * @param initialValues Initial values.
+   * @param newValuesCallback Call back containing new values
+   */
+  public void configureAndShow(
+    String title,
+    List<String> prompts,
+    List<String> initialValues,
+    CallbackP<List<String>> newValuesCallback
+  );
 
-	public void configureAndShow(String title, String prompt, String initialValue, CallbackP<String> newValueCallback);
+  public void configureAndShow(
+    String title,
+    List<String> prompts,
+    List<String> initialValues,
+    List<PromptForValuesModalViewImpl.InputType> inputType,
+    CallbackP<List<String>> newValuesCallback
+  );
 
-	public void configureAndShow(String title, String prompt, String initialValue, PromptForValuesModalView.InputType inputType, CallbackP<String> newValueCallback);
+  void configureAndShow(Configuration configuration);
 
-	/**
-	 * Configure this view with starting data.
-	 * 
-	 * @param title The modal title
-	 * @param prompts Prompt values
-	 * @param initialValues Initial values.
-	 * @param newValuesCallback Call back containing new values
-	 */
-	public void configureAndShow(String title, List<String> prompts, List<String> initialValues, CallbackP<List<String>> newValuesCallback);
+  /**
+   * Show an error message..
+   *
+   * @param error
+   */
+  public void showError(String error);
 
+  /**
+   * Clear name and errors.
+   */
+  public void clear();
 
-	public void configureAndShow(String title, List<String> prompts, List<String> initialValues, List<PromptForValuesModalViewImpl.InputType> inputType, CallbackP<List<String>> newValuesCallback);
+  /**
+   * Set loading state.
+   *
+   * @param isLoading
+   */
+  public void setLoading(boolean isLoading);
 
-	void configureAndShow(Configuration configuration);
-
-	/**
-	 * Show an error message..
-	 * 
-	 * @param error
-	 */
-	public void showError(String error);
-
-	/**
-	 * Clear name and errors.
-	 */
-	public void clear();
-
-	/**
-	 * Set loading state.
-	 * 
-	 * @param isLoading
-	 */
-	public void setLoading(boolean isLoading);
-
-	public void hide();
+  public void hide();
 }

@@ -3,20 +3,24 @@ package org.sagebionetworks.web.client;
 import com.google.inject.Inject;
 
 public class MarkdownItImpl implements MarkdownIt {
-	private SynapseJSNIUtils jsniUtils;
 
-	@Inject
-	public MarkdownItImpl(SynapseJSNIUtils jsniUtils) {
-		this.jsniUtils = jsniUtils;
-	}
+  private SynapseJSNIUtils jsniUtils;
 
-	@Override
-	public String markdown2Html(String md, String uniqueSuffix) {
-		String html = _markdown2Html(md, uniqueSuffix);
-		return jsniUtils.sanitizeHtml(html);
-	}
+  @Inject
+  public MarkdownItImpl(SynapseJSNIUtils jsniUtils) {
+    this.jsniUtils = jsniUtils;
+  }
 
-	private final static native String _markdown2Html(String md, String uniqueSuffix) /*-{
+  @Override
+  public String markdown2Html(String md, String uniqueSuffix) {
+    String html = _markdown2Html(md, uniqueSuffix);
+    return jsniUtils.sanitizeHtml(html);
+  }
+
+  private static final native String _markdown2Html(
+    String md,
+    String uniqueSuffix
+  ) /*-{
 		try {
 			if (!$wnd.md) {
 				$wnd.md = $wnd.markdownit();
@@ -65,5 +69,4 @@ public class MarkdownItImpl implements MarkdownIt {
 			return md;
 		}
 	}-*/;
-
 }

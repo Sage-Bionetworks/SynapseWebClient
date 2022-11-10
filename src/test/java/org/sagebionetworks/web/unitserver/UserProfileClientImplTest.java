@@ -7,7 +7,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import javax.servlet.http.HttpServletRequest;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -24,70 +23,85 @@ import org.sagebionetworks.web.server.servlet.UserProfileClientImpl;
 
 /**
  * Test for the UserAccountServiceImpl
- * 
+ *
  */
 public class UserProfileClientImplTest {
-	@Mock
-	SynapseProvider mockSynapseProvider;
-	@Mock
-	TokenProvider mockTokenProvider;
-	@Mock
-	UserProfileClientImpl userProfileClient;
-	@Mock
-	VerificationSubmission mockVerificationSubmission;
-	String testSessionToken = "12345abcde";
-	UserProfile testProfile;
 
-	@Mock
-	SynapseClient mockSynapse;
+  @Mock
+  SynapseProvider mockSynapseProvider;
 
+  @Mock
+  TokenProvider mockTokenProvider;
 
-	@Mock
-	ThreadLocal<HttpServletRequest> mockThreadLocal;
+  @Mock
+  UserProfileClientImpl userProfileClient;
 
-	@Mock
-	HttpServletRequest mockRequest;
+  @Mock
+  VerificationSubmission mockVerificationSubmission;
 
-	String userIp = "127.0.0.1";
+  String testSessionToken = "12345abcde";
+  UserProfile testProfile;
 
-	@Before
-	public void before() throws SynapseException, JSONObjectAdapterException {
-		MockitoAnnotations.initMocks(this);
-		when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
+  @Mock
+  SynapseClient mockSynapse;
 
-		testProfile = new UserProfile();
-		testProfile.setOwnerId("123");
+  @Mock
+  ThreadLocal<HttpServletRequest> mockThreadLocal;
 
-		userProfileClient = new UserProfileClientImpl();
-		userProfileClient.setSynapseProvider(mockSynapseProvider);
-		userProfileClient.setTokenProvider(mockTokenProvider);
-		when(mockSynapse.getMyProfile()).thenReturn(testProfile);
+  @Mock
+  HttpServletRequest mockRequest;
 
-		Whitebox.setInternalState(userProfileClient, "perThreadRequest", mockThreadLocal);
-		userIp = "127.0.0.1";
-		when(mockThreadLocal.get()).thenReturn(mockRequest);
-		when(mockRequest.getRemoteAddr()).thenReturn(userIp);
-	}
+  String userIp = "127.0.0.1";
 
-	@Test
-	public void testCreateVerificationSubmission() throws Exception {
-		String firstName = "Jack", lastName = "Frost", location = "everywhere", company = "unknown";
+  @Before
+  public void before() throws SynapseException, JSONObjectAdapterException {
+    MockitoAnnotations.initMocks(this);
+    when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
 
-		when(mockVerificationSubmission.getFirstName()).thenReturn(firstName);
-		when(mockVerificationSubmission.getLastName()).thenReturn(lastName);
-		when(mockVerificationSubmission.getLocation()).thenReturn(location);
-		when(mockVerificationSubmission.getCompany()).thenReturn(company);
+    testProfile = new UserProfile();
+    testProfile.setOwnerId("123");
 
-		String hostPageBaseURL = "http://127.0.0.1:8080/Portal.html?gwt.codesvr=127.0.0.1:9321";
-		userProfileClient.createVerificationSubmission(mockVerificationSubmission, hostPageBaseURL);
-		verify(mockSynapse).getMyProfile();
-		assertEquals(firstName, testProfile.getFirstName());
-		assertEquals(lastName, testProfile.getLastName());
-		assertEquals(location, testProfile.getLocation());
-		assertEquals(company, testProfile.getCompany());
+    userProfileClient = new UserProfileClientImpl();
+    userProfileClient.setSynapseProvider(mockSynapseProvider);
+    userProfileClient.setTokenProvider(mockTokenProvider);
+    when(mockSynapse.getMyProfile()).thenReturn(testProfile);
 
-		verify(mockSynapse).createVerificationSubmission(eq(mockVerificationSubmission), contains(hostPageBaseURL));
-	}
+    Whitebox.setInternalState(
+      userProfileClient,
+      "perThreadRequest",
+      mockThreadLocal
+    );
+    userIp = "127.0.0.1";
+    when(mockThreadLocal.get()).thenReturn(mockRequest);
+    when(mockRequest.getRemoteAddr()).thenReturn(userIp);
+  }
 
+  @Test
+  public void testCreateVerificationSubmission() throws Exception {
+    String firstName = "Jack", lastName = "Frost", location =
+      "everywhere", company = "unknown";
 
+    when(mockVerificationSubmission.getFirstName()).thenReturn(firstName);
+    when(mockVerificationSubmission.getLastName()).thenReturn(lastName);
+    when(mockVerificationSubmission.getLocation()).thenReturn(location);
+    when(mockVerificationSubmission.getCompany()).thenReturn(company);
+
+    String hostPageBaseURL =
+      "http://127.0.0.1:8080/Portal.html?gwt.codesvr=127.0.0.1:9321";
+    userProfileClient.createVerificationSubmission(
+      mockVerificationSubmission,
+      hostPageBaseURL
+    );
+    verify(mockSynapse).getMyProfile();
+    assertEquals(firstName, testProfile.getFirstName());
+    assertEquals(lastName, testProfile.getLastName());
+    assertEquals(location, testProfile.getLocation());
+    assertEquals(company, testProfile.getCompany());
+
+    verify(mockSynapse)
+      .createVerificationSubmission(
+        eq(mockVerificationSubmission),
+        contains(hostPageBaseURL)
+      );
+  }
 }

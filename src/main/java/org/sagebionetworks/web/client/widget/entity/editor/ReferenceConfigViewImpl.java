@@ -1,70 +1,69 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
-import org.gwtbootstrap3.client.ui.TextBox;
-import org.sagebionetworks.web.client.DisplayUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.gwtbootstrap3.client.ui.TextBox;
+import org.sagebionetworks.web.client.DisplayUtils;
 
 public class ReferenceConfigViewImpl implements ReferenceConfigView {
-	public interface ReferenceConfigViewImplUiBinder extends UiBinder<Widget, ReferenceConfigViewImpl> {
-	}
 
-	private Presenter presenter;
-	private Widget widget;
-	@UiField
-	TextBox referenceField;
+  public interface ReferenceConfigViewImplUiBinder
+    extends UiBinder<Widget, ReferenceConfigViewImpl> {}
 
-	@Inject
-	public ReferenceConfigViewImpl(ReferenceConfigViewImplUiBinder binder) {
-		widget = binder.createAndBindUi(this);
-	}
+  private Presenter presenter;
+  private Widget widget;
 
-	@Override
-	public void initView() {}
+  @UiField
+  TextBox referenceField;
 
-	@Override
-	public Widget asWidget() {
-		return widget;
-	}
+  @Inject
+  public ReferenceConfigViewImpl(ReferenceConfigViewImplUiBinder binder) {
+    widget = binder.createAndBindUi(this);
+  }
 
-	@Override
-	public void checkParams() throws IllegalArgumentException {}
+  @Override
+  public void initView() {}
 
-	@Override
-	public void showLoading() {
+  @Override
+  public Widget asWidget() {
+    return widget;
+  }
 
-	}
+  @Override
+  public void checkParams() throws IllegalArgumentException {}
 
-	@Override
-	public void showInfo(String message) {
-		DisplayUtils.showInfo(message);
-	}
+  @Override
+  public void showLoading() {}
 
-	@Override
-	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
-	}
+  @Override
+  public void showInfo(String message) {
+    DisplayUtils.showInfo(message);
+  }
 
-	@Override
-	public void clear() {
-		referenceField.setValue("");
-	}
+  @Override
+  public void showErrorMessage(String message) {
+    DisplayUtils.showErrorMessage(message);
+  }
 
-	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-	}
+  @Override
+  public void clear() {
+    referenceField.setValue("");
+  }
 
-	@Override
-	public void setReference(String reference) {
-		referenceField.setValue(reference);
-	}
+  @Override
+  public void setPresenter(Presenter presenter) {
+    this.presenter = presenter;
+  }
 
-	@Override
-	public String getReference() {
-		return referenceField.getValue();
-	}
+  @Override
+  public void setReference(String reference) {
+    referenceField.setValue(reference);
+  }
 
+  @Override
+  public String getReference() {
+    return referenceField.getValue();
+  }
 }

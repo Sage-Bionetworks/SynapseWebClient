@@ -2,6 +2,10 @@ package org.sagebionetworks.web.client.widget.entity.file;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
+import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
@@ -26,168 +30,238 @@ import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.aws.AwsSdk;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.shared.WebConstants;
-import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 
-public class FileDownloadMenuItem implements FileDownloadMenuItemView.Presenter, SynapseWidgetPresenter {
-	public static final String DOWNLOAD_ACTION_EVENT_NAME = "Download";
-	public static final String FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME = "FilesAddedToDownloadList";
-	public static final String FILE_DIRECTLY_DOWNLOADED_EVENT_NAME = "FileDirectlyDownloaded";
-	public static final String ACCESS_REQUIREMENTS_LINK = "#!AccessRequirements:ID=";
-	public static final String LOGIN_PLACE_LINK = "#!LoginPlace:0";
-	private FileDownloadMenuItemView view;
-	private EntityBundle entityBundle;
-	private SynapseClientAsync synapseClient;
-	private PortalGinInjector ginInjector;
-	SynapseJavascriptClient jsClient;
-	AuthenticationController authController;
-	SynapseJSNIUtils jsniUtils;
-	GWTWrapper gwt;
-	CookieProvider cookies;
-	AwsSdk awsSdk;
-	PopupUtilsView popupUtilsView;
-	FileHandle dataFileHandle;
-	JavaScriptObject s3;
+public class FileDownloadMenuItem
+  implements FileDownloadMenuItemView.Presenter, SynapseWidgetPresenter {
 
-	@Inject
-	public FileDownloadMenuItem(FileDownloadMenuItemView view, SynapseClientAsync synapseClient, PortalGinInjector ginInjector, SynapseJavascriptClient jsClient, AuthenticationController authController, SynapseJSNIUtils jsniUtils, GWTWrapper gwt, CookieProvider cookies, AwsSdk awsSdk, PopupUtilsView popupUtilsView) {
-		this.view = view;
-		this.synapseClient = synapseClient;
-		fixServiceEntryPoint(synapseClient);
-		this.ginInjector = ginInjector;
-		this.jsClient = jsClient;
-		this.authController = authController;
-		this.jsniUtils = jsniUtils;
-		this.gwt = gwt;
-		this.cookies = cookies;
-		this.awsSdk = awsSdk;
-		this.popupUtilsView = popupUtilsView;
-		view.setPresenter(this);
-	}
+  public static final String DOWNLOAD_ACTION_EVENT_NAME = "Download";
+  public static final String FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME =
+    "FilesAddedToDownloadList";
+  public static final String FILE_DIRECTLY_DOWNLOADED_EVENT_NAME =
+    "FileDirectlyDownloaded";
+  public static final String ACCESS_REQUIREMENTS_LINK =
+    "#!AccessRequirements:ID=";
+  public static final String LOGIN_PLACE_LINK = "#!LoginPlace:0";
+  private FileDownloadMenuItemView view;
+  private EntityBundle entityBundle;
+  private SynapseClientAsync synapseClient;
+  private PortalGinInjector ginInjector;
+  SynapseJavascriptClient jsClient;
+  AuthenticationController authController;
+  SynapseJSNIUtils jsniUtils;
+  GWTWrapper gwt;
+  CookieProvider cookies;
+  AwsSdk awsSdk;
+  PopupUtilsView popupUtilsView;
+  FileHandle dataFileHandle;
+  JavaScriptObject s3;
 
-	public void configure(final EntityBundle bundle) {
-		view.clear();
-		if (bundle.getRestrictionInformation() != null) {
-			configure(bundle, bundle.getRestrictionInformation());
-		} else {
-			jsClient.getRestrictionInformation(bundle.getEntity().getId(), RestrictableObjectType.ENTITY, new AsyncCallback<RestrictionInformationResponse>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					handleException(caught);
-				}
+  @Inject
+  public FileDownloadMenuItem(
+    FileDownloadMenuItemView view,
+    SynapseClientAsync synapseClient,
+    PortalGinInjector ginInjector,
+    SynapseJavascriptClient jsClient,
+    AuthenticationController authController,
+    SynapseJSNIUtils jsniUtils,
+    GWTWrapper gwt,
+    CookieProvider cookies,
+    AwsSdk awsSdk,
+    PopupUtilsView popupUtilsView
+  ) {
+    this.view = view;
+    this.synapseClient = synapseClient;
+    fixServiceEntryPoint(synapseClient);
+    this.ginInjector = ginInjector;
+    this.jsClient = jsClient;
+    this.authController = authController;
+    this.jsniUtils = jsniUtils;
+    this.gwt = gwt;
+    this.cookies = cookies;
+    this.awsSdk = awsSdk;
+    this.popupUtilsView = popupUtilsView;
+    view.setPresenter(this);
+  }
 
-				public void onSuccess(RestrictionInformationResponse restrictionInformation) {
-					configure(bundle, restrictionInformation);
-				};
-			});
-		}
-	}
+  public void configure(final EntityBundle bundle) {
+    view.clear();
+    if (bundle.getRestrictionInformation() != null) {
+      configure(bundle, bundle.getRestrictionInformation());
+    } else {
+      jsClient.getRestrictionInformation(
+        bundle.getEntity().getId(),
+        RestrictableObjectType.ENTITY,
+        new AsyncCallback<RestrictionInformationResponse>() {
+          @Override
+          public void onFailure(Throwable caught) {
+            handleException(caught);
+          }
 
-	public void configure(EntityBundle bundle, RestrictionInformationResponse restrictionInformation) {
-		view.clear();
-		this.entityBundle = bundle;
-		dataFileHandle = getFileHandle();
-		s3 = null;
+          public void onSuccess(
+            RestrictionInformationResponse restrictionInformation
+          ) {
+            configure(bundle, restrictionInformation);
+          }
+        }
+      );
+    }
+  }
 
-		if (restrictionInformation.getHasUnmetAccessRequirement()) {
-			// if in alpha, send to access requirements
-			view.setIsDirectDownloadLink(ACCESS_REQUIREMENTS_LINK + bundle.getEntity().getId() + "&" + AccessRequirementsPlace.TYPE_PARAM + "=" + RestrictableObjectType.ENTITY.toString());
-		} else {
-			if (dataFileHandle != null) {
-				if (dataFileHandle instanceof ExternalObjectStoreFileHandle) {
-					view.setIsUnauthenticatedS3DirectDownload();
-				} else {
-					String fileNameOverride = entityBundle.getFileName();
-					String directDownloadUrl = getDirectDownloadURL((FileEntity) entityBundle.getEntity(), dataFileHandle, fileNameOverride);
+  public void configure(
+    EntityBundle bundle,
+    RestrictionInformationResponse restrictionInformation
+  ) {
+    view.clear();
+    this.entityBundle = bundle;
+    dataFileHandle = getFileHandle();
+    s3 = null;
 
-					// special case, if this starts with sftp proxy, then handle
-					String sftpProxy = ginInjector.getSynapseProperties().getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT);
-					if (directDownloadUrl.startsWith(sftpProxy)) {
-						view.setIsSFTPDownload();
-					} else {
-						view.setIsDirectDownloadLink(directDownloadUrl);
-					}
-				}
-			} else if (!authController.isLoggedIn()) {
-				view.setIsDirectDownloadLink(LOGIN_PLACE_LINK);
-			}
-		}
-	}
+    if (restrictionInformation.getHasUnmetAccessRequirement()) {
+      // if in alpha, send to access requirements
+      view.setIsDirectDownloadLink(
+        ACCESS_REQUIREMENTS_LINK +
+        bundle.getEntity().getId() +
+        "&" +
+        AccessRequirementsPlace.TYPE_PARAM +
+        "=" +
+        RestrictableObjectType.ENTITY.toString()
+      );
+    } else {
+      if (dataFileHandle != null) {
+        if (dataFileHandle instanceof ExternalObjectStoreFileHandle) {
+          view.setIsUnauthenticatedS3DirectDownload();
+        } else {
+          String fileNameOverride = entityBundle.getFileName();
+          String directDownloadUrl = getDirectDownloadURL(
+            (FileEntity) entityBundle.getEntity(),
+            dataFileHandle,
+            fileNameOverride
+          );
 
-	private void handleException(Throwable t) {
-		popupUtilsView.showErrorMessage(t.getMessage());
-	}
+          // special case, if this starts with sftp proxy, then handle
+          String sftpProxy = ginInjector
+            .getSynapseProperties()
+            .getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT);
+          if (directDownloadUrl.startsWith(sftpProxy)) {
+            view.setIsSFTPDownload();
+          } else {
+            view.setIsDirectDownloadLink(directDownloadUrl);
+          }
+        }
+      } else if (!authController.isLoggedIn()) {
+        view.setIsDirectDownloadLink(LOGIN_PLACE_LINK);
+      }
+    }
+  }
 
-	public FileHandle getFileHandle() {
-		if (entityBundle != null && entityBundle.getEntity() != null) {
-			if (entityBundle.getEntity() instanceof FileEntity) {
-					return DisplayUtils.getFileHandle(entityBundle);
-			}
-		}
-		return null;
-	}
+  private void handleException(Throwable t) {
+    popupUtilsView.showErrorMessage(t.getMessage());
+  }
 
-	
-	public String getDirectDownloadURL(FileEntity fileEntity, FileHandle fileHandle, String fileNameOverride) {
-		String externalUrl = null;
-		if (fileHandle instanceof ExternalFileHandle) {
-			externalUrl = ((ExternalFileHandle) fileHandle).getExternalURL();
-		}
+  public FileHandle getFileHandle() {
+    if (entityBundle != null && entityBundle.getEntity() != null) {
+      if (entityBundle.getEntity() instanceof FileEntity) {
+        return DisplayUtils.getFileHandle(entityBundle);
+      }
+    }
+    return null;
+  }
 
-		String directDownloadURL = null;
-		if (externalUrl != null && externalUrl.toLowerCase().startsWith(WebConstants.SFTP_PREFIX)) {
-			// point to sftp proxy instead
-			directDownloadURL = Uploader.getSftpProxyLink(fileNameOverride, externalUrl, ginInjector.getSynapseProperties(), gwt);
-		} else {
-			directDownloadURL = jsniUtils.getFileHandleAssociationUrl(fileEntity.getId(), FileHandleAssociateType.FileEntity, fileHandle.getId());
-		}
-		return directDownloadURL;
-	}
+  public String getDirectDownloadURL(
+    FileEntity fileEntity,
+    FileHandle fileHandle,
+    String fileNameOverride
+  ) {
+    String externalUrl = null;
+    if (fileHandle instanceof ExternalFileHandle) {
+      externalUrl = ((ExternalFileHandle) fileHandle).getExternalURL();
+    }
 
-	@Override
-	public Widget asWidget() {
-		return view.asWidget();
-	}
+    String directDownloadURL = null;
+    if (
+      externalUrl != null &&
+      externalUrl.toLowerCase().startsWith(WebConstants.SFTP_PREFIX)
+    ) {
+      // point to sftp proxy instead
+      directDownloadURL =
+        Uploader.getSftpProxyLink(
+          fileNameOverride,
+          externalUrl,
+          ginInjector.getSynapseProperties(),
+          gwt
+        );
+    } else {
+      directDownloadURL =
+        jsniUtils.getFileHandleAssociationUrl(
+          fileEntity.getId(),
+          FileHandleAssociateType.FileEntity,
+          fileHandle.getId()
+        );
+    }
+    return directDownloadURL;
+  }
 
-	@Override
-	public void onUnauthenticatedS3DirectDownloadClicked() {
-		// ask for credentials, use bucket/endpoint info from storage location
-		ExternalObjectStoreFileHandle objectStoreFileHandle = (ExternalObjectStoreFileHandle) dataFileHandle;
-		view.showLoginS3DirectDownloadDialog(objectStoreFileHandle.getEndpointUrl());
-	}
+  @Override
+  public Widget asWidget() {
+    return view.asWidget();
+  }
 
-	@Override
-	public void onLoginS3DirectDownloadClicked(String accessKeyId, String secretAccessKey) {
-		final ExternalObjectStoreFileHandle objectStoreFileHandle = (ExternalObjectStoreFileHandle) dataFileHandle;
-		CallbackP<JavaScriptObject> s3Callback = new CallbackP<JavaScriptObject>() {
-			@Override
-			public void invoke(JavaScriptObject s3JsObject) {
-				s3 = s3JsObject;
-				// NOTE: most browsers block the popup because the button click event is not directly associated to
-				// the login popup.
-				// Show the direct download button after authorization succeeds.
-				view.showS3DirectDownloadDialog();
-			}
-		};
-		awsSdk.getS3(accessKeyId, secretAccessKey, objectStoreFileHandle.getBucket(), objectStoreFileHandle.getEndpointUrl(), s3Callback);
-	}
+  @Override
+  public void onUnauthenticatedS3DirectDownloadClicked() {
+    // ask for credentials, use bucket/endpoint info from storage location
+    ExternalObjectStoreFileHandle objectStoreFileHandle = (ExternalObjectStoreFileHandle) dataFileHandle;
+    view.showLoginS3DirectDownloadDialog(
+      objectStoreFileHandle.getEndpointUrl()
+    );
+  }
 
-	@Override
-	public void onAuthenticatedS3DirectDownloadClicked() {
-		ExternalObjectStoreFileHandle objectStoreFileHandle = (ExternalObjectStoreFileHandle) dataFileHandle;
-		String presignedUrl = awsSdk.getPresignedURL(objectStoreFileHandle.getFileKey(), objectStoreFileHandle.getBucket(), objectStoreFileHandle.getFileName(), s3);
-		popupUtilsView.openInNewWindow(presignedUrl);
-	}
+  @Override
+  public void onLoginS3DirectDownloadClicked(
+    String accessKeyId,
+    String secretAccessKey
+  ) {
+    final ExternalObjectStoreFileHandle objectStoreFileHandle = (ExternalObjectStoreFileHandle) dataFileHandle;
+    CallbackP<JavaScriptObject> s3Callback = new CallbackP<JavaScriptObject>() {
+      @Override
+      public void invoke(JavaScriptObject s3JsObject) {
+        s3 = s3JsObject;
+        // NOTE: most browsers block the popup because the button click event is not directly associated to
+        // the login popup.
+        // Show the direct download button after authorization succeeds.
+        view.showS3DirectDownloadDialog();
+      }
+    };
+    awsSdk.getS3(
+      accessKeyId,
+      secretAccessKey,
+      objectStoreFileHandle.getBucket(),
+      objectStoreFileHandle.getEndpointUrl(),
+      s3Callback
+    );
+  }
 
-	@Override
-	public void onSFTPDownloadErrorClicked() {
-		popupUtilsView.showErrorMessage(DisplayConstants.ERROR_SFTP_DOWNLOAD_TITLE, DisplayConstants.ERROR_SFTP_DOWNLOAD_MESSAGE);
-	}
+  @Override
+  public void onAuthenticatedS3DirectDownloadClicked() {
+    ExternalObjectStoreFileHandle objectStoreFileHandle = (ExternalObjectStoreFileHandle) dataFileHandle;
+    String presignedUrl = awsSdk.getPresignedURL(
+      objectStoreFileHandle.getFileKey(),
+      objectStoreFileHandle.getBucket(),
+      objectStoreFileHandle.getFileName(),
+      s3
+    );
+    popupUtilsView.openInNewWindow(presignedUrl);
+  }
 
-	@Override
-	public void onDirectDownloadClicked() {
-		// user already directly sent to download fha, could use this hook to send an event to analytics if we want
-	}
+  @Override
+  public void onSFTPDownloadErrorClicked() {
+    popupUtilsView.showErrorMessage(
+      DisplayConstants.ERROR_SFTP_DOWNLOAD_TITLE,
+      DisplayConstants.ERROR_SFTP_DOWNLOAD_MESSAGE
+    );
+  }
+
+  @Override
+  public void onDirectDownloadClicked() {
+    // user already directly sent to download fha, could use this hook to send an event to analytics if we want
+  }
 }

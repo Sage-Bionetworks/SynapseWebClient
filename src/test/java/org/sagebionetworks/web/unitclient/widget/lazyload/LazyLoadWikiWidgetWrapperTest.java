@@ -3,6 +3,9 @@ package org.sagebionetworks.web.unitclient.widget.lazyload;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Widget;
 import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,59 +21,88 @@ import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadWikiWidgetWrapper;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadWikiWidgetWrapperView;
 import org.sagebionetworks.web.shared.WikiPageKey;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Widget;
 
 public class LazyLoadWikiWidgetWrapperTest {
-	LazyLoadWikiWidgetWrapper widget;
-	@Mock
-	LazyLoadWikiWidgetWrapperView mockView;
-	@Mock
-	LazyLoadHelper mockLazyLoadHelper;
-	@Mock
-	SynapseJSNIUtils mockSynapseJSNIUtils;
-	@Mock
-	WidgetRendererPresenter mockWikiWidget;
-	@Mock
-	WikiPageKey mockWikiKey;
-	@Mock
-	Map<String, String> mockWidgetDescriptor;
-	@Mock
-	Callback mockWidgetRefreshRequired;
-	@Captor
-	ArgumentCaptor<AsyncCallback<WidgetRendererPresenter>> callbackCaptor;
-	@Mock
-	WidgetRegistrar mockWidgetRegistrar;
-	Long wikiVersionInView = 20L;
-	public static final String WIDGET_CONTENT_TYPE = "image";
 
-	@Before
-	public void setUp() throws Exception {
-		MockitoAnnotations.initMocks(this);
-		widget = new LazyLoadWikiWidgetWrapper(mockView, mockLazyLoadHelper, mockSynapseJSNIUtils, mockWidgetRegistrar);
-	}
+  LazyLoadWikiWidgetWrapper widget;
 
-	private void simulateLazyLoadEvent() {
-		ArgumentCaptor<Callback> captor = ArgumentCaptor.forClass(Callback.class);
-		verify(mockLazyLoadHelper).configure(captor.capture(), eq(mockView));
-		captor.getValue().invoke();
-	}
+  @Mock
+  LazyLoadWikiWidgetWrapperView mockView;
 
-	@Test
-	public void testHappyCase() {
-		// configure
-		widget.configure(WIDGET_CONTENT_TYPE, mockWikiKey, mockWidgetDescriptor, mockWidgetRefreshRequired, wikiVersionInView);
-		verify(mockLazyLoadHelper).setIsConfigured();
-		verify(mockView).showLoading();
+  @Mock
+  LazyLoadHelper mockLazyLoadHelper;
 
-		simulateLazyLoadEvent();
-		verify(mockWidgetRegistrar).getWidgetRendererForWidgetDescriptorAfterLazyLoad(eq(WIDGET_CONTENT_TYPE), callbackCaptor.capture());
-		callbackCaptor.getValue().onSuccess(mockWikiWidget);
+  @Mock
+  SynapseJSNIUtils mockSynapseJSNIUtils;
 
-		verify(mockWikiWidget).configure(mockWikiKey, mockWidgetDescriptor, mockWidgetRefreshRequired, wikiVersionInView);
-		String className = mockWikiWidget.getClass().getSimpleName();
-		verify(mockView).showWidget(any(Widget.class), eq(className));
-	}
+  @Mock
+  WidgetRendererPresenter mockWikiWidget;
 
+  @Mock
+  WikiPageKey mockWikiKey;
 
+  @Mock
+  Map<String, String> mockWidgetDescriptor;
+
+  @Mock
+  Callback mockWidgetRefreshRequired;
+
+  @Captor
+  ArgumentCaptor<AsyncCallback<WidgetRendererPresenter>> callbackCaptor;
+
+  @Mock
+  WidgetRegistrar mockWidgetRegistrar;
+
+  Long wikiVersionInView = 20L;
+  public static final String WIDGET_CONTENT_TYPE = "image";
+
+  @Before
+  public void setUp() throws Exception {
+    MockitoAnnotations.initMocks(this);
+    widget =
+      new LazyLoadWikiWidgetWrapper(
+        mockView,
+        mockLazyLoadHelper,
+        mockSynapseJSNIUtils,
+        mockWidgetRegistrar
+      );
+  }
+
+  private void simulateLazyLoadEvent() {
+    ArgumentCaptor<Callback> captor = ArgumentCaptor.forClass(Callback.class);
+    verify(mockLazyLoadHelper).configure(captor.capture(), eq(mockView));
+    captor.getValue().invoke();
+  }
+
+  @Test
+  public void testHappyCase() {
+    // configure
+    widget.configure(
+      WIDGET_CONTENT_TYPE,
+      mockWikiKey,
+      mockWidgetDescriptor,
+      mockWidgetRefreshRequired,
+      wikiVersionInView
+    );
+    verify(mockLazyLoadHelper).setIsConfigured();
+    verify(mockView).showLoading();
+
+    simulateLazyLoadEvent();
+    verify(mockWidgetRegistrar)
+      .getWidgetRendererForWidgetDescriptorAfterLazyLoad(
+        eq(WIDGET_CONTENT_TYPE),
+        callbackCaptor.capture()
+      );
+    callbackCaptor.getValue().onSuccess(mockWikiWidget);
+
+    verify(mockWikiWidget)
+      .configure(
+        mockWikiKey,
+        mockWidgetDescriptor,
+        mockWidgetRefreshRequired,
+        wikiVersionInView
+      );
+    String className = mockWikiWidget.getClass().getSimpleName();
+    verify(mockView).showWidget(any(Widget.class), eq(className));
+  }
 }

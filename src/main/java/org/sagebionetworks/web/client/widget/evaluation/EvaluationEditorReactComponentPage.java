@@ -1,6 +1,12 @@
 package org.sagebionetworks.web.client.widget.evaluation;
 
-
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.EvaluationEditorPageProps;
@@ -10,61 +16,71 @@ import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
-
 public class EvaluationEditorReactComponentPage extends Composite {
-	public interface Binder extends UiBinder<Widget, EvaluationEditorReactComponentPage> {}
 
-	private SynapseContextPropsProvider propsProvider;
+  public interface Binder
+    extends UiBinder<Widget, EvaluationEditorReactComponentPage> {}
 
-	@UiField
-	Anchor backToChallenge;
+  private SynapseContextPropsProvider propsProvider;
 
-	@UiField
-	ReactComponentDiv evaluationEditorContainer;
+  @UiField
+  Anchor backToChallenge;
 
-	String evaluationId;
-	String accessToken;
-	String entityId;
-	EvaluationEditorPageProps.Callback onPageBack;
-	boolean utc;
+  @UiField
+  ReactComponentDiv evaluationEditorContainer;
 
-	@Inject
-	public EvaluationEditorReactComponentPage(Binder binder, SynapseContextPropsProvider propsProvider) {
-		this.propsProvider = propsProvider;
-		initWidget(binder.createAndBindUi(this));
-	}
+  String evaluationId;
+  String accessToken;
+  String entityId;
+  EvaluationEditorPageProps.Callback onPageBack;
+  boolean utc;
 
-	public void configure(String evaluationId, String entityId, String token, boolean utc, EvaluationEditorPageProps.Callback onPageBack){
-		this.evaluationId = evaluationId;
-		this.entityId = entityId;
-		this.onPageBack = onPageBack;
-		this.accessToken = token;
-		this.utc = utc;
-	}
+  @Inject
+  public EvaluationEditorReactComponentPage(
+    Binder binder,
+    SynapseContextPropsProvider propsProvider
+  ) {
+    this.propsProvider = propsProvider;
+    initWidget(binder.createAndBindUi(this));
+  }
 
-	@Override
-	protected void onLoad() {
-		super.onLoad();
-		EvaluationEditorPageProps editorProps = EvaluationEditorPageProps.create(evaluationId, entityId, this.onPageBack);
-		ReactNode component = React.createElementWithSynapseContext(SRC.SynapseComponents.EvaluationEditorPage, editorProps, propsProvider.getJsInteropContextProps());
-		evaluationEditorContainer.render(component);
-	}
+  public void configure(
+    String evaluationId,
+    String entityId,
+    String token,
+    boolean utc,
+    EvaluationEditorPageProps.Callback onPageBack
+  ) {
+    this.evaluationId = evaluationId;
+    this.entityId = entityId;
+    this.onPageBack = onPageBack;
+    this.accessToken = token;
+    this.utc = utc;
+  }
 
-	@UiHandler(value={"backToChallenge"})
-	void onBackToChallengeClick(ClickEvent event){
-		unmountReactComponents();
-		onPageBack.run();
-	}
+  @Override
+  protected void onLoad() {
+    super.onLoad();
+    EvaluationEditorPageProps editorProps = EvaluationEditorPageProps.create(
+      evaluationId,
+      entityId,
+      this.onPageBack
+    );
+    ReactNode component = React.createElementWithSynapseContext(
+      SRC.SynapseComponents.EvaluationEditorPage,
+      editorProps,
+      propsProvider.getJsInteropContextProps()
+    );
+    evaluationEditorContainer.render(component);
+  }
 
-	private void unmountReactComponents(){
-		ReactDOM.unmountComponentAtNode(evaluationEditorContainer.getElement());
-	}
+  @UiHandler(value = { "backToChallenge" })
+  void onBackToChallengeClick(ClickEvent event) {
+    unmountReactComponents();
+    onPageBack.run();
+  }
 
+  private void unmountReactComponents() {
+    ReactDOM.unmountComponentAtNode(evaluationEditorContainer.getElement());
+  }
 }

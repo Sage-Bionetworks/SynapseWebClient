@@ -6,6 +6,11 @@ import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_DESCRIPTION
 import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_DESCRIPTION_PART_2;
 import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_PRIORITY;
 import static org.sagebionetworks.web.shared.WebConstants.REVIEW_DATA_REQUEST_COMPONENT_ID;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
@@ -27,231 +32,264 @@ import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.WebConstants;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 
-public class RestrictionWidget implements RestrictionWidgetView.Presenter, SynapseWidgetPresenter, IsWidget {
-	private AuthenticationController authenticationController;
-	private RestrictionWidgetView view;
-	private boolean showChangeLink, showFlagLink, showCurrentAccessUI, showFolderRestrictionsUI;
-	private Entity entity;
-	private boolean canChangePermissions;
-	private DataAccessClientAsync dataAccessClient;
-	private SynapseAlert synAlert;
-	private IsACTMemberAsyncHandler isACTMemberAsyncHandler;
-	private SynapseJavascriptClient jsClient;
-	GWTWrapper gwt;
-	SynapseJSNIUtils jsniUtils;
-	GlobalApplicationState globalAppState;
+public class RestrictionWidget
+  implements RestrictionWidgetView.Presenter, SynapseWidgetPresenter, IsWidget {
 
-	@Inject
-	public RestrictionWidget(RestrictionWidgetView view,
-			AuthenticationController authenticationController,
-			DataAccessClientAsync dataAccessClient,
-			SynapseAlert synAlert,
-			IsACTMemberAsyncHandler isACTMemberAsyncHandler,
-			SynapseJavascriptClient jsClient,
-			GWTWrapper gwt,
-			SynapseJSNIUtils jsniUtils,
-			GlobalApplicationState globalAppState) {
-		this.view = view;
-		this.authenticationController = authenticationController;
-		this.dataAccessClient = dataAccessClient;
-		fixServiceEntryPoint(dataAccessClient);
-		this.synAlert = synAlert;
-		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
-		this.jsClient = jsClient;
-		this.gwt = gwt;
-		this.jsniUtils = jsniUtils;
-		this.globalAppState = globalAppState;
-		view.setSynAlert(synAlert.asWidget());
-		view.setPresenter(this);
-		//by default, show the current users access to the given entity.
-		showCurrentAccessUI = true;
-		// by default, we are not showing the folder restrictions UI
-		showFolderRestrictionsUI = false;
-	}
+  private AuthenticationController authenticationController;
+  private RestrictionWidgetView view;
+  private boolean showChangeLink, showFlagLink, showCurrentAccessUI, showFolderRestrictionsUI;
+  private Entity entity;
+  private boolean canChangePermissions;
+  private DataAccessClientAsync dataAccessClient;
+  private SynapseAlert synAlert;
+  private IsACTMemberAsyncHandler isACTMemberAsyncHandler;
+  private SynapseJavascriptClient jsClient;
+  GWTWrapper gwt;
+  SynapseJSNIUtils jsniUtils;
+  GlobalApplicationState globalAppState;
 
-	public void configure(Entity entity, boolean canChangePermissions) {
-		this.entity = entity;
-		this.canChangePermissions = canChangePermissions;
-		loadRestrictionInformation();
-		if (showCurrentAccessUI) {
-			Long versionNumber = null;
-			if (entity instanceof Versionable) {
-				versionNumber = ((Versionable)entity).getVersionNumber();
-			}
-			view.configureCurrentAccessComponent(entity.getId(), versionNumber);
-		}
-	}
+  @Inject
+  public RestrictionWidget(
+    RestrictionWidgetView view,
+    AuthenticationController authenticationController,
+    DataAccessClientAsync dataAccessClient,
+    SynapseAlert synAlert,
+    IsACTMemberAsyncHandler isACTMemberAsyncHandler,
+    SynapseJavascriptClient jsClient,
+    GWTWrapper gwt,
+    SynapseJSNIUtils jsniUtils,
+    GlobalApplicationState globalAppState
+  ) {
+    this.view = view;
+    this.authenticationController = authenticationController;
+    this.dataAccessClient = dataAccessClient;
+    fixServiceEntryPoint(dataAccessClient);
+    this.synAlert = synAlert;
+    this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
+    this.jsClient = jsClient;
+    this.gwt = gwt;
+    this.jsniUtils = jsniUtils;
+    this.globalAppState = globalAppState;
+    view.setSynAlert(synAlert.asWidget());
+    view.setPresenter(this);
+    //by default, show the current users access to the given entity.
+    showCurrentAccessUI = true;
+    // by default, we are not showing the folder restrictions UI
+    showFolderRestrictionsUI = false;
+  }
 
-	public void setShowChangeLink(boolean showChangeLink) {
-		this.showChangeLink = showChangeLink;
-	}
+  public void configure(Entity entity, boolean canChangePermissions) {
+    this.entity = entity;
+    this.canChangePermissions = canChangePermissions;
+    loadRestrictionInformation();
+    if (showCurrentAccessUI) {
+      Long versionNumber = null;
+      if (entity instanceof Versionable) {
+        versionNumber = ((Versionable) entity).getVersionNumber();
+      }
+      view.configureCurrentAccessComponent(entity.getId(), versionNumber);
+    }
+  }
 
-	public void setShowFlagLink(boolean showFlagLink) {
-		this.showFlagLink = showFlagLink;
-	}
+  public void setShowChangeLink(boolean showChangeLink) {
+    this.showChangeLink = showChangeLink;
+  }
 
-	public void showFolderRestrictionUI() {
-		showFolderRestrictionsUI = true;
-		view.showFolderRestrictionUI();
-	}
+  public void setShowFlagLink(boolean showFlagLink) {
+    this.showFlagLink = showFlagLink;
+  }
 
-	public boolean isAnonymous() {
-		return !authenticationController.isLoggedIn();
-	}
+  public void showFolderRestrictionUI() {
+    showFolderRestrictionsUI = true;
+    view.showFolderRestrictionUI();
+  }
 
-	@Override
-	public Widget asWidget() {
-		return view.asWidget();
-	}
+  public boolean isAnonymous() {
+    return !authenticationController.isLoggedIn();
+  }
 
-	public void loadRestrictionInformation() {
-		view.clear();
-		synAlert.clear();
-		jsClient.getRestrictionInformation(entity.getId(), RestrictableObjectType.ENTITY, new AsyncCallback<RestrictionInformationResponse>() {
-			@Override
-			public void onSuccess(RestrictionInformationResponse restrictionInformation) {
-				configureUI(restrictionInformation);
-			}
+  @Override
+  public Widget asWidget() {
+    return view.asWidget();
+  }
 
-			@Override
-			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
-			}
-		});
+  public void loadRestrictionInformation() {
+    view.clear();
+    synAlert.clear();
+    jsClient.getRestrictionInformation(
+      entity.getId(),
+      RestrictableObjectType.ENTITY,
+      new AsyncCallback<RestrictionInformationResponse>() {
+        @Override
+        public void onSuccess(
+          RestrictionInformationResponse restrictionInformation
+        ) {
+          configureUI(restrictionInformation);
+        }
 
-	}
+        @Override
+        public void onFailure(Throwable caught) {
+          synAlert.handleException(caught);
+        }
+      }
+    );
+  }
 
-	public void configureUI(RestrictionInformationResponse restrictionInformation) {
-		boolean isAnonymous = isAnonymous();
-		boolean hasAdministrativeAccess = false;
+  public void configureUI(
+    RestrictionInformationResponse restrictionInformation
+  ) {
+    boolean isAnonymous = isAnonymous();
+    boolean hasAdministrativeAccess = false;
 
-		if (!isAnonymous) {
-			hasAdministrativeAccess = canChangePermissions;
-		}
-		RestrictionLevel restrictionLevel = restrictionInformation.getRestrictionLevel();
+    if (!isAnonymous) {
+      hasAdministrativeAccess = canChangePermissions;
+    }
+    RestrictionLevel restrictionLevel = restrictionInformation.getRestrictionLevel();
 
-		switch (restrictionLevel) {
-			case OPEN:
-				view.showNoRestrictionsUI();
-				break;
-			case RESTRICTED_BY_TERMS_OF_USE:
-			case CONTROLLED_BY_ACT:
-				view.showControlledUseUI();
-				if (showFolderRestrictionsUI) {
-					// also show the link to the terms
-					view.showFolderRestrictionsLink(entity.getId());
-				}
-				break;
-			default:
-				throw new IllegalArgumentException(restrictionLevel.toString());
-		}
+    switch (restrictionLevel) {
+      case OPEN:
+        view.showNoRestrictionsUI();
+        break;
+      case RESTRICTED_BY_TERMS_OF_USE:
+      case CONTROLLED_BY_ACT:
+        view.showControlledUseUI();
+        if (showFolderRestrictionsUI) {
+          // also show the link to the terms
+          view.showFolderRestrictionsLink(entity.getId());
+        }
+        break;
+      default:
+        throw new IllegalArgumentException(restrictionLevel.toString());
+    }
 
-		// ARs can technically be applied, but they don't work in a useful way, so hide the button (SWC-5909)
-		boolean entityTypeAllowsRestrictions = !(entity instanceof EntityView) && !(entity instanceof Dataset);
+    // ARs can technically be applied, but they don't work in a useful way, so hide the button (SWC-5909)
+    boolean entityTypeAllowsRestrictions =
+      !(entity instanceof EntityView) && !(entity instanceof Dataset);
 
-		// show the info link if there are any restrictions, or if we are supposed to show the flag link (to
-		// allow people to flag or admin to "change" the data access level).
-		boolean isChangeLink = restrictionLevel == RestrictionLevel.OPEN && hasAdministrativeAccess && entityTypeAllowsRestrictions;
-		boolean isRestricted = restrictionLevel != RestrictionLevel.OPEN;
-		if ((isChangeLink && showChangeLink) || isRestricted) {
-			if (isChangeLink)
-				view.showChangeLink();
-		}
+    // show the info link if there are any restrictions, or if we are supposed to show the flag link (to
+    // allow people to flag or admin to "change" the data access level).
+    boolean isChangeLink =
+      restrictionLevel == RestrictionLevel.OPEN &&
+      hasAdministrativeAccess &&
+      entityTypeAllowsRestrictions;
+    boolean isRestricted = restrictionLevel != RestrictionLevel.OPEN;
+    if ((isChangeLink && showChangeLink) || isRestricted) {
+      if (isChangeLink) view.showChangeLink();
+    }
 
-		if (showFlagLink) {
-			view.showFlagUI();
-		}
-	}
+    if (showFlagLink) {
+      view.showFlagUI();
+    }
+  }
 
-	@Override
-	public void imposeRestrictionOkClicked() {
-		Boolean isYesSelected = view.isYesHumanDataRadioSelected();
-		Boolean isNoSelected = view.isNoHumanDataRadioSelected();
+  @Override
+  public void imposeRestrictionOkClicked() {
+    Boolean isYesSelected = view.isYesHumanDataRadioSelected();
+    Boolean isNoSelected = view.isNoHumanDataRadioSelected();
 
-		if (isNoSelected != null && isNoSelected) {
-			// no-op, just hide the dialog
-			imposeRestrictionCancelClicked();
-		} else if ((isYesSelected == null || !isYesSelected) && (isNoSelected == null || !isNoSelected)) {
-			// no selection
-			view.showErrorMessage("You must make a selection before continuing.");
-		} else {
-			view.showLoading();
-			view.setImposeRestrictionModalVisible(false);
+    if (isNoSelected != null && isNoSelected) {
+      // no-op, just hide the dialog
+      imposeRestrictionCancelClicked();
+    } else if (
+      (isYesSelected == null || !isYesSelected) &&
+      (isNoSelected == null || !isNoSelected)
+    ) {
+      // no selection
+      view.showErrorMessage("You must make a selection before continuing.");
+    } else {
+      view.showLoading();
+      view.setImposeRestrictionModalVisible(false);
 
-			dataAccessClient.createLockAccessRequirement(entity.getId(), new AsyncCallback<Void>() {
-				@Override
-				public void onSuccess(Void result) {
-					view.showInfo("Successfully imposed restriction");
-					// reconfigure (reload restriction information and reconfigure HasAccess)
-					configure(entity, canChangePermissions);
-				}
+      dataAccessClient.createLockAccessRequirement(
+        entity.getId(),
+        new AsyncCallback<Void>() {
+          @Override
+          public void onSuccess(Void result) {
+            view.showInfo("Successfully imposed restriction");
+            // reconfigure (reload restriction information and reconfigure HasAccess)
+            configure(entity, canChangePermissions);
+          }
 
-				@Override
-				public void onFailure(Throwable caught) {
-					synAlert.handleException(caught);
-				}
-			});
-		}
-	}
+          @Override
+          public void onFailure(Throwable caught) {
+            synAlert.handleException(caught);
+          }
+        }
+      );
+    }
+  }
 
-	@Override
-	public void imposeRestrictionCancelClicked() {
-		view.setImposeRestrictionModalVisible(false);
-	}
+  @Override
+  public void imposeRestrictionCancelClicked() {
+    view.setImposeRestrictionModalVisible(false);
+  }
 
-	@Override
-	public void reportIssueClicked() {
-		// report abuse via Jira issue collector
-		String userId = WebConstants.ANONYMOUS, email = WebConstants.ANONYMOUS, displayName = WebConstants.ANONYMOUS, synId = entity.getId();
-		UserProfile userProfile = authenticationController.getCurrentUserProfile();
-		if (userProfile != null) {
-			userId = userProfile.getOwnerId();
-			displayName = DisplayUtils.getDisplayName(userProfile);
-			email = DisplayUtils.getPrimaryEmail(userProfile);
-		}
+  @Override
+  public void reportIssueClicked() {
+    // report abuse via Jira issue collector
+    String userId = WebConstants.ANONYMOUS, email =
+      WebConstants.ANONYMOUS, displayName =
+      WebConstants.ANONYMOUS, synId = entity.getId();
+    UserProfile userProfile = authenticationController.getCurrentUserProfile();
+    if (userProfile != null) {
+      userId = userProfile.getOwnerId();
+      displayName = DisplayUtils.getDisplayName(userProfile);
+      email = DisplayUtils.getPrimaryEmail(userProfile);
+    }
 
-		jsniUtils.showJiraIssueCollector("", // summary
-				FLAG_ISSUE_DESCRIPTION_PART_1 + gwt.getCurrentURL() + FLAG_ISSUE_DESCRIPTION_PART_2, FLAG_ISSUE_COLLECTOR_URL, userId, displayName, email, synId, // Synapse data object ID
-				REVIEW_DATA_REQUEST_COMPONENT_ID, null, // AR ID
-				FLAG_ISSUE_PRIORITY);
-	}
+    jsniUtils.showJiraIssueCollector(
+      "", // summary
+      FLAG_ISSUE_DESCRIPTION_PART_1 +
+      gwt.getCurrentURL() +
+      FLAG_ISSUE_DESCRIPTION_PART_2,
+      FLAG_ISSUE_COLLECTOR_URL,
+      userId,
+      displayName,
+      email,
+      synId, // Synapse data object ID
+      REVIEW_DATA_REQUEST_COMPONENT_ID,
+      null, // AR ID
+      FLAG_ISSUE_PRIORITY
+    );
+  }
 
-	@Override
-	public void notHumanDataClicked() {
-		// and show the warning message
-		view.setNotSensitiveHumanDataMessageVisible(true);
-	}
+  @Override
+  public void notHumanDataClicked() {
+    // and show the warning message
+    view.setNotSensitiveHumanDataMessageVisible(true);
+  }
 
-	@Override
-	public void yesHumanDataClicked() {
-		// and hide the warning message
-		view.setNotSensitiveHumanDataMessageVisible(false);
-	}
+  @Override
+  public void yesHumanDataClicked() {
+    // and hide the warning message
+    view.setNotSensitiveHumanDataMessageVisible(false);
+  }
 
-	@Override
-	public void changeClicked() {
-		isACTMemberAsyncHandler.isACTActionAvailable(new CallbackP<Boolean>() {
-			@Override
-			public void invoke(Boolean isACT) {
-				if (isACT) {
-					// go to access requirements place where they can modify access requirements
-					AccessRequirementsPlace place = new AccessRequirementsPlace("");
-					place.putParam(AccessRequirementsPlace.ID_PARAM, entity.getId());
-					place.putParam(AccessRequirementsPlace.TYPE_PARAM, RestrictableObjectType.ENTITY.toString());
-					globalAppState.getPlaceChanger().goTo(place);
-				} else {
-					view.showVerifyDataSensitiveDialog();
-				}
-			}
-		});
-	}
-	
-	public void setShowCurrentAccessUI(boolean showCurrentAccessUI) {
-		this.showCurrentAccessUI = showCurrentAccessUI;
-	}
+  @Override
+  public void changeClicked() {
+    isACTMemberAsyncHandler.isACTActionAvailable(
+      new CallbackP<Boolean>() {
+        @Override
+        public void invoke(Boolean isACT) {
+          if (isACT) {
+            // go to access requirements place where they can modify access requirements
+            AccessRequirementsPlace place = new AccessRequirementsPlace("");
+            place.putParam(AccessRequirementsPlace.ID_PARAM, entity.getId());
+            place.putParam(
+              AccessRequirementsPlace.TYPE_PARAM,
+              RestrictableObjectType.ENTITY.toString()
+            );
+            globalAppState.getPlaceChanger().goTo(place);
+          } else {
+            view.showVerifyDataSensitiveDialog();
+          }
+        }
+      }
+    );
+  }
+
+  public void setShowCurrentAccessUI(boolean showCurrentAccessUI) {
+    this.showCurrentAccessUI = showCurrentAccessUI;
+  }
 }

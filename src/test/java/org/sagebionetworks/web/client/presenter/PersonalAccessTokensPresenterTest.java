@@ -5,6 +5,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.junit.GWTMockUtilities;
+import com.google.gwt.user.client.ui.AcceptsOneWidget;
+import com.google.gwt.user.client.ui.Widget;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -17,60 +21,55 @@ import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.view.PersonalAccessTokensView;
 
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.junit.GWTMockUtilities;
-import com.google.gwt.user.client.ui.AcceptsOneWidget;
-import com.google.gwt.user.client.ui.Widget;
-
 @RunWith(MockitoJUnitRunner.class)
 public class PersonalAccessTokensPresenterTest {
 
-    @Mock
-    PersonalAccessTokensView mockView;
+  @Mock
+  PersonalAccessTokensView mockView;
 
-    @Mock
-    GlobalApplicationState globalApplicationState;
+  @Mock
+  GlobalApplicationState globalApplicationState;
 
-    @InjectMocks
-    PersonalAccessTokensPresenter presenter;
+  @InjectMocks
+  PersonalAccessTokensPresenter presenter;
 
-    @Test
-    public void testSetPlace() {
-        PersonalAccessTokenPlace place = new PersonalAccessTokenPlace("token");
+  @Test
+  public void testSetPlace() {
+    PersonalAccessTokenPlace place = new PersonalAccessTokenPlace("token");
 
-        // Method under test
-        presenter.setPlace(place);
+    // Method under test
+    presenter.setPlace(place);
 
-        // Called once in the constructor and once on setPlace invocation
-        verify(mockView, times(2)).setPresenter(presenter);
-    }
+    // Called once in the constructor and once on setPlace invocation
+    verify(mockView, times(2)).setPresenter(presenter);
+  }
 
-    @Test
-    public void testStart() {
-        GWTMockUtilities.disarm();
+  @Test
+  public void testStart() {
+    GWTMockUtilities.disarm();
 
-        AcceptsOneWidget mockPanel = mock(AcceptsOneWidget.class);
-        EventBus mockEventBus = mock(EventBus.class);
-        when(mockView.asWidget()).thenReturn(mock(Widget.class));
+    AcceptsOneWidget mockPanel = mock(AcceptsOneWidget.class);
+    EventBus mockEventBus = mock(EventBus.class);
+    when(mockView.asWidget()).thenReturn(mock(Widget.class));
 
-        // Method under test
-        presenter.start(mockPanel, mockEventBus);
+    // Method under test
+    presenter.start(mockPanel, mockEventBus);
 
-        verify(mockView).render();
-        verify(mockPanel).setWidget(mockView.asWidget());
+    verify(mockView).render();
+    verify(mockPanel).setWidget(mockView.asWidget());
 
-        GWTMockUtilities.restore();
-    }
+    GWTMockUtilities.restore();
+  }
 
-    @Test
-    public void testGoTo() {
-        PlaceChanger mockPlaceChanger = mock(PlaceChanger.class);
-        when(globalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-        Profile profilePlace = new Profile("token", Synapse.ProfileArea.SETTINGS);
+  @Test
+  public void testGoTo() {
+    PlaceChanger mockPlaceChanger = mock(PlaceChanger.class);
+    when(globalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
+    Profile profilePlace = new Profile("token", Synapse.ProfileArea.SETTINGS);
 
-        // Method under test
-        presenter.goTo(profilePlace);
+    // Method under test
+    presenter.goTo(profilePlace);
 
-        verify(mockPlaceChanger).goTo(profilePlace);
-    }
+    verify(mockPlaceChanger).goTo(profilePlace);
+  }
 }

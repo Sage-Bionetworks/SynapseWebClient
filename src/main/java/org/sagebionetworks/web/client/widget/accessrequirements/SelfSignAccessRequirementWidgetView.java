@@ -1,58 +1,57 @@
 package org.sagebionetworks.web.client.widget.accessrequirements;
 
-import org.sagebionetworks.web.client.widget.lazyload.SupportsLazyLoadInterface;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import org.sagebionetworks.web.client.widget.lazyload.SupportsLazyLoadInterface;
 
-public interface SelfSignAccessRequirementWidgetView extends IsWidget, SupportsLazyLoadInterface {
+public interface SelfSignAccessRequirementWidgetView
+  extends IsWidget, SupportsLazyLoadInterface {
+  /**
+   * Set the presenter.
+   *
+   * @param presenter
+   */
+  void setPresenter(Presenter presenter);
 
-	/**
-	 * Set the presenter.
-	 * 
-	 * @param presenter
-	 */
-	void setPresenter(Presenter presenter);
+  void addStyleNames(String styleNames);
 
-	void addStyleNames(String styleNames);
+  void setWikiTermsWidget(Widget wikiWidget);
 
-	void setWikiTermsWidget(Widget wikiWidget);
+  void showApprovedHeading();
 
-	void showApprovedHeading();
+  void showUnapprovedHeading();
 
-	void showUnapprovedHeading();
+  void showSignTermsButton();
 
-	void showSignTermsButton();
+  void showGetCertifiedUI();
 
-	void showGetCertifiedUI();
+  void showGetProfileValidatedUI();
 
-	void showGetProfileValidatedUI();
+  void resetState();
 
-	void resetState();
+  void setEditAccessRequirementWidget(IsWidget w);
 
-	void setEditAccessRequirementWidget(IsWidget w);
+  void setDeleteAccessRequirementWidget(IsWidget w);
 
-	void setDeleteAccessRequirementWidget(IsWidget w);
+  void setSubjectsWidget(IsWidget w);
 
-	void setSubjectsWidget(IsWidget w);
+  void setManageAccessWidget(IsWidget w);
 
-	void setManageAccessWidget(IsWidget w);
+  void showLoginButton();
 
-	void showLoginButton();
+  void hideControls();
 
-	void hideControls();
+  void setAccessRequirementID(String arID);
+  void setAccessRequirementIDVisible(boolean visible);
 
-	void setAccessRequirementID(String arID);
-	void setAccessRequirementIDVisible(boolean visible);
+  /**
+   * Presenter interface
+   */
+  public interface Presenter {
+    void onSignTerms();
 
-	/**
-	 * Presenter interface
-	 */
-	public interface Presenter {
-		void onSignTerms();
+    void onCertify();
 
-		void onCertify();
-
-		void onValidateProfile();
-	}
-
+    void onValidateProfile();
+  }
 }

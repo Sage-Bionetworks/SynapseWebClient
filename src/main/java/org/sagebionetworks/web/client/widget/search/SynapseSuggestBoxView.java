@@ -1,80 +1,79 @@
 package org.sagebionetworks.web.client.widget.search;
 
-import org.sagebionetworks.web.client.SynapseView;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import com.google.gwt.event.dom.client.HasKeyDownHandlers;
 import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.IsWidget;
+import org.sagebionetworks.web.client.SynapseView;
+import org.sagebionetworks.web.client.utils.CallbackP;
 
-public interface SynapseSuggestBoxView extends IsWidget, SynapseView, Focusable, HasKeyDownHandlers {
+public interface SynapseSuggestBoxView
+  extends IsWidget, SynapseView, Focusable, HasKeyDownHandlers {
+  /**
+   * Gets the string of text in the suggest box.
+   *
+   * @return The text of the currently contained in the suggest box.
+   */
+  String getText();
 
-	/**
-	 * Gets the string of text in the suggest box.
-	 * 
-	 * @return The text of the currently contained in the suggest box.
-	 */
-	String getText();
+  SynapseSuggestOracle getUserGroupSuggestOracle();
 
-	SynapseSuggestOracle getUserGroupSuggestOracle();
+  void hideLoading();
 
-	void hideLoading();
+  void clear();
 
-	void clear();
+  void updateFieldStateForSuggestions(int numResults, int offset);
 
-	void updateFieldStateForSuggestions(int numResults, int offset);
+  void setPlaceholderText(String text);
 
-	void setPlaceholderText(String text);
+  int getWidth();
 
-	int getWidth();
+  void setFocus(boolean focused);
 
-	void setFocus(boolean focused);
+  void selectAll();
 
-	void selectAll();
+  /**
+   * Sets the displays width. This width does not include decorations such as margin, border, or
+   * padding.
+   *
+   * @param width The CSS unit of width (e.g. "10px", "1em")
+   */
+  void setDisplayWidth(String width);
 
-	/**
-	 * Sets the displays width. This width does not include decorations such as margin, border, or
-	 * padding.
-	 * 
-	 * @param width The CSS unit of width (e.g. "10px", "1em")
-	 */
-	void setDisplayWidth(String width);
+  /**
+   * Set the presenter.
+   *
+   * @param presenter
+   */
+  void setPresenter(Presenter presenter);
 
+  /**
+   * Presenter interface
+   */
+  public interface Presenter {
+    UserGroupSuggestion getSelectedSuggestion();
 
-	/**
-	 * Set the presenter.
-	 * 
-	 * @param presenter
-	 */
-	void setPresenter(Presenter presenter);
+    void setSelectedSuggestion(UserGroupSuggestion selectedSuggestion);
 
-	/**
-	 * Presenter interface
-	 */
-	public interface Presenter {
-		UserGroupSuggestion getSelectedSuggestion();
+    void getPrevSuggestions();
 
-		void setSelectedSuggestion(UserGroupSuggestion selectedSuggestion);
+    void getNextSuggestions();
 
-		void getPrevSuggestions();
+    void addItemSelectedHandler(CallbackP<UserGroupSuggestion> callback);
 
-		void getNextSuggestions();
+    void showLoading();
 
-		void addItemSelectedHandler(CallbackP<UserGroupSuggestion> callback);
+    void hideLoading();
 
-		void showLoading();
+    void showErrorMessage(String message);
 
-		void hideLoading();
+    void updateFieldStateForSuggestions(int numResults, int offset);
 
-		void showErrorMessage(String message);
+    void handleOracleException(Throwable caught);
+  }
 
-		void updateFieldStateForSuggestions(int numResults, int offset);
+  void configure(SynapseSuggestOracle oracle);
 
-		void handleOracleException(Throwable caught);
-	}
+  void setText(String text);
 
-	void configure(SynapseSuggestOracle oracle);
-
-	void setText(String text);
-
-	void setSelectedText(String displayString);
+  void setSelectedText(String displayString);
 }

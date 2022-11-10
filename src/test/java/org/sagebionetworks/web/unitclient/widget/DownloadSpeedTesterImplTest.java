@@ -7,6 +7,11 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
+
+import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.RequestException;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -27,137 +32,204 @@ import org.sagebionetworks.web.client.widget.asynch.PresignedAndFileHandleURLAsy
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.test.helper.RequestBuilderMockStubber;
-import com.google.gwt.http.client.RequestCallback;
-import com.google.gwt.http.client.RequestException;
-import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class DownloadSpeedTesterImplTest {
 
-	DownloadSpeedTesterImpl downloadSpeedTester;
+  DownloadSpeedTesterImpl downloadSpeedTester;
 
-	@Mock
-	AuthenticationController mockAuthController;
-	@Mock
-	PresignedAndFileHandleURLAsyncHandler mockFileHandleAsyncHandler;
-	@Mock
-	RequestBuilderWrapper mockRequestBuilder;
-	@Mock
-	SynapseJavascriptClient mockJsClient;
+  @Mock
+  AuthenticationController mockAuthController;
 
-	@Mock
-	FileResult mockFileResult;
-	@Mock
-	S3FileHandle mockFileHandle;
-	@Mock
-	FileEntity mockFileEntity;
-	@Mock
-	Response mockResponse;
-	@Mock
-	AsyncCallback<Double> mockCallback;
-	@Captor
-	ArgumentCaptor<Throwable> throwableCaptor;
-	@Mock
-	ClientCache mockClientCache;
-	public static final String FILE_HANDLE_ID = "876567";
-	public static final Long FILE_CONTENT_SIZE = 1L;
-	public static final String PRESIGNED_URL = "https://s3.presigned.url/test.zip";
+  @Mock
+  PresignedAndFileHandleURLAsyncHandler mockFileHandleAsyncHandler;
 
-	@Before
-	public void setUp() throws Exception {
-		MockitoAnnotations.initMocks(this);
-		when(mockAuthController.isLoggedIn()).thenReturn(true);
+  @Mock
+  RequestBuilderWrapper mockRequestBuilder;
 
-		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK);
-		when(mockFileEntity.getDataFileHandleId()).thenReturn(FILE_HANDLE_ID);
-		when(mockFileResult.getFileHandle()).thenReturn(mockFileHandle);
-		when(mockFileResult.getPreSignedURL()).thenReturn(PRESIGNED_URL);
-		when(mockFileHandle.getContentSize()).thenReturn(FILE_CONTENT_SIZE);
+  @Mock
+  SynapseJavascriptClient mockJsClient;
 
-		AsyncMockStubber.callSuccessWith(mockFileEntity).when(mockJsClient).getEntity(anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(mockFileResult).when(mockFileHandleAsyncHandler).getFileResult(any(FileHandleAssociation.class), any(AsyncCallback.class));
-		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse).when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
+  @Mock
+  FileResult mockFileResult;
 
-		downloadSpeedTester = new DownloadSpeedTesterImpl(mockAuthController, mockFileHandleAsyncHandler, mockRequestBuilder, mockJsClient, mockClientCache);
-		when(mockClientCache.get(DownloadSpeedTesterImpl.ESTIMATED_DOWNLOAD_SPEED_CACHE_KEY)).thenReturn(null);
-		when(mockClientCache.contains(DownloadSpeedTesterImpl.ESTIMATED_DOWNLOAD_SPEED_CACHE_KEY)).thenReturn(false);
-	}
+  @Mock
+  S3FileHandle mockFileHandle;
 
-	@Test
-	public void testHappyCase() {
-		downloadSpeedTester.testDownloadSpeed(mockCallback);
+  @Mock
+  FileEntity mockFileEntity;
 
-		verify(mockCallback).onSuccess(anyDouble());
-	}
+  @Mock
+  Response mockResponse;
 
-	@Test
-	public void testNotLoggedIn() {
-		when(mockAuthController.isLoggedIn()).thenReturn(false);
+  @Mock
+  AsyncCallback<Double> mockCallback;
 
-		downloadSpeedTester.testDownloadSpeed(mockCallback);
+  @Captor
+  ArgumentCaptor<Throwable> throwableCaptor;
 
-		verify(mockCallback).onFailure(throwableCaptor.capture());
-		assertTrue(throwableCaptor.getValue() instanceof UnauthorizedException);
-	}
+  @Mock
+  ClientCache mockClientCache;
 
-	@Test
-	public void testFailToGetEntity() {
-		Exception error = new Exception("didn't work");
-		AsyncMockStubber.callFailureWith(error).when(mockJsClient).getEntity(anyString(), any(AsyncCallback.class));
+  public static final String FILE_HANDLE_ID = "876567";
+  public static final Long FILE_CONTENT_SIZE = 1L;
+  public static final String PRESIGNED_URL =
+    "https://s3.presigned.url/test.zip";
 
-		downloadSpeedTester.testDownloadSpeed(mockCallback);
+  @Before
+  public void setUp() throws Exception {
+    MockitoAnnotations.initMocks(this);
+    when(mockAuthController.isLoggedIn()).thenReturn(true);
 
-		verify(mockCallback).onFailure(error);
-	}
+    when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK);
+    when(mockFileEntity.getDataFileHandleId()).thenReturn(FILE_HANDLE_ID);
+    when(mockFileResult.getFileHandle()).thenReturn(mockFileHandle);
+    when(mockFileResult.getPreSignedURL()).thenReturn(PRESIGNED_URL);
+    when(mockFileHandle.getContentSize()).thenReturn(FILE_CONTENT_SIZE);
 
-	@Test
-	public void testFailToGetFileResult() {
-		when(mockFileResult.getPreSignedURL()).thenReturn(null);
-		when(mockFileResult.getFileHandle()).thenReturn(null);
-		when(mockFileResult.getFailureCode()).thenReturn(FileResultFailureCode.UNAUTHORIZED);
+    AsyncMockStubber
+      .callSuccessWith(mockFileEntity)
+      .when(mockJsClient)
+      .getEntity(anyString(), any(AsyncCallback.class));
+    AsyncMockStubber
+      .callSuccessWith(mockFileResult)
+      .when(mockFileHandleAsyncHandler)
+      .getFileResult(
+        any(FileHandleAssociation.class),
+        any(AsyncCallback.class)
+      );
+    RequestBuilderMockStubber
+      .callOnResponseReceived(null, mockResponse)
+      .when(mockRequestBuilder)
+      .sendRequest(anyString(), any(RequestCallback.class));
 
-		downloadSpeedTester.testDownloadSpeed(mockCallback);
+    downloadSpeedTester =
+      new DownloadSpeedTesterImpl(
+        mockAuthController,
+        mockFileHandleAsyncHandler,
+        mockRequestBuilder,
+        mockJsClient,
+        mockClientCache
+      );
+    when(
+      mockClientCache.get(
+        DownloadSpeedTesterImpl.ESTIMATED_DOWNLOAD_SPEED_CACHE_KEY
+      )
+    )
+      .thenReturn(null);
+    when(
+      mockClientCache.contains(
+        DownloadSpeedTesterImpl.ESTIMATED_DOWNLOAD_SPEED_CACHE_KEY
+      )
+    )
+      .thenReturn(false);
+  }
 
-		verify(mockCallback).onFailure(throwableCaptor.capture());
-		assertTrue(throwableCaptor.getValue().getMessage().contains(FileResultFailureCode.UNAUTHORIZED.toString()));
-	}
+  @Test
+  public void testHappyCase() {
+    downloadSpeedTester.testDownloadSpeed(mockCallback);
 
-	@Test
-	public void testFailDownloadFile() {
-		String statusText = "gateway timed out";
-		when(mockResponse.getStatusCode()).thenReturn(Response.SC_GATEWAY_TIMEOUT);
-		when(mockResponse.getStatusText()).thenReturn(statusText);
+    verify(mockCallback).onSuccess(anyDouble());
+  }
 
-		downloadSpeedTester.testDownloadSpeed(mockCallback);
+  @Test
+  public void testNotLoggedIn() {
+    when(mockAuthController.isLoggedIn()).thenReturn(false);
 
-		verify(mockCallback).onFailure(throwableCaptor.capture());
-		assertTrue(throwableCaptor.getValue().getMessage().contains(statusText));
-	}
+    downloadSpeedTester.testDownloadSpeed(mockCallback);
 
-	@Test
-	public void testCachedDownloadSpeed() {
-		String cachedDownloadSpeedString = "188267.37037";
-		when(mockClientCache.contains(DownloadSpeedTesterImpl.ESTIMATED_DOWNLOAD_SPEED_CACHE_KEY)).thenReturn(true);
-		when(mockClientCache.get(DownloadSpeedTesterImpl.ESTIMATED_DOWNLOAD_SPEED_CACHE_KEY)).thenReturn(cachedDownloadSpeedString);
+    verify(mockCallback).onFailure(throwableCaptor.capture());
+    assertTrue(throwableCaptor.getValue() instanceof UnauthorizedException);
+  }
 
-		downloadSpeedTester.testDownloadSpeed(mockCallback);
+  @Test
+  public void testFailToGetEntity() {
+    Exception error = new Exception("didn't work");
+    AsyncMockStubber
+      .callFailureWith(error)
+      .when(mockJsClient)
+      .getEntity(anyString(), any(AsyncCallback.class));
 
-		verifyZeroInteractions(mockRequestBuilder, mockJsClient);
-		verify(mockCallback).onSuccess(Double.valueOf(cachedDownloadSpeedString));
-	}
+    downloadSpeedTester.testDownloadSpeed(mockCallback);
 
-	@Test
-	public void testCachedInvalidValueDownloadSpeed() throws RequestException {
-		String cachedDownloadSpeedString = Double.toString(Double.POSITIVE_INFINITY);
-		when(mockClientCache.contains(DownloadSpeedTesterImpl.ESTIMATED_DOWNLOAD_SPEED_CACHE_KEY)).thenReturn(true);
-		when(mockClientCache.get(DownloadSpeedTesterImpl.ESTIMATED_DOWNLOAD_SPEED_CACHE_KEY)).thenReturn(cachedDownloadSpeedString);
+    verify(mockCallback).onFailure(error);
+  }
 
-		downloadSpeedTester.testDownloadSpeed(mockCallback);
+  @Test
+  public void testFailToGetFileResult() {
+    when(mockFileResult.getPreSignedURL()).thenReturn(null);
+    when(mockFileResult.getFileHandle()).thenReturn(null);
+    when(mockFileResult.getFailureCode())
+      .thenReturn(FileResultFailureCode.UNAUTHORIZED);
 
-		// verify it runs the test
-		verify(mockJsClient).getEntity(anyString(), any(AsyncCallback.class));
-		verify(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
-		verify(mockCallback).onSuccess(anyDouble());
-	}
+    downloadSpeedTester.testDownloadSpeed(mockCallback);
 
+    verify(mockCallback).onFailure(throwableCaptor.capture());
+    assertTrue(
+      throwableCaptor
+        .getValue()
+        .getMessage()
+        .contains(FileResultFailureCode.UNAUTHORIZED.toString())
+    );
+  }
+
+  @Test
+  public void testFailDownloadFile() {
+    String statusText = "gateway timed out";
+    when(mockResponse.getStatusCode()).thenReturn(Response.SC_GATEWAY_TIMEOUT);
+    when(mockResponse.getStatusText()).thenReturn(statusText);
+
+    downloadSpeedTester.testDownloadSpeed(mockCallback);
+
+    verify(mockCallback).onFailure(throwableCaptor.capture());
+    assertTrue(throwableCaptor.getValue().getMessage().contains(statusText));
+  }
+
+  @Test
+  public void testCachedDownloadSpeed() {
+    String cachedDownloadSpeedString = "188267.37037";
+    when(
+      mockClientCache.contains(
+        DownloadSpeedTesterImpl.ESTIMATED_DOWNLOAD_SPEED_CACHE_KEY
+      )
+    )
+      .thenReturn(true);
+    when(
+      mockClientCache.get(
+        DownloadSpeedTesterImpl.ESTIMATED_DOWNLOAD_SPEED_CACHE_KEY
+      )
+    )
+      .thenReturn(cachedDownloadSpeedString);
+
+    downloadSpeedTester.testDownloadSpeed(mockCallback);
+
+    verifyZeroInteractions(mockRequestBuilder, mockJsClient);
+    verify(mockCallback).onSuccess(Double.valueOf(cachedDownloadSpeedString));
+  }
+
+  @Test
+  public void testCachedInvalidValueDownloadSpeed() throws RequestException {
+    String cachedDownloadSpeedString = Double.toString(
+      Double.POSITIVE_INFINITY
+    );
+    when(
+      mockClientCache.contains(
+        DownloadSpeedTesterImpl.ESTIMATED_DOWNLOAD_SPEED_CACHE_KEY
+      )
+    )
+      .thenReturn(true);
+    when(
+      mockClientCache.get(
+        DownloadSpeedTesterImpl.ESTIMATED_DOWNLOAD_SPEED_CACHE_KEY
+      )
+    )
+      .thenReturn(cachedDownloadSpeedString);
+
+    downloadSpeedTester.testDownloadSpeed(mockCallback);
+
+    // verify it runs the test
+    verify(mockJsClient).getEntity(anyString(), any(AsyncCallback.class));
+    verify(mockRequestBuilder)
+      .sendRequest(anyString(), any(RequestCallback.class));
+    verify(mockCallback).onSuccess(anyDouble());
+  }
 }

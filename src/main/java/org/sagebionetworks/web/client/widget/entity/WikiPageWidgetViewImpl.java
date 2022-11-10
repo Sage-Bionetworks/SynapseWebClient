@@ -1,5 +1,16 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.binder.EventBinder;
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
@@ -17,337 +28,348 @@ import org.sagebionetworks.web.client.place.WikiDiff;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.shared.WikiPageKey;
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.binder.EventBinder;
 
 /**
  * Lightweight widget used to show a wiki page (has a markdown widget and pagebrowser)
- * 
+ *
  * @author Jay
  *
  */
-public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetView {
-	private static final String WELL = "well";
-	private static final String COL_MD_3 = "col-md-3";
-	private static final String COL_MD_9 = "col-md-9";
-	private static final String COL_XS_12 = "col-xs-12";
+public class WikiPageWidgetViewImpl
+  extends FlowPanel
+  implements WikiPageWidgetView {
 
-	public interface Binder extends UiBinder<Widget, WikiPageWidgetViewImpl> {
-	}
+  private static final String WELL = "well";
+  private static final String COL_MD_3 = "col-md-3";
+  private static final String COL_MD_9 = "col-md-9";
+  private static final String COL_XS_12 = "col-xs-12";
 
-	WikiPageWidgetView.Presenter presenter;
+  public interface Binder extends UiBinder<Widget, WikiPageWidgetViewImpl> {}
 
-	@UiField
-	FlowPanel mainPanel;
+  WikiPageWidgetView.Presenter presenter;
 
-	@UiField
-	Italic noWikiCanEditMessage;
+  @UiField
+  FlowPanel mainPanel;
 
-	@UiField
-	Italic noWikiCannotEditMessage;
+  @UiField
+  Italic noWikiCanEditMessage;
 
-	@UiField
-	FlowPanel wikiPagePanel;
+  @UiField
+  Italic noWikiCannotEditMessage;
 
-	@UiField
-	FlowPanel createdModifiedHistoryPanel;
+  @UiField
+  FlowPanel wikiPagePanel;
 
-	@UiField
-	Alert diffVersionAlert;
+  @UiField
+  FlowPanel createdModifiedHistoryPanel;
 
-	@UiField
-	Italic createdOnText;
-	@UiField
-	Italic modifiedOnText;
+  @UiField
+  Alert diffVersionAlert;
 
-	@UiField
-	Button wikiHistoryButton;
-	@UiField
-	Button wikiCompareButton;
+  @UiField
+  Italic createdOnText;
 
-	@UiField
-	Button restoreButton;
+  @UiField
+  Italic modifiedOnText;
 
-	@UiField
-	FlowPanel wikiHistoryPanel;
+  @UiField
+  Button wikiHistoryButton;
 
-	@UiField
-	FlowPanel wikiSubpagesPanel;
+  @UiField
+  Button wikiCompareButton;
 
-	@UiField
-	SimplePanel synAlertPanel;
+  @UiField
+  Button restoreButton;
 
-	@UiField
-	LoadingSpinner loadingPanel;
+  @UiField
+  FlowPanel wikiHistoryPanel;
 
-	@UiField
-	SimplePanel markdownPanel;
+  @UiField
+  FlowPanel wikiSubpagesPanel;
 
-	@UiField
-	Anchor anchorToCurrentVersion;
+  @UiField
+  SimplePanel synAlertPanel;
 
-	@UiField
-	Collapse historyCollapse;
+  @UiField
+  LoadingSpinner loadingPanel;
 
-	@UiField
-	Div wikiHeadingContainer;
-	@UiField
-	Div actionMenuContainer;
-	
-	Heading wikiHeading;
-	Widget widget;
-	WikiPageKey key;
+  @UiField
+  SimplePanel markdownPanel;
 
-	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-	}
+  @UiField
+  Anchor anchorToCurrentVersion;
 
-	SynapseJSNIUtils jsniUtils;
+  @UiField
+  Collapse historyCollapse;
 
-	@Inject
-	public WikiPageWidgetViewImpl(Binder binder, SynapseJSNIUtils jsniUtils) {
-		widget = binder.createAndBindUi(this);
-		this.jsniUtils = jsniUtils;
-		restoreButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				// state held in presenter
-				presenter.restoreClicked();
-			}
-		});
-		anchorToCurrentVersion.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.reloadWikiPage();
-				setDiffVersionAlertVisible(false);
-			}
-		});
-		wikiHistoryButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (historyCollapse.isShown()) {
-					wikiHistoryButton.setIcon(IconType.CARET_SQUARE_O_RIGHT);
-					historyCollapse.hide();
-				} else {
-					wikiHistoryButton.setIcon(IconType.CARET_SQUARE_O_DOWN);
-					historyCollapse.show();
-					presenter.showWikiHistory();
-				}
-			}
-		});
-		historyCollapse.hide();
-		wikiHistoryButton.setIcon(IconType.CARET_SQUARE_O_RIGHT);
-		wikiCompareButton.addClickHandler(event -> {
-			WikiDiff place = new WikiDiff(key);
-			DisplayUtils.newWindow("#!WikiDiff:" + place.toToken(), "_blank", "");
-		});
-	}
+  @UiField
+  Div wikiHeadingContainer;
 
-	@Override
-	public void setWikiHeadingText(String title) {
-		wikiHeadingContainer.clear();
-		if (DisplayUtils.isDefined(title)) {
-			wikiHeading = new Heading(HeadingSize.H2);
-			wikiHeading.setText(title);
-			wikiHeadingContainer.add(wikiHeading);
-		}
-	}
+  @UiField
+  Div actionMenuContainer;
 
-	@Override
-	public void scrollWikiHeadingIntoView() {
-		if (wikiHeading != null && !DisplayUtils.isInViewport(wikiHeading)) {
-			jsniUtils.scrollIntoView(wikiHeading.getElement());
-		}
-	}
+  Heading wikiHeading;
+  Widget widget;
+  WikiPageKey key;
 
-	@Override
-	public void clear() {
-		historyCollapse.hide();
-		wikiHistoryButton.setIcon(IconType.CARET_SQUARE_O_RIGHT);
-		loadingPanel.setVisible(false);
-		diffVersionAlert.setVisible(false);
-		noWikiCanEditMessage.setVisible(false);
-		noWikiCannotEditMessage.setVisible(false);
-	}
+  @Override
+  public void setPresenter(Presenter presenter) {
+    this.presenter = presenter;
+  }
 
-	@Override
-	public void showPopup(String title, String message, MessagePopup popupType, Callback okCallback, Callback cancelCallback) {
-		DisplayUtils.showPopup(title, message, popupType, okCallback, cancelCallback);
-	}
+  SynapseJSNIUtils jsniUtils;
 
-	@Override
-	public void setWikiSubpagesWidget(IsWidget wikiSubpages) {
-		wikiSubpagesPanel.clear();
-		wikiSubpagesPanel.add(wikiSubpages);
-	}
+  @Inject
+  public WikiPageWidgetViewImpl(Binder binder, SynapseJSNIUtils jsniUtils) {
+    widget = binder.createAndBindUi(this);
+    this.jsniUtils = jsniUtils;
+    restoreButton.addClickHandler(
+      new ClickHandler() {
+        @Override
+        public void onClick(ClickEvent event) {
+          // state held in presenter
+          presenter.restoreClicked();
+        }
+      }
+    );
+    anchorToCurrentVersion.addClickHandler(
+      new ClickHandler() {
+        @Override
+        public void onClick(ClickEvent event) {
+          presenter.reloadWikiPage();
+          setDiffVersionAlertVisible(false);
+        }
+      }
+    );
+    wikiHistoryButton.addClickHandler(
+      new ClickHandler() {
+        @Override
+        public void onClick(ClickEvent event) {
+          if (historyCollapse.isShown()) {
+            wikiHistoryButton.setIcon(IconType.CARET_SQUARE_O_RIGHT);
+            historyCollapse.hide();
+          } else {
+            wikiHistoryButton.setIcon(IconType.CARET_SQUARE_O_DOWN);
+            historyCollapse.show();
+            presenter.showWikiHistory();
+          }
+        }
+      }
+    );
+    historyCollapse.hide();
+    wikiHistoryButton.setIcon(IconType.CARET_SQUARE_O_RIGHT);
+    wikiCompareButton.addClickHandler(event -> {
+      WikiDiff place = new WikiDiff(key);
+      DisplayUtils.newWindow("#!WikiDiff:" + place.toToken(), "_blank", "");
+    });
+  }
 
-	@Override
-	public void setWikiSubpagesWidgetVisible(boolean isVisible) {
-		wikiSubpagesPanel.setVisible(isVisible);
-	}
+  @Override
+  public void setWikiHeadingText(String title) {
+    wikiHeadingContainer.clear();
+    if (DisplayUtils.isDefined(title)) {
+      wikiHeading = new Heading(HeadingSize.H2);
+      wikiHeading.setText(title);
+      wikiHeadingContainer.add(wikiHeading);
+    }
+  }
 
-	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
-	}
+  @Override
+  public void scrollWikiHeadingIntoView() {
+    if (wikiHeading != null && !DisplayUtils.isInViewport(wikiHeading)) {
+      jsniUtils.scrollIntoView(wikiHeading.getElement());
+    }
+  }
 
-	@Override
-	public void showInfo(String message) {
-		DisplayUtils.showInfo(message);
-	}
+  @Override
+  public void clear() {
+    historyCollapse.hide();
+    wikiHistoryButton.setIcon(IconType.CARET_SQUARE_O_RIGHT);
+    loadingPanel.setVisible(false);
+    diffVersionAlert.setVisible(false);
+    noWikiCanEditMessage.setVisible(false);
+    noWikiCannotEditMessage.setVisible(false);
+  }
 
-	@Override
-	public Widget asWidget() {
-		return widget;
-	}
+  @Override
+  public void showPopup(
+    String title,
+    String message,
+    MessagePopup popupType,
+    Callback okCallback,
+    Callback cancelCallback
+  ) {
+    DisplayUtils.showPopup(
+      title,
+      message,
+      popupType,
+      okCallback,
+      cancelCallback
+    );
+  }
 
-	@Override
-	public void addStyleName(String style) {
-		widget.addStyleName(style);
-	}
+  @Override
+  public void setWikiSubpagesWidget(IsWidget wikiSubpages) {
+    wikiSubpagesPanel.clear();
+    wikiSubpagesPanel.add(wikiSubpages);
+  }
 
+  @Override
+  public void setWikiSubpagesWidgetVisible(boolean isVisible) {
+    wikiSubpagesPanel.setVisible(isVisible);
+  }
 
-	/*
-	 * +------+ | Wiki | +---------------------------------------------------------+ | +---------+
-	 * +-----------------------------------------+ | | | 2 | | +-------------------------------------+ |
-	 * | | | | | | Notice | | | | | | | +-------------------------------------+ | | | +---------+ | Wiki
-	 * content | | | | | | | | | | | | | | | | | | | | Modified/Created by | | | | Show Wiki History 3 |
-	 * | | 1 +-----------------------------------------+ |
-	 * +---------------------------------------------------------+
-	 * 
-	 * 1 - this widget 2 - WikiSubpagesWidget widget 3 - wikiPagePanel
-	 */
+  public void showErrorMessage(String message) {
+    DisplayUtils.showErrorMessage(message);
+  }
 
-	@Override
-	public void expandWikiSubpages() {
-		wikiPagePanel.setStyleName("");
-		wikiPagePanel.addStyleName(COL_XS_12);
-		wikiPagePanel.addStyleName(COL_MD_9);
+  @Override
+  public void showInfo(String message) {
+    DisplayUtils.showInfo(message);
+  }
 
-		wikiSubpagesPanel.setStyleName("");
-		wikiSubpagesPanel.addStyleName(COL_XS_12);
-		wikiSubpagesPanel.addStyleName(WELL);
-		wikiSubpagesPanel.addStyleName(COL_MD_3);
-	}
+  @Override
+  public Widget asWidget() {
+    return widget;
+  }
 
-	@Override
-	public void collapseWikiSubpages() {
-		wikiPagePanel.setStyleName("");
-		wikiPagePanel.addStyleName(COL_XS_12);
+  @Override
+  public void addStyleName(String style) {
+    widget.addStyleName(style);
+  }
 
-		wikiSubpagesPanel.setStyleName("");
-		wikiSubpagesPanel.addStyleName(COL_XS_12);
-	}
+  /*
+   * +------+ | Wiki | +---------------------------------------------------------+ | +---------+
+   * +-----------------------------------------+ | | | 2 | | +-------------------------------------+ |
+   * | | | | | | Notice | | | | | | | +-------------------------------------+ | | | +---------+ | Wiki
+   * content | | | | | | | | | | | | | | | | | | | | Modified/Created by | | | | Show Wiki History 3 |
+   * | | 1 +-----------------------------------------+ |
+   * +---------------------------------------------------------+
+   *
+   * 1 - this widget 2 - WikiSubpagesWidget widget 3 - wikiPagePanel
+   */
 
-	@Override
-	public void setWikiHistoryWidget(IsWidget historyWidget) {
-		wikiHistoryPanel.clear();
-		wikiHistoryPanel.add(historyWidget);
-	}
+  @Override
+  public void expandWikiSubpages() {
+    wikiPagePanel.setStyleName("");
+    wikiPagePanel.addStyleName(COL_XS_12);
+    wikiPagePanel.addStyleName(COL_MD_9);
 
-	@Override
-	public void setSynapseAlertWidget(IsWidget synapseAlert) {
-		synAlertPanel.setWidget(synapseAlert);
-	}
+    wikiSubpagesPanel.setStyleName("");
+    wikiSubpagesPanel.addStyleName(COL_XS_12);
+    wikiSubpagesPanel.addStyleName(WELL);
+    wikiSubpagesPanel.addStyleName(COL_MD_3);
+  }
 
-	@Override
-	public void setMarkdownWidget(IsWidget markdownWidget) {
-		markdownPanel.setWidget(markdownWidget);
-	}
+  @Override
+  public void collapseWikiSubpages() {
+    wikiPagePanel.setStyleName("");
+    wikiPagePanel.addStyleName(COL_XS_12);
 
-	@Override
-	public void setRestoreButtonVisible(boolean isVisible) {
-		restoreButton.setVisible(isVisible);
-	}
+    wikiSubpagesPanel.setStyleName("");
+    wikiSubpagesPanel.addStyleName(COL_XS_12);
+  }
 
-	@Override
-	public void setDiffVersionAlertVisible(boolean isVisible) {
-		diffVersionAlert.setVisible(isVisible);
-	}
+  @Override
+  public void setWikiHistoryWidget(IsWidget historyWidget) {
+    wikiHistoryPanel.clear();
+    wikiHistoryPanel.add(historyWidget);
+  }
 
-	@Override
-	public void setModifiedCreatedByHistoryPanelVisible(boolean isVisible) {
-		createdModifiedHistoryPanel.setVisible(isVisible);
-	}
+  @Override
+  public void setSynapseAlertWidget(IsWidget synapseAlert) {
+    synAlertPanel.setWidget(synapseAlert);
+  }
 
-	@Override
-	public void setNoWikiCannotEditMessageVisible(boolean isVisible) {
-		noWikiCannotEditMessage.setVisible(isVisible);
-	}
+  @Override
+  public void setMarkdownWidget(IsWidget markdownWidget) {
+    markdownPanel.setWidget(markdownWidget);
+  }
 
-	@Override
-	public void setNoWikiCanEditMessageVisible(boolean isVisible) {
-		noWikiCanEditMessage.setVisible(isVisible);
+  @Override
+  public void setRestoreButtonVisible(boolean isVisible) {
+    restoreButton.setVisible(isVisible);
+  }
 
-	}
+  @Override
+  public void setDiffVersionAlertVisible(boolean isVisible) {
+    diffVersionAlert.setVisible(isVisible);
+  }
 
-	@Override
-	public void setMarkdownVisible(boolean isVisible) {
-		markdownPanel.setVisible(isVisible);
-	}
+  @Override
+  public void setModifiedCreatedByHistoryPanelVisible(boolean isVisible) {
+    createdModifiedHistoryPanel.setVisible(isVisible);
+  }
 
-	@Override
-	public void setMainPanelVisible(boolean isVisible) {
-		mainPanel.setVisible(isVisible);
-	}
+  @Override
+  public void setNoWikiCannotEditMessageVisible(boolean isVisible) {
+    noWikiCannotEditMessage.setVisible(isVisible);
+  }
 
-	@Override
-	public void setLoadingVisible(boolean isVisible) {
-		loadingPanel.setVisible(isVisible);
-	}
+  @Override
+  public void setNoWikiCanEditMessageVisible(boolean isVisible) {
+    noWikiCanEditMessage.setVisible(isVisible);
+  }
 
-	@Override
-	public void setWikiHistoryVisible(boolean isVisible) {
-		if (isVisible) {
-			historyCollapse.show();
-			wikiHistoryButton.setIcon(IconType.CARET_SQUARE_O_DOWN);
-		} else {
-			historyCollapse.hide();
-			wikiHistoryButton.setIcon(IconType.CARET_SQUARE_O_RIGHT);
-		}
-	}
+  @Override
+  public void setMarkdownVisible(boolean isVisible) {
+    markdownPanel.setVisible(isVisible);
+  }
 
-	@Override
-	public void setCreatedOn(String date) {
-		createdOnText.setText(date);
-	}
+  @Override
+  public void setMainPanelVisible(boolean isVisible) {
+    mainPanel.setVisible(isVisible);
+  }
 
-	@Override
-	public void setModifiedOn(String date) {
-		modifiedOnText.setText(date);
-	}
+  @Override
+  public void setLoadingVisible(boolean isVisible) {
+    loadingPanel.setVisible(isVisible);
+  }
 
-	@Override
-	public void setWikiHistoryDiffToolButtonVisible(boolean visible, WikiPageKey key) {
-		this.key = key;
-		wikiCompareButton.setVisible(visible);
-	}
-	
-	@Override
-	public void setActionMenu(IsWidget w) {
-		w.asWidget().removeFromParent();
-		actionMenuContainer.clear();
-		actionMenuContainer.add(w);
-	}
+  @Override
+  public void setWikiHistoryVisible(boolean isVisible) {
+    if (isVisible) {
+      historyCollapse.show();
+      wikiHistoryButton.setIcon(IconType.CARET_SQUARE_O_DOWN);
+    } else {
+      historyCollapse.hide();
+      wikiHistoryButton.setIcon(IconType.CARET_SQUARE_O_RIGHT);
+    }
+  }
 
+  @Override
+  public void setCreatedOn(String date) {
+    createdOnText.setText(date);
+  }
 
-	/** Event binder code **/
-	interface EBinder extends EventBinder<WikiPageWidget> {
-	};
+  @Override
+  public void setModifiedOn(String date) {
+    modifiedOnText.setText(date);
+  }
 
-	private final EBinder eventBinder = GWT.create(EBinder.class);
+  @Override
+  public void setWikiHistoryDiffToolButtonVisible(
+    boolean visible,
+    WikiPageKey key
+  ) {
+    this.key = key;
+    wikiCompareButton.setVisible(visible);
+  }
 
-	@Override
-	public EventBinder<WikiPageWidget> getEventBinder() {
-		return eventBinder;
-	}
+  @Override
+  public void setActionMenu(IsWidget w) {
+    w.asWidget().removeFromParent();
+    actionMenuContainer.clear();
+    actionMenuContainer.add(w);
+  }
+
+  /** Event binder code **/
+  interface EBinder extends EventBinder<WikiPageWidget> {}
+
+  private final EBinder eventBinder = GWT.create(EBinder.class);
+
+  @Override
+  public EventBinder<WikiPageWidget> getEventBinder() {
+    return eventBinder;
+  }
 }

@@ -6,28 +6,27 @@ import com.google.gwt.place.shared.Prefix;
 
 public class Quiz extends Place {
 
-	private String token;
+  private String token;
 
-	public Quiz(String token) {
-		this.token = token;
-	}
+  public Quiz(String token) {
+    this.token = token;
+  }
 
-	public String toToken() {
-		return token;
-	}
+  public String toToken() {
+    return token;
+  }
 
-	@Prefix("!Quiz")
-	public static class Tokenizer implements PlaceTokenizer<Quiz> {
-		@Override
-		public String getToken(Quiz place) {
-			return place.toToken();
-		}
+  @Prefix("!Quiz")
+  public static class Tokenizer implements PlaceTokenizer<Quiz> {
 
-		@Override
-		public Quiz getPlace(String token) {
-			return new Quiz(token);
-		}
-	}
+    @Override
+    public String getToken(Quiz place) {
+      return place.toToken();
+    }
 
+    @Override
+    public Quiz getPlace(String token) {
+      return new Quiz(token);
+    }
+  }
 }
-

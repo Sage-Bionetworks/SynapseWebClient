@@ -1,23 +1,23 @@
 package org.sagebionetworks.web.client.view;
 
-import org.sagebionetworks.web.client.SynapseView;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import org.sagebionetworks.web.client.SynapseView;
 
 public interface SubscriptionView extends IsWidget, SynapseView {
-	void setPresenter(Presenter presenter);
+  void setPresenter(Presenter presenter);
 
-	void setSynAlert(Widget w);
+  void setSynAlert(Widget w);
 
-	void setTopicWidget(Widget w);
+  void setTopicWidget(Widget w);
 
-	void selectSubscribedButton();
+  void selectSubscribedButton();
 
-	void selectUnsubscribedButton();
+  void selectUnsubscribedButton();
 
-	public interface Presenter {
-		void onSubscribe();
+  public interface Presenter {
+    void onSubscribe();
 
-		void onUnsubscribe();
-	}
+    void onUnsubscribe();
+  }
 }

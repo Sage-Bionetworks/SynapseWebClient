@@ -3,6 +3,7 @@ package org.sagebionetworks.web.unitclient.widget.entity.browse;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Before;
@@ -16,118 +17,119 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 
 public class EntityFilterTest {
-	List<EntityHeader> headers;
-	EntityHeader projectHeader, folderHeader, fileHeader, linkHeader;
 
-	@Before
-	public void setUp() {
-		headers = new ArrayList<EntityHeader>();
-		projectHeader = new EntityHeader();
-		projectHeader.setType(Project.class.getName());
-		headers.add(projectHeader);
-		folderHeader = new EntityHeader();
-		folderHeader.setType(Folder.class.getName());
-		headers.add(folderHeader);
-		fileHeader = new EntityHeader();
-		fileHeader.setType(FileEntity.class.getName());
-		headers.add(fileHeader);
-		linkHeader = new EntityHeader();
-		linkHeader.setType(Link.class.getName());
-		headers.add(linkHeader);
-	}
+  List<EntityHeader> headers;
+  EntityHeader projectHeader, folderHeader, fileHeader, linkHeader;
 
-	@Test
-	public void testFilterAllAllowed() {
-		EntityFilter filter = EntityFilter.PROJECT_FOLDER_FILE_LINK;
-		List<EntityType> queryValues = filter.getEntityQueryValues();
+  @Before
+  public void setUp() {
+    headers = new ArrayList<EntityHeader>();
+    projectHeader = new EntityHeader();
+    projectHeader.setType(Project.class.getName());
+    headers.add(projectHeader);
+    folderHeader = new EntityHeader();
+    folderHeader.setType(Folder.class.getName());
+    headers.add(folderHeader);
+    fileHeader = new EntityHeader();
+    fileHeader.setType(FileEntity.class.getName());
+    headers.add(fileHeader);
+    linkHeader = new EntityHeader();
+    linkHeader.setType(Link.class.getName());
+    headers.add(linkHeader);
+  }
 
-		assertTrue(queryValues.contains(EntityType.project));
-		assertTrue(queryValues.contains(EntityType.folder));
-		assertTrue(queryValues.contains(EntityType.file));
-		assertTrue(queryValues.contains(EntityType.link));
+  @Test
+  public void testFilterAllAllowed() {
+    EntityFilter filter = EntityFilter.PROJECT_FOLDER_FILE_LINK;
+    List<EntityType> queryValues = filter.getEntityQueryValues();
 
-		List<EntityHeader> filteredHeaders = filter.filterForBrowsing(headers);
+    assertTrue(queryValues.contains(EntityType.project));
+    assertTrue(queryValues.contains(EntityType.folder));
+    assertTrue(queryValues.contains(EntityType.file));
+    assertTrue(queryValues.contains(EntityType.link));
 
-		assertEquals(headers.size(), filteredHeaders.size());
-	}
+    List<EntityHeader> filteredHeaders = filter.filterForBrowsing(headers);
 
-	@Test
-	public void testFilterContainersOnly() {
-		EntityFilter filter = EntityFilter.CONTAINER;
-		List<EntityType> queryValues = filter.getEntityQueryValues();
+    assertEquals(headers.size(), filteredHeaders.size());
+  }
 
-		assertTrue(queryValues.contains(EntityType.project));
-		assertTrue(queryValues.contains(EntityType.folder));
-		assertFalse(queryValues.contains(EntityType.file));
-		assertFalse(queryValues.contains(EntityType.link));
+  @Test
+  public void testFilterContainersOnly() {
+    EntityFilter filter = EntityFilter.CONTAINER;
+    List<EntityType> queryValues = filter.getEntityQueryValues();
 
-		List<EntityHeader> filteredHeaders = filter.filterForBrowsing(headers);
-		assertTrue(filteredHeaders.contains(projectHeader));
-		assertTrue(filteredHeaders.contains(folderHeader));
-		assertFalse(filteredHeaders.contains(fileHeader));
-		assertFalse(filteredHeaders.contains(linkHeader));
-	}
+    assertTrue(queryValues.contains(EntityType.project));
+    assertTrue(queryValues.contains(EntityType.folder));
+    assertFalse(queryValues.contains(EntityType.file));
+    assertFalse(queryValues.contains(EntityType.link));
 
-	@Test
-	public void testFilterProjectsOnly() {
-		EntityFilter filter = EntityFilter.PROJECT;
-		List<EntityType> queryValues = filter.getEntityQueryValues();
+    List<EntityHeader> filteredHeaders = filter.filterForBrowsing(headers);
+    assertTrue(filteredHeaders.contains(projectHeader));
+    assertTrue(filteredHeaders.contains(folderHeader));
+    assertFalse(filteredHeaders.contains(fileHeader));
+    assertFalse(filteredHeaders.contains(linkHeader));
+  }
 
-		assertTrue(queryValues.contains(EntityType.project));
-		assertFalse(queryValues.contains(EntityType.folder));
-		assertFalse(queryValues.contains(EntityType.file));
-		assertFalse(queryValues.contains(EntityType.link));
+  @Test
+  public void testFilterProjectsOnly() {
+    EntityFilter filter = EntityFilter.PROJECT;
+    List<EntityType> queryValues = filter.getEntityQueryValues();
 
-		List<EntityHeader> filteredHeaders = filter.filterForBrowsing(headers);
-		assertTrue(filteredHeaders.contains(projectHeader));
-		assertFalse(filteredHeaders.contains(folderHeader));
-		assertFalse(filteredHeaders.contains(fileHeader));
-		assertFalse(filteredHeaders.contains(linkHeader));
-	}
+    assertTrue(queryValues.contains(EntityType.project));
+    assertFalse(queryValues.contains(EntityType.folder));
+    assertFalse(queryValues.contains(EntityType.file));
+    assertFalse(queryValues.contains(EntityType.link));
 
-	@Test
-	public void testFilterFolders() {
-		EntityFilter filter = EntityFilter.CONTAINER;
-		List<EntityType> queryValues = filter.getEntityQueryValues();
+    List<EntityHeader> filteredHeaders = filter.filterForBrowsing(headers);
+    assertTrue(filteredHeaders.contains(projectHeader));
+    assertFalse(filteredHeaders.contains(folderHeader));
+    assertFalse(filteredHeaders.contains(fileHeader));
+    assertFalse(filteredHeaders.contains(linkHeader));
+  }
 
-		assertTrue(queryValues.contains(EntityType.project));
-		assertTrue(queryValues.contains(EntityType.folder));
-		assertFalse(queryValues.contains(EntityType.file));
-		assertFalse(queryValues.contains(EntityType.link));
+  @Test
+  public void testFilterFolders() {
+    EntityFilter filter = EntityFilter.CONTAINER;
+    List<EntityType> queryValues = filter.getEntityQueryValues();
 
-		List<EntityHeader> filteredHeaders = filter.filterForBrowsing(headers);
-		assertTrue(filteredHeaders.contains(projectHeader));
-		assertTrue(filteredHeaders.contains(folderHeader));
-		assertFalse(filteredHeaders.contains(fileHeader));
-		assertFalse(filteredHeaders.contains(linkHeader));
-	}
+    assertTrue(queryValues.contains(EntityType.project));
+    assertTrue(queryValues.contains(EntityType.folder));
+    assertFalse(queryValues.contains(EntityType.file));
+    assertFalse(queryValues.contains(EntityType.link));
 
-	@Test
-	public void testFilterFiles() {
-		EntityFilter filter = EntityFilter.FILE;
-		List<EntityType> queryValues = filter.getEntityQueryValues();
+    List<EntityHeader> filteredHeaders = filter.filterForBrowsing(headers);
+    assertTrue(filteredHeaders.contains(projectHeader));
+    assertTrue(filteredHeaders.contains(folderHeader));
+    assertFalse(filteredHeaders.contains(fileHeader));
+    assertFalse(filteredHeaders.contains(linkHeader));
+  }
 
-		assertFalse(queryValues.contains(EntityType.project));
-		assertFalse(queryValues.contains(EntityType.folder));
-		assertTrue(queryValues.contains(EntityType.file));
-		assertFalse(queryValues.contains(EntityType.link));
+  @Test
+  public void testFilterFiles() {
+    EntityFilter filter = EntityFilter.FILE;
+    List<EntityType> queryValues = filter.getEntityQueryValues();
 
-		List<EntityHeader> filteredHeaders = filter.filterForBrowsing(headers);
-		assertFalse(filteredHeaders.contains(projectHeader));
-		assertFalse(filteredHeaders.contains(folderHeader));
-		assertTrue(filteredHeaders.contains(fileHeader));
-		assertFalse(filteredHeaders.contains(linkHeader));
-	}
+    assertFalse(queryValues.contains(EntityType.project));
+    assertFalse(queryValues.contains(EntityType.folder));
+    assertTrue(queryValues.contains(EntityType.file));
+    assertFalse(queryValues.contains(EntityType.link));
 
-	@Test
-	public void testAllButLink() {
-		EntityFilter filter = EntityFilter.ALL_BUT_LINK;
-		for (EntityType type : EntityType.values()) {
-			if (EntityType.link.equals(type)) {
-				assertFalse(filter.getEntityQueryValues().contains(type));
-			} else {
-				assertTrue(filter.getEntityQueryValues().contains(type));
-			}
-		}
-	}
+    List<EntityHeader> filteredHeaders = filter.filterForBrowsing(headers);
+    assertFalse(filteredHeaders.contains(projectHeader));
+    assertFalse(filteredHeaders.contains(folderHeader));
+    assertTrue(filteredHeaders.contains(fileHeader));
+    assertFalse(filteredHeaders.contains(linkHeader));
+  }
+
+  @Test
+  public void testAllButLink() {
+    EntityFilter filter = EntityFilter.ALL_BUT_LINK;
+    for (EntityType type : EntityType.values()) {
+      if (EntityType.link.equals(type)) {
+        assertFalse(filter.getEntityQueryValues().contains(type));
+      } else {
+        assertTrue(filter.getEntityQueryValues().contains(type));
+      }
+    }
+  }
 }

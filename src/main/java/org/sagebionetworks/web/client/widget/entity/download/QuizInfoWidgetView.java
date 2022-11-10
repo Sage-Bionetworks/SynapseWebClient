@@ -1,17 +1,15 @@
 package org.sagebionetworks.web.client.widget.entity.download;
 
-import org.sagebionetworks.web.client.SynapseView;
 import com.google.gwt.user.client.ui.IsWidget;
+import org.sagebionetworks.web.client.SynapseView;
 
 public interface QuizInfoWidgetView extends IsWidget, SynapseView {
+  void setPresenter(Presenter presenter);
 
-	void setPresenter(Presenter presenter);
+  void configure();
 
-	void configure();
-
-	/**
-	 * Presenter interface
-	 */
-	public interface Presenter {
-	}
+  /**
+   * Presenter interface
+   */
+  public interface Presenter {}
 }

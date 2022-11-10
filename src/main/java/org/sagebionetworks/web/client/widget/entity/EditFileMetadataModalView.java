@@ -3,69 +3,65 @@ package org.sagebionetworks.web.client.widget.entity;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface EditFileMetadataModalView extends IsWidget {
+  /**
+   * Business logic handler for this view.
+   *
+   */
+  public interface Presenter {
+    /**
+     * Called when the create button is pressed.
+     */
+    public void onPrimary();
+  }
 
-	/**
-	 * Business logic handler for this view.
-	 *
-	 */
-	public interface Presenter {
+  public void configure(String entityName, String fileName, String contentType);
 
-		/**
-		 * Called when the create button is pressed.
-		 */
-		public void onPrimary();
-	}
+  public String getEntityName();
 
-	public void configure(String entityName, String fileName, String contentType);
+  public String getFileName();
 
-	public String getEntityName();
+  public String getContentType();
 
-	public String getFileName();
+  /**
+   * Show an error message..
+   *
+   * @param error
+   */
+  public void showError(String error);
 
-	public String getContentType();
+  /**
+   * Pop up an error message (outside of dialog)
+   *
+   * @param error
+   */
+  public void showErrorPopup(String error);
 
-	/**
-	 * Show an error message..
-	 * 
-	 * @param error
-	 */
-	public void showError(String error);
+  /**
+   * Bind this view to its presenter.
+   *
+   * @param presenter
+   */
+  public void setPresenter(Presenter presenter);
 
-	/**
-	 * Pop up an error message (outside of dialog)
-	 * 
-	 * @param error
-	 */
-	public void showErrorPopup(String error);
+  /**
+   * Show the dialog.
+   */
+  public void show();
 
+  /**
+   * Hide the dialog.
+   */
+  public void hide();
 
-	/**
-	 * Bind this view to its presenter.
-	 * 
-	 * @param presenter
-	 */
-	public void setPresenter(Presenter presenter);
+  /**
+   * Clear name and errors.
+   */
+  public void clear();
 
-	/**
-	 * Show the dialog.
-	 */
-	public void show();
-
-	/**
-	 * Hide the dialog.
-	 */
-	public void hide();
-
-	/**
-	 * Clear name and errors.
-	 */
-	public void clear();
-
-	/**
-	 * Set loading state.
-	 * 
-	 * @param isLoading
-	 */
-	public void setLoading(boolean isLoading);
-
+  /**
+   * Set loading state.
+   *
+   * @param isLoading
+   */
+  public void setLoading(boolean isLoading);
 }

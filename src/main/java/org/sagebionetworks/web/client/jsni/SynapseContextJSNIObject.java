@@ -9,22 +9,23 @@ import com.google.gwt.core.client.JavaScriptObject;
  */
 public class SynapseContextJSNIObject extends JavaScriptObject {
 
-    protected SynapseContextJSNIObject() {
-    }
+  protected SynapseContextJSNIObject() {}
 
-    public static native SynapseContextJSNIObject create() /*-{
+  public static native SynapseContextJSNIObject create() /*-{
         return {};
     }-*/;
 
-    public final native void setAccessToken(String accessToken) /*-{
+  public final native void setAccessToken(String accessToken) /*-{
         this.accessToken = accessToken;
     }-*/;
 
-    public final native void setIsInExperimentalMode(boolean isInExperimentalMode) /*-{
+  public final native void setIsInExperimentalMode(
+    boolean isInExperimentalMode
+  ) /*-{
         this.isInExperimentalMode = isInExperimentalMode;
     }-*/;
 
-    public final native void setUtcTime(boolean utcTime) /*-{
+  public final native void setUtcTime(boolean utcTime) /*-{
         this.utcTime = utcTime;
     }-*/;
 }

@@ -1,31 +1,31 @@
 package org.sagebionetworks.web.client.widget;
 
 public interface SelectableListView {
-	// selection toolbar state
-	void setCanDelete(boolean canDelete);
+  // selection toolbar state
+  void setCanDelete(boolean canDelete);
 
-	void setCanMoveUp(boolean canMoveUp);
+  void setCanMoveUp(boolean canMoveUp);
 
-	void setCanMoveDown(boolean canMoveDown);
+  void setCanMoveDown(boolean canMoveDown);
 
-	void setButtonToolbarVisible(boolean visible);
+  void setButtonToolbarVisible(boolean visible);
 
-	void setSelectionToolbarHandler(Presenter selectableItemList);
+  void setSelectionToolbarHandler(Presenter selectableItemList);
 
-	void setSelectionState(CheckBoxState selectionState);
+  void setSelectionState(CheckBoxState selectionState);
 
-	/**
-	 * Presenter interface
-	 */
-	public interface Presenter {
-		void onMoveDown();
+  /**
+   * Presenter interface
+   */
+  public interface Presenter {
+    void onMoveDown();
 
-		void onMoveUp();
+    void onMoveUp();
 
-		void deleteSelected();
+    void deleteSelected();
 
-		void selectNone();
+    void selectNone();
 
-		void selectAll();
-	}
+    void selectAll();
+  }
 }
