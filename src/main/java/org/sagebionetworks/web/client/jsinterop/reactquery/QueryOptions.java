@@ -8,13 +8,17 @@ import jsinterop.annotations.JsType;
 public class QueryOptions {
 
   public long staleTime;
+  public long cacheTime;
   public boolean retry;
+  public boolean refetchOnWindowFocus;
 
   @JsOverlay
   public static QueryOptions create() {
     QueryOptions queryOptions = new QueryOptions();
-    queryOptions.staleTime = 30 * 1000L; // 30s
+    queryOptions.staleTime = 60 * 1000L; // 60s
+    queryOptions.cacheTime = 1000L * 60 * 30; // 30 min
     queryOptions.retry = false; // SynapseClient knows which queries to retry
+    queryOptions.refetchOnWindowFocus = false;
     return queryOptions;
   }
 }
