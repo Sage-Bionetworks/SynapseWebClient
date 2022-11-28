@@ -17,12 +17,13 @@
     <g:SimplePanel ui:field="synapseAlertContainer" />
     <bh:Div ui:field="modalDialogContainer" />
     <g:SimplePanel ui:field="fileBreadcrumbContainer" />
-    <bh:Div addStyleNames="margin-top-15 margin-left-15 margin-right-15">
+    <bh:Div addStyleNames="margin-top-15 entity-page-side-margins">
       <g:SimplePanel ui:field="folderTitlebarContainer" visible="false" />
       <g:SimplePanel ui:field="fileTitlebarContainer" visible="false" />
       <g:SimplePanel ui:field="fileMetadataContainer" visible="false" />
     </bh:Div>
-    <b:Column size="XS_12">
+    <g:SimplePanel ui:field="addToDownloadListWidgetContainer" />
+    <bh:Div addStyleNames="entity-page-side-margins">
       <g:SimplePanel ui:field="fileHistoryContainer" />
       <g:SimplePanel
         ui:field="filesWikiPageContainer"
@@ -92,6 +93,6 @@
         addStyleNames="padding-bottom-15"
         ui:field="fileModifiedAndCreatedContainer"
       />
-    </b:Column>
+    </bh:Div>
   </g:FlowPanel>
 </ui:UiBinder>

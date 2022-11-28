@@ -15,7 +15,7 @@ import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.file.DockerTitleBar;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -69,7 +69,7 @@ public class DockerRepoWidget {
     return view.asWidget();
   }
 
-  public void configure(EntityBundle bundle, ActionMenuWidget actionMenu) {
+  public void configure(EntityBundle bundle, EntityActionMenu actionMenu) {
     this.entity = (DockerRepository) bundle.getEntity();
     this.canEdit = bundle.getPermissions().getCanCertifiedUserEdit();
     metadata.configure(bundle, null, actionMenu);

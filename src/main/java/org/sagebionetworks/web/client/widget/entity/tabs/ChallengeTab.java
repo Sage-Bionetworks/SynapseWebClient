@@ -12,7 +12,7 @@ import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.evaluation.AdministerEvaluationsList;
 import org.sagebionetworks.web.client.widget.evaluation.ChallengeWidget;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModal;
@@ -28,7 +28,7 @@ public class ChallengeTab implements ChallengeTabView.Presenter {
   AuthenticationController authenticationController;
   GlobalApplicationState globalApplicationState;
   CookieProvider cookies;
-  ActionMenuWidget actionMenuWidget;
+  EntityActionMenu actionMenuWidget;
 
   String entityId;
   EvaluationEditorModal evalEditor;
@@ -96,7 +96,7 @@ public class ChallengeTab implements ChallengeTabView.Presenter {
 
     evaluationList.configure(entityId, editEvaluationCallback);
 
-    tab.configureEntityActionController(projectBundle, true, null);
+    tab.configureEntityActionController(projectBundle, true, null, null);
   }
 
   /**
@@ -142,9 +142,7 @@ public class ChallengeTab implements ChallengeTabView.Presenter {
     );
     actionMenuWidget.setActionListener(
       Action.ADD_EVALUATION_QUEUE,
-      (Action action) -> {
-        showCreateNewEvaluationEditor(entityId);
-      }
+      (action, e) -> showCreateNewEvaluationEditor(entityId)
     );
   }
 

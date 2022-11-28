@@ -51,4 +51,6 @@ public interface FilesTabView extends IsWidget {
   void showLoading(boolean value);
 
   void setFilesTab(FilesTab presenter);
+
+  void setAddToDownloadListWidget(IsWidget w);
 }

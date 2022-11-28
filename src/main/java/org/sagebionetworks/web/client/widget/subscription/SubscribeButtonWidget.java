@@ -21,8 +21,8 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionListener;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.ActionListenerV2;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 
 public class SubscribeButtonWidget
   implements SubscribeButtonWidgetView.Presenter, SynapseWidgetPresenter {
@@ -36,8 +36,8 @@ public class SubscribeButtonWidget
   AuthenticationController authController;
   GlobalApplicationState globalApplicationState;
   Callback onSubscribeCallback, onUnsubscribeCallback;
-  ActionMenuWidget actionMenu;
-  ActionListener subscribeActionListener, unsubscribeActionListener;
+  EntityActionMenu actionMenu;
+  ActionListenerV2 subscribeActionListener, unsubscribeActionListener;
   boolean iconOnly;
 
   @Inject
@@ -56,14 +56,8 @@ public class SubscribeButtonWidget
     iconOnly = false;
     view.setSynAlert(synAlert.asWidget());
     view.setPresenter(this);
-    subscribeActionListener =
-      action -> {
-        onSubscribe();
-      };
-    unsubscribeActionListener =
-      action -> {
-        onUnsubscribe();
-      };
+    subscribeActionListener = (action, e) -> onSubscribe();
+    unsubscribeActionListener = (action, e) -> onUnsubscribe();
   }
 
   public SubscribeButtonWidget showIconOnly() {
@@ -123,7 +117,7 @@ public class SubscribeButtonWidget
   public void configure(
     SubscriptionObjectType type,
     String id,
-    ActionMenuWidget actionMenu
+    EntityActionMenu actionMenu
   ) {
     this.id = id;
     this.type = type;

@@ -42,7 +42,7 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesView;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -70,7 +70,7 @@ public class WikiSubpagesWidgetTest {
   SynapseJavascriptClient mockSynapseJavascriptClient;
 
   @Mock
-  ActionMenuWidget mockActionMenuWidget;
+  EntityActionMenu mockActionMenuWidget;
 
   WikiSubpagesWidget widget;
   List<V2WikiHeader> wikiHeadersList;
@@ -369,7 +369,7 @@ public class WikiSubpagesWidgetTest {
         any(),
         anyBoolean(),
         any(CallbackP.class),
-        any(ActionMenuWidget.class)
+        any(EntityActionMenu.class)
       );
     // hidden initially in configure, and called again because only a single WikiPage is in the header
     // tree.
@@ -394,7 +394,7 @@ public class WikiSubpagesWidgetTest {
         any(),
         anyBoolean(),
         any(CallbackP.class),
-        any(ActionMenuWidget.class)
+        any(EntityActionMenu.class)
       );
   }
 
@@ -422,7 +422,7 @@ public class WikiSubpagesWidgetTest {
         any(),
         anyBoolean(),
         any(CallbackP.class),
-        any(ActionMenuWidget.class)
+        any(EntityActionMenu.class)
       );
 
     // widget has been configured for this entity id, let's reconfigure with a different page. same
@@ -450,7 +450,7 @@ public class WikiSubpagesWidgetTest {
         any(),
         anyBoolean(),
         any(CallbackP.class),
-        any(ActionMenuWidget.class)
+        any(EntityActionMenu.class)
       );
   }
 
@@ -479,7 +479,7 @@ public class WikiSubpagesWidgetTest {
         any(),
         anyBoolean(),
         any(CallbackP.class),
-        any(ActionMenuWidget.class)
+        any(EntityActionMenu.class)
       );
 
     // widget has been configured for this entity id, let's reconfigure with a different page that's in
@@ -511,7 +511,7 @@ public class WikiSubpagesWidgetTest {
         any(),
         anyBoolean(),
         any(CallbackP.class),
-        any(ActionMenuWidget.class)
+        any(EntityActionMenu.class)
       );
   }
 }

@@ -13,6 +13,8 @@ $synapse-dark-text: #515359;
 $synapse-red-error: #eb5757;
 $synapse-gray-med: #dcdcdc;
 
+$entity-page-side-spacing: 40px;
+
 // Colors from https://www.figma.com/file/0oPm5lLSUva8kyfVNMS6FA/Synapse-Style-%26-Component-Library?node-id=77%3A1598
 $synapse-primary-color-palette: (
   100: #d7dee4,
@@ -192,7 +194,7 @@ a:focus {
     padding: 0px 43px 40px 43px;
   }
   #rootPanel .pageHeader {
-    padding: 21px 43px;
+    padding: 24px $entity-page-side-spacing;
     min-height: 93px;
     @include synapse-blue-triangles-bg;
     h3.pageHeaderTitle {
@@ -218,7 +220,8 @@ a:focus {
         }
       }
       button.toolsMenuButton,
-      .dropdown.open {
+      .dropdown.open,
+      .MuiButton-root {
         @include transparent-button();
       }
     }
@@ -308,6 +311,9 @@ end sticky footer
     padding: 15px 0 30px 0;
   }
   .nav-tabs {
+    display: flex;
+    padding-left: $entity-page-side-spacing;
+    flex-wrap: wrap;
     border-bottom: none;
     box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.05);
     > li {
@@ -322,6 +328,8 @@ end sticky footer
   }
   .nav-tabs > li > a {
     box-shadow: none;
+    border-left: none;
+    border-right: none;
     border-bottom: none;
   }
   .nav > li > a {
@@ -856,12 +864,21 @@ input[type='text'][readonly].border-none,
   margin-right: 40px;
 }
 
+.margin-left-40 {
+  margin-right: 40px;
+}
+
 .margin-right-30 {
   margin-right: 30px;
 }
 
 .margin-right-65 {
   margin-right: 65px;
+}
+
+.entity-page-side-margins {
+  margin-left: $entity-page-side-spacing;
+  margin-right: $entity-page-side-spacing;
 }
 
 .margin-0-imp {
@@ -2351,7 +2368,7 @@ i.fa.small-icon {
 }
 @media (min-width: 992px) {
   .entity-tab {
-    width: 180px;
+    margin-right: 30px;
   }
   .finder-tab {
     width: 200px;

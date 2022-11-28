@@ -16,7 +16,8 @@ import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 
 public class Tab implements TabView.Presenter {
 
@@ -33,7 +34,7 @@ public class Tab implements TabView.Presenter {
   boolean pushState;
 
   EntityActionController entityActionController;
-  ActionMenuWidget entityActionMenu;
+  EntityActionMenu entityActionMenu;
   PopupUtilsView popupUtils;
   EntityArea area;
   String tabTitle;
@@ -45,7 +46,7 @@ public class Tab implements TabView.Presenter {
     SynapseJSNIUtils synapseJSNIUtils,
     GWTWrapper gwt,
     EntityActionController entityActionController,
-    ActionMenuWidget entityActionMenu,
+    EntityActionMenu entityActionMenu,
     PopupUtilsView popupUtils
   ) {
     this.view = view;
@@ -186,21 +187,23 @@ public class Tab implements TabView.Presenter {
     this.isContentStale = isContentStale;
   }
 
-  public ActionMenuWidget getEntityActionMenu() {
+  public EntityActionMenu getEntityActionMenu() {
     return entityActionMenu;
   }
 
   public void configureEntityActionController(
     EntityBundle bundle,
     boolean isCurrentVersion,
-    String wikiPageKey
+    String wikiPageKey,
+    AddToDownloadListV2 addToDownloadListWidget
   ) {
     entityActionController.configure(
       entityActionMenu,
       bundle,
       isCurrentVersion,
       wikiPageKey,
-      area
+      area,
+      addToDownloadListWidget
     );
   }
 

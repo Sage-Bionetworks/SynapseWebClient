@@ -38,7 +38,7 @@ public class RestrictionWidget
 
   private AuthenticationController authenticationController;
   private RestrictionWidgetView view;
-  private boolean showChangeLink, showFlagLink, showCurrentAccessUI, showFolderRestrictionsUI;
+  private boolean showChangeLink, showCurrentAccessUI, showFolderRestrictionsUI;
   private Entity entity;
   private boolean canChangePermissions;
   private DataAccessClientAsync dataAccessClient;
@@ -94,10 +94,6 @@ public class RestrictionWidget
 
   public void setShowChangeLink(boolean showChangeLink) {
     this.showChangeLink = showChangeLink;
-  }
-
-  public void setShowFlagLink(boolean showFlagLink) {
-    this.showFlagLink = showFlagLink;
   }
 
   public void showFolderRestrictionUI() {
@@ -177,10 +173,6 @@ public class RestrictionWidget
     if ((isChangeLink && showChangeLink) || isRestricted) {
       if (isChangeLink) view.showChangeLink();
     }
-
-    if (showFlagLink) {
-      view.showFlagUI();
-    }
   }
 
   @Override
@@ -223,35 +215,6 @@ public class RestrictionWidget
   @Override
   public void imposeRestrictionCancelClicked() {
     view.setImposeRestrictionModalVisible(false);
-  }
-
-  @Override
-  public void reportIssueClicked() {
-    // report abuse via Jira issue collector
-    String userId = WebConstants.ANONYMOUS, email =
-      WebConstants.ANONYMOUS, displayName =
-      WebConstants.ANONYMOUS, synId = entity.getId();
-    UserProfile userProfile = authenticationController.getCurrentUserProfile();
-    if (userProfile != null) {
-      userId = userProfile.getOwnerId();
-      displayName = DisplayUtils.getDisplayName(userProfile);
-      email = DisplayUtils.getPrimaryEmail(userProfile);
-    }
-
-    jsniUtils.showJiraIssueCollector(
-      "", // summary
-      FLAG_ISSUE_DESCRIPTION_PART_1 +
-      gwt.getCurrentURL() +
-      FLAG_ISSUE_DESCRIPTION_PART_2,
-      FLAG_ISSUE_COLLECTOR_URL,
-      userId,
-      displayName,
-      email,
-      synId, // Synapse data object ID
-      REVIEW_DATA_REQUEST_COMPONENT_ID,
-      null, // AR ID
-      FLAG_ISSUE_PRIORITY
-    );
   }
 
   @Override

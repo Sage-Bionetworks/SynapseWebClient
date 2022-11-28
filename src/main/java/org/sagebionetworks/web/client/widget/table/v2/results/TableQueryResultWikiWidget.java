@@ -6,7 +6,6 @@ import com.google.inject.Inject;
 import java.util.Map;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.Query;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -17,8 +16,9 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.explore.TableEntityWidgetV2;
 import org.sagebionetworks.web.shared.WidgetConstants;
@@ -32,7 +32,8 @@ public class TableQueryResultWikiWidget
   TableQueryResultWikiWidgetView view;
   SynapseJavascriptClient jsClient;
   SynapseAlert synAlert;
-  ActionMenuWidget actionMenu;
+  EntityActionMenu actionMenu;
+  AddToDownloadListV2 addToDownloadListV2;
   EntityActionController entityActionController;
   Query query;
   boolean isQueryVisible;
@@ -44,13 +45,14 @@ public class TableQueryResultWikiWidget
   @Inject
   public TableQueryResultWikiWidget(
     TableQueryResultWikiWidgetView view,
-    ActionMenuWidget actionMenu,
+    EntityActionMenu actionMenu,
     EntityActionController entityActionController,
     SynapseJSNIUtils synapseJsniUtils,
     SynapseJavascriptClient jsClient,
     SynapseAlert synAlert,
     GWTWrapper gwt,
-    PortalGinInjector ginInjector
+    PortalGinInjector ginInjector,
+    AddToDownloadListV2 addToDownloadListV2
   ) {
     this.view = view;
     this.actionMenu = actionMenu;
@@ -61,6 +63,7 @@ public class TableQueryResultWikiWidget
     view.setSynAlert(synAlert.asWidget());
     this.ginInjector = ginInjector;
     this.gwt = gwt;
+    this.addToDownloadListV2 = addToDownloadListV2;
     actionMenu.addControllerWidget(entityActionController.asWidget());
   }
 
@@ -151,7 +154,8 @@ public class TableQueryResultWikiWidget
           bundle,
           isCurrentVersion,
           bundle.getRootWikiId(),
-          EntityArea.TABLES
+          EntityArea.TABLES,
+          addToDownloadListV2
         );
         boolean canEdit = false;
         hideEditActions();

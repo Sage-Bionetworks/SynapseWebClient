@@ -20,58 +20,60 @@
       global="false"
       addStyleNames="moveup-10"
     />
-    <bh:Div
-      addStyleNames="margin-top-15 margin-left-15 margin-right-15 flexcontainer-row"
-    >
-      <bh:Div
-        addStyleNames="flexcontainer-column flexcontainer-column-fill-width"
-      >
-        <g:SimplePanel ui:field="tableTitlebarContainer" visible="false" />
+    <bh:Div addStyleNames="margin-top-15 entity-page-side-margins">
+      <bh:Div addStyleNames="flexcontainer-row">
+        <bh:Div
+          addStyleNames="flexcontainer-column flexcontainer-column-fill-width"
+        >
+          <g:SimplePanel ui:field="tableTitlebarContainer" visible="false" />
+        </bh:Div>
+        <bh:Div
+          addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end min-width-70"
+          ui:field="actionMenuContainer"
+        />
       </bh:Div>
-      <bh:Div
-        addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end min-width-70"
-        ui:field="actionMenuContainer"
-      />
-    </bh:Div>
-    <bh:Div addStyleNames="margin-left-15 margin-right-15">
-      <g:SimplePanel ui:field="tableMetadataContainer" visible="false" />
-      <b:Heading size="H3" ui:field="title" />
-      <bh:Div addStyleNames="margin-bottom-20">
-        <bh:Span ui:field="tableDescription" />
-        <b:Anchor ui:field="helpLink" />
+      <bh:Div>
+        <g:SimplePanel ui:field="tableMetadataContainer" visible="false" />
+        <b:Heading size="H3" ui:field="title" />
+        <bh:Div addStyleNames="margin-bottom-20">
+          <bh:Span ui:field="tableDescription" />
+          <b:Anchor ui:field="helpLink" />
+        </bh:Div>
       </bh:Div>
+      <g:FlowPanel>
+        <g:SimplePanel ui:field="tableListWidgetContainer" visible="false" />
+        <g:SimplePanel
+          ui:field="tableWikiPageContainer"
+          addStyleNames="panel panel-default panel-body margin-bottom-0-imp"
+          visible="false"
+        />
+        <g:SimplePanel
+          addStyleNames="margin-top-15"
+          ui:field="tableWidgetContainer"
+        />
+        <g:SimplePanel
+          addStyleNames="padding-bottom-15"
+          ui:field="tableModifiedAndCreatedContainer"
+        />
+        <b:Row>
+          <b:Column size="XS_12" ui:field="provenanceContainer">
+            <g:FlowPanel
+              addStyleNames="light-border padding-10 margin-bottom-15"
+            >
+              <bh:Div addStyleNames="highlight-title">
+                <bh:Text>Provenance</bh:Text>
+                <w:HelpWidget
+                  helpMarkdown="Provenance tracks the relationship between data, code and analytical results"
+                  href="https://help.synapse.org/docs/Provenance.1972470373.html"
+                  addStyleNames="margin-left-5"
+                  placement="BOTTOM"
+                />
+              </bh:Div>
+              <bh:Div ui:field="provenanceContainerHighlightBox" />
+            </g:FlowPanel>
+          </b:Column>
+        </b:Row>
+      </g:FlowPanel>
     </bh:Div>
-    <b:Column size="XS_12">
-      <g:SimplePanel ui:field="tableListWidgetContainer" visible="false" />
-      <g:SimplePanel
-        ui:field="tableWikiPageContainer"
-        addStyleNames="panel panel-default panel-body margin-bottom-0-imp"
-        visible="false"
-      />
-      <g:SimplePanel
-        addStyleNames="margin-top-15"
-        ui:field="tableWidgetContainer"
-      />
-      <g:SimplePanel
-        addStyleNames="padding-bottom-15"
-        ui:field="tableModifiedAndCreatedContainer"
-      />
-      <b:Row>
-        <b:Column size="XS_12" ui:field="provenanceContainer">
-          <g:FlowPanel addStyleNames="light-border padding-10 margin-bottom-15">
-            <bh:Div addStyleNames="highlight-title">
-              <bh:Text>Provenance</bh:Text>
-              <w:HelpWidget
-                helpMarkdown="Provenance tracks the relationship between data, code and analytical results"
-                href="https://help.synapse.org/docs/Provenance.1972470373.html"
-                addStyleNames="margin-left-5"
-                placement="BOTTOM"
-              />
-            </bh:Div>
-            <bh:Div ui:field="provenanceContainerHighlightBox" />
-          </g:FlowPanel>
-        </b:Column>
-      </b:Row>
-    </b:Column>
   </g:FlowPanel>
 </ui:UiBinder>

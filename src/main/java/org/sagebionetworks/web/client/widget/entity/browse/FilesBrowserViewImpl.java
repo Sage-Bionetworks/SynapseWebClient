@@ -23,7 +23,6 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 
   private EntityTreeBrowser entityTreeBrowser;
   private Widget widget;
-  private Presenter presenter;
 
   @UiField
   Div files;
@@ -32,16 +31,7 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
   Div commandsContainer;
 
   @UiField
-  AnchorListItem addToDownloadListLink;
-
-  @UiField
-  AnchorListItem programmaticOptionsLink;
-
-  @UiField
   Div addToDownloadListContainer;
-
-  @UiField
-  Button downloadOptionsButton;
 
   @UiField
   Div actionMenuContainer;
@@ -49,62 +39,22 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
   @UiField
   Heading title;
 
-  @UiField
-  Tooltip downloadTooltip;
-
-  @UiField
-  Tooltip addToDownloadCartTooltip;
-
   @Inject
   public FilesBrowserViewImpl(
     FilesBrowserViewImplUiBinder binder,
-    EntityTreeBrowser entityTreeBrowser,
-    AuthenticationController authController
+    EntityTreeBrowser entityTreeBrowser
   ) {
     widget = binder.createAndBindUi(this);
     this.entityTreeBrowser = entityTreeBrowser;
     Widget etbW = entityTreeBrowser.asWidget();
     etbW.addStyleName("margin-top-10");
     files.add(etbW);
-    programmaticOptionsLink.addClickHandler(event -> {
-      presenter.onProgrammaticDownloadOptions();
-    });
-    addToDownloadListLink.addClickHandler(event -> {
-      presenter.onAddToDownloadList();
-    });
-    entityTreeBrowser.setIsEmptyCallback(isEmpty -> {
-      if (isEmpty) {
-        downloadTooltip.setTitle(
-          "There are no downloadable items in this folder."
-        );
-        downloadOptionsButton.setEnabled(false);
-      } else if (!authController.isLoggedIn()) {
-        downloadTooltip.setTitle(
-          "You must be logged in to download items in this folder."
-        );
-        downloadOptionsButton.setEnabled(false);
-      } else {
-        downloadTooltip.setTitle("Direct and programmatic download options");
-        downloadOptionsButton.setEnabled(true);
-      }
-    });
   }
 
   @Override
   public void configure(String entityId) {
     title.setVisible(false);
     entityTreeBrowser.configure(entityId);
-  }
-
-  @Override
-  public void setHasFile(boolean isFile) {
-    if (!isFile) {
-      addToDownloadCartTooltip.setTitle("There are no files in this folder.");
-      addToDownloadListLink.setEnabled(false);
-    } else {
-      addToDownloadCartTooltip.setTitle(null);
-      addToDownloadListLink.setEnabled(true);
-    }
   }
 
   @Override
@@ -139,22 +89,18 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
   }
 
   @Override
-  public void setPresenter(Presenter p) {
-    this.presenter = p;
-  }
-
-  @Override
-  public void setAddToDownloadList(IsWidget w) {
-    addToDownloadListContainer.clear();
-    addToDownloadListContainer.add(w);
-  }
-
-  @Override
   public void setActionMenu(IsWidget w) {
     w.asWidget().removeFromParent();
     actionMenuContainer.clear();
     actionMenuContainer.add(w);
     // if showing action menu, then show title.
     title.setVisible(true);
+  }
+
+  @Override
+  public void setAddToDownloadListWidget(IsWidget w) {
+    w.asWidget().removeFromParent();
+    addToDownloadListContainer.clear();
+    addToDownloadListContainer.add(w);
   }
 }

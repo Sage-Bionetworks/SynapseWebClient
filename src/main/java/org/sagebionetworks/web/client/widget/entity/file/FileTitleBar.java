@@ -19,10 +19,8 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PopupUtilsView;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -31,38 +29,33 @@ import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.EntityBadge;
 import org.sagebionetworks.web.client.widget.entity.VersionHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 
 public class FileTitleBar
   implements SynapseWidgetPresenter, FileTitleBarView.Presenter {
 
-  private FileTitleBarView view;
+  private final FileTitleBarView view;
   private EntityBundle entityBundle;
-  private SynapseProperties synapseProperties;
-  private FileDownloadMenuItem fileDownloadMenuItem;
-  private SynapseJavascriptClient jsClient;
-  private FileClientsHelp fileClientsHelp;
-  private EventBus eventBus;
-  private SynapseJSNIUtils jsniUtils;
-  private GlobalApplicationState globalAppState;
-  private AuthenticationController authController;
-  private CookieProvider cookies;
-  private PopupUtilsView popupUtils;
-  private ActionMenuWidget actionMenuWidget;
-  private VersionHistoryWidget versionHistoryWidget;
+  private final SynapseProperties synapseProperties;
+  private final FileDownloadHandlerWidget fileDownloadMenuItem;
+  private final SynapseJavascriptClient jsClient;
+  private final FileClientsHelp fileClientsHelp;
+  private final EventBus eventBus;
+  private final GlobalApplicationState globalAppState;
+  private final AuthenticationController authController;
+  private final PopupUtilsView popupUtils;
+  private EntityActionMenu actionMenuWidget;
 
   @Inject
   public FileTitleBar(
     FileTitleBarView view,
     SynapseProperties synapseProperties,
-    FileDownloadMenuItem fileDownloadButton,
+    FileDownloadHandlerWidget fileDownloadButton,
     SynapseJavascriptClient jsClient,
     FileClientsHelp fileClientsHelp,
     EventBus eventBus,
-    SynapseJSNIUtils jsniUtils,
     GlobalApplicationState globalAppState,
     AuthenticationController authController,
-    CookieProvider cookies,
     PopupUtilsView popupUtils
   ) {
     this.view = view;
@@ -71,30 +64,26 @@ public class FileTitleBar
     this.jsClient = jsClient;
     this.fileClientsHelp = fileClientsHelp;
     this.eventBus = eventBus;
-    this.jsniUtils = jsniUtils;
     this.globalAppState = globalAppState;
     this.authController = authController;
-    this.cookies = cookies;
     this.popupUtils = popupUtils;
-    view.setFileDownloadMenuItem(fileDownloadButton.asWidget());
     view.setPresenter(this);
   }
 
   public void configure(
     EntityBundle bundle,
-    ActionMenuWidget actionMenu,
+    EntityActionMenu actionMenu,
     VersionHistoryWidget versionHistoryWidget
   ) {
     this.entityBundle = bundle;
     this.actionMenuWidget = actionMenu;
-    this.versionHistoryWidget = versionHistoryWidget;
-    view.setCanDownload(entityBundle.getPermissions().getCanDownload());
+    configureActionMenu();
     view.setExternalUrlUIVisible(false);
     view.setExternalObjectStoreUIVisible(false);
     view.setFileSize("");
 
     view.createTitlebar(bundle.getEntity());
-    fileDownloadMenuItem.configure(bundle);
+    fileDownloadMenuItem.configure(actionMenu, bundle);
 
     FileHandle fileHandle = DisplayUtils.getFileHandle(entityBundle);
     boolean isFilenamePanelVisible = fileHandle != null;
@@ -135,6 +124,17 @@ public class FileTitleBar
       view.setVersionHistoryLinkText(
         (visible ? "Hide" : "Show") + " Version History"
       )
+    );
+  }
+
+  public void configureActionMenu() {
+    actionMenuWidget.setActionListener(
+      Action.ADD_TO_DOWNLOAD_CART,
+      (action, e) -> onAddToDownloadList()
+    );
+    actionMenuWidget.setActionListener(
+      Action.SHOW_PROGRAMMATIC_OPTIONS,
+      (action, e) -> onProgrammaticDownloadOptions()
     );
   }
 
@@ -188,11 +188,6 @@ public class FileTitleBar
     return view.asWidget();
   }
 
-  public static boolean isDataPossiblyWithin(FileEntity fileEntity) {
-    String dataFileHandleId = fileEntity.getDataFileHandleId();
-    return (dataFileHandleId != null && dataFileHandleId.length() > 0);
-  }
-
   public void configureExternalFile(ExternalFileHandle externalFileHandle) {
     view.setExternalUrlUIVisible(true);
     view.setExternalUrl(externalFileHandle.getExternalURL());
@@ -241,7 +236,6 @@ public class FileTitleBar
     view.setFileLocation("| External Object Store");
   }
 
-  @Override
   public void onAddToDownloadList() {
     if (!authController.isLoggedIn()) {
       view.showErrorMessage(
@@ -280,10 +274,9 @@ public class FileTitleBar
 
   @Override
   public void toggleShowVersionHistory() {
-    this.actionMenuWidget.onAction(Action.SHOW_VERSION_HISTORY);
+    this.actionMenuWidget.onAction(Action.SHOW_VERSION_HISTORY, null);
   }
 
-  @Override
   public void onProgrammaticDownloadOptions() {
     FileEntity entity = (FileEntity) entityBundle.getEntity();
     fileClientsHelp.configureAndShow(entity.getId(), entity.getVersionNumber());

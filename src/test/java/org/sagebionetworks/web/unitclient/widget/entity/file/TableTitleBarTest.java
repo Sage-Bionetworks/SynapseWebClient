@@ -20,7 +20,7 @@ import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.widget.entity.VersionHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.file.TableTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.TableTitleBarView;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TableTitleBarTest {
@@ -43,7 +43,7 @@ public class TableTitleBarTest {
   MaterializedView mockMaterializedView;
 
   @Mock
-  ActionMenuWidget mockActionMenuWidget;
+  EntityActionMenu mockActionMenuWidget;
 
   @Mock
   UserEntityPermissions mockPermissions;

@@ -46,7 +46,7 @@ import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataView;
 import org.sagebionetworks.web.client.widget.entity.VersionHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationsRendererWidget;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWidget;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -78,7 +78,7 @@ public class EntityMetadataTest {
   SynapseJSNIUtils mockJSNI;
 
   @Mock
-  ActionMenuWidget mockActionMenuWidget;
+  EntityActionMenu mockActionMenuWidget;
 
   @Mock
   CookieProvider mockCookies;
@@ -120,7 +120,6 @@ public class EntityMetadataTest {
     verify(mockView, never()).setVersionHistoryWidget(any(IsWidget.class)); // lazily created
     verify(mockView).setRestrictionWidgetV2(any(IsWidget.class));
     verify(mockRestrictionWidgetV2).setShowChangeLink(true);
-    verify(mockRestrictionWidgetV2).setShowFlagLink(true);
     verify(mockView).setRestrictionWidgetV2Visible(true);
   }
 

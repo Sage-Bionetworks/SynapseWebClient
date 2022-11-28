@@ -207,7 +207,6 @@ public class RestrictionWidgetTest {
 
   @Test
   public void testConfigureLoggedInControlled() {
-    widget.setShowFlagLink(true);
     when(mockRestrictionInformation.getRestrictionLevel())
       .thenReturn(RestrictionLevel.CONTROLLED_BY_ACT);
     when(mockRestrictionInformation.getHasUnmetAccessRequirement())
@@ -218,12 +217,10 @@ public class RestrictionWidgetTest {
 
     verify(mockView).clear();
     verify(mockView).showControlledUseUI();
-    verify(mockView).showFlagUI();
   }
 
   @Test
   public void testConfigureAnonymousControlled() {
-    widget.setShowFlagLink(true);
     when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
 
     when(mockRestrictionInformation.getRestrictionLevel())
@@ -236,7 +233,6 @@ public class RestrictionWidgetTest {
 
     verify(mockView).clear();
     verify(mockView).showControlledUseUI();
-    verify(mockView).showFlagUI();
   }
 
   @Test
@@ -256,7 +252,6 @@ public class RestrictionWidgetTest {
   @Test
   public void testConfigureLoggedInOpen() {
     widget.setShowChangeLink(true);
-    widget.setShowFlagLink(true);
     when(mockRestrictionInformation.getRestrictionLevel())
       .thenReturn(RestrictionLevel.OPEN);
     boolean canChangePermissions = true;
@@ -266,13 +261,11 @@ public class RestrictionWidgetTest {
     verify(mockView).showNoRestrictionsUI();
 
     verify(mockView).showChangeLink();
-    verify(mockView).showFlagUI();
   }
 
   @Test
   public void testConfigureAnonymousOpen() {
     // no access restrictions, anonymous
-    widget.setShowFlagLink(true);
     when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
     when(mockRestrictionInformation.getRestrictionLevel())
       .thenReturn(RestrictionLevel.OPEN);
@@ -284,7 +277,6 @@ public class RestrictionWidgetTest {
     verify(mockView).showNoRestrictionsUI();
 
     verify(mockView, never()).showChangeLink();
-    verify(mockView).showFlagUI();
   }
 
   @Test
@@ -340,30 +332,6 @@ public class RestrictionWidgetTest {
     verify(mockDataAccessClient, never())
       .createLockAccessRequirement(anyString(), any(AsyncCallback.class));
     verify(mockView).setImposeRestrictionModalVisible(false);
-  }
-
-  @Test
-  public void testReportIssueClicked() {
-    when(mockRestrictionInformation.getRestrictionLevel())
-      .thenReturn(RestrictionLevel.OPEN);
-    widget.configure(mockEntity, true);
-
-    widget.reportIssueClicked();
-    verify(mockJsniUtils)
-      .showJiraIssueCollector(
-        "", // summary
-        FLAG_ISSUE_DESCRIPTION_PART_1 +
-        CURRENT_URL +
-        WebConstants.FLAG_ISSUE_DESCRIPTION_PART_2, // description
-        FLAG_ISSUE_COLLECTOR_URL,
-        OWNER_ID,
-        DisplayUtils.getDisplayName(FIRST_NAME, LAST_NAME, USERNAME),
-        EMAIL,
-        ENTITY_ID, // Synapse data object ID
-        REVIEW_DATA_REQUEST_COMPONENT_ID,
-        null, // Access requirement ID
-        FLAG_ISSUE_PRIORITY
-      );
   }
 
   @Test

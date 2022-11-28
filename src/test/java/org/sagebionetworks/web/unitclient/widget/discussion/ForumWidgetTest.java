@@ -1,9 +1,10 @@
 package org.sagebionetworks.web.unitclient.widget.discussion;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyLong;
@@ -61,8 +62,8 @@ import org.sagebionetworks.web.client.widget.discussion.SubscribersWidget;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModal;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionListener;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.ActionListenerV2;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -133,7 +134,7 @@ public class ForumWidgetTest {
   ArgumentCaptor<Callback> callbackCaptor;
 
   @Captor
-  ArgumentCaptor<ActionListener> actionListenerCaptor;
+  ArgumentCaptor<ActionListenerV2> actionListenerCaptor;
 
   @Mock
   SynapseJavascriptClient mockSynapseJavascriptClient;
@@ -142,7 +143,7 @@ public class ForumWidgetTest {
   SynapseProperties mockSynapseProperties;
 
   @Mock
-  ActionMenuWidget mockActionMenuWidget;
+  EntityActionMenu mockActionMenuWidget;
 
   ForumWidget forumWidget;
   private boolean canModerate = false;
@@ -252,7 +253,7 @@ public class ForumWidgetTest {
     Callback deleteCallback = null;
     boolean isCurrentUserModerator = false;
     String replyId = null;
-    ActionMenuWidget actionMenu = null;
+    EntityActionMenu actionMenu = null;
     ArgumentCaptor<DiscussionThreadBundle> threadCaptor = ArgumentCaptor.forClass(
       DiscussionThreadBundle.class
     );
@@ -605,7 +606,7 @@ public class ForumWidgetTest {
         eq(Action.CREATE_THREAD),
         actionListenerCaptor.capture()
       );
-    actionListenerCaptor.getValue().onAction(Action.CREATE_THREAD);
+    actionListenerCaptor.getValue().onAction(Action.CREATE_THREAD, null);
     verify(mockNewDiscussionThreadModal).show();
 
     when(mockView.isDeletedThreadListVisible()).thenReturn(false);
@@ -614,7 +615,7 @@ public class ForumWidgetTest {
         eq(Action.SHOW_DELETED_THREADS),
         actionListenerCaptor.capture()
       );
-    actionListenerCaptor.getValue().onAction(Action.SHOW_DELETED_THREADS);
+    actionListenerCaptor.getValue().onAction(Action.SHOW_DELETED_THREADS, null);
     verify(mockView).setDeletedThreadListVisible(true);
 
     // verify action menu commands updated for forum

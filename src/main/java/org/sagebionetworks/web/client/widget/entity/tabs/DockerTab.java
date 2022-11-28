@@ -140,7 +140,7 @@ public class DockerTab implements DockerTabView.Presenter {
       view.setBreadcrumbVisible(isRepo);
       view.setDockerRepoListVisible(isProject);
       view.setDockerRepoUIVisible(isRepo);
-      tab.configureEntityActionController(bundle, true, null);
+      tab.configureEntityActionController(bundle, true, null, null);
       if (isRepo) {
         tab.setEntityNameAndPlace(
           bundle.getEntity().getName(),

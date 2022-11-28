@@ -14,10 +14,10 @@ import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorReactCom
 public class ChallengeTabViewImpl implements ChallengeTabView {
 
   @UiField
-  Container evaluationListContainer;
+  FlowPanel evaluationListContainer;
 
   @UiField
-  Container challengeWidgetContainer;
+  FlowPanel challengeWidgetContainer;
 
   @UiField
   Span actionMenuContainer;
@@ -26,7 +26,7 @@ public class ChallengeTabViewImpl implements ChallengeTabView {
   FlowPanel adminTabContainer;
 
   @UiField
-  Container evaluationEditorContainer;
+  FlowPanel evaluationEditorContainer;
 
   public interface TabsViewImplUiBinder
     extends UiBinder<Widget, ChallengeTabViewImpl> {}

@@ -9,7 +9,7 @@ import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.VersionHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 
 public class TableTitleBar
   implements SynapseWidgetPresenter, TableTitleBarView.Presenter {
@@ -21,7 +21,7 @@ public class TableTitleBar
 
   private TableTitleBarView view;
   private EntityBundle entityBundle;
-  private ActionMenuWidget actionMenuWidget;
+  private EntityActionMenu actionMenuWidget;
   private VersionHistoryWidget versionHistoryWidget;
 
   @Inject
@@ -32,7 +32,7 @@ public class TableTitleBar
 
   public void configure(
     EntityBundle bundle,
-    ActionMenuWidget actionMenu,
+    EntityActionMenu actionMenu,
     VersionHistoryWidget versionHistoryWidget
   ) {
     this.entityBundle = bundle;
@@ -94,6 +94,6 @@ public class TableTitleBar
 
   @Override
   public void toggleShowVersionHistory() {
-    this.actionMenuWidget.onAction(Action.SHOW_VERSION_HISTORY);
+    this.actionMenuWidget.onAction(Action.SHOW_VERSION_HISTORY, null);
   }
 }

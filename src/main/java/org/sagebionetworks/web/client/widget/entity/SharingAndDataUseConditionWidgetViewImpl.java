@@ -52,7 +52,6 @@ public class SharingAndDataUseConditionWidgetViewImpl
     restrictionWidgetV2.setShowCurrentAccessUI(false);
     restrictionWidgetV2.showFolderRestrictionUI();
     this.cookies = cookies;
-    restrictionWidgetV2.setShowFlagLink(false);
     this.accessControlListModalWidget = accessControlListModalWidget;
     this.addStyleName("sharingAndDataUseConditions");
     container = new FlowPanel();

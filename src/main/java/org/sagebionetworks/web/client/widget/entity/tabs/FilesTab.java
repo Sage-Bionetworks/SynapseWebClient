@@ -14,7 +14,6 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.VersionableEntity;
-import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -33,6 +32,7 @@ import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
+import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.provenance.v2.ProvenanceWidget;
@@ -59,7 +59,6 @@ public class FilesTab {
   DiscussionThreadListWidget discussionThreadListWidget;
   ModifiedCreatedByWidget modifiedCreatedBy;
 
-  public static int WIDGET_HEIGHT_PX = 270;
   Map<String, String> configMap;
 
   EntityBundle projectBundle;
@@ -68,6 +67,7 @@ public class FilesTab {
   EntityBundle entityBundle;
   CallbackP<String> entitySelectedCallback;
   ProvenanceWidget provWidget;
+  AddToDownloadListV2 addToDownloadListWidget;
 
   @Inject
   public FilesTab(Tab tab, PortalGinInjector ginInjector) {
@@ -100,6 +100,7 @@ public class FilesTab {
       this.modifiedCreatedBy = ginInjector.getModifiedCreatedByWidget();
       this.discussionThreadListWidget =
         ginInjector.getDiscussionThreadListWidget();
+      this.addToDownloadListWidget = ginInjector.getAddToDownloadListV2();
       tab.setContent(view.asWidget());
       previewWidget.addStyleName("min-height-200");
       view.setFileTitlebar(fileTitleBar.asWidget());
@@ -112,18 +113,14 @@ public class FilesTab {
       view.setSynapseAlert(synAlert.asWidget());
       view.setModifiedCreatedBy(modifiedCreatedBy);
       view.setDiscussionThreadListWidget(discussionThreadListWidget.asWidget());
+      view.setAddToDownloadListWidget(addToDownloadListWidget.asWidget());
       view.setFilesTab(this);
-      discussionThreadListWidget.setThreadIdClickedCallback(
-        new CallbackP<DiscussionThreadBundle>() {
-          @Override
-          public void invoke(DiscussionThreadBundle bundle) {
-            globalApplicationState
-              .getPlaceChanger()
-              .goTo(
-                TopicUtils.getThreadPlace(bundle.getProjectId(), bundle.getId())
-              );
-          }
-        }
+      discussionThreadListWidget.setThreadIdClickedCallback(bundle ->
+        globalApplicationState
+          .getPlaceChanger()
+          .goTo(
+            TopicUtils.getThreadPlace(bundle.getProjectId(), bundle.getId())
+          )
       );
 
       configMap =
@@ -133,13 +130,11 @@ public class FilesTab {
   }
 
   public void initBreadcrumbLinkClickedHandler() {
-    CallbackP<Place> breadcrumbClicked = new CallbackP<Place>() {
-      public void invoke(Place place) {
-        // if this is the project id, then just reconfigure from the project bundle
-        Synapse synapse = (Synapse) place;
-        String entityId = synapse.getEntityId();
-        entitySelectedCallback.invoke(entityId);
-      }
+    CallbackP<Place> breadcrumbClicked = place -> {
+      // if this is the project id, then just reconfigure from the project bundle
+      Synapse synapse = (Synapse) place;
+      String entityId = synapse.getEntityId();
+      entitySelectedCallback.invoke(entityId);
     };
     breadcrumb.setLinkClickedHandler(breadcrumbClicked);
   }
@@ -278,7 +273,12 @@ public class FilesTab {
     if (isCurrentVersion == null) {
       isCurrentVersion = true;
     }
-    tab.configureEntityActionController(bundle, isCurrentVersion, null);
+    tab.configureEntityActionController(
+      bundle,
+      isCurrentVersion,
+      null,
+      addToDownloadListWidget
+    );
 
     EntityArea area = isProject ? EntityArea.FILES : null;
     tab.setEntityNameAndPlace(
@@ -294,6 +294,9 @@ public class FilesTab {
       // the action menu is added to the title bar if Folder, to the browser if Project
       if (isProject) {
         filesBrowser.setActionMenu(tab.getEntityActionMenu());
+        filesBrowser.setAddToDownloadListWidget(addToDownloadListWidget);
+      } else {
+        view.setAddToDownloadListWidget(addToDownloadListWidget);
       }
     }
 
@@ -352,21 +355,17 @@ public class FilesTab {
         canEdit,
         wikiCallback
       );
-      CallbackP<String> wikiReloadHandler = new CallbackP<String>() {
-        @Override
-        public void invoke(String wikiPageId) {
-          wikiPageWidget.configure(
-            new WikiPageKey(
-              currentEntityId,
-              ObjectType.ENTITY.toString(),
-              wikiPageId,
-              versionNumber
-            ),
-            canEdit,
-            wikiCallback
-          );
-        }
-      };
+      CallbackP<String> wikiReloadHandler = wikiPageId ->
+        wikiPageWidget.configure(
+          new WikiPageKey(
+            currentEntityId,
+            ObjectType.ENTITY.toString(),
+            wikiPageId,
+            versionNumber
+          ),
+          canEdit,
+          wikiCallback
+        );
       wikiPageWidget.setWikiReloadHandler(wikiReloadHandler);
     }
   }

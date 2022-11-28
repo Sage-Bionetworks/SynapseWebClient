@@ -33,7 +33,7 @@ import org.sagebionetworks.web.client.widget.entity.EntityMetadataView.Presenter
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationsRendererWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWidget;
 
 public class EntityMetadata implements Presenter {
@@ -47,7 +47,7 @@ public class EntityMetadata implements Presenter {
   private PortalGinInjector ginInjector;
   private ContainerItemCountWidget containerItemCountWidget;
   private org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWidget restrictionWidgetV2;
-  private ActionMenuWidget actionMenu;
+  private EntityActionMenu actionMenu;
 
   @Inject
   public EntityMetadata(
@@ -74,7 +74,6 @@ public class EntityMetadata implements Presenter {
     this.view.setRestrictionWidgetV2(restrictionWidgetV2);
     this.view.setContainerItemCountWidget(containerItemCountWidget);
     restrictionWidgetV2.setShowChangeLink(true);
-    restrictionWidgetV2.setShowFlagLink(true);
     view.setRestrictionWidgetV2Visible(true);
   }
 
@@ -93,7 +92,7 @@ public class EntityMetadata implements Presenter {
   public void configure(
     EntityBundle bundle,
     Long versionNumber,
-    ActionMenuWidget actionMenu
+    EntityActionMenu actionMenu
   ) {
     clear();
     this.actionMenu = actionMenu;
@@ -111,7 +110,7 @@ public class EntityMetadata implements Presenter {
     setAnnotationsVisible(false);
     actionMenu.setActionListener(
       Action.SHOW_ANNOTATIONS,
-      action -> {
+      (action, e) -> {
         if (DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider())) {
           // In alpha mode, this pops up a modal. We always want to show annotations when this is clicked
           setAnnotationsVisible(true);
@@ -124,7 +123,7 @@ public class EntityMetadata implements Presenter {
 
     actionMenu.setActionListener(
       Action.SHOW_VERSION_HISTORY,
-      action -> {
+      (action, e) -> {
         getVersionHistoryWidget()
           .setVisible(!getVersionHistoryWidget().isVisible());
       }
@@ -295,6 +294,6 @@ public class EntityMetadata implements Presenter {
 
   @Override
   public void toggleAnnotationsVisible() {
-    actionMenu.onAction(Action.SHOW_ANNOTATIONS);
+    actionMenu.onAction(Action.SHOW_ANNOTATIONS, null);
   }
 }

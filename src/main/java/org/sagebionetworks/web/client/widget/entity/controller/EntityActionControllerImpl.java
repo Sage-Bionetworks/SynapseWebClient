@@ -9,6 +9,11 @@ import static org.sagebionetworks.web.client.utils.FutureUtils.getDoneFuture;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getFuture;
 import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.CONTAINER;
 import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.PROJECT;
+import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_COLLECTOR_URL;
+import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_DESCRIPTION_PART_1;
+import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_DESCRIPTION_PART_2;
+import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_PRIORITY;
+import static org.sagebionetworks.web.shared.WebConstants.REVIEW_DATA_REQUEST_COMPONENT_ID;
 
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
@@ -19,14 +24,16 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-import org.gwtbootstrap3.client.ui.constants.ButtonType;
-import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityChildrenRequest;
+import org.sagebionetworks.repo.model.EntityChildrenResponse;
+import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Link;
@@ -34,6 +41,8 @@ import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
+import org.sagebionetworks.repo.model.RestrictionInformationResponse;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.VersionableEntity;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
@@ -58,6 +67,7 @@ import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.NotificationVariant;
+import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PopupUtilsView;
@@ -68,6 +78,7 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.jsinterop.AlertButtonConfig;
 import org.sagebionetworks.web.client.jsinterop.EntityFinderScope;
+import org.sagebionetworks.web.client.jsinterop.ReactMouseEvent;
 import org.sagebionetworks.web.client.jsinterop.ToastMessageOptions;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.place.Profile;
@@ -80,6 +91,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
+import org.sagebionetworks.web.client.widget.clienthelp.ContainerClientsHelp;
 import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModal;
 import org.sagebionetworks.web.client.widget.doi.CreateOrUpdateDoiModal;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
@@ -92,13 +104,14 @@ import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidget;
 import org.sagebionetworks.web.client.widget.entity.download.AddFolderDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
+import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionListener;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.ActionListenerV2;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.DefaultEntityActionMenuLayoutUtil;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTab;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
-import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
 import org.sagebionetworks.web.client.widget.statistics.StatisticsPlotWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.MaterializedViewEditor;
@@ -107,6 +120,7 @@ import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModal
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget;
 import org.sagebionetworks.web.client.widget.team.SelectTeamModal;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
@@ -114,7 +128,7 @@ import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
 public class EntityActionControllerImpl
-  implements EntityActionController, ActionListener {
+  implements EntityActionController, ActionListenerV2 {
 
   public static final String AVAILABLE_IN_VERSION_HISTORY =
     "This will be available within your version history.";
@@ -224,10 +238,11 @@ public class EntityActionControllerImpl
   String entityTypeDisplay;
   boolean isUserAuthenticated;
   boolean isCurrentVersion;
-  ActionMenuWidget actionMenu;
+  EntityActionMenu actionMenu;
   WikiMarkdownEditor wikiEditor;
   ProvenanceEditorWidget provenanceEditor;
   StorageLocationWidget storageLocationEditor;
+  AddToDownloadListV2 addToDownloadListWidget;
   CookieProvider cookies;
   ChallengeClientAsync challengeClient;
   SelectTeamModal selectTeamModal;
@@ -248,6 +263,7 @@ public class EntityActionControllerImpl
   StatisticsPlotWidget statisticsPlotWidget;
   ChallengeTab challengeTab;
   PopupUtilsView popupUtils;
+  ContainerClientsHelp containerClientsHelp;
 
   @Inject
   public EntityActionControllerImpl(
@@ -491,17 +507,29 @@ public class EntityActionControllerImpl
     return storageLocationEditor;
   }
 
+  private AddToDownloadListV2 getAddToDownloadListWidget() {
+    return addToDownloadListWidget;
+  }
+
+  private ContainerClientsHelp getContainerClientsHelp() {
+    if (containerClientsHelp == null) {
+      containerClientsHelp = ginInjector.getContainerClientsHelp();
+    }
+    return containerClientsHelp;
+  }
+
   private PromptForValuesModalView.Configuration.Builder getPromptForValuesModalConfigBuilder() {
     return ginInjector.getPromptForValuesModalConfigurationBuilder();
   }
 
   @Override
   public void configure(
-    ActionMenuWidget actionMenu,
+    EntityActionMenu actionMenu,
     EntityBundle entityBundle,
     boolean isCurrentVersion,
     String wikiPageId,
-    EntityArea currentArea
+    EntityArea currentArea,
+    AddToDownloadListV2 addToDownloadListWidget
   ) {
     this.entityBundle = entityBundle;
     this.wikiPageId = wikiPageId;
@@ -513,27 +541,9 @@ public class EntityActionControllerImpl
     this.entityTypeDisplay =
       getFriendlyEntityTypeName(entityBundle.getEntity());
     this.currentArea = currentArea;
+    this.addToDownloadListWidget = addToDownloadListWidget;
 
     reconfigureActions();
-
-    if (!(entity instanceof Project)) {
-      actionMenu.setToolsButtonIcon(entityTypeDisplay + TOOLS, IconType.GEAR);
-      actionMenu.setToolsButtonType(ButtonType.DEFAULT);
-    } else if (currentArea != null) {
-      if (
-        EntityArea.TABLES.equals(currentArea) ||
-        EntityArea.DATASETS.equals(currentArea)
-      ) {
-        actionMenu.setToolsButtonType(ButtonType.PRIMARY);
-        actionMenu.setToolsButtonIcon("Add New", null);
-      } else {
-        actionMenu.setToolsButtonIcon(
-          DisplayUtils.capitalize(currentArea.name()) + TOOLS,
-          IconType.GEAR
-        );
-        actionMenu.setToolsButtonType(ButtonType.DEFAULT);
-      }
-    }
   }
 
   private void reconfigureActions() {
@@ -542,6 +552,9 @@ public class EntityActionControllerImpl
 
     // hide all commands by default
     actionMenu.hideAllActions();
+
+    // Set up the action menu layout
+    configureActionMenuLayout();
 
     // Setup the actions
     configureDeleteAction();
@@ -571,15 +584,24 @@ public class EntityActionControllerImpl
     configureAddExternalDockerRepo();
     configureStatisticsPlotAction();
     configureFullTextSearch();
+    configureReportViolation();
 
     // These configuration methods are asynchronous
+    FluentFuture fileDownloadFuture = configureFileDownload();
+    FluentFuture containerDownloadFuture = configureContainerDownload();
     FluentFuture challengeFuture = configureCreateChallenge();
     FluentFuture actFuture = configureACTCommands();
     FluentFuture reorderWikiSubpagesFuture = configureReorderWikiSubpages();
 
     // Show the button
     FluentFuture.from(
-      whenAllComplete(challengeFuture, actFuture, reorderWikiSubpagesFuture)
+      whenAllComplete(
+        fileDownloadFuture,
+        containerDownloadFuture,
+        challengeFuture,
+        actFuture,
+        reorderWikiSubpagesFuture
+      )
         .call(
           () -> {
             actionMenu.setIsLoading(false);
@@ -601,6 +623,45 @@ public class EntityActionControllerImpl
     }
   }
 
+  private void configureReportViolation() {
+    actionMenu.setActionVisible(
+      Action.REPORT_VIOLATION,
+      !(entityBundle.getEntity() instanceof Project)
+    );
+    actionMenu.setActionListener(
+      Action.REPORT_VIOLATION,
+      (action, event) -> {
+        // report abuse via Jira issue collector
+        String userId = WebConstants.ANONYMOUS, email =
+          WebConstants.ANONYMOUS, displayName =
+          WebConstants.ANONYMOUS, synId = entity.getId();
+        UserProfile userProfile = authenticationController.getCurrentUserProfile();
+        if (userProfile != null) {
+          userId = userProfile.getOwnerId();
+          displayName = DisplayUtils.getDisplayName(userProfile);
+          email = DisplayUtils.getPrimaryEmail(userProfile);
+        }
+
+        ginInjector
+          .getSynapseJSNIUtils()
+          .showJiraIssueCollector(
+            "", // summary
+            FLAG_ISSUE_DESCRIPTION_PART_1 +
+            gwt.getCurrentURL() +
+            FLAG_ISSUE_DESCRIPTION_PART_2,
+            FLAG_ISSUE_COLLECTOR_URL,
+            userId,
+            displayName,
+            email,
+            synId, // Synapse data object ID
+            REVIEW_DATA_REQUEST_COMPONENT_ID,
+            null, // AR ID
+            FLAG_ISSUE_PRIORITY
+          );
+      }
+    );
+  }
+
   private void configureFullTextSearch() {
     if (
       entityBundle.getEntity() instanceof Table &&
@@ -617,13 +678,126 @@ public class EntityActionControllerImpl
         Action.TOGGLE_FULL_TEXT_SEARCH,
         actionTextPrefix + " Full Text Search"
       );
-      IconType icon = isFTSEnabled
-        ? IconType.SEARCH_MINUS
-        : IconType.SEARCH_PLUS;
-      actionMenu.setActionIcon(Action.TOGGLE_FULL_TEXT_SEARCH, icon);
     } else {
       actionMenu.setActionVisible(Action.TOGGLE_FULL_TEXT_SEARCH, false);
     }
+  }
+
+  private FluentFuture configureFileDownload() {
+    FluentFuture<RestrictionInformationResponse> future = getDoneFuture(null);
+
+    if (entity instanceof FileEntity) {
+      boolean canDownload = entityBundle.getPermissions().getCanDownload();
+      actionMenu.setDownloadMenuEnabled(canDownload);
+      if (canDownload) {
+        actionMenu.setDownloadMenuTooltipText("");
+      } else {
+        String viewOnlyHelpText = authenticationController.isLoggedIn()
+          ? "You don't have download permission. Request access from an administrator, shown under File Tools ➔ File Sharing Settings"
+          : "You need to log in to download this file.";
+        actionMenu.setDownloadMenuTooltipText(viewOnlyHelpText);
+      }
+      actionMenu.setActionVisible(Action.DOWNLOAD_FILE, true);
+      actionMenu.setActionVisible(Action.ADD_TO_DOWNLOAD_CART, true);
+
+      actionMenu.setActionVisible(Action.SHOW_PROGRAMMATIC_OPTIONS, true);
+
+      future = getDoneFuture(entityBundle.getRestrictionInformation());
+      if (entityBundle.getRestrictionInformation() == null) {
+        future =
+          getSynapseJavascriptClient()
+            .getRestrictionInformation(
+              entity.getId(),
+              RestrictableObjectType.ENTITY
+            );
+      }
+      future.addCallback(
+        new FutureCallback<RestrictionInformationResponse>() {
+          @Override
+          public void onSuccess(
+            @NullableDecl RestrictionInformationResponse restrictionInformation
+          ) {
+            ginInjector
+              .getFileDownloadHandlerWidget()
+              .configure(actionMenu, entityBundle, restrictionInformation);
+          }
+
+          @Override
+          public void onFailure(Throwable t) {
+            popupUtils.showErrorMessage(t.getMessage());
+          }
+        },
+        directExecutor()
+      );
+    }
+    return future;
+  }
+
+  private FluentFuture configureContainerDownload() {
+    FluentFuture<EntityChildrenResponse> future = getDoneFuture(null);
+
+    if (
+      (entity instanceof Project && EntityArea.FILES.equals(currentArea)) ||
+      entity instanceof Folder
+    ) {
+      actionMenu.setActionVisible(Action.ADD_TO_DOWNLOAD_CART, true);
+      actionMenu.setActionListener(
+        Action.ADD_TO_DOWNLOAD_CART,
+        (action, e) -> getAddToDownloadListWidget().configure(entity.getId())
+      );
+      actionMenu.setActionVisible(Action.SHOW_PROGRAMMATIC_OPTIONS, true);
+      actionMenu.setActionListener(
+        Action.SHOW_PROGRAMMATIC_OPTIONS,
+        (action, e) ->
+          getContainerClientsHelp().configureAndShow(entity.getId())
+      );
+
+      if (Boolean.TRUE.equals(entityBundle.getHasChildren())) {
+        actionMenu.setDownloadMenuEnabled(true);
+        actionMenu.setDownloadMenuTooltipText(null);
+        // Check if the container has any files
+        EntityChildrenRequest filesRequest = new EntityChildrenRequest();
+        filesRequest.setParentId(entity.getId());
+        filesRequest.setIncludeSumFileSizes(false);
+        filesRequest.setIncludeTotalChildCount(false);
+        filesRequest.setIncludeTypes(
+          Collections.singletonList(EntityType.file)
+        );
+        future = getSynapseJavascriptClient().getEntityChildren(filesRequest);
+        future.addCallback(
+          new FutureCallback<EntityChildrenResponse>() {
+            @Override
+            public void onSuccess(EntityChildrenResponse result) {
+              if (result.getPage().isEmpty()) {
+                actionMenu.setActionEnabled(Action.ADD_TO_DOWNLOAD_CART, false);
+                actionMenu.setActionTooltipText(
+                  Action.ADD_TO_DOWNLOAD_CART,
+                  "There are no files in this folder."
+                );
+              } else {
+                actionMenu.setActionEnabled(Action.ADD_TO_DOWNLOAD_CART, true);
+                actionMenu.setActionTooltipText(
+                  Action.ADD_TO_DOWNLOAD_CART,
+                  null
+                );
+              }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+              view.showErrorMessage(t.getMessage());
+            }
+          },
+          directExecutor()
+        );
+      } else {
+        actionMenu.setDownloadMenuEnabled(false);
+        actionMenu.setDownloadMenuTooltipText(
+          "There are no downloadable items in this folder."
+        );
+      }
+    }
+    return future;
   }
 
   private void configureAddExternalDockerRepo() {
@@ -699,7 +873,6 @@ public class EntityActionControllerImpl
     // supports the workflow)
     actionMenu.setActionVisible(Action.APPROVE_USER_ACCESS, false);
     actionMenu.setActionVisible(Action.MANAGE_ACCESS_REQUIREMENTS, false);
-    actionMenu.setACTDividerVisible(false);
     // show ACT commands if this is the Project Settings tools menu, or if the entity is not a project
     // (looking at a child entity)
     if (
@@ -725,7 +898,6 @@ public class EntityActionControllerImpl
                 Action.MANAGE_ACCESS_REQUIREMENTS,
                 EntityActionControllerImpl.this
               );
-              actionMenu.setACTDividerVisible(true);
             }
           }
 
@@ -1261,6 +1433,22 @@ public class EntityActionControllerImpl
     }
   }
 
+  private void configureActionMenuLayout() {
+    if (isTopLevelProjectToolsMenu(entity, currentArea)) {
+      // use Area layout
+      actionMenu.setLayout(
+        DefaultEntityActionMenuLayoutUtil.getLayout(currentArea)
+      );
+    } else {
+      // use Entity type layout
+      actionMenu.setLayout(
+        DefaultEntityActionMenuLayoutUtil.getLayout(
+          EntityTypeUtils.getEntityType(entity)
+        )
+      );
+    }
+  }
+
   private void configureDeleteAction() {
     if (isTopLevelProjectToolsMenu(entityBundle.getEntity(), currentArea)) {
       actionMenu.setActionVisible(Action.DELETE_ENTITY, false);
@@ -1302,16 +1490,6 @@ public class EntityActionControllerImpl
         Action.VIEW_SHARING_SETTINGS,
         entityTypeDisplay + " Sharing Settings"
       );
-      if (
-        PublicPrivateBadge.isPublic(
-          entityBundle.getBenefactorAcl(),
-          ginInjector.getSynapseProperties().getPublicPrincipalIds()
-        )
-      ) {
-        actionMenu.setActionIcon(Action.VIEW_SHARING_SETTINGS, IconType.GLOBE);
-      } else {
-        actionMenu.setActionIcon(Action.VIEW_SHARING_SETTINGS, IconType.LOCK);
-      }
     }
   }
 
@@ -1409,7 +1587,7 @@ public class EntityActionControllerImpl
   }
 
   @Override
-  public void onAction(Action action) {
+  public void onAction(Action action, ReactMouseEvent event) {
     switch (action) {
       case DELETE_ENTITY:
         onDeleteEntity();

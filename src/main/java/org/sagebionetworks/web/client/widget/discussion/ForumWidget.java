@@ -28,8 +28,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModal;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionListener;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
 
 public class ForumWidget implements ForumWidgetView.Presenter {
@@ -61,7 +60,7 @@ public class ForumWidget implements ForumWidgetView.Presenter {
   Set<String> moderatorIds = new HashSet<String>();
   ParameterizedToken params;
   Topic forumTopic = new Topic();
-  ActionMenuWidget actionMenu;
+  EntityActionMenu actionMenu;
 
   // From portal.properties, what thread should we show if no threads are available?
   public static final String DEFAULT_THREAD_ID_KEY =
@@ -246,7 +245,7 @@ public class ForumWidget implements ForumWidgetView.Presenter {
     String entityId,
     final ParameterizedToken params,
     Boolean isCurrentUserModerator,
-    ActionMenuWidget actionMenu,
+    EntityActionMenu actionMenu,
     CallbackP<ParameterizedToken> paramChangeCallback,
     Callback urlChangeCallback
   ) {
@@ -439,21 +438,11 @@ public class ForumWidget implements ForumWidgetView.Presenter {
       // add listener for forum commands
       actionMenu.setActionListener(
         Action.CREATE_THREAD,
-        new ActionListener() {
-          @Override
-          public void onAction(Action action) {
-            onClickNewThread();
-          }
-        }
+        (action, e) -> onClickNewThread()
       );
       actionMenu.setActionListener(
         Action.SHOW_DELETED_THREADS,
-        new ActionListener() {
-          @Override
-          public void onAction(Action action) {
-            onClickDeletedThreadCommand();
-          }
-        }
+        (action, e) -> onClickDeletedThreadCommand()
       );
     }
   }

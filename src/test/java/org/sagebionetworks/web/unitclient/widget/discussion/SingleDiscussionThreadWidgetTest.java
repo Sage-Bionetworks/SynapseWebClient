@@ -66,8 +66,8 @@ import org.sagebionetworks.web.client.widget.discussion.modal.EditDiscussionThre
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionListener;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.ActionListenerV2;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.refresh.ReplyCountAlert;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
@@ -156,13 +156,13 @@ public class SingleDiscussionThreadWidgetTest {
   ArgumentCaptor<Callback> callbackCaptor;
 
   @Captor
-  ArgumentCaptor<ActionListener> actionListenerCaptor;
+  ArgumentCaptor<ActionListenerV2> actionListenerCaptor;
 
   @Mock
   SynapseJavascriptClient mockSynapseJavascriptClient;
 
   @Mock
-  ActionMenuWidget mockActionMenuWidget;
+  EntityActionMenu mockActionMenuWidget;
 
   @Mock
   SynapseProperties mockSynapseProperties;
@@ -349,8 +349,8 @@ public class SingleDiscussionThreadWidgetTest {
         eq(Action.EDIT_THREAD),
         actionListenerCaptor.capture()
       );
-    ActionListener actionListener = actionListenerCaptor.getValue();
-    actionListener.onAction(Action.EDIT_THREAD);
+    ActionListenerV2 actionListener = actionListenerCaptor.getValue();
+    actionListener.onAction(Action.EDIT_THREAD, null);
     verify(mockEditThreadModal).show();
 
     // verify delete
@@ -360,7 +360,7 @@ public class SingleDiscussionThreadWidgetTest {
         actionListenerCaptor.capture()
       );
     actionListener = actionListenerCaptor.getValue();
-    actionListener.onAction(Action.DELETE_THREAD);
+    actionListener.onAction(Action.DELETE_THREAD, null);
     verify(mockPopupUtils).showConfirmDelete(anyString(), any(Callback.class));
 
     // verify restore
@@ -370,7 +370,7 @@ public class SingleDiscussionThreadWidgetTest {
         actionListenerCaptor.capture()
       );
     actionListener = actionListenerCaptor.getValue();
-    actionListener.onAction(Action.RESTORE_THREAD);
+    actionListener.onAction(Action.RESTORE_THREAD, null);
     verify(mockPopupUtils)
       .showConfirmDialog(anyString(), anyString(), callbackCaptor.capture());
     callbackCaptor.getValue().invoke();
@@ -383,7 +383,7 @@ public class SingleDiscussionThreadWidgetTest {
     verify(mockActionMenuWidget)
       .setActionListener(eq(Action.PIN_THREAD), actionListenerCaptor.capture());
     actionListener = actionListenerCaptor.getValue();
-    actionListener.onAction(Action.PIN_THREAD);
+    actionListener.onAction(Action.PIN_THREAD, null);
     verify(mockDiscussionForumClientAsync)
       .pinThread(anyString(), any(AsyncCallback.class));
   }
@@ -422,8 +422,8 @@ public class SingleDiscussionThreadWidgetTest {
       .setActionText(eq(Action.PIN_THREAD), eq(UNPIN_THREAD_ACTION_TEXT));
     verify(mockActionMenuWidget)
       .setActionListener(eq(Action.PIN_THREAD), actionListenerCaptor.capture());
-    ActionListener actionListener = actionListenerCaptor.getValue();
-    actionListener.onAction(Action.EDIT_THREAD);
+    ActionListenerV2 actionListener = actionListenerCaptor.getValue();
+    actionListener.onAction(Action.EDIT_THREAD, null);
     verify(mockDiscussionForumClientAsync)
       .unpinThread(anyString(), any(AsyncCallback.class));
   }

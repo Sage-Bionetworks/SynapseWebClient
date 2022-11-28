@@ -12,7 +12,6 @@ public interface RestrictionWidgetView extends IsWidget, SynapseView {
   public void setPresenter(Presenter presenter);
 
   void configureCurrentAccessComponent(String entityId, Long versionNumber);
-  void showFlagUI();
   void showFolderRestrictionsLink(String entityId);
   void showChangeLink();
 
@@ -39,8 +38,6 @@ public interface RestrictionWidgetView extends IsWidget, SynapseView {
    */
   public interface Presenter {
     void changeClicked();
-
-    void reportIssueClicked();
 
     void imposeRestrictionOkClicked();
 

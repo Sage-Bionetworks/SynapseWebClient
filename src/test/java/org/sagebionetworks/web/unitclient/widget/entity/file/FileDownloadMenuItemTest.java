@@ -9,8 +9,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.FormPanel;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Before;
@@ -32,29 +30,24 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.aws.AwsSdk;
-import org.sagebionetworks.web.client.widget.entity.file.FileDownloadMenuItem;
+import org.sagebionetworks.web.client.widget.entity.file.FileDownloadHandlerWidget;
 import org.sagebionetworks.web.client.widget.entity.file.FileDownloadMenuItemView;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
-import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 public class FileDownloadMenuItemTest {
 
   @Mock
   FileDownloadMenuItemView mockView;
-
-  @Mock
-  SynapseClientAsync mockSynapseClient;
 
   @Mock
   SynapseProperties mockSynapseProperties;
@@ -73,9 +66,6 @@ public class FileDownloadMenuItemTest {
 
   @Mock
   ExternalObjectStoreFileHandle mockObjectStoreFileHandle;
-
-  @Mock
-  EntityUpdatedEvent mockEntityUpdatedEvent;
 
   @Mock
   SynapseJavascriptClient mockSynapseJavascriptClient;
@@ -104,10 +94,13 @@ public class FileDownloadMenuItemTest {
   @Mock
   JavaScriptObject mockS3;
 
+  @Mock
+  EntityActionMenu mockActionMenu;
+
   @Captor
   ArgumentCaptor<CallbackP> callbackPCaptor;
 
-  FileDownloadMenuItem widget;
+  FileDownloadHandlerWidget widget;
   List<FileHandle> fileHandles;
 
   public static final String SFTP_ENDPOINT = "https://sftp.org/sftp";
@@ -121,9 +114,8 @@ public class FileDownloadMenuItemTest {
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
     widget =
-      new FileDownloadMenuItem(
+      new FileDownloadHandlerWidget(
         mockView,
-        mockSynapseClient,
         mockGinInjector,
         mockSynapseJavascriptClient,
         mockAuthController,
@@ -144,10 +136,6 @@ public class FileDownloadMenuItemTest {
     when(mockEntityBundle.getFileHandles()).thenReturn(fileHandles);
     when(mockGinInjector.getSynapseProperties())
       .thenReturn(mockSynapseProperties);
-    AsyncMockStubber
-      .callSuccessWith(SFTP_HOST)
-      .when(mockSynapseClient)
-      .getHost(anyString(), any(AsyncCallback.class));
     when(
       mockJsniUtils.getFileHandleAssociationUrl(
         anyString(),
@@ -166,7 +154,11 @@ public class FileDownloadMenuItemTest {
     // Null locations
     when(mockAuthController.isLoggedIn()).thenReturn(true);
     when(mockEntityBundle.getFileHandles()).thenReturn(null);
-    widget.configure(mockEntityBundle, mockRestrictionInformation);
+    widget.configure(
+      mockActionMenu,
+      mockEntityBundle,
+      mockRestrictionInformation
+    );
     assertNull(widget.getFileHandle());
   }
 
@@ -175,9 +167,13 @@ public class FileDownloadMenuItemTest {
   public void testLoadFileDownloadUrlAnonymous() throws RestServiceException {
     // Not Logged in Test: Download
     when(mockAuthController.isLoggedIn()).thenReturn(false);
-    widget.configure(mockEntityBundle, mockRestrictionInformation);
+    widget.configure(
+      mockActionMenu,
+      mockEntityBundle,
+      mockRestrictionInformation
+    );
     verify(mockView)
-      .setIsDirectDownloadLink(FileDownloadMenuItem.LOGIN_PLACE_LINK);
+      .setIsDirectDownloadLink(FileDownloadHandlerWidget.LOGIN_PLACE_LINK);
     assertNull(widget.getFileHandle());
   }
 
@@ -195,7 +191,11 @@ public class FileDownloadMenuItemTest {
     when(mockEntityBundle.getFileHandles()).thenReturn(fileHandles);
     when(mockFileEntity.getDataFileHandleId()).thenReturn(fileHandleId);
     when(mockAuthController.isLoggedIn()).thenReturn(true);
-    widget.configure(mockEntityBundle, mockRestrictionInformation);
+    widget.configure(
+      mockActionMenu,
+      mockEntityBundle,
+      mockRestrictionInformation
+    );
     assertNotNull(widget.getFileHandle());
     verify(mockView).setIsDirectDownloadLink(fileHandleAssociationUrl);
   }
@@ -214,7 +214,11 @@ public class FileDownloadMenuItemTest {
     when(mockFileHandle.getFileName()).thenReturn("myExternalFileName.png");
     when(mockFileHandle.getExternalURL()).thenReturn(url);
     when(mockAuthController.isLoggedIn()).thenReturn(true);
-    widget.configure(mockEntityBundle, mockRestrictionInformation);
+    widget.configure(
+      mockActionMenu,
+      mockEntityBundle,
+      mockRestrictionInformation
+    );
     assertNotNull(widget.getFileHandle());
     // SWC-5987: go through the FHA servlet, even if it's an external URL
     verify(mockView).setIsDirectDownloadLink(fileHandleAssociationUrl);
@@ -236,7 +240,11 @@ public class FileDownloadMenuItemTest {
     when(mockObjectStoreFileHandle.getFileName()).thenReturn(fileName);
     fileHandles.add(mockObjectStoreFileHandle);
     when(mockAuthController.isLoggedIn()).thenReturn(true);
-    widget.configure(mockEntityBundle, mockRestrictionInformation);
+    widget.configure(
+      mockActionMenu,
+      mockEntityBundle,
+      mockRestrictionInformation
+    );
     verify(mockView).setIsUnauthenticatedS3DirectDownload();
 
     // under this configuration, try clicking the download button (verify login dialog shown)
@@ -282,11 +290,15 @@ public class FileDownloadMenuItemTest {
     when(mockAuthController.isLoggedIn()).thenReturn(true);
     when(mockRestrictionInformation.getHasUnmetAccessRequirement())
       .thenReturn(true);
-    widget.configure(mockEntityBundle, mockRestrictionInformation);
+    widget.configure(
+      mockActionMenu,
+      mockEntityBundle,
+      mockRestrictionInformation
+    );
 
     verify(mockView)
       .setIsDirectDownloadLink(
-        FileDownloadMenuItem.ACCESS_REQUIREMENTS_LINK +
+        FileDownloadHandlerWidget.ACCESS_REQUIREMENTS_LINK +
         ENTITY_ID +
         "&" +
         AccessRequirementsPlace.TYPE_PARAM +

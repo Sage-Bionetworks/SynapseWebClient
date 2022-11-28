@@ -48,7 +48,7 @@ import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidget.ActionHand
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidgetView;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -104,7 +104,7 @@ public class WikiPageWidgetTest {
   ArgumentCaptor<CallbackP<WikiPageKey>> callbackPCaptor;
 
   @Mock
-  ActionMenuWidget mockActionMenuWidget;
+  EntityActionMenu mockActionMenuWidget;
 
   @Mock
   CookieProvider mockCookies;
@@ -217,7 +217,7 @@ public class WikiPageWidgetTest {
         any(WikiPageKey.class),
         anyBoolean(),
         any(CallbackP.class),
-        any(ActionMenuWidget.class)
+        any(EntityActionMenu.class)
       );
 
     verify(mockHistoryWidget, never())
@@ -390,7 +390,7 @@ public class WikiPageWidgetTest {
         any(WikiPageKey.class),
         anyBoolean(),
         callbackPCaptor.capture(),
-        any(ActionMenuWidget.class)
+        any(EntityActionMenu.class)
       );
     // invoke subpage clicked
     callbackPCaptor.getValue().invoke(wikiPageKey);

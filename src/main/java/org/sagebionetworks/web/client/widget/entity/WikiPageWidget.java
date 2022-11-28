@@ -30,7 +30,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidget.ActionHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -169,7 +169,7 @@ public class WikiPageWidget
     );
   }
 
-  public void showSubpages(ActionMenuWidget actionMenu) {
+  public void showSubpages(EntityActionMenu actionMenu) {
     view.setWikiSubpagesWidgetVisible(true);
     configureWikiSubpagesWidget(actionMenu);
   }
@@ -303,7 +303,7 @@ public class WikiPageWidget
     }
   }
 
-  public void configureWikiSubpagesWidget(ActionMenuWidget actionMenu) {
+  public void configureWikiSubpagesWidget(EntityActionMenu actionMenu) {
     // check configuration of wikiKey
     wikiSubpages.configure(
       wikiKey,

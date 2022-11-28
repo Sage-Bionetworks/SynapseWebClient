@@ -31,12 +31,6 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
   Anchor changeLink;
 
   @UiField
-  Span flagUI;
-
-  @UiField
-  Anchor reportIssueLink;
-
-  @UiField
   Anchor folderViewTermsLink;
 
   @UiField
@@ -77,9 +71,6 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
     changeLink.addClickHandler(event -> {
       presenter.changeClicked();
     });
-    reportIssueLink.addClickHandler(event -> {
-      presenter.reportIssueClicked();
-    });
   }
 
   @Override
@@ -119,11 +110,6 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
   }
 
   @Override
-  public void showFlagUI() {
-    flagUI.setVisible(true);
-  }
-
-  @Override
   public void showChangeLink() {
     linkUI.setVisible(true);
     changeLink.setVisible(true);
@@ -147,7 +133,6 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
   @Override
   public void clear() {
     linkUI.setVisible(false);
-    flagUI.setVisible(false);
     changeLink.setVisible(false);
     modals.resetImposeRestrictionModal();
   }

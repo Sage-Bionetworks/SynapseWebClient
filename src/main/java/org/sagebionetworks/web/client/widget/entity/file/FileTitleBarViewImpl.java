@@ -12,16 +12,15 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.UIObject;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import org.gwtbootstrap3.client.ui.*;
+import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.EntityTypeIcon;
-import org.sagebionetworks.web.client.widget.HelpWidget;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 
 public class FileTitleBarViewImpl
@@ -70,15 +69,6 @@ public class FileTitleBarViewImpl
   Heading entityName;
 
   @UiField
-  DropDownMenu dropdownMenu;
-
-  @UiField
-  AnchorListItem addToDownloadListLink;
-
-  @UiField
-  AnchorListItem programmaticOptionsLink;
-
-  @UiField
   Div externalObjectStoreUI;
 
   @UiField
@@ -100,13 +90,7 @@ public class FileTitleBarViewImpl
   Span versionUiCurrent;
 
   @UiField
-  Button downloadOptionsButton;
-
-  @UiField
   Div actionMenuContainer;
-
-  @UiField
-  Tooltip downloadTooltip;
 
   interface FileTitleBarViewImplUiBinder
     extends UiBinder<Widget, FileTitleBarViewImpl> {}
@@ -120,7 +104,6 @@ public class FileTitleBarViewImpl
   public FileTitleBarViewImpl(
     FavoriteWidget favoriteWidget,
     Md5Link md5Link,
-    GlobalApplicationState globalAppState,
     AuthenticationController authController
   ) {
     this.favoriteWidget = favoriteWidget;
@@ -132,12 +115,6 @@ public class FileTitleBarViewImpl
 
     favoritePanel.addStyleName("inline-block");
     favoritePanel.setWidget(favoriteWidget.asWidget());
-    addToDownloadListLink.addClickHandler(event -> {
-      presenter.onAddToDownloadList();
-    });
-    programmaticOptionsLink.addClickHandler(event -> {
-      presenter.onProgrammaticDownloadOptions();
-    });
     showVersionHistoryLink.addClickHandler(event -> {
       presenter.toggleShowVersionHistory();
     });
@@ -224,11 +201,6 @@ public class FileTitleBarViewImpl
   }
 
   @Override
-  public void setFileDownloadMenuItem(Widget w) {
-    dropdownMenu.insert(w, 0);
-  }
-
-  @Override
   public void setExternalObjectStoreUIVisible(boolean visible) {
     externalObjectStoreUI.setVisible(visible);
   }
@@ -252,19 +224,6 @@ public class FileTitleBarViewImpl
   @Override
   public void setVersion(Long versionNumber) {
     version.setText(versionNumber.toString());
-  }
-
-  @Override
-  public void setCanDownload(boolean canDownload) {
-    downloadOptionsButton.setEnabled(canDownload);
-    if (canDownload) {
-      downloadTooltip.setTitle("Direct and programmatic download options");
-    } else {
-      String viewOnlyHelpText = authController.isLoggedIn()
-        ? "You don't have download permission. Request access from an administrator, shown under File Tools ➔ File Sharing Settings"
-        : "You need to log in to download this file.";
-      downloadTooltip.setTitle(viewOnlyHelpText);
-    }
   }
 
   @Override

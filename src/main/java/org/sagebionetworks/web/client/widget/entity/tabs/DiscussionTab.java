@@ -85,7 +85,7 @@ public class DiscussionTab implements DiscussionTabView.Presenter {
         tab.showTab();
       }
     };
-    tab.configureEntityActionController(projectBundle, true, null);
+    tab.configureEntityActionController(projectBundle, true, null, null);
     forumWidget.configure(
       entityId,
       params,

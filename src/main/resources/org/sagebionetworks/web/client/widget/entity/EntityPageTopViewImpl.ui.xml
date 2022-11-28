@@ -8,28 +8,28 @@
 >
   <g:HTMLPanel>
     <!--Project level information -->
-    <bh:Div
-      addStyleNames="pageHeader min-height-48 padding-left-15 padding-right-15"
-    >
-      <b:Row addStyleNames="projectMetadata" ui:field="projectUI">
-        <b:Column size="XS_12">
-          <bh:Span
-            ui:field="projectActionMenuContainer"
-            addStyleNames="right"
-            paddingTop="20"
-          />
-          <bh:Div addStyleNames="projectTitle margin-left-15 margin-right-15">
-            <bh:Div ui:field="projectTitleBar" />
-            <g:SimplePanel ui:field="projectMetadataContainer" />
-          </bh:Div>
-          <w:LoadingSpinner
-            size="40px"
-            ui:field="loadingUI"
-            addStyleNames="center-block center"
-          />
-        </b:Column>
-      </b:Row>
+    <bh:Div addStyleNames="pageHeader min-height-48">
+      <g:FlowPanel addStyleNames="projectMetadata" ui:field="projectUI">
+        <bh:Span
+          ui:field="projectActionMenuContainer"
+          addStyleNames="right"
+          paddingTop="20"
+        />
+        <bh:Div addStyleNames="projectTitle">
+          <bh:Div ui:field="projectTitleBar" />
+          <g:SimplePanel ui:field="projectMetadataContainer" />
+        </bh:Div>
+        <w:LoadingSpinner
+          size="40px"
+          ui:field="loadingUI"
+          addStyleNames="center-block center"
+        />
+      </g:FlowPanel>
     </bh:Div>
     <bh:Div ui:field="tabsUI" />
+    <bh:Div
+      addStyleNames="margin-top-10"
+      ui:field="addToDownloadListContainer"
+    />
   </g:HTMLPanel>
 </ui:UiBinder>

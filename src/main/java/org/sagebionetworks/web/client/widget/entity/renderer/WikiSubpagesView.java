@@ -6,7 +6,7 @@ import java.util.List;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 public interface WikiSubpagesView extends IsWidget, SynapseView {
@@ -23,7 +23,7 @@ public interface WikiSubpagesView extends IsWidget, SynapseView {
     WikiPageKey curWikiKey,
     boolean isEmbeddedOwnerPage,
     CallbackP<WikiPageKey> wikiPageCallback,
-    ActionMenuWidget actionMenu
+    EntityActionMenu actionMenu
   );
 
   void hideSubpages();
