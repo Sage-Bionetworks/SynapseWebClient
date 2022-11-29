@@ -1,0 +1,178 @@
+package org.sagebionetworks.web.client.widget.entity.menu.v3;
+
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
+import java.util.List;
+import java.util.Map;
+import org.sagebionetworks.repo.model.EntityType;
+import org.sagebionetworks.web.client.jsinterop.ReactMouseEvent;
+import org.sagebionetworks.web.client.jsinterop.entity.actionmenu.ActionConfiguration;
+import org.sagebionetworks.web.client.jsinterop.entity.actionmenu.EntityActionMenuDropdownConfiguration;
+import org.sagebionetworks.web.client.jsinterop.entity.actionmenu.EntityActionMenuDropdownMap;
+import org.sagebionetworks.web.client.jsinterop.entity.actionmenu.EntityActionMenuLayout;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
+
+public class EntityActionMenuImpl
+  implements EntityActionMenu, EntityActionMenuView.Presenter {
+
+  private EntityActionMenuLayout currentLayout;
+  private final EntityActionMenuDropdownMap dropdownMenuConfigurations;
+  private final Map<Action, ActionConfiguration> actionConfigurations;
+
+  private final EntityActionMenuView view;
+  private boolean isLoading;
+
+  @Inject
+  public EntityActionMenuImpl(EntityActionMenuView view) {
+    this.view = view;
+    this.view.setPresenter(this);
+    actionConfigurations =
+      DefaultActionConfigurationUtil.getDefaultActionConfiguration();
+    dropdownMenuConfigurations =
+      EntityActionMenuDropdownMap.create(
+        EntityActionMenuDropdownConfiguration.create(true, "", false),
+        EntityActionMenuDropdownConfiguration.create(true, "", false)
+      );
+    currentLayout =
+      DefaultEntityActionMenuLayoutUtil.getLayout(EntityType.project);
+
+    synchronizeView();
+  }
+
+  @Override
+  public void setActionListener(
+    Action action,
+    ActionListenerV2 actionListener
+  ) {
+    actionConfigurations.get(action).clearActionListeners();
+    actionConfigurations.get(action).setHref(null);
+    addActionListener(action, actionListener);
+  }
+
+  @Override
+  public void addActionListener(
+    Action action,
+    ActionListenerV2 actionListener
+  ) {
+    actionConfigurations.get(action).addActionListener(actionListener);
+  }
+
+  @Override
+  public void setActionHref(Action action, String href) {
+    actionConfigurations.get(action).clearActionListeners();
+    addActionHref(action, href);
+  }
+
+  @Override
+  public void addActionHref(Action action, String href) {
+    actionConfigurations.get(action).setHref(href);
+    synchronizeView();
+  }
+
+  @Override
+  public void setActionVisible(Action action, boolean visible) {
+    actionConfigurations.get(action).setVisible(visible);
+    synchronizeView();
+  }
+
+  @Override
+  public void setDownloadMenuEnabled(boolean enabled) {
+    dropdownMenuConfigurations
+      .getDownloadMenuConfiguration()
+      .setDisabled(!enabled);
+    synchronizeView();
+  }
+
+  @Override
+  public void setActionEnabled(Action action, boolean enabled) {
+    actionConfigurations.get(action).setDisabled(!enabled);
+    synchronizeView();
+  }
+
+  public void setDownloadMenuTooltipText(String tooltipText) {
+    dropdownMenuConfigurations
+      .getDownloadMenuConfiguration()
+      .setTooltipText(tooltipText);
+    synchronizeView();
+  }
+
+  @Override
+  public void setActionTooltipText(Action action, String tooltipText) {
+    actionConfigurations.get(action).setTooltipText(tooltipText);
+    synchronizeView();
+  }
+
+  @Override
+  public void setActionText(Action action, String text) {
+    actionConfigurations.get(action).setText(text);
+    synchronizeView();
+  }
+
+  @Override
+  public void setLayout(EntityActionMenuLayout layout) {
+    this.currentLayout = layout;
+    synchronizeView();
+  }
+
+  @Override
+  public void reset() {
+    // Hide all widgets and clear all Listeners
+    hideAllActions();
+    this.actionConfigurations.forEach((key, value) ->
+        value.clearActionListeners()
+      );
+    synchronizeView();
+  }
+
+  @Override
+  public void addControllerWidget(IsWidget controllerWidget) {
+    this.view.addControllerWidget(controllerWidget);
+  }
+
+  @Override
+  public void setIsLoading(boolean isLoading) {
+    this.isLoading = isLoading;
+    synchronizeView();
+  }
+
+  @Override
+  public void hideAllActions() {
+    this.actionConfigurations.forEach((key, value) -> value.setVisible(false));
+    synchronizeView();
+  }
+
+  private void synchronizeView() {
+    this.view.setIsLoading(this.isLoading);
+    if (!this.isLoading) {
+      this.view.configure(
+          actionConfigurations,
+          dropdownMenuConfigurations,
+          currentLayout
+        );
+    }
+  }
+
+  @Override
+  public void onAction(Action action, ReactMouseEvent mouseEvent) {
+    // forward to the listeners
+    List<ActionListenerV2> listeners = actionConfigurations
+      .get(action)
+      .getActionListeners();
+    if (listeners.isEmpty()) {
+      throw new IllegalArgumentException(
+        "Attempted to invoke action " +
+        action.name() +
+        " with no listeners present"
+      );
+    }
+    for (ActionListenerV2 listener : listeners) {
+      listener.onAction(action, mouseEvent);
+    }
+  }
+
+  @Override
+  public Widget asWidget() {
+    return this.view.asWidget();
+  }
+}

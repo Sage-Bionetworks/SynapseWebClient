@@ -4,6 +4,7 @@ import jsinterop.annotations.JsNullable;
 import jsinterop.annotations.JsPackage;
 import jsinterop.annotations.JsType;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.jsinterop.entity.actionmenu.EntityActionMenuProps;
 
 @JsType(isNative = true, namespace = JsPackage.GLOBAL)
 public class SRC {
@@ -49,6 +50,7 @@ public class SRC {
     public static ReactComponentType<IDUReportProps> IDUReport;
     public static ReactComponentType CertificationQuiz;
     public static ReactComponentType<EntityPageBreadcrumbsProps> EntityPageBreadcrumbs;
+    public static ReactComponentType<EntityActionMenuProps> EntityActionMenu;
 
     /**
      * Pushes a global toast message. In SWC, you should use {@link DisplayUtils#notify}, rather than calling this method directly.

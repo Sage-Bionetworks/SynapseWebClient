@@ -448,6 +448,10 @@ import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidgetImpl;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidgetView;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenuImpl;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenuView;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenuViewImpl;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrarImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.AttachmentPreviewWidgetView;
@@ -1004,6 +1008,8 @@ public class PortalGinModule extends AbstractGinModule {
 
     // ActionMenu V2
     bind(ActionMenuWidget.class).to(ActionMenuWidgetImpl.class);
+    bind(EntityActionMenu.class).to(EntityActionMenuImpl.class);
+    bind(EntityActionMenuView.class).to(EntityActionMenuViewImpl.class);
 
     bind(ActionMenuWidgetView.class).to(ActionMenuWidgetViewImpl.class);
 
