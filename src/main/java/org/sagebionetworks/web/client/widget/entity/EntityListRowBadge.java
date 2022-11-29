@@ -141,6 +141,7 @@ public class EntityListRowBadge
 
   public void setEntityBundle(EntityBundle eb) {
     view.setEntityType(EntityTypeUtils.getEntityType(eb.getEntity()));
+
     entityName = eb.getEntity().getName();
     view.setEntityLink(
       entityName,
@@ -169,6 +170,7 @@ public class EntityListRowBadge
     if (eb.getEntity() instanceof Versionable) {
       Versionable versionable = (Versionable) eb.getEntity();
       view.setVersion(versionable.getVersionNumber().toString());
+      version = versionable.getVersionNumber();
     } else {
       view.setVersion(N_A);
     }
