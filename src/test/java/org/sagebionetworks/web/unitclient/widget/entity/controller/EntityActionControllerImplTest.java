@@ -33,6 +33,10 @@ import static org.sagebionetworks.web.client.widget.entity.controller.EntityActi
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.UPDATE_DOI_FOR;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.WAS_SUCCESSFULLY_DELETED;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.WIKI;
+import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_COLLECTOR_URL;
+import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_DESCRIPTION_PART_1;
+import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_PRIORITY;
+import static org.sagebionetworks.web.shared.WebConstants.REVIEW_DATA_REQUEST_COMPONENT_ID;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
@@ -70,6 +74,7 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
 import org.sagebionetworks.repo.model.UserBundle;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
@@ -96,6 +101,7 @@ import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
@@ -339,6 +345,9 @@ public class EntityActionControllerImplTest {
   FileDownloadHandlerWidget mockFileDownloadHandlerWidget;
 
   @Mock
+  SynapseJSNIUtilsImpl mockJsniUtils;
+
+  @Mock
   ContainerClientsHelp mockContainerClientsHelp;
 
   PromptForValuesModalView.Configuration.Builder mockPromptModalConfigurationBuilder;
@@ -407,6 +416,7 @@ public class EntityActionControllerImplTest {
       .thenReturn(mockPublicPrincipalIds);
     when(mockPortalGinInjector.getSynapseJavascriptClient())
       .thenReturn(mockSynapseJavascriptClient);
+    when(mockPortalGinInjector.getSynapseJSNIUtils()).thenReturn(mockJsniUtils);
     when(mockPortalGinInjector.getCreateTableViewWizard())
       .thenReturn(mockCreateTableViewWizard);
     when(mockPortalGinInjector.getUploadTableModalWidget())
@@ -4556,5 +4566,61 @@ public class EntityActionControllerImplTest {
       .setActionVisible(Action.SHOW_PROGRAMMATIC_OPTIONS, true);
     verify(mockActionMenu).setDownloadMenuEnabled(true);
     verify(mockActionMenu).setDownloadMenuTooltipText(null);
+  }
+
+  @Test
+  public void testReportViolation() {
+    String url = "https://www.synapse.org/#!Synapse:syn123";
+    String ownerId = "4958725";
+    String email = "email@address.com";
+    String firstName = "Synapse";
+    String lastName = "User";
+    String username = "SynUser123";
+    UserProfile profile = new UserProfile();
+    profile.setOwnerId(ownerId);
+    profile.setFirstName(firstName);
+    profile.setLastName(lastName);
+    profile.setUserName(username);
+    profile.setEmails(Collections.singletonList(email));
+    when(mockAuthenticationController.getCurrentUserProfile())
+      .thenReturn(profile);
+    when(mockGWT.getCurrentURL()).thenReturn(url);
+    entityBundle.setEntity(new FileEntity());
+    entityBundle.getEntity().setId(entityId);
+
+    // Call under test - configuration
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+
+    verify(mockActionMenu).setActionVisible(Action.REPORT_VIOLATION, true);
+    verify(mockActionMenu)
+      .setActionListener(
+        eq(Action.REPORT_VIOLATION),
+        actionListenerCaptor.capture()
+      );
+
+    // Call under test - invocation
+    actionListenerCaptor.getValue().onAction(Action.REPORT_VIOLATION, null);
+    verify(mockJsniUtils)
+      .showJiraIssueCollector(
+        "", // summary
+        FLAG_ISSUE_DESCRIPTION_PART_1 +
+        url +
+        WebConstants.FLAG_ISSUE_DESCRIPTION_PART_2, // description
+        FLAG_ISSUE_COLLECTOR_URL,
+        ownerId,
+        DisplayUtils.getDisplayName(firstName, lastName, username),
+        email,
+        entityId, // Synapse data object ID
+        REVIEW_DATA_REQUEST_COMPONENT_ID,
+        null, // Access requirement ID
+        FLAG_ISSUE_PRIORITY
+      );
   }
 }
