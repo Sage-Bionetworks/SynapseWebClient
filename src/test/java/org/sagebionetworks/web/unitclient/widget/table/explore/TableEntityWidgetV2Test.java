@@ -59,8 +59,8 @@ import org.sagebionetworks.web.client.widget.CopyTextModal;
 import org.sagebionetworks.web.client.widget.clienthelp.FileViewClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
-import org.sagebionetworks.web.client.widget.entity.menu.v3.ActionListenerV2;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.Action;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.ActionListener;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
@@ -149,7 +149,7 @@ public class TableEntityWidgetV2Test {
   AuthenticationController mockAuthController;
 
   @Captor
-  ArgumentCaptor<ActionListenerV2> actionListenerCaptor;
+  ArgumentCaptor<ActionListener> actionListenerCaptor;
 
   @Mock
   TotalVisibleResultsWidget mockTotalVisibleResultsWidget;
@@ -574,7 +574,7 @@ public class TableEntityWidgetV2Test {
         eq(Action.SHOW_TABLE_SCHEMA),
         actionListenerCaptor.capture()
       );
-    ActionListenerV2 listener = actionListenerCaptor.getValue();
+    ActionListener listener = actionListenerCaptor.getValue();
     verify(mockView).setSchemaVisible(false);
     listener.onAction(Action.SHOW_TABLE_SCHEMA, null);
     verify(mockView).setSchemaVisible(true);
@@ -602,7 +602,7 @@ public class TableEntityWidgetV2Test {
         eq(Action.SHOW_VIEW_SCOPE),
         actionListenerCaptor.capture()
       );
-    ActionListenerV2 listener = actionListenerCaptor.getValue();
+    ActionListener listener = actionListenerCaptor.getValue();
     verify(mockView).setScopeVisible(false);
     listener.onAction(Action.SHOW_VIEW_SCOPE, null);
     verify(mockView).setScopeVisible(true);
@@ -811,7 +811,7 @@ public class TableEntityWidgetV2Test {
         eq(Action.EDIT_ENTITYREF_COLLECTION_ITEMS),
         actionListenerCaptor.capture()
       );
-    ActionListenerV2 listener = actionListenerCaptor.getValue();
+    ActionListener listener = actionListenerCaptor.getValue();
 
     listener.onAction(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, null);
     verify(mockView).setItemsEditorVisible(true);
@@ -955,7 +955,7 @@ public class TableEntityWidgetV2Test {
         actionListenerCaptor.capture()
       );
 
-    ActionListenerV2 onEditDatasetItems = actionListenerCaptor.getValue();
+    ActionListener onEditDatasetItems = actionListenerCaptor.getValue();
 
     // Check that we begin with the items editor closed.
     verify(mockView, never()).setItemsEditorVisible(true);
@@ -990,7 +990,7 @@ public class TableEntityWidgetV2Test {
         eq(Action.EDIT_ENTITYREF_COLLECTION_ITEMS),
         actionListenerCaptor.capture()
       );
-    ActionListenerV2 listener = actionListenerCaptor.getValue();
+    ActionListener listener = actionListenerCaptor.getValue();
 
     listener.onAction(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, null);
     verify(mockView).setItemsEditorVisible(true);

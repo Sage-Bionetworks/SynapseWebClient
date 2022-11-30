@@ -9,7 +9,6 @@ import org.sagebionetworks.web.client.jsinterop.ActionViewProps;
 import org.sagebionetworks.web.client.jsinterop.SxProps;
 import org.sagebionetworks.web.client.jsinterop.entity.actionmenu.EntityActionMenuLayout;
 import org.sagebionetworks.web.client.place.Synapse;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 
 public class DefaultEntityActionMenuLayoutUtil {
 

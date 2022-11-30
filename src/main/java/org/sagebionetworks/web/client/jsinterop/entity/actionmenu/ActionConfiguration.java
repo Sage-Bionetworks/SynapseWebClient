@@ -6,8 +6,8 @@ import jsinterop.annotations.JsOverlay;
 import jsinterop.annotations.JsPackage;
 import jsinterop.annotations.JsType;
 import org.sagebionetworks.web.client.jsinterop.ReactMouseEventHandler;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
-import org.sagebionetworks.web.client.widget.entity.menu.v3.ActionListenerV2;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.Action;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.ActionListener;
 
 @JsType(isNative = true, namespace = JsPackage.GLOBAL, name = "Object")
 public class ActionConfiguration {
@@ -21,7 +21,7 @@ public class ActionConfiguration {
   private ReactMouseEventHandler onClick;
 
   private Action _action;
-  private List<ActionListenerV2> _actionListeners;
+  private List<ActionListener> _actionListeners;
 
   @JsOverlay
   public static ActionConfiguration create(Action action, String text) {
@@ -55,7 +55,7 @@ public class ActionConfiguration {
   }
 
   @JsOverlay
-  public final void addActionListener(final ActionListenerV2 listener) {
+  public final void addActionListener(final ActionListener listener) {
     _actionListeners.add(listener);
   }
 
@@ -65,7 +65,7 @@ public class ActionConfiguration {
   }
 
   @JsOverlay
-  public final List<ActionListenerV2> getActionListeners() {
+  public final List<ActionListener> getActionListeners() {
     return _actionListeners;
   }
 

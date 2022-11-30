@@ -6,11 +6,9 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import java.util.Map;
-import jsinterop.base.Js;
 import jsinterop.base.JsPropertyMap;
 import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactMouseEventHandler;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.jsinterop.SkeletonButtonProps;
@@ -20,7 +18,6 @@ import org.sagebionetworks.web.client.jsinterop.entity.actionmenu.EntityActionMe
 import org.sagebionetworks.web.client.jsinterop.entity.actionmenu.EntityActionMenuLayout;
 import org.sagebionetworks.web.client.jsinterop.entity.actionmenu.EntityActionMenuProps;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 
 public class EntityActionMenuViewImpl implements EntityActionMenuView {
 

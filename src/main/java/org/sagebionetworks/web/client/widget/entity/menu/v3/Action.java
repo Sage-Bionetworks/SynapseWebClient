@@ -1,4 +1,4 @@
-package org.sagebionetworks.web.client.widget.entity.menu.v2;
+package org.sagebionetworks.web.client.widget.entity.menu.v3;
 
 /**
  * The enumeration of possible actions of an entity action menu.

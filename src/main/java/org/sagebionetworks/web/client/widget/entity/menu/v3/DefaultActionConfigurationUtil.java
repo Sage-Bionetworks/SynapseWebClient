@@ -5,7 +5,6 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import org.sagebionetworks.web.client.jsinterop.entity.actionmenu.ActionConfiguration;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 
 public class DefaultActionConfigurationUtil {
 

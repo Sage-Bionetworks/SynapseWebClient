@@ -1,10 +1,9 @@
 package org.sagebionetworks.web.client.widget.entity.menu.v3;
 
 import org.sagebionetworks.web.client.jsinterop.ReactMouseEvent;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 
 @FunctionalInterface
-public interface ActionListenerV2 {
+public interface ActionListener {
   /**
    * Called when a user invokes an action.
    *

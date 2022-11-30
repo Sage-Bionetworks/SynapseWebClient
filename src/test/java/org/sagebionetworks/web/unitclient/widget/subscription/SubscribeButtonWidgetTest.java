@@ -35,8 +35,8 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
-import org.sagebionetworks.web.client.widget.entity.menu.v3.ActionListenerV2;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.Action;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.ActionListener;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidgetView;
@@ -80,7 +80,7 @@ public class SubscribeButtonWidgetTest {
   EntityActionMenu mockActionMenuWidget;
 
   @Captor
-  ArgumentCaptor<ActionListenerV2> actionListenerCaptor;
+  ArgumentCaptor<ActionListener> actionListenerCaptor;
 
   private static final String TEST_OBJECT_ID = "3";
   private static final String TEST_SUBSCRIPTION_ID = "8837";
@@ -191,7 +191,7 @@ public class SubscribeButtonWidgetTest {
     verify(mockSynAlert).clear();
     verify(mockView).showUnfollowButton();
     verify(mockActionMenuWidget)
-      .setActionListener(eq(Action.FOLLOW), any(ActionListenerV2.class));
+      .setActionListener(eq(Action.FOLLOW), any(ActionListener.class));
     verify(mockActionMenuWidget)
       .setActionText(Action.FOLLOW, "Unfollow Thread");
   }
@@ -204,7 +204,7 @@ public class SubscribeButtonWidgetTest {
     verify(mockSynAlert).clear();
     verify(mockView).showFollowButton();
     verify(mockActionMenuWidget)
-      .setActionListener(eq(Action.FOLLOW), any(ActionListenerV2.class));
+      .setActionListener(eq(Action.FOLLOW), any(ActionListener.class));
     verify(mockActionMenuWidget).setActionText(Action.FOLLOW, "Follow Forum");
   }
 

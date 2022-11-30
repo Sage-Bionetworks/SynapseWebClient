@@ -138,8 +138,8 @@ import org.sagebionetworks.web.client.widget.entity.download.AddFolderDialogWidg
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
 import org.sagebionetworks.web.client.widget.entity.file.FileDownloadHandlerWidget;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
-import org.sagebionetworks.web.client.widget.entity.menu.v3.ActionListenerV2;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.Action;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.ActionListener;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModal;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
@@ -264,7 +264,7 @@ public class EntityActionControllerImplTest {
   ArgumentCaptor<AsyncCallback<UserBundle>> userBundleCaptor;
 
   @Captor
-  ArgumentCaptor<ActionListenerV2> actionListenerCaptor;
+  ArgumentCaptor<ActionListener> actionListenerCaptor;
 
   @Captor
   ArgumentCaptor<AsyncCallback<SnapshotResponse>> tableSnapshotResponseCaptor;

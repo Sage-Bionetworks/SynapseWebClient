@@ -65,8 +65,8 @@ import org.sagebionetworks.web.client.widget.discussion.SubscribersWidget;
 import org.sagebionetworks.web.client.widget.discussion.modal.EditDiscussionThreadModal;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
-import org.sagebionetworks.web.client.widget.entity.menu.v3.ActionListenerV2;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.Action;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.ActionListener;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.refresh.ReplyCountAlert;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
@@ -156,7 +156,7 @@ public class SingleDiscussionThreadWidgetTest {
   ArgumentCaptor<Callback> callbackCaptor;
 
   @Captor
-  ArgumentCaptor<ActionListenerV2> actionListenerCaptor;
+  ArgumentCaptor<ActionListener> actionListenerCaptor;
 
   @Mock
   SynapseJavascriptClient mockSynapseJavascriptClient;
@@ -349,7 +349,7 @@ public class SingleDiscussionThreadWidgetTest {
         eq(Action.EDIT_THREAD),
         actionListenerCaptor.capture()
       );
-    ActionListenerV2 actionListener = actionListenerCaptor.getValue();
+    ActionListener actionListener = actionListenerCaptor.getValue();
     actionListener.onAction(Action.EDIT_THREAD, null);
     verify(mockEditThreadModal).show();
 
@@ -422,7 +422,7 @@ public class SingleDiscussionThreadWidgetTest {
       .setActionText(eq(Action.PIN_THREAD), eq(UNPIN_THREAD_ACTION_TEXT));
     verify(mockActionMenuWidget)
       .setActionListener(eq(Action.PIN_THREAD), actionListenerCaptor.capture());
-    ActionListenerV2 actionListener = actionListenerCaptor.getValue();
+    ActionListener actionListener = actionListenerCaptor.getValue();
     actionListener.onAction(Action.EDIT_THREAD, null);
     verify(mockDiscussionForumClientAsync)
       .unpinThread(anyString(), any(AsyncCallback.class));

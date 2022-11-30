@@ -61,8 +61,8 @@ import org.sagebionetworks.web.client.widget.discussion.SingleDiscussionThreadWi
 import org.sagebionetworks.web.client.widget.discussion.SubscribersWidget;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModal;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
-import org.sagebionetworks.web.client.widget.entity.menu.v3.ActionListenerV2;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.Action;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.ActionListener;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
@@ -134,7 +134,7 @@ public class ForumWidgetTest {
   ArgumentCaptor<Callback> callbackCaptor;
 
   @Captor
-  ArgumentCaptor<ActionListenerV2> actionListenerCaptor;
+  ArgumentCaptor<ActionListener> actionListenerCaptor;
 
   @Mock
   SynapseJavascriptClient mockSynapseJavascriptClient;

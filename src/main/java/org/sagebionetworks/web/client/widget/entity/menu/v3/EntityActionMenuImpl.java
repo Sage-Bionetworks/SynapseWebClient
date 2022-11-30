@@ -11,7 +11,6 @@ import org.sagebionetworks.web.client.jsinterop.entity.actionmenu.ActionConfigur
 import org.sagebionetworks.web.client.jsinterop.entity.actionmenu.EntityActionMenuDropdownConfiguration;
 import org.sagebionetworks.web.client.jsinterop.entity.actionmenu.EntityActionMenuDropdownMap;
 import org.sagebionetworks.web.client.jsinterop.entity.actionmenu.EntityActionMenuLayout;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 
 public class EntityActionMenuImpl
   implements EntityActionMenu, EntityActionMenuView.Presenter {
@@ -41,20 +40,14 @@ public class EntityActionMenuImpl
   }
 
   @Override
-  public void setActionListener(
-    Action action,
-    ActionListenerV2 actionListener
-  ) {
+  public void setActionListener(Action action, ActionListener actionListener) {
     actionConfigurations.get(action).clearActionListeners();
     actionConfigurations.get(action).setHref(null);
     addActionListener(action, actionListener);
   }
 
   @Override
-  public void addActionListener(
-    Action action,
-    ActionListenerV2 actionListener
-  ) {
+  public void addActionListener(Action action, ActionListener actionListener) {
     actionConfigurations.get(action).addActionListener(actionListener);
   }
 
@@ -156,7 +149,7 @@ public class EntityActionMenuImpl
   @Override
   public void onAction(Action action, ReactMouseEvent mouseEvent) {
     // forward to the listeners
-    List<ActionListenerV2> listeners = actionConfigurations
+    List<ActionListener> listeners = actionConfigurations
       .get(action)
       .getActionListeners();
     if (listeners.isEmpty()) {
@@ -166,7 +159,7 @@ public class EntityActionMenuImpl
         " with no listeners present"
       );
     }
-    for (ActionListenerV2 listener : listeners) {
+    for (ActionListener listener : listeners) {
       listener.onAction(action, mouseEvent);
     }
   }

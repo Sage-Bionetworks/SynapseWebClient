@@ -20,8 +20,8 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
-import org.sagebionetworks.web.client.widget.entity.menu.v3.ActionListenerV2;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.Action;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.ActionListener;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 
 public class SubscribeButtonWidget
@@ -37,7 +37,7 @@ public class SubscribeButtonWidget
   GlobalApplicationState globalApplicationState;
   Callback onSubscribeCallback, onUnsubscribeCallback;
   EntityActionMenu actionMenu;
-  ActionListenerV2 subscribeActionListener, unsubscribeActionListener;
+  ActionListener subscribeActionListener, unsubscribeActionListener;
   boolean iconOnly;
 
   @Inject

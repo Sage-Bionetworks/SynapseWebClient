@@ -6,7 +6,7 @@ import com.google.inject.Inject;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.jsinterop.ReactMouseEvent;
 import org.sagebionetworks.web.client.jsinterop.ReactMouseEventHandler;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 
 public class FileDownloadMenuItemViewImpl implements FileDownloadMenuItemView {
