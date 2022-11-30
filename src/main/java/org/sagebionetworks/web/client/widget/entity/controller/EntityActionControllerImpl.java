@@ -603,8 +603,7 @@ public class EntityActionControllerImpl
 
   private void configureFullTextSearch() {
     if (
-      entityBundle.getEntity() instanceof Table &&
-      DisplayUtils.isInTestWebsite(cookies)
+      entityBundle.getEntity() instanceof Table
     ) {
       Table tableEntity = (Table) entityBundle.getEntity();
       actionMenu.setActionVisible(Action.TOGGLE_FULL_TEXT_SEARCH, true);
