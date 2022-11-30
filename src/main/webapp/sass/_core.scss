@@ -312,18 +312,22 @@ end sticky footer
   }
   .nav-tabs {
     display: flex;
-    padding-left: $entity-page-side-spacing;
     flex-wrap: wrap;
     border-bottom: none;
     box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.05);
     > li {
       margin-bottom: 0px;
+      > a {
+        font-weight: 900;
+      }
+    }
+    > li:not(.active):not(:hover) > a {
+      color: #878e95;
     }
   }
   .nav-tabs > li.active > a,
   .nav-tabs > li.active > a:hover,
   .nav-tabs > li.active > a:focus {
-    border: none;
     text-decoration: none;
   }
   .nav-tabs > li > a {
@@ -333,16 +337,15 @@ end sticky footer
     border-bottom: none;
   }
   .nav > li > a {
-    padding: 25px 15px 18px 15px;
+    height: 50px;
+    padding: 15px 2px;
   }
   .nav-tabs > li.active > a,
   #rootPanel .nav-tabs > li > a:hover {
     box-shadow: inset 0 -4px 0 $synapse-green;
     background-color: unset;
-    border: none;
+    border-color: transparent;
     text-decoration: none;
-    padding-top: 26px;
-    padding-bottom: 18px;
   }
   @media (min-width: 768px) {
     .lead {
@@ -2367,8 +2370,13 @@ i.fa.small-icon {
   }
 }
 @media (min-width: 992px) {
+  #body {
+    .nav-tabs {
+      padding-left: $entity-page-side-spacing;
+    }
+  }
   .entity-tab {
-    margin-right: 30px;
+    margin-right: 50px;
   }
   .finder-tab {
     width: 200px;
@@ -2395,7 +2403,7 @@ i.fa.small-icon {
     display: none !important;
   }
 }
-#body .entity-tab > a,
+
 #body .finder-tab > a {
   text-align: center;
   padding: 25px 15px 18px 15px;

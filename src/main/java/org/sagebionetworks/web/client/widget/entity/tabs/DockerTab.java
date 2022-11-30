@@ -50,9 +50,6 @@ public class DockerTab implements DockerTabView.Presenter {
       WebConstants.DOCS_URL + "Synapse-Docker-Registry.2011037752.html",
       EntityArea.DOCKER
     );
-
-    // Necessary for "beta" badge. Remove when bringing out of beta.
-    tab.addTabListItemStyle("min-width-150");
   }
 
   public void lazyInject() {
