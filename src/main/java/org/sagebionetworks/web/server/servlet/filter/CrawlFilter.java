@@ -529,15 +529,17 @@ public class CrawlFilter extends OncePerRequestFilter {
 
       json.put("dateModified", df.format(ds.getModifiedOn()));
 
-      object = new JSONObjectAdapterImpl();
-      object.put("@type", "Person");
-      UserProfile profile = synapseClient.getUserProfile(ds.getCreatedBy());
-      object.put("name", getDisplayName(profile));
-      object.put(
-        "url",
-        "https://www.synapse.org/#!Profile:" + ds.getCreatedBy()
-      );
-      json.put("creator", object);
+      //      TODO: Proper attribution is critical to our mission, so the creator must be updatable
+      //            by administrators of the Dataset (not hard-coded to the entity creator)
+      //      object = new JSONObjectAdapterImpl();
+      //      object.put("@type", "Person");
+      //      UserProfile profile = synapseClient.getUserProfile(ds.getCreatedBy());
+      //      object.put("name", getDisplayName(profile));
+      //      object.put(
+      //        "url",
+      //        "https://www.synapse.org/#!Profile:" + ds.getCreatedBy()
+      //      );
+      //      json.put("creator", object);
 
       html.append(json.toJSONString());
       html.append("</script>");
