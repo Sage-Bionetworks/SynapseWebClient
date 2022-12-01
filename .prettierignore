@@ -5,6 +5,7 @@
 
 # SVG files don't need to be human-readable
 *.svg
+*.png
 
 # These artifacts were generated and/or pre-minified and then checked in
 src/main/webapp/css/**/*
