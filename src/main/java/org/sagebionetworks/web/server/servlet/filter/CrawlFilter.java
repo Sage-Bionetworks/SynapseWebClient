@@ -344,6 +344,7 @@ public class CrawlFilter extends OncePerRequestFilter {
     EntityBundleRequest bundleRequest = new EntityBundleRequest();
     bundleRequest.setIncludeEntity(true);
     bundleRequest.setIncludeAnnotations(true);
+
     EntityBundle bundle = synapseClient.getEntityBundle(
       entityId,
       bundleRequest
@@ -352,13 +353,18 @@ public class CrawlFilter extends OncePerRequestFilter {
     if (entity instanceof Dataset) {
       // attempt to get the latest stable version (instead of the draft)
       try {
-        bundle =
-          synapseClient.getEntityBundleForVersion(
-            entityId,
-            ((Dataset) entity).getVersionNumber() - 1,
-            bundleRequest
-          );
-        entity = bundle.getEntity();
+        Long latestEntityVersion = synapseClient.getLatestEntityVersion(
+          entity.getId()
+        );
+        if (latestEntityVersion != null) {
+          bundle =
+            synapseClient.getEntityBundleForVersion(
+              entityId,
+              latestEntityVersion,
+              bundleRequest
+            );
+          entity = bundle.getEntity();
+        }
       } catch (RestServiceException e) {
         e.printStackTrace();
       }

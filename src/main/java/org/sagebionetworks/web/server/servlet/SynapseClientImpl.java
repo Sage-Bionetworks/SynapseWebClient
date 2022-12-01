@@ -54,6 +54,7 @@ import org.sagebionetworks.repo.model.TeamMemberTypeFilterOptions;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.auth.NewUserSignedToken;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.dao.WikiPageKeyHelper;
@@ -233,6 +234,24 @@ public class SynapseClientImpl
       throw ExceptionUtil.convertSynapseException(e);
     } catch (UnsupportedEncodingException e) {
       throw new UnknownErrorException(e.getMessage());
+    }
+  }
+
+  public Long getLatestEntityVersion(String entityId)
+    throws RestServiceException {
+    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    try {
+      org.sagebionetworks.reflection.model.PaginatedResults<VersionInfo> paginatedResults = synapseClient.getEntityVersions(
+        entityId,
+        0,
+        1
+      );
+      List<VersionInfo> results = paginatedResults.getResults();
+      if (results.size() > 0) {
+        return results.get(0).getVersionNumber();
+      } else return null;
+    } catch (SynapseException e) {
+      throw ExceptionUtil.convertSynapseException(e);
     }
   }
 

@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client;
 
 import java.io.IOException;
 import java.util.Properties;
-import org.jdom.JDOMException;
 import org.sagebionetworks.SettingsLoader;
 
 public class StackEndpoints {
@@ -64,7 +63,7 @@ public class StackEndpoints {
           }
         } catch (IOException e) {
           e.printStackTrace();
-        } catch (JDOMException e) {
+        } catch (Exception e) {
           e.printStackTrace();
         }
       }
