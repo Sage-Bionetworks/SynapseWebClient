@@ -12,9 +12,13 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
@@ -52,10 +56,13 @@ import org.sagebionetworks.repo.model.search.Hit;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.KeyValue;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
+import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
+import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
+import org.sagebionetworks.schema.adapter.org.json.JSONArrayAdapterImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.place.TeamSearch;
@@ -99,6 +106,8 @@ public class CrawlFilter extends OncePerRequestFilter {
     Pattern.CASE_INSENSITIVE
   );
 
+  DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
+
   private String removeSynapseWikiWidgets(String markdown) {
     return wikiWidgetPattern.matcher(markdown).replaceAll("");
   }
@@ -125,6 +134,8 @@ public class CrawlFilter extends OncePerRequestFilter {
   ) {
     this.synapseClient = synapseClient;
     this.discussionForumClient = discussionForumClient;
+
+    df.setTimeZone(TimeZone.getTimeZone("UTC"));
   }
 
   @Override
@@ -311,15 +322,21 @@ public class CrawlFilter extends OncePerRequestFilter {
       profile.getOwnerId() +
       "\">"
     );
-    if (profile.getFirstName() != null) {
-      createdByBuilder.append(profile.getFirstName() + " ");
-    }
-    if (profile.getLastName() != null) {
-      createdByBuilder.append(profile.getLastName() + " ");
-    }
+    createdByBuilder.append(getDisplayName(profile));
     createdByBuilder.append(profile.getUserName());
     createdByBuilder.append("</a>");
     return createdByBuilder.toString();
+  }
+
+  private String getDisplayName(UserProfile profile) {
+    StringBuilder displayNameBuilder = new StringBuilder();
+    if (profile.getFirstName() != null) {
+      displayNameBuilder.append(profile.getFirstName() + " ");
+    }
+    if (profile.getLastName() != null) {
+      displayNameBuilder.append(profile.getLastName() + " ");
+    }
+    return displayNameBuilder.toString();
   }
 
   private String getEntityHtml(String entityId)
@@ -332,6 +349,20 @@ public class CrawlFilter extends OncePerRequestFilter {
       bundleRequest
     );
     Entity entity = bundle.getEntity();
+    if (entity instanceof Dataset) {
+      // attempt to get the latest stable version (instead of the draft)
+      try {
+        bundle =
+          synapseClient.getEntityBundleForVersion(
+            entityId,
+            ((Dataset) entity).getVersionNumber() - 1,
+            bundleRequest
+          );
+        entity = bundle.getEntity();
+      } catch (RestServiceException e) {
+        e.printStackTrace();
+      }
+    }
     Annotations annotations = bundle.getAnnotations();
     String name = escapeHtml(entity.getName());
     String description = escapeHtml(entity.getDescription());
@@ -360,6 +391,9 @@ public class CrawlFilter extends OncePerRequestFilter {
     if (annotations.getAnnotations().containsKey("noindex")) {
       html.append(META_ROBOTS_NOINDEX);
     }
+
+    html.append(getDatasetScriptElement(bundle));
+
     html.append("</head><body><h1>" + name + "</h1>");
     if (description != null) {
       html.append(description + "<br />");
@@ -442,6 +476,72 @@ public class CrawlFilter extends OncePerRequestFilter {
       i++;
     } while (i < MAX_CHILD_PAGES && childList.getNextPageToken() != null);
     html.append("</body></html>");
+    return html.toString();
+  }
+
+  public String getDatasetScriptElement(EntityBundle bundle)
+    throws JSONObjectAdapterException, RestServiceException {
+    StringBuilder html = new StringBuilder();
+    if (bundle.getEntity() instanceof Dataset) {
+      Dataset ds = (Dataset) bundle.getEntity();
+      html.append("<script type=\"application/ld+json\">");
+      JSONObjectAdapter json = new JSONObjectAdapterImpl();
+      json.put("@context", "http://schema.org/");
+      json.put("@type", "Dataset");
+      json.put("name", ds.getName());
+      json.put("description", ds.getDescription());
+      json.put(
+        "url",
+        "https://www.synapse.org/#!Synapse:" +
+        ds.getId() +
+        "." +
+        ds.getVersionNumber()
+      );
+      json.put("version", ds.getVersionNumber());
+
+      // add annotations
+      JSONArrayAdapter array = new JSONArrayAdapterImpl();
+      Map<String, AnnotationsValue> annotations = bundle
+        .getAnnotations()
+        .getAnnotations();
+      Set<String> annotationKeys = annotations.keySet();
+      int index = 0;
+      for (String key : annotationKeys) {
+        List<String> keyValuePairList = new ArrayList<String>();
+        keyValuePairList.add(key);
+        List<String> values = annotations.get(key).getValue();
+        for (String value : values) {
+          keyValuePairList.add(value);
+        }
+        array.put(index++, String.join(", ", keyValuePairList));
+      }
+      json.put("keywords", array);
+
+      // include identifier if there is a DOI association?
+
+      JSONObjectAdapter object = new JSONObjectAdapterImpl();
+      object.put("@type", "DataCatalog");
+      object.put("name", "Synapse");
+      object.put("url", "https://www.synapse.org");
+      json.put("includedInDataCatalog", object);
+
+      json.put("isAccessibleForFree", true);
+
+      json.put("dateModified", df.format(ds.getModifiedOn()));
+
+      object = new JSONObjectAdapterImpl();
+      object.put("@type", "Person");
+      UserProfile profile = synapseClient.getUserProfile(ds.getCreatedBy());
+      object.put("name", getDisplayName(profile));
+      object.put(
+        "url",
+        "https://www.synapse.org/#!Profile:" + ds.getCreatedBy()
+      );
+      json.put("creator", object);
+
+      html.append(json.toJSONString());
+      html.append("</script>");
+    }
     return html.toString();
   }
 
