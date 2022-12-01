@@ -6,6 +6,7 @@
     "font-awesome": "4.7.0",
     "jquery": "3.5.1",
     "jsplumb": "2.13.2",
+    "moment": "^2.29.4",
     "pica": "6.0.0",
     "prop-types": "^15.6.2",
     "react": "18.2.0",
