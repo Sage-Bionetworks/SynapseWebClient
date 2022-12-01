@@ -35,9 +35,6 @@
         <bh:Div ui:field="createVersionJobTrackingWidgetContainer" />
       </b:ModalBody>
     </b:Modal>
-    <bh:Div
-      ui:field="extraWidgetsContainer"
-      addStyleNames="extraWidgetsContainer"
-    />
+    <bh:Div ui:field="extraWidgetsContainer" />
   </bh:Span>
 </ui:UiBinder>

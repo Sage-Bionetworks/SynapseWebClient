@@ -323,7 +323,19 @@ public class TableEntityWidgetV2
       );
 
     // Edit data
-    this.actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, hasQueryableData);
+    this.actionMenu.setActionEnabled(Action.EDIT_TABLE_DATA, hasQueryableData);
+    if (hasQueryableData) {
+      this.actionMenu.setActionTooltipText(
+          Action.EDIT_TABLE_DATA,
+          "Bulk edit cell values"
+        );
+    } else {
+      this.actionMenu.setActionText(
+          Action.EDIT_TABLE_DATA,
+          "There is no data to edit"
+        );
+    }
+    this.actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, true);
   }
 
   /**
