@@ -41,8 +41,9 @@ import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.Action;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.table.explore.TableEntityWidgetV2;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWikiWidget;
@@ -75,7 +76,7 @@ public class TableQueryResultWikiWidgetTest {
   TableEntityWidgetV2 mockTableEntityWidget;
 
   @Mock
-  ActionMenuWidget mockActionMenu;
+  EntityActionMenu mockActionMenu;
 
   @Mock
   EntityActionController mockEntityActionController;
@@ -100,6 +101,9 @@ public class TableQueryResultWikiWidgetTest {
   @Captor
   ArgumentCaptor<Callback> callbackCaptor;
 
+  @Mock
+  AddToDownloadListV2 mockAddToDownloadListWidget;
+
   @Before
   public void before() {
     when(mockGinInjector.getCookieProvider()).thenReturn(mockCookies);
@@ -112,7 +116,8 @@ public class TableQueryResultWikiWidgetTest {
         mockSynapseJavascriptClient,
         mockSynAlert,
         mockGWT,
-        mockGinInjector
+        mockGinInjector,
+        mockAddToDownloadListWidget
       );
     AsyncMockStubber
       .callSuccessWith(mockEntityBundle)
@@ -164,7 +169,8 @@ public class TableQueryResultWikiWidgetTest {
         mockEntityBundle,
         isCurrentVersion,
         wikiPageRootId,
-        EntityArea.TABLES
+        EntityArea.TABLES,
+        mockAddToDownloadListWidget
       );
     boolean canEdit = false;
     verify(mockTableEntityWidget)
@@ -288,7 +294,8 @@ public class TableQueryResultWikiWidgetTest {
       mockSynapseJavascriptClient,
       mockSynAlert,
       mockGWT,
-      mockGinInjector
+      mockGinInjector,
+      mockAddToDownloadListWidget
     );
     TableQueryResultWikiWidget widget2 = new TableQueryResultWikiWidget(
       mockView,
@@ -298,7 +305,8 @@ public class TableQueryResultWikiWidgetTest {
       mockSynapseJavascriptClient,
       mockSynAlert,
       mockGWT,
-      mockGinInjector
+      mockGinInjector,
+      mockAddToDownloadListWidget
     );
 
     Map<String, String> descriptor = new HashMap<String, String>();

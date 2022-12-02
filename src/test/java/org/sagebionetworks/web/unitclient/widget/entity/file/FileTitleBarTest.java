@@ -11,7 +11,6 @@ import static org.mockito.Mockito.when;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Widget;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -37,7 +36,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PopupUtilsView;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -47,10 +45,10 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.EntityBadge;
 import org.sagebionetworks.web.client.widget.entity.VersionHistoryWidget;
-import org.sagebionetworks.web.client.widget.entity.file.FileDownloadMenuItem;
+import org.sagebionetworks.web.client.widget.entity.file.FileDownloadHandlerWidget;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBarView;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -77,16 +75,13 @@ public class FileTitleBarTest {
   Long synStorageLocationId = 1L;
 
   @Mock
-  FileDownloadMenuItem mockFileDownloadButton;
+  FileDownloadHandlerWidget mockFileDownloadButton;
 
   @Mock
   ExternalObjectStoreFileHandle mockExternalObjectStoreFileHandle;
 
   @Mock
-  ActionMenuWidget mockActionMenuWidget;
-
-  @Mock
-  SynapseJSNIUtils mockSynapseJSNIUtils;
+  EntityActionMenu mockActionMenuWidget;
 
   @Mock
   SynapseJavascriptClient mockJsClient;
@@ -95,9 +90,6 @@ public class FileTitleBarTest {
   FileClientsHelp mockFileClientsHelp;
 
   List<VersionInfo> versions;
-
-  @Mock
-  VersionInfo mockCurrentVersion;
 
   @Mock
   EventBus mockEventBus;
@@ -140,10 +132,8 @@ public class FileTitleBarTest {
         mockJsClient,
         mockFileClientsHelp,
         mockEventBus,
-        mockSynapseJSNIUtils,
         mockGlobalApplicationState,
         mockAuthController,
-        mockCookies,
         mockPopupUtils
       );
     when(mockGlobalApplicationState.getPlaceChanger())
@@ -169,7 +159,6 @@ public class FileTitleBarTest {
     s3FileHandle.setStorageLocationId(synStorageLocationId);
     fileHandles.add(s3FileHandle);
     Mockito.when(mockBundle.getFileHandles()).thenReturn(fileHandles);
-    verify(mockView).setFileDownloadMenuItem(any(Widget.class));
     versions = new ArrayList<>();
     when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(USER_ID);
     AsyncMockStubber
@@ -196,7 +185,6 @@ public class FileTitleBarTest {
 
   @Test
   public void testConstruction() {
-    verify(mockView).setFileDownloadMenuItem(any(Widget.class));
     verify(mockView).setPresenter(fileTitleBar);
   }
 
@@ -260,22 +248,8 @@ public class FileTitleBarTest {
       mockActionMenuWidget,
       mockVersionHistoryWidget
     );
-    verify(mockFileDownloadButton).configure(mockBundle);
+    verify(mockFileDownloadButton).configure(mockActionMenuWidget, mockBundle);
     verify(mockView).setVersion(FILE_VERSION);
-    verify(mockView).setCanDownload(true); // set up in the Before
-  }
-
-  @Test
-  public void testCannotDownload() {
-    when(mockPermissions.getCanDownload()).thenReturn(false);
-
-    fileTitleBar.configure(
-      mockBundle,
-      mockActionMenuWidget,
-      mockVersionHistoryWidget
-    );
-
-    verify(mockView).setCanDownload(false);
   }
 
   @Test
@@ -410,7 +384,7 @@ public class FileTitleBarTest {
       mockActionMenuWidget,
       mockVersionHistoryWidget
     );
-    verify(mockFileDownloadButton).configure(mockBundle);
+    verify(mockFileDownloadButton).configure(mockActionMenuWidget, mockBundle);
     verify(mockView).setExternalObjectStoreUIVisible(true);
     verify(mockView).setExternalObjectStoreInfo(endpoint, bucket, fileKey);
   }

@@ -17,8 +17,8 @@ import org.sagebionetworks.web.client.events.WikiSubpagesCollapseEvent;
 import org.sagebionetworks.web.client.events.WikiSubpagesExpandEvent;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.Action;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 public class WikiSubpagesViewImpl
@@ -71,7 +71,7 @@ public class WikiSubpagesViewImpl
     final WikiPageKey curWikiKey,
     boolean isEmbeddedInOwnerPage,
     CallbackP<WikiPageKey> wikiPageCallback,
-    ActionMenuWidget actionMenu
+    EntityActionMenu actionMenu
   ) {
     clear();
     navTreeContainer = new FlowPanel();
@@ -117,7 +117,7 @@ public class WikiSubpagesViewImpl
     if (actionMenu != null) {
       actionMenu.setActionListener(
         Action.REORDER_WIKI_SUBPAGES,
-        action -> editOrderClickHandler.onClick(null)
+        (action, e) -> editOrderClickHandler.onClick(null)
       );
     }
     showHideButton.addClickHandler(

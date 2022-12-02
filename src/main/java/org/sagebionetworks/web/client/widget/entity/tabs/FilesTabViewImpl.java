@@ -36,6 +36,9 @@ public class FilesTabViewImpl implements FilesTabView {
   SimplePanel filesWikiPageContainer;
 
   @UiField
+  SimplePanel addToDownloadListWidgetContainer;
+
+  @UiField
   Column filePreviewContainer;
 
   @UiField
@@ -289,5 +292,11 @@ public class FilesTabViewImpl implements FilesTabView {
   @Override
   public void setFilesTab(FilesTab presenter) {
     this.presenter = presenter;
+  }
+
+  @Override
+  public void setAddToDownloadListWidget(IsWidget w) {
+    addToDownloadListWidgetContainer.clear();
+    addToDownloadListWidgetContainer.add(w);
   }
 }

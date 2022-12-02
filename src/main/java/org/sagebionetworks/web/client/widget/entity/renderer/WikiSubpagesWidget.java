@@ -16,7 +16,7 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
@@ -29,7 +29,7 @@ public class WikiSubpagesWidget
   private Place ownerObjectLink;
 
   private boolean canEdit;
-  private ActionMenuWidget actionMenu;
+  private EntityActionMenu actionMenu;
 
   // true if wiki is embedded in it's owner page. false if it should be shown as a stand-alone wiki
   private boolean isEmbeddedInOwnerPage;
@@ -53,7 +53,7 @@ public class WikiSubpagesWidget
     final WikiPageKey wikiKey,
     boolean embeddedInOwnerPage,
     CallbackP<WikiPageKey> reloadWikiPageCallback,
-    ActionMenuWidget actionMenu
+    EntityActionMenu actionMenu
   ) {
     // SWC-4177: if loading a page within the currently shown nav tree, don't reload the tree.
     if (

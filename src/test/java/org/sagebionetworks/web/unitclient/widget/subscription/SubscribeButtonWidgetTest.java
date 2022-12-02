@@ -1,9 +1,9 @@
 package org.sagebionetworks.web.unitclient.widget.subscription;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertNull;
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -35,9 +35,9 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionListener;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.Action;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.ActionListener;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidgetView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -77,7 +77,7 @@ public class SubscribeButtonWidgetTest {
   Subscription mockSubscription;
 
   @Mock
-  ActionMenuWidget mockActionMenuWidget;
+  EntityActionMenu mockActionMenuWidget;
 
   @Captor
   ArgumentCaptor<ActionListener> actionListenerCaptor;
@@ -175,7 +175,7 @@ public class SubscribeButtonWidgetTest {
       .setActionListener(eq(Action.FOLLOW), actionListenerCaptor.capture());
 
     // simulate click
-    actionListenerCaptor.getValue().onAction(Action.FOLLOW);
+    actionListenerCaptor.getValue().onAction(Action.FOLLOW, null);
     verify(mockView).showErrorMessage(DisplayConstants.ERROR_LOGIN_REQUIRED);
     verify(mockPlaceChanger).goTo(isA(LoginPlace.class));
   }

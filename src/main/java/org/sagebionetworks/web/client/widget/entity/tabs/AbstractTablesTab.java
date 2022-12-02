@@ -362,7 +362,7 @@ public abstract class AbstractTablesTab
     boolean isCurrentVersion =
       !isProject && ((Table) entity).getIsLatestVersion();
 
-    tab.configureEntityActionController(bundle, isCurrentVersion, null);
+    tab.configureEntityActionController(bundle, isCurrentVersion, null, null);
     if (isShownInTab) {
       final boolean canEdit = bundle.getPermissions().getCanCertifiedUserEdit();
 

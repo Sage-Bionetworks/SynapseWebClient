@@ -1,37 +1,27 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.jsinterop.ReactMouseEvent;
+import org.sagebionetworks.web.client.jsinterop.ReactMouseEventHandler;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.Action;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 
 public class FileDownloadMenuItemViewImpl implements FileDownloadMenuItemView {
 
   private Presenter presenter;
+  private EntityActionMenu actionMenu;
+  String href;
 
-  @UiField
-  AnchorListItem downloadLink;
-
+  FlowPanel panel;
   PortalGinInjector ginInjector;
-
-  interface FileDownloadMenuItemViewImplUiBinder
-    extends UiBinder<Widget, FileDownloadMenuItemViewImpl> {}
-
-  private static FileDownloadMenuItemViewImplUiBinder uiBinder = GWT.create(
-    FileDownloadMenuItemViewImplUiBinder.class
-  );
-  Widget widget;
-  ClickHandler licensedDownloadClickHandler, directDownloadClickHandler, sftpDownloadClickHandler;
-  HandlerRegistration downloadLinkHandlerRegistration;
+  ReactMouseEventHandler licensedDownloadClickHandler, directDownloadClickHandler, sftpDownloadClickHandler;
 
   @Inject
   public FileDownloadMenuItemViewImpl(PortalGinInjector ginInjector) {
-    widget = uiBinder.createAndBindUi(this);
+    this.panel = new FlowPanel();
     this.ginInjector = ginInjector;
     licensedDownloadClickHandler =
       event -> {
@@ -52,44 +42,57 @@ public class FileDownloadMenuItemViewImpl implements FileDownloadMenuItemView {
   public void clear() {}
 
   private void clearClickHandlers() {
-    if (downloadLinkHandlerRegistration != null) {
-      downloadLinkHandlerRegistration.removeHandler();
-    }
-    downloadLink.setHref("#");
+    this.actionMenu.setActionHref(Action.DOWNLOAD_FILE, "#");
   }
 
   @Override
   public void setIsSFTPDownload() {
-    String href = downloadLink.getHref();
+    String oldHref = this.href;
     clearClickHandlers();
-    downloadLink.setHref(href);
-    downloadLinkHandlerRegistration =
-      downloadLink.addClickHandler(sftpDownloadClickHandler);
+    this.href = oldHref;
+    actionMenu.setActionHref(Action.DOWNLOAD_FILE, this.href);
+    actionMenu.addActionListener(
+      Action.DOWNLOAD_FILE,
+      (Action action, ReactMouseEvent event) ->
+        sftpDownloadClickHandler.onClick(event)
+    );
   }
 
   @Override
   public void setIsUnauthenticatedS3DirectDownload() {
     clearClickHandlers();
-    downloadLinkHandlerRegistration =
-      downloadLink.addClickHandler(licensedDownloadClickHandler);
+    actionMenu.setActionListener(
+      Action.DOWNLOAD_FILE,
+      (Action action, ReactMouseEvent event) ->
+        licensedDownloadClickHandler.onClick(event)
+    );
   }
 
   @Override
   public void setIsDirectDownloadLink(String href) {
     clearClickHandlers();
-    downloadLink.setHref(href);
-    downloadLinkHandlerRegistration =
-      downloadLink.addClickHandler(directDownloadClickHandler);
+    this.href = href;
+    actionMenu.setActionHref(Action.DOWNLOAD_FILE, href);
+    actionMenu.addActionListener(
+      Action.DOWNLOAD_FILE,
+      (Action action, ReactMouseEvent event) ->
+        directDownloadClickHandler.onClick(event)
+    );
   }
 
   @Override
   public Widget asWidget() {
-    return widget;
+    return panel.asWidget();
   }
 
   @Override
   public void setPresenter(Presenter presenter) {
     this.presenter = presenter;
+  }
+
+  @Override
+  public void setActionMenu(EntityActionMenu actionMenu) {
+    this.actionMenu = actionMenu;
   }
 
   @Override

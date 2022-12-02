@@ -39,7 +39,7 @@ import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.DatasetsTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.DiscussionTab;
@@ -52,12 +52,11 @@ import org.sagebionetworks.web.client.widget.entity.tabs.WikiTab;
 
 public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 
-  public static final String PROJECT_SETTINGS = "Project Settings";
-  private EntityPageTopView view;
+  private final EntityPageTopView view;
   private EntityBundle currentTargetEntityBundle, projectBundle, filesEntityBundle, tablesEntityBundle, dockerEntityBundle, datasetsEntityBundle;
   private Throwable projectBundleLoadError;
   private Entity entity;
-  private SynapseJavascriptClient synapseJavascriptClient;
+  private final SynapseJavascriptClient synapseJavascriptClient;
 
   private Synapse.EntityArea area;
   private String initialAreaToken;
@@ -65,26 +64,26 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
   private Long currentTargetVersionNumber, filesVersionNumber, tablesVersionNumber, datasetsVersionNumber;
   private EntityHeader projectHeader;
 
-  private Tabs tabs;
-  private WikiTab wikiTab;
-  private FilesTab filesTab;
-  private TablesTab tablesTab;
-  private DatasetsTab datasetsTab;
-  private ChallengeTab challengeTab;
-  private DiscussionTab discussionTab;
-  private DockerTab dockerTab;
-  private BasicTitleBar projectTitleBar;
-  private EntityMetadata projectMetadata;
-  private SynapseClientAsync synapseClient;
+  private final Tabs tabs;
+  private final WikiTab wikiTab;
+  private final FilesTab filesTab;
+  private final TablesTab tablesTab;
+  private final DatasetsTab datasetsTab;
+  private final ChallengeTab challengeTab;
+  private final DiscussionTab discussionTab;
+  private final DockerTab dockerTab;
+  private final BasicTitleBar projectTitleBar;
+  private final EntityMetadata projectMetadata;
+  private final SynapseClientAsync synapseClient;
   // how many tabs have been marked as visible
   private int visibleTabCount;
 
-  private EntityActionController projectActionController;
-  private ActionMenuWidget projectActionMenu;
-  private PlaceChanger placeChanger;
-  private CookieProvider cookies;
-  private EventBus eventBus;
-  private EntityId2BundleCache entityId2BundleCache;
+  private final EntityActionController projectActionController;
+  private final EntityActionMenu projectActionMenu;
+  private final PlaceChanger placeChanger;
+  private final CookieProvider cookies;
+  private final EventBus eventBus;
+  private final EntityId2BundleCache entityId2BundleCache;
   public boolean pushTabUrlToBrowserHistory = false;
   public static final EntityBundleRequest ALL_PARTS_REQUEST = new EntityBundleRequest();
   private int countTabContentChecked;
@@ -123,7 +122,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
     DiscussionTab discussionTab,
     DockerTab dockerTab,
     EntityActionController projectActionController,
-    ActionMenuWidget projectActionMenu,
+    EntityActionMenu projectActionMenu,
     CookieProvider cookies,
     SynapseJavascriptClient synapseJavascriptClient,
     GlobalApplicationState globalAppState,
@@ -810,9 +809,10 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
         projectBundle,
         true,
         wikiId,
+        null,
+        // The project action controller doesn't surface download functionality
         null
       );
-      projectActionMenu.setToolsButtonIcon(PROJECT_SETTINGS, null);
     }
 
     initDefaultTabPlaces();

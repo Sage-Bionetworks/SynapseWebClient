@@ -76,6 +76,7 @@ import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget;
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceEditor;
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceSourceEditor;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
+import org.sagebionetworks.web.client.widget.clienthelp.ContainerClientsHelp;
 import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelp;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListItemWidget;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidget;
@@ -154,6 +155,7 @@ import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
+import org.sagebionetworks.web.client.widget.entity.file.FileDownloadHandlerWidget;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.S3DirectLoginDialog;
 import org.sagebionetworks.web.client.widget.entity.file.TableTitleBar;
@@ -850,6 +852,8 @@ public interface PortalGinInjector extends Ginjector {
 
   WikiVersionAnchorListItem getWikiVersionAnchorListItem();
 
+  FileDownloadHandlerWidget getFileDownloadHandlerWidget();
+
   SynapseProperties getSynapseProperties();
 
   QuizInfoDialog getQuizInfoDialog();
@@ -896,5 +900,8 @@ public interface PortalGinInjector extends Ginjector {
   JSONObjectAdapter getJSONObjectAdapter();
 
   QueryClientProvider getQueryClientProvider();
+
   PopupUtilsView getPopupUtils();
+
+  ContainerClientsHelp getContainerClientsHelp();
 }

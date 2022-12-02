@@ -23,7 +23,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.SynapseForumView;
 import org.sagebionetworks.web.client.widget.discussion.ForumWidget;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 
 public class SynapseForumPresenterTest {
 
@@ -78,7 +78,7 @@ public class SynapseForumPresenterTest {
         anyString(),
         any(ParameterizedToken.class),
         eq(DEFAULT_IS_MODERATOR),
-        any(ActionMenuWidget.class),
+        any(EntityActionMenu.class),
         any(CallbackP.class),
         any(Callback.class)
       );

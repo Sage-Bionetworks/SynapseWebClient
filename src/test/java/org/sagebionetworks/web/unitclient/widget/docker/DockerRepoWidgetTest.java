@@ -27,7 +27,7 @@ import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.file.DockerTitleBar;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -67,7 +67,7 @@ public class DockerRepoWidgetTest {
   CookieProvider mockCookieProvider;
 
   @Mock
-  ActionMenuWidget mockActionWidget;
+  EntityActionMenu mockActionWidget;
 
   @Mock
   EventBus mockEventBus;

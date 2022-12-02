@@ -5,19 +5,14 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import com.google.gwt.user.client.ui.IsWidget;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
-import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,22 +20,15 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.web.client.jsinterop.ReactMouseEvent;
 import org.sagebionetworks.web.client.jsinterop.entity.actionmenu.ActionConfiguration;
 import org.sagebionetworks.web.client.jsinterop.entity.actionmenu.EntityActionMenuDropdownMap;
 import org.sagebionetworks.web.client.jsinterop.entity.actionmenu.EntityActionMenuLayout;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionListener;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidgetImpl;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidgetView;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionView;
-import org.sagebionetworks.web.client.widget.entity.menu.v3.ActionListenerV2;
-import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.Action;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.ActionListener;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenuImpl;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenuView;
-import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenuViewImpl;
 
 @RunWith(MockitoJUnitRunner.class)
 public class EntityActionMenuImplTest {
@@ -49,7 +37,7 @@ public class EntityActionMenuImplTest {
   EntityActionMenuView mockView;
 
   @Mock
-  ActionListenerV2 mockActionListener;
+  ActionListener mockActionListener;
 
   @Mock
   ReactMouseEvent mockMouseEvent;
@@ -100,7 +88,7 @@ public class EntityActionMenuImplTest {
 
   @Test
   public void testSetActionListener() {
-    ActionListenerV2 mockActionListener2 = Mockito.mock(ActionListenerV2.class);
+    ActionListener mockActionListener2 = Mockito.mock(ActionListener.class);
     entityActionMenu.setActionListener(
       Action.CHANGE_ENTITY_NAME,
       mockActionListener2
@@ -121,7 +109,7 @@ public class EntityActionMenuImplTest {
 
   @Test
   public void testAddActionListener() {
-    ActionListenerV2 mockActionListener2 = Mockito.mock(ActionListenerV2.class);
+    ActionListener mockActionListener2 = Mockito.mock(ActionListener.class);
     entityActionMenu.addActionListener(
       Action.CHANGE_ENTITY_NAME,
       mockActionListener2

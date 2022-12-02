@@ -33,6 +33,10 @@ import static org.sagebionetworks.web.client.widget.entity.controller.EntityActi
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.UPDATE_DOI_FOR;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.WAS_SUCCESSFULLY_DELETED;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.WIKI;
+import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_COLLECTOR_URL;
+import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_DESCRIPTION_PART_1;
+import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_PRIORITY;
+import static org.sagebionetworks.web.shared.WebConstants.REVIEW_DATA_REQUEST_COMPONENT_ID;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
@@ -42,7 +46,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.junit.Before;
 import org.junit.Test;
@@ -59,6 +62,8 @@ import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityChildrenResponse;
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.EntityTypeUtils;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -67,7 +72,9 @@ import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.ResourceAccess;
+import org.sagebionetworks.repo.model.RestrictionInformationResponse;
 import org.sagebionetworks.repo.model.UserBundle;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
@@ -94,6 +101,7 @@ import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
@@ -111,6 +119,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
+import org.sagebionetworks.web.client.widget.clienthelp.ContainerClientsHelp;
 import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModal;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
@@ -127,8 +136,11 @@ import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceEditorW
 import org.sagebionetworks.web.client.widget.entity.controller.StorageLocationWidget;
 import org.sagebionetworks.web.client.widget.entity.download.AddFolderDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
+import org.sagebionetworks.web.client.widget.entity.file.FileDownloadHandlerWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.Action;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.ActionListener;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModal;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
@@ -198,7 +210,7 @@ public class EntityActionControllerImplTest {
   UploadDialogWidget mockUploader;
 
   @Mock
-  ActionMenuWidget mockActionMenu;
+  EntityActionMenu mockActionMenu;
 
   @Mock
   EventBus mockEventBus;
@@ -250,6 +262,9 @@ public class EntityActionControllerImplTest {
 
   @Captor
   ArgumentCaptor<AsyncCallback<UserBundle>> userBundleCaptor;
+
+  @Captor
+  ArgumentCaptor<ActionListener> actionListenerCaptor;
 
   @Captor
   ArgumentCaptor<AsyncCallback<SnapshotResponse>> tableSnapshotResponseCaptor;
@@ -320,6 +335,21 @@ public class EntityActionControllerImplTest {
   @Mock
   MaterializedView mockMaterializedView;
 
+  @Mock
+  AddToDownloadListV2 mockAddToDownloadListWidget;
+
+  @Mock
+  RestrictionInformationResponse mockRestrictionInformation;
+
+  @Mock
+  FileDownloadHandlerWidget mockFileDownloadHandlerWidget;
+
+  @Mock
+  SynapseJSNIUtilsImpl mockJsniUtils;
+
+  @Mock
+  ContainerClientsHelp mockContainerClientsHelp;
+
   PromptForValuesModalView.Configuration.Builder mockPromptModalConfigurationBuilder;
   Set<ResourceAccess> resourceAccessSet;
 
@@ -386,6 +416,7 @@ public class EntityActionControllerImplTest {
       .thenReturn(mockPublicPrincipalIds);
     when(mockPortalGinInjector.getSynapseJavascriptClient())
       .thenReturn(mockSynapseJavascriptClient);
+    when(mockPortalGinInjector.getSynapseJSNIUtils()).thenReturn(mockJsniUtils);
     when(mockPortalGinInjector.getCreateTableViewWizard())
       .thenReturn(mockCreateTableViewWizard);
     when(mockPortalGinInjector.getUploadTableModalWidget())
@@ -398,8 +429,15 @@ public class EntityActionControllerImplTest {
       .thenReturn(mockJobTrackingWidget);
     when(mockPortalGinInjector.getPromptForValuesModalConfigurationBuilder())
       .thenReturn(mockPromptModalConfigurationBuilder);
+    when(mockPortalGinInjector.getFileDownloadHandlerWidget())
+      .thenReturn(mockFileDownloadHandlerWidget);
+    when(mockPortalGinInjector.getContainerClientsHelp())
+      .thenReturn(mockContainerClientsHelp);
     when(mockIsACTMemberAsyncHandler.isACTActionAvailable())
       .thenReturn(getDoneFuture(false));
+    when(mockSynapseJavascriptClient.getRestrictionInformation(any(), any()))
+      .thenReturn(getDoneFuture(mockRestrictionInformation));
+
     // The controller under test.
     controller =
       new EntityActionControllerImpl(
@@ -429,6 +467,7 @@ public class EntityActionControllerImplTest {
     permissions.setCanDelete(true);
     permissions.setCanPublicRead(true);
     permissions.setCanUpload(true);
+    permissions.setCanDownload(true);
     permissions.setCanAddChild(true);
     permissions.setCanEdit(true);
     permissions.setCanCertifiedUserEdit(true);
@@ -436,6 +475,7 @@ public class EntityActionControllerImplTest {
     permissions.setCanMove(true);
     entityBundle = new EntityBundle();
     entityBundle.setEntity(table);
+    entityBundle.setHasChildren(false);
     entityBundle.setPermissions(permissions);
     entityBundle.setDoiAssociation(new DoiAssociation());
     entityBundle.setBenefactorAcl(mockACL);
@@ -489,7 +529,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     // delete
     verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, true);
@@ -548,7 +589,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       isCurrentVersion,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     // delete
     verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, true);
@@ -610,7 +652,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       isCurrentVersion,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     // Cannot delete
     verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, false);
@@ -666,7 +709,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       isCurrentVersion,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     // delete
     verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, true);
@@ -722,7 +766,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       isCurrentVersion,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     // delete
     verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, true);
@@ -785,7 +830,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       isCurrentVersion,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     // Cannot delete
     verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, false);
@@ -842,7 +888,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       isCurrentVersion,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     // delete
     verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, true);
@@ -897,7 +944,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     // delete
     verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, true);
@@ -949,7 +997,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     // delete
     verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, true);
@@ -1007,7 +1056,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     // Cannot delete without permission
     verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, false);
@@ -1055,7 +1105,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
 
     verify(mockActionMenu)
@@ -1078,12 +1129,11 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.CHANGE_ENTITY_NAME, false);
     verify(mockActionMenu).setActionVisible(Action.MOVE_ENTITY, false);
-    verify(mockActionMenu)
-      .setToolsButtonIcon("Docker Repository Tools", IconType.GEAR);
     verify(mockActionMenu)
       .setActionVisible(Action.TOGGLE_FULL_TEXT_SEARCH, false);
   }
@@ -1110,7 +1160,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
 
     verify(mockActionMenu)
@@ -1130,8 +1181,6 @@ public class EntityActionControllerImplTest {
       .setActionVisible(Action.ADD_MATERIALIZED_VIEW, canCertifiedUserEdit);
     verify(mockActionMenu)
       .setActionListener(Action.ADD_MATERIALIZED_VIEW, controller);
-
-    verify(mockActionMenu).setToolsButtonIcon("Add New", null);
   }
 
   @Test
@@ -1145,7 +1194,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
 
     verify(mockActionMenu)
@@ -1171,14 +1221,14 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
 
     verify(mockActionMenu).setActionVisible(Action.UPLOAD_TABLE, false);
     verify(mockActionMenu).setActionVisible(Action.ADD_TABLE, false);
     verify(mockActionMenu).setActionVisible(Action.ADD_FILE_VIEW, false);
     verify(mockActionMenu).setActionVisible(Action.ADD_PROJECT_VIEW, false);
-    verify(mockActionMenu).setToolsButtonIcon("Files Tools", IconType.GEAR);
   }
 
   @Test
@@ -1196,7 +1246,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
 
     verify(mockActionMenu)
@@ -1206,8 +1257,6 @@ public class EntityActionControllerImplTest {
       .setActionVisible(Action.ADD_DATASET_COLLECTION, canCertifiedUserEdit);
     verify(mockActionMenu)
       .setActionListener(Action.ADD_DATASET_COLLECTION, controller);
-
-    verify(mockActionMenu).setToolsButtonIcon("Add New", null);
   }
 
   @Test
@@ -1221,7 +1270,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
 
     verify(mockActionMenu)
@@ -1244,13 +1294,13 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
 
     verify(mockActionMenu).setActionVisible(Action.ADD_DATASET, false);
     verify(mockActionMenu)
       .setActionVisible(Action.ADD_DATASET_COLLECTION, false);
-    verify(mockActionMenu).setToolsButtonIcon("Files Tools", IconType.GEAR);
   }
 
   @Test
@@ -1278,7 +1328,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.REORDER_WIKI_SUBPAGES, true);
   }
@@ -1298,7 +1349,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     verify(mockActionMenu)
       .setActionVisible(Action.REORDER_WIKI_SUBPAGES, false);
@@ -1315,7 +1367,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     verify(mockActionMenu)
       .setActionVisible(Action.REORDER_WIKI_SUBPAGES, false);
@@ -1332,7 +1385,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     verify(mockActionMenu)
       .setActionVisible(Action.REORDER_WIKI_SUBPAGES, false);
@@ -1346,11 +1400,10 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
 
-    verify(mockActionMenu)
-      .setActionIcon(Action.VIEW_SHARING_SETTINGS, IconType.GLOBE);
     verify(mockActionMenu).setActionVisible(Action.SHOW_ANNOTATIONS, true);
     verify(mockActionMenu).setActionVisible(Action.SHOW_VERSION_HISTORY, true);
 
@@ -1370,7 +1423,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
 
     verify(mockActionMenu).setActionVisible(Action.CREATE_TABLE_VERSION, true);
@@ -1381,7 +1435,6 @@ public class EntityActionControllerImplTest {
     verify(mockActionMenu).setActionVisible(Action.EDIT_TABLE_DATA, false);
     verify(mockActionMenu).setActionVisible(Action.SHOW_TABLE_SCHEMA, true);
     verify(mockActionMenu).setActionVisible(Action.SHOW_VIEW_SCOPE, false);
-    verify(mockActionMenu).setToolsButtonIcon("Table Tools", IconType.GEAR);
   }
 
   @Test
@@ -1396,10 +1449,9 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
-    verify(mockActionMenu)
-      .setActionIcon(Action.VIEW_SHARING_SETTINGS, IconType.GLOBE);
     verify(mockActionMenu).setActionVisible(Action.SHOW_ANNOTATIONS, true);
     verify(mockActionMenu).setActionVisible(Action.SHOW_VERSION_HISTORY, true);
 
@@ -1408,20 +1460,6 @@ public class EntityActionControllerImplTest {
     verify(mockActionMenu).setActionVisible(Action.EDIT_TABLE_DATA, false);
     verify(mockActionMenu).setActionVisible(Action.SHOW_TABLE_SCHEMA, false);
     verify(mockActionMenu).setActionVisible(Action.SHOW_VIEW_SCOPE, false);
-  }
-
-  @Test
-  public void testConfigureNotPublicIsLoggedIn() {
-    entityBundle.getPermissions().setCanPublicRead(false);
-    controller.configure(
-      mockActionMenu,
-      entityBundle,
-      true,
-      wikiPageId,
-      currentEntityArea
-    );
-    verify(mockActionMenu)
-      .setActionIcon(Action.VIEW_SHARING_SETTINGS, IconType.LOCK);
   }
 
   @Test
@@ -1438,6 +1476,7 @@ public class EntityActionControllerImplTest {
     permissions.setCanEdit(true);
     permissions.setCanCertifiedUserEdit(true);
     permissions.setCanMove(true);
+    permissions.setCanDownload(true);
     entityBundle = new EntityBundle();
     entityBundle.setEntity(file);
     entityBundle.setPermissions(permissions);
@@ -1447,7 +1486,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.SHOW_VERSION_HISTORY, true);
   }
@@ -1462,7 +1502,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.EDIT_WIKI_PAGE, true);
     verify(mockActionMenu).setActionListener(Action.EDIT_WIKI_PAGE, controller);
@@ -1473,7 +1514,6 @@ public class EntityActionControllerImplTest {
         EntityTypeUtils.getDisplayName(EntityType.project) +
         WIKI
       );
-    verify(mockActionMenu).setToolsButtonIcon("Wiki Tools", IconType.GEAR);
   }
 
   @Test
@@ -1485,7 +1525,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.EDIT_WIKI_PAGE, true);
     verify(mockActionMenu).setActionListener(Action.EDIT_WIKI_PAGE, controller);
@@ -1496,7 +1537,6 @@ public class EntityActionControllerImplTest {
         EntityTypeUtils.getDisplayName(EntityType.folder) +
         WIKI
       );
-    verify(mockActionMenu).setToolsButtonIcon("Folder Tools", IconType.GEAR);
   }
 
   @Test
@@ -1509,7 +1549,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.EDIT_WIKI_PAGE, false);
     verify(mockActionMenu).setActionListener(Action.EDIT_WIKI_PAGE, controller);
@@ -1525,7 +1566,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.DELETE_WIKI_PAGE, true);
     verify(mockActionMenu)
@@ -1543,7 +1585,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.DELETE_WIKI_PAGE, false);
     verify(mockActionMenu)
@@ -1559,7 +1602,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.DELETE_WIKI_PAGE, false);
   }
@@ -1573,7 +1617,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.EDIT_WIKI_PAGE, true);
   }
@@ -1587,7 +1632,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.EDIT_WIKI_PAGE, true);
   }
@@ -1601,7 +1647,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.EDIT_WIKI_PAGE, true);
   }
@@ -1615,7 +1662,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.VIEW_WIKI_SOURCE, true);
     verify(mockActionMenu)
@@ -1632,7 +1680,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.VIEW_WIKI_SOURCE, true);
     verify(mockActionMenu)
@@ -1648,7 +1697,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.VIEW_WIKI_SOURCE, true);
   }
@@ -1662,7 +1712,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.VIEW_WIKI_SOURCE, true);
   }
@@ -1676,7 +1727,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.VIEW_WIKI_SOURCE, true);
   }
@@ -1689,7 +1741,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      EntityArea.TABLES
+      EntityArea.TABLES,
+      mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.ADD_SUBMISSION_VIEW, true);
     verify(mockActionMenu)
@@ -1705,7 +1758,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      EntityArea.TABLES
+      EntityArea.TABLES,
+      mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.ADD_SUBMISSION_VIEW, false);
     verify(mockActionMenu)
@@ -1719,7 +1773,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.MOVE_ENTITY, true);
   }
@@ -1732,7 +1787,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.MOVE_ENTITY, false);
   }
@@ -1745,7 +1801,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.MOVE_ENTITY, true);
     verify(mockActionMenu)
@@ -1765,7 +1822,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.MOVE_ENTITY, false);
   }
@@ -1778,7 +1836,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.UPLOAD_NEW_FILE, true);
     verify(mockActionMenu)
@@ -1794,7 +1853,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.UPLOAD_NEW_FILE, false);
     verify(mockActionMenu)
@@ -1811,7 +1871,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.EDIT_PROVENANCE, canEdit);
     verify(mockActionMenu)
@@ -1828,7 +1889,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.EDIT_PROVENANCE, canEdit);
     verify(mockActionMenu)
@@ -1846,7 +1908,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.EDIT_PROVENANCE, canEdit);
     verify(mockActionMenu)
@@ -1863,7 +1926,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.EDIT_PROVENANCE, canEdit);
     verify(mockActionMenu)
@@ -1878,7 +1942,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.EDIT_PROVENANCE, false);
   }
@@ -1890,9 +1955,10 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
-    controller.onAction(Action.APPROVE_USER_ACCESS);
+    controller.onAction(Action.APPROVE_USER_ACCESS, null);
     verify(mockApproveUserAccessModal).configure(entityBundle);
     verify(mockApproveUserAccessModal).show();
   }
@@ -1908,9 +1974,10 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
-    controller.onAction(Action.EDIT_PROVENANCE);
+    controller.onAction(Action.EDIT_PROVENANCE, null);
     verify(mockProvenanceEditorWidget).configure(entityBundle);
     verify(mockProvenanceEditorWidget).show();
   }
@@ -1930,10 +1997,11 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     // the call under tests
-    controller.onAction(Action.DELETE_ENTITY);
+    controller.onAction(Action.DELETE_ENTITY, null);
     verify(mockView).showConfirmDeleteDialog(anyString(), any(Callback.class));
     // should not make it to the pre-flight check
     verify(mockPreflightController, never())
@@ -1960,10 +2028,11 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     // the call under test
-    controller.onAction(Action.DELETE_ENTITY);
+    controller.onAction(Action.DELETE_ENTITY, null);
     verify(mockView).showConfirmDeleteDialog(anyString(), any(Callback.class));
     verify(mockPreflightController)
       .checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
@@ -1983,11 +2052,12 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
 
     // the call under test
-    controller.onAction(Action.CREATE_TABLE_VERSION);
+    controller.onAction(Action.CREATE_TABLE_VERSION, null);
 
     verify(mockPreflightController)
       .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
@@ -2045,11 +2115,12 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
 
     // the call under test
-    controller.onAction(Action.CREATE_TABLE_VERSION);
+    controller.onAction(Action.CREATE_TABLE_VERSION, null);
 
     verify(mockPreflightController)
       .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
@@ -2125,11 +2196,12 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
 
     // the call under test
-    controller.onAction(Action.CREATE_TABLE_VERSION);
+    controller.onAction(Action.CREATE_TABLE_VERSION, null);
 
     verify(mockPreflightController)
       .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
@@ -2212,10 +2284,11 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     // the call under test
-    controller.onAction(Action.DELETE_ENTITY);
+    controller.onAction(Action.DELETE_ENTITY, null);
     verify(mockView).showConfirmDeleteDialog(anyString(), any(Callback.class));
     verify(mockPreflightController)
       .checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
@@ -2247,10 +2320,11 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     // the call under test
-    controller.onAction(Action.DELETE_ENTITY);
+    controller.onAction(Action.DELETE_ENTITY, null);
     verify(mockView).showConfirmDeleteDialog(anyString(), any(Callback.class));
     verify(mockPreflightController)
       .checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
@@ -2275,7 +2349,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     // call under test
     Place result = controller.createDeletePlace();
@@ -2299,7 +2374,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     // call under test
     Place result = controller.createDeletePlace();
@@ -2321,7 +2397,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     // call under test
     Place result = controller.createDeletePlace();
@@ -2341,7 +2418,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     // call under test
     Place result = controller.createDeletePlace();
@@ -2363,10 +2441,11 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     // method under test
-    controller.onAction(Action.VIEW_SHARING_SETTINGS);
+    controller.onAction(Action.VIEW_SHARING_SETTINGS, null);
     verify(mockAccessControlListModalWidget).showSharing(any(Callback.class));
     verify(mockAccessControlListModalWidget)
       .configure(any(Entity.class), anyBoolean());
@@ -2385,10 +2464,11 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     // method under test
-    controller.onAction(Action.VIEW_SHARING_SETTINGS);
+    controller.onAction(Action.VIEW_SHARING_SETTINGS, null);
     verify(mockAccessControlListModalWidget)
       .configure(any(Entity.class), anyBoolean());
     verify(mockAccessControlListModalWidget).showSharing(any(Callback.class));
@@ -2410,10 +2490,11 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     // method under test
-    controller.onAction(Action.CHANGE_ENTITY_NAME);
+    controller.onAction(Action.CHANGE_ENTITY_NAME, null);
     verify(mockRenameEntityModalWidget)
       .onRename(any(Entity.class), any(Callback.class));
     verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
@@ -2434,10 +2515,11 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     // method under test
-    controller.onAction(Action.CHANGE_ENTITY_NAME);
+    controller.onAction(Action.CHANGE_ENTITY_NAME, null);
     verify(mockRenameEntityModalWidget)
       .onRename(any(Entity.class), any(Callback.class));
     verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
@@ -2458,10 +2540,11 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     // method under test
-    controller.onAction(Action.CHANGE_ENTITY_NAME);
+    controller.onAction(Action.CHANGE_ENTITY_NAME, null);
     verify(mockRenameEntityModalWidget, never())
       .onRename(any(Entity.class), any(Callback.class));
     verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
@@ -2507,10 +2590,11 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     // method under test
-    controller.onAction(Action.EDIT_FILE_METADATA);
+    controller.onAction(Action.EDIT_FILE_METADATA, null);
     verify(mockEditFileMetadataModalWidget)
       .configure(
         any(FileEntity.class),
@@ -2545,10 +2629,11 @@ public class EntityActionControllerImplTest {
       entityBundle,
       false,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     // method under test
-    controller.onAction(Action.EDIT_FILE_METADATA);
+    controller.onAction(Action.EDIT_FILE_METADATA, null);
     verify(mockEditFileMetadataModalWidget, never())
       .configure(
         any(FileEntity.class),
@@ -2582,10 +2667,11 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     // method under test
-    controller.onAction(Action.EDIT_PROJECT_METADATA);
+    controller.onAction(Action.EDIT_PROJECT_METADATA, null);
     verify(mockEditProjectMetadataModalWidget)
       .configure(any(Project.class), anyBoolean(), any(Callback.class));
     verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
@@ -2606,10 +2692,11 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     // method under test
-    controller.onAction(Action.EDIT_PROJECT_METADATA);
+    controller.onAction(Action.EDIT_PROJECT_METADATA, null);
     verify(mockEditProjectMetadataModalWidget, never())
       .configure(any(Project.class), anyBoolean(), any(Callback.class));
     verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
@@ -2627,9 +2714,10 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
-    controller.onAction(Action.EDIT_WIKI_PAGE);
+    controller.onAction(Action.EDIT_WIKI_PAGE, null);
     verify(mockSynapseClient, never())
       .createV2WikiPageWithV1(
         anyString(),
@@ -2661,9 +2749,10 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       null,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
-    controller.onAction(Action.EDIT_WIKI_PAGE);
+    controller.onAction(Action.EDIT_WIKI_PAGE, null);
     verify(mockMarkdownEditorWidget)
       .configure(any(WikiPageKey.class), any(CallbackP.class));
   }
@@ -2683,9 +2772,10 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       null,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
-    controller.onAction(Action.VIEW_WIKI_SOURCE);
+    controller.onAction(Action.VIEW_WIKI_SOURCE, null);
     verify(mockView).showInfoDialog(anyString(), eq(markdown));
   }
 
@@ -2701,9 +2791,10 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       null,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
-    controller.onAction(Action.VIEW_WIKI_SOURCE);
+    controller.onAction(Action.VIEW_WIKI_SOURCE, null);
     verify(mockView).showErrorMessage(anyString());
   }
 
@@ -2805,9 +2896,10 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
-    controller.onAction(Action.MOVE_ENTITY);
+    controller.onAction(Action.MOVE_ENTITY, null);
     verify(mockEntityFinderBuilder, never()).build();
     verify(mockEntityFinder, never()).show();
     verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
@@ -2829,9 +2921,10 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
-    controller.onAction(Action.MOVE_ENTITY);
+    controller.onAction(Action.MOVE_ENTITY, null);
     verify(mockEntityFinderBuilder).setSelectableTypes(EntityFilter.PROJECT);
     verify(mockEntityFinderBuilder)
       .setVersionSelection(EntityFinderWidget.VersionSelection.DISALLOWED);
@@ -2857,9 +2950,10 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
-    controller.onAction(Action.MOVE_ENTITY);
+    controller.onAction(Action.MOVE_ENTITY, null);
     verify(mockEntityFinderBuilder).setSelectableTypes(EntityFilter.PROJECT);
     verify(mockEntityFinderBuilder)
       .setVersionSelection(EntityFinderWidget.VersionSelection.DISALLOWED);
@@ -2885,7 +2979,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     controller.createLink("syn9876", mockEntityFinder);
     verify(mockEntityFinder).showError(DisplayConstants.ERROR_CANT_MOVE_HERE);
@@ -2903,7 +2998,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     controller.createLink("syn9876", mockEntityFinder);
     verify(mockEntityFinder).showError(DisplayConstants.ERROR_NOT_FOUND);
@@ -2921,7 +3017,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     controller.createLink("syn9876", mockEntityFinder);
     verify(mockEntityFinder).showError(DisplayConstants.ERROR_NOT_AUTHORIZED);
@@ -2940,7 +3037,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     controller.createLink("syn9876", mockEntityFinder);
     verify(mockEntityFinder).showError(error);
@@ -2965,7 +3063,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       isCurrentVersion,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     controller.setIsShowingVersion(true);
     String target = "syn9876";
@@ -3007,7 +3106,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     controller.setIsShowingVersion(false);
     String target = "syn9876";
@@ -3036,9 +3136,10 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
-    controller.onAction(Action.CREATE_LINK);
+    controller.onAction(Action.CREATE_LINK, null);
     verify(mockEntityFinder, never()).show();
     verify(mockView, never()).showInfo(anyString());
   }
@@ -3058,9 +3159,10 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
-    controller.onAction(Action.CREATE_LINK);
+    controller.onAction(Action.CREATE_LINK, null);
     verify(mockEntityFinderBuilder).setSelectableTypes(EntityFilter.CONTAINER);
     verify(mockEntityFinderBuilder)
       .setVersionSelection(EntityFinderWidget.VersionSelection.DISALLOWED);
@@ -3086,9 +3188,10 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
-    controller.onAction(Action.SUBMIT_TO_CHALLENGE);
+    controller.onAction(Action.SUBMIT_TO_CHALLENGE, null);
     verify(mockSubmitter, never())
       .configure(any(Entity.class), any(Set.class), any(FormParams.class));
   }
@@ -3104,9 +3207,10 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
-    controller.onAction(Action.SUBMIT_TO_CHALLENGE);
+    controller.onAction(Action.SUBMIT_TO_CHALLENGE, null);
     verify(mockSubmitter)
       .configure(any(Entity.class), any(Set.class), any(FormParams.class));
   }
@@ -3122,9 +3226,10 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
-    controller.onAction(Action.CHANGE_STORAGE_LOCATION);
+    controller.onAction(Action.CHANGE_STORAGE_LOCATION, null);
     verify(mockStorageLocationWidget).configure(this.entityBundle);
     verify(mockStorageLocationWidget).show();
   }
@@ -3140,9 +3245,10 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
-    controller.onAction(Action.CHANGE_STORAGE_LOCATION);
+    controller.onAction(Action.CHANGE_STORAGE_LOCATION, null);
     verify(mockStorageLocationWidget, never())
       .configure(any(EntityBundle.class));
     verify(mockStorageLocationWidget, never()).show();
@@ -3159,9 +3265,10 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
-    controller.onAction(Action.UPLOAD_NEW_FILE);
+    controller.onAction(Action.UPLOAD_NEW_FILE, null);
     verify(mockUploader, never()).show();
   }
 
@@ -3176,9 +3283,10 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
-    controller.onAction(Action.UPLOAD_NEW_FILE);
+    controller.onAction(Action.UPLOAD_NEW_FILE, null);
     verify(mockUploader).show();
     verify(mockUploader).setUploaderLinkNameVisible(false);
   }
@@ -3192,7 +3300,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.ADD_WIKI_SUBPAGE, true);
     verify(mockActionMenu)
@@ -3209,7 +3318,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.ADD_WIKI_SUBPAGE, false);
     verify(mockActionMenu, never())
@@ -3224,7 +3334,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.ADD_WIKI_SUBPAGE, false);
   }
@@ -3237,7 +3348,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.ADD_WIKI_SUBPAGE, false);
   }
@@ -3250,7 +3362,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.ADD_WIKI_SUBPAGE, false);
   }
@@ -3267,9 +3380,10 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
-    controller.onAction(Action.ADD_WIKI_SUBPAGE);
+    controller.onAction(Action.ADD_WIKI_SUBPAGE, null);
     verify(mockSynapseClient, never())
       .createV2WikiPageWithV1(
         anyString(),
@@ -3306,9 +3420,10 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       null,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
-    controller.onAction(Action.ADD_WIKI_SUBPAGE);
+    controller.onAction(Action.ADD_WIKI_SUBPAGE, null);
     verify(mockSynapseClient)
       .createV2WikiPageWithV1(
         anyString(),
@@ -3346,9 +3461,10 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       "123",
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
-    controller.onAction(Action.ADD_WIKI_SUBPAGE);
+    controller.onAction(Action.ADD_WIKI_SUBPAGE, null);
     // verify that it has not yet created the wiki page
     verify(mockSynapseClient, never())
       .createV2WikiPageWithV1(
@@ -3423,7 +3539,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       "123",
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     controller.createWikiPage("foo");
 
@@ -3445,7 +3562,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     // initially hide, then show
     verify(mockActionMenu).setActionVisible(Action.CREATE_OR_UPDATE_DOI, false);
@@ -3462,7 +3580,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.CREATE_OR_UPDATE_DOI, false);
     verify(mockActionMenu).setActionVisible(Action.CREATE_OR_UPDATE_DOI, true);
@@ -3479,7 +3598,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     // initially hide, never show
     verify(mockActionMenu).setActionVisible(Action.CREATE_OR_UPDATE_DOI, false);
@@ -3494,7 +3614,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     // hide, and then show with 'update' text
     verify(mockActionMenu).setActionVisible(Action.CREATE_OR_UPDATE_DOI, false);
@@ -3520,7 +3641,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     // hide, and then show with 'update' text
     verify(mockActionMenu).setActionVisible(Action.CREATE_OR_UPDATE_DOI, false);
@@ -3539,9 +3661,10 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
-    controller.onAction(Action.CREATE_CHALLENGE);
+    controller.onAction(Action.CREATE_CHALLENGE, null);
     verify(mockSelectTeamModal).show();
 
     // now simulate that a team was selected
@@ -3569,14 +3692,15 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     String error = "an error";
     AsyncMockStubber
       .callFailureWith(new Exception(error))
       .when(mockChallengeClient)
       .createChallenge(any(Challenge.class), any(AsyncCallback.class));
-    controller.onAction(Action.CREATE_CHALLENGE);
+    controller.onAction(Action.CREATE_CHALLENGE, null);
     // now simulate that a challenge team was selected
     ArgumentCaptor<CallbackP> teamSelectedCallback = ArgumentCaptor.forClass(
       CallbackP.class
@@ -3601,7 +3725,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     // initially hide, then show
     InOrder inOrder = inOrder(mockActionMenu);
@@ -3611,8 +3736,6 @@ public class EntityActionControllerImplTest {
     inOrder
       .verify(mockActionMenu)
       .setActionVisible(Action.CREATE_CHALLENGE, true);
-    verify(mockActionMenu, never())
-      .setToolsButtonIcon(anyString(), any(IconType.class));
   }
 
   @Test
@@ -3630,7 +3753,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     verify(mockActionMenu, never())
       .setActionVisible(Action.DELETE_CHALLENGE, true);
@@ -3648,7 +3772,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.DELETE_CHALLENGE, true);
   }
@@ -3672,7 +3797,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.CREATE_CHALLENGE, false);
     verify(mockActionMenu, never())
@@ -3692,7 +3818,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     // initially hide, never show
     verify(mockActionMenu).setActionVisible(Action.CREATE_CHALLENGE, false);
@@ -3711,7 +3838,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.CREATE_CHALLENGE, false);
     verify(mockView).showErrorMessage(error);
@@ -3735,14 +3863,15 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     String display =
       ARE_YOU_SURE_YOU_WANT_TO_DELETE +
       "Folder \"Test\"?" +
       DELETE_FOLDER_EXPLANATION;
     // the call under tests
-    controller.onAction(Action.DELETE_ENTITY);
+    controller.onAction(Action.DELETE_ENTITY, null);
     verify(mockView).showConfirmDeleteDialog(eq(display), any(Callback.class));
     // should not make it to the pre-flight check
     verify(mockPreflightController, never())
@@ -3767,12 +3896,13 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     String display = ARE_YOU_SURE_YOU_WANT_TO_DELETE + "Project \"Test\"?";
     String folderDisplay = display + DELETE_FOLDER_EXPLANATION;
     // the call under tests
-    controller.onAction(Action.DELETE_ENTITY);
+    controller.onAction(Action.DELETE_ENTITY, null);
     verify(mockView).showConfirmDeleteDialog(eq(display), any(Callback.class));
     verify(mockView, times(0))
       .showConfirmDeleteDialog(eq(folderDisplay), any(Callback.class));
@@ -3793,7 +3923,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
 
     verify(mockActionMenu)
@@ -3816,7 +3947,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
 
     verify(mockActionMenu)
@@ -3824,7 +3956,6 @@ public class EntityActionControllerImplTest {
     verify(mockActionMenu).setActionVisible(Action.APPROVE_USER_ACCESS, true);
     verify(mockActionMenu)
       .setActionListener(Action.MANAGE_ACCESS_REQUIREMENTS, controller);
-    verify(mockActionMenu).setACTDividerVisible(true);
   }
 
   @Test
@@ -3835,10 +3966,11 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
 
-    controller.onAction(Action.MANAGE_ACCESS_REQUIREMENTS);
+    controller.onAction(Action.MANAGE_ACCESS_REQUIREMENTS, null);
     verify(mockPlaceChanger).goTo(any(AccessRequirementsPlace.class));
   }
 
@@ -3857,9 +3989,10 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
-    controller.onAction(Action.UPLOAD_FILE);
+    controller.onAction(Action.UPLOAD_FILE, null);
     boolean isEntity = true;
     Entity currentFileEntity = null;
     CallbackP<String> fileHandleIdCallback = null;
@@ -3886,9 +4019,10 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
-    controller.onAction(Action.CREATE_FOLDER);
+    controller.onAction(Action.CREATE_FOLDER, null);
     verify(mockAddFolderDialogWidget).show(entityId);
   }
 
@@ -3907,9 +4041,10 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
-    controller.onAction(Action.UPLOAD_TABLE);
+    controller.onAction(Action.UPLOAD_TABLE, null);
     verify(mockUploadTableModalWidget).configure(entityId, null);
     verify(mockUploadTableModalWidget).showModal(any(WizardCallback.class));
   }
@@ -3929,9 +4064,10 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
-    controller.onAction(Action.ADD_TABLE);
+    controller.onAction(Action.ADD_TABLE, null);
     verify(mockCreateTableViewWizard).configure(entityId, TableType.table);
     verify(mockCreateTableViewWizard).showModal(any(WizardCallback.class));
   }
@@ -3951,9 +4087,10 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
-    controller.onAction(Action.ADD_FILE_VIEW);
+    controller.onAction(Action.ADD_FILE_VIEW, null);
     verify(mockCreateTableViewWizard).configure(entityId, TableType.file_view);
     verify(mockCreateTableViewWizard).showModal(any(WizardCallback.class));
   }
@@ -3973,9 +4110,10 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
-    controller.onAction(Action.ADD_PROJECT_VIEW);
+    controller.onAction(Action.ADD_PROJECT_VIEW, null);
     verify(mockCreateTableViewWizard)
       .configure(entityId, TableType.project_view);
     verify(mockCreateTableViewWizard).showModal(any(WizardCallback.class));
@@ -3996,9 +4134,10 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
-    controller.onAction(Action.CREATE_EXTERNAL_DOCKER_REPO);
+    controller.onAction(Action.CREATE_EXTERNAL_DOCKER_REPO, null);
     verify(mockAddExternalRepoModal)
       .configuration(eq(entityId), any(Callback.class));
     verify(mockAddExternalRepoModal).show();
@@ -4015,10 +4154,11 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
 
-    controller.onAction(Action.DELETE_CHALLENGE);
+    controller.onAction(Action.DELETE_CHALLENGE, null);
 
     verify(mockView).showConfirmDeleteDialog(anyString(), any(Callback.class));
     // should not make it to the pre-flight check
@@ -4045,10 +4185,11 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
 
-    controller.onAction(Action.DELETE_CHALLENGE);
+    controller.onAction(Action.DELETE_CHALLENGE, null);
 
     verify(mockView).showConfirmDeleteDialog(anyString(), any(Callback.class));
     verify(mockPreflightController)
@@ -4078,10 +4219,11 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
 
-    controller.onAction(Action.DELETE_CHALLENGE);
+    controller.onAction(Action.DELETE_CHALLENGE, null);
 
     verify(mockChallengeClient)
       .deleteChallenge(anyString(), any(AsyncCallback.class));
@@ -4097,7 +4239,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     AsyncMockStubber
       .callWithInvoke()
@@ -4114,7 +4257,7 @@ public class EntityActionControllerImplTest {
       );
     assertFalse(tableEntity.getIsSearchEnabled());
 
-    controller.onAction(Action.TOGGLE_FULL_TEXT_SEARCH);
+    controller.onAction(Action.TOGGLE_FULL_TEXT_SEARCH, null);
 
     assertTrue(tableEntity.getIsSearchEnabled());
     verify(mockView).showSuccess(anyString());
@@ -4129,7 +4272,8 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     AsyncMockStubber
       .callWithInvoke()
@@ -4146,7 +4290,7 @@ public class EntityActionControllerImplTest {
       );
     assertFalse(tableEntity.getIsSearchEnabled());
 
-    controller.onAction(Action.TOGGLE_FULL_TEXT_SEARCH);
+    controller.onAction(Action.TOGGLE_FULL_TEXT_SEARCH, null);
 
     assertFalse(tableEntity.getIsSearchEnabled());
     verify(mockView).showErrorMessage(errorMessage);
@@ -4173,9 +4317,10 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
-    controller.onAction(Action.ADD_MATERIALIZED_VIEW);
+    controller.onAction(Action.ADD_MATERIALIZED_VIEW, null);
     verify(mockMaterializedViewEditor)
       .configure(entityBundle.getEntity().getId());
     verify(mockMaterializedViewEditor).show();
@@ -4191,14 +4336,15 @@ public class EntityActionControllerImplTest {
       entityBundle,
       true,
       wikiPageId,
-      currentEntityArea
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
     AsyncMockStubber
       .callWithInvoke()
       .when(mockPreflightController)
       .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
 
-    controller.onAction(Action.EDIT_DEFINING_SQL);
+    controller.onAction(Action.EDIT_DEFINING_SQL, null);
 
     // user is prompted for the new SQL
     ArgumentCaptor<PromptCallback> callbackCaptor = ArgumentCaptor.forClass(
@@ -4223,6 +4369,257 @@ public class EntityActionControllerImplTest {
         anyString(),
         anyBoolean(),
         any(AsyncCallback.class)
+      );
+  }
+
+  @Test
+  public void testConfigureFileDownloadCanDownload() {
+    entityBundle.setEntity(new FileEntity());
+
+    // Call under test
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+
+    verify(mockActionMenu).setDownloadMenuEnabled(true);
+    verify(mockActionMenu).setDownloadMenuTooltipText("");
+    verify(mockActionMenu).setActionVisible(Action.DOWNLOAD_FILE, true);
+    verify(mockActionMenu).setActionVisible(Action.ADD_TO_DOWNLOAD_CART, true);
+    verify(mockActionMenu)
+      .setActionVisible(Action.SHOW_PROGRAMMATIC_OPTIONS, true);
+
+    verify(mockFileDownloadHandlerWidget)
+      .configure(mockActionMenu, entityBundle, mockRestrictionInformation);
+  }
+
+  @Test
+  public void testConfigureFileDownloadCannotDownload() {
+    entityBundle.setEntity(new FileEntity());
+    entityBundle.getPermissions().setCanDownload(false);
+
+    // Call under test
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+
+    verify(mockActionMenu).setDownloadMenuEnabled(false);
+    verify(mockActionMenu)
+      .setDownloadMenuTooltipText(
+        "You don't have download permission. Request access from an administrator, shown under File Tools ➔ File Sharing Settings"
+      );
+    verify(mockActionMenu).setActionVisible(Action.DOWNLOAD_FILE, true);
+    verify(mockActionMenu).setActionVisible(Action.ADD_TO_DOWNLOAD_CART, true);
+    verify(mockActionMenu)
+      .setActionVisible(Action.SHOW_PROGRAMMATIC_OPTIONS, true);
+
+    verify(mockFileDownloadHandlerWidget)
+      .configure(mockActionMenu, entityBundle, mockRestrictionInformation);
+  }
+
+  @Test
+  public void testConfigureFileDownloadUnauthenticated() {
+    entityBundle.setEntity(new FileEntity());
+    entityBundle.getPermissions().setCanDownload(false);
+
+    when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+
+    // Call under test
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+
+    verify(mockActionMenu).setDownloadMenuEnabled(false);
+    verify(mockActionMenu)
+      .setDownloadMenuTooltipText("You need to log in to download this file.");
+    verify(mockActionMenu).setActionVisible(Action.DOWNLOAD_FILE, true);
+    verify(mockActionMenu).setActionVisible(Action.ADD_TO_DOWNLOAD_CART, true);
+    verify(mockActionMenu)
+      .setActionVisible(Action.SHOW_PROGRAMMATIC_OPTIONS, true);
+
+    verify(mockFileDownloadHandlerWidget)
+      .configure(mockActionMenu, entityBundle, mockRestrictionInformation);
+  }
+
+  @Test
+  public void testConfigureContainerDownload() {
+    EntityChildrenResponse fileChildrenResponse = new EntityChildrenResponse();
+    fileChildrenResponse.setPage(Collections.singletonList(new EntityHeader()));
+    when(mockSynapseJavascriptClient.getEntityChildren(any()))
+      .thenReturn(getDoneFuture(fileChildrenResponse));
+
+    entityBundle.setEntity(new Project());
+    entityBundle.getEntity().setId(entityId);
+    entityBundle.setHasChildren(true);
+    currentEntityArea = EntityArea.FILES;
+
+    // Call under test
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+
+    verify(mockActionMenu).setActionVisible(Action.ADD_TO_DOWNLOAD_CART, true);
+    verify(mockActionMenu).setActionEnabled(Action.ADD_TO_DOWNLOAD_CART, true);
+    verify(mockActionMenu)
+      .setActionTooltipText(Action.ADD_TO_DOWNLOAD_CART, null);
+    verify(mockActionMenu)
+      .setActionVisible(Action.SHOW_PROGRAMMATIC_OPTIONS, true);
+    verify(mockActionMenu).setDownloadMenuEnabled(true);
+    verify(mockActionMenu).setDownloadMenuTooltipText(null);
+
+    // Test the action listeners
+    verify(mockActionMenu)
+      .setActionListener(
+        eq(Action.ADD_TO_DOWNLOAD_CART),
+        actionListenerCaptor.capture()
+      );
+    actionListenerCaptor.getValue().onAction(Action.ADD_TO_DOWNLOAD_CART, null);
+    verify(mockAddToDownloadListWidget).configure(entityId);
+
+    verify(mockActionMenu)
+      .setActionListener(
+        eq(Action.SHOW_PROGRAMMATIC_OPTIONS),
+        actionListenerCaptor.capture()
+      );
+    actionListenerCaptor
+      .getValue()
+      .onAction(Action.SHOW_PROGRAMMATIC_OPTIONS, null);
+    verify(mockContainerClientsHelp).configureAndShow(entityId);
+  }
+
+  @Test
+  public void testConfigureContainerDownloadNoChildren() {
+    entityBundle.setEntity(new Folder());
+    entityBundle.getEntity().setId(entityId);
+    entityBundle.setHasChildren(false);
+
+    // Call under test
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+
+    verify(mockActionMenu).setDownloadMenuEnabled(false);
+    verify(mockActionMenu)
+      .setDownloadMenuTooltipText(
+        "There are no downloadable items in this folder."
+      );
+
+    // No need to see if there are any files
+    verify(mockSynapseJavascriptClient, never()).getEntityChildren(any());
+  }
+
+  @Test
+  public void testConfigureContainerDownloadNoFileChildren() {
+    EntityChildrenResponse fileChildrenResponse = new EntityChildrenResponse();
+    fileChildrenResponse.setPage(Collections.emptyList());
+    when(mockSynapseJavascriptClient.getEntityChildren(any()))
+      .thenReturn(getDoneFuture(fileChildrenResponse));
+
+    entityBundle.setEntity(new Project());
+    entityBundle.getEntity().setId(entityId);
+    entityBundle.setHasChildren(true);
+    currentEntityArea = EntityArea.FILES;
+
+    // Call under test
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+
+    verify(mockActionMenu).setActionVisible(Action.ADD_TO_DOWNLOAD_CART, true);
+    verify(mockActionMenu).setActionEnabled(Action.ADD_TO_DOWNLOAD_CART, false);
+    verify(mockActionMenu)
+      .setActionTooltipText(
+        Action.ADD_TO_DOWNLOAD_CART,
+        "There are no files in this folder."
+      );
+    verify(mockActionMenu)
+      .setActionVisible(Action.SHOW_PROGRAMMATIC_OPTIONS, true);
+    verify(mockActionMenu).setDownloadMenuEnabled(true);
+    verify(mockActionMenu).setDownloadMenuTooltipText(null);
+  }
+
+  @Test
+  public void testReportViolation() {
+    String url = "https://www.synapse.org/#!Synapse:syn123";
+    String ownerId = "4958725";
+    String email = "email@address.com";
+    String firstName = "Synapse";
+    String lastName = "User";
+    String username = "SynUser123";
+    UserProfile profile = new UserProfile();
+    profile.setOwnerId(ownerId);
+    profile.setFirstName(firstName);
+    profile.setLastName(lastName);
+    profile.setUserName(username);
+    profile.setEmails(Collections.singletonList(email));
+    when(mockAuthenticationController.getCurrentUserProfile())
+      .thenReturn(profile);
+    when(mockGWT.getCurrentURL()).thenReturn(url);
+    entityBundle.setEntity(new FileEntity());
+    entityBundle.getEntity().setId(entityId);
+
+    // Call under test - configuration
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+
+    verify(mockActionMenu).setActionVisible(Action.REPORT_VIOLATION, true);
+    verify(mockActionMenu)
+      .setActionListener(
+        eq(Action.REPORT_VIOLATION),
+        actionListenerCaptor.capture()
+      );
+
+    // Call under test - invocation
+    actionListenerCaptor.getValue().onAction(Action.REPORT_VIOLATION, null);
+    verify(mockJsniUtils)
+      .showJiraIssueCollector(
+        "", // summary
+        FLAG_ISSUE_DESCRIPTION_PART_1 +
+        url +
+        WebConstants.FLAG_ISSUE_DESCRIPTION_PART_2, // description
+        FLAG_ISSUE_COLLECTOR_URL,
+        ownerId,
+        DisplayUtils.getDisplayName(firstName, lastName, username),
+        email,
+        entityId, // Synapse data object ID
+        REVIEW_DATA_REQUEST_COMPONENT_ID,
+        null, // Access requirement ID
+        FLAG_ISSUE_PRIORITY
       );
   }
 }

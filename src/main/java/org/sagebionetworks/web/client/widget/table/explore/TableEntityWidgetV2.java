@@ -30,8 +30,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
-import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.GlobalApplicationStateImpl;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cache.SessionStorage;
@@ -45,8 +43,8 @@ import org.sagebionetworks.web.client.widget.CopyTextModal;
 import org.sagebionetworks.web.client.widget.clienthelp.FileViewClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.Action;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQueryModalWidget;
@@ -134,7 +132,7 @@ public class TableEntityWidgetV2
   DownloadTableQueryModalWidget downloadTableQueryModalWidget;
   UploadTableModalWidget uploadTableModalWidget;
   TableEntityWidgetView view;
-  ActionMenuWidget actionMenu;
+  EntityActionMenu actionMenu;
   PreflightController preflightController;
   SessionStorage sessionStorage;
   EventBus eventBus;
@@ -221,7 +219,7 @@ public class TableEntityWidgetV2
     boolean canEdit,
     boolean isShowTableOnly,
     QueryChangeHandler qch,
-    ActionMenuWidget actionMenu
+    EntityActionMenu actionMenu
   ) {
     this.entityBundle = bundle;
     Entity table = bundle.getEntity();
@@ -287,19 +285,15 @@ public class TableEntityWidgetV2
     );
     this.actionMenu.setActionListener(
         Action.UPLOAD_TABLE_DATA,
-        action -> {
-          onUploadTableData();
-        }
+        (action, e) -> onUploadTableData()
       );
     this.actionMenu.setActionListener(
         Action.EDIT_TABLE_DATA,
-        action -> {
-          onEditResults();
-        }
+        (action, e) -> onEditResults()
       );
     this.actionMenu.setActionListener(
         Action.SHOW_TABLE_SCHEMA,
-        action -> {
+        (action, e) -> {
           boolean isVisible = !view.isSchemaVisible();
           view.setSchemaVisible(isVisible);
           String showHide = isVisible ? HIDE : SHOW;
@@ -312,7 +306,7 @@ public class TableEntityWidgetV2
 
     this.actionMenu.setActionListener(
         Action.SHOW_VIEW_SCOPE,
-        action -> {
+        (action, e) -> {
           boolean isVisible = !view.isScopeVisible();
           view.setScopeVisible(isVisible);
           String showHide = isVisible ? HIDE : SHOW;
@@ -325,18 +319,23 @@ public class TableEntityWidgetV2
 
     this.actionMenu.setActionListener(
         Action.EDIT_ENTITYREF_COLLECTION_ITEMS,
-        action -> {
-          showDatasetItemsEditor();
-        }
+        (action, e) -> showDatasetItemsEditor()
       );
 
     // Edit data
     this.actionMenu.setActionEnabled(Action.EDIT_TABLE_DATA, hasQueryableData);
     if (hasQueryableData) {
-      this.actionMenu.setEditTableDataTooltipText("Bulk edit cell values");
+      this.actionMenu.setActionTooltipText(
+          Action.EDIT_TABLE_DATA,
+          "Bulk edit cell values"
+        );
     } else {
-      this.actionMenu.setEditTableDataTooltipText("There is no data to edit");
+      this.actionMenu.setActionText(
+          Action.EDIT_TABLE_DATA,
+          "There is no data to edit"
+        );
     }
+    this.actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, true);
   }
 
   /**
@@ -688,11 +687,11 @@ public class TableEntityWidgetV2
           .setTitle("Dataset Saved")
           .setSecondaryButton(
             "Show Schema",
-            () -> this.actionMenu.onAction(Action.SHOW_TABLE_SCHEMA)
+            () -> this.actionMenu.onAction(Action.SHOW_TABLE_SCHEMA, null)
           )
           .setPrimaryButton(
             "Create Stable Version",
-            () -> this.actionMenu.onAction(Action.CREATE_TABLE_VERSION)
+            () -> this.actionMenu.onAction(Action.CREATE_TABLE_VERSION, null)
           )
           .build();
         DisplayUtils.notify(
@@ -712,12 +711,12 @@ public class TableEntityWidgetV2
 
   @Override
   public void toggleSchemaCollapse() {
-    this.actionMenu.onAction(Action.SHOW_TABLE_SCHEMA);
+    this.actionMenu.onAction(Action.SHOW_TABLE_SCHEMA, null);
   }
 
   @Override
   public void toggleScopeCollapse() {
-    this.actionMenu.onAction(Action.SHOW_VIEW_SCOPE);
+    this.actionMenu.onAction(Action.SHOW_VIEW_SCOPE, null);
   }
 
   private void showDatasetItemsEditor() {

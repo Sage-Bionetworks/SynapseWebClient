@@ -10,7 +10,7 @@
     field='help'
     type='org.sagebionetworks.web.client.help.HelpMessages'
   />
-  <bh:Div addStyleNames="margin-top-15 margin-left-15 margin-right-15">
+  <bh:Div addStyleNames="margin-top-15 entity-page-side-margins">
     <bh:Div ui:field="forumContainer" />
   </bh:Div>
 </ui:UiBinder>

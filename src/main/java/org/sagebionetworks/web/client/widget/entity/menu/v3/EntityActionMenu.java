@@ -2,9 +2,8 @@ package org.sagebionetworks.web.client.widget.entity.menu.v3;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import org.sagebionetworks.web.client.jsinterop.entity.actionmenu.EntityActionMenuLayout;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 
-public interface EntityActionMenu extends IsWidget, ActionListenerV2 {
+public interface EntityActionMenu extends IsWidget, ActionListener {
   /**
    * Toggle the visibility of a particular action.
    */
@@ -13,12 +12,12 @@ public interface EntityActionMenu extends IsWidget, ActionListenerV2 {
   /**
    * Replace all listeners and href of the action with the new listener.
    */
-  void setActionListener(Action action, ActionListenerV2 actionListener);
+  void setActionListener(Action action, ActionListener actionListener);
 
   /**
    * Add a new listener to the action. Does not remove existing listeners or href.
    */
-  void addActionListener(Action action, ActionListenerV2 actionListener);
+  void addActionListener(Action action, ActionListener actionListener);
 
   /**
    * Replace all listeners and href of the action with the new href.

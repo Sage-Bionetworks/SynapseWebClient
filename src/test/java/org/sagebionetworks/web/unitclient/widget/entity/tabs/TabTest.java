@@ -28,7 +28,8 @@ import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.entity.tabs.TabView;
 
@@ -50,7 +51,10 @@ public class TabTest {
   EntityActionController mockActionController;
 
   @Mock
-  ActionMenuWidget mockActionMenu;
+  EntityActionMenu mockActionMenu;
+
+  @Mock
+  AddToDownloadListV2 mockAddToDownloadListWidget;
 
   @Mock
   EntityBundle mockEntityBundle;
@@ -114,7 +118,8 @@ public class TabTest {
     tab.configureEntityActionController(
       mockEntityBundle,
       isCurrentVersion,
-      wikiPageKey
+      wikiPageKey,
+      mockAddToDownloadListWidget
     );
 
     verify(mockActionController)
@@ -123,7 +128,8 @@ public class TabTest {
         mockEntityBundle,
         isCurrentVersion,
         wikiPageKey,
-        area
+        area,
+        mockAddToDownloadListWidget
       );
   }
 

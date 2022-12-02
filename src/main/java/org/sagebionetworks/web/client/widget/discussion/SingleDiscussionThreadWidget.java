@@ -33,9 +33,9 @@ import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.discussion.modal.EditDiscussionThreadModal;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionListener;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.Action;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.ActionListener;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.refresh.ReplyCountAlert;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
 import org.sagebionetworks.web.client.widget.user.AvatarSize;
@@ -99,7 +99,7 @@ public class SingleDiscussionThreadWidget
   private boolean isThreadDeleted;
   private SubscribersWidget threadSubscribersWidget;
   Topic threadTopic = new Topic();
-  private ActionMenuWidget actionMenu;
+  private EntityActionMenu actionMenu;
   ActionListener editActionListener, unpinActionListener, pinActionListener, deleteActionListener, restoreActionListener;
   Boolean isPinned;
   PopupUtilsView popupUtils;
@@ -185,28 +185,11 @@ public class SingleDiscussionThreadWidget
         }
       };
     threadTopic.setObjectType(SubscriptionObjectType.THREAD);
-    editActionListener =
-      action -> {
-        onClickEditThread();
-      };
-    pinActionListener =
-      action -> {
-        onClickPinThread();
-      };
-    unpinActionListener =
-      action -> {
-        onClickUnpinThread();
-      };
-
-    deleteActionListener =
-      action -> {
-        onClickDeleteThread();
-      };
-
-    restoreActionListener =
-      action -> {
-        onClickRestore();
-      };
+    editActionListener = (action, e) -> onClickEditThread();
+    pinActionListener = (action, e) -> onClickPinThread();
+    unpinActionListener = (action, e) -> onClickUnpinThread();
+    deleteActionListener = (action, e) -> onClickDeleteThread();
+    restoreActionListener = (action, e) -> onClickRestore();
   }
 
   @Override
@@ -219,7 +202,7 @@ public class SingleDiscussionThreadWidget
     String replyId,
     Boolean isCurrentUserModerator,
     Set<String> moderatorIds,
-    ActionMenuWidget actionMenu,
+    EntityActionMenu actionMenu,
     Callback deleteOrRestoreCallback
   ) {
     this.title = bundle.getTitle();

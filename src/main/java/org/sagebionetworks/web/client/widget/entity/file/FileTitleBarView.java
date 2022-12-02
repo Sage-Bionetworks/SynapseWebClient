@@ -10,8 +10,6 @@ public interface FileTitleBarView extends IsWidget, SynapseView {
 
   void setFileLocation(String location);
 
-  void setFileDownloadMenuItem(Widget w);
-
   void setFilenameContainerVisible(boolean visible);
 
   void setEntityName(String name);
@@ -40,8 +38,6 @@ public interface FileTitleBarView extends IsWidget, SynapseView {
 
   void setPresenter(Presenter p);
 
-  void setCanDownload(boolean canDownload);
-
   void setActionMenu(IsWidget w);
 
   void setVersionHistoryLinkText(String text);
@@ -50,10 +46,6 @@ public interface FileTitleBarView extends IsWidget, SynapseView {
    * Presenter interface
    */
   public interface Presenter {
-    void onProgrammaticDownloadOptions();
-
-    void onAddToDownloadList();
-
     void toggleShowVersionHistory();
   }
 }

@@ -12,7 +12,6 @@ import org.sagebionetworks.web.client.place.SynapseForumPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.discussion.ForumWidget;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 
 public class DiscussionTab implements DiscussionTabView.Presenter {
@@ -85,7 +84,7 @@ public class DiscussionTab implements DiscussionTabView.Presenter {
         tab.showTab();
       }
     };
-    tab.configureEntityActionController(projectBundle, true, null);
+    tab.configureEntityActionController(projectBundle, true, null, null);
     forumWidget.configure(
       entityId,
       params,

@@ -12,7 +12,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.SynapseForumView;
 import org.sagebionetworks.web.client.widget.discussion.ForumWidget;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.shared.WebConstants;
 
 public class SynapseForumPresenter
@@ -66,7 +66,7 @@ public class SynapseForumPresenter
         globalApplicationState.pushCurrentPlace(place);
       }
     };
-    ActionMenuWidget actionMenu = null;
+    EntityActionMenu actionMenu = null;
     forumWidget.configure(
       entityId,
       place.getParameterizedToken(),

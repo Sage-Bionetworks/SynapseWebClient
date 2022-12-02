@@ -3,7 +3,7 @@ package org.sagebionetworks.web.client.jsinterop;
 import jsinterop.annotations.JsOverlay;
 import jsinterop.annotations.JsPackage;
 import jsinterop.annotations.JsType;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.Action;
 
 @JsType(isNative = true, namespace = JsPackage.GLOBAL, name = "Object")
 public class ActionViewProps {

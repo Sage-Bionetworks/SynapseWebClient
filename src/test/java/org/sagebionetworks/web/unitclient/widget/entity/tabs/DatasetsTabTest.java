@@ -59,7 +59,7 @@ import org.sagebionetworks.web.client.widget.entity.VersionHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.file.TableTitleBar;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.entity.tabs.AbstractTablesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.DatasetsTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
@@ -122,7 +122,7 @@ public class DatasetsTabTest {
   UserEntityPermissions mockPermissions;
 
   @Mock
-  ActionMenuWidget mockActionMenuWidget;
+  EntityActionMenu mockActionMenuWidget;
 
   @Mock
   CallbackP<String> mockEntitySelectedCallback;

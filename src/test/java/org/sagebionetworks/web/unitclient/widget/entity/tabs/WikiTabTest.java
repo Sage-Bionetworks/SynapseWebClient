@@ -23,7 +23,8 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.entity.tabs.WikiTab;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -47,7 +48,10 @@ public class WikiTabTest {
   PortalGinInjector mockPortalGinInjector;
 
   @Mock
-  ActionMenuWidget mockActionMenuWidget;
+  EntityActionMenu mockActionMenuWidget;
+
+  @Mock
+  AddToDownloadListV2 mockAddToDownloadListWidget;
 
   @Mock
   EntityBundle mockProjectEntityBundle;
@@ -66,6 +70,8 @@ public class WikiTabTest {
       .thenReturn(mockWikiPageWidget);
     when(mockPortalGinInjector.getSynapseJavascriptClient())
       .thenReturn(mockJsClient);
+    when(mockPortalGinInjector.getAddToDownloadListV2())
+      .thenReturn(mockAddToDownloadListWidget);
     tab.lazyInject();
   }
 
@@ -141,7 +147,8 @@ public class WikiTabTest {
       .configureEntityActionController(
         mockProjectEntityBundle,
         true,
-        newSubWikiPageId
+        newSubWikiPageId,
+        null
       );
   }
 

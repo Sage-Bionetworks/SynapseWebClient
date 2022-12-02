@@ -1,10 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
-import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
@@ -19,32 +16,28 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.aws.AwsSdk;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.shared.WebConstants;
 
-public class FileDownloadMenuItem
-  implements FileDownloadMenuItemView.Presenter, SynapseWidgetPresenter {
+/**
+ * Handles business logic for downloading files with various storage configurations.
+ */
+public class FileDownloadHandlerWidget
+  implements FileDownloadMenuItemView.Presenter {
 
-  public static final String DOWNLOAD_ACTION_EVENT_NAME = "Download";
-  public static final String FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME =
-    "FilesAddedToDownloadList";
-  public static final String FILE_DIRECTLY_DOWNLOADED_EVENT_NAME =
-    "FileDirectlyDownloaded";
   public static final String ACCESS_REQUIREMENTS_LINK =
     "#!AccessRequirements:ID=";
   public static final String LOGIN_PLACE_LINK = "#!LoginPlace:0";
   private FileDownloadMenuItemView view;
   private EntityBundle entityBundle;
-  private SynapseClientAsync synapseClient;
   private PortalGinInjector ginInjector;
   SynapseJavascriptClient jsClient;
   AuthenticationController authController;
@@ -57,9 +50,8 @@ public class FileDownloadMenuItem
   JavaScriptObject s3;
 
   @Inject
-  public FileDownloadMenuItem(
+  public FileDownloadHandlerWidget(
     FileDownloadMenuItemView view,
-    SynapseClientAsync synapseClient,
     PortalGinInjector ginInjector,
     SynapseJavascriptClient jsClient,
     AuthenticationController authController,
@@ -70,8 +62,6 @@ public class FileDownloadMenuItem
     PopupUtilsView popupUtilsView
   ) {
     this.view = view;
-    this.synapseClient = synapseClient;
-    fixServiceEntryPoint(synapseClient);
     this.ginInjector = ginInjector;
     this.jsClient = jsClient;
     this.authController = authController;
@@ -83,10 +73,13 @@ public class FileDownloadMenuItem
     view.setPresenter(this);
   }
 
-  public void configure(final EntityBundle bundle) {
+  public void configure(
+    final EntityActionMenu actionMenu,
+    final EntityBundle bundle
+  ) {
     view.clear();
     if (bundle.getRestrictionInformation() != null) {
-      configure(bundle, bundle.getRestrictionInformation());
+      configure(actionMenu, bundle, bundle.getRestrictionInformation());
     } else {
       jsClient.getRestrictionInformation(
         bundle.getEntity().getId(),
@@ -100,7 +93,7 @@ public class FileDownloadMenuItem
           public void onSuccess(
             RestrictionInformationResponse restrictionInformation
           ) {
-            configure(bundle, restrictionInformation);
+            configure(actionMenu, bundle, restrictionInformation);
           }
         }
       );
@@ -108,10 +101,12 @@ public class FileDownloadMenuItem
   }
 
   public void configure(
+    final EntityActionMenu actionMenu,
     EntityBundle bundle,
     RestrictionInformationResponse restrictionInformation
   ) {
     view.clear();
+    this.view.setActionMenu(actionMenu);
     this.entityBundle = bundle;
     dataFileHandle = getFileHandle();
     s3 = null;
@@ -202,11 +197,6 @@ public class FileDownloadMenuItem
   }
 
   @Override
-  public Widget asWidget() {
-    return view.asWidget();
-  }
-
-  @Override
   public void onUnauthenticatedS3DirectDownloadClicked() {
     // ask for credentials, use bucket/endpoint info from storage location
     ExternalObjectStoreFileHandle objectStoreFileHandle = (ExternalObjectStoreFileHandle) dataFileHandle;
@@ -221,15 +211,12 @@ public class FileDownloadMenuItem
     String secretAccessKey
   ) {
     final ExternalObjectStoreFileHandle objectStoreFileHandle = (ExternalObjectStoreFileHandle) dataFileHandle;
-    CallbackP<JavaScriptObject> s3Callback = new CallbackP<JavaScriptObject>() {
-      @Override
-      public void invoke(JavaScriptObject s3JsObject) {
-        s3 = s3JsObject;
-        // NOTE: most browsers block the popup because the button click event is not directly associated to
-        // the login popup.
-        // Show the direct download button after authorization succeeds.
-        view.showS3DirectDownloadDialog();
-      }
+    CallbackP<JavaScriptObject> s3Callback = s3JsObject -> {
+      s3 = s3JsObject;
+      // NOTE: most browsers block the popup because the button click event is not directly associated to
+      // the login popup.
+      // Show the direct download button after authorization succeeds.
+      view.showS3DirectDownloadDialog();
     };
     awsSdk.getS3(
       accessKeyId,

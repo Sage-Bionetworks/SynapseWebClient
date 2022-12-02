@@ -37,10 +37,15 @@ public class WikiTab {
     if (wikiPageWidget == null) {
       this.wikiPageWidget = ginInjector.getWikiPageWidget();
       wikiPageWidget.addStyleName(
-        "panel panel-default panel-body margin-top-15 margin-left-15 margin-right-15 margin-bottom-0-imp"
+        "panel panel-default panel-body margin-top-15 entity-page-side-margins margin-bottom-0-imp"
       );
       wikiPageWidget.setWikiReloadHandler(wikiPageId -> {
-        tab.configureEntityActionController(projectBundle, true, wikiPageId);
+        tab.configureEntityActionController(
+          projectBundle,
+          true,
+          wikiPageId,
+          null
+        );
         setEntityNameAndPlace(entityId, entityName, wikiPageId);
       });
       tab.setContent(wikiPageWidget.asWidget());
@@ -63,7 +68,7 @@ public class WikiTab {
     this.entityId = entityId;
     this.entityName = entityName;
     this.projectBundle = projectBundle;
-    tab.configureEntityActionController(projectBundle, true, wikiPageId);
+    tab.configureEntityActionController(projectBundle, true, wikiPageId, null);
     WikiPageKey wikiPageKey = new WikiPageKey(
       entityId,
       ObjectType.ENTITY.name(),

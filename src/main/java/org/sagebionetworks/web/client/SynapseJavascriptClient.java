@@ -947,6 +947,25 @@ public class SynapseJavascriptClient {
     );
   }
 
+  public FluentFuture<RestrictionInformationResponse> getRestrictionInformation(
+    String subjectId,
+    RestrictableObjectType type
+  ) {
+    String url = getRepoServiceUrl() + RESTRICTION_INFORMATION;
+    RestrictionInformationRequest request = new RestrictionInformationRequest();
+    request.setObjectId(subjectId);
+    request.setRestrictableObjectType(type);
+    return getFuture(callback ->
+      doPost(
+        url,
+        request,
+        OBJECT_TYPE.RestrictionInformationResponse,
+        true,
+        callback
+      )
+    );
+  }
+
   public Request getEntityChildren(
     EntityChildrenRequest request,
     final AsyncCallback<EntityChildrenResponse> callback
@@ -958,6 +977,15 @@ public class SynapseJavascriptClient {
       OBJECT_TYPE.EntityChildrenResponse,
       true,
       callback
+    );
+  }
+
+  public FluentFuture<EntityChildrenResponse> getEntityChildren(
+    EntityChildrenRequest request
+  ) {
+    String url = getRepoServiceUrl() + ENTITY + CHILDREN;
+    return getFuture(callback ->
+      doPost(url, request, OBJECT_TYPE.EntityChildrenResponse, true, callback)
     );
   }
 

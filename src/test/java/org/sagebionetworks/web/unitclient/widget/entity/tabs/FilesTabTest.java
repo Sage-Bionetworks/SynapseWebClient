@@ -21,7 +21,6 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -51,9 +50,10 @@ import org.sagebionetworks.web.client.widget.entity.VersionHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
+import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.entity.tabs.FilesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.FilesTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
@@ -157,7 +157,10 @@ public class FilesTabTest {
   ArgumentCaptor<CallbackP> callbackPCaptor;
 
   @Mock
-  ActionMenuWidget mockActionMenuWidget;
+  EntityActionMenu mockActionMenuWidget;
+
+  @Mock
+  AddToDownloadListV2 mockAddToDownloadListWidget;
 
   @Mock
   SynapseJavascriptClient mockJsClient;
@@ -214,6 +217,8 @@ public class FilesTabTest {
     when(mockPortalGinInjector.getSynapseJavascriptClient())
       .thenReturn(mockJsClient);
     when(mockPortalGinInjector.getCookieProvider()).thenReturn(mockCookies);
+    when(mockPortalGinInjector.getAddToDownloadListV2())
+      .thenReturn(mockAddToDownloadListWidget);
 
     tab.setEntitySelectedCallback(mockEntitySelectedCallback);
 

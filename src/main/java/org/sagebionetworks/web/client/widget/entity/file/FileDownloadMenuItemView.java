@@ -1,9 +1,12 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
 import com.google.gwt.user.client.ui.IsWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 
 public interface FileDownloadMenuItemView extends IsWidget {
   void setPresenter(Presenter presenter);
+
+  void setActionMenu(EntityActionMenu actionMenu);
 
   void clear();
 

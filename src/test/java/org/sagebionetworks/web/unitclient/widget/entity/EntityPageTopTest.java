@@ -60,8 +60,9 @@ import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTopView;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
+import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.DatasetsTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.DiscussionTab;
@@ -161,7 +162,7 @@ public class EntityPageTopTest {
   EntityActionController mockProjectActionController;
 
   @Mock
-  ActionMenuWidget mockProjectActionMenuWidget;
+  EntityActionMenu mockProjectActionMenuWidget;
 
   @Mock
   AccessControlList mockACL;
@@ -483,10 +484,9 @@ public class EntityPageTopTest {
         mockProjectBundle,
         true,
         projectWikiId,
-        projectSettingsEntityArea
+        projectSettingsEntityArea,
+        null
       );
-    verify(mockProjectActionMenuWidget)
-      .setToolsButtonIcon(EntityPageTop.PROJECT_SETTINGS, null);
 
     verify(mockFilesTab, never())
       .setProject(projectEntityId, mockProjectBundle, null);
@@ -595,8 +595,6 @@ public class EntityPageTopTest {
     verify(mockTabs).showTab(mockFilesInnerTab, false);
     verify(mockProjectMetadata)
       .configure(mockProjectBundle, null, mockProjectActionMenuWidget);
-    verify(mockProjectActionMenuWidget)
-      .setToolsButtonIcon(EntityPageTop.PROJECT_SETTINGS, null);
 
     verify(mockFilesTab).setProject(projectEntityId, mockProjectBundle, null);
     verify(mockFilesTab).configure(mockEntityBundle, versionNumber);
