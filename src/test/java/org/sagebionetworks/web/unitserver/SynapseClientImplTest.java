@@ -278,6 +278,9 @@ public class SynapseClientImplTest {
   Challenge mockChallenge;
 
   @Mock
+  PaginatedResults<VersionInfo> mockPaginatedVersionResults;
+
+  @Mock
   MembershipInvitation mockMembershipInvitation;
 
   @Captor
@@ -531,6 +534,9 @@ public class SynapseClientImplTest {
     when(mockEntityChildrenResponse.getPage()).thenReturn(entityChildrenPage);
     when(mockSynapse.getEntityChildren(any(EntityChildrenRequest.class)))
       .thenReturn(mockEntityChildrenResponse);
+
+    when(mockSynapse.getEntityVersions(anyString(), anyInt(), anyInt()))
+      .thenReturn(mockPaginatedVersionResults);
   }
 
   private AccessRequirement createAccessRequirement(ACCESS_TYPE type) {
@@ -1105,6 +1111,26 @@ public class SynapseClientImplTest {
       "parentEntityId"
     );
     assertEquals(fileEntityId, file.getId());
+  }
+
+  @Test
+  public void testGetLatestEnttiyVersion() throws RestServiceException {
+    String entityId = "syn1";
+    List<VersionInfo> entityVersions = new ArrayList<VersionInfo>();
+    when(mockPaginatedVersionResults.getResults()).thenReturn(entityVersions);
+
+    // when no versions are available, returns null
+    assertNull(synapseClient.getLatestEntityVersion(entityId));
+
+    VersionInfo latestVersion = new VersionInfo();
+    Long latestVersionNumber = 42L;
+    latestVersion.setVersionNumber(latestVersionNumber);
+    entityVersions.add(latestVersion);
+
+    assertEquals(
+      latestVersionNumber,
+      synapseClient.getLatestEntityVersion(entityId)
+    );
   }
 
   @Test
