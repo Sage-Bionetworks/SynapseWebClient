@@ -8,7 +8,11 @@
 >
   <bh:Div>
     <!-- Tabs -->
-    <b:NavTabs ui:field="navTabs" addStyleNames="position-relative">
+    <b:NavTabs
+      b:id="projectTabs"
+      ui:field="navTabs"
+      addStyleNames="position-relative"
+    >
       <!-- list of b:TabListItem-->
       <!-- <b:TabListItem ui:field="tabItem1" active="true" dataTarget="#tab1" text="Tab1"/>  -->
     </b:NavTabs>
