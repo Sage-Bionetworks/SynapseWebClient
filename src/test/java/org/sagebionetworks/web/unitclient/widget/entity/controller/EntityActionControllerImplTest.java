@@ -3585,9 +3585,8 @@ public class EntityActionControllerImplTest {
     );
     verify(mockActionMenu).setActionVisible(Action.CREATE_OR_UPDATE_DOI, false);
     verify(mockActionMenu).setActionVisible(Action.CREATE_OR_UPDATE_DOI, true);
-    // verify that we currently do not support FTS for EntityViews
     verify(mockActionMenu)
-      .setActionVisible(Action.TOGGLE_FULL_TEXT_SEARCH, false);
+      .setActionVisible(Action.TOGGLE_FULL_TEXT_SEARCH, true);
   }
 
   @Test
