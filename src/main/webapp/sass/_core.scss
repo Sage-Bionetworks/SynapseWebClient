@@ -311,8 +311,6 @@ end sticky footer
     padding: 15px 0 30px 0;
   }
   .nav-tabs {
-    display: flex;
-    flex-wrap: wrap;
     border-bottom: none;
     box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.05);
     > li {
@@ -331,14 +329,14 @@ end sticky footer
     text-decoration: none;
   }
   .nav-tabs > li > a {
+    text-decoration: none;
     box-shadow: none;
     border-left: none;
     border-right: none;
     border-bottom: none;
   }
   .nav > li > a {
-    height: 50px;
-    padding: 15px 2px;
+    padding: 25px 15px 18px 15px;
   }
   .nav-tabs > li.active > a,
   #rootPanel .nav-tabs > li > a:hover {
@@ -346,6 +344,15 @@ end sticky footer
     background-color: unset;
     border-color: transparent;
     text-decoration: none;
+  }
+
+  #projectTabs.nav-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    > li > a {
+      height: 50px;
+      padding: 15px 2px;
+    }
   }
   @media (min-width: 768px) {
     .lead {
@@ -2371,7 +2378,7 @@ i.fa.small-icon {
 }
 @media (min-width: 992px) {
   #body {
-    .nav-tabs {
+    #projectTabs.nav-tabs {
       padding-left: $entity-page-side-spacing;
     }
   }
