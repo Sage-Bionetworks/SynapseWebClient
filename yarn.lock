@@ -2837,10 +2837,10 @@ supports-preserve-symlinks-flag@^1.0.0:
   resolved "https://registry.yarnpkg.com/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz#6eda4bd344a3c94aea376d4cc31bc77311039e09"
   integrity sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==
 
-synapse-react-client@3.1.17:
-  version "3.1.17"
-  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-3.1.17.tgz#1ea1dfbb5155bff529b06d76795f831906a562fa"
-  integrity sha512-IkplQG5nyb6NNzgNUAHvb7neBLRptpn9kjDIwrOXl/1qrBzrBkXDQnIQhhy9K/WQUDTDNCAIp4Yp9fbAYbmoxg==
+synapse-react-client@3.1.18:
+  version "3.1.18"
+  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-3.1.18.tgz#1e1518c070c65d115c1d94167311ef403ddc500a"
+  integrity sha512-Zp0WmkY6wDFFYUw1ReBCQZF5lK2tSlp7BlZ4NBBc7kZaYgsLv73mICXdyOKsHZNxuoHpSQFAezqfPzXWyHxg2A==
   dependencies:
     "@apidevtools/json-schema-ref-parser" "^9.0.9"
     "@brainhubeu/react-carousel" "1.19.26"
