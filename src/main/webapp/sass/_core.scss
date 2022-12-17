@@ -3967,3 +3967,12 @@ div.border {
   width: 0;
   min-width: 100%;
 }
+
+// quick patch for https://sagebionetworks.jira.com/browse/SWC-6343
+.SynapseHomepage
+  .PoweredBySynapseFlexContainer
+  .PoweredBySynapseItem
+  .PoweredBySynapseItemGrid
+  .logo {
+  max-width: 50px;
+}
