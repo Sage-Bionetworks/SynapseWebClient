@@ -99,13 +99,23 @@ public class TeamEditModalWidget
   public void onConfirm() {
     String newName = view.getName();
     String newDescription = view.getDescription();
-    boolean canPublicJoin = view.getPublicJoin();
+
+    Boolean canPublicJoin = false;
+    Boolean canRequestMembership = null;
+
+    if (view.getIsLockedDown()) {
+      canRequestMembership = false;
+    } else if (view.getIsNoAuthRequired()) {
+      canPublicJoin = true;
+    } //else team in default state, so canRequestMembership should remain null and canPublicJoin should remain false
+
     if (newName == null || newName.trim().length() == 0) {
       synAlert.showError("You must provide a name.");
     } else {
       team.setName(newName);
       team.setDescription(newDescription);
       team.setCanPublicJoin(canPublicJoin);
+      team.setCanRequestMembership(canRequestMembership);
       team.setIcon(uploadedFileHandleId);
       updateACLFromView();
       synapseClient.updateTeam(
@@ -148,6 +158,20 @@ public class TeamEditModalWidget
     view.hideLoading();
     view.clear();
     view.configure(team);
+    //SWC-6259
+    Boolean canPublicJoin = team.getCanPublicJoin();
+    Boolean canRequestMembership = team.getCanRequestMembership();
+    // default:
+    view.setTeamManagerAuthRequiredOptionActive();
+    if (canRequestMembership == null) {
+      if (canPublicJoin != null && canPublicJoin) {
+        view.setNoAuthNeededOptionActive();
+      }
+    } else {
+      if (!canRequestMembership.booleanValue()) {
+        view.setLockedDownOptionActive();
+      }
+    }
     if (team.getIcon() != null) view.setImageURL(
       jsniUtils.getFileHandleAssociationUrl(
         team.getId(),
