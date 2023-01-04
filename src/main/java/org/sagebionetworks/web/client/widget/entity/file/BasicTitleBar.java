@@ -1,58 +1,32 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
-import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.Project;
+import java.util.function.Consumer;
+import org.sagebionetworks.repo.model.RestrictableObjectType;
+import org.sagebionetworks.repo.model.VersionableEntity;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
-import org.sagebionetworks.web.client.EntityTypeUtils;
-import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.jsinterop.EntityPageTitleBarProps;
+import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenuProps;
 
 public class BasicTitleBar implements SynapseWidgetPresenter {
 
   private BasicTitleBarView view;
-  private AuthenticationController authenticationController;
-  private FavoriteWidget favWidget;
+  private final GlobalApplicationState globalAppState;
+
+  private EntityPageTitleBarProps props;
 
   @Inject
   public BasicTitleBar(
     BasicTitleBarView view,
-    AuthenticationController authenticationController,
-    FavoriteWidget favWidget
+    GlobalApplicationState globalApplicationState
   ) {
     this.view = view;
-    this.authenticationController = authenticationController;
-    this.favWidget = favWidget;
-    view.setFavoritesWidget(favWidget.asWidget());
-  }
-
-  public void configure(EntityBundle bundle) {
-    favWidget.configure(bundle.getEntity().getId());
-    view.setFavoritesWidgetVisible(authenticationController.isLoggedIn());
-    view.setTitle(bundle.getEntity().getName());
-    if (!(bundle.getEntity() instanceof Project)) {
-      view.setEntityType(EntityTypeUtils.getEntityType(bundle.getEntity()));
-    } else {
-      view.setEntityType(null);
-    }
-  }
-
-  public void configure(EntityHeader entityHeader) {
-    favWidget.configure(entityHeader.getId());
-    view.setFavoritesWidgetVisible(authenticationController.isLoggedIn());
-    view.setTitle(entityHeader.getName());
-    if (!(Project.class.getName().equals(entityHeader.getType()))) {
-      view.setEntityType(EntityTypeUtils.getEntityType(entityHeader));
-    } else {
-      view.setEntityType(null);
-    }
-  }
-
-  public void clearState() {
-    view.clear();
+    this.globalAppState = globalApplicationState;
   }
 
   @Override
@@ -60,7 +34,45 @@ public class BasicTitleBar implements SynapseWidgetPresenter {
     return view.asWidget();
   }
 
-  public void setActionMenu(IsWidget w) {
-    view.setActionMenu(w);
+  public void configure(EntityBundle bundle, EntityActionMenu actionMenu) {
+    if (bundle.getEntity() instanceof VersionableEntity) {
+      this.props =
+        EntityPageTitleBarProps.create(
+          bundle.getEntity().getId(),
+          ((VersionableEntity) bundle.getEntity()).getVersionNumber()
+        );
+    } else {
+      this.props = EntityPageTitleBarProps.create(bundle.getEntity().getId());
+    }
+    addActClickhandler(bundle.getEntity().getId());
+    setActionMenu(actionMenu);
+    this.view.setProps(this.props);
+  }
+
+  private void addActClickhandler(String entityId) {
+    this.props.setOnActMemberClickAddConditionsForUse(() -> {
+        // go to access requirements place where they can modify access requirements
+        AccessRequirementsPlace place = new AccessRequirementsPlace("");
+        place.putParam(AccessRequirementsPlace.ID_PARAM, entityId);
+        place.putParam(
+          AccessRequirementsPlace.TYPE_PARAM,
+          RestrictableObjectType.ENTITY.toString()
+        );
+        globalAppState.getPlaceChanger().goTo(place);
+      });
+  }
+
+  private void setActionMenu(EntityActionMenu actionMenu) {
+    this.props.setEntityActionMenuProps(actionMenu.getProps());
+
+    // An action menu will be rendered in the title bar by React, so remove it from the parent
+    actionMenu.asWidget().removeFromParent();
+
+    // Register a listener so the menu will update when the props change
+    Consumer<EntityActionMenuProps> onActionMenuPropsChange = actionMenuProps -> {
+      this.props.setEntityActionMenuProps(actionMenuProps);
+      this.view.setProps(this.props);
+    };
+    actionMenu.addPropUpdateListener(onActionMenuPropsChange);
   }
 }

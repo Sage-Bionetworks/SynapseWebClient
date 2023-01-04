@@ -21,6 +21,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.DisplayConstants.FILE_VIEW;
 import static org.sagebionetworks.web.client.DisplayConstants.MATERIALIZED_VIEW;
+import static org.sagebionetworks.web.client.DisplayConstants.VIEW_DOWNLOAD_LIST;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getDoneFuture;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getFailedFuture;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.ARE_YOU_SURE_YOU_WANT_TO_DELETE;
@@ -58,6 +59,7 @@ import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
+import org.sagebionetworks.client.exceptions.SynapseClientException;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.Challenge;
@@ -79,6 +81,7 @@ import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.doi.v2.DoiAssociation;
+import org.sagebionetworks.repo.model.download.AddBatchOfFilesToDownloadListResponse;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.Dataset;
@@ -106,9 +109,11 @@ import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.jsinterop.ToastMessageOptions;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
+import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
@@ -120,6 +125,7 @@ import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.clienthelp.ContainerClientsHelp;
+import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelp;
 import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModal;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
@@ -320,6 +326,9 @@ public class EntityActionControllerImplTest {
   @Captor
   ArgumentCaptor<AsynchronousProgressHandler> asyncProgressHandlerCaptor;
 
+  @Captor
+  ArgumentCaptor<AsyncCallback<AddBatchOfFilesToDownloadListResponse>> addToDownloadListAsyncCallbackCaptor;
+
   @Mock
   TableUpdateTransactionResponse mockTableUpdateTransactionResponse;
 
@@ -346,6 +355,9 @@ public class EntityActionControllerImplTest {
 
   @Mock
   SynapseJSNIUtilsImpl mockJsniUtils;
+
+  @Mock
+  FileClientsHelp mockFileClientsHelp;
 
   @Mock
   ContainerClientsHelp mockContainerClientsHelp;
@@ -431,6 +443,8 @@ public class EntityActionControllerImplTest {
       .thenReturn(mockPromptModalConfigurationBuilder);
     when(mockPortalGinInjector.getFileDownloadHandlerWidget())
       .thenReturn(mockFileDownloadHandlerWidget);
+    when(mockPortalGinInjector.getFileClientsHelp())
+      .thenReturn(mockFileClientsHelp);
     when(mockPortalGinInjector.getContainerClientsHelp())
       .thenReturn(mockContainerClientsHelp);
     when(mockIsACTMemberAsyncHandler.isACTActionAvailable())
@@ -4453,6 +4467,165 @@ public class EntityActionControllerImplTest {
 
     verify(mockFileDownloadHandlerWidget)
       .configure(mockActionMenu, entityBundle, mockRestrictionInformation);
+  }
+
+  @Test
+  public void testAddFileToDownloadCartHandlerSuccess() {
+    FileEntity file = new FileEntity();
+    file.setId(entityId);
+    file.setName(entityName);
+    file.setVersionNumber(3L);
+    entityBundle.setEntity(file);
+
+    // Call under test
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+
+    verify(mockActionMenu).setActionVisible(Action.ADD_TO_DOWNLOAD_CART, true);
+    verify(mockActionMenu)
+      .setActionListener(
+        eq(Action.ADD_TO_DOWNLOAD_CART),
+        actionListenerCaptor.capture()
+      );
+
+    // Call under test
+    actionListenerCaptor.getValue().onAction(Action.ADD_TO_DOWNLOAD_CART, null);
+
+    verify(mockSynapseJavascriptClient)
+      .addFileToDownloadListV2(
+        eq(entityId),
+        eq(3L),
+        addToDownloadListAsyncCallbackCaptor.capture()
+      );
+
+    // Call succeeds
+    addToDownloadListAsyncCallbackCaptor.getValue().onSuccess(null);
+    verify(mockPopupUtils)
+      .showInfo(anyString(), anyString(), eq(VIEW_DOWNLOAD_LIST));
+    verify(mockEventBus).fireEvent(any(DownloadListUpdatedEvent.class));
+  }
+
+  @Test
+  public void testAddFileToDownloadCartHandlerFailure() {
+    FileEntity file = new FileEntity();
+    file.setId(entityId);
+    file.setName(entityName);
+    file.setVersionNumber(3L);
+    entityBundle.setEntity(file);
+
+    // Call under test
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+
+    verify(mockActionMenu).setActionVisible(Action.ADD_TO_DOWNLOAD_CART, true);
+    verify(mockActionMenu)
+      .setActionListener(
+        eq(Action.ADD_TO_DOWNLOAD_CART),
+        actionListenerCaptor.capture()
+      );
+
+    // Call under test
+    actionListenerCaptor.getValue().onAction(Action.ADD_TO_DOWNLOAD_CART, null);
+
+    verify(mockSynapseJavascriptClient)
+      .addFileToDownloadListV2(
+        eq(entityId),
+        eq(3L),
+        addToDownloadListAsyncCallbackCaptor.capture()
+      );
+
+    // Call fails
+    String message = "failure reason";
+    addToDownloadListAsyncCallbackCaptor
+      .getValue()
+      .onFailure(new SynapseClientException(message));
+    verify(mockView).showErrorMessage(eq(message));
+    verify(mockEventBus, never())
+      .fireEvent(any(DownloadListUpdatedEvent.class));
+  }
+
+  @Test
+  public void testAddFileToDownloadCartHandlerUnauthenticated() {
+    when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+
+    FileEntity file = new FileEntity();
+    file.setId(entityId);
+    file.setName(entityName);
+    file.setVersionNumber(3L);
+    entityBundle.setEntity(file);
+
+    // Call under test
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+
+    verify(mockActionMenu).setActionVisible(Action.ADD_TO_DOWNLOAD_CART, true);
+    verify(mockActionMenu)
+      .setActionListener(
+        eq(Action.ADD_TO_DOWNLOAD_CART),
+        actionListenerCaptor.capture()
+      );
+
+    // Call under test
+    actionListenerCaptor.getValue().onAction(Action.ADD_TO_DOWNLOAD_CART, null);
+
+    verify(mockView).showErrorMessage(anyString());
+    verify(mockPlaceChanger).goTo(any(LoginPlace.class));
+    verify(mockSynapseJavascriptClient, never())
+      .addFileToDownloadListV2(any(), any(), any());
+    verify(mockEventBus, never())
+      .fireEvent(any(DownloadListUpdatedEvent.class));
+  }
+
+  @Test
+  public void testFileShowProgrammaticOptionsHandler() {
+    FileEntity file = new FileEntity();
+    file.setId(entityId);
+    file.setName(entityName);
+    file.setVersionNumber(3L);
+    entityBundle.setEntity(file);
+
+    // Call under test
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+
+    verify(mockActionMenu)
+      .setActionVisible(Action.SHOW_PROGRAMMATIC_OPTIONS, true);
+    verify(mockActionMenu)
+      .setActionListener(
+        eq(Action.SHOW_PROGRAMMATIC_OPTIONS),
+        actionListenerCaptor.capture()
+      );
+
+    // Call under test
+    actionListenerCaptor
+      .getValue()
+      .onAction(Action.SHOW_PROGRAMMATIC_OPTIONS, null);
+
+    verify(mockFileClientsHelp).configureAndShow(entityId, 3L);
   }
 
   @Test

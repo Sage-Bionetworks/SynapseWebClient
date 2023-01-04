@@ -47,6 +47,7 @@ import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.VersionableEntity;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
+import org.sagebionetworks.repo.model.download.AddBatchOfFilesToDownloadListResponse;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.Dataset;
@@ -75,12 +76,14 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.jsinterop.AlertButtonConfig;
 import org.sagebionetworks.web.client.jsinterop.EntityFinderScope;
 import org.sagebionetworks.web.client.jsinterop.ReactMouseEvent;
 import org.sagebionetworks.web.client.jsinterop.ToastMessageOptions;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
+import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
@@ -92,10 +95,12 @@ import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.clienthelp.ContainerClientsHelp;
+import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelp;
 import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModal;
 import org.sagebionetworks.web.client.widget.doi.CreateOrUpdateDoiModal;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
+import org.sagebionetworks.web.client.widget.entity.EntityBadge;
 import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalView;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
@@ -222,6 +227,7 @@ public class EntityActionControllerImpl
   SynapseClientAsync synapseClient;
   SynapseJavascriptClient jsClient;
   GlobalApplicationState globalApplicationState;
+  FileClientsHelp fileClientsHelp;
   AuthenticationController authenticationController;
   AccessControlListModalWidget accessControlListModalWidget;
   RenameEntityModalWidget renameEntityModalWidget;
@@ -396,6 +402,13 @@ public class EntityActionControllerImpl
       globalApplicationState = ginInjector.getGlobalApplicationState();
     }
     return globalApplicationState;
+  }
+
+  private FileClientsHelp getFileClientsHelp() {
+    if (fileClientsHelp == null) {
+      fileClientsHelp = ginInjector.getFileClientsHelp();
+    }
+    return fileClientsHelp;
   }
 
   private AccessControlListModalWidget getAccessControlListModalWidget() {
@@ -663,9 +676,7 @@ public class EntityActionControllerImpl
   }
 
   private void configureFullTextSearch() {
-    if (
-      entityBundle.getEntity() instanceof Table
-    ) {
+    if (entityBundle.getEntity() instanceof Table) {
       Table tableEntity = (Table) entityBundle.getEntity();
       actionMenu.setActionVisible(Action.TOGGLE_FULL_TEXT_SEARCH, true);
       actionMenu.setActionListener(Action.TOGGLE_FULL_TEXT_SEARCH, this);
@@ -697,9 +708,58 @@ public class EntityActionControllerImpl
         actionMenu.setDownloadMenuTooltipText(viewOnlyHelpText);
       }
       actionMenu.setActionVisible(Action.DOWNLOAD_FILE, true);
+
       actionMenu.setActionVisible(Action.ADD_TO_DOWNLOAD_CART, true);
+      actionMenu.setActionListener(
+        Action.ADD_TO_DOWNLOAD_CART,
+        (action, e) -> {
+          if (!authenticationController.isLoggedIn()) {
+            view.showErrorMessage(
+              "You will need to sign in to add a file to the Download List."
+            );
+            getGlobalApplicationState()
+              .getPlaceChanger()
+              .goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+          } else {
+            FileEntity entity = (FileEntity) entityBundle.getEntity();
+
+            getSynapseJavascriptClient()
+              .addFileToDownloadListV2(
+                entity.getId(),
+                entity.getVersionNumber(),
+                new AsyncCallback<AddBatchOfFilesToDownloadListResponse>() {
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    view.showErrorMessage(caught.getMessage());
+                  }
+
+                  public void onSuccess(
+                    AddBatchOfFilesToDownloadListResponse result
+                  ) {
+                    String href = "#!DownloadCart:0";
+                    popupUtils.showInfo(
+                      entity.getName() + EntityBadge.ADDED_TO_DOWNLOAD_LIST,
+                      href,
+                      DisplayConstants.VIEW_DOWNLOAD_LIST
+                    );
+                    eventBus.fireEvent(new DownloadListUpdatedEvent());
+                  }
+                }
+              );
+          }
+        }
+      );
 
       actionMenu.setActionVisible(Action.SHOW_PROGRAMMATIC_OPTIONS, true);
+      actionMenu.setActionListener(
+        Action.SHOW_PROGRAMMATIC_OPTIONS,
+        (action, e) ->
+          getFileClientsHelp()
+            .configureAndShow(
+              entity.getId(),
+              ((FileEntity) entity).getVersionNumber()
+            )
+      );
 
       future = getDoneFuture(entityBundle.getRestrictionInformation());
       if (entityBundle.getRestrictionInformation() == null) {

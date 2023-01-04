@@ -7,24 +7,29 @@ import jsinterop.base.JsPropertyMap;
 import org.sagebionetworks.web.client.jsinterop.ReactComponentProps;
 
 @JsType(isNative = true, namespace = JsPackage.GLOBAL, name = "Object")
-public class EntityActionMenuProps extends ReactComponentProps {
+public class EntityActionMenuPropsJsInterop extends ReactComponentProps {
 
-  JsPropertyMap<ActionConfiguration> actionConfiguration;
+  public JsPropertyMap<ActionConfiguration> actionConfiguration;
 
-  EntityActionMenuDropdownMap menuConfiguration;
+  public EntityActionMenuDropdownMap menuConfiguration;
 
-  EntityActionMenuLayout layout;
+  public EntityActionMenuLayout layout;
 
   @JsOverlay
-  public static EntityActionMenuProps create(
+  public static EntityActionMenuPropsJsInterop create(
     JsPropertyMap<ActionConfiguration> actionConfiguration,
     EntityActionMenuDropdownMap menuConfiguration,
     EntityActionMenuLayout layout
   ) {
-    EntityActionMenuProps props = new EntityActionMenuProps();
+    EntityActionMenuPropsJsInterop props = new EntityActionMenuPropsJsInterop();
     props.actionConfiguration = actionConfiguration;
     props.menuConfiguration = menuConfiguration;
     props.layout = layout;
     return props;
+  }
+
+  @JsOverlay
+  public final JsPropertyMap<ActionConfiguration> getActionConfiguration() {
+    return this.actionConfiguration;
   }
 }

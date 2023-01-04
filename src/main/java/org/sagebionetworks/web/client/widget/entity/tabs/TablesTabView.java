@@ -5,6 +5,8 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 public interface TablesTabView extends IsWidget {
+  void setProjectLevelUIVisible(boolean visible);
+
   public interface Presenter {}
 
   void setTitle(String title);

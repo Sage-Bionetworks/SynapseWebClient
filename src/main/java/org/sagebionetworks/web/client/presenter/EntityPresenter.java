@@ -8,6 +8,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.binder.EventHandler;
+import java.util.Collections;
 import java.util.List;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -21,9 +22,10 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.context.QueryClientProvider;
+import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.jsinterop.reactquery.QueryClient;
-import org.sagebionetworks.web.client.jsinterop.reactquery.SynapseReactClientQueryKey;
+import org.sagebionetworks.web.client.jsinterop.reactquery.SynapseReactClientEntityQueryKey;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -320,12 +322,20 @@ public class EntityPresenter
 
   @EventHandler
   public void onEntityUpdatedEvent(EntityUpdatedEvent event) {
-    List<SynapseReactClientQueryKey> queryKey = SynapseReactClientQueryKey.create(
+    List<SynapseReactClientEntityQueryKey> queryKey = SynapseReactClientEntityQueryKey.create(
       "entity",
       event.getEntityId()
     );
     queryClient.resetQueries(queryKey);
     globalAppState.refreshPage();
+  }
+
+  @EventHandler
+  public void onDownloadListUpdatedUpdatedEvent(
+    DownloadListUpdatedEvent _event
+  ) {
+    List<String> queryKey = Collections.singletonList("downloadList");
+    queryClient.invalidateQueries(queryKey);
   }
 
   // for testing only

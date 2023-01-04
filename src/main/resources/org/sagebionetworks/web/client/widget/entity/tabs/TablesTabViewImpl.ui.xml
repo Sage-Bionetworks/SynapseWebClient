@@ -8,8 +8,8 @@
   xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
 >
   <g:FlowPanel ui:field="tablesTabContainer" addStyleNames="tablesTabContent">
-    <g:SimplePanel ui:field="tableBreadcrumbContainer" visible="false" />
     <g:SimplePanel ui:field="synapseAlertContainer" />
+    <g:SimplePanel ui:field="tableBreadcrumbContainer" visible="false" />
     <w:FullWidthAlert
       ui:field="versionAlert"
       alertType="WARNING"
@@ -18,28 +18,33 @@
       primaryCTAText="View Version History"
       visible="false"
       global="false"
-      addStyleNames="moveup-10"
+      addStyleNames="margin-top-bottom-minus-10"
     />
+    <g:SimplePanel ui:field="tableTitlebarContainer" visible="false" />
+    <g:SimplePanel ui:field="tableMetadataContainer" visible="false" />
+
     <bh:Div addStyleNames="margin-top-15 entity-page-side-margins">
-      <bh:Div addStyleNames="flexcontainer-row">
+      <bh:Div
+        ui:field="projectLevelUI"
+        addStyleNames="flexcontainer-row flexcontainer-align-items-center"
+      >
         <bh:Div
           addStyleNames="flexcontainer-column flexcontainer-column-fill-width"
         >
-          <g:SimplePanel ui:field="tableTitlebarContainer" visible="false" />
+          <bh:Div>
+            <b:Heading size="H3" ui:field="title" />
+            <bh:Div addStyleNames="margin-bottom-20">
+              <bh:Span ui:field="tableDescription" />
+              <b:Anchor ui:field="helpLink" />
+            </bh:Div>
+          </bh:Div>
         </bh:Div>
         <bh:Div
           addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end min-width-70"
           ui:field="actionMenuContainer"
         />
       </bh:Div>
-      <bh:Div>
-        <g:SimplePanel ui:field="tableMetadataContainer" visible="false" />
-        <b:Heading size="H3" ui:field="title" />
-        <bh:Div addStyleNames="margin-bottom-20">
-          <bh:Span ui:field="tableDescription" />
-          <b:Anchor ui:field="helpLink" />
-        </bh:Div>
-      </bh:Div>
+
       <g:FlowPanel>
         <g:SimplePanel ui:field="tableListWidgetContainer" visible="false" />
         <g:SimplePanel

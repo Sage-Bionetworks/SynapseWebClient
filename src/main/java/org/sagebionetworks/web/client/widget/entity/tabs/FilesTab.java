@@ -34,7 +34,6 @@ import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
-import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.provenance.v2.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.refresh.EntityRefreshAlert;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -45,7 +44,7 @@ public class FilesTab {
 
   Tab tab;
   FilesTabView view;
-  FileTitleBar fileTitleBar;
+  BasicTitleBar titleBar;
   BasicTitleBar folderTitleBar;
   Breadcrumb breadcrumb;
   EntityMetadata metadata;
@@ -85,7 +84,7 @@ public class FilesTab {
   public void lazyInject() {
     if (view == null) {
       this.view = ginInjector.getFilesTabView();
-      this.fileTitleBar = ginInjector.getFileTitleBar();
+      this.titleBar = ginInjector.getBasicTitleBar();
       this.folderTitleBar = ginInjector.getBasicTitleBar();
       this.breadcrumb = ginInjector.getBreadcrumb();
       this.metadata = ginInjector.getEntityMetadata();
@@ -103,7 +102,7 @@ public class FilesTab {
       this.addToDownloadListWidget = ginInjector.getAddToDownloadListV2();
       tab.setContent(view.asWidget());
       previewWidget.addStyleName("min-height-200");
-      view.setFileTitlebar(fileTitleBar.asWidget());
+      view.setTitlebar(titleBar.asWidget());
       view.setFolderTitlebar(folderTitleBar.asWidget());
       view.setBreadcrumb(breadcrumb.asWidget());
       view.setFileBrowser(filesBrowser.asWidget());
@@ -245,11 +244,8 @@ public class FilesTab {
     // File title bar
     view.setFileTitlebarVisible(isFile);
     if (isFile) {
-      fileTitleBar.configure(
-        bundle,
-        tab.getEntityActionMenu(),
-        metadata.getVersionHistoryWidget()
-      );
+      titleBar.configure(bundle, tab.getEntityActionMenu());
+
       previewWidget.configure(bundle);
       discussionThreadListWidget.configure(currentEntityId, null, null);
       view.setDiscussionText(currentEntity.getName());
@@ -257,8 +253,7 @@ public class FilesTab {
     view.setDiscussionThreadListWidgetVisible(isFile);
     view.setFolderTitlebarVisible(isFolder);
     if (isFolder) {
-      folderTitleBar.configure(bundle);
-      folderTitleBar.setActionMenu(tab.getEntityActionMenu());
+      folderTitleBar.configure(bundle, tab.getEntityActionMenu());
     }
 
     // Metadata

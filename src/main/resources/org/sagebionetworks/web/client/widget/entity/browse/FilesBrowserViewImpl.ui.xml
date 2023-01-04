@@ -11,7 +11,7 @@
   xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt"
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 >
-  <bh:Div addStyleNames="filesBrowser">
+  <bh:Div addStyleNames="filesBrowser margin-top-15">
     <bh:Div
       ui:field="commandsContainer"
       addStyleNames="flexcontainer-row"

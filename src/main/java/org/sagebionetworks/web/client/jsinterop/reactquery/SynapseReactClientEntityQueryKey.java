@@ -8,7 +8,7 @@ import jsinterop.annotations.JsPackage;
 import jsinterop.annotations.JsType;
 
 @JsType(isNative = true, namespace = JsPackage.GLOBAL, name = "Object")
-public class SynapseReactClientQueryKey {
+public class SynapseReactClientEntityQueryKey {
 
   public String objectType;
 
@@ -16,11 +16,11 @@ public class SynapseReactClientQueryKey {
   public String id;
 
   @JsOverlay
-  public static List<SynapseReactClientQueryKey> create(
+  public static List<SynapseReactClientEntityQueryKey> create(
     String objectType,
     String id
   ) {
-    SynapseReactClientQueryKey defaultQueryKey = new SynapseReactClientQueryKey();
+    SynapseReactClientEntityQueryKey defaultQueryKey = new SynapseReactClientEntityQueryKey();
     defaultQueryKey.objectType = objectType;
     defaultQueryKey.id = id;
     return Arrays.asList(defaultQueryKey);

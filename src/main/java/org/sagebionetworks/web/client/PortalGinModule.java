@@ -436,12 +436,10 @@ import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBarView;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBarViewImpl;
 import org.sagebionetworks.web.client.widget.entity.file.FileDownloadMenuItemView;
 import org.sagebionetworks.web.client.widget.entity.file.FileDownloadMenuItemViewImpl;
-import org.sagebionetworks.web.client.widget.entity.file.FileTitleBarView;
-import org.sagebionetworks.web.client.widget.entity.file.FileTitleBarViewImpl;
+import org.sagebionetworks.web.client.widget.entity.file.ProjectTitleBarView;
+import org.sagebionetworks.web.client.widget.entity.file.ProjectTitleBarViewImpl;
 import org.sagebionetworks.web.client.widget.entity.file.S3DirectLoginDialog;
 import org.sagebionetworks.web.client.widget.entity.file.S3DirectLoginDialogImpl;
-import org.sagebionetworks.web.client.widget.entity.file.TableTitleBarView;
-import org.sagebionetworks.web.client.widget.entity.file.TableTitleBarViewImpl;
 import org.sagebionetworks.web.client.widget.entity.file.downloadlist.PackageSizeSummaryView;
 import org.sagebionetworks.web.client.widget.entity.file.downloadlist.PackageSizeSummaryViewImpl;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
@@ -1020,14 +1018,10 @@ public class PortalGinModule extends AbstractGinModule {
     bind(RenameEntityModalWidget.class).to(RenameEntityModalWidgetImpl.class);
     // Rejected Reason
     bind(RejectReasonView.class).to(RejectReasonViewImpl.class);
-    // FileBox
-    bind(FileTitleBarView.class)
-      .to(FileTitleBarViewImpl.class)
-      .in(Singleton.class);
 
+    bind(ProjectTitleBarView.class).to(ProjectTitleBarViewImpl.class);
     bind(BasicTitleBarView.class).to(BasicTitleBarViewImpl.class);
 
-    bind(TableTitleBarView.class).to(TableTitleBarViewImpl.class);
     // Search Box
     bind(SearchBoxView.class).to(SearchBoxViewImpl.class).in(Singleton.class);
     // Reject Data Access Request Dialog

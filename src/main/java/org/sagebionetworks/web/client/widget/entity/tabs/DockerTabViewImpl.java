@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.tabs;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -28,6 +29,9 @@ public class DockerTabViewImpl implements DockerTabView {
 
   @UiField
   Heading title;
+
+  @UiField
+  FlowPanel projectLevelUi;
 
   Presenter presenter;
   Widget widget;
@@ -89,6 +93,11 @@ public class DockerTabViewImpl implements DockerTabView {
   @Override
   public void clearDockerRepoWidget() {
     dockerRepoWidgetContainer.clear();
+  }
+
+  @Override
+  public void setProjectLevelUiVisible(boolean visible) {
+    projectLevelUi.setVisible(visible);
   }
 
   @Override

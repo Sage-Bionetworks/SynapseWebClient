@@ -14,7 +14,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
-import org.sagebionetworks.web.client.widget.entity.file.DockerTitleBar;
+import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
@@ -29,7 +29,7 @@ public class DockerRepoWidget {
   private ProvenanceWidget provWidget;
   private EntityMetadata metadata;
   private ModifiedCreatedByWidget modifiedCreatedBy;
-  private DockerTitleBar dockerTitleBar;
+  private BasicTitleBar dockerTitleBar;
   private DockerCommitListWidget dockerCommitListWidget;
   private CookieProvider cookies;
   private boolean canEdit;
@@ -41,7 +41,7 @@ public class DockerRepoWidget {
     DockerRepoWidgetView view,
     WikiPageWidget wikiPageWidget,
     ProvenanceWidget provWidget,
-    DockerTitleBar dockerTitleBar,
+    BasicTitleBar dockerTitleBar,
     EntityMetadata metadata,
     ModifiedCreatedByWidget modifiedCreatedBy,
     DockerCommitListWidget dockerCommitListWidget,
@@ -73,7 +73,7 @@ public class DockerRepoWidget {
     this.entity = (DockerRepository) bundle.getEntity();
     this.canEdit = bundle.getPermissions().getCanCertifiedUserEdit();
     metadata.configure(bundle, null, actionMenu);
-    dockerTitleBar.configure(entity);
+    dockerTitleBar.configure(bundle, actionMenu);
     modifiedCreatedBy.configure(
       entity.getCreatedOn(),
       entity.getCreatedBy(),

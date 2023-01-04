@@ -8,7 +8,17 @@ public class QueryClient {
 
   public QueryClient(QueryClientOptions config) {}
 
-  public native void resetQueries(List<SynapseReactClientQueryKey> queryKey);
+  /**
+   * Removes the cached query data and triggers a refetch.
+   * @param queryKey
+   */
+  public native void resetQueries(List<?> queryKey);
+
+  /**
+   * Triggers a refetch of matching query data without removing the cached data.
+   * @param queryKey
+   */
+  public native void invalidateQueries(List<?> queryKey);
 
   public native void clear();
 }

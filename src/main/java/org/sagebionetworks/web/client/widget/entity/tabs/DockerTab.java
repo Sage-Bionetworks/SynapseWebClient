@@ -111,6 +111,7 @@ public class DockerTab implements DockerTabView.Presenter {
       title,
       new Synapse(projectEntityId, null, EntityArea.DOCKER, null)
     );
+    view.setProjectLevelUiVisible(true);
   }
 
   public void resetView() {
@@ -138,6 +139,7 @@ public class DockerTab implements DockerTabView.Presenter {
       view.setDockerRepoListVisible(isProject);
       view.setDockerRepoUIVisible(isRepo);
       tab.configureEntityActionController(bundle, true, null, null);
+
       if (isRepo) {
         tab.setEntityNameAndPlace(
           bundle.getEntity().getName(),
@@ -165,6 +167,7 @@ public class DockerTab implements DockerTabView.Presenter {
         );
         DockerRepoWidget repoWidget = ginInjector.createNewDockerRepoWidget();
         view.setDockerRepoWidget(repoWidget.asWidget());
+        view.setProjectLevelUiVisible(false);
         repoWidget.configure(bundle, tab.getEntityActionMenu());
       } else if (isProject) {
         areaToken = null;

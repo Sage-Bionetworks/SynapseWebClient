@@ -3,8 +3,10 @@ package org.sagebionetworks.web.client.widget.entity.menu.v3;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.web.client.jsinterop.ReactMouseEvent;
 import org.sagebionetworks.web.client.jsinterop.entity.actionmenu.ActionConfiguration;
@@ -12,20 +14,20 @@ import org.sagebionetworks.web.client.jsinterop.entity.actionmenu.EntityActionMe
 import org.sagebionetworks.web.client.jsinterop.entity.actionmenu.EntityActionMenuDropdownMap;
 import org.sagebionetworks.web.client.jsinterop.entity.actionmenu.EntityActionMenuLayout;
 
-public class EntityActionMenuImpl
-  implements EntityActionMenu, EntityActionMenuView.Presenter {
+public class EntityActionMenuImpl implements EntityActionMenu {
 
   private EntityActionMenuLayout currentLayout;
   private final EntityActionMenuDropdownMap dropdownMenuConfigurations;
   private final Map<Action, ActionConfiguration> actionConfigurations;
 
   private final EntityActionMenuView view;
+
+  List<Consumer<EntityActionMenuProps>> propUpdateListeners = new ArrayList<>();
   private boolean isLoading;
 
   @Inject
   public EntityActionMenuImpl(EntityActionMenuView view) {
     this.view = view;
-    this.view.setPresenter(this);
     actionConfigurations =
       DefaultActionConfigurationUtil.getDefaultActionConfiguration();
     dropdownMenuConfigurations =
@@ -135,14 +137,25 @@ public class EntityActionMenuImpl
     synchronizeView();
   }
 
+  @Override
+  public void addPropUpdateListener(Consumer<EntityActionMenuProps> listener) {
+    propUpdateListeners.add(listener);
+  }
+
+  @Override
+  public EntityActionMenuProps getProps() {
+    return new EntityActionMenuProps(
+      this.actionConfigurations,
+      dropdownMenuConfigurations,
+      currentLayout
+    );
+  }
+
   private void synchronizeView() {
+    propUpdateListeners.forEach(listener -> listener.accept(getProps()));
     this.view.setIsLoading(this.isLoading);
     if (!this.isLoading) {
-      this.view.configure(
-          actionConfigurations,
-          dropdownMenuConfigurations,
-          currentLayout
-        );
+      this.view.configure(this.getProps());
     }
   }
 

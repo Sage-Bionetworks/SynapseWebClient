@@ -365,6 +365,15 @@ public class QueryResultEditorWidget
     this.view.hideProgress();
   }
 
+  public static boolean isTableTypeQueryResultEditable(TableType tableType) {
+    // Datasets should not be editable (SWC-5870, SWC-5903)
+    return !(
+      tableType.equals(TableType.dataset) ||
+      tableType.equals(TableType.dataset_collection) ||
+      tableType.equals(TableType.materialized_view)
+    );
+  }
+
   /**
    * The results are editable if all of the select columns have ID
    *
@@ -374,23 +383,18 @@ public class QueryResultEditorWidget
     QueryResultBundle bundle,
     TableType tableType
   ) {
-    if (
-      tableType.equals(TableType.dataset) ||
-      tableType.equals(TableType.dataset_collection) ||
-      tableType.equals(TableType.materialized_view)
-    ) {
-      // Datasets should not be editable (SWC-5870, SWC-5903)
+    if (!isTableTypeQueryResultEditable(tableType)) {
       return false;
     }
 
-    List<SelectColumn> selectColums = QueryBundleUtils.getSelectFromBundle(
+    List<SelectColumn> selectColumns = QueryBundleUtils.getSelectFromBundle(
       bundle
     );
-    if (selectColums == null) {
+    if (selectColumns == null) {
       return false;
     }
     // Do all columns have IDs?
-    for (SelectColumn col : selectColums) {
+    for (SelectColumn col : selectColumns) {
       if (col.getId() == null) {
         return false;
       }

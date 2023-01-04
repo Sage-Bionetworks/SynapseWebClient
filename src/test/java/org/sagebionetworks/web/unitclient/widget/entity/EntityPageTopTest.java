@@ -60,8 +60,7 @@ import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTopView;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
-import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
-import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
+import org.sagebionetworks.web.client.widget.entity.file.ProjectTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.DatasetsTab;
@@ -171,7 +170,7 @@ public class EntityPageTopTest {
   CookieProvider mockCookies;
 
   @Mock
-  BasicTitleBar mockProjectTitleBar;
+  ProjectTitleBar mockProjectTitleBar;
 
   @Mock
   SynapseJavascriptClient mockSynapseJavascriptClient;

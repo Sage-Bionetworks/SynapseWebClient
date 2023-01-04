@@ -95,6 +95,8 @@ public class EntityMetadata implements Presenter {
     EntityActionMenu actionMenu
   ) {
     clear();
+    // The "detailed metadata" is shown in the title bar React component for non-project entities.
+    view.setDetailedMetadataVisible(bundle.getEntity() instanceof Project);
     this.actionMenu = actionMenu;
     Entity en = bundle.getEntity();
     view.setEntityId(en.getId());
@@ -189,10 +191,6 @@ public class EntityMetadata implements Presenter {
       en,
       bundle.getPermissions().getCanChangePermissions()
     );
-  }
-
-  public void setVisible(boolean visible) {
-    view.setDetailedMetadataVisible(visible);
   }
 
   public void setAnnotationsVisible(boolean visible) {

@@ -36,7 +36,7 @@
       </b:Tooltip>
       <w:HelpWidget
         helpMarkdown="Conditions for use describes data use requirements that must be fulfilled before downloading."
-        href="https://help.synapse.org/docs/Conditions-for-Use.2009596938.html"
+        href="https://help.synapse.org/docs/Sharing-Settings,-Permissions,-and-Conditions-for-Use.2024276030.html#SharingSettings,Permissions,andConditionsforUse-ConditionsforUse"
         addStyleNames="margin-left-5"
       />
     </bh:Span>

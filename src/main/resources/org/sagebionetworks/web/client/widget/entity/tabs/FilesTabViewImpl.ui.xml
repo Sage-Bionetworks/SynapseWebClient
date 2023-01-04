@@ -17,7 +17,7 @@
     <g:SimplePanel ui:field="synapseAlertContainer" />
     <bh:Div ui:field="modalDialogContainer" />
     <g:SimplePanel ui:field="fileBreadcrumbContainer" />
-    <bh:Div addStyleNames="margin-top-15 entity-page-side-margins">
+    <bh:Div>
       <g:SimplePanel ui:field="folderTitlebarContainer" visible="false" />
       <g:SimplePanel ui:field="fileTitlebarContainer" visible="false" />
       <g:SimplePanel ui:field="fileMetadataContainer" visible="false" />

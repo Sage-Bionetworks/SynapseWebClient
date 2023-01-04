@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.menu.v3;
 
 import com.google.gwt.user.client.ui.IsWidget;
+import java.util.function.Consumer;
 import org.sagebionetworks.web.client.jsinterop.entity.actionmenu.EntityActionMenuLayout;
 
 public interface EntityActionMenu extends IsWidget, ActionListener {
@@ -72,4 +73,8 @@ public interface EntityActionMenu extends IsWidget, ActionListener {
   void addControllerWidget(IsWidget controllerWidget);
 
   void setIsLoading(boolean isLoading);
+
+  EntityActionMenuProps getProps();
+
+  void addPropUpdateListener(Consumer<EntityActionMenuProps> listener);
 }

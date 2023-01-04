@@ -4,7 +4,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 public interface FilesTabView extends IsWidget {
-  void setFileTitlebar(Widget w);
+  void setTitlebar(Widget w);
 
   void setFileTitlebarVisible(boolean visible);
 

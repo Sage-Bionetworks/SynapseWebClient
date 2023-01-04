@@ -206,6 +206,9 @@ a:focus {
     .description {
       color: white;
     }
+    .entityMetadata {
+      margin: 0px;
+    }
     .projectMetadata {
       .projectTitle {
         > *,
@@ -893,6 +896,11 @@ input[type='text'][readonly].border-none,
 
 .margin-0-imp {
   margin: 0px !important;
+}
+
+.margin-top-bottom-minus-10 {
+  margin-top: -10px;
+  margin-bottom: -10px;
 }
 
 .margin-0-imp-before:before {
