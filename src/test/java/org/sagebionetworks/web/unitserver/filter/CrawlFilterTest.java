@@ -14,6 +14,7 @@ import static org.sagebionetworks.web.server.servlet.filter.CrawlFilter.META_ROB
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -29,6 +30,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
+import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.annotation.v2.Annotations;
 import org.sagebionetworks.repo.model.annotation.v2.AnnotationsValue;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
@@ -76,6 +78,9 @@ public class CrawlFilterTest {
   @Mock
   PrintWriter mockPrintWriter;
 
+  @Captor
+  ArgumentCaptor<EntityChildrenRequest> entityChildrenRequestCaptor;
+
   @Before
   public void setUp() throws RestServiceException, IOException {
     filter = new CrawlFilter();
@@ -99,7 +104,8 @@ public class CrawlFilterTest {
   }
 
   @Test
-  public void testSynapseEntityPage() throws ServletException, IOException {
+  public void testSynapseEntityPage()
+    throws ServletException, IOException, RestServiceException {
     String synapseID = "syn12345";
     String entityName = "my mock entity";
     when(mockEntity.getId()).thenReturn(synapseID);
@@ -114,6 +120,17 @@ public class CrawlFilterTest {
     assertTrue(outputString.contains(synapseID));
     assertTrue(outputString.contains(entityName));
     assertFalse(outputString.contains(META_ROBOTS_NOINDEX));
+
+    // verify we are asking for all entity types, except link
+    verify(mockSynapseClient)
+      .getEntityChildren(entityChildrenRequestCaptor.capture());
+    EntityChildrenRequest entityChildrenRequest = entityChildrenRequestCaptor.getValue();
+    List<EntityType> entityTypes = entityChildrenRequest.getIncludeTypes();
+    for (EntityType type : EntityType.values()) {
+      if (type != EntityType.link) {
+        assertTrue(entityTypes.contains(type));
+      }
+    }
   }
 
   @Test
