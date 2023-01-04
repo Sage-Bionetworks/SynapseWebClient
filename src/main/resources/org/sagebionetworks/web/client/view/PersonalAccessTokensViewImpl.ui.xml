@@ -5,7 +5,6 @@
   xmlns:c="urn:import:com.google.gwt.user.cellview.client"
   xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
   xmlns:t="urn:import:org.sagebionetworks.web.client.widget.table.v2"
-  xmlns:a="urn:import:org.sagebionetworks.web.client.widget.entity.menu.v2"
   xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt"
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
   xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
