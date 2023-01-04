@@ -31,7 +31,7 @@
           <b:TextBox
             ui:field="editNameField"
             b:id="editName"
-            addStyleNames="margin-left-10 margin-bottom-10 hide-resize"
+            addStyleNames="margin-bottom-10 hide-resize"
           />
         </b:FormGroup>
         <b:FormGroup>
@@ -39,26 +39,27 @@
           <b:TextArea
             ui:field="editDescriptionField"
             b:id="editDescription"
-            addStyleNames="margin-left-10 margin-bottom-10 hide-resize"
+            addStyleNames="margin-bottom-10 hide-resize"
           />
         </b:FormGroup>
         <b:FormGroup addStyleNames="margin-top-20">
+          <b:FormLabel>Membership</b:FormLabel>
           <b:Radio
             ui:field="teamManagerAuthRequiredOption"
             name="membershipAuthOptions"
-            text="Users must be authorized by a team manager to join this team"
+            text="Users must be authorized by a team manager to join this team."
             value="true"
           />
           <b:Radio
             ui:field="noAuthRequiredOption"
             name="membershipAuthOptions"
-            text="Users can join this team without team manager authorization"
+            text="Users can join this team without team manager authorization."
             value="false"
           />
           <b:Radio
             ui:field="lockedDownOption"
             name="membershipAuthOptions"
-            text="Team is locked, users may not join or request access. New users must be invited by the team manager"
+            text="Team is locked, users may not join or request access. New users must be invited by a team manager."
             value="false"
           />
         </b:FormGroup>
