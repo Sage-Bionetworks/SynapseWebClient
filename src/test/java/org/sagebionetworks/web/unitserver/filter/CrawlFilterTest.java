@@ -127,9 +127,7 @@ public class CrawlFilterTest {
     EntityChildrenRequest entityChildrenRequest = entityChildrenRequestCaptor.getValue();
     List<EntityType> entityTypes = entityChildrenRequest.getIncludeTypes();
     for (EntityType type : EntityType.values()) {
-      if (type != EntityType.link) {
-        assertTrue(entityTypes.contains(type));
-      }
+      assertEquals(EntityType.link != type, entityTypes.contains(type));
     }
   }
 
