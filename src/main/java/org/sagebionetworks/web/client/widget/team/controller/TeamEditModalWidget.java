@@ -164,7 +164,7 @@ public class TeamEditModalWidget
     // default:
     view.setTeamManagerAuthRequiredOptionActive();
     if (canRequestMembership == null) {
-      if (canPublicJoin != null && canPublicJoin) {
+      if (Boolean.TRUE.equals(canPublicJoin)) {
         view.setNoAuthNeededOptionActive();
       }
     } else {
