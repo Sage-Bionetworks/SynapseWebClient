@@ -85,8 +85,6 @@ public class TeamEditModalWidgetTest {
   String newName = "newName";
   String oldDesc = "oldDesc";
   String newDesc = "newDesc";
-  boolean oldPublicJoin = false;
-  boolean newPublicJoin = true;
   String oldIcon = "oldIcon";
   String newIcon = "newIcon";
   Exception caught = new Exception("this is an exception");
@@ -158,7 +156,6 @@ public class TeamEditModalWidgetTest {
     when(mockFileMeta.getFileName()).thenReturn("new filename");
     when(mockView.getName()).thenReturn(newName);
     when(mockView.getDescription()).thenReturn(newDesc);
-    when(mockView.getPublicJoin()).thenReturn(newPublicJoin);
     when(mockJSNIUtils.getRawFileHandleUrl(anyString()))
       .thenReturn(RAW_FILE_HANDLE_URL);
     when(
@@ -226,10 +223,8 @@ public class TeamEditModalWidgetTest {
 
     verify(mockView).getName();
     verify(mockView).getDescription();
-    verify(mockView).getPublicJoin();
     verify(mockTeam).setName(newName);
     verify(mockTeam).setDescription(newDesc);
-    verify(mockTeam).setCanPublicJoin(newPublicJoin);
     verify(mockTeam).setIcon(newIcon);
     verify(mockSynapseClient)
       .updateTeam(eq(mockTeam), eq(acl), any(AsyncCallback.class));
@@ -282,10 +277,8 @@ public class TeamEditModalWidgetTest {
 
     verify(mockView).getName();
     verify(mockView).getDescription();
-    verify(mockView).getPublicJoin();
     verify(mockTeam).setName(newName);
     verify(mockTeam).setDescription(newDesc);
-    verify(mockTeam).setCanPublicJoin(newPublicJoin);
     verify(mockTeam).setIcon(null);
     verify(mockSynapseClient)
       .updateTeam(eq(mockTeam), eq(acl), any(AsyncCallback.class));
@@ -311,7 +304,6 @@ public class TeamEditModalWidgetTest {
 
     verify(mockTeam).setName(newName);
     verify(mockTeam).setDescription(newDesc);
-    verify(mockTeam).setCanPublicJoin(newPublicJoin);
     verify(mockTeam).setIcon(newIcon);
     verify(mockSynapseClient)
       .updateTeam(eq(mockTeam), eq(acl), any(AsyncCallback.class));
@@ -397,5 +389,65 @@ public class TeamEditModalWidgetTest {
     ResourceAccess ra = acl.getResourceAccess().iterator().next();
     assertEquals(TEAM_ID, ra.getPrincipalId());
     assertEquals(ModelConstants.TEAM_MESSENGER_PERMISSIONS, ra.getAccessType());
+  }
+
+  @Test
+  public void testConfigureTeamManagerRequiredToAuthorize() {
+    when(mockTeam.getCanPublicJoin()).thenReturn(false);
+    when(mockTeam.getCanRequestMembership()).thenReturn(null);
+
+    presenter.configureAndShow(mockTeam);
+
+    verify(mockView).setTeamManagerAuthRequiredOptionActive();
+
+    // test change to public can join
+    when(mockView.getIsTeamManagerAuthRequired()).thenReturn(false);
+    when(mockView.getIsNoAuthRequired()).thenReturn(true);
+    when(mockView.getIsLockedDown()).thenReturn(false);
+
+    presenter.onConfirm();
+
+    verify(mockTeam).setCanPublicJoin(true);
+    verify(mockTeam).setCanRequestMembership(null);
+  }
+
+  @Test
+  public void testConfigurePublicCanJoin() {
+    when(mockTeam.getCanPublicJoin()).thenReturn(true);
+    when(mockTeam.getCanRequestMembership()).thenReturn(null);
+
+    presenter.configureAndShow(mockTeam);
+
+    verify(mockView).setNoAuthNeededOptionActive();
+
+    // test change to locked down
+    when(mockView.getIsTeamManagerAuthRequired()).thenReturn(false);
+    when(mockView.getIsNoAuthRequired()).thenReturn(false);
+    when(mockView.getIsLockedDown()).thenReturn(true);
+
+    presenter.onConfirm();
+
+    verify(mockTeam).setCanPublicJoin(false);
+    verify(mockTeam).setCanRequestMembership(false);
+  }
+
+  @Test
+  public void testConfigureTeamLockedDown() {
+    when(mockTeam.getCanPublicJoin()).thenReturn(false);
+    when(mockTeam.getCanRequestMembership()).thenReturn(false);
+
+    presenter.configureAndShow(mockTeam);
+
+    verify(mockView).setLockedDownOptionActive();
+
+    // test change to default
+    when(mockView.getIsTeamManagerAuthRequired()).thenReturn(true);
+    when(mockView.getIsNoAuthRequired()).thenReturn(false);
+    when(mockView.getIsLockedDown()).thenReturn(false);
+
+    presenter.onConfirm();
+
+    verify(mockTeam).setCanPublicJoin(false);
+    verify(mockTeam).setCanRequestMembership(null);
   }
 }

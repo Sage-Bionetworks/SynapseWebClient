@@ -27,8 +27,6 @@ public interface TeamEditModalWidgetView {
 
   String getDescription();
 
-  boolean getPublicJoin();
-
   void setUploadWidget(Widget uploader);
 
   void setImageURL(String fileHandleId);
@@ -52,4 +50,16 @@ public interface TeamEditModalWidgetView {
   void clear();
 
   void configure(Team team);
+
+  void setTeamManagerAuthRequiredOptionActive();
+
+  void setNoAuthNeededOptionActive();
+
+  void setLockedDownOptionActive();
+
+  boolean getIsTeamManagerAuthRequired();
+
+  boolean getIsNoAuthRequired();
+
+  boolean getIsLockedDown();
 }
