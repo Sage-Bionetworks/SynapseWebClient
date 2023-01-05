@@ -168,7 +168,7 @@ public class TeamEditModalWidget
         view.setNoAuthNeededOptionActive();
       }
     } else {
-      if (!canRequestMembership.booleanValue()) {
+      if (Boolean.FALSE.equals(canRequestMembership) {
         view.setLockedDownOptionActive();
       }
     }
