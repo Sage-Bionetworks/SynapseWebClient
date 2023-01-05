@@ -49,7 +49,6 @@
             name="membershipAuthOptions"
             text="Users must be authorized by a team manager to join this team."
             value="true"
-            marginLeft="-5"
           />
           <b:Radio
             ui:field="noAuthRequiredOption"
