@@ -43,12 +43,13 @@
           />
         </b:FormGroup>
         <b:FormGroup addStyleNames="margin-top-20">
-          <b:FormLabel>Membership</b:FormLabel>
+          <b:FormLabel>Access</b:FormLabel>
           <b:Radio
             ui:field="teamManagerAuthRequiredOption"
             name="membershipAuthOptions"
             text="Users must be authorized by a team manager to join this team."
             value="true"
+            marginLeft="-5"
           />
           <b:Radio
             ui:field="noAuthRequiredOption"
@@ -71,7 +72,7 @@
           />
         </b:FormGroup>
         <b:FormGroup addStyleNames="margin-top-20">
-          <b:FormLabel for="uploadWidget">Upload new Icon</b:FormLabel>
+          <b:FormLabel for="uploadWidget">Upload new icon</b:FormLabel>
           <b:Row b:id="uploadWidget">
             <b:Column size="MD_4">
               <bh:Div ui:field="iconContainer">
