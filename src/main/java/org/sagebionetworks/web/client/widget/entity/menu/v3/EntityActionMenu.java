@@ -76,5 +76,5 @@ public interface EntityActionMenu extends IsWidget, ActionListener {
 
   EntityActionMenuProps getProps();
 
-  void addPropUpdateListener(Consumer<EntityActionMenuProps> listener);
+  void setPropUpdateListener(Consumer<EntityActionMenuProps> listener);
 }

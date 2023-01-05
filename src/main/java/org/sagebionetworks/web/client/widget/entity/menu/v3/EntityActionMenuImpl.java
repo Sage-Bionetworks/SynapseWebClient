@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.entity.menu.v3;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -22,7 +21,7 @@ public class EntityActionMenuImpl implements EntityActionMenu {
 
   private final EntityActionMenuView view;
 
-  List<Consumer<EntityActionMenuProps>> propUpdateListeners = new ArrayList<>();
+  private Consumer<EntityActionMenuProps> propUpdateListener;
   private boolean isLoading;
 
   @Inject
@@ -138,8 +137,8 @@ public class EntityActionMenuImpl implements EntityActionMenu {
   }
 
   @Override
-  public void addPropUpdateListener(Consumer<EntityActionMenuProps> listener) {
-    propUpdateListeners.add(listener);
+  public void setPropUpdateListener(Consumer<EntityActionMenuProps> listener) {
+    propUpdateListener = listener;
   }
 
   @Override
@@ -152,7 +151,9 @@ public class EntityActionMenuImpl implements EntityActionMenu {
   }
 
   private void synchronizeView() {
-    propUpdateListeners.forEach(listener -> listener.accept(getProps()));
+    if (propUpdateListener != null) {
+      propUpdateListener.accept(getProps());
+    }
     this.view.setIsLoading(this.isLoading);
     if (!this.isLoading) {
       this.view.configure(this.getProps());

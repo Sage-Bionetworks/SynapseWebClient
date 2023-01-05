@@ -135,7 +135,7 @@ public class BasicTitleBarTest {
 
     verify(mockActionMenuWidget).removeFromParent();
     verify(mockActionMenu)
-      .addPropUpdateListener(onActionMenuPropsChangeCaptor.capture());
+      .setPropUpdateListener(onActionMenuPropsChangeCaptor.capture());
     // Verify that the action menu props are passed to the view
     verify(mockView).setProps(propsCaptor.capture());
     assertEquals(

@@ -73,6 +73,6 @@ public class BasicTitleBar implements SynapseWidgetPresenter {
       this.props.setEntityActionMenuProps(actionMenuProps);
       this.view.setProps(this.props);
     };
-    actionMenu.addPropUpdateListener(onActionMenuPropsChange);
+    actionMenu.setPropUpdateListener(onActionMenuPropsChange);
   }
 }

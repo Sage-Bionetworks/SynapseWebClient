@@ -25,6 +25,7 @@ import org.sagebionetworks.web.client.context.QueryClientProvider;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.jsinterop.reactquery.QueryClient;
+import org.sagebionetworks.web.client.jsinterop.reactquery.QueryKeyConstants;
 import org.sagebionetworks.web.client.jsinterop.reactquery.SynapseReactClientEntityQueryKey;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -323,7 +324,7 @@ public class EntityPresenter
   @EventHandler
   public void onEntityUpdatedEvent(EntityUpdatedEvent event) {
     List<SynapseReactClientEntityQueryKey> queryKey = SynapseReactClientEntityQueryKey.create(
-      "entity",
+      QueryKeyConstants.ENTITY,
       event.getEntityId()
     );
     queryClient.resetQueries(queryKey);
@@ -334,7 +335,9 @@ public class EntityPresenter
   public void onDownloadListUpdatedUpdatedEvent(
     DownloadListUpdatedEvent _event
   ) {
-    List<String> queryKey = Collections.singletonList("downloadList");
+    List<String> queryKey = Collections.singletonList(
+      QueryKeyConstants.DOWNLOAD_LIST
+    );
     queryClient.invalidateQueries(queryKey);
   }
 
