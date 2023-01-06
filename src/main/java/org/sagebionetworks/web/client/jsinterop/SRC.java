@@ -51,7 +51,8 @@ public class SRC {
     public static ReactComponentType CertificationQuiz;
     public static ReactComponentType<EntityPageBreadcrumbsProps> EntityPageBreadcrumbs;
     public static ReactComponentType<EntityPageTitleBarProps> EntityPageTitleBar;
-    public static ReactComponentType<EntityActionMenuProps> EntityActionMenu;
+
+    public static ReactComponentType<EntityActionMenuPropsJsInterop> EntityActionMenu;
     public static ReactComponentType<HtmlPreviewProps> HtmlPreview;
 
     /**
