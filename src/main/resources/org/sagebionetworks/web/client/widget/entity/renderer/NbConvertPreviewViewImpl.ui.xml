@@ -7,11 +7,26 @@
   xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
 >
   <bh:Div addStyleNames="margin-5">
+    <bh:Div
+      ui:field="htmlSanitizedWarning"
+      visible="false"
+      addStyleNames="margin-top-20 margin-bottom-10"
+    >
+      <b:Alert type="INFO">
+        <bh:Text text="Limited rendering only." />
+        <b:Anchor
+          ui:field="showContentLink"
+          text="External view available."
+          addStyleNames="margin-left-5"
+        />
+      </b:Alert>
+    </bh:Div>
     <bh:Div ui:field="loadingUI" addStyleNames="center center-block">
       <w:LoadingSpinner size="31px" />
       <bh:Text ui:field="loadingMessage" />
     </bh:Div>
-    <w:ReactComponentDiv ui:field="container" />
+    <bh:Div ui:field="htmlContainer" />
+    <bh:Span ui:field="storeRawHtmlSpan" visible="false" />
     <bh:Div ui:field="synAlertContainer" />
   </bh:Div>
 </ui:UiBinder>
