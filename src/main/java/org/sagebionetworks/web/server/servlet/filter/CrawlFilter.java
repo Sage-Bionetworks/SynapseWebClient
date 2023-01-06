@@ -502,6 +502,8 @@ public class CrawlFilter extends OncePerRequestFilter {
       json.put("name", ds.getName());
       if (plainTextWiki != null) {
         json.put("description", plainTextWiki);
+      } else {
+        json.put("description", ds.getDescription());
       }
       json.put(
         "url",
