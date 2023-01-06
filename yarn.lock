@@ -1993,14 +1993,7 @@ minimist@^1.2.0:
   resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.6.tgz#8637a5b759ea0d6e98702cfb3a9283323c93af44"
   integrity sha512-Jsjnk4bw3YJqYzbdyBiNsPWHPfO++UGG749Cxs6peCu5Xg4nrena6OVxOYxrQTqww0Jmwt+Ref8rggumkTLz9Q==
 
-moment-timezone@^0.5.37:
-  version "0.5.37"
-  resolved "https://registry.yarnpkg.com/moment-timezone/-/moment-timezone-0.5.37.tgz#adf97f719c4e458fdb12e2b4e87b8bec9f4eef1e"
-  integrity sha512-uEDzDNFhfaywRl+vwXxffjjq1q0Vzr+fcQpQ1bU0kbzorfS7zVtZnCnGc8mhWmF39d4g4YriF6kwA75mJKE/Zg==
-  dependencies:
-    moment ">= 2.9.0"
-
-"moment@>= 2.9.0", moment@^2.29.4:
+moment@^2.29.4:
   version "2.29.4"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.29.4.tgz#3dbe052889fe7c1b2ed966fcb3a77328964ef108"
   integrity sha512-5LC9SOxjSc2HF6vO2CyuTDNivEdoz2IvyJJGj6X8DJ0eFyfszE0QiEd+iXmBvUP3WHxSjFH/vIsA0EN00cgr8w==
@@ -2932,10 +2925,10 @@ supports-preserve-symlinks-flag@^1.0.0:
   resolved "https://registry.yarnpkg.com/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz#6eda4bd344a3c94aea376d4cc31bc77311039e09"
   integrity sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==
 
-synapse-react-client@3.1.18:
-  version "3.1.18"
-  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-3.1.18.tgz#1e1518c070c65d115c1d94167311ef403ddc500a"
-  integrity sha512-Zp0WmkY6wDFFYUw1ReBCQZF5lK2tSlp7BlZ4NBBc7kZaYgsLv73mICXdyOKsHZNxuoHpSQFAezqfPzXWyHxg2A==
+synapse-react-client@3.1.19:
+  version "3.1.19"
+  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-3.1.19.tgz#2ecf482851e7e8edba40a284f2c1a24200b77b15"
+  integrity sha512-3GIzb2e7djpa7ZE7AQoew6RlPvEgDbh/yT2nHITAhrsyEq3edFEUcYa5uE+VLFnNAV8mOUaQcM0eJvMlm4CjVQ==
   dependencies:
     "@apidevtools/json-schema-ref-parser" "^9.0.9"
     "@brainhubeu/react-carousel" "1.19.26"
