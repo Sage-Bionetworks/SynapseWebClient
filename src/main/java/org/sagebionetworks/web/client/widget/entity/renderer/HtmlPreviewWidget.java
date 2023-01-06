@@ -31,10 +31,8 @@ import org.sagebionetworks.web.shared.WebConstants;
  * @author jayhodgson
  *
  */
-public class HtmlPreviewWidget implements IsWidget, HtmlPreviewView.Presenter {
+public class HtmlPreviewWidget implements IsWidget {
 
-  public static final String CONFIRM_OPEN_HTML_MESSAGE =
-    "Click \"OK\" to leave this page and open this content in a new window; this enables additional functionality, but should only be done if you trust the content.";
   protected HtmlPreviewView view;
   protected PresignedURLAsyncHandler presignedURLAsyncHandler;
   protected FileHandleAssociation fha;
@@ -70,46 +68,14 @@ public class HtmlPreviewWidget implements IsWidget, HtmlPreviewView.Presenter {
     this.popupUtils = popupUtils;
     this.gwt = gwt;
     view.setSynAlert(synAlert);
-    view.setPresenter(this);
     if (friendlyMaxFileSize == null) {
       friendlyMaxFileSize = gwt.getFriendlySize(MAX_HTML_FILE_SIZE, true);
     }
   }
 
   public void renderHTML(final String rawHtml) {
-    synapseClient.isUserAllowedToRenderHTML(
-      createdBy,
-      new AsyncCallback<Boolean>() {
-        @Override
-        public void onFailure(Throwable caught) {
-          view.setLoadingVisible(false);
-          showSanitizedHtml();
-          jsniUtils.consoleError(caught.getMessage());
-        }
-
-        @Override
-        public void onSuccess(Boolean trustedUser) {
-          view.setLoadingVisible(false);
-          if (trustedUser) {
-            view.setHtml(rawHtml);
-          } else {
-            showSanitizedHtml();
-          }
-        }
-
-        private void showSanitizedHtml() {
-          // is the sanitized version the same as the original??
-          String sanitizedHtml = jsniUtils.sanitizeHtml(rawHtml);
-          if (rawHtml.equals(sanitizedHtml)) {
-            view.setHtml(rawHtml);
-          } else {
-            view.setHtml(sanitizedHtml);
-            view.setRawHtml(rawHtml);
-            view.setSanitizedWarningVisible(true);
-          }
-        }
-      }
-    );
+    view.setLoadingVisible(false);
+    view.configure(createdBy, rawHtml);
   }
 
   public void configure(String synapseId, FileHandle fileHandle) {
@@ -144,7 +110,6 @@ public class HtmlPreviewWidget implements IsWidget, HtmlPreviewView.Presenter {
     if (fha != null) {
       synAlert.clear();
       view.setLoadingVisible(true);
-      view.setSanitizedWarningVisible(false);
       presignedURLAsyncHandler.getFileResult(
         fha,
         new AsyncCallback<FileResult>() {
@@ -201,18 +166,5 @@ public class HtmlPreviewWidget implements IsWidget, HtmlPreviewView.Presenter {
         synAlert.handleException(exception);
       }
     };
-  }
-
-  @Override
-  public void onShowFullContent() {
-    // confirm
-    popupUtils.showConfirmDialog(
-      "",
-      CONFIRM_OPEN_HTML_MESSAGE,
-      () -> {
-        // user clicked yes
-        view.openRawHtmlInNewWindow();
-      }
-    );
   }
 }
