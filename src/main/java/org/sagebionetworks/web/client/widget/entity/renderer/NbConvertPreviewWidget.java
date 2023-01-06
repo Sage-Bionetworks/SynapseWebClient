@@ -5,7 +5,6 @@ import static org.sagebionetworks.web.client.SynapseJavascriptClient.ACCEPT;
 import static org.sagebionetworks.web.shared.WebConstants.NBCONVERT_ENDPOINT_PROPERTY;
 import static org.sagebionetworks.web.shared.WebConstants.TEXT_HTML_CHARSET_UTF8;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
@@ -139,7 +138,6 @@ public class NbConvertPreviewWidget
 
         @Override
         public void onSuccess(Boolean trustedUser) {
-          GWT.debugger();
           view.setLoadingVisible(false);
           if (trustedUser) {
             view.setHtml(wrappedRawHtml);
