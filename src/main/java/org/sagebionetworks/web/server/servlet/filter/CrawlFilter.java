@@ -372,8 +372,9 @@ public class CrawlFilter extends OncePerRequestFilter {
     Annotations annotations = bundle.getAnnotations();
     String name = escapeHtml(entity.getName());
     String description = escapeHtml(entity.getDescription());
-    String markdown = null;
     String createdBy = null;
+    String plainTextWiki = null;
+
     try {
       createdBy = getCreatedByString(entity.getCreatedBy());
     } catch (Exception e) {}
@@ -381,7 +382,18 @@ public class CrawlFilter extends OncePerRequestFilter {
       WikiPage rootPage = synapseClient.getV2WikiPageAsV1(
         new WikiPageKey(entity.getId(), ObjectType.ENTITY.toString(), null)
       );
-      markdown = escapeHtml(rootPage.getMarkdown());
+      String markdown = escapeHtml(rootPage.getMarkdown());
+      if (markdown != null) {
+        try {
+          Node document = parser.parse(removeSynapseWikiWidgets(markdown));
+          HtmlRenderer renderer = HtmlRenderer.builder().build();
+          String wikiHtml = renderer.render(document);
+          // extract plain text from wiki html
+          plainTextWiki = Jsoup.parse(wikiHtml).text();
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+      }
     } catch (Exception e) {}
 
     StringBuilder html = new StringBuilder();
@@ -398,7 +410,7 @@ public class CrawlFilter extends OncePerRequestFilter {
       html.append(META_ROBOTS_NOINDEX);
     }
 
-    html.append(getDatasetScriptElement(bundle));
+    html.append(getDatasetScriptElement(bundle, plainTextWiki));
 
     html.append("</head><body><h1>" + name + "</h1>");
     if (description != null) {
@@ -407,17 +419,8 @@ public class CrawlFilter extends OncePerRequestFilter {
     if (createdBy != null) {
       html.append("Created By " + createdBy + "<br />");
     }
-    if (markdown != null) {
-      try {
-        Node document = parser.parse(removeSynapseWikiWidgets(markdown));
-        HtmlRenderer renderer = HtmlRenderer.builder().build();
-        String wikiHtml = renderer.render(document);
-        // extract plain text from wiki html
-        markdown = Jsoup.parse(wikiHtml).text();
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-      html.append(markdown + "<br />");
+    if (plainTextWiki != null) {
+      html.append(plainTextWiki + "<br />");
     }
     html.append("<br />");
     Map<String, AnnotationsValue> annotationMap = annotations.getAnnotations();
@@ -485,8 +488,10 @@ public class CrawlFilter extends OncePerRequestFilter {
     return html.toString();
   }
 
-  public String getDatasetScriptElement(EntityBundle bundle)
-    throws JSONObjectAdapterException, RestServiceException {
+  public String getDatasetScriptElement(
+    EntityBundle bundle,
+    String plainTextWiki
+  ) throws JSONObjectAdapterException, RestServiceException {
     StringBuilder html = new StringBuilder();
     if (bundle.getEntity() instanceof Dataset) {
       Dataset ds = (Dataset) bundle.getEntity();
@@ -495,7 +500,9 @@ public class CrawlFilter extends OncePerRequestFilter {
       json.put("@context", "http://schema.org/");
       json.put("@type", "Dataset");
       json.put("name", ds.getName());
-      json.put("description", ds.getDescription());
+      if (plainTextWiki != null) {
+        json.put("description", plainTextWiki);
+      }
       json.put(
         "url",
         "https://www.synapse.org/#!Synapse:" +
