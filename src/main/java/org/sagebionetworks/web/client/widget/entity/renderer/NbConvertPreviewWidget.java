@@ -5,6 +5,7 @@ import static org.sagebionetworks.web.client.SynapseJavascriptClient.ACCEPT;
 import static org.sagebionetworks.web.shared.WebConstants.NBCONVERT_ENDPOINT_PROPERTY;
 import static org.sagebionetworks.web.shared.WebConstants.TEXT_HTML_CHARSET_UTF8;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
@@ -29,8 +30,6 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 public class NbConvertPreviewWidget
   implements IsWidget, NbConvertPreviewView.Presenter {
 
-  public static final String DOWNLOAD_NOTEBOOK_MESSAGE =
-    "Download this Juypter notebook and run in a local notebook server to see the fully interactive version.";
   String nbConvertEndpoint;
   public static final String HTML_PREFIX =
     "<html><head>" +
@@ -77,10 +76,8 @@ public class NbConvertPreviewWidget
       friendlyMaxFileSize =
         gwt.getFriendlySize(HtmlPreviewWidget.MAX_HTML_FILE_SIZE, true);
     }
-
     nbConvertEndpoint =
       synapseProperties.getSynapseProperty(NBCONVERT_ENDPOINT_PROPERTY);
-    view.setShowContentLinkText(DOWNLOAD_NOTEBOOK_MESSAGE);
   }
 
   public void configure(String synapseId, FileHandle fileHandle) {
@@ -142,6 +139,7 @@ public class NbConvertPreviewWidget
 
         @Override
         public void onSuccess(Boolean trustedUser) {
+          GWT.debugger();
           view.setLoadingVisible(false);
           if (trustedUser) {
             view.setHtml(wrappedRawHtml);
@@ -158,7 +156,6 @@ public class NbConvertPreviewWidget
           } else {
             view.setHtml(sanitizedHtml);
             view.setRawHtml(wrappedRawHtml);
-            view.setSanitizedWarningVisible(true);
           }
         }
       }
@@ -166,7 +163,6 @@ public class NbConvertPreviewWidget
   }
 
   public void setPresignedUrl(String url) {
-    view.setSanitizedWarningVisible(true);
     String encodedUrl = gwt.encodeQueryString(url);
     // use lambda endpoint to resolve ipynb file to html
     requestBuilder.configure(

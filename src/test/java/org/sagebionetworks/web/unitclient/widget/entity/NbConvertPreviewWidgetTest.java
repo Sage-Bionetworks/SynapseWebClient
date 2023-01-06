@@ -5,7 +5,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.SynapseJavascriptClient.ACCEPT;
@@ -37,7 +36,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.asynch.PresignedURLAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.entity.renderer.HtmlPreviewView;
+import org.sagebionetworks.web.client.widget.entity.renderer.NbConvertPreviewView;
 import org.sagebionetworks.web.client.widget.entity.renderer.NbConvertPreviewWidget;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.test.helper.RequestBuilderMockStubber;
@@ -53,7 +52,7 @@ public class NbConvertPreviewWidgetTest {
   NbConvertPreviewWidget previewWidget;
 
   @Mock
-  HtmlPreviewView mockView;
+  NbConvertPreviewView mockView;
 
   @Mock
   RequestBuilderWrapper mockRequestBuilder;
@@ -226,7 +225,6 @@ public class NbConvertPreviewWidgetTest {
     verify(mockSynapseClient)
       .isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
     // user is allowed to render html, so raw html is rendered
-    verify(mockView).setSanitizedWarningVisible(false);
     verify(mockView).setHtml(WRAPPED_HTML);
     verify(mockView).setLoadingVisible(true);
     verify(mockView).setLoadingVisible(false);
@@ -247,7 +245,6 @@ public class NbConvertPreviewWidgetTest {
     verify(mockSynapseClient)
       .isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
     // user is not allowed to render, but sanitized version is the same as raw
-    verify(mockView).setSanitizedWarningVisible(false);
     verify(mockSynapseJSNIUtils).sanitizeHtml(WRAPPED_HTML);
     verify(mockView).setHtml(WRAPPED_HTML);
     verify(mockView).setLoadingVisible(true);
@@ -266,13 +263,9 @@ public class NbConvertPreviewWidgetTest {
     verify(mockSynapseClient)
       .isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
     // user is not allowed to render. show sanitized version
-    verify(mockView).setSanitizedWarningVisible(false);
     verify(mockSynapseJSNIUtils).sanitizeHtml(WRAPPED_HTML);
     verify(mockView).setHtml(SANITIZED_HTML);
     verify(mockView).setRawHtml(WRAPPED_HTML);
-    // once because user is not on the html/js team, once because this is an ipynb (need link to
-    // download for fully interactive version)
-    verify(mockView, times(2)).setSanitizedWarningVisible(true);
     verify(mockView).setLoadingVisible(true);
     verify(mockView).setLoadingVisible(false);
   }
@@ -290,12 +283,9 @@ public class NbConvertPreviewWidgetTest {
 
     verify(mockSynapseClient)
       .isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
-    // user is not allowed to render. show sanitized version
-    verify(mockView).setSanitizedWarningVisible(false);
     verify(mockSynapseJSNIUtils).sanitizeHtml(WRAPPED_HTML);
     verify(mockView).setHtml(SANITIZED_HTML);
     verify(mockView).setRawHtml(WRAPPED_HTML);
-    verify(mockView, times(2)).setSanitizedWarningVisible(true);
     verify(mockView).setLoadingVisible(true);
     verify(mockView).setLoadingVisible(false);
     verify(mockSynapseJSNIUtils).consoleError(errorMessage);

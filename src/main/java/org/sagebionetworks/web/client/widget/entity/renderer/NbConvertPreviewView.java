@@ -15,10 +15,6 @@ public interface NbConvertPreviewView extends IsWidget {
 
   void openInNewWindow(String url);
 
-  void setSanitizedWarningVisible(boolean visible);
-
-  void setShowContentLinkText(String text);
-
   void setPresenter(Presenter p);
 
   public interface Presenter {

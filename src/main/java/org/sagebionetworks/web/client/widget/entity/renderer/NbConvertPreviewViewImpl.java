@@ -176,11 +176,6 @@ public class NbConvertPreviewViewImpl implements NbConvertPreviewView {
   }
 
   @Override
-  public void setSanitizedWarningVisible(boolean visible) {
-    htmlSanitizedWarning.setVisible(visible);
-  }
-
-  @Override
   public void setRawHtml(String rawHtml) {
     storeRawHtmlSpan.setText(rawHtml);
   }
@@ -188,10 +183,5 @@ public class NbConvertPreviewViewImpl implements NbConvertPreviewView {
   @Override
   public void openInNewWindow(String url) {
     Window.open(url, "", "");
-  }
-
-  @Override
-  public void setShowContentLinkText(String text) {
-    showContentLink.setText(text);
   }
 }
