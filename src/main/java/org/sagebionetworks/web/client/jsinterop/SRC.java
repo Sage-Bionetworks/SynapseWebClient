@@ -50,8 +50,9 @@ public class SRC {
     public static ReactComponentType<IDUReportProps> IDUReport;
     public static ReactComponentType CertificationQuiz;
     public static ReactComponentType<EntityPageBreadcrumbsProps> EntityPageBreadcrumbs;
-    public static ReactComponentType<EntityActionMenuPropsJsInterop> EntityActionMenu;
     public static ReactComponentType<EntityPageTitleBarProps> EntityPageTitleBar;
+    public static ReactComponentType<EntityActionMenuProps> EntityActionMenu;
+    public static ReactComponentType<HtmlPreviewProps> HtmlPreview;
 
     /**
      * Pushes a global toast message. In SWC, you should use {@link DisplayUtils#notify}, rather than calling this method directly.

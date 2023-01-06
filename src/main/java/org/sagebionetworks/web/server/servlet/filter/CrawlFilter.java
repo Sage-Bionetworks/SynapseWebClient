@@ -783,8 +783,11 @@ public class CrawlFilter extends OncePerRequestFilter {
     EntityChildrenRequest newQuery = new EntityChildrenRequest();
     newQuery.setParentId(parentId);
     List<EntityType> types = new ArrayList<EntityType>();
-    types.add(EntityType.file);
-    types.add(EntityType.folder);
+    for (EntityType type : EntityType.values()) {
+      if (EntityType.link != type) {
+        types.add(type);
+      }
+    }
     newQuery.setIncludeTypes(types);
     return newQuery;
   }

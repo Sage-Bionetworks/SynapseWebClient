@@ -15,6 +15,7 @@ import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Image;
 import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.Radio;
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
@@ -32,7 +33,13 @@ public class TeamEditModalWidgetViewImpl
   TextArea editDescriptionField;
 
   @UiField
-  CheckBox publicJoinCheckbox;
+  Radio teamManagerAuthRequiredOption;
+
+  @UiField
+  Radio noAuthRequiredOption;
+
+  @UiField
+  Radio lockedDownOption;
 
   @UiField
   CheckBox authenticatedUsersCanSendCheckbox;
@@ -104,7 +111,42 @@ public class TeamEditModalWidgetViewImpl
     this.team = team;
     editNameField.setValue(team.getName());
     editDescriptionField.setValue(team.getDescription());
-    publicJoinCheckbox.setValue(team.getCanPublicJoin());
+  }
+
+  @Override
+  public void setTeamManagerAuthRequiredOptionActive() {
+    teamManagerAuthRequiredOption.setValue(true, true);
+    noAuthRequiredOption.setValue(false, true);
+    lockedDownOption.setValue(false, true);
+  }
+
+  @Override
+  public void setNoAuthNeededOptionActive() {
+    teamManagerAuthRequiredOption.setValue(false, true);
+    noAuthRequiredOption.setValue(true, true);
+    lockedDownOption.setValue(false, true);
+  }
+
+  @Override
+  public void setLockedDownOptionActive() {
+    teamManagerAuthRequiredOption.setValue(false, true);
+    noAuthRequiredOption.setValue(false, true);
+    lockedDownOption.setValue(true, true);
+  }
+
+  @Override
+  public boolean getIsTeamManagerAuthRequired() {
+    return teamManagerAuthRequiredOption.getValue();
+  }
+
+  @Override
+  public boolean getIsNoAuthRequired() {
+    return noAuthRequiredOption.getValue();
+  }
+
+  @Override
+  public boolean getIsLockedDown() {
+    return lockedDownOption.getValue();
   }
 
   @Override
@@ -155,11 +197,6 @@ public class TeamEditModalWidgetViewImpl
   }
 
   @Override
-  public boolean getPublicJoin() {
-    return publicJoinCheckbox.getValue();
-  }
-
-  @Override
   public void show() {
     modal.show();
     DisplayUtils.focusOnChildInput(modal);
@@ -174,8 +211,7 @@ public class TeamEditModalWidgetViewImpl
   public void clear() {
     editNameField.setValue("");
     editDescriptionField.setValue("");
-    // defaults to the checkbox unchecked, as it's the most common case
-    publicJoinCheckbox.setValue(false);
+    setTeamManagerAuthRequiredOptionActive();
     setDefaultIconVisible();
   }
 

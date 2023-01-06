@@ -131,11 +131,6 @@ public class HtmlPreviewWidgetTest {
       .callOnResponseReceived(null, mockResponse)
       .when(mockRequestBuilder)
       .sendRequest(anyString(), any(RequestCallback.class));
-    when(mockSynapseJSNIUtils.sanitizeHtml(HTML)).thenReturn(SANITIZED_HTML);
-    AsyncMockStubber
-      .callSuccessWith(true)
-      .when(mockSynapseClient)
-      .isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
     AsyncMockStubber
       .callSuccessWith(mockFileResult)
       .when(mockPresignedURLAsyncHandler)
@@ -207,99 +202,6 @@ public class HtmlPreviewWidgetTest {
     verify(mockSynapseAlert).handleException(exceptionCaptor.capture());
     Throwable th = exceptionCaptor.getValue();
     assertTrue(th.getMessage().contains(error));
-  }
-
-  @Test
-  public void testRenderHtmlTrusted() {
-    previewWidget.configure(ENTITY_ID, mockFileHandle);
-
-    verify(mockSynapseClient)
-      .isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
-    // user is allowed to render html, so raw html is rendered
-    verify(mockView).setSanitizedWarningVisible(false);
-    verify(mockView).setHtml(HTML);
-    verify(mockView).setLoadingVisible(true);
-    verify(mockView).setLoadingVisible(false);
-  }
-
-  @Test
-  public void testRenderHtmlUntrustedButSafe() {
-    AsyncMockStubber
-      .callSuccessWith(false)
-      .when(mockSynapseClient)
-      .isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
-    when(mockSynapseJSNIUtils.sanitizeHtml(HTML)).thenReturn(HTML);
-
-    previewWidget.configure(ENTITY_ID, mockFileHandle);
-
-    verify(mockSynapseClient)
-      .isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
-    // user is not allowed to render, but sanitized version is the same as raw
-    verify(mockView).setSanitizedWarningVisible(false);
-    verify(mockSynapseJSNIUtils).sanitizeHtml(HTML);
-    verify(mockView).setHtml(HTML);
-    verify(mockView).setLoadingVisible(true);
-    verify(mockView).setLoadingVisible(false);
-  }
-
-  @Test
-  public void testBlockRenderHtmlUntrusted() {
-    AsyncMockStubber
-      .callSuccessWith(false)
-      .when(mockSynapseClient)
-      .isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
-
-    previewWidget.configure(ENTITY_ID, mockFileHandle);
-
-    verify(mockSynapseClient)
-      .isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
-    // user is not allowed to render. show sanitized version
-    verify(mockView).setSanitizedWarningVisible(false);
-    verify(mockSynapseJSNIUtils).sanitizeHtml(HTML);
-    verify(mockView).setHtml(SANITIZED_HTML);
-    verify(mockView).setRawHtml(HTML);
-    verify(mockView).setSanitizedWarningVisible(true);
-    verify(mockView).setLoadingVisible(true);
-    verify(mockView).setLoadingVisible(false);
-  }
-
-  @Test
-  public void testIsTrustedCheckFailure() {
-    String errorMessage = "unable to determine if user is on the team";
-    Exception ex = new Exception(errorMessage);
-    AsyncMockStubber
-      .callFailureWith(ex)
-      .when(mockSynapseClient)
-      .isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
-
-    previewWidget.configure(ENTITY_ID, mockFileHandle);
-
-    verify(mockSynapseClient)
-      .isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
-    // user is not allowed to render. show sanitized version
-    verify(mockView).setSanitizedWarningVisible(false);
-    verify(mockSynapseJSNIUtils).sanitizeHtml(HTML);
-    verify(mockView).setHtml(SANITIZED_HTML);
-    verify(mockView).setRawHtml(HTML);
-    verify(mockView).setSanitizedWarningVisible(true);
-    verify(mockView).setLoadingVisible(true);
-    verify(mockView).setLoadingVisible(false);
-    verify(mockSynapseJSNIUtils).consoleError(errorMessage);
-  }
-
-  @Test
-  public void testOnShowFullContent() {
-    previewWidget.onShowFullContent();
-
-    verify(mockPopupUtils)
-      .showConfirmDialog(
-        eq(""),
-        eq(HtmlPreviewWidget.CONFIRM_OPEN_HTML_MESSAGE),
-        callbackCaptor.capture()
-      );
-
-    callbackCaptor.getValue().invoke();
-    verify(mockView).openRawHtmlInNewWindow();
   }
 
   @Test
