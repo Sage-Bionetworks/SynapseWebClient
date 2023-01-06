@@ -3,29 +3,32 @@ package org.sagebionetworks.web.client.widget.entity.file;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import org.gwtbootstrap3.client.ui.Heading;
-import org.gwtbootstrap3.client.ui.html.Div;
-import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.widget.EntityTypeIcon;
+import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.jsinterop.EntityPageTitleBarProps;
+import org.sagebionetworks.web.client.jsinterop.React;
+import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.SRC;
+import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 
 public class BasicTitleBarViewImpl implements BasicTitleBarView {
 
-  @UiField
-  Heading fileName;
+  private final SynapseContextPropsProvider propsProvider;
 
   @UiField
-  SimplePanel favoritePanel;
+  ReactComponentDiv reactComponentContainer;
 
-  @UiField
-  EntityTypeIcon entityIcon;
-
-  @UiField
-  Div actionMenuContainer;
+  @Override
+  public void setProps(EntityPageTitleBarProps props) {
+    ReactNode reactNode = React.createElementWithSynapseContext(
+      SRC.SynapseComponents.EntityPageTitleBar,
+      props,
+      propsProvider.getJsInteropContextProps()
+    );
+    reactComponentContainer.render(reactNode);
+  }
 
   interface BasicTitleBarViewImplUiBinder
     extends UiBinder<Widget, BasicTitleBarViewImpl> {}
@@ -36,38 +39,14 @@ public class BasicTitleBarViewImpl implements BasicTitleBarView {
   Widget widget;
 
   @Inject
-  public BasicTitleBarViewImpl() {
+  public BasicTitleBarViewImpl(SynapseContextPropsProvider propsProvider) {
     widget = uiBinder.createAndBindUi(this);
-  }
-
-  public void setFavoritesWidget(Widget favoritesWidget) {
-    favoritePanel.addStyleName("inline-block");
-    favoritePanel.setWidget(favoritesWidget);
-  }
-
-  @Override
-  public void setFavoritesWidgetVisible(boolean visible) {
-    favoritePanel.setVisible(visible);
-  }
-
-  @Override
-  public void setTitle(String name) {
-    fileName.setText(name);
+    this.propsProvider = propsProvider;
   }
 
   @Override
   public Widget asWidget() {
     return widget;
-  }
-
-  @Override
-  public void setEntityType(EntityType entityType) {
-    if (entityType == null) {
-      entityIcon.setVisible(false);
-    } else {
-      entityIcon.setVisible(true);
-      entityIcon.setType(entityType);
-    }
   }
 
   @Override
@@ -81,13 +60,6 @@ public class BasicTitleBarViewImpl implements BasicTitleBarView {
   @Override
   public void showInfo(String message) {
     DisplayUtils.showInfo(message);
-  }
-
-  @Override
-  public void setActionMenu(IsWidget w) {
-    w.asWidget().removeFromParent();
-    actionMenuContainer.clear();
-    actionMenuContainer.add(w);
   }
 
   @Override

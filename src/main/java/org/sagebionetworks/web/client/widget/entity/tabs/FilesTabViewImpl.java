@@ -150,7 +150,7 @@ public class FilesTabViewImpl implements FilesTabView {
   }
 
   @Override
-  public void setFileTitlebar(Widget w) {
+  public void setTitlebar(Widget w) {
     fileTitlebarContainer.setWidget(w);
   }
 

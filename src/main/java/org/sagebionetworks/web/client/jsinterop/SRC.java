@@ -4,7 +4,7 @@ import jsinterop.annotations.JsNullable;
 import jsinterop.annotations.JsPackage;
 import jsinterop.annotations.JsType;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.jsinterop.entity.actionmenu.EntityActionMenuProps;
+import org.sagebionetworks.web.client.jsinterop.entity.actionmenu.EntityActionMenuPropsJsInterop;
 
 @JsType(isNative = true, namespace = JsPackage.GLOBAL)
 public class SRC {
@@ -50,7 +50,9 @@ public class SRC {
     public static ReactComponentType<IDUReportProps> IDUReport;
     public static ReactComponentType CertificationQuiz;
     public static ReactComponentType<EntityPageBreadcrumbsProps> EntityPageBreadcrumbs;
-    public static ReactComponentType<EntityActionMenuProps> EntityActionMenu;
+    public static ReactComponentType<EntityPageTitleBarProps> EntityPageTitleBar;
+
+    public static ReactComponentType<EntityActionMenuPropsJsInterop> EntityActionMenu;
     public static ReactComponentType<HtmlPreviewProps> HtmlPreview;
 
     /**

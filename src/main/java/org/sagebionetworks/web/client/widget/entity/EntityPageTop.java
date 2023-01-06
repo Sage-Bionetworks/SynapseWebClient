@@ -38,7 +38,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl;
-import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
+import org.sagebionetworks.web.client.widget.entity.file.ProjectTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.DatasetsTab;
@@ -72,7 +72,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
   private final ChallengeTab challengeTab;
   private final DiscussionTab discussionTab;
   private final DockerTab dockerTab;
-  private final BasicTitleBar projectTitleBar;
+  private final ProjectTitleBar projectTitleBar;
   private final EntityMetadata projectMetadata;
   private final SynapseClientAsync synapseClient;
   // how many tabs have been marked as visible
@@ -112,7 +112,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
     EntityPageTopView view,
     SynapseClientAsync synapseClient,
     Tabs tabs,
-    BasicTitleBar projectTitleBar,
+    ProjectTitleBar projectTitleBar,
     EntityMetadata projectMetadata,
     WikiTab wikiTab,
     FilesTab filesTab,

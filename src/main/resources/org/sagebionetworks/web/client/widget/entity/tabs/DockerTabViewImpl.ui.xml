@@ -10,7 +10,10 @@
   <g:FlowPanel addStyleNames="dockerTabContent">
     <g:SimplePanel ui:field="synapseAlertContainer" />
     <g:SimplePanel ui:field="dockerBreadcrumbContainer" visible="false" />
-    <g:FlowPanel addStyleNames="margin-top-15 entity-page-side-margins">
+    <g:FlowPanel
+      ui:field="projectLevelUi"
+      addStyleNames="margin-top-15 entity-page-side-margins"
+    >
       <bh:Div addStyleNames="flexcontainer-row">
         <bh:Div
           addStyleNames="flexcontainer-column flexcontainer-column-fill-width"
@@ -28,7 +31,7 @@
         />
       </bh:Div>
       <g:SimplePanel ui:field="dockerRepoListWidgetContainer" />
-      <g:SimplePanel ui:field="dockerRepoWidgetContainer" />
     </g:FlowPanel>
+    <g:SimplePanel ui:field="dockerRepoWidgetContainer" />
   </g:FlowPanel>
 </ui:UiBinder>

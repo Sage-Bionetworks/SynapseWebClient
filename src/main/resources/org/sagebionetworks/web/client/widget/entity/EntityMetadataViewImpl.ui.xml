@@ -6,11 +6,14 @@
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
   xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
 >
-  <g:HTMLPanel>
+  <g:HTMLPanel addStyleNames="entityMetadata entity-page-side-margins">
     <g:HTMLPanel ui:field="detailedMetadata">
       <w:ReactComponentDiv ui:field="annotationsModalContainer" />
       <bh:Div>
-        <bh:Span addStyleNames="boldText margin-right-5" text="Synapse ID:" />
+        <bh:Span
+          addStyleNames="boldText margin-right-5"
+          text="Project SynID:"
+        />
         <g:TextBox
           ui:field="idField"
           width="115px"
@@ -32,7 +35,7 @@
         </bh:Span>
         <bh:Br addStyleNames="visible-xs visible-sm" />
         <bh:Span ui:field="uploadDestinationPanel" visible="false">
-          <bh:Span addStyleNames="boldText">Storage Location:</bh:Span>
+          <bh:Span addStyleNames="boldText">Project Storage Location:</bh:Span>
           <bh:Span ui:field="uploadDestinationField" />
         </bh:Span>
       </bh:Div>

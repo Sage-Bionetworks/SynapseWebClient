@@ -156,9 +156,8 @@ import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.FileDownloadHandlerWidget;
-import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
+import org.sagebionetworks.web.client.widget.entity.file.ProjectTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.S3DirectLoginDialog;
-import org.sagebionetworks.web.client.widget.entity.file.TableTitleBar;
 import org.sagebionetworks.web.client.widget.entity.renderer.AttachmentPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.BookmarkWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ButtonLinkWidget;
@@ -710,11 +709,9 @@ public interface PortalGinInjector extends Ginjector {
 
   FilesTabView getFilesTabView();
 
-  FileTitleBar getFileTitleBar();
-
   BasicTitleBar getBasicTitleBar();
 
-  TableTitleBar getTableTitleBar();
+  ProjectTitleBar getProjectTitleBar();
 
   EntityMetadata getEntityMetadata();
 

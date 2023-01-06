@@ -58,7 +58,7 @@ import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.VersionHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
-import org.sagebionetworks.web.client.widget.entity.file.TableTitleBar;
+import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.entity.tabs.AbstractTablesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.DatasetsTab;
@@ -86,7 +86,7 @@ public class DatasetsTabTest {
   TableListWidget mockTableListWidget;
 
   @Mock
-  TableTitleBar mockTitleBar;
+  BasicTitleBar mockTitleBar;
 
   @Mock
   Breadcrumb mockBreadcrumb;
@@ -179,7 +179,7 @@ public class DatasetsTabTest {
     when(mockPortalGinInjector.getTablesTabView()).thenReturn(mockView);
     when(mockPortalGinInjector.getTableListWidget())
       .thenReturn(mockTableListWidget);
-    when(mockPortalGinInjector.getTableTitleBar()).thenReturn(mockTitleBar);
+    when(mockPortalGinInjector.getBasicTitleBar()).thenReturn(mockTitleBar);
     when(mockPortalGinInjector.getBreadcrumb()).thenReturn(mockBreadcrumb);
     when(mockPortalGinInjector.getEntityMetadata())
       .thenReturn(mockEntityMetadata);
@@ -284,12 +284,7 @@ public class DatasetsTabTest {
   private void verifyTableConfiguration(Long version) {
     verify(mockBreadcrumb)
       .configure(any(EntityPath.class), eq(EntityArea.DATASETS));
-    verify(mockTitleBar)
-      .configure(
-        mockDatasetBundle,
-        mockActionMenuWidget,
-        mockVersionHistoryWidget
-      );
+    verify(mockTitleBar).configure(mockDatasetBundle, mockActionMenuWidget);
     verify(mockEntityMetadata)
       .configure(mockDatasetBundle, version, mockActionMenuWidget);
     verify(mockTableEntityWidget)

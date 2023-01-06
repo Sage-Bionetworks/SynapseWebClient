@@ -145,6 +145,7 @@ public class EntityMetadataTest {
     bundle.setPermissions(permissions);
     bundle.setDoiAssociation(mockDoiAssociation);
     widget.configure(bundle, null, mockActionMenuWidget);
+    verify(mockView).setDetailedMetadataVisible(true);
     verify(mockView).setRestrictionPanelVisible(false);
     verify(mockDoiWidgetV2).configure(mockDoiAssociation);
     verify(mockAnnotationsWidget)
@@ -177,6 +178,7 @@ public class EntityMetadataTest {
     bundle.setPermissions(permissions);
     bundle.setDoiAssociation(mockDoiAssociation);
     widget.configure(bundle, null, mockActionMenuWidget);
+    verify(mockView).setDetailedMetadataVisible(true);
     verify(mockView).setRestrictionPanelVisible(false);
     verify(mockDoiWidgetV2).configure(mockDoiAssociation);
     verify(mockAnnotationsWidget)
@@ -205,6 +207,7 @@ public class EntityMetadataTest {
     bundle.setDoiAssociation(mockDoiAssociation);
     Long versionNumber = null;
     widget.configure(bundle, versionNumber, mockActionMenuWidget);
+    verify(mockView).setDetailedMetadataVisible(false);
     verify(mockFileHistoryWidget, never())
       .setEntityBundle(bundle, versionNumber);
     verify(mockDoiWidgetV2).configure(mockDoiAssociation);
@@ -233,6 +236,7 @@ public class EntityMetadataTest {
     bundle.setDoiAssociation(mockDoiAssociation);
     Long versionNumber = null;
     widget.configure(bundle, versionNumber, mockActionMenuWidget);
+    verify(mockView).setDetailedMetadataVisible(false);
     verify(mockFileHistoryWidget).setEntityBundle(bundle, versionNumber);
     verify(mockFileHistoryWidget).setVisible(false);
     verify(mockDoiWidgetV2).configure(mockDoiAssociation);
@@ -261,6 +265,7 @@ public class EntityMetadataTest {
     bundle.setPermissions(permissions);
     bundle.setDoiAssociation(mockDoiAssociation);
     widget.configure(bundle, versionNumber, mockActionMenuWidget);
+    verify(mockView).setDetailedMetadataVisible(false);
     verify(mockFileHistoryWidget).setEntityBundle(bundle, versionNumber);
     verify(mockDoiWidgetV2).configure(mockDoiAssociation);
     verify(mockAnnotationsWidget)
@@ -298,6 +303,7 @@ public class EntityMetadataTest {
       .thenReturn(getDoneFuture(mockDoiAssociation));
 
     widget.configure(bundle, versionNumber, mockActionMenuWidget);
+    verify(mockView).setDetailedMetadataVisible(false);
     verify(mockFileHistoryWidget).setEntityBundle(bundle, versionNumber);
     verify(mockDoiWidgetV2).configure(mockDoiAssociation); // !
     verify(mockAnnotationsWidget)
@@ -332,6 +338,7 @@ public class EntityMetadataTest {
       .thenReturn(getFailedFuture());
 
     widget.configure(bundle, versionNumber, mockActionMenuWidget);
+    verify(mockView).setDetailedMetadataVisible(false);
     verify(mockFileHistoryWidget).setEntityBundle(bundle, versionNumber);
     verify(mockDoiWidgetV2, never()).configure(any()); // !
     verify(mockAnnotationsWidget)
@@ -368,18 +375,11 @@ public class EntityMetadataTest {
     // Because this isn't the latest version, we should have never requested a DOI
     verify(mockJsClient, never()).getDoiAssociation(any(), any(), any());
 
+    verify(mockView).setDetailedMetadataVisible(false);
     verify(mockFileHistoryWidget).setEntityBundle(bundle, versionNumber);
     verify(mockDoiWidgetV2, never()).configure(any()); // !
     verify(mockAnnotationsWidget)
       .configure(bundle, canCertifiedUserEdit, isCurrentVersion);
-  }
-
-  @Test
-  public void testSetDetailedMetadataVisible() {
-    widget.setVisible(true);
-    verify(mockView).setDetailedMetadataVisible(true);
-    widget.setVisible(false);
-    verify(mockView).setDetailedMetadataVisible(false);
   }
 
   @Test
@@ -521,6 +521,7 @@ public class EntityMetadataTest {
     bundle.setPermissions(permissions);
     bundle.setDoiAssociation(mockDoiAssociation);
     widget.configure(bundle, null, mockActionMenuWidget);
+    verify(mockView).setDetailedMetadataVisible(false);
     verify(mockDoiWidgetV2).configure(mockDoiAssociation);
     verify(mockAnnotationsWidget)
       .configure(bundle, canCertifiedUserEdit, isCurrentVersion);
@@ -558,6 +559,7 @@ public class EntityMetadataTest {
 
     widget.configure(bundle, null, mockActionMenuWidget);
 
+    verify(mockView).setDetailedMetadataVisible(false);
     verify(mockView).setDescription(description);
     // For now we don't show description in any circumstance. When we do show descriptions, this condition can be flipped
     verify(mockView).setDescriptionVisible(false);

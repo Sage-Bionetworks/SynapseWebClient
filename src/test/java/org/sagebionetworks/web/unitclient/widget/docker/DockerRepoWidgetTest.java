@@ -26,7 +26,7 @@ import org.sagebionetworks.web.client.widget.docker.DockerRepoWidgetView;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
-import org.sagebionetworks.web.client.widget.entity.file.DockerTitleBar;
+import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -52,7 +52,7 @@ public class DockerRepoWidgetTest {
   private UserEntityPermissions mockPermissions;
 
   @Mock
-  DockerTitleBar mockDockerTitleBar;
+  BasicTitleBar mockDockerTitleBar;
 
   @Mock
   EntityMetadata mockMetadata;
@@ -137,7 +137,7 @@ public class DockerRepoWidgetTest {
     verify(mockProvWidget).configure(any(Map.class));
     verify(mockView).setDockerPullCommand(DOCKER_PULL_COMMAND + repoName);
     verify(mockMetadata).configure(mockEntityBundle, null, mockActionWidget);
-    verify(mockDockerTitleBar).configure(mockEntity);
+    verify(mockDockerTitleBar).configure(mockEntityBundle, mockActionWidget);
     verify(mockModifiedCreatedBy)
       .configure(createdOn, createdBy, modifiedOn, modifiedBy);
     verify(mockDockerCommitListWidget).configure(entityId, false);
@@ -160,7 +160,7 @@ public class DockerRepoWidgetTest {
     verify(mockProvWidget).configure(any(Map.class));
     verify(mockView).setDockerPullCommand(DOCKER_PULL_COMMAND + repoName);
     verify(mockMetadata).configure(mockEntityBundle, null, mockActionWidget);
-    verify(mockDockerTitleBar).configure(mockEntity);
+    verify(mockDockerTitleBar).configure(mockEntityBundle, mockActionWidget);
     verify(mockModifiedCreatedBy)
       .configure(createdOn, createdBy, modifiedOn, modifiedBy);
   }

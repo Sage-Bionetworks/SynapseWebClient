@@ -57,6 +57,9 @@ public class TablesTabViewImpl implements TablesTabView {
   FullWidthAlert versionAlert;
 
   @UiField
+  Div projectLevelUI;
+
+  @UiField
   Span tableDescription;
 
   @UiField
@@ -83,6 +86,11 @@ public class TablesTabViewImpl implements TablesTabView {
   @Override
   public void setTableList(Widget w) {
     tableListWidgetContainer.setWidget(w);
+  }
+
+  @Override
+  public void setProjectLevelUIVisible(boolean visible) {
+    this.projectLevelUI.setVisible(visible);
   }
 
   @Override

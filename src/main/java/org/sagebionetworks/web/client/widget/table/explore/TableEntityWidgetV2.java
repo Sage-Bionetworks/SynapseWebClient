@@ -335,7 +335,10 @@ public class TableEntityWidgetV2
           "There is no data to edit"
         );
     }
-    this.actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, true);
+    this.actionMenu.setActionVisible(
+        Action.EDIT_TABLE_DATA,
+        QueryResultEditorWidget.isTableTypeQueryResultEditable(tableType)
+      );
   }
 
   /**

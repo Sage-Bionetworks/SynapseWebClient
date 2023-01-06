@@ -52,7 +52,7 @@ import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
-import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
+import org.sagebionetworks.web.client.widget.entity.file.ProjectTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.entity.tabs.FilesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.FilesTabView;
@@ -73,10 +73,10 @@ public class FilesTabTest {
   CallbackP<Tab> mockOnClickCallback;
 
   @Mock
-  FileTitleBar mockFileTitleBar;
+  ProjectTitleBar mockProjectTitleBar;
 
   @Mock
-  BasicTitleBar mockBasicTitleBar;
+  BasicTitleBar mockTitleBar;
 
   @Mock
   Breadcrumb mockBreadcrumb;
@@ -196,9 +196,9 @@ public class FilesTabTest {
     tab = new FilesTab(mockTab, mockPortalGinInjector);
 
     when(mockPortalGinInjector.getFilesTabView()).thenReturn(mockView);
-    when(mockPortalGinInjector.getFileTitleBar()).thenReturn(mockFileTitleBar);
-    when(mockPortalGinInjector.getBasicTitleBar())
-      .thenReturn(mockBasicTitleBar);
+    when(mockPortalGinInjector.getBasicTitleBar()).thenReturn(mockTitleBar);
+    when(mockPortalGinInjector.getProjectTitleBar())
+      .thenReturn(mockProjectTitleBar);
     when(mockPortalGinInjector.getBreadcrumb()).thenReturn(mockBreadcrumb);
     when(mockPortalGinInjector.getEntityMetadata())
       .thenReturn(mockEntityMetadata);
@@ -247,7 +247,7 @@ public class FilesTabTest {
 
   @Test
   public void testConstruction() {
-    verify(mockView).setFileTitlebar(any(Widget.class));
+    verify(mockView).setTitlebar(any(Widget.class));
     verify(mockView).setFolderTitlebar(any(Widget.class));
     verify(mockView).setBreadcrumb(any(Widget.class));
     verify(mockView).setPreview(any(Widget.class));
@@ -356,12 +356,7 @@ public class FilesTabTest {
     verify(mockView).setWikiPageWidgetVisible(false);
     verify(mockView).setWikiPageWidgetVisible(true);
 
-    verify(mockFileTitleBar)
-      .configure(
-        mockEntityBundle,
-        mockActionMenuWidget,
-        mockVersionHistoryWidget
-      );
+    verify(mockTitleBar).configure(mockEntityBundle, mockActionMenuWidget);
     verify(mockPreviewWidget).configure(mockEntityBundle);
 
     verify(mockEntityMetadata)
@@ -420,7 +415,7 @@ public class FilesTabTest {
     verify(mockView).setRefreshAlert(any(Widget.class));
     verify(mockEntityRefreshAlert).configure(folderEntityId);
 
-    verify(mockBasicTitleBar).configure(mockEntityBundle);
+    verify(mockProjectTitleBar, never()).configure(mockEntityBundle);
 
     verify(mockEntityMetadata)
       .configure(mockEntityBundle, version, mockActionMenuWidget);

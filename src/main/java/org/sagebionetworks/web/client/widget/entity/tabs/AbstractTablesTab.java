@@ -38,7 +38,7 @@ import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
-import org.sagebionetworks.web.client.widget.entity.file.TableTitleBar;
+import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.provenance.v2.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
@@ -77,7 +77,7 @@ public abstract class AbstractTablesTab
   Tab tab;
   TablesTabView view;
   TableListWidget tableListWidget;
-  TableTitleBar titleBar;
+  BasicTitleBar titleBar;
   Breadcrumb breadcrumb;
   EntityMetadata metadata;
   QueryTokenProvider queryTokenProvider;
@@ -131,11 +131,7 @@ public abstract class AbstractTablesTab
       areaToken = null;
       entitySelectedCallback.invoke(entityHeader.getId());
       // selected a table/view, show title info immediately
-      titleBar.configure(
-        entityBundle,
-        tab.getEntityActionMenu(),
-        metadata.getVersionHistoryWidget()
-      );
+      titleBar.configure(entityBundle, tab.getEntityActionMenu());
 
       List<LinkData> links = new ArrayList<>();
       Place projectPlace = new Synapse(
@@ -163,7 +159,7 @@ public abstract class AbstractTablesTab
     if (view == null) {
       this.view = ginInjector.getTablesTabView();
       this.tableListWidget = ginInjector.getTableListWidget();
-      this.titleBar = ginInjector.getTableTitleBar();
+      this.titleBar = ginInjector.getBasicTitleBar();
       this.breadcrumb = ginInjector.getBreadcrumb();
       this.metadata = ginInjector.getEntityMetadata();
       this.queryTokenProvider = ginInjector.getQueryTokenProvider();
@@ -364,15 +360,13 @@ public abstract class AbstractTablesTab
 
     tab.configureEntityActionController(bundle, isCurrentVersion, null, null);
     if (isShownInTab) {
+      view.setProjectLevelUIVisible(false);
+
       final boolean canEdit = bundle.getPermissions().getCanCertifiedUserEdit();
 
       updateVersionAndAreaToken(entity.getId(), version, areaToken);
       breadcrumb.configure(bundle.getPath(), getTabArea());
-      titleBar.configure(
-        bundle,
-        tab.getEntityActionMenu(),
-        metadata.getVersionHistoryWidget()
-      );
+      titleBar.configure(bundle, tab.getEntityActionMenu());
       modifiedCreatedBy.configure(
         entity.getCreatedOn(),
         entity.getCreatedBy(),
@@ -449,6 +443,7 @@ public abstract class AbstractTablesTab
           directExecutor()
         );
     } else if (isProject) {
+      view.setProjectLevelUIVisible(true);
       areaToken = null;
       tableListWidget.configure(bundle, getTypesShownInList());
       view.setWikiPageVisible(false);

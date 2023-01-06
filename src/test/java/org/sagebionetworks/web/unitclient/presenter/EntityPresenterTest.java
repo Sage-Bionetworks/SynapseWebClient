@@ -45,9 +45,10 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.EntityId2BundleCache;
 import org.sagebionetworks.web.client.context.QueryClientProvider;
+import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.jsinterop.reactquery.QueryClient;
-import org.sagebionetworks.web.client.jsinterop.reactquery.SynapseReactClientQueryKey;
+import org.sagebionetworks.web.client.jsinterop.reactquery.SynapseReactClientEntityQueryKey;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
@@ -137,7 +138,10 @@ public class EntityPresenterTest {
   QueryClient mockQueryClient;
 
   @Captor
-  ArgumentCaptor<List<SynapseReactClientQueryKey>> reactQueryKeyCaptor;
+  ArgumentCaptor<List<SynapseReactClientEntityQueryKey>> reactQueryKeyCaptor;
+
+  @Captor
+  ArgumentCaptor<List<String>> stringListCaptor;
 
   @Before
   public void setup() throws Exception {
@@ -336,10 +340,10 @@ public class EntityPresenterTest {
     verify(mockQueryClient).resetQueries(reactQueryKeyCaptor.capture());
     verify(mockGlobalApplicationState).refreshPage();
 
-    List<SynapseReactClientQueryKey> passedQueryKey = reactQueryKeyCaptor.getValue();
+    List<SynapseReactClientEntityQueryKey> passedQueryKey = reactQueryKeyCaptor.getValue();
     assertNotNull(passedQueryKey);
     assertEquals(passedQueryKey.size(), 1);
-    SynapseReactClientQueryKey keyObject = passedQueryKey.get(0);
+    SynapseReactClientEntityQueryKey keyObject = passedQueryKey.get(0);
     assertEquals(keyObject.objectType, "entity");
     assertEquals(keyObject.id, null);
   }
@@ -351,12 +355,26 @@ public class EntityPresenterTest {
     verify(mockQueryClient).resetQueries(reactQueryKeyCaptor.capture());
     verify(mockGlobalApplicationState).refreshPage();
 
-    List<SynapseReactClientQueryKey> passedQueryKey = reactQueryKeyCaptor.getValue();
+    List<SynapseReactClientEntityQueryKey> passedQueryKey = reactQueryKeyCaptor.getValue();
     assertNotNull(passedQueryKey);
     assertEquals(passedQueryKey.size(), 1);
-    SynapseReactClientQueryKey keyObject = passedQueryKey.get(0);
+    SynapseReactClientEntityQueryKey keyObject = passedQueryKey.get(0);
     assertEquals(keyObject.objectType, "entity");
     assertEquals(keyObject.id, entityId);
+  }
+
+  @Test
+  public void testDownloadListUpdatedUpdatedEvent() {
+    entityPresenter.onDownloadListUpdatedUpdatedEvent(
+      new DownloadListUpdatedEvent()
+    );
+
+    verify(mockQueryClient).invalidateQueries(stringListCaptor.capture());
+
+    List<String> passedQueryKey = stringListCaptor.getValue();
+    assertNotNull(passedQueryKey);
+    assertEquals(passedQueryKey.size(), 1);
+    assertEquals(passedQueryKey.get(0), "downloadList");
   }
 
   @Test
