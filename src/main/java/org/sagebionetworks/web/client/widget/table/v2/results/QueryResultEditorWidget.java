@@ -90,7 +90,7 @@ public class QueryResultEditorWidget
     this.tableType = tableType;
     this.view.setErrorMessageVisible(false);
     // configure the widget
-    pageWidget.configure(bundle, null, null, true, tableType, this, null, null);
+    pageWidget.configure(bundle, null, null, tableType, this, null, null);
     setJobRunning(false);
     this.globalApplicationState.setIsEditing(true);
     this.view.setSaveButtonLoading(false);

@@ -56,7 +56,6 @@ public class RowWidget implements IsWidget, RowView.Presenter {
   public void configure(
     final String tableId,
     final List<ColumnModel> types,
-    final boolean isEditor,
     TableType tableType,
     final Row row,
     RowSelectionListener rowSelectionListener
@@ -68,31 +67,25 @@ public class RowWidget implements IsWidget, RowView.Presenter {
     this.rowId = row.getRowId();
     this.rowVersion = row.getVersionNumber();
     this.cells = new ArrayList<Cell>(types.size());
-    configureAfterInit(tableId, types, isEditor, tableType, row);
+    configureAfterInit(tableId, types, tableType, row);
   }
 
   private void configureAfterInit(
     String tableId,
     List<ColumnModel> types,
-    boolean isEditor,
     TableType tableType,
     Row row
   ) {
     // Setup each cell
-    Set<String> defaultColumnNames = null;
-    if (isEditor) {
-      defaultColumnNames =
-        fileViewDefaultColumns.getDefaultViewColumnNames(tableType);
-    }
+    Set<String> defaultColumnNames = fileViewDefaultColumns.getDefaultViewColumnNames(
+      tableType
+    );
     for (ColumnModel type : types) {
       // Create each cell
       Cell cell = null;
       if (
-        isEditor &&
-        (
-          TableType.table.equals(tableType) ||
-          !defaultColumnNames.contains(type.getName())
-        )
+        TableType.table.equals(tableType) ||
+        !defaultColumnNames.contains(type.getName())
       ) {
         cell = cellFactory.createEditor(type);
       } else {

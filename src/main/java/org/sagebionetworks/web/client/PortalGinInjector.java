@@ -543,8 +543,6 @@ public interface PortalGinInjector extends Ginjector {
 
   RowWidget createRowWidget();
 
-  TablePageWidget createNewTablePageWidget();
-
   QueryResultEditorWidget createNewQueryResultEditorWidget();
 
   // TableEntity V2 cells

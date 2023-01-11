@@ -671,8 +671,6 @@ import org.sagebionetworks.web.client.widget.table.v2.results.StaticTableHeader;
 import org.sagebionetworks.web.client.widget.table.v2.results.StaticTableHeaderImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.TablePageView;
 import org.sagebionetworks.web.client.widget.table.v2.results.TablePageViewImpl;
-import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultView;
-import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWikiWidgetView;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWikiWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditorView;
@@ -1201,7 +1199,6 @@ public class PortalGinModule extends AbstractGinModule {
     bind(TableEntityWidgetView.class).to(TableEntityWidgetViewImpl.class);
     bind(RowView.class).to(RowViewImpl.class);
     bind(TablePageView.class).to(TablePageViewImpl.class);
-    bind(TableQueryResultView.class).to(TableQueryResultViewImpl.class);
     bind(QueryResultEditorView.class).to(QueryResultEditorViewImpl.class);
     bind(QueryInputView.class).to(QueryInputViewImpl.class);
     bind(JobTrackingWidget.class).to(AsynchronousProgressWidget.class);

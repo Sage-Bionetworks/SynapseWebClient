@@ -40,7 +40,6 @@ import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.renderer.SingleButtonView;
-import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultDateRangeViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultRangeViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultRangeWidget;
@@ -177,7 +176,7 @@ public class FacetsWidgetTest {
     verify(mockView).add(mockJobTrackingWidget);
     verify(mockJobTrackingWidget)
       .startAndTrackJob(
-        eq(TableQueryResultWidget.RUNNING_QUERY_MESSAGE),
+        eq(""),
         eq(false),
         eq(AsynchType.TableQuery),
         qbrCaptor.capture(),
