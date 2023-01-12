@@ -16,6 +16,7 @@ public class ColumnModelTableRowEditorStub
 
   private boolean isValid = true;
   private boolean isSetToBeDefaultFileViewColumn = false;
+  private boolean isView = false;
   private boolean canHaveDefault = true;
 
   @Override
@@ -51,8 +52,9 @@ public class ColumnModelTableRowEditorStub
   }
 
   @Override
-  public void setCanHaveDefault(boolean canHaveDefault) {
-    this.canHaveDefault = canHaveDefault;
+  public void setIsView() {
+    isView = true;
+    canHaveDefault = false;
   }
 
   public boolean canHaveDefault() {

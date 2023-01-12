@@ -165,6 +165,7 @@ public class CellFactory {
         case USERID:
           editor = ginInjector.createUserIdCellEditor();
           break;
+        case MEDIUMTEXT:
         case LARGETEXT:
           editor = ginInjector.createLargeTextFormCellEditor();
           break;

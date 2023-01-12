@@ -671,8 +671,6 @@ import org.sagebionetworks.web.client.widget.table.v2.results.StaticTableHeader;
 import org.sagebionetworks.web.client.widget.table.v2.results.StaticTableHeaderImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.TablePageView;
 import org.sagebionetworks.web.client.widget.table.v2.results.TablePageViewImpl;
-import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultView;
-import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWikiWidgetView;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWikiWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditorView;
@@ -711,8 +709,6 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEdi
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEditorViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdListRendererCellView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdListRendererCellViewImpl;
-import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultValuesView;
-import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultValuesViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorView;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorWidget;
@@ -1201,7 +1197,6 @@ public class PortalGinModule extends AbstractGinModule {
     bind(TableEntityWidgetView.class).to(TableEntityWidgetViewImpl.class);
     bind(RowView.class).to(RowViewImpl.class);
     bind(TablePageView.class).to(TablePageViewImpl.class);
-    bind(TableQueryResultView.class).to(TableQueryResultViewImpl.class);
     bind(QueryResultEditorView.class).to(QueryResultEditorViewImpl.class);
     bind(QueryInputView.class).to(QueryInputViewImpl.class);
     bind(JobTrackingWidget.class).to(AsynchronousProgressWidget.class);
@@ -1515,9 +1510,6 @@ public class PortalGinModule extends AbstractGinModule {
       .in(Singleton.class);
 
     bind(DivView.class).to(DivViewImpl.class);
-
-    bind(FacetColumnResultValuesView.class)
-      .to(FacetColumnResultValuesViewImpl.class);
 
     bind(ViewDefaultColumns.class).in(Singleton.class);
     bind(SubscribersWidgetView.class).to(SubscribersWidgetViewImpl.class);

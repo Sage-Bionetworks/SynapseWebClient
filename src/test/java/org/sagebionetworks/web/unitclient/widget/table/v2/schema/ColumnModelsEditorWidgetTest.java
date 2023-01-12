@@ -211,8 +211,8 @@ public class ColumnModelsEditorWidgetTest {
       .createColumnModelEditorWidget();
     verify(mockColumnModelTableRowEditorWidget1).setToBeDefaultFileViewColumn();
     verify(mockColumnModelTableRowEditorWidget2).setToBeDefaultFileViewColumn();
-    verify(mockColumnModelTableRowEditorWidget1).setCanHaveDefault(false);
-    verify(mockColumnModelTableRowEditorWidget2).setCanHaveDefault(false);
+    verify(mockColumnModelTableRowEditorWidget1).setIsView();
+    verify(mockColumnModelTableRowEditorWidget2).setIsView();
   }
 
   @Test

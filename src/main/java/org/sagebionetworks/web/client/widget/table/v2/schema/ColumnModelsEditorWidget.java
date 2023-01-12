@@ -120,8 +120,9 @@ public class ColumnModelsEditorWidget
     ColumnModel cm
   ) {
     ColumnModelTableRowEditorWidget rowEditor = ginInjector.createColumnModelEditorWidget();
-    if (!TableType.table.equals(tableType)) {
-      rowEditor.setCanHaveDefault(false);
+    boolean isView = !TableType.table.equals(tableType);
+    if (isView) {
+      rowEditor.setIsView();
       if (getDefaultColumnNames().contains(cm.getName())) {
         rowEditor.setToBeDefaultFileViewColumn();
       }

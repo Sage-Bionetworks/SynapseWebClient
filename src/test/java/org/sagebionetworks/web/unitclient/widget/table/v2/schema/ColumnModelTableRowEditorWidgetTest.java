@@ -455,7 +455,7 @@ public class ColumnModelTableRowEditorWidgetTest {
     assertFalse(editor.canHaveDefault(ColumnTypeViewEnum.File));
     assertFalse(editor.canHaveDefault(ColumnTypeViewEnum.LargeText));
 
-    editor.setCanHaveDefault(false);
+    editor.setIsView();
     assertFalse(editor.canHaveDefault(ColumnTypeViewEnum.Boolean));
     assertFalse(editor.canHaveDefault(ColumnTypeViewEnum.Integer));
     assertFalse(editor.canHaveDefault(ColumnTypeViewEnum.Boolean));

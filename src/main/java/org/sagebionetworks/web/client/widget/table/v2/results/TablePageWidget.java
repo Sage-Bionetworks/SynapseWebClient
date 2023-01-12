@@ -61,7 +61,6 @@ public class TablePageWidget implements IsWidget, RowSelectionListener {
    *
    * @param bundle The query results.
    * @param query The query used to generate this page.
-   * @param isEditable Is this page editable.
    * @param rowSelectionListener If null then selection will be disabled.
    * @param pageChangeListener If null then pagination will be disabled.
    */
@@ -69,7 +68,6 @@ public class TablePageWidget implements IsWidget, RowSelectionListener {
     QueryResultBundle bundle,
     Query query,
     List<SortItem> sortList,
-    boolean isEditable,
     TableType tableType,
     RowSelectionListener rowSelectionListener,
     final PagingAndSortingListener pageChangeListener,
@@ -122,25 +120,11 @@ public class TablePageWidget implements IsWidget, RowSelectionListener {
     for (ColumnModel type : types) {
       // Create each header
       String headerName = type.getName();
-      if (!isEditable) {
-        // For sorting we need click handler and to set sort direction when needed.
-        SortableTableHeader sth = ginInjector.createSortableTableHeader();
-        sth.configure(type.getName(), pageChangeListener);
-        headers.add(sth);
-        sth.setIsResizable(true);
-        if (sortedHeaders.containsKey(headerName)) {
-          SortItem sortItem = sortedHeaders.get(headerName);
-          sth.setSortDirection(sortItem.getDirection());
-        } else {
-          sth.setSortDirection(null);
-        }
-      } else {
-        // For the static case we just set the header name.
-        StaticTableHeader sth = ginInjector.createStaticTableHeader();
-        sth.setHeader(headerName);
-        sth.setIsResizable(false);
-        headers.add(sth);
-      }
+      // For the static case we just set the header name.
+      StaticTableHeader sth = ginInjector.createStaticTableHeader();
+      sth.setHeader(headerName);
+      sth.setIsResizable(false);
+      headers.add(sth);
     }
 
     view.setTableHeaders(headers);
@@ -148,7 +132,7 @@ public class TablePageWidget implements IsWidget, RowSelectionListener {
     // Build the rows for this table
     for (Row row : bundle.getQueryResult().getQueryResults().getRows()) {
       // Create the row
-      addRow(row, isEditable);
+      addRow(row);
     }
     // add rows in bulk to the view (single attach event)
     view.addRows(rows);
@@ -160,7 +144,7 @@ public class TablePageWidget implements IsWidget, RowSelectionListener {
    * @param isSelectable
    * @param row
    */
-  private RowWidget addRow(Row row, boolean isEditor) {
+  private RowWidget addRow(Row row) {
     // Create a new row and configure it with the data.
     RowWidget rowWidget = ginInjector.createRowWidget();
     // We only listen to selection changes on the row if one was provided.
@@ -168,7 +152,7 @@ public class TablePageWidget implements IsWidget, RowSelectionListener {
     if (rowSelectionListener != null) {
       listner = this;
     }
-    rowWidget.configure(tableId, types, isEditor, tableType, row, listner);
+    rowWidget.configure(tableId, types, tableType, row, listner);
     rows.add(rowWidget);
     return rowWidget;
   }
@@ -182,7 +166,7 @@ public class TablePageWidget implements IsWidget, RowSelectionListener {
    * Add a new row to the table.
    */
   public void onAddNewRow() {
-    view.addRow(addRow(new Row(), true));
+    view.addRow(addRow(new Row()));
   }
 
   /**

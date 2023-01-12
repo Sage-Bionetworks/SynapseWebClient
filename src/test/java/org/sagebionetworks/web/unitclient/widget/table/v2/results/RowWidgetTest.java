@@ -97,146 +97,89 @@ public class RowWidgetTest {
     tableType = TableType.table;
   }
 
-  /**
-   * A basic round trip test where a widget is configured with a row then the row is extracted.
-   */
-  @Test
-  public void testConfigureAndGet() {
-    boolean isEditor = false;
-    rowWidget.configure(tableId, types, isEditor, tableType, aRow, null);
-    Row extracted = rowWidget.getRow();
-    assertNotNull(extracted);
-    assertFalse(
-      "The extracted row must not be same instance as the configured row.",
-      aRow == extracted
-    );
-    assertEquals(aRow, extracted);
-  }
-
   @Test
   public void testConfigureEditor() {
-    boolean isEditor = true;
-    rowWidget.configure(tableId, types, isEditor, tableType, aRow, null);
+    rowWidget.configure(tableId, types, tableType, aRow, null);
     Row extracted = rowWidget.getRow();
     assertEquals(aRow, extracted);
   }
 
   @Test
   public void testNullSelectionListner() {
-    boolean isEditor = true;
-    rowWidget.configure(tableId, types, isEditor, tableType, aRow, null);
+    rowWidget.configure(tableId, types, tableType, aRow, null);
     // selection should not be shown without a listener.
     verify(mockView).setSelectVisible(false);
   }
 
   @Test
   public void testWithSelectionListner() {
-    boolean isEditor = true;
-    rowWidget.configure(tableId, types, isEditor, tableType, aRow, mockListner);
+    rowWidget.configure(tableId, types, tableType, aRow, mockListner);
     // selection must be shown when given a listener.
     verify(mockView).setSelectVisible(true);
   }
 
   @Test
   public void testViewSelectNotVisible() {
-    boolean isEditor = true;
     tableType = TableType.file_view;
-    rowWidget.configure(tableId, types, isEditor, tableType, aRow, mockListner);
+    rowWidget.configure(tableId, types, tableType, aRow, mockListner);
     // selection must be shown when given a listener.
     verify(mockView).setSelectVisible(false);
   }
 
   @Test
   public void testIsValid() {
-    boolean isEditor = true;
-    rowWidget.configure(tableId, types, isEditor, tableType, aRow, mockListner);
+    rowWidget.configure(tableId, types, tableType, aRow, mockListner);
     assertTrue(rowWidget.isValid());
     cellStubs.get(4).setIsValid(false);
     assertFalse(rowWidget.isValid());
   }
 
   @Test
-  public void testTakesAddressCell() {
-    TakesAddressCell mockTakesAddress = Mockito.mock(TakesAddressCell.class);
-    when(mockCellFactory.createRenderer(any(ColumnModel.class)))
-      .thenReturn(mockTakesAddress);
-    boolean isEditor = false;
-    rowWidget.configure(tableId, types, isEditor, tableType, aRow, mockListner);
-    verify(mockTakesAddress)
-      .setCellAddresss(
-        new CellAddress(
-          tableId,
-          types.get(0),
-          aRow.getRowId(),
-          aRow.getVersionNumber(),
-          tableType
-        )
-      );
-    verify(mockTakesAddress)
-      .setCellAddresss(
-        new CellAddress(
-          tableId,
-          types.get(1),
-          aRow.getRowId(),
-          aRow.getVersionNumber(),
-          tableType
-        )
-      );
-  }
-
-  @Test
-  public void testTakesAddressCellIsView() {
-    tableType = TableType.project_view;
-    TakesAddressCell mockTakesAddress = Mockito.mock(TakesAddressCell.class);
-    when(mockCellFactory.createRenderer(any(ColumnModel.class)))
-      .thenReturn(mockTakesAddress);
-    boolean isEditor = false;
-    rowWidget.configure(tableId, types, isEditor, tableType, aRow, mockListner);
-    verify(mockTakesAddress)
-      .setCellAddresss(
-        new CellAddress(
-          tableId,
-          types.get(0),
-          aRow.getRowId(),
-          aRow.getVersionNumber(),
-          tableType
-        )
-      );
-    verify(mockTakesAddress)
-      .setCellAddresss(
-        new CellAddress(
-          tableId,
-          types.get(1),
-          aRow.getRowId(),
-          aRow.getVersionNumber(),
-          tableType
-        )
-      );
-  }
-
-  @Test
   public void testEditDefaultColumnModelsIsView() {
     tableType = TableType.file_view;
-    boolean isEditor = true;
     HashSet<String> defaultColumnNames = new HashSet<String>();
     for (ColumnModel cm : types) {
       defaultColumnNames.add(cm.getName());
     }
+    TakesAddressCell mockTakesAddress = Mockito.mock(TakesAddressCell.class);
+    when(mockCellFactory.createRenderer(any(ColumnModel.class)))
+      .thenReturn(mockTakesAddress);
+
     when(
       mockFileViewDefaultColumns.getDefaultViewColumnNames(TableType.file_view)
     )
       .thenReturn(defaultColumnNames);
-    rowWidget.configure(tableId, types, isEditor, tableType, aRow, mockListner);
+    rowWidget.configure(tableId, types, tableType, aRow, mockListner);
     verify(mockCellFactory, times(types.size()))
       .createRenderer(any(ColumnModel.class));
     verify(mockCellFactory, never()).createEditor(any(ColumnModel.class));
+
+    verify(mockTakesAddress)
+      .setCellAddresss(
+        new CellAddress(
+          tableId,
+          types.get(0),
+          aRow.getRowId(),
+          aRow.getVersionNumber(),
+          tableType
+        )
+      );
+    verify(mockTakesAddress)
+      .setCellAddresss(
+        new CellAddress(
+          tableId,
+          types.get(1),
+          aRow.getRowId(),
+          aRow.getVersionNumber(),
+          tableType
+        )
+      );
   }
 
   @Test
   public void testEditDefaultColumnModelsIsTable() {
     defaultColumnModels.addAll(types);
-    boolean isEditor = true;
-    rowWidget.configure(tableId, types, isEditor, tableType, aRow, mockListner);
+    rowWidget.configure(tableId, types, tableType, aRow, mockListner);
     verify(mockCellFactory, never()).createRenderer(any(ColumnModel.class));
     verify(mockCellFactory, times(types.size()))
       .createEditor(any(ColumnModel.class));

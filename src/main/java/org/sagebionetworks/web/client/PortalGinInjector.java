@@ -227,7 +227,6 @@ import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorW
 import org.sagebionetworks.web.client.widget.table.v2.results.RowWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.SortableTableHeader;
 import org.sagebionetworks.web.client.widget.table.v2.results.StaticTableHeader;
-import org.sagebionetworks.web.client.widget.table.v2.results.TablePageWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWikiWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanFormCellEditor;
@@ -255,11 +254,6 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendere
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdListRendererCellView;
-import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultDateRangeViewImpl;
-import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultRangeViewImpl;
-import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultRangeWidget;
-import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultSliderRangeViewImpl;
-import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultValuesWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowViewer;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView;
@@ -543,8 +537,6 @@ public interface PortalGinInjector extends Ginjector {
 
   RowWidget createRowWidget();
 
-  TablePageWidget createNewTablePageWidget();
-
   QueryResultEditorWidget createNewQueryResultEditorWidget();
 
   // TableEntity V2 cells
@@ -679,17 +671,6 @@ public interface PortalGinInjector extends Ginjector {
   EntityListRowBadge getEntityListRowBadge();
 
   CancelControlWidget getCancelControlWidget();
-
-  FacetColumnResultRangeWidget getFacetColumnResultRangeWidget();
-
-  FacetColumnResultValuesWidget getFacetColumnResultValuesWidget();
-
-  // facet range views
-  FacetColumnResultRangeViewImpl getFacetColumnResultRangeViewImpl();
-
-  FacetColumnResultDateRangeViewImpl getFacetColumnResultDateRangeViewImpl();
-
-  FacetColumnResultSliderRangeViewImpl getFacetColumnResultSliderRangeViewImpl();
 
   DiscussionTabView getDiscussionTabView();
 

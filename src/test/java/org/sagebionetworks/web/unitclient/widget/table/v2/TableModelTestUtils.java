@@ -91,6 +91,9 @@ public class TableModelTestUtils {
           case LINK:
             defaultValue = "http";
             break;
+          case MEDIUMTEXT:
+            defaultValue = null;
+            break;
           case LARGETEXT:
             defaultValue = null;
             break;
@@ -381,6 +384,8 @@ public class TableModelTestUtils {
       case ENTITYID:
         return "syn" + i;
       case LINK:
+        return "";
+      case MEDIUMTEXT:
         return "";
       case LARGETEXT:
         return "";

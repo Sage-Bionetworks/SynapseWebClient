@@ -24,5 +24,5 @@ public interface ColumnModelTableRowEditorWidget extends ColumnModelTableRow {
 
   public void setToBeDefaultFileViewColumn();
 
-  public void setCanHaveDefault(boolean canHaveDefault);
+  public void setIsView();
 }

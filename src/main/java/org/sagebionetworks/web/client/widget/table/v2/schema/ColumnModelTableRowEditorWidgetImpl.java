@@ -6,7 +6,11 @@ import static org.sagebionetworks.web.client.widget.table.v2.schema.ColumnFacetT
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.web.client.StringUtils;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
@@ -36,6 +40,7 @@ public class ColumnModelTableRowEditorWidgetImpl
   CellFactory factory;
   String maxSize = null;
   boolean canHaveDefault = true;
+  boolean isView = false;
 
   @Inject
   public ColumnModelTableRowEditorWidgetImpl(
@@ -91,17 +96,13 @@ public class ColumnModelTableRowEditorWidgetImpl
     view.setDefaultEditorVisible(canHaveDefault(newType));
   }
 
-  @Override
-  public void setCanHaveDefault(boolean canHaveDefault) {
-    this.canHaveDefault = canHaveDefault;
-  }
-
   public boolean canHaveDefault(ColumnTypeViewEnum type) {
     if (canHaveDefault) {
       switch (type.getType()) {
         case ENTITYID:
         case FILEHANDLEID:
         case USERID:
+        case MEDIUMTEXT:
         case LARGETEXT:
           return false;
         default:
@@ -242,6 +243,14 @@ public class ColumnModelTableRowEditorWidgetImpl
     return defaultEditor;
   }
 
+  @Override
+  public void setIsView() {
+    // SWC-6333:  if this column is in a view, only allow column types that are mapped to annotation types.
+    // And maintain the behavior that these columns cannot have default values.
+    canHaveDefault = false;
+    isView = true;
+  }
+
   /**
    * Get the default max size for a given type.
    *
@@ -260,12 +269,25 @@ public class ColumnModelTableRowEditorWidgetImpl
     }
   }
 
+  Set<ColumnTypeViewEnum> unsupportedTypesForViews = new HashSet<ColumnTypeViewEnum>(
+    Arrays.asList(ColumnTypeViewEnum.LargeText, ColumnTypeViewEnum.MediumText)
+  );
+
   @Override
   public void configure(
     ColumnModel model,
     SelectionPresenter selectionPresenter
   ) {
     view.setSelectionPresenter(selectionPresenter);
+
+    // add column types to the dropdown:
+    Arrays
+      .asList(ColumnTypeViewEnum.values())
+      .stream()
+      .filter((val -> (!isView || !unsupportedTypesForViews.contains(val)))) // keep all values for tables, or keep value if not found in unsupportedTypesForViews.
+      .forEach(val -> {
+        view.addColumnType(val);
+      }); // and add this filtered set to the view
     // this will setup the view with the correct widgets.
     configureViewForType(
       ColumnTypeViewEnum.getViewForType(model.getColumnType())
