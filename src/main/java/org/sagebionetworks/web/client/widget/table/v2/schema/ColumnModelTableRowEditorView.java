@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.v2.schema;
 
+import java.util.ArrayList;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
 
 /**
@@ -109,4 +110,6 @@ public interface ColumnModelTableRowEditorView extends ColumnModelTableRow {
   public void setFacetValues(String... items);
 
   void setToBeDefaultFileViewColumn();
+
+  void addColumnType(ColumnTypeViewEnum item);
 }

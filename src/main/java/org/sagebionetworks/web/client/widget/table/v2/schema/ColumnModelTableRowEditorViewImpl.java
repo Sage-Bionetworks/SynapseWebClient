@@ -8,6 +8,8 @@ import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import org.gwtbootstrap3.client.ui.FormControlStatic;
 import org.gwtbootstrap3.client.ui.FormGroup;
@@ -162,6 +164,11 @@ public class ColumnModelTableRowEditorViewImpl
       }
     }
     type.setSelectedIndex(index);
+  }
+
+  @Override
+  public void addColumnType(ColumnTypeViewEnum item) {
+    type.addItem(item.toString());
   }
 
   @Override
