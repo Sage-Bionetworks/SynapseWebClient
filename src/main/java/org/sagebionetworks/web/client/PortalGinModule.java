@@ -709,8 +709,6 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEdi
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEditorViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdListRendererCellView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdListRendererCellViewImpl;
-import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultValuesView;
-import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultValuesViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorView;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorWidget;
@@ -1512,9 +1510,6 @@ public class PortalGinModule extends AbstractGinModule {
       .in(Singleton.class);
 
     bind(DivView.class).to(DivViewImpl.class);
-
-    bind(FacetColumnResultValuesView.class)
-      .to(FacetColumnResultValuesViewImpl.class);
 
     bind(ViewDefaultColumns.class).in(Singleton.class);
     bind(SubscribersWidgetView.class).to(SubscribersWidgetViewImpl.class);
