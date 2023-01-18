@@ -1293,6 +1293,16 @@ public class EntityActionControllerImpl
     if (isWikiableConfig(entityBundle.getEntity(), currentArea)) {
       actionMenu.setActionVisible(Action.VIEW_WIKI_SOURCE, true);
       actionMenu.setActionListener(Action.VIEW_WIKI_SOURCE, this);
+      actionMenu.setActionEnabled(
+        Action.VIEW_WIKI_SOURCE,
+        entityBundle.getRootWikiId() != null
+      );
+      actionMenu.setActionTooltipText(
+        Action.VIEW_WIKI_SOURCE,
+        entityBundle.getRootWikiId() == null
+          ? "This " + entityTypeDisplay + " has no wiki."
+          : null
+      );
     } else {
       actionMenu.setActionVisible(Action.VIEW_WIKI_SOURCE, false);
     }

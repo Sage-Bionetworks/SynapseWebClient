@@ -1682,6 +1682,25 @@ public class EntityActionControllerImplTest {
     verify(mockActionMenu).setActionVisible(Action.VIEW_WIKI_SOURCE, true);
     verify(mockActionMenu)
       .setActionListener(Action.VIEW_WIKI_SOURCE, controller);
+    verify(mockActionMenu).setActionEnabled(Action.VIEW_WIKI_SOURCE, true);
+  }
+
+  @Test
+  public void testConfigureViewWikiSourceNoWiki() {
+    entityBundle.setEntity(new Folder());
+    entityBundle.setRootWikiId(null);
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+    verify(mockActionMenu).setActionVisible(Action.VIEW_WIKI_SOURCE, true);
+    verify(mockActionMenu)
+      .setActionListener(Action.VIEW_WIKI_SOURCE, controller);
+    verify(mockActionMenu).setActionEnabled(Action.VIEW_WIKI_SOURCE, false);
   }
 
   @Test
@@ -1700,6 +1719,7 @@ public class EntityActionControllerImplTest {
     verify(mockActionMenu).setActionVisible(Action.VIEW_WIKI_SOURCE, true);
     verify(mockActionMenu)
       .setActionListener(Action.VIEW_WIKI_SOURCE, controller);
+    verify(mockActionMenu).setActionEnabled(Action.VIEW_WIKI_SOURCE, true);
   }
 
   @Test
@@ -1715,6 +1735,7 @@ public class EntityActionControllerImplTest {
       mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.VIEW_WIKI_SOURCE, true);
+    verify(mockActionMenu).setActionEnabled(Action.VIEW_WIKI_SOURCE, true);
   }
 
   @Test
@@ -1730,6 +1751,7 @@ public class EntityActionControllerImplTest {
       mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.VIEW_WIKI_SOURCE, true);
+    verify(mockActionMenu).setActionEnabled(Action.VIEW_WIKI_SOURCE, true);
   }
 
   @Test
@@ -1745,6 +1767,7 @@ public class EntityActionControllerImplTest {
       mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.VIEW_WIKI_SOURCE, true);
+    verify(mockActionMenu).setActionEnabled(Action.VIEW_WIKI_SOURCE, true);
   }
 
   @Test
