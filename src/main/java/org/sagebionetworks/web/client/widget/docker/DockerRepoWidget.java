@@ -74,12 +74,7 @@ public class DockerRepoWidget {
     this.canEdit = bundle.getPermissions().getCanCertifiedUserEdit();
     metadata.configure(bundle, null, actionMenu);
     dockerTitleBar.configure(bundle, actionMenu);
-    modifiedCreatedBy.configure(
-      entity.getCreatedOn(),
-      entity.getCreatedBy(),
-      entity.getModifiedOn(),
-      entity.getModifiedBy()
-    );
+    modifiedCreatedBy.configure(entity.getId(), null);
     configureWikiPage(bundle);
     configureProvenance(entity.getId());
     view.setDockerPullCommand(DOCKER_PULL_COMMAND + entity.getRepositoryName());

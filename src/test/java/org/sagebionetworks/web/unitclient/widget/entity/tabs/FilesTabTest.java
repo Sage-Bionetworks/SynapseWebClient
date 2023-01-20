@@ -299,8 +299,7 @@ public class FilesTabTest {
     // show project info
     verify(mockView, times(2)).setProvenanceVisible(false);
     verify(mockView).clearRefreshAlert();
-    verify(mockModifiedCreatedBy)
-      .configure(any(Date.class), anyString(), any(Date.class), anyString());
+    verify(mockModifiedCreatedBy).configure(projectEntityId, version);
     verify(mockView).setFileBrowserVisible(true);
     verify(mockFilesBrowser).configure(projectEntityId);
     verify(mockFilesBrowser)
@@ -366,8 +365,7 @@ public class FilesTabTest {
       .configure(any(EntityPath.class), eq(EntityArea.FILES));
 
     verify(mockView).setProvenanceVisible(true);
-    verify(mockModifiedCreatedBy)
-      .configure(any(Date.class), anyString(), any(Date.class), anyString());
+    verify(mockModifiedCreatedBy).configure(fileEntityId, version);
     verify(mockView).setWikiPageWidgetVisible(true);
 
     verify(mockView, times(2)).setFileBrowserVisible(false);
@@ -424,8 +422,7 @@ public class FilesTabTest {
       .configure(any(EntityPath.class), eq(EntityArea.FILES));
 
     verify(mockView, times(2)).setProvenanceVisible(false);
-    verify(mockModifiedCreatedBy)
-      .configure(any(Date.class), anyString(), any(Date.class), anyString());
+    verify(mockModifiedCreatedBy).configure(folderEntityId, null);
     verify(mockView).setWikiPageWidgetVisible(true);
 
     verify(mockView).setFileBrowserVisible(true);

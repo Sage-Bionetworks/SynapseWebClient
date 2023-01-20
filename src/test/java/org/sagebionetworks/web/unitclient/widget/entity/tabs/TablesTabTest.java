@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
@@ -318,9 +319,7 @@ public class TablesTabTest {
         mockActionMenuWidget
       );
     verify(mockView).setTableEntityWidget(any(Widget.class));
-    verify(mockModifiedCreatedBy)
-      .configure(any(Date.class), anyString(), any(Date.class), anyString());
-    verify(mockModifiedCreatedBy, never()).setCreatedHelpWidgetVisible(true);
+    verify(mockModifiedCreatedBy).configure(tableEntityId, version);
     verify(mockProvenanceWidget).configure(mapCaptor.capture());
     // verify configuration
     Map<String, String> provConfig = mapCaptor.getValue();
@@ -370,7 +369,7 @@ public class TablesTabTest {
     tab.setProject(projectEntityId, mockProjectEntityBundle, null);
     tab.configure(mockProjectEntityBundle, version, areaToken);
     verify(mockModifiedCreatedBy, Mockito.never())
-      .configure(any(Date.class), anyString(), any(Date.class), anyString());
+      .configure(anyString(), anyLong());
     verify(mockView).setEntityMetadataVisible(false);
     verify(mockView).setBreadcrumbVisible(false);
     verify(mockView).setTableListVisible(true);

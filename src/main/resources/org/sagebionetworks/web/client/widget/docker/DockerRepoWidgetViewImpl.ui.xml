@@ -67,13 +67,8 @@
             </g:FlowPanel>
           </b:Column>
         </b:Row>
-        <b:Row>
-          <g:SimplePanel
-            addStyleNames="margin-bottom-15 margin-left-15"
-            ui:field="dockerModifiedAndCreatedContainer"
-          />
-        </b:Row>
       </g:FlowPanel>
+      <g:SimplePanel ui:field="dockerModifiedAndCreatedContainer" />
     </b:Column>
     <g:SimplePanel ui:field="synapseAlertContainer" />
   </b:Row>

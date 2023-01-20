@@ -7,45 +7,35 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
+import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.jsinterop.CreatedByModifiedByProps;
+import org.sagebionetworks.web.client.jsinterop.React;
+import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.ReferenceJsObject;
+import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.widget.HelpWidget;
+import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 
 public class ModifiedCreatedByWidgetViewImpl
   implements ModifiedCreatedByWidgetView {
 
   @UiField
-  Span createdBadgePanel;
-
-  @UiField
-  Span createdOnText;
-
-  @UiField
-  Span modifiedBadgePanel;
-
-  @UiField
-  Span modifiedOnText;
-
-  @UiField
-  Div container;
-
-  @UiField
-  Span createdByUI;
-
-  @UiField
-  Span modifiedByUI;
-
-  @UiField
-  HelpWidget createdHelpWidget;
+  ReactComponentDiv container;
 
   public interface ModifiedCreatedByWidgetViewImplUiBinder
     extends UiBinder<Widget, ModifiedCreatedByWidgetViewImpl> {}
 
   private Widget widget;
 
+  private final SynapseContextPropsProvider propsProvider;
+
   @Inject
   public ModifiedCreatedByWidgetViewImpl(
-    ModifiedCreatedByWidgetViewImplUiBinder binder
+    ModifiedCreatedByWidgetViewImplUiBinder binder,
+    SynapseContextPropsProvider propsProvider
   ) {
     widget = binder.createAndBindUi(this);
+    this.propsProvider = propsProvider;
   }
 
   @Override
@@ -54,39 +44,17 @@ public class ModifiedCreatedByWidgetViewImpl
   }
 
   @Override
-  public void setCreatedOnText(String text) {
-    createdOnText.setText(text);
-  }
-
-  @Override
-  public void setModifiedOnText(String text) {
-    modifiedOnText.setText(text);
-  }
-
-  @Override
-  public void setModifiedBadge(IsWidget modifiedBadge) {
-    modifiedBadgePanel.clear();
-    modifiedBadgePanel.add(modifiedBadge);
-  }
-
-  @Override
-  public void setCreatedBadge(IsWidget createdBadge) {
-    createdBadgePanel.clear();
-    createdBadgePanel.add(createdBadge);
+  public void setProps(CreatedByModifiedByProps props) {
+    ReactNode component = React.createElementWithSynapseContext(
+      SRC.SynapseComponents.CreatedByModifiedBy,
+      props,
+      propsProvider.getJsInteropContextProps()
+    );
+    container.render(component);
   }
 
   @Override
   public void setVisible(boolean isVisible) {
     container.setVisible(isVisible);
-  }
-
-  @Override
-  public void setCreatedHelpWidgetVisible(boolean visible) {
-    createdHelpWidget.setVisible(visible);
-  }
-
-  @Override
-  public void setCreatedHelpWidgetText(String text) {
-    createdHelpWidget.setHelpMarkdown(text);
   }
 }

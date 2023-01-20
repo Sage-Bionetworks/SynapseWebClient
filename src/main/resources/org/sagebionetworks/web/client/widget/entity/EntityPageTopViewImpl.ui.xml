@@ -27,9 +27,5 @@
       </g:FlowPanel>
     </bh:Div>
     <bh:Div ui:field="tabsUI" />
-    <bh:Div
-      addStyleNames="margin-top-10"
-      ui:field="addToDownloadListContainer"
-    />
   </g:HTMLPanel>
 </ui:UiBinder>

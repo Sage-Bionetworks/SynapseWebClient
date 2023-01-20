@@ -52,7 +52,12 @@ $synapse-tertiary-color-palette: (
   900: #2f2814,
 );
 
-$full-root-panel-height: calc(100vh - 93px - 130px);
+$page-header-min-height: 93px;
+$footer-height: 160px;
+
+$full-root-panel-height: calc(
+  100vh - #{$page-header-min-height} - #{$footer-height}
+);
 
 @mixin border-radius($radius) {
   -webkit-border-radius: $radius;
@@ -195,7 +200,7 @@ a:focus {
   }
   #rootPanel .pageHeader {
     padding: 24px $entity-page-side-spacing;
-    min-height: 93px;
+    min-height: $page-header-min-height;
     @include synapse-blue-triangles-bg;
     h3.pageHeaderTitle {
       color: white;

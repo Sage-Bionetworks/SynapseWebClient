@@ -66,7 +66,7 @@ public class QueryWrapperPlotNavProps extends ReactComponentProps {
     props.shouldDeepLink = false;
     props.name = "Items";
     props.downloadCartPageUrl = "#!DownloadCart:0";
-    props.showLastUpdatedOn = true;
+    props.showLastUpdatedOn = false;
     // SWC-6138 - hide charts by default
     props.defaultShowFacetVisualization = false;
     return props;

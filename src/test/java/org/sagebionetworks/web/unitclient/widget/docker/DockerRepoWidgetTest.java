@@ -138,8 +138,7 @@ public class DockerRepoWidgetTest {
     verify(mockView).setDockerPullCommand(DOCKER_PULL_COMMAND + repoName);
     verify(mockMetadata).configure(mockEntityBundle, null, mockActionWidget);
     verify(mockDockerTitleBar).configure(mockEntityBundle, mockActionWidget);
-    verify(mockModifiedCreatedBy)
-      .configure(createdOn, createdBy, modifiedOn, modifiedBy);
+    verify(mockModifiedCreatedBy).configure(entityId, null);
     verify(mockDockerCommitListWidget).configure(entityId, false);
     verify(mockView).setProvenanceWidgetVisible(false);
   }
@@ -161,7 +160,6 @@ public class DockerRepoWidgetTest {
     verify(mockView).setDockerPullCommand(DOCKER_PULL_COMMAND + repoName);
     verify(mockMetadata).configure(mockEntityBundle, null, mockActionWidget);
     verify(mockDockerTitleBar).configure(mockEntityBundle, mockActionWidget);
-    verify(mockModifiedCreatedBy)
-      .configure(createdOn, createdBy, modifiedOn, modifiedBy);
+    verify(mockModifiedCreatedBy).configure(entityId, null);
   }
 }
