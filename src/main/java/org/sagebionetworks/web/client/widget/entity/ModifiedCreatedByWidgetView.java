@@ -1,18 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import com.google.gwt.user.client.ui.IsWidget;
+import org.sagebionetworks.web.client.jsinterop.CreatedByModifiedByProps;
+import org.sagebionetworks.web.client.jsinterop.ReferenceJsObject;
 
 public interface ModifiedCreatedByWidgetView extends IsWidget {
-  void setCreatedOnText(String string);
-
-  void setModifiedOnText(String string);
-
-  void setModifiedBadge(IsWidget modifiedBadge);
-
-  void setCreatedBadge(IsWidget createdBadge);
+  void setProps(CreatedByModifiedByProps props);
 
   void setVisible(boolean b);
-  void setCreatedHelpWidgetVisible(boolean visible);
-
-  void setCreatedHelpWidgetText(String text);
 }

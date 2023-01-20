@@ -54,6 +54,7 @@ public class SRC {
 
     public static ReactComponentType<EntityActionMenuPropsJsInterop> EntityActionMenu;
     public static ReactComponentType<HtmlPreviewProps> HtmlPreview;
+    public static ReactComponentType<CreatedByModifiedByProps> CreatedByModifiedBy;
 
     /**
      * Pushes a global toast message. In SWC, you should use {@link DisplayUtils#notify}, rather than calling this method directly.

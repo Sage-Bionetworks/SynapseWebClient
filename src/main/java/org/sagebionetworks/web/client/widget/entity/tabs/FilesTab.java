@@ -313,12 +313,7 @@ public class FilesTab {
       }
     }
     // Created By and Modified By
-    modifiedCreatedBy.configure(
-      currentEntity.getCreatedOn(),
-      currentEntity.getCreatedBy(),
-      currentEntity.getModifiedOn(),
-      currentEntity.getModifiedBy()
-    );
+    modifiedCreatedBy.configure(currentEntity.getId(), versionNumber);
 
     // Wiki Page
     boolean isWikiPageVisible = !isProject;

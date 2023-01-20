@@ -89,10 +89,7 @@
           </g:FlowPanel>
         </b:Column>
       </b:Row>
-      <g:SimplePanel
-        addStyleNames="padding-bottom-15"
-        ui:field="fileModifiedAndCreatedContainer"
-      />
     </bh:Div>
+    <g:SimplePanel ui:field="fileModifiedAndCreatedContainer" />
   </g:FlowPanel>
 </ui:UiBinder>

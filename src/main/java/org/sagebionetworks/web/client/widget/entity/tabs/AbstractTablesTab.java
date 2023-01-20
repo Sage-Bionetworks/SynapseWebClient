@@ -367,13 +367,7 @@ public abstract class AbstractTablesTab
       updateVersionAndAreaToken(entity.getId(), version, areaToken);
       breadcrumb.configure(bundle.getPath(), getTabArea());
       titleBar.configure(bundle, tab.getEntityActionMenu());
-      modifiedCreatedBy.configure(
-        entity.getCreatedOn(),
-        entity.getCreatedBy(),
-        entity.getModifiedOn(),
-        entity.getModifiedBy()
-      );
-      configureCreatedByHelpWidget();
+      modifiedCreatedBy.configure(entity.getId(), version);
       tableEntityWidget = ginInjector.createNewTableEntityWidgetV2();
       view.setTableEntityWidget(tableEntityWidget.asWidget());
       boolean isShowTableOnly = false;
@@ -524,13 +518,6 @@ public abstract class AbstractTablesTab
     this.view.setVersionAlertPrimaryText(
         (versionHistoryIsVisible ? "Hide" : "Show") + " Version History"
       );
-  }
-
-  private void configureCreatedByHelpWidget() {
-    modifiedCreatedBy.setCreatedHelpWidgetVisible(
-      entityBundle.getEntity() instanceof Dataset
-    );
-    modifiedCreatedBy.setCreatedHelpWidgetText(DATASET_CREATED_BY_HELP_TEXT);
   }
 
   private FluentFuture<Long> getLatestSnapshotVersionNumber() {
