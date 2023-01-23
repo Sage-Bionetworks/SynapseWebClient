@@ -103,7 +103,6 @@ public class AuthenticationControllerImpl implements AuthenticationController {
           public void onSuccess(LoginResponse response) {
             storeAuthenticationReceipt(response.getAuthenticationReceipt());
             setNewAccessToken(response.getAccessToken(), callback);
-            clearQueryClientCache();
           }
 
           @Override
@@ -198,6 +197,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
             DateTimeUtilsImpl.getWeekFromNow()
           );
           currentUserAccessToken = accessToken;
+          clearQueryClientCache();
           userAccountService.getMyProfile(
             new AsyncCallback<UserProfile>() {
               @Override
@@ -236,6 +236,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
         public void onFailure(Throwable t) {
           currentUserAccessToken = null;
           currentUserProfile = null;
+          clearQueryClientCache();
           ginInjector.getSessionDetector().initializeAccessTokenState();
           callback.onFailure(t);
         }
@@ -388,7 +389,6 @@ public class AuthenticationControllerImpl implements AuthenticationController {
               ginInjector.getGlobalApplicationState().refreshPage();
             }
             checkForQuarantinedEmail();
-            clearQueryClientCache();
           } else {
             ginInjector.getHeader().refresh();
             // we've determined that the session has not changed
