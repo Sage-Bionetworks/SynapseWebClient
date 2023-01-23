@@ -283,6 +283,7 @@ public class AuthenticationControllerImplTest {
 
     assertNull(authenticationController.getCurrentUserProfile());
     verify(mockSessionDetector).initializeAccessTokenState();
+    verify(mockQueryClient).clear();
     verify(mockPlaceChanger).goTo(placeCaptor.capture());
     Place place = placeCaptor.getValue();
     assertTrue(place instanceof LoginPlace);
@@ -316,6 +317,7 @@ public class AuthenticationControllerImplTest {
     );
     verify(mockJsClient, never())
       .initSession(anyString(), any(AsyncCallback.class));
+    verify(mockQueryClient).clear();
     Exception scEx = new StatusCodeException(0, "0 ");
     when(mockJsClient.getAccessToken()).thenReturn(getFailedFuture(scEx));
 
