@@ -42,6 +42,12 @@ public class Header implements HeaderView.Presenter, IsWidget {
     } else {
       view.setCookieNotificationVisible(false);
     }
+    if (cookies.getCookie(CookieKeys.NIH_SHARING_ALERT_DISMISSED) == null) {
+      view.setNIHAlertVisible(true);
+    } else {
+      view.setNIHAlertVisible(false);
+    }
+
     // portal alert state sticks around for entire app session
     String portalAlertString = cookies.getCookie(CookieKeys.PORTAL_CONFIG);
     isShowingPortalAlert = portalAlertString != null;
@@ -83,6 +89,16 @@ public class Header implements HeaderView.Presenter, IsWidget {
     view.setCookieNotificationVisible(false);
     cookies.setCookie(
       CookieKeys.COOKIES_ACCEPTED,
+      Boolean.TRUE.toString(),
+      DateTimeUtilsImpl.getYearFromNow()
+    );
+  }
+
+  @Override
+  public void onNIHNotificationDismissed() {
+    view.setNIHAlertVisible(false);
+    cookies.setCookie(
+      CookieKeys.NIH_SHARING_ALERT_DISMISSED,
       Boolean.TRUE.toString(),
       DateTimeUtilsImpl.getYearFromNow()
     );

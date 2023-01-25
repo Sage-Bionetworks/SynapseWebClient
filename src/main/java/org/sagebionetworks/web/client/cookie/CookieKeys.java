@@ -29,6 +29,9 @@ public class CookieKeys {
     "org.sagebionetworks.synapse.datetime.utc";
   public static String COOKIES_ACCEPTED =
     "org.sagebionetworks.security.cookies.notification.okclicked";
+  public static String NIH_SHARING_ALERT_DISMISSED =
+    "org.sagebionetworks.nih.sharing.notification.clicked";
+
   public static String PORTAL_CONFIG =
     "org.sagebionetworks.security.cookies.portal.config";
 }
