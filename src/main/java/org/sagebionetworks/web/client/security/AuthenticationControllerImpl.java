@@ -26,7 +26,6 @@ import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.context.QueryClientProvider;
-import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.jsinterop.reactquery.QueryClient;
 import org.sagebionetworks.web.client.place.Down;
@@ -57,7 +56,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
   public static String COOKIES_ACCEPTED =
     "org.sagebionetworks.security.cookies.notification.okclicked";
 
-  private String[] persistantLocalStorageKeys = new String[] {
+  private String[] persistentLocalStorageKeys = new String[] {
     USER_AUTHENTICATION_RECEIPT,
     NIH_NOTIFICATION_DISMISSED,
     COOKIES_ACCEPTED,
@@ -284,7 +283,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
   public void clearLocalStorage() {
     Map<String, String> storedKeyValues = new HashMap<String, String>();
     storedKeyValues.clear();
-    for (String key : persistantLocalStorageKeys) {
+    for (String key : persistentLocalStorageKeys) {
       if (localStorage.contains(key)) {
         storedKeyValues.put(key, localStorage.get(key));
       }
