@@ -99,6 +99,11 @@ public class ViewDefaultColumns {
   }
 
   public List<ColumnModel> getDefaultViewColumns(TableType tableType) {
+    /*
+     * TODO: We should instead asynchronously fetch the default columns using the viewEntityType and viewTypeMask of the specific table.
+     * The widgets that call this would need to be refactored to use Future callbacks and handle loading and error states.
+     * See https://rest-docs.synapse.org/rest/GET/column/tableview/defaults.html
+     */
     if (TableType.submission_view.equals(tableType)) {
       return defaultSubmissionViewColumns;
     } else if (TableType.dataset.equals(tableType)) {
