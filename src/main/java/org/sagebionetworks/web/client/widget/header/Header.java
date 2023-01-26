@@ -44,10 +44,12 @@ public class Header implements HeaderView.Presenter, IsWidget {
     view.getEventBinder().bindEventHandlers(this, eventBus);
     view.setCookieNotificationVisible(
       !localStorage.contains(AuthenticationControllerImpl.COOKIES_ACCEPTED)
-    )
+    );
     view.setNIHAlertVisible(
-      !localStorage.contains(AuthenticationControllerImpl.NIH_NOTIFICATION_DISMISSED)
-    )
+      !localStorage.contains(
+        AuthenticationControllerImpl.NIH_NOTIFICATION_DISMISSED
+      )
+    );
 
     // portal alert state sticks around for entire app session
     String portalAlertString = cookies.getCookie(CookieKeys.PORTAL_CONFIG);
