@@ -282,7 +282,6 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 
   public void clearLocalStorage() {
     Map<String, String> storedKeyValues = new HashMap<String, String>();
-    storedKeyValues.clear();
     for (String key : persistentLocalStorageKeys) {
       if (localStorage.contains(key)) {
         storedKeyValues.put(key, localStorage.get(key));
