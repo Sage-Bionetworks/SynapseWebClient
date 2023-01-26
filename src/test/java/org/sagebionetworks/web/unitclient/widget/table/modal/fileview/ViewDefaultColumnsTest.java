@@ -29,8 +29,8 @@ public class ViewDefaultColumnsTest {
   @Mock
   SynapseJavascriptClient mockJsClient;
 
-  List<ColumnModel> columns, projectColumns, submissionViewColumns;
-  ViewDefaultColumns fileViewDefaultColumns;
+  List<ColumnModel> columns, projectColumns, submissionViewColumns, datasetColumns, datasetCollectionColumns;
+  ViewDefaultColumns viewDefaultColumns;
 
   @Mock
   Exception mockException;
@@ -48,10 +48,15 @@ public class ViewDefaultColumnsTest {
   ColumnModel fileColumn;
   ColumnModel projectColumn;
   ColumnModel submissionViewColumn;
+  ColumnModel datasetColumn;
+  ColumnModel datasetCollectionColumn;
   public static final String FILE_COLUMN = "default file column name";
   public static final String PROJECT_COLUMN = "default project name";
   public static final String SUBMISSION_VIEW_COLUMN =
     "default submission view column name";
+  public static final String DATASET_COLUMN = "default dataset column name";
+  public static final String DATASET_COLLECTION_COLUMN =
+    "default dataset collection column name";
 
   @Before
   public void setUp() throws Exception {
@@ -66,11 +71,20 @@ public class ViewDefaultColumnsTest {
     submissionViewColumn = new ColumnModel();
     submissionViewColumn.setId("3");
     submissionViewColumn.setName(SUBMISSION_VIEW_COLUMN);
+    datasetColumn = new ColumnModel();
+    datasetColumn.setId("4");
+    datasetColumn.setName(DATASET_COLUMN);
+    datasetCollectionColumn = new ColumnModel();
+    datasetCollectionColumn.setId("5");
+    datasetCollectionColumn.setName(DATASET_COLLECTION_COLUMN);
 
     adapterFactory = new AdapterFactoryImpl();
     columns = Collections.singletonList(fileColumn);
     projectColumns = Collections.singletonList(projectColumn);
     submissionViewColumns = Collections.singletonList(submissionViewColumn);
+    datasetColumns = Collections.singletonList(datasetColumn);
+    datasetCollectionColumns =
+      Collections.singletonList(datasetCollectionColumn);
     when(
       mockJsClient.getDefaultColumnsForView(
         TableType.file_view.getViewTypeMask()
@@ -85,24 +99,40 @@ public class ViewDefaultColumnsTest {
       .thenReturn(getDoneFuture(projectColumns));
     when(mockJsClient.getDefaultColumnsForView(ViewEntityType.submissionview))
       .thenReturn(getDoneFuture(submissionViewColumns));
-    fileViewDefaultColumns =
+    when(mockJsClient.getDefaultColumnsForView(ViewEntityType.dataset))
+      .thenReturn(getDoneFuture(datasetColumns));
+    when(
+      mockJsClient.getDefaultColumnsForView(ViewEntityType.datasetcollection)
+    )
+      .thenReturn(getDoneFuture(datasetCollectionColumns));
+    viewDefaultColumns =
       new ViewDefaultColumns(mockJsClient, adapterFactory, mockPopupUtils);
   }
 
   @Test
   public void testGetDefaultColumnNames() {
-    Set<String> columnNames = fileViewDefaultColumns.getDefaultViewColumnNames(
+    Set<String> columnNames = viewDefaultColumns.getDefaultViewColumnNames(
       TableType.file_view
     );
-    Set<String> projectColumnNames = fileViewDefaultColumns.getDefaultViewColumnNames(
+    Set<String> projectColumnNames = viewDefaultColumns.getDefaultViewColumnNames(
       TableType.project_view
     );
-    Set<String> submissionViewColumnNames = fileViewDefaultColumns.getDefaultViewColumnNames(
+    Set<String> submissionViewColumnNames = viewDefaultColumns.getDefaultViewColumnNames(
       TableType.submission_view
+    );
+    Set<String> datasetColumnNames = viewDefaultColumns.getDefaultViewColumnNames(
+      TableType.dataset
+    );
+    Set<String> datasetCollectionColumnNames = viewDefaultColumns.getDefaultViewColumnNames(
+      TableType.dataset_collection
     );
     assertTrue(columnNames.contains(FILE_COLUMN));
     assertTrue(projectColumnNames.contains(PROJECT_COLUMN));
     assertTrue(submissionViewColumnNames.contains(SUBMISSION_VIEW_COLUMN));
+    assertTrue(datasetColumnNames.contains(DATASET_COLUMN));
+    assertTrue(
+      datasetCollectionColumnNames.contains(DATASET_COLLECTION_COLUMN)
+    );
   }
 
   @Test
@@ -113,7 +143,7 @@ public class ViewDefaultColumnsTest {
       )
     )
       .thenReturn(getFailedFuture(mockException));
-    fileViewDefaultColumns =
+    viewDefaultColumns =
       new ViewDefaultColumns(mockJsClient, adapterFactory, mockPopupUtils);
 
     verify(mockJsClient, times(2))
@@ -129,7 +159,7 @@ public class ViewDefaultColumnsTest {
       )
     )
       .thenReturn(getFailedFuture(mockException));
-    fileViewDefaultColumns =
+    viewDefaultColumns =
       new ViewDefaultColumns(mockJsClient, adapterFactory, mockPopupUtils);
 
     verify(mockJsClient, times(2))
@@ -141,7 +171,7 @@ public class ViewDefaultColumnsTest {
   public void testSubmissionViewInitFailure() {
     when(mockJsClient.getDefaultColumnsForView(ViewEntityType.submissionview))
       .thenReturn(getFailedFuture(mockException));
-    fileViewDefaultColumns =
+    viewDefaultColumns =
       new ViewDefaultColumns(mockJsClient, adapterFactory, mockPopupUtils);
 
     verify(mockJsClient, times(2))

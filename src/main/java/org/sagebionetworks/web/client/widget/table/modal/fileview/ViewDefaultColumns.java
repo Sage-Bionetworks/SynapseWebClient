@@ -19,7 +19,7 @@ import org.sagebionetworks.web.client.SynapseJavascriptClient;
 public class ViewDefaultColumns {
 
   private SynapseJavascriptClient jsClient;
-  private List<ColumnModel> defaultFileViewColumns, defaultProjectViewColumns, defaultSubmissionViewColumns;
+  private List<ColumnModel> defaultFileViewColumns, defaultProjectViewColumns, defaultSubmissionViewColumns, defaultDatasetColumns, defaultDatasetCollectionColumns;
 
   private AdapterFactory adapterFactory;
   PopupUtilsView popupUtils;
@@ -46,12 +46,20 @@ public class ViewDefaultColumns {
     FluentFuture<List<ColumnModel>> submissionViewColumnsFuture = jsClient.getDefaultColumnsForView(
       ViewEntityType.submissionview
     );
+    FluentFuture<List<ColumnModel>> datasetColumnsFuture = jsClient.getDefaultColumnsForView(
+      ViewEntityType.dataset
+    );
+    FluentFuture<List<ColumnModel>> datasetCollectionColumnsFuture = jsClient.getDefaultColumnsForView(
+      ViewEntityType.datasetcollection
+    );
     FluentFuture
       .from(
         whenAllComplete(
           fileViewColumnsFuture,
           projectViewColumnsFuture,
-          submissionViewColumnsFuture
+          submissionViewColumnsFuture,
+          datasetColumnsFuture,
+          datasetCollectionColumnsFuture
         )
           .call(
             () -> {
@@ -60,6 +68,9 @@ public class ViewDefaultColumns {
                 clearIds(projectViewColumnsFuture.get());
               defaultSubmissionViewColumns =
                 clearIds(submissionViewColumnsFuture.get());
+              defaultDatasetColumns = clearIds(datasetColumnsFuture.get());
+              defaultDatasetCollectionColumns =
+                clearIds(datasetCollectionColumnsFuture.get());
               return null;
             },
             directExecutor()
@@ -84,18 +95,16 @@ public class ViewDefaultColumns {
   }
 
   public Set<String> getDefaultViewColumnNames(TableType tableType) {
-    if (TableType.submission_view.equals(tableType)) {
-      return getColumnNames(defaultSubmissionViewColumns);
-    } else if (tableType.isIncludeFiles()) {
-      return getColumnNames(defaultFileViewColumns);
-    } else {
-      return getColumnNames(defaultProjectViewColumns);
-    }
+    return getColumnNames(getDefaultViewColumns(tableType));
   }
 
   public List<ColumnModel> getDefaultViewColumns(TableType tableType) {
     if (TableType.submission_view.equals(tableType)) {
       return defaultSubmissionViewColumns;
+    } else if (TableType.dataset.equals(tableType)) {
+      return defaultDatasetColumns;
+    } else if (TableType.dataset_collection.equals(tableType)) {
+      return defaultDatasetCollectionColumns;
     } else if (tableType.isIncludeFiles()) {
       return defaultFileViewColumns;
     } else {
