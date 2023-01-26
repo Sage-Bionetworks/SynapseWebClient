@@ -172,6 +172,8 @@ public class AuthenticationControllerImplTest {
     when(mockGlobalApplicationState.getLastPlace()).thenReturn(mockPlace);
     when(mockClientCache.get(USER_AUTHENTICATION_RECEIPT))
       .thenReturn(USER_AUTHENTICATION_RECEIPT_VALUE);
+    when(mockClientCache.contains(USER_AUTHENTICATION_RECEIPT))
+      .thenReturn(true);
 
     authenticationController.logoutUser();
 

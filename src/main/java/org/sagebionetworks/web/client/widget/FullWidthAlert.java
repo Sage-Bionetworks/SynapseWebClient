@@ -156,6 +156,11 @@ public class FullWidthAlert implements IsWidget {
     rerender();
   }
 
+  public void setOnClose(FullWidthAlertProps.Callback onClose) {
+    this.onClose = onClose;
+    rerender();
+  }
+
   public void setGlobal(boolean isGlobal) {
     this.isGlobal = isGlobal;
   }

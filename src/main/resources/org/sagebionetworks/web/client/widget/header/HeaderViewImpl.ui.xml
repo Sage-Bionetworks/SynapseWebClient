@@ -109,5 +109,18 @@
       secondaryCTAHref="https://s3.amazonaws.com/static.synapse.org/governance/SynapsePrivacyPolicy.pdf"
       primaryCTAText="Accept and continue"
     />
+    <w:FullWidthAlert
+      ui:field="nihNotificationAlert"
+      visible="false"
+      alertType="INFO"
+      global="false"
+      messageTitle="2023 NIH Policy for Data Management and Sharing"
+      message="Following January 25, 2023, all projects seeking NIH-funding will be required to submit a data management and sharing plan. We can help with that!"
+      secondaryCTAText="Learn More"
+      secondaryCTAHref="https://grants.nih.gov/grants/guide/notice-files/NOT-OD-21-013.html"
+      primaryCTAText="Contact us!"
+      primaryCTAHref="https://sagebionetworks.jira.com/servicedesk/customer/portal/9/group/16/create/85?summary=NIH%20Data%20Management%20Policy%20Request"
+      addStyleNames="nihNotificationAlert"
+    />
   </bh:Div>
 </ui:UiBinder>

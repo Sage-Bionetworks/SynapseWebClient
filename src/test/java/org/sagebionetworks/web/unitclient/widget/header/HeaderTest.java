@@ -11,7 +11,6 @@ import static org.mockito.Mockito.when;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.web.bindery.event.shared.binder.EventBinder;
-import java.util.Date;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -26,8 +25,10 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.security.AuthenticationControllerImpl;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.HeaderView;
 
@@ -45,6 +46,9 @@ public class HeaderTest {
 
   @Mock
   CookieProvider mockCookies;
+
+  @Mock
+  ClientCache mockLocalStorage;
 
   @Mock
   UserProfile mockUserProfile;
@@ -73,6 +77,7 @@ public class HeaderTest {
         mockSynapseJSNIUtils,
         mockEventBus,
         mockCookies,
+        mockLocalStorage,
         jsonObjectAdapter
       );
   }
@@ -120,8 +125,11 @@ public class HeaderTest {
   }
 
   @Test
-  public void testInitWithAcceptCookiesCookie() {
-    when(mockCookies.getCookie(CookieKeys.COOKIES_ACCEPTED)).thenReturn("true");
+  public void testInitWithAcceptCookies() {
+    when(
+      mockLocalStorage.contains(AuthenticationControllerImpl.COOKIES_ACCEPTED)
+    )
+      .thenReturn(true);
     reset(mockView);
     when(mockView.getEventBinder()).thenReturn(mockEventBinder);
 
@@ -131,6 +139,7 @@ public class HeaderTest {
         mockSynapseJSNIUtils,
         mockEventBus,
         mockCookies,
+        mockLocalStorage,
         jsonObjectAdapter
       );
 
@@ -141,11 +150,47 @@ public class HeaderTest {
   public void testOnCookieNotificationDismissed() {
     header.onCookieNotificationDismissed();
 
-    verify(mockCookies)
-      .setCookie(
-        eq(CookieKeys.COOKIES_ACCEPTED),
+    verify(mockLocalStorage)
+      .put(
+        eq(AuthenticationControllerImpl.COOKIES_ACCEPTED),
         eq(Boolean.TRUE.toString()),
-        any(Date.class)
+        any(Long.class)
+      );
+  }
+
+  @Test
+  public void testInitWithNIHNotificationDismissed() {
+    when(
+      mockLocalStorage.contains(
+        AuthenticationControllerImpl.NIH_NOTIFICATION_DISMISSED
+      )
+    )
+      .thenReturn(true);
+    reset(mockView);
+    when(mockView.getEventBinder()).thenReturn(mockEventBinder);
+
+    header =
+      new Header(
+        mockView,
+        mockSynapseJSNIUtils,
+        mockEventBus,
+        mockCookies,
+        mockLocalStorage,
+        jsonObjectAdapter
+      );
+
+    verify(mockView).setNIHAlertVisible(false);
+  }
+
+  @Test
+  public void testOnNIHNotificationDismissed() {
+    header.onNIHNotificationDismissed();
+
+    verify(mockLocalStorage)
+      .put(
+        eq(AuthenticationControllerImpl.NIH_NOTIFICATION_DISMISSED),
+        eq(Boolean.TRUE.toString()),
+        any(Long.class)
       );
   }
 
@@ -161,6 +206,7 @@ public class HeaderTest {
         mockSynapseJSNIUtils,
         mockEventBus,
         mockCookies,
+        mockLocalStorage,
         jsonObjectAdapter
       );
 
@@ -182,6 +228,7 @@ public class HeaderTest {
         mockSynapseJSNIUtils,
         mockEventBus,
         mockCookies,
+        mockLocalStorage,
         jsonObjectAdapter
       );
 

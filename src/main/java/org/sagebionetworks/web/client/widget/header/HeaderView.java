@@ -19,9 +19,11 @@ public interface HeaderView extends IsWidget {
    */
   public interface Presenter {
     void onCookieNotificationDismissed();
+    void onNIHNotificationDismissed();
   }
 
   void setStagingAlertVisible(boolean visible);
+  void setNIHAlertVisible(boolean visible);
 
   void openNewWindow(String url);
 

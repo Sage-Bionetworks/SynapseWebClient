@@ -40,6 +40,9 @@ public class HeaderViewImpl extends Composite implements HeaderView {
   FullWidthAlert cookieNotificationAlert;
 
   @UiField
+  FullWidthAlert nihNotificationAlert;
+
+  @UiField
   Div portalAlert;
 
   @UiField
@@ -76,6 +79,9 @@ public class HeaderViewImpl extends Composite implements HeaderView {
     this.propsProvider = propsProvider;
     cookieNotificationAlert.addPrimaryCTAClickHandler(event -> {
       presenter.onCookieNotificationDismissed();
+    });
+    nihNotificationAlert.setOnClose(() -> {
+      presenter.onNIHNotificationDismissed();
     });
 
     initClickHandlers();
@@ -198,5 +204,10 @@ public class HeaderViewImpl extends Composite implements HeaderView {
       }
     }
     portalAlert.setVisible(visible);
+  }
+
+  @Override
+  public void setNIHAlertVisible(boolean visible) {
+    nihNotificationAlert.setVisible(visible);
   }
 }
