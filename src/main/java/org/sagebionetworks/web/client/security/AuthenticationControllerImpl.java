@@ -9,6 +9,8 @@ import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.StatusCodeException;
 import com.google.inject.Inject;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.auth.LoginRequest;
@@ -24,7 +26,6 @@ import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.context.QueryClientProvider;
-import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.jsinterop.reactquery.QueryClient;
 import org.sagebionetworks.web.client.place.Down;
@@ -50,6 +51,16 @@ public class AuthenticationControllerImpl implements AuthenticationController {
     "last_user_authentication_receipt";
   private static final String AUTHENTICATION_MESSAGE =
     "Invalid username or password.";
+  public static final String NIH_NOTIFICATION_DISMISSED =
+    "nih_notification_dismissed";
+  public static String COOKIES_ACCEPTED =
+    "org.sagebionetworks.security.cookies.notification.okclicked";
+
+  private String[] persistentLocalStorageKeys = new String[] {
+    USER_AUTHENTICATION_RECEIPT,
+    NIH_NOTIFICATION_DISMISSED,
+    COOKIES_ACCEPTED,
+  };
   private static String currentUserAccessToken;
   private static UserProfile currentUserProfile;
   private UserAccountServiceAsync userAccountService;
@@ -192,11 +203,6 @@ public class AuthenticationControllerImpl implements AuthenticationController {
       new FutureCallback<String>() {
         @Override
         public void onSuccess(String accessToken) {
-          cookies.setCookie(
-            CookieKeys.USER_LOGGED_IN_RECENTLY,
-            "true",
-            DateTimeUtilsImpl.getWeekFromNow()
-          );
           currentUserAccessToken = accessToken;
           userAccountService.getMyProfile(
             new AsyncCallback<UserProfile>() {
@@ -274,13 +280,28 @@ public class AuthenticationControllerImpl implements AuthenticationController {
     );
   }
 
+  public void clearLocalStorage() {
+    Map<String, String> storedKeyValues = new HashMap<String, String>();
+    for (String key : persistentLocalStorageKeys) {
+      if (localStorage.contains(key)) {
+        storedKeyValues.put(key, localStorage.get(key));
+      }
+    }
+    localStorage.clear();
+    for (String key : storedKeyValues.keySet()) {
+      localStorage.put(
+        key,
+        storedKeyValues.get(key),
+        DateTimeUtilsImpl.getYearFromNow().getTime()
+      );
+    }
+  }
+
   @Override
   public void logoutUser() {
     // terminate the session, remove the cookie
     jsniUtils.setAnalyticsUserId("");
-    String receipt = localStorage.get(USER_AUTHENTICATION_RECEIPT);
-    localStorage.clear();
-    storeAuthenticationReceipt(receipt);
+    clearLocalStorage();
     // save last place but clear other session storage values on logout.
     Place lastPlace = ginInjector.getGlobalApplicationState().getLastPlace();
     sessionStorage.clear();
