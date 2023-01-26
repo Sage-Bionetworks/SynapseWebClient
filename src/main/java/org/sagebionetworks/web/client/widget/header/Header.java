@@ -8,8 +8,10 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DateTimeUtilsImpl;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.security.AuthenticationControllerImpl;
 
 public class Header implements HeaderView.Presenter, IsWidget {
 
@@ -18,6 +20,7 @@ public class Header implements HeaderView.Presenter, IsWidget {
   private HeaderView view;
   private SynapseJSNIUtils synapseJSNIUtils;
   CookieProvider cookies;
+  private ClientCache localStorage;
   public static boolean isShowingPortalAlert = false;
   public static JSONObjectAdapter portalAlertJson = null;
 
@@ -27,22 +30,28 @@ public class Header implements HeaderView.Presenter, IsWidget {
     SynapseJSNIUtils synapseJSNIUtils,
     EventBus eventBus,
     CookieProvider cookies,
+    ClientCache localStorage,
     JSONObjectAdapter jsonObjectAdapter
   ) {
     this.view = view;
     this.cookies = cookies;
+    this.localStorage = localStorage;
     this.synapseJSNIUtils = synapseJSNIUtils;
     view.clear();
 
     view.setPresenter(this);
     initStagingAlert();
     view.getEventBinder().bindEventHandlers(this, eventBus);
-    if (cookies.getCookie(CookieKeys.COOKIES_ACCEPTED) == null) {
+    if (!localStorage.contains(AuthenticationControllerImpl.COOKIES_ACCEPTED)) {
       view.setCookieNotificationVisible(true);
     } else {
       view.setCookieNotificationVisible(false);
     }
-    if (cookies.getCookie(CookieKeys.NIH_SHARING_ALERT_DISMISSED) == null) {
+    if (
+      !localStorage.contains(
+        AuthenticationControllerImpl.NIH_NOTIFICATION_DISMISSED
+      )
+    ) {
       view.setNIHAlertVisible(true);
     } else {
       view.setNIHAlertVisible(false);
@@ -87,20 +96,20 @@ public class Header implements HeaderView.Presenter, IsWidget {
   @Override
   public void onCookieNotificationDismissed() {
     view.setCookieNotificationVisible(false);
-    cookies.setCookie(
-      CookieKeys.COOKIES_ACCEPTED,
+    localStorage.put(
+      AuthenticationControllerImpl.COOKIES_ACCEPTED,
       Boolean.TRUE.toString(),
-      DateTimeUtilsImpl.getYearFromNow()
+      DateTimeUtilsImpl.getYearFromNow().getTime()
     );
   }
 
   @Override
   public void onNIHNotificationDismissed() {
     view.setNIHAlertVisible(false);
-    cookies.setCookie(
-      CookieKeys.NIH_SHARING_ALERT_DISMISSED,
+    localStorage.put(
+      AuthenticationControllerImpl.NIH_NOTIFICATION_DISMISSED,
       Boolean.TRUE.toString(),
-      DateTimeUtilsImpl.getYearFromNow()
+      DateTimeUtilsImpl.getYearFromNow().getTime()
     );
   }
 }
