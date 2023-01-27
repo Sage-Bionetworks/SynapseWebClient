@@ -112,7 +112,7 @@
     <w:FullWidthAlert
       ui:field="nihNotificationAlert"
       visible="false"
-      alertType="INFO"
+      alertType="WARNING"
       global="false"
       messageTitle="2023 NIH Policy for Data Management and Sharing"
       message="Following January 25, 2023, all projects seeking NIH-funding will be required to submit a data management and sharing plan. We can help with that!"
