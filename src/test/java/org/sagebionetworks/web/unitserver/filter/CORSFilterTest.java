@@ -68,6 +68,26 @@ public class CORSFilterTest {
   }
 
   @Test
+  public void testInvalidSubdomainCannotUseCredentials()
+    throws ServletException, IOException {
+    // See SWC-6374, SWC-6383
+    // we are in a .synapse.org subdomain, but not one that is known to exist
+    when(mockRequest.getHeader(ACCESS_CONTROL_ALLOW_CREDENTIALS_HEADER))
+      .thenReturn(Boolean.TRUE.toString());
+    when(mockRequest.getHeader(ORIGIN_HEADER))
+      .thenReturn("https://notarealsubdomain" + SYNAPSE_ORG_SUFFIX); // https://notarealsubdomain.synapse.org
+
+    filter.testFilter(mockRequest, mockResponse, mockFilterChain);
+
+    // verify allow origin header set to * (causes CORS preflight to fail browserside)
+    verify(mockResponse)
+      .addHeader(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER, DEFAULT_ALLOW_ORIGIN);
+    // and Access-Control-Allow-Credentials is not added to the response
+    verify(mockResponse, never())
+      .addHeader(ACCESS_CONTROL_ALLOW_CREDENTIALS_HEADER, "true");
+  }
+
+  @Test
   public void testNotSynapseOrg() throws ServletException, IOException {
     // we are not in a .synapse.org subdomain
     when(mockRequest.getHeader(ACCESS_CONTROL_ALLOW_CREDENTIALS_HEADER))
