@@ -14,6 +14,7 @@ import static org.sagebionetworks.web.server.StackEndpoints.STACK_BEANSTALK_NUMB
 import static org.sagebionetworks.web.server.StackEndpoints.STACK_INSTANCE_PROPERTY_NAME;
 import static org.sagebionetworks.web.server.StackEndpoints.STACK_PROPERTY_NAME;
 
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.web.server.StackEndpoints;
@@ -26,7 +27,12 @@ public class StackEndpointsTest {
     StackEndpoints.skipLoadingSettingsFile();
   }
 
-  private void clearProperties() {
+  @AfterClass
+  public static void afterAll() {
+    clearProperties();
+  }
+
+  private static void clearProperties() {
     System.clearProperty(REPO_ENDPOINT_KEY);
     System.clearProperty(FILE_ENDPOINT_KEY);
     System.clearProperty(AUTH_ENDPOINT_KEY);
