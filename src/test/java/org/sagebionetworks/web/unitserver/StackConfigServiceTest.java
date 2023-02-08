@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.unitserver;
 
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,7 +16,6 @@ import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.Session;
-import org.sagebionetworks.repo.model.principal.AccountSetupInfo;
 import org.sagebionetworks.repo.model.versionInfo.SynapseVersionInfo;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.server.servlet.StackConfigServiceImpl;

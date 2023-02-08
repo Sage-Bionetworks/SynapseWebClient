@@ -684,11 +684,16 @@ public class SynapseClientImplTest {
 
   @Test
   public void testGetUserProfile() throws Exception {
+    String currentValue = System.getProperty(StackEndpoints.REPO_ENDPOINT_KEY);
+
     // verify call is directly calling the synapse client provider
     String testRepoUrl = "http://mytestrepourl";
     System.setProperty(StackEndpoints.REPO_ENDPOINT_KEY, testRepoUrl);
     UserProfile userProfile = synapseClient.getUserProfile(testUserId);
     assertEquals(userProfile, testUserProfile);
+
+    // Cleanup -- set the previous value of the property
+    System.setProperty(StackEndpoints.REPO_ENDPOINT_KEY, currentValue);
   }
 
   @Test
