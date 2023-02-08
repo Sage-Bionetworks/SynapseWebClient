@@ -78,6 +78,8 @@ public class StackEndpoints {
       String repoEndpoint = System.getProperty(REPO_ENDPOINT_KEY);
       if (repoEndpoint != null) {
         // done, overwriting using old params
+        System.out.println("Found repo endpoint from config:");
+        System.out.println(repoEndpoint);
         endpointPrefixFromConfiguration =
           repoEndpoint.substring(0, repoEndpoint.indexOf("/repo/"));
       }
