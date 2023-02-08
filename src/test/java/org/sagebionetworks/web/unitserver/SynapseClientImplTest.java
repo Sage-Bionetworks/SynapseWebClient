@@ -693,7 +693,11 @@ public class SynapseClientImplTest {
     assertEquals(userProfile, testUserProfile);
 
     // Cleanup -- set the previous value of the property
-    System.setProperty(StackEndpoints.REPO_ENDPOINT_KEY, currentValue);
+    if (currentValue != null) {
+      System.setProperty(StackEndpoints.REPO_ENDPOINT_KEY, currentValue);
+    } else {
+      System.clearProperty(StackEndpoints.REPO_ENDPOINT_KEY);
+    }
   }
 
   @Test
