@@ -107,6 +107,9 @@ public class ChallengeClientImplTest {
 
   private static final String EVAL_ID_1 = "eval ID 1";
   private static final String EVAL_ID_2 = "eval ID 2";
+
+  private static final String HTTP_REQUEST_URL =
+    "https://www.synapse.org/Portal/challenge";
   private static JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
   private static AdapterFactory adapterFactory = new AdapterFactoryImpl();
   ChallengeTeam testChallengeTeam1, testChallengeTeam2;
@@ -124,7 +127,8 @@ public class ChallengeClientImplTest {
   public void before() throws SynapseException, JSONObjectAdapterException {
     mockSynapse = Mockito.mock(SynapseClient.class);
     mockSynapseProvider = Mockito.mock(SynapseProvider.class);
-    when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
+    when(mockSynapseProvider.createNewClient(anyString()))
+      .thenReturn(mockSynapse);
     mockTokenProvider = Mockito.mock(TokenProvider.class);
 
     synapseClient = new ChallengeClientImpl();
@@ -173,6 +177,8 @@ public class ChallengeClientImplTest {
     userIp = "127.0.0.1";
     when(mockThreadLocal.get()).thenReturn(mockRequest);
     when(mockRequest.getRemoteAddr()).thenReturn(userIp);
+    when(mockRequest.getRequestURL())
+      .thenReturn(new StringBuffer(HTTP_REQUEST_URL));
   }
 
   @Test

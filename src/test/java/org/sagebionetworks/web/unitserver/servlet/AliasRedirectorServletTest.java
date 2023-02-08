@@ -63,7 +63,8 @@ public class AliasRedirectorServletTest {
     throws IOException, SynapseException, JSONObjectAdapterException {
     MockitoAnnotations.initMocks(this);
     servlet = new AliasRedirectorServlet();
-    when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
+    when(mockSynapseProvider.createNewClient(anyString()))
+      .thenReturn(mockSynapse);
 
     servlet.setSynapseProvider(mockSynapseProvider);
 
@@ -111,10 +112,6 @@ public class AliasRedirectorServletTest {
 
     assertTrue(redirectUrl.contains(AliasRedirectorServlet.PROFILE_PLACE));
     assertTrue(redirectUrl.contains(ownerId));
-
-    // as an additional test, verify that synapse client is set up
-    verify(mockSynapse).setAuthEndpoint(SynapseClientBaseTest.AUTH_BASE);
-    verify(mockSynapse).setRepositoryEndpoint(SynapseClientBaseTest.REPO_BASE);
 
     // look for no cache headers
     verify(mockResponse)

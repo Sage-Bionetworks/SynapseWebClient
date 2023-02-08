@@ -85,7 +85,6 @@ import org.sagebionetworks.repo.model.UserGroup;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
@@ -132,7 +131,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.util.SerializationUtils;
-import org.sagebionetworks.web.client.StackEndpoints;
+import org.sagebionetworks.web.server.StackEndpoints;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
@@ -165,6 +164,8 @@ public class SynapseClientImplTest {
   private static final String BANNER_1 = "Banner 1";
   public static final String TEST_HOME_PAGE_BASE = "http://mysynapse.org/";
   public static final String MY_USER_PROFILE_OWNER_ID = "MyOwnerID";
+  private static final String HTTP_REQUEST_URL =
+    "https://www.synapse.org/Portal/endpoint";
 
   @Mock
   SynapseProvider mockSynapseProvider;
@@ -311,7 +312,8 @@ public class SynapseClientImplTest {
 
   @Before
   public void before() throws SynapseException, JSONObjectAdapterException {
-    when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
+    when(mockSynapseProvider.createNewClient(anyString()))
+      .thenReturn(mockSynapse);
     when(mockPaginatedMembershipRequest.getTotalNumberOfResults())
       .thenReturn(3L);
     synapseClient = new SynapseClientImpl();
@@ -530,6 +532,8 @@ public class SynapseClientImplTest {
     userIp = "127.0.0.1";
     when(mockThreadLocal.get()).thenReturn(mockRequest);
     when(mockRequest.getRemoteAddr()).thenReturn(userIp);
+    when(mockRequest.getRequestURL())
+      .thenReturn(new StringBuffer(HTTP_REQUEST_URL));
     entityChildrenPage = new ArrayList<EntityHeader>();
     when(mockEntityChildrenResponse.getPage()).thenReturn(entityChildrenPage);
     when(mockSynapse.getEntityChildren(any(EntityChildrenRequest.class)))

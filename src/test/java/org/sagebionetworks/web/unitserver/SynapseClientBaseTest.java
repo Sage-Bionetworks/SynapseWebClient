@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitserver;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -13,7 +14,7 @@ import org.mockito.Mock;
 import org.mockito.internal.util.reflection.Whitebox;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.client.SynapseClient;
-import org.sagebionetworks.web.client.StackEndpoints;
+import org.sagebionetworks.web.server.StackEndpoints;
 import org.sagebionetworks.web.server.servlet.SynapseClientBase;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 
@@ -35,6 +36,7 @@ public class SynapseClientBaseTest {
   HttpServletRequest mockRequest;
 
   String userIp = "127.0.0.1";
+  String requestHost = "www.synapse.org";
   public static final String ENDPOINT_PREFIX =
     "https://repo-test.prod.sagebase.org";
   public static final String FILE_BASE = ENDPOINT_PREFIX + "/file/v1";
@@ -52,7 +54,8 @@ public class SynapseClientBaseTest {
   @Before
   public void setUp() throws Exception {
     synapseClientBase = new SynapseClientBase();
-    when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapseClient);
+    when(mockSynapseProvider.createNewClient(anyString()))
+      .thenReturn(mockSynapseClient);
     Whitebox.setInternalState(
       synapseClientBase,
       "synapseProvider",
@@ -73,13 +76,11 @@ public class SynapseClientBaseTest {
   public void testCreateSynapseClient() {
     String sessionToken = "fakeSessionToken";
     SynapseClient createdClient = synapseClientBase.createSynapseClient(
+      requestHost,
       sessionToken
     );
     assertEquals(mockSynapseClient, createdClient);
     verify(mockSynapseClient).setBearerAuthorizationToken(sessionToken);
-    verify(mockSynapseClient).setRepositoryEndpoint(REPO_BASE);
-    verify(mockSynapseClient).setAuthEndpoint(AUTH_BASE);
-    verify(mockSynapseClient).setFileEndpoint(FILE_BASE);
     verify(mockSynapseClient)
       .appendUserAgent(SynapseClientBase.PORTAL_USER_AGENT);
     verify(mockSynapseClient).setUserIpAddress(userIp);
@@ -90,6 +91,7 @@ public class SynapseClientBaseTest {
     when(mockThreadLocal.get()).thenReturn(null);
     String sessionToken = "fakeSessionToken";
     SynapseClient createdClient = synapseClientBase.createSynapseClient(
+      requestHost,
       sessionToken
     );
     verify(mockSynapseClient, never()).setUserIpAddress(userIp);

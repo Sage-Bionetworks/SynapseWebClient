@@ -16,7 +16,7 @@ import org.apache.commons.logging.LogFactory;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.versionInfo.SynapseVersionInfo;
-import org.sagebionetworks.web.client.StackEndpoints;
+import org.sagebionetworks.web.server.StackEndpoints;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl.PortalVersionHolder;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
@@ -26,10 +26,13 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
  */
 public class VersionsServlet extends HttpServlet {
 
-  public static final String TEXT_CONTENT_TYPE = "text/plain";
   private static Log log = LogFactory.getLog(VersionsServlet.class);
   private static final long serialVersionUID = 1L;
   protected static final ThreadLocal<HttpServletRequest> perThreadRequest = new ThreadLocal<HttpServletRequest>();
+  private final RequestHostProvider requestHostProvider = () ->
+    UserDataProvider.getThreadLocalRequestHost(
+      VersionsServlet.perThreadRequest.get()
+    );
 
   private final Supplier<SynapseVersionInfo> synapseVersionCache = Suppliers.memoizeWithExpiration(
     versionSupplier(),
@@ -44,13 +47,9 @@ public class VersionsServlet extends HttpServlet {
   private SynapseProvider synapseProvider = new SynapseProviderImpl();
 
   private SynapseClient createNewClient() {
-    SynapseClient client = synapseProvider.createNewClient();
-    client.setAuthEndpoint(
-      StackEndpoints.getAuthenticationServicePublicEndpoint()
+    return synapseProvider.createNewClient(
+      this.requestHostProvider.getRequestHost()
     );
-    client.setRepositoryEndpoint(StackEndpoints.getRepositoryServiceEndpoint());
-    client.setFileEndpoint(StackEndpoints.getFileServiceEndpoint());
-    return client;
   }
 
   private Supplier<SynapseVersionInfo> versionSupplier() {

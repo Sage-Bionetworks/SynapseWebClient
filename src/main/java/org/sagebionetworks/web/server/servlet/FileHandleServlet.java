@@ -33,7 +33,7 @@ import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.RowReference;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
-import org.sagebionetworks.web.client.StackEndpoints;
+import org.sagebionetworks.web.server.StackEndpoints;
 import org.sagebionetworks.web.shared.WebConstants;
 
 /**
@@ -61,10 +61,13 @@ public class FileHandleServlet extends HttpServlet {
     }
   };
 
+  private RequestHostProvider requestHostProvider = () ->
+    UserDataProvider.getThreadLocalRequestHost(
+      FileHandleServlet.perThreadRequest.get()
+    );
+
   /**
    * Unit test can override this.
-   *
-   * @param fileHandleProvider
    */
   public void setSynapseProvider(SynapseProvider synapseProvider) {
     this.synapseProvider = synapseProvider;
@@ -483,12 +486,9 @@ public class FileHandleServlet extends HttpServlet {
    * @return
    */
   private SynapseClient createNewClient(String accessToken) {
-    SynapseClient client = synapseProvider.createNewClient();
-    client.setAuthEndpoint(
-      StackEndpoints.getAuthenticationServicePublicEndpoint()
+    SynapseClient client = synapseProvider.createNewClient(
+      requestHostProvider.getRequestHost()
     );
-    client.setRepositoryEndpoint(StackEndpoints.getRepositoryServiceEndpoint());
-    client.setFileEndpoint(StackEndpoints.getFileServiceEndpoint());
     if (accessToken != null) client.setBearerAuthorizationToken(accessToken);
     return client;
   }

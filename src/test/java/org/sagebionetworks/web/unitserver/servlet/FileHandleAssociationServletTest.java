@@ -65,7 +65,8 @@ public class FileHandleAssociationServletTest {
     MockitoAnnotations.initMocks(this);
     servlet = new FileHandleAssociationServlet();
 
-    when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
+    when(mockSynapseProvider.createNewClient(anyString()))
+      .thenReturn(mockSynapse);
 
     resolvedUrl = new URL("http://localhost/file.png");
     when(mockSynapse.getFileURL(any(FileHandleAssociation.class)))
@@ -117,9 +118,6 @@ public class FileHandleAssociationServletTest {
     assertEquals(fileHandleId, fha.getFileHandleId());
 
     // as an additional test, verify that synapse client is set up
-    verify(mockSynapse).setAuthEndpoint(SynapseClientBaseTest.AUTH_BASE);
-    verify(mockSynapse).setRepositoryEndpoint(SynapseClientBaseTest.REPO_BASE);
-    verify(mockSynapse).setFileEndpoint(anyString());
     verify(mockSynapse).setBearerAuthorizationToken(sessionToken);
 
     // look for 30 second cache header

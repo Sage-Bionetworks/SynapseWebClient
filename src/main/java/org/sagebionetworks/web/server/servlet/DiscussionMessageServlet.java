@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.sagebionetworks.client.SynapseClient;
-import org.sagebionetworks.web.client.StackEndpoints;
+import org.sagebionetworks.web.server.StackEndpoints;
 import org.sagebionetworks.web.shared.WebConstants;
 
 /**
@@ -19,14 +19,14 @@ public class DiscussionMessageServlet extends HttpServlet {
   protected static final ThreadLocal<HttpServletRequest> perThreadRequest = new ThreadLocal<HttpServletRequest>();
 
   private SynapseProvider synapseProvider = new SynapseProviderImpl();
-  private TokenProvider tokenProvider = new TokenProvider() {
-    @Override
-    public String getToken() {
-      return UserDataProvider.getThreadLocalUserToken(
-        DiscussionMessageServlet.perThreadRequest.get()
-      );
-    }
-  };
+  private TokenProvider tokenProvider = () ->
+    UserDataProvider.getThreadLocalUserToken(
+      DiscussionMessageServlet.perThreadRequest.get()
+    );
+  private RequestHostProvider requestHostProvider = () ->
+    UserDataProvider.getThreadLocalRequestHost(
+      DiscussionMessageServlet.perThreadRequest.get()
+    );
 
   @Override
   protected void service(HttpServletRequest arg0, HttpServletResponse arg1)
@@ -65,12 +65,9 @@ public class DiscussionMessageServlet extends HttpServlet {
    * @return
    */
   private SynapseClient createNewClient(String accessToken) {
-    SynapseClient client = synapseProvider.createNewClient();
-    client.setAuthEndpoint(
-      StackEndpoints.getAuthenticationServicePublicEndpoint()
+    SynapseClient client = synapseProvider.createNewClient(
+      requestHostProvider.getRequestHost()
     );
-    client.setRepositoryEndpoint(StackEndpoints.getRepositoryServiceEndpoint());
-    client.setFileEndpoint(StackEndpoints.getFileServiceEndpoint());
     if (accessToken != null) client.setBearerAuthorizationToken(accessToken);
     return client;
   }

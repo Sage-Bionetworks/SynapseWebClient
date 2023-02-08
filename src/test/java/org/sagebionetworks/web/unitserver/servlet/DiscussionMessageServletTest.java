@@ -62,7 +62,8 @@ public class DiscussionMessageServletTest {
     URL resolvedUrl = new URL("http://localhost/file.png");
     when(mockSynapse.getThreadUrl(anyString())).thenReturn(resolvedUrl);
     when(mockSynapse.getReplyUrl(anyString())).thenReturn(resolvedUrl);
-    when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
+    when(mockSynapseProvider.createNewClient(anyString()))
+      .thenReturn(mockSynapse);
     when(mockResponse.getOutputStream()).thenReturn(responseOutputStream);
     when(mockRequest.getRequestURL())
       .thenReturn(new StringBuffer("https://www.synapse.org/"));
@@ -90,9 +91,6 @@ public class DiscussionMessageServletTest {
     verify(mockResponse).sendRedirect(anyString());
 
     // as an additional test, verify that synapse client is set up
-    verify(mockSynapse).setAuthEndpoint(SynapseClientBaseTest.AUTH_BASE);
-    verify(mockSynapse).setRepositoryEndpoint(SynapseClientBaseTest.REPO_BASE);
-    verify(mockSynapse).setFileEndpoint(SynapseClientBaseTest.FILE_BASE);
     verify(mockSynapse).setBearerAuthorizationToken(sessionToken);
   }
 
@@ -117,9 +115,6 @@ public class DiscussionMessageServletTest {
     verify(mockResponse).sendRedirect(anyString());
 
     // as an additional test, verify that synapse client is set up
-    verify(mockSynapse).setAuthEndpoint(SynapseClientBaseTest.AUTH_BASE);
-    verify(mockSynapse).setRepositoryEndpoint(SynapseClientBaseTest.REPO_BASE);
-    verify(mockSynapse).setFileEndpoint(SynapseClientBaseTest.FILE_BASE);
     verify(mockSynapse).setBearerAuthorizationToken(sessionToken);
   }
 

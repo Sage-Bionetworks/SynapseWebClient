@@ -14,7 +14,7 @@ import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.file.CloudProviderFileHandleInterface;
 import org.sagebionetworks.web.client.LinkedInService;
-import org.sagebionetworks.web.client.StackEndpoints;
+import org.sagebionetworks.web.server.StackEndpoints;
 import org.sagebionetworks.web.shared.LinkedInInfo;
 import org.scribe.model.OAuthRequest;
 import org.scribe.model.Response;
@@ -30,7 +30,7 @@ import org.w3c.dom.NodeList;
 
 public class LinkedInServiceImpl
   extends RemoteServiceServlet
-  implements LinkedInService, TokenProvider {
+  implements LinkedInService, TokenProvider, RequestHostProvider {
 
   private static Logger logger = Logger.getLogger(
     LinkedInServiceImpl.class.getName()
@@ -284,6 +284,13 @@ public class LinkedInServiceImpl
     );
   }
 
+  @Override
+  public String getRequestHost() {
+    return UserDataProvider.getThreadLocalRequestHost(
+      this.getThreadLocalRequest()
+    );
+  }
+
   private org.sagebionetworks.client.SynapseClient createSynapseClient() {
     return createSynapseClient(getToken());
   }
@@ -294,17 +301,12 @@ public class LinkedInServiceImpl
    */
   private SynapseClient createSynapseClient(String accessToken) {
     // Create a new syanpse
-    SynapseClient synapseClient = synapseProvider.createNewClient();
+    SynapseClient synapseClient = synapseProvider.createNewClient(
+      this.getRequestHost()
+    );
     if (accessToken != null) {
       synapseClient.setBearerAuthorizationToken(accessToken);
     }
-    synapseClient.setRepositoryEndpoint(
-      StackEndpoints.getRepositoryServiceEndpoint()
-    );
-    synapseClient.setAuthEndpoint(
-      StackEndpoints.getAuthenticationServicePublicEndpoint()
-    );
-    synapseClient.setFileEndpoint(StackEndpoints.getFileServiceEndpoint());
     // Append the portal's version information to the user agent.
     synapseClient.appendUserAgent(SynapseClientBase.PORTAL_USER_AGENT);
     return synapseClient;

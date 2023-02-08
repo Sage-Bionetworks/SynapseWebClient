@@ -55,6 +55,9 @@ public class StackConfigServiceTest {
   ArgumentCaptor<String> stringCaptor;
 
   public static final String REPO_VERSION = "stack-1";
+  private static final String HTTP_REQUEST_URL =
+    "https://www.synapse.org/Portal/stackConfig";
+
   StackConfigServiceImpl stackConfigService;
 
   @Before
@@ -82,6 +85,8 @@ public class StackConfigServiceTest {
     );
     when(mockThreadLocal.get()).thenReturn(mockRequest);
     when(mockRequest.getRemoteAddr()).thenReturn("127.0.0.1");
+    when(mockRequest.getRequestURL())
+      .thenReturn(new StringBuffer(HTTP_REQUEST_URL));
 
     when(mockSynapseVersionInfo.getVersion()).thenReturn(REPO_VERSION);
     when(mockSynapse.getVersionInfo()).thenReturn(mockSynapseVersionInfo);

@@ -20,8 +20,8 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.annotation.v2.Annotations;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
-import org.sagebionetworks.web.client.StackEndpoints;
 import org.sagebionetworks.web.client.exceptions.IllegalArgumentException;
+import org.sagebionetworks.web.server.StackEndpoints;
 import org.sagebionetworks.web.shared.WebConstants;
 
 public class SlackServlet extends HttpServlet {
@@ -40,12 +40,14 @@ public class SlackServlet extends HttpServlet {
     "\\s*[sS]{1}[yY]{1}[nN]{1}\\d+\\s*";
   Pattern p = Pattern.compile(SYNAPSE_ID_REGEX);
 
+  private final RequestHostProvider requestHostProvider = () ->
+    UserDataProvider.getThreadLocalRequestHost(
+      SlackServlet.perThreadRequest.get()
+    );
   private SynapseProvider synapseProvider = new SynapseProviderImpl();
 
   /**
    * Unit test can override this.
-   *
-   * @param fileHandleProvider
    */
   public void setSynapseProvider(SynapseProvider synapseProvider) {
     this.synapseProvider = synapseProvider;
@@ -214,12 +216,9 @@ public class SlackServlet extends HttpServlet {
    * @return
    */
   private SynapseClient createNewClient() {
-    SynapseClient client = synapseProvider.createNewClient();
-    client.setAuthEndpoint(
-      StackEndpoints.getAuthenticationServicePublicEndpoint()
+    SynapseClient client = synapseProvider.createNewClient(
+      requestHostProvider.getRequestHost()
     );
-    client.setRepositoryEndpoint(StackEndpoints.getRepositoryServiceEndpoint());
-    client.setFileEndpoint(StackEndpoints.getFileServiceEndpoint());
     return client;
   }
 }

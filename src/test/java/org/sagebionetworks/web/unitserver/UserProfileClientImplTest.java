@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitserver;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.contains;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
@@ -51,12 +52,15 @@ public class UserProfileClientImplTest {
   @Mock
   HttpServletRequest mockRequest;
 
+  private static final String HTTP_REQUEST_URL =
+    "https://www.synapse.org/Portal/endpoint";
   String userIp = "127.0.0.1";
 
   @Before
   public void before() throws SynapseException, JSONObjectAdapterException {
     MockitoAnnotations.initMocks(this);
-    when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
+    when(mockSynapseProvider.createNewClient(anyString()))
+      .thenReturn(mockSynapse);
 
     testProfile = new UserProfile();
     testProfile.setOwnerId("123");
@@ -74,6 +78,8 @@ public class UserProfileClientImplTest {
     userIp = "127.0.0.1";
     when(mockThreadLocal.get()).thenReturn(mockRequest);
     when(mockRequest.getRemoteAddr()).thenReturn(userIp);
+    when(mockRequest.getRequestURL())
+      .thenReturn(new StringBuffer(HTTP_REQUEST_URL));
   }
 
   @Test

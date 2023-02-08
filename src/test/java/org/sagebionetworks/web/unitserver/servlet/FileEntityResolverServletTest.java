@@ -63,7 +63,8 @@ public class FileEntityResolverServletTest {
     MockitoAnnotations.initMocks(this);
     servlet = new FileEntityResolverServlet();
 
-    when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
+    when(mockSynapseProvider.createNewClient(anyString()))
+      .thenReturn(mockSynapse);
 
     URL resolvedUrl = new URL(resolvedUrlString);
     when(
@@ -106,9 +107,6 @@ public class FileEntityResolverServletTest {
     assertTrue(responseText.contains(resolvedUrlString));
 
     // as an additional test, verify that synapse client is set up
-    verify(mockSynapse).setAuthEndpoint(SynapseClientBaseTest.AUTH_BASE);
-    verify(mockSynapse).setRepositoryEndpoint(SynapseClientBaseTest.REPO_BASE);
-    verify(mockSynapse).setFileEndpoint(anyString());
     verify(mockSynapse).setBearerAuthorizationToken(sessionToken);
   }
 
