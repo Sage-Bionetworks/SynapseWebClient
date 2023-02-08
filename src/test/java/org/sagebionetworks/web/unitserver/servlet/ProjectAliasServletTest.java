@@ -46,7 +46,8 @@ public class ProjectAliasServletTest {
     // unintentionally testing those classes
     mockSynapse = mock(SynapseClient.class);
     mockSynapseProvider = mock(SynapseProvider.class);
-    when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
+    when(mockSynapseProvider.createNewClient(anyString()))
+      .thenReturn(mockSynapse);
 
     mockTokenProvider = mock(TokenProvider.class);
 

@@ -114,7 +114,8 @@ public class SlackServletTest {
     when(mockEntityPath.getPath()).thenReturn(entityPath);
     when(mockEntityBundle.getPath()).thenReturn(mockEntityPath);
     when(mockParentProject.getName()).thenReturn(ENTITY_PROJECT);
-    when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
+    when(mockSynapseProvider.createNewClient(anyString()))
+      .thenReturn(mockSynapse);
     when(mockResponse.getOutputStream()).thenReturn(mockOutputStream);
     when(mockEntityBundle.getThreadCount()).thenReturn(THREAD_COUNT);
     when(mockEntityBundle.getAnnotations()).thenReturn(mockAnnotations);
@@ -150,11 +151,6 @@ public class SlackServletTest {
     assertTrue(outputValue.contains(ENTITY_STRING_ANNOTATION_KEY));
     assertTrue(outputValue.contains(ENTITY_STRING_ANNOTATION_VALUE1));
     assertTrue(outputValue.contains(ENTITY_STRING_ANNOTATION_VALUE2));
-
-    // as an additional test, verify that synapse client is set up
-    verify(mockSynapse).setAuthEndpoint(SynapseClientBaseTest.AUTH_BASE);
-    verify(mockSynapse).setRepositoryEndpoint(SynapseClientBaseTest.REPO_BASE);
-    verify(mockSynapse).setFileEndpoint(SynapseClientBaseTest.FILE_BASE);
   }
 
   @Test

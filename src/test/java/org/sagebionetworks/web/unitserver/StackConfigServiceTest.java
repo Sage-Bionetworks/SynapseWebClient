@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.unitserver;
 
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,7 +16,6 @@ import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.Session;
-import org.sagebionetworks.repo.model.principal.AccountSetupInfo;
 import org.sagebionetworks.repo.model.versionInfo.SynapseVersionInfo;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.server.servlet.StackConfigServiceImpl;
@@ -55,6 +53,9 @@ public class StackConfigServiceTest {
   ArgumentCaptor<String> stringCaptor;
 
   public static final String REPO_VERSION = "stack-1";
+  private static final String HTTP_REQUEST_URL =
+    "https://www.synapse.org/Portal/stackConfig";
+
   StackConfigServiceImpl stackConfigService;
 
   @Before
@@ -82,6 +83,8 @@ public class StackConfigServiceTest {
     );
     when(mockThreadLocal.get()).thenReturn(mockRequest);
     when(mockRequest.getRemoteAddr()).thenReturn("127.0.0.1");
+    when(mockRequest.getRequestURL())
+      .thenReturn(new StringBuffer(HTTP_REQUEST_URL));
 
     when(mockSynapseVersionInfo.getVersion()).thenReturn(REPO_VERSION);
     when(mockSynapse.getVersionInfo()).thenReturn(mockSynapseVersionInfo);

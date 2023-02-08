@@ -1,10 +1,17 @@
-package org.sagebionetworks.web.client;
+package org.sagebionetworks.web.server;
 
-import java.io.IOException;
 import java.util.Properties;
+import java.util.logging.Logger;
 import org.sagebionetworks.SettingsLoader;
 
 public class StackEndpoints {
+
+  public static final String STAGING_SYNAPSE_ORG = "staging.synapse.org";
+  public static final String TST_SYNAPSE_ORG = "tst.synapse.org";
+  public static final String PORTAL_DEV_HOST = "portal-dev.dev.sagebase.org";
+  private static Logger logger = Logger.getLogger(
+    StackEndpoints.class.getName()
+  );
 
   public static final String REPO_ENDPOINT_KEY =
     "org.sagebionetworks.repositoryservice.endpoint";
@@ -27,29 +34,31 @@ public class StackEndpoints {
   public static final String FILE_SUFFIX = "/file/v1";
   public static final String AUTH_SUFFIX = "/auth/v1";
 
-  private static String endpointPrefix = null;
+  private static boolean hasLoadedConfiguration = false;
+  private static String endpointPrefixFromConfiguration = null;
   private static boolean loadSettingsFile = true;
 
-  public static String getRepositoryServiceEndpoint() {
-    return getEndpoint(REPO_ENDPOINT_KEY, REPO_SUFFIX);
+  public static String getRepositoryServiceEndpoint(String host) {
+    return getEndpoint(host, REPO_SUFFIX);
   }
 
-  public static String getFileServiceEndpoint() {
-    return getEndpoint(FILE_ENDPOINT_KEY, FILE_SUFFIX);
+  public static String getFileServiceEndpoint(String host) {
+    return getEndpoint(host, FILE_SUFFIX);
   }
 
-  public static String getAuthenticationServicePublicEndpoint() {
-    return getEndpoint(AUTH_ENDPOINT_KEY, AUTH_SUFFIX);
+  public static String getAuthenticationServicePublicEndpoint(String host) {
+    return getEndpoint(host, AUTH_SUFFIX);
   }
 
-  public static String getEndpoint(String propertyName, String suffix) {
-    return getEndpointPrefix() + suffix;
+  public static String getEndpoint(String host, String suffix) {
+    return getEndpointPrefix(host) + suffix;
   }
 
-  private static String getEndpointPrefix() {
-    if (endpointPrefix == null) {
-      // init endpoint prefix
+  private static String getEndpointPrefix(String host) {
+    if (!hasLoadedConfiguration) {
+      // init endpointPrefix
       if (loadSettingsFile) {
+        // fallback to loading from settings
         try {
           // override any properties with the m2 settings property values (if set)
           Properties props = SettingsLoader.loadSettingsFile();
@@ -61,8 +70,6 @@ public class StackEndpoints {
               }
             }
           }
-        } catch (IOException e) {
-          e.printStackTrace();
         } catch (Exception e) {
           e.printStackTrace();
         }
@@ -71,42 +78,28 @@ public class StackEndpoints {
       String repoEndpoint = System.getProperty(REPO_ENDPOINT_KEY);
       if (repoEndpoint != null) {
         // done, overwriting using old params
-        endpointPrefix =
+        endpointPrefixFromConfiguration =
           repoEndpoint.substring(0, repoEndpoint.indexOf("/repo/"));
-      } else {
-        // get stack name, like "prod" or "dev"
-        String stackName = System.getProperty(STACK_PROPERTY_NAME);
-        if (stackName == null) {
-          stackName = System.getProperty(PARAM3);
-        }
-        // get stack instance, like "222"
-        String stackInstance = System.getProperty(STACK_INSTANCE_PROPERTY_NAME);
-        if (stackInstance == null) {
-          stackInstance = System.getProperty(PARAM4);
-        }
+      }
+      hasLoadedConfiguration = true;
+    }
 
-        // get beanstalk number, like "0" or "1"
-        String stack = System.getProperty(STACK_BEANSTALK_NUMBER_PROPERTY_NAME);
-        if (stack == null) {
-          stack = System.getProperty(PARAM5);
-          if (stack == null) {
-            stack = "0";
-          }
-        }
+    String endpointPrefix = endpointPrefixFromConfiguration;
 
-        // put it all together. like https://repo-prod-222-0.prod.sagebase.org
-        endpointPrefix =
-          "https://repo-" +
-          stackName +
-          "-" +
-          stackInstance +
-          "-" +
-          stack +
-          "." +
-          stackName +
-          ".sagebase.org";
+    if (endpointPrefix == null) {
+      // No configuration was specified, so look at the hostname of the incoming request
+      if ( // Staging / tst
+        STAGING_SYNAPSE_ORG.equals(host) || TST_SYNAPSE_ORG.equals(host)
+      ) {
+        endpointPrefix = "https://repo-staging.prod.sagebase.org";
+      } else if (PORTAL_DEV_HOST.equals(host)) { // Dev instance
+        endpointPrefix = "https://repo-dev.dev.sagebase.org";
+      } else { // www.synapse.org, or some other host
+        // None of these hosts match and no configuration was loaded from settings, fall back to prod
+        endpointPrefix = "https://repo-prod.prod.sagebase.org";
       }
     }
+
     return endpointPrefix;
   }
 
@@ -114,7 +107,8 @@ public class StackEndpoints {
    * For testing only
    */
   public static void clear() {
-    endpointPrefix = null;
+    hasLoadedConfiguration = false;
+    endpointPrefixFromConfiguration = null;
   }
 
   public static void skipLoadingSettingsFile() {

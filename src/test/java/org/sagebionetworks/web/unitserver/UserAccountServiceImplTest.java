@@ -2,6 +2,7 @@ package org.sagebionetworks.web.unitserver;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -39,7 +40,8 @@ public class UserAccountServiceImplTest {
   public void before() throws SynapseException, JSONObjectAdapterException {
     mockSynapse = Mockito.mock(SynapseClient.class);
     mockSynapseProvider = Mockito.mock(SynapseProvider.class);
-    when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
+    when(mockSynapseProvider.createNewClient(anyString()))
+      .thenReturn(mockSynapse);
     mockTokenProvider = Mockito.mock(TokenProvider.class);
 
     testProfile = new UserProfile();

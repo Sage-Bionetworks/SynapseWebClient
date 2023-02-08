@@ -10,12 +10,12 @@ import java.util.Properties;
 import javax.servlet.http.HttpServletRequest;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
-import org.sagebionetworks.web.client.StackEndpoints;
+import org.sagebionetworks.web.server.StackEndpoints;
 
 @SuppressWarnings("serial")
 public class SynapseClientBase
   extends RemoteServiceServlet
-  implements TokenProvider {
+  implements TokenProvider, RequestHostProvider {
 
   // This will be appended to the User-Agent header.
   public static final String PORTAL_USER_AGENT =
@@ -45,6 +45,7 @@ public class SynapseClientBase
   }
 
   private TokenProvider tokenProvider = this;
+  private RequestHostProvider requestHostProvider = this;
   AdapterFactory adapterFactory = new AdapterFactoryImpl();
 
   /**
@@ -91,16 +92,22 @@ public class SynapseClientBase
     );
   }
 
-  public String getRepositoryServiceUrl() {
-    return StackEndpoints.getRepositoryServiceEndpoint();
+  @Override
+  public String getRequestHost() {
+    return UserDataProvider.getThreadLocalRequestHost(
+      this.getThreadLocalRequest()
+    );
   }
 
   protected org.sagebionetworks.client.SynapseClient createSynapseClient() {
-    return createSynapseClient(tokenProvider.getToken());
+    return createSynapseClient(
+      requestHostProvider.getRequestHost(),
+      tokenProvider.getToken()
+    );
   }
 
   public org.sagebionetworks.client.SynapseClient createAnonymousSynapseClient() {
-    return createSynapseClient(null);
+    return createSynapseClient(requestHostProvider.getRequestHost(), null);
   }
 
   /**
@@ -108,20 +115,16 @@ public class SynapseClientBase
    * each request
    */
   public org.sagebionetworks.client.SynapseClient createSynapseClient(
+    String requestHost,
     String accessToken
   ) {
-    // Create a new syanpse
-    org.sagebionetworks.client.SynapseClient synapseClient = synapseProvider.createNewClient();
+    // SynapseClient is stateful, so always create a new one
+    org.sagebionetworks.client.SynapseClient synapseClient = synapseProvider.createNewClient(
+      requestHost
+    );
     if (accessToken != null) {
       synapseClient.setBearerAuthorizationToken(accessToken);
     }
-    synapseClient.setRepositoryEndpoint(
-      StackEndpoints.getRepositoryServiceEndpoint()
-    );
-    synapseClient.setAuthEndpoint(
-      StackEndpoints.getAuthenticationServicePublicEndpoint()
-    );
-    synapseClient.setFileEndpoint(StackEndpoints.getFileServiceEndpoint());
     // Append the portal's version information to the user agent.
     synapseClient.appendUserAgent(PORTAL_USER_AGENT);
     if (this.getThreadLocalRequest() != null) {

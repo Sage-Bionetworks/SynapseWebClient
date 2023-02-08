@@ -9,8 +9,8 @@ import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.repo.model.auth.NewUser;
 import org.sagebionetworks.repo.model.principal.AccountSetupInfo;
 import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
-import org.sagebionetworks.web.client.StackEndpoints;
 import org.sagebionetworks.web.client.UserAccountService;
+import org.sagebionetworks.web.server.StackEndpoints;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
@@ -18,7 +18,7 @@ import org.springframework.web.client.RestClientException;
 
 public class UserAccountServiceImpl
   extends RemoteServiceServlet
-  implements UserAccountService, TokenProvider {
+  implements UserAccountService, TokenProvider, RequestHostProvider {
 
   public static final long serialVersionUID = 498269726L;
 
@@ -113,6 +113,13 @@ public class UserAccountServiceImpl
   }
 
   @Override
+  public String getRequestHost() {
+    return UserDataProvider.getThreadLocalRequestHost(
+      this.getThreadLocalRequest()
+    );
+  }
+
+  @Override
   public PublicPrincipalIds getPublicAndAuthenticatedGroupPrincipalIds() {
     if (publicPrincipalIds == null) {
       try {
@@ -164,29 +171,21 @@ public class UserAccountServiceImpl
   }
 
   private SynapseClient createSynapseClient(String accessToken) {
-    SynapseClient synapseClient = synapseProvider.createNewClient();
+    SynapseClient synapseClient = synapseProvider.createNewClient(
+      this.getRequestHost()
+    );
     if (accessToken == null) {
       accessToken = tokenProvider.getToken();
     }
     if (accessToken != null) {
       synapseClient.setBearerAuthorizationToken(accessToken);
     }
-    synapseClient.setRepositoryEndpoint(
-      StackEndpoints.getRepositoryServiceEndpoint()
-    );
-    synapseClient.setAuthEndpoint(
-      StackEndpoints.getAuthenticationServicePublicEndpoint()
-    );
     return synapseClient;
   }
 
   private SynapseClient createAnonymousSynapseClient() {
-    SynapseClient synapseClient = synapseProvider.createNewClient();
-    synapseClient.setRepositoryEndpoint(
-      StackEndpoints.getRepositoryServiceEndpoint()
-    );
-    synapseClient.setAuthEndpoint(
-      StackEndpoints.getAuthenticationServicePublicEndpoint()
+    SynapseClient synapseClient = synapseProvider.createNewClient(
+      this.getRequestHost()
     );
     return synapseClient;
   }

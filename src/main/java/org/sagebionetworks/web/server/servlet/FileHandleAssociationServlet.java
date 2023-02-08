@@ -16,7 +16,7 @@ import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
-import org.sagebionetworks.web.client.StackEndpoints;
+import org.sagebionetworks.web.server.StackEndpoints;
 import org.sagebionetworks.web.server.servlet.filter.GWTAllCacheFilter;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -33,19 +33,17 @@ public class FileHandleAssociationServlet extends HttpServlet {
   protected static final ThreadLocal<HttpServletRequest> perThreadRequest = new ThreadLocal<HttpServletRequest>();
   private SynapseProvider synapseProvider = new SynapseProviderImpl();
   public static final long CACHE_TIME_SECONDS = 30; // 30 seconds
-  private TokenProvider tokenProvider = new TokenProvider() {
-    @Override
-    public String getToken() {
-      return UserDataProvider.getThreadLocalUserToken(
-        FileHandleAssociationServlet.perThreadRequest.get()
-      );
-    }
-  };
+  private TokenProvider tokenProvider = () ->
+    UserDataProvider.getThreadLocalUserToken(
+      FileHandleAssociationServlet.perThreadRequest.get()
+    );
+  private RequestHostProvider requestHostProvider = () ->
+    UserDataProvider.getThreadLocalRequestHost(
+      FileHandleAssociationServlet.perThreadRequest.get()
+    );
 
   /**
    * Unit test can override this.
-   *
-   * @param fileHandleProvider
    */
   public void setSynapseProvider(SynapseProvider synapseProvider) {
     this.synapseProvider = synapseProvider;
@@ -157,12 +155,9 @@ public class FileHandleAssociationServlet extends HttpServlet {
    * @return
    */
   private SynapseClient createNewClient(String accessToken) {
-    SynapseClient client = synapseProvider.createNewClient();
-    client.setAuthEndpoint(
-      StackEndpoints.getAuthenticationServicePublicEndpoint()
+    SynapseClient client = synapseProvider.createNewClient(
+      requestHostProvider.getRequestHost()
     );
-    client.setRepositoryEndpoint(StackEndpoints.getRepositoryServiceEndpoint());
-    client.setFileEndpoint(StackEndpoints.getFileServiceEndpoint());
     if (accessToken != null) client.setBearerAuthorizationToken(accessToken);
     return client;
   }

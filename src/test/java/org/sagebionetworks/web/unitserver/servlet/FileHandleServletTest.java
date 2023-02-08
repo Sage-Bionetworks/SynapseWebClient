@@ -63,7 +63,8 @@ public class FileHandleServletTest {
   public void setup() throws IOException, SynapseException {
     MockitoAnnotations.initMocks(this);
     servlet = new FileHandleServlet();
-    when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
+    when(mockSynapseProvider.createNewClient(anyString()))
+      .thenReturn(mockSynapse);
 
     WikiPage testPage = new WikiPage();
     testPage.setAttachmentFileHandleIds(new ArrayList<String>());
@@ -233,9 +234,6 @@ public class FileHandleServletTest {
     verify(mockResponse).sendRedirect(anyString());
 
     // as an additional test, verify that synapse client is set up
-    verify(mockSynapse).setAuthEndpoint(SynapseClientBaseTest.AUTH_BASE);
-    verify(mockSynapse).setRepositoryEndpoint(SynapseClientBaseTest.REPO_BASE);
-    verify(mockSynapse).setFileEndpoint(anyString());
     verify(mockSynapse).setBearerAuthorizationToken(sessionToken);
   }
 

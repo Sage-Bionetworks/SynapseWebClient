@@ -53,7 +53,8 @@ public class DataAccessClientImplTest {
     dataAccessClient = new DataAccessClientImpl();
     dataAccessClient.setSynapseProvider(mockSynapseProvider);
     dataAccessClient.setTokenProvider(mockTokenProvider);
-    when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
+    when(mockSynapseProvider.createNewClient(anyString()))
+      .thenReturn(mockSynapse);
     when(mockSubject.getId()).thenReturn(TARGET_SUBJECT_ID);
     when(mockSubject.getType()).thenReturn(TARGET_SUBJECT_TYPE);
     when(mockRestrictableObjectDescriptorResponse.getSubjects())
