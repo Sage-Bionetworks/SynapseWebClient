@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.server.servlet;
 
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLDecoder;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -44,6 +46,18 @@ public class UserDataProvider {
       }
     }
     // Cannot find user login data in the cookies. Treating as anonymous.;
+    return null;
+  }
+
+  public static String getThreadLocalRequestHost(
+    HttpServletRequest threadLocalRequest
+  ) {
+    if (threadLocalRequest == null) return null;
+    try {
+      return new URL(threadLocalRequest.getRequestURL().toString()).getHost();
+    } catch (MalformedURLException e) {
+      logger.error(e);
+    }
     return null;
   }
 }

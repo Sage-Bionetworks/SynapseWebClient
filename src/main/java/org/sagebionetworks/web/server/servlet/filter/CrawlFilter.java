@@ -147,13 +147,12 @@ public class CrawlFilter extends OncePerRequestFilter {
     if (synapseClient == null) {
       init(new SynapseClientImpl(), new DiscussionForumClientImpl());
     }
-    HttpServletRequest httpRqst = (HttpServletRequest) request;
     // Is this an ugly url that we need to convert/handle?
-    String queryString = httpRqst.getQueryString();
+    String queryString = request.getQueryString();
     if (queryString != null && queryString.contains(ESCAPED_FRAGMENT)) {
       try {
         this.jsonObjectAdapter = new JSONObjectAdapterImpl();
-        String uri = httpRqst.getRequestURI();
+        String uri = request.getRequestURI();
         int port = request.getServerPort();
         String domain = request.getServerName();
         String lowerCaseDomain = domain.toLowerCase();
@@ -164,9 +163,8 @@ public class CrawlFilter extends OncePerRequestFilter {
           )
         ) {
           response.setContentType("text/html");
-          HttpServletResponse httpResponse = (HttpServletResponse) response;
-          httpResponse.setStatus(HttpServletResponse.SC_OK);
-          PrintWriter out = httpResponse.getWriter();
+          response.setStatus(HttpServletResponse.SC_OK);
+          PrintWriter out = response.getWriter();
           out.println("Synapse test site  - " + domain);
           return;
         }

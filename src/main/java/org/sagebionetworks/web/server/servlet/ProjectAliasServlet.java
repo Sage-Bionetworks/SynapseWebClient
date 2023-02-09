@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.EntityId;
-import org.sagebionetworks.web.client.StackEndpoints;
+import org.sagebionetworks.web.server.StackEndpoints;
 import org.sagebionetworks.web.shared.WebConstants;
 
 /**
@@ -28,19 +28,17 @@ public class ProjectAliasServlet extends HttpServlet {
   protected static final ThreadLocal<HttpServletRequest> perThreadRequest = new ThreadLocal<HttpServletRequest>();
 
   private SynapseProvider synapseProvider = new SynapseProviderImpl();
-  private TokenProvider tokenProvider = new TokenProvider() {
-    @Override
-    public String getToken() {
-      return UserDataProvider.getThreadLocalUserToken(
-        ProjectAliasServlet.perThreadRequest.get()
-      );
-    }
-  };
+  private TokenProvider tokenProvider = () ->
+    UserDataProvider.getThreadLocalUserToken(
+      ProjectAliasServlet.perThreadRequest.get()
+    );
+  private RequestHostProvider requestHostProvider = () ->
+    UserDataProvider.getThreadLocalRequestHost(
+      ProjectAliasServlet.perThreadRequest.get()
+    );
 
   /**
    * Unit test can override this.
-   *
-   * @param fileHandleProvider
    */
   public void setSynapseProvider(SynapseProvider synapseProvider) {
     this.synapseProvider = synapseProvider;
@@ -80,7 +78,7 @@ public class ProjectAliasServlet extends HttpServlet {
     response.setDateHeader(WebConstants.EXPIRES_KEY, 0L); // Proxy
     String token = null;
     try {
-      token = getToken(request);
+      token = getToken();
     } catch (Throwable e) {
       // unable to get session token, so it's an anonymous request
     }
@@ -119,11 +117,8 @@ public class ProjectAliasServlet extends HttpServlet {
 
   /**
    * Get the session token
-   *
-   * @param request
-   * @return
    */
-  public String getToken(final HttpServletRequest request) {
+  public String getToken() {
     return tokenProvider.getToken();
   }
 
@@ -133,12 +128,9 @@ public class ProjectAliasServlet extends HttpServlet {
    * @return
    */
   private SynapseClient createNewClient(String accessToken) {
-    SynapseClient client = synapseProvider.createNewClient();
-    client.setAuthEndpoint(
-      StackEndpoints.getAuthenticationServicePublicEndpoint()
+    SynapseClient client = synapseProvider.createNewClient(
+      requestHostProvider.getRequestHost()
     );
-    client.setRepositoryEndpoint(StackEndpoints.getRepositoryServiceEndpoint());
-    client.setFileEndpoint(StackEndpoints.getFileServiceEndpoint());
     if (accessToken != null) client.setBearerAuthorizationToken(accessToken);
     return client;
   }

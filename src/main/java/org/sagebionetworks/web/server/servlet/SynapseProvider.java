@@ -15,4 +15,6 @@ public interface SynapseProvider {
    * @return
    */
   public SynapseClient createNewClient();
+
+  public SynapseClient createNewClient(String portalRequestHost);
 }

@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.repo.model.UserGroupHeader;
-import org.sagebionetworks.web.client.StackEndpoints;
+import org.sagebionetworks.web.server.StackEndpoints;
 import org.sagebionetworks.web.shared.WebConstants;
 
 /**
@@ -32,6 +32,11 @@ public class AliasRedirectorServlet extends HttpServlet {
 
   protected static final ThreadLocal<HttpServletRequest> perThreadRequest = new ThreadLocal<HttpServletRequest>();
 
+  private final RequestHostProvider requestHostProvider = () ->
+    UserDataProvider.getThreadLocalRequestHost(
+      AliasRedirectorServlet.perThreadRequest.get()
+    );
+
   /**
    * Injected with Gin
    */
@@ -39,8 +44,6 @@ public class AliasRedirectorServlet extends HttpServlet {
 
   /**
    * Unit test can override this.
-   *
-   * @param fileHandleProvider
    */
   public void setSynapseProvider(SynapseProvider synapseProvider) {
     this.synapseProvider = synapseProvider;
@@ -109,12 +112,8 @@ public class AliasRedirectorServlet extends HttpServlet {
   }
 
   private SynapseClient createNewClient() {
-    SynapseClient client = synapseProvider.createNewClient();
-    client.setAuthEndpoint(
-      StackEndpoints.getAuthenticationServicePublicEndpoint()
+    return synapseProvider.createNewClient(
+      requestHostProvider.getRequestHost()
     );
-    client.setRepositoryEndpoint(StackEndpoints.getRepositoryServiceEndpoint());
-    client.setFileEndpoint(StackEndpoints.getFileServiceEndpoint());
-    return client;
   }
 }

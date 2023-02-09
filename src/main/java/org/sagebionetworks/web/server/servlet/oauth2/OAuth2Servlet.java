@@ -16,15 +16,23 @@ import org.sagebionetworks.client.exceptions.SynapseServiceUnavailable;
 import org.sagebionetworks.repo.model.oauth.OAuthProvider;
 import org.sagebionetworks.repo.model.oauth.OAuthUrlRequest;
 import org.sagebionetworks.repo.model.oauth.OAuthUrlResponse;
-import org.sagebionetworks.web.client.StackEndpoints;
+import org.sagebionetworks.web.server.StackEndpoints;
 import org.sagebionetworks.web.server.servlet.FileHandleAssociationServlet;
+import org.sagebionetworks.web.server.servlet.RequestHostProvider;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.SynapseProviderImpl;
+import org.sagebionetworks.web.server.servlet.UserDataProvider;
 import org.sagebionetworks.web.shared.WebConstants;
 
 public abstract class OAuth2Servlet extends HttpServlet {
 
   private SynapseProvider synapseProvider = new SynapseProviderImpl();
+  protected static final ThreadLocal<HttpServletRequest> perThreadRequest = new ThreadLocal<>();
+
+  private final RequestHostProvider requestHostProvider = () ->
+    UserDataProvider.getThreadLocalRequestHost(
+      OAuth2Servlet.perThreadRequest.get()
+    );
 
   /**
    * Injected
@@ -141,7 +149,9 @@ public abstract class OAuth2Servlet extends HttpServlet {
       synapseClient.setBearerAuthorizationToken(accessToken);
     }
     synapseClient.setAuthEndpoint(
-      StackEndpoints.getAuthenticationServicePublicEndpoint()
+      StackEndpoints.getAuthenticationServicePublicEndpoint(
+        requestHostProvider.getRequestHost()
+      )
     );
     return synapseClient;
   }
