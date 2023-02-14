@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
+import org.sagebionetworks.client.exceptions.SynapseTwoFactorAuthRequiredException;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.repo.model.oauth.OAuthAccountCreationRequest;
 import org.sagebionetworks.repo.model.oauth.OAuthProvider;
@@ -34,13 +35,13 @@ public class OAuth2SessionServlet extends OAuth2Servlet {
     String provideString = req.getParameter(WebConstants.OAUTH2_PROVIDER);
     OAuthProvider provider = OAuthProvider.valueOf(provideString);
     // This code will be provided after the user authenticates with a provider.
-    String athenticationCode = req.getParameter(WebConstants.OAUTH2_CODE);
+    String authenticationCode = req.getParameter(WebConstants.OAUTH2_CODE);
     // we're using the OAuth2 state parameter to send the username through the OAuth round-trip
     // (creating a new account).
     String state = req.getParameter(WebConstants.OAUTH2_STATE);
     String redirectUrl = createRedirectUrl(req, provider);
     // If we do not have a code
-    if (athenticationCode == null) {
+    if (authenticationCode == null) {
       redirectToProvider(req, resp, provider, redirectUrl, state);
     } else if (state != null && !state.isEmpty()) {
       // create the new account
@@ -49,11 +50,11 @@ public class OAuth2SessionServlet extends OAuth2Servlet {
         resp,
         URLDecoder.decode(state),
         provider,
-        athenticationCode,
+        authenticationCode,
         redirectUrl
       );
     } else {
-      validateUser(req, resp, provider, athenticationCode, redirectUrl);
+      validateUser(req, resp, provider, authenticationCode, redirectUrl);
     }
   }
 
@@ -62,20 +63,20 @@ public class OAuth2SessionServlet extends OAuth2Servlet {
    *
    * @param resp
    * @param provider
-   * @param athenticationCode
+   * @param authenticationCode
    * @throws IOException
    */
   public void validateUser(
     HttpServletRequest req,
     HttpServletResponse resp,
     OAuthProvider provider,
-    String athenticationCode,
+    String authenticationCode,
     String redirectUrl
   ) throws IOException {
     try {
       SynapseClient client = createSynapseClient();
       OAuthValidationRequest request = new OAuthValidationRequest();
-      request.setAuthenticationCode(athenticationCode);
+      request.setAuthenticationCode(authenticationCode);
       request.setProvider(provider);
       request.setRedirectUrl(redirectUrl);
       LoginResponse token = client.validateOAuthAuthenticationCodeForAccessToken(
@@ -91,6 +92,16 @@ public class OAuth2SessionServlet extends OAuth2Servlet {
     } catch (SynapseNotFoundException e) {
       // used to send the user to register
       resp.sendRedirect(REGISTER_ACCOUNT);
+    } catch (SynapseTwoFactorAuthRequiredException e) {
+      // Go back to the login page to attempt the 2fa challenge.
+      resp.sendRedirect(
+        LOGIN_PLACE +
+        "0" +
+        "?userId=" +
+        e.getUserId().toString() +
+        "&twoFaToken=" +
+        e.getTwoFaToken()
+      );
     } catch (SynapseException e) {
       resp.sendRedirect(
         FileHandleAssociationServlet.getBaseUrl(req) +
