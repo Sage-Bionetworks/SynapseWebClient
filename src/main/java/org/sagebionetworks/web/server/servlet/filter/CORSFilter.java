@@ -30,6 +30,7 @@ public class CORSFilter extends OncePerRequestFilter {
     "staging",
     "tst",
     "signin",
+    "accounts.sagebionetworks",
     // Data portals
     "adknowledgeportal",
     "alzdrugtool",
@@ -48,6 +49,7 @@ public class CORSFilter extends OncePerRequestFilter {
     "stopadportal"
   );
   public static final String SYNAPSE_ORG_SUFFIX = ".synapse.org";
+  public static final String STAGING_PREFIX = "staging.";
 
   @Override
   protected void doFilterInternal(
@@ -62,6 +64,10 @@ public class CORSFilter extends OncePerRequestFilter {
       String subdomain = url
         .getHost()
         .substring(0, url.getHost().length() - SYNAPSE_ORG_SUFFIX.length());
+      if (subdomain.startsWith(STAGING_PREFIX)) {
+        subdomain =
+          subdomain.substring(STAGING_PREFIX.length(), subdomain.length());
+      }
       if (ALLOWED_SYNAPSE_SUBDOMAINS.contains(subdomain)) {
         allowOrigin = origin;
         response.addHeader(ACCESS_CONTROL_ALLOW_CREDENTIALS_HEADER, "true");
