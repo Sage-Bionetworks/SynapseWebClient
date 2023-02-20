@@ -9,6 +9,11 @@ public class QueryClient {
   public QueryClient(QueryClientOptions config) {}
 
   /**
+   * Removes all cached query data and triggers a refetch.
+   */
+  public native void resetQueries();
+
+  /**
    * Removes the cached query data and triggers a refetch.
    * @param queryKey
    */
@@ -19,6 +24,4 @@ public class QueryClient {
    * @param queryKey
    */
   public native void invalidateQueries(List<?> queryKey);
-
-  public native void clear();
 }
