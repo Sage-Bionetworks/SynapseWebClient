@@ -9,6 +9,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.security.AuthenticationControllerImpl.USER_AUTHENTICATION_RECEIPT;
@@ -20,10 +21,12 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.StatusCodeException;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.auth.LoginRequest;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
@@ -52,6 +55,7 @@ import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+@RunWith(MockitoJUnitRunner.class)
 public class AuthenticationControllerImplTest {
 
   public static final String ACCESS_TOKEN = "1111";
@@ -126,7 +130,6 @@ public class AuthenticationControllerImplTest {
 
   @Before
   public void before() throws JSONObjectAdapterException {
-    MockitoAnnotations.initMocks(this);
     // by default, return a valid user session data if asked
     AsyncMockStubber
       .callSuccessWith(null)
@@ -197,7 +200,7 @@ public class AuthenticationControllerImplTest {
     verify(mockSessionDetector).initializeAccessTokenState();
     verify(mockGlobalApplicationState).refreshPage();
     verify(mockSynapseJSNIUtils).setAnalyticsUserId("");
-    verify(mockQueryClient).clear();
+    verify(mockQueryClient).resetQueries();
   }
 
   @Test
@@ -266,7 +269,7 @@ public class AuthenticationControllerImplTest {
     verify(loginCallback).onSuccess(any(UserProfile.class));
     verify(mockSessionDetector).initializeAccessTokenState();
     verify(mockSynapseJSNIUtils).setAnalyticsUserId(USER_ID);
-    verify(mockQueryClient).clear();
+    verify(mockQueryClient).resetQueries();
   }
 
   @Test
@@ -285,7 +288,7 @@ public class AuthenticationControllerImplTest {
 
     assertNull(authenticationController.getCurrentUserProfile());
     verify(mockSessionDetector).initializeAccessTokenState();
-    verify(mockQueryClient).clear();
+    verify(mockQueryClient).resetQueries();
     verify(mockPlaceChanger).goTo(placeCaptor.capture());
     Place place = placeCaptor.getValue();
     assertTrue(place instanceof LoginPlace);
@@ -319,7 +322,7 @@ public class AuthenticationControllerImplTest {
     );
     verify(mockJsClient, never())
       .initSession(anyString(), any(AsyncCallback.class));
-    verify(mockQueryClient).clear();
+    verify(mockQueryClient).resetQueries();
     Exception scEx = new StatusCodeException(0, "0 ");
     when(mockJsClient.getAccessToken()).thenReturn(getFailedFuture(scEx));
 
@@ -338,6 +341,24 @@ public class AuthenticationControllerImplTest {
 
   // Note. If login when the stack is in READ_ONLY mode, then the widgets SynapseAlert should send
   // user to the Down page.
+
+  @Test
+  public void testInitializeFromExistingAccessTokenCookieSameToken() {
+    verify(mockQueryClient, never()).resetQueries();
+
+    // invoke the method twice, verify that we don't blow away the cache the second time
+    authenticationController.initializeFromExistingAccessTokenCookie(
+      mockUserProfileCallback
+    );
+
+    verify(mockQueryClient, times(1)).resetQueries();
+
+    authenticationController.initializeFromExistingAccessTokenCookie(
+      mockUserProfileCallback
+    );
+
+    verify(mockQueryClient, times(1)).resetQueries();
+  }
 
   @Test
   public void testCheckForQuarantinedEmailNullStatus() {
