@@ -71,12 +71,8 @@ public class CORSFilterTest {
   public void testStagingSynapseOrg() throws ServletException, IOException {
     when(mockRequest.getHeader(ORIGIN_HEADER))
       .thenReturn(
-        "https://" +
-        STAGING_PREFIX +
-        "accounts.sagebionetworks" +
-        SYNAPSE_ORG_SUFFIX
-      ); // https://staging.accounts.sagebionetworks.synapse.org
-    // we are in a staging.*.synapse.org subdomain
+        "https://staging.accounts.sagebionetworks" + SYNAPSE_ORG_SUFFIX
+      ); // SWC-6399: explicitly test https://staging.accounts.sagebionetworks.synapse.org
     filter.testFilter(mockRequest, mockResponse, mockFilterChain);
 
     // verify allow origin header set to the specific origin

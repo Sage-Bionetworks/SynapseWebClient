@@ -63,7 +63,6 @@ public class CORSFilter extends OncePerRequestFilter {
   );
 
   public static final String SYNAPSE_ORG_SUFFIX = ".synapse.org";
-  public static final String STAGING_PREFIX = "staging.";
 
   @Override
   protected void doFilterInternal(
