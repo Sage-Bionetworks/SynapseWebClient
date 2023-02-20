@@ -50,6 +50,8 @@ public class CORSFilter extends OncePerRequestFilter {
     "csbc-pson",
     "dhealth",
     "staging.dhealth",
+    "eliteportal",
+    "staging.eliteportal",
     "htan",
     "staging.htan",
     "nf",
