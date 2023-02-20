@@ -5,11 +5,11 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.*;
 import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.ACCESS_CONTROL_ALLOW_CREDENTIALS_HEADER;
 import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.ACCESS_CONTROL_ALLOW_ORIGIN_HEADER;
 import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.DEFAULT_ALLOW_ORIGIN;
 import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.ORIGIN_HEADER;
-import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.SYNAPSE_ORG_SUFFIX;
 
 import java.io.IOException;
 import javax.servlet.FilterChain;
@@ -62,6 +62,30 @@ public class CORSFilterTest {
       );
     String allowOriginHeaderValue = stringCaptor.getValue();
     assertEquals("https://tst.synapse.org", allowOriginHeaderValue);
+    // and Access-Control-Allow-Credentials is set to true
+    verify(mockResponse)
+      .addHeader(ACCESS_CONTROL_ALLOW_CREDENTIALS_HEADER, "true");
+  }
+
+  @Test
+  public void testStagingSynapseOrg() throws ServletException, IOException {
+    when(mockRequest.getHeader(ORIGIN_HEADER))
+      .thenReturn(
+        "https://staging.accounts.sagebionetworks" + SYNAPSE_ORG_SUFFIX
+      ); // SWC-6399: explicitly test https://staging.accounts.sagebionetworks.synapse.org
+    filter.testFilter(mockRequest, mockResponse, mockFilterChain);
+
+    // verify allow origin header set to the specific origin
+    verify(mockResponse)
+      .addHeader(
+        eq(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER),
+        stringCaptor.capture()
+      );
+    String allowOriginHeaderValue = stringCaptor.getValue();
+    assertEquals(
+      "https://staging.accounts.sagebionetworks.synapse.org",
+      allowOriginHeaderValue
+    );
     // and Access-Control-Allow-Credentials is set to true
     verify(mockResponse)
       .addHeader(ACCESS_CONTROL_ALLOW_CREDENTIALS_HEADER, "true");

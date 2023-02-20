@@ -30,23 +30,38 @@ public class CORSFilter extends OncePerRequestFilter {
     "staging",
     "tst",
     "signin",
+    "staging-signin",
+    "accounts.sagebionetworks",
+    "staging.accounts.sagebionetworks",
     // Data portals
     "adknowledgeportal",
+    "staging.adknowledgeportal",
     "alzdrugtool",
+    "staging.alzdrugtool",
     "arkportal",
+    "staging.arkportal",
     "bsmn",
+    "staging.bsmn",
     "cancercomplexity",
+    "staging.cancercomplexity",
     "www.cancercomplexity",
     "covidrecoverycorpsresearcher",
+    "staging.covidrecoverycorpsresearcher",
     "csbc-pson",
     "dhealth",
+    "staging.dhealth",
     "htan",
+    "staging.htan",
     "nf",
+    "staging.nf",
     "psychencode",
+    "staging.psychencode",
     "shiny",
     "shinypro",
-    "stopadportal"
+    "stopadportal",
+    "staging.stopadportal"
   );
+
   public static final String SYNAPSE_ORG_SUFFIX = ".synapse.org";
 
   @Override

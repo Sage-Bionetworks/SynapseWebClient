@@ -61,8 +61,8 @@ public class AuthenticationControllerImpl implements AuthenticationController {
     NIH_NOTIFICATION_DISMISSED,
     COOKIES_ACCEPTED,
   };
-  private static String currentUserAccessToken;
-  private static UserProfile currentUserProfile;
+  private String currentUserAccessToken;
+  private UserProfile currentUserProfile;
   private UserAccountServiceAsync userAccountService;
   private ClientCache localStorage;
   private SessionStorage sessionStorage;
@@ -91,8 +91,8 @@ public class AuthenticationControllerImpl implements AuthenticationController {
     this.queryClient = queryClientProvider.getQueryClient();
   }
 
-  public void clearQueryClientCache() {
-    queryClient.clear();
+  public void resetQueryClientCache() {
+    queryClient.resetQueries();
   }
 
   @Override
@@ -202,8 +202,10 @@ public class AuthenticationControllerImpl implements AuthenticationController {
       new FutureCallback<String>() {
         @Override
         public void onSuccess(String accessToken) {
-          currentUserAccessToken = accessToken;
-          clearQueryClientCache();
+          if (!Objects.equals(currentUserAccessToken, accessToken)) {
+            resetQueryClientCache();
+            currentUserAccessToken = accessToken;
+          }
           userAccountService.getMyProfile(
             new AsyncCallback<UserProfile>() {
               @Override
@@ -242,7 +244,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
         public void onFailure(Throwable t) {
           currentUserAccessToken = null;
           currentUserProfile = null;
-          clearQueryClientCache();
+          resetQueryClientCache();
           ginInjector.getSessionDetector().initializeAccessTokenState();
           callback.onFailure(t);
         }
@@ -327,7 +329,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
           }
 
           private void afterCall() {
-            clearQueryClientCache();
+            resetQueryClientCache();
             ginInjector.getGlobalApplicationState().refreshPage();
           }
         }
