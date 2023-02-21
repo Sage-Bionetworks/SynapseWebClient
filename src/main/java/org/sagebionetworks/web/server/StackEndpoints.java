@@ -91,7 +91,7 @@ public class StackEndpoints {
       if (STAGING_SYNAPSE_ORG.equals(host)) { // Staging
         endpointPrefix = "https://repo-staging.prod.sagebase.org";
       } else if (TST_SYNAPSE_ORG.equals(host)) { // tst
-        endpointPrefix = "https://repo-tst.sagebase.org";
+        endpointPrefix = "https://repo-tst.prod.sagebase.org";
       } else if (PORTAL_DEV_HOST.equals(host)) { // Dev instance
         endpointPrefix = "https://repo-dev.dev.sagebase.org";
       } else { // www.synapse.org, or some other host
