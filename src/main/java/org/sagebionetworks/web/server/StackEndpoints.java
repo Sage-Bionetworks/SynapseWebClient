@@ -88,10 +88,10 @@ public class StackEndpoints {
 
     if (endpointPrefix == null) {
       // No configuration was specified, so look at the hostname of the incoming request
-      if ( // Staging / tst
-        STAGING_SYNAPSE_ORG.equals(host) || TST_SYNAPSE_ORG.equals(host)
-      ) {
+      if (STAGING_SYNAPSE_ORG.equals(host)) { // Staging
         endpointPrefix = "https://repo-staging.prod.sagebase.org";
+      } else if (TST_SYNAPSE_ORG.equals(host)) { // tst
+        endpointPrefix = "https://repo-tst.prod.sagebase.org";
       } else if (PORTAL_DEV_HOST.equals(host)) { // Dev instance
         endpointPrefix = "https://repo-dev.dev.sagebase.org";
       } else { // www.synapse.org, or some other host
