@@ -107,7 +107,7 @@ public class StackEndpointsTest {
   @Test
   public void testEndpointConstructionTst() {
     String requestHostName = "tst.synapse.org";
-    String expected = "https://repo-staging.prod.sagebase.org";
+    String expected = "https://repo-tst.prod.sagebase.org";
 
     assertEquals(
       expected + FILE_SUFFIX,
