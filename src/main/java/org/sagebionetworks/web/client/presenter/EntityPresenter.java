@@ -8,6 +8,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.binder.EventHandler;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.sagebionetworks.repo.model.Entity;
@@ -335,7 +336,8 @@ public class EntityPresenter
   public void onDownloadListUpdatedUpdatedEvent(
     DownloadListUpdatedEvent _event
   ) {
-    List<String> queryKey = Collections.singletonList(
+    List<String> queryKey = Arrays.asList(
+      authenticationController.getCurrentUserAccessToken(),
       QueryKeyConstants.DOWNLOAD_LIST
     );
     queryClient.invalidateQueries(queryKey);
