@@ -106,6 +106,7 @@ public class EntityPresenterTest {
   Entity EntityModel1;
   EntityBundle eb;
   String entityId = "syn43344";
+  String accessToken = "1234";
   Synapse.EntityArea area = Synapse.EntityArea.FILES;
   String areaToken = null;
   long id;
@@ -150,6 +151,8 @@ public class EntityPresenterTest {
     when(mockGlobalApplicationState.getPlaceChanger())
       .thenReturn(mockPlaceChanger);
     when(mockQueryClientProvider.getQueryClient()).thenReturn(mockQueryClient);
+    when(mockAuthenticationController.getCurrentUserAccessToken())
+      .thenReturn(accessToken);
     entityPresenter =
       new EntityPresenter(
         mockView,
@@ -373,8 +376,9 @@ public class EntityPresenterTest {
 
     List<String> passedQueryKey = stringListCaptor.getValue();
     assertNotNull(passedQueryKey);
-    assertEquals(passedQueryKey.size(), 1);
-    assertEquals(passedQueryKey.get(0), "downloadList");
+    assertEquals(passedQueryKey.size(), 2);
+    assertEquals(passedQueryKey.get(0), accessToken);
+    assertEquals(passedQueryKey.get(1), "downloadList");
   }
 
   @Test
