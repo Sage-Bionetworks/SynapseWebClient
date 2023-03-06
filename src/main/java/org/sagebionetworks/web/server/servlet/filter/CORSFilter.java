@@ -36,6 +36,7 @@ public class CORSFilter extends OncePerRequestFilter {
     // Data portals
     "adknowledgeportal",
     "staging.adknowledgeportal",
+    "prod.adknowledgeportal",
     "alzdrugtool",
     "staging.alzdrugtool",
     "arkportal",
