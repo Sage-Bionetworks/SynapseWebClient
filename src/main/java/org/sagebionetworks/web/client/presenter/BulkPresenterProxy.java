@@ -55,6 +55,7 @@ import org.sagebionetworks.web.client.place.SynapseForumPlace;
 import org.sagebionetworks.web.client.place.Team;
 import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.place.Trash;
+import org.sagebionetworks.web.client.place.TwoFactorAuthPlace;
 import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.place.WikiDiff;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
@@ -803,6 +804,22 @@ public class BulkPresenterProxy extends AbstractActivity {
           public void onSuccess() {
             OAuthClientEditorPresenter presenter = ginjector.getOAuthClientEditorPresenter();
             presenter.setPlace((OAuthClientEditorPlace) place);
+            presenter.start(panel, eventBus);
+          }
+
+          @Override
+          public void onFailure(Throwable caught) {
+            loadError(caught);
+          }
+        }
+      );
+    } else if (place instanceof TwoFactorAuthPlace) {
+      GWT.runAsync(
+        new RunAsyncCallback() {
+          @Override
+          public void onSuccess() {
+            TwoFactorAuthPresenter presenter = ginjector.getTwoFactorAuthPresenter();
+            presenter.setPlace((TwoFactorAuthPlace) place);
             presenter.start(panel, eventBus);
           }
 

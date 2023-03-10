@@ -55,6 +55,9 @@ public class SRC {
     public static ReactComponentType<EntityActionMenuPropsJsInterop> EntityActionMenu;
     public static ReactComponentType<HtmlPreviewProps> HtmlPreview;
     public static ReactComponentType<CreatedByModifiedByProps> CreatedByModifiedBy;
+    public static ReactComponentType<TwoFactorAuthSettingsPanelProps> TwoFactorAuthSettingsPanel;
+    public static ReactComponentType<TwoFactorBackupCodesProps> TwoFactorBackupCodes;
+    public static ReactComponentType<TwoFactorEnrollmentFormProps> TwoFactorEnrollmentForm;
 
     /**
      * Pushes a global toast message. In SWC, you should use {@link DisplayUtils#notify}, rather than calling this method directly.

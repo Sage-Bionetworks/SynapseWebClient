@@ -115,6 +115,8 @@ import org.sagebionetworks.web.client.view.TeamView;
 import org.sagebionetworks.web.client.view.TeamViewImpl;
 import org.sagebionetworks.web.client.view.TrashView;
 import org.sagebionetworks.web.client.view.TrashViewImpl;
+import org.sagebionetworks.web.client.view.TwoFactorAuthView;
+import org.sagebionetworks.web.client.view.TwoFactorAuthViewImpl;
 import org.sagebionetworks.web.client.view.WikiDiffView;
 import org.sagebionetworks.web.client.view.WikiDiffViewImpl;
 import org.sagebionetworks.web.client.view.users.PasswordResetView;
@@ -1619,5 +1621,9 @@ public class PortalGinModule extends AbstractGinModule {
     bind(IntendedDataUseReportWidgetView.class)
       .to(IntendedDataUseReportWidgetViewImpl.class);
     bind(DialogView.class).to(Dialog.class);
+
+    bind(TwoFactorAuthView.class)
+      .to(TwoFactorAuthViewImpl.class)
+      .in(Singleton.class);
   }
 }

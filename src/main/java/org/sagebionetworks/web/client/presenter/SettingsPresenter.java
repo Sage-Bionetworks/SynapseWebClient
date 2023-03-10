@@ -1,11 +1,14 @@
 package org.sagebionetworks.web.client.presenter;
 
+import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import static org.sagebionetworks.web.client.presenter.ProfilePresenter.IS_CERTIFIED;
 import static org.sagebionetworks.web.client.presenter.ProfilePresenter.ORC_ID;
 import static org.sagebionetworks.web.client.presenter.ProfilePresenter.PROFILE;
 import static org.sagebionetworks.web.client.presenter.ProfilePresenter.VERIFICATION_SUBMISSION;
 
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -15,6 +18,8 @@ import java.util.List;
 import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.auth.ChangePasswordWithCurrentPassword;
+import org.sagebionetworks.repo.model.auth.TwoFactorAuthStatus;
+import org.sagebionetworks.repo.model.auth.TwoFactorState;
 import org.sagebionetworks.repo.model.oauth.OAuthProvider;
 import org.sagebionetworks.repo.model.verification.AttachmentMetadata;
 import org.sagebionetworks.repo.model.verification.VerificationState;
@@ -255,6 +260,32 @@ public class SettingsPresenter implements SettingsView.Presenter {
     view.setOauthClientSettingsVisible(
       DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider())
     );
+
+    if (DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider())) {
+      view.setTwoFactorAuthSettingsVisible(true);
+    } else {
+      // If 2FA is enabled, show the settings pane, even if experimental mode is disabled
+      // When released from experimental mode (SWC-6411), this block can be removed
+      jsClient
+        .getTwoFactorAuthStatusForCurrentUser()
+        .addCallback(
+          new FutureCallback<TwoFactorAuthStatus>() {
+            @Override
+            public void onSuccess(TwoFactorAuthStatus result) {
+              view.setTwoFactorAuthSettingsVisible(
+                TwoFactorState.ENABLED.equals(result.getStatus())
+              );
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+              GWT.log("Unable to get 2FA status", t);
+            }
+          },
+          directExecutor()
+        );
+    }
+
     this.view.render();
   }
 

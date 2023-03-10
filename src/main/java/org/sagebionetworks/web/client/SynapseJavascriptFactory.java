@@ -38,6 +38,7 @@ import org.sagebionetworks.repo.model.asynch.AsyncJobId;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBodyInstanceFactory;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
+import org.sagebionetworks.repo.model.auth.TwoFactorAuthStatus;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.dataaccess.AccessApprovalNotificationResponse;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionInfoPage;
@@ -91,6 +92,7 @@ import org.sagebionetworks.web.shared.exceptions.ResultNotReadyException;
 public class SynapseJavascriptFactory {
 
   public enum OBJECT_TYPE {
+    TwoFactorAuthStatus,
     ValidationResults,
     JsonSchemaObjectBinding,
     PaginatedResultsEvaluations,
@@ -238,6 +240,8 @@ public class SynapseJavascriptFactory {
         return new UserGroupHeaderResponse(json).getList();
       case UserBundle:
         return new UserBundle(json);
+      case TwoFactorAuthStatus:
+        return new TwoFactorAuthStatus(json);
       case Count:
         return new Count(json).getCount();
       case V2WikiPage:
