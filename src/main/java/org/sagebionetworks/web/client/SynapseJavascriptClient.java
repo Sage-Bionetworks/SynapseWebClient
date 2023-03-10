@@ -81,6 +81,7 @@ import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.auth.ChangePasswordInterface;
 import org.sagebionetworks.repo.model.auth.LoginRequest;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
+import org.sagebionetworks.repo.model.auth.TwoFactorAuthStatus;
 import org.sagebionetworks.repo.model.auth.Username;
 import org.sagebionetworks.repo.model.dataaccess.AccessApprovalNotificationRequest;
 import org.sagebionetworks.repo.model.dataaccess.AccessApprovalNotificationResponse;
@@ -3244,5 +3245,10 @@ public class SynapseJavascriptClient {
   ) {
     String url = getRepoServiceUrl() + ACCESS_REQUIREMENT + id + ACL;
     return getFuture(cb -> doPut(url, acl, OBJECT_TYPE.AccessControlList, cb));
+  }
+
+  public FluentFuture<TwoFactorAuthStatus> getTwoFactorAuthStatusForCurrentUser() {
+    String url = getAuthServiceUrl() + "/2fa";
+    return getFuture(cb -> doGet(url, OBJECT_TYPE.TwoFactorAuthStatus, cb));
   }
 }

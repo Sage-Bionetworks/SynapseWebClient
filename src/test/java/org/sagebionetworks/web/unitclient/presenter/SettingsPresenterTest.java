@@ -16,6 +16,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.client.utils.FutureUtils.getDoneFuture;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -32,6 +33,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.auth.ChangePasswordWithCurrentPassword;
+import org.sagebionetworks.repo.model.auth.TwoFactorAuthStatus;
+import org.sagebionetworks.repo.model.auth.TwoFactorState;
 import org.sagebionetworks.repo.model.oauth.OAuthProvider;
 import org.sagebionetworks.repo.model.principal.NotificationEmail;
 import org.sagebionetworks.repo.model.verification.AttachmentMetadata;
@@ -132,6 +135,8 @@ public class SettingsPresenterTest {
   @Mock
   CookieProvider mockCookieProvider;
 
+  TwoFactorAuthStatus twoFactorDisabledStatus = new TwoFactorAuthStatus();
+
   @Before
   public void setup() throws JSONObjectAdapterException {
     when(mockInjector.getSynapseAlertWidget()).thenReturn(mockSynAlert);
@@ -211,6 +216,8 @@ public class SettingsPresenterTest {
     emails.add(email);
     profile.setEmails(emails);
 
+    twoFactorDisabledStatus.setStatus(TwoFactorState.DISABLED);
+
     when(mockUserBundle.getVerificationSubmission())
       .thenReturn(mockVerificationSubmission);
     when(mockInjector.getVerificationSubmissionWidget())
@@ -237,6 +244,9 @@ public class SettingsPresenterTest {
     when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
     when(mockAuthenticationController.getCurrentUserPrincipalId())
       .thenReturn(CURRENT_USER_ID);
+
+    when(mockSynapseJavascriptClient.getTwoFactorAuthStatusForCurrentUser())
+      .thenReturn(getDoneFuture(twoFactorDisabledStatus));
   }
 
   @Test
@@ -767,5 +777,43 @@ public class SettingsPresenterTest {
       .thenReturn("true");
     presenter.configure();
     verify(mockView).setOauthClientSettingsVisible(true);
+  }
+
+  @Test
+  public void testTwoFactorAuthSettingsHidden() {
+    when(
+      mockCookieProvider.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)
+    )
+      .thenReturn(null);
+    presenter.configure();
+    verify(mockView).setTwoFactorAuthSettingsVisible(false);
+  }
+
+  @Test
+  public void testTwoFactorAuthSettingsShownInExperimentalMode() {
+    when(
+      mockCookieProvider.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)
+    )
+      .thenReturn("true");
+    presenter.configure();
+    verify(mockView).setTwoFactorAuthSettingsVisible(true);
+  }
+
+  @Test
+  public void testTwoFactorAuthSettingsShownIfEnabled() {
+    TwoFactorAuthStatus enabledStatus = new TwoFactorAuthStatus();
+    enabledStatus.setStatus(TwoFactorState.ENABLED);
+
+    when(mockSynapseJavascriptClient.getTwoFactorAuthStatusForCurrentUser())
+      .thenReturn(getDoneFuture(enabledStatus));
+    when(
+      mockCookieProvider.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)
+    )
+      .thenReturn(null);
+
+    presenter.configure();
+
+    verify(mockView).setTwoFactorAuthSettingsVisible(true);
+    verify(mockSynapseJavascriptClient).getTwoFactorAuthStatusForCurrentUser();
   }
 }

@@ -31,12 +31,20 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.jsinterop.React;
+import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.SRC;
+import org.sagebionetworks.web.client.jsinterop.TwoFactorAuthSettingsPanelProps;
 import org.sagebionetworks.web.client.place.OAuthClientEditorPlace;
 import org.sagebionetworks.web.client.place.PersonalAccessTokenPlace;
 import org.sagebionetworks.web.client.place.Quiz;
+import org.sagebionetworks.web.client.place.TwoFactorAuthPlace;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 import org.sagebionetworks.web.shared.WebConstants;
 
 public class SettingsViewImpl extends Composite implements SettingsView {
@@ -52,6 +60,12 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 
   @UiField
   HTMLPanel personalAccessTokensHighlightBox;
+
+  @UiField
+  HTMLPanel twoFactorAuthSettingsPanelContainer;
+
+  @UiField
+  ReactComponentDiv twoFactorAuthSettingsPanel;
 
   @UiField
   Button managePersonalAccessTokensButton;
@@ -199,7 +213,9 @@ public class SettingsViewImpl extends Composite implements SettingsView {
   @Inject
   public SettingsViewImpl(
     SettingsViewImplUiBinder binder,
-    final SynapseJSNIUtils jsniUtils
+    final SynapseJSNIUtils jsniUtils,
+    final GlobalApplicationState globalApplicationState,
+    final SynapseContextPropsProvider propsProvider
   ) {
     initWidget(binder.createAndBindUi(this));
     ClickHandler notificationsClickHandler = getNotificationsClickHandler();
@@ -328,6 +344,23 @@ public class SettingsViewImpl extends Composite implements SettingsView {
         new OAuthClientEditorPlace(ClientProperties.DEFAULT_PLACE_TOKEN)
       )
     );
+    ReactNode twoFactorAuthPanelNode = React.createElementWithSynapseContext(
+      SRC.SynapseComponents.TwoFactorAuthSettingsPanel,
+      TwoFactorAuthSettingsPanelProps.create(
+        () ->
+          globalApplicationState
+            .getPlaceChanger()
+            .goTo(new TwoFactorAuthPlace(TwoFactorAuthPlace.BEGIN_ENROLLMENT)),
+        () ->
+          globalApplicationState
+            .getPlaceChanger()
+            .goTo(
+              new TwoFactorAuthPlace(TwoFactorAuthPlace.REPLACE_RECOVERY_CODES)
+            )
+      ),
+      propsProvider.getJsInteropContextProps()
+    );
+    twoFactorAuthSettingsPanel.render(twoFactorAuthPanelNode);
   }
 
   @Override
@@ -547,6 +580,11 @@ public class SettingsViewImpl extends Composite implements SettingsView {
   @Override
   public void setOauthClientSettingsVisible(boolean visible) {
     oAuthClientEditorHighlightBox.setVisible(visible);
+  }
+
+  @Override
+  public void setTwoFactorAuthSettingsVisible(boolean visible) {
+    twoFactorAuthSettingsPanelContainer.setVisible(visible);
   }
 
   @Override

@@ -14,8 +14,7 @@
         <b:Column size="LG_6">
           <bh:Div ui:field="editProfilePanel" addStyleNames="highlight-box">
             <b:Button ui:field="editProfileButton" icon="EDIT">
-              Edit
-							Profile
+              Edit Profile
             </b:Button>
           </bh:Div>
           <bh:Div ui:field="dateTimeFormatPanel" addStyleNames="highlight-box">
@@ -307,7 +306,7 @@
         </g:FlowPanel>
         <g:SimplePanel ui:field="notificationSynAlertPanel" />
       </bh:Div>
-      <g:FlowPanel addStyleNames="light-border padding-10 margin-bottom-15">
+      <g:FlowPanel addStyleNames="light-border">
         <bh:Div addStyleNames="highlight-title">
           <bh:Text>Following</bh:Text>
           <w:HelpWidget
@@ -320,14 +319,20 @@
       </g:FlowPanel>
 
       <g:HTMLPanel
+        addStyleNames="highlight-box padding-top-16"
+        ui:field="twoFactorAuthSettingsPanelContainer"
+      >
+        <w:ReactComponentDiv ui:field="twoFactorAuthSettingsPanel" />
+      </g:HTMLPanel>
+      <g:HTMLPanel
         ui:field="personalAccessTokensHighlightBox"
         addStyleNames="highlight-box"
       >
         <p>
           You can issue personal access tokens to authenticate your scripts with
-          scoped access
-					to your account. It is important that you treat personal access tokens with	the
-          same security as your password.
+          scoped access to your account. It is
+            important that you treat personal access tokens with the same
+          security as your password.
         </p>
         <b:Button
           ui:field="managePersonalAccessTokensButton"
@@ -339,6 +344,10 @@
         ui:field="oAuthClientEditorHighlightBox"
         addStyleNames="highlight-box"
       >
+        <p>
+          OAuth Clients can be created to develop applications that use Synapse
+          as an identity provider.
+        </p>
         <b:Button
           ui:field="gotoOAuthClientEditorButton"
           addStyleNames="margin-top-10"
@@ -353,9 +362,8 @@
       >
         <p>
           Using an API key allows you to authenticate your scripts for an
-					indefinite amount of time. It is important that you treat your API
-					key with
-					the same security as your password.
+          indefinite amount of time. It is important
+          that you treat your API key with the same security as your password.
         </p>
         <b:Panel ui:field="apiKeyUI">
           <b:PanelBody>
