@@ -34,6 +34,13 @@ public abstract class OAuth2Servlet extends HttpServlet {
       OAuth2Servlet.perThreadRequest.get()
     );
 
+  @Override
+  protected void service(HttpServletRequest arg0, HttpServletResponse arg1)
+    throws ServletException, IOException {
+    OAuth2Servlet.perThreadRequest.set(arg0);
+    super.service(arg0, arg1);
+  }
+
   /**
    * Injected
    *
