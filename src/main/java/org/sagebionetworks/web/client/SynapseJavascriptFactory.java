@@ -52,6 +52,7 @@ import org.sagebionetworks.repo.model.discussion.ThreadCount;
 import org.sagebionetworks.repo.model.docker.DockerCommit;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.doi.v2.Doi;
+import org.sagebionetworks.repo.model.download.ActionRequiredList;
 import org.sagebionetworks.repo.model.download.AddBatchOfFilesToDownloadListResponse;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.AddPartResponse;
@@ -92,6 +93,7 @@ import org.sagebionetworks.web.shared.exceptions.ResultNotReadyException;
 public class SynapseJavascriptFactory {
 
   public enum OBJECT_TYPE {
+    ActionRequiredList,
     TwoFactorAuthStatus,
     ValidationResults,
     JsonSchemaObjectBinding,
@@ -240,6 +242,8 @@ public class SynapseJavascriptFactory {
         return new UserGroupHeaderResponse(json).getList();
       case UserBundle:
         return new UserBundle(json);
+      case ActionRequiredList:
+        return new ActionRequiredList(json);
       case TwoFactorAuthStatus:
         return new TwoFactorAuthStatus(json);
       case Count:

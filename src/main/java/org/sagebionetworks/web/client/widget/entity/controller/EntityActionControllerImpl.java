@@ -47,7 +47,11 @@ import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.VersionableEntity;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
+import org.sagebionetworks.repo.model.download.ActionRequiredList;
 import org.sagebionetworks.repo.model.download.AddBatchOfFilesToDownloadListResponse;
+import org.sagebionetworks.repo.model.download.EnableTwoFa;
+import org.sagebionetworks.repo.model.download.MeetAccessRequirement;
+import org.sagebionetworks.repo.model.download.RequestDownload;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.Dataset;
@@ -694,7 +698,9 @@ public class EntityActionControllerImpl
   }
 
   private FluentFuture configureFileDownload() {
-    FluentFuture<RestrictionInformationResponse> future = getDoneFuture(null);
+    FluentFuture<RestrictionInformationResponse> restrictionInformationFuture = getDoneFuture(
+      null
+    );
 
     if (entity instanceof FileEntity) {
       boolean canDownload = entityBundle.getPermissions().getCanDownload();
@@ -702,10 +708,46 @@ public class EntityActionControllerImpl
       if (canDownload) {
         actionMenu.setDownloadMenuTooltipText("");
       } else {
-        String viewOnlyHelpText = authenticationController.isLoggedIn()
-          ? "You don't have download permission. Request access from an administrator, shown under File Tools ➔ File Sharing Settings"
-          : "You need to log in to download this file.";
-        actionMenu.setDownloadMenuTooltipText(viewOnlyHelpText);
+        if (!authenticationController.isLoggedIn()) {
+          actionMenu.setDownloadMenuTooltipText(
+            "You need to log in to download this file."
+          );
+        } else {
+          actionMenu.setDownloadMenuTooltipText(
+            "You don't have permission to download this file."
+          );
+          // Queue up request to identify reasons why the file cannot be downloaded, and update the tooltip when the request finishes.
+          getSynapseJavascriptClient()
+            .getActionsRequiredForEntityDownload(entity.getId())
+            .addCallback(
+              new FutureCallback<ActionRequiredList>() {
+                @Override
+                public void onSuccess(@NullableDecl ActionRequiredList result) {
+                  if (result != null) {
+                    StringBuilder downloadMenuTooltipText = new StringBuilder(
+                      "You don't have permission to download this file."
+                    );
+                    for (org.sagebionetworks.repo.model.download.Action action : result.getActions()) {
+                      downloadMenuTooltipText
+                        .append("\n\n")
+                        .append(
+                          getTooltipTextForRequiredActionForDownload(action)
+                        );
+                    }
+                    actionMenu.setDownloadMenuTooltipText(
+                      downloadMenuTooltipText.toString()
+                    );
+                  }
+                }
+
+                @Override
+                public void onFailure(Throwable caught) {
+                  view.showErrorMessage(caught.getMessage());
+                }
+              },
+              directExecutor()
+            );
+        }
       }
       actionMenu.setActionVisible(Action.DOWNLOAD_FILE, true);
 
@@ -761,16 +803,17 @@ public class EntityActionControllerImpl
             )
       );
 
-      future = getDoneFuture(entityBundle.getRestrictionInformation());
+      restrictionInformationFuture =
+        getDoneFuture(entityBundle.getRestrictionInformation());
       if (entityBundle.getRestrictionInformation() == null) {
-        future =
+        restrictionInformationFuture =
           getSynapseJavascriptClient()
             .getRestrictionInformation(
               entity.getId(),
               RestrictableObjectType.ENTITY
             );
       }
-      future.addCallback(
+      restrictionInformationFuture.addCallback(
         new FutureCallback<RestrictionInformationResponse>() {
           @Override
           public void onSuccess(
@@ -789,7 +832,7 @@ public class EntityActionControllerImpl
         directExecutor()
       );
     }
-    return future;
+    return restrictionInformationFuture;
   }
 
   private FluentFuture configureContainerDownload() {
@@ -2796,5 +2839,18 @@ public class EntityActionControllerImpl
   @Override
   public void setIsShowingVersion(boolean isShowingVersion) {
     this.isShowingVersion = isShowingVersion;
+  }
+
+  private String getTooltipTextForRequiredActionForDownload(
+    org.sagebionetworks.repo.model.download.Action action
+  ) {
+    if (action instanceof RequestDownload) {
+      return "Request access from an administrator, shown under File Tools ➔ File Sharing Settings.";
+    } else if (action instanceof MeetAccessRequirement) {
+      return "This controlled data has additional requirements. Click \"Request Access\" underneath the SynID and follow the instructions.";
+    } else if (action instanceof EnableTwoFa) {
+      return "You must enable two-factor authentication to download this file.";
+    }
+    return "";
   }
 }

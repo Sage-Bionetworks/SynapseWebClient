@@ -43,6 +43,7 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -81,7 +82,11 @@ import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.doi.v2.DoiAssociation;
+import org.sagebionetworks.repo.model.download.ActionRequiredList;
 import org.sagebionetworks.repo.model.download.AddBatchOfFilesToDownloadListResponse;
+import org.sagebionetworks.repo.model.download.EnableTwoFa;
+import org.sagebionetworks.repo.model.download.MeetAccessRequirement;
+import org.sagebionetworks.repo.model.download.RequestDownload;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.Dataset;
@@ -4436,6 +4441,26 @@ public class EntityActionControllerImplTest {
 
   @Test
   public void testConfigureFileDownloadCannotDownload() {
+    RequestDownload requestAclAction = new RequestDownload();
+    EnableTwoFa enableTwoFaAction = new EnableTwoFa();
+    MeetAccessRequirement meetAccessRequirementAction = new MeetAccessRequirement();
+
+    ActionRequiredList actionsRequiredForDownload = new ActionRequiredList();
+    actionsRequiredForDownload.setActions(
+      Arrays.asList(
+        enableTwoFaAction,
+        requestAclAction,
+        meetAccessRequirementAction
+      )
+    );
+
+    when(
+      mockSynapseJavascriptClient.getActionsRequiredForEntityDownload(
+        anyString()
+      )
+    )
+      .thenReturn(getDoneFuture(actionsRequiredForDownload));
+
     entityBundle.setEntity(new FileEntity());
     entityBundle.getPermissions().setCanDownload(false);
 
@@ -4452,7 +4477,10 @@ public class EntityActionControllerImplTest {
     verify(mockActionMenu).setDownloadMenuEnabled(false);
     verify(mockActionMenu)
       .setDownloadMenuTooltipText(
-        "You don't have download permission. Request access from an administrator, shown under File Tools ➔ File Sharing Settings"
+        "You don't have permission to download this file." +
+        "\n\nYou must enable two-factor authentication to download this file." +
+        "\n\nRequest access from an administrator, shown under File Tools ➔ File Sharing Settings." +
+        "\n\nThis controlled data has additional requirements. Click \"Request Access\" underneath the SynID and follow the instructions."
       );
     verify(mockActionMenu).setActionVisible(Action.DOWNLOAD_FILE, true);
     verify(mockActionMenu).setActionVisible(Action.ADD_TO_DOWNLOAD_CART, true);
