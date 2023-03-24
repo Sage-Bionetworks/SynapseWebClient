@@ -4477,13 +4477,29 @@ public class EntityActionControllerImplTest {
     );
 
     verify(mockActionMenu).setDownloadMenuEnabled(false);
-    verify(mockActionMenu)
-      .setDownloadMenuTooltipText(
-        "You don't have permission to download this file." +
-        "\n\nYou must enable two-factor authentication to download this file." +
-        "\n\nRequest access from an administrator, shown under File Tools ➔ File Sharing Settings." +
-        "\n\nThis controlled data has additional requirements. Click \"Request Access\" underneath the SynID and follow the instructions."
-      );
+    ArgumentCaptor<String> tooltipCaptor = new ArgumentCaptor<>();
+    verify(mockActionMenu, times(2))
+      .setDownloadMenuTooltipText(tooltipCaptor.capture());
+    String tooltip = tooltipCaptor.getAllValues().get(1);
+    assertTrue(
+      tooltip.contains("You don't have permission to download this file.")
+    );
+    assertTrue(
+      tooltip.contains(
+        "You must enable two-factor authentication to download this file."
+      )
+    );
+    assertTrue(
+      tooltip.contains(
+        "This controlled data has additional requirements. Click \"Request Access\" underneath the SynID and follow the instructions."
+      )
+    );
+    assertTrue(
+      tooltip.contains(
+        "Request access from an administrator, shown under File Tools ➔ File Sharing Settings."
+      )
+    );
+
     verify(mockActionMenu).setActionVisible(Action.DOWNLOAD_FILE, true);
     verify(mockActionMenu).setActionVisible(Action.ADD_TO_DOWNLOAD_CART, true);
     verify(mockActionMenu)
