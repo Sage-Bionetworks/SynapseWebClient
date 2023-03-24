@@ -225,6 +225,14 @@ public class EntityActionControllerImpl
 
   public static final String CREATE_DOI_FOR = "Create DOI for  ";
   public static final String UPDATE_DOI_FOR = "Update DOI for  ";
+  public static final String REQUEST_DOWNLOAD_GUIDANCE =
+    "Request access from an administrator, shown under File Tools ➔ File Sharing Settings.";
+  public static final String ACCESS_REQUIREMENT_GUIDANCE =
+    "This controlled data has additional requirements. Click \"Request Access\" underneath the SynID and follow the instructions.";
+  public static final String ENABLE_2FA_GUIDANCE =
+    "You must enable two-factor authentication to download this file.";
+  public static final String NO_PERMISSION_TO_DOWNLOAD =
+    "You don't have permission to download this file.";
 
   EntityArea currentArea;
 
@@ -715,9 +723,7 @@ public class EntityActionControllerImpl
             "You need to log in to download this file."
           );
         } else {
-          actionMenu.setDownloadMenuTooltipText(
-            "You don't have permission to download this file."
-          );
+          actionMenu.setDownloadMenuTooltipText(NO_PERMISSION_TO_DOWNLOAD);
           // Queue up request to identify reasons why the file cannot be downloaded, and update the tooltip when the request finishes.
           getSynapseJavascriptClient()
             .getActionsRequiredForEntityDownload(entity.getId())
@@ -727,7 +733,7 @@ public class EntityActionControllerImpl
                 public void onSuccess(@NullableDecl ActionRequiredList result) {
                   if (result != null) {
                     StringBuilder downloadMenuTooltipText = new StringBuilder(
-                      "You don't have permission to download this file."
+                      NO_PERMISSION_TO_DOWNLOAD
                     );
                     // There may be multiple actions of the same class, but we only want to show one message for each type
                     // Get the unique set of action classes.
@@ -2857,11 +2863,11 @@ public class EntityActionControllerImpl
     Class<? extends org.sagebionetworks.repo.model.download.Action> clazz
   ) {
     if (RequestDownload.class.equals(clazz)) {
-      return "Request access from an administrator, shown under File Tools ➔ File Sharing Settings.";
+      return REQUEST_DOWNLOAD_GUIDANCE;
     } else if (MeetAccessRequirement.class.equals(clazz)) {
-      return "This controlled data has additional requirements. Click \"Request Access\" underneath the SynID and follow the instructions.";
+      return ACCESS_REQUIREMENT_GUIDANCE;
     } else if (EnableTwoFa.class.equals(clazz)) {
-      return "You must enable two-factor authentication to download this file.";
+      return ENABLE_2FA_GUIDANCE;
     }
     return "";
   }

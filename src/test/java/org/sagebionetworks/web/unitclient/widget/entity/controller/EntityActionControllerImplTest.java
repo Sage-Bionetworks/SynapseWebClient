@@ -24,12 +24,16 @@ import static org.sagebionetworks.web.client.DisplayConstants.MATERIALIZED_VIEW;
 import static org.sagebionetworks.web.client.DisplayConstants.VIEW_DOWNLOAD_LIST;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getDoneFuture;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getFailedFuture;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.ACCESS_REQUIREMENT_GUIDANCE;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.ARE_YOU_SURE_YOU_WANT_TO_DELETE;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETE_FOLDER_EXPLANATION;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETE_PREFIX;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.EDIT_NAME_AND_DESCRIPTION;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.EDIT_WIKI_PREFIX;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.ENABLE_2FA_GUIDANCE;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.MOVE_PREFIX;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.NO_PERMISSION_TO_DOWNLOAD;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.REQUEST_DOWNLOAD_GUIDANCE;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.THE;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.UPDATE_DOI_FOR;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.WAS_SUCCESSFULLY_DELETED;
@@ -4481,24 +4485,10 @@ public class EntityActionControllerImplTest {
     verify(mockActionMenu, times(2))
       .setDownloadMenuTooltipText(tooltipCaptor.capture());
     String tooltip = tooltipCaptor.getAllValues().get(1);
-    assertTrue(
-      tooltip.contains("You don't have permission to download this file.")
-    );
-    assertTrue(
-      tooltip.contains(
-        "You must enable two-factor authentication to download this file."
-      )
-    );
-    assertTrue(
-      tooltip.contains(
-        "This controlled data has additional requirements. Click \"Request Access\" underneath the SynID and follow the instructions."
-      )
-    );
-    assertTrue(
-      tooltip.contains(
-        "Request access from an administrator, shown under File Tools ➔ File Sharing Settings."
-      )
-    );
+    assertTrue(tooltip.contains(NO_PERMISSION_TO_DOWNLOAD));
+    assertTrue(tooltip.contains(ENABLE_2FA_GUIDANCE));
+    assertTrue(tooltip.contains(ACCESS_REQUIREMENT_GUIDANCE));
+    assertTrue(tooltip.contains(REQUEST_DOWNLOAD_GUIDANCE));
 
     verify(mockActionMenu).setActionVisible(Action.DOWNLOAD_FILE, true);
     verify(mockActionMenu).setActionVisible(Action.ADD_TO_DOWNLOAD_CART, true);
