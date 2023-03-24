@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.sagebionetworks.repo.model.Challenge;
@@ -47,7 +49,11 @@ import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.VersionableEntity;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
+import org.sagebionetworks.repo.model.download.ActionRequiredList;
 import org.sagebionetworks.repo.model.download.AddBatchOfFilesToDownloadListResponse;
+import org.sagebionetworks.repo.model.download.EnableTwoFa;
+import org.sagebionetworks.repo.model.download.MeetAccessRequirement;
+import org.sagebionetworks.repo.model.download.RequestDownload;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.Dataset;
@@ -219,6 +225,14 @@ public class EntityActionControllerImpl
 
   public static final String CREATE_DOI_FOR = "Create DOI for  ";
   public static final String UPDATE_DOI_FOR = "Update DOI for  ";
+  public static final String REQUEST_DOWNLOAD_GUIDANCE =
+    "Request access from an administrator, shown under File Tools ➔ File Sharing Settings.";
+  public static final String ACCESS_REQUIREMENT_GUIDANCE =
+    "This controlled data has additional requirements. Click \"Request Access\" underneath the SynID and follow the instructions.";
+  public static final String ENABLE_2FA_GUIDANCE =
+    "You must enable two-factor authentication to download this file.";
+  public static final String NO_PERMISSION_TO_DOWNLOAD =
+    "You don't have permission to download this file.";
 
   EntityArea currentArea;
 
@@ -694,7 +708,9 @@ public class EntityActionControllerImpl
   }
 
   private FluentFuture configureFileDownload() {
-    FluentFuture<RestrictionInformationResponse> future = getDoneFuture(null);
+    FluentFuture<RestrictionInformationResponse> restrictionInformationFuture = getDoneFuture(
+      null
+    );
 
     if (entity instanceof FileEntity) {
       boolean canDownload = entityBundle.getPermissions().getCanDownload();
@@ -702,10 +718,54 @@ public class EntityActionControllerImpl
       if (canDownload) {
         actionMenu.setDownloadMenuTooltipText("");
       } else {
-        String viewOnlyHelpText = authenticationController.isLoggedIn()
-          ? "You don't have download permission. Request access from an administrator, shown under File Tools ➔ File Sharing Settings"
-          : "You need to log in to download this file.";
-        actionMenu.setDownloadMenuTooltipText(viewOnlyHelpText);
+        if (!authenticationController.isLoggedIn()) {
+          actionMenu.setDownloadMenuTooltipText(
+            "You need to log in to download this file."
+          );
+        } else {
+          actionMenu.setDownloadMenuTooltipText(NO_PERMISSION_TO_DOWNLOAD);
+          // Queue up request to identify reasons why the file cannot be downloaded, and update the tooltip when the request finishes.
+          getSynapseJavascriptClient()
+            .getActionsRequiredForEntityDownload(entity.getId())
+            .addCallback(
+              new FutureCallback<ActionRequiredList>() {
+                @Override
+                public void onSuccess(@NullableDecl ActionRequiredList result) {
+                  if (result != null) {
+                    StringBuilder downloadMenuTooltipText = new StringBuilder(
+                      NO_PERMISSION_TO_DOWNLOAD
+                    );
+                    // There may be multiple actions of the same class, but we only want to show one message for each type
+                    // Get the unique set of action classes.
+                    Set<Class<? extends org.sagebionetworks.repo.model.download.Action>> uniqueClasses = result
+                      .getActions()
+                      .stream()
+                      .map(
+                        org.sagebionetworks.repo.model.download.Action::getClass
+                      )
+                      .collect(Collectors.toSet());
+
+                    for (Class<? extends org.sagebionetworks.repo.model.download.Action> clazz : uniqueClasses) {
+                      downloadMenuTooltipText
+                        .append("\n\n")
+                        .append(
+                          getTooltipTextForRequiredActionForDownload(clazz)
+                        );
+                    }
+                    actionMenu.setDownloadMenuTooltipText(
+                      downloadMenuTooltipText.toString()
+                    );
+                  }
+                }
+
+                @Override
+                public void onFailure(Throwable caught) {
+                  view.showErrorMessage(caught.getMessage());
+                }
+              },
+              directExecutor()
+            );
+        }
       }
       actionMenu.setActionVisible(Action.DOWNLOAD_FILE, true);
 
@@ -761,16 +821,17 @@ public class EntityActionControllerImpl
             )
       );
 
-      future = getDoneFuture(entityBundle.getRestrictionInformation());
+      restrictionInformationFuture =
+        getDoneFuture(entityBundle.getRestrictionInformation());
       if (entityBundle.getRestrictionInformation() == null) {
-        future =
+        restrictionInformationFuture =
           getSynapseJavascriptClient()
             .getRestrictionInformation(
               entity.getId(),
               RestrictableObjectType.ENTITY
             );
       }
-      future.addCallback(
+      restrictionInformationFuture.addCallback(
         new FutureCallback<RestrictionInformationResponse>() {
           @Override
           public void onSuccess(
@@ -789,7 +850,7 @@ public class EntityActionControllerImpl
         directExecutor()
       );
     }
-    return future;
+    return restrictionInformationFuture;
   }
 
   private FluentFuture configureContainerDownload() {
@@ -2796,5 +2857,18 @@ public class EntityActionControllerImpl
   @Override
   public void setIsShowingVersion(boolean isShowingVersion) {
     this.isShowingVersion = isShowingVersion;
+  }
+
+  private String getTooltipTextForRequiredActionForDownload(
+    Class<? extends org.sagebionetworks.repo.model.download.Action> clazz
+  ) {
+    if (RequestDownload.class.equals(clazz)) {
+      return REQUEST_DOWNLOAD_GUIDANCE;
+    } else if (MeetAccessRequirement.class.equals(clazz)) {
+      return ACCESS_REQUIREMENT_GUIDANCE;
+    } else if (EnableTwoFa.class.equals(clazz)) {
+      return ENABLE_2FA_GUIDANCE;
+    }
+    return "";
   }
 }

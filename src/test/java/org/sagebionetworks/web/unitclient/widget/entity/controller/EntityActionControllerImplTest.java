@@ -24,12 +24,16 @@ import static org.sagebionetworks.web.client.DisplayConstants.MATERIALIZED_VIEW;
 import static org.sagebionetworks.web.client.DisplayConstants.VIEW_DOWNLOAD_LIST;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getDoneFuture;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getFailedFuture;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.ACCESS_REQUIREMENT_GUIDANCE;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.ARE_YOU_SURE_YOU_WANT_TO_DELETE;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETE_FOLDER_EXPLANATION;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETE_PREFIX;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.EDIT_NAME_AND_DESCRIPTION;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.EDIT_WIKI_PREFIX;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.ENABLE_2FA_GUIDANCE;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.MOVE_PREFIX;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.NO_PERMISSION_TO_DOWNLOAD;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.REQUEST_DOWNLOAD_GUIDANCE;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.THE;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.UPDATE_DOI_FOR;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.WAS_SUCCESSFULLY_DELETED;
@@ -43,6 +47,7 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -81,7 +86,11 @@ import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.doi.v2.DoiAssociation;
+import org.sagebionetworks.repo.model.download.ActionRequiredList;
 import org.sagebionetworks.repo.model.download.AddBatchOfFilesToDownloadListResponse;
+import org.sagebionetworks.repo.model.download.EnableTwoFa;
+import org.sagebionetworks.repo.model.download.MeetAccessRequirement;
+import org.sagebionetworks.repo.model.download.RequestDownload;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.Dataset;
@@ -4436,6 +4445,28 @@ public class EntityActionControllerImplTest {
 
   @Test
   public void testConfigureFileDownloadCannotDownload() {
+    RequestDownload requestAclAction = new RequestDownload();
+    EnableTwoFa enableTwoFaAction = new EnableTwoFa();
+    MeetAccessRequirement meetAccessRequirementAction1 = new MeetAccessRequirement();
+    MeetAccessRequirement meetAccessRequirementAction2 = new MeetAccessRequirement();
+
+    ActionRequiredList actionsRequiredForDownload = new ActionRequiredList();
+    actionsRequiredForDownload.setActions(
+      Arrays.asList(
+        enableTwoFaAction,
+        requestAclAction,
+        meetAccessRequirementAction1,
+        meetAccessRequirementAction2
+      )
+    );
+
+    when(
+      mockSynapseJavascriptClient.getActionsRequiredForEntityDownload(
+        anyString()
+      )
+    )
+      .thenReturn(getDoneFuture(actionsRequiredForDownload));
+
     entityBundle.setEntity(new FileEntity());
     entityBundle.getPermissions().setCanDownload(false);
 
@@ -4450,10 +4481,15 @@ public class EntityActionControllerImplTest {
     );
 
     verify(mockActionMenu).setDownloadMenuEnabled(false);
-    verify(mockActionMenu)
-      .setDownloadMenuTooltipText(
-        "You don't have download permission. Request access from an administrator, shown under File Tools ➔ File Sharing Settings"
-      );
+    ArgumentCaptor<String> tooltipCaptor = new ArgumentCaptor<>();
+    verify(mockActionMenu, times(2))
+      .setDownloadMenuTooltipText(tooltipCaptor.capture());
+    String tooltip = tooltipCaptor.getAllValues().get(1);
+    assertTrue(tooltip.contains(NO_PERMISSION_TO_DOWNLOAD));
+    assertTrue(tooltip.contains(ENABLE_2FA_GUIDANCE));
+    assertTrue(tooltip.contains(ACCESS_REQUIREMENT_GUIDANCE));
+    assertTrue(tooltip.contains(REQUEST_DOWNLOAD_GUIDANCE));
+
     verify(mockActionMenu).setActionVisible(Action.DOWNLOAD_FILE, true);
     verify(mockActionMenu).setActionVisible(Action.ADD_TO_DOWNLOAD_CART, true);
     verify(mockActionMenu)

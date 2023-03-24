@@ -101,6 +101,7 @@ import org.sagebionetworks.repo.model.docker.DockerCommit;
 import org.sagebionetworks.repo.model.docker.DockerCommitSortBy;
 import org.sagebionetworks.repo.model.doi.v2.Doi;
 import org.sagebionetworks.repo.model.doi.v2.DoiAssociation;
+import org.sagebionetworks.repo.model.download.ActionRequiredList;
 import org.sagebionetworks.repo.model.download.AddBatchOfFilesToDownloadListRequest;
 import org.sagebionetworks.repo.model.download.AddBatchOfFilesToDownloadListResponse;
 import org.sagebionetworks.repo.model.download.DownloadListItem;
@@ -325,7 +326,8 @@ public class SynapseJavascriptClient {
   public static final String ASYNC_GET = "/async/get/";
   public static final String AUTH_OAUTH_2 = "/oauth2";
   public static final String AUTH_OAUTH_2_ALIAS = AUTH_OAUTH_2 + "/alias";
-  public static final String DOWNLOAD_LIST = "/download/list";
+  public static final String DOWNLOAD = "/download";
+  public static final String DOWNLOAD_LIST = DOWNLOAD + "/list";
   public static final String DOWNLOAD_LIST_ADD = DOWNLOAD_LIST + "/add";
   public static final String DOWNLOAD_LIST_REMOVE = DOWNLOAD_LIST + "/remove";
   public static final String DOWNLOAD_LIST_CLEAR = DOWNLOAD_LIST + "/clear";
@@ -333,7 +335,7 @@ public class SynapseJavascriptClient {
   public static final String ACL = "/acl";
   public static final String ACCESS_APPROVAL = "/accessApproval";
   public static final String SUBMISSIONS = "/submissions";
-  public static final String DOWNLOAD_ORDER = "/download/order";
+  public static final String DOWNLOAD_ORDER = DOWNLOAD + "/order";
   public static final String DOWNLOAD_ORDER_HISTORY =
     DOWNLOAD_ORDER + "/history";
   public static final String STORAGE_REPORT = "/storageReport";
@@ -346,10 +348,10 @@ public class SynapseJavascriptClient {
   public static final String REDIRECT_PARAMETER = "redirect=";
   public static final String ACCOUNT = "/account";
   public static final String EMAIL_VALIDATION = "/emailValidation";
+  public static final String ACTIONS = "/actions";
   public static final String PORTAL_ENDPOINT_PARAM = "portalEndpoint=";
   public static final int LIMIT_50 = 50;
   public static final String SIGNED_TOKEN = "#!SignedToken:";
-
   public Map<String, List<Request>> requestsMap;
 
   public String synapseVersionInfo;
@@ -3250,5 +3252,13 @@ public class SynapseJavascriptClient {
   public FluentFuture<TwoFactorAuthStatus> getTwoFactorAuthStatusForCurrentUser() {
     String url = getAuthServiceUrl() + "/2fa";
     return getFuture(cb -> doGet(url, OBJECT_TYPE.TwoFactorAuthStatus, cb));
+  }
+
+  public FluentFuture<ActionRequiredList> getActionsRequiredForEntityDownload(
+    String entityId
+  ) {
+    String url =
+      getRepoServiceUrl() + ENTITY + "/" + entityId + ACTIONS + DOWNLOAD;
+    return getFuture(cb -> doGet(url, OBJECT_TYPE.ActionRequiredList, cb));
   }
 }
