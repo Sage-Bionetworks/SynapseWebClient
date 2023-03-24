@@ -4443,14 +4443,16 @@ public class EntityActionControllerImplTest {
   public void testConfigureFileDownloadCannotDownload() {
     RequestDownload requestAclAction = new RequestDownload();
     EnableTwoFa enableTwoFaAction = new EnableTwoFa();
-    MeetAccessRequirement meetAccessRequirementAction = new MeetAccessRequirement();
+    MeetAccessRequirement meetAccessRequirementAction1 = new MeetAccessRequirement();
+    MeetAccessRequirement meetAccessRequirementAction2 = new MeetAccessRequirement();
 
     ActionRequiredList actionsRequiredForDownload = new ActionRequiredList();
     actionsRequiredForDownload.setActions(
       Arrays.asList(
         enableTwoFaAction,
         requestAclAction,
-        meetAccessRequirementAction
+        meetAccessRequirementAction1,
+        meetAccessRequirementAction2
       )
     );
 

@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.sagebionetworks.repo.model.Challenge;
@@ -727,11 +729,21 @@ public class EntityActionControllerImpl
                     StringBuilder downloadMenuTooltipText = new StringBuilder(
                       "You don't have permission to download this file."
                     );
-                    for (org.sagebionetworks.repo.model.download.Action action : result.getActions()) {
+                    // There may be multiple actions of the same class, but we only want to show one message for each type
+                    // Get the unique set of action classes.
+                    Set<Class<? extends org.sagebionetworks.repo.model.download.Action>> uniqueClasses = result
+                      .getActions()
+                      .stream()
+                      .map(
+                        org.sagebionetworks.repo.model.download.Action::getClass
+                      )
+                      .collect(Collectors.toSet());
+
+                    for (Class<? extends org.sagebionetworks.repo.model.download.Action> clazz : uniqueClasses) {
                       downloadMenuTooltipText
                         .append("\n\n")
                         .append(
-                          getTooltipTextForRequiredActionForDownload(action)
+                          getTooltipTextForRequiredActionForDownload(clazz)
                         );
                     }
                     actionMenu.setDownloadMenuTooltipText(
@@ -2842,13 +2854,13 @@ public class EntityActionControllerImpl
   }
 
   private String getTooltipTextForRequiredActionForDownload(
-    org.sagebionetworks.repo.model.download.Action action
+    Class<? extends org.sagebionetworks.repo.model.download.Action> clazz
   ) {
-    if (action instanceof RequestDownload) {
+    if (RequestDownload.class.equals(clazz)) {
       return "Request access from an administrator, shown under File Tools ➔ File Sharing Settings.";
-    } else if (action instanceof MeetAccessRequirement) {
+    } else if (MeetAccessRequirement.class.equals(clazz)) {
       return "This controlled data has additional requirements. Click \"Request Access\" underneath the SynID and follow the instructions.";
-    } else if (action instanceof EnableTwoFa) {
+    } else if (EnableTwoFa.class.equals(clazz)) {
       return "You must enable two-factor authentication to download this file.";
     }
     return "";
