@@ -38,7 +38,7 @@
               <bh:Text>Preview</bh:Text>
               <w:HelpWidget
                 helpMarkdown="Preview shows a portion of the file content. Content is only visible when the user is logged in and has satisfied all conditions for use."
-                href="https://help.synapse.org/docs/Files-and-Folders.2048458885.html#FilesandFolders-FilePreviews"
+                href="https://help.synapse.org/docs/Uploading-and-Organizing-Data-Into-Projects,-Files,-and-Folders.2048327716.html#UploadingandOrganizingDataIntoProjects,Files,andFolders-FilePreviews"
                 addStyleNames="margin-left-5"
                 placement="BOTTOM"
               />

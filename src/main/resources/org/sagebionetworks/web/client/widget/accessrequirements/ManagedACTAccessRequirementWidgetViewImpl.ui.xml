@@ -47,12 +47,12 @@
       </b:BlockQuote>
       <bh:Div marginRight="30">
         <bh:Text>
-          For more information on use conditions, please read the
+          For more information on use conditions, please read about
         </bh:Text>
         <b:Anchor
-          text="Conditions for using Human Data in Synapse"
+          text="Controlled Access Data in Synapse"
           addStyleNames="link margin-left-5"
-          href="https://help.synapse.org/docs/Governance-Overview.2009597114.html"
+          href="https://help.synapse.org/docs/Data-Access-Types.2014904611.html#DataAccessTypes-ControlledAccessData"
           target="_blank"
         />
         <bh:Text>.&nbsp;&nbsp;</bh:Text>
