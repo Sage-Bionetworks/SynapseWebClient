@@ -25,7 +25,6 @@ import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.Button;
@@ -65,9 +64,6 @@ public class DeleteAccessRequirementButtonTest {
   ArgumentCaptor<CallbackP> callbackPCaptor;
 
   @Mock
-  CookieProvider mockCookies;
-
-  @Mock
   Callback mockRefreshCallback;
 
   ClickHandler onButtonClickHandler;
@@ -81,8 +77,7 @@ public class DeleteAccessRequirementButtonTest {
         mockButton,
         mockIsACTMemberAsyncHandler,
         mockSynapseClient,
-        mockPopupUtilsView,
-        mockCookies
+        mockPopupUtilsView
       );
     verify(mockButton).addClickHandler(clickHandlerCaptor.capture());
     onButtonClickHandler = clickHandlerCaptor.getValue();
@@ -110,10 +105,6 @@ public class DeleteAccessRequirementButtonTest {
 
   @Test
   public void testConfigureWithAR() {
-    when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
-    )
-      .thenReturn("true");
     widget.configure(mockAccessRequirement, mockRefreshCallback);
     verify(mockButton).setText(DELETE_ACCESS_REQUIREMENT_BUTTON_TEXT);
     verify(mockIsACTMemberAsyncHandler)
@@ -138,25 +129,6 @@ public class DeleteAccessRequirementButtonTest {
     verify(mockPopupUtilsView)
       .showInfo(eq(DELETED_ACCESS_REQUIREMENT_SUCCESS_MESSAGE));
     verify(mockRefreshCallback).invoke();
-  }
-
-  @Test
-  public void testConfigureWithARNotInAlpha() {
-    when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
-    )
-      .thenReturn(null);
-    widget.configure(mockAccessRequirement, mockRefreshCallback);
-    verify(mockIsACTMemberAsyncHandler)
-      .isACTActionAvailable(callbackPCaptor.capture());
-
-    CallbackP<Boolean> isACTMemberCallback = callbackPCaptor.getValue();
-    // invoking with false should hide the button again
-    isACTMemberCallback.invoke(false);
-    verify(mockButton, times(2)).setVisible(false);
-
-    isACTMemberCallback.invoke(true);
-    verify(mockButton, times(3)).setVisible(false);
   }
 
   @Test
