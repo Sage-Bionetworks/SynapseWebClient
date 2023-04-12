@@ -11,7 +11,7 @@
       <b:Heading size="H4" text="Edit Order">
         <w:HelpWidget
           helpMarkdown="Select a wiki page and use the arrows to move it to the desired position."
-          href="https://help.synapse.org/docs/Wikis.1975746682.html#Wikis-ModifyPageOrder"
+          href="https://help.synapse.org/docs/Wikis.1975746682.html#CreatingandManagingWikis-ModifyingPageOrder"
           addStyleNames="margin-left-5"
           placement="BOTTOM"
         />

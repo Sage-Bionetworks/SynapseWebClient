@@ -58,8 +58,8 @@
         <bh:Div addStyleNames="highlight-title">
           <bh:Text ui:field="annotationsTitleText">Annotations</bh:Text>
           <w:HelpWidget
-            helpMarkdown="Projects, folders and files can be annotated with key-value terms describing the content.&#10;These terms enables data queries through the web or the Synapse analytical clients"
-            href="https://help.synapse.org/docs/Annotations-and-Queries.2011070649.html"
+            helpMarkdown="Projects, folders and files can be annotated with key-value terms describing the content.&#10;Using these terms enables data queries through the web or the Synapse analytical clients"
+            href="https://help.synapse.org/docs/Annotating-Data-With-Metadata.2667708522.html"
             addStyleNames="margin-left-5"
           />
           <w:IconSvg

@@ -21,7 +21,7 @@
           addStyleNames="displayInline"
         />
         <w:HelpWidget
-          helpMarkdown="Synapse is built on a number of RESTful web APIs that allow users to interact with the system via a number of clients. The [Synapse API documentation](https://help.synapse.org/docs/API-Documentation.1985184035.html) is available online."
+          helpMarkdown="Synapse is built on a number of RESTful web APIs that allow users to interact with the system via a number of clients. The [Synapse API documentation](https://help.synapse.org/docs/API-Clients-and-Documentation.1985446128.html) is available online."
           href="https://help.synapse.org/docs/Installing-Synapse-API-clients.1985249668.html"
           addStyleNames="margin-left-5"
           placement="BOTTOM"
