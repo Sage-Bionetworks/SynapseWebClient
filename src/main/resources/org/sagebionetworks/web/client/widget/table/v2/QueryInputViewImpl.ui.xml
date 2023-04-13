@@ -27,7 +27,7 @@
       </b:InputGroupButton>
       <w:HelpWidget
         helpMarkdown="The data contained within a Synapse `Table` can be retrieved by using a SQL-like query language either through the web portal or through the analytical clients. Queries are **not** case sensitive."
-        href="https://help.synapse.org/docs/Searching-Tables-and-Views.2009596168.html"
+        href="https://help.synapse.org/docs/Querying-Tables,-Views,-and-Datasets.2667642897.html"
         width="22px"
         placement="LEFT"
         addStyleNames="margin-left-5 moveup-15 displayTableCell"

@@ -24,7 +24,7 @@
         />
         <w:HelpWidget
           helpMarkdown="Set metadata annotation fields. Field values are **not** case sensitive."
-          href="https://help.synapse.org/docs/Annotations-and-Queries.2011070649.html"
+          href="https://help.synapse.org/docs/Annotating-Data-With-Metadata.2667708522.html"
           addStyleNames="margin-left-5"
           placement="BOTTOM"
         />
