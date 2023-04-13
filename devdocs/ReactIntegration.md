@@ -46,7 +46,7 @@ If your application uses Synapse context (e.g. uses authentication to call the S
 
 How you manage updating your widget's view will vary based on the scenario, but when you're ready to render the component, this is all you have to do:
 
-```javaFu
+```java
 import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.React;
 
