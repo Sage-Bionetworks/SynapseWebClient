@@ -6,8 +6,8 @@ import org.sagebionetworks.web.client.jsinterop.SynapseReactClientFullContextPro
 import org.sagebionetworks.web.client.jsni.FullContextProviderPropsJSNIObject;
 
 /**
- * Synapse React Client components must be wrapped in a SynapseContextProvider. A SynapseContextPropsProvider provides the props for the
- * SynapseContextProvider.
+ * Synapse React Client components must be wrapped in a SynapseContext, react-query QueryContext, and MUI Theme context.
+ * Implementers of this interface provide the props for a FullContextProvider, which provides all of these contexts.
  */
 public interface SynapseReactClientFullContextPropsProvider {
   /**
@@ -17,7 +17,7 @@ public interface SynapseReactClientFullContextPropsProvider {
   SynapseReactClientFullContextProviderProps getJsInteropContextProps();
 
   /**
-   * Provides JSNI-compatible props for SynapseContextProvider. If you're porting a new React component, please consider
+   * Provides JSNI-compatible props for FullContextProvider. If you're porting a new React component, please consider
    * using JsInterop before using JSNI.
    */
   FullContextProviderPropsJSNIObject getJsniContextProps();
