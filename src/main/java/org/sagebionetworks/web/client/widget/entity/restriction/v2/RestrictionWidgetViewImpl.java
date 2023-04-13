@@ -10,7 +10,7 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.HasAccessProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
@@ -55,13 +55,13 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
   // this UI widget
   Widget widget;
   RestrictionWidgetModalsViewImpl modals;
-  SynapseContextPropsProvider propsProvider;
+  SynapseReactClientFullContextPropsProvider propsProvider;
 
   @Inject
   public RestrictionWidgetViewImpl(
     Binder binder,
     RestrictionWidgetModalsViewImpl modals,
-    SynapseContextPropsProvider propsProvider
+    SynapseReactClientFullContextPropsProvider propsProvider
   ) {
     this.widget = binder.createAndBindUi(this);
     this.modals = modals;

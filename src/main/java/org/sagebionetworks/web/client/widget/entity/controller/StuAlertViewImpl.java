@@ -7,7 +7,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.ErrorPageProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
@@ -20,7 +20,7 @@ public class StuAlertViewImpl implements StuAlertView {
   public interface Binder extends UiBinder<Widget, StuAlertViewImpl> {}
 
   Widget widget;
-  SynapseContextPropsProvider propsProvider;
+  SynapseReactClientFullContextPropsProvider propsProvider;
 
   @UiField
   ReactComponentDiv errorPageContainer;
@@ -33,7 +33,9 @@ public class StuAlertViewImpl implements StuAlertView {
   boolean is404, is403;
 
   @Inject
-  public StuAlertViewImpl(SynapseContextPropsProvider propsProvider) {
+  public StuAlertViewImpl(
+    SynapseReactClientFullContextPropsProvider propsProvider
+  ) {
     this.propsProvider = propsProvider;
   }
 

@@ -11,7 +11,7 @@ import org.gwtbootstrap3.client.ui.ButtonGroup;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.ForumSearchProps.OnSearchResultsVisibleHandler;
 
 public class ForumWidgetViewImpl implements ForumWidgetView {
@@ -87,7 +87,7 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
   Div newThreadButtonFlexContainer;
 
   private Presenter presenter;
-  private SynapseContextPropsProvider propsProvider;
+  private SynapseReactClientFullContextPropsProvider propsProvider;
   Widget widget;
 
   public interface Binder extends UiBinder<Widget, ForumWidgetViewImpl> {}
@@ -95,7 +95,7 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
   @Inject
   public ForumWidgetViewImpl(
     Binder binder,
-    SynapseContextPropsProvider propsProvider
+    SynapseReactClientFullContextPropsProvider propsProvider
   ) {
     widget = binder.createAndBindUi(this);
     this.propsProvider = propsProvider;

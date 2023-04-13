@@ -11,7 +11,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.presenter.TrashPresenter;
 import org.sagebionetworks.web.client.view.TrashView;
@@ -25,7 +25,7 @@ public class TrashPresenterTest {
   TrashView mockView;
 
   @Mock
-  SynapseContextPropsProvider mockPropsProvider;
+  SynapseReactClientFullContextPropsProvider mockPropsProvider;
 
   @Mock
   Trash mockPlace;

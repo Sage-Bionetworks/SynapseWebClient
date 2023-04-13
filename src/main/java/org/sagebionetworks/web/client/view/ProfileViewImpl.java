@@ -30,7 +30,7 @@ import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.jsinterop.EmptyProps;
 import org.sagebionetworks.web.client.jsinterop.React;
@@ -214,14 +214,14 @@ public class ProfileViewImpl extends Composite implements ProfileView {
   AnchorListItem loadingTeamsListItem = new AnchorListItem("Loading...");
 
   CookieProvider cookies;
-  SynapseContextPropsProvider propsProvider;
+  SynapseReactClientFullContextPropsProvider propsProvider;
 
   @Inject
   public ProfileViewImpl(
     ProfileViewImplUiBinder binder,
     Header headerWidget,
     CookieProvider cookies,
-    SynapseContextPropsProvider propsProvider
+    SynapseReactClientFullContextPropsProvider propsProvider
   ) {
     initWidget(binder.createAndBindUi(this));
     this.headerWidget = headerWidget;

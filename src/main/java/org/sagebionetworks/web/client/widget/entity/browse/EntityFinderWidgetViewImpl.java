@@ -17,7 +17,7 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.EntityFinderProps;
 import org.sagebionetworks.web.client.jsinterop.EntityFinderScope;
 import org.sagebionetworks.web.client.jsinterop.React;
@@ -37,7 +37,7 @@ public class EntityFinderWidgetViewImpl implements EntityFinderWidgetView {
 
   private SynapseJSNIUtils jsniUtils;
   private SynapseAlert synAlert;
-  private SynapseContextPropsProvider contextPropsProvider;
+  private SynapseReactClientFullContextPropsProvider contextPropsProvider;
 
   // the modal dialog
   private Modal modal;
@@ -68,7 +68,7 @@ public class EntityFinderWidgetViewImpl implements EntityFinderWidgetView {
     Binder uiBinder,
     SynapseJSNIUtils jsniUtils,
     SynapseAlert synAlert,
-    final SynapseContextPropsProvider propsProvider,
+    final SynapseReactClientFullContextPropsProvider propsProvider,
     final PopupUtilsView popupUtils
   ) {
     this.modal = (Modal) uiBinder.createAndBindUi(this);

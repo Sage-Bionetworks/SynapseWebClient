@@ -4,7 +4,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.IsWidget;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.jsinterop.EntityBadgeIconsProps;
-import org.sagebionetworks.web.client.jsinterop.SynapseContextProviderProps;
+import org.sagebionetworks.web.client.jsinterop.SynapseReactClientFullContextProviderProps;
 import org.sagebionetworks.web.client.widget.lazyload.SupportsLazyLoadInterface;
 
 public interface EntityBadgeView extends IsWidget, SupportsLazyLoadInterface {
@@ -22,7 +22,7 @@ public interface EntityBadgeView extends IsWidget, SupportsLazyLoadInterface {
 
   void setIcons(
     EntityBadgeIconsProps props,
-    SynapseContextProviderProps contextProps
+    SynapseReactClientFullContextProviderProps contextProps
   );
 
   void setError(String error);

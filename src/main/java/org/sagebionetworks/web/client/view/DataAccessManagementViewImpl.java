@@ -5,7 +5,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
@@ -17,7 +17,7 @@ public class DataAccessManagementViewImpl implements DataAccessManagementView {
   public interface DataAccessManagementViewImplUiBinder
     extends UiBinder<Widget, DataAccessManagementViewImpl> {}
 
-  private SynapseContextPropsProvider propsProvider;
+  private SynapseReactClientFullContextPropsProvider propsProvider;
   private Header headerWidget;
 
   @UiField
@@ -29,7 +29,7 @@ public class DataAccessManagementViewImpl implements DataAccessManagementView {
   public DataAccessManagementViewImpl(
     DataAccessManagementViewImplUiBinder binder,
     Header headerWidget,
-    SynapseContextPropsProvider propsProvider
+    SynapseReactClientFullContextPropsProvider propsProvider
   ) {
     widget = binder.createAndBindUi(this);
     this.headerWidget = headerWidget;

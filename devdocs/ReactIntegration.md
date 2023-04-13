@@ -40,20 +40,20 @@ While you can append your React component to any element, we have [ReactComponen
 
 ### Passing Synapse context
 
-If your application uses Synapse context (e.g. uses authentication to call the Synapse API), then you will also need to pass a context provider. To do so, you can inject [SynapseContextPropsProvider](../src/main/java/org/sagebionetworks/web/client/context/SynapseContextPropsProvider.java), which will create the wrapping context for you.
+If your application uses Synapse context (e.g. uses authentication to call the Synapse API), then you will also need to pass a context provider. To do so, you can inject [SynapseReactClientFullContextPropsProvider](../src/main/java/org/sagebionetworks/web/client/context/SynapseReactClientFullContextPropsProvider.java), which will create the wrapping context for you.
 
 ### Render the element
 
 How you manage updating your widget's view will vary based on the scenario, but when you're ready to render the component, this is all you have to do:
 
 ```java
-import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.React;
 
 class MyView {
 
   // Typically injected
-  SynapseContextPropsProvider propsProvider;
+  SynapseReactClientFullContextPropsProvider propsProvider;
 
   void renderComponent() {
     MyProps props = props.create(/**/);

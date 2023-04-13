@@ -2,7 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.IDUReportProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
@@ -13,12 +13,12 @@ public class IntendedDataUseReportWidgetViewImpl
   implements IntendedDataUseReportWidgetView {
 
   ReactComponentDiv reactComponent;
-  SynapseContextPropsProvider propsProvider;
+  SynapseReactClientFullContextPropsProvider propsProvider;
 
   @Inject
   public IntendedDataUseReportWidgetViewImpl(
     ReactComponentDiv reactComponent,
-    SynapseContextPropsProvider propsProvider
+    SynapseReactClientFullContextPropsProvider propsProvider
   ) {
     this.reactComponent = reactComponent;
     this.propsProvider = propsProvider;

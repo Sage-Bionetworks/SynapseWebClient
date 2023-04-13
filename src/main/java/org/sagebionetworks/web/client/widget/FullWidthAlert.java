@@ -10,8 +10,6 @@ import org.sagebionetworks.web.client.jsinterop.FullWidthAlertProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
-import org.sagebionetworks.web.client.jsinterop.SynapseContextJsObject;
-import org.sagebionetworks.web.client.jsinterop.SynapseContextProviderProps;
 
 public class FullWidthAlert implements IsWidget {
 

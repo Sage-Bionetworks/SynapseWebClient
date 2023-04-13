@@ -33,9 +33,9 @@ import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.EntityFinderScope;
-import org.sagebionetworks.web.client.jsni.SynapseContextProviderPropsJSNIObject;
+import org.sagebionetworks.web.client.jsni.FullContextProviderPropsJSNIObject;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
@@ -58,7 +58,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
   private boolean showEntityFinder;
   private Reference selectedReference;
   AuthenticationController authController;
-  SynapseContextPropsProvider propsProvider;
+  SynapseReactClientFullContextPropsProvider propsProvider;
   boolean isForm;
   JavaScriptObject formRef;
 
@@ -173,7 +173,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
     EvaluationList evaluationList,
     PortalGinInjector ginInjector,
     AuthenticationController authController,
-    SynapseContextPropsProvider propsProvider
+    SynapseReactClientFullContextPropsProvider propsProvider
   ) {
     widget = binder.createAndBindUi(this);
     this.entityFinderBuilder = entityFinderBuilder;
@@ -427,7 +427,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
     String jsonSchemaSynId,
     String uiSchemaSynId,
     EvaluationSubmitterViewImpl view,
-    SynapseContextProviderPropsJSNIObject wrapperProps
+    FullContextProviderPropsJSNIObject wrapperProps
   ) /*-{
 		try {
 			view.@org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitterViewImpl::formRef = $wnd.React
@@ -451,7 +451,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 			};
 
 			var component = $wnd.React.createElement($wnd.SRC.SynapseComponents.EntityForm, props, null);
-			var wrapper = $wnd.React.createElement($wnd.SRC.SynapseContext.SynapseContextProvider, wrapperProps, component);
+			var wrapper = $wnd.React.createElement($wnd.SRC.SynapseContext.FullContextProvider, wrapperProps, component);
             reactComponentDiv.@org.sagebionetworks.web.client.widget.ReactComponentDiv::render(Lorg/sagebionetworks/web/client/jsinterop/ReactNode;)(wrapper);
 		} catch (err) {
 			console.error(err);

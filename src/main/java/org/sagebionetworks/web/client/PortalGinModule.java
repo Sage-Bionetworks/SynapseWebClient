@@ -20,8 +20,8 @@ import org.sagebionetworks.web.client.cache.StorageImpl;
 import org.sagebionetworks.web.client.cache.StorageWrapper;
 import org.sagebionetworks.web.client.context.QueryClientProvider;
 import org.sagebionetworks.web.client.context.QueryClientProviderImpl;
-import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
-import org.sagebionetworks.web.client.context.SynapseContextPropsProviderImpl;
+import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
+import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProviderImpl;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.cookie.GWTCookieImpl;
 import org.sagebionetworks.web.client.presenter.DownPresenter;
@@ -1610,8 +1610,8 @@ public class PortalGinModule extends AbstractGinModule {
       .to(EntityFinderWidgetImpl.Builder.class);
 
     bind(EntityFinderWidgetView.class).to(EntityFinderWidgetViewImpl.class);
-    bind(SynapseContextPropsProvider.class)
-      .to(SynapseContextPropsProviderImpl.class);
+    bind(SynapseReactClientFullContextPropsProvider.class)
+      .to(SynapseReactClientFullContextPropsProviderImpl.class);
 
     bind(AddToDownloadListV2.class).to(AddToDownloadListV2Impl.class);
     bind(OpenDataView.class).to(OpenDataViewImpl.class);

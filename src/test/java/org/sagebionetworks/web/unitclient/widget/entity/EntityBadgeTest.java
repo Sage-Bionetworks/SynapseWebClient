@@ -43,7 +43,7 @@ import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
-import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.jsinterop.EntityBadgeIconsProps;
@@ -106,7 +106,7 @@ public class EntityBadgeTest {
   CookieProvider mockCookies;
 
   @Mock
-  SynapseContextPropsProvider propsProvider;
+  SynapseReactClientFullContextPropsProvider propsProvider;
 
   @Captor
   ArgumentCaptor<EntityBadgeIconsProps> iconsPropsArgumentCaptor;

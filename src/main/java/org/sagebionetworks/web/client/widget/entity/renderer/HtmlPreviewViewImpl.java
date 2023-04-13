@@ -6,7 +6,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.HtmlPreviewProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
@@ -27,12 +27,12 @@ public class HtmlPreviewViewImpl implements HtmlPreviewView {
   ReactComponentDiv container;
 
   Widget w;
-  SynapseContextPropsProvider propsProvider;
+  SynapseReactClientFullContextPropsProvider propsProvider;
 
   @Inject
   public HtmlPreviewViewImpl(
     Binder binder,
-    SynapseContextPropsProvider propsProvider
+    SynapseReactClientFullContextPropsProvider propsProvider
   ) {
     w = binder.createAndBindUi(this);
     this.propsProvider = propsProvider;

@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.jsinterop;
 import jsinterop.annotations.JsOverlay;
 import jsinterop.annotations.JsPackage;
 import jsinterop.annotations.JsType;
+import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 
 @JsType(isNative = true, namespace = JsPackage.GLOBAL)
 public class React {
@@ -35,7 +36,7 @@ public class React {
     ReactComponentType<P> component,
     P props
   ) {
-    SynapseContextProviderProps emptyContext = SynapseContextProviderProps.create(
+    SynapseReactClientFullContextProviderProps emptyContext = SynapseReactClientFullContextProviderProps.create(
       SynapseContextJsObject.create(null, false, false),
       null
     );
@@ -46,7 +47,7 @@ public class React {
    * Wraps a component in SynapseContextProvider. Nearly all Synapse React Client components must be wrapped in this context, so this utility
    * simplifies creating the wrapper.
    *
-   * For setting props, use {@link org.sagebionetworks.web.client.context.SynapseContextPropsProvider}
+   * For setting props, use {@link SynapseReactClientFullContextPropsProvider}
    * @param component
    * @param props
    * @param wrapperProps
@@ -59,11 +60,11 @@ public class React {
   > ReactNode createElementWithSynapseContext(
     ReactComponentType<P> component,
     P props,
-    SynapseContextProviderProps wrapperProps
+    SynapseReactClientFullContextProviderProps wrapperProps
   ) {
     ReactNode componentElement = createElement(component, props);
     return createElement(
-      SRC.SynapseContext.SynapseContextProvider,
+      SRC.SynapseContext.FullContextProvider,
       wrapperProps,
       componentElement
     );

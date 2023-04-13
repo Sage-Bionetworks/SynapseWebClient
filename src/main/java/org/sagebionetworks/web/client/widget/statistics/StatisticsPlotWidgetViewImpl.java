@@ -4,19 +4,16 @@ import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
-import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseProperties;
-import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
-import org.sagebionetworks.web.client.jsinterop.SynapseContextProviderProps;
-import org.sagebionetworks.web.client.jsni.SynapseContextProviderPropsJSNIObject;
+import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
+import org.sagebionetworks.web.client.jsni.FullContextProviderPropsJSNIObject;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 
 public class StatisticsPlotWidgetViewImpl
@@ -43,7 +40,7 @@ public class StatisticsPlotWidgetViewImpl
 
   Widget widget;
   SynapseJSNIUtils jsniUtils;
-  SynapseContextPropsProvider propsProvider;
+  SynapseReactClientFullContextPropsProvider propsProvider;
   String endpoint;
 
   @Inject
@@ -51,7 +48,7 @@ public class StatisticsPlotWidgetViewImpl
     StatisticsPlotWidgetViewImplUiBinder binder,
     SynapseJSNIUtils jsniUtils,
     SynapseProperties synapseProperties,
-    SynapseContextPropsProvider propsProvider
+    SynapseReactClientFullContextPropsProvider propsProvider
   ) {
     widget = binder.createAndBindUi(this);
     this.jsniUtils = jsniUtils;
@@ -79,7 +76,7 @@ public class StatisticsPlotWidgetViewImpl
     String projectId,
     String accessToken,
     String fullRepoEndpoint,
-    SynapseContextProviderPropsJSNIObject wrapperProps
+    FullContextProviderPropsJSNIObject wrapperProps
   ) /*-{
 		try {
 			// URL.host returns the domain (that is the hostname) followed by (if a port was specified) a ':' and the port of the URL
@@ -98,7 +95,7 @@ public class StatisticsPlotWidgetViewImpl
 			}
 
 			var component = $wnd.React.createElement($wnd.SRC.SynapseComponents.StatisticsPlot, props, null)
-			var wrapper = $wnd.React.createElement($wnd.SRC.SynapseContext.SynapseContextProvider, wrapperProps, component)
+			var wrapper = $wnd.React.createElement($wnd.SRC.SynapseContext.FullContextProvider, wrapperProps, component)
 			reactComponentDiv.@org.sagebionetworks.web.client.widget.ReactComponentDiv::render(Lorg/sagebionetworks/web/client/jsinterop/ReactNode;)(wrapper);
 		} catch (err) {
 			console.error(err);

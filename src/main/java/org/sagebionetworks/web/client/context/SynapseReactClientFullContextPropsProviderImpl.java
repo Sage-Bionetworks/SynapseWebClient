@@ -5,14 +5,14 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.jsinterop.SynapseContextJsObject;
-import org.sagebionetworks.web.client.jsinterop.SynapseContextProviderProps;
+import org.sagebionetworks.web.client.jsinterop.SynapseReactClientFullContextProviderProps;
+import org.sagebionetworks.web.client.jsni.FullContextProviderPropsJSNIObject;
 import org.sagebionetworks.web.client.jsni.QueryClientJSNIObject;
-import org.sagebionetworks.web.client.jsni.SynapseContextJSNIObject;
-import org.sagebionetworks.web.client.jsni.SynapseContextProviderPropsJSNIObject;
+import org.sagebionetworks.web.client.jsni.SynapseReactClientFullContextJSNIObject;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 
-public class SynapseContextPropsProviderImpl
-  implements SynapseContextPropsProvider {
+public class SynapseReactClientFullContextPropsProviderImpl
+  implements SynapseReactClientFullContextPropsProvider {
 
   private AuthenticationController authController;
   private GlobalApplicationState globalApplicationState;
@@ -20,7 +20,7 @@ public class SynapseContextPropsProviderImpl
   private QueryClientProvider queryClientProvider;
 
   @Inject
-  SynapseContextPropsProviderImpl(
+  SynapseReactClientFullContextPropsProviderImpl(
     final AuthenticationController authController,
     final GlobalApplicationState globalApplicationState,
     final CookieProvider cookies,
@@ -33,8 +33,8 @@ public class SynapseContextPropsProviderImpl
   }
 
   @Override
-  public SynapseContextProviderProps getJsInteropContextProps() {
-    return SynapseContextProviderProps.create(
+  public SynapseReactClientFullContextProviderProps getJsInteropContextProps() {
+    return SynapseReactClientFullContextProviderProps.create(
       SynapseContextJsObject.create(
         authController.getCurrentUserAccessToken(),
         DisplayUtils.isInTestWebsite(cookies),
@@ -45,15 +45,15 @@ public class SynapseContextPropsProviderImpl
   }
 
   @Override
-  public SynapseContextProviderPropsJSNIObject getJsniContextProps() {
-    SynapseContextJSNIObject synapseContext = SynapseContextJSNIObject.create();
+  public FullContextProviderPropsJSNIObject getJsniContextProps() {
+    SynapseReactClientFullContextJSNIObject synapseContext = SynapseReactClientFullContextJSNIObject.create();
     synapseContext.setAccessToken(authController.getCurrentUserAccessToken());
     synapseContext.setIsInExperimentalMode(
       DisplayUtils.isInTestWebsite(cookies)
     );
     synapseContext.setUtcTime(globalApplicationState.isShowingUTCTime());
 
-    SynapseContextProviderPropsJSNIObject props = SynapseContextProviderPropsJSNIObject.create();
+    FullContextProviderPropsJSNIObject props = FullContextProviderPropsJSNIObject.create();
     props.setSynapseContext(synapseContext);
     props.setQueryClient(QueryClientJSNIObject.getQueryClientSingleton());
     return props;

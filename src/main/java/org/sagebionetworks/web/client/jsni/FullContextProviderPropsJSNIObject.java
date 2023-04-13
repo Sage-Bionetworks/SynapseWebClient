@@ -3,20 +3,20 @@ package org.sagebionetworks.web.client.jsni;
 import com.google.gwt.core.client.JavaScriptObject;
 
 /**
- * JSNI-compatible object for SynapseContextProvider props.
+ * JSNI-compatible object for FullContextProvider props.
  *
  * If you're porting a new React component, please consider using JsInterop before using this object.
  */
-public class SynapseContextProviderPropsJSNIObject extends JavaScriptObject {
+public class FullContextProviderPropsJSNIObject extends JavaScriptObject {
 
-  protected SynapseContextProviderPropsJSNIObject() {}
+  protected FullContextProviderPropsJSNIObject() {}
 
-  public static native SynapseContextProviderPropsJSNIObject create() /*-{
+  public static native FullContextProviderPropsJSNIObject create() /*-{
         return {};
     }-*/;
 
   public final native void setSynapseContext(
-    SynapseContextJSNIObject context
+    SynapseReactClientFullContextJSNIObject context
   ) /*-{
         this.synapseContext = context;
     }-*/;

@@ -16,7 +16,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.jsinterop.EntityBadgeIconsProps;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -42,7 +42,7 @@ public class EntityBadge
   private final PopupUtilsView popupUtils;
   private final EventBus eventBus;
   private ClickHandler customClickHandler;
-  private final SynapseContextPropsProvider propsProvider;
+  private final SynapseReactClientFullContextPropsProvider propsProvider;
 
   private final EntityBadgeIconsProps.OnUnlinkSuccess onUnlinkSuccess;
   private final EntityBadgeIconsProps.OnUnlinkError onUnlinkError;
@@ -56,7 +56,7 @@ public class EntityBadge
     PopupUtilsView popupUtils,
     EventBus eventBus,
     AuthenticationController authController,
-    SynapseContextPropsProvider propsProvider
+    SynapseReactClientFullContextPropsProvider propsProvider
   ) {
     this.view = view;
     this.globalAppState = globalAppState;

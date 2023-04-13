@@ -19,7 +19,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.JSON;
 import org.sagebionetworks.web.client.jsinterop.MenuAction;
 import org.sagebionetworks.web.client.jsinterop.React;
@@ -47,7 +47,7 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
   boolean showCardOnHover = true;
   AdapterFactory adapterFactory;
   SynapseJSNIUtils jsniUtils;
-  SynapseContextPropsProvider propsProvider;
+  SynapseReactClientFullContextPropsProvider propsProvider;
   BadgeType badgeType = BadgeType.SMALL_CARD;
   AvatarSize avatarSize = AvatarSize.MEDIUM;
   FocusPanel userBadgeContainer = new FocusPanel();
@@ -62,7 +62,7 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
     SynapseJSNIUtils jsniUtils,
     AdapterFactory adapterFactory,
     AuthenticationController authController,
-    final SynapseContextPropsProvider propsProvider
+    final SynapseReactClientFullContextPropsProvider propsProvider
   ) {
     placeChanger = globalAppState.getPlaceChanger();
     this.adapterFactory = adapterFactory;

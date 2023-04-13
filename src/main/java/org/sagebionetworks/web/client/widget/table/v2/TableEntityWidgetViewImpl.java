@@ -14,7 +14,7 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnQueryCallback;
 import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnQueryResultBundleCallback;
 import org.sagebionetworks.web.client.jsinterop.React;
@@ -80,7 +80,7 @@ public class TableEntityWidgetViewImpl
   EntityViewScopeWidget scopeWidget;
   SubmissionViewScopeWidget submissionViewScopeWidget;
   TableEntityWidgetView.Presenter presenter;
-  SynapseContextPropsProvider propsProvider;
+  SynapseReactClientFullContextPropsProvider propsProvider;
 
   @Inject
   public TableEntityWidgetViewImpl(
@@ -88,7 +88,7 @@ public class TableEntityWidgetViewImpl
     PortalGinInjector ginInjector,
     EntityViewScopeWidget scopeWidget,
     SubmissionViewScopeWidget submissionViewScopeWidget,
-    SynapseContextPropsProvider propsProvider
+    SynapseReactClientFullContextPropsProvider propsProvider
   ) {
     initWidget(uiBinder.createAndBindUi(this));
     this.ginInjector = ginInjector;
