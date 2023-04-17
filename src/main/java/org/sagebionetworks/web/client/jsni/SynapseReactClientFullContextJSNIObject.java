@@ -7,11 +7,11 @@ import com.google.gwt.core.client.JavaScriptObject;
  *
  * If you're porting a new React component, please consider using JsInterop before using this object.
  */
-public class SynapseContextJSNIObject extends JavaScriptObject {
+public class SynapseReactClientFullContextJSNIObject extends JavaScriptObject {
 
-  protected SynapseContextJSNIObject() {}
+  protected SynapseReactClientFullContextJSNIObject() {}
 
-  public static native SynapseContextJSNIObject create() /*-{
+  public static native SynapseReactClientFullContextJSNIObject create() /*-{
         return {};
     }-*/;
 

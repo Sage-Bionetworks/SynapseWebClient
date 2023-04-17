@@ -22,7 +22,7 @@ import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.jsinterop.AccountLevelBadgeProps;
 import org.sagebionetworks.web.client.jsinterop.React;
@@ -140,7 +140,7 @@ public class UserProfileEditorWidgetViewImpl
   com.google.gwt.user.client.ui.TextBoxBase locationTextBox;
   boolean isEditing = false;
   SynapseJSNIUtils jsniUtils;
-  SynapseContextPropsProvider propsProvider;
+  SynapseReactClientFullContextPropsProvider propsProvider;
   Presenter presenter;
   String originalButtonText;
   CookieProvider cookies;
@@ -152,7 +152,7 @@ public class UserProfileEditorWidgetViewImpl
     GlobalApplicationState globalAppState,
     AuthenticationController authController,
     SynapseJSNIUtils jsniUtils,
-    SynapseContextPropsProvider propsProvider,
+    SynapseReactClientFullContextPropsProvider propsProvider,
     CookieProvider cookies
   ) {
     widget = binder.createAndBindUi(this);

@@ -75,6 +75,8 @@ public class SRC {
   @JsType(isNative = true)
   public static class SynapseContext {
 
-    public static ReactComponentType<SynapseContextProviderProps> SynapseContextProvider;
+    /* We use FullContextProvider because it will provide the SynapseContext, react-query QueryContext, and MUI Theme
+     context for all React trees that we render */
+    public static ReactComponentType<SynapseReactClientFullContextProviderProps> FullContextProvider;
   }
 }

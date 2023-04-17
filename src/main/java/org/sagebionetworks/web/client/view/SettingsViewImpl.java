@@ -33,7 +33,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
@@ -215,7 +215,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
     SettingsViewImplUiBinder binder,
     final SynapseJSNIUtils jsniUtils,
     final GlobalApplicationState globalApplicationState,
-    final SynapseContextPropsProvider propsProvider
+    final SynapseReactClientFullContextPropsProvider propsProvider
   ) {
     initWidget(binder.createAndBindUi(this));
     ClickHandler notificationsClickHandler = getNotificationsClickHandler();

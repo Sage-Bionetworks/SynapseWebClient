@@ -19,7 +19,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
@@ -65,13 +65,13 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 
   private Presenter presenter;
   String portalHref = "";
-  SynapseContextPropsProvider propsProvider;
+  SynapseReactClientFullContextPropsProvider propsProvider;
   PortalGinInjector ginInjector;
 
   @Inject
   public HeaderViewImpl(
     Binder binder,
-    SynapseContextPropsProvider propsProvider,
+    SynapseReactClientFullContextPropsProvider propsProvider,
     PortalGinInjector ginInjector
   ) {
     this.initWidget(binder.createAndBindUi(this));

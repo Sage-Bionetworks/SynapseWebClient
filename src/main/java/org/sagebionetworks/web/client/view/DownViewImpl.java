@@ -4,7 +4,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.ErrorPageProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
@@ -17,7 +17,7 @@ public class DownViewImpl implements DownView {
   public static final String SYNAPSE_DOWN_MAINTENANCE_TITLE =
     "Sorry, Synapse is down for maintenance.";
   private Header headerWidget;
-  private SynapseContextPropsProvider propsProvider;
+  private SynapseReactClientFullContextPropsProvider propsProvider;
 
   @UiField
   ReactComponentDiv srcDownContainer;
@@ -38,7 +38,7 @@ public class DownViewImpl implements DownView {
   public DownViewImpl(
     Binder uiBinder,
     Header headerWidget,
-    final SynapseContextPropsProvider propsProvider
+    final SynapseReactClientFullContextPropsProvider propsProvider
   ) {
     widget = uiBinder.createAndBindUi(this);
     this.headerWidget = headerWidget;

@@ -9,7 +9,7 @@ import com.google.inject.Inject;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.jsinterop.TwoFactorBackupCodesProps;
@@ -30,7 +30,7 @@ public class TwoFactorAuthViewImpl
   private Presenter presenter;
   private Header headerWidget;
   SynapseJSNIUtils jsniUtils;
-  SynapseContextPropsProvider propsProvider;
+  SynapseReactClientFullContextPropsProvider propsProvider;
 
   public interface LoginViewImplBinder
     extends UiBinder<Widget, TwoFactorAuthViewImpl> {}
@@ -40,7 +40,7 @@ public class TwoFactorAuthViewImpl
     LoginViewImplBinder uiBinder,
     Header headerWidget,
     SynapseJSNIUtils jsniUtils,
-    SynapseContextPropsProvider propsProvider
+    SynapseReactClientFullContextPropsProvider propsProvider
   ) {
     initWidget(uiBinder.createAndBindUi(this));
     this.headerWidget = headerWidget;

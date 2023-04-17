@@ -6,7 +6,7 @@ import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.DownloadConfirmationProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
@@ -15,7 +15,7 @@ import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 
 public class AddToDownloadListV2Impl implements AddToDownloadListV2 {
 
-  private SynapseContextPropsProvider propsProvider;
+  private SynapseReactClientFullContextPropsProvider propsProvider;
 
   ReactComponentDiv container = new ReactComponentDiv();
 
@@ -25,7 +25,7 @@ public class AddToDownloadListV2Impl implements AddToDownloadListV2 {
 
   @Inject
   public AddToDownloadListV2Impl(
-    SynapseContextPropsProvider propsProvider,
+    SynapseReactClientFullContextPropsProvider propsProvider,
     JSONObjectAdapter adapter
   ) {
     this.propsProvider = propsProvider;

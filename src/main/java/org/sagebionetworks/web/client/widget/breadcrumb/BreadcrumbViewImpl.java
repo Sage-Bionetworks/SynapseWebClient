@@ -5,7 +5,7 @@ import com.google.inject.Inject;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.BreadcrumbItem;
 import org.sagebionetworks.web.client.jsinterop.EntityPageBreadcrumbsProps;
 import org.sagebionetworks.web.client.jsinterop.React;
@@ -16,12 +16,14 @@ import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 
 public class BreadcrumbViewImpl implements BreadcrumbView {
 
-  private final SynapseContextPropsProvider propsProvider;
+  private final SynapseReactClientFullContextPropsProvider propsProvider;
   ReactComponentDiv container;
   private Presenter presenter;
 
   @Inject
-  public BreadcrumbViewImpl(SynapseContextPropsProvider propsProvider) {
+  public BreadcrumbViewImpl(
+    SynapseReactClientFullContextPropsProvider propsProvider
+  ) {
     this.propsProvider = propsProvider;
     container = new ReactComponentDiv();
   }

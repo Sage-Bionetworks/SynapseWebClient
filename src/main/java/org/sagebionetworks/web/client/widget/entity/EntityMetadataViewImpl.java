@@ -16,7 +16,7 @@ import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.jsinterop.EntityModalProps;
 import org.sagebionetworks.web.client.jsinterop.React;
@@ -40,7 +40,7 @@ public class EntityMetadataViewImpl
   private String entityId;
   private Long versionNumber;
   private CookieProvider cookies;
-  private SynapseContextPropsProvider propsProvider;
+  private SynapseReactClientFullContextPropsProvider propsProvider;
 
   @UiField
   HTMLPanel detailedMetadata;
@@ -93,7 +93,7 @@ public class EntityMetadataViewImpl
   @Inject
   public EntityMetadataViewImpl(
     final SynapseJSNIUtils jsniUtils,
-    final SynapseContextPropsProvider propsProvider
+    final SynapseReactClientFullContextPropsProvider propsProvider
   ) {
     this.propsProvider = propsProvider;
     initWidget(uiBinder.createAndBindUi(this));

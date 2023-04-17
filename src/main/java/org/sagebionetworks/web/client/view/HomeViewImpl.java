@@ -6,7 +6,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
@@ -25,13 +25,13 @@ public class HomeViewImpl extends Composite implements HomeView {
   private static final String PROJECT_VIEW_ID = "syn23593547.3";
 
   private Header headerWidget;
-  private SynapseContextPropsProvider propsProvider;
+  private SynapseReactClientFullContextPropsProvider propsProvider;
 
   @Inject
   public HomeViewImpl(
     HomeViewImplUiBinder binder,
     Header headerWidget,
-    final SynapseContextPropsProvider propsProvider
+    final SynapseReactClientFullContextPropsProvider propsProvider
   ) {
     initWidget(binder.createAndBindUi(this));
 

@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.view;
 
-import com.google.gwt.dom.client.Element;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
@@ -13,12 +12,11 @@ import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.context.SynapseContextPropsProvider;
+import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.jsinterop.TermsAndConditionsProps;
-import org.sagebionetworks.web.client.jsni.SynapseContextProviderPropsJSNIObject;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.FullWidthAlert;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
@@ -62,7 +60,7 @@ public class LoginViewImpl extends Composite implements LoginView {
   private LoginWidget loginWidget;
   private Header headerWidget;
   SynapseJSNIUtils jsniUtils;
-  SynapseContextPropsProvider propsProvider;
+  SynapseReactClientFullContextPropsProvider propsProvider;
   PageProgressWidget pageProgressWidget;
   Callback backBtnCallback, forwardBtnCallback;
 
@@ -76,7 +74,7 @@ public class LoginViewImpl extends Composite implements LoginView {
     LoginWidget loginWidget,
     SynapseJSNIUtils jsniUtils,
     PageProgressWidget pageProgressWidget,
-    SynapseContextPropsProvider propsProvider
+    SynapseReactClientFullContextPropsProvider propsProvider
   ) {
     initWidget(uiBinder.createAndBindUi(this));
     this.loginWidget = loginWidget;
