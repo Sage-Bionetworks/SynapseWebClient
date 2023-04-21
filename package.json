@@ -8,6 +8,7 @@
     "jsplumb": "2.13.2",
     "moment": "^2.29.4",
     "pica": "6.0.0",
+    "plotly.js": "^1.58.4",
     "prop-types": "^15.6.2",
     "react": "18.2.0",
     "react-bootstrap": "^1.0.0-beta.12",

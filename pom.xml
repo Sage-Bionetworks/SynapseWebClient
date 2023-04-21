@@ -465,6 +465,10 @@
                   file="${project.basedir}/node_modules/font-awesome/fonts/fontawesome-webfont.ttf"
                   tofile="src/main/webapp/fonts/fontawesome-webfont.ttf"
                 />
+                <copy
+                  file="${project.basedir}/node_modules/plotly.js/dist/plotly.min.js"
+                  tofile="src/main/webapp/generated/plotly.min.js"
+                />
                 <!-- Copy development versions of some key dependencies for devmode debugging -->
                 <copy
                   file="${project.basedir}/node_modules/react/umd/react.development.js"
