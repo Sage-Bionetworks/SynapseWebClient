@@ -8,6 +8,7 @@
     "jsplumb": "2.13.2",
     "moment": "^2.29.4",
     "pica": "6.0.0",
+    "plotly.js": "^1.58.4",
     "prop-types": "^15.6.2",
     "react": "18.2.0",
     "react-bootstrap": "^1.0.0-beta.12",
@@ -17,7 +18,7 @@
     "react-router-dom": "^5.3.3",
     "react-transition-group": "2.6.0",
     "sass": "1.36.0",
-    "synapse-react-client": "3.1.30",
+    "synapse-react-client": "3.1.31",
     "universal-cookie": "^4.0.3"
   },
   "devDependencies": {
