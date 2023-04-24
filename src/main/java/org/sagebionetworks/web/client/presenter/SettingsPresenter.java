@@ -257,9 +257,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
     view.setApiKeySettingsVisible(
       DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider())
     );
-    view.setOauthClientSettingsVisible(
-      DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider())
-    );
+    view.setOauthClientSettingsVisible(true);
 
     if (DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider())) {
       view.setTwoFactorAuthSettingsVisible(true);
