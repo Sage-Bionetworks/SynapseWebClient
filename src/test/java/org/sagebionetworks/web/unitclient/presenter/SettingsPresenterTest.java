@@ -760,21 +760,7 @@ public class SettingsPresenterTest {
   }
 
   @Test
-  public void testOauthClientSettingsHidden() {
-    when(
-      mockCookieProvider.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)
-    )
-      .thenReturn(null);
-    presenter.configure();
-    verify(mockView).setOauthClientSettingsVisible(false);
-  }
-
-  @Test
-  public void testOauthClientSettingsShownInExperimentalMode() {
-    when(
-      mockCookieProvider.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)
-    )
-      .thenReturn("true");
+  public void testOauthClientSettingsShown() {
     presenter.configure();
     verify(mockView).setOauthClientSettingsVisible(true);
   }
