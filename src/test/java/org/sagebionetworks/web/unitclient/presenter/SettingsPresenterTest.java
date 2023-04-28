@@ -766,40 +766,8 @@ public class SettingsPresenterTest {
   }
 
   @Test
-  public void testTwoFactorAuthSettingsHidden() {
-    when(
-      mockCookieProvider.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)
-    )
-      .thenReturn(null);
-    presenter.configure();
-    verify(mockView).setTwoFactorAuthSettingsVisible(false);
-  }
-
-  @Test
-  public void testTwoFactorAuthSettingsShownInExperimentalMode() {
-    when(
-      mockCookieProvider.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)
-    )
-      .thenReturn("true");
+  public void testTwoFactorAuthSettingsShown() {
     presenter.configure();
     verify(mockView).setTwoFactorAuthSettingsVisible(true);
-  }
-
-  @Test
-  public void testTwoFactorAuthSettingsShownIfEnabled() {
-    TwoFactorAuthStatus enabledStatus = new TwoFactorAuthStatus();
-    enabledStatus.setStatus(TwoFactorState.ENABLED);
-
-    when(mockSynapseJavascriptClient.getTwoFactorAuthStatusForCurrentUser())
-      .thenReturn(getDoneFuture(enabledStatus));
-    when(
-      mockCookieProvider.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)
-    )
-      .thenReturn(null);
-
-    presenter.configure();
-
-    verify(mockView).setTwoFactorAuthSettingsVisible(true);
-    verify(mockSynapseJavascriptClient).getTwoFactorAuthStatusForCurrentUser();
   }
 }
