@@ -33,6 +33,9 @@ public class CreateManagedACTAccessRequirementStep2ViewImpl
   CheckBox validatedCheckbox;
 
   @UiField
+  CheckBox twoFaRequiredCheckbox;
+
+  @UiField
   CheckBox ducCheckbox;
 
   @UiField
@@ -130,6 +133,11 @@ public class CreateManagedACTAccessRequirementStep2ViewImpl
   }
 
   @Override
+  public void setIsTwoFactorAuthRequired(boolean value) {
+    twoFaRequiredCheckbox.setValue(value);
+  }
+
+  @Override
   public boolean areOtherAttachmentsRequired() {
     return otherAttachmentsCheckbox.getValue();
   }
@@ -162,6 +170,11 @@ public class CreateManagedACTAccessRequirementStep2ViewImpl
   @Override
   public boolean isValidatedProfileRequired() {
     return validatedCheckbox.getValue();
+  }
+
+  @Override
+  public boolean isTwoFactorAuthRequired() {
+    return twoFaRequiredCheckbox.getValue();
   }
 
   @Override

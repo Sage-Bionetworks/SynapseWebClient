@@ -135,6 +135,7 @@ public class CreateManagedACTAccessRequirementStep2
     view.setIsValidatedProfileRequired(
       accessRequirement.getIsValidatedProfileRequired()
     );
+    view.setIsTwoFactorAuthRequired(accessRequirement.getIsTwoFaRequired());
     view.setIsIDURequired(accessRequirement.getIsIDURequired());
   }
 
@@ -195,6 +196,7 @@ public class CreateManagedACTAccessRequirementStep2
     accessRequirement.setIsValidatedProfileRequired(
       view.isValidatedProfileRequired()
     );
+    accessRequirement.setIsTwoFaRequired(view.isTwoFactorAuthRequired());
     // create/update access requirement
     synapseClient.createOrUpdateAccessRequirement(
       accessRequirement,
