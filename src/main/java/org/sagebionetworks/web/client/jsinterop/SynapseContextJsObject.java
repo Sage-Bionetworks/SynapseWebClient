@@ -11,6 +11,7 @@ public class SynapseContextJsObject {
   @JsNullable
   public String accessToken;
 
+  public String downloadCartPageUrl;
   public boolean isInExperimentalMode;
   public boolean utcTime;
 
@@ -24,6 +25,7 @@ public class SynapseContextJsObject {
     context.accessToken = accessToken;
     context.isInExperimentalMode = isInExperimentalMode;
     context.utcTime = utcTime;
+    context.downloadCartPageUrl = "/#!DownloadCart:0";
     return context;
   }
 }
