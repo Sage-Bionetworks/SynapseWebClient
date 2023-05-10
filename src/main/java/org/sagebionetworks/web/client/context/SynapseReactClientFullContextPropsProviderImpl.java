@@ -52,6 +52,7 @@ public class SynapseReactClientFullContextPropsProviderImpl
       DisplayUtils.isInTestWebsite(cookies)
     );
     synapseContext.setUtcTime(globalApplicationState.isShowingUTCTime());
+    synapseContext.setDownloadCartPageUrl("/#!DownloadCart:0");
 
     FullContextProviderPropsJSNIObject props = FullContextProviderPropsJSNIObject.create();
     props.setSynapseContext(synapseContext);
