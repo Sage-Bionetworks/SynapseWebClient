@@ -28,4 +28,10 @@ public class SynapseReactClientFullContextJSNIObject extends JavaScriptObject {
   public final native void setUtcTime(boolean utcTime) /*-{
         this.utcTime = utcTime;
     }-*/;
+
+  public final native void setDownloadCartPageUrl(
+    String downloadCartPageUrl
+  ) /*-{
+  	this.downloadCartPageUrl = downloadCartPageUrl;
+	}-*/;
 }
