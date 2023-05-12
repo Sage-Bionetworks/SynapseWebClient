@@ -27,11 +27,15 @@
               <b:FormLabel>Accessor requirements</b:FormLabel>
               <b:CheckBox
                 ui:field="certifiedCheckbox"
-                text="Data Requestors must be certified."
+                text="Accessors must be certified."
               />
               <b:CheckBox
                 ui:field="validatedCheckbox"
-                text="Data Requestors must have a validated profile."
+                text="Accessors must have a validated profile."
+              />
+              <b:CheckBox
+                ui:field="twoFaRequiredCheckbox"
+                text="Accessors must use two-factor authentication (2FA)."
               />
             </b:FormGroup>
             <b:FormGroup>

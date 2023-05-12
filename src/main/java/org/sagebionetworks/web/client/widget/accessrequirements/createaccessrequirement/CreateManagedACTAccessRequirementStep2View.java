@@ -23,6 +23,8 @@ public interface CreateManagedACTAccessRequirementStep2View extends IsWidget {
 
   void setIsValidatedProfileRequired(boolean value);
 
+  void setIsTwoFactorAuthRequired(boolean value);
+
   boolean areOtherAttachmentsRequired();
 
   String getExpirationPeriod();
@@ -36,6 +38,8 @@ public interface CreateManagedACTAccessRequirementStep2View extends IsWidget {
   boolean isIRBApprovalRequired();
 
   boolean isValidatedProfileRequired();
+
+  boolean isTwoFactorAuthRequired();
 
   void setWikiPageRenderer(IsWidget w);
 
