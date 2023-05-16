@@ -45,6 +45,8 @@ public class CORSFilter extends OncePerRequestFilter {
     "cancercomplexity",
     "staging.cancercomplexity",
     "www.cancercomplexity",
+    "challenges",
+    "staging.challenges",
     "covidrecoverycorpsresearcher",
     "staging.covidrecoverycorpsresearcher",
     "csbc-pson",
