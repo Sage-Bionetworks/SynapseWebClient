@@ -1,5 +1,9 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
+import com.google.gwt.dom.client.Document;
+import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.ScriptElement;
+import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Button;
@@ -81,6 +85,7 @@ public class TableEntityWidgetViewImpl
   SubmissionViewScopeWidget submissionViewScopeWidget;
   TableEntityWidgetView.Presenter presenter;
   SynapseReactClientFullContextPropsProvider propsProvider;
+  ScriptElement datasetScriptElement;
 
   @Inject
   public TableEntityWidgetViewImpl(
@@ -104,6 +109,16 @@ public class TableEntityWidgetViewImpl
     );
     scopeCollapseCloseButton.addClickHandler(event ->
       this.presenter.toggleScopeCollapse()
+    );
+    addAttachHandler(
+      new AttachEvent.Handler() {
+        @Override
+        public void onAttachOrDetach(AttachEvent event) {
+          if (!event.isAttached()) {
+            removeDatasetJsonLdElement();
+          }
+        }
+      }
     );
   }
 
@@ -231,5 +246,24 @@ public class TableEntityWidgetViewImpl
   @Override
   public void setQueryWrapperPlotNavVisible(boolean visible) {
     plotNavContainer.setVisible(visible);
+  }
+
+  @Override
+  public void removeDatasetJsonLdElement() {
+    if (datasetScriptElement != null) {
+      Element head = Document.get().getElementsByTagName("head").getItem(0);
+      head.removeChild(datasetScriptElement);
+      datasetScriptElement = null;
+    }
+  }
+
+  @Override
+  public void injectDatasetJsonLd(String elementContent) {
+    removeDatasetJsonLdElement();
+    Element head = Document.get().getElementsByTagName("head").getItem(0);
+    datasetScriptElement = Document.get().createScriptElement();
+    datasetScriptElement.setType("application/ld+json");
+    datasetScriptElement.setInnerText(elementContent);
+    head.appendChild(datasetScriptElement);
   }
 }

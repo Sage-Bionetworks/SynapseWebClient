@@ -327,4 +327,7 @@ public interface SynapseClient extends RemoteService {
     String membershipInvitationId,
     String hostPageBaseURL
   ) throws RestServiceException;
+
+  String getDatasetScriptElementContent(String entityId)
+    throws RestServiceException;
 }

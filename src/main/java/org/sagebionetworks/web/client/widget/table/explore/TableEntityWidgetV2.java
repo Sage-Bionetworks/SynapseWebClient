@@ -236,6 +236,7 @@ public class TableEntityWidgetV2
     this.entityTypeDisplay =
       EntityTypeUtils.getFriendlyEntityTypeName(bundle.getEntity());
     this.isShowTableOnly = isShowTableOnly;
+    injectJsonLdIfDataset();
     reconfigureState();
     showEditorIfEditableAndEmpty();
   }
@@ -243,6 +244,27 @@ public class TableEntityWidgetV2
   private void reconfigureState() {
     initializeQuery();
     configureActions();
+  }
+
+  public void injectJsonLdIfDataset() {
+    if (TableType.dataset == tableType) {
+      synapseClient.getDatasetScriptElementContent(
+        entityBundle.getEntity().getId(),
+        new AsyncCallback<String>() {
+          @Override
+          public void onFailure(Throwable caught) {
+            view.showErrorMessage(caught.getMessage());
+          }
+
+          @Override
+          public void onSuccess(String jsonLd) {
+            view.injectDatasetJsonLd(jsonLd);
+          }
+        }
+      );
+    } else {
+      view.removeDatasetJsonLdElement();
+    }
   }
 
   /**
