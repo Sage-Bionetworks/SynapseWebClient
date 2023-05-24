@@ -27,10 +27,6 @@ public interface SettingsView extends IsWidget, SynapseView {
 
   public void updateNotificationCheckbox(UserProfile profile);
 
-  void setSubscriptionsListWidget(Widget w);
-
-  void setSubscriptionsVisible(boolean visible);
-
   void setEmailAddressesWidget(IsWidget w);
 
   public interface Presenter {

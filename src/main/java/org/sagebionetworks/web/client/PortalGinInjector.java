@@ -24,6 +24,7 @@ import org.sagebionetworks.web.client.presenter.DownloadCartPresenter;
 import org.sagebionetworks.web.client.presenter.EmailInvitationPresenter;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
 import org.sagebionetworks.web.client.presenter.ErrorPresenter;
+import org.sagebionetworks.web.client.presenter.FollowingPagePresenter;
 import org.sagebionetworks.web.client.presenter.HelpPresenter;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
@@ -212,7 +213,6 @@ import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidge
 import org.sagebionetworks.web.client.widget.sharing.AclAddPeoplePanel;
 import org.sagebionetworks.web.client.widget.sharing.SharingPermissionsGrid;
 import org.sagebionetworks.web.client.widget.statistics.StatisticsPlotWidget;
-import org.sagebionetworks.web.client.widget.subscription.TopicRowWidget;
 import org.sagebionetworks.web.client.widget.table.TableEntityListGroupItem;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.api.APITableWidget;
@@ -648,8 +648,6 @@ public interface PortalGinInjector extends Ginjector {
 
   ReplyWidget createReplyWidget();
 
-  TopicRowWidget getTopicRowWidget();
-
   EntityRefreshAlert getEntityRefreshAlert();
 
   ReplyCountAlert getReplyCountAlert();
@@ -885,4 +883,6 @@ public interface PortalGinInjector extends Ginjector {
   ContainerClientsHelp getContainerClientsHelp();
 
   TwoFactorAuthPresenter getTwoFactorAuthPresenter();
+
+  FollowingPagePresenter getFollowingPagePresenter();
 }

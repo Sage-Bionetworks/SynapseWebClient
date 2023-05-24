@@ -145,9 +145,6 @@ public class SettingsViewImpl extends Composite implements SettingsView {
   SimplePanel apiSynAlertPanel;
 
   @UiField
-  Div subscriptionsContainer;
-
-  @UiField
   AnchorListItem dateFormatLocal;
 
   @UiField
@@ -543,17 +540,6 @@ public class SettingsViewImpl extends Composite implements SettingsView {
   @Override
   public void setPasswordSynAlertWidget(IsWidget synAlert) {
     passwordSynAlertPanel.setWidget(synAlert);
-  }
-
-  @Override
-  public void setSubscriptionsListWidget(Widget w) {
-    subscriptionsContainer.clear();
-    subscriptionsContainer.add(w);
-  }
-
-  @Override
-  public void setSubscriptionsVisible(boolean visible) {
-    subscriptionsContainer.setVisible(visible);
   }
 
   @Override

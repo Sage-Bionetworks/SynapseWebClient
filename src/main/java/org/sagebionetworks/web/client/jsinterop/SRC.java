@@ -58,6 +58,7 @@ public class SRC {
     public static ReactComponentType<TwoFactorAuthSettingsPanelProps> TwoFactorAuthSettingsPanel;
     public static ReactComponentType<TwoFactorBackupCodesProps> TwoFactorBackupCodes;
     public static ReactComponentType<TwoFactorEnrollmentFormProps> TwoFactorEnrollmentForm;
+    public static ReactComponentType<EmptyProps> SubscriptionPage;
 
     /**
      * Pushes a global toast message. In SWC, you should use {@link DisplayUtils#notify}, rather than calling this method directly.
