@@ -512,7 +512,6 @@ public class CrawlFilter extends OncePerRequestFilter {
     StringBuilder html = new StringBuilder();
     if (bundle.getEntity() instanceof Dataset) {
       Dataset ds = (Dataset) bundle.getEntity();
-      html.append("<script type=\"application/ld+json\">");
       JSONObjectAdapter json = new JSONObjectAdapterImpl();
       json.put("@context", "http://schema.org/");
       json.put("@type", "Dataset");
@@ -574,7 +573,6 @@ public class CrawlFilter extends OncePerRequestFilter {
       //      json.put("creator", object);
 
       html.append(json.toJSONString());
-      html.append("</script>");
     }
     return html.toString();
   }
