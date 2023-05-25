@@ -16,7 +16,6 @@
           creates a thread.
         </bh:Paragraph>
       </bh:Div>
-      <bh:Div ui:field="synAlertContainer" addStyleNames="container" />
       <w:ReactComponentDiv
         addStyleNames="pageContent margin-top-30"
         ui:field="reactContainer"

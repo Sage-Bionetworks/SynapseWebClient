@@ -6,7 +6,6 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 import org.sagebionetworks.web.client.place.FollowingPlace;
 import org.sagebionetworks.web.client.view.FollowingPageView;
-import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 public class FollowingPagePresenter
   extends AbstractActivity
@@ -15,9 +14,8 @@ public class FollowingPagePresenter
   private final FollowingPageView view;
 
   @Inject
-  public FollowingPagePresenter(FollowingPageView view, SynapseAlert synAlert) {
+  public FollowingPagePresenter(FollowingPageView view) {
     this.view = view;
-    view.setSynAlert(synAlert);
   }
 
   @Override
