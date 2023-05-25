@@ -62,7 +62,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.SettingsView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.profile.EmailAddressesWidget;
-import org.sagebionetworks.web.client.widget.subscription.SubscriptionListWidget;
 import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionWidget;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -107,9 +106,6 @@ public class SettingsPresenterTest {
   AdapterFactory adapterFactory = new AdapterFactoryImpl();
 
   @Mock
-  SubscriptionListWidget mockSubscriptionListWidget;
-
-  @Mock
   EmailAddressesWidget mockEmailAddressesWidget;
 
   @Mock
@@ -148,13 +144,11 @@ public class SettingsPresenterTest {
         mockGlobalApplicationState,
         mockSynapseClient,
         mockInjector,
-        mockSubscriptionListWidget,
         mockEmailAddressesWidget,
         mockPopupUtils,
         mockSynapseJavascriptClient
       );
     verify(mockView).setPresenter(presenter);
-    verify(mockView).setSubscriptionsListWidget(any(Widget.class));
     when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
     when(mockAuthenticationController.getCurrentUserProfile())
       .thenReturn(profile);
@@ -429,7 +423,6 @@ public class SettingsPresenterTest {
     presenter.configure();
     verify(mockSynAlert, times(3)).clear();
     verify(mockView).clear();
-    verify(mockSubscriptionListWidget).configure();
     verify(mockView).updateNotificationCheckbox(profile);
     verify(mockAuthenticationController).updateCachedProfile(profile);
     verify(mockView).setShowingLocalTime();
@@ -451,7 +444,6 @@ public class SettingsPresenterTest {
       .getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
     presenter.configure();
     verify(mockView).clear();
-    verify(mockSubscriptionListWidget).configure();
     verify(mockSynAlert).handleException(ex);
   }
 

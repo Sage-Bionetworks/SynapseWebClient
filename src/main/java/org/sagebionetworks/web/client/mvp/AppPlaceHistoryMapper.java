@@ -18,6 +18,7 @@ import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.DownloadCartPlace;
 import org.sagebionetworks.web.client.place.EmailInvitation;
 import org.sagebionetworks.web.client.place.ErrorPlace;
+import org.sagebionetworks.web.client.place.FollowingPlace;
 import org.sagebionetworks.web.client.place.Governance;
 import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.Home;
@@ -94,6 +95,7 @@ import org.sagebionetworks.web.client.place.users.RegisterAccount;
     DataAccessManagementPlace.Tokenizer.class,
     OAuthClientEditorPlace.Tokenizer.class,
     TwoFactorAuthPlace.Tokenizer.class,
+    FollowingPlace.Tokenizer.class,
   }
 )
 public interface AppPlaceHistoryMapper extends PlaceHistoryMapper {}

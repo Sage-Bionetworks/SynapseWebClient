@@ -34,7 +34,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.SettingsView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.profile.EmailAddressesWidget;
-import org.sagebionetworks.web.client.widget.subscription.SubscriptionListWidget;
 import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionWidget;
 
 public class SettingsPresenter implements SettingsView.Presenter {
@@ -47,7 +46,6 @@ public class SettingsPresenter implements SettingsView.Presenter {
   private SynapseAlert notificationSynAlert;
   private SynapseAlert passwordSynAlert;
   private PortalGinInjector ginInjector;
-  private SubscriptionListWidget subscriptionListWidget;
   private EmailAddressesWidget emailAddressesWidget;
   private SynapseJavascriptClient jsClient;
   public Callback resubmitVerificationCallback;
@@ -62,7 +60,6 @@ public class SettingsPresenter implements SettingsView.Presenter {
     GlobalApplicationState globalApplicationState,
     SynapseClientAsync synapseClient,
     PortalGinInjector ginInjector,
-    SubscriptionListWidget subscriptionListWidget,
     EmailAddressesWidget emailAddressesWidget,
     PopupUtilsView popupUtils,
     SynapseJavascriptClient jsClient
@@ -73,11 +70,9 @@ public class SettingsPresenter implements SettingsView.Presenter {
     this.synapseClient = synapseClient;
     fixServiceEntryPoint(synapseClient);
     this.ginInjector = ginInjector;
-    this.subscriptionListWidget = subscriptionListWidget;
     this.emailAddressesWidget = emailAddressesWidget;
     this.popupUtils = popupUtils;
     this.jsClient = jsClient;
-    view.setSubscriptionsListWidget(subscriptionListWidget.asWidget());
     view.setEmailAddressesWidget(emailAddressesWidget);
     view.setPresenter(this);
     resubmitVerificationCallback =
@@ -241,7 +236,6 @@ public class SettingsPresenter implements SettingsView.Presenter {
     if (authenticationController.isLoggedIn()) {
       getUserProfile();
 
-      subscriptionListWidget.configure();
       if (globalApplicationState.isShowingUTCTime()) {
         view.setShowingUTCTime();
       } else {

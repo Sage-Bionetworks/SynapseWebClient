@@ -69,6 +69,8 @@ import org.sagebionetworks.web.client.view.EntityView;
 import org.sagebionetworks.web.client.view.EntityViewImpl;
 import org.sagebionetworks.web.client.view.ErrorView;
 import org.sagebionetworks.web.client.view.ErrorViewImpl;
+import org.sagebionetworks.web.client.view.FollowingPageView;
+import org.sagebionetworks.web.client.view.FollowingPageViewImpl;
 import org.sagebionetworks.web.client.view.HelpView;
 import org.sagebionetworks.web.client.view.HelpViewImpl;
 import org.sagebionetworks.web.client.view.HomeView;
@@ -596,10 +598,6 @@ import org.sagebionetworks.web.client.widget.statistics.StatisticsPlotWidgetView
 import org.sagebionetworks.web.client.widget.statistics.StatisticsPlotWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidgetView;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.subscription.SubscriptionListWidgetView;
-import org.sagebionetworks.web.client.widget.subscription.SubscriptionListWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.subscription.TopicRowWidgetView;
-import org.sagebionetworks.web.client.widget.subscription.TopicRowWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.subscription.TopicWidgetView;
 import org.sagebionetworks.web.client.widget.subscription.TopicWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.table.TableListWidgetView;
@@ -1441,9 +1439,7 @@ public class PortalGinModule extends AbstractGinModule {
     bind(TopicWidgetView.class).to(TopicWidgetViewImpl.class);
     bind(SubscribeButtonWidgetView.class)
       .to(SubscribeButtonWidgetViewImpl.class);
-    bind(SubscriptionListWidgetView.class)
-      .to(SubscriptionListWidgetViewImpl.class);
-    bind(TopicRowWidgetView.class).to(TopicRowWidgetViewImpl.class);
+
     bind(RefreshAlertView.class).to(RefreshAlertViewImpl.class);
     bind(UserSelectorView.class).to(UserSelectorViewImpl.class);
     bind(CreateTableViewWizardStep1View.class)
@@ -1624,6 +1620,10 @@ public class PortalGinModule extends AbstractGinModule {
 
     bind(TwoFactorAuthView.class)
       .to(TwoFactorAuthViewImpl.class)
+      .in(Singleton.class);
+
+    bind(FollowingPageView.class)
+      .to(FollowingPageViewImpl.class)
       .in(Singleton.class);
   }
 }

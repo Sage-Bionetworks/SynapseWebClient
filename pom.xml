@@ -358,7 +358,7 @@
         </executions>
 
         <configuration>
-          <nodeVersion>v14.15.4</nodeVersion>
+          <nodeVersion>v18.16.0</nodeVersion>
           <yarnVersion>v1.22.17</yarnVersion>
         </configuration>
       </plugin>

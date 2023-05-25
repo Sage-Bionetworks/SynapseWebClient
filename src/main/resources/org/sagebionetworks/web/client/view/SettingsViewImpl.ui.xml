@@ -309,13 +309,18 @@
       <g:FlowPanel addStyleNames="light-border">
         <bh:Div addStyleNames="highlight-title">
           <bh:Text>Following</bh:Text>
-          <w:HelpWidget
-            helpMarkdown="These are discussion threads and forums that you have been subscribed to which means you will receive an email when someone responds or creates a thread."
-            href="https://help.synapse.org/docs/Discussion-Forums.1985904796.html"
-            addStyleNames="margin-left-5"
-          />
         </bh:Div>
-        <bh:Div ui:field="subscriptionsContainer" />
+        <bh:Paragraph>
+          Your followed forums and threads have moved! To view the topics that
+          you are following, click
+          <a
+            onclick="document.querySelector('[aria-label=\'Your Account\']').click()"
+          >
+            Your Account
+          </a>
+          in the main sidebar menu and
+          then click "Following".
+        </bh:Paragraph>
       </g:FlowPanel>
 
       <g:HTMLPanel
