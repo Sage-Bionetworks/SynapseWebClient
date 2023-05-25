@@ -192,7 +192,13 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
     entityAnchor.setPaddingBottom(0);
     entityTypeIconContainer.setWidget(entityTypeIcon);
     entityTypeIcon.setType(getEntityTypeForClassName(entityHeader.getType()));
-    entityContainer.add(entityAnchor);
+    if (entityHeader.getName().length() > 40) {
+      Tooltip tooltip = new Tooltip(entityAnchor, entityHeader.getName());
+      tooltip.addTooltipClassName("max-width-none");
+      entityContainer.add(tooltip);
+    } else {
+      entityContainer.add(entityAnchor);
+    }
     idField.setText(entityHeader.getId());
     if (entityHeader.getModifiedBy() != null) {
       modifiedByBadge.configure(entityHeader.getModifiedBy());
