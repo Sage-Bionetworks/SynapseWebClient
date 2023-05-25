@@ -4,6 +4,7 @@ import org.sagebionetworks.web.client.context.SynapseReactClientFullContextProps
 import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps;
 import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnQueryCallback;
 import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnQueryResultBundleCallback;
+import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnViewSharingSettingsHandler;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
@@ -17,6 +18,7 @@ public class QueryWrapperPlotNav extends ReactComponentDiv {
     String initQueryJson,
     OnQueryCallback onQueryChange,
     OnQueryResultBundleCallback onQueryResultBundleChange,
+    OnViewSharingSettingsHandler onViewSharingSettingsHandler,
     boolean hideSqlEditorControl
   ) {
     QueryWrapperPlotNavProps props = QueryWrapperPlotNavProps.create(
@@ -24,6 +26,7 @@ public class QueryWrapperPlotNav extends ReactComponentDiv {
       initQueryJson,
       onQueryChange,
       onQueryResultBundleChange,
+      onViewSharingSettingsHandler,
       hideSqlEditorControl
     );
 

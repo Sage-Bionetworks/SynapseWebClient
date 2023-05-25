@@ -30,6 +30,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityRef;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.ColumnModel;
@@ -49,10 +50,12 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnQueryCallback;
 import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnQueryResultBundleCallback;
+import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnViewSharingSettingsHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
@@ -63,6 +66,7 @@ import org.sagebionetworks.web.client.widget.entity.menu.v3.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.ActionListener;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.header.Header;
+import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.explore.TableEntityWidgetV2;
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQueryModalWidget;
@@ -122,6 +126,15 @@ public class TableEntityWidgetV2Test {
   @Mock
   EventBus mockEventBus;
 
+  @Mock
+  SynapseJavascriptClient mockJsClient;
+
+  @Mock
+  AccessControlListModalWidget mockACLModalWidget;
+
+  @Mock
+  Entity mockEntity;
+
   @Captor
   ArgumentCaptor<Callback> callbackCaptor;
 
@@ -163,6 +176,9 @@ public class TableEntityWidgetV2Test {
   @Captor
   ArgumentCaptor<OnQueryResultBundleCallback> onQueryResultBundleCallbackCaptor;
 
+  @Captor
+  ArgumentCaptor<OnViewSharingSettingsHandler> onViewSharingSettingsHandlerCaptor;
+
   @Mock
   GlobalApplicationState mockGlobalState;
 
@@ -196,6 +212,14 @@ public class TableEntityWidgetV2Test {
     when(mockPortalGinInjector.createNewQueryResultEditorWidget())
       .thenReturn(mockQueryResultEditorWidget);
     when(mockPortalGinInjector.getJSONObjectAdapter()).thenReturn(portalJson);
+    when(mockPortalGinInjector.getAccessControlListModalWidget())
+      .thenReturn(mockACLModalWidget);
+    when(mockPortalGinInjector.getSynapseJavascriptClient())
+      .thenReturn(mockJsClient);
+    AsyncMockStubber
+      .callSuccessWith(mockEntity)
+      .when(mockJsClient)
+      .getEntity(anyString(), any(AsyncCallback.class));
     widget =
       new TableEntityWidgetV2(
         mockView,
@@ -524,6 +548,7 @@ public class TableEntityWidgetV2Test {
         eq(adapter.toJSONString()),
         onQueryCallbackCaptor.capture(),
         onQueryResultBundleCallbackCaptor.capture(),
+        onViewSharingSettingsHandlerCaptor.capture(),
         eq(expectedHideSqlEditorControl)
       );
 
@@ -556,6 +581,15 @@ public class TableEntityWidgetV2Test {
       expectedQueryCount,
       widget.getCurrentQueryResultBundle().getQueryCount()
     );
+
+    // test OnViewSharingSettingsHandler
+    OnViewSharingSettingsHandler onViewSharingSettingsHandler = onViewSharingSettingsHandlerCaptor.getValue();
+    String testEntityId = "syn0000001";
+    onViewSharingSettingsHandler.onViewSharingSettingsClicked(testEntityId);
+
+    verify(mockJsClient).getEntity(eq(testEntityId), any(AsyncCallback.class));
+    verify(mockACLModalWidget).configure(mockEntity, false);
+    verify(mockACLModalWidget).showSharing(any(Callback.class));
   }
 
   @Test

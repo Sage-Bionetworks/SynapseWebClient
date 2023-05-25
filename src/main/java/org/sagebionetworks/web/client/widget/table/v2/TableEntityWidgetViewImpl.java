@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnQueryCallback;
 import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnQueryResultBundleCallback;
+import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnViewSharingSettingsHandler;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
@@ -214,6 +215,7 @@ public class TableEntityWidgetViewImpl
     String initQueryJson,
     OnQueryCallback onQueryChange,
     OnQueryResultBundleCallback onQueryResultBundleChange,
+    OnViewSharingSettingsHandler onViewSharingSettingsHandler,
     boolean hideSqlEditorControl
   ) {
     QueryWrapperPlotNav plotNav = new QueryWrapperPlotNav(
@@ -222,6 +224,7 @@ public class TableEntityWidgetViewImpl
       initQueryJson,
       onQueryChange,
       onQueryResultBundleChange,
+      onViewSharingSettingsHandler,
       hideSqlEditorControl
     );
     plotNavContainer.clear();
