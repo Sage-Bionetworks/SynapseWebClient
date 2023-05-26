@@ -59,7 +59,7 @@
         <b:Row>
           <b:Column size="XS_12" ui:field="provenanceContainer">
             <g:FlowPanel
-              addStyleNames="light-border padding-10 margin-bottom-15"
+              addStyleNames="light-border padding-10 margin-bottom-15 margin-top-15"
             >
               <bh:Div addStyleNames="highlight-title">
                 <bh:Text>Provenance</bh:Text>

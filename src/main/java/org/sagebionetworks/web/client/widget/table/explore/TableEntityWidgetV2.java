@@ -30,6 +30,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cache.SessionStorage;
@@ -37,6 +38,7 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.jsinterop.DatasetEditorProps;
 import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnQueryCallback;
 import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnQueryResultBundleCallback;
+import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnViewSharingSettingsHandler;
 import org.sagebionetworks.web.client.jsinterop.ToastMessageOptions;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
@@ -46,6 +48,7 @@ import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.header.Header;
+import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQueryModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
@@ -135,6 +138,8 @@ public class TableEntityWidgetV2
   EntityActionMenu actionMenu;
   PreflightController preflightController;
   SessionStorage sessionStorage;
+  private AccessControlListModalWidget aclModal;
+  private PopupUtilsView popupUtils;
   EventBus eventBus;
 
   EntityBundle entityBundle;
@@ -179,6 +184,7 @@ public class TableEntityWidgetV2
     this.ginInjector = ginInjector;
     this.sessionStorage = sessionStorage;
     this.eventBus = eventBus;
+    this.popupUtils = ginInjector.getPopupUtils();
     this.view.setPresenter(this);
     view.setQueryWrapperPlotNavVisible(true);
   }
@@ -431,6 +437,10 @@ public class TableEntityWidgetV2
             ginInjector.getSynapseJSNIUtils().consoleError(e);
           }
         };
+
+        OnViewSharingSettingsHandler onViewSharingSettingsHandler = entityId -> {
+          onViewSharingSettingsClicked(entityId);
+        };
         JSONObjectAdapter adapter = ginInjector
           .getJSONObjectAdapter()
           .createNew();
@@ -442,6 +452,7 @@ public class TableEntityWidgetV2
             adapter.toJSONString(),
             onQueryChange,
             onQueryResultBundleChange,
+            onViewSharingSettingsHandler,
             hideSqlEditorControl
           );
         } catch (JSONObjectAdapterException e) {
@@ -752,5 +763,34 @@ public class TableEntityWidgetV2
    */
   public QueryResultBundle getCurrentQueryResultBundle() {
     return currentQueryResultBundle;
+  }
+
+  private AccessControlListModalWidget getAccessControlListModalWidget() {
+    if (aclModal == null) {
+      aclModal = ginInjector.getAccessControlListModalWidget();
+    }
+    return aclModal;
+  }
+
+  public void onViewSharingSettingsClicked(String benefactorEntityId) {
+    ginInjector
+      .getSynapseJavascriptClient()
+      .getEntity(
+        benefactorEntityId,
+        new AsyncCallback<Entity>() {
+          @Override
+          public void onSuccess(Entity entity) {
+            boolean canChangePermission = false;
+            getAccessControlListModalWidget()
+              .configure(entity, canChangePermission);
+            getAccessControlListModalWidget().showSharing(() -> {});
+          }
+
+          @Override
+          public void onFailure(Throwable caught) {
+            popupUtils.showErrorMessage(caught.getMessage());
+          }
+        }
+      );
   }
 }
