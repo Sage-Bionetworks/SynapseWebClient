@@ -102,6 +102,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.util.SerializationUtils;
 import org.sagebionetworks.web.client.SynapseClient;
+import org.sagebionetworks.web.server.servlet.filter.CrawlFilter;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
@@ -2108,5 +2109,23 @@ public class SynapseClientImpl
       throw ExceptionUtil.convertSynapseException(e);
     }
     return results;
+  }
+
+  @Override
+  public String getDatasetScriptElementContent(String entityId)
+    throws RestServiceException {
+    String plainTextWiki = CrawlFilter.getPlainTextWiki(entityId, this);
+    EntityBundleRequest bundleRequest = new EntityBundleRequest();
+    bundleRequest.setIncludeEntity(true);
+    bundleRequest.setIncludeAnnotations(true);
+    EntityBundle entityBundle = getEntityBundle(entityId, bundleRequest);
+    try {
+      return CrawlFilter.getDatasetScriptElementContent(
+        entityBundle,
+        plainTextWiki
+      );
+    } catch (Exception e) {
+      throw ExceptionUtil.convertSynapseException(e);
+    }
   }
 }

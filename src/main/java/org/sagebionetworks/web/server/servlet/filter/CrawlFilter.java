@@ -99,16 +99,16 @@ public class CrawlFilter extends OncePerRequestFilter {
   public static final int MAX_CHILD_PAGES = 5;
 
   // Markdown processor
-  Parser parser = Parser.builder().build();
-  String synapseWikiWidgetDefinitionRegex = "[$][{].*[}]";
-  Pattern wikiWidgetPattern = Pattern.compile(
+  private static Parser parser = Parser.builder().build();
+  private static String synapseWikiWidgetDefinitionRegex = "[$][{].*[}]";
+  private static Pattern wikiWidgetPattern = Pattern.compile(
     synapseWikiWidgetDefinitionRegex,
     Pattern.CASE_INSENSITIVE
   );
 
-  DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
+  private static DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
 
-  private String removeSynapseWikiWidgets(String markdown) {
+  private static String removeSynapseWikiWidgets(String markdown) {
     return wikiWidgetPattern.matcher(markdown).replaceAll("");
   }
 
@@ -337,6 +337,31 @@ public class CrawlFilter extends OncePerRequestFilter {
     return displayNameBuilder.toString();
   }
 
+  public static String getPlainTextWiki(
+    String entityId,
+    SynapseClientImpl synapseClient
+  ) {
+    String plainTextWiki = null;
+    try {
+      WikiPage rootPage = synapseClient.getV2WikiPageAsV1(
+        new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null)
+      );
+      String markdown = escapeHtml(rootPage.getMarkdown());
+      if (markdown != null) {
+        try {
+          Node document = parser.parse(removeSynapseWikiWidgets(markdown));
+          HtmlRenderer renderer = HtmlRenderer.builder().build();
+          String wikiHtml = renderer.render(document);
+          // extract plain text from wiki html
+          plainTextWiki = Jsoup.parse(wikiHtml).text();
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+      }
+    } catch (Exception e) {}
+    return plainTextWiki;
+  }
+
   private String getEntityHtml(String entityId)
     throws RestServiceException, JSONObjectAdapterException {
     EntityBundleRequest bundleRequest = new EntityBundleRequest();
@@ -371,28 +396,11 @@ public class CrawlFilter extends OncePerRequestFilter {
     String name = escapeHtml(entity.getName());
     String description = escapeHtml(entity.getDescription());
     String createdBy = null;
-    String plainTextWiki = null;
 
     try {
       createdBy = getCreatedByString(entity.getCreatedBy());
     } catch (Exception e) {}
-    try {
-      WikiPage rootPage = synapseClient.getV2WikiPageAsV1(
-        new WikiPageKey(entity.getId(), ObjectType.ENTITY.toString(), null)
-      );
-      String markdown = escapeHtml(rootPage.getMarkdown());
-      if (markdown != null) {
-        try {
-          Node document = parser.parse(removeSynapseWikiWidgets(markdown));
-          HtmlRenderer renderer = HtmlRenderer.builder().build();
-          String wikiHtml = renderer.render(document);
-          // extract plain text from wiki html
-          plainTextWiki = Jsoup.parse(wikiHtml).text();
-        } catch (Exception e) {
-          e.printStackTrace();
-        }
-      }
-    } catch (Exception e) {}
+    String plainTextWiki = getPlainTextWiki(entity.getId(), synapseClient);
 
     StringBuilder html = new StringBuilder();
 
@@ -486,14 +494,24 @@ public class CrawlFilter extends OncePerRequestFilter {
     return html.toString();
   }
 
-  public String getDatasetScriptElement(
+  private String getDatasetScriptElement(
     EntityBundle bundle,
     String plainTextWiki
-  ) throws JSONObjectAdapterException, RestServiceException {
+  ) throws JSONObjectAdapterException {
+    StringBuilder html = new StringBuilder();
+    html.append("<script type=\"application/ld+json\">");
+    html.append(getDatasetScriptElementContent(bundle, plainTextWiki));
+    html.append("\"</script>\"");
+    return html.toString();
+  }
+
+  public static String getDatasetScriptElementContent(
+    EntityBundle bundle,
+    String plainTextWiki
+  ) throws JSONObjectAdapterException {
     StringBuilder html = new StringBuilder();
     if (bundle.getEntity() instanceof Dataset) {
       Dataset ds = (Dataset) bundle.getEntity();
-      html.append("<script type=\"application/ld+json\">");
       JSONObjectAdapter json = new JSONObjectAdapterImpl();
       json.put("@context", "http://schema.org/");
       json.put("@type", "Dataset");
@@ -555,7 +573,6 @@ public class CrawlFilter extends OncePerRequestFilter {
       //      json.put("creator", object);
 
       html.append(json.toJSONString());
-      html.append("</script>");
     }
     return html.toString();
   }

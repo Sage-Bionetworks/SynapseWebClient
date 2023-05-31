@@ -438,4 +438,9 @@ public interface SynapseClientAsync {
     char delimiter,
     AsyncCallback<ArrayList<String[]>> callback
   );
+
+  void getDatasetScriptElementContent(
+    String entityId,
+    AsyncCallback<String> callback
+  );
 }
