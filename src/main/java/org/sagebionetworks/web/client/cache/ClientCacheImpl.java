@@ -18,14 +18,18 @@ public class ClientCacheImpl implements ClientCache {
   @Override
   public String get(String key) {
     String expireTimeString = storage.getItem(key + SUFFIX);
-    if (storage.isStorageSupported() && expireTimeString != null) {
-      Long expireTime = Long.parseLong(expireTimeString);
-      if (System.currentTimeMillis() < expireTime) {
-        return storage.getItem(key);
+    if (storage.isStorageSupported()) {
+      if (expireTimeString != null) {
+        Long expireTime = Long.parseLong(expireTimeString);
+        if (System.currentTimeMillis() < expireTime) {
+          return storage.getItem(key);
+        } else {
+          // expired, clean up
+          storage.removeItem(key);
+          storage.removeItem(key + SUFFIX);
+        }
       } else {
-        // expired, clean up
-        storage.removeItem(key);
-        storage.removeItem(key + SUFFIX);
+        return storage.getItem(key);
       }
     }
     return null;
