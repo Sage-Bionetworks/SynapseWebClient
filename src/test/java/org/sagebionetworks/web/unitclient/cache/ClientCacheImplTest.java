@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -70,6 +71,17 @@ public class ClientCacheImplTest {
     cache.put(key, value, expireTime);
     assertFalse(cache.contains(key));
     verify(mockStorage).removeItem(eq(key));
+  }
+
+  @Test
+  public void testLackingExpirationValue() {
+    String key = "testkey";
+    String value = "testValue";
+    when(mockStorage.getItem(key + ClientCacheImpl.SUFFIX)).thenReturn(null);
+    when(mockStorage.getItem(eq(key))).thenReturn(value);
+    // value is returned if it has no expiration value (and local storage is supported/available)
+    assertEquals(value, cache.get(key));
+    verify(mockStorage, never()).removeItem(eq(key));
   }
 
   @Test
