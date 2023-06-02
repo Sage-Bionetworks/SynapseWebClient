@@ -56,11 +56,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
   public static String COOKIES_ACCEPTED =
     "org.sagebionetworks.security.cookies.notification.okclicked";
 
-  private String[] persistentLocalStorageKeys = new String[] {
-    USER_AUTHENTICATION_RECEIPT,
-    NIH_NOTIFICATION_DISMISSED,
-    COOKIES_ACCEPTED,
-  };
+  private String[] persistentLocalStorageKeys;
   private String currentUserAccessToken;
   private UserProfile currentUserProfile;
   private UserAccountServiceAsync userAccountService;
@@ -89,6 +85,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
     this.ginInjector = ginInjector;
     this.jsniUtils = jsniUtils;
     this.queryClient = queryClientProvider.getQueryClient();
+    setPersistentLocalStorageKeys();
   }
 
   public void resetQueryClientCache() {
@@ -422,5 +419,28 @@ public class AuthenticationControllerImpl implements AuthenticationController {
         }
       }
     );
+  }
+
+  private void setPersistentLocalStorageKeys() {
+    String[] swcPersistentLocalStorageKeys = new String[] {
+      USER_AUTHENTICATION_RECEIPT,
+      NIH_NOTIFICATION_DISMISSED,
+      COOKIES_ACCEPTED,
+    };
+    String[] srcPersistentLocalStorageKeys = jsniUtils.getSrcPersistentLocalStorageKeys();
+
+    int srcKeysLength = srcPersistentLocalStorageKeys.length;
+    int swcKeysLength = swcPersistentLocalStorageKeys.length;
+
+    this.persistentLocalStorageKeys = new String[srcKeysLength + swcKeysLength];
+
+    for (int i = 0; i < srcKeysLength; i++) {
+      this.persistentLocalStorageKeys[i] = srcPersistentLocalStorageKeys[i];
+    }
+
+    for (int i = 0; i < swcKeysLength; i++) {
+      this.persistentLocalStorageKeys[srcKeysLength + i] =
+        swcPersistentLocalStorageKeys[i];
+    }
   }
 }

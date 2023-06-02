@@ -38,6 +38,15 @@ public class DiscussionTab implements DiscussionTabView.Presenter {
       WebConstants.DOCS_URL + "Discussion-Forums.1985904796.html",
       EntityArea.DISCUSSION
     );
+    tab.configureOrientationBanner(
+      "Discussions",
+      "Getting Started With Discussions",
+      "Discussion forums are a space to communicate with others, similar to a message board. The discussion forum is visible to users who have access to the project.",
+      null,
+      null,
+      "Learn More About Discussions",
+      "https://help.synapse.org/docs/Discussion-Forums.1985904796.html"
+    );
   }
 
   public void lazyInject() {

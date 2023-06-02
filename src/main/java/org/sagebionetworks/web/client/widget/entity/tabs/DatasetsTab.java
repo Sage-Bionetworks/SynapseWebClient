@@ -42,6 +42,15 @@ public class DatasetsTab extends AbstractTablesTab {
       DATASETS_HELP_URL,
       EntityArea.DATASETS
     );
+    tab.configureOrientationBanner(
+      "Datasets",
+      "Getting Started With Datasets",
+      "Use Datasets to produce and distribute an immutable set of files found across one or more Projects or Folders.",
+      null,
+      null,
+      "Learn More About Datasets",
+      "https://help.synapse.org/docs/Datasets.2611281979.html"
+    );
   }
 
   @Override

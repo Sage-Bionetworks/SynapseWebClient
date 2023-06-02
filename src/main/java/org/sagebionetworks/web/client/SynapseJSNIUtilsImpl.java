@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client;
 
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.LinkElement;
@@ -12,6 +13,7 @@ import com.google.gwt.user.client.Window.Location;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.web.client.callback.MD5Callback;
+import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResultJso;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
@@ -588,6 +590,16 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
     link.setRel("stylesheet");
     link.setHref(url);
     _nativeAttachToHead(link);
+  }
+
+  @Override
+  public String[] getSrcPersistentLocalStorageKeys() {
+    JsArrayString jsArray = SRC.SynapseConstants.PERSISTENT_LOCAL_STORAGE_KEYS;
+    String[] javaArray = new String[jsArray.length()];
+    for (int i = 0; i < jsArray.length(); i++) {
+      javaArray[i] = jsArray.get(i);
+    }
+    return javaArray;
   }
 
   /**

@@ -94,6 +94,8 @@ public interface SynapseJSNIUtils {
 
   public void loadCss(String url);
 
+  public String[] getSrcPersistentLocalStorageKeys();
+
   /**
    * initialize the behavior for on pop state
    */

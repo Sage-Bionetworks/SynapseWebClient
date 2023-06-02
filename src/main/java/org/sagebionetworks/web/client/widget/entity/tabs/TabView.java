@@ -17,6 +17,16 @@ public interface TabView extends IsWidget {
     String helpLink
   );
 
+  void configureOrientationBanner(
+    String name,
+    String title,
+    String text,
+    String primaryButtonText,
+    String primaryButtonHref,
+    String secondaryButtonText,
+    String secondaryButtonHref
+  );
+
   void setContent(Widget content);
 
   Widget getTabListItem();

@@ -16,6 +16,11 @@
           creates a thread.
         </bh:Paragraph>
       </bh:Div>
+      <w:OrientationBanner
+        name="Following"
+        title="All The Discussions You're Following"
+        text="When you click the &ldquo;follow&rdquo; button on any forum or thread in Synapse, a link to that discussion will show up here. From here, it's easy to return to discussions you care about, or stop following the ones you don't."
+      />
       <w:ReactComponentDiv
         addStyleNames="pageContent margin-top-30"
         ui:field="reactContainer"

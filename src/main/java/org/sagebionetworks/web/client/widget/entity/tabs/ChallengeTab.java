@@ -54,6 +54,15 @@ public class ChallengeTab implements ChallengeTabView.Presenter {
       "http://sagebionetworks.org/platforms/",
       EntityArea.CHALLENGE
     );
+    tab.configureOrientationBanner(
+      "Challenges",
+      "Getting Started With Your Challenges",
+      "Challenges are open science, collaborative competitions for evaluating and comparing computational algorithms or solutions to problems.",
+      null,
+      null,
+      "Learn More About Challenges",
+      "https://help.synapse.org/docs/Challenges.1985184148.html"
+    );
   }
 
   public void lazyInject() {

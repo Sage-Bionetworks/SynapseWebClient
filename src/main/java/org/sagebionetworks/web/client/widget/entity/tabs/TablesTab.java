@@ -34,6 +34,15 @@ public class TablesTab extends AbstractTablesTab {
       TABLES_HELP_URL,
       EntityArea.TABLES
     );
+    tab.configureOrientationBanner(
+      "Tables",
+      "Getting Started With Tables",
+      "Synapse tables are used to organize web-accessible, sharable, and queryable data. Tables may be queried and edited with the Synapse UI, as well as with the Synapse programmatic clients.",
+      null,
+      null,
+      "Learn More About Tables",
+      "https://help.synapse.org/docs/Organizing-Data-With-Tables.2011038095.html"
+    );
   }
 
   @Override

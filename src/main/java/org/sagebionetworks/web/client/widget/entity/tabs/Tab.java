@@ -80,6 +80,26 @@ public class Tab implements TabView.Presenter {
     this.area = area;
   }
 
+  public void configureOrientationBanner(
+    String name,
+    String title,
+    String text,
+    String primaryButtonText,
+    String primaryButtonHref,
+    String secondaryButtonText,
+    String secondaryButtonHref
+  ) {
+    view.configureOrientationBanner(
+      name,
+      title,
+      text,
+      primaryButtonText,
+      primaryButtonHref,
+      secondaryButtonText,
+      secondaryButtonHref
+    );
+  }
+
   public void setContent(Widget widget) {
     view.setContent(widget);
   }
