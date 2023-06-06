@@ -979,7 +979,7 @@ public class EntityActionControllerImpl
       actionMenu.setActionListener(Action.ADD_DATASET, this);
       actionMenu.setActionVisible(
         Action.ADD_DATASET_COLLECTION,
-        canEditResults && DisplayUtils.isInTestWebsite(cookies)
+        canEditResults
       );
       actionMenu.setActionListener(Action.ADD_DATASET_COLLECTION, this);
     } else {
