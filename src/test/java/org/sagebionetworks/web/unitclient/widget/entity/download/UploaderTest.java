@@ -124,6 +124,12 @@ public class UploaderTest {
   ExternalObjectStoreUploadDestination mockExternalObjectStoreUploadDestination;
 
   @Mock
+  ExternalS3UploadDestination mockExternalS3UploadDestination;
+
+  @Mock
+  ExternalGoogleCloudUploadDestination mockExternalGoogleCloudUploadDestination;
+
+  @Mock
   SynapseJavascriptClient mockSynapseJavascriptClient;
 
   @Mock
@@ -150,6 +156,10 @@ public class UploaderTest {
   @Captor
   ArgumentCaptor<Callback> callbackCaptor;
 
+  S3UploadDestination defaultUploadDestination;
+
+  private final Long defaultSynapseStorageId = 1L;
+
   public static final String SUCCESS_FILE_HANDLE = "99999";
 
   @Before
@@ -166,10 +176,17 @@ public class UploaderTest {
       mockSynapseJsniUtils.getContentType(any(JavaScriptObject.class), anyInt())
     )
       .thenReturn("image/png");
-    S3UploadDestination d = new S3UploadDestination();
-    d.setUploadType(UploadType.S3);
+    when(
+      mockSynapseProperties.getSynapseProperty(
+        eq(WebConstants.DEFAULT_STORAGE_ID_PROPERTY_KEY)
+      )
+    )
+      .thenReturn(defaultSynapseStorageId.toString());
+    defaultUploadDestination = new S3UploadDestination();
+    defaultUploadDestination.setStorageLocationId(defaultSynapseStorageId);
+    defaultUploadDestination.setUploadType(UploadType.S3);
     List<UploadDestination> destinations = new ArrayList<UploadDestination>();
-    destinations.add(d);
+    destinations.add(defaultUploadDestination);
     AsyncMockStubber
       .callSuccessWith(destinations)
       .when(mockSynapseJavascriptClient)
@@ -420,24 +437,100 @@ public class UploaderTest {
   }
 
   @Test
+  public void testUpdateDefaultUploadBannerView() throws Exception {
+    reset(mockView);
+    // The defaultUploadDestination is pre-configured to have the expected ID
+    uploader.updateUploadBannerView(defaultUploadDestination);
+    verify(mockView).showUploadingToSynapseStorage();
+  }
+
+  @Test
+  public void testUpdateExternalObjectStoreUploadBannerViewNull()
+    throws Exception {
+    reset(mockView);
+    when(mockExternalObjectStoreUploadDestination.getBanner()).thenReturn(null);
+    String endpointUrl = "https://s3likestorage.cloudprovider.web";
+    String bucket = "mybucket";
+    when(mockExternalObjectStoreUploadDestination.getEndpointUrl())
+      .thenReturn(endpointUrl);
+    when(mockExternalObjectStoreUploadDestination.getBucket())
+      .thenReturn((bucket));
+    uploader.updateUploadBannerView(mockExternalObjectStoreUploadDestination);
+    verify(mockView)
+      .showUploadingBanner("Uploading to " + endpointUrl + "/" + bucket);
+  }
+
+  @Test
+  public void testUpdateGoogleCloudUploadBannerViewNull() throws Exception {
+    reset(mockView);
+    when(mockExternalGoogleCloudUploadDestination.getBanner()).thenReturn(null);
+    String endpointUrl = "https://s3likestorage.cloudprovider.web";
+    String bucket = "mybucket";
+    when(mockExternalGoogleCloudUploadDestination.getBucket())
+      .thenReturn((bucket));
+    uploader.updateUploadBannerView(mockExternalGoogleCloudUploadDestination);
+    verify(mockView)
+      .showUploadingBanner("Uploading to Google Cloud Storage: " + bucket);
+  }
+
+  @Test
+  public void testUpdateGoogleCloudUploadBannerViewNullWithBaseKey()
+    throws Exception {
+    reset(mockView);
+    when(mockExternalGoogleCloudUploadDestination.getBanner()).thenReturn(null);
+    String endpointUrl = "https://s3likestorage.cloudprovider.web";
+    String bucket = "mybucket";
+    String baseKey = "somefolder";
+    when(mockExternalGoogleCloudUploadDestination.getBucket())
+      .thenReturn((bucket));
+    when(mockExternalGoogleCloudUploadDestination.getBaseKey())
+      .thenReturn(baseKey);
+    uploader.updateUploadBannerView(mockExternalGoogleCloudUploadDestination);
+    verify(mockView)
+      .showUploadingBanner(
+        "Uploading to Google Cloud Storage: " + bucket + "/" + baseKey
+      );
+  }
+
+  @Test
   public void testUpdateS3UploadBannerViewNull() throws Exception {
     reset(mockView);
-    uploader.updateUploadBannerView(null);
-    verify(mockView).showUploadingToSynapseStorage();
+    when(mockExternalS3UploadDestination.getBanner()).thenReturn(null);
+    String bucket = "mybucket";
+    when(mockExternalS3UploadDestination.getBucket()).thenReturn(bucket);
+    uploader.updateUploadBannerView(mockExternalS3UploadDestination);
+    verify(mockView).showUploadingBanner("Uploading to AWS S3: " + bucket);
+  }
+
+  @Test
+  public void testUpdateS3UploadBannerViewNullWithBaseKey() throws Exception {
+    reset(mockView);
+    when(mockExternalS3UploadDestination.getBanner()).thenReturn(null);
+    String bucket = "mybucket";
+    String baseKey = "somefolder";
+    when(mockExternalS3UploadDestination.getBucket()).thenReturn(bucket);
+    when(mockExternalS3UploadDestination.getBaseKey()).thenReturn(baseKey);
+    uploader.updateUploadBannerView(mockExternalS3UploadDestination);
+    verify(mockView)
+      .showUploadingBanner("Uploading to AWS S3: " + bucket + "/" + baseKey);
   }
 
   @Test
   public void testUpdateS3UploadBannerViewEmpty() throws Exception {
     reset(mockView);
-    uploader.updateUploadBannerView("");
-    verify(mockView).showUploadingToSynapseStorage();
+    when(mockExternalS3UploadDestination.getBanner()).thenReturn("");
+    String bucket = "mybucket";
+    when(mockExternalS3UploadDestination.getBucket()).thenReturn(bucket);
+    uploader.updateUploadBannerView(mockExternalS3UploadDestination);
+    verify(mockView).showUploadingBanner("Uploading to AWS S3: " + bucket);
   }
 
   @Test
   public void testUpdateS3UploadBannerViewSet() throws Exception {
     reset(mockView);
     String banner = "this is my test banner";
-    uploader.updateUploadBannerView(banner);
+    when(mockExternalS3UploadDestination.getBanner()).thenReturn(banner);
+    uploader.updateUploadBannerView(mockExternalS3UploadDestination);
     verify(mockView).showUploadingBanner(banner);
   }
 
