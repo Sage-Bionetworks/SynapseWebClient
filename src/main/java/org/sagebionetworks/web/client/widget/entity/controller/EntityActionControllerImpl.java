@@ -690,7 +690,10 @@ public class EntityActionControllerImpl
   }
 
   private void configureFullTextSearch() {
-    if (entityBundle.getEntity() instanceof Table) {
+    if (
+      entityBundle.getEntity() instanceof Table &&
+      entityBundle.getPermissions().getCanCertifiedUserEdit()
+    ) {
       Table tableEntity = (Table) entityBundle.getEntity();
       actionMenu.setActionVisible(Action.TOGGLE_FULL_TEXT_SEARCH, true);
       actionMenu.setActionListener(Action.TOGGLE_FULL_TEXT_SEARCH, this);

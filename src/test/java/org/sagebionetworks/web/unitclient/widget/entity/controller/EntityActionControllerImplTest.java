@@ -596,6 +596,56 @@ public class EntityActionControllerImplTest {
   }
 
   @Test
+  public void testConfigureWithTableEntityNoPermission() {
+    boolean canEdit = false;
+    boolean canCertifiedUserEdit = false;
+    boolean canDelete = false;
+    boolean canChangePermission = false;
+    permissions.setCanEdit(canEdit);
+    permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
+    permissions.setCanDelete(canDelete);
+    permissions.setCanChangePermissions(canChangePermission);
+
+    when(
+      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+    )
+      .thenReturn("true");
+
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+    // delete
+    verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, false);
+    // share
+    verify(mockActionMenu).setActionVisible(Action.VIEW_SHARING_SETTINGS, true);
+    verify(mockActionMenu)
+      .setActionListener(Action.VIEW_SHARING_SETTINGS, controller);
+    // rename
+    verify(mockActionMenu).setActionVisible(Action.CHANGE_ENTITY_NAME, false);
+    verify(mockActionMenu)
+      .setActionListener(Action.CHANGE_ENTITY_NAME, controller);
+    // upload
+    verify(mockActionMenu).setActionVisible(Action.UPLOAD_NEW_FILE, false);
+    // version history
+    verify(mockActionMenu).setActionVisible(Action.SHOW_VERSION_HISTORY, true);
+    // create table version (snapshot)
+    verify(mockActionMenu).setActionVisible(Action.CREATE_TABLE_VERSION, false);
+    // full text search
+    verify(mockActionMenu)
+      .setActionVisible(Action.TOGGLE_FULL_TEXT_SEARCH, false);
+    // Show scope/items should not be visible for a TableEntity
+    verify(mockActionMenu).setActionVisible(Action.SHOW_VIEW_SCOPE, false);
+    verify(mockActionMenu)
+      .setActionVisible(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, false);
+    verify(mockActionMenu).setActionVisible(Action.EDIT_DEFINING_SQL, false);
+  }
+
+  @Test
   public void testConfigureWithDataset() {
     Dataset dataset = new Dataset();
     entityBundle.setEntity(dataset);
