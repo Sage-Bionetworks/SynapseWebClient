@@ -7,15 +7,25 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
+import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
+import org.sagebionetworks.web.client.jsinterop.AccessRequirementListProps;
+import org.sagebionetworks.web.client.jsinterop.React;
+import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 
 public class ManagedACTAccessRequirementWidgetViewImpl
   implements ManagedACTAccessRequirementWidgetView {
@@ -51,7 +61,7 @@ public class ManagedACTAccessRequirementWidgetViewImpl
   Button loginButton;
 
   @UiField
-  Div requestDataAccessWizardContainer;
+  ReactComponentDiv requestDataAccessWidget;
 
   @UiField
   Div editAccessRequirementContainer;
@@ -107,6 +117,8 @@ public class ManagedACTAccessRequirementWidgetViewImpl
   @UiField
   Span accessRequirementDescription;
 
+  private final JSONObjectAdapter jsonObjectAdapter;
+  private final SynapseReactClientFullContextPropsProvider propsProvider;
   Callback onAttachCallback;
   public static final String DEFAULT_AR_DESCRIPTION = "these data";
 
@@ -119,9 +131,13 @@ public class ManagedACTAccessRequirementWidgetViewImpl
   @Inject
   public ManagedACTAccessRequirementWidgetViewImpl(
     Binder binder,
-    GlobalApplicationState globalAppState
+    GlobalApplicationState globalAppState,
+    JSONObjectAdapter jsonObjectAdapter,
+    SynapseReactClientFullContextPropsProvider propsProvider
   ) {
     this.w = binder.createAndBindUi(this);
+    this.jsonObjectAdapter = jsonObjectAdapter;
+    this.propsProvider = propsProvider;
     cancelRequestButton.addClickHandler(event -> {
       presenter.onCancelRequest();
     });
@@ -207,12 +223,6 @@ public class ManagedACTAccessRequirementWidgetViewImpl
   @Override
   public void showUpdateRequestButton() {
     updateRequestButton.setVisible(true);
-  }
-
-  @Override
-  public void setDataAccessRequestWizard(IsWidget w) {
-    requestDataAccessWizardContainer.clear();
-    requestDataAccessWizardContainer.add(w);
   }
 
   @Override
@@ -343,5 +353,38 @@ public class ManagedACTAccessRequirementWidgetViewImpl
       accessRequirementDescription.setText(DEFAULT_AR_DESCRIPTION);
       accessRequirementDescription.removeStyleName("boldText");
     }
+  }
+
+  @Override
+  public void showRequestAccessModal(
+    ManagedACTAccessRequirement accessRequirement
+  ) {
+    try {
+      JSONObjectAdapter arAsJson = accessRequirement.writeToJSONObject(
+        jsonObjectAdapter
+      );
+      List<JSONObjectAdapter> arList = new ArrayList<JSONObjectAdapter>();
+      arList.add(arAsJson);
+      AccessRequirementListProps.Callback onHide = () -> {
+        hideRequestAccessModal();
+      };
+      AccessRequirementListProps props = AccessRequirementListProps.create(
+        onHide,
+        arList
+      );
+      requestDataAccessWidget.render(
+        React.createElementWithSynapseContext(
+          SRC.SynapseComponents.AccessRequirementList,
+          props,
+          propsProvider.getJsInteropContextProps()
+        )
+      );
+    } catch (JSONObjectAdapterException e) {
+      presenter.handleException(e);
+    }
+  }
+
+  public void hideRequestAccessModal() {
+    requestDataAccessWidget.clear();
   }
 }

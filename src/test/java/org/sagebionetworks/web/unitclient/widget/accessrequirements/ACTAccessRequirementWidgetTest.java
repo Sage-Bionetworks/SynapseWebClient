@@ -43,7 +43,6 @@ import org.sagebionetworks.web.client.widget.accessrequirements.CreateAccessRequ
 import org.sagebionetworks.web.client.widget.accessrequirements.DeleteAccessRequirementButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.ReviewAccessorsButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.SubjectsWidget;
-import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateDataAccessRequestWizard;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
@@ -83,9 +82,6 @@ public class ACTAccessRequirementWidgetTest {
 
   @Mock
   PortalGinInjector mockGinInjector;
-
-  @Mock
-  CreateDataAccessRequestWizard mockCreateDataAccessRequestWizard;
 
   @Mock
   ACTAccessRequirement mockACTAccessRequirement;
@@ -161,8 +157,6 @@ public class ACTAccessRequirementWidgetTest {
         mockConvertACTAccessRequirementButton,
         mockJsniUtils
       );
-    when(mockGinInjector.getCreateDataAccessRequestWizard())
-      .thenReturn(mockCreateDataAccessRequestWizard);
     when(mockACTAccessRequirement.getSubjectIds()).thenReturn(mockSubjectIds);
     AsyncMockStubber
       .callSuccessWith(ROOT_WIKI_ID)

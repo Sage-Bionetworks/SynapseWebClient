@@ -4,6 +4,7 @@
   xmlns:g="urn:import:com.google.gwt.user.client.ui"
   xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+  xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
 >
   <ui:with
     field='icons'
@@ -182,7 +183,7 @@
         />
       </bh:Div>
       <bh:ClearFix />
-      <bh:Div ui:field="requestDataAccessWizardContainer" />
+      <w:ReactComponentDiv ui:field="requestDataAccessWidget" />
       <bh:Div ui:field="synAlertContainer" />
     </b:PanelBody>
   </b:Panel>

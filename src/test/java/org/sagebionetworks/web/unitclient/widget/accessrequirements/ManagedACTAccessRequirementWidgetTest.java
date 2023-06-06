@@ -41,12 +41,10 @@ import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccess
 import org.sagebionetworks.web.client.widget.accessrequirements.ReviewAccessRequestsButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.ReviewAccessorsButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.SubjectsWidget;
-import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateDataAccessRequestWizard;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
-import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -75,10 +73,7 @@ public class ManagedACTAccessRequirementWidgetTest {
   PortalGinInjector mockGinInjector;
 
   @Mock
-  CreateDataAccessRequestWizard mockCreateDataAccessRequestWizard;
-
-  @Mock
-  ManagedACTAccessRequirement mockACTAccessRequirement;
+  ManagedACTAccessRequirement mockManagedACTAccessRequirement;
 
   @Mock
   CreateAccessRequirementButton mockCreateAccessRequirementButton;
@@ -167,9 +162,8 @@ public class ManagedACTAccessRequirementWidgetTest {
         mockManageAccessButton,
         mockIsACTMemberAsyncHandler
       );
-    when(mockGinInjector.getCreateDataAccessRequestWizard())
-      .thenReturn(mockCreateDataAccessRequestWizard);
-    when(mockACTAccessRequirement.getSubjectIds()).thenReturn(mockSubjectIds);
+    when(mockManagedACTAccessRequirement.getSubjectIds())
+      .thenReturn(mockSubjectIds);
     AsyncMockStubber
       .callSuccessWith(ROOT_WIKI_ID)
       .when(mockJsClient)
@@ -204,15 +198,16 @@ public class ManagedACTAccessRequirementWidgetTest {
 
   @Test
   public void testSetRequirement() {
-    widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
+    widget.setRequirement(mockManagedACTAccessRequirement, mockRefreshCallback);
 
     verify(mockCreateAccessRequirementButton)
-      .configure(eq(mockACTAccessRequirement), any(Callback.class));
+      .configure(eq(mockManagedACTAccessRequirement), any(Callback.class));
     verify(mockDeleteAccessRequirementButton)
-      .configure(eq(mockACTAccessRequirement), any(Callback.class));
-    verify(mockIduReportButton).configure(mockACTAccessRequirement);
-    verify(mockReviewAccessRequestsButton).configure(mockACTAccessRequirement);
-    verify(mockManageAccessButton).configure(mockACTAccessRequirement);
+      .configure(eq(mockManagedACTAccessRequirement), any(Callback.class));
+    verify(mockIduReportButton).configure(mockManagedACTAccessRequirement);
+    verify(mockReviewAccessRequestsButton)
+      .configure(mockManagedACTAccessRequirement);
+    verify(mockManageAccessButton).configure(mockManagedACTAccessRequirement);
     verify(mockSubjectsWidget).configure(mockSubjectIds);
     verify(mockLazyLoadHelper).setIsConfigured();
     verify(mockView).setAccessRequirementName(null);
@@ -220,10 +215,10 @@ public class ManagedACTAccessRequirementWidgetTest {
 
   @Test
   public void testSetRequirementWithWikiTermsAndCustomDescription() {
-    when(mockACTAccessRequirement.getName())
+    when(mockManagedACTAccessRequirement.getName())
       .thenReturn(ACCESS_REQUIREMENT_NAME);
 
-    widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
+    widget.setRequirement(mockManagedACTAccessRequirement, mockRefreshCallback);
 
     verify(mockWikiPageWidget)
       .configure(
@@ -239,7 +234,7 @@ public class ManagedACTAccessRequirementWidgetTest {
   public void testSubmittedState() {
     when(mockAuthController.getCurrentUserPrincipalId())
       .thenReturn(SUBMITTER_ID);
-    widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
+    widget.setRequirement(mockManagedACTAccessRequirement, mockRefreshCallback);
     when(mockSubmissionStatus.getState()).thenReturn(SubmissionState.SUBMITTED);
     lazyLoadDataCallback.invoke();
     verify(mockView).showUnapprovedHeading();
@@ -251,7 +246,7 @@ public class ManagedACTAccessRequirementWidgetTest {
   public void testSubmittedStateByAnotherUser() {
     when(mockAuthController.getCurrentUserPrincipalId())
       .thenReturn("different id");
-    widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
+    widget.setRequirement(mockManagedACTAccessRequirement, mockRefreshCallback);
     when(mockSubmissionStatus.getState()).thenReturn(SubmissionState.SUBMITTED);
     lazyLoadDataCallback.invoke();
     verify(mockView).showUnapprovedHeading();
@@ -262,7 +257,7 @@ public class ManagedACTAccessRequirementWidgetTest {
 
   @Test
   public void testApprovedState() {
-    widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
+    widget.setRequirement(mockManagedACTAccessRequirement, mockRefreshCallback);
     when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(true);
     when(mockSubmissionStatus.getState()).thenReturn(SubmissionState.APPROVED);
     lazyLoadDataCallback.invoke();
@@ -275,7 +270,7 @@ public class ManagedACTAccessRequirementWidgetTest {
   @Test
   public void testAnonymous() {
     when(mockAuthController.isLoggedIn()).thenReturn(false);
-    widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
+    widget.setRequirement(mockManagedACTAccessRequirement, mockRefreshCallback);
     lazyLoadDataCallback.invoke();
     verify(mockView).showUnapprovedHeading();
     verify(mockView).showLoginButton();
@@ -284,7 +279,7 @@ public class ManagedACTAccessRequirementWidgetTest {
   @Test
   public void testApprovedStateWithExpiration() {
     String friendlyDate = "June 9th, 2018";
-    widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
+    widget.setRequirement(mockManagedACTAccessRequirement, mockRefreshCallback);
     when(mockDataAccessSubmissionStatus.getExpiredOn()).thenReturn(new Date());
     when(mockDateTimeUtils.getLongFriendlyDate(any(Date.class)))
       .thenReturn(friendlyDate);
@@ -299,7 +294,7 @@ public class ManagedACTAccessRequirementWidgetTest {
 
   @Test
   public void testApprovedStateWithExpirationZero() {
-    widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
+    widget.setRequirement(mockManagedACTAccessRequirement, mockRefreshCallback);
     when(mockDataAccessSubmissionStatus.getExpiredOn()).thenReturn(new Date(0));
     when(mockSubmissionStatus.getState()).thenReturn(SubmissionState.APPROVED);
     when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(true);
@@ -310,7 +305,7 @@ public class ManagedACTAccessRequirementWidgetTest {
   @Test
   public void testRejectedState() {
     String rejectedReason = "Please sign";
-    widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
+    widget.setRequirement(mockManagedACTAccessRequirement, mockRefreshCallback);
     when(mockSubmissionStatus.getState()).thenReturn(SubmissionState.REJECTED);
     when(mockSubmissionStatus.getRejectedReason()).thenReturn(rejectedReason);
     lazyLoadDataCallback.invoke();
@@ -322,7 +317,7 @@ public class ManagedACTAccessRequirementWidgetTest {
   @Test
   public void testCancelledState() {
     when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(false);
-    widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
+    widget.setRequirement(mockManagedACTAccessRequirement, mockRefreshCallback);
     when(mockSubmissionStatus.getState()).thenReturn(SubmissionState.CANCELLED);
     lazyLoadDataCallback.invoke();
     verify(mockView).showUnapprovedHeading();
@@ -333,7 +328,7 @@ public class ManagedACTAccessRequirementWidgetTest {
   public void testCancelledStatePreviouslyApproved() {
     // see SWC-3686
     when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(true);
-    widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
+    widget.setRequirement(mockManagedACTAccessRequirement, mockRefreshCallback);
     when(mockSubmissionStatus.getState()).thenReturn(SubmissionState.CANCELLED);
     lazyLoadDataCallback.invoke();
     verify(mockView).showApprovedHeading();
@@ -348,7 +343,7 @@ public class ManagedACTAccessRequirementWidgetTest {
       .callFailureWith(ex)
       .when(mockDataAccessClient)
       .getAccessRequirementStatus(anyString(), any(AsyncCallback.class));
-    widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
+    widget.setRequirement(mockManagedACTAccessRequirement, mockRefreshCallback);
     lazyLoadDataCallback.invoke();
     verify(mockSynAlert).handleException(ex);
   }
@@ -360,7 +355,7 @@ public class ManagedACTAccessRequirementWidgetTest {
       .when(mockDataAccessClient)
       .cancelDataAccessSubmission(anyString(), any(AsyncCallback.class));
 
-    widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
+    widget.setRequirement(mockManagedACTAccessRequirement, mockRefreshCallback);
     when(mockSubmissionStatus.getState()).thenReturn(SubmissionState.APPROVED);
     lazyLoadDataCallback.invoke();
 
@@ -380,7 +375,7 @@ public class ManagedACTAccessRequirementWidgetTest {
       .when(mockDataAccessClient)
       .cancelDataAccessSubmission(anyString(), any(AsyncCallback.class));
 
-    widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
+    widget.setRequirement(mockManagedACTAccessRequirement, mockRefreshCallback);
     when(mockSubmissionStatus.getState()).thenReturn(SubmissionState.APPROVED);
     lazyLoadDataCallback.invoke();
 
@@ -391,18 +386,15 @@ public class ManagedACTAccessRequirementWidgetTest {
   }
 
   @Test
-  public void testRequestAccess() {
+  public void testRequestAccess() throws Exception {
     when(mockDataAccessSubmissionStatus.getCurrentSubmissionStatus())
       .thenReturn(null);
-    widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
+    widget.setRequirement(mockManagedACTAccessRequirement, mockRefreshCallback);
     widget.setTargetSubject(mockSubject);
     lazyLoadDataCallback.invoke();
 
     widget.onRequestAccess();
-    verify(mockCreateDataAccessRequestWizard)
-      .configure(mockACTAccessRequirement, mockSubject);
-    verify(mockCreateDataAccessRequestWizard)
-      .showModal(any(WizardCallback.class));
+    verify(mockView).showRequestAccessModal(mockManagedACTAccessRequirement);
   }
 
   @Test
@@ -411,7 +403,7 @@ public class ManagedACTAccessRequirementWidgetTest {
       .callFailureWith(new NotFoundException())
       .when(mockJsClient)
       .getRootWikiPageKey(anyString(), anyString(), any(AsyncCallback.class));
-    widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
+    widget.setRequirement(mockManagedACTAccessRequirement, mockRefreshCallback);
     verify(mockView).setWikiTermsWidgetVisible(false);
     verify(mockView, never()).setWikiTermsWidgetVisible(true);
   }

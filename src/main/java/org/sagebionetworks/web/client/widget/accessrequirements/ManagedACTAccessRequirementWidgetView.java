@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.accessrequirements;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.web.client.widget.lazyload.SupportsLazyLoadInterface;
 
 public interface ManagedACTAccessRequirementWidgetView
@@ -39,8 +40,6 @@ public interface ManagedACTAccessRequirementWidgetView
 
   void resetState();
 
-  void setDataAccessRequestWizard(IsWidget w);
-
   void setEditAccessRequirementWidget(IsWidget w);
 
   void setDeleteAccessRequirementWidget(IsWidget w);
@@ -71,6 +70,8 @@ public interface ManagedACTAccessRequirementWidgetView
   void setAccessRequirementID(String arID);
   void setAccessRequirementName(String description);
 
+  void showRequestAccessModal(ManagedACTAccessRequirement accessRequirement);
+
   /**
    * Presenter interface
    */
@@ -78,5 +79,7 @@ public interface ManagedACTAccessRequirementWidgetView
     void onCancelRequest();
 
     void onRequestAccess();
+
+    void handleException(Throwable t);
   }
 }
