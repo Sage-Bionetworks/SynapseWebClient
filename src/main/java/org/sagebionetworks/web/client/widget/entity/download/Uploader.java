@@ -222,10 +222,17 @@ public class Uploader
     this.uploadBasedOnConfiguration();
   }
 
-  public void updateUploadBannerView(String banner) {
-    if (DisplayUtils.isDefined(banner)) view.showUploadingBanner(
-      banner
-    ); else view.showUploadingToSynapseStorage();
+  public void updateUploadBannerView(UploadDestination uploadDestination) {
+    Long defaultStorageId = Long.parseLong(
+      synapseProperties.getSynapseProperty(
+        WebConstants.DEFAULT_STORAGE_ID_PROPERTY_KEY
+      )
+    );
+    if (defaultStorageId.equals(uploadDestination.getStorageLocationId())) {
+      view.showUploadingToSynapseStorage();
+    } else {
+      view.showUploadingBanner(getBannerText(uploadDestination));
+    }
   }
 
   public void queryForUploadDestination() {
@@ -252,7 +259,7 @@ public class Uploader
               currentUploadType = UploadType.S3;
               storageLocationId =
                 uploadDestinations.get(0).getStorageLocationId();
-              updateUploadBannerView(uploadDestinations.get(0).getBanner());
+              updateUploadBannerView(uploadDestinations.get(0));
             } else if (
               uploadDestinations.get(
                 0
@@ -261,7 +268,7 @@ public class Uploader
               currentUploadType = UploadType.GOOGLECLOUDSTORAGE;
               storageLocationId =
                 uploadDestinations.get(0).getStorageLocationId();
-              updateUploadBannerView(uploadDestinations.get(0).getBanner());
+              updateUploadBannerView(uploadDestinations.get(0));
             } else if (
               uploadDestinations.get(0) instanceof ExternalUploadDestination
             ) {
@@ -294,13 +301,7 @@ public class Uploader
                 externalUploadDestination.getStorageLocationId();
               currentUploadType = externalUploadDestination.getUploadType();
               String banner = externalUploadDestination.getBanner();
-              if (!DisplayUtils.isDefined(banner)) {
-                banner =
-                  "Uploading to S3: " + externalUploadDestination.getBucket();
-                if (externalUploadDestination.getBaseKey() != null) banner +=
-                  "/" + externalUploadDestination.getBaseKey();
-              }
-              updateUploadBannerView(banner);
+              updateUploadBannerView(externalUploadDestination);
               // direct to s3(-like) storage
             } else if (
               uploadDestinations.get(
@@ -394,7 +395,7 @@ public class Uploader
   /**
    * Create any missing folders based on the relative path
    *
-   * @param relativePath
+   * @param path
    */
   public void mkdirs(String[] path) {
     // current file path (remove file name)
@@ -1067,5 +1068,42 @@ public class Uploader
   @Override
   public Long getStorageLocationId() {
     return this.storageLocationId;
+  }
+
+  private String getBannerText(UploadDestination uploadDestination) {
+    if (DisplayUtils.isDefined(uploadDestination.getBanner())) {
+      return uploadDestination.getBanner();
+    }
+
+    String bannerPrefix = "Uploading to ";
+    if (uploadDestination instanceof ExternalUploadDestination) {
+      ExternalUploadDestination dest = (ExternalUploadDestination) uploadDestination;
+      return bannerPrefix + dest.getUrl();
+    } else if (
+      uploadDestination instanceof ExternalObjectStoreUploadDestination
+    ) {
+      ExternalObjectStoreUploadDestination dest = (ExternalObjectStoreUploadDestination) uploadDestination;
+      return bannerPrefix + dest.getEndpointUrl() + "/" + dest.getBucket();
+    } else if (
+      uploadDestination instanceof ExternalGoogleCloudUploadDestination
+    ) {
+      ExternalGoogleCloudUploadDestination dest = (ExternalGoogleCloudUploadDestination) uploadDestination;
+      String banner =
+        bannerPrefix + "Google Cloud Storage: " + dest.getBucket();
+      if (DisplayUtils.isDefined(dest.getBaseKey())) {
+        banner += "/" + dest.getBaseKey();
+      }
+      return banner;
+    } else if (uploadDestination instanceof ExternalS3UploadDestination) {
+      ExternalS3UploadDestination dest = (ExternalS3UploadDestination) uploadDestination;
+      String banner = bannerPrefix + "AWS S3: " + dest.getBucket();
+      if (DisplayUtils.isDefined(dest.getBaseKey())) {
+        banner += "/" + dest.getBaseKey();
+      }
+      return banner;
+    }
+
+    // fallback
+    return bannerPrefix + " custom storage";
   }
 }
