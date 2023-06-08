@@ -23,6 +23,7 @@
                   addStyleNames="margin-bottom-15 margin-right-5 moveup-2"
                   width="35px"
                   height="35px"
+                  altText="Synapse logo"
                 />
                 <b:Heading
                   size="H3"
@@ -39,6 +40,7 @@
                   addStyleNames="margin-bottom-15 margin-right-5 moveup-2"
                   width="35px"
                   height="35px"
+                  altText="Synapse logo"
                 />
                 <b:Heading
                   size="H3"
@@ -56,6 +58,7 @@
                   addStyleNames="flexcontainer-column margin-right-5 margin-top-3"
                   width="18px"
                   height="18px"
+                  altText="Experimental Mode"
                 />
                 <b:Anchor
                   ui:field="debugLink"
@@ -226,6 +229,7 @@
                 <g:Image
                   url="images/sagebionetworks-logo.svg"
                   addStyleNames="center-in-div"
+                  altText="Sage Bionetworks logo"
                 />
               </bh:Div>
               <bh:Div addStyleNames="margin-top-10">

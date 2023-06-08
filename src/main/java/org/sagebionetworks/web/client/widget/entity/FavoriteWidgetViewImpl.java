@@ -34,7 +34,6 @@ public class FavoriteWidgetViewImpl implements FavoriteWidgetView {
   @Inject
   public FavoriteWidgetViewImpl(Binder binder) {
     widget = binder.createAndBindUi(this);
-
     favoriteIcon.addClickHandler(
       new ClickHandler() {
         @Override
@@ -51,6 +50,18 @@ public class FavoriteWidgetViewImpl implements FavoriteWidgetView {
         }
       }
     );
+    favoriteIcon
+      .getElement()
+      .setAttribute(
+        "aria-label",
+        "Click the star to remove this from your favorites"
+      );
+    notFavoriteIcon
+      .getElement()
+      .setAttribute(
+        "aria-label",
+        "Click the star to add this to your favorites"
+      );
   }
 
   @Override
