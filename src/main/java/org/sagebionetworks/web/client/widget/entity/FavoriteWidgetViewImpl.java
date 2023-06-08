@@ -60,7 +60,7 @@ public class FavoriteWidgetViewImpl implements FavoriteWidgetView {
       .getElement()
       .setAttribute(
         "aria-label",
-        "Click the star to add this from your favorites"
+        "Click the star to add this to your favorites"
       );
   }
 
