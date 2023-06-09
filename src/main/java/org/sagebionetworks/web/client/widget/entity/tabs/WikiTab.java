@@ -31,6 +31,15 @@ public class WikiTab {
       WebConstants.DOCS_URL + "Wikis.1975746682.html",
       EntityArea.WIKI
     );
+    tab.configureOrientationBanner(
+      "Wikis",
+      "Getting Started With Wikis",
+      "Wikis provide a space to write narrative content to describe a project or content within a project. Wikis are available in Synapse on projects, folders, and files. Every project has a separate Wiki tab where you can create pages and a hierarchy of sub-pages.",
+      null,
+      null,
+      "Learn More About Wikis",
+      "https://help.synapse.org/docs/Creating-and-Managing-Wikis.1975746682.html"
+    );
   }
 
   public void lazyInject() {

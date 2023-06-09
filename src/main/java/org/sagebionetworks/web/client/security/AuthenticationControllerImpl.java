@@ -9,7 +9,9 @@ import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.StatusCodeException;
 import com.google.inject.Inject;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -56,11 +58,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
   public static String COOKIES_ACCEPTED =
     "org.sagebionetworks.security.cookies.notification.okclicked";
 
-  private String[] persistentLocalStorageKeys = new String[] {
-    USER_AUTHENTICATION_RECEIPT,
-    NIH_NOTIFICATION_DISMISSED,
-    COOKIES_ACCEPTED,
-  };
+  private List<String> persistentLocalStorageKeys;
   private String currentUserAccessToken;
   private UserProfile currentUserProfile;
   private UserAccountServiceAsync userAccountService;
@@ -89,6 +87,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
     this.ginInjector = ginInjector;
     this.jsniUtils = jsniUtils;
     this.queryClient = queryClientProvider.getQueryClient();
+    setPersistentLocalStorageKeys();
   }
 
   public void resetQueryClientCache() {
@@ -422,5 +421,24 @@ public class AuthenticationControllerImpl implements AuthenticationController {
         }
       }
     );
+  }
+
+  private void setPersistentLocalStorageKeys() {
+    String[] swcPersistentLocalStorageKeys = new String[] {
+      USER_AUTHENTICATION_RECEIPT,
+      NIH_NOTIFICATION_DISMISSED,
+      COOKIES_ACCEPTED,
+    };
+    String[] srcPersistentLocalStorageKeys = jsniUtils.getSrcPersistentLocalStorageKeys();
+
+    this.persistentLocalStorageKeys = new ArrayList<String>();
+
+    for (int i = 0; i < srcPersistentLocalStorageKeys.length; i++) {
+      this.persistentLocalStorageKeys.add(srcPersistentLocalStorageKeys[i]);
+    }
+
+    for (int i = 0; i < swcPersistentLocalStorageKeys.length; i++) {
+      this.persistentLocalStorageKeys.add(swcPersistentLocalStorageKeys[i]);
+    }
   }
 }

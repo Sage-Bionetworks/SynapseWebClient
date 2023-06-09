@@ -19,6 +19,7 @@
               size="H3"
             />
           </bh:Div>
+          <g:SimplePanel ui:field="orientationBannerPanel" />
           <div ui:field="dashboardUI" class="inline-block" style="width:100%;">
             <b:Alert
               ui:field="loginAlert"

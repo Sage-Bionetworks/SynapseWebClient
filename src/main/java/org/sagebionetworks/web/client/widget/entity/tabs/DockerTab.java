@@ -50,6 +50,15 @@ public class DockerTab implements DockerTabView.Presenter {
       WebConstants.DOCS_URL + "Synapse-Docker-Registry.2011037752.html",
       EntityArea.DOCKER
     );
+    tab.configureOrientationBanner(
+      "Docker",
+      "Getting Started With Docker",
+      "The Synapse Docker Registry provides a space for Synapse users to store and distribute their Docker images per Synapse project.",
+      null,
+      null,
+      "Learn More About Docker",
+      "https://help.synapse.org/docs/Synapse-Docker-Registry.2011037752.html"
+    );
   }
 
   public void lazyInject() {

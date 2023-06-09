@@ -5,6 +5,7 @@
   xmlns:c="urn:import:com.google.gwt.user.cellview.client"
   xmlns:s="urn:import:org.sagebionetworks.web.client.view"
   xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
+  xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
   xmlns:bb="urn:import:org.gwtbootstrap3.client.ui"
 >
   <g:HTMLPanel>
@@ -16,6 +17,11 @@
           addStyleNames="clearright clearfix"
         />
       </div>
+      <w:OrientationBanner
+        name="TrashCan"
+        title="Getting Started With Trash Can"
+        text="The trash can contains items that were recently deleted. You can recover deleted items in the trash can by clicking &ldquo;Restore&rdquo;. Items will remain in the trash can for 30 days before being automatically purged."
+      />
       <div>
         <div class="pageContent margin-top-60">
           <g:SimplePanel ui:field="componentContainer" />

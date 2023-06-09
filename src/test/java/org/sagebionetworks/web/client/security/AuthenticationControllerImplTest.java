@@ -127,6 +127,11 @@ public class AuthenticationControllerImplTest {
   UserProfile profile;
   public static final String USER_ID = "98208";
   public static final String USER_AUTHENTICATION_RECEIPT_VALUE = "abc-def-ghi";
+  public static final String ORIENTATION_BANNER_STORAGE_VALUE = "true";
+  public static final String ORIENTATION_BANNER_DISMISSED =
+    "orientation_banner_dismissed";
+  public static final String ORIENTATION_BANNER_NOT_DISMISSED =
+    "orientation_banner_not_dismissed";
 
   @Before
   public void before() throws JSONObjectAdapterException {
@@ -148,6 +153,13 @@ public class AuthenticationControllerImplTest {
       .getNotificationEmail(any(AsyncCallback.class));
     when(mockGinInjector.getSynapseJavascriptClient()).thenReturn(mockJsClient);
     when(mockQueryClientProvider.getQueryClient()).thenReturn(mockQueryClient);
+    when(mockSynapseJSNIUtils.getSrcPersistentLocalStorageKeys())
+      .thenReturn(
+        new String[] {
+          ORIENTATION_BANNER_DISMISSED,
+          ORIENTATION_BANNER_NOT_DISMISSED,
+        }
+      );
     authenticationController =
       new AuthenticationControllerImpl(
         mockUserAccountService,
@@ -177,6 +189,10 @@ public class AuthenticationControllerImplTest {
       .thenReturn(USER_AUTHENTICATION_RECEIPT_VALUE);
     when(mockClientCache.contains(USER_AUTHENTICATION_RECEIPT))
       .thenReturn(true);
+    when(mockClientCache.get(ORIENTATION_BANNER_DISMISSED))
+      .thenReturn(ORIENTATION_BANNER_STORAGE_VALUE);
+    when(mockClientCache.contains(ORIENTATION_BANNER_DISMISSED))
+      .thenReturn(true);
 
     authenticationController.logoutUser();
 
@@ -193,6 +209,20 @@ public class AuthenticationControllerImplTest {
       .put(
         eq(USER_AUTHENTICATION_RECEIPT),
         eq(USER_AUTHENTICATION_RECEIPT_VALUE),
+        anyLong()
+      );
+    // verify that dismissed orientation banner is restored
+    verify(mockClientCache)
+      .put(
+        eq(ORIENTATION_BANNER_DISMISSED),
+        eq(ORIENTATION_BANNER_STORAGE_VALUE),
+        anyLong()
+      );
+    // verify that non-dimissed orientation banner is not restored
+    verify(mockClientCache, never())
+      .put(
+        eq(ORIENTATION_BANNER_NOT_DISMISSED),
+        eq(ORIENTATION_BANNER_STORAGE_VALUE),
         anyLong()
       );
     // verify last place is restored

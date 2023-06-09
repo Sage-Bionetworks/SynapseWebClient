@@ -79,6 +79,15 @@ public class FilesTab {
       WebConstants.DOCS_URL + "Files-and-Folders.2048458885.html",
       EntityArea.FILES
     );
+    tab.configureOrientationBanner(
+      "Files",
+      "Getting Started With Files",
+      "Synapse files can be created by uploading content from your local computer or linking to digital files on the web. You can annotate files with custom metadata, embed files into Synapse wiki pages, or associate them with a DOI.",
+      null,
+      null,
+      "Learn More About Files",
+      "https://help.synapse.org/docs/Managing-Files-and-Folders.2058846522.html"
+    );
   }
 
   public void lazyInject() {

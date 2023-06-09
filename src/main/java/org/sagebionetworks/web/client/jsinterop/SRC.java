@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.jsinterop;
 
+import com.google.gwt.core.client.JsArrayString;
 import jsinterop.annotations.JsNullable;
 import jsinterop.annotations.JsPackage;
 import jsinterop.annotations.JsType;
@@ -23,6 +24,7 @@ public class SRC {
     public static ReactComponentType<DownloadCartPageProps> DownloadCartPage;
     public static ReactComponentType<DownloadConfirmationProps> DownloadConfirmation;
     public static ReactComponentType<FullWidthAlertProps> FullWidthAlert;
+    public static ReactComponentType<OrientationBannerProps> OrientationBanner;
     public static ReactComponentType<SchemaDrivenAnnotationEditorProps> SchemaDrivenAnnotationEditor;
     public static ReactComponentType<SynapseNavDrawerProps> SynapseNavDrawer;
     public static ReactComponentType<EmptyProps> FavoritesPage;
@@ -80,5 +82,11 @@ public class SRC {
     /* We use FullContextProvider because it will provide the SynapseContext, react-query QueryContext, and MUI Theme
      context for all React trees that we render */
     public static ReactComponentType<SynapseReactClientFullContextProviderProps> FullContextProvider;
+  }
+
+  @JsType(isNative = true)
+  public static class SynapseConstants {
+
+    public static JsArrayString PERSISTENT_LOCAL_STORAGE_KEYS;
   }
 }

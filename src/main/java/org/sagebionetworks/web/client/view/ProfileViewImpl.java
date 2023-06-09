@@ -43,6 +43,7 @@ import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.presenter.ProjectFilterEnum;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
+import org.sagebionetworks.web.client.widget.OrientationBanner;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.table.v2.results.SortableTableHeaderImpl;
@@ -92,6 +93,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 
   @UiField
   Heading pageHeaderTitle;
+
+  @UiField
+  SimplePanel orientationBannerPanel;
 
   // Project tab
   // filters
@@ -204,6 +208,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 
   private Presenter presenter;
   private Header headerWidget;
+  private OrientationBanner orientationBanner;
   // View profile widgets
   private static Icon defaultProfilePicture = new Icon(IconType.SYN_USER);
 
@@ -221,12 +226,14 @@ public class ProfileViewImpl extends Composite implements ProfileView {
     ProfileViewImplUiBinder binder,
     Header headerWidget,
     CookieProvider cookies,
-    SynapseReactClientFullContextPropsProvider propsProvider
+    SynapseReactClientFullContextPropsProvider propsProvider,
+    OrientationBanner orientationBanner
   ) {
     initWidget(binder.createAndBindUi(this));
     this.headerWidget = headerWidget;
     this.cookies = cookies;
     this.propsProvider = propsProvider;
+    this.orientationBanner = orientationBanner;
     headerWidget.configure();
     projectSearchTextBox
       .getElement()
@@ -501,6 +508,28 @@ public class ProfileViewImpl extends Composite implements ProfileView {
     DisplayUtils.hide(favoritesTabContainer);
   }
 
+  private void configureOrientationBanner(
+    String name,
+    String title,
+    String text,
+    String primaryButtonText,
+    ClickHandler primaryButtonClickHandler,
+    String secondaryButtonText,
+    String secondaryButtonHref
+  ) {
+    orientationBannerPanel.clear();
+    orientationBanner.configure(
+      name,
+      title,
+      text,
+      primaryButtonText,
+      primaryButtonClickHandler,
+      secondaryButtonText,
+      secondaryButtonHref
+    );
+    orientationBannerPanel.setWidget(orientationBanner.asWidget());
+  }
+
   /**
    * Used only for setting the view's tab display
    *
@@ -516,22 +545,64 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 
     if (targetTab == Synapse.ProfileArea.PROFILE) {
       pageHeaderTitle.setText(profileHeaderText);
+      orientationBannerPanel.clear();
       DisplayUtils.show(profileTabContainer);
     } else if (targetTab == Synapse.ProfileArea.PROJECTS) {
       pageHeaderTitle.setText("Your Projects");
+      configureOrientationBanner(
+        "Projects",
+        "Getting Started With Your Projects",
+        "Projects are the main \"containers\" where information is stored and organized in Synapse. They are online workspaces where you can collaborate and share your work with teammates. Projects can be shared with individuals, small teams, or large consortia. Projects can be private so only you and your team can see what\'s inside, or they can be shared publicly for anyone to browse.",
+        null,
+        null,
+        "Learn More About Projects",
+        "https://help.synapse.org/docs/Setting-Up-a-Project.2055471258.html"
+      );
       DisplayUtils.show(projectsTabContainer);
     } else if (targetTab == Synapse.ProfileArea.TEAMS) {
       pageHeaderTitle.setText("Your Teams");
+      configureOrientationBanner(
+        "Teams",
+        "Getting Started With Your Teams",
+        "Teams allow you to easily manage groups of users to control access to projects, communicate with colleagues, and participate in challenges.",
+        "Search Teams",
+        new ClickHandler() {
+          @Override
+          public void onClick(ClickEvent event) {
+            presenter.goTo(new TeamSearch(teamSearchTextBox.getValue()));
+          }
+        },
+        "Learn More About Teams",
+        "https://help.synapse.org/docs/Teams.1985446029.html"
+      );
       DisplayUtils.show(teamsTabContainer);
     } else if (targetTab == Synapse.ProfileArea.SETTINGS) {
       pageHeaderTitle.setText("Account Settings");
+      orientationBannerPanel.clear();
       DisplayUtils.show(settingsTabContainer);
     } else if (targetTab == Synapse.ProfileArea.CHALLENGES) {
       pageHeaderTitle.setText("Your Challenges");
+      configureOrientationBanner(
+        "Challenges",
+        "Getting Started With Your Challenges",
+        "Challenges are open science, collaborative competitions for evaluating and comparing computational algorithms or solutions to problems.",
+        null,
+        null,
+        "Learn More About Challenges",
+        "https://help.synapse.org/docs/Challenges.1985184148.html"
+      );
       DisplayUtils.show(challengesTabContainer);
     } else if (targetTab == Synapse.ProfileArea.FAVORITES) {
       pageHeaderTitle.setText("Your Favorites");
-
+      configureOrientationBanner(
+        "Favorites",
+        "Getting Started With Your Favorites",
+        "Throughout Synapse, you can favorite pretty much any item (project, file, folder, table, dataset, etc.) by clicking the star icon next to its name. This will add that item to your favorites list.",
+        null,
+        null,
+        "Learn More About Favorites",
+        "https://help.synapse.org/docs/Navigating-Synapse.2048557182.html#NavigatingSynapse-Favorites"
+      );
       EmptyProps props = EmptyProps.create();
       ReactNode component = React.createElementWithSynapseContext(
         SRC.SynapseComponents.FavoritesPage,

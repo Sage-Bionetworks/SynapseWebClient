@@ -6,6 +6,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.InlineHTML;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import org.gwtbootstrap3.client.ui.Anchor;
@@ -18,6 +19,7 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.widget.ClickableDiv;
 import org.sagebionetworks.web.client.widget.HelpWidget;
 import org.sagebionetworks.web.client.widget.IconSvg;
+import org.sagebionetworks.web.client.widget.OrientationBanner;
 
 public class TabViewImpl implements TabView {
 
@@ -33,6 +35,9 @@ public class TabViewImpl implements TabView {
   ListItem tabListItem;
 
   @UiField
+  SimplePanel orientationBannerPanel;
+
+  @UiField
   Div contentDiv;
 
   boolean isActive = false;
@@ -43,13 +48,18 @@ public class TabViewImpl implements TabView {
   Widget widget;
   ClickHandler tabClickedHandler;
   Anchor anchor;
+  OrientationBanner orientationBanner;
 
   @Inject
-  public TabViewImpl(HelpWidget helpWidget) {
+  public TabViewImpl(
+    HelpWidget helpWidget,
+    OrientationBanner orientationBanner
+  ) {
     // empty constructor, you can include this widget in the ui xml
     TabViewImplUiBinder binder = GWT.create(TabViewImplUiBinder.class);
     widget = binder.createAndBindUi(this);
     this.helpWidget = helpWidget;
+    this.orientationBanner = orientationBanner;
     tabClickedHandler =
       new ClickHandler() {
         @Override
@@ -65,6 +75,29 @@ public class TabViewImpl implements TabView {
   @Override
   public void setPresenter(Presenter presenter) {
     this.presenter = presenter;
+  }
+
+  @Override
+  public void configureOrientationBanner(
+    String name,
+    String title,
+    String text,
+    String primaryButtonText,
+    ClickHandler primaryButtonClickHandler,
+    String secondaryButtonText,
+    String secondaryButtonHref
+  ) {
+    orientationBannerPanel.clear();
+    orientationBanner.configure(
+      name,
+      title,
+      text,
+      primaryButtonText,
+      primaryButtonClickHandler,
+      secondaryButtonText,
+      secondaryButtonHref
+    );
+    orientationBannerPanel.setWidget(orientationBanner.asWidget());
   }
 
   @Override
