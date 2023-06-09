@@ -513,7 +513,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
     String title,
     String text,
     String primaryButtonText,
-    String primaryButtonHref,
+    ClickHandler primaryButtonClickHandler,
     String secondaryButtonText,
     String secondaryButtonHref
   ) {
@@ -523,7 +523,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
       title,
       text,
       primaryButtonText,
-      primaryButtonHref,
+      primaryButtonClickHandler,
       secondaryButtonText,
       secondaryButtonHref
     );
@@ -566,7 +566,12 @@ public class ProfileViewImpl extends Composite implements ProfileView {
         "Getting Started With Your Teams",
         "Teams allow you to easily manage groups of users to control access to projects, communicate with colleagues, and participate in challenges.",
         "Search Teams",
-        "https://www.synapse.org/#!TeamSearch:",
+        new ClickHandler() {
+          @Override
+          public void onClick(ClickEvent event) {
+            presenter.goTo(new TeamSearch(teamSearchTextBox.getValue()));
+          }
+        },
         "Learn More About Teams",
         "https://help.synapse.org/docs/Teams.1985446029.html"
       );

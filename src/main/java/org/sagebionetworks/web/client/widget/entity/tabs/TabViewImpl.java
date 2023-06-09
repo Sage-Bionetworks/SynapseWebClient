@@ -83,7 +83,7 @@ public class TabViewImpl implements TabView {
     String title,
     String text,
     String primaryButtonText,
-    String primaryButtonHref,
+    ClickHandler primaryButtonClickHandler,
     String secondaryButtonText,
     String secondaryButtonHref
   ) {
@@ -93,7 +93,7 @@ public class TabViewImpl implements TabView {
       title,
       text,
       primaryButtonText,
-      primaryButtonHref,
+      primaryButtonClickHandler,
       secondaryButtonText,
       secondaryButtonHref
     );

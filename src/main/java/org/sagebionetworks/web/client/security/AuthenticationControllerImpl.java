@@ -9,7 +9,9 @@ import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.StatusCodeException;
 import com.google.inject.Inject;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -56,7 +58,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
   public static String COOKIES_ACCEPTED =
     "org.sagebionetworks.security.cookies.notification.okclicked";
 
-  private String[] persistentLocalStorageKeys;
+  private List<String> persistentLocalStorageKeys;
   private String currentUserAccessToken;
   private UserProfile currentUserProfile;
   private UserAccountServiceAsync userAccountService;
@@ -429,18 +431,14 @@ public class AuthenticationControllerImpl implements AuthenticationController {
     };
     String[] srcPersistentLocalStorageKeys = jsniUtils.getSrcPersistentLocalStorageKeys();
 
-    int srcKeysLength = srcPersistentLocalStorageKeys.length;
-    int swcKeysLength = swcPersistentLocalStorageKeys.length;
+    this.persistentLocalStorageKeys = new ArrayList<String>();
 
-    this.persistentLocalStorageKeys = new String[srcKeysLength + swcKeysLength];
-
-    for (int i = 0; i < srcKeysLength; i++) {
-      this.persistentLocalStorageKeys[i] = srcPersistentLocalStorageKeys[i];
+    for (int i = 0; i < srcPersistentLocalStorageKeys.length; i++) {
+      this.persistentLocalStorageKeys.add(srcPersistentLocalStorageKeys[i]);
     }
 
-    for (int i = 0; i < swcKeysLength; i++) {
-      this.persistentLocalStorageKeys[srcKeysLength + i] =
-        swcPersistentLocalStorageKeys[i];
+    for (int i = 0; i < swcPersistentLocalStorageKeys.length; i++) {
+      this.persistentLocalStorageKeys.add(swcPersistentLocalStorageKeys[i]);
     }
   }
 }

@@ -121,7 +121,7 @@ public class OrientationBanner implements IsWidget {
     String title,
     String text,
     String primaryButtonText,
-    String primaryButtonHref,
+    ClickHandler primaryButtonClickHandler,
     String secondaryButtonText,
     String secondaryButtonHref
   ) {
@@ -131,6 +131,6 @@ public class OrientationBanner implements IsWidget {
     this.primaryButtonText = primaryButtonText;
     this.secondaryButtonText = secondaryButtonText;
     this.secondaryButtonHref = secondaryButtonHref;
-    setPrimaryCTAHref(primaryButtonHref);
+    addPrimaryCTAClickHandler(primaryButtonClickHandler);
   }
 }

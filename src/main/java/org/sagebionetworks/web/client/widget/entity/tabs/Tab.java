@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import java.util.ArrayList;
@@ -85,7 +86,7 @@ public class Tab implements TabView.Presenter {
     String title,
     String text,
     String primaryButtonText,
-    String primaryButtonHref,
+    ClickHandler primaryButtonClickHandler,
     String secondaryButtonText,
     String secondaryButtonHref
   ) {
@@ -94,7 +95,7 @@ public class Tab implements TabView.Presenter {
       title,
       text,
       primaryButtonText,
-      primaryButtonHref,
+      primaryButtonClickHandler,
       secondaryButtonText,
       secondaryButtonHref
     );
