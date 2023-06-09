@@ -68,7 +68,6 @@ import org.sagebionetworks.web.client.widget.accessrequirements.SubjectWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.TermsOfUseAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.approval.AccessorGroupWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateAccessRequirementWizard;
-import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateDataAccessRequestWizard;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.ACTDataAccessSubmissionWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.OpenSubmissionWidget;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
@@ -748,8 +747,6 @@ public interface PortalGinInjector extends Ginjector {
   EntityIdCellRenderer getEntityIdCellRenderer();
 
   UserIdCellRenderer getUserIdCellRenderer();
-
-  CreateDataAccessRequestWizard getCreateDataAccessRequestWizard();
 
   ManagedACTAccessRequirementWidget getManagedACTAccessRequirementWidget();
 

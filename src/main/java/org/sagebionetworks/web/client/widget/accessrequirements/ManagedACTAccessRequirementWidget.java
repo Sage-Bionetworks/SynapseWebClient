@@ -14,17 +14,14 @@ import org.sagebionetworks.repo.model.dataaccess.ManagedACTAccessRequirementStat
 import org.sagebionetworks.repo.model.dataaccess.SubmissionStatus;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DateTimeUtils;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateDataAccessRequestWizard;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
-import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -275,24 +272,12 @@ public class ManagedACTAccessRequirementWidget
 
   @Override
   public void onRequestAccess() {
-    // pop up DataAccessRequest dialog
-    CreateDataAccessRequestWizard wizard = ginInjector.getCreateDataAccessRequestWizard();
-    view.setDataAccessRequestWizard(wizard);
-    wizard.configure(ar, targetSubject);
-    wizard.showModal(
-      new WizardCallback() {
-        // In any case, the state may have changed, so refresh this AR
-        @Override
-        public void onFinished() {
-          refreshApprovalState();
-        }
+    view.showRequestAccessModal(this.ar);
+  }
 
-        @Override
-        public void onCanceled() {
-          refreshApprovalState();
-        }
-      }
-    );
+  @Override
+  public void handleException(Throwable t) {
+    synAlert.handleException(t);
   }
 
   public void addStyleNames(String styleNames) {

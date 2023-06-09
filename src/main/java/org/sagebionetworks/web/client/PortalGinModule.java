@@ -164,10 +164,6 @@ import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequ
 import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateManagedACTAccessRequirementStep2ViewImpl;
 import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateManagedACTAccessRequirementStep3View;
 import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateManagedACTAccessRequirementStep3ViewImpl;
-import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateDataAccessSubmissionWizardStep2View;
-import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateDataAccessSubmissionWizardStep2ViewImpl;
-import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateResearchProjectWizardStep1View;
-import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateResearchProjectWizardStep1ViewImpl;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.ACTDataAccessSubmissionWidgetView;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.ACTDataAccessSubmissionWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.OpenSubmissionWidgetView;
@@ -1519,10 +1515,6 @@ public class PortalGinModule extends AbstractGinModule {
       .to(ACTAccessRequirementWidgetViewImpl.class);
     bind(TermsOfUseAccessRequirementWidgetView.class)
       .to(TermsOfUseAccessRequirementWidgetViewImpl.class);
-    bind(CreateResearchProjectWizardStep1View.class)
-      .to(CreateResearchProjectWizardStep1ViewImpl.class);
-    bind(CreateDataAccessSubmissionWizardStep2View.class)
-      .to(CreateDataAccessSubmissionWizardStep2ViewImpl.class);
     bind(FileHandleWidgetView.class).to(FileHandleWidgetViewImpl.class);
     bind(CreateAccessRequirementStep1View.class)
       .to(CreateAccessRequirementStep1ViewImpl.class);
