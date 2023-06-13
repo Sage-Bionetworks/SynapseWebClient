@@ -16,6 +16,7 @@ import org.sagebionetworks.repo.model.table.MaterializedView;
 import org.sagebionetworks.repo.model.table.SubmissionView;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.repo.model.table.VirtualTable;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 
 public class EntityTypeUtils {
@@ -24,6 +25,7 @@ public class EntityTypeUtils {
   public static final String ENTITY_VIEW_DISPLAY_NAME = "View";
   public static final String MATERIALIZED_VIEW_DISPLAY_NAME =
     "Materialized View";
+  public static final String VIRTUAL_TABLE_DISPLAY_NAME = "Virtual Table";
   public static final String DATASET_DISPLAY_NAME = "Dataset";
 
   public static final String DATASET_COLLECTION_DISPLAY_NAME =
@@ -56,6 +58,8 @@ public class EntityTypeUtils {
         entityType.equalsIgnoreCase(EntityType.materializedview.name())
       ) {
         className = MaterializedView.class.getName();
+      } else if (entityType.equalsIgnoreCase(EntityType.virtualtable.name())) {
+        className = VirtualTable.class.getName();
       } else if (entityType.equalsIgnoreCase(EntityType.dataset.name())) {
         className = Dataset.class.getName();
       } else if (
@@ -101,6 +105,9 @@ public class EntityTypeUtils {
     } else if (MaterializedView.class.getName().equals(className)) {
       // Materialized View
       type = EntityType.materializedview;
+    } else if (VirtualTable.class.getName().equals(className)) {
+      // Virtual Table
+      type = EntityType.virtualtable;
     } else if (Dataset.class.getName().equals(className)) {
       type = EntityType.dataset;
     } else if (DatasetCollection.class.getName().equals(className)) {
@@ -147,7 +154,10 @@ public class EntityTypeUtils {
       // FileView
       icon = IconType.TH_LIST;
     } else if (MaterializedView.class.getName().equals(className)) {
-      // FileView
+      // Materialized View
+      icon = IconType.TH_LIST;
+    } else if (VirtualTable.class.getName().equals(className)) {
+      // Virtual Table
       icon = IconType.TH_LIST;
     } else if (SubmissionView.class.getName().equals(className)) {
       // Submission View
@@ -173,6 +183,8 @@ public class EntityTypeUtils {
       friendlyName = ENTITY_VIEW_DISPLAY_NAME;
     } else if (MaterializedView.class.getName().equals(className)) {
       friendlyName = MATERIALIZED_VIEW_DISPLAY_NAME;
+    } else if (VirtualTable.class.getName().equals(className)) {
+      friendlyName = VIRTUAL_TABLE_DISPLAY_NAME;
     } else if (SubmissionView.class.getName().equals(className)) {
       friendlyName = SUBMISSION_VIEW_DISPLAY_NAME;
     } else if (DatasetCollection.class.getName().equals(className)) {

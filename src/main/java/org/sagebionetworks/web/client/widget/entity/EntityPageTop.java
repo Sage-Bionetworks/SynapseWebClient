@@ -334,7 +334,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
   }
 
   private void setTargetVersion(Long versionNumber) {
-    if (EntityActionControllerImpl.isVersionSupported(entity, cookies)) {
+    if (EntityActionControllerImpl.isVersionSupported(entity)) {
       this.currentTargetVersionNumber = versionNumber;
     } else {
       this.currentTargetVersionNumber = null;

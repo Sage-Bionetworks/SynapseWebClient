@@ -99,7 +99,8 @@ public class DefaultEntityActionMenuLayoutUtil {
               ActionViewProps.create(Action.ADD_FILE_VIEW),
               ActionViewProps.create(Action.ADD_PROJECT_VIEW),
               ActionViewProps.create(Action.ADD_SUBMISSION_VIEW),
-              ActionViewProps.create(Action.ADD_MATERIALIZED_VIEW)
+              ActionViewProps.create(Action.ADD_MATERIALIZED_VIEW),
+              ActionViewProps.create(Action.ADD_VIRTUAL_TABLE)
             )
           )
         );
@@ -484,6 +485,7 @@ public class DefaultEntityActionMenuLayoutUtil {
         );
         break;
       case materializedview:
+      case virtualtable:
         layout.setPrimaryMenuText(
           EntityTypeUtils.getDisplayName(entityType) + TOOLS_SUFFIX
         );

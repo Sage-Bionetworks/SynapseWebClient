@@ -116,6 +116,7 @@ public class DefaultActionConfigurationUtil {
         Action.ADD_MATERIALIZED_VIEW,
         "Add Materialized View"
       ),
+      ActionConfiguration.create(Action.ADD_VIRTUAL_TABLE, "Add Virtual Table"),
       ActionConfiguration.create(Action.FOLLOW, "Follow"),
       ActionConfiguration.create(Action.CREATE_THREAD, "Create New Thread"),
       ActionConfiguration.create(

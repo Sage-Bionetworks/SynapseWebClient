@@ -15,6 +15,7 @@ import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.MaterializedView;
 import org.sagebionetworks.repo.model.table.SubmissionView;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.repo.model.table.VirtualTable;
 
 public class EntityTypeUtilsTest {
 
@@ -60,6 +61,12 @@ public class EntityTypeUtilsTest {
       MaterializedView.class.getName(),
       EntityTypeUtils.getEntityClassNameForEntityType(
         EntityType.materializedview.name()
+      )
+    );
+    assertEquals(
+      VirtualTable.class.getName(),
+      EntityTypeUtils.getEntityClassNameForEntityType(
+        EntityType.virtualtable.name()
       )
     );
     assertEquals(
@@ -117,6 +124,12 @@ public class EntityTypeUtilsTest {
       )
     );
     assertEquals(
+      EntityType.virtualtable,
+      EntityTypeUtils.getEntityTypeForEntityClassName(
+        VirtualTable.class.getName()
+      )
+    );
+    assertEquals(
       EntityType.file,
       EntityTypeUtils.getEntityTypeForEntityClassName("default")
     );
@@ -155,6 +168,12 @@ public class EntityTypeUtilsTest {
       )
     );
     assertEquals(
+      IconType.TH_LIST,
+      EntityTypeUtils.getIconTypeForEntityClassName(
+        VirtualTable.class.getName()
+      )
+    );
+    assertEquals(
       IconType.FILE,
       EntityTypeUtils.getIconTypeForEntityClassName("default")
     );
@@ -181,6 +200,10 @@ public class EntityTypeUtilsTest {
     assertEquals(
       EntityTypeUtils.MATERIALIZED_VIEW_DISPLAY_NAME,
       EntityTypeUtils.getFriendlyTableTypeName(MaterializedView.class.getName())
+    );
+    assertEquals(
+      EntityTypeUtils.VIRTUAL_TABLE_DISPLAY_NAME,
+      EntityTypeUtils.getFriendlyTableTypeName(VirtualTable.class.getName())
     );
 
     assertEquals(
@@ -211,6 +234,12 @@ public class EntityTypeUtilsTest {
     header.setType(MaterializedView.class.getName());
     assertEquals(
       EntityType.materializedview,
+      EntityTypeUtils.getEntityType(header)
+    );
+
+    header.setType(VirtualTable.class.getName());
+    assertEquals(
+      EntityType.virtualtable,
       EntityTypeUtils.getEntityType(header)
     );
 

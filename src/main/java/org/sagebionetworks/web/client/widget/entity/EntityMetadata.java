@@ -134,12 +134,7 @@ public class EntityMetadata implements Presenter {
     boolean isCurrentVersion = en instanceof VersionableEntity
       ? ((VersionableEntity) en).getIsLatestVersion()
       : true;
-    if (
-      EntityActionControllerImpl.isVersionSupported(
-        bundle.getEntity(),
-        ginInjector.getCookieProvider()
-      )
-    ) {
+    if (EntityActionControllerImpl.isVersionSupported(bundle.getEntity())) {
       getVersionHistoryWidget()
         .setVisible(
           !((VersionableEntity) bundle.getEntity()).getIsLatestVersion()

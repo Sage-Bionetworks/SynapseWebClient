@@ -60,6 +60,7 @@ import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.DatasetCollection;
 import org.sagebionetworks.repo.model.table.EntityRefCollectionView;
 import org.sagebionetworks.repo.model.table.EntityView;
+import org.sagebionetworks.repo.model.table.HasDefiningSql;
 import org.sagebionetworks.repo.model.table.MaterializedView;
 import org.sagebionetworks.repo.model.table.SnapshotRequest;
 import org.sagebionetworks.repo.model.table.SnapshotResponse;
@@ -68,6 +69,7 @@ import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionResponse;
+import org.sagebionetworks.repo.model.table.VirtualTable;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
@@ -125,7 +127,7 @@ import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.statistics.StatisticsPlotWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.MaterializedViewEditor;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.SqlDefinedTableEditor;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
@@ -272,7 +274,7 @@ public class EntityActionControllerImpl
   IsACTMemberAsyncHandler isACTMemberAsyncHandler;
   AddFolderDialogWidget addFolderDialogWidget;
   CreateTableViewWizard createTableViewWizard;
-  MaterializedViewEditor materializedViewEditor;
+  SqlDefinedTableEditor sqlDefinedTableEditor;
   boolean isShowingVersion = false;
   WizardCallback entityUpdatedWizardCallback;
   UploadTableModalWidget uploadTableModalWidget;
@@ -434,12 +436,12 @@ public class EntityActionControllerImpl
     return accessControlListModalWidget;
   }
 
-  private MaterializedViewEditor getMaterializedViewEditor() {
-    if (materializedViewEditor == null) {
-      materializedViewEditor = ginInjector.getMaterializedViewEditor();
-      this.view.addWidget(materializedViewEditor.asWidget());
+  private SqlDefinedTableEditor getSqlDefinedTableEditor() {
+    if (sqlDefinedTableEditor == null) {
+      sqlDefinedTableEditor = ginInjector.getSqlDefinedTableEditor();
+      this.view.addWidget(sqlDefinedTableEditor.asWidget());
     }
-    return materializedViewEditor;
+    return sqlDefinedTableEditor;
   }
 
   private CreateTableViewWizard getCreateTableViewWizard() {
@@ -959,6 +961,11 @@ public class EntityActionControllerImpl
       actionMenu.setActionListener(Action.ADD_SUBMISSION_VIEW, this);
       actionMenu.setActionVisible(Action.ADD_MATERIALIZED_VIEW, canEditResults);
       actionMenu.setActionListener(Action.ADD_MATERIALIZED_VIEW, this);
+      actionMenu.setActionVisible(
+        Action.ADD_VIRTUAL_TABLE,
+        canEditResults && DisplayUtils.isInTestWebsite(cookies)
+      );
+      actionMenu.setActionListener(Action.ADD_VIRTUAL_TABLE, this);
     } else {
       actionMenu.setActionVisible(Action.UPLOAD_TABLE, false);
       actionMenu.setActionVisible(Action.ADD_TABLE, false);
@@ -966,6 +973,7 @@ public class EntityActionControllerImpl
       actionMenu.setActionVisible(Action.ADD_PROJECT_VIEW, false);
       actionMenu.setActionVisible(Action.ADD_SUBMISSION_VIEW, false);
       actionMenu.setActionVisible(Action.ADD_MATERIALIZED_VIEW, false);
+      actionMenu.setActionVisible(Action.ADD_VIRTUAL_TABLE, false);
     }
   }
 
@@ -1255,12 +1263,10 @@ public class EntityActionControllerImpl
   private void configureTableCommands() {
     if (entityBundle.getEntity() instanceof Table) {
       boolean isEntityRefCollectionView = entityBundle.getEntity() instanceof EntityRefCollectionView;
-      boolean isMaterializedView = entityBundle.getEntity() instanceof MaterializedView;
-      // EntityRefCollectionView results are not editable, even if the user has permissions, because rows may reference immutable versions (SWC-5870, SWC-5903)
       boolean canEditResults =
         permissions.getCanCertifiedUserEdit() &&
-        !isEntityRefCollectionView &&
-        !isMaterializedView;
+        isEditCellValuesSupported(entityBundle.getEntity());
+
       actionMenu.setActionVisible(Action.UPLOAD_TABLE_DATA, canEditResults);
       actionMenu.setActionText(
         Action.UPLOAD_TABLE_DATA,
@@ -1270,9 +1276,7 @@ public class EntityActionControllerImpl
       actionMenu.setActionVisible(Action.SHOW_TABLE_SCHEMA, true);
       actionMenu.setActionVisible(
         Action.SHOW_VIEW_SCOPE,
-        !(entityBundle.getEntity() instanceof TableEntity) &&
-        !isEntityRefCollectionView &&
-        !isMaterializedView
+        isDefinedByScope(entityBundle.getEntity())
       );
       actionMenu.setActionVisible(
         Action.EDIT_ENTITYREF_COLLECTION_ITEMS,
@@ -1283,7 +1287,7 @@ public class EntityActionControllerImpl
       actionMenu.setActionVisible(
         Action.EDIT_DEFINING_SQL,
         permissions.getCanCertifiedUserEdit() &&
-        isMaterializedView &&
+        isDefinedBySql(entityBundle.getEntity()) &&
         isCurrentVersion
       );
       actionMenu.setActionListener(Action.EDIT_DEFINING_SQL, this);
@@ -1415,10 +1419,7 @@ public class EntityActionControllerImpl
   private void configureCreateTableViewSnapshot() {
     if (
       entityBundle.getEntity() instanceof Table &&
-      EntityActionControllerImpl.isVersionSupported(
-        entityBundle.getEntity(),
-        cookies
-      )
+      EntityActionControllerImpl.isVersionSupported(entityBundle.getEntity())
     ) {
       if (entityBundle.getEntity() instanceof Dataset) {
         // "Stable Version" for datasets (SWC-5919)
@@ -1497,8 +1498,7 @@ public class EntityActionControllerImpl
 
   private void configureVersionHistory() {
     boolean isVersionHistoryAvailable = EntityActionControllerImpl.isVersionSupported(
-      entityBundle.getEntity(),
-      cookies
+      entityBundle.getEntity()
     );
     actionMenu.setActionVisible(
       Action.SHOW_VERSION_HISTORY,
@@ -1626,12 +1626,29 @@ public class EntityActionControllerImpl
     }
   }
 
-  public static boolean isVersionSupported(
-    Entity entity,
-    CookieProvider cookies
-  ) {
+  public static boolean isVersionSupported(Entity entity) {
+    // The following table types inherit Versionable, but do not actually support snapshot versioning
     boolean isMaterializedView = entity instanceof MaterializedView;
-    return entity instanceof Versionable && !isMaterializedView;
+    boolean isVirtualTable = entity instanceof VirtualTable;
+    boolean isSubmissionView = entity instanceof SubmissionView;
+    boolean isNonSnapshottableTable =
+      isMaterializedView || isVirtualTable || isSubmissionView;
+    return entity instanceof Versionable && !isNonSnapshottableTable;
+  }
+
+  public static boolean isDefinedByScope(Entity entity) {
+    return entity instanceof EntityView || entity instanceof SubmissionView;
+  }
+
+  public static boolean isDefinedBySql(Entity entity) {
+    return entity instanceof HasDefiningSql;
+  }
+
+  public static boolean isEditCellValuesSupported(Entity entity) {
+    // EntityRefCollectionView results are not editable, even if the user has permissions, because rows may reference immutable versions (SWC-5870, SWC-5903)
+    return QueryResultEditorWidget.isTableTypeQueryResultEditable(
+      entity.getClass()
+    );
   }
 
   public boolean isTopLevelProjectToolsMenu(Entity entity, EntityArea area) {
@@ -1818,6 +1835,9 @@ public class EntityActionControllerImpl
       case ADD_MATERIALIZED_VIEW:
         onAddMaterializedView();
         break;
+      case ADD_VIRTUAL_TABLE:
+        onAddVirtualTable();
+        break;
       case CREATE_EXTERNAL_DOCKER_REPO:
         onCreateExternalDockerRepo();
         break;
@@ -1978,8 +1998,24 @@ public class EntityActionControllerImpl
       MaterializedView.class.getName(),
       () -> {
         // to create a MaterializedView, we need to know the definingSQL
-        getMaterializedViewEditor()
-          .configure(entityBundle.getEntity().getId())
+        getSqlDefinedTableEditor()
+          .configure(
+            entityBundle.getEntity().getId(),
+            EntityType.materializedview
+          )
+          .show();
+      }
+    );
+  }
+
+  public void onAddVirtualTable() {
+    preflightController.checkCreateEntity(
+      entityBundle,
+      VirtualTable.class.getName(),
+      () -> {
+        // to create a MaterializedView, we need to know the definingSQL
+        getSqlDefinedTableEditor()
+          .configure(entityBundle.getEntity().getId(), EntityType.virtualtable)
           .show();
       }
     );
@@ -2353,15 +2389,13 @@ public class EntityActionControllerImpl
 
   private void onEditDefiningSql() {
     if (isCurrentVersion) {
-      checkUpdateEntity(() -> {
-        postCheckEditDefiningSql();
-      });
+      checkUpdateEntity(this::postCheckEditDefiningSql);
     }
   }
 
   private PromptCallback getUpdateDefiningSqlCallback() {
     return value -> {
-      ((MaterializedView) entity).setDefiningSQL(value);
+      ((HasDefiningSql) entity).setDefiningSQL(value);
       getSynapseJavascriptClient()
         .updateEntity(
           entity,
@@ -2710,7 +2744,7 @@ public class EntityActionControllerImpl
     // prompt for defining sql
     view.showPromptDialog(
       "Update SQL",
-      ((MaterializedView) entity).getDefiningSQL(),
+      ((HasDefiningSql) entity).getDefiningSQL(),
       getUpdateDefiningSqlCallback(),
       PromptForValuesModalView.InputType.TEXTAREA
     );

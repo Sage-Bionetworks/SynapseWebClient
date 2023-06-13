@@ -21,6 +21,7 @@ import org.sagebionetworks.repo.model.table.SubmissionView;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.ViewTypeMask;
+import org.sagebionetworks.repo.model.table.VirtualTable;
 import org.sagebionetworks.web.client.DisplayConstants;
 
 public class TableType {
@@ -29,7 +30,7 @@ public class TableType {
    * We specifically enumerate some common TableTypes to use elsewhere, but a TableType object does not have to match one of these
    */
 
-  // TableEntity, SubmissionView, MaterializedView, and Dataset don't use viewTypeMask
+  // TableEntity, SubmissionView, MaterializedView, VirtualTable, and Dataset don't use viewTypeMask
   public static final TableType table = new TableType(TableEntity.class, null);
   public static final TableType submission_view = new TableType(
     SubmissionView.class,
@@ -39,6 +40,11 @@ public class TableType {
     MaterializedView.class,
     null
   );
+  public static final TableType virtual_table = new TableType(
+    VirtualTable.class,
+    null
+  );
+
   // We specify a viewTypeMask of 'FILE' for Datasets because they work like file views in many ways
   public static final TableType dataset = new TableType(Dataset.class, FILE);
   public static final TableType dataset_collection = new TableType(
@@ -133,6 +139,8 @@ public class TableType {
       return TableType.submission_view;
     } else if (entity instanceof MaterializedView) {
       return TableType.materialized_view;
+    } else if (entity instanceof VirtualTable) {
+      return TableType.virtual_table;
     } else if (entity instanceof EntityView) {
       EntityView view = (EntityView) entity;
 
@@ -171,6 +179,9 @@ public class TableType {
     if (this.clazz == MaterializedView.class) {
       return DisplayConstants.MATERIALIZED_VIEW;
     }
+    if (this.clazz == VirtualTable.class) {
+      return DisplayConstants.VIRTUAL_TABLE;
+    }
     if (this.clazz == Dataset.class) {
       return DisplayConstants.DATASET;
     }
@@ -191,5 +202,9 @@ public class TableType {
       }
     }
     return DisplayConstants.TABLE;
+  }
+
+  public Class<? extends Table> getClazz() {
+    return clazz;
   }
 }

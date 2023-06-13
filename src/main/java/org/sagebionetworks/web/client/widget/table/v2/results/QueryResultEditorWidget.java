@@ -11,10 +11,12 @@ import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.AppendableRowSetRequest;
 import org.sagebionetworks.repo.model.table.EntityUpdateResult;
 import org.sagebionetworks.repo.model.table.EntityUpdateResults;
+import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.PartialRow;
 import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.SelectColumn;
+import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.TableUpdateRequest;
 import org.sagebionetworks.repo.model.table.TableUpdateResponse;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
@@ -367,11 +369,12 @@ public class QueryResultEditorWidget
 
   public static boolean isTableTypeQueryResultEditable(TableType tableType) {
     // Datasets should not be editable (SWC-5870, SWC-5903)
-    return !(
-      tableType.equals(TableType.dataset) ||
-      tableType.equals(TableType.dataset_collection) ||
-      tableType.equals(TableType.materialized_view)
-    );
+    return isTableTypeQueryResultEditable(tableType.getClazz());
+  }
+
+  public static boolean isTableTypeQueryResultEditable(Class<?> clazz) {
+    // EntityRefCollectionView results are not editable, even if the user has permissions, because rows may reference immutable versions (SWC-5870, SWC-5903)
+    return clazz.equals(TableEntity.class) || clazz.equals(EntityView.class);
   }
 
   /**

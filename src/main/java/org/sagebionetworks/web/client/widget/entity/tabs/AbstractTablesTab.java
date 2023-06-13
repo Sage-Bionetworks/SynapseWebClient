@@ -279,8 +279,7 @@ public abstract class AbstractTablesTab
     String areaToken
   ) {
     boolean isVersionSupported = EntityActionControllerImpl.isVersionSupported(
-      entityBundle.getEntity(),
-      ginInjector.getCookieProvider()
+      entityBundle.getEntity()
     );
     Long newVersion = isVersionSupported ? versionNumber : null;
     Synapse newPlace = new Synapse(
@@ -342,8 +341,7 @@ public abstract class AbstractTablesTab
     boolean isShownInTab = isEntityShownInTab(entity);
     boolean isProject = entity instanceof Project;
     boolean isVersionSupported = EntityActionControllerImpl.isVersionSupported(
-      entityBundle.getEntity(),
-      ginInjector.getCookieProvider()
+      entityBundle.getEntity()
     );
     version = isVersionSupported ? versionNumber : null;
     view.setTitle(getTabDisplayName());
