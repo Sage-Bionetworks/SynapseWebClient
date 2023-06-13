@@ -387,7 +387,8 @@ public class TablesTabTest {
           EntityType.table,
           EntityType.entityview,
           EntityType.submissionview,
-          EntityType.materializedview
+          EntityType.materializedview,
+          EntityType.virtualtable
         )
       );
 
