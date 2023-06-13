@@ -352,9 +352,6 @@ public class EntityActionControllerImplTest {
   PromptForValuesModalView.Configuration mockPromptModalConfiguration;
 
   @Mock
-  EntityView mockEntityView;
-
-  @Mock
   SubmissionView mockSubmissionView;
 
   @Mock
@@ -384,6 +381,8 @@ public class EntityActionControllerImplTest {
   PromptForValuesModalView.Configuration.Builder mockPromptModalConfigurationBuilder;
   Set<ResourceAccess> resourceAccessSet;
 
+  EntityView mockEntityView;
+
   public static final String SELECTED_TEAM_ID = "987654";
   public static final long PUBLIC_USER_ID = 77772L;
 
@@ -391,6 +390,7 @@ public class EntityActionControllerImplTest {
 
   @Before
   public void before() {
+    mockEntityView = new EntityView();
     mockEntityFinderBuilder =
       mock(EntityFinderWidget.Builder.class, new SelfReturningAnswer());
     mockPromptModalConfigurationBuilder =
@@ -518,10 +518,9 @@ public class EntityActionControllerImplTest {
     selected = new Reference();
     selected.setTargetId("syn9876");
 
-    when(mockEntityView.getId()).thenReturn(entityId);
-    when(mockEntityView.getParentId()).thenReturn(parentId);
-    when(mockEntityView.getViewTypeMask())
-      .thenReturn(new Long(WebConstants.FILE));
+    mockEntityView.setId(entityId);
+    mockEntityView.setParentId(parentId);
+    mockEntityView.setViewTypeMask(new Long(WebConstants.FILE));
 
     // Setup the mock entity selector to select an entity.
     Mockito
