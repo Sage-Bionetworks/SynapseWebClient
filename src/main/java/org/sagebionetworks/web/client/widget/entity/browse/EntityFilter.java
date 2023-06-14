@@ -10,6 +10,7 @@ import static org.sagebionetworks.repo.model.EntityType.materializedview;
 import static org.sagebionetworks.repo.model.EntityType.project;
 import static org.sagebionetworks.repo.model.EntityType.submissionview;
 import static org.sagebionetworks.repo.model.EntityType.table;
+import static org.sagebionetworks.repo.model.EntityType.virtualtable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,8 +40,9 @@ public enum EntityFilter {
     entityview,
     submissionview,
     dataset,
+    datasetcollection,
     materializedview,
-    datasetcollection
+    virtualtable
   ),
   PROJECT_OR_TABLE(
     project,
@@ -48,8 +50,9 @@ public enum EntityFilter {
     entityview,
     submissionview,
     dataset,
+    datasetcollection,
     materializedview,
-    datasetcollection
+    virtualtable
   );
 
   // when browsing (in the entity tree browser), only these types should be shown.

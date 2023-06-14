@@ -218,7 +218,7 @@ import org.sagebionetworks.web.client.widget.table.api.APITableWidget;
 import org.sagebionetworks.web.client.widget.table.explore.TableEntityWidgetV2;
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQueryModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.MaterializedViewEditor;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.SqlDefinedTableEditor;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.ViewDefaultColumns;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
@@ -784,7 +784,7 @@ public interface PortalGinInjector extends Ginjector {
 
   CreateTableViewWizard getCreateTableViewWizard();
 
-  MaterializedViewEditor getMaterializedViewEditor();
+  SqlDefinedTableEditor getSqlDefinedTableEditor();
 
   UploadTableModalWidget getUploadTableModalWidget();
 

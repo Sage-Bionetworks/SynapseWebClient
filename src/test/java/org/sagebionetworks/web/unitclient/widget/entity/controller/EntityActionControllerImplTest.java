@@ -21,7 +21,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.DisplayConstants.FILE_VIEW;
 import static org.sagebionetworks.web.client.DisplayConstants.MATERIALIZED_VIEW;
+import static org.sagebionetworks.web.client.DisplayConstants.SUBMISSION_VIEW;
 import static org.sagebionetworks.web.client.DisplayConstants.VIEW_DOWNLOAD_LIST;
+import static org.sagebionetworks.web.client.DisplayConstants.VIRTUAL_TABLE;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getDoneFuture;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getFailedFuture;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.ACCESS_REQUIREMENT_GUIDANCE;
@@ -98,9 +100,11 @@ import org.sagebionetworks.repo.model.table.DatasetCollection;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.MaterializedView;
 import org.sagebionetworks.repo.model.table.SnapshotResponse;
+import org.sagebionetworks.repo.model.table.SubmissionView;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionResponse;
+import org.sagebionetworks.repo.model.table.VirtualTable;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
@@ -160,7 +164,7 @@ import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModal;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.MaterializedViewEditor;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.SqlDefinedTableEditor;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
@@ -211,7 +215,7 @@ public class EntityActionControllerImplTest {
   EditProjectMetadataModalWidget mockEditProjectMetadataModalWidget;
 
   @Mock
-  MaterializedViewEditor mockMaterializedViewEditor;
+  SqlDefinedTableEditor mockSqlDefinedTableEditor;
 
   EntityFinderWidget.Builder mockEntityFinderBuilder;
 
@@ -348,10 +352,13 @@ public class EntityActionControllerImplTest {
   PromptForValuesModalView.Configuration mockPromptModalConfiguration;
 
   @Mock
-  EntityView mockEntityView;
+  SubmissionView mockSubmissionView;
 
   @Mock
   MaterializedView mockMaterializedView;
+
+  @Mock
+  VirtualTable mockVirtualTable;
 
   @Mock
   AddToDownloadListV2 mockAddToDownloadListWidget;
@@ -374,6 +381,8 @@ public class EntityActionControllerImplTest {
   PromptForValuesModalView.Configuration.Builder mockPromptModalConfigurationBuilder;
   Set<ResourceAccess> resourceAccessSet;
 
+  EntityView mockEntityView;
+
   public static final String SELECTED_TEAM_ID = "987654";
   public static final long PUBLIC_USER_ID = 77772L;
 
@@ -381,6 +390,7 @@ public class EntityActionControllerImplTest {
 
   @Before
   public void before() {
+    mockEntityView = new EntityView();
     mockEntityFinderBuilder =
       mock(EntityFinderWidget.Builder.class, new SelfReturningAnswer());
     mockPromptModalConfigurationBuilder =
@@ -407,8 +417,8 @@ public class EntityActionControllerImplTest {
       .thenReturn(mockEditProjectMetadataModalWidget);
     when(mockPortalGinInjector.getEntityFinderBuilder())
       .thenReturn(mockEntityFinderBuilder);
-    when(mockPortalGinInjector.getMaterializedViewEditor())
-      .thenReturn(mockMaterializedViewEditor);
+    when(mockPortalGinInjector.getSqlDefinedTableEditor())
+      .thenReturn(mockSqlDefinedTableEditor);
     when(mockEntityFinderBuilder.build()).thenReturn(mockEntityFinder);
 
     when(mockPortalGinInjector.getUploadDialogWidget())
@@ -508,10 +518,9 @@ public class EntityActionControllerImplTest {
     selected = new Reference();
     selected.setTargetId("syn9876");
 
-    when(mockEntityView.getId()).thenReturn(entityId);
-    when(mockEntityView.getParentId()).thenReturn(parentId);
-    when(mockEntityView.getViewTypeMask())
-      .thenReturn(new Long(WebConstants.FILE));
+    mockEntityView.setId(entityId);
+    mockEntityView.setParentId(parentId);
+    mockEntityView.setViewTypeMask(new Long(WebConstants.FILE));
 
     // Setup the mock entity selector to select an entity.
     Mockito
@@ -1056,6 +1065,56 @@ public class EntityActionControllerImplTest {
   }
 
   @Test
+  public void testConfigureWithSubmissionView() {
+    entityBundle.setEntity(mockSubmissionView);
+    boolean canCertifiedUserEdit = true;
+    permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
+
+    when(
+      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+    )
+      .thenReturn("true");
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+    // delete
+    verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, true);
+    verify(mockActionMenu)
+      .setActionText(Action.DELETE_ENTITY, DELETE_PREFIX + SUBMISSION_VIEW);
+    verify(mockActionMenu).setActionListener(Action.DELETE_ENTITY, controller);
+    // share
+    verify(mockActionMenu).setActionVisible(Action.VIEW_SHARING_SETTINGS, true);
+    verify(mockActionMenu)
+      .setActionListener(Action.VIEW_SHARING_SETTINGS, controller);
+    // rename
+    verify(mockActionMenu).setActionVisible(Action.CHANGE_ENTITY_NAME, true);
+    verify(mockActionMenu)
+      .setActionText(Action.CHANGE_ENTITY_NAME, EDIT_NAME_AND_DESCRIPTION);
+    verify(mockActionMenu)
+      .setActionListener(Action.CHANGE_ENTITY_NAME, controller);
+    // upload
+    verify(mockActionMenu).setActionVisible(Action.UPLOAD_NEW_FILE, false);
+    // Submission views are not versionable/snapshottable
+    verify(mockActionMenu).setActionVisible(Action.SHOW_VERSION_HISTORY, false);
+    verify(mockActionMenu).setActionVisible(Action.CREATE_TABLE_VERSION, false);
+
+    // Edit/upload are not possible for a submission view
+    verify(mockActionMenu).setActionVisible(Action.EDIT_TABLE_DATA, false);
+    verify(mockActionMenu).setActionVisible(Action.UPLOAD_TABLE_DATA, false);
+    // Show scope should be visible
+    verify(mockActionMenu).setActionVisible(Action.SHOW_VIEW_SCOPE, true);
+    verify(mockActionMenu).setActionVisible(Action.EDIT_DEFINING_SQL, false);
+    // Edit dataset items should not be visible
+    verify(mockActionMenu)
+      .setActionVisible(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, false);
+  }
+
+  @Test
   public void testConfigureWithMaterializedView() {
     entityBundle.setEntity(mockMaterializedView);
     boolean canCertifiedUserEdit = true;
@@ -1167,6 +1226,117 @@ public class EntityActionControllerImplTest {
   }
 
   @Test
+  public void testConfigureWithVirtualTable() {
+    entityBundle.setEntity(mockVirtualTable);
+    boolean canCertifiedUserEdit = true;
+    permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
+    when(
+      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+    )
+      .thenReturn("true");
+
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+    // delete
+    verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, true);
+    verify(mockActionMenu)
+      .setActionText(Action.DELETE_ENTITY, DELETE_PREFIX + VIRTUAL_TABLE);
+    verify(mockActionMenu).setActionListener(Action.DELETE_ENTITY, controller);
+    // share
+    verify(mockActionMenu).setActionVisible(Action.VIEW_SHARING_SETTINGS, true);
+    verify(mockActionMenu)
+      .setActionListener(Action.VIEW_SHARING_SETTINGS, controller);
+    // rename
+    verify(mockActionMenu).setActionVisible(Action.CHANGE_ENTITY_NAME, true);
+    verify(mockActionMenu)
+      .setActionText(Action.CHANGE_ENTITY_NAME, EDIT_NAME_AND_DESCRIPTION);
+    verify(mockActionMenu)
+      .setActionListener(Action.CHANGE_ENTITY_NAME, controller);
+    // upload
+    verify(mockActionMenu).setActionVisible(Action.UPLOAD_NEW_FILE, false);
+    // versions not currently supported for virtual tables
+    // version history
+    verify(mockActionMenu).setActionVisible(Action.SHOW_VERSION_HISTORY, false);
+    // create table version (snapshot)
+    verify(mockActionMenu).setActionVisible(Action.CREATE_TABLE_VERSION, false);
+    // edit actions, never enabled for Virtual Tables
+    verify(mockActionMenu).setActionVisible(Action.EDIT_TABLE_DATA, false);
+    verify(mockActionMenu).setActionVisible(Action.UPLOAD_TABLE_DATA, false);
+    // Show scope should NOT be visible for Virtual Tables (it's determined by the definingSQL)
+    verify(mockActionMenu).setActionVisible(Action.SHOW_VIEW_SCOPE, false);
+    // VirtualTable has SQL definition that can be edited
+    verify(mockActionMenu).setActionVisible(Action.EDIT_DEFINING_SQL, true);
+    // Edit dataset items should not be visible
+    verify(mockActionMenu)
+      .setActionVisible(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, false);
+  }
+
+  @Test
+  public void testConfigureWithVirtualTableNoPermission() {
+    entityBundle.setEntity(mockVirtualTable);
+    boolean canEdit = false;
+    boolean canCertifiedUserEdit = false;
+    boolean canDelete = false;
+    boolean canChangePermission = false;
+    permissions.setCanEdit(canEdit);
+    permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
+    permissions.setCanDelete(canDelete);
+    permissions.setCanChangePermissions(canChangePermission);
+
+    when(
+      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+    )
+      .thenReturn("true");
+
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+    // Cannot delete without permission
+    verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, false);
+    verify(mockActionMenu)
+      .setActionText(Action.DELETE_ENTITY, DELETE_PREFIX + VIRTUAL_TABLE);
+    verify(mockActionMenu).setActionListener(Action.DELETE_ENTITY, controller);
+    // share is always visible
+    verify(mockActionMenu).setActionVisible(Action.VIEW_SHARING_SETTINGS, true);
+    verify(mockActionMenu)
+      .setActionListener(Action.VIEW_SHARING_SETTINGS, controller);
+    // Cannot rename
+    verify(mockActionMenu).setActionVisible(Action.CHANGE_ENTITY_NAME, false);
+    verify(mockActionMenu)
+      .setActionText(Action.CHANGE_ENTITY_NAME, EDIT_NAME_AND_DESCRIPTION);
+    verify(mockActionMenu)
+      .setActionListener(Action.CHANGE_ENTITY_NAME, controller);
+    // Upload is never visible on VirtualTable
+    verify(mockActionMenu).setActionVisible(Action.UPLOAD_NEW_FILE, false);
+    // versions not currently supported for Virtual Tables
+    // version history
+    verify(mockActionMenu).setActionVisible(Action.SHOW_VERSION_HISTORY, false);
+    // create table version (snapshot)
+    verify(mockActionMenu).setActionVisible(Action.CREATE_TABLE_VERSION, false);
+    // edit actions, never enabled for Virtual Tables
+    verify(mockActionMenu).setActionVisible(Action.EDIT_TABLE_DATA, false);
+    verify(mockActionMenu).setActionVisible(Action.UPLOAD_TABLE_DATA, false);
+    // Show scope should NOT be visible for Virtual Tables (it's determined by the definingSQL)
+    verify(mockActionMenu).setActionVisible(Action.SHOW_VIEW_SCOPE, false);
+    // Cannot edit defining SQL without permission
+    verify(mockActionMenu).setActionVisible(Action.EDIT_DEFINING_SQL, false);
+    // Edit dataset items should never be visible for a Virtual Table
+    verify(mockActionMenu)
+      .setActionVisible(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, false);
+  }
+
+  @Test
   public void testDisableFullTextSearch() {
     when(
       mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
@@ -1254,6 +1424,10 @@ public class EntityActionControllerImplTest {
       .setActionVisible(Action.ADD_MATERIALIZED_VIEW, canCertifiedUserEdit);
     verify(mockActionMenu)
       .setActionListener(Action.ADD_MATERIALIZED_VIEW, controller);
+    verify(mockActionMenu)
+      .setActionVisible(Action.ADD_VIRTUAL_TABLE, canCertifiedUserEdit);
+    verify(mockActionMenu)
+      .setActionListener(Action.ADD_VIRTUAL_TABLE, controller);
   }
 
   @Test
@@ -1281,6 +1455,8 @@ public class EntityActionControllerImplTest {
       .setActionVisible(Action.ADD_PROJECT_VIEW, canCertifiedUserEdit);
     verify(mockActionMenu)
       .setActionVisible(Action.ADD_MATERIALIZED_VIEW, canCertifiedUserEdit);
+    verify(mockActionMenu)
+      .setActionVisible(Action.ADD_VIRTUAL_TABLE, canCertifiedUserEdit);
   }
 
   @Test
@@ -4394,8 +4570,10 @@ public class EntityActionControllerImplTest {
 
   @Test
   public void testOnAddMaterializedView() {
-    when(mockMaterializedViewEditor.configure(anyString()))
-      .thenReturn(mockMaterializedViewEditor);
+    when(
+      mockSqlDefinedTableEditor.configure(anyString(), any(EntityType.class))
+    )
+      .thenReturn(mockSqlDefinedTableEditor);
     AsyncMockStubber
       .callSuccessWith(mockMaterializedView)
       .when(mockSynapseJavascriptClient)
@@ -4405,7 +4583,7 @@ public class EntityActionControllerImplTest {
       .when(mockPreflightController)
       .checkCreateEntity(
         any(EntityBundle.class),
-        anyString(),
+        eq(MaterializedView.class.getCanonicalName()),
         any(Callback.class)
       );
     controller.configure(
@@ -4417,9 +4595,41 @@ public class EntityActionControllerImplTest {
       mockAddToDownloadListWidget
     );
     controller.onAction(Action.ADD_MATERIALIZED_VIEW, null);
-    verify(mockMaterializedViewEditor)
-      .configure(entityBundle.getEntity().getId());
-    verify(mockMaterializedViewEditor).show();
+    verify(mockSqlDefinedTableEditor)
+      .configure(entityBundle.getEntity().getId(), EntityType.materializedview);
+    verify(mockSqlDefinedTableEditor).show();
+  }
+
+  @Test
+  public void testOnAddVirtualTable() {
+    when(
+      mockSqlDefinedTableEditor.configure(anyString(), any(EntityType.class))
+    )
+      .thenReturn(mockSqlDefinedTableEditor);
+    AsyncMockStubber
+      .callSuccessWith(mockVirtualTable)
+      .when(mockSynapseJavascriptClient)
+      .createEntity(any(Entity.class), any(AsyncCallback.class));
+    AsyncMockStubber
+      .callWithInvoke()
+      .when(mockPreflightController)
+      .checkCreateEntity(
+        any(EntityBundle.class),
+        eq(VirtualTable.class.getCanonicalName()),
+        any(Callback.class)
+      );
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+    controller.onAction(Action.ADD_VIRTUAL_TABLE, null);
+    verify(mockSqlDefinedTableEditor)
+      .configure(entityBundle.getEntity().getId(), EntityType.virtualtable);
+    verify(mockSqlDefinedTableEditor).show();
   }
 
   @Test

@@ -7,28 +7,33 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityType;
+import org.sagebionetworks.repo.model.table.HasDefiningSql;
 import org.sagebionetworks.repo.model.table.MaterializedView;
+import org.sagebionetworks.repo.model.table.Table;
+import org.sagebionetworks.repo.model.table.VirtualTable;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
-public class MaterializedViewEditor
-  implements MaterializedViewEditorView.Presenter, IsWidget {
+public class SqlDefinedTableEditor
+  implements SqlDefinedTableEditorView.Presenter, IsWidget {
 
   public static final String MATERIALIZED_VIEW_HELP_MARKDOWN =
     "A Synapse Materialized View is a type of table that is automatically built from a Synapse SQL query.";
   SynapseAlert synAlert;
-  MaterializedViewEditorView view;
+  SqlDefinedTableEditorView view;
   SynapseJavascriptClient jsClient;
   GlobalApplicationState globalAppState;
   PopupUtilsView popupUtils;
   String parentEntityId;
+  EntityType entityType;
 
   @Inject
-  public MaterializedViewEditor(
-    MaterializedViewEditorView view,
+  public SqlDefinedTableEditor(
+    SqlDefinedTableEditorView view,
     SynapseJavascriptClient jsClient,
     SynapseAlert synAlert,
     GlobalApplicationState globalAppState
@@ -45,8 +50,21 @@ public class MaterializedViewEditor
     );
   }
 
-  public MaterializedViewEditor configure(String parentEntityId) {
+  public SqlDefinedTableEditor configure(
+    String parentEntityId,
+    EntityType entityType
+  ) {
+    if (
+      !EntityType.materializedview.equals(entityType) &&
+      !EntityType.virtualtable.equals(entityType)
+    ) {
+      throw new IllegalArgumentException(
+        "Expected MaterializedView or VirtualTable but got " +
+        entityType.toString()
+      );
+    }
     this.parentEntityId = parentEntityId;
+    this.entityType = entityType;
     synAlert.clear();
     view.reset();
     return this;
@@ -63,11 +81,21 @@ public class MaterializedViewEditor
 
   @Override
   public void onSave() {
-    //create MaterializedView
-    MaterializedView newEntity = new MaterializedView();
+    // create the table
+    Table newEntity;
+    if (EntityType.materializedview.equals(this.entityType)) {
+      newEntity = new MaterializedView();
+    } else if (EntityType.virtualtable.equals(this.entityType)) {
+      newEntity = new VirtualTable();
+    } else {
+      throw new IllegalArgumentException(
+        "Expected MaterializedView or VirtualTable but got " +
+        entityType.toString()
+      );
+    }
     newEntity.setName(view.getName());
     newEntity.setDescription(view.getDescription());
-    newEntity.setDefiningSQL(view.getDefiningSql());
+    ((HasDefiningSql) newEntity).setDefiningSQL(view.getDefiningSql());
     newEntity.setParentId(parentEntityId);
     synAlert.clear();
     jsClient

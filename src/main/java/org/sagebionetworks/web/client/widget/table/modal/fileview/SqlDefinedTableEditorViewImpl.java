@@ -16,11 +16,11 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.widget.HelpWidget;
 
-public class MaterializedViewEditorViewImpl
-  implements MaterializedViewEditorView {
+public class SqlDefinedTableEditorViewImpl
+  implements SqlDefinedTableEditorView {
 
   public interface Binder
-    extends UiBinder<Widget, MaterializedViewEditorViewImpl> {}
+    extends UiBinder<Widget, SqlDefinedTableEditorViewImpl> {}
 
   @UiField
   TextBox nameField;
@@ -50,7 +50,7 @@ public class MaterializedViewEditorViewImpl
   Presenter p;
 
   @Inject
-  public MaterializedViewEditorViewImpl(Binder binder, CookieProvider cookies) {
+  public SqlDefinedTableEditorViewImpl(Binder binder, CookieProvider cookies) {
     modal = (Modal) binder.createAndBindUi(this);
     // This constructor won't re-run unless the page is refreshed, so the FormGroup won't be visible after enabling Experimental Mode w/o a refresh
     descriptionFormGroup.setVisible(DisplayUtils.isInTestWebsite(cookies));
