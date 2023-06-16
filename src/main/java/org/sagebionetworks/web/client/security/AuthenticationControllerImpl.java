@@ -5,6 +5,7 @@ import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEn
 
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.StatusCodeException;
@@ -193,6 +194,18 @@ public class AuthenticationControllerImpl implements AuthenticationController {
   public void initializeFromExistingAccessTokenCookie(
     AsyncCallback<UserProfile> callback
   ) {
+    initializeFromExistingAccessTokenCookie(callback, false);
+  }
+
+  /**
+   * Access token cookie should be set before this call
+   *
+   * @param callback
+   */
+  public void initializeFromExistingAccessTokenCookie(
+    AsyncCallback<UserProfile> callback,
+    boolean forceResetQueryClientCache
+  ) {
     // attempt to detect the current access token.  if found, get the associated user profile.  if forbidden (due to ToU), send to ToU page.
     FluentFuture<String> accessTokenFuture = ginInjector
       .getSynapseJavascriptClient()
@@ -204,6 +217,8 @@ public class AuthenticationControllerImpl implements AuthenticationController {
           if (!Objects.equals(currentUserAccessToken, accessToken)) {
             resetQueryClientCache();
             currentUserAccessToken = accessToken;
+          } else if (forceResetQueryClientCache) {
+            resetQueryClientCache();
           }
           userAccountService.getMyProfile(
             new AsyncCallback<UserProfile>() {

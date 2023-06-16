@@ -391,6 +391,25 @@ public class AuthenticationControllerImplTest {
   }
 
   @Test
+  public void testInitializeFromExistingAccessTokenCookieSameTokenForceQueryClientReset() {
+    verify(mockQueryClient, never()).resetQueries();
+
+    // invoke the method twice, verify that the queryclient is cleared the second time when we force it
+    authenticationController.initializeFromExistingAccessTokenCookie(
+      mockUserProfileCallback
+    );
+
+    verify(mockQueryClient, times(1)).resetQueries();
+
+    authenticationController.initializeFromExistingAccessTokenCookie(
+      mockUserProfileCallback,
+      true
+    );
+
+    verify(mockQueryClient, times(2)).resetQueries();
+  }
+
+  @Test
   public void testCheckForQuarantinedEmailNullStatus() {
     when(mockNotificationEmail.getQuarantineStatus()).thenReturn(null);
 

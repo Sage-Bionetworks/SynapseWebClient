@@ -37,6 +37,11 @@ public interface AuthenticationController {
     final AsyncCallback<UserProfile> callback
   );
 
+  void initializeFromExistingAccessTokenCookie(
+    final AsyncCallback<UserProfile> callback,
+    boolean forceResetQueryClient
+  );
+
   /**
    * Terminates the session of the current user
    */

@@ -3,9 +3,11 @@ package org.sagebionetworks.web.unitclient.presenter;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -20,6 +22,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -75,6 +79,9 @@ public class LoginPresenterTest {
   @Captor
   ArgumentCaptor<Callback> callbackCaptor;
 
+  @Captor
+  ArgumentCaptor<AsyncCallback<UserProfile>> asyncCallbackCaptor;
+
   @Mock
   PopupUtilsView mockPopupUtils;
 
@@ -108,10 +115,6 @@ public class LoginPresenterTest {
       .callSuccessWith(mockUserProfile)
       .when(mockAuthenticationController)
       .setNewAccessToken(anyString(), any(AsyncCallback.class));
-    AsyncMockStubber
-      .callSuccessWith(mockUserProfile)
-      .when(mockAuthenticationController)
-      .initializeFromExistingAccessTokenCookie(any(AsyncCallback.class));
   }
 
   @Test
@@ -166,10 +169,21 @@ public class LoginPresenterTest {
 
     loginPresenter.onAcceptTermsOfUse();
 
+    // Verify the AuthenticationController method was called and invoke the passed callback
+    verify(mockAuthenticationController)
+      .initializeFromExistingAccessTokenCookie(
+        asyncCallbackCaptor.capture(),
+        eq(true)
+      );
+    asyncCallbackCaptor.getValue().onSuccess(mockUserProfile);
+
     verify(mockAuthenticationController)
       .signTermsOfUse(any(AsyncCallback.class));
     verify(mockAuthenticationController)
-      .initializeFromExistingAccessTokenCookie(any(AsyncCallback.class));
+      .initializeFromExistingAccessTokenCookie(
+        any(AsyncCallback.class),
+        eq(true)
+      );
     // verify we only showed this once:
     verify(mockView).showTermsOfUse(eq(false));
     // go to the last place (or the user dashboard Profile place if last place is not set)
