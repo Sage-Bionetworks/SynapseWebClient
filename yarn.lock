@@ -402,6 +402,17 @@
     prop-types "^15.8.1"
     react-is "^18.2.0"
 
+"@mui/x-data-grid@5.17.26":
+  version "5.17.26"
+  resolved "https://registry.yarnpkg.com/@mui/x-data-grid/-/x-data-grid-5.17.26.tgz#1f7fa73dd3986cf052e2fd2cb56eb4678a7bd913"
+  integrity sha512-eGJq9J0g9cDGLFfMmugOadZx0mJeOd/yQpHwEa5gUXyONS6qF0OhXSWyDOhDdA3l2TOoQzotMN5dY/T4Wl1KYA==
+  dependencies:
+    "@babel/runtime" "^7.18.9"
+    "@mui/utils" "^5.10.3"
+    clsx "^1.2.1"
+    prop-types "^15.8.1"
+    reselect "^4.1.6"
+
 "@mui/x-date-pickers@^5.0.20":
   version "5.0.20"
   resolved "https://registry.yarnpkg.com/@mui/x-date-pickers/-/x-date-pickers-5.0.20.tgz#7b4e5b5a214a8095937ba7d82bb82acd6f270d72"
@@ -5152,6 +5163,11 @@ require-main-filename@^2.0.0:
   resolved "https://registry.yarnpkg.com/require-main-filename/-/require-main-filename-2.0.0.tgz#d0b329ecc7cc0f61649f62215be69af54aa8989b"
   integrity sha512-NKN5kMDylKuldxYLSUfrbo5Tuzh4hd+2E8NPPX02mZtn1VuREQToYe/ZdlJy+J3uCpfaiGF05e7B8W0iXbQHmg==
 
+reselect@^4.1.6:
+  version "4.1.8"
+  resolved "https://registry.yarnpkg.com/reselect/-/reselect-4.1.8.tgz#3f5dc671ea168dccdeb3e141236f69f02eaec524"
+  integrity sha512-ab9EmR80F/zQTMNeneUr4cv+jSwPJgIlvEmVwLerwrWVbpLlBuls9XHzIeTFy4cegU2NHBp3va0LKOzU5qFEYQ==
+
 resize-observer-polyfill@^1.5.0:
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/resize-observer-polyfill/-/resize-observer-polyfill-1.5.1.tgz#0e9020dd3d21024458d4ebd27e23e40269810464"
@@ -5705,10 +5721,10 @@ svg-path-sdf@^1.1.3:
     parse-svg-path "^0.1.2"
     svg-path-bounds "^1.0.1"
 
-synapse-react-client@3.1.36:
-  version "3.1.36"
-  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-3.1.36.tgz#c3305ca653bba9bd7e1966e191dac54eada2dbb7"
-  integrity sha512-45phSSKgQ21drdHrxp25QJHPaCO8HcTb5G/Phqn6RVU0+KkUhCMTi7bCfZxzv5Ncgbcr0C/x3/16+FGduwl2CA==
+synapse-react-client@3.1.37:
+  version "3.1.37"
+  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-3.1.37.tgz#82df4a2f84a1c768dc92f164d241698ef3d09a1b"
+  integrity sha512-L3rS7lyoaYuRmM1SjCYRPTkod1hYhXiY3rdfD8OyPixdGXDX50gDlRgOjiojMzJJXXFEhXH6JrvMgUPBj9pBXw==
   dependencies:
     "@apidevtools/json-schema-ref-parser" "^9.0.9"
     "@brainhubeu/react-carousel" "1.19.26"
@@ -5718,6 +5734,7 @@ synapse-react-client@3.1.36:
     "@mui/material" "^5.11.16"
     "@mui/system" "^5.11.16"
     "@mui/utils" "^5.11.13"
+    "@mui/x-data-grid" "5.17.26"
     "@mui/x-date-pickers" "^5.0.20"
     "@popperjs/core" "^2.10.2"
     "@react-google-maps/api" "^2.13.1"
