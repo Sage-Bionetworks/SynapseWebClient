@@ -80,6 +80,8 @@ public class LoginPresenter
         public void onSuccess(Void result) {
           // Have to get the UserSessionData again,
           // since it won't contain the UserProfile if the terms haven't been signed
+          // We also need to force-reset the QueryClient so the React components know to refetch
+          boolean forceResetQueryClient = true;
           synAlert.clear();
           authenticationController.initializeFromExistingAccessTokenCookie(
             new AsyncCallback<UserProfile>() {
@@ -94,7 +96,8 @@ public class LoginPresenter
                 // Signed ToU. Check for temp username, passing record, and then forward
                 userAuthenticated();
               }
-            }
+            },
+            forceResetQueryClient
           );
         }
       }
