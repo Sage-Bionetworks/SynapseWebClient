@@ -15,6 +15,8 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
+import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
+import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -357,7 +359,8 @@ public class ManagedACTAccessRequirementWidgetViewImpl
 
   @Override
   public void showRequestAccessModal(
-    ManagedACTAccessRequirement accessRequirement
+    ManagedACTAccessRequirement accessRequirement,
+    RestrictableObjectDescriptor targetSubject
   ) {
     try {
       JSONObjectAdapter arAsJson = accessRequirement.writeToJSONObject(
@@ -368,9 +371,14 @@ public class ManagedACTAccessRequirementWidgetViewImpl
       AccessRequirementListProps.Callback onHide = () -> {
         hideRequestAccessModal();
       };
+      String entityId = "";
+      if (targetSubject.getType() == RestrictableObjectType.ENTITY) {
+        entityId = targetSubject.getId();
+      }
       AccessRequirementListProps props = AccessRequirementListProps.create(
         onHide,
-        arList
+        arList,
+        entityId
       );
       requestDataAccessWidget.render(
         React.createElementWithSynapseContext(

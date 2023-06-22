@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.accessrequirements;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
+import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.web.client.widget.lazyload.SupportsLazyLoadInterface;
 
 public interface ManagedACTAccessRequirementWidgetView
@@ -70,7 +71,10 @@ public interface ManagedACTAccessRequirementWidgetView
   void setAccessRequirementID(String arID);
   void setAccessRequirementName(String description);
 
-  void showRequestAccessModal(ManagedACTAccessRequirement accessRequirement);
+  void showRequestAccessModal(
+    ManagedACTAccessRequirement accessRequirement,
+    RestrictableObjectDescriptor targetSubject
+  );
 
   /**
    * Presenter interface

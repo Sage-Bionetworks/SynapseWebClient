@@ -394,7 +394,8 @@ public class ManagedACTAccessRequirementWidgetTest {
     lazyLoadDataCallback.invoke();
 
     widget.onRequestAccess();
-    verify(mockView).showRequestAccessModal(mockManagedACTAccessRequirement);
+    verify(mockView)
+      .showRequestAccessModal(mockManagedACTAccessRequirement, mockSubject);
   }
 
   @Test
