@@ -272,7 +272,7 @@ public class ManagedACTAccessRequirementWidget
 
   @Override
   public void onRequestAccess() {
-    view.showRequestAccessModal(this.ar);
+    view.showRequestAccessModal(this.ar, targetSubject);
   }
 
   @Override

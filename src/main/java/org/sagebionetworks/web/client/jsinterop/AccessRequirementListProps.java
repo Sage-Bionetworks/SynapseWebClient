@@ -18,15 +18,18 @@ public class AccessRequirementListProps extends ReactComponentProps {
   boolean renderAsModal;
   Object[] accessRequirementFromProps;
   Callback onHide;
+  String entityId;
 
   @JsOverlay
   public static AccessRequirementListProps create(
     Callback onHide,
-    List<JSONObjectAdapter> accessRequirements
+    List<JSONObjectAdapter> accessRequirements,
+    String entityId
   ) {
     AccessRequirementListProps props = new AccessRequirementListProps();
     props.renderAsModal = true;
     props.onHide = onHide;
+    props.entityId = entityId;
     props.accessRequirementFromProps =
       accessRequirements
         .stream()
