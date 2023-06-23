@@ -222,7 +222,11 @@ public class EntityPresenter
 
         @Override
         public void onSuccess(String jsonLd) {
-          view.injectDatasetJsonLd(jsonLd);
+          if (DisplayUtils.isDefined(jsonLd)) {
+            view.injectDatasetJsonLd(jsonLd);
+          } else {
+            view.removeDatasetJsonLdElement();
+          }
         }
       }
     );

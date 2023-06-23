@@ -41,6 +41,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.EntityId2BundleCache;
@@ -102,6 +103,9 @@ public class EntityPresenterTest {
   @Mock
   EntityPageTop mockEntityPageTop;
 
+  @Mock
+  SynapseClientAsync mockSynapseClient;
+
   String EntityId = "1";
   Entity EntityModel1;
   EntityBundle eb;
@@ -110,6 +114,9 @@ public class EntityPresenterTest {
   Synapse.EntityArea area = Synapse.EntityArea.FILES;
   String areaToken = null;
   long id;
+
+  public static final String DATASET_JSON_LD =
+    "{\"@context\":\"http://schema.org/\",\"@type\":\"Dataset\",\"name\":\"yet another ds\",\"description\":\"\",\"url\":\"https://www.synapse.org/#!Synapse:syn33748233.2\",\"version\":2,\"keywords\":[],\"includedInDataCatalog\":{\"@type\":\"DataCatalog\",\"name\":\"Synapse\",\"url\":\"https://www.synapse.org\"},\"isAccessibleForFree\":true,\"dateModified\":\"2022-08-26T21:47Z\"}";
 
   @Mock
   EntityHeader mockProjectEntityHeader;
@@ -166,7 +173,8 @@ public class EntityPresenterTest {
         mockOpenInviteWidget,
         mockGwtWrapper,
         mockEventBus,
-        mockQueryClientProvider
+        mockQueryClientProvider,
+        mockSynapseClient
       );
     Entity testEntity = new Project();
     eb = new EntityBundle();
@@ -197,6 +205,10 @@ public class EntityPresenterTest {
       .when(mockSynapseJavascriptClient)
       .getEntity(anyString(), any(AsyncCallback.class));
     id = 0L;
+    AsyncMockStubber
+      .callSuccessWith(DATASET_JSON_LD)
+      .when(mockSynapseClient)
+      .getDatasetScriptElementContent(anyString(), any(AsyncCallback.class));
   }
 
   @Test
@@ -389,5 +401,26 @@ public class EntityPresenterTest {
     assertFalse(EntityPresenter.isValidEntityId("sy"));
     assertFalse(EntityPresenter.isValidEntityId("synFOOBAR"));
     assertTrue(EntityPresenter.isValidEntityId("SyN198327"));
+  }
+
+  @Test
+  public void testInjectJsonLdIfDataset() {
+    when(mockPlace.getEntityId()).thenReturn(entityId);
+    entityPresenter.setPlace(mockPlace);
+
+    verify(mockView).injectDatasetJsonLd(DATASET_JSON_LD);
+  }
+
+  @Test
+  public void testInjectJsonLdIfDatasetNotDataset() {
+    when(mockPlace.getEntityId()).thenReturn(entityId);
+    AsyncMockStubber
+      .callSuccessWith("")
+      .when(mockSynapseClient)
+      .getDatasetScriptElementContent(anyString(), any(AsyncCallback.class));
+
+    entityPresenter.setPlace(mockPlace);
+
+    verify(mockView).removeDatasetJsonLdElement();
   }
 }

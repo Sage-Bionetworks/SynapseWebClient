@@ -129,12 +129,10 @@ public class EntityViewImpl implements EntityView {
   @Override
   public void injectDatasetJsonLd(String elementContent) {
     removeDatasetJsonLdElement();
-    if (DisplayUtils.isDefined(elementContent)) {
-      Element head = Document.get().getElementsByTagName("head").getItem(0);
-      datasetScriptElement = Document.get().createScriptElement();
-      datasetScriptElement.setType("application/ld+json");
-      datasetScriptElement.setInnerText(elementContent);
-      head.appendChild(datasetScriptElement);
-    }
+    Element head = Document.get().getElementsByTagName("head").getItem(0);
+    datasetScriptElement = Document.get().createScriptElement();
+    datasetScriptElement.setType("application/ld+json");
+    datasetScriptElement.setInnerText(elementContent);
+    head.appendChild(datasetScriptElement);
   }
 }
