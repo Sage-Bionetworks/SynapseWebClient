@@ -87,6 +87,7 @@ import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.table.ColumnChange;
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.FacetColumnRequest;
 import org.sagebionetworks.repo.model.table.TableSchemaChangeRequest;
 import org.sagebionetworks.repo.model.table.TableUpdateRequest;
@@ -2114,16 +2115,21 @@ public class SynapseClientImpl
   @Override
   public String getDatasetScriptElementContent(String entityId)
     throws RestServiceException {
-    String plainTextWiki = CrawlFilter.getPlainTextWiki(entityId, this);
-    EntityBundleRequest bundleRequest = new EntityBundleRequest();
-    bundleRequest.setIncludeEntity(true);
-    bundleRequest.setIncludeAnnotations(true);
-    EntityBundle entityBundle = getEntityBundle(entityId, bundleRequest);
     try {
-      return CrawlFilter.getDatasetScriptElementContent(
-        entityBundle,
-        plainTextWiki
-      );
+      org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+      Entity entity = synapseClient.getEntityById(entityId);
+      if (entity instanceof Dataset) {
+        String plainTextWiki = CrawlFilter.getPlainTextWiki(entityId, this);
+        EntityBundleRequest bundleRequest = new EntityBundleRequest();
+        bundleRequest.setIncludeEntity(true);
+        bundleRequest.setIncludeAnnotations(true);
+        EntityBundle entityBundle = getEntityBundle(entityId, bundleRequest);
+        return CrawlFilter.getDatasetScriptElementContent(
+          entityBundle,
+          plainTextWiki
+        );
+      }
+      return "";
     } catch (Exception e) {
       throw ExceptionUtil.convertSynapseException(e);
     }
