@@ -172,7 +172,7 @@
               </bh:Div>
             </bh:Div>
             <w:HelpWidget
-              helpMarkdown="A Synapse Qualified Researcher is a Certified User with a validated user profile.&#10;Synapse Qualified Researchers are eligible to request access to Bridge data."
+              helpMarkdown="A Synapse user with a validated profile is eligible to request access to specific controlled access tier data, including mHealth data."
               text="More info..."
               href="https://help.synapse.org/docs/User-Types.2007072795.html#UserAccountTiers-ValidatedUsers"
             />
