@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.presenter;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -9,7 +11,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.binder.EventHandler;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -21,6 +22,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.context.QueryClientProvider;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
@@ -59,6 +61,7 @@ public class EntityPresenter
   private GWTWrapper gwt;
   private SynapseJavascriptClient jsClient;
   private QueryClient queryClient;
+  private SynapseClientAsync synapseClient;
 
   @Inject
   public EntityPresenter(
@@ -73,7 +76,8 @@ public class EntityPresenter
     OpenTeamInvitationsWidget openTeamInvitesWidget,
     GWTWrapper gwt,
     EventBus eventBus,
-    QueryClientProvider queryClientProvider
+    QueryClientProvider queryClientProvider,
+    SynapseClientAsync synapseClient
   ) {
     this.headerWidget = headerWidget;
     this.entityPageTop = entityPageTop;
@@ -85,6 +89,8 @@ public class EntityPresenter
     this.jsClient = jsClient;
     this.gwt = gwt;
     this.queryClient = queryClientProvider.getQueryClient();
+    this.synapseClient = synapseClient;
+    fixServiceEntryPoint(synapseClient);
     clear();
     entityPresenterEventBinder
       .getEventBinder()
@@ -206,6 +212,24 @@ public class EntityPresenter
   }
 
   public void getEntityBundleAndLoadPageTop() {
+    synapseClient.getDatasetScriptElementContent(
+      entityId,
+      new AsyncCallback<String>() {
+        @Override
+        public void onFailure(Throwable caught) {
+          view.showErrorMessage(caught.getMessage());
+        }
+
+        @Override
+        public void onSuccess(String jsonLd) {
+          if (DisplayUtils.isDefined(jsonLd)) {
+            view.injectDatasetJsonLd(jsonLd);
+          } else {
+            view.removeDatasetJsonLdElement();
+          }
+        }
+      }
+    );
     final AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
       @Override
       public void onSuccess(EntityBundle bundle) {

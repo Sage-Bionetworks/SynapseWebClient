@@ -1,5 +1,9 @@
 package org.sagebionetworks.web.client.view;
 
+import com.google.gwt.dom.client.Document;
+import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.ScriptElement;
+import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -32,6 +36,7 @@ public class EntityViewImpl implements EntityView {
   Heading accessDependentMessage;
 
   private Widget widget;
+  ScriptElement datasetScriptElement;
 
   @Inject
   public EntityViewImpl(EntityViewImplUiBinder binder) {
@@ -39,6 +44,16 @@ public class EntityViewImpl implements EntityView {
     Window.scrollTo(0, 0); // scroll user to top of page
     // TODO : need to dynamically set the header widget
     // headerWidget.setMenuItemActive(MenuItems.PROJECTS);
+    widget.addAttachHandler(
+      new AttachEvent.Handler() {
+        @Override
+        public void onAttachOrDetach(AttachEvent event) {
+          if (!event.isAttached()) {
+            removeDatasetJsonLdElement();
+          }
+        }
+      }
+    );
   }
 
   @Override
@@ -100,5 +115,24 @@ public class EntityViewImpl implements EntityView {
   @Override
   public void setOpenTeamInvitesVisible(boolean isVisible) {
     openInvitesPanel.setVisible(isVisible);
+  }
+
+  @Override
+  public void removeDatasetJsonLdElement() {
+    if (datasetScriptElement != null) {
+      Element head = Document.get().getElementsByTagName("head").getItem(0);
+      head.removeChild(datasetScriptElement);
+      datasetScriptElement = null;
+    }
+  }
+
+  @Override
+  public void injectDatasetJsonLd(String elementContent) {
+    removeDatasetJsonLdElement();
+    Element head = Document.get().getElementsByTagName("head").getItem(0);
+    datasetScriptElement = Document.get().createScriptElement();
+    datasetScriptElement.setType("application/ld+json");
+    datasetScriptElement.setInnerText(elementContent);
+    head.appendChild(datasetScriptElement);
   }
 }

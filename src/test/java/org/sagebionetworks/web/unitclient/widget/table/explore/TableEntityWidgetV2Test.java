@@ -145,8 +145,6 @@ public class TableEntityWidgetV2Test {
     "select * from syn123 where \"x\" = 'a'";
   public static final String EXPECTED_SQL_FOR_CLIENT =
     "select * from syn123 where \\\"x\\\" = 'a'";
-  public static final String DATASET_JSON_LD =
-    "{\"@context\":\"http://schema.org/\",\"@type\":\"Dataset\",\"name\":\"yet another ds\",\"description\":\"\",\"url\":\"https://www.synapse.org/#!Synapse:syn33748233.2\",\"version\":2,\"keywords\":[],\"includedInDataCatalog\":{\"@type\":\"DataCatalog\",\"name\":\"Synapse\",\"url\":\"https://www.synapse.org\"},\"isAccessibleForFree\":true,\"dateModified\":\"2022-08-26T21:47Z\"}";
 
   @Mock
   FileViewClientsHelp mockFileViewClientsHelp;
@@ -253,10 +251,6 @@ public class TableEntityWidgetV2Test {
     when(mockQueryChangeHandler.getQueryString()).thenReturn(query);
     Header.isShowingPortalAlert = false;
     Header.portalAlertJson = null;
-    AsyncMockStubber
-      .callSuccessWith(DATASET_JSON_LD)
-      .when(mockSynapseClient)
-      .getDatasetScriptElementContent(anyString(), any(AsyncCallback.class));
   }
 
   private void configureBundleWithView(ViewType viewType) {
@@ -1044,34 +1038,5 @@ public class TableEntityWidgetV2Test {
     verify(mockView).setItemsEditorVisible(false);
     verify(mockActionMenu)
       .setActionVisible(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, true);
-  }
-
-  @Test
-  public void testInjectJsonLdIfDataset() {
-    configureBundleWithDataset();
-    widget.configure(
-      entityBundle,
-      versionNumber,
-      true,
-      false,
-      mockQueryChangeHandler,
-      mockActionMenu
-    );
-
-    verify(mockView).injectDatasetJsonLd(DATASET_JSON_LD);
-  }
-
-  @Test
-  public void testInjectJsonLdIfDatasetNotDataset() {
-    widget.configure(
-      entityBundle,
-      versionNumber,
-      true,
-      false,
-      mockQueryChangeHandler,
-      mockActionMenu
-    );
-
-    verify(mockView).removeDatasetJsonLdElement();
   }
 }

@@ -99,6 +99,4 @@ public interface TableEntityWidgetView extends IsWidget {
   void configureTableOnly(String sql);
 
   void setQueryWrapperPlotNavVisible(boolean visible);
-  void injectDatasetJsonLd(String elementContent);
-  void removeDatasetJsonLdElement();
 }
