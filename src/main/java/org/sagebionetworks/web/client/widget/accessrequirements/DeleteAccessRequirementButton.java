@@ -81,7 +81,12 @@ public class DeleteAccessRequirementButton implements IsWidget {
     popupUtils.showConfirmDialog(
       DELETE_ACCESS_REQUIREMENT_TITLE,
       DELETE_ACCESS_REQUIREMENT_MESSAGE,
-      confirmedDeleteCallback
+      () -> {
+        popupUtils.showConfirmDelete(
+          "Are you absolutely sure? This deletes the Access Requirement and all Approvals that are currently associated with this Access Requirement.",
+          confirmedDeleteCallback
+        );
+      }
     );
   }
 
