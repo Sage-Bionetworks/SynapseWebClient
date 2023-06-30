@@ -2,6 +2,7 @@ package org.sagebionetworks.web.unitclient.widget.accessrequirements;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -100,6 +101,9 @@ public class DeleteAccessRequirementButtonTest {
         eq(DELETE_ACCESS_REQUIREMENT_MESSAGE),
         callbackCaptor.capture()
       );
+    callbackCaptor.getValue().invoke();
+    verify(mockPopupUtilsView)
+      .showConfirmDelete(anyString(), callbackCaptor.capture());
     return callbackCaptor.getValue();
   }
 
