@@ -220,6 +220,7 @@ public class ManagedACTAccessRequirementWidget
     view.showUpdateRequestButton();
   }
 
+  @Override
   public void refreshApprovalState() {
     view.resetState();
     if (!authController.isLoggedIn()) {

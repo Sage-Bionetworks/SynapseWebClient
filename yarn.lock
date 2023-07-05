@@ -332,6 +332,8 @@
   version "5.11.16"
   resolved "https://registry.yarnpkg.com/@mui/icons-material/-/icons-material-5.11.16.tgz#417fa773c56672e39d6ccfed9ac55591985f0d38"
   integrity sha512-oKkx9z9Kwg40NtcIajF9uOXhxiyTZrrm9nmIJ4UjkU2IdHpd4QVLbCc/5hZN/y0C6qzi2Zlxyr9TGddQx2vx2A==
+  dependencies:
+    "@babel/runtime" "^7.21.0"
 
 "@mui/material@^5.0.0", "@mui/material@^5.11.16":
   version "5.13.2"
@@ -5719,10 +5721,10 @@ svg-path-sdf@^1.1.3:
     parse-svg-path "^0.1.2"
     svg-path-bounds "^1.0.1"
 
-synapse-react-client@3.1.41:
-  version "3.1.41"
-  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-3.1.41.tgz#0f29eda84098397338be72392504952899c23ad0"
-  integrity sha512-RllP50Hl7epdLXc5ICs/INFi7cRP5nd2H9+F5iadSWbHAvZhvKNV+1892M/dJpBSy1emnBgJrEydX+pPvwNZbw==
+synapse-react-client@3.1.42:
+  version "3.1.42"
+  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-3.1.42.tgz#d887be643e1aab92c7c46814b18516f14e9ca702"
+  integrity sha512-aIySo5wR5flH93Z5aDCL0Wb14MDBWbelVWcNMC5XiPCXZnQaOxJr1zWpu4Us2l/EGIOoVRceX3+GoVOHFag4lQ==
   dependencies:
     "@apidevtools/json-schema-ref-parser" "^9.0.9"
     "@brainhubeu/react-carousel" "1.19.26"
