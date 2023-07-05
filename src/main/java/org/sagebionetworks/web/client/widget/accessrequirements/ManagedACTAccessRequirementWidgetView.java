@@ -84,6 +84,8 @@ public interface ManagedACTAccessRequirementWidgetView
 
     void onRequestAccess();
 
+    void refreshApprovalState();
+
     void handleException(Throwable t);
   }
 }
