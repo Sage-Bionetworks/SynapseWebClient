@@ -9,6 +9,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.Nullable;
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
@@ -360,7 +361,7 @@ public class ManagedACTAccessRequirementWidgetViewImpl
   @Override
   public void showRequestAccessModal(
     ManagedACTAccessRequirement accessRequirement,
-    RestrictableObjectDescriptor targetSubject
+    @Nullable RestrictableObjectDescriptor targetSubject
   ) {
     try {
       JSONObjectAdapter arAsJson = accessRequirement.writeToJSONObject(
@@ -369,10 +370,14 @@ public class ManagedACTAccessRequirementWidgetViewImpl
       List<JSONObjectAdapter> arList = new ArrayList<JSONObjectAdapter>();
       arList.add(arAsJson);
       AccessRequirementListProps.Callback onHide = () -> {
+        presenter.refreshApprovalState();
         hideRequestAccessModal();
       };
-      String entityId = "";
-      if (targetSubject.getType() == RestrictableObjectType.ENTITY) {
+      String entityId = null;
+      if (
+        targetSubject != null &&
+        targetSubject.getType() == RestrictableObjectType.ENTITY
+      ) {
         entityId = targetSubject.getId();
       }
       AccessRequirementListProps props = AccessRequirementListProps.create(
