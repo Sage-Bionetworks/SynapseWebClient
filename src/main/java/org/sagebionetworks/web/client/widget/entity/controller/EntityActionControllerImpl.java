@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.Entity;
@@ -735,7 +735,7 @@ public class EntityActionControllerImpl
             .addCallback(
               new FutureCallback<ActionRequiredList>() {
                 @Override
-                public void onSuccess(@NullableDecl ActionRequiredList result) {
+                public void onSuccess(@Nullable ActionRequiredList result) {
                   if (result != null) {
                     StringBuilder downloadMenuTooltipText = new StringBuilder(
                       NO_PERMISSION_TO_DOWNLOAD
@@ -840,7 +840,7 @@ public class EntityActionControllerImpl
         new FutureCallback<RestrictionInformationResponse>() {
           @Override
           public void onSuccess(
-            @NullableDecl RestrictionInformationResponse restrictionInformation
+            @Nullable RestrictionInformationResponse restrictionInformation
           ) {
             ginInjector
               .getFileDownloadHandlerWidget()
@@ -1014,7 +1014,7 @@ public class EntityActionControllerImpl
       future.addCallback(
         new FutureCallback<Boolean>() {
           @Override
-          public void onSuccess(@NullableDecl Boolean isACT) {
+          public void onSuccess(@Nullable Boolean isACT) {
             if (isACT) {
               actionMenu.setActionVisible(Action.APPROVE_USER_ACCESS, true);
               actionMenu.setActionListener(

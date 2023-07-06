@@ -11,7 +11,7 @@ import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Reference;
@@ -164,7 +164,7 @@ public class CreateTableViewWizardStep1
       defaultColumnsFuture.addCallback(
         new FutureCallback<List<ColumnModel>>() {
           @Override
-          public void onSuccess(@NullableDecl List<ColumnModel> results) {
+          public void onSuccess(@Nullable List<ColumnModel> results) {
             List<String> columnIds = new ArrayList<>();
             for (ColumnModel col : results) {
               columnIds.add(col.getId());
