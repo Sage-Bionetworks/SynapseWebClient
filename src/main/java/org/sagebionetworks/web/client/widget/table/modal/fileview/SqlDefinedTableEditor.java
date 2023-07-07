@@ -23,7 +23,13 @@ public class SqlDefinedTableEditor
   implements SqlDefinedTableEditorView.Presenter, IsWidget {
 
   public static final String MATERIALIZED_VIEW_HELP_MARKDOWN =
-    "A Synapse Materialized View is a type of table that is automatically built from a Synapse SQL query.";
+    "A Synapse Materialized View is a type of table that is automatically built from a Synapse SQL query. " +
+    "The defining SQL of a Materialized View can contain JOIN clauses to combine data from multiple tables.";
+
+  public static final String VIRTUAL_TABLE_HELP_MARKDOWN =
+    "A Synapse Virtual Table is a type of table that is defined by a Synapse SQL query. " +
+    "Any query on a Virtual Table will execute the defining SQL statement on the referenced table. " +
+    "The defining SQL of a Virtual Table cannot include JOIN clauses on multiple tables.";
   SynapseAlert synAlert;
   SqlDefinedTableEditorView view;
   SynapseJavascriptClient jsClient;
@@ -45,26 +51,28 @@ public class SqlDefinedTableEditor
     this.synAlert = synAlert;
     this.view.setPresenter(this);
     view.setSynAlert(synAlert);
-    view.setHelp(
-      MATERIALIZED_VIEW_HELP_MARKDOWN,
-      CreateTableViewWizard.VIEW_URL
-    );
   }
 
   public SqlDefinedTableEditor configure(
     String parentEntityId,
     EntityType entityType
   ) {
-    if (
-      !EntityType.materializedview.equals(entityType) &&
-      !EntityType.virtualtable.equals(entityType)
-    ) {
+    if (EntityType.materializedview.equals(entityType)) {
+      view.setHelp(
+        MATERIALIZED_VIEW_HELP_MARKDOWN,
+        CreateTableViewWizard.VIEW_URL
+      );
+    } else if (EntityType.virtualtable.equals(entityType)) {
+      view.setHelp(VIRTUAL_TABLE_HELP_MARKDOWN, CreateTableViewWizard.VIEW_URL);
+    } else {
       throw new IllegalArgumentException(
         "Expected MaterializedView or VirtualTable but got " +
         entityType.toString()
       );
     }
+
     view.setModalTitle("Create " + EntityTypeUtils.getDisplayName(entityType));
+
     this.parentEntityId = parentEntityId;
     this.entityType = entityType;
     synAlert.clear();

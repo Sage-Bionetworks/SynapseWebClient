@@ -80,11 +80,6 @@ public class SqlDefinedTableEditorViewTest {
   @Test
   public void testConstruction() {
     verify(mockView).setPresenter(widget);
-    verify(mockView)
-      .setHelp(
-        SqlDefinedTableEditor.MATERIALIZED_VIEW_HELP_MARKDOWN,
-        CreateTableViewWizard.VIEW_URL
-      );
     verify(mockView).setSynAlert(mockSynapseAlert);
   }
 
@@ -96,6 +91,11 @@ public class SqlDefinedTableEditorViewTest {
     verify(mockSynapseAlert).clear();
     verify(mockView).reset();
     verify(mockView).setModalTitle("Create Materialized View");
+    verify(mockView)
+      .setHelp(
+        SqlDefinedTableEditor.MATERIALIZED_VIEW_HELP_MARKDOWN,
+        CreateTableViewWizard.VIEW_URL
+      );
     verify(mockView).show();
 
     String name = "a new view";
@@ -124,6 +124,11 @@ public class SqlDefinedTableEditorViewTest {
     verify(mockSynapseAlert).clear();
     verify(mockView).reset();
     verify(mockView).setModalTitle("Create Virtual Table");
+    verify(mockView)
+      .setHelp(
+        SqlDefinedTableEditor.VIRTUAL_TABLE_HELP_MARKDOWN,
+        CreateTableViewWizard.VIEW_URL
+      );
     verify(mockView).show();
 
     String name = "a new view";
