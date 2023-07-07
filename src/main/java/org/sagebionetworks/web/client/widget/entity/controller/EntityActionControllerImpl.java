@@ -2406,7 +2406,9 @@ public class EntityActionControllerImpl
             public void onSuccess(Entity result) {
               fireEntityUpdatedEvent();
               view.showSuccess(
-                "Updated the Synapse SQL query that defines this Materialized View."
+                "Updated the Synapse SQL query that defines this " +
+                EntityTypeUtils.getFriendlyEntityTypeName(result) +
+                "."
               );
             }
 
