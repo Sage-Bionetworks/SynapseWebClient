@@ -7,6 +7,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.FormGroup;
+import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.TextBox;
@@ -21,6 +22,9 @@ public class SqlDefinedTableEditorViewImpl
 
   public interface Binder
     extends UiBinder<Widget, SqlDefinedTableEditorViewImpl> {}
+
+  @UiField
+  Heading modalHeading;
 
   @UiField
   TextBox nameField;
@@ -95,6 +99,11 @@ public class SqlDefinedTableEditorViewImpl
   @Override
   public String getDefiningSql() {
     return definingSqlField.getText();
+  }
+
+  @Override
+  public void setModalTitle(String title) {
+    modalHeading.setText(title);
   }
 
   @Override

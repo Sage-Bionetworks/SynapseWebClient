@@ -14,8 +14,9 @@
     <b:ModalHeader>
       <b:Heading
         size="H4"
+        ui:field="modalHeading"
         addStyleNames="displayInline"
-        text="Create Materialized View"
+        text="Create using SQL"
       />
       <bh:Span ui:field="helpContainer" />
     </b:ModalHeader>

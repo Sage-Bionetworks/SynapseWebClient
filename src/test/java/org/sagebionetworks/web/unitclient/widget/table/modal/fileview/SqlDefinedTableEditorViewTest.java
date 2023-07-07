@@ -30,7 +30,7 @@ import org.sagebionetworks.web.client.widget.table.modal.fileview.SqlDefinedTabl
 import org.sagebionetworks.web.client.widget.table.modal.fileview.SqlDefinedTableEditorView;
 
 @RunWith(MockitoJUnitRunner.class)
-public class MaterializedViewEditorTest {
+public class SqlDefinedTableEditorViewTest {
 
   @Mock
   SqlDefinedTableEditorView mockView;
@@ -95,6 +95,7 @@ public class MaterializedViewEditorTest {
 
     verify(mockSynapseAlert).clear();
     verify(mockView).reset();
+    verify(mockView).setModalTitle("Create Materialized View");
     verify(mockView).show();
 
     String name = "a new view";
@@ -122,6 +123,7 @@ public class MaterializedViewEditorTest {
 
     verify(mockSynapseAlert).clear();
     verify(mockView).reset();
+    verify(mockView).setModalTitle("Create Virtual Table");
     verify(mockView).show();
 
     String name = "a new view";

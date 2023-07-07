@@ -8,6 +8,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityType;
+import org.sagebionetworks.repo.model.EntityTypeUtils;
 import org.sagebionetworks.repo.model.table.HasDefiningSql;
 import org.sagebionetworks.repo.model.table.MaterializedView;
 import org.sagebionetworks.repo.model.table.Table;
@@ -63,6 +64,7 @@ public class SqlDefinedTableEditor
         entityType.toString()
       );
     }
+    view.setModalTitle("Create " + EntityTypeUtils.getDisplayName(entityType));
     this.parentEntityId = parentEntityId;
     this.entityType = entityType;
     synAlert.clear();
