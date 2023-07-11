@@ -117,7 +117,7 @@
       messageTitle="2023 NIH Policy for Data Management and Sharing"
       message="Following January 25, 2023, all projects seeking NIH-funding will be required to submit a data management and sharing plan. We can help with that!"
       secondaryCTAText="Learn More"
-      secondaryCTAHref="https://grants.nih.gov/grants/guide/notice-files/NOT-OD-21-013.html"
+      secondaryCTAHref="https://help.synapse.org/docs/Synapse-Pricing.2965078125.html"
       primaryCTAText="Contact us!"
       primaryCTAHref="https://sagebionetworks.jira.com/servicedesk/customer/portal/9/group/16/create/85?summary=NIH%20Data%20Management%20Policy%20Request&amp;description=%3CPlease%20add%20a%20paragraph%20describing%20your%20project%20and%20your%20expected%20data%20storage%20need%20%28e.g.%2C%20duration%20and%20expected%20volume%29%3E"
       addStyleNames="nihNotificationAlert"
