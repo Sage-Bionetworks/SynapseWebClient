@@ -1,15 +1,15 @@
 package org.sagebionetworks.web.unitserver.filter;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.*;
 import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.ACCESS_CONTROL_ALLOW_CREDENTIALS_HEADER;
 import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.ACCESS_CONTROL_ALLOW_ORIGIN_HEADER;
-import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.DEFAULT_ALLOW_ORIGIN;
 import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.ORIGIN_HEADER;
+import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.SYNAPSE_ORG_SUFFIX;
 
 import java.io.IOException;
 import javax.servlet.FilterChain;
@@ -103,9 +103,9 @@ public class CORSFilterTest {
 
     filter.testFilter(mockRequest, mockResponse, mockFilterChain);
 
-    // verify allow origin header set to * (causes CORS preflight to fail browserside)
-    verify(mockResponse)
-      .addHeader(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER, DEFAULT_ALLOW_ORIGIN);
+    // verify allow origin header is not set (causes CORS preflight to fail browserside)
+    verify(mockResponse, never())
+      .addHeader(eq(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER), anyString());
     // and Access-Control-Allow-Credentials is not added to the response
     verify(mockResponse, never())
       .addHeader(ACCESS_CONTROL_ALLOW_CREDENTIALS_HEADER, "true");
@@ -120,9 +120,9 @@ public class CORSFilterTest {
 
     filter.testFilter(mockRequest, mockResponse, mockFilterChain);
 
-    // verify allow origin header set to * (causes CORS preflight to fail browserside)
-    verify(mockResponse)
-      .addHeader(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER, DEFAULT_ALLOW_ORIGIN);
+    // verify allow origin header is not set (causes CORS preflight to fail browserside)
+    verify(mockResponse, never())
+      .addHeader(eq(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER), anyString());
     // and Access-Control-Allow-Credentials is not added to the response
     verify(mockResponse, never())
       .addHeader(ACCESS_CONTROL_ALLOW_CREDENTIALS_HEADER, "true");

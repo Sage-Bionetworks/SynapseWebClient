@@ -16,7 +16,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class CORSFilter extends OncePerRequestFilter {
 
   public static final String ORIGIN_HEADER = "origin";
-  public static final String DEFAULT_ALLOW_ORIGIN = "*";
   public static final String ACCESS_CONTROL_ALLOW_ORIGIN_HEADER =
     "Access-Control-Allow-Origin";
   public static final String ACCESS_CONTROL_ALLOW_CREDENTIALS_HEADER =
@@ -74,7 +73,6 @@ public class CORSFilter extends OncePerRequestFilter {
     HttpServletResponse response,
     FilterChain filterChain
   ) throws ServletException, IOException {
-    String allowOrigin = DEFAULT_ALLOW_ORIGIN;
     String origin = request.getHeader(ORIGIN_HEADER);
     if (origin != null && origin.toLowerCase().endsWith(SYNAPSE_ORG_SUFFIX)) {
       URL url = new URL(origin.toLowerCase());
@@ -82,24 +80,23 @@ public class CORSFilter extends OncePerRequestFilter {
         .getHost()
         .substring(0, url.getHost().length() - SYNAPSE_ORG_SUFFIX.length());
       if (ALLOWED_SYNAPSE_SUBDOMAINS.contains(subdomain)) {
-        allowOrigin = origin;
+        response.addHeader(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER, origin);
         response.addHeader(ACCESS_CONTROL_ALLOW_CREDENTIALS_HEADER, "true");
-      }
-    }
 
-    response.addHeader(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER, allowOrigin);
-    if (
-      request.getHeader("Access-Control-Request-Method") != null &&
-      "OPTIONS".equals(request.getMethod())
-    ) {
-      response.addHeader(
-        "Access-Control-Allow-Methods",
-        "GET, POST, PUT, DELETE"
-      );
-      // response.addHeader("Access-Control-Allow-Headers",
-      // "Authorization");
-      response.addHeader("Access-Control-Allow-Headers", "Content-Type");
-      response.addHeader("Access-Control-Max-Age", "1");
+        if (
+          request.getHeader("Access-Control-Request-Method") != null &&
+          "OPTIONS".equals(request.getMethod())
+        ) {
+          response.addHeader(
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE"
+          );
+          // response.addHeader("Access-Control-Allow-Headers",
+          // "Authorization");
+          response.addHeader("Access-Control-Allow-Headers", "Content-Type");
+          response.addHeader("Access-Control-Max-Age", "1");
+        }
+      }
     }
 
     filterChain.doFilter(request, response);
