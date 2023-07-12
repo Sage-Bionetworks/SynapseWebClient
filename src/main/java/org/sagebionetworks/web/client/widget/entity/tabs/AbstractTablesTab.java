@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityType;
@@ -422,7 +422,7 @@ public abstract class AbstractTablesTab
         .addCallback(
           new FutureCallback<Long>() {
             @Override
-            public void onSuccess(@NullableDecl Long result) {
+            public void onSuccess(@Nullable Long result) {
               latestSnapshotVersionNumber = result;
               configureVersionAlert();
             }
@@ -523,9 +523,9 @@ public abstract class AbstractTablesTab
       .getEntityVersions(entityBundle.getEntity().getId(), 0, 1)
       .transform(
         new Function<List<VersionInfo>, Long>() {
-          @NullableDecl
+          @Nullable
           @Override
-          public Long apply(@NullableDecl List<VersionInfo> result) {
+          public Long apply(@Nullable List<VersionInfo> result) {
             if (result.size() > 0) {
               return result.get(0).getVersionNumber();
             }

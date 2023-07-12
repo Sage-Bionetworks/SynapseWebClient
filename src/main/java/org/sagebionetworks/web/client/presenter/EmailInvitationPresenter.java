@@ -14,7 +14,7 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import javax.inject.Inject;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sagebionetworks.repo.model.InviteeVerificationSignedToken;
 import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.repo.model.MembershipInvtnSignedToken;
@@ -137,7 +137,7 @@ public class EmailInvitationPresenter
         new FutureCallback<InviteeVerificationSignedToken>() {
           @Override
           public void onSuccess(
-            @NullableDecl InviteeVerificationSignedToken token
+            @Nullable InviteeVerificationSignedToken token
           ) {
             bindInvitationToAuthenticatedUser(token);
           }

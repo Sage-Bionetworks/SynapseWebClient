@@ -10,7 +10,7 @@ import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
@@ -73,7 +73,7 @@ public class IsACTMemberAsyncHandlerImpl implements IsACTMemberAsyncHandler {
       .addCallback(
         new FutureCallback<Boolean>() {
           @Override
-          public void onSuccess(@NullableDecl Boolean result) {
+          public void onSuccess(@Nullable Boolean result) {
             callback.invoke(result);
           }
 
