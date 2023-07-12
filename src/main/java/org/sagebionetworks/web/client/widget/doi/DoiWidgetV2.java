@@ -6,7 +6,7 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.doi.v2.DoiAssociation;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -39,7 +39,7 @@ public class DoiWidgetV2 implements IsWidget {
       .addCallback(
         new FutureCallback<DoiAssociation>() {
           @Override
-          public void onSuccess(@NullableDecl DoiAssociation doiAssociation) {
+          public void onSuccess(@Nullable DoiAssociation doiAssociation) {
             configure(doiAssociation);
           }
 

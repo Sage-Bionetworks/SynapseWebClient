@@ -63,7 +63,6 @@ public class ClientProperties {
   public static final String IMAGE_CENTERING_TABLE_START =
     "<table width=\"100%\" height=\"100%\" align=\"center\" valign=\"center\"><tr><td>";
   public static final String IMAGE_CENTERING_TABLE_END = "</td></tr></table>";
-  public static final String STYLE_DISPLAY_INLINE = "inline-block";
 
   /*
    * JavaScript WebResources
@@ -77,19 +76,6 @@ public class ClientProperties {
   public static final String QUERY_SERVICE_PREFIX = "/query?query=";
   public static final String EVALUATION_QUERY_SERVICE_PREFIX =
     "/evaluation/submission/query?query=";
-
-  public static final WebResource SYNAPSE_REACT_COMPONENTS_JS = new WebResource(
-    "js/SRC/synapse-react-client.production.min.js"
-  );
-  public static final WebResource PROP_TYPES_JS = new WebResource(
-    "https://unpkg.com/prop-types@15.6.2/prop-types.min.js"
-  );
-  public static final WebResource REACT_MEASURE_JS = new WebResource(
-    "https://unpkg.com/react-measure@2.2.2/dist/index.umd.js"
-  );
-  public static final WebResource REACT_TOOLTIP_JS = new WebResource(
-    "https://unpkg.com/react-tooltip@3.9.2/standalone/react-tooltip.min.js"
-  );
 
   public static final WebResource DIFF_LIB_JS = new WebResource(
     "js/diff/difflib.js"

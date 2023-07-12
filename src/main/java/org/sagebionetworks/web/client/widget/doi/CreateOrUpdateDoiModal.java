@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.ObjectType;
@@ -104,7 +104,7 @@ public class CreateOrUpdateDoiModal
     doiRequest.addCallback(
       new FutureCallback<Doi>() {
         @Override
-        public void onSuccess(@NullableDecl Doi doi) {
+        public void onSuccess(@Nullable Doi doi) {
           doiExists = true;
           setDoi(doi);
           populateAndShowView();
