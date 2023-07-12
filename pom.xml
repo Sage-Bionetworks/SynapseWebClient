@@ -21,7 +21,7 @@
     </webappDirectory>
     <synapse.version>457.0</synapse.version>
     <gwtVersion>2.10.0</gwtVersion>
-    <org.springframework.version>5.3.28</org.springframework.version>
+    <org.springframework.version>6.0.0</org.springframework.version>
     <guiceVersion>3.0</guiceVersion>
     <ginVersion>2.1.2</ginVersion>
     <xstream.version>1.3.1</xstream.version>
