@@ -62,7 +62,7 @@
         />
         <w:HelpWidget
           helpMarkdown="Present a custom HTML form to the user to fill out during submission.  Form is built using a JSON schema."
-          href="https://react-jsonschema-form.readthedocs.io/en/latest/"
+          href="https://rjsf-team.github.io/react-jsonschema-form/docs/"
           addStyleNames="margin-left-5"
           placement="BOTTOM"
         />

@@ -1,7 +1,6 @@
 {
   "dependencies": {
-    "@rjsf/core": "^4.0.1",
-    "@sage-bionetworks/react-base-table": "^1.13.2",
+    "@sage-bionetworks/react-base-table": "1.13.4",
     "croppie": "2.6.5",
     "font-awesome": "4.7.0",
     "jquery": "3.5.1",
@@ -9,24 +8,24 @@
     "moment": "^2.29.4",
     "pica": "6.0.0",
     "plotly.js": "^2.24.3",
-    "prop-types": "^15.6.2",
+    "prop-types": "^15.8.1",
     "react": "18.2.0",
-    "react-bootstrap": "^1.0.0-beta.12",
+    "react-bootstrap": "^1.6.7",
     "react-dom": "18.2.0",
-    "react-measure": "2.2.2",
-    "react-query": "^3.39.1",
-    "react-router-dom": "^5.3.3",
+    "react-measure": "2.5.2",
+    "react-query": "^3.39.3",
+    "react-router-dom": "^5.3.4",
     "react-transition-group": "2.6.0",
-    "sass": "1.36.0",
-    "synapse-react-client": "3.1.43",
-    "universal-cookie": "^4.0.3"
+    "sass": "^1.63.6",
+    "synapse-react-client": "3.1.44",
+    "universal-cookie": "^4.0.4"
   },
   "devDependencies": {
-    "@prettier/plugin-xml": "^2.2.0",
+    "@prettier/plugin-xml": "^3.1.0",
     "husky": ">=6",
     "lint-staged": ">=10",
-    "prettier": "^2.7.1",
-    "prettier-plugin-java": "^1.6.2"
+    "prettier": "^3.0.0",
+    "prettier-plugin-java": "^2.2.0"
   },
   "lint-staged": {
     "*.{*}": "prettier --write"
