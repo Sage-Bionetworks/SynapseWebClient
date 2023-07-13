@@ -479,7 +479,7 @@
                   tofile="src/main/webapp/generated/react-query.development.js"
                 />
                 <copy
-                  file="${project.basedir}/node_modules/react-plotly/dist/create-plotly-component.min.js"
+                  file="${project.basedir}/node_modules/react-plotly.js/dist/create-plotly-component.min.js"
                   tofile="src/main/webapp/generated/create-plotly-component.min.js"
                 />
                 <copy
