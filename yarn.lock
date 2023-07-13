@@ -3936,6 +3936,13 @@ react-overlays@^5.1.2:
     uncontrollable "^7.2.1"
     warning "^4.0.3"
 
+react-plotly.js@2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/react-plotly.js/-/react-plotly.js-2.2.0.tgz#238a242f3c05c993c72e1435d0c9ae2f34d7e86a"
+  integrity sha512-+OWgUDZCMWJsZDhWupTvxvjZu/Q7Wbnaikq0PtdX2QQ4s/HuRj2uYydx3HfoDrW4Mc97aZsMnEVAqUxAEaf6FA==
+  dependencies:
+    prop-types "^15.5.10"
+
 react-plotly.js@^2.6.0:
   version "2.6.0"
   resolved "https://registry.yarnpkg.com/react-plotly.js/-/react-plotly.js-2.6.0.tgz#ad6b68ee64f1b5cfa142ee92c59687f9c2c09209"
