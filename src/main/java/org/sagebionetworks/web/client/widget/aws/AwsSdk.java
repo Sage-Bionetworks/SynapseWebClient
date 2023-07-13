@@ -120,7 +120,7 @@ public class AwsSdk {
 		var params = {
 			Bucket : bucketName,
 			Key : key,
-			Expires : 20,
+			Expires : 200,
 			ResponseContentDisposition : 'attachment; filename="' + fileName
 					+ '"'
 		};
@@ -167,7 +167,8 @@ public class AwsSdk {
 				Bucket : bucketName
 			},
 			credentials : creds,
-			s3ForcePathStyle : true
+			s3ForcePathStyle : true,
+			signatureVersion: 'v4'
 		});
 		return s3;
 	}-*/;
