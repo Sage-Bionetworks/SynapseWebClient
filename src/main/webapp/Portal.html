@@ -8,6 +8,11 @@
     />
     <meta name="author" content="Sage Bionetworks, info@sagebase.org" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self' data: blob: 'unsafe-inline' 'unsafe-eval' *.synapse.org *.sagebase.org *.googleapis.com *.gstatic.com *.googletagmanager.com cdn.statuspage.io s3.amazonaws.com www.google-analytics.com kh896k90gyvg.statuspage.io 127.0.0.1:9876; img-src * data: blob:"
+    />
     <meta
       name="google-site-verification"
       content="KIO5H8Bg3i0oAEAzTEMK5qIlYJLbd2zogLs_-im4rI0"
@@ -504,9 +509,7 @@
       head.load(cdnEndpoint + 'generated/prop-types.min.js')
       head.load(cdnEndpoint + 'generated/react-measure.js')
       head.load(cdnEndpoint + 'generated/plotly.min.js')
-      head.load(
-        'https://unpkg.com/react-plotly.js@2.2.0/dist/create-plotly-component.min.js',
-      )
+      head.load(cdnEndpoint + 'generated/create-plotly-component.min.js')
       head.load(cdnEndpoint + 'generated/react-router-dom.min.js')
       head.load(cdnEndpoint + 'generated/universalCookie.min.js')
       head.load(cdnEndpoint + 'generated/react-bootstrap.min.js')
