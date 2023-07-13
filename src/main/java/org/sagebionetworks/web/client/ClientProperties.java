@@ -23,9 +23,8 @@ public class ClientProperties {
     "image/png",
     "image/svg+xml",
   };
-  public static final HashSet<String> IMAGE_CONTENT_TYPES_SET = new HashSet<String>(
-    Arrays.asList(IMAGE_CONTENT_TYPES)
-  );
+  public static final HashSet<String> IMAGE_CONTENT_TYPES_SET =
+    new HashSet<String>(Arrays.asList(IMAGE_CONTENT_TYPES));
 
   public static final String[] TABLE_CONTENT_TYPES = new String[] {
     "application/vnd.ms-excel",
@@ -37,9 +36,8 @@ public class ClientProperties {
     "text/",
     "text/tsv",
   };
-  public static final HashSet<String> TABLE_CONTENT_TYPES_SET = new HashSet<String>(
-    Arrays.asList(TABLE_CONTENT_TYPES)
-  );
+  public static final HashSet<String> TABLE_CONTENT_TYPES_SET =
+    new HashSet<String>(Arrays.asList(TABLE_CONTENT_TYPES));
 
   public static final String[] CODE_EXTENSIONS = new String[] {
     ".cwl",
