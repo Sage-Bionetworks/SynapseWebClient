@@ -168,6 +168,11 @@ public class PortalServletModule extends ServletModule {
     bind(OAuth2AliasServlet.class).in(Singleton.class);
     serve("/Portal/oauth2AliasCallback").with(OAuth2AliasServlet.class);
 
+    //    // (Dataset) JSON-LD element
+    //    bind(JsonLdContentServlet.class).in(Singleton.class);
+    //    serve("/Portal/" + WebConstants.JSON_LD_CONTENT_SERVLET)
+    //      .with(JsonLdContentServlet.class);
+
     // The Rest template provider should be a singleton.
     bind(RestTemplateProviderImpl.class).in(Singleton.class);
     bind(RestTemplateProvider.class).to(RestTemplateProviderImpl.class);

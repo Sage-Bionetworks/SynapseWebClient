@@ -134,23 +134,16 @@ public class SynapseClientImpl
 
   public static final String SYN_PREFIX = "syn";
   public static final Charset MESSAGE_CHARSET = Charset.forName("UTF-8");
-  public static final ContentType HTML_MESSAGE_CONTENT_TYPE = ContentType.create(
-    "text/html",
-    MESSAGE_CHARSET
-  );
-  public static final ContentType PLAIN_MESSAGE_CONTENT_TYPE = ContentType.create(
-    "text/plain",
-    MESSAGE_CHARSET
-  );
+  public static final ContentType HTML_MESSAGE_CONTENT_TYPE =
+    ContentType.create("text/html", MESSAGE_CHARSET);
+  public static final ContentType PLAIN_MESSAGE_CONTENT_TYPE =
+    ContentType.create("text/plain", MESSAGE_CHARSET);
 
   public static final long LIMIT_50 = 50;
   private static Log log = LogFactory.getLog(SynapseClientImpl.class);
 
-  private final Supplier<Set<String>> htmlTeamMembersCache = Suppliers.memoizeWithExpiration(
-    teamMembersSupplier(),
-    1,
-    TimeUnit.HOURS
-  );
+  private final Supplier<Set<String>> htmlTeamMembersCache =
+    Suppliers.memoizeWithExpiration(teamMembersSupplier(), 1, TimeUnit.HOURS);
 
   public Set<String> getHtmlTeamMembers() {
     return htmlTeamMembersCache.get();
@@ -161,16 +154,18 @@ public class SynapseClientImpl
       public Set<String> get() {
         Set<String> userIdSet = new HashSet<String>();
         try {
-          org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+          org.sagebionetworks.client.SynapseClient synapseClient =
+            createSynapseClient();
           long currentOffset = 0;
           List<TeamMember> teamMembers = null;
           do {
-            org.sagebionetworks.reflection.model.PaginatedResults<TeamMember> teamMembersPaginatedResults = synapseClient.getTeamMembers(
-              htmlTeamId,
-              null,
-              LIMIT_50,
-              currentOffset
-            );
+            org.sagebionetworks.reflection.model.PaginatedResults<TeamMember> teamMembersPaginatedResults =
+              synapseClient.getTeamMembers(
+                htmlTeamId,
+                null,
+                LIMIT_50,
+                currentOffset
+              );
             teamMembers = teamMembersPaginatedResults.getResults();
             for (TeamMember teamMember : teamMembers) {
               userIdSet.add(teamMember.getMember().getOwnerId());
@@ -190,7 +185,8 @@ public class SynapseClientImpl
   private volatile HashSet<String> wikiBasedEntities;
 
   public Project getProject(String projectId) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       return (Project) synapseClient.getEntityById(projectId);
     } catch (SynapseException e) {
@@ -203,7 +199,8 @@ public class SynapseClientImpl
     EntityBundleRequest bundleRequest
   ) throws RestServiceException {
     try {
-      org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+      org.sagebionetworks.client.SynapseClient synapseClient =
+        createSynapseClient();
       return synapseClient.getEntityBundleV2(entityId, bundleRequest);
     } catch (SynapseException e) {
       throw ExceptionUtil.convertSynapseException(e);
@@ -216,7 +213,8 @@ public class SynapseClientImpl
     EntityBundleRequest bundleRequest
   ) throws RestServiceException {
     try {
-      org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+      org.sagebionetworks.client.SynapseClient synapseClient =
+        createSynapseClient();
       return synapseClient.getEntityBundleV2(
         entityId,
         versionNumber,
@@ -229,7 +227,8 @@ public class SynapseClientImpl
 
   public SearchResults search(SearchQuery searchQuery)
     throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       return synapseClient.search(searchQuery);
     } catch (SynapseException e) {
@@ -241,13 +240,11 @@ public class SynapseClientImpl
 
   public Long getLatestEntityVersion(String entityId)
     throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
-      org.sagebionetworks.reflection.model.PaginatedResults<VersionInfo> paginatedResults = synapseClient.getEntityVersions(
-        entityId,
-        0,
-        1
-      );
+      org.sagebionetworks.reflection.model.PaginatedResults<VersionInfo> paginatedResults =
+        synapseClient.getEntityVersions(entityId, 0, 1);
       List<VersionInfo> results = paginatedResults.getResults();
       if (results.size() > 0) {
         return results.get(0).getVersionNumber();
@@ -276,7 +273,8 @@ public class SynapseClientImpl
   public Entity moveEntity(String entityId, String newParentEntityId)
     throws RestServiceException {
     try {
-      org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+      org.sagebionetworks.client.SynapseClient synapseClient =
+        createSynapseClient();
       Entity entity = synapseClient.getEntityById(entityId);
       entity.setParentId(newParentEntityId);
       return synapseClient.putEntity(entity);
@@ -289,7 +287,8 @@ public class SynapseClientImpl
   public void deleteEntityVersionById(String entityId, Long versionNumber)
     throws RestServiceException {
     try {
-      org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+      org.sagebionetworks.client.SynapseClient synapseClient =
+        createSynapseClient();
       synapseClient.deleteEntityVersionById(entityId, versionNumber);
     } catch (SynapseException e) {
       throw ExceptionUtil.convertSynapseException(e);
@@ -302,7 +301,8 @@ public class SynapseClientImpl
     long limit
   ) throws RestServiceException {
     try {
-      org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+      org.sagebionetworks.client.SynapseClient synapseClient =
+        createSynapseClient();
       return convertPaginated(synapseClient.viewTrashForUser(offset, limit));
     } catch (SynapseException e) {
       throw ExceptionUtil.convertSynapseException(e);
@@ -313,7 +313,8 @@ public class SynapseClientImpl
   public void restoreFromTrash(String entityId, String newParentId)
     throws RestServiceException {
     try {
-      org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+      org.sagebionetworks.client.SynapseClient synapseClient =
+        createSynapseClient();
       synapseClient.restoreFromTrash(entityId, newParentId);
     } catch (SynapseException e) {
       throw ExceptionUtil.convertSynapseException(e);
@@ -324,7 +325,8 @@ public class SynapseClientImpl
   public void purgeMultipleTrashedEntitiesForUser(Set<String> entityIds)
     throws RestServiceException {
     try {
-      org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+      org.sagebionetworks.client.SynapseClient synapseClient =
+        createSynapseClient();
       for (String entityId : entityIds) {
         synapseClient.purgeTrashForUser(entityId);
       }
@@ -335,7 +337,8 @@ public class SynapseClientImpl
 
   public UserProfile getUserProfile(String userId) throws RestServiceException {
     try {
-      org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+      org.sagebionetworks.client.SynapseClient synapseClient =
+        createSynapseClient();
       UserProfile profile;
       if (userId == null) {
         profile = synapseClient.getMyProfile();
@@ -350,7 +353,8 @@ public class SynapseClientImpl
 
   public Team getTeam(String teamId) throws RestServiceException {
     try {
-      org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+      org.sagebionetworks.client.SynapseClient synapseClient =
+        createSynapseClient();
       return synapseClient.getTeam(teamId);
     } catch (SynapseException e) {
       throw ExceptionUtil.convertSynapseException(e);
@@ -359,7 +363,8 @@ public class SynapseClientImpl
 
   private String getUserIdFromUsername(String username)
     throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       PrincipalAliasRequest request = new PrincipalAliasRequest();
       request.setAlias(username);
@@ -384,7 +389,8 @@ public class SynapseClientImpl
   public void updateUserProfile(UserProfile profile)
     throws RestServiceException {
     try {
-      org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+      org.sagebionetworks.client.SynapseClient synapseClient =
+        createSynapseClient();
       synapseClient.updateMyProfile(profile);
     } catch (SynapseException e) {
       throw ExceptionUtil.convertSynapseException(e);
@@ -394,7 +400,8 @@ public class SynapseClientImpl
   @Override
   public void addEmail(EmailValidationSignedToken emailValidationSignedToken)
     throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       boolean setAsNotificationEmail = false; // SWC-5619 (do not auto-set as notification email)
       synapseClient.addEmail(
@@ -408,7 +415,8 @@ public class SynapseClientImpl
 
   @Override
   public void setNotificationEmail(String email) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       synapseClient.setNotificationEmail(email);
     } catch (SynapseException e) {
@@ -418,7 +426,8 @@ public class SynapseClientImpl
 
   @Override
   public void removeEmail(String email) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       synapseClient.removeEmail(email);
     } catch (SynapseException e) {
@@ -428,7 +437,8 @@ public class SynapseClientImpl
 
   public AccessControlList getBenefactorAcl(String id)
     throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       EntityBundleRequest bundleRequest = new EntityBundleRequest();
       bundleRequest.setIncludeBenefactorACL(true);
@@ -449,7 +459,8 @@ public class SynapseClientImpl
   @Override
   public AccessControlList createAcl(AccessControlList acl)
     throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       return synapseClient.createACL(acl);
     } catch (SynapseException e) {
@@ -460,7 +471,8 @@ public class SynapseClientImpl
   @Override
   public AccessControlList updateAcl(AccessControlList acl)
     throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       return synapseClient.updateACL(acl);
     } catch (SynapseException e) {
@@ -470,7 +482,8 @@ public class SynapseClientImpl
 
   public AccessControlList updateTeamAcl(AccessControlList acl)
     throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       return synapseClient.updateTeamACL(acl);
     } catch (SynapseException e) {
@@ -481,7 +494,8 @@ public class SynapseClientImpl
   @Override
   public AccessControlList getTeamAcl(String teamId)
     throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       return synapseClient.getTeamACL(teamId);
     } catch (SynapseException e) {
@@ -492,7 +506,8 @@ public class SynapseClientImpl
   @Override
   public AccessControlList deleteAcl(String ownerEntityId)
     throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       // first delete the ACL
       synapseClient.deleteACL(ownerEntityId);
@@ -509,7 +524,8 @@ public class SynapseClientImpl
     throws RestServiceException {
     ObjectType type = ObjectType.valueOf(ownerType);
     ACCESS_TYPE access = ACCESS_TYPE.valueOf(accessType);
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       return synapseClient.canAccess(ownerId, type, access);
     } catch (SynapseException e) {
@@ -521,7 +537,8 @@ public class SynapseClientImpl
   public AccessRequirement createOrUpdateAccessRequirement(
     AccessRequirement ar
   ) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       if (ar.getId() == null) {
         return synapseClient.createAccessRequirement(ar);
@@ -538,7 +555,8 @@ public class SynapseClientImpl
     ACCESS_TYPE accessType,
     org.sagebionetworks.client.SynapseClient synapseClient
   ) throws SynapseException {
-    List<AccessRequirement> allAccessRequirements = new ArrayList<AccessRequirement>();
+    List<AccessRequirement> allAccessRequirements =
+      new ArrayList<AccessRequirement>();
     long offset = ZERO_OFFSET;
     boolean isDone = false;
     while (!isDone) {
@@ -558,9 +576,11 @@ public class SynapseClientImpl
   @Override
   public List<AccessRequirement> getTeamAccessRequirements(String teamId)
     throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
-      RestrictableObjectDescriptor subjectId = new RestrictableObjectDescriptor();
+      RestrictableObjectDescriptor subjectId =
+        new RestrictableObjectDescriptor();
       subjectId.setId(teamId);
       subjectId.setType(RestrictableObjectType.TEAM);
       List<AccessRequirement> accessRequirements = getAllAccessRequirements(
@@ -578,7 +598,8 @@ public class SynapseClientImpl
   @Override
   public AccessApproval createAccessApproval(AccessApproval aaEW)
     throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       return synapseClient.createAccessApproval(aaEW);
     } catch (SynapseException e) {
@@ -591,7 +612,8 @@ public class SynapseClientImpl
     String accessRequirement,
     String accessorId
   ) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       synapseClient.revokeAccessApprovals(accessRequirement, accessorId);
     } catch (SynapseException e) {
@@ -609,7 +631,8 @@ public class SynapseClientImpl
     String md5,
     Long storageLocationId
   ) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       Entity entity = synapseClient.getEntityById(entityId);
       if (!(entity instanceof FileEntity)) {
@@ -691,7 +714,8 @@ public class SynapseClientImpl
     String md5,
     Long storageLocationId
   ) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       FileEntity newEntity = new FileEntity();
       ExternalFileHandle clone = createExternalFileHandle(
@@ -730,7 +754,8 @@ public class SynapseClientImpl
   public FileHandleResults getWikiAttachmentHandles(
     org.sagebionetworks.web.shared.WikiPageKey key
   ) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       if (key.getWikiPageId() == null) {
         // asking for the root. find the root id first
@@ -764,7 +789,8 @@ public class SynapseClientImpl
     String wikiId,
     Long versionToUpdate
   ) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       return synapseClient.restoreV2WikiPage(
         ownerId,
@@ -780,7 +806,8 @@ public class SynapseClientImpl
   @Override
   public void deleteV2WikiPage(org.sagebionetworks.web.shared.WikiPageKey key)
     throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(
         key.getOwnerObjectId(),
@@ -797,7 +824,8 @@ public class SynapseClientImpl
   public FileHandleResults getV2WikiAttachmentHandles(
     org.sagebionetworks.web.shared.WikiPageKey key
   ) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       if (key.getWikiPageId() == null) {
         // asking for the root. find the root id first
@@ -825,7 +853,8 @@ public class SynapseClientImpl
     Long limit,
     Long offset
   ) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(
         key.getOwnerObjectId(),
@@ -846,7 +875,8 @@ public class SynapseClientImpl
     String ownerType,
     WikiPage page
   ) throws IOException, RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       return synapseClient.createWikiPage(
         ownerId,
@@ -864,7 +894,8 @@ public class SynapseClientImpl
     String ownerType,
     WikiPage page
   ) throws IOException, RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       return synapseClient.updateWikiPage(
         ownerId,
@@ -896,7 +927,8 @@ public class SynapseClientImpl
   public WikiPage getV2WikiPageAsV1(
     org.sagebionetworks.web.shared.WikiPageKey key
   ) throws RestServiceException, IOException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(
       key.getOwnerObjectId(),
       ObjectType.valueOf(key.getOwnerObjectType()),
@@ -911,7 +943,8 @@ public class SynapseClientImpl
 
   @Override
   public EntityHeader addFavorite(String entityId) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       return synapseClient.addFavorite(entityId);
     } catch (SynapseException e) {
@@ -921,7 +954,8 @@ public class SynapseClientImpl
 
   @Override
   public void removeFavorite(String entityId) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       synapseClient.removeFavorite(entityId);
     } catch (SynapseException e) {
@@ -930,7 +964,8 @@ public class SynapseClientImpl
   }
 
   public void deleteTeam(String teamId) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       synapseClient.deleteTeam(teamId);
     } catch (SynapseException e) {
@@ -940,7 +975,8 @@ public class SynapseClientImpl
 
   @Override
   public long getTeamMemberCount(String teamId) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       return synapseClient.countTeamMembers(teamId, null);
     } catch (SynapseException e) {
@@ -955,15 +991,17 @@ public class SynapseClientImpl
     Integer limit,
     Integer offset
   ) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
-      org.sagebionetworks.reflection.model.PaginatedResults<TeamMember> members = synapseClient.getTeamMembers(
-        teamId,
-        fragment,
-        memberType,
-        limit,
-        offset
-      );
+      org.sagebionetworks.reflection.model.PaginatedResults<TeamMember> members =
+        synapseClient.getTeamMembers(
+          teamId,
+          fragment,
+          memberType,
+          limit,
+          offset
+        );
       List<TeamMember> teamMembers = members.getResults();
 
       // gather user ids to ask for all user profiles in bulk
@@ -972,7 +1010,8 @@ public class SynapseClientImpl
         userIds.add(Long.parseLong(member.getMember().getOwnerId()));
       }
       List<UserProfile> profiles = synapseClient.listUserProfiles(userIds);
-      List<TeamMemberBundle> teamMemberBundles = new ArrayList<TeamMemberBundle>();
+      List<TeamMemberBundle> teamMemberBundles =
+        new ArrayList<TeamMemberBundle>();
       for (int i = 0; i < userIds.size(); i++) {
         teamMemberBundles.add(
           new TeamMemberBundle(
@@ -1007,7 +1046,8 @@ public class SynapseClientImpl
     Integer limit,
     Integer offset
   ) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       if (searchTerm != null && searchTerm.trim().length() == 0) searchTerm =
         null;
@@ -1024,7 +1064,8 @@ public class SynapseClientImpl
     String currentUserId,
     String teamId
   ) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       return synapseClient.getTeamMembershipStatus(teamId, currentUserId);
     } catch (SynapseException e) {
@@ -1040,13 +1081,12 @@ public class SynapseClientImpl
     String hostPageBaseURL,
     Date expiresOn
   ) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       String signedTokenEndpoint = getSignedTokenEndpoint(hostPageBaseURL);
-      TeamMembershipStatus membershipStatus = synapseClient.getTeamMembershipStatus(
-        teamId,
-        currentUserId
-      );
+      TeamMembershipStatus membershipStatus =
+        synapseClient.getTeamMembershipStatus(teamId, currentUserId);
       // if we can join the team without creating the request (like if we
       // are a team admin, or there is an open invitation), then just do
       // that!
@@ -1087,7 +1127,8 @@ public class SynapseClientImpl
     String message,
     String hostPageBaseURL
   ) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       String signedTokenEndpoint = getSignedTokenEndpoint(hostPageBaseURL);
       synapseClient.addTeamMember(
@@ -1104,7 +1145,8 @@ public class SynapseClientImpl
   @Override
   public String getCertifiedUserPassingRecord(String userId)
     throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       PassingRecord passingRecord = synapseClient.getCertifiedUserPassingRecord(
         userId
@@ -1130,7 +1172,8 @@ public class SynapseClientImpl
 
   @Override
   public String getCertificationQuiz() throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       Quiz quiz = synapseClient.getCertifiedUserTest();
       JSONObjectAdapter quizJson = quiz.writeToJSONObject(
@@ -1147,7 +1190,8 @@ public class SynapseClientImpl
   @Override
   public PassingRecord submitCertificationQuizResponse(QuizResponse response)
     throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       return synapseClient.submitCertifiedUserTestResponse(response);
     } catch (SynapseException e) {
@@ -1159,12 +1203,14 @@ public class SynapseClientImpl
   public Boolean isTeamMember(String userId, Long groupPrincipalId)
     throws RestServiceException {
     Boolean isMember = null;
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
-      TeamMembershipStatus membershipStatus = synapseClient.getTeamMembershipStatus(
-        groupPrincipalId.toString(),
-        userId
-      );
+      TeamMembershipStatus membershipStatus =
+        synapseClient.getTeamMembershipStatus(
+          groupPrincipalId.toString(),
+          userId
+        );
       isMember = membershipStatus.getIsMember();
     } catch (SynapseException e) {
       throw ExceptionUtil.convertSynapseException(e);
@@ -1178,7 +1224,8 @@ public class SynapseClientImpl
     String teamId,
     boolean isLoggedIn
   ) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       long memberCount = synapseClient.countTeamMembers(teamId, null);
       boolean isAdmin = false;
@@ -1202,14 +1249,16 @@ public class SynapseClientImpl
   @Override
   public List<MembershipRequestBundle> getOpenRequests(String teamId)
     throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
-      org.sagebionetworks.reflection.model.PaginatedResults<MembershipRequest> requests = synapseClient.getOpenMembershipRequests(
-        teamId,
-        null,
-        MAX_LIMIT,
-        ZERO_OFFSET
-      );
+      org.sagebionetworks.reflection.model.PaginatedResults<MembershipRequest> requests =
+        synapseClient.getOpenMembershipRequests(
+          teamId,
+          null,
+          MAX_LIMIT,
+          ZERO_OFFSET
+        );
       // and ask for the team info for each invite, and fill that in the
       // bundle
       List<Long> userIds = new ArrayList<>();
@@ -1220,7 +1269,8 @@ public class SynapseClientImpl
         userIds,
         synapseClient
       );
-      ArrayList<MembershipRequestBundle> returnList = new ArrayList<MembershipRequestBundle>();
+      ArrayList<MembershipRequestBundle> returnList =
+        new ArrayList<MembershipRequestBundle>();
       // now go through and create a MembershipRequestBundle for each pair
       for (MembershipRequest request : requests.getResults()) {
         UserProfile profile = userId2UserProfile.get(request.getUserId());
@@ -1251,18 +1301,21 @@ public class SynapseClientImpl
   @Override
   public ArrayList<OpenUserInvitationBundle> getOpenInvitations(String userId)
     throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
-      org.sagebionetworks.reflection.model.PaginatedResults<MembershipInvitation> invitations = synapseClient.getOpenMembershipInvitations(
-        userId,
-        null,
-        MAX_LIMIT,
-        ZERO_OFFSET
-      );
+      org.sagebionetworks.reflection.model.PaginatedResults<MembershipInvitation> invitations =
+        synapseClient.getOpenMembershipInvitations(
+          userId,
+          null,
+          MAX_LIMIT,
+          ZERO_OFFSET
+        );
       // and ask for the team info for each invite, and fill that in the
       // bundle
 
-      ArrayList<OpenUserInvitationBundle> returnList = new ArrayList<OpenUserInvitationBundle>();
+      ArrayList<OpenUserInvitationBundle> returnList =
+        new ArrayList<OpenUserInvitationBundle>();
       // now go through and create a MembershipInvitationBundle for each
       // pair
 
@@ -1283,14 +1336,14 @@ public class SynapseClientImpl
     String membershipInvitationId,
     String hostPageBaseURL
   ) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       // resend the invitation. get the invitation, clear out system specified values, re-create the
       // invitation, and delete the old one.
       String signedTokenEndpoint = getSignedTokenEndpoint(hostPageBaseURL);
-      MembershipInvitation membershipInvitation = synapseClient.getMembershipInvitation(
-        membershipInvitationId
-      );
+      MembershipInvitation membershipInvitation =
+        synapseClient.getMembershipInvitation(membershipInvitationId);
       membershipInvitation.setCreatedBy(null);
       membershipInvitation.setCreatedOn(null);
       membershipInvitation.setId(null);
@@ -1321,18 +1374,21 @@ public class SynapseClientImpl
     Integer limit,
     Integer offset
   ) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
-      org.sagebionetworks.reflection.model.PaginatedResults<MembershipInvitation> invitations = synapseClient.getOpenMembershipInvitationSubmissions(
-        teamId,
-        null,
-        limit,
-        offset
-      );
+      org.sagebionetworks.reflection.model.PaginatedResults<MembershipInvitation> invitations =
+        synapseClient.getOpenMembershipInvitationSubmissions(
+          teamId,
+          null,
+          limit,
+          offset
+        );
       // and ask for the team info for each invite, and fill that in the
       // bundle
 
-      ArrayList<OpenTeamInvitationBundle> returnList = new ArrayList<OpenTeamInvitationBundle>();
+      ArrayList<OpenTeamInvitationBundle> returnList =
+        new ArrayList<OpenTeamInvitationBundle>();
       // now go through and create a MembershipInvitationBundle for each
       // pair
 
@@ -1385,7 +1441,8 @@ public class SynapseClientImpl
     String teamId,
     boolean isTeamAdmin
   ) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       synapseClient.setTeamMemberPermissions(teamId, targetUserId, isTeamAdmin);
     } catch (SynapseException e) {
@@ -1396,7 +1453,8 @@ public class SynapseClientImpl
   @Override
   public Team updateTeam(Team team, AccessControlList teamAcl)
     throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       updateTeamAcl(teamAcl);
       return synapseClient.updateTeam(team);
@@ -1420,7 +1478,8 @@ public class SynapseClientImpl
     String fileName,
     String parentEntityId
   ) throws RestServiceException, SynapseException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       String entityId = synapseClient.lookupChild(parentEntityId, fileName);
       Entity entity = synapseClient.getEntityById(entityId);
@@ -1439,7 +1498,8 @@ public class SynapseClientImpl
     String entityId,
     String parentEntityId
   ) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       // create entity if we have to
       FileEntity fileEntity = null;
@@ -1538,18 +1598,21 @@ public class SynapseClientImpl
     SignedTokenInterface signedToken,
     String hostPageBaseURL
   ) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
 
     try {
       if (signedToken instanceof JoinTeamSignedToken) {
-        JoinTeamSignedToken joinTeamSignedToken = (JoinTeamSignedToken) signedToken;
+        JoinTeamSignedToken joinTeamSignedToken =
+          (JoinTeamSignedToken) signedToken;
         return synapseClient.addTeamMember(
           joinTeamSignedToken,
           getTeamEndpoint(hostPageBaseURL),
           getSignedTokenEndpoint(hostPageBaseURL)
         );
       } else if (signedToken instanceof NotificationSettingsSignedToken) {
-        NotificationSettingsSignedToken notificationSignedToken = (NotificationSettingsSignedToken) signedToken;
+        NotificationSettingsSignedToken notificationSignedToken =
+          (NotificationSettingsSignedToken) signedToken;
         return synapseClient.updateNotificationSettings(
           notificationSignedToken
         );
@@ -1622,7 +1685,8 @@ public class SynapseClientImpl
 
   @Override
   public String getAPIKey() throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       return synapseClient.retrieveApiKey();
     } catch (SynapseException e) {
@@ -1637,7 +1701,8 @@ public class SynapseClientImpl
     String messageBody,
     String hostPageBaseURL
   ) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       MessageToUser message = new MessageToUser();
       message.setRecipients(recipients);
@@ -1668,7 +1733,8 @@ public class SynapseClientImpl
     String messageBody,
     String hostPageBaseURL
   ) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       MessageToUser message = new MessageToUser();
       message.setSubject(subject);
@@ -1695,7 +1761,8 @@ public class SynapseClientImpl
   @Override
   public Boolean isAliasAvailable(String alias, String aliasType)
     throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createAnonymousSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createAnonymousSynapseClient();
     try {
       AliasType type = AliasType.valueOf(aliasType);
       AliasCheckRequest request = new AliasCheckRequest();
@@ -1717,8 +1784,10 @@ public class SynapseClientImpl
 
   private void initHelpPagesMap() {
     if (pageName2WikiKeyMap == null) {
-      HashMap<String, org.sagebionetworks.web.shared.WikiPageKey> tempMap = new HashMap<String, org.sagebionetworks.web.shared.WikiPageKey>();
-      HashMap<String, String> properties = PortalPropertiesHolder.getPropertiesMap();
+      HashMap<String, org.sagebionetworks.web.shared.WikiPageKey> tempMap =
+        new HashMap<String, org.sagebionetworks.web.shared.WikiPageKey>();
+      HashMap<String, String> properties =
+        PortalPropertiesHolder.getPropertiesMap();
       for (String key : properties.keySet()) {
         if (key.startsWith(WebConstants.WIKI_PROPERTIES_PACKAGE)) {
           String value = properties.get(key);
@@ -1765,7 +1834,8 @@ public class SynapseClientImpl
 
   @Override
   public String deleteApiKey() throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       synapseClient.invalidateApiKey();
       return getAPIKey();
@@ -1780,10 +1850,12 @@ public class SynapseClientImpl
     List<ColumnModel> oldSchema,
     List<ColumnModel> proposedSchema
   ) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       // Create any models that do not have an ID, or that have changed
-      Map<String, ColumnModel> oldColumnModelId2Model = new HashMap<String, ColumnModel>();
+      Map<String, ColumnModel> oldColumnModelId2Model =
+        new HashMap<String, ColumnModel>();
       for (ColumnModel columnModel : oldSchema) {
         oldColumnModelId2Model.put(columnModel.getId(), columnModel);
       }
@@ -1828,10 +1900,13 @@ public class SynapseClientImpl
         }
       }
 
-      TableUpdateTransactionRequest request = new TableUpdateTransactionRequest();
+      TableUpdateTransactionRequest request =
+        new TableUpdateTransactionRequest();
       request.setEntityId(tableId);
-      List<TableUpdateRequest> requestChangeList = new ArrayList<TableUpdateRequest>();
-      TableSchemaChangeRequest newTableSchemaChangeRequest = new TableSchemaChangeRequest();
+      List<TableUpdateRequest> requestChangeList =
+        new ArrayList<TableUpdateRequest>();
+      TableSchemaChangeRequest newTableSchemaChangeRequest =
+        new TableSchemaChangeRequest();
       newTableSchemaChangeRequest.setEntityId(tableId);
       newTableSchemaChangeRequest.setChanges(changes);
       List<String> orderedColumnIds = new ArrayList<>();
@@ -1862,7 +1937,8 @@ public class SynapseClientImpl
   public EntityChildrenResponse getEntityChildren(
     EntityChildrenRequest request
   ) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       return synapseClient.getEntityChildren(request);
     } catch (SynapseException e) {
@@ -1873,7 +1949,8 @@ public class SynapseClientImpl
   @Override
   public List<ColumnModel> createTableColumns(List<ColumnModel> models)
     throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       return synapseClient.createColumnModels(models);
     } catch (SynapseException e) {
@@ -1912,8 +1989,10 @@ public class SynapseClientImpl
     throws RestServiceException {
     try {
       Set<String> banners = new HashSet<String>();
-      org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-      List<StorageLocationSetting> existingStorageLocations = synapseClient.getMyStorageLocationSettings();
+      org.sagebionetworks.client.SynapseClient synapseClient =
+        createSynapseClient();
+      List<StorageLocationSetting> existingStorageLocations =
+        synapseClient.getMyStorageLocationSettings();
       for (StorageLocationSetting storageLocationSetting : existingStorageLocations) {
         if (storageLocationSetting.getBanner() != null) {
           banners.add(storageLocationSetting.getBanner());
@@ -1931,7 +2010,8 @@ public class SynapseClientImpl
     StorageLocationSetting setting
   ) throws RestServiceException {
     try {
-      org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+      org.sagebionetworks.client.SynapseClient synapseClient =
+        createSynapseClient();
       // first, try to find a matching storage location setting for this user, and reuse
       Long locationId = null;
       if (setting != null) {
@@ -1947,10 +2027,11 @@ public class SynapseClientImpl
       locationIds.add(locationId);
 
       // update existing upload destination project/folder setting
-      UploadDestinationListSetting projectSetting = (UploadDestinationListSetting) synapseClient.getProjectSetting(
-        parentEntityId,
-        ProjectSettingsType.upload
-      );
+      UploadDestinationListSetting projectSetting =
+        (UploadDestinationListSetting) synapseClient.getProjectSetting(
+          parentEntityId,
+          ProjectSettingsType.upload
+        );
       if (projectSetting != null) {
         projectSetting.setLocations(locationIds);
         synapseClient.updateProjectSetting(projectSetting);
@@ -1973,13 +2054,15 @@ public class SynapseClientImpl
     FileHandleCopyRequest copyRequest
   ) throws RestServiceException {
     try {
-      org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-      BatchFileHandleCopyRequest batchRequest = new BatchFileHandleCopyRequest();
+      org.sagebionetworks.client.SynapseClient synapseClient =
+        createSynapseClient();
+      BatchFileHandleCopyRequest batchRequest =
+        new BatchFileHandleCopyRequest();
       batchRequest.setCopyRequests(Collections.singletonList(copyRequest));
-      BatchFileHandleCopyResult batchCopyResults = synapseClient.copyFileHandles(
-        batchRequest
-      );
-      List<FileHandleCopyResult> copyResults = batchCopyResults.getCopyResults();
+      BatchFileHandleCopyResult batchCopyResults =
+        synapseClient.copyFileHandles(batchRequest);
+      List<FileHandleCopyResult> copyResults =
+        batchCopyResults.getCopyResults();
       // sanity check
       if (copyResults.size() != 1) {
         throw new UnknownErrorException(
@@ -2013,8 +2096,10 @@ public class SynapseClientImpl
     List<ColumnModel> schema
   ) throws RestServiceException {
     try {
-      org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-      TransformSqlWithFacetsRequest request = new TransformSqlWithFacetsRequest();
+      org.sagebionetworks.client.SynapseClient synapseClient =
+        createSynapseClient();
+      TransformSqlWithFacetsRequest request =
+        new TransformSqlWithFacetsRequest();
       request.setSqlToTransform(basicSql);
       request.setSelectedFacets(selectedFacets);
       request.setSchema(schema);
@@ -2033,7 +2118,8 @@ public class SynapseClientImpl
   @Override
   public boolean isChallenge(String projectId) throws RestServiceException {
     try {
-      org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+      org.sagebionetworks.client.SynapseClient synapseClient =
+        createSynapseClient();
       return isChallenge(projectId, synapseClient);
     } catch (SynapseException e) {
       throw ExceptionUtil.convertSynapseException(e);
@@ -2067,7 +2153,8 @@ public class SynapseClientImpl
   public void deleteAccessRequirement(Long accessRequirementId)
     throws RestServiceException {
     try {
-      org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+      org.sagebionetworks.client.SynapseClient synapseClient =
+        createSynapseClient();
       synapseClient.deleteAccessRequirement(accessRequirementId);
     } catch (SynapseException e) {
       throw ExceptionUtil.convertSynapseException(e);
@@ -2079,7 +2166,8 @@ public class SynapseClientImpl
     ExternalObjectStoreFileHandle fileHandle
   ) throws RestServiceException {
     try {
-      org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+      org.sagebionetworks.client.SynapseClient synapseClient =
+        createSynapseClient();
       return synapseClient
         .createExternalObjectStoreFileHandle(fileHandle)
         .getId();
@@ -2110,28 +2198,5 @@ public class SynapseClientImpl
       throw ExceptionUtil.convertSynapseException(e);
     }
     return results;
-  }
-
-  @Override
-  public String getDatasetScriptElementContent(String entityId)
-    throws RestServiceException {
-    try {
-      org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-      Entity entity = synapseClient.getEntityById(entityId);
-      if (entity instanceof Dataset) {
-        String plainTextWiki = CrawlFilter.getPlainTextWiki(entityId, this);
-        EntityBundleRequest bundleRequest = new EntityBundleRequest();
-        bundleRequest.setIncludeEntity(true);
-        bundleRequest.setIncludeAnnotations(true);
-        EntityBundle entityBundle = getEntityBundle(entityId, bundleRequest);
-        return CrawlFilter.getDatasetScriptElementContent(
-          entityBundle,
-          plainTextWiki
-        );
-      }
-      return "";
-    } catch (Exception e) {
-      throw ExceptionUtil.convertSynapseException(e);
-    }
   }
 }
