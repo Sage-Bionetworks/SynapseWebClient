@@ -10,7 +10,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.json.JSONObject;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.ObjectType;
@@ -108,9 +107,7 @@ public class JsonLdContentServlet extends HttpServlet {
           );
       }
 
-      JSONObject json = new JSONObject();
-      json.put("jsonld", datasetScriptElementContent);
-      out.println(json.toString());
+      out.println(datasetScriptElementContent);
     } catch (Exception e) {
       logger.log(Level.WARNING, e.getMessage(), e);
       response.sendError(
