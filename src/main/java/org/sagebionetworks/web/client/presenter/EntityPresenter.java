@@ -212,67 +212,50 @@ public class EntityPresenter
   }
 
   public void getEntityBundleAndLoadPageTop() {
-    synapseClient.getDatasetScriptElementContent(
-      entityId,
-      new AsyncCallback<String>() {
+    final AsyncCallback<EntityBundle> callback =
+      new AsyncCallback<EntityBundle>() {
+        @Override
+        public void onSuccess(EntityBundle bundle) {
+          synAlert.clear();
+          view.setLoadingVisible(false);
+          // Redirect if Entity is a Link
+          if (bundle.getEntity() instanceof Link) {
+            Reference ref = ((Link) bundle.getEntity()).getLinksTo();
+            entityId = null;
+            if (ref != null) {
+              // redefine where the page is and refresh
+              entityId = ref.getTargetId();
+              versionNumber = ref.getTargetVersionNumber();
+              refresh();
+              return;
+            } else {
+              // show error and then allow entity bundle to go to view
+              view.showErrorMessage(DisplayConstants.ERROR_NO_LINK_DEFINED);
+            }
+          }
+          EntityHeader projectHeader = DisplayUtils.getProjectHeader(
+            bundle.getPath()
+          );
+          if (projectHeader == null) {
+            synAlert.showError(DisplayConstants.ERROR_GENERIC_RELOAD);
+          } else {
+            entityPageTop.configure(
+              bundle,
+              versionNumber,
+              projectHeader,
+              area,
+              areaToken
+            );
+            view.setEntityPageTopWidget(entityPageTop);
+            view.setEntityPageTopVisible(true);
+          }
+        }
+
         @Override
         public void onFailure(Throwable caught) {
-          view.showErrorMessage(caught.getMessage());
+          onError(caught);
         }
-
-        @Override
-        public void onSuccess(String jsonLd) {
-          if (DisplayUtils.isDefined(jsonLd)) {
-            view.injectDatasetJsonLd(jsonLd);
-          } else {
-            view.removeDatasetJsonLdElement();
-          }
-        }
-      }
-    );
-    final AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
-      @Override
-      public void onSuccess(EntityBundle bundle) {
-        synAlert.clear();
-        view.setLoadingVisible(false);
-        // Redirect if Entity is a Link
-        if (bundle.getEntity() instanceof Link) {
-          Reference ref = ((Link) bundle.getEntity()).getLinksTo();
-          entityId = null;
-          if (ref != null) {
-            // redefine where the page is and refresh
-            entityId = ref.getTargetId();
-            versionNumber = ref.getTargetVersionNumber();
-            refresh();
-            return;
-          } else {
-            // show error and then allow entity bundle to go to view
-            view.showErrorMessage(DisplayConstants.ERROR_NO_LINK_DEFINED);
-          }
-        }
-        EntityHeader projectHeader = DisplayUtils.getProjectHeader(
-          bundle.getPath()
-        );
-        if (projectHeader == null) {
-          synAlert.showError(DisplayConstants.ERROR_GENERIC_RELOAD);
-        } else {
-          entityPageTop.configure(
-            bundle,
-            versionNumber,
-            projectHeader,
-            area,
-            areaToken
-          );
-          view.setEntityPageTopWidget(entityPageTop);
-          view.setEntityPageTopVisible(true);
-        }
-      }
-
-      @Override
-      public void onFailure(Throwable caught) {
-        onError(caught);
-      }
-    };
+      };
 
     if (versionNumber == null) {
       jsClient.getEntityBundle(
@@ -348,10 +331,11 @@ public class EntityPresenter
 
   @EventHandler
   public void onEntityUpdatedEvent(EntityUpdatedEvent event) {
-    List<SynapseReactClientEntityQueryKey> queryKey = SynapseReactClientEntityQueryKey.create(
-      QueryKeyConstants.ENTITY,
-      event.getEntityId()
-    );
+    List<SynapseReactClientEntityQueryKey> queryKey =
+      SynapseReactClientEntityQueryKey.create(
+        QueryKeyConstants.ENTITY,
+        event.getEntityId()
+      );
     queryClient.resetQueries(queryKey);
     globalAppState.refreshPage();
   }

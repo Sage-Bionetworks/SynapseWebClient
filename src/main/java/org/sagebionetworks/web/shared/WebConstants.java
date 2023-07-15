@@ -240,6 +240,7 @@ public class WebConstants {
   public static final String SLACK_SERVLET = "slack";
   public static final String VERSIONS_SERVLET = "versions";
   public static final String FILE_HANDLE_UPLOAD_SERVLET = "filehandle";
+  public static final String JSON_LD_CONTENT_SERVLET = "jsonldcontent";
   public static final String SESSION_COOKIE_SERVLET = "sessioncookie";
   public static final String FILE_ENTITY_RESOLVER_SERVLET = "fileresolver";
   public static final String SFTP_PROXY_ENDPOINT =

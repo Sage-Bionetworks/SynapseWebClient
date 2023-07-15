@@ -91,11 +91,8 @@ public class CrawlFilter extends OncePerRequestFilter {
   JSONObjectAdapter jsonObjectAdapter = null;
   private static final String DISCUSSION_THREAD_ID = "/discussion/threadId=";
   public static final String ESCAPED_FRAGMENT = "_escaped_fragment_=";
-  private final Supplier<String> homePageCached = Suppliers.memoizeWithExpiration(
-    homePageSupplier(),
-    1,
-    TimeUnit.DAYS
-  );
+  private final Supplier<String> homePageCached =
+    Suppliers.memoizeWithExpiration(homePageSupplier(), 1, TimeUnit.DAYS);
   public static final int MAX_CHILD_PAGES = 5;
 
   // Markdown processor
@@ -337,28 +334,24 @@ public class CrawlFilter extends OncePerRequestFilter {
     return displayNameBuilder.toString();
   }
 
-  public static String getPlainTextWiki(
-    String entityId,
-    SynapseClientImpl synapseClient
-  ) {
+  public static String getPlainTextWiki(String entityId, WikiPage rootPage) {
     String plainTextWiki = null;
-    try {
-      WikiPage rootPage = synapseClient.getV2WikiPageAsV1(
-        new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null)
-      );
-      String markdown = escapeHtml(rootPage.getMarkdown());
-      if (markdown != null) {
-        try {
-          Node document = parser.parse(removeSynapseWikiWidgets(markdown));
-          HtmlRenderer renderer = HtmlRenderer.builder().build();
-          String wikiHtml = renderer.render(document);
-          // extract plain text from wiki html
-          plainTextWiki = Jsoup.parse(wikiHtml).text();
-        } catch (Exception e) {
-          e.printStackTrace();
+    if (rootPage != null) {
+      try {
+        String markdown = escapeHtml(rootPage.getMarkdown());
+        if (markdown != null) {
+          try {
+            Node document = parser.parse(removeSynapseWikiWidgets(markdown));
+            HtmlRenderer renderer = HtmlRenderer.builder().build();
+            String wikiHtml = renderer.render(document);
+            // extract plain text from wiki html
+            plainTextWiki = Jsoup.parse(wikiHtml).text();
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
         }
-      }
-    } catch (Exception e) {}
+      } catch (Exception e) {}
+    }
     return plainTextWiki;
   }
 
@@ -396,11 +389,15 @@ public class CrawlFilter extends OncePerRequestFilter {
     String name = escapeHtml(entity.getName());
     String description = escapeHtml(entity.getDescription());
     String createdBy = null;
-
+    WikiPage rootPage = null;
     try {
       createdBy = getCreatedByString(entity.getCreatedBy());
+      rootPage =
+        synapseClient.getV2WikiPageAsV1(
+          new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null)
+        );
     } catch (Exception e) {}
-    String plainTextWiki = getPlainTextWiki(entity.getId(), synapseClient);
+    String plainTextWiki = getPlainTextWiki(entity.getId(), rootPage);
 
     StringBuilder html = new StringBuilder();
 
@@ -454,7 +451,8 @@ public class CrawlFilter extends OncePerRequestFilter {
               false,
               DiscussionFilter.EXCLUDE_DELETED
             );
-          List<DiscussionThreadBundle> threadList = paginatedThreads.getResults();
+          List<DiscussionThreadBundle> threadList =
+            paginatedThreads.getResults();
           for (DiscussionThreadBundle thread : threadList) {
             html.append(
               "<a href=\"https://www.synapse.org/#!Synapse:" +
@@ -597,14 +595,15 @@ public class CrawlFilter extends OncePerRequestFilter {
       createdBy = getCreatedByString(thread.getCreatedBy());
     } catch (Exception e) {}
     html.append("Created by " + createdBy + "<br>");
-    PaginatedResults<DiscussionReplyBundle> replies = discussionForumClient.getRepliesForThread(
-      thread.getId(),
-      100L,
-      0L,
-      DiscussionReplyOrder.CREATED_ON,
-      false,
-      DiscussionFilter.EXCLUDE_DELETED
-    );
+    PaginatedResults<DiscussionReplyBundle> replies =
+      discussionForumClient.getRepliesForThread(
+        thread.getId(),
+        100L,
+        0L,
+        DiscussionReplyOrder.CREATED_ON,
+        false,
+        DiscussionFilter.EXCLUDE_DELETED
+      );
     for (DiscussionReplyBundle reply : replies.getResults()) {
       try {
         String replyURL = discussionForumClient.getReplyUrl(

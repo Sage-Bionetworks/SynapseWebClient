@@ -38,8 +38,4 @@ public interface EntityView extends IsWidget {
   void setEntityPageTopVisible(boolean isVisible);
 
   void setOpenTeamInvitesVisible(boolean isVisible);
-
-  void injectDatasetJsonLd(String elementContent);
-
-  void removeDatasetJsonLdElement();
 }
