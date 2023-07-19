@@ -613,6 +613,18 @@
     "@react-hook/latest" "^1.0.2"
     "@react-hook/passive-layout-effect" "^1.2.0"
 
+"@react-hookz/deep-equal@^1.0.4":
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@react-hookz/deep-equal/-/deep-equal-1.0.4.tgz#68a71f36cbc88724b3ce6f4036183778b6e7f282"
+  integrity sha512-N56fTrAPUDz/R423pag+n6TXWbvlBZDtTehaGFjK0InmN+V2OFWLE/WmORhmn6Ce7dlwH5+tQN1LJFw3ngTJVg==
+
+"@react-hookz/web@^23.1.0":
+  version "23.1.0"
+  resolved "https://registry.yarnpkg.com/@react-hookz/web/-/web-23.1.0.tgz#4e9bf133c56519924b4c2988aca20d09387f5e0a"
+  integrity sha512-fvbURdsa1ukttbLR1ASE/XmqXP09vZ1PiCYppYeR1sNMzCrdkG0iBnjxniFSVjJ8gIw2fRs6nqMTbeBz2uAkuA==
+  dependencies:
+    "@react-hookz/deep-equal" "^1.0.4"
+
 "@reactflow/background@11.2.4":
   version "11.2.4"
   resolved "https://registry.yarnpkg.com/@reactflow/background/-/background-11.2.4.tgz#06cd4c9f222dbeb2d3ffb2a530b6d88bf130dd9c"
@@ -4650,10 +4662,10 @@ svg-path-sdf@^1.1.3:
     parse-svg-path "^0.1.2"
     svg-path-bounds "^1.0.1"
 
-synapse-react-client@3.1.44:
-  version "3.1.44"
-  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-3.1.44.tgz#c4d735429882b1879766b693ebbe590a3b8325aa"
-  integrity sha512-f2aKdbFmg3JPmMr6+zUPF3fOMArusbjG29WjUoX9kUVoBRNUtFYasTuaKqpQlPGK1+VbnNr+Y5iayHQE9oETuw==
+synapse-react-client@3.1.45:
+  version "3.1.45"
+  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-3.1.45.tgz#6d30977de3655948dc688df07717b777e87380e7"
+  integrity sha512-kI/V2pB74bT2YY5au0Cgd9/hac8rBGf2UXH8SDmXX4lcuQz5treAKTX4KvnBuf1YE+rCETt9P3AQyJrZ+SAo4g==
   dependencies:
     "@apidevtools/json-schema-ref-parser" "^9.1.2"
     "@brainhubeu/react-carousel" "1.19.26"
@@ -4668,6 +4680,7 @@ synapse-react-client@3.1.44:
     "@popperjs/core" "^2.11.8"
     "@react-google-maps/api" "^2.18.1"
     "@react-hook/resize-observer" "^1.2.6"
+    "@react-hookz/web" "^23.1.0"
     "@rjsf/core" "^5.9.0"
     "@rjsf/mui" "^5.9.0"
     "@rjsf/utils" "^5.9.0"
