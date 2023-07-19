@@ -104,6 +104,7 @@ public class ColumnModelTableRowEditorWidgetImpl
         case USERID:
         case MEDIUMTEXT:
         case LARGETEXT:
+        case JSON:
           return false;
         default:
           return true;
@@ -269,9 +270,14 @@ public class ColumnModelTableRowEditorWidgetImpl
     }
   }
 
-  Set<ColumnTypeViewEnum> unsupportedTypesForViews = new HashSet<ColumnTypeViewEnum>(
-    Arrays.asList(ColumnTypeViewEnum.LargeText, ColumnTypeViewEnum.MediumText)
-  );
+  Set<ColumnTypeViewEnum> unsupportedTypesForViews =
+    new HashSet<ColumnTypeViewEnum>(
+      Arrays.asList(
+        ColumnTypeViewEnum.LargeText,
+        ColumnTypeViewEnum.MediumText,
+        ColumnTypeViewEnum.JSON
+      )
+    );
 
   @Override
   public void configure(
