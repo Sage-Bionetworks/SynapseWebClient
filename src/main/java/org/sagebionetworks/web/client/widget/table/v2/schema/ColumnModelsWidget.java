@@ -139,7 +139,8 @@ public class ColumnModelsWidget
     List<ColumnModelTableRow> rowViewers = new ArrayList<>();
     for (ColumnModel cm : startingModels) {
       // Create a viewer
-      ColumnModelTableRowViewer rowViewer = ginInjector.createNewColumnModelTableRowViewer();
+      ColumnModelTableRowViewer rowViewer =
+        ginInjector.createNewColumnModelTableRowViewer();
       ColumnModelUtils.applyColumnModelToRow(cm, rowViewer);
       rowViewer.setSelectable(false);
       rowViewers.add(rowViewer);
@@ -149,9 +150,8 @@ public class ColumnModelsWidget
 
   public void getDefaultColumnsForView() {
     synAlert.clear();
-    List<ColumnModel> defaultColumns = fileViewDefaultColumns.getDefaultViewColumns(
-      tableType
-    );
+    List<ColumnModel> defaultColumns =
+      fileViewDefaultColumns.getDefaultViewColumns(tableType);
     editor.addColumns(defaultColumns);
   }
 
@@ -203,7 +203,8 @@ public class ColumnModelsWidget
 
           @Override
           public void onComplete(AsynchronousResponseBody response) {
-            ViewColumnModelResponse viewColumnModelResponse = (ViewColumnModelResponse) response;
+            ViewColumnModelResponse viewColumnModelResponse =
+              (ViewColumnModelResponse) response;
             editor.addColumns(viewColumnModelResponse.getResults());
             if (viewColumnModelResponse.getNextPageToken() != null) {
               getPossibleColumnModelsForViewScope(

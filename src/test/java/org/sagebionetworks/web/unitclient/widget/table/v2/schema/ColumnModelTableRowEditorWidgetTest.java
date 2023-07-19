@@ -22,6 +22,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorView;
@@ -38,6 +39,7 @@ public class ColumnModelTableRowEditorWidgetTest {
   CellEditor mockStringListEditor;
   CellEditor mockLinkEditor;
   CellEditor mockBooleanEditor;
+  CookieProvider mockCookies;
 
   @Before
   public void before() {
@@ -47,6 +49,7 @@ public class ColumnModelTableRowEditorWidgetTest {
     mockStringListEditor = Mockito.mock(CellEditor.class);
     mockLinkEditor = Mockito.mock(CellEditor.class);
     mockBooleanEditor = Mockito.mock(CellEditor.class);
+    mockCookies = Mockito.mock(CookieProvider.class);
     ColumnModel cm = new ColumnModel();
     cm.setColumnType(ColumnType.STRING);
     when(mockFactory.createEditor(cm)).thenReturn(mockStringEditor);
@@ -61,7 +64,12 @@ public class ColumnModelTableRowEditorWidgetTest {
     when(mockFactory.createEditor(cm)).thenReturn(mockBooleanEditor);
     when(mockView.getColumnType()).thenReturn(ColumnTypeViewEnum.String);
     when(mockView.getMaxSize()).thenReturn("");
-    editor = new ColumnModelTableRowEditorWidgetImpl(mockView, mockFactory);
+    editor =
+      new ColumnModelTableRowEditorWidgetImpl(
+        mockView,
+        mockFactory,
+        mockCookies
+      );
     columnModel = new ColumnModel();
     columnModel.setColumnType(ColumnType.STRING);
     columnModel.setMaximumSize(15L);

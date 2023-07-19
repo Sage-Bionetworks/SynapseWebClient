@@ -112,6 +112,10 @@ public class TableModelTestUtils {
           case USERID_LIST:
             defaultValue = "1234567, 1234568";
             break;
+          case JSON:
+            defaultValue =
+              "{\"foo\":\"bar\", \"baz\": [\"one\", \"two\", \"three\"]}";
+            break;
           default:
             throw new IllegalStateException("huh? missing enum");
         }
@@ -399,6 +403,12 @@ public class TableModelTestUtils {
         return (isUpdate ? "syn123, syn124" : "syn234, syn235") + i;
       case USERID_LIST:
         return "111, 112" + i;
+      case JSON:
+        if (i % 2 > 0 ^ isUpdate) {
+          return "{\"foo\": \"bar\", \"i\": " + i + "}";
+        } else {
+          return "[\"foo\", \"bar\", " + i + "]";
+        }
     }
     throw new IllegalArgumentException(
       "Unknown ColumnType: " + cm.getColumnType()

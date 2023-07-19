@@ -6,13 +6,14 @@ import static org.sagebionetworks.web.client.widget.table.v2.schema.ColumnFacetT
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.StringUtils;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
 
@@ -38,6 +39,8 @@ public class ColumnModelTableRowEditorWidgetImpl
   ColumnModelTableRowEditorView view;
   ColumnTypeViewEnum currentType;
   CellFactory factory;
+  private final CookieProvider cookies;
+
   String maxSize = null;
   boolean canHaveDefault = true;
   boolean isView = false;
@@ -45,10 +48,12 @@ public class ColumnModelTableRowEditorWidgetImpl
   @Inject
   public ColumnModelTableRowEditorWidgetImpl(
     ColumnModelTableRowEditorView view,
-    CellFactory factory
+    CellFactory factory,
+    CookieProvider cookies
   ) {
     this.view = view;
     this.factory = factory;
+    this.cookies = cookies;
     view.setTypePresenter(this);
   }
 
@@ -104,6 +109,7 @@ public class ColumnModelTableRowEditorWidgetImpl
         case USERID:
         case MEDIUMTEXT:
         case LARGETEXT:
+        case JSON:
           return false;
         default:
           return true;
@@ -269,9 +275,14 @@ public class ColumnModelTableRowEditorWidgetImpl
     }
   }
 
-  Set<ColumnTypeViewEnum> unsupportedTypesForViews = new HashSet<ColumnTypeViewEnum>(
-    Arrays.asList(ColumnTypeViewEnum.LargeText, ColumnTypeViewEnum.MediumText)
-  );
+  Set<ColumnTypeViewEnum> unsupportedTypesForViews =
+    new HashSet<ColumnTypeViewEnum>(
+      Arrays.asList(
+        ColumnTypeViewEnum.LargeText,
+        ColumnTypeViewEnum.MediumText,
+        ColumnTypeViewEnum.JSON
+      )
+    );
 
   @Override
   public void configure(
@@ -284,6 +295,13 @@ public class ColumnModelTableRowEditorWidgetImpl
     Arrays
       .asList(ColumnTypeViewEnum.values())
       .stream()
+      .filter(val ->
+        // Only show JSON ColumnType in experimental mode
+        (
+          DisplayUtils.isInTestWebsite(cookies) ||
+          !ColumnTypeViewEnum.JSON.equals(val)
+        )
+      )
       .filter((val -> (!isView || !unsupportedTypesForViews.contains(val)))) // keep all values for tables, or keep value if not found in unsupportedTypesForViews.
       .forEach(val -> {
         view.addColumnType(val);
