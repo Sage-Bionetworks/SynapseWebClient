@@ -1,0 +1,47 @@
+name: 'Build/Run End-to-End Tests'
+
+on:
+  push:
+    branches: [SWC-6514]
+env:
+  CONTAINER_NAME: 'swc-tomcat'
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    env:
+      CI: true
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 8
+        uses: actions/setup-java@v3
+        with:
+          java-version: '8'
+          distribution: 'temurin'
+          cache: maven
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
+      - name: Run SWC on Tomcat
+        run: |
+          docker run \
+            --name $CONTAINER_NAME \
+            -d --rm \
+            -p 8888:8080 \
+            -v "/$(pwd)/target/portal-develop-SNAPSHOT.war:/usr/local/tomcat/webapps/ROOT.war" \
+            -v "/$(pwd)/e2e_workflow/settings.xml":/root/.m2/settings.xml \
+            tomcat:9.0
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+      - name: Run Playwright tests
+        env:
+          DEV_ADMIN_USERNAME: ${{ secrets.DEV_ADMIN_USERNAME }}
+          DEV_ADMIN_API_KEY: ${{ secrets.DEV_ADMIN_API_KEY }}
+        run: yarn playwright test
+      - name: Upload Playwright Report
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+      - name: Stop Tomcat
+        run: docker stop $CONTAINER_NAME
