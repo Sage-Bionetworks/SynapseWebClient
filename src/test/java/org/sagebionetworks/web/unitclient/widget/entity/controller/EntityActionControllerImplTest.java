@@ -530,7 +530,8 @@ public class EntityActionControllerImplTest {
           public Void answer(InvocationOnMock invocation) throws Throwable {
             verify(mockEntityFinderBuilder)
               .setSelectedHandler(entityFinderSelectedHandlerCaptor.capture());
-            EntityFinderWidget.SelectedHandler<Reference> handler = entityFinderSelectedHandlerCaptor.getValue();
+            EntityFinderWidget.SelectedHandler<Reference> handler =
+              entityFinderSelectedHandlerCaptor.getValue();
             handler.onSelected(selected, mockEntityFinder);
             return null;
           }
@@ -602,6 +603,7 @@ public class EntityActionControllerImplTest {
     verify(mockActionMenu)
       .setActionVisible(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, false);
     verify(mockActionMenu).setActionVisible(Action.EDIT_DEFINING_SQL, false);
+    verify(mockActionMenu).setActionVisible(Action.VIEW_DEFINING_SQL, false);
   }
 
   @Test
@@ -652,6 +654,7 @@ public class EntityActionControllerImplTest {
     verify(mockActionMenu)
       .setActionVisible(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, false);
     verify(mockActionMenu).setActionVisible(Action.EDIT_DEFINING_SQL, false);
+    verify(mockActionMenu).setActionVisible(Action.VIEW_DEFINING_SQL, false);
   }
 
   @Test
@@ -706,6 +709,7 @@ public class EntityActionControllerImplTest {
     // Show scope should not be visible
     verify(mockActionMenu).setActionVisible(Action.SHOW_VIEW_SCOPE, false);
     verify(mockActionMenu).setActionVisible(Action.EDIT_DEFINING_SQL, false);
+    verify(mockActionMenu).setActionVisible(Action.VIEW_DEFINING_SQL, false);
     // Edit dataset items should be visible
     verify(mockActionMenu)
       .setActionVisible(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, true);
@@ -769,6 +773,7 @@ public class EntityActionControllerImplTest {
     // Show scope always disabled for datasets
     verify(mockActionMenu).setActionVisible(Action.SHOW_VIEW_SCOPE, false);
     verify(mockActionMenu).setActionVisible(Action.EDIT_DEFINING_SQL, false);
+    verify(mockActionMenu).setActionVisible(Action.VIEW_DEFINING_SQL, false);
     // Cannot edit items without permission
     verify(mockActionMenu)
       .setActionVisible(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, false);
@@ -826,6 +831,7 @@ public class EntityActionControllerImplTest {
     // Show scope should not be visible
     verify(mockActionMenu).setActionVisible(Action.SHOW_VIEW_SCOPE, false);
     verify(mockActionMenu).setActionVisible(Action.EDIT_DEFINING_SQL, false);
+    verify(mockActionMenu).setActionVisible(Action.VIEW_DEFINING_SQL, false);
     // Edit dataset items should NOT be visible if not the current version
     verify(mockActionMenu)
       .setActionVisible(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, false);
@@ -884,6 +890,7 @@ public class EntityActionControllerImplTest {
     // Show scope should not be visible
     verify(mockActionMenu).setActionVisible(Action.SHOW_VIEW_SCOPE, false);
     verify(mockActionMenu).setActionVisible(Action.EDIT_DEFINING_SQL, false);
+    verify(mockActionMenu).setActionVisible(Action.VIEW_DEFINING_SQL, false);
     // Edit dataset items should be visible
     verify(mockActionMenu)
       .setActionVisible(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, true);
@@ -948,6 +955,7 @@ public class EntityActionControllerImplTest {
     // Show scope always disabled for datasets
     verify(mockActionMenu).setActionVisible(Action.SHOW_VIEW_SCOPE, false);
     verify(mockActionMenu).setActionVisible(Action.EDIT_DEFINING_SQL, false);
+    verify(mockActionMenu).setActionVisible(Action.VIEW_DEFINING_SQL, false);
     // Cannot edit items without permission
     verify(mockActionMenu)
       .setActionVisible(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, false);
@@ -1006,6 +1014,7 @@ public class EntityActionControllerImplTest {
     // Show scope should not be visible
     verify(mockActionMenu).setActionVisible(Action.SHOW_VIEW_SCOPE, false);
     verify(mockActionMenu).setActionVisible(Action.EDIT_DEFINING_SQL, false);
+    verify(mockActionMenu).setActionVisible(Action.VIEW_DEFINING_SQL, false);
     // Edit dataset items should NOT be visible if not the current version
     verify(mockActionMenu)
       .setActionVisible(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, false);
@@ -1058,6 +1067,7 @@ public class EntityActionControllerImplTest {
     // Show scope should be visible
     verify(mockActionMenu).setActionVisible(Action.SHOW_VIEW_SCOPE, true);
     verify(mockActionMenu).setActionVisible(Action.EDIT_DEFINING_SQL, false);
+    verify(mockActionMenu).setActionVisible(Action.VIEW_DEFINING_SQL, false);
     // Edit dataset items should not be visible
 
     verify(mockActionMenu)
@@ -1109,6 +1119,7 @@ public class EntityActionControllerImplTest {
     // Show scope should be visible
     verify(mockActionMenu).setActionVisible(Action.SHOW_VIEW_SCOPE, true);
     verify(mockActionMenu).setActionVisible(Action.EDIT_DEFINING_SQL, false);
+    verify(mockActionMenu).setActionVisible(Action.VIEW_DEFINING_SQL, false);
     // Edit dataset items should not be visible
     verify(mockActionMenu)
       .setActionVisible(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, false);
@@ -1161,6 +1172,7 @@ public class EntityActionControllerImplTest {
     verify(mockActionMenu).setActionVisible(Action.SHOW_VIEW_SCOPE, false);
     // Materialized View has SQL definition that can be edited
     verify(mockActionMenu).setActionVisible(Action.EDIT_DEFINING_SQL, true);
+    verify(mockActionMenu).setActionVisible(Action.VIEW_DEFINING_SQL, false);
     // Edit dataset items should not be visible
     verify(mockActionMenu)
       .setActionVisible(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, false);
@@ -1220,6 +1232,7 @@ public class EntityActionControllerImplTest {
     verify(mockActionMenu).setActionVisible(Action.SHOW_VIEW_SCOPE, false);
     // Cannot edit defining SQL without permission
     verify(mockActionMenu).setActionVisible(Action.EDIT_DEFINING_SQL, false);
+    verify(mockActionMenu).setActionVisible(Action.VIEW_DEFINING_SQL, true);
     // Edit dataset items should never be visible for a materialized view
     verify(mockActionMenu)
       .setActionVisible(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, false);
@@ -1272,6 +1285,7 @@ public class EntityActionControllerImplTest {
     verify(mockActionMenu).setActionVisible(Action.SHOW_VIEW_SCOPE, false);
     // VirtualTable has SQL definition that can be edited
     verify(mockActionMenu).setActionVisible(Action.EDIT_DEFINING_SQL, true);
+    verify(mockActionMenu).setActionVisible(Action.VIEW_DEFINING_SQL, false);
     // Edit dataset items should not be visible
     verify(mockActionMenu)
       .setActionVisible(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, false);
@@ -1331,6 +1345,7 @@ public class EntityActionControllerImplTest {
     verify(mockActionMenu).setActionVisible(Action.SHOW_VIEW_SCOPE, false);
     // Cannot edit defining SQL without permission
     verify(mockActionMenu).setActionVisible(Action.EDIT_DEFINING_SQL, false);
+    verify(mockActionMenu).setActionVisible(Action.VIEW_DEFINING_SQL, true);
     // Edit dataset items should never be visible for a Virtual Table
     verify(mockActionMenu)
       .setActionVisible(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, false);
@@ -2340,7 +2355,8 @@ public class EntityActionControllerImplTest {
     verify(mockPromptModalConfigurationBuilder)
       .setCallback(callbackListStringCaptor.capture());
     verify(mockView).showMultiplePromptDialog(mockPromptModalConfiguration);
-    CallbackP<List<String>> valuesCallback = callbackListStringCaptor.getValue();
+    CallbackP<List<String>> valuesCallback =
+      callbackListStringCaptor.getValue();
     // invoke with a label and comment
     String label = "my label";
     String comment = "my comment";
@@ -2359,7 +2375,8 @@ public class EntityActionControllerImplTest {
     verify(mockView).hideMultiplePromptDialog();
     verify(mockView).showCreateVersionDialog();
 
-    AsyncCallback<SnapshotResponse> handler = tableSnapshotResponseCaptor.getValue();
+    AsyncCallback<SnapshotResponse> handler =
+      tableSnapshotResponseCaptor.getValue();
 
     // Failure
     String errorMsg = "Error message";
@@ -2403,7 +2420,8 @@ public class EntityActionControllerImplTest {
     verify(mockPromptModalConfigurationBuilder)
       .setCallback(callbackListStringCaptor.capture());
     verify(mockView).showMultiplePromptDialog(mockPromptModalConfiguration);
-    CallbackP<List<String>> valuesCallback = callbackListStringCaptor.getValue();
+    CallbackP<List<String>> valuesCallback =
+      callbackListStringCaptor.getValue();
     // invoke with a label and comment
     String label = "my label";
     String comment = "my comment";
@@ -2420,8 +2438,10 @@ public class EntityActionControllerImplTest {
         tableUpdateTransactionRequestCaptor.capture(),
         asyncProgressHandlerCaptor.capture()
       );
-    TableUpdateTransactionRequest request = tableUpdateTransactionRequestCaptor.getValue();
-    AsynchronousProgressHandler<TableUpdateTransactionResponse> handler = asyncProgressHandlerCaptor.getValue();
+    TableUpdateTransactionRequest request =
+      tableUpdateTransactionRequestCaptor.getValue();
+    AsynchronousProgressHandler<TableUpdateTransactionResponse> handler =
+      asyncProgressHandlerCaptor.getValue();
 
     // verify request
     assertEquals(entityId, request.getEntityId());
@@ -2484,7 +2504,8 @@ public class EntityActionControllerImplTest {
     verify(mockPromptModalConfigurationBuilder)
       .setCallback(callbackListStringCaptor.capture());
     verify(mockView).showMultiplePromptDialog(mockPromptModalConfiguration);
-    CallbackP<List<String>> valuesCallback = callbackListStringCaptor.getValue();
+    CallbackP<List<String>> valuesCallback =
+      callbackListStringCaptor.getValue();
     // invoke with a label and comment
     String label = "my label";
     String comment = "my comment";
@@ -2501,7 +2522,8 @@ public class EntityActionControllerImplTest {
         tableUpdateTransactionRequestCaptor.capture(),
         asyncProgressHandlerCaptor.capture()
       );
-    TableUpdateTransactionRequest request = tableUpdateTransactionRequestCaptor.getValue();
+    TableUpdateTransactionRequest request =
+      tableUpdateTransactionRequestCaptor.getValue();
     AsynchronousProgressHandler handler = asyncProgressHandlerCaptor.getValue();
 
     // verify request
@@ -4679,6 +4701,26 @@ public class EntityActionControllerImplTest {
   }
 
   @Test
+  public void testOnViewDefiningSql() {
+    String sql = "select everything";
+    entityBundle.setEntity(mockMaterializedView);
+    when(mockMaterializedView.getDefiningSQL()).thenReturn(sql);
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+
+    controller.onAction(Action.VIEW_DEFINING_SQL, null);
+
+    // user is prompted for the new SQL
+    verify(mockView).showInfoDialog(anyString(), eq(sql));
+  }
+
+  @Test
   public void testConfigureFileDownloadCanDownload() {
     entityBundle.setEntity(new FileEntity());
 
@@ -4707,8 +4749,10 @@ public class EntityActionControllerImplTest {
   public void testConfigureFileDownloadCannotDownload() {
     RequestDownload requestAclAction = new RequestDownload();
     EnableTwoFa enableTwoFaAction = new EnableTwoFa();
-    MeetAccessRequirement meetAccessRequirementAction1 = new MeetAccessRequirement();
-    MeetAccessRequirement meetAccessRequirementAction2 = new MeetAccessRequirement();
+    MeetAccessRequirement meetAccessRequirementAction1 =
+      new MeetAccessRequirement();
+    MeetAccessRequirement meetAccessRequirementAction2 =
+      new MeetAccessRequirement();
 
     ActionRequiredList actionsRequiredForDownload = new ActionRequiredList();
     actionsRequiredForDownload.setActions(
