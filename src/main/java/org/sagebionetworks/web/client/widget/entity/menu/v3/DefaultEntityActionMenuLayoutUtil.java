@@ -492,6 +492,7 @@ public class DefaultEntityActionMenuLayoutUtil {
         layout.setButtonActions(
           Arrays.asList(
             ActionViewProps.create(Action.EDIT_DEFINING_SQL, "edit"),
+            ActionViewProps.create(Action.VIEW_DEFINING_SQL, "article"),
             ActionViewProps.create(Action.SHOW_ANNOTATIONS, "label"),
             ActionViewProps.create(Action.SHOW_TABLE_SCHEMA, "columns")
           )
