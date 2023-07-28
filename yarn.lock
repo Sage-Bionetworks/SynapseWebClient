@@ -3885,6 +3885,11 @@ react-hot-toast@2.2.0:
   dependencies:
     goober "^2.1.1"
 
+react-inspector@^6.0.2:
+  version "6.0.2"
+  resolved "https://registry.yarnpkg.com/react-inspector/-/react-inspector-6.0.2.tgz#aa3028803550cb6dbd7344816d5c80bf39d07e9d"
+  integrity sha512-x+b7LxhmHXjHoU/VrFAzw5iutsILRoYyDq97EDYdFpPLcvqtEzk4ZSZSQjnFPbr5T57tLXnHcqFYoN1pI6u8uQ==
+
 react-intersection-observer@^9.5.2:
   version "9.5.2"
   resolved "https://registry.yarnpkg.com/react-intersection-observer/-/react-intersection-observer-9.5.2.tgz#f68363a1ff292323c0808201b58134307a1626d0"
@@ -4662,10 +4667,10 @@ svg-path-sdf@^1.1.3:
     parse-svg-path "^0.1.2"
     svg-path-bounds "^1.0.1"
 
-synapse-react-client@3.1.45:
-  version "3.1.45"
-  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-3.1.45.tgz#6d30977de3655948dc688df07717b777e87380e7"
-  integrity sha512-kI/V2pB74bT2YY5au0Cgd9/hac8rBGf2UXH8SDmXX4lcuQz5treAKTX4KvnBuf1YE+rCETt9P3AQyJrZ+SAo4g==
+synapse-react-client@3.1.46:
+  version "3.1.46"
+  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-3.1.46.tgz#bb0463e75d76dafb54506ef9d25ec2926cf8a305"
+  integrity sha512-kW2yyjuzvc+qW/c4OoxjqLOhd8Nw0gfWSQ2+OMiKE2O54/Ernhn4+uh1GilGezpOBbpiEeov1EOi5cwQNgnsjA==
   dependencies:
     "@apidevtools/json-schema-ref-parser" "^9.1.2"
     "@brainhubeu/react-carousel" "1.19.26"
@@ -4723,6 +4728,7 @@ synapse-react-client@3.1.45:
     react-datetime "^3.2.0"
     react-error-boundary "^3.1.4"
     react-hot-toast "2.2.0"
+    react-inspector "^6.0.2"
     react-intersection-observer "^9.5.2"
     react-mailchimp-subscribe "^2.1.3"
     react-measure "^2.5.2"
