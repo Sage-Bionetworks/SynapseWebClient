@@ -15,7 +15,7 @@ import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.DatasetCollection;
 import org.sagebionetworks.repo.model.table.EntityView;
-import org.sagebionetworks.repo.model.table.MaterializedView;
+import org.sagebionetworks.repo.model.table.HasDefiningSql;
 import org.sagebionetworks.repo.model.table.SubmissionView;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.View;
@@ -124,8 +124,8 @@ public class ColumnModelsWidget
 
   @Override
   public void configure(EntityBundle bundle, boolean isEditable) {
-    boolean isMaterializedView = bundle.getEntity() instanceof MaterializedView;
-    this.isEditable = isEditable && !isMaterializedView;
+    boolean hasDefiningSql = bundle.getEntity() instanceof HasDefiningSql;
+    this.isEditable = isEditable && !hasDefiningSql;
     this.bundle = bundle;
     List<ColumnModel> startingModels = bundle
       .getTableBundle()
