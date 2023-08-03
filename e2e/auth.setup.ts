@@ -1,6 +1,6 @@
 // Required environment variables:
-// - DEV_ADMIN_USERNAME: username of admin who can create users on backend dev stack
-// - DEV_ADMIN_API_KEY: api key for admin who can create users on backend dev stack
+// - ADMIN_USERNAME: username for admin
+// - ADMIN_PASSWORD: password for admin
 //
 // Environment variables:
 // - in CI: set in repo GitHub secrets, read via env in workflow
@@ -8,25 +8,42 @@
 
 import { expect, test as setup } from '@playwright/test'
 import { v4 as uuidv4 } from 'uuid'
-import { STORAGE_STATE } from '../playwright.config'
+import { ADMIN_STORAGE_STATE, USER_STORAGE_STATE } from '../playwright.config'
 import { getEndpoint } from './helpers/http'
+import { setLocalStorage } from './helpers/localStorage'
 import {
-  TEST_USER_LOCALSTORAGE_KEY,
-  TestUser,
+  USER_NAME_LOCALSTORAGE_KEY,
   createTestUser,
-  getAdminCredentials,
+  getAccessTokenFromCookie,
+  getAdminUserCredentials,
   loginTestUser,
-  setTestUserId,
 } from './helpers/testUser'
+import { TestUser } from './helpers/types'
 
-setup('authenticate', async ({ page }) => {
-  const { testUserName, testUserPassword } = await setup.step(
+setup('authenticate users', async ({ browser }) => {
+  const adminAccessToken = await setup.step('authenticate admin', async () => {
+    const adminPage = await browser.newPage()
+    const { adminUserName, adminUserPassword } = getAdminUserCredentials()
+
+    await loginTestUser(adminPage, adminUserName!, adminUserPassword!)
+    await adminPage.context().storageState({ path: ADMIN_STORAGE_STATE })
+
+    return getAccessTokenFromCookie(adminPage)
+  })
+
+  const { userPage, testUserName, testUserPassword } = await setup.step(
     'create test user',
     async () => {
-      const { adminUserName, adminApiKey } = getAdminCredentials()
+      const userPage = await browser.newPage()
 
       const testUserName = 'swc-e2e-' + uuidv4()
       const testUserPassword = 'password-' + uuidv4()
+      /* 
+      const testUserName = 'swc-e2e-test'
+      const testUserPassword = process.env.USER_PASSWORD!
+      expect(testUserPassword).not.toBeUndefined() 
+      */
+
       const testUserEmail = `${testUserName}@test.com`
       const testUserIsValidated = false
 
@@ -40,25 +57,20 @@ setup('authenticate', async ({ page }) => {
 
       const testUserId = await createTestUser(
         getEndpoint(),
-        adminUserName!,
-        adminApiKey!,
         testUser,
+        adminAccessToken,
       )
-
       expect(testUserId).not.toBeUndefined()
-      console.log(`Create user: ${testUserName}, id: ${testUserId}`)
 
-      // Save user id in context, so the test user can be deleted during clean up
-      await setTestUserId(page, TEST_USER_LOCALSTORAGE_KEY, testUserId)
-      await page.context().storageState({ path: STORAGE_STATE })
+      await setLocalStorage(userPage, USER_NAME_LOCALSTORAGE_KEY, testUserName)
+      await userPage.context().storageState({ path: USER_STORAGE_STATE })
 
-      return { testUserName, testUserPassword }
+      return { userPage, testUserName, testUserPassword }
     },
   )
 
   await setup.step('authenticate test user', async () => {
-    await loginTestUser(page, testUserName, testUserPassword)
-    // Save user authentication state in context, so login doesn't have to be repeated
-    await page.context().storageState({ path: STORAGE_STATE })
+    await loginTestUser(userPage, testUserName, testUserPassword)
+    await userPage.context().storageState({ path: USER_STORAGE_STATE })
   })
 })

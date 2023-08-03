@@ -1,20 +1,42 @@
-import { expect, test } from '@playwright/test'
+import { Page, expect, test } from '@playwright/test'
+import { v4 as uuidv4 } from 'uuid'
+import { goToDashboard } from './helpers/testUser'
+
+const PROJECT_NAME = 'swc-e2e-project-' + uuidv4()
+
+async function createProject(page: Page, projectName: string) {
+  await goToDashboard(page)
+  await page.getByLabel('Projects').click()
+  await page.getByLabel('Create a New Project').click()
+  await page.getByLabel('Project Name').type(projectName)
+  await page.getByRole('button', { name: 'Save' }).click()
+}
 
 test.describe('Projects', () => {
-  test('should show alert when creating a new project with an existing name', async ({
-    page,
-  }) => {
-    await page.goto('/')
-    await page
-      .getByRole('link', { name: 'View Your Dashboard' })
-      .first()
-      .click()
-    await page.getByLabel('Projects').click()
-    await page.getByLabel('Create a New Project').click()
-    await page.getByLabel('Project Name').type('new project')
-    await page.getByRole('button', { name: 'Save' }).click()
-    await expect(
-      page.getByText(/an entity with the name.*already exists/i),
-    ).toBeVisible()
+  test('should create and delete a project', async ({ page }) => {
+    await test.step('should create a project with a unique name', async () => {
+      await createProject(page, PROJECT_NAME)
+      await expect(
+        page.getByRole('heading', { name: PROJECT_NAME }),
+      ).toBeVisible()
+    })
+
+    await test.step('should show an alert when creating a project with an existing name', async () => {
+      await createProject(page, PROJECT_NAME)
+      await expect(
+        page.getByText(/an entity with the name.*already exists/i),
+      ).toBeVisible()
+    })
+
+    await test.step('should delete a project', async () => {
+      await goToDashboard(page)
+      await page.getByRole('button', { name: 'Created by me' }).click()
+      await page.getByRole('link', { name: PROJECT_NAME }).click()
+      await page.getByRole('button', { name: 'Project Tools' }).click()
+      await page.getByRole('menuitem', { name: 'Delete Project' }).click()
+      await page.getByRole('button', { name: 'Delete', exact: true }).click()
+      await page.getByRole('button', { name: 'Created by me' }).click()
+      await expect(page.getByText(PROJECT_NAME)).not.toBeVisible()
+    })
   })
 })

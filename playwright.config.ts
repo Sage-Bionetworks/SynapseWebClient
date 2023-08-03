@@ -1,13 +1,14 @@
 import { defineConfig, devices } from '@playwright/test'
 import dotenv from 'dotenv'
 
-export const STORAGE_STATE = 'playwright/.auth/user.json'
+export const USER_STORAGE_STATE = 'playwright/.auth/user.json'
+export const ADMIN_STORAGE_STATE = 'playwright/.auth/adminUser.json'
 
 /**
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
  *
- * For local development only. GitHub Action will set env using values in GitHub Secrets.
+ * For local development only. In CI, GitHub Action will set env using values in GitHub Secrets.
  */
 dotenv.config()
 
@@ -59,7 +60,7 @@ export default defineConfig({
       use: {
         ...devices['Desktop Chrome'],
         // Use prepared auth state.
-        storageState: STORAGE_STATE,
+        storageState: USER_STORAGE_STATE,
       },
       testMatch: /.*\.loggedin\.spec.ts/,
       dependencies: ['setup'],
@@ -68,7 +69,7 @@ export default defineConfig({
     // Clean up project
     {
       name: 'cleanup',
-      use: { storageState: STORAGE_STATE },
+      use: { storageState: USER_STORAGE_STATE },
       testMatch: /.*\.cleanup\.ts/,
     },
 

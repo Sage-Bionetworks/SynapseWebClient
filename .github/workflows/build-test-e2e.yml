@@ -3,23 +3,16 @@ name: 'Build/Run End-to-End Tests'
 on:
   push:
     branches: [SWC-6514]
-env:
-  CONTAINER_NAME: 'swc-tomcat'
 jobs:
-  build-and-test:
+  build-and-run-e2e:
     runs-on: ubuntu-latest
     env:
+      CONTAINER_NAME: 'swc-tomcat'
       CI: true
     steps:
       - uses: actions/checkout@v3
-      - name: Set up JDK 8
-        uses: actions/setup-java@v3
-        with:
-          java-version: '8'
-          distribution: 'temurin'
-          cache: maven
-      - name: Build with Maven
-        run: mvn -B package --file pom.xml
+      - name: Build SWC
+        uses: ./.github/workflows/build
       - name: Run SWC on Tomcat
         run: |
           docker run \
@@ -33,8 +26,8 @@ jobs:
         run: npx playwright install --with-deps
       - name: Run Playwright tests
         env:
-          DEV_ADMIN_USERNAME: ${{ secrets.DEV_ADMIN_USERNAME }}
-          DEV_ADMIN_API_KEY: ${{ secrets.DEV_ADMIN_API_KEY }}
+          ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
         run: yarn playwright test
       - name: Upload Playwright Report
         uses: actions/upload-artifact@v3
