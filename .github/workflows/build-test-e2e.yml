@@ -23,7 +23,7 @@ jobs:
             -v "/$(pwd)/e2e_workflow/settings.xml":/root/.m2/settings.xml \
             tomcat:9.0
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
+        run: yarn playwright install --with-deps chromium
       - name: Run Playwright tests
         env:
           ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
@@ -37,4 +37,5 @@ jobs:
           path: playwright-report/
           retention-days: 30
       - name: Stop Tomcat
+        if: always()
         run: docker stop $CONTAINER_NAME
