@@ -1,4 +1,5 @@
 import { createHmac } from 'crypto'
+import { fetchWithExponentialTimeout } from './srcFetch'
 
 export const BASE64_ENCODING = 'base64'
 export const DEFAULT_GETDELETE_HEADERS = {
@@ -48,34 +49,6 @@ export function getUserIdFromJwt(token: string) {
   return payload.sub
 }
 
-async function doFetch<TResponse>(url: RequestInfo, options: RequestInit) {
-  const response = await fetch(url, options)
-  const contentType = response.headers.get('Content-Type')
-  const responseBody = await response.text()
-  let responseObject: TResponse | string = responseBody
-  try {
-    // try to parse it as json
-    if (contentType && contentType.includes('application/json')) {
-      responseObject = JSON.parse(responseBody) as TResponse
-    }
-  } catch (error) {
-    console.warn('Failed to parse response as JSON', responseBody)
-  }
-
-  if (response.ok) {
-    return responseObject
-  } else if (
-    responseObject !== null &&
-    typeof responseObject === 'object' &&
-    'reason' in responseObject &&
-    typeof responseObject.reason === 'string'
-  ) {
-    throw new Error(response.status + responseObject.reason + url.toString())
-  } else {
-    throw new Error(response.status + url.toString())
-  }
-}
-
 function updateHeaders(
   headers: { [key: string]: string },
   uri: string,
@@ -114,7 +87,7 @@ export async function doPost<T>(
     method: 'POST',
     mode: 'cors',
   }
-  return await doFetch(url, options)
+  return await fetchWithExponentialTimeout(url, options)
 }
 
 export async function doGet<T>(
@@ -137,7 +110,7 @@ export async function doGet<T>(
     method: 'GET',
     mode: 'cors',
   }
-  return await doFetch(url, options)
+  return await fetchWithExponentialTimeout(url, options)
 }
 
 export async function doDelete<T>(
@@ -160,7 +133,7 @@ export async function doDelete<T>(
     method: 'DELETE',
     mode: 'cors',
   }
-  return await doFetch(url, options)
+  return await fetchWithExponentialTimeout(url, options)
 }
 
 export function getEndpoint() {

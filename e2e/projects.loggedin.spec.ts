@@ -43,5 +43,7 @@ test.describe('Projects', () => {
     await page.getByRole('button', { name: 'Delete', exact: true }).click()
     await page.getByRole('button', { name: 'Created by me' }).click()
     await expect(page.getByText(PROJECT_NAME)).not.toBeVisible()
+
+    await browser.close()
   })
 })

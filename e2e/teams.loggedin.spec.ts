@@ -147,5 +147,7 @@ test.describe('Teams', () => {
       adminAccessToken,
       adminAccessToken,
     )
+
+    await browser.close()
   })
 })
