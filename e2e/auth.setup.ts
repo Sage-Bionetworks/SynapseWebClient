@@ -21,6 +21,7 @@ import {
 import { TestUser } from './helpers/types'
 
 setup('authenticate users', async ({ browser }) => {
+  setup.slow()
   const adminAccessToken = await setup.step('authenticate admin', async () => {
     const adminPage = await browser.newPage()
     const { adminUserName, adminUserPassword } = getAdminUserCredentials()
@@ -41,7 +42,7 @@ setup('authenticate users', async ({ browser }) => {
       /* 
       const testUserName = 'swc-e2e-test'
       const testUserPassword = process.env.USER_PASSWORD!
-      expect(testUserPassword).not.toBeUndefined() 
+      expect(testUserPassword).not.toBeUndefined()
       */
 
       const testUserEmail = `${testUserName}@test.com`

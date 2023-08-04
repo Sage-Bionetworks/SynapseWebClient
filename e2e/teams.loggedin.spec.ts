@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { chromium, expect, test } from '@playwright/test'
 import { v4 as uuidv4 } from 'uuid'
 import { ADMIN_STORAGE_STATE, USER_STORAGE_STATE } from '../playwright.config'
 import { getLocalStorage } from './helpers/localStorage'
@@ -102,38 +102,50 @@ test.describe('Teams', () => {
       ).toBeVisible()
       await expect(adminPage.getByText('2 team members')).toBeVisible()
     })
+  })
 
-    await test.step('user should delete team', async () => {
-      await userPage.getByRole('button', { name: 'Team Actions' }).click()
-      await userPage.getByRole('link', { name: 'Delete Team' }).click()
-      await userPage.getByRole('button', { name: 'Delete' }).click()
-      await expect(
-        userPage.getByText('Team successfully deleted'),
-      ).toBeVisible()
+  test.afterAll(async () => {
+    const browser = await chromium.launch()
+    const userPage = await browser.newPage({ storageState: USER_STORAGE_STATE })
+    const adminPage = await browser.newPage({
+      storageState: ADMIN_STORAGE_STATE,
     })
 
-    await test.step('should delete team invitation and acceptance messages', async () => {
-      const adminUserId = await getUserIdFromLocalStorage(adminPage)
-      const adminAccessToken = await getAccessTokenFromCookie(adminPage)
+    // delete team
+    await goToDashboard(userPage)
+    await userPage.getByLabel('Teams').click()
+    await userPage.getByRole('link', { name: TEAM_NAME }).click()
+    await userPage.getByRole('button', { name: 'Team Actions' }).click()
+    await userPage.getByRole('link', { name: 'Delete Team' }).click()
+    await userPage.getByRole('button', { name: 'Delete' }).click()
+    await expect(userPage.getByText('Team successfully deleted')).toBeVisible()
+    await expect(
+      userPage.getByRole('link', { name: TEAM_NAME }),
+    ).not.toBeVisible()
 
-      const userUserId = await getUserIdFromLocalStorage(userPage)
-      const userAccessToken = await getAccessTokenFromCookie(userPage)
+    // delete team invitation and acceptance messages
+    const adminUserId = await getUserIdFromLocalStorage(adminPage)
+    const adminAccessToken = await getAccessTokenFromCookie(adminPage)
 
-      // invitation: user -> admin
-      await deleteTeamInvitationMessage(
-        [adminUserId!],
-        userName!,
-        TEAM_NAME,
-        userAccessToken,
-        adminAccessToken,
-      )
+    const userUserId = await getUserIdFromLocalStorage(userPage)
+    const userAccessToken = await getAccessTokenFromCookie(userPage)
+    const userName = await getLocalStorage(userPage, USER_NAME_LOCALSTORAGE_KEY)
+    expect(userName).not.toBeNull()
 
-      // acceptance: admin -> user
-      await deleteTeamInviteAcceptanceMessage(
-        [userUserId!],
-        adminAccessToken,
-        adminAccessToken,
-      )
-    })
+    // invitation: user -> admin
+    await deleteTeamInvitationMessage(
+      [adminUserId!],
+      userName!,
+      TEAM_NAME,
+      userAccessToken,
+      adminAccessToken,
+    )
+
+    // acceptance: admin -> user
+    await deleteTeamInviteAcceptanceMessage(
+      [userUserId!],
+      adminAccessToken,
+      adminAccessToken,
+    )
   })
 })

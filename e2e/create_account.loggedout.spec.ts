@@ -5,6 +5,12 @@ test.describe('Create Account', () => {
     page,
   }) => {
     await page.goto('/')
+    // Allow time for SWC compilation
+    await expect(
+      page.getByRole('heading', { name: 'Loading…' }),
+    ).not.toBeVisible(
+      { timeout: 2 * 60 * 1000 }, // ...wait 2 minutes if necessary
+    )
     await page.getByRole('link', { name: 'Register Now' }).first().click()
     await page.getByRole('textbox').first().fill('test123')
     await page.getByPlaceholder('Your email address').fill('test123')

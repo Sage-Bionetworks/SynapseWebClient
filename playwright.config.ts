@@ -19,14 +19,16 @@ export default defineConfig({
   testDir: './e2e',
   /* Timeout to allow portal enough time to compile when running locally */
   timeout: 5 * 60 * 1000,
+  /* Increase expectation timeout on CI */
+  expect: { timeout: process.env.CI ? 30 * 1000 : 5 * 1000 },
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Limit the number of failures on CI to save resources */
   maxFailures: process.env.CI ? 10 : undefined,
-  /* Retry on CI only */
-  retries: process.env.CI ? 2 : 0,
+  /* Retries */
+  retries: 0,
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
@@ -37,7 +39,7 @@ export default defineConfig({
     baseURL: 'http://127.0.0.1:8888/Portal.html',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: process.env.CI ? 'on-first-retry' : 'retain-on-failure',
+    trace: 'retain-on-failure',
   },
 
   /* Configure projects for major browsers */
