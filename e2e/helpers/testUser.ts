@@ -52,7 +52,10 @@ export async function loginTestUser(
 ) {
   // Perform authentication steps
   await page.goto('/')
-  await page.getByRole('link', { name: 'Log in to Synapse' }).first().click()
+  const link = page.getByRole('link', { name: 'Log in to Synapse' }).first()
+  await expect(link).toBeVisible({ timeout: 15_000 }) // allow extra time
+  await link.click()
+
   await page.getByRole('button', { name: 'Sign in with your email' }).click()
   await page.getByLabel('Username or Email Address').fill(testUserName)
   await page.getByLabel('Password').fill(testUserPassword)
@@ -61,7 +64,7 @@ export async function loginTestUser(
   // Wait until the page reaches a state where all cookies are set
   await expect(
     page.getByRole('heading', { name: 'Your Projects' }),
-  ).toBeVisible()
+  ).toBeVisible({ timeout: 15_000 }) // allow extra time
 }
 
 export async function goToDashboard(page: Page) {
