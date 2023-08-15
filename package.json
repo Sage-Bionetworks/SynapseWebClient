@@ -38,6 +38,7 @@
     "prepare": "husky install",
     "e2e": "yarn playwright test",
     "e2e:ui": "yarn playwright test --ui",
-    "e2e:codegen": "yarn playwright codegen"
+    "e2e:codegen": "yarn playwright codegen",
+    "e2e:report": "yarn playwright show-report"
   }
 }
