@@ -2,7 +2,7 @@ name: 'Build/Run End-to-End Tests'
 
 on:
   push:
-    branches: [SWC-6514]
+    branches: [SWC-6514, develop, release-**]
 jobs:
   build-and-run-e2e:
     runs-on: ubuntu-latest
