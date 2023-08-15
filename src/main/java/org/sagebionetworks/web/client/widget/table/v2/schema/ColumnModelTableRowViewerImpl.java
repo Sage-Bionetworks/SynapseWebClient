@@ -6,7 +6,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import java.util.List;
 import org.gwtbootstrap3.client.ui.FormControlStatic;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
 
 /**
@@ -21,6 +20,9 @@ public class ColumnModelTableRowViewerImpl
 
   public interface Binder
     extends UiBinder<TableRow, ColumnModelTableRowViewerImpl> {}
+
+  @UiField
+  FormControlStatic id;
 
   @UiField
   FormControlStatic name;
@@ -43,19 +45,14 @@ public class ColumnModelTableRowViewerImpl
   @UiField
   FormControlStatic restrictValues;
 
-  String id;
-
   @Inject
-  public ColumnModelTableRowViewerImpl(
-    Binder uiBinder,
-    CookieProvider cookies
-  ) {
+  public ColumnModelTableRowViewerImpl(Binder uiBinder) {
     row = uiBinder.createAndBindUi(this);
   }
 
   @Override
   public String getId() {
-    return id;
+    return id.getText();
   }
 
   @Override
@@ -95,7 +92,7 @@ public class ColumnModelTableRowViewerImpl
 
   @Override
   public void setId(String id) {
-    this.id = id;
+    this.id.setText(id);
   }
 
   @Override
