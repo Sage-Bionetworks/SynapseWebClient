@@ -64,15 +64,21 @@ export async function loginTestUser(
   await page.getByRole('button', { name: 'Sign in' }).click()
 
   // Wait until the page reaches a state where all cookies are set
-  await page.waitForURL('**/#!Profile:**/projects/all')
-  await expect(
-    page.getByRole('heading', { name: 'Your Projects' }),
-  ).toBeVisible()
+  await expect(page.getByLabel('Projects')).toBeVisible()
+  await expect(page.getByLabel('Your Account')).toBeVisible({
+    timeout: 30 * 1000,
+  })
 }
 
 export async function goToDashboard(page: Page) {
   await page.goto('/')
   await page.getByRole('link', { name: 'View Your Dashboard' }).first().click()
+
+  // wait for page to load
+  await expect(page.getByLabel('Projects')).toBeVisible()
+  await expect(page.getByLabel('Your Account')).toBeVisible({
+    timeout: 30 * 1000,
+  })
 }
 
 export async function getAccessTokenFromCookie(page: Page) {
