@@ -64,6 +64,7 @@ export async function loginTestUser(
   await page.getByRole('button', { name: 'Sign in' }).click()
 
   // Wait until the page reaches a state where all cookies are set
+  await page.waitForURL('**/#!Profile:**/projects/all')
   await expect(
     page.getByRole('heading', { name: 'Your Projects' }),
   ).toBeVisible()

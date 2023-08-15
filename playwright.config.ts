@@ -4,6 +4,8 @@ import dotenv from 'dotenv'
 export const USER_STORAGE_STATE = 'playwright/.auth/user.json'
 export const ADMIN_STORAGE_STATE = 'playwright/.auth/adminUser.json'
 
+const baseURL = 'http://127.0.0.1:8888'
+
 /**
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
@@ -32,14 +34,16 @@ export default defineConfig({
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: 'html',
+  // Concise 'dot' for CI, default 'list' when running locally
+  reporter: process.env.CI ? [['list'], ['html']] : 'html',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: 'http://127.0.0.1:8888/Portal.html',
+    baseURL: baseURL,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'retain-on-failure',
+    // Until reports are saved in a secure location, do not collect traces on CI, since login network requests include user credentials
+    trace: process.env.CI ? 'off' : 'retain-on-failure',
   },
 
   /* Configure projects for major browsers */
@@ -106,8 +110,8 @@ export default defineConfig({
     // },
   ],
   webServer: {
-    command: 'mvn gwt:run',
-    url: 'http://127.0.0.1:8888/',
+    command: process.env.CI ? '' : 'mvn gwt:run',
+    url: baseURL,
     reuseExistingServer: true, // on CI, will use the tomcat server
   },
 })

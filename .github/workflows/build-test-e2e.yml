@@ -16,7 +16,7 @@ jobs:
       - name: Run SWC on Tomcat
         run: |
           docker run \
-            --name $CONTAINER_NAME \
+            --name "${CONTAINER_NAME}" \
             -d --rm \
             -p 8888:8080 \
             -v "/$(pwd)/target/portal-develop-SNAPSHOT.war:/usr/local/tomcat/webapps/ROOT.war" \
@@ -38,4 +38,4 @@ jobs:
           retention-days: 30
       - name: Stop Tomcat
         if: always()
-        run: docker stop $CONTAINER_NAME
+        run: docker stop "${CONTAINER_NAME}"
