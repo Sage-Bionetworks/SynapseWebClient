@@ -31,3 +31,16 @@ To prevent conflicting changes, each test run creates (and deletes) a unique dev
 However, entities that are not namespaced must be created with care. For example, Projects must have names that are unique across Synapse. So, consider a test that creates a new project named "My Project". If two developers run the test at the same time, one of the tests will fail, because the project name will not be unique. Therefore, when creating entities that are not user-namespaced, entity names should include a unique key, e.g. `${uuidv4()} New Project`. Other non-user-namespaced include users and teams.
 
 To prevent cluttering the backend dev stack with old test run objects, tests should clean up after themselves. So, if a new Project is created, the test suite should delete the project after all tests utilizing that Project have run.
+
+## Debugging
+
+Traces are useful to review network requests/responses, step through video of the UI, and use a pick locator to identfy selectors. However, since network requests can contain sensitive information (e.g. login credentials), traces should not be saved as artifacts on public CI. See more about traces in the [Playwright docs](https://playwright.dev/docs/trace-viewer-intro).
+
+Playwright supports the [`DEBUG` environment variable](https://playwright.dev/docs/debug#verbose-api-logs) to output debug logs during execution, including the following options:
+
+- `pw:webserver`: checking whether webserver is available
+- `pw:browser`: launching and closing browser
+- `pw:test`: setting up and tearing down tests
+- `pw:api`: verbose logging of each playwright test call -- will log typed values, so can expose user credentials and should not be used on public CI
+
+Multiple debug variables can be passed via a comma separated list, e.g. `DEBUG="pw:webserver,pw:browser" yarn e2e`.

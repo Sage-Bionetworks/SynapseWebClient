@@ -22,7 +22,7 @@
     "universal-cookie": "^4.0.4"
   },
   "devDependencies": {
-    "@playwright/test": "^1.36.1",
+    "@playwright/test": "1.37.0",
     "@prettier/plugin-xml": "^3.1.0",
     "dotenv": "^16.3.1",
     "husky": ">=6",
