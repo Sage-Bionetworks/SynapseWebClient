@@ -10,6 +10,9 @@
       <b:CheckBox ui:field="select" />
     </t:TableData>
     <t:TableData>
+      <b:FormControlStatic ui:field="id" />
+    </t:TableData>
+    <t:TableData>
       <b:FormControlStatic ui:field="name" />
     </t:TableData>
     <t:TableData>
