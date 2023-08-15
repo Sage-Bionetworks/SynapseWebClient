@@ -18,7 +18,7 @@ const TEAM_NAME = 'swc-e2e-team-' + uuidv4()
 const INVITATION_MESSAGE = 'swc e2e test team invitation' + uuidv4()
 
 test.describe('Teams', () => {
-  test('should exercise team lifecycle', async ({ browser }) => {
+  test('should exercise team lifecycle', async ({ browser }, testInfo) => {
     const { userPage, userName } =
       await test.step('should get user credentials', async () => {
         const userPage = await browser.newPage({
@@ -64,14 +64,22 @@ test.describe('Teams', () => {
       await userPage
         .getByRole('menuitem', { name: `@${adminUserName}` })
         .click()
+      const loadInvitedUser = userPage.getByText('Loading...')
+      await expect(loadInvitedUser).toBeVisible()
+      await expect(loadInvitedUser).not.toBeVisible()
 
       await userPage.getByLabel('Invitation Message').type(INVITATION_MESSAGE)
-      await userPage.getByRole('button', { name: 'Send Invitation' }).click()
+      await userPage.getByRole('button', { name: 'Send Invitation(s)' }).click()
+
+      const spinner = userPage.locator('.modal-body > .spinner')
+      await expect(spinner).toBeVisible()
+      await expect(spinner).not.toBeVisible()
+      await expect(userPage.getByText('Invitation(s) Sent')).toBeVisible()
     })
 
     await test.step('user should view pending invitations', async () => {
       await expect(userPage.getByText('Pending Invitations')).toBeVisible({
-        timeout: 10_000, // add extra timeout, so backend can finish sending request
+        timeout: testInfo.timeout * 3, // add extra timeout, so backend can finish sending request
       })
       const row = userPage.getByRole('row', { name: adminUserName! })
       await expect(row).toBeVisible()
@@ -81,6 +89,10 @@ test.describe('Teams', () => {
     await test.step('admin should accept team invitation', async () => {
       await goToDashboard(adminPage)
       await adminPage.getByLabel('Teams').click()
+
+      await expect(
+        adminPage.getByRole('heading', { name: 'Your Teams' }),
+      ).toBeVisible()
 
       // get row for this invitation
       // ...in case multiple test suite users have invited admin user at the same time
