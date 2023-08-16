@@ -1,4 +1,4 @@
-import { chromium, expect, test } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import { v4 as uuidv4 } from 'uuid'
 import { ADMIN_STORAGE_STATE, USER_STORAGE_STATE } from '../playwright.config'
 import { getLocalStorage } from './helpers/localStorage'
@@ -116,8 +116,7 @@ test.describe('Teams', () => {
     })
   })
 
-  test.afterAll(async () => {
-    const browser = await chromium.launch()
+  test.afterAll(async ({ browser }) => {
     const userPage = await browser.newPage({ storageState: USER_STORAGE_STATE })
     const adminPage = await browser.newPage({
       storageState: ADMIN_STORAGE_STATE,
@@ -159,7 +158,5 @@ test.describe('Teams', () => {
       adminAccessToken,
       adminAccessToken,
     )
-
-    await browser.close()
   })
 })

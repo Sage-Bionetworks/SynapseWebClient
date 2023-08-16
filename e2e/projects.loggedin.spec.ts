@@ -1,4 +1,4 @@
-import { Page, chromium, expect, test } from '@playwright/test'
+import { Page, expect, test } from '@playwright/test'
 import { v4 as uuidv4 } from 'uuid'
 import { USER_STORAGE_STATE } from '../playwright.config'
 import { goToDashboard } from './helpers/testUser'
@@ -30,8 +30,7 @@ test.describe('Projects', () => {
     })
   })
 
-  test.afterAll(async () => {
-    const browser = await chromium.launch()
+  test.afterAll(async ({ browser }) => {
     const page = await browser.newPage({ storageState: USER_STORAGE_STATE })
 
     // delete project
@@ -43,7 +42,5 @@ test.describe('Projects', () => {
     await page.getByRole('button', { name: 'Delete', exact: true }).click()
     await page.getByRole('button', { name: 'Created by me' }).click()
     await expect(page.getByText(PROJECT_NAME)).not.toBeVisible()
-
-    await browser.close()
   })
 })
