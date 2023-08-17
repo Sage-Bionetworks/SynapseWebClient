@@ -131,6 +131,11 @@ test.describe('Teams', () => {
         adminPage.getByRole('link', { name: adminUserName! }),
       ).toBeVisible()
     })
+
+    await test.step('close pages', async () => {
+      await adminPage.close()
+      await userPage.close()
+    })
   })
 
   test.afterAll(async ({ browser }) => {
@@ -175,5 +180,9 @@ test.describe('Teams', () => {
       adminAccessToken,
       adminAccessToken,
     )
+
+    // clean up
+    await adminPage.close()
+    await userPage.close()
   })
 })

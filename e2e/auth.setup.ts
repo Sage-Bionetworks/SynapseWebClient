@@ -22,15 +22,21 @@ import { TestUser } from './helpers/types'
 
 setup('authenticate users', async ({ browser }) => {
   setup.slow()
-  const adminAccessToken = await setup.step('authenticate admin', async () => {
-    const adminPage = await browser.newPage()
-    const { adminUserName, adminUserPassword } = getAdminUserCredentials()
 
-    await loginTestUser(adminPage, adminUserName!, adminUserPassword!)
-    await adminPage.context().storageState({ path: ADMIN_STORAGE_STATE })
+  const { adminAccessToken, adminPage } = await setup.step(
+    'authenticate admin',
+    async () => {
+      const { adminUserName, adminUserPassword } = getAdminUserCredentials()
 
-    return getAccessTokenFromCookie(adminPage)
-  })
+      const adminPage = await browser.newPage()
+      await loginTestUser(adminPage, adminUserName!, adminUserPassword!)
+      await adminPage.context().storageState({ path: ADMIN_STORAGE_STATE })
+
+      const adminAccessToken = await getAccessTokenFromCookie(adminPage)
+
+      return { adminAccessToken, adminPage }
+    },
+  )
 
   const { userPage, testUserName, testUserPassword } = await setup.step(
     'create test user',
@@ -73,5 +79,10 @@ setup('authenticate users', async ({ browser }) => {
   await setup.step('authenticate test user', async () => {
     await loginTestUser(userPage, testUserName, testUserPassword)
     await userPage.context().storageState({ path: USER_STORAGE_STATE })
+  })
+
+  await setup.step('close pages', async () => {
+    await adminPage.close()
+    await userPage.close()
   })
 })

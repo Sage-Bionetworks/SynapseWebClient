@@ -35,12 +35,34 @@ test.describe('Projects', () => {
 
     // delete project
     await goToDashboard(page)
+    await expect(
+      page.getByRole('heading', { name: 'Your Projects' }),
+    ).toBeVisible()
+
     await page.getByRole('button', { name: 'Created by me' }).click()
     await page.getByRole('link', { name: PROJECT_NAME }).click()
     await page.getByRole('button', { name: 'Project Tools' }).click()
     await page.getByRole('menuitem', { name: 'Delete Project' }).click()
+
+    await expect(
+      page.getByRole('heading', { name: 'Confirm Deletion' }),
+    ).toBeVisible()
+    await expect(
+      page.getByText(
+        `Are you sure you want to delete Project "${PROJECT_NAME}"?`,
+      ),
+    ).toBeVisible()
+
     await page.getByRole('button', { name: 'Delete', exact: true }).click()
+
+    await expect(
+      page.getByText('The Project was successfully deleted.'),
+    ).toBeVisible()
+
     await page.getByRole('button', { name: 'Created by me' }).click()
     await expect(page.getByText(PROJECT_NAME)).not.toBeVisible()
+
+    // clean up
+    await page.close()
   })
 })

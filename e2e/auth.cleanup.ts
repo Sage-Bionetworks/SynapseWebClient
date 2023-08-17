@@ -8,14 +8,21 @@ import {
 } from './helpers/testUser'
 
 cleanup('cleanup', async ({ browser }) => {
-  await cleanup.step('delete test user', async () => {
-    const adminPage = await browser.newPage({
-      storageState: ADMIN_STORAGE_STATE,
-    })
-    const userPage = await browser.newPage({
-      storageState: USER_STORAGE_STATE,
-    })
+  const { adminPage, userPage } = await cleanup.step(
+    'create pages',
+    async () => {
+      const adminPage = await browser.newPage({
+        storageState: ADMIN_STORAGE_STATE,
+      })
+      const userPage = await browser.newPage({
+        storageState: USER_STORAGE_STATE,
+      })
 
+      return { adminPage, userPage }
+    },
+  )
+
+  await cleanup.step('delete test user', async () => {
     const adminAccessToken = await getAccessTokenFromCookie(adminPage)
     const testUserId = await getUserIdFromLocalStorage(userPage)
 
@@ -25,5 +32,10 @@ cleanup('cleanup', async ({ browser }) => {
       adminAccessToken,
     )
     expect(result).toEqual(testUserId)
+  })
+
+  await cleanup.step('close pages', async () => {
+    await adminPage.close()
+    await userPage.close()
   })
 })
