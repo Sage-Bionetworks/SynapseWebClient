@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { Page, expect, test } from '@playwright/test'
 import { v4 as uuidv4 } from 'uuid'
 import { ADMIN_STORAGE_STATE, USER_STORAGE_STATE } from '../playwright.config'
 import { getLocalStorage } from './helpers/localStorage'
@@ -17,30 +17,33 @@ import {
 const TEAM_NAME = 'swc-e2e-team-' + uuidv4()
 const INVITATION_MESSAGE = 'swc e2e test team invitation' + uuidv4()
 
+let adminPage: Page
+let userPage: Page
+
 test.describe('Teams', () => {
-  test('should exercise team lifecycle', async ({ browser }, testInfo) => {
-    const { userPage, userName } =
-      await test.step('should get user credentials', async () => {
-        const userPage = await browser.newPage({
-          storageState: USER_STORAGE_STATE,
-        })
-        const userName = await getLocalStorage(
-          userPage,
-          USER_NAME_LOCALSTORAGE_KEY,
-        )
-        expect(userName).not.toBeNull()
+  test.beforeAll(async ({ browser }) => {
+    adminPage = await browser.newPage({
+      storageState: ADMIN_STORAGE_STATE,
+    })
+    userPage = await browser.newPage({
+      storageState: USER_STORAGE_STATE,
+    })
+  })
+  test('should exercise team lifecycle', async ({}, testInfo) => {
+    const userName = await test.step('should get user name', async () => {
+      const userName = await getLocalStorage(
+        userPage,
+        USER_NAME_LOCALSTORAGE_KEY,
+      )
+      expect(userName).not.toBeNull()
 
-        return { userPage, userName }
-      })
+      return userName
+    })
 
-    const { adminPage, adminUserName } =
-      await test.step('should get admin credentials', async () => {
-        const adminPage = await browser.newPage({
-          storageState: ADMIN_STORAGE_STATE,
-        })
-        const { adminUserName } = getAdminUserCredentials()
-        return { adminPage, adminUserName }
-      })
+    const adminUserName = await test.step('should get admin name', async () => {
+      const { adminUserName } = getAdminUserCredentials()
+      return adminUserName
+    })
 
     await test.step('user should create a team with a unique name', async () => {
       await goToDashboard(userPage)
@@ -131,19 +134,9 @@ test.describe('Teams', () => {
         adminPage.getByRole('link', { name: adminUserName! }),
       ).toBeVisible()
     })
-
-    await test.step('close pages', async () => {
-      await adminPage.close()
-      await userPage.close()
-    })
   })
 
-  test.afterAll(async ({ browser }) => {
-    const userPage = await browser.newPage({ storageState: USER_STORAGE_STATE })
-    const adminPage = await browser.newPage({
-      storageState: ADMIN_STORAGE_STATE,
-    })
-
+  test.afterAll(async () => {
     // delete team
     await goToDashboard(userPage)
     await userPage.getByLabel('Teams').click()
@@ -156,7 +149,7 @@ test.describe('Teams', () => {
       userPage.getByRole('link', { name: TEAM_NAME }),
     ).not.toBeVisible()
 
-    // delete team invitation and acceptance messages
+    // get credentials
     const adminUserId = await getUserIdFromLocalStorage(adminPage)
     const adminAccessToken = await getAccessTokenFromCookie(adminPage)
 
@@ -165,7 +158,11 @@ test.describe('Teams', () => {
     const userName = await getLocalStorage(userPage, USER_NAME_LOCALSTORAGE_KEY)
     expect(userName).not.toBeNull()
 
-    // invitation: user -> admin
+    // close pages
+    await adminPage.close()
+    await userPage.close()
+
+    // delete team invitation: user -> admin
     await deleteTeamInvitationMessage(
       [adminUserId!],
       userName!,
@@ -174,15 +171,11 @@ test.describe('Teams', () => {
       adminAccessToken,
     )
 
-    // acceptance: admin -> user
+    // delete team acceptance: admin -> user
     await deleteTeamInviteAcceptanceMessage(
       [userUserId!],
       adminAccessToken,
       adminAccessToken,
     )
-
-    // clean up
-    await adminPage.close()
-    await userPage.close()
   })
 })
