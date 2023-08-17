@@ -45,6 +45,9 @@ test.describe('Teams', () => {
     await test.step('user should create a team with a unique name', async () => {
       await goToDashboard(userPage)
       await userPage.getByLabel('Teams').click()
+      await expect(
+        userPage.getByRole('heading', { name: 'Your Teams' }),
+      ).toBeVisible()
 
       await userPage.getByRole('button', { name: 'Create a New Team' }).click()
       await userPage.getByRole('textbox').nth(1).fill(TEAM_NAME)
@@ -105,14 +108,28 @@ test.describe('Teams', () => {
 
     await test.step('admin should view team page', async () => {
       await adminPage.getByRole('link', { name: TEAM_NAME }).click()
+      await adminPage.waitForTimeout(2 * 1000) // allow time for responses to return
 
       await expect(
+        adminPage.locator('h3').filter({
+          hasText: TEAM_NAME,
+        }),
+      ).toBeVisible()
+      await expect(adminPage.getByText('2 team members')).toBeVisible()
+
+      await expect(
+        adminPage.getByRole('heading', { name: 'Managers' }),
+      ).toBeVisible()
+      await expect(
         adminPage.getByRole('link', { name: userName! }),
+      ).toBeVisible()
+
+      await expect(
+        adminPage.getByRole('heading', { name: 'Members' }),
       ).toBeVisible()
       await expect(
         adminPage.getByRole('link', { name: adminUserName! }),
       ).toBeVisible()
-      await expect(adminPage.getByText('2 team members')).toBeVisible()
     })
   })
 
