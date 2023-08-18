@@ -27,8 +27,6 @@ let adminPage: Page
 let userPage: Page
 
 setup.describe('Setup', () => {
-  setup.describe.configure({ retries: 2 })
-
   setup.beforeAll(async ({ browser }) => {
     adminPage = await browser.newPage()
     userPage = await browser.newPage()
