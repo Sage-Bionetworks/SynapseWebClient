@@ -1,10 +1,9 @@
 name: 'Build/Run End-to-End Tests'
 
-on:
-  push:
-    branches: [SWC-6514, develop, release-**]
+on: push
 jobs:
   build-and-run-e2e:
+    if: ${{ github.ref == 'develop' || github.ref == 'release-**' || github.actor == github.repository_owner }}
     runs-on: ubuntu-latest
     env:
       CONTAINER_NAME: 'swc-tomcat'

@@ -1,6 +1,8 @@
 # End-to-End Testing Workflow
 
-## Dev Workflow
+## Dev Setup
+
+### Local
 
 1. Create a .env file with the following environment variables: `ADMIN_USERNAME` and `ADMIN_PASSWORD`.
 2. Build SWC: `mvn clean install`
@@ -11,6 +13,10 @@
 The test suite will create a new test user with randomly generated username / password on the dev stack for tests that require an authenticated test user. The user will be deleted after the tests finish running.
 
 When writing a new test, it can be useful to create a static user with known username and password, so that issues can be debugged by logging into the user's account. Additionally, users can only be deleted if all associated objects have also been deleted. If a test creates an entity in the user account but fails to clean up the entity, the test user won't be deleted and will clutter the dev stack. After a failed test run, persistent entities and test user accounts can be cleaned up more easily if user credentials are known.
+
+### CI
+
+In your forked repository, create [an Actions secret](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository) for both `ADMIN_USERNAME` and `ADMIN_PASSWORD`. The tests will run on each push to your forked repository.
 
 ## Writing Tests
 
@@ -31,6 +37,13 @@ To prevent conflicting changes, each test run creates (and deletes) a unique dev
 However, entities that are not user-namespaced must be created with care. For example, Projects must have names that are unique across Synapse. So, consider a test that creates a new project named "My Project". If two developers run the test at the same time, one of the tests will fail, because the project name will not be unique. Therefore, when creating entities that are not user-namespaced, entity names should include a unique key, e.g. `${uuidv4()} New Project`. Other entities that aren't user-namespaced are users and teams.
 
 To prevent cluttering the backend dev stack with old test run objects, tests should clean up after themselves. So, if a new Project is created, the test suite should delete the project after all tests utilizing that Project have run.
+
+### Common Issues
+
+- Not awaiting an auto-retrying expectation, such as `toBeVisible()` -- these assertions will retry until the assertion passes or the timeout is reached. However, they are async, so must be awaited. See full list [here](https://playwright.dev/docs/test-assertions#auto-retrying-assertions).
+- Not closing pages that are manually opened -- any page that is manually opened in a test with `const page = await browser.newPage()` must be closed with `await page.close()`. Otherwise, the accumulation of open pages will consume resources and cause issues in CI.
+- Opening a new browser instance in `beforeAll` or `afterAll` -- the new browser instance will consume resources and cause issues in CI and is [strongly discouraged by Playwright](https://github.com/microsoft/playwright/issues/20598#issuecomment-1420543115). Instead, use the existing browser instance, e.g. `test.beforeAll(async ({browser}) => {const page = await browser.newPage()})`.
+- Not awaiting elements in the order in which they appear on the page -- network requests are slower on CI than locally. By awaiting each element as it appears, the subsequent elements are given time to appear and can help avoid timing problems which cause tests to fail.
 
 ## Debugging
 
