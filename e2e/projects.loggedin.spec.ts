@@ -6,8 +6,7 @@ import { goToDashboard } from './helpers/testUser'
 const PROJECT_NAME = 'swc-e2e-project-' + uuidv4()
 
 async function createProject(page: Page, projectName: string) {
-  await goToDashboard(page)
-  await page.getByLabel('Projects').click()
+  await page.getByLabel('Projects', { exact: true }).click()
   await page.getByLabel('Create a New Project').click()
   await page.getByLabel('Project Name').type(projectName)
   await page.getByRole('button', { name: 'Save' }).click()
@@ -16,6 +15,7 @@ async function createProject(page: Page, projectName: string) {
 test.describe('Projects', () => {
   test('should create a project', async ({ page }) => {
     await test.step('should create a project with a unique name', async () => {
+      await goToDashboard(page)
       await createProject(page, PROJECT_NAME)
       await expect(
         page.getByRole('heading', { name: PROJECT_NAME }),
