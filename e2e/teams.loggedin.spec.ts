@@ -100,6 +100,12 @@ test.describe('Teams', () => {
         adminPage.getByRole('heading', { name: 'Your Teams' }),
       ).toBeVisible()
 
+      const spinner = adminPage.locator('.margin-10 > div > .spinner')
+      expect(spinner).toBeVisible()
+      expect(spinner).not.toBeVisible()
+
+      await adminPage.waitForTimeout(2 * 1000) // allow time for responses to return
+
       // get row for this invitation
       // ...in case multiple test suite users have invited admin user at the same time
       const row = adminPage.getByRole('row', { name: TEAM_NAME })
@@ -158,10 +164,6 @@ test.describe('Teams', () => {
     const userName = await getLocalStorage(userPage, USER_NAME_LOCALSTORAGE_KEY)
     expect(userName).not.toBeNull()
 
-    // close pages
-    await adminPage.close()
-    await userPage.close()
-
     // delete team invitation: user -> admin
     await deleteTeamInvitationMessage(
       [adminUserId!],
@@ -177,5 +179,9 @@ test.describe('Teams', () => {
       adminAccessToken,
       adminAccessToken,
     )
+
+    // close pages
+    await adminPage.close()
+    await userPage.close()
   })
 })
