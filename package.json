@@ -18,7 +18,7 @@
     "react-transition-group": "2.6.0",
     "react-plotly.js": "2.2.0",
     "sass": "^1.63.6",
-    "synapse-react-client": "3.1.47",
+    "synapse-react-client": "3.1.49",
     "universal-cookie": "^4.0.4"
   },
   "devDependencies": {
