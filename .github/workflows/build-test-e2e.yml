@@ -10,13 +10,17 @@ jobs:
       CI: true
     steps:
       - uses: actions/checkout@v3
-      - name: Build SWC
-        uses: ./.github/workflows/build
       - name: Setup docker (missing on MacOS)
         if: runner.os == 'macos'
         run: |
+          # workaround for https://github.com/actions/runner-images/issues/8104
+          brew update
+          brew reinstall qemu
+
           brew install docker
           colima start
+      - name: Build SWC
+        uses: ./.github/workflows/build
       - name: Run SWC on Tomcat
         run: |
           docker run \
