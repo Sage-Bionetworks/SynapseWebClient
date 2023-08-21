@@ -14,6 +14,7 @@ jobs:
         if: runner.os == 'macos'
         run: |
           # workaround for https://github.com/actions/runner-images/issues/8104
+          export HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1
           brew update
           brew reinstall qemu
 
