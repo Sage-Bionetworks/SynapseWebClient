@@ -87,6 +87,12 @@ export async function goToDashboard(page: Page) {
   })
 }
 
+export async function logoutTestUser(page: Page) {
+  await page.getByLabel('Your Account').click()
+  await page.getByText('Sign Out').click()
+  await expect(page.getByLabel('Sign in')).toBeVisible()
+}
+
 export async function getAccessTokenFromCookie(page: Page) {
   const cookie = (await page.context().cookies()).find(
     cookie => cookie.name === 'org.sagebionetworks.security.user.login.token',

@@ -5,6 +5,8 @@ import {
   deleteTestUser,
   getAccessTokenFromCookie,
   getUserIdFromLocalStorage,
+  goToDashboard,
+  logoutTestUser,
 } from './helpers/testUser'
 
 cleanup('cleanup', async ({ browser }) => {
@@ -22,10 +24,25 @@ cleanup('cleanup', async ({ browser }) => {
     },
   )
 
-  await cleanup.step('delete test user', async () => {
-    const adminAccessToken = await getAccessTokenFromCookie(adminPage)
-    const testUserId = await getUserIdFromLocalStorage(userPage)
+  const { adminAccessToken, testUserId } = await cleanup.step(
+    'get credentials',
+    async () => {
+      const adminAccessToken = await getAccessTokenFromCookie(adminPage)
+      const testUserId = await getUserIdFromLocalStorage(userPage)
 
+      return { adminAccessToken, testUserId }
+    },
+  )
+
+  await cleanup.step('logout users', async () => {
+    await goToDashboard(userPage)
+    await logoutTestUser(userPage)
+
+    await goToDashboard(adminPage)
+    await logoutTestUser(adminPage)
+  })
+
+  await cleanup.step('delete test user', async () => {
     const result = await deleteTestUser(
       getEndpoint(),
       testUserId!,
