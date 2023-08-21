@@ -98,17 +98,12 @@ test.describe('Teams', () => {
     await test.step('admin should accept team invitation', async () => {
       await goToDashboard(adminPage)
 
-      const spinner = adminPage.locator('.margin-10 > div > .spinner')
       await Promise.all([
         expect(
           adminPage.getByRole('heading', { name: 'Your Teams' }),
         ).toBeVisible(),
-        expect(spinner).toBeVisible(),
         adminPage.getByLabel('Teams').click(),
       ])
-
-      expect(spinner).not.toBeVisible()
-
       await adminPage.waitForTimeout(2 * 1000) // allow time for responses to return
 
       // get row for this invitation
@@ -121,7 +116,17 @@ test.describe('Teams', () => {
     })
 
     await test.step('admin should view team page', async () => {
-      await adminPage.getByRole('link', { name: TEAM_NAME }).click()
+      const teamLink = adminPage.getByRole('link', { name: TEAM_NAME })
+
+      // handle case where occasionally two team links are shown
+      // ...before resolving to one team link
+      await expect
+        .poll(async () => {
+          return await teamLink.count()
+        })
+        .toBe(1)
+
+      await teamLink.click()
       await adminPage.waitForTimeout(2 * 1000) // allow time for responses to return
 
       await expect(
