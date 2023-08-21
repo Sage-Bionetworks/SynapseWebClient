@@ -75,10 +75,13 @@ test.describe('Teams', () => {
       await expect(loadInvitedUser).not.toBeVisible()
 
       await userPage.getByLabel('Invitation Message').type(INVITATION_MESSAGE)
-      await userPage.getByRole('button', { name: 'Send Invitation(s)' }).click()
 
       const spinner = userPage.locator('.modal-body > .spinner')
-      await expect(spinner).toBeVisible()
+      await Promise.all([
+        expect(spinner).toBeVisible(),
+        userPage.getByRole('button', { name: 'Send Invitation(s)' }).click(),
+      ])
+
       await expect(spinner).not.toBeVisible()
       await expect(userPage.getByText('Invitation(s) Sent')).toBeVisible()
     })
@@ -94,14 +97,16 @@ test.describe('Teams', () => {
 
     await test.step('admin should accept team invitation', async () => {
       await goToDashboard(adminPage)
-      await adminPage.getByLabel('Teams').click()
-
-      await expect(
-        adminPage.getByRole('heading', { name: 'Your Teams' }),
-      ).toBeVisible()
 
       const spinner = adminPage.locator('.margin-10 > div > .spinner')
-      expect(spinner).toBeVisible()
+      await Promise.all([
+        expect(
+          adminPage.getByRole('heading', { name: 'Your Teams' }),
+        ).toBeVisible(),
+        expect(spinner).toBeVisible(),
+        adminPage.getByLabel('Teams').click(),
+      ])
+
       expect(spinner).not.toBeVisible()
 
       await adminPage.waitForTimeout(2 * 1000) // allow time for responses to return
