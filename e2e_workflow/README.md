@@ -38,17 +38,9 @@ However, entities that are not user-namespaced must be created with care. For ex
 
 To prevent cluttering the backend dev stack with old test run objects, tests should clean up after themselves. So, if a new Project is created, the test suite should delete the project after all tests utilizing that Project have run.
 
-### Common Issues
-
-- Not awaiting an auto-retrying expectation, such as `toBeVisible()` -- these assertions will retry until the assertion passes or the timeout is reached. However, they are async, so must be awaited. See full list [here](https://playwright.dev/docs/test-assertions#auto-retrying-assertions).
-- Not closing pages that are manually opened -- any page that is manually opened in a test with `const page = await browser.newPage()` must be closed with `await page.close()`. Otherwise, the accumulation of open pages will consume resources and cause issues in CI.
-- Opening a new browser instance in `beforeAll` or `afterAll` -- the new browser instance will consume resources and cause issues in CI and is [strongly discouraged by Playwright](https://github.com/microsoft/playwright/issues/20598#issuecomment-1420543115). Instead, use the existing browser instance, e.g. `test.beforeAll(async ({browser}) => {const page = await browser.newPage()})`.
-- Not awaiting elements in the order in which they appear on the page -- network requests are slower on CI than locally. By awaiting each element as it appears, the subsequent elements are given time to appear and can help avoid timing problems which cause tests to fail.
-- Not accounting for timing issues when awaiting short-lived elements -- for example, after a user clicks on a button, a loader may appear while waiting for some work to finish, then disappear when the work is done. The test may expect the loader to appear and disappear. However, depending on how quickly the work finishes, the loader may appear and disappear before Playwright has checked for its existence. Use `Promise.all` to ensure that the check for the element is fired before the button is clicked and the loader's appearance isn't missed. See more discussion [here](https://github.com/microsoft/playwright/issues/5470#issuecomment-1285640689) and an illustrated example [here](https://tally-b.medium.com/the-illustrated-guide-to-using-promise-all-in-playwright-tests-af7a98af3f32).
-
 ## Debugging
 
-Traces are useful to review network requests, step through video of the UI, and use a pick locator to identfy selectors. However, since network requests can contain sensitive information (e.g. login credentials), traces should not be saved as artifacts on public CI. See more about traces in the [Playwright docs](https://playwright.dev/docs/trace-viewer-intro).
+Traces are useful to review network requests, step through video of the UI, and use a pick locator to identfy selectors. However, since network requests can contain sensitive information (e.g. login credentials), traces should not be saved as artifacts on public CI. See more about traces in the [Playwright docs](https://playwright.dev/docs/trace-viewer-intro). However, traces can be saved in private GitHub repositories. See the [example snippet](#saving-traces) below.
 
 Playwright supports the [`DEBUG` environment variable](https://playwright.dev/docs/debug#verbose-api-logs) to output debug logs during execution, including the following options:
 
@@ -58,3 +50,93 @@ Playwright supports the [`DEBUG` environment variable](https://playwright.dev/do
 - `pw:api`: verbose logging of each playwright test call -- will log typed values, so can expose user credentials and should not be used on public CI
 
 Multiple debug variables can be passed via a comma separated list, e.g. `DEBUG="pw:webserver,pw:browser" yarn e2e`.
+
+### Common Issues
+
+- Not awaiting an auto-retrying expectation, such as `toBeVisible()` -- these assertions will retry until the assertion passes or the timeout is reached. However, they are async, so must be awaited. See full list [here](https://playwright.dev/docs/test-assertions#auto-retrying-assertions).
+- Not awaiting elements in the order in which they appear on the page -- network requests may be slower on CI than locally. By awaiting each element as it appears, the subsequent elements are given time to appear and can help avoid timing problems which cause tests to be flaky.
+- Not accounting for timing issues when awaiting short-lived elements -- for example, after a user clicks on a button, a loader may appear while waiting for some work to finish, then disappear when the work is done. The test may expect the loader to appear and disappear. However, depending on how quickly the work finishes, the loader may appear and disappear before Playwright has checked for its existence. Use `Promise.all` to ensure that the check for the element is fired before the button is clicked and the loader's appearance isn't missed. See more discussion [here](https://github.com/microsoft/playwright/issues/5470#issuecomment-1285640689) and an illustrated example [here](https://tally-b.medium.com/the-illustrated-guide-to-using-promise-all-in-playwright-tests-af7a98af3f32).
+
+### Troubleshooting Flaky Tests in CI
+
+Occasionally, tests will consistently pass locally, but intermittently fail in CI. The following are techniques for troubleshooting the cause of the flakiness. See [this guide](https://ray.run/blog/detecting-and-handling-flaky-tests-in-playwright) for more ideas.
+
+#### Network speed
+
+CI machines may have slower network speeds than local machines. Help the test fail locally by emulating slower network speeds via the Chrome DevTools Protocol:
+
+```typescript
+const page = await browser.newPage()
+const cdpSession = await page.context().newCDPSession(page)
+
+// set network conditions, as per:
+//   https://github.com/microsoft/playwright/issues/6038#issuecomment-812521882
+const networkConditions = {
+  'Slow 3G': {
+    download: ((500 * 1000) / 8) * 0.8,
+    upload: ((500 * 1000) / 8) * 0.8,
+    latency: 400 * 5,
+  },
+  'Fast 3G': {
+    download: ((1.6 * 1000 * 1000) / 8) * 0.9,
+    upload: ((750 * 1000) / 8) * 0.9,
+    latency: 150 * 3.75,
+  },
+}
+await cdpSession.send('Network.emulateNetworkConditions', {
+  downloadThroughput: networkConditions['Fast 3G'].download,
+  uploadThroughput: networkConditions['Fast 3G'].upload,
+  latency: networkConditions['Fast 3G'].latency,
+  offline: false,
+})
+
+// or set cpu throttling rate, as per:
+//   https://dev.to/codux/flaky-tests-and-how-to-deal-with-them-2id2
+await cdpSession.send('Emulation.setCPUThrottlingRate', { rate: 3 })
+```
+
+#### Hardware Resources
+
+A developer's local machine may have more powerful hardware resources compared to GitHub Actions workflow runners. If a VM is overbooked, tests may fail.
+
+Check whether resources are consumed that don't need to be:
+
+- Is a new browser instance launched in a test or a test hook? The new browser instance will consume resources and is [strongly discouraged by Playwright](https://github.com/microsoft/playwright/issues/20598#issuecomment-1420543115). Instead, use the existing browser instance, e.g. `test.beforeAll(async ({browser}) => {const page = await browser.newPage()})`.
+- Is a new page or a new browser instance opened manually, but not closed when the test finishes? Playwright will handle opening/closing the initial browser instance and the page provided for each test, but manually allocated resources must be cleaned up by the user. Otherwise, they will consume resources for the duration of the test suite. For example, a page opened with `const page = await browser.newPage()` must be closed with `await page.close()`. Similarly, a browser instance launched with `const browser = await chromium.launch()` must be closed with `await browser.close()`.
+
+Check whether increasing the VM size resolves the flakiness, by changing the runner in the GitHub Action workflow. See standard GitHub runner hardware resources [here](https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources) and larger runners [here](https://docs.github.com/en/actions/using-github-hosted-runners/about-larger-runners#machine-specs-for-larger-runners).
+
+#### Saving Traces
+
+Traces can be invaluable for troubleshooting a failure in CI. However, traces may contain sensitive information. So instead of saving traces in public CI, follow these steps:
+
+1. Create a **private** GitHub repository
+2. Create the appropriate Actions secrets, as described [here](#ci)
+3. Copy the current workflow from `.github/workflows/build-test-e2e.yml` to the new repo (along with any composite workflows)
+4. Change the trigger so the workflow can be [manually triggered](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#workflow_dispatch):
+
+```yml
+on: workflow_dispatch
+```
+
+5. Change the checkout step to point at the branch in your forked repo, e.g.:
+
+```yml
+- uses: actions/checkout@v3
+  with:
+    repository: hallieswan/SynapseWebClient
+    ref: SWC-6514
+```
+
+6. Change the `Run Playwright tests` step so that traces are on and/or DEBUG variables are set, e.g.:
+
+```yml
+- name: Run Playwright tests
+  env:
+    ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
+    ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+  run: DEBUG="pw:api" yarn playwright test --trace on
+```
+
+7. Manually [trigger](https://docs.github.com/en/actions/using-workflows/manually-running-a-workflow) the workflow.
+8. Download the playwright-report artifact and [view the report](https://playwright.dev/docs/ci-intro#viewing-the-html-report), which will contain traces.
