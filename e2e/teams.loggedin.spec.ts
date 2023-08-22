@@ -104,7 +104,6 @@ test.describe('Teams', () => {
         ).toBeVisible(),
         adminPage.getByLabel('Teams').click(),
       ])
-      await adminPage.waitForTimeout(2 * 1000) // allow time for responses to return
 
       // get row for this invitation
       // ...in case multiple test suite users have invited admin user at the same time
@@ -127,7 +126,6 @@ test.describe('Teams', () => {
         .toBe(1)
 
       await teamLink.click()
-      await adminPage.waitForTimeout(2 * 1000) // allow time for responses to return
 
       await expect(
         adminPage.locator('h3').filter({
