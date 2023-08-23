@@ -33,6 +33,10 @@ setup.describe('Setup', () => {
   })
 
   setup('authenticate users', async () => {
+    // This may be the first test to run and trigger SWC compilation
+    // ...which may take 15+ seconds. Mark this test as slow,
+    // ...so the test will be given triple timeout.
+    // https://playwright.dev/docs/api/class-test#test-slow-1
     setup.slow()
 
     await setup.step('authenticate admin', async () => {

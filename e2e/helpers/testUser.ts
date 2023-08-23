@@ -45,6 +45,14 @@ export async function deleteTestUser(
   return testUserId
 }
 
+// Use after initially navigating to baseURL
+// ...to give SWC time to compile, if necessary
+export async function waitForInitialPageLoad(page: Page) {
+  await expect(page.getByRole('heading', { name: 'Loading…' })).not.toBeVisible(
+    { timeout: 2 * 60 * 1000 }, // ...wait 2 minutes if necessary
+  )
+}
+
 export async function loginTestUser(
   page: Page,
   testUserName: string,
@@ -52,11 +60,8 @@ export async function loginTestUser(
 ) {
   // Perform authentication steps
   await page.goto('/')
+  await waitForInitialPageLoad(page)
 
-  // Allow time for SWC compilation
-  await expect(page.getByRole('heading', { name: 'Loading…' })).not.toBeVisible(
-    { timeout: 2 * 60 * 1000 }, // ...wait 2 minutes if necessary
-  )
   await page.getByRole('link', { name: 'Log in to Synapse' }).first().click()
   await page.getByRole('button', { name: 'Sign in with your email' }).click()
   await page.getByLabel('Username or Email Address').fill(testUserName)
