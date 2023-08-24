@@ -3,7 +3,7 @@ name: 'Build/Run End-to-End Tests'
 on: push
 jobs:
   build-and-run-e2e:
-    if: ${{ github.ref == 'develop' || github.ref == 'release-**' || github.actor == github.repository_owner }}
+    if: ${{ github.ref_name == 'develop' || github.ref_name == 'release-**' || github.actor == github.repository_owner }}
     runs-on: macos-latest
     env:
       CONTAINER_NAME: 'swc-tomcat'
