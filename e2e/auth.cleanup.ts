@@ -3,7 +3,7 @@ import { ADMIN_STORAGE_STATE, USER_STORAGE_STATE } from '../playwright.config'
 import { getEndpoint } from './helpers/http'
 import {
   deleteTestUser,
-  getAccessTokenFromCookie,
+  getAdminPAT,
   getUserIdFromLocalStorage,
   goToDashboard,
   logoutTestUser,
@@ -23,15 +23,11 @@ cleanup.describe('Clean up', () => {
   })
 
   cleanup('clean up users', async () => {
-    const { adminAccessToken, testUserId } = await cleanup.step(
-      'get credentials',
-      async () => {
-        const adminAccessToken = await getAccessTokenFromCookie(adminPage)
-        const testUserId = await getUserIdFromLocalStorage(userPage)
+    const { testUserId } = await cleanup.step('get credentials', async () => {
+      const testUserId = await getUserIdFromLocalStorage(userPage)
 
-        return { adminAccessToken, testUserId }
-      },
-    )
+      return { testUserId }
+    })
 
     await cleanup.step('logout users', async () => {
       await goToDashboard(userPage)
@@ -45,7 +41,7 @@ cleanup.describe('Clean up', () => {
       const result = await deleteTestUser(
         getEndpoint(),
         testUserId!,
-        adminAccessToken,
+        getAdminPAT(),
       )
       expect(result).toEqual(testUserId)
     })

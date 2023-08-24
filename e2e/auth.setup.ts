@@ -15,14 +15,13 @@ import {
   USER_NAME_LOCALSTORAGE_KEY,
   createTestUser,
   deleteTestUser,
-  getAccessTokenFromCookie,
+  getAdminPAT,
   getAdminUserCredentials,
   loginTestUser,
 } from './helpers/testUser'
 import { TestUser } from './helpers/types'
 
 let testUserId: string | undefined
-let adminAccessToken: string | undefined
 let adminPage: Page
 let userPage: Page
 
@@ -44,20 +43,17 @@ setup.describe('Setup', () => {
 
       await loginTestUser(adminPage, adminUserName!, adminUserPassword!)
       await adminPage.context().storageState({ path: ADMIN_STORAGE_STATE })
-
-      adminAccessToken = await getAccessTokenFromCookie(adminPage)
     })
 
     const { testUserName, testUserPassword } = await setup.step(
       'create test user',
       async () => {
-        const testUserName = 'swc-e2e-' + uuidv4()
-        const testUserPassword = 'password-' + uuidv4()
-        /* 
+        /* const testUserName = 'swc-e2e-' + uuidv4()
+        const testUserPassword = 'password-' + uuidv4() */
+
         const testUserName = 'swc-e2e-test'
         const testUserPassword = process.env.USER_PASSWORD!
-        expect(testUserPassword).not.toBeUndefined() 
-        */
+        expect(testUserPassword).not.toBeUndefined()
 
         const testUserEmail = `${testUserName}@test.com`
         const testUserIsValidated = false
@@ -73,7 +69,7 @@ setup.describe('Setup', () => {
         testUserId = await createTestUser(
           getEndpoint(),
           testUser,
-          adminAccessToken,
+          getAdminPAT(),
         )
         expect(testUserId).not.toBeUndefined()
 
@@ -106,7 +102,7 @@ setup.describe('Setup', () => {
       const result = await deleteTestUser(
         getEndpoint(),
         testUserId!,
-        adminAccessToken,
+        getAdminPAT(),
       )
       expect(result).toEqual(testUserId)
     }

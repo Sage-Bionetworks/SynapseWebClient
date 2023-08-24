@@ -14,6 +14,12 @@ export function getAdminUserCredentials() {
   return { adminUserName, adminUserPassword }
 }
 
+export function getAdminPAT() {
+  const adminPAT = process.env.ADMIN_PAT!
+  expect(adminPAT).not.toBeUndefined()
+  return adminPAT
+}
+
 export async function createTestUser(
   endpoint: string,
   testUser: TestUser,

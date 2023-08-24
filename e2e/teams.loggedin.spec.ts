@@ -9,6 +9,7 @@ import {
 import {
   USER_NAME_LOCALSTORAGE_KEY,
   getAccessTokenFromCookie,
+  getAdminPAT,
   getAdminUserCredentials,
   getUserIdFromLocalStorage,
   goToDashboard,
@@ -165,7 +166,7 @@ test.describe('Teams', () => {
 
     // get credentials
     const adminUserId = await getUserIdFromLocalStorage(adminPage)
-    const adminAccessToken = await getAccessTokenFromCookie(adminPage)
+    const adminPAT = getAdminPAT()
 
     const userUserId = await getUserIdFromLocalStorage(userPage)
     const userAccessToken = await getAccessTokenFromCookie(userPage)
@@ -178,15 +179,11 @@ test.describe('Teams', () => {
       userName!,
       TEAM_NAME,
       userAccessToken,
-      adminAccessToken,
+      adminPAT,
     )
 
     // delete team acceptance: admin -> user
-    await deleteTeamInviteAcceptanceMessage(
-      [userUserId!],
-      adminAccessToken,
-      adminAccessToken,
-    )
+    await deleteTeamInviteAcceptanceMessage([userUserId!], adminPAT, adminPAT)
 
     // close pages
     await adminPage.close()
