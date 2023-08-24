@@ -13,25 +13,32 @@
     "react-bootstrap": "^1.6.7",
     "react-dom": "18.2.0",
     "react-measure": "2.5.2",
+    "react-plotly.js": "2.2.0",
     "react-query": "^3.39.3",
     "react-router-dom": "^5.3.4",
     "react-transition-group": "2.6.0",
-    "react-plotly.js": "2.2.0",
     "sass": "^1.63.6",
     "synapse-react-client": "3.1.49",
     "universal-cookie": "^4.0.4"
   },
   "devDependencies": {
+    "@playwright/test": "1.37.0",
     "@prettier/plugin-xml": "^3.1.0",
+    "dotenv": "^16.3.1",
     "husky": ">=6",
     "lint-staged": ">=10",
     "prettier": "^3.0.0",
-    "prettier-plugin-java": "^2.2.0"
+    "prettier-plugin-java": "^2.2.0",
+    "uuid": "^9.0.0"
   },
   "lint-staged": {
     "*.{*}": "prettier --write"
   },
   "scripts": {
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "e2e": "yarn playwright test",
+    "e2e:ui": "yarn playwright test --ui",
+    "e2e:codegen": "yarn playwright codegen",
+    "e2e:report": "yarn playwright show-report"
   }
 }
