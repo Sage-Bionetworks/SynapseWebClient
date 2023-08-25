@@ -48,7 +48,6 @@ import org.mockito.Mockito;
 import org.mockito.internal.util.reflection.Whitebox;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.client.SynapseClient;
-import org.sagebionetworks.client.exceptions.SynapseBadRequestException;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.evaluation.model.Evaluation;
@@ -115,14 +114,10 @@ import org.sagebionetworks.repo.model.quiz.QuizResponse;
 import org.sagebionetworks.repo.model.table.ColumnChange;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
-import org.sagebionetworks.repo.model.table.FacetColumnRequest;
-import org.sagebionetworks.repo.model.table.FacetColumnValuesRequest;
-import org.sagebionetworks.repo.model.table.FacetType;
 import org.sagebionetworks.repo.model.table.SqlTransformRequest;
 import org.sagebionetworks.repo.model.table.TableSchemaChangeRequest;
 import org.sagebionetworks.repo.model.table.TableUpdateRequest;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
-import org.sagebionetworks.repo.model.table.TransformSqlWithFacetsRequest;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
@@ -400,7 +395,8 @@ public class SynapseClientImplTest {
     bene.setId("syn999");
     when(mockSynapse.getEntityBenefactor(anyString())).thenReturn(bene);
 
-    org.sagebionetworks.reflection.model.PaginatedResults<EntityHeader> batchHeaders = new org.sagebionetworks.reflection.model.PaginatedResults<EntityHeader>();
+    org.sagebionetworks.reflection.model.PaginatedResults<EntityHeader> batchHeaders =
+      new org.sagebionetworks.reflection.model.PaginatedResults<EntityHeader>();
     batchHeaderResults = new ArrayList<EntityHeader>();
     for (int i = 0; i < 10; i++) {
       EntityHeader h = new EntityHeader();
@@ -410,7 +406,8 @@ public class SynapseClientImplTest {
     batchHeaders.setResults(batchHeaderResults);
     when(mockSynapse.getEntityHeaderBatch(anyList())).thenReturn(batchHeaders);
 
-    List<AccessRequirement> accessRequirements = new ArrayList<AccessRequirement>();
+    List<AccessRequirement> accessRequirements =
+      new ArrayList<AccessRequirement>();
     accessRequirements.add(createAccessRequirement(ACCESS_TYPE.DOWNLOAD));
 
     int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN;
@@ -442,7 +439,8 @@ public class SynapseClientImplTest {
     handle.setFileName(testFileName);
     handle.setKey("key");
     when(mockSynapse.getRawFileHandle(anyString())).thenReturn(handle);
-    org.sagebionetworks.reflection.model.PaginatedResults<AccessRequirement> ars = new org.sagebionetworks.reflection.model.PaginatedResults<AccessRequirement>();
+    org.sagebionetworks.reflection.model.PaginatedResults<AccessRequirement> ars =
+      new org.sagebionetworks.reflection.model.PaginatedResults<AccessRequirement>();
     ars.setTotalNumberOfResults(0);
     ars.setResults(new ArrayList<AccessRequirement>());
     when(
@@ -458,7 +456,8 @@ public class SynapseClientImplTest {
     when(mockUserProfile.getOwnerId()).thenReturn(MY_USER_PROFILE_OWNER_ID);
     when(mockSynapse.getMyProfile()).thenReturn(mockUserProfile);
 
-    PaginatedResults<MembershipInvitation> openInvites = new PaginatedResults<MembershipInvitation>();
+    PaginatedResults<MembershipInvitation> openInvites =
+      new PaginatedResults<MembershipInvitation>();
     openInvites.setTotalNumberOfResults(0);
     when(
       mockSynapse.getOpenMembershipInvitations(
@@ -470,7 +469,8 @@ public class SynapseClientImplTest {
     )
       .thenReturn(openInvites);
 
-    PaginatedResults<MembershipRequest> openRequests = new PaginatedResults<MembershipRequest>();
+    PaginatedResults<MembershipRequest> openRequests =
+      new PaginatedResults<MembershipRequest>();
     openRequests.setTotalNumberOfResults(0);
     when(
       mockSynapse.getOpenMembershipRequests(
@@ -544,11 +544,13 @@ public class SynapseClientImplTest {
   }
 
   private AccessRequirement createAccessRequirement(ACCESS_TYPE type) {
-    TermsOfUseAccessRequirement accessRequirement = new TermsOfUseAccessRequirement();
+    TermsOfUseAccessRequirement accessRequirement =
+      new TermsOfUseAccessRequirement();
     accessRequirement.setConcreteType(
       TermsOfUseAccessRequirement.class.getName()
     );
-    RestrictableObjectDescriptor descriptor = new RestrictableObjectDescriptor();
+    RestrictableObjectDescriptor descriptor =
+      new RestrictableObjectDescriptor();
     descriptor.setId("101");
     descriptor.setType(RestrictableObjectType.ENTITY);
     accessRequirement.setSubjectIds(
@@ -559,12 +561,14 @@ public class SynapseClientImplTest {
   }
 
   private void setupTeamInvitations() throws SynapseException {
-    ArrayList<MembershipInvitation> testInvitations = new ArrayList<MembershipInvitation>();
+    ArrayList<MembershipInvitation> testInvitations =
+      new ArrayList<MembershipInvitation>();
     testInvitation = new MembershipInvitation();
     testInvitation.setId("628319");
     testInvitation.setInviteeId(USER_ID);
     testInvitations.add(testInvitation);
-    PaginatedResults<MembershipInvitation> paginatedInvitations = new PaginatedResults<MembershipInvitation>();
+    PaginatedResults<MembershipInvitation> paginatedInvitations =
+      new PaginatedResults<MembershipInvitation>();
     paginatedInvitations.setResults(testInvitations);
     when(
       mockSynapse.getOpenMembershipInvitationSubmissions(
@@ -584,11 +588,13 @@ public class SynapseClientImplTest {
   }
 
   private void setupOpenTeamRequest() throws SynapseException {
-    ArrayList<MembershipRequest> testInvitations = new ArrayList<MembershipRequest>();
+    ArrayList<MembershipRequest> testInvitations =
+      new ArrayList<MembershipRequest>();
     when(mockMembershipRequest.getTeamId()).thenReturn("111");
     when(mockMembershipRequest.getUserId()).thenReturn(USER_ID);
     testInvitations.add(mockMembershipRequest);
-    PaginatedResults<MembershipRequest> paginatedInvitations = new PaginatedResults<MembershipRequest>();
+    PaginatedResults<MembershipRequest> paginatedInvitations =
+      new PaginatedResults<MembershipRequest>();
     paginatedInvitations.setResults(testInvitations);
     when(
       mockSynapse.getOpenMembershipRequests(
@@ -771,7 +777,8 @@ public class SynapseClientImplTest {
 
   @Test
   public void testGetV2WikiHistory() throws Exception {
-    PaginatedResults<V2WikiHistorySnapshot> historyResults = new PaginatedResults<V2WikiHistorySnapshot>();
+    PaginatedResults<V2WikiHistorySnapshot> historyResults =
+      new PaginatedResults<V2WikiHistorySnapshot>();
     when(
       mockSynapse.getV2WikiHistory(
         any(org.sagebionetworks.repo.model.dao.WikiPageKey.class),
@@ -858,14 +865,16 @@ public class SynapseClientImplTest {
 
   @Test
   public void testHtmlTeamMembersCache() throws Exception {
-    PaginatedResults<TeamMember> teamMembersPage1 = new PaginatedResults<TeamMember>();
+    PaginatedResults<TeamMember> teamMembersPage1 =
+      new PaginatedResults<TeamMember>();
     String trustedUserId = "876543";
     UserGroupHeader mockHeader = mock(UserGroupHeader.class);
     when(mockHeader.getOwnerId()).thenReturn(trustedUserId);
     TeamMember mockTeamMember = mock(TeamMember.class);
     when(mockTeamMember.getMember()).thenReturn(mockHeader);
     teamMembersPage1.setResults(Collections.singletonList(mockTeamMember));
-    PaginatedResults<TeamMember> teamMembersPage2 = new PaginatedResults<TeamMember>();
+    PaginatedResults<TeamMember> teamMembersPage2 =
+      new PaginatedResults<TeamMember>();
     teamMembersPage2.setResults(new ArrayList());
     when(
       mockSynapse.getTeamMembers(anyString(), anyString(), anyInt(), anyInt())
@@ -1259,11 +1268,8 @@ public class SynapseClientImplTest {
     int limit = 55;
     int offset = 2;
     String teamId = "132";
-    List<OpenTeamInvitationBundle> invitationBundles = synapseClient.getOpenTeamInvitations(
-      teamId,
-      limit,
-      offset
-    );
+    List<OpenTeamInvitationBundle> invitationBundles =
+      synapseClient.getOpenTeamInvitations(teamId, limit, offset);
     verify(mockSynapse)
       .getOpenMembershipInvitationSubmissions(
         eq(teamId),
@@ -1338,7 +1344,8 @@ public class SynapseClientImplTest {
     throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
     // set team member count
     Long testMemberCount = 111L;
-    PaginatedResults<TeamMember> allMembers = new PaginatedResults<TeamMember>();
+    PaginatedResults<TeamMember> allMembers =
+      new PaginatedResults<TeamMember>();
     allMembers.setTotalNumberOfResults(testMemberCount);
     List<TeamMember> members = new ArrayList<TeamMember>();
 
@@ -1489,9 +1496,8 @@ public class SynapseClientImplTest {
       .toJSONString();
     when(mockSynapse.getCertifiedUserPassingRecord(anyString()))
       .thenReturn(passingRecord);
-    String returnedPassingRecordJson = synapseClient.getCertifiedUserPassingRecord(
-      "123"
-    );
+    String returnedPassingRecordJson =
+      synapseClient.getCertifiedUserPassingRecord("123");
     verify(mockSynapse).getCertifiedUserPassingRecord(anyString());
     assertEquals(passingRecordJson, returnedPassingRecordJson);
   }
@@ -1537,7 +1543,8 @@ public class SynapseClientImplTest {
 
   @Test
   public void testFilterAccessRequirements() throws Exception {
-    List<AccessRequirement> unfilteredAccessRequirements = new ArrayList<AccessRequirement>();
+    List<AccessRequirement> unfilteredAccessRequirements =
+      new ArrayList<AccessRequirement>();
     List<AccessRequirement> filteredAccessRequirements;
     // filter empty list should not result in failure
     filteredAccessRequirements =
@@ -1587,7 +1594,8 @@ public class SynapseClientImplTest {
 
   @Test
   public void testAddEmail() throws Exception {
-    EmailValidationSignedToken emailValidationSignedToken = new EmailValidationSignedToken();
+    EmailValidationSignedToken emailValidationSignedToken =
+      new EmailValidationSignedToken();
     synapseClient.addEmail(emailValidationSignedToken);
     verify(mockSynapse)
       .addEmail(any(EmailValidationSignedToken.class), anyBoolean());
@@ -1696,8 +1704,10 @@ public class SynapseClientImplTest {
 
   private void setupGetMyLocationSettings()
     throws SynapseException, RestServiceException {
-    List<StorageLocationSetting> existingStorageLocations = new ArrayList<StorageLocationSetting>();
-    StorageLocationSetting storageLocation = new ExternalS3StorageLocationSetting();
+    List<StorageLocationSetting> existingStorageLocations =
+      new ArrayList<StorageLocationSetting>();
+    StorageLocationSetting storageLocation =
+      new ExternalS3StorageLocationSetting();
     storageLocation.setStorageLocationId(1L);
     storageLocation.setBanner(BANNER_1);
     existingStorageLocations.add(storageLocation);
@@ -1748,17 +1758,20 @@ public class SynapseClientImplTest {
     throws SynapseException, RestServiceException {
     setupGetMyLocationSettings();
     Long storageLocationId = 2L;
-    UploadDestinationListSetting projectSetting = new UploadDestinationListSetting();
+    UploadDestinationListSetting projectSetting =
+      new UploadDestinationListSetting();
     projectSetting.setLocations(Collections.EMPTY_LIST);
     when(mockSynapse.getProjectSetting(entityId, ProjectSettingsType.upload))
       .thenReturn(projectSetting);
 
     // test the case when it finds a duplicate storage location.
-    ExternalStorageLocationSetting setting = new ExternalStorageLocationSetting();
+    ExternalStorageLocationSetting setting =
+      new ExternalStorageLocationSetting();
     setting.setBanner(BANNER_2);
     setting.setUrl("sftp://www.jayhodgson.com");
 
-    ExternalStorageLocationSetting foundSetting = new ExternalStorageLocationSetting();
+    ExternalStorageLocationSetting foundSetting =
+      new ExternalStorageLocationSetting();
     foundSetting.setBanner(BANNER_2);
     foundSetting.setUrl("sftp://www.jayhodgson.com");
     foundSetting.setStorageLocationId(storageLocationId);
@@ -1780,7 +1793,8 @@ public class SynapseClientImplTest {
       ProjectSetting.class
     );
     verify(mockSynapse).updateProjectSetting(captor.capture());
-    UploadDestinationListSetting updatedProjectSetting = (UploadDestinationListSetting) captor.getValue();
+    UploadDestinationListSetting updatedProjectSetting =
+      (UploadDestinationListSetting) captor.getValue();
     List<Long> locations = updatedProjectSetting.getLocations();
     assertEquals(storageLocationId, locations.get(0));
   }
@@ -1790,7 +1804,8 @@ public class SynapseClientImplTest {
     throws SynapseException, RestServiceException {
     setupGetMyLocationSettings();
 
-    UploadDestinationListSetting projectSetting = new UploadDestinationListSetting();
+    UploadDestinationListSetting projectSetting =
+      new UploadDestinationListSetting();
     projectSetting.setLocations(Collections.EMPTY_LIST);
     when(mockSynapse.getProjectSetting(entityId, ProjectSettingsType.upload))
       .thenReturn(projectSetting);
@@ -1805,7 +1820,8 @@ public class SynapseClientImplTest {
       ProjectSetting.class
     );
     verify(mockSynapse).updateProjectSetting(captor.capture());
-    UploadDestinationListSetting updatedProjectSetting = (UploadDestinationListSetting) captor.getValue();
+    UploadDestinationListSetting updatedProjectSetting =
+      (UploadDestinationListSetting) captor.getValue();
     List<Long> locations = updatedProjectSetting.getLocations();
     assertEquals(SynapseClientImpl.defaultStorageLocation, locations.get(0));
   }
@@ -1818,12 +1834,14 @@ public class SynapseClientImplTest {
       .thenReturn(null);
 
     // test the case when it does not find duplicate storage location setting.
-    ExternalStorageLocationSetting setting = new ExternalStorageLocationSetting();
+    ExternalStorageLocationSetting setting =
+      new ExternalStorageLocationSetting();
     setting.setBanner(BANNER_2);
     setting.setUrl("sftp://www.google.com");
 
     Long newStorageLocationId = 1007L;
-    ExternalStorageLocationSetting createdSetting = new ExternalStorageLocationSetting();
+    ExternalStorageLocationSetting createdSetting =
+      new ExternalStorageLocationSetting();
     createdSetting.setStorageLocationId(newStorageLocationId);
 
     when(
@@ -1843,7 +1861,8 @@ public class SynapseClientImplTest {
       ProjectSetting.class
     );
     verify(mockSynapse).createProjectSetting(captor.capture());
-    UploadDestinationListSetting updatedProjectSetting = (UploadDestinationListSetting) captor.getValue();
+    UploadDestinationListSetting updatedProjectSetting =
+      (UploadDestinationListSetting) captor.getValue();
     List<Long> locations = updatedProjectSetting.getLocations();
     assertEquals(newStorageLocationId, locations.get(0));
     assertEquals(
@@ -1900,7 +1919,8 @@ public class SynapseClientImplTest {
       )
     )
       .thenReturn(eb);
-    PaginatedResults<VersionInfo> versionInfoPaginatedResults = new PaginatedResults<VersionInfo>();
+    PaginatedResults<VersionInfo> versionInfoPaginatedResults =
+      new PaginatedResults<VersionInfo>();
     List<VersionInfo> versionInfoList = new LinkedList<VersionInfo>();
     VersionInfo versionInfo = new VersionInfo();
     versionInfo.setVersionNumber(latestVersionNumber);
@@ -1929,15 +1949,15 @@ public class SynapseClientImplTest {
     when(mockSynapse.getColumnModelsForTableEntity(tableId))
       .thenReturn(oldColumnModels);
 
-    TableUpdateTransactionRequest request = synapseClient.getTableUpdateTransactionRequest(
-      tableId,
-      oldColumnModels,
-      newColumnModels
-    );
+    TableUpdateTransactionRequest request =
+      synapseClient.getTableUpdateTransactionRequest(
+        tableId,
+        oldColumnModels,
+        newColumnModels
+      );
     assertEquals(1, request.getChanges().size());
-    TableSchemaChangeRequest tableUpdateRequest = (TableSchemaChangeRequest) request
-      .getChanges()
-      .get(0);
+    TableSchemaChangeRequest tableUpdateRequest =
+      (TableSchemaChangeRequest) request.getChanges().get(0);
     List<String> orderColumnIds = tableUpdateRequest.getOrderedColumnIds();
     assertEquals(OLD_COLUMN_MODEL_ID2, orderColumnIds.get(0));
     assertEquals(OLD_COLUMN_MODEL_ID1, orderColumnIds.get(1));
@@ -1954,18 +1974,18 @@ public class SynapseClientImplTest {
     List<ColumnModel> newColumnModels = Collections.singletonList(
       mockNewColumnModel
     );
-    TableUpdateTransactionRequest request = synapseClient.getTableUpdateTransactionRequest(
-      tableId,
-      oldColumnModels,
-      newColumnModels
-    );
+    TableUpdateTransactionRequest request =
+      synapseClient.getTableUpdateTransactionRequest(
+        tableId,
+        oldColumnModels,
+        newColumnModels
+      );
     verify(mockSynapse).createColumnModels(anyList());
     assertEquals(tableId, request.getEntityId());
     List<TableUpdateRequest> tableUpdates = request.getChanges();
     assertEquals(1, tableUpdates.size());
-    TableSchemaChangeRequest schemaChange = (TableSchemaChangeRequest) tableUpdates.get(
-      0
-    );
+    TableSchemaChangeRequest schemaChange =
+      (TableSchemaChangeRequest) tableUpdates.get(0);
     List<ColumnChange> changes = schemaChange.getChanges();
     assertEquals(1, changes.size());
     ColumnChange columnChange = changes.get(0);
@@ -2022,18 +2042,18 @@ public class SynapseClientImplTest {
     when(mockSynapse.createColumnModels(anyList()))
       .thenReturn(newSchemaAfterUpdate);
 
-    TableUpdateTransactionRequest request = synapseClient.getTableUpdateTransactionRequest(
-      tableId,
-      oldSchema,
-      proposedNewSchema
-    );
+    TableUpdateTransactionRequest request =
+      synapseClient.getTableUpdateTransactionRequest(
+        tableId,
+        oldSchema,
+        proposedNewSchema
+      );
     verify(mockSynapse).createColumnModels(anyList());
     assertEquals(tableId, request.getEntityId());
     List<TableUpdateRequest> tableUpdates = request.getChanges();
     assertEquals(1, tableUpdates.size());
-    TableSchemaChangeRequest schemaChange = (TableSchemaChangeRequest) tableUpdates.get(
-      0
-    );
+    TableSchemaChangeRequest schemaChange =
+      (TableSchemaChangeRequest) tableUpdates.get(0);
 
     // changes should consist of a create, an update, and a delete
     List<ColumnChange> changes = schemaChange.getChanges();
@@ -2096,52 +2116,6 @@ public class SynapseClientImplTest {
     synapseClient.updateFileEntity(mockFileEntity, mockFileHandleCopyRequest);
   }
 
-  @Test(expected = BadRequestException.class)
-  public void testGenerateSqlWithFacetsError()
-    throws RestServiceException, SynapseException {
-    when(mockSynapse.transformSqlRequest(any(SqlTransformRequest.class)))
-      .thenThrow(new SynapseBadRequestException());
-    synapseClient.generateSqlWithFacets(null, null, null);
-  }
-
-  @Test
-  public void testGenerateSqlWithFacets()
-    throws RestServiceException, SynapseException {
-    String sql = "select * from syn123";
-    String expectedTransformedSql =
-      "SELECT * FROM syn123 WHERE ( ( \"col1\" = 'a' ) )";
-    when(mockSynapse.transformSqlRequest(any(SqlTransformRequest.class)))
-      .thenReturn(expectedTransformedSql);
-    FacetColumnRequest request = new FacetColumnValuesRequest();
-    String columnName = "col1";
-    String facetValue = "a";
-    request.setColumnName(columnName);
-    when(mockNewColumnModel.getName()).thenReturn(columnName);
-    when(mockNewColumnModel.getFacetType()).thenReturn(FacetType.enumeration);
-    when(mockNewColumnModel.getColumnType()).thenReturn(ColumnType.STRING);
-    ((FacetColumnValuesRequest) request).setFacetValues(
-        Collections.singleton(facetValue)
-      );
-    List<FacetColumnRequest> selectedFacets = Collections.singletonList(
-      request
-    );
-    List<ColumnModel> schema = Collections.singletonList(mockNewColumnModel);
-
-    String newSql = synapseClient.generateSqlWithFacets(
-      sql,
-      selectedFacets,
-      schema
-    );
-
-    verify(mockSynapse)
-      .transformSqlRequest(sqlTransformRequestCaptor.capture());
-    assertEquals(expectedTransformedSql, newSql);
-    TransformSqlWithFacetsRequest transformRequest = (TransformSqlWithFacetsRequest) sqlTransformRequestCaptor.getValue();
-    assertEquals(sql, transformRequest.getSqlToTransform());
-    assertEquals(selectedFacets, transformRequest.getSelectedFacets());
-    assertEquals(schema, transformRequest.getSchema());
-  }
-
   @Test
   public void testGetFileNameFromLocationPath() {
     String name = "filename.txt";
@@ -2177,7 +2151,8 @@ public class SynapseClientImplTest {
       .thenReturn(true);
     assertTrue(synapseClient.isChallenge("syn123"));
 
-    org.sagebionetworks.reflection.model.PaginatedResults<Evaluation> testResults = new org.sagebionetworks.reflection.model.PaginatedResults<Evaluation>();
+    org.sagebionetworks.reflection.model.PaginatedResults<Evaluation> testResults =
+      new org.sagebionetworks.reflection.model.PaginatedResults<Evaluation>();
     Evaluation e = new Evaluation();
     e.setId(EVAL_ID_1);
     e.setContentSource("syn123");

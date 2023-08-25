@@ -87,12 +87,9 @@ import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.table.ColumnChange;
 import org.sagebionetworks.repo.model.table.ColumnModel;
-import org.sagebionetworks.repo.model.table.Dataset;
-import org.sagebionetworks.repo.model.table.FacetColumnRequest;
 import org.sagebionetworks.repo.model.table.TableSchemaChangeRequest;
 import org.sagebionetworks.repo.model.table.TableUpdateRequest;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
-import org.sagebionetworks.repo.model.table.TransformSqlWithFacetsRequest;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
@@ -103,7 +100,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.util.SerializationUtils;
 import org.sagebionetworks.web.client.SynapseClient;
-import org.sagebionetworks.web.server.servlet.filter.CrawlFilter;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
@@ -2084,26 +2080,6 @@ public class SynapseClientImpl
         toUpdate.setDataFileHandleId(newFileHandle.getId());
         return synapseClient.putEntity(toUpdate);
       }
-    } catch (SynapseException e) {
-      throw ExceptionUtil.convertSynapseException(e);
-    }
-  }
-
-  @Override
-  public String generateSqlWithFacets(
-    String basicSql,
-    List<FacetColumnRequest> selectedFacets,
-    List<ColumnModel> schema
-  ) throws RestServiceException {
-    try {
-      org.sagebionetworks.client.SynapseClient synapseClient =
-        createSynapseClient();
-      TransformSqlWithFacetsRequest request =
-        new TransformSqlWithFacetsRequest();
-      request.setSqlToTransform(basicSql);
-      request.setSelectedFacets(selectedFacets);
-      request.setSchema(schema);
-      return synapseClient.transformSqlRequest(request);
     } catch (SynapseException e) {
       throw ExceptionUtil.convertSynapseException(e);
     }
