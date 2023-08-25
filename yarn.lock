@@ -777,6 +777,18 @@
     react-virtualized-auto-sizer "^1.0.20"
     react-window "^1.8.9"
 
+"@tanstack/react-table@^8.9.3":
+  version "8.9.3"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-table/-/react-table-8.9.3.tgz#03a52e9e15f65c82a8c697a445c42bfca0c5cfc4"
+  integrity sha512-Ng9rdm3JPoSCi6cVZvANsYnF+UoGVRxflMb270tVj0+LjeT/ZtZ9ckxF6oLPLcKesza6VKBqtdF9mQ+vaz24Aw==
+  dependencies:
+    "@tanstack/table-core" "8.9.3"
+
+"@tanstack/table-core@8.9.3":
+  version "8.9.3"
+  resolved "https://registry.yarnpkg.com/@tanstack/table-core/-/table-core-8.9.3.tgz#991da6b015f6200fdc841c48048bee5e197f6a46"
+  integrity sha512-NpHZBoHTfqyJk0m/s/+CSuAiwtebhYK90mDuf5eylTvgViNOujiaOaxNDxJkQQAsVvHWZftUGAx1EfO1rkKtLg==
+
 "@turf/area@^6.4.0":
   version "6.5.0"
   resolved "https://registry.yarnpkg.com/@turf/area/-/area-6.5.0.tgz#1d0d7aee01d8a4a3d4c91663ed35cc615f36ad56"
@@ -1624,13 +1636,6 @@ colorette@^2.0.19:
   version "2.0.20"
   resolved "https://registry.yarnpkg.com/colorette/-/colorette-2.0.20.tgz#9eb793e6833067f7235902fcd3b09917a000a95a"
   integrity sha512-IfEDxwoWIjkeXL1eXcDiow4UbKjhLdq6/EuSVR9GMN7KVH3r9gQ83e73hsz1Nd1T3ijd5xv1wcWRYO+D6kCI2w==
-
-column-resizer@^1.4.0:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/column-resizer/-/column-resizer-1.4.0.tgz#baebab36acd81102787aec5cd966193159340186"
-  integrity sha512-KM5Jh/UBKwVUr01oEGN/OvxF6gZIEn4c1Qde4iHSqNru9hxq93ao3u93qb9N1E1TZ2Sxjh4x7OHGe8v/P8FgkA==
-  dependencies:
-    string-hash "~1.1.3"
 
 commander@2, commander@^2.15.1, commander@^2.19.0, commander@^2.20.3:
   version "2.20.3"
@@ -4563,11 +4568,6 @@ string-argv@^0.3.1:
   resolved "https://registry.yarnpkg.com/string-argv/-/string-argv-0.3.2.tgz#2b6d0ef24b656274d957d54e0a4bbf6153dc02b6"
   integrity sha512-aqD2Q0144Z+/RqG52NeHEkZauTAUWJO8c6yTftGJKO3Tja5tUgIfmIl6kExvhtxSDP7fXB6DvzkfMpCd/F3G+Q==
 
-string-hash@~1.1.3:
-  version "1.1.3"
-  resolved "https://registry.yarnpkg.com/string-hash/-/string-hash-1.1.3.tgz#e8aafc0ac1855b4666929ed7dd1275df5d6c811b"
-  integrity sha512-kJUvRUFK49aub+a7T1nNE66EJbZBMnBgoC1UbCZ5n6bsZKBRga4KgBRTMn/pFkeCZSYtNeSyMxPDM0AXWELk2A==
-
 string-split-by@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/string-split-by/-/string-split-by-1.0.0.tgz#53895fb3397ebc60adab1f1e3a131f5372586812"
@@ -4692,10 +4692,10 @@ svg-path-sdf@^1.1.3:
     parse-svg-path "^0.1.2"
     svg-path-bounds "^1.0.1"
 
-synapse-react-client@3.1.49:
-  version "3.1.49"
-  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-3.1.49.tgz#afaf31f7faf03618c1c334d6245d28c6c0e214bd"
-  integrity sha512-7ehbvhPG4j2zgwjKpTg/TGAX6fIIBT7oIyFI24qXMVixMCeqtH7/zFP0cYI8E/Bz1ux8o++iwSv3peVzW/UMJg==
+synapse-react-client@3.1.50:
+  version "3.1.50"
+  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-3.1.50.tgz#cb342f737c3a696ba9061f7abd46e7f05634b9bb"
+  integrity sha512-Cihn+p2ORj0TWyPo9ciiBkuO0A0cdbDv5lofLCn0U3zXZSr2Yg34jqpc+iHQNW9pOqxH8LwYv+lAhJ/2R8ztkg==
   dependencies:
     "@apidevtools/json-schema-ref-parser" "^9.1.2"
     "@brainhubeu/react-carousel" "1.19.26"
@@ -4716,11 +4716,11 @@ synapse-react-client@3.1.49:
     "@rjsf/utils" "^5.9.0"
     "@rjsf/validator-ajv8" "^5.9.0"
     "@sage-bionetworks/react-base-table" "^1.13.4"
+    "@tanstack/react-table" "^8.9.3"
     "@upsetjs/react" "^1.11.0"
     animate.css "^4.1.1"
     bootstrap "^4.6.2"
     classnames "^2.3.2"
-    column-resizer "^1.4.0"
     dagre "^0.8.5"
     dayjs "^1.11.9"
     downshift "^6.1.12"
