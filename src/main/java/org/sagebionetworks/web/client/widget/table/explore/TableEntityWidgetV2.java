@@ -420,27 +420,29 @@ public class TableEntityWidgetV2
             ginInjector.getSynapseJSNIUtils().consoleError(e);
           }
         };
-        OnQueryResultBundleCallback onQueryResultBundleChange = newQueryResultBundleJson -> {
-          try {
-            JSONObjectAdapter adapter = ginInjector
-              .getJSONObjectAdapter()
-              .createNew(newQueryResultBundleJson);
-            this.currentQueryResultBundle = new QueryResultBundle(adapter);
-            this.queryExecutionFinished(
-                true,
-                QueryResultEditorWidget.isQueryResultEditable(
-                  this.currentQueryResultBundle,
-                  tableType
-                )
-              );
-          } catch (JSONObjectAdapterException e) {
-            ginInjector.getSynapseJSNIUtils().consoleError(e);
-          }
-        };
+        OnQueryResultBundleCallback onQueryResultBundleChange =
+          newQueryResultBundleJson -> {
+            try {
+              JSONObjectAdapter adapter = ginInjector
+                .getJSONObjectAdapter()
+                .createNew(newQueryResultBundleJson);
+              this.currentQueryResultBundle = new QueryResultBundle(adapter);
+              this.queryExecutionFinished(
+                  true,
+                  QueryResultEditorWidget.isQueryResultEditable(
+                    this.currentQueryResultBundle,
+                    tableType
+                  )
+                );
+            } catch (JSONObjectAdapterException e) {
+              ginInjector.getSynapseJSNIUtils().consoleError(e);
+            }
+          };
 
-        OnViewSharingSettingsHandler onViewSharingSettingsHandler = entityId -> {
-          onViewSharingSettingsClicked(entityId);
-        };
+        OnViewSharingSettingsHandler onViewSharingSettingsHandler =
+          entityId -> {
+            onViewSharingSettingsClicked(entityId);
+          };
         JSONObjectAdapter adapter = ginInjector
           .getJSONObjectAdapter()
           .createNew();
@@ -459,22 +461,6 @@ public class TableEntityWidgetV2
           ginInjector.getSynapseJSNIUtils().consoleError(e);
         }
       }
-    }
-  }
-
-  private void generateSqlWithFacets(AsyncCallback<String> callback) {
-    if (
-      currentQuery.getSelectedFacets() == null ||
-      currentQuery.getSelectedFacets().isEmpty()
-    ) {
-      callback.onSuccess(currentQuery.getSql());
-    } else {
-      synapseClient.generateSqlWithFacets(
-        currentQuery.getSql(),
-        currentQuery.getSelectedFacets(),
-        tableBundle.getColumnModels(),
-        callback
-      );
     }
   }
 
@@ -665,26 +651,9 @@ public class TableEntityWidgetV2
   }
 
   @Override
-  public void onShowDownloadFilesProgrammatically() {
-    AsyncCallback<String> callback = new AsyncCallback<String>() {
-      @Override
-      public void onSuccess(String sql) {
-        String escapedSql = sql.replace("\"", "\\\"");
-        fileViewClientsHelp.setQuery(escapedSql);
-        fileViewClientsHelp.show();
-      }
-
-      @Override
-      public void onFailure(Throwable caught) {
-        view.showErrorMessage(caught.getMessage());
-      }
-    };
-    generateSqlWithFacets(callback);
-  }
-
-  @Override
   public void onAddToDownloadList() {
-    AddToDownloadListV2 newAddToDownloadList = ginInjector.getAddToDownloadListV2();
+    AddToDownloadListV2 newAddToDownloadList =
+      ginInjector.getAddToDownloadListV2();
     view.setAddToDownloadList(newAddToDownloadList);
     newAddToDownloadList.configure(
       entityBundle.getEntity().getId(),

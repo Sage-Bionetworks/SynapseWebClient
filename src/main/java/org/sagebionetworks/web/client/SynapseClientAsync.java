@@ -400,13 +400,6 @@ public interface SynapseClientAsync {
     AsyncCallback<Void> asyncCallback
   );
 
-  void generateSqlWithFacets(
-    String basicSql,
-    List<FacetColumnRequest> selectedFacets,
-    List<ColumnModel> schema,
-    AsyncCallback<String> callback
-  );
-
   void isUserAllowedToRenderHTML(
     String userId,
     AsyncCallback<Boolean> callback
