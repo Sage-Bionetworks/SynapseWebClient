@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04-4core-16BGRAM-150GBSSD
+    runs-on: ubuntu-22.04-4core-16GBRAM-150GBSSD
 
     steps:
       - uses: actions/checkout@v3
