@@ -728,26 +728,26 @@
   dependencies:
     dequal "^2.0.2"
 
-"@rjsf/core@^5.9.0":
-  version "5.9.0"
-  resolved "https://registry.yarnpkg.com/@rjsf/core/-/core-5.9.0.tgz#eb8268f593b843cc8f58b347b54d6af808252ab6"
-  integrity sha512-HYgnWKTGVfbj6bs1O9SYyw4VgBfoISZeQti259aiKK08XDVH+tgThxBMX4CyMjC/K9I4ralRV9KRlGO1un0DzQ==
+"@rjsf/core@5.12.1":
+  version "5.12.1"
+  resolved "https://registry.yarnpkg.com/@rjsf/core/-/core-5.12.1.tgz#ab879ffa9fa1dbd8d2cde77aba0bd43155563b1a"
+  integrity sha512-1YFhZ90/uHRx1akQmDdIjBxGMjs/5gtuTLUFwl6GbOwTm2fhZRh3qXRFyTXz81Oy6TGcbrxBJEYvFg2iHjYKCA==
   dependencies:
     lodash "^4.17.21"
     lodash-es "^4.17.21"
-    markdown-to-jsx "^7.2.1"
+    markdown-to-jsx "^7.3.2"
     nanoid "^3.3.6"
     prop-types "^15.8.1"
 
-"@rjsf/mui@^5.9.0":
-  version "5.9.0"
-  resolved "https://registry.yarnpkg.com/@rjsf/mui/-/mui-5.9.0.tgz#7153aa54bc7f298be8429d840ba6ee99ff073deb"
-  integrity sha512-wG5GaT8BjLk2btU3nyd5haZeIVS418+837zheAaQ5VkQWhRZ7Zw3eyX3ngRYJjhaOcwDmBvdg/7liWwjZNrf0w==
+"@rjsf/mui@5.12.1":
+  version "5.12.1"
+  resolved "https://registry.yarnpkg.com/@rjsf/mui/-/mui-5.12.1.tgz#cd255b3bf31d2cba7cc5832bd25d815ad7975838"
+  integrity sha512-d7cNFIdt6N24m5NPrNSqfCe2SUyUjX48Goo7z4J9vOHWxo5kdDfBEa3UwNA/DR9lo+9cYY7QTvKbgrTkxWU58A==
 
-"@rjsf/utils@^5.9.0":
-  version "5.9.0"
-  resolved "https://registry.yarnpkg.com/@rjsf/utils/-/utils-5.9.0.tgz#6eed703daa38b9eb3941647c6bae15ba8f7fd76d"
-  integrity sha512-+UBRrbHgbG/y6Lj32O0U5oiNpbpKZqsFxPKuOCmOqpsfwmb072AyGoHqskc2e05Ur/iURcbBu3xt72aF1azLmQ==
+"@rjsf/utils@5.12.1":
+  version "5.12.1"
+  resolved "https://registry.yarnpkg.com/@rjsf/utils/-/utils-5.12.1.tgz#2edea90ff93cd7c810c7b52878dea56af6ac7ad2"
+  integrity sha512-/k8+7WdLwhaYsOQvH5BQINipj2IJvjEW3QQv4jQQ7sXtkpdUjieZayRfaE8DHfRdm9HjgJURJFDy3EODkWPl6A==
   dependencies:
     json-schema-merge-allof "^0.8.1"
     jsonpointer "^5.0.1"
@@ -755,10 +755,10 @@
     lodash-es "^4.17.21"
     react-is "^18.2.0"
 
-"@rjsf/validator-ajv8@^5.9.0":
-  version "5.9.0"
-  resolved "https://registry.yarnpkg.com/@rjsf/validator-ajv8/-/validator-ajv8-5.9.0.tgz#91d6a524ef8ee7395a08174213e10142947390a1"
-  integrity sha512-MHMHUxDICWYmenHBjK7SIPqiqPvvm3fwQyttHhH47IZKOw6wpypglK0EaLLwD5GBbEPsTcmKwHe1VydUNcfhnQ==
+"@rjsf/validator-ajv8@5.12.1":
+  version "5.12.1"
+  resolved "https://registry.yarnpkg.com/@rjsf/validator-ajv8/-/validator-ajv8-5.12.1.tgz#58c15a56c26a6ce8f6763c16ed9747f8c7207480"
+  integrity sha512-m4QO44yp60LTIfd4RPUu/h07B8U9umbD3I4Nh4iv9oyUudncaZFFXRopKcBm08v30VkN0tjMwuu0SxGDpzMtHA==
   dependencies:
     ajv "^8.12.0"
     ajv-formats "^2.1.1"
@@ -2916,6 +2916,11 @@ java-parser@2.0.4:
     chevrotain "6.5.0"
     lodash "4.17.21"
 
+jotai@^2.3.1:
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/jotai/-/jotai-2.4.0.tgz#3f0b30fa54dfb4b4bb22141264512bccca5f5149"
+  integrity sha512-NUHJdAJe3C8Prf0DD6EzezCATjkNvfCNI7pgkaX7bCPPsqE0oK8L9RzZsEhz/UxFoGRayXwacTvAli0VEYKkqQ==
+
 jquery@3.5.1:
   version "3.5.1"
   resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.5.1.tgz#d7b4d08e1bfdb86ad2f1a3d039ea17304717abb5"
@@ -3232,10 +3237,10 @@ markdown-it@^12.3.2:
     mdurl "^1.0.1"
     uc.micro "^1.0.5"
 
-markdown-to-jsx@^7.2.1:
-  version "7.2.1"
-  resolved "https://registry.yarnpkg.com/markdown-to-jsx/-/markdown-to-jsx-7.2.1.tgz#87061fd3176ad926ef3d99493e5c57f6335e0c51"
-  integrity sha512-9HrdzBAo0+sFz9ZYAGT5fB8ilzTW+q6lPocRxrIesMO+aB40V9MgFfbfMXxlGjf22OpRy+IXlvVaQenicdpgbg==
+markdown-to-jsx@^7.3.2:
+  version "7.3.2"
+  resolved "https://registry.yarnpkg.com/markdown-to-jsx/-/markdown-to-jsx-7.3.2.tgz#f286b4d112dad3028acc1e77dfe1f653b347e131"
+  integrity sha512-B+28F5ucp83aQm+OxNrPkS8z0tMKaeHiy0lHJs3LqCyDQFtWuenaIrkaVTgAm1pf1AU85LXltva86hlaT17i8Q==
 
 match-sorter@^6.0.2:
   version "6.3.1"
@@ -4692,10 +4697,10 @@ svg-path-sdf@^1.1.3:
     parse-svg-path "^0.1.2"
     svg-path-bounds "^1.0.1"
 
-synapse-react-client@3.1.51:
-  version "3.1.51"
-  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-3.1.51.tgz#d823aefe07379f3cec75a8a71d8e8cb6585108ee"
-  integrity sha512-hi7H/ZmATcHPD9OiizsLg1h4yb8yBt8mtmy+7UZisFRKkPTJzjEkH0d5aHTCROOXLyNtPwNnLOsuJ52rUC5aWg==
+synapse-react-client@3.1.52:
+  version "3.1.52"
+  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-3.1.52.tgz#3770234ef1e65a65a2264de0c0ed7b0c0cf15ba6"
+  integrity sha512-iT72DLBVT+5RTjPxQFT3UhOWehM0LqbhsOcGwoskfs62QHh6Fe0JoZJ7Gr1te+MlsHbQDsUijfER4gWvTittnw==
   dependencies:
     "@apidevtools/json-schema-ref-parser" "^9.1.2"
     "@brainhubeu/react-carousel" "1.19.26"
@@ -4711,10 +4716,10 @@ synapse-react-client@3.1.51:
     "@react-google-maps/api" "^2.18.1"
     "@react-hook/resize-observer" "^1.2.6"
     "@react-hookz/web" "^23.1.0"
-    "@rjsf/core" "^5.9.0"
-    "@rjsf/mui" "^5.9.0"
-    "@rjsf/utils" "^5.9.0"
-    "@rjsf/validator-ajv8" "^5.9.0"
+    "@rjsf/core" "5.12.1"
+    "@rjsf/mui" "5.12.1"
+    "@rjsf/utils" "5.12.1"
+    "@rjsf/validator-ajv8" "5.12.1"
     "@sage-bionetworks/react-base-table" "^1.13.4"
     "@tanstack/react-table" "^8.9.3"
     "@upsetjs/react" "^1.11.0"
@@ -4726,6 +4731,7 @@ synapse-react-client@3.1.51:
     downshift "^6.1.12"
     history "^5.3.0"
     immutable "4.1.0"
+    jotai "^2.3.1"
     json-rules-engine "^4.1.0"
     katex "0.11.1"
     lodash-es "^4.17.21"
