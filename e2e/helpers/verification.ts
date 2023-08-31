@@ -20,8 +20,10 @@ export async function getVerificationSubmissionId(
   await waitForSrcEndpointConfig(page)
   const bundle = await page.evaluate(
     async ({ userId, accessToken }) => {
+      // @ts-expect-error: Cannot find name 'SRC'
       const mask = await SRC.SynapseConstants
         .USER_BUNDLE_MASK_VERIFICATION_SUBMISSION
+      // @ts-expect-error: Cannot find name 'SRC'
       return await SRC.SynapseClient.getUserBundle(userId, mask, accessToken)
     },
     { userId, accessToken },
@@ -38,8 +40,10 @@ export async function deleteVerificationSubmissionById(
   await waitForSrcEndpointConfig(page)
   await page.evaluate(
     async ({ verificationSubmissionId, accessToken }) => {
+      // @ts-expect-error: Cannot find name 'SRC'
       const endpoint = await SRC.SynapseEnums.BackendDestinationEnum
         .REPO_ENDPOINT
+      // @ts-expect-error: Cannot find name 'SRC'
       return await SRC.HttpClient.doDelete(
         `/repo/v1/verificationSubmission/${verificationSubmissionId}`,
         accessToken,
