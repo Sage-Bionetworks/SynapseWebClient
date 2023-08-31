@@ -1,110 +1,66 @@
 // Required environment variables:
-// - ADMIN_USERNAME: username for admin
-// - ADMIN_PASSWORD: password for admin
+// - ADMIN_PAT: personal access token for admin
 //
 // Environment variables:
 // - in CI: set in repo GitHub secrets, read via env in workflow
 // - locally: set in .env file, read by dotenv
 
 import { Page, expect, test as setup } from '@playwright/test'
-import { v4 as uuidv4 } from 'uuid'
-import { ADMIN_STORAGE_STATE, USER_STORAGE_STATE } from '../playwright.config'
 import { getEndpoint } from './helpers/http'
 import { setLocalStorage } from './helpers/localStorage'
 import {
-  USER_NAME_LOCALSTORAGE_KEY,
+  cleanupTestUser,
   createTestUser,
-  deleteTestUser,
   getAdminPAT,
-  getAdminUserCredentials,
   loginTestUser,
 } from './helpers/testUser'
-import { TestUser } from './helpers/types'
+import { userConfigs } from './helpers/userConfig'
 
-let testUserId: string | undefined
-let adminPage: Page
-let userPage: Page
+for (const {
+  testName,
+  storageStatePath,
+  localStorageKey,
+  user,
+} of userConfigs) {
+  let userId: string | undefined
+  let userPage: Page
 
-setup.describe('Setup', () => {
-  setup.beforeAll(async ({ browser }) => {
-    adminPage = await browser.newPage()
-    userPage = await browser.newPage()
-  })
-
-  setup('authenticate users', async () => {
-    // This may be the first test to run and trigger SWC compilation
-    // ...which may take 15+ seconds. Mark this test as slow,
-    // ...so the test will be given triple timeout.
-    // https://playwright.dev/docs/api/class-test#test-slow-1
-    setup.slow()
-
-    await setup.step('authenticate admin', async () => {
-      const { adminUserName, adminUserPassword } = getAdminUserCredentials()
-
-      await loginTestUser(adminPage, adminUserName!, adminUserPassword!)
-      await adminPage.context().storageState({ path: ADMIN_STORAGE_STATE })
+  setup.describe(`Setup: ${testName}`, () => {
+    setup.beforeAll(async ({ browser }) => {
+      userPage = await browser.newPage()
     })
 
-    const { testUserName, testUserPassword } = await setup.step(
-      'create test user',
-      async () => {
-        /* const testUserName = 'swc-e2e-' + uuidv4()
-        const testUserPassword = 'password-' + uuidv4() */
+    setup('create and authenticate user', async () => {
+      // This may be the first test to run and trigger SWC compilation
+      // ...which may take 15+ seconds. Mark this test as slow,
+      // ...so the test will be given triple timeout.
+      // https://playwright.dev/docs/api/class-test#test-slow-1
+      setup.slow()
 
-        const testUserName = 'swc-e2e-test'
-        const testUserPassword = process.env.USER_PASSWORD!
-        expect(testUserPassword).not.toBeUndefined()
+      await setup.step('create test user', async () => {
+        userId = await createTestUser(getEndpoint(), user, getAdminPAT())
+        expect(userId).not.toBeUndefined()
 
-        const testUserEmail = `${testUserName}@test.com`
-        const testUserIsValidated = false
+        await setLocalStorage(userPage, localStorageKey, user.username)
+        await userPage.context().storageState({ path: storageStatePath })
+      })
 
-        const testUser: TestUser = {
-          username: testUserName,
-          email: testUserEmail,
-          password: testUserPassword,
-          tou: true,
-          validatedUser: testUserIsValidated,
-        }
+      await setup.step('authenticate test user', async () => {
+        await loginTestUser(userPage, user.username, user.password)
+        await userPage.context().storageState({ path: storageStatePath })
+      })
+    })
 
-        testUserId = await createTestUser(
-          getEndpoint(),
-          testUser,
-          getAdminPAT(),
-        )
-        expect(testUserId).not.toBeUndefined()
+    setup.afterAll(async ({}, { expectedStatus, status }) => {
+      // delete test user if setup wasn't successful:
+      // ...cleanup isn't run until after last retry
+      // ...so we delete here, so we can retry setup without leaving behind test users
+      if (status !== expectedStatus && userId !== undefined) {
+        await cleanupTestUser(userId, userPage)
+      }
 
-        await setLocalStorage(
-          userPage,
-          USER_NAME_LOCALSTORAGE_KEY,
-          testUserName,
-        )
-        await userPage.context().storageState({ path: USER_STORAGE_STATE })
-
-        return { testUserName, testUserPassword }
-      },
-    )
-
-    await setup.step('authenticate test user', async () => {
-      await loginTestUser(userPage, testUserName, testUserPassword)
-      await userPage.context().storageState({ path: USER_STORAGE_STATE })
+      // clean up page
+      await userPage.close()
     })
   })
-
-  setup.afterAll(async ({}, { expectedStatus, status }) => {
-    // clean up pages
-    await adminPage.close()
-    await userPage.close()
-
-    // delete test user if setup wasn't successful:
-    // ...cleanup isn't run until after last retry
-    // ...so we delete here, so we can retry setup without leaving behind test users
-    if (status !== expectedStatus && testUserId !== undefined) {
-      const result = await deleteTestUser(
-        getEndpoint(),
-        testUserId!,
-        getAdminPAT(),
-      )
-      expect(result).toEqual(testUserId)
-    }
-  })
-})
+}

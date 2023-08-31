@@ -4,7 +4,7 @@
 
 ### Local
 
-1. Create a .env file with the following environment variables: `ADMIN_USERNAME` and `ADMIN_PASSWORD`.
+1. Create a .env file with the following environment variables: `ADMIN_PAT`.
 2. Build SWC: `mvn clean install`
 3. Run Tests\*: `yarn e2e`
 
@@ -16,7 +16,7 @@ When writing a new test, it can be useful to create a static user with known use
 
 ### CI
 
-In your forked repository, create [an Actions secret](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository) for both `ADMIN_USERNAME` and `ADMIN_PASSWORD`. The tests will run on each push to your forked repository.
+In your forked repository, create [an Actions secret](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository) for `ADMIN_PAT`. The tests will run on each push to your forked repository.
 
 ## Writing Tests
 
@@ -133,8 +133,7 @@ on: workflow_dispatch
 ```yml
 - name: Run Playwright tests
   env:
-    ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
-    ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+    ADMIN_PAT: ${{ secrets.ADMIN_PAT }}
   run: DEBUG="pw:api" yarn playwright test --trace on
 ```
 

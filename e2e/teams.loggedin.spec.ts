@@ -1,30 +1,35 @@
 import { Page, expect, test } from '@playwright/test'
 import { v4 as uuidv4 } from 'uuid'
-import { ADMIN_STORAGE_STATE, USER_STORAGE_STATE } from '../playwright.config'
+import {
+  USER_STORAGE_STATE,
+  USER_VALIDATED_STORAGE_STATE,
+} from '../playwright.config'
 import { getLocalStorage } from './helpers/localStorage'
 import {
   deleteTeamInvitationMessage,
   deleteTeamInviteAcceptanceMessage,
 } from './helpers/messages'
 import {
-  USER_NAME_LOCALSTORAGE_KEY,
   getAccessTokenFromCookie,
   getAdminPAT,
-  getAdminUserCredentials,
   getUserIdFromLocalStorage,
   goToDashboard,
 } from './helpers/testUser'
+import {
+  USER_NAME_LOCALSTORAGE_KEY,
+  USER_VALIDATED_NAME_LOCALSTORAGE_KEY,
+} from './helpers/userConfig'
 
 const TEAM_NAME = 'swc-e2e-team-' + uuidv4()
-const INVITATION_MESSAGE = 'swc e2e test team invitation' + uuidv4()
+const INVITATION_MESSAGE = 'swc-e2e-invite'
 
-let adminPage: Page
+let validatedUserPage: Page
 let userPage: Page
 
 test.describe('Teams', () => {
   test.beforeAll(async ({ browser }) => {
-    adminPage = await browser.newPage({
-      storageState: ADMIN_STORAGE_STATE,
+    validatedUserPage = await browser.newPage({
+      storageState: USER_VALIDATED_STORAGE_STATE,
     })
     userPage = await browser.newPage({
       storageState: USER_STORAGE_STATE,
@@ -38,13 +43,19 @@ test.describe('Teams', () => {
       )
       expect(userName).not.toBeNull()
 
-      return userName
+      return userName!
     })
 
-    const adminUserName = await test.step('should get admin name', async () => {
-      const { adminUserName } = getAdminUserCredentials()
-      return adminUserName
-    })
+    const validatedUserName =
+      await test.step('should get validated user name', async () => {
+        const validatedUserName = await getLocalStorage(
+          validatedUserPage,
+          USER_VALIDATED_NAME_LOCALSTORAGE_KEY,
+        )
+        expect(validatedUserName).not.toBeNull()
+
+        return validatedUserName!
+      })
 
     await test.step('user should create a team with a unique name', async () => {
       await goToDashboard(userPage)
@@ -61,27 +72,26 @@ test.describe('Teams', () => {
       ).toBeVisible()
     })
 
-    await test.step('user should invite admin to team', async () => {
+    await test.step('user should invite validated user to team', async () => {
       await userPage.getByRole('button', { name: 'Team Actions' }).click()
       await userPage.getByRole('link', { name: 'Invite User' }).click()
 
       await userPage
         .getByRole('textbox', { name: 'Enter a name or email address...' })
-        .type(adminUserName!)
+        .type(validatedUserName)
       await userPage
-        .getByRole('menuitem', { name: `@${adminUserName}` })
+        .getByRole('menuitem', { name: `@${validatedUserName}` })
         .click()
       const loadInvitedUser = userPage.getByText('Loading...')
       await expect(loadInvitedUser).toBeVisible()
       await expect(loadInvitedUser).not.toBeVisible()
 
-      await userPage.getByLabel('Invitation Message').type(INVITATION_MESSAGE)
+      const inviteMessageBox = userPage.getByLabel('Invitation Message')
+      await inviteMessageBox.click()
+      await inviteMessageBox.type(INVITATION_MESSAGE)
 
       const spinner = userPage.locator('.modal-body > .spinner')
-      await Promise.all([
-        expect(spinner).toBeVisible(),
-        userPage.getByRole('button', { name: 'Send Invitation(s)' }).click(),
-      ])
+      await userPage.getByRole('button', { name: 'Send Invitation(s)' }).click()
 
       await expect(spinner).not.toBeVisible()
       await expect(userPage.getByText('Invitation(s) Sent')).toBeVisible()
@@ -91,32 +101,32 @@ test.describe('Teams', () => {
       await expect(userPage.getByText('Pending Invitations')).toBeVisible({
         timeout: testInfo.timeout * 3, // add extra timeout, so backend can finish sending request
       })
-      const row = userPage.getByRole('row', { name: adminUserName! })
+      const row = userPage.getByRole('row', { name: validatedUserName })
       await expect(row).toBeVisible()
       await expect(row.getByText(INVITATION_MESSAGE)).toBeVisible()
     })
 
-    await test.step('admin should accept team invitation', async () => {
-      await goToDashboard(adminPage)
+    await test.step('validated user should accept team invitation', async () => {
+      await goToDashboard(validatedUserPage)
 
       await Promise.all([
         expect(
-          adminPage.getByRole('heading', { name: 'Your Teams' }),
+          validatedUserPage.getByRole('heading', { name: 'Your Teams' }),
         ).toBeVisible(),
-        adminPage.getByLabel('Teams').click(),
+        validatedUserPage.getByLabel('Teams').click(),
       ])
 
       // get row for this invitation
-      // ...in case multiple test suite users have invited admin user at the same time
-      const row = adminPage.getByRole('row', { name: TEAM_NAME })
+      // ...in case multiple tests have invited validated user at the same time
+      const row = validatedUserPage.getByRole('row', { name: TEAM_NAME })
       await expect(row.getByText(INVITATION_MESSAGE)).toBeVisible()
 
       await row.getByRole('button', { name: 'Join' }).click()
       await expect(row).not.toBeVisible()
     })
 
-    await test.step('admin should view team page', async () => {
-      const teamLink = adminPage.getByRole('link', { name: TEAM_NAME })
+    await test.step('validated user should view team page', async () => {
+      const teamLink = validatedUserPage.getByRole('link', { name: TEAM_NAME })
 
       // handle case where occasionally two team links are shown
       // ...before resolving to one team link
@@ -129,24 +139,27 @@ test.describe('Teams', () => {
       await teamLink.click()
 
       await expect(
-        adminPage.locator('h3').filter({
+        validatedUserPage.locator('h3').filter({
           hasText: TEAM_NAME,
         }),
       ).toBeVisible()
-      await expect(adminPage.getByText('2 team members')).toBeVisible()
+      await expect(validatedUserPage.getByText('2 team members')).toBeVisible()
 
       await expect(
-        adminPage.getByRole('heading', { name: 'Managers' }),
+        validatedUserPage.getByRole('heading', { name: 'Managers' }),
       ).toBeVisible()
       await expect(
-        adminPage.getByRole('link', { name: userName! }),
+        validatedUserPage.getByRole('link', { name: userName, exact: true }),
       ).toBeVisible()
 
       await expect(
-        adminPage.getByRole('heading', { name: 'Members' }),
+        validatedUserPage.getByRole('heading', { name: 'Members' }),
       ).toBeVisible()
       await expect(
-        adminPage.getByRole('link', { name: adminUserName! }),
+        validatedUserPage.getByRole('link', {
+          name: validatedUserName,
+          exact: true,
+        }),
       ).toBeVisible()
     })
   })
@@ -165,28 +178,36 @@ test.describe('Teams', () => {
     ).not.toBeVisible()
 
     // get credentials
-    const adminUserId = await getUserIdFromLocalStorage(adminPage)
     const adminPAT = getAdminPAT()
+
+    const validatedUserId = await getUserIdFromLocalStorage(validatedUserPage)
+    const validatedUserAccessToken = await getAccessTokenFromCookie(
+      validatedUserPage,
+    )
 
     const userUserId = await getUserIdFromLocalStorage(userPage)
     const userAccessToken = await getAccessTokenFromCookie(userPage)
     const userName = await getLocalStorage(userPage, USER_NAME_LOCALSTORAGE_KEY)
     expect(userName).not.toBeNull()
 
-    // delete team invitation: user -> admin
+    // delete team invitation: user -> validated user
     await deleteTeamInvitationMessage(
-      [adminUserId!],
+      [validatedUserId],
       userName!,
       TEAM_NAME,
       userAccessToken,
       adminPAT,
     )
 
-    // delete team acceptance: admin -> user
-    await deleteTeamInviteAcceptanceMessage([userUserId!], adminPAT, adminPAT)
+    // delete team acceptance: validated user -> user
+    await deleteTeamInviteAcceptanceMessage(
+      [userUserId!],
+      validatedUserAccessToken,
+      adminPAT,
+    )
 
     // close pages
-    await adminPage.close()
+    await validatedUserPage.close()
     await userPage.close()
   })
 })
