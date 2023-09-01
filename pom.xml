@@ -430,8 +430,8 @@
                   tofile="src/main/webapp/generated/react-measure.js"
                 />
                 <copy
-                  file="${project.basedir}/node_modules/react-query/dist/react-query.production.min.js"
-                  tofile="src/main/webapp/generated/react-query.production.min.js"
+                  file="${project.basedir}/node_modules/@tanstack/react-query/build/umd/index.production.js"
+                  tofile="src/main/webapp/generated/react-query.production.js"
                 />
                 <copy
                   file="${project.basedir}/node_modules/universal-cookie/umd/universalCookie.min.js"
@@ -475,7 +475,7 @@
                   tofile="src/main/webapp/generated/react-dom.development.js"
                 />
                 <copy
-                  file="${project.basedir}/node_modules/react-query/dist/react-query.development.js"
+                  file="${project.basedir}/node_modules/@tanstack/react-query/build/umd/index.development.js"
                   tofile="src/main/webapp/generated/react-query.development.js"
                 />
                 <copy
