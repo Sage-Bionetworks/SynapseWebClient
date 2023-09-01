@@ -10,26 +10,15 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.binder.EventHandler;
-import java.util.Arrays;
 import java.util.List;
-import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.Link;
-import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.Versionable;
+import org.sagebionetworks.repo.model.*;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
-import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.*;
 import org.sagebionetworks.web.client.context.QueryClientProvider;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
+import org.sagebionetworks.web.client.jsinterop.KeyFactory;
 import org.sagebionetworks.web.client.jsinterop.reactquery.QueryClient;
-import org.sagebionetworks.web.client.jsinterop.reactquery.QueryKeyConstants;
-import org.sagebionetworks.web.client.jsinterop.reactquery.SynapseReactClientEntityQueryKey;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -331,12 +320,12 @@ public class EntityPresenter
 
   @EventHandler
   public void onEntityUpdatedEvent(EntityUpdatedEvent event) {
-    List<SynapseReactClientEntityQueryKey> queryKey =
-      SynapseReactClientEntityQueryKey.create(
-        QueryKeyConstants.ENTITY,
-        event.getEntityId()
-      );
-    queryClient.resetQueries(queryKey);
+    KeyFactory keyFactory = new KeyFactory(
+      authenticationController.getCurrentUserAccessToken()
+    );
+
+    List<?> queryKey = keyFactory.getEntityQueryKey(event.getEntityId());
+    queryClient.invalidateQueries(queryKey);
     globalAppState.refreshPage();
   }
 
@@ -344,11 +333,10 @@ public class EntityPresenter
   public void onDownloadListUpdatedUpdatedEvent(
     DownloadListUpdatedEvent _event
   ) {
-    List<String> queryKey = Arrays.asList(
-      authenticationController.getCurrentUserAccessToken(),
-      QueryKeyConstants.DOWNLOAD_LIST
+    KeyFactory keyFactory = new KeyFactory(
+      authenticationController.getCurrentUserAccessToken()
     );
-    queryClient.invalidateQueries(queryKey);
+    queryClient.invalidateQueries(keyFactory.getDownloadListBaseQueryKey());
   }
 
   // for testing only
