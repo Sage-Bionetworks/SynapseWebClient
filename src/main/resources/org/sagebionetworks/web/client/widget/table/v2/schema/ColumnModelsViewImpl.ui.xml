@@ -33,7 +33,7 @@
       <t:THead>
         <t:TableRow>
           <t:TableHeader />
-          <t:TableHeader>
+          <t:TableHeader ui:field="columnIdTableHeader">
             <b.html:Text>Column ID</b.html:Text>
           </t:TableHeader>
           <t:TableHeader>

@@ -19,6 +19,7 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.view.bootstrap.ButtonUtils;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
 import org.sagebionetworks.web.client.view.bootstrap.table.Table;
+import org.sagebionetworks.web.client.view.bootstrap.table.TableHeader;
 
 /**
  * A table view of a list of ColumnModels
@@ -76,6 +77,9 @@ public class ColumnModelsViewImpl
 
   @UiField
   Span extraButtonsContainer;
+
+  @UiField
+  TableHeader columnIdTableHeader;
 
   ViewType viewType;
   Presenter presenter;
@@ -192,9 +196,11 @@ public class ColumnModelsViewImpl
     if (ViewType.VIEWER.equals(type)) {
       editColumnsButton.setVisible(isEditable);
       addColumnButton.setVisible(false);
+      columnIdTableHeader.setVisible(true);
     } else {
       editColumnsButton.setVisible(false);
       addColumnButton.setVisible(true);
+      columnIdTableHeader.setVisible(false);
     }
   }
 
