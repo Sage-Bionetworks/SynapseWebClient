@@ -1,16 +1,9 @@
-import { Page, expect } from '@playwright/test'
-import { navigateToHomepageIfPageHasNotBeenLoaded } from './localStorage'
-
-export async function waitForSrcEndpointConfig(page: Page) {
-  // window only available after page has initially loaded
-  await navigateToHomepageIfPageHasNotBeenLoaded(page)
-  // ensure that endpoint config is set,
-  // ...so API calls point to the correct stack
-  await expect(async () => {
-    const response = await page.evaluate('window.SRC.OVERRIDE_ENDPOINT_CONFIG')
-    expect(response).not.toBeUndefined()
-  }).toPass()
-}
+import { Page } from '@playwright/test'
+import {
+  BackendDestinationEnum,
+  doDelete,
+  waitForSrcEndpointConfig,
+} from './http'
 
 export async function getVerificationSubmissionId(
   userId: string,
@@ -37,21 +30,8 @@ export async function deleteVerificationSubmissionById(
   accessToken: string,
   page: Page,
 ) {
-  await waitForSrcEndpointConfig(page)
-  await page.evaluate(
-    async ({ verificationSubmissionId, accessToken }) => {
-      // @ts-expect-error: Cannot find name 'SRC'
-      const endpoint = await SRC.SynapseEnums.BackendDestinationEnum
-        .REPO_ENDPOINT
-      // @ts-expect-error: Cannot find name 'SRC'
-      return await SRC.HttpClient.doDelete(
-        `/repo/v1/verificationSubmission/${verificationSubmissionId}`,
-        accessToken,
-        endpoint,
-      )
-    },
-    { verificationSubmissionId, accessToken },
-  )
+  const url = `/repo/v1/verificationSubmission/${verificationSubmissionId}`
+  await doDelete(page, url, accessToken, BackendDestinationEnum.REPO_ENDPOINT)
 }
 
 export async function deleteVerificationSubmissionIfExists(
