@@ -14,6 +14,7 @@ import java.util.List;
 import org.sagebionetworks.repo.model.*;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.*;
+import org.sagebionetworks.web.client.context.KeyFactoryProvider;
 import org.sagebionetworks.web.client.context.QueryClientProvider;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -51,6 +52,7 @@ public class EntityPresenter
   private SynapseJavascriptClient jsClient;
   private QueryClient queryClient;
   private SynapseClientAsync synapseClient;
+  private KeyFactoryProvider keyFactoryProvider;
 
   @Inject
   public EntityPresenter(
@@ -66,7 +68,8 @@ public class EntityPresenter
     GWTWrapper gwt,
     EventBus eventBus,
     QueryClientProvider queryClientProvider,
-    SynapseClientAsync synapseClient
+    SynapseClientAsync synapseClient,
+    KeyFactoryProvider keyFactoryProvider
   ) {
     this.headerWidget = headerWidget;
     this.entityPageTop = entityPageTop;
@@ -79,6 +82,7 @@ public class EntityPresenter
     this.gwt = gwt;
     this.queryClient = queryClientProvider.getQueryClient();
     this.synapseClient = synapseClient;
+    this.keyFactoryProvider = keyFactoryProvider;
     fixServiceEntryPoint(synapseClient);
     clear();
     entityPresenterEventBinder
@@ -320,7 +324,7 @@ public class EntityPresenter
 
   @EventHandler
   public void onEntityUpdatedEvent(EntityUpdatedEvent event) {
-    KeyFactory keyFactory = new KeyFactory(
+    KeyFactory keyFactory = keyFactoryProvider.getKeyFactory(
       authenticationController.getCurrentUserAccessToken()
     );
 
@@ -333,7 +337,7 @@ public class EntityPresenter
   public void onDownloadListUpdatedUpdatedEvent(
     DownloadListUpdatedEvent _event
   ) {
-    KeyFactory keyFactory = new KeyFactory(
+    KeyFactory keyFactory = keyFactoryProvider.getKeyFactory(
       authenticationController.getCurrentUserAccessToken()
     );
     queryClient.invalidateQueries(keyFactory.getDownloadListBaseQueryKey());

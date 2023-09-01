@@ -18,6 +18,8 @@ import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cache.SessionStorageImpl;
 import org.sagebionetworks.web.client.cache.StorageImpl;
 import org.sagebionetworks.web.client.cache.StorageWrapper;
+import org.sagebionetworks.web.client.context.KeyFactoryProvider;
+import org.sagebionetworks.web.client.context.KeyFactoryProviderImpl;
 import org.sagebionetworks.web.client.context.QueryClientProvider;
 import org.sagebionetworks.web.client.context.QueryClientProviderImpl;
 import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
@@ -1617,5 +1619,7 @@ public class PortalGinModule extends AbstractGinModule {
     bind(FollowingPageView.class)
       .to(FollowingPageViewImpl.class)
       .in(Singleton.class);
+
+    bind(KeyFactoryProvider.class).to(KeyFactoryProviderImpl.class);
   }
 }
