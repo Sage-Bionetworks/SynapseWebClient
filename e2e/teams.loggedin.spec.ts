@@ -88,7 +88,8 @@ test.describe('Teams', () => {
 
       const inviteMessageBox = userPage.getByLabel('Invitation Message')
       await inviteMessageBox.click()
-      await inviteMessageBox.type(INVITATION_MESSAGE)
+      await inviteMessageBox.fill(INVITATION_MESSAGE)
+      await expect(inviteMessageBox).toHaveValue(INVITATION_MESSAGE)
 
       const spinner = userPage.locator('.modal-body > .spinner')
       await userPage.getByRole('button', { name: 'Send Invitation(s)' }).click()
