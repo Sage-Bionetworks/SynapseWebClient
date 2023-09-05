@@ -4,7 +4,7 @@ on: push
 jobs:
   build-and-run-e2e:
     if: ${{ github.ref_name == 'develop' || github.ref_name == 'release-**' || github.actor == github.repository_owner }}
-    runs-on: macos-latest
+    runs-on: ${{ github.repository_owner == 'Sage-Bionetworks' && 'ubuntu-22.04-4core-16GBRAM-150GBSSD' || 'macos-latest' }}
     env:
       CONTAINER_NAME: 'swc-tomcat'
       CI: true
@@ -48,6 +48,7 @@ jobs:
           retention-days: 30
       - name: Stop Tomcat
         if: always()
-        run: |
-          docker stop "${CONTAINER_NAME}"
-          colima stop
+        run: docker stop "${CONTAINER_NAME}"
+      - name: Stop Colima
+        if: runner.os == 'macos'
+        run: colima stop
