@@ -37,8 +37,7 @@ jobs:
         run: yarn playwright install --with-deps chromium
       - name: Run Playwright tests
         env:
-          ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
-          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          ADMIN_PAT: ${{ secrets.ADMIN_PAT }}
         run: yarn playwright test
       - name: Upload Playwright Report
         uses: actions/upload-artifact@v3

@@ -1,6 +1,6 @@
 import { Page } from '@playwright/test'
 
-async function navigateToHomepageIfPageHasNotBeenLoaded(page: Page) {
+export async function navigateToHomepageIfPageHasNotBeenLoaded(page: Page) {
   if (page.url() === 'about:blank') {
     // Navigate to homepage, so that localStorage is available
     await page.goto('/')

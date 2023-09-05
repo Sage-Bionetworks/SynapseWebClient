@@ -2,7 +2,8 @@ import { defineConfig, devices } from '@playwright/test'
 import dotenv from 'dotenv'
 
 export const USER_STORAGE_STATE = 'playwright/.auth/user.json'
-export const ADMIN_STORAGE_STATE = 'playwright/.auth/adminUser.json'
+export const USER_VALIDATED_STORAGE_STATE =
+  'playwright/.auth/userValidated.json'
 
 const baseURL = 'http://127.0.0.1:8888'
 

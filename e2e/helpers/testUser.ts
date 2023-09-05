@@ -1,17 +1,15 @@
 import { Page, expect } from '@playwright/test'
-import { doDelete, doPost, getUserIdFromJwt } from './http'
+import { doDelete, doPost, getEndpoint, getUserIdFromJwt } from './http'
 import { getLocalStorage } from './localStorage'
 import { LoginResponse, TestUser } from './types'
+import { deleteVerificationSubmissionIfExists } from './verification'
 
 const TEST_USER_URI = '/repo/v1/admin/user'
-export const USER_NAME_LOCALSTORAGE_KEY = 'USER_NAME'
 
-export function getAdminUserCredentials() {
-  const adminUserName = process.env.ADMIN_USERNAME
-  const adminUserPassword = process.env.ADMIN_PASSWORD
-  expect(adminUserName).not.toBeUndefined()
-  expect(adminUserPassword).not.toBeUndefined()
-  return { adminUserName, adminUserPassword }
+export function getAdminPAT() {
+  const adminPAT = process.env.ADMIN_PAT!
+  expect(adminPAT).not.toBeUndefined()
+  return adminPAT
 }
 
 export async function createTestUser(
@@ -43,6 +41,16 @@ export async function deleteTestUser(
   const uri = `${TEST_USER_URI}/${testUserId}`
   await doDelete(endpoint, uri, accessToken, adminUserName, adminApiKey)
   return testUserId
+}
+
+export async function cleanupTestUser(testUserId: string, userPage: Page) {
+  await deleteVerificationSubmissionIfExists(
+    testUserId,
+    getAdminPAT(),
+    userPage,
+  )
+  const result = await deleteTestUser(getEndpoint(), testUserId, getAdminPAT())
+  expect(result).toEqual(testUserId)
 }
 
 // Use after initially navigating to baseURL
@@ -105,5 +113,5 @@ export async function getAccessTokenFromCookie(page: Page) {
 export async function getUserIdFromLocalStorage(page: Page) {
   const id = await getLocalStorage(page, 'SESSION_MARKER')
   expect(id).not.toBeNull()
-  return id
+  return id!
 }
