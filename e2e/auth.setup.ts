@@ -12,6 +12,7 @@ import {
   cleanupTestUser,
   createTestUser,
   getAdminPAT,
+  getUserIdFromLocalStorage,
   loginTestUser,
 } from './helpers/testUser'
 import { userConfigs } from './helpers/userConfig'
@@ -47,6 +48,10 @@ for (const {
 
       await setup.step('authenticate test user', async () => {
         await loginTestUser(userPage, user.username, user.password)
+        // ensure that session_marker, i.e. user id, is set before saving state
+        await expect(async () => {
+          await getUserIdFromLocalStorage(userPage)
+        }).toPass()
         await userPage.context().storageState({ path: storageStatePath })
       })
     })
