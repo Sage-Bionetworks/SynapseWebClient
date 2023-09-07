@@ -1,11 +1,5 @@
 import { Page } from '@playwright/test'
-
-export async function navigateToHomepageIfPageHasNotBeenLoaded(page: Page) {
-  if (page.url() === 'about:blank') {
-    // Navigate to homepage, so that localStorage is available
-    await page.goto('/')
-  }
-}
+import { navigateToHomepageIfPageHasNotBeenLoaded } from './utils'
 
 export async function setLocalStorage(page: Page, key: string, value: string) {
   await navigateToHomepageIfPageHasNotBeenLoaded(page)
