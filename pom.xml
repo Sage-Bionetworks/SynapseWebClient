@@ -490,6 +490,10 @@
                   file="${project.basedir}/node_modules/spark-md5/spark-md5.min.js"
                   tofile="src/main/webapp/generated/spark-md5.min.js"
                 />
+                <copy
+                  file="${project.basedir}/node_modules/papaparse/papaparse.min.js"
+                  tofile="src/main/webapp/generated/papaparse.min.js"
+                />
               </target>
             </configuration>
           </execution>
