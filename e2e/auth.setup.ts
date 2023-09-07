@@ -6,7 +6,6 @@
 // - locally: set in .env file, read by dotenv
 
 import { Page, expect, test as setup } from '@playwright/test'
-import { getEndpoint } from './helpers/http'
 import { setLocalStorage } from './helpers/localStorage'
 import {
   cleanupTestUser,
@@ -39,7 +38,7 @@ for (const {
       setup.slow()
 
       await setup.step('create test user', async () => {
-        userId = await createTestUser(getEndpoint(), user, getAdminPAT())
+        userId = await createTestUser(user, getAdminPAT(), userPage)
         expect(userId).not.toBeUndefined()
 
         await setLocalStorage(userPage, localStorageKey, user.username)

@@ -198,6 +198,7 @@ test.describe('Teams', () => {
       TEAM_NAME,
       userAccessToken,
       adminPAT,
+      userPage,
     )
 
     // delete team acceptance: validated user -> user
@@ -205,6 +206,7 @@ test.describe('Teams', () => {
       [userUserId!],
       validatedUserAccessToken,
       adminPAT,
+      validatedUserPage,
     )
 
     // close pages

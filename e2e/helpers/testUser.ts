@@ -1,9 +1,10 @@
 import { Page, expect } from '@playwright/test'
-import { doDelete, doPost, getEndpoint, getUserIdFromJwt } from './http'
+import { BackendDestinationEnum, doDelete, doPost } from './http'
 import { getLocalStorage } from './localStorage'
 import { LoginResponse, TestUser } from './types'
 import { deleteVerificationSubmissionIfExists } from './verification'
 
+const BASE64_ENCODING = 'base64'
 const TEST_USER_URI = '/repo/v1/admin/user'
 
 export function getAdminPAT() {
@@ -12,34 +13,39 @@ export function getAdminPAT() {
   return adminPAT
 }
 
+function getUserIdFromJwt(token: string) {
+  const payload = JSON.parse(
+    Buffer.from(token.split('.')[1], BASE64_ENCODING).toString(),
+  )
+  return payload.sub
+}
+
 export async function createTestUser(
-  endpoint: string,
   testUser: TestUser,
-  accessToken?: string,
-  adminUserName?: string,
-  adminApiKey?: string,
+  accessToken: string,
+  page: Page,
 ) {
-  const content = JSON.stringify(testUser)
   const responseObject = (await doPost(
-    endpoint,
+    page,
     TEST_USER_URI,
-    content,
+    testUser,
     accessToken,
-    adminUserName,
-    adminApiKey,
+    BackendDestinationEnum.REPO_ENDPOINT,
   )) as LoginResponse
   return getUserIdFromJwt(responseObject.accessToken)
 }
 
 export async function deleteTestUser(
-  endpoint: string,
   testUserId: string,
-  accessToken?: string,
-  adminUserName?: string,
-  adminApiKey?: string,
+  accessToken: string,
+  page: Page,
 ) {
-  const uri = `${TEST_USER_URI}/${testUserId}`
-  await doDelete(endpoint, uri, accessToken, adminUserName, adminApiKey)
+  await doDelete(
+    page,
+    `${TEST_USER_URI}/${testUserId}`,
+    accessToken,
+    BackendDestinationEnum.REPO_ENDPOINT,
+  )
   return testUserId
 }
 
@@ -49,7 +55,7 @@ export async function cleanupTestUser(testUserId: string, userPage: Page) {
     getAdminPAT(),
     userPage,
   )
-  const result = await deleteTestUser(getEndpoint(), testUserId, getAdminPAT())
+  const result = await deleteTestUser(testUserId, getAdminPAT(), userPage)
   expect(result).toEqual(testUserId)
 }
 

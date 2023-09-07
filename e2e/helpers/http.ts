@@ -1,141 +1,107 @@
-import { createHmac } from 'crypto'
-import { fetchWithExponentialTimeout } from './srcFetch'
+import { Page, expect } from '@playwright/test'
+import { navigateToHomepageIfPageHasNotBeenLoaded } from './localStorage'
 
-export const BASE64_ENCODING = 'base64'
-export const DEFAULT_GETDELETE_HEADERS = {
-  Accept: '*/*',
-  'User-Agent': 'SynapseWebClient',
-}
-export const DEFAULT_POST_HEADERS = {
-  ...DEFAULT_GETDELETE_HEADERS,
-  Accept: 'application/json; charset=UTF-8',
-  'Content-Type': 'application/json; charset=UTF-8',
+export enum BackendDestinationEnum {
+  REPO_ENDPOINT,
+  PORTAL_ENDPOINT,
 }
 
-function generateDigitalSignature(
-  data: string,
-  base64EncodedSecretKey: string,
-) {
-  const hash = createHmac(
-    'sha1',
-    Buffer.from(base64EncodedSecretKey, BASE64_ENCODING),
-  )
-    .update(data)
-    .digest(BASE64_ENCODING)
-  return hash
-}
-
-function getDigitalSignature(
-  uri: string,
-  username: string,
-  base64EncodedSecretKey: string,
-) {
-  const timestamp = new Date().toISOString()
-  const signature = generateDigitalSignature(
-    `${username}${uri}${timestamp}`,
-    base64EncodedSecretKey,
-  )
-  return {
-    userId: username,
-    signatureTimestamp: timestamp,
-    signature: signature,
-  }
-}
-
-export function getUserIdFromJwt(token: string) {
-  const payload = JSON.parse(
-    Buffer.from(token.split('.')[1], BASE64_ENCODING).toString(),
-  )
-  return payload.sub
-}
-
-function updateHeaders(
-  headers: { [key: string]: string },
-  uri: string,
-  accessToken?: string,
-  userName?: string,
-  apiKey?: string,
-) {
-  return {
-    ...headers,
-    ...(accessToken && {
-      'Access-Control-Request-Headers': 'authorization',
-      Authorization: `Bearer ${accessToken}`,
-    }),
-    ...(apiKey && userName && getDigitalSignature(uri, userName, apiKey)),
-  }
+export async function waitForSrcEndpointConfig(page: Page) {
+  // window only available after page has initially loaded
+  await navigateToHomepageIfPageHasNotBeenLoaded(page)
+  // ensure that endpoint config is set,
+  // ...so API calls point to the correct stack
+  await expect(async () => {
+    const response = await page.evaluate('window.SRC.OVERRIDE_ENDPOINT_CONFIG')
+    expect(response).not.toBeUndefined()
+  }).toPass()
 }
 
 export async function doPost<T>(
-  endpoint: string,
-  uri: string,
-  requestContent: string,
-  accessToken?: string,
-  userName?: string,
-  apiKey?: string,
+  page: Page,
+  url: string,
+  requestJsonObject: unknown,
+  accessToken: string | undefined,
+  endpoint: BackendDestinationEnum,
+  additionalOptions: RequestInit = {},
 ) {
-  const url: RequestInfo = `${endpoint}${uri}`
-  const options: RequestInit = {
-    body: requestContent,
-    headers: updateHeaders(
-      DEFAULT_POST_HEADERS,
-      uri,
+  await waitForSrcEndpointConfig(page)
+  const response = await page.evaluate(
+    async ({
+      url,
+      requestJsonObject,
       accessToken,
-      userName,
-      apiKey,
-    ),
-    method: 'POST',
-    mode: 'cors',
-  }
-  return await fetchWithExponentialTimeout(url, options)
+      endpoint,
+      additionalOptions,
+    }) => {
+      // @ts-expect-error: Cannot find name 'SRC'
+      const srcEndpoint = await SRC.SynapseEnums.BackendDestinationEnum[
+        endpoint
+      ]
+      // @ts-expect-error: Cannot find name 'SRC'
+      return await SRC.HttpClient.doPost(
+        url,
+        requestJsonObject,
+        accessToken,
+        srcEndpoint,
+        additionalOptions,
+      )
+    },
+    { url, requestJsonObject, accessToken, endpoint, additionalOptions },
+  )
+  return response
 }
 
 export async function doGet<T>(
-  endpoint: string,
-  uri: string,
-  accessToken?: string,
-  userName?: string,
-  apiKey?: string,
+  page: Page,
+  url: string,
+  accessToken: string | undefined,
+  endpoint: BackendDestinationEnum,
+  additionalOptions: RequestInit = {},
 ) {
-  const url: RequestInfo = `${endpoint}${uri}`
-  const options: RequestInit = {
-    body: null,
-    headers: updateHeaders(
-      DEFAULT_GETDELETE_HEADERS,
-      uri,
-      accessToken,
-      userName,
-      apiKey,
-    ),
-    method: 'GET',
-    mode: 'cors',
-  }
-  return await fetchWithExponentialTimeout(url, options)
+  await waitForSrcEndpointConfig(page)
+  const response = await page.evaluate(
+    async ({ url, accessToken, endpoint, additionalOptions }) => {
+      // @ts-expect-error: Cannot find name 'SRC'
+      const srcEndpoint = await SRC.SynapseEnums.BackendDestinationEnum[
+        endpoint
+      ]
+      // @ts-expect-error: Cannot find name 'SRC'
+      return await SRC.HttpClient.doGet(
+        url,
+        accessToken,
+        srcEndpoint,
+        additionalOptions,
+      )
+    },
+    { url, accessToken, endpoint, additionalOptions },
+  )
+  return response
 }
 
 export async function doDelete<T>(
-  endpoint: string,
-  uri: string,
-  accessToken?: string,
-  userName?: string,
-  apiKey?: string,
+  page: Page,
+  url: string,
+  accessToken: string | undefined,
+  endpoint: BackendDestinationEnum,
+  additionalOptions: RequestInit = {},
 ) {
-  const url: RequestInfo = `${endpoint}${uri}`
-  const options: RequestInit = {
-    body: null,
-    headers: updateHeaders(
-      DEFAULT_GETDELETE_HEADERS,
-      uri,
-      accessToken,
-      userName,
-      apiKey,
-    ),
-    method: 'DELETE',
-    mode: 'cors',
-  }
-  return await fetchWithExponentialTimeout(url, options)
-}
-
-export function getEndpoint() {
-  return 'https://repo-dev.dev.sagebase.org'
+  await waitForSrcEndpointConfig(page)
+  const response = await page.evaluate(
+    async ({ url, accessToken, endpoint, additionalOptions }) => {
+      // @ts-expect-error: Cannot find name 'SRC'
+      const srcEndpoint = await SRC.SynapseEnums.BackendDestinationEnum[
+        endpoint
+      ]
+      // @ts-expect-error: Cannot find name 'SRC'
+      return await SRC.HttpClient.doDelete(
+        url,
+        accessToken,
+        srcEndpoint,
+        additionalOptions,
+      )
+    },
+    { url, accessToken, endpoint, additionalOptions },
+  )
+  return response
 }
