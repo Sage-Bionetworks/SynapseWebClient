@@ -75,6 +75,11 @@ export async function loginTestUser(
   await page.getByLabel('Password').fill(testUserPassword)
   await page.getByRole('button', { name: 'Sign in' }).click()
 
+  // Wait for redirect
+  await expect(async () => {
+    expect(page.url()).not.toContain('LoginPlace')
+  }).toPass()
+
   // Wait until the page reaches a state where all cookies are set
   await expect(page.getByLabel('Search')).toBeVisible()
   await expect(page.getByLabel('Projects')).toBeVisible()
