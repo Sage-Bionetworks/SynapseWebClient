@@ -321,7 +321,7 @@ public class MultipartUploaderTest {
         anyBoolean(),
         any(AsyncCallback.class)
       );
-    verify(mockHandler).uploadFailed(EMPTY_FILE_ERROR_MESSAGE + FILE_NAME);
+    verify(mockHandler).uploadSuccess(null);
   }
 
   @Test
@@ -341,9 +341,8 @@ public class MultipartUploaderTest {
         anyBoolean(),
         any(AsyncCallback.class)
       );
-    ArgumentCaptor<BatchPresignedUploadUrlRequest> captor = ArgumentCaptor.forClass(
-      BatchPresignedUploadUrlRequest.class
-    );
+    ArgumentCaptor<BatchPresignedUploadUrlRequest> captor =
+      ArgumentCaptor.forClass(BatchPresignedUploadUrlRequest.class);
     verify(mockJsClient)
       .getMultipartPresignedUrlBatch(
         captor.capture(),
