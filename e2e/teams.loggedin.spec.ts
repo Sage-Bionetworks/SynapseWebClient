@@ -65,7 +65,10 @@ test.describe('Teams', () => {
       ).toBeVisible()
 
       await userPage.getByRole('button', { name: 'Create a New Team' }).click()
-      await userPage.getByRole('textbox').nth(1).fill(TEAM_NAME)
+      const teamNameInput = userPage.getByRole('textbox').nth(1)
+      await teamNameInput.fill(TEAM_NAME)
+      await expect(teamNameInput).toHaveValue(TEAM_NAME)
+
       await userPage.getByRole('button', { name: 'OK' }).click()
       await expect(
         userPage.getByText(`Team Created: ${TEAM_NAME}`),

@@ -8,7 +8,11 @@ const PROJECT_NAME = 'swc-e2e-project-' + uuidv4()
 async function createProject(page: Page, projectName: string) {
   await page.getByLabel('Projects', { exact: true }).click()
   await page.getByLabel('Create a New Project').click()
-  await page.getByLabel('Project Name').type(projectName)
+
+  const projectNameInput = page.getByLabel('Project Name')
+  await projectNameInput.fill(projectName)
+  await expect(projectNameInput).toHaveValue(projectName)
+
   await page.getByRole('button', { name: 'Save' }).click()
 }
 
