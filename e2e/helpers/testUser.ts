@@ -71,9 +71,25 @@ export async function loginTestUser(
 
   await page.getByRole('link', { name: 'Log in to Synapse' }).first().click()
   await page.getByRole('button', { name: 'Sign in with your email' }).click()
-  await page.getByLabel('Username or Email Address').fill(testUserName)
-  await page.getByLabel('Password').fill(testUserPassword)
+
+  const usernameInput = page.getByLabel('Username or Email Address')
+  await usernameInput.fill(testUserName)
+  await expect(usernameInput).toHaveValue(testUserName)
+
+  const passwordInput = page.getByLabel('Password')
+  await expect(passwordInput).toBeEmpty()
+  await passwordInput.fill(testUserPassword)
+  await expect(passwordInput).not.toBeEmpty()
+
   await page.getByRole('button', { name: 'Sign in' }).click()
+
+  // Ensure that correct username/password were received
+  const loadingButton = page.getByRole('button', { name: 'Logging you in' })
+  await expect(loadingButton).toBeVisible()
+  await expect(loadingButton).not.toBeVisible()
+  await expect(
+    page.getByText('The provided username/password combination is incorrect'),
+  ).not.toBeVisible()
 
   // Wait for redirect
   await expect(async () => {
