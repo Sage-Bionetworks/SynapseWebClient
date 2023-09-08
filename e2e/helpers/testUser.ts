@@ -2,6 +2,7 @@ import { Page, expect } from '@playwright/test'
 import { BackendDestinationEnum, doDelete, doPost } from './http'
 import { getLocalStorage } from './localStorage'
 import { LoginResponse, TestUser } from './types'
+import { waitForInitialPageLoad } from './utils'
 import { deleteVerificationSubmissionIfExists } from './verification'
 
 const BASE64_ENCODING = 'base64'
@@ -59,14 +60,6 @@ export async function cleanupTestUser(testUserId: string, userPage: Page) {
   expect(result).toEqual(testUserId)
 }
 
-// Use after initially navigating to baseURL
-// ...to give SWC time to compile, if necessary
-export async function waitForInitialPageLoad(page: Page) {
-  await expect(page.getByRole('heading', { name: 'Loading…' })).not.toBeVisible(
-    { timeout: 2 * 60 * 1000 }, // ...wait 2 minutes if necessary
-  )
-}
-
 export async function loginTestUser(
   page: Page,
   testUserName: string,
@@ -82,6 +75,11 @@ export async function loginTestUser(
   await page.getByLabel('Password').fill(testUserPassword)
   await page.getByRole('button', { name: 'Sign in' }).click()
 
+  // Wait for redirect
+  await expect(async () => {
+    expect(page.url()).not.toContain('LoginPlace')
+  }).toPass()
+
   // Wait until the page reaches a state where all cookies are set
   await expect(page.getByLabel('Search')).toBeVisible()
   await expect(page.getByLabel('Projects')).toBeVisible()
@@ -92,6 +90,7 @@ export async function loginTestUser(
 
 export async function goToDashboard(page: Page) {
   await page.goto('/')
+  await waitForInitialPageLoad(page)
   await page.getByRole('link', { name: 'View Your Dashboard' }).first().click()
 
   // wait for page to load

@@ -15,6 +15,7 @@ import {
   loginTestUser,
 } from './helpers/testUser'
 import { userConfigs } from './helpers/userConfig'
+import { waitForInitialPageLoad } from './helpers/utils'
 
 for (const {
   testName,
@@ -28,6 +29,8 @@ for (const {
   setup.describe(`Setup: ${testName}`, () => {
     setup.beforeAll(async ({ browser }) => {
       userPage = await browser.newPage()
+      await userPage.goto('/')
+      await waitForInitialPageLoad(userPage)
     })
 
     setup('create and authenticate user', async () => {

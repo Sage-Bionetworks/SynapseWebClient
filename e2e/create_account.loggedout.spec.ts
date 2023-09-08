@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { waitForInitialPageLoad } from './helpers/testUser'
+import { waitForInitialPageLoad } from './helpers/utils'
 
 test.describe('Create Account', () => {
   test('should show an alert when an invalid email address is used', async ({

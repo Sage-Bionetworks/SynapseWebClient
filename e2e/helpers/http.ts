@@ -1,5 +1,5 @@
 import { Page, expect } from '@playwright/test'
-import { navigateToHomepageIfPageHasNotBeenLoaded } from './localStorage'
+import { navigateToHomepageIfPageHasNotBeenLoaded } from './utils'
 
 export enum BackendDestinationEnum {
   REPO_ENDPOINT,
