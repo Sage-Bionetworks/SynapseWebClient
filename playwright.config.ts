@@ -21,7 +21,7 @@ dotenv.config()
 export default defineConfig({
   testDir: './e2e',
   /* Timeout to allow portal enough time to compile when running locally */
-  timeout: 5 * 60 * 1000,
+  timeout: 2 * 60 * 1000,
   /* Increase expectation timeout on CI */
   expect: { timeout: process.env.CI ? 30 * 1000 : 5 * 1000 },
   /* Run tests in files in parallel */

@@ -34,12 +34,6 @@ for (const {
     })
 
     setup('create and authenticate user', async () => {
-      // This may be the first test to run and trigger SWC compilation
-      // ...which may take 15+ seconds. Mark this test as slow,
-      // ...so the test will be given triple timeout.
-      // https://playwright.dev/docs/api/class-test#test-slow-1
-      setup.slow()
-
       await setup.step('create test user', async () => {
         userId = await createTestUser(user, getAdminPAT(), userPage)
         expect(userId).not.toBeUndefined()
