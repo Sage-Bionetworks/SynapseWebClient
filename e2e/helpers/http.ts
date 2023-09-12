@@ -1,20 +1,9 @@
-import { Page, expect } from '@playwright/test'
-import { navigateToHomepageIfPageHasNotBeenLoaded } from './utils'
+import { Page } from '@playwright/test'
+import { waitForSrcEndpointConfig } from './utils'
 
 export enum BackendDestinationEnum {
   REPO_ENDPOINT,
   PORTAL_ENDPOINT,
-}
-
-export async function waitForSrcEndpointConfig(page: Page) {
-  // window only available after page has initially loaded
-  await navigateToHomepageIfPageHasNotBeenLoaded(page)
-  // ensure that endpoint config is set,
-  // ...so API calls point to the correct stack
-  await expect(async () => {
-    const response = await page.evaluate('window.SRC.OVERRIDE_ENDPOINT_CONFIG')
-    expect(response).not.toBeUndefined()
-  }).toPass()
 }
 
 export async function doPost<T>(

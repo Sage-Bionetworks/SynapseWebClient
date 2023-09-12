@@ -51,32 +51,18 @@ export default defineConfig({
   projects: [
     // Setup project
     { name: 'setup', testMatch: /.*\.setup\.ts/, teardown: 'cleanup' },
-
-    // Tests that don't require authentication
     {
-      name: 'chromium - logged out',
+      name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
       },
-      testMatch: /.*\.loggedout\.spec.ts/,
-    },
-
-    // Tests that require authentication
-    {
-      name: 'chromium - logged in',
-      use: {
-        ...devices['Desktop Chrome'],
-        // Use prepared auth state.
-        storageState: USER_STORAGE_STATE,
-      },
-      testMatch: /.*\.loggedin\.spec.ts/,
+      testMatch: /.*\.spec.ts/,
       dependencies: ['setup'],
     },
 
     // Clean up project
     {
       name: 'cleanup',
-      use: { storageState: USER_STORAGE_STATE },
       testMatch: /.*\.cleanup\.ts/,
     },
 

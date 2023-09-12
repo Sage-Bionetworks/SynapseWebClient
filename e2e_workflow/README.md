@@ -56,6 +56,7 @@ Multiple debug variables can be passed via a comma separated list, e.g. `DEBUG="
 - Not awaiting an auto-retrying expectation, such as `toBeVisible()` -- these assertions will retry until the assertion passes or the timeout is reached. However, they are async, so must be awaited. See full list [here](https://playwright.dev/docs/test-assertions#auto-retrying-assertions).
 - Not awaiting elements in the order in which they appear on the page -- network requests may be slower on CI than locally. By awaiting each element as it appears, the subsequent elements are given time to appear and can help avoid timing problems which cause tests to be flaky.
 - Not accounting for timing issues when awaiting short-lived elements -- for example, after a user clicks on a button, a loader may appear while waiting for some work to finish, then disappear when the work is done. The test may expect the loader to appear and disappear. However, depending on how quickly the work finishes, the loader may appear and disappear before Playwright has checked for its existence. Use `Promise.all` to ensure that the check for the element is fired before the button is clicked and the loader's appearance isn't missed. See more discussion [here](https://github.com/microsoft/playwright/issues/5470#issuecomment-1285640689) and an illustrated example [here](https://tally-b.medium.com/the-illustrated-guide-to-using-promise-all-in-playwright-tests-af7a98af3f32).
+- Not ensuring that values entered into input fields are set in state before submitting a form -- Playwright acts as a very fast user and tests may be faster in CI than locally. If a form is submitted before an input value has been set in state, then the form will be submitted without a value for that input. After entering a value in an input, check that the input has the correct value (`await expect(input).toHaveValue('expectedValue')`) before submitting the form (`await submitButton.click()`).
 
 ### Troubleshooting Flaky Tests in CI
 
@@ -97,7 +98,7 @@ await cdpSession.send('Emulation.setCPUThrottlingRate', { rate: 3 })
 
 #### Hardware Resources
 
-A developer's local machine may have more powerful hardware resources compared to GitHub Actions workflow runners. If a VM is overbooked, tests may fail.
+A developer's local machine may have more powerful hardware resources compared to GitHub Actions workflow runners. If a VM is overbooked, tests may fail. Alternately, the remote machine may be more powerful than the local machine.
 
 Check whether resources are consumed that don't need to be:
 
@@ -105,6 +106,16 @@ Check whether resources are consumed that don't need to be:
 - Is a new page or a new browser instance opened manually, but not closed when the test finishes? Playwright will handle opening/closing the initial browser instance and the page provided for each test, but manually allocated resources must be cleaned up by the user. Otherwise, they will consume resources for the duration of the test suite. For example, a page opened with `const page = await browser.newPage()` must be closed with `await page.close()`. Similarly, a browser instance launched with `const browser = await chromium.launch()` must be closed with `await browser.close()`.
 
 Check whether increasing the VM size resolves the flakiness, by changing the runner in the GitHub Action workflow. See standard GitHub runner hardware resources [here](https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources) and larger runners [here](https://docs.github.com/en/actions/using-github-hosted-runners/about-larger-runners#machine-specs-for-larger-runners).
+
+If CI is faster than the local machine, look for race conditions. For example, a value is entered into a form input, then a button is clicked to submit the form. If the machine is very fast, the form may be submitted before the input value is set in state, which can result in sending an empty value for that input. To resolve, ensure that input values are set before submitting a form:
+
+```TypeScript
+const inputValue = 'test'
+const input = page.getByLabel('Input Name')
+await input.fill(inputValue)
+await expect(input).toHaveValue(inputValue)
+await page.getByRole('button', { name: 'submit' }).click()
+```
 
 #### Saving Traces
 
