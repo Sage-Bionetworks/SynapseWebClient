@@ -1,7 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { v4 as uuidv4 } from 'uuid'
 import { testAuth } from './fixtures/authenticatedUserPages'
-import { getLocalStorage } from './helpers/localStorage'
 import {
   deleteTeamInvitationMessage,
   deleteTeamInviteAcceptanceMessage,
@@ -13,8 +12,9 @@ import {
   goToDashboard,
 } from './helpers/testUser'
 import {
-  USER_NAME_LOCALSTORAGE_KEY,
-  USER_VALIDATED_NAME_LOCALSTORAGE_KEY,
+  userConfigs,
+  userPrefix,
+  userValidatedPrefix,
 } from './helpers/userConfig'
 
 const TEAM_NAME = 'swc-e2e-team-' + uuidv4()
@@ -29,26 +29,12 @@ test.describe('Teams', () => {
   testAuth(
     'should exercise team lifecycle',
     async ({ userPage, validatedUserPage }, testInfo) => {
-      const userName = await testAuth.step('should get user name', async () => {
-        const userName = await getLocalStorage(
-          userPage,
-          USER_NAME_LOCALSTORAGE_KEY,
-        )
-        expect(userName).not.toBeNull()
-
-        return userName!
-      })
-
-      const validatedUserName = await testAuth.step(
-        'should get validated user name',
+      const { userName, validatedUserName } = await testAuth.step(
+        'should get user names',
         async () => {
-          const validatedUserName = await getLocalStorage(
-            validatedUserPage,
-            USER_VALIDATED_NAME_LOCALSTORAGE_KEY,
-          )
-          expect(validatedUserName).not.toBeNull()
-
-          return validatedUserName!
+          const userName = userConfigs[userPrefix].username
+          const validatedUserName = userConfigs[userValidatedPrefix].username
+          return { userName, validatedUserName }
         },
       )
 
@@ -201,13 +187,13 @@ test.describe('Teams', () => {
 
     const userUserId = await getUserIdFromLocalStorage(userPage)
     const userAccessToken = await getAccessTokenFromCookie(userPage)
-    const userName = await getLocalStorage(userPage, USER_NAME_LOCALSTORAGE_KEY)
+    const userName = userConfigs[userPrefix].username
     expect(userName).not.toBeNull()
 
     // delete team invitation: user -> validated user
     await deleteTeamInvitationMessage(
       [validatedUserId],
-      userName!,
+      userName,
       TEAM_NAME,
       userAccessToken,
       adminPAT,

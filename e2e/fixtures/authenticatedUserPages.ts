@@ -1,7 +1,6 @@
 import { test as base, Browser, expect, type Page } from '@playwright/test'
 import { unlinkSync } from 'fs'
 import { baseURL } from '../../playwright.config'
-import { setLocalStorage } from '../helpers/localStorage'
 import {
   cleanupTestUser,
   createTestUser,
@@ -13,6 +12,7 @@ import {
   storageStateDir,
   userConfigs,
   userPrefix,
+  UserPrefixes,
   userValidatedPrefix,
 } from '../helpers/userConfig'
 import { waitForInitialPageLoad } from '../helpers/utils'
@@ -22,7 +22,7 @@ type AuthenticatedUserPageTestFixtures = {
   validatedUserPage: Page
 }
 
-type StorageStatePaths = { [key: string]: string }
+type StorageStatePaths = { [key in UserPrefixes]?: string }
 type AuthenticatedUserPageWorkerFixtures = {
   createUsers: void
   storageStatePaths: StorageStatePaths
@@ -39,7 +39,7 @@ const createPage = async (browser: Browser) => {
 
 // Generate test fixture for a specified user
 // ...based on: https://github.com/microsoft/playwright/issues/14570
-function createUserPageFixture<Page>(userPrefix: string) {
+function createUserPageFixture<Page>(userPrefix: UserPrefixes) {
   return async (
     { browser, storageStatePaths },
     use: (r: Page) => Promise<void>,
@@ -67,7 +67,7 @@ export const testAuth = base.extend<
         return await createPage(browser)
       })
 
-      for (const { user } of userConfigs) {
+      for (const user of Object.values(userConfigs)) {
         await base.step(`create test user - ${user.username}`, async () => {
           const userId = await createTestUser(user, getAdminPAT(), page)
           expect(userId).not.toBeUndefined()
@@ -99,7 +99,7 @@ export const testAuth = base.extend<
     async ({ browser, browserName, createUsers }, use) => {
       let storageStatePaths: StorageStatePaths = {}
 
-      for (const { userPrefix, localStorageKey, user } of userConfigs) {
+      for (const [userPrefix, user] of Object.entries(userConfigs)) {
         const userPage = await base.step(
           `create page: ${user.username}`,
           async () => {
@@ -109,13 +109,14 @@ export const testAuth = base.extend<
 
         await base.step(`authenticate: ${user.username}`, async () => {
           await loginTestUser(userPage, user.username, user.password)
-          await setLocalStorage(userPage, localStorageKey, user.username)
 
           // ensure that session_marker, i.e. user id, is set before saving state
           await expect(async () => {
             await getUserIdFromLocalStorage(userPage)
           }).toPass()
+        })
 
+        await base.step(`save storageState: ${user.username}`, async () => {
           const storageStateFileName = `${browserName}_${process.env.TEST_PARALLEL_INDEX}_${user.username}.json`
           const storageStatePath = `${storageStateDir}/${storageStateFileName}`
           await userPage.context().storageState({ path: storageStatePath })

@@ -4,10 +4,9 @@ import { TestUser } from './types'
 export const storageStateDir = 'playwright/.auth/'
 
 export const userPrefix = 'swc-e2e-user'
-export const USER_NAME_LOCALSTORAGE_KEY = 'USER_NAME'
-
 export const userValidatedPrefix = 'swc-e2e-user-validated'
-export const USER_VALIDATED_NAME_LOCALSTORAGE_KEY = 'USER_VALIDATED_NAME'
+const userPrefixes = [userPrefix, userValidatedPrefix] as const
+export type UserPrefixes = (typeof userPrefixes)[number]
 
 const generateUserName = (prefix: string) => {
   // uncomment to use static username for troubleshooting:
@@ -28,32 +27,22 @@ const generateUserEmail = (prefix: string) => {
 }
 
 type UserConfig = {
-  userPrefix: string
-  localStorageKey: string
-  user: TestUser
+  [key in UserPrefixes]: TestUser
 }
 
-export const userConfigs: UserConfig[] = [
-  {
-    userPrefix: userPrefix,
-    localStorageKey: USER_NAME_LOCALSTORAGE_KEY,
-    user: {
-      username: generateUserName(userPrefix),
-      email: generateUserEmail(userPrefix),
-      password: generateUserPassword(),
-      tou: true,
-      validatedUser: false,
-    },
+export const userConfigs: UserConfig = {
+  [userPrefix]: {
+    username: generateUserName(userPrefix),
+    email: generateUserEmail(userPrefix),
+    password: generateUserPassword(),
+    tou: true,
+    validatedUser: false,
   },
-  {
-    userPrefix: userValidatedPrefix,
-    localStorageKey: USER_VALIDATED_NAME_LOCALSTORAGE_KEY,
-    user: {
-      username: generateUserName(userValidatedPrefix),
-      email: generateUserEmail(userValidatedPrefix),
-      password: generateUserPassword(),
-      tou: true,
-      validatedUser: true,
-    },
+  [userValidatedPrefix]: {
+    username: generateUserName(userValidatedPrefix),
+    email: generateUserEmail(userValidatedPrefix),
+    password: generateUserPassword(),
+    tou: true,
+    validatedUser: true,
   },
-]
+}
