@@ -19,16 +19,16 @@ test.describe('Homepage', () => {
 
   testAuth(
     'should show View Your Dashboard button when logged in',
-    async ({ page }) => {
-      await page.goto('/')
-      await waitForInitialPageLoad(page)
+    async ({ userPage }) => {
+      await userPage.goto('/')
+      await waitForInitialPageLoad(userPage)
 
       await expect(
-        page.getByRole('link', { name: 'Log in to Synapse' }),
-      ).toHaveCount(2)
-      await expect(
-        page.getByRole('link', { name: 'View Your Dashboard' }),
+        userPage.getByRole('link', { name: 'Log in to Synapse' }),
       ).toHaveCount(0)
+      await expect(
+        userPage.getByRole('link', { name: 'View Your Dashboard' }),
+      ).toHaveCount(2)
     },
   )
 })

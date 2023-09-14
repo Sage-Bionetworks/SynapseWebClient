@@ -1,11 +1,7 @@
 import { defineConfig, devices } from '@playwright/test'
 import dotenv from 'dotenv'
 
-export const USER_STORAGE_STATE = 'playwright/.auth/user.json'
-export const USER_VALIDATED_STORAGE_STATE =
-  'playwright/.auth/userValidated.json'
-
-const baseURL = 'http://127.0.0.1:8888'
+export const baseURL = 'http://127.0.0.1:8888'
 
 /**
  * Read environment variables from file.
@@ -49,21 +45,10 @@ export default defineConfig({
 
   /* Configure projects for major browsers */
   projects: [
-    // Setup project
-    { name: 'setup', testMatch: /.*\.setup\.ts/, teardown: 'cleanup' },
     {
       name: 'chromium',
-      use: {
-        ...devices['Desktop Chrome'],
-      },
+      use: { ...devices['Desktop Chrome'] },
       testMatch: /.*\.spec.ts/,
-      dependencies: ['setup'],
-    },
-
-    // Clean up project
-    {
-      name: 'cleanup',
-      testMatch: /.*\.cleanup\.ts/,
     },
 
     /* {

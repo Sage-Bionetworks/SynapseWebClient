@@ -20,6 +20,11 @@ import {
 const TEAM_NAME = 'swc-e2e-team-' + uuidv4()
 const INVITATION_MESSAGE = 'swc-e2e-invite'
 
+// Run multiple describes in parallel, but run tests inside each describe in order
+// ...tests within describe expect afterAll to be run with the same users, i.e. on the same worker
+// https://playwright.dev/docs/api/class-test#test-describe-configure
+test.describe.configure({ mode: 'serial' })
+
 test.describe('Teams', () => {
   testAuth(
     'should exercise team lifecycle',

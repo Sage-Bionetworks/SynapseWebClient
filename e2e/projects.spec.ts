@@ -16,6 +16,11 @@ async function createProject(page: Page, projectName: string) {
   await page.getByRole('button', { name: 'Save' }).click()
 }
 
+// Run multiple describes in parallel, but run tests inside each describe in order
+// ...tests within describe expect afterAll to be run with the same users, i.e. on the same worker
+// https://playwright.dev/docs/api/class-test#test-describe-configure
+test.describe.configure({ mode: 'serial' })
+
 test.describe('Projects', () => {
   testAuth('should create a project', async ({ userPage }) => {
     await testAuth.step(
