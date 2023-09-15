@@ -24,8 +24,9 @@
     "papaparse": "^5.4.1"
   },
   "devDependencies": {
-    "@playwright/test": "1.37.0",
+    "@playwright/test": "1.38.0",
     "@prettier/plugin-xml": "^3.1.0",
+    "@types/node": "^20.6.0",
     "dotenv": "^16.3.1",
     "husky": ">=6",
     "lint-staged": ">=10",

@@ -69,7 +69,7 @@ test.describe('Teams', () => {
 
           await userPage
             .getByRole('textbox', { name: 'Enter a name or email address...' })
-            .type(validatedUserName)
+            .pressSequentially(validatedUserName)
           await userPage
             .getByRole('menuitem', { name: `@${validatedUserName}` })
             .click()
