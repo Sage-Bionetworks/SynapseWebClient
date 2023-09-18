@@ -32,11 +32,13 @@ See more about [test isolation in Playwright](https://playwright.dev/docs/browse
 
 Since all tests are run against the backend dev stack, concurrent test runs are not fully isolated from one another -- all test runs write to the same server. Tests can produce side effects that persist on the dev stack. If those side effects aren't cleaned up, the same test may fail on subsequent runs.
 
-To prevent conflicting changes, each test run creates (and deletes) a unique dev stack user, so that user-namespaced entities will not conflict. For example, consider a test where a user creates a new Table named "My Table". Even if two developers run the test suite at the same time, the table will still be created, because the table name will be unique in the context of the user created for that run.
+To prevent conflicting changes, each test run creates (and deletes) a unique dev stack user\*, so that user-namespaced entities will not conflict. For example, consider a test where a user creates a new Table named "My Table". Even if two developers run the test suite at the same time, the table will still be created, because the table name will be unique in the context of the user created for that run.
 
 However, entities that are not user-namespaced must be created with care. For example, Projects must have names that are unique across Synapse. So, consider a test that creates a new project named "My Project". If two developers run the test at the same time, one of the tests will fail, because the project name will not be unique. Therefore, when creating entities that are not user-namespaced, entity names should include a unique key, e.g. `${uuidv4()} New Project`. Other entities that aren't user-namespaced are users and teams.
 
 To prevent cluttering the backend dev stack with old test run objects, tests should clean up after themselves. So, if a new Project is created, the test suite should delete the project after all tests utilizing that Project have run.
+
+\*Note: to allow tests to be run in parallel within a run, worker fixtures create test users that are also unique per worker and browser name.
 
 ## Debugging
 

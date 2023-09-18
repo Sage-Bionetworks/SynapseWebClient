@@ -54,6 +54,13 @@ test.describe('Projects', () => {
 
     await userPage.getByRole('button', { name: 'Created by me' }).click()
     await userPage.getByRole('link', { name: PROJECT_NAME }).click()
+
+    await expect(
+      userPage.getByRole('heading', { name: PROJECT_NAME }),
+    ).toBeVisible()
+    await expect(
+      userPage.getByRole('button', { name: 'Delete Wiki Page' }),
+    ).toBeVisible()
     await userPage.getByRole('button', { name: 'Project Tools' }).click()
     await userPage.getByRole('menuitem', { name: 'Delete Project' }).click()
 
