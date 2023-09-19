@@ -1,19 +1,17 @@
 import { v4 as uuidv4 } from 'uuid'
-import {
-  USER_STORAGE_STATE,
-  USER_VALIDATED_STORAGE_STATE,
-} from '../../playwright.config'
 import { TestUser } from './types'
 
-const userNamePrefix = 'swc-e2e-user'
-export const USER_NAME_LOCALSTORAGE_KEY = 'USER_NAME'
+export const storageStateDir = 'playwright/.auth/'
 
-const userValidatedPrefix = 'swc-e2e-user-validated'
-export const USER_VALIDATED_NAME_LOCALSTORAGE_KEY = 'USER_VALIDATED_NAME'
+export const userPrefix = 'swc-e2e-user'
+export const userValidatedPrefix = 'swc-e2e-user-validated'
+const userPrefixes = [userPrefix, userValidatedPrefix] as const
+export type UserPrefixes = (typeof userPrefixes)[number]
 
 const generateUserName = (prefix: string) => {
   // uncomment to use static username for troubleshooting:
-  // return prefix
+  // ...and ensure that usernames are unique per worker
+  // return `${prefix}-${process.env.TEST_PARALLEL_INDEX}`
 
   return `${prefix}-${uuidv4()}`
 }
@@ -29,37 +27,22 @@ const generateUserEmail = (prefix: string) => {
 }
 
 type UserConfig = {
-  // used to ensure that dynamically generated tests have static names
-  // ...see https://github.com/microsoft/playwright/issues/24273#issuecomment-1640003150
-  testName: string
-  storageStatePath: string
-  localStorageKey: string
-  user: TestUser
+  [key in UserPrefixes]: TestUser
 }
 
-export const userConfigs: UserConfig[] = [
-  {
-    testName: userNamePrefix,
-    storageStatePath: USER_STORAGE_STATE,
-    localStorageKey: USER_NAME_LOCALSTORAGE_KEY,
-    user: {
-      username: generateUserName(userNamePrefix),
-      email: generateUserEmail(userNamePrefix),
-      password: generateUserPassword(),
-      tou: true,
-      validatedUser: false,
-    },
+export const userConfigs: UserConfig = {
+  [userPrefix]: {
+    username: generateUserName(userPrefix),
+    email: generateUserEmail(userPrefix),
+    password: generateUserPassword(),
+    tou: true,
+    validatedUser: false,
   },
-  {
-    testName: userValidatedPrefix,
-    storageStatePath: USER_VALIDATED_STORAGE_STATE,
-    localStorageKey: USER_VALIDATED_NAME_LOCALSTORAGE_KEY,
-    user: {
-      username: generateUserName(userValidatedPrefix),
-      email: generateUserEmail(userValidatedPrefix),
-      password: generateUserPassword(),
-      tou: true,
-      validatedUser: true,
-    },
+  [userValidatedPrefix]: {
+    username: generateUserName(userValidatedPrefix),
+    email: generateUserEmail(userValidatedPrefix),
+    password: generateUserPassword(),
+    tou: true,
+    validatedUser: true,
   },
-]
+}

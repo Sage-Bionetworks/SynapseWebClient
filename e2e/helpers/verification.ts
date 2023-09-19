@@ -1,9 +1,6 @@
 import { Page } from '@playwright/test'
-import {
-  BackendDestinationEnum,
-  doDelete,
-  waitForSrcEndpointConfig,
-} from './http'
+import { BackendDestinationEnum, doDelete } from './http'
+import { waitForSrcEndpointConfig } from './utils'
 
 export async function getVerificationSubmissionId(
   userId: string,

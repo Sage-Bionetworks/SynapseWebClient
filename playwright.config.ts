@@ -1,11 +1,7 @@
 import { defineConfig, devices } from '@playwright/test'
 import dotenv from 'dotenv'
 
-export const USER_STORAGE_STATE = 'playwright/.auth/user.json'
-export const USER_VALIDATED_STORAGE_STATE =
-  'playwright/.auth/userValidated.json'
-
-const baseURL = 'http://127.0.0.1:8888'
+export const baseURL = 'http://127.0.0.1:8888'
 
 /**
  * Read environment variables from file.
@@ -33,7 +29,7 @@ export default defineConfig({
   /* Retries */
   retries: process.env.CI ? 2 : 0,
   /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : undefined,
+  workers: process.env.CI ? 1 : 2,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   // Concise 'dot' for CI, default 'list' when running locally
   reporter: process.env.CI ? [['list'], ['html']] : 'html',
@@ -49,46 +45,23 @@ export default defineConfig({
 
   /* Configure projects for major browsers */
   projects: [
-    // Setup project
-    { name: 'setup', testMatch: /.*\.setup\.ts/, teardown: 'cleanup' },
-
-    // Tests that don't require authentication
     {
-      name: 'chromium - logged out',
-      use: {
-        ...devices['Desktop Chrome'],
-      },
-      testMatch: /.*\.loggedout\.spec.ts/,
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] },
+      testMatch: /.*\.spec.ts/,
     },
 
-    // Tests that require authentication
     {
-      name: 'chromium - logged in',
-      use: {
-        ...devices['Desktop Chrome'],
-        // Use prepared auth state.
-        storageState: USER_STORAGE_STATE,
-      },
-      testMatch: /.*\.loggedin\.spec.ts/,
-      dependencies: ['setup'],
-    },
-
-    // Clean up project
-    {
-      name: 'cleanup',
-      use: { storageState: USER_STORAGE_STATE },
-      testMatch: /.*\.cleanup\.ts/,
-    },
-
-    /* {
       name: 'firefox',
       use: { ...devices['Desktop Firefox'] },
+      testMatch: /.*\.spec.ts/,
     },
 
     {
       name: 'webkit',
       use: { ...devices['Desktop Safari'] },
-    }, */
+      testMatch: /.*\.spec.ts/,
+    },
 
     /* Test against mobile viewports. */
     // {

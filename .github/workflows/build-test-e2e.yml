@@ -35,7 +35,7 @@ jobs:
             -v "/$(pwd)/e2e_workflow/settings.xml":/root/.m2/settings.xml \
             tomcat:9.0
       - name: Install Playwright Browsers
-        run: yarn playwright install --with-deps chromium
+        run: yarn playwright install --with-deps
       - name: Run Playwright tests
         env:
           ADMIN_PAT: ${{ secrets.ADMIN_PAT }}
