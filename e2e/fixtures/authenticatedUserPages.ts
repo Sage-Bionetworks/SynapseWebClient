@@ -1,6 +1,7 @@
 import { test as base, Browser, expect, type Page } from '@playwright/test'
 import { unlinkSync } from 'fs'
 import { baseURL } from '../../playwright.config'
+import { setCertifiedUserStatus } from '../helpers/certification'
 import {
   cleanupTestUser,
   createTestUser,
@@ -47,8 +48,8 @@ function createUserPageFixture<Page>(userPrefix: UserPrefixes) {
     const context = await browser.newContext({
       storageState: storageStatePaths[userPrefix],
     })
-    const validatedUserPage = await context.newPage()
-    await use(validatedUserPage)
+    const userPage = await context.newPage()
+    await use(userPage)
     await context.close()
   }
 }
@@ -68,10 +69,18 @@ export const testAuth = base.extend<
       })
 
       for (const user of Object.values(userConfigs)) {
-        await base.step(`create test user - ${user.username}`, async () => {
-          const userId = await createTestUser(user, getAdminPAT(), page)
-          expect(userId).not.toBeUndefined()
-          userIds.push(userId)
+        const userId = await base.step(
+          `create test user - ${user.username}`,
+          async () => {
+            const userId = await createTestUser(user, getAdminPAT(), page)
+            expect(userId).not.toBeUndefined()
+            userIds.push(userId)
+            return userId
+          },
+        )
+
+        await base.step(`certify test user - ${user.username}`, async () => {
+          await setCertifiedUserStatus(userId, true, getAdminPAT(), page)
         })
       }
 
