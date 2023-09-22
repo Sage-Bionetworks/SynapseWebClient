@@ -726,7 +726,11 @@ input[type='text'][readonly].border-none,
 .codeContent {
   background-color: #f0f0f0;
   color: #000000;
-  font: 12px/1.4 arial, FreeSans, Helvetica, sans-serif;
+  font:
+    12px/1.4 arial,
+    FreeSans,
+    Helvetica,
+    sans-serif;
   font-family: Courier, monospace;
   overflow: auto;
   padding: 3px;
@@ -744,7 +748,11 @@ input[type='text'][readonly].border-none,
 
 .suggestSearchTerm {
   color: #7a0402;
-  font: 12px/1.4 arial, FreeSans, Helvetica, sans-serif;
+  font:
+    12px/1.4 arial,
+    FreeSans,
+    Helvetica,
+    sans-serif;
   font-family: Courier, monospace;
 }
 
@@ -2592,9 +2600,6 @@ Looks for any child element under .modal-fullscreen that has a class that contai
 
 #body .inline-user-badge {
   display: inline-flex;
-  div {
-    display: inline;
-  }
   .SRC-userImgSmall,
   .SRC-userImgMedium,
   .SRC-userImgLarge,
@@ -3297,6 +3302,10 @@ div.border {
 #body .fullOpacity {
   opacity: 1;
   transition: opacity 0.3s ease-in;
+}
+
+#body .SRC-grid-item .UserBadge {
+  width: 100%;
 }
 
 #headerPanel {
