@@ -477,4 +477,28 @@ public class TeamPresenterTest {
     verify(mockView).addWidgets(any(Widget.class));
     verify(mockTeamProjectsModalWidget).configureAndShow(mockTeam);
   }
+
+  @Test
+  public void testCanRequestMembershipNull() {
+    when(mockTeam.getCanRequestMembership()).thenReturn(null);
+    presenter.refresh(teamId);
+
+    verify(mockView).setTeamRequestsClosedAlertVisible(false);
+  }
+
+  @Test
+  public void testCanRequestMembershipTrue() {
+    when(mockTeam.getCanRequestMembership()).thenReturn(true);
+    presenter.refresh(teamId);
+
+    verify(mockView).setTeamRequestsClosedAlertVisible(false);
+  }
+
+  @Test
+  public void testCanRequestMembershipFalse() {
+    when(mockTeam.getCanRequestMembership()).thenReturn(false);
+    presenter.refresh(teamId);
+
+    verify(mockView).setTeamRequestsClosedAlertVisible(true);
+  }
 }
