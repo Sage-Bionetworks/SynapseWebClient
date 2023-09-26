@@ -210,7 +210,8 @@ public class TeamPresenter
         public void onSuccess(TeamBundle result) {
           team = result.getTeam();
           ginInjector.getSynapseJSNIUtils().setPageTitle(team.getName());
-          TeamMembershipStatus teamMembershipStatus = result.getTeamMembershipStatus();
+          TeamMembershipStatus teamMembershipStatus =
+            result.getTeamMembershipStatus();
           boolean isAdmin = result.isUserAdmin();
           Callback refreshCallback = () -> {
             refresh(teamId);
@@ -220,6 +221,12 @@ public class TeamPresenter
             : team.getCanPublicJoin();
           view.setPublicJoinVisible(canPublicJoin);
           view.setTeam(team, teamMembershipStatus);
+          Boolean canRequestMembership = team.getCanRequestMembership();
+          boolean isLockedDown =
+            canRequestMembership != null &&
+            Boolean.FALSE.equals(canRequestMembership);
+          view.setTeamRequestsClosedAlertVisible(isLockedDown);
+
           managerListWidget.configure(
             teamId,
             isAdmin,

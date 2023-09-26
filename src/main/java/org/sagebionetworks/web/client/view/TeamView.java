@@ -74,4 +74,6 @@ public interface TeamView extends IsWidget, SynapseView {
   int getClientHeight();
 
   void addWidgets(Widget... widgets);
+
+  void setTeamRequestsClosedAlertVisible(boolean b);
 }

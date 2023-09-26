@@ -21,6 +21,7 @@ import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.widget.FullWidthAlert;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.team.BigTeamBadge;
 import org.sagebionetworks.web.client.widget.team.InviteWidget;
@@ -104,6 +105,9 @@ public class TeamViewImpl extends Composite implements TeamView {
 
   @UiField
   Div widgetsContainer;
+
+  @UiField
+  FullWidthAlert teamClosedAlert;
 
   private Presenter presenter;
   private Header headerWidget;
@@ -321,5 +325,10 @@ public class TeamViewImpl extends Composite implements TeamView {
     if (visible) {
       toolsMenu.setVisible(true);
     }
+  }
+
+  @Override
+  public void setTeamRequestsClosedAlertVisible(boolean visible) {
+    teamClosedAlert.setVisible(visible);
   }
 }
