@@ -196,16 +196,6 @@ public class TableListWidgetTest {
   }
 
   @Test
-  public void testOnTableClicked() {
-    widget.setTableClickedCallback(mockTableClickedCallback);
-    widget.onTableClicked(mockEntityHeader);
-
-    verify(mockView).showLoading();
-    verify(mockView).clearTableWidgets();
-    verify(mockTableClickedCallback).invoke(mockEntityHeader);
-  }
-
-  @Test
   public void testCopyToClipboard() {
     // add search results
     searchResults.clear();

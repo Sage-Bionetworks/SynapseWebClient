@@ -27,11 +27,6 @@ public interface TableListWidgetView extends IsWidget, SynapseView {
    * Presenter interface
    */
   public interface Presenter {
-    /**
-     * Report when a table is clicked
-     */
-    void onTableClicked(EntityHeader header);
-
     void toggleSort(SortBy sortByColumn);
 
     void copyIDsToClipboard();

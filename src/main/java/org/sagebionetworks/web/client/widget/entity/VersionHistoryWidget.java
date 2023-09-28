@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -15,16 +16,19 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.VersionableEntity;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
+import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.shared.WebConstants;
 
 /**
  * This widget shows the properties and annotations as a non-editable table grid.
@@ -46,6 +50,7 @@ public class VersionHistoryWidget
   private SynapseJavascriptClient jsClient;
   int currentOffset;
   private Request currentRequest;
+  private ClientCache clientCache;
 
   private List<Consumer<Boolean>> visibilityChangeListeners = new ArrayList<>();
 
@@ -56,7 +61,8 @@ public class VersionHistoryWidget
     SynapseJavascriptClient jsClient,
     GlobalApplicationState globalApplicationState,
     PreflightController preflightController,
-    SynapseAlert synAlert
+    SynapseAlert synAlert,
+    ClientCache clientCache
   ) {
     super();
     this.synapseClient = synapseClient;
@@ -67,6 +73,7 @@ public class VersionHistoryWidget
     this.preflightController = preflightController;
     this.view.setPresenter(this);
     this.synAlert = synAlert;
+    this.clientCache = clientCache;
     view.setSynAlert(synAlert);
   }
 
@@ -174,7 +181,16 @@ public class VersionHistoryWidget
     onMore();
   }
 
+  @Override
   public void gotoCurrentVersion() {
+    // if this is a Dataset, force load the draft version
+    if (bundle.getEntity() instanceof Dataset) {
+      clientCache.put(
+        bundle.getEntity().getId() +
+        WebConstants.FORCE_LOAD_DRAFT_DATASET_SUFFIX,
+        "true"
+      );
+    }
     Long targetVersion = null;
     Synapse synapse = new Synapse(
       bundle.getEntity().getId(),

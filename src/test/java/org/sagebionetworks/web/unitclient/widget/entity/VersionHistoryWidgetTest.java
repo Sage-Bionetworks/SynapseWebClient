@@ -48,6 +48,7 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.VersionHistoryWidget;
@@ -100,6 +101,9 @@ public class VersionHistoryWidgetTest {
   SynapseAlert mockSynAlert;
 
   @Mock
+  ClientCache mockClientCache;
+
+  @Mock
   Consumer<Boolean> mockListener;
 
   @Before
@@ -120,7 +124,8 @@ public class VersionHistoryWidgetTest {
         mockJsClient,
         mockGlobalApplicationState,
         mockPreflightController,
-        mockSynAlert
+        mockSynAlert,
+        mockClientCache
       );
 
     vb = new FileEntity();
@@ -133,8 +138,10 @@ public class VersionHistoryWidgetTest {
     when(bundle.getPermissions().getCanCertifiedUserEdit()).thenReturn(true);
     when(bundle.getEntity()).thenReturn(vb);
 
-    List<AccessRequirement> accessRequirements = new ArrayList<AccessRequirement>();
-    TermsOfUseAccessRequirement accessRequirement = new TermsOfUseAccessRequirement();
+    List<AccessRequirement> accessRequirements =
+      new ArrayList<AccessRequirement>();
+    TermsOfUseAccessRequirement accessRequirement =
+      new TermsOfUseAccessRequirement();
     accessRequirement.setId(101L);
     accessRequirement.setTermsOfUse("terms of use");
     accessRequirements.add(accessRequirement);
@@ -203,17 +210,18 @@ public class VersionHistoryWidgetTest {
         anyInt(),
         any(AsyncCallback.class)
       );
-    AsyncCallback<PaginatedResults<VersionInfo>> callback = new AsyncCallback<PaginatedResults<VersionInfo>>() {
-      @Override
-      public void onFailure(Throwable caught) {
-        assertTrue(caught instanceof IllegalArgumentException);
-      }
+    AsyncCallback<PaginatedResults<VersionInfo>> callback =
+      new AsyncCallback<PaginatedResults<VersionInfo>>() {
+        @Override
+        public void onFailure(Throwable caught) {
+          assertTrue(caught instanceof IllegalArgumentException);
+        }
 
-      @Override
-      public void onSuccess(PaginatedResults<VersionInfo> result) {
-        fail("Called onSuccess on a failure");
-      }
-    };
+        @Override
+        public void onSuccess(PaginatedResults<VersionInfo> result) {
+          fail("Called onSuccess on a failure");
+        }
+      };
     versionHistoryWidget.setEntityBundle(bundle, null);
   }
 
@@ -231,7 +239,8 @@ public class VersionHistoryWidgetTest {
         anyBoolean(),
         (AsyncCallback<Entity>) any()
       );
-    VersionableEntity capturedEntity = (VersionableEntity) entityCaptor.getValue();
+    VersionableEntity capturedEntity =
+      (VersionableEntity) entityCaptor.getValue();
     assertEquals(testComment, capturedEntity.getVersionComment());
     assertEquals(testLabel, capturedEntity.getVersionLabel());
     verify(mockGlobalApplicationState).refreshPage();

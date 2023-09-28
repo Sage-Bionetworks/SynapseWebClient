@@ -9,6 +9,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -63,7 +64,7 @@ public class VersionHistoryWidgetViewImpl
   TBody previousVersionsTable;
 
   @UiField
-  Hyperlink currentVersionLink;
+  Anchor currentVersionLink;
 
   @UiField
   Button editInfoButton;
@@ -89,7 +90,8 @@ public class VersionHistoryWidgetViewImpl
   CallbackP<List<String>> versionValuesCallback;
   PromptForValuesModalView editVersionInfoModal;
   boolean isTable = false;
-  private static DateTimeFormat shortDateFormat = DateTimeFormat.getShortDateFormat();
+  private static DateTimeFormat shortDateFormat =
+    DateTimeFormat.getShortDateFormat();
   private Presenter presenter;
 
   @Inject
@@ -116,6 +118,9 @@ public class VersionHistoryWidgetViewImpl
     moreButton.addClickHandler(event -> {
       presenter.onMore();
     });
+    currentVersionLink.addClickHandler(event -> {
+      presenter.gotoCurrentVersion();
+    });
   }
 
   @Override
@@ -124,9 +129,6 @@ public class VersionHistoryWidgetViewImpl
     isTable = entity instanceof Table;
     sizeTableHeader.setVisible(!isTable);
     md5TableHeader.setVisible(!isTable);
-    currentVersionLink.setTargetHistoryToken(
-      DisplayUtils.getSynapseHistoryTokenNoHash(entity.getId())
-    );
     currentVersionLink.setVisible(isShowingOlderVersion);
     String currentVersionLinkText;
     if (entity instanceof Dataset) {

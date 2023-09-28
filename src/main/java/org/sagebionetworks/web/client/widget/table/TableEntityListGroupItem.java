@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.table;
 
 import static org.sagebionetworks.web.client.DisplayUtils.TEXTBOX_SELECT_ALL_FIELD_CLICKHANDLER;
 
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -100,7 +99,7 @@ public class TableEntityListGroupItem implements IsWidget {
     idField.addClickHandler(TEXTBOX_SELECT_ALL_FIELD_CLICKHANDLER);
   }
 
-  public void configure(EntityHeader header, final ClickHandler clickHandler) {
+  public void configure(EntityHeader header) {
     entityAnchor = new Anchor();
     entityAnchor.addClickHandler(EntityBadgeViewImpl.STANDARD_CLICKHANDLER);
     entityAnchor.setText(header.getName());
@@ -148,7 +147,8 @@ public class TableEntityListGroupItem implements IsWidget {
 
           @Override
           public void onSuccess(EntityBundle result) {
-            EntityRefCollectionView dataset = (EntityRefCollectionView) result.getEntity();
+            EntityRefCollectionView dataset =
+              (EntityRefCollectionView) result.getEntity();
             int itemCount = dataset.getItems() == null
               ? 0
               : dataset.getItems().size();

@@ -303,6 +303,8 @@ public class WebConstants {
     "_TEMP_IMAGE_ATTACHMENT";
   public static final String WIKIPAGE_SUFFIX = "_WIKI_PAGE";
   public static final String FILE_HANDLE_SUFFIX = "_FILE_HANDLE";
+  public static final String FORCE_LOAD_DRAFT_DATASET_SUFFIX =
+    "_LOAD_DRAFT_DATASET";
 
   public static final String TABLE_COLUMN_ID = "columnId";
   public static final String TABLE_ROW_ID = "rowId";
