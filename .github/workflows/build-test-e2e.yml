@@ -14,13 +14,6 @@ jobs:
       - name: Setup docker (missing on MacOS)
         if: runner.os == 'macos'
         run: |
-          # workaround for https://github.com/actions/runner-images/issues/8104
-          # ...and handle 8.1.0 regression: https://github.com/Homebrew/homebrew-core/issues/140244
-          export HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1
-          brew uninstall --ignore-dependencies qemu
-          curl -OSL https://raw.githubusercontent.com/Homebrew/homebrew-core/dc0669eca9479e9eeb495397ba3a7480aaa45c2e/Formula/qemu.rb
-          brew install ./qemu.rb
-
           brew install docker
           colima start
       - name: Build SWC
