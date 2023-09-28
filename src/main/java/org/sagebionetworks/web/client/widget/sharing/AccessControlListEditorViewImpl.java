@@ -71,7 +71,7 @@ public class AccessControlListEditorViewImpl
       "Learn more about managing access controls and permissions in Synapse."
     );
     helpWidget.setHref(
-      WebConstants.DOCS_URL + "Conditions-for-Use.2009596938.html"
+      WebConstants.DOCS_URL + WebConstants.SHARING_SETTINGS_URL
     );
     helpWidget.setAddStyleNames("margin-left-5");
 
@@ -215,7 +215,8 @@ public class AccessControlListEditorViewImpl
           "The sharing settings shown below are currently being inherited from&nbsp;"
         )
       );
-      EntityIdCellRenderer entityRenderer = ginInjector.getEntityIdCellRenderer();
+      EntityIdCellRenderer entityRenderer =
+        ginInjector.getEntityIdCellRenderer();
       ClickHandler customClickHandler = event -> {
         DisplayUtils.newWindow("#!Synapse:" + aclEntityId, "", "");
       };
@@ -264,12 +265,13 @@ public class AccessControlListEditorViewImpl
         add(helpWidget);
       } else {
         // Configure AddPeopleToAclPanel.
-        CallbackP<UserGroupSuggestion> addPersonCallback = new CallbackP<UserGroupSuggestion>() {
-          @Override
-          public void invoke(UserGroupSuggestion param) {
-            addPersonToAcl(param);
-          }
-        };
+        CallbackP<UserGroupSuggestion> addPersonCallback =
+          new CallbackP<UserGroupSuggestion>() {
+            @Override
+            public void invoke(UserGroupSuggestion param) {
+              addPersonToAcl(param);
+            }
+          };
 
         CallbackP<Void> makePublicCallback = new CallbackP<Void>() {
           @Override
