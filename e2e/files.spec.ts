@@ -174,13 +174,21 @@ test.describe('Files', () => {
     await testAuth.step(
       'First user shares the file with second user',
       async () => {
-        await userPage
-          .getByRole('textbox', { name: 'Enter name...' })
-          .pressSequentially(validatedUserName)
-        await userPage
-          .getByRole('menuitem', { name: validatedUserName })
-          .click()
-        await userPage.getByRole('cell', { name: validatedUserName }).click()
+        const inputUserTextBox = userPage.getByRole('textbox', {
+          name: 'Enter name...',
+        })
+        await inputUserTextBox.fill(validatedUserName)
+        await inputUserTextBox.press('Shift') // trigger menu
+
+        const selectUserMenu = userPage.getByRole('menuitem', {
+          name: validatedUserName,
+        })
+        await expect(selectUserMenu).toBeVisible()
+        await selectUserMenu.click()
+
+        await expect(
+          userPage.getByRole('cell', { name: validatedUserName }),
+        ).toBeVisible()
 
         // Don't send message, so we don't have to clean up the message
         await userPage.getByText('Notify people via email').click()
