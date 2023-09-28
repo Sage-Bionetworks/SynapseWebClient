@@ -280,6 +280,7 @@ public class EntityPresenter
             forceLoadDraftDataset == null
           ) {
             loadStableDatasetIfAvailable(bundle.getEntity().getId());
+            return;
           }
           clientCache.remove(
             bundle.getEntity().getId() +
