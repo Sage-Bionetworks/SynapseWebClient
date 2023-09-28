@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -14,11 +15,14 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.client.utils.FutureUtils.getDoneFuture;
 
+import com.google.common.util.concurrent.FluentFuture;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.web.bindery.event.shared.binder.EventBinder;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.junit.Before;
@@ -34,9 +38,12 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.VersionInfo;
+import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
+import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -60,6 +67,7 @@ import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -95,10 +103,16 @@ public class EntityPresenterTest {
   StuAlert mockSynAlert;
 
   @Mock
+  UserEntityPermissions mockUserEntityPermissions;
+
+  @Mock
   OpenTeamInvitationsWidget mockOpenInviteWidget;
 
   @Mock
   Header mockHeaderWidget;
+
+  @Mock
+  Dataset mockDataset;
 
   @Mock
   EntityPageTop mockEntityPageTop;
@@ -110,6 +124,7 @@ public class EntityPresenterTest {
   String accessToken = "1234";
   Synapse.EntityArea area = Synapse.EntityArea.FILES;
   String areaToken = null;
+  Long latestSnapshotVersionNumber = 5L;
   long id;
 
   @Mock
@@ -157,6 +172,23 @@ public class EntityPresenterTest {
     when(mockQueryClientProvider.getQueryClient()).thenReturn(mockQueryClient);
     when(mockAuthenticationController.getCurrentUserAccessToken())
       .thenReturn(accessToken);
+
+    VersionInfo latestSnapshot = new VersionInfo();
+    latestSnapshot.setVersionNumber(latestSnapshotVersionNumber);
+
+    List<VersionInfo> versions = Collections.singletonList(latestSnapshot);
+    FluentFuture<List<VersionInfo>> versionsFuture = getDoneFuture(versions);
+    when(
+      mockSynapseJavascriptClient.getEntityVersions(
+        anyString(),
+        anyInt(),
+        anyInt()
+      )
+    )
+      .thenReturn(versionsFuture);
+
+    when(mockDataset.getId()).thenReturn(entityId);
+
     entityPresenter =
       new EntityPresenter(
         mockView,
@@ -176,6 +208,7 @@ public class EntityPresenterTest {
     Entity testEntity = new Project();
     eb = new EntityBundle();
     eb.setEntity(testEntity);
+    eb.setPermissions(mockUserEntityPermissions);
     EntityPath path = new EntityPath();
     path.setPath(Collections.singletonList(mockProjectEntityHeader));
     when(mockProjectEntityHeader.getType()).thenReturn(Project.class.getName());
@@ -396,5 +429,107 @@ public class EntityPresenterTest {
     assertFalse(EntityPresenter.isValidEntityId("sy"));
     assertFalse(EntityPresenter.isValidEntityId("synFOOBAR"));
     assertTrue(EntityPresenter.isValidEntityId("SyN198327"));
+  }
+
+  @Test
+  public void testLoadDraftDatasetCanEdit() {
+    eb.setEntity(mockDataset);
+    when(mockUserEntityPermissions.getCanCertifiedUserEdit()).thenReturn(true);
+    when(mockPlace.getVersionNumber()).thenReturn(null);
+    when(mockPlace.getEntityId()).thenReturn(entityId);
+
+    entityPresenter.setPlace(mockPlace);
+
+    verify(mockEntityPageTop)
+      .configure(
+        eq(eb),
+        eq(null), // verify the draft version is loaded
+        any(EntityHeader.class),
+        any(EntityArea.class),
+        anyString()
+      );
+  }
+
+  @Test
+  public void testLoadDraftDatasetCannotEdit() {
+    eb.setEntity(mockDataset);
+    when(mockUserEntityPermissions.getCanCertifiedUserEdit()).thenReturn(false);
+    when(mockPlace.getVersionNumber()).thenReturn(null);
+    when(mockPlace.getEntityId()).thenReturn(entityId);
+
+    entityPresenter.setPlace(mockPlace);
+
+    verify(mockEntityPageTop)
+      .configure(
+        eq(eb),
+        eq(latestSnapshotVersionNumber), // verify the latest snapshot version is loaded
+        any(EntityHeader.class),
+        any(EntityArea.class),
+        anyString()
+      );
+  }
+
+  @Test
+  public void testLoadDraftDatasetCannotEditNoSnapshots() {
+    FluentFuture<List<VersionInfo>> versionsFuture = getDoneFuture(
+      Collections.emptyList()
+    );
+    when(
+      mockSynapseJavascriptClient.getEntityVersions(
+        anyString(),
+        anyInt(),
+        anyInt()
+      )
+    )
+      .thenReturn(versionsFuture);
+    eb.setEntity(mockDataset);
+    when(mockUserEntityPermissions.getCanCertifiedUserEdit()).thenReturn(false);
+    when(mockPlace.getVersionNumber()).thenReturn(null);
+    when(mockPlace.getEntityId()).thenReturn(entityId);
+    // From the client cache, initially return null, and then "true" (we will verify that we try to set this value during the process)
+    when(
+      mockClientCache.get(
+        entityId + WebConstants.FORCE_LOAD_DRAFT_DATASET_SUFFIX
+      )
+    )
+      .thenReturn((String) null, "true");
+
+    entityPresenter.setPlace(mockPlace);
+
+    verify(mockClientCache)
+      .put(entityId + WebConstants.FORCE_LOAD_DRAFT_DATASET_SUFFIX, "true");
+    verify(mockEntityPageTop)
+      .configure(
+        eq(eb),
+        eq(null), // verify the draft version is loaded because there are no snapshots
+        any(EntityHeader.class),
+        any(EntityArea.class),
+        anyString()
+      );
+  }
+
+  @Test
+  public void testLoadDraftDatasetCannotEditForceLoad() {
+    eb.setEntity(mockDataset);
+    when(mockUserEntityPermissions.getCanCertifiedUserEdit()).thenReturn(false);
+    when(mockPlace.getVersionNumber()).thenReturn(null);
+    when(mockPlace.getEntityId()).thenReturn(entityId);
+    when(
+      mockClientCache.get(
+        entityId + WebConstants.FORCE_LOAD_DRAFT_DATASET_SUFFIX
+      )
+    )
+      .thenReturn("true");
+
+    entityPresenter.setPlace(mockPlace);
+
+    verify(mockEntityPageTop)
+      .configure(
+        eq(eb),
+        eq(null), // verify the draft version is loaded
+        any(EntityHeader.class),
+        any(EntityArea.class),
+        anyString()
+      );
   }
 }
