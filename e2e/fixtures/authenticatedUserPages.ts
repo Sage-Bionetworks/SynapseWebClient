@@ -1,9 +1,7 @@
 import { test as base, Browser, expect, type Page } from '@playwright/test'
 import { unlinkSync } from 'fs'
-import { v4 as uuidv4 } from 'uuid'
 import { baseURL } from '../../playwright.config'
 import { setCertifiedUserStatus } from '../helpers/certification'
-import { createProject, deleteEntity } from '../helpers/entities'
 import {
   cleanupTestUser,
   createTestUser,
@@ -20,15 +18,9 @@ import {
 } from '../helpers/userConfig'
 import { waitForInitialPageLoad } from '../helpers/utils'
 
-type UseProjectReturn = {
-  projectName: string
-  projectId: string
-}
-
 type AuthenticatedUserPageTestFixtures = {
   userPage: Page
   validatedUserPage: Page
-  useProject: (accessToken: string) => Promise<UseProjectReturn>
 }
 
 type StorageStatePaths = { [key in UserPrefixes]?: string }
@@ -66,7 +58,6 @@ export const testAuth = base.extend<
   AuthenticatedUserPageTestFixtures,
   AuthenticatedUserPageWorkerFixtures
 >({
-  // USERS ---------------------------------------------------------------------
   // creates and deletes all test users defined in userConfig
   // ...per worker + browserName
   createUsers: [
@@ -156,18 +147,4 @@ export const testAuth = base.extend<
   ],
   userPage: createUserPageFixture(userPrefix),
   validatedUserPage: createUserPageFixture(userValidatedPrefix),
-  // ENTITIES ------------------------------------------------------------------
-  useProject: async ({ page }, use) => {
-    let projectId: string | undefined = undefined
-    const projectName = 'swc-e2e-project-fixture-' + uuidv4()
-
-    await use(async (accessToken: string) => {
-      projectId = await createProject(projectName, accessToken, page)
-      return { projectName, projectId }
-    })
-
-    if (projectId) {
-      await deleteEntity(projectId, true, getAdminPAT(), page)
-    }
-  },
 })

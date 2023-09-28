@@ -1,11 +1,7 @@
 import { Page } from '@playwright/test'
+import { deleteFileHandle } from './entities'
 import { BackendDestinationEnum, doDelete, doGet } from './http'
-import {
-  FileHandle,
-  MessageBundle,
-  MessageToUser,
-  PaginatedResults,
-} from './types'
+import { MessageBundle, MessageToUser, PaginatedResults } from './types'
 
 // Retrieves the current authenticated user's outbox.
 export async function getUserOutbox(accessToken: string, page: Page) {
@@ -19,7 +15,7 @@ export async function getUserOutbox(accessToken: string, page: Page) {
 
 // Retrieves the current authenticated user's inbox.
 // It may take several seconds for a message to appear in the inbox after creation.
-async function getUserInbox(accessToken: string, page: Page) {
+export async function getUserInbox(accessToken: string, page: Page) {
   return (await doGet(
     page,
     '/repo/v1/message/inbox',
@@ -41,38 +37,6 @@ async function deleteUserMessage(
     BackendDestinationEnum.REPO_ENDPOINT,
   )
   return messageId
-}
-
-// Get a FileHandle using its ID.
-// Note: Only the user that created the FileHandle can access it directly.
-async function getFileHandle(
-  accessToken: string,
-  handleId: string,
-  page: Page,
-) {
-  return (await doGet(
-    page,
-    `/file/v1/fileHandle/${handleId}`,
-    accessToken,
-    BackendDestinationEnum.REPO_ENDPOINT,
-  )) as FileHandle
-}
-
-// Delete a FileHandle using its ID.
-// Note: Only the user that created the FileHandle can delete it.
-//   Also, a FileHandle cannot be deleted if it is associated with a FileEntity or WikiPage
-async function deleteFileHandle(
-  accessToken: string,
-  handleId: string,
-  page: Page,
-) {
-  await doDelete(
-    page,
-    `/file/v1/fileHandle/${handleId}`,
-    accessToken,
-    BackendDestinationEnum.REPO_ENDPOINT,
-  )
-  return handleId
 }
 
 function arraysAreEqual(arr1: string[], arr2: string[]) {

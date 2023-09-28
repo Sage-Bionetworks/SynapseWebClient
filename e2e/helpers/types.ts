@@ -71,3 +71,16 @@ export type PaginatedResults<T> = {
   totalNumberOfResults: number //	Calculating the actual totalNumberOfResults is not longer supported. Therefore, for each page, the totalNumberOfResults is estimated using the current page, limit, and offset. When the page size equals the limit, the totalNumberOfResults will be offset+pageSize+ 1. Otherwise, the totalNumberOfResults will be offset+pageSize.
   results: T[] // The the id of the entity to which this reference refers
 }
+
+/* ENTITIES */
+export type Project = {
+  name: string
+  id: string
+}
+
+export type FileUploadComplete = {
+  fileHandleId: string
+  fileName: string
+}
+
+export type FileType = 'text/txt' | 'text/csv' | 'application/json'

@@ -136,3 +136,7 @@ export async function getUserIdFromLocalStorage(page: Page) {
   expect(id).not.toBeNull()
   return id!
 }
+
+export async function acceptSiteCookies(page: Page) {
+  await page.getByRole('button', { name: 'Accept and continue' }).click()
+}
