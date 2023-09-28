@@ -41,9 +41,9 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cache.EntityId2BundleCache;
 import org.sagebionetworks.web.client.context.QueryClientProvider;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
@@ -103,9 +103,6 @@ public class EntityPresenterTest {
   @Mock
   EntityPageTop mockEntityPageTop;
 
-  @Mock
-  SynapseClientAsync mockSynapseClient;
-
   String EntityId = "1";
   Entity EntityModel1;
   EntityBundle eb;
@@ -142,6 +139,9 @@ public class EntityPresenterTest {
   @Mock
   QueryClient mockQueryClient;
 
+  @Mock
+  ClientCache mockClientCache;
+
   @Captor
   ArgumentCaptor<List<SynapseReactClientEntityQueryKey>> reactQueryKeyCaptor;
 
@@ -171,7 +171,7 @@ public class EntityPresenterTest {
         mockGwtWrapper,
         mockEventBus,
         mockQueryClientProvider,
-        mockSynapseClient
+        mockClientCache
       );
     Entity testEntity = new Project();
     eb = new EntityBundle();
