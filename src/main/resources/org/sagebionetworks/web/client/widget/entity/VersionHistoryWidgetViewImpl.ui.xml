@@ -19,7 +19,7 @@
         <w:IconSvg ui:field="closeButton" addStyleNames="close" icon="close" />
       </bh:Div>
       <bh:Div ui:field="synAlertContainer" />
-      <g:Hyperlink
+      <g:Anchor
         ui:field="currentVersionLink"
         text="Go to the current version"
         styleName="link"

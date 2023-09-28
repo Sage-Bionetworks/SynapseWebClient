@@ -182,9 +182,6 @@ public abstract class AbstractTablesTab
       view.setModifiedCreatedBy(modifiedCreatedBy);
       view.setWikiPage(wikiPageWidget.asWidget());
       tab.setContent(view.asWidget());
-      tableListWidget.setTableClickedCallback(
-        getTableListWidgetClickedCallback()
-      );
       initBreadcrumbLinkClickedHandler();
       configMap =
         org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget.getDefaultWidgetDescriptor();
@@ -314,7 +311,8 @@ public abstract class AbstractTablesTab
       view.setProvenance(provWidget);
       provWidget.configure(configMap);
     } else {
-      org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget provWidget = ginInjector.getProvenanceRenderer();
+      org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget provWidget =
+        ginInjector.getProvenanceRenderer();
       view.setProvenance(provWidget);
       provWidget.configure(configMap);
     }
@@ -379,19 +377,20 @@ public abstract class AbstractTablesTab
       );
       // Configure wiki
       view.setWikiPageVisible(true);
-      final WikiPageWidget.Callback wikiCallback = new WikiPageWidget.Callback() {
-        @Override
-        public void pageUpdated() {
-          ginInjector
-            .getEventBus()
-            .fireEvent(new EntityUpdatedEvent(entity.getId()));
-        }
+      final WikiPageWidget.Callback wikiCallback =
+        new WikiPageWidget.Callback() {
+          @Override
+          public void pageUpdated() {
+            ginInjector
+              .getEventBus()
+              .fireEvent(new EntityUpdatedEvent(entity.getId()));
+          }
 
-        @Override
-        public void noWikiFound() {
-          view.setWikiPageVisible(false);
-        }
-      };
+          @Override
+          public void noWikiFound() {
+            view.setWikiPageVisible(false);
+          }
+        };
       wikiPageWidget.configure(
         new WikiPageKey(
           entity.getId(),
