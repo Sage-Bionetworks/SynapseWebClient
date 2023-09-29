@@ -138,138 +138,136 @@ test.describe('Files', () => {
     await context.close()
   })
 
-  testAuth('File sharing', async ({ userPage, validatedUserPage }) => {
-    const userName = userConfigs['swc-e2e-user'].username
-    const validatedUserName = userConfigs['swc-e2e-user-validated'].username
+  testAuth(
+    'File sharing',
+    async ({ userPage, validatedUserPage }, testInfo) => {
+      const userName = userConfigs['swc-e2e-user'].username
+      const validatedUserName = userConfigs['swc-e2e-user-validated'].username
 
-    const { fileEntityId, fileName } = await testAuth.step(
-      'Create a file',
-      async () => {
-        const userAccessToken = await getAccessTokenFromCookie(userPage)
-        const fileName = `${generateEntityName('file')}.txt`
-        const { fileEntityId, fileHandleId } = await createFile(
-          fileName,
-          'Created for SWC e2e testing.',
-          'text/txt',
-          userProject.id,
-          userAccessToken,
-          userPage,
-        )
-        fileHandleIds.push(fileHandleId)
-        return { fileEntityId, fileName }
-      },
-    )
+      const { fileEntityId, fileName } = await testAuth.step(
+        'Create a file',
+        async () => {
+          const userAccessToken = await getAccessTokenFromCookie(userPage)
+          const fileName = `${generateEntityName('file')}.txt`
+          const { fileEntityId, fileHandleId } = await createFile(
+            fileName,
+            'Created for SWC e2e testing.',
+            'text/txt',
+            userProject.id,
+            userAccessToken,
+            userPage,
+          )
+          fileHandleIds.push(fileHandleId)
+          return { fileEntityId, fileName }
+        },
+      )
 
-    await testAuth.step('First user can view a private file', async () => {
-      await userPage.goto(`${entityUrlPathname(userProject.id)}/files`)
-      await waitForInitialPageLoad(userPage)
+      await testAuth.step('First user can view a private file', async () => {
+        await userPage.goto(`${entityUrlPathname(userProject.id)}/files`)
+        await waitForInitialPageLoad(userPage)
 
-      const fileLink = userPage.getByRole('link', { name: fileName })
-      await expect(fileLink).toBeVisible()
+        const fileLink = userPage.getByRole('link', { name: fileName })
+        await expect(fileLink).toBeVisible()
 
-      await fileLink.click()
-      await expect(
-        userPage.getByText(`Discussion about ${fileName}`),
-      ).toBeVisible()
-    })
+        await fileLink.click()
+        await expect(
+          userPage.getByText(`Discussion about ${fileName}`),
+        ).toBeVisible()
+      })
 
-    await openFileSharingSettings(userPage)
-    await confirmSharingSettings(userPage, userName, validatedUserName, false)
+      await openFileSharingSettings(userPage)
+      await confirmSharingSettings(userPage, userName, validatedUserName, false)
 
-    await testAuth.step('Second user cannot access the file', async () => {
-      await validatedUserPage.goto(entityUrlPathname(fileEntityId))
-      await waitForInitialPageLoad(validatedUserPage)
+      await testAuth.step('Second user cannot access the file', async () => {
+        await validatedUserPage.goto(entityUrlPathname(fileEntityId))
+        await waitForInitialPageLoad(validatedUserPage)
 
-      await expectNoAccessPage(validatedUserPage)
-    })
+        await expectNoAccessPage(validatedUserPage)
+      })
 
-    await testAuth.step(
-      'First user enables Local Sharing Settings for the File',
-      async () => {
-        await userPage
-          .getByRole('button', { name: 'Create Local Sharing Settings' })
+      await testAuth.step(
+        'First user enables Local Sharing Settings for the File',
+        async () => {
+          await userPage
+            .getByRole('button', { name: 'Create Local Sharing Settings' })
+            .click()
+          await expect(
+            userPage.getByRole('heading', { name: 'Add More People' }),
+          ).toBeVisible()
+        },
+      )
+
+      await testAuth.step(
+        'First user shares the file with second user',
+        async () => {
+          await userPage
+            .getByRole('textbox', { name: 'Enter name...' })
+            .pressSequentially(validatedUserName)
+          await userPage
+            .getByRole('menuitem', { name: `@${validatedUserName}` })
+            .click({ timeout: testInfo.timeout * 3 })
+
+          await expect(
+            userPage.getByRole('cell', { name: validatedUserName }),
+          ).toBeVisible()
+
+          // Don't send message, so we don't have to clean up the message
+          await userPage.getByText('Notify people via email').click()
+
+          // Cookies banner covers the button to save settings
+          // ...so close banner by accepting cookies
+          await acceptSiteCookies(userPage)
+
+          await saveFileSharingSettings(userPage)
+        },
+      )
+
+      await openFileSharingSettings(userPage)
+      await confirmSharingSettings(userPage, userName, validatedUserName, true)
+
+      await testAuth.step('Second user accesses the file', async () => {
+        await validatedUserPage.reload()
+        await expect(
+          validatedUserPage.getByText(`Discussion about ${fileName}`),
+        ).toBeVisible()
+      })
+
+      await testAuth.step('Second user downloads the file', async () => {
+        await validatedUserPage
+          .getByRole('button', { name: 'Download Options' })
           .click()
-        await expect(
-          userPage.getByRole('heading', { name: 'Add More People' }),
-        ).toBeVisible()
-      },
-    )
-
-    await testAuth.step(
-      'First user shares the file with second user',
-      async () => {
-        const inputUserTextBox = userPage.getByRole('textbox', {
-          name: 'Enter name...',
-        })
-        await inputUserTextBox.fill(validatedUserName)
-        await inputUserTextBox.press('Shift') // trigger menu
-
-        const selectUserMenu = userPage.getByRole('menuitem', {
-          name: validatedUserName,
-        })
-        await expect(selectUserMenu).toBeVisible()
-        await selectUserMenu.click()
-
-        await expect(
-          userPage.getByRole('cell', { name: validatedUserName }),
-        ).toBeVisible()
-
-        // Don't send message, so we don't have to clean up the message
-        await userPage.getByText('Notify people via email').click()
-
-        // Cookies banner covers the button to save settings
-        // ...so close banner by accepting cookies
-        await acceptSiteCookies(userPage)
-
-        await saveFileSharingSettings(userPage)
-      },
-    )
-
-    await openFileSharingSettings(userPage)
-    await confirmSharingSettings(userPage, userName, validatedUserName, true)
-
-    await testAuth.step('Second user accesses the file', async () => {
-      await validatedUserPage.reload()
-      await expect(
-        validatedUserPage.getByText(`Discussion about ${fileName}`),
-      ).toBeVisible()
-    })
-
-    await testAuth.step('Second user downloads the file', async () => {
-      await validatedUserPage
-        .getByRole('button', { name: 'Download Options' })
-        .click()
-      const downloadPromise = validatedUserPage.waitForEvent('download')
-      await validatedUserPage
-        .getByRole('menuitem', { name: 'Download File' })
-        .click()
-      const download = await downloadPromise
-      expect(download.suggestedFilename()).toBe(fileName)
-    })
-
-    await testAuth.step(
-      'First user removes local sharing settings',
-      async () => {
-        await userPage
-          .getByRole('button', { name: 'Delete Local Sharing Settings' })
+        const downloadPromise = validatedUserPage.waitForEvent('download')
+        await validatedUserPage
+          .getByRole('menuitem', { name: 'Download File' })
           .click()
+        const download = await downloadPromise
+        expect(download.suggestedFilename()).toBe(fileName)
+      })
 
-        await expect(
-          userPage.getByRole('button', {
-            name: 'Create Local Sharing Settings',
-          }),
-        ).toBeVisible()
+      await testAuth.step(
+        'First user removes local sharing settings',
+        async () => {
+          await userPage
+            .getByRole('button', { name: 'Delete Local Sharing Settings' })
+            .click()
 
-        await saveFileSharingSettings(userPage)
-      },
-    )
+          await expect(
+            userPage.getByRole('button', {
+              name: 'Create Local Sharing Settings',
+            }),
+          ).toBeVisible()
 
-    await openFileSharingSettings(userPage)
-    await confirmSharingSettings(userPage, userName, validatedUserName, false)
+          await saveFileSharingSettings(userPage)
+        },
+      )
 
-    await testAuth.step('Second user cannot access the file', async () => {
-      await validatedUserPage.reload()
-      await expectNoAccessPage(validatedUserPage)
-    })
-  })
+      await openFileSharingSettings(userPage)
+      await confirmSharingSettings(userPage, userName, validatedUserName, false)
+
+      await testAuth.step('Second user cannot access the file', async () => {
+        await validatedUserPage.reload()
+        await expectNoAccessPage(validatedUserPage)
+      })
+    },
+  )
 })
