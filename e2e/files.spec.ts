@@ -44,8 +44,6 @@ const confirmSharingSettings = async (
   secondUserName: string,
   secondUserVisible: boolean,
 ) => {
-  await openFileSharingSettings(firstUserPage)
-
   await testAuth.step(
     'First user is listed in File Sharing settings',
     async () => {
@@ -72,6 +70,31 @@ const confirmSharingSettings = async (
       }
     },
   )
+}
+
+const confirmAndClosePermissionsSavedAlert = async (page: Page) => {
+  const permissionsAlert = page.getByRole('alert').filter({
+    has: page.getByText('Permissions were successfully saved to Synapse'),
+  })
+  await expect(permissionsAlert).toBeVisible()
+  await permissionsAlert.getByRole('button').click()
+  await expect(permissionsAlert).not.toBeVisible()
+}
+
+const saveFileSharingSettings = async (page: Page) => {
+  const savingButton = page.getByText('Saving...')
+  await Promise.all([
+    expect(savingButton).toBeVisible(),
+    page.getByRole('button', { name: 'Save' }).click(),
+  ])
+  await expect(savingButton).not.toBeVisible()
+
+  // Modal is closed after settings are saved
+  await expect(
+    page.getByRole('heading', { name: 'File Sharing Settings' }),
+  ).not.toBeVisible()
+
+  await confirmAndClosePermissionsSavedAlert(page)
 }
 
 let userProject: Project
@@ -150,6 +173,7 @@ test.describe('Files', () => {
       ).toBeVisible()
     })
 
+    await openFileSharingSettings(userPage)
     await confirmSharingSettings(userPage, userName, validatedUserName, false)
 
     await testAuth.step('Second user cannot access the file', async () => {
@@ -197,10 +221,11 @@ test.describe('Files', () => {
         // ...so close banner by accepting cookies
         await acceptSiteCookies(userPage)
 
-        await userPage.getByRole('button', { name: 'Save' }).click()
+        await saveFileSharingSettings(userPage)
       },
     )
 
+    await openFileSharingSettings(userPage)
     await confirmSharingSettings(userPage, userName, validatedUserName, true)
 
     await testAuth.step('Second user accesses the file', async () => {
@@ -228,10 +253,18 @@ test.describe('Files', () => {
         await userPage
           .getByRole('button', { name: 'Delete Local Sharing Settings' })
           .click()
-        await userPage.getByRole('button', { name: 'Save' }).click()
+
+        await expect(
+          userPage.getByRole('button', {
+            name: 'Create Local Sharing Settings',
+          }),
+        ).toBeVisible()
+
+        await saveFileSharingSettings(userPage)
       },
     )
 
+    await openFileSharingSettings(userPage)
     await confirmSharingSettings(userPage, userName, validatedUserName, false)
 
     await testAuth.step('Second user cannot access the file', async () => {

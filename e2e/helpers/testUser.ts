@@ -81,11 +81,13 @@ export async function loginTestUser(
   await passwordInput.fill(testUserPassword)
   await expect(passwordInput).not.toBeEmpty()
 
-  await page.getByRole('button', { name: 'Sign in' }).click()
+  const loadingButton = page.getByRole('button', { name: 'Logging you in' })
+  await Promise.all([
+    expect(loadingButton).toBeVisible(),
+    page.getByRole('button', { name: 'Sign in' }).click(),
+  ])
 
   // Ensure that correct username/password were received
-  const loadingButton = page.getByRole('button', { name: 'Logging you in' })
-  await expect(loadingButton).toBeVisible()
   await expect(loadingButton).not.toBeVisible()
   await expect(
     page.getByText('The provided username/password combination is incorrect'),
