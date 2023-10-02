@@ -200,9 +200,12 @@ test.describe('Files', () => {
       await testAuth.step(
         'First user shares the file with second user',
         async () => {
-          await userPage
-            .getByRole('textbox', { name: 'Enter name...' })
-            .pressSequentially(validatedUserName)
+          const userSuggestBox = userPage.getByRole('textbox', {
+            name: 'Enter name...',
+          })
+          await userSuggestBox.fill(validatedUserName)
+          await userSuggestBox.press('Shift')
+
           await userPage
             .getByRole('menuitem', { name: `@${validatedUserName}` })
             .click({ timeout: testInfo.timeout * 3 })
