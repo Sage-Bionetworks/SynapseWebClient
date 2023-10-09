@@ -290,6 +290,7 @@ public class TeamPresenterTest {
     when(mockTeamMembershipStatus.getIsMember()).thenReturn(false);
     // SWC-2655: also test null canPublicJoin
     when(mockTeam.getCanPublicJoin()).thenReturn(null);
+    when(mockTeam.getCanRequestMembership()).thenReturn(true);
     presenter.refresh(teamId);
 
     // once
@@ -500,5 +501,28 @@ public class TeamPresenterTest {
     presenter.refresh(teamId);
 
     verify(mockView).setTeamRequestsClosedAlertVisible(true);
+  }
+
+  @Test
+  public void testNotMemberOfLockedTeam() {
+    boolean isAdmin = false;
+    when(mockTeamBundle.isUserAdmin()).thenReturn(isAdmin);
+    when(mockTeamMembershipStatus.getIsMember()).thenReturn(false);
+    when(mockTeam.getCanRequestMembership()).thenReturn(false);
+
+    presenter.refresh(teamId);
+
+    verify(mockJoinWidget, never())
+      .configure(
+        eq(teamId),
+        anyBoolean(),
+        eq(mockTeamMembershipStatus),
+        any(Callback.class),
+        anyString(),
+        anyString(),
+        anyString(),
+        anyString(),
+        anyBoolean()
+      );
   }
 }
