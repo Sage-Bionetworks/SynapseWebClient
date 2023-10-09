@@ -2913,10 +2913,10 @@ java-parser@2.0.4:
     chevrotain "6.5.0"
     lodash "4.17.21"
 
-jotai@^2.3.1:
-  version "2.4.0"
-  resolved "https://registry.yarnpkg.com/jotai/-/jotai-2.4.0.tgz#3f0b30fa54dfb4b4bb22141264512bccca5f5149"
-  integrity sha512-NUHJdAJe3C8Prf0DD6EzezCATjkNvfCNI7pgkaX7bCPPsqE0oK8L9RzZsEhz/UxFoGRayXwacTvAli0VEYKkqQ==
+jotai@^2.4.2:
+  version "2.4.3"
+  resolved "https://registry.yarnpkg.com/jotai/-/jotai-2.4.3.tgz#a8eff8ca6de968d6a04616329dd1335ce52e70f3"
+  integrity sha512-CSAHX9LqWG5WCrU8OgBoZbBJ+Bo9rQU0mPusEF4e0CZ/SNFgurG26vb3UpgvCSJZgYVcUQNiUBM5q86PA8rstQ==
 
 jquery@3.5.1:
   version "3.5.1"
@@ -4708,10 +4708,10 @@ svg-path-sdf@^1.1.3:
     parse-svg-path "^0.1.2"
     svg-path-bounds "^1.0.1"
 
-synapse-react-client@3.1.55:
-  version "3.1.55"
-  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-3.1.55.tgz#6943401e3b7df99a4cb0d93ace303abac7c25ac6"
-  integrity sha512-bbHL3xuL2xfxwbBBUhMf9Mu9qiQys55tbQWZPNIy1aM/9pUaiVNnOaGjIk6fT5MGt+6slwhWjQMzhctn09fv4Q==
+synapse-react-client@3.1.56:
+  version "3.1.56"
+  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-3.1.56.tgz#c3e65927f852c565ff7c9c111e3e2cffd6cd536b"
+  integrity sha512-/TwRMpvLhg9bfCYVPqUCXj0o5uNLMPmPPdjLLbVbt2xtqemlSSLqLs11u5LgNYRyGCack+VKRq0K6Kvj8+kA7w==
   dependencies:
     "@apidevtools/json-schema-ref-parser" "^9.1.2"
     "@brainhubeu/react-carousel" "1.19.26"
@@ -4742,7 +4742,7 @@ synapse-react-client@3.1.55:
     downshift "^6.1.12"
     history "^5.3.0"
     immutable "4.1.0"
-    jotai "^2.3.1"
+    jotai "^2.4.2"
     json-rules-engine "^4.1.0"
     katex "0.11.1"
     lodash-es "^4.17.21"
