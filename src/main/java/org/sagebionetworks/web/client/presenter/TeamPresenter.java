@@ -242,20 +242,26 @@ public class TeamPresenter
           openMembershipRequestsWidget.setVisible(isAdmin);
 
           if (
-            teamMembershipStatus == null || !teamMembershipStatus.getIsMember()
+            (
+              teamMembershipStatus == null ||
+              !teamMembershipStatus.getIsMember()
+            )
           ) {
-            // not a member, add Join widget
-            joinTeamWidget.configure(
-              teamId,
-              false,
-              teamMembershipStatus,
-              refreshCallback,
-              null,
-              null,
-              null,
-              null,
-              false
-            );
+            // not a member, is team locked down?
+            if (!isLockedDown) {
+              // not locked down, add the Join team widget
+              joinTeamWidget.configure(
+                teamId,
+                false,
+                teamMembershipStatus,
+                refreshCallback,
+                null,
+                null,
+                null,
+                null,
+                false
+              );
+            }
           } else {
             view.setCommandsVisible(true);
             view.showMemberMenuItems();
