@@ -46,6 +46,7 @@
     "e2e:chromium": "yarn playwright test --project=chromium",
     "e2e:ui": "yarn playwright test --ui",
     "e2e:codegen": "yarn playwright codegen",
-    "e2e:report": "yarn playwright show-report"
+    "e2e:report": "yarn playwright show-report",
+    "e2e:report:blob": "yarn playwright merge-reports --reporter html ./blob-report && yarn e2e:report"
   }
 }

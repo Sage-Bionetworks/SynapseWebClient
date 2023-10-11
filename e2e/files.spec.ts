@@ -140,7 +140,9 @@ test.describe('Files', () => {
     async ({ userPage, validatedUserPage, browserName }, testInfo) => {
       // invitation widget is much slower on webkit
       // ...so increase test timeout
-      testInfo.slow(browserName === 'webkit')
+      if (browserName === 'webkit') {
+        test.setTimeout(testInfo.timeout * 5)
+      }
 
       const userName = userConfigs['swc-e2e-user'].username
       const validatedUserName = userConfigs['swc-e2e-user-validated'].username
