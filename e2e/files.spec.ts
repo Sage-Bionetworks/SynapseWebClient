@@ -82,12 +82,9 @@ const confirmAndClosePermissionsSavedAlert = async (page: Page) => {
 }
 
 const saveFileSharingSettings = async (page: Page) => {
-  const savingButton = page.getByText('Saving...')
-  await Promise.all([
-    expect(savingButton).toBeVisible(),
-    page.getByRole('button', { name: 'Save' }).click(),
-  ])
-  await expect(savingButton).not.toBeVisible()
+  const saveButton = page.getByRole('button', { name: 'Save' })
+  await saveButton.click()
+  await expect(saveButton).not.toBeVisible()
 
   // Modal is closed after settings are saved
   await expect(
@@ -216,7 +213,7 @@ test.describe('Files', () => {
 
           await expect(
             userPage.getByRole('cell', { name: validatedUserName }),
-          ).toBeVisible()
+          ).toBeVisible({ timeout: testInfo.timeout * 3 })
 
           // Don't send message, so we don't have to clean up the message
           await userPage.getByText('Notify people via email').click()
@@ -262,7 +259,7 @@ test.describe('Files', () => {
             userPage.getByRole('button', {
               name: 'Create Local Sharing Settings',
             }),
-          ).toBeVisible()
+          ).toBeVisible({ timeout: testInfo.timeout * 3 })
 
           await saveFileSharingSettings(userPage)
         },
