@@ -138,9 +138,13 @@ test.describe('Files', () => {
   testAuth(
     'File sharing',
     async ({ userPage, validatedUserPage, browserName }, testInfo) => {
-      // invitation widget is much slower on webkit
-      // ...so increase test timeout
       if (browserName === 'webkit') {
+        test.info().annotations.push({
+          type: 'very slow',
+          description: `webkit in CI only. May be related to the InviteWidget. 
+            Evaluate if timeout can be removed after addressing 
+            https://sagebionetworks.jira.com/browse/SWC-6569.`,
+        })
         test.setTimeout(testInfo.timeout * 5)
       }
 
