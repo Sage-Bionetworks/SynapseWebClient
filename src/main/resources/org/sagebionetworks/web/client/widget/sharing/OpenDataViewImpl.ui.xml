@@ -26,42 +26,48 @@
     <bh:Div
       ui:field="isPublicAndAdmin"
       visible="false"
-      marginTop="10"
-      marginBottom="20"
+      marginTop="5"
+      marginBottom="15"
     >
-      <bh:Paragraph marginBottom="0" addStyleNames="has-warning">
-        <w:IconSvg
-          icon="warningOutlined"
-          addStyleNames="form-control-feedback displayInline margin-right-5 moveup-3"
-        />
-        <bh:Strong>
-          This is not anonymous access data. Users must be logged in to Synapse
-          to download it.
-        </bh:Strong>
-      </bh:Paragraph>
-      <bh:Paragraph addStyleNames="lightGreyText" marginLeft="33">
-        Contact
-        <b:Anchor href="mailto://act@sagebase.org">act@sagebase.org</b:Anchor>
-        to find out how make this data open.
-      </bh:Paragraph>
+      <bh:Div
+        addStyleNames="lightGreyBackground"
+        paddingTop="20"
+        paddingRight="20"
+        paddingBottom="10"
+        paddingLeft="20"
+      >
+        <bh:Paragraph marginBottom="0">
+          <bh:Strong>
+            Users must be logged in to download public access data.
+          </bh:Strong>
+        </bh:Paragraph>
+        <bh:Paragraph addStyleNames="lightGreyText">
+          This data is publicly viewable, but only registered and logged-in
+          users can download it.
+        </bh:Paragraph>
+      </bh:Div>
     </bh:Div>
     <bh:Div
       ui:field="isPrivateAndOpenAndAdmin"
       visible="false"
-      marginTop="10"
-      marginBottom="20"
+      marginTop="5"
+      marginBottom="15"
     >
-      <bh:Paragraph marginBottom="0" addStyleNames="has-warning">
-        <w:IconSvg
-          icon="warningOutlined"
-          addStyleNames="form-control-feedback displayInline margin-right-5 moveup-3"
-        />
-        <bh:Strong>This is not anonymous access data.</bh:Strong>
-      </bh:Paragraph>
-      <bh:Paragraph addStyleNames="lightGreyText" marginLeft="33">
-        You must grant public access for all users to be able to anonymously
-        download it.
-      </bh:Paragraph>
+      <bh:Div
+        addStyleNames="lightGreyBackground"
+        paddingTop="20"
+        paddingRight="20"
+        paddingBottom="10"
+        paddingLeft="20"
+      >
+        <bh:Paragraph marginBottom="0">
+          <bh:Strong>This is not anonymous access data.</bh:Strong>
+        </bh:Paragraph>
+        <bh:Paragraph addStyleNames="lightGreyText">
+          You must grant public access for all users to be able to anonymously
+	        download it.
+        </bh:Paragraph>
+      </bh:Div>
     </bh:Div>
   </bh:Div>
 </ui:UiBinder>
