@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html id="synapse.org" dir="ltr" lang="en-US">
   <head>
     <title>Synapse | Sage Bionetworks</title>
@@ -8,6 +8,11 @@
     />
     <meta name="author" content="Sage Bionetworks, info@sagebase.org" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self' data: blob: 'unsafe-inline' 'unsafe-eval' *.synapse.org *.sagebase.org *.googleapis.com *.gstatic.com *.googletagmanager.com cdn.statuspage.io s3.amazonaws.com www.google-analytics.com kh896k90gyvg.statuspage.io *.youtube.com *.rstudio.com *.google.com *.shinyapps.io *.smartsheet.com 127.0.0.1:9876; img-src * data: blob:; connect-src https://* http://127.0.0.1:8888"
+    />
     <meta
       name="google-site-verification"
       content="KIO5H8Bg3i0oAEAzTEMK5qIlYJLbd2zogLs_-im4rI0"
@@ -60,6 +65,8 @@
       <script src="bootstrap-3.0/assets/js/html5shiv.js"></script>
       <script src="bootstrap-3.0/assets/js/respond.min.js"></script>
     <![endif]-->
+
+    <script src="js/json-ld-element-loader.js"></script>
 
     <!-- 
     Adding the following meta tag should tell the crawler to try to crawl the ugly version of *this* URL.
@@ -504,10 +511,7 @@
       head.load(cdnEndpoint + 'generated/prop-types.min.js')
       head.load(cdnEndpoint + 'generated/react-measure.js')
       head.load(cdnEndpoint + 'generated/plotly.min.js')
-      head.load(
-        'https://unpkg.com/react-plotly.js@2.2.0/dist/create-plotly-component.min.js',
-      )
-      head.load(cdnEndpoint + 'generated/react-jsonschema-form.js')
+      head.load(cdnEndpoint + 'generated/create-plotly-component.min.js')
       head.load(cdnEndpoint + 'generated/react-router-dom.min.js')
       head.load(cdnEndpoint + 'generated/universalCookie.min.js')
       head.load(cdnEndpoint + 'generated/react-bootstrap.min.js')
@@ -525,6 +529,7 @@
       head.load(cdnEndpoint + 'css/katex-0.10.1.min.css')
       head.load('//cdn.statuspage.io/se-v2.js')
       // head.load("//kh896k90gyvg.statuspage.io/embed/script.js");
+      head.load(cdnEndpoint + 'generated/papaparse.min.js')
     </script>
   </head>
   <body id="body">

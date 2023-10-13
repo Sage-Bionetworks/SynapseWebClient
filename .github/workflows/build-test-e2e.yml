@@ -1,0 +1,55 @@
+name: 'Build/Run End-to-End Tests'
+
+on: push
+jobs:
+  build-and-run-e2e:
+    if: ${{ github.ref_name == 'develop' || startsWith(github.ref_name, 'release-') || github.actor == github.repository_owner }}
+    runs-on: ${{ github.repository_owner == 'Sage-Bionetworks' && 'ubuntu-22.04-4core-16GBRAM-150GBSSD' || 'macos-latest' }}
+    timeout-minutes: 60
+    env:
+      CONTAINER_NAME: 'swc-tomcat'
+      CI: true
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup docker (missing on MacOS)
+        if: runner.os == 'macos'
+        run: |
+          # workaround for https://github.com/actions/runner-images/issues/8104
+          # ...and handle 8.1.0 regression: https://github.com/Homebrew/homebrew-core/issues/140244
+          export HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1
+          brew uninstall --ignore-dependencies qemu
+          curl -OSL https://raw.githubusercontent.com/Homebrew/homebrew-core/dc0669eca9479e9eeb495397ba3a7480aaa45c2e/Formula/qemu.rb
+          brew install ./qemu.rb
+
+          brew install docker
+          colima start
+      - name: Build SWC
+        uses: ./.github/workflows/build
+      - name: Run SWC on Tomcat
+        run: |
+          docker run \
+            --name "${CONTAINER_NAME}" \
+            -d --rm \
+            -p 8888:8080 \
+            -v "/$(pwd)/target/portal-develop-SNAPSHOT.war:/usr/local/tomcat/webapps/ROOT.war" \
+            -v "/$(pwd)/e2e_workflow/settings.xml":/root/.m2/settings.xml \
+            tomcat:9.0
+      - name: Install Playwright Browsers
+        run: yarn playwright install --with-deps
+      - name: Run Playwright tests
+        env:
+          ADMIN_PAT: ${{ secrets.ADMIN_PAT }}
+        run: yarn playwright test
+      - name: Upload Playwright Report
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+      - name: Stop Tomcat
+        if: always()
+        run: docker stop "${CONTAINER_NAME}"
+      - name: Stop Colima
+        if: runner.os == 'macos'
+        run: colima stop

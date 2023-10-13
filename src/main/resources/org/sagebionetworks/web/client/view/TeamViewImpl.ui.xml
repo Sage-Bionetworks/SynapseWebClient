@@ -137,6 +137,14 @@
             ui:field="joinTeamPanel"
             addStyleNames="margin-bottom-5 margin-top-10"
           />
+          <w:FullWidthAlert
+            ui:field="teamClosedAlert"
+            alertType="INFO"
+            message="This team is closed to membership requests."
+            primaryCTAText=""
+            visible="false"
+            global="false"
+          />
           <g:SimplePanel
             ui:field="openMembershipRequestsPanel"
             addStyleNames="margin-bottom-5 margin-top-60"

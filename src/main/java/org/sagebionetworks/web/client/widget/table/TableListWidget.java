@@ -17,7 +17,6 @@ import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
@@ -35,7 +34,6 @@ public class TableListWidget
   private SynapseJavascriptClient jsClient;
   private EntityChildrenRequest query;
   private EntityBundle parentBundle;
-  private CallbackP<EntityHeader> onTableClickCallback;
   private LoadMoreWidgetContainer loadMoreWidget;
   private SynapseAlert synAlert;
   private PortalGinInjector ginInjector;
@@ -186,12 +184,7 @@ public class TableListWidget
     for (EntityHeader header : results) {
       addSynIdToList(header.getId());
       TableEntityListGroupItem item = ginInjector.getTableEntityListGroupItem();
-      item.configure(
-        header,
-        event -> {
-          this.onTableClicked(header);
-        }
-      );
+      item.configure(header);
       item.setItemCountVisible(shouldItemCountBeVisible());
       view.addTableListItem(item);
     }
@@ -204,24 +197,6 @@ public class TableListWidget
   public Widget asWidget() {
     view.setPresenter(this);
     return view.asWidget();
-  }
-
-  /**
-   * Invokes callback when a table entity is clicked in the table list.
-   *
-   * @param callback
-   */
-  public void setTableClickedCallback(CallbackP<EntityHeader> callback) {
-    this.onTableClickCallback = callback;
-  }
-
-  @Override
-  public void onTableClicked(EntityHeader entityHeader) {
-    if (onTableClickCallback != null) {
-      view.showLoading();
-      view.clearTableWidgets();
-      onTableClickCallback.invoke(entityHeader);
-    }
   }
 
   @Override

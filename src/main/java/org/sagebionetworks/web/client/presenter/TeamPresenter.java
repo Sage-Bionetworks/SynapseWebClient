@@ -210,7 +210,8 @@ public class TeamPresenter
         public void onSuccess(TeamBundle result) {
           team = result.getTeam();
           ginInjector.getSynapseJSNIUtils().setPageTitle(team.getName());
-          TeamMembershipStatus teamMembershipStatus = result.getTeamMembershipStatus();
+          TeamMembershipStatus teamMembershipStatus =
+            result.getTeamMembershipStatus();
           boolean isAdmin = result.isUserAdmin();
           Callback refreshCallback = () -> {
             refresh(teamId);
@@ -220,6 +221,12 @@ public class TeamPresenter
             : team.getCanPublicJoin();
           view.setPublicJoinVisible(canPublicJoin);
           view.setTeam(team, teamMembershipStatus);
+          Boolean canRequestMembership = team.getCanRequestMembership();
+          boolean isLockedDown =
+            canRequestMembership != null &&
+            Boolean.FALSE.equals(canRequestMembership);
+          view.setTeamRequestsClosedAlertVisible(isLockedDown);
+
           managerListWidget.configure(
             teamId,
             isAdmin,
@@ -235,20 +242,26 @@ public class TeamPresenter
           openMembershipRequestsWidget.setVisible(isAdmin);
 
           if (
-            teamMembershipStatus == null || !teamMembershipStatus.getIsMember()
+            (
+              teamMembershipStatus == null ||
+              !teamMembershipStatus.getIsMember()
+            )
           ) {
-            // not a member, add Join widget
-            joinTeamWidget.configure(
-              teamId,
-              false,
-              teamMembershipStatus,
-              refreshCallback,
-              null,
-              null,
-              null,
-              null,
-              false
-            );
+            // not a member, is team locked down?
+            if (!isLockedDown) {
+              // not locked down, add the Join team widget
+              joinTeamWidget.configure(
+                teamId,
+                false,
+                teamMembershipStatus,
+                refreshCallback,
+                null,
+                null,
+                null,
+                null,
+                false
+              );
+            }
           } else {
             view.setCommandsVisible(true);
             view.showMemberMenuItems();

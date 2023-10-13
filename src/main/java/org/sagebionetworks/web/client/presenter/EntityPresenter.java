@@ -1,7 +1,10 @@
 package org.sagebionetworks.web.client.presenter;
 
-import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 
+import com.google.common.base.Function;
+import com.google.common.util.concurrent.FluentFuture;
+import com.google.common.util.concurrent.FutureCallback;
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -12,18 +15,21 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.binder.EventHandler;
 import java.util.Arrays;
 import java.util.List;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
+import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.context.QueryClientProvider;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -40,6 +46,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
@@ -61,7 +68,7 @@ public class EntityPresenter
   private GWTWrapper gwt;
   private SynapseJavascriptClient jsClient;
   private QueryClient queryClient;
-  private SynapseClientAsync synapseClient;
+  private ClientCache clientCache;
 
   @Inject
   public EntityPresenter(
@@ -77,7 +84,7 @@ public class EntityPresenter
     GWTWrapper gwt,
     EventBus eventBus,
     QueryClientProvider queryClientProvider,
-    SynapseClientAsync synapseClient
+    ClientCache clientCache
   ) {
     this.headerWidget = headerWidget;
     this.entityPageTop = entityPageTop;
@@ -89,8 +96,7 @@ public class EntityPresenter
     this.jsClient = jsClient;
     this.gwt = gwt;
     this.queryClient = queryClientProvider.getQueryClient();
-    this.synapseClient = synapseClient;
-    fixServiceEntryPoint(synapseClient);
+    this.clientCache = clientCache;
     clear();
     entityPresenterEventBinder
       .getEventBinder()
@@ -211,68 +217,115 @@ public class EntityPresenter
     }
   }
 
+  private FluentFuture<Long> getLatestSnapshotVersionNumber(String entityId) {
+    return jsClient
+      .getEntityVersions(entityId, 0, 1)
+      .transform(
+        new Function<List<VersionInfo>, Long>() {
+          @Nullable
+          @Override
+          public Long apply(@Nullable List<VersionInfo> result) {
+            if (result.size() > 0) {
+              return result.get(0).getVersionNumber();
+            }
+            return null;
+          }
+        },
+        directExecutor()
+      );
+  }
+
+  public void loadStableDatasetIfAvailable(String entityId) {
+    getLatestSnapshotVersionNumber(entityId)
+      .addCallback(
+        new FutureCallback<Long>() {
+          @Override
+          public void onSuccess(@Nullable Long result) {
+            if (result == null) {
+              // no stable versions found, force load the draft version
+              clientCache.put(
+                entityId + WebConstants.FORCE_LOAD_DRAFT_DATASET_SUFFIX,
+                "true"
+              );
+            } else {
+              // stable version found, load that instead
+              versionNumber = result;
+            }
+            getEntityBundleAndLoadPageTop();
+          }
+
+          @Override
+          public void onFailure(Throwable t) {
+            synAlert.showError(t.getMessage());
+          }
+        },
+        directExecutor()
+      );
+  }
+
   public void getEntityBundleAndLoadPageTop() {
-    synapseClient.getDatasetScriptElementContent(
-      entityId,
-      new AsyncCallback<String>() {
+    final AsyncCallback<EntityBundle> callback =
+      new AsyncCallback<EntityBundle>() {
+        @Override
+        public void onSuccess(EntityBundle bundle) {
+          //SWC-6551: If entity is the draft version of a Dataset, the current user cannot edit, and we are not told to force load the draft version, then load the latest stable version (if available)
+          String forceLoadDraftDataset = clientCache.get(
+            bundle.getEntity().getId() +
+            WebConstants.FORCE_LOAD_DRAFT_DATASET_SUFFIX
+          );
+          if (
+            bundle.getEntity() instanceof Dataset &&
+            !bundle.getPermissions().getCanCertifiedUserEdit() &&
+            versionNumber == null &&
+            forceLoadDraftDataset == null
+          ) {
+            loadStableDatasetIfAvailable(bundle.getEntity().getId());
+            return;
+          }
+          clientCache.remove(
+            bundle.getEntity().getId() +
+            WebConstants.FORCE_LOAD_DRAFT_DATASET_SUFFIX
+          );
+          synAlert.clear();
+          view.setLoadingVisible(false);
+          // Redirect if Entity is a Link
+          if (bundle.getEntity() instanceof Link) {
+            Reference ref = ((Link) bundle.getEntity()).getLinksTo();
+            entityId = null;
+            if (ref != null) {
+              // redefine where the page is and refresh
+              entityId = ref.getTargetId();
+              versionNumber = ref.getTargetVersionNumber();
+              refresh();
+              return;
+            } else {
+              // show error and then allow entity bundle to go to view
+              view.showErrorMessage(DisplayConstants.ERROR_NO_LINK_DEFINED);
+            }
+          }
+          EntityHeader projectHeader = DisplayUtils.getProjectHeader(
+            bundle.getPath()
+          );
+          if (projectHeader == null) {
+            synAlert.showError(DisplayConstants.ERROR_GENERIC_RELOAD);
+          } else {
+            entityPageTop.configure(
+              bundle,
+              versionNumber,
+              projectHeader,
+              area,
+              areaToken
+            );
+            view.setEntityPageTopWidget(entityPageTop);
+            view.setEntityPageTopVisible(true);
+          }
+        }
+
         @Override
         public void onFailure(Throwable caught) {
-          view.showErrorMessage(caught.getMessage());
+          onError(caught);
         }
-
-        @Override
-        public void onSuccess(String jsonLd) {
-          if (DisplayUtils.isDefined(jsonLd)) {
-            view.injectDatasetJsonLd(jsonLd);
-          } else {
-            view.removeDatasetJsonLdElement();
-          }
-        }
-      }
-    );
-    final AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
-      @Override
-      public void onSuccess(EntityBundle bundle) {
-        synAlert.clear();
-        view.setLoadingVisible(false);
-        // Redirect if Entity is a Link
-        if (bundle.getEntity() instanceof Link) {
-          Reference ref = ((Link) bundle.getEntity()).getLinksTo();
-          entityId = null;
-          if (ref != null) {
-            // redefine where the page is and refresh
-            entityId = ref.getTargetId();
-            versionNumber = ref.getTargetVersionNumber();
-            refresh();
-            return;
-          } else {
-            // show error and then allow entity bundle to go to view
-            view.showErrorMessage(DisplayConstants.ERROR_NO_LINK_DEFINED);
-          }
-        }
-        EntityHeader projectHeader = DisplayUtils.getProjectHeader(
-          bundle.getPath()
-        );
-        if (projectHeader == null) {
-          synAlert.showError(DisplayConstants.ERROR_GENERIC_RELOAD);
-        } else {
-          entityPageTop.configure(
-            bundle,
-            versionNumber,
-            projectHeader,
-            area,
-            areaToken
-          );
-          view.setEntityPageTopWidget(entityPageTop);
-          view.setEntityPageTopVisible(true);
-        }
-      }
-
-      @Override
-      public void onFailure(Throwable caught) {
-        onError(caught);
-      }
-    };
+      };
 
     if (versionNumber == null) {
       jsClient.getEntityBundle(
@@ -348,10 +401,11 @@ public class EntityPresenter
 
   @EventHandler
   public void onEntityUpdatedEvent(EntityUpdatedEvent event) {
-    List<SynapseReactClientEntityQueryKey> queryKey = SynapseReactClientEntityQueryKey.create(
-      QueryKeyConstants.ENTITY,
-      event.getEntityId()
-    );
+    List<SynapseReactClientEntityQueryKey> queryKey =
+      SynapseReactClientEntityQueryKey.create(
+        QueryKeyConstants.ENTITY,
+        event.getEntityId()
+      );
     queryClient.resetQueries(queryKey);
     globalAppState.refreshPage();
   }

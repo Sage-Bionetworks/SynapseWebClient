@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
@@ -141,8 +140,6 @@ public class TableEntityWidgetV2Test {
   @Captor
   ArgumentCaptor<Query> queryCaptor;
 
-  public static final String FACET_SQL =
-    "select * from syn123 where \"x\" = 'a'";
   public static final String EXPECTED_SQL_FOR_CLIENT =
     "select * from syn123 where \\\"x\\\" = 'a'";
 
@@ -231,15 +228,6 @@ public class TableEntityWidgetV2Test {
         mockEventBus
       );
 
-    AsyncMockStubber
-      .callSuccessWith(FACET_SQL)
-      .when(mockSynapseClient)
-      .generateSqlWithFacets(
-        anyString(),
-        anyList(),
-        anyList(),
-        any(AsyncCallback.class)
-      );
     // The test bundle
     entityBundle = new EntityBundle();
     entityBundle.setEntity(tableEntity);
@@ -574,7 +562,8 @@ public class TableEntityWidgetV2Test {
     newBundle.setQueryCount(expectedQueryCount);
     newBundle.writeToJSONObject(adapter);
 
-    OnQueryResultBundleCallback queryResultCallback = onQueryResultBundleCallbackCaptor.getValue();
+    OnQueryResultBundleCallback queryResultCallback =
+      onQueryResultBundleCallbackCaptor.getValue();
     queryResultCallback.run(adapter.toJSONString());
 
     assertEquals(
@@ -583,7 +572,8 @@ public class TableEntityWidgetV2Test {
     );
 
     // test OnViewSharingSettingsHandler
-    OnViewSharingSettingsHandler onViewSharingSettingsHandler = onViewSharingSettingsHandlerCaptor.getValue();
+    OnViewSharingSettingsHandler onViewSharingSettingsHandler =
+      onViewSharingSettingsHandlerCaptor.getValue();
     String testEntityId = "syn0000001";
     onViewSharingSettingsHandler.onViewSharingSettingsClicked(testEntityId);
 
@@ -729,26 +719,6 @@ public class TableEntityWidgetV2Test {
     // proceed to edit
     verify(mockQueryResultEditorWidget)
       .showEditor(any(QueryResultBundle.class), any(TableType.class));
-  }
-
-  @Test
-  public void testOnShowDownloadFiles() {
-    Query startQuery = new Query();
-    startQuery.setSql(FACET_SQL);
-    when(mockQueryChangeHandler.getQueryString()).thenReturn(startQuery);
-    widget.configure(
-      entityBundle,
-      versionNumber,
-      true,
-      false,
-      mockQueryChangeHandler,
-      mockActionMenu
-    );
-
-    widget.onShowDownloadFilesProgrammatically();
-
-    verify(mockFileViewClientsHelp).setQuery(EXPECTED_SQL_FOR_CLIENT);
-    verify(mockFileViewClientsHelp).show();
   }
 
   @Test

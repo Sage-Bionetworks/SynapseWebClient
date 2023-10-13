@@ -29,6 +29,8 @@ public class WebConstants {
   public static final String DOCS_URL = DOCS_BASE_URL + "docs/";
   public static final String PROVENANCE_API_URL =
     DOCS_URL + "Provenance.1972470373.html";
+  public static final String SHARING_SETTINGS_URL =
+    "Sharing-Settings-Permissions-and-Conditions-for-Use.2024276030.html";
 
   public static final String PREVIEW_UNAVAILABLE_PATH = "images/blank.png";
 
@@ -240,6 +242,7 @@ public class WebConstants {
   public static final String SLACK_SERVLET = "slack";
   public static final String VERSIONS_SERVLET = "versions";
   public static final String FILE_HANDLE_UPLOAD_SERVLET = "filehandle";
+  public static final String JSON_LD_CONTENT_SERVLET = "jsonldcontent";
   public static final String SESSION_COOKIE_SERVLET = "sessioncookie";
   public static final String FILE_ENTITY_RESOLVER_SERVLET = "fileresolver";
   public static final String SFTP_PROXY_ENDPOINT =
@@ -302,6 +305,8 @@ public class WebConstants {
     "_TEMP_IMAGE_ATTACHMENT";
   public static final String WIKIPAGE_SUFFIX = "_WIKI_PAGE";
   public static final String FILE_HANDLE_SUFFIX = "_FILE_HANDLE";
+  public static final String FORCE_LOAD_DRAFT_DATASET_SUFFIX =
+    "_LOAD_DRAFT_DATASET";
 
   public static final String TABLE_COLUMN_ID = "columnId";
   public static final String TABLE_ROW_ID = "rowId";

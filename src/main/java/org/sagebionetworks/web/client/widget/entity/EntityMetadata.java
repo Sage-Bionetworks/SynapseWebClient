@@ -7,7 +7,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import java.util.List;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.ObjectType;
@@ -167,7 +167,7 @@ public class EntityMetadata implements Presenter {
         .addCallback(
           new FutureCallback<DoiAssociation>() {
             @Override
-            public void onSuccess(@NullableDecl DoiAssociation doiAssociation) {
+            public void onSuccess(@Nullable DoiAssociation doiAssociation) {
               doiWidgetV2.configure(doiAssociation);
             }
 

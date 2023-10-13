@@ -300,7 +300,7 @@ public class DisplayConstants {
   public static final String NEW_VERSION_AVAILABLE =
     "New Version of Synapse Available. ";
   public static final String NEW_VERSION_INSTRUCTIONS =
-    "A new version of Synapse is now available, please save your work and reload the page to ensure proper function.";
+    "A new version of Synapse is now available, please save your work. In a few minutes this page will automatically reload to ensure proper function.";
   public static final String UPLOAD_DIALOG_TITLE = "Upload";
   public static final String SHOW_ALL_RESULTS = "Show Results for All Types";
   public static final String FORGOT_PASSWORD = "forgot password?";

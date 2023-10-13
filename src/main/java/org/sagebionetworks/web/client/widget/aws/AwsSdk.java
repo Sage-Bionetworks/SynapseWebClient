@@ -89,11 +89,9 @@ public class AwsSdk {
 		var listener = function(err, data) {
 			if (err) {
 				//error
-				console.log("Upload error, retrying:", err.code, err.message);
+				console.log("Upload error", err.code, err.message);
 				upload.abort();
-				setTimeout(function() {
-					upload.send(listener);
-				}, 5000);
+				callback.@org.sagebionetworks.web.client.widget.upload.S3DirectUploadHandler::uploadFailed(Ljava/lang/String;)(err.message);
 			} else {
 				//success
 				callback.@org.sagebionetworks.web.client.widget.upload.S3DirectUploadHandler::uploadSuccess()();
@@ -120,7 +118,7 @@ public class AwsSdk {
 		var params = {
 			Bucket : bucketName,
 			Key : key,
-			Expires : 20,
+			Expires : 200,
 			ResponseContentDisposition : 'attachment; filename="' + fileName
 					+ '"'
 		};
@@ -167,7 +165,8 @@ public class AwsSdk {
 				Bucket : bucketName
 			},
 			credentials : creds,
-			s3ForcePathStyle : true
+			s3ForcePathStyle : true,
+			signatureVersion: 'v4'
 		});
 		return s3;
 	}-*/;

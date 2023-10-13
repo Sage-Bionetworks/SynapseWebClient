@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityType;
@@ -182,9 +182,6 @@ public abstract class AbstractTablesTab
       view.setModifiedCreatedBy(modifiedCreatedBy);
       view.setWikiPage(wikiPageWidget.asWidget());
       tab.setContent(view.asWidget());
-      tableListWidget.setTableClickedCallback(
-        getTableListWidgetClickedCallback()
-      );
       initBreadcrumbLinkClickedHandler();
       configMap =
         org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget.getDefaultWidgetDescriptor();
@@ -314,7 +311,8 @@ public abstract class AbstractTablesTab
       view.setProvenance(provWidget);
       provWidget.configure(configMap);
     } else {
-      org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget provWidget = ginInjector.getProvenanceRenderer();
+      org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget provWidget =
+        ginInjector.getProvenanceRenderer();
       view.setProvenance(provWidget);
       provWidget.configure(configMap);
     }
@@ -379,19 +377,20 @@ public abstract class AbstractTablesTab
       );
       // Configure wiki
       view.setWikiPageVisible(true);
-      final WikiPageWidget.Callback wikiCallback = new WikiPageWidget.Callback() {
-        @Override
-        public void pageUpdated() {
-          ginInjector
-            .getEventBus()
-            .fireEvent(new EntityUpdatedEvent(entity.getId()));
-        }
+      final WikiPageWidget.Callback wikiCallback =
+        new WikiPageWidget.Callback() {
+          @Override
+          public void pageUpdated() {
+            ginInjector
+              .getEventBus()
+              .fireEvent(new EntityUpdatedEvent(entity.getId()));
+          }
 
-        @Override
-        public void noWikiFound() {
-          view.setWikiPageVisible(false);
-        }
-      };
+          @Override
+          public void noWikiFound() {
+            view.setWikiPageVisible(false);
+          }
+        };
       wikiPageWidget.configure(
         new WikiPageKey(
           entity.getId(),
@@ -422,7 +421,7 @@ public abstract class AbstractTablesTab
         .addCallback(
           new FutureCallback<Long>() {
             @Override
-            public void onSuccess(@NullableDecl Long result) {
+            public void onSuccess(@Nullable Long result) {
               latestSnapshotVersionNumber = result;
               configureVersionAlert();
             }
@@ -523,9 +522,9 @@ public abstract class AbstractTablesTab
       .getEntityVersions(entityBundle.getEntity().getId(), 0, 1)
       .transform(
         new Function<List<VersionInfo>, Long>() {
-          @NullableDecl
+          @Nullable
           @Override
-          public Long apply(@NullableDecl List<VersionInfo> result) {
+          public Long apply(@Nullable List<VersionInfo> result) {
             if (result.size() > 0) {
               return result.get(0).getVersionNumber();
             }

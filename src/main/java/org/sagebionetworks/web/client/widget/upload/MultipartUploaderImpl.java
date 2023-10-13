@@ -110,10 +110,9 @@ public class MultipartUploaderImpl implements MultipartUploader {
     isCanceled = false;
     isDebugLevelLogging = DisplayUtils.isInTestWebsite(cookies);
 
-    // SWC-3779: check for empty file
     long fileSize = (long) synapseJsniUtils.getFileSize(blob);
     if (fileSize <= 0) {
-      handler.uploadFailed(EMPTY_FILE_ERROR_MESSAGE + fileName);
+      handler.uploadSuccess(null);
       return;
     }
 
@@ -252,7 +251,8 @@ public class MultipartUploaderImpl implements MultipartUploader {
       currentPartNumber +
       "\n"
     );
-    BatchPresignedUploadUrlRequest batchPresignedUploadUrlRequest = new BatchPresignedUploadUrlRequest();
+    BatchPresignedUploadUrlRequest batchPresignedUploadUrlRequest =
+      new BatchPresignedUploadUrlRequest();
     batchPresignedUploadUrlRequest.setContentType(BINARY_CONTENT_TYPE);
     batchPresignedUploadUrlRequest.setPartNumbers(
       Collections.singletonList(new Long(currentPartNumber))

@@ -24,3 +24,12 @@ src/main/webapp/fonts/*
 
 # If using jenv for JDK management
 /.java-version
+
+# Playwright
+/test-results/
+/playwright-report/
+/playwright/.cache/
+/playwright/.auth/
+
+# dotenv
+.env

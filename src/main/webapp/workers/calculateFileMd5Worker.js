@@ -1,6 +1,12 @@
-importScripts(
-  'https://cdnjs.cloudflare.com/ajax/libs/spark-md5/3.0.0/spark-md5.min.js',
-)
+// determine cdn endpoint (staging or prod, do not use a cdn for local or dev builds)
+var cdnEndpoint = '//cdn-' + location.hostname + '/'
+var synapseOrgRegex = /(www|staging|tst)\.synapse\.org$/
+
+if (!synapseOrgRegex.test(location.hostname)) {
+  cdnEndpoint = '/'
+}
+
+importScripts(cdnEndpoint + 'generated/spark-md5.min.js')
 
 onmessage = function (e) {
   console.log('Message received from main script')

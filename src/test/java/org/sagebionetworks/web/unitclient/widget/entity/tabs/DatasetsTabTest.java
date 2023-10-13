@@ -22,7 +22,6 @@ import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.Widget;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import org.junit.Before;
@@ -251,18 +250,6 @@ public class DatasetsTabTest {
   public void testSetTabClickedCallback() {
     tab.setTabClickedCallback(mockOnClickCallback);
     verify(mockTab).addTabClickedCallback(mockOnClickCallback);
-  }
-
-  @Test
-  public void testClickTable() {
-    // verify that clicking on an item in the datasets list sends the event back to the entity page top
-    // (to get the new target entity)
-    String newEntityId = "syn9839838";
-    when(mockEntityHeader.getId()).thenReturn(newEntityId);
-    verify(mockTableListWidget)
-      .setTableClickedCallback(callbackPCaptor.capture());
-    callbackPCaptor.getValue().invoke(mockEntityHeader);
-    verify(mockEntitySelectedCallback).invoke(newEntityId);
   }
 
   @Test

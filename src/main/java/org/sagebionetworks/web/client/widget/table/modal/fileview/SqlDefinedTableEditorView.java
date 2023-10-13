@@ -8,6 +8,7 @@ public interface SqlDefinedTableEditorView extends IsWidget {
   String getDescription();
   void setDescription(String description);
   String getDefiningSql();
+  void setModalTitle(String title);
   void setDefiningSql(String definingSql);
   void setHelp(String helpMarkdown, String helpUrl);
   void setSynAlert(IsWidget w);

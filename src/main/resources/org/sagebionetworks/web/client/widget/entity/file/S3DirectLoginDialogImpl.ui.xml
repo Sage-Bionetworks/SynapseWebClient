@@ -38,6 +38,7 @@
           size="LARGE"
           icon="DOWNLOAD"
           width="100%"
+          marginBottom="30"
         >
           Download
         </b:Button>

@@ -292,12 +292,6 @@ public interface SynapseClient extends RemoteService {
   void deleteAccessApprovals(String accessRequirement, String accessorId)
     throws RestServiceException;
 
-  String generateSqlWithFacets(
-    String basicSql,
-    List<org.sagebionetworks.repo.model.table.FacetColumnRequest> selectedFacets,
-    List<ColumnModel> schema
-  ) throws RestServiceException;
-
   Boolean isUserAllowedToRenderHTML(String userId) throws RestServiceException;
 
   long getTeamMemberCount(String teamId) throws RestServiceException;
@@ -327,7 +321,4 @@ public interface SynapseClient extends RemoteService {
     String membershipInvitationId,
     String hostPageBaseURL
   ) throws RestServiceException;
-
-  String getDatasetScriptElementContent(String entityId)
-    throws RestServiceException;
 }

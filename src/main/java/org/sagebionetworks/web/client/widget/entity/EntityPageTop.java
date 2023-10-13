@@ -85,7 +85,8 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
   private final EventBus eventBus;
   private final EntityId2BundleCache entityId2BundleCache;
   public boolean pushTabUrlToBrowserHistory = false;
-  public static final EntityBundleRequest ALL_PARTS_REQUEST = new EntityBundleRequest();
+  public static final EntityBundleRequest ALL_PARTS_REQUEST =
+    new EntityBundleRequest();
   private int countTabContentChecked;
 
   static {

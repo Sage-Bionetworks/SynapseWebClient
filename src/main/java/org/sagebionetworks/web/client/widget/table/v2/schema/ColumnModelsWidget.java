@@ -15,7 +15,7 @@ import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.DatasetCollection;
 import org.sagebionetworks.repo.model.table.EntityView;
-import org.sagebionetworks.repo.model.table.MaterializedView;
+import org.sagebionetworks.repo.model.table.HasDefiningSql;
 import org.sagebionetworks.repo.model.table.SubmissionView;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.View;
@@ -124,8 +124,8 @@ public class ColumnModelsWidget
 
   @Override
   public void configure(EntityBundle bundle, boolean isEditable) {
-    boolean isMaterializedView = bundle.getEntity() instanceof MaterializedView;
-    this.isEditable = isEditable && !isMaterializedView;
+    boolean hasDefiningSql = bundle.getEntity() instanceof HasDefiningSql;
+    this.isEditable = isEditable && !hasDefiningSql;
     this.bundle = bundle;
     List<ColumnModel> startingModels = bundle
       .getTableBundle()
@@ -139,7 +139,8 @@ public class ColumnModelsWidget
     List<ColumnModelTableRow> rowViewers = new ArrayList<>();
     for (ColumnModel cm : startingModels) {
       // Create a viewer
-      ColumnModelTableRowViewer rowViewer = ginInjector.createNewColumnModelTableRowViewer();
+      ColumnModelTableRowViewer rowViewer =
+        ginInjector.createNewColumnModelTableRowViewer();
       ColumnModelUtils.applyColumnModelToRow(cm, rowViewer);
       rowViewer.setSelectable(false);
       rowViewers.add(rowViewer);
@@ -149,9 +150,8 @@ public class ColumnModelsWidget
 
   public void getDefaultColumnsForView() {
     synAlert.clear();
-    List<ColumnModel> defaultColumns = fileViewDefaultColumns.getDefaultViewColumns(
-      tableType
-    );
+    List<ColumnModel> defaultColumns =
+      fileViewDefaultColumns.getDefaultViewColumns(tableType);
     editor.addColumns(defaultColumns);
   }
 
@@ -203,7 +203,8 @@ public class ColumnModelsWidget
 
           @Override
           public void onComplete(AsynchronousResponseBody response) {
-            ViewColumnModelResponse viewColumnModelResponse = (ViewColumnModelResponse) response;
+            ViewColumnModelResponse viewColumnModelResponse =
+              (ViewColumnModelResponse) response;
             editor.addColumns(viewColumnModelResponse.getResults());
             if (viewColumnModelResponse.getNextPageToken() != null) {
               getPossibleColumnModelsForViewScope(

@@ -27,7 +27,8 @@ public enum ColumnTypeViewEnum {
   EntityIdList(ColumnType.ENTITYID_LIST),
   UserIdList(ColumnType.USERID_LIST),
   SubmissionId(ColumnType.SUBMISSIONID),
-  EvaluationId(ColumnType.EVALUATIONID);
+  EvaluationId(ColumnType.EVALUATIONID),
+  JSON(ColumnType.JSON);
 
   private ColumnType type;
 

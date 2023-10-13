@@ -1,0 +1,33 @@
+<!-- Used when serving war with tomcat -->
+<settings
+  xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+                      http://maven.apache.org/xsd/settings-1.0.0.xsd"
+>
+  <localRepository />
+  <interactiveMode />
+  <usePluginRegistry />
+  <offline />
+  <pluginGroups />
+  <servers />
+  <mirrors />
+  <proxies />
+  <profiles>
+    <profile>
+      <id>dev-environment</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <org.sagebionetworks.portal.endpoint>
+          http://127.0.0.1:8888/Portal.html
+        </org.sagebionetworks.portal.endpoint>
+        <org.sagebionetworks.repositoryservice.endpoint>
+          https://repo-dev.dev.sagebase.org/repo/v1
+        </org.sagebionetworks.repositoryservice.endpoint>
+      </properties>
+    </profile>
+  </profiles>
+  <activeProfiles />
+</settings>

@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.Entity;
@@ -662,9 +662,10 @@ public class EntityActionControllerImpl
       (action, event) -> {
         // report abuse via Jira issue collector
         String userId = WebConstants.ANONYMOUS, email =
-          WebConstants.ANONYMOUS, displayName =
-          WebConstants.ANONYMOUS, synId = entity.getId();
-        UserProfile userProfile = authenticationController.getCurrentUserProfile();
+          WebConstants.ANONYMOUS, displayName = WebConstants.ANONYMOUS, synId =
+          entity.getId();
+        UserProfile userProfile =
+          authenticationController.getCurrentUserProfile();
         if (userProfile != null) {
           userId = userProfile.getOwnerId();
           displayName = DisplayUtils.getDisplayName(userProfile);
@@ -713,9 +714,8 @@ public class EntityActionControllerImpl
   }
 
   private FluentFuture configureFileDownload() {
-    FluentFuture<RestrictionInformationResponse> restrictionInformationFuture = getDoneFuture(
-      null
-    );
+    FluentFuture<RestrictionInformationResponse> restrictionInformationFuture =
+      getDoneFuture(null);
 
     if (entity instanceof FileEntity) {
       boolean canDownload = entityBundle.getPermissions().getCanDownload();
@@ -735,20 +735,21 @@ public class EntityActionControllerImpl
             .addCallback(
               new FutureCallback<ActionRequiredList>() {
                 @Override
-                public void onSuccess(@NullableDecl ActionRequiredList result) {
+                public void onSuccess(@Nullable ActionRequiredList result) {
                   if (result != null) {
                     StringBuilder downloadMenuTooltipText = new StringBuilder(
                       NO_PERMISSION_TO_DOWNLOAD
                     );
                     // There may be multiple actions of the same class, but we only want to show one message for each type
                     // Get the unique set of action classes.
-                    Set<Class<? extends org.sagebionetworks.repo.model.download.Action>> uniqueClasses = result
-                      .getActions()
-                      .stream()
-                      .map(
-                        org.sagebionetworks.repo.model.download.Action::getClass
-                      )
-                      .collect(Collectors.toSet());
+                    Set<Class<? extends org.sagebionetworks.repo.model.download.Action>> uniqueClasses =
+                      result
+                        .getActions()
+                        .stream()
+                        .map(
+                          org.sagebionetworks.repo.model.download.Action::getClass
+                        )
+                        .collect(Collectors.toSet());
 
                     for (Class<? extends org.sagebionetworks.repo.model.download.Action> clazz : uniqueClasses) {
                       downloadMenuTooltipText
@@ -840,7 +841,7 @@ public class EntityActionControllerImpl
         new FutureCallback<RestrictionInformationResponse>() {
           @Override
           public void onSuccess(
-            @NullableDecl RestrictionInformationResponse restrictionInformation
+            @Nullable RestrictionInformationResponse restrictionInformation
           ) {
             ginInjector
               .getFileDownloadHandlerWidget()
@@ -1014,7 +1015,7 @@ public class EntityActionControllerImpl
       future.addCallback(
         new FutureCallback<Boolean>() {
           @Override
-          public void onSuccess(@NullableDecl Boolean isACT) {
+          public void onSuccess(@Nullable Boolean isACT) {
             if (isACT) {
               actionMenu.setActionVisible(Action.APPROVE_USER_ACCESS, true);
               actionMenu.setActionListener(
@@ -1262,7 +1263,8 @@ public class EntityActionControllerImpl
 
   private void configureTableCommands() {
     if (entityBundle.getEntity() instanceof Table) {
-      boolean isEntityRefCollectionView = entityBundle.getEntity() instanceof EntityRefCollectionView;
+      boolean isEntityRefCollectionView =
+        entityBundle.getEntity() instanceof EntityRefCollectionView;
       boolean canEditResults =
         permissions.getCanCertifiedUserEdit() &&
         isEditCellValuesSupported(entityBundle.getEntity());
@@ -1291,6 +1293,14 @@ public class EntityActionControllerImpl
         isCurrentVersion
       );
       actionMenu.setActionListener(Action.EDIT_DEFINING_SQL, this);
+
+      actionMenu.setActionVisible(
+        Action.VIEW_DEFINING_SQL,
+        !permissions.getCanCertifiedUserEdit() &&
+        isDefinedBySql(entityBundle.getEntity()) &&
+        isCurrentVersion
+      );
+      actionMenu.setActionListener(Action.VIEW_DEFINING_SQL, this);
     } else {
       actionMenu.setActionVisible(Action.UPLOAD_TABLE_DATA, false);
       actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, false);
@@ -1497,9 +1507,8 @@ public class EntityActionControllerImpl
   }
 
   private void configureVersionHistory() {
-    boolean isVersionHistoryAvailable = EntityActionControllerImpl.isVersionSupported(
-      entityBundle.getEntity()
-    );
+    boolean isVersionHistoryAvailable =
+      EntityActionControllerImpl.isVersionSupported(entityBundle.getEntity());
     actionMenu.setActionVisible(
       Action.SHOW_VERSION_HISTORY,
       isVersionHistoryAvailable
@@ -1771,6 +1780,9 @@ public class EntityActionControllerImpl
         break;
       case EDIT_DEFINING_SQL:
         onEditDefiningSql();
+        break;
+      case VIEW_DEFINING_SQL:
+        onViewDefiningSql();
         break;
       case MOVE_ENTITY:
         onMove();
@@ -2406,7 +2418,9 @@ public class EntityActionControllerImpl
             public void onSuccess(Entity result) {
               fireEntityUpdatedEvent();
               view.showSuccess(
-                "Updated the Synapse SQL query that defines this Materialized View."
+                "Updated the Synapse SQL query that defines this " +
+                EntityTypeUtils.getFriendlyEntityTypeName(result) +
+                "."
               );
             }
 
@@ -2446,7 +2460,8 @@ public class EntityActionControllerImpl
                   EntityArea.TABLES,
                   null
                 );
-                ToastMessageOptions.Builder messageBuilder = new ToastMessageOptions.Builder();
+                ToastMessageOptions.Builder messageBuilder =
+                  new ToastMessageOptions.Builder();
                 messageBuilder.setTitle(SNAPSHOT_CREATED);
                 popupUtils.notify(
                   SNAPSHOT_CREATED_DETAILS_TABLE,
@@ -2475,7 +2490,8 @@ public class EntityActionControllerImpl
         String comment = values.get(1);
         // create the version via an update table transaction
         // Start the job.
-        TableUpdateTransactionRequest transactionRequest = new TableUpdateTransactionRequest();
+        TableUpdateTransactionRequest transactionRequest =
+          new TableUpdateTransactionRequest();
         transactionRequest.setEntityId(entityId);
         SnapshotRequest snapshotRequest = new SnapshotRequest();
         snapshotRequest.setSnapshotLabel(label);
@@ -2504,13 +2520,15 @@ public class EntityActionControllerImpl
               @Override
               public void onComplete(TableUpdateTransactionResponse response) {
                 view.hideCreateVersionDialog();
-                String errors = QueryResultEditorWidget.getEntityUpdateResultsFailures(
-                  response
-                );
+                String errors =
+                  QueryResultEditorWidget.getEntityUpdateResultsFailures(
+                    response
+                  );
                 if (!errors.isEmpty()) {
                   view.showErrorMessage(errors);
                 } else {
-                  ToastMessageOptions.Builder messageBuilder = new ToastMessageOptions.Builder();
+                  ToastMessageOptions.Builder messageBuilder =
+                    new ToastMessageOptions.Builder();
                   EntityArea newVersionArea;
                   String toastMsg;
                   Long newVersionNumber = response.getSnapshotVersionNumber();
@@ -2597,7 +2615,8 @@ public class EntityActionControllerImpl
     List<String> prompts = new ArrayList<>();
     prompts.add("Label");
     prompts.add("Comment");
-    PromptForValuesModalView.Configuration.Builder configBuilder = getPromptForValuesModalConfigBuilder();
+    PromptForValuesModalView.Configuration.Builder configBuilder =
+      getPromptForValuesModalConfigBuilder();
     configBuilder
       .setTitle(getCreateSnapshotTitleCopy(entity))
       .addPrompt("Label", "")
@@ -2747,6 +2766,13 @@ public class EntityActionControllerImpl
       ((HasDefiningSql) entity).getDefiningSQL(),
       getUpdateDefiningSqlCallback(),
       PromptForValuesModalView.InputType.TEXTAREA
+    );
+  }
+
+  private void onViewDefiningSql() {
+    view.showInfoDialog(
+      "Defining SQL",
+      ((HasDefiningSql) entity).getDefiningSQL()
     );
   }
 

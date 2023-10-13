@@ -30,7 +30,7 @@ import org.sagebionetworks.web.client.widget.table.modal.fileview.SqlDefinedTabl
 import org.sagebionetworks.web.client.widget.table.modal.fileview.SqlDefinedTableEditorView;
 
 @RunWith(MockitoJUnitRunner.class)
-public class MaterializedViewEditorTest {
+public class SqlDefinedTableEditorViewTest {
 
   @Mock
   SqlDefinedTableEditorView mockView;
@@ -80,11 +80,6 @@ public class MaterializedViewEditorTest {
   @Test
   public void testConstruction() {
     verify(mockView).setPresenter(widget);
-    verify(mockView)
-      .setHelp(
-        SqlDefinedTableEditor.MATERIALIZED_VIEW_HELP_MARKDOWN,
-        CreateTableViewWizard.VIEW_URL
-      );
     verify(mockView).setSynAlert(mockSynapseAlert);
   }
 
@@ -95,6 +90,12 @@ public class MaterializedViewEditorTest {
 
     verify(mockSynapseAlert).clear();
     verify(mockView).reset();
+    verify(mockView).setModalTitle("Create Materialized View");
+    verify(mockView)
+      .setHelp(
+        SqlDefinedTableEditor.MATERIALIZED_VIEW_HELP_MARKDOWN,
+        CreateTableViewWizard.VIEW_URL
+      );
     verify(mockView).show();
 
     String name = "a new view";
@@ -122,6 +123,12 @@ public class MaterializedViewEditorTest {
 
     verify(mockSynapseAlert).clear();
     verify(mockView).reset();
+    verify(mockView).setModalTitle("Create Virtual Table");
+    verify(mockView)
+      .setHelp(
+        SqlDefinedTableEditor.VIRTUAL_TABLE_HELP_MARKDOWN,
+        CreateTableViewWizard.VIEW_URL
+      );
     verify(mockView).show();
 
     String name = "a new view";

@@ -400,13 +400,6 @@ public interface SynapseClientAsync {
     AsyncCallback<Void> asyncCallback
   );
 
-  void generateSqlWithFacets(
-    String basicSql,
-    List<FacetColumnRequest> selectedFacets,
-    List<ColumnModel> schema,
-    AsyncCallback<String> callback
-  );
-
   void isUserAllowedToRenderHTML(
     String userId,
     AsyncCallback<Boolean> callback
@@ -437,10 +430,5 @@ public interface SynapseClientAsync {
     String csvPreviewText,
     char delimiter,
     AsyncCallback<ArrayList<String[]>> callback
-  );
-
-  void getDatasetScriptElementContent(
-    String entityId,
-    AsyncCallback<String> callback
   );
 }
