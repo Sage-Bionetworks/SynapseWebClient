@@ -3,6 +3,7 @@ import { unlinkSync } from 'fs'
 import { baseURL } from '../../playwright.config'
 import { setCertifiedUserStatus } from '../helpers/certification'
 import {
+  acceptSiteCookies,
   cleanupTestUser,
   createTestUser,
   getAdminPAT,
@@ -49,6 +50,12 @@ function createUserPageFixture<Page>(userPrefix: UserPrefixes) {
       storageState: storageStatePaths[userPrefix],
     })
     const userPage = await context.newPage()
+
+    // accept cookies, so banner doesn't obscure buttons in other tests
+    await userPage.goto('/')
+    await waitForInitialPageLoad(userPage)
+    await acceptSiteCookies(userPage)
+
     await use(userPage)
     await context.close()
   }

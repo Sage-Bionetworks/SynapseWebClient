@@ -8,14 +8,22 @@ import {
   entityUrlPathname,
   generateEntityName,
 } from './helpers/entities'
-import {
-  acceptSiteCookies,
-  getAccessTokenFromCookie,
-  getAdminPAT,
-} from './helpers/testUser'
+import { getAccessTokenFromCookie, getAdminPAT } from './helpers/testUser'
 import { Project } from './helpers/types'
 import { userConfigs } from './helpers/userConfig'
 import { waitForInitialPageLoad } from './helpers/utils'
+
+const expectFilePageLoaded = async (
+  fileName: string,
+  fileEntityId: string,
+  page: Page,
+) => {
+  await page.waitForURL(entityUrlPathname(fileEntityId))
+  await expect(page.getByText(`Discussion about ${fileName}`)).toBeVisible()
+
+  await expect(page.getByText('Loading provenance...')).not.toBeVisible()
+  await expect(page.getByText(fileEntityId, { exact: true })).toBeVisible()
+}
 
 const openFileSharingSettings = async (page: Page) => {
   await testAuth.step('First user can open File Sharing Settings', async () => {
@@ -177,9 +185,7 @@ test.describe('Files', () => {
         await expect(fileLink).toBeVisible()
 
         await fileLink.click()
-        await expect(
-          userPage.getByText(`Discussion about ${fileName}`),
-        ).toBeVisible()
+        await expectFilePageLoaded(fileName, fileEntityId, userPage)
       })
 
       await openFileSharingSettings(userPage)
@@ -224,10 +230,6 @@ test.describe('Files', () => {
           // Don't send message, so we don't have to clean up the message
           await userPage.getByText('Notify people via email').click()
 
-          // Cookies banner covers the button to save settings
-          // ...so close banner by accepting cookies
-          await acceptSiteCookies(userPage)
-
           await saveFileSharingSettings(userPage)
         },
       )
@@ -237,9 +239,7 @@ test.describe('Files', () => {
 
       await testAuth.step('Second user accesses the file', async () => {
         await validatedUserPage.reload()
-        await expect(
-          validatedUserPage.getByText(`Discussion about ${fileName}`),
-        ).toBeVisible()
+        await expectFilePageLoaded(fileName, fileEntityId, validatedUserPage)
       })
 
       await testAuth.step('Second user downloads the file', async () => {
