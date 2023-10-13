@@ -5,6 +5,7 @@ env:
   BUILD_ARTIFACT_NAME: swc-war
   BUILD_DIR: target
   BUILD_NAME: portal-develop-SNAPSHOT.war
+  NODE_VERSION: 18.16.0
   PW_ALL_BLOBS_DIR: all-blob-reports
 jobs:
   build:
@@ -52,6 +53,9 @@ jobs:
             -v "/$(pwd)/${{ env.BUILD_DIR }}/${{ env.BUILD_NAME }}:/usr/local/tomcat/webapps/ROOT.war" \
             -v "/$(pwd)/e2e_workflow/settings.xml":/root/.m2/settings.xml \
             tomcat:9.0
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
       - name: Install dependencies
         run: yarn install --frozen-lockfile
       - name: Install Playwright Browsers
@@ -82,7 +86,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: ${{ env.NODE_VERSION }}
       - name: Install dependencies
         run: yarn install --frozen-lockfile
       - name: Download blob reports from GitHub Actions Artifacts
