@@ -94,3 +94,38 @@ export async function doDelete<T>(
   )
   return response
 }
+
+export async function doPut<T>(
+  page: Page,
+  url: string,
+  requestJsonObject: unknown,
+  accessToken: string | undefined,
+  endpoint: BackendDestinationEnum,
+  additionalOptions: RequestInit = {},
+) {
+  await waitForSrcEndpointConfig(page)
+  const response = await page.evaluate(
+    async ({
+      url,
+      requestJsonObject,
+      accessToken,
+      endpoint,
+      additionalOptions,
+    }) => {
+      // @ts-expect-error: Cannot find name 'SRC'
+      const srcEndpoint = await SRC.SynapseEnums.BackendDestinationEnum[
+        endpoint
+      ]
+      // @ts-expect-error: Cannot find name 'SRC'
+      return await SRC.HttpClient.doPut(
+        url,
+        requestJsonObject,
+        accessToken,
+        srcEndpoint,
+        additionalOptions,
+      )
+    },
+    { url, requestJsonObject, accessToken, endpoint, additionalOptions },
+  )
+  return response
+}

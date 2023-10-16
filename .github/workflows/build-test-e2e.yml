@@ -1,11 +1,34 @@
 name: 'Build/Run End-to-End Tests'
 
 on: push
+env:
+  BUILD_ARTIFACT_NAME: swc-war
+  BUILD_DIR: target
+  BUILD_NAME: portal-develop-SNAPSHOT.war
+  NODE_VERSION: 18.16.0
+  PW_ALL_BLOBS_DIR: all-blob-reports
 jobs:
-  build-and-run-e2e:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build SWC
+        uses: ./.github/workflows/build
+      - name: Upload build to GitHub Actions Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.BUILD_ARTIFACT_NAME }}
+          path: '${{ env.BUILD_DIR }}/${{ env.BUILD_NAME }}'
+          retention-days: 1
+  playwright-tests:
     if: ${{ github.ref_name == 'develop' || startsWith(github.ref_name, 'release-') || github.actor == github.repository_owner }}
+    needs: [build]
     runs-on: ${{ github.repository_owner == 'Sage-Bionetworks' && 'ubuntu-22.04-4core-16GBRAM-150GBSSD' || 'macos-latest' }}
     timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1/3, 2/3, 3/3]
     env:
       CONTAINER_NAME: 'swc-tomcat'
       CI: true
@@ -14,42 +37,68 @@ jobs:
       - name: Setup docker (missing on MacOS)
         if: runner.os == 'macos'
         run: |
-          # workaround for https://github.com/actions/runner-images/issues/8104
-          # ...and handle 8.1.0 regression: https://github.com/Homebrew/homebrew-core/issues/140244
-          export HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1
-          brew uninstall --ignore-dependencies qemu
-          curl -OSL https://raw.githubusercontent.com/Homebrew/homebrew-core/dc0669eca9479e9eeb495397ba3a7480aaa45c2e/Formula/qemu.rb
-          brew install ./qemu.rb
-
           brew install docker
           colima start
-      - name: Build SWC
-        uses: ./.github/workflows/build
+      - name: Download build from GitHub Actions Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ env.BUILD_ARTIFACT_NAME }}
+          path: ${{ env.BUILD_DIR }}
       - name: Run SWC on Tomcat
         run: |
           docker run \
-            --name "${CONTAINER_NAME}" \
+            --name "${{ env.CONTAINER_NAME }}" \
             -d --rm \
             -p 8888:8080 \
-            -v "/$(pwd)/target/portal-develop-SNAPSHOT.war:/usr/local/tomcat/webapps/ROOT.war" \
+            -v "/$(pwd)/${{ env.BUILD_DIR }}/${{ env.BUILD_NAME }}:/usr/local/tomcat/webapps/ROOT.war" \
             -v "/$(pwd)/e2e_workflow/settings.xml":/root/.m2/settings.xml \
             tomcat:9.0
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
       - name: Install Playwright Browsers
         run: yarn playwright install --with-deps
       - name: Run Playwright tests
         env:
           ADMIN_PAT: ${{ secrets.ADMIN_PAT }}
-        run: yarn playwright test
-      - name: Upload Playwright Report
+        run: yarn playwright test --shard ${{ matrix.shard }}
+      - name: Upload blob report to GitHub Actions Artifacts
         uses: actions/upload-artifact@v3
         if: always()
         with:
-          name: playwright-report
-          path: playwright-report/
-          retention-days: 30
+          name: ${{ env.PW_ALL_BLOBS_DIR }}
+          path: blob-report
+          retention-days: 1
       - name: Stop Tomcat
         if: always()
-        run: docker stop "${CONTAINER_NAME}"
+        run: docker stop "${{ env.CONTAINER_NAME }}"
       - name: Stop Colima
         if: runner.os == 'macos'
         run: colima stop
+  merge-reports:
+    # Merge reports after playwright-tests, even if some shards have failed
+    if: always()
+    needs: [playwright-tests]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Download blob reports from GitHub Actions Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ env.PW_ALL_BLOBS_DIR }}
+          path: ${{ env.PW_ALL_BLOBS_DIR }}
+      - name: Merge into HTML Report
+        run: yarn playwright merge-reports --reporter html ./"${{ env.PW_ALL_BLOBS_DIR }}"
+      - name: Upload HTML report
+        uses: actions/upload-artifact@v3
+        with:
+          name: html-report--attempt-${{ github.run_attempt }}
+          path: playwright-report
+          retention-days: 14

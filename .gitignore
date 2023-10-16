@@ -30,6 +30,8 @@ src/main/webapp/fonts/*
 /playwright-report/
 /playwright/.cache/
 /playwright/.auth/
+/blob-report/
+/all-blob-reports/
 
 # dotenv
 .env

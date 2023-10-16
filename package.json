@@ -24,7 +24,7 @@
     "papaparse": "^5.4.1"
   },
   "devDependencies": {
-    "@playwright/test": "1.38.0",
+    "@playwright/test": "^1.39.0",
     "@prettier/plugin-xml": "^3.1.0",
     "@types/node": "18.6.5",
     "dotenv": "^16.3.1",
@@ -46,6 +46,8 @@
     "e2e:chromium": "yarn playwright test --project=chromium",
     "e2e:ui": "yarn playwright test --ui",
     "e2e:codegen": "yarn playwright codegen",
-    "e2e:report": "yarn playwright show-report"
+    "e2e:report": "yarn playwright show-report",
+    "e2e:report:blob": "yarn playwright merge-reports --reporter html ./blob-report && yarn e2e:report",
+    "playwright:update": "yarn add -D @playwright/test@latest; yarn playwright install"
   }
 }

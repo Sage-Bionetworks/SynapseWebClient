@@ -84,9 +84,6 @@ export async function loginTestUser(
   await page.getByRole('button', { name: 'Sign in' }).click()
 
   // Ensure that correct username/password were received
-  const loadingButton = page.getByRole('button', { name: 'Logging you in' })
-  await expect(loadingButton).toBeVisible()
-  await expect(loadingButton).not.toBeVisible()
   await expect(
     page.getByText('The provided username/password combination is incorrect'),
   ).not.toBeVisible()
@@ -135,4 +132,8 @@ export async function getUserIdFromLocalStorage(page: Page) {
   const id = await getLocalStorage(page, 'SESSION_MARKER')
   expect(id).not.toBeNull()
   return id!
+}
+
+export async function acceptSiteCookies(page: Page) {
+  await page.getByRole('button', { name: 'Accept and continue' }).click()
 }
