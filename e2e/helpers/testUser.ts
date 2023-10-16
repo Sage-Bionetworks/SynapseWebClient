@@ -69,6 +69,10 @@ export async function loginTestUser(
   await page.goto('/')
   await waitForInitialPageLoad(page)
 
+  // Accept cookies, so banner doesn't obscure buttons in other tests
+  await acceptSiteCookies(page)
+
+  // Login
   await page.getByRole('link', { name: 'Log in to Synapse' }).first().click()
   await page.getByRole('button', { name: 'Sign in with your email' }).click()
 
