@@ -5,6 +5,8 @@ import { goToDashboard } from './helpers/testUser'
 import { Project } from './helpers/types'
 import { waitForInitialPageLoad } from './helpers/utils'
 
+// Public project owned by swc-e2e-admin on backend dev stack.
+// In the future, consider creating/deleting a new public project within the test instead.
 const PUBLIC_PROJECT: Project = {
   name: 'swc-e2e-test-project',
   id: 'syn12366772',
@@ -109,6 +111,8 @@ test.describe('Favorites', () => {
         'User does not have project listed on their favorites page',
         async () => {
           await goToFavorites(userPage)
+
+          // The page needs to be reloaded for the favorites list to update
           await userPage.reload()
           await expectFavoritesPageLoaded(userPage)
 
