@@ -17,7 +17,6 @@ import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.place.Challenges;
 import org.sagebionetworks.web.client.place.ChangeUsername;
 import org.sagebionetworks.web.client.place.ComingSoon;
-import org.sagebionetworks.web.client.place.DataAccessApprovalTokenPlace;
 import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.EmailInvitation;
 import org.sagebionetworks.web.client.place.ErrorPlace;
@@ -30,7 +29,6 @@ import org.sagebionetworks.web.client.place.NewAccount;
 import org.sagebionetworks.web.client.place.PasswordResetSignedTokenPlace;
 import org.sagebionetworks.web.client.place.PeopleSearch;
 import org.sagebionetworks.web.client.place.Profile;
-import org.sagebionetworks.web.client.place.Quiz;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.SignedToken;
 import org.sagebionetworks.web.client.place.StandaloneWiki;
@@ -132,8 +130,6 @@ public class AppActivityMapper implements ActivityMapper {
       this.ginjector.getAuthenticationController();
     GlobalApplicationState globalApplicationState =
       this.ginjector.getGlobalApplicationState();
-
-    globalApplicationState.recordPlaceVisit(place);
 
     // set current and last places
     Place storedCurrentPlace = globalApplicationState.getCurrentPlace();

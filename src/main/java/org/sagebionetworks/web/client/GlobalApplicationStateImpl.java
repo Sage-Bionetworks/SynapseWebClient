@@ -70,7 +70,8 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
    */
   public static String LAST_PLACE =
     "org.sagebionetworks.synapse.place.last.place";
-  public static final ArrayList<String> SAFE_TO_IGNORE_ERRORS = new ArrayList<String>();
+  public static final ArrayList<String> SAFE_TO_IGNORE_ERRORS =
+    new ArrayList<String>();
 
   static {
     // Benign error thrown by VideoWidget (<video>). ResizeObserver was not able to deliver all
@@ -172,7 +173,8 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
     } else if (
       e instanceof com.google.web.bindery.event.shared.UmbrellaException
     ) {
-      com.google.web.bindery.event.shared.UmbrellaException ue = (com.google.web.bindery.event.shared.UmbrellaException) e;
+      com.google.web.bindery.event.shared.UmbrellaException ue =
+        (com.google.web.bindery.event.shared.UmbrellaException) e;
       if (ue.getCauses().size() > 0) {
         return unwrap(ue.getCauses().iterator().next());
       }
@@ -387,18 +389,10 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
         } else {
           gwt.replaceItem(token, false);
         }
-
-        recordPlaceVisit(targetPlace);
       }
     } catch (Throwable t) {
       synapseJSNIUtils.consoleError(t.getMessage());
     }
-  }
-
-  @Override
-  public void recordPlaceVisit(Place targetPlace) {
-    String token = appPlaceHistoryMapper.getToken(targetPlace);
-    synapseJSNIUtils.recordPageVisit(token);
   }
 
   @Override

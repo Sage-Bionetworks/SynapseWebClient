@@ -110,8 +110,6 @@ public interface GlobalApplicationState {
 
   public void refreshPage();
 
-  public void recordPlaceVisit(Place targetPlace);
-
   void replaceCurrentPlace(Place targetPlace);
 
   void setShowUTCTime(boolean showUTC);

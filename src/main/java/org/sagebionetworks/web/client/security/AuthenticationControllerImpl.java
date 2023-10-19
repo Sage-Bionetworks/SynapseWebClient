@@ -5,7 +5,6 @@ import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEn
 
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.StatusCodeException;
@@ -226,7 +225,6 @@ public class AuthenticationControllerImpl implements AuthenticationController {
               public void onSuccess(UserProfile profile) {
                 currentUserProfile = profile;
                 ginInjector.getSessionDetector().initializeAccessTokenState();
-                jsniUtils.setAnalyticsUserId(getCurrentUserPrincipalId());
                 callback.onSuccess(currentUserProfile);
               }
 
@@ -274,7 +272,8 @@ public class AuthenticationControllerImpl implements AuthenticationController {
         new AsyncCallback<NotificationEmail>() {
           @Override
           public void onSuccess(NotificationEmail notificationEmailStatus) {
-            EmailQuarantineStatus status = notificationEmailStatus.getQuarantineStatus();
+            EmailQuarantineStatus status =
+              notificationEmailStatus.getQuarantineStatus();
             if (isQuarantined(status)) {
               ginInjector
                 .getQuarantinedEmailModal()
@@ -317,7 +316,6 @@ public class AuthenticationControllerImpl implements AuthenticationController {
   @Override
   public void logoutUser() {
     // terminate the session, remove the cookie
-    jsniUtils.setAnalyticsUserId("");
     clearLocalStorage();
     // save last place but clear other session storage values on logout.
     Place lastPlace = ginInjector.getGlobalApplicationState().getLastPlace();
@@ -444,7 +442,8 @@ public class AuthenticationControllerImpl implements AuthenticationController {
       NIH_NOTIFICATION_DISMISSED,
       COOKIES_ACCEPTED,
     };
-    String[] srcPersistentLocalStorageKeys = jsniUtils.getSrcPersistentLocalStorageKeys();
+    String[] srcPersistentLocalStorageKeys =
+      jsniUtils.getSrcPersistentLocalStorageKeys();
 
     this.persistentLocalStorageKeys = new ArrayList<String>();
 

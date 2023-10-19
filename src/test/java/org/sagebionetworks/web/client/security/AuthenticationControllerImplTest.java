@@ -25,7 +25,6 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.auth.LoginRequest;
@@ -229,7 +228,6 @@ public class AuthenticationControllerImplTest {
     verify(mockGlobalApplicationState).setLastPlace(mockPlace);
     verify(mockSessionDetector).initializeAccessTokenState();
     verify(mockGlobalApplicationState).refreshPage();
-    verify(mockSynapseJSNIUtils).setAnalyticsUserId("");
     verify(mockQueryClient).resetQueries();
   }
 
@@ -298,7 +296,6 @@ public class AuthenticationControllerImplTest {
 
     verify(loginCallback).onSuccess(any(UserProfile.class));
     verify(mockSessionDetector).initializeAccessTokenState();
-    verify(mockSynapseJSNIUtils).setAnalyticsUserId(USER_ID);
     verify(mockQueryClient).resetQueries();
   }
 
