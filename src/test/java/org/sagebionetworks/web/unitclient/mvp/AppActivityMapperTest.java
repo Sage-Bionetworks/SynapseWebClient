@@ -93,9 +93,6 @@ public class AppActivityMapperTest {
 
     // Validate that the place was set.
     verify(mockBulkPresenterProxy).setPlace(unknownPlace);
-
-    // validate that the place change was recorded
-    verify(mockGlobalApplicationState).recordPlaceVisit(unknownPlace);
   }
 
   /*

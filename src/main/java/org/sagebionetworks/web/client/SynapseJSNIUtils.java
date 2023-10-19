@@ -10,10 +10,6 @@ import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray;
 
 public interface SynapseJSNIUtils {
-  public void recordPageVisit(String token);
-
-  void setAnalyticsUserId(String userId);
-
   public String getCurrentHistoryToken();
 
   public void highlightCodeBlocks();

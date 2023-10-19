@@ -89,18 +89,20 @@
       type="application/opensearchdescription+xml"
     />
     <link rel="manifest" href="manifest.json" />
-    <!-- Google Analytics -->
+    <!-- Google Tag Manager -->
     <script>
-      window.dataLayer = window.dataLayer || []
-      function gtag() {
-        dataLayer.push(arguments)
-      }
-      gtag('js', new Date())
-      gtag('config', 'G-CEKFPZDZX7', {
-        // manual page views in a SPA
-        send_page_view: false,
-      })
+      ;(function (w, d, s, l, i) {
+        w[l] = w[l] || []
+        w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' })
+        var f = d.getElementsByTagName(s)[0],
+          j = d.createElement(s),
+          dl = l != 'dataLayer' ? '&l=' + l : ''
+        j.async = true
+        j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl
+        f.parentNode.insertBefore(j, f)
+      })(window, document, 'script', 'dataLayer', 'GTM-KPW4KS62')
     </script>
+    <!-- End Google Tag Manager -->
     <script>
       // Modern browsers natively support this function.
       if (typeof Object.assign !== 'function') {
@@ -503,7 +505,6 @@
       head.load(cdnEndpoint + 'js/details-shim.min.js')
       head.load(cdnEndpoint + 'js/xss.min.js')
       head.load(cdnEndpoint + 'generated/pica.min.js')
-      head.load('https://www.googletagmanager.com/gtag/js?id=G-CEKFPZDZX7')
       head.load(reactPath)
       head.load(reactDomPath)
       head.load(reactQueryPath)
@@ -569,6 +570,16 @@
           >
         </div>
       </noscript>
+      <!-- Google Tag Manager (noscript) -->
+      <noscript
+        ><iframe
+          src="https://www.googletagmanager.com/ns.html?id=GTM-KPW4KS62"
+          height="0"
+          width="0"
+          style="display: none; visibility: hidden"
+        ></iframe
+      ></noscript>
+      <!-- End Google Tag Manager (noscript) -->
       <!-- This is the GWT-generated body -->
       <div id="alertWrapper">
         <div id="alertContainer"></div>

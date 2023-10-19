@@ -25,44 +25,6 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
   private static ProgressCallback progressCallback;
 
   @Override
-  public void setAnalyticsUserId(String userID) {
-    _setAnalyticsUserId(userID);
-  }
-
-  private static native void _setAnalyticsUserId(String userID) /*-{
-		try {
-			$wnd.gtag('config', 'G-CEKFPZDZX7', {
-				'user_id': userID,
-				// manual page views in a SPA
-				send_page_view: false
-			});
-		} catch (err) {
-			console.error(err);
-		}
-	}-*/;
-
-  @Override
-  public void recordPageVisit(String token) {
-    String pageTitle = Document.get().getTitle();
-    _recordPageVisit(pageTitle, token);
-  }
-
-  private static native void _recordPageVisit(
-    String pageTitle,
-    String token
-  ) /*-{
-		try {
-			$wnd.gtag('event', 'page_view', {
-				page_title: pageTitle,
-				page_location: '/#'+token,
-				send_to: 'G-CEKFPZDZX7'
-			})
-		} catch (err) {
-			console.error(err);
-		}
-	}-*/;
-
-  @Override
   public String getCurrentHistoryToken() {
     return History.getToken();
   }
