@@ -4708,10 +4708,10 @@ svg-path-sdf@^1.1.3:
     parse-svg-path "^0.1.2"
     svg-path-bounds "^1.0.1"
 
-synapse-react-client@3.1.56:
-  version "3.1.56"
-  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-3.1.56.tgz#c3e65927f852c565ff7c9c111e3e2cffd6cd536b"
-  integrity sha512-/TwRMpvLhg9bfCYVPqUCXj0o5uNLMPmPPdjLLbVbt2xtqemlSSLqLs11u5LgNYRyGCack+VKRq0K6Kvj8+kA7w==
+synapse-react-client@3.1.57:
+  version "3.1.57"
+  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-3.1.57.tgz#a76d3d26e93570d8aada62e365f6c26a993f0ec8"
+  integrity sha512-eiEyYS3faSE97Gsdm8YZtC2mBdr9IAXHq5LGk0t8k3A4x4jRDHMiiGgVjzOwxVyhqv8Q8YuehvVvQ5xjSGPkow==
   dependencies:
     "@apidevtools/json-schema-ref-parser" "^9.1.2"
     "@brainhubeu/react-carousel" "1.19.26"
@@ -4760,6 +4760,7 @@ synapse-react-client@3.1.56:
     markdown-it-synapse-math "^3.0.5"
     markdown-it-synapse-table "^1.0.6"
     mui-one-time-password-input "1.1.0"
+    papaparse "^5.4.1"
     plotly.js-basic-dist "^2.24.3"
     pluralize "^8.0.0"
     prop-types "^15.8.1"
