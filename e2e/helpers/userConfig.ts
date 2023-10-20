@@ -11,7 +11,7 @@ export type UserPrefixes = (typeof userPrefixes)[number]
 const generateUserName = (prefix: string) => {
   // uncomment to use static username for troubleshooting:
   // ...and ensure that usernames are unique per worker
-  // return `${prefix}-${process.env.TEST_PARALLEL_INDEX}`
+  // return `local-${prefix}-${process.env.TEST_PARALLEL_INDEX}`
 
   return `${prefix}-${uuidv4()}`
 }

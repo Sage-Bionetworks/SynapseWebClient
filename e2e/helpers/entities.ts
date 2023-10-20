@@ -8,8 +8,20 @@ export function generateEntityName(entityType: 'project' | 'folder' | 'file') {
   return `swc-e2e-${entityType}-entity-${uuidv4()}`
 }
 
+const entityHashBang = '#!Synapse'
+
 export function entityUrlPathname(entityId: string) {
-  return `/#!Synapse:${entityId}`
+  return `/${entityHashBang}:${entityId}`
+}
+
+export function getEntityIdFromPathname(pathname: string) {
+  if (!pathname.includes(entityHashBang)) {
+    return ''
+  }
+
+  return pathname
+    .replace(new RegExp(`.*${entityHashBang}:`), '')
+    .replace(/\/.*/, '')
 }
 
 export async function createProject(
@@ -128,6 +140,16 @@ export async function getEntity(
     { accessToken, entityId, versionNumber },
   )
   return entity
+}
+
+export async function getEntityFileHandleId(
+  page: Page,
+  accessToken: string | undefined = undefined,
+  entityId: string,
+  versionNumber?: string | number,
+) {
+  const fileEntity = await getEntity(page, accessToken, entityId, versionNumber)
+  return fileEntity.dataFileHandleId as string
 }
 
 // https://rest-docs.synapse.org/rest/DELETE/entity/id.html

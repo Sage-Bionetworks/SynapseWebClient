@@ -141,3 +141,10 @@ export async function getUserIdFromLocalStorage(page: Page) {
 export async function acceptSiteCookies(page: Page) {
   await page.getByRole('button', { name: 'Accept and continue' }).click()
 }
+
+export const dismissAlert = async (page: Page, alertText: string) => {
+  const alert = page.getByRole('alert').filter({ hasText: alertText })
+  expect(alert).toBeVisible()
+  await alert.getByRole('button', { name: 'Close' }).click()
+  await expect(alert).not.toBeVisible()
+}
