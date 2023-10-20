@@ -146,15 +146,17 @@ test.describe('Files', () => {
   testAuth(
     'File sharing',
     async ({ userPage, validatedUserPage, browserName }, testInfo) => {
-      if (browserName === 'webkit') {
-        test.info().annotations.push({
-          type: 'very slow',
-          description: `webkit in CI only. May be related to the InviteWidget. 
-            Evaluate if timeout can be removed after addressing 
-            https://sagebionetworks.jira.com/browse/SWC-6569.`,
-        })
-        test.setTimeout(testInfo.timeout * 5)
-      }
+      // Use test.fixme because test.fail doesn't mark test as expected to fail
+      // when there is a test timeout. Since test timeouts are expensive,
+      // Playwright recommends skipping the test entirely with test.fixme.
+      // See: https://github.com/microsoft/playwright/issues/16317
+      test.fixme(
+        browserName === 'webkit' && !!process.env.CI,
+        `Very slow in webkit in CI only (passes after 6min in macos-latest runner, 
+          times out after 10min in Sage ubuntu-22.04-4core-16GBRAM-150GBSSD runner). 
+          May be related to the InviteWidget. Evaluate if test passes after addressing 
+          https://sagebionetworks.jira.com/browse/SWC-6569.`,
+      )
 
       const userName = userConfigs['swc-e2e-user'].username
       const validatedUserName = userConfigs['swc-e2e-user-validated'].username
