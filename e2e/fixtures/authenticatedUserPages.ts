@@ -23,7 +23,7 @@ type AuthenticatedUserPageTestFixtures = {
   validatedUserPage: Page
 }
 
-type StorageStatePaths = { [key in UserPrefixes]?: string }
+export type StorageStatePaths = { [key in UserPrefixes]?: string }
 type AuthenticatedUserPageWorkerFixtures = {
   createUsers: void
   storageStatePaths: StorageStatePaths
