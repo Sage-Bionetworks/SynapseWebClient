@@ -137,9 +137,14 @@ const uploadFile = async (
   })
 
   await testAuth.step('ensure there was not an upload error', async () => {
-    await expect(
-      page.getByRole('heading', { name: 'Upload Error' }),
-    ).not.toBeVisible()
+    const uploadError = page.getByRole('heading', { name: 'Upload Error' })
+    if (await uploadError.isVisible()) {
+      const uploadErrorText = await page
+        .getByRole('dialog')
+        .getByText('Unable to upload the file')
+        .textContent()
+      throw new Error(`Upload Error: ${uploadErrorText}`)
+    }
   })
 }
 
