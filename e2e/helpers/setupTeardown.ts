@@ -1,12 +1,18 @@
 import { Browser } from '@playwright/test'
 import { StorageStatePaths } from '../fixtures/authenticatedUserPages'
+import ACCESS_TYPE from './ACCESS_TYPE'
+import { addUserToEntityACL } from './acl'
 import {
   createProject,
   deleteFileHandleWithRetry,
   deleteProject,
   generateEntityName,
 } from './entities'
-import { getAccessTokenFromCookie, getAdminPAT } from './testUser'
+import {
+  getAccessTokenFromCookie,
+  getAdminPAT,
+  getUserIdFromLocalStorage,
+} from './testUser'
 import { Project } from './types'
 import { UserPrefixes } from './userConfig'
 
@@ -26,6 +32,32 @@ export const setupProject = async (
   await context.close()
 
   return { name: projectName, id: projectId } as Project
+}
+
+export const setupProjectWithPermissions = async (
+  browser: Browser,
+  projectCreator: UserPrefixes,
+  projectAccessor: UserPrefixes,
+  storageStatePaths: StorageStatePaths,
+  accessorPermissions: ACCESS_TYPE[] = [ACCESS_TYPE.DOWNLOAD, ACCESS_TYPE.READ],
+) => {
+  const project = await setupProject(browser, projectCreator, storageStatePaths)
+
+  const context = await browser.newContext({
+    storageState: storageStatePaths[projectAccessor],
+  })
+  const page = await context.newPage()
+  const userId = await getUserIdFromLocalStorage(page)
+  await addUserToEntityACL(
+    page,
+    project.id,
+    Number(userId),
+    getAdminPAT(),
+    accessorPermissions,
+  )
+  await context.close()
+
+  return project
 }
 
 export const teardownProjectsAndFileHandles = async (
