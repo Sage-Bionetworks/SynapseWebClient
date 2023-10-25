@@ -4,15 +4,27 @@
 
 ### Local
 
-1. Create a .env file with the following environment variables: `ADMIN_PAT`.
-2. Build SWC: `mvn clean install`
-3. Run Tests\*: `yarn e2e`
+1. Install Docker, if not already installed.
+2. Create a new admin user on the backend dev stack named: `swc-e2e-admin-{your-name}`, then create a new PAT with View, Download, and Modify permissions.
+3. Create a `.env` file with the following environment variables: `ADMIN_PAT`.
+4. Build SWC: `yarn build`
+5. Serve SWC via Tomcat Docker container: `yarn docker:start`
+6. Run Tests: `yarn e2e`. Tests can be run multiple times against the same Docker container.
+7. When finished testing, stop and remove Docker container: `yarn docker:stop`
 
-\*Note: if running tests repeatedly without changing SWC, it will be faster to run SWC in a separate terminal (`mvn gwt:run`) and then run tests (`yarn e2e`), since Playwright will use the existing server and SWC won't need to recompile before tests are run.
+Notes:
 
-The test suite will create a new test user with randomly generated username / password on the dev stack for tests that require an authenticated test user. The user will be deleted after the tests finish running.
-
-When writing a new test, it can be useful to create a static user with known username and password, so that issues can be debugged by logging into the user's account. Additionally, users can only be deleted if all associated objects have also been deleted. If a test creates an entity in the user account but fails to clean up the entity, the test user won't be deleted and will clutter the dev stack. After a failed test run, persistent entities and test user accounts can be cleaned up more easily if user credentials are known.
+- Test user creation:
+  - The test suite will create a new test user with randomly generated username / password on the backend dev stack for tests that require an authenticated test user. The user will be deleted after the tests finish running.
+  - However, test users can only be deleted if all associated objects have also been deleted. If a test creates an entity in the user account but fails to clean up the entity, the test user won't be deleted and will clutter the dev stack. After a failed test run, persistent entities and test user accounts can be cleaned up more easily if user credentials are known.
+- Writing new tests:
+  - Create static test users with known username and password, so that issues can be debugged by logging into the user accounts. See comments in `e2e/helpers/userConfig.ts`.
+  - Start by running the new test against one browser with one worker, trace on, and no retries: `yarn e2e --project=firefox --workers=1 --retries=0 --trace=on e2e/{new_test}.spec.ts`.
+  - Before pushing changes to CI, run tests with the same configuration as CI by adding `CI=true` to the `.env` file.
+- Running tests without installing Docker:
+  - Ensure that your maven settings file (usually located at `~/.m2/settings.xml`) points at the backend development stack. See endpoint parameters [in this guide](https://sagebionetworks.jira.com/wiki/spaces/SWC/pages/15597754/Developer+Bootstrap).
+  - Run `mvn clean install` followed by `mvn gwt:run` instead of steps 2 and 3.
+  - If you would like to run tests repeatedly without changing SWC, it will be faster to run SWC in a separate terminal (`mvn gwt:run`) and then run tests (`yarn e2e`), since Playwright will use the existing server and SWC won't need to recompile before tests are run.
 
 ### CI
 
