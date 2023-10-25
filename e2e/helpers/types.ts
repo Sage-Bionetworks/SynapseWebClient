@@ -1,3 +1,5 @@
+import ACCESS_TYPE from './ACCESS_TYPE'
+
 /* USERS */
 export type LoginResponse = {
   accessToken: string // A token that authorizes subsequent requests
@@ -84,3 +86,19 @@ export type FileUploadComplete = {
 }
 
 export type FileType = 'text/txt' | 'text/csv' | 'application/json'
+
+/* ACL */
+export type ResourceAccess = {
+  principalId: number
+  accessType: ACCESS_TYPE[]
+}
+
+export type AccessControlList = {
+  id: string
+  createdBy?: string
+  creationDate?: string
+  modifiedBy?: string
+  modifiedOn?: string
+  etag?: string
+  resourceAccess: ResourceAccess[]
+}
