@@ -28,7 +28,6 @@ import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.context.QueryClientProvider;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.jsinterop.reactquery.QueryClient;
 import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -57,6 +56,8 @@ public class AuthenticationControllerImpl implements AuthenticationController {
     "nih_notification_dismissed";
   public static String COOKIES_ACCEPTED =
     "org.sagebionetworks.security.cookies.notification.okclicked";
+  public static String FORCE_DISPLAY_ORIGINAL_COLUMN_NAMES =
+    "force-display-original-column-names";
 
   private List<String> persistentLocalStorageKeys;
   private String currentUserAccessToken;
@@ -66,7 +67,6 @@ public class AuthenticationControllerImpl implements AuthenticationController {
   private SessionStorage sessionStorage;
   private PortalGinInjector ginInjector;
   private SynapseJSNIUtils jsniUtils;
-  private CookieProvider cookies;
   private QueryClient queryClient;
 
   @Inject
@@ -74,7 +74,6 @@ public class AuthenticationControllerImpl implements AuthenticationController {
     UserAccountServiceAsync userAccountService,
     ClientCache localStorage,
     SessionStorage sessionStorage,
-    CookieProvider cookies,
     PortalGinInjector ginInjector,
     SynapseJSNIUtils jsniUtils,
     QueryClientProvider queryClientProvider
@@ -83,7 +82,6 @@ public class AuthenticationControllerImpl implements AuthenticationController {
     fixServiceEntryPoint(userAccountService);
     this.localStorage = localStorage;
     this.sessionStorage = sessionStorage;
-    this.cookies = cookies;
     this.ginInjector = ginInjector;
     this.jsniUtils = jsniUtils;
     this.queryClient = queryClientProvider.getQueryClient();
@@ -441,6 +439,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
       USER_AUTHENTICATION_RECEIPT,
       NIH_NOTIFICATION_DISMISSED,
       COOKIES_ACCEPTED,
+      FORCE_DISPLAY_ORIGINAL_COLUMN_NAMES,
     };
     String[] srcPersistentLocalStorageKeys =
       jsniUtils.getSrcPersistentLocalStorageKeys();

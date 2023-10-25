@@ -43,7 +43,6 @@ import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.context.QueryClientProvider;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.jsinterop.reactquery.QueryClient;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -59,9 +58,6 @@ public class AuthenticationControllerImplTest {
 
   public static final String ACCESS_TOKEN = "1111";
   AuthenticationControllerImpl authenticationController;
-
-  @Mock
-  CookieProvider mockCookieProvider;
 
   @Mock
   UserAccountServiceAsync mockUserAccountService;
@@ -164,7 +160,6 @@ public class AuthenticationControllerImplTest {
         mockUserAccountService,
         mockClientCache,
         mockSessionStorage,
-        mockCookieProvider,
         mockGinInjector,
         mockSynapseJSNIUtils,
         mockQueryClientProvider
