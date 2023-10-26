@@ -14,11 +14,11 @@ import {
   getUserIdFromLocalStorage,
 } from './testUser'
 import { Project } from './types'
-import { UserPrefixes } from './userConfig'
+import { UserPrefix } from './userConfig'
 
 export const setupProject = async (
   browser: Browser,
-  projectCreator: UserPrefixes,
+  projectCreator: UserPrefix,
   storageStatePaths: StorageStatePaths,
 ) => {
   const context = await browser.newContext({
@@ -36,8 +36,8 @@ export const setupProject = async (
 
 export const setupProjectWithPermissions = async (
   browser: Browser,
-  projectCreator: UserPrefixes,
-  projectAccessor: UserPrefixes,
+  projectCreator: UserPrefix,
+  projectAccessor: UserPrefix,
   storageStatePaths: StorageStatePaths,
   accessorPermissions: ACCESS_TYPE[] = [ACCESS_TYPE.DOWNLOAD, ACCESS_TYPE.READ],
 ) => {
@@ -70,12 +70,12 @@ export const teardownProjectsAndFileHandles = async (
   const accessToken = getAdminPAT()
 
   // delete projects
-  for await (const project of projects) {
+  for (const project of projects) {
     await deleteProject(project.id, accessToken, page)
   }
 
   // delete fileHandles
-  for await (const fileHandleId of fileHandleIds) {
+  for (const fileHandleId of fileHandleIds) {
     await deleteFileHandleWithRetry(accessToken, fileHandleId, page)
   }
 

@@ -7,8 +7,11 @@ import {
 } from './helpers/setupTeardown'
 import { dismissAlert } from './helpers/testUser'
 import { Project } from './helpers/types'
-import { UserPrefixes, userConfigs } from './helpers/userConfig'
+import { UserPrefix, userConfigs } from './helpers/userConfig'
 
+// FIXME: Discussion action icons are not buttons and don't have accessible
+// names, so can't be selected by role + name or by label -- select by
+// classname to differentiate between the icons
 const discussionActionIconClasses = {
   PIN: '.fa-thumb-tack.imageButton',
   EDIT: '.fa-pencil.imageButton',
@@ -88,7 +91,7 @@ const expectDiscussionThreadLoaded = async (page: Page, threadId: number) => {
 const expectThreadReplyVisible = async (
   page: Page,
   threadReply: string,
-  replierPrefix: UserPrefixes,
+  replierPrefix: UserPrefix,
 ) => {
   await testAuth.step('Confirm thread reply is visible', async () => {
     const discussionReply = page.locator(discussionReplySelector)
