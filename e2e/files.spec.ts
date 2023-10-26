@@ -3,14 +3,15 @@ import path from 'path'
 import { testAuth } from './fixtures/authenticatedUserPages'
 import {
   createFile,
-  createProject,
-  deleteFileHandleWithRetry,
-  deleteProject,
   entityUrlPathname,
   generateEntityName,
   getEntityFileHandleId,
   getEntityIdFromPathname,
 } from './helpers/entities'
+import {
+  setupProject,
+  teardownProjectsAndFileHandles,
+} from './helpers/setupTeardown'
 import {
   dismissAlert,
   getAccessTokenFromCookie,
@@ -167,40 +168,17 @@ let fileHandleIds: string[] = []
 
 test.describe('Files', () => {
   testAuth.beforeAll(async ({ browser, storageStatePaths }) => {
-    const userContext = await browser.newContext({
-      storageState: storageStatePaths['swc-e2e-user'],
-    })
-    const userPage = await userContext.newPage()
-    const userAccessToken = await getAccessTokenFromCookie(userPage)
-
-    // create project
-    const userProjectName = generateEntityName('project')
-    const userProjectId = await createProject(
-      userProjectName,
-      userAccessToken,
-      userPage,
-    )
-    userProject = { name: userProjectName, id: userProjectId }
-
-    await userContext.close()
+    userProject = await setupProject(browser, 'swc-e2e-user', storageStatePaths)
   })
 
   testAuth.afterAll(async ({ browser }) => {
-    const context = await browser.newContext()
-    const page = await context.newPage()
-    const accessToken = getAdminPAT()
-
-    // delete project
     if (userProject.id) {
-      await deleteProject(userProject.id, accessToken, page)
+      await teardownProjectsAndFileHandles(
+        browser,
+        [userProject],
+        fileHandleIds,
+      )
     }
-
-    // delete fileHandles
-    for await (const fileHandleId of fileHandleIds) {
-      await deleteFileHandleWithRetry(accessToken, fileHandleId, page)
-    }
-
-    await context.close()
   })
 
   testAuth(

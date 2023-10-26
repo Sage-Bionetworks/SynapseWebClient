@@ -13,7 +13,7 @@ import {
   storageStateDir,
   userConfigs,
   userPrefix,
-  UserPrefixes,
+  UserPrefix,
   userValidatedPrefix,
 } from '../helpers/userConfig'
 import { waitForInitialPageLoad } from '../helpers/utils'
@@ -23,7 +23,7 @@ type AuthenticatedUserPageTestFixtures = {
   validatedUserPage: Page
 }
 
-type StorageStatePaths = { [key in UserPrefixes]?: string }
+export type StorageStatePaths = { [key in UserPrefix]?: string }
 type AuthenticatedUserPageWorkerFixtures = {
   createUsers: void
   storageStatePaths: StorageStatePaths
@@ -40,7 +40,7 @@ const createPage = async (browser: Browser) => {
 
 // Generate test fixture for a specified user
 // ...based on: https://github.com/microsoft/playwright/issues/14570
-function createUserPageFixture<Page>(userPrefix: UserPrefixes) {
+function createUserPageFixture<Page>(userPrefix: UserPrefix) {
   return async (
     { browser, storageStatePaths },
     use: (r: Page) => Promise<void>,
