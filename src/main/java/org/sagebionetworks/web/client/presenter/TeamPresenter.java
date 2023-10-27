@@ -247,8 +247,11 @@ public class TeamPresenter
               !teamMembershipStatus.getIsMember()
             )
           ) {
-            // not a member, is team locked down?
-            if (!isLockedDown) {
+            // not a member, show the Join Team button if the team is not locked down, or if the user has an open team invitation
+            boolean hasOpenInvitation =
+              teamMembershipStatus != null &&
+              teamMembershipStatus.getHasOpenInvitation();
+            if (!isLockedDown || hasOpenInvitation) {
               // not locked down, add the Join team widget
               joinTeamWidget.configure(
                 teamId,
