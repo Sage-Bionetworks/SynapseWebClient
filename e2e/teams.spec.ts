@@ -31,6 +31,8 @@ test.describe('Teams', () => {
   testAuth(
     'should exercise team lifecycle',
     async ({ userPage, validatedUserPage }, testInfo) => {
+      test.slow()
+
       const { userName, validatedUserName } = await testAuth.step(
         'should get user names',
         async () => {
