@@ -114,9 +114,19 @@ const uploadFile = async (
         ? 'Upload or Link to a File'
         : 'Upload a New Version of File'
     await page.getByRole('button', { name: uploadButtonText }).click()
+
+    await expect(page.getByRole('link', { name: 'Upload File' })).toBeVisible()
+    await expect(page.getByRole('link', { name: 'Link to URL' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Browse...' })).toBeVisible()
   })
 
   await testAuth.step('choose file', async () => {
+    // Ensure that upload type is specified before attempting upload
+    // to prevent upload error: "Unsupported external upload type specified: undefined"
+    await expect(
+      page.getByText(/all uploaded files will be stored in synapsestorage/i),
+    ).toBeVisible()
+
     const fileChooserPromise = page.waitForEvent('filechooser')
     await page.getByRole('button', { name: 'Browse...' }).click()
     if (uploadType === 'initialUpload') {
@@ -140,10 +150,7 @@ const uploadFile = async (
   await testAuth.step('ensure there was not an upload error', async () => {
     const uploadError = page.getByRole('heading', { name: 'Upload Error' })
     if (await uploadError.isVisible()) {
-      const uploadErrorText = await page
-        .getByRole('dialog')
-        .getByText('Unable to upload the file')
-        .textContent()
+      const uploadErrorText = await page.getByRole('dialog').textContent()
       throw new Error(`Upload Error: ${uploadErrorText}`)
     }
   })
