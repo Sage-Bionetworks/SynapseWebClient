@@ -110,6 +110,12 @@ await cdpSession.send('Network.emulateNetworkConditions', {
 await cdpSession.send('Emulation.setCPUThrottlingRate', { rate: 3 })
 ```
 
+Alternately, manually run the test with network throttling (e.g. Slow 3G) applied to the browser. This can be useful for identifying states that occur when there is a slow network connection.
+
+#### Repeats
+
+A flaky test in CI can be difficult to reproduce locally. However, running the test many times in a row (via Playwright's `--repeat-each` flag) can help reveal the flake.
+
 #### Hardware Resources
 
 A developer's local machine may have more powerful hardware resources compared to GitHub Actions workflow runners. If a VM is overbooked, tests may fail. Alternately, the remote machine may be more powerful than the local machine.

@@ -72,7 +72,12 @@ const expectThreadTableLoaded = async (
   })
 }
 
-const expectDiscussionThreadLoaded = async (page: Page, threadId: number) => {
+const expectDiscussionThreadLoaded = async (
+  page: Page,
+  threadId: number,
+  threadTitle: string,
+  threadBody: string,
+) => {
   await testAuth.step('Discussion thread has loaded', async () => {
     await page.waitForURL(
       `${entityUrlPathname(userProject.id)}/discussion/threadId=${threadId}`,
@@ -90,6 +95,12 @@ const expectDiscussionThreadLoaded = async (page: Page, threadId: number) => {
     await expect(
       page.getByRole('button', { name: 'Most Recent' }),
     ).toBeVisible()
+
+    const discussionThread = page.locator(discussionThreadSelector)
+    await expect(discussionThread.getByText(threadTitle)).toBeVisible()
+    await expect(discussionThread.getByText(threadBody)).toBeVisible({
+      timeout: 60_000,
+    })
   })
 }
 
@@ -224,7 +235,12 @@ test.describe('Discussions', () => {
 
           await testAuth.step('Go to thread', async () => {
             await threadLink.click()
-            await expectDiscussionThreadLoaded(userPage, threadId)
+            await expectDiscussionThreadLoaded(
+              userPage,
+              threadId,
+              threadTitle,
+              threadBody,
+            )
           })
 
           await testAuth.step('Check thread info', async () => {
@@ -239,8 +255,6 @@ test.describe('Discussions', () => {
               }),
             ).toBeVisible()
             await expect(discussionThread.getByText('Moderator')).toBeVisible()
-            await expect(discussionThread.getByText(threadTitle)).toBeVisible()
-            await expect(discussionThread.getByText(threadBody)).toBeVisible()
           })
 
           return threadId
@@ -254,6 +268,7 @@ test.describe('Discussions', () => {
 
         await expectDiscussionPageLoaded(userPage, userProject.id)
 
+        // retry if the view count hasn't updated
         await expect(async () => {
           // reload is necessary for view count to update
           await userPage.reload()
@@ -282,7 +297,12 @@ test.describe('Discussions', () => {
 
       await testAuth.step('Second user can view thread', async () => {
         await validatedUserPage.getByRole('link', { name: threadTitle }).click()
-        await expectDiscussionThreadLoaded(validatedUserPage, threadId)
+        await expectDiscussionThreadLoaded(
+          validatedUserPage,
+          threadId,
+          threadTitle,
+          threadBody,
+        )
       })
 
       const secondUserReplyPostActions = await testAuth.step(
@@ -300,9 +320,15 @@ test.describe('Discussions', () => {
           })
 
           await testAuth.step('Post a reply', async () => {
-            await discussionThread
-              .getByRole('textbox', { name: 'Write a reply...' })
-              .click()
+            const replyInput = discussionThread.getByRole('textbox', {
+              name: 'Write a reply...',
+            })
+
+            // A second reply input briefly appears when the network
+            // connection is slow. Wait for the second input to be hidden.
+            await expect(replyInput).toHaveCount(1)
+
+            await replyInput.click()
             const threadTextbox = getThreadTextbox(validatedUserPage)
             await threadTextbox.fill(threadReply)
             await expect(threadTextbox).toHaveValue(threadReply)
@@ -367,7 +393,12 @@ test.describe('Discussions', () => {
         async () => {
           await testAuth.step('Go to discussion thread', async () => {
             await userPage.getByRole('link', { name: threadTitle }).click()
-            await expectDiscussionThreadLoaded(userPage, threadId)
+            await expectDiscussionThreadLoaded(
+              userPage,
+              threadId,
+              threadTitle,
+              threadBody,
+            )
           })
 
           await expectThreadReplyVisible(
