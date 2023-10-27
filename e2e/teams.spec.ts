@@ -5,6 +5,7 @@ import {
   deleteTeamInvitationMessage,
   deleteTeamInviteAcceptanceMessage,
 } from './helpers/messages'
+import { deleteTeam, getTeamIdFromPathname } from './helpers/teams'
 import {
   getAccessTokenFromCookie,
   getAdminPAT,
@@ -19,6 +20,7 @@ import {
 
 const TEAM_NAME = 'swc-e2e-team-' + uuidv4()
 const INVITATION_MESSAGE = 'swc-e2e-invite'
+let teamId: string | undefined = undefined
 
 // Run multiple describes in parallel, but run tests inside each describe in order
 // ...tests within describe expect afterAll to be run with the same users, i.e. on the same worker
@@ -60,6 +62,10 @@ test.describe('Teams', () => {
           ).toBeVisible()
         },
       )
+
+      await testAuth.step('user should get teamId', async () => {
+        teamId = getTeamIdFromPathname(userPage.url())
+      })
 
       await testAuth.step(
         'user should invite validated user to team',
@@ -161,22 +167,26 @@ test.describe('Teams', () => {
           }),
         ).toBeVisible()
       })
+
+      await testAuth.step('user deletes team', async () => {
+        await goToDashboard(userPage)
+        await userPage.getByLabel('Teams').click()
+        await userPage.getByRole('link', { name: TEAM_NAME }).click()
+        await userPage.getByRole('button', { name: 'Team Actions' }).click()
+        await userPage.getByRole('link', { name: 'Delete Team' }).click()
+        await userPage.getByRole('button', { name: 'Delete' }).click()
+        await expect(
+          userPage.getByText('Team successfully deleted'),
+        ).toBeVisible()
+        await expect(
+          userPage.getByRole('link', { name: TEAM_NAME }),
+        ).not.toBeVisible()
+        teamId = undefined
+      })
     },
   )
 
   testAuth.afterAll(async ({ userPage, validatedUserPage }) => {
-    // delete team
-    await goToDashboard(userPage)
-    await userPage.getByLabel('Teams').click()
-    await userPage.getByRole('link', { name: TEAM_NAME }).click()
-    await userPage.getByRole('button', { name: 'Team Actions' }).click()
-    await userPage.getByRole('link', { name: 'Delete Team' }).click()
-    await userPage.getByRole('button', { name: 'Delete' }).click()
-    await expect(userPage.getByText('Team successfully deleted')).toBeVisible()
-    await expect(
-      userPage.getByRole('link', { name: TEAM_NAME }),
-    ).not.toBeVisible()
-
     // get credentials
     const adminPAT = getAdminPAT()
 
@@ -189,6 +199,11 @@ test.describe('Teams', () => {
     const userAccessToken = await getAccessTokenFromCookie(userPage)
     const userName = userConfigs[userPrefix].username
     expect(userName).not.toBeNull()
+
+    // delete team if it was created but not cleaned up during the test
+    if (teamId) {
+      await deleteTeam(teamId, userAccessToken, userPage)
+    }
 
     // delete team invitation: user -> validated user
     await deleteTeamInvitationMessage(
