@@ -525,4 +525,28 @@ public class TeamPresenterTest {
         anyBoolean()
       );
   }
+
+  @Test
+  public void testNotMemberOfLockedTeamHasOpenInvite() {
+    boolean isAdmin = false;
+    when(mockTeamBundle.isUserAdmin()).thenReturn(isAdmin);
+    when(mockTeamMembershipStatus.getIsMember()).thenReturn(false);
+    when(mockTeamMembershipStatus.getHasOpenInvitation()).thenReturn(true);
+    when(mockTeam.getCanRequestMembership()).thenReturn(false);
+
+    presenter.refresh(teamId);
+
+    verify(mockJoinWidget)
+      .configure(
+        eq(teamId),
+        anyBoolean(),
+        eq(mockTeamMembershipStatus),
+        any(Callback.class),
+        anyString(),
+        anyString(),
+        anyString(),
+        anyString(),
+        anyBoolean()
+      );
+  }
 }
