@@ -5,7 +5,11 @@ import {
   setupProjectWithPermissions,
   teardownProjectsAndFileHandles,
 } from './helpers/setupTeardown'
-import { dismissAlert } from './helpers/testUser'
+import {
+  dismissAlert,
+  expectDiscussionPageLoaded,
+  getDefaultDiscussionPath,
+} from './helpers/testUser'
 import { Project } from './helpers/types'
 import { UserPrefix, userConfigs } from './helpers/userConfig'
 
@@ -22,26 +26,8 @@ const discussionActionIconClasses = {
 const discussionThreadSelector = '.discussionThread:visible'
 const discussionReplySelector = '.discussionReply:visible'
 
-const getDefaultDiscussionPath = (projectId: string) => {
-  return `${entityUrlPathname(projectId)}/discussion/default`
-}
-
 const getThreadTextbox = (page: Page) => {
   return page.locator('.markdownEditor').getByRole('textbox')
-}
-
-const expectDiscussionPageLoaded = async (page: Page, projectId: string) => {
-  await testAuth.step('Default discussion page has loaded', async () => {
-    await page.waitForURL(getDefaultDiscussionPath(projectId))
-    await expect(
-      page.getByRole('heading', { name: 'Discussion' }),
-    ).toBeVisible()
-    await expect(page.getByRole('button', { name: 'New Thread' })).toBeVisible()
-    await expect(
-      page.getByRole('button', { name: 'Discussion Tools' }),
-    ).toBeVisible()
-    await expect(page.getByPlaceholder('Search discussions')).toBeVisible()
-  })
 }
 
 const expectThreadTableLoaded = async (

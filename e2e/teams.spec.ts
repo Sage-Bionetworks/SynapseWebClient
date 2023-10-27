@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { Page, expect, test } from '@playwright/test'
 import { v4 as uuidv4 } from 'uuid'
 import { testAuth } from './fixtures/authenticatedUserPages'
 import {
@@ -7,6 +7,7 @@ import {
 } from './helpers/messages'
 import { deleteTeam, getTeamIdFromPathname } from './helpers/teams'
 import {
+  dismissAlert,
   getAccessTokenFromCookie,
   getAdminPAT,
   getUserIdFromLocalStorage,
@@ -17,6 +18,26 @@ import {
   userPrefix,
   userValidatedPrefix,
 } from './helpers/userConfig'
+
+const expectMyTeamsPageLoaded = async (page: Page) => {
+  await expect(page.getByRole('heading', { name: 'Your Teams' })).toBeVisible()
+  await expect(
+    page.getByRole('button', { name: 'Search All Teams' }),
+  ).toBeVisible()
+  await expect(
+    page.getByRole('button', {
+      name: 'Create a New Team',
+    }),
+  ).toBeVisible()
+  await expect(page.getByPlaceholder('Team name')).toBeVisible()
+}
+
+const expectTeamPageLoaded = async (page: Page, teamName: string) => {
+  await expect(page.locator('h3').filter({ hasText: teamName })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Team Actions' })).toBeVisible()
+  await expect(page.getByPlaceholder('Find team members')).toBeVisible()
+  await expect(page.getByRole('link', { name: teamName })).toBeVisible()
+}
 
 const TEAM_NAME = 'swc-e2e-team-' + uuidv4()
 const INVITATION_MESSAGE = 'swc-e2e-invite'
@@ -47,9 +68,7 @@ test.describe('Teams', () => {
         async () => {
           await goToDashboard(userPage)
           await userPage.getByLabel('Teams').click()
-          await expect(
-            userPage.getByRole('heading', { name: 'Your Teams' }),
-          ).toBeVisible()
+          await expectMyTeamsPageLoaded(userPage)
 
           await userPage
             .getByRole('button', { name: 'Create a New Team' })
@@ -59,9 +78,9 @@ test.describe('Teams', () => {
           await expect(teamNameInput).toHaveValue(TEAM_NAME)
 
           await userPage.getByRole('button', { name: 'OK' }).click()
-          await expect(
-            userPage.getByText(`Team Created: ${TEAM_NAME}`),
-          ).toBeVisible()
+          await dismissAlert(userPage, `Team Created: ${TEAM_NAME}`)
+          await expectTeamPageLoaded(userPage, TEAM_NAME)
+          await expect(userPage.getByText('1 team members')).toBeVisible()
         },
       )
 
@@ -96,7 +115,7 @@ test.describe('Teams', () => {
             .click()
 
           await expect(spinner).not.toBeVisible()
-          await expect(userPage.getByText('Invitation(s) Sent')).toBeVisible()
+          await dismissAlert(userPage, 'Invitation(s) Sent')
         },
       )
 
@@ -112,17 +131,14 @@ test.describe('Teams', () => {
       await test.step('validated user should accept team invitation', async () => {
         await goToDashboard(validatedUserPage)
 
-        await Promise.all([
-          expect(
-            validatedUserPage.getByRole('heading', { name: 'Your Teams' }),
-          ).toBeVisible(),
-          validatedUserPage.getByLabel('Teams').click(),
-        ])
+        await validatedUserPage.getByLabel('Teams').click()
+        await expectMyTeamsPageLoaded(validatedUserPage)
 
         // get row for this invitation
         // ...in case multiple tests have invited validated user at the same time
         const row = validatedUserPage.getByRole('row', { name: TEAM_NAME })
         await expect(row.getByText(INVITATION_MESSAGE)).toBeVisible()
+        await expect(row.getByRole('button', { name: 'Cancel' })).toBeVisible()
 
         await row.getByRole('button', { name: 'Join' }).click()
         await expect(row).not.toBeVisible()
@@ -137,17 +153,19 @@ test.describe('Teams', () => {
         // ...before resolving to one team link
         await expect
           .poll(async () => {
-            return await teamLink.count()
+            const count = await teamLink.count()
+            // if no team links appear after joining the team
+            // ...try reloading the page to see if the link subsequently appears
+            if (count === 0) {
+              await validatedUserPage.reload()
+            }
+            return count
           })
           .toBe(1)
 
         await teamLink.click()
 
-        await expect(
-          validatedUserPage.locator('h3').filter({
-            hasText: TEAM_NAME,
-          }),
-        ).toBeVisible()
+        await expectTeamPageLoaded(validatedUserPage, TEAM_NAME)
         await expect(
           validatedUserPage.getByText('2 team members'),
         ).toBeVisible()
@@ -171,15 +189,11 @@ test.describe('Teams', () => {
       })
 
       await testAuth.step('user deletes team', async () => {
-        await goToDashboard(userPage)
-        await userPage.getByLabel('Teams').click()
-        await userPage.getByRole('link', { name: TEAM_NAME }).click()
         await userPage.getByRole('button', { name: 'Team Actions' }).click()
         await userPage.getByRole('link', { name: 'Delete Team' }).click()
         await userPage.getByRole('button', { name: 'Delete' }).click()
-        await expect(
-          userPage.getByText('Team successfully deleted'),
-        ).toBeVisible()
+
+        await dismissAlert(userPage, 'Team successfully deleted')
         await expect(
           userPage.getByRole('link', { name: TEAM_NAME }),
         ).not.toBeVisible()
