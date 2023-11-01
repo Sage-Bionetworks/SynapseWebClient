@@ -27,7 +27,8 @@ public interface SharingPermissionsGridView extends IsWidget, SynapseView {
   void configure(
     CallbackP<Long> deleteButtonCallback,
     SetAccessCallback setAccessCallback,
-    boolean isOpenData
+    boolean isOpenData,
+    boolean isInherited
   );
 
   public interface Presenter {}
