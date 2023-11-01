@@ -1,4 +1,6 @@
 import { Page, expect } from '@playwright/test'
+import { testAuth } from '../fixtures/authenticatedUserPages'
+import { entityUrlPathname } from './entities'
 import { BackendDestinationEnum, doDelete, doPost } from './http'
 import { getLocalStorage } from './localStorage'
 import { LoginResponse, TestUser } from './types'
@@ -147,4 +149,25 @@ export const dismissAlert = async (page: Page, alertText: string) => {
   expect(alert).toBeVisible()
   await alert.getByRole('button', { name: 'Close' }).click()
   await expect(alert).not.toBeVisible()
+}
+
+export const getDefaultDiscussionPath = (projectId: string) => {
+  return `${entityUrlPathname(projectId)}/discussion/default`
+}
+
+export const expectDiscussionPageLoaded = async (
+  page: Page,
+  projectId: string,
+) => {
+  await testAuth.step('Default discussion page has loaded', async () => {
+    await page.waitForURL(getDefaultDiscussionPath(projectId))
+    await expect(
+      page.getByRole('heading', { name: 'Discussion' }),
+    ).toBeVisible()
+    await expect(page.getByRole('button', { name: 'New Thread' })).toBeVisible()
+    await expect(
+      page.getByRole('button', { name: 'Discussion Tools' }),
+    ).toBeVisible()
+    await expect(page.getByPlaceholder('Search discussions')).toBeVisible()
+  })
 }

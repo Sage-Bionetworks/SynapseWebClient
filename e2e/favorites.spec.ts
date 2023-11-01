@@ -1,7 +1,7 @@
 import { Page, expect, test } from '@playwright/test'
 import { testAuth } from './fixtures/authenticatedUserPages'
 import { entityUrlPathname } from './helpers/entities'
-import { goToDashboard } from './helpers/testUser'
+import { expectDiscussionPageLoaded, goToDashboard } from './helpers/testUser'
 import { Project } from './helpers/types'
 import { waitForInitialPageLoad } from './helpers/utils'
 
@@ -31,10 +31,11 @@ async function expectProjectPageLoaded(
 ) {
   await page.waitForURL(entityUrlPathname(projectId))
   await expect(page.getByRole('heading', { name: projectName })).toBeVisible()
-  await page.waitForURL(
-    `${entityUrlPathname(PUBLIC_PROJECT.id)}/discussion/default`,
-  )
-  await expect(page.getByRole('heading', { name: 'Discussion' })).toBeVisible()
+  await expectDiscussionPageLoaded(page, projectId)
+}
+
+function getFavoriteStarSpiner(page: Page) {
+  return page.locator('.pageHeader').locator('.spinner:visible')
 }
 
 test.describe('Favorites', () => {
@@ -70,7 +71,9 @@ test.describe('Favorites', () => {
         await expect(addFavorite).toBeVisible()
         await expect(removeFavorite).not.toBeVisible()
 
+        const spinner = getFavoriteStarSpiner(userPage)
         await addFavorite.click()
+        await expect(spinner).not.toBeVisible()
 
         await expect(addFavorite).not.toBeVisible()
         await expect(removeFavorite).toBeVisible()
@@ -101,7 +104,9 @@ test.describe('Favorites', () => {
         await expect(addFavorite).not.toBeVisible()
         await expect(removeFavorite).toBeVisible()
 
+        const spinner = getFavoriteStarSpiner(userPage)
         await removeFavorite.click()
+        await expect(spinner).not.toBeVisible()
 
         await expect(addFavorite).toBeVisible()
         await expect(removeFavorite).not.toBeVisible()
