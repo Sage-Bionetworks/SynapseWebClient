@@ -232,7 +232,12 @@ public class AccessControlListEditorViewImpl
     };
 
     getSharingPermissionsGrid()
-      .configure(removeUserCallback, setAccessCallback, isOpenData);
+      .configure(
+        removeUserCallback,
+        setAccessCallback,
+        isOpenData,
+        isInherited
+      );
     add(getSharingPermissionsGrid().asWidget());
 
     if (!canChangePermission) {

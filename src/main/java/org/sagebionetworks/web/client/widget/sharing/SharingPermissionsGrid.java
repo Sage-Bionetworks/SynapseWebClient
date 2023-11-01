@@ -41,9 +41,15 @@ public class SharingPermissionsGrid
   public void configure(
     CallbackP<Long> deleteButtonCallback,
     SetAccessCallback setAccessCallback,
-    boolean isOpenData
+    boolean isOpenData,
+    boolean isInherited
   ) {
-    view.configure(deleteButtonCallback, setAccessCallback, isOpenData);
+    view.configure(
+      deleteButtonCallback,
+      setAccessCallback,
+      isOpenData,
+      isInherited
+    );
   }
 
   public AclEntry getAt(int index) {

@@ -20,6 +20,7 @@ import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableHeader;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
+import org.sagebionetworks.web.client.widget.HelpWidget;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditorViewImpl.SetAccessCallback;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
@@ -49,7 +50,7 @@ public class SharingPermissionsGridViewImpl
 
   private PortalGinInjector ginInjector;
   private String publicAclPrincipalId;
-  private boolean isOpenData;
+  private boolean isOpenData, isInherited;
 
   @Inject
   public SharingPermissionsGridViewImpl(
@@ -87,11 +88,13 @@ public class SharingPermissionsGridViewImpl
   public void configure(
     CallbackP<Long> deleteButtonCallback,
     SetAccessCallback setAccessCallback,
-    boolean isOpenData
+    boolean isOpenData,
+    boolean isInherited
   ) {
     this.deleteButtonCallback = deleteButtonCallback;
     this.setAccessCallback = setAccessCallback;
     this.isOpenData = isOpenData;
+    this.isInherited = isInherited;
   }
 
   @Override
@@ -150,12 +153,14 @@ public class SharingPermissionsGridViewImpl
     boolean isDeleteButtonAvailable =
       deleteButtonVisible && deleteButtonCallback != null;
     Widget permissionWidget;
-
+    boolean isInheritedACLOverwritten = false;
     if (aclEntry.getOwnerId().equals(publicAclPrincipalId)) {
       // SWC-6314 (and SWC-6083): If this is the public group, render Can Download if OPEN_DATA, otherwise Can View.
       if (isOpenData) {
         permissionWidget =
           new Text(permissionDisplay.get(PermissionLevel.CAN_DOWNLOAD));
+        // SWC-6579: If ACL is inherited, then also show an info tooltip
+        isInheritedACLOverwritten = isInherited;
       } else {
         permissionWidget = new Text(permListBox.getSelectedItemText());
       }
@@ -167,6 +172,14 @@ public class SharingPermissionsGridViewImpl
     }
 
     data.add(permissionWidget);
+    if (isInheritedACLOverwritten) {
+      HelpWidget help = new HelpWidget();
+      help.setIconType(IconType.INFO_CIRCLE);
+      help.setHelpMarkdown(
+        "The inherited sharing settings for this entity were overridden by an administrator."
+      );
+      data.add(help);
+    }
 
     if (isDeleteButtonAvailable) {
       // Add delete button and size columns.
