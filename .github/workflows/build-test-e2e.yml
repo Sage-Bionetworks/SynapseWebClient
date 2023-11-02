@@ -81,8 +81,8 @@ jobs:
         run: colima stop
   merge-reports:
     # Merge reports after playwright-tests, even if some shards have failed
-    # But skip this job if the previous job was cancelled
-    if: ${{ !cancelled() }}
+    # But skip this job if the previous job was cancelled or skipped
+    if: ${{ !cancelled() && needs.playwright-tests.result != 'skipped' }}
     needs: [playwright-tests]
     runs-on: ubuntu-latest
     steps:
