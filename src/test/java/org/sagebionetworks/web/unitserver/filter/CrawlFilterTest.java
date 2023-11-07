@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.ORIGIN_HEADER;
@@ -89,7 +90,6 @@ public class CrawlFilterTest {
       .thenReturn("https://www" + SYNAPSE_ORG_SUFFIX);
     when(mockRequest.getServerName()).thenReturn("www" + SYNAPSE_ORG_SUFFIX);
     when(mockRequest.getScheme()).thenReturn("https");
-    when(mockRequest.getScheme()).thenReturn("https");
     when(mockRequest.getHeader("User-Agent")).thenReturn("Googlebot/2.1");
     when(
       mockSynapseClient.getEntityBundle(
@@ -150,5 +150,19 @@ public class CrawlFilterTest {
     String outputString = stringCaptor.getValue();
     assertTrue(outputString.contains(synapseID));
     assertTrue(outputString.contains(META_ROBOTS_NOINDEX));
+  }
+
+  @Test
+  public void testNonBotResponse()
+    throws ServletException, IOException, RestServiceException {
+    when(mockRequest.getHeader("User-Agent"))
+      .thenReturn(
+        "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.111 Safari/537.36"
+      );
+    when(mockRequest.getRequestURI()).thenReturn("/Synapse:syn123");
+
+    filter.testFilter(mockRequest, mockResponse, mockFilterChain);
+
+    verify(mockPrintWriter, never()).println(anyString());
   }
 }
