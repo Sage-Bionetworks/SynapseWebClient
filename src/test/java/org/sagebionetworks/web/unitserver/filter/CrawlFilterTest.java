@@ -5,11 +5,11 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.ORIGIN_HEADER;
 import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.SYNAPSE_ORG_SUFFIX;
-import static org.sagebionetworks.web.server.servlet.filter.CrawlFilter.ESCAPED_FRAGMENT;
 import static org.sagebionetworks.web.server.servlet.filter.CrawlFilter.META_ROBOTS_NOINDEX;
 
 import java.io.IOException;
@@ -90,6 +90,7 @@ public class CrawlFilterTest {
       .thenReturn("https://www" + SYNAPSE_ORG_SUFFIX);
     when(mockRequest.getServerName()).thenReturn("www" + SYNAPSE_ORG_SUFFIX);
     when(mockRequest.getScheme()).thenReturn("https");
+    when(mockRequest.getHeader("User-Agent")).thenReturn("Googlebot/2.1");
     when(
       mockSynapseClient.getEntityBundle(
         anyString(),
@@ -111,8 +112,7 @@ public class CrawlFilterTest {
     String entityName = "my mock entity";
     when(mockEntity.getId()).thenReturn(synapseID);
     when(mockEntity.getName()).thenReturn(entityName);
-    when(mockRequest.getQueryString())
-      .thenReturn(ESCAPED_FRAGMENT + "Synapse:" + synapseID);
+    when(mockRequest.getRequestURI()).thenReturn("/Synapse:" + synapseID);
 
     filter.testFilter(mockRequest, mockResponse, mockFilterChain);
 
@@ -125,7 +125,8 @@ public class CrawlFilterTest {
     // verify we are asking for all entity types, except link
     verify(mockSynapseClient)
       .getEntityChildren(entityChildrenRequestCaptor.capture());
-    EntityChildrenRequest entityChildrenRequest = entityChildrenRequestCaptor.getValue();
+    EntityChildrenRequest entityChildrenRequest =
+      entityChildrenRequestCaptor.getValue();
     List<EntityType> entityTypes = entityChildrenRequest.getIncludeTypes();
     for (EntityType type : EntityType.values()) {
       assertEquals(EntityType.link != type, entityTypes.contains(type));
@@ -137,9 +138,9 @@ public class CrawlFilterTest {
     throws ServletException, IOException {
     String synapseID = "syn12345";
     when(mockEntity.getId()).thenReturn(synapseID);
-    when(mockRequest.getQueryString())
-      .thenReturn(ESCAPED_FRAGMENT + "Synapse:" + synapseID);
-    Map<String, AnnotationsValue> annotationsMap = new HashMap<String, AnnotationsValue>();
+    when(mockRequest.getRequestURI()).thenReturn("/Synapse:" + synapseID);
+    Map<String, AnnotationsValue> annotationsMap =
+      new HashMap<String, AnnotationsValue>();
     when(mockAnnotations.getAnnotations()).thenReturn(annotationsMap);
     annotationsMap.put("noindex", new AnnotationsValue());
 
@@ -149,5 +150,19 @@ public class CrawlFilterTest {
     String outputString = stringCaptor.getValue();
     assertTrue(outputString.contains(synapseID));
     assertTrue(outputString.contains(META_ROBOTS_NOINDEX));
+  }
+
+  @Test
+  public void testNonBotResponse()
+    throws ServletException, IOException, RestServiceException {
+    when(mockRequest.getHeader("User-Agent"))
+      .thenReturn(
+        "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.111 Safari/537.36"
+      );
+    when(mockRequest.getRequestURI()).thenReturn("/Synapse:syn123");
+
+    filter.testFilter(mockRequest, mockResponse, mockFilterChain);
+
+    verify(mockPrintWriter, never()).println(anyString());
   }
 }

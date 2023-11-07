@@ -31,16 +31,21 @@ public class PlacesRedirectFilter implements Filter {
     try {
       HttpServletRequest httpRqst = (HttpServletRequest) rqst;
 
-      URL requestURL = new URL(httpRqst.getRequestURL().toString());
-      String path = fixPath(requestURL.getPath());
-      URL redirectURL = new URL(
-        requestURL.getProtocol(),
-        requestURL.getHost(),
-        requestURL.getPort(),
-        path
-      );
-      HttpServletResponse httpRsp = (HttpServletResponse) rspn;
-      httpRsp.sendRedirect(httpRsp.encodeRedirectURL(redirectURL.toString()));
+      String userAgent = httpRqst.getHeader("User-Agent");
+      // Bots are not redirected to the #! GWT place page
+      boolean isLikelyBot = CrawlFilter.isLikelyBot(userAgent);
+      if (!isLikelyBot) {
+        URL requestURL = new URL(httpRqst.getRequestURL().toString());
+        String path = fixPath(requestURL.getPath());
+        URL redirectURL = new URL(
+          requestURL.getProtocol(),
+          requestURL.getHost(),
+          requestURL.getPort(),
+          path
+        );
+        HttpServletResponse httpRsp = (HttpServletResponse) rspn;
+        httpRsp.sendRedirect(httpRsp.encodeRedirectURL(redirectURL.toString()));
+      }
     } catch (Exception e) {
       e.printStackTrace();
     }
