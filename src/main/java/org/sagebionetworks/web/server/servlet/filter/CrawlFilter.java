@@ -135,6 +135,10 @@ public class CrawlFilter extends OncePerRequestFilter {
     df.setTimeZone(TimeZone.getTimeZone("UTC"));
   }
 
+  public static boolean isLikelyBot(String userAgent) {
+    return userAgent != null && userAgent.toLowerCase().contains("bot");
+  }
+
   @Override
   protected void doFilterInternal(
     HttpServletRequest request,
@@ -145,8 +149,7 @@ public class CrawlFilter extends OncePerRequestFilter {
       init(new SynapseClientImpl(), new DiscussionForumClientImpl());
     }
     String userAgent = request.getHeader("User-Agent");
-    boolean isLikelyBot =
-      userAgent != null && userAgent.toLowerCase().contains("bot");
+    boolean isLikelyBot = isLikelyBot(userAgent);
 
     if (isLikelyBot) {
       try {

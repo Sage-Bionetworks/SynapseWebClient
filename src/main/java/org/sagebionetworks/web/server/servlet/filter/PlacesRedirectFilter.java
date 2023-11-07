@@ -33,8 +33,7 @@ public class PlacesRedirectFilter implements Filter {
 
       String userAgent = httpRqst.getHeader("User-Agent");
       // Bots are not redirected to the #! GWT place page
-      boolean isLikelyBot =
-        userAgent != null && userAgent.toLowerCase().contains("bot");
+      boolean isLikelyBot = CrawlFilter.isLikelyBot(userAgent);
       if (!isLikelyBot) {
         URL requestURL = new URL(httpRqst.getRequestURL().toString());
         String path = fixPath(requestURL.getPath());
