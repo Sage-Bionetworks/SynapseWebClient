@@ -9,7 +9,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.ORIGIN_HEADER;
 import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.SYNAPSE_ORG_SUFFIX;
-import static org.sagebionetworks.web.server.servlet.filter.CrawlFilter.ESCAPED_FRAGMENT;
 import static org.sagebionetworks.web.server.servlet.filter.CrawlFilter.META_ROBOTS_NOINDEX;
 
 import java.io.IOException;
@@ -90,6 +89,8 @@ public class CrawlFilterTest {
       .thenReturn("https://www" + SYNAPSE_ORG_SUFFIX);
     when(mockRequest.getServerName()).thenReturn("www" + SYNAPSE_ORG_SUFFIX);
     when(mockRequest.getScheme()).thenReturn("https");
+    when(mockRequest.getScheme()).thenReturn("https");
+    when(mockRequest.getHeader("User-Agent")).thenReturn("Googlebot/2.1");
     when(
       mockSynapseClient.getEntityBundle(
         anyString(),
@@ -111,8 +112,7 @@ public class CrawlFilterTest {
     String entityName = "my mock entity";
     when(mockEntity.getId()).thenReturn(synapseID);
     when(mockEntity.getName()).thenReturn(entityName);
-    when(mockRequest.getQueryString())
-      .thenReturn(ESCAPED_FRAGMENT + "Synapse:" + synapseID);
+    when(mockRequest.getRequestURI()).thenReturn("/Synapse:" + synapseID);
 
     filter.testFilter(mockRequest, mockResponse, mockFilterChain);
 
@@ -125,7 +125,8 @@ public class CrawlFilterTest {
     // verify we are asking for all entity types, except link
     verify(mockSynapseClient)
       .getEntityChildren(entityChildrenRequestCaptor.capture());
-    EntityChildrenRequest entityChildrenRequest = entityChildrenRequestCaptor.getValue();
+    EntityChildrenRequest entityChildrenRequest =
+      entityChildrenRequestCaptor.getValue();
     List<EntityType> entityTypes = entityChildrenRequest.getIncludeTypes();
     for (EntityType type : EntityType.values()) {
       assertEquals(EntityType.link != type, entityTypes.contains(type));
@@ -137,9 +138,9 @@ public class CrawlFilterTest {
     throws ServletException, IOException {
     String synapseID = "syn12345";
     when(mockEntity.getId()).thenReturn(synapseID);
-    when(mockRequest.getQueryString())
-      .thenReturn(ESCAPED_FRAGMENT + "Synapse:" + synapseID);
-    Map<String, AnnotationsValue> annotationsMap = new HashMap<String, AnnotationsValue>();
+    when(mockRequest.getRequestURI()).thenReturn("/Synapse:" + synapseID);
+    Map<String, AnnotationsValue> annotationsMap =
+      new HashMap<String, AnnotationsValue>();
     when(mockAnnotations.getAnnotations()).thenReturn(annotationsMap);
     annotationsMap.put("noindex", new AnnotationsValue());
 

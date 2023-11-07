@@ -145,7 +145,8 @@ public class CrawlFilter extends OncePerRequestFilter {
       init(new SynapseClientImpl(), new DiscussionForumClientImpl());
     }
     String userAgent = request.getHeader("User-Agent");
-    boolean isLikelyBot = userAgent != null && userAgent.contains("bot");
+    boolean isLikelyBot =
+      userAgent != null && userAgent.toLowerCase().contains("bot");
 
     if (isLikelyBot) {
       try {
