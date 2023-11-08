@@ -7,7 +7,6 @@ import com.google.gwt.thirdparty.guava.common.base.Suppliers;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -80,6 +79,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 /**
  * This filter detects ajax crawler (Google). If so, it takes over the renders the javascript page
  * and handles the response.
+ * It used to be based on the Google AJAX crawl scheme: https://developers.google.com/search/blog/2009/10/proposal-for-making-ajax-crawlable
+ * But has been rewritten to send all links through the PlacesRedirectFilter (no '#!' links are returned).
  *
  */
 public class CrawlFilter extends OncePerRequestFilter {
@@ -90,7 +91,6 @@ public class CrawlFilter extends OncePerRequestFilter {
   DiscussionForumClientImpl discussionForumClient = null;
   JSONObjectAdapter jsonObjectAdapter = null;
   private static final String DISCUSSION_THREAD_ID = "/discussion/threadId=";
-  public static final String ESCAPED_FRAGMENT = "_escaped_fragment_=";
   private final Supplier<String> homePageCached =
     Suppliers.memoizeWithExpiration(homePageSupplier(), 1, TimeUnit.DAYS);
   public static final int MAX_CHILD_PAGES = 5;
@@ -135,6 +135,10 @@ public class CrawlFilter extends OncePerRequestFilter {
     df.setTimeZone(TimeZone.getTimeZone("UTC"));
   }
 
+  public static boolean isLikelyBot(String userAgent) {
+    return userAgent != null && userAgent.toLowerCase().contains("bot");
+  }
+
   @Override
   protected void doFilterInternal(
     HttpServletRequest request,
@@ -144,13 +148,14 @@ public class CrawlFilter extends OncePerRequestFilter {
     if (synapseClient == null) {
       init(new SynapseClientImpl(), new DiscussionForumClientImpl());
     }
-    // Is this an ugly url that we need to convert/handle?
-    String queryString = request.getQueryString();
-    if (queryString != null && queryString.contains(ESCAPED_FRAGMENT)) {
+    String userAgent = request.getHeader("User-Agent");
+    boolean isLikelyBot = isLikelyBot(userAgent);
+
+    if (isLikelyBot) {
       try {
         this.jsonObjectAdapter = new JSONObjectAdapterImpl();
+        // Get the components needed to construct the URL
         String uri = request.getRequestURI();
-        int port = request.getServerPort();
         String domain = request.getServerName();
         String lowerCaseDomain = domain.toLowerCase();
         if (
@@ -165,71 +170,49 @@ public class CrawlFilter extends OncePerRequestFilter {
           out.println("Synapse test site  - " + domain);
           return;
         }
-        String scheme = request.getScheme();
         // build an html page for this request
         String html = "";
-        String fixedQueryString = uri + rewriteQueryString(queryString);
-        if (fixedQueryString.contains("#!Home")) {
+
+        if (uri.startsWith("/Home") || uri.isEmpty()) {
           // send back info about the site
           html = getCachedHomePageHtml();
-        } else if (fixedQueryString.contains("#!Synapse")) {
-          if (fixedQueryString.contains(DISCUSSION_THREAD_ID)) {
-            String threadId = fixedQueryString.substring(
-              fixedQueryString.indexOf(DISCUSSION_THREAD_ID) +
-              DISCUSSION_THREAD_ID.length()
+        } else if (uri.startsWith("/Synapse")) {
+          if (uri.contains(DISCUSSION_THREAD_ID)) {
+            String threadId = uri.substring(
+              uri.indexOf(DISCUSSION_THREAD_ID) + DISCUSSION_THREAD_ID.length()
             );
             html = getThreadHtml(threadId);
           } else {
             // index information about the synapse entity
-            String entityId = fixedQueryString.substring(
-              fixedQueryString.indexOf(":", fixedQueryString.indexOf("#!")) + 1
-            );
+            String entityId = uri.substring(uri.indexOf(":") + 1);
             html = getEntityHtml(entityId);
           }
-        } else if (fixedQueryString.contains("#!Search")) {
+        } else if (uri.startsWith("/Search")) {
           // index all projects
-          String searchQueryJson = fixedQueryString.substring(
-            fixedQueryString.indexOf(":", fixedQueryString.indexOf("#!")) + 1
-          );
+          String searchQueryJson = uri.substring(uri.indexOf(":") + 1);
           html = getAllProjectsHtml(URLDecoder.decode(searchQueryJson));
-        } else if (fixedQueryString.contains("#!TeamSearch")) {
+        } else if (uri.startsWith("/TeamSearch")) {
           // index all teams
-          String startIndex = fixedQueryString.substring(
-            fixedQueryString.indexOf(
-              TeamSearch.START_DELIMITER,
-              fixedQueryString.indexOf("#!")
-            ) +
+          String startIndex = uri.substring(
+            uri.indexOf(TeamSearch.START_DELIMITER) +
             TeamSearch.START_DELIMITER.length()
           );
           html = getAllTeamsHtml(startIndex);
-        } else if (fixedQueryString.contains("#!Team")) {
+        } else if (uri.startsWith("/Team")) {
           // index team (including members)
-          String teamId = fixedQueryString.substring(
-            fixedQueryString.indexOf(":", fixedQueryString.indexOf("#!")) + 1
-          );
+          String teamId = uri.substring(uri.indexOf(":") + 1);
           html = getTeamHtml(teamId);
-        } else if (fixedQueryString.contains("#!Profile")) {
+        } else if (uri.startsWith("/Profile")) {
           // index team (including members)
-          String profileId = fixedQueryString.substring(
-            fixedQueryString.indexOf(":", fixedQueryString.indexOf("#!")) + 1
-          );
+          String profileId = uri.substring(uri.indexOf(":") + 1);
           html = getProfileHtml(profileId);
         }
-
-        URL url = new URL(scheme, domain, port, fixedQueryString);
-        // replace all relative links with full links due to this Google AJAX crawler support chicken-dance
-        String originalUrl = url.toString();
-        String toPage = originalUrl.substring(0, originalUrl.indexOf("#") + 1);
-        String replacedWithFullHrefs = html.replace(
-          "href=\"#",
-          "href=\"" + toPage
-        );
 
         response.setContentType("text/html");
         HttpServletResponse httpResponse = (HttpServletResponse) response;
         httpResponse.setStatus(HttpServletResponse.SC_OK);
         PrintWriter out = httpResponse.getWriter();
-        out.println(replacedWithFullHrefs);
+        out.println(html);
       } catch (Exception e) {
         e.printStackTrace();
       }
@@ -266,7 +249,7 @@ public class CrawlFilter extends OncePerRequestFilter {
     );
     // add link to team search
     html.append(
-      "<h3><a href=\"https://www.synapse.org/#!TeamSearch:" +
+      "<h3><a href=\"https://www.synapse.org/TeamSearch:" +
       TeamSearch.START_DELIMITER +
       "0\">Teams</a></h3><br />"
     );
@@ -286,7 +269,7 @@ public class CrawlFilter extends OncePerRequestFilter {
             );
           } else {
             html.append(
-              "<a href=\"https://www.synapse.org/#!Synapse:" +
+              "<a href=\"https://www.synapse.org/Synapse:" +
               hit.getId() +
               "\">" +
               hit.getName() +
@@ -313,7 +296,7 @@ public class CrawlFilter extends OncePerRequestFilter {
   private String getUserProfileString(UserProfile profile) {
     StringBuilder createdByBuilder = new StringBuilder();
     createdByBuilder.append(
-      "<a href=\"https://www.synapse.org/#!Profile:" +
+      "<a href=\"https://www.synapse.org/Profile:" +
       profile.getOwnerId() +
       "\">"
     );
@@ -455,7 +438,7 @@ public class CrawlFilter extends OncePerRequestFilter {
             paginatedThreads.getResults();
           for (DiscussionThreadBundle thread : threadList) {
             html.append(
-              "<a href=\"https://www.synapse.org/#!Synapse:" +
+              "<a href=\"https://www.synapse.org/Synapse:" +
               entity.getId() +
               DISCUSSION_THREAD_ID +
               thread.getId() +
@@ -478,7 +461,7 @@ public class CrawlFilter extends OncePerRequestFilter {
       childList = synapseClient.getEntityChildren(request);
       for (EntityHeader childId : childList.getPage()) {
         html.append(
-          "<a href=\"https://www.synapse.org/#!Synapse:" +
+          "<a href=\"https://www.synapse.org/Synapse:" +
           childId.getId() +
           "\">" +
           childId.getId() +
@@ -521,7 +504,7 @@ public class CrawlFilter extends OncePerRequestFilter {
       }
       json.put(
         "url",
-        "https://www.synapse.org/#!Synapse:" +
+        "https://www.synapse.org/Synapse:" +
         ds.getId() +
         "." +
         ds.getVersionNumber()
@@ -566,7 +549,7 @@ public class CrawlFilter extends OncePerRequestFilter {
       //      object.put("name", getDisplayName(profile));
       //      object.put(
       //        "url",
-      //        "https://www.synapse.org/#!Profile:" + ds.getCreatedBy()
+      //        "https://www.synapse.org/Profile:" + ds.getCreatedBy()
       //      );
       //      json.put("creator", object);
 
@@ -728,7 +711,7 @@ public class CrawlFilter extends OncePerRequestFilter {
     for (Hit hit : results.getHits()) {
       // add links
       html.append(
-        "<a href=\"https://www.synapse.org/#!Synapse:" +
+        "<a href=\"https://www.synapse.org/Synapse:" +
         hit.getId() +
         "\">" +
         hit.getName() +
@@ -740,7 +723,7 @@ public class CrawlFilter extends OncePerRequestFilter {
     inputQuery.setStart(newStart);
     String newJson = EntityFactory.createJSONStringForEntity(inputQuery);
     html.append(
-      "<a href=\"https://www.synapse.org/#!Search:" +
+      "<a href=\"https://www.synapse.org/Search:" +
       URLEncoder.encode(newJson) +
       "\">Next Page</a><br />"
     );
@@ -768,7 +751,7 @@ public class CrawlFilter extends OncePerRequestFilter {
     for (Team team : teams.getResults()) {
       // add links
       html.append(
-        "<a href=\"https://www.synapse.org/#!Team:" +
+        "<a href=\"https://www.synapse.org/Team:" +
         team.getId() +
         "\">" +
         team.getName() +
@@ -778,7 +761,7 @@ public class CrawlFilter extends OncePerRequestFilter {
     // add another link for the next page of results
     long newStart = start + teams.getResults().size();
     html.append(
-      "<h4><a href=\"https://www.synapse.org/#!TeamSearch:" +
+      "<h4><a href=\"https://www.synapse.org/TeamSearch:" +
       TeamSearch.START_DELIMITER +
       newStart +
       "\">Next Page</a></h4><br />"
@@ -786,20 +769,6 @@ public class CrawlFilter extends OncePerRequestFilter {
 
     html.append("</body></html>");
     return html.toString();
-  }
-
-  public String rewriteQueryString(String uglyUrl) {
-    try {
-      String decoded = URLDecoder.decode(uglyUrl, "UTF-8");
-      // dev mode
-      String result = decoded.replace("gwt", "?gwt");
-      result = result.replace("&" + ESCAPED_FRAGMENT, "#!");
-      result = result.replace("?" + ESCAPED_FRAGMENT, "#!");
-      result = result.replace(ESCAPED_FRAGMENT, "#!");
-      return result;
-    } catch (UnsupportedEncodingException e) {
-      return "";
-    }
   }
 
   public EntityChildrenRequest createGetChildrenQuery(String parentId) {
