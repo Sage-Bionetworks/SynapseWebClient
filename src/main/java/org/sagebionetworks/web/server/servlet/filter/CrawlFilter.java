@@ -396,7 +396,8 @@ public class CrawlFilter extends OncePerRequestFilter {
       html.append(META_ROBOTS_NOINDEX);
     }
 
-    html.append(getDatasetScriptElement(bundle, plainTextWiki));
+    // SWC-6609: removed for now
+    //    html.append(getDatasetScriptElement(bundle, plainTextWiki));
 
     html.append("</head><body><h1>" + name + "</h1>");
     if (description != null) {
