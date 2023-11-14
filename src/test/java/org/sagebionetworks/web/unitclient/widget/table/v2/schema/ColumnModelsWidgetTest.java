@@ -28,6 +28,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.EntityView;
@@ -43,9 +44,11 @@ import org.sagebionetworks.repo.model.table.ViewTypeMask;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
@@ -55,6 +58,7 @@ import org.sagebionetworks.web.client.widget.table.modal.fileview.ViewDefaultCol
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRow;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowViewer;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsEditorV2Widget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.ViewType;
@@ -83,6 +87,12 @@ public class ColumnModelsWidgetTest {
 
   @Mock
   ColumnModelsEditorWidget mockEditor;
+
+  @Mock
+  ColumnModelsEditorV2Widget mockEditorV2;
+
+  @Mock
+  CookieProvider mockCookies;
 
   @Mock
   PortalGinInjector mockGinInjector;
@@ -194,7 +204,9 @@ public class ColumnModelsWidgetTest {
         mockJobTrackingWidget,
         mockFileViewDefaultColumns,
         mockSynAlert,
-        mockPopupUtilsView
+        mockPopupUtilsView,
+        mockEditorV2,
+        mockCookies
       );
     when(mockEditor.validate()).thenReturn(true);
     when(mockTableSchemaChangeRequest.getChanges())
@@ -391,12 +403,13 @@ public class ColumnModelsWidgetTest {
     widget.onEditColumns();
     when(mockEditor.getEditedColumnModels())
       .thenReturn(TableModelTestUtils.createOneOfEachType(false));
+    when(mockEditorV2.getEditedColumnModels())
+      .thenReturn(TableModelTestUtils.createOneOfEachType(false));
     // Now call save
     widget.onSave();
     boolean isDeterminate = false;
-    ArgumentCaptor<AsynchronousProgressHandler> captor = ArgumentCaptor.forClass(
-      AsynchronousProgressHandler.class
-    );
+    ArgumentCaptor<AsynchronousProgressHandler> captor =
+      ArgumentCaptor.forClass(AsynchronousProgressHandler.class);
     verify(mockJobTrackingWidget)
       .startAndTrackJob(
         eq(ColumnModelsWidget.UPDATING_SCHEMA),
@@ -413,9 +426,8 @@ public class ColumnModelsWidgetTest {
     Long viewMask,
     String nextPageToken
   ) {
-    ArgumentCaptor<AsynchronousProgressHandler> captor = ArgumentCaptor.forClass(
-      AsynchronousProgressHandler.class
-    );
+    ArgumentCaptor<AsynchronousProgressHandler> captor =
+      ArgumentCaptor.forClass(AsynchronousProgressHandler.class);
     boolean isDeterminate = false;
     verify(mockJobTrackingWidget)
       .startAndTrackJob(
@@ -425,7 +437,8 @@ public class ColumnModelsWidgetTest {
         viewColumnModelRequestCaptor.capture(),
         captor.capture()
       );
-    ViewColumnModelRequest capturedRequest = viewColumnModelRequestCaptor.getValue();
+    ViewColumnModelRequest capturedRequest =
+      viewColumnModelRequestCaptor.getValue();
     assertEquals(scopeIds, capturedRequest.getViewScope().getScope());
     assertEquals(viewMask, capturedRequest.getViewScope().getViewTypeMask());
     assertEquals(nextPageToken, capturedRequest.getNextPageToken());
@@ -550,5 +563,49 @@ public class ColumnModelsWidgetTest {
     assertEquals(TableType.project_view, TableType.getTableType(mockView));
 
     assertEquals(TableType.table, TableType.getTableType(table));
+  }
+
+  @Test
+  public void testUseV2EditorInExperimentalMode() {
+    when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+      .thenReturn("true");
+
+    widget =
+      new ColumnModelsWidget(
+        mockBaseView,
+        mockGinInjector,
+        mockSynapseClient,
+        mockEditor,
+        mockJobTrackingWidget,
+        mockFileViewDefaultColumns,
+        mockSynAlert,
+        mockPopupUtilsView,
+        mockEditorV2,
+        mockCookies
+      );
+
+    verify(mockBaseView).setEditor(mockEditorV2);
+
+    boolean isEditable = true;
+    List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
+    tableBundle.setColumnModels(schema);
+    widget.configure(mockBundle, isEditable);
+    // show the editor
+    widget.onEditColumns();
+    verify(mockEditorV2).configure(EntityType.table, null, schema);
+    verify(mockBaseView).showEditor();
+
+    // Test saving
+    onSave().onComplete(null);
+    InOrder inOrder = inOrder(mockBaseView);
+    inOrder.verify(mockBaseView).setJobTrackingWidgetVisible(true);
+    inOrder.verify(mockBaseView).setJobTrackingWidgetVisible(false);
+
+    verify(mockEditorV2).getEditedColumnModels();
+    verify(mockBaseView).setLoading();
+    verify(mockBaseView).hideEditor();
+    verify(mockSynAlert).clear();
+    verify(mockPopupUtilsView).notify(anyString(), anyString(), any());
+    verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
   }
 }

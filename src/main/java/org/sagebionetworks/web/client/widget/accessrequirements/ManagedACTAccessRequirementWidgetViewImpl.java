@@ -7,8 +7,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
 import javax.annotation.Nullable;
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
@@ -19,7 +18,6 @@ import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
@@ -363,38 +361,29 @@ public class ManagedACTAccessRequirementWidgetViewImpl
     ManagedACTAccessRequirement accessRequirement,
     @Nullable RestrictableObjectDescriptor targetSubject
   ) {
-    try {
-      JSONObjectAdapter arAsJson = accessRequirement.writeToJSONObject(
-        jsonObjectAdapter
-      );
-      List<JSONObjectAdapter> arList = new ArrayList<JSONObjectAdapter>();
-      arList.add(arAsJson);
-      AccessRequirementListProps.Callback onHide = () -> {
-        presenter.refreshApprovalState();
-        hideRequestAccessModal();
-      };
-      String entityId = null;
-      if (
-        targetSubject != null &&
-        targetSubject.getType() == RestrictableObjectType.ENTITY
-      ) {
-        entityId = targetSubject.getId();
-      }
-      AccessRequirementListProps props = AccessRequirementListProps.create(
-        onHide,
-        arList,
-        entityId
-      );
-      requestDataAccessWidget.render(
-        React.createElementWithSynapseContext(
-          SRC.SynapseComponents.AccessRequirementList,
-          props,
-          propsProvider.getJsInteropContextProps()
-        )
-      );
-    } catch (JSONObjectAdapterException e) {
-      presenter.handleException(e);
+    AccessRequirementListProps.Callback onHide = () -> {
+      presenter.refreshApprovalState();
+      hideRequestAccessModal();
+    };
+    String entityId = null;
+    if (
+      targetSubject != null &&
+      targetSubject.getType() == RestrictableObjectType.ENTITY
+    ) {
+      entityId = targetSubject.getId();
     }
+    AccessRequirementListProps props = AccessRequirementListProps.create(
+      onHide,
+      Collections.singletonList(accessRequirement),
+      entityId
+    );
+    requestDataAccessWidget.render(
+      React.createElementWithSynapseContext(
+        SRC.SynapseComponents.AccessRequirementList,
+        props,
+        propsProvider.getJsInteropContextProps()
+      )
+    );
   }
 
   public void hideRequestAccessModal() {

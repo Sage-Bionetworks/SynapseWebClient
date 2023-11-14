@@ -5,7 +5,7 @@ import jsinterop.annotations.JsFunction;
 import jsinterop.annotations.JsOverlay;
 import jsinterop.annotations.JsPackage;
 import jsinterop.annotations.JsType;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.repo.model.AccessRequirement;
 
 @JsType(isNative = true, namespace = JsPackage.GLOBAL, name = "Object")
 public class AccessRequirementListProps extends ReactComponentProps {
@@ -23,7 +23,7 @@ public class AccessRequirementListProps extends ReactComponentProps {
   @JsOverlay
   public static AccessRequirementListProps create(
     Callback onHide,
-    List<JSONObjectAdapter> accessRequirements,
+    List<AccessRequirement> accessRequirements,
     String entityId
   ) {
     AccessRequirementListProps props = new AccessRequirementListProps();
@@ -33,7 +33,7 @@ public class AccessRequirementListProps extends ReactComponentProps {
     props.accessRequirementFromProps =
       accessRequirements
         .stream()
-        .map(o -> JSON.parse(o.toJSONString()))
+        .map(JSONEntityUtils::toJsInteropCompatibleObject)
         .toArray();
     return props;
   }

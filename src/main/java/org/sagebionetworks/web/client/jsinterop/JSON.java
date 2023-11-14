@@ -7,4 +7,6 @@ import jsinterop.annotations.JsType;
 public class JSON {
 
   public static native Object parse(String json);
+
+  public static native String stringify(Object obj);
 }
