@@ -14,14 +14,14 @@ public class TableColumnSchemaFormProps extends ReactComponentProps {
   String entityType;
   Object viewScope;
   Object[] initialData;
-  Object ref;
+  ReactRef<TableColumnSchemaFormRef> ref;
 
   @JsOverlay
   public static TableColumnSchemaFormProps create(
     EntityType entityType,
     ViewScope viewScope,
     List<ColumnModel> initialData,
-    Object ref
+    ReactRef<TableColumnSchemaFormRef> ref
   ) {
     TableColumnSchemaFormProps props = new TableColumnSchemaFormProps();
     props.entityType = entityType.name();
