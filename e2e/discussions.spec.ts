@@ -8,6 +8,7 @@ import {
 import {
   dismissAlert,
   expectDiscussionPageLoaded,
+  expectDiscussionThreadLoaded,
   getDefaultDiscussionPath,
 } from './helpers/testUser'
 import { Project } from './helpers/types'
@@ -55,38 +56,6 @@ const expectThreadTableLoaded = async (
     await expect(threadCells.nth(4), 'Should have correct views').toHaveText(
       views,
     )
-  })
-}
-
-const expectDiscussionThreadLoaded = async (
-  page: Page,
-  threadId: number,
-  threadTitle: string,
-  threadBody: string,
-) => {
-  await testAuth.step('Discussion thread has loaded', async () => {
-    await page.waitForURL(
-      `${entityUrlPathname(userProject.id)}/discussion/threadId=${threadId}`,
-    )
-    await expect(
-      page.getByRole('heading', { name: 'Discussion' }),
-    ).toBeVisible()
-
-    await expect(
-      page.getByRole('button', { name: /show all threads/i }),
-    ).toBeVisible({ timeout: 60_000 })
-    await expect(
-      page.getByRole('button', { name: 'Date Posted' }),
-    ).toBeVisible()
-    await expect(
-      page.getByRole('button', { name: 'Most Recent' }),
-    ).toBeVisible()
-
-    const discussionThread = page.locator(discussionThreadSelector)
-    await expect(discussionThread.getByText(threadTitle)).toBeVisible()
-    await expect(discussionThread.getByText(threadBody)).toBeVisible({
-      timeout: 60_000,
-    })
   })
 }
 
@@ -226,6 +195,7 @@ test.describe('Discussions', () => {
               threadId,
               threadTitle,
               threadBody,
+              userProject.id,
             )
           })
 
@@ -288,6 +258,7 @@ test.describe('Discussions', () => {
           threadId,
           threadTitle,
           threadBody,
+          userProject.id,
         )
       })
 
@@ -384,6 +355,7 @@ test.describe('Discussions', () => {
               threadId,
               threadTitle,
               threadBody,
+              userProject.id,
             )
           })
 

@@ -5,7 +5,11 @@ import {
   deleteTeamInvitationMessage,
   deleteTeamInviteAcceptanceMessage,
 } from './helpers/messages'
-import { deleteTeam, getTeamIdFromPathname } from './helpers/teams'
+import {
+  deleteTeam,
+  getTeamIdFromPathname,
+  teamHashBang,
+} from './helpers/teams'
 import {
   dismissAlert,
   getAccessTokenFromCookie,
@@ -78,15 +82,17 @@ test.describe('Teams', () => {
           await expect(teamNameInput).toHaveValue(TEAM_NAME)
 
           await userPage.getByRole('button', { name: 'OK' }).click()
+
+          await testAuth.step('user should get teamId', async () => {
+            await userPage.waitForURL(`/${teamHashBang}:**`)
+            teamId = getTeamIdFromPathname(userPage.url())
+          })
+
           await dismissAlert(userPage, `Team Created: ${TEAM_NAME}`)
           await expectTeamPageLoaded(userPage, TEAM_NAME)
           await expect(userPage.getByText('1 team members')).toBeVisible()
         },
       )
-
-      await testAuth.step('user should get teamId', async () => {
-        teamId = getTeamIdFromPathname(userPage.url())
-      })
 
       await testAuth.step(
         'user should invite validated user to team',
@@ -153,6 +159,7 @@ test.describe('Teams', () => {
         // ...before resolving to one team link
         await expect
           .poll(async () => {
+            await expectMyTeamsPageLoaded(validatedUserPage)
             const count = await teamLink.count()
             // if no team links appear after joining the team
             // ...try reloading the page to see if the link subsequently appears

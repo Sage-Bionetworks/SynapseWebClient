@@ -67,10 +67,6 @@ export async function loginTestUser(
   testUserName: string,
   testUserPassword: string,
 ) {
-  // Perform authentication steps
-  await page.goto('/')
-  await waitForInitialPageLoad(page)
-
   // Accept cookies, so banner doesn't obscure buttons in other tests
   await acceptSiteCookies(page)
 
@@ -169,5 +165,38 @@ export const expectDiscussionPageLoaded = async (
       page.getByRole('button', { name: 'Discussion Tools' }),
     ).toBeVisible()
     await expect(page.getByPlaceholder('Search discussions')).toBeVisible()
+  })
+}
+
+export const expectDiscussionThreadLoaded = async (
+  page: Page,
+  threadId: number,
+  threadTitle: string,
+  threadBody: string,
+  projectId: string,
+) => {
+  await testAuth.step('Discussion thread has loaded', async () => {
+    await page.waitForURL(
+      `${entityUrlPathname(projectId)}/discussion/threadId=${threadId}`,
+    )
+    await expect(
+      page.getByRole('heading', { name: 'Discussion' }),
+    ).toBeVisible()
+
+    await expect(
+      page.getByRole('button', { name: /show all threads/i }),
+    ).toBeVisible({ timeout: 60_000 })
+    await expect(
+      page.getByRole('button', { name: 'Date Posted' }),
+    ).toBeVisible()
+    await expect(
+      page.getByRole('button', { name: 'Most Recent' }),
+    ).toBeVisible()
+
+    const discussionThread = page.locator('.discussionThread:visible')
+    await expect(discussionThread.getByText(threadTitle)).toBeVisible()
+    await expect(discussionThread.getByText(threadBody)).toBeVisible({
+      timeout: 60_000,
+    })
   })
 }

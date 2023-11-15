@@ -1,7 +1,7 @@
 import { Page } from '@playwright/test'
 import { BackendDestinationEnum, doDelete } from './http'
 
-const teamHashBang = '#!Team'
+export const teamHashBang = '#!Team'
 
 export function getTeamIdFromPathname(pathname: string) {
   if (!pathname.includes(teamHashBang)) {
