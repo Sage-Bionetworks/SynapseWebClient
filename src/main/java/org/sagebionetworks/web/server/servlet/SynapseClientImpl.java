@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.server.servlet;
 
 import au.com.bytecode.opencsv.CSVReader;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.thirdparty.guava.common.base.Supplier;
 import com.google.gwt.thirdparty.guava.common.base.Suppliers;
 import java.io.IOException;
