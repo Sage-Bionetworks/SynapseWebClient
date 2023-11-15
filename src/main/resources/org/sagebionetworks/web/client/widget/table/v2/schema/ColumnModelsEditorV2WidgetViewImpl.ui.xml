@@ -1,0 +1,6 @@
+<ui:UiBinder
+  xmlns:ui="urn:ui:com.google.gwt.uibinder"
+  xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
+>
+  <w:ReactComponentDiv ui:field="reactContainer" />
+</ui:UiBinder>

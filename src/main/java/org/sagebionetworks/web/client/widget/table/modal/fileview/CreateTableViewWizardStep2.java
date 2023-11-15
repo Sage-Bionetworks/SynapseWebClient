@@ -7,27 +7,32 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.SubmissionView;
 import org.sagebionetworks.repo.model.table.Table;
+import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.ViewColumnModelRequest;
 import org.sagebionetworks.repo.model.table.ViewColumnModelResponse;
 import org.sagebionetworks.repo.model.table.ViewEntityType;
 import org.sagebionetworks.repo.model.table.ViewScope;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Synapse;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsEditorV2Widget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
@@ -48,6 +53,7 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
     "Schema update cancelled";
   public static final String FINISH = "Finish";
   ColumnModelsEditorWidget editor;
+  ColumnModelsEditorV2Widget editorV2;
   String tableId;
   ModalPresenter presenter;
   // the TableEntity or View
@@ -59,6 +65,7 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
   CreateTableViewWizardStep2View view;
   SynapseJSNIUtils jsniUtils;
   GlobalApplicationState globalAppState;
+  CookieProvider cookies;
 
   /*
    * Set to true to indicate that change selections are in progress. This allows selection change
@@ -81,35 +88,33 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
     ViewDefaultColumns fileViewDefaultColumns,
     SynapseJavascriptClient jsClient,
     SynapseJSNIUtils jsniUtils,
-    GlobalApplicationState globalAppState
+    GlobalApplicationState globalAppState,
+    ColumnModelsEditorV2Widget editorV2,
+    CookieProvider cookieProvider
   ) {
     this.view = view;
     this.synapseClient = synapseClient;
     fixServiceEntryPoint(synapseClient);
     this.editor = editor;
+    this.editorV2 = editorV2;
     this.jobTrackingWidget = jobTrackingWidget;
     this.fileViewDefaultColumns = fileViewDefaultColumns;
     this.jsClient = jsClient;
     this.jsniUtils = jsniUtils;
     this.globalAppState = globalAppState;
+    this.cookies = cookieProvider;
     view.setJobTracker(jobTrackingWidget.asWidget());
-    view.setEditor(editor.asWidget());
-    editor.setOnAddDefaultViewColumnsCallback(
-      new Callback() {
-        @Override
-        public void invoke() {
-          getDefaultColumnsForView();
-        }
-      }
-    );
-    editor.setOnAddAnnotationColumnsCallback(
-      new Callback() {
-        @Override
-        public void invoke() {
-          getPossibleColumnModelsForViewScope(null);
-        }
-      }
-    );
+    if (DisplayUtils.isInTestWebsite(cookieProvider)) {
+      view.setEditor(editorV2.asWidget());
+    } else {
+      view.setEditor(editor.asWidget());
+      editor.setOnAddDefaultViewColumnsCallback(
+        this::onAddDefaultViewColumnsCallback
+      );
+      editor.setOnAddAnnotationColumnsCallback(() ->
+        getPossibleColumnModelsForViewScope(null)
+      );
+    }
   }
 
   public void configure(Table entity, TableType tableType) {
@@ -118,30 +123,45 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
     this.entity = entity;
     this.tableType = tableType;
 
-    editor.configure(tableType, new ArrayList<ColumnModel>());
+    List<ColumnModel> defaultColumns = getDefaultColumns();
 
-    boolean isView = !TableType.table.equals(tableType);
-    this.editor.setAddDefaultColumnsButtonVisible(isView);
-    this.editor.setAddAnnotationColumnsButtonVisible(isView);
-    if (isView) {
-      // start with the default file columns
-      getDefaultColumnsForView();
+    if (DisplayUtils.isInTestWebsite(this.cookies)) {
+      editorV2.configure(
+        EntityTypeUtils.getEntityType(entity),
+        getViewScope(),
+        defaultColumns
+      );
+    } else {
+      editor.configure(tableType, new ArrayList<>());
+      boolean isView = !TableType.table.equals(tableType);
+      this.editor.setAddDefaultColumnsButtonVisible(isView);
+      this.editor.setAddAnnotationColumnsButtonVisible(isView);
+      if (isView) {
+        // start with the default file columns
+        editor.addColumns(defaultColumns);
+      }
     }
   }
 
-  public void getDefaultColumnsForView() {
-    List<ColumnModel> defaultColumns = fileViewDefaultColumns.getDefaultViewColumns(
-      tableType
-    );
-    editor.addColumns(defaultColumns);
+  public void onAddDefaultViewColumnsCallback() {
+    editor.addColumns(getDefaultColumns());
   }
 
-  public void getPossibleColumnModelsForViewScope(String nextPageToken) {
-    view.setJobTrackerVisible(true);
-    presenter.clearErrors();
+  public List<ColumnModel> getDefaultColumns() {
+    boolean isView = !TableType.table.equals(tableType);
+    if (isView) {
+      return fileViewDefaultColumns.getDefaultViewColumns(tableType);
+    } else {
+      return Collections.emptyList();
+    }
+  }
+
+  public ViewScope getViewScope() {
     ViewScope scope = new ViewScope();
     List<String> scopeIds = null;
-    if (entity instanceof EntityView) {
+    if (entity instanceof TableEntity) {
+      return null;
+    } else if (entity instanceof EntityView) {
       scopeIds = ((EntityView) entity).getScopeIds();
       scope.setViewTypeMask(tableType.getViewTypeMask().longValue());
       scope.setViewEntityType(ViewEntityType.entityview);
@@ -150,6 +170,13 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
       scope.setViewEntityType(ViewEntityType.submissionview);
     }
     scope.setScope(scopeIds);
+    return scope;
+  }
+
+  public void getPossibleColumnModelsForViewScope(String nextPageToken) {
+    view.setJobTrackerVisible(true);
+    presenter.clearErrors();
+    ViewScope scope = getViewScope();
 
     ViewColumnModelRequest request = new ViewColumnModelRequest();
     request.setViewScope(scope);
@@ -169,7 +196,8 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 
           @Override
           public void onComplete(AsynchronousResponseBody response) {
-            ViewColumnModelResponse viewColumnModelResponse = (ViewColumnModelResponse) response;
+            ViewColumnModelResponse viewColumnModelResponse =
+              (ViewColumnModelResponse) response;
             editor.addColumns(viewColumnModelResponse.getResults());
             if (viewColumnModelResponse.getNextPageToken() != null) {
               getPossibleColumnModelsForViewScope(
@@ -240,16 +268,24 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
   public void onPrimary() {
     presenter.setLoading(true);
     // Save it the data is valid
-    if (!editor.validate()) {
+    boolean isValid = DisplayUtils.isInTestWebsite(cookies)
+      ? editorV2.validate()
+      : editor.validate();
+    if (!isValid) {
       presenter.setErrorMessage(ColumnModelsWidget.SEE_THE_ERROR_S_ABOVE);
       return;
     }
     // Get the models from the view and save them
-    List<ColumnModel> newSchema = editor.getEditedColumnModels();
+    List<ColumnModel> newSchema;
+    if (DisplayUtils.isInTestWebsite(cookies)) {
+      newSchema = editorV2.getEditedColumnModels();
+    } else {
+      newSchema = editor.getEditedColumnModels();
+    }
     presenter.clearErrors();
     synapseClient.getTableUpdateTransactionRequest(
       entity.getId(),
-      new ArrayList<ColumnModel>(),
+      new ArrayList<>(),
       newSchema,
       new AsyncCallback<TableUpdateTransactionRequest>() {
         @Override

@@ -25,6 +25,8 @@ public class React {
     ReactNode[] children
   );
 
+  public static native <T> T createRef();
+
   /**
    * Similar to {@link #createElementWithSynapseContext} but only includes the theme. Any components rendered will NOT get the full Synapse context, including
    * access token + auth state, experimental mode status, and time display settings.
@@ -36,10 +38,11 @@ public class React {
     ReactComponentType<P> component,
     P props
   ) {
-    SynapseReactClientFullContextProviderProps emptyContext = SynapseReactClientFullContextProviderProps.create(
-      SynapseContextJsObject.create(null, false, false),
-      null
-    );
+    SynapseReactClientFullContextProviderProps emptyContext =
+      SynapseReactClientFullContextProviderProps.create(
+        SynapseContextJsObject.create(null, false, false),
+        null
+      );
     return createElementWithSynapseContext(component, props, emptyContext);
   }
 

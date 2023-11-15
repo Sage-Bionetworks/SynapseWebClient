@@ -114,7 +114,6 @@ import org.sagebionetworks.repo.model.quiz.QuizResponse;
 import org.sagebionetworks.repo.model.table.ColumnChange;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
-import org.sagebionetworks.repo.model.table.SqlTransformRequest;
 import org.sagebionetworks.repo.model.table.TableSchemaChangeRequest;
 import org.sagebionetworks.repo.model.table.TableUpdateRequest;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
@@ -299,9 +298,6 @@ public class SynapseClientImplTest {
 
   @Mock
   HttpServletRequest mockRequest;
-
-  @Captor
-  ArgumentCaptor<SqlTransformRequest> sqlTransformRequestCaptor;
 
   String userIp = "127.0.0.1";
 

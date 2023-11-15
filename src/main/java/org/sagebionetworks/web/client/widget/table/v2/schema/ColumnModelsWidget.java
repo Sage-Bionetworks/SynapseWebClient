@@ -17,6 +17,7 @@ import org.sagebionetworks.repo.model.table.DatasetCollection;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.HasDefiningSql;
 import org.sagebionetworks.repo.model.table.SubmissionView;
+import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.View;
 import org.sagebionetworks.repo.model.table.ViewColumnModelRequest;
@@ -24,9 +25,11 @@ import org.sagebionetworks.repo.model.table.ViewColumnModelResponse;
 import org.sagebionetworks.repo.model.table.ViewEntityType;
 import org.sagebionetworks.repo.model.table.ViewScope;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
@@ -55,6 +58,7 @@ public class ColumnModelsWidget
   ColumnModelsViewBase baseView;
   ColumnModelsView viewer;
   ColumnModelsEditorWidget editor;
+  ColumnModelsEditorV2Widget editorV2;
   boolean isEditable;
   SynapseClientAsync synapseClient;
   String tableId;
@@ -66,12 +70,8 @@ public class ColumnModelsWidget
   PopupUtilsView popupUtilsView;
   public static final String UPDATING_SCHEMA = "Updating the table schema...";
   public static final String RETRIEVING_DATA = "Retrieving data...";
+  private final CookieProvider cookies;
 
-  /**
-   * New presenter with its view.
-   *
-   * @param fileview
-   */
   @Inject
   public ColumnModelsWidget(
     ColumnModelsViewBase baseView,
@@ -81,7 +81,9 @@ public class ColumnModelsWidget
     JobTrackingWidget jobTrackingWidget,
     ViewDefaultColumns fileViewDefaultColumns,
     SynapseAlert synAlert,
-    PopupUtilsView popupUtilsView
+    PopupUtilsView popupUtilsView,
+    ColumnModelsEditorV2Widget editorV2,
+    CookieProvider cookies
   ) {
     this.ginInjector = ginInjector;
     // we will always have a viewer
@@ -94,30 +96,23 @@ public class ColumnModelsWidget
     this.viewer = ginInjector.createNewColumnModelsView();
     this.viewer.setEditHandler(this);
     this.editor = editor;
+    this.editorV2 = editorV2;
+    this.cookies = cookies;
     // Add all of the parts
     this.baseView.setViewer(this.viewer);
-    this.baseView.setEditor(this.editor);
+    if (DisplayUtils.isInTestWebsite(cookies)) {
+      this.baseView.setEditor(this.editorV2);
+    } else {
+      this.baseView.setEditor(this.editor);
+    }
     this.baseView.setJobTrackingWidget(jobTrackingWidget);
     this.baseView.setJobTrackingWidgetVisible(false);
     this.synapseClient = synapseClient;
     fixServiceEntryPoint(synapseClient);
     this.fileViewDefaultColumns = fileViewDefaultColumns;
-    editor.setOnAddDefaultViewColumnsCallback(
-      new Callback() {
-        @Override
-        public void invoke() {
-          getDefaultColumnsForView();
-        }
-      }
-    );
-
-    editor.setOnAddAnnotationColumnsCallback(
-      new Callback() {
-        @Override
-        public void invoke() {
-          getPossibleColumnModelsForViewScope(null);
-        }
-      }
+    editor.setOnAddDefaultViewColumnsCallback(this::getDefaultColumnsForView);
+    editor.setOnAddAnnotationColumnsCallback(() ->
+      getPossibleColumnModelsForViewScope(null)
     );
     baseView.setSynAlert(synAlert);
   }
@@ -155,13 +150,13 @@ public class ColumnModelsWidget
     editor.addColumns(defaultColumns);
   }
 
-  public void getPossibleColumnModelsForViewScope(String nextPageToken) {
-    synAlert.clear();
-
+  public ViewScope getViewScope() {
     ViewScope scope = new ViewScope();
     List<String> scopeIds = null;
     Entity entity = bundle.getEntity();
-    if (entity instanceof EntityView) {
+    if (entity instanceof TableEntity) {
+      return null;
+    } else if (entity instanceof EntityView) {
       scopeIds = ((EntityView) entity).getScopeIds();
       scope.setViewTypeMask(((EntityView) entity).getViewTypeMask());
       scope.setViewEntityType(ViewEntityType.entityview);
@@ -171,18 +166,28 @@ public class ColumnModelsWidget
     } else if (entity instanceof Dataset) {
       scopeIds = new ArrayList<>();
       for (EntityRef item : ((Dataset) entity).getItems()) {
-        scopeIds.add(item.getEntityId());
+        scopeIds.add(
+          item.getEntityId() + "." + item.getVersionNumber().toString()
+        );
       }
       scope.setViewEntityType(ViewEntityType.dataset);
     } else if (entity instanceof DatasetCollection) {
       scopeIds = new ArrayList<>();
       for (EntityRef item : ((DatasetCollection) entity).getItems()) {
         scopeIds.add(item.getEntityId());
+        scopeIds.add(
+          item.getEntityId() + "." + item.getVersionNumber().toString()
+        );
       }
       scope.setViewEntityType(ViewEntityType.datasetcollection);
     }
     scope.setScope(scopeIds);
+    return scope;
+  }
 
+  public void getPossibleColumnModelsForViewScope(String nextPageToken) {
+    synAlert.clear();
+    ViewScope scope = getViewScope();
     ViewColumnModelRequest request = new ViewColumnModelRequest();
     request.setViewScope(scope);
     request.setNextPageToken(nextPageToken);
@@ -235,15 +240,27 @@ public class ColumnModelsWidget
         "Cannot call onEditColumns() for a read-only widget"
       );
     }
-    editor.configure(tableType, bundle.getTableBundle().getColumnModels());
+    if (DisplayUtils.isInTestWebsite(cookies)) {
+      ViewScope viewScope = getViewScope();
+      editorV2.configure(
+        EntityTypeUtils.getEntityType(bundle.getEntity()),
+        viewScope,
+        bundle.getTableBundle().getColumnModels()
+      );
+    } else {
+      editor.configure(tableType, bundle.getTableBundle().getColumnModels());
+    }
     // Pass this to the base
     baseView.showEditor();
   }
 
   @Override
   public void onSave() {
+    boolean isValid = DisplayUtils.isInTestWebsite(cookies)
+      ? editorV2.validate()
+      : editor.validate();
     // Save it the data is valid
-    if (!editor.validate()) {
+    if (!isValid) {
       synAlert.showError(SEE_THE_ERROR_S_ABOVE);
       baseView.resetSaveButton();
       return;
@@ -252,7 +269,12 @@ public class ColumnModelsWidget
     }
     // Get the models from the view and save them
     baseView.setLoading();
-    List<ColumnModel> newSchema = editor.getEditedColumnModels();
+    List<ColumnModel> newSchema;
+    if (DisplayUtils.isInTestWebsite(cookies)) {
+      newSchema = editorV2.getEditedColumnModels();
+    } else {
+      newSchema = editor.getEditedColumnModels();
+    }
     synapseClient.getTableUpdateTransactionRequest(
       bundle.getEntity().getId(),
       bundle.getTableBundle().getColumnModels(),
