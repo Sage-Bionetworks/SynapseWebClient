@@ -81,13 +81,11 @@ public class CreateTableViewWizardStep2Test {
   String parentId;
   CreateTableViewWizardStep2 widget;
 
-  EntityView mockEntityView;
+  EntityView entityViewStub;
 
-  @Mock
-  TableEntity mockTableEntity;
+  TableEntity tableEntityStub;
 
-  @Mock
-  SubmissionView mockSubmissionView;
+  SubmissionView submissionViewStub;
 
   @Mock
   SynapseClientAsync mockSynapseClient;
@@ -167,12 +165,12 @@ public class CreateTableViewWizardStep2Test {
   @Before
   public void before() {
     MockitoAnnotations.initMocks(this);
-    mockTableEntity = new TableEntity();
-    mockEntityView = new EntityView();
-    mockSubmissionView = new SubmissionView();
-    mockTableEntity.setId(ENTITY_ID);
-    mockEntityView.setId(ENTITY_ID);
-    mockSubmissionView.setId(ENTITY_ID);
+    tableEntityStub = new TableEntity();
+    entityViewStub = new EntityView();
+    submissionViewStub = new SubmissionView();
+    tableEntityStub.setId(ENTITY_ID);
+    entityViewStub.setId(ENTITY_ID);
+    submissionViewStub.setId(ENTITY_ID);
     when(mockGlobalAppState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 
     widget =
@@ -219,8 +217,8 @@ public class CreateTableViewWizardStep2Test {
       )
     )
       .thenReturn(mockDefaultSubmissionViewColumnModels);
-    mockEntityView.setScopeIds(mockViewScopeIds);
-    mockSubmissionView.setScopeIds(mockSubmissionViewScopeIds);
+    entityViewStub.setScopeIds(mockViewScopeIds);
+    submissionViewStub.setScopeIds(mockSubmissionViewScopeIds);
     when(mockViewColumnModelResponsePage1.getNextPageToken())
       .thenReturn(NEXT_PAGE_TOKEN);
     when(mockViewColumnModelResponsePage1.getResults())
@@ -252,7 +250,7 @@ public class CreateTableViewWizardStep2Test {
 
   @Test
   public void testConfigureTable() {
-    widget.configure(mockTableEntity, TableType.table);
+    widget.configure(tableEntityStub, TableType.table);
     verify(mockEditor).setAddDefaultColumnsButtonVisible(false);
     verify(mockEditor).setAddAnnotationColumnsButtonVisible(false);
     verify(mockEditor).configure(TableType.table, new ArrayList<ColumnModel>());
@@ -262,7 +260,7 @@ public class CreateTableViewWizardStep2Test {
   public void testConfigureTableExperimentalMode() {
     setUpInExperimentalMode();
 
-    widget.configure(mockTableEntity, TableType.table);
+    widget.configure(tableEntityStub, TableType.table);
     verify(mockEditorV2)
       .configure(
         eq(EntityType.table),
@@ -270,9 +268,7 @@ public class CreateTableViewWizardStep2Test {
         eq(new ArrayList<>())
       );
     ViewScope viewScope = viewScopeCaptor.getValue();
-    assertNull(viewScope.getScope());
-    assertNull(viewScope.getViewType());
-    assertNull(viewScope.getViewEntityType());
+    assertNull(viewScope);
   }
 
   @Test
@@ -280,7 +276,7 @@ public class CreateTableViewWizardStep2Test {
     verify(mockView).setJobTracker(any(Widget.class));
     verify(mockView).setEditor(any(Widget.class));
 
-    widget.configure(mockEntityView, TableType.file_view);
+    widget.configure(entityViewStub, TableType.file_view);
     verify(mockEditor)
       .configure(TableType.file_view, new ArrayList<ColumnModel>());
     verify(mockEditor).setAddDefaultColumnsButtonVisible(true);
@@ -295,7 +291,7 @@ public class CreateTableViewWizardStep2Test {
     verify(mockView, times(2)).setJobTracker(any(Widget.class));
     verify(mockView, times(2)).setEditor(any(Widget.class));
 
-    widget.configure(mockEntityView, TableType.file_view);
+    widget.configure(entityViewStub, TableType.file_view);
     verify(mockEditorV2)
       .configure(
         eq(EntityType.entityview),
@@ -311,7 +307,7 @@ public class CreateTableViewWizardStep2Test {
 
   @Test
   public void testConfigureSubmissionView() {
-    widget.configure(mockEntityView, TableType.submission_view);
+    widget.configure(entityViewStub, TableType.submission_view);
 
     verify(mockEditor)
       .configure(TableType.submission_view, new ArrayList<ColumnModel>());
@@ -323,7 +319,7 @@ public class CreateTableViewWizardStep2Test {
   @Test
   public void testConfigureSubmissionViewExperimentalMode() {
     setUpInExperimentalMode();
-    widget.configure(mockSubmissionView, TableType.submission_view);
+    widget.configure(submissionViewStub, TableType.submission_view);
 
     verify(mockEditorV2)
       .configure(
@@ -343,7 +339,7 @@ public class CreateTableViewWizardStep2Test {
     verify(mockView).setJobTracker(any(Widget.class));
     verify(mockView).setEditor(any(Widget.class));
 
-    widget.configure(mockEntityView, TableType.project_view);
+    widget.configure(entityViewStub, TableType.project_view);
     verify(mockEditor)
       .configure(TableType.project_view, new ArrayList<ColumnModel>());
     verify(mockEditor).setAddDefaultColumnsButtonVisible(true);
@@ -358,7 +354,7 @@ public class CreateTableViewWizardStep2Test {
     verify(mockView, times(2)).setJobTracker(any(Widget.class));
     verify(mockView, times(2)).setEditor(any(Widget.class));
 
-    widget.configure(mockEntityView, TableType.project_view);
+    widget.configure(entityViewStub, TableType.project_view);
     verify(mockEditorV2)
       .configure(
         eq(EntityType.entityview),
@@ -375,7 +371,7 @@ public class CreateTableViewWizardStep2Test {
   @Test
   public void testGetPossibleColumnModelsForViewScope() {
     // test is set up so that rpc successfully returns 2 pages, and then stops.
-    widget.configure(mockEntityView, TableType.file_view);
+    widget.configure(entityViewStub, TableType.file_view);
 
     String firstPageToken = null;
     widget.getPossibleColumnModelsForViewScope(firstPageToken);
@@ -401,7 +397,7 @@ public class CreateTableViewWizardStep2Test {
   @Test
   public void testGetPossibleColumnModelsForProjectViewScope() {
     // test is set up so that rpc successfully returns 2 pages, and then stops.
-    widget.configure(mockEntityView, TableType.project_view);
+    widget.configure(entityViewStub, TableType.project_view);
 
     String firstPageToken = null;
     widget.getPossibleColumnModelsForViewScope(firstPageToken);
@@ -425,7 +421,7 @@ public class CreateTableViewWizardStep2Test {
 
   @Test
   public void testGetPossibleColumnModelsForSubmissionViewScope() {
-    widget.configure(mockSubmissionView, TableType.submission_view);
+    widget.configure(submissionViewStub, TableType.submission_view);
 
     String firstPageToken = null;
     widget.getPossibleColumnModelsForViewScope(firstPageToken);
@@ -450,7 +446,7 @@ public class CreateTableViewWizardStep2Test {
 
   @Test
   public void testGetPossibleColumnModelsForViewScopeFailure() {
-    widget.configure(mockEntityView, filesFoldersTablesView);
+    widget.configure(entityViewStub, filesFoldersTablesView);
     String error = "error message getting annotation column models";
     Exception ex = new Exception(error);
     String firstPageToken = null;
@@ -489,7 +485,7 @@ public class CreateTableViewWizardStep2Test {
     verify(mockWizardPresenter).addCallback(wizardCallbackCaptor.capture());
     ModalWizardWidget.WizardCallback wizardCallback =
       wizardCallbackCaptor.getValue();
-    widget.configure(mockTableEntity, TableType.table);
+    widget.configure(tableEntityStub, TableType.table);
 
     // simulate user cancels
     wizardCallback.onCanceled();
@@ -512,7 +508,7 @@ public class CreateTableViewWizardStep2Test {
     verify(mockWizardPresenter).addCallback(wizardCallbackCaptor.capture());
     ModalWizardWidget.WizardCallback wizardCallback =
       wizardCallbackCaptor.getValue();
-    widget.configure(mockTableEntity, TableType.table);
+    widget.configure(tableEntityStub, TableType.table);
 
     // simulate user cancels
     wizardCallback.onCanceled();
@@ -527,7 +523,7 @@ public class CreateTableViewWizardStep2Test {
   }
 
   private AsynchronousProgressHandler onPrimary() {
-    widget.configure(mockTableEntity, TableType.table);
+    widget.configure(tableEntityStub, TableType.table);
     widget.onPrimary();
     boolean isDeterminate = false;
     ArgumentCaptor<AsynchronousProgressHandler> captor =
@@ -614,7 +610,7 @@ public class CreateTableViewWizardStep2Test {
 
   @Test
   public void testOnPrimaryFailure() {
-    widget.configure(mockTableEntity, TableType.table);
+    widget.configure(tableEntityStub, TableType.table);
     String error = "error message";
     Exception ex = new Exception(error);
     AsyncMockStubber

@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.jsinterop;
 
 import java.util.List;
+import jsinterop.annotations.JsNullable;
 import jsinterop.annotations.JsOverlay;
 import jsinterop.annotations.JsPackage;
 import jsinterop.annotations.JsType;
@@ -12,7 +13,10 @@ import org.sagebionetworks.repo.model.table.ViewScope;
 public class TableColumnSchemaFormProps extends ReactComponentProps {
 
   String entityType;
+
+  @JsNullable
   Object viewScope;
+
   Object[] initialData;
   ReactRef<TableColumnSchemaFormRef> ref;
 
@@ -25,7 +29,9 @@ public class TableColumnSchemaFormProps extends ReactComponentProps {
   ) {
     TableColumnSchemaFormProps props = new TableColumnSchemaFormProps();
     props.entityType = entityType.name();
-    props.viewScope = JSONEntityUtils.toJsInteropCompatibleObject(viewScope);
+    if (viewScope != null) {
+      props.viewScope = JSONEntityUtils.toJsInteropCompatibleObject(viewScope);
+    }
     props.initialData =
       initialData
         .stream()

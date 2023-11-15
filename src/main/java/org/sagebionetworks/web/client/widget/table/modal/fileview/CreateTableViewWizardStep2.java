@@ -160,7 +160,7 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
     ViewScope scope = new ViewScope();
     List<String> scopeIds = null;
     if (entity instanceof TableEntity) {
-      return new ViewScope();
+      return null;
     } else if (entity instanceof EntityView) {
       scopeIds = ((EntityView) entity).getScopeIds();
       scope.setViewTypeMask(tableType.getViewTypeMask().longValue());
