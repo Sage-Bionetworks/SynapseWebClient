@@ -209,6 +209,7 @@ public class ColumnModelsWidgetTest {
         mockCookies
       );
     when(mockEditor.validate()).thenReturn(true);
+    when(mockEditorV2.validate()).thenReturn(true);
     when(mockTableSchemaChangeRequest.getChanges())
       .thenReturn(Collections.singletonList(mockTableUpdateRequest));
     AsyncMockStubber

@@ -270,7 +270,9 @@ public class CreateTableViewWizardStep2Test {
         eq(new ArrayList<>())
       );
     ViewScope viewScope = viewScopeCaptor.getValue();
-    assertNull(viewScope);
+    assertNull(viewScope.getScope());
+    assertNull(viewScope.getViewType());
+    assertNull(viewScope.getViewEntityType());
   }
 
   @Test
