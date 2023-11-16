@@ -144,7 +144,8 @@ export const testAuth = base.extend<
     },
     // specify timeout so worker fixture duration doesn't skew test duration
     // ...see https://github.com/microsoft/playwright/issues/15338
-    { scope: 'worker', timeout: defaultTestTimeout },
+    // ...multiply timeout by each user to be authenticated
+    { scope: 'worker', timeout: defaultTestTimeout * 2 },
   ],
   userPage: createUserPageFixture(userPrefix),
   validatedUserPage: createUserPageFixture(userValidatedPrefix),

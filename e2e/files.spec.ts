@@ -195,7 +195,9 @@ test.describe('Files', () => {
 
   testAuth(
     'File sharing',
-    async ({ userPage, validatedUserPage, browserName }, testInfo) => {
+    async ({ userPage, validatedUserPage, browserName }) => {
+      test.slow()
+
       // Use test.fixme because test.fail doesn't mark test as expected to fail
       // when there is a test timeout. Since test timeouts are expensive,
       // Playwright recommends skipping the test entirely with test.fixme.
@@ -346,6 +348,8 @@ test.describe('Files', () => {
   testAuth(
     'should create and delete a file',
     async ({ userPage, browserName }) => {
+      test.slow()
+
       test.fail(
         browserName === 'webkit',
         `Playwright is not preserving the File's lastModified time in webkit, so 
