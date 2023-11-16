@@ -1,5 +1,6 @@
 import { Page, expect, test } from '@playwright/test'
 import path from 'path'
+import { defaultExpectTimeout } from '../playwright.config'
 import { testAuth } from './fixtures/authenticatedUserPages'
 import {
   createFile,
@@ -45,15 +46,18 @@ const openFileSharingSettings = async (page: Page) => {
   })
 }
 
-const expectNoAccessPage = async (page: Page) => {
+const expectNoAccessPage = async (
+  page: Page,
+  expectTimeout: number = defaultExpectTimeout,
+) => {
   await expect(
     page.getByRole('heading', {
       name: 'Sorry, no access to this page.',
     }),
-  ).toBeVisible()
+  ).toBeVisible({ timeout: expectTimeout })
   await expect(
     page.getByText('You are not authorized to access the page requested.'),
-  ).toBeVisible()
+  ).toBeVisible({ timeout: expectTimeout })
 }
 
 const confirmSharingSettings = async (
@@ -229,7 +233,9 @@ test.describe('Files', () => {
         await waitForInitialPageLoad(userPage)
 
         const fileLink = userPage.getByRole('link', { name: fileName })
-        await expect(fileLink).toBeVisible()
+        await expect(fileLink).toBeVisible({
+          timeout: defaultExpectTimeout * 3, // extra time for file to be created
+        })
 
         await fileLink.click()
         await expectFilePageLoaded(fileName, fileEntityId, userPage)
@@ -268,11 +274,11 @@ test.describe('Files', () => {
 
           await userPage
             .getByRole('menuitem', { name: `@${validatedUserName}` })
-            .click({ timeout: testInfo.timeout * 3 })
+            .click({ timeout: defaultExpectTimeout * 3 })
 
           await expect(
             userPage.getByRole('cell', { name: validatedUserName }),
-          ).toBeVisible({ timeout: testInfo.timeout * 3 })
+          ).toBeVisible({ timeout: defaultExpectTimeout * 3 })
 
           // Don't send message, so we don't have to clean up the message
           await userPage.getByText('Notify people via email').click()
@@ -312,7 +318,7 @@ test.describe('Files', () => {
             userPage.getByRole('button', {
               name: 'Create Local Sharing Settings',
             }),
-          ).toBeVisible({ timeout: testInfo.timeout * 3 })
+          ).toBeVisible({ timeout: defaultExpectTimeout * 3 })
 
           await saveFileSharingSettings(userPage)
         },
@@ -322,8 +328,13 @@ test.describe('Files', () => {
       await confirmSharingSettings(userPage, userName, validatedUserName, false)
 
       await testAuth.step('Second user cannot access the file', async () => {
-        await validatedUserPage.reload()
-        await expectNoAccessPage(validatedUserPage)
+        await expect(async () => {
+          await validatedUserPage.reload()
+          await expectNoAccessPage(
+            validatedUserPage,
+            defaultExpectTimeout * 0.5, // use shorter expect timeout, so reload is tried earlier
+          )
+        }).toPass()
       })
     },
   )
@@ -359,7 +370,9 @@ test.describe('Files', () => {
 
       const fileLink = await testAuth.step('get link to file', async () => {
         const fileLink = userPage.getByRole('link', { name: fileName })
-        await expect(fileLink).toBeVisible()
+        await expect(fileLink).toBeVisible({
+          timeout: defaultExpectTimeout * 3, // extra time for file to be created
+        })
         return fileLink
       })
 
@@ -485,13 +498,20 @@ test.describe('Files', () => {
         await testAuth.step('go to trash can', async () => {
           await userPage.getByLabel('Trash Can').click()
 
-          const trashCanHeading = userPage.getByRole('heading', {
-            name: 'Trash Can',
-          })
-          await expect(trashCanHeading).toBeVisible()
+          // reload page if trash can deferred js does not load
+          await expect(async () => {
+            await userPage.reload()
 
-          // click on heading, so tooltip on trash can nav button is hidden
-          await trashCanHeading.click()
+            const trashCanHeading = userPage.getByRole('heading', {
+              name: 'Trash Can',
+            })
+            await expect(trashCanHeading).toBeVisible({
+              timeout: defaultExpectTimeout * 0.5, // decrease timeout, so reload happens more quickly
+            })
+
+            // click on heading, so tooltip on trash can nav button is hidden
+            await trashCanHeading.click()
+          }).toPass()
         })
 
         await testAuth.step('remove file from trash can', async () => {

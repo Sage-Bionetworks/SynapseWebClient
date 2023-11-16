@@ -1,4 +1,5 @@
 import { Page, expect } from '@playwright/test'
+import { defaultExpectTimeout } from '../../playwright.config'
 import { testAuth } from '../fixtures/authenticatedUserPages'
 import { entityUrlPathname } from './entities'
 import { BackendDestinationEnum, doDelete, doPost } from './http'
@@ -98,9 +99,7 @@ export async function loginTestUser(
   // Wait until the page reaches a state where all cookies are set
   await expect(page.getByLabel('Search')).toBeVisible()
   await expect(page.getByLabel('Projects')).toBeVisible()
-  await expect(page.getByLabel('Your Account')).toBeVisible({
-    timeout: 30 * 1000,
-  })
+  await expect(page.getByLabel('Your Account')).toBeVisible()
 }
 
 export async function goToDashboard(page: Page) {
@@ -111,9 +110,7 @@ export async function goToDashboard(page: Page) {
   // wait for page to load
   await expect(page.getByLabel('Search')).toBeVisible()
   await expect(page.getByLabel('Projects')).toBeVisible()
-  await expect(page.getByLabel('Your Account')).toBeVisible({
-    timeout: 30 * 1000,
-  })
+  await expect(page.getByLabel('Your Account')).toBeVisible()
 }
 
 export async function logoutTestUser(page: Page) {
@@ -142,7 +139,9 @@ export async function acceptSiteCookies(page: Page) {
 
 export const dismissAlert = async (page: Page, alertText: string) => {
   const alert = page.getByRole('alert').filter({ hasText: alertText })
-  expect(alert).toBeVisible()
+  // allow extra time for alert to appear
+  // ...to handle alerts triggered by potentially slow network requests, e.g. create file
+  expect(alert).toBeVisible({ timeout: defaultExpectTimeout * 3 })
   await alert.getByRole('button', { name: 'Close' }).click()
   await expect(alert).not.toBeVisible()
 }
@@ -154,17 +153,22 @@ export const getDefaultDiscussionPath = (projectId: string) => {
 export const expectDiscussionPageLoaded = async (
   page: Page,
   projectId: string,
+  expectTimeout: number = defaultExpectTimeout,
 ) => {
   await testAuth.step('Default discussion page has loaded', async () => {
     await page.waitForURL(getDefaultDiscussionPath(projectId))
-    await expect(
-      page.getByRole('heading', { name: 'Discussion' }),
-    ).toBeVisible()
-    await expect(page.getByRole('button', { name: 'New Thread' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Discussion' })).toBeVisible(
+      { timeout: expectTimeout },
+    )
+    await expect(page.getByRole('button', { name: 'New Thread' })).toBeVisible({
+      timeout: expectTimeout,
+    })
     await expect(
       page.getByRole('button', { name: 'Discussion Tools' }),
-    ).toBeVisible()
-    await expect(page.getByPlaceholder('Search discussions')).toBeVisible()
+    ).toBeVisible({ timeout: expectTimeout })
+    await expect(page.getByPlaceholder('Search discussions')).toBeVisible({
+      timeout: expectTimeout,
+    })
   })
 }
 
@@ -185,7 +189,7 @@ export const expectDiscussionThreadLoaded = async (
 
     await expect(
       page.getByRole('button', { name: /show all threads/i }),
-    ).toBeVisible({ timeout: 60_000 })
+    ).toBeVisible({ timeout: defaultExpectTimeout * 3 }) // extra time for thread response to return
     await expect(
       page.getByRole('button', { name: 'Date Posted' }),
     ).toBeVisible()
@@ -195,8 +199,6 @@ export const expectDiscussionThreadLoaded = async (
 
     const discussionThread = page.locator('.discussionThread:visible')
     await expect(discussionThread.getByText(threadTitle)).toBeVisible()
-    await expect(discussionThread.getByText(threadBody)).toBeVisible({
-      timeout: 60_000,
-    })
+    await expect(discussionThread.getByText(threadBody)).toBeVisible()
   })
 }

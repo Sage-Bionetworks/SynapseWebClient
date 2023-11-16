@@ -1,6 +1,6 @@
 import { test as base, Browser, expect, type Page } from '@playwright/test'
 import { unlinkSync } from 'fs'
-import { baseURL } from '../../playwright.config'
+import { baseURL, defaultTestTimeout } from '../../playwright.config'
 import { setCertifiedUserStatus } from '../helpers/certification'
 import {
   cleanupTestUser,
@@ -100,7 +100,7 @@ export const testAuth = base.extend<
     },
     // specify timeout so worker fixture duration doesn't skew test duration
     // ...see https://github.com/microsoft/playwright/issues/15338
-    { scope: 'worker', timeout: 2 * 60 * 1000 },
+    { scope: 'worker', timeout: defaultTestTimeout },
   ],
   // stores auth state for each user in userConfig in storageState file, then deletes file
   // ...per worker + browserName
@@ -144,7 +144,7 @@ export const testAuth = base.extend<
     },
     // specify timeout so worker fixture duration doesn't skew test duration
     // ...see https://github.com/microsoft/playwright/issues/15338
-    { scope: 'worker', timeout: 2 * 60 * 1000 },
+    { scope: 'worker', timeout: defaultTestTimeout },
   ],
   userPage: createUserPageFixture(userPrefix),
   validatedUserPage: createUserPageFixture(userValidatedPrefix),

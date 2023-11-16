@@ -1,5 +1,6 @@
 import { Page, expect, test } from '@playwright/test'
 import { v4 as uuidv4 } from 'uuid'
+import { defaultExpectTimeout } from '../playwright.config'
 import { testAuth } from './fixtures/authenticatedUserPages'
 import {
   deleteTeamInvitationMessage,
@@ -127,7 +128,7 @@ test.describe('Teams', () => {
 
       await test.step('user should view pending invitations', async () => {
         await expect(userPage.getByText('Pending Invitations')).toBeVisible({
-          timeout: testInfo.timeout * 3, // add extra timeout, so backend can finish sending request
+          timeout: defaultExpectTimeout * 3, // add extra timeout, so backend can finish sending request
         })
         const row = userPage.getByRole('row', { name: validatedUserName })
         await expect(row).toBeVisible()
@@ -170,9 +171,18 @@ test.describe('Teams', () => {
           })
           .toBe(1)
 
+        const responsePromise = validatedUserPage.waitForResponse(
+          response =>
+            response.url().includes('synapseclient') &&
+            (response.request().postData()?.includes('getTeamMemberCount') ||
+              false),
+          { timeout: defaultExpectTimeout * 3 }, // allow time for the response to return
+        )
         await teamLink.click()
 
         await expectTeamPageLoaded(validatedUserPage, TEAM_NAME)
+
+        await responsePromise
         await expect(
           validatedUserPage.getByText('2 team members'),
         ).toBeVisible()

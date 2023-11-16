@@ -1,6 +1,6 @@
 import { Page, expect, test } from '@playwright/test'
+import { defaultExpectTimeout } from '../playwright.config'
 import { testAuth } from './fixtures/authenticatedUserPages'
-import { entityUrlPathname } from './helpers/entities'
 import {
   setupProjectWithPermissions,
   teardownProjectsAndFileHandles,
@@ -228,7 +228,11 @@ test.describe('Discussions', () => {
         await expect(async () => {
           // reload is necessary for view count to update
           await userPage.reload()
-          await expectDiscussionPageLoaded(userPage, userProject.id)
+          await expectDiscussionPageLoaded(
+            userPage,
+            userProject.id,
+            defaultExpectTimeout * 0.5, // use shorter expect timeout, so reload is tried earlier
+          )
           await expectThreadTableLoaded(
             userPage,
             threadTitle,
