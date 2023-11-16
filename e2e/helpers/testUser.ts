@@ -1,4 +1,4 @@
-import { Page, expect } from '@playwright/test'
+import { Page, expect, test } from '@playwright/test'
 import { defaultExpectTimeout } from '../../playwright.config'
 import { testAuth } from '../fixtures/authenticatedUserPages'
 import { entityUrlPathname } from './entities'
@@ -63,6 +63,32 @@ export async function cleanupTestUser(testUserId: string, userPage: Page) {
   expect(result).toEqual(testUserId)
 }
 
+async function getSuccessfulLoginResponsePromise(page: Page) {
+  return page.waitForResponse(
+    async response =>
+      response.url().includes('/auth/v1/login2') && response.status() == 201,
+    { timeout: defaultExpectTimeout * 3 }, // allow time for the response to return
+  )
+}
+
+async function getAuthenticatedUserBundleResponsePromise(page: Page) {
+  return page.waitForResponse(
+    async response =>
+      response.url().includes('/repo/v1/user/bundle?mask=127') &&
+      response.status() == 200 &&
+      !(await response.text()).includes('Anonymous'),
+    { timeout: defaultExpectTimeout * 3 }, // allow time for the response to return
+  )
+}
+
+export async function expectAuthenticatedNavDrawerLoaded(page: Page) {
+  await test.step('authenticated nav drawer is loaded', async () => {
+    await expect(page.getByLabel('Search')).toBeVisible()
+    await expect(page.getByLabel('Projects', { exact: true })).toBeVisible()
+    await expect(page.getByLabel('Your Account')).toBeVisible()
+  })
+}
+
 export async function loginTestUser(
   page: Page,
   testUserName: string,
@@ -84,6 +110,9 @@ export async function loginTestUser(
   await passwordInput.fill(testUserPassword)
   await expect(passwordInput).not.toBeEmpty()
 
+  const successfulLoginResponsePromise = getSuccessfulLoginResponsePromise(page)
+  const authenticatedUserBundleResponsePromise =
+    getAuthenticatedUserBundleResponsePromise(page)
   await page.getByRole('button', { name: 'Sign in' }).click()
 
   // Ensure that correct username/password were received
@@ -92,25 +121,50 @@ export async function loginTestUser(
   ).not.toBeVisible()
 
   // Wait for redirect
+  await successfulLoginResponsePromise
   await expect(async () => {
     expect(page.url()).not.toContain('LoginPlace')
   }).toPass()
 
   // Wait until the page reaches a state where all cookies are set
-  await expect(page.getByLabel('Search')).toBeVisible()
-  await expect(page.getByLabel('Projects')).toBeVisible()
-  await expect(page.getByLabel('Your Account')).toBeVisible()
+  await authenticatedUserBundleResponsePromise
+  await expectAuthenticatedNavDrawerLoaded(page)
 }
 
 export async function goToDashboard(page: Page) {
   await page.goto('/')
   await waitForInitialPageLoad(page)
+
+  const authenticatedUserBundleResponsePromise =
+    getAuthenticatedUserBundleResponsePromise(page)
   await page.getByRole('link', { name: 'View Your Dashboard' }).first().click()
 
   // wait for page to load
-  await expect(page.getByLabel('Search')).toBeVisible()
-  await expect(page.getByLabel('Projects')).toBeVisible()
-  await expect(page.getByLabel('Your Account')).toBeVisible()
+  await authenticatedUserBundleResponsePromise
+  await expectAuthenticatedNavDrawerLoaded(page)
+}
+
+export async function reloadDashboardPage(page: Page) {
+  await test.step('reload dashboard page', async () => {
+    const authenticatedUserBundleResponsePromise =
+      getAuthenticatedUserBundleResponsePromise(page)
+    await page.reload()
+
+    // wait for page to load
+    await waitForInitialPageLoad(page)
+    await authenticatedUserBundleResponsePromise
+    await expectAuthenticatedNavDrawerLoaded(page)
+  })
+}
+
+export async function goToDashboardPage(page: Page, urlPath: string) {
+  const authenticatedUserBundleResponsePromise =
+    getAuthenticatedUserBundleResponsePromise(page)
+  await page.goto(urlPath)
+
+  await waitForInitialPageLoad(page)
+  await authenticatedUserBundleResponsePromise
+  await expectAuthenticatedNavDrawerLoaded(page)
 }
 
 export async function logoutTestUser(page: Page) {

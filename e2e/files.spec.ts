@@ -17,10 +17,11 @@ import {
   dismissAlert,
   getAccessTokenFromCookie,
   getAdminPAT,
+  goToDashboardPage,
+  reloadDashboardPage,
 } from './helpers/testUser'
 import { Project } from './helpers/types'
 import { userConfigs } from './helpers/userConfig'
-import { waitForInitialPageLoad } from './helpers/utils'
 
 const expectFilePageLoaded = async (
   fileName: string,
@@ -229,8 +230,10 @@ test.describe('Files', () => {
       )
 
       await testAuth.step('First user can view a private file', async () => {
-        await userPage.goto(`${entityUrlPathname(userProject.id)}/files`)
-        await waitForInitialPageLoad(userPage)
+        await goToDashboardPage(
+          userPage,
+          `${entityUrlPathname(userProject.id)}/files`,
+        )
 
         const fileLink = userPage.getByRole('link', { name: fileName })
         await expect(fileLink).toBeVisible({
@@ -245,9 +248,10 @@ test.describe('Files', () => {
       await confirmSharingSettings(userPage, userName, validatedUserName, false)
 
       await testAuth.step('Second user cannot access the file', async () => {
-        await validatedUserPage.goto(entityUrlPathname(fileEntityId))
-        await waitForInitialPageLoad(validatedUserPage)
-
+        await goToDashboardPage(
+          validatedUserPage,
+          entityUrlPathname(fileEntityId),
+        )
         await expectNoAccessPage(validatedUserPage)
       })
 
@@ -291,7 +295,7 @@ test.describe('Files', () => {
       await confirmSharingSettings(userPage, userName, validatedUserName, true)
 
       await testAuth.step('Second user accesses the file', async () => {
-        await validatedUserPage.reload()
+        await reloadDashboardPage(validatedUserPage)
         await expectFilePageLoaded(fileName, fileEntityId, validatedUserPage)
       })
 
@@ -329,7 +333,7 @@ test.describe('Files', () => {
 
       await testAuth.step('Second user cannot access the file', async () => {
         await expect(async () => {
-          await validatedUserPage.reload()
+          await reloadDashboardPage(validatedUserPage)
           await expectNoAccessPage(
             validatedUserPage,
             defaultExpectTimeout * 0.5, // use shorter expect timeout, so reload is tried earlier
@@ -355,8 +359,7 @@ test.describe('Files', () => {
       const updatedFilePath = `data/test_file2.csv`
 
       await testAuth.step('go to files tab', async () => {
-        await userPage.goto(entityUrlPathname(userProject.id))
-        await waitForInitialPageLoad(userPage)
+        await goToDashboardPage(userPage, entityUrlPathname(userProject.id))
         await expect(
           userPage.getByRole('heading', { name: userProject.name }),
         ).toBeVisible()
@@ -500,7 +503,7 @@ test.describe('Files', () => {
 
           // reload page if trash can deferred js does not load
           await expect(async () => {
-            await userPage.reload()
+            await reloadDashboardPage(userPage)
 
             const trashCanHeading = userPage.getByRole('heading', {
               name: 'Trash Can',

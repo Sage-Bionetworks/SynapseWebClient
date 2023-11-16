@@ -17,6 +17,7 @@ import {
   getAdminPAT,
   getUserIdFromLocalStorage,
   goToDashboard,
+  reloadDashboardPage,
 } from './helpers/testUser'
 import {
   userConfigs,
@@ -165,7 +166,7 @@ test.describe('Teams', () => {
             // if no team links appear after joining the team
             // ...try reloading the page to see if the link subsequently appears
             if (count === 0) {
-              await validatedUserPage.reload()
+              await reloadDashboardPage(validatedUserPage)
             }
             return count
           })
@@ -174,6 +175,7 @@ test.describe('Teams', () => {
         const responsePromise = validatedUserPage.waitForResponse(
           response =>
             response.url().includes('synapseclient') &&
+            response.status() == 200 &&
             (response.request().postData()?.includes('getTeamMemberCount') ||
               false),
           { timeout: defaultExpectTimeout * 3 }, // allow time for the response to return

@@ -10,6 +10,8 @@ import {
   expectDiscussionPageLoaded,
   expectDiscussionThreadLoaded,
   getDefaultDiscussionPath,
+  goToDashboardPage,
+  reloadDashboardPage,
 } from './helpers/testUser'
 import { Project } from './helpers/types'
 import { UserPrefix, userConfigs } from './helpers/userConfig'
@@ -71,7 +73,9 @@ const expectThreadReplyVisible = async (
         name: `@${userConfigs[replierPrefix].username}`,
       }),
     ).toBeVisible()
-    await expect(discussionReply.getByText(threadReply)).toBeVisible()
+    await expect(discussionReply.getByText(threadReply)).toBeVisible({
+      timeout: defaultExpectTimeout * 2, // allow extra time for reply to become visible
+    })
   })
 }
 
@@ -142,7 +146,11 @@ test.describe('Discussions', () => {
       const threadReplyEdited = 'An edited reply to the Thread'
 
       await testAuth.step('First user goes to Project', async () => {
-        await userPage.goto(getDefaultDiscussionPath(userProject.id))
+        await goToDashboardPage(
+          userPage,
+          getDefaultDiscussionPath(userProject.id),
+        )
+
         await expectDiscussionPageLoaded(userPage, userProject.id)
       })
 
@@ -227,7 +235,7 @@ test.describe('Discussions', () => {
         // retry if the view count hasn't updated
         await expect(async () => {
           // reload is necessary for view count to update
-          await userPage.reload()
+          await reloadDashboardPage(userPage)
           await expectDiscussionPageLoaded(
             userPage,
             userProject.id,
@@ -244,7 +252,10 @@ test.describe('Discussions', () => {
       })
 
       await testAuth.step('Second user can view discussion', async () => {
-        await validatedUserPage.goto(getDefaultDiscussionPath(userProject.id))
+        await goToDashboardPage(
+          validatedUserPage,
+          getDefaultDiscussionPath(userProject.id),
+        )
         await expectDiscussionPageLoaded(validatedUserPage, userProject.id)
         await expectThreadTableLoaded(
           userPage,

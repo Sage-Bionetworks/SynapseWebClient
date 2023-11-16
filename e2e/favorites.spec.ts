@@ -1,9 +1,13 @@
 import { Page, expect, test } from '@playwright/test'
 import { testAuth } from './fixtures/authenticatedUserPages'
 import { entityUrlPathname } from './helpers/entities'
-import { expectDiscussionPageLoaded, goToDashboard } from './helpers/testUser'
+import {
+  expectDiscussionPageLoaded,
+  goToDashboard,
+  goToDashboardPage,
+  reloadDashboardPage,
+} from './helpers/testUser'
 import { Project } from './helpers/types'
-import { waitForInitialPageLoad } from './helpers/utils'
 
 // Public project owned by swc-e2e-admin on backend dev stack.
 // In the future, consider creating/deleting a new public project within the test instead.
@@ -29,7 +33,6 @@ async function expectProjectPageLoaded(
   projectName: string,
   projectId: string,
 ) {
-  await page.waitForURL(entityUrlPathname(projectId))
   await expect(page.getByRole('heading', { name: projectName })).toBeVisible()
   await expectDiscussionPageLoaded(page, projectId)
 }
@@ -58,8 +61,7 @@ test.describe('Favorites', () => {
       })
 
       await testAuth.step('user goes to public project', async () => {
-        await userPage.goto(entityUrlPathname(PUBLIC_PROJECT.id))
-        await waitForInitialPageLoad(userPage)
+        await goToDashboardPage(userPage, entityUrlPathname(PUBLIC_PROJECT.id))
         await expectProjectPageLoaded(
           userPage,
           PUBLIC_PROJECT.name,
@@ -118,7 +120,7 @@ test.describe('Favorites', () => {
           await goToFavorites(userPage)
 
           // The page needs to be reloaded for the favorites list to update
-          await userPage.reload()
+          await reloadDashboardPage(userPage)
           await expectFavoritesPageLoaded(userPage)
 
           await expect(projectLink).not.toBeVisible()
