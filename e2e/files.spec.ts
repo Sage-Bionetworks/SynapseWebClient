@@ -350,14 +350,6 @@ test.describe('Files', () => {
     async ({ userPage, browserName }) => {
       test.slow()
 
-      test.fail(
-        browserName === 'webkit',
-        `Playwright is not preserving the File's lastModified time in webkit, so 
-        file upload fails because it seems like the file was modified during 
-        upload. See https://github.com/microsoft/playwright/issues/27452. Fix 
-        planned for Playwright v1.40.`,
-      )
-
       const fileName = 'test_file.csv'
       const filePath = `data/${fileName}`
       const updatedFilePath = `data/test_file2.csv`
