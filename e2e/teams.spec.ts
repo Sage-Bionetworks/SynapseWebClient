@@ -222,6 +222,8 @@ test.describe('Teams', () => {
   )
 
   testAuth.afterAll(async ({ userPage, validatedUserPage }) => {
+    test.slow()
+
     // get credentials
     const adminPAT = getAdminPAT()
 
