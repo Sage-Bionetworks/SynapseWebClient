@@ -165,9 +165,6 @@ public class EntityPresenterTest {
   @Mock
   KeyFactory mockKeyFactory;
 
-  @Captor
-  ArgumentCaptor<List<String>> stringListCaptor;
-
   @Before
   public void setup() throws Exception {
     when(mockEntityPresenterEventBinder.getEventBinder())
@@ -416,7 +413,7 @@ public class EntityPresenterTest {
 
     verify(mockKeyFactoryProvider).getKeyFactory(anyString());
     verify(mockKeyFactory).getDownloadListBaseQueryKey();
-    verify(mockQueryClient).invalidateQueries(stringListCaptor.capture());
+    verify(mockQueryClient).invalidateQueries(anyList());
   }
 
   @Test
