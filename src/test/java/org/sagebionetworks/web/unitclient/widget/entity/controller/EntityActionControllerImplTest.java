@@ -2468,9 +2468,9 @@ public class EntityActionControllerImplTest {
     handler.onComplete(mockTableUpdateTransactionResponse);
     verify(mockView).hideCreateVersionDialog();
     verify(mockPopupUtils).notify(any(), any(), any(ToastMessageOptions.class));
+    // EntityUpdatedEvent is fired to invalidate caches
+    verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
     verify(mockPlaceChanger).goTo(any());
-    // Don't fire an updated event; we used placeChanger to go to a new place.
-    verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
   }
 
   @Test
@@ -2551,9 +2551,9 @@ public class EntityActionControllerImplTest {
     handler.onComplete(mockTableUpdateTransactionResponse);
     verify(mockView).hideCreateVersionDialog();
     verify(mockPopupUtils).notify(any(), any(), any(ToastMessageOptions.class));
+    // Fire the updated event to ensure caches are invalidated
+    verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
     verify(mockPlaceChanger).goTo(any());
-    // Don't fire an updated event; we used placeChanger to go to a new place.
-    verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
   }
 
   @Test
