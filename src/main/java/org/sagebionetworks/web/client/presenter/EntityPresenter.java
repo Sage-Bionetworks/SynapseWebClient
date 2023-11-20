@@ -13,7 +13,6 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.binder.EventHandler;
-import java.util.Arrays;
 import java.util.List;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sagebionetworks.repo.model.Entity;
@@ -30,12 +29,12 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.ClientCache;
+import org.sagebionetworks.web.client.context.KeyFactoryProvider;
 import org.sagebionetworks.web.client.context.QueryClientProvider;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
+import org.sagebionetworks.web.client.jsinterop.KeyFactory;
 import org.sagebionetworks.web.client.jsinterop.reactquery.QueryClient;
-import org.sagebionetworks.web.client.jsinterop.reactquery.QueryKeyConstants;
-import org.sagebionetworks.web.client.jsinterop.reactquery.SynapseReactClientEntityQueryKey;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -69,6 +68,7 @@ public class EntityPresenter
   private SynapseJavascriptClient jsClient;
   private QueryClient queryClient;
   private ClientCache clientCache;
+  private KeyFactoryProvider keyFactoryProvider;
 
   @Inject
   public EntityPresenter(
@@ -84,7 +84,8 @@ public class EntityPresenter
     GWTWrapper gwt,
     EventBus eventBus,
     QueryClientProvider queryClientProvider,
-    ClientCache clientCache
+    ClientCache clientCache,
+    KeyFactoryProvider keyFactoryProvider
   ) {
     this.headerWidget = headerWidget;
     this.entityPageTop = entityPageTop;
@@ -97,6 +98,7 @@ public class EntityPresenter
     this.gwt = gwt;
     this.queryClient = queryClientProvider.getQueryClient();
     this.clientCache = clientCache;
+    this.keyFactoryProvider = keyFactoryProvider;
     clear();
     entityPresenterEventBinder
       .getEventBinder()
@@ -401,12 +403,12 @@ public class EntityPresenter
 
   @EventHandler
   public void onEntityUpdatedEvent(EntityUpdatedEvent event) {
-    List<SynapseReactClientEntityQueryKey> queryKey =
-      SynapseReactClientEntityQueryKey.create(
-        QueryKeyConstants.ENTITY,
-        event.getEntityId()
-      );
-    queryClient.resetQueries(queryKey);
+    KeyFactory keyFactory = keyFactoryProvider.getKeyFactory(
+      authenticationController.getCurrentUserAccessToken()
+    );
+
+    List<?> queryKey = keyFactory.getEntityQueryKey(event.getEntityId());
+    queryClient.invalidateQueries(queryKey);
     globalAppState.refreshPage();
   }
 
@@ -414,11 +416,10 @@ public class EntityPresenter
   public void onDownloadListUpdatedUpdatedEvent(
     DownloadListUpdatedEvent _event
   ) {
-    List<String> queryKey = Arrays.asList(
-      authenticationController.getCurrentUserAccessToken(),
-      QueryKeyConstants.DOWNLOAD_LIST
+    KeyFactory keyFactory = keyFactoryProvider.getKeyFactory(
+      authenticationController.getCurrentUserAccessToken()
     );
-    queryClient.invalidateQueries(queryKey);
+    queryClient.invalidateQueries(keyFactory.getDownloadListBaseQueryKey());
   }
 
   // for testing only

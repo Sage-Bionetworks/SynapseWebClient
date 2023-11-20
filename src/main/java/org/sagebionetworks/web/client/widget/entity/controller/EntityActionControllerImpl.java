@@ -2527,6 +2527,7 @@ public class EntityActionControllerImpl
                 if (!errors.isEmpty()) {
                   view.showErrorMessage(errors);
                 } else {
+                  fireEntityUpdatedEvent();
                   ToastMessageOptions.Builder messageBuilder =
                     new ToastMessageOptions.Builder();
                   EntityArea newVersionArea;
