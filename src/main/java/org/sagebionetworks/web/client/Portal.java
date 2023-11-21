@@ -4,6 +4,8 @@ import com.google.gwt.activity.shared.ActivityManager;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.RunAsyncCallback;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.place.shared.PlaceHistoryHandler;
@@ -12,9 +14,15 @@ import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
+import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
+import org.sagebionetworks.web.client.jsinterop.React;
+import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.RedirectDialogProps;
+import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 
@@ -98,9 +106,8 @@ public class Portal implements EntryPoint {
                   AppPlaceHistoryMapper historyMapper = GWT.create(
                     AppPlaceHistoryMapper.class
                   );
-                  final PlaceHistoryHandler historyHandler = new PlaceHistoryHandler(
-                    historyMapper
-                  );
+                  final PlaceHistoryHandler historyHandler =
+                    new PlaceHistoryHandler(historyMapper);
                   historyHandler.register(
                     placeController,
                     eventBus,
@@ -117,7 +124,8 @@ public class Portal implements EntryPoint {
                     RootPanel.get("headerPanel"),
                     RootPanel.get("rootPanel")
                   );
-                  final GlobalApplicationState globalApplicationState = ginjector.getGlobalApplicationState();
+                  final GlobalApplicationState globalApplicationState =
+                    ginjector.getGlobalApplicationState();
                   globalApplicationState.setPlaceController(placeController);
                   globalApplicationState.setAppPlaceHistoryMapper(
                     historyMapper
@@ -153,6 +161,11 @@ public class Portal implements EntryPoint {
                             // start a timer to check to see if we're approaching the max allowable space in the web storage.
                             // clears out the web storage (cache) if this is the case.
                             ginjector.getWebStorageMaxSizeDetector().start();
+
+                            //initialize a click handler that listens for events that take the user outside of synapse.org
+                            addRedirectHandler(
+                              ginjector.getSynapseReactClientFullContextPropsProvider()
+                            );
                           }
                         }
                       );
@@ -223,5 +236,31 @@ public class Portal implements EntryPoint {
     final GlobalApplicationState globalApplicationState
   ) {
     globalApplicationState.initOnPopStateHandler();
+  }
+
+  public void addRedirectHandler(
+    SynapseReactClientFullContextPropsProvider propsProvider
+  ) {
+    ClickHandler CLICK_HANDLER = event -> {
+      String targetUrl = event.getNativeEvent().getEventTarget().toString();
+      if (
+        targetUrl.startsWith("http") &&
+        !targetUrl.contains(Window.Location.getHostName())
+      ) {
+        event.preventDefault();
+        ReactComponentDiv redirectDialogContainer = new ReactComponentDiv();
+        RootPanel.get().add(redirectDialogContainer);
+        ReactNode node = React.createElementWithSynapseContext(
+          SRC.SynapseComponents.RedirectDialog,
+          RedirectDialogProps.create(
+            targetUrl,
+            "You are currently being redirected to a site outside of Synapse"
+          ),
+          propsProvider.getJsInteropContextProps()
+        );
+        redirectDialogContainer.render(node);
+      }
+    };
+    RootPanel.get().addDomHandler(CLICK_HANDLER, ClickEvent.getType());
   }
 }

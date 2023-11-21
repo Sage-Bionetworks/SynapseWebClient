@@ -63,6 +63,7 @@ public class SRC {
     public static ReactComponentType<EmptyProps> SubscriptionPage;
     public static ReactComponentType<AccessRequirementListProps> AccessRequirementList;
     public static ReactComponentType<TableColumnSchemaFormProps> TableColumnSchemaForm;
+    public static ReactComponentType<RedirectDialogProps> RedirectDialog;
 
     /**
      * Pushes a global toast message. In SWC, you should use {@link DisplayUtils#notify}, rather than calling this method directly.
