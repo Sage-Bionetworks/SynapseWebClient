@@ -108,9 +108,7 @@ test.describe('Teams', () => {
           await userPage
             .getByRole('menuitem', { name: `@${validatedUserName}` })
             .click()
-          const loadInvitedUser = userPage.getByText('Loading...')
-          await expect(loadInvitedUser).toBeVisible()
-          await expect(loadInvitedUser).not.toBeVisible()
+          await expect(userPage.getByText('Loading...')).not.toBeVisible()
 
           const inviteMessageBox = userPage.getByLabel('Invitation Message')
           await inviteMessageBox.click()

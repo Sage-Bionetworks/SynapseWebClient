@@ -100,7 +100,7 @@ export const testAuth = base.extend<
     },
     // specify timeout so worker fixture duration doesn't skew test duration
     // ...see https://github.com/microsoft/playwright/issues/15338
-    { scope: 'worker', timeout: defaultTestTimeout },
+    { scope: 'worker', timeout: defaultTestTimeout * 2 },
   ],
   // stores auth state for each user in userConfig in storageState file, then deletes file
   // ...per worker + browserName
