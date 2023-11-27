@@ -126,6 +126,7 @@ test.describe('Discussions', () => {
   })
 
   testAuth.afterAll(async ({ browser }) => {
+    test.slow()
     if (userProject.id) {
       await teardownProjectsAndFileHandles(
         browser,

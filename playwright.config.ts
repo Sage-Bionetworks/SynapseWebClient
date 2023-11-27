@@ -14,8 +14,8 @@ dotenv.config()
 // FIXME: expect timeout not available in testInfo fixture in v1.39
 // change tests to use testInfo fixture once expect settings are exposed,
 // see: https://github.com/microsoft/playwright/issues/27915
-export const defaultExpectTimeout = process.env.CI ? 2 * 60 * 1000 : 5 * 1000
-export const defaultTestTimeout = process.env.CI ? 6 * 60 * 1000 : 2 * 60 * 1000
+export const defaultExpectTimeout = process.env.CI ? 60 * 1000 : 5 * 1000
+export const defaultTestTimeout = 2 * 60 * 1000
 
 /**
  * See https://playwright.dev/docs/test-configuration.

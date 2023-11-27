@@ -80,6 +80,7 @@ test.describe('Projects', () => {
   })
 
   testAuth.afterAll(async ({ browser }) => {
+    test.slow()
     // if test failed before project was deleted, then delete project here
     if (projectId) {
       const context = await browser.newContext()

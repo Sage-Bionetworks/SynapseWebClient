@@ -184,6 +184,7 @@ test.describe('Files', () => {
   })
 
   testAuth.afterAll(async ({ browser }) => {
+    test.slow()
     if (userProject.id) {
       await teardownProjectsAndFileHandles(
         browser,
@@ -196,8 +197,6 @@ test.describe('Files', () => {
   testAuth(
     'File sharing',
     async ({ userPage, validatedUserPage, browserName }) => {
-      test.slow()
-
       // Use test.fixme because test.fail doesn't mark test as expected to fail
       // when there is a test timeout. Since test timeouts are expensive,
       // Playwright recommends skipping the test entirely with test.fixme.

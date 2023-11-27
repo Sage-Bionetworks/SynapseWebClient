@@ -57,9 +57,7 @@ test.describe.configure({ mode: 'serial' })
 test.describe('Teams', () => {
   testAuth(
     'should exercise team lifecycle',
-    async ({ userPage, validatedUserPage }, testInfo) => {
-      test.slow()
-
+    async ({ userPage, validatedUserPage }) => {
       const { userName, validatedUserName } = await testAuth.step(
         'should get user names',
         async () => {
