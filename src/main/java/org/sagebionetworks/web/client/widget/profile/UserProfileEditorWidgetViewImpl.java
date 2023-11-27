@@ -10,6 +10,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.HelpBlock;
 import org.gwtbootstrap3.client.ui.Row;
@@ -113,7 +114,7 @@ public class UserProfileEditorWidgetViewImpl
   Anchor changePasswordLink;
 
   @UiField
-  Row orcIDContainer;
+  Column orcIDContainer;
 
   @UiField
   Anchor orcIdLink;
@@ -387,11 +388,12 @@ public class UserProfileEditorWidgetViewImpl
 
   @Override
   public void setOwnerId(String userId) {
-    ReactNode accountLevelBadgeComponent = React.createElementWithSynapseContext(
-      SRC.SynapseComponents.AccountLevelBadge,
-      AccountLevelBadgeProps.create(userId),
-      propsProvider.getJsInteropContextProps()
-    );
+    ReactNode accountLevelBadgeComponent =
+      React.createElementWithSynapseContext(
+        SRC.SynapseComponents.AccountLevelBadge,
+        AccountLevelBadgeProps.create(userId),
+        propsProvider.getJsInteropContextProps()
+      );
     accountLevelBadgeContainer.render(accountLevelBadgeComponent);
 
     UserProfileLinksProps props = UserProfileLinksProps.create(userId);
