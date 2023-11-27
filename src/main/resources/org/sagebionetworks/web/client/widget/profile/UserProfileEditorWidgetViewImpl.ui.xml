@@ -147,8 +147,8 @@
             </b:FormGroup>
           </b:Column>
         </b:Row>
-        <b:Row ui:field="orcIDContainer">
-          <b:Column size="MD_12,LG_6">
+        <b:Row>
+          <b:Column size="MD_12,LG_6" ui:field="orcIDContainer">
             <b:FormGroup>
               <b:FormLabel for="orcId">ORCID</b:FormLabel>
               <bh:Div>
