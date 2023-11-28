@@ -89,7 +89,15 @@ public class CertifiedUserControllerImpl implements CertifiedUserController {
       // not logged in
       placeChanger.goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
     } else {
-      callback.invoke();
+      // If the user could edit if certified, but currently cannot edit, then show the quiz info dialog
+      if (
+        toUpdate.getPermissions().getCanCertifiedUserEdit() &&
+        !toUpdate.getPermissions().getCanEdit()
+      ) {
+        getQuizInfoDialog().show();
+      } else {
+        callback.invoke();
+      }
     }
   }
 }
