@@ -1808,6 +1808,7 @@ public class EntityActionControllerImplTest {
     entityBundle.setEntity(new Folder());
     entityBundle.setRootWikiId("7890");
     permissions.setCanEdit(false);
+    permissions.setCanCertifiedUserEdit(false);
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -1818,6 +1819,28 @@ public class EntityActionControllerImplTest {
     );
     verify(mockActionMenu).setActionVisible(Action.EDIT_WIKI_PAGE, false);
     verify(mockActionMenu).setActionListener(Action.EDIT_WIKI_PAGE, controller);
+  }
+
+  @Test
+  public void testConfigureWikiCannotEditUntilCertified() {
+    entityBundle.setEntity(new Folder());
+    entityBundle.setRootWikiId("7890");
+    permissions.setCanEdit(false);
+    permissions.setCanCertifiedUserEdit(true);
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+
+    verify(mockActionMenu).setActionVisible(Action.EDIT_WIKI_PAGE, true);
+
+    controller.onAction(Action.EDIT_WIKI_PAGE, null);
+    verify(mockPreflightController)
+      .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
   }
 
   @Test
@@ -2170,6 +2193,7 @@ public class EntityActionControllerImplTest {
   public void testConfigureProvenanceFileCannotEdit() {
     boolean canEdit = false;
     entityBundle.getPermissions().setCanEdit(canEdit);
+    entityBundle.getPermissions().setCanCertifiedUserEdit(canEdit);
     entityBundle.setEntity(new FileEntity());
     controller.configure(
       mockActionMenu,
@@ -2182,6 +2206,27 @@ public class EntityActionControllerImplTest {
     verify(mockActionMenu).setActionVisible(Action.EDIT_PROVENANCE, canEdit);
     verify(mockActionMenu)
       .setActionListener(Action.EDIT_PROVENANCE, controller);
+  }
+
+  @Test
+  public void testConfigureProvenanceFileCannotEditUntilCertified() {
+    entityBundle.getPermissions().setCanEdit(false);
+    entityBundle.getPermissions().setCanCertifiedUserEdit(true);
+    entityBundle.setEntity(new FileEntity());
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+
+    verify(mockActionMenu).setActionVisible(Action.EDIT_PROVENANCE, true);
+
+    controller.onAction(Action.EDIT_PROVENANCE, null);
+    verify(mockPreflightController)
+      .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
   }
 
   @Test
@@ -2207,6 +2252,7 @@ public class EntityActionControllerImplTest {
   public void testConfigureProvenanceDockerCannotEdit() {
     boolean canEdit = false;
     entityBundle.getPermissions().setCanEdit(canEdit);
+    entityBundle.getPermissions().setCanCertifiedUserEdit(canEdit);
     entityBundle.setEntity(new DockerRepository());
     controller.configure(
       mockActionMenu,
@@ -2219,6 +2265,26 @@ public class EntityActionControllerImplTest {
     verify(mockActionMenu).setActionVisible(Action.EDIT_PROVENANCE, canEdit);
     verify(mockActionMenu)
       .setActionListener(Action.EDIT_PROVENANCE, controller);
+  }
+
+  @Test
+  public void testConfigureProvenanceDockerCannotEditUntilCertified() {
+    entityBundle.getPermissions().setCanEdit(false);
+    entityBundle.getPermissions().setCanCertifiedUserEdit(true);
+    entityBundle.setEntity(new DockerRepository());
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+    verify(mockActionMenu).setActionVisible(Action.EDIT_PROVENANCE, true);
+
+    controller.onAction(Action.EDIT_PROVENANCE, null);
+    verify(mockPreflightController)
+      .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
   }
 
   @Test

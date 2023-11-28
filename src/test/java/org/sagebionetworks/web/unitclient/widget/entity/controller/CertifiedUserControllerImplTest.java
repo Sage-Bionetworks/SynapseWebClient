@@ -64,6 +64,8 @@ public class CertifiedUserControllerImplTest {
     permissions = new UserEntityPermissions();
     permissions.setIsCertifiedUser(true);
     permissions.setIsCertificationRequired(true);
+    permissions.setCanCertifiedUserEdit(true);
+    permissions.setCanEdit(true);
     bundle = new EntityBundle();
     bundle.setEntity(entity);
     bundle.setPermissions(permissions);
@@ -143,11 +145,23 @@ public class CertifiedUserControllerImplTest {
   }
 
   @Test
-  public void testUpadateNotCertified() {
+  public void testUpdateNotCertified() {
     permissions.setIsCertifiedUser(false);
+    permissions.setCanEdit(true);
+    permissions.setCanCertifiedUserEdit(true);
     controller.checkUpdateEntity(bundle, mockCallback);
     verify(mockCallback).invoke();
     verify(mockQuizInfoDialog, never()).show();
+  }
+
+  @Test
+  public void testUpdateCertifiedRequired() {
+    permissions.setIsCertifiedUser(false);
+    permissions.setCanEdit(false);
+    permissions.setCanCertifiedUserEdit(true);
+    controller.checkUpdateEntity(bundle, mockCallback);
+    verify(mockCallback, never()).invoke();
+    verify(mockQuizInfoDialog).show();
   }
 
   @Test

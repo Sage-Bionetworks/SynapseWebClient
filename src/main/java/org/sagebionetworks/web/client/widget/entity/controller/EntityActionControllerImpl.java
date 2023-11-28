@@ -1082,7 +1082,7 @@ public class EntityActionControllerImpl
     ) {
       actionMenu.setActionVisible(
         Action.EDIT_PROVENANCE,
-        permissions.getCanEdit()
+        permissions.getCanCertifiedUserEdit()
       );
       actionMenu.setActionListener(Action.EDIT_PROVENANCE, this);
       actionMenu.setActionText(
@@ -1101,7 +1101,7 @@ public class EntityActionControllerImpl
     ) {
       actionMenu.setActionVisible(
         Action.CHANGE_STORAGE_LOCATION,
-        permissions.getCanEdit()
+        permissions.getCanCertifiedUserEdit()
       );
       actionMenu.setActionText(
         Action.CHANGE_STORAGE_LOCATION,
@@ -1354,7 +1354,7 @@ public class EntityActionControllerImpl
     if (isWikiableConfig(entityBundle.getEntity(), currentArea)) {
       actionMenu.setActionVisible(
         Action.EDIT_WIKI_PAGE,
-        permissions.getCanEdit()
+        permissions.getCanCertifiedUserEdit()
       );
       actionMenu.setActionListener(Action.EDIT_WIKI_PAGE, this);
       actionMenu.setActionText(
