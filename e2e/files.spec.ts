@@ -422,20 +422,18 @@ test.describe('Files', () => {
       await testAuth.step('upload a new file', async () => {
         await uploadFile(userPage, updatedFilePath, 'newVersion')
         await expectFilePageLoaded(fileName, fileEntityId, userPage)
-        await dismissFileUploadAlert(userPage)
+        // Upload success alert intermittently appears when uploading a new version of the same file
+        await testAuth.step(
+          'dismiss file upload alert for new version of file, if visible',
+          async () => {
+            if (
+              await userPage.getByText('File successfully uploaded').isVisible()
+            ) {
+              await dismissFileUploadAlert(userPage)
+            }
+          },
+        )
       })
-
-      // Upload success alert intermittently appears when uploading a new version of the same file
-      await testAuth.step(
-        'dismiss file upload alert for new version of file, if visible',
-        async () => {
-          if (
-            await userPage.getByText('File successfully uploaded').isVisible()
-          ) {
-            await dismissFileUploadAlert(userPage)
-          }
-        },
-      )
 
       await testAuth.step(
         'confirm uploading new file changed md5 and version',
