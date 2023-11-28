@@ -1,9 +1,11 @@
 import { Page, expect, test } from '@playwright/test'
 import { v4 as uuidv4 } from 'uuid'
 import { testAuth } from './fixtures/authenticatedUserPages'
-import { goToDashboard } from './helpers/testUser'
+import { deleteProject, getEntityIdFromPathname } from './helpers/entities'
+import { dismissAlert, getAdminPAT, goToDashboard } from './helpers/testUser'
 
 const PROJECT_NAME = 'swc-e2e-project-' + uuidv4()
+let projectId: string | undefined = undefined
 
 async function createProject(page: Page, projectName: string) {
   await page.getByLabel('Projects', { exact: true }).click()
@@ -31,6 +33,10 @@ test.describe('Projects', () => {
         await expect(
           userPage.getByRole('heading', { name: PROJECT_NAME }),
         ).toBeVisible()
+        await expect(
+          userPage.getByRole('button', { name: 'Delete Wiki Page' }),
+        ).toBeVisible()
+        projectId = getEntityIdFromPathname(userPage.url())
       },
     )
 
@@ -41,45 +47,46 @@ test.describe('Projects', () => {
         await expect(
           userPage.getByText(/an entity with the name.*already exists/i),
         ).toBeVisible()
+        await userPage.getByRole('button', { name: 'Cancel' }).click()
+        await expect(
+          userPage.getByText('Create a new Project', { exact: true }),
+        ).not.toBeVisible()
       },
     )
+
+    await testAuth.step('should delete project', async () => {
+      await userPage.getByRole('button', { name: 'Project Tools' }).click()
+      await userPage.getByRole('menuitem', { name: 'Delete Project' }).click()
+
+      await expect(
+        userPage.getByRole('heading', { name: 'Confirm Deletion' }),
+      ).toBeVisible()
+      await expect(
+        userPage.getByText(
+          `Are you sure you want to delete Project "${PROJECT_NAME}"?`,
+        ),
+      ).toBeVisible()
+
+      await userPage
+        .getByRole('button', { name: 'Delete', exact: true })
+        .click()
+    })
+
+    await testAuth.step('confirm project deleted', async () => {
+      await dismissAlert(userPage, 'The Project was successfully deleted.')
+      await expect(userPage.getByText(PROJECT_NAME)).not.toBeVisible()
+      projectId = undefined
+    })
   })
 
-  testAuth.afterAll(async ({ userPage }) => {
-    // delete project
-    await goToDashboard(userPage)
-    await expect(
-      userPage.getByRole('heading', { name: 'Your Projects' }),
-    ).toBeVisible()
-
-    await userPage.getByRole('button', { name: 'Created by me' }).click()
-    await userPage.getByRole('link', { name: PROJECT_NAME }).click()
-
-    await expect(
-      userPage.getByRole('heading', { name: PROJECT_NAME }),
-    ).toBeVisible()
-    await expect(
-      userPage.getByRole('button', { name: 'Delete Wiki Page' }),
-    ).toBeVisible()
-    await userPage.getByRole('button', { name: 'Project Tools' }).click()
-    await userPage.getByRole('menuitem', { name: 'Delete Project' }).click()
-
-    await expect(
-      userPage.getByRole('heading', { name: 'Confirm Deletion' }),
-    ).toBeVisible()
-    await expect(
-      userPage.getByText(
-        `Are you sure you want to delete Project "${PROJECT_NAME}"?`,
-      ),
-    ).toBeVisible()
-
-    await userPage.getByRole('button', { name: 'Delete', exact: true }).click()
-
-    await expect(
-      userPage.getByText('The Project was successfully deleted.'),
-    ).toBeVisible()
-
-    await userPage.getByRole('button', { name: 'Created by me' }).click()
-    await expect(userPage.getByText(PROJECT_NAME)).not.toBeVisible()
+  testAuth.afterAll(async ({ browser }) => {
+    test.slow()
+    // if test failed before project was deleted, then delete project here
+    if (projectId) {
+      const context = await browser.newContext()
+      const page = await context.newPage()
+      await deleteProject(projectId, getAdminPAT(), page)
+      await context.close()
+    }
   })
 })

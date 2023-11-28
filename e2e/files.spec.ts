@@ -1,5 +1,6 @@
 import { Page, expect, test } from '@playwright/test'
 import path from 'path'
+import { defaultExpectTimeout } from '../playwright.config'
 import { testAuth } from './fixtures/authenticatedUserPages'
 import {
   createFile,
@@ -16,10 +17,11 @@ import {
   dismissAlert,
   getAccessTokenFromCookie,
   getAdminPAT,
+  goToDashboardPage,
+  reloadDashboardPage,
 } from './helpers/testUser'
 import { Project } from './helpers/types'
 import { userConfigs } from './helpers/userConfig'
-import { waitForInitialPageLoad } from './helpers/utils'
 
 const expectFilePageLoaded = async (
   fileName: string,
@@ -45,15 +47,18 @@ const openFileSharingSettings = async (page: Page) => {
   })
 }
 
-const expectNoAccessPage = async (page: Page) => {
+const expectNoAccessPage = async (
+  page: Page,
+  expectTimeout: number = defaultExpectTimeout,
+) => {
   await expect(
     page.getByRole('heading', {
       name: 'Sorry, no access to this page.',
     }),
-  ).toBeVisible()
+  ).toBeVisible({ timeout: expectTimeout })
   await expect(
     page.getByText('You are not authorized to access the page requested.'),
-  ).toBeVisible()
+  ).toBeVisible({ timeout: expectTimeout })
 }
 
 const confirmSharingSettings = async (
@@ -179,6 +184,7 @@ test.describe('Files', () => {
   })
 
   testAuth.afterAll(async ({ browser }) => {
+    test.slow()
     if (userProject.id) {
       await teardownProjectsAndFileHandles(
         browser,
@@ -190,7 +196,7 @@ test.describe('Files', () => {
 
   testAuth(
     'File sharing',
-    async ({ userPage, validatedUserPage, browserName }, testInfo) => {
+    async ({ userPage, validatedUserPage, browserName }) => {
       // Use test.fixme because test.fail doesn't mark test as expected to fail
       // when there is a test timeout. Since test timeouts are expensive,
       // Playwright recommends skipping the test entirely with test.fixme.
@@ -225,11 +231,15 @@ test.describe('Files', () => {
       )
 
       await testAuth.step('First user can view a private file', async () => {
-        await userPage.goto(`${entityUrlPathname(userProject.id)}/files`)
-        await waitForInitialPageLoad(userPage)
+        await goToDashboardPage(
+          userPage,
+          `${entityUrlPathname(userProject.id)}/files`,
+        )
 
         const fileLink = userPage.getByRole('link', { name: fileName })
-        await expect(fileLink).toBeVisible()
+        await expect(fileLink).toBeVisible({
+          timeout: defaultExpectTimeout * 3, // extra time for file to be created
+        })
 
         await fileLink.click()
         await expectFilePageLoaded(fileName, fileEntityId, userPage)
@@ -239,9 +249,10 @@ test.describe('Files', () => {
       await confirmSharingSettings(userPage, userName, validatedUserName, false)
 
       await testAuth.step('Second user cannot access the file', async () => {
-        await validatedUserPage.goto(entityUrlPathname(fileEntityId))
-        await waitForInitialPageLoad(validatedUserPage)
-
+        await goToDashboardPage(
+          validatedUserPage,
+          entityUrlPathname(fileEntityId),
+        )
         await expectNoAccessPage(validatedUserPage)
       })
 
@@ -268,11 +279,11 @@ test.describe('Files', () => {
 
           await userPage
             .getByRole('menuitem', { name: `@${validatedUserName}` })
-            .click({ timeout: testInfo.timeout * 3 })
+            .click({ timeout: defaultExpectTimeout * 3 })
 
           await expect(
             userPage.getByRole('cell', { name: validatedUserName }),
-          ).toBeVisible({ timeout: testInfo.timeout * 3 })
+          ).toBeVisible({ timeout: defaultExpectTimeout * 3 })
 
           // Don't send message, so we don't have to clean up the message
           await userPage.getByText('Notify people via email').click()
@@ -285,7 +296,7 @@ test.describe('Files', () => {
       await confirmSharingSettings(userPage, userName, validatedUserName, true)
 
       await testAuth.step('Second user accesses the file', async () => {
-        await validatedUserPage.reload()
+        await reloadDashboardPage(validatedUserPage)
         await expectFilePageLoaded(fileName, fileEntityId, validatedUserPage)
       })
 
@@ -312,7 +323,7 @@ test.describe('Files', () => {
             userPage.getByRole('button', {
               name: 'Create Local Sharing Settings',
             }),
-          ).toBeVisible({ timeout: testInfo.timeout * 3 })
+          ).toBeVisible({ timeout: defaultExpectTimeout * 3 })
 
           await saveFileSharingSettings(userPage)
         },
@@ -322,8 +333,13 @@ test.describe('Files', () => {
       await confirmSharingSettings(userPage, userName, validatedUserName, false)
 
       await testAuth.step('Second user cannot access the file', async () => {
-        await validatedUserPage.reload()
-        await expectNoAccessPage(validatedUserPage)
+        await expect(async () => {
+          await reloadDashboardPage(validatedUserPage)
+          await expectNoAccessPage(
+            validatedUserPage,
+            defaultExpectTimeout * 0.5, // use shorter expect timeout, so reload is tried earlier
+          )
+        }).toPass()
       })
     },
   )
@@ -331,21 +347,14 @@ test.describe('Files', () => {
   testAuth(
     'should create and delete a file',
     async ({ userPage, browserName }) => {
-      test.fail(
-        browserName === 'webkit',
-        `Playwright is not preserving the File's lastModified time in webkit, so 
-        file upload fails because it seems like the file was modified during 
-        upload. See https://github.com/microsoft/playwright/issues/27452. Fix 
-        planned for Playwright v1.40.`,
-      )
+      test.slow()
 
       const fileName = 'test_file.csv'
       const filePath = `data/${fileName}`
       const updatedFilePath = `data/test_file2.csv`
 
       await testAuth.step('go to files tab', async () => {
-        await userPage.goto(entityUrlPathname(userProject.id))
-        await waitForInitialPageLoad(userPage)
+        await goToDashboardPage(userPage, entityUrlPathname(userProject.id))
         await expect(
           userPage.getByRole('heading', { name: userProject.name }),
         ).toBeVisible()
@@ -359,7 +368,9 @@ test.describe('Files', () => {
 
       const fileLink = await testAuth.step('get link to file', async () => {
         const fileLink = userPage.getByRole('link', { name: fileName })
-        await expect(fileLink).toBeVisible()
+        await expect(fileLink).toBeVisible({
+          timeout: defaultExpectTimeout * 3, // extra time for file to be created
+        })
         return fileLink
       })
 
@@ -411,7 +422,17 @@ test.describe('Files', () => {
       await testAuth.step('upload a new file', async () => {
         await uploadFile(userPage, updatedFilePath, 'newVersion')
         await expectFilePageLoaded(fileName, fileEntityId, userPage)
-        await dismissFileUploadAlert(userPage)
+        // Upload success alert intermittently appears when uploading a new version of the same file
+        await testAuth.step(
+          'dismiss file upload alert for new version of file, if visible',
+          async () => {
+            if (
+              await userPage.getByText('File successfully uploaded').isVisible()
+            ) {
+              await dismissFileUploadAlert(userPage)
+            }
+          },
+        )
       })
 
       await testAuth.step(
@@ -485,13 +506,20 @@ test.describe('Files', () => {
         await testAuth.step('go to trash can', async () => {
           await userPage.getByLabel('Trash Can').click()
 
-          const trashCanHeading = userPage.getByRole('heading', {
-            name: 'Trash Can',
-          })
-          await expect(trashCanHeading).toBeVisible()
+          // reload page if trash can deferred js does not load
+          await expect(async () => {
+            await reloadDashboardPage(userPage)
 
-          // click on heading, so tooltip on trash can nav button is hidden
-          await trashCanHeading.click()
+            const trashCanHeading = userPage.getByRole('heading', {
+              name: 'Trash Can',
+            })
+            await expect(trashCanHeading).toBeVisible({
+              timeout: defaultExpectTimeout * 0.5, // decrease timeout, so reload happens more quickly
+            })
+
+            // click on heading, so tooltip on trash can nav button is hidden
+            await trashCanHeading.click()
+          }).toPass()
         })
 
         await testAuth.step('remove file from trash can', async () => {

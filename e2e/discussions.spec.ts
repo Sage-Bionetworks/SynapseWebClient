@@ -1,6 +1,6 @@
 import { Page, expect, test } from '@playwright/test'
+import { defaultExpectTimeout } from '../playwright.config'
 import { testAuth } from './fixtures/authenticatedUserPages'
-import { entityUrlPathname } from './helpers/entities'
 import {
   setupProjectWithPermissions,
   teardownProjectsAndFileHandles,
@@ -8,7 +8,10 @@ import {
 import {
   dismissAlert,
   expectDiscussionPageLoaded,
+  expectDiscussionThreadLoaded,
   getDefaultDiscussionPath,
+  goToDashboardPage,
+  reloadDashboardPage,
 } from './helpers/testUser'
 import { Project } from './helpers/types'
 import { UserPrefix, userConfigs } from './helpers/userConfig'
@@ -58,38 +61,6 @@ const expectThreadTableLoaded = async (
   })
 }
 
-const expectDiscussionThreadLoaded = async (
-  page: Page,
-  threadId: number,
-  threadTitle: string,
-  threadBody: string,
-) => {
-  await testAuth.step('Discussion thread has loaded', async () => {
-    await page.waitForURL(
-      `${entityUrlPathname(userProject.id)}/discussion/threadId=${threadId}`,
-    )
-    await expect(
-      page.getByRole('heading', { name: 'Discussion' }),
-    ).toBeVisible()
-
-    await expect(
-      page.getByRole('button', { name: /show all threads/i }),
-    ).toBeVisible({ timeout: 60_000 })
-    await expect(
-      page.getByRole('button', { name: 'Date Posted' }),
-    ).toBeVisible()
-    await expect(
-      page.getByRole('button', { name: 'Most Recent' }),
-    ).toBeVisible()
-
-    const discussionThread = page.locator(discussionThreadSelector)
-    await expect(discussionThread.getByText(threadTitle)).toBeVisible()
-    await expect(discussionThread.getByText(threadBody)).toBeVisible({
-      timeout: 60_000,
-    })
-  })
-}
-
 const expectThreadReplyVisible = async (
   page: Page,
   threadReply: string,
@@ -102,7 +73,9 @@ const expectThreadReplyVisible = async (
         name: `@${userConfigs[replierPrefix].username}`,
       }),
     ).toBeVisible()
-    await expect(discussionReply.getByText(threadReply)).toBeVisible()
+    await expect(discussionReply.getByText(threadReply)).toBeVisible({
+      timeout: defaultExpectTimeout * 2, // allow extra time for reply to become visible
+    })
   })
 }
 
@@ -153,6 +126,7 @@ test.describe('Discussions', () => {
   })
 
   testAuth.afterAll(async ({ browser }) => {
+    test.slow()
     if (userProject.id) {
       await teardownProjectsAndFileHandles(
         browser,
@@ -173,7 +147,11 @@ test.describe('Discussions', () => {
       const threadReplyEdited = 'An edited reply to the Thread'
 
       await testAuth.step('First user goes to Project', async () => {
-        await userPage.goto(getDefaultDiscussionPath(userProject.id))
+        await goToDashboardPage(
+          userPage,
+          getDefaultDiscussionPath(userProject.id),
+        )
+
         await expectDiscussionPageLoaded(userPage, userProject.id)
       })
 
@@ -226,6 +204,7 @@ test.describe('Discussions', () => {
               threadId,
               threadTitle,
               threadBody,
+              userProject.id,
             )
           })
 
@@ -257,8 +236,12 @@ test.describe('Discussions', () => {
         // retry if the view count hasn't updated
         await expect(async () => {
           // reload is necessary for view count to update
-          await userPage.reload()
-          await expectDiscussionPageLoaded(userPage, userProject.id)
+          await reloadDashboardPage(userPage)
+          await expectDiscussionPageLoaded(
+            userPage,
+            userProject.id,
+            defaultExpectTimeout * 0.5, // use shorter expect timeout, so reload is tried earlier
+          )
           await expectThreadTableLoaded(
             userPage,
             threadTitle,
@@ -270,7 +253,10 @@ test.describe('Discussions', () => {
       })
 
       await testAuth.step('Second user can view discussion', async () => {
-        await validatedUserPage.goto(getDefaultDiscussionPath(userProject.id))
+        await goToDashboardPage(
+          validatedUserPage,
+          getDefaultDiscussionPath(userProject.id),
+        )
         await expectDiscussionPageLoaded(validatedUserPage, userProject.id)
         await expectThreadTableLoaded(
           userPage,
@@ -288,6 +274,7 @@ test.describe('Discussions', () => {
           threadId,
           threadTitle,
           threadBody,
+          userProject.id,
         )
       })
 
@@ -384,6 +371,7 @@ test.describe('Discussions', () => {
               threadId,
               threadTitle,
               threadBody,
+              userProject.id,
             )
           })
 

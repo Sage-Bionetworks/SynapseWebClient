@@ -1,17 +1,23 @@
 import { Page, expect, test } from '@playwright/test'
 import { v4 as uuidv4 } from 'uuid'
+import { defaultExpectTimeout } from '../playwright.config'
 import { testAuth } from './fixtures/authenticatedUserPages'
 import {
   deleteTeamInvitationMessage,
   deleteTeamInviteAcceptanceMessage,
 } from './helpers/messages'
-import { deleteTeam, getTeamIdFromPathname } from './helpers/teams'
+import {
+  deleteTeam,
+  getTeamIdFromPathname,
+  teamHashBang,
+} from './helpers/teams'
 import {
   dismissAlert,
   getAccessTokenFromCookie,
   getAdminPAT,
   getUserIdFromLocalStorage,
   goToDashboard,
+  reloadDashboardPage,
 } from './helpers/testUser'
 import {
   userConfigs,
@@ -51,9 +57,7 @@ test.describe.configure({ mode: 'serial' })
 test.describe('Teams', () => {
   testAuth(
     'should exercise team lifecycle',
-    async ({ userPage, validatedUserPage }, testInfo) => {
-      test.slow()
-
+    async ({ userPage, validatedUserPage }) => {
       const { userName, validatedUserName } = await testAuth.step(
         'should get user names',
         async () => {
@@ -78,15 +82,17 @@ test.describe('Teams', () => {
           await expect(teamNameInput).toHaveValue(TEAM_NAME)
 
           await userPage.getByRole('button', { name: 'OK' }).click()
+
+          await testAuth.step('user should get teamId', async () => {
+            await userPage.waitForURL(`/${teamHashBang}:**`)
+            teamId = getTeamIdFromPathname(userPage.url())
+          })
+
           await dismissAlert(userPage, `Team Created: ${TEAM_NAME}`)
           await expectTeamPageLoaded(userPage, TEAM_NAME)
           await expect(userPage.getByText('1 team members')).toBeVisible()
         },
       )
-
-      await testAuth.step('user should get teamId', async () => {
-        teamId = getTeamIdFromPathname(userPage.url())
-      })
 
       await testAuth.step(
         'user should invite validated user to team',
@@ -100,9 +106,7 @@ test.describe('Teams', () => {
           await userPage
             .getByRole('menuitem', { name: `@${validatedUserName}` })
             .click()
-          const loadInvitedUser = userPage.getByText('Loading...')
-          await expect(loadInvitedUser).toBeVisible()
-          await expect(loadInvitedUser).not.toBeVisible()
+          await expect(userPage.getByText('Loading...')).not.toBeVisible()
 
           const inviteMessageBox = userPage.getByLabel('Invitation Message')
           await inviteMessageBox.click()
@@ -121,7 +125,7 @@ test.describe('Teams', () => {
 
       await test.step('user should view pending invitations', async () => {
         await expect(userPage.getByText('Pending Invitations')).toBeVisible({
-          timeout: testInfo.timeout * 3, // add extra timeout, so backend can finish sending request
+          timeout: defaultExpectTimeout * 3, // add extra timeout, so backend can finish sending request
         })
         const row = userPage.getByRole('row', { name: validatedUserName })
         await expect(row).toBeVisible()
@@ -153,19 +157,30 @@ test.describe('Teams', () => {
         // ...before resolving to one team link
         await expect
           .poll(async () => {
+            await expectMyTeamsPageLoaded(validatedUserPage)
             const count = await teamLink.count()
             // if no team links appear after joining the team
             // ...try reloading the page to see if the link subsequently appears
             if (count === 0) {
-              await validatedUserPage.reload()
+              await reloadDashboardPage(validatedUserPage)
             }
             return count
           })
           .toBe(1)
 
+        const responsePromise = validatedUserPage.waitForResponse(
+          response =>
+            response.url().includes('synapseclient') &&
+            response.status() == 200 &&
+            (response.request().postData()?.includes('getTeamMemberCount') ||
+              false),
+          { timeout: defaultExpectTimeout * 3 }, // allow time for the response to return
+        )
         await teamLink.click()
 
         await expectTeamPageLoaded(validatedUserPage, TEAM_NAME)
+
+        await responsePromise
         await expect(
           validatedUserPage.getByText('2 team members'),
         ).toBeVisible()
@@ -203,6 +218,8 @@ test.describe('Teams', () => {
   )
 
   testAuth.afterAll(async ({ userPage, validatedUserPage }) => {
+    test.slow()
+
     // get credentials
     const adminPAT = getAdminPAT()
 

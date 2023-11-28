@@ -11,15 +11,21 @@ export const baseURL = 'http://127.0.0.1:8888'
  */
 dotenv.config()
 
+// FIXME: expect timeout not available in testInfo fixture in v1.39
+// change tests to use testInfo fixture once expect settings are exposed,
+// see: https://github.com/microsoft/playwright/issues/27915
+export const defaultExpectTimeout = process.env.CI ? 60 * 1000 : 5 * 1000
+export const defaultTestTimeout = 2 * 60 * 1000
+
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
   testDir: './e2e',
   /* Timeout to allow portal enough time to compile when running locally */
-  timeout: 2 * 60 * 1000,
+  timeout: defaultTestTimeout,
   /* Increase expectation timeout on CI */
-  expect: { timeout: process.env.CI ? 30 * 1000 : 5 * 1000 },
+  expect: { timeout: defaultExpectTimeout },
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -27,7 +33,7 @@ export default defineConfig({
   /* Limit the number of failures on CI to save resources */
   maxFailures: process.env.CI ? 10 : undefined,
   /* Retries */
-  retries: process.env.CI ? 2 : 0,
+  retries: process.env.CI ? 1 : 0,
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : 2,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
