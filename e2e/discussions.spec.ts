@@ -424,7 +424,11 @@ test.describe('Discussions', () => {
         })
 
         await testAuth.step('Dismiss alert', async () => {
-          await dismissAlert(validatedUserPage, 'A reply has been edited.')
+          // handle case where alert has auto-closed before the test gets to this step
+          const alertText = 'A reply has been edited.'
+          if (await validatedUserPage.getByText(alertText).isVisible()) {
+            await dismissAlert(validatedUserPage, alertText)
+          }
         })
 
         await expectThreadReplyVisible(

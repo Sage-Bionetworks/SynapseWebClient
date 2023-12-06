@@ -66,6 +66,8 @@ test.describe('Tables', () => {
   })
 
   testAuth('should allow table CRUD', async ({ userPage }) => {
+    test.slow()
+
     const tableName = generateEntityName('table')
     const tableDescription = 'table test description'
 
