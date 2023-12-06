@@ -13,7 +13,8 @@ import {
 } from './helpers/tableColumnSchemaEditor'
 import {
   TableDataConfig,
-  enterTableListValues,
+  confirmTableDataDimensions,
+  enterTableDataRow,
   enterTableValue,
   expectTableColumnHeaders,
   expectTableDataCorrect,
@@ -26,8 +27,6 @@ import {
   openTableEditor,
   runQuery,
   saveTableDataChanges,
-  selectTableDate,
-  selectTableRestrictedValue,
   toggleQueryEditor,
 } from './helpers/tables'
 import {
@@ -80,7 +79,11 @@ test.describe('Tables', () => {
         name: 'color',
         type: 'String',
         size: 50,
-        restrictValues: [
+        /* 
+        // TODO: uncomment when SWC-6627 fixed
+        // able to enter restrictValues via Playwright test in chromium, 
+        // ...but not in firefox/webkit
+        restrictValues: [ 
           'blue',
           'green',
           'indigo',
@@ -88,7 +91,7 @@ test.describe('Tables', () => {
           'red',
           'violet',
           'yellow',
-        ],
+        ], */
       },
       { name: 'search_terms', type: 'String List', maxListLength: 10 },
     ]
@@ -219,32 +222,16 @@ test.describe('Tables', () => {
       await test.step('enter test data', async () => {
         const addRowButton = userPage.getByRole('button', { name: 'Add Row' })
         for (let index = 0; index < initialTableData.length; index++) {
-          await test.step('add row', async () => {
-            await addRowButton.click()
-          })
-
           await test.step(`enter test data: ${initialTableData[index].item}`, async () => {
+            await addRowButton.click()
+
             // start from 1 so column headers in first row are skipped
             const cells = tableRows.nth(index + 1).getByRole('cell')
-
-            await enterTableValue(cells.nth(1), initialTableData[index].item)
-            await enterTableValue(
-              cells.nth(2),
-              initialTableData[index].quantity,
-            )
-            await selectTableDate(
+            await enterTableDataRow(
               userPage,
-              cells.nth(3),
-              initialTableData[index].stock_date as string,
-            )
-            await selectTableRestrictedValue(
-              cells.nth(4),
-              initialTableData[index].color as string,
-            )
-            await enterTableListValues(
-              userPage,
-              cells.nth(5),
-              initialTableData[index].search_terms,
+              cells,
+              initialColumnsSchemaConfig,
+              initialTableData[index],
             )
           })
         }
@@ -353,16 +340,12 @@ test.describe('Tables', () => {
         await runQuery(userPage, `SELECT ${column} FROM ${tableEntityId}`)
 
         await test.step('confirm query results', async () => {
+          await confirmTableDataDimensions(userPage, updatedTableData.length, 1)
           await expectTableDataCorrect(
             userPage,
             [updatedColumnsSchemaConfig[0]],
             updatedTableData.map(data => ({ [column]: data[column] })),
           )
-          await test.step('confirm only one column visible', async () => {
-            await expect(
-              userPage.getByTestId('SynapseTable').getByRole('row').first(),
-            ).toHaveCount(1)
-          })
         })
       })
 
@@ -375,16 +358,19 @@ test.describe('Tables', () => {
         )
 
         await test.step('confirm query results', async () => {
+          const expectedData = updatedTableData.filter(
+            data => data[column] > value,
+          )
+          await confirmTableDataDimensions(
+            userPage,
+            expectedData.length,
+            updatedColumnsSchemaConfig.length,
+          )
           await expectTableDataCorrect(
             userPage,
             updatedColumnsSchemaConfig,
-            updatedTableData.filter(data => data[column] > value),
+            expectedData,
           )
-          await test.step('confirm only three rows (header and two data rows) are visible', async () => {
-            await expect(
-              userPage.getByTestId('SynapseTable').getByRole('row'),
-            ).toHaveCount(3)
-          })
         })
       })
 

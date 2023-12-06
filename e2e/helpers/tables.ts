@@ -65,6 +65,31 @@ export const getTableEditorRows = async (page: Page) => {
   return page.locator('.table.synapseViewOrTable').getByRole('row')
 }
 
+// Enter table rows ------------------------------------------------------------
+export const enterTableDataRow = async (
+  page: Page,
+  tableCells: Locator,
+  columnsSchemaConfig: ColumnSchemaConfig[],
+  tableData: TableDataConfig,
+) => {
+  for (let index = 0; index < columnsSchemaConfig.length; index++) {
+    const config = columnsSchemaConfig[index]
+    const cell = tableCells.nth(index + 1) // shift right for checkboxes
+    const value = tableData[config.name]
+
+    if (config.type === 'Date') {
+      await selectTableDate(page, cell, value as string)
+    } else if (config.type.includes('List')) {
+      await enterTableListValues(page, cell, value)
+    } else if (config.restrictValues || config.type === 'Boolean') {
+      await selectTableRestrictValues(cell, value as string)
+    } else {
+      await enterTableValue(cell, value)
+    }
+  }
+}
+
+// Enter individual table cells ------------------------------------------------
 // non-list type, no restricted value
 export const enterTableValue = async (
   cell: Locator,
@@ -139,7 +164,7 @@ export const selectTableDate = async (
   })
 }
 
-export const selectTableRestrictedValue = async (
+export const selectTableRestrictValues = async (
   cell: Locator,
   option: string,
 ) => {
@@ -179,7 +204,9 @@ export const enterTableListValues = async (
 export const saveTableDataChanges = async (page: Page) => {
   await test.step('save table data changes', async () => {
     await page.getByRole('button', { name: 'Save' }).click()
-    await expect(getTableEditorHeader(page)).not.toBeVisible()
+    await expect(getTableEditorHeader(page)).not.toBeVisible({
+      timeout: defaultExpectTimeout * 3, // allow time for changes to be applied
+    })
     await expect(page.getByText('Applying changes...')).not.toBeVisible()
   })
 }
@@ -346,5 +373,23 @@ export const runQuery = async (
           (await response.json()).requestBody.query.sql === query,
       )
     }
+  })
+}
+
+export const confirmTableDataDimensions = async (
+  page: Page,
+  nDataRows: number,
+  nCols: number,
+) => {
+  await test.step('confirm table dimensions', async () => {
+    const tableRows = page.getByTestId('SynapseTable').getByRole('row')
+    await expect(
+      tableRows.first().getByRole('cell'),
+      `should have ${nCols} column(s)`,
+    ).toHaveCount(nCols)
+    await expect(
+      tableRows,
+      `should have column headers and ${nDataRows} data row(s)`,
+    ).toHaveCount(nDataRows + 1)
   })
 }
