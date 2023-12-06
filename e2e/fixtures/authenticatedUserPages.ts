@@ -94,7 +94,11 @@ export const testAuth = base.extend<
 
       const cleanupPage = await createPage(browser)
       for (const userId of userIds) {
-        await cleanupTestUser(userId, cleanupPage)
+        try {
+          await cleanupTestUser(userId, cleanupPage)
+        } catch (error) {
+          console.error(`Failed to clean up userId: ${userId}:\n${error}`)
+        }
       }
       await cleanupPage.close()
     },
