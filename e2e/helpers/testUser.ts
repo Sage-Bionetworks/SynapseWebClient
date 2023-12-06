@@ -256,3 +256,21 @@ export const expectDiscussionThreadLoaded = async (
     await expect(discussionThread.getByText(threadBody)).toBeVisible()
   })
 }
+
+export const toggleIntoExperimentalMode = async (page: Page) => {
+  await test.step('toggle into experimental mode', async () => {
+    await expect(
+      page.getByRole('link', { name: 'Experimental Mode Off' }),
+    ).toBeVisible()
+
+    await page.getByRole('link', { name: 'Experimental Mode' }).click()
+    await expect(
+      page.getByRole('heading', { name: 'Experimental Mode' }),
+    ).toBeVisible()
+    await page.getByRole('button', { name: 'OK' }).click()
+
+    await expect(
+      page.getByRole('link', { name: 'Experimental Mode On' }),
+    ).toBeVisible()
+  })
+}
