@@ -12,14 +12,15 @@ export type ColumnSchemaConfig = {
   facet?: FacetType
 }
 type ColumnSchemaKey = keyof ColumnSchemaConfig
-const columnSchemaIndexMap: Record<ColumnSchemaKey, number> = {
-  name: 0,
-  type: 1,
-  size: 2,
-  maxListLength: 3,
-  defaultValue: 4,
-  restrictValues: 5,
-  facet: 6,
+const columnNameToSchemaKey: Record<string, ColumnSchemaKey | string> = {
+  'Column ID': 'id',
+  'Column Name': 'name',
+  'Column Type': 'type',
+  Size: 'size',
+  'Max List Length': 'maxListLength',
+  'Default Value': 'defaultValue',
+  'Restrict Values': 'restrictValues',
+  Facet: 'facet',
 }
 
 // Set Individual Column Schema ------------------------------------------------
@@ -218,6 +219,7 @@ const expectColumnSchemaKeyMatchesConfig = async (
 const expectColumnSchemaMatchesConfig = async (
   columnSchemaConfig: ColumnSchemaConfig,
   schemaCells: Locator,
+  columnSchemaIndexMap: Record<ColumnSchemaKey, number>,
 ) => {
   await test.step(`confirm column schema: ${columnSchemaConfig.name}`, async () => {
     for (const columnSchemaKey in columnSchemaConfig) {
@@ -226,10 +228,7 @@ const expectColumnSchemaMatchesConfig = async (
       await expectColumnSchemaKeyMatchesConfig(
         columnSchemaConfig,
         columnSchemaKey as ColumnSchemaKey,
-        // the initial column is empty in UI
-        // ...and the second column contains the column ID
-        // ...so shift index by 2
-        schemaCells.nth(columnSchemaIndex + 2),
+        schemaCells.nth(columnSchemaIndex),
       )
     }
   })
@@ -238,11 +237,16 @@ const expectColumnSchemaMatchesConfig = async (
 const expectAllColumnSchemasMatchConfig = async (
   columnsSchemaConfig: ColumnSchemaConfig[],
   schemaRows: Locator,
+  columnSchemaIndexMap: Record<ColumnSchemaKey, number>,
 ) => {
   for (let i = 0; i < columnsSchemaConfig.length; i++) {
     // skip the first row, which contains the table headers
     const schemaCells = schemaRows.nth(i + 1).getByRole('cell')
-    await expectColumnSchemaMatchesConfig(columnsSchemaConfig[i], schemaCells)
+    await expectColumnSchemaMatchesConfig(
+      columnsSchemaConfig[i],
+      schemaCells,
+      columnSchemaIndexMap,
+    )
   }
 }
 
@@ -265,26 +269,26 @@ export const expectTableSchemaCorrect = async (
     await openTableColumnSchema(page)
     const schemaRows = await getTableColumnSchemaRows(page)
 
-    await test.step('confirm schema column names', async () => {
-      const columnNamesExpected = [
-        'Column ID',
-        'Column Name',
-        'Column Type',
-        'Size',
-        'Max List Length',
-        'Default Value',
-        'Restrict Values',
-        'Facet',
-      ]
-      const columnNames = schemaRows.nth(0).getByRole('cell')
-      for (let i = 0; i < columnNamesExpected.length; i++) {
-        // the initial column is empty in UI, so start from 1
-        await expect(columnNames.nth(i + 1)).toHaveText(columnNamesExpected[i])
-      }
-    })
+    const columnSchemaIndexMap =
+      await test.step('confirm schema column names', async () => {
+        const columnNamesExpected = Object.keys(columnNameToSchemaKey)
+        let columnSchemaIndexMap: Partial<Record<ColumnSchemaKey, number>> = {}
+        const columnNames = schemaRows.nth(0).getByRole('cell')
+        for (let i = 0; i < columnNamesExpected.length; i++) {
+          // the initial column is empty in UI, so start from 1
+          const columnName = await columnNames.nth(i + 1).textContent()
+          expect(columnName).toBe(columnNamesExpected[i])
+          columnSchemaIndexMap[columnNameToSchemaKey[columnName!]] = i + 1
+        }
+        return columnSchemaIndexMap as Record<ColumnSchemaKey, number>
+      })
 
     await test.step('confirm schema rows', async () => {
-      await expectAllColumnSchemasMatchConfig(columnsSchemaConfig, schemaRows)
+      await expectAllColumnSchemasMatchConfig(
+        columnsSchemaConfig,
+        schemaRows,
+        columnSchemaIndexMap,
+      )
     })
   })
 }
