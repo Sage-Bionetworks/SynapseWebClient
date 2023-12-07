@@ -99,4 +99,23 @@ public class QuestionContainerWidgetTest {
     verify(mockView).configureMoreInfo(docLink, helpText);
     verify(mockView).setMoreInfoVisible(true);
   }
+
+  @Test
+  public void testHelpShownWhenNoLink() {
+    setExclusive(false);
+    String docLink = null;
+    String helpText = "Help text";
+    when(mockMultichoiceQuestion.getDocLink()).thenReturn(docLink);
+    when(mockMultichoiceQuestion.getHelpText()).thenReturn(helpText);
+    questionContainerWidget.configure(1L, mockMultichoiceQuestion, null);
+    verify(mockView, times(2))
+      .addCheckBox(
+        eq(mockMultichoiceQuestion.getQuestionIndex()),
+        anyString(),
+        anyLong(),
+        eq(false)
+      );
+    verify(mockView).configureMoreInfo(docLink, helpText);
+    verify(mockView).setMoreInfoVisible(true);
+  }
 }
