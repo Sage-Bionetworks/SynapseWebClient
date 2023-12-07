@@ -279,7 +279,6 @@ test.describe('Tables', () => {
         await addColumnsFromColumnSchemaConfig(
           userPage,
           updatedColumnsSchemaConfig,
-          initialColumnsSchemaConfig.length,
         )
       })
 

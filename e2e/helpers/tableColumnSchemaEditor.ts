@@ -166,12 +166,16 @@ const enterColumnSchema = async (
 export const addColumnsFromColumnSchemaConfig = async (
   page: Page,
   columnConfigs: ColumnSchemaConfig[],
-  columnStartingIndex: number = 0,
 ) => {
   await test.step('add columns from column schema config', async () => {
     const addColumnButton = page.getByRole('button', {
       name: 'Add Column',
     })
+
+    const columnStartingIndex =
+      await test.step('calculate starting index', async () => {
+        return await page.getByPlaceholder('Column name').count()
+      })
 
     for (
       let columnIndex = columnStartingIndex;
