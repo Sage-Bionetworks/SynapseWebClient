@@ -236,9 +236,7 @@ public class ACTDataAccessSubmissionsPresenter
                 actAccessRequirement.getSubjectIds()
               );
               entitySubjectsWidget.configure(
-                actAccessRequirement.getSubjectIds(),
-                false,
-                null
+                actAccessRequirement.getSubjectIds()
               );
               loadData();
             } else {

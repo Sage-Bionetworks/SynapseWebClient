@@ -150,7 +150,7 @@ public class ManagedACTAccessRequirementWidget
     reviewAccessRequestsButton.configure(ar);
     manageAccessButton.configure(ar);
     teamSubjectsWidget.configure(ar.getSubjectIds());
-    entitySubjectsWidget.configure(ar.getSubjectIds(), false, null);
+    entitySubjectsWidget.configure(ar.getSubjectIds());
     lazyLoadHelper.setIsConfigured();
     view.setAccessRequirementID(ar.getId().toString());
     isACTMemberAsyncHandler.isACTActionAvailable(isACT -> {

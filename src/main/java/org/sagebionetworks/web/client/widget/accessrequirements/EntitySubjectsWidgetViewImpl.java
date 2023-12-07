@@ -52,7 +52,10 @@ public class EntitySubjectsWidgetViewImpl implements EntitySubjectsWidgetView {
         newRefList -> {
           presenter.onChange(newRefList);
         },
-        "Mark for Removal from AR"
+        "Mark for Removal from AR",
+        newEntityIDsValue -> {
+          presenter.onChangeEntityIDsValue(newEntityIDsValue);
+        }
       ),
       propsProvider.getJsInteropContextProps()
     );

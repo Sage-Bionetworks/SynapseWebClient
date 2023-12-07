@@ -129,7 +129,7 @@ public class TermsOfUseAccessRequirementWidget
       view.setAccessRequirementIDVisible(isACT);
     });
     teamSubjectsWidget.configure(ar.getSubjectIds());
-    entitySubjectsWidget.configure(ar.getSubjectIds(), false, null);
+    entitySubjectsWidget.configure(ar.getSubjectIds());
     manageAccessButton.configure(ar);
     lazyLoadHelper.setIsConfigured();
   }

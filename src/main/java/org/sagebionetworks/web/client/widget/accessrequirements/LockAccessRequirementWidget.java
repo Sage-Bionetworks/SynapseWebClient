@@ -37,7 +37,7 @@ public class LockAccessRequirementWidget implements IsWidget {
     this.ar = ar;
     deleteAccessRequirementButton.configure(ar, refreshCallback);
     teamSubjectsWidget.configure(ar.getSubjectIds());
-    entitySubjectsWidget.configure(ar.getSubjectIds(), false, null);
+    entitySubjectsWidget.configure(ar.getSubjectIds());
   }
 
   public void addStyleNames(String styleNames) {

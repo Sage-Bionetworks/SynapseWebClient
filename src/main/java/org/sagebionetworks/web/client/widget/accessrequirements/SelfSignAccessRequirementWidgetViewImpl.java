@@ -188,7 +188,7 @@ public class SelfSignAccessRequirementWidgetViewImpl
   }
 
   @Override
-  public void setEntitySubjectsWidget(IsWidget entitySubjectsWidget) {
+  public void setEntitySubjectsWidget(IsWidget w) {
     entitySubjectsWidgetContainer.clear();
     entitySubjectsWidgetContainer.add(w);
   }

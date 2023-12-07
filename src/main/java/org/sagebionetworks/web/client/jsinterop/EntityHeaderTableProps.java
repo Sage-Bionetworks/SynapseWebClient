@@ -19,12 +19,21 @@ public class EntityHeaderTableProps extends ReactComponentProps {
 
   @FunctionalInterface
   @JsFunction
-  public interface OnUpdateJavaScriptObject {
+  public interface OnUpdateReferenceList {
     void onUpdate(ReferenceJsObject[] referenceListJsObject);
   }
 
+  @FunctionalInterface
+  @JsFunction
+  public interface OnUpdateString {
+    void onUpdatString(String newValue);
+  }
+
   @JsNullable
-  OnUpdateJavaScriptObject onUpdate;
+  OnUpdateReferenceList onUpdate;
+
+  @JsNullable
+  OnUpdateString onUpdateEntityIDsTextbox;
 
   @JsNullable
   String removeSelectedRowsButtonText;
@@ -34,7 +43,8 @@ public class EntityHeaderTableProps extends ReactComponentProps {
     List<Reference> refs,
     boolean isEditable,
     CallbackP<ReferenceList> onUpdate,
-    String removeSelectedRowsButtonText
+    String removeSelectedRowsButtonText,
+    CallbackP<String> onUpdateEntityIDsTextbox
   ) {
     EntityHeaderTableProps props = new EntityHeaderTableProps();
     props.references = new ReferenceJsObject[refs.size()];
@@ -60,7 +70,10 @@ public class EntityHeaderTableProps extends ReactComponentProps {
         newList.setReferences(referenceList);
         onUpdate.invoke(newList);
       };
-
+    props.onUpdateEntityIDsTextbox =
+      newValue -> {
+        onUpdateEntityIDsTextbox.invoke(newValue);
+      };
     return props;
   }
 }

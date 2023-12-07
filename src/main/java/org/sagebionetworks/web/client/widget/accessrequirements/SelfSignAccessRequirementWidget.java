@@ -138,7 +138,7 @@ public class SelfSignAccessRequirementWidget
     createAccessRequirementButton.configure(ar, refreshCallback);
     deleteAccessRequirementButton.configure(ar, refreshCallback);
     teamSubjectsWidget.configure(ar.getSubjectIds());
-    entitySubjectsWidget.configure(ar.getSubjectIds(), false, null);
+    entitySubjectsWidget.configure(ar.getSubjectIds());
     manageAccessButton.configure(ar);
     view.setAccessRequirementID(ar.getId().toString());
     isACTMemberAsyncHandler.isACTActionAvailable(isACT -> {

@@ -122,7 +122,6 @@ public class CreateAccessRequirementStep1
     teamSubjectsWidget.configure(subjects);
     entitySubjectsWidget.configure(
       subjects,
-      true,
       newSubjects -> {
         subjects = newSubjects;
       }
@@ -144,6 +143,12 @@ public class CreateAccessRequirementStep1
     // SWC-3700: validate that subjects have been set
     if (subjects.size() == 0) {
       modalPresenter.setErrorMessage(EMPTY_SUBJECT_LIST_ERROR_MESSAGE);
+      return;
+    }
+    if (!entitySubjectsWidget.isEntityIDsTextboxEmpty()) {
+      modalPresenter.setErrorMessage(
+        "Synapse IDs were specified but not added to the subjects list.  Please either clear out the Add Synapse IDs textbox or click the Add Entities button."
+      );
       return;
     }
 

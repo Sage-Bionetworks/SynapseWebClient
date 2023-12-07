@@ -8,6 +8,8 @@ public interface EntitySubjectsWidgetView extends IsWidget {
 
   public interface Presenter {
     void onChange(ReferenceList updatedEntityReferences);
+
+    void onChangeEntityIDsValue(String newEntityIDsValue);
   }
 
   void showEntityHeadersTable(

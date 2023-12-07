@@ -20,6 +20,7 @@ public class EntitySubjectsWidget
   IsACTMemberAsyncHandler isACTMemberAsyncHandler;
 
   CallbackP<List<RestrictableObjectDescriptor>> onUpdate;
+  String currentEntityIDsValue = "";
 
   @Inject
   public EntitySubjectsWidget(
@@ -35,12 +36,15 @@ public class EntitySubjectsWidget
 
   @Override
   public Widget asWidget() {
-    return this.view.asWidget();
+    return view.asWidget();
+  }
+
+  public void configure(final List<RestrictableObjectDescriptor> subjects) {
+    configure(subjects, null);
   }
 
   public void configure(
     final List<RestrictableObjectDescriptor> subjects,
-    boolean isEditable,
     CallbackP<List<RestrictableObjectDescriptor>> onUpdate
   ) {
     this.onUpdate = onUpdate;
@@ -50,7 +54,7 @@ public class EntitySubjectsWidget
         public void invoke(Boolean isACT) {
           view.setVisible(isACT);
           if (isACT) {
-            configureAfterACTCheck(subjects, isEditable);
+            configureAfterACTCheck(subjects);
           }
         }
       }
@@ -58,8 +62,7 @@ public class EntitySubjectsWidget
   }
 
   private void configureAfterACTCheck(
-    List<RestrictableObjectDescriptor> subjects,
-    boolean isEditable
+    List<RestrictableObjectDescriptor> subjects
   ) {
     ReferenceList entityReferences = new ReferenceList();
     List<Reference> referenceList = new ArrayList<>();
@@ -71,6 +74,7 @@ public class EntitySubjectsWidget
       }
     }
     entityReferences.setReferences(referenceList);
+    boolean isEditable = onUpdate != null;
     view.showEntityHeadersTable(entityReferences, isEditable);
   }
 
@@ -85,5 +89,14 @@ public class EntitySubjectsWidget
       newSubjects.add(newRod);
     }
     onUpdate.invoke(newSubjects);
+  }
+
+  @Override
+  public void onChangeEntityIDsValue(String newEntityIDsValue) {
+    this.currentEntityIDsValue = newEntityIDsValue;
+  }
+
+  public boolean isEntityIDsTextboxEmpty() {
+    return currentEntityIDsValue.trim().isEmpty();
   }
 }

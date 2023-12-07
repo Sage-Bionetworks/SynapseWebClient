@@ -135,7 +135,7 @@ public class ACTAccessRequirementWidget
     createAccessRequirementButton.configure(ar, refreshCallback);
     deleteAccessRequirementButton.configure(ar, refreshCallback);
     teamSubjectsWidget.configure(ar.getSubjectIds());
-    entitySubjectsWidget.configure(ar.getSubjectIds(), false, null);
+    entitySubjectsWidget.configure(ar.getSubjectIds());
     manageAccessButton.configure(ar);
     convertACTAccessRequirementButton.configure(ar, refreshCallback);
     view.setAccessRequirementName(ar.getName());
