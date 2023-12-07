@@ -69,6 +69,7 @@ public class EntitySubjectsWidget
         referenceList.add(ref);
       }
     }
+    entityReferences.setReferences(referenceList);
     view.showEntityHeadersTable(entityReferences, isEditable);
   }
 
