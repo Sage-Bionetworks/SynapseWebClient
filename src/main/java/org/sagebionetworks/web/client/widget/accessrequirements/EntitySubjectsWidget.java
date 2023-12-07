@@ -30,6 +30,7 @@ public class EntitySubjectsWidget
     this.view = view;
     this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
     view.setVisible(false);
+    view.setPresenter(this);
   }
 
   @Override

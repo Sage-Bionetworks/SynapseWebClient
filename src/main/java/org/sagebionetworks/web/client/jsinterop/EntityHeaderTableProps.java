@@ -55,10 +55,10 @@ public class EntityHeaderTableProps extends ReactComponentProps {
         for (ReferenceJsObject refJsObject : referenceListJsObject) {
           Reference ref = new Reference();
           ref.setTargetId(refJsObject.targetId);
-          ref.setTargetVersionNumber(refJsObject.targetVersionNumber);
           referenceList.add(ref);
         }
         newList.setReferences(referenceList);
+        onUpdate.invoke(newList);
       };
 
     return props;

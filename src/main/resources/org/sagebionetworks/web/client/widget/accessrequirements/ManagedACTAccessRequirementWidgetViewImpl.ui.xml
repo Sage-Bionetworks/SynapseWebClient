@@ -63,6 +63,10 @@
 					and Compliance Team (ACT) to discuss at act@sagebase.org
         </bh:Text>
       </bh:Div>
+      <bh:Div
+        ui:field="entitySubjectsWidgetContainer"
+        addStyleNames="margin-left-5 margin-right-5"
+      />
       <bh:ClearFix />
       <bh:Div>
         <bh:Div
@@ -72,11 +76,6 @@
         />
       </bh:Div>
       <bh:ClearFix />
-      <bh:Div
-        ui:field="entitySubjectsWidgetContainer"
-        pull="LEFT"
-        addStyleNames="margin-left-5 margin-right-5"
-      />
       <bh:Div addStyleNames="margin-top-5" ui:field="controlsContainer">
         <bh:Div
           ui:field="reviewAccessRequestsContainer"

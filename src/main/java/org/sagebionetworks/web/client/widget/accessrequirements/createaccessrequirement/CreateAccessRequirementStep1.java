@@ -160,7 +160,6 @@ public class CreateAccessRequirementStep1
     accessRequirement.setAccessType(currentAccessType);
     accessRequirement.setSubjectIds(subjects);
     accessRequirement.setName(view.getName());
-
     modalPresenter.setLoading(true);
     synapseClient.createOrUpdateAccessRequirement(
       accessRequirement,

@@ -39,6 +39,11 @@
           <g:HTML ui:field="terms" styleName="font-size-14" />
         </bh:Paragraph>
       </b:BlockQuote>
+      <bh:Div
+        ui:field="entitySubjectsWidgetContainer"
+        addStyleNames="margin-left-5 margin-right-5"
+      />
+
       <bh:ClearFix />
       <bh:Div addStyleNames="margin-top-5" ui:field="controlsContainer">
         <bh:Div
@@ -61,10 +66,6 @@
           pull="RIGHT"
           visible="false"
           addStyleNames="margin-right-5"
-        />
-        <bh:Div
-          ui:field="entitySubjectsWidgetContainer"
-          addStyleNames="margin-left-5 margin-right-5"
         />
         <bh:Div
           ui:field="teamSubjectsWidgetContainer"

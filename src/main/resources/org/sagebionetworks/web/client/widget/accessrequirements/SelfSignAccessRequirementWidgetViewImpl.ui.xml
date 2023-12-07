@@ -33,6 +33,10 @@
       <b:BlockQuote>
         <g:SimplePanel ui:field="wikiContainer" />
       </b:BlockQuote>
+      <bh:Div
+        ui:field="entitySubjectsWidgetContainer"
+        addStyleNames="margin-left-5 margin-right-5"
+      />
       <bh:ClearFix />
       <bh:Div addStyleNames="margin-top-5" ui:field="controlsContainer">
         <bh:Div
@@ -88,11 +92,6 @@
           visible="false"
           addStyleNames="small-alert margin-right-2"
         />
-        <bh:Div
-          ui:field="entitySubjectsWidgetContainer"
-          addStyleNames="margin-left-5 margin-right-5"
-        />
-
         <bh:Div
           ui:field="teamSubjectsWidgetContainer"
           pull="LEFT"

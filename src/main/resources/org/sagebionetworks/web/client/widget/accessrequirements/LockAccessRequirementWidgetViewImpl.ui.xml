@@ -26,12 +26,12 @@
           text="Access restricted pending review by Synapse Access and Compliance Team."
         />
       </bh:Div>
+      <bh:Div
+        ui:field="entitySubjectsWidgetContainer"
+        addStyleNames="margin-left-5 margin-right-5"
+      />
       <bh:ClearFix />
       <bh:Div>
-        <bh:Div
-          ui:field="entitySubjectsWidgetContainer"
-          addStyleNames="margin-left-5 margin-right-5"
-        />
         <bh:Div
           ui:field="teamSubjectsWidgetContainer"
           pull="LEFT"
