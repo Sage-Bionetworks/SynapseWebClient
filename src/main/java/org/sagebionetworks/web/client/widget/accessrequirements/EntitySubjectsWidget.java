@@ -82,6 +82,7 @@ public class EntitySubjectsWidget
       RestrictableObjectDescriptor newRod = new RestrictableObjectDescriptor();
       newRod.setId(ref.getTargetId());
       newRod.setType(RestrictableObjectType.ENTITY);
+      newSubjects.add(newRod);
     }
     onUpdate.invoke(newSubjects);
   }
