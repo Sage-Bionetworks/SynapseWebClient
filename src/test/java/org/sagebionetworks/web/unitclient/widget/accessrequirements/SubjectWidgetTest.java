@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.accessrequirements;
 
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import org.junit.Before;
@@ -65,13 +66,7 @@ public class SubjectWidgetTest {
       mockSubjectDeletedCallback
     );
 
-    verify(mockGinInjector).createEntityIdCellRenderer();
-    verify(mockEntityIdCellRendererImpl).setValue(ID, false);
-    verify(mockView).setDeleteVisible(true);
-
-    // test delete callback
-    widget.onDelete();
-    verify(mockSubjectDeletedCallback).invoke(widget);
+    verifyZeroInteractions(mockGinInjector);
   }
 
   @Test
