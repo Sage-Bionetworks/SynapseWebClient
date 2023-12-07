@@ -29,7 +29,11 @@
       <bh:ClearFix />
       <bh:Div>
         <bh:Div
-          ui:field="subjectsWidgetContainer"
+          ui:field="entitySubjectsWidgetContainer"
+          addStyleNames="margin-left-5 margin-right-5"
+        />
+        <bh:Div
+          ui:field="teamSubjectsWidgetContainer"
           pull="LEFT"
           addStyleNames="margin-left-5 margin-right-5"
         />

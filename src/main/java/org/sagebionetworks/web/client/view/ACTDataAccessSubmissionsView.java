@@ -35,7 +35,7 @@ public interface ACTDataAccessSubmissionsView extends IsWidget, SynapseView {
 
   void setIsValidatedProfileRequired(boolean value);
 
-  void setSubjectsWidget(IsWidget w);
+  void setTeamSubjectsWidget(IsWidget w);
 
   void setAccessRequirementUIVisible(boolean visible);
 
@@ -58,4 +58,6 @@ public interface ACTDataAccessSubmissionsView extends IsWidget, SynapseView {
 
     void onClearAccessorFilter();
   }
+
+  void setEntitySubjectsWidget(IsWidget w);
 }

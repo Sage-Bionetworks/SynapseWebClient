@@ -53,7 +53,7 @@ public interface ManagedACTAccessRequirementWidgetView
 
   void setReviewAccessRequestsWidget(IsWidget w);
 
-  void setSubjectsWidget(IsWidget w);
+  void setTeamSubjectsWidget(IsWidget w);
 
   void setVisible(boolean visible);
 
@@ -88,4 +88,6 @@ public interface ManagedACTAccessRequirementWidgetView
 
     void handleException(Throwable t);
   }
+
+  void setEntitySubjectsWidget(IsWidget entitySubjectsWidget);
 }

@@ -40,7 +40,7 @@ import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccess
 import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccessRequirementWidgetView;
 import org.sagebionetworks.web.client.widget.accessrequirements.ReviewAccessRequestsButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.ReviewAccessorsButton;
-import org.sagebionetworks.web.client.widget.accessrequirements.SubjectsWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.TeamSubjectsWidget;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -85,7 +85,7 @@ public class ManagedACTAccessRequirementWidgetTest {
   ReviewAccessRequestsButton mockReviewAccessRequestsButton;
 
   @Mock
-  SubjectsWidget mockSubjectsWidget;
+  TeamSubjectsWidget mockTeamSubjectsWidget;
 
   @Mock
   LazyLoadHelper mockLazyLoadHelper;
@@ -149,7 +149,7 @@ public class ManagedACTAccessRequirementWidgetTest {
         mockWikiPageWidget,
         mockSynAlert,
         mockGinInjector,
-        mockSubjectsWidget,
+        mockTeamSubjectsWidget,
         mockCreateAccessRequirementButton,
         mockDeleteAccessRequirementButton,
         mockReviewAccessRequestsButton,
@@ -208,7 +208,7 @@ public class ManagedACTAccessRequirementWidgetTest {
     verify(mockReviewAccessRequestsButton)
       .configure(mockManagedACTAccessRequirement);
     verify(mockManageAccessButton).configure(mockManagedACTAccessRequirement);
-    verify(mockSubjectsWidget).configure(mockSubjectIds);
+    verify(mockTeamSubjectsWidget).configure(mockSubjectIds);
     verify(mockLazyLoadHelper).setIsConfigured();
     verify(mockView).setAccessRequirementName(null);
   }

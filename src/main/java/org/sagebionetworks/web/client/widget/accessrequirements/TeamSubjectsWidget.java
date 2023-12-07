@@ -5,20 +5,21 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import java.util.List;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
+import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.DivView;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 
-public class SubjectsWidget implements IsWidget {
+public class TeamSubjectsWidget implements IsWidget {
 
   DivView view;
   PortalGinInjector ginInjector;
   IsACTMemberAsyncHandler isACTMemberAsyncHandler;
-  CallbackP<SubjectWidget> subjectWidgetDeletedCallback;
+  CallbackP<TeamSubjectWidget> subjectWidgetDeletedCallback;
 
   @Inject
-  public SubjectsWidget(
+  public TeamSubjectsWidget(
     DivView view,
     PortalGinInjector ginInjector,
     IsACTMemberAsyncHandler isACTMemberAsyncHandler
@@ -54,9 +55,11 @@ public class SubjectsWidget implements IsWidget {
   ) {
     view.clear();
     for (RestrictableObjectDescriptor rod : subjects) {
-      SubjectWidget subjectWidget = ginInjector.getSubjectWidget();
-      subjectWidget.configure(rod, subjectWidgetDeletedCallback);
-      view.add(subjectWidget);
+      if (rod.getType().equals(RestrictableObjectType.TEAM)) {
+        TeamSubjectWidget subjectWidget = ginInjector.getSubjectWidget();
+        subjectWidget.configure(rod, subjectWidgetDeletedCallback);
+        view.add(subjectWidget);
+      }
     }
   }
 
@@ -64,9 +67,9 @@ public class SubjectsWidget implements IsWidget {
     final CallbackP<RestrictableObjectDescriptor> subjectDeletedCallback
   ) {
     subjectWidgetDeletedCallback =
-      new CallbackP<SubjectWidget>() {
+      new CallbackP<TeamSubjectWidget>() {
         @Override
-        public void invoke(SubjectWidget subjectWidget) {
+        public void invoke(TeamSubjectWidget subjectWidget) {
           view.remove(subjectWidget);
           subjectDeletedCallback.invoke(
             subjectWidget.getRestrictableObjectDescriptor()

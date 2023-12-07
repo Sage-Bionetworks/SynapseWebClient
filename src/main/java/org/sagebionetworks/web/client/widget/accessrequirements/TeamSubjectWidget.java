@@ -7,19 +7,21 @@ import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer.RenderOption;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
 
-public class SubjectWidget implements SubjectWidgetView.Presenter, IsWidget {
+public class TeamSubjectWidget
+  implements TeamSubjectWidgetView.Presenter, IsWidget {
 
-  SubjectWidgetView view;
+  TeamSubjectWidgetView view;
   PortalGinInjector ginInjector;
   RestrictableObjectDescriptor rod;
-  CallbackP<SubjectWidget> deletedCallback;
+  CallbackP<TeamSubjectWidget> deletedCallback;
 
   @Inject
-  public SubjectWidget(SubjectWidgetView view, PortalGinInjector ginInjector) {
+  public TeamSubjectWidget(
+    TeamSubjectWidgetView view,
+    PortalGinInjector ginInjector
+  ) {
     this.view = view;
     this.ginInjector = ginInjector;
     view.setPresenter(this);
@@ -27,16 +29,11 @@ public class SubjectWidget implements SubjectWidgetView.Presenter, IsWidget {
 
   public void configure(
     RestrictableObjectDescriptor rod,
-    CallbackP<SubjectWidget> deletedCallback
+    CallbackP<TeamSubjectWidget> deletedCallback
   ) {
     this.rod = rod;
     this.deletedCallback = deletedCallback;
-    if (rod.getType().equals(RestrictableObjectType.ENTITY)) {
-      EntityIdCellRenderer entityRenderer = (EntityIdCellRenderer) ginInjector.createEntityIdCellRenderer();
-      entityRenderer.setRenderOption(RenderOption.NAME_AND_ID);
-      entityRenderer.setValue(rod.getId(), false);
-      view.setSubjectRendererWidget(entityRenderer);
-    } else if (rod.getType().equals(RestrictableObjectType.TEAM)) {
+    if (rod.getType().equals(RestrictableObjectType.TEAM)) {
       TeamBadge teamBadge = ginInjector.getTeamBadgeWidget();
       teamBadge.configure(rod.getId());
       teamBadge.addStyleName("margin-right-5");

@@ -64,7 +64,7 @@ import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequiremen
 import org.sagebionetworks.web.client.widget.accessrequirements.LockAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.SelfSignAccessRequirementWidget;
-import org.sagebionetworks.web.client.widget.accessrequirements.SubjectWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.TeamSubjectWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.TermsOfUseAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.approval.AccessorGroupWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateAccessRequirementWizard;
@@ -776,7 +776,7 @@ public interface PortalGinInjector extends Ginjector {
 
   SelfSignAccessRequirementWidget getSelfSignAccessRequirementWidget();
 
-  SubjectWidget getSubjectWidget();
+  TeamSubjectWidget getSubjectWidget();
 
   UserListRowWidget getUserListRowWidget();
 

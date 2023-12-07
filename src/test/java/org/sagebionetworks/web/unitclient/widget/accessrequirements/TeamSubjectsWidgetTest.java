@@ -17,13 +17,13 @@ import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.DivView;
-import org.sagebionetworks.web.client.widget.accessrequirements.SubjectWidget;
-import org.sagebionetworks.web.client.widget.accessrequirements.SubjectsWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.TeamSubjectWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.TeamSubjectsWidget;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 
-public class SubjectsWidgetTest {
+public class TeamSubjectsWidgetTest {
 
-  SubjectsWidget widget;
+  TeamSubjectsWidget widget;
 
   @Mock
   DivView mockView;
@@ -41,13 +41,13 @@ public class SubjectsWidgetTest {
   ArgumentCaptor<CallbackP<Boolean>> callbackCaptor;
 
   @Mock
-  SubjectWidget mockSubjectWidget;
+  TeamSubjectWidget mockSubjectWidget;
 
   @Mock
   CallbackP<RestrictableObjectDescriptor> mockDeleteCallback;
 
   @Captor
-  ArgumentCaptor<CallbackP<SubjectWidget>> subjectWidgetCallbackCaptor;
+  ArgumentCaptor<CallbackP<TeamSubjectWidget>> subjectWidgetCallbackCaptor;
 
   public static final String ID = "876787";
 
@@ -55,7 +55,7 @@ public class SubjectsWidgetTest {
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
     widget =
-      new SubjectsWidget(
+      new TeamSubjectsWidget(
         mockView,
         mockGinInjector,
         mockIsACTMemberAsyncHandler
@@ -113,7 +113,8 @@ public class SubjectsWidgetTest {
         eq(mockRestrictableObjectDescriptor),
         subjectWidgetCallbackCaptor.capture()
       );
-    CallbackP<SubjectWidget> callbackP = subjectWidgetCallbackCaptor.getValue();
+    CallbackP<TeamSubjectWidget> callbackP =
+      subjectWidgetCallbackCaptor.getValue();
 
     // simulate subject deleted by the subjects widget
     callbackP.invoke(mockSubjectWidget);

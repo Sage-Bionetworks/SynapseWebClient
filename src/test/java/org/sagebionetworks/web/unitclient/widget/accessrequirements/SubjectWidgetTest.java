@@ -11,17 +11,17 @@ import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.accessrequirements.SubjectWidget;
-import org.sagebionetworks.web.client.widget.accessrequirements.SubjectWidgetView;
+import org.sagebionetworks.web.client.widget.accessrequirements.TeamSubjectWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.TeamSubjectWidgetView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
 
 public class SubjectWidgetTest {
 
-  SubjectWidget widget;
+  TeamSubjectWidget widget;
 
   @Mock
-  SubjectWidgetView mockView;
+  TeamSubjectWidgetView mockView;
 
   @Mock
   PortalGinInjector mockGinInjector;
@@ -36,14 +36,14 @@ public class SubjectWidgetTest {
   RestrictableObjectDescriptor mockRestrictableObjectDescriptor;
 
   @Mock
-  CallbackP<SubjectWidget> mockSubjectDeletedCallback;
+  CallbackP<TeamSubjectWidget> mockSubjectDeletedCallback;
 
   public static final String ID = "876787";
 
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
-    widget = new SubjectWidget(mockView, mockGinInjector);
+    widget = new TeamSubjectWidget(mockView, mockGinInjector);
     when(mockGinInjector.createEntityIdCellRenderer())
       .thenReturn(mockEntityIdCellRendererImpl);
     when(mockGinInjector.getTeamBadgeWidget()).thenReturn(mockTeamBadge);

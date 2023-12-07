@@ -10,11 +10,11 @@ import com.google.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Span;
 
-public class SubjectWidgetViewImpl implements SubjectWidgetView {
+public class TeamSubjectWidgetViewImpl implements TeamSubjectWidgetView {
 
   private Presenter presenter;
 
-  public interface Binder extends UiBinder<Widget, SubjectWidgetViewImpl> {}
+  public interface Binder extends UiBinder<Widget, TeamSubjectWidgetViewImpl> {}
 
   @UiField
   Span container;
@@ -25,7 +25,7 @@ public class SubjectWidgetViewImpl implements SubjectWidgetView {
   Widget w;
 
   @Inject
-  public SubjectWidgetViewImpl(Binder binder) {
+  public TeamSubjectWidgetViewImpl(Binder binder) {
     this.w = binder.createAndBindUi(this);
     deleteButton.addClickHandler(
       new ClickHandler() {

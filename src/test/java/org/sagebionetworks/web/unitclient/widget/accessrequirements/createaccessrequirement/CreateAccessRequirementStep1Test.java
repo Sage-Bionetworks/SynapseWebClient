@@ -30,7 +30,7 @@ import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.SelfSignAccessRequirement;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.widget.accessrequirements.SubjectsWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.TeamSubjectsWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateAccessRequirementStep1;
 import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateAccessRequirementStep1View;
 import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateBasicAccessRequirementStep2;
@@ -70,7 +70,7 @@ public class CreateAccessRequirementStep1Test {
   RestrictableObjectDescriptor mockTeamRestrictableObjectDescriptor;
 
   @Mock
-  SubjectsWidget mockSubjectsWidget;
+  TeamSubjectsWidget mockTeamSubjectsWidget;
 
   @Captor
   ArgumentCaptor<AccessRequirement> arCaptor;
@@ -102,7 +102,7 @@ public class CreateAccessRequirementStep1Test {
         mockActStep2,
         mockTouStep2,
         mockSynapseClient,
-        mockSubjectsWidget
+        mockTeamSubjectsWidget
       );
     widget.setModalPresenter(mockModalPresenter);
     when(mockView.getTeamIds()).thenReturn(VIEW_TEAM_IDS);
@@ -132,7 +132,7 @@ public class CreateAccessRequirementStep1Test {
   @Test
   public void testConfigureWithEntityRod() {
     widget.configure(mockEntityRestrictableObjectDescriptor);
-    verify(mockSubjectsWidget).configure(listCaptor.capture());
+    verify(mockTeamSubjectsWidget).configure(listCaptor.capture());
     assertEquals(
       mockEntityRestrictableObjectDescriptor,
       listCaptor.getValue().get(0)
@@ -161,7 +161,7 @@ public class CreateAccessRequirementStep1Test {
   @Test
   public void testConfigureWithTeamRod() {
     widget.configure(mockTeamRestrictableObjectDescriptor);
-    verify(mockSubjectsWidget).configure(listCaptor.capture());
+    verify(mockTeamSubjectsWidget).configure(listCaptor.capture());
     assertEquals(
       mockTeamRestrictableObjectDescriptor,
       listCaptor.getValue().get(0)
@@ -260,33 +260,12 @@ public class CreateAccessRequirementStep1Test {
   }
 
   @Test
-  public void testGetSubjectIds() {
-    RestrictableObjectDescriptor mockSubject1 = mock(
-      RestrictableObjectDescriptor.class
-    );
-    RestrictableObjectDescriptor mockSubject2 = mock(
-      RestrictableObjectDescriptor.class
-    );
-    when(mockSubject1.getId()).thenReturn(VIEW_ENTITY_ID1);
-    when(mockSubject2.getId()).thenReturn(VIEW_ENTITY_ID2);
-    List<RestrictableObjectDescriptor> testList = new ArrayList<RestrictableObjectDescriptor>();
-    assertEquals("", widget.getSubjectIds(testList));
-    testList.add(mockSubject1);
-    assertEquals(VIEW_ENTITY_ID1, widget.getSubjectIds(testList));
-    testList.add(mockSubject2);
-    assertEquals(
-      VIEW_ENTITY_ID1 + ", " + VIEW_ENTITY_ID2,
-      widget.getSubjectIds(testList)
-    );
-  }
-
-  @Test
   public void testAddEntities() {
     RestrictableObjectDescriptor rod = new RestrictableObjectDescriptor();
     rod.setId(ROD_ENTITY_ID);
     rod.setType(RestrictableObjectType.ENTITY);
     widget.configure(rod);
-    verify(mockSubjectsWidget).configure(listCaptor.capture());
+    verify(mockTeamSubjectsWidget).configure(listCaptor.capture());
     assertEquals(rod, listCaptor.getValue().get(0));
 
     // now add 1 new ID, 1 duplicate of the new ID, and 1 duplicate of the ID that the widget was
@@ -297,7 +276,7 @@ public class CreateAccessRequirementStep1Test {
 
     widget.onAddEntities();
 
-    verify(mockSubjectsWidget, times(2)).configure(listCaptor.capture());
+    verify(mockTeamSubjectsWidget, times(2)).configure(listCaptor.capture());
     List<RestrictableObjectDescriptor> subjects = listCaptor.getValue();
     assertEquals(2, subjects.size());
     assertEquals(rod, subjects.get(0));
@@ -310,7 +289,7 @@ public class CreateAccessRequirementStep1Test {
     rod.setId(ROD_TEAM_ID);
     rod.setType(RestrictableObjectType.TEAM);
     widget.configure(rod);
-    verify(mockSubjectsWidget).configure(listCaptor.capture());
+    verify(mockTeamSubjectsWidget).configure(listCaptor.capture());
     assertEquals(rod, listCaptor.getValue().get(0));
 
     // now add 1 new ID, 1 duplicate of the new ID, and 1 duplicate of the ID that the widget was
@@ -321,7 +300,7 @@ public class CreateAccessRequirementStep1Test {
 
     widget.onAddTeams();
 
-    verify(mockSubjectsWidget, times(2)).configure(listCaptor.capture());
+    verify(mockTeamSubjectsWidget, times(2)).configure(listCaptor.capture());
     List<RestrictableObjectDescriptor> subjects = listCaptor.getValue();
     assertEquals(2, subjects.size());
     assertEquals(rod, subjects.get(0));

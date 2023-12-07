@@ -40,7 +40,8 @@ public class ACTAccessRequirementWidget
   PortalGinInjector ginInjector;
   CreateAccessRequirementButton createAccessRequirementButton;
   DeleteAccessRequirementButton deleteAccessRequirementButton;
-  SubjectsWidget subjectsWidget;
+  TeamSubjectsWidget teamSubjectsWidget;
+  EntitySubjectsWidget entitySubjectsWidget;
   String submissionId;
   LazyLoadHelper lazyLoadHelper;
   AuthenticationController authController;
@@ -55,7 +56,8 @@ public class ACTAccessRequirementWidget
     WikiPageWidget wikiPageWidget,
     SynapseAlert synAlert,
     PortalGinInjector ginInjector,
-    SubjectsWidget subjectsWidget,
+    TeamSubjectsWidget teamSubjectsWidget,
+    EntitySubjectsWidget entitySubjectsWidget,
     CreateAccessRequirementButton createAccessRequirementButton,
     DeleteAccessRequirementButton deleteAccessRequirementButton,
     DataAccessClientAsync dataAccessClient,
@@ -70,7 +72,8 @@ public class ACTAccessRequirementWidget
     this.synAlert = synAlert;
     this.wikiPageWidget = wikiPageWidget;
     this.ginInjector = ginInjector;
-    this.subjectsWidget = subjectsWidget;
+    this.teamSubjectsWidget = teamSubjectsWidget;
+    this.entitySubjectsWidget = entitySubjectsWidget;
     this.createAccessRequirementButton = createAccessRequirementButton;
     this.deleteAccessRequirementButton = deleteAccessRequirementButton;
     this.dataAccessClient = dataAccessClient;
@@ -85,7 +88,9 @@ public class ACTAccessRequirementWidget
     view.setWikiTermsWidget(wikiPageWidget.asWidget());
     view.setEditAccessRequirementWidget(createAccessRequirementButton);
     view.setDeleteAccessRequirementWidget(deleteAccessRequirementButton);
-    view.setSubjectsWidget(subjectsWidget);
+    view.setTeamSubjectsWidget(teamSubjectsWidget);
+    view.setEntitySubjectsWidget(entitySubjectsWidget);
+
     view.setSynAlert(synAlert);
     view.setManageAccessWidget(manageAccessButton);
     view.setConvertAccessRequirementWidget(convertACTAccessRequirementButton);
@@ -129,7 +134,8 @@ public class ACTAccessRequirementWidget
     );
     createAccessRequirementButton.configure(ar, refreshCallback);
     deleteAccessRequirementButton.configure(ar, refreshCallback);
-    subjectsWidget.configure(ar.getSubjectIds());
+    teamSubjectsWidget.configure(ar.getSubjectIds());
+    entitySubjectsWidget.configure(ar.getSubjectIds(), false, null);
     manageAccessButton.configure(ar);
     convertACTAccessRequirementButton.configure(ar, refreshCallback);
     view.setAccessRequirementName(ar.getName());

@@ -81,7 +81,10 @@ public class ACTDataAccessSubmissionsViewImpl
   CheckBox iduCheckbox;
 
   @UiField
-  Div subjectsContainer;
+  Div teamSubjectsContainer;
+
+  @UiField
+  Div entitySubjectsContainer;
 
   @UiField
   TextBox expirationPeriodTextbox;
@@ -241,9 +244,15 @@ public class ACTDataAccessSubmissionsViewImpl
   }
 
   @Override
-  public void setSubjectsWidget(IsWidget w) {
-    subjectsContainer.clear();
-    subjectsContainer.add(w);
+  public void setTeamSubjectsWidget(IsWidget w) {
+    teamSubjectsContainer.clear();
+    teamSubjectsContainer.add(w);
+  }
+
+  @Override
+  public void setEntitySubjectsWidget(IsWidget w) {
+    entitySubjectsContainer.clear();
+    entitySubjectsContainer.add(w);
   }
 
   @Override

@@ -14,26 +14,10 @@
     <bh:Div>
       <b:FormGroup>
         <b:FormLabel>Resources</b:FormLabel>
-        <bh:Div ui:field="subjectsContainer" />
-        <b:InputGroup ui:field="entityUI">
-          <b:TextBox
-            ui:field="entityIds"
-            placeholder="Enter Synapse IDs (i.e. 'syn123, syn456')"
-            autoComplete="false"
-          />
-          <b:InputGroupButton>
-            <b:Button
-              ui:field="synapseMultiIdButton"
-              text="Add Entities"
-              icon="PLUS"
-            />
-          </b:InputGroupButton>
-          <w:HelpWidget
-            helpMarkdown="Enter Synapse IDs (i.e. `syn123, syn456`)"
-            addStyleNames="margin-left-5 moveup-10"
-            placement="LEFT"
-          />
-        </b:InputGroup>
+        <bh:Div ui:field="teamSubjectsContainer" />
+        <bh:Div ui:field="entityUI">
+          <bh:Div ui:field="entitySubjectsContainer" />
+        </bh:Div>
         <b:InputGroup ui:field="teamUI">
           <b:TextBox
             ui:field="teamIds"

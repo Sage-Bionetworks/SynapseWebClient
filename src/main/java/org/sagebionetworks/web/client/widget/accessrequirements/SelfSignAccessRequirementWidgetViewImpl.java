@@ -52,7 +52,10 @@ public class SelfSignAccessRequirementWidgetViewImpl
   Div deleteAccessRequirementContainer;
 
   @UiField
-  Div subjectsWidgetContainer;
+  Div teamSubjectsWidgetContainer;
+
+  @UiField
+  Div entitySubjectsWidgetContainer;
 
   @UiField
   Div manageAccessContainer;
@@ -179,9 +182,15 @@ public class SelfSignAccessRequirementWidgetViewImpl
   }
 
   @Override
-  public void setSubjectsWidget(IsWidget w) {
-    subjectsWidgetContainer.clear();
-    subjectsWidgetContainer.add(w);
+  public void setTeamSubjectsWidget(IsWidget w) {
+    teamSubjectsWidgetContainer.clear();
+    teamSubjectsWidgetContainer.add(w);
+  }
+
+  @Override
+  public void setEntitySubjectsWidget(IsWidget entitySubjectsWidget) {
+    entitySubjectsWidgetContainer.clear();
+    entitySubjectsWidgetContainer.add(w);
   }
 
   @Override

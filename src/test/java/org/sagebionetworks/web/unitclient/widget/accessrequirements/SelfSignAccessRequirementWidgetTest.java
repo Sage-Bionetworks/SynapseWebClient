@@ -37,7 +37,7 @@ import org.sagebionetworks.web.client.widget.accessrequirements.DeleteAccessRequ
 import org.sagebionetworks.web.client.widget.accessrequirements.ReviewAccessorsButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.SelfSignAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.SelfSignAccessRequirementWidgetView;
-import org.sagebionetworks.web.client.widget.accessrequirements.SubjectsWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.TeamSubjectsWidget;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -78,7 +78,7 @@ public class SelfSignAccessRequirementWidgetTest {
   DeleteAccessRequirementButton mockDeleteAccessRequirementButton;
 
   @Mock
-  SubjectsWidget mockSubjectsWidget;
+  TeamSubjectsWidget mockTeamSubjectsWidget;
 
   @Mock
   List<RestrictableObjectDescriptor> mockSubjectIds;
@@ -134,7 +134,7 @@ public class SelfSignAccessRequirementWidgetTest {
         mockSynapseClient,
         mockWikiPageWidget,
         mockSynAlert,
-        mockSubjectsWidget,
+        mockTeamSubjectsWidget,
         mockCreateAccessRequirementButton,
         mockDeleteAccessRequirementButton,
         mockLazyLoadHelper,
