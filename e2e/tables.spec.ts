@@ -14,9 +14,8 @@ import {
 import {
   TableDataConfig,
   confirmTableDataDimensions,
-  enterTableDataRow,
+  enterTableData,
   enterTableValue,
-  expectTableColumnHeaders,
   expectTableDataCorrect,
   expectTableItemNumberCorrect,
   expectTablePageLoaded,
@@ -216,30 +215,12 @@ test.describe('Tables', () => {
     await test.step('User adds data to the table', async () => {
       await openTableEditor(userPage)
 
-      const tableRows = await getTableEditorRows(userPage)
+      await enterTableData(
+        userPage,
+        initialColumnsSchemaConfig,
+        initialTableData,
+      )
 
-      // skip initial empty column
-      await expectTableColumnHeaders(tableRows, initialColumnsSchemaConfig, 1)
-
-      await test.step('enter test data', async () => {
-        const addRowButton = userPage.getByRole('button', { name: 'Add Row' })
-        for (let index = 0; index < initialTableData.length; index++) {
-          await test.step(`enter test data: ${initialTableData[index].item}`, async () => {
-            await addRowButton.click()
-
-            // start from 1 so column headers in first row are skipped
-            const cells = tableRows.nth(index + 1).getByRole('cell')
-            await enterTableDataRow(
-              userPage,
-              cells,
-              initialColumnsSchemaConfig,
-              initialTableData[index],
-            )
-          })
-        }
-      })
-
-      const saveButton = userPage.getByRole('button', { name: 'Save' })
       await test.step('column type is enforced', async () => {
         const rowIndex = 2
         const columnIndex = initialColumnsSchemaConfig.findIndex(
@@ -248,6 +229,7 @@ test.describe('Tables', () => {
 
         const cell =
           await test.step('change value to the incorrect type', async () => {
+            const tableRows = await getTableEditorRows(userPage)
             const cell = tableRows
               .nth(rowIndex + 1) // shift down for column headers
               .getByRole('cell')
@@ -257,7 +239,7 @@ test.describe('Tables', () => {
           })
 
         await test.step('saving table triggers an error', async () => {
-          await saveButton.click()
+          await userPage.getByRole('button', { name: 'Save' }).click()
           await expect(cell).toHaveText('Value must be an integer.')
           await expect(
             userPage.getByText('See the error(s) above.'),
@@ -431,7 +413,9 @@ test.describe('Tables', () => {
           userPage.getByRole('heading', { name: 'Confirm Deletion' }),
         ).toBeVisible()
         await expect(
-          userPage.getByText('Are you sure you want to'),
+          userPage.getByText(
+            `Are you sure you want to delete Table "${tableName}"?`,
+          ),
         ).toBeVisible()
         await userPage.getByRole('button', { name: 'Delete' }).click()
         await dismissAlert(userPage, 'The Table was successfully deleted')

@@ -104,7 +104,7 @@ const enterColumnRestrictValues = async (
 
     await page.getByRole('button', { name: 'Paste new values' }).click()
     await page
-      .getByPlaceholder('Place comma or tab delimited')
+      .getByPlaceholder('Place comma or tab delimited values here')
       .fill(values.join(','))
     await page.getByRole('button', { name: 'Add', exact: true }).click()
     await page.getByRole('button', { name: 'OK' }).click()

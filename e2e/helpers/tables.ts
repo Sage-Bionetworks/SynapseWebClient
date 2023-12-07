@@ -66,7 +66,7 @@ export const getTableEditorRows = async (page: Page) => {
 }
 
 // Enter table rows ------------------------------------------------------------
-export const enterTableDataRow = async (
+const enterTableDataRow = async (
   page: Page,
   tableCells: Locator,
   columnsSchemaConfig: ColumnSchemaConfig[],
@@ -87,6 +87,35 @@ export const enterTableDataRow = async (
       await enterTableValue(cell, value)
     }
   }
+}
+
+export const enterTableData = async (
+  page: Page,
+  columnsSchemaConfig: ColumnSchemaConfig[],
+  tableData: TableDataConfig[],
+) => {
+  const tableRows = await getTableEditorRows(page)
+
+  // skip initial empty column
+  await expectTableColumnHeaders(tableRows, columnsSchemaConfig, 1)
+
+  await test.step('enter test data', async () => {
+    const addRowButton = page.getByRole('button', { name: 'Add Row' })
+    for (let index = 0; index < tableData.length; index++) {
+      await test.step(`enter test data: ${tableData[index].item}`, async () => {
+        await addRowButton.click()
+
+        // start from 1 so column headers in first row are skipped
+        const cells = tableRows.nth(index + 1).getByRole('cell')
+        await enterTableDataRow(
+          page,
+          cells,
+          columnsSchemaConfig,
+          tableData[index],
+        )
+      })
+    }
+  })
 }
 
 // Enter individual table cells ------------------------------------------------
@@ -189,7 +218,9 @@ export const enterTableListValues = async (
     await test.step('add values', async () => {
       await page.getByRole('button', { name: 'PASTE NEW VALUES' }).click()
       await page
-        .getByRole('textbox', { name: 'Paste comma or tab delimited' })
+        .getByRole('textbox', {
+          name: 'Paste comma or tab delimited values here.',
+        })
         .fill(Array.isArray(values) ? values.join(',') : values.toString())
       await page.getByRole('button', { name: 'ADD', exact: true }).click()
     })
@@ -212,6 +243,10 @@ export const saveTableDataChanges = async (page: Page) => {
 }
 
 // Validate table data ---------------------------------------------------------
+const getTableRows = async (page: Page) => {
+  return page.getByTestId('SynapseTable').getByRole('row')
+}
+
 export const expectTableColumnHeaders = async (
   tableRows: Locator,
   columnsSchemaConfig: ColumnSchemaConfig[],
@@ -296,13 +331,13 @@ const expectTableRowCorrect = async (
   })
 }
 
-export const expectTableRowsCorrect = async (
+export const expectTableDataCorrect = async (
   page: Page,
   columnsSchemaConfig: ColumnSchemaConfig[],
   tableData: TableDataConfig[],
 ) => {
-  await test.step('rows contain correct data', async () => {
-    const tableRows = page.getByTestId('SynapseTable').getByRole('row')
+  await test.step('confirm table data', async () => {
+    const tableRows = await getTableRows(page)
     await expectTableColumnHeaders(tableRows, columnsSchemaConfig, 0)
 
     for (let dataIndex = 0; dataIndex < tableData.length; dataIndex++) {
@@ -326,16 +361,6 @@ export const expectTableItemNumberCorrect = async (
         name: `Items (${tableData.length})`,
       }),
     ).toBeVisible()
-  })
-}
-
-export const expectTableDataCorrect = async (
-  page: Page,
-  columnsSchemaConfig: ColumnSchemaConfig[],
-  tableData: TableDataConfig[],
-) => {
-  await test.step('data is displayed', async () => {
-    await expectTableRowsCorrect(page, columnsSchemaConfig, tableData)
   })
 }
 
@@ -382,7 +407,7 @@ export const confirmTableDataDimensions = async (
   nCols: number,
 ) => {
   await test.step('confirm table dimensions', async () => {
-    const tableRows = page.getByTestId('SynapseTable').getByRole('row')
+    const tableRows = await getTableRows(page)
     await expect(
       tableRows.first().getByRole('cell'),
       `should have ${nCols} column(s)`,
