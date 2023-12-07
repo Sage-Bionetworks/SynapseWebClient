@@ -27,6 +27,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.accessrequirements.CreateAccessRequirementButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.DeleteAccessRequirementButton;
+import org.sagebionetworks.web.client.widget.accessrequirements.EntitySubjectsWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.ReviewAccessorsButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.TeamSubjectsWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.TermsOfUseAccessRequirementWidget;
@@ -77,6 +78,9 @@ public class TermsOfUseAccessRequirementWidgetTest {
   TeamSubjectsWidget mockTeamSubjectsWidget;
 
   @Mock
+  EntitySubjectsWidget mockEntitySubjectsWidget;
+
+  @Mock
   List<RestrictableObjectDescriptor> mockSubjectIds;
 
   @Mock
@@ -116,6 +120,7 @@ public class TermsOfUseAccessRequirementWidgetTest {
         mockWikiPageWidget,
         mockSynAlert,
         mockTeamSubjectsWidget,
+        mockEntitySubjectsWidget,
         mockCreateAccessRequirementButton,
         mockDeleteAccessRequirementButton,
         mockLazyLoadHelper,
@@ -162,6 +167,7 @@ public class TermsOfUseAccessRequirementWidgetTest {
     verify(mockDeleteAccessRequirementButton)
       .configure(mockTermsOfUseAccessRequirement, mockRefreshCallback);
     verify(mockTeamSubjectsWidget).configure(mockSubjectIds);
+    verify(mockEntitySubjectsWidget).configure(mockSubjectIds);
   }
 
   @Test

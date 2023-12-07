@@ -34,6 +34,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.accessrequirements.CreateAccessRequirementButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.DeleteAccessRequirementButton;
+import org.sagebionetworks.web.client.widget.accessrequirements.EntitySubjectsWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.ReviewAccessorsButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.SelfSignAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.SelfSignAccessRequirementWidgetView;
@@ -79,6 +80,9 @@ public class SelfSignAccessRequirementWidgetTest {
 
   @Mock
   TeamSubjectsWidget mockTeamSubjectsWidget;
+
+  @Mock
+  EntitySubjectsWidget mockEntitySubjectsWidget;
 
   @Mock
   List<RestrictableObjectDescriptor> mockSubjectIds;
@@ -135,6 +139,7 @@ public class SelfSignAccessRequirementWidgetTest {
         mockWikiPageWidget,
         mockSynAlert,
         mockTeamSubjectsWidget,
+        mockEntitySubjectsWidget,
         mockCreateAccessRequirementButton,
         mockDeleteAccessRequirementButton,
         mockLazyLoadHelper,
@@ -183,6 +188,8 @@ public class SelfSignAccessRequirementWidgetTest {
         eq(false),
         any(WikiPageWidget.Callback.class)
       );
+    verify(mockTeamSubjectsWidget).configure(mockSubjectIds);
+    verify(mockEntitySubjectsWidget).configure(mockSubjectIds);
   }
 
   @Test

@@ -5,7 +5,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -30,6 +30,8 @@ import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.SelfSignAccessRequirement;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.accessrequirements.EntitySubjectsWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.TeamSubjectsWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateAccessRequirementStep1;
 import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateAccessRequirementStep1View;
@@ -72,11 +74,17 @@ public class CreateAccessRequirementStep1Test {
   @Mock
   TeamSubjectsWidget mockTeamSubjectsWidget;
 
+  @Mock
+  EntitySubjectsWidget mockEntitySubjectsWidget;
+
   @Captor
   ArgumentCaptor<AccessRequirement> arCaptor;
 
   @Captor
   ArgumentCaptor<List> listCaptor;
+
+  @Captor
+  ArgumentCaptor<CallbackP<List<RestrictableObjectDescriptor>>> callbackPCaptor;
 
   public static final String VIEW_TEAM_ID1 = "5678";
   public static final String VIEW_TEAM_ID2 = "8765";
@@ -102,11 +110,11 @@ public class CreateAccessRequirementStep1Test {
         mockActStep2,
         mockTouStep2,
         mockSynapseClient,
-        mockTeamSubjectsWidget
+        mockTeamSubjectsWidget,
+        mockEntitySubjectsWidget
       );
     widget.setModalPresenter(mockModalPresenter);
     when(mockView.getTeamIds()).thenReturn(VIEW_TEAM_IDS);
-    when(mockView.getEntityIds()).thenReturn(VIEW_ENTITY_IDS);
     when(mockEntityRestrictableObjectDescriptor.getType())
       .thenReturn(RestrictableObjectType.ENTITY);
     when(mockEntityRestrictableObjectDescriptor.getId())
@@ -127,6 +135,7 @@ public class CreateAccessRequirementStep1Test {
       .thenReturn(new ArrayList<RestrictableObjectDescriptor>());
     when(mockTermsOfUseAccessRequirement.getSubjectIds())
       .thenReturn(new ArrayList<RestrictableObjectDescriptor>());
+    when(mockEntitySubjectsWidget.isEntityIDsTextboxEmpty()).thenReturn(true);
   }
 
   @Test
@@ -230,6 +239,30 @@ public class CreateAccessRequirementStep1Test {
   }
 
   @Test
+  public void testUnsavedEntityIDListChanges() {
+    when(mockEntitySubjectsWidget.isEntityIDsTextboxEmpty()).thenReturn(false);
+    when(mockACTAccessRequirement.getName()).thenReturn(NAME);
+    when(mockACTAccessRequirement.getSubjectIds())
+      .thenReturn(
+        Collections.singletonList(mockEntityRestrictableObjectDescriptor)
+      );
+
+    widget.configure(mockACTAccessRequirement);
+
+    widget.onPrimary();
+
+    verify(mockSynapseClient, never())
+      .createOrUpdateAccessRequirement(
+        eq(mockACTAccessRequirement),
+        any(AsyncCallback.class)
+      );
+    verify(mockModalPresenter)
+      .setErrorMessage(
+        CreateAccessRequirementStep1.UNSAVED_ENTITY_IDS_ERROR_MESSAGE
+      );
+  }
+
+  @Test
   public void testConfigureWithToUAccessRequirement() {
     when(mockTermsOfUseAccessRequirement.getSubjectIds())
       .thenReturn(
@@ -265,22 +298,22 @@ public class CreateAccessRequirementStep1Test {
     rod.setId(ROD_ENTITY_ID);
     rod.setType(RestrictableObjectType.ENTITY);
     widget.configure(rod);
-    verify(mockTeamSubjectsWidget).configure(listCaptor.capture());
+    verify(mockEntitySubjectsWidget)
+      .configure(listCaptor.capture(), callbackPCaptor.capture());
     assertEquals(rod, listCaptor.getValue().get(0));
 
     // now add 1 new ID, 1 duplicate of the new ID, and 1 duplicate of the ID that the widget was
     // configured with.
     String newID = "syn9292929292";
     String entityIds = ROD_ENTITY_ID + "," + newID + "," + newID;
-    when(mockView.getEntityIds()).thenReturn(entityIds);
+    CallbackP<List<RestrictableObjectDescriptor>> callbackP =
+      callbackPCaptor.getValue();
 
-    widget.onAddEntities();
+    List<RestrictableObjectDescriptor> newSubjects = new ArrayList<>();
+    newSubjects.add(mockEntityRestrictableObjectDescriptor);
+    callbackP.invoke(newSubjects);
 
-    verify(mockTeamSubjectsWidget, times(2)).configure(listCaptor.capture());
-    List<RestrictableObjectDescriptor> subjects = listCaptor.getValue();
-    assertEquals(2, subjects.size());
-    assertEquals(rod, subjects.get(0));
-    assertEquals(newID, subjects.get(1).getId());
+    assertEquals(newSubjects, widget.getSubjects());
   }
 
   @Test

@@ -32,6 +32,8 @@ public class CreateAccessRequirementStep1
 
   public static final String EMPTY_SUBJECT_LIST_ERROR_MESSAGE =
     "Please select at least one resource for this Access Requirement to be associated with.";
+  public static final String UNSAVED_ENTITY_IDS_ERROR_MESSAGE =
+    "Synapse IDs were specified but not added to the subjects list.  Please either clear out the Add Synapse IDs textbox or click the Add Entities button.";
   CreateAccessRequirementStep1View view;
   List<RestrictableObjectDescriptor> subjects;
   ModalPresenter modalPresenter;
@@ -146,9 +148,7 @@ public class CreateAccessRequirementStep1
       return;
     }
     if (!entitySubjectsWidget.isEntityIDsTextboxEmpty()) {
-      modalPresenter.setErrorMessage(
-        "Synapse IDs were specified but not added to the subjects list.  Please either clear out the Add Synapse IDs textbox or click the Add Entities button."
-      );
+      modalPresenter.setErrorMessage(UNSAVED_ENTITY_IDS_ERROR_MESSAGE);
       return;
     }
 
@@ -199,5 +199,13 @@ public class CreateAccessRequirementStep1
   public void setModalPresenter(ModalPresenter modalPresenter) {
     this.modalPresenter = modalPresenter;
     modalPresenter.setPrimaryButtonText(DisplayConstants.NEXT);
+  }
+
+  /**
+   * For testing purposes only
+   * @return
+   */
+  public List<RestrictableObjectDescriptor> getSubjects() {
+    return subjects;
   }
 }
