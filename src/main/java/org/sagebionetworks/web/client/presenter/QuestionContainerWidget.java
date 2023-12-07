@@ -44,7 +44,8 @@ public class QuestionContainerWidget
     MultichoiceResponse response
   ) {
     view.configure(questionNumber, question.getPrompt());
-    final MultichoiceQuestion multichoiceQuestion = (MultichoiceQuestion) question;
+    final MultichoiceQuestion multichoiceQuestion =
+      (MultichoiceQuestion) question;
     this.questionIndex = question.getQuestionIndex();
     this.questionPrompt = question.getPrompt();
     if (question instanceof MultichoiceQuestion) {
@@ -69,7 +70,10 @@ public class QuestionContainerWidget
         }
       }
       String helpLink = question.getDocLink();
-      if (DisplayUtils.isDefined(helpLink)) {
+      String helpText = question.getHelpText();
+      if (
+        DisplayUtils.isDefined(helpLink) || DisplayUtils.isDefined(helpText)
+      ) {
         view.setMoreInfoVisible(true);
         view.configureMoreInfo(helpLink, question.getHelpText());
       } else {
