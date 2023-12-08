@@ -33,7 +33,7 @@ public interface SelfSignAccessRequirementWidgetView
 
   void setDeleteAccessRequirementWidget(IsWidget w);
 
-  void setSubjectsWidget(IsWidget w);
+  void setTeamSubjectsWidget(IsWidget w);
 
   void setManageAccessWidget(IsWidget w);
 
@@ -54,4 +54,6 @@ public interface SelfSignAccessRequirementWidgetView
 
     void onValidateProfile();
   }
+
+  void setEntitySubjectsWidget(IsWidget entitySubjectsWidget);
 }

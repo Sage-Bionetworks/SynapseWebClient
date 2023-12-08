@@ -80,7 +80,10 @@ public class ManagedACTAccessRequirementWidgetViewImpl
   Div controlsContainer;
 
   @UiField
-  Div subjectsWidgetContainer;
+  Div teamSubjectsWidgetContainer;
+
+  @UiField
+  Div entitySubjectsWidgetContainer;
 
   @UiField
   Div synAlertContainer;
@@ -265,9 +268,15 @@ public class ManagedACTAccessRequirementWidgetViewImpl
   }
 
   @Override
-  public void setSubjectsWidget(IsWidget w) {
-    subjectsWidgetContainer.clear();
-    subjectsWidgetContainer.add(w);
+  public void setTeamSubjectsWidget(IsWidget w) {
+    teamSubjectsWidgetContainer.clear();
+    teamSubjectsWidgetContainer.add(w);
+  }
+
+  @Override
+  public void setEntitySubjectsWidget(IsWidget w) {
+    entitySubjectsWidgetContainer.clear();
+    entitySubjectsWidgetContainer.add(w);
   }
 
   @Override

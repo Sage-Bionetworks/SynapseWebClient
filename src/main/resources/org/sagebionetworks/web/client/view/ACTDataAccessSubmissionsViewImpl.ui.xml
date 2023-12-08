@@ -31,7 +31,8 @@
       size="H5"
       addStyleNames="margin-top-30 margin-left-35 margin-right-10"
     >
-      <bh:Div ui:field="subjectsContainer" />
+      <bh:Div ui:field="teamSubjectsContainer" />
+      <bh:Div ui:field="entitySubjectsContainer" />
     </b:Heading>
     <bh:Div ui:field="synAlertContainer" />
     <b:Panel

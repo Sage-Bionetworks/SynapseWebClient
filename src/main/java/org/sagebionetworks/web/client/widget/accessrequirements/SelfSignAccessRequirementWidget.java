@@ -44,7 +44,8 @@ public class SelfSignAccessRequirementWidget
   AuthenticationController authController;
   CreateAccessRequirementButton createAccessRequirementButton;
   DeleteAccessRequirementButton deleteAccessRequirementButton;
-  SubjectsWidget subjectsWidget;
+  TeamSubjectsWidget teamSubjectsWidget;
+  EntitySubjectsWidget entitySubjectsWidget;
   LazyLoadHelper lazyLoadHelper;
   PopupUtilsView popupUtils;
   ReviewAccessorsButton manageAccessButton;
@@ -60,7 +61,8 @@ public class SelfSignAccessRequirementWidget
     SynapseClientAsync synapseClient,
     WikiPageWidget wikiPageWidget,
     SynapseAlert synAlert,
-    SubjectsWidget subjectsWidget,
+    TeamSubjectsWidget teamSubjectsWidget,
+    EntitySubjectsWidget entitySubjectsWidget,
     CreateAccessRequirementButton createAccessRequirementButton,
     DeleteAccessRequirementButton deleteAccessRequirementButton,
     LazyLoadHelper lazyLoadHelper,
@@ -77,7 +79,8 @@ public class SelfSignAccessRequirementWidget
     this.synAlert = synAlert;
     this.wikiPageWidget = wikiPageWidget;
     this.authController = authController;
-    this.subjectsWidget = subjectsWidget;
+    this.teamSubjectsWidget = teamSubjectsWidget;
+    this.entitySubjectsWidget = entitySubjectsWidget;
     this.createAccessRequirementButton = createAccessRequirementButton;
     this.deleteAccessRequirementButton = deleteAccessRequirementButton;
     this.lazyLoadHelper = lazyLoadHelper;
@@ -90,7 +93,8 @@ public class SelfSignAccessRequirementWidget
     view.setWikiTermsWidget(wikiPageWidget.asWidget());
     view.setEditAccessRequirementWidget(createAccessRequirementButton);
     view.setDeleteAccessRequirementWidget(deleteAccessRequirementButton);
-    view.setSubjectsWidget(subjectsWidget);
+    view.setTeamSubjectsWidget(teamSubjectsWidget);
+    view.setEntitySubjectsWidget(entitySubjectsWidget);
     view.setManageAccessWidget(manageAccessButton);
     Callback loadDataCallback = new Callback() {
       @Override
@@ -133,7 +137,8 @@ public class SelfSignAccessRequirementWidget
     );
     createAccessRequirementButton.configure(ar, refreshCallback);
     deleteAccessRequirementButton.configure(ar, refreshCallback);
-    subjectsWidget.configure(ar.getSubjectIds());
+    teamSubjectsWidget.configure(ar.getSubjectIds());
+    entitySubjectsWidget.configure(ar.getSubjectIds());
     manageAccessButton.configure(ar);
     view.setAccessRequirementID(ar.getId().toString());
     isACTMemberAsyncHandler.isACTActionAvailable(isACT -> {
@@ -221,17 +226,18 @@ public class SelfSignAccessRequirementWidget
   public void onSignTerms() {
     // create the self-signed access approval, then update this object
     synAlert.clear();
-    AsyncCallback<AccessApproval> callback = new AsyncCallback<AccessApproval>() {
-      @Override
-      public void onFailure(Throwable t) {
-        synAlert.handleException(t);
-      }
+    AsyncCallback<AccessApproval> callback =
+      new AsyncCallback<AccessApproval>() {
+        @Override
+        public void onFailure(Throwable t) {
+          synAlert.handleException(t);
+        }
 
-      @Override
-      public void onSuccess(AccessApproval result) {
-        refreshCallback.invoke();
-      }
-    };
+        @Override
+        public void onSuccess(AccessApproval result) {
+          refreshCallback.invoke();
+        }
+      };
     AccessApproval approval = new AccessApproval();
     approval.setAccessorId(authController.getCurrentUserPrincipalId());
     approval.setRequirementId(ar.getId());

@@ -35,8 +35,9 @@ import org.sagebionetworks.web.client.view.ACTDataAccessSubmissionsView;
 import org.sagebionetworks.web.client.widget.Button;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
+import org.sagebionetworks.web.client.widget.accessrequirements.EntitySubjectsWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccessRequirementWidget;
-import org.sagebionetworks.web.client.widget.accessrequirements.SubjectsWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.TeamSubjectsWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.ACTDataAccessSubmissionWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
@@ -69,7 +70,8 @@ public class ACTDataAccessSubmissionsPresenter
   String nextPageToken;
   String accessorId;
   private ManagedACTAccessRequirement actAccessRequirement;
-  private SubjectsWidget subjectsWidget;
+  private TeamSubjectsWidget teamSubjectsWidget;
+  private EntitySubjectsWidget entitySubjectsWidget;
   DateTimeFormat dateFormat;
   Callback refreshCallback;
   SynapseSuggestBox accessorSuggestWidget;
@@ -86,7 +88,8 @@ public class ACTDataAccessSubmissionsPresenter
     final Button showHideAccessRequirementButton,
     FileHandleWidget ducTemplateFileHandleWidget,
     SynapseJavascriptClient jsClient,
-    SubjectsWidget subjectsWidget,
+    TeamSubjectsWidget teamSubjectsWidget,
+    EntitySubjectsWidget entitySubjectsWidget,
     GWTWrapper gwt,
     SynapseSuggestBox accessorSuggestWidget,
     UserGroupSuggestionProvider provider,
@@ -99,7 +102,8 @@ public class ACTDataAccessSubmissionsPresenter
     this.loadMoreContainer = loadMoreContainer;
     this.actAccessRequirementWidget = actAccessRequirementWidget;
     actAccessRequirementWidget.setReviewAccessRequestsVisible(false);
-    this.subjectsWidget = subjectsWidget;
+    this.teamSubjectsWidget = teamSubjectsWidget;
+    this.entitySubjectsWidget = entitySubjectsWidget;
     this.accessorSuggestWidget = accessorSuggestWidget;
     this.selectedAccessorUserBadge = selectedAccessorUserBadge;
     this.ducTemplateFileHandleWidget = ducTemplateFileHandleWidget;
@@ -139,7 +143,8 @@ public class ACTDataAccessSubmissionsPresenter
     view.setAccessRequirementWidget(actAccessRequirementWidget);
     view.setLoadMoreContainer(loadMoreContainer);
     view.setShowHideButton(showHideAccessRequirementButton);
-    view.setSubjectsWidget(subjectsWidget);
+    view.setTeamSubjectsWidget(teamSubjectsWidget);
+    view.setEntitySubjectsWidget(entitySubjectsWidget);
     view.setPresenter(this);
 
     loadMoreContainer.configure(
@@ -227,8 +232,12 @@ public class ACTDataAccessSubmissionsPresenter
                 actAccessRequirement,
                 refreshCallback
               );
-              subjectsWidget.configure(actAccessRequirement.getSubjectIds());
-
+              teamSubjectsWidget.configure(
+                actAccessRequirement.getSubjectIds()
+              );
+              entitySubjectsWidget.configure(
+                actAccessRequirement.getSubjectIds()
+              );
               loadData();
             } else {
               synAlert.showError(
@@ -283,7 +292,8 @@ public class ACTDataAccessSubmissionsPresenter
           nextPageToken = submissionPage.getNextPageToken();
           for (Submission submission : submissionPage.getResults()) {
             // create a new row for each data access submission.
-            ACTDataAccessSubmissionWidget w = ginInjector.getACTDataAccessSubmissionWidget();
+            ACTDataAccessSubmissionWidget w =
+              ginInjector.getACTDataAccessSubmissionWidget();
             w.configure(submission);
             w.setDucColumnVisible(actAccessRequirement.getIsDUCRequired());
             w.setIrbColumnVisible(

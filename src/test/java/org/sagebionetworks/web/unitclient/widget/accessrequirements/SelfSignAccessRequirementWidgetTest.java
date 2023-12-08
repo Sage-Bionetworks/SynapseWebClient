@@ -34,10 +34,11 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.accessrequirements.CreateAccessRequirementButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.DeleteAccessRequirementButton;
+import org.sagebionetworks.web.client.widget.accessrequirements.EntitySubjectsWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.ReviewAccessorsButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.SelfSignAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.SelfSignAccessRequirementWidgetView;
-import org.sagebionetworks.web.client.widget.accessrequirements.SubjectsWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.TeamSubjectsWidget;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -78,7 +79,10 @@ public class SelfSignAccessRequirementWidgetTest {
   DeleteAccessRequirementButton mockDeleteAccessRequirementButton;
 
   @Mock
-  SubjectsWidget mockSubjectsWidget;
+  TeamSubjectsWidget mockTeamSubjectsWidget;
+
+  @Mock
+  EntitySubjectsWidget mockEntitySubjectsWidget;
 
   @Mock
   List<RestrictableObjectDescriptor> mockSubjectIds;
@@ -134,7 +138,8 @@ public class SelfSignAccessRequirementWidgetTest {
         mockSynapseClient,
         mockWikiPageWidget,
         mockSynAlert,
-        mockSubjectsWidget,
+        mockTeamSubjectsWidget,
+        mockEntitySubjectsWidget,
         mockCreateAccessRequirementButton,
         mockDeleteAccessRequirementButton,
         mockLazyLoadHelper,
@@ -183,6 +188,8 @@ public class SelfSignAccessRequirementWidgetTest {
         eq(false),
         any(WikiPageWidget.Callback.class)
       );
+    verify(mockTeamSubjectsWidget).configure(mockSubjectIds);
+    verify(mockEntitySubjectsWidget).configure(mockSubjectIds);
   }
 
   @Test

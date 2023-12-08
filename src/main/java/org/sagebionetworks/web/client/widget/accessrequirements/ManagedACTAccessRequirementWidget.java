@@ -39,7 +39,8 @@ public class ManagedACTAccessRequirementWidget
   CreateAccessRequirementButton createAccessRequirementButton;
   DeleteAccessRequirementButton deleteAccessRequirementButton;
   IntendedDataUseReportButton iduReportButton;
-  SubjectsWidget subjectsWidget;
+  TeamSubjectsWidget teamSubjectsWidget;
+  EntitySubjectsWidget entitySubjectsWidget;
   ReviewAccessRequestsButton reviewAccessRequestsButton;
   String submissionId;
   LazyLoadHelper lazyLoadHelper;
@@ -57,7 +58,8 @@ public class ManagedACTAccessRequirementWidget
     WikiPageWidget wikiPageWidget,
     SynapseAlert synAlert,
     PortalGinInjector ginInjector,
-    SubjectsWidget subjectsWidget,
+    TeamSubjectsWidget teamSubjectsWidget,
+    EntitySubjectsWidget entitySubjectsWidget,
     CreateAccessRequirementButton createAccessRequirementButton,
     DeleteAccessRequirementButton deleteAccessRequirementButton,
     ReviewAccessRequestsButton reviewAccessRequestsButton,
@@ -75,7 +77,8 @@ public class ManagedACTAccessRequirementWidget
     this.synAlert = synAlert;
     this.wikiPageWidget = wikiPageWidget;
     this.ginInjector = ginInjector;
-    this.subjectsWidget = subjectsWidget;
+    this.teamSubjectsWidget = teamSubjectsWidget;
+    this.entitySubjectsWidget = entitySubjectsWidget;
     this.createAccessRequirementButton = createAccessRequirementButton;
     this.deleteAccessRequirementButton = deleteAccessRequirementButton;
     this.reviewAccessRequestsButton = reviewAccessRequestsButton;
@@ -96,7 +99,8 @@ public class ManagedACTAccessRequirementWidget
     view.setDeleteAccessRequirementWidget(deleteAccessRequirementButton);
     view.setReviewAccessRequestsWidget(reviewAccessRequestsButton);
     view.setManageAccessWidget(manageAccessButton);
-    view.setSubjectsWidget(subjectsWidget);
+    view.setTeamSubjectsWidget(teamSubjectsWidget);
+    view.setEntitySubjectsWidget(entitySubjectsWidget);
     view.setIDUReportButton(iduReportButton);
     view.setSynAlert(synAlert);
     Callback loadDataCallback = new Callback() {
@@ -145,7 +149,8 @@ public class ManagedACTAccessRequirementWidget
     iduReportButton.configure(ar);
     reviewAccessRequestsButton.configure(ar);
     manageAccessButton.configure(ar);
-    subjectsWidget.configure(ar.getSubjectIds());
+    teamSubjectsWidget.configure(ar.getSubjectIds());
+    entitySubjectsWidget.configure(ar.getSubjectIds());
     lazyLoadHelper.setIsConfigured();
     view.setAccessRequirementID(ar.getId().toString());
     isACTMemberAsyncHandler.isACTActionAvailable(isACT -> {
@@ -161,7 +166,8 @@ public class ManagedACTAccessRequirementWidget
   public void setDataAccessSubmissionStatus(
     ManagedACTAccessRequirementStatus status
   ) {
-    SubmissionStatus currentSubmissionStatus = status.getCurrentSubmissionStatus();
+    SubmissionStatus currentSubmissionStatus =
+      status.getCurrentSubmissionStatus();
     submissionId = currentSubmissionStatus.getSubmissionId();
     switch (currentSubmissionStatus.getState()) {
       case SUBMITTED:
@@ -237,7 +243,8 @@ public class ManagedACTAccessRequirementWidget
 
         @Override
         public void onSuccess(AccessRequirementStatus status) {
-          ManagedACTAccessRequirementStatus managedACTARStatus = (ManagedACTAccessRequirementStatus) status;
+          ManagedACTAccessRequirementStatus managedACTARStatus =
+            (ManagedACTAccessRequirementStatus) status;
           if (managedACTARStatus.getCurrentSubmissionStatus() == null) {
             if (status.getIsApproved()) {
               showApproved();

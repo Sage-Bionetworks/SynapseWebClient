@@ -35,7 +35,7 @@ public interface TermsOfUseAccessRequirementWidgetView
 
   void setDeleteAccessRequirementWidget(IsWidget w);
 
-  void setSubjectsWidget(IsWidget w);
+  void setTeamSubjectsWidget(IsWidget w);
 
   void setManageAccessWidget(IsWidget w);
 
@@ -52,4 +52,6 @@ public interface TermsOfUseAccessRequirementWidgetView
   public interface Presenter {
     void onSignTerms();
   }
+
+  void setEntitySubjectsWidget(IsWidget entitySubjectsWidget);
 }

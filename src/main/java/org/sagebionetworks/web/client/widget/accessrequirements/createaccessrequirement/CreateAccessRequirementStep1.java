@@ -6,7 +6,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
@@ -18,7 +17,8 @@ import org.sagebionetworks.repo.model.SelfSignAccessRequirement;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.accessrequirements.SubjectsWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.EntitySubjectsWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.TeamSubjectsWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
 
 /**
@@ -32,6 +32,8 @@ public class CreateAccessRequirementStep1
 
   public static final String EMPTY_SUBJECT_LIST_ERROR_MESSAGE =
     "Please select at least one resource for this Access Requirement to be associated with.";
+  public static final String UNSAVED_ENTITY_IDS_ERROR_MESSAGE =
+    "Synapse IDs were specified but not added to the subjects list.  Please either clear out the Add Synapse IDs textbox or click the Add Entities button.";
   CreateAccessRequirementStep1View view;
   List<RestrictableObjectDescriptor> subjects;
   ModalPresenter modalPresenter;
@@ -40,7 +42,8 @@ public class CreateAccessRequirementStep1
   ACCESS_TYPE currentAccessType;
   AccessRequirement accessRequirement;
   SynapseClientAsync synapseClient;
-  SubjectsWidget subjectsWidget;
+  TeamSubjectsWidget teamSubjectsWidget;
+  EntitySubjectsWidget entitySubjectsWidget;
 
   @Inject
   public CreateAccessRequirementStep1(
@@ -48,43 +51,29 @@ public class CreateAccessRequirementStep1
     CreateManagedACTAccessRequirementStep2 actStep2,
     CreateBasicAccessRequirementStep2 touStep2,
     SynapseClientAsync synapseClient,
-    SubjectsWidget subjectsWidget
+    TeamSubjectsWidget teamSubjectsWidget,
+    EntitySubjectsWidget entitySubjectsWidget
   ) {
     super();
     this.view = view;
     this.actStep2 = actStep2;
     this.basicStep2 = touStep2;
-    this.subjectsWidget = subjectsWidget;
+    this.teamSubjectsWidget = teamSubjectsWidget;
+    this.entitySubjectsWidget = entitySubjectsWidget;
     this.synapseClient = synapseClient;
     fixServiceEntryPoint(synapseClient);
-    view.setSubjects(subjectsWidget);
+    view.setTeamSubjects(teamSubjectsWidget);
+    view.setEntitySubjects(entitySubjectsWidget);
     view.setPresenter(this);
-    CallbackP<RestrictableObjectDescriptor> deleteSubjectCallback = new CallbackP<RestrictableObjectDescriptor>() {
-      @Override
-      public void invoke(RestrictableObjectDescriptor subject) {
-        subjects.remove(subject);
-        refreshSubjects();
-      }
-    };
-    subjectsWidget.setDeleteCallback(deleteSubjectCallback);
-  }
-
-  @Override
-  public void onAddEntities() {
-    currentAccessType = ACCESS_TYPE.DOWNLOAD;
-    String entityIds = view.getEntityIds();
-    String[] entities = entityIds.split("[,\\s]\\s*");
-    for (int i = 0; i < entities.length; i++) {
-      if (entities[i].trim().length() > 0) {
-        RestrictableObjectDescriptor newSubject = new RestrictableObjectDescriptor();
-        newSubject.setId(entities[i]);
-        newSubject.setType(RestrictableObjectType.ENTITY);
-        if (!subjects.contains(newSubject)) {
-          subjects.add(newSubject);
+    CallbackP<RestrictableObjectDescriptor> deleteSubjectCallback =
+      new CallbackP<RestrictableObjectDescriptor>() {
+        @Override
+        public void invoke(RestrictableObjectDescriptor subject) {
+          subjects.remove(subject);
+          refreshSubjects();
         }
-      }
-    }
-    refreshSubjects();
+      };
+    teamSubjectsWidget.setDeleteCallback(deleteSubjectCallback);
   }
 
   @Override
@@ -94,7 +83,8 @@ public class CreateAccessRequirementStep1
     String[] teams = teamIds.split("[,\\s]\\s*");
     for (int i = 0; i < teams.length; i++) {
       if (teams[i].trim().length() > 0) {
-        RestrictableObjectDescriptor newSubject = new RestrictableObjectDescriptor();
+        RestrictableObjectDescriptor newSubject =
+          new RestrictableObjectDescriptor();
         newSubject.setId(teams[i]);
         newSubject.setType(RestrictableObjectType.TEAM);
         if (!subjects.contains(newSubject)) {
@@ -112,7 +102,8 @@ public class CreateAccessRequirementStep1
   public void configure(RestrictableObjectDescriptor initialSubject) {
     accessRequirement = null;
     view.setAccessRequirementTypeSelectionVisible(true);
-    List<RestrictableObjectDescriptor> initialSubjects = new ArrayList<RestrictableObjectDescriptor>();
+    List<RestrictableObjectDescriptor> initialSubjects =
+      new ArrayList<RestrictableObjectDescriptor>();
     initialSubjects.add(initialSubject);
     setSubjects(initialSubjects);
   }
@@ -130,12 +121,18 @@ public class CreateAccessRequirementStep1
 
   private void setSubjects(List<RestrictableObjectDescriptor> initialSubjects) {
     subjects = initialSubjects;
-    subjectsWidget.configure(subjects);
+    teamSubjectsWidget.configure(subjects);
+    entitySubjectsWidget.configure(
+      subjects,
+      newSubjects -> {
+        subjects = newSubjects;
+      }
+    );
 
     if (subjects.size() > 0) {
       if (subjects.get(0).getType().equals(RestrictableObjectType.ENTITY)) {
         currentAccessType = ACCESS_TYPE.DOWNLOAD;
-        view.setEntityIdsString("");
+        view.showEntityUI();
       } else {
         currentAccessType = ACCESS_TYPE.PARTICIPATE;
         view.setTeamIdsString("");
@@ -143,23 +140,15 @@ public class CreateAccessRequirementStep1
     }
   }
 
-  public String getSubjectIds(List<RestrictableObjectDescriptor> subjects) {
-    StringBuilder sb = new StringBuilder();
-    for (Iterator iterator = subjects.iterator(); iterator.hasNext();) {
-      RestrictableObjectDescriptor subject = (RestrictableObjectDescriptor) iterator.next();
-      sb.append(subject.getId());
-      if (iterator.hasNext()) {
-        sb.append(", ");
-      }
-    }
-    return sb.toString();
-  }
-
   @Override
   public void onPrimary() {
     // SWC-3700: validate that subjects have been set
     if (subjects.size() == 0) {
       modalPresenter.setErrorMessage(EMPTY_SUBJECT_LIST_ERROR_MESSAGE);
+      return;
+    }
+    if (!entitySubjectsWidget.isEntityIDsTextboxEmpty()) {
+      modalPresenter.setErrorMessage(UNSAVED_ENTITY_IDS_ERROR_MESSAGE);
       return;
     }
 
@@ -176,7 +165,6 @@ public class CreateAccessRequirementStep1
     accessRequirement.setAccessType(currentAccessType);
     accessRequirement.setSubjectIds(subjects);
     accessRequirement.setName(view.getName());
-
     modalPresenter.setLoading(true);
     synapseClient.createOrUpdateAccessRequirement(
       accessRequirement,
@@ -211,5 +199,13 @@ public class CreateAccessRequirementStep1
   public void setModalPresenter(ModalPresenter modalPresenter) {
     this.modalPresenter = modalPresenter;
     modalPresenter.setPrimaryButtonText(DisplayConstants.NEXT);
+  }
+
+  /**
+   * For testing purposes only
+   * @return
+   */
+  public List<RestrictableObjectDescriptor> getSubjects() {
+    return subjects;
   }
 }

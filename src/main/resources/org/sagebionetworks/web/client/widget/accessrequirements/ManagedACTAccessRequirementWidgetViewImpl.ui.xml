@@ -63,10 +63,14 @@
 					and Compliance Team (ACT) to discuss at act@sagebase.org
         </bh:Text>
       </bh:Div>
+      <bh:Div
+        ui:field="entitySubjectsWidgetContainer"
+        addStyleNames="margin-left-5 margin-right-5"
+      />
       <bh:ClearFix />
       <bh:Div>
         <bh:Div
-          ui:field="subjectsWidgetContainer"
+          ui:field="teamSubjectsWidgetContainer"
           pull="LEFT"
           addStyleNames="margin-left-5 margin-right-5"
         />

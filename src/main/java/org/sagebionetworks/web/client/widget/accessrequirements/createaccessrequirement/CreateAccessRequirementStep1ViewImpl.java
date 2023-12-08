@@ -11,7 +11,6 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.InputGroup;
 import org.gwtbootstrap3.client.ui.Radio;
-import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 
@@ -24,13 +23,10 @@ public class CreateAccessRequirementStep1ViewImpl
   Widget widget;
 
   @UiField
-  Div subjectsContainer;
+  Div teamSubjectsContainer;
 
   @UiField
-  TextBox entityIds;
-
-  @UiField
-  Button synapseMultiIdButton;
+  Div entitySubjectsContainer;
 
   @UiField
   TextBox teamIds;
@@ -59,19 +55,11 @@ public class CreateAccessRequirementStep1ViewImpl
   InputGroup teamUI;
 
   @UiField
-  InputGroup entityUI;
+  Div entityUI;
 
   @Inject
   public CreateAccessRequirementStep1ViewImpl(Binder binder) {
     widget = binder.createAndBindUi(this);
-    synapseMultiIdButton.addClickHandler(
-      new ClickHandler() {
-        @Override
-        public void onClick(ClickEvent event) {
-          presenter.onAddEntities();
-        }
-      }
-    );
 
     teamMultiIdButton.addClickHandler(
       new ClickHandler() {
@@ -83,7 +71,8 @@ public class CreateAccessRequirementStep1ViewImpl
     );
   }
 
-  private void showEntityUI() {
+  @Override
+  public void showEntityUI() {
     entityUI.setVisible(true);
     teamUI.setVisible(false);
   }
@@ -99,14 +88,15 @@ public class CreateAccessRequirementStep1ViewImpl
   }
 
   @Override
-  public void setSubjects(IsWidget w) {
-    subjectsContainer.clear();
-    subjectsContainer.add(w);
+  public void setTeamSubjects(IsWidget w) {
+    teamSubjectsContainer.clear();
+    teamSubjectsContainer.add(w);
   }
 
   @Override
-  public String getEntityIds() {
-    return entityIds.getText();
+  public void setEntitySubjects(IsWidget w) {
+    entitySubjectsContainer.clear();
+    entitySubjectsContainer.add(w);
   }
 
   @Override
@@ -117,12 +107,6 @@ public class CreateAccessRequirementStep1ViewImpl
   @Override
   public void setName(String name) {
     nameField.setText(name);
-  }
-
-  @Override
-  public void setEntityIdsString(String ids) {
-    entityIds.setText(ids);
-    showEntityUI();
   }
 
   @Override

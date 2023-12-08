@@ -37,7 +37,8 @@ public interface ACTAccessRequirementWidgetView
 
   void setDeleteAccessRequirementWidget(IsWidget w);
 
-  void setSubjectsWidget(IsWidget w);
+  void setTeamSubjectsWidget(IsWidget w);
+  void setEntitySubjectsWidget(IsWidget w);
 
   void setVisible(boolean visible);
 

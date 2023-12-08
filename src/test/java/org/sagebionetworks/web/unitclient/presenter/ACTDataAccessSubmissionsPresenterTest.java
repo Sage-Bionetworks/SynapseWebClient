@@ -51,8 +51,9 @@ import org.sagebionetworks.web.client.view.ACTDataAccessSubmissionsView;
 import org.sagebionetworks.web.client.widget.Button;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
+import org.sagebionetworks.web.client.widget.accessrequirements.EntitySubjectsWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccessRequirementWidget;
-import org.sagebionetworks.web.client.widget.accessrequirements.SubjectsWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.TeamSubjectsWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.ACTDataAccessSubmissionWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
@@ -108,7 +109,10 @@ public class ACTDataAccessSubmissionsPresenterTest {
   ACTDataAccessSubmissionWidget mockACTDataAccessSubmissionWidget;
 
   @Mock
-  SubjectsWidget mockSubjectsWidget;
+  TeamSubjectsWidget mockTeamSubjectsWidget;
+
+  @Mock
+  EntitySubjectsWidget mockEntitySubjectsWidget;
 
   @Mock
   List<RestrictableObjectDescriptor> mockSubjects;
@@ -159,7 +163,8 @@ public class ACTDataAccessSubmissionsPresenterTest {
         mockButton,
         mockDucTemplateFileHandleWidget,
         mockJsClient,
-        mockSubjectsWidget,
+        mockTeamSubjectsWidget,
+        mockEntitySubjectsWidget,
         mockGWT,
         mockAccessorSuggestWidget,
         mockUserGroupSuggestionProvider,
@@ -246,7 +251,8 @@ public class ACTDataAccessSubmissionsPresenterTest {
     );
     assertEquals(AR_ID, fha.getAssociateObjectId());
     assertEquals(FILE_HANDLE_ID, fha.getFileHandleId());
-    verify(mockSubjectsWidget).configure(mockSubjects);
+    verify(mockTeamSubjectsWidget).configure(mockSubjects);
+    verify(mockEntitySubjectsWidget).configure(mockSubjects);
     verify(mockView).setAreOtherAttachmentsRequired(true);
     verify(mockView).setExpirationPeriod(EXPIRATION_PERIOD);
     verify(mockView).setIsCertifiedUserRequired(true);

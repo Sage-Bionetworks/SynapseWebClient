@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement;
 
 import com.google.gwt.user.client.ui.IsWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.EntitySubjectsWidget;
 
 /**
  * View shows the first step of the wizard
@@ -9,7 +10,7 @@ import com.google.gwt.user.client.ui.IsWidget;
  *
  */
 public interface CreateAccessRequirementStep1View extends IsWidget {
-  void setSubjects(IsWidget w);
+  void setTeamSubjects(IsWidget w);
 
   boolean isManagedACTAccessRequirementType();
 
@@ -18,10 +19,6 @@ public interface CreateAccessRequirementStep1View extends IsWidget {
   boolean isTermsOfUseAccessRequirementType();
 
   void setPresenter(Presenter p);
-
-  String getEntityIds();
-
-  void setEntityIdsString(String ids);
 
   String getTeamIds();
 
@@ -36,8 +33,10 @@ public interface CreateAccessRequirementStep1View extends IsWidget {
    * Presenter interface
    */
   public interface Presenter {
-    void onAddEntities();
-
     void onAddTeams();
   }
+
+  void setEntitySubjects(IsWidget entitySubjectsWidget);
+
+  void showEntityUI();
 }

@@ -146,14 +146,16 @@ import org.sagebionetworks.web.client.widget.RadioWidget;
 import org.sagebionetworks.web.client.widget.RadioWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidgetView;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.accessrequirements.EntitySubjectsWidgetView;
+import org.sagebionetworks.web.client.widget.accessrequirements.EntitySubjectsWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.accessrequirements.LockAccessRequirementWidgetView;
 import org.sagebionetworks.web.client.widget.accessrequirements.LockAccessRequirementWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccessRequirementWidgetView;
 import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccessRequirementWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.accessrequirements.SelfSignAccessRequirementWidgetView;
 import org.sagebionetworks.web.client.widget.accessrequirements.SelfSignAccessRequirementWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.accessrequirements.SubjectWidgetView;
-import org.sagebionetworks.web.client.widget.accessrequirements.SubjectWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.accessrequirements.TeamSubjectWidgetView;
+import org.sagebionetworks.web.client.widget.accessrequirements.TeamSubjectWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.accessrequirements.TermsOfUseAccessRequirementWidgetView;
 import org.sagebionetworks.web.client.widget.accessrequirements.TermsOfUseAccessRequirementWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.accessrequirements.approval.AccessorGroupView;
@@ -1558,7 +1560,8 @@ public class PortalGinModule extends AbstractGinModule {
     bind(AccessorGroupView.class).to(AccessorGroupViewImpl.class);
     bind(SelfSignAccessRequirementWidgetView.class)
       .to(SelfSignAccessRequirementWidgetViewImpl.class);
-    bind(SubjectWidgetView.class).to(SubjectWidgetViewImpl.class);
+    bind(TeamSubjectWidgetView.class).to(TeamSubjectWidgetViewImpl.class);
+    bind(EntitySubjectsWidgetView.class).to(EntitySubjectsWidgetViewImpl.class);
     bind(AwsLoginView.class).to(AwsLoginViewImpl.class);
     bind(UserListRowWidgetView.class).to(UserListRowWidgetViewImpl.class);
     bind(UserListView.class).to(UserListViewImpl.class);
