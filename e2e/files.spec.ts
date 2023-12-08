@@ -170,7 +170,7 @@ const dismissFileUploadAlert = async (page: Page) => {
 const getFileMD5 = async (page: Page) => {
   return await testAuth.step('get file MD5', async () => {
     const row = page.getByRole('row').filter({ hasText: 'MD5' })
-    expect(row.getByRole('cell')).toHaveCount(2)
+    await expect(row.getByRole('cell')).toHaveCount(2)
     return row.getByRole('cell').filter({ hasNotText: 'MD5' }).textContent()
   })
 }

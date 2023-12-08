@@ -31,7 +31,7 @@ const enterColumnName = async (
 ) => {
   await test.step('enter column name', async () => {
     const columnNameFields = page.getByPlaceholder('Column name')
-    expect(columnNameFields).toHaveCount(columnIndex + 1)
+    await expect(columnNameFields).toHaveCount(columnIndex + 1)
     await columnNameFields.nth(columnIndex).fill(columnName)
   })
 }

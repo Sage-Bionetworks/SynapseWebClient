@@ -195,7 +195,7 @@ export const dismissAlert = async (page: Page, alertText: string) => {
   const alert = page.getByRole('alert').filter({ hasText: alertText })
   // allow extra time for alert to appear
   // ...to handle alerts triggered by potentially slow network requests, e.g. create file
-  expect(alert).toBeVisible({ timeout: defaultExpectTimeout * 3 })
+  await expect(alert).toBeVisible({ timeout: defaultExpectTimeout * 3 })
   await alert.getByRole('button', { name: 'Close' }).click()
   await expect(alert).not.toBeVisible()
 }
