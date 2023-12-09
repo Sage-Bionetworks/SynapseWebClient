@@ -44,6 +44,13 @@ jobs:
     env:
       CONTAINER_NAME: 'swc-tomcat'
       CI: true
+      DESTINATION_BUCKET: e2e-reports-bucket-bucket-1p1qz6p48t4uy
+      REPORT_ID: ${{ github.event.repository.name }}-${{ github.run_id }}-${{ github.run_attempt }}
+      IS_SAGE_REPO: ${{ github.repository_owner == 'Sage-Bionetworks' }}
+    # Allow OIDC Integration (so we can assume the AWS role to deploy)
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - uses: actions/checkout@v3
       - name: Setup docker (missing on MacOS)
@@ -75,10 +82,23 @@ jobs:
       - name: Run Playwright tests
         env:
           ADMIN_PAT: ${{ secrets.ADMIN_PAT }}
-        run: yarn playwright test --shard ${{ matrix.shard }}
+          TRACE_TOGGLE: ${{ env.IS_SAGE_REPO && 'on' || 'off'}}
+        run: yarn playwright test --shard ${{ matrix.shard }} --trace=${{ env.TRACE_TOGGLE }}
+      - name: Assume AWS Role
+        uses: aws-actions/configure-aws-credentials@v2
+        if: ${{ env.IS_SAGE_REPO }}
+        with:
+          aws-region: us-east-1
+          role-to-assume: arn:aws:iam::449435941126:role/sagebase-github-oidc-synapsedev-e2e-infra
+          role-session-name: GitHubActions-${{ github.repository_owner }}-${{ github.event.repository.name }}-${{ github.run_id }}
+          role-duration-seconds: 1200
+      - name: Upload blob report to S3
+        if: ${{ env.IS_SAGE_REPO }}
+        run: |
+          aws s3 sync ./blob-report --region us-east-1 s3://${{ env.DESTINATION_BUCKET }}/${{ env.REPORT_ID }}/
       - name: Upload blob report to GitHub Actions Artifacts
         uses: actions/upload-artifact@v3
-        if: always()
+        if: ${{ !env.IS_SAGE_REPO && always() }}
         with:
           name: ${{ env.PW_ALL_BLOBS_DIR }}
           path: blob-report
@@ -92,7 +112,7 @@ jobs:
   merge-reports:
     # Merge reports after playwright-tests, even if some shards have failed
     # But skip this job if the previous job was cancelled or skipped
-    if: ${{ !cancelled() && needs.playwright-tests.result != 'skipped' }}
+    if: ${{ github.repository_owner != 'Sage-Bionetworks' && !cancelled() && needs.playwright-tests.result != 'skipped' }}
     needs: [playwright-tests]
     runs-on: ubuntu-latest
     steps:
