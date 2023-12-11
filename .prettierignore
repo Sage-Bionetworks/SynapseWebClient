@@ -49,5 +49,6 @@ src/main/webapp/fonts/*
 # If using jenv for JDK management
 /.java-version
 
-# Ignore e2e mock data files
+# Ignore e2e mock data files and scripts
 /e2e/data/*.csv
+/e2e_workflow/*.sh

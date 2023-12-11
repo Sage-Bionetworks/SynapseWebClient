@@ -30,7 +30,26 @@ Notes:
 
 ### CI
 
+#### Forked Repositories
+
 In your forked repository, ensure that [Actions are enabled](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository), then create [an Actions secret](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository) for `ADMIN_PAT`. The tests will run on each push to your forked repository.
+
+#### Sage Repository
+
+In the Sage-Bionetworks repository, the tests will run on push to `develop` and `release-**` branches. The Playwright blob report from each shard will be saved in the `s3://e2e-reports-bucket-bucket-1p1qz6p48t4uy` S3 bucket. Each report will be named as `report-{ shard-number }.zip` and be located within a subdirectory named `SynapseWebClient-${ github-run-id }-${ run-attempt-number }`.
+
+The bucket is accessible using the `org-sagebase-synapsedev` account. The AWS console or CLI can be used to view the reports:
+
+- AWS console
+  - Download the shard reports locally.
+  - Move the files into the `blob-report` directory in SWC.
+  - Run `yarn e2e:report:blob` to merge the shard reports and open the resulting HTML report in the browser.
+- AWS CLI
+  - Install [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html), if necessary.
+  - Configure access credentials for AWS CLI SSO.
+  - Run `e2e_workflow/view_s3_report.sh` with the following arguments: AWS SSO profile name, the GitHub run ID of the report to view, and optionally, the run attempt number.
+
+_Note_: reports are saved to S3 so reports can include traces, which can contain credentials for the backend dev stack. Reports including traces can't be saved as GitHub artifacts, since artifacts in public repositories are publically accessible.
 
 ## Writing Tests
 
