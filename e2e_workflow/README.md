@@ -17,7 +17,9 @@ Notes:
 - Test user creation:
   - The test suite will create a new test user with randomly generated username / password on the backend dev stack for tests that require an authenticated test user. The user will be deleted after the tests finish running.
   - However, test users can only be deleted if all associated objects have also been deleted. If a test creates an entity in the user account but fails to clean up the entity, the test user won't be deleted and will clutter the dev stack. After a failed test run, persistent entities and test user accounts can be cleaned up more easily if user credentials are known.
+  - _Note_: All objects that are visible in the UI should be cleaned up. A best effort should be made to clean up test users. However, test users that have created a table will not be deleted, due to [this bug](https://sagebionetworks.jira.com/browse/PLFM-8179). We have decided it is acceptable to leave test users on the dev stack if unable to fully delete all associated objects.
 - Writing new tests:
+  - Review a simliar [backend integration test](https://github.com/Sage-Bionetworks/Synapse-Repository-Services/tree/develop/integration-test/src/test/java/org/sagebionetworks) for the order in which to clean up associated objects.
   - Create static test users with known username and password, so that issues can be debugged by logging into the user accounts. See comments in `e2e/helpers/userConfig.ts`.
   - Start by running the new test against one browser with one worker, trace on, and no retries: `yarn e2e --project=firefox --workers=1 --retries=0 --trace=on e2e/{new_test}.spec.ts`.
   - Before pushing changes to CI, run tests with the same configuration as CI by adding `CI=true` to the `.env` file.
@@ -28,7 +30,7 @@ Notes:
 
 ### CI
 
-In your forked repository, create [an Actions secret](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository) for `ADMIN_PAT`. The tests will run on each push to your forked repository.
+In your forked repository, ensure that [Actions are enabled](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository), then create [an Actions secret](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository) for `ADMIN_PAT`. The tests will run on each push to your forked repository.
 
 ## Writing Tests
 

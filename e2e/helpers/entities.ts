@@ -4,7 +4,9 @@ import { BackendDestinationEnum, doDelete, doGet } from './http'
 import { FileHandle, FileType, FileUploadComplete } from './types'
 import { waitForSrcEndpointConfig } from './utils'
 
-export function generateEntityName(entityType: 'project' | 'folder' | 'file') {
+export function generateEntityName(
+  entityType: 'project' | 'folder' | 'file' | 'table',
+) {
   return `swc-e2e-${entityType}-entity-${uuidv4()}`
 }
 

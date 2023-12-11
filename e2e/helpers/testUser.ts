@@ -195,7 +195,7 @@ export const dismissAlert = async (page: Page, alertText: string) => {
   const alert = page.getByRole('alert').filter({ hasText: alertText })
   // allow extra time for alert to appear
   // ...to handle alerts triggered by potentially slow network requests, e.g. create file
-  expect(alert).toBeVisible({ timeout: defaultExpectTimeout * 3 })
+  await expect(alert).toBeVisible({ timeout: defaultExpectTimeout * 3 })
   await alert.getByRole('button', { name: 'Close' }).click()
   await expect(alert).not.toBeVisible()
 }
@@ -254,5 +254,23 @@ export const expectDiscussionThreadLoaded = async (
     const discussionThread = page.locator('.discussionThread:visible')
     await expect(discussionThread.getByText(threadTitle)).toBeVisible()
     await expect(discussionThread.getByText(threadBody)).toBeVisible()
+  })
+}
+
+export const toggleIntoExperimentalMode = async (page: Page) => {
+  await test.step('toggle into experimental mode', async () => {
+    await expect(
+      page.getByRole('link', { name: 'Experimental Mode Off' }),
+    ).toBeVisible()
+
+    await page.getByRole('link', { name: 'Experimental Mode' }).click()
+    await expect(
+      page.getByRole('heading', { name: 'Experimental Mode' }),
+    ).toBeVisible()
+    await page.getByRole('button', { name: 'OK' }).click()
+
+    await expect(
+      page.getByRole('link', { name: 'Experimental Mode On' }),
+    ).toBeVisible()
   })
 }
