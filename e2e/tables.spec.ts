@@ -276,6 +276,13 @@ test.describe('Tables', () => {
         })
 
       await test.step('add new columns', async () => {
+        // wait for previously entered column schemas to appear
+        // ...so addColumnsFromColumnSchemaConfig calculates correct starting column index
+        await expect(
+          userPage.getByPlaceholder('Column name'),
+          'should load previously entered column schemas',
+        ).toHaveCount(initialColumnsSchemaConfig.length)
+
         await addColumnsFromColumnSchemaConfig(
           userPage,
           updatedColumnsSchemaConfig,
