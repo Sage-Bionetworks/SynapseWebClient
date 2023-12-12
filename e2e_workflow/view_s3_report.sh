@@ -1,6 +1,7 @@
 #!/bin/bash
-#   View Playwright report stored in S3
-#     ./view_s3_report.sh [aws-sso-profile-name] [github-run-id] [optional-run-attempt-number]
+
+# View Playwright report stored in S3
+#   ./view_s3_report.sh [aws-sso-profile-name] [github-run-id] [optional-run-attempt-number]
 #
 
 # Abort script on errors and unbound variables
