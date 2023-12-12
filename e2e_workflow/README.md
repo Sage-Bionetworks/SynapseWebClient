@@ -45,6 +45,7 @@ The GitHub UI or CLI can be used to view the reports:
   - Run `yarn e2e:report` to view the HTML report in the browser.
 - GitHub CLI
   - Install [GitHub CLI](https://cli.github.com/), if necessary.
+  - Install [jq](https://jqlang.github.io/jq/download/), if necessary.
   - [Authenticate](https://cli.github.com/manual/gh_auth_login) with a GitHub host, if necessary.
   - Run `e2e_workflow/view_github_report.sh` with the following arguments: GitHub repo owner name and the GitHub run ID of the report to view. The HTML report will open in the browser.
 
