@@ -40,7 +40,7 @@ The GitHub UI or CLI can be used to view the reports:
 
 - GitHub UI
   - Navigate to the Action run summary page.
-  - Download the report named "html-report--atttempt-{number}". _Note:_ only the report from the latest attempt will be available.
+  - Download the report named "html-report--attempt-{number}". _Note:_ only the report from the latest attempt will be available.
   - Unzip the file and move the "index.html" file into the `playwright-report` directory in SWC.
   - Run `yarn e2e:report` to view the HTML report in the browser.
 - GitHub CLI
