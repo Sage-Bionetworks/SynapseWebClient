@@ -63,6 +63,12 @@ jobs:
         with:
           name: ${{ env.BUILD_ARTIFACT_NAME }}
           path: ${{ env.BUILD_DIR }}
+      - name: Confirm build downloaded
+        run: |
+          if [ ! -f "/$(pwd)/${{ env.BUILD_DIR }}/${{ env.BUILD_NAME }}" ]; then
+            echo "::error ::downloaded WAR not found"
+            exit 1
+          fi
       - name: Run SWC on Tomcat
         run: |
           docker run \
@@ -85,7 +91,7 @@ jobs:
           TRACE_TOGGLE: ${{ github.repository_owner == 'Sage-Bionetworks' && 'on' || 'off'}}
         run: yarn playwright test --shard ${{ matrix.shard }} --trace=${{ env.TRACE_TOGGLE }}
       - name: Assume AWS Role
-        if: github.repository_owner == 'Sage-Bionetworks'
+        if: ${{ github.repository_owner == 'Sage-Bionetworks' && always() }}
         uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-region: us-east-1
@@ -93,7 +99,7 @@ jobs:
           role-session-name: GitHubActions-${{ github.repository_owner }}-${{ github.event.repository.name }}-${{ github.run_id }}
           role-duration-seconds: 1200
       - name: Upload blob report to S3
-        if: github.repository_owner == 'Sage-Bionetworks'
+        if: ${{ github.repository_owner == 'Sage-Bionetworks' && always() }}
         run: |
           aws s3 sync ./blob-report --region us-east-1 s3://${{ env.DESTINATION_BUCKET }}/${{ env.REPORT_ID }}/
       - name: Upload blob report to GitHub Actions Artifacts
