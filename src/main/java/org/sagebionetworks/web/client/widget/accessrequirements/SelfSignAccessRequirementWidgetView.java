@@ -55,5 +55,11 @@ public interface SelfSignAccessRequirementWidgetView
     void onValidateProfile();
   }
 
+  void setCoveredEntitiesHeadingVisible(boolean visible);
+
   void setEntitySubjectsWidget(IsWidget entitySubjectsWidget);
+
+  void setAccessRequirementRelatedProjectsList(
+    IsWidget accessRequirementRelatedProjectsList
+  );
 }

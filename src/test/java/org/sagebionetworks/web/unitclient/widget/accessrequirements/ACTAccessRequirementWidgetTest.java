@@ -38,6 +38,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidgetView;
+import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequirementRelatedProjectsList;
 import org.sagebionetworks.web.client.widget.accessrequirements.ConvertACTAccessRequirementButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.CreateAccessRequirementButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.DeleteAccessRequirementButton;
@@ -100,6 +101,9 @@ public class ACTAccessRequirementWidgetTest {
   EntitySubjectsWidget mockEntitySubjectsWidget;
 
   @Mock
+  AccessRequirementRelatedProjectsList mockAccessRequirementRelatedProjectsList;
+
+  @Mock
   LazyLoadHelper mockLazyLoadHelper;
 
   @Mock
@@ -153,6 +157,7 @@ public class ACTAccessRequirementWidgetTest {
         mockGinInjector,
         mockTeamSubjectsWidget,
         mockEntitySubjectsWidget,
+        mockAccessRequirementRelatedProjectsList,
         mockCreateAccessRequirementButton,
         mockDeleteAccessRequirementButton,
         mockDataAccessClient,

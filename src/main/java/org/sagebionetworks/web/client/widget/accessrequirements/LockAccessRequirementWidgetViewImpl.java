@@ -19,6 +19,9 @@ public class LockAccessRequirementWidgetViewImpl
   @UiField
   Div entitySubjectsWidgetContainer;
 
+  @UiField
+  Div accessRequirementRelatedProjectsListContainer;
+
   public interface Binder
     extends UiBinder<Widget, LockAccessRequirementWidgetViewImpl> {}
 
@@ -55,5 +58,11 @@ public class LockAccessRequirementWidgetViewImpl
   public void setEntitySubjectsWidget(IsWidget entitySubjectsWidget) {
     entitySubjectsWidgetContainer.clear();
     entitySubjectsWidgetContainer.add(w);
+  }
+
+  @Override
+  public void setAccessRequirementRelatedProjectsList(IsWidget w) {
+    accessRequirementRelatedProjectsListContainer.clear();
+    accessRequirementRelatedProjectsListContainer.add(w);
   }
 }

@@ -46,6 +46,7 @@ public class SelfSignAccessRequirementWidget
   DeleteAccessRequirementButton deleteAccessRequirementButton;
   TeamSubjectsWidget teamSubjectsWidget;
   EntitySubjectsWidget entitySubjectsWidget;
+  AccessRequirementRelatedProjectsList accessRequirementRelatedProjectsList;
   LazyLoadHelper lazyLoadHelper;
   PopupUtilsView popupUtils;
   ReviewAccessorsButton manageAccessButton;
@@ -63,6 +64,7 @@ public class SelfSignAccessRequirementWidget
     SynapseAlert synAlert,
     TeamSubjectsWidget teamSubjectsWidget,
     EntitySubjectsWidget entitySubjectsWidget,
+    AccessRequirementRelatedProjectsList accessRequirementRelatedProjectsList,
     CreateAccessRequirementButton createAccessRequirementButton,
     DeleteAccessRequirementButton deleteAccessRequirementButton,
     LazyLoadHelper lazyLoadHelper,
@@ -81,6 +83,8 @@ public class SelfSignAccessRequirementWidget
     this.authController = authController;
     this.teamSubjectsWidget = teamSubjectsWidget;
     this.entitySubjectsWidget = entitySubjectsWidget;
+    this.accessRequirementRelatedProjectsList =
+      accessRequirementRelatedProjectsList;
     this.createAccessRequirementButton = createAccessRequirementButton;
     this.deleteAccessRequirementButton = deleteAccessRequirementButton;
     this.lazyLoadHelper = lazyLoadHelper;
@@ -95,6 +99,9 @@ public class SelfSignAccessRequirementWidget
     view.setDeleteAccessRequirementWidget(deleteAccessRequirementButton);
     view.setTeamSubjectsWidget(teamSubjectsWidget);
     view.setEntitySubjectsWidget(entitySubjectsWidget);
+    view.setAccessRequirementRelatedProjectsList(
+      accessRequirementRelatedProjectsList
+    );
     view.setManageAccessWidget(manageAccessButton);
     Callback loadDataCallback = new Callback() {
       @Override
@@ -139,10 +146,12 @@ public class SelfSignAccessRequirementWidget
     deleteAccessRequirementButton.configure(ar, refreshCallback);
     teamSubjectsWidget.configure(ar.getSubjectIds());
     entitySubjectsWidget.configure(ar.getSubjectIds());
+    accessRequirementRelatedProjectsList.configure(ar.getId().toString());
     manageAccessButton.configure(ar);
     view.setAccessRequirementID(ar.getId().toString());
     isACTMemberAsyncHandler.isACTActionAvailable(isACT -> {
       view.setAccessRequirementIDVisible(isACT);
+      view.setCoveredEntitiesHeadingVisible(isACT);
     });
     lazyLoadHelper.setIsConfigured();
   }

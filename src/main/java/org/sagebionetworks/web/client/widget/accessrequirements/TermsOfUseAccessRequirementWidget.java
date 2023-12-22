@@ -37,6 +37,7 @@ public class TermsOfUseAccessRequirementWidget
   DeleteAccessRequirementButton deleteAccessRequirementButton;
   TeamSubjectsWidget teamSubjectsWidget;
   EntitySubjectsWidget entitySubjectsWidget;
+  AccessRequirementRelatedProjectsList accessRequirementRelatedProjectsList;
   LazyLoadHelper lazyLoadHelper;
   Callback refreshCallback;
   ReviewAccessorsButton manageAccessButton;
@@ -53,6 +54,7 @@ public class TermsOfUseAccessRequirementWidget
     SynapseAlert synAlert,
     TeamSubjectsWidget teamSubjectsWidget,
     EntitySubjectsWidget entitySubjectsWidget,
+    AccessRequirementRelatedProjectsList accessRequirementRelatedProjectsList,
     CreateAccessRequirementButton createAccessRequirementButton,
     DeleteAccessRequirementButton deleteAccessRequirementButton,
     LazyLoadHelper lazyLoadHelper,
@@ -70,6 +72,8 @@ public class TermsOfUseAccessRequirementWidget
     this.authController = authController;
     this.teamSubjectsWidget = teamSubjectsWidget;
     this.entitySubjectsWidget = entitySubjectsWidget;
+    this.accessRequirementRelatedProjectsList =
+      accessRequirementRelatedProjectsList;
     this.createAccessRequirementButton = createAccessRequirementButton;
     this.deleteAccessRequirementButton = deleteAccessRequirementButton;
     this.lazyLoadHelper = lazyLoadHelper;
@@ -82,6 +86,9 @@ public class TermsOfUseAccessRequirementWidget
     view.setDeleteAccessRequirementWidget(deleteAccessRequirementButton);
     view.setTeamSubjectsWidget(teamSubjectsWidget);
     view.setEntitySubjectsWidget(entitySubjectsWidget);
+    view.setAccessRequirementRelatedProjectsList(
+      accessRequirementRelatedProjectsList
+    );
     view.setManageAccessWidget(manageAccessButton);
     Callback loadDataCallback = new Callback() {
       @Override
@@ -127,9 +134,11 @@ public class TermsOfUseAccessRequirementWidget
     view.setAccessRequirementID(ar.getId().toString());
     isACTMemberAsyncHandler.isACTActionAvailable(isACT -> {
       view.setAccessRequirementIDVisible(isACT);
+      view.setCoveredEntitiesHeadingVisible(isACT);
     });
     teamSubjectsWidget.configure(ar.getSubjectIds());
     entitySubjectsWidget.configure(ar.getSubjectIds());
+    accessRequirementRelatedProjectsList.configure(ar.getId().toString());
     manageAccessButton.configure(ar);
     lazyLoadHelper.setIsConfigured();
   }

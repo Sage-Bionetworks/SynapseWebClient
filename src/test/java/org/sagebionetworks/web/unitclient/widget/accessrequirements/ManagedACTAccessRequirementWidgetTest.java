@@ -33,6 +33,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequirementRelatedProjectsList;
 import org.sagebionetworks.web.client.widget.accessrequirements.CreateAccessRequirementButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.DeleteAccessRequirementButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.EntitySubjectsWidget;
@@ -90,6 +91,9 @@ public class ManagedACTAccessRequirementWidgetTest {
 
   @Mock
   EntitySubjectsWidget mockEntitySubjectsWidget;
+
+  @Mock
+  AccessRequirementRelatedProjectsList mockAccessRequirementRelatedProjectsList;
 
   @Mock
   LazyLoadHelper mockLazyLoadHelper;
@@ -155,6 +159,7 @@ public class ManagedACTAccessRequirementWidgetTest {
         mockGinInjector,
         mockTeamSubjectsWidget,
         mockEntitySubjectsWidget,
+        mockAccessRequirementRelatedProjectsList,
         mockCreateAccessRequirementButton,
         mockDeleteAccessRequirementButton,
         mockReviewAccessRequestsButton,
