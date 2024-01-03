@@ -89,5 +89,11 @@ public interface ManagedACTAccessRequirementWidgetView
     void handleException(Throwable t);
   }
 
+  void setCoveredEntitiesHeadingVisible(boolean visible);
+
   void setEntitySubjectsWidget(IsWidget entitySubjectsWidget);
+
+  void setAccessRequirementRelatedProjectsList(
+    IsWidget accessRequirementRelatedProjectsList
+  );
 }

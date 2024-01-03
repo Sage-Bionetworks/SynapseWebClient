@@ -40,6 +40,10 @@ public interface ACTAccessRequirementWidgetView
   void setTeamSubjectsWidget(IsWidget w);
   void setEntitySubjectsWidget(IsWidget w);
 
+  void setAccessRequirementRelatedProjectsList(
+    IsWidget accessRequirementRelatedProjectsList
+  );
+
   void setVisible(boolean visible);
 
   void setSynAlert(IsWidget w);

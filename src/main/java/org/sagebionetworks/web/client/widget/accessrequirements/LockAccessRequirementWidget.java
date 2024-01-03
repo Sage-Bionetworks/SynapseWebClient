@@ -13,12 +13,14 @@ public class LockAccessRequirementWidget implements IsWidget {
   DeleteAccessRequirementButton deleteAccessRequirementButton;
   TeamSubjectsWidget teamSubjectsWidget;
   EntitySubjectsWidget entitySubjectsWidget;
+  AccessRequirementRelatedProjectsList accessRequirementRelatedProjectsList;
 
   @Inject
   public LockAccessRequirementWidget(
     LockAccessRequirementWidgetView view,
     TeamSubjectsWidget teamSubjectsWidget,
     EntitySubjectsWidget entitySubjectsWidget,
+    AccessRequirementRelatedProjectsList accessRequirementRelatedProjectsList,
     DeleteAccessRequirementButton deleteAccessRequirementButton
   ) {
     this.view = view;
@@ -28,6 +30,9 @@ public class LockAccessRequirementWidget implements IsWidget {
     view.setDeleteAccessRequirementWidget(deleteAccessRequirementButton);
     view.setTeamSubjectsWidget(teamSubjectsWidget);
     view.setEntitySubjectsWidget(entitySubjectsWidget);
+    view.setAccessRequirementRelatedProjectsList(
+      accessRequirementRelatedProjectsList
+    );
   }
 
   public void setRequirement(
@@ -38,6 +43,7 @@ public class LockAccessRequirementWidget implements IsWidget {
     deleteAccessRequirementButton.configure(ar, refreshCallback);
     teamSubjectsWidget.configure(ar.getSubjectIds());
     entitySubjectsWidget.configure(ar.getSubjectIds());
+    accessRequirementRelatedProjectsList.configure(ar.getId().toString());
   }
 
   public void addStyleNames(String styleNames) {

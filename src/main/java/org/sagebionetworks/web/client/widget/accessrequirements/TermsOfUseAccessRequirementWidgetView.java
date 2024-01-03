@@ -53,5 +53,11 @@ public interface TermsOfUseAccessRequirementWidgetView
     void onSignTerms();
   }
 
+  void setCoveredEntitiesHeadingVisible(boolean visible);
+
   void setEntitySubjectsWidget(IsWidget entitySubjectsWidget);
+
+  void setAccessRequirementRelatedProjectsList(
+    IsWidget accessRequirementRelatedProjectsList
+  );
 }

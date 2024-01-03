@@ -40,6 +40,18 @@
         </bh:Paragraph>
       </b:BlockQuote>
       <bh:Div
+        ui:field="coveredEntitiesHeadingUI"
+        visible="false"
+        styleName="margin-top-10"
+      >
+        <g:InlineLabel styleName="boldText" text="Entities Covered" />
+        <bh:Hr addStyleNames="margin-top-5 margin-bottom-5" />
+      </bh:Div>
+      <bh:Div
+        ui:field="accessRequirementRelatedProjectsListContainer"
+        addStyleNames="margin-left-5 margin-right-5 accessRequirementRelatedProjectsListContainer"
+      />
+      <bh:Div
         ui:field="entitySubjectsWidgetContainer"
         addStyleNames="margin-left-5 margin-right-5"
       />

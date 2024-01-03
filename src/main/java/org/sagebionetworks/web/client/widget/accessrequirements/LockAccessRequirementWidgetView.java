@@ -10,4 +10,8 @@ public interface LockAccessRequirementWidgetView extends IsWidget {
   void setTeamSubjectsWidget(IsWidget w);
 
   void setEntitySubjectsWidget(IsWidget entitySubjectsWidget);
+
+  void setAccessRequirementRelatedProjectsList(
+    IsWidget accessRequirementRelatedProjectsList
+  );
 }

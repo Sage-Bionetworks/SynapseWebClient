@@ -3888,3 +3888,23 @@ div.border {
   margin: 0px;
   padding: 15px;
 }
+
+// swc.css list styles override MUI list styles
+// Re-specify MUI list style here
+.accessRequirementRelatedProjectsListContainer > div {
+  p {
+    padding-bottom: 0px;
+    margin-bottom: 0px;
+  }
+  ul {
+    padding-left: 32px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    list-style-type: disc;
+    li {
+      padding-top: 4px;
+      padding-bottom: 4px;
+      margin-left: 0px;
+    }
+  }
+}

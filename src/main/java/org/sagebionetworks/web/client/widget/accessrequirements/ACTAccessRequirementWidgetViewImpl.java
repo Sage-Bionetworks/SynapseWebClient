@@ -54,6 +54,9 @@ public class ACTAccessRequirementWidgetViewImpl
   Div entitySubjectsWidgetContainer;
 
   @UiField
+  Div accessRequirementRelatedProjectsListContainer;
+
+  @UiField
   Div synAlertContainer;
 
   @UiField
@@ -187,6 +190,12 @@ public class ACTAccessRequirementWidgetViewImpl
   public void setEntitySubjectsWidget(IsWidget w) {
     entitySubjectsWidgetContainer.clear();
     entitySubjectsWidgetContainer.add(w);
+  }
+
+  @Override
+  public void setAccessRequirementRelatedProjectsList(IsWidget w) {
+    accessRequirementRelatedProjectsListContainer.clear();
+    accessRequirementRelatedProjectsListContainer.add(w);
   }
 
   @Override

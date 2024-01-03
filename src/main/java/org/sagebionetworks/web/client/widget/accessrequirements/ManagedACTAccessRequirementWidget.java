@@ -41,6 +41,7 @@ public class ManagedACTAccessRequirementWidget
   IntendedDataUseReportButton iduReportButton;
   TeamSubjectsWidget teamSubjectsWidget;
   EntitySubjectsWidget entitySubjectsWidget;
+  AccessRequirementRelatedProjectsList accessRequirementRelatedProjectsList;
   ReviewAccessRequestsButton reviewAccessRequestsButton;
   String submissionId;
   LazyLoadHelper lazyLoadHelper;
@@ -60,6 +61,7 @@ public class ManagedACTAccessRequirementWidget
     PortalGinInjector ginInjector,
     TeamSubjectsWidget teamSubjectsWidget,
     EntitySubjectsWidget entitySubjectsWidget,
+    AccessRequirementRelatedProjectsList accessRequirementRelatedProjectsList,
     CreateAccessRequirementButton createAccessRequirementButton,
     DeleteAccessRequirementButton deleteAccessRequirementButton,
     ReviewAccessRequestsButton reviewAccessRequestsButton,
@@ -79,6 +81,8 @@ public class ManagedACTAccessRequirementWidget
     this.ginInjector = ginInjector;
     this.teamSubjectsWidget = teamSubjectsWidget;
     this.entitySubjectsWidget = entitySubjectsWidget;
+    this.accessRequirementRelatedProjectsList =
+      accessRequirementRelatedProjectsList;
     this.createAccessRequirementButton = createAccessRequirementButton;
     this.deleteAccessRequirementButton = deleteAccessRequirementButton;
     this.reviewAccessRequestsButton = reviewAccessRequestsButton;
@@ -101,6 +105,9 @@ public class ManagedACTAccessRequirementWidget
     view.setManageAccessWidget(manageAccessButton);
     view.setTeamSubjectsWidget(teamSubjectsWidget);
     view.setEntitySubjectsWidget(entitySubjectsWidget);
+    view.setAccessRequirementRelatedProjectsList(
+      accessRequirementRelatedProjectsList
+    );
     view.setIDUReportButton(iduReportButton);
     view.setSynAlert(synAlert);
     Callback loadDataCallback = new Callback() {
@@ -151,10 +158,12 @@ public class ManagedACTAccessRequirementWidget
     manageAccessButton.configure(ar);
     teamSubjectsWidget.configure(ar.getSubjectIds());
     entitySubjectsWidget.configure(ar.getSubjectIds());
+    accessRequirementRelatedProjectsList.configure(ar.getId().toString());
     lazyLoadHelper.setIsConfigured();
     view.setAccessRequirementID(ar.getId().toString());
     isACTMemberAsyncHandler.isACTActionAvailable(isACT -> {
       view.setAccessRequirementIDVisible(isACT);
+      view.setCoveredEntitiesHeadingVisible(isACT);
     });
     view.setAccessRequirementName(ar.getName());
   }

@@ -42,6 +42,7 @@ public class ACTAccessRequirementWidget
   DeleteAccessRequirementButton deleteAccessRequirementButton;
   TeamSubjectsWidget teamSubjectsWidget;
   EntitySubjectsWidget entitySubjectsWidget;
+  AccessRequirementRelatedProjectsList accessRequirementRelatedProjectsList;
   String submissionId;
   LazyLoadHelper lazyLoadHelper;
   AuthenticationController authController;
@@ -58,6 +59,7 @@ public class ACTAccessRequirementWidget
     PortalGinInjector ginInjector,
     TeamSubjectsWidget teamSubjectsWidget,
     EntitySubjectsWidget entitySubjectsWidget,
+    AccessRequirementRelatedProjectsList accessRequirementRelatedProjectsList,
     CreateAccessRequirementButton createAccessRequirementButton,
     DeleteAccessRequirementButton deleteAccessRequirementButton,
     DataAccessClientAsync dataAccessClient,
@@ -74,6 +76,8 @@ public class ACTAccessRequirementWidget
     this.ginInjector = ginInjector;
     this.teamSubjectsWidget = teamSubjectsWidget;
     this.entitySubjectsWidget = entitySubjectsWidget;
+    this.accessRequirementRelatedProjectsList =
+      accessRequirementRelatedProjectsList;
     this.createAccessRequirementButton = createAccessRequirementButton;
     this.deleteAccessRequirementButton = deleteAccessRequirementButton;
     this.dataAccessClient = dataAccessClient;
@@ -90,6 +94,9 @@ public class ACTAccessRequirementWidget
     view.setDeleteAccessRequirementWidget(deleteAccessRequirementButton);
     view.setTeamSubjectsWidget(teamSubjectsWidget);
     view.setEntitySubjectsWidget(entitySubjectsWidget);
+    view.setAccessRequirementRelatedProjectsList(
+      accessRequirementRelatedProjectsList
+    );
 
     view.setSynAlert(synAlert);
     view.setManageAccessWidget(manageAccessButton);
@@ -136,6 +143,7 @@ public class ACTAccessRequirementWidget
     deleteAccessRequirementButton.configure(ar, refreshCallback);
     teamSubjectsWidget.configure(ar.getSubjectIds());
     entitySubjectsWidget.configure(ar.getSubjectIds());
+    accessRequirementRelatedProjectsList.configure(ar.getId().toString());
     manageAccessButton.configure(ar);
     convertACTAccessRequirementButton.configure(ar, refreshCallback);
     view.setAccessRequirementName(ar.getName());

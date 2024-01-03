@@ -83,7 +83,13 @@ public class ManagedACTAccessRequirementWidgetViewImpl
   Div teamSubjectsWidgetContainer;
 
   @UiField
+  Div coveredEntitiesHeadingUI;
+
+  @UiField
   Div entitySubjectsWidgetContainer;
+
+  @UiField
+  Div accessRequirementRelatedProjectsListContainer;
 
   @UiField
   Div synAlertContainer;
@@ -277,6 +283,17 @@ public class ManagedACTAccessRequirementWidgetViewImpl
   public void setEntitySubjectsWidget(IsWidget w) {
     entitySubjectsWidgetContainer.clear();
     entitySubjectsWidgetContainer.add(w);
+  }
+
+  @Override
+  public void setCoveredEntitiesHeadingVisible(boolean visible) {
+    coveredEntitiesHeadingUI.setVisible(visible);
+  }
+
+  @Override
+  public void setAccessRequirementRelatedProjectsList(IsWidget w) {
+    accessRequirementRelatedProjectsListContainer.clear();
+    accessRequirementRelatedProjectsListContainer.add(w);
   }
 
   @Override
