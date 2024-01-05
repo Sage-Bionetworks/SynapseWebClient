@@ -1,4 +1,9 @@
 import { Locator, Page, expect, test } from '@playwright/test'
+import {
+  AsynchronousJobStatus,
+  QueryBundleRequest,
+  QueryResultBundle,
+} from '@sage-bionetworks/synapse-types'
 import { defaultExpectTimeout } from '../../playwright.config'
 import { selectDateUsingGoogUiDatePicker } from './dates'
 import { entityUrlPathname } from './entities'
@@ -62,7 +67,7 @@ export const openTableEditor = async (page: Page) => {
   })
 }
 
-export const getTableEditorRows = async (page: Page) => {
+export const getTableEditorRows = (page: Page) => {
   return page.locator('.table.synapseViewOrTable').getByRole('row')
 }
 
@@ -95,7 +100,7 @@ export const enterTableData = async (
   columnsSchemaConfig: ColumnSchemaConfig[],
   tableData: TableDataConfig[],
 ) => {
-  const tableRows = await getTableEditorRows(page)
+  const tableRows = getTableEditorRows(page)
 
   // skip initial empty column
   await expectTableColumnHeaders(tableRows, columnsSchemaConfig, 1)
@@ -103,7 +108,9 @@ export const enterTableData = async (
   await test.step('enter test data', async () => {
     const addRowButton = page.getByRole('button', { name: 'Add Row' })
     for (let index = 0; index < tableData.length; index++) {
-      await test.step(`enter test data: ${tableData[index].item}`, async () => {
+      const item = tableData[index].item.toString()
+
+      await test.step(`enter test data: ${item}`, async () => {
         await addRowButton.click()
 
         // start from 1 so column headers in first row are skipped
@@ -198,7 +205,7 @@ export const saveTableDataChanges = async (page: Page) => {
 }
 
 // Validate table data ---------------------------------------------------------
-const getTableRows = async (page: Page) => {
+const getTableRows = (page: Page) => {
   return page.getByTestId('SynapseTable').getByRole('row')
 }
 
@@ -239,33 +246,31 @@ const expectTableRowCorrect = async (
         .nth(colIndex)
         .textContent()
       await test.step(`confirm ${columnName}`, async () => {
-        const expectedText =
-          await test.step('format expected text', async () => {
-            let expectedText = tableData[columnName!]
+        const expectedText = await test.step('format expected text', () => {
+          let expectedText = tableData[columnName!]
 
-            // handle lists
-            if (Array.isArray(expectedText)) {
-              expectedText = expectedText.join(', ')
-            }
+          // handle lists
+          if (Array.isArray(expectedText)) {
+            expectedText = expectedText.join(', ')
+          }
 
-            // handle dates
-            const columnSchema = columnsSchemaConfig.find(
-              config => config.name === columnName!,
-            )
-            if (columnSchema?.type === 'Date') {
-              const date = dateStringToDate(expectedText.toString())
-              expectedText = `${
-                date.getMonth() + 1
-              }/${date.getDate()}/${date.getFullYear()}`
-            }
+          // handle dates
+          const columnSchema = columnsSchemaConfig.find(
+            config => config.name === columnName!,
+          )
+          if (columnSchema?.type === 'Date') {
+            const date = dateStringToDate(expectedText.toString())
+            expectedText = `${
+              date.getMonth() + 1
+            }/${date.getDate()}/${date.getFullYear()}`
+          }
 
-            return expectedText
-          })
+          return expectedText
+        })
 
-        const tableCell =
-          await test.step('get table cell to check', async () => {
-            return tableRows.nth(rowIndex).getByRole('cell').nth(colIndex)
-          })
+        const tableCell = await test.step('get table cell to check', () => {
+          return tableRows.nth(rowIndex).getByRole('cell').nth(colIndex)
+        })
 
         await test.step('expand cell, if needed', async () => {
           const expandButton = tableCell.locator(
@@ -292,7 +297,7 @@ export const expectTableDataCorrect = async (
   tableData: TableDataConfig[],
 ) => {
   await test.step('confirm table data', async () => {
-    const tableRows = await getTableRows(page)
+    const tableRows = getTableRows(page)
     await expectTableColumnHeaders(tableRows, columnsSchemaConfig, 0)
 
     for (let dataIndex = 0; dataIndex < tableData.length; dataIndex++) {
@@ -348,9 +353,24 @@ export const runQuery = async (
         async response =>
           response.url().includes('/repo/v1/asynchronous/job/') &&
           response.status() === 200 &&
-          (await response.json()).responseBody?.queryResult &&
-          (await response.json()).jobState === 'COMPLETE' &&
-          (await response.json()).requestBody.query.sql === query,
+          (
+            (await response.json()) as AsynchronousJobStatus<
+              QueryBundleRequest,
+              QueryResultBundle
+            >
+          ).responseBody?.queryResult !== undefined &&
+          (
+            (await response.json()) as AsynchronousJobStatus<
+              QueryBundleRequest,
+              QueryResultBundle
+            >
+          ).jobState === 'COMPLETE' &&
+          (
+            (await response.json()) as AsynchronousJobStatus<
+              QueryBundleRequest,
+              QueryResultBundle
+            >
+          ).requestBody.query.sql === query,
       )
     }
   })
@@ -362,7 +382,7 @@ export const confirmTableDataDimensions = async (
   nCols: number,
 ) => {
   await test.step('confirm table dimensions', async () => {
-    const tableRows = await getTableRows(page)
+    const tableRows = getTableRows(page)
     await expect(
       tableRows.first().getByRole('cell'),
       `should have ${nCols} column(s)`,

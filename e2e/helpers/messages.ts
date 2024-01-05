@@ -1,27 +1,34 @@
 import { Page } from '@playwright/test'
+import { PaginatedResults } from '@sage-bionetworks/synapse-types'
 import { deleteFileHandle } from './entities'
 import { BackendDestinationEnum, doDelete, doGet } from './http'
-import { MessageBundle, MessageToUser, PaginatedResults } from './types'
+import { MessageBundle, MessageToUser } from './types'
 
 // Retrieves the current authenticated user's outbox.
-export async function getUserOutbox(accessToken: string, page: Page) {
-  return (await doGet(
+export async function getUserOutbox(
+  accessToken: string,
+  page: Page,
+): Promise<PaginatedResults<MessageToUser>> {
+  return await doGet(
     page,
     '/repo/v1/message/outbox',
     accessToken,
     BackendDestinationEnum.REPO_ENDPOINT,
-  )) as PaginatedResults<MessageToUser>
+  )
 }
 
 // Retrieves the current authenticated user's inbox.
 // It may take several seconds for a message to appear in the inbox after creation.
-export async function getUserInbox(accessToken: string, page: Page) {
-  return (await doGet(
+export async function getUserInbox(
+  accessToken: string,
+  page: Page,
+): Promise<PaginatedResults<MessageBundle>> {
+  return await doGet(
     page,
     '/repo/v1/message/inbox',
     accessToken,
     BackendDestinationEnum.REPO_ENDPOINT,
-  )) as PaginatedResults<MessageBundle>
+  )
 }
 
 // Deletes a message. Only accessible to administrators.
@@ -53,7 +60,8 @@ export async function deleteUserOutboxMessageAndAssociatedFile(
   adminAccessToken: string,
   page: Page,
 ) {
-  const messages = (await getUserOutbox(userAccessToken, page)).results.filter(
+  const outbox = await getUserOutbox(userAccessToken, page)
+  const messages = outbox.results.filter(
     message =>
       message.subject === subject &&
       arraysAreEqual(recipients.sort(), message.recipients.sort()),

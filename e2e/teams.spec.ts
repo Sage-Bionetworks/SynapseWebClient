@@ -60,7 +60,7 @@ test.describe('Teams', () => {
     async ({ userPage, validatedUserPage }) => {
       const { userName, validatedUserName } = await testAuth.step(
         'should get user names',
-        async () => {
+        () => {
           const userName = userConfigs[userPrefix].username
           const validatedUserName = userConfigs[userValidatedPrefix].username
           return { userName, validatedUserName }
@@ -250,7 +250,7 @@ test.describe('Teams', () => {
 
     // delete team acceptance: validated user -> user
     await deleteTeamInviteAcceptanceMessage(
-      [userUserId!],
+      [userUserId],
       validatedUserAccessToken,
       adminPAT,
       validatedUserPage,

@@ -1,6 +1,9 @@
 import { Page } from '@playwright/test'
-import ACCESS_TYPE from './ACCESS_TYPE'
-import { AccessControlList, ResourceAccess } from './types'
+import {
+  ACCESS_TYPE,
+  AccessControlList,
+  ResourceAccess,
+} from '@sage-bionetworks/synapse-types'
 import { waitForSrcEndpointConfig } from './utils'
 
 // https://rest-docs.synapse.org/rest/GET/entity/id/acl.html
@@ -9,11 +12,15 @@ async function getEntityACL(page: Page, entityId: string, accessToken: string) {
   const acl = await page.evaluate(
     async ({ entityId, accessToken }) => {
       // @ts-expect-error: Cannot find name 'SRC'
-      return await SRC.SynapseClient.getEntityACL(entityId, accessToken)
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      return (await SRC.SynapseClient.getEntityACL(
+        entityId,
+        accessToken,
+      )) as AccessControlList
     },
     { entityId, accessToken },
   )
-  return acl as AccessControlList
+  return acl
 }
 
 /**
@@ -30,11 +37,15 @@ async function updateEntityACL(
   const updatedACL = await page.evaluate(
     async ({ acl, accessToken }) => {
       // @ts-expect-error: Cannot find name 'SRC'
-      return await SRC.SynapseClient.updateEntityACL(acl, accessToken)
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      return (await SRC.SynapseClient.updateEntityACL(
+        acl,
+        accessToken,
+      )) as AccessControlList
     },
     { acl, accessToken },
   )
-  return updatedACL as AccessControlList
+  return updatedACL
 }
 
 // Note: The caller must be granted ACCESS_TYPE.CHANGE_PERMISSIONS on the Entity to call this method

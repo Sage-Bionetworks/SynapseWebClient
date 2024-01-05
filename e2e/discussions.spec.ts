@@ -79,10 +79,7 @@ const expectThreadReplyVisible = async (
   })
 }
 
-const getDiscussionParentActionButtons = async (
-  page: Page,
-  threadTitle: string,
-) => {
+const getDiscussionParentActionButtons = (page: Page, threadTitle: string) => {
   const parentPost = page
     .locator(discussionThreadSelector)
     .locator('.row')
@@ -97,10 +94,7 @@ const getDiscussionParentActionButtons = async (
   }
 }
 
-const getDiscussionReplyActionButtons = async (
-  page: Page,
-  threadReply: string,
-) => {
+const getDiscussionReplyActionButtons = (page: Page, threadReply: string) => {
   const replyPost = page
     .locator(discussionThreadSelector)
     .locator('.row')
@@ -113,7 +107,7 @@ const getDiscussionReplyActionButtons = async (
 }
 
 let userProject: Project
-let fileHandleIds: string[] = []
+const fileHandleIds: string[] = []
 
 test.describe('Discussions', () => {
   testAuth.beforeAll(async ({ browser, storageStatePaths }) => {
@@ -333,7 +327,7 @@ test.describe('Discussions', () => {
           await testAuth.step(
             'Confirm second user has expected actions available on thread title',
             async () => {
-              const parentPostActions = await getDiscussionParentActionButtons(
+              const parentPostActions = getDiscussionParentActionButtons(
                 validatedUserPage,
                 threadTitle,
               )
@@ -347,7 +341,7 @@ test.describe('Discussions', () => {
           const secondUserReplyPostActions = await testAuth.step(
             'Confirm second user has expected actions available on thread reply',
             async () => {
-              const replyPostActions = await getDiscussionReplyActionButtons(
+              const replyPostActions = getDiscussionReplyActionButtons(
                 validatedUserPage,
                 threadReply,
               )
@@ -384,7 +378,7 @@ test.describe('Discussions', () => {
           await testAuth.step(
             'Confirm first user has expected actions available on thread title',
             async () => {
-              const parentPostActions = await getDiscussionParentActionButtons(
+              const parentPostActions = getDiscussionParentActionButtons(
                 userPage,
                 threadTitle,
               )
@@ -398,7 +392,7 @@ test.describe('Discussions', () => {
           const firstUserReplyPostActions = await testAuth.step(
             'Confirm first user has expected actions available on thread reply',
             async () => {
-              const replyPostActions = await getDiscussionReplyActionButtons(
+              const replyPostActions = getDiscussionReplyActionButtons(
                 userPage,
                 threadReply,
               )

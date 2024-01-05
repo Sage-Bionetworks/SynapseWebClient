@@ -8,6 +8,20 @@ env:
   NODE_VERSION: 18.16.0
   PW_ALL_BLOBS_DIR: all-blob-reports
 jobs:
+  lint-e2e:
+    # Run in Sage repo on develop or release- branches
+    # and on all branches in user-owned forks
+    if: ${{ github.ref_name == 'develop' || startsWith(github.ref_name, 'release-') || github.actor == github.repository_owner }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Lint E2E tests
+        run: yarn e2e:lint
   build:
     # Run in Sage repo on develop or release- branches
     # and on all branches in user-owned forks

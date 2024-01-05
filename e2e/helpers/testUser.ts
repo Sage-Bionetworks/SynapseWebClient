@@ -1,10 +1,11 @@
 import { Page, expect, test } from '@playwright/test'
+import { LoginResponse } from '@sage-bionetworks/synapse-types'
 import { defaultExpectTimeout } from '../../playwright.config'
 import { testAuth } from '../fixtures/authenticatedUserPages'
 import { entityUrlPathname } from './entities'
 import { BackendDestinationEnum, doDelete, doPost } from './http'
 import { getLocalStorage } from './localStorage'
-import { LoginResponse, TestUser } from './types'
+import { JwtPayload, TestUser } from './types'
 import { waitForInitialPageLoad } from './utils'
 import { deleteVerificationSubmissionIfExists } from './verification'
 
@@ -20,7 +21,7 @@ export function getAdminPAT() {
 function getUserIdFromJwt(token: string) {
   const payload = JSON.parse(
     Buffer.from(token.split('.')[1], BASE64_ENCODING).toString(),
-  )
+  ) as JwtPayload
   return payload.sub
 }
 
@@ -29,14 +30,14 @@ export async function createTestUser(
   accessToken: string,
   page: Page,
 ) {
-  const responseObject = (await doPost(
+  const responseObject = await doPost(
     page,
     TEST_USER_URI,
     testUser,
     accessToken,
     BackendDestinationEnum.REPO_ENDPOINT,
-  )) as LoginResponse
-  return getUserIdFromJwt(responseObject.accessToken)
+  )
+  return getUserIdFromJwt((responseObject as LoginResponse).accessToken)
 }
 
 export async function deleteTestUser(
@@ -65,7 +66,7 @@ export async function cleanupTestUser(testUserId: string, userPage: Page) {
 
 async function getSuccessfulLoginResponsePromise(page: Page) {
   return page.waitForResponse(
-    async response =>
+    response =>
       response.url().includes('/auth/v1/login2') && response.status() == 201,
     { timeout: defaultExpectTimeout * 3 }, // allow time for the response to return
   )
@@ -122,7 +123,7 @@ export async function loginTestUser(
 
   // Wait for redirect
   await successfulLoginResponsePromise
-  await expect(async () => {
+  await expect(() => {
     expect(page.url()).not.toContain('LoginPlace')
   }).toPass()
 

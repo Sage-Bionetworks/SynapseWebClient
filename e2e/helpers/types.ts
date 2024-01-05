@@ -1,12 +1,4 @@
-import ACCESS_TYPE from './ACCESS_TYPE'
-
 /* USERS */
-export type LoginResponse = {
-  accessToken: string // A token that authorizes subsequent requests
-  acceptsTermsOfUse: boolean // Does the user accept the terms of use?
-  authenticationReceipt: string // A valid receipt allows the user to skip extra security checks.
-}
-
 export type TestUser = {
   username: string
   email: string
@@ -15,25 +7,10 @@ export type TestUser = {
   validatedUser: boolean // true if a verification approved state should be added for the user
 }
 
-/* FILES */
-export type FileHandleStatus =
-  | 'AVAILABLE' //	The default status of a file handle that is considered available and linked to at least on object (For the possible associations see FileHandleAssociateType).
-  | 'UNLINKED' // The file handle has been detected as not linked to any object (For the possible associations see FileHandleAssociateType), this file will eventually be archived.
-  | 'ARCHIVED' // The file handle has been archived after being UNLINKED for more than 30 days. The file handle can be restored by the creator using the dedicated API. When ARCHIVED the file might not be readily accessible and restoring might take a few hours.
-
-export type FileHandle = {
-  id: string //	The ID of this FileHandle. All references to this FileHandle will use this ID. Synapse will generate this ID when the FileHandle is created.
-  etag: string //	FileHandles are immutable from the perspective of the API. The only field that can be change is the previewId. When a new previewId is set, the etag will change.
-  createdBy: string //	The ID Of the user that created this file.
-  createdOn: string //	The date when this file was uploaded.
-  modifiedOn: string //	The date when the file was modified. This is handled by the backend and cannot be modified.
-  concreteType: string //	This is used to indicate the implementation of this interface. For example, an S3FileHandle should be set to: org.sagebionetworks.repo.model.file.S3FileHandle
-  contentType: string //	Must be: http://en.wikipedia.org/wiki/Internet_media_type
-  contentMd5: string //	The file's content MD5.
-  fileName: string //	The short, user visible name for this file.
-  storageLocationId: number //	The optional storage location descriptor
-  contentSize: number //	The size of the file in bytes.
-  status: FileHandleStatus // The status of the file handle as computed by the backend. This value cannot be changed, any file handle that is not AVAILABLE should not be used.
+// Note: many other fields are included in the payload, but only including
+// field used by e2e tests here
+export type JwtPayload = {
+  sub: string
 }
 
 /* MESSAGES */
@@ -56,9 +33,9 @@ export type MessageToUser = {
   bcc: string //	The email addresses in the 'bcc' field of the email message
 }
 
-export type MessageStatusType = 'READ' | 'UNREAD' | 'ARCHIVED'
+type MessageStatusType = 'READ' | 'UNREAD' | 'ARCHIVED'
 
-export type MessageStatus = {
+type MessageStatus = {
   messageId: string //	The unique identifier of the message.
   recipientId: string // The unique identifier of the recipient of this message.
   status: MessageStatusType // The status of the message, from the RECIPIENT'S standpoint
@@ -69,36 +46,10 @@ export type MessageBundle = {
   status: MessageStatus // JSON schema for message status from the RECIPIENT'S standpoint
 }
 
-export type PaginatedResults<T> = {
-  totalNumberOfResults: number //	Calculating the actual totalNumberOfResults is not longer supported. Therefore, for each page, the totalNumberOfResults is estimated using the current page, limit, and offset. When the page size equals the limit, the totalNumberOfResults will be offset+pageSize+ 1. Otherwise, the totalNumberOfResults will be offset+pageSize.
-  results: T[] // The the id of the entity to which this reference refers
-}
-
 /* ENTITIES */
 export type Project = {
   name: string
   id: string
 }
 
-export type FileUploadComplete = {
-  fileHandleId: string
-  fileName: string
-}
-
 export type FileType = 'text/txt' | 'text/csv' | 'application/json'
-
-/* ACL */
-export type ResourceAccess = {
-  principalId: number
-  accessType: ACCESS_TYPE[]
-}
-
-export type AccessControlList = {
-  id: string
-  createdBy?: string
-  creationDate?: string
-  modifiedBy?: string
-  modifiedOn?: string
-  etag?: string
-  resourceAccess: ResourceAccess[]
-}

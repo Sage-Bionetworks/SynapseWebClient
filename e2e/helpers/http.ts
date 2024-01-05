@@ -24,17 +24,19 @@ export async function doPost<T>(
       additionalOptions,
     }) => {
       // @ts-expect-error: Cannot find name 'SRC'
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
       const srcEndpoint = await SRC.SynapseEnums.BackendDestinationEnum[
         endpoint
       ]
       // @ts-expect-error: Cannot find name 'SRC'
-      return await SRC.HttpClient.doPost(
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      return (await SRC.HttpClient.doPost(
         url,
         requestJsonObject,
         accessToken,
         srcEndpoint,
         additionalOptions,
-      )
+      )) as T
     },
     { url, requestJsonObject, accessToken, endpoint, additionalOptions },
   )
@@ -52,16 +54,18 @@ export async function doGet<T>(
   const response = await page.evaluate(
     async ({ url, accessToken, endpoint, additionalOptions }) => {
       // @ts-expect-error: Cannot find name 'SRC'
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
       const srcEndpoint = await SRC.SynapseEnums.BackendDestinationEnum[
         endpoint
       ]
       // @ts-expect-error: Cannot find name 'SRC'
-      return await SRC.HttpClient.doGet(
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      return (await SRC.HttpClient.doGet(
         url,
         accessToken,
         srcEndpoint,
         additionalOptions,
-      )
+      )) as T
     },
     { url, accessToken, endpoint, additionalOptions },
   )
@@ -79,16 +83,18 @@ export async function doDelete<T>(
   const response = await page.evaluate(
     async ({ url, accessToken, endpoint, additionalOptions }) => {
       // @ts-expect-error: Cannot find name 'SRC'
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
       const srcEndpoint = await SRC.SynapseEnums.BackendDestinationEnum[
         endpoint
       ]
       // @ts-expect-error: Cannot find name 'SRC'
-      return await SRC.HttpClient.doDelete(
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      return (await SRC.HttpClient.doDelete(
         url,
         accessToken,
         srcEndpoint,
         additionalOptions,
-      )
+      )) as T
     },
     { url, accessToken, endpoint, additionalOptions },
   )
@@ -113,17 +119,19 @@ export async function doPut<T>(
       additionalOptions,
     }) => {
       // @ts-expect-error: Cannot find name 'SRC'
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
       const srcEndpoint = await SRC.SynapseEnums.BackendDestinationEnum[
         endpoint
       ]
       // @ts-expect-error: Cannot find name 'SRC'
-      return await SRC.HttpClient.doPut(
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      return (await SRC.HttpClient.doPut(
         url,
         requestJsonObject,
         accessToken,
         srcEndpoint,
         additionalOptions,
-      )
+      )) as T
     },
     { url, requestJsonObject, accessToken, endpoint, additionalOptions },
   )

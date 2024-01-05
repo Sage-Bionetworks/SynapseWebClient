@@ -12,7 +12,7 @@ export type ColumnSchemaConfig = {
   facet?: FacetType
 }
 type ColumnSchemaKey = keyof ColumnSchemaConfig
-const columnNameToSchemaKey: Record<string, ColumnSchemaKey | string> = {
+const columnNameToSchemaKey: Record<string, ColumnSchemaKey | 'id'> = {
   'Column ID': 'id',
   'Column Name': 'name',
   'Column Type': 'type',
@@ -227,7 +227,8 @@ const expectColumnSchemaMatchesConfig = async (
 ) => {
   await test.step(`confirm column schema: ${columnSchemaConfig.name}`, async () => {
     for (const columnSchemaKey in columnSchemaConfig) {
-      const columnSchemaIndex = columnSchemaIndexMap[columnSchemaKey]
+      const columnSchemaIndex =
+        columnSchemaIndexMap[columnSchemaKey as ColumnSchemaKey]
 
       await expectColumnSchemaKeyMatchesConfig(
         columnSchemaConfig,
@@ -261,7 +262,7 @@ export const openTableColumnSchema = async (page: Page) => {
   })
 }
 
-const getTableColumnSchemaRows = async (page: Page) => {
+const getTableColumnSchemaRows = (page: Page) => {
   return page.getByRole('table').filter({ hasText: 'Column' }).getByRole('row')
 }
 
@@ -271,12 +272,14 @@ export const expectTableSchemaCorrect = async (
 ) => {
   await test.step('table has expected schema', async () => {
     await openTableColumnSchema(page)
-    const schemaRows = await getTableColumnSchemaRows(page)
+    const schemaRows = getTableColumnSchemaRows(page)
 
     const columnSchemaIndexMap =
       await test.step('confirm schema column names', async () => {
         const columnNamesExpected = Object.keys(columnNameToSchemaKey)
-        let columnSchemaIndexMap: Partial<Record<ColumnSchemaKey, number>> = {}
+        const columnSchemaIndexMap: Partial<
+          Record<ColumnSchemaKey | 'id', number>
+        > = {}
         const columnNames = schemaRows.nth(0).getByRole('cell')
         for (let i = 0; i < columnNamesExpected.length; i++) {
           // the initial column is empty in UI, so start from 1

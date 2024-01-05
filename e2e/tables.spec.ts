@@ -37,7 +37,7 @@ import {
 import { Project } from './helpers/types'
 
 let userProject: Project
-let fileHandleIds: string[] = []
+const fileHandleIds: string[] = []
 let tableEntityId: string | undefined = undefined
 
 const noTablesText =
@@ -125,7 +125,7 @@ test.describe('Tables', () => {
       ...initialColumnsSchemaConfig,
       { name: 'reorder_quantity', type: 'Integer', defaultValue: '25' },
     ]
-    const updatedTableData = initialTableData.map((data, index) => ({
+    const updatedTableData: TableDataConfig[] = initialTableData.map(data => ({
       ...data,
       reorder_quantity: '25',
     }))
@@ -229,7 +229,7 @@ test.describe('Tables', () => {
 
         const cell =
           await test.step('change value to the incorrect type', async () => {
-            const tableRows = await getTableEditorRows(userPage)
+            const tableRows = getTableEditorRows(userPage)
             const cell = tableRows
               .nth(rowIndex + 1) // shift down for column headers
               .getByRole('cell')
@@ -334,7 +334,9 @@ test.describe('Tables', () => {
           await expectTableDataCorrect(
             userPage,
             [updatedColumnsSchemaConfig[0]],
-            updatedTableData.map(data => ({ [column]: data[column] })),
+            updatedTableData.map(data => ({
+              [column]: data[column],
+            })),
           )
         })
       })
@@ -349,7 +351,7 @@ test.describe('Tables', () => {
 
         await test.step('confirm query results', async () => {
           const expectedData = updatedTableData.filter(
-            data => data[column] > value,
+            data => (data[column] as number) > value,
           )
           await confirmTableDataDimensions(
             userPage,
@@ -386,7 +388,7 @@ test.describe('Tables', () => {
       await openTableEditor(userPage)
 
       await test.step('edit row value', async () => {
-        const tableRows = await getTableEditorRows(userPage)
+        const tableRows = getTableEditorRows(userPage)
         const cell = tableRows
           .nth(rowIndex + 1) // shift down for headers
           .getByRole('cell')
