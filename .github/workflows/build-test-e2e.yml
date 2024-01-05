@@ -79,7 +79,7 @@ jobs:
           path: ${{ env.BUILD_DIR }}
       - name: Confirm build downloaded
         run: |
-          if [ ! -f "/$(pwd)/${{ env.BUILD_DIR }}/${{ env.BUILD_NAME }}" ]; then
+          if [ ! -e "/$(pwd)/${{ env.BUILD_DIR }}/${{ env.BUILD_NAME }}" ]; then
             echo "::error ::downloaded WAR not found"
             exit 1
           fi
@@ -99,6 +99,12 @@ jobs:
         run: yarn install --frozen-lockfile
       - name: Install Playwright Browsers
         run: yarn playwright install --with-deps
+      - name: Confirm Docker container is running
+        run: |
+          if [[ $(docker ps --filter "name=${{ env.CONTAINER_NAME }}" --format '{{.Names}}') != "${{ env.CONTAINER_NAME }}" ]]; then
+            echo "::error SWC docker container is not running"
+            exit 1
+          fi
       - name: Run Playwright tests
         env:
           ADMIN_PAT: ${{ secrets.ADMIN_PAT }}
