@@ -1,8 +1,11 @@
 import { Page } from '@playwright/test'
-import { PaginatedResults } from '@sage-bionetworks/synapse-types'
+import {
+  MessageBundle,
+  MessageToUser,
+  PaginatedResults,
+} from '@sage-bionetworks/synapse-types'
 import { deleteFileHandle } from './entities'
 import { BackendDestinationEnum, doDelete, doGet } from './http'
-import { MessageBundle, MessageToUser } from './types'
 
 // Retrieves the current authenticated user's outbox.
 export async function getUserOutbox(

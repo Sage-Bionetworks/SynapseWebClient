@@ -895,10 +895,10 @@
     react-virtualized-auto-sizer "^1.0.20"
     react-window "^1.8.9"
 
-"@sage-bionetworks/synapse-types@^0.0.1":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@sage-bionetworks/synapse-types/-/synapse-types-0.0.1.tgz#725792366731aff93b6c4341ad818dcf4d47a524"
-  integrity sha512-XsfOg06eKi8fMmgDtMX2BS+3e1lt4Ruq3BCEs6AKzbfCyMONDotO96e1k2KknEfPSwAKhosLTC/cZQj2aTCmbg==
+"@sage-bionetworks/synapse-types@^0.0.2":
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@sage-bionetworks/synapse-types/-/synapse-types-0.0.2.tgz#4190a908a10f10d0cc51e304d6d1d23da41ad64e"
+  integrity sha512-31MxrIOnJiAUYeXsDsf2J+q9A6nVZt9pWGfG+pYoKC2vZIgUo7L3ToelYEqoufvdgHht+aWq83bnk/+Y4UNoUA==
 
 "@tanstack/react-table@^8.9.3":
   version "8.9.3"
