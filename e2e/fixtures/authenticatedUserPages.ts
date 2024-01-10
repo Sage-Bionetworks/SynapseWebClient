@@ -114,6 +114,12 @@ export const testAuth = base.extend<
   // ...per worker + browserName
   // ...depends on createUsers worker fixture to create each test user
   storageStatePaths: [
+    /* Destructured fixtures are the dependencies of the current fixture, see:
+    https://playwright.dev/docs/test-fixtures#execution-order
+    Since test users must be created before the test user can be authenticated,
+    the storageStatePaths worker fixture depends on the createUsers worker fixture.
+    This tells Playwright to set up createUsers before executing storageStatePaths. 
+    Ignore the linting error, since createUsers is intentionally declared as a dependency here. */
     // eslint-disable-next-line  @typescript-eslint/no-unused-vars
     async ({ browser, browserName, createUsers }, use) => {
       const storageStatePaths: StorageStatePaths = {}
