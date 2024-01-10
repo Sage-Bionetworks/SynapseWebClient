@@ -1,7 +1,13 @@
 import { Page, expect } from '@playwright/test'
+import {
+  Entity,
+  FileEntity,
+  FileHandle,
+  FileUploadComplete,
+} from '@sage-bionetworks/synapse-types'
 import { v4 as uuidv4 } from 'uuid'
 import { BackendDestinationEnum, doDelete, doGet } from './http'
-import { FileHandle, FileType, FileUploadComplete } from './types'
+import { FileType } from './types'
 import { waitForSrcEndpointConfig } from './utils'
 
 export function generateEntityName(
@@ -35,7 +41,11 @@ export async function createProject(
   const entity = await page.evaluate(
     async ({ projectName, accessToken }) => {
       // @ts-expect-error: Cannot find name 'SRC'
-      return await SRC.SynapseClient.createProject(projectName, accessToken)
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      return (await SRC.SynapseClient.createProject(
+        projectName,
+        accessToken,
+      )) as Entity
     },
     { projectName, accessToken },
   )
@@ -63,11 +73,16 @@ async function uploadFile(
       // File interface is only available in the browser (not node.js)
       const file = new File([fileContent], fileName, { type: fileType })
       // @ts-expect-error: Cannot find name 'SRC'
-      return await SRC.SynapseClient.uploadFile(accessToken, fileName, file)
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      return (await SRC.SynapseClient.uploadFile(
+        accessToken,
+        fileName,
+        file,
+      )) as FileUploadComplete
     },
     { accessToken, fileName, fileContent, fileType },
   )
-  return fileUploadComplete as FileUploadComplete
+  return fileUploadComplete
 }
 
 async function createFileEntity(
@@ -87,7 +102,11 @@ async function createFileEntity(
   const entity = await page.evaluate(
     async ({ accessToken, fileEntityJson }) => {
       // @ts-expect-error: Cannot find name 'SRC'
-      return await SRC.SynapseClient.createEntity(fileEntityJson, accessToken)
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      return (await SRC.SynapseClient.createEntity(
+        fileEntityJson,
+        accessToken,
+      )) as FileEntity
     },
     { accessToken, fileEntityJson },
   )
@@ -123,7 +142,7 @@ export async function createFile(
   }
 }
 
-export async function getEntity(
+export async function getEntity<T extends Entity>(
   page: Page,
   accessToken: string | undefined = undefined,
   entityId: string,
@@ -133,11 +152,12 @@ export async function getEntity(
   const entity = await page.evaluate(
     async ({ accessToken, entityId, versionNumber }) => {
       // @ts-expect-error: Cannot find name 'SRC'
-      return await SRC.SynapseClient.getEntity(
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      return (await SRC.SynapseClient.getEntity(
         accessToken,
         entityId,
         versionNumber,
-      )
+      )) as T
     },
     { accessToken, entityId, versionNumber },
   )
@@ -150,8 +170,13 @@ export async function getEntityFileHandleId(
   entityId: string,
   versionNumber?: string | number,
 ) {
-  const fileEntity = await getEntity(page, accessToken, entityId, versionNumber)
-  return fileEntity.dataFileHandleId as string
+  const fileEntity = await getEntity<FileEntity>(
+    page,
+    accessToken,
+    entityId,
+    versionNumber,
+  )
+  return fileEntity.dataFileHandleId
 }
 
 // https://rest-docs.synapse.org/rest/DELETE/entity/id.html
@@ -172,13 +197,13 @@ export async function getFileHandle(
   accessToken: string,
   handleId: string,
   page: Page,
-) {
-  return (await doGet(
+): Promise<FileHandle> {
+  return await doGet(
     page,
     `/file/v1/fileHandle/${handleId}`,
     accessToken,
     BackendDestinationEnum.REPO_ENDPOINT,
-  )) as FileHandle
+  )
 }
 
 // Delete a FileHandle using its ID.

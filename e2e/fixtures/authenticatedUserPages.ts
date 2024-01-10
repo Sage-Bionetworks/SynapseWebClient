@@ -1,5 +1,5 @@
 import { test as base, Browser, expect, type Page } from '@playwright/test'
-import { unlinkSync } from 'fs'
+import { PathLike, unlinkSync } from 'fs'
 import { baseURL, defaultTestTimeout } from '../../playwright.config'
 import { setCertifiedUserStatus } from '../helpers/certification'
 import {
@@ -40,9 +40,13 @@ const createPage = async (browser: Browser) => {
 
 // Generate test fixture for a specified user
 // ...based on: https://github.com/microsoft/playwright/issues/14570
-function createUserPageFixture<Page>(userPrefix: UserPrefix) {
+type CreateUserPageFixture = {
+  browser: Browser
+  storageStatePaths: StorageStatePaths
+}
+function createUserPageFixture(userPrefix: UserPrefix) {
   return async (
-    { browser, storageStatePaths },
+    { browser, storageStatePaths }: CreateUserPageFixture,
     use: (r: Page) => Promise<void>,
   ) => {
     const context = await browser.newContext({
@@ -63,7 +67,7 @@ export const testAuth = base.extend<
   // ...per worker + browserName
   createUsers: [
     async ({ browser }, use) => {
-      let userIds: string[] = []
+      const userIds: string[] = []
 
       const page = await base.step('setup page', async () => {
         return await createPage(browser)
@@ -110,8 +114,15 @@ export const testAuth = base.extend<
   // ...per worker + browserName
   // ...depends on createUsers worker fixture to create each test user
   storageStatePaths: [
+    /* Destructured fixtures are the dependencies of the current fixture, see:
+    https://playwright.dev/docs/test-fixtures#execution-order
+    Since test users must be created before the test user can be authenticated,
+    the storageStatePaths worker fixture depends on the createUsers worker fixture.
+    This tells Playwright to set up createUsers before executing storageStatePaths. 
+    Ignore the linting error, since createUsers is intentionally declared as a dependency here. */
+    // eslint-disable-next-line  @typescript-eslint/no-unused-vars
     async ({ browser, browserName, createUsers }, use) => {
-      let storageStatePaths: StorageStatePaths = {}
+      const storageStatePaths: StorageStatePaths = {}
 
       for (const [userPrefix, user] of Object.entries(userConfigs)) {
         const userPage = await base.step(
@@ -134,7 +145,7 @@ export const testAuth = base.extend<
           const storageStateFileName = `${browserName}_${process.env.TEST_PARALLEL_INDEX}_${user.username}.json`
           const storageStatePath = `${storageStateDir}/${storageStateFileName}`
           await userPage.context().storageState({ path: storageStatePath })
-          storageStatePaths[userPrefix] = storageStatePath
+          storageStatePaths[userPrefix as UserPrefix] = storageStatePath
           await userPage.close()
         })
       }
@@ -143,7 +154,7 @@ export const testAuth = base.extend<
 
       // delete files
       for (const userPrefix in storageStatePaths) {
-        unlinkSync(storageStatePaths[userPrefix])
+        unlinkSync(storageStatePaths[userPrefix as UserPrefix] as PathLike)
       }
     },
     // specify timeout so worker fixture duration doesn't skew test duration

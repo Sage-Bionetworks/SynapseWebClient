@@ -1,6 +1,6 @@
 import { Browser } from '@playwright/test'
+import { ACCESS_TYPE } from '@sage-bionetworks/synapse-types'
 import { StorageStatePaths } from '../fixtures/authenticatedUserPages'
-import ACCESS_TYPE from './ACCESS_TYPE'
 import { addUserToEntityACL } from './acl'
 import {
   createProject,

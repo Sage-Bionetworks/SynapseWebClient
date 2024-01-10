@@ -1,4 +1,5 @@
 import { Page } from '@playwright/test'
+import { UserBundle } from '@sage-bionetworks/synapse-types'
 import { BackendDestinationEnum, doDelete } from './http'
 import { waitForSrcEndpointConfig } from './utils'
 
@@ -11,10 +12,16 @@ export async function getVerificationSubmissionId(
   const bundle = await page.evaluate(
     async ({ userId, accessToken }) => {
       // @ts-expect-error: Cannot find name 'SRC'
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
       const mask = await SRC.SynapseConstants
         .USER_BUNDLE_MASK_VERIFICATION_SUBMISSION
       // @ts-expect-error: Cannot find name 'SRC'
-      return await SRC.SynapseClient.getUserBundle(userId, mask, accessToken)
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      return (await SRC.SynapseClient.getUserBundle(
+        userId,
+        mask,
+        accessToken,
+      )) as UserBundle
     },
     { userId, accessToken },
   )

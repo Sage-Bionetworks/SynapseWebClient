@@ -176,7 +176,7 @@ const getFileMD5 = async (page: Page) => {
 }
 
 let userProject: Project
-let fileHandleIds: string[] = []
+const fileHandleIds: string[] = []
 
 test.describe('Files', () => {
   testAuth.beforeAll(async ({ browser, storageStatePaths }) => {
@@ -344,72 +344,85 @@ test.describe('Files', () => {
     },
   )
 
-  testAuth(
-    'should create and delete a file',
-    async ({ userPage, browserName }) => {
-      test.slow()
+  testAuth('should create and delete a file', async ({ userPage }) => {
+    test.slow()
 
-      const fileName = 'test_file.csv'
-      const filePath = `data/${fileName}`
-      const updatedFilePath = `data/test_file2.csv`
+    const fileName = 'test_file.csv'
+    const filePath = `data/${fileName}`
+    const updatedFilePath = `data/test_file2.csv`
 
-      await testAuth.step('go to files tab', async () => {
-        await goToDashboardPage(userPage, entityUrlPathname(userProject.id))
-        await expect(
-          userPage.getByRole('heading', { name: userProject.name }),
-        ).toBeVisible()
-        await userPage.getByRole('link', { name: 'Files', exact: true }).click()
+    await testAuth.step('go to files tab', async () => {
+      await goToDashboardPage(userPage, entityUrlPathname(userProject.id))
+      await expect(
+        userPage.getByRole('heading', { name: userProject.name }),
+      ).toBeVisible()
+      await userPage.getByRole('link', { name: 'Files', exact: true }).click()
+    })
+
+    await testAuth.step('upload file', async () => {
+      await uploadFile(userPage, filePath, 'initialUpload')
+      await dismissFileUploadAlert(userPage)
+    })
+
+    const fileLink = await testAuth.step('get link to file', async () => {
+      const fileLink = userPage.getByRole('link', { name: fileName })
+      await expect(fileLink).toBeVisible({
+        timeout: defaultExpectTimeout * 3, // extra time for file to be created
       })
+      return fileLink
+    })
 
-      await testAuth.step('upload file', async () => {
-        await uploadFile(userPage, filePath, 'initialUpload')
-        await dismissFileUploadAlert(userPage)
-      })
+    const { fileEntityId } = await testAuth.step(
+      'get fileEntityId',
+      async () => {
+        const fileLinkHref = await fileLink.getAttribute('href')
+        expect(fileLinkHref).not.toBeNull()
 
-      const fileLink = await testAuth.step('get link to file', async () => {
-        const fileLink = userPage.getByRole('link', { name: fileName })
-        await expect(fileLink).toBeVisible({
-          timeout: defaultExpectTimeout * 3, // extra time for file to be created
-        })
-        return fileLink
-      })
+        const fileEntityId = getEntityIdFromPathname(fileLinkHref!)
+        expect(fileEntityId).not.toBe('')
 
-      const { fileEntityId } = await testAuth.step(
-        'get fileEntityId',
-        async () => {
-          const fileLinkHref = await fileLink.getAttribute('href')
-          expect(fileLinkHref).not.toBeNull()
+        return { fileEntityId }
+      },
+    )
 
-          const fileEntityId = getEntityIdFromPathname(fileLinkHref!)
-          expect(fileEntityId).not.toBe('')
+    const md5v1 = await testAuth.step('view file', async () => {
+      await fileLink.click()
+      await expectFilePageLoaded(fileName, fileEntityId, userPage)
+      return await getFileMD5(userPage)
+    })
 
-          return { fileEntityId }
-        },
-      )
+    await testAuth.step('re-upload file', async () => {
+      await uploadFile(userPage, filePath, 'newVersion')
+      await expectFilePageLoaded(fileName, fileEntityId, userPage)
+    })
 
-      const md5v1 = await testAuth.step('view file', async () => {
-        await fileLink.click()
-        await expectFilePageLoaded(fileName, fileEntityId, userPage)
-        return await getFileMD5(userPage)
-      })
+    await testAuth.step(
+      'confirm re-upload did not change md5 or version',
+      async () => {
+        const md5reupload = await getFileMD5(userPage)
+        expect(md5v1).toEqual(md5reupload)
+        await expect(userPage.getByText('V1 (Current)')).toBeVisible()
+      },
+    )
 
-      await testAuth.step('re-upload file', async () => {
-        await uploadFile(userPage, filePath, 'newVersion')
-        await expectFilePageLoaded(fileName, fileEntityId, userPage)
-      })
+    // Upload success alert intermittently appears when re-uploading the same file
+    await testAuth.step(
+      'dismiss file upload alert for re-uploaded file, if visible',
+      async () => {
+        if (
+          await userPage.getByText('File successfully uploaded').isVisible()
+        ) {
+          await dismissFileUploadAlert(userPage)
+        }
+      },
+    )
 
+    await testAuth.step('upload a new file', async () => {
+      await uploadFile(userPage, updatedFilePath, 'newVersion')
+      await expectFilePageLoaded(fileName, fileEntityId, userPage)
+      // Upload success alert intermittently appears when uploading a new version of the same file
       await testAuth.step(
-        'confirm re-upload did not change md5 or version',
-        async () => {
-          const md5reupload = await getFileMD5(userPage)
-          expect(md5v1).toEqual(md5reupload)
-          await expect(userPage.getByText('V1 (Current)')).toBeVisible()
-        },
-      )
-
-      // Upload success alert intermittently appears when re-uploading the same file
-      await testAuth.step(
-        'dismiss file upload alert for re-uploaded file, if visible',
+        'dismiss file upload alert for new version of file, if visible',
         async () => {
           if (
             await userPage.getByText('File successfully uploaded').isVisible()
@@ -418,147 +431,127 @@ test.describe('Files', () => {
           }
         },
       )
+    })
 
-      await testAuth.step('upload a new file', async () => {
-        await uploadFile(userPage, updatedFilePath, 'newVersion')
-        await expectFilePageLoaded(fileName, fileEntityId, userPage)
-        // Upload success alert intermittently appears when uploading a new version of the same file
-        await testAuth.step(
-          'dismiss file upload alert for new version of file, if visible',
-          async () => {
-            if (
-              await userPage.getByText('File successfully uploaded').isVisible()
-            ) {
-              await dismissFileUploadAlert(userPage)
-            }
-          },
+    await testAuth.step(
+      'confirm uploading new file changed md5 and version',
+      async () => {
+        const md5v2 = await getFileMD5(userPage)
+        expect(md5v1).not.toEqual(md5v2)
+        await expect(userPage.getByText('V2 (Current)')).toBeVisible()
+      },
+    )
+
+    await testAuth.step(
+      'add associated fileHandleIds to cleanup list',
+      async () => {
+        const fileHandleIdV1 = await getEntityFileHandleId(
+          userPage,
+          getAdminPAT(),
+          fileEntityId,
+          1,
         )
+        const fileHandleIdV2 = await getEntityFileHandleId(
+          userPage,
+          getAdminPAT(),
+          fileEntityId,
+          2,
+        )
+        fileHandleIds.push(fileHandleIdV1)
+        fileHandleIds.push(fileHandleIdV2)
+      },
+    )
+
+    await testAuth.step('move file to trash can', async () => {
+      await testAuth.step('delete file', async () => {
+        await userPage.getByRole('button', { name: 'File Tools' }).click()
+        await userPage.getByRole('menuitem', { name: 'Delete File' }).click()
       })
 
-      await testAuth.step(
-        'confirm uploading new file changed md5 and version',
-        async () => {
-          const md5v2 = await getFileMD5(userPage)
-          expect(md5v1).not.toEqual(md5v2)
-          await expect(userPage.getByText('V2 (Current)')).toBeVisible()
-        },
-      )
+      await testAuth.step('confirm deletion', async () => {
+        await expect(
+          userPage.getByRole('heading', { name: 'Confirm Deletion' }),
+        ).toBeVisible()
+        await expect(
+          userPage.getByText(
+            `Are you sure you want to delete File "${fileName}"?`,
+          ),
+        ).toBeVisible()
+        await expect(
+          userPage.getByRole('button', { name: 'Cancel' }),
+        ).toBeVisible()
 
-      await testAuth.step(
-        'add associated fileHandleIds to cleanup list',
-        async () => {
-          const fileHandleIdV1 = await getEntityFileHandleId(
-            userPage,
-            getAdminPAT(),
-            fileEntityId,
-            1,
-          )
-          const fileHandleIdV2 = await getEntityFileHandleId(
-            userPage,
-            getAdminPAT(),
-            fileEntityId,
-            2,
-          )
-          fileHandleIds.push(fileHandleIdV1)
-          fileHandleIds.push(fileHandleIdV2)
-        },
-      )
+        await userPage.getByRole('button', { name: 'Delete' }).click()
+      })
 
-      await testAuth.step('move file to trash can', async () => {
-        await testAuth.step('delete file', async () => {
-          await userPage.getByRole('button', { name: 'File Tools' }).click()
-          await userPage.getByRole('menuitem', { name: 'Delete File' }).click()
-        })
+      await testAuth.step('confirm that file was deleted', async () => {
+        await userPage.waitForURL(`${entityUrlPathname(userProject.id)}/files/`)
 
-        await testAuth.step('confirm deletion', async () => {
-          await expect(
-            userPage.getByRole('heading', { name: 'Confirm Deletion' }),
-          ).toBeVisible()
-          await expect(
-            userPage.getByText(
-              `Are you sure you want to delete File "${fileName}"?`,
-            ),
-          ).toBeVisible()
-          await expect(
-            userPage.getByRole('button', { name: 'Cancel' }),
-          ).toBeVisible()
+        await expect(
+          userPage.getByRole('heading', { name: 'Files' }),
+        ).toBeVisible()
+        await expect(
+          userPage.getByRole('link', { name: fileName }),
+        ).not.toBeVisible()
 
-          await userPage.getByRole('button', { name: 'Delete' }).click()
-        })
+        await dismissAlert(userPage, 'The File was successfully deleted.')
+      })
+    })
 
-        await testAuth.step('confirm that file was deleted', async () => {
-          await userPage.waitForURL(
-            `${entityUrlPathname(userProject.id)}/files/`,
-          )
+    await testAuth.step('remove file from trash can', async () => {
+      await testAuth.step('go to trash can', async () => {
+        await userPage.getByLabel('Trash Can').click()
 
-          await expect(
-            userPage.getByRole('heading', { name: 'Files' }),
-          ).toBeVisible()
-          await expect(
-            userPage.getByRole('link', { name: fileName }),
-          ).not.toBeVisible()
+        // reload page if trash can deferred js does not load
+        await expect(async () => {
+          await reloadDashboardPage(userPage)
 
-          await dismissAlert(userPage, 'The File was successfully deleted.')
-        })
+          const trashCanHeading = userPage.getByRole('heading', {
+            name: 'Trash Can',
+          })
+          await expect(trashCanHeading).toBeVisible({
+            timeout: defaultExpectTimeout * 0.5, // decrease timeout, so reload happens more quickly
+          })
+
+          // click on heading, so tooltip on trash can nav button is hidden
+          await trashCanHeading.click()
+        }).toPass()
       })
 
       await testAuth.step('remove file from trash can', async () => {
-        await testAuth.step('go to trash can', async () => {
-          await userPage.getByLabel('Trash Can').click()
-
-          // reload page if trash can deferred js does not load
-          await expect(async () => {
-            await reloadDashboardPage(userPage)
-
-            const trashCanHeading = userPage.getByRole('heading', {
-              name: 'Trash Can',
-            })
-            await expect(trashCanHeading).toBeVisible({
-              timeout: defaultExpectTimeout * 0.5, // decrease timeout, so reload happens more quickly
-            })
-
-            // click on heading, so tooltip on trash can nav button is hidden
-            await trashCanHeading.click()
-          }).toPass()
+        const fileCheckbox = userPage.getByRole('checkbox', {
+          name: `Select ${fileEntityId}`,
         })
+        await expect(fileCheckbox).not.toBeChecked()
 
-        await testAuth.step('remove file from trash can', async () => {
-          const fileCheckbox = userPage.getByRole('checkbox', {
-            name: `Select ${fileEntityId}`,
-          })
-          await expect(fileCheckbox).not.toBeChecked()
+        // Currently programmatically dispatching the click event
+        // because the following aren't working:
+        //  - await fileCheckbox.click() -> fails due to <div class="pageContent margin-top-60"> intercepting pointer events
+        //  - await fileCheckbox.click({force: true}) -> fails to actually check the checkbox
+        await fileCheckbox.dispatchEvent('click')
 
-          // Currently programmatically dispatching the click event
-          // because the following aren't working:
-          //  - await fileCheckbox.click() -> fails due to <div class="pageContent margin-top-60"> intercepting pointer events
-          //  - await fileCheckbox.click({force: true}) -> fails to actually check the checkbox
-          await fileCheckbox.dispatchEvent('click')
+        await expect(fileCheckbox).toBeChecked()
 
-          await expect(fileCheckbox).toBeChecked()
-
-          await userPage
-            .getByRole('button', { name: 'Delete Selected' })
-            .click()
-        })
-
-        await testAuth.step('confirm removal from trash can', async () => {
-          await expect(
-            userPage.getByText('Delete selected items from your Trash?'),
-          ).toBeVisible()
-          await userPage.getByRole('button', { name: 'Delete' }).click()
-        })
-
-        await testAuth.step(
-          'confirm that file was removed from trash can',
-          async () => {
-            await expect(userPage.getByText(fileName)).not.toBeVisible()
-            await expect(userPage.getByText(fileEntityId)).not.toBeVisible()
-            await expect(
-              userPage.getByText('Trash Can is currently empty.'),
-            ).toBeVisible()
-          },
-        )
+        await userPage.getByRole('button', { name: 'Delete Selected' }).click()
       })
-    },
-  )
+
+      await testAuth.step('confirm removal from trash can', async () => {
+        await expect(
+          userPage.getByText('Delete selected items from your Trash?'),
+        ).toBeVisible()
+        await userPage.getByRole('button', { name: 'Delete' }).click()
+      })
+
+      await testAuth.step(
+        'confirm that file was removed from trash can',
+        async () => {
+          await expect(userPage.getByText(fileName)).not.toBeVisible()
+          await expect(userPage.getByText(fileEntityId)).not.toBeVisible()
+          await expect(
+            userPage.getByText('Trash Can is currently empty.'),
+          ).toBeVisible()
+        },
+      )
+    })
+  })
 })
