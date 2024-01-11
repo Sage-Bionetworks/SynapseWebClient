@@ -56,6 +56,8 @@ public class OAuth2AliasServlet extends OAuth2Servlet {
       OAuthValidationRequest request = new OAuthValidationRequest();
       request.setProvider(provider);
       request.setAuthenticationCode(authorizationCode);
+      String redirectUrl = createRedirectUrl(req, provider);
+      request.setRedirectUrl(redirectUrl);
       PrincipalAlias response = client.bindOAuthProvidersUserId(request);
       resp.sendRedirect(PROFILE_BIND_SUCCESS_PLACE);
     } catch (Exception e) {
