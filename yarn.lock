@@ -50,7 +50,7 @@
     chalk "^2.0.0"
     js-tokens "^4.0.0"
 
-"@babel/runtime@^7.0.0", "@babel/runtime@^7.1.2", "@babel/runtime@^7.11.0", "@babel/runtime@^7.12.0", "@babel/runtime@^7.12.13", "@babel/runtime@^7.12.5", "@babel/runtime@^7.13.8", "@babel/runtime@^7.14.0", "@babel/runtime@^7.14.8", "@babel/runtime@^7.18.3", "@babel/runtime@^7.18.9", "@babel/runtime@^7.2.0", "@babel/runtime@^7.21.0", "@babel/runtime@^7.5.5", "@babel/runtime@^7.6.2", "@babel/runtime@^7.6.3", "@babel/runtime@^7.7.2", "@babel/runtime@^7.7.6", "@babel/runtime@^7.8.7":
+"@babel/runtime@^7.0.0", "@babel/runtime@^7.1.2", "@babel/runtime@^7.11.0", "@babel/runtime@^7.12.0", "@babel/runtime@^7.12.13", "@babel/runtime@^7.12.5", "@babel/runtime@^7.13.8", "@babel/runtime@^7.14.0", "@babel/runtime@^7.14.8", "@babel/runtime@^7.18.3", "@babel/runtime@^7.18.9", "@babel/runtime@^7.2.0", "@babel/runtime@^7.21.0", "@babel/runtime@^7.5.5", "@babel/runtime@^7.6.2", "@babel/runtime@^7.6.3", "@babel/runtime@^7.7.2", "@babel/runtime@^7.8.7":
   version "7.21.5"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.21.5.tgz#8492dddda9644ae3bda3b45eabe87382caee7200"
   integrity sha512-8jI69toZqqcsnqGGqwGS4Qb1VwLOEp4hz+CXPywcvjs60u3B4Pom/U/7rm4W8tMOYEB+E9wgD0mW1l3r8qlI9Q==
@@ -895,7 +895,7 @@
     react-virtualized-auto-sizer "^1.0.20"
     react-window "^1.8.9"
 
-"@sage-bionetworks/synapse-types@^0.0.2":
+"@sage-bionetworks/synapse-types@0.0.2", "@sage-bionetworks/synapse-types@^0.0.2":
   version "0.0.2"
   resolved "https://registry.yarnpkg.com/@sage-bionetworks/synapse-types/-/synapse-types-0.0.2.tgz#4190a908a10f10d0cc51e304d6d1d23da41ad64e"
   integrity sha512-31MxrIOnJiAUYeXsDsf2J+q9A6nVZt9pWGfG+pYoKC2vZIgUo7L3ToelYEqoufvdgHht+aWq83bnk/+Y4UNoUA==
@@ -3138,7 +3138,7 @@ hash-it@^4.0.4:
   dependencies:
     curriable "^1.1.0"
 
-history@^4.9.0:
+history@^4.10.1, history@^4.9.0:
   version "4.10.1"
   resolved "https://registry.yarnpkg.com/history/-/history-4.10.1.tgz#33371a65e3a83b267434e2b3f3b1b4c58aad4cf3"
   integrity sha512-36nwAD620w12kuzPAsyINPWJqlNbij+hpK1k9XRloDtym8mxzGYl2c17LnV6IAGB2Dmg4tEa7G7DlawS0+qjew==
@@ -3149,13 +3149,6 @@ history@^4.9.0:
     tiny-invariant "^1.0.2"
     tiny-warning "^1.0.0"
     value-equal "^1.0.1"
-
-history@^5.3.0:
-  version "5.3.0"
-  resolved "https://registry.yarnpkg.com/history/-/history-5.3.0.tgz#1548abaa245ba47992f063a0783db91ef201c73b"
-  integrity sha512-ZqaKwjjrAYUYfLG+htGaIIZ4nioX2L70ZUMIFysS3xvBsSG4x/n1V6TXV3N8ZYNuFGlDirFg32T7B6WOUPDYcQ==
-  dependencies:
-    "@babel/runtime" "^7.7.6"
 
 hoist-non-react-statics@^3.1.0, hoist-non-react-statics@^3.3.1:
   version "3.3.2"
@@ -5339,10 +5332,10 @@ svg-path-sdf@^1.1.3:
     parse-svg-path "^0.1.2"
     svg-path-bounds "^1.0.1"
 
-synapse-react-client@3.1.70:
-  version "3.1.70"
-  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-3.1.70.tgz#1ff2b67eb40a89a631199cbde0501e7206f8fbd8"
-  integrity sha512-F15YtNZySi6HrVHtxfr1XoahKy9yRNlogo3OxTDoOoUQNKEuVBHKHFThz3iuTyfH470Ksheb1EuVNLeZKzQvyQ==
+synapse-react-client@3.1.71:
+  version "3.1.71"
+  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-3.1.71.tgz#c0950c837735161028c17b600f5c23df43fd3323"
+  integrity sha512-GqFfZO7S7BF4C284mD0scoMaqEgBOiezTcOMCvojzO/JuEd8kVgDPNHSCo92uYoW7PG94n5Ig+p2Lcz7L0sfUQ==
   dependencies:
     "@apidevtools/json-schema-ref-parser" "^9.1.2"
     "@brainhubeu/react-carousel" "1.19.26"
@@ -5363,6 +5356,7 @@ synapse-react-client@3.1.70:
     "@rjsf/utils" "5.12.1"
     "@rjsf/validator-ajv8" "5.12.1"
     "@sage-bionetworks/react-base-table" "^1.13.4"
+    "@sage-bionetworks/synapse-types" "0.0.2"
     "@tanstack/react-table" "^8.9.3"
     "@upsetjs/react" "^1.11.0"
     animate.css "^4.1.1"
@@ -5371,7 +5365,7 @@ synapse-react-client@3.1.70:
     dagre "^0.8.5"
     dayjs "^1.11.9"
     downshift "^6.1.12"
-    history "^5.3.0"
+    history "^4.10.1"
     immutable "4.1.0"
     jotai "^2.4.2"
     json-rules-engine "^4.1.0"
