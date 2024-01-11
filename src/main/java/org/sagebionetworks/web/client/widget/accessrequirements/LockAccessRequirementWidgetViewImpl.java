@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.accessrequirements;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -21,6 +22,15 @@ public class LockAccessRequirementWidgetViewImpl
 
   @UiField
   Div accessRequirementRelatedProjectsListContainer;
+
+  @UiField
+  Div coveredEntitiesHeadingUI;
+
+  @UiField
+  Div accessRequirementIDUI;
+
+  @UiField
+  InlineLabel accessRequirementIDField;
 
   public interface Binder
     extends UiBinder<Widget, LockAccessRequirementWidgetViewImpl> {}
@@ -55,7 +65,7 @@ public class LockAccessRequirementWidgetViewImpl
   }
 
   @Override
-  public void setEntitySubjectsWidget(IsWidget entitySubjectsWidget) {
+  public void setEntitySubjectsWidget(IsWidget w) {
     entitySubjectsWidgetContainer.clear();
     entitySubjectsWidgetContainer.add(w);
   }
@@ -64,5 +74,20 @@ public class LockAccessRequirementWidgetViewImpl
   public void setAccessRequirementRelatedProjectsList(IsWidget w) {
     accessRequirementRelatedProjectsListContainer.clear();
     accessRequirementRelatedProjectsListContainer.add(w);
+  }
+
+  @Override
+  public void setCoveredEntitiesHeadingVisible(boolean visible) {
+    coveredEntitiesHeadingUI.setVisible(visible);
+  }
+
+  @Override
+  public void setAccessRequirementID(String arID) {
+    accessRequirementIDField.setText(arID);
+  }
+
+  @Override
+  public void setAccessRequirementIDVisible(boolean visible) {
+    accessRequirementIDUI.setVisible(visible);
   }
 }

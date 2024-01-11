@@ -23,6 +23,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
@@ -67,7 +68,8 @@ public class ACTAccessRequirementWidget
     AuthenticationController authController,
     ReviewAccessorsButton manageAccessButton,
     ConvertACTAccessRequirementButton convertACTAccessRequirementButton,
-    SynapseJSNIUtils jsniUtils
+    SynapseJSNIUtils jsniUtils,
+    IsACTMemberAsyncHandler isACTMemberAsyncHandler
   ) {
     this.view = view;
     this.jsClient = jsClient;
@@ -107,6 +109,10 @@ public class ACTAccessRequirementWidget
         refreshApprovalState();
       }
     };
+    isACTMemberAsyncHandler.isACTActionAvailable(isACT -> {
+      view.setAccessRequirementIDVisible(isACT);
+      view.setCoveredEntitiesHeadingVisible(isACT);
+    });
 
     lazyLoadHelper.configure(loadDataCallback, view);
   }
@@ -147,7 +153,7 @@ public class ACTAccessRequirementWidget
     manageAccessButton.configure(ar);
     convertACTAccessRequirementButton.configure(ar, refreshCallback);
     view.setAccessRequirementName(ar.getName());
-
+    view.setAccessRequirementID(ar.getId().toString());
     lazyLoadHelper.setIsConfigured();
   }
 

@@ -14,4 +14,10 @@ public interface LockAccessRequirementWidgetView extends IsWidget {
   void setAccessRequirementRelatedProjectsList(
     IsWidget accessRequirementRelatedProjectsList
   );
+
+  void setCoveredEntitiesHeadingVisible(boolean visible);
+
+  void setAccessRequirementIDVisible(boolean visible);
+
+  void setAccessRequirementID(String arID);
 }
