@@ -63,4 +63,10 @@ public interface ACTAccessRequirementWidgetView
   public interface Presenter {
     void onRequestAccess();
   }
+
+  void setCoveredEntitiesHeadingVisible(boolean visible);
+
+  void setAccessRequirementIDVisible(boolean visible);
+
+  void setAccessRequirementID(String arID);
 }

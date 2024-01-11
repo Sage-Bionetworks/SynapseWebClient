@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.accessrequirements;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -81,6 +82,15 @@ public class ACTAccessRequirementWidgetViewImpl
 
   @UiField
   Span accessRequirementDescription;
+
+  @UiField
+  Div coveredEntitiesHeadingUI;
+
+  @UiField
+  Div accessRequirementIDUI;
+
+  @UiField
+  InlineLabel accessRequirementIDField;
 
   public interface Binder
     extends UiBinder<Widget, ACTAccessRequirementWidgetViewImpl> {}
@@ -262,5 +272,20 @@ public class ACTAccessRequirementWidgetViewImpl
       );
       accessRequirementDescription.removeStyleName("boldText");
     }
+  }
+
+  @Override
+  public void setCoveredEntitiesHeadingVisible(boolean visible) {
+    coveredEntitiesHeadingUI.setVisible(visible);
+  }
+
+  @Override
+  public void setAccessRequirementID(String arID) {
+    accessRequirementIDField.setText(arID);
+  }
+
+  @Override
+  public void setAccessRequirementIDVisible(boolean visible) {
+    accessRequirementIDUI.setVisible(visible);
   }
 }
