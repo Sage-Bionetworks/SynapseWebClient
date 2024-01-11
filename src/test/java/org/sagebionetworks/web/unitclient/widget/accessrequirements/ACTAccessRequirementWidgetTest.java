@@ -45,6 +45,7 @@ import org.sagebionetworks.web.client.widget.accessrequirements.DeleteAccessRequ
 import org.sagebionetworks.web.client.widget.accessrequirements.EntitySubjectsWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.ReviewAccessorsButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.TeamSubjectsWidget;
+import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
@@ -142,6 +143,9 @@ public class ACTAccessRequirementWidgetTest {
   @Mock
   SynapseJSNIUtils mockJsniUtils;
 
+  @Mock
+  IsACTMemberAsyncHandler mockIsACTMemberAsyncHandler;
+
   Callback lazyLoadDataCallback;
 
   public static final String ROOT_WIKI_ID = "777";
@@ -165,7 +169,8 @@ public class ACTAccessRequirementWidgetTest {
         mockAuthController,
         mockManageAccessButton,
         mockConvertACTAccessRequirementButton,
-        mockJsniUtils
+        mockJsniUtils,
+        mockIsACTMemberAsyncHandler
       );
     when(mockACTAccessRequirement.getSubjectIds()).thenReturn(mockSubjectIds);
     AsyncMockStubber

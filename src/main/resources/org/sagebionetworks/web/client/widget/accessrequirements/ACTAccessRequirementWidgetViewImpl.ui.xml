@@ -61,7 +61,14 @@
 					and Compliance Team (ACT) to discuss at act@sagebase.org
         </bh:Text>
       </bh:Div>
-      <bh:Div styleName="margin-top-10">
+      <bh:Div ui:field="accessRequirementIDUI" visible="false">
+        <g:InlineLabel
+          addStyleNames="boldText margin-right-5"
+          text="Access Requirement ID:"
+        />
+        <g:InlineLabel ui:field="accessRequirementIDField" />
+      </bh:Div>
+      <bh:Div ui:field="coveredEntitiesHeadingUI" styleName="margin-top-10">
         <g:InlineLabel styleName="boldText" text="Entities Covered" />
         <bh:Hr addStyleNames="margin-top-5 margin-bottom-5" />
       </bh:Div>
