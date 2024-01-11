@@ -431,6 +431,7 @@ public class UserProfileEditorWidgetViewImpl
           accountTypeContainer.setVisible(showAccountType);
         }
 
+        // error will be handled/shown by React component
         @Override
         public void onFailure(Throwable caught) {}
       }
