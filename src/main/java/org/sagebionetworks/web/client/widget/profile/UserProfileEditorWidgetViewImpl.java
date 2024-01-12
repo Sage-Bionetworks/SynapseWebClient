@@ -1,8 +1,12 @@
 package org.sagebionetworks.web.client.widget.profile;
 
+import static org.sagebionetworks.web.client.presenter.ProfilePresenter.IS_CERTIFIED;
+import static org.sagebionetworks.web.client.presenter.ProfilePresenter.IS_VERIFIED;
+
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.SuggestBox;
@@ -20,12 +24,14 @@ import org.gwtbootstrap3.client.ui.base.TextBoxBase;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
+import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.jsinterop.AccountLevelBadgeProps;
+import org.sagebionetworks.web.client.jsinterop.AccountLevelBadgesProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
@@ -120,7 +126,10 @@ public class UserProfileEditorWidgetViewImpl
   Anchor orcIdLink;
 
   @UiField
-  ReactComponentDiv accountLevelBadgeContainer;
+  Column accountTypeContainer;
+
+  @UiField
+  ReactComponentDiv accountLevelBadgesContainer;
 
   @UiField
   Div userProfileLinksUI;
@@ -145,6 +154,7 @@ public class UserProfileEditorWidgetViewImpl
   Presenter presenter;
   String originalButtonText;
   CookieProvider cookies;
+  SynapseJavascriptClient jsClient;
 
   @Inject
   public UserProfileEditorWidgetViewImpl(
@@ -154,12 +164,14 @@ public class UserProfileEditorWidgetViewImpl
     AuthenticationController authController,
     SynapseJSNIUtils jsniUtils,
     SynapseReactClientFullContextPropsProvider propsProvider,
-    CookieProvider cookies
+    CookieProvider cookies,
+    SynapseJavascriptClient jsClient
   ) {
     widget = binder.createAndBindUi(this);
     this.jsniUtils = jsniUtils;
     this.propsProvider = propsProvider;
     this.cookies = cookies;
+    this.jsClient = jsClient;
     locationSuggestBox = new SuggestBox(locationOracle);
     locationSuggestBox.setWidth("100%");
     locationTextBox = locationSuggestBox.getTextBox();
@@ -388,13 +400,14 @@ public class UserProfileEditorWidgetViewImpl
 
   @Override
   public void setOwnerId(String userId) {
-    ReactNode accountLevelBadgeComponent =
+    ReactNode accountLevelBadgesComponent =
       React.createElementWithSynapseContext(
-        SRC.SynapseComponents.AccountLevelBadge,
-        AccountLevelBadgeProps.create(userId),
+        SRC.SynapseComponents.AccountLevelBadges,
+        AccountLevelBadgesProps.create(userId),
         propsProvider.getJsInteropContextProps()
       );
-    accountLevelBadgeContainer.render(accountLevelBadgeComponent);
+    accountLevelBadgesContainer.render(accountLevelBadgesComponent);
+    setAccountTypeVisibility(Long.parseLong(userId));
 
     UserProfileLinksProps props = UserProfileLinksProps.create(userId);
     ReactNode profileLinksComponent = React.createElementWithSynapseContext(
@@ -403,6 +416,26 @@ public class UserProfileEditorWidgetViewImpl
       propsProvider.getJsInteropContextProps()
     );
     userProfileLinksReactComponentContainer.render(profileLinksComponent);
+  }
+
+  public void setAccountTypeVisibility(Long userId) {
+    int mask = IS_CERTIFIED | IS_VERIFIED;
+    jsClient.getUserBundle(
+      userId,
+      mask,
+      new AsyncCallback<UserBundle>() {
+        @Override
+        public void onSuccess(UserBundle bundle) {
+          boolean showAccountType =
+            bundle.getIsCertified() | bundle.getIsVerified();
+          accountTypeContainer.setVisible(showAccountType);
+        }
+
+        // error will be handled/shown by React component
+        @Override
+        public void onFailure(Throwable caught) {}
+      }
+    );
   }
 
   @Override

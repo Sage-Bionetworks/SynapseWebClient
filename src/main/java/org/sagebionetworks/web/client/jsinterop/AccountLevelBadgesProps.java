@@ -5,13 +5,13 @@ import jsinterop.annotations.JsPackage;
 import jsinterop.annotations.JsType;
 
 @JsType(isNative = true, namespace = JsPackage.GLOBAL, name = "Object")
-public class AccountLevelBadgeProps extends ReactComponentProps {
+public class AccountLevelBadgesProps extends ReactComponentProps {
 
   String userId;
 
   @JsOverlay
-  public static AccountLevelBadgeProps create(String userId) {
-    AccountLevelBadgeProps props = new AccountLevelBadgeProps();
+  public static AccountLevelBadgesProps create(String userId) {
+    AccountLevelBadgesProps props = new AccountLevelBadgesProps();
     props.userId = userId;
     return props;
   }

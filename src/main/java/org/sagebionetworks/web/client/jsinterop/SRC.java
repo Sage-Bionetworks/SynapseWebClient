@@ -46,7 +46,7 @@ public class SRC {
     public static ReactComponentType<LoginPageProps> LoginPage;
     public static ReactComponentType<HasAccessProps> HasAccess;
     public static ReactComponentType<UserCardProps> UserCard;
-    public static ReactComponentType<AccountLevelBadgeProps> AccountLevelBadge;
+    public static ReactComponentType<AccountLevelBadgesProps> AccountLevelBadges;
     public static ReactComponentType<PageProgressProps> PageProgress;
     public static ReactComponentType<TermsAndConditionsProps> TermsAndConditions;
     public static ReactComponentType<IDUReportProps> IDUReport;

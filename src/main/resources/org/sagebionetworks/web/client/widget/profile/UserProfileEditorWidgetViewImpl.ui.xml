@@ -156,15 +156,15 @@
               </bh:Div>
             </b:FormGroup>
           </b:Column>
-          <b:Column size="MD_12,LG_6">
+        </b:Row>
+        <b:Row>
+          <b:Column size="XS_12" ui:field="accountTypeContainer">
             <b:FormGroup>
               <b:FormLabel for="accountType">Account Type</b:FormLabel>
-              <bh:Div>
-                <w:ReactComponentDiv
-                  ui:field="accountLevelBadgeContainer"
-                  addStyleNames="accountLevelBadgeContainer"
-                />
-              </bh:Div>
+              <w:ReactComponentDiv
+                ui:field="accountLevelBadgesContainer"
+                addStyleNames="accountLevelBadgesContainer margin-top-5"
+              />
             </b:FormGroup>
           </b:Column>
         </b:Row>
