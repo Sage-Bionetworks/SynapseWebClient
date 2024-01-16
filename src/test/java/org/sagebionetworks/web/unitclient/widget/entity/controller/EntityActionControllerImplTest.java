@@ -124,6 +124,7 @@ import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
+import org.sagebionetworks.web.client.jsinterop.CreateTableViewWizardProps;
 import org.sagebionetworks.web.client.jsinterop.ToastMessageOptions;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -377,6 +378,12 @@ public class EntityActionControllerImplTest {
 
   @Mock
   ContainerClientsHelp mockContainerClientsHelp;
+
+  @Captor
+  ArgumentCaptor<CreateTableViewWizardProps.OnComplete> createTableWizardOnCompleteCaptor;
+
+  @Captor
+  ArgumentCaptor<CreateTableViewWizardProps.OnCancel> createTableWizardOnCancelCaptor;
 
   PromptForValuesModalView.Configuration.Builder mockPromptModalConfigurationBuilder;
   Set<ResourceAccess> resourceAccessSet;
@@ -1428,21 +1435,6 @@ public class EntityActionControllerImplTest {
     verify(mockActionMenu)
       .setActionVisible(Action.ADD_TABLE, canCertifiedUserEdit);
     verify(mockActionMenu).setActionListener(Action.ADD_TABLE, controller);
-    verify(mockActionMenu)
-      .setActionVisible(Action.ADD_FILE_VIEW, canCertifiedUserEdit);
-    verify(mockActionMenu).setActionListener(Action.ADD_FILE_VIEW, controller);
-    verify(mockActionMenu)
-      .setActionVisible(Action.ADD_PROJECT_VIEW, canCertifiedUserEdit);
-    verify(mockActionMenu)
-      .setActionListener(Action.ADD_PROJECT_VIEW, controller);
-    verify(mockActionMenu)
-      .setActionVisible(Action.ADD_MATERIALIZED_VIEW, canCertifiedUserEdit);
-    verify(mockActionMenu)
-      .setActionListener(Action.ADD_MATERIALIZED_VIEW, controller);
-    verify(mockActionMenu)
-      .setActionVisible(Action.ADD_VIRTUAL_TABLE, canCertifiedUserEdit);
-    verify(mockActionMenu)
-      .setActionListener(Action.ADD_VIRTUAL_TABLE, controller);
   }
 
   @Test
@@ -1464,14 +1456,6 @@ public class EntityActionControllerImplTest {
       .setActionVisible(Action.UPLOAD_TABLE, canCertifiedUserEdit);
     verify(mockActionMenu)
       .setActionVisible(Action.ADD_TABLE, canCertifiedUserEdit);
-    verify(mockActionMenu)
-      .setActionVisible(Action.ADD_FILE_VIEW, canCertifiedUserEdit);
-    verify(mockActionMenu)
-      .setActionVisible(Action.ADD_PROJECT_VIEW, canCertifiedUserEdit);
-    verify(mockActionMenu)
-      .setActionVisible(Action.ADD_MATERIALIZED_VIEW, canCertifiedUserEdit);
-    verify(mockActionMenu)
-      .setActionVisible(Action.ADD_VIRTUAL_TABLE, canCertifiedUserEdit);
   }
 
   @Test
@@ -1491,8 +1475,6 @@ public class EntityActionControllerImplTest {
 
     verify(mockActionMenu).setActionVisible(Action.UPLOAD_TABLE, false);
     verify(mockActionMenu).setActionVisible(Action.ADD_TABLE, false);
-    verify(mockActionMenu).setActionVisible(Action.ADD_FILE_VIEW, false);
-    verify(mockActionMenu).setActionVisible(Action.ADD_PROJECT_VIEW, false);
   }
 
   @Test
@@ -2041,39 +2023,6 @@ public class EntityActionControllerImplTest {
     );
     verify(mockActionMenu).setActionVisible(Action.VIEW_WIKI_SOURCE, true);
     verify(mockActionMenu).setActionEnabled(Action.VIEW_WIKI_SOURCE, true);
-  }
-
-  @Test
-  public void testConfigureAddSubmissionView() {
-    entityBundle.setEntity(new Project());
-    controller.configure(
-      mockActionMenu,
-      entityBundle,
-      true,
-      wikiPageId,
-      EntityArea.TABLES,
-      mockAddToDownloadListWidget
-    );
-    verify(mockActionMenu).setActionVisible(Action.ADD_SUBMISSION_VIEW, true);
-    verify(mockActionMenu)
-      .setActionListener(Action.ADD_SUBMISSION_VIEW, controller);
-  }
-
-  @Test
-  public void testConfigureAddSubmissionViewCannotEdit() {
-    entityBundle.setEntity(new Project());
-    permissions.setCanCertifiedUserEdit(false);
-    controller.configure(
-      mockActionMenu,
-      entityBundle,
-      true,
-      wikiPageId,
-      EntityArea.TABLES,
-      mockAddToDownloadListWidget
-    );
-    verify(mockActionMenu).setActionVisible(Action.ADD_SUBMISSION_VIEW, false);
-    verify(mockActionMenu)
-      .setActionListener(Action.ADD_SUBMISSION_VIEW, controller);
   }
 
   @Test
@@ -4428,55 +4377,23 @@ public class EntityActionControllerImplTest {
       mockAddToDownloadListWidget
     );
     controller.onAction(Action.ADD_TABLE, null);
-    verify(mockCreateTableViewWizard).configure(entityId, TableType.table);
-    verify(mockCreateTableViewWizard).showModal(any(WizardCallback.class));
-  }
-
-  @Test
-  public void testAddFileView() {
-    AsyncMockStubber
-      .callWithInvoke()
-      .when(mockPreflightController)
-      .checkCreateEntity(
-        any(EntityBundle.class),
-        anyString(),
-        any(Callback.class)
-      );
-    controller.configure(
-      mockActionMenu,
-      entityBundle,
-      true,
-      wikiPageId,
-      currentEntityArea,
-      mockAddToDownloadListWidget
-    );
-    controller.onAction(Action.ADD_FILE_VIEW, null);
-    verify(mockCreateTableViewWizard).configure(entityId, TableType.file_view);
-    verify(mockCreateTableViewWizard).showModal(any(WizardCallback.class));
-  }
-
-  @Test
-  public void testAddProjectView() {
-    AsyncMockStubber
-      .callWithInvoke()
-      .when(mockPreflightController)
-      .checkCreateEntity(
-        any(EntityBundle.class),
-        anyString(),
-        any(Callback.class)
-      );
-    controller.configure(
-      mockActionMenu,
-      entityBundle,
-      true,
-      wikiPageId,
-      currentEntityArea,
-      mockAddToDownloadListWidget
-    );
-    controller.onAction(Action.ADD_PROJECT_VIEW, null);
     verify(mockCreateTableViewWizard)
-      .configure(entityId, TableType.project_view);
-    verify(mockCreateTableViewWizard).showModal(any(WizardCallback.class));
+      .configure(
+        eq(entityId),
+        createTableWizardOnCompleteCaptor.capture(),
+        createTableWizardOnCancelCaptor.capture()
+      );
+    verify(mockCreateTableViewWizard).setOpen(true);
+
+    // Test onCancel
+    createTableWizardOnCancelCaptor.getValue().onCancel();
+    verify(mockPlaceChanger, never()).goTo(any());
+    verify(mockCreateTableViewWizard).setOpen(false);
+
+    // Test onComplete
+    createTableWizardOnCompleteCaptor.getValue().onComplete("syn123");
+    verify(mockPlaceChanger).goTo(any(Synapse.class));
+    verify(mockCreateTableViewWizard, times(2)).setOpen(false);
   }
 
   @Test
@@ -4654,70 +4571,6 @@ public class EntityActionControllerImplTest {
 
     assertFalse(tableEntity.getIsSearchEnabled());
     verify(mockView).showErrorMessage(errorMessage);
-  }
-
-  @Test
-  public void testOnAddMaterializedView() {
-    when(
-      mockSqlDefinedTableEditor.configure(anyString(), any(EntityType.class))
-    )
-      .thenReturn(mockSqlDefinedTableEditor);
-    AsyncMockStubber
-      .callSuccessWith(mockMaterializedView)
-      .when(mockSynapseJavascriptClient)
-      .createEntity(any(Entity.class), any(AsyncCallback.class));
-    AsyncMockStubber
-      .callWithInvoke()
-      .when(mockPreflightController)
-      .checkCreateEntity(
-        any(EntityBundle.class),
-        eq(MaterializedView.class.getCanonicalName()),
-        any(Callback.class)
-      );
-    controller.configure(
-      mockActionMenu,
-      entityBundle,
-      true,
-      wikiPageId,
-      currentEntityArea,
-      mockAddToDownloadListWidget
-    );
-    controller.onAction(Action.ADD_MATERIALIZED_VIEW, null);
-    verify(mockSqlDefinedTableEditor)
-      .configure(entityBundle.getEntity().getId(), EntityType.materializedview);
-    verify(mockSqlDefinedTableEditor).show();
-  }
-
-  @Test
-  public void testOnAddVirtualTable() {
-    when(
-      mockSqlDefinedTableEditor.configure(anyString(), any(EntityType.class))
-    )
-      .thenReturn(mockSqlDefinedTableEditor);
-    AsyncMockStubber
-      .callSuccessWith(mockVirtualTable)
-      .when(mockSynapseJavascriptClient)
-      .createEntity(any(Entity.class), any(AsyncCallback.class));
-    AsyncMockStubber
-      .callWithInvoke()
-      .when(mockPreflightController)
-      .checkCreateEntity(
-        any(EntityBundle.class),
-        eq(VirtualTable.class.getCanonicalName()),
-        any(Callback.class)
-      );
-    controller.configure(
-      mockActionMenu,
-      entityBundle,
-      true,
-      wikiPageId,
-      currentEntityArea,
-      mockAddToDownloadListWidget
-    );
-    controller.onAction(Action.ADD_VIRTUAL_TABLE, null);
-    verify(mockSqlDefinedTableEditor)
-      .configure(entityBundle.getEntity().getId(), EntityType.virtualtable);
-    verify(mockSqlDefinedTableEditor).show();
   }
 
   @Test

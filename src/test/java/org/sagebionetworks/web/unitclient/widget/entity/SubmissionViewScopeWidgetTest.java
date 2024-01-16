@@ -25,13 +25,9 @@ import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.SubmissionView;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.evaluation.EvaluationFinder;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationList;
 import org.sagebionetworks.web.client.widget.evaluation.SubmissionViewScopeEditor;
-import org.sagebionetworks.web.client.widget.evaluation.SubmissionViewScopeEditorView;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep1;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.SubmissionViewScopeWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.SubmissionViewScopeWidgetView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -228,6 +224,6 @@ public class SubmissionViewScopeWidgetTest {
     widget.onSave();
 
     verify(mockSynAlert)
-      .showError(CreateTableViewWizardStep1.EMPTY_SCOPE_MESSAGE);
+      .showError(SubmissionViewScopeWidget.EMPTY_SCOPE_MESSAGE);
   }
 }

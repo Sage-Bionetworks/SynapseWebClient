@@ -614,10 +614,6 @@ import org.sagebionetworks.web.client.widget.table.modal.download.DownloadFilePa
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadFilePageViewImpl;
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQueryModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQueryModalWidgetImpl;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep1View;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep1ViewImpl;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep2View;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep2ViewImpl;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidgetView;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityViewScopeWidgetView;
@@ -1446,8 +1442,6 @@ public class PortalGinModule extends AbstractGinModule {
 
     bind(RefreshAlertView.class).to(RefreshAlertViewImpl.class);
     bind(UserSelectorView.class).to(UserSelectorViewImpl.class);
-    bind(CreateTableViewWizardStep1View.class)
-      .to(CreateTableViewWizardStep1ViewImpl.class);
 
     bind(EntityContainerListWidgetView.class)
       .to(EntityContainerListWidgetViewImpl.class);
@@ -1464,8 +1458,6 @@ public class PortalGinModule extends AbstractGinModule {
     bind(ContainerClientsHelp.class).to(ContainerClientsHelpImpl.class);
 
     bind(FileDownloadMenuItemView.class).to(FileDownloadMenuItemViewImpl.class);
-    bind(CreateTableViewWizardStep2View.class)
-      .to(CreateTableViewWizardStep2ViewImpl.class);
     bind(SqlDefinedTableEditorView.class)
       .to(SqlDefinedTableEditorViewImpl.class);
     bind(ChallengeWidgetView.class).to(ChallengeWidgetViewImpl.class);

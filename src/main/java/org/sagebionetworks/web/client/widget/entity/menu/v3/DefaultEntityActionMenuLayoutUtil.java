@@ -94,14 +94,7 @@ public class DefaultEntityActionMenuLayoutUtil {
         );
         layout.setPrimaryMenuActions(
           Collections.singletonList(
-            Arrays.asList(
-              ActionViewProps.create(Action.ADD_TABLE),
-              ActionViewProps.create(Action.ADD_FILE_VIEW),
-              ActionViewProps.create(Action.ADD_PROJECT_VIEW),
-              ActionViewProps.create(Action.ADD_SUBMISSION_VIEW),
-              ActionViewProps.create(Action.ADD_MATERIALIZED_VIEW),
-              ActionViewProps.create(Action.ADD_VIRTUAL_TABLE)
-            )
+            Arrays.asList(ActionViewProps.create(Action.ADD_TABLE))
           )
         );
         break;

@@ -954,27 +954,9 @@ public class EntityActionControllerImpl
       actionMenu.setActionListener(Action.UPLOAD_TABLE, this);
       actionMenu.setActionVisible(Action.ADD_TABLE, canEditResults);
       actionMenu.setActionListener(Action.ADD_TABLE, this);
-      actionMenu.setActionVisible(Action.ADD_FILE_VIEW, canEditResults);
-      actionMenu.setActionListener(Action.ADD_FILE_VIEW, this);
-      actionMenu.setActionVisible(Action.ADD_PROJECT_VIEW, canEditResults);
-      actionMenu.setActionListener(Action.ADD_PROJECT_VIEW, this);
-      actionMenu.setActionVisible(Action.ADD_SUBMISSION_VIEW, canEditResults);
-      actionMenu.setActionListener(Action.ADD_SUBMISSION_VIEW, this);
-      actionMenu.setActionVisible(Action.ADD_MATERIALIZED_VIEW, canEditResults);
-      actionMenu.setActionListener(Action.ADD_MATERIALIZED_VIEW, this);
-      actionMenu.setActionVisible(
-        Action.ADD_VIRTUAL_TABLE,
-        canEditResults && DisplayUtils.isInTestWebsite(cookies)
-      );
-      actionMenu.setActionListener(Action.ADD_VIRTUAL_TABLE, this);
     } else {
       actionMenu.setActionVisible(Action.UPLOAD_TABLE, false);
       actionMenu.setActionVisible(Action.ADD_TABLE, false);
-      actionMenu.setActionVisible(Action.ADD_FILE_VIEW, false);
-      actionMenu.setActionVisible(Action.ADD_PROJECT_VIEW, false);
-      actionMenu.setActionVisible(Action.ADD_SUBMISSION_VIEW, false);
-      actionMenu.setActionVisible(Action.ADD_MATERIALIZED_VIEW, false);
-      actionMenu.setActionVisible(Action.ADD_VIRTUAL_TABLE, false);
     }
   }
 
@@ -1829,26 +1811,11 @@ public class EntityActionControllerImpl
       case ADD_TABLE:
         onAddTable();
         break;
-      case ADD_FILE_VIEW:
-        onAddFileView();
-        break;
       case ADD_DATASET:
         onAddDataset();
         break;
       case ADD_DATASET_COLLECTION:
         onAddDatasetCollection();
-        break;
-      case ADD_PROJECT_VIEW:
-        onAddProjectView();
-        break;
-      case ADD_SUBMISSION_VIEW:
-        onAddSubmissionView();
-        break;
-      case ADD_MATERIALIZED_VIEW:
-        onAddMaterializedView();
-        break;
-      case ADD_VIRTUAL_TABLE:
-        onAddVirtualTable();
         break;
       case CREATE_EXTERNAL_DOCKER_REPO:
         onCreateExternalDockerRepo();
@@ -1954,16 +1921,6 @@ public class EntityActionControllerImpl
     getUploadTableModalWidget().showModal(entityUpdatedWizardCallback);
   }
 
-  public void onAddFileView() {
-    preflightController.checkCreateEntity(
-      entityBundle,
-      EntityView.class.getName(),
-      () -> {
-        postCheckCreateTableOrView(TableType.file_view);
-      }
-    );
-  }
-
   public void onAddDataset() {
     preflightController.checkCreateEntity(
       entityBundle,
@@ -1980,16 +1937,6 @@ public class EntityActionControllerImpl
       Dataset.class.getName(),
       () -> {
         postCheckCreateTableOrView(TableType.dataset_collection);
-      }
-    );
-  }
-
-  public void onAddProjectView() {
-    preflightController.checkCreateEntity(
-      entityBundle,
-      EntityView.class.getName(),
-      () -> {
-        postCheckCreateTableOrView(TableType.project_view);
       }
     );
   }
@@ -2033,32 +1980,19 @@ public class EntityActionControllerImpl
     );
   }
 
-  private void postCheckCreateTableOrView(TableType type) {
-    getCreateTableViewWizard()
-      .configure(entityBundle.getEntity().getId(), type);
-    getCreateTableViewWizard()
-      .showModal(
-        new WizardCallback() {
-          @Override
-          public void onFinished() {
-            // Intentionally empty
-            // The modal will redirect us to the appropriate Place, which will trigger a full page update
-          }
-
-          @Override
-          public void onCanceled() {}
-        }
-      );
-  }
-
-  public void onAddSubmissionView() {
-    preflightController.checkCreateEntity(
-      entityBundle,
-      SubmissionView.class.getName(),
+  private void postCheckCreateTableOrView(TableType table) {
+    CreateTableViewWizard wizard = getCreateTableViewWizard();
+    wizard.configure(
+      entityBundle.getEntity().getId(),
+      newId -> {
+        wizard.setOpen(false);
+        getGlobalApplicationState().getPlaceChanger().goTo(new Synapse(newId));
+      },
       () -> {
-        postCheckCreateTableOrView(TableType.submission_view);
+        wizard.setOpen(false);
       }
     );
+    wizard.setOpen(true);
   }
 
   private void onUploadNewFileEntity() {
