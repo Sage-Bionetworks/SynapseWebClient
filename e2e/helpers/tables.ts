@@ -24,7 +24,9 @@ export const expectTablesPageLoaded = async (page: Page, projectId: string) => {
     await expect(
       page.getByRole('button', { name: 'Upload a Table' }),
     ).toBeVisible()
-    await expect(page.getByRole('button', { name: 'Add New...' })).toBeVisible()
+    await expect(
+      page.getByRole('button', { name: 'Add Table or View' }),
+    ).toBeVisible()
   })
 }
 

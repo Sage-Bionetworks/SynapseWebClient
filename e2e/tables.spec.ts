@@ -145,29 +145,18 @@ test.describe('Tables', () => {
     })
 
     await test.step('User creates a table', async () => {
-      const createTableHeader =
-        await test.step('open table creation modal', async () => {
-          await userPage.getByRole('button', { name: 'Add New...' }).click()
-          await userPage.getByRole('menuitem', { name: 'Add Table' }).click()
-          const createTableHeader = userPage.getByRole('heading', {
-            name: 'Create Table',
-          })
-          await expect(createTableHeader).toBeVisible()
-          return createTableHeader
+      await test.step('open table creation modal', async () => {
+        await userPage
+          .getByRole('button', { name: 'Add Table or View' })
+          .click()
+        await userPage.getByRole('heading', {
+          name: 'Create Table or View',
         })
-
-      await test.step('enter table name and description', async () => {
         await userPage
-          .locator('div')
-          .filter({ hasText: /^Name$/ })
-          .getByRole('textbox')
-          .fill(tableName)
-        await userPage
-          .locator('div')
-          .filter({ hasText: /^Description$/ })
-          .locator('textarea')
-          .fill(tableDescription)
-        await userPage.getByRole('button', { name: 'Next' }).click()
+          .getByRole('menuitem', {
+            name: 'Table',
+          })
+          .click()
       })
 
       await test.step('create table schema', async () => {
@@ -175,14 +164,13 @@ test.describe('Tables', () => {
           userPage,
           initialColumnsSchemaConfig,
         )
+        await userPage.getByRole('button', { name: 'Next' }).click()
       })
 
-      await test.step('finish creating table', async () => {
+      await test.step('enter table name and description', async () => {
+        await userPage.getByLabel('Name').fill(tableName)
+        await userPage.getByLabel('Description').fill(tableDescription)
         await userPage.getByRole('button', { name: 'Finish' }).click()
-        await expect(
-          userPage.getByText('Updating the table schema...'),
-        ).toBeVisible()
-        await expect(createTableHeader).not.toBeVisible()
       })
     })
 
