@@ -67,6 +67,35 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v3
+      - name: Check colima and lima version
+        if: runner.os == 'macos'
+        run: |
+          echo "- runner colima version: $(colima version)" >> $GITHUB_STEP_SUMMARY
+          LIMA_VERSION=$(limactl --version)
+          echo "- runner lima version: ${LIMA_VERSION}" >> $GITHUB_STEP_SUMMARY
+          if [[ !("${LIMA_VERSION}" == "limactl version 0.19.0" || "${LIMA_VERSION}" == "limactl version 0.19.1") ]]; then 
+            echo "::warning::runner lima version has changed. Consider removing lima/colima downgrade, see SWC-6655."
+          fi
+      - name: Downgrade colima/lima versions
+        if: runner.os == 'macos'
+        run: |
+          brew uninstall colima
+          brew uninstall lima
+
+          # install lima
+          LIMA_VERSION="v0.18.0"
+          LIMA_VERSION_URL="https://github.com/lima-vm/lima/releases/download/${LIMA_VERSION}/lima-${LIMA_VERSION:1}-$(uname -s)-$(uname -m).tar.gz"
+          curl -fsSL "${LIMA_VERSION_URL}" | tar Cxzvm /usr/local
+
+          # install colima
+          COLIMA_VERSION="v0.6.6"
+          COLIMA_VERSION_URL="https://github.com/abiosoft/colima/releases/download/${COLIMA_VERSION}/colima-$(uname -s)-$(uname -m)"
+          sudo mkdir -p /usr/local/bin
+          sudo curl -L -o /usr/local/bin/colima "${COLIMA_VERSION_URL}" && sudo chmod +x /usr/local/bin/colima
+
+          # Get colima and lima versions
+          limactl --version
+          colima version
       - name: Setup docker (missing on MacOS)
         if: runner.os == 'macos'
         run: |
@@ -77,12 +106,6 @@ jobs:
         with:
           name: ${{ env.BUILD_ARTIFACT_NAME }}
           path: ${{ env.BUILD_DIR }}
-      - name: Confirm build downloaded
-        run: |
-          if [ ! -e "/$(pwd)/${{ env.BUILD_DIR }}/${{ env.BUILD_NAME }}" ]; then
-            echo "::error ::downloaded WAR not found"
-            exit 1
-          fi
       - name: Run SWC on Tomcat
         run: |
           docker run \
@@ -99,10 +122,34 @@ jobs:
         run: yarn install --frozen-lockfile
       - name: Install Playwright Browsers
         run: yarn playwright install --with-deps
-      - name: Confirm Docker container is running
+      - name: Check for common errors
         run: |
+          if [ ! -e "/$(pwd)/${{ env.BUILD_DIR }}/${{ env.BUILD_NAME }}" ]; then
+            echo "::error:: downloaded WAR not found at expected location"
+            exit 1
+          fi
           if [[ $(docker ps --filter "name=${{ env.CONTAINER_NAME }}" --format '{{.Names}}') != "${{ env.CONTAINER_NAME }}" ]]; then
-            echo "::error SWC docker container is not running"
+            echo "::error:: SWC docker container is not running"
+            exit 1
+          fi
+          if ! docker port "${{ env.CONTAINER_NAME }}" | grep -q "8080/tcp -> 0.0.0.0:8888"; then
+              echo "::error:: SWC container configuration does not specify expected port mapping"
+              exit 1
+          fi
+          if [[ "$(docker exec "${{ env.CONTAINER_NAME }}" bash -c "curl -sS -o /dev/null -w '%{http_code}\n' http://127.0.0.1:8080")" != "200" ]]; then
+            echo "::error:: SWC container port not accessible from container"
+            exit 1
+          fi
+          if [[ "$(docker exec "${{ env.CONTAINER_NAME }}" bash -c "curl -sS -o /dev/null -w '%{http_code}\n' http://172.17.0.1:8888")" != "200" ]]; then
+            echo "::error:: SWC host port not accessible from container"
+            exit 1
+          fi
+          if ! netstat -an | grep -q "8888"; then
+            echo "::error:: host is not listening to SWC host port"
+            exit 1
+          fi
+          if [[ "$(curl -w '%{http_code}' --output /dev/null --silent --fail --show-error http://127.0.0.1:8888 2>&1)" != "200" ]]; then
+            echo "::error:: SWC host port not accessible from host"
             exit 1
           fi
       - name: Run Playwright tests
