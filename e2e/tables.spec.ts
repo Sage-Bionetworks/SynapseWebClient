@@ -149,7 +149,7 @@ test.describe('Tables', () => {
         await userPage
           .getByRole('button', { name: 'Add Table or View' })
           .click()
-        await userPage.getByRole('heading', {
+        userPage.getByRole('heading', {
           name: 'Create Table or View',
         })
         await userPage
