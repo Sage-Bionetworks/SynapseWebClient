@@ -203,6 +203,7 @@ public class UserProfileEditorWidgetImplTest {
     verify(mockSynAlert, times(nCalls)).clear();
     verify(mockView, times(nCalls)).hideLinkError();
     verify(mockView, times(nCalls)).hideUsernameError();
+    verify(mockView, times(nCalls)).clearEmails();
     verify(mockView, times(nCalls)).setOwnerId(profile.getOwnerId());
     verify(mockView, times(nCalls)).setFirstName(profile.getFirstName());
     verify(mockView, times(nCalls)).setOrcIdHref(ORC_ID);

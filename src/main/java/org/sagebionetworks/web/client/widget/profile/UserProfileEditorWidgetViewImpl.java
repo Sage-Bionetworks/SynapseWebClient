@@ -215,8 +215,12 @@ public class UserProfileEditorWidgetViewImpl
   }
 
   @Override
-  public void setEmails(List<String> emails, String notificationEmail) {
+  public void clearEmails() {
     emailDiv.clear();
+  }
+
+  @Override
+  public void setEmails(List<String> emails, String notificationEmail) {
     if (notificationEmail != null) {
       IsWidget w = getEmailElement(notificationEmail, "strong");
       emailDiv.add(w);

@@ -111,6 +111,7 @@ public class UserProfileEditorWidgetImpl
     view.hideUsernameError();
     view.hideLinkError();
     synAlert.clear();
+    view.clearEmails();
     view.setUsername(profile.getUserName());
     view.setFirstName(profile.getFirstName());
     view.setLastName(profile.getLastName());

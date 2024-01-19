@@ -71,6 +71,7 @@ public interface UserProfileEditorWidgetView extends IsWidget {
   void setEditMode(boolean isEditing);
 
   void setOwnerId(String userId);
+  void clearEmails();
   void setEmails(List<String> emails, String notificationEmail);
   void resetSaveButtonState();
   void setCanEdit(boolean canEdit);
