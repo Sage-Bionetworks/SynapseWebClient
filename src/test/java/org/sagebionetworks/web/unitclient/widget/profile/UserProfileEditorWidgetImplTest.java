@@ -1,11 +1,12 @@
 package org.sagebionetworks.web.unitclient.widget.profile;
 
-import static org.junit.Assert.*;
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -30,7 +31,6 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.place.Profile;
-import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -214,7 +214,6 @@ public class UserProfileEditorWidgetImplTest {
     verify(mockView, times(nCalls)).setLocation(profile.getLocation());
     verify(mockView, times(nCalls)).setLink(profile.getUrl());
     verify(mockView, times(nCalls)).setBio(profile.getSummary());
-    verify(mockView, times(nCalls)).setEmail(EMAIL2);
     verify(mockImageWidget, times(nCalls))
       .configure(profile.getOwnerId(), profile.getProfilePicureFileHandleId());
     verifyIsEditingMode(false, nCalls);
@@ -225,6 +224,7 @@ public class UserProfileEditorWidgetImplTest {
     widget.configure(profile, ORC_ID, mockCallback);
 
     verifyConfigure(1);
+    verify(mockView).setEmails(userEmails, EMAIL2);
     verify(mockView).setCanEdit(true);
   }
 
@@ -239,9 +239,23 @@ public class UserProfileEditorWidgetImplTest {
   @Test
   public void testConfigureNotOwner() {
     when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(null); //anonymous
+    profile.setEmails(null);
     widget.configure(profile, ORC_ID, mockCallback);
 
     verifyConfigure(1);
+    verify(mockView, never()).setEmails(anyList(), anyString());
+    verify(mockView).setCanEdit(false);
+  }
+
+  @Test
+  public void testConfigureACT() {
+    // in this case, the current user ID does not match the profile user ID, but the email list is returned by the service.
+    when(mockAuthController.getCurrentUserPrincipalId())
+      .thenReturn("100200300400");
+    widget.configure(profile, ORC_ID, mockCallback);
+
+    verifyConfigure(1);
+    verify(mockView).setEmails(userEmails, null);
     verify(mockView).setCanEdit(false);
   }
 

@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.profile;
 
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.user.client.ui.IsWidget;
+import java.util.List;
 
 public interface UserProfileEditorWidgetView extends IsWidget {
   public interface Presenter {
@@ -70,7 +71,7 @@ public interface UserProfileEditorWidgetView extends IsWidget {
   void setEditMode(boolean isEditing);
 
   void setOwnerId(String userId);
-  void setEmail(String email);
+  void setEmails(List<String> emails, String notificationEmail);
   void resetSaveButtonState();
   void setCanEdit(boolean canEdit);
 

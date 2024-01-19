@@ -120,28 +120,33 @@ public class UserProfileEditorWidgetImpl
     view.setIndustry(profile.getIndustry());
     view.setLocation(profile.getLocation());
     view.setLink(profile.getUrl());
+    boolean isCurrentUserProfile = profile
+      .getOwnerId()
+      .equals(authController.getCurrentUserPrincipalId());
     if (profile.getEmails() != null && profile.getEmails().size() > 0) {
       // find out what the primary (notification) email address is
       // SWC-5599: the first email is not the notification email address.
-      jsClient.getNotificationEmail(
-        new AsyncCallback<NotificationEmail>() {
-          @Override
-          public void onFailure(Throwable caught) {
-            synAlert.handleException(caught);
-          }
+      if (isCurrentUserProfile) {
+        jsClient.getNotificationEmail(
+          new AsyncCallback<NotificationEmail>() {
+            @Override
+            public void onFailure(Throwable caught) {
+              synAlert.handleException(caught);
+            }
 
-          public void onSuccess(NotificationEmail notificationEmail) {
-            view.setEmail(notificationEmail.getEmail());
+            public void onSuccess(NotificationEmail notificationEmail) {
+              view.setEmails(profile.getEmails(), notificationEmail.getEmail());
+            }
           }
-        }
-      );
+        );
+      } else {
+        view.setEmails(profile.getEmails(), null);
+      }
     }
     view.setOrcIdHref(orcIdHref);
     view.setOwnerId(profile.getOwnerId());
     setIsEditingMode(false);
-    view.setCanEdit(
-      profile.getOwnerId().equals(authController.getCurrentUserPrincipalId())
-    );
+    view.setCanEdit(isCurrentUserProfile);
     this.fileHandleId = profile.getProfilePicureFileHandleId();
     imageWidget.configure(profile.getOwnerId(), this.fileHandleId);
     imageWidget.setRemovePictureCallback(
