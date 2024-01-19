@@ -12,6 +12,7 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import java.util.List;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Column;
@@ -20,6 +21,7 @@ import org.gwtbootstrap3.client.ui.HelpBlock;
 import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.base.TextBoxBase;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.gwtbootstrap3.client.ui.html.Div;
@@ -78,7 +80,7 @@ public class UserProfileEditorWidgetViewImpl
   TextBox industry;
 
   @UiField
-  TextBox email;
+  Div emailDiv;
 
   @UiField
   Div locationSuggestBoxContainer;
@@ -213,8 +215,33 @@ public class UserProfileEditorWidgetViewImpl
   }
 
   @Override
-  public void setEmail(String email) {
-    this.email.setText(email);
+  public void clearEmails() {
+    emailDiv.clear();
+  }
+
+  @Override
+  public void setEmails(List<String> emails, String notificationEmail) {
+    if (notificationEmail != null) {
+      IsWidget w = getEmailElement(notificationEmail, "strong");
+      emailDiv.add(w);
+    }
+    for (String email : emails) {
+      if (!email.equals(notificationEmail)) {
+        IsWidget w = getEmailElement(email, null);
+        emailDiv.add(w);
+      }
+    }
+  }
+
+  private IsWidget getEmailElement(String email, String paragraphStyles) {
+    Tooltip t = new Tooltip(email);
+    Paragraph p = new Paragraph(email);
+    if (paragraphStyles != null) {
+      p.addStyleName(paragraphStyles);
+    }
+    p.setMarginBottom(0);
+    t.add(p);
+    return t;
   }
 
   @Override

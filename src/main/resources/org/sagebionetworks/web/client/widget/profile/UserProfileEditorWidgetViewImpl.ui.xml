@@ -107,12 +107,11 @@
         <b:Row ui:field="ownerFieldsContainer">
           <b:Column size="MD_12,LG_6">
             <b:FormGroup>
-              <b:FormLabel for="email">Email Address</b:FormLabel>
-              <b:TextBox
-                name="email"
-                ui:field="email"
-                readOnly="true"
-                addStyleNames="margin-bottom-10"
+              <b:FormLabel>Email Address</b:FormLabel>
+              <bh:Div
+                ui:field="emailDiv"
+                marginBottom="10"
+                addStyleNames="truncate"
               />
               <b:Anchor
                 addStyleNames="displayInlineBlock"
