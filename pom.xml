@@ -19,7 +19,7 @@
     <webappDirectory>
       ${project.build.directory}/${project.build.finalName}
     </webappDirectory>
-    <synapse.version>475.0</synapse.version>
+    <synapse.version>484.0</synapse.version>
     <gwtVersion>2.10.0</gwtVersion>
     <org.springframework.version>5.3.28</org.springframework.version>
     <guiceVersion>3.0</guiceVersion>

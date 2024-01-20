@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.presenter;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+import static org.sagebionetworks.web.client.presenter.ProfilePresenter.IS_CERTIFIED;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -14,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.quiz.MultichoiceResponse;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.repo.model.quiz.Question;
@@ -30,11 +32,11 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.CertificationQuizView;
 import org.sagebionetworks.web.client.view.QuizView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 public class QuizPresenter
   extends AbstractActivity
@@ -48,9 +50,11 @@ public class QuizPresenter
   private AdapterFactory adapterFactory;
   private Quiz quiz;
   private PortalGinInjector ginInjector;
-  private Map<Long, QuestionContainerWidget> questionNumberToQuestionWidget = new HashMap<Long, QuestionContainerWidget>();
+  private Map<Long, QuestionContainerWidget> questionNumberToQuestionWidget =
+    new HashMap<Long, QuestionContainerWidget>();
   private SynapseAlert synAlert;
   private CertificationQuizView SRCview;
+  SynapseJavascriptClient jsClient;
   private org.sagebionetworks.web.client.place.Quiz place;
 
   @Inject
@@ -63,7 +67,8 @@ public class QuizPresenter
     AdapterFactory adapterFactory,
     JSONObjectAdapter jsonObjectAdapter,
     PortalGinInjector ginInjector,
-    SynapseAlert synAlert
+    SynapseAlert synAlert,
+    SynapseJavascriptClient jsClient
   ) {
     // Set the presenter on the view
     this.authenticationController = authenticationController;
@@ -75,6 +80,7 @@ public class QuizPresenter
     this.synAlert = synAlert;
     this.SRCview = srcView;
     this.view = view;
+    this.jsClient = jsClient;
     this.view.setPresenter(this);
     view.setSynAlertWidget(synAlert.asWidget());
   }
@@ -109,7 +115,8 @@ public class QuizPresenter
     List<Question> questions = quiz.getQuestions();
     Long questionNumber = Long.valueOf(1);
     for (Question question : questions) {
-      QuestionContainerWidget newQuestion = ginInjector.getQuestionContainerWidget();
+      QuestionContainerWidget newQuestion =
+        ginInjector.getQuestionContainerWidget();
       questionNumberToQuestionWidget.put(questionNumber, newQuestion);
       newQuestion.configure(questionNumber, question, null);
       view.addQuestionContainerWidget(newQuestion.asWidget());
@@ -135,7 +142,8 @@ public class QuizPresenter
 
         utils.consoleLog("\nQuestions in the UI...");
         utils.consoleLog("Index : Prompt");
-        Collection<QuestionContainerWidget> uiQuestions = questionNumberToQuestionWidget.values();
+        Collection<QuestionContainerWidget> uiQuestions =
+          questionNumberToQuestionWidget.values();
         for (QuestionContainerWidget questionContainerWidget : uiQuestions) {
           utils.consoleLog(
             questionContainerWidget.getQuestionIndex() +
@@ -171,12 +179,12 @@ public class QuizPresenter
     // submit question/answer combinations for approval
     // create response object from answers
     QuizResponse submission = new QuizResponse();
-    List<QuestionResponse> questionResponses = new ArrayList<QuestionResponse>();
+    List<QuestionResponse> questionResponses =
+      new ArrayList<QuestionResponse>();
 
     for (Long questionNumber : questionNumberToQuestionWidget.keySet()) {
-      QuestionContainerWidget questionWidget = questionNumberToQuestionWidget.get(
-        questionNumber
-      );
+      QuestionContainerWidget questionWidget =
+        questionNumberToQuestionWidget.get(questionNumber);
       Set<Long> answers = questionWidget.getAnswers();
       Long questionIndex = questionWidget.getQuestionIndex();
       MultichoiceResponse response = new MultichoiceResponse();
@@ -220,10 +228,12 @@ public class QuizPresenter
   @Override
   public void showQuizFromPassingRecord(PassingRecord passingRecord) {
     view.clear();
-    List<ResponseCorrectness> responseCorrections = passingRecord.getCorrections();
+    List<ResponseCorrectness> responseCorrections =
+      passingRecord.getCorrections();
     Long questionNumber = Long.valueOf(1);
     for (ResponseCorrectness response : responseCorrections) {
-      QuestionContainerWidget newQuestion = ginInjector.getQuestionContainerWidget();
+      QuestionContainerWidget newQuestion =
+        ginInjector.getQuestionContainerWidget();
       questionNumberToQuestionWidget.put(questionNumber, newQuestion);
       newQuestion.configure(
         questionNumber,
@@ -285,7 +295,36 @@ public class QuizPresenter
 
   public void getIsCertified() {
     synAlert.clear();
+    String currentUserId = authenticationController.getCurrentUserPrincipalId();
+    if (currentUserId == null) {
+      synAlert.showLogin();
+      return;
+    }
+
     view.showLoading();
+    jsClient.getUserBundle(
+      new Long(currentUserId),
+      IS_CERTIFIED,
+      new AsyncCallback<UserBundle>() {
+        @Override
+        public void onSuccess(UserBundle userBundle) {
+          if (userBundle.getIsCertified()) {
+            getPassingRecord();
+          } else {
+            getQuiz();
+          }
+        }
+
+        @Override
+        public void onFailure(Throwable caught) {
+          view.hideLoading();
+          synAlert.handleException(caught);
+        }
+      }
+    );
+  }
+
+  public void getPassingRecord() {
     AsyncCallback<String> callback = new AsyncCallback<String>() {
       @Override
       public void onSuccess(String passingRecordJson) {
@@ -305,11 +344,7 @@ public class QuizPresenter
       @Override
       public void onFailure(Throwable caught) {
         view.hideLoading();
-        if (caught instanceof NotFoundException) {
-          getQuiz();
-        } else {
-          synAlert.handleException(caught);
-        }
+        synAlert.handleException(caught);
       }
     };
     synapseClient.getCertifiedUserPassingRecord(
