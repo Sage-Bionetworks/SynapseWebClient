@@ -279,9 +279,7 @@ test.describe('Tables', () => {
 
       await test.step('save changes to table column schema', async () => {
         await userPage.getByRole('button', { name: 'Save' }).click()
-        await expect(
-          userPage.getByText('Updating the table schema...'),
-        ).toBeVisible()
+        await expect(userPage.getByText('Saving...')).toBeVisible()
 
         await expect(tableSchemaEditorHeader).not.toBeVisible()
         await expectTablePageLoaded(userPage, tableName, tableDescription)
