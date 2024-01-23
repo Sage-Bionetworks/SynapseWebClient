@@ -6,29 +6,6 @@
   xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
 >
   <g:HTMLPanel>
-    <b:ButtonToolBar ui:field="buttonToolbar" visible="false">
-      <b:ButtonGroup>
-        <b:Button ui:field="selectTogglebutton" icon="SQUARE_O" />
-        <b:Button ui:field="selectDropDown" dataToggle="DROPDOWN" />
-        <b:DropDownMenu>
-          <b:DropDownHeader>Select</b:DropDownHeader>
-          <b:AnchorListItem ui:field="selectAllItem">All</b:AnchorListItem>
-          <b:AnchorListItem ui:field="selectNoneItem">None</b:AnchorListItem>
-        </b:DropDownMenu>
-      </b:ButtonGroup>
-      <b:ButtonGroup>
-        <b:Button ui:field="moveUpButton" icon="ARROW_UP" enabled="false" />
-        <b:Button ui:field="moveDownButton" icon="ARROW_DOWN" enabled="false" />
-      </b:ButtonGroup>
-      <b:ButtonGroup>
-        <b:Button
-          ui:field="deleteSelectedButton"
-          icon="TRASH_O"
-          enabled="false"
-        />
-      </b:ButtonGroup>
-    </b:ButtonToolBar>
-
     <t:Table ui:field="table" styleName="table table-striped table-condensed">
       <t:THead>
         <t:TableRow>
@@ -61,32 +38,10 @@
       </t:THead>
       <t:TBody ui:field="tableBody" />
     </t:Table>
-    <b:Button ui:field="addColumnButton" icon="PLUS" type="INFO">
-      Add
-			Column
-    </b:Button>
     <b:Button ui:field="editColumnsButton" icon="GEAR" type="INFO">
       Edit
 			Schema
     </b:Button>
-    <b:Button
-      ui:field="addDefaultColumnsButton"
-      type="DEFAULT"
-      visible="false"
-      addStyleNames="margin-left-5"
-    >
-      Add
-			Default View Columns
-    </b:Button>
-    <b:Button
-      ui:field="addAnnotationColumnsButton"
-      type="DEFAULT"
-      visible="false"
-      addStyleNames="margin-left-5"
-    >
-      Add
-			All Annotations
-    </b:Button>
-    <b.html:Span ui:field="extraButtonsContainer" />
+    <b.html:Div ui:field="editorContainer" />
   </g:HTMLPanel>
 </ui:UiBinder>

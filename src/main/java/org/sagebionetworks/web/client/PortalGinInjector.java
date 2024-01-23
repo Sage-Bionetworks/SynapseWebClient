@@ -256,11 +256,9 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellRen
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdListRendererCellView;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowViewer;
-import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsEditorV2Widget;
-import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsEditorV2WidgetView;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
-import org.sagebionetworks.web.client.widget.table.v2.schema.ImportTableViewColumnsButton;
 import org.sagebionetworks.web.client.widget.team.BigTeamBadge;
 import org.sagebionetworks.web.client.widget.team.EmailInvitationBadge;
 import org.sagebionetworks.web.client.widget.team.JoinTeamConfigEditor;
@@ -526,8 +524,6 @@ public interface PortalGinInjector extends Ginjector {
 
   // TableEntity V2
   ColumnModelsView createNewColumnModelsView();
-
-  ImportTableViewColumnsButton getImportTableViewColumnsButton();
 
   ColumnModelsWidget createNewColumnModelsWidget();
 
@@ -885,6 +881,5 @@ public interface PortalGinInjector extends Ginjector {
 
   FollowingPagePresenter getFollowingPagePresenter();
 
-  ColumnModelsEditorV2Widget getColumnModelsEditorV2Widget();
-  ColumnModelsEditorV2WidgetView getColumnModelsEditorV2WidgetView();
+  ColumnModelsEditorWidget getColumnModelsEditorWidget();
 }

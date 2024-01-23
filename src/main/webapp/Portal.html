@@ -485,6 +485,10 @@
         srcPath = cdnEndpoint + 'generated/synapse-react-client.development.js'
       }
 
+      // TODO: Workaround for SWC-6664
+      // Override the conditional above and just use the production distribution
+      reactQueryPath = cdnEndpoint + 'generated/react-query.production.min.js'
+
       head.load(cdnEndpoint + 'generated/swc.css')
       head.load(cdnEndpoint + 'generated/jquery.min.js')
       head.load(
