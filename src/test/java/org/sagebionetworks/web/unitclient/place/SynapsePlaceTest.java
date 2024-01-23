@@ -220,6 +220,26 @@ public class SynapsePlaceTest {
     Assert.assertEquals(testToken, tokenizer.getToken(place));
   }
 
+  // SWC-6646: verify trailing ',' or '.' are ignored
+  @Test
+  public void testInvalidTrailingCharacter() {
+    String testToken = testEntityId + WIKI_DELIMITER + testAreaToken + ",";
+    Synapse place = tokenizer.getPlace(testToken);
+
+    Assert.assertEquals(testEntityId, place.getEntityId());
+    Assert.assertNull(place.getVersionNumber());
+    Assert.assertEquals(Synapse.EntityArea.WIKI, place.getArea());
+    Assert.assertEquals(testAreaToken, place.getAreaToken());
+
+    testToken = testEntityId + WIKI_DELIMITER + testAreaToken + ".";
+    place = tokenizer.getPlace(testToken);
+
+    Assert.assertEquals(testEntityId, place.getEntityId());
+    Assert.assertNull(place.getVersionNumber());
+    Assert.assertEquals(Synapse.EntityArea.WIKI, place.getArea());
+    Assert.assertEquals(testAreaToken, place.getAreaToken());
+  }
+
   @Test
   public void testGetHrefForDotVersionNull() {
     assertEquals(null, Synapse.getHrefForDotVersion(null));

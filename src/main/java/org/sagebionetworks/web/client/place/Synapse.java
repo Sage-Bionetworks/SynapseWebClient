@@ -19,10 +19,11 @@ public class Synapse extends Place {
   private Synapse.EntityArea area;
 
   public Synapse(String token) {
-    this.synapsePlaceToken = token;
+    // SWC-6646: strip any trailing ',' or '.'
+    this.synapsePlaceToken = token.replaceAll("[,\\.]+$", "");
     area = null;
     areaToken = null;
-    String[] tokensArray = token.split(DELIMITER);
+    String[] tokensArray = synapsePlaceToken.split(DELIMITER);
     LinkedList<String> tokens = new LinkedList<String>();
     for (int i = 0; i < tokensArray.length; i++) {
       tokens.add(tokensArray[i]);
