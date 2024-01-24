@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.presenter;
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.URL;
+import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
@@ -42,7 +43,8 @@ public class SearchPresenter
 
   private SearchQuery currentSearch;
   private SearchResults currentResult;
-  private Map<String, String> timeValueToDisplay = new HashMap<String, String>();
+  private Map<String, String> timeValueToDisplay =
+    new HashMap<String, String>();
   private Date searchStartTime;
   private SynapseJavascriptClient jsClient;
 
@@ -89,6 +91,15 @@ public class SearchPresenter
     String queryTerm = place.getSearchTerm();
     if (queryTerm == null) queryTerm = "";
     currentSearch = checkForJson(queryTerm);
+    if (currentSearch.getQueryTerm().size() == 1) {
+      Place redirectPlace = SearchUtil.willRedirect(
+        currentSearch.getQueryTerm().get(0)
+      );
+      if (redirectPlace != null) {
+        globalApplicationState.getPlaceChanger().goTo(redirectPlace);
+        return;
+      }
+    }
     if (place.getStart() != null) currentSearch.setStart(place.getStart());
     executeSearch();
   }
