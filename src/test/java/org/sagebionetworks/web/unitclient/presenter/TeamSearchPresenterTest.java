@@ -19,11 +19,14 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.presenter.TeamSearchPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -50,6 +53,9 @@ public class TeamSearchPresenterTest {
 
   @Mock
   GlobalApplicationState mockGlobalApplicationState;
+
+  @Mock
+  PlaceChanger mockPlaceChanger;
 
   @Mock
   SynapseClientAsync mockSynapse;
@@ -103,6 +109,8 @@ public class TeamSearchPresenterTest {
     when(mockPlace.getSearchTerm()).thenReturn(searchTerm);
     when(mockPortalGinInjector.getBigTeamBadgeWidget())
       .thenReturn(mockTeamBadge);
+    when(mockGlobalApplicationState.getPlaceChanger())
+      .thenReturn(mockPlaceChanger);
   }
 
   private static PaginatedResults<Team> getTestTeams() {
@@ -184,5 +192,15 @@ public class TeamSearchPresenterTest {
         anyInt(),
         any(AsyncCallback.class)
       );
+  }
+
+  @Test
+  public void testSetPlaceWithSynapseID() throws Exception {
+    // verify searching on a single term that is a Synapse ID redirects to the Synapse place
+    String term = ClientProperties.SYNAPSE_ID_PREFIX + "1234567890"; // # 'syn1234567890'
+
+    presenter.setPlace(new TeamSearch(term));
+
+    verify(mockPlaceChanger).goTo(new Synapse(term));
   }
 }

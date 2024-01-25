@@ -34,6 +34,9 @@ public class SearchUtil {
    * @return
    */
   public static Place willRedirect(String queryTerm) {
+    if (queryTerm == null || queryTerm.trim().length() == 0) {
+      return null;
+    }
     if (queryTerm.startsWith(ClientProperties.SYNAPSE_ID_PREFIX)) {
       String remainder = queryTerm.replaceFirst(
         ClientProperties.SYNAPSE_ID_PREFIX,

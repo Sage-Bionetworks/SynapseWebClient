@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
@@ -102,6 +103,13 @@ public class SearchPresenterTest {
   @Test
   public void constructor() {
     verify(mockView).setPresenter(searchPresenter);
+  }
+
+  @Test
+  public void testWillRedirectEmptySearchTerm() throws Exception {
+    assertNull(SearchUtil.willRedirect((String) null));
+    assertNull(SearchUtil.willRedirect(""));
+    assertNull(SearchUtil.willRedirect("   "));
   }
 
   @Test
@@ -221,5 +229,20 @@ public class SearchPresenterTest {
     verify(mockJsClient, times(2))
       .getSearchResults(any(SearchQuery.class), any(AsyncCallback.class)); // 4
     assertTrue(getTimeFacet(facetName).isEmpty());
+  }
+
+  @Test
+  public void testSetPlaceWithJsonSynapseIdAsSearchTerm() throws Exception {
+    // verify searching on a single term that is a Synapse ID redirects to the Synapse place
+    String term = ClientProperties.SYNAPSE_ID_PREFIX + "1234567890"; // # 'syn1234567890'
+
+    SearchQuery searchQuery = SearchQueryUtils.getDefaultSearchQuery();
+    searchQuery.setQueryTerm(Arrays.asList(new String[] { term }));
+    String searchQueryJson = searchQuery
+      .writeToJSONObject(jsonObjectAdapter.createNew())
+      .toJSONString();
+    searchPresenter.setPlace(new Search(searchQueryJson));
+
+    verify(mockPlaceChanger).goTo(new Synapse(term));
   }
 }

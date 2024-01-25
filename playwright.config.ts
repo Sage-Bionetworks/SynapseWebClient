@@ -90,8 +90,11 @@ export default defineConfig({
     // },
   ],
   webServer: {
-    command: process.env.CI ? '' : 'mvn gwt:run',
+    command: process.env.CI
+      ? 'echo SWC not available at baseURL'
+      : 'mvn gwt:run',
     url: baseURL,
     reuseExistingServer: true, // on CI, will use the tomcat server
+    stdout: 'pipe',
   },
 })
