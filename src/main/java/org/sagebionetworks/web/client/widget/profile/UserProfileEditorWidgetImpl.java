@@ -124,7 +124,10 @@ public class UserProfileEditorWidgetImpl
     boolean isCurrentUserProfile = profile
       .getOwnerId()
       .equals(authController.getCurrentUserPrincipalId());
-    if (profile.getEmails() != null && profile.getEmails().size() > 0) {
+    boolean isEmailAvailable =
+      profile.getEmails() != null && profile.getEmails().size() > 0;
+    view.setEmailsVisible(isEmailAvailable);
+    if (isEmailAvailable) {
       // find out what the primary (notification) email address is
       // SWC-5599: the first email is not the notification email address.
       if (isCurrentUserProfile) {

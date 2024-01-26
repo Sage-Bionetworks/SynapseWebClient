@@ -226,6 +226,7 @@ public class UserProfileEditorWidgetImplTest {
 
     verifyConfigure(1);
     verify(mockView).setEmails(userEmails, EMAIL2);
+    verify(mockView).setEmailsVisible(true);
     verify(mockView).setCanEdit(true);
   }
 
@@ -245,6 +246,7 @@ public class UserProfileEditorWidgetImplTest {
 
     verifyConfigure(1);
     verify(mockView, never()).setEmails(anyList(), anyString());
+    verify(mockView).setEmailsVisible(false);
     verify(mockView).setCanEdit(false);
   }
 
@@ -257,6 +259,7 @@ public class UserProfileEditorWidgetImplTest {
 
     verifyConfigure(1);
     verify(mockView).setEmails(userEmails, null);
+    verify(mockView).setEmailsVisible(true);
     verify(mockView).setCanEdit(false);
   }
 
