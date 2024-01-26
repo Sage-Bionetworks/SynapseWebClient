@@ -83,13 +83,16 @@ const enterTableDataRow = async (
   for (let index = 0; index < columnsSchemaConfig.length; index++) {
     const config = columnsSchemaConfig[index]
     const cell = tableCells.nth(index + 1) // shift right for checkboxes
-    const value = tableData[config.name]
+    let value = tableData[config.name]
 
     if (config.type === 'Date') {
       await selectTableDate(page, cell, value as string)
     } else if (config.type.includes('List')) {
       await enterTableListValues(page, cell, value)
     } else if (config.restrictValues || config.type === 'Boolean') {
+      if (value == undefined) {
+        value = 'nothing selected'
+      }
       await selectTableRestrictValues(cell, value as string)
     } else {
       await enterTableValue(cell, value)
@@ -250,6 +253,18 @@ const expectTableRowCorrect = async (
       await test.step(`confirm ${columnName}`, async () => {
         const expectedText = await test.step('format expected text', () => {
           let expectedText = tableData[columnName!]
+          const columnSchema = columnsSchemaConfig.find(
+            config => config.name === columnName!,
+          )
+
+          // handle null
+          if (expectedText == null) {
+            if (columnSchema?.defaultValue) {
+              expectedText = columnSchema.defaultValue
+            } else {
+              return '–'
+            }
+          }
 
           // handle lists
           if (Array.isArray(expectedText)) {
@@ -257,9 +272,6 @@ const expectTableRowCorrect = async (
           }
 
           // handle dates
-          const columnSchema = columnsSchemaConfig.find(
-            config => config.name === columnName!,
-          )
           if (columnSchema?.type === 'Date') {
             const date = dateStringToDate(expectedText.toString())
             expectedText = `${
