@@ -18,9 +18,13 @@ import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.shared.WebConstants;
 
 public class SqlDefinedTableEditor
   implements SqlDefinedTableEditorView.Presenter, IsWidget {
+
+  public static final String VIEW_URL =
+    WebConstants.DOCS_URL + "Views.2011070739.html";
 
   public static final String MATERIALIZED_VIEW_HELP_MARKDOWN =
     "A Synapse Materialized View is a type of table that is automatically built from a Synapse SQL query. " +
@@ -58,12 +62,9 @@ public class SqlDefinedTableEditor
     EntityType entityType
   ) {
     if (EntityType.materializedview.equals(entityType)) {
-      view.setHelp(
-        MATERIALIZED_VIEW_HELP_MARKDOWN,
-        CreateTableViewWizard.VIEW_URL
-      );
+      view.setHelp(MATERIALIZED_VIEW_HELP_MARKDOWN, VIEW_URL);
     } else if (EntityType.virtualtable.equals(entityType)) {
-      view.setHelp(VIRTUAL_TABLE_HELP_MARKDOWN, CreateTableViewWizard.VIEW_URL);
+      view.setHelp(VIRTUAL_TABLE_HELP_MARKDOWN, VIEW_URL);
     } else {
       throw new IllegalArgumentException(
         "Expected MaterializedView or VirtualTable but got " +

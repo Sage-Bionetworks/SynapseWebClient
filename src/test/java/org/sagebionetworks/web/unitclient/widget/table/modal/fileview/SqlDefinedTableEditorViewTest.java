@@ -25,7 +25,6 @@ import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.SqlDefinedTableEditor;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.SqlDefinedTableEditorView;
 
@@ -94,7 +93,7 @@ public class SqlDefinedTableEditorViewTest {
     verify(mockView)
       .setHelp(
         SqlDefinedTableEditor.MATERIALIZED_VIEW_HELP_MARKDOWN,
-        CreateTableViewWizard.VIEW_URL
+        SqlDefinedTableEditor.VIEW_URL
       );
     verify(mockView).show();
 
@@ -108,7 +107,8 @@ public class SqlDefinedTableEditorViewTest {
     widget.onSave();
 
     verify(mockSynapseJavascriptClient).createEntity(entityCaptor.capture());
-    MaterializedView newMaterializedView = (MaterializedView) entityCaptor.getValue();
+    MaterializedView newMaterializedView =
+      (MaterializedView) entityCaptor.getValue();
     assertEquals(name, newMaterializedView.getName());
     assertEquals(definingSql, newMaterializedView.getDefiningSQL());
     assertEquals(description, newMaterializedView.getDescription());
@@ -127,7 +127,7 @@ public class SqlDefinedTableEditorViewTest {
     verify(mockView)
       .setHelp(
         SqlDefinedTableEditor.VIRTUAL_TABLE_HELP_MARKDOWN,
-        CreateTableViewWizard.VIEW_URL
+        SqlDefinedTableEditor.VIEW_URL
       );
     verify(mockView).show();
 

@@ -106,18 +106,7 @@ public class DefaultActionConfigurationUtil {
         Action.ADD_DATASET_COLLECTION,
         "Add Dataset Collection"
       ),
-      ActionConfiguration.create(Action.ADD_TABLE, "Add Table"),
-      ActionConfiguration.create(Action.ADD_FILE_VIEW, "Add File View"),
-      ActionConfiguration.create(Action.ADD_PROJECT_VIEW, "Add Project View"),
-      ActionConfiguration.create(
-        Action.ADD_SUBMISSION_VIEW,
-        "Add Submission View"
-      ),
-      ActionConfiguration.create(
-        Action.ADD_MATERIALIZED_VIEW,
-        "Add Materialized View"
-      ),
-      ActionConfiguration.create(Action.ADD_VIRTUAL_TABLE, "Add Virtual Table"),
+      ActionConfiguration.create(Action.ADD_TABLE, "Add Table or View"),
       ActionConfiguration.create(Action.FOLLOW, "Follow"),
       ActionConfiguration.create(Action.CREATE_THREAD, "Create New Thread"),
       ActionConfiguration.create(

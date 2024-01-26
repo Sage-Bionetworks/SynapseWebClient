@@ -29,6 +29,9 @@ import org.sagebionetworks.web.client.widget.evaluation.SubmissionViewScopeEdito
 public class SubmissionViewScopeWidget
   implements SynapseWidgetPresenter, SubmissionViewScopeWidgetView.Presenter {
 
+  public static final String EMPTY_SCOPE_MESSAGE =
+    "Please define the scope for this view.";
+
   boolean isEditable;
   SubmissionViewScopeWidgetView view;
   SynapseJavascriptClient jsClient;
@@ -149,7 +152,7 @@ public class SubmissionViewScopeWidget
     synAlert.clear();
     List<String> newScopeIds = editScopeWidget.getEvaluationIds();
     if (newScopeIds.isEmpty()) {
-      synAlert.showError(CreateTableViewWizardStep1.EMPTY_SCOPE_MESSAGE);
+      synAlert.showError(EMPTY_SCOPE_MESSAGE);
       return;
     }
     view.setLoading(true);

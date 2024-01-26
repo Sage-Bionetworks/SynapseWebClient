@@ -35,6 +35,7 @@ import {
   toggleIntoExperimentalMode,
 } from './helpers/testUser'
 import { Project } from './helpers/types'
+import { defaultExpectTimeout } from '../playwright.config'
 
 let userProject: Project
 const fileHandleIds: string[] = []
@@ -73,18 +74,14 @@ test.describe('Tables', () => {
     const initialColumnsSchemaConfig: ColumnSchemaConfig[] = [
       { name: 'item', type: 'String', size: 20 },
       { name: 'quantity', type: 'Integer', defaultValue: '500' },
-      // { name: 'on_sale', type: 'Boolean', defaultValue: 'false' }, - currently broken, SWC-6630
-      // { name: 'size', type: 'Integer', restrictValues: '1,2,3,4' }, - currently broken, SWC-6622
+      { name: 'on_sale', type: 'Boolean', defaultValue: 'false' },
+      { name: 'size', type: 'Integer', restrictValues: ['1', '2', '3', '4'] },
       { name: 'stock_date', type: 'Date', facet: 'Range' },
       {
         name: 'color',
         type: 'String',
         size: 50,
-        /* 
-        // TODO: uncomment when SWC-6627 fixed
-        // able to enter restrictValues via Playwright test in chromium, 
-        // ...but not in firefox/webkit
-        restrictValues: [ 
+        restrictValues: [
           'blue',
           'green',
           'indigo',
@@ -92,7 +89,7 @@ test.describe('Tables', () => {
           'red',
           'violet',
           'yellow',
-        ], */
+        ],
       },
       { name: 'search_terms', type: 'String List', maxListLength: 10 },
     ]
@@ -104,6 +101,7 @@ test.describe('Tables', () => {
         stock_date: '2012-04-28',
         color: 'blue',
         search_terms: ['fleece', 'hand wash'],
+        on_sale: 'true',
       },
       {
         item: 'hat',
@@ -111,6 +109,7 @@ test.describe('Tables', () => {
         stock_date: '2023-12-21',
         color: 'yellow',
         search_terms: ['recycled', 'five-panel', 'cotton', 'machine wash'],
+        on_sale: 'false',
       },
       {
         item: 'socks',
@@ -136,8 +135,7 @@ test.describe('Tables', () => {
       await expect(userPage.getByText(noTablesText)).toBeVisible()
     })
 
-    // TODO: remove this step after react-based table column schema editor is
-    // released from experimental mode
+    // TODO: remove this step after table descriptions are visible outide of experimental mode
     await test.step('Toggle into Experimental Mode to use react-based table column schema editor', async () => {
       await toggleIntoExperimentalMode(userPage)
       await expectTablesPageLoaded(userPage, userProject.id)
@@ -145,29 +143,18 @@ test.describe('Tables', () => {
     })
 
     await test.step('User creates a table', async () => {
-      const createTableHeader =
-        await test.step('open table creation modal', async () => {
-          await userPage.getByRole('button', { name: 'Add New...' }).click()
-          await userPage.getByRole('menuitem', { name: 'Add Table' }).click()
-          const createTableHeader = userPage.getByRole('heading', {
-            name: 'Create Table',
-          })
-          await expect(createTableHeader).toBeVisible()
-          return createTableHeader
+      await test.step('open table creation modal', async () => {
+        await userPage
+          .getByRole('button', { name: 'Add Table or View' })
+          .click()
+        userPage.getByRole('heading', {
+          name: 'Create Table or View',
         })
-
-      await test.step('enter table name and description', async () => {
         await userPage
-          .locator('div')
-          .filter({ hasText: /^Name$/ })
-          .getByRole('textbox')
-          .fill(tableName)
-        await userPage
-          .locator('div')
-          .filter({ hasText: /^Description$/ })
-          .locator('textarea')
-          .fill(tableDescription)
-        await userPage.getByRole('button', { name: 'Next' }).click()
+          .getByRole('menuitem', {
+            name: 'Table',
+          })
+          .click()
       })
 
       await test.step('create table schema', async () => {
@@ -175,14 +162,13 @@ test.describe('Tables', () => {
           userPage,
           initialColumnsSchemaConfig,
         )
+        await userPage.getByRole('button', { name: 'Next' }).click()
       })
 
-      await test.step('finish creating table', async () => {
+      await test.step('enter table name and description', async () => {
+        await userPage.getByLabel('Name').fill(tableName)
+        await userPage.getByLabel('Description').fill(tableDescription)
         await userPage.getByRole('button', { name: 'Finish' }).click()
-        await expect(
-          userPage.getByText('Updating the table schema...'),
-        ).toBeVisible()
-        await expect(createTableHeader).not.toBeVisible()
       })
     })
 
@@ -291,11 +277,11 @@ test.describe('Tables', () => {
 
       await test.step('save changes to table column schema', async () => {
         await userPage.getByRole('button', { name: 'Save' }).click()
-        await expect(
-          userPage.getByText('Updating the table schema...'),
-        ).toBeVisible()
+        await expect(userPage.getByText('Saving...')).toBeVisible()
 
-        await expect(tableSchemaEditorHeader).not.toBeVisible()
+        await expect(tableSchemaEditorHeader).not.toBeVisible(
+          { timeout: defaultExpectTimeout * 3 }, // allow time for the response to return
+        )
         await expectTablePageLoaded(userPage, tableName, tableDescription)
 
         await dismissAlert(

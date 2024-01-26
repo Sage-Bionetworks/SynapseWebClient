@@ -61,9 +61,10 @@ public class SRC {
     public static ReactComponentType<TwoFactorEnrollmentFormProps> TwoFactorEnrollmentForm;
     public static ReactComponentType<EmptyProps> SubscriptionPage;
     public static ReactComponentType<AccessRequirementListProps> AccessRequirementList;
-    public static ReactComponentType<TableColumnSchemaFormProps> TableColumnSchemaForm;
+    public static ReactComponentType<TableColumnSchemaEditorProps> TableColumnSchemaEditor;
     public static ReactComponentType<EntityHeaderTableProps> EntityHeaderTable;
     public static ReactComponentType<AccessRequirementRelatedProjectsListProps> AccessRequirementRelatedProjectsList;
+    public static ReactComponentType<CreateTableViewWizardProps> CreateTableViewWizard;
 
     /**
      * Pushes a global toast message. In SWC, you should use {@link DisplayUtils#notify}, rather than calling this method directly.

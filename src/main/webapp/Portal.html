@@ -475,15 +475,19 @@
       if (processEnvironment === 'production') {
         reactPath = cdnEndpoint + 'generated/react.production.min.js'
         reactDomPath = cdnEndpoint + 'generated/react-dom.production.min.js'
-        reactQueryPath = cdnEndpoint + 'generated/react-query.production.min.js'
+        // reactQueryPath = cdnEndpoint + 'generated/react-query.production.min.js'
         srcPath =
           cdnEndpoint + 'generated/synapse-react-client.production.min.js'
       } else {
         reactPath = cdnEndpoint + 'generated/react.development.js'
         reactDomPath = cdnEndpoint + 'generated/react-dom.development.js'
-        reactQueryPath = cdnEndpoint + 'generated/react-query.development.js'
+        // reactQueryPath = cdnEndpoint + 'generated/react-query.development.js'
         srcPath = cdnEndpoint + 'generated/synapse-react-client.development.js'
       }
+
+      // TODO: Workaround for SWC-6664
+      // Override the conditional above and just use the production distribution
+      reactQueryPath = cdnEndpoint + 'generated/react-query.production.min.js'
 
       head.load(cdnEndpoint + 'generated/swc.css')
       head.load(cdnEndpoint + 'generated/jquery.min.js')

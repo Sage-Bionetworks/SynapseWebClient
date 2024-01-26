@@ -614,10 +614,6 @@ import org.sagebionetworks.web.client.widget.table.modal.download.DownloadFilePa
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadFilePageViewImpl;
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQueryModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQueryModalWidgetImpl;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep1View;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep1ViewImpl;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep2View;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep2ViewImpl;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidgetView;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityViewScopeWidgetView;
@@ -709,18 +705,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEdi
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEditorViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdListRendererCellView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdListRendererCellViewImpl;
-import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorView;
-import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorViewImpl;
-import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorWidget;
-import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorWidgetImpl;
-import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowViewer;
-import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowViewerImpl;
-import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsEditorV2WidgetView;
-import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsEditorV2WidgetViewImpl;
-import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView;
-import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsViewBase;
-import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsViewBaseImpl;
-import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.schema.*;
 import org.sagebionetworks.web.client.widget.team.BigTeamBadgeView;
 import org.sagebionetworks.web.client.widget.team.BigTeamBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.team.EmailInvitationBadgeView;
@@ -1187,7 +1172,6 @@ public class PortalGinModule extends AbstractGinModule {
      * TableEntity related bindings
      */
     bind(TableListWidgetView.class).to(TableListWidgetViewImpl.class);
-    bind(ColumnModelsViewBase.class).to(ColumnModelsViewBaseImpl.class);
 
     bind(ColumnModelsView.class).to(ColumnModelsViewImpl.class);
     bind(ColumnModelTableRowEditorView.class)
@@ -1196,8 +1180,8 @@ public class PortalGinModule extends AbstractGinModule {
       .to(ColumnModelTableRowEditorWidgetImpl.class);
     bind(ColumnModelTableRowViewer.class)
       .to(ColumnModelTableRowViewerImpl.class);
-    bind(ColumnModelsEditorV2WidgetView.class)
-      .to(ColumnModelsEditorV2WidgetViewImpl.class);
+    bind(ColumnModelsEditorWidgetView.class)
+      .to(ColumnModelsEditorWidgetViewImpl.class);
     bind(TableEntityWidgetView.class).to(TableEntityWidgetViewImpl.class);
     bind(RowView.class).to(RowViewImpl.class);
     bind(TablePageView.class).to(TablePageViewImpl.class);
@@ -1446,8 +1430,6 @@ public class PortalGinModule extends AbstractGinModule {
 
     bind(RefreshAlertView.class).to(RefreshAlertViewImpl.class);
     bind(UserSelectorView.class).to(UserSelectorViewImpl.class);
-    bind(CreateTableViewWizardStep1View.class)
-      .to(CreateTableViewWizardStep1ViewImpl.class);
 
     bind(EntityContainerListWidgetView.class)
       .to(EntityContainerListWidgetViewImpl.class);
@@ -1464,8 +1446,6 @@ public class PortalGinModule extends AbstractGinModule {
     bind(ContainerClientsHelp.class).to(ContainerClientsHelpImpl.class);
 
     bind(FileDownloadMenuItemView.class).to(FileDownloadMenuItemViewImpl.class);
-    bind(CreateTableViewWizardStep2View.class)
-      .to(CreateTableViewWizardStep2ViewImpl.class);
     bind(SqlDefinedTableEditorView.class)
       .to(SqlDefinedTableEditorViewImpl.class);
     bind(ChallengeWidgetView.class).to(ChallengeWidgetViewImpl.class);
