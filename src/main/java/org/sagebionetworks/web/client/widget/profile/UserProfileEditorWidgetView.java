@@ -77,4 +77,6 @@ public interface UserProfileEditorWidgetView extends IsWidget {
   void setCanEdit(boolean canEdit);
 
   void setOrcIdHref(String orcIdHref);
+
+  void setEmailsVisible(boolean visible);
 }

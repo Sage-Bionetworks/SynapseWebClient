@@ -140,7 +140,10 @@ public class UserProfileEditorWidgetViewImpl
   ReactComponentDiv userProfileLinksReactComponentContainer;
 
   @UiField
-  Row ownerFieldsContainer;
+  Row passwordContainer;
+
+  @UiField
+  Column emailAddressContainer;
 
   @UiField
   Div commandsContainer;
@@ -217,6 +220,11 @@ public class UserProfileEditorWidgetViewImpl
   @Override
   public void clearEmails() {
     emailDiv.clear();
+  }
+
+  @Override
+  public void setEmailsVisible(boolean visible) {
+    emailAddressContainer.setVisible(visible);
   }
 
   @Override
@@ -472,7 +480,7 @@ public class UserProfileEditorWidgetViewImpl
 
   @Override
   public void setCanEdit(boolean canEdit) {
-    ownerFieldsContainer.setVisible(canEdit);
+    passwordContainer.setVisible(canEdit);
     commandsContainer.setVisible(canEdit);
   }
 
