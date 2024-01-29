@@ -1,0 +1,21 @@
+name: build-main
+
+on:
+  push:
+    branches: [develop, release-**]
+  pull_request:
+    branches: [develop, release-**]
+
+jobs:
+  call-build:
+    if: github.event_name == 'push' && github.repository_owner == 'Sage-Bionetworks'
+    uses: ./.github/workflows/build.yaml
+    with:
+      mvn_goal: deploy
+    secrets: inherit
+  call-test:
+    if: github.event_name == 'pull_request'
+    uses: ./.github/workflows/build.yaml
+    with:
+      mvn_goal: package
+    secrets: inherit
