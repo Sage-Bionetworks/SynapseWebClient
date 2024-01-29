@@ -303,7 +303,7 @@ public class DisplayConstants {
     "A new version of Synapse is now available, please save your work. In a few minutes this page will automatically reload to ensure proper function.";
   public static final String UPLOAD_DIALOG_TITLE = "Upload";
   public static final String SHOW_ALL_RESULTS = "Show Results for All Types";
-  public static final String FORGOT_PASSWORD = "forgot password?";
+  public static final String FORGOT_PASSWORD = "Forgot password?";
   public static final String SIGNING_IN = "Signing in...";
   public static final String TABLES = "Tables";
   public static final String DATASETS = "Datasets";

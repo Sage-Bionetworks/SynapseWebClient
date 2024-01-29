@@ -45,24 +45,11 @@ import org.sagebionetworks.web.client.place.TwoFactorAuthPlace;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
-import org.sagebionetworks.web.shared.WebConstants;
 
 public class SettingsViewImpl extends Composite implements SettingsView {
 
   public interface SettingsViewImplUiBinder
     extends UiBinder<Widget, SettingsViewImpl> {}
-
-  @UiField
-  Div changeSynapsePasswordUI;
-
-  @UiField
-  Div changeSynapsePasswordHighlightBox;
-
-  @UiField
-  HTMLPanel personalAccessTokensHighlightBox;
-
-  @UiField
-  HTMLPanel twoFactorAuthSettingsPanelContainer;
 
   @UiField
   ReactComponentDiv twoFactorAuthSettingsPanel;
@@ -71,16 +58,10 @@ public class SettingsViewImpl extends Composite implements SettingsView {
   Button managePersonalAccessTokensButton;
 
   @UiField
-  HTMLPanel oAuthClientEditorHighlightBox;
-
-  @UiField
   Button gotoOAuthClientEditorButton;
 
   @UiField
-  HTMLPanel apiKeyHighlightBox;
-
-  @UiField
-  Div editProfilePanel;
+  HTMLPanel apiKeySettingsContainer;
 
   @UiField
   Panel apiKeyUI;
@@ -89,15 +70,9 @@ public class SettingsViewImpl extends Composite implements SettingsView {
   org.gwtbootstrap3.client.ui.Button editProfileButton;
 
   @UiField
-  Div dateTimeFormatPanel;
-
-  @UiField
   FlowPanel forgotPasswordContainer;
 
   Anchor forgotPasswordLink;
-
-  @UiField
-  Div emailSettingsPanel;
 
   @UiField
   Div emailsPanel;
@@ -238,24 +213,6 @@ public class SettingsViewImpl extends Composite implements SettingsView {
     });
     forgotPasswordContainer.addStyleName("inline-block");
     forgotPasswordContainer.add(forgotPasswordLink);
-    emailSettingsPanel
-      .getElement()
-      .setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Email");
-    changeSynapsePasswordHighlightBox
-      .getElement()
-      .setAttribute(
-        WebConstants.HIGHLIGHT_BOX_TITLE,
-        "Change Synapse Password"
-      );
-    apiKeyHighlightBox
-      .getElement()
-      .setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Synapse API Key");
-    editProfilePanel
-      .getElement()
-      .setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Profile");
-    dateTimeFormatPanel
-      .getElement()
-      .setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Date/Time Format");
 
     ClickHandler editProfileClickHandler = event -> {
       presenter.onEditProfile();
@@ -326,16 +283,10 @@ public class SettingsViewImpl extends Composite implements SettingsView {
       )
     );
 
-    personalAccessTokensHighlightBox
-      .getElement()
-      .setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Personal Access Tokens");
     managePersonalAccessTokensButton.addClickHandler(event ->
       presenter.goTo(new PersonalAccessTokenPlace(""))
     );
 
-    oAuthClientEditorHighlightBox
-      .getElement()
-      .setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "OAuth Client Editor");
     gotoOAuthClientEditorButton.addClickHandler(event ->
       presenter.goTo(
         new OAuthClientEditorPlace(ClientProperties.DEFAULT_PLACE_TOKEN)
@@ -560,17 +511,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 
   @Override
   public void setApiKeySettingsVisible(boolean visible) {
-    apiKeyHighlightBox.setVisible(visible);
-  }
-
-  @Override
-  public void setOauthClientSettingsVisible(boolean visible) {
-    oAuthClientEditorHighlightBox.setVisible(visible);
-  }
-
-  @Override
-  public void setTwoFactorAuthSettingsVisible(boolean visible) {
-    twoFactorAuthSettingsPanelContainer.setVisible(visible);
+    apiKeySettingsContainer.setVisible(visible);
   }
 
   @Override

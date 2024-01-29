@@ -7,7 +7,7 @@
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
   xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
 >
-  <g:FlowPanel addStyleNames="dockerTabContent">
+  <g:FlowPanel addStyleNames="margin-bottom-15">
     <g:SimplePanel ui:field="synapseAlertContainer" />
     <g:SimplePanel ui:field="dockerBreadcrumbContainer" visible="false" />
     <g:FlowPanel

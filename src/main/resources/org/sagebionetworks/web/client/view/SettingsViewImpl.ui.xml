@@ -12,40 +12,43 @@
     <bh:Div>
       <b:Row>
         <b:Column size="LG_6">
-          <bh:Div ui:field="editProfilePanel" addStyleNames="highlight-box">
-            <b:Button ui:field="editProfileButton" icon="EDIT">
-              Edit Profile
-            </b:Button>
+          <bh:Div addStyleNames="margin-bottom-20">
+            <bh:Div addStyleNames="highlight-title">
+              <bh:Text>Profile</bh:Text>
+            </bh:Div>
+            <bh:Div addStyleNames="margin-15">
+              <b:Button ui:field="editProfileButton" icon="EDIT">
+                Edit Profile
+              </b:Button>
+            </bh:Div>
           </bh:Div>
-          <bh:Div ui:field="dateTimeFormatPanel" addStyleNames="highlight-box">
-            <b:ButtonGroup>
-              <b:Button
-                ui:field="dateFormatDropdown"
-                dataToggle="DROPDOWN"
-                size="SMALL"
-                text="Local time"
-                addStyleNames="margin-top-10"
-              />
-              <b:DropDownMenu>
-                <b:AnchorListItem
-                  ui:field="dateFormatLocal"
+          <bh:Div addStyleNames="margin-bottom-20">
+            <bh:Div addStyleNames="highlight-title">
+              <bh:Text>Date/Time Format</bh:Text>
+            </bh:Div>
+            <bh:Div addStyleNames="margin-15">
+              <b:ButtonGroup>
+                <b:Button
+                  ui:field="dateFormatDropdown"
+                  dataToggle="DROPDOWN"
                   text="Local time"
                 />
-                <b:AnchorListItem ui:field="dateFormatUTC" text="UTC" />
-              </b:DropDownMenu>
-            </b:ButtonGroup>
+                <b:DropDownMenu>
+                  <b:AnchorListItem
+                    ui:field="dateFormatLocal"
+                    text="Local time"
+                  />
+                  <b:AnchorListItem ui:field="dateFormatUTC" text="UTC" />
+                </b:DropDownMenu>
+              </b:ButtonGroup>
+            </bh:Div>
           </bh:Div>
-          <bh:Div addStyleNames="light-border" marginTop="10">
+          <bh:Div addStyleNames="margin-bottom-20">
             <bh:Div addStyleNames="highlight-title">
               <bh:Text>Certification</bh:Text>
             </bh:Div>
             <bh:Div>
-              <bh:Div
-                marginLeft="10"
-                marginRight="10"
-                marginTop="10"
-                marginBottom="10"
-              >
+              <bh:Div addStyleNames="margin-15">
                 <b:Button ui:field="certificationButton">
                   Get Certified
                 </b:Button>
@@ -64,20 +67,16 @@
               />
             </bh:Div>
           </bh:Div>
-          <bh:Div
-            ui:field="profileValidationUI"
-            addStyleNames="light-border"
-            marginTop="10"
-          >
+          <bh:Div addStyleNames="margin-bottom-20">
             <bh:Div addStyleNames="highlight-title">
               <bh:Text>Profile Validation</bh:Text>
             </bh:Div>
             <bh:Div>
               <bh:Div
-                marginLeft="10"
-                marginRight="10"
-                marginTop="10"
-                marginBottom="10"
+                marginLeft="15"
+                marginRight="15"
+                marginTop="15"
+                marginBottom="15"
               >
                 <b:Button
                   ui:field="verificationSubmittedButton"
@@ -179,78 +178,67 @@
           </bh:Div>
         </b:Column>
         <b:Column size="LG_6">
-          <bh:Div ui:field="changeSynapsePasswordUI">
-            <bh:Div
-              ui:field="changeSynapsePasswordHighlightBox"
-              addStyleNames="highlight-box"
-            >
-              <bh:Div addStyleNames="form-horizontal">
-                <b:Row ui:field="currentPassword" addStyleNames="form-group">
-                  <b:Column size="SM_3" addStyleNames="control-label boldText">
-                    <bh:Text>Current password</bh:Text>
-                  </b:Column>
-                  <b:Column size="SM_8">
-                    <g:PasswordTextBox
-                      ui:field="currentPasswordField"
-                      addStyleNames="form-control"
-                    />
-                  </b:Column>
-                </b:Row>
-                <b:Row ui:field="password1" addStyleNames="form-group">
-                  <b:Column size="SM_3" addStyleNames="control-label boldText">
-                    <bh:Text>New password</bh:Text>
-                  </b:Column>
-                  <b:Column size="SM_8">
-                    <g:PasswordTextBox
-                      ui:field="password1Field"
-                      styleName="form-control"
-                    />
-                  </b:Column>
-                </b:Row>
-                <b:Row ui:field="password2" addStyleNames="form-group">
-                  <b:Column size="SM_3" addStyleNames="control-label boldText">
-                    <bh:Text>Confirm password</bh:Text>
-                  </b:Column>
-                  <b:Column size="SM_8">
-                    <g:PasswordTextBox
-                      ui:field="password2Field"
-                      styleName="form-control"
-                    />
-                  </b:Column>
-                </b:Row>
-                <b:Row>
-                  <b:Column size="SM_12">
-                    <b:Button
-                      ui:field="changePasswordBtn"
-                      addStyleNames="margin-top-10 margin-bottom-10"
-                      text="Change Password"
-                    />
-                    <g:FlowPanel ui:field="forgotPasswordContainer" />
-                  </b:Column>
-                </b:Row>
-                <b:Row>
-                  <b:Column size="SM_12">
-                    <g:SimplePanel ui:field="passwordSynAlertPanel" />
-                  </b:Column>
-                </b:Row>
-              </bh:Div>
+          <bh:Div addStyleNames="margin-bottom-20">
+            <bh:Div addStyleNames="highlight-title">
+              <bh:Text>Change Synapse Password</bh:Text>
+            </bh:Div>
+
+            <bh:Div addStyleNames="form-horizontal margin-15">
+              <b:Row ui:field="currentPassword" addStyleNames="form-group">
+                <b:Column size="SM_3" addStyleNames="control-label boldText">
+                  <bh:Text>Current password</bh:Text>
+                </b:Column>
+                <b:Column size="SM_8">
+                  <g:PasswordTextBox
+                    ui:field="currentPasswordField"
+                    addStyleNames="form-control"
+                  />
+                </b:Column>
+              </b:Row>
+              <b:Row ui:field="password1" addStyleNames="form-group">
+                <b:Column size="SM_3" addStyleNames="control-label boldText">
+                  <bh:Text>New password</bh:Text>
+                </b:Column>
+                <b:Column size="SM_8">
+                  <g:PasswordTextBox
+                    ui:field="password1Field"
+                    styleName="form-control"
+                  />
+                </b:Column>
+              </b:Row>
+              <b:Row ui:field="password2" addStyleNames="form-group">
+                <b:Column size="SM_3" addStyleNames="control-label boldText">
+                  <bh:Text>Confirm password</bh:Text>
+                </b:Column>
+                <b:Column size="SM_8">
+                  <g:PasswordTextBox
+                    ui:field="password2Field"
+                    styleName="form-control"
+                  />
+                </b:Column>
+              </b:Row>
+              <b:Row>
+                <b:Column size="SM_12">
+                  <b:Button
+                    ui:field="changePasswordBtn"
+                    addStyleNames="margin-top-10 margin-bottom-10"
+                    text="Change Password"
+                  />
+                  <g:FlowPanel ui:field="forgotPasswordContainer" />
+                </b:Column>
+              </b:Row>
+              <b:Row>
+                <b:Column size="SM_12">
+                  <g:SimplePanel ui:field="passwordSynAlertPanel" />
+                </b:Column>
+              </b:Row>
             </bh:Div>
           </bh:Div>
-          <bh:Div
-            ui:field="orcIdUI"
-            addStyleNames="light-border"
-            marginTop="10"
-            marginBottom="10"
-          >
+          <bh:Div addStyleNames="margin-bottom-20">
             <bh:Div addStyleNames="highlight-title">
               <bh:Text>ORCID</bh:Text>
             </bh:Div>
-            <bh:Div
-              marginLeft="10"
-              marginRight="10"
-              marginTop="10"
-              marginBottom="10"
-            >
+            <bh:Div addStyleNames="margin-15">
               <b:Button
                 ui:field="linkORCIDButton"
                 addStyleNames="margin-right-10"
@@ -273,17 +261,12 @@
               </bh:Span>
             </bh:Div>
           </bh:Div>
-          <bh:Div addStyleNames="light-border" marginTop="10">
+          <bh:Div addStyleNames="margin-bottom-20">
             <bh:Div addStyleNames="highlight-title">
               <bh:Text>Synapse Terms and Conditions for Use</bh:Text>
             </bh:Div>
             <bh:Div>
-              <bh:Div
-                marginLeft="10"
-                marginRight="10"
-                marginTop="10"
-                marginBottom="10"
-              >
+              <bh:Div addStyleNames="margin-15">
                 <b:Button ui:field="synapseTermsAcceptedButton" type="SUCCESS">
                   Accepted Terms and Conditions for Use
                 </b:Button>
@@ -292,12 +275,15 @@
           </bh:Div>
         </b:Column>
       </b:Row>
-      <bh:Div
-        ui:field="emailSettingsPanel"
-        addStyleNames="highlight-box margin-bottom-15"
-      >
-        <bh:Div ui:field="emailsPanel" />
-        <g:FlowPanel styleName="margin-left-10 margin-top-10">
+
+      <bh:Div addStyleNames="margin-bottom-20">
+        <bh:Div addStyleNames="highlight-title">
+          <bh:Text>Email</bh:Text>
+        </bh:Div>
+        <bh:Div addStyleNames="margin-15">
+          <bh:Div ui:field="emailsPanel" />
+        </bh:Div>
+        <g:FlowPanel>
           <b:CheckBox
             ui:field="emailNotificationsCheckbox"
             text="Allow Synapse to send me email notifications"
@@ -306,11 +292,11 @@
         </g:FlowPanel>
         <g:SimplePanel ui:field="notificationSynAlertPanel" />
       </bh:Div>
-      <g:FlowPanel addStyleNames="light-border">
+      <g:FlowPanel addStyleNames="margin-bottom-20">
         <bh:Div addStyleNames="highlight-title">
           <bh:Text>Following</bh:Text>
         </bh:Div>
-        <bh:Paragraph>
+        <bh:Paragraph addStyleNames="margin-15">
           Your followed forums and threads have moved! To view the topics that
           you are following, click
           <a
@@ -323,48 +309,61 @@
         </bh:Paragraph>
       </g:FlowPanel>
 
-      <g:HTMLPanel
-        addStyleNames="highlight-box padding-top-16"
-        ui:field="twoFactorAuthSettingsPanelContainer"
-      >
-        <w:ReactComponentDiv ui:field="twoFactorAuthSettingsPanel" />
-      </g:HTMLPanel>
-      <g:HTMLPanel
-        ui:field="personalAccessTokensHighlightBox"
-        addStyleNames="highlight-box"
-      >
-        <p>
-          You can issue personal access tokens to authenticate your scripts with
-          scoped access to your account. It is
-            important that you treat personal access tokens with the same
-          security as your password.
-        </p>
-        <b:Button
-          ui:field="managePersonalAccessTokensButton"
-          addStyleNames="margin-top-10"
-          text="Manage Personal Access Tokens"
-        />
-      </g:HTMLPanel>
-      <g:HTMLPanel
-        ui:field="oAuthClientEditorHighlightBox"
-        addStyleNames="highlight-box"
-      >
-        <p>
-          OAuth Clients can be created to develop applications that use Synapse
-          as an identity provider.
-        </p>
-        <b:Button
-          ui:field="gotoOAuthClientEditorButton"
-          addStyleNames="margin-top-10"
-          text="Go to OAuth Client Manager"
+      <g:HTMLPanel addStyleNames="margin-bottom-20">
+        <bh:Div addStyleNames="highlight-title">
+          <bh:Text>Two-factor Authentication (2FA)</bh:Text>
+        </bh:Div>
+        <w:ReactComponentDiv
+          ui:field="twoFactorAuthSettingsPanel"
+          addStyleNames="margin-15"
         />
       </g:HTMLPanel>
 
+      <g:HTMLPanel addStyleNames="margin-bottom-20">
+        <bh:Div addStyleNames="highlight-title">
+          <bh:Text>Personal Access Tokens</bh:Text>
+        </bh:Div>
+        <bh:Div addStyleNames="margin-15">
+          <bh:Paragraph>
+            You can issue personal access tokens to authenticate your scripts
+            with
+          scoped access to your account. It is
+            important that you treat personal access tokens with the same
+          security as your password.
+          </bh:Paragraph>
+          <b:Button
+            ui:field="managePersonalAccessTokensButton"
+            addStyleNames="margin-top-10"
+            text="Manage Personal Access Tokens"
+          />
+        </bh:Div>
+      </g:HTMLPanel>
+      <g:HTMLPanel addStyleNames="margin-bottom-20">
+        <bh:Div addStyleNames="highlight-title">
+          <bh:Text>OAuth Client Editor</bh:Text>
+        </bh:Div>
+        <bh:Div addStyleNames="margin-15">
+          <bh:Paragraph>
+            OAuth Clients can be created to develop applications that use
+            Synapse
+          as an identity provider.
+          </bh:Paragraph>
+          <b:Button
+            ui:field="gotoOAuthClientEditorButton"
+            addStyleNames="margin-top-10"
+            text="Go to OAuth Client Manager"
+          />
+        </bh:Div>
+      </g:HTMLPanel>
+
       <g:HTMLPanel
-        ui:field="apiKeyHighlightBox"
-        addStyleNames="highlight-box"
+        ui:field="apiKeySettingsContainer"
         visible="false"
+        addStyleNames="margin-bottom-20"
       >
+        <bh:Div addStyleNames="highlight-title">
+          <bh:Text>Synapse API Key</bh:Text>
+        </bh:Div>
         <p>
           Using an API key allows you to authenticate your scripts for an
           indefinite amount of time. It is important

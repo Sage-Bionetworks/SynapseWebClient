@@ -998,6 +998,10 @@ input[type='text'][readonly].border-none,
   margin: 10px;
 }
 
+.margin-15 {
+  margin: 15px;
+}
+
 .margin-top-left-10 {
   margin-top: 10px;
   margin-left: 10px;
@@ -2311,10 +2315,11 @@ i.fa.small-icon {
 
 .highlight-title {
   color: $synapse-dark-text;
-  font-size: 20px;
-  font-weight: 400;
-  line-height: 24px;
-  padding: 8px 0px 16px;
+  background-color: #f1f3f5;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 20px;
+  padding: 8px 10px;
 }
 
 .highlight-title [class*='fa'] {

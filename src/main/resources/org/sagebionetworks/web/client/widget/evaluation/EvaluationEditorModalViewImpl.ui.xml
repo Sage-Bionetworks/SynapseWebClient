@@ -75,7 +75,7 @@
               <b:FormLabel text="Number of Rounds" />
               <w:NumberBox ui:field="numberOfRoundsField" />
             </b:FormGroup>
-            <bh:Div addStyleNames="light-border padding-10">
+            <bh:Div addStyleNames="padding-10">
               <bh:Div addStyleNames="highlight-title">
                 <bh:Text>Round Duration</bh:Text>
               </bh:Div>
