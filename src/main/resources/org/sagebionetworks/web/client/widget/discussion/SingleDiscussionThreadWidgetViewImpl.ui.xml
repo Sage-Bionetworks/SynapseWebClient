@@ -14,8 +14,12 @@
   <bh:Div addStyleNames="discussionThread overflow-x-hidden">
     <bh:Div ui:field="refreshAlertContainer" />
     <bh:Div addStyleNames="overflow-x-hidden">
-      <bh:Div ui:field="deletedThread" visible="false">
-        <bh:Span addStyleNames="highlight-title">Deleted Thread</bh:Span>
+      <bh:Div
+        ui:field="deletedThread"
+        visible="false"
+        addStyleNames="highlight-title"
+      >
+        <bh:Text>Deleted Thread</bh:Text>
       </bh:Div>
       <bh:Div addStyleNames="margin-top-10 padding-left-10" width="100%">
         <bh:Div

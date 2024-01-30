@@ -100,7 +100,7 @@
             addStyleNames="displayInline"
           />
         </b:FormGroup>
-        <bh:Div ui:field="quotaUI" addStyleNames="light-border">
+        <bh:Div ui:field="quotaUI">
           <bh:Div addStyleNames="highlight-title">
             <bh:Text>Quota</bh:Text>
           </bh:Div>

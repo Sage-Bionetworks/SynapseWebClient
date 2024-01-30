@@ -17,7 +17,7 @@
       addStyleNames="padding-bottom-15"
       toggle="false"
     >
-      <g:FlowPanel addStyleNames="light-border padding-10 margin-bottom-15">
+      <g:FlowPanel addStyleNames="margin-bottom-15">
         <bh:Div addStyleNames="highlight-title">
           <bh:Text>Scope</bh:Text>
           <g:Button ui:field="scopeCollapseCloseButton" addStyleNames="close">
@@ -33,7 +33,7 @@
       ui:field="schemaCollapse"
       toggle="false"
     >
-      <g:FlowPanel addStyleNames="light-border padding-10 margin-bottom-15">
+      <g:FlowPanel addStyleNames="margin-bottom-15">
         <bh:Div addStyleNames="highlight-title">
           <bh:Text>Schema</bh:Text>
           <w:HelpWidget

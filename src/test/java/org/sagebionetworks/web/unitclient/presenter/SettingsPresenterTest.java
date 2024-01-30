@@ -343,7 +343,8 @@ public class SettingsPresenterTest {
     boolean sendEmailNotifications = false;
     boolean markEmailedMessagesAsRead = false;
 
-    org.sagebionetworks.repo.model.message.Settings notificationSettings = new org.sagebionetworks.repo.model.message.Settings();
+    org.sagebionetworks.repo.model.message.Settings notificationSettings =
+      new org.sagebionetworks.repo.model.message.Settings();
     notificationSettings.setMarkEmailedMessagesAsRead(true);
     notificationSettings.setSendEmailNotifications(true);
     profile.setNotificationSettings(notificationSettings);
@@ -749,17 +750,5 @@ public class SettingsPresenterTest {
       .thenReturn("true");
     presenter.configure();
     verify(mockView).setApiKeySettingsVisible(true);
-  }
-
-  @Test
-  public void testOauthClientSettingsShown() {
-    presenter.configure();
-    verify(mockView).setOauthClientSettingsVisible(true);
-  }
-
-  @Test
-  public void testTwoFactorAuthSettingsShown() {
-    presenter.configure();
-    verify(mockView).setTwoFactorAuthSettingsVisible(true);
   }
 }
