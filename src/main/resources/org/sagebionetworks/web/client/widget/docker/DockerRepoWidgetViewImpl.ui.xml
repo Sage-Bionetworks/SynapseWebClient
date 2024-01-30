@@ -22,7 +22,7 @@
               <bh:Div addStyleNames="highlight-title">
                 <bh:Text text="Docker Pull Command" />
               </bh:Div>
-              <b:PanelBody>
+              <b:PanelBody addStyleNames="margin-15">
                 <g:TextBox
                   ui:field="dockerPullCommand"
                   addStyleNames="border-none noBackground"
