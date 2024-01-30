@@ -46,7 +46,8 @@ export default defineConfig({
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     // Until reports are saved in a secure location, do not collect traces on CI, since login network requests include user credentials
-    trace: process.env.CI ? 'off' : 'retain-on-failure',
+    // Collect the trace only on the first retry to speed up slow webkit runs. See https://github.com/microsoft/playwright/issues/18119#issuecomment-1370734489
+    trace: process.env.CI ? 'off' : 'on-first-retry',
   },
 
   /* Configure projects for major browsers */

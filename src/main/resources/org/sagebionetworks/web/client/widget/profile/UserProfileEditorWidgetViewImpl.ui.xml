@@ -104,8 +104,8 @@
             </b:FormGroup>
           </b:Column>
         </b:Row>
-        <b:Row ui:field="ownerFieldsContainer">
-          <b:Column size="MD_12,LG_6">
+        <b:Row>
+          <b:Column size="MD_12,LG_6" ui:field="emailAddressContainer">
             <b:FormGroup>
               <b:FormLabel>Email Address</b:FormLabel>
               <bh:Div
@@ -124,6 +124,16 @@
               </b:Anchor>
             </b:FormGroup>
           </b:Column>
+          <b:Column size="MD_12,LG_6" ui:field="orcIDContainer">
+            <b:FormGroup>
+              <b:FormLabel for="orcId">ORCID</b:FormLabel>
+              <bh:Div>
+                <b:Anchor ui:field="orcIdLink" target="_blank" />
+              </bh:Div>
+            </b:FormGroup>
+          </b:Column>
+        </b:Row>
+        <b:Row ui:field="passwordContainer">
           <b:Column size="MD_12,LG_6">
             <b:FormGroup>
               <b:FormLabel for="password">Password</b:FormLabel>
@@ -143,16 +153,6 @@
               >
                 Change password
               </b:Anchor>
-            </b:FormGroup>
-          </b:Column>
-        </b:Row>
-        <b:Row>
-          <b:Column size="MD_12,LG_6" ui:field="orcIDContainer">
-            <b:FormGroup>
-              <b:FormLabel for="orcId">ORCID</b:FormLabel>
-              <bh:Div>
-                <b:Anchor ui:field="orcIdLink" target="_blank" />
-              </bh:Div>
             </b:FormGroup>
           </b:Column>
         </b:Row>
