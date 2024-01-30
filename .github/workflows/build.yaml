@@ -21,10 +21,7 @@ jobs:
           server-username: MAVEN_USERNAME
           server-password: MAVEN_USERPWD
       - name: Version develop artifacts
-        if: github.ref == 'refs/head/develop'
-        run: echo pomSnapshotToGitHash.sh
-      - name: Version release artifacts
-        if: github.event_name == 'pull_request' && contains(github.base_ref, 'release')
+        if: ${{ inputs.mvn_goal }} == 'deploy'
         run: echo pomSnapshotToLastGitHash.sh
       - name: Build with Maven
         run: echo mvn -B ${{ inputs.mvn_goal }} --file pom.xml
