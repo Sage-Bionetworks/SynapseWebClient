@@ -15,7 +15,7 @@ public class TwoFactorAuthSettingsPanelProps extends ReactComponentProps {
 
   Callback onBeginTwoFactorEnrollment;
   Callback onRegenerateBackupCodes;
-  boolean showTitle;
+  boolean hideTitle;
 
   @JsOverlay
   public static TwoFactorAuthSettingsPanelProps create(
@@ -26,7 +26,7 @@ public class TwoFactorAuthSettingsPanelProps extends ReactComponentProps {
       new TwoFactorAuthSettingsPanelProps();
     props.onBeginTwoFactorEnrollment = onBeginTwoFactorEnrollment;
     props.onRegenerateBackupCodes = onRegenerateBackupCodes;
-    props.showTitle = false; // always false in SWC
+    props.hideTitle = true; // always true in SWC
     return props;
   }
 }

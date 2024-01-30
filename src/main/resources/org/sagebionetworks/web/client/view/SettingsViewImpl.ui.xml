@@ -72,12 +72,7 @@
               <bh:Text>Profile Validation</bh:Text>
             </bh:Div>
             <bh:Div>
-              <bh:Div
-                marginLeft="15"
-                marginRight="15"
-                marginTop="15"
-                marginBottom="15"
-              >
+              <bh:Div addStyleNames="margin-15">
                 <b:Button
                   ui:field="verificationSubmittedButton"
                   type="PRIMARY"
@@ -116,12 +111,7 @@
               </bh:Div>
             </bh:Div>
             <bh:Div ui:field="verifyAlert">
-              <bh:Div
-                marginLeft="10"
-                marginRight="10"
-                marginTop="10"
-                marginBottom="10"
-              >
+              <bh:Div addStyleNames="margin-15">
                 <bh:Paragraph>
                   <bh:Text>
                     Users with a validated profile can access more features and
