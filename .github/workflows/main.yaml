@@ -8,7 +8,7 @@ on:
 
 jobs:
   call-build:
-    if: github.event_name == 'push' && github.repository_owner == 'Sage-Bionetworks'
+    if: github.event_name == 'push' && github.ref != 'refs/heads/develop' && github.repository_owner == 'Sage-Bionetworks'
     uses: ./.github/workflows/build.yaml
     with:
       mvn_goal: deploy
