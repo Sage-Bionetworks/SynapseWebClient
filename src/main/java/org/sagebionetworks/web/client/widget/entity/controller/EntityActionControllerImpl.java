@@ -274,6 +274,7 @@ public class EntityActionControllerImpl
   IsACTMemberAsyncHandler isACTMemberAsyncHandler;
   AddFolderDialogWidget addFolderDialogWidget;
   CreateTableViewWizard createTableViewWizard;
+  CreateDatasetOrCollection createDatasetOrCollection;
   SqlDefinedTableEditor sqlDefinedTableEditor;
   boolean isShowingVersion = false;
   WizardCallback entityUpdatedWizardCallback;
@@ -450,6 +451,14 @@ public class EntityActionControllerImpl
       this.view.addWidget(createTableViewWizard.asWidget());
     }
     return createTableViewWizard;
+  }
+
+  private CreateDatasetOrCollection getCreateDatasetOrCollection() {
+    if (createDatasetOrCollection == null) {
+      createDatasetOrCollection = ginInjector.getCreateDatasetOrCollection();
+      this.view.addWidget(createDatasetOrCollection.asWidget());
+    }
+    return createDatasetOrCollection;
   }
 
   private UploadTableModalWidget getUploadTableModalWidget() {
@@ -1926,7 +1935,7 @@ public class EntityActionControllerImpl
       entityBundle,
       Dataset.class.getName(),
       () -> {
-        postCheckCreateTableOrView(TableType.dataset);
+        postCheckCreateDatasetOrCollection(TableType.dataset);
       }
     );
   }
@@ -1936,7 +1945,7 @@ public class EntityActionControllerImpl
       entityBundle,
       Dataset.class.getName(),
       () -> {
-        postCheckCreateTableOrView(TableType.dataset_collection);
+        postCheckCreateDatasetOrCollection(TableType.dataset_collection);
       }
     );
   }
@@ -1978,6 +1987,11 @@ public class EntityActionControllerImpl
           .show();
       }
     );
+  }
+
+  private void postCheckCreateDatasetOrCollection(TableType type) {
+    CreateDatasetOrCollection dialog = getCreateDatasetOrCollection();
+    dialog.configure(entityBundle.getEntity().getId(), type);
   }
 
   private void postCheckCreateTableOrView(TableType table) {
