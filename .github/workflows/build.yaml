@@ -21,8 +21,8 @@ jobs:
           server-username: MAVEN_USERNAME
           server-password: MAVEN_USERPWD
       - name: Version artifacts
-        if: ${{ inputs.mvn_goal != 'deploy' }}
-        run: chmod 777 pomSnapshotToGitHash.sh && ./pomSnapshotToGitHash.sh
+        if: ${{ inputs.mvn_goal == 'deploy' }}
+        run: chmod 777 pomSnapshotToLastGitTag.sh && ./pomSnapshotToLastGitTag.sh
       - name: Build with Maven
         run: echo mvn -B ${{ inputs.mvn_goal }} --file pom.xml
         env:
