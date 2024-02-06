@@ -124,7 +124,8 @@ public class SettingsPresenter implements SettingsView.Presenter {
         String username = authenticationController
           .getCurrentUserProfile()
           .getUserName();
-        ChangePasswordWithCurrentPassword changePasswordRequest = new ChangePasswordWithCurrentPassword();
+        ChangePasswordWithCurrentPassword changePasswordRequest =
+          new ChangePasswordWithCurrentPassword();
         changePasswordRequest.setCurrentPassword(existingPassword);
         changePasswordRequest.setNewPassword(newPassword);
         changePasswordRequest.setUsername(
@@ -188,7 +189,8 @@ public class SettingsPresenter implements SettingsView.Presenter {
     AsyncCallback<UserProfile> callback = new AsyncCallback<UserProfile>() {
       @Override
       public void onSuccess(final UserProfile myProfile) {
-        org.sagebionetworks.repo.model.message.Settings settings = myProfile.getNotificationSettings();
+        org.sagebionetworks.repo.model.message.Settings settings =
+          myProfile.getNotificationSettings();
         if (settings == null) {
           settings = new org.sagebionetworks.repo.model.message.Settings();
           settings.setMarkEmailedMessagesAsRead(false);
@@ -246,8 +248,6 @@ public class SettingsPresenter implements SettingsView.Presenter {
     view.setApiKeySettingsVisible(
       DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider())
     );
-    view.setOauthClientSettingsVisible(true);
-    view.setTwoFactorAuthSettingsVisible(true);
 
     this.view.render();
   }
@@ -422,8 +422,9 @@ public class SettingsPresenter implements SettingsView.Presenter {
   }
 
   public void initializeVerificationUI() {
-    // The UI is depends on the current state
-    VerificationSubmission submission = currentUserBundle.getVerificationSubmission();
+    // The UI depends on the current state
+    VerificationSubmission submission =
+      currentUserBundle.getVerificationSubmission();
 
     if (submission == null) {
       // no submission. if the owner, provide way to submit

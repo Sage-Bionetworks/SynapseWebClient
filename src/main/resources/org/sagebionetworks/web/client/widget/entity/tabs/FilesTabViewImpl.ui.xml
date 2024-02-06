@@ -23,7 +23,7 @@
       <g:SimplePanel ui:field="fileMetadataContainer" visible="false" />
     </bh:Div>
     <g:SimplePanel ui:field="addToDownloadListWidgetContainer" />
-    <bh:Div addStyleNames="entity-page-side-margins">
+    <bh:Div addStyleNames="entity-page-side-margins margin-bottom-40">
       <g:SimplePanel ui:field="fileHistoryContainer" />
       <g:SimplePanel
         ui:field="filesWikiPageContainer"
@@ -33,7 +33,7 @@
       <g:SimplePanel ui:field="fileBrowserContainer" />
       <b:Row addStyleNames="margin-top-10">
         <b:Column size="MD_6" ui:field="filePreviewContainer">
-          <g:FlowPanel addStyleNames="light-border padding-10 margin-bottom-15">
+          <g:FlowPanel>
             <bh:Div addStyleNames="highlight-title">
               <bh:Text>Preview</bh:Text>
               <w:HelpWidget
@@ -51,14 +51,14 @@
             </bh:Div>
             <g:ScrollPanel
               height="200px"
-              addStyleNames="light-border whiteBackground"
+              addStyleNames="padding-15 whiteBackground"
             >
               <bh:Div ui:field="filePreviewWidgetContainer" />
             </g:ScrollPanel>
           </g:FlowPanel>
         </b:Column>
         <b:Column size="MD_6" ui:field="fileProvenanceContainer">
-          <g:FlowPanel addStyleNames="light-border padding-10 margin-bottom-15">
+          <g:FlowPanel>
             <bh:Div addStyleNames="highlight-title">
               <bh:Text>Provenance</bh:Text>
               <w:HelpWidget
@@ -76,12 +76,14 @@
             </bh:Div>
             <bh:Div
               ui:field="fileProvenanceGraphContainer"
-              addStyleNames="light-border whiteBackground"
+              addStyleNames="padding-15 whiteBackground"
             />
           </g:FlowPanel>
         </b:Column>
+      </b:Row>
+      <b:Row addStyleNames="margin-top-10">
         <b:Column size="MD_12" ui:field="discussionContainer">
-          <g:FlowPanel addStyleNames="light-border padding-10 margin-bottom-15">
+          <g:FlowPanel>
             <bh:Div addStyleNames="highlight-title">
               <bh:Text ui:field="discussionText" />
             </bh:Div>

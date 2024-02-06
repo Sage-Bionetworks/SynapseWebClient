@@ -64,18 +64,16 @@
     </bh:Div>
     <bh:Div
       ui:field="deleteThreadsArea"
-      addStyleNames="highlight-box padding-top-0-imp margin-bottom-20"
+      addStyleNames="padding-top-0-imp margin-top-20 margin-bottom-20"
       visible="false"
     >
-      <b:Row addStyleNames="margin-top-10">
-        <b:Column size="XS_12">
-          <bh:Span addStyleNames="highlight-title">Deleted Threads</bh:Span>
-        </b:Column>
-      </b:Row>
+      <bh:Div addStyleNames="highlight-title">
+        <bh:Text>Deleted Threads</bh:Text>
+      </bh:Div>
       <b:Row>
         <b:Column size="XS_12">
           <g:SimplePanel
-            addStyleNames="margin-top-10"
+            addStyleNames="margin-15"
             ui:field="deletedThreadListContainer"
             visible="false"
           />

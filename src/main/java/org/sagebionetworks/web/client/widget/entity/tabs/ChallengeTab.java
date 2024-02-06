@@ -6,7 +6,6 @@ import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -15,7 +14,6 @@ import org.sagebionetworks.web.client.widget.entity.menu.v3.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.evaluation.AdministerEvaluationsList;
 import org.sagebionetworks.web.client.widget.evaluation.ChallengeWidget;
-import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModal;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorReactComponentPage;
 
 public class ChallengeTab implements ChallengeTabView.Presenter {
@@ -27,11 +25,9 @@ public class ChallengeTab implements ChallengeTabView.Presenter {
   PortalGinInjector ginInjector;
   AuthenticationController authenticationController;
   GlobalApplicationState globalApplicationState;
-  CookieProvider cookies;
   EntityActionMenu actionMenuWidget;
 
   String entityId;
-  EvaluationEditorModal evalEditor;
   UserEntityPermissions permissions;
 
   @Inject
@@ -39,14 +35,12 @@ public class ChallengeTab implements ChallengeTabView.Presenter {
     Tab tab,
     PortalGinInjector ginInjector,
     AuthenticationController authenticationController,
-    GlobalApplicationState globalApplicationState,
-    CookieProvider cookies
+    GlobalApplicationState globalApplicationState
   ) {
     this.tab = tab;
     this.ginInjector = ginInjector;
     this.authenticationController = authenticationController;
     this.globalApplicationState = globalApplicationState;
-    this.cookies = cookies;
     tab.configure(
       "Challenge",
       "challenge",
@@ -97,11 +91,8 @@ public class ChallengeTab implements ChallengeTabView.Presenter {
     );
     challengeWidget.configure(entityId, entityName);
 
-    //This is currently only used in the "alpha" test mode where a React component is using
-    // a different Evaluation editor
-    Consumer<String> editEvaluationCallback = (String evaluationId) -> {
+    Consumer<String> editEvaluationCallback = (String evaluationId) ->
       showEvaluationEditor(null, evaluationId);
-    };
 
     evaluationList.configure(entityId, editEvaluationCallback);
 
@@ -114,10 +105,8 @@ public class ChallengeTab implements ChallengeTabView.Presenter {
    * @param evaluationId non-null if updating existing evaluation
    */
   private void showEvaluationEditor(String entityId, String evaluationId) {
-    //This is currently only used in the "alpha" test mode where a React component is using
-    // a different Evaluation editor
-
-    EvaluationEditorReactComponentPage evaluationEditor = ginInjector.createEvaluationEditorReactComponentPage();
+    EvaluationEditorReactComponentPage evaluationEditor =
+      ginInjector.createEvaluationEditorReactComponentPage();
     globalApplicationState.setIsEditing(true);
     evaluationEditor.configure(
       evaluationId,
@@ -138,9 +127,6 @@ public class ChallengeTab implements ChallengeTabView.Presenter {
 
   @Override
   public void showCreateNewEvaluationEditor(String entityId) {
-    //This is currently only used in the "alpha" test mode where a React component is using
-    // a different Evaluation editor
-
     showEvaluationEditor(entityId, null);
   }
 

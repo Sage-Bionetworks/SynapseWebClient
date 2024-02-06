@@ -19,6 +19,8 @@ public class DatasetsTab extends AbstractTablesTab {
 
   public static final String DATASETS_HELP =
     "Create a Draft Dataset and add File versions. Annotate, Mint DOI’s, and Publish your Dataset to share it with others.";
+  public static final String DATASET_COLLECTIONS_HELP =
+    "Dataset Collections allow you to collate Datasets found across one or more Synapse Projects or Folders. In order to add a Dataset to a Dataset Collection, it must be shared with you.";
 
   public static final String DATASETS_AND_COLLECTIONS_HELP =
     "Use Datasets to produce and distribute an immutable set of files found across one or more Projects or Folders. You can also create Dataset Collections which contain multiple Datasets.";

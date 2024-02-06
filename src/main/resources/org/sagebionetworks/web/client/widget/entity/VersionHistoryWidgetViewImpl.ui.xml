@@ -10,10 +10,10 @@
 >
   <b:Collapse
     ui:field="collapse"
-    addStyleNames="light-border margin-bottom-15"
+    addStyleNames="margin-bottom-15"
     toggle="false"
   >
-    <g:FlowPanel addStyleNames="padding-10 margin-bottom-15">
+    <g:FlowPanel addStyleNames="margin-bottom-15">
       <bh:Div addStyleNames="highlight-title">
         <bh:Text>Version History</bh:Text>
         <w:IconSvg ui:field="closeButton" addStyleNames="close" icon="close" />

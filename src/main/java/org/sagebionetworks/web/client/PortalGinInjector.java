@@ -120,6 +120,7 @@ import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidgetView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
+import org.sagebionetworks.web.client.widget.entity.controller.CreateDatasetOrCollection;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityRefProvEntryView;
 import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceListWidget;
@@ -781,6 +782,8 @@ public interface PortalGinInjector extends Ginjector {
   EditAnnotationsDialog getEditAnnotationsDialog();
 
   CreateTableViewWizard getCreateTableViewWizard();
+
+  CreateDatasetOrCollection getCreateDatasetOrCollection();
 
   SqlDefinedTableEditor getSqlDefinedTableEditor();
 

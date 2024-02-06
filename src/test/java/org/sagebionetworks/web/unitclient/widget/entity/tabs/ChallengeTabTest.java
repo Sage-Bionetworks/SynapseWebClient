@@ -62,9 +62,6 @@ public class ChallengeTabTest {
   @Mock
   EntityActionMenu mockActionMenuWidget;
 
-  @Mock
-  CookieProvider mockCookieProvider;
-
   ChallengeTab tab;
 
   @Mock
@@ -92,8 +89,7 @@ public class ChallengeTabTest {
         mockTab,
         mockPortalGinInjector,
         mockAuthenticationController,
-        mockGlobalApplicationState,
-        mockCookieProvider
+        mockGlobalApplicationState
       );
     when(mockTab.getEntityActionMenu()).thenReturn(mockActionMenuWidget);
     when(mockPortalGinInjector.getChallengeTabView()).thenReturn(mockView);

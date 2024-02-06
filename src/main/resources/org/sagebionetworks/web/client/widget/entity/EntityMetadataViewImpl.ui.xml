@@ -52,9 +52,7 @@
       toggle="false"
       b:id="annotationContentCollapse"
     >
-      <g:FlowPanel
-        addStyleNames="light-border padding-10 margin-bottom-15 margin-top-40 background-color-white"
-      >
+      <g:FlowPanel addStyleNames="margin-bottom-15 margin-top-40">
         <bh:Div addStyleNames="highlight-title">
           <bh:Text ui:field="annotationsTitleText">Annotations</bh:Text>
           <w:HelpWidget
