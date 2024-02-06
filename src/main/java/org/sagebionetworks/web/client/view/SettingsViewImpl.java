@@ -269,11 +269,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
       presenter.goTo(new Quiz("Certification"))
     );
     certificationPassedButton.addClickHandler(event ->
-      DisplayUtils.newWindow(
-        "https://help.synapse.org/docs/User-Types.2007072795.html#UserAccountTiers-CertifiedUsers",
-        "_blank",
-        ""
-      )
+      presenter.goTo(new Quiz("Certification"))
     );
     synapseTermsAcceptedButton.addClickHandler(event ->
       DisplayUtils.newWindow(
