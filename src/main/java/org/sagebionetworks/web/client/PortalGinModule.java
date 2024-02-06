@@ -95,10 +95,6 @@ import org.sagebionetworks.web.client.view.PlaceView;
 import org.sagebionetworks.web.client.view.PlaceViewImpl;
 import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.client.view.ProfileViewImpl;
-import org.sagebionetworks.web.client.view.QuestionContainerWidgetView;
-import org.sagebionetworks.web.client.view.QuestionContainerWidgetViewImpl;
-import org.sagebionetworks.web.client.view.QuizView;
-import org.sagebionetworks.web.client.view.QuizViewImpl;
 import org.sagebionetworks.web.client.view.SearchView;
 import org.sagebionetworks.web.client.view.SearchViewImpl;
 import org.sagebionetworks.web.client.view.SettingsView;
@@ -705,7 +701,16 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEdi
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEditorViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdListRendererCellView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdListRendererCellViewImpl;
-import org.sagebionetworks.web.client.widget.table.v2.schema.*;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorView;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorWidget;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorWidgetImpl;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowViewer;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowViewerImpl;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsEditorWidgetView;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsEditorWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsViewImpl;
 import org.sagebionetworks.web.client.widget.team.BigTeamBadgeView;
 import org.sagebionetworks.web.client.widget.team.BigTeamBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.team.EmailInvitationBadgeView;
@@ -883,9 +888,6 @@ public class PortalGinModule extends AbstractGinModule {
     // Synapse Wiki Pages
     bind(SynapseWikiView.class).to(SynapseWikiViewImpl.class);
 
-    // QuizView
-    bind(QuizView.class).to(QuizViewImpl.class).in(Singleton.class);
-
     // Certificate
     bind(CertificateWidgetView.class).to(CertificateWidgetViewImpl.class);
 
@@ -939,10 +941,6 @@ public class PortalGinModule extends AbstractGinModule {
     /*
      * Widgets
      */
-
-    // QuestionContainerWidget
-    bind(QuestionContainerWidgetView.class)
-      .to(QuestionContainerWidgetViewImpl.class);
 
     // DoiWidget
     bind(DoiWidgetV2View.class).to(DoiWidgetV2ViewImpl.class);

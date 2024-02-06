@@ -35,7 +35,6 @@ import org.sagebionetworks.web.client.presenter.PasswordResetSignedTokenPresente
 import org.sagebionetworks.web.client.presenter.PeopleSearchPresenter;
 import org.sagebionetworks.web.client.presenter.PersonalAccessTokensPresenter;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
-import org.sagebionetworks.web.client.presenter.QuestionContainerWidget;
 import org.sagebionetworks.web.client.presenter.QuizPresenter;
 import org.sagebionetworks.web.client.presenter.SearchPresenter;
 import org.sagebionetworks.web.client.presenter.SettingsPresenter;
@@ -508,8 +507,6 @@ public interface PortalGinInjector extends Ginjector {
   WebStorageMaxSizeDetector getWebStorageMaxSizeDetector();
 
   SynapseStatusDetector getSynapseStatusDetector();
-
-  QuestionContainerWidget getQuestionContainerWidget();
 
   SynapseAlert getSynapseAlertWidget();
 
