@@ -14,6 +14,11 @@ public class EntityModalProps extends ReactComponentProps {
     void run();
   }
 
+  @JsFunction
+  public interface BooleanCallback {
+    void run(boolean value);
+  }
+
   String entityId;
   boolean show;
 
@@ -29,6 +34,9 @@ public class EntityModalProps extends ReactComponentProps {
   @JsNullable
   Double versionNumber;
 
+  @JsNullable
+  BooleanCallback onEditModeChanged;
+
   @JsOverlay
   public static EntityModalProps create(
     String entityId,
@@ -36,7 +44,8 @@ public class EntityModalProps extends ReactComponentProps {
     boolean show,
     Callback onClose,
     String initialTab,
-    boolean showTabs
+    boolean showTabs,
+    BooleanCallback onEditModeChanged
   ) {
     EntityModalProps props = new EntityModalProps();
     props.entityId = entityId;
@@ -47,6 +56,7 @@ public class EntityModalProps extends ReactComponentProps {
     props.onClose = onClose;
     props.initialTab = initialTab;
     props.showTabs = showTabs;
+    props.onEditModeChanged = onEditModeChanged;
     return props;
   }
 }
