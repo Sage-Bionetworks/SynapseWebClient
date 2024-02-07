@@ -682,8 +682,9 @@ public class TableEntityWidgetV2
           DisplayUtils.NotificationVariant.SUCCESS,
           toastOptions
         );
-        eventBus.fireEvent(new EntityUpdatedEvent(tableId));
+        ginInjector.getGlobalApplicationState().setIsEditing(false);
         closeItemsEditor();
+        eventBus.fireEvent(new EntityUpdatedEvent(tableId));
       },
       () -> closeItemsEditor(),
       hasUnsavedChanges ->
