@@ -12,6 +12,9 @@ extras/
 /.sass-cache/
 .idea/*
 
+src/main/main.iml
+src/test/test.iml
+
 # We use a maven plugin to download node and required modules.
 # Since these are retrieved at build-time, no need to commit.
 node/*
