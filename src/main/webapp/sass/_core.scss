@@ -2605,12 +2605,6 @@ Looks for any child element under .modal-fullscreen that has a class that contai
 
 #body .inline-user-badge {
   display: inline-flex;
-  .SRC-userImgSmall,
-  .SRC-userImgMedium,
-  .SRC-userImgLarge,
-  .SRC-centerContentInline {
-    display: inline-flex;
-  }
 }
 
 /* seamless attribute is not yet supported on most browsers, so define the style here for all iframes with this attribute */
@@ -3397,10 +3391,6 @@ div.border {
   }
   .UserBadge {
     display: inline-flex;
-    .SRC-userImgSmall,
-    .SRC-userImgMedium {
-      padding: 0px;
-    }
   }
 }
 #body {
@@ -3793,8 +3783,8 @@ div.border {
 }
 
 .TeamManagerBadge {
+  width: 100%;
   margin-left: 2px;
-  margin-right: 2px;
   padding-left: 15px;
   position: relative;
   z-index: 1;
