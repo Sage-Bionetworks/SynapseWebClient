@@ -5330,10 +5330,10 @@ svg-path-sdf@^1.1.3:
     parse-svg-path "^0.1.2"
     svg-path-bounds "^1.0.1"
 
-synapse-react-client@3.1.77:
-  version "3.1.77"
-  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-3.1.77.tgz#1182ad05c772afa962fbf48716259968403271a4"
-  integrity sha512-yBq4TTVczXg7kb0OtxpVsZ+f3qLiWs10LZEEDQUnAHJtZ4DHlphaZyO7cJ6u4Fpe/6Hrdd9CJuctRhZbWaHOgA==
+synapse-react-client@3.1.78:
+  version "3.1.78"
+  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-3.1.78.tgz#06ff55e2c395fb7940aee753a25afc5985672ff3"
+  integrity sha512-n39RhA37wjdHfwXDfvNlFa0iQYiBy8d2V5+asB/khfXOjT5ybuPqrUSX4axvnZtAC8MU4gNFhUmH2Z9T0eUcsA==
   dependencies:
     "@apidevtools/json-schema-ref-parser" "^9.1.2"
     "@brainhubeu/react-carousel" "1.19.26"
