@@ -15,9 +15,8 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.jsinterop.EntityModalProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
@@ -32,15 +31,15 @@ public class EntityMetadataViewImpl
   interface EntityMetadataViewImplUiBinder
     extends UiBinder<Widget, EntityMetadataViewImpl> {}
 
-  private static EntityMetadataViewImplUiBinder uiBinder = GWT.create(
+  private static final EntityMetadataViewImplUiBinder uiBinder = GWT.create(
     EntityMetadataViewImplUiBinder.class
   );
 
   private Presenter presenter;
   private String entityId;
   private Long versionNumber;
-  private CookieProvider cookies;
-  private SynapseReactClientFullContextPropsProvider propsProvider;
+  private final SynapseReactClientFullContextPropsProvider propsProvider;
+  private final GlobalApplicationState globalApplicationState;
 
   @UiField
   HTMLPanel detailedMetadata;
@@ -92,10 +91,11 @@ public class EntityMetadataViewImpl
 
   @Inject
   public EntityMetadataViewImpl(
-    final SynapseJSNIUtils jsniUtils,
-    final SynapseReactClientFullContextPropsProvider propsProvider
+    final SynapseReactClientFullContextPropsProvider propsProvider,
+    final GlobalApplicationState globalApplicationState
   ) {
     this.propsProvider = propsProvider;
+    this.globalApplicationState = globalApplicationState;
     initWidget(uiBinder.createAndBindUi(this));
     idField.addClickHandler(event -> idField.selectAll());
     annotationsContentCloseButton.addClickHandler(event ->
@@ -137,21 +137,26 @@ public class EntityMetadataViewImpl
 
   @Override
   public void setAnnotationsModalVisible(boolean visible) {
-    boolean showTabs = false;
-    EntityModalProps props = EntityModalProps.create(
-      entityId,
-      versionNumber,
-      visible,
-      () -> setAnnotationsModalVisible(false),
-      "ANNOTATIONS",
-      showTabs
-    );
-    ReactNode component = React.createElementWithSynapseContext(
-      SRC.SynapseComponents.EntityModal,
-      props,
-      propsProvider.getJsInteropContextProps()
-    );
-    annotationsModalContainer.render(component);
+    if (visible) {
+      boolean showTabs = false;
+      EntityModalProps props = EntityModalProps.create(
+        entityId,
+        versionNumber,
+        visible,
+        () -> setAnnotationsModalVisible(false),
+        "ANNOTATIONS",
+        showTabs,
+        globalApplicationState::setIsEditing
+      );
+      ReactNode component = React.createElementWithSynapseContext(
+        SRC.SynapseComponents.EntityModal,
+        props,
+        propsProvider.getJsInteropContextProps()
+      );
+      annotationsModalContainer.render(component);
+    } else {
+      annotationsModalContainer.clear();
+    }
   }
 
   @Override
