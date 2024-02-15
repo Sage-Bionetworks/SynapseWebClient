@@ -56,7 +56,7 @@
         />
         <b:Heading
           size="H5"
-          addStyleNames="displayInline letter-spacing-6 lato vertical-align-middle"
+          addStyleNames="displayInline letter-spacing-6 dmsans vertical-align-middle"
           text="SYNAPSE"
         />
       </bh:Div>

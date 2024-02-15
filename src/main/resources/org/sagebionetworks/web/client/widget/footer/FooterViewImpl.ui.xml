@@ -27,7 +27,7 @@
                 />
                 <b:Heading
                   size="H3"
-                  addStyleNames="displayInline color-white lato letter-spacing-6 moveup-5"
+                  addStyleNames="displayInline color-white dmsans letter-spacing-6 moveup-5"
                   text="SYNAPSE"
                 />
               </bh:Div>
@@ -44,7 +44,7 @@
                 />
                 <b:Heading
                   size="H3"
-                  addStyleNames="displayInline color-white lato letter-spacing-6 moveup-5"
+                  addStyleNames="displayInline color-white dmsans letter-spacing-6 moveup-5"
                   text="SYNAPSE"
                 />
               </bh:Div>

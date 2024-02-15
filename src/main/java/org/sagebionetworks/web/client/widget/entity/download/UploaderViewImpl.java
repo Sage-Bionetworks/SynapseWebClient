@@ -707,7 +707,7 @@ public class UploaderViewImpl extends FlowPanel implements UploaderView {
     uploadDestinationContainer.add(logo);
     Heading synapse = new Heading(HeadingSize.H3);
     synapse.addStyleName(
-      "lato notransition letter-spacing-6 displayInlineBlock"
+      "dmsans notransition letter-spacing-6 displayInlineBlock"
     );
     synapse.setText("SYNAPSE");
     uploadDestinationContainer.add(synapse);
