@@ -173,10 +173,17 @@
               addStyleNames="color-white displayBlock margin-top-5 margin-bottom-5"
             />
             <bh:Div addStyleNames="margin-top-10 margin-bottom-10">
-              <g:Image
-                addStyleNames="margin-right-5"
-                url="images/sagebionetworks-logo.svg"
-              />
+              <g:FocusPanel
+                ui:field="sageLogo2"
+                addStyleNames="displayInline link"
+              >
+                <g:Image
+                  url="images/sagebionetworks-logo.svg"
+                  addStyleNames="center-in-div"
+                  altText="Sage Bionetworks logo"
+                  height="30px"
+                />
+              </g:FocusPanel>
               <b:Anchor
                 ui:field="copyrightYear2"
                 href="http://sagebionetworks.org/"
@@ -221,18 +228,22 @@
           <bh:Div
             addStyleNames="flexcontainer-row flexcontainer-justify-space-between hidden-xs"
           >
-            <bh:Div width="180px" />
+            <bh:Div width="160px" />
             <!-- dummy column to center Sage Bionetworks logo (offset Synapse versions
 							on the right) -->
             <bh:Div>
-              <bh:Div>
+              <g:FocusPanel
+                ui:field="sageLogo1"
+                addStyleNames="displayInline link"
+              >
                 <g:Image
                   url="images/sagebionetworks-logo.svg"
                   addStyleNames="center-in-div"
                   altText="Sage Bionetworks logo"
+                  height="30px"
                 />
-              </bh:Div>
-              <bh:Div addStyleNames="margin-top-10">
+              </g:FocusPanel>
+              <bh:Div addStyleNames="margin-top-10 center">
                 <b:Anchor
                   ui:field="copyrightYear"
                   href="http://sagebionetworks.org/"

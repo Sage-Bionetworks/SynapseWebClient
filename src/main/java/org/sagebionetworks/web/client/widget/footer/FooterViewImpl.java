@@ -1,10 +1,12 @@
 package org.sagebionetworks.web.client.widget.footer;
 
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -68,6 +70,12 @@ public class FooterViewImpl implements FooterView {
   @UiField
   Image alphaModeStatusIcon;
 
+  @UiField
+  FocusPanel sageLogo1;
+
+  @UiField
+  FocusPanel sageLogo2;
+
   SageImageBundle sageImageBundle;
   String portalVersion, repoVersion, srcVersion;
   private Presenter presenter;
@@ -91,16 +99,13 @@ public class FooterViewImpl implements FooterView {
     Callback constructViewCallback = () -> {
       IsWidget widget = binder.createAndBindUi(this);
       container.add(widget);
-
       initDebugModeLink();
       hideACTActionsContainer.add(hideACTActionsButton);
       copyrightYear.setText(
-        DateTimeFormat.getFormat("yyyy").format(new Date()) +
-        " SAGE BIONETWORKS"
+        DateTimeFormat.getFormat("yyyy").format(new Date())
       );
       copyrightYear2.setText(
-        DateTimeFormat.getFormat("yyyy").format(new Date()) +
-        " SAGE BIONETWORKS"
+        DateTimeFormat.getFormat("yyyy").format(new Date())
       );
       reportAbuseLink.addClickHandler(event -> {
         presenter.onReportAbuseClicked();
@@ -116,7 +121,11 @@ public class FooterViewImpl implements FooterView {
         srcVersionSpan.setText(srcVersion);
         srcVersionSpan2.setText(srcVersion);
       }
-
+      ClickHandler sageLogoClickHandler = event -> {
+        Window.Location.assign("https://sagebionetworks.org");
+      };
+      sageLogo1.addClickHandler(sageLogoClickHandler);
+      sageLogo2.addClickHandler(sageLogoClickHandler);
       refresh();
     };
     gwt.scheduleExecution(constructViewCallback, 2500);
