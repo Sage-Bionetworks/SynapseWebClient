@@ -125,6 +125,7 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.jsinterop.CreateTableViewWizardProps;
+import org.sagebionetworks.web.client.jsinterop.SqlDefinedTableEditorModalProps;
 import org.sagebionetworks.web.client.jsinterop.ToastMessageOptions;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -145,6 +146,7 @@ import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalView;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
+import org.sagebionetworks.web.client.widget.entity.SqlDefinedEditorModalWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
@@ -216,7 +218,7 @@ public class EntityActionControllerImplTest {
   EditProjectMetadataModalWidget mockEditProjectMetadataModalWidget;
 
   @Mock
-  SqlDefinedTableEditor mockSqlDefinedTableEditor;
+  SqlDefinedEditorModalWidget mockSqlDefinedTableEditorModalWidget;
 
   EntityFinderWidget.Builder mockEntityFinderBuilder;
 
@@ -405,6 +407,7 @@ public class EntityActionControllerImplTest {
         PromptForValuesModalView.Configuration.Builder.class,
         new SelfReturningAnswer()
       );
+    //    when(mockMaterializedView.getId()).thenReturn(entityId);
 
     when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
     when(mockAuthenticationController.getCurrentUserPrincipalId())
@@ -424,8 +427,8 @@ public class EntityActionControllerImplTest {
       .thenReturn(mockEditProjectMetadataModalWidget);
     when(mockPortalGinInjector.getEntityFinderBuilder())
       .thenReturn(mockEntityFinderBuilder);
-    when(mockPortalGinInjector.getSqlDefinedTableEditor())
-      .thenReturn(mockSqlDefinedTableEditor);
+    when(mockPortalGinInjector.getSqlDefinedEditorModalWidget())
+      .thenReturn(mockSqlDefinedTableEditorModalWidget);
     when(mockEntityFinderBuilder.build()).thenReturn(mockEntityFinder);
 
     when(mockPortalGinInjector.getUploadDialogWidget())
@@ -4574,7 +4577,8 @@ public class EntityActionControllerImplTest {
   }
 
   @Test
-  public void testOnEditDefiningSql() {
+  public void testOnEditDefiningSqlOnCancel() {
+    when(mockMaterializedView.getId()).thenReturn(entityId);
     String oldSql = "select everything";
     entityBundle.setEntity(mockMaterializedView);
     when(mockMaterializedView.getDefiningSQL()).thenReturn(oldSql);
@@ -4593,30 +4597,58 @@ public class EntityActionControllerImplTest {
 
     controller.onAction(Action.EDIT_DEFINING_SQL, null);
 
-    // user is prompted for the new SQL
-    ArgumentCaptor<PromptCallback> callbackCaptor = ArgumentCaptor.forClass(
-      PromptCallback.class
+    ArgumentCaptor<SqlDefinedTableEditorModalProps.OnUpdate> onUpdateArgumentCaptor =
+      ArgumentCaptor.forClass(SqlDefinedTableEditorModalProps.OnUpdate.class);
+    ArgumentCaptor<SqlDefinedTableEditorModalProps.OnCancel> onCancelArgumentCaptor =
+      ArgumentCaptor.forClass(SqlDefinedTableEditorModalProps.OnCancel.class);
+    verify(mockSqlDefinedTableEditorModalWidget)
+      .configure(
+        eq(entityId),
+        onUpdateArgumentCaptor.capture(),
+        onCancelArgumentCaptor.capture()
+      );
+
+    onCancelArgumentCaptor.getValue().onCancel();
+    verify(mockSqlDefinedTableEditorModalWidget).setOpen(false);
+    verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
+  }
+
+  @Test
+  public void testOnEditDefiningSqlOnUpdate() {
+    when(mockMaterializedView.getId()).thenReturn(entityId);
+    String oldSql = "select everything";
+    entityBundle.setEntity(mockMaterializedView);
+    when(mockMaterializedView.getDefiningSQL()).thenReturn(oldSql);
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
     );
-    verify(mockView)
-      .showPromptDialog(
-        anyString(),
-        anyString(),
-        callbackCaptor.capture(),
-        eq(PromptForValuesModalView.InputType.TEXTAREA)
-      );
-    PromptCallback capturedCallback = callbackCaptor.getValue();
-    String newSql = "select nothing";
+    AsyncMockStubber
+      .callWithInvoke()
+      .when(mockPreflightController)
+      .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
 
-    capturedCallback.callback(newSql);
+    controller.onAction(Action.EDIT_DEFINING_SQL, null);
 
-    verify(mockMaterializedView).setDefiningSQL(newSql);
-    verify(mockSynapseJavascriptClient)
-      .updateEntity(
-        eq(mockMaterializedView),
-        anyString(),
-        anyBoolean(),
-        any(AsyncCallback.class)
+    ArgumentCaptor<SqlDefinedTableEditorModalProps.OnUpdate> onUpdateArgumentCaptor =
+      ArgumentCaptor.forClass(SqlDefinedTableEditorModalProps.OnUpdate.class);
+    ArgumentCaptor<SqlDefinedTableEditorModalProps.OnCancel> onCancelArgumentCaptor =
+      ArgumentCaptor.forClass(SqlDefinedTableEditorModalProps.OnCancel.class);
+    verify(mockSqlDefinedTableEditorModalWidget)
+      .configure(
+        eq(entityId),
+        onUpdateArgumentCaptor.capture(),
+        onCancelArgumentCaptor.capture()
       );
+
+    onUpdateArgumentCaptor.getValue().OnUpdate();
+    verify(mockSqlDefinedTableEditorModalWidget).setOpen(false);
+
+    verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
   }
 
   @Test

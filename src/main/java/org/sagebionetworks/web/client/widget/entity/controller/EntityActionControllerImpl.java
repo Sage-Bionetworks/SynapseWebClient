@@ -111,6 +111,7 @@ import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidg
 import org.sagebionetworks.web.client.widget.entity.EntityBadge;
 import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalView;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
+import org.sagebionetworks.web.client.widget.entity.SqlDefinedEditorModalWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
 import org.sagebionetworks.web.client.widget.entity.WikiPageDeleteConfirmationDialog;
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal;
@@ -276,6 +277,7 @@ public class EntityActionControllerImpl
   CreateTableViewWizard createTableViewWizard;
   CreateDatasetOrCollection createDatasetOrCollection;
   SqlDefinedTableEditor sqlDefinedTableEditor;
+  SqlDefinedEditorModalWidget sqlDefinedEditorModalWidget;
   boolean isShowingVersion = false;
   WizardCallback entityUpdatedWizardCallback;
   UploadTableModalWidget uploadTableModalWidget;
@@ -467,6 +469,15 @@ public class EntityActionControllerImpl
       view.addWidget(uploadTableModalWidget);
     }
     return uploadTableModalWidget;
+  }
+
+  private SqlDefinedEditorModalWidget getSqlDefinedEditorModalWidget() {
+    if (sqlDefinedEditorModalWidget == null) {
+      sqlDefinedEditorModalWidget =
+        ginInjector.getSqlDefinedEditorModalWidget();
+      view.addWidget(sqlDefinedEditorModalWidget);
+    }
+    return sqlDefinedEditorModalWidget;
   }
 
   private AddExternalRepoModal getAddExternalRepoModal() {
@@ -2709,13 +2720,19 @@ public class EntityActionControllerImpl
   }
 
   private void postCheckEditDefiningSql() {
-    // prompt for defining sql
-    view.showPromptDialog(
-      "Update SQL",
-      ((HasDefiningSql) entity).getDefiningSQL(),
-      getUpdateDefiningSqlCallback(),
-      PromptForValuesModalView.InputType.TEXTAREA
-    );
+    String entityId = entity.getId();
+    getSqlDefinedEditorModalWidget()
+      .configure(
+        entityId,
+        () -> {
+          getSqlDefinedEditorModalWidget().setOpen(false);
+          eventBus.fireEvent(new EntityUpdatedEvent(entity.getId()));
+        },
+        () -> {
+          getSqlDefinedEditorModalWidget().setOpen(false);
+        }
+      );
+    getSqlDefinedEditorModalWidget().setOpen(true);
   }
 
   private void onViewDefiningSql() {

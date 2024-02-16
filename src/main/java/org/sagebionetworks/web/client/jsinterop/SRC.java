@@ -65,6 +65,7 @@ public class SRC {
     public static ReactComponentType<EntityHeaderTableProps> EntityHeaderTable;
     public static ReactComponentType<AccessRequirementRelatedProjectsListProps> AccessRequirementRelatedProjectsList;
     public static ReactComponentType<CreateTableViewWizardProps> CreateTableViewWizard;
+    public static ReactComponentType<SqlDefinedTableEditorModalProps> SqlDefinedTableEditorModal;
 
     /**
      * Pushes a global toast message. In SWC, you should use {@link DisplayUtils#notify}, rather than calling this method directly.
