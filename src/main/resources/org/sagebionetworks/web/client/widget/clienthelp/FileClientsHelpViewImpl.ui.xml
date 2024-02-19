@@ -48,7 +48,7 @@
                     <br />
                     syn = synapseclient.Synapse()
                     <br />
-                    syn.login('synapse_username','password')
+                    syn.login(authToken="")
                     <br />
                     <br />
                     # Obtain a pointer and download the data
@@ -79,13 +79,12 @@
                   <code class="nohighlight">
 										library(synapser)
 										<br />
-										synLogin('username','password')
+										synLogin(authToken="")
 										<br />
 										<br />
 										# Obtain a pointer and download the data
 										<br />
-										<span ui:field="id5" />
-										&#60;- synGet(entity='<span ui:field="id6" />'
+										<span ui:field="id5" /> &#60;- synGet(entity='<span ui:field="id6" />'
 										<span ui:field="versionUI3">
                       , version=
                       <span ui:field="version3" />

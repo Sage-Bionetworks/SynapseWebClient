@@ -49,7 +49,7 @@
                   <br />
                   syn = synapseclient.Synapse()
                   <br />
-                  syn.login('synapse_username','password')
+                  syn.login(authToken="")
                   <br />
                   files = synapseutils.syncFromSynapse(syn, '
                   <span ui:field="id2" />
@@ -68,7 +68,7 @@
 									library(synapserutils)
 									<br />
 									<br />
-									synLogin('synapse_username', 'password')
+									synLogin(authToken="")
 									<br />
 									files &#60;- synapserutils::syncFromSynapse('<span ui:field="id3" />')
 									<br />
