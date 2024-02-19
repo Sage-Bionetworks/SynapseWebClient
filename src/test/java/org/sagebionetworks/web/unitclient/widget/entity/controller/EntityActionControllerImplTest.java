@@ -407,7 +407,6 @@ public class EntityActionControllerImplTest {
         PromptForValuesModalView.Configuration.Builder.class,
         new SelfReturningAnswer()
       );
-    //    when(mockMaterializedView.getId()).thenReturn(entityId);
 
     when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
     when(mockAuthenticationController.getCurrentUserPrincipalId())
