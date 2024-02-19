@@ -49,11 +49,6 @@
               </pre>
             </g:HTMLPanel>
           </b:TabPane>
-          <!-- <b:TabPane ui:field="pythonTabPane"> <g:HTMLPanel> <pre> <code 
-						class="nohighlight">import synapseclient<br/>import synapseutils<br/><br/>syn 
-						= synapseclient.Synapse()<br/>syn.login('synapse_username','password')<br/>files 
-						= synapseutils.syncFromSynapse(syn, '<span ui:field="id2"/>')<br/> </code> 
-						</pre> </g:HTMLPanel> </b:TabPane> -->
         </b:TabContent>
       </b:TabPanel>
     </b:ModalBody>
