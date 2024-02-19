@@ -9,34 +9,27 @@ import jsinterop.annotations.JsType;
 @JsType(isNative = true, namespace = JsPackage.GLOBAL, name = "Object")
 public class SqlDefinedTableEditorModalProps extends ReactComponentProps {
 
-  // going to match the props sent from src
   @FunctionalInterface
   @JsFunction
-  public interface OnUpdate {
-    void OnUpdate();
-  }
-
-  @FunctionalInterface
-  @JsFunction
-  public interface OnCancel {
-    void onCancel();
+  public interface Callback {
+    void run();
   }
 
   public String entityId;
   public boolean open;
 
   @JsNullable
-  public OnUpdate onUpdate;
+  public Callback onUpdate;
 
   @JsNullable
-  public OnCancel onCancel;
+  public Callback onCancel;
 
   @JsOverlay
   public static SqlDefinedTableEditorModalProps create(
     String entityId,
     boolean open,
-    OnUpdate onUpdate,
-    OnCancel onCancel
+    Callback onUpdate,
+    Callback onCancel
   ) {
     SqlDefinedTableEditorModalProps props =
       new SqlDefinedTableEditorModalProps();

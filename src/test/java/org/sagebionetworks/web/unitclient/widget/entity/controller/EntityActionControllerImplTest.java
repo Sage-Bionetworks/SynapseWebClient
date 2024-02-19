@@ -4597,10 +4597,10 @@ public class EntityActionControllerImplTest {
 
     controller.onAction(Action.EDIT_DEFINING_SQL, null);
 
-    ArgumentCaptor<SqlDefinedTableEditorModalProps.OnUpdate> onUpdateArgumentCaptor =
-      ArgumentCaptor.forClass(SqlDefinedTableEditorModalProps.OnUpdate.class);
-    ArgumentCaptor<SqlDefinedTableEditorModalProps.OnCancel> onCancelArgumentCaptor =
-      ArgumentCaptor.forClass(SqlDefinedTableEditorModalProps.OnCancel.class);
+    ArgumentCaptor<SqlDefinedTableEditorModalProps.Callback> onUpdateArgumentCaptor =
+      ArgumentCaptor.forClass(SqlDefinedTableEditorModalProps.Callback.class);
+    ArgumentCaptor<SqlDefinedTableEditorModalProps.Callback> onCancelArgumentCaptor =
+      ArgumentCaptor.forClass(SqlDefinedTableEditorModalProps.Callback.class);
     verify(mockSqlDefinedTableEditorModalWidget)
       .configure(
         eq(entityId),
@@ -4608,7 +4608,7 @@ public class EntityActionControllerImplTest {
         onCancelArgumentCaptor.capture()
       );
 
-    onCancelArgumentCaptor.getValue().onCancel();
+    onCancelArgumentCaptor.getValue().run();
     verify(mockSqlDefinedTableEditorModalWidget).setOpen(false);
     verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
   }
@@ -4634,10 +4634,10 @@ public class EntityActionControllerImplTest {
 
     controller.onAction(Action.EDIT_DEFINING_SQL, null);
 
-    ArgumentCaptor<SqlDefinedTableEditorModalProps.OnUpdate> onUpdateArgumentCaptor =
-      ArgumentCaptor.forClass(SqlDefinedTableEditorModalProps.OnUpdate.class);
-    ArgumentCaptor<SqlDefinedTableEditorModalProps.OnCancel> onCancelArgumentCaptor =
-      ArgumentCaptor.forClass(SqlDefinedTableEditorModalProps.OnCancel.class);
+    ArgumentCaptor<SqlDefinedTableEditorModalProps.Callback> onUpdateArgumentCaptor =
+      ArgumentCaptor.forClass(SqlDefinedTableEditorModalProps.Callback.class);
+    ArgumentCaptor<SqlDefinedTableEditorModalProps.Callback> onCancelArgumentCaptor =
+      ArgumentCaptor.forClass(SqlDefinedTableEditorModalProps.Callback.class);
     verify(mockSqlDefinedTableEditorModalWidget)
       .configure(
         eq(entityId),
@@ -4645,7 +4645,7 @@ public class EntityActionControllerImplTest {
         onCancelArgumentCaptor.capture()
       );
 
-    onUpdateArgumentCaptor.getValue().OnUpdate();
+    onUpdateArgumentCaptor.getValue().run();
     verify(mockSqlDefinedTableEditorModalWidget).setOpen(false);
 
     verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));

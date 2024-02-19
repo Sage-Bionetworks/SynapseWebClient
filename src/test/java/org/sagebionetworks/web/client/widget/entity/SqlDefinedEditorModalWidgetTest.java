@@ -22,10 +22,10 @@ public class SqlDefinedEditorModalWidgetTest {
   SqlDefinedEditorModalWidgetView mockView;
 
   @Mock
-  SqlDefinedTableEditorModalProps.OnUpdate mockOnUpdate;
+  SqlDefinedTableEditorModalProps.Callback mockOnUpdate;
 
   @Mock
-  SqlDefinedTableEditorModalProps.OnCancel mockOnCancel;
+  SqlDefinedTableEditorModalProps.Callback mockOnCancel;
 
   @Mock
   GlobalApplicationState mockGlobalAppState;

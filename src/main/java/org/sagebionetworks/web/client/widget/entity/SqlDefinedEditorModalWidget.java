@@ -14,8 +14,8 @@ public class SqlDefinedEditorModalWidget implements IsWidget {
   private boolean open;
 
   private String entityId;
-  private SqlDefinedTableEditorModalProps.OnCancel onCancel;
-  private SqlDefinedTableEditorModalProps.OnUpdate onUpdate;
+  private SqlDefinedTableEditorModalProps.Callback onCancel;
+  private SqlDefinedTableEditorModalProps.Callback onUpdate;
 
   @Inject
   public SqlDefinedEditorModalWidget(
@@ -29,8 +29,8 @@ public class SqlDefinedEditorModalWidget implements IsWidget {
 
   public void configure(
     String entityId,
-    SqlDefinedTableEditorModalProps.OnUpdate onUpdate,
-    SqlDefinedTableEditorModalProps.OnCancel onCancel
+    SqlDefinedTableEditorModalProps.Callback onUpdate,
+    SqlDefinedTableEditorModalProps.Callback onCancel
   ) {
     this.entityId = entityId;
     this.onUpdate = onUpdate;
