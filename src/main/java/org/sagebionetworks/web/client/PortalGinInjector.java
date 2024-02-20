@@ -89,27 +89,8 @@ import org.sagebionetworks.web.client.widget.docker.DockerRepoWidget;
 import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModal;
 import org.sagebionetworks.web.client.widget.doi.CreateOrUpdateDoiModal;
 import org.sagebionetworks.web.client.widget.doi.DoiWidgetV2;
-import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
-import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
-import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
-import org.sagebionetworks.web.client.widget.entity.EntityListRowBadge;
-import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
-import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
-import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
-import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
-import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
-import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
-import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
-import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalView;
-import org.sagebionetworks.web.client.widget.entity.RegisterTeamDialog;
-import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
-import org.sagebionetworks.web.client.widget.entity.TutorialWizard;
-import org.sagebionetworks.web.client.widget.entity.VersionHistoryRowView;
-import org.sagebionetworks.web.client.widget.entity.VersionHistoryWidget;
-import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
-import org.sagebionetworks.web.client.widget.entity.WikiPageDeleteConfirmationDialog;
-import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
-import org.sagebionetworks.web.client.widget.entity.WikiVersionAnchorListItem;
+import org.sagebionetworks.web.client.widget.entity.*;
+import org.sagebionetworks.web.client.widget.entity.SqlDefinedEditorModalWidget;
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal;
 import org.sagebionetworks.web.client.widget.entity.act.RejectReasonWidget;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeItem;
@@ -785,6 +766,8 @@ public interface PortalGinInjector extends Ginjector {
   SqlDefinedTableEditor getSqlDefinedTableEditor();
 
   UploadTableModalWidget getUploadTableModalWidget();
+
+  SqlDefinedEditorModalWidget getSqlDefinedEditorModalWidget();
 
   AddExternalRepoModal getAddExternalRepoModal();
 
