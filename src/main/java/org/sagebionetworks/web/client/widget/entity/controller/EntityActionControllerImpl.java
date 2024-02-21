@@ -128,7 +128,6 @@ import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.statistics.StatisticsPlotWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.SqlDefinedTableEditor;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
@@ -276,7 +275,6 @@ public class EntityActionControllerImpl
   AddFolderDialogWidget addFolderDialogWidget;
   CreateTableViewWizard createTableViewWizard;
   CreateDatasetOrCollection createDatasetOrCollection;
-  SqlDefinedTableEditor sqlDefinedTableEditor;
   SqlDefinedEditorModalWidget sqlDefinedEditorModalWidget;
   boolean isShowingVersion = false;
   WizardCallback entityUpdatedWizardCallback;
@@ -437,14 +435,6 @@ public class EntityActionControllerImpl
       this.view.addWidget(accessControlListModalWidget);
     }
     return accessControlListModalWidget;
-  }
-
-  private SqlDefinedTableEditor getSqlDefinedTableEditor() {
-    if (sqlDefinedTableEditor == null) {
-      sqlDefinedTableEditor = ginInjector.getSqlDefinedTableEditor();
-      this.view.addWidget(sqlDefinedTableEditor.asWidget());
-    }
-    return sqlDefinedTableEditor;
   }
 
   private CreateTableViewWizard getCreateTableViewWizard() {
@@ -1967,35 +1957,6 @@ public class EntityActionControllerImpl
       TableEntity.class.getName(),
       () -> {
         postCheckCreateTableOrView(TableType.table);
-      }
-    );
-  }
-
-  public void onAddMaterializedView() {
-    preflightController.checkCreateEntity(
-      entityBundle,
-      MaterializedView.class.getName(),
-      () -> {
-        // to create a MaterializedView, we need to know the definingSQL
-        getSqlDefinedTableEditor()
-          .configure(
-            entityBundle.getEntity().getId(),
-            EntityType.materializedview
-          )
-          .show();
-      }
-    );
-  }
-
-  public void onAddVirtualTable() {
-    preflightController.checkCreateEntity(
-      entityBundle,
-      VirtualTable.class.getName(),
-      () -> {
-        // to create a MaterializedView, we need to know the definingSQL
-        getSqlDefinedTableEditor()
-          .configure(entityBundle.getEntity().getId(), EntityType.virtualtable)
-          .show();
       }
     );
   }
