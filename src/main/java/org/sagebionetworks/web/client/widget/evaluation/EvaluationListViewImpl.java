@@ -1,81 +1,50 @@
 package org.sagebionetworks.web.client.widget.evaluation;
 
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import java.util.ArrayList;
 import java.util.List;
-import org.gwtbootstrap3.client.ui.ButtonGroup;
-import org.gwtbootstrap3.client.ui.Panel;
-import org.gwtbootstrap3.client.ui.Radio;
-import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Span;
-import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.widget.HelpWidget;
+import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
+import org.sagebionetworks.web.client.jsinterop.AvailableEvaluationQueueListProps;
+import org.sagebionetworks.web.client.jsinterop.React;
+import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.SRC;
+import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 
-public class EvaluationListViewImpl
-  extends Panel
-  implements EvaluationListView {
+public class EvaluationListViewImpl implements EvaluationListView {
 
-  List<Radio> evaluationCheckboxes;
+  SynapseReactClientFullContextPropsProvider propsProvider;
+  ReactComponentDiv reactContainer;
+  Presenter presenter;
 
   @Inject
-  public EvaluationListViewImpl() {
-    evaluationCheckboxes = new ArrayList<Radio>();
+  public EvaluationListViewImpl(
+    SynapseReactClientFullContextPropsProvider propsProvider
+  ) {
+    this.propsProvider = propsProvider;
+    reactContainer = new ReactComponentDiv();
   }
 
   @Override
   public void configure(List<Evaluation> list, boolean isSelectable) {
-    clear();
-
-    if (list == null || list.size() == 0) {
-      addNoAttachmentRow();
-    } else if (list.size() == 1) {
-      Span singleItem = new Span();
-      singleItem.add(new Text(list.get(0).getName()));
-      add(singleItem);
-    } else {
-      populateTable(list, isSelectable);
-    }
-  }
-
-  private void addNoAttachmentRow() {
-    add(new InlineHTML("No evaluations found"));
-  }
-
-  private void populateTable(List<Evaluation> list, boolean isSelectable) {
-    ButtonGroup group = new ButtonGroup();
-    for (final Evaluation data : list) {
-      Div row = new Div();
-      if (isSelectable) {
-        final Radio selectBox = new Radio("evaluationButtons", data.getName());
-        selectBox.addStyleName("margin-left-10 displayInline");
-        row.add(selectBox);
-        evaluationCheckboxes.add(selectBox);
-      } else {
-        Span s = new Span();
-        s.setText(data.getName());
-        row.add(s);
-      }
-      if (DisplayUtils.isDefined(data.getSubmissionInstructionsMessage())) {
-        HelpWidget helpWidget = new HelpWidget();
-        helpWidget.setHelpMarkdown(
-          SafeHtmlUtils.htmlEscape(data.getSubmissionInstructionsMessage())
-        );
-        helpWidget.setAddStyleNames("margin-left-10 greyText-imp");
-        row.add(helpWidget.asWidget());
-      }
-      group.add(row);
-    }
-    add(group);
+    ReactNode element = React.createElementWithSynapseContext(
+      SRC.SynapseComponents.AvailableEvaluationQueueList,
+      AvailableEvaluationQueueListProps.create(
+        list,
+        isSelectable,
+        evaluation -> {
+          presenter.onChangeSelectedEvaluation(evaluation);
+        }
+      ),
+      propsProvider.getJsInteropContextProps()
+    );
+    reactContainer.render(element);
   }
 
   @Override
   public Widget asWidget() {
-    return this;
+    return reactContainer;
   }
 
   @Override
@@ -86,8 +55,7 @@ public class EvaluationListViewImpl
 
   @Override
   public void clear() {
-    super.clear();
-    evaluationCheckboxes.clear();
+    reactContainer.clear();
   }
 
   @Override
@@ -101,17 +69,7 @@ public class EvaluationListViewImpl
   }
 
   @Override
-  public Integer getSelectedEvaluationIndex() {
-    for (int i = 0; i < evaluationCheckboxes.size(); i++) {
-      if (evaluationCheckboxes.get(i).getValue()) {
-        return i;
-      }
-    }
-    return null;
-  }
-
-  @Override
-  public void setSelectedEvaluationIndex(int i) {
-    evaluationCheckboxes.get(i).setValue(true, true);
+  public void setPresenter(Presenter presenter) {
+    this.presenter = presenter;
   }
 }

@@ -2,11 +2,8 @@ package org.sagebionetworks.web.unitclient.widget.entity;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +31,7 @@ public class EvaluationListTest {
     List<Evaluation> emptyList = new ArrayList<Evaluation>();
     boolean isSelectable = true;
     widget.configure(emptyList, isSelectable);
-    verify(mockView, never()).setSelectedEvaluationIndex(anyInt());
+    assertNull(widget.getSelectedEvaluation());
   }
 
   @Test
@@ -46,7 +43,7 @@ public class EvaluationListTest {
     evaluations.add(singleEvaluation);
     boolean isSelectable = true;
     widget.configure(evaluations, isSelectable);
-    when(mockView.getSelectedEvaluationIndex()).thenReturn(null);
+    widget.onChangeSelectedEvaluation(singleEvaluation);
     assertEquals(singleEvaluation, widget.getSelectedEvaluation());
   }
 
@@ -59,8 +56,6 @@ public class EvaluationListTest {
     evaluations.add(new Evaluation());
     boolean isSelectable = true;
     widget.configure(evaluations, isSelectable);
-    verify(mockView, never()).setSelectedEvaluationIndex(anyInt());
-    when(mockView.getSelectedEvaluationIndex()).thenReturn(null);
     assertNull(widget.getSelectedEvaluation());
   }
 
@@ -75,7 +70,7 @@ public class EvaluationListTest {
     evaluations.add(eval2);
     boolean isSelectable = true;
     widget.configure(evaluations, isSelectable);
-    when(mockView.getSelectedEvaluationIndex()).thenReturn(1);
+    widget.onChangeSelectedEvaluation(eval2);
 
     assertEquals(eval2, widget.getSelectedEvaluation());
   }
@@ -90,5 +85,6 @@ public class EvaluationListTest {
     widget.configure(evaluations, isSelectable);
 
     verify(mockView).configure(evaluations, isSelectable);
+    assertNull(widget.getSelectedEvaluation());
   }
 }
