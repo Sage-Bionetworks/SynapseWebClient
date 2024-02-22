@@ -3910,6 +3910,10 @@ div.border {
   > .MuiAutocomplete-popper
   > .MuiAutocomplete-paper,
 .AvailableEvaluationQueueList > .MuiBox-root {
+  p {
+    margin-bottom: 0px;
+    padding-bottom: 0px;
+  }
   ul {
     margin: 0;
     padding: 8px 0;
