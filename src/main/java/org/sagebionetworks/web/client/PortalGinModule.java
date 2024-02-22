@@ -616,8 +616,6 @@ import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContaine
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityViewScopeWidgetView;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityViewScopeWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.SqlDefinedTableEditorView;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.SqlDefinedTableEditorViewImpl;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.SubmissionViewScopeWidgetView;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.SubmissionViewScopeWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.ViewDefaultColumns;
@@ -1446,8 +1444,6 @@ public class PortalGinModule extends AbstractGinModule {
     bind(ContainerClientsHelp.class).to(ContainerClientsHelpImpl.class);
 
     bind(FileDownloadMenuItemView.class).to(FileDownloadMenuItemViewImpl.class);
-    bind(SqlDefinedTableEditorView.class)
-      .to(SqlDefinedTableEditorViewImpl.class);
     bind(SqlDefinedEditorModalWidgetView.class)
       .to(SqlDefinedEditorModalWidgetViewImpl.class);
     bind(ChallengeWidgetView.class).to(ChallengeWidgetViewImpl.class);

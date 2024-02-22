@@ -167,7 +167,6 @@ import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModal;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.SqlDefinedTableEditor;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
