@@ -10,7 +10,7 @@ public class KeyFactory {
   @JsConstructor
   public KeyFactory(String accessToken) {}
 
-  public native List<?> getDownloadListBaseQueryKey();
+  public native Object[] getDownloadListBaseQueryKey();
 
-  public native List<?> getEntityQueryKey(String entityId);
+  public native Object[] getEntityQueryKey(String entityId);
 }

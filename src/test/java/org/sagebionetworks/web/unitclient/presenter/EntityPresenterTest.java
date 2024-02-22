@@ -58,6 +58,7 @@ import org.sagebionetworks.web.client.context.QueryClientProvider;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.jsinterop.KeyFactory;
+import org.sagebionetworks.web.client.jsinterop.reactquery.InvalidateQueryFilters;
 import org.sagebionetworks.web.client.jsinterop.reactquery.QueryClient;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
@@ -382,38 +383,41 @@ public class EntityPresenterTest {
   @Test
   public void testEntityUpdatedHandlerWithoutId() {
     when(mockKeyFactory.getEntityQueryKey(anyString()))
-      .thenReturn(new ArrayList<>());
+      .thenReturn(new Object[] {});
     entityPresenter.onEntityUpdatedEvent(new EntityUpdatedEvent());
 
     verify(mockKeyFactoryProvider).getKeyFactory(anyString());
     verify(mockKeyFactory).getEntityQueryKey(null);
-    verify(mockQueryClient).invalidateQueries(anyList());
+    verify(mockQueryClient)
+      .invalidateQueries(any(InvalidateQueryFilters.class));
     verify(mockGlobalApplicationState).refreshPage();
   }
 
   @Test
   public void testEntityUpdatedHandlerWithId() {
     when(mockKeyFactory.getEntityQueryKey(anyString()))
-      .thenReturn(new ArrayList<>());
+      .thenReturn(new Object[] {});
     entityPresenter.onEntityUpdatedEvent(new EntityUpdatedEvent(entityId));
 
     verify(mockKeyFactoryProvider).getKeyFactory(anyString());
     verify(mockKeyFactory).getEntityQueryKey(entityId);
-    verify(mockQueryClient).invalidateQueries(anyList());
+    verify(mockQueryClient)
+      .invalidateQueries(any(InvalidateQueryFilters.class));
     verify(mockGlobalApplicationState).refreshPage();
   }
 
   @Test
   public void testDownloadListUpdatedUpdatedEvent() {
     when(mockKeyFactory.getDownloadListBaseQueryKey())
-      .thenReturn(new ArrayList<>());
+      .thenReturn(new Object[] {});
     entityPresenter.onDownloadListUpdatedUpdatedEvent(
       new DownloadListUpdatedEvent()
     );
 
     verify(mockKeyFactoryProvider).getKeyFactory(anyString());
     verify(mockKeyFactory).getDownloadListBaseQueryKey();
-    verify(mockQueryClient).invalidateQueries(anyList());
+    verify(mockQueryClient)
+      .invalidateQueries(any(InvalidateQueryFilters.class));
   }
 
   @Test
