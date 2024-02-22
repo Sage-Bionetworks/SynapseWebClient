@@ -1,21 +1,9 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyList;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getDoneFuture;
 
 import com.google.common.util.concurrent.FluentFuture;
@@ -23,14 +11,11 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.web.bindery.event.shared.binder.EventBinder;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -60,6 +45,7 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.jsinterop.KeyFactory;
 import org.sagebionetworks.web.client.jsinterop.reactquery.InvalidateQueryFilters;
 import org.sagebionetworks.web.client.jsinterop.reactquery.QueryClient;
+import org.sagebionetworks.web.client.jsinterop.reactquery.QueryKey;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
@@ -382,8 +368,9 @@ public class EntityPresenterTest {
 
   @Test
   public void testEntityUpdatedHandlerWithoutId() {
+    QueryKey mockQueryKey = mock(QueryKey.class);
     when(mockKeyFactory.getEntityQueryKey(anyString()))
-      .thenReturn(new Object[] {});
+      .thenReturn(mockQueryKey);
     entityPresenter.onEntityUpdatedEvent(new EntityUpdatedEvent());
 
     verify(mockKeyFactoryProvider).getKeyFactory(anyString());
@@ -395,8 +382,9 @@ public class EntityPresenterTest {
 
   @Test
   public void testEntityUpdatedHandlerWithId() {
+    QueryKey mockQueryKey = mock(QueryKey.class);
     when(mockKeyFactory.getEntityQueryKey(anyString()))
-      .thenReturn(new Object[] {});
+      .thenReturn(mockQueryKey);
     entityPresenter.onEntityUpdatedEvent(new EntityUpdatedEvent(entityId));
 
     verify(mockKeyFactoryProvider).getKeyFactory(anyString());
@@ -408,8 +396,8 @@ public class EntityPresenterTest {
 
   @Test
   public void testDownloadListUpdatedUpdatedEvent() {
-    when(mockKeyFactory.getDownloadListBaseQueryKey())
-      .thenReturn(new Object[] {});
+    QueryKey mockQueryKey = mock(QueryKey.class);
+    when(mockKeyFactory.getDownloadListBaseQueryKey()).thenReturn(mockQueryKey);
     entityPresenter.onDownloadListUpdatedUpdatedEvent(
       new DownloadListUpdatedEvent()
     );

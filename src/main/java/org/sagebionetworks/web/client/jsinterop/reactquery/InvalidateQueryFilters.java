@@ -7,10 +7,10 @@ import jsinterop.annotations.JsType;
 @JsType(isNative = true, namespace = JsPackage.GLOBAL, name = "Object")
 public class InvalidateQueryFilters {
 
-  Object[] queryKey;
+  QueryKey queryKey;
 
   @JsOverlay
-  public static InvalidateQueryFilters create(Object[] queryKey) {
+  public static InvalidateQueryFilters create(QueryKey queryKey) {
     InvalidateQueryFilters props = new InvalidateQueryFilters();
     props.queryKey = queryKey;
     return props;
