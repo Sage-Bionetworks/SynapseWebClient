@@ -2,11 +2,11 @@ package org.sagebionetworks.web.unitserver.servlet.oaut;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.contains;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.server.servlet.oauth2.OAuth2SessionServlet.LOGIN_PLACE;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -20,7 +20,6 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseBadRequestException;
@@ -33,7 +32,6 @@ import org.sagebionetworks.repo.model.oauth.OAuthUrlRequest;
 import org.sagebionetworks.repo.model.oauth.OAuthUrlResponse;
 import org.sagebionetworks.repo.model.oauth.OAuthValidationRequest;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
-import org.sagebionetworks.web.server.servlet.InitSessionServlet;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.oauth2.OAuth2SessionServlet;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -148,9 +146,8 @@ public class OAuth2SessionServletTest {
   public void testCreateAccountViaOAuth()
     throws ServletException, IOException, SynapseException {
     String testAccessToken = "accessToken";
-    ArgumentCaptor<OAuthAccountCreationRequest> argument = ArgumentCaptor.forClass(
-      OAuthAccountCreationRequest.class
-    );
+    ArgumentCaptor<OAuthAccountCreationRequest> argument =
+      ArgumentCaptor.forClass(OAuthAccountCreationRequest.class);
     LoginResponse resp = new LoginResponse();
     String state = "my-username";
     resp.setAccessToken(testAccessToken);
@@ -222,6 +219,7 @@ public class OAuth2SessionServletTest {
     when(mockRequest.getParameter(WebConstants.OAUTH2_CODE))
       .thenReturn("auth code");
     servlet.doGet(mockRequest, mockResponse);
-    verify(mockResponse).sendRedirect(OAuth2SessionServlet.REGISTER_ACCOUNT);
+    verify(mockResponse)
+      .sendRedirect(LOGIN_PLACE + WebConstants.ORCID_NOT_LINKED);
   }
 }
