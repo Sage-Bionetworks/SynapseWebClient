@@ -63,6 +63,7 @@ public class SRC {
     public static ReactComponentType<AccessRequirementListProps> AccessRequirementList;
     public static ReactComponentType<TableColumnSchemaEditorProps> TableColumnSchemaEditor;
     public static ReactComponentType<EntityHeaderTableProps> EntityHeaderTable;
+    public static ReactComponentType<AvailableEvaluationQueueListProps> AvailableEvaluationQueueList;
     public static ReactComponentType<AccessRequirementRelatedProjectsListProps> AccessRequirementRelatedProjectsList;
     public static ReactComponentType<CreateTableViewWizardProps> CreateTableViewWizard;
     public static ReactComponentType<SqlDefinedTableEditorModalProps> SqlDefinedTableEditorModal;

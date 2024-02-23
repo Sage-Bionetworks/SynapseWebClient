@@ -8,7 +8,9 @@ import org.sagebionetworks.web.client.SynapseView;
 public interface EvaluationListView extends IsWidget, SynapseView {
   void configure(List<Evaluation> evaluationList, boolean isSelectable);
 
-  Integer getSelectedEvaluationIndex();
+  void setPresenter(Presenter presenter);
 
-  void setSelectedEvaluationIndex(int i);
+  public interface Presenter {
+    void onChangeSelectedEvaluation(Evaluation evaluation);
+  }
 }
