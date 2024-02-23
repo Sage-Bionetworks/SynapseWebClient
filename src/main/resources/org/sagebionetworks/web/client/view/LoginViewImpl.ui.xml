@@ -16,7 +16,10 @@
   </ui:style>
   <g:HTMLPanel>
     <div>
-      <bh:Div ui:field="synAlertContainer" addStyleNames="container" />
+      <bh:Div
+        ui:field="synAlertContainer"
+        addStyleNames="synapseAlert global"
+      />
       <g:HTMLPanel ui:field="loginView" visible="true">
         <!-- LoginView -->
         <g:SimplePanel ui:field="loginWidgetPanel" />
