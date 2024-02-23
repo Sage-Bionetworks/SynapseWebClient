@@ -6,7 +6,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.contains;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.web.server.servlet.oauth2.OAuth2SessionServlet.LOGIN_PLACE;
+import static org.sagebionetworks.web.server.servlet.oauth2.OAuth2SessionServlet.*;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -216,6 +216,26 @@ public class OAuth2SessionServletTest {
       .thenThrow(new SynapseNotFoundException("an error message"));
     when(mockRequest.getParameter(WebConstants.OAUTH2_PROVIDER))
       .thenReturn(OAuthProvider.GOOGLE_OAUTH_2_0.name());
+    when(mockRequest.getParameter(WebConstants.OAUTH2_CODE))
+      .thenReturn("auth code");
+    servlet.doGet(mockRequest, mockResponse);
+    verify(mockResponse).sendRedirect(REGISTER_ACCOUNT);
+  }
+
+  @Test
+  public void testValidateNotFoundORCiD()
+    throws ServletException, IOException, SynapseException {
+    ArgumentCaptor<OAuthValidationRequest> argument = ArgumentCaptor.forClass(
+      OAuthValidationRequest.class
+    );
+    when(
+      mockClient.validateOAuthAuthenticationCodeForAccessToken(
+        argument.capture()
+      )
+    )
+      .thenThrow(new SynapseNotFoundException("an error message"));
+    when(mockRequest.getParameter(WebConstants.OAUTH2_PROVIDER))
+      .thenReturn(OAuthProvider.ORCID.name());
     when(mockRequest.getParameter(WebConstants.OAUTH2_CODE))
       .thenReturn("auth code");
     servlet.doGet(mockRequest, mockResponse);
