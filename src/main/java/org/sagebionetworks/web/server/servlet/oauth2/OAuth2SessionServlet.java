@@ -79,9 +79,8 @@ public class OAuth2SessionServlet extends OAuth2Servlet {
       request.setAuthenticationCode(authenticationCode);
       request.setProvider(provider);
       request.setRedirectUrl(redirectUrl);
-      LoginResponse token = client.validateOAuthAuthenticationCodeForAccessToken(
-        request
-      );
+      LoginResponse token =
+        client.validateOAuthAuthenticationCodeForAccessToken(request);
       Cookie cookie = InitSessionServlet.getNewAccessTokenCookie(
         token.getAccessToken(),
         req.getScheme(),
@@ -90,8 +89,12 @@ public class OAuth2SessionServlet extends OAuth2Servlet {
       resp.addCookie(cookie);
       resp.sendRedirect(LOGIN_PLACE + WebConstants.REDIRECT_TO_LAST_PLACE);
     } catch (SynapseNotFoundException e) {
-      // used to send the user to register
-      resp.sendRedirect(REGISTER_ACCOUNT);
+      if (OAuthProvider.ORCID.equals(provider)) {
+        // SWC-6699: ORCiD is not associated to an account
+        resp.sendRedirect(LOGIN_PLACE + WebConstants.ORCID_NOT_LINKED);
+      } else {
+        resp.sendRedirect(REGISTER_ACCOUNT);
+      }
     } catch (SynapseTwoFactorAuthRequiredException e) {
       // Go back to the login page to attempt the 2fa challenge.
       resp.sendRedirect(
