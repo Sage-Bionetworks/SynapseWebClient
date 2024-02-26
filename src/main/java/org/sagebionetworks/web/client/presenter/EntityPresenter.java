@@ -34,6 +34,7 @@ import org.sagebionetworks.web.client.context.QueryClientProvider;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.jsinterop.KeyFactory;
+import org.sagebionetworks.web.client.jsinterop.reactquery.InvalidateQueryFilters;
 import org.sagebionetworks.web.client.jsinterop.reactquery.QueryClient;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -407,8 +408,11 @@ public class EntityPresenter
       authenticationController.getCurrentUserAccessToken()
     );
 
-    List<?> queryKey = keyFactory.getEntityQueryKey(event.getEntityId());
-    queryClient.invalidateQueries(queryKey);
+    queryClient.invalidateQueries(
+      InvalidateQueryFilters.create(
+        keyFactory.getEntityQueryKey(event.getEntityId())
+      )
+    );
     globalAppState.refreshPage();
   }
 
@@ -419,7 +423,9 @@ public class EntityPresenter
     KeyFactory keyFactory = keyFactoryProvider.getKeyFactory(
       authenticationController.getCurrentUserAccessToken()
     );
-    queryClient.invalidateQueries(keyFactory.getDownloadListBaseQueryKey());
+    queryClient.invalidateQueries(
+      InvalidateQueryFilters.create(keyFactory.getDownloadListBaseQueryKey())
+    );
   }
 
   // for testing only
