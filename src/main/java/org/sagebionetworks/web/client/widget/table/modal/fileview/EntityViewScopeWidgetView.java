@@ -13,19 +13,9 @@ public interface EntityViewScopeWidgetView extends IsWidget {
 
   void setEntityListWidget(IsWidget w);
 
-  void setEditableEntityListWidget(IsWidget w);
-
-  void setSynAlert(IsWidget w);
-
-  void showModal();
-
-  void hideModal();
+  void setEditableEntityViewModalWidget(IsWidget w); // TODO: replace setEditableEntityViewModalWidget
 
   void setEditMaskAndScopeButtonVisible(boolean visible);
-
-  void setEditMaskVisible(boolean visible);
-
-  void setLoading(boolean loading);
 
   boolean isFileSelected();
 
@@ -44,8 +34,6 @@ public interface EntityViewScopeWidgetView extends IsWidget {
   void setIsDatasetSelected(boolean selected);
 
   public interface Presenter {
-    void onSave();
-
     void onEditScopeAndMask();
 
     void updateViewTypeMask();

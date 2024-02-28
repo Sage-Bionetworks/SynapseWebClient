@@ -1,9 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.table.modal.fileview;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.never;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -16,6 +13,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -24,10 +22,10 @@ import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.ViewType;
-import org.sagebionetworks.repo.model.table.ViewTypeMask;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
-import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.jsinterop.EntityViewScopeEditorModalProps;
+import org.sagebionetworks.web.client.widget.entity.EntityViewScopeEditorModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityViewScopeWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityViewScopeWidgetView;
@@ -45,13 +43,10 @@ public class ScopeWidgetTest {
   SynapseJavascriptClient mockJsClient;
 
   @Mock
-  SynapseAlert mockSynapseAlert;
-
-  @Mock
   EntityContainerListWidget mockViewScopeWidget;
 
   @Mock
-  EntityContainerListWidget mockEditScopeWidget;
+  EntityViewScopeEditorModalWidget mockEntityViewScopeEditorModalWidget;
 
   @Mock
   EntityBundle mockBundle;
@@ -76,6 +71,8 @@ public class ScopeWidgetTest {
   String scopeId1 = "syn456";
   String scopeId2 = "syn789";
 
+  String entityId = "syn123";
+
   // Versions for Dataset only
   Long scopeVersion1 = 5L;
   Long scopeVersion2 = 2L;
@@ -92,12 +89,11 @@ public class ScopeWidgetTest {
         mockView,
         mockJsClient,
         mockViewScopeWidget,
-        mockEditScopeWidget,
-        mockSynapseAlert,
+        mockEntityViewScopeEditorModalWidget,
         mockEventBus
       );
     when(mockBundle.getEntity()).thenReturn(mockEntityView);
-    when(mockEntityView.getId()).thenReturn("syn123");
+    when(mockEntityView.getId()).thenReturn(entityId);
     when(mockEntityView.getScopeIds()).thenReturn(mockScopeIds);
     when(mockEntityView.getType()).thenReturn(ViewType.file);
     when(mockEntityView.getViewTypeMask()).thenReturn(null);
@@ -137,13 +133,12 @@ public class ScopeWidgetTest {
   @Test
   public void testConstruction() {
     verify(mockView).setPresenter(widget);
-    verify(mockView).setEditableEntityListWidget(any(Widget.class));
+    verify(mockView).setEditableEntityViewModalWidget(any(Widget.class));
     verify(mockView).setEntityListWidget(any(Widget.class));
-    verify(mockView).setSynAlert(any(Widget.class));
   }
 
   @Test
-  public void testConfigureEntityViewHappyCase() {
+  public void testOnEditScopeAndMaskOnUpdate() {
     // configure with an entityview, edit the scope, and save.
     boolean isEditable = true;
     widget.configure(mockBundle, isEditable);
@@ -155,39 +150,52 @@ public class ScopeWidgetTest {
     verify(mockView).setEditMaskAndScopeButtonVisible(true);
     verify(mockView).setVisible(true);
 
-    // edit
     widget.onEditScopeAndMask();
-    verify(mockEditScopeWidget)
-      .configure(mockReferencesWithoutVersions, true, TableType.file_view);
-    verify(mockView).showModal();
 
-    // update file view to file+table view
-    when(mockView.isFileSelected()).thenReturn(true);
-    when(mockView.isTableSelected()).thenReturn(true);
-    widget.updateViewTypeMask();
-
-    // save new scope
-    widget.onSave();
-
-    verify(mockSynapseAlert).clear();
-    verify(mockView).setLoading(true);
-    // verify view type has been updated
-    // clears out old ViewType, replaced with mask
-    verify(mockEntityView).setType(null);
-    verify(mockEntityView)
-      .setViewTypeMask(
-        ViewTypeMask.getMaskForDepricatedType(ViewType.file_and_table)
+    ArgumentCaptor<EntityViewScopeEditorModalProps.Callback> onUpdateArgumentCaptor =
+      ArgumentCaptor.forClass(EntityViewScopeEditorModalProps.Callback.class);
+    ArgumentCaptor<EntityViewScopeEditorModalProps.Callback> onCancelArgumentCaptor =
+      ArgumentCaptor.forClass(EntityViewScopeEditorModalProps.Callback.class);
+    verify(mockEntityViewScopeEditorModalWidget)
+      .configure(
+        eq(entityId),
+        onUpdateArgumentCaptor.capture(),
+        onCancelArgumentCaptor.capture(),
+        eq(true)
       );
-    verify(mockJsClient)
-      .updateEntity(
-        any(Table.class),
-        anyString(),
-        anyBoolean(),
-        any(AsyncCallback.class)
-      );
-    verify(mockView).setLoading(false);
-    verify(mockView).hideModal();
+    onUpdateArgumentCaptor.getValue().run();
+    verify(mockEntityViewScopeEditorModalWidget).setOpen(false);
     verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
+  }
+
+  @Test
+  public void testOnEditScopeAndMaskOnCancel() {
+    // configure with an entityview, edit the scope, and save.
+    boolean isEditable = true;
+    widget.configure(mockBundle, isEditable);
+
+    // The view scope widget does not allow edit of the scope. That occurs in the modal (with the
+    // editScopeWidget)
+    verify(mockViewScopeWidget)
+      .configure(mockReferencesWithoutVersions, false, TableType.file_view);
+    verify(mockView).setEditMaskAndScopeButtonVisible(true);
+    verify(mockView).setVisible(true);
+
+    widget.onEditScopeAndMask();
+
+    ArgumentCaptor<EntityViewScopeEditorModalProps.Callback> onUpdateArgumentCaptor =
+      ArgumentCaptor.forClass(EntityViewScopeEditorModalProps.Callback.class);
+    ArgumentCaptor<EntityViewScopeEditorModalProps.Callback> onCancelArgumentCaptor =
+      ArgumentCaptor.forClass(EntityViewScopeEditorModalProps.Callback.class);
+    verify(mockEntityViewScopeEditorModalWidget)
+      .configure(
+        eq(entityId),
+        onUpdateArgumentCaptor.capture(),
+        onCancelArgumentCaptor.capture(),
+        eq(true)
+      );
+    onCancelArgumentCaptor.getValue().run();
+    verify(mockEntityViewScopeEditorModalWidget).setOpen(false);
   }
 
   @Test
@@ -213,73 +221,28 @@ public class ScopeWidgetTest {
 
     // Simulate clicking the edit button
     widget.onEditScopeAndMask();
-
-    // The mask editor should not be visible
-    verify(mockView).setEditMaskVisible(false);
   }
 
   @Test
-  public void testConfigureHappyCaseProjectView() {
-    when(mockEntityView.getType()).thenReturn(ViewType.project);
-    // configure with an entityview, edit the scope, and save.
-    boolean isEditable = true;
-    widget.configure(mockBundle, isEditable);
-
-    // The edit button should be visible
-    verify(mockView).setEditMaskAndScopeButtonVisible(true);
-
-    // The view scope widget should be configured and not be editable
-    verify(mockViewScopeWidget)
-      .configure(mockReferencesWithoutVersions, false, TableType.project_view);
-
-    // Simulate clicking the edit button
-    widget.onEditScopeAndMask();
-
-    // The mask editor should not be visible
-    verify(mockView).setEditMaskVisible(false);
-  }
-
-  @Test
-  public void testConfigureFileView() {
-    when(mockEntityView.getType()).thenReturn(ViewType.file);
-    boolean isEditable = true;
-
-    widget.configure(mockBundle, isEditable);
-    widget.onEditScopeAndMask();
-
-    // The mask editor should be visible
-    verify(mockView).setEditMaskVisible(true);
-
-    // Show File View options for project view
-    verify(mockView).setIsFileSelected(true);
-    verify(mockView).setIsFolderSelected(false);
-    verify(mockView).setIsTableSelected(false);
-    verify(mockView).setIsDatasetSelected(false);
-  }
-
-  @Test
-  public void testConfigureFileAndTableView() {
+  public void testConfigureView() {
     when(mockEntityView.getType()).thenReturn(ViewType.file_and_table);
     boolean isEditable = true;
 
     widget.configure(mockBundle, isEditable);
     widget.onEditScopeAndMask();
 
-    // The mask editor should be visible
-    verify(mockView).setEditMaskVisible(true);
-
-    // Show File View options for project view
-    verify(mockView).setIsFileSelected(true);
-    verify(mockView).setIsFolderSelected(false);
-    verify(mockView).setIsTableSelected(true);
-    verify(mockView).setIsDatasetSelected(false);
-
-    // verify update view type from file+table to file
-    when(mockView.isFileSelected()).thenReturn(true);
-    widget.updateViewTypeMask();
-    widget.onSave();
-
-    verify(mockEntityView).setViewTypeMask(ViewTypeMask.File.getMask());
+    // verify new editor is configured
+    ArgumentCaptor<EntityViewScopeEditorModalProps.Callback> onUpdateArgumentCaptor =
+      ArgumentCaptor.forClass(EntityViewScopeEditorModalProps.Callback.class);
+    ArgumentCaptor<EntityViewScopeEditorModalProps.Callback> onCancelArgumentCaptor =
+      ArgumentCaptor.forClass(EntityViewScopeEditorModalProps.Callback.class);
+    verify(mockEntityViewScopeEditorModalWidget)
+      .configure(
+        eq(entityId),
+        onUpdateArgumentCaptor.capture(),
+        onCancelArgumentCaptor.capture(),
+        eq(true)
+      );
   }
 
   @Test
@@ -300,38 +263,6 @@ public class ScopeWidgetTest {
       .configure(mockReferencesWithoutVersions, false, TableType.file_view);
     verify(mockView).setEditMaskAndScopeButtonVisible(false);
     verify(mockView).setVisible(true);
-  }
-
-  @Test
-  public void testOnSaveFailure() {
-    Exception ex = new Exception("error on save");
-    AsyncMockStubber
-      .callFailureWith(ex)
-      .when(mockJsClient)
-      .updateEntity(
-        any(Table.class),
-        anyString(),
-        anyBoolean(),
-        any(AsyncCallback.class)
-      );
-    boolean isEditable = true;
-
-    widget.configure(mockBundle, isEditable);
-    widget.onSave();
-
-    verify(mockSynapseAlert).clear();
-    verify(mockView).setLoading(true);
-    verify(mockJsClient)
-      .updateEntity(
-        any(Table.class),
-        anyString(),
-        anyBoolean(),
-        any(AsyncCallback.class)
-      );
-    verify(mockView).setLoading(false);
-    verify(mockSynapseAlert).handleException(ex);
-    verify(mockView, never()).hideModal();
-    verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
   }
 
   @Test
