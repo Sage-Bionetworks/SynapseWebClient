@@ -11,8 +11,6 @@ public class SqlDefinedEditorModalWidget implements IsWidget {
   private final GlobalApplicationState globalApplicationState;
   private final SqlDefinedEditorModalWidgetView view;
 
-  private boolean open;
-
   private String entityId;
   private SqlDefinedTableEditorModalProps.Callback onCancel;
   private SqlDefinedTableEditorModalProps.Callback onUpdate;

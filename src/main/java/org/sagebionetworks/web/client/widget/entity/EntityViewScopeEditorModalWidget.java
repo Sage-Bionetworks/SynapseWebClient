@@ -19,7 +19,6 @@ public class EntityViewScopeEditorModalWidget implements IsWidget {
   private String entityId;
   private EntityViewScopeEditorModalProps.Callback onCancel;
   private EntityViewScopeEditorModalProps.Callback onUpdate;
-  boolean open;
 
   @Inject
   public EntityViewScopeEditorModalWidget(
@@ -34,19 +33,17 @@ public class EntityViewScopeEditorModalWidget implements IsWidget {
   public void configure(
     String entityId,
     EntityViewScopeEditorModalProps.Callback onUpdate,
-    EntityViewScopeEditorModalProps.Callback onCancel,
-    boolean open
+    EntityViewScopeEditorModalProps.Callback onCancel
   ) {
     this.entityId = entityId;
     this.onUpdate = onUpdate;
     this.onCancel = onCancel;
-    this.open = open;
     EntityViewScopeEditorModalProps props =
       EntityViewScopeEditorModalProps.create(
         entityId,
         onUpdate,
         onCancel,
-        open
+        false
       );
     view.renderComponent(props);
   }

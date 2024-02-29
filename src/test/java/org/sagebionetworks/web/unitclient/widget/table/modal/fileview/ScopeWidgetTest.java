@@ -1,8 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.table.modal.fileview;
 
 import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -160,8 +159,7 @@ public class ScopeWidgetTest {
       .configure(
         eq(entityId),
         onUpdateArgumentCaptor.capture(),
-        onCancelArgumentCaptor.capture(),
-        eq(true)
+        onCancelArgumentCaptor.capture()
       );
     onUpdateArgumentCaptor.getValue().run();
     verify(mockEntityViewScopeEditorModalWidget).setOpen(false);
@@ -191,11 +189,11 @@ public class ScopeWidgetTest {
       .configure(
         eq(entityId),
         onUpdateArgumentCaptor.capture(),
-        onCancelArgumentCaptor.capture(),
-        eq(true)
+        onCancelArgumentCaptor.capture()
       );
     onCancelArgumentCaptor.getValue().run();
     verify(mockEntityViewScopeEditorModalWidget).setOpen(false);
+    verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
   }
 
   @Test
@@ -239,9 +237,8 @@ public class ScopeWidgetTest {
     verify(mockEntityViewScopeEditorModalWidget)
       .configure(
         eq(entityId),
-        onUpdateArgumentCaptor.capture(),
-        onCancelArgumentCaptor.capture(),
-        eq(true)
+        any(EntityViewScopeEditorModalProps.Callback.class),
+        any(EntityViewScopeEditorModalProps.Callback.class)
       );
   }
 

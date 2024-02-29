@@ -41,4 +41,3 @@ public class EntityViewScopeEditorModalProps extends ReactComponentProps {
     return props;
   }
 }
-// TODO: create EntityViewScopeEditorModalWidget, View, and IMPL

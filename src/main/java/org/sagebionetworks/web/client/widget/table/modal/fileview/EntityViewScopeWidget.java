@@ -42,7 +42,7 @@ public class EntityViewScopeWidget
   SynapseJavascriptClient jsClient;
   EntityBundle bundle;
   EntityContainerListWidget viewScopeWidget;
-  EntityViewScopeEditorModalWidget editEntityViewScopeModalWidget; // TODO: replace edit scope widget with the react compoenent widget & fix corresponding test
+  EntityViewScopeEditorModalWidget editEntityViewScopeModalWidget;
   EntityView currentView;
   TableType tableType;
   EventBus eventBus;
@@ -132,8 +132,7 @@ public class EntityViewScopeWidget
       },
       () -> {
         editEntityViewScopeModalWidget.setOpen(false);
-      },
-      true
+      }
     );
     editEntityViewScopeModalWidget.setOpen(true);
   }

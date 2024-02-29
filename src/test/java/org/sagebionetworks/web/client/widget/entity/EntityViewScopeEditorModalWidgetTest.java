@@ -53,15 +53,14 @@ public class EntityViewScopeEditorModalWidgetTest {
   }
 
   @Test
-  public void testConstruction() {
-    widget.configure(ENTITY_ID, mockOnUpdate, mockOnCancel, open);
+  public void testConfigure() {
+    widget.configure(ENTITY_ID, mockOnUpdate, mockOnCancel);
     verify(mockView).renderComponent(propsCaptor.capture());
     EntityViewScopeEditorModalProps capturedProps = propsCaptor.getValue();
 
     assertEquals(ENTITY_ID, capturedProps.entityId);
     assertEquals(mockOnUpdate, capturedProps.onUpdate);
     assertEquals(mockOnCancel, capturedProps.onCancel);
-    assertEquals(open, capturedProps.open);
   }
 
   @Test
