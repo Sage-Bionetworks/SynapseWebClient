@@ -11,7 +11,9 @@ import com.google.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.PortalGinInjector;
 
 public class EntityViewScopeWidgetViewImpl
   implements EntityViewScopeWidgetView {
@@ -26,19 +28,7 @@ public class EntityViewScopeWidgetViewImpl
   SimplePanel editScopeContainer;
 
   @UiField
-  SimplePanel editScopeAlertContainer;
-
-  @UiField
-  Button saveButton;
-
-  @UiField
   Button editButton;
-
-  @UiField
-  Modal editModal;
-
-  @UiField
-  Div viewOptionsContainer;
 
   Widget widget;
   Presenter presenter;
@@ -52,7 +42,6 @@ public class EntityViewScopeWidgetViewImpl
   ) {
     widget = binder.createAndBindUi(this);
     this.viewOptions = viewOptions;
-    viewOptionsContainer.add(viewOptions);
     editButton.addClickHandler(
       new ClickHandler() {
         @Override
@@ -61,18 +50,9 @@ public class EntityViewScopeWidgetViewImpl
         }
       }
     );
-    saveButton.addClickHandler(
-      new ClickHandler() {
-        @Override
-        public void onClick(ClickEvent event) {
-          presenter.onSave();
-        }
-      }
-    );
     viewOptions.addClickHandler(event -> {
       presenter.updateViewTypeMask();
     });
-    originalButtonText = saveButton.getText();
   }
 
   @Override
@@ -91,26 +71,9 @@ public class EntityViewScopeWidgetViewImpl
     viewScopeContainer.setWidget(entityListWidget);
   }
 
-  @Override
-  public void setEditableEntityListWidget(IsWidget entityListWidget) {
+  public void setEditableEntityViewModalWidget(IsWidget entityListWidget) {
     editScopeContainer.clear();
     editScopeContainer.setWidget(entityListWidget);
-  }
-
-  @Override
-  public void showModal() {
-    editModal.show();
-  }
-
-  @Override
-  public void hideModal() {
-    editModal.hide();
-  }
-
-  @Override
-  public void setSynAlert(IsWidget w) {
-    editScopeAlertContainer.clear();
-    editScopeAlertContainer.setWidget(w);
   }
 
   @Override
@@ -121,16 +84,6 @@ public class EntityViewScopeWidgetViewImpl
   @Override
   public void setEditMaskAndScopeButtonVisible(boolean visible) {
     editButton.setVisible(visible);
-  }
-
-  @Override
-  public void setEditMaskVisible(boolean visible) {
-    viewOptionsContainer.setVisible(visible);
-  }
-
-  @Override
-  public void setLoading(boolean loading) {
-    DisplayUtils.showLoading(saveButton, loading, originalButtonText);
   }
 
   @Override

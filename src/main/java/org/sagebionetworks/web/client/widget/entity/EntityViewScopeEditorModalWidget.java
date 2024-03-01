@@ -3,21 +3,26 @@ package org.sagebionetworks.web.client.widget.entity;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.jsinterop.EntityViewScopeEditorModalProps;
 import org.sagebionetworks.web.client.jsinterop.SqlDefinedTableEditorModalProps;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 
-public class SqlDefinedEditorModalWidget implements IsWidget {
+public class EntityViewScopeEditorModalWidget implements IsWidget {
 
   private final GlobalApplicationState globalApplicationState;
-  private final SqlDefinedEditorModalWidgetView view;
+  private final EntityViewScopeEditorModalWidgetView view;
 
   private String entityId;
-  private SqlDefinedTableEditorModalProps.Callback onCancel;
-  private SqlDefinedTableEditorModalProps.Callback onUpdate;
+  private EntityViewScopeEditorModalProps.Callback onCancel;
+  private EntityViewScopeEditorModalProps.Callback onUpdate;
 
   @Inject
-  public SqlDefinedEditorModalWidget(
-    SqlDefinedEditorModalWidgetView view,
+  public EntityViewScopeEditorModalWidget(
+    EntityViewScopeEditorModalWidgetView view,
     GlobalApplicationState globalApplicationState
   ) {
     super();
@@ -27,30 +32,30 @@ public class SqlDefinedEditorModalWidget implements IsWidget {
 
   public void configure(
     String entityId,
-    SqlDefinedTableEditorModalProps.Callback onUpdate,
-    SqlDefinedTableEditorModalProps.Callback onCancel
+    EntityViewScopeEditorModalProps.Callback onUpdate,
+    EntityViewScopeEditorModalProps.Callback onCancel
   ) {
     this.entityId = entityId;
     this.onUpdate = onUpdate;
     this.onCancel = onCancel;
-    SqlDefinedTableEditorModalProps props =
-      SqlDefinedTableEditorModalProps.create(
+    EntityViewScopeEditorModalProps props =
+      EntityViewScopeEditorModalProps.create(
         entityId,
-        false,
         onUpdate,
-        onCancel
+        onCancel,
+        false
       );
     view.renderComponent(props);
   }
 
   public void setOpen(boolean open) {
     globalApplicationState.setIsEditing(open);
-    SqlDefinedTableEditorModalProps props =
-      SqlDefinedTableEditorModalProps.create(
+    EntityViewScopeEditorModalProps props =
+      EntityViewScopeEditorModalProps.create(
         entityId,
-        open,
         onUpdate,
-        onCancel
+        onCancel,
+        open
       );
     view.renderComponent(props);
   }
