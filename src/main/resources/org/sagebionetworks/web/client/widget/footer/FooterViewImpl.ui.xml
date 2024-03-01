@@ -50,7 +50,7 @@
               </bh:Div>
             </bh:Div>
 
-            <bh:Div width="200px" addStyleNames="text-align-right">
+            <bh:Div width="204px" addStyleNames="text-align-right">
               <bh:Span ui:field="hideACTActionsContainer" />
               <bh:Div width="100%" addStyleNames="flexcontainer-row">
                 <g:Image
