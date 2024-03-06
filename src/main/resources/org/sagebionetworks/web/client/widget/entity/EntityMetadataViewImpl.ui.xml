@@ -8,7 +8,7 @@
 >
   <g:HTMLPanel addStyleNames="entityMetadata entity-page-side-margins">
     <g:HTMLPanel ui:field="detailedMetadata">
-      <w:ReactComponentDiv ui:field="annotationsModalContainer" />
+      <g:SimplePanel ui:field="entityModalWidgetContainer" />
       <bh:Div>
         <bh:Span
           addStyleNames="boldText margin-right-5"

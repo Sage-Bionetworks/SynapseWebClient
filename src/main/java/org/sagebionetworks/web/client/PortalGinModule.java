@@ -267,6 +267,8 @@ import org.sagebionetworks.web.client.widget.entity.EntityListRowBadgeView;
 import org.sagebionetworks.web.client.widget.entity.EntityListRowBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataView;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataViewImpl;
+import org.sagebionetworks.web.client.widget.entity.EntityModalWidgetView;
+import org.sagebionetworks.web.client.widget.entity.EntityModalWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTopView;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTopViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntitySearchBoxView;
@@ -1450,6 +1452,7 @@ public class PortalGinModule extends AbstractGinModule {
       .to(SqlDefinedEditorModalWidgetViewImpl.class);
     bind(EntityViewScopeEditorModalWidgetView.class)
       .to(EntityViewScopeEditorModalWidgetViewImpl.class);
+    bind(EntityModalWidgetView.class).to(EntityModalWidgetViewImpl.class);
     bind(ChallengeWidgetView.class).to(ChallengeWidgetViewImpl.class);
     bind(SelectTeamModalView.class).to(SelectTeamModalViewImpl.class);
     bind(ApproveUserAccessModalView.class)
