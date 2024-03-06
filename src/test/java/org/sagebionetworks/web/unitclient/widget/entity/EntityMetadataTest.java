@@ -41,10 +41,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.widget.doi.DoiWidgetV2;
-import org.sagebionetworks.web.client.widget.entity.ContainerItemCountWidget;
-import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
-import org.sagebionetworks.web.client.widget.entity.EntityMetadataView;
-import org.sagebionetworks.web.client.widget.entity.VersionHistoryWidget;
+import org.sagebionetworks.web.client.widget.entity.*;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationsRendererWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWidget;
@@ -89,6 +86,9 @@ public class EntityMetadataTest {
   @Mock
   PortalGinInjector mockGinInjector;
 
+  @Mock
+  EntityModalWidget mockEntityModalWidget;
+
   String entityId = "syn123";
   String entityName = "testEntity";
   EntityMetadata widget;
@@ -109,7 +109,8 @@ public class EntityMetadataTest {
         mockJSNI,
         mockRestrictionWidgetV2,
         mockItemCountWidget,
-        mockGinInjector
+        mockGinInjector,
+        mockEntityModalWidget
       );
   }
 
@@ -384,8 +385,10 @@ public class EntityMetadataTest {
 
   @Test
   public void testConfigureStorageLocationExternalS3() {
-    List<UploadDestination> uploadDestinations = new ArrayList<UploadDestination>();
-    ExternalS3UploadDestination exS3Destination = new ExternalS3UploadDestination();
+    List<UploadDestination> uploadDestinations =
+      new ArrayList<UploadDestination>();
+    ExternalS3UploadDestination exS3Destination =
+      new ExternalS3UploadDestination();
     exS3Destination.setBucket("testBucket");
     exS3Destination.setBaseKey("testBaseKey");
     uploadDestinations.add(exS3Destination);
@@ -401,8 +404,10 @@ public class EntityMetadataTest {
 
   @Test
   public void testConfigureStorageLocationExternalGoogleCloud() {
-    List<UploadDestination> uploadDestinations = new ArrayList<UploadDestination>();
-    ExternalGoogleCloudUploadDestination exGCDestination = new ExternalGoogleCloudUploadDestination();
+    List<UploadDestination> uploadDestinations =
+      new ArrayList<UploadDestination>();
+    ExternalGoogleCloudUploadDestination exGCDestination =
+      new ExternalGoogleCloudUploadDestination();
     exGCDestination.setBucket("testBucket");
     exGCDestination.setBaseKey("testBaseKey");
     uploadDestinations.add(exGCDestination);
@@ -418,7 +423,8 @@ public class EntityMetadataTest {
 
   @Test
   public void testConfigureStorageLocationExternalSftp() {
-    List<UploadDestination> uploadDestinations = new ArrayList<UploadDestination>();
+    List<UploadDestination> uploadDestinations =
+      new ArrayList<UploadDestination>();
     ExternalUploadDestination exS3Destination = new ExternalUploadDestination();
     exS3Destination.setUrl("sftp://testUrl.com/abcdef");
     exS3Destination.setUploadType(UploadType.SFTP);
@@ -435,7 +441,8 @@ public class EntityMetadataTest {
 
   @Test
   public void testConfigureStorageLocationExternal() {
-    List<UploadDestination> uploadDestinations = new ArrayList<UploadDestination>();
+    List<UploadDestination> uploadDestinations =
+      new ArrayList<UploadDestination>();
     ExternalUploadDestination exS3Destination = new ExternalUploadDestination();
     exS3Destination.setUploadType(UploadType.HTTPS);
     exS3Destination.setUrl("testUrl.com");
@@ -454,8 +461,10 @@ public class EntityMetadataTest {
   public void testConfigureStorageLocationExternalObjectStore() {
     String endpointUrl = "https://externalobjectstore";
     String bucket = "mybucket";
-    List<UploadDestination> uploadDestinations = new ArrayList<UploadDestination>();
-    ExternalObjectStoreUploadDestination exS3Destination = new ExternalObjectStoreUploadDestination();
+    List<UploadDestination> uploadDestinations =
+      new ArrayList<UploadDestination>();
+    ExternalObjectStoreUploadDestination exS3Destination =
+      new ExternalObjectStoreUploadDestination();
     exS3Destination.setUploadType(UploadType.S3);
     exS3Destination.setEndpointUrl(endpointUrl);
     exS3Destination.setBucket(bucket);
@@ -632,7 +641,7 @@ public class EntityMetadataTest {
       .thenReturn(null);
     widget.setAnnotationsVisible(true);
     verify(mockView).setAnnotationsVisible(true);
-    verify(mockView, never()).setAnnotationsModalVisible(true);
+    verify(mockEntityModalWidget, never()).setOpen(true);
   }
 
   @Test
@@ -640,7 +649,7 @@ public class EntityMetadataTest {
     when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
       .thenReturn("true");
     widget.setAnnotationsVisible(true);
-    verify(mockView).setAnnotationsModalVisible(true);
+    verify(mockEntityModalWidget).setOpen(true);
     verify(mockView, never()).setAnnotationsVisible(true);
   }
 }
