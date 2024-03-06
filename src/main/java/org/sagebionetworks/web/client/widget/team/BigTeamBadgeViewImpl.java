@@ -54,6 +54,9 @@ public class BigTeamBadgeViewImpl implements BigTeamBadgeView {
   @UiField
   TextBoxWithCopyToClipboardWidget synapseEmailField;
 
+  @UiField
+  Div emailUI;
+
   GlobalApplicationState globalApplicationState;
   IconsImageBundle iconsImageBundle;
   Linkify linkify;
@@ -150,6 +153,11 @@ public class BigTeamBadgeViewImpl implements BigTeamBadgeView {
   public void setMemberCountWidget(IsWidget widget) {
     memberCountContainer.clear();
     memberCountContainer.add(widget);
+  }
+
+  @Override
+  public void setTeamEmailVisible(boolean visible) {
+    emailUI.setVisible(visible);
   }
 
   @Override
