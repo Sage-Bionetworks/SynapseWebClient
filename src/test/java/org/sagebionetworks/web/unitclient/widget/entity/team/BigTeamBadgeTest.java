@@ -12,6 +12,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -38,6 +39,9 @@ public class BigTeamBadgeTest {
   @Mock
   TeamMemberCountWidget mockTeamMemberCountWidget;
 
+  @Mock
+  TeamMembershipStatus mockTeamMembershipStatus;
+
   BigTeamBadge presenter;
 
   @Mock
@@ -48,22 +52,20 @@ public class BigTeamBadgeTest {
 
   @Before
   public void setUp() throws Exception {
-    presenter =
-      new BigTeamBadge(
-        mockView,
-        mockJsClient,
-        mockJsniUtils,
-        mockAuthenticationController,
-        mockTeamMemberCountWidget
-      );
+    presenter = new BigTeamBadge(
+      mockView,
+      mockJsClient,
+      mockJsniUtils,
+      mockAuthenticationController,
+      mockTeamMemberCountWidget
+    );
+    when(mockTeam.getName()).thenReturn("simpleteam");
     when(mockTeam.getDescription()).thenReturn(TEAM_DESCRIPTION);
     when(mockTeam.getIcon()).thenReturn("1111");
-    AsyncMockStubber
-      .callSuccessWith(TEAM_ICON_URL)
+    AsyncMockStubber.callSuccessWith(TEAM_ICON_URL)
       .when(mockJsClient)
       .getTeamPicturePreviewURL(anyString(), any(AsyncCallback.class));
-    AsyncMockStubber
-      .callSuccessWith(mockTeam)
+    AsyncMockStubber.callSuccessWith(mockTeam)
       .when(mockJsClient)
       .getTeam(anyString(), any(AsyncCallback.class));
   }
@@ -77,8 +79,7 @@ public class BigTeamBadgeTest {
 
   @Test
   public void testConfigureFailedToGetIcon() {
-    AsyncMockStubber
-      .callFailureWith(new Exception("failed"))
+    AsyncMockStubber.callFailureWith(new Exception("failed"))
       .when(mockJsClient)
       .getTeamPicturePreviewURL(anyString(), any(AsyncCallback.class));
 
@@ -89,33 +90,63 @@ public class BigTeamBadgeTest {
 
   @Test
   public void testGetTeamEmail() {
-    boolean canSendEmail = true;
-    when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-    assertEquals(
-      "basic@synapse.org",
-      presenter.getTeamEmail("basic", canSendEmail)
-    );
+    assertEquals("basic@synapse.org", presenter.getTeamEmail("basic"));
     assertEquals(
       "StandardCaseHere@synapse.org",
-      presenter.getTeamEmail("Standard Case Here", canSendEmail)
+      presenter.getTeamEmail("Standard Case Here")
     );
     assertEquals(
       "unlikelycase@synapse.org",
-      presenter.getTeamEmail(" \n\r unlikely\t case ", canSendEmail)
+      presenter.getTeamEmail(" \n\r unlikely\t case ")
     );
     assertEquals(
       "Another_UnlikelyCase@synapse.org",
-      presenter.getTeamEmail(
-        " %^$##* Another_Unlikely\t &*#$)(!!@~Case ",
-        canSendEmail
-      )
+      presenter.getTeamEmail(" %^$##* Another_Unlikely\t &*#$)(!!@~Case ")
+    );
+  }
+
+  @Test
+  public void testEmailVisible() {
+    when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+    when(mockTeamMembershipStatus.getCanSendEmail()).thenReturn(true);
+
+    presenter.setViewTeam(
+      mockTeam,
+      TEAM_DESCRIPTION,
+      mockTeamMembershipStatus,
+      TEAM_ICON_URL
     );
 
-    canSendEmail = false;
-    assertEquals("", presenter.getTeamEmail("basic", canSendEmail));
+    verify(mockView).setTeamEmailVisible(true);
+  }
 
-    canSendEmail = true;
+  @Test
+  public void testEmailNotVisibleWhenAnonymous() {
     when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
-    assertEquals("", presenter.getTeamEmail("basic", canSendEmail));
+    when(mockTeamMembershipStatus.getCanSendEmail()).thenReturn(true);
+
+    presenter.setViewTeam(
+      mockTeam,
+      TEAM_DESCRIPTION,
+      mockTeamMembershipStatus,
+      TEAM_ICON_URL
+    );
+
+    verify(mockView).setTeamEmailVisible(false);
+  }
+
+  @Test
+  public void testEmailNotVisibleWhenUnauthorized() {
+    when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+    when(mockTeamMembershipStatus.getCanSendEmail()).thenReturn(false);
+
+    presenter.setViewTeam(
+      mockTeam,
+      TEAM_DESCRIPTION,
+      mockTeamMembershipStatus,
+      TEAM_ICON_URL
+    );
+
+    verify(mockView).setTeamEmailVisible(false);
   }
 }

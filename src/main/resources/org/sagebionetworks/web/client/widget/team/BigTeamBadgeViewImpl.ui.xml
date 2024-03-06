@@ -46,10 +46,16 @@
           <bh:Text>team members</bh:Text>
         </bh:Div>
         <bh:Div ui:field="descriptionContainer" marginTop="10" />
-        <w:TextBoxWithCopyToClipboardWidget
-          ui:field="synapseEmailField"
-          addStyleNames="margin-top-10"
-        />
+        <bh:Div ui:field="emailUI">
+          <bh:Text>Team email list:</bh:Text>
+          <w:TextBoxWithCopyToClipboardWidget
+            ui:field="synapseEmailField"
+            addStyleNames="margin-top-10 margin-left-5 margin-right-5"
+          />
+          <bh:Italic>
+            (note: all emails to this address sent to the entire team)
+          </bh:Italic>
+        </bh:Div>
       </bh:Span>
     </bh:Span>
   </bh:Div>
