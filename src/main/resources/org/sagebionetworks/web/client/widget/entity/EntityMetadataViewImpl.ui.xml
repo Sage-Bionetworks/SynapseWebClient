@@ -46,29 +46,6 @@
       </bh:Paragraph>
       <bh:Paragraph ui:field="descriptionText" />
     </bh:Div>
-
-    <b:Collapse
-      ui:field="annotationsContent"
-      toggle="false"
-      b:id="annotationContentCollapse"
-    >
-      <g:FlowPanel addStyleNames="margin-bottom-15 margin-top-40">
-        <bh:Div addStyleNames="highlight-title">
-          <bh:Text ui:field="annotationsTitleText">Annotations</bh:Text>
-          <w:HelpWidget
-            helpMarkdown="Projects, folders and files can be annotated with key-value terms describing the content.&#10;Using these terms enables data queries through the web or the Synapse analytical clients"
-            href="https://help.synapse.org/docs/Annotating-Data-With-Metadata.2667708522.html"
-            addStyleNames="margin-left-5"
-          />
-          <w:IconSvg
-            ui:field="annotationsContentCloseButton"
-            addStyleNames="close"
-            icon="close"
-          />
-        </bh:Div>
-        <g:SimplePanel ui:field="annotationsContainer" />
-      </g:FlowPanel>
-    </b:Collapse>
     <bh:Div ui:field="fileHistoryContainer" />
   </g:HTMLPanel>
 </ui:UiBinder>
