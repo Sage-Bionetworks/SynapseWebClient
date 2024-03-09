@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test'
 import { testAuth } from './fixtures/authenticatedUserPages'
 import { waitForInitialPageLoad } from './helpers/utils'
 
-test.describe('Homepage', () => {
+test.describe('Homepage - Unauthenticated', () => {
   test('should show Log In To Synapse button when logged out', async ({
     page,
   }) => {
@@ -16,7 +16,9 @@ test.describe('Homepage', () => {
       page.getByRole('link', { name: 'View Your Dashboard' }),
     ).toHaveCount(0)
   })
+})
 
+testAuth.describe('Homepage - Authenticated', () => {
   testAuth(
     'should show View Your Dashboard button when logged in',
     async ({ userPage }) => {
