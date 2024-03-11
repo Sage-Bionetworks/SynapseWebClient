@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect } from '@playwright/test'
 import { testAuth } from './fixtures/authenticatedUserPages'
 import { deleteEntity, generateEntityName } from './helpers/entities'
 import {
@@ -44,13 +44,13 @@ let tableEntityId: string | undefined = undefined
 const noTablesText =
   'There are no Tables associated with this project. Any Tables you create in this project will appear here'
 
-test.describe('Tables', () => {
+testAuth.describe('Tables', () => {
   testAuth.beforeAll(async ({ browser, storageStatePaths }) => {
     userProject = await setupProject(browser, 'swc-e2e-user', storageStatePaths)
   })
 
   testAuth.afterAll(async ({ browser }) => {
-    test.slow()
+    testAuth.slow()
     if (tableEntityId) {
       const page = await browser.newPage()
       await deleteEntity(tableEntityId, true, getAdminPAT(), page)
@@ -66,7 +66,7 @@ test.describe('Tables', () => {
   })
 
   testAuth('should allow table CRUD', async ({ userPage }) => {
-    test.slow()
+    testAuth.slow()
 
     const tableName = generateEntityName('table')
     const tableDescription = 'table test description'
@@ -129,21 +129,24 @@ test.describe('Tables', () => {
       reorder_quantity: '25',
     }))
 
-    await test.step('User goes to tables page', async () => {
+    await testAuth.step('User goes to tables page', async () => {
       await goToDashboardPage(userPage, getTablesPath(userProject.id))
       await expectTablesPageLoaded(userPage, userProject.id)
       await expect(userPage.getByText(noTablesText)).toBeVisible()
     })
 
     // TODO: remove this step after table descriptions are visible outide of experimental mode
-    await test.step('Toggle into Experimental Mode to use react-based table column schema editor', async () => {
-      await toggleIntoExperimentalMode(userPage)
-      await expectTablesPageLoaded(userPage, userProject.id)
-      await expect(userPage.getByText(noTablesText)).toBeVisible()
-    })
+    await testAuth.step(
+      'Toggle into Experimental Mode to use react-based table column schema editor',
+      async () => {
+        await toggleIntoExperimentalMode(userPage)
+        await expectTablesPageLoaded(userPage, userProject.id)
+        await expect(userPage.getByText(noTablesText)).toBeVisible()
+      },
+    )
 
-    await test.step('User creates a table', async () => {
-      await test.step('open table creation modal', async () => {
+    await testAuth.step('User creates a table', async () => {
+      await testAuth.step('open table creation modal', async () => {
         await userPage
           .getByRole('button', { name: 'Add Table or View' })
           .click()
@@ -157,7 +160,7 @@ test.describe('Tables', () => {
           .click()
       })
 
-      await test.step('create table schema', async () => {
+      await testAuth.step('create table schema', async () => {
         await addColumnsFromColumnSchemaConfig(
           userPage,
           initialColumnsSchemaConfig,
@@ -165,40 +168,43 @@ test.describe('Tables', () => {
         await userPage.getByRole('button', { name: 'Next' }).click()
       })
 
-      await test.step('enter table name and description', async () => {
+      await testAuth.step('enter table name and description', async () => {
         await userPage.getByLabel('Name').fill(tableName)
         await userPage.getByLabel('Description').fill(tableDescription)
         await userPage.getByRole('button', { name: 'Finish' }).click()
       })
     })
 
-    await test.step('Table has been created with expected schema', async () => {
-      await expectTablePageLoaded(userPage, tableName, tableDescription)
+    await testAuth.step(
+      'Table has been created with expected schema',
+      async () => {
+        await expectTablePageLoaded(userPage, tableName, tableDescription)
 
-      await test.step('get table entity id', async () => {
-        tableEntityId =
-          (await userPage
-            .getByRole('row')
-            .filter({ hasText: 'SynId' })
-            .getByRole('cell')
-            .nth(1)
-            .textContent()) || undefined
-        expect(tableEntityId).not.toBeUndefined()
-      })
+        await testAuth.step('get table entity id', async () => {
+          tableEntityId =
+            (await userPage
+              .getByRole('row')
+              .filter({ hasText: 'SynId' })
+              .getByRole('cell')
+              .nth(1)
+              .textContent()) || undefined
+          expect(tableEntityId).not.toBeUndefined()
+        })
 
-      await test.step('table is currently empty', async () => {
-        await expect(
-          userPage.getByRole('heading', { name: 'Items (0)' }),
-        ).toBeVisible()
-        await expect(
-          userPage.getByText('This table is currently empty'),
-        ).toBeVisible()
-      })
+        await testAuth.step('table is currently empty', async () => {
+          await expect(
+            userPage.getByRole('heading', { name: 'Items (0)' }),
+          ).toBeVisible()
+          await expect(
+            userPage.getByText('This table is currently empty'),
+          ).toBeVisible()
+        })
 
-      await expectTableSchemaCorrect(userPage, initialColumnsSchemaConfig)
-    })
+        await expectTableSchemaCorrect(userPage, initialColumnsSchemaConfig)
+      },
+    )
 
-    await test.step('User adds data to the table', async () => {
+    await testAuth.step('User adds data to the table', async () => {
       await openTableEditor(userPage)
 
       await enterTableData(
@@ -207,14 +213,15 @@ test.describe('Tables', () => {
         initialTableData,
       )
 
-      await test.step('column type is enforced', async () => {
+      await testAuth.step('column type is enforced', async () => {
         const rowIndex = 2
         const columnIndex = initialColumnsSchemaConfig.findIndex(
           config => config.name === 'quantity',
         )
 
-        const cell =
-          await test.step('change value to the incorrect type', async () => {
+        const cell = await testAuth.step(
+          'change value to the incorrect type',
+          async () => {
             const tableRows = getTableEditorRows(userPage)
             const cell = tableRows
               .nth(rowIndex + 1) // shift down for column headers
@@ -222,9 +229,10 @@ test.describe('Tables', () => {
               .nth(columnIndex + 1) // shift right for checkboxes
             await enterTableValue(cell, 'STRING')
             return cell
-          })
+          },
+        )
 
-        await test.step('saving table triggers an error', async () => {
+        await testAuth.step('saving table triggers an error', async () => {
           await userPage.getByRole('button', { name: 'Save' }).click()
           await expect(cell).toHaveText('Value must be an integer.')
           await expect(
@@ -232,7 +240,7 @@ test.describe('Tables', () => {
           ).toBeVisible()
         })
 
-        await test.step('fix error', async () => {
+        await testAuth.step('fix error', async () => {
           await enterTableValue(cell, initialTableData[rowIndex].quantity)
         })
       })
@@ -249,19 +257,21 @@ test.describe('Tables', () => {
       )
     })
 
-    await test.step('User edits table schema', async () => {
+    await testAuth.step('User edits table schema', async () => {
       await openTableColumnSchema(userPage)
-      const tableSchemaEditorHeader =
-        await test.step('open table column schema editor modal', async () => {
+      const tableSchemaEditorHeader = await testAuth.step(
+        'open table column schema editor modal',
+        async () => {
           await userPage.getByRole('button', { name: 'Edit Schema' }).click()
           const tableSchemaEditorHeader = userPage.getByRole('heading', {
             name: 'Edit Columns',
           })
           await expect(tableSchemaEditorHeader).toBeVisible()
           return tableSchemaEditorHeader
-        })
+        },
+      )
 
-      await test.step('add new columns', async () => {
+      await testAuth.step('add new columns', async () => {
         // wait for previously entered column schemas to appear
         // ...so addColumnsFromColumnSchemaConfig calculates correct starting column index
         await expect(
@@ -275,7 +285,7 @@ test.describe('Tables', () => {
         )
       })
 
-      await test.step('save changes to table column schema', async () => {
+      await testAuth.step('save changes to table column schema', async () => {
         await userPage.getByRole('button', { name: 'Save' }).click()
         await expect(userPage.getByText('Saving...')).toBeVisible()
 
@@ -292,30 +302,33 @@ test.describe('Tables', () => {
 
       await expectTableSchemaCorrect(userPage, updatedColumnsSchemaConfig)
 
-      await test.step('default value is automatically populated in newly created column', async () => {
-        await expectTableItemNumberCorrect(userPage, updatedTableData)
-        await expectTableDataCorrect(
-          userPage,
-          updatedColumnsSchemaConfig,
-          updatedTableData,
-        )
-      })
+      await testAuth.step(
+        'default value is automatically populated in newly created column',
+        async () => {
+          await expectTableItemNumberCorrect(userPage, updatedTableData)
+          await expectTableDataCorrect(
+            userPage,
+            updatedColumnsSchemaConfig,
+            updatedTableData,
+          )
+        },
+      )
     })
 
-    await test.step('User queries the table', async () => {
+    await testAuth.step('User queries the table', async () => {
       const defaultQuery = getDefaultQuery(tableEntityId!)
       await toggleQueryEditor(userPage)
 
-      await test.step('current query matches table', async () => {
+      await testAuth.step('current query matches table', async () => {
         const queryInput = userPage.getByPlaceholder('Enter Query')
         await expect(queryInput).toHaveValue(defaultQuery)
       })
 
-      await test.step('query table to select a single column', async () => {
+      await testAuth.step('query table to select a single column', async () => {
         const column = updatedColumnsSchemaConfig[0].name
         await runQuery(userPage, `SELECT ${column} FROM ${tableEntityId}`)
 
-        await test.step('confirm query results', async () => {
+        await testAuth.step('confirm query results', async () => {
           await confirmTableDataDimensions(userPage, updatedTableData.length, 1)
           await expectTableDataCorrect(
             userPage,
@@ -327,32 +340,35 @@ test.describe('Tables', () => {
         })
       })
 
-      await test.step('query table to select rows where column greater than a value', async () => {
-        const value = 200
-        const column = 'quantity'
-        await runQuery(
-          userPage,
-          `SELECT * FROM ${tableEntityId} WHERE ${column} > ${value}`,
-        )
-
-        await test.step('confirm query results', async () => {
-          const expectedData = updatedTableData.filter(
-            data => (data[column] as number) > value,
-          )
-          await confirmTableDataDimensions(
+      await testAuth.step(
+        'query table to select rows where column greater than a value',
+        async () => {
+          const value = 200
+          const column = 'quantity'
+          await runQuery(
             userPage,
-            expectedData.length,
-            updatedColumnsSchemaConfig.length,
+            `SELECT * FROM ${tableEntityId} WHERE ${column} > ${value}`,
           )
-          await expectTableDataCorrect(
-            userPage,
-            updatedColumnsSchemaConfig,
-            expectedData,
-          )
-        })
-      })
 
-      await test.step('return table to default setup', async () => {
+          await testAuth.step('confirm query results', async () => {
+            const expectedData = updatedTableData.filter(
+              data => (data[column] as number) > value,
+            )
+            await confirmTableDataDimensions(
+              userPage,
+              expectedData.length,
+              updatedColumnsSchemaConfig.length,
+            )
+            await expectTableDataCorrect(
+              userPage,
+              updatedColumnsSchemaConfig,
+              expectedData,
+            )
+          })
+        },
+      )
+
+      await testAuth.step('return table to default setup', async () => {
         await runQuery(userPage, defaultQuery, true)
         await expectTableDataCorrect(
           userPage,
@@ -363,7 +379,7 @@ test.describe('Tables', () => {
       })
     })
 
-    await test.step('User updates data in the table', async () => {
+    await testAuth.step('User updates data in the table', async () => {
       const columnName = 'quantity'
       const rowIndex = updatedTableData.length - 1
       const columnIndex = updatedColumnsSchemaConfig.findIndex(
@@ -373,7 +389,7 @@ test.describe('Tables', () => {
 
       await openTableEditor(userPage)
 
-      await test.step('edit row value', async () => {
+      await testAuth.step('edit row value', async () => {
         const tableRows = getTableEditorRows(userPage)
         const cell = tableRows
           .nth(rowIndex + 1) // shift down for headers
@@ -385,7 +401,7 @@ test.describe('Tables', () => {
       await saveTableDataChanges(userPage)
       await expectTablePageLoaded(userPage, tableName, tableDescription)
 
-      await test.step('updated data is displayed', async () => {
+      await testAuth.step('updated data is displayed', async () => {
         updatedTableData[rowIndex][columnName] = newValue
         await expectTableItemNumberCorrect(userPage, updatedTableData)
         await expectTableDataCorrect(
@@ -396,13 +412,13 @@ test.describe('Tables', () => {
       })
     })
 
-    await test.step('User deletes the table', async () => {
-      await test.step('delete table', async () => {
+    await testAuth.step('User deletes the table', async () => {
+      await testAuth.step('delete table', async () => {
         await userPage.getByRole('button', { name: 'Table Tools' }).click()
         await userPage.getByRole('menuitem', { name: 'Delete Table' }).click()
       })
 
-      await test.step('confirm deletion', async () => {
+      await testAuth.step('confirm deletion', async () => {
         await expect(
           userPage.getByRole('heading', { name: 'Confirm Deletion' }),
         ).toBeVisible()
@@ -415,7 +431,7 @@ test.describe('Tables', () => {
         await dismissAlert(userPage, 'The Table was successfully deleted')
       })
 
-      await test.step('no tables are shown on Tables tab', async () => {
+      await testAuth.step('no tables are shown on Tables tab', async () => {
         await userPage.waitForURL(getTablesPath(userProject.id))
         await expect(userPage.getByText(noTablesText)).toBeVisible()
       })

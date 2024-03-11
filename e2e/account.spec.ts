@@ -1,8 +1,8 @@
-import { expect, test } from '@playwright/test'
+import { expect } from '@playwright/test'
 import { testAuth } from './fixtures/authenticatedUserPages'
 import { goToDashboard } from './helpers/testUser'
 
-test.describe('Account Settings', () => {
+testAuth.describe('Account Settings', () => {
   testAuth('should show certification status', async ({ userPage }) => {
     await goToDashboard(userPage)
 

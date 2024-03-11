@@ -1,4 +1,4 @@
-import { Page, expect, test } from '@playwright/test'
+import { Page, expect } from '@playwright/test'
 import { defaultExpectTimeout } from '../playwright.config'
 import { testAuth } from './fixtures/authenticatedUserPages'
 import {
@@ -109,7 +109,7 @@ const getDiscussionReplyActionButtons = (page: Page, threadReply: string) => {
 let userProject: Project
 const fileHandleIds: string[] = []
 
-test.describe('Discussions', () => {
+testAuth.describe('Discussions', () => {
   testAuth.beforeAll(async ({ browser, storageStatePaths }) => {
     userProject = await setupProjectWithPermissions(
       browser,
@@ -120,7 +120,7 @@ test.describe('Discussions', () => {
   })
 
   testAuth.afterAll(async ({ browser }) => {
-    test.slow()
+    testAuth.slow()
     if (userProject.id) {
       await teardownProjectsAndFileHandles(
         browser,
@@ -133,7 +133,7 @@ test.describe('Discussions', () => {
   testAuth(
     'should allow discussion and reply CRUD',
     async ({ userPage, validatedUserPage }) => {
-      test.slow()
+      testAuth.slow()
 
       const threadTitle = 'The Title of the Thread'
       const threadBody = 'The body of the Thread'

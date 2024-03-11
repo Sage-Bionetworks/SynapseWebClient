@@ -1,4 +1,4 @@
-import { Page, expect, test } from '@playwright/test'
+import { Page, expect } from '@playwright/test'
 import path from 'path'
 import { defaultExpectTimeout } from '../playwright.config'
 import { testAuth } from './fixtures/authenticatedUserPages'
@@ -178,13 +178,13 @@ const getFileMD5 = async (page: Page) => {
 let userProject: Project
 const fileHandleIds: string[] = []
 
-test.describe('Files', () => {
+testAuth.describe('Files', () => {
   testAuth.beforeAll(async ({ browser, storageStatePaths }) => {
     userProject = await setupProject(browser, 'swc-e2e-user', storageStatePaths)
   })
 
   testAuth.afterAll(async ({ browser }) => {
-    test.slow()
+    testAuth.slow()
     if (userProject.id) {
       await teardownProjectsAndFileHandles(
         browser,
@@ -201,7 +201,7 @@ test.describe('Files', () => {
       // when there is a test timeout. Since test timeouts are expensive,
       // Playwright recommends skipping the test entirely with test.fixme.
       // See: https://github.com/microsoft/playwright/issues/16317
-      test.fixme(
+      testAuth.fixme(
         browserName === 'webkit' && !!process.env.CI,
         `Very slow in webkit in CI only (passes after 6min in macos-latest runner, 
           times out after 10min in Sage ubuntu-22.04-4core-16GBRAM-150GBSSD runner). 
@@ -345,7 +345,7 @@ test.describe('Files', () => {
   )
 
   testAuth('should create and delete a file', async ({ userPage }) => {
-    test.slow()
+    testAuth.slow()
 
     const fileName = 'test_file.csv'
     const filePath = `data/${fileName}`
