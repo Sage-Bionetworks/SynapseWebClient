@@ -40,7 +40,6 @@ public class ACTAccessRequirementWidget
   ACTAccessRequirement ar;
   PortalGinInjector ginInjector;
   CreateAccessRequirementButton createAccessRequirementButton;
-  DeleteAccessRequirementButton deleteAccessRequirementButton;
   TeamSubjectsWidget teamSubjectsWidget;
   EntitySubjectsWidget entitySubjectsWidget;
   AccessRequirementRelatedProjectsList accessRequirementRelatedProjectsList;
@@ -62,7 +61,6 @@ public class ACTAccessRequirementWidget
     EntitySubjectsWidget entitySubjectsWidget,
     AccessRequirementRelatedProjectsList accessRequirementRelatedProjectsList,
     CreateAccessRequirementButton createAccessRequirementButton,
-    DeleteAccessRequirementButton deleteAccessRequirementButton,
     DataAccessClientAsync dataAccessClient,
     LazyLoadHelper lazyLoadHelper,
     AuthenticationController authController,
@@ -81,7 +79,6 @@ public class ACTAccessRequirementWidget
     this.accessRequirementRelatedProjectsList =
       accessRequirementRelatedProjectsList;
     this.createAccessRequirementButton = createAccessRequirementButton;
-    this.deleteAccessRequirementButton = deleteAccessRequirementButton;
     this.dataAccessClient = dataAccessClient;
     fixServiceEntryPoint(dataAccessClient);
     this.lazyLoadHelper = lazyLoadHelper;
@@ -93,7 +90,6 @@ public class ACTAccessRequirementWidget
     view.setPresenter(this);
     view.setWikiTermsWidget(wikiPageWidget.asWidget());
     view.setEditAccessRequirementWidget(createAccessRequirementButton);
-    view.setDeleteAccessRequirementWidget(deleteAccessRequirementButton);
     view.setTeamSubjectsWidget(teamSubjectsWidget);
     view.setEntitySubjectsWidget(entitySubjectsWidget);
     view.setAccessRequirementRelatedProjectsList(
@@ -146,7 +142,6 @@ public class ACTAccessRequirementWidget
       }
     );
     createAccessRequirementButton.configure(ar, refreshCallback);
-    deleteAccessRequirementButton.configure(ar, refreshCallback);
     teamSubjectsWidget.configure(ar.getSubjectIds());
     entitySubjectsWidget.configure(ar.getSubjectIds());
     accessRequirementRelatedProjectsList.configure(ar.getId().toString());

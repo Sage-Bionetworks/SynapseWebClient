@@ -34,7 +34,6 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequirementRelatedProjectsList;
 import org.sagebionetworks.web.client.widget.accessrequirements.CreateAccessRequirementButton;
-import org.sagebionetworks.web.client.widget.accessrequirements.DeleteAccessRequirementButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.EntitySubjectsWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.ReviewAccessorsButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.SelfSignAccessRequirementWidget;
@@ -75,9 +74,6 @@ public class SelfSignAccessRequirementWidgetTest {
 
   @Mock
   CreateAccessRequirementButton mockCreateAccessRequirementButton;
-
-  @Mock
-  DeleteAccessRequirementButton mockDeleteAccessRequirementButton;
 
   @Mock
   TeamSubjectsWidget mockTeamSubjectsWidget;
@@ -134,43 +130,41 @@ public class SelfSignAccessRequirementWidgetTest {
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
-    widget =
-      new SelfSignAccessRequirementWidget(
-        mockView,
-        mockAuthController,
-        mockDataAccessClient,
-        mockSynapseClient,
-        mockWikiPageWidget,
-        mockSynAlert,
-        mockTeamSubjectsWidget,
-        mockEntitySubjectsWidget,
-        mockAccessRequirementRelatedProjectsList,
-        mockCreateAccessRequirementButton,
-        mockDeleteAccessRequirementButton,
-        mockLazyLoadHelper,
-        mockManageAccessButton,
-        mockPopupUtils,
-        mockSynapseJavascriptClient,
-        mockIsACTMemberAsyncHandler
-      );
+    widget = new SelfSignAccessRequirementWidget(
+      mockView,
+      mockAuthController,
+      mockDataAccessClient,
+      mockSynapseClient,
+      mockWikiPageWidget,
+      mockSynAlert,
+      mockTeamSubjectsWidget,
+      mockEntitySubjectsWidget,
+      mockAccessRequirementRelatedProjectsList,
+      mockCreateAccessRequirementButton,
+      mockLazyLoadHelper,
+      mockManageAccessButton,
+      mockPopupUtils,
+      mockSynapseJavascriptClient,
+      mockIsACTMemberAsyncHandler
+    );
     when(mockAccessRequirement.getId()).thenReturn(AR_ID);
     when(mockAccessRequirement.getVersionNumber()).thenReturn(AR_VERSION);
     when(mockAccessRequirement.getSubjectIds()).thenReturn(mockSubjectIds);
-    AsyncMockStubber
-      .callSuccessWith(ROOT_WIKI_ID)
+    AsyncMockStubber.callSuccessWith(ROOT_WIKI_ID)
       .when(mockSynapseJavascriptClient)
       .getRootWikiPageKey(anyString(), anyString(), any(AsyncCallback.class));
-    verify(mockLazyLoadHelper)
-      .configure(callbackCaptor.capture(), eq(mockView));
+    verify(mockLazyLoadHelper).configure(
+      callbackCaptor.capture(),
+      eq(mockView)
+    );
     lazyLoadDataCallback = callbackCaptor.getValue();
-    when(mockAuthController.getCurrentUserPrincipalId())
-      .thenReturn(CURRENT_USER_ID);
-    AsyncMockStubber
-      .callSuccessWith(mockUserBundle)
+    when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(
+      CURRENT_USER_ID
+    );
+    AsyncMockStubber.callSuccessWith(mockUserBundle)
       .when(mockSynapseJavascriptClient)
       .getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
-    AsyncMockStubber
-      .callSuccessWith(mockDataAccessSubmissionStatus)
+    AsyncMockStubber.callSuccessWith(mockDataAccessSubmissionStatus)
       .when(mockDataAccessClient)
       .getAccessRequirementStatus(anyString(), any(AsyncCallback.class));
     when(mockAuthController.isLoggedIn()).thenReturn(true);
@@ -187,12 +181,11 @@ public class SelfSignAccessRequirementWidgetTest {
   @Test
   public void testSetRequirementWithWikiTerms() {
     widget.setRequirement(mockAccessRequirement, mockRefreshCallback);
-    verify(mockWikiPageWidget)
-      .configure(
-        any(WikiPageKey.class),
-        eq(false),
-        any(WikiPageWidget.Callback.class)
-      );
+    verify(mockWikiPageWidget).configure(
+      any(WikiPageKey.class),
+      eq(false),
+      any(WikiPageWidget.Callback.class)
+    );
     verify(mockTeamSubjectsWidget).configure(mockSubjectIds);
     verify(mockEntitySubjectsWidget).configure(mockSubjectIds);
   }
@@ -249,8 +242,9 @@ public class SelfSignAccessRequirementWidgetTest {
   @Test
   public void testUnapprovedStateValidationRequiredNotValidated() {
     when(mockUserBundle.getIsVerified()).thenReturn(false);
-    when(mockAccessRequirement.getIsValidatedProfileRequired())
-      .thenReturn(true);
+    when(mockAccessRequirement.getIsValidatedProfileRequired()).thenReturn(
+      true
+    );
     widget.setRequirement(mockAccessRequirement, mockRefreshCallback);
     when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(false);
     lazyLoadDataCallback.invoke();
@@ -262,8 +256,9 @@ public class SelfSignAccessRequirementWidgetTest {
   @Test
   public void testUnapprovedStateValidationRequiredIsValidated() {
     when(mockUserBundle.getIsVerified()).thenReturn(true);
-    when(mockAccessRequirement.getIsValidatedProfileRequired())
-      .thenReturn(true);
+    when(mockAccessRequirement.getIsValidatedProfileRequired()).thenReturn(
+      true
+    );
     widget.setRequirement(mockAccessRequirement, mockRefreshCallback);
     when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(false);
     lazyLoadDataCallback.invoke();
@@ -276,8 +271,9 @@ public class SelfSignAccessRequirementWidgetTest {
     when(mockUserBundle.getIsCertified()).thenReturn(false);
     when(mockUserBundle.getIsVerified()).thenReturn(false);
     when(mockAccessRequirement.getIsCertifiedUserRequired()).thenReturn(true);
-    when(mockAccessRequirement.getIsValidatedProfileRequired())
-      .thenReturn(true);
+    when(mockAccessRequirement.getIsValidatedProfileRequired()).thenReturn(
+      true
+    );
     widget.setRequirement(mockAccessRequirement, mockRefreshCallback);
     when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(false);
     lazyLoadDataCallback.invoke();
@@ -290,12 +286,12 @@ public class SelfSignAccessRequirementWidgetTest {
   @Test
   public void testGetUserBundleFailure() {
     Exception ex = new Exception("error getting user bundle");
-    AsyncMockStubber
-      .callFailureWith(ex)
+    AsyncMockStubber.callFailureWith(ex)
       .when(mockSynapseJavascriptClient)
       .getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
-    when(mockAccessRequirement.getIsValidatedProfileRequired())
-      .thenReturn(true);
+    when(mockAccessRequirement.getIsValidatedProfileRequired()).thenReturn(
+      true
+    );
     widget.setRequirement(mockAccessRequirement, mockRefreshCallback);
     when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(false);
 
@@ -306,24 +302,23 @@ public class SelfSignAccessRequirementWidgetTest {
 
   @Test
   public void testOnSignTerms() {
-    AsyncMockStubber
-      .callSuccessWith(mockAccessApproval)
+    AsyncMockStubber.callSuccessWith(mockAccessApproval)
       .when(mockSynapseClient)
       .createAccessApproval(
         any(AccessApproval.class),
         any(AsyncCallback.class)
       );
-    when(mockAccessRequirement.getIsValidatedProfileRequired())
-      .thenReturn(true);
+    when(mockAccessRequirement.getIsValidatedProfileRequired()).thenReturn(
+      true
+    );
     widget.setRequirement(mockAccessRequirement, mockRefreshCallback);
 
     widget.onSignTerms();
 
-    verify(mockSynapseClient)
-      .createAccessApproval(
-        accessApprovalCaptor.capture(),
-        any(AsyncCallback.class)
-      );
+    verify(mockSynapseClient).createAccessApproval(
+      accessApprovalCaptor.capture(),
+      any(AsyncCallback.class)
+    );
     verify(mockRefreshCallback).invoke();
     AccessApproval capturedAccessApproval = accessApprovalCaptor.getValue();
     assertEquals(AR_ID, capturedAccessApproval.getRequirementId());
@@ -334,8 +329,7 @@ public class SelfSignAccessRequirementWidgetTest {
   @Test
   public void testOnSignTermsFailure() {
     Exception ex = new Exception("error signing terms");
-    AsyncMockStubber
-      .callFailureWith(ex)
+    AsyncMockStubber.callFailureWith(ex)
       .when(mockSynapseClient)
       .createAccessApproval(
         any(AccessApproval.class),
@@ -345,25 +339,26 @@ public class SelfSignAccessRequirementWidgetTest {
 
     widget.onSignTerms();
 
-    verify(mockSynapseClient)
-      .createAccessApproval(
-        any(AccessApproval.class),
-        any(AsyncCallback.class)
-      );
+    verify(mockSynapseClient).createAccessApproval(
+      any(AccessApproval.class),
+      any(AsyncCallback.class)
+    );
     verify(mockSynAlert).handleException(ex);
   }
 
   @Test
   public void testOnCertify() {
     widget.onCertify();
-    verify(mockPopupUtils)
-      .openInNewWindow(WebConstants.DOCS_URL + GET_CERTIFIED_PAGE);
+    verify(mockPopupUtils).openInNewWindow(
+      WebConstants.DOCS_URL + GET_CERTIFIED_PAGE
+    );
   }
 
   @Test
   public void testOnValidateProfile() {
     widget.onValidateProfile();
-    verify(mockPopupUtils)
-      .openInNewWindow(WebConstants.DOCS_URL + GET_VALIDATED_PROFILE_PAGE);
+    verify(mockPopupUtils).openInNewWindow(
+      WebConstants.DOCS_URL + GET_VALIDATED_PROFILE_PAGE
+    );
   }
 }
