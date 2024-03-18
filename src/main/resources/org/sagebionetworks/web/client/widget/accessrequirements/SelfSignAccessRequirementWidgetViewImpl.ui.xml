@@ -114,11 +114,6 @@
           pull="RIGHT"
           addStyleNames="margin-right-5"
         />
-        <bh:Div
-          ui:field="deleteAccessRequirementContainer"
-          pull="RIGHT"
-          addStyleNames="margin-right-5"
-        />
         <b:Alert
           ui:field="approvedAlert"
           type="SUCCESS"

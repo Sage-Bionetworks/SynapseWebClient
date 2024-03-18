@@ -54,7 +54,11 @@
           href="https://help.synapse.org/docs/Data-Access-Types.2014904611.html#DataAccessTypes-ControlledAccessData"
           target="_blank"
         />
-        <bh:Text>.&nbsp;&nbsp;</bh:Text>
+        <bh:Text>
+          .
+          &nbsp;
+          &nbsp;
+        </bh:Text>
         <bh:Text>
           If you think this data is posted inappropriately or should
 					have different access conditions, please alert the Synapse Access
@@ -103,11 +107,6 @@
         />
         <bh:Div
           ui:field="editAccessRequirementContainer"
-          pull="RIGHT"
-          addStyleNames="margin-right-5 margin-top-5"
-        />
-        <bh:Div
-          ui:field="deleteAccessRequirementContainer"
           pull="RIGHT"
           addStyleNames="margin-right-5 margin-top-5"
         />

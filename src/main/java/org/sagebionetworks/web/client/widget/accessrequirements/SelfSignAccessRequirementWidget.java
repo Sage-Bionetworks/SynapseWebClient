@@ -43,7 +43,6 @@ public class SelfSignAccessRequirementWidget
   SelfSignAccessRequirement ar;
   AuthenticationController authController;
   CreateAccessRequirementButton createAccessRequirementButton;
-  DeleteAccessRequirementButton deleteAccessRequirementButton;
   TeamSubjectsWidget teamSubjectsWidget;
   EntitySubjectsWidget entitySubjectsWidget;
   AccessRequirementRelatedProjectsList accessRequirementRelatedProjectsList;
@@ -66,7 +65,6 @@ public class SelfSignAccessRequirementWidget
     EntitySubjectsWidget entitySubjectsWidget,
     AccessRequirementRelatedProjectsList accessRequirementRelatedProjectsList,
     CreateAccessRequirementButton createAccessRequirementButton,
-    DeleteAccessRequirementButton deleteAccessRequirementButton,
     LazyLoadHelper lazyLoadHelper,
     ReviewAccessorsButton manageAccessButton,
     PopupUtilsView popupUtils,
@@ -86,7 +84,6 @@ public class SelfSignAccessRequirementWidget
     this.accessRequirementRelatedProjectsList =
       accessRequirementRelatedProjectsList;
     this.createAccessRequirementButton = createAccessRequirementButton;
-    this.deleteAccessRequirementButton = deleteAccessRequirementButton;
     this.lazyLoadHelper = lazyLoadHelper;
     this.manageAccessButton = manageAccessButton;
     this.popupUtils = popupUtils;
@@ -96,7 +93,6 @@ public class SelfSignAccessRequirementWidget
     view.setPresenter(this);
     view.setWikiTermsWidget(wikiPageWidget.asWidget());
     view.setEditAccessRequirementWidget(createAccessRequirementButton);
-    view.setDeleteAccessRequirementWidget(deleteAccessRequirementButton);
     view.setTeamSubjectsWidget(teamSubjectsWidget);
     view.setEntitySubjectsWidget(entitySubjectsWidget);
     view.setAccessRequirementRelatedProjectsList(
@@ -143,7 +139,6 @@ public class SelfSignAccessRequirementWidget
       }
     );
     createAccessRequirementButton.configure(ar, refreshCallback);
-    deleteAccessRequirementButton.configure(ar, refreshCallback);
     teamSubjectsWidget.configure(ar.getSubjectIds());
     entitySubjectsWidget.configure(ar.getSubjectIds());
     accessRequirementRelatedProjectsList.configure(ar.getId().toString());
@@ -235,18 +230,19 @@ public class SelfSignAccessRequirementWidget
   public void onSignTerms() {
     // create the self-signed access approval, then update this object
     synAlert.clear();
-    AsyncCallback<AccessApproval> callback =
-      new AsyncCallback<AccessApproval>() {
-        @Override
-        public void onFailure(Throwable t) {
-          synAlert.handleException(t);
-        }
+    AsyncCallback<AccessApproval> callback = new AsyncCallback<
+      AccessApproval
+    >() {
+      @Override
+      public void onFailure(Throwable t) {
+        synAlert.handleException(t);
+      }
 
-        @Override
-        public void onSuccess(AccessApproval result) {
-          refreshCallback.invoke();
-        }
-      };
+      @Override
+      public void onSuccess(AccessApproval result) {
+        refreshCallback.invoke();
+      }
+    };
     AccessApproval approval = new AccessApproval();
     approval.setAccessorId(authController.getCurrentUserPrincipalId());
     approval.setRequirementId(ar.getId());

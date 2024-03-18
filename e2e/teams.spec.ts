@@ -1,4 +1,4 @@
-import { Page, expect, test } from '@playwright/test'
+import { Page, expect } from '@playwright/test'
 import { v4 as uuidv4 } from 'uuid'
 import { defaultExpectTimeout } from '../playwright.config'
 import { testAuth } from './fixtures/authenticatedUserPages'
@@ -52,9 +52,9 @@ let teamId: string | undefined = undefined
 // Run multiple describes in parallel, but run tests inside each describe in order
 // ...tests within describe expect afterAll to be run with the same users, i.e. on the same worker
 // https://playwright.dev/docs/api/class-test#test-describe-configure
-test.describe.configure({ mode: 'serial' })
+testAuth.describe.configure({ mode: 'serial' })
 
-test.describe('Teams', () => {
+testAuth.describe('Teams', () => {
   testAuth(
     'should exercise team lifecycle',
     async ({ userPage, validatedUserPage }) => {
@@ -123,7 +123,7 @@ test.describe('Teams', () => {
         },
       )
 
-      await test.step('user should view pending invitations', async () => {
+      await testAuth.step('user should view pending invitations', async () => {
         await expect(userPage.getByText('Pending Invitations')).toBeVisible({
           timeout: defaultExpectTimeout * 3, // add extra timeout, so backend can finish sending request
         })
@@ -132,21 +132,26 @@ test.describe('Teams', () => {
         await expect(row.getByText(INVITATION_MESSAGE)).toBeVisible()
       })
 
-      await test.step('validated user should accept team invitation', async () => {
-        await goToDashboard(validatedUserPage)
+      await testAuth.step(
+        'validated user should accept team invitation',
+        async () => {
+          await goToDashboard(validatedUserPage)
 
-        await validatedUserPage.getByLabel('Teams').click()
-        await expectMyTeamsPageLoaded(validatedUserPage)
+          await validatedUserPage.getByLabel('Teams').click()
+          await expectMyTeamsPageLoaded(validatedUserPage)
 
-        // get row for this invitation
-        // ...in case multiple tests have invited validated user at the same time
-        const row = validatedUserPage.getByRole('row', { name: TEAM_NAME })
-        await expect(row.getByText(INVITATION_MESSAGE)).toBeVisible()
-        await expect(row.getByRole('button', { name: 'Cancel' })).toBeVisible()
+          // get row for this invitation
+          // ...in case multiple tests have invited validated user at the same time
+          const row = validatedUserPage.getByRole('row', { name: TEAM_NAME })
+          await expect(row.getByText(INVITATION_MESSAGE)).toBeVisible()
+          await expect(
+            row.getByRole('button', { name: 'Cancel' }),
+          ).toBeVisible()
 
-        await row.getByRole('button', { name: 'Join' }).click()
-        await expect(row).not.toBeVisible()
-      })
+          await row.getByRole('button', { name: 'Join' }).click()
+          await expect(row).not.toBeVisible()
+        },
+      )
 
       await testAuth.step('validated user should view team page', async () => {
         const teamLink = validatedUserPage.getByRole('link', {
@@ -218,15 +223,14 @@ test.describe('Teams', () => {
   )
 
   testAuth.afterAll(async ({ userPage, validatedUserPage }) => {
-    test.slow()
+    testAuth.slow()
 
     // get credentials
     const adminPAT = getAdminPAT()
 
     const validatedUserId = await getUserIdFromLocalStorage(validatedUserPage)
-    const validatedUserAccessToken = await getAccessTokenFromCookie(
-      validatedUserPage,
-    )
+    const validatedUserAccessToken =
+      await getAccessTokenFromCookie(validatedUserPage)
 
     const userUserId = await getUserIdFromLocalStorage(userPage)
     const userAccessToken = await getAccessTokenFromCookie(userPage)
