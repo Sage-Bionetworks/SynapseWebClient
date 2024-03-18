@@ -24,22 +24,18 @@ import org.sagebionetworks.repo.model.file.S3UploadDestination;
 import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.file.UploadType;
 import org.sagebionetworks.repo.model.table.TableEntity;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.doi.DoiWidgetV2;
-import org.sagebionetworks.web.client.widget.entity.EntityMetadataView.Presenter;
-import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationsRendererWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWidget;
 
-public class EntityMetadata implements Presenter {
+public class EntityMetadata {
 
   private final EntityMetadataView view;
-  private final AnnotationsRendererWidget annotationsWidget;
   private final DoiWidgetV2 doiWidgetV2;
   private VersionHistoryWidget versionHistoryWidget;
   private final SynapseJavascriptClient jsClient;
@@ -47,7 +43,6 @@ public class EntityMetadata implements Presenter {
   private final PortalGinInjector ginInjector;
   private final ContainerItemCountWidget containerItemCountWidget;
   private final org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWidget restrictionWidgetV2;
-  private EntityActionMenu actionMenu;
   private final EntityModalWidget entityModalWidget;
 
   private boolean annotationsAreVisible = false;
@@ -56,7 +51,6 @@ public class EntityMetadata implements Presenter {
   public EntityMetadata(
     EntityMetadataView view,
     DoiWidgetV2 doiWidgetV2,
-    AnnotationsRendererWidget annotationsWidget,
     SynapseJavascriptClient jsClient,
     SynapseJSNIUtils jsni,
     RestrictionWidget restrictionWidgetV2,
@@ -66,16 +60,13 @@ public class EntityMetadata implements Presenter {
   ) {
     this.view = view;
     this.doiWidgetV2 = doiWidgetV2;
-    this.annotationsWidget = annotationsWidget;
     this.jsClient = jsClient;
     this.jsni = jsni;
     this.restrictionWidgetV2 = restrictionWidgetV2;
     this.containerItemCountWidget = containerItemCountWidget;
     this.ginInjector = ginInjector;
     this.entityModalWidget = entityModalWidget;
-    this.view.setPresenter(this);
     this.view.setDoiWidget(doiWidgetV2);
-    this.view.setAnnotationsRendererWidget(annotationsWidget);
     this.view.setEntityModalWidget(entityModalWidget);
     this.view.setRestrictionWidgetV2(restrictionWidgetV2);
     this.view.setContainerItemCountWidget(containerItemCountWidget);
@@ -103,7 +94,6 @@ public class EntityMetadata implements Presenter {
     clear();
     // The "detailed metadata" is shown in the title bar React component for non-project entities.
     view.setDetailedMetadataVisible(bundle.getEntity() instanceof Project);
-    this.actionMenu = actionMenu;
     Entity en = bundle.getEntity();
     view.setEntityId(en.getId());
     entityModalWidget.configure(
@@ -120,20 +110,16 @@ public class EntityMetadata implements Presenter {
     view.setDescriptionVisible(false);
     view.setDescription(en.getDescription());
 
-    boolean canEdit = bundle.getPermissions().getCanCertifiedUserEdit();
     setAnnotationsVisible(false);
     actionMenu.setActionListener(
       Action.SHOW_ANNOTATIONS,
       (action, e) -> setAnnotationsVisible(!annotationsAreVisible)
     );
 
-    actionMenu.setActionListener(
-      Action.SHOW_VERSION_HISTORY,
-      (action, e) -> {
-        getVersionHistoryWidget()
-          .setVisible(!getVersionHistoryWidget().isVisible());
-      }
-    );
+    actionMenu.setActionListener(Action.SHOW_VERSION_HISTORY, (action, e) -> {
+      getVersionHistoryWidget()
+        .setVisible(!getVersionHistoryWidget().isVisible());
+    });
 
     boolean isCurrentVersion = en instanceof VersionableEntity
       ? ((VersionableEntity) en).getIsLatestVersion()
@@ -185,23 +171,15 @@ public class EntityMetadata implements Presenter {
     } else if (bundle.getDoiAssociation() != null) {
       doiWidgetV2.configure(bundle.getDoiAssociation());
     }
-    annotationsWidget.configure(bundle, canEdit, isCurrentVersion);
     restrictionWidgetV2.configure(
       en,
       bundle.getPermissions().getCanChangePermissions()
     );
   }
 
-  @Override
   public void setAnnotationsVisible(boolean visible) {
     annotationsAreVisible = visible;
-    if (DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider())) {
-      entityModalWidget.setOpen(visible);
-      view.setAnnotationsVisible(false);
-    } else {
-      view.setAnnotationsVisible(visible);
-      entityModalWidget.setOpen(false);
-    }
+    entityModalWidget.setOpen(visible);
   }
 
   public void clear() {
@@ -250,9 +228,8 @@ public class EntityMetadata implements Presenter {
               }
               view.setUploadDestinationText(description);
             } else if (
-              uploadDestinations.get(
-                0
-              ) instanceof ExternalGoogleCloudUploadDestination
+              uploadDestinations.get(0) instanceof
+              ExternalGoogleCloudUploadDestination
             ) {
               ExternalGoogleCloudUploadDestination externalUploadDestination =
                 (ExternalGoogleCloudUploadDestination) uploadDestinations.get(
@@ -265,9 +242,8 @@ public class EntityMetadata implements Presenter {
               }
               view.setUploadDestinationText(description);
             } else if (
-              uploadDestinations.get(
-                0
-              ) instanceof ExternalObjectStoreUploadDestination
+              uploadDestinations.get(0) instanceof
+              ExternalObjectStoreUploadDestination
             ) {
               ExternalObjectStoreUploadDestination destination =
                 (ExternalObjectStoreUploadDestination) uploadDestinations.get(
@@ -287,14 +263,5 @@ public class EntityMetadata implements Presenter {
         }
       );
     }
-  }
-
-  public void setAnnotationsTitleText(String text) {
-    view.setAnnotationsTitleText(text);
-  }
-
-  @Override
-  public void toggleAnnotationsVisible() {
-    actionMenu.onAction(Action.SHOW_ANNOTATIONS, null);
   }
 }
