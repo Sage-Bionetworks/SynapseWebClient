@@ -19,13 +19,19 @@ public class SRC {
     public static ReactComponentType<DatasetEditorProps> DatasetItemsEditor;
     public static ReactComponentType<EntityFinderProps> EntityFinder;
     public static ReactComponentType<EvaluationCardProps> EvaluationCard;
-    public static ReactComponentType<EvaluationEditorPageProps> EvaluationEditorPage;
+    public static ReactComponentType<
+      EvaluationEditorPageProps
+    > EvaluationEditorPage;
     public static ReactComponentType<AccessTokenPageProps> AccessTokenPage;
     public static ReactComponentType<DownloadCartPageProps> DownloadCartPage;
-    public static ReactComponentType<DownloadConfirmationProps> DownloadConfirmation;
+    public static ReactComponentType<
+      DownloadConfirmationProps
+    > DownloadConfirmation;
     public static ReactComponentType<FullWidthAlertProps> FullWidthAlert;
     public static ReactComponentType<OrientationBannerProps> OrientationBanner;
-    public static ReactComponentType<SchemaDrivenAnnotationEditorProps> SchemaDrivenAnnotationEditor;
+    public static ReactComponentType<
+      SchemaDrivenAnnotationEditorProps
+    > SchemaDrivenAnnotationEditor;
     public static ReactComponentType<SynapseNavDrawerProps> SynapseNavDrawer;
     public static ReactComponentType<EmptyProps> FavoritesPage;
     public static ReactComponentType<EntityModalProps> EntityModal;
@@ -33,8 +39,12 @@ public class SRC {
     public static ReactComponentType<EntityTypeIconProps> EntityTypeIcon;
     public static ReactComponentType<UserProfileLinksProps> UserProfileLinks;
     public static ReactComponentType<SkeletonButtonProps> SkeletonButton;
-    public static ReactComponentType<QueryWrapperPlotNavProps> QueryWrapperPlotNav;
-    public static ReactComponentType<StandaloneQueryWrapperProps> StandaloneQueryWrapper;
+    public static ReactComponentType<
+      QueryWrapperPlotNavProps
+    > QueryWrapperPlotNav;
+    public static ReactComponentType<
+      StandaloneQueryWrapperProps
+    > StandaloneQueryWrapper;
     public static ReactComponentType<ForumSearchProps> ForumSearch;
     public static ReactComponentType ReviewerDashboard;
     public static ReactComponentType<ProvenanceGraphProps> ProvenanceGraph;
@@ -46,28 +56,63 @@ public class SRC {
     public static ReactComponentType<LoginPageProps> LoginPage;
     public static ReactComponentType<HasAccessProps> HasAccess;
     public static ReactComponentType<UserCardProps> UserCard;
-    public static ReactComponentType<AccountLevelBadgesProps> AccountLevelBadges;
+    public static ReactComponentType<
+      AccountLevelBadgesProps
+    > AccountLevelBadges;
     public static ReactComponentType<PageProgressProps> PageProgress;
-    public static ReactComponentType<TermsAndConditionsProps> TermsAndConditions;
+    public static ReactComponentType<
+      TermsAndConditionsProps
+    > TermsAndConditions;
     public static ReactComponentType<IDUReportProps> IDUReport;
     public static ReactComponentType CertificationQuiz;
-    public static ReactComponentType<EntityPageBreadcrumbsProps> EntityPageBreadcrumbs;
-    public static ReactComponentType<EntityPageTitleBarProps> EntityPageTitleBar;
-    public static ReactComponentType<EntityActionMenuPropsJsInterop> EntityActionMenu;
+    public static ReactComponentType<
+      EntityPageBreadcrumbsProps
+    > EntityPageBreadcrumbs;
+    public static ReactComponentType<
+      EntityPageTitleBarProps
+    > EntityPageTitleBar;
+    public static ReactComponentType<
+      EntityActionMenuPropsJsInterop
+    > EntityActionMenu;
     public static ReactComponentType<HtmlPreviewProps> HtmlPreview;
-    public static ReactComponentType<CreatedByModifiedByProps> CreatedByModifiedBy;
-    public static ReactComponentType<TwoFactorAuthSettingsPanelProps> TwoFactorAuthSettingsPanel;
-    public static ReactComponentType<TwoFactorBackupCodesProps> TwoFactorBackupCodes;
-    public static ReactComponentType<TwoFactorEnrollmentFormProps> TwoFactorEnrollmentForm;
+    public static ReactComponentType<
+      CreatedByModifiedByProps
+    > CreatedByModifiedBy;
+    public static ReactComponentType<
+      TwoFactorAuthSettingsPanelProps
+    > TwoFactorAuthSettingsPanel;
+    public static ReactComponentType<
+      TwoFactorBackupCodesProps
+    > TwoFactorBackupCodes;
+    public static ReactComponentType<
+      TwoFactorEnrollmentFormProps
+    > TwoFactorEnrollmentForm;
     public static ReactComponentType<EmptyProps> SubscriptionPage;
-    public static ReactComponentType<AccessRequirementListProps> AccessRequirementList;
-    public static ReactComponentType<TableColumnSchemaEditorProps> TableColumnSchemaEditor;
+    public static ReactComponentType<
+      AccessRequirementListProps
+    > AccessRequirementList;
+    public static ReactComponentType<
+      TableColumnSchemaEditorProps
+    > TableColumnSchemaEditor;
     public static ReactComponentType<EntityHeaderTableProps> EntityHeaderTable;
-    public static ReactComponentType<AvailableEvaluationQueueListProps> AvailableEvaluationQueueList;
-    public static ReactComponentType<AccessRequirementRelatedProjectsListProps> AccessRequirementRelatedProjectsList;
-    public static ReactComponentType<CreateTableViewWizardProps> CreateTableViewWizard;
-    public static ReactComponentType<SqlDefinedTableEditorModalProps> SqlDefinedTableEditorModal;
-    public static ReactComponentType<EntityViewScopeEditorModalProps> EntityViewScopeEditorModal;
+    public static ReactComponentType<
+      AvailableEvaluationQueueListProps
+    > AvailableEvaluationQueueList;
+    public static ReactComponentType<
+      AccessRequirementRelatedProjectsListProps
+    > AccessRequirementRelatedProjectsList;
+    public static ReactComponentType<
+      CreateTableViewWizardProps
+    > CreateTableViewWizard;
+    public static ReactComponentType<
+      SqlDefinedTableEditorModalProps
+    > SqlDefinedTableEditorModal;
+    public static ReactComponentType<
+      EntityViewScopeEditorModalProps
+    > EntityViewScopeEditorModal;
+    public static ReactComponentType<
+      SubmissionViewScopeEditorModalProps
+    > SubmissionViewScopeEditorModal;
 
     /**
      * Pushes a global toast message. In SWC, you should use {@link DisplayUtils#notify}, rather than calling this method directly.
@@ -87,7 +132,9 @@ public class SRC {
 
     /* We use FullContextProvider because it will provide the SynapseContext, react-query QueryContext, and MUI Theme
      context for all React trees that we render */
-    public static ReactComponentType<SynapseReactClientFullContextProviderProps> FullContextProvider;
+    public static ReactComponentType<
+      SynapseReactClientFullContextProviderProps
+    > FullContextProvider;
   }
 
   @JsType(isNative = true)

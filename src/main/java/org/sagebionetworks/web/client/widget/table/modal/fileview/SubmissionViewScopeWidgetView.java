@@ -22,10 +22,7 @@ public interface SubmissionViewScopeWidgetView extends IsWidget {
 
   void setEditButtonVisible(boolean visible);
 
-  void setLoading(boolean loading);
-
   public interface Presenter {
-    void onSave();
     void onEdit();
   }
 

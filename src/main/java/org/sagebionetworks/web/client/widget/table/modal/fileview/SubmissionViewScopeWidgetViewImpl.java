@@ -26,9 +26,6 @@ public class SubmissionViewScopeWidgetViewImpl
   SimplePanel editScopeAlertContainer;
 
   @UiField
-  Button saveButton;
-
-  @UiField
   Button editButton;
 
   @UiField
@@ -36,7 +33,6 @@ public class SubmissionViewScopeWidgetViewImpl
 
   Widget widget;
   Presenter presenter;
-  String originalButtonText;
 
   @Inject
   public SubmissionViewScopeWidgetViewImpl(Binder binder) {
@@ -44,10 +40,6 @@ public class SubmissionViewScopeWidgetViewImpl
     editButton.addClickHandler(event -> {
       presenter.onEdit();
     });
-    saveButton.addClickHandler(event -> {
-      presenter.onSave();
-    });
-    originalButtonText = saveButton.getText();
   }
 
   @Override
@@ -96,10 +88,5 @@ public class SubmissionViewScopeWidgetViewImpl
   @Override
   public void setEditButtonVisible(boolean visible) {
     editButton.setVisible(visible);
-  }
-
-  @Override
-  public void setLoading(boolean loading) {
-    DisplayUtils.showLoading(saveButton, loading, originalButtonText);
   }
 }

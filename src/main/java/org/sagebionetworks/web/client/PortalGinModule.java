@@ -538,8 +538,8 @@ import org.sagebionetworks.web.client.widget.evaluation.EvaluationListView;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationListViewImpl;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitterView;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitterViewImpl;
-import org.sagebionetworks.web.client.widget.evaluation.SubmissionViewScopeEditorView;
-import org.sagebionetworks.web.client.widget.evaluation.SubmissionViewScopeEditorViewImpl;
+import org.sagebionetworks.web.client.widget.evaluation.SubmissionViewScopeEditorModalWidgetView;
+import org.sagebionetworks.web.client.widget.evaluation.SubmissionViewScopeEditorModalWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.footer.FooterView;
 import org.sagebionetworks.web.client.widget.footer.FooterViewImpl;
@@ -783,8 +783,9 @@ public class PortalGinModule extends AbstractGinModule {
       .to(GlobalApplicationStateImpl.class)
       .in(Singleton.class);
 
-    bind(GlobalApplicationStateView.class)
-      .to(GlobalApplicationStateViewImpl.class);
+    bind(GlobalApplicationStateView.class).to(
+      GlobalApplicationStateViewImpl.class
+    );
     bind(LazyLoadCallbackQueue.class)
       .to(LazyLoadCallbackQueueImpl.class)
       .in(Singleton.class);
@@ -808,8 +809,9 @@ public class PortalGinModule extends AbstractGinModule {
     bind(DownPresenter.class).in(Singleton.class);
     bind(SignedTokenPresenter.class).in(Singleton.class);
     bind(PersonalAccessTokensPresenter.class).in(Singleton.class);
-    bind(AnnotationsRendererWidgetView.class)
-      .to(AnnotationsRendererWidgetViewImpl.class);
+    bind(AnnotationsRendererWidgetView.class).to(
+      AnnotationsRendererWidgetViewImpl.class
+    );
 
     bind(VersionHistoryWidgetView.class).to(VersionHistoryWidgetViewImpl.class);
     // GWT utility methods
@@ -949,8 +951,9 @@ public class PortalGinModule extends AbstractGinModule {
     // DoiWidget
     bind(DoiWidgetV2View.class).to(DoiWidgetV2ViewImpl.class);
 
-    bind(CreateOrUpdateDoiModalView.class)
-      .to(CreateOrUpdateDoiModalViewImpl.class);
+    bind(CreateOrUpdateDoiModalView.class).to(
+      CreateOrUpdateDoiModalViewImpl.class
+    );
 
     // LoginWidget
     bind(LoginWidgetView.class)
@@ -965,18 +968,23 @@ public class PortalGinModule extends AbstractGinModule {
     bind(CookieProvider.class).to(GWTCookieImpl.class);
 
     // ACL Editor
-    bind(AccessControlListEditorView.class)
-      .to(AccessControlListEditorViewImpl.class);
-    bind(AccessControlListModalWidget.class)
-      .to(AccessControlListModalWidgetImpl.class);
+    bind(AccessControlListEditorView.class).to(
+      AccessControlListEditorViewImpl.class
+    );
+    bind(AccessControlListModalWidget.class).to(
+      AccessControlListModalWidgetImpl.class
+    );
 
-    bind(AccessControlListModalWidgetView.class)
-      .to(AccessControlListModalWidgetViewImpl.class);
-    bind(EvaluationAccessControlListModalWidget.class)
-      .to(EvaluationAccessControlListModalWidgetImpl.class);
+    bind(AccessControlListModalWidgetView.class).to(
+      AccessControlListModalWidgetViewImpl.class
+    );
+    bind(EvaluationAccessControlListModalWidget.class).to(
+      EvaluationAccessControlListModalWidgetImpl.class
+    );
     // Sharing Permissions Grid
-    bind(SharingPermissionsGridView.class)
-      .to(SharingPermissionsGridViewImpl.class);
+    bind(SharingPermissionsGridView.class).to(
+      SharingPermissionsGridViewImpl.class
+    );
 
     // basic pagination
     bind(BasicPaginationView.class).to(BasicPaginationViewImpl.class);
@@ -992,16 +1000,18 @@ public class PortalGinModule extends AbstractGinModule {
     bind(EntityActionMenuView.class).to(EntityActionMenuViewImpl.class);
 
     bind(EntityActionController.class).to(EntityActionControllerImpl.class);
-    bind(EntityActionControllerView.class)
-      .to(EntityActionControllerViewImpl.class);
+    bind(EntityActionControllerView.class).to(
+      EntityActionControllerViewImpl.class
+    );
 
     bind(PreflightController.class).to(PreflightControllerImpl.class);
     bind(CertifiedUserController.class).to(CertifiedUserControllerImpl.class);
     bind(BigPromptModalView.class).to(BigPromptModalViewImpl.class);
     bind(PromptForValuesModalView.class).to(PromptForValuesModalViewImpl.class);
 
-    bind(PromptForValuesModalView.Configuration.Builder.class)
-      .to(PromptForValuesModalConfigurationImpl.Builder.class);
+    bind(PromptForValuesModalView.Configuration.Builder.class).to(
+      PromptForValuesModalConfigurationImpl.Builder.class
+    );
     bind(RenameEntityModalWidget.class).to(RenameEntityModalWidgetImpl.class);
     // Rejected Reason
     bind(RejectReasonView.class).to(RejectReasonViewImpl.class);
@@ -1012,8 +1022,9 @@ public class PortalGinModule extends AbstractGinModule {
     // Search Box
     bind(SearchBoxView.class).to(SearchBoxViewImpl.class).in(Singleton.class);
     // Reject Data Access Request Dialog
-    bind(RejectDataAccessRequestModalView.class)
-      .to(RejectDataAccessRequestModalViewImpl.class);
+    bind(RejectDataAccessRequestModalView.class).to(
+      RejectDataAccessRequestModalViewImpl.class
+    );
 
     // User Suggest Box
     bind(SynapseSuggestBoxView.class).to(SynapseSuggestBoxViewImpl.class);
@@ -1044,8 +1055,9 @@ public class PortalGinModule extends AbstractGinModule {
     bind(EvaluationListView.class).to(EvaluationListViewImpl.class);
 
     // Administer Evaluations list
-    bind(AdministerEvaluationsListView.class)
-      .to(AdministerEvaluationsListViewImpl.class);
+    bind(AdministerEvaluationsListView.class).to(
+      AdministerEvaluationsListViewImpl.class
+    );
 
     // EntitySearchBox
     bind(EntitySearchBoxView.class).to(EntitySearchBoxViewImpl.class);
@@ -1055,29 +1067,34 @@ public class PortalGinModule extends AbstractGinModule {
 
     bind(UserProfileEditorWidget.class).to(UserProfileEditorWidgetImpl.class);
 
-    bind(UserProfileEditorWidgetView.class)
-      .to(UserProfileEditorWidgetViewImpl.class);
+    bind(UserProfileEditorWidgetView.class).to(
+      UserProfileEditorWidgetViewImpl.class
+    );
 
     bind(ProfileImageView.class).to(ProfileImageViewImpl.class);
     bind(ProfileImageWidget.class).to(ProfileImageWidgetImpl.class);
     // API Table Column manager
-    bind(APITableColumnManagerView.class)
-      .to(APITableColumnManagerViewImpl.class);
+    bind(APITableColumnManagerView.class).to(
+      APITableColumnManagerViewImpl.class
+    );
     bind(APITableColumnConfigView.class).to(APITableColumnConfigViewImpl.class);
 
     // single subpages view
     bind(WikiSubpagesView.class).to(WikiSubpagesViewImpl.class);
     // SubPages Order Editor
-    bind(WikiSubpagesOrderEditorView.class)
-      .to(WikiSubpagesOrderEditorViewImpl.class);
+    bind(WikiSubpagesOrderEditorView.class).to(
+      WikiSubpagesOrderEditorViewImpl.class
+    );
 
     // SubPages Order Editor Tree
-    bind(WikiSubpageOrderEditorTreeView.class)
-      .to(WikiSubpageOrderEditorTreeViewImpl.class);
+    bind(WikiSubpageOrderEditorTreeView.class).to(
+      WikiSubpageOrderEditorTreeViewImpl.class
+    );
 
     // SubPages Navigation Tree
-    bind(WikiSubpageNavigationTreeView.class)
-      .to(WikiSubpageNavigationTreeViewImpl.class);
+    bind(WikiSubpageNavigationTreeView.class).to(
+      WikiSubpageNavigationTreeViewImpl.class
+    );
 
     // Widget Registration
     bind(WidgetRegistrar.class)
@@ -1085,8 +1102,9 @@ public class PortalGinModule extends AbstractGinModule {
       .in(Singleton.class);
 
     // UI Widget Descriptor editor
-    bind(BaseEditWidgetDescriptorView.class)
-      .to(BaseEditWidgetDescriptorViewImpl.class);
+    bind(BaseEditWidgetDescriptorView.class).to(
+      BaseEditWidgetDescriptorViewImpl.class
+    );
 
     bind(ReferenceConfigView.class).to(ReferenceConfigViewImpl.class);
 
@@ -1105,8 +1123,9 @@ public class PortalGinModule extends AbstractGinModule {
     bind(EntityListConfigView.class).to(EntityListConfigViewImpl.class);
     bind(ShinySiteConfigView.class).to(ShinySiteConfigViewImpl.class);
     bind(ButtonLinkConfigView.class).to(ButtonLinkConfigViewImpl.class);
-    bind(EvaluationSubmissionConfigView.class)
-      .to(EvaluationSubmissionConfigViewImpl.class);
+    bind(EvaluationSubmissionConfigView.class).to(
+      EvaluationSubmissionConfigViewImpl.class
+    );
     bind(VideoConfigView.class).to(VideoConfigViewImpl.class);
     bind(TableQueryResultWikiView.class).to(TableQueryResultWikiViewImpl.class);
     bind(TeamSelectEditorView.class).to(TeamSelectEditorViewImpl.class);
@@ -1117,13 +1136,16 @@ public class PortalGinModule extends AbstractGinModule {
     bind(EntityListWidgetView.class).to(EntityListWidgetViewImpl.class);
     bind(IFrameView.class).to(IFrameViewImpl.class);
     bind(ImageWidgetView.class).to(ImageWidgetViewImpl.class);
-    bind(AttachmentPreviewWidgetView.class)
-      .to(AttachmentPreviewWidgetViewImpl.class);
+    bind(AttachmentPreviewWidgetView.class).to(
+      AttachmentPreviewWidgetViewImpl.class
+    );
     bind(APITableWidgetView.class).to(APITableWidgetViewImpl.class);
-    bind(TableOfContentsWidgetView.class)
-      .to(TableOfContentsWidgetViewImpl.class);
-    bind(WikiFilesPreviewWidgetView.class)
-      .to(WikiFilesPreviewWidgetViewImpl.class);
+    bind(TableOfContentsWidgetView.class).to(
+      TableOfContentsWidgetViewImpl.class
+    );
+    bind(WikiFilesPreviewWidgetView.class).to(
+      WikiFilesPreviewWidgetViewImpl.class
+    );
     bind(ButtonLinkWidgetView.class).to(ButtonLinkWidgetViewImpl.class);
     bind(EmptyWidgetView.class).to(EmptyWidgetViewImpl.class);
     bind(VideoWidgetView.class).to(VideoWidgetViewImpl.class);
@@ -1132,10 +1154,9 @@ public class PortalGinModule extends AbstractGinModule {
     // ProvenanceWidget
     bind(
       org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView.class
-    )
-      .to(
-        org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetViewImpl.class
-      );
+    ).to(
+      org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetViewImpl.class
+    );
     bind(ProvenanceWidgetView.class).to(ProvenanceWidgetViewImpl.class);
 
     // MarkdownWidget
@@ -1176,14 +1197,18 @@ public class PortalGinModule extends AbstractGinModule {
     bind(TableListWidgetView.class).to(TableListWidgetViewImpl.class);
 
     bind(ColumnModelsView.class).to(ColumnModelsViewImpl.class);
-    bind(ColumnModelTableRowEditorView.class)
-      .to(ColumnModelTableRowEditorViewImpl.class);
-    bind(ColumnModelTableRowEditorWidget.class)
-      .to(ColumnModelTableRowEditorWidgetImpl.class);
-    bind(ColumnModelTableRowViewer.class)
-      .to(ColumnModelTableRowViewerImpl.class);
-    bind(ColumnModelsEditorWidgetView.class)
-      .to(ColumnModelsEditorWidgetViewImpl.class);
+    bind(ColumnModelTableRowEditorView.class).to(
+      ColumnModelTableRowEditorViewImpl.class
+    );
+    bind(ColumnModelTableRowEditorWidget.class).to(
+      ColumnModelTableRowEditorWidgetImpl.class
+    );
+    bind(ColumnModelTableRowViewer.class).to(
+      ColumnModelTableRowViewerImpl.class
+    );
+    bind(ColumnModelsEditorWidgetView.class).to(
+      ColumnModelsEditorWidgetViewImpl.class
+    );
     bind(TableEntityWidgetView.class).to(TableEntityWidgetViewImpl.class);
     bind(RowView.class).to(RowViewImpl.class);
     bind(TablePageView.class).to(TablePageViewImpl.class);
@@ -1203,29 +1228,34 @@ public class PortalGinModule extends AbstractGinModule {
     bind(UploadCSVAppendPageView.class).to(UploadCSVAppendPageViewImpl.class);
     bind(SortableTableHeader.class).to(SortableTableHeaderImpl.class);
     bind(StaticTableHeader.class).to(StaticTableHeaderImpl.class);
-    bind(TotalVisibleResultsWidgetView.class)
-      .to(TotalVisibleResultsWidgetViewImpl.class);
+    bind(TotalVisibleResultsWidgetView.class).to(
+      TotalVisibleResultsWidgetViewImpl.class
+    );
     bind(CreateDownloadPage.class).to(CreateDownloadPageImpl.class);
     bind(CreateDownloadPageView.class).to(CreateDownloadPageViewImpl.class);
 
     bind(DownloadFilePage.class).to(DownloadFilePageImpl.class);
     bind(DownloadFilePageView.class).to(DownloadFilePageViewImpl.class);
 
-    bind(DownloadTableQueryModalWidget.class)
-      .to(DownloadTableQueryModalWidgetImpl.class);
+    bind(DownloadTableQueryModalWidget.class).to(
+      DownloadTableQueryModalWidgetImpl.class
+    );
     /*
      * TableEntity cell bindings.
      */
     bind(LinkCellRendererView.class).to(LinkCellRendererViewImpl.class);
     bind(StringRendererCellView.class).to(StringRendererCellViewImpl.class);
 
-    bind(StringListRendererCellView.class)
-      .to(StringListRendererCellViewImpl.class);
+    bind(StringListRendererCellView.class).to(
+      StringListRendererCellViewImpl.class
+    );
     bind(DateListRendererCellView.class).to(DateListRendererCellViewImpl.class);
-    bind(UserIdListRendererCellView.class)
-      .to(UserIdListRendererCellViewImpl.class);
-    bind(EntityIdListRendererCellView.class)
-      .to(EntityIdListRendererCellViewImpl.class);
+    bind(UserIdListRendererCellView.class).to(
+      UserIdListRendererCellViewImpl.class
+    );
+    bind(EntityIdListRendererCellView.class).to(
+      EntityIdListRendererCellViewImpl.class
+    );
     bind(CellEditorView.class).to(CellEditorViewImpl.class);
     bind(NumberCellEditorView.class).to(NumberCellEditorViewImpl.class);
     bind(ListCellEditorView.class).to(ListCellEditorViewImpl.class);
@@ -1234,8 +1264,9 @@ public class PortalGinModule extends AbstractGinModule {
     bind(FileCellEditorView.class).to(FileCellEditorViewImpl.class);
     bind(FileCellRendererView.class).to(FileCellRendererViewImpl.class);
     bind(EntityIdCellRendererView.class).to(EntityIdCellRendererViewImpl.class);
-    bind(LargeStringCellEditorView.class)
-      .to(LargeStringCellEditorViewImpl.class);
+    bind(LargeStringCellEditorView.class).to(
+      LargeStringCellEditorViewImpl.class
+    );
     bind(JSONListCellEditorView.class).to(JSONListCellEditorViewImpl.class);
     bind(EditJSONListModalView.class)
       .to(EditJSONListModalViewImpl.class)
@@ -1264,18 +1295,22 @@ public class PortalGinModule extends AbstractGinModule {
 
     bind(TeamLeaveModalWidgetView.class).to(TeamLeaveModalWidgetViewImpl.class);
 
-    bind(TeamDeleteModalWidgetView.class)
-      .to(TeamDeleteModalWidgetViewImpl.class);
+    bind(TeamDeleteModalWidgetView.class).to(
+      TeamDeleteModalWidgetViewImpl.class
+    );
     // Open Team Invitations widget
-    bind(OpenTeamInvitationsWidgetView.class)
-      .to(OpenTeamInvitationsWidgetViewImpl.class);
+    bind(OpenTeamInvitationsWidgetView.class).to(
+      OpenTeamInvitationsWidgetViewImpl.class
+    );
     // Pending Team Join Requests widget
-    bind(OpenMembershipRequestsWidgetView.class)
-      .to(OpenMembershipRequestsWidgetViewImpl.class);
+    bind(OpenMembershipRequestsWidgetView.class).to(
+      OpenMembershipRequestsWidgetViewImpl.class
+    );
 
     // Current User Invites widget
-    bind(OpenUserInvitationsWidgetView.class)
-      .to(OpenUserInvitationsWidgetViewImpl.class);
+    bind(OpenUserInvitationsWidgetView.class).to(
+      OpenUserInvitationsWidgetViewImpl.class
+    );
 
     // Team List widget (link to search teams page, optionally can create team)
     bind(TeamListWidgetView.class).to(TeamListWidgetViewImpl.class);
@@ -1293,35 +1328,40 @@ public class PortalGinModule extends AbstractGinModule {
     bind(JoinTeamConfigEditorView.class).to(JoinTeamConfigEditorViewImpl.class);
 
     // Submit to evaluation widget
-    bind(SubmitToEvaluationWidgetView.class)
-      .to(SubmitToEvaluationWidgetViewImpl.class);
+    bind(SubmitToEvaluationWidgetView.class).to(
+      SubmitToEvaluationWidgetViewImpl.class
+    );
 
     // Team renderer
     bind(TeamBadgeView.class).to(TeamBadgeViewImpl.class);
 
     bind(BigTeamBadgeView.class).to(BigTeamBadgeViewImpl.class);
     bind(UserTeamConfigView.class).to(UserTeamConfigViewImpl.class);
-    bind(SharingAndDataUseConditionWidgetView.class)
-      .to(SharingAndDataUseConditionWidgetViewImpl.class);
+    bind(SharingAndDataUseConditionWidgetView.class).to(
+      SharingAndDataUseConditionWidgetViewImpl.class
+    );
 
     bind(WizardProgressWidgetView.class).to(WizardProgressWidgetViewImpl.class);
 
     bind(UploadDialogWidgetView.class).to(UploadDialogWidgetViewImpl.class);
 
-    bind(AddFolderDialogWidgetView.class)
-      .to(AddFolderDialogWidgetViewImpl.class);
+    bind(AddFolderDialogWidgetView.class).to(
+      AddFolderDialogWidgetViewImpl.class
+    );
     bind(LoginModalView.class).to(LoginModalViewImpl.class);
     bind(ImageParamsPanelView.class).to(ImageParamsPanelViewImpl.class);
 
     bind(RegisterTeamDialogView.class).to(RegisterTeamDialogViewImpl.class);
 
-    bind(EditRegisteredTeamDialogView.class)
-      .to(EditRegisteredTeamDialogViewImpl.class);
+    bind(EditRegisteredTeamDialogView.class).to(
+      EditRegisteredTeamDialogViewImpl.class
+    );
     bind(ChallengeTeamsView.class).to(ChallengeTeamsViewImpl.class);
     bind(ChallengeBadgeView.class).to(ChallengeBadgeViewImpl.class);
     bind(ProjectBadgeView.class).to(ProjectBadgeViewImpl.class);
-    bind(TableQueryResultWikiWidgetView.class)
-      .to(TableQueryResultWikiWidgetViewImpl.class);
+    bind(TableQueryResultWikiWidgetView.class).to(
+      TableQueryResultWikiWidgetViewImpl.class
+    );
     bind(SingleButtonView.class).to(SingleButtonViewImpl.class);
     bind(AnnotationTransformer.class)
       .to(AnnotationTransformerImpl.class)
@@ -1329,10 +1369,12 @@ public class PortalGinModule extends AbstractGinModule {
 
     bind(AnnotationEditorView.class).to(AnnotationEditorViewImpl.class);
 
-    bind(EditAnnotationsDialogView.class)
-      .to(EditAnnotationsDialogViewImpl.class);
-    bind(CommaSeparatedValuesParserView.class)
-      .to(CommaSeparatedValuesParserViewImpl.class);
+    bind(EditAnnotationsDialogView.class).to(
+      EditAnnotationsDialogViewImpl.class
+    );
+    bind(CommaSeparatedValuesParserView.class).to(
+      CommaSeparatedValuesParserViewImpl.class
+    );
     bind(PapaCSVParser.class).in(Singleton.class);
     bind(AnnotationCellFactory.class)
       .to(AnnotationCellFactoryImpl.class)
@@ -1342,38 +1384,47 @@ public class PortalGinModule extends AbstractGinModule {
       .in(Singleton.class);
 
     bind(VersionHistoryRowView.class).to(VersionHistoryRowViewImpl.class);
-    bind(SynapseStandaloneWikiView.class)
-      .to(SynapseStandaloneWikiViewImpl.class);
+    bind(SynapseStandaloneWikiView.class).to(
+      SynapseStandaloneWikiViewImpl.class
+    );
 
     bind(SynapseAlertView.class).to(SynapseAlertViewImpl.class);
     bind(SynapseAlert.class).to(SynapseAlertImpl.class);
 
-    bind(ProvenanceEditorWidgetView.class)
-      .to(ProvenanceEditorWidgetViewImpl.class);
+    bind(ProvenanceEditorWidgetView.class).to(
+      ProvenanceEditorWidgetViewImpl.class
+    );
     bind(ProvenanceListWidgetView.class).to(ProvenanceListWidgetViewImpl.class);
 
-    bind(ProvenanceURLDialogWidgetView.class)
-      .to(ProvenanceURLDialogWidgetViewImpl.class);
+    bind(ProvenanceURLDialogWidgetView.class).to(
+      ProvenanceURLDialogWidgetViewImpl.class
+    );
     bind(EntityRefProvEntryView.class).to(EntityRefProvEntryViewImpl.class);
     bind(URLProvEntryView.class).to(URLProvEntryViewImpl.class);
-    bind(StorageLocationWidgetView.class)
-      .to(StorageLocationWidgetViewImpl.class);
+    bind(StorageLocationWidgetView.class).to(
+      StorageLocationWidgetViewImpl.class
+    );
     bind(ErrorView.class).to(ErrorViewImpl.class);
     bind(PreviewConfigView.class).to(PreviewConfigViewImpl.class);
     bind(SynapseFormConfigView.class).to(SynapseFormConfigViewImpl.class);
     bind(DownloadCartPageView.class).to(DownloadCartPageViewImpl.class);
-    bind(EditFileMetadataModalView.class)
-      .to(EditFileMetadataModalViewImpl.class);
-    bind(EditFileMetadataModalWidget.class)
-      .to(EditFileMetadataModalWidgetImpl.class);
+    bind(EditFileMetadataModalView.class).to(
+      EditFileMetadataModalViewImpl.class
+    );
+    bind(EditFileMetadataModalWidget.class).to(
+      EditFileMetadataModalWidgetImpl.class
+    );
 
-    bind(EditProjectMetadataModalView.class)
-      .to(EditProjectMetadataModalViewImpl.class);
-    bind(EditProjectMetadataModalWidget.class)
-      .to(EditProjectMetadataModalWidgetImpl.class);
+    bind(EditProjectMetadataModalView.class).to(
+      EditProjectMetadataModalViewImpl.class
+    );
+    bind(EditProjectMetadataModalWidget.class).to(
+      EditProjectMetadataModalWidgetImpl.class
+    );
     bind(BiodallianceWidgetView.class).to(BiodallianceWidgetViewImpl.class);
-    bind(BiodallianceSourceEditorView.class)
-      .to(BiodallianceSourceEditorViewImpl.class);
+    bind(BiodallianceSourceEditorView.class).to(
+      BiodallianceSourceEditorViewImpl.class
+    );
     bind(BiodallianceEditorView.class).to(BiodallianceEditorViewImpl.class);
     bind(TabView.class).to(TabViewImpl.class);
     bind(TabsView.class).to(TabsViewImpl.class);
@@ -1384,23 +1435,28 @@ public class PortalGinModule extends AbstractGinModule {
     bind(ChallengeTabView.class).to(ChallengeTabViewImpl.class);
     bind(DiscussionTabView.class).to(DiscussionTabViewImpl.class);
     bind(DockerTabView.class).to(DockerTabViewImpl.class);
-    bind(ModifiedCreatedByWidgetView.class)
-      .to(ModifiedCreatedByWidgetViewImpl.class);
+    bind(ModifiedCreatedByWidgetView.class).to(
+      ModifiedCreatedByWidgetViewImpl.class
+    );
     bind(FileHandleListView.class).to(FileHandleListViewImpl.class);
     bind(ACTView.class).to(ACTViewImpl.class);
     bind(CytoscapeConfigView.class).to(CytoscapeConfigViewImpl.class);
     bind(CytoscapeView.class).to(CytoscapeViewImpl.class);
     // discussion
-    bind(DiscussionThreadModalView.class)
-      .to(DiscussionThreadModalViewImpl.class);
+    bind(DiscussionThreadModalView.class).to(
+      DiscussionThreadModalViewImpl.class
+    );
     bind(ReplyModalView.class).to(ReplyModalViewImpl.class);
 
-    bind(DiscussionThreadListWidgetView.class)
-      .to(DiscussionThreadListWidgetViewImpl.class);
-    bind(DiscussionThreadListItemWidgetView.class)
-      .to(DiscussionThreadListItemWidgetViewImpl.class);
-    bind(SingleDiscussionThreadWidgetView.class)
-      .to(SingleDiscussionThreadWidgetViewImpl.class);
+    bind(DiscussionThreadListWidgetView.class).to(
+      DiscussionThreadListWidgetViewImpl.class
+    );
+    bind(DiscussionThreadListItemWidgetView.class).to(
+      DiscussionThreadListItemWidgetViewImpl.class
+    );
+    bind(SingleDiscussionThreadWidgetView.class).to(
+      SingleDiscussionThreadWidgetViewImpl.class
+    );
     bind(ReplyWidgetView.class).to(ReplyWidgetViewImpl.class);
     bind(ForumWidgetView.class).to(ForumWidgetViewImpl.class);
     bind(NewReplyWidgetView.class).to(NewReplyWidgetViewImpl.class);
@@ -1409,17 +1465,20 @@ public class PortalGinModule extends AbstractGinModule {
     bind(DockerRepoWidgetView.class).to(DockerRepoWidgetViewImpl.class);
 
     bind(AddExternalRepoModalView.class).to(AddExternalRepoModalViewImpl.class);
-    bind(DockerCommitRowWidgetView.class)
-      .to(DockerCommitRowWidgetViewImpl.class);
-    bind(DockerCommitListWidgetView.class)
-      .to(DockerCommitListWidgetViewImpl.class);
+    bind(DockerCommitRowWidgetView.class).to(
+      DockerCommitRowWidgetViewImpl.class
+    );
+    bind(DockerCommitListWidgetView.class).to(
+      DockerCommitListWidgetViewImpl.class
+    );
     bind(SessionStorage.class).to(SessionStorageImpl.class);
     bind(SynapseForumView.class).to(SynapseForumViewImpl.class);
 
     bind(WikiMarkdownEditorView.class).to(WikiMarkdownEditorViewImpl.class);
     bind(StuAlertView.class).to(StuAlertViewImpl.class);
-    bind(SynapseTableFormWidgetView.class)
-      .to(SynapseTableFormWidgetViewImpl.class);
+    bind(SynapseTableFormWidgetView.class).to(
+      SynapseTableFormWidgetViewImpl.class
+    );
     bind(RowFormView.class).to(RowFormViewImpl.class);
 
     bind(RadioCellEditorView.class).to(RadioCellEditorViewImpl.class);
@@ -1427,40 +1486,52 @@ public class PortalGinModule extends AbstractGinModule {
     bind(SubscriptionView.class).to(SubscriptionViewImpl.class);
 
     bind(TopicWidgetView.class).to(TopicWidgetViewImpl.class);
-    bind(SubscribeButtonWidgetView.class)
-      .to(SubscribeButtonWidgetViewImpl.class);
+    bind(SubscribeButtonWidgetView.class).to(
+      SubscribeButtonWidgetViewImpl.class
+    );
 
     bind(RefreshAlertView.class).to(RefreshAlertViewImpl.class);
     bind(UserSelectorView.class).to(UserSelectorViewImpl.class);
 
-    bind(EntityContainerListWidgetView.class)
-      .to(EntityContainerListWidgetViewImpl.class);
-    bind(EntityViewScopeWidgetView.class)
-      .to(EntityViewScopeWidgetViewImpl.class);
+    bind(EntityContainerListWidgetView.class).to(
+      EntityContainerListWidgetViewImpl.class
+    );
+    bind(EntityViewScopeWidgetView.class).to(
+      EntityViewScopeWidgetViewImpl.class
+    );
     bind(CopyTextModal.class).to(CopyTextModalImpl.class);
-    bind(EvaluationEditorModalView.class)
-      .to(EvaluationEditorModalViewImpl.class);
-    bind(LoadMoreWidgetContainerView.class)
-      .to(LoadMoreWidgetContainerViewImpl.class);
+    bind(EvaluationEditorModalView.class).to(
+      EvaluationEditorModalViewImpl.class
+    );
+    bind(LoadMoreWidgetContainerView.class).to(
+      LoadMoreWidgetContainerViewImpl.class
+    );
 
     bind(RadioWidget.class).to(RadioWidgetViewImpl.class);
     bind(FileClientsHelpView.class).to(FileClientsHelpViewImpl.class);
     bind(ContainerClientsHelp.class).to(ContainerClientsHelpImpl.class);
 
     bind(FileDownloadMenuItemView.class).to(FileDownloadMenuItemViewImpl.class);
-    bind(SqlDefinedEditorModalWidgetView.class)
-      .to(SqlDefinedEditorModalWidgetViewImpl.class);
-    bind(EntityViewScopeEditorModalWidgetView.class)
-      .to(EntityViewScopeEditorModalWidgetViewImpl.class);
+    bind(SqlDefinedEditorModalWidgetView.class).to(
+      SqlDefinedEditorModalWidgetViewImpl.class
+    );
+    bind(EntityViewScopeEditorModalWidgetView.class).to(
+      EntityViewScopeEditorModalWidgetViewImpl.class
+    );
+    bind(SubmissionViewScopeEditorModalWidgetView.class).to(
+      SubmissionViewScopeEditorModalWidgetViewImpl.class
+    );
     bind(EntityModalWidgetView.class).to(EntityModalWidgetViewImpl.class);
     bind(ChallengeWidgetView.class).to(ChallengeWidgetViewImpl.class);
     bind(SelectTeamModalView.class).to(SelectTeamModalViewImpl.class);
-    bind(ApproveUserAccessModalView.class)
-      .to(ApproveUserAccessModalViewImpl.class);
+    bind(ApproveUserAccessModalView.class).to(
+      ApproveUserAccessModalViewImpl.class
+    );
     bind(UserBadgeListView.class).to(UserBadgeListViewImpl.class);
     bind(EntityListRowBadgeView.class).to(EntityListRowBadgeViewImpl.class);
-    bind(LazyLoadWikiWidgetWrapperView.class)
-      .to(LazyLoadWikiWidgetWrapperViewImpl.class);
+    bind(LazyLoadWikiWidgetWrapperView.class).to(
+      LazyLoadWikiWidgetWrapperViewImpl.class
+    );
     bind(EntityHeaderAsyncHandler.class)
       .to(EntityHeaderAsyncHandlerImpl.class)
       .in(Singleton.class);
@@ -1502,49 +1573,62 @@ public class PortalGinModule extends AbstractGinModule {
     bind(SubscribersWidgetView.class).to(SubscribersWidgetViewImpl.class);
 
     bind(PlaceView.class).to(PlaceViewImpl.class);
-    bind(ManagedACTAccessRequirementWidgetView.class)
-      .to(ManagedACTAccessRequirementWidgetViewImpl.class);
-    bind(ACTAccessRequirementWidgetView.class)
-      .to(ACTAccessRequirementWidgetViewImpl.class);
-    bind(TermsOfUseAccessRequirementWidgetView.class)
-      .to(TermsOfUseAccessRequirementWidgetViewImpl.class);
+    bind(ManagedACTAccessRequirementWidgetView.class).to(
+      ManagedACTAccessRequirementWidgetViewImpl.class
+    );
+    bind(ACTAccessRequirementWidgetView.class).to(
+      ACTAccessRequirementWidgetViewImpl.class
+    );
+    bind(TermsOfUseAccessRequirementWidgetView.class).to(
+      TermsOfUseAccessRequirementWidgetViewImpl.class
+    );
     bind(FileHandleWidgetView.class).to(FileHandleWidgetViewImpl.class);
-    bind(CreateAccessRequirementStep1View.class)
-      .to(CreateAccessRequirementStep1ViewImpl.class);
-    bind(CreateManagedACTAccessRequirementStep2View.class)
-      .to(CreateManagedACTAccessRequirementStep2ViewImpl.class);
-    bind(CreateBasicAccessRequirementStep2View.class)
-      .to(CreateBasicAccessRequirementStep2ViewImpl.class);
-    bind(CreateManagedACTAccessRequirementStep3View.class)
-      .to(CreateManagedACTAccessRequirementStep3ViewImpl.class);
+    bind(CreateAccessRequirementStep1View.class).to(
+      CreateAccessRequirementStep1ViewImpl.class
+    );
+    bind(CreateManagedACTAccessRequirementStep2View.class).to(
+      CreateManagedACTAccessRequirementStep2ViewImpl.class
+    );
+    bind(CreateBasicAccessRequirementStep2View.class).to(
+      CreateBasicAccessRequirementStep2ViewImpl.class
+    );
+    bind(CreateManagedACTAccessRequirementStep3View.class).to(
+      CreateManagedACTAccessRequirementStep3ViewImpl.class
+    );
     bind(Button.class).to(ButtonImpl.class);
     bind(IsACTMemberAsyncHandler.class)
       .to(IsACTMemberAsyncHandlerImpl.class)
       .in(Singleton.class);
     bind(PopupUtilsView.class).to(PopupUtilsViewImpl.class).in(Singleton.class);
 
-    bind(ProfileCertifiedValidatedView.class)
-      .to(ProfileCertifiedValidatedViewImpl.class);
+    bind(ProfileCertifiedValidatedView.class).to(
+      ProfileCertifiedValidatedViewImpl.class
+    );
 
-    bind(ACTDataAccessSubmissionsView.class)
-      .to(ACTDataAccessSubmissionsViewImpl.class);
+    bind(ACTDataAccessSubmissionsView.class).to(
+      ACTDataAccessSubmissionsViewImpl.class
+    );
     bind(RestrictionWidgetView.class).to(RestrictionWidgetViewImpl.class);
-    bind(ACTDataAccessSubmissionWidgetView.class)
-      .to(ACTDataAccessSubmissionWidgetViewImpl.class);
+    bind(ACTDataAccessSubmissionWidgetView.class).to(
+      ACTDataAccessSubmissionWidgetViewImpl.class
+    );
     bind(OpenSubmissionWidgetView.class).to(OpenSubmissionWidgetViewImpl.class);
-    bind(LockAccessRequirementWidgetView.class)
-      .to(LockAccessRequirementWidgetViewImpl.class);
+    bind(LockAccessRequirementWidgetView.class).to(
+      LockAccessRequirementWidgetViewImpl.class
+    );
     bind(ImageUploadView.class).to(ImageUploadViewImpl.class);
-    bind(RevokeUserAccessModalView.class)
-      .to(RevokeUserAccessModalViewImpl.class);
+    bind(RevokeUserAccessModalView.class).to(
+      RevokeUserAccessModalViewImpl.class
+    );
     bind(PlotlyWidgetView.class).to(PlotlyWidgetViewImpl.class);
     bind(PlotlyConfigView.class).to(PlotlyConfigViewImpl.class);
     bind(DateTimeUtils.class).to(DateTimeUtilsImpl.class).in(Singleton.class);
     bind(ACTAccessApprovalsView.class).to(ACTAccessApprovalsViewImpl.class);
 
     bind(AccessorGroupView.class).to(AccessorGroupViewImpl.class);
-    bind(SelfSignAccessRequirementWidgetView.class)
-      .to(SelfSignAccessRequirementWidgetViewImpl.class);
+    bind(SelfSignAccessRequirementWidgetView.class).to(
+      SelfSignAccessRequirementWidgetViewImpl.class
+    );
     bind(TeamSubjectWidgetView.class).to(TeamSubjectWidgetViewImpl.class);
     bind(EntitySubjectsWidgetView.class).to(EntitySubjectsWidgetViewImpl.class);
     bind(AwsLoginView.class).to(AwsLoginViewImpl.class);
@@ -1560,8 +1644,9 @@ public class PortalGinModule extends AbstractGinModule {
     bind(NbConvertPreviewView.class).to(NbConvertPreviewViewImpl.class);
     bind(S3DirectLoginDialog.class).to(S3DirectLoginDialogImpl.class);
 
-    bind(WikiPageDeleteConfirmationDialogView.class)
-      .to(WikiPageDeleteConfirmationDialogViewImpl.class);
+    bind(WikiPageDeleteConfirmationDialogView.class).to(
+      WikiPageDeleteConfirmationDialogViewImpl.class
+    );
     bind(WikiDiffView.class).to(WikiDiffViewImpl.class);
     bind(SynapseProperties.class)
       .to(SynapsePropertiesImpl.class)
@@ -1569,39 +1654,45 @@ public class PortalGinModule extends AbstractGinModule {
     bind(Moment.class).to(MomentImpl.class);
     bind(DownloadSpeedTester.class).to(DownloadSpeedTesterImpl.class);
     bind(PackageSizeSummaryView.class).to(PackageSizeSummaryViewImpl.class);
-    bind(EntityPresenterEventBinder.class)
-      .to(EntityPresenterEventBinderImpl.class);
+    bind(EntityPresenterEventBinder.class).to(
+      EntityPresenterEventBinderImpl.class
+    );
     bind(Linkify.class).to(LinkifyImpl.class);
-    bind(PasswordResetSignedTokenView.class)
-      .to(PasswordResetSignedTokenViewImpl.class);
-    bind(TeamProjectsModalWidgetView.class)
-      .to(TeamProjectsModalWidgetViewImpl.class);
-    bind(ContainerItemCountWidgetView.class)
-      .to(ContainerItemCountWidgetViewImpl.class);
+    bind(PasswordResetSignedTokenView.class).to(
+      PasswordResetSignedTokenViewImpl.class
+    );
+    bind(TeamProjectsModalWidgetView.class).to(
+      TeamProjectsModalWidgetViewImpl.class
+    );
+    bind(ContainerItemCountWidgetView.class).to(
+      ContainerItemCountWidgetViewImpl.class
+    );
     bind(StatisticsPlotWidgetView.class).to(StatisticsPlotWidgetViewImpl.class);
     bind(QuarantinedEmailModal.class).in(Singleton.class);
-    bind(SubmissionViewScopeEditorView.class)
-      .to(SubmissionViewScopeEditorViewImpl.class);
     bind(EvaluationFinderView.class).to(EvaluationFinderViewImpl.class);
-    bind(SubmissionViewScopeWidgetView.class)
-      .to(SubmissionViewScopeWidgetViewImpl.class);
+    bind(SubmissionViewScopeWidgetView.class).to(
+      SubmissionViewScopeWidgetViewImpl.class
+    );
     bind(PersonalAccessTokensView.class).to(PersonalAccessTokensViewImpl.class);
     bind(PageProgressWidgetView.class).to(PageProgressWidgetViewImpl.class);
     bind(EntityFinderWidget.class).to(EntityFinderWidgetImpl.class);
-    bind(EntityFinderWidget.Builder.class)
-      .to(EntityFinderWidgetImpl.Builder.class);
+    bind(EntityFinderWidget.Builder.class).to(
+      EntityFinderWidgetImpl.Builder.class
+    );
 
     bind(EntityFinderWidgetView.class).to(EntityFinderWidgetViewImpl.class);
-    bind(SynapseReactClientFullContextPropsProvider.class)
-      .to(SynapseReactClientFullContextPropsProviderImpl.class);
+    bind(SynapseReactClientFullContextPropsProvider.class).to(
+      SynapseReactClientFullContextPropsProviderImpl.class
+    );
 
     bind(AddToDownloadListV2.class).to(AddToDownloadListV2Impl.class);
     bind(OpenDataView.class).to(OpenDataViewImpl.class);
     bind(QueryClientProvider.class)
       .to(QueryClientProviderImpl.class)
       .in(Singleton.class);
-    bind(IntendedDataUseReportWidgetView.class)
-      .to(IntendedDataUseReportWidgetViewImpl.class);
+    bind(IntendedDataUseReportWidgetView.class).to(
+      IntendedDataUseReportWidgetViewImpl.class
+    );
     bind(DialogView.class).to(Dialog.class);
 
     bind(TwoFactorAuthView.class)
