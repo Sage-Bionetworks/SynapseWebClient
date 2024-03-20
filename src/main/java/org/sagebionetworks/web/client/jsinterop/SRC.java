@@ -178,7 +178,7 @@ public class SRC {
       int storageLocationId,
       String contentType,
       Progress progressCallback,
-      IsCancelled isCancelled
+      IsCancelled getIsCancelled
     );
   }
 }
