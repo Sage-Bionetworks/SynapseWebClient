@@ -90,7 +90,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
       fileName +
       "\n"
     );
-    Promise p = srcUploadFileWrapper.uploadFile(
+    Promise<FileUploadComplete> p = srcUploadFileWrapper.uploadFile(
       auth.getCurrentUserAccessToken(),
       fileName,
       blob,
@@ -107,9 +107,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
       }
     );
     p.then(fileUploadResolve -> {
-      FileUploadComplete fileUploadComplete =
-        (FileUploadComplete) fileUploadResolve;
-      handler.uploadSuccess(fileUploadComplete.fileHandleId);
+      handler.uploadSuccess(fileUploadResolve.fileHandleId);
     });
     p.catch_(error -> {
       handler.uploadFailed(error.toString());

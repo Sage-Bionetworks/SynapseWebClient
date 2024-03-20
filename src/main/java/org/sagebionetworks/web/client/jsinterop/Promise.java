@@ -7,23 +7,23 @@ import jsinterop.annotations.JsPackage;
 import jsinterop.annotations.JsType;
 
 @JsType(isNative = true, namespace = JsPackage.GLOBAL)
-public class Promise {
+public class Promise<T> {
 
   @JsFunction
-  public interface FunctionParam {
-    void exec(Object o);
+  public interface FunctionParam<T> {
+    void exec(T o);
   }
 
   @JsFunction
-  public interface ConstructorParam {
-    void exec(FunctionParam resolve, FunctionParam reject);
+  public interface ConstructorParam<T> {
+    void exec(FunctionParam<T> resolve, FunctionParam<T> reject);
   }
 
   @JsConstructor
   public Promise(ConstructorParam parameters) {}
 
-  public native Promise then(FunctionParam f);
+  public native Promise<T> then(FunctionParam<T> f);
 
   @JsMethod(name = "catch")
-  public native Promise catch_(FunctionParam f);
+  public native Promise<T> catch_(FunctionParam<Object> f);
 }

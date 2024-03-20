@@ -171,7 +171,7 @@ public class SRC {
       boolean isCancelled();
     }
 
-    public static native Promise uploadFile(
+    public static native Promise<FileUploadComplete> uploadFile(
       String accessToken,
       String filename,
       JavaScriptObject file, // blob

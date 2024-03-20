@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.client.widget.upload;
 
 import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.event.logical.shared.HasAttachHandlers;
 import org.sagebionetworks.web.client.jsinterop.Promise;
+import org.sagebionetworks.web.client.jsinterop.SRC.SynapseClient.FileUploadComplete;
 import org.sagebionetworks.web.client.jsinterop.SRC.SynapseClient.IsCancelled;
 import org.sagebionetworks.web.client.jsinterop.SRC.SynapseClient.Progress;
 
@@ -13,7 +13,7 @@ import org.sagebionetworks.web.client.jsinterop.SRC.SynapseClient.Progress;
  *
  */
 public interface SRCUploadFileWrapper {
-  public Promise uploadFile(
+  public Promise<FileUploadComplete> uploadFile(
     String accessToken,
     String filename,
     JavaScriptObject file, // blob
