@@ -10,7 +10,6 @@ import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Window.Location;
-import com.google.gwt.xhr.client.XMLHttpRequest;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.jsinterop.SRC;
@@ -21,8 +20,6 @@ import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray
 import org.sagebionetworks.web.shared.WebConstants;
 
 public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
-
-  private static ProgressCallback progressCallback;
 
   @Override
   public String getCurrentHistoryToken() {
@@ -211,8 +208,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
   @Override
   public void setPageDescription(String newDescription) {
     if (Document.get() != null) {
-      NodeList<com.google.gwt.dom.client.Element> tags = Document
-        .get()
+      NodeList<com.google.gwt.dom.client.Element> tags = Document.get()
         .getElementsByTagName("meta");
       for (int i = 0; i < tags.getLength(); i++) {
         MetaElement metaTag = ((MetaElement) tags.getItem(i));
@@ -222,20 +218,6 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
         }
       }
     }
-  }
-
-  @Override
-  public void uploadFileChunk(
-    String contentType,
-    JavaScriptObject blob,
-    Long startByte,
-    Long endByte,
-    String url,
-    XMLHttpRequest xhr,
-    ProgressCallback callback
-  ) {
-    SynapseJSNIUtilsImpl.progressCallback = callback;
-    _directUploadBlob(contentType, blob, startByte, endByte, url, xhr);
   }
 
   @Override
@@ -263,57 +245,6 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
     JavaScriptObject fileList
   ) /*-{
 		return fileList[index];
-	}-*/;
-
-  private static final native void _directUploadBlob(
-    String contentType,
-    JavaScriptObject fileToUpload,
-    Long startByte,
-    Long endByte,
-    String url,
-    XMLHttpRequest xhr
-  ) /*-{
-		var start = parseInt(startByte) || 0;
-		var end = parseInt(endByte) || fileToUpload.size - 1;
-		var fileSliceToUpload;
-		//in versions later than Firefox 13 and Chrome 21, Blob.slice() is not prefixed (and the vendor prefixed methods are deprecated)
-		if (fileToUpload.slice) {
-			fileSliceToUpload = fileToUpload.slice(start, end + 1, contentType);
-		} else if (fileToUpload.mozSlice) {
-			fileSliceToUpload = fileToUpload.mozSlice(start, end + 1, contentType);
-		} else if (fileToUpload.webkitSlice) {
-			fileSliceToUpload = fileToUpload.webkitSlice(start, end + 1, contentType);
-		} else {
-			throw new Error("Unable to slice file.");
-		}
-		xhr.upload.onprogress = $entry(@org.sagebionetworks.web.client.SynapseJSNIUtilsImpl::updateProgress(Lcom/google/gwt/core/client/JavaScriptObject;));
-		xhr.open('PUT', url, true);
-		//explicitly set content type
-		xhr.setRequestHeader('Content-type', contentType);
-		xhr.send(fileSliceToUpload);
-	}-*/;
-
-  public static void updateProgress(JavaScriptObject evt) {
-    if (SynapseJSNIUtilsImpl.progressCallback != null) {
-      SynapseJSNIUtilsImpl.progressCallback.updateProgress(
-        _getLoaded(evt),
-        _getTotal(evt)
-      );
-    }
-  }
-
-  private static final native double _getLoaded(JavaScriptObject evt) /*-{
-		if (evt.lengthComputable) {
-			return evt.loaded;
-		}
-		return 0;
-	}-*/;
-
-  private static final native double _getTotal(JavaScriptObject evt) /*-{
-		if (evt.lengthComputable) {
-			return evt.total;
-		}
-		return 0;
 	}-*/;
 
   @Override
@@ -414,42 +345,6 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 			$wnd.calculateFileMd5Worker.postMessage(file);
 	  } else {
 			md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback::setMD5(Ljava/lang/String;)(null);
-  	}
-	}-*/;
-
-  /**
-   * Using SparkMD5 (https://github.com/satazor/SparkMD5) to calculate the md5 of part of a file.
-   */
-  @Override
-  public void getFilePartMd5(
-    JavaScriptObject blob,
-    int currentChunk,
-    Long chunkSize,
-    MD5Callback md5Callback
-  ) {
-    _getFilePartMd5(blob, currentChunk, chunkSize.doubleValue(), md5Callback);
-  }
-
-  private static final native void _getFilePartMd5(
-    JavaScriptObject file,
-    int currentChunk,
-    double chunkSize,
-    MD5Callback md5Callback
-  ) /*-{
-		if ($wnd.Worker) {
-			if (!$wnd.calculateFilePartMd5Worker) {
-			  $wnd.calculateFilePartMd5Worker = new $wnd.Worker("workers/calculateFilePartMd5Worker.js");
-			};
-			$wnd.calculateFilePartMd5Worker.onmessage = function(event) {
-				md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback:: setMD5(Ljava/lang/String;) (event.data);
-			};
-			$wnd.calculateFilePartMd5Worker.postMessage({
-				file: file,
-				currentChunk: currentChunk,
-				chunkSize: chunkSize
-			});
-	  } else {
-			md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback:: setMD5(Ljava/lang/String;) (null);
   	}
 	}-*/;
 

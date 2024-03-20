@@ -10,7 +10,6 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.jsinterop.Promise;
-import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.jsinterop.SRC.SynapseClient.FileUploadComplete;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 
@@ -42,6 +41,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
   boolean isCanceled;
   DateTimeUtils dateTimeUtils;
   AuthenticationController auth;
+  SRCUploadFileWrapper srcUploadFileWrapper;
 
   @Inject
   public MultipartUploaderImpl(
@@ -49,7 +49,8 @@ public class MultipartUploaderImpl implements MultipartUploader {
     GWTWrapper gwt,
     SynapseJSNIUtils synapseJsniUtils,
     CookieProvider cookies,
-    DateTimeUtils dateTimeUtils
+    DateTimeUtils dateTimeUtils,
+    SRCUploadFileWrapper srcUploadFileWrapper
   ) {
     super();
     this.auth = auth;
@@ -58,6 +59,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
     this.percentFormat = gwt.getNumberFormat("##");
     this.cookies = cookies;
     this.dateTimeUtils = dateTimeUtils;
+    this.srcUploadFileWrapper = srcUploadFileWrapper;
   }
 
   @Override
@@ -88,7 +90,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
       fileName +
       "\n"
     );
-    Promise p = SRC.SynapseClient.uploadFile(
+    Promise p = srcUploadFileWrapper.uploadFile(
       auth.getCurrentUserAccessToken(),
       fileName,
       blob,

@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Element;
-import com.google.gwt.xhr.client.XMLHttpRequest;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
@@ -47,16 +46,6 @@ public interface SynapseJSNIUtils {
 
   public JavaScriptObject getFileBlob(int index, JavaScriptObject fileList);
 
-  public void uploadFileChunk(
-    String contentType,
-    JavaScriptObject blob,
-    Long startByte,
-    Long endByte,
-    String url,
-    XMLHttpRequest xhr,
-    ProgressCallback callback
-  );
-
   public String getContentType(JavaScriptObject fileList, int index);
 
   public boolean isFileAPISupported();
@@ -66,13 +55,6 @@ public interface SynapseJSNIUtils {
   public String getFileUrl(String fileFieldId);
 
   public void getFileMd5(JavaScriptObject blob, MD5Callback callback);
-
-  public void getFilePartMd5(
-    JavaScriptObject blob,
-    int currentChunk,
-    Long chunkSize,
-    MD5Callback md5Callback
-  );
 
   public double getFileSize(JavaScriptObject blob);
 

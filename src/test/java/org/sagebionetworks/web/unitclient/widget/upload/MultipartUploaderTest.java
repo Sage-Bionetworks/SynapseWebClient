@@ -4,9 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -16,7 +14,6 @@ import static org.sagebionetworks.web.client.ContentTypeUtils.fixDefaultContentT
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.logical.shared.HasAttachHandlers;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.xhr.client.XMLHttpRequest;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -32,10 +29,12 @@ import org.sagebionetworks.web.client.ProgressCallback;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.jsinterop.Promise;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl;
 import org.sagebionetworks.web.client.widget.upload.ProgressingFileUploadHandler;
+import org.sagebionetworks.web.client.widget.upload.SRCUploadFileWrapper;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -80,6 +79,12 @@ public class MultipartUploaderTest {
   @Mock
   JavaScriptObject mockFileBlob;
 
+  @Mock
+  SRCUploadFileWrapper mockSRCUploadFileWrapper;
+
+  @Mock
+  Promise mockPromise;
+
   public static final String UPLOAD_ID = "39282";
   public static final String RESULT_FILE_HANDLE_ID = "999999";
   public static final double FILE_SIZE = 9281;
@@ -96,6 +101,17 @@ public class MultipartUploaderTest {
       synapseJsniUtils.getContentType(any(JavaScriptObject.class), anyInt())
     ).thenReturn("image/png");
 
+    when(
+      mockSRCUploadFileWrapper.uploadFile(
+        anyString(),
+        anyString(),
+        any(),
+        anyInt(),
+        anyString(),
+        any(),
+        any()
+      )
+    ).thenReturn(mockPromise);
     when(synapseJsniUtils.getFileSize(any(JavaScriptObject.class))).thenReturn(
       FILE_SIZE
     );
@@ -121,7 +137,8 @@ public class MultipartUploaderTest {
       gwt,
       synapseJsniUtils,
       mockCookies,
-      mockDateTimeUtils
+      mockDateTimeUtils,
+      mockSRCUploadFileWrapper
     );
 
     when(mockView.isAttached()).thenReturn(true);
@@ -188,17 +205,7 @@ public class MultipartUploaderTest {
 
     // user cancels the upload
     uploader.cancelUpload();
-    verify(synapseJsniUtils).uploadFileChunk(
-      eq(MultipartUploaderImpl.BINARY_CONTENT_TYPE),
-      any(JavaScriptObject.class),
-      anyLong(),
-      anyLong(),
-      anyString(),
-      any(XMLHttpRequest.class),
-      progressCaptor.capture()
-    );
-    ProgressCallback progressCallback = progressCaptor.getValue();
-    progressCallback.updateProgress(0, 1);
+
     // never updated the handler because the upload has been canceled (can't verify the abort(), since
     // xhr is a js object).
     verifyZeroInteractions(mockHandler);
