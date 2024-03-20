@@ -99,6 +99,9 @@ public class MultipartUploaderImpl implements MultipartUploader {
         String progressText =
           percentFormat.format(currentProgress * 100.0) + "%";
         handler.updateProgress(currentProgress, progressText, "");
+      },
+      () -> {
+        return isCanceled || !view.isAttached();
       }
     );
     p.then(fileUploadResolve -> {

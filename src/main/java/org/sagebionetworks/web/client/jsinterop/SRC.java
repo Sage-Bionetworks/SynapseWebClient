@@ -165,13 +165,20 @@ public class SRC {
       void onProgress(ProgressCallback callback);
     }
 
+    @FunctionalInterface
+    @JsFunction
+    public interface IsCancelled {
+      boolean isCancelled();
+    }
+
     public static native Promise uploadFile(
       String accessToken,
       String filename,
       JavaScriptObject file, // blob
       int storageLocationId,
       String contentType,
-      Progress progressCallback
+      Progress progressCallback,
+      IsCancelled isCancelled
     );
   }
 }
