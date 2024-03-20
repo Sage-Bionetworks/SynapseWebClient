@@ -15,13 +15,13 @@ public class AccessRequirementAclEditorProps extends ReactComponentProps {
 
   String accessRequirementId;
   BooleanCallback onSaveComplete;
-  Object ref;
+  ReactRef<AccessRequirementAclEditorHandler> ref;
 
   @JsOverlay
   public static AccessRequirementAclEditorProps create(
     String accessRequirementId,
     BooleanCallback onSaveComplete,
-    Object ref
+    ReactRef<AccessRequirementAclEditorHandler> ref
   ) {
     AccessRequirementAclEditorProps props =
       new AccessRequirementAclEditorProps();
