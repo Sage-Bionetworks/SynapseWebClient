@@ -2,10 +2,8 @@ package org.sagebionetworks.web.unitclient.widget.upload;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
@@ -13,23 +11,22 @@ import static org.sagebionetworks.web.client.ContentTypeUtils.fixDefaultContentT
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.logical.shared.HasAttachHandlers;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.file.MultipartUploadRequest;
 import org.sagebionetworks.repo.model.util.ContentTypeUtils;
 import org.sagebionetworks.web.client.DateTimeUtils;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.ProgressCallback;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.jsinterop.Promise;
+import org.sagebionetworks.web.client.jsinterop.Promise.FunctionParam;
+import org.sagebionetworks.web.client.jsinterop.SRC.SynapseClient.FileUploadComplete;
+import org.sagebionetworks.web.client.jsinterop.SRC.SynapseClient.IsCancelled;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl;
@@ -37,7 +34,6 @@ import org.sagebionetworks.web.client.widget.upload.ProgressingFileUploadHandler
 import org.sagebionetworks.web.client.widget.upload.SRCUploadFileWrapper;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
-import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.test.helper.CallbackMockStubber;
 
 public class MultipartUploaderTest {
@@ -62,9 +58,6 @@ public class MultipartUploaderTest {
   Long storageLocationId = 9090L;
 
   @Mock
-  SynapseJavascriptClient mockJsClient;
-
-  @Mock
   CookieProvider mockCookies;
 
   @Mock
@@ -84,6 +77,15 @@ public class MultipartUploaderTest {
 
   @Mock
   Promise mockPromise;
+
+  @Captor
+  ArgumentCaptor<IsCancelled> isCancelledCaptor;
+
+  @Mock
+  FileUploadComplete mockFileUploadComplete;
+
+  @Captor
+  ArgumentCaptor<FunctionParam> promiseHandlerCaptor;
 
   public static final String UPLOAD_ID = "39282";
   public static final String RESULT_FILE_HANDLE_ID = "999999";
@@ -112,6 +114,7 @@ public class MultipartUploaderTest {
         any()
       )
     ).thenReturn(mockPromise);
+
     when(synapseJsniUtils.getFileSize(any(JavaScriptObject.class))).thenReturn(
       FILE_SIZE
     );
@@ -142,19 +145,7 @@ public class MultipartUploaderTest {
     );
 
     when(mockView.isAttached()).thenReturn(true);
-  }
-
-  @Test
-  public void testDirectUploadFolder() throws Exception {
-    uploader.uploadFile(
-      FILE_NAME,
-      CONTENT_TYPE,
-      mockFileBlob,
-      mockHandler,
-      storageLocationId,
-      mockView
-    );
-    verify(mockHandler).uploadFailed(DisplayConstants.MD5_CALCULATION_ERROR);
+    mockFileUploadComplete.fileHandleId = RESULT_FILE_HANDLE_ID;
   }
 
   @Test
@@ -170,11 +161,6 @@ public class MultipartUploaderTest {
       storageLocationId,
       mockView
     );
-    verify(mockJsClient, never()).startMultipartUpload(
-      any(MultipartUploadRequest.class),
-      anyBoolean(),
-      any(AsyncCallback.class)
-    );
     verify(mockHandler).uploadSuccess(null);
   }
 
@@ -188,6 +174,12 @@ public class MultipartUploaderTest {
       storageLocationId,
       mockView
     );
+
+    verify(mockPromise).then(promiseHandlerCaptor.capture());
+    FunctionParam thenHandler = promiseHandlerCaptor.getValue();
+
+    thenHandler.exec(mockFileUploadComplete);
+
     // the handler should get the id.
     verify(mockHandler).uploadSuccess(RESULT_FILE_HANDLE_ID);
   }
@@ -203,9 +195,22 @@ public class MultipartUploaderTest {
       mockView
     );
 
+    verify(mockSRCUploadFileWrapper).uploadFile(
+      anyString(),
+      anyString(),
+      any(),
+      anyInt(),
+      anyString(),
+      any(),
+      isCancelledCaptor.capture()
+    );
+    IsCancelled isCancelled = isCancelledCaptor.getValue();
+    assertEquals(false, isCancelled.isCancelled());
+
     // user cancels the upload
     uploader.cancelUpload();
 
+    assertEquals(true, isCancelled.isCancelled());
     // never updated the handler because the upload has been canceled (can't verify the abort(), since
     // xhr is a js object).
     verifyZeroInteractions(mockHandler);
@@ -214,13 +219,6 @@ public class MultipartUploaderTest {
   @Test
   public void testStartMultipartUploadFailure() throws Exception {
     String error = "failed";
-    AsyncMockStubber.callFailureWith(new IllegalArgumentException(error))
-      .when(mockJsClient)
-      .startMultipartUpload(
-        any(MultipartUploadRequest.class),
-        anyBoolean(),
-        any(AsyncCallback.class)
-      );
     uploader.uploadFile(
       FILE_NAME,
       CONTENT_TYPE,
@@ -229,6 +227,11 @@ public class MultipartUploaderTest {
       storageLocationId,
       mockView
     );
+
+    verify(mockPromise).catch_(promiseHandlerCaptor.capture());
+    FunctionParam errorHandler = promiseHandlerCaptor.getValue();
+
+    errorHandler.exec(error);
 
     verify(mockHandler).uploadFailed(error);
   }

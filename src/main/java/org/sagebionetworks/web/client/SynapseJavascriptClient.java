@@ -111,11 +111,8 @@ import org.sagebionetworks.repo.model.entity.SortBy;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
-import org.sagebionetworks.repo.model.file.AddPartResponse;
 import org.sagebionetworks.repo.model.file.BatchFileRequest;
 import org.sagebionetworks.repo.model.file.BatchFileResult;
-import org.sagebionetworks.repo.model.file.BatchPresignedUploadUrlRequest;
-import org.sagebionetworks.repo.model.file.BatchPresignedUploadUrlResponse;
 import org.sagebionetworks.repo.model.file.DownloadList;
 import org.sagebionetworks.repo.model.file.DownloadOrder;
 import org.sagebionetworks.repo.model.file.DownloadOrderSummaryRequest;
@@ -124,8 +121,6 @@ import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.file.FileHandleAssociationList;
-import org.sagebionetworks.repo.model.file.MultipartUploadRequest;
-import org.sagebionetworks.repo.model.file.MultipartUploadStatus;
 import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.oauth.OAuthProvider;
 import org.sagebionetworks.repo.model.principal.AliasList;
@@ -441,8 +436,9 @@ public class SynapseJavascriptClient {
 
   private String getSynapseVersionInfo() {
     if (synapseVersionInfo == null) {
-      synapseVersionInfo =
-        synapseProperties.getSynapseProperty(SYNAPSE_VERSION_KEY);
+      synapseVersionInfo = synapseProperties.getSynapseProperty(
+        SYNAPSE_VERSION_KEY
+      );
     }
     return synapseVersionInfo;
   }
@@ -657,8 +653,10 @@ public class SynapseJavascriptClient {
                   JSONObjectAdapter jsonObject = jsonObjectAdapter.createNew(
                     response.getText()
                   );
-                  responseObject =
-                    jsFactory.newInstance(responseType, jsonObject);
+                  responseObject = jsFactory.newInstance(
+                    responseType,
+                    jsonObject
+                  );
                 }
                 if (callback != null) {
                   callback.onSuccess(responseObject);
@@ -707,10 +705,9 @@ public class SynapseJavascriptClient {
                     responseText = jsonObject.get("reason").toString();
                   }
                   if (jsonObject.has("errorCode")) {
-                    responseCode =
-                      ErrorResponseCode.valueOf(
-                        jsonObject.get("errorCode").toString()
-                      );
+                    responseCode = ErrorResponseCode.valueOf(
+                      jsonObject.get("errorCode").toString()
+                    );
                   }
                 } catch (Exception e) {
                   jsniUtils.consoleError(
@@ -785,8 +782,8 @@ public class SynapseJavascriptClient {
     String entityId,
     EntityBundleRequest request
   ) {
-    return getFuture(cb ->
-      getEntityBundleForVersion(entityId, null, request, cb)
+    return getFuture(
+      cb -> getEntityBundleForVersion(entityId, null, request, cb)
     );
   }
 
@@ -958,14 +955,15 @@ public class SynapseJavascriptClient {
     RestrictionInformationRequest request = new RestrictionInformationRequest();
     request.setObjectId(subjectId);
     request.setRestrictableObjectType(type);
-    return getFuture(callback ->
-      doPost(
-        url,
-        request,
-        OBJECT_TYPE.RestrictionInformationResponse,
-        true,
-        callback
-      )
+    return getFuture(
+      callback ->
+        doPost(
+          url,
+          request,
+          OBJECT_TYPE.RestrictionInformationResponse,
+          true,
+          callback
+        )
     );
   }
 
@@ -987,8 +985,9 @@ public class SynapseJavascriptClient {
     EntityChildrenRequest request
   ) {
     String url = getRepoServiceUrl() + ENTITY + CHILDREN;
-    return getFuture(callback ->
-      doPost(url, request, OBJECT_TYPE.EntityChildrenResponse, true, callback)
+    return getFuture(
+      callback ->
+        doPost(url, request, OBJECT_TYPE.EntityChildrenResponse, true, callback)
     );
   }
 
@@ -1005,7 +1004,9 @@ public class SynapseJavascriptClient {
     final AsyncCallback<WikiPage> callback
   ) {
     if (key.getWikiPageId() == null) {
-      AsyncCallback<String> wikiPageIdKeyCallback = new AsyncCallback<String>() {
+      AsyncCallback<String> wikiPageIdKeyCallback = new AsyncCallback<
+        String
+      >() {
         @Override
         public void onFailure(Throwable caught) {
           callback.onFailure(caught);
@@ -1044,7 +1045,9 @@ public class SynapseJavascriptClient {
     final AsyncCallback<V2WikiPage> callback
   ) {
     if (key.getWikiPageId() == null) {
-      AsyncCallback<String> wikiPageIdKeyCallback = new AsyncCallback<String>() {
+      AsyncCallback<String> wikiPageIdKeyCallback = new AsyncCallback<
+        String
+      >() {
         @Override
         public void onFailure(Throwable caught) {
           callback.onFailure(caught);
@@ -1099,7 +1102,11 @@ public class SynapseJavascriptClient {
       ownerObjectId +
       WIKIKEY;
 
-    AsyncCallback<org.sagebionetworks.repo.model.dao.WikiPageKey> wikiPageKeyCallback = new AsyncCallback<org.sagebionetworks.repo.model.dao.WikiPageKey>() {
+    AsyncCallback<
+      org.sagebionetworks.repo.model.dao.WikiPageKey
+    > wikiPageKeyCallback = new AsyncCallback<
+      org.sagebionetworks.repo.model.dao.WikiPageKey
+    >() {
       @Override
       public void onFailure(Throwable caught) {
         wikiPageIdKeyCallback.onFailure(caught);
@@ -1242,26 +1249,27 @@ public class SynapseJavascriptClient {
       "&" +
       LIMIT_PARAMETER +
       "200";
-    AsyncCallback<List<EntityHeader>> paginatedResultsCallback = new AsyncCallback<List<EntityHeader>>() {
-      @Override
-      public void onFailure(Throwable caught) {
-        callback.onFailure(caught);
-      }
+    AsyncCallback<List<EntityHeader>> paginatedResultsCallback =
+      new AsyncCallback<List<EntityHeader>>() {
+        @Override
+        public void onFailure(Throwable caught) {
+          callback.onFailure(caught);
+        }
 
-      public void onSuccess(List<EntityHeader> results) {
-        // sort by name
-        Collections.sort(
-          results,
-          new Comparator<EntityHeader>() {
-            @Override
-            public int compare(EntityHeader o1, EntityHeader o2) {
-              return o1.getName().compareToIgnoreCase(o2.getName());
+        public void onSuccess(List<EntityHeader> results) {
+          // sort by name
+          Collections.sort(
+            results,
+            new Comparator<EntityHeader>() {
+              @Override
+              public int compare(EntityHeader o1, EntityHeader o2) {
+                return o1.getName().compareToIgnoreCase(o2.getName());
+              }
             }
-          }
-        );
-        callback.onSuccess(results);
-      }
-    };
+          );
+          callback.onSuccess(results);
+        }
+      };
     doGet(
       url,
       OBJECT_TYPE.PaginatedResultsEntityHeader,
@@ -1663,22 +1671,22 @@ public class SynapseJavascriptClient {
       MEMBERSHIP_INVITATION +
       "/" +
       token.getMembershipInvitationId();
-    return getFuture(cb ->
-      doPost(url, token, OBJECT_TYPE.MembershipInvitation, true, cb)
+    return getFuture(
+      cb -> doPost(url, token, OBJECT_TYPE.MembershipInvitation, true, cb)
     );
   }
 
-  public FluentFuture<InviteeVerificationSignedToken> getInviteeVerificationSignedToken(
-    String membershipInvitationId
-  ) {
+  public FluentFuture<
+    InviteeVerificationSignedToken
+  > getInviteeVerificationSignedToken(String membershipInvitationId) {
     String url =
       getRepoServiceUrl() +
       MEMBERSHIP_INVITATION +
       "/" +
       membershipInvitationId +
       INVITEE_VERIFICATION_SIGNED_TOKEN;
-    return getFuture(cb ->
-      doGet(url, OBJECT_TYPE.InviteeVerificationSignedToken, cb)
+    return getFuture(
+      cb -> doGet(url, OBJECT_TYPE.InviteeVerificationSignedToken, cb)
     );
   }
 
@@ -1711,14 +1719,14 @@ public class SynapseJavascriptClient {
       gwt.getHostPageBaseURL() + SIGNED_TOKEN
     );
     url +=
-      "?" +
-      ACCEPT_INVITATION_ENDPOINT_PARAM +
-      "=" +
-      signedTokenEndpoint +
-      "&" +
-      NOTIFICATION_UNSUBSCRIBE_ENDPOINT_PARAM +
-      "=" +
-      signedTokenEndpoint;
+    "?" +
+    ACCEPT_INVITATION_ENDPOINT_PARAM +
+    "=" +
+    signedTokenEndpoint +
+    "&" +
+    NOTIFICATION_UNSUBSCRIBE_ENDPOINT_PARAM +
+    "=" +
+    signedTokenEndpoint;
     doPost(url, invitation, OBJECT_TYPE.MembershipInvitation, false, callback);
   }
 
@@ -1859,15 +1867,16 @@ public class SynapseJavascriptClient {
       "?viewTypeMask=" +
       viewTypeMask;
     boolean canCancel = false;
-    return getFuture(cb ->
-      doGet(
-        url,
-        OBJECT_TYPE.ListWrapperColumnModel,
-        APPLICATION_JSON_CHARSET_UTF8,
-        authController.getCurrentUserAccessToken(),
-        canCancel,
-        cb
-      )
+    return getFuture(
+      cb ->
+        doGet(
+          url,
+          OBJECT_TYPE.ListWrapperColumnModel,
+          APPLICATION_JSON_CHARSET_UTF8,
+          authController.getCurrentUserAccessToken(),
+          canCancel,
+          cb
+        )
     );
   }
 
@@ -1880,15 +1889,16 @@ public class SynapseJavascriptClient {
       "?viewEntityType=" +
       viewEntityType.name();
     boolean canCancel = false;
-    return getFuture(cb ->
-      doGet(
-        url,
-        OBJECT_TYPE.ListWrapperColumnModel,
-        APPLICATION_JSON_CHARSET_UTF8,
-        authController.getCurrentUserAccessToken(),
-        canCancel,
-        cb
-      )
+    return getFuture(
+      cb ->
+        doGet(
+          url,
+          OBJECT_TYPE.ListWrapperColumnModel,
+          APPLICATION_JSON_CHARSET_UTF8,
+          authController.getCurrentUserAccessToken(),
+          canCancel,
+          cb
+        )
     );
   }
 
@@ -1954,8 +1964,8 @@ public class SynapseJavascriptClient {
     String url = getRepoServiceUrl() + TEAM + "List";
     IdList idList = new IdList();
     idList.setList(teamIdsLong);
-    return getFuture(cb ->
-      doPost(url, idList, OBJECT_TYPE.ListWrapperTeam, true, cb)
+    return getFuture(
+      cb -> doPost(url, idList, OBJECT_TYPE.ListWrapperTeam, true, cb)
     );
   }
 
@@ -2050,13 +2060,13 @@ public class SynapseJavascriptClient {
     }
 
     url +=
-      '?' +
-      LIMIT_PARAMETER +
-      limit +
-      "&sort=" +
-      sortBy.name() +
-      "&sortDirection=" +
-      sortDir.name();
+    '?' +
+    LIMIT_PARAMETER +
+    limit +
+    "&sort=" +
+    sortBy.name() +
+    "&sortDirection=" +
+    sortDir.name();
 
     if (nextPageToken != null) {
       url += "&" + NEXT_PAGE_TOKEN_PARAM + nextPageToken;
@@ -2206,63 +2216,6 @@ public class SynapseJavascriptClient {
     doGet(url, OBJECT_TYPE.PaginatedDockerCommit, callback);
   }
 
-  public void startMultipartUpload(
-    MultipartUploadRequest request,
-    Boolean forceRestart,
-    AsyncCallback<MultipartUploadStatus> callback
-  ) {
-    String url = getFileServiceUrl() + "/file/multipart";
-    // the restart parameter is optional.
-    if (forceRestart != null) {
-      url += "?forceRestart=" + forceRestart.toString();
-    }
-    doPost(url, request, OBJECT_TYPE.MultipartUploadStatus, false, callback);
-  }
-
-  public void getMultipartPresignedUrlBatch(
-    BatchPresignedUploadUrlRequest request,
-    AsyncCallback<BatchPresignedUploadUrlResponse> callback
-  ) {
-    String url =
-      getFileServiceUrl() +
-      "/file/multipart/" +
-      request.getUploadId() +
-      "/presigned/url/batch";
-    doPost(
-      url,
-      request,
-      OBJECT_TYPE.BatchPresignedUploadUrlResponse,
-      false,
-      callback
-    );
-  }
-
-  public void addPartToMultipartUpload(
-    String uploadId,
-    int partNumber,
-    String partMD5Hex,
-    AsyncCallback<AddPartResponse> callback
-  ) {
-    String url =
-      getFileServiceUrl() +
-      "/file/multipart/" +
-      uploadId +
-      "/add/" +
-      partNumber +
-      "?partMD5Hex=" +
-      partMD5Hex;
-    doPut(url, null, OBJECT_TYPE.AddPartResponse, callback);
-  }
-
-  public void completeMultipartUpload(
-    String uploadId,
-    AsyncCallback<MultipartUploadStatus> callback
-  ) {
-    String url =
-      getFileServiceUrl() + "/file/multipart/" + uploadId + "/complete";
-    doPut(url, null, OBJECT_TYPE.MultipartUploadStatus, callback);
-  }
-
   public void getOpenMembershipRequestCount(
     String teamId,
     AsyncCallback<Long> callback
@@ -2408,7 +2361,8 @@ public class SynapseJavascriptClient {
     listItem.setFileEntityId(fileEntityId);
     listItem.setVersionNumber(version);
     toAdd.add(listItem);
-    AddBatchOfFilesToDownloadListRequest request = new AddBatchOfFilesToDownloadListRequest();
+    AddBatchOfFilesToDownloadListRequest request =
+      new AddBatchOfFilesToDownloadListRequest();
     request.setBatchToAdd(toAdd);
     String url = getRepoServiceUrl() + "/download/list/add";
     doPost(
@@ -2448,7 +2402,9 @@ public class SynapseJavascriptClient {
     FileHandleAssociation fha,
     AsyncCallback<DownloadList> callback
   ) {
-    List<FileHandleAssociation> toRemove = new ArrayList<FileHandleAssociation>();
+    List<FileHandleAssociation> toRemove = new ArrayList<
+      FileHandleAssociation
+    >();
     toRemove.add(fha);
     removeFilesFromDownloadList(toRemove, callback);
   }
@@ -2522,8 +2478,8 @@ public class SynapseJavascriptClient {
   }
 
   public FluentFuture<String> getAccessToken() {
-    return getFuture(cb ->
-      doGet(jsniUtils.getAccessTokenCookieUrl(), OBJECT_TYPE.String, cb)
+    return getFuture(
+      cb -> doGet(jsniUtils.getAccessTokenCookieUrl(), OBJECT_TYPE.String, cb)
     );
   }
 
@@ -2791,10 +2747,10 @@ public class SynapseJavascriptClient {
     Username username = new Username();
     username.setEmail(emailAddress);
     url +=
-      "?passwordResetEndpoint=" +
-      gwt.encodeQueryString(
-        gwt.getHostPageBaseURL() + "#!PasswordResetSignedToken:"
-      );
+    "?passwordResetEndpoint=" +
+    gwt.encodeQueryString(
+      gwt.getHostPageBaseURL() + "#!PasswordResetSignedToken:"
+    );
     doPost(url, username, OBJECT_TYPE.None, false, cb);
   }
 
@@ -2856,20 +2812,21 @@ public class SynapseJavascriptClient {
     }
     if (memberType != null) {
       url +=
-        "&" +
-        NAME_MEMBERTYPE_FILTER +
-        gwt.encodeQueryString(memberType.toString());
+      "&" +
+      NAME_MEMBERTYPE_FILTER +
+      gwt.encodeQueryString(memberType.toString());
     }
-    AsyncCallback<List<TeamMember>> paginatedResultsCallback = new AsyncCallback<List<TeamMember>>() {
-      @Override
-      public void onFailure(Throwable caught) {
-        callback.onFailure(caught);
-      }
+    AsyncCallback<List<TeamMember>> paginatedResultsCallback =
+      new AsyncCallback<List<TeamMember>>() {
+        @Override
+        public void onFailure(Throwable caught) {
+          callback.onFailure(caught);
+        }
 
-      public void onSuccess(List<TeamMember> teamMembers) {
-        getTeamMembersStep2(teamMembers, limit, offset, callback);
-      }
-    };
+        public void onSuccess(List<TeamMember> teamMembers) {
+          getTeamMembersStep2(teamMembers, limit, offset, callback);
+        }
+      };
     doGet(
       url,
       OBJECT_TYPE.PaginatedResultsTeamMember,
@@ -2896,7 +2853,9 @@ public class SynapseJavascriptClient {
 
       @Override
       public void onSuccess(List profiles) {
-        List<TeamMemberBundle> teamMemberBundles = new ArrayList<TeamMemberBundle>();
+        List<TeamMemberBundle> teamMemberBundles = new ArrayList<
+          TeamMemberBundle
+        >();
         for (int i = 0; i < userIds.size(); i++) {
           teamMemberBundles.add(
             new TeamMemberBundle(
@@ -3117,7 +3076,8 @@ public class SynapseJavascriptClient {
     List<String> recipientIds,
     AsyncCallback<AccessApprovalNotificationResponse> cb
   ) {
-    AccessApprovalNotificationRequest request = new AccessApprovalNotificationRequest();
+    AccessApprovalNotificationRequest request =
+      new AccessApprovalNotificationRequest();
     List<Long> recipientIdsLongs = recipientIds
       .stream()
       .map(Long::parseLong)
@@ -3236,8 +3196,8 @@ public class SynapseJavascriptClient {
     AccessControlList acl
   ) {
     String url = getRepoServiceUrl() + ACCESS_REQUIREMENT + id + ACL;
-    return getFuture(cb ->
-      doPost(url, acl, OBJECT_TYPE.AccessControlList, false, cb)
+    return getFuture(
+      cb -> doPost(url, acl, OBJECT_TYPE.AccessControlList, false, cb)
     );
   }
 
@@ -3249,7 +3209,9 @@ public class SynapseJavascriptClient {
     return getFuture(cb -> doPut(url, acl, OBJECT_TYPE.AccessControlList, cb));
   }
 
-  public FluentFuture<TwoFactorAuthStatus> getTwoFactorAuthStatusForCurrentUser() {
+  public FluentFuture<
+    TwoFactorAuthStatus
+  > getTwoFactorAuthStatusForCurrentUser() {
     String url = getAuthServiceUrl() + "/2fa";
     return getFuture(cb -> doGet(url, OBJECT_TYPE.TwoFactorAuthStatus, cb));
   }
