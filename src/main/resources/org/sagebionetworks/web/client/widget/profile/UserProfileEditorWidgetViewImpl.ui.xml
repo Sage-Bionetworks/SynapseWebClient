@@ -30,12 +30,14 @@
             <b:FormGroup>
               <b:FormLabel for="firstName">First Name</b:FormLabel>
               <b:TextBox name="firstName" ui:field="firstName" />
+              <bh:Paragraph ui:field="firstNameRenderer" visible="false" />
             </b:FormGroup>
           </b:Column>
           <b:Column size="MD_12,LG_6">
             <b:FormGroup>
               <b:FormLabel for="lastName">Last Name</b:FormLabel>
               <b:TextBox name="lastName" ui:field="lastName" />
+              <bh:Paragraph ui:field="lastNameRenderer" visible="false" />
             </b:FormGroup>
           </b:Column>
         </b:Row>
@@ -44,6 +46,10 @@
             <b:FormGroup>
               <b:FormLabel for="currentPosition">Current Position</b:FormLabel>
               <b:TextBox name="currentPosition" ui:field="currentPosition" />
+              <bh:Paragraph
+                ui:field="currentPositionRenderer"
+                visible="false"
+              />
             </b:FormGroup>
           </b:Column>
           <b:Column size="MD_12,LG_6">
@@ -54,6 +60,10 @@
               <b:TextBox
                 name="currentAffiliation"
                 ui:field="currentAffiliation"
+              />
+              <bh:Paragraph
+                ui:field="currentAffiliationRenderer"
+                visible="false"
               />
             </b:FormGroup>
           </b:Column>
@@ -76,6 +86,7 @@
             <b:FormGroup ui:field="usernameFormGroup">
               <b:FormLabel for="username">Username</b:FormLabel>
               <b:TextBox name="username" ui:field="username" />
+              <bh:Paragraph ui:field="usernameRenderer" visible="false" />
               <b:HelpBlock ui:field="usernameHelpBlock" />
             </b:FormGroup>
           </b:Column>
@@ -95,12 +106,14 @@
             <b:FormGroup>
               <b:FormLabel for="industry">Industry/Discipline</b:FormLabel>
               <b:TextBox name="industry" ui:field="industry" />
+              <bh:Paragraph ui:field="industryRenderer" visible="false" />
             </b:FormGroup>
           </b:Column>
           <b:Column size="MD_12,LG_6">
             <b:FormGroup>
               <b:FormLabel for="location">City, Country</b:FormLabel>
               <bh:Div ui:field="locationSuggestBoxContainer" />
+              <bh:Paragraph ui:field="locationRenderer" visible="false" />
             </b:FormGroup>
           </b:Column>
         </b:Row>
@@ -144,6 +157,7 @@
               >
                 NotThePassword
               </g:PasswordTextBox>
+
               <b:Anchor
                 addStyleNames="displayInlineBlock"
                 ui:field="changePasswordLink"
