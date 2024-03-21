@@ -10,14 +10,13 @@ import com.google.gwt.user.client.ui.IsWidget;
  */
 public interface CreateManagedACTAccessRequirementStep3View extends IsWidget {
   void setPresenter(Presenter p);
-  void setReviewerUIVisible(boolean visible);
-  void setReviewerBadge(IsWidget w);
-  void setReviewerSearchBox(IsWidget w);
+  void configure(String accessRequirementId);
+  void saveAcl();
 
   /*
    * Presenter interface
    */
   public interface Presenter {
-    void onRemoveReviewer();
+    void onSaveComplete(boolean saveSuccessful);
   }
 }

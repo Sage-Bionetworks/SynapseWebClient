@@ -2,79 +2,68 @@ package org.sagebionetworks.web.client.widget.accessrequirements.createaccessreq
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import org.gwtbootstrap3.client.ui.Icon;
-import org.gwtbootstrap3.client.ui.html.Div;
-import org.sagebionetworks.web.client.SynapseProperties;
-import org.sagebionetworks.web.client.widget.team.TeamBadge;
+import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
+import org.sagebionetworks.web.client.jsinterop.AccessRequirementAclEditorHandler;
+import org.sagebionetworks.web.client.jsinterop.AccessRequirementAclEditorProps;
+import org.sagebionetworks.web.client.jsinterop.React;
+import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.ReactRef;
+import org.sagebionetworks.web.client.jsinterop.SRC;
+import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 
 public class CreateManagedACTAccessRequirementStep3ViewImpl
   implements CreateManagedACTAccessRequirementStep3View {
-
-  @UiField
-  Div actTeamContainer;
-
-  @UiField
-  Div otherUserTeamContainer;
-
-  @UiField
-  Div otherUserTeamUI;
-
-  @UiField
-  Div userTeamSearchContainer;
-
-  @UiField
-  Icon deleteIcon;
 
   public interface Binder
     extends UiBinder<Widget, CreateManagedACTAccessRequirementStep3ViewImpl> {}
 
   Widget widget;
 
+  @UiField
+  ReactComponentDiv reactContainer;
+
+  ReactRef<AccessRequirementAclEditorHandler> componentRef;
+
+  SynapseReactClientFullContextPropsProvider propsProvider;
   Presenter presenter;
 
   @Inject
   public CreateManagedACTAccessRequirementStep3ViewImpl(
     Binder binder,
-    TeamBadge actTeamBadge,
-    SynapseProperties synapseProperties
+    SynapseReactClientFullContextPropsProvider propsProvider
   ) {
     widget = binder.createAndBindUi(this);
+    this.propsProvider = propsProvider;
+  }
 
-    actTeamBadge.configure(
-      synapseProperties.getSynapseProperty(
-        "org.sagebionetworks.portal.act.team_id"
-      )
+  @Override
+  public void configure(String accessRequirementId) {
+    componentRef = React.createRef();
+    reactContainer.clear();
+    ReactNode element = React.createElementWithSynapseContext(
+      SRC.SynapseComponents.AccessRequirementAclEditor,
+      AccessRequirementAclEditorProps.create(
+        accessRequirementId,
+        saveSuccessful -> {
+          presenter.onSaveComplete(saveSuccessful);
+        },
+        componentRef
+      ),
+      propsProvider.getJsInteropContextProps()
     );
-    actTeamBadge.addStyleName("font-size-13 margin-left-2"); // match style with UserTeamBadge
-    actTeamContainer.add(actTeamBadge);
-    deleteIcon.addClickHandler(event -> {
-      presenter.onRemoveReviewer();
-    });
+    reactContainer.render(element);
+  }
+
+  @Override
+  public void saveAcl() {
+    componentRef.current.save();
   }
 
   @Override
   public Widget asWidget() {
     return widget;
-  }
-
-  @Override
-  public void setReviewerBadge(IsWidget w) {
-    otherUserTeamContainer.clear();
-    otherUserTeamContainer.add(w);
-  }
-
-  @Override
-  public void setReviewerUIVisible(boolean visible) {
-    otherUserTeamUI.setVisible(visible);
-  }
-
-  @Override
-  public void setReviewerSearchBox(IsWidget w) {
-    userTeamSearchContainer.clear();
-    userTeamSearchContainer.add(w);
   }
 
   @Override
