@@ -211,8 +211,6 @@ public class UploaderTest {
         any(AsyncCallback.class)
       );
 
-    when(mockGwt.createXMLHttpRequest()).thenReturn(null);
-
     String[] fileNames = { "newFile.txt" };
     when(
       mockSynapseJsniUtils.getMultipleUploadFileNames(

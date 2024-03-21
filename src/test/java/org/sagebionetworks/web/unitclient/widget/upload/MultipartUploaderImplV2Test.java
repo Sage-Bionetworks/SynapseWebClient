@@ -27,15 +27,13 @@ import org.sagebionetworks.web.client.jsinterop.Promise.FunctionParam;
 import org.sagebionetworks.web.client.jsinterop.SRC.SynapseClient.FileUploadComplete;
 import org.sagebionetworks.web.client.jsinterop.SRC.SynapseClient.IsCancelled;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.upload.MultipartUploaderImplV2;
 import org.sagebionetworks.web.client.widget.upload.ProgressingFileUploadHandler;
 import org.sagebionetworks.web.client.widget.upload.SRCUploadFileWrapper;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
-import org.sagebionetworks.web.test.helper.CallbackMockStubber;
 
-public class MultipartUploaderV2Test {
+public class MultipartUploaderImplV2Test {
 
   @Mock
   AuthenticationController mockAuth;
@@ -90,12 +88,6 @@ public class MultipartUploaderV2Test {
   public void before() throws Exception {
     MockitoAnnotations.initMocks(this);
 
-    // direct upload
-    // by default, do not support direct upload (direct upload tests will turn on)
-    when(
-      synapseJsniUtils.getContentType(any(JavaScriptObject.class), anyInt())
-    ).thenReturn("image/png");
-
     when(
       mockSRCUploadFileWrapper.uploadFile(
         anyString(),
@@ -111,22 +103,6 @@ public class MultipartUploaderV2Test {
     when(synapseJsniUtils.getFileSize(any(JavaScriptObject.class))).thenReturn(
       FILE_SIZE
     );
-    // fire the timer
-    CallbackMockStubber.invokeCallback()
-      .when(gwt)
-      .scheduleExecution(any(Callback.class), anyInt());
-    when(gwt.createXMLHttpRequest()).thenReturn(null);
-
-    String[] fileNames = { "newFile.txt" };
-    when(
-      synapseJsniUtils.getMultipleUploadFileNames(any(JavaScriptObject.class))
-    ).thenReturn(fileNames);
-
-    String file1 = "file1.txt";
-    fileNames = new String[] { file1 };
-    when(
-      synapseJsniUtils.getMultipleUploadFileNames(any(JavaScriptObject.class))
-    ).thenReturn(fileNames);
 
     uploader = new MultipartUploaderImplV2(
       mockAuth,
