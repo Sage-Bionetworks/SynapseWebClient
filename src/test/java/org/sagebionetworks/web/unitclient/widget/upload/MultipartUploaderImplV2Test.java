@@ -98,19 +98,20 @@ public class MultipartUploaderImplV2Test {
         any(),
         any()
       )
-    ).thenReturn(mockPromise);
+    )
+      .thenReturn(mockPromise);
 
-    when(synapseJsniUtils.getFileSize(any(JavaScriptObject.class))).thenReturn(
-      FILE_SIZE
-    );
+    when(synapseJsniUtils.getFileSize(any(JavaScriptObject.class)))
+      .thenReturn(FILE_SIZE);
 
-    uploader = new MultipartUploaderImplV2(
-      mockAuth,
-      gwt,
-      synapseJsniUtils,
-      mockDateTimeUtils,
-      mockSRCUploadFileWrapper
-    );
+    uploader =
+      new MultipartUploaderImplV2(
+        mockAuth,
+        gwt,
+        synapseJsniUtils,
+        mockDateTimeUtils,
+        mockSRCUploadFileWrapper
+      );
 
     when(mockView.isAttached()).thenReturn(true);
     mockFileUploadComplete.fileHandleId = RESULT_FILE_HANDLE_ID;
@@ -118,9 +119,8 @@ public class MultipartUploaderImplV2Test {
 
   @Test
   public void testDirectUploadEmptyFile() throws Exception {
-    when(synapseJsniUtils.getFileSize(any(JavaScriptObject.class))).thenReturn(
-      0.0
-    );
+    when(synapseJsniUtils.getFileSize(any(JavaScriptObject.class)))
+      .thenReturn(0.0);
     uploader.uploadFile(
       FILE_NAME,
       CONTENT_TYPE,
@@ -163,15 +163,16 @@ public class MultipartUploaderImplV2Test {
       mockView
     );
 
-    verify(mockSRCUploadFileWrapper).uploadFile(
-      anyString(),
-      anyString(),
-      any(),
-      anyInt(),
-      anyString(),
-      any(),
-      isCancelledCaptor.capture()
-    );
+    verify(mockSRCUploadFileWrapper)
+      .uploadFile(
+        anyString(),
+        anyString(),
+        any(),
+        anyInt(),
+        anyString(),
+        any(),
+        isCancelledCaptor.capture()
+      );
     IsCancelled isCancelled = isCancelledCaptor.getValue();
     assertEquals(false, isCancelled.isCancelled());
 

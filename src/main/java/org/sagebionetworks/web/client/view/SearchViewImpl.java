@@ -473,10 +473,11 @@ public class SearchViewImpl extends Composite implements SearchView {
     Heading h4 = new Heading(HeadingSize.H4);
     FlowPanel headingPanel = new FlowPanel();
     h4.add(headingPanel);
-    org.gwtbootstrap3.client.ui.Anchor link = new org.gwtbootstrap3.client.ui.Anchor(
-      hit.getName(),
-      DisplayUtils.getSynapseHistoryToken(hit.getId())
-    );
+    org.gwtbootstrap3.client.ui.Anchor link =
+      new org.gwtbootstrap3.client.ui.Anchor(
+        hit.getName(),
+        DisplayUtils.getSynapseHistoryToken(hit.getId())
+      );
     EntityTypeIcon icon = new EntityTypeIcon(entityType);
     icon.addStyleName("lightGreyText margin-right-10 margin-left-5");
     headingPanel.add(icon);
@@ -528,7 +529,7 @@ public class SearchViewImpl extends Composite implements SearchView {
         safeLink += " class=\"hitBreadcrumbParent\"";
       }
       safeLink +=
-        ">" + SafeHtmlUtils.fromString(header.getName()).asString() + "</a>";
+      ">" + SafeHtmlUtils.fromString(header.getName()).asString() + "</a>";
       pathBuilder.appendHtmlConstant(safeLink);
 
       if (i < headers.size() - 1) {

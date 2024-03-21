@@ -7,7 +7,9 @@ import org.sagebionetworks.repo.model.Entity;
 public class WidgetDescriptorUpdatedEvent
   extends GwtEvent<WidgetDescriptorUpdatedHandler> {
 
-  private static final Type<WidgetDescriptorUpdatedHandler> TYPE = new Type<WidgetDescriptorUpdatedHandler>();
+  private static final Type<WidgetDescriptorUpdatedHandler> TYPE = new Type<
+    WidgetDescriptorUpdatedHandler
+  >();
   private String name, oldName;
   private Entity entityWrapper;
   private boolean isDeleted;
@@ -22,7 +24,9 @@ public class WidgetDescriptorUpdatedEvent
   }
 
   @Override
-  public com.google.gwt.event.shared.GwtEvent.Type<WidgetDescriptorUpdatedHandler> getAssociatedType() {
+  public com.google.gwt.event.shared.GwtEvent.Type<
+    WidgetDescriptorUpdatedHandler
+  > getAssociatedType() {
     return TYPE;
   }
 

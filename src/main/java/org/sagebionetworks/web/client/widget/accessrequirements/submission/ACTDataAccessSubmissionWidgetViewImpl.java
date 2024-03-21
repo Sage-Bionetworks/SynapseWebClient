@@ -196,7 +196,8 @@ public class ACTDataAccessSubmissionWidgetViewImpl
   public void addAccessors(IsWidget w, String username) {
     Div div = new Div();
     div.add(w);
-    TextBoxWithCopyToClipboardWidget emailTextBox = new TextBoxWithCopyToClipboardWidget();
+    TextBoxWithCopyToClipboardWidget emailTextBox =
+      new TextBoxWithCopyToClipboardWidget();
     emailTextBox.setText(username + "@synapse.org");
     emailTextBox.setAddStyleNames("margin-left-15");
     div.add(emailTextBox);

@@ -49,10 +49,8 @@ public class SessionDetector {
         // compare the local user id to the one in the cache (across the current browser tabs)
         String currentSessionUserId = getSessionMarker();
         if (
-          (
-            authController.isLoggedIn() &&
-            loopCount % FORCE_CHECK_EVERY_X_ITERATIONS == 0
-          ) ||
+          (authController.isLoggedIn() &&
+            loopCount % FORCE_CHECK_EVERY_X_ITERATIONS == 0) ||
           !Objects.equals(
             authController.getCurrentUserPrincipalId(),
             currentSessionUserId

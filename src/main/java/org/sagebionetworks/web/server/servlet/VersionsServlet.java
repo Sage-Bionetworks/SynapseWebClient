@@ -28,17 +28,15 @@ public class VersionsServlet extends HttpServlet {
 
   private static Log log = LogFactory.getLog(VersionsServlet.class);
   private static final long serialVersionUID = 1L;
-  protected static final ThreadLocal<HttpServletRequest> perThreadRequest = new ThreadLocal<HttpServletRequest>();
+  protected static final ThreadLocal<HttpServletRequest> perThreadRequest =
+    new ThreadLocal<HttpServletRequest>();
   private final RequestHostProvider requestHostProvider = () ->
     UserDataProvider.getThreadLocalRequestHost(
       VersionsServlet.perThreadRequest.get()
     );
 
-  private final Supplier<SynapseVersionInfo> synapseVersionCache = Suppliers.memoizeWithExpiration(
-    versionSupplier(),
-    5,
-    TimeUnit.MINUTES
-  );
+  private final Supplier<SynapseVersionInfo> synapseVersionCache =
+    Suppliers.memoizeWithExpiration(versionSupplier(), 5, TimeUnit.MINUTES);
 
   public SynapseVersionInfo getSynapseVersionInfo() {
     return synapseVersionCache.get();
@@ -56,7 +54,8 @@ public class VersionsServlet extends HttpServlet {
     return new Supplier<SynapseVersionInfo>() {
       public SynapseVersionInfo get() {
         try {
-          org.sagebionetworks.client.SynapseClient synapseClient = createNewClient();
+          org.sagebionetworks.client.SynapseClient synapseClient =
+            createNewClient();
           return synapseClient.getVersionInfo();
         } catch (SynapseException e) {
           log.error(e);

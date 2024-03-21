@@ -242,10 +242,8 @@ public class TeamPresenter
           openMembershipRequestsWidget.setVisible(isAdmin);
 
           if (
-            (
-              teamMembershipStatus == null ||
-              !teamMembershipStatus.getIsMember()
-            )
+            (teamMembershipStatus == null ||
+              !teamMembershipStatus.getIsMember())
           ) {
             // not a member, show the Join Team button if the team is not locked down, or if the user has an open team invitation
             boolean hasOpenInvitation =

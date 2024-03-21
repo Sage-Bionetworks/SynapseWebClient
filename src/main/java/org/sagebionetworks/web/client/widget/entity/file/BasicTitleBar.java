@@ -69,10 +69,11 @@ public class BasicTitleBar implements SynapseWidgetPresenter {
     actionMenu.asWidget().removeFromParent();
 
     // Register a listener so the menu will update when the props change
-    Consumer<EntityActionMenuProps> onActionMenuPropsChange = actionMenuProps -> {
-      this.props.setEntityActionMenuProps(actionMenuProps);
-      this.view.setProps(this.props);
-    };
+    Consumer<EntityActionMenuProps> onActionMenuPropsChange =
+      actionMenuProps -> {
+        this.props.setEntityActionMenuProps(actionMenuProps);
+        this.view.setProps(this.props);
+      };
     actionMenu.setPropUpdateListener(onActionMenuPropsChange);
   }
 }

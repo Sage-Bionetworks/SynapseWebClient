@@ -31,7 +31,8 @@ public class InitSessionServlet extends HttpServlet {
   public static final String ROOT_PATH = "/";
   public static final String SYNAPSE_ORG = "synapse.org";
   private static final long serialVersionUID = 1L;
-  protected static final ThreadLocal<HttpServletRequest> perThreadRequest = new ThreadLocal<HttpServletRequest>();
+  protected static final ThreadLocal<HttpServletRequest> perThreadRequest =
+    new ThreadLocal<HttpServletRequest>();
   // backend expires this token after a day, so this cookie should never last this long (10 days)
   public static final int DEFAULT_COOKIE_EXPIRATION = 60 * 60 * 24 * 10;
   private SynapseProvider synapseProvider = new SynapseProviderImpl();

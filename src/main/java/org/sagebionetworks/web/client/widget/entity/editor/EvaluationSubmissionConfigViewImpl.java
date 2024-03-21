@@ -107,12 +107,10 @@ public class EvaluationSubmissionConfigViewImpl
         .setSelectableTypes(EntityFilter.PROJECT)
         .setVersionSelection(EntityFinderWidget.VersionSelection.DISALLOWED)
         .setSelectedHandler(
-          (
-            (selected, entityFinder) -> {
+          ((selected, entityFinder) -> {
               challengeProjectField.setValue(selected.getTargetId());
               entityFinder.hide();
-            }
-          )
+            })
         )
         .build()
         .show();
@@ -124,12 +122,10 @@ public class EvaluationSubmissionConfigViewImpl
         .setSelectableTypes(EntityFilter.CONTAINER)
         .setVersionSelection(EntityFinderWidget.VersionSelection.DISALLOWED)
         .setSelectedHandler(
-          (
-            (selected, entityFinder) -> {
+          ((selected, entityFinder) -> {
               formContainerIdField.setValue(selected.getTargetId());
               entityFinder.hide();
-            }
-          )
+            })
         )
         .build()
         .show();
@@ -140,12 +136,10 @@ public class EvaluationSubmissionConfigViewImpl
         .setSelectableTypes(EntityFilter.FILE)
         .setVersionSelection(EntityFinderWidget.VersionSelection.DISALLOWED)
         .setSelectedHandler(
-          (
-            (selected, entityFinder) -> {
+          ((selected, entityFinder) -> {
               schemaFileSynIdField.setValue(selected.getTargetId());
               entityFinder.hide();
-            }
-          )
+            })
         )
         .build()
         .show();
@@ -156,12 +150,10 @@ public class EvaluationSubmissionConfigViewImpl
         .setSelectableTypes(EntityFilter.FILE)
         .setVersionSelection(EntityFinderWidget.VersionSelection.DISALLOWED)
         .setSelectedHandler(
-          (
-            (selected, entityFinder) -> {
+          ((selected, entityFinder) -> {
               uiSchemaFileSynIdField.setValue(selected.getTargetId());
               entityFinder.hide();
-            }
-          )
+            })
         )
         .build()
         .show();

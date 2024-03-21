@@ -103,26 +103,27 @@ public class TeamSearchPresenter
   public void loadMore() {
     synAlert.clear();
     // execute search, and update view with the results
-    AsyncCallback<PaginatedResults<Team>> callback =
-      new AsyncCallback<PaginatedResults<Team>>() {
-        @Override
-        public void onSuccess(PaginatedResults<Team> result) {
-          for (Team team : result.getResults()) {
-            BigTeamBadge teamBadge = ginInjector.getBigTeamBadgeWidget();
-            teamBadge.configure(team, "");
-            teamBadge.addStyleName("light-border SRC-grid-item");
-            loadMoreWidgetContainer.add(teamBadge.asWidget());
-          }
-          offset += SEARCH_TEAM_LIMIT;
-          loadMoreWidgetContainer.setIsMore(!result.getResults().isEmpty());
+    AsyncCallback<PaginatedResults<Team>> callback = new AsyncCallback<
+      PaginatedResults<Team>
+    >() {
+      @Override
+      public void onSuccess(PaginatedResults<Team> result) {
+        for (Team team : result.getResults()) {
+          BigTeamBadge teamBadge = ginInjector.getBigTeamBadgeWidget();
+          teamBadge.configure(team, "");
+          teamBadge.addStyleName("light-border SRC-grid-item");
+          loadMoreWidgetContainer.add(teamBadge.asWidget());
         }
+        offset += SEARCH_TEAM_LIMIT;
+        loadMoreWidgetContainer.setIsMore(!result.getResults().isEmpty());
+      }
 
-        @Override
-        public void onFailure(Throwable caught) {
-          loadMoreWidgetContainer.setIsMore(false);
-          synAlert.handleException(caught);
-        }
-      };
+      @Override
+      public void onFailure(Throwable caught) {
+        loadMoreWidgetContainer.setIsMore(false);
+        synAlert.handleException(caught);
+      }
+    };
     synapseClient.getTeamsBySearch(
       searchTerm,
       SEARCH_TEAM_LIMIT,

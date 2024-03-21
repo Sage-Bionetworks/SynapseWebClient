@@ -139,7 +139,9 @@ public class QueryTableConfigEditor
                 }
               }
             }
-            List<APITableColumnConfig> newConfigs = new ArrayList<APITableColumnConfig>();
+            List<APITableColumnConfig> newConfigs = new ArrayList<
+              APITableColumnConfig
+            >();
             for (String headerName : headers) {
               APITableColumnConfig config = new APITableColumnConfig();
               HashSet<String> inputColumnName = new HashSet<String>();

@@ -46,7 +46,8 @@ public class CreateAccessRequirementButton implements IsWidget {
       new ClickHandler() {
         @Override
         public void onClick(ClickEvent event) {
-          CreateAccessRequirementWizard wizard = ginInjector.getCreateAccessRequirementWizard();
+          CreateAccessRequirementWizard wizard =
+            ginInjector.getCreateAccessRequirementWizard();
           if (subject != null) {
             wizard.configure(subject);
           } else if (ar != null) {

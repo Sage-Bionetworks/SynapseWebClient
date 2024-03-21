@@ -179,7 +179,8 @@ public class AccessorGroupViewImpl implements AccessorGroupView {
 
   @Override
   public void addEmail(String username) {
-    TextBoxWithCopyToClipboardWidget emailTextBox = new TextBoxWithCopyToClipboardWidget();
+    TextBoxWithCopyToClipboardWidget emailTextBox =
+      new TextBoxWithCopyToClipboardWidget();
     emailTextBox.setText(username + "@synapse.org");
     emailTextBox.setAddStyleNames("displayBlock");
     emailsContainer.add(emailTextBox);

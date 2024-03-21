@@ -267,68 +267,69 @@ public class EntityPresenter
   }
 
   public void getEntityBundleAndLoadPageTop() {
-    final AsyncCallback<EntityBundle> callback =
-      new AsyncCallback<EntityBundle>() {
-        @Override
-        public void onSuccess(EntityBundle bundle) {
-          //SWC-6551: If entity is the draft version of a Dataset, the current user cannot edit, and we are not told to force load the draft version, then load the latest stable version (if available)
-          String forceLoadDraftDataset = clientCache.get(
-            bundle.getEntity().getId() +
-            WebConstants.FORCE_LOAD_DRAFT_DATASET_SUFFIX
-          );
-          if (
-            bundle.getEntity() instanceof Dataset &&
-            !bundle.getPermissions().getCanCertifiedUserEdit() &&
-            versionNumber == null &&
-            forceLoadDraftDataset == null
-          ) {
-            loadStableDatasetIfAvailable(bundle.getEntity().getId());
+    final AsyncCallback<EntityBundle> callback = new AsyncCallback<
+      EntityBundle
+    >() {
+      @Override
+      public void onSuccess(EntityBundle bundle) {
+        //SWC-6551: If entity is the draft version of a Dataset, the current user cannot edit, and we are not told to force load the draft version, then load the latest stable version (if available)
+        String forceLoadDraftDataset = clientCache.get(
+          bundle.getEntity().getId() +
+          WebConstants.FORCE_LOAD_DRAFT_DATASET_SUFFIX
+        );
+        if (
+          bundle.getEntity() instanceof Dataset &&
+          !bundle.getPermissions().getCanCertifiedUserEdit() &&
+          versionNumber == null &&
+          forceLoadDraftDataset == null
+        ) {
+          loadStableDatasetIfAvailable(bundle.getEntity().getId());
+          return;
+        }
+        clientCache.remove(
+          bundle.getEntity().getId() +
+          WebConstants.FORCE_LOAD_DRAFT_DATASET_SUFFIX
+        );
+        synAlert.clear();
+        view.setLoadingVisible(false);
+        // Redirect if Entity is a Link
+        if (bundle.getEntity() instanceof Link) {
+          Reference ref = ((Link) bundle.getEntity()).getLinksTo();
+          entityId = null;
+          if (ref != null) {
+            // redefine where the page is and refresh
+            entityId = ref.getTargetId();
+            versionNumber = ref.getTargetVersionNumber();
+            refresh();
             return;
-          }
-          clientCache.remove(
-            bundle.getEntity().getId() +
-            WebConstants.FORCE_LOAD_DRAFT_DATASET_SUFFIX
-          );
-          synAlert.clear();
-          view.setLoadingVisible(false);
-          // Redirect if Entity is a Link
-          if (bundle.getEntity() instanceof Link) {
-            Reference ref = ((Link) bundle.getEntity()).getLinksTo();
-            entityId = null;
-            if (ref != null) {
-              // redefine where the page is and refresh
-              entityId = ref.getTargetId();
-              versionNumber = ref.getTargetVersionNumber();
-              refresh();
-              return;
-            } else {
-              // show error and then allow entity bundle to go to view
-              view.showErrorMessage(DisplayConstants.ERROR_NO_LINK_DEFINED);
-            }
-          }
-          EntityHeader projectHeader = DisplayUtils.getProjectHeader(
-            bundle.getPath()
-          );
-          if (projectHeader == null) {
-            synAlert.showError(DisplayConstants.ERROR_GENERIC_RELOAD);
           } else {
-            entityPageTop.configure(
-              bundle,
-              versionNumber,
-              projectHeader,
-              area,
-              areaToken
-            );
-            view.setEntityPageTopWidget(entityPageTop);
-            view.setEntityPageTopVisible(true);
+            // show error and then allow entity bundle to go to view
+            view.showErrorMessage(DisplayConstants.ERROR_NO_LINK_DEFINED);
           }
         }
-
-        @Override
-        public void onFailure(Throwable caught) {
-          onError(caught);
+        EntityHeader projectHeader = DisplayUtils.getProjectHeader(
+          bundle.getPath()
+        );
+        if (projectHeader == null) {
+          synAlert.showError(DisplayConstants.ERROR_GENERIC_RELOAD);
+        } else {
+          entityPageTop.configure(
+            bundle,
+            versionNumber,
+            projectHeader,
+            area,
+            areaToken
+          );
+          view.setEntityPageTopWidget(entityPageTop);
+          view.setEntityPageTopVisible(true);
         }
-      };
+      }
+
+      @Override
+      public void onFailure(Throwable caught) {
+        onError(caught);
+      }
+    };
 
     if (versionNumber == null) {
       jsClient.getEntityBundle(

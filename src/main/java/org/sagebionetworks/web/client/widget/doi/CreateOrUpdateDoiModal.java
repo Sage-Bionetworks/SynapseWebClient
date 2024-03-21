@@ -128,11 +128,8 @@ public class CreateOrUpdateDoiModal
     requests.add(doiRequest);
 
     if (entity instanceof VersionableEntity) {
-      FluentFuture<List<VersionInfo>> versionRequest = javascriptClient.getEntityVersions(
-        entity.getId(),
-        0,
-        100
-      );
+      FluentFuture<List<VersionInfo>> versionRequest =
+        javascriptClient.getEntityVersions(entity.getId(), 0, 100);
       versionRequest.addCallback(
         new FutureCallback<List<VersionInfo>>() {
           @Override
@@ -286,11 +283,9 @@ public class CreateOrUpdateDoiModal
           popupUtilsView.showInfo(
             DOI_CREATED_MESSAGE +
             newDoi.getObjectId() +
-            (
-              newDoi.getObjectVersion() == null
+            (newDoi.getObjectVersion() == null
                 ? ""
-                : "." + newDoi.getObjectVersion()
-            )
+                : "." + newDoi.getObjectVersion())
           );
           String toastTitle, toastMessage;
           if (doiExists) {

@@ -70,8 +70,9 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
    */
   public static String LAST_PLACE =
     "org.sagebionetworks.synapse.place.last.place";
-  public static final ArrayList<String> SAFE_TO_IGNORE_ERRORS =
-    new ArrayList<String>();
+  public static final ArrayList<String> SAFE_TO_IGNORE_ERRORS = new ArrayList<
+    String
+  >();
 
   static {
     // Benign error thrown by VideoWidget (<video>). ResizeObserver was not able to deliver all

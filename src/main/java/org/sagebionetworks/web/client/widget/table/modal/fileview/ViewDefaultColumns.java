@@ -19,7 +19,9 @@ import org.sagebionetworks.web.client.SynapseJavascriptClient;
 public class ViewDefaultColumns {
 
   private SynapseJavascriptClient jsClient;
-  private List<ColumnModel> defaultFileViewColumns, defaultProjectViewColumns, defaultSubmissionViewColumns, defaultDatasetColumns, defaultDatasetCollectionColumns;
+  private List<
+    ColumnModel
+  > defaultFileViewColumns, defaultProjectViewColumns, defaultSubmissionViewColumns, defaultDatasetColumns, defaultDatasetCollectionColumns;
 
   private AdapterFactory adapterFactory;
   PopupUtilsView popupUtils;
@@ -37,21 +39,18 @@ public class ViewDefaultColumns {
   }
 
   public void init() {
-    FluentFuture<List<ColumnModel>> fileViewColumnsFuture = jsClient.getDefaultColumnsForView(
-      TableType.file_view.getViewTypeMask()
-    );
-    FluentFuture<List<ColumnModel>> projectViewColumnsFuture = jsClient.getDefaultColumnsForView(
-      TableType.project_view.getViewTypeMask()
-    );
-    FluentFuture<List<ColumnModel>> submissionViewColumnsFuture = jsClient.getDefaultColumnsForView(
-      ViewEntityType.submissionview
-    );
-    FluentFuture<List<ColumnModel>> datasetColumnsFuture = jsClient.getDefaultColumnsForView(
-      ViewEntityType.dataset
-    );
-    FluentFuture<List<ColumnModel>> datasetCollectionColumnsFuture = jsClient.getDefaultColumnsForView(
-      ViewEntityType.datasetcollection
-    );
+    FluentFuture<List<ColumnModel>> fileViewColumnsFuture =
+      jsClient.getDefaultColumnsForView(TableType.file_view.getViewTypeMask());
+    FluentFuture<List<ColumnModel>> projectViewColumnsFuture =
+      jsClient.getDefaultColumnsForView(
+        TableType.project_view.getViewTypeMask()
+      );
+    FluentFuture<List<ColumnModel>> submissionViewColumnsFuture =
+      jsClient.getDefaultColumnsForView(ViewEntityType.submissionview);
+    FluentFuture<List<ColumnModel>> datasetColumnsFuture =
+      jsClient.getDefaultColumnsForView(ViewEntityType.dataset);
+    FluentFuture<List<ColumnModel>> datasetCollectionColumnsFuture =
+      jsClient.getDefaultColumnsForView(ViewEntityType.datasetcollection);
     FluentFuture
       .from(
         whenAllComplete(

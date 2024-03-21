@@ -45,10 +45,8 @@ public class SubmissionViewScopeEditorModalWidgetTest {
 
   @Before
   public void before() {
-    widget = new SubmissionViewScopeEditorModalWidget(
-      mockView,
-      mockGlobalAppState
-    );
+    widget =
+      new SubmissionViewScopeEditorModalWidget(mockView, mockGlobalAppState);
     when(mockGlobalAppState.getPlaceChanger()).thenReturn(mockPlaceChanger);
   }
 

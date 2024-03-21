@@ -171,7 +171,8 @@ public class WikiDiffViewImpl implements WikiDiffView {
   ) {
     dropdown.clear();
     for (V2WikiHistorySnapshot v2WikiHistorySnapshot : wikiVersionHistory) {
-      WikiVersionAnchorListItem item = ginInjector.getWikiVersionAnchorListItem();
+      WikiVersionAnchorListItem item =
+        ginInjector.getWikiVersionAnchorListItem();
       item.setV2WikiHistorySnapshot(v2WikiHistorySnapshot);
       item.addClickHandler(clickHandler);
       dropdown.add(item);

@@ -183,7 +183,9 @@ public class EvaluationSubmitter implements Presenter {
 
   private AsyncCallback<List<Evaluation>> getEvalCallback() {
     challengeListSynAlert.clear();
-    AsyncCallback<List<Evaluation>> callback = new AsyncCallback<List<Evaluation>>() {
+    AsyncCallback<List<Evaluation>> callback = new AsyncCallback<
+      List<Evaluation>
+    >() {
       @Override
       public void onSuccess(List<Evaluation> evaluations) {
         if (evaluations == null || evaluations.size() == 0) {
@@ -361,12 +363,15 @@ public class EvaluationSubmitter implements Presenter {
     contributorSynAlert.clear();
     // get contributor list for this team
     view.setContributorsLoading(true);
-    AsyncCallback<TeamSubmissionEligibility> callback = new AsyncCallback<TeamSubmissionEligibility>() {
+    AsyncCallback<TeamSubmissionEligibility> callback = new AsyncCallback<
+      TeamSubmissionEligibility
+    >() {
       @Override
       public void onSuccess(TeamSubmissionEligibility teamEligibility) {
         view.setContributorsLoading(false);
         // is the team eligible???
-        SubmissionEligibility teamSubmissionEligibility = teamEligibility.getTeamEligibility();
+        SubmissionEligibility teamSubmissionEligibility =
+          teamEligibility.getTeamEligibility();
         if (!teamSubmissionEligibility.getIsEligible()) {
           // show the error
           String reason = ""; // unknown reason
@@ -474,7 +479,9 @@ public class EvaluationSubmitter implements Presenter {
       submissionName != null && submissionName.trim().length() > 0
     ) newSubmission.setName(submissionName);
     if (!isIndividualSubmission && !selectedTeamEligibleMembers.isEmpty()) {
-      Set<SubmissionContributor> contributors = new HashSet<SubmissionContributor>();
+      Set<SubmissionContributor> contributors = new HashSet<
+        SubmissionContributor
+      >();
       for (Long memberId : selectedTeamEligibleMembers) {
         SubmissionContributor contributor = new SubmissionContributor();
         contributor.setPrincipalId(memberId.toString());

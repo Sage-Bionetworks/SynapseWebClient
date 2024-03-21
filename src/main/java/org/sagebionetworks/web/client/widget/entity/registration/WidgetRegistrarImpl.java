@@ -94,7 +94,10 @@ import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 public class WidgetRegistrarImpl implements WidgetRegistrar {
 
-  private HashMap<String, String> contentType2FriendlyName = new HashMap<String, String>();
+  private HashMap<String, String> contentType2FriendlyName = new HashMap<
+    String,
+    String
+  >();
 
   PortalGinInjector ginInjector;
   JSONObjectAdapter adapter;
@@ -254,7 +257,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
     Callback widgetRefreshRequired,
     Long wikiVersionInView
   ) {
-    LazyLoadWikiWidgetWrapper wrapper = ginInjector.getLazyLoadWikiWidgetWrapper();
+    LazyLoadWikiWidgetWrapper wrapper =
+      ginInjector.getLazyLoadWikiWidgetWrapper();
     wrapper.configure(
       contentTypeKey,
       wikiKey,
@@ -294,9 +298,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
     String contentTypeKey,
     AsyncCallback<WidgetRendererPresenter> callback
   ) {
-    WidgetRendererPresenter presenter = getWidgetRendererForWidgetDescriptorAfterLazyLoad(
-      contentTypeKey
-    );
+    WidgetRendererPresenter presenter =
+      getWidgetRendererForWidgetDescriptorAfterLazyLoad(contentTypeKey);
     if (presenter == null) {
       callback.onFailure(
         new NotFoundException(

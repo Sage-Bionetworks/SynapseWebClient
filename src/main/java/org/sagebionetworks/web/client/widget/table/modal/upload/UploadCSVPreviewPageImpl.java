@@ -85,7 +85,8 @@ public class UploadCSVPreviewPageImpl
   @Override
   public void onPrimary() {
     // Get the current options
-    UploadToTablePreviewRequest currentOptions = csvOptionsWidget.getCurrentOptions();
+    UploadToTablePreviewRequest currentOptions =
+      csvOptionsWidget.getCurrentOptions();
     UploadToTableRequest uploadRequest = UploadRequestUtils.createFromPreview(
       currentOptions
     );
@@ -127,7 +128,8 @@ public class UploadCSVPreviewPageImpl
    * @return
    */
   private UploadToTablePreviewRequest createDefaultPreviewRequest() {
-    UploadToTablePreviewRequest previewRequest = new UploadToTablePreviewRequest();
+    UploadToTablePreviewRequest previewRequest =
+      new UploadToTablePreviewRequest();
     CsvTableDescriptor descriptor = new CsvTableDescriptor();
     descriptor.setSeparator(type.getDelimiter());
     previewRequest.setCsvTableDescriptor(descriptor);
@@ -145,7 +147,8 @@ public class UploadCSVPreviewPageImpl
     this.presenter.setPrimaryButtonText(NEXT);
     this.presenter.setInstructionMessage(PREPARING_A_PREVIEW);
     this.presenter.setLoading(true);
-    final UploadToTablePreviewRequest previewRequest = csvOptionsWidget.getCurrentOptions();
+    final UploadToTablePreviewRequest previewRequest =
+      csvOptionsWidget.getCurrentOptions();
     // Start the job
     jobTrackingWidget.startAndTrackJob(
       ANALYZING_FILE,

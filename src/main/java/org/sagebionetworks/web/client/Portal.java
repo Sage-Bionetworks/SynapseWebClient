@@ -98,9 +98,8 @@ public class Portal implements EntryPoint {
                   AppPlaceHistoryMapper historyMapper = GWT.create(
                     AppPlaceHistoryMapper.class
                   );
-                  final PlaceHistoryHandler historyHandler = new PlaceHistoryHandler(
-                    historyMapper
-                  );
+                  final PlaceHistoryHandler historyHandler =
+                    new PlaceHistoryHandler(historyMapper);
                   historyHandler.register(
                     placeController,
                     eventBus,
@@ -117,7 +116,8 @@ public class Portal implements EntryPoint {
                     RootPanel.get("headerPanel"),
                     RootPanel.get("rootPanel")
                   );
-                  final GlobalApplicationState globalApplicationState = ginjector.getGlobalApplicationState();
+                  final GlobalApplicationState globalApplicationState =
+                    ginjector.getGlobalApplicationState();
                   globalApplicationState.setPlaceController(placeController);
                   globalApplicationState.setAppPlaceHistoryMapper(
                     historyMapper

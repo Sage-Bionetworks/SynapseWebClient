@@ -381,17 +381,19 @@ public class WikiPageWidget
 
   @Override
   public void showRestoreWarning(final Long versionToRestore) {
-    org.sagebionetworks.web.client.utils.Callback okCallback = new org.sagebionetworks.web.client.utils.Callback() {
-      @Override
-      public void invoke() {
-        versionInView = versionToRestore;
-        restoreConfirmed();
-      }
-    };
-    org.sagebionetworks.web.client.utils.Callback cancelCallback = new org.sagebionetworks.web.client.utils.Callback() {
-      @Override
-      public void invoke() {}
-    };
+    org.sagebionetworks.web.client.utils.Callback okCallback =
+      new org.sagebionetworks.web.client.utils.Callback() {
+        @Override
+        public void invoke() {
+          versionInView = versionToRestore;
+          restoreConfirmed();
+        }
+      };
+    org.sagebionetworks.web.client.utils.Callback cancelCallback =
+      new org.sagebionetworks.web.client.utils.Callback() {
+        @Override
+        public void invoke() {}
+      };
     view.showPopup(
       DisplayConstants.RESTORING_WIKI_VERSION_WARNING_TITLE,
       DisplayConstants.RESTORING_WIKI_VERSION_WARNING_MESSAGE,

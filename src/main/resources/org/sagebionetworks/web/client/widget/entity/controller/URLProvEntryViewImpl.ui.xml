@@ -12,14 +12,16 @@
   <t:TableRow>
     <t:TableData addStyleNames="col-xs-4">
       <bh:Strong>
-		    	Name:&nbsp;
-		    </bh:Strong>
+        Name:
+        &nbsp;
+      </bh:Strong>
       <bh:Text ui:field="urlNameField" />
     </t:TableData>
     <t:TableData addStyleNames="col-xs-7">
       <bh:Strong addStyleNames="left">
-            	URL:&nbsp;
-            </bh:Strong>
+        URL:
+        &nbsp;
+      </bh:Strong>
       <b:Anchor ui:field="urlAddressField" />
     </t:TableData>
     <t:TableData addStyleNames="col-xs-1">

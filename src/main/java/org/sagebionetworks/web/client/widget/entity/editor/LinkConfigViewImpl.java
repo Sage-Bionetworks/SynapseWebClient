@@ -36,10 +36,8 @@ public class LinkConfigViewImpl implements LinkConfigView {
   public void checkParams() throws IllegalArgumentException {
     String url = urlField.getValue();
     if (
-      !(
-        ValidationUtils.isValidUrl(url, false) ||
-        EntityIdCellEditor.SYN_PATTERN.test(url)
-      )
+      !(ValidationUtils.isValidUrl(url, false) ||
+        EntityIdCellEditor.SYN_PATTERN.test(url))
     ) throw new IllegalArgumentException(
       "Invalid URL or Synapse ID: " + urlField.getValue()
     );

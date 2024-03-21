@@ -155,7 +155,8 @@ public class ApproveUserAccessModalTest {
   @Mock
   PopupUtilsView mockPopupUtils;
 
-  RestrictableObjectDescriptor expectedRestrictableObjectDescriptor = new RestrictableObjectDescriptor();
+  RestrictableObjectDescriptor expectedRestrictableObjectDescriptor =
+    new RestrictableObjectDescriptor();
   Long accessReq;
   String userId;
   String message;

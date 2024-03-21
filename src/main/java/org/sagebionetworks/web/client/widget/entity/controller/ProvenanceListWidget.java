@@ -46,7 +46,8 @@ public class ProvenanceListWidget
         .setSelectedMultiHandler((refs, finder) -> {
           for (Reference ref : refs) {
             if (ref.getTargetId() != null) {
-              final EntityRefProvEntryView newEntry = ginInjector.getEntityRefEntry();
+              final EntityRefProvEntryView newEntry =
+                ginInjector.getEntityRefEntry();
               rows.add(newEntry);
               String targetId = ref.getTargetId();
               Long version = ref.getTargetVersionNumber();

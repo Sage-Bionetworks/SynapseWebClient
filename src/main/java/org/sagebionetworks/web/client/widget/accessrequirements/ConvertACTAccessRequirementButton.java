@@ -100,7 +100,8 @@ public class ConvertACTAccessRequirementButton
   }
 
   public void convertAccessRequirement() {
-    AccessRequirementConversionRequest request = new AccessRequirementConversionRequest();
+    AccessRequirementConversionRequest request =
+      new AccessRequirementConversionRequest();
     request.setAccessRequirementId(ar.getId().toString());
     request.setCurrentVersion(ar.getVersionNumber());
     request.setEtag(ar.getEtag());

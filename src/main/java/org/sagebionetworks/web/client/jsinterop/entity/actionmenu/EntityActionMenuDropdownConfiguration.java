@@ -18,7 +18,8 @@ public class EntityActionMenuDropdownConfiguration {
     String tooltipText,
     boolean disabled
   ) {
-    EntityActionMenuDropdownConfiguration config = new EntityActionMenuDropdownConfiguration();
+    EntityActionMenuDropdownConfiguration config =
+      new EntityActionMenuDropdownConfiguration();
     config.visible = visible;
     config.tooltipText = tooltipText;
     config.disabled = disabled;

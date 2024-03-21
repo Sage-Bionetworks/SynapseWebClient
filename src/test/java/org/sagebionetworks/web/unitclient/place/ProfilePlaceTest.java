@@ -177,12 +177,10 @@ public class ProfilePlaceTest {
   public static final String CREATED_BY_ME_DELIMITER = Profile.getDelimiter(
     ProjectFilterEnum.CREATED_BY_ME
   );
-  public static final String ALL_MY_TEAM_PROJECTS_DELIMITER = Profile.getDelimiter(
-    ProjectFilterEnum.ALL_MY_TEAM_PROJECTS
-  );
-  public static final String SHARED_DIRECTLY_WITH_ME_PROJECTS_DELIMITER = Profile.getDelimiter(
-    ProjectFilterEnum.SHARED_DIRECTLY_WITH_ME
-  );
+  public static final String ALL_MY_TEAM_PROJECTS_DELIMITER =
+    Profile.getDelimiter(ProjectFilterEnum.ALL_MY_TEAM_PROJECTS);
+  public static final String SHARED_DIRECTLY_WITH_ME_PROJECTS_DELIMITER =
+    Profile.getDelimiter(ProjectFilterEnum.SHARED_DIRECTLY_WITH_ME);
   public static final String TEAM_PROJECTS_DELIMITER = Profile.getDelimiter(
     ProjectFilterEnum.TEAM
   );

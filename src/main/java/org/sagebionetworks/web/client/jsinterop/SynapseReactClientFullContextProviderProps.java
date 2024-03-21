@@ -17,7 +17,8 @@ public class SynapseReactClientFullContextProviderProps
     SynapseContextJsObject synapseContext,
     QueryClient queryClient
   ) {
-    SynapseReactClientFullContextProviderProps props = new SynapseReactClientFullContextProviderProps();
+    SynapseReactClientFullContextProviderProps props =
+      new SynapseReactClientFullContextProviderProps();
     props.synapseContext = synapseContext;
     props.queryClient = queryClient;
     return props;

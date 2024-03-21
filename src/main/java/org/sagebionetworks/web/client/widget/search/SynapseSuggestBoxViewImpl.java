@@ -53,17 +53,13 @@ public class SynapseSuggestBoxViewImpl
     });
 
     // Previous suggestions button.
-    (
-      (SynapseSuggestionDisplay) suggestBox.getSuggestionDisplay()
-    ).getPrevButton()
+    ((SynapseSuggestionDisplay) suggestBox.getSuggestionDisplay()).getPrevButton()
       .addClickHandler(event -> {
         presenter.getPrevSuggestions();
       });
 
     // Next suggestions button.
-    (
-      (SynapseSuggestionDisplay) suggestBox.getSuggestionDisplay()
-    ).getNextButton()
+    ((SynapseSuggestionDisplay) suggestBox.getSuggestionDisplay()).getNextButton()
       .addClickHandler(event -> {
         presenter.getNextSuggestions();
       });
@@ -92,17 +88,11 @@ public class SynapseSuggestBoxViewImpl
   @Override
   public void updateFieldStateForSuggestions(int numResults, int offset) {
     Button prevBtn =
-      (
-        (SynapseSuggestionDisplay) suggestBox.getSuggestionDisplay()
-      ).getPrevButton();
+      ((SynapseSuggestionDisplay) suggestBox.getSuggestionDisplay()).getPrevButton();
     Button nextBtn =
-      (
-        (SynapseSuggestionDisplay) suggestBox.getSuggestionDisplay()
-      ).getNextButton();
+      ((SynapseSuggestionDisplay) suggestBox.getSuggestionDisplay()).getNextButton();
     Label resultsLbl =
-      (
-        (SynapseSuggestionDisplay) suggestBox.getSuggestionDisplay()
-      ).getResultsLabel();
+      ((SynapseSuggestionDisplay) suggestBox.getSuggestionDisplay()).getResultsLabel();
 
     prevBtn.setEnabled(offset != 0);
     boolean moreResults = offset + SynapseSuggestBox.PAGE_SIZE < numResults;
@@ -143,9 +133,7 @@ public class SynapseSuggestBoxViewImpl
 
   @Override
   public void hideLoading() {
-    (
-      (SynapseSuggestionDisplay) suggestBox.getSuggestionDisplay()
-    ).hideLoading();
+    ((SynapseSuggestionDisplay) suggestBox.getSuggestionDisplay()).hideLoading();
   }
 
   @Override

@@ -14,7 +14,10 @@
   <bh:Div visible="false">
     <b:Heading size="H3" ui:field="totalItemCountContainer">
       <bh:Span ui:field="totalItemCountItemName">Files</bh:Span>
-      <bh:Span>&nbsp;(</bh:Span>
+      <bh:Span>
+        &nbsp;
+        (
+      </bh:Span>
       <bh:Span ui:field="totalItemCount">-</bh:Span>
       <bh:Span>)</bh:Span>
       <bh:Span

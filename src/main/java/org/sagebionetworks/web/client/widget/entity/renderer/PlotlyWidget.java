@@ -329,9 +329,9 @@ public class PlotlyWidget
     String[] xData = ArrayUtils.getStringArray(
       graphData.remove(xAxisColumnName)
     );
-    List<PlotlyTraceWrapper> plotlyGraphData = new ArrayList<PlotlyTraceWrapper>(
-      graphData.size()
-    );
+    List<PlotlyTraceWrapper> plotlyGraphData = new ArrayList<
+      PlotlyTraceWrapper
+    >(graphData.size());
     for (String columnName : graphData.keySet()) {
       PlotlyTraceWrapper trace = new PlotlyTraceWrapper();
       trace.setX(xData);

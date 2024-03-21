@@ -44,8 +44,7 @@ public class MembershipRequestBundle implements IsSerializable {
     final int prime = 31;
     int result = 1;
     result =
-      prime *
-      result +
+      prime * result +
       ((membershipRequest == null) ? 0 : membershipRequest.hashCode());
     result =
       prime * result + ((userProfile == null) ? 0 : userProfile.hashCode());

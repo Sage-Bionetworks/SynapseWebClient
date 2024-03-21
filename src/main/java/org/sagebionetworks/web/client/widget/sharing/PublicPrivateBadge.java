@@ -63,7 +63,9 @@ public class PublicPrivateBadge {
   public void configure(Entity entity) {
     view.clear();
     this.entity = entity;
-    AsyncCallback<AccessControlList> callback1 = new AsyncCallback<AccessControlList>() {
+    AsyncCallback<AccessControlList> callback1 = new AsyncCallback<
+      AccessControlList
+    >() {
       @Override
       public void onSuccess(AccessControlList result) {
         setAcl(result, null);

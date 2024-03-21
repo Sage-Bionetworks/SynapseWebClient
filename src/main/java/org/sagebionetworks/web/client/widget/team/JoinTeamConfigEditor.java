@@ -139,7 +139,8 @@ public class JoinTeamConfigEditor
 
   @Override
   public void updateDescriptorFromView() throws IllegalArgumentException {
-    UserGroupSuggestion suggestion = (UserGroupSuggestion) teamSuggestBox.getSelectedSuggestion();
+    UserGroupSuggestion suggestion =
+      (UserGroupSuggestion) teamSuggestBox.getSelectedSuggestion();
     if (suggestion != null) {
       descriptor.put(WidgetConstants.TEAM_ID_KEY, suggestion.getId());
     }

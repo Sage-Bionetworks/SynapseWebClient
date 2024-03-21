@@ -148,53 +148,51 @@ public class ACTAccessRequirementWidgetTest {
 
   @Before
   public void setUp() throws Exception {
-    widget = new ACTAccessRequirementWidget(
-      mockView,
-      mockJsClient,
-      mockWikiPageWidget,
-      mockSynAlert,
-      mockGinInjector,
-      mockTeamSubjectsWidget,
-      mockEntitySubjectsWidget,
-      mockAccessRequirementRelatedProjectsList,
-      mockCreateAccessRequirementButton,
-      mockDataAccessClient,
-      mockLazyLoadHelper,
-      mockAuthController,
-      mockManageAccessButton,
-      mockConvertACTAccessRequirementButton,
-      mockJsniUtils,
-      mockIsACTMemberAsyncHandler
-    );
+    widget =
+      new ACTAccessRequirementWidget(
+        mockView,
+        mockJsClient,
+        mockWikiPageWidget,
+        mockSynAlert,
+        mockGinInjector,
+        mockTeamSubjectsWidget,
+        mockEntitySubjectsWidget,
+        mockAccessRequirementRelatedProjectsList,
+        mockCreateAccessRequirementButton,
+        mockDataAccessClient,
+        mockLazyLoadHelper,
+        mockAuthController,
+        mockManageAccessButton,
+        mockConvertACTAccessRequirementButton,
+        mockJsniUtils,
+        mockIsACTMemberAsyncHandler
+      );
     when(mockACTAccessRequirement.getSubjectIds()).thenReturn(mockSubjectIds);
-    AsyncMockStubber.callSuccessWith(ROOT_WIKI_ID)
+    AsyncMockStubber
+      .callSuccessWith(ROOT_WIKI_ID)
       .when(mockJsClient)
       .getRootWikiPageKey(anyString(), anyString(), any(AsyncCallback.class));
-    verify(mockLazyLoadHelper).configure(
-      callbackCaptor.capture(),
-      eq(mockView)
-    );
+    verify(mockLazyLoadHelper)
+      .configure(callbackCaptor.capture(), eq(mockView));
     lazyLoadDataCallback = callbackCaptor.getValue();
-    AsyncMockStubber.callSuccessWith(mockDataAccessSubmissionStatus)
+    AsyncMockStubber
+      .callSuccessWith(mockDataAccessSubmissionStatus)
       .when(mockDataAccessClient)
       .getAccessRequirementStatus(anyString(), any(AsyncCallback.class));
     when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(false);
     when(mockAuthController.getCurrentUserProfile()).thenReturn(mockProfile);
     when(mockProfile.getOwnerId()).thenReturn(USER_ID);
-    when(mockProfile.getEmails()).thenReturn(
-      Collections.singletonList(USER_EMAIL)
-    );
+    when(mockProfile.getEmails())
+      .thenReturn(Collections.singletonList(USER_EMAIL));
     when(mockProfile.getFirstName()).thenReturn(FIRST_NAME);
     when(mockProfile.getLastName()).thenReturn(LAST_NAME);
     when(mockProfile.getUserName()).thenReturn(USERNAME);
-    when(mockSubjectIds.get(anyInt())).thenReturn(
-      mockRestrictableObjectDescriptor
-    );
+    when(mockSubjectIds.get(anyInt()))
+      .thenReturn(mockRestrictableObjectDescriptor);
     when(mockAuthController.isLoggedIn()).thenReturn(true);
     when(mockACTAccessRequirement.getId()).thenReturn(ACCESS_REQUIREMENT_ID);
-    when(mockRestrictableObjectDescriptor.getId()).thenReturn(
-      SUBJECT_OBJECT_ID
-    );
+    when(mockRestrictableObjectDescriptor.getId())
+      .thenReturn(SUBJECT_OBJECT_ID);
   }
 
   @Test
@@ -207,7 +205,8 @@ public class ACTAccessRequirementWidgetTest {
 
   @Test
   public void testSetRequirementWithContactInfoTerms() {
-    AsyncMockStubber.callFailureWith(new NotFoundException())
+    AsyncMockStubber
+      .callFailureWith(new NotFoundException())
       .when(mockJsClient)
       .getRootWikiPageKey(anyString(), anyString(), any(AsyncCallback.class));
     String tou = "must do things before access is allowed";
@@ -215,10 +214,8 @@ public class ACTAccessRequirementWidgetTest {
     widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
     verify(mockView).setTerms(tou);
     verify(mockView).showTermsUI();
-    verify(mockCreateAccessRequirementButton).configure(
-      mockACTAccessRequirement,
-      mockRefreshCallback
-    );
+    verify(mockCreateAccessRequirementButton)
+      .configure(mockACTAccessRequirement, mockRefreshCallback);
     verify(mockTeamSubjectsWidget).configure(mockSubjectIds);
     verify(mockEntitySubjectsWidget).configure(mockSubjectIds);
     verify(mockLazyLoadHelper).setIsConfigured();
@@ -227,17 +224,17 @@ public class ACTAccessRequirementWidgetTest {
 
   @Test
   public void testSetRequirementWithWikiTermsAndCustomDescription() {
-    when(mockACTAccessRequirement.getName()).thenReturn(
-      ACCESS_REQUIREMENT_NAME
-    );
+    when(mockACTAccessRequirement.getName())
+      .thenReturn(ACCESS_REQUIREMENT_NAME);
 
     widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
 
-    verify(mockWikiPageWidget).configure(
-      any(WikiPageKey.class),
-      eq(false),
-      any(WikiPageWidget.Callback.class)
-    );
+    verify(mockWikiPageWidget)
+      .configure(
+        any(WikiPageKey.class),
+        eq(false),
+        any(WikiPageWidget.Callback.class)
+      );
     verify(mockView).setAccessRequirementName(ACCESS_REQUIREMENT_NAME);
     verify(mockView, never()).setTerms(anyString());
     verify(mockView, never()).showTermsUI();
@@ -298,17 +295,18 @@ public class ACTAccessRequirementWidgetTest {
 
     widget.onRequestAccess();
 
-    verify(mockJsniUtils).showJiraIssueCollector(
-      REQUEST_ACCESS_ISSUE_SUMMARY,
-      REQUEST_ACCESS_ISSUE_DESCRIPTION,
-      REQUEST_ACCESS_ISSUE_COLLECTOR_URL,
-      USER_ID,
-      DisplayUtils.getDisplayName(FIRST_NAME, LAST_NAME, USERNAME),
-      USER_EMAIL,
-      SUBJECT_OBJECT_ID,
-      GRANT_ACCESS_REQUEST_COMPONENT_ID,
-      ACCESS_REQUIREMENT_ID.toString(),
-      ISSUE_PRIORITY_MINOR
-    );
+    verify(mockJsniUtils)
+      .showJiraIssueCollector(
+        REQUEST_ACCESS_ISSUE_SUMMARY,
+        REQUEST_ACCESS_ISSUE_DESCRIPTION,
+        REQUEST_ACCESS_ISSUE_COLLECTOR_URL,
+        USER_ID,
+        DisplayUtils.getDisplayName(FIRST_NAME, LAST_NAME, USERNAME),
+        USER_EMAIL,
+        SUBJECT_OBJECT_ID,
+        GRANT_ACCESS_REQUEST_COMPONENT_ID,
+        ACCESS_REQUIREMENT_ID.toString(),
+        ISSUE_PRIORITY_MINOR
+      );
   }
 }

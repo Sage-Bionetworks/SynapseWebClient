@@ -68,7 +68,9 @@ public class ColumnModelsWidgetTest {
   ArgumentCaptor<String> entityIdCaptor;
 
   @Captor
-  ArgumentCaptor<TableColumnSchemaEditorProps.OnColumnsUpdated> onColumnsUpdatedCaptor;
+  ArgumentCaptor<
+    TableColumnSchemaEditorProps.OnColumnsUpdated
+  > onColumnsUpdatedCaptor;
 
   @Captor
   ArgumentCaptor<TableColumnSchemaEditorProps.OnCancel> onCancelCaptor;

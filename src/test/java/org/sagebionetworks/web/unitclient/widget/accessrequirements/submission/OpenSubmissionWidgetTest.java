@@ -92,7 +92,8 @@ public class OpenSubmissionWidgetTest {
 
   @Test
   public void testLoadAccessRequirementSuccessWithACTAccessRequirement() {
-    ManagedACTAccessRequirement actAccessRequirement = new ManagedACTAccessRequirement();
+    ManagedACTAccessRequirement actAccessRequirement =
+      new ManagedACTAccessRequirement();
     AsyncMockStubber
       .callSuccessWith(actAccessRequirement)
       .when(mockClient)
@@ -107,7 +108,8 @@ public class OpenSubmissionWidgetTest {
 
   @Test
   public void testLoadAccessRequirementSuccessWithTermsOfUseAccessRequirement() {
-    TermsOfUseAccessRequirement touAccessRequirement = new TermsOfUseAccessRequirement();
+    TermsOfUseAccessRequirement touAccessRequirement =
+      new TermsOfUseAccessRequirement();
     AsyncMockStubber
       .callSuccessWith(touAccessRequirement)
       .when(mockClient)

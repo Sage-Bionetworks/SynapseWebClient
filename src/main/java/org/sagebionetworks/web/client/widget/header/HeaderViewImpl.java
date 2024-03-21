@@ -134,7 +134,8 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 
   @Override
   public void refresh() {
-    GlobalApplicationState globalAppState = ginInjector.getGlobalApplicationState();
+    GlobalApplicationState globalAppState =
+      ginInjector.getGlobalApplicationState();
     if (
       globalAppState.getCurrentPlace() == null ||
       globalAppState.getCurrentPlace() instanceof Home ||

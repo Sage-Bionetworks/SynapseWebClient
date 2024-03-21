@@ -34,7 +34,8 @@ public class SlackServlet extends HttpServlet {
 
   private static final long serialVersionUID = 1L;
 
-  protected static final ThreadLocal<HttpServletRequest> perThreadRequest = new ThreadLocal<HttpServletRequest>();
+  protected static final ThreadLocal<HttpServletRequest> perThreadRequest =
+    new ThreadLocal<HttpServletRequest>();
   public static final String COMMA = ", ";
   public static final String SYNAPSE_ID_REGEX =
     "\\s*[sS]{1}[yY]{1}[nN]{1}\\d+\\s*";

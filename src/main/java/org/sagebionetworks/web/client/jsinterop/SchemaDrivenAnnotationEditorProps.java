@@ -24,7 +24,8 @@ public class SchemaDrivenAnnotationEditorProps extends ReactComponentProps {
     String entityId,
     Callback onSuccess
   ) {
-    SchemaDrivenAnnotationEditorProps props = new SchemaDrivenAnnotationEditorProps();
+    SchemaDrivenAnnotationEditorProps props =
+      new SchemaDrivenAnnotationEditorProps();
     props.entityId = entityId;
     props.onSuccess = onSuccess;
     return props;

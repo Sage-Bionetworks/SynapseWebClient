@@ -154,7 +154,9 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
     ElementWrapper el = view.getElementById(currentWidgetDiv);
     while (el != null) {
       final Element loadElement = el.getElement();
-      final AsyncCallback<Void> mathProcessorLoadedCallback = new AsyncCallback<Void>() {
+      final AsyncCallback<Void> mathProcessorLoadedCallback = new AsyncCallback<
+        Void
+      >() {
         @Override
         public void onSuccess(Void result) {
           synapseJSNIUtils.processMath(loadElement);
@@ -193,21 +195,21 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
         try {
           innerText = innerText.trim();
           String contentType = widgetRegistrar.getWidgetContentType(innerText);
-          Map<String, String> widgetDescriptor = widgetRegistrar.getWidgetDescriptor(
-            innerText
-          );
-          IsWidget presenter = widgetRegistrar.getWidgetRendererForWidgetDescriptor(
-            wikiKey,
-            contentType,
-            widgetDescriptor,
-            new Callback() {
-              @Override
-              public void invoke() {
-                refresh();
-              }
-            },
-            wikiVersionInView
-          );
+          Map<String, String> widgetDescriptor =
+            widgetRegistrar.getWidgetDescriptor(innerText);
+          IsWidget presenter =
+            widgetRegistrar.getWidgetRendererForWidgetDescriptor(
+              wikiKey,
+              contentType,
+              widgetDescriptor,
+              new Callback() {
+                @Override
+                public void invoke() {
+                  refresh();
+                }
+              },
+              wikiVersionInView
+            );
           if (presenter == null) throw new IllegalArgumentException(
             "Unable to render widget from the specified markdown."
           );

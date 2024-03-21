@@ -29,7 +29,9 @@ public class ViewDefaultColumnsTest {
   @Mock
   SynapseJavascriptClient mockJsClient;
 
-  List<ColumnModel> columns, projectColumns, submissionViewColumns, datasetColumns, datasetCollectionColumns;
+  List<
+    ColumnModel
+  > columns, projectColumns, submissionViewColumns, datasetColumns, datasetCollectionColumns;
   ViewDefaultColumns viewDefaultColumns;
 
   @Mock
@@ -114,18 +116,16 @@ public class ViewDefaultColumnsTest {
     Set<String> columnNames = viewDefaultColumns.getDefaultViewColumnNames(
       TableType.file_view
     );
-    Set<String> projectColumnNames = viewDefaultColumns.getDefaultViewColumnNames(
-      TableType.project_view
-    );
-    Set<String> submissionViewColumnNames = viewDefaultColumns.getDefaultViewColumnNames(
-      TableType.submission_view
-    );
-    Set<String> datasetColumnNames = viewDefaultColumns.getDefaultViewColumnNames(
-      TableType.dataset
-    );
-    Set<String> datasetCollectionColumnNames = viewDefaultColumns.getDefaultViewColumnNames(
-      TableType.dataset_collection
-    );
+    Set<String> projectColumnNames =
+      viewDefaultColumns.getDefaultViewColumnNames(TableType.project_view);
+    Set<String> submissionViewColumnNames =
+      viewDefaultColumns.getDefaultViewColumnNames(TableType.submission_view);
+    Set<String> datasetColumnNames =
+      viewDefaultColumns.getDefaultViewColumnNames(TableType.dataset);
+    Set<String> datasetCollectionColumnNames =
+      viewDefaultColumns.getDefaultViewColumnNames(
+        TableType.dataset_collection
+      );
     assertTrue(columnNames.contains(FILE_COLUMN));
     assertTrue(projectColumnNames.contains(PROJECT_COLUMN));
     assertTrue(submissionViewColumnNames.contains(SUBMISSION_VIEW_COLUMN));

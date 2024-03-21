@@ -185,9 +185,8 @@ public class UploadCSVFinalPageImplTest {
     request.setLinesToSkip(null);
     page.configure(fileName, parentId, request, schema);
 
-    UploadToTableRequest expected = UploadRequestUtils.cloneUploadToTableRequest(
-      request
-    );
+    UploadToTableRequest expected =
+      UploadRequestUtils.cloneUploadToTableRequest(request);
     expected.getCsvTableDescriptor().setIsFirstLineHeader(Boolean.FALSE);
     expected.setLinesToSkip(1L);
 
@@ -205,9 +204,8 @@ public class UploadCSVFinalPageImplTest {
     request.setLinesToSkip(startLinesToSkip);
     page.configure(fileName, parentId, request, schema);
 
-    UploadToTableRequest expected = UploadRequestUtils.cloneUploadToTableRequest(
-      request
-    );
+    UploadToTableRequest expected =
+      UploadRequestUtils.cloneUploadToTableRequest(request);
     expected.getCsvTableDescriptor().setIsFirstLineHeader(Boolean.FALSE);
     expected.setLinesToSkip(startLinesToSkip + 1);
 
@@ -224,9 +222,8 @@ public class UploadCSVFinalPageImplTest {
     request.setLinesToSkip(null);
     page.configure(fileName, parentId, request, schema);
 
-    UploadToTableRequest expected = UploadRequestUtils.cloneUploadToTableRequest(
-      request
-    );
+    UploadToTableRequest expected =
+      UploadRequestUtils.cloneUploadToTableRequest(request);
 
     UploadToTableRequest result = page.getUploadToTableRequest();
     assertEquals(expected, result);

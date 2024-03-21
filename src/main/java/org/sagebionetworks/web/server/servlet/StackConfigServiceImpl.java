@@ -36,7 +36,8 @@ public class StackConfigServiceImpl
 
   @Override
   public StackStatus getCurrentStatus() throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createAnonymousSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createAnonymousSynapseClient();
     try {
       return synapseClient.getCurrentStackStatus();
     } catch (Exception e) {
@@ -46,7 +47,8 @@ public class StackConfigServiceImpl
 
   @Override
   public HashMap<String, String> getSynapseProperties() {
-    HashMap<String, String> properties = PortalPropertiesHolder.getPropertiesMap();
+    HashMap<String, String> properties =
+      PortalPropertiesHolder.getPropertiesMap();
     properties.put(
       WebConstants.REPO_SERVICE_URL_KEY,
       StackEndpoints.getRepositoryServiceEndpoint(this.getRequestHost())

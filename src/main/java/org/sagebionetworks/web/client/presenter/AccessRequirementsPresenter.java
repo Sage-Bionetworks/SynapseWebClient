@@ -192,7 +192,8 @@ public class AccessRequirementsPresenter
     for (AccessRequirement accessRequirement : allArs) {
       arIds.add(Long.toString(accessRequirement.getId()));
     }
-    BatchAccessApprovalInfoRequest request = new BatchAccessApprovalInfoRequest();
+    BatchAccessApprovalInfoRequest request =
+      new BatchAccessApprovalInfoRequest();
     request.setAccessRequirementIds(arIds);
     request.setUserId(authController.getCurrentUserPrincipalId());
 

@@ -42,7 +42,8 @@ public class DiscussionForumClientImpl
 
   public Forum getForumByProjectId(String projectId)
     throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       return synapseClient.getForumByProjectId(projectId);
     } catch (SynapseException e) {
@@ -53,7 +54,8 @@ public class DiscussionForumClientImpl
   @Override
   public DiscussionThreadBundle createThread(CreateDiscussionThread toCreate)
     throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       return synapseClient.createThread(toCreate);
     } catch (SynapseException e) {
@@ -63,7 +65,8 @@ public class DiscussionForumClientImpl
 
   public DiscussionThreadBundle getThread(String threadId)
     throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       return synapseClient.getThread(threadId);
     } catch (SynapseException e) {
@@ -79,7 +82,8 @@ public class DiscussionForumClientImpl
     Boolean ascending,
     DiscussionFilter filter
   ) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       return convertPaginated(
         synapseClient.getThreadsForForum(
@@ -98,7 +102,8 @@ public class DiscussionForumClientImpl
 
   @Override
   public void markThreadAsDeleted(String threadId) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       synapseClient.markThreadAsDeleted(threadId);
     } catch (SynapseException e) {
@@ -109,7 +114,8 @@ public class DiscussionForumClientImpl
   @Override
   public DiscussionReplyBundle createReply(CreateDiscussionReply toCreate)
     throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       return synapseClient.createReply(toCreate);
     } catch (SynapseException e) {
@@ -119,7 +125,8 @@ public class DiscussionForumClientImpl
 
   public DiscussionReplyBundle getReply(String replyId)
     throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       return synapseClient.getReply(replyId);
     } catch (SynapseException e) {
@@ -135,7 +142,8 @@ public class DiscussionForumClientImpl
     Boolean ascending,
     DiscussionFilter filter
   ) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       return convertPaginated(
         synapseClient.getRepliesForThread(
@@ -157,7 +165,8 @@ public class DiscussionForumClientImpl
     String replyId,
     UpdateReplyMessage newMessage
   ) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       return synapseClient.updateReplyMessage(replyId, newMessage);
     } catch (SynapseException e) {
@@ -167,7 +176,8 @@ public class DiscussionForumClientImpl
 
   @Override
   public void markReplyAsDeleted(String replyId) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       synapseClient.markReplyAsDeleted(replyId);
     } catch (SynapseException e) {
@@ -184,7 +194,8 @@ public class DiscussionForumClientImpl
     updateTitle.setTitle(newThread.getTitle());
     UpdateThreadMessage updateMessage = new UpdateThreadMessage();
     updateMessage.setMessageMarkdown(newThread.getMessage());
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       synapseClient.updateThreadTitle(threadId, updateTitle);
       return synapseClient.updateThreadMessage(threadId, updateMessage);
@@ -194,7 +205,8 @@ public class DiscussionForumClientImpl
   }
 
   public String getThreadUrl(String messageKey) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       return synapseClient.getThreadUrl(messageKey).toString();
     } catch (SynapseException e) {
@@ -203,7 +215,8 @@ public class DiscussionForumClientImpl
   }
 
   public String getReplyUrl(String messageKey) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       return synapseClient.getReplyUrl(messageKey).toString();
     } catch (SynapseException e) {
@@ -213,7 +226,8 @@ public class DiscussionForumClientImpl
 
   @Override
   public Project getForumProject(String forumId) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       Forum forum = synapseClient.getForum(forumId);
       return (Project) synapseClient.getEntityById(forum.getProjectId());
@@ -224,7 +238,8 @@ public class DiscussionForumClientImpl
 
   @Override
   public void pinThread(String threadId) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       synapseClient.pinThread(threadId);
     } catch (SynapseException e) {
@@ -234,7 +249,8 @@ public class DiscussionForumClientImpl
 
   @Override
   public void unpinThread(String threadId) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       synapseClient.unpinThread(threadId);
     } catch (SynapseException e) {
@@ -244,7 +260,8 @@ public class DiscussionForumClientImpl
 
   @Override
   public void restoreThread(String threadId) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       synapseClient.restoreDeletedThread(threadId);
     } catch (SynapseException e) {

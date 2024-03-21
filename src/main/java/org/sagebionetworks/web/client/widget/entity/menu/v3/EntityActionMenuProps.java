@@ -37,7 +37,8 @@ public class EntityActionMenuProps {
   }
 
   public EntityActionMenuPropsJsInterop toJsInterop() {
-    JsPropertyMap<ActionConfiguration> actionConfigMap = new ActionConfigurationMap();
+    JsPropertyMap<ActionConfiguration> actionConfigMap =
+      new ActionConfigurationMap();
     this.actionConfiguration.keySet()
       .forEach(action -> {
         ActionConfiguration config = this.actionConfiguration.get(action);

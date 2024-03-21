@@ -15,7 +15,8 @@ import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 public class BaseEntityHeaderAsyncHandlerImpl {
 
-  private Map<Reference, List<AsyncCallback<EntityHeader>>> reference2Callback = new HashMap<Reference, List<AsyncCallback<EntityHeader>>>();
+  private Map<Reference, List<AsyncCallback<EntityHeader>>> reference2Callback =
+    new HashMap<Reference, List<AsyncCallback<EntityHeader>>>();
   SynapseJavascriptClient jsClient;
   boolean isUsingVersion;
 
@@ -52,7 +53,13 @@ public class BaseEntityHeaderAsyncHandlerImpl {
 
   public void executeRequests() {
     if (!reference2Callback.isEmpty()) {
-      final Map<Reference, List<AsyncCallback<EntityHeader>>> reference2CallbackCopy = new HashMap<Reference, List<AsyncCallback<EntityHeader>>>();
+      final Map<
+        Reference,
+        List<AsyncCallback<EntityHeader>>
+      > reference2CallbackCopy = new HashMap<
+        Reference,
+        List<AsyncCallback<EntityHeader>>
+      >();
       reference2CallbackCopy.putAll(reference2Callback);
       reference2Callback.clear();
       List<Reference> entityIdsList = new ArrayList<Reference>();
@@ -69,9 +76,8 @@ public class BaseEntityHeaderAsyncHandlerImpl {
           }
 
           private void callOnFailure(Reference entityId, Throwable ex) {
-            List<AsyncCallback<EntityHeader>> callbacks = reference2CallbackCopy.get(
-              entityId
-            );
+            List<AsyncCallback<EntityHeader>> callbacks =
+              reference2CallbackCopy.get(entityId);
             if (callbacks != null) {
               for (AsyncCallback<EntityHeader> callback : callbacks) {
                 callback.onFailure(ex);
@@ -89,9 +95,8 @@ public class BaseEntityHeaderAsyncHandlerImpl {
               } else {
                 ref.setTargetVersionNumber(null);
               }
-              List<AsyncCallback<EntityHeader>> callbacks = reference2CallbackCopy.remove(
-                ref
-              );
+              List<AsyncCallback<EntityHeader>> callbacks =
+                reference2CallbackCopy.remove(ref);
               if (callbacks != null) {
                 for (AsyncCallback<EntityHeader> callback : callbacks) {
                   callback.onSuccess(entityHeader);

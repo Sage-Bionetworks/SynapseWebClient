@@ -139,8 +139,10 @@ public class CrawlFilterTest {
     String synapseID = "syn12345";
     when(mockEntity.getId()).thenReturn(synapseID);
     when(mockRequest.getRequestURI()).thenReturn("/Synapse:" + synapseID);
-    Map<String, AnnotationsValue> annotationsMap =
-      new HashMap<String, AnnotationsValue>();
+    Map<String, AnnotationsValue> annotationsMap = new HashMap<
+      String,
+      AnnotationsValue
+    >();
     when(mockAnnotations.getAnnotations()).thenReturn(annotationsMap);
     annotationsMap.put("noindex", new AnnotationsValue());
 

@@ -153,7 +153,9 @@ public class SubmitToEvaluationWidget
       }
       return;
     } else {
-      AsyncCallback<Set<String>> asyncCallback = new AsyncCallback<Set<String>>() {
+      AsyncCallback<Set<String>> asyncCallback = new AsyncCallback<
+        Set<String>
+      >() {
         @Override
         public void onSuccess(Set<String> evaluationIds) {
           // if no evaluations are accessible, do not continue (show nothing)

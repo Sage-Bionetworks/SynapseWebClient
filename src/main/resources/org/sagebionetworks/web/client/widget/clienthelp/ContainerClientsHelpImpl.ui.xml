@@ -63,16 +63,20 @@
             <g:HTMLPanel>
               <pre>
                 <code class="nohighlight">
-									library(synapser)
-									<br />
-									library(synapserutils)
-									<br />
-									<br />
-									synLogin(authToken="")
-									<br />
-									files &#60;- synapserutils::syncFromSynapse('<span ui:field="id3" />')
-									<br />
-								</code>
+                  library(synapser)
+                  <br />
+                  library(synapserutils)
+                  <br />
+                  <br />
+                  synLogin(authToken="")
+                  <br />
+                  files
+                  &#60;
+                  - synapserutils::syncFromSynapse('
+                  <span ui:field="id3" />
+                  ')
+                  <br />
+                </code>
               </pre>
             </g:HTMLPanel>
           </b:TabPane>

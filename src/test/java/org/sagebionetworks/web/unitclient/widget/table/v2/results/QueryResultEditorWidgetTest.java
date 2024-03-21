@@ -313,7 +313,8 @@ public class QueryResultEditorWidgetTest {
     // not valid
     when(mockPageWidget.isValid()).thenReturn(true);
     // setup successful job
-    TableUpdateTransactionResponse response = new TableUpdateTransactionResponse();
+    TableUpdateTransactionResponse response =
+      new TableUpdateTransactionResponse();
     List<TableUpdateResponse> results = new ArrayList<TableUpdateResponse>();
     results.add(new RowReferenceSetResults());
     response.setResults(results);
@@ -349,7 +350,8 @@ public class QueryResultEditorWidgetTest {
     // not valid
     when(mockPageWidget.isValid()).thenReturn(true);
     // setup successful job
-    TableUpdateTransactionResponse response = new TableUpdateTransactionResponse();
+    TableUpdateTransactionResponse response =
+      new TableUpdateTransactionResponse();
     List<TableUpdateResponse> results = new ArrayList<TableUpdateResponse>();
     EntityUpdateResult entityUpdateResult = new EntityUpdateResult();
     EntityUpdateResults entityUpdateResults = new EntityUpdateResults();
@@ -482,7 +484,9 @@ public class QueryResultEditorWidgetTest {
   @Test
   public void testGetEntityUpdateResultsFailureSuccessIndex() {
     EntityUpdateResults results = new EntityUpdateResults();
-    List<EntityUpdateResult> updateResults = new ArrayList<EntityUpdateResult>();
+    List<EntityUpdateResult> updateResults = new ArrayList<
+      EntityUpdateResult
+    >();
     updateResults.add(mockEntityUpdateResult1);
     updateResults.add(mockEntityUpdateResult2);
     results.setUpdateResults(updateResults);

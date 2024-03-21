@@ -110,7 +110,8 @@ public class VerificationSubmissionWidget
 
   @Override
   public void showSubmissionInModal() {
-    VerificationSubmissionWidget widget = ginInjector.getVerificationSubmissionWidget();
+    VerificationSubmissionWidget widget =
+      ginInjector.getVerificationSubmissionWidget();
     boolean isModal = true;
     if (isNewSubmission) {
       widget.configure(profile, orcId, isModal, existingAttachments);
@@ -317,7 +318,8 @@ public class VerificationSubmissionWidget
 
   @Override
   public void approveVerification() {
-    PromptForValuesModalView promptForValuesModal = ginInjector.getPromptForValuesModal();
+    PromptForValuesModalView promptForValuesModal =
+      ginInjector.getPromptForValuesModal();
     view.setPromptModal(promptForValuesModal.asWidget());
     promptForValuesModal.configureAndShow(
       getConfirmationDialogTitle(VerificationStateEnum.APPROVED),
@@ -426,7 +428,8 @@ public class VerificationSubmissionWidget
     RejectReasonWidget promptModal = ginInjector.getRejectReasonWidget();
     view.setPromptModal(promptModal.asWidget());
     promptModal.show(rejectionReason -> {
-      PromptForValuesModalView promptForValuesModal = ginInjector.getPromptForValuesModal();
+      PromptForValuesModalView promptForValuesModal =
+        ginInjector.getPromptForValuesModal();
       view.setPromptModal(promptForValuesModal.asWidget());
       promptForValuesModal.configureAndShow(
         getConfirmationDialogTitle(actRejectState),

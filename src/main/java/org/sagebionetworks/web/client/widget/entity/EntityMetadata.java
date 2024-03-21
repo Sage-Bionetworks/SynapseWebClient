@@ -116,10 +116,13 @@ public class EntityMetadata {
       (action, e) -> setAnnotationsVisible(!annotationsAreVisible)
     );
 
-    actionMenu.setActionListener(Action.SHOW_VERSION_HISTORY, (action, e) -> {
-      getVersionHistoryWidget()
-        .setVisible(!getVersionHistoryWidget().isVisible());
-    });
+    actionMenu.setActionListener(
+      Action.SHOW_VERSION_HISTORY,
+      (action, e) -> {
+        getVersionHistoryWidget()
+          .setVisible(!getVersionHistoryWidget().isVisible());
+      }
+    );
 
     boolean isCurrentVersion = en instanceof VersionableEntity
       ? ((VersionableEntity) en).getIsLatestVersion()

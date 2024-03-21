@@ -151,10 +151,16 @@ public class ScopeWidgetTest {
 
     widget.onEditScopeAndMask();
 
-    ArgumentCaptor<EntityViewScopeEditorModalProps.Callback> onUpdateArgumentCaptor =
-      ArgumentCaptor.forClass(EntityViewScopeEditorModalProps.Callback.class);
-    ArgumentCaptor<EntityViewScopeEditorModalProps.Callback> onCancelArgumentCaptor =
-      ArgumentCaptor.forClass(EntityViewScopeEditorModalProps.Callback.class);
+    ArgumentCaptor<
+      EntityViewScopeEditorModalProps.Callback
+    > onUpdateArgumentCaptor = ArgumentCaptor.forClass(
+      EntityViewScopeEditorModalProps.Callback.class
+    );
+    ArgumentCaptor<
+      EntityViewScopeEditorModalProps.Callback
+    > onCancelArgumentCaptor = ArgumentCaptor.forClass(
+      EntityViewScopeEditorModalProps.Callback.class
+    );
     verify(mockEntityViewScopeEditorModalWidget)
       .configure(
         eq(entityId),
@@ -181,10 +187,16 @@ public class ScopeWidgetTest {
 
     widget.onEditScopeAndMask();
 
-    ArgumentCaptor<EntityViewScopeEditorModalProps.Callback> onUpdateArgumentCaptor =
-      ArgumentCaptor.forClass(EntityViewScopeEditorModalProps.Callback.class);
-    ArgumentCaptor<EntityViewScopeEditorModalProps.Callback> onCancelArgumentCaptor =
-      ArgumentCaptor.forClass(EntityViewScopeEditorModalProps.Callback.class);
+    ArgumentCaptor<
+      EntityViewScopeEditorModalProps.Callback
+    > onUpdateArgumentCaptor = ArgumentCaptor.forClass(
+      EntityViewScopeEditorModalProps.Callback.class
+    );
+    ArgumentCaptor<
+      EntityViewScopeEditorModalProps.Callback
+    > onCancelArgumentCaptor = ArgumentCaptor.forClass(
+      EntityViewScopeEditorModalProps.Callback.class
+    );
     verify(mockEntityViewScopeEditorModalWidget)
       .configure(
         eq(entityId),
@@ -230,10 +242,16 @@ public class ScopeWidgetTest {
     widget.onEditScopeAndMask();
 
     // verify new editor is configured
-    ArgumentCaptor<EntityViewScopeEditorModalProps.Callback> onUpdateArgumentCaptor =
-      ArgumentCaptor.forClass(EntityViewScopeEditorModalProps.Callback.class);
-    ArgumentCaptor<EntityViewScopeEditorModalProps.Callback> onCancelArgumentCaptor =
-      ArgumentCaptor.forClass(EntityViewScopeEditorModalProps.Callback.class);
+    ArgumentCaptor<
+      EntityViewScopeEditorModalProps.Callback
+    > onUpdateArgumentCaptor = ArgumentCaptor.forClass(
+      EntityViewScopeEditorModalProps.Callback.class
+    );
+    ArgumentCaptor<
+      EntityViewScopeEditorModalProps.Callback
+    > onCancelArgumentCaptor = ArgumentCaptor.forClass(
+      EntityViewScopeEditorModalProps.Callback.class
+    );
     verify(mockEntityViewScopeEditorModalWidget)
       .configure(
         eq(entityId),

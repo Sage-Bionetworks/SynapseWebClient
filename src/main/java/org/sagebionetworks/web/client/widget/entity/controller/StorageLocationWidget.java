@@ -119,7 +119,8 @@ public class StorageLocationWidget
             // set up the view
             String banner = trim(uploadDestination.getBanner());
             if (uploadDestination instanceof ExternalS3UploadDestination) {
-              ExternalS3UploadDestination destination = (ExternalS3UploadDestination) uploadDestination;
+              ExternalS3UploadDestination destination =
+                (ExternalS3UploadDestination) uploadDestination;
               boolean isStsEnabled = destination.getStsEnabled() == null
                 ? false
                 : destination.getStsEnabled();
@@ -133,7 +134,8 @@ public class StorageLocationWidget
               uploadDestination instanceof ExternalGoogleCloudUploadDestination
             ) {
               view.setGoogleCloudVisible(true);
-              ExternalGoogleCloudUploadDestination destination = (ExternalGoogleCloudUploadDestination) uploadDestination;
+              ExternalGoogleCloudUploadDestination destination =
+                (ExternalGoogleCloudUploadDestination) uploadDestination;
               view.setGoogleCloudBaseKey(trim(destination.getBaseKey()));
               view.setGoogleCloudBucket(trim(destination.getBucket()));
               view.setExternalGoogleCloudBanner(banner);
@@ -141,7 +143,8 @@ public class StorageLocationWidget
             } else if (
               uploadDestination instanceof ExternalObjectStoreUploadDestination
             ) {
-              ExternalObjectStoreUploadDestination destination = (ExternalObjectStoreUploadDestination) uploadDestination;
+              ExternalObjectStoreUploadDestination destination =
+                (ExternalObjectStoreUploadDestination) uploadDestination;
               view.setExternalObjectStoreBanner(banner);
               view.setExternalObjectStoreBucket(trim(destination.getBucket()));
               view.setExternalObjectStoreEndpointUrl(
@@ -221,7 +224,8 @@ public class StorageLocationWidget
     throws Exception {
     try {
       if (view.isExternalS3StorageSelected()) {
-        ExternalS3StorageLocationSetting setting = new ExternalS3StorageLocationSetting();
+        ExternalS3StorageLocationSetting setting =
+          new ExternalS3StorageLocationSetting();
         setting.setBanner(
           replaceWithNullIfEmptyTrimmedString(view.getExternalS3Banner())
         );
@@ -235,7 +239,8 @@ public class StorageLocationWidget
         setting.setUploadType(UploadType.S3);
         return setting;
       } else if (view.isExternalGoogleCloudStorageSelected()) {
-        ExternalGoogleCloudStorageLocationSetting setting = new ExternalGoogleCloudStorageLocationSetting();
+        ExternalGoogleCloudStorageLocationSetting setting =
+          new ExternalGoogleCloudStorageLocationSetting();
         setting.setBanner(
           replaceWithNullIfEmptyTrimmedString(
             view.getExternalGoogleCloudBanner()
@@ -250,7 +255,8 @@ public class StorageLocationWidget
         setting.setUploadType(UploadType.GOOGLECLOUDSTORAGE);
         return setting;
       } else if (view.isExternalObjectStoreSelected()) {
-        ExternalObjectStorageLocationSetting setting = new ExternalObjectStorageLocationSetting();
+        ExternalObjectStorageLocationSetting setting =
+          new ExternalObjectStorageLocationSetting();
         setting.setBanner(
           replaceWithNullIfEmptyTrimmedString(
             view.getExternalObjectStoreBanner()
@@ -289,7 +295,8 @@ public class StorageLocationWidget
   public String validate(StorageLocationSetting setting) {
     if (setting != null) {
       if (setting instanceof ExternalS3StorageLocationSetting) {
-        ExternalS3StorageLocationSetting externalS3StorageLocationSetting = (ExternalS3StorageLocationSetting) setting;
+        ExternalS3StorageLocationSetting externalS3StorageLocationSetting =
+          (ExternalS3StorageLocationSetting) setting;
         if (
           externalS3StorageLocationSetting.getBucket() == null ||
           externalS3StorageLocationSetting.getBucket().trim().isEmpty()
@@ -297,7 +304,8 @@ public class StorageLocationWidget
           return "Bucket is required.";
         }
       } else if (setting instanceof ExternalGoogleCloudStorageLocationSetting) {
-        ExternalGoogleCloudStorageLocationSetting externalGoogleCloudStorageLocationSetting = (ExternalGoogleCloudStorageLocationSetting) setting;
+        ExternalGoogleCloudStorageLocationSetting externalGoogleCloudStorageLocationSetting =
+          (ExternalGoogleCloudStorageLocationSetting) setting;
         if (
           externalGoogleCloudStorageLocationSetting.getBucket() == null ||
           externalGoogleCloudStorageLocationSetting.getBucket().trim().isEmpty()

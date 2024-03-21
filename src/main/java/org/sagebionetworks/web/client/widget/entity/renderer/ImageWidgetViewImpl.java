@@ -167,7 +167,7 @@ public class ImageWidgetViewImpl extends FlowPanel implements ImageWidgetView {
 
         private void setImageToMaxSize(float imageWidth, float imageHeight) {
           image.setWidth(MAX_IMAGE_WIDTH + "px");
-          image.setHeight(imageHeight * MAX_IMAGE_WIDTH / imageWidth + "px");
+          image.setHeight((imageHeight * MAX_IMAGE_WIDTH) / imageWidth + "px");
         }
       }
     );
