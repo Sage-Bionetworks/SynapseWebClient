@@ -760,7 +760,9 @@ import org.sagebionetworks.web.client.widget.upload.FileInputViewImpl;
 import org.sagebionetworks.web.client.widget.upload.ImageUploadView;
 import org.sagebionetworks.web.client.widget.upload.ImageUploadViewImpl;
 import org.sagebionetworks.web.client.widget.upload.MultipartUploader;
-import org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl;
+import org.sagebionetworks.web.client.widget.upload.MultipartUploaderImplV2;
+import org.sagebionetworks.web.client.widget.upload.SRCUploadFileWrapper;
+import org.sagebionetworks.web.client.widget.upload.SRCUploadFileWrapperImpl;
 import org.sagebionetworks.web.client.widget.user.UserBadgeView;
 import org.sagebionetworks.web.client.widget.user.UserBadgeViewImpl;
 
@@ -1029,7 +1031,7 @@ public class PortalGinModule extends AbstractGinModule {
     // User Suggest Box
     bind(SynapseSuggestBoxView.class).to(SynapseSuggestBoxViewImpl.class);
 
-    bind(MultipartUploader.class).to(MultipartUploaderImpl.class);
+    bind(MultipartUploader.class).to(MultipartUploaderImplV2.class);
 
     bind(FileInputView.class).to(FileInputViewImpl.class);
 
@@ -1704,5 +1706,6 @@ public class PortalGinModule extends AbstractGinModule {
       .in(Singleton.class);
 
     bind(KeyFactoryProvider.class).to(KeyFactoryProviderImpl.class);
+    bind(SRCUploadFileWrapper.class).to(SRCUploadFileWrapperImpl.class);
   }
 }

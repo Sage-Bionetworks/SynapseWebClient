@@ -29,6 +29,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -62,8 +63,8 @@ public class Uploader
     SynapseWidgetPresenter,
     ProgressingFileUploadHandler {
 
-  public static final long OLD_BROWSER_MAX_SIZE = (long) ClientProperties.MB *
-  5; // 5MB
+  public static final long OLD_BROWSER_MAX_SIZE =
+    (long) ClientProperties.MB * 5; // 5MB
   private UploaderView view;
   private UploadSuccessHandler successHandler;
   private CancelHandler cancelHandler;
@@ -77,6 +78,7 @@ public class Uploader
   private GlobalApplicationState globalAppState;
   private GWTWrapper gwt;
   MultipartUploader multiPartUploader;
+  MultipartUploader legacyMultiPartUploader;
   AuthenticationController authenticationController;
 
   private String[] fileNames;
@@ -107,7 +109,8 @@ public class Uploader
     S3DirectUploader s3DirectUploader,
     SynapseJavascriptClient jsClient,
     SynapseProperties synapseProperties,
-    EventBus eventBus
+    EventBus eventBus,
+    PortalGinInjector ginInjector
   ) {
     this.view = view;
     this.synapseClient = synapseClient;
@@ -122,6 +125,7 @@ public class Uploader
     this.jsClient = jsClient;
     this.synapseProperties = synapseProperties;
     this.eventBus = eventBus;
+    legacyMultiPartUploader = ginInjector.getLegacyMultipartUploader();
     view.setPresenter(this);
   }
 
@@ -184,7 +188,8 @@ public class Uploader
 
   public String getSelectedFilesText() {
     String[] selectedFiles = getSelectedFileNames();
-    if (selectedFiles == null) return ""; else if (selectedFiles.length == 1) {
+    if (selectedFiles == null) return "";
+    else if (selectedFiles.length == 1) {
       return selectedFiles[0];
     } else {
       return selectedFiles.length + " files";
@@ -257,17 +262,18 @@ public class Uploader
               uploadDestinations.get(0) instanceof S3UploadDestination
             ) {
               currentUploadType = UploadType.S3;
-              storageLocationId =
-                uploadDestinations.get(0).getStorageLocationId();
+              storageLocationId = uploadDestinations
+                .get(0)
+                .getStorageLocationId();
               updateUploadBannerView(uploadDestinations.get(0));
             } else if (
-              uploadDestinations.get(
-                0
-              ) instanceof ExternalGoogleCloudUploadDestination
+              uploadDestinations.get(0) instanceof
+              ExternalGoogleCloudUploadDestination
             ) {
               currentUploadType = UploadType.GOOGLECLOUDSTORAGE;
-              storageLocationId =
-                uploadDestinations.get(0).getStorageLocationId();
+              storageLocationId = uploadDestinations
+                .get(0)
+                .getStorageLocationId();
               updateUploadBannerView(uploadDestinations.get(0));
             } else if (
               uploadDestinations.get(0) instanceof ExternalUploadDestination
@@ -301,9 +307,8 @@ public class Uploader
               updateUploadBannerView(externalUploadDestination);
               // direct to s3(-like) storage
             } else if (
-              uploadDestinations.get(
-                0
-              ) instanceof ExternalObjectStoreUploadDestination
+              uploadDestinations.get(0) instanceof
+              ExternalObjectStoreUploadDestination
             ) {
               ExternalObjectStoreUploadDestination externalUploadDestination =
                 (ExternalObjectStoreUploadDestination) uploadDestinations.get(
@@ -669,14 +674,18 @@ public class Uploader
         view
       );
     } else {
-      this.multiPartUploader.uploadFile(
-          fileName,
-          contentType,
-          currentFile,
-          this,
-          storageLocationId,
-          view
-        );
+      // TODO: PLFM-8252: If Google Cloud platform Synapse solution supports parallel upload, then remove legacyMultiPartUploader (and all associated code)
+      MultipartUploader currentUploader = currentUploadType == UploadType.S3
+        ? multiPartUploader
+        : legacyMultiPartUploader;
+      currentUploader.uploadFile(
+        fileName,
+        contentType,
+        currentFile,
+        this,
+        storageLocationId,
+        view
+      );
     }
   }
 
@@ -1067,8 +1076,7 @@ public class Uploader
   ) {
     double percentPerFile = 1.0 / (double) numberFiles;
     double percentOfAllFiles =
-      percentPerFile *
-      percentOfCurrentFile +
+      percentPerFile * percentOfCurrentFile +
       (percentPerFile * currentFileIndex);
     return percentOfAllFiles;
   }

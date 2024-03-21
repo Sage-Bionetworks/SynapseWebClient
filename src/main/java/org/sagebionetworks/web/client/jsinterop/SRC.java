@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client.jsinterop;
 
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArrayString;
+import jsinterop.annotations.JsFunction;
 import jsinterop.annotations.JsNullable;
 import jsinterop.annotations.JsPackage;
 import jsinterop.annotations.JsType;
@@ -141,5 +143,45 @@ public class SRC {
   public static class SynapseConstants {
 
     public static JsArrayString PERSISTENT_LOCAL_STORAGE_KEYS;
+  }
+
+  @JsType(isNative = true)
+  public static class SynapseClient {
+
+    @JsType(isNative = true, namespace = JsPackage.GLOBAL, name = "Object")
+    public static class ProgressCallback {
+
+      public double value;
+      public double total;
+    }
+
+    @JsType(isNative = true, namespace = JsPackage.GLOBAL, name = "Object")
+    public static class FileUploadComplete {
+
+      public String fileHandleId;
+      public String fileName;
+    }
+
+    @FunctionalInterface
+    @JsFunction
+    public interface Progress {
+      void onProgress(ProgressCallback callback);
+    }
+
+    @FunctionalInterface
+    @JsFunction
+    public interface IsCancelled {
+      boolean isCancelled();
+    }
+
+    public static native Promise<FileUploadComplete> uploadFile(
+      String accessToken,
+      String filename,
+      JavaScriptObject file, // blob
+      int storageLocationId,
+      String contentType,
+      Progress progressCallback,
+      IsCancelled getIsCancelled
+    );
   }
 }

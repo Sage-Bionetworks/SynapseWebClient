@@ -23,8 +23,6 @@ public class EntityMetadataViewImpl
     EntityMetadataViewImplUiBinder.class
   );
 
-  private Presenter presenter;
-
   @UiField
   HTMLPanel detailedMetadata;
 
@@ -36,15 +34,6 @@ public class EntityMetadataViewImpl
 
   @UiField
   Span doiPanel;
-
-  @UiField
-  Collapse annotationsContent;
-
-  @UiField
-  SimplePanel annotationsContainer;
-
-  @UiField
-  IconSvg annotationsContentCloseButton;
 
   @UiField
   Span containerItemCountContainer;
@@ -62,9 +51,6 @@ public class EntityMetadataViewImpl
   Span uploadDestinationField;
 
   @UiField
-  Text annotationsTitleText;
-
-  @UiField
   Div descriptionContainer;
 
   @UiField
@@ -77,14 +63,6 @@ public class EntityMetadataViewImpl
   public EntityMetadataViewImpl() {
     initWidget(uiBinder.createAndBindUi(this));
     idField.addClickHandler(event -> idField.selectAll());
-    annotationsContentCloseButton.addClickHandler(event ->
-      this.presenter.toggleAnnotationsVisible()
-    );
-  }
-
-  @Override
-  public void setPresenter(Presenter presenter) {
-    this.presenter = presenter;
   }
 
   @Override
@@ -100,11 +78,6 @@ public class EntityMetadataViewImpl
   }
 
   @Override
-  public void setAnnotationsRendererWidget(IsWidget annotationsWidget) {
-    annotationsContainer.setWidget(annotationsWidget);
-  }
-
-  @Override
   public void setUploadDestinationPanelVisible(boolean isVisible) {
     uploadDestinationPanel.setVisible(isVisible);
   }
@@ -112,15 +85,6 @@ public class EntityMetadataViewImpl
   @Override
   public void setUploadDestinationText(String text) {
     uploadDestinationField.setText(text);
-  }
-
-  @Override
-  public void setAnnotationsVisible(boolean visible) {
-    if (visible) {
-      annotationsContent.show();
-    } else {
-      annotationsContent.hide();
-    }
   }
 
   @Override
@@ -137,7 +101,6 @@ public class EntityMetadataViewImpl
   @Override
   public void clear() {
     dataUseContainer.setVisible(false);
-    annotationsContent.hide();
     uploadDestinationField.setText("");
     uploadDestinationPanel.setVisible(false);
   }
@@ -172,11 +135,6 @@ public class EntityMetadataViewImpl
   @Override
   public void setRestrictionWidgetV2Visible(boolean visible) {
     restrictionPanelV2.setVisible(visible);
-  }
-
-  @Override
-  public void setAnnotationsTitleText(String text) {
-    annotationsTitleText.setText(text);
   }
 
   @Override
