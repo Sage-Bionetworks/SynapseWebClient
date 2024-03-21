@@ -22,7 +22,6 @@ import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.Tooltip;
-import org.gwtbootstrap3.client.ui.base.TextBoxBase;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
@@ -65,25 +64,46 @@ public class UserProfileEditorWidgetViewImpl
   TextBox username;
 
   @UiField
+  Paragraph usernameRenderer;
+
+  @UiField
   TextBox firstName;
+
+  @UiField
+  Paragraph firstNameRenderer;
 
   @UiField
   TextBox lastName;
 
   @UiField
+  Paragraph lastNameRenderer;
+
+  @UiField
   TextBox currentPosition;
+
+  @UiField
+  Paragraph currentPositionRenderer;
 
   @UiField
   TextBox currentAffiliation;
 
   @UiField
+  Paragraph currentAffiliationRenderer;
+
+  @UiField
   TextBox industry;
+
+  @UiField
+  Paragraph industryRenderer;
 
   @UiField
   Div emailDiv;
 
   @UiField
   Div locationSuggestBoxContainer;
+
+  @UiField
+  Paragraph locationRenderer;
 
   @UiField
   FormGroup linkFormGroup;
@@ -151,7 +171,6 @@ public class UserProfileEditorWidgetViewImpl
   SuggestBox locationSuggestBox;
   private Widget widget;
 
-  TextBoxBase[] textBoxes;
   com.google.gwt.user.client.ui.TextBoxBase locationTextBox;
   boolean isEditing = false;
   SynapseJSNIUtils jsniUtils;
@@ -182,17 +201,6 @@ public class UserProfileEditorWidgetViewImpl
     locationTextBox = locationSuggestBox.getTextBox();
     locationTextBox.addStyleName("form-control");
     locationSuggestBoxContainer.add(locationSuggestBox);
-    // note, not adding email since it's not editable here.
-    textBoxes =
-      new TextBoxBase[] {
-        username,
-        firstName,
-        lastName,
-        currentPosition,
-        currentAffiliation,
-        industry,
-        link,
-      };
     editProfileButton.addClickHandler(event -> {
       presenter.setIsEditingMode(true);
     });
@@ -215,6 +223,7 @@ public class UserProfileEditorWidgetViewImpl
   @Override
   public void setUsername(String username) {
     this.username.setText(username);
+    usernameRenderer.setText(username);
   }
 
   @Override
@@ -255,6 +264,7 @@ public class UserProfileEditorWidgetViewImpl
   @Override
   public void setFirstName(String firstName) {
     this.firstName.setText(firstName);
+    firstNameRenderer.setText(firstName);
   }
 
   @Override
@@ -275,6 +285,7 @@ public class UserProfileEditorWidgetViewImpl
   @Override
   public void setLastName(String lastName) {
     this.lastName.setText(lastName);
+    lastNameRenderer.setText(lastName);
   }
 
   @Override
@@ -340,11 +351,13 @@ public class UserProfileEditorWidgetViewImpl
   @Override
   public void setCurrentPosition(String position) {
     currentPosition.setText(position);
+    currentPositionRenderer.setText(position);
   }
 
   @Override
   public void setCurrentAffiliation(String company) {
     currentAffiliation.setText(company);
+    currentAffiliationRenderer.setText(company);
   }
 
   @Override
@@ -355,6 +368,7 @@ public class UserProfileEditorWidgetViewImpl
   @Override
   public void setIndustry(String industry) {
     this.industry.setText(industry);
+    industryRenderer.setText(industry);
   }
 
   @Override
@@ -365,6 +379,7 @@ public class UserProfileEditorWidgetViewImpl
   @Override
   public void setLocation(String location) {
     this.locationSuggestBox.setText(location);
+    locationRenderer.setText(location);
   }
 
   @Override
@@ -395,33 +410,46 @@ public class UserProfileEditorWidgetViewImpl
   @Override
   public void setEditMode(boolean isEditing) {
     this.isEditing = isEditing;
-    for (TextBoxBase tb : textBoxes) {
-      tb.setReadOnly(!isEditing);
-    }
 
     bioEditor.setVisible(isEditing);
     bioRenderer.setVisible(!isEditing);
     locationTextBox.setReadOnly(!isEditing);
+    firstName.setVisible(isEditing);
+    firstNameRenderer.setVisible(!isEditing);
     firstName.setPlaceholder(isEditing ? "Enter first name" : "");
+    lastName.setVisible(isEditing);
+    lastNameRenderer.setVisible(!isEditing);
     lastName.setPlaceholder(isEditing ? "Enter last name" : "");
+    currentAffiliation.setVisible(isEditing);
+    currentAffiliationRenderer.setVisible(!isEditing);
     currentAffiliation.setPlaceholder(
       isEditing ? "Enter current affiliation" : ""
     );
+
     bioEditor.setPlaceholder("Enter bio");
+    link.setVisible(isEditing);
+    linkRenderer.setVisible(!isEditing);
     link.setPlaceholder(isEditing ? "Enter link to more info" : "");
+    locationSuggestBoxContainer.setVisible(isEditing);
+    locationRenderer.setVisible(!isEditing);
     locationTextBox
       .getElement()
       .setAttribute("placeholder", isEditing ? "Enter City, Country" : "");
+    currentPosition.setVisible(isEditing);
+    currentPositionRenderer.setVisible(!isEditing);
     currentPosition.setPlaceholder(isEditing ? "Enter current position" : "");
+    industry.setVisible(isEditing);
+    industryRenderer.setVisible(!isEditing);
     industry.setPlaceholder(isEditing ? "Enter industry/discipline" : "");
 
     editProfileButton.setVisible(!isEditing);
     saveProfileButton.setVisible(isEditing);
     cancelButton.setVisible(isEditing);
-    linkRenderer.setVisible(!isEditing);
-    link.setVisible(isEditing);
     changeEmailLink.setVisible(isEditing);
     changePasswordLink.setVisible(isEditing);
+    username.setVisible(isEditing);
+    usernameRenderer.setVisible(!isEditing);
+
     if (!isEditing) {
       DisplayUtils.showLoading(saveProfileButton, false, originalButtonText);
     }
