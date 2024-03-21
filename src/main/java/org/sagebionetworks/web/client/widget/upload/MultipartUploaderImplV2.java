@@ -5,10 +5,8 @@ import com.google.gwt.event.logical.shared.HasAttachHandlers;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.inject.Inject;
 import org.sagebionetworks.web.client.DateTimeUtils;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.jsinterop.Promise;
 import org.sagebionetworks.web.client.jsinterop.SRC.SynapseClient.FileUploadComplete;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -29,13 +27,9 @@ public class MultipartUploaderImplV2 implements MultipartUploader {
   // with a 3 second delay between attempts.
   public static final int RETRY_DELAY = 3000;
 
-  private GWTWrapper gwt;
   private SynapseJSNIUtils synapseJsniUtils;
   private NumberFormat percentFormat;
-  private CookieProvider cookies;
 
-  // in alpha mode, upload log is sent to the js console
-  private boolean isDebugLevelLogging = false;
   JavaScriptObject blob;
   HasAttachHandlers view;
   boolean isCanceled;
@@ -48,16 +42,13 @@ public class MultipartUploaderImplV2 implements MultipartUploader {
     AuthenticationController auth,
     GWTWrapper gwt,
     SynapseJSNIUtils synapseJsniUtils,
-    CookieProvider cookies,
     DateTimeUtils dateTimeUtils,
     SRCUploadFileWrapper srcUploadFileWrapper
   ) {
     super();
     this.auth = auth;
-    this.gwt = gwt;
     this.synapseJsniUtils = synapseJsniUtils;
     this.percentFormat = gwt.getNumberFormat("##");
-    this.cookies = cookies;
     this.dateTimeUtils = dateTimeUtils;
     this.srcUploadFileWrapper = srcUploadFileWrapper;
   }
@@ -74,7 +65,6 @@ public class MultipartUploaderImplV2 implements MultipartUploader {
     this.blob = blob;
     this.view = view;
     isCanceled = false;
-    isDebugLevelLogging = DisplayUtils.isInTestWebsite(cookies);
 
     long fileSize = (long) synapseJsniUtils.getFileSize(blob);
     if (fileSize <= 0) {
@@ -82,14 +72,6 @@ public class MultipartUploaderImplV2 implements MultipartUploader {
       return;
     }
 
-    log(
-      gwt.getUserAgent() +
-      "\n" +
-      gwt.getAppVersion() +
-      "\nDirectly uploading " +
-      fileName +
-      "\n"
-    );
     Promise<FileUploadComplete> p = srcUploadFileWrapper.uploadFile(
       auth.getCurrentUserAccessToken(),
       fileName,
@@ -112,17 +94,6 @@ public class MultipartUploaderImplV2 implements MultipartUploader {
     p.catch_(error -> {
       handler.uploadFailed(error.toString());
     });
-  }
-
-  public void log(String message) {
-    if (isDebugLevelLogging) {
-      synapseJsniUtils.consoleLog(message);
-    }
-  }
-
-  public void logError(String message) {
-    // to the console
-    synapseJsniUtils.consoleError(message);
   }
 
   @Override

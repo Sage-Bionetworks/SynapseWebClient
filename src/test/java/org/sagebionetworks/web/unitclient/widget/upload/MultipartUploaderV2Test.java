@@ -22,7 +22,6 @@ import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.ProgressCallback;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.jsinterop.Promise;
 import org.sagebionetworks.web.client.jsinterop.Promise.FunctionParam;
 import org.sagebionetworks.web.client.jsinterop.SRC.SynapseClient.FileUploadComplete;
@@ -51,14 +50,8 @@ public class MultipartUploaderV2Test {
   GWTWrapper gwt;
 
   MultipartUploaderImplV2 uploader;
-  String MD5;
-  String partMd5;
 
-  String[] fileNames;
   Long storageLocationId = 9090L;
-
-  @Mock
-  CookieProvider mockCookies;
 
   @Mock
   HasAttachHandlers mockView;
@@ -76,7 +69,7 @@ public class MultipartUploaderV2Test {
   SRCUploadFileWrapper mockSRCUploadFileWrapper;
 
   @Mock
-  Promise mockPromise;
+  Promise<FileUploadComplete> mockPromise;
 
   @Captor
   ArgumentCaptor<IsCancelled> isCancelledCaptor;
@@ -139,7 +132,6 @@ public class MultipartUploaderV2Test {
       mockAuth,
       gwt,
       synapseJsniUtils,
-      mockCookies,
       mockDateTimeUtils,
       mockSRCUploadFileWrapper
     );
