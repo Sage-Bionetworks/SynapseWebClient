@@ -379,6 +379,7 @@ public class UserProfileEditorWidgetViewImpl
   @Override
   public void setLocation(String location) {
     this.locationSuggestBox.setText(location);
+    locationRenderer.setText(location);
   }
 
   @Override
