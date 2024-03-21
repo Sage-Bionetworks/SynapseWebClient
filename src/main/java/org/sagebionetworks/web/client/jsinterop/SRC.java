@@ -112,6 +112,9 @@ public class SRC {
     public static ReactComponentType<
       EntityViewScopeEditorModalProps
     > EntityViewScopeEditorModal;
+    public static ReactComponentType<
+      SubmissionViewScopeEditorModalProps
+    > SubmissionViewScopeEditorModal;
 
     /**
      * Pushes a global toast message. In SWC, you should use {@link DisplayUtils#notify}, rather than calling this method directly.

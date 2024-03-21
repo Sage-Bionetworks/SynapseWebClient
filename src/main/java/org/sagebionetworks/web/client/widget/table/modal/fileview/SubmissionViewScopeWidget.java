@@ -16,7 +16,7 @@ import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationFinder;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationList;
-import org.sagebionetworks.web.client.widget.evaluation.SubmissionViewScopeEditor;
+import org.sagebionetworks.web.client.widget.evaluation.SubmissionViewScopeEditorModalWidget;
 
 /**
  * All business logic for viewing and editing the SubmissionView scope.
@@ -37,7 +37,7 @@ public class SubmissionViewScopeWidget
   SynapseJavascriptClient jsClient;
   EntityBundle bundle;
   EvaluationList viewScopeWidget;
-  SubmissionViewScopeEditor editScopeWidget;
+  SubmissionViewScopeEditorModalWidget editScopeWidget;
   SynapseAlert synAlert;
   SubmissionView currentView;
   EventBus eventBus;
@@ -54,7 +54,7 @@ public class SubmissionViewScopeWidget
     SubmissionViewScopeWidgetView view,
     SynapseJavascriptClient jsClient,
     EvaluationList viewScopeWidget,
-    SubmissionViewScopeEditor editScopeWidget,
+    SubmissionViewScopeEditorModalWidget editScopeWidget,
     SynapseAlert synAlert,
     EventBus eventBus
   ) {
@@ -147,40 +147,17 @@ public class SubmissionViewScopeWidget
   }
 
   @Override
-  public void onSave() {
-    // update scope
-    synAlert.clear();
-    List<String> newScopeIds = editScopeWidget.getEvaluationIds();
-    if (newScopeIds.isEmpty()) {
-      synAlert.showError(EMPTY_SCOPE_MESSAGE);
-      return;
-    }
-    view.setLoading(true);
-    currentView.setScopeIds(newScopeIds);
-    jsClient.updateEntity(
-      currentView,
-      null,
-      null,
-      new AsyncCallback<Entity>() {
-        @Override
-        public void onSuccess(Entity entity) {
-          view.setLoading(false);
-          view.hideModal();
-          eventBus.fireEvent(new EntityUpdatedEvent(entity.getId()));
-        }
-
-        @Override
-        public void onFailure(Throwable caught) {
-          view.setLoading(false);
-          synAlert.handleException(caught);
-        }
+  public void onEdit() {
+    editScopeWidget.configure(
+      bundle.getEntity().getId(),
+      () -> {
+        editScopeWidget.setOpen(false);
+        eventBus.fireEvent(new EntityUpdatedEvent(currentView.getId()));
+      },
+      () -> {
+        editScopeWidget.setOpen(false);
       }
     );
-  }
-
-  @Override
-  public void onEdit() {
-    editScopeWidget.configure(evaluationsList);
-    view.showModal();
+    editScopeWidget.setOpen(true);
   }
 }

@@ -1,23 +1,23 @@
-package org.sagebionetworks.web.client.widget.entity;
+package org.sagebionetworks.web.client.widget.evaluation;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.jsinterop.EntityViewScopeEditorModalProps;
+import org.sagebionetworks.web.client.jsinterop.SubmissionViewScopeEditorModalProps;
 
-public class EntityViewScopeEditorModalWidget implements IsWidget {
+public class SubmissionViewScopeEditorModalWidget implements IsWidget {
 
   private final GlobalApplicationState globalApplicationState;
-  private final EntityViewScopeEditorModalWidgetView view;
+  private final SubmissionViewScopeEditorModalWidgetView view;
 
   private String entityId;
-  private EntityViewScopeEditorModalProps.Callback onCancel;
-  private EntityViewScopeEditorModalProps.Callback onUpdate;
+  private SubmissionViewScopeEditorModalProps.Callback onCancel;
+  private SubmissionViewScopeEditorModalProps.Callback onUpdate;
 
   @Inject
-  public EntityViewScopeEditorModalWidget(
-    EntityViewScopeEditorModalWidgetView view,
+  public SubmissionViewScopeEditorModalWidget(
+    SubmissionViewScopeEditorModalWidgetView view,
     GlobalApplicationState globalApplicationState
   ) {
     super();
@@ -27,14 +27,14 @@ public class EntityViewScopeEditorModalWidget implements IsWidget {
 
   public void configure(
     String entityId,
-    EntityViewScopeEditorModalProps.Callback onUpdate,
-    EntityViewScopeEditorModalProps.Callback onCancel
+    SubmissionViewScopeEditorModalProps.Callback onUpdate,
+    SubmissionViewScopeEditorModalProps.Callback onCancel
   ) {
     this.entityId = entityId;
     this.onUpdate = onUpdate;
     this.onCancel = onCancel;
-    EntityViewScopeEditorModalProps props =
-      EntityViewScopeEditorModalProps.create(
+    SubmissionViewScopeEditorModalProps props =
+      SubmissionViewScopeEditorModalProps.create(
         entityId,
         onUpdate,
         onCancel,
@@ -45,8 +45,8 @@ public class EntityViewScopeEditorModalWidget implements IsWidget {
 
   public void setOpen(boolean open) {
     globalApplicationState.setIsEditing(open);
-    EntityViewScopeEditorModalProps props =
-      EntityViewScopeEditorModalProps.create(
+    SubmissionViewScopeEditorModalProps props =
+      SubmissionViewScopeEditorModalProps.create(
         entityId,
         onUpdate,
         onCancel,

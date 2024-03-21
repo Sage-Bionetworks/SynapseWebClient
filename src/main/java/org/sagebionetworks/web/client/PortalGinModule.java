@@ -538,8 +538,8 @@ import org.sagebionetworks.web.client.widget.evaluation.EvaluationListView;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationListViewImpl;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitterView;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitterViewImpl;
-import org.sagebionetworks.web.client.widget.evaluation.SubmissionViewScopeEditorView;
-import org.sagebionetworks.web.client.widget.evaluation.SubmissionViewScopeEditorViewImpl;
+import org.sagebionetworks.web.client.widget.evaluation.SubmissionViewScopeEditorModalWidgetView;
+import org.sagebionetworks.web.client.widget.evaluation.SubmissionViewScopeEditorModalWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.footer.FooterView;
 import org.sagebionetworks.web.client.widget.footer.FooterViewImpl;
@@ -1520,6 +1520,9 @@ public class PortalGinModule extends AbstractGinModule {
     bind(EntityViewScopeEditorModalWidgetView.class).to(
       EntityViewScopeEditorModalWidgetViewImpl.class
     );
+    bind(SubmissionViewScopeEditorModalWidgetView.class).to(
+      SubmissionViewScopeEditorModalWidgetViewImpl.class
+    );
     bind(EntityModalWidgetView.class).to(EntityModalWidgetViewImpl.class);
     bind(ChallengeWidgetView.class).to(ChallengeWidgetViewImpl.class);
     bind(SelectTeamModalView.class).to(SelectTeamModalViewImpl.class);
@@ -1668,9 +1671,6 @@ public class PortalGinModule extends AbstractGinModule {
     );
     bind(StatisticsPlotWidgetView.class).to(StatisticsPlotWidgetViewImpl.class);
     bind(QuarantinedEmailModal.class).in(Singleton.class);
-    bind(SubmissionViewScopeEditorView.class).to(
-      SubmissionViewScopeEditorViewImpl.class
-    );
     bind(EvaluationFinderView.class).to(EvaluationFinderViewImpl.class);
     bind(SubmissionViewScopeWidgetView.class).to(
       SubmissionViewScopeWidgetViewImpl.class

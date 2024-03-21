@@ -1,14 +1,10 @@
 package org.sagebionetworks.web.client.widget.table.modal.fileview;
 
-import static org.sagebionetworks.web.shared.WebConstants.PROJECT;
-
 import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
-import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.EntityView;
@@ -16,7 +12,6 @@ import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityViewScopeEditorModalWidget;
-import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 /**
  * All business logic for viewing and editing the EntityView scope.
@@ -112,13 +107,12 @@ public class EntityViewScopeWidget
 
   @Override
   public void updateViewTypeMask() {
-    tableType =
-      TableType.getEntityViewTableType(
-        view.isFileSelected(),
-        view.isFolderSelected(),
-        view.isTableSelected(),
-        view.isDatasetSelected()
-      );
+    tableType = TableType.getEntityViewTableType(
+      view.isFileSelected(),
+      view.isFolderSelected(),
+      view.isTableSelected(),
+      view.isDatasetSelected()
+    );
   }
 
   @Override
