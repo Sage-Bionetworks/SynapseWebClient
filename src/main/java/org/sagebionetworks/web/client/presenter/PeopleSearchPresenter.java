@@ -91,7 +91,9 @@ public class PeopleSearchPresenter
     this.synAlert.clear();
 
     // execute search, and update view with the results
-    AsyncCallback<UserGroupHeaderResponsePage> callback = new AsyncCallback<UserGroupHeaderResponsePage>() {
+    AsyncCallback<UserGroupHeaderResponsePage> callback = new AsyncCallback<
+      UserGroupHeaderResponsePage
+    >() {
       @Override
       public void onSuccess(UserGroupHeaderResponsePage result) {
         for (UserGroupHeader header : result.getChildren()) {

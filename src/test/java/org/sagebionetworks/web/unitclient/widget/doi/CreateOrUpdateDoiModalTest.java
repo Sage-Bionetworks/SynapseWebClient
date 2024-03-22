@@ -710,9 +710,8 @@ public class CreateOrUpdateDoiModalTest {
   public void testGetSuggestedResourceTypeGeneral() {
     for (EntityType entityType : EntityType.values()) {
       // Call under test
-      DoiResourceTypeGeneral actual = CreateOrUpdateDoiModal.getSuggestedResourceTypeGeneral(
-        entityType
-      );
+      DoiResourceTypeGeneral actual =
+        CreateOrUpdateDoiModal.getSuggestedResourceTypeGeneral(entityType);
       if (
         entityType.equals(EntityType.project) ||
         entityType.equals(EntityType.folder)

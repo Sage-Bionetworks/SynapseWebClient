@@ -425,7 +425,9 @@ public class APITableWidgetTest {
 
   private APITableConfig getTableConfig() {
     APITableConfig tableConfig = new APITableConfig(descriptor);
-    List<APITableColumnConfig> configList = new ArrayList<APITableColumnConfig>();
+    List<APITableColumnConfig> configList = new ArrayList<
+      APITableColumnConfig
+    >();
     APITableColumnConfig columnConfig = new APITableColumnConfig();
     Set<String> inputColName = new HashSet<String>();
     inputColName.add(col1Name);
@@ -513,7 +515,8 @@ public class APITableWidgetTest {
     APITableConfig tableConfig = getTableConfig();
     tableConfig.setUri(inputUri);
     widget.setTableConfig(tableConfig);
-    List<APITableColumnConfig> sortColumnConfigs = tableConfig.getColumnConfigs();
+    List<APITableColumnConfig> sortColumnConfigs =
+      tableConfig.getColumnConfigs();
     sortColumnConfigs.get(0).setSort(COLUMN_SORT_TYPE.NONE);
     sortColumnConfigs.get(1).setSort(COLUMN_SORT_TYPE.DESC);
     widget.columnClicked(0);

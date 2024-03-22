@@ -77,7 +77,8 @@ public class S3DirectUploader implements S3DirectUploadHandler {
     if (handler != null && view.isAttached()) {
       // success!
       // create a new file handle and tell the handler about the new handle
-      ExternalObjectStoreFileHandle fileHandle = new ExternalObjectStoreFileHandle();
+      ExternalObjectStoreFileHandle fileHandle =
+        new ExternalObjectStoreFileHandle();
       fileHandle.setContentMd5(md5);
       Double fileSize = synapseJsniUtils.getFileSize(blob);
       fileHandle.setContentSize(fileSize.longValue());

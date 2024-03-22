@@ -153,7 +153,10 @@ public class DefaultActionConfigurationUtil {
     return configurationMap;
   }
 
-  public static Map<Action, ActionConfiguration> getDefaultActionConfiguration() {
+  public static Map<
+    Action,
+    ActionConfiguration
+  > getDefaultActionConfiguration() {
     return createMap();
   }
 }

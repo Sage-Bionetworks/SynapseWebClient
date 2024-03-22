@@ -69,7 +69,9 @@ public class WikiHistoryWidgetTest {
         mockSynAlert
       );
 
-    PaginatedResults<JSONEntity> paginatedHistory = new PaginatedResults<JSONEntity>();
+    PaginatedResults<JSONEntity> paginatedHistory = new PaginatedResults<
+      JSONEntity
+    >();
     paginatedHistory.setTotalNumberOfResults(1);
     List<JSONEntity> results = new ArrayList<JSONEntity>();
     V2WikiHistorySnapshot snapshot = new V2WikiHistorySnapshot();
@@ -87,7 +89,8 @@ public class WikiHistoryWidgetTest {
         any(AsyncCallback.class)
       );
 
-    UserGroupHeaderResponsePage responsePage = new UserGroupHeaderResponsePage();
+    UserGroupHeaderResponsePage responsePage =
+      new UserGroupHeaderResponsePage();
     responsePage.setChildren(new ArrayList<UserGroupHeader>());
 
     AsyncMockStubber
@@ -170,7 +173,9 @@ public class WikiHistoryWidgetTest {
 
   @Test
   public void testConfigureNextPageEmptyResults() {
-    PaginatedResults<JSONEntity> paginatedHistory = new PaginatedResults<JSONEntity>();
+    PaginatedResults<JSONEntity> paginatedHistory = new PaginatedResults<
+      JSONEntity
+    >();
     paginatedHistory.setTotalNumberOfResults(0);
     paginatedHistory.setResults(new ArrayList<JSONEntity>());
     AsyncMockStubber

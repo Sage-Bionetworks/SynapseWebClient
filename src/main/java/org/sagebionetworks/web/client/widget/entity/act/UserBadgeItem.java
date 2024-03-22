@@ -139,7 +139,8 @@ public class UserBadgeItem implements IsWidget, SelectableListItem {
     userBadge.asWidget().addStyleName("flexcontainer-column margin-top-10");
     badgeContainerRow.add(userBadge.asWidget());
 
-    ProfileCertifiedValidatedWidget w = portalGinInjector.getProfileCertifiedValidatedWidget();
+    ProfileCertifiedValidatedWidget w =
+      portalGinInjector.getProfileCertifiedValidatedWidget();
     w.configure(Long.parseLong(userId));
     Div flexColumn = new Div();
     flexColumn.addStyleName("flexcontainer-column");

@@ -69,7 +69,8 @@ public class OpenMembershipRequestsWidgetViewImpl
     table.setWidth("100%");
     mainContainer.add(table);
     for (int i = 0; i < profiles.size(); i++) {
-      OpenMembershipRequestWidget openMembershipRequestWidget = ginInjector.getOpenMembershipRequestWidget();
+      OpenMembershipRequestWidget openMembershipRequestWidget =
+        ginInjector.getOpenMembershipRequestWidget();
       UserProfile profile = profiles.get(i);
       UserBadge renderer = ginInjector.getUserBadgeWidget();
       renderer.configure(profile);

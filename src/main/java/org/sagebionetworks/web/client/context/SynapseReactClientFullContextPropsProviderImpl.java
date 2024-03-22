@@ -46,7 +46,8 @@ public class SynapseReactClientFullContextPropsProviderImpl
 
   @Override
   public FullContextProviderPropsJSNIObject getJsniContextProps() {
-    SynapseReactClientFullContextJSNIObject synapseContext = SynapseReactClientFullContextJSNIObject.create();
+    SynapseReactClientFullContextJSNIObject synapseContext =
+      SynapseReactClientFullContextJSNIObject.create();
     synapseContext.setAccessToken(authController.getCurrentUserAccessToken());
     synapseContext.setIsInExperimentalMode(
       DisplayUtils.isInTestWebsite(cookies)
@@ -54,7 +55,8 @@ public class SynapseReactClientFullContextPropsProviderImpl
     synapseContext.setUtcTime(globalApplicationState.isShowingUTCTime());
     synapseContext.setDownloadCartPageUrl("/#!DownloadCart:0");
 
-    FullContextProviderPropsJSNIObject props = FullContextProviderPropsJSNIObject.create();
+    FullContextProviderPropsJSNIObject props =
+      FullContextProviderPropsJSNIObject.create();
     props.setSynapseContext(synapseContext);
     props.setQueryClient(QueryClientJSNIObject.getQueryClientSingleton());
     return props;

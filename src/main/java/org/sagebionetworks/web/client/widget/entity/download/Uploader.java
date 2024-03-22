@@ -188,8 +188,7 @@ public class Uploader
 
   public String getSelectedFilesText() {
     String[] selectedFiles = getSelectedFileNames();
-    if (selectedFiles == null) return "";
-    else if (selectedFiles.length == 1) {
+    if (selectedFiles == null) return ""; else if (selectedFiles.length == 1) {
       return selectedFiles[0];
     } else {
       return selectedFiles.length + " files";
@@ -262,18 +261,16 @@ public class Uploader
               uploadDestinations.get(0) instanceof S3UploadDestination
             ) {
               currentUploadType = UploadType.S3;
-              storageLocationId = uploadDestinations
-                .get(0)
-                .getStorageLocationId();
+              storageLocationId =
+                uploadDestinations.get(0).getStorageLocationId();
               updateUploadBannerView(uploadDestinations.get(0));
             } else if (
               uploadDestinations.get(0) instanceof
               ExternalGoogleCloudUploadDestination
             ) {
               currentUploadType = UploadType.GOOGLECLOUDSTORAGE;
-              storageLocationId = uploadDestinations
-                .get(0)
-                .getStorageLocationId();
+              storageLocationId =
+                uploadDestinations.get(0).getStorageLocationId();
               updateUploadBannerView(uploadDestinations.get(0));
             } else if (
               uploadDestinations.get(0) instanceof ExternalUploadDestination

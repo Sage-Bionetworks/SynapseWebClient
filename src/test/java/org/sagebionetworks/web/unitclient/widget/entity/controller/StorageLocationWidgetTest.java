@@ -187,7 +187,8 @@ public class StorageLocationWidgetTest {
 
   @Test
   public void testNullBanner() {
-    ExternalS3UploadDestination entityStorageLocationSetting = new ExternalS3UploadDestination();
+    ExternalS3UploadDestination entityStorageLocationSetting =
+      new ExternalS3UploadDestination();
     String baseKey = "key";
     String bucket = "a.bucket     ";
     String banner = null;
@@ -208,7 +209,8 @@ public class StorageLocationWidgetTest {
       mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
     )
       .thenReturn("true");
-    ExternalS3UploadDestination entityStorageLocationSetting = new ExternalS3UploadDestination();
+    ExternalS3UploadDestination entityStorageLocationSetting =
+      new ExternalS3UploadDestination();
     String baseKey = "key";
     String bucket = "a.bucket     ";
     String banner = "upload to a.bucket";
@@ -232,7 +234,8 @@ public class StorageLocationWidgetTest {
 
   @Test
   public void testS3StsEnabled() {
-    ExternalS3UploadDestination entityStorageLocationSetting = new ExternalS3UploadDestination();
+    ExternalS3UploadDestination entityStorageLocationSetting =
+      new ExternalS3UploadDestination();
     entityStorageLocationSetting.setBanner("");
     entityStorageLocationSetting.setBucket("");
     entityStorageLocationSetting.setBaseKey("");
@@ -250,7 +253,8 @@ public class StorageLocationWidgetTest {
   // This test can be deleted once STS is out of alpha mode
   @Test
   public void testS3StsNotEnabledNotInAlpha() {
-    ExternalS3UploadDestination entityStorageLocationSetting = new ExternalS3UploadDestination();
+    ExternalS3UploadDestination entityStorageLocationSetting =
+      new ExternalS3UploadDestination();
     entityStorageLocationSetting.setBanner("");
     entityStorageLocationSetting.setBucket("");
     entityStorageLocationSetting.setBaseKey("");
@@ -267,7 +271,8 @@ public class StorageLocationWidgetTest {
 
   @Test
   public void testGetStorageLocationSettingHideSFTP() {
-    ExternalS3UploadDestination entityStorageLocationSetting = new ExternalS3UploadDestination();
+    ExternalS3UploadDestination entityStorageLocationSetting =
+      new ExternalS3UploadDestination();
     entityStorageLocationSetting.setBanner("");
     entityStorageLocationSetting.setBucket("");
     entityStorageLocationSetting.setBaseKey("");
@@ -281,7 +286,8 @@ public class StorageLocationWidgetTest {
 
   @Test
   public void testGetStorageLocationSettingGoogleCloud() {
-    ExternalGoogleCloudUploadDestination entityStorageLocationSetting = new ExternalGoogleCloudUploadDestination();
+    ExternalGoogleCloudUploadDestination entityStorageLocationSetting =
+      new ExternalGoogleCloudUploadDestination();
     String bucket = "my-bucket";
     String baseKey = "key.txt";
     String banner = "upload to a google cloud bucket";
@@ -302,7 +308,8 @@ public class StorageLocationWidgetTest {
 
   @Test
   public void testGetStorageLocationSettingExternalObjectStore() {
-    ExternalObjectStoreUploadDestination setting = new ExternalObjectStoreUploadDestination();
+    ExternalObjectStoreUploadDestination setting =
+      new ExternalObjectStoreUploadDestination();
     String endpointUrl = "something.gov";
     String bucket = "mybucket";
     String banner = "upload to a sftp site";
@@ -383,7 +390,8 @@ public class StorageLocationWidgetTest {
         locationSettingCaptor.capture(),
         any(AsyncCallback.class)
       );
-    ExternalObjectStorageLocationSetting setting = (ExternalObjectStorageLocationSetting) locationSettingCaptor.getValue();
+    ExternalObjectStorageLocationSetting setting =
+      (ExternalObjectStorageLocationSetting) locationSettingCaptor.getValue();
     assertEquals(banner, setting.getBanner());
     assertEquals(endpointUrl, setting.getEndpointUrl());
     assertEquals(bucket, setting.getBucket());
@@ -435,7 +443,8 @@ public class StorageLocationWidgetTest {
         any(AsyncCallback.class)
       );
 
-    ExternalS3StorageLocationSetting capturedSetting = (ExternalS3StorageLocationSetting) captor.getValue();
+    ExternalS3StorageLocationSetting capturedSetting =
+      (ExternalS3StorageLocationSetting) captor.getValue();
     assertEquals(baseKey.trim(), capturedSetting.getBaseKey());
     assertEquals(bucket.trim(), capturedSetting.getBucket());
     assertEquals(banner.trim(), capturedSetting.getBanner());
@@ -472,7 +481,8 @@ public class StorageLocationWidgetTest {
         any(AsyncCallback.class)
       );
 
-    ExternalGoogleCloudStorageLocationSetting capturedSetting = (ExternalGoogleCloudStorageLocationSetting) captor.getValue();
+    ExternalGoogleCloudStorageLocationSetting capturedSetting =
+      (ExternalGoogleCloudStorageLocationSetting) captor.getValue();
     assertEquals(baseKey.trim(), capturedSetting.getBaseKey());
     assertEquals(bucket.trim(), capturedSetting.getBucket());
     assertEquals(banner.trim(), capturedSetting.getBanner());

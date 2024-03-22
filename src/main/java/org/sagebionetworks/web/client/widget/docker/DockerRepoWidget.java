@@ -83,7 +83,8 @@ public class DockerRepoWidget {
   }
 
   private void configureProvenance(final String entityId) {
-    Map<String, String> configMap = ProvenanceWidget.getDefaultWidgetDescriptor();
+    Map<String, String> configMap =
+      ProvenanceWidget.getDefaultWidgetDescriptor();
     configMap.put(
       WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY,
       DisplayUtils.createEntityVersionString(entityId, null)

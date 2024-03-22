@@ -78,7 +78,8 @@ public class AccessRequirementWidget implements IsWidget {
   ) {
     div.clear();
     if (requirement instanceof ManagedACTAccessRequirement) {
-      ManagedACTAccessRequirementWidget w = ginInjector.getManagedACTAccessRequirementWidget();
+      ManagedACTAccessRequirementWidget w =
+        ginInjector.getManagedACTAccessRequirementWidget();
       w.setRequirement(
         (ManagedACTAccessRequirement) requirement,
         refreshCallback
@@ -89,14 +90,16 @@ public class AccessRequirementWidget implements IsWidget {
       }
       div.add(w);
     } else if (requirement instanceof ACTAccessRequirement) {
-      ACTAccessRequirementWidget w = ginInjector.getACTAccessRequirementWidget();
+      ACTAccessRequirementWidget w =
+        ginInjector.getACTAccessRequirementWidget();
       w.setRequirement((ACTAccessRequirement) requirement, refreshCallback);
       if (isHideControls) {
         w.hideControls();
       }
       div.add(w);
     } else if (requirement instanceof TermsOfUseAccessRequirement) {
-      TermsOfUseAccessRequirementWidget w = ginInjector.getTermsOfUseAccessRequirementWidget();
+      TermsOfUseAccessRequirementWidget w =
+        ginInjector.getTermsOfUseAccessRequirementWidget();
       w.setRequirement(
         (TermsOfUseAccessRequirement) requirement,
         refreshCallback
@@ -106,7 +109,8 @@ public class AccessRequirementWidget implements IsWidget {
       }
       div.add(w);
     } else if (requirement instanceof SelfSignAccessRequirement) {
-      SelfSignAccessRequirementWidget w = ginInjector.getSelfSignAccessRequirementWidget();
+      SelfSignAccessRequirementWidget w =
+        ginInjector.getSelfSignAccessRequirementWidget();
       w.setRequirement(
         (SelfSignAccessRequirement) requirement,
         refreshCallback
@@ -116,7 +120,8 @@ public class AccessRequirementWidget implements IsWidget {
       }
       div.add(w);
     } else if (requirement instanceof LockAccessRequirement) {
-      LockAccessRequirementWidget w = ginInjector.getLockAccessRequirementWidget();
+      LockAccessRequirementWidget w =
+        ginInjector.getLockAccessRequirementWidget();
       w.setRequirement((LockAccessRequirement) requirement, refreshCallback);
       div.add(w);
     } else {

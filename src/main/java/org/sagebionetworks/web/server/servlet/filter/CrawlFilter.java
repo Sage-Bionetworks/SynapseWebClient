@@ -159,10 +159,8 @@ public class CrawlFilter extends OncePerRequestFilter {
         String domain = request.getServerName();
         String lowerCaseDomain = domain.toLowerCase();
         if (
-          !(
-            lowerCaseDomain.contains("www.synapse.org") ||
-            lowerCaseDomain.contains("127.0.0.1")
-          )
+          !(lowerCaseDomain.contains("www.synapse.org") ||
+            lowerCaseDomain.contains("127.0.0.1"))
         ) {
           response.setContentType("text/html");
           response.setStatus(HttpServletResponse.SC_OK);

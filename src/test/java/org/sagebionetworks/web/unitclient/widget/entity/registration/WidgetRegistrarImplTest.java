@@ -137,9 +137,10 @@ public class WidgetRegistrarImplTest {
   @Test
   public void testGetWidgetDescriptor() throws JSONObjectAdapterException {
     // from MD representation, verify that various widget descriptors can be constructed
-    Map<String, String> actualWidgetDescriptor = widgetRegistrar.getWidgetDescriptor(
-      WidgetConstants.IMAGE_CONTENT_TYPE + "?fileName=" + testFileName
-    );
+    Map<String, String> actualWidgetDescriptor =
+      widgetRegistrar.getWidgetDescriptor(
+        WidgetConstants.IMAGE_CONTENT_TYPE + "?fileName=" + testFileName
+      );
     Assert.assertEquals(
       testFileName,
       actualWidgetDescriptor.get(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY)

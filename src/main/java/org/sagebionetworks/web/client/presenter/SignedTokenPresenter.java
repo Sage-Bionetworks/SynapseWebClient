@@ -123,7 +123,8 @@ public class SignedTokenPresenter
   }
 
   public void handleSettingsToken(SignedTokenInterface signedToken) {
-    NotificationSettingsSignedToken token = (NotificationSettingsSignedToken) signedToken;
+    NotificationSettingsSignedToken token =
+      (NotificationSettingsSignedToken) signedToken;
     unsubscribingUserBadge.configure(token.getUserId());
     view.showConfirmUnsubscribe(signedToken);
   }

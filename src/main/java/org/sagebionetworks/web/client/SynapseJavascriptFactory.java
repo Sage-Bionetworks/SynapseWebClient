@@ -204,7 +204,8 @@ public class SynapseJavascriptFactory {
     }
     if (OBJECT_TYPE.AsyncResponse.equals(type)) {
       String concreteType = json.getString("concreteType");
-      AsynchronousResponseBodyInstanceFactory asyncResponseFactory = AsynchronousResponseBodyInstanceFactory.singleton();
+      AsynchronousResponseBodyInstanceFactory asyncResponseFactory =
+        AsynchronousResponseBodyInstanceFactory.singleton();
       AsynchronousResponseBody response = asyncResponseFactory.newInstance(
         concreteType
       );
@@ -337,26 +338,24 @@ public class SynapseJavascriptFactory {
           "results"
         );
         for (int i = 0; i < versionInfoResultsJsonArray.length(); i++) {
-          JSONObjectAdapter jsonObject = versionInfoResultsJsonArray.getJSONObject(
-            i
-          );
+          JSONObjectAdapter jsonObject =
+            versionInfoResultsJsonArray.getJSONObject(i);
           versionInfoList.add(new VersionInfo(jsonObject));
         }
         return versionInfoList;
       case PaginatedResultsDiscussionThreadBundle:
         // json really represents a PaginatedResults (cannot reference here in js)
-        List<DiscussionThreadBundle> discussionThreadBundleList = new ArrayList<>();
-        JSONArrayAdapter discussionThreadBundleResultsJsonArray = json.getJSONArray(
-          "results"
-        );
+        List<DiscussionThreadBundle> discussionThreadBundleList =
+          new ArrayList<>();
+        JSONArrayAdapter discussionThreadBundleResultsJsonArray =
+          json.getJSONArray("results");
         for (
           int i = 0;
           i < discussionThreadBundleResultsJsonArray.length();
           i++
         ) {
-          JSONObjectAdapter jsonObject = discussionThreadBundleResultsJsonArray.getJSONObject(
-            i
-          );
+          JSONObjectAdapter jsonObject =
+            discussionThreadBundleResultsJsonArray.getJSONObject(i);
           discussionThreadBundleList.add(
             new DiscussionThreadBundle(jsonObject)
           );
@@ -369,26 +368,24 @@ public class SynapseJavascriptFactory {
           "results"
         );
         for (int i = 0; i < evaluationListResultsJsonArray.length(); i++) {
-          JSONObjectAdapter jsonObject = evaluationListResultsJsonArray.getJSONObject(
-            i
-          );
+          JSONObjectAdapter jsonObject =
+            evaluationListResultsJsonArray.getJSONObject(i);
           evaluationList.add(new Evaluation(jsonObject));
         }
         return evaluationList;
       case PaginatedResultsDiscussionReplyBundle:
         // json really represents a PaginatedResults (cannot reference here in js)
-        List<DiscussionReplyBundle> discussionReplyBundleList = new ArrayList<>();
-        JSONArrayAdapter discussionReplyBundleResultsJsonArray = json.getJSONArray(
-          "results"
-        );
+        List<DiscussionReplyBundle> discussionReplyBundleList =
+          new ArrayList<>();
+        JSONArrayAdapter discussionReplyBundleResultsJsonArray =
+          json.getJSONArray("results");
         for (
           int i = 0;
           i < discussionReplyBundleResultsJsonArray.length();
           i++
         ) {
-          JSONObjectAdapter jsonObject = discussionReplyBundleResultsJsonArray.getJSONObject(
-            i
-          );
+          JSONObjectAdapter jsonObject =
+            discussionReplyBundleResultsJsonArray.getJSONObject(i);
           discussionReplyBundleList.add(new DiscussionReplyBundle(jsonObject));
         }
         return discussionReplyBundleList;
@@ -436,9 +433,8 @@ public class SynapseJavascriptFactory {
           "results"
         );
         for (int i = 0; i < referenceResultsJsonArray.length(); i++) {
-          JSONObjectAdapter jsonObject = referenceResultsJsonArray.getJSONObject(
-            i
-          );
+          JSONObjectAdapter jsonObject =
+            referenceResultsJsonArray.getJSONObject(i);
           referenceList.add(new Reference(jsonObject));
         }
         return referenceList;
@@ -471,14 +467,14 @@ public class SynapseJavascriptFactory {
         return teamList;
       case ListWrapperUploadDestinations:
         List<UploadDestination> uploadDestinationList = new ArrayList<>();
-        UploadDestinationInstanceFactory uploadDestinationFactory = UploadDestinationInstanceFactory.singleton();
+        UploadDestinationInstanceFactory uploadDestinationFactory =
+          UploadDestinationInstanceFactory.singleton();
         JSONArrayAdapter jsonUploadDestinationsArray = json.getJSONArray(
           "list"
         );
         for (int i = 0; i < jsonUploadDestinationsArray.length(); i++) {
-          JSONObjectAdapter jsonObject = jsonUploadDestinationsArray.getJSONObject(
-            i
-          );
+          JSONObjectAdapter jsonObject =
+            jsonUploadDestinationsArray.getJSONObject(i);
           String concreteType = jsonObject.getString("concreteType");
           UploadDestination response = uploadDestinationFactory.newInstance(
             concreteType

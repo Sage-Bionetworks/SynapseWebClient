@@ -174,7 +174,9 @@ public class TableEntityWidgetV2Test {
   ArgumentCaptor<OnQueryResultBundleCallback> onQueryResultBundleCallbackCaptor;
 
   @Captor
-  ArgumentCaptor<OnViewSharingSettingsHandler> onViewSharingSettingsHandlerCaptor;
+  ArgumentCaptor<
+    OnViewSharingSettingsHandler
+  > onViewSharingSettingsHandlerCaptor;
 
   @Mock
   GlobalApplicationState mockGlobalState;

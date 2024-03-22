@@ -339,7 +339,10 @@ public class ProfilePresenterTest {
       .when(mockSynapseJavascriptClient)
       .createTeam(any(Team.class), any(AsyncCallback.class));
 
-    org.sagebionetworks.reflection.model.PaginatedResults<EntityHeader> testBatchResults = new org.sagebionetworks.reflection.model.PaginatedResults<EntityHeader>();
+    org.sagebionetworks.reflection.model.PaginatedResults<
+      EntityHeader
+    > testBatchResults =
+      new org.sagebionetworks.reflection.model.PaginatedResults<EntityHeader>();
     List<EntityHeader> testEvaluationResults = new ArrayList<EntityHeader>();
     EntityHeader testEvaluation = new EntityHeader();
     testEvaluation.setId("eval project id 1");
@@ -1386,7 +1389,9 @@ public class ProfilePresenterTest {
   @Test
   public void testRefreshTeamsEmpty() {
     int totalNotifications = 0; // must be even for tests to pass
-    List<OpenUserInvitationBundle> invites = new ArrayList<OpenUserInvitationBundle>();
+    List<OpenUserInvitationBundle> invites = new ArrayList<
+      OpenUserInvitationBundle
+    >();
     setupUserTeams(0, 0);
     profilePresenter.setIsOwner(true);
     profilePresenter.refreshTeams();
@@ -1408,7 +1413,9 @@ public class ProfilePresenterTest {
       .when(mockSynapseJavascriptClient)
       .getOpenMembershipInvitationCount(any(AsyncCallback.class));
     int inviteCount = 0;
-    List<OpenUserInvitationBundle> invites = new ArrayList<OpenUserInvitationBundle>();
+    List<OpenUserInvitationBundle> invites = new ArrayList<
+      OpenUserInvitationBundle
+    >();
     for (int i = 0; i < inviteCount; i++) {
       invites.add(new OpenUserInvitationBundle());
     }
@@ -1435,7 +1442,9 @@ public class ProfilePresenterTest {
       .when(mockSynapseJavascriptClient)
       .getOpenMembershipInvitationCount(any(AsyncCallback.class));
     int inviteCount = totalNotifications;
-    List<OpenUserInvitationBundle> invites = new ArrayList<OpenUserInvitationBundle>();
+    List<OpenUserInvitationBundle> invites = new ArrayList<
+      OpenUserInvitationBundle
+    >();
     for (int i = 0; i < inviteCount; i++) {
       invites.add(new OpenUserInvitationBundle());
     }

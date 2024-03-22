@@ -30,8 +30,7 @@ public class EntityBundlePlus implements IsSerializable {
     result =
       prime * result + ((entityBundle == null) ? 0 : entityBundle.hashCode());
     result =
-      prime *
-      result +
+      prime * result +
       ((latestVersionNumber == null) ? 0 : latestVersionNumber.hashCode());
     return result;
   }

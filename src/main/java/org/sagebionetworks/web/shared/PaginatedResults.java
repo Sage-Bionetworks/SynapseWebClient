@@ -73,8 +73,7 @@ public class PaginatedResults<T extends JSONEntity> implements IsSerializable {
     int result = 1;
     result = prime * result + ((results == null) ? 0 : results.hashCode());
     result =
-      prime *
-      result +
+      prime * result +
       (int) (totalNumberOfResults ^ (totalNumberOfResults >>> 32));
     return result;
   }

@@ -16,7 +16,8 @@ import org.sagebionetworks.web.shared.WebConstants;
 public class DiscussionMessageServlet extends HttpServlet {
 
   private static final long serialVersionUID = 1L;
-  protected static final ThreadLocal<HttpServletRequest> perThreadRequest = new ThreadLocal<HttpServletRequest>();
+  protected static final ThreadLocal<HttpServletRequest> perThreadRequest =
+    new ThreadLocal<HttpServletRequest>();
 
   private SynapseProvider synapseProvider = new SynapseProviderImpl();
   private TokenProvider tokenProvider = () ->

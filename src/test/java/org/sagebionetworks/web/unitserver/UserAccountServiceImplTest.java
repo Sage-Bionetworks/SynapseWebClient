@@ -76,7 +76,8 @@ public class UserAccountServiceImplTest {
     String fName = "ralph";
     String lName = "wiggum";
     String pw = "password";
-    EmailValidationSignedToken emailValidationSignedToken = new EmailValidationSignedToken();
+    EmailValidationSignedToken emailValidationSignedToken =
+      new EmailValidationSignedToken();
     AccountSetupInfo testASI = new AccountSetupInfo();
     testASI.setUsername(username);
     testASI.setFirstName(fName);

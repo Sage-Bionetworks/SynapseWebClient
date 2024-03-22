@@ -48,7 +48,8 @@ public class MarkdownWidgetViewImpl implements MarkdownWidgetView {
       AnchorElement el = (AnchorElement) event.getCurrentTarget();
       String href = el.getHref();
       String placeToken = href.substring(href.indexOf('!'));
-      AppPlaceHistoryMapper appPlaceHistoryMapper = globalAppState.getAppPlaceHistoryMapper();
+      AppPlaceHistoryMapper appPlaceHistoryMapper =
+        globalAppState.getAppPlaceHistoryMapper();
       Place newPlace = appPlaceHistoryMapper.getPlace(placeToken);
       globalAppState.getPlaceChanger().goTo(newPlace);
     }

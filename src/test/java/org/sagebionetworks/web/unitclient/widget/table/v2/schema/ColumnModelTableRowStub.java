@@ -104,8 +104,7 @@ public class ColumnModelTableRowStub implements ColumnModelTableRow {
     result = prime * result + (isSelected ? 1231 : 1237);
     result = prime * result + ((maxSize == null) ? 0 : maxSize.hashCode());
     result =
-      prime *
-      result +
+      prime * result +
       ((selectionPresenter == null) ? 0 : selectionPresenter.hashCode());
     return result;
   }

@@ -78,8 +78,7 @@ public class ProjectPagedResults implements Serializable {
     final int prime = 31;
     int result = 1;
     result =
-      prime *
-      result +
+      prime * result +
       ((lastModifiedBy == null) ? 0 : lastModifiedBy.hashCode());
     result = prime * result + ((results == null) ? 0 : results.hashCode());
     result = prime * result + totalNumberOfResults;

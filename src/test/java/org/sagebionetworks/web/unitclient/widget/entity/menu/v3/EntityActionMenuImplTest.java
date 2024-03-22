@@ -62,7 +62,8 @@ public class EntityActionMenuImplTest {
     verify(mockView).configure(propsCaptor.capture());
 
     EntityActionMenuProps props = propsCaptor.getValue();
-    Map<Action, ActionConfiguration> actionConfiguration = props.getActionConfiguration();
+    Map<Action, ActionConfiguration> actionConfiguration =
+      props.getActionConfiguration();
     // Every action should be configured
     assertEquals(Action.values().length, actionConfiguration.keySet().size());
     // All actions should not be visible

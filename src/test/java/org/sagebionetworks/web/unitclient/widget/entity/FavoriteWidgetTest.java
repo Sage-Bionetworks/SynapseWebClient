@@ -71,7 +71,9 @@ public class FavoriteWidgetTest {
     EntityHeader newFav = new EntityHeader();
     newFav.setId("syn123");
     favs.add(newFav);
-    PaginatedResults<EntityHeader> favorites = new PaginatedResults<EntityHeader>();
+    PaginatedResults<EntityHeader> favorites = new PaginatedResults<
+      EntityHeader
+    >();
     List<EntityHeader> results = new ArrayList<EntityHeader>();
     AsyncMockStubber
       .callSuccessWith(results)

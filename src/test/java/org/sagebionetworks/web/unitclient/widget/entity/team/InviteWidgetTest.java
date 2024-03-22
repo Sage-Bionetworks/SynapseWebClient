@@ -311,7 +311,8 @@ public class InviteWidgetTest {
         membershipInvitationCaptor.capture(),
         any(AsyncCallback.class)
       );
-    List<MembershipInvitation> invites = membershipInvitationCaptor.getAllValues();
+    List<MembershipInvitation> invites =
+      membershipInvitationCaptor.getAllValues();
     assertEquals(email1, invites.get(0).getInviteeEmail());
     assertEquals(teamId, invites.get(0).getTeamId());
     assertEquals(invitationMessage, invites.get(0).getMessage());

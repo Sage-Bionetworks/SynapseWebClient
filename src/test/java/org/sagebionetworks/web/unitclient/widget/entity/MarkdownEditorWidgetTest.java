@@ -181,7 +181,10 @@ public class MarkdownEditorWidgetTest {
   @Test
   public void testGetFormattingGuide() throws Exception {
     reset(mockSynapseClient);
-    Map<String, WikiPageKey> testHelpPagesMap = new HashMap<String, WikiPageKey>();
+    Map<String, WikiPageKey> testHelpPagesMap = new HashMap<
+      String,
+      WikiPageKey
+    >();
     WikiPageKey formattingGuideWikiKey = new WikiPageKey(
       "syn1234",
       ObjectType.ENTITY.toString(),
@@ -329,9 +332,8 @@ public class MarkdownEditorWidgetTest {
 
     // verify that a widget descriptor update handler is added, and when fired it sends back to our
     // handler that we passed as input to the configure.
-    ArgumentCaptor<WidgetDescriptorUpdatedHandler> captor = ArgumentCaptor.forClass(
-      WidgetDescriptorUpdatedHandler.class
-    );
+    ArgumentCaptor<WidgetDescriptorUpdatedHandler> captor =
+      ArgumentCaptor.forClass(WidgetDescriptorUpdatedHandler.class);
     verify(mockEditDescriptor)
       .addWidgetDescriptorUpdatedHandler(captor.capture());
     WidgetDescriptorUpdatedEvent event = new WidgetDescriptorUpdatedEvent();
@@ -381,9 +383,8 @@ public class MarkdownEditorWidgetTest {
 
     // verify that a widget descriptor update handler is added, and when fired it removes the old widget
     // markdown (to replace it with the updated value)
-    ArgumentCaptor<WidgetDescriptorUpdatedHandler> captor = ArgumentCaptor.forClass(
-      WidgetDescriptorUpdatedHandler.class
-    );
+    ArgumentCaptor<WidgetDescriptorUpdatedHandler> captor =
+      ArgumentCaptor.forClass(WidgetDescriptorUpdatedHandler.class);
     verify(mockEditDescriptor)
       .addWidgetDescriptorUpdatedHandler(captor.capture());
     WidgetDescriptorUpdatedEvent event = new WidgetDescriptorUpdatedEvent();

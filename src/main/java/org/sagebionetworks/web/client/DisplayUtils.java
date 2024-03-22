@@ -119,10 +119,11 @@ public class DisplayUtils {
 
   public static final Integer DEFAULT_TOAST_TIMEOUT_MS = 1000 * 15;
 
-  public static final ClickHandler TEXTBOX_SELECT_ALL_FIELD_CLICKHANDLER = event -> {
-    TextBox source = (TextBox) event.getSource();
-    source.selectAll();
-  };
+  public static final ClickHandler TEXTBOX_SELECT_ALL_FIELD_CLICKHANDLER =
+    event -> {
+      TextBox source = (TextBox) event.getSource();
+      source.selectAll();
+    };
   public static final ClickHandler DO_NOTHING_CLICKHANDLER = event -> {
     if (!DisplayUtils.isAnyModifierKeyDown(event)) {
       if (event != null) {
@@ -1201,7 +1202,8 @@ public class DisplayUtils {
     ButtonType type,
     String iconClass
   ) {
-    com.google.gwt.user.client.ui.Button btn = new com.google.gwt.user.client.ui.Button();
+    com.google.gwt.user.client.ui.Button btn =
+      new com.google.gwt.user.client.ui.Button();
     relabelIconButton(btn, title, iconClass);
     btn.removeStyleName("gwt-Button");
     btn.addStyleName("btn btn-" + type.toString().toLowerCase());

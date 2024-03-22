@@ -96,7 +96,8 @@ public class UploadCSVPreviewPageImplTest {
       .setInstructionMessage(UploadCSVPreviewPageImpl.PREPARING_A_PREVIEW);
     verify(mockPresenter).setLoading(true);
     // We expect this to be the first request.
-    UploadToTablePreviewRequest expectedRequst = new UploadToTablePreviewRequest();
+    UploadToTablePreviewRequest expectedRequst =
+      new UploadToTablePreviewRequest();
     CsvTableDescriptor expectedDescriptor = new CsvTableDescriptor();
     expectedDescriptor.setSeparator(type.getDelimiter());
     // expect full scan the first time.

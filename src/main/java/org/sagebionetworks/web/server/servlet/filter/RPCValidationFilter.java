@@ -35,11 +35,12 @@ public class RPCValidationFilter implements Filter {
     if (request.getContentType() == null) {
       // Proxy the request so the content type is not null
       HttpServletRequest httpRequest = (HttpServletRequest) request;
-      HttpServletRequest requestProxy = (HttpServletRequest) Proxy.newProxyInstance(
-        HttpServletRequest.class.getClassLoader(),
-        new Class[] { HttpServletRequest.class },
-        new Handler(httpRequest)
-      );
+      HttpServletRequest requestProxy =
+        (HttpServletRequest) Proxy.newProxyInstance(
+          HttpServletRequest.class.getClassLoader(),
+          new Class[] { HttpServletRequest.class },
+          new Handler(httpRequest)
+        );
       chain.doFilter(requestProxy, response);
     } else {
       // Do nothing

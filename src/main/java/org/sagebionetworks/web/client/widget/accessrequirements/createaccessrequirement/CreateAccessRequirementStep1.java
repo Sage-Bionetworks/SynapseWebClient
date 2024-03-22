@@ -102,8 +102,9 @@ public class CreateAccessRequirementStep1
   public void configure(RestrictableObjectDescriptor initialSubject) {
     accessRequirement = null;
     view.setAccessRequirementTypeSelectionVisible(true);
-    List<RestrictableObjectDescriptor> initialSubjects =
-      new ArrayList<RestrictableObjectDescriptor>();
+    List<RestrictableObjectDescriptor> initialSubjects = new ArrayList<
+      RestrictableObjectDescriptor
+    >();
     initialSubjects.add(initialSubject);
     setSubjects(initialSubjects);
   }

@@ -35,9 +35,8 @@ public class SearchQueryUtilsTest {
     Tissue,
     CreatedBy,
   };
-  public static final Set<SearchFieldName> EXPECTED_FACET_FIELDS = new HashSet<>(
-    Arrays.asList(SET_VALUES)
-  );
+  public static final Set<SearchFieldName> EXPECTED_FACET_FIELDS =
+    new HashSet<>(Arrays.asList(SET_VALUES));
 
   @Test
   public void testGetDefaultSearchQuery() {

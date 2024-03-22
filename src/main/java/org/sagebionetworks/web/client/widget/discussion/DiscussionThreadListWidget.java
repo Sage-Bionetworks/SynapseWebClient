@@ -43,7 +43,8 @@ public class DiscussionThreadListWidget
   private DiscussionFilter filter;
   private String entityId;
   private LoadMoreWidgetContainer loadMoreWidgetContainer;
-  private Map<String, DiscussionThreadListItemWidget> threadId2Widget = new HashMap<String, DiscussionThreadListItemWidget>();
+  private Map<String, DiscussionThreadListItemWidget> threadId2Widget =
+    new HashMap<String, DiscussionThreadListItemWidget>();
 
   @Inject
   public DiscussionThreadListWidget(
@@ -93,7 +94,8 @@ public class DiscussionThreadListWidget
       }
     );
 
-    DiscussionThreadCountAlert threadCountAlert = ginInjector.getDiscussionThreadCountAlert();
+    DiscussionThreadCountAlert threadCountAlert =
+      ginInjector.getDiscussionThreadCountAlert();
     view.setThreadCountAlert(threadCountAlert.asWidget());
     threadCountAlert.configure(forumId);
     loadInitialForumResults();
@@ -163,7 +165,8 @@ public class DiscussionThreadListWidget
         boolean isEmpty = results.isEmpty() && offset == 0; // no threads
 
         for (DiscussionThreadBundle bundle : results) {
-          DiscussionThreadListItemWidget thread = ginInjector.createThreadListItemWidget();
+          DiscussionThreadListItemWidget thread =
+            ginInjector.createThreadListItemWidget();
           thread.configure(bundle);
           if (threadIdClickedCallback != null) {
             thread.setThreadIdClickedCallback(threadIdClickedCallback);
@@ -232,9 +235,8 @@ public class DiscussionThreadListWidget
   public void scrollToThread(String threadId) {
     if (threadId2Widget.containsKey(threadId)) {
       // update thread data and scroll into view
-      final DiscussionThreadListItemWidget threadListItemWidget = threadId2Widget.get(
-        threadId
-      );
+      final DiscussionThreadListItemWidget threadListItemWidget =
+        threadId2Widget.get(threadId);
       jsClient.getThread(
         threadId,
         new AsyncCallback<DiscussionThreadBundle>() {

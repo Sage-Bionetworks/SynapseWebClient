@@ -8,4 +8,4 @@ For more information about Synapse, please see the [Synapse Docs](http://docs.sy
 
 Interested in spinning up a local web client? Go to the [SWC Developer Bootstrap](https://sagebionetworks.jira.com/wiki/display/SWC/Developer+Bootstrap) to find out how.
 
-A subset of the site is implemented by React components.  [Storybook](https://sage-bionetworks.github.io/synapse-web-monorepo/) | [Github](https://github.com/Sage-Bionetworks/synapse-web-monorepo/tree/main/packages/synapse-react-client)
+A subset of the site is implemented by React components. [Storybook](https://sage-bionetworks.github.io/synapse-web-monorepo/) | [Github](https://github.com/Sage-Bionetworks/synapse-web-monorepo/tree/main/packages/synapse-react-client)

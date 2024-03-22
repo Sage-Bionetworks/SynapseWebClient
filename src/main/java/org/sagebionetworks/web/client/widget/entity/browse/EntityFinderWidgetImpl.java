@@ -46,7 +46,9 @@ public class EntityFinderWidgetImpl
   private EntityFilter visibleTypesInTree;
   private boolean treeOnly;
   private EntityFinderWidget.SelectedHandler<Reference> selectedHandler;
-  private EntityFinderWidget.SelectedHandler<List<Reference>> selectedMultiHandler;
+  private EntityFinderWidget.SelectedHandler<
+    List<Reference>
+  > selectedMultiHandler;
 
   private String modalTitle;
   private String promptCopy;
@@ -144,10 +146,9 @@ public class EntityFinderWidgetImpl
       selected,
       finder
     ) -> {};
-    private EntityFinderWidget.SelectedHandler<List<Reference>> selectedMultiHandler = (
-      selected,
-      finder
-    ) -> {};
+    private EntityFinderWidget.SelectedHandler<
+      List<Reference>
+    > selectedMultiHandler = (selected, finder) -> {};
 
     private VersionSelection versionSelection = VersionSelection.TRACKED;
     private EntityFilter visibleTypesInList = ALL;

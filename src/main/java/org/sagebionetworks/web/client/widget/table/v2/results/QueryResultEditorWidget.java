@@ -298,9 +298,8 @@ public class QueryResultEditorWidget
 
         @Override
         public void onComplete(AsynchronousResponseBody response) {
-          String errors = QueryResultEditorWidget.getEntityUpdateResultsFailures(
-            response
-          );
+          String errors =
+            QueryResultEditorWidget.getEntityUpdateResultsFailures(response);
           if (!errors.isEmpty()) {
             view.showErrorDialog(
               "<h4>Unable to update the following files</h4>" + errors

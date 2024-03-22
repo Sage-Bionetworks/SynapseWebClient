@@ -240,7 +240,7 @@ public class PromptForValuesModalViewImpl implements PromptForValuesModalView {
     if (
       configuration.getInitialValues() != null &&
       configuration.getPrompts().size() !=
-      configuration.getInitialValues().size()
+        configuration.getInitialValues().size()
     ) {
       throw new IllegalArgumentException(
         "If set, initialValues size must equal prompts size."

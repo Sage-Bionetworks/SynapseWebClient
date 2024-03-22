@@ -68,7 +68,9 @@ public class EntityListConfigEditorTest {
   ArgumentCaptor<CallbackP<String>> promptCallbackCaptor;
 
   @Captor
-  ArgumentCaptor<EntityFinderWidget.SelectedHandler<List<Reference>>> entityFinderCaptor;
+  ArgumentCaptor<
+    EntityFinderWidget.SelectedHandler<List<Reference>>
+  > entityFinderCaptor;
 
   @Before
   public void setup() throws Exception {

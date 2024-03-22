@@ -90,9 +90,10 @@ public class EmailInvitationPresenter
         }
 
         public void onSuccess(SignedTokenInterface token) {
-          FluentFuture<MembershipInvitation> invitationFuture = jsClient.getMembershipInvitation(
-            (MembershipInvtnSignedToken) token
-          );
+          FluentFuture<MembershipInvitation> invitationFuture =
+            jsClient.getMembershipInvitation(
+              (MembershipInvtnSignedToken) token
+            );
           invitationFuture.addCallback(
             new FutureCallback<MembershipInvitation>() {
               @Override

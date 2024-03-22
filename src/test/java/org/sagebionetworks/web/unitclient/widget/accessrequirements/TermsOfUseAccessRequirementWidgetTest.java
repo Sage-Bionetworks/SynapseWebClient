@@ -110,34 +110,34 @@ public class TermsOfUseAccessRequirementWidgetTest {
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
-    widget = new TermsOfUseAccessRequirementWidget(
-      mockView,
-      mockAuthController,
-      mockDataAccessClient,
-      mockSynapseClient,
-      mockJsClient,
-      mockWikiPageWidget,
-      mockSynAlert,
-      mockTeamSubjectsWidget,
-      mockEntitySubjectsWidget,
-      mockAccessRequirementRelatedProjectsList,
-      mockCreateAccessRequirementButton,
-      mockLazyLoadHelper,
-      mockManageAccessButton,
-      mockIsACTMemberAsyncHandler
-    );
-    when(mockTermsOfUseAccessRequirement.getSubjectIds()).thenReturn(
-      mockSubjectIds
-    );
-    AsyncMockStubber.callSuccessWith(ROOT_WIKI_ID)
+    widget =
+      new TermsOfUseAccessRequirementWidget(
+        mockView,
+        mockAuthController,
+        mockDataAccessClient,
+        mockSynapseClient,
+        mockJsClient,
+        mockWikiPageWidget,
+        mockSynAlert,
+        mockTeamSubjectsWidget,
+        mockEntitySubjectsWidget,
+        mockAccessRequirementRelatedProjectsList,
+        mockCreateAccessRequirementButton,
+        mockLazyLoadHelper,
+        mockManageAccessButton,
+        mockIsACTMemberAsyncHandler
+      );
+    when(mockTermsOfUseAccessRequirement.getSubjectIds())
+      .thenReturn(mockSubjectIds);
+    AsyncMockStubber
+      .callSuccessWith(ROOT_WIKI_ID)
       .when(mockJsClient)
       .getRootWikiPageKey(anyString(), anyString(), any(AsyncCallback.class));
-    verify(mockLazyLoadHelper).configure(
-      callbackCaptor.capture(),
-      eq(mockView)
-    );
+    verify(mockLazyLoadHelper)
+      .configure(callbackCaptor.capture(), eq(mockView));
     lazyLoadDataCallback = callbackCaptor.getValue();
-    AsyncMockStubber.callSuccessWith(mockDataAccessSubmissionStatus)
+    AsyncMockStubber
+      .callSuccessWith(mockDataAccessSubmissionStatus)
       .when(mockDataAccessClient)
       .getAccessRequirementStatus(anyString(), any(AsyncCallback.class));
     when(mockAuthController.isLoggedIn()).thenReturn(true);
@@ -153,7 +153,8 @@ public class TermsOfUseAccessRequirementWidgetTest {
 
   @Test
   public void testSetRequirementWithContactInfoTerms() {
-    AsyncMockStubber.callFailureWith(new NotFoundException())
+    AsyncMockStubber
+      .callFailureWith(new NotFoundException())
       .when(mockJsClient)
       .getRootWikiPageKey(anyString(), anyString(), any(AsyncCallback.class));
     String tou = "must do things before access is allowed";
@@ -161,10 +162,8 @@ public class TermsOfUseAccessRequirementWidgetTest {
     widget.setRequirement(mockTermsOfUseAccessRequirement, mockRefreshCallback);
     verify(mockView).setTerms(tou);
     verify(mockView).showTermsUI();
-    verify(mockCreateAccessRequirementButton).configure(
-      mockTermsOfUseAccessRequirement,
-      mockRefreshCallback
-    );
+    verify(mockCreateAccessRequirementButton)
+      .configure(mockTermsOfUseAccessRequirement, mockRefreshCallback);
     verify(mockTeamSubjectsWidget).configure(mockSubjectIds);
     verify(mockEntitySubjectsWidget).configure(mockSubjectIds);
   }
@@ -172,11 +171,12 @@ public class TermsOfUseAccessRequirementWidgetTest {
   @Test
   public void testSetRequirementWithWikiTerms() {
     widget.setRequirement(mockTermsOfUseAccessRequirement, mockRefreshCallback);
-    verify(mockWikiPageWidget).configure(
-      any(WikiPageKey.class),
-      eq(false),
-      any(WikiPageWidget.Callback.class)
-    );
+    verify(mockWikiPageWidget)
+      .configure(
+        any(WikiPageKey.class),
+        eq(false),
+        any(WikiPageWidget.Callback.class)
+      );
     verify(mockView, never()).setTerms(anyString());
     verify(mockView, never()).showTermsUI();
   }

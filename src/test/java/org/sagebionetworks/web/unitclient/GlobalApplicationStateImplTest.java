@@ -209,9 +209,8 @@ public class GlobalApplicationStateImplTest {
     Throwable actualException = new Exception("I am dead, Horatio");
     Set<Throwable> causes = new LinkedHashSet<Throwable>();
     causes.add(actualException);
-    com.google.web.bindery.event.shared.UmbrellaException umbrellaException = new com.google.web.bindery.event.shared.UmbrellaException(
-      causes
-    );
+    com.google.web.bindery.event.shared.UmbrellaException umbrellaException =
+      new com.google.web.bindery.event.shared.UmbrellaException(causes);
     Set<Throwable> umbrellaUmbrellaCauses = new HashSet<Throwable>();
     umbrellaUmbrellaCauses.add(umbrellaException);
     UmbrellaException umbrellaUmbrellaException = new UmbrellaException(

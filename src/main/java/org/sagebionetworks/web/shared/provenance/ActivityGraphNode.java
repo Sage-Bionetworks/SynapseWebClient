@@ -97,8 +97,7 @@ public class ActivityGraphNode extends ProvGraphNode implements IsSerializable {
     final int prime = 31;
     int result = super.hashCode();
     result =
-      prime *
-      result +
+      prime * result +
       ((activityDescription == null) ? 0 : activityDescription.hashCode());
     result =
       prime * result + ((activityId == null) ? 0 : activityId.hashCode());

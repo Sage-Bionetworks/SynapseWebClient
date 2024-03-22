@@ -120,7 +120,10 @@ public class SlackServletTest {
     when(mockEntityBundle.getThreadCount()).thenReturn(THREAD_COUNT);
     when(mockEntityBundle.getAnnotations()).thenReturn(mockAnnotations);
 
-    Map<String, AnnotationsValue> annotations = new HashMap<String, AnnotationsValue>();
+    Map<String, AnnotationsValue> annotations = new HashMap<
+      String,
+      AnnotationsValue
+    >();
     List<String> values = new ArrayList<String>();
     values.add(ENTITY_STRING_ANNOTATION_VALUE1);
     values.add(ENTITY_STRING_ANNOTATION_VALUE2);

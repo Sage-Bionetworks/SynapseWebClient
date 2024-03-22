@@ -179,9 +179,9 @@ public class LinkedInServiceImpl
 
       try {
         location =
-          (
-            (Element) doc.getElementsByTagName("location").item(0)
-          ).getElementsByTagName("name")
+          ((Element) doc
+              .getElementsByTagName("location")
+              .item(0)).getElementsByTagName("name")
             .item(0)
             .getFirstChild()
             .getNodeValue();

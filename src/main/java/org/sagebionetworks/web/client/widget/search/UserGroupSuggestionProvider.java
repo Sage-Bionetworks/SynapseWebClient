@@ -62,10 +62,11 @@ public class UserGroupSuggestionProvider {
               );
             }
           }
-          SynapseSuggestionBundle suggestionBundle = new SynapseSuggestionBundle(
-            suggestions,
-            result.getTotalNumberOfResults()
-          );
+          SynapseSuggestionBundle suggestionBundle =
+            new SynapseSuggestionBundle(
+              suggestions,
+              result.getTotalNumberOfResults()
+            );
           callback.onSuccess(suggestionBundle);
         }
 

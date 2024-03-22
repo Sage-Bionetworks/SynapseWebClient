@@ -56,9 +56,8 @@ public class AsyncServiceRecorderTest {
     // int
     Class inType = int.class;
     Class expectedOut = Integer.class;
-    Class actualOut = AsyncServiceRecorder.getAsyncCallbackTypeFromSynchReturnType(
-      inType
-    );
+    Class actualOut =
+      AsyncServiceRecorder.getAsyncCallbackTypeFromSynchReturnType(inType);
     assertEquals(expectedOut, actualOut);
     // long
     inType = long.class;

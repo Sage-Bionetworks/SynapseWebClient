@@ -65,9 +65,7 @@ public class EntitySearchBoxViewImpl
     );
 
     // Previous suggestions button.
-    (
-      (SynapseSuggestionDisplay) suggestBox.getSuggestionDisplay()
-    ).getPrevButton()
+    ((SynapseSuggestionDisplay) suggestBox.getSuggestionDisplay()).getPrevButton()
       .addClickHandler(
         new ClickHandler() {
           @Override
@@ -78,9 +76,7 @@ public class EntitySearchBoxViewImpl
       );
 
     // Next suggestions button.
-    (
-      (SynapseSuggestionDisplay) suggestBox.getSuggestionDisplay()
-    ).getNextButton()
+    ((SynapseSuggestionDisplay) suggestBox.getSuggestionDisplay()).getNextButton()
       .addClickHandler(
         new ClickHandler() {
           @Override
@@ -111,17 +107,11 @@ public class EntitySearchBoxViewImpl
     long offset
   ) {
     Button prevBtn =
-      (
-        (SynapseSuggestionDisplay) suggestBox.getSuggestionDisplay()
-      ).getPrevButton();
+      ((SynapseSuggestionDisplay) suggestBox.getSuggestionDisplay()).getPrevButton();
     Button nextBtn =
-      (
-        (SynapseSuggestionDisplay) suggestBox.getSuggestionDisplay()
-      ).getNextButton();
+      ((SynapseSuggestionDisplay) suggestBox.getSuggestionDisplay()).getNextButton();
     Label resultsLbl =
-      (
-        (SynapseSuggestionDisplay) suggestBox.getSuggestionDisplay()
-      ).getResultsLabel();
+      ((SynapseSuggestionDisplay) suggestBox.getSuggestionDisplay()).getResultsLabel();
 
     prevBtn.setEnabled(offset != 0);
     boolean moreResults =
@@ -132,11 +122,9 @@ public class EntitySearchBoxViewImpl
       "Displaying " +
       (offset + 1) +
       " - " +
-      (
-        moreResults
+      (moreResults
           ? offset + EntitySearchBox.PAGE_SIZE
-          : responsePage.getFound()
-      ) +
+          : responsePage.getFound()) +
       " of " +
       responsePage.getFound();
     resultsLbl.setText(resultsLabel);
@@ -167,9 +155,7 @@ public class EntitySearchBoxViewImpl
 
   @Override
   public void hideLoading() {
-    (
-      (SynapseSuggestionDisplay) suggestBox.getSuggestionDisplay()
-    ).hideLoading();
+    ((SynapseSuggestionDisplay) suggestBox.getSuggestionDisplay()).hideLoading();
   }
 
   @Override

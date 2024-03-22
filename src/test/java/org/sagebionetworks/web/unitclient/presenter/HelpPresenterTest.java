@@ -39,7 +39,10 @@ public class HelpPresenterTest {
     verify(mockView).setPresenter(presenter);
     place = Mockito.mock(Help.class);
     when(place.toToken()).thenReturn(WebConstants.GETTING_STARTED);
-    HashMap<String, WikiPageKey> pageName2WikiKeyMap = new HashMap<String, WikiPageKey>();
+    HashMap<String, WikiPageKey> pageName2WikiKeyMap = new HashMap<
+      String,
+      WikiPageKey
+    >();
     String userGuideEntity = "syn1113";
     String userGuideWiki = "44442";
     userGuideKey =

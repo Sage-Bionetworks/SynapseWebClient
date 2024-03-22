@@ -129,12 +129,10 @@ public class APITableColumnConfig {
     result =
       prime * result + ((decimalPlaces == null) ? 0 : decimalPlaces.hashCode());
     result =
-      prime *
-      result +
+      prime * result +
       ((displayColumnName == null) ? 0 : displayColumnName.hashCode());
     result =
-      prime *
-      result +
+      prime * result +
       ((inputColumnNames == null) ? 0 : inputColumnNames.hashCode());
     result =
       prime * result + ((rendererName == null) ? 0 : rendererName.hashCode());

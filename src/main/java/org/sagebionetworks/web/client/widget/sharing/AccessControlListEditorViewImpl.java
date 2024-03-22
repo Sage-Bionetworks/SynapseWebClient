@@ -270,13 +270,14 @@ public class AccessControlListEditorViewImpl
         add(helpWidget);
       } else {
         // Configure AddPeopleToAclPanel.
-        CallbackP<UserGroupSuggestion> addPersonCallback =
-          new CallbackP<UserGroupSuggestion>() {
-            @Override
-            public void invoke(UserGroupSuggestion param) {
-              addPersonToAcl(param);
-            }
-          };
+        CallbackP<UserGroupSuggestion> addPersonCallback = new CallbackP<
+          UserGroupSuggestion
+        >() {
+          @Override
+          public void invoke(UserGroupSuggestion param) {
+            addPersonToAcl(param);
+          }
+        };
 
         CallbackP<Void> makePublicCallback = new CallbackP<Void>() {
           @Override

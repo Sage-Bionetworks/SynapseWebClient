@@ -89,7 +89,9 @@ public class EmailInvitationPresenterTest {
   private ArgumentCaptor<Profile> placeCaptor;
 
   @Captor
-  private ArgumentCaptor<org.sagebionetworks.web.client.place.Team> teamPlaceCaptor;
+  private ArgumentCaptor<
+    org.sagebionetworks.web.client.place.Team
+  > teamPlaceCaptor;
 
   private EmailInvitationPresenter presenter;
   private String encodedMISignedToken;
@@ -161,7 +163,8 @@ public class EmailInvitationPresenterTest {
       .getInviteeVerificationSignedToken(mockMembershipInvitation.getId());
     verify(mockJsClient).updateInviteeId(mockInviteeVerificationSignedToken);
     verify(mockPlaceChanger).goTo(teamPlaceCaptor.capture());
-    org.sagebionetworks.web.client.place.Team teamPlace = teamPlaceCaptor.getValue();
+    org.sagebionetworks.web.client.place.Team teamPlace =
+      teamPlaceCaptor.getValue();
     assertEquals(TEAM_ID, teamPlace.getTeamId());
   }
 

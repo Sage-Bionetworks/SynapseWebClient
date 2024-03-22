@@ -16,7 +16,8 @@ import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 public class UserGroupHeaderFromAliasAsyncHandlerImpl
   implements UserGroupHeaderFromAliasAsyncHandler {
 
-  private Map<String, List<AsyncCallback<UserGroupHeader>>> reference2Callback = new HashMap<String, List<AsyncCallback<UserGroupHeader>>>();
+  private Map<String, List<AsyncCallback<UserGroupHeader>>> reference2Callback =
+    new HashMap<String, List<AsyncCallback<UserGroupHeader>>>();
   SynapseJavascriptClient jsClient;
   GWTWrapper gwt;
 
@@ -52,7 +53,13 @@ public class UserGroupHeaderFromAliasAsyncHandlerImpl
 
   public void executeRequests() {
     if (!reference2Callback.isEmpty()) {
-      final Map<String, List<AsyncCallback<UserGroupHeader>>> reference2CallbackCopy = new HashMap<String, List<AsyncCallback<UserGroupHeader>>>();
+      final Map<
+        String,
+        List<AsyncCallback<UserGroupHeader>>
+      > reference2CallbackCopy = new HashMap<
+        String,
+        List<AsyncCallback<UserGroupHeader>>
+      >();
       reference2CallbackCopy.putAll(reference2Callback);
       reference2Callback.clear();
       ArrayList<String> aliasNames = new ArrayList<String>();
@@ -69,9 +76,8 @@ public class UserGroupHeaderFromAliasAsyncHandlerImpl
           }
 
           private void callOnFailure(String alias, Throwable ex) {
-            List<AsyncCallback<UserGroupHeader>> callbacks = reference2CallbackCopy.get(
-              alias
-            );
+            List<AsyncCallback<UserGroupHeader>> callbacks =
+              reference2CallbackCopy.get(alias);
             if (callbacks != null) {
               for (AsyncCallback<UserGroupHeader> callback : callbacks) {
                 callback.onFailure(ex);
@@ -85,9 +91,8 @@ public class UserGroupHeaderFromAliasAsyncHandlerImpl
               String alias = gwt
                 .getUniqueAliasName(header.getUserName())
                 .toLowerCase();
-              List<AsyncCallback<UserGroupHeader>> callbacks = reference2CallbackCopy.remove(
-                alias
-              );
+              List<AsyncCallback<UserGroupHeader>> callbacks =
+                reference2CallbackCopy.remove(alias);
               if (callbacks != null) {
                 for (AsyncCallback<UserGroupHeader> callback : callbacks) {
                   callback.onSuccess(header);

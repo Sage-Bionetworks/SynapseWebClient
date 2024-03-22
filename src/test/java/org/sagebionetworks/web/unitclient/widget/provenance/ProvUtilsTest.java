@@ -107,12 +107,18 @@ public class ProvUtilsTest {
     List<Activity> activities = new ArrayList<Activity>();
     activities.add(act);
     Map<String, ProvGraphNode> idToNode = new HashMap<String, ProvGraphNode>();
-    Map<Reference, EntityHeader> refToHeader = new HashMap<Reference, EntityHeader>();
+    Map<Reference, EntityHeader> refToHeader = new HashMap<
+      Reference,
+      EntityHeader
+    >();
     refToHeader.put(ref1, header1);
     refToHeader.put(ref2, header2);
     refToHeader.put(ref3, header3);
 
-    Map<Reference, String> generatedByActivityId = new HashMap<Reference, String>();
+    Map<Reference, String> generatedByActivityId = new HashMap<
+      Reference,
+      String
+    >();
     generatedByActivityId.put(ref1, act.getId());
 
     Map<String, Activity> processedActivities = new HashMap<String, Activity>();

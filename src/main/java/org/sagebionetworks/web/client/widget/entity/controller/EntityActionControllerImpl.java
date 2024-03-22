@@ -752,16 +752,21 @@ public class EntityActionControllerImpl
                     );
                     // There may be multiple actions of the same class, but we only want to show one message for each type
                     // Get the unique set of action classes.
-                    Set<Class<? extends org.sagebionetworks.repo.model.download.Action>> uniqueClasses =
-                      result
-                        .getActions()
-                        .stream()
-                        .map(
-                          org.sagebionetworks.repo.model.download.Action::getClass
-                        )
-                        .collect(Collectors.toSet());
+                    Set<
+                      Class<
+                        ? extends org.sagebionetworks.repo.model.download.Action
+                      >
+                    > uniqueClasses = result
+                      .getActions()
+                      .stream()
+                      .map(
+                        org.sagebionetworks.repo.model.download.Action::getClass
+                      )
+                      .collect(Collectors.toSet());
 
-                    for (Class<? extends org.sagebionetworks.repo.model.download.Action> clazz : uniqueClasses) {
+                    for (Class<
+                      ? extends org.sagebionetworks.repo.model.download.Action
+                    > clazz : uniqueClasses) {
                       downloadMenuTooltipText
                         .append("\n\n")
                         .append(
@@ -1255,8 +1260,8 @@ public class EntityActionControllerImpl
 
   private void configureTableCommands() {
     if (entityBundle.getEntity() instanceof Table) {
-      boolean isEntityRefCollectionView =
-        entityBundle.getEntity() instanceof EntityRefCollectionView;
+      boolean isEntityRefCollectionView = entityBundle.getEntity() instanceof
+      EntityRefCollectionView;
       boolean canEditResults =
         permissions.getCanCertifiedUserEdit() &&
         isEditCellValuesSupported(entityBundle.getEntity());

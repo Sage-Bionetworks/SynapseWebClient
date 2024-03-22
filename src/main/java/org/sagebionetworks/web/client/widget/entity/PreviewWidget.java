@@ -166,10 +166,8 @@ public class PreviewWidget
         return PreviewFileType.CODE;
       } else if (
         fileName != null &&
-        (
-          fileName.toLowerCase().endsWith(".md") ||
-          fileName.toLowerCase().endsWith(".rmd")
-        )
+        (fileName.toLowerCase().endsWith(".md") ||
+          fileName.toLowerCase().endsWith(".rmd"))
       ) {
         return PreviewFileType.MARKDOWN;
       } else if (
@@ -208,7 +206,9 @@ public class PreviewWidget
     EntityBundleRequest bundleRequest = new EntityBundleRequest();
     bundleRequest.setIncludeEntity(true);
     bundleRequest.setIncludeFileHandles(true);
-    AsyncCallback<EntityBundle> entityBundleCallback = new AsyncCallback<EntityBundle>() {
+    AsyncCallback<EntityBundle> entityBundleCallback = new AsyncCallback<
+      EntityBundle
+    >() {
       @Override
       public void onFailure(Throwable caught) {
         view.addSynapseAlertWidget(synapseAlert.asWidget());
@@ -282,9 +282,8 @@ public class PreviewWidget
   }
 
   private void renderFilePreview(EntityBundle bundle) {
-    CloudProviderFileHandleInterface previewFileHandle = DisplayUtils.getPreviewFileHandle(
-      bundle
-    );
+    CloudProviderFileHandleInterface previewFileHandle =
+      DisplayUtils.getPreviewFileHandle(bundle);
     FileHandle originalFileHandle = DisplayUtils.getFileHandle(bundle);
     PreviewFileType originalFileHandlePreviewType = getOriginalFileType(
       originalFileHandle
@@ -325,7 +324,8 @@ public class PreviewWidget
         break;
       case TIFF:
         // use UTIF.js to render
-        TIFFPreviewWidget tiffPreviewWidget = ginInjector.getTIFFPreviewWidget();
+        TIFFPreviewWidget tiffPreviewWidget =
+          ginInjector.getTIFFPreviewWidget();
         tiffPreviewWidget.configure(
           bundle.getEntity().getId(),
           fileHandleToShow
@@ -342,7 +342,8 @@ public class PreviewWidget
         view.setPreviewWidget(pdfPreviewWidget);
         break;
       case IPYNB:
-        NbConvertPreviewWidget nbConvertPreviewWidget = ginInjector.getNbConvertPreviewWidget();
+        NbConvertPreviewWidget nbConvertPreviewWidget =
+          ginInjector.getNbConvertPreviewWidget();
         nbConvertPreviewWidget.configure(
           bundle.getEntity().getId(),
           fileHandleToShow
@@ -360,7 +361,8 @@ public class PreviewWidget
         view.setPreviewWidget(videoWidget);
         break;
       case HTML:
-        HtmlPreviewWidget htmlPreviewWidget = ginInjector.getHtmlPreviewWidget();
+        HtmlPreviewWidget htmlPreviewWidget =
+          ginInjector.getHtmlPreviewWidget();
         htmlPreviewWidget.configure(
           bundle.getEntity().getId(),
           fileHandleToShow
@@ -427,9 +429,10 @@ public class PreviewWidget
                           }
                           switch (previewType) {
                             case CODE:
-                              String codePreview = SafeHtmlUtils.htmlEscapeAllowEntities(
-                                responseText
-                              );
+                              String codePreview =
+                                SafeHtmlUtils.htmlEscapeAllowEntities(
+                                  responseText
+                                );
                               String extension = ContentTypeUtils.getExtension(
                                 fileHandleToShow.getFileName()
                               );
@@ -439,7 +442,8 @@ public class PreviewWidget
                               );
                               break;
                             case MARKDOWN:
-                              MarkdownWidget markdownWidget = ginInjector.getMarkdownWidget();
+                              MarkdownWidget markdownWidget =
+                                ginInjector.getMarkdownWidget();
                               markdownWidget.configure(responseText);
                               view.setPreviewWidget(markdownWidget);
                               break;

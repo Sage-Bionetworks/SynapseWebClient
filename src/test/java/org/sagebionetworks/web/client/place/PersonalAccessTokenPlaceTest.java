@@ -6,7 +6,8 @@ import org.junit.Test;
 
 public class PersonalAccessTokenPlaceTest {
 
-  PersonalAccessTokenPlace.Tokenizer tokenizer = new PersonalAccessTokenPlace.Tokenizer();
+  PersonalAccessTokenPlace.Tokenizer tokenizer =
+    new PersonalAccessTokenPlace.Tokenizer();
   String testToken;
 
   @Before

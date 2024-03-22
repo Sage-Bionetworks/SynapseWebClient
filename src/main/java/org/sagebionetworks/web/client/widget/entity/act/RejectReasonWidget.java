@@ -129,7 +129,8 @@ public class RejectReasonWidget
                 new AsyncCallback<FileResult>() {
                   @Override
                   public void onSuccess(FileResult result) {
-                    RequestBuilderWrapper requestBuilder = ginInjector.getRequestBuilder();
+                    RequestBuilderWrapper requestBuilder =
+                      ginInjector.getRequestBuilder();
                     requestBuilder.configure(
                       RequestBuilder.GET,
                       result.getPreSignedURL()

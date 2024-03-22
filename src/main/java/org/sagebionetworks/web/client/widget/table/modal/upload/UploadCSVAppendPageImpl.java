@@ -60,7 +60,8 @@ public class UploadCSVAppendPageImpl implements UploadCSVAppendPage {
     presenter.setLoading(true);
     view.setTrackingWidgetVisible(true);
     // Start the job.
-    TableUpdateTransactionRequest transactionRequest = new TableUpdateTransactionRequest();
+    TableUpdateTransactionRequest transactionRequest =
+      new TableUpdateTransactionRequest();
     transactionRequest.setEntityId(request.getTableId());
     List<TableUpdateRequest> changes = new ArrayList<TableUpdateRequest>();
     changes.add(request);
@@ -78,9 +79,8 @@ public class UploadCSVAppendPageImpl implements UploadCSVAppendPage {
 
           @Override
           public void onComplete(AsynchronousResponseBody response) {
-            String errors = QueryResultEditorWidget.getEntityUpdateResultsFailures(
-              response
-            );
+            String errors =
+              QueryResultEditorWidget.getEntityUpdateResultsFailures(response);
             if (!errors.isEmpty()) {
               view.showErrorDialog(errors);
             }

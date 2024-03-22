@@ -91,7 +91,9 @@ public class APITableConfig {
   public static List<APITableColumnConfig> parseTableColumnConfigs(
     Map<String, String> descriptor
   ) {
-    List<APITableColumnConfig> columnConfigs = new ArrayList<APITableColumnConfig>();
+    List<APITableColumnConfig> columnConfigs = new ArrayList<
+      APITableColumnConfig
+    >();
     // reconstruct table column configs (if there are any)
     int i = 0;
     while (
