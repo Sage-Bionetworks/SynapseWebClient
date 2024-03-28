@@ -20,7 +20,7 @@
       ${project.build.directory}/${project.build.finalName}
     </webappDirectory>
     <synapse.version>493.0</synapse.version>
-    <gwtVersion>2.10.0</gwtVersion>
+    <gwtVersion>2.11.0</gwtVersion>
     <org.springframework.version>5.3.32</org.springframework.version>
     <guiceVersion>3.0</guiceVersion>
     <ginVersion>2.1.2</ginVersion>
@@ -199,7 +199,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>gwt-maven-plugin</artifactId>
-        <version>${gwtVersion}</version>
+        <version>2.10.0</version>
         <executions>
           <execution>
             <goals>
@@ -497,6 +497,12 @@
       <groupId>com.google.gwt.eventbinder</groupId>
       <artifactId>eventbinder</artifactId>
       <version>1.1.0</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.google.gwt</groupId>
+          <artifactId>gwt-user</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.gwtbootstrap3</groupId>
@@ -655,19 +661,19 @@
       <version>${log4j.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.google.gwt</groupId>
+      <groupId>org.gwtproject</groupId>
       <artifactId>gwt-servlet</artifactId>
       <version>${gwtVersion}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
-      <groupId>com.google.gwt</groupId>
+      <groupId>org.gwtproject</groupId>
       <artifactId>gwt-user</artifactId>
-      <version>${gwtVersion}</version>
+      <version>2.11.0</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>com.google.gwt</groupId>
+      <groupId>org.gwtproject</groupId>
       <artifactId>gwt-codeserver</artifactId>
       <version>${gwtVersion}</version>
       <scope>provided</scope>
@@ -694,6 +700,12 @@
       <artifactId>gwtp-all</artifactId>
       <version>1.6</version>
       <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>com.google.gwt</groupId>
+          <artifactId>gwt-user</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.sagebionetworks</groupId>
@@ -740,6 +752,12 @@
       <artifactId>gwtmockito</artifactId>
       <version>1.1.9</version>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>com.google.gwt</groupId>
+          <artifactId>gwt-user</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <!-- Scribe library, imported for OAuth for LinkedIn -->
