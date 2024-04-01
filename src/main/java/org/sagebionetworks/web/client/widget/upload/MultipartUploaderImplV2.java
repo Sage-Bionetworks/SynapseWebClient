@@ -7,9 +7,11 @@ import com.google.inject.Inject;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.jsinterop.Promise;
 import org.sagebionetworks.web.client.jsinterop.SRC.SynapseClient.FileUploadComplete;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.shared.WebConstants;
 
 /**
  * Perform a multi-part parallel upload utilizing code from the Synapse React Client
@@ -36,6 +38,7 @@ public class MultipartUploaderImplV2 implements MultipartUploader {
   DateTimeUtils dateTimeUtils;
   AuthenticationController auth;
   SRCUploadFileWrapper srcUploadFileWrapper;
+  private SynapseProperties synapseProperties;
 
   @Inject
   public MultipartUploaderImplV2(
@@ -43,7 +46,8 @@ public class MultipartUploaderImplV2 implements MultipartUploader {
     GWTWrapper gwt,
     SynapseJSNIUtils synapseJsniUtils,
     DateTimeUtils dateTimeUtils,
-    SRCUploadFileWrapper srcUploadFileWrapper
+    SRCUploadFileWrapper srcUploadFileWrapper,
+    SynapseProperties synapseProperties
   ) {
     super();
     this.auth = auth;
@@ -51,6 +55,7 @@ public class MultipartUploaderImplV2 implements MultipartUploader {
     this.percentFormat = gwt.getNumberFormat("##");
     this.dateTimeUtils = dateTimeUtils;
     this.srcUploadFileWrapper = srcUploadFileWrapper;
+    this.synapseProperties = synapseProperties;
   }
 
   @Override
@@ -62,6 +67,15 @@ public class MultipartUploaderImplV2 implements MultipartUploader {
     final Long storageLocationId,
     HasAttachHandlers view
   ) {
+    Long defaultStorageId = Long.parseLong(
+      synapseProperties.getSynapseProperty(
+        WebConstants.DEFAULT_STORAGE_ID_PROPERTY_KEY
+      )
+    );
+
+    int storageLocationIntValue = storageLocationId == null
+      ? defaultStorageId.intValue()
+      : storageLocationId.intValue();
     this.blob = blob;
     this.view = view;
     isCanceled = false;
@@ -76,7 +90,7 @@ public class MultipartUploaderImplV2 implements MultipartUploader {
       auth.getCurrentUserAccessToken(),
       fileName,
       blob,
-      storageLocationId.intValue(),
+      storageLocationIntValue,
       contentType,
       progress -> {
         double currentProgress = progress.value / progress.total;
