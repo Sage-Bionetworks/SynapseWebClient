@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
@@ -22,6 +23,7 @@ import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.ProgressCallback;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.jsinterop.Promise;
 import org.sagebionetworks.web.client.jsinterop.Promise.FunctionParam;
 import org.sagebionetworks.web.client.jsinterop.SRC.SynapseClient.FileUploadComplete;
@@ -67,6 +69,9 @@ public class MultipartUploaderImplV2Test {
   SRCUploadFileWrapper mockSRCUploadFileWrapper;
 
   @Mock
+  SynapseProperties mockSynapseProperties;
+
+  @Mock
   Promise<FileUploadComplete> mockPromise;
 
   @Captor
@@ -83,6 +88,7 @@ public class MultipartUploaderImplV2Test {
   public static final double FILE_SIZE = 9281;
   public static final String FILE_NAME = "file.txt";
   public static final String CONTENT_TYPE = "text/plain";
+  public static final long defaultStorageLocationId = 1L;
 
   @Before
   public void before() throws Exception {
@@ -104,12 +110,19 @@ public class MultipartUploaderImplV2Test {
       FILE_SIZE
     );
 
+    when(
+      mockSynapseProperties.getSynapseProperty(
+        WebConstants.DEFAULT_STORAGE_ID_PROPERTY_KEY
+      )
+    ).thenReturn(String.valueOf(defaultStorageLocationId));
+
     uploader = new MultipartUploaderImplV2(
       mockAuth,
       gwt,
       synapseJsniUtils,
       mockDateTimeUtils,
-      mockSRCUploadFileWrapper
+      mockSRCUploadFileWrapper,
+      mockSynapseProperties
     );
 
     when(mockView.isAttached()).thenReturn(true);
@@ -148,6 +161,35 @@ public class MultipartUploaderImplV2Test {
 
     thenHandler.exec(mockFileUploadComplete);
 
+    // the handler should get the id.
+    verify(mockHandler).uploadSuccess(RESULT_FILE_HANDLE_ID);
+  }
+
+  @Test
+  public void testDirectUploadEmptyStorageLocationId() throws Exception {
+    uploader.uploadFile(
+      FILE_NAME,
+      CONTENT_TYPE,
+      mockFileBlob,
+      mockHandler,
+      null,
+      mockView
+    );
+
+    verify(mockPromise).then(promiseHandlerCaptor.capture());
+    FunctionParam thenHandler = promiseHandlerCaptor.getValue();
+
+    thenHandler.exec(mockFileUploadComplete);
+
+    verify(mockSRCUploadFileWrapper).uploadFile(
+      anyString(),
+      anyString(),
+      any(),
+      eq((int) defaultStorageLocationId),
+      anyString(),
+      any(),
+      any()
+    );
     // the handler should get the id.
     verify(mockHandler).uploadSuccess(RESULT_FILE_HANDLE_ID);
   }
