@@ -485,6 +485,10 @@
                   file="${project.basedir}/node_modules/papaparse/papaparse.min.js"
                   tofile="src/main/webapp/generated/papaparse.min.js"
                 />
+                <copy
+                  file="${project.basedir}/node_modules/xss/dist/xss.min.js"
+                  tofile="src/main/webapp/generated/xss.min.js"
+                />
               </target>
             </configuration>
           </execution>
