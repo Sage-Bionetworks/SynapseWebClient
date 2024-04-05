@@ -211,8 +211,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
   @Override
   public void setPageDescription(String newDescription) {
     if (Document.get() != null) {
-      NodeList<com.google.gwt.dom.client.Element> tags = Document
-        .get()
+      NodeList<com.google.gwt.dom.client.Element> tags = Document.get()
         .getElementsByTagName("meta");
       for (int i = 0; i < tags.getLength(); i++) {
         MetaElement metaTag = ((MetaElement) tags.getItem(i));
@@ -697,21 +696,25 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 						return html;
 					}
 				},
-				safeAttrValue : function(tag, name, value) {
-					// returning nothing removes the value
-					if (tag === 'img' && name === 'src') {
-						if (value
-								&& (value.startsWith('data:image/') || value
-										.startsWith('http'))) {
-							return value;
-						}
-					} else {
-						return value;
-					}
-				}
-			};
-			$wnd.xss = new $wnd.filterXSS.FilterXSS(options);
-			return true;
+                safeAttrValue: function(tag, name, value) {
+                  // Apply default safeAttrValue filtering:
+                  value = $wnd.filterXSS.safeAttrValue(tag, name, value);
+                  if (tag === 'img' && name === 'src') {
+                    if (
+                      !(
+                        value &&
+                        (value.startsWith('data:image/') || value.startsWith('http'))
+                      )
+                    ) {
+                      return ''
+                    }
+                  }
+                  value = $wnd.filterXSS.escapeAttrValue(value)
+                  return value
+                }
+              }
+			$wnd.xss = new $wnd.filterXSS.FilterXSS(options)
+			return true
 		} catch (err) {
 			console.error(err);
 			return false;
