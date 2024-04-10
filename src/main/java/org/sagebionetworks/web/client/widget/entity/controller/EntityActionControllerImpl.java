@@ -310,16 +310,15 @@ public class EntityActionControllerImpl
     this.gwt = gwt;
     this.eventBus = eventBus;
     this.popupUtils = popupUtilsView;
-    entityUpdatedWizardCallback =
-      new WizardCallback() {
-        @Override
-        public void onFinished() {
-          fireEntityUpdatedEvent();
-        }
+    entityUpdatedWizardCallback = new WizardCallback() {
+      @Override
+      public void onFinished() {
+        fireEntityUpdatedEvent();
+      }
 
-        @Override
-        public void onCanceled() {}
-      };
+      @Override
+      public void onCanceled() {}
+    };
   }
 
   private void fireEntityUpdatedEvent() {
@@ -577,8 +576,9 @@ public class EntityActionControllerImpl
     this.entity = entityBundle.getEntity();
     this.isUserAuthenticated = authenticationController.isLoggedIn();
     this.isCurrentVersion = isCurrentVersion;
-    this.entityTypeDisplay =
-      getFriendlyEntityTypeName(entityBundle.getEntity());
+    this.entityTypeDisplay = getFriendlyEntityTypeName(
+      entityBundle.getEntity()
+    );
     this.currentArea = currentArea;
     this.addToDownloadListWidget = addToDownloadListWidget;
 
@@ -640,14 +640,13 @@ public class EntityActionControllerImpl
         challengeFuture,
         actFuture,
         reorderWikiSubpagesFuture
+      ).call(
+        () -> {
+          actionMenu.setIsLoading(false);
+          return null;
+        },
+        directExecutor()
       )
-        .call(
-          () -> {
-            actionMenu.setIsLoading(false);
-            return null;
-          },
-          directExecutor()
-        )
     );
   }
 
@@ -667,39 +666,36 @@ public class EntityActionControllerImpl
       Action.REPORT_VIOLATION,
       !(entityBundle.getEntity() instanceof Project)
     );
-    actionMenu.setActionListener(
-      Action.REPORT_VIOLATION,
-      (action, event) -> {
-        // report abuse via Jira issue collector
-        String userId = WebConstants.ANONYMOUS, email =
-          WebConstants.ANONYMOUS, displayName = WebConstants.ANONYMOUS, synId =
-          entity.getId();
-        UserProfile userProfile =
-          authenticationController.getCurrentUserProfile();
-        if (userProfile != null) {
-          userId = userProfile.getOwnerId();
-          displayName = DisplayUtils.getDisplayName(userProfile);
-          email = DisplayUtils.getPrimaryEmail(userProfile);
-        }
-
-        ginInjector
-          .getSynapseJSNIUtils()
-          .showJiraIssueCollector(
-            "", // summary
-            FLAG_ISSUE_DESCRIPTION_PART_1 +
-            gwt.getCurrentURL() +
-            FLAG_ISSUE_DESCRIPTION_PART_2,
-            FLAG_ISSUE_COLLECTOR_URL,
-            userId,
-            displayName,
-            email,
-            synId, // Synapse data object ID
-            REVIEW_DATA_REQUEST_COMPONENT_ID,
-            null, // AR ID
-            FLAG_ISSUE_PRIORITY
-          );
+    actionMenu.setActionListener(Action.REPORT_VIOLATION, (action, event) -> {
+      // report abuse via Jira issue collector
+      String userId = WebConstants.ANONYMOUS, email =
+        WebConstants.ANONYMOUS, displayName = WebConstants.ANONYMOUS, synId =
+        entity.getId();
+      UserProfile userProfile =
+        authenticationController.getCurrentUserProfile();
+      if (userProfile != null) {
+        userId = userProfile.getOwnerId();
+        displayName = DisplayUtils.getDisplayName(userProfile);
+        email = DisplayUtils.getPrimaryEmail(userProfile);
       }
-    );
+
+      ginInjector
+        .getSynapseJSNIUtils()
+        .showJiraIssueCollector(
+          "", // summary
+          FLAG_ISSUE_DESCRIPTION_PART_1 +
+          gwt.getCurrentURL() +
+          FLAG_ISSUE_DESCRIPTION_PART_2,
+          FLAG_ISSUE_COLLECTOR_URL,
+          userId,
+          displayName,
+          email,
+          synId, // Synapse data object ID
+          REVIEW_DATA_REQUEST_COMPONENT_ID,
+          null, // AR ID
+          FLAG_ISSUE_PRIORITY
+        );
+    });
   }
 
   private void configureFullTextSearch() {
@@ -791,45 +787,42 @@ public class EntityActionControllerImpl
       actionMenu.setActionVisible(Action.DOWNLOAD_FILE, true);
 
       actionMenu.setActionVisible(Action.ADD_TO_DOWNLOAD_CART, true);
-      actionMenu.setActionListener(
-        Action.ADD_TO_DOWNLOAD_CART,
-        (action, e) -> {
-          if (!authenticationController.isLoggedIn()) {
-            view.showErrorMessage(
-              "You will need to sign in to add a file to the Download List."
-            );
-            getGlobalApplicationState()
-              .getPlaceChanger()
-              .goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
-          } else {
-            FileEntity entity = (FileEntity) entityBundle.getEntity();
+      actionMenu.setActionListener(Action.ADD_TO_DOWNLOAD_CART, (action, e) -> {
+        if (!authenticationController.isLoggedIn()) {
+          view.showErrorMessage(
+            "You will need to sign in to add a file to the Download List."
+          );
+          getGlobalApplicationState()
+            .getPlaceChanger()
+            .goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+        } else {
+          FileEntity entity = (FileEntity) entityBundle.getEntity();
 
-            getSynapseJavascriptClient()
-              .addFileToDownloadListV2(
-                entity.getId(),
-                entity.getVersionNumber(),
-                new AsyncCallback<AddBatchOfFilesToDownloadListResponse>() {
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    view.showErrorMessage(caught.getMessage());
-                  }
-
-                  public void onSuccess(
-                    AddBatchOfFilesToDownloadListResponse result
-                  ) {
-                    String href = "#!DownloadCart:0";
-                    popupUtils.showInfo(
-                      entity.getName() + EntityBadge.ADDED_TO_DOWNLOAD_LIST,
-                      href,
-                      DisplayConstants.VIEW_DOWNLOAD_LIST
-                    );
-                    eventBus.fireEvent(new DownloadListUpdatedEvent());
-                  }
+          getSynapseJavascriptClient()
+            .addFileToDownloadListV2(
+              entity.getId(),
+              entity.getVersionNumber(),
+              new AsyncCallback<AddBatchOfFilesToDownloadListResponse>() {
+                @Override
+                public void onFailure(Throwable caught) {
+                  view.showErrorMessage(caught.getMessage());
                 }
-              );
-          }
+
+                public void onSuccess(
+                  AddBatchOfFilesToDownloadListResponse result
+                ) {
+                  String href = "#!DownloadCart:0";
+                  popupUtils.showInfo(
+                    entity.getName() + EntityBadge.ADDED_TO_DOWNLOAD_LIST,
+                    href,
+                    DisplayConstants.VIEW_DOWNLOAD_LIST
+                  );
+                  eventBus.fireEvent(new DownloadListUpdatedEvent());
+                }
+              }
+            );
         }
-      );
+      });
 
       actionMenu.setActionVisible(Action.SHOW_PROGRAMMATIC_OPTIONS, true);
       actionMenu.setActionListener(
@@ -842,15 +835,15 @@ public class EntityActionControllerImpl
             )
       );
 
-      restrictionInformationFuture =
-        getDoneFuture(entityBundle.getRestrictionInformation());
+      restrictionInformationFuture = getDoneFuture(
+        entityBundle.getRestrictionInformation()
+      );
       if (entityBundle.getRestrictionInformation() == null) {
-        restrictionInformationFuture =
-          getSynapseJavascriptClient()
-            .getRestrictionInformation(
-              entity.getId(),
-              RestrictableObjectType.ENTITY
-            );
+        restrictionInformationFuture = getSynapseJavascriptClient()
+          .getRestrictionInformation(
+            entity.getId(),
+            RestrictableObjectType.ENTITY
+          );
       }
       restrictionInformationFuture.addCallback(
         new FutureCallback<RestrictionInformationResponse>() {
@@ -1231,12 +1224,9 @@ public class EntityActionControllerImpl
    */
   public void postConfirmedDeleteChallenge() {
     // The user has confirmed the delete, the next step is the preflight check.
-    preflightController.checkDeleteEntity(
-      this.entityBundle,
-      () -> {
-        postCheckDeleteChallenge();
-      }
-    );
+    preflightController.checkDeleteEntity(this.entityBundle, () -> {
+      postCheckDeleteChallenge();
+    });
   }
 
   public void postCheckDeleteChallenge() {
@@ -1390,13 +1380,14 @@ public class EntityActionControllerImpl
       permissions.getCanEdit()
     ) {
       // shown if there's more than one page
-      FluentFuture<List<V2WikiHeader>> future = getFuture(cb ->
-        getSynapseJavascriptClient()
-          .getV2WikiHeaderTree(
-            entityBundle.getEntity().getId(),
-            ObjectType.ENTITY.name(),
-            cb
-          )
+      FluentFuture<List<V2WikiHeader>> future = getFuture(
+        cb ->
+          getSynapseJavascriptClient()
+            .getV2WikiHeaderTree(
+              entityBundle.getEntity().getId(),
+              ObjectType.ENTITY.name(),
+              cb
+            )
       );
       future.addCallback(
         new FutureCallback<List<V2WikiHeader>>() {
@@ -1549,7 +1540,7 @@ public class EntityActionControllerImpl
     }
   }
 
-  private void configureRenameAction() {
+  private void configureRenameAction() { ////
     if (
       !hasCustomRenameEditor(entityBundle.getEntity()) &&
       !(entityBundle.getEntity() instanceof DockerRepository)
@@ -1910,12 +1901,9 @@ public class EntityActionControllerImpl
 
   private void postCheckCreateExternalDockerRepo() {
     getAddExternalRepoModal()
-      .configuration(
-        entityBundle.getEntity().getId(),
-        () -> {
-          fireEntityUpdatedEvent();
-        }
-      );
+      .configuration(entityBundle.getEntity().getId(), () -> {
+        fireEntityUpdatedEvent();
+      });
     getAddExternalRepoModal().show();
   }
 
@@ -2304,12 +2292,9 @@ public class EntityActionControllerImpl
       wikiPageId
     );
     getWikiMarkdownEditor()
-      .configure(
-        key,
-        wikiPage -> {
-          fireEntityUpdatedEvent();
-        }
-      );
+      .configure(key, wikiPage -> {
+        fireEntityUpdatedEvent();
+      });
   }
 
   private void onCreateTableViewSnapshot() {
@@ -2614,9 +2599,24 @@ public class EntityActionControllerImpl
   }
 
   private void onRename() {
-    checkUpdateEntity(() -> {
-      postCheckRename();
-    });
+    if (
+      entityBundle.getEntity() instanceof VersionableEntity &&
+      ((VersionableEntity) entityBundle.getEntity()).getIsLatestVersion()
+    ) {
+      checkUpdateEntity(() -> {
+        postCheckRename();
+      });
+    } else if (entityBundle.getEntity() instanceof VersionableEntity) {
+      view.showErrorMessage(
+        "Can only change the name of the most recent " +
+        entityBundle.getEntityType() +
+        " version."
+      );
+    } else {
+      checkUpdateEntity(() -> {
+        postCheckRename();
+      });
+    }
   }
 
   /**
@@ -2624,12 +2624,9 @@ public class EntityActionControllerImpl
    */
   private void postCheckRename() {
     getRenameEntityModalWidget()
-      .onRename(
-        this.entity,
-        () -> {
-          fireEntityUpdatedEvent();
-        }
-      );
+      .onRename(this.entity, () -> {
+        fireEntityUpdatedEvent();
+      });
   }
 
   private void onEditFileMetadata() {
@@ -2676,13 +2673,9 @@ public class EntityActionControllerImpl
       canChangeSettings = false;
     }
     getEditProjectMetadataModalWidget()
-      .configure(
-        (Project) entityBundle.getEntity(),
-        canChangeSettings,
-        () -> {
-          fireEntityUpdatedEvent();
-        }
-      );
+      .configure((Project) entityBundle.getEntity(), canChangeSettings, () -> {
+        fireEntityUpdatedEvent();
+      });
   }
 
   private void postCheckEditDefiningSql() {
@@ -2715,21 +2708,18 @@ public class EntityActionControllerImpl
       wikiPageId
     );
     getWikiPageDeleteConfirmationDialog()
-      .show(
-        key,
-        parentWikiId -> {
-          getGlobalApplicationState()
-            .getPlaceChanger()
-            .goTo(
-              new Synapse(
-                entityBundle.getEntity().getId(),
-                null,
-                EntityArea.WIKI,
-                parentWikiId
-              )
-            );
-        }
-      );
+      .show(key, parentWikiId -> {
+        getGlobalApplicationState()
+          .getPlaceChanger()
+          .goTo(
+            new Synapse(
+              entityBundle.getEntity().getId(),
+              null,
+              EntityArea.WIKI,
+              parentWikiId
+            )
+          );
+      });
   }
 
   @Override
@@ -2811,25 +2801,21 @@ public class EntityActionControllerImpl
     if (parentId != null && !(entityBundle.getEntity() instanceof Project)) {
       if (
         entityBundle.getEntity() instanceof EntityRefCollectionView
-      ) gotoPlace =
-        new Synapse(parentId, null, EntityArea.DATASETS, null); else if (
-        entityBundle.getEntity() instanceof Table
-      ) gotoPlace =
-        new Synapse(parentId, null, EntityArea.TABLES, null); else if (
-        entityBundle.getEntity() instanceof DockerRepository
-      ) gotoPlace =
-        new Synapse(parentId, null, EntityArea.DOCKER, null); else if (
+      ) gotoPlace = new Synapse(parentId, null, EntityArea.DATASETS, null);
+      else if (entityBundle.getEntity() instanceof Table) gotoPlace =
+        new Synapse(parentId, null, EntityArea.TABLES, null);
+      else if (entityBundle.getEntity() instanceof DockerRepository) gotoPlace =
+        new Synapse(parentId, null, EntityArea.DOCKER, null);
+      else if (
         entityBundle.getEntity() instanceof FileEntity ||
         entityBundle.getEntity() instanceof Folder
-      ) gotoPlace =
-        new Synapse(parentId, null, EntityArea.FILES, null); else gotoPlace =
-        new Synapse(parentId);
+      ) gotoPlace = new Synapse(parentId, null, EntityArea.FILES, null);
+      else gotoPlace = new Synapse(parentId);
     } else {
-      gotoPlace =
-        new Profile(
-          authenticationController.getCurrentUserPrincipalId(),
-          ProfileArea.PROJECTS
-        );
+      gotoPlace = new Profile(
+        authenticationController.getCurrentUserPrincipalId(),
+        ProfileArea.PROJECTS
+      );
     }
     return gotoPlace;
   }
