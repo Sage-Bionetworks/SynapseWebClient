@@ -1540,7 +1540,7 @@ public class EntityActionControllerImpl
     }
   }
 
-  private void configureRenameAction() { ////
+  private void configureRenameAction() {
     if (
       !hasCustomRenameEditor(entityBundle.getEntity()) &&
       !(entityBundle.getEntity() instanceof DockerRepository)
@@ -2275,7 +2275,18 @@ public class EntityActionControllerImpl
   }
 
   private void checkUpdateEntity(Callback cb) {
-    preflightController.checkUpdateEntity(this.entityBundle, cb);
+    if (
+      entityBundle.getEntity() instanceof VersionableEntity &&
+      !((VersionableEntity) entityBundle.getEntity()).getIsLatestVersion()
+    ) {
+      view.showErrorMessage(
+        "Can only edit the most recent " +
+        entityBundle.getEntityType() +
+        " version."
+      );
+    } else {
+      preflightController.checkUpdateEntity(this.entityBundle, cb);
+    }
   }
 
   private void onEditWiki() {
@@ -2599,24 +2610,9 @@ public class EntityActionControllerImpl
   }
 
   private void onRename() {
-    if (
-      entityBundle.getEntity() instanceof VersionableEntity &&
-      ((VersionableEntity) entityBundle.getEntity()).getIsLatestVersion()
-    ) {
-      checkUpdateEntity(() -> {
-        postCheckRename();
-      });
-    } else if (entityBundle.getEntity() instanceof VersionableEntity) {
-      view.showErrorMessage(
-        "Can only change the name of the most recent " +
-        entityBundle.getEntityType() +
-        " version."
-      );
-    } else {
-      checkUpdateEntity(() -> {
-        postCheckRename();
-      });
-    }
+    checkUpdateEntity(() -> {
+      postCheckRename();
+    });
   }
 
   /**
