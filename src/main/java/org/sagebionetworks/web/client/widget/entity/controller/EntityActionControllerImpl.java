@@ -2275,18 +2275,7 @@ public class EntityActionControllerImpl
   }
 
   private void checkUpdateEntity(Callback cb) {
-    if (
-      entityBundle.getEntity() instanceof VersionableEntity &&
-      !((VersionableEntity) entityBundle.getEntity()).getIsLatestVersion()
-    ) {
-      view.showErrorMessage(
-        "Can only edit the most recent " +
-        entityBundle.getEntityType() +
-        " version."
-      );
-    } else {
-      preflightController.checkUpdateEntity(this.entityBundle, cb);
-    }
+    preflightController.checkUpdateEntity(this.entityBundle, cb);
   }
 
   private void onEditWiki() {
@@ -2610,9 +2599,28 @@ public class EntityActionControllerImpl
   }
 
   private void onRename() {
-    checkUpdateEntity(() -> {
-      postCheckRename();
-    });
+    if (checkIsLatestVersion()) {
+      checkUpdateEntity(() -> {
+        postCheckRename();
+      });
+    } else {
+      view.showErrorMessage(
+        "Can only change the name of the most recent " +
+        entityBundle.getEntityType() +
+        " version."
+      );
+    }
+  }
+
+  private boolean checkIsLatestVersion() {
+    if (
+      entityBundle.getEntity() instanceof VersionableEntity &&
+      ((VersionableEntity) entityBundle.getEntity()).getIsLatestVersion()
+    ) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   /**
