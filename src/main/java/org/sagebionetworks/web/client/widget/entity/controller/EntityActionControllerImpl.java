@@ -2774,6 +2774,14 @@ public class EntityActionControllerImpl
             // Go to entity's parent
             Place gotoPlace = createDeletePlace();
             getGlobalApplicationState().getPlaceChanger().goTo(gotoPlace);
+            KeyFactory keyFactory = keyFactoryProvider.getKeyFactory(
+              authenticationController.getCurrentUserAccessToken()
+            );
+            queryClient.invalidateQueries(
+              InvalidateQueryFilters.create(
+                keyFactory.getTrashCanItemsQueryKey()
+              )
+            );
           }
 
           @Override
@@ -2784,12 +2792,6 @@ public class EntityActionControllerImpl
           }
         }
       );
-    KeyFactory keyFactory = keyFactoryProvider.getKeyFactory(
-      authenticationController.getCurrentUserAccessToken()
-    );
-    queryClient.invalidateQueries(
-      InvalidateQueryFilters.create(keyFactory.getTrashCanItemsQueryKey())
-    );
   }
 
   /**

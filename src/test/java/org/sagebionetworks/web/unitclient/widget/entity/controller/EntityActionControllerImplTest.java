@@ -2866,6 +2866,13 @@ public class EntityActionControllerImplTest {
     verify(mockView).showErrorMessage(
       DisplayConstants.ERROR_ENTITY_DELETE_FAILURE + error
     );
+    QueryKey mockQueryKey = mock(QueryKey.class);
+    when(mockKeyFactory.getTrashCanItemsQueryKey()).thenReturn(mockQueryKey);
+    verify(mockKeyFactoryProvider, never()).getKeyFactory(anyString());
+    verify(mockKeyFactory, never()).getTrashCanItemsQueryKey();
+    verify(mockQueryClient, never()).invalidateQueries(
+      any(InvalidateQueryFilters.class)
+    );
   }
 
   @Test
