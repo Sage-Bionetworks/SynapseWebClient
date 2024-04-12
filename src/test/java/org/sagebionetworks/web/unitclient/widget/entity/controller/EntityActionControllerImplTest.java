@@ -386,6 +386,9 @@ public class EntityActionControllerImplTest {
   @Mock
   ContainerClientsHelp mockContainerClientsHelp;
 
+  @Mock
+  Dataset mockDataset;
+
   @Captor
   ArgumentCaptor<
     CreateTableViewWizardProps.OnComplete
@@ -2865,9 +2868,104 @@ public class EntityActionControllerImplTest {
     );
     // method under test
     controller.onAction(Action.CHANGE_ENTITY_NAME, null);
-    verify(mockRenameEntityModalWidget, never())
-      .onRename(any(Entity.class), any(Callback.class));
+    verify(mockRenameEntityModalWidget, never()).onRename(
+      any(Entity.class),
+      any(Callback.class)
+    );
     verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
+  }
+
+  @Test
+  public void testRenameDatasetIsNotLatestVersion() {
+    entityBundle.setEntity(mockDataset);
+    AsyncMockStubber.callWithInvoke()
+      .when(mockPreflightController)
+      .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+    AsyncMockStubber.callWithInvoke()
+      .when(mockRenameEntityModalWidget)
+      .onRename(any(Entity.class), any(Callback.class));
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+    when(mockDataset.getIsLatestVersion()).thenReturn(false);
+    // method under test
+    controller.onAction(Action.CHANGE_ENTITY_NAME, null);
+    verify(mockRenameEntityModalWidget, never()).onRename(
+      any(Entity.class),
+      any(Callback.class)
+    );
+    verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
+    verify(mockView).showErrorMessage(
+      "Can only change the name of the most recent " +
+      entityBundle.getEntityType() +
+      " version."
+    );
+  }
+
+  @Test
+  public void testRenameDatasetIsLatestVersion() {
+    entityBundle.setEntity(mockDataset);
+    AsyncMockStubber.callWithInvoke()
+      .when(mockPreflightController)
+      .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+    AsyncMockStubber.callWithInvoke()
+      .when(mockRenameEntityModalWidget)
+      .onRename(any(Entity.class), any(Callback.class));
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+    when(mockDataset.getIsLatestVersion()).thenReturn(true);
+    // method under test
+    controller.onAction(Action.CHANGE_ENTITY_NAME, null);
+    verify(mockRenameEntityModalWidget).onRename(
+      any(Entity.class),
+      any(Callback.class)
+    );
+    verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
+    verify(mockView, never()).showErrorMessage(
+      "Can only change the name of the most recent " +
+      entityBundle.getEntityType() +
+      " version."
+    );
+  }
+
+  @Test
+  public void testRenameFolder() {
+    Folder folder = new Folder();
+    folder.setId(entityId);
+    folder.setParentId(parentId);
+    entityBundle.setEntity(folder);
+    AsyncMockStubber.callWithInvoke()
+      .when(mockPreflightController)
+      .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+    AsyncMockStubber.callWithInvoke()
+      .when(mockRenameEntityModalWidget)
+      .onRename(any(Entity.class), any(Callback.class));
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+    // method under test
+    controller.onAction(Action.CHANGE_ENTITY_NAME, null);
+    verify(mockRenameEntityModalWidget).onRename(
+      any(Entity.class),
+      any(Callback.class)
+    );
+    verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
   }
 
   @Test

@@ -2613,13 +2613,15 @@ public class EntityActionControllerImpl
   }
 
   private boolean checkIsLatestVersion() {
-    if (
-      entityBundle.getEntity() instanceof VersionableEntity &&
-      ((VersionableEntity) entityBundle.getEntity()).getIsLatestVersion()
-    ) {
+    // If the entity is not a versionable entity, it should be considered as the LatestVersion
+    if (!(entityBundle.getEntity() instanceof VersionableEntity)) {
       return true;
     } else {
-      return false;
+      if (((VersionableEntity) entityBundle.getEntity()).getIsLatestVersion()) {
+        return true;
+      } else {
+        return false;
+      }
     }
   }
 
