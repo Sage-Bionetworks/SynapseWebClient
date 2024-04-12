@@ -121,12 +121,18 @@ import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
+import org.sagebionetworks.web.client.context.KeyFactoryProvider;
+import org.sagebionetworks.web.client.context.QueryClientProvider;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.jsinterop.CreateTableViewWizardProps;
+import org.sagebionetworks.web.client.jsinterop.KeyFactory;
 import org.sagebionetworks.web.client.jsinterop.SqlDefinedTableEditorModalProps;
 import org.sagebionetworks.web.client.jsinterop.ToastMessageOptions;
+import org.sagebionetworks.web.client.jsinterop.reactquery.InvalidateQueryFilters;
+import org.sagebionetworks.web.client.jsinterop.reactquery.QueryClient;
+import org.sagebionetworks.web.client.jsinterop.reactquery.QueryKey;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
@@ -386,6 +392,18 @@ public class EntityActionControllerImplTest {
   @Mock
   ContainerClientsHelp mockContainerClientsHelp;
 
+  @Mock
+  QueryClientProvider mockQueryClientProvider;
+
+  @Mock
+  QueryClient mockQueryClient;
+
+  @Mock
+  KeyFactoryProvider mockKeyFactoryProvider;
+
+  @Mock
+  KeyFactory mockKeyFactory;
+
   @Captor
   ArgumentCaptor<
     CreateTableViewWizardProps.OnComplete
@@ -409,99 +427,138 @@ public class EntityActionControllerImplTest {
   @Before
   public void before() {
     mockEntityView = new EntityView();
-    mockEntityFinderBuilder =
-      mock(EntityFinderWidget.Builder.class, new SelfReturningAnswer());
-    mockPromptModalConfigurationBuilder =
-      mock(
-        PromptForValuesModalView.Configuration.Builder.class,
-        new SelfReturningAnswer()
-      );
+    mockEntityFinderBuilder = mock(
+      EntityFinderWidget.Builder.class,
+      new SelfReturningAnswer()
+    );
+    mockPromptModalConfigurationBuilder = mock(
+      PromptForValuesModalView.Configuration.Builder.class,
+      new SelfReturningAnswer()
+    );
 
     when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-    when(mockAuthenticationController.getCurrentUserPrincipalId())
-      .thenReturn(currentUserId);
-    when(mockGlobalApplicationState.getPlaceChanger())
-      .thenReturn(mockPlaceChanger);
+    when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(
+      currentUserId
+    );
+    when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(
+      mockPlaceChanger
+    );
+    when(mockKeyFactoryProvider.getKeyFactory(anyString())).thenReturn(
+      mockKeyFactory
+    );
 
-    when(mockPortalGinInjector.getSynapseProperties())
-      .thenReturn(mockSynapseProperties);
-    when(mockPortalGinInjector.getAccessControlListModalWidget())
-      .thenReturn(mockAccessControlListModalWidget);
-    when(mockPortalGinInjector.getRenameEntityModalWidget())
-      .thenReturn(mockRenameEntityModalWidget);
-    when(mockPortalGinInjector.getEditFileMetadataModalWidget())
-      .thenReturn(mockEditFileMetadataModalWidget);
-    when(mockPortalGinInjector.getEditProjectMetadataModalWidget())
-      .thenReturn(mockEditProjectMetadataModalWidget);
-    when(mockPortalGinInjector.getEntityFinderBuilder())
-      .thenReturn(mockEntityFinderBuilder);
-    when(mockPortalGinInjector.getSqlDefinedEditorModalWidget())
-      .thenReturn(mockSqlDefinedTableEditorModalWidget);
+    when(mockPortalGinInjector.getSynapseProperties()).thenReturn(
+      mockSynapseProperties
+    );
+    when(mockPortalGinInjector.getAccessControlListModalWidget()).thenReturn(
+      mockAccessControlListModalWidget
+    );
+    when(mockPortalGinInjector.getRenameEntityModalWidget()).thenReturn(
+      mockRenameEntityModalWidget
+    );
+    when(mockPortalGinInjector.getEditFileMetadataModalWidget()).thenReturn(
+      mockEditFileMetadataModalWidget
+    );
+    when(mockPortalGinInjector.getEditProjectMetadataModalWidget()).thenReturn(
+      mockEditProjectMetadataModalWidget
+    );
+    when(mockPortalGinInjector.getEntityFinderBuilder()).thenReturn(
+      mockEntityFinderBuilder
+    );
+    when(mockPortalGinInjector.getSqlDefinedEditorModalWidget()).thenReturn(
+      mockSqlDefinedTableEditorModalWidget
+    );
     when(mockEntityFinderBuilder.build()).thenReturn(mockEntityFinder);
 
-    when(mockPortalGinInjector.getUploadDialogWidget())
-      .thenReturn(mockUploader);
-    when(mockPortalGinInjector.getWikiMarkdownEditor())
-      .thenReturn(mockMarkdownEditorWidget);
-    when(mockPortalGinInjector.getProvenanceEditorWidget())
-      .thenReturn(mockProvenanceEditorWidget);
-    when(mockPortalGinInjector.getStorageLocationWidget())
-      .thenReturn(mockStorageLocationWidget);
-    when(mockPortalGinInjector.getEvaluationEditorModal())
-      .thenReturn(mockEvalEditor);
-    when(mockPortalGinInjector.getSelectTeamModal())
-      .thenReturn(mockSelectTeamModal);
-    when(mockPortalGinInjector.getApproveUserAccessModal())
-      .thenReturn(mockApproveUserAccessModal);
-    when(mockPortalGinInjector.getChallengeClientAsync())
-      .thenReturn(mockChallengeClient);
-    when(mockPortalGinInjector.getSynapseClientAsync())
-      .thenReturn(mockSynapseClient);
-    when(mockPortalGinInjector.getGlobalApplicationState())
-      .thenReturn(mockGlobalApplicationState);
-    when(mockPortalGinInjector.getEvaluationSubmitter())
-      .thenReturn(mockSubmitter);
-    when(mockSynapseProperties.getPublicPrincipalIds())
-      .thenReturn(mockPublicPrincipalIds);
-    when(mockPortalGinInjector.getSynapseJavascriptClient())
-      .thenReturn(mockSynapseJavascriptClient);
+    when(mockPortalGinInjector.getUploadDialogWidget()).thenReturn(
+      mockUploader
+    );
+    when(mockPortalGinInjector.getWikiMarkdownEditor()).thenReturn(
+      mockMarkdownEditorWidget
+    );
+    when(mockPortalGinInjector.getProvenanceEditorWidget()).thenReturn(
+      mockProvenanceEditorWidget
+    );
+    when(mockPortalGinInjector.getStorageLocationWidget()).thenReturn(
+      mockStorageLocationWidget
+    );
+    when(mockPortalGinInjector.getEvaluationEditorModal()).thenReturn(
+      mockEvalEditor
+    );
+    when(mockPortalGinInjector.getSelectTeamModal()).thenReturn(
+      mockSelectTeamModal
+    );
+    when(mockPortalGinInjector.getApproveUserAccessModal()).thenReturn(
+      mockApproveUserAccessModal
+    );
+    when(mockPortalGinInjector.getChallengeClientAsync()).thenReturn(
+      mockChallengeClient
+    );
+    when(mockPortalGinInjector.getSynapseClientAsync()).thenReturn(
+      mockSynapseClient
+    );
+    when(mockPortalGinInjector.getGlobalApplicationState()).thenReturn(
+      mockGlobalApplicationState
+    );
+    when(mockPortalGinInjector.getEvaluationSubmitter()).thenReturn(
+      mockSubmitter
+    );
+    when(mockSynapseProperties.getPublicPrincipalIds()).thenReturn(
+      mockPublicPrincipalIds
+    );
+    when(mockPortalGinInjector.getSynapseJavascriptClient()).thenReturn(
+      mockSynapseJavascriptClient
+    );
     when(mockPortalGinInjector.getSynapseJSNIUtils()).thenReturn(mockJsniUtils);
-    when(mockPortalGinInjector.getCreateTableViewWizard())
-      .thenReturn(mockCreateTableViewWizard);
-    when(mockPortalGinInjector.getUploadTableModalWidget())
-      .thenReturn(mockUploadTableModalWidget);
-    when(mockPortalGinInjector.getAddExternalRepoModal())
-      .thenReturn(mockAddExternalRepoModal);
-    when(mockPortalGinInjector.getAddFolderDialogWidget())
-      .thenReturn(mockAddFolderDialogWidget);
-    when(mockPortalGinInjector.creatNewAsynchronousProgressWidget())
-      .thenReturn(mockJobTrackingWidget);
-    when(mockPortalGinInjector.getPromptForValuesModalConfigurationBuilder())
-      .thenReturn(mockPromptModalConfigurationBuilder);
-    when(mockPortalGinInjector.getFileDownloadHandlerWidget())
-      .thenReturn(mockFileDownloadHandlerWidget);
-    when(mockPortalGinInjector.getFileClientsHelp())
-      .thenReturn(mockFileClientsHelp);
-    when(mockPortalGinInjector.getContainerClientsHelp())
-      .thenReturn(mockContainerClientsHelp);
-    when(mockIsACTMemberAsyncHandler.isACTActionAvailable())
-      .thenReturn(getDoneFuture(false));
-    when(mockSynapseJavascriptClient.getRestrictionInformation(any(), any()))
-      .thenReturn(getDoneFuture(mockRestrictionInformation));
+    when(mockPortalGinInjector.getCreateTableViewWizard()).thenReturn(
+      mockCreateTableViewWizard
+    );
+    when(mockPortalGinInjector.getUploadTableModalWidget()).thenReturn(
+      mockUploadTableModalWidget
+    );
+    when(mockPortalGinInjector.getAddExternalRepoModal()).thenReturn(
+      mockAddExternalRepoModal
+    );
+    when(mockPortalGinInjector.getAddFolderDialogWidget()).thenReturn(
+      mockAddFolderDialogWidget
+    );
+    when(mockPortalGinInjector.creatNewAsynchronousProgressWidget()).thenReturn(
+      mockJobTrackingWidget
+    );
+    when(
+      mockPortalGinInjector.getPromptForValuesModalConfigurationBuilder()
+    ).thenReturn(mockPromptModalConfigurationBuilder);
+    when(mockPortalGinInjector.getFileDownloadHandlerWidget()).thenReturn(
+      mockFileDownloadHandlerWidget
+    );
+    when(mockPortalGinInjector.getFileClientsHelp()).thenReturn(
+      mockFileClientsHelp
+    );
+    when(mockPortalGinInjector.getContainerClientsHelp()).thenReturn(
+      mockContainerClientsHelp
+    );
+    when(mockIsACTMemberAsyncHandler.isACTActionAvailable()).thenReturn(
+      getDoneFuture(false)
+    );
+    when(
+      mockSynapseJavascriptClient.getRestrictionInformation(any(), any())
+    ).thenReturn(getDoneFuture(mockRestrictionInformation));
+    when(mockQueryClientProvider.getQueryClient()).thenReturn(mockQueryClient);
 
     // The controller under test.
-    controller =
-      new EntityActionControllerImpl(
-        mockView,
-        mockPreflightController,
-        mockPortalGinInjector,
-        mockAuthenticationController,
-        mockCookies,
-        mockIsACTMemberAsyncHandler,
-        mockGWT,
-        mockEventBus,
-        mockPopupUtils
-      );
+    controller = new EntityActionControllerImpl(
+      mockView,
+      mockPreflightController,
+      mockPortalGinInjector,
+      mockAuthenticationController,
+      mockCookies,
+      mockIsACTMemberAsyncHandler,
+      mockGWT,
+      mockEventBus,
+      mockPopupUtils,
+      mockQueryClientProvider,
+      mockKeyFactoryProvider
+    );
 
     parentId = "syn456";
     entityId = "syn123";
@@ -541,40 +598,40 @@ public class EntityActionControllerImplTest {
     mockEntityView.setViewTypeMask(new Long(WebConstants.FILE));
 
     // Setup the mock entity selector to select an entity.
-    Mockito
-      .doAnswer(
-        new Answer<Void>() {
-          @Override
-          public Void answer(InvocationOnMock invocation) throws Throwable {
-            verify(mockEntityFinderBuilder)
-              .setSelectedHandler(entityFinderSelectedHandlerCaptor.capture());
-            EntityFinderWidget.SelectedHandler<Reference> handler =
-              entityFinderSelectedHandlerCaptor.getValue();
-            handler.onSelected(selected, mockEntityFinder);
-            return null;
-          }
+    Mockito.doAnswer(
+      new Answer<Void>() {
+        @Override
+        public Void answer(InvocationOnMock invocation) throws Throwable {
+          verify(mockEntityFinderBuilder).setSelectedHandler(
+            entityFinderSelectedHandlerCaptor.capture()
+          );
+          EntityFinderWidget.SelectedHandler<Reference> handler =
+            entityFinderSelectedHandlerCaptor.getValue();
+          handler.onSelected(selected, mockEntityFinder);
+          return null;
         }
-      )
+      }
+    )
       .when(mockEntityFinder)
       .show();
     currentEntityArea = null;
-    CallbackMockStubber
-      .invokeCallback()
+    CallbackMockStubber.invokeCallback()
       .when(mockGWT)
       .scheduleExecution(any(Callback.class), anyInt());
 
-    when(mockPromptModalConfigurationBuilder.buildConfiguration())
-      .thenReturn(mockPromptModalConfiguration);
-    when(mockSynapseJavascriptClient.getChallengeForProject(anyString()))
-      .thenReturn(getDoneFuture(new Challenge()));
+    when(mockPromptModalConfigurationBuilder.buildConfiguration()).thenReturn(
+      mockPromptModalConfiguration
+    );
+    when(
+      mockSynapseJavascriptClient.getChallengeForProject(anyString())
+    ).thenReturn(getDoneFuture(new Challenge()));
   }
 
   @Test
   public void testConfigureWithTableEntity() {
     when(
       mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
-    )
-      .thenReturn("true");
+    ).thenReturn("true");
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -585,41 +642,56 @@ public class EntityActionControllerImplTest {
     );
     // delete
     verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, true);
-    verify(mockActionMenu)
-      .setActionText(
-        Action.DELETE_ENTITY,
-        DELETE_PREFIX + EntityTypeUtils.getDisplayName(EntityType.table)
-      );
+    verify(mockActionMenu).setActionText(
+      Action.DELETE_ENTITY,
+      DELETE_PREFIX + EntityTypeUtils.getDisplayName(EntityType.table)
+    );
     verify(mockActionMenu).setActionListener(Action.DELETE_ENTITY, controller);
     // share
     verify(mockActionMenu).setActionVisible(Action.VIEW_SHARING_SETTINGS, true);
-    verify(mockActionMenu)
-      .setActionListener(Action.VIEW_SHARING_SETTINGS, controller);
+    verify(mockActionMenu).setActionListener(
+      Action.VIEW_SHARING_SETTINGS,
+      controller
+    );
     // rename
     verify(mockActionMenu).setActionVisible(Action.CHANGE_ENTITY_NAME, true);
-    verify(mockActionMenu)
-      .setActionText(Action.CHANGE_ENTITY_NAME, EDIT_NAME_AND_DESCRIPTION);
-    verify(mockActionMenu)
-      .setActionListener(Action.CHANGE_ENTITY_NAME, controller);
+    verify(mockActionMenu).setActionText(
+      Action.CHANGE_ENTITY_NAME,
+      EDIT_NAME_AND_DESCRIPTION
+    );
+    verify(mockActionMenu).setActionListener(
+      Action.CHANGE_ENTITY_NAME,
+      controller
+    );
     // upload
     verify(mockActionMenu).setActionVisible(Action.UPLOAD_NEW_FILE, false);
     // version history
     verify(mockActionMenu).setActionVisible(Action.SHOW_VERSION_HISTORY, true);
     // create table version (snapshot)
     verify(mockActionMenu).setActionVisible(Action.CREATE_TABLE_VERSION, true);
-    verify(mockActionMenu)
-      .setActionListener(Action.CREATE_TABLE_VERSION, controller);
+    verify(mockActionMenu).setActionListener(
+      Action.CREATE_TABLE_VERSION,
+      controller
+    );
     // full text search
-    verify(mockActionMenu)
-      .setActionVisible(Action.TOGGLE_FULL_TEXT_SEARCH, true);
-    verify(mockActionMenu)
-      .setActionText(Action.TOGGLE_FULL_TEXT_SEARCH, "Enable Full Text Search");
-    verify(mockActionMenu)
-      .setActionListener(Action.TOGGLE_FULL_TEXT_SEARCH, controller);
+    verify(mockActionMenu).setActionVisible(
+      Action.TOGGLE_FULL_TEXT_SEARCH,
+      true
+    );
+    verify(mockActionMenu).setActionText(
+      Action.TOGGLE_FULL_TEXT_SEARCH,
+      "Enable Full Text Search"
+    );
+    verify(mockActionMenu).setActionListener(
+      Action.TOGGLE_FULL_TEXT_SEARCH,
+      controller
+    );
     // Show scope/items should not be visible for a TableEntity
     verify(mockActionMenu).setActionVisible(Action.SHOW_VIEW_SCOPE, false);
-    verify(mockActionMenu)
-      .setActionVisible(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, false);
+    verify(mockActionMenu).setActionVisible(
+      Action.EDIT_ENTITYREF_COLLECTION_ITEMS,
+      false
+    );
     verify(mockActionMenu).setActionVisible(Action.EDIT_DEFINING_SQL, false);
     verify(mockActionMenu).setActionVisible(Action.VIEW_DEFINING_SQL, false);
   }
@@ -637,8 +709,7 @@ public class EntityActionControllerImplTest {
 
     when(
       mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
-    )
-      .thenReturn("true");
+    ).thenReturn("true");
 
     controller.configure(
       mockActionMenu,
@@ -652,12 +723,16 @@ public class EntityActionControllerImplTest {
     verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, false);
     // share
     verify(mockActionMenu).setActionVisible(Action.VIEW_SHARING_SETTINGS, true);
-    verify(mockActionMenu)
-      .setActionListener(Action.VIEW_SHARING_SETTINGS, controller);
+    verify(mockActionMenu).setActionListener(
+      Action.VIEW_SHARING_SETTINGS,
+      controller
+    );
     // rename
     verify(mockActionMenu).setActionVisible(Action.CHANGE_ENTITY_NAME, false);
-    verify(mockActionMenu)
-      .setActionListener(Action.CHANGE_ENTITY_NAME, controller);
+    verify(mockActionMenu).setActionListener(
+      Action.CHANGE_ENTITY_NAME,
+      controller
+    );
     // upload
     verify(mockActionMenu).setActionVisible(Action.UPLOAD_NEW_FILE, false);
     // version history
@@ -665,12 +740,16 @@ public class EntityActionControllerImplTest {
     // create table version (snapshot)
     verify(mockActionMenu).setActionVisible(Action.CREATE_TABLE_VERSION, false);
     // full text search
-    verify(mockActionMenu)
-      .setActionVisible(Action.TOGGLE_FULL_TEXT_SEARCH, false);
+    verify(mockActionMenu).setActionVisible(
+      Action.TOGGLE_FULL_TEXT_SEARCH,
+      false
+    );
     // Show scope/items should not be visible for a TableEntity
     verify(mockActionMenu).setActionVisible(Action.SHOW_VIEW_SCOPE, false);
-    verify(mockActionMenu)
-      .setActionVisible(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, false);
+    verify(mockActionMenu).setActionVisible(
+      Action.EDIT_ENTITYREF_COLLECTION_ITEMS,
+      false
+    );
     verify(mockActionMenu).setActionVisible(Action.EDIT_DEFINING_SQL, false);
     verify(mockActionMenu).setActionVisible(Action.VIEW_DEFINING_SQL, false);
   }
@@ -685,8 +764,7 @@ public class EntityActionControllerImplTest {
 
     when(
       mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
-    )
-      .thenReturn("true");
+    ).thenReturn("true");
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -697,30 +775,37 @@ public class EntityActionControllerImplTest {
     );
     // delete
     verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, true);
-    verify(mockActionMenu)
-      .setActionText(
-        Action.DELETE_ENTITY,
-        DELETE_PREFIX + EntityTypeUtils.getDisplayName(EntityType.dataset)
-      );
+    verify(mockActionMenu).setActionText(
+      Action.DELETE_ENTITY,
+      DELETE_PREFIX + EntityTypeUtils.getDisplayName(EntityType.dataset)
+    );
     verify(mockActionMenu).setActionListener(Action.DELETE_ENTITY, controller);
     // share
     verify(mockActionMenu).setActionVisible(Action.VIEW_SHARING_SETTINGS, true);
-    verify(mockActionMenu)
-      .setActionListener(Action.VIEW_SHARING_SETTINGS, controller);
+    verify(mockActionMenu).setActionListener(
+      Action.VIEW_SHARING_SETTINGS,
+      controller
+    );
     // rename
     verify(mockActionMenu).setActionVisible(Action.CHANGE_ENTITY_NAME, true);
-    verify(mockActionMenu)
-      .setActionText(Action.CHANGE_ENTITY_NAME, EDIT_NAME_AND_DESCRIPTION);
-    verify(mockActionMenu)
-      .setActionListener(Action.CHANGE_ENTITY_NAME, controller);
+    verify(mockActionMenu).setActionText(
+      Action.CHANGE_ENTITY_NAME,
+      EDIT_NAME_AND_DESCRIPTION
+    );
+    verify(mockActionMenu).setActionListener(
+      Action.CHANGE_ENTITY_NAME,
+      controller
+    );
     // upload
     verify(mockActionMenu).setActionVisible(Action.UPLOAD_NEW_FILE, false);
     // version history
     verify(mockActionMenu).setActionVisible(Action.SHOW_VERSION_HISTORY, true);
     // create table version (snapshot)
     verify(mockActionMenu).setActionVisible(Action.CREATE_TABLE_VERSION, true);
-    verify(mockActionMenu)
-      .setActionListener(Action.CREATE_TABLE_VERSION, controller);
+    verify(mockActionMenu).setActionListener(
+      Action.CREATE_TABLE_VERSION,
+      controller
+    );
     // edit actions (should be disabled in the ui, even if user has permission)
     verify(mockActionMenu).setActionVisible(Action.EDIT_TABLE_DATA, false);
     verify(mockActionMenu).setActionVisible(Action.UPLOAD_TABLE_DATA, false);
@@ -729,8 +814,10 @@ public class EntityActionControllerImplTest {
     verify(mockActionMenu).setActionVisible(Action.EDIT_DEFINING_SQL, false);
     verify(mockActionMenu).setActionVisible(Action.VIEW_DEFINING_SQL, false);
     // Edit dataset items should be visible
-    verify(mockActionMenu)
-      .setActionVisible(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, true);
+    verify(mockActionMenu).setActionVisible(
+      Action.EDIT_ENTITYREF_COLLECTION_ITEMS,
+      true
+    );
   }
 
   @Test
@@ -749,8 +836,7 @@ public class EntityActionControllerImplTest {
 
     when(
       mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
-    )
-      .thenReturn("true");
+    ).thenReturn("true");
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -761,30 +847,37 @@ public class EntityActionControllerImplTest {
     );
     // Cannot delete
     verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, false);
-    verify(mockActionMenu)
-      .setActionText(
-        Action.DELETE_ENTITY,
-        DELETE_PREFIX + EntityTypeUtils.getDisplayName(EntityType.dataset)
-      );
+    verify(mockActionMenu).setActionText(
+      Action.DELETE_ENTITY,
+      DELETE_PREFIX + EntityTypeUtils.getDisplayName(EntityType.dataset)
+    );
     verify(mockActionMenu).setActionListener(Action.DELETE_ENTITY, controller);
     // share is always visible
     verify(mockActionMenu).setActionVisible(Action.VIEW_SHARING_SETTINGS, true);
-    verify(mockActionMenu)
-      .setActionListener(Action.VIEW_SHARING_SETTINGS, controller);
+    verify(mockActionMenu).setActionListener(
+      Action.VIEW_SHARING_SETTINGS,
+      controller
+    );
     // Cannot rename
     verify(mockActionMenu).setActionVisible(Action.CHANGE_ENTITY_NAME, false);
-    verify(mockActionMenu)
-      .setActionText(Action.CHANGE_ENTITY_NAME, EDIT_NAME_AND_DESCRIPTION);
-    verify(mockActionMenu)
-      .setActionListener(Action.CHANGE_ENTITY_NAME, controller);
+    verify(mockActionMenu).setActionText(
+      Action.CHANGE_ENTITY_NAME,
+      EDIT_NAME_AND_DESCRIPTION
+    );
+    verify(mockActionMenu).setActionListener(
+      Action.CHANGE_ENTITY_NAME,
+      controller
+    );
     // upload always disabled for datasets
     verify(mockActionMenu).setActionVisible(Action.UPLOAD_NEW_FILE, false);
     // version history
     verify(mockActionMenu).setActionVisible(Action.SHOW_VERSION_HISTORY, true);
     // Cannot create table version (snapshot)
     verify(mockActionMenu).setActionVisible(Action.CREATE_TABLE_VERSION, false);
-    verify(mockActionMenu)
-      .setActionListener(Action.CREATE_TABLE_VERSION, controller);
+    verify(mockActionMenu).setActionListener(
+      Action.CREATE_TABLE_VERSION,
+      controller
+    );
     // edit data actions always disabled for datasets
     verify(mockActionMenu).setActionVisible(Action.EDIT_TABLE_DATA, false);
     verify(mockActionMenu).setActionVisible(Action.UPLOAD_TABLE_DATA, false);
@@ -793,8 +886,10 @@ public class EntityActionControllerImplTest {
     verify(mockActionMenu).setActionVisible(Action.EDIT_DEFINING_SQL, false);
     verify(mockActionMenu).setActionVisible(Action.VIEW_DEFINING_SQL, false);
     // Cannot edit items without permission
-    verify(mockActionMenu)
-      .setActionVisible(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, false);
+    verify(mockActionMenu).setActionVisible(
+      Action.EDIT_ENTITYREF_COLLECTION_ITEMS,
+      false
+    );
   }
 
   @Test
@@ -807,8 +902,7 @@ public class EntityActionControllerImplTest {
 
     when(
       mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
-    )
-      .thenReturn("true");
+    ).thenReturn("true");
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -819,30 +913,37 @@ public class EntityActionControllerImplTest {
     );
     // delete
     verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, true);
-    verify(mockActionMenu)
-      .setActionText(
-        Action.DELETE_ENTITY,
-        DELETE_PREFIX + EntityTypeUtils.getDisplayName(EntityType.dataset)
-      );
+    verify(mockActionMenu).setActionText(
+      Action.DELETE_ENTITY,
+      DELETE_PREFIX + EntityTypeUtils.getDisplayName(EntityType.dataset)
+    );
     verify(mockActionMenu).setActionListener(Action.DELETE_ENTITY, controller);
     // share
     verify(mockActionMenu).setActionVisible(Action.VIEW_SHARING_SETTINGS, true);
-    verify(mockActionMenu)
-      .setActionListener(Action.VIEW_SHARING_SETTINGS, controller);
+    verify(mockActionMenu).setActionListener(
+      Action.VIEW_SHARING_SETTINGS,
+      controller
+    );
     // rename
     verify(mockActionMenu).setActionVisible(Action.CHANGE_ENTITY_NAME, true);
-    verify(mockActionMenu)
-      .setActionText(Action.CHANGE_ENTITY_NAME, EDIT_NAME_AND_DESCRIPTION);
-    verify(mockActionMenu)
-      .setActionListener(Action.CHANGE_ENTITY_NAME, controller);
+    verify(mockActionMenu).setActionText(
+      Action.CHANGE_ENTITY_NAME,
+      EDIT_NAME_AND_DESCRIPTION
+    );
+    verify(mockActionMenu).setActionListener(
+      Action.CHANGE_ENTITY_NAME,
+      controller
+    );
     // upload
     verify(mockActionMenu).setActionVisible(Action.UPLOAD_NEW_FILE, false);
     // version history
     verify(mockActionMenu).setActionVisible(Action.SHOW_VERSION_HISTORY, true);
     // create table version (snapshot)
     verify(mockActionMenu).setActionVisible(Action.CREATE_TABLE_VERSION, true);
-    verify(mockActionMenu)
-      .setActionListener(Action.CREATE_TABLE_VERSION, controller);
+    verify(mockActionMenu).setActionListener(
+      Action.CREATE_TABLE_VERSION,
+      controller
+    );
     // edit actions (should be disabled in the ui, even if user has permission)
     verify(mockActionMenu).setActionVisible(Action.EDIT_TABLE_DATA, false);
     verify(mockActionMenu).setActionVisible(Action.UPLOAD_TABLE_DATA, false);
@@ -851,8 +952,10 @@ public class EntityActionControllerImplTest {
     verify(mockActionMenu).setActionVisible(Action.EDIT_DEFINING_SQL, false);
     verify(mockActionMenu).setActionVisible(Action.VIEW_DEFINING_SQL, false);
     // Edit dataset items should NOT be visible if not the current version
-    verify(mockActionMenu)
-      .setActionVisible(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, false);
+    verify(mockActionMenu).setActionVisible(
+      Action.EDIT_ENTITYREF_COLLECTION_ITEMS,
+      false
+    );
   }
 
   @Test
@@ -865,8 +968,7 @@ public class EntityActionControllerImplTest {
 
     when(
       mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
-    )
-      .thenReturn("true");
+    ).thenReturn("true");
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -877,31 +979,38 @@ public class EntityActionControllerImplTest {
     );
     // delete
     verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, true);
-    verify(mockActionMenu)
-      .setActionText(
-        Action.DELETE_ENTITY,
-        DELETE_PREFIX +
-        EntityTypeUtils.getDisplayName(EntityType.datasetcollection)
-      );
+    verify(mockActionMenu).setActionText(
+      Action.DELETE_ENTITY,
+      DELETE_PREFIX +
+      EntityTypeUtils.getDisplayName(EntityType.datasetcollection)
+    );
     verify(mockActionMenu).setActionListener(Action.DELETE_ENTITY, controller);
     // share
     verify(mockActionMenu).setActionVisible(Action.VIEW_SHARING_SETTINGS, true);
-    verify(mockActionMenu)
-      .setActionListener(Action.VIEW_SHARING_SETTINGS, controller);
+    verify(mockActionMenu).setActionListener(
+      Action.VIEW_SHARING_SETTINGS,
+      controller
+    );
     // rename
     verify(mockActionMenu).setActionVisible(Action.CHANGE_ENTITY_NAME, true);
-    verify(mockActionMenu)
-      .setActionText(Action.CHANGE_ENTITY_NAME, EDIT_NAME_AND_DESCRIPTION);
-    verify(mockActionMenu)
-      .setActionListener(Action.CHANGE_ENTITY_NAME, controller);
+    verify(mockActionMenu).setActionText(
+      Action.CHANGE_ENTITY_NAME,
+      EDIT_NAME_AND_DESCRIPTION
+    );
+    verify(mockActionMenu).setActionListener(
+      Action.CHANGE_ENTITY_NAME,
+      controller
+    );
     // upload
     verify(mockActionMenu).setActionVisible(Action.UPLOAD_NEW_FILE, false);
     // version history
     verify(mockActionMenu).setActionVisible(Action.SHOW_VERSION_HISTORY, true);
     // create table version (snapshot)
     verify(mockActionMenu).setActionVisible(Action.CREATE_TABLE_VERSION, true);
-    verify(mockActionMenu)
-      .setActionListener(Action.CREATE_TABLE_VERSION, controller);
+    verify(mockActionMenu).setActionListener(
+      Action.CREATE_TABLE_VERSION,
+      controller
+    );
     // edit actions (should be disabled in the ui, even if user has permission)
     verify(mockActionMenu).setActionVisible(Action.EDIT_TABLE_DATA, false);
     verify(mockActionMenu).setActionVisible(Action.UPLOAD_TABLE_DATA, false);
@@ -910,8 +1019,10 @@ public class EntityActionControllerImplTest {
     verify(mockActionMenu).setActionVisible(Action.EDIT_DEFINING_SQL, false);
     verify(mockActionMenu).setActionVisible(Action.VIEW_DEFINING_SQL, false);
     // Edit dataset items should be visible
-    verify(mockActionMenu)
-      .setActionVisible(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, true);
+    verify(mockActionMenu).setActionVisible(
+      Action.EDIT_ENTITYREF_COLLECTION_ITEMS,
+      true
+    );
   }
 
   @Test
@@ -930,8 +1041,7 @@ public class EntityActionControllerImplTest {
 
     when(
       mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
-    )
-      .thenReturn("true");
+    ).thenReturn("true");
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -942,31 +1052,38 @@ public class EntityActionControllerImplTest {
     );
     // Cannot delete
     verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, false);
-    verify(mockActionMenu)
-      .setActionText(
-        Action.DELETE_ENTITY,
-        DELETE_PREFIX +
-        EntityTypeUtils.getDisplayName(EntityType.datasetcollection)
-      );
+    verify(mockActionMenu).setActionText(
+      Action.DELETE_ENTITY,
+      DELETE_PREFIX +
+      EntityTypeUtils.getDisplayName(EntityType.datasetcollection)
+    );
     verify(mockActionMenu).setActionListener(Action.DELETE_ENTITY, controller);
     // share is always visible
     verify(mockActionMenu).setActionVisible(Action.VIEW_SHARING_SETTINGS, true);
-    verify(mockActionMenu)
-      .setActionListener(Action.VIEW_SHARING_SETTINGS, controller);
+    verify(mockActionMenu).setActionListener(
+      Action.VIEW_SHARING_SETTINGS,
+      controller
+    );
     // Cannot rename
     verify(mockActionMenu).setActionVisible(Action.CHANGE_ENTITY_NAME, false);
-    verify(mockActionMenu)
-      .setActionText(Action.CHANGE_ENTITY_NAME, EDIT_NAME_AND_DESCRIPTION);
-    verify(mockActionMenu)
-      .setActionListener(Action.CHANGE_ENTITY_NAME, controller);
+    verify(mockActionMenu).setActionText(
+      Action.CHANGE_ENTITY_NAME,
+      EDIT_NAME_AND_DESCRIPTION
+    );
+    verify(mockActionMenu).setActionListener(
+      Action.CHANGE_ENTITY_NAME,
+      controller
+    );
     // upload always disabled for datasets
     verify(mockActionMenu).setActionVisible(Action.UPLOAD_NEW_FILE, false);
     // version history
     verify(mockActionMenu).setActionVisible(Action.SHOW_VERSION_HISTORY, true);
     // Cannot create table version (snapshot)
     verify(mockActionMenu).setActionVisible(Action.CREATE_TABLE_VERSION, false);
-    verify(mockActionMenu)
-      .setActionListener(Action.CREATE_TABLE_VERSION, controller);
+    verify(mockActionMenu).setActionListener(
+      Action.CREATE_TABLE_VERSION,
+      controller
+    );
     // edit data actions always disabled for datasets
     verify(mockActionMenu).setActionVisible(Action.EDIT_TABLE_DATA, false);
     verify(mockActionMenu).setActionVisible(Action.UPLOAD_TABLE_DATA, false);
@@ -975,8 +1092,10 @@ public class EntityActionControllerImplTest {
     verify(mockActionMenu).setActionVisible(Action.EDIT_DEFINING_SQL, false);
     verify(mockActionMenu).setActionVisible(Action.VIEW_DEFINING_SQL, false);
     // Cannot edit items without permission
-    verify(mockActionMenu)
-      .setActionVisible(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, false);
+    verify(mockActionMenu).setActionVisible(
+      Action.EDIT_ENTITYREF_COLLECTION_ITEMS,
+      false
+    );
   }
 
   @Test
@@ -989,8 +1108,7 @@ public class EntityActionControllerImplTest {
 
     when(
       mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
-    )
-      .thenReturn("true");
+    ).thenReturn("true");
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -1001,31 +1119,38 @@ public class EntityActionControllerImplTest {
     );
     // delete
     verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, true);
-    verify(mockActionMenu)
-      .setActionText(
-        Action.DELETE_ENTITY,
-        DELETE_PREFIX +
-        EntityTypeUtils.getDisplayName(EntityType.datasetcollection)
-      );
+    verify(mockActionMenu).setActionText(
+      Action.DELETE_ENTITY,
+      DELETE_PREFIX +
+      EntityTypeUtils.getDisplayName(EntityType.datasetcollection)
+    );
     verify(mockActionMenu).setActionListener(Action.DELETE_ENTITY, controller);
     // share
     verify(mockActionMenu).setActionVisible(Action.VIEW_SHARING_SETTINGS, true);
-    verify(mockActionMenu)
-      .setActionListener(Action.VIEW_SHARING_SETTINGS, controller);
+    verify(mockActionMenu).setActionListener(
+      Action.VIEW_SHARING_SETTINGS,
+      controller
+    );
     // rename
     verify(mockActionMenu).setActionVisible(Action.CHANGE_ENTITY_NAME, true);
-    verify(mockActionMenu)
-      .setActionText(Action.CHANGE_ENTITY_NAME, EDIT_NAME_AND_DESCRIPTION);
-    verify(mockActionMenu)
-      .setActionListener(Action.CHANGE_ENTITY_NAME, controller);
+    verify(mockActionMenu).setActionText(
+      Action.CHANGE_ENTITY_NAME,
+      EDIT_NAME_AND_DESCRIPTION
+    );
+    verify(mockActionMenu).setActionListener(
+      Action.CHANGE_ENTITY_NAME,
+      controller
+    );
     // upload
     verify(mockActionMenu).setActionVisible(Action.UPLOAD_NEW_FILE, false);
     // version history
     verify(mockActionMenu).setActionVisible(Action.SHOW_VERSION_HISTORY, true);
     // create table version (snapshot)
     verify(mockActionMenu).setActionVisible(Action.CREATE_TABLE_VERSION, true);
-    verify(mockActionMenu)
-      .setActionListener(Action.CREATE_TABLE_VERSION, controller);
+    verify(mockActionMenu).setActionListener(
+      Action.CREATE_TABLE_VERSION,
+      controller
+    );
     // edit actions (should be disabled in the ui, even if user has permission)
     verify(mockActionMenu).setActionVisible(Action.EDIT_TABLE_DATA, false);
     verify(mockActionMenu).setActionVisible(Action.UPLOAD_TABLE_DATA, false);
@@ -1034,8 +1159,10 @@ public class EntityActionControllerImplTest {
     verify(mockActionMenu).setActionVisible(Action.EDIT_DEFINING_SQL, false);
     verify(mockActionMenu).setActionVisible(Action.VIEW_DEFINING_SQL, false);
     // Edit dataset items should NOT be visible if not the current version
-    verify(mockActionMenu)
-      .setActionVisible(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, false);
+    verify(mockActionMenu).setActionVisible(
+      Action.EDIT_ENTITYREF_COLLECTION_ITEMS,
+      false
+    );
   }
 
   @Test
@@ -1046,8 +1173,7 @@ public class EntityActionControllerImplTest {
 
     when(
       mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
-    )
-      .thenReturn("true");
+    ).thenReturn("true");
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -1058,27 +1184,37 @@ public class EntityActionControllerImplTest {
     );
     // delete
     verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, true);
-    verify(mockActionMenu)
-      .setActionText(Action.DELETE_ENTITY, DELETE_PREFIX + FILE_VIEW);
+    verify(mockActionMenu).setActionText(
+      Action.DELETE_ENTITY,
+      DELETE_PREFIX + FILE_VIEW
+    );
     verify(mockActionMenu).setActionListener(Action.DELETE_ENTITY, controller);
     // share
     verify(mockActionMenu).setActionVisible(Action.VIEW_SHARING_SETTINGS, true);
-    verify(mockActionMenu)
-      .setActionListener(Action.VIEW_SHARING_SETTINGS, controller);
+    verify(mockActionMenu).setActionListener(
+      Action.VIEW_SHARING_SETTINGS,
+      controller
+    );
     // rename
     verify(mockActionMenu).setActionVisible(Action.CHANGE_ENTITY_NAME, true);
-    verify(mockActionMenu)
-      .setActionText(Action.CHANGE_ENTITY_NAME, EDIT_NAME_AND_DESCRIPTION);
-    verify(mockActionMenu)
-      .setActionListener(Action.CHANGE_ENTITY_NAME, controller);
+    verify(mockActionMenu).setActionText(
+      Action.CHANGE_ENTITY_NAME,
+      EDIT_NAME_AND_DESCRIPTION
+    );
+    verify(mockActionMenu).setActionListener(
+      Action.CHANGE_ENTITY_NAME,
+      controller
+    );
     // upload
     verify(mockActionMenu).setActionVisible(Action.UPLOAD_NEW_FILE, false);
     // version history
     verify(mockActionMenu).setActionVisible(Action.SHOW_VERSION_HISTORY, true);
     // create table version (snapshot)
     verify(mockActionMenu).setActionVisible(Action.CREATE_TABLE_VERSION, true);
-    verify(mockActionMenu)
-      .setActionListener(Action.CREATE_TABLE_VERSION, controller);
+    verify(mockActionMenu).setActionListener(
+      Action.CREATE_TABLE_VERSION,
+      controller
+    );
     // edit actions
     verify(mockActionMenu).setActionVisible(Action.EDIT_TABLE_DATA, true);
     verify(mockActionMenu).setActionVisible(Action.UPLOAD_TABLE_DATA, true);
@@ -1088,8 +1224,10 @@ public class EntityActionControllerImplTest {
     verify(mockActionMenu).setActionVisible(Action.VIEW_DEFINING_SQL, false);
     // Edit dataset items should not be visible
 
-    verify(mockActionMenu)
-      .setActionVisible(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, false);
+    verify(mockActionMenu).setActionVisible(
+      Action.EDIT_ENTITYREF_COLLECTION_ITEMS,
+      false
+    );
   }
 
   @Test
@@ -1100,8 +1238,7 @@ public class EntityActionControllerImplTest {
 
     when(
       mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
-    )
-      .thenReturn("true");
+    ).thenReturn("true");
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -1112,19 +1249,27 @@ public class EntityActionControllerImplTest {
     );
     // delete
     verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, true);
-    verify(mockActionMenu)
-      .setActionText(Action.DELETE_ENTITY, DELETE_PREFIX + SUBMISSION_VIEW);
+    verify(mockActionMenu).setActionText(
+      Action.DELETE_ENTITY,
+      DELETE_PREFIX + SUBMISSION_VIEW
+    );
     verify(mockActionMenu).setActionListener(Action.DELETE_ENTITY, controller);
     // share
     verify(mockActionMenu).setActionVisible(Action.VIEW_SHARING_SETTINGS, true);
-    verify(mockActionMenu)
-      .setActionListener(Action.VIEW_SHARING_SETTINGS, controller);
+    verify(mockActionMenu).setActionListener(
+      Action.VIEW_SHARING_SETTINGS,
+      controller
+    );
     // rename
     verify(mockActionMenu).setActionVisible(Action.CHANGE_ENTITY_NAME, true);
-    verify(mockActionMenu)
-      .setActionText(Action.CHANGE_ENTITY_NAME, EDIT_NAME_AND_DESCRIPTION);
-    verify(mockActionMenu)
-      .setActionListener(Action.CHANGE_ENTITY_NAME, controller);
+    verify(mockActionMenu).setActionText(
+      Action.CHANGE_ENTITY_NAME,
+      EDIT_NAME_AND_DESCRIPTION
+    );
+    verify(mockActionMenu).setActionListener(
+      Action.CHANGE_ENTITY_NAME,
+      controller
+    );
     // upload
     verify(mockActionMenu).setActionVisible(Action.UPLOAD_NEW_FILE, false);
     // Submission views are not versionable/snapshottable
@@ -1139,8 +1284,10 @@ public class EntityActionControllerImplTest {
     verify(mockActionMenu).setActionVisible(Action.EDIT_DEFINING_SQL, false);
     verify(mockActionMenu).setActionVisible(Action.VIEW_DEFINING_SQL, false);
     // Edit dataset items should not be visible
-    verify(mockActionMenu)
-      .setActionVisible(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, false);
+    verify(mockActionMenu).setActionVisible(
+      Action.EDIT_ENTITYREF_COLLECTION_ITEMS,
+      false
+    );
   }
 
   @Test
@@ -1150,8 +1297,7 @@ public class EntityActionControllerImplTest {
     permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
     when(
       mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
-    )
-      .thenReturn("true");
+    ).thenReturn("true");
 
     controller.configure(
       mockActionMenu,
@@ -1163,19 +1309,27 @@ public class EntityActionControllerImplTest {
     );
     // delete
     verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, true);
-    verify(mockActionMenu)
-      .setActionText(Action.DELETE_ENTITY, DELETE_PREFIX + MATERIALIZED_VIEW);
+    verify(mockActionMenu).setActionText(
+      Action.DELETE_ENTITY,
+      DELETE_PREFIX + MATERIALIZED_VIEW
+    );
     verify(mockActionMenu).setActionListener(Action.DELETE_ENTITY, controller);
     // share
     verify(mockActionMenu).setActionVisible(Action.VIEW_SHARING_SETTINGS, true);
-    verify(mockActionMenu)
-      .setActionListener(Action.VIEW_SHARING_SETTINGS, controller);
+    verify(mockActionMenu).setActionListener(
+      Action.VIEW_SHARING_SETTINGS,
+      controller
+    );
     // rename
     verify(mockActionMenu).setActionVisible(Action.CHANGE_ENTITY_NAME, true);
-    verify(mockActionMenu)
-      .setActionText(Action.CHANGE_ENTITY_NAME, EDIT_NAME_AND_DESCRIPTION);
-    verify(mockActionMenu)
-      .setActionListener(Action.CHANGE_ENTITY_NAME, controller);
+    verify(mockActionMenu).setActionText(
+      Action.CHANGE_ENTITY_NAME,
+      EDIT_NAME_AND_DESCRIPTION
+    );
+    verify(mockActionMenu).setActionListener(
+      Action.CHANGE_ENTITY_NAME,
+      controller
+    );
     // upload
     verify(mockActionMenu).setActionVisible(Action.UPLOAD_NEW_FILE, false);
     // versions not currently supported for Materialized Views
@@ -1192,8 +1346,10 @@ public class EntityActionControllerImplTest {
     verify(mockActionMenu).setActionVisible(Action.EDIT_DEFINING_SQL, true);
     verify(mockActionMenu).setActionVisible(Action.VIEW_DEFINING_SQL, false);
     // Edit dataset items should not be visible
-    verify(mockActionMenu)
-      .setActionVisible(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, false);
+    verify(mockActionMenu).setActionVisible(
+      Action.EDIT_ENTITYREF_COLLECTION_ITEMS,
+      false
+    );
   }
 
   @Test
@@ -1210,8 +1366,7 @@ public class EntityActionControllerImplTest {
 
     when(
       mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
-    )
-      .thenReturn("true");
+    ).thenReturn("true");
 
     controller.configure(
       mockActionMenu,
@@ -1223,19 +1378,27 @@ public class EntityActionControllerImplTest {
     );
     // Cannot delete without permission
     verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, false);
-    verify(mockActionMenu)
-      .setActionText(Action.DELETE_ENTITY, DELETE_PREFIX + MATERIALIZED_VIEW);
+    verify(mockActionMenu).setActionText(
+      Action.DELETE_ENTITY,
+      DELETE_PREFIX + MATERIALIZED_VIEW
+    );
     verify(mockActionMenu).setActionListener(Action.DELETE_ENTITY, controller);
     // share is always visible
     verify(mockActionMenu).setActionVisible(Action.VIEW_SHARING_SETTINGS, true);
-    verify(mockActionMenu)
-      .setActionListener(Action.VIEW_SHARING_SETTINGS, controller);
+    verify(mockActionMenu).setActionListener(
+      Action.VIEW_SHARING_SETTINGS,
+      controller
+    );
     // Cannot rename
     verify(mockActionMenu).setActionVisible(Action.CHANGE_ENTITY_NAME, false);
-    verify(mockActionMenu)
-      .setActionText(Action.CHANGE_ENTITY_NAME, EDIT_NAME_AND_DESCRIPTION);
-    verify(mockActionMenu)
-      .setActionListener(Action.CHANGE_ENTITY_NAME, controller);
+    verify(mockActionMenu).setActionText(
+      Action.CHANGE_ENTITY_NAME,
+      EDIT_NAME_AND_DESCRIPTION
+    );
+    verify(mockActionMenu).setActionListener(
+      Action.CHANGE_ENTITY_NAME,
+      controller
+    );
     // Upload is never visible on MaterializedView
     verify(mockActionMenu).setActionVisible(Action.UPLOAD_NEW_FILE, false);
     // versions not currently supported for Materialized Views
@@ -1252,8 +1415,10 @@ public class EntityActionControllerImplTest {
     verify(mockActionMenu).setActionVisible(Action.EDIT_DEFINING_SQL, false);
     verify(mockActionMenu).setActionVisible(Action.VIEW_DEFINING_SQL, true);
     // Edit dataset items should never be visible for a materialized view
-    verify(mockActionMenu)
-      .setActionVisible(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, false);
+    verify(mockActionMenu).setActionVisible(
+      Action.EDIT_ENTITYREF_COLLECTION_ITEMS,
+      false
+    );
   }
 
   @Test
@@ -1263,8 +1428,7 @@ public class EntityActionControllerImplTest {
     permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
     when(
       mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
-    )
-      .thenReturn("true");
+    ).thenReturn("true");
 
     controller.configure(
       mockActionMenu,
@@ -1276,19 +1440,27 @@ public class EntityActionControllerImplTest {
     );
     // delete
     verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, true);
-    verify(mockActionMenu)
-      .setActionText(Action.DELETE_ENTITY, DELETE_PREFIX + VIRTUAL_TABLE);
+    verify(mockActionMenu).setActionText(
+      Action.DELETE_ENTITY,
+      DELETE_PREFIX + VIRTUAL_TABLE
+    );
     verify(mockActionMenu).setActionListener(Action.DELETE_ENTITY, controller);
     // share
     verify(mockActionMenu).setActionVisible(Action.VIEW_SHARING_SETTINGS, true);
-    verify(mockActionMenu)
-      .setActionListener(Action.VIEW_SHARING_SETTINGS, controller);
+    verify(mockActionMenu).setActionListener(
+      Action.VIEW_SHARING_SETTINGS,
+      controller
+    );
     // rename
     verify(mockActionMenu).setActionVisible(Action.CHANGE_ENTITY_NAME, true);
-    verify(mockActionMenu)
-      .setActionText(Action.CHANGE_ENTITY_NAME, EDIT_NAME_AND_DESCRIPTION);
-    verify(mockActionMenu)
-      .setActionListener(Action.CHANGE_ENTITY_NAME, controller);
+    verify(mockActionMenu).setActionText(
+      Action.CHANGE_ENTITY_NAME,
+      EDIT_NAME_AND_DESCRIPTION
+    );
+    verify(mockActionMenu).setActionListener(
+      Action.CHANGE_ENTITY_NAME,
+      controller
+    );
     // upload
     verify(mockActionMenu).setActionVisible(Action.UPLOAD_NEW_FILE, false);
     // versions not currently supported for virtual tables
@@ -1305,8 +1477,10 @@ public class EntityActionControllerImplTest {
     verify(mockActionMenu).setActionVisible(Action.EDIT_DEFINING_SQL, true);
     verify(mockActionMenu).setActionVisible(Action.VIEW_DEFINING_SQL, false);
     // Edit dataset items should not be visible
-    verify(mockActionMenu)
-      .setActionVisible(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, false);
+    verify(mockActionMenu).setActionVisible(
+      Action.EDIT_ENTITYREF_COLLECTION_ITEMS,
+      false
+    );
   }
 
   @Test
@@ -1323,8 +1497,7 @@ public class EntityActionControllerImplTest {
 
     when(
       mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
-    )
-      .thenReturn("true");
+    ).thenReturn("true");
 
     controller.configure(
       mockActionMenu,
@@ -1336,19 +1509,27 @@ public class EntityActionControllerImplTest {
     );
     // Cannot delete without permission
     verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, false);
-    verify(mockActionMenu)
-      .setActionText(Action.DELETE_ENTITY, DELETE_PREFIX + VIRTUAL_TABLE);
+    verify(mockActionMenu).setActionText(
+      Action.DELETE_ENTITY,
+      DELETE_PREFIX + VIRTUAL_TABLE
+    );
     verify(mockActionMenu).setActionListener(Action.DELETE_ENTITY, controller);
     // share is always visible
     verify(mockActionMenu).setActionVisible(Action.VIEW_SHARING_SETTINGS, true);
-    verify(mockActionMenu)
-      .setActionListener(Action.VIEW_SHARING_SETTINGS, controller);
+    verify(mockActionMenu).setActionListener(
+      Action.VIEW_SHARING_SETTINGS,
+      controller
+    );
     // Cannot rename
     verify(mockActionMenu).setActionVisible(Action.CHANGE_ENTITY_NAME, false);
-    verify(mockActionMenu)
-      .setActionText(Action.CHANGE_ENTITY_NAME, EDIT_NAME_AND_DESCRIPTION);
-    verify(mockActionMenu)
-      .setActionListener(Action.CHANGE_ENTITY_NAME, controller);
+    verify(mockActionMenu).setActionText(
+      Action.CHANGE_ENTITY_NAME,
+      EDIT_NAME_AND_DESCRIPTION
+    );
+    verify(mockActionMenu).setActionListener(
+      Action.CHANGE_ENTITY_NAME,
+      controller
+    );
     // Upload is never visible on VirtualTable
     verify(mockActionMenu).setActionVisible(Action.UPLOAD_NEW_FILE, false);
     // versions not currently supported for Virtual Tables
@@ -1365,16 +1546,17 @@ public class EntityActionControllerImplTest {
     verify(mockActionMenu).setActionVisible(Action.EDIT_DEFINING_SQL, false);
     verify(mockActionMenu).setActionVisible(Action.VIEW_DEFINING_SQL, true);
     // Edit dataset items should never be visible for a Virtual Table
-    verify(mockActionMenu)
-      .setActionVisible(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, false);
+    verify(mockActionMenu).setActionVisible(
+      Action.EDIT_ENTITYREF_COLLECTION_ITEMS,
+      false
+    );
   }
 
   @Test
   public void testDisableFullTextSearch() {
     when(
       mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
-    )
-      .thenReturn("true");
+    ).thenReturn("true");
     ((TableEntity) entityBundle.getEntity()).setIsSearchEnabled(true);
     controller.configure(
       mockActionMenu,
@@ -1385,15 +1567,18 @@ public class EntityActionControllerImplTest {
       mockAddToDownloadListWidget
     );
 
-    verify(mockActionMenu)
-      .setActionVisible(Action.TOGGLE_FULL_TEXT_SEARCH, true);
-    verify(mockActionMenu)
-      .setActionText(
-        Action.TOGGLE_FULL_TEXT_SEARCH,
-        "Disable Full Text Search"
-      );
-    verify(mockActionMenu)
-      .setActionListener(Action.TOGGLE_FULL_TEXT_SEARCH, controller);
+    verify(mockActionMenu).setActionVisible(
+      Action.TOGGLE_FULL_TEXT_SEARCH,
+      true
+    );
+    verify(mockActionMenu).setActionText(
+      Action.TOGGLE_FULL_TEXT_SEARCH,
+      "Disable Full Text Search"
+    );
+    verify(mockActionMenu).setActionListener(
+      Action.TOGGLE_FULL_TEXT_SEARCH,
+      controller
+    );
   }
 
   @Test
@@ -1410,8 +1595,10 @@ public class EntityActionControllerImplTest {
     );
     verify(mockActionMenu).setActionVisible(Action.CHANGE_ENTITY_NAME, false);
     verify(mockActionMenu).setActionVisible(Action.MOVE_ENTITY, false);
-    verify(mockActionMenu)
-      .setActionVisible(Action.TOGGLE_FULL_TEXT_SEARCH, false);
+    verify(mockActionMenu).setActionVisible(
+      Action.TOGGLE_FULL_TEXT_SEARCH,
+      false
+    );
   }
 
   private void setPublicCanRead() {
@@ -1425,8 +1612,7 @@ public class EntityActionControllerImplTest {
   public void testConfigureProjectLevelTableCommandsCanEdit() {
     when(
       mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
-    )
-      .thenReturn("true");
+    ).thenReturn("true");
     entityBundle.setEntity(new Project());
     currentEntityArea = EntityArea.TABLES;
     boolean canCertifiedUserEdit = true;
@@ -1440,11 +1626,15 @@ public class EntityActionControllerImplTest {
       mockAddToDownloadListWidget
     );
 
-    verify(mockActionMenu)
-      .setActionVisible(Action.UPLOAD_TABLE, canCertifiedUserEdit);
+    verify(mockActionMenu).setActionVisible(
+      Action.UPLOAD_TABLE,
+      canCertifiedUserEdit
+    );
     verify(mockActionMenu).setActionListener(Action.UPLOAD_TABLE, controller);
-    verify(mockActionMenu)
-      .setActionVisible(Action.ADD_TABLE, canCertifiedUserEdit);
+    verify(mockActionMenu).setActionVisible(
+      Action.ADD_TABLE,
+      canCertifiedUserEdit
+    );
     verify(mockActionMenu).setActionListener(Action.ADD_TABLE, controller);
   }
 
@@ -1463,10 +1653,14 @@ public class EntityActionControllerImplTest {
       mockAddToDownloadListWidget
     );
 
-    verify(mockActionMenu)
-      .setActionVisible(Action.UPLOAD_TABLE, canCertifiedUserEdit);
-    verify(mockActionMenu)
-      .setActionVisible(Action.ADD_TABLE, canCertifiedUserEdit);
+    verify(mockActionMenu).setActionVisible(
+      Action.UPLOAD_TABLE,
+      canCertifiedUserEdit
+    );
+    verify(mockActionMenu).setActionVisible(
+      Action.ADD_TABLE,
+      canCertifiedUserEdit
+    );
   }
 
   @Test
@@ -1492,8 +1686,7 @@ public class EntityActionControllerImplTest {
   public void testConfigureProjectLevelDatasetCommandsCanEdit() {
     when(
       mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
-    )
-      .thenReturn("true");
+    ).thenReturn("true");
     entityBundle.setEntity(new Project());
     currentEntityArea = EntityArea.DATASETS;
     boolean canCertifiedUserEdit = true;
@@ -1507,13 +1700,19 @@ public class EntityActionControllerImplTest {
       mockAddToDownloadListWidget
     );
 
-    verify(mockActionMenu)
-      .setActionVisible(Action.ADD_DATASET, canCertifiedUserEdit);
+    verify(mockActionMenu).setActionVisible(
+      Action.ADD_DATASET,
+      canCertifiedUserEdit
+    );
     verify(mockActionMenu).setActionListener(Action.ADD_DATASET, controller);
-    verify(mockActionMenu)
-      .setActionVisible(Action.ADD_DATASET_COLLECTION, canCertifiedUserEdit);
-    verify(mockActionMenu)
-      .setActionListener(Action.ADD_DATASET_COLLECTION, controller);
+    verify(mockActionMenu).setActionVisible(
+      Action.ADD_DATASET_COLLECTION,
+      canCertifiedUserEdit
+    );
+    verify(mockActionMenu).setActionListener(
+      Action.ADD_DATASET_COLLECTION,
+      controller
+    );
   }
 
   @Test
@@ -1531,13 +1730,19 @@ public class EntityActionControllerImplTest {
       mockAddToDownloadListWidget
     );
 
-    verify(mockActionMenu)
-      .setActionVisible(Action.ADD_DATASET, canCertifiedUserEdit);
+    verify(mockActionMenu).setActionVisible(
+      Action.ADD_DATASET,
+      canCertifiedUserEdit
+    );
     verify(mockActionMenu).setActionListener(Action.ADD_DATASET, controller);
-    verify(mockActionMenu)
-      .setActionVisible(Action.ADD_DATASET_COLLECTION, canCertifiedUserEdit);
-    verify(mockActionMenu)
-      .setActionListener(Action.ADD_DATASET_COLLECTION, controller);
+    verify(mockActionMenu).setActionVisible(
+      Action.ADD_DATASET_COLLECTION,
+      canCertifiedUserEdit
+    );
+    verify(mockActionMenu).setActionListener(
+      Action.ADD_DATASET_COLLECTION,
+      controller
+    );
   }
 
   @Test
@@ -1556,8 +1761,10 @@ public class EntityActionControllerImplTest {
     );
 
     verify(mockActionMenu).setActionVisible(Action.ADD_DATASET, false);
-    verify(mockActionMenu)
-      .setActionVisible(Action.ADD_DATASET_COLLECTION, false);
+    verify(mockActionMenu).setActionVisible(
+      Action.ADD_DATASET_COLLECTION,
+      false
+    );
   }
 
   @Test
@@ -1572,8 +1779,7 @@ public class EntityActionControllerImplTest {
     page.setParentId("rootid");
     headers.add(page);
 
-    AsyncMockStubber
-      .callSuccessWith(headers)
+    AsyncMockStubber.callSuccessWith(headers)
       .when(mockSynapseJavascriptClient)
       .getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
     entityBundle.setEntity(new Project());
@@ -1593,8 +1799,7 @@ public class EntityActionControllerImplTest {
 
   @Test
   public void testConfigureReorderWikiSubpagesNoTree() {
-    AsyncMockStubber
-      .callSuccessWith(new ArrayList<V2WikiHeader>())
+    AsyncMockStubber.callSuccessWith(new ArrayList<V2WikiHeader>())
       .when(mockSynapseJavascriptClient)
       .getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
     entityBundle.setEntity(new Project());
@@ -1609,8 +1814,10 @@ public class EntityActionControllerImplTest {
       currentEntityArea,
       mockAddToDownloadListWidget
     );
-    verify(mockActionMenu)
-      .setActionVisible(Action.REORDER_WIKI_SUBPAGES, false);
+    verify(mockActionMenu).setActionVisible(
+      Action.REORDER_WIKI_SUBPAGES,
+      false
+    );
   }
 
   @Test
@@ -1627,8 +1834,10 @@ public class EntityActionControllerImplTest {
       currentEntityArea,
       mockAddToDownloadListWidget
     );
-    verify(mockActionMenu)
-      .setActionVisible(Action.REORDER_WIKI_SUBPAGES, false);
+    verify(mockActionMenu).setActionVisible(
+      Action.REORDER_WIKI_SUBPAGES,
+      false
+    );
   }
 
   @Test
@@ -1645,8 +1854,10 @@ public class EntityActionControllerImplTest {
       currentEntityArea,
       mockAddToDownloadListWidget
     );
-    verify(mockActionMenu)
-      .setActionVisible(Action.REORDER_WIKI_SUBPAGES, false);
+    verify(mockActionMenu).setActionVisible(
+      Action.REORDER_WIKI_SUBPAGES,
+      false
+    );
   }
 
   @Test
@@ -1764,13 +1975,12 @@ public class EntityActionControllerImplTest {
     );
     verify(mockActionMenu).setActionVisible(Action.EDIT_WIKI_PAGE, true);
     verify(mockActionMenu).setActionListener(Action.EDIT_WIKI_PAGE, controller);
-    verify(mockActionMenu)
-      .setActionText(
-        Action.EDIT_WIKI_PAGE,
-        EDIT_WIKI_PREFIX +
-        EntityTypeUtils.getDisplayName(EntityType.project) +
-        WIKI
-      );
+    verify(mockActionMenu).setActionText(
+      Action.EDIT_WIKI_PAGE,
+      EDIT_WIKI_PREFIX +
+      EntityTypeUtils.getDisplayName(EntityType.project) +
+      WIKI
+    );
   }
 
   @Test
@@ -1787,13 +1997,12 @@ public class EntityActionControllerImplTest {
     );
     verify(mockActionMenu).setActionVisible(Action.EDIT_WIKI_PAGE, true);
     verify(mockActionMenu).setActionListener(Action.EDIT_WIKI_PAGE, controller);
-    verify(mockActionMenu)
-      .setActionText(
-        Action.EDIT_WIKI_PAGE,
-        EDIT_WIKI_PREFIX +
-        EntityTypeUtils.getDisplayName(EntityType.folder) +
-        WIKI
-      );
+    verify(mockActionMenu).setActionText(
+      Action.EDIT_WIKI_PAGE,
+      EDIT_WIKI_PREFIX +
+      EntityTypeUtils.getDisplayName(EntityType.folder) +
+      WIKI
+    );
   }
 
   @Test
@@ -1832,8 +2041,10 @@ public class EntityActionControllerImplTest {
     verify(mockActionMenu).setActionVisible(Action.EDIT_WIKI_PAGE, true);
 
     controller.onAction(Action.EDIT_WIKI_PAGE, null);
-    verify(mockPreflightController)
-      .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+    verify(mockPreflightController).checkUpdateEntity(
+      any(EntityBundle.class),
+      any(Callback.class)
+    );
   }
 
   @Test
@@ -1850,8 +2061,10 @@ public class EntityActionControllerImplTest {
       mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.DELETE_WIKI_PAGE, true);
-    verify(mockActionMenu)
-      .setActionListener(Action.DELETE_WIKI_PAGE, controller);
+    verify(mockActionMenu).setActionListener(
+      Action.DELETE_WIKI_PAGE,
+      controller
+    );
   }
 
   @Test
@@ -1869,8 +2082,10 @@ public class EntityActionControllerImplTest {
       mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.DELETE_WIKI_PAGE, false);
-    verify(mockActionMenu)
-      .setActionListener(Action.DELETE_WIKI_PAGE, controller);
+    verify(mockActionMenu).setActionListener(
+      Action.DELETE_WIKI_PAGE,
+      controller
+    );
   }
 
   @Test
@@ -1946,8 +2161,10 @@ public class EntityActionControllerImplTest {
       mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.VIEW_WIKI_SOURCE, true);
-    verify(mockActionMenu)
-      .setActionListener(Action.VIEW_WIKI_SOURCE, controller);
+    verify(mockActionMenu).setActionListener(
+      Action.VIEW_WIKI_SOURCE,
+      controller
+    );
     verify(mockActionMenu).setActionEnabled(Action.VIEW_WIKI_SOURCE, true);
   }
 
@@ -1964,8 +2181,10 @@ public class EntityActionControllerImplTest {
       mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.VIEW_WIKI_SOURCE, true);
-    verify(mockActionMenu)
-      .setActionListener(Action.VIEW_WIKI_SOURCE, controller);
+    verify(mockActionMenu).setActionListener(
+      Action.VIEW_WIKI_SOURCE,
+      controller
+    );
     verify(mockActionMenu).setActionEnabled(Action.VIEW_WIKI_SOURCE, false);
   }
 
@@ -1983,8 +2202,10 @@ public class EntityActionControllerImplTest {
       mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.VIEW_WIKI_SOURCE, true);
-    verify(mockActionMenu)
-      .setActionListener(Action.VIEW_WIKI_SOURCE, controller);
+    verify(mockActionMenu).setActionListener(
+      Action.VIEW_WIKI_SOURCE,
+      controller
+    );
     verify(mockActionMenu).setActionEnabled(Action.VIEW_WIKI_SOURCE, true);
   }
 
@@ -2075,11 +2296,10 @@ public class EntityActionControllerImplTest {
       mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.MOVE_ENTITY, true);
-    verify(mockActionMenu)
-      .setActionText(
-        Action.MOVE_ENTITY,
-        MOVE_PREFIX + EntityTypeUtils.getDisplayName(EntityType.folder)
-      );
+    verify(mockActionMenu).setActionText(
+      Action.MOVE_ENTITY,
+      MOVE_PREFIX + EntityTypeUtils.getDisplayName(EntityType.folder)
+    );
     verify(mockActionMenu).setActionListener(Action.MOVE_ENTITY, controller);
   }
 
@@ -2110,8 +2330,10 @@ public class EntityActionControllerImplTest {
       mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.UPLOAD_NEW_FILE, true);
-    verify(mockActionMenu)
-      .setActionListener(Action.UPLOAD_NEW_FILE, controller);
+    verify(mockActionMenu).setActionListener(
+      Action.UPLOAD_NEW_FILE,
+      controller
+    );
   }
 
   @Test
@@ -2127,8 +2349,10 @@ public class EntityActionControllerImplTest {
       mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.UPLOAD_NEW_FILE, false);
-    verify(mockActionMenu)
-      .setActionListener(Action.UPLOAD_NEW_FILE, controller);
+    verify(mockActionMenu).setActionListener(
+      Action.UPLOAD_NEW_FILE,
+      controller
+    );
   }
 
   @Test
@@ -2145,8 +2369,10 @@ public class EntityActionControllerImplTest {
       mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.EDIT_PROVENANCE, canEdit);
-    verify(mockActionMenu)
-      .setActionListener(Action.EDIT_PROVENANCE, controller);
+    verify(mockActionMenu).setActionListener(
+      Action.EDIT_PROVENANCE,
+      controller
+    );
   }
 
   @Test
@@ -2164,8 +2390,10 @@ public class EntityActionControllerImplTest {
       mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.EDIT_PROVENANCE, canEdit);
-    verify(mockActionMenu)
-      .setActionListener(Action.EDIT_PROVENANCE, controller);
+    verify(mockActionMenu).setActionListener(
+      Action.EDIT_PROVENANCE,
+      controller
+    );
   }
 
   @Test
@@ -2185,8 +2413,10 @@ public class EntityActionControllerImplTest {
     verify(mockActionMenu).setActionVisible(Action.EDIT_PROVENANCE, true);
 
     controller.onAction(Action.EDIT_PROVENANCE, null);
-    verify(mockPreflightController)
-      .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+    verify(mockPreflightController).checkUpdateEntity(
+      any(EntityBundle.class),
+      any(Callback.class)
+    );
   }
 
   @Test
@@ -2204,8 +2434,10 @@ public class EntityActionControllerImplTest {
       mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.EDIT_PROVENANCE, canEdit);
-    verify(mockActionMenu)
-      .setActionListener(Action.EDIT_PROVENANCE, controller);
+    verify(mockActionMenu).setActionListener(
+      Action.EDIT_PROVENANCE,
+      controller
+    );
   }
 
   @Test
@@ -2223,8 +2455,10 @@ public class EntityActionControllerImplTest {
       mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.EDIT_PROVENANCE, canEdit);
-    verify(mockActionMenu)
-      .setActionListener(Action.EDIT_PROVENANCE, controller);
+    verify(mockActionMenu).setActionListener(
+      Action.EDIT_PROVENANCE,
+      controller
+    );
   }
 
   @Test
@@ -2243,8 +2477,10 @@ public class EntityActionControllerImplTest {
     verify(mockActionMenu).setActionVisible(Action.EDIT_PROVENANCE, true);
 
     controller.onAction(Action.EDIT_PROVENANCE, null);
-    verify(mockPreflightController)
-      .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+    verify(mockPreflightController).checkUpdateEntity(
+      any(EntityBundle.class),
+      any(Callback.class)
+    );
   }
 
   @Test
@@ -2278,8 +2514,7 @@ public class EntityActionControllerImplTest {
 
   @Test
   public void testOnEditProvenance() {
-    AsyncMockStubber
-      .callWithInvoke()
+    AsyncMockStubber.callWithInvoke()
       .when(mockPreflightController)
       .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
     controller.configure(
@@ -2301,8 +2536,7 @@ public class EntityActionControllerImplTest {
      * The user must be shown a confirm dialog before a delete. Confirm is signaled via the
      * Callback.invoke() in this case we do not want to confirm.
      */
-    AsyncMockStubber
-      .callNoInvovke()
+    AsyncMockStubber.callNoInvovke()
       .when(mockView)
       .showConfirmDeleteDialog(anyString(), any(Callback.class));
     controller.configure(
@@ -2317,23 +2551,23 @@ public class EntityActionControllerImplTest {
     controller.onAction(Action.DELETE_ENTITY, null);
     verify(mockView).showConfirmDeleteDialog(anyString(), any(Callback.class));
     // should not make it to the pre-flight check
-    verify(mockPreflightController, never())
-      .checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
+    verify(mockPreflightController, never()).checkDeleteEntity(
+      any(EntityBundle.class),
+      any(Callback.class)
+    );
   }
 
   @Test
   public void testOnDeleteConfirmedPreFlightFailed() {
     // confirm the delete
-    AsyncMockStubber
-      .callWithInvoke()
+    AsyncMockStubber.callWithInvoke()
       .when(mockView)
       .showConfirmDeleteDialog(anyString(), any(Callback.class));
     /*
      * The preflight check is confirmed by calling Callback.invoke(), in this case it must not be
      * invoked.
      */
-    AsyncMockStubber
-      .callNoInvovke()
+    AsyncMockStubber.callNoInvovke()
       .when(mockPreflightController)
       .checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
     controller.configure(
@@ -2347,17 +2581,20 @@ public class EntityActionControllerImplTest {
     // the call under test
     controller.onAction(Action.DELETE_ENTITY, null);
     verify(mockView).showConfirmDeleteDialog(anyString(), any(Callback.class));
-    verify(mockPreflightController)
-      .checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
+    verify(mockPreflightController).checkDeleteEntity(
+      any(EntityBundle.class),
+      any(Callback.class)
+    );
     // Must not make it to the actual delete since preflight failed.
-    verify(mockSynapseJavascriptClient, never())
-      .deleteEntityById(anyString(), any(AsyncCallback.class));
+    verify(mockSynapseJavascriptClient, never()).deleteEntityById(
+      anyString(),
+      any(AsyncCallback.class)
+    );
   }
 
   @Test
   public void testOnCreateTableSnapshot() {
-    AsyncMockStubber
-      .callWithInvoke()
+    AsyncMockStubber.callWithInvoke()
       .when(mockPreflightController)
       .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
     controller.configure(
@@ -2372,14 +2609,19 @@ public class EntityActionControllerImplTest {
     // the call under test
     controller.onAction(Action.CREATE_TABLE_VERSION, null);
 
-    verify(mockPreflightController)
-      .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+    verify(mockPreflightController).checkUpdateEntity(
+      any(EntityBundle.class),
+      any(Callback.class)
+    );
     verify(mockPromptModalConfigurationBuilder).setTitle(anyString());
     verify(mockPromptModalConfigurationBuilder).setBodyCopy(anyString());
-    verify(mockPromptModalConfigurationBuilder, times(2))
-      .addPrompt(anyString(), anyString());
-    verify(mockPromptModalConfigurationBuilder)
-      .setCallback(callbackListStringCaptor.capture());
+    verify(mockPromptModalConfigurationBuilder, times(2)).addPrompt(
+      anyString(),
+      anyString()
+    );
+    verify(mockPromptModalConfigurationBuilder).setCallback(
+      callbackListStringCaptor.capture()
+    );
     verify(mockView).showMultiplePromptDialog(mockPromptModalConfiguration);
     CallbackP<List<String>> valuesCallback =
       callbackListStringCaptor.getValue();
@@ -2390,14 +2632,13 @@ public class EntityActionControllerImplTest {
     values.add(label);
     values.add(comment);
     valuesCallback.invoke(values);
-    verify(mockSynapseJavascriptClient)
-      .createSnapshot(
-        eq(entityId),
-        eq(comment),
-        eq(label),
-        isNull(String.class),
-        tableSnapshotResponseCaptor.capture()
-      );
+    verify(mockSynapseJavascriptClient).createSnapshot(
+      eq(entityId),
+      eq(comment),
+      eq(label),
+      isNull(String.class),
+      tableSnapshotResponseCaptor.capture()
+    );
     verify(mockView).hideMultiplePromptDialog();
     verify(mockView).showCreateVersionDialog();
 
@@ -2421,8 +2662,7 @@ public class EntityActionControllerImplTest {
   @Test
   public void testOnCreateEntityViewSnapshot() {
     entityBundle.setEntity(mockEntityView);
-    AsyncMockStubber
-      .callWithInvoke()
+    AsyncMockStubber.callWithInvoke()
       .when(mockPreflightController)
       .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
     controller.configure(
@@ -2437,14 +2677,19 @@ public class EntityActionControllerImplTest {
     // the call under test
     controller.onAction(Action.CREATE_TABLE_VERSION, null);
 
-    verify(mockPreflightController)
-      .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+    verify(mockPreflightController).checkUpdateEntity(
+      any(EntityBundle.class),
+      any(Callback.class)
+    );
     verify(mockPromptModalConfigurationBuilder).setTitle(anyString());
     verify(mockPromptModalConfigurationBuilder).setBodyCopy(anyString());
-    verify(mockPromptModalConfigurationBuilder, times(2))
-      .addPrompt(anyString(), anyString());
-    verify(mockPromptModalConfigurationBuilder)
-      .setCallback(callbackListStringCaptor.capture());
+    verify(mockPromptModalConfigurationBuilder, times(2)).addPrompt(
+      anyString(),
+      anyString()
+    );
+    verify(mockPromptModalConfigurationBuilder).setCallback(
+      callbackListStringCaptor.capture()
+    );
     verify(mockView).showMultiplePromptDialog(mockPromptModalConfiguration);
     CallbackP<List<String>> valuesCallback =
       callbackListStringCaptor.getValue();
@@ -2456,14 +2701,13 @@ public class EntityActionControllerImplTest {
     values.add(comment);
     valuesCallback.invoke(values);
 
-    verify(mockJobTrackingWidget)
-      .startAndTrackJob(
-        eq(EntityActionControllerImpl.CREATING_A_NEW_VIEW_VERSION_MESSAGE),
-        eq(false),
-        eq(AsynchType.TableTransaction),
-        tableUpdateTransactionRequestCaptor.capture(),
-        asyncProgressHandlerCaptor.capture()
-      );
+    verify(mockJobTrackingWidget).startAndTrackJob(
+      eq(EntityActionControllerImpl.CREATING_A_NEW_VIEW_VERSION_MESSAGE),
+      eq(false),
+      eq(AsynchType.TableTransaction),
+      tableUpdateTransactionRequestCaptor.capture(),
+      asyncProgressHandlerCaptor.capture()
+    );
     TableUpdateTransactionRequest request =
       tableUpdateTransactionRequestCaptor.getValue();
     AsynchronousProgressHandler<TableUpdateTransactionResponse> handler =
@@ -2505,8 +2749,7 @@ public class EntityActionControllerImplTest {
     dataset.setId(entityId);
     dataset.setParentId(parentId);
     entityBundle.setEntity(dataset);
-    AsyncMockStubber
-      .callWithInvoke()
+    AsyncMockStubber.callWithInvoke()
       .when(mockPreflightController)
       .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
     controller.configure(
@@ -2521,14 +2764,19 @@ public class EntityActionControllerImplTest {
     // the call under test
     controller.onAction(Action.CREATE_TABLE_VERSION, null);
 
-    verify(mockPreflightController)
-      .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+    verify(mockPreflightController).checkUpdateEntity(
+      any(EntityBundle.class),
+      any(Callback.class)
+    );
     verify(mockPromptModalConfigurationBuilder).setTitle(anyString());
     verify(mockPromptModalConfigurationBuilder).setBodyCopy(anyString());
-    verify(mockPromptModalConfigurationBuilder, times(2))
-      .addPrompt(anyString(), anyString());
-    verify(mockPromptModalConfigurationBuilder)
-      .setCallback(callbackListStringCaptor.capture());
+    verify(mockPromptModalConfigurationBuilder, times(2)).addPrompt(
+      anyString(),
+      anyString()
+    );
+    verify(mockPromptModalConfigurationBuilder).setCallback(
+      callbackListStringCaptor.capture()
+    );
     verify(mockView).showMultiplePromptDialog(mockPromptModalConfiguration);
     CallbackP<List<String>> valuesCallback =
       callbackListStringCaptor.getValue();
@@ -2540,14 +2788,13 @@ public class EntityActionControllerImplTest {
     values.add(comment);
     valuesCallback.invoke(values);
 
-    verify(mockJobTrackingWidget)
-      .startAndTrackJob(
-        eq(EntityActionControllerImpl.CREATING_A_NEW_DATASET_VERSION_MESSAGE),
-        eq(false),
-        eq(AsynchType.TableTransaction),
-        tableUpdateTransactionRequestCaptor.capture(),
-        asyncProgressHandlerCaptor.capture()
-      );
+    verify(mockJobTrackingWidget).startAndTrackJob(
+      eq(EntityActionControllerImpl.CREATING_A_NEW_DATASET_VERSION_MESSAGE),
+      eq(false),
+      eq(AsynchType.TableTransaction),
+      tableUpdateTransactionRequestCaptor.capture(),
+      asyncProgressHandlerCaptor.capture()
+    );
     TableUpdateTransactionRequest request =
       tableUpdateTransactionRequestCaptor.getValue();
     AsynchronousProgressHandler handler = asyncProgressHandlerCaptor.getValue();
@@ -2585,18 +2832,15 @@ public class EntityActionControllerImplTest {
   @Test
   public void testOnDeleteConfirmedPreFlightPassedDeleteFailed() {
     // confirm the delete
-    AsyncMockStubber
-      .callWithInvoke()
+    AsyncMockStubber.callWithInvoke()
       .when(mockView)
       .showConfirmDeleteDialog(anyString(), any(Callback.class));
     // confirm pre-flight
-    AsyncMockStubber
-      .callWithInvoke()
+    AsyncMockStubber.callWithInvoke()
       .when(mockPreflightController)
       .checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
     String error = "some error";
-    AsyncMockStubber
-      .callFailureWith(new Throwable(error))
+    AsyncMockStubber.callFailureWith(new Throwable(error))
       .when(mockSynapseJavascriptClient)
       .deleteEntityById(anyString(), any(AsyncCallback.class));
     controller.configure(
@@ -2610,29 +2854,31 @@ public class EntityActionControllerImplTest {
     // the call under test
     controller.onAction(Action.DELETE_ENTITY, null);
     verify(mockView).showConfirmDeleteDialog(anyString(), any(Callback.class));
-    verify(mockPreflightController)
-      .checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
+    verify(mockPreflightController).checkDeleteEntity(
+      any(EntityBundle.class),
+      any(Callback.class)
+    );
     // an attempt to delete should be made
-    verify(mockSynapseJavascriptClient)
-      .deleteEntityById(anyString(), any(AsyncCallback.class));
-    verify(mockView)
-      .showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE + error);
+    verify(mockSynapseJavascriptClient).deleteEntityById(
+      anyString(),
+      any(AsyncCallback.class)
+    );
+    verify(mockView).showErrorMessage(
+      DisplayConstants.ERROR_ENTITY_DELETE_FAILURE + error
+    );
   }
 
   @Test
   public void testOnDeleteConfirmedPreFlightPassedDeleteSuccess() {
     // confirm the delete
-    AsyncMockStubber
-      .callWithInvoke()
+    AsyncMockStubber.callWithInvoke()
       .when(mockView)
       .showConfirmDeleteDialog(anyString(), any(Callback.class));
     // confirm pre-flight
-    AsyncMockStubber
-      .callWithInvoke()
+    AsyncMockStubber.callWithInvoke()
       .when(mockPreflightController)
       .checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
-    AsyncMockStubber
-      .callSuccessWith(null)
+    AsyncMockStubber.callSuccessWith(null)
       .when(mockSynapseJavascriptClient)
       .deleteEntityById(anyString(), any(AsyncCallback.class));
     controller.configure(
@@ -2646,19 +2892,30 @@ public class EntityActionControllerImplTest {
     // the call under test
     controller.onAction(Action.DELETE_ENTITY, null);
     verify(mockView).showConfirmDeleteDialog(anyString(), any(Callback.class));
-    verify(mockPreflightController)
-      .checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
+    verify(mockPreflightController).checkDeleteEntity(
+      any(EntityBundle.class),
+      any(Callback.class)
+    );
     // an attempt to delete should be made
-    verify(mockSynapseJavascriptClient)
-      .deleteEntityById(anyString(), any(AsyncCallback.class));
-    verify(mockView)
-      .showInfo(
-        THE +
-        EntityTypeUtils.getDisplayName(EntityType.table) +
-        WAS_SUCCESSFULLY_DELETED
-      );
-    verify(mockPlaceChanger)
-      .goTo(new Synapse(parentId, null, EntityArea.TABLES, null));
+    verify(mockSynapseJavascriptClient).deleteEntityById(
+      anyString(),
+      any(AsyncCallback.class)
+    );
+    verify(mockView).showInfo(
+      THE +
+      EntityTypeUtils.getDisplayName(EntityType.table) +
+      WAS_SUCCESSFULLY_DELETED
+    );
+    verify(mockPlaceChanger).goTo(
+      new Synapse(parentId, null, EntityArea.TABLES, null)
+    );
+    QueryKey mockQueryKey = mock(QueryKey.class);
+    when(mockKeyFactory.getTrashCanItemsQueryKey()).thenReturn(mockQueryKey);
+    verify(mockKeyFactoryProvider).getKeyFactory(anyString());
+    verify(mockKeyFactory).getTrashCanItemsQueryKey();
+    verify(mockQueryClient).invalidateQueries(
+      any(InvalidateQueryFilters.class)
+    );
   }
 
   @Test
@@ -2752,8 +3009,7 @@ public class EntityActionControllerImplTest {
     /*
      * Share change is confirmed by calling Callback.invoke(), in this case it must not be invoked.
      */
-    AsyncMockStubber
-      .callNoInvovke()
+    AsyncMockStubber.callNoInvovke()
       .when(mockAccessControlListModalWidget)
       .showSharing(any(Callback.class));
     controller.configure(
@@ -2767,16 +3023,17 @@ public class EntityActionControllerImplTest {
     // method under test
     controller.onAction(Action.VIEW_SHARING_SETTINGS, null);
     verify(mockAccessControlListModalWidget).showSharing(any(Callback.class));
-    verify(mockAccessControlListModalWidget)
-      .configure(any(Entity.class), anyBoolean());
+    verify(mockAccessControlListModalWidget).configure(
+      any(Entity.class),
+      anyBoolean()
+    );
     verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
   }
 
   @Test
   public void testOnShareWithChange() {
     // invoke this time
-    AsyncMockStubber
-      .callWithInvoke()
+    AsyncMockStubber.callWithInvoke()
       .when(mockAccessControlListModalWidget)
       .showSharing(any(Callback.class));
     controller.configure(
@@ -2789,20 +3046,20 @@ public class EntityActionControllerImplTest {
     );
     // method under test
     controller.onAction(Action.VIEW_SHARING_SETTINGS, null);
-    verify(mockAccessControlListModalWidget)
-      .configure(any(Entity.class), anyBoolean());
+    verify(mockAccessControlListModalWidget).configure(
+      any(Entity.class),
+      anyBoolean()
+    );
     verify(mockAccessControlListModalWidget).showSharing(any(Callback.class));
     verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
   }
 
   @Test
   public void testRenameHappy() {
-    AsyncMockStubber
-      .callWithInvoke()
+    AsyncMockStubber.callWithInvoke()
       .when(mockPreflightController)
       .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
-    AsyncMockStubber
-      .callWithInvoke()
+    AsyncMockStubber.callWithInvoke()
       .when(mockRenameEntityModalWidget)
       .onRename(any(Entity.class), any(Callback.class));
     controller.configure(
@@ -2815,19 +3072,19 @@ public class EntityActionControllerImplTest {
     );
     // method under test
     controller.onAction(Action.CHANGE_ENTITY_NAME, null);
-    verify(mockRenameEntityModalWidget)
-      .onRename(any(Entity.class), any(Callback.class));
+    verify(mockRenameEntityModalWidget).onRename(
+      any(Entity.class),
+      any(Callback.class)
+    );
     verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
   }
 
   @Test
   public void testRenameNoChange() {
-    AsyncMockStubber
-      .callWithInvoke()
+    AsyncMockStubber.callWithInvoke()
       .when(mockPreflightController)
       .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
-    AsyncMockStubber
-      .callNoInvovke()
+    AsyncMockStubber.callNoInvovke()
       .when(mockRenameEntityModalWidget)
       .onRename(any(Entity.class), any(Callback.class));
     controller.configure(
@@ -2840,19 +3097,19 @@ public class EntityActionControllerImplTest {
     );
     // method under test
     controller.onAction(Action.CHANGE_ENTITY_NAME, null);
-    verify(mockRenameEntityModalWidget)
-      .onRename(any(Entity.class), any(Callback.class));
+    verify(mockRenameEntityModalWidget).onRename(
+      any(Entity.class),
+      any(Callback.class)
+    );
     verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
   }
 
   @Test
   public void testRenameFailedPreFlight() {
-    AsyncMockStubber
-      .callNoInvovke()
+    AsyncMockStubber.callNoInvovke()
       .when(mockPreflightController)
       .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
-    AsyncMockStubber
-      .callNoInvovke()
+    AsyncMockStubber.callNoInvovke()
       .when(mockRenameEntityModalWidget)
       .onRename(any(Entity.class), any(Callback.class));
     controller.configure(
@@ -2865,8 +3122,10 @@ public class EntityActionControllerImplTest {
     );
     // method under test
     controller.onAction(Action.CHANGE_ENTITY_NAME, null);
-    verify(mockRenameEntityModalWidget, never())
-      .onRename(any(Entity.class), any(Callback.class));
+    verify(mockRenameEntityModalWidget, never()).onRename(
+      any(Entity.class),
+      any(Callback.class)
+    );
     verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
   }
 
@@ -2892,12 +3151,10 @@ public class EntityActionControllerImplTest {
       currentUserId
     );
     when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(currentPlace);
-    AsyncMockStubber
-      .callWithInvoke()
+    AsyncMockStubber.callWithInvoke()
       .when(mockPreflightController)
       .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
-    AsyncMockStubber
-      .callNoInvovke()
+    AsyncMockStubber.callNoInvovke()
       .when(mockEditFileMetadataModalWidget)
       .configure(
         any(FileEntity.class),
@@ -2915,12 +3172,11 @@ public class EntityActionControllerImplTest {
     );
     // method under test
     controller.onAction(Action.EDIT_FILE_METADATA, null);
-    verify(mockEditFileMetadataModalWidget)
-      .configure(
-        any(FileEntity.class),
-        any(FileHandle.class),
-        any(Callback.class)
-      );
+    verify(mockEditFileMetadataModalWidget).configure(
+      any(FileEntity.class),
+      any(FileHandle.class),
+      any(Callback.class)
+    );
     verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
   }
 
@@ -2932,12 +3188,10 @@ public class EntityActionControllerImplTest {
     file.setVersionNumber(1L);
     entityBundle.setEntity(file);
     // currentPlace returns a non-null versionNumber
-    AsyncMockStubber
-      .callWithInvoke()
+    AsyncMockStubber.callWithInvoke()
       .when(mockPreflightController)
       .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
-    AsyncMockStubber
-      .callNoInvovke()
+    AsyncMockStubber.callNoInvovke()
       .when(mockEditFileMetadataModalWidget)
       .configure(
         any(FileEntity.class),
@@ -2954,17 +3208,15 @@ public class EntityActionControllerImplTest {
     );
     // method under test
     controller.onAction(Action.EDIT_FILE_METADATA, null);
-    verify(mockEditFileMetadataModalWidget, never())
-      .configure(
-        any(FileEntity.class),
-        any(FileHandle.class),
-        any(Callback.class)
-      );
+    verify(mockEditFileMetadataModalWidget, never()).configure(
+      any(FileEntity.class),
+      any(FileHandle.class),
+      any(Callback.class)
+    );
     verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
-    verify(mockView)
-      .showErrorMessage(
-        "Can only edit the metadata of the most recent file version."
-      );
+    verify(mockView).showErrorMessage(
+      "Can only edit the metadata of the most recent file version."
+    );
   }
 
   @Test
@@ -2974,12 +3226,10 @@ public class EntityActionControllerImplTest {
     project.setParentId(parentId);
     entityBundle.setEntity(project);
 
-    AsyncMockStubber
-      .callWithInvoke()
+    AsyncMockStubber.callWithInvoke()
       .when(mockPreflightController)
       .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
-    AsyncMockStubber
-      .callNoInvovke()
+    AsyncMockStubber.callNoInvovke()
       .when(mockEditProjectMetadataModalWidget)
       .configure(any(Project.class), anyBoolean(), any(Callback.class));
     controller.configure(
@@ -2992,19 +3242,20 @@ public class EntityActionControllerImplTest {
     );
     // method under test
     controller.onAction(Action.EDIT_PROJECT_METADATA, null);
-    verify(mockEditProjectMetadataModalWidget)
-      .configure(any(Project.class), anyBoolean(), any(Callback.class));
+    verify(mockEditProjectMetadataModalWidget).configure(
+      any(Project.class),
+      anyBoolean(),
+      any(Callback.class)
+    );
     verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
   }
 
   @Test
   public void testEditProjectMetadataFailedPreFlight() {
-    AsyncMockStubber
-      .callNoInvovke()
+    AsyncMockStubber.callNoInvovke()
       .when(mockPreflightController)
       .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
-    AsyncMockStubber
-      .callNoInvovke()
+    AsyncMockStubber.callNoInvovke()
       .when(mockEditProjectMetadataModalWidget)
       .configure(any(Project.class), anyBoolean(), any(Callback.class));
     controller.configure(
@@ -3017,15 +3268,17 @@ public class EntityActionControllerImplTest {
     );
     // method under test
     controller.onAction(Action.EDIT_PROJECT_METADATA, null);
-    verify(mockEditProjectMetadataModalWidget, never())
-      .configure(any(Project.class), anyBoolean(), any(Callback.class));
+    verify(mockEditProjectMetadataModalWidget, never()).configure(
+      any(Project.class),
+      anyBoolean(),
+      any(Callback.class)
+    );
     verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
   }
 
   @Test
   public void testOnAddWikiNoUpdate() {
-    AsyncMockStubber
-      .callNoInvovke()
+    AsyncMockStubber.callNoInvovke()
       .when(mockPreflightController)
       .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
     entityBundle.setRootWikiId(null);
@@ -3038,24 +3291,21 @@ public class EntityActionControllerImplTest {
       mockAddToDownloadListWidget
     );
     controller.onAction(Action.EDIT_WIKI_PAGE, null);
-    verify(mockSynapseClient, never())
-      .createV2WikiPageWithV1(
-        anyString(),
-        anyString(),
-        any(WikiPage.class),
-        any(AsyncCallback.class)
-      );
+    verify(mockSynapseClient, never()).createV2WikiPageWithV1(
+      anyString(),
+      anyString(),
+      any(WikiPage.class),
+      any(AsyncCallback.class)
+    );
     verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
   }
 
   @Test
   public void testOnAddWikiCanUpdate() {
-    AsyncMockStubber
-      .callWithInvoke()
+    AsyncMockStubber.callWithInvoke()
       .when(mockPreflightController)
       .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
-    AsyncMockStubber
-      .callSuccessWith(new WikiPage())
+    AsyncMockStubber.callSuccessWith(new WikiPage())
       .when(mockSynapseClient)
       .createV2WikiPageWithV1(
         anyString(),
@@ -3073,8 +3323,10 @@ public class EntityActionControllerImplTest {
       mockAddToDownloadListWidget
     );
     controller.onAction(Action.EDIT_WIKI_PAGE, null);
-    verify(mockMarkdownEditorWidget)
-      .configure(any(WikiPageKey.class), any(CallbackP.class));
+    verify(mockMarkdownEditorWidget).configure(
+      any(WikiPageKey.class),
+      any(CallbackP.class)
+    );
   }
 
   @Test
@@ -3082,8 +3334,7 @@ public class EntityActionControllerImplTest {
     WikiPage page = new WikiPage();
     String markdown = "hello markdown";
     page.setMarkdown(markdown);
-    AsyncMockStubber
-      .callSuccessWith(page)
+    AsyncMockStubber.callSuccessWith(page)
       .when(mockSynapseJavascriptClient)
       .getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
     entityBundle.setRootWikiId("111");
@@ -3101,8 +3352,7 @@ public class EntityActionControllerImplTest {
 
   @Test
   public void testOnViewWikiSourceError() {
-    AsyncMockStubber
-      .callFailureWith(new Exception())
+    AsyncMockStubber.callFailureWith(new Exception())
       .when(mockSynapseJavascriptClient)
       .getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
     entityBundle.setRootWikiId("111");
@@ -3206,8 +3456,7 @@ public class EntityActionControllerImplTest {
 
   @Test
   public void testOnMoveNoUpdate() {
-    AsyncMockStubber
-      .callNoInvovke()
+    AsyncMockStubber.callNoInvovke()
       .when(mockPreflightController)
       .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
     entityBundle.setEntity(new Folder());
@@ -3228,12 +3477,10 @@ public class EntityActionControllerImplTest {
   @Test
   public void testOnMoveCanUpdateFailed() {
     String error = "An error";
-    AsyncMockStubber
-      .callFailureWith(new Throwable(error))
+    AsyncMockStubber.callFailureWith(new Throwable(error))
       .when(mockSynapseClient)
       .moveEntity(anyString(), anyString(), any(AsyncCallback.class));
-    AsyncMockStubber
-      .callWithInvoke()
+    AsyncMockStubber.callWithInvoke()
       .when(mockPreflightController)
       .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
     controller.configure(
@@ -3246,8 +3493,9 @@ public class EntityActionControllerImplTest {
     );
     controller.onAction(Action.MOVE_ENTITY, null);
     verify(mockEntityFinderBuilder).setSelectableTypes(EntityFilter.PROJECT);
-    verify(mockEntityFinderBuilder)
-      .setVersionSelection(EntityFinderWidget.VersionSelection.DISALLOWED);
+    verify(mockEntityFinderBuilder).setVersionSelection(
+      EntityFinderWidget.VersionSelection.DISALLOWED
+    );
     verify(mockEntityFinderBuilder).build();
     verify(mockEntityFinder).show();
     verify(mockEntityFinder, never()).hide();
@@ -3257,12 +3505,10 @@ public class EntityActionControllerImplTest {
 
   @Test
   public void testOnMoveCanUpdateSuccess() {
-    AsyncMockStubber
-      .callSuccessWith(new Folder())
+    AsyncMockStubber.callSuccessWith(new Folder())
       .when(mockSynapseClient)
       .moveEntity(anyString(), anyString(), any(AsyncCallback.class));
-    AsyncMockStubber
-      .callWithInvoke()
+    AsyncMockStubber.callWithInvoke()
       .when(mockPreflightController)
       .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
     controller.configure(
@@ -3275,23 +3521,27 @@ public class EntityActionControllerImplTest {
     );
     controller.onAction(Action.MOVE_ENTITY, null);
     verify(mockEntityFinderBuilder).setSelectableTypes(EntityFilter.PROJECT);
-    verify(mockEntityFinderBuilder)
-      .setVersionSelection(EntityFinderWidget.VersionSelection.DISALLOWED);
-    verify(mockEntityFinderBuilder)
-      .setSelectedHandler(any(EntityFinderWidget.SelectedHandler.class));
+    verify(mockEntityFinderBuilder).setVersionSelection(
+      EntityFinderWidget.VersionSelection.DISALLOWED
+    );
+    verify(mockEntityFinderBuilder).setSelectedHandler(
+      any(EntityFinderWidget.SelectedHandler.class)
+    );
     verify(mockEntityFinderBuilder).build();
     verify(mockEntityFinder).show();
     verify(mockEntityFinder).hide();
-    verify(mockSynapseClient)
-      .moveEntity(anyString(), anyString(), any(AsyncCallback.class));
+    verify(mockSynapseClient).moveEntity(
+      anyString(),
+      anyString(),
+      any(AsyncCallback.class)
+    );
     verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
     verify(mockView, never()).showErrorMessage(anyString());
   }
 
   @Test
   public void testCreateLinkBadRequest() {
-    AsyncMockStubber
-      .callFailureWith(new BadRequestException("bad"))
+    AsyncMockStubber.callFailureWith(new BadRequestException("bad"))
       .when(mockSynapseJavascriptClient)
       .createEntity(any(Entity.class), any(AsyncCallback.class));
     controller.configure(
@@ -3309,8 +3559,7 @@ public class EntityActionControllerImplTest {
 
   @Test
   public void testCreateLinkNotFound() {
-    AsyncMockStubber
-      .callFailureWith(new NotFoundException("not found"))
+    AsyncMockStubber.callFailureWith(new NotFoundException("not found"))
       .when(mockSynapseJavascriptClient)
       .createEntity(any(Entity.class), any(AsyncCallback.class));
     controller.configure(
@@ -3328,8 +3577,7 @@ public class EntityActionControllerImplTest {
 
   @Test
   public void testCreateLinkUnauthorizedException() {
-    AsyncMockStubber
-      .callFailureWith(new UnauthorizedException("no way"))
+    AsyncMockStubber.callFailureWith(new UnauthorizedException("no way"))
       .when(mockSynapseJavascriptClient)
       .createEntity(any(Entity.class), any(AsyncCallback.class));
     controller.configure(
@@ -3348,8 +3596,7 @@ public class EntityActionControllerImplTest {
   @Test
   public void testCreateLinkUnknownException() {
     String error = "some error";
-    AsyncMockStubber
-      .callFailureWith(new Throwable(error))
+    AsyncMockStubber.callFailureWith(new Throwable(error))
       .when(mockSynapseJavascriptClient)
       .createEntity(any(Entity.class), any(AsyncCallback.class));
     controller.configure(
@@ -3373,8 +3620,7 @@ public class EntityActionControllerImplTest {
     Long entityVersion = 42L;
     ((Versionable) entity).setVersionNumber(entityVersion);
     ArgumentCaptor<Entity> argument = ArgumentCaptor.forClass(Entity.class);
-    AsyncMockStubber
-      .callSuccessWith(new Link())
+    AsyncMockStubber.callSuccessWith(new Link())
       .when(mockSynapseJavascriptClient)
       .createEntity(argument.capture(), any(AsyncCallback.class));
     boolean isCurrentVersion = false;
@@ -3390,12 +3636,11 @@ public class EntityActionControllerImplTest {
     String target = "syn9876";
     controller.createLink(target, mockEntityFinder);
     verify(mockView, never()).showErrorMessage(anyString());
-    verify(mockPopupUtils)
-      .notify(
-        eq(DisplayConstants.TEXT_LINK_SAVED),
-        eq(NotificationVariant.SUCCESS),
-        any(ToastMessageOptions.class)
-      );
+    verify(mockPopupUtils).notify(
+      eq(DisplayConstants.TEXT_LINK_SAVED),
+      eq(NotificationVariant.SUCCESS),
+      any(ToastMessageOptions.class)
+    );
     verify(mockEntityFinder).hide();
     Entity capture = argument.getValue();
     assertNotNull(capture);
@@ -3417,8 +3662,7 @@ public class EntityActionControllerImplTest {
     Long entityVersion = 42L;
     ((Versionable) entity).setVersionNumber(entityVersion);
     ArgumentCaptor<Entity> argument = ArgumentCaptor.forClass(Entity.class);
-    AsyncMockStubber
-      .callSuccessWith(new Link())
+    AsyncMockStubber.callSuccessWith(new Link())
       .when(mockSynapseJavascriptClient)
       .createEntity(argument.capture(), any(AsyncCallback.class));
     controller.configure(
@@ -3447,8 +3691,7 @@ public class EntityActionControllerImplTest {
 
   @Test
   public void testOnLinkNoUpdate() {
-    AsyncMockStubber
-      .callNoInvovke()
+    AsyncMockStubber.callNoInvovke()
       .when(mockPreflightController)
       .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
     controller.configure(
@@ -3466,12 +3709,10 @@ public class EntityActionControllerImplTest {
 
   @Test
   public void testOnLink() {
-    AsyncMockStubber
-      .callSuccessWith(new Link())
+    AsyncMockStubber.callSuccessWith(new Link())
       .when(mockSynapseJavascriptClient)
       .createEntity(any(Entity.class), any(AsyncCallback.class));
-    AsyncMockStubber
-      .callWithInvoke()
+    AsyncMockStubber.callWithInvoke()
       .when(mockPreflightController)
       .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
     controller.configure(
@@ -3484,23 +3725,22 @@ public class EntityActionControllerImplTest {
     );
     controller.onAction(Action.CREATE_LINK, null);
     verify(mockEntityFinderBuilder).setSelectableTypes(EntityFilter.CONTAINER);
-    verify(mockEntityFinderBuilder)
-      .setVersionSelection(EntityFinderWidget.VersionSelection.DISALLOWED);
+    verify(mockEntityFinderBuilder).setVersionSelection(
+      EntityFinderWidget.VersionSelection.DISALLOWED
+    );
     verify(mockEntityFinderBuilder).build();
     verify(mockEntityFinder).show();
     verify(mockEntityFinder).hide();
-    verify(mockPopupUtils)
-      .notify(
-        eq(DisplayConstants.TEXT_LINK_SAVED),
-        eq(NotificationVariant.SUCCESS),
-        any(ToastMessageOptions.class)
-      );
+    verify(mockPopupUtils).notify(
+      eq(DisplayConstants.TEXT_LINK_SAVED),
+      eq(NotificationVariant.SUCCESS),
+      any(ToastMessageOptions.class)
+    );
   }
 
   @Test
   public void testOnSubmitNoUpdate() {
-    AsyncMockStubber
-      .callNoInvovke()
+    AsyncMockStubber.callNoInvovke()
       .when(mockPreflightController)
       .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
     controller.configure(
@@ -3512,14 +3752,16 @@ public class EntityActionControllerImplTest {
       mockAddToDownloadListWidget
     );
     controller.onAction(Action.SUBMIT_TO_CHALLENGE, null);
-    verify(mockSubmitter, never())
-      .configure(any(Entity.class), any(Set.class), any(FormParams.class));
+    verify(mockSubmitter, never()).configure(
+      any(Entity.class),
+      any(Set.class),
+      any(FormParams.class)
+    );
   }
 
   @Test
   public void testOnSubmitWithUdate() {
-    AsyncMockStubber
-      .callWithInvoke()
+    AsyncMockStubber.callWithInvoke()
       .when(mockPreflightController)
       .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
     controller.configure(
@@ -3531,14 +3773,16 @@ public class EntityActionControllerImplTest {
       mockAddToDownloadListWidget
     );
     controller.onAction(Action.SUBMIT_TO_CHALLENGE, null);
-    verify(mockSubmitter)
-      .configure(any(Entity.class), any(Set.class), any(FormParams.class));
+    verify(mockSubmitter).configure(
+      any(Entity.class),
+      any(Set.class),
+      any(FormParams.class)
+    );
   }
 
   @Test
   public void testOnChangeStorageLocation() {
-    AsyncMockStubber
-      .callWithInvoke()
+    AsyncMockStubber.callWithInvoke()
       .when(mockPreflightController)
       .checkUploadToEntity(any(EntityBundle.class), any(Callback.class));
     controller.configure(
@@ -3556,8 +3800,7 @@ public class EntityActionControllerImplTest {
 
   @Test
   public void testOnChangeStorageLocationNoUpload() {
-    AsyncMockStubber
-      .callNoInvovke()
+    AsyncMockStubber.callNoInvovke()
       .when(mockPreflightController)
       .checkUploadToEntity(any(EntityBundle.class), any(Callback.class));
     controller.configure(
@@ -3569,15 +3812,15 @@ public class EntityActionControllerImplTest {
       mockAddToDownloadListWidget
     );
     controller.onAction(Action.CHANGE_STORAGE_LOCATION, null);
-    verify(mockStorageLocationWidget, never())
-      .configure(any(EntityBundle.class));
+    verify(mockStorageLocationWidget, never()).configure(
+      any(EntityBundle.class)
+    );
     verify(mockStorageLocationWidget, never()).show();
   }
 
   @Test
   public void testOnUploadNewFileNoUpload() {
-    AsyncMockStubber
-      .callNoInvovke()
+    AsyncMockStubber.callNoInvovke()
       .when(mockPreflightController)
       .checkUploadToEntity(any(EntityBundle.class), any(Callback.class));
     controller.configure(
@@ -3594,8 +3837,7 @@ public class EntityActionControllerImplTest {
 
   @Test
   public void testOnUploadNewFileWithUpload() {
-    AsyncMockStubber
-      .callWithInvoke()
+    AsyncMockStubber.callWithInvoke()
       .when(mockPreflightController)
       .checkUploadToEntity(any(EntityBundle.class), any(Callback.class));
     controller.configure(
@@ -3624,8 +3866,10 @@ public class EntityActionControllerImplTest {
       mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.ADD_WIKI_SUBPAGE, true);
-    verify(mockActionMenu)
-      .setActionListener(Action.ADD_WIKI_SUBPAGE, controller);
+    verify(mockActionMenu).setActionListener(
+      Action.ADD_WIKI_SUBPAGE,
+      controller
+    );
   }
 
   @Test
@@ -3642,8 +3886,10 @@ public class EntityActionControllerImplTest {
       mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.ADD_WIKI_SUBPAGE, false);
-    verify(mockActionMenu, never())
-      .setActionVisible(Action.ADD_WIKI_SUBPAGE, true);
+    verify(mockActionMenu, never()).setActionVisible(
+      Action.ADD_WIKI_SUBPAGE,
+      true
+    );
   }
 
   @Test
@@ -3690,8 +3936,7 @@ public class EntityActionControllerImplTest {
 
   @Test
   public void testOnAddWikiSubpageNoUpdate() {
-    AsyncMockStubber
-      .callNoInvovke()
+    AsyncMockStubber.callNoInvovke()
       .when(mockPreflightController)
       .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
     entityBundle.setRootWikiId(null);
@@ -3704,13 +3949,12 @@ public class EntityActionControllerImplTest {
       mockAddToDownloadListWidget
     );
     controller.onAction(Action.ADD_WIKI_SUBPAGE, null);
-    verify(mockSynapseClient, never())
-      .createV2WikiPageWithV1(
-        anyString(),
-        anyString(),
-        any(WikiPage.class),
-        any(AsyncCallback.class)
-      );
+    verify(mockSynapseClient, never()).createV2WikiPageWithV1(
+      anyString(),
+      anyString(),
+      any(WikiPage.class),
+      any(AsyncCallback.class)
+    );
     verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
   }
 
@@ -3718,15 +3962,13 @@ public class EntityActionControllerImplTest {
   public void testOnRootAddWikiSubpageCanUpdate() {
     // Edge case. User attempts to add a subpage on a project that does not yet have a wiki. Verify a
     // root page is created (and page refreshed)...
-    AsyncMockStubber
-      .callWithInvoke()
+    AsyncMockStubber.callWithInvoke()
       .when(mockPreflightController)
       .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
     WikiPage newWikiPage = new WikiPage();
     String newWikiPageId = "49382";
     newWikiPage.setId(newWikiPageId);
-    AsyncMockStubber
-      .callSuccessWith(newWikiPage)
+    AsyncMockStubber.callSuccessWith(newWikiPage)
       .when(mockSynapseClient)
       .createV2WikiPageWithV1(
         anyString(),
@@ -3744,30 +3986,28 @@ public class EntityActionControllerImplTest {
       mockAddToDownloadListWidget
     );
     controller.onAction(Action.ADD_WIKI_SUBPAGE, null);
-    verify(mockSynapseClient)
-      .createV2WikiPageWithV1(
-        anyString(),
-        anyString(),
-        any(WikiPage.class),
-        any(AsyncCallback.class)
-      );
-    verify(mockPlaceChanger)
-      .goTo(new Synapse(entityId, null, EntityArea.WIKI, newWikiPageId));
+    verify(mockSynapseClient).createV2WikiPageWithV1(
+      anyString(),
+      anyString(),
+      any(WikiPage.class),
+      any(AsyncCallback.class)
+    );
+    verify(mockPlaceChanger).goTo(
+      new Synapse(entityId, null, EntityArea.WIKI, newWikiPageId)
+    );
   }
 
   @Test
   public void testOnAddWikiSubpageCanUpdate() {
     // Set up so that we are on the root wiki page, and we run the add subpage command.
-    AsyncMockStubber
-      .callWithInvoke()
+    AsyncMockStubber.callWithInvoke()
       .when(mockPreflightController)
       .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
     WikiPage newWikiPage = new WikiPage();
     String newWikiPageId = "55555";
     newWikiPage.setId(newWikiPageId);
 
-    AsyncMockStubber
-      .callSuccessWith(newWikiPage)
+    AsyncMockStubber.callSuccessWith(newWikiPage)
       .when(mockSynapseClient)
       .createV2WikiPageWithV1(
         anyString(),
@@ -3786,66 +4026,61 @@ public class EntityActionControllerImplTest {
     );
     controller.onAction(Action.ADD_WIKI_SUBPAGE, null);
     // verify that it has not yet created the wiki page
-    verify(mockSynapseClient, never())
-      .createV2WikiPageWithV1(
-        anyString(),
-        anyString(),
-        any(WikiPage.class),
-        any(AsyncCallback.class)
-      );
+    verify(mockSynapseClient, never()).createV2WikiPageWithV1(
+      anyString(),
+      anyString(),
+      any(WikiPage.class),
+      any(AsyncCallback.class)
+    );
     verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
     // it prompts the user for a wiki page name
     ArgumentCaptor<PromptCallback> callbackCaptor = ArgumentCaptor.forClass(
       PromptCallback.class
     );
-    verify(mockView)
-      .showPromptDialog(
-        anyString(),
-        anyString(),
-        callbackCaptor.capture(),
-        eq(PromptForValuesModalView.InputType.TEXTBOX)
-      );
+    verify(mockView).showPromptDialog(
+      anyString(),
+      anyString(),
+      callbackCaptor.capture(),
+      eq(PromptForValuesModalView.InputType.TEXTBOX)
+    );
     PromptCallback capturedCallback = callbackCaptor.getValue();
     // if called back with an undefined value, a wiki page is still not created
     capturedCallback.callback("");
-    verify(mockSynapseClient, never())
-      .createV2WikiPageWithV1(
-        anyString(),
-        anyString(),
-        any(WikiPage.class),
-        any(AsyncCallback.class)
-      );
+    verify(mockSynapseClient, never()).createV2WikiPageWithV1(
+      anyString(),
+      anyString(),
+      any(WikiPage.class),
+      any(AsyncCallback.class)
+    );
     verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
 
     capturedCallback.callback(null);
-    verify(mockSynapseClient, never())
-      .createV2WikiPageWithV1(
-        anyString(),
-        anyString(),
-        any(WikiPage.class),
-        any(AsyncCallback.class)
-      );
+    verify(mockSynapseClient, never()).createV2WikiPageWithV1(
+      anyString(),
+      anyString(),
+      any(WikiPage.class),
+      any(AsyncCallback.class)
+    );
     verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
 
     capturedCallback.callback("a valid name");
-    verify(mockSynapseClient)
-      .createV2WikiPageWithV1(
-        anyString(),
-        anyString(),
-        any(WikiPage.class),
-        any(AsyncCallback.class)
-      );
+    verify(mockSynapseClient).createV2WikiPageWithV1(
+      anyString(),
+      anyString(),
+      any(WikiPage.class),
+      any(AsyncCallback.class)
+    );
     verify(mockView).showSuccess(anyString());
-    verify(mockPlaceChanger)
-      .goTo(new Synapse(entityId, null, EntityArea.WIKI, newWikiPageId));
+    verify(mockPlaceChanger).goTo(
+      new Synapse(entityId, null, EntityArea.WIKI, newWikiPageId)
+    );
   }
 
   @Test
   public void testCreateWikiPageFailure() {
     // Set up so that we are on the root wiki page, and we run the add subpage command.
     String error = "goodnight";
-    AsyncMockStubber
-      .callFailureWith(new Exception(error))
+    AsyncMockStubber.callFailureWith(new Exception(error))
       .when(mockSynapseClient)
       .createV2WikiPageWithV1(
         anyString(),
@@ -3864,13 +4099,12 @@ public class EntityActionControllerImplTest {
     );
     controller.createWikiPage("foo");
 
-    verify(mockSynapseClient)
-      .createV2WikiPageWithV1(
-        anyString(),
-        anyString(),
-        any(WikiPage.class),
-        any(AsyncCallback.class)
-      );
+    verify(mockSynapseClient).createV2WikiPageWithV1(
+      anyString(),
+      anyString(),
+      any(WikiPage.class),
+      any(AsyncCallback.class)
+    );
     verify(mockView).showErrorMessage(anyString());
   }
 
@@ -3905,8 +4139,10 @@ public class EntityActionControllerImplTest {
     );
     verify(mockActionMenu).setActionVisible(Action.CREATE_OR_UPDATE_DOI, false);
     verify(mockActionMenu).setActionVisible(Action.CREATE_OR_UPDATE_DOI, true);
-    verify(mockActionMenu)
-      .setActionVisible(Action.TOGGLE_FULL_TEXT_SEARCH, true);
+    verify(mockActionMenu).setActionVisible(
+      Action.TOGGLE_FULL_TEXT_SEARCH,
+      true
+    );
   }
 
   @Test
@@ -3923,8 +4159,10 @@ public class EntityActionControllerImplTest {
     );
     // initially hide, never show
     verify(mockActionMenu).setActionVisible(Action.CREATE_OR_UPDATE_DOI, false);
-    verify(mockActionMenu, never())
-      .setActionVisible(Action.CREATE_OR_UPDATE_DOI, true);
+    verify(mockActionMenu, never()).setActionVisible(
+      Action.CREATE_OR_UPDATE_DOI,
+      true
+    );
   }
 
   @Test
@@ -3940,16 +4178,15 @@ public class EntityActionControllerImplTest {
     // hide, and then show with 'update' text
     verify(mockActionMenu).setActionVisible(Action.CREATE_OR_UPDATE_DOI, false);
     verify(mockActionMenu).setActionVisible(Action.CREATE_OR_UPDATE_DOI, true);
-    verify(mockActionMenu)
-      .setActionText(
-        Action.CREATE_OR_UPDATE_DOI,
-        UPDATE_DOI_FOR +
-        EntityTypeUtils.getDisplayName(
-          EntityTypeUtils.getEntityTypeForClass(
-            entityBundle.getEntity().getClass()
-          )
+    verify(mockActionMenu).setActionText(
+      Action.CREATE_OR_UPDATE_DOI,
+      UPDATE_DOI_FOR +
+      EntityTypeUtils.getDisplayName(
+        EntityTypeUtils.getEntityTypeForClass(
+          entityBundle.getEntity().getClass()
         )
-      );
+      )
+    );
   }
 
   @Test
@@ -3966,14 +4203,15 @@ public class EntityActionControllerImplTest {
     );
     // hide, and then show with 'update' text
     verify(mockActionMenu).setActionVisible(Action.CREATE_OR_UPDATE_DOI, false);
-    verify(mockActionMenu, never())
-      .setActionVisible(Action.CREATE_OR_UPDATE_DOI, true);
+    verify(mockActionMenu, never()).setActionVisible(
+      Action.CREATE_OR_UPDATE_DOI,
+      true
+    );
   }
 
   @Test
   public void testOnSelectChallengeTeam() {
-    AsyncMockStubber
-      .callSuccessWith(null)
+    AsyncMockStubber.callSuccessWith(null)
       .when(mockChallengeClient)
       .createChallenge(any(Challenge.class), any(AsyncCallback.class));
     controller.configure(
@@ -3995,10 +4233,13 @@ public class EntityActionControllerImplTest {
     teamSelectedCallback.getValue().invoke(SELECTED_TEAM_ID);
 
     ArgumentCaptor<Challenge> captor = ArgumentCaptor.forClass(Challenge.class);
-    verify(mockChallengeClient)
-      .createChallenge(captor.capture(), any(AsyncCallback.class));
-    verify(mockPlaceChanger)
-      .goTo(new Synapse(entityId, null, EntityArea.CHALLENGE, null));
+    verify(mockChallengeClient).createChallenge(
+      captor.capture(),
+      any(AsyncCallback.class)
+    );
+    verify(mockPlaceChanger).goTo(
+      new Synapse(entityId, null, EntityArea.CHALLENGE, null)
+    );
     verify(mockView).showSuccess(DisplayConstants.CHALLENGE_CREATED);
     Challenge c = captor.getValue();
     assertNull(c.getId());
@@ -4016,8 +4257,7 @@ public class EntityActionControllerImplTest {
       mockAddToDownloadListWidget
     );
     String error = "an error";
-    AsyncMockStubber
-      .callFailureWith(new Exception(error))
+    AsyncMockStubber.callFailureWith(new Exception(error))
       .when(mockChallengeClient)
       .createChallenge(any(Challenge.class), any(AsyncCallback.class));
     controller.onAction(Action.CREATE_CHALLENGE, null);
@@ -4028,8 +4268,10 @@ public class EntityActionControllerImplTest {
     verify(mockSelectTeamModal).configure(teamSelectedCallback.capture());
     teamSelectedCallback.getValue().invoke(SELECTED_TEAM_ID);
 
-    verify(mockChallengeClient)
-      .createChallenge(any(Challenge.class), any(AsyncCallback.class));
+    verify(mockChallengeClient).createChallenge(
+      any(Challenge.class),
+      any(AsyncCallback.class)
+    );
     verify(mockView).showErrorMessage(error);
   }
 
@@ -4038,8 +4280,9 @@ public class EntityActionControllerImplTest {
     // note that the currentArea is null (project settings)
     currentEntityArea = null;
     entityBundle.setEntity(new Project());
-    when(mockSynapseJavascriptClient.getChallengeForProject(anyString()))
-      .thenReturn(getFailedFuture(new NotFoundException()));
+    when(
+      mockSynapseJavascriptClient.getChallengeForProject(anyString())
+    ).thenReturn(getFailedFuture(new NotFoundException()));
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -4064,8 +4307,7 @@ public class EntityActionControllerImplTest {
     // project settings menu
     currentEntityArea = null;
     entityBundle.setEntity(new Project());
-    AsyncMockStubber
-      .callSuccessWith(new Challenge())
+    AsyncMockStubber.callSuccessWith(new Challenge())
       .when(mockChallengeClient)
       .getChallengeForProject(anyString(), any(AsyncCallback.class));
     controller.configure(
@@ -4076,8 +4318,10 @@ public class EntityActionControllerImplTest {
       currentEntityArea,
       mockAddToDownloadListWidget
     );
-    verify(mockActionMenu, never())
-      .setActionVisible(Action.DELETE_CHALLENGE, true);
+    verify(mockActionMenu, never()).setActionVisible(
+      Action.DELETE_CHALLENGE,
+      true
+    );
   }
 
   @Test
@@ -4085,8 +4329,9 @@ public class EntityActionControllerImplTest {
     // currentArea is on the challenge tab
     currentEntityArea = EntityArea.CHALLENGE;
     entityBundle.setEntity(new Project());
-    when(mockSynapseJavascriptClient.getChallengeForProject(anyString()))
-      .thenReturn(getDoneFuture(new Challenge()));
+    when(
+      mockSynapseJavascriptClient.getChallengeForProject(anyString())
+    ).thenReturn(getDoneFuture(new Challenge()));
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -4105,11 +4350,9 @@ public class EntityActionControllerImplTest {
     currentEntityArea = EntityArea.WIKI;
     when(
       mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
-    )
-      .thenReturn("true");
+    ).thenReturn("true");
     entityBundle.setEntity(new Project());
-    AsyncMockStubber
-      .callFailureWith(new NotFoundException())
+    AsyncMockStubber.callFailureWith(new NotFoundException())
       .when(mockChallengeClient)
       .getChallengeForProject(anyString(), any(AsyncCallback.class));
     controller.configure(
@@ -4121,16 +4364,17 @@ public class EntityActionControllerImplTest {
       mockAddToDownloadListWidget
     );
     verify(mockActionMenu).setActionVisible(Action.CREATE_CHALLENGE, false);
-    verify(mockActionMenu, never())
-      .setActionVisible(Action.CREATE_CHALLENGE, true);
+    verify(mockActionMenu, never()).setActionVisible(
+      Action.CREATE_CHALLENGE,
+      true
+    );
   }
 
   @Test
   public void testConfigureChallengeFoundNonEditable() throws Exception {
     entityBundle.setEntity(new Project());
     permissions.setCanEdit(false);
-    AsyncMockStubber
-      .callSuccessWith(new Challenge())
+    AsyncMockStubber.callSuccessWith(new Challenge())
       .when(mockChallengeClient)
       .getChallengeForProject(anyString(), any(AsyncCallback.class));
     controller.configure(
@@ -4143,16 +4387,19 @@ public class EntityActionControllerImplTest {
     );
     // initially hide, never show
     verify(mockActionMenu).setActionVisible(Action.CREATE_CHALLENGE, false);
-    verify(mockActionMenu, never())
-      .setActionVisible(Action.CREATE_CHALLENGE, true);
+    verify(mockActionMenu, never()).setActionVisible(
+      Action.CREATE_CHALLENGE,
+      true
+    );
   }
 
   @Test
   public void testGetChallengeError() throws Exception {
     entityBundle.setEntity(new Project());
     String error = "an error";
-    when(mockSynapseJavascriptClient.getChallengeForProject(anyString()))
-      .thenReturn(getFailedFuture(new Exception(error)));
+    when(
+      mockSynapseJavascriptClient.getChallengeForProject(anyString())
+    ).thenReturn(getFailedFuture(new Exception(error)));
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -4171,8 +4418,7 @@ public class EntityActionControllerImplTest {
      * The user must be shown a confirm dialog before a delete. Confirm is signaled via the
      * Callback.invoke() in this case we do not want to confirm.
      */
-    AsyncMockStubber
-      .callNoInvovke()
+    AsyncMockStubber.callNoInvovke()
       .when(mockView)
       .showConfirmDeleteDialog(anyString(), any(Callback.class));
     Folder f = new Folder();
@@ -4194,8 +4440,10 @@ public class EntityActionControllerImplTest {
     controller.onAction(Action.DELETE_ENTITY, null);
     verify(mockView).showConfirmDeleteDialog(eq(display), any(Callback.class));
     // should not make it to the pre-flight check
-    verify(mockPreflightController, never())
-      .checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
+    verify(mockPreflightController, never()).checkDeleteEntity(
+      any(EntityBundle.class),
+      any(Callback.class)
+    );
   }
 
   @Test
@@ -4204,8 +4452,7 @@ public class EntityActionControllerImplTest {
      * The user must be shown a confirm dialog before a delete. Confirm is signaled via the
      * Callback.invoke() in this case we do not want to confirm.
      */
-    AsyncMockStubber
-      .callNoInvovke()
+    AsyncMockStubber.callNoInvovke()
       .when(mockView)
       .showConfirmDeleteDialog(anyString(), any(Callback.class));
     Project p = new Project();
@@ -4224,19 +4471,24 @@ public class EntityActionControllerImplTest {
     // the call under tests
     controller.onAction(Action.DELETE_ENTITY, null);
     verify(mockView).showConfirmDeleteDialog(eq(display), any(Callback.class));
-    verify(mockView, times(0))
-      .showConfirmDeleteDialog(eq(folderDisplay), any(Callback.class));
+    verify(mockView, times(0)).showConfirmDeleteDialog(
+      eq(folderDisplay),
+      any(Callback.class)
+    );
     // should not make it to the pre-flight check
-    verify(mockPreflightController, never())
-      .checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
+    verify(mockPreflightController, never()).checkDeleteEntity(
+      any(EntityBundle.class),
+      any(Callback.class)
+    );
   }
 
   @Test
   public void testConfigureManageAccessRequirementsAsNonACTMember() {
     entityBundle.setEntity(new Folder());
     entityBundle.setRootWikiId("7890");
-    when(mockIsACTMemberAsyncHandler.isACTActionAvailable())
-      .thenReturn(getDoneFuture(false));
+    when(mockIsACTMemberAsyncHandler.isACTActionAvailable()).thenReturn(
+      getDoneFuture(false)
+    );
 
     controller.configure(
       mockActionMenu,
@@ -4247,11 +4499,15 @@ public class EntityActionControllerImplTest {
       mockAddToDownloadListWidget
     );
 
-    verify(mockActionMenu)
-      .setActionVisible(Action.MANAGE_ACCESS_REQUIREMENTS, false);
+    verify(mockActionMenu).setActionVisible(
+      Action.MANAGE_ACCESS_REQUIREMENTS,
+      false
+    );
     verify(mockActionMenu).setActionVisible(Action.APPROVE_USER_ACCESS, false);
-    verify(mockActionMenu, never())
-      .setActionVisible(Action.MANAGE_ACCESS_REQUIREMENTS, true);
+    verify(mockActionMenu, never()).setActionVisible(
+      Action.MANAGE_ACCESS_REQUIREMENTS,
+      true
+    );
     verify(mockIsACTMemberAsyncHandler, atLeastOnce()).isACTActionAvailable();
   }
 
@@ -4259,8 +4515,9 @@ public class EntityActionControllerImplTest {
   public void testConfigureManageAccessRequirementsAsACTMemberAsACTMember() {
     entityBundle.setEntity(new Folder());
     entityBundle.setRootWikiId("7890");
-    when(mockIsACTMemberAsyncHandler.isACTActionAvailable())
-      .thenReturn(getDoneFuture(true));
+    when(mockIsACTMemberAsyncHandler.isACTActionAvailable()).thenReturn(
+      getDoneFuture(true)
+    );
 
     controller.configure(
       mockActionMenu,
@@ -4271,11 +4528,15 @@ public class EntityActionControllerImplTest {
       mockAddToDownloadListWidget
     );
 
-    verify(mockActionMenu)
-      .setActionVisible(Action.MANAGE_ACCESS_REQUIREMENTS, true);
+    verify(mockActionMenu).setActionVisible(
+      Action.MANAGE_ACCESS_REQUIREMENTS,
+      true
+    );
     verify(mockActionMenu).setActionVisible(Action.APPROVE_USER_ACCESS, true);
-    verify(mockActionMenu)
-      .setActionListener(Action.MANAGE_ACCESS_REQUIREMENTS, controller);
+    verify(mockActionMenu).setActionListener(
+      Action.MANAGE_ACCESS_REQUIREMENTS,
+      controller
+    );
   }
 
   @Test
@@ -4296,8 +4557,7 @@ public class EntityActionControllerImplTest {
 
   @Test
   public void testUploadNewFileEntity() {
-    AsyncMockStubber
-      .callWithInvoke()
+    AsyncMockStubber.callWithInvoke()
       .when(mockPreflightController)
       .checkUploadToEntity(any(EntityBundle.class), any(Callback.class));
     String folderId = "syn1292";
@@ -4316,22 +4576,20 @@ public class EntityActionControllerImplTest {
     boolean isEntity = true;
     Entity currentFileEntity = null;
     CallbackP<String> fileHandleIdCallback = null;
-    verify(mockUploader)
-      .configure(
-        DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK,
-        currentFileEntity,
-        folderId,
-        fileHandleIdCallback,
-        isEntity
-      );
+    verify(mockUploader).configure(
+      DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK,
+      currentFileEntity,
+      folderId,
+      fileHandleIdCallback,
+      isEntity
+    );
     verify(mockUploader).setUploaderLinkNameVisible(true);
     verify(mockUploader).show();
   }
 
   @Test
   public void testCreateFolder() {
-    AsyncMockStubber
-      .callWithInvoke()
+    AsyncMockStubber.callWithInvoke()
       .when(mockPreflightController)
       .checkUploadToEntity(any(EntityBundle.class), any(Callback.class));
     controller.configure(
@@ -4348,8 +4606,7 @@ public class EntityActionControllerImplTest {
 
   @Test
   public void testUploadTable() {
-    AsyncMockStubber
-      .callWithInvoke()
+    AsyncMockStubber.callWithInvoke()
       .when(mockPreflightController)
       .checkCreateEntityAndUpload(
         any(EntityBundle.class),
@@ -4371,8 +4628,7 @@ public class EntityActionControllerImplTest {
 
   @Test
   public void testAddTable() {
-    AsyncMockStubber
-      .callWithInvoke()
+    AsyncMockStubber.callWithInvoke()
       .when(mockPreflightController)
       .checkCreateEntity(
         any(EntityBundle.class),
@@ -4388,12 +4644,11 @@ public class EntityActionControllerImplTest {
       mockAddToDownloadListWidget
     );
     controller.onAction(Action.ADD_TABLE, null);
-    verify(mockCreateTableViewWizard)
-      .configure(
-        eq(entityId),
-        createTableWizardOnCompleteCaptor.capture(),
-        createTableWizardOnCancelCaptor.capture()
-      );
+    verify(mockCreateTableViewWizard).configure(
+      eq(entityId),
+      createTableWizardOnCompleteCaptor.capture(),
+      createTableWizardOnCancelCaptor.capture()
+    );
     verify(mockCreateTableViewWizard).setOpen(true);
 
     // Test onCancel
@@ -4409,8 +4664,7 @@ public class EntityActionControllerImplTest {
 
   @Test
   public void testCreateExternalDockerRepo() {
-    AsyncMockStubber
-      .callWithInvoke()
+    AsyncMockStubber.callWithInvoke()
       .when(mockPreflightController)
       .checkCreateEntity(
         any(EntityBundle.class),
@@ -4426,15 +4680,16 @@ public class EntityActionControllerImplTest {
       mockAddToDownloadListWidget
     );
     controller.onAction(Action.CREATE_EXTERNAL_DOCKER_REPO, null);
-    verify(mockAddExternalRepoModal)
-      .configuration(eq(entityId), any(Callback.class));
+    verify(mockAddExternalRepoModal).configuration(
+      eq(entityId),
+      any(Callback.class)
+    );
     verify(mockAddExternalRepoModal).show();
   }
 
   @Test
   public void testDeleteChallengeCancelConfirm() {
-    AsyncMockStubber
-      .callNoInvovke()
+    AsyncMockStubber.callNoInvovke()
       .when(mockView)
       .showConfirmDeleteDialog(anyString(), any(Callback.class));
     controller.configure(
@@ -4450,22 +4705,21 @@ public class EntityActionControllerImplTest {
 
     verify(mockView).showConfirmDeleteDialog(anyString(), any(Callback.class));
     // should not make it to the pre-flight check
-    verify(mockPreflightController, never())
-      .checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
+    verify(mockPreflightController, never()).checkDeleteEntity(
+      any(EntityBundle.class),
+      any(Callback.class)
+    );
   }
 
   @Test
   public void testDeleteChallengeConfirmed() {
-    AsyncMockStubber
-      .callSuccessWith(null)
+    AsyncMockStubber.callSuccessWith(null)
       .when(mockChallengeClient)
       .deleteChallenge(anyString(), any(AsyncCallback.class));
-    AsyncMockStubber
-      .callWithInvoke()
+    AsyncMockStubber.callWithInvoke()
       .when(mockView)
       .showConfirmDeleteDialog(anyString(), any(Callback.class));
-    AsyncMockStubber
-      .callWithInvoke()
+    AsyncMockStubber.callWithInvoke()
       .when(mockPreflightController)
       .checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
     controller.configure(
@@ -4480,26 +4734,27 @@ public class EntityActionControllerImplTest {
     controller.onAction(Action.DELETE_CHALLENGE, null);
 
     verify(mockView).showConfirmDeleteDialog(anyString(), any(Callback.class));
-    verify(mockPreflightController)
-      .checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
-    verify(mockChallengeClient)
-      .deleteChallenge(anyString(), any(AsyncCallback.class));
+    verify(mockPreflightController).checkDeleteEntity(
+      any(EntityBundle.class),
+      any(Callback.class)
+    );
+    verify(mockChallengeClient).deleteChallenge(
+      anyString(),
+      any(AsyncCallback.class)
+    );
     verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
   }
 
   @Test
   public void testDeleteChallengeFailure() {
     String error = "unable to delete challenge";
-    AsyncMockStubber
-      .callFailureWith(new Exception(error))
+    AsyncMockStubber.callFailureWith(new Exception(error))
       .when(mockChallengeClient)
       .deleteChallenge(anyString(), any(AsyncCallback.class));
-    AsyncMockStubber
-      .callWithInvoke()
+    AsyncMockStubber.callWithInvoke()
       .when(mockView)
       .showConfirmDeleteDialog(anyString(), any(Callback.class));
-    AsyncMockStubber
-      .callWithInvoke()
+    AsyncMockStubber.callWithInvoke()
       .when(mockPreflightController)
       .checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
     controller.configure(
@@ -4513,8 +4768,10 @@ public class EntityActionControllerImplTest {
 
     controller.onAction(Action.DELETE_CHALLENGE, null);
 
-    verify(mockChallengeClient)
-      .deleteChallenge(anyString(), any(AsyncCallback.class));
+    verify(mockChallengeClient).deleteChallenge(
+      anyString(),
+      any(AsyncCallback.class)
+    );
     verify(mockView).showErrorMessage(error);
     verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
   }
@@ -4530,12 +4787,10 @@ public class EntityActionControllerImplTest {
       currentEntityArea,
       mockAddToDownloadListWidget
     );
-    AsyncMockStubber
-      .callWithInvoke()
+    AsyncMockStubber.callWithInvoke()
       .when(mockPreflightController)
       .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
-    AsyncMockStubber
-      .callSuccessWith(tableEntity)
+    AsyncMockStubber.callSuccessWith(tableEntity)
       .when(mockSynapseJavascriptClient)
       .updateEntity(
         any(Entity.class),
@@ -4709,11 +4964,16 @@ public class EntityActionControllerImplTest {
     verify(mockActionMenu).setDownloadMenuTooltipText("");
     verify(mockActionMenu).setActionVisible(Action.DOWNLOAD_FILE, true);
     verify(mockActionMenu).setActionVisible(Action.ADD_TO_DOWNLOAD_CART, true);
-    verify(mockActionMenu)
-      .setActionVisible(Action.SHOW_PROGRAMMATIC_OPTIONS, true);
+    verify(mockActionMenu).setActionVisible(
+      Action.SHOW_PROGRAMMATIC_OPTIONS,
+      true
+    );
 
-    verify(mockFileDownloadHandlerWidget)
-      .configure(mockActionMenu, entityBundle, mockRestrictionInformation);
+    verify(mockFileDownloadHandlerWidget).configure(
+      mockActionMenu,
+      entityBundle,
+      mockRestrictionInformation
+    );
   }
 
   @Test
@@ -4739,8 +4999,7 @@ public class EntityActionControllerImplTest {
       mockSynapseJavascriptClient.getActionsRequiredForEntityDownload(
         anyString()
       )
-    )
-      .thenReturn(getDoneFuture(actionsRequiredForDownload));
+    ).thenReturn(getDoneFuture(actionsRequiredForDownload));
 
     entityBundle.setEntity(new FileEntity());
     entityBundle.getPermissions().setCanDownload(false);
@@ -4757,8 +5016,9 @@ public class EntityActionControllerImplTest {
 
     verify(mockActionMenu).setDownloadMenuEnabled(false);
     ArgumentCaptor<String> tooltipCaptor = new ArgumentCaptor<>();
-    verify(mockActionMenu, times(2))
-      .setDownloadMenuTooltipText(tooltipCaptor.capture());
+    verify(mockActionMenu, times(2)).setDownloadMenuTooltipText(
+      tooltipCaptor.capture()
+    );
     String tooltip = tooltipCaptor.getAllValues().get(1);
     assertTrue(tooltip.contains(NO_PERMISSION_TO_DOWNLOAD));
     assertTrue(tooltip.contains(ENABLE_2FA_GUIDANCE));
@@ -4767,11 +5027,16 @@ public class EntityActionControllerImplTest {
 
     verify(mockActionMenu).setActionVisible(Action.DOWNLOAD_FILE, true);
     verify(mockActionMenu).setActionVisible(Action.ADD_TO_DOWNLOAD_CART, true);
-    verify(mockActionMenu)
-      .setActionVisible(Action.SHOW_PROGRAMMATIC_OPTIONS, true);
+    verify(mockActionMenu).setActionVisible(
+      Action.SHOW_PROGRAMMATIC_OPTIONS,
+      true
+    );
 
-    verify(mockFileDownloadHandlerWidget)
-      .configure(mockActionMenu, entityBundle, mockRestrictionInformation);
+    verify(mockFileDownloadHandlerWidget).configure(
+      mockActionMenu,
+      entityBundle,
+      mockRestrictionInformation
+    );
   }
 
   @Test
@@ -4792,15 +5057,21 @@ public class EntityActionControllerImplTest {
     );
 
     verify(mockActionMenu).setDownloadMenuEnabled(false);
-    verify(mockActionMenu)
-      .setDownloadMenuTooltipText("You need to log in to download this file.");
+    verify(mockActionMenu).setDownloadMenuTooltipText(
+      "You need to log in to download this file."
+    );
     verify(mockActionMenu).setActionVisible(Action.DOWNLOAD_FILE, true);
     verify(mockActionMenu).setActionVisible(Action.ADD_TO_DOWNLOAD_CART, true);
-    verify(mockActionMenu)
-      .setActionVisible(Action.SHOW_PROGRAMMATIC_OPTIONS, true);
+    verify(mockActionMenu).setActionVisible(
+      Action.SHOW_PROGRAMMATIC_OPTIONS,
+      true
+    );
 
-    verify(mockFileDownloadHandlerWidget)
-      .configure(mockActionMenu, entityBundle, mockRestrictionInformation);
+    verify(mockFileDownloadHandlerWidget).configure(
+      mockActionMenu,
+      entityBundle,
+      mockRestrictionInformation
+    );
   }
 
   @Test
@@ -4822,26 +5093,27 @@ public class EntityActionControllerImplTest {
     );
 
     verify(mockActionMenu).setActionVisible(Action.ADD_TO_DOWNLOAD_CART, true);
-    verify(mockActionMenu)
-      .setActionListener(
-        eq(Action.ADD_TO_DOWNLOAD_CART),
-        actionListenerCaptor.capture()
-      );
+    verify(mockActionMenu).setActionListener(
+      eq(Action.ADD_TO_DOWNLOAD_CART),
+      actionListenerCaptor.capture()
+    );
 
     // Call under test
     actionListenerCaptor.getValue().onAction(Action.ADD_TO_DOWNLOAD_CART, null);
 
-    verify(mockSynapseJavascriptClient)
-      .addFileToDownloadListV2(
-        eq(entityId),
-        eq(3L),
-        addToDownloadListAsyncCallbackCaptor.capture()
-      );
+    verify(mockSynapseJavascriptClient).addFileToDownloadListV2(
+      eq(entityId),
+      eq(3L),
+      addToDownloadListAsyncCallbackCaptor.capture()
+    );
 
     // Call succeeds
     addToDownloadListAsyncCallbackCaptor.getValue().onSuccess(null);
-    verify(mockPopupUtils)
-      .showInfo(anyString(), anyString(), eq(VIEW_DOWNLOAD_LIST));
+    verify(mockPopupUtils).showInfo(
+      anyString(),
+      anyString(),
+      eq(VIEW_DOWNLOAD_LIST)
+    );
     verify(mockEventBus).fireEvent(any(DownloadListUpdatedEvent.class));
   }
 
@@ -4864,21 +5136,19 @@ public class EntityActionControllerImplTest {
     );
 
     verify(mockActionMenu).setActionVisible(Action.ADD_TO_DOWNLOAD_CART, true);
-    verify(mockActionMenu)
-      .setActionListener(
-        eq(Action.ADD_TO_DOWNLOAD_CART),
-        actionListenerCaptor.capture()
-      );
+    verify(mockActionMenu).setActionListener(
+      eq(Action.ADD_TO_DOWNLOAD_CART),
+      actionListenerCaptor.capture()
+    );
 
     // Call under test
     actionListenerCaptor.getValue().onAction(Action.ADD_TO_DOWNLOAD_CART, null);
 
-    verify(mockSynapseJavascriptClient)
-      .addFileToDownloadListV2(
-        eq(entityId),
-        eq(3L),
-        addToDownloadListAsyncCallbackCaptor.capture()
-      );
+    verify(mockSynapseJavascriptClient).addFileToDownloadListV2(
+      eq(entityId),
+      eq(3L),
+      addToDownloadListAsyncCallbackCaptor.capture()
+    );
 
     // Call fails
     String message = "failure reason";
@@ -4886,8 +5156,9 @@ public class EntityActionControllerImplTest {
       .getValue()
       .onFailure(new SynapseClientException(message));
     verify(mockView).showErrorMessage(eq(message));
-    verify(mockEventBus, never())
-      .fireEvent(any(DownloadListUpdatedEvent.class));
+    verify(mockEventBus, never()).fireEvent(
+      any(DownloadListUpdatedEvent.class)
+    );
   }
 
   @Test
@@ -4911,21 +5182,24 @@ public class EntityActionControllerImplTest {
     );
 
     verify(mockActionMenu).setActionVisible(Action.ADD_TO_DOWNLOAD_CART, true);
-    verify(mockActionMenu)
-      .setActionListener(
-        eq(Action.ADD_TO_DOWNLOAD_CART),
-        actionListenerCaptor.capture()
-      );
+    verify(mockActionMenu).setActionListener(
+      eq(Action.ADD_TO_DOWNLOAD_CART),
+      actionListenerCaptor.capture()
+    );
 
     // Call under test
     actionListenerCaptor.getValue().onAction(Action.ADD_TO_DOWNLOAD_CART, null);
 
     verify(mockView).showErrorMessage(anyString());
     verify(mockPlaceChanger).goTo(any(LoginPlace.class));
-    verify(mockSynapseJavascriptClient, never())
-      .addFileToDownloadListV2(any(), any(), any());
-    verify(mockEventBus, never())
-      .fireEvent(any(DownloadListUpdatedEvent.class));
+    verify(mockSynapseJavascriptClient, never()).addFileToDownloadListV2(
+      any(),
+      any(),
+      any()
+    );
+    verify(mockEventBus, never()).fireEvent(
+      any(DownloadListUpdatedEvent.class)
+    );
   }
 
   @Test
@@ -4946,13 +5220,14 @@ public class EntityActionControllerImplTest {
       mockAddToDownloadListWidget
     );
 
-    verify(mockActionMenu)
-      .setActionVisible(Action.SHOW_PROGRAMMATIC_OPTIONS, true);
-    verify(mockActionMenu)
-      .setActionListener(
-        eq(Action.SHOW_PROGRAMMATIC_OPTIONS),
-        actionListenerCaptor.capture()
-      );
+    verify(mockActionMenu).setActionVisible(
+      Action.SHOW_PROGRAMMATIC_OPTIONS,
+      true
+    );
+    verify(mockActionMenu).setActionListener(
+      eq(Action.SHOW_PROGRAMMATIC_OPTIONS),
+      actionListenerCaptor.capture()
+    );
 
     // Call under test
     actionListenerCaptor
@@ -4966,8 +5241,9 @@ public class EntityActionControllerImplTest {
   public void testConfigureContainerDownload() {
     EntityChildrenResponse fileChildrenResponse = new EntityChildrenResponse();
     fileChildrenResponse.setPage(Collections.singletonList(new EntityHeader()));
-    when(mockSynapseJavascriptClient.getEntityChildren(any()))
-      .thenReturn(getDoneFuture(fileChildrenResponse));
+    when(mockSynapseJavascriptClient.getEntityChildren(any())).thenReturn(
+      getDoneFuture(fileChildrenResponse)
+    );
 
     entityBundle.setEntity(new Project());
     entityBundle.getEntity().setId(entityId);
@@ -4986,27 +5262,29 @@ public class EntityActionControllerImplTest {
 
     verify(mockActionMenu).setActionVisible(Action.ADD_TO_DOWNLOAD_CART, true);
     verify(mockActionMenu).setActionEnabled(Action.ADD_TO_DOWNLOAD_CART, true);
-    verify(mockActionMenu)
-      .setActionTooltipText(Action.ADD_TO_DOWNLOAD_CART, null);
-    verify(mockActionMenu)
-      .setActionVisible(Action.SHOW_PROGRAMMATIC_OPTIONS, true);
+    verify(mockActionMenu).setActionTooltipText(
+      Action.ADD_TO_DOWNLOAD_CART,
+      null
+    );
+    verify(mockActionMenu).setActionVisible(
+      Action.SHOW_PROGRAMMATIC_OPTIONS,
+      true
+    );
     verify(mockActionMenu).setDownloadMenuEnabled(true);
     verify(mockActionMenu).setDownloadMenuTooltipText(null);
 
     // Test the action listeners
-    verify(mockActionMenu)
-      .setActionListener(
-        eq(Action.ADD_TO_DOWNLOAD_CART),
-        actionListenerCaptor.capture()
-      );
+    verify(mockActionMenu).setActionListener(
+      eq(Action.ADD_TO_DOWNLOAD_CART),
+      actionListenerCaptor.capture()
+    );
     actionListenerCaptor.getValue().onAction(Action.ADD_TO_DOWNLOAD_CART, null);
     verify(mockAddToDownloadListWidget).configure(entityId);
 
-    verify(mockActionMenu)
-      .setActionListener(
-        eq(Action.SHOW_PROGRAMMATIC_OPTIONS),
-        actionListenerCaptor.capture()
-      );
+    verify(mockActionMenu).setActionListener(
+      eq(Action.SHOW_PROGRAMMATIC_OPTIONS),
+      actionListenerCaptor.capture()
+    );
     actionListenerCaptor
       .getValue()
       .onAction(Action.SHOW_PROGRAMMATIC_OPTIONS, null);
@@ -5030,10 +5308,9 @@ public class EntityActionControllerImplTest {
     );
 
     verify(mockActionMenu).setDownloadMenuEnabled(false);
-    verify(mockActionMenu)
-      .setDownloadMenuTooltipText(
-        "There are no downloadable items in this folder."
-      );
+    verify(mockActionMenu).setDownloadMenuTooltipText(
+      "There are no downloadable items in this folder."
+    );
 
     // No need to see if there are any files
     verify(mockSynapseJavascriptClient, never()).getEntityChildren(any());
@@ -5043,8 +5320,9 @@ public class EntityActionControllerImplTest {
   public void testConfigureContainerDownloadNoFileChildren() {
     EntityChildrenResponse fileChildrenResponse = new EntityChildrenResponse();
     fileChildrenResponse.setPage(Collections.emptyList());
-    when(mockSynapseJavascriptClient.getEntityChildren(any()))
-      .thenReturn(getDoneFuture(fileChildrenResponse));
+    when(mockSynapseJavascriptClient.getEntityChildren(any())).thenReturn(
+      getDoneFuture(fileChildrenResponse)
+    );
 
     entityBundle.setEntity(new Project());
     entityBundle.getEntity().setId(entityId);
@@ -5063,13 +5341,14 @@ public class EntityActionControllerImplTest {
 
     verify(mockActionMenu).setActionVisible(Action.ADD_TO_DOWNLOAD_CART, true);
     verify(mockActionMenu).setActionEnabled(Action.ADD_TO_DOWNLOAD_CART, false);
-    verify(mockActionMenu)
-      .setActionTooltipText(
-        Action.ADD_TO_DOWNLOAD_CART,
-        "There are no files in this folder."
-      );
-    verify(mockActionMenu)
-      .setActionVisible(Action.SHOW_PROGRAMMATIC_OPTIONS, true);
+    verify(mockActionMenu).setActionTooltipText(
+      Action.ADD_TO_DOWNLOAD_CART,
+      "There are no files in this folder."
+    );
+    verify(mockActionMenu).setActionVisible(
+      Action.SHOW_PROGRAMMATIC_OPTIONS,
+      true
+    );
     verify(mockActionMenu).setDownloadMenuEnabled(true);
     verify(mockActionMenu).setDownloadMenuTooltipText(null);
   }
@@ -5088,8 +5367,9 @@ public class EntityActionControllerImplTest {
     profile.setLastName(lastName);
     profile.setUserName(username);
     profile.setEmails(Collections.singletonList(email));
-    when(mockAuthenticationController.getCurrentUserProfile())
-      .thenReturn(profile);
+    when(mockAuthenticationController.getCurrentUserProfile()).thenReturn(
+      profile
+    );
     when(mockGWT.getCurrentURL()).thenReturn(url);
     entityBundle.setEntity(new FileEntity());
     entityBundle.getEntity().setId(entityId);
@@ -5105,28 +5385,26 @@ public class EntityActionControllerImplTest {
     );
 
     verify(mockActionMenu).setActionVisible(Action.REPORT_VIOLATION, true);
-    verify(mockActionMenu)
-      .setActionListener(
-        eq(Action.REPORT_VIOLATION),
-        actionListenerCaptor.capture()
-      );
+    verify(mockActionMenu).setActionListener(
+      eq(Action.REPORT_VIOLATION),
+      actionListenerCaptor.capture()
+    );
 
     // Call under test - invocation
     actionListenerCaptor.getValue().onAction(Action.REPORT_VIOLATION, null);
-    verify(mockJsniUtils)
-      .showJiraIssueCollector(
-        "", // summary
-        FLAG_ISSUE_DESCRIPTION_PART_1 +
-        url +
-        WebConstants.FLAG_ISSUE_DESCRIPTION_PART_2, // description
-        FLAG_ISSUE_COLLECTOR_URL,
-        ownerId,
-        DisplayUtils.getDisplayName(firstName, lastName, username),
-        email,
-        entityId, // Synapse data object ID
-        REVIEW_DATA_REQUEST_COMPONENT_ID,
-        null, // Access requirement ID
-        FLAG_ISSUE_PRIORITY
-      );
+    verify(mockJsniUtils).showJiraIssueCollector(
+      "", // summary
+      FLAG_ISSUE_DESCRIPTION_PART_1 +
+      url +
+      WebConstants.FLAG_ISSUE_DESCRIPTION_PART_2, // description
+      FLAG_ISSUE_COLLECTOR_URL,
+      ownerId,
+      DisplayUtils.getDisplayName(firstName, lastName, username),
+      email,
+      entityId, // Synapse data object ID
+      REVIEW_DATA_REQUEST_COMPONENT_ID,
+      null, // Access requirement ID
+      FLAG_ISSUE_PRIORITY
+    );
   }
 }
