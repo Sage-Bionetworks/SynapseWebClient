@@ -2,3 +2,5 @@
 # You may need to run git config blame.ignoreRevsFile .git-blame-ignore-revs
 ## 2022-11-09 - Ran prettier code-formatter on entire repo after adding lint-staged to enforce code formatting
 53b439d81b4126848ce42514c6b5cc62fe5f5fa8
+## 2024-03-22 - Reverted prettier-plugin-java to v2.5.0 to avoid regression https://github.com/jhipster/prettier-java/issues/650
+09d3d9ef4c2a24d8079ab8dc7947c680f9c42efa
