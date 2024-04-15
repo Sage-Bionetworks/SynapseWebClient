@@ -275,14 +275,15 @@ public class ColumnModelTableRowEditorWidgetImpl
     }
   }
 
-  Set<ColumnTypeViewEnum> unsupportedTypesForViews =
-    new HashSet<ColumnTypeViewEnum>(
-      Arrays.asList(
-        ColumnTypeViewEnum.LargeText,
-        ColumnTypeViewEnum.MediumText,
-        ColumnTypeViewEnum.JSON
-      )
-    );
+  Set<ColumnTypeViewEnum> unsupportedTypesForViews = new HashSet<
+    ColumnTypeViewEnum
+  >(
+    Arrays.asList(
+      ColumnTypeViewEnum.LargeText,
+      ColumnTypeViewEnum.MediumText,
+      ColumnTypeViewEnum.JSON
+    )
+  );
 
   @Override
   public void configure(
@@ -297,10 +298,8 @@ public class ColumnModelTableRowEditorWidgetImpl
       .stream()
       .filter(val ->
         // Only show JSON ColumnType in experimental mode
-        (
-          DisplayUtils.isInTestWebsite(cookies) ||
-          !ColumnTypeViewEnum.JSON.equals(val)
-        )
+        (DisplayUtils.isInTestWebsite(cookies) ||
+          !ColumnTypeViewEnum.JSON.equals(val))
       )
       .filter((val -> (!isView || !unsupportedTypesForViews.contains(val)))) // keep all values for tables, or keep value if not found in unsupportedTypesForViews.
       .forEach(val -> {

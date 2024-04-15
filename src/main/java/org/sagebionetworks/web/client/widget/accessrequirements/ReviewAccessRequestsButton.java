@@ -36,11 +36,12 @@ public class ReviewAccessRequestsButton implements IsWidget {
       new ClickHandler() {
         @Override
         public void onClick(ClickEvent event) {
-          ACTDataAccessSubmissionsPlace place = new ACTDataAccessSubmissionsPlace(
-            ACTDataAccessSubmissionsPlace.ACCESS_REQUIREMENT_ID_PARAM +
-            "=" +
-            ar.getId()
-          );
+          ACTDataAccessSubmissionsPlace place =
+            new ACTDataAccessSubmissionsPlace(
+              ACTDataAccessSubmissionsPlace.ACCESS_REQUIREMENT_ID_PARAM +
+              "=" +
+              ar.getId()
+            );
           globalAppState.getPlaceChanger().goTo(place);
         }
       }

@@ -295,7 +295,8 @@ public class APITableWidget
       cell.setValue(value);
       return cell;
     } else if (ApiTableColumnType.CANCEL_CONTROL.equals(type)) {
-      CancelControlWidget cancelRequestWidget = ginInjector.getCancelControlWidget();
+      CancelControlWidget cancelRequestWidget =
+        ginInjector.getCancelControlWidget();
       cancelRequestWidget.configure(value);
       return cancelRequestWidget;
     } else if (ApiTableColumnType.MARKDOWN_LINK.equals(type)) {
@@ -502,7 +503,9 @@ public class APITableWidget
     List<String> columnNames,
     APITableConfig tableConfig
   ) {
-    List<APITableColumnConfig> defaultConfigs = new ArrayList<APITableColumnConfig>();
+    List<APITableColumnConfig> defaultConfigs = new ArrayList<
+      APITableColumnConfig
+    >();
     // create a config for each column
     for (int i = 0; i < columnNames.size(); i++) {
       APITableColumnConfig newConfig = new APITableColumnConfig();
@@ -541,10 +544,8 @@ public class APITableWidget
           WidgetConstants.API_TABLE_COLUMN_RENDERER_EPOCH_DATE;
       } else if (
         synapseIdColumnNames.contains(lowerCaseColumnName) ||
-        (
-          isNodeQueryService(tableConfig.getUri()) &&
-          WebConstants.DEFAULT_COL_NAME_ID.equals(lowerCaseColumnName)
-        )
+        (isNodeQueryService(tableConfig.getUri()) &&
+          WebConstants.DEFAULT_COL_NAME_ID.equals(lowerCaseColumnName))
       ) {
         defaultRendererName =
           WidgetConstants.API_TABLE_COLUMN_RENDERER_SYNAPSE_ID;

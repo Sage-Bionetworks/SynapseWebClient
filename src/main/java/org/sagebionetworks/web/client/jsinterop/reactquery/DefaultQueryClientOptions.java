@@ -11,7 +11,8 @@ public class DefaultQueryClientOptions {
 
   @JsOverlay
   public static DefaultQueryClientOptions create() {
-    DefaultQueryClientOptions defaultQueryClientOptions = new DefaultQueryClientOptions();
+    DefaultQueryClientOptions defaultQueryClientOptions =
+      new DefaultQueryClientOptions();
     defaultQueryClientOptions.queries = QueryOptions.create();
     return defaultQueryClientOptions;
   }

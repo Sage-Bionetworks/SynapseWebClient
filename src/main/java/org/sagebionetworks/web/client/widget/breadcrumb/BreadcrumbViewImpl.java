@@ -52,15 +52,13 @@ public class BreadcrumbViewImpl implements BreadcrumbView {
         if (data.getPlace() instanceof Synapse) {
           Synapse synapsePlace = (Synapse) data.getPlace();
           href =
-            (
-              "#" +
+            ("#" +
               DisplayUtils.getSynapseHistoryTokenNoHash(
                 synapsePlace.getEntityId(),
                 synapsePlace.getVersionNumber(),
                 synapsePlace.getArea(),
                 synapsePlace.getAreaToken()
-              )
-            );
+              ));
         }
         BreadcrumbItem.OnClick clickHandler = null;
         if (data.getPlace() != null) {

@@ -100,10 +100,8 @@ public class UploadCSVFilePageImpl implements UploadCSVFilePage {
     FileMetadata meta = uploadFile.getFileMeta();
     String contentType = meta.getContentType();
     String fileName = meta.getFileName();
-    ContentTypeDelimiter contentTypeDelimiter = ContentTypeDelimiter.findByContentType(
-      contentType,
-      fileName
-    );
+    ContentTypeDelimiter contentTypeDelimiter =
+      ContentTypeDelimiter.findByContentType(contentType, fileName);
     this.nextPage.configure(
         contentTypeDelimiter,
         fileName,

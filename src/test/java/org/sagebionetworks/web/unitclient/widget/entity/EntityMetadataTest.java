@@ -93,20 +93,20 @@ public class EntityMetadataTest {
 
   @Before
   public void before() {
-    when(mockGinInjector.getVersionHistoryWidget()).thenReturn(
-      mockFileHistoryWidget
-    );
+    when(mockGinInjector.getVersionHistoryWidget())
+      .thenReturn(mockFileHistoryWidget);
     when(mockGinInjector.getCookieProvider()).thenReturn(mockCookies);
-    widget = new EntityMetadata(
-      mockView,
-      mockDoiWidgetV2,
-      mockJsClient,
-      mockJSNI,
-      mockRestrictionWidgetV2,
-      mockItemCountWidget,
-      mockGinInjector,
-      mockEntityModalWidget
-    );
+    widget =
+      new EntityMetadata(
+        mockView,
+        mockDoiWidgetV2,
+        mockJsClient,
+        mockJSNI,
+        mockRestrictionWidgetV2,
+        mockItemCountWidget,
+        mockGinInjector,
+        mockEntityModalWidget
+      );
   }
 
   @Test
@@ -122,17 +122,16 @@ public class EntityMetadataTest {
   public void testSetEntityBundleProject() {
     when(
       mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
-    ).thenReturn(null);
+    )
+      .thenReturn(null);
     UserEntityPermissions permissions = mock(UserEntityPermissions.class);
     boolean canChangePermissions = false;
     boolean canCertifiedUserEdit = true;
     boolean isCurrentVersion = true;
-    when(permissions.getCanChangePermissions()).thenReturn(
-      canChangePermissions
-    );
-    when(permissions.getCanCertifiedUserEdit()).thenReturn(
-      canCertifiedUserEdit
-    );
+    when(permissions.getCanChangePermissions())
+      .thenReturn(canChangePermissions);
+    when(permissions.getCanCertifiedUserEdit())
+      .thenReturn(canCertifiedUserEdit);
     Project project = new Project();
     project.setName(entityName);
     project.setId(entityId);
@@ -154,17 +153,16 @@ public class EntityMetadataTest {
     // Use this test to verify alpha mode behavior
     when(
       mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
-    ).thenReturn("true");
+    )
+      .thenReturn("true");
     UserEntityPermissions permissions = mock(UserEntityPermissions.class);
     boolean canChangePermissions = false;
     boolean canCertifiedUserEdit = true;
     boolean isCurrentVersion = true;
-    when(permissions.getCanChangePermissions()).thenReturn(
-      canChangePermissions
-    );
-    when(permissions.getCanCertifiedUserEdit()).thenReturn(
-      canCertifiedUserEdit
-    );
+    when(permissions.getCanChangePermissions())
+      .thenReturn(canChangePermissions);
+    when(permissions.getCanCertifiedUserEdit())
+      .thenReturn(canCertifiedUserEdit);
     Project project = new Project();
     project.setName(entityName);
     project.setId(entityId);
@@ -187,12 +185,10 @@ public class EntityMetadataTest {
     boolean canChangePermissions = true;
     boolean canCertifiedUserEdit = false;
     boolean isCurrentVersion = true;
-    when(permissions.getCanChangePermissions()).thenReturn(
-      canChangePermissions
-    );
-    when(permissions.getCanCertifiedUserEdit()).thenReturn(
-      canCertifiedUserEdit
-    );
+    when(permissions.getCanChangePermissions())
+      .thenReturn(canChangePermissions);
+    when(permissions.getCanCertifiedUserEdit())
+      .thenReturn(canCertifiedUserEdit);
     DockerRepository dockerRepo = new DockerRepository();
     dockerRepo.setName(entityName);
     dockerRepo.setId(entityId);
@@ -203,10 +199,8 @@ public class EntityMetadataTest {
     Long versionNumber = null;
     widget.configure(bundle, versionNumber, mockActionMenuWidget);
     verify(mockView).setDetailedMetadataVisible(false);
-    verify(mockFileHistoryWidget, never()).setEntityBundle(
-      bundle,
-      versionNumber
-    );
+    verify(mockFileHistoryWidget, never())
+      .setEntityBundle(bundle, versionNumber);
     verify(mockDoiWidgetV2).configure(mockDoiAssociation);
     verify(mockItemCountWidget, never()).configure(anyString());
   }
@@ -217,12 +211,10 @@ public class EntityMetadataTest {
     boolean canChangePermissions = true;
     boolean canCertifiedUserEdit = false;
     boolean isCurrentVersion = true;
-    when(permissions.getCanChangePermissions()).thenReturn(
-      canChangePermissions
-    );
-    when(permissions.getCanCertifiedUserEdit()).thenReturn(
-      canCertifiedUserEdit
-    );
+    when(permissions.getCanChangePermissions())
+      .thenReturn(canChangePermissions);
+    when(permissions.getCanCertifiedUserEdit())
+      .thenReturn(canCertifiedUserEdit);
     FileEntity fileEntity = new FileEntity();
     fileEntity.setName(entityName);
     fileEntity.setId(entityId);
@@ -245,12 +237,10 @@ public class EntityMetadataTest {
     boolean canChangePermissions = true;
     boolean canCertifiedUserEdit = false;
     boolean isCurrentVersion = false;
-    when(permissions.getCanChangePermissions()).thenReturn(
-      canChangePermissions
-    );
-    when(permissions.getCanCertifiedUserEdit()).thenReturn(
-      canCertifiedUserEdit
-    );
+    when(permissions.getCanChangePermissions())
+      .thenReturn(canChangePermissions);
+    when(permissions.getCanCertifiedUserEdit())
+      .thenReturn(canCertifiedUserEdit);
     Long versionNumber = -122L;
     FileEntity fileEntity = new FileEntity();
     fileEntity.setName(entityName);
@@ -276,12 +266,10 @@ public class EntityMetadataTest {
     boolean canChangePermissions = true;
     boolean canCertifiedUserEdit = false;
     boolean isCurrentVersion = true;
-    when(permissions.getCanChangePermissions()).thenReturn(
-      canChangePermissions
-    );
-    when(permissions.getCanCertifiedUserEdit()).thenReturn(
-      canCertifiedUserEdit
-    );
+    when(permissions.getCanChangePermissions())
+      .thenReturn(canChangePermissions);
+    when(permissions.getCanCertifiedUserEdit())
+      .thenReturn(canCertifiedUserEdit);
 
     Long versionNumber = 5L;
     FileEntity fileEntity = new FileEntity();
@@ -296,9 +284,8 @@ public class EntityMetadataTest {
     // The bundle did not contain a DOI, which can happen if the version was specified but there is no versioned DOI
     bundle.setDoiAssociation(null);
     // The unversioned DOI exists
-    when(
-      mockJsClient.getDoiAssociation(entityId, ObjectType.ENTITY, null)
-    ).thenReturn(getDoneFuture(mockDoiAssociation));
+    when(mockJsClient.getDoiAssociation(entityId, ObjectType.ENTITY, null))
+      .thenReturn(getDoneFuture(mockDoiAssociation));
 
     widget.configure(bundle, versionNumber, mockActionMenuWidget);
     verify(mockView).setDetailedMetadataVisible(false);
@@ -312,12 +299,10 @@ public class EntityMetadataTest {
     boolean canChangePermissions = true;
     boolean canCertifiedUserEdit = false;
     boolean isCurrentVersion = true;
-    when(permissions.getCanChangePermissions()).thenReturn(
-      canChangePermissions
-    );
-    when(permissions.getCanCertifiedUserEdit()).thenReturn(
-      canCertifiedUserEdit
-    );
+    when(permissions.getCanChangePermissions())
+      .thenReturn(canChangePermissions);
+    when(permissions.getCanCertifiedUserEdit())
+      .thenReturn(canCertifiedUserEdit);
 
     Long versionNumber = 5L;
     FileEntity fileEntity = new FileEntity();
@@ -332,9 +317,8 @@ public class EntityMetadataTest {
     // The bundle did not contain a DOI
     bundle.setDoiAssociation(null);
     // No unversioned DOI exists (404 will result in failed future)
-    when(
-      mockJsClient.getDoiAssociation(entityId, ObjectType.ENTITY, null)
-    ).thenReturn(getFailedFuture());
+    when(mockJsClient.getDoiAssociation(entityId, ObjectType.ENTITY, null))
+      .thenReturn(getFailedFuture());
 
     widget.configure(bundle, versionNumber, mockActionMenuWidget);
     verify(mockView).setDetailedMetadataVisible(false);
@@ -349,12 +333,10 @@ public class EntityMetadataTest {
     boolean canChangePermissions = true;
     boolean canCertifiedUserEdit = false;
     boolean isCurrentVersion = false; // !
-    when(permissions.getCanChangePermissions()).thenReturn(
-      canChangePermissions
-    );
-    when(permissions.getCanCertifiedUserEdit()).thenReturn(
-      canCertifiedUserEdit
-    );
+    when(permissions.getCanChangePermissions())
+      .thenReturn(canChangePermissions);
+    when(permissions.getCanCertifiedUserEdit())
+      .thenReturn(canCertifiedUserEdit);
 
     Long versionNumber = 5L;
     FileEntity fileEntity = new FileEntity();
@@ -389,7 +371,8 @@ public class EntityMetadataTest {
     exS3Destination.setBucket("testBucket");
     exS3Destination.setBaseKey("testBaseKey");
     uploadDestinations.add(exS3Destination);
-    AsyncMockStubber.callSuccessWith(uploadDestinations)
+    AsyncMockStubber
+      .callSuccessWith(uploadDestinations)
       .when(mockJsClient)
       .getUploadDestinations(anyString(), any(AsyncCallback.class));
     widget.configureStorageLocation(folderEntity);
@@ -408,7 +391,8 @@ public class EntityMetadataTest {
     exGCDestination.setBucket("testBucket");
     exGCDestination.setBaseKey("testBaseKey");
     uploadDestinations.add(exGCDestination);
-    AsyncMockStubber.callSuccessWith(uploadDestinations)
+    AsyncMockStubber
+      .callSuccessWith(uploadDestinations)
       .when(mockJsClient)
       .getUploadDestinations(anyString(), any(AsyncCallback.class));
     widget.configureStorageLocation(folderEntity);
@@ -426,7 +410,8 @@ public class EntityMetadataTest {
     exS3Destination.setUrl("sftp://testUrl.com/abcdef");
     exS3Destination.setUploadType(UploadType.SFTP);
     uploadDestinations.add(exS3Destination);
-    AsyncMockStubber.callSuccessWith(uploadDestinations)
+    AsyncMockStubber
+      .callSuccessWith(uploadDestinations)
       .when(mockJsClient)
       .getUploadDestinations(anyString(), any(AsyncCallback.class));
     widget.configureStorageLocation(folderEntity);
@@ -444,7 +429,8 @@ public class EntityMetadataTest {
     exS3Destination.setUploadType(UploadType.HTTPS);
     exS3Destination.setUrl("testUrl.com");
     uploadDestinations.add(exS3Destination);
-    AsyncMockStubber.callSuccessWith(uploadDestinations)
+    AsyncMockStubber
+      .callSuccessWith(uploadDestinations)
       .when(mockJsClient)
       .getUploadDestinations(anyString(), any(AsyncCallback.class));
     widget.configureStorageLocation(folderEntity);
@@ -466,7 +452,8 @@ public class EntityMetadataTest {
     exS3Destination.setEndpointUrl(endpointUrl);
     exS3Destination.setBucket(bucket);
     uploadDestinations.add(exS3Destination);
-    AsyncMockStubber.callSuccessWith(uploadDestinations)
+    AsyncMockStubber
+      .callSuccessWith(uploadDestinations)
       .when(mockJsClient)
       .getUploadDestinations(anyString(), any(AsyncCallback.class));
     widget.configureStorageLocation(folderEntity);
@@ -477,7 +464,8 @@ public class EntityMetadataTest {
 
   @Test
   public void testConfigureStorageLocationSynapseStorage() {
-    AsyncMockStubber.callSuccessWith(null)
+    AsyncMockStubber
+      .callSuccessWith(null)
       .when(mockJsClient)
       .getUploadDestinations(anyString(), any(AsyncCallback.class));
     widget.configureStorageLocation(folderEntity);
@@ -488,7 +476,8 @@ public class EntityMetadataTest {
 
   @Test
   public void testConfigureStorageLocationFailure() {
-    AsyncMockStubber.callFailureWith(new Exception("This is an exception!"))
+    AsyncMockStubber
+      .callFailureWith(new Exception("This is an exception!"))
       .when(mockJsClient)
       .getUploadDestinations(anyString(), any(AsyncCallback.class));
     widget.configureStorageLocation(folderEntity);
@@ -499,7 +488,8 @@ public class EntityMetadataTest {
 
   @Test
   public void testConfigureStorageLocationFile() {
-    AsyncMockStubber.callSuccessWith(null)
+    AsyncMockStubber
+      .callSuccessWith(null)
       .when(mockJsClient)
       .getUploadDestinations(anyString(), any(AsyncCallback.class));
     widget.configureStorageLocation(new FileEntity());
@@ -513,12 +503,10 @@ public class EntityMetadataTest {
     boolean canChangePermissions = false;
     boolean canCertifiedUserEdit = true;
     boolean isCurrentVersion = true;
-    when(permissions.getCanChangePermissions()).thenReturn(
-      canChangePermissions
-    );
-    when(permissions.getCanCertifiedUserEdit()).thenReturn(
-      canCertifiedUserEdit
-    );
+    when(permissions.getCanChangePermissions())
+      .thenReturn(canChangePermissions);
+    when(permissions.getCanCertifiedUserEdit())
+      .thenReturn(canCertifiedUserEdit);
     EntityBundle bundle = new EntityBundle();
     bundle.setEntity(folderEntity);
     folderEntity.setId(entityId);
@@ -527,10 +515,8 @@ public class EntityMetadataTest {
     widget.configure(bundle, null, mockActionMenuWidget);
     verify(mockView).setDetailedMetadataVisible(false);
     verify(mockDoiWidgetV2).configure(mockDoiAssociation);
-    verify(mockRestrictionWidgetV2).configure(
-      folderEntity,
-      canChangePermissions
-    );
+    verify(mockRestrictionWidgetV2)
+      .configure(folderEntity, canChangePermissions);
     verify(mockView, never()).setRestrictionWidgetV2Visible(false);
     verify(mockItemCountWidget).configure(entityId);
   }
@@ -540,7 +526,8 @@ public class EntityMetadataTest {
     // We currently only show the description field for Tables
     when(
       mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
-    ).thenReturn("true");
+    )
+      .thenReturn("true");
 
     String description = "A description for a table";
 
@@ -553,12 +540,10 @@ public class EntityMetadataTest {
     UserEntityPermissions permissions = mock(UserEntityPermissions.class);
     boolean canChangePermissions = false;
     boolean canCertifiedUserEdit = true;
-    when(permissions.getCanChangePermissions()).thenReturn(
-      canChangePermissions
-    );
-    when(permissions.getCanCertifiedUserEdit()).thenReturn(
-      canCertifiedUserEdit
-    );
+    when(permissions.getCanChangePermissions())
+      .thenReturn(canChangePermissions);
+    when(permissions.getCanCertifiedUserEdit())
+      .thenReturn(canCertifiedUserEdit);
     bundle.setPermissions(permissions);
     bundle.setDoiAssociation(mockDoiAssociation);
 
@@ -575,7 +560,8 @@ public class EntityMetadataTest {
   public void testNoDescriptionForNonTables() {
     when(
       mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
-    ).thenReturn("true");
+    )
+      .thenReturn("true");
 
     String description = "A description for a FOLDER";
 
@@ -588,12 +574,10 @@ public class EntityMetadataTest {
     UserEntityPermissions permissions = mock(UserEntityPermissions.class);
     boolean canChangePermissions = false;
     boolean canCertifiedUserEdit = true;
-    when(permissions.getCanChangePermissions()).thenReturn(
-      canChangePermissions
-    );
-    when(permissions.getCanCertifiedUserEdit()).thenReturn(
-      canCertifiedUserEdit
-    );
+    when(permissions.getCanChangePermissions())
+      .thenReturn(canChangePermissions);
+    when(permissions.getCanCertifiedUserEdit())
+      .thenReturn(canCertifiedUserEdit);
     bundle.setPermissions(permissions);
     bundle.setDoiAssociation(mockDoiAssociation);
 
@@ -606,7 +590,8 @@ public class EntityMetadataTest {
   public void testNoDescriptionWithoutExperimentalMode() {
     when(
       mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
-    ).thenReturn(null);
+    )
+      .thenReturn(null);
 
     String description = "A description for a table";
 
@@ -619,12 +604,10 @@ public class EntityMetadataTest {
     UserEntityPermissions permissions = mock(UserEntityPermissions.class);
     boolean canChangePermissions = false;
     boolean canCertifiedUserEdit = true;
-    when(permissions.getCanChangePermissions()).thenReturn(
-      canChangePermissions
-    );
-    when(permissions.getCanCertifiedUserEdit()).thenReturn(
-      canCertifiedUserEdit
-    );
+    when(permissions.getCanChangePermissions())
+      .thenReturn(canChangePermissions);
+    when(permissions.getCanCertifiedUserEdit())
+      .thenReturn(canCertifiedUserEdit);
     bundle.setPermissions(permissions);
     bundle.setDoiAssociation(mockDoiAssociation);
 
@@ -635,9 +618,8 @@ public class EntityMetadataTest {
 
   @Test
   public void testSetAnnotationsVisible() {
-    when(
-      mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)
-    ).thenReturn("true");
+    when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+      .thenReturn("true");
 
     widget.setAnnotationsVisible(true);
 

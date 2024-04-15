@@ -37,7 +37,8 @@ public class ChangeUsernamePresenterTest {
   SynapseClientAsync mockSynapseClient;
   SynapseAlert mockSynAlert;
   AdapterFactory adapterFactory = new AdapterFactoryImpl();
-  private static JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
+  private static JSONObjectAdapter jsonObjectAdapter =
+    new JSONObjectAdapterImpl();
   PlaceChanger mockPlaceChanger;
   AcceptsOneWidget mockPanel;
   EventBus mockEventBus;

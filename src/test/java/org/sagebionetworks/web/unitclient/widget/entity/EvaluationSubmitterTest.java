@@ -198,7 +198,9 @@ public class EvaluationSubmitterTest {
 
     requirements = new PaginatedResults<TermsOfUseAccessRequirement>();
     requirements.setTotalNumberOfResults(0);
-    List<TermsOfUseAccessRequirement> ars = new ArrayList<TermsOfUseAccessRequirement>();
+    List<TermsOfUseAccessRequirement> ars = new ArrayList<
+      TermsOfUseAccessRequirement
+    >();
     requirements.setResults(ars);
 
     // by default, this is a standard evaluation (no challenge)
@@ -268,7 +270,8 @@ public class EvaluationSubmitterTest {
     // also set contributors, and verify on individual submission that this is not set in the submission
     // add eligible member
     Long eligibleMemberId = 60L;
-    MemberSubmissionEligibility memberEligibility = new MemberSubmissionEligibility();
+    MemberSubmissionEligibility memberEligibility =
+      new MemberSubmissionEligibility();
     memberEligibility.setPrincipalId(eligibleMemberId);
     memberEligibility.setIsEligible(true);
     memberEligibilityList.add(memberEligibility);
@@ -505,7 +508,8 @@ public class EvaluationSubmitterTest {
 
     // set contributor list
     Long eligibleMemberId = 60L;
-    MemberSubmissionEligibility memberEligibility = new MemberSubmissionEligibility();
+    MemberSubmissionEligibility memberEligibility =
+      new MemberSubmissionEligibility();
     memberEligibility.setPrincipalId(eligibleMemberId);
     memberEligibility.setIsEligible(true);
     memberEligibilityList.add(memberEligibility);
@@ -576,7 +580,8 @@ public class EvaluationSubmitterTest {
 
     // add eligible member
     Long eligibleMemberId = 60L;
-    MemberSubmissionEligibility memberEligibility = new MemberSubmissionEligibility();
+    MemberSubmissionEligibility memberEligibility =
+      new MemberSubmissionEligibility();
     memberEligibility.setPrincipalId(eligibleMemberId);
     memberEligibility.setIsEligible(true);
     memberEligibilityList.add(memberEligibility);
@@ -729,7 +734,8 @@ public class EvaluationSubmitterTest {
     submitter.onTeamSubmissionOptionClicked();
     submitter.onTeamSelected(0);
     Long eligibleMemberId = 60L;
-    MemberSubmissionEligibility memberEligibility = new MemberSubmissionEligibility();
+    MemberSubmissionEligibility memberEligibility =
+      new MemberSubmissionEligibility();
     memberEligibility.setPrincipalId(eligibleMemberId);
     memberEligibility.setIsEligible(true);
     memberEligibilityList.add(memberEligibility);

@@ -130,7 +130,8 @@ public class ACTPresenter
           boolean isACT = true;
           boolean isModal = false;
           for (VerificationSubmission submission : results.getResults()) {
-            VerificationSubmissionWidget w = ginInjector.getVerificationSubmissionWidget();
+            VerificationSubmissionWidget w =
+              ginInjector.getVerificationSubmissionWidget();
             w.configure(submission, isACT, isModal);
             loadMoreContainer.add(w.asWidget());
             w.show();

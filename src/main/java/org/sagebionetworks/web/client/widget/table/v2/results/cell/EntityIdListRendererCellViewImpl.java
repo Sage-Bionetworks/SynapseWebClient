@@ -48,7 +48,8 @@ public class EntityIdListRendererCellViewImpl
         int arrayLength = parsedJson.length();
         for (int i = 0; i < arrayLength; i++) {
           String entityId = parsedJson.get(i).toString();
-          EntityIdCellRenderer renderer = ginInjector.createEntityIdCellRenderer();
+          EntityIdCellRenderer renderer =
+            ginInjector.createEntityIdCellRenderer();
           renderer.setValue(entityId);
           div.add(renderer);
         }

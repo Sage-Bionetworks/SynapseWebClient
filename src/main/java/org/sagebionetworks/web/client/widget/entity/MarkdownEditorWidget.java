@@ -545,9 +545,8 @@ public class MarkdownEditorWidget
       String innerText = widgetSelectionState.getInnerWidgetText();
       view.setSelectionRange(widgetStartIndex, innerText.length());
       String contentTypeKey = widgetRegistrar.getWidgetContentType(innerText);
-      Map<String, String> widgetDescriptor = widgetRegistrar.getWidgetDescriptor(
-        innerText
-      );
+      Map<String, String> widgetDescriptor =
+        widgetRegistrar.getWidgetDescriptor(innerText);
 
       WidgetDescriptorUpdatedHandler handler = event -> {
         // replace old widget text

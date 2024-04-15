@@ -167,7 +167,8 @@ public class PasswordResetSignedTokenPresenterTest {
         changePasswordWithTokenCaptor.capture(),
         any(AsyncCallback.class)
       );
-    ChangePasswordWithToken changePasswordWithTokenRequest = changePasswordWithTokenCaptor.getValue();
+    ChangePasswordWithToken changePasswordWithTokenRequest =
+      changePasswordWithTokenCaptor.getValue();
     assertEquals(newPassword, changePasswordWithTokenRequest.getNewPassword());
     assertEquals(
       mockPasswordResetSignedToken,

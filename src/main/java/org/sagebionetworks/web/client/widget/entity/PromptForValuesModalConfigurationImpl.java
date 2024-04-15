@@ -191,7 +191,8 @@ public class PromptForValuesModalConfigurationImpl
 
     @Override
     public PromptForValuesModalConfigurationImpl buildConfiguration() {
-      PromptForValuesModalConfigurationImpl configuration = new PromptForValuesModalConfigurationImpl();
+      PromptForValuesModalConfigurationImpl configuration =
+        new PromptForValuesModalConfigurationImpl();
       configuration.setTitle(this.title);
       configuration.setBodyCopy(this.bodyCopy);
       configuration.setPrompts(this.prompts);

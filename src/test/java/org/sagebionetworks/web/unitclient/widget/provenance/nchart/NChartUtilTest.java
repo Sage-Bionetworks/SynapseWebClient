@@ -122,10 +122,8 @@ public class NChartUtilTest {
     d4.setStartingNode(true);
 
     // execute
-    NChartLayersArrayTestImpl ncLayersArray = (NChartLayersArrayTestImpl) NChartUtil.createLayers(
-      jsoProvider,
-      graph
-    );
+    NChartLayersArrayTestImpl ncLayersArray =
+      (NChartLayersArrayTestImpl) NChartUtil.createLayers(jsoProvider, graph);
 
     // verify
     List<NChartLayer> layers = ncLayersArray.getLayers();
@@ -138,11 +136,12 @@ public class NChartUtilTest {
     aConnectedNodes.add(d2);
     aConnectedNodes.add(d3);
     aConnectedNodes.add(d4);
-    NChartLayerNodeTestImpl lnA = (NChartLayerNodeTestImpl) NChartUtil.createActivityLayerNode(
-      jsoProvider,
-      a,
-      aConnectedNodes
-    );
+    NChartLayerNodeTestImpl lnA =
+      (NChartLayerNodeTestImpl) NChartUtil.createActivityLayerNode(
+        jsoProvider,
+        a,
+        aConnectedNodes
+      );
 
     int layerIdx;
     List<NChartLayerNode> layerNodes;
@@ -203,10 +202,8 @@ public class NChartUtilTest {
     d5.setStartingNode(true);
 
     // execute
-    NChartLayersArrayTestImpl ncLayersArray = (NChartLayersArrayTestImpl) NChartUtil.createLayers(
-      jsoProvider,
-      graph
-    );
+    NChartLayersArrayTestImpl ncLayersArray =
+      (NChartLayersArrayTestImpl) NChartUtil.createLayers(jsoProvider, graph);
 
     // verify
     List<NChartLayer> layers = ncLayersArray.getLayers();
@@ -219,39 +216,43 @@ public class NChartUtilTest {
     List<ProvGraphNode> aConnectedNodes = new ArrayList<ProvGraphNode>();
     aConnectedNodes.add(d1);
     aConnectedNodes.add(d2);
-    NChartLayerNodeTestImpl lnA = (NChartLayerNodeTestImpl) NChartUtil.createActivityLayerNode(
-      jsoProvider,
-      a,
-      aConnectedNodes
-    );
+    NChartLayerNodeTestImpl lnA =
+      (NChartLayerNodeTestImpl) NChartUtil.createActivityLayerNode(
+        jsoProvider,
+        a,
+        aConnectedNodes
+      );
 
     List<ProvGraphNode> bConnectedNodes = new ArrayList<ProvGraphNode>();
     aConnectedNodes.add(d2);
     aConnectedNodes.add(d3);
-    NChartLayerNodeTestImpl lnB = (NChartLayerNodeTestImpl) NChartUtil.createActivityLayerNode(
-      jsoProvider,
-      b,
-      bConnectedNodes
-    );
+    NChartLayerNodeTestImpl lnB =
+      (NChartLayerNodeTestImpl) NChartUtil.createActivityLayerNode(
+        jsoProvider,
+        b,
+        bConnectedNodes
+      );
 
     List<ProvGraphNode> cConnectedNodes = new ArrayList<ProvGraphNode>();
     aConnectedNodes.add(d3);
     aConnectedNodes.add(d4);
     aConnectedNodes.add(d6);
-    NChartLayerNodeTestImpl lnC = (NChartLayerNodeTestImpl) NChartUtil.createActivityLayerNode(
-      jsoProvider,
-      c,
-      cConnectedNodes
-    );
+    NChartLayerNodeTestImpl lnC =
+      (NChartLayerNodeTestImpl) NChartUtil.createActivityLayerNode(
+        jsoProvider,
+        c,
+        cConnectedNodes
+      );
 
     List<ProvGraphNode> dConnectedNodes = new ArrayList<ProvGraphNode>();
     aConnectedNodes.add(d5);
     aConnectedNodes.add(d4);
-    NChartLayerNodeTestImpl lnD = (NChartLayerNodeTestImpl) NChartUtil.createActivityLayerNode(
-      jsoProvider,
-      d,
-      dConnectedNodes
-    );
+    NChartLayerNodeTestImpl lnD =
+      (NChartLayerNodeTestImpl) NChartUtil.createActivityLayerNode(
+        jsoProvider,
+        d,
+        dConnectedNodes
+      );
 
     int layerIdx;
     List<NChartLayerNode> layerNodes;
@@ -358,10 +359,8 @@ public class NChartUtilTest {
     d4.setStartingNode(true);
 
     // execute
-    NChartLayersArrayTestImpl ncLayersArray = (NChartLayersArrayTestImpl) NChartUtil.createLayers(
-      jsoProvider,
-      graph
-    );
+    NChartLayersArrayTestImpl ncLayersArray =
+      (NChartLayersArrayTestImpl) NChartUtil.createLayers(jsoProvider, graph);
 
     // verify
     List<NChartLayer> layers = ncLayersArray.getLayers();
@@ -373,20 +372,22 @@ public class NChartUtilTest {
     aConnectedNodes.add(d1);
     aConnectedNodes.add(d2);
     aConnectedNodes.add(d3);
-    NChartLayerNodeTestImpl lnA = (NChartLayerNodeTestImpl) NChartUtil.createActivityLayerNode(
-      jsoProvider,
-      a,
-      aConnectedNodes
-    );
+    NChartLayerNodeTestImpl lnA =
+      (NChartLayerNodeTestImpl) NChartUtil.createActivityLayerNode(
+        jsoProvider,
+        a,
+        aConnectedNodes
+      );
     List<ProvGraphNode> bConnectedNodes = new ArrayList<ProvGraphNode>();
     bConnectedNodes.add(d1);
     bConnectedNodes.add(d3);
     bConnectedNodes.add(d4);
-    NChartLayerNodeTestImpl lnB = (NChartLayerNodeTestImpl) NChartUtil.createActivityLayerNode(
-      jsoProvider,
-      b,
-      bConnectedNodes
-    );
+    NChartLayerNodeTestImpl lnB =
+      (NChartLayerNodeTestImpl) NChartUtil.createActivityLayerNode(
+        jsoProvider,
+        b,
+        bConnectedNodes
+      );
 
     int layerIdx;
     List<NChartLayerNode> layerNodes;
@@ -580,7 +581,10 @@ public class NChartUtilTest {
     graph.addEdge(new ProvGraphEdge(a, d2));
     d1.setStartingNode(true);
 
-    Map<String, List<XYPoint>> idToPoints = new HashMap<String, List<XYPoint>>();
+    Map<String, List<XYPoint>> idToPoints = new HashMap<
+      String,
+      List<XYPoint>
+    >();
     idToPoints.put(
       d2.getId(),
       Arrays.asList(new XYPoint[] { new XYPointTestImpl(200, 1) })

@@ -22,7 +22,8 @@ public class ReferenceJSNIObject extends JavaScriptObject {
   public final native int getTargetVersionNumber() /*-{ return this.targetVersionNumber || -1 }-*/;
 
   public final org.sagebionetworks.repo.model.Reference getJavaObject() {
-    org.sagebionetworks.repo.model.Reference r = new org.sagebionetworks.repo.model.Reference();
+    org.sagebionetworks.repo.model.Reference r =
+      new org.sagebionetworks.repo.model.Reference();
     r.setTargetId(this.getTargetId());
     if (this.getTargetVersionNumber() == -1) {
       r.setTargetVersionNumber(null);

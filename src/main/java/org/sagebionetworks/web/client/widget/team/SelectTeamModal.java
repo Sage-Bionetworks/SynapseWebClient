@@ -48,7 +48,8 @@ public class SelectTeamModal implements SelectTeamModalView.Presenter {
 
   @Override
   public void onSelectTeam() {
-    UserGroupSuggestion suggestion = (UserGroupSuggestion) teamSuggestBox.getSelectedSuggestion();
+    UserGroupSuggestion suggestion =
+      (UserGroupSuggestion) teamSuggestBox.getSelectedSuggestion();
     if (suggestion != null && teamIdSelectedCallback != null) {
       teamIdSelectedCallback.invoke(suggestion.getId());
     }

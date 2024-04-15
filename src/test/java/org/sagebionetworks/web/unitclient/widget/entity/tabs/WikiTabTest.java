@@ -127,7 +127,8 @@ public class WikiTabTest {
 
     verify(mockWikiPageWidget)
       .setWikiReloadHandler(mockWikiReloadHandlerCaptor.capture());
-    CallbackP<String> mockWikiReloadHandler = mockWikiReloadHandlerCaptor.getValue();
+    CallbackP<String> mockWikiReloadHandler =
+      mockWikiReloadHandlerCaptor.getValue();
 
     // simulate reload of a different wiki page ID
     String newSubWikiPageId = "10";

@@ -9,7 +9,10 @@
   <bh:Div>
     <bh:Div ui:field="loadingUI">
       <w:LoadingSpinner size="16px" />
-      <bh:Text>&nbsp; Loading...</bh:Text>
+      <bh:Text>
+        &nbsp;
+        Loading...
+      </bh:Text>
     </bh:Div>
 
     <b:Alert type="WARNING" ui:field="errorUI">

@@ -11,7 +11,9 @@ public class AccessRequirementUtils {
     List<AccessRequirement> unfilteredList,
     ACCESS_TYPE filter
   ) {
-    List<AccessRequirement> filteredAccessRequirements = new ArrayList<AccessRequirement>();
+    List<AccessRequirement> filteredAccessRequirements = new ArrayList<
+      AccessRequirement
+    >();
     if (unfilteredList != null) {
       for (AccessRequirement accessRequirement : unfilteredList) {
         if (filter.equals(accessRequirement.getAccessType())) {

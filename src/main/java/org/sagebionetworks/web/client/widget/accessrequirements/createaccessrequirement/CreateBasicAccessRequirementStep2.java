@@ -88,7 +88,8 @@ public class CreateBasicAccessRequirementStep2
       accessRequirement instanceof HasAccessorRequirement
     );
     if (accessRequirement instanceof HasAccessorRequirement) {
-      HasAccessorRequirement hasAccessorRequirement = (HasAccessorRequirement) accessRequirement;
+      HasAccessorRequirement hasAccessorRequirement =
+        (HasAccessorRequirement) accessRequirement;
       view.setIsCertifiedUserRequired(
         hasAccessorRequirement.getIsCertifiedUserRequired()
       );
@@ -156,7 +157,8 @@ public class CreateBasicAccessRequirementStep2
   @Override
   public void onPrimary() {
     if (accessRequirement instanceof HasAccessorRequirement) {
-      HasAccessorRequirement hasAccessorRequirement = (HasAccessorRequirement) accessRequirement;
+      HasAccessorRequirement hasAccessorRequirement =
+        (HasAccessorRequirement) accessRequirement;
       // update AR
       hasAccessorRequirement.setIsCertifiedUserRequired(
         view.isCertifiedUserRequired()

@@ -156,7 +156,8 @@ public class OpenUserInvitationsWidget
         );
       } else if (mis.getInviteeEmail() != null) {
         // Invitee is an email address
-        EmailInvitationBadge emailInvitationBadge = ginInjector.getEmailInvitationBadgeWidget();
+        EmailInvitationBadge emailInvitationBadge =
+          ginInjector.getEmailInvitationBadgeWidget();
         emailInvitationBadge.configure(mis.getInviteeEmail());
         view.addInvitation(
           emailInvitationBadge,

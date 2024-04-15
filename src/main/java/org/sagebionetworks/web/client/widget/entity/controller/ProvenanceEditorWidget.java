@@ -97,8 +97,12 @@ public class ProvenanceEditorWidget
           view.setDescription(result.getDescription());
           Set<Used> allProvenance = result.getUsed();
           if (allProvenance != null) {
-            List<ProvenanceEntry> usedEntries = new LinkedList<ProvenanceEntry>();
-            List<ProvenanceEntry> executedEntries = new LinkedList<ProvenanceEntry>();
+            List<ProvenanceEntry> usedEntries = new LinkedList<
+              ProvenanceEntry
+            >();
+            List<ProvenanceEntry> executedEntries = new LinkedList<
+              ProvenanceEntry
+            >();
             for (Used provEntry : allProvenance) {
               ProvenanceEntry toAdd;
               if (provEntry instanceof UsedEntity) {

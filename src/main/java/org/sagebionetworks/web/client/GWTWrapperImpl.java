@@ -27,10 +27,8 @@ public class GWTWrapperImpl implements GWTWrapper {
 
   private static final RegExp PATTERN_WHITE_SPACE = RegExp.compile("^\\s+$");
   // Used to replace all characters expect letters and numbers.
-  private static final RegExp PRINICPAL_UNIQUENESS_REPLACE_PATTERN = RegExp.compile(
-    "[^a-z0-9]",
-    "gi"
-  );
+  private static final RegExp PRINICPAL_UNIQUENESS_REPLACE_PATTERN =
+    RegExp.compile("[^a-z0-9]", "gi");
 
   public int scrollTop = -1;
 

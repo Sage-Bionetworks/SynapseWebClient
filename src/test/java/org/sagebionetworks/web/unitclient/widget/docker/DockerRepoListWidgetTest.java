@@ -114,9 +114,8 @@ public class DockerRepoListWidgetTest {
 
   @Test
   public void testCreateDockerRepoEntityQuery() {
-    EntityChildrenRequest query = dockerRepoListWidget.createDockerRepoEntityQuery(
-      projectId
-    );
+    EntityChildrenRequest query =
+      dockerRepoListWidget.createDockerRepoEntityQuery(projectId);
     assertEquals(projectId, query.getParentId());
     assertEquals(
       Collections.singletonList(EntityType.dockerrepo),

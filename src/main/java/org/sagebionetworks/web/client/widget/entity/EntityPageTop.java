@@ -422,8 +422,10 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
       public void onSuccess(EntityBundle bundle) {
         view.setProjectLoadingVisible(false);
         // by default, all tab entity bundles point to the project entity bundle
-        projectBundle = filesEntityBundle = tablesEntityBundle =
-          datasetsEntityBundle = dockerEntityBundle = bundle;
+        projectBundle =
+          filesEntityBundle =
+            tablesEntityBundle =
+              datasetsEntityBundle = dockerEntityBundle = bundle;
         projectTitleBar.configure(projectBundle);
         projectMetadata.configure(projectBundle, null, projectActionMenu);
         view.setProjectUIVisible(true);
@@ -649,32 +651,24 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
     // SWC-3137: show all tabs, until project display settings state persists. Challenge is still
     // dependent on content.
     // always show the discussion tab
-    getTabVisibilityCallback(
-      EntityArea.DISCUSSION,
-      discussionTab.asTab()
-    ).onSuccess(true);
+    getTabVisibilityCallback(EntityArea.DISCUSSION, discussionTab.asTab())
+      .onSuccess(true);
     if (
       projectBundle == null ||
       projectBundle.getPermissions() == null ||
       projectBundle.getPermissions().getCanEdit()
     ) {
       // if user can edit, then show other tabs
-      getTabVisibilityCallback(EntityArea.WIKI, wikiTab.asTab()).onSuccess(
-        true
-      );
-      getTabVisibilityCallback(EntityArea.FILES, filesTab.asTab()).onSuccess(
-        true
-      );
-      getTabVisibilityCallback(
-        EntityArea.DATASETS,
-        datasetsTab.asTab()
-      ).onSuccess(true);
-      getTabVisibilityCallback(EntityArea.TABLES, tablesTab.asTab()).onSuccess(
-        true
-      );
-      getTabVisibilityCallback(EntityArea.DOCKER, dockerTab.asTab()).onSuccess(
-        true
-      );
+      getTabVisibilityCallback(EntityArea.WIKI, wikiTab.asTab())
+        .onSuccess(true);
+      getTabVisibilityCallback(EntityArea.FILES, filesTab.asTab())
+        .onSuccess(true);
+      getTabVisibilityCallback(EntityArea.DATASETS, datasetsTab.asTab())
+        .onSuccess(true);
+      getTabVisibilityCallback(EntityArea.TABLES, tablesTab.asTab())
+        .onSuccess(true);
+      getTabVisibilityCallback(EntityArea.DOCKER, dockerTab.asTab())
+        .onSuccess(true);
     } else {
       // otherwise only show the tabs only if content is present.
       synapseJavascriptClient.isWiki(

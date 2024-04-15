@@ -80,12 +80,10 @@ public class WikiPageKey implements IsSerializable {
     result =
       prime * result + ((ownerObjectId == null) ? 0 : ownerObjectId.hashCode());
     result =
-      prime *
-      result +
+      prime * result +
       ((ownerObjectType == null) ? 0 : ownerObjectType.hashCode());
     result =
-      prime *
-      result +
+      prime * result +
       ((ownerObjectVersion == null) ? 0 : ownerObjectVersion.hashCode());
     result =
       prime * result + ((wikiPageId == null) ? 0 : wikiPageId.hashCode());

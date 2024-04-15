@@ -37,7 +37,8 @@ public class RestTemplateProviderImpl implements RestTemplateProvider {
     // This connection manager allows us to have multiple thread
     // making http calls.
     // For now use the default values.
-    PoolingHttpClientConnectionManager poolingManager = new PoolingHttpClientConnectionManager();
+    PoolingHttpClientConnectionManager poolingManager =
+      new PoolingHttpClientConnectionManager();
     poolingManager.setMaxTotal(maxTotalConnections);
     HttpClientBuilder builder = HttpClientBuilder.create();
     builder.setConnectionManager(poolingManager);
@@ -46,9 +47,8 @@ public class RestTemplateProviderImpl implements RestTemplateProvider {
     );
     HttpClient client = builder.build();
     // We can now use this manager to create our rest template
-    HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory(
-      client
-    );
+    HttpComponentsClientHttpRequestFactory factory =
+      new HttpComponentsClientHttpRequestFactory(client);
     tempalteSingleton = new RestTemplate(factory);
   }
 

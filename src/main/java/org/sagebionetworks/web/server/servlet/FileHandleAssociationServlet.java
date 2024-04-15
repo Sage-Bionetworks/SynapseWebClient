@@ -30,7 +30,8 @@ public class FileHandleAssociationServlet extends HttpServlet {
 
   public static final String ERROR_PLACE = "#!Error:";
   private static final long serialVersionUID = 1L;
-  protected static final ThreadLocal<HttpServletRequest> perThreadRequest = new ThreadLocal<HttpServletRequest>();
+  protected static final ThreadLocal<HttpServletRequest> perThreadRequest =
+    new ThreadLocal<HttpServletRequest>();
   private SynapseProvider synapseProvider = new SynapseProviderImpl();
   public static final long CACHE_TIME_SECONDS = 30; // 30 seconds
   private TokenProvider tokenProvider = () ->

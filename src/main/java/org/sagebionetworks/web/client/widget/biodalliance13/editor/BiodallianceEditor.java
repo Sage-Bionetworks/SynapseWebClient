@@ -113,7 +113,9 @@ public class BiodallianceEditor
     Map<String, String> descriptor
   ) {
     // reconstruct biodalliance sources (if there are any)
-    List<BiodallianceSourceEditor> sources = new ArrayList<BiodallianceSourceEditor>();
+    List<BiodallianceSourceEditor> sources = new ArrayList<
+      BiodallianceSourceEditor
+    >();
     int i = 0;
     while (
       descriptor.containsKey(WidgetConstants.BIODALLIANCE_SOURCE_PREFIX + i)
@@ -121,7 +123,8 @@ public class BiodallianceEditor
       String sourceJsonString = descriptor.get(
         WidgetConstants.BIODALLIANCE_SOURCE_PREFIX + i
       );
-      BiodallianceSourceEditor editor = ginInjector.getBiodallianceSourceEditor();
+      BiodallianceSourceEditor editor =
+        ginInjector.getBiodallianceSourceEditor();
       editor.setSourceJson(sourceJsonString);
       editor.setSelectionChangedCallback(selectionChangedCallback);
       sources.add(editor);
@@ -173,9 +176,8 @@ public class BiodallianceEditor
 
     // and add the sources to the map
     for (int j = 0; j < selectableItemList.size(); j++) {
-      BiodallianceSourceEditor sourceEditor = (BiodallianceSourceEditor) selectableItemList.get(
-        j
-      );
+      BiodallianceSourceEditor sourceEditor =
+        (BiodallianceSourceEditor) selectableItemList.get(j);
       descriptor.put(
         WidgetConstants.BIODALLIANCE_SOURCE_PREFIX + j,
         sourceEditor.toJsonObject().toString()

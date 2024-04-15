@@ -211,7 +211,8 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
   @Override
   public void setPageDescription(String newDescription) {
     if (Document.get() != null) {
-      NodeList<com.google.gwt.dom.client.Element> tags = Document.get()
+      NodeList<com.google.gwt.dom.client.Element> tags = Document
+        .get()
         .getElementsByTagName("meta");
       for (int i = 0; i < tags.getLength(); i++) {
         MetaElement metaTag = ((MetaElement) tags.getItem(i));

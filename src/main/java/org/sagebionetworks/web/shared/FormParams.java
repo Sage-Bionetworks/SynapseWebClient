@@ -34,12 +34,10 @@ public class FormParams implements IsSerializable {
     final int prime = 31;
     int result = 1;
     result =
-      prime *
-      result +
+      prime * result +
       ((containerSynId == null) ? 0 : containerSynId.hashCode());
     result =
-      prime *
-      result +
+      prime * result +
       ((jsonSchemaSynId == null) ? 0 : jsonSchemaSynId.hashCode());
     result =
       prime * result + ((uiSchemaSynId == null) ? 0 : uiSchemaSynId.hashCode());

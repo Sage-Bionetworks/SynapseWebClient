@@ -119,7 +119,9 @@ public class VideoWidget implements WidgetRendererPresenter {
   ) {
     EntityBundleRequest request = new EntityBundleRequest();
     request.setIncludeFileHandles(true);
-    List<ListenableFuture<EntityBundle>> entityBundleCalls = new ArrayList<ListenableFuture<EntityBundle>>();
+    List<ListenableFuture<EntityBundle>> entityBundleCalls = new ArrayList<
+      ListenableFuture<EntityBundle>
+    >();
     if (mp4SynapseId != null) {
       entityBundleCalls.add(jsClient.getEntityBundle(mp4SynapseId, request));
     }

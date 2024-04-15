@@ -142,8 +142,10 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 public class SynapseJavascriptClientTest {
 
   SynapseJavascriptClient client;
-  private static SynapseJavascriptFactory synapseJsFactory = new SynapseJavascriptFactory();
-  private static JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
+  private static SynapseJavascriptFactory synapseJsFactory =
+    new SynapseJavascriptFactory();
+  private static JSONObjectAdapter jsonObjectAdapter =
+    new JSONObjectAdapterImpl();
   public static final String REPO_ENDPOINT = "http://repo-endpoint/v1";
   public static final String FILE_ENDPOINT = "http://file-endpoint/v1";
   public static final String AUTH_ENDPOINT = "http://auth-endpoint/v1";
@@ -244,81 +246,52 @@ public class SynapseJavascriptClientTest {
     String reason = "error message";
     ErrorResponseCode errorResponseCode = null;
     assertTrue(
-      getException(
-        SC_UNAUTHORIZED,
-        reason,
-        errorResponseCode
-      ) instanceof UnauthorizedException
+      getException(SC_UNAUTHORIZED, reason, errorResponseCode) instanceof
+      UnauthorizedException
     );
     assertTrue(
-      getException(
-        SC_FORBIDDEN,
-        reason,
-        errorResponseCode
-      ) instanceof ForbiddenException
+      getException(SC_FORBIDDEN, reason, errorResponseCode) instanceof
+      ForbiddenException
     );
     assertTrue(
-      getException(
-        SC_NOT_FOUND,
-        reason,
-        errorResponseCode
-      ) instanceof NotFoundException
+      getException(SC_NOT_FOUND, reason, errorResponseCode) instanceof
+      NotFoundException
     );
     assertTrue(
-      getException(
-        SC_BAD_REQUEST,
-        reason,
-        errorResponseCode
-      ) instanceof BadRequestException
+      getException(SC_BAD_REQUEST, reason, errorResponseCode) instanceof
+      BadRequestException
     );
     assertTrue(
-      getException(
-        SC_LOCKED,
-        reason,
-        errorResponseCode
-      ) instanceof LockedException
+      getException(SC_LOCKED, reason, errorResponseCode) instanceof
+      LockedException
     );
     assertTrue(
-      getException(
-        SC_PRECONDITION_FAILED,
-        reason,
-        errorResponseCode
-      ) instanceof ConflictingUpdateException
+      getException(SC_PRECONDITION_FAILED, reason, errorResponseCode) instanceof
+      ConflictingUpdateException
     );
     assertTrue(
-      getException(
-        SC_GONE,
-        reason,
-        errorResponseCode
-      ) instanceof DeprecatedServiceException
+      getException(SC_GONE, reason, errorResponseCode) instanceof
+      DeprecatedServiceException
     );
     assertTrue(
       getException(
         SynapseTooManyRequestsException.TOO_MANY_REQUESTS_STATUS_CODE,
         reason,
         errorResponseCode
-      ) instanceof TooManyRequestsException
+      ) instanceof
+      TooManyRequestsException
     );
     assertTrue(
-      getException(
-        SC_SERVICE_UNAVAILABLE,
-        reason,
-        errorResponseCode
-      ) instanceof SynapseDownException
+      getException(SC_SERVICE_UNAVAILABLE, reason, errorResponseCode) instanceof
+      SynapseDownException
     );
     assertTrue(
-      getException(
-        SC_CONFLICT,
-        reason,
-        errorResponseCode
-      ) instanceof ConflictException
+      getException(SC_CONFLICT, reason, errorResponseCode) instanceof
+      ConflictException
     );
     assertTrue(
-      getException(
-        -1,
-        reason,
-        errorResponseCode
-      ) instanceof UnknownErrorException
+      getException(-1, reason, errorResponseCode) instanceof
+      UnknownErrorException
     );
 
     assertNull(
@@ -783,46 +756,36 @@ public class SynapseJavascriptClientTest {
     JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
     new FileEntity().writeToJSONObject(adapter);
     assertTrue(
-      synapseJsFactory.newInstance(
-        OBJECT_TYPE.Entity,
-        adapter
-      ) instanceof FileEntity
+      synapseJsFactory.newInstance(OBJECT_TYPE.Entity, adapter) instanceof
+      FileEntity
     );
 
     adapter = jsonObjectAdapter.createNew();
     new Folder().writeToJSONObject(adapter);
     assertTrue(
-      synapseJsFactory.newInstance(
-        OBJECT_TYPE.Entity,
-        adapter
-      ) instanceof Folder
+      synapseJsFactory.newInstance(OBJECT_TYPE.Entity, adapter) instanceof
+      Folder
     );
 
     adapter = jsonObjectAdapter.createNew();
     new EntityView().writeToJSONObject(adapter);
     assertTrue(
-      synapseJsFactory.newInstance(
-        OBJECT_TYPE.Entity,
-        adapter
-      ) instanceof EntityView
+      synapseJsFactory.newInstance(OBJECT_TYPE.Entity, adapter) instanceof
+      EntityView
     );
 
     adapter = jsonObjectAdapter.createNew();
     new TableEntity().writeToJSONObject(adapter);
     assertTrue(
-      synapseJsFactory.newInstance(
-        OBJECT_TYPE.Entity,
-        adapter
-      ) instanceof TableEntity
+      synapseJsFactory.newInstance(OBJECT_TYPE.Entity, adapter) instanceof
+      TableEntity
     );
 
     adapter = jsonObjectAdapter.createNew();
     new Project().writeToJSONObject(adapter);
     assertTrue(
-      synapseJsFactory.newInstance(
-        OBJECT_TYPE.Entity,
-        adapter
-      ) instanceof Project
+      synapseJsFactory.newInstance(OBJECT_TYPE.Entity, adapter) instanceof
+      Project
     );
 
     adapter = jsonObjectAdapter.createNew();
@@ -834,19 +797,15 @@ public class SynapseJavascriptClientTest {
     adapter = jsonObjectAdapter.createNew();
     new Preview().writeToJSONObject(adapter);
     assertTrue(
-      synapseJsFactory.newInstance(
-        OBJECT_TYPE.Entity,
-        adapter
-      ) instanceof Preview
+      synapseJsFactory.newInstance(OBJECT_TYPE.Entity, adapter) instanceof
+      Preview
     );
 
     adapter = jsonObjectAdapter.createNew();
     new DockerRepository().writeToJSONObject(adapter);
     assertTrue(
-      synapseJsFactory.newInstance(
-        OBJECT_TYPE.Entity,
-        adapter
-      ) instanceof DockerRepository
+      synapseJsFactory.newInstance(OBJECT_TYPE.Entity, adapter) instanceof
+      DockerRepository
     );
   }
 
@@ -1082,10 +1041,11 @@ public class SynapseJavascriptClientTest {
     JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
     resultBundle.writeToJSONObject(adapter);
 
-    QueryResultBundle newResultBundleInstance = (QueryResultBundle) synapseJsFactory.newInstance(
-      OBJECT_TYPE.AsyncResponse,
-      adapter
-    );
+    QueryResultBundle newResultBundleInstance =
+      (QueryResultBundle) synapseJsFactory.newInstance(
+        OBJECT_TYPE.AsyncResponse,
+        adapter
+      );
 
     assertEquals(resultBundle, newResultBundleInstance);
   }

@@ -118,7 +118,8 @@ public class PasswordResetPresenter
   @Override
   public void resetPassword(String currentPassword, String newPassword) {
     synAlert.clear();
-    ChangePasswordWithCurrentPassword changePasswordRequest = new ChangePasswordWithCurrentPassword();
+    ChangePasswordWithCurrentPassword changePasswordRequest =
+      new ChangePasswordWithCurrentPassword();
     changePasswordRequest.setCurrentPassword(currentPassword);
     changePasswordRequest.setNewPassword(newPassword);
     changePasswordRequest.setUsername(
@@ -132,7 +133,8 @@ public class PasswordResetPresenter
           view.showInfo(DisplayConstants.PASSWORD_RESET_TEXT);
           view.showPasswordResetSuccess();
 
-          UserProfile profile = authenticationController.getCurrentUserProfile();
+          UserProfile profile =
+            authenticationController.getCurrentUserProfile();
           if (
             profile != null &&
             profile.getUserName() != null &&

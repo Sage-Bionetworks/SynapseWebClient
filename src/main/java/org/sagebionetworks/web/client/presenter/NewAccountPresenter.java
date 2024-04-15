@@ -116,7 +116,8 @@ public class NewAccountPresenter
   ) {
     view.setLoading(true);
     synAlert.clear();
-    EmailValidationSignedToken emailValidationSignedToken = accountCreationToken.getEmailValidationSignedToken();
+    EmailValidationSignedToken emailValidationSignedToken =
+      accountCreationToken.getEmailValidationSignedToken();
     userAccountService.createUserStep2(
       userName.trim(),
       fName.trim(),

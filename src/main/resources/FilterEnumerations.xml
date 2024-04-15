@@ -6,27 +6,45 @@
       <operator>GREATER_THAN</operator>
       <values>
         <displayable>
-          <display>&gt;25</display>
+          <display>
+            &gt;
+            25
+          </display>
           <value>25</value>
         </displayable>
         <displayable>
-          <display>&gt;50</display>
+          <display>
+            &gt;
+            50
+          </display>
           <value>50</value>
         </displayable>
         <displayable>
-          <display>&gt;100</display>
+          <display>
+            &gt;
+            100
+          </display>
           <value>100</value>
         </displayable>
         <displayable>
-          <display>&gt;1000</display>
+          <display>
+            &gt;
+            1000
+          </display>
           <value>1000</value>
         </displayable>
         <displayable>
-          <display>&gt;5,000</display>
+          <display>
+            &gt;
+            5,000
+          </display>
           <value>5000</value>
         </displayable>
         <displayable>
-          <display>&gt;10,000</display>
+          <display>
+            &gt;
+            10,000
+          </display>
           <value>10000</value>
         </displayable>
       </values>

@@ -27,7 +27,8 @@ import org.sagebionetworks.web.shared.WebConstants;
 public abstract class OAuth2Servlet extends HttpServlet {
 
   private SynapseProvider synapseProvider = new SynapseProviderImpl();
-  protected static final ThreadLocal<HttpServletRequest> perThreadRequest = new ThreadLocal<>();
+  protected static final ThreadLocal<HttpServletRequest> perThreadRequest =
+    new ThreadLocal<>();
 
   private final RequestHostProvider requestHostProvider = () ->
     UserDataProvider.getThreadLocalRequestHost(
