@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.accessrequirements;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -10,21 +8,28 @@ import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.jsinterop.CreateOrUpdateAccessRequirementWizardProps;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.Button;
 import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateAccessRequirementWizard;
+import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateOrUpdateAccessRequirementWizard;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
+import org.sagebionetworks.web.client.widget.entity.renderer.SingleButtonView;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
 
-public class CreateAccessRequirementButton implements IsWidget {
+public class CreateAccessRequirementButton
+  implements SingleButtonView.Presenter, IsWidget {
+
+  private SingleButtonView view;
+  private CookieProvider cookies;
 
   public static final String CREATE_NEW_ACCESS_REQUIREMENT_BUTTON_TEXT =
     "Create New Access Requirement";
   public static final String EDIT_ACCESS_REQUIREMENT_BUTTON_TEXT =
     "Edit Access Requirement";
-  public Button button;
   public IsACTMemberAsyncHandler isACTMemberAsyncHandler;
   public PortalGinInjector ginInjector;
   RestrictableObjectDescriptor subject;
@@ -33,49 +38,25 @@ public class CreateAccessRequirementButton implements IsWidget {
 
   @Inject
   public CreateAccessRequirementButton(
-    Button button,
+    SingleButtonView view,
     IsACTMemberAsyncHandler isACTMemberAsyncHandler,
+    CookieProvider cookies,
     final PortalGinInjector ginInjector
   ) {
-    this.button = button;
+    this.view = view;
     this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
     this.ginInjector = ginInjector;
-    button.setVisible(false);
-    button.addStyleName("margin-left-10");
-    button.addClickHandler(
-      new ClickHandler() {
-        @Override
-        public void onClick(ClickEvent event) {
-          CreateAccessRequirementWizard wizard =
-            ginInjector.getCreateAccessRequirementWizard();
-          if (subject != null) {
-            wizard.configure(subject);
-          } else if (ar != null) {
-            wizard.configure(ar);
-          }
-          wizard.showModal(
-            new WizardCallback() {
-              @Override
-              public void onFinished() {
-                refreshCallback.invoke();
-              }
-
-              @Override
-              public void onCanceled() {
-                refreshCallback.invoke();
-              }
-            }
-          );
-        }
-      }
-    );
+    this.cookies = cookies;
+    view.setButtonVisible(false);
+    view.addStyleNames("margin-left-10");
+    view.setPresenter(this);
   }
 
   public void configure(AccessRequirement ar, Callback refreshCallback) {
-    button.setText(EDIT_ACCESS_REQUIREMENT_BUTTON_TEXT);
-    button.setSize(ButtonSize.DEFAULT);
-    button.setType(ButtonType.DEFAULT);
-    button.setIcon(IconType.EDIT);
+    view.setButtonText(EDIT_ACCESS_REQUIREMENT_BUTTON_TEXT);
+    view.setButtonSize(ButtonSize.DEFAULT);
+    view.setButtonType(ButtonType.DEFAULT);
+    view.setButtonIcon(IconType.EDIT);
     this.refreshCallback = refreshCallback;
     this.subject = null;
     this.ar = ar;
@@ -86,10 +67,10 @@ public class CreateAccessRequirementButton implements IsWidget {
     RestrictableObjectDescriptor subject,
     Callback refreshCallback
   ) {
-    button.setText(CREATE_NEW_ACCESS_REQUIREMENT_BUTTON_TEXT);
-    button.setSize(ButtonSize.LARGE);
-    button.setType(ButtonType.PRIMARY);
-    button.setIcon(IconType.PLUS);
+    view.setButtonText(CREATE_NEW_ACCESS_REQUIREMENT_BUTTON_TEXT);
+    view.setButtonSize(ButtonSize.LARGE);
+    view.setButtonType(ButtonType.PRIMARY);
+    view.setButtonIcon(IconType.PLUS);
     this.refreshCallback = refreshCallback;
     this.subject = subject;
     this.ar = null;
@@ -101,13 +82,72 @@ public class CreateAccessRequirementButton implements IsWidget {
       new CallbackP<Boolean>() {
         @Override
         public void invoke(Boolean isACTMember) {
-          button.setVisible(isACTMember);
+          view.setButtonVisible(isACTMember);
         }
       }
     );
   }
 
+  @Override
+  public void onClick() {
+    if (DisplayUtils.isInTestWebsite(cookies)) {
+      useSrcWizard();
+    } else {
+      useSwcWizard();
+    }
+  }
+
+  private void useSwcWizard() {
+    CreateAccessRequirementWizard wizard =
+      ginInjector.getCreateAccessRequirementWizard();
+    if (subject != null) {
+      wizard.configure(subject);
+    } else if (ar != null) {
+      wizard.configure(ar);
+    }
+    wizard.showModal(
+      new WizardCallback() {
+        @Override
+        public void onFinished() {
+          refreshCallback.invoke();
+          view.clearWidgets();
+        }
+
+        @Override
+        public void onCanceled() {
+          refreshCallback.invoke();
+          view.clearWidgets();
+        }
+      }
+    );
+  }
+
+  private void useSrcWizard() {
+    CreateOrUpdateAccessRequirementWizard wizard =
+      ginInjector.getCreateOrUpdateAccessRequirementWizard();
+
+    CreateOrUpdateAccessRequirementWizardProps.OnComplete onComplete = () -> {
+      wizard.setOpen(false);
+      refreshCallback.invoke();
+      view.clearWidgets();
+    };
+    CreateOrUpdateAccessRequirementWizardProps.OnCancel onCancel = () -> {
+      wizard.setOpen(false);
+      refreshCallback.invoke();
+      view.clearWidgets();
+    };
+
+    if (subject != null) {
+      wizard.configure(subject, onComplete, onCancel);
+    } else if (ar != null) {
+      wizard.configure(ar, onComplete, onCancel);
+    }
+    wizard.setOpen(true);
+    view.addWidget(wizard.asWidget());
+  }
+
+  @Override
   public Widget asWidget() {
-    return button.asWidget();
+    return view.asWidget();
   }
 }
