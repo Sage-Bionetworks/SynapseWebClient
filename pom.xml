@@ -503,6 +503,76 @@
                   tofile="src/main/webapp/generated/papaparse.min.js"
                 />
                 <copy
+                  file="${project.basedir}/node_modules/katex/dist/katex.min.js"
+                  tofile="src/main/webapp/generated/katex.min.js"
+                />
+                <copy
+                  file="${project.basedir}/node_modules/katex/dist/katex.min.css"
+                  tofile="src/main/webapp/generated/katex.min.css"
+                />
+                <copy
+                  file="${project.basedir}/node_modules/markdown-it/dist/markdown-it.min.js"
+                  tofile="src/main/webapp/generated/markdown-it.js"
+                />
+                <copy
+                  file="${project.basedir}/node_modules/markdown-it-br/dist/markdown-it-br.min.js"
+                  tofile="src/main/webapp/generated/markdown-it-br.js"
+                />
+                <copy
+                  file="${project.basedir}/node_modules/markdown-it-center-text/dist/markdown-it-center-text.min.js"
+                  tofile="src/main/webapp/generated/markdown-it-center-text.js"
+                />
+                <copy
+                  file="${project.basedir}/node_modules/markdown-it-container/dist/markdown-it-container.min.js"
+                  tofile="src/main/webapp/generated/markdown-it-container.js"
+                />
+                <copy
+                  file="${project.basedir}/node_modules/markdown-it-emphasis-alt/dist/markdown-it-emphasis-alt.min.js"
+                  tofile="src/main/webapp/generated/markdown-it-emphasis-alt.js"
+                />
+                <copy
+                  file="${project.basedir}/node_modules/markdown-it-inline-comments/dist/markdown-it-inline-comments.min.js"
+                  tofile="src/main/webapp/generated/markdown-it-inline-comments.js"
+                />
+
+                <copy
+                  file="${project.basedir}/node_modules/markdown-it-math/dist/markdown-it-math.min.js"
+                  tofile="src/main/webapp/generated/markdown-it-math.js"
+                />
+
+                <copy
+                  file="${project.basedir}/node_modules/markdown-it-strikethrough-alt/dist/markdown-it-strikethrough-alt.min.js"
+                  tofile="src/main/webapp/generated/markdown-it-strikethrough-alt.js"
+                />
+                <copy
+                  file="${project.basedir}/node_modules/markdown-it-sub-alt/dist/markdown-it-sub.min.js"
+                  tofile="src/main/webapp/generated/markdown-it-sub.js"
+                />
+                <copy
+                  file="${project.basedir}/node_modules/markdown-it-sup-alt/dist/markdown-it-sup.min.js"
+                  tofile="src/main/webapp/generated/markdown-it-sup.js"
+                />
+
+                <copy
+                  file="${project.basedir}/node_modules/markdown-it-synapse/dist/index.global.js"
+                  tofile="src/main/webapp/generated/markdown-it-synapse.js"
+                />
+
+                <copy
+                  file="${project.basedir}/node_modules/markdown-it-synapse-heading/dist/markdown-it-synapse-heading.min.js"
+                  tofile="src/main/webapp/generated/markdown-it-synapse-heading.js"
+                />
+
+                <copy
+                  file="${project.basedir}/node_modules/markdown-it-synapse-math/dist/markdown-it-synapse-math.min.js"
+                  tofile="src/main/webapp/generated/markdown-it-synapse-math.js"
+                />
+
+                <copy
+                  file="${project.basedir}/node_modules/markdown-it-synapse-table/dist/markdown-it-synapse-table.min.js"
+                  tofile="src/main/webapp/generated/markdown-it-synapse-table.js"
+                />
+                <copy
                   file="${project.basedir}/node_modules/xss/dist/xss.min.js"
                   tofile="src/main/webapp/generated/xss.min.js"
                 />
