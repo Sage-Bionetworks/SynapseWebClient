@@ -19,6 +19,7 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sagebionetworks.repo.model.EntityType.dataset;
 import static org.sagebionetworks.web.client.DisplayConstants.FILE_VIEW;
 import static org.sagebionetworks.web.client.DisplayConstants.MATERIALIZED_VIEW;
 import static org.sagebionetworks.web.client.DisplayConstants.SUBMISSION_VIEW;
@@ -121,12 +122,18 @@ import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
+import org.sagebionetworks.web.client.context.KeyFactoryProvider;
+import org.sagebionetworks.web.client.context.QueryClientProvider;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.jsinterop.CreateTableViewWizardProps;
+import org.sagebionetworks.web.client.jsinterop.KeyFactory;
 import org.sagebionetworks.web.client.jsinterop.SqlDefinedTableEditorModalProps;
 import org.sagebionetworks.web.client.jsinterop.ToastMessageOptions;
+import org.sagebionetworks.web.client.jsinterop.reactquery.InvalidateQueryFilters;
+import org.sagebionetworks.web.client.jsinterop.reactquery.QueryClient;
+import org.sagebionetworks.web.client.jsinterop.reactquery.QueryKey;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
@@ -387,6 +394,18 @@ public class EntityActionControllerImplTest {
   ContainerClientsHelp mockContainerClientsHelp;
 
   @Mock
+  QueryClientProvider mockQueryClientProvider;
+
+  @Mock
+  QueryClient mockQueryClient;
+
+  @Mock
+  KeyFactoryProvider mockKeyFactoryProvider;
+
+  @Mock
+  KeyFactory mockKeyFactory;
+
+  @Mock
   Dataset mockDataset;
 
   @Captor
@@ -425,6 +444,8 @@ public class EntityActionControllerImplTest {
       .thenReturn(currentUserId);
     when(mockGlobalApplicationState.getPlaceChanger())
       .thenReturn(mockPlaceChanger);
+    when(mockKeyFactoryProvider.getKeyFactory(anyString()))
+      .thenReturn(mockKeyFactory);
 
     when(mockPortalGinInjector.getSynapseProperties())
       .thenReturn(mockSynapseProperties);
@@ -491,6 +512,7 @@ public class EntityActionControllerImplTest {
       .thenReturn(getDoneFuture(false));
     when(mockSynapseJavascriptClient.getRestrictionInformation(any(), any()))
       .thenReturn(getDoneFuture(mockRestrictionInformation));
+    when(mockQueryClientProvider.getQueryClient()).thenReturn(mockQueryClient);
 
     // The controller under test.
     controller =
@@ -503,7 +525,9 @@ public class EntityActionControllerImplTest {
         mockIsACTMemberAsyncHandler,
         mockGWT,
         mockEventBus,
-        mockPopupUtils
+        mockPopupUtils,
+        mockQueryClientProvider,
+        mockKeyFactoryProvider
       );
 
     parentId = "syn456";
@@ -2620,6 +2644,12 @@ public class EntityActionControllerImplTest {
       .deleteEntityById(anyString(), any(AsyncCallback.class));
     verify(mockView)
       .showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE + error);
+    QueryKey mockQueryKey = mock(QueryKey.class);
+    when(mockKeyFactory.getTrashCanItemsQueryKey()).thenReturn(mockQueryKey);
+    verify(mockKeyFactoryProvider, never()).getKeyFactory(anyString());
+    verify(mockKeyFactory, never()).getTrashCanItemsQueryKey();
+    verify(mockQueryClient, never())
+      .invalidateQueries(any(InvalidateQueryFilters.class));
   }
 
   @Test
@@ -2662,6 +2692,12 @@ public class EntityActionControllerImplTest {
       );
     verify(mockPlaceChanger)
       .goTo(new Synapse(parentId, null, EntityArea.TABLES, null));
+    QueryKey mockQueryKey = mock(QueryKey.class);
+    when(mockKeyFactory.getTrashCanItemsQueryKey()).thenReturn(mockQueryKey);
+    verify(mockKeyFactoryProvider).getKeyFactory(anyString());
+    verify(mockKeyFactory).getTrashCanItemsQueryKey();
+    verify(mockQueryClient)
+      .invalidateQueries(any(InvalidateQueryFilters.class));
   }
 
   @Test
@@ -2876,6 +2912,7 @@ public class EntityActionControllerImplTest {
   @Test
   public void testRenameDatasetIsNotLatestVersion() {
     entityBundle.setEntity(mockDataset);
+    entityBundle.setEntityType(dataset);
     AsyncMockStubber
       .callWithInvoke()
       .when(mockPreflightController)
@@ -2899,16 +2936,13 @@ public class EntityActionControllerImplTest {
       .onRename(any(Entity.class), any(Callback.class));
     verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
     verify(mockView)
-      .showErrorMessage(
-        "Can only change the name of the most recent " +
-        entityBundle.getEntityType() +
-        " version."
-      );
+      .showErrorMessage("Can only change the name of the draft dataset.");
   }
 
   @Test
   public void testRenameDatasetIsLatestVersion() {
     entityBundle.setEntity(mockDataset);
+    entityBundle.setEntityType(dataset);
     AsyncMockStubber
       .callWithInvoke()
       .when(mockPreflightController)
@@ -2932,11 +2966,7 @@ public class EntityActionControllerImplTest {
       .onRename(any(Entity.class), any(Callback.class));
     verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
     verify(mockView, never())
-      .showErrorMessage(
-        "Can only change the name of the most recent " +
-        entityBundle.getEntityType() +
-        " version."
-      );
+      .showErrorMessage("Can only change the name of the draft dataset.");
   }
 
   @Test

@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.controller;
 
 import static com.google.common.util.concurrent.Futures.whenAllComplete;
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
+import static org.sagebionetworks.repo.model.EntityType.dataset;
 import static org.sagebionetworks.web.client.EntityTypeUtils.DATASET_COLLECTION_DISPLAY_NAME;
 import static org.sagebionetworks.web.client.EntityTypeUtils.getFriendlyEntityTypeName;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
@@ -83,13 +84,18 @@ import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.context.KeyFactoryProvider;
+import org.sagebionetworks.web.client.context.QueryClientProvider;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.jsinterop.AlertButtonConfig;
 import org.sagebionetworks.web.client.jsinterop.EntityFinderScope;
+import org.sagebionetworks.web.client.jsinterop.KeyFactory;
 import org.sagebionetworks.web.client.jsinterop.ReactMouseEvent;
 import org.sagebionetworks.web.client.jsinterop.ToastMessageOptions;
+import org.sagebionetworks.web.client.jsinterop.reactquery.InvalidateQueryFilters;
+import org.sagebionetworks.web.client.jsinterop.reactquery.QueryClient;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
@@ -287,6 +293,8 @@ public class EntityActionControllerImpl
   ChallengeTab challengeTab;
   PopupUtilsView popupUtils;
   ContainerClientsHelp containerClientsHelp;
+  QueryClient queryClient;
+  KeyFactoryProvider keyFactoryProvider;
 
   @Inject
   public EntityActionControllerImpl(
@@ -298,7 +306,9 @@ public class EntityActionControllerImpl
     IsACTMemberAsyncHandler isACTMemberAsyncHandler,
     GWTWrapper gwt,
     EventBus eventBus,
-    PopupUtilsView popupUtilsView
+    PopupUtilsView popupUtilsView,
+    QueryClientProvider queryClientProvider,
+    KeyFactoryProvider keyFactoryProvider
   ) {
     super();
     this.view = view;
@@ -310,6 +320,8 @@ public class EntityActionControllerImpl
     this.gwt = gwt;
     this.eventBus = eventBus;
     this.popupUtils = popupUtilsView;
+    this.queryClient = queryClientProvider.getQueryClient();
+    this.keyFactoryProvider = keyFactoryProvider;
     entityUpdatedWizardCallback =
       new WizardCallback() {
         @Override
@@ -2619,11 +2631,15 @@ public class EntityActionControllerImpl
         postCheckRename();
       });
     } else {
-      view.showErrorMessage(
-        "Can only change the name of the most recent " +
-        entityBundle.getEntityType() +
-        " version."
-      );
+      if (entityBundle.getEntityType() == dataset) {
+        view.showErrorMessage("Can only change the name of the draft dataset.");
+      } else {
+        view.showErrorMessage(
+          "Can only change the name of the most recent " +
+          entityBundle.getEntityType() +
+          " version."
+        );
+      }
     }
   }
 
@@ -2809,6 +2825,14 @@ public class EntityActionControllerImpl
             // Go to entity's parent
             Place gotoPlace = createDeletePlace();
             getGlobalApplicationState().getPlaceChanger().goTo(gotoPlace);
+            KeyFactory keyFactory = keyFactoryProvider.getKeyFactory(
+              authenticationController.getCurrentUserAccessToken()
+            );
+            queryClient.invalidateQueries(
+              InvalidateQueryFilters.create(
+                keyFactory.getTrashCanItemsQueryKey()
+              )
+            );
           }
 
           @Override

@@ -14,4 +14,6 @@ public class KeyFactory {
   public native QueryKey getDownloadListBaseQueryKey();
 
   public native QueryKey getEntityQueryKey(String entityId);
+
+  public native QueryKey getTrashCanItemsQueryKey();
 }
