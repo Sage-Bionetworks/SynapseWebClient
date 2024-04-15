@@ -91,7 +91,8 @@ public class DockerCommitListWidget
             }
           } else {
             for (final DockerCommit commit : result) {
-              DockerCommitRowWidget dockerCommitRow = ginInjector.createNewDockerCommitRowWidget();
+              DockerCommitRowWidget dockerCommitRow =
+                ginInjector.createNewDockerCommitRowWidget();
               dockerCommitRow.configure(commit);
               dockerCommitRow.setOnClickCallback(
                 new CallbackP<DockerCommit>() {

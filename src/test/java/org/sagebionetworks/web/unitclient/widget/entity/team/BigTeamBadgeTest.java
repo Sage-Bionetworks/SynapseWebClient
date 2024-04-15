@@ -52,20 +52,23 @@ public class BigTeamBadgeTest {
 
   @Before
   public void setUp() throws Exception {
-    presenter = new BigTeamBadge(
-      mockView,
-      mockJsClient,
-      mockJsniUtils,
-      mockAuthenticationController,
-      mockTeamMemberCountWidget
-    );
+    presenter =
+      new BigTeamBadge(
+        mockView,
+        mockJsClient,
+        mockJsniUtils,
+        mockAuthenticationController,
+        mockTeamMemberCountWidget
+      );
     when(mockTeam.getName()).thenReturn("simpleteam");
     when(mockTeam.getDescription()).thenReturn(TEAM_DESCRIPTION);
     when(mockTeam.getIcon()).thenReturn("1111");
-    AsyncMockStubber.callSuccessWith(TEAM_ICON_URL)
+    AsyncMockStubber
+      .callSuccessWith(TEAM_ICON_URL)
       .when(mockJsClient)
       .getTeamPicturePreviewURL(anyString(), any(AsyncCallback.class));
-    AsyncMockStubber.callSuccessWith(mockTeam)
+    AsyncMockStubber
+      .callSuccessWith(mockTeam)
       .when(mockJsClient)
       .getTeam(anyString(), any(AsyncCallback.class));
   }
@@ -79,7 +82,8 @@ public class BigTeamBadgeTest {
 
   @Test
   public void testConfigureFailedToGetIcon() {
-    AsyncMockStubber.callFailureWith(new Exception("failed"))
+    AsyncMockStubber
+      .callFailureWith(new Exception("failed"))
       .when(mockJsClient)
       .getTeamPicturePreviewURL(anyString(), any(AsyncCallback.class));
 

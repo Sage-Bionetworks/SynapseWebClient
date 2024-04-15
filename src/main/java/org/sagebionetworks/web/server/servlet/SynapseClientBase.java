@@ -119,9 +119,8 @@ public class SynapseClientBase
     String accessToken
   ) {
     // SynapseClient is stateful, so always create a new one
-    org.sagebionetworks.client.SynapseClient synapseClient = synapseProvider.createNewClient(
-      requestHost
-    );
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      synapseProvider.createNewClient(requestHost);
     if (accessToken != null) {
       synapseClient.setBearerAuthorizationToken(accessToken);
     }

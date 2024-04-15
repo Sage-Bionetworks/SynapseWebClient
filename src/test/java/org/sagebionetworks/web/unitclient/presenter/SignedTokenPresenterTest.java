@@ -318,7 +318,8 @@ public class SignedTokenPresenterTest {
   @Test
   public void testSetPlaceUnsubscribe() {
     // For the unsubscribe token, a special view is shown.
-    NotificationSettingsSignedToken token = new NotificationSettingsSignedToken();
+    NotificationSettingsSignedToken token =
+      new NotificationSettingsSignedToken();
     AsyncMockStubber
       .callSuccessWith(token)
       .when(mockSynapseClient)

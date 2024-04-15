@@ -127,7 +127,10 @@ public class EvaluationAccessControlListEditor
   }
 
   public HashMap<PermissionLevel, String> getPermissionsToDisplay() {
-    HashMap<PermissionLevel, String> permissionDisplay = new HashMap<PermissionLevel, String>();
+    HashMap<PermissionLevel, String> permissionDisplay = new HashMap<
+      PermissionLevel,
+      String
+    >();
     permissionDisplay.put(
       PermissionLevel.CAN_VIEW,
       DisplayConstants.MENU_PERMISSION_LEVEL_CAN_VIEW
@@ -457,7 +460,9 @@ public class EvaluationAccessControlListEditor
     validateEditorState();
     synAlert.clear();
     // Create an async callback to receive the updated ACL from Synapse
-    AsyncCallback<AccessControlList> callback = new AsyncCallback<AccessControlList>() {
+    AsyncCallback<AccessControlList> callback = new AsyncCallback<
+      AccessControlList
+    >() {
       @Override
       public void onSuccess(AccessControlList result) {
         acl = result;

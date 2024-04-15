@@ -107,12 +107,13 @@ public class EntityViewScopeWidget
 
   @Override
   public void updateViewTypeMask() {
-    tableType = TableType.getEntityViewTableType(
-      view.isFileSelected(),
-      view.isFolderSelected(),
-      view.isTableSelected(),
-      view.isDatasetSelected()
-    );
+    tableType =
+      TableType.getEntityViewTableType(
+        view.isFileSelected(),
+        view.isFolderSelected(),
+        view.isTableSelected(),
+        view.isDatasetSelected()
+      );
   }
 
   @Override

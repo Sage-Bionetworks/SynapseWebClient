@@ -57,20 +57,15 @@ public class PublicPrincipalIds implements IsSerializable {
     final int prime = 31;
     int result = 1;
     result =
-      prime *
-      result +
+      prime * result +
       ((anonymousUserId == null) ? 0 : anonymousUserId.hashCode());
     result =
-      prime *
-      result +
-      (
-        (authenticatedAclPrincipalId == null)
+      prime * result +
+      ((authenticatedAclPrincipalId == null)
           ? 0
-          : authenticatedAclPrincipalId.hashCode()
-      );
+          : authenticatedAclPrincipalId.hashCode());
     result =
-      prime *
-      result +
+      prime * result +
       ((publicAclPrincipalId == null) ? 0 : publicAclPrincipalId.hashCode());
     return result;
   }

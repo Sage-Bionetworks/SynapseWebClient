@@ -98,7 +98,9 @@ public class PlotlyConfigEditorTest {
   ArgumentCaptor<List<String>> availableColumnNamesCaptor;
 
   @Captor
-  ArgumentCaptor<EntityFinderWidget.SelectedHandler<Reference>> finderCallbackCaptor;
+  ArgumentCaptor<
+    EntityFinderWidget.SelectedHandler<Reference>
+  > finderCallbackCaptor;
 
   public static String X_COLUMN_NAME = "x Column";
   public static String Y_COLUMN_NAME = "y column";
@@ -450,7 +452,8 @@ public class PlotlyConfigEditorTest {
       .setSelectedHandler(finderCallbackCaptor.capture());
     verify(mockEntityFinderBuilder).build();
     verify(mockFinder).show();
-    EntityFinderWidget.SelectedHandler<Reference> callback = finderCallbackCaptor.getValue();
+    EntityFinderWidget.SelectedHandler<Reference> callback =
+      finderCallbackCaptor.getValue();
     String newTableId = "syn222";
     Reference r = new Reference();
     r.setTargetId(newTableId);

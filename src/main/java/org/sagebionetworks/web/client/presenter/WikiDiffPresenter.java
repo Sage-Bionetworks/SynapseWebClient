@@ -149,7 +149,8 @@ public class WikiDiffPresenter
         public void onSuccess(PaginatedResults<V2WikiHistorySnapshot> result) {
           PaginatedResults<V2WikiHistorySnapshot> paginatedHistory = result;
           // paginatedHistory.getTotalNumberOfResults() should return total!
-          List<V2WikiHistorySnapshot> historyAsListOfHeaders = paginatedHistory.getResults();
+          List<V2WikiHistorySnapshot> historyAsListOfHeaders =
+            paginatedHistory.getResults();
           if (
             historyAsListOfHeaders == null || historyAsListOfHeaders.isEmpty()
           ) {

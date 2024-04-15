@@ -65,7 +65,8 @@ public class GovernanceServiceHelperTest {
     final String principalId = "101";
     final Long accessRequirementId = 102L;
 
-    PostMessageContentAccessRequirement ar = new PostMessageContentAccessRequirement();
+    PostMessageContentAccessRequirement ar =
+      new PostMessageContentAccessRequirement();
     ar.setId(accessRequirementId);
 
     // verify get access requirement text now just returns the url

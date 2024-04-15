@@ -99,7 +99,8 @@ public class UploadCSVFinishPageImpl implements UploadCSVFinishPage {
     List<ColumnModel> columns = preProcessColumns(suggestedSchema);
     editors = new ArrayList<ColumnModelTableRow>(columns.size());
     for (ColumnModel cm : columns) {
-      ColumnModelTableRowEditorWidget editor = portalGinInjector.createColumnModelEditorWidget();
+      ColumnModelTableRowEditorWidget editor =
+        portalGinInjector.createColumnModelEditorWidget();
       editors.add(editor);
       editor.configure(cm, null);
       editor.setSelectVisible(false);
@@ -167,7 +168,8 @@ public class UploadCSVFinishPageImpl implements UploadCSVFinishPage {
     this.uploadtoTableRequest.setTableId(table.getId());
     this.view.setTrackerVisible(true);
 
-    TableUpdateTransactionRequest transactionRequest = new TableUpdateTransactionRequest();
+    TableUpdateTransactionRequest transactionRequest =
+      new TableUpdateTransactionRequest();
     transactionRequest.setEntityId(uploadtoTableRequest.getTableId());
     List<TableUpdateRequest> changes = new ArrayList<TableUpdateRequest>();
     TableSchemaChangeRequest changeRequest = new TableSchemaChangeRequest();

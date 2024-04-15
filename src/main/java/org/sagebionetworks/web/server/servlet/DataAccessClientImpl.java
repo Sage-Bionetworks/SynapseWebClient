@@ -31,7 +31,8 @@ public class DataAccessClientImpl
   @Override
   public ResearchProject getResearchProject(Long arId)
     throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       return synapseClient.getResearchProjectForUpdate(arId.toString());
     } catch (SynapseException e) {
@@ -42,7 +43,8 @@ public class DataAccessClientImpl
   @Override
   public ResearchProject updateResearchProject(ResearchProject researchProject)
     throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       return synapseClient.createOrUpdateResearchProject(researchProject);
     } catch (SynapseException e) {
@@ -53,7 +55,8 @@ public class DataAccessClientImpl
   @Override
   public RequestInterface getDataAccessRequest(Long id)
     throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       return synapseClient.getRequestForUpdate(id.toString());
     } catch (SynapseException e) {
@@ -65,7 +68,8 @@ public class DataAccessClientImpl
   public RequestInterface updateDataAccessRequest(
     RequestInterface dataAccessRequest
   ) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       return synapseClient.createOrUpdateRequest(dataAccessRequest);
     } catch (SynapseException e) {
@@ -78,14 +82,13 @@ public class DataAccessClientImpl
     CreateSubmissionRequest createSubmissionRequest,
     Long arId
   ) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       if (createSubmissionRequest.getSubjectId() == null) {
         // no context (for example, on an ACT dashboard) - pick the first subject to direct the user to.
-        RestrictableObjectDescriptorResponse response = synapseClient.getSubjects(
-          arId.toString(),
-          null
-        );
+        RestrictableObjectDescriptorResponse response =
+          synapseClient.getSubjects(arId.toString(), null);
         RestrictableObjectDescriptor subject = response.getSubjects().get(0);
         createSubmissionRequest.setSubjectId(subject.getId());
         createSubmissionRequest.setSubjectType(subject.getType());
@@ -102,7 +105,8 @@ public class DataAccessClientImpl
     Long limit,
     Long offset
   ) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       return synapseClient
         .getAccessRequirements(subject, limit, offset)
@@ -116,7 +120,8 @@ public class DataAccessClientImpl
   public AccessRequirementStatus getAccessRequirementStatus(
     String accessRequirementId
   ) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       return synapseClient.getAccessRequirementStatus(accessRequirementId);
     } catch (SynapseException e) {
@@ -128,7 +133,8 @@ public class DataAccessClientImpl
   public BatchAccessApprovalInfoResponse getAccessRequirementStatus(
     BatchAccessApprovalInfoRequest request
   ) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       return synapseClient.getBatchAccessApprovalInfo(request);
     } catch (SynapseException e) {
@@ -139,7 +145,8 @@ public class DataAccessClientImpl
   @Override
   public void cancelDataAccessSubmission(String submissionId)
     throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       synapseClient.cancelSubmission(submissionId);
     } catch (SynapseException e) {
@@ -150,7 +157,8 @@ public class DataAccessClientImpl
   @Override
   public void createLockAccessRequirement(String entityId)
     throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       synapseClient.createLockAccessRequirement(entityId);
     } catch (SynapseException e) {
@@ -164,7 +172,8 @@ public class DataAccessClientImpl
     SubmissionState newState,
     String reason
   ) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       return synapseClient.updateSubmissionState(
         submissionId,
@@ -179,7 +188,8 @@ public class DataAccessClientImpl
   @Override
   public OpenSubmissionPage getOpenSubmissions(String nextPageToken)
     throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       return synapseClient.getOpenSubmissions(nextPageToken);
     } catch (SynapseException e) {
@@ -190,7 +200,8 @@ public class DataAccessClientImpl
   @Override
   public AccessorGroupResponse listAccessorGroup(AccessorGroupRequest request)
     throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       return synapseClient.listAccessorGroup(request);
     } catch (SynapseException e) {
@@ -201,7 +212,8 @@ public class DataAccessClientImpl
   @Override
   public void revokeGroup(String accessRequirementId, String submitterId)
     throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       synapseClient.revokeGroup(accessRequirementId, submitterId);
     } catch (SynapseException e) {
@@ -213,7 +225,8 @@ public class DataAccessClientImpl
   public AccessRequirement convertAccessRequirement(
     AccessRequirementConversionRequest request
   ) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       return synapseClient.convertAccessRequirement(request);
     } catch (SynapseException e) {

@@ -71,13 +71,15 @@ public class WikiSubpageNavigationTreeViewImpl
       final Div subListContainer = new Div();
       subListContainer.add(subList);
       ul.add(subListContainer);
-      final org.gwtbootstrap3.client.ui.Anchor collapseAnchor = new org.gwtbootstrap3.client.ui.Anchor();
+      final org.gwtbootstrap3.client.ui.Anchor collapseAnchor =
+        new org.gwtbootstrap3.client.ui.Anchor();
       collapseAnchor.setIcon(IconType.ANGLE_DOWN);
       collapseAnchor.setPull(Pull.RIGHT);
       collapseAnchor
         .getElement()
         .setAttribute("aria-label", "Collapse Wiki tree");
-      final org.gwtbootstrap3.client.ui.Anchor expandAnchor = new org.gwtbootstrap3.client.ui.Anchor();
+      final org.gwtbootstrap3.client.ui.Anchor expandAnchor =
+        new org.gwtbootstrap3.client.ui.Anchor();
       expandAnchor.setIcon(IconType.ANGLE_RIGHT);
       expandAnchor.setPull(Pull.RIGHT);
       expandAnchor.getElement().setAttribute("aria-label", "Expand Wiki tree");

@@ -12,14 +12,16 @@
   <t:TableRow>
     <t:TableData addStyleNames="col-xs-4">
       <bh:Strong addStyleNames="left">
-	        	Synapse ID:&nbsp;
-	        </bh:Strong>
+        Synapse ID:
+        &nbsp;
+      </bh:Strong>
       <b:Anchor ui:field="synIdField" />
     </t:TableData>
     <t:TableData addStyleNames="col-xs-7">
       <bh:Strong>
-	        	Version:&nbsp;
-	        </bh:Strong>
+        Version:
+        &nbsp;
+      </bh:Strong>
       <bh:Text ui:field="synVersionField" />
     </t:TableData>
     <t:TableData addStyleNames="col-xs-1">

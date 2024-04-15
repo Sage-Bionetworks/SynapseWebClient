@@ -599,7 +599,8 @@ public class SingleDiscussionThreadWidget
 
   @Override
   public void onClickEditThread() {
-    EditDiscussionThreadModal editThreadModal = ginInjector.getEditDiscussionThreadModal();
+    EditDiscussionThreadModal editThreadModal =
+      ginInjector.getEditDiscussionThreadModal();
     view.setEditThreadModal(editThreadModal.asWidget());
     editThreadModal.configure(
       threadId,

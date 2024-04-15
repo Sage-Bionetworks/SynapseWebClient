@@ -109,7 +109,8 @@ public class PasswordResetSignedTokenPresenter
       synAlert.showError(DisplayConstants.PASSWORDS_MISMATCH);
     } else {
       view.setChangePasswordEnabled(false);
-      ChangePasswordWithToken changePasswordRequest = new ChangePasswordWithToken();
+      ChangePasswordWithToken changePasswordRequest =
+        new ChangePasswordWithToken();
       changePasswordRequest.setNewPassword(password1);
       changePasswordRequest.setPasswordChangeToken(signedToken);
       jsClient.changePassword(

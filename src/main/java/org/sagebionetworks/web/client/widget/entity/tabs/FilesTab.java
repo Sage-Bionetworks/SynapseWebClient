@@ -316,7 +316,8 @@ public class FilesTab {
         view.setProvenance(provWidget.asWidget());
         provWidget.configure(configMap);
       } else {
-        org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget provWidget = ginInjector.getProvenanceRenderer();
+        org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget provWidget =
+          ginInjector.getProvenanceRenderer();
         view.setProvenance(provWidget.asWidget());
         provWidget.configure(configMap);
       }
@@ -329,21 +330,22 @@ public class FilesTab {
     view.setWikiPageWidgetVisible(isWikiPageVisible);
     if (isWikiPageVisible) {
       final boolean canEdit = bundle.getPermissions().getCanCertifiedUserEdit();
-      final WikiPageWidget.Callback wikiCallback = new WikiPageWidget.Callback() {
-        @Override
-        public void pageUpdated() {
-          ginInjector
-            .getEventBus()
-            .fireEvent(
-              new EntityUpdatedEvent(entityBundle.getEntity().getId())
-            );
-        }
+      final WikiPageWidget.Callback wikiCallback =
+        new WikiPageWidget.Callback() {
+          @Override
+          public void pageUpdated() {
+            ginInjector
+              .getEventBus()
+              .fireEvent(
+                new EntityUpdatedEvent(entityBundle.getEntity().getId())
+              );
+          }
 
-        @Override
-        public void noWikiFound() {
-          view.setWikiPageWidgetVisible(false);
-        }
-      };
+          @Override
+          public void noWikiFound() {
+            view.setWikiPageWidgetVisible(false);
+          }
+        };
       wikiPageWidget.configure(
         new WikiPageKey(
           currentEntityId,

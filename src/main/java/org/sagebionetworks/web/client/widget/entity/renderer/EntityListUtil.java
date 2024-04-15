@@ -29,10 +29,10 @@ public class EntityListUtil {
       if (ref == null) continue;
       if (!recordStr.equals("")) recordStr += LIST_DELIMITER;
       recordStr +=
-        DisplayUtils.createEntityVersionString(
-          ref.getTargetId(),
-          ref.getTargetVersionNumber()
-        );
+      DisplayUtils.createEntityVersionString(
+        ref.getTargetId(),
+        ref.getTargetVersionNumber()
+      );
       String note = record.getNote();
       if (note != null && !note.equals("")) {
         recordStr += NOTE_DELIMITER + WidgetEncodingUtil.encodeValue(note);

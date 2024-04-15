@@ -13,7 +13,10 @@ import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 public abstract class AsyncHandlerImpl {
 
-  private Map<Object, List<AsyncCallback>> reference2Callback = new HashMap<Object, List<AsyncCallback>>();
+  private Map<Object, List<AsyncCallback>> reference2Callback = new HashMap<
+    Object,
+    List<AsyncCallback>
+  >();
 
   public abstract void doCall(List ids, AsyncCallback<List> callback);
 
@@ -42,7 +45,8 @@ public abstract class AsyncHandlerImpl {
 
   public void executeRequests() {
     if (!reference2Callback.isEmpty()) {
-      final Map<Object, List<AsyncCallback>> reference2CallbackCopy = new HashMap<Object, List<AsyncCallback>>();
+      final Map<Object, List<AsyncCallback>> reference2CallbackCopy =
+        new HashMap<Object, List<AsyncCallback>>();
       reference2CallbackCopy.putAll(reference2Callback);
       reference2Callback.clear();
       List ids = new ArrayList();

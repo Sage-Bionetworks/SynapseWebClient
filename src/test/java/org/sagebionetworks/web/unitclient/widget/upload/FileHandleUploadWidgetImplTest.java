@@ -203,7 +203,8 @@ public class FileHandleUploadWidgetImplTest {
       new Answer<Void>() {
         @Override
         public Void answer(InvocationOnMock invocation) throws Throwable {
-          ProgressingFileUploadHandler handler = (ProgressingFileUploadHandler) invocation.getArguments()[1];
+          ProgressingFileUploadHandler handler =
+            (ProgressingFileUploadHandler) invocation.getArguments()[1];
           handler.updateProgress(0.1, "10%", "100 KB/s");
           handler.updateProgress(0.9, "90%", "10 MB/s");
           handler.uploadFailed(error);
@@ -261,7 +262,8 @@ public class FileHandleUploadWidgetImplTest {
       new Answer<Void>() {
         @Override
         public Void answer(InvocationOnMock invocation) throws Throwable {
-          ProgressingFileUploadHandler handler = (ProgressingFileUploadHandler) invocation.getArguments()[1];
+          ProgressingFileUploadHandler handler =
+            (ProgressingFileUploadHandler) invocation.getArguments()[1];
           handler.updateProgress(0.1, "10%", "100 KB/s");
           handler.updateProgress(0.9, "90%", "10 MB/s");
           handler.uploadFailed(error);

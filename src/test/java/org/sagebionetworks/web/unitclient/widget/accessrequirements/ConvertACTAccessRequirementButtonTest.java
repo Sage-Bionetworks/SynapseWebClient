@@ -146,7 +146,8 @@ public class ConvertACTAccessRequirementButtonTest {
         conversionRequestCaptor.capture(),
         any(AsyncCallback.class)
       );
-    AccessRequirementConversionRequest request = conversionRequestCaptor.getValue();
+    AccessRequirementConversionRequest request =
+      conversionRequestCaptor.getValue();
     assertEquals(AR_ID.toString(), request.getAccessRequirementId());
     assertEquals(AR_VERSION, request.getCurrentVersion());
     assertEquals(AR_ETAG, request.getEtag());

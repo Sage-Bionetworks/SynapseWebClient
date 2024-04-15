@@ -46,7 +46,10 @@ public class ProvenanceWidget
   private static final int DEFAULT_HEIGHT = 270;
   private ProvenanceWidgetView view;
   SynapseJavascriptClient jsClient;
-  private Map<String, ProvGraphNode> idToNode = new HashMap<String, ProvGraphNode>();
+  private Map<String, ProvGraphNode> idToNode = new HashMap<
+    String,
+    ProvGraphNode
+  >();
   private SynapseJSNIUtils synapseJSNIUtils;
   private Map<String, String> descriptor;
   private JsoProvider jsoProvider;
@@ -55,10 +58,16 @@ public class ProvenanceWidget
     public void onComplete();
   }
 
-  Map<Reference, String> generatedByActivityId = new HashMap<Reference, String>();
+  Map<Reference, String> generatedByActivityId = new HashMap<
+    Reference,
+    String
+  >();
   Map<String, Activity> processedActivities = new HashMap<String, Activity>();
   Set<Reference> references = new HashSet<Reference>();
-  Map<Reference, EntityHeader> refToHeader = new HashMap<Reference, EntityHeader>();
+  Map<Reference, EntityHeader> refToHeader = new HashMap<
+    Reference,
+    EntityHeader
+  >();
   Set<Reference> startRefs;
   boolean showExpand;
   boolean showUndefinedAndErrorActivity;
@@ -181,7 +190,9 @@ public class ProvenanceWidget
     synAlert.clear();
     // callback after all starting references have their current version looked up
     // (if Versionable)
-    AsyncCallback<Void> lookupCurrentVersionCallback = new AsyncCallback<Void>() {
+    AsyncCallback<Void> lookupCurrentVersionCallback = new AsyncCallback<
+      Void
+    >() {
       @Override
       public void onSuccess(Void result) {
         // load stack with starting nodes at depth 0
@@ -424,10 +435,8 @@ public class ProvenanceWidget
           UsedEntity ue = (UsedEntity) u;
           if (
             ue.getReference() != null &&
-            (
-              references.contains(ue.getReference()) ||
-              ue.getReference().getTargetId() == null
-            )
+            (references.contains(ue.getReference()) ||
+              ue.getReference().getTargetId() == null)
           ) {
             previouslyProcessed.add(u);
           }
@@ -603,7 +612,10 @@ public class ProvenanceWidget
       new AsyncCallback<ArrayList<EntityHeader>>() {
         @Override
         public void onSuccess(ArrayList<EntityHeader> currentVersions) {
-          Map<String, Long> entityToCurrentVersion = new HashMap<String, Long>();
+          Map<String, Long> entityToCurrentVersion = new HashMap<
+            String,
+            Long
+          >();
           for (EntityHeader header : currentVersions) {
             entityToCurrentVersion.put(
               header.getId(),

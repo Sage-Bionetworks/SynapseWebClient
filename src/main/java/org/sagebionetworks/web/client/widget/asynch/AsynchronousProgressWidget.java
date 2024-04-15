@@ -135,7 +135,7 @@ public class AsynchronousProgressWidget
     }
     double current = status.getProgressCurrent();
     double total = status.getProgressTotal();
-    return current / total * 100.0;
+    return (current / total) * 100.0;
   }
 
   @Override

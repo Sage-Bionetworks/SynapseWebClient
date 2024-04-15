@@ -66,9 +66,9 @@ public class ButtonLinkWidget implements WidgetRendererPresenter {
     if (isIncludePrincipalId(descriptor) && authController.isLoggedIn()) {
       String prefix = url.contains("?") ? "&" : "?";
       url +=
-        prefix +
-        SYNAPSE_USER_ID_QUERY_PARAM +
-        authController.getCurrentUserPrincipalId();
+      prefix +
+      SYNAPSE_USER_ID_QUERY_PARAM +
+      authController.getCurrentUserPrincipalId();
     }
     boolean isHighlight = false;
     if (descriptor.containsKey(WebConstants.HIGHLIGHT_KEY)) {

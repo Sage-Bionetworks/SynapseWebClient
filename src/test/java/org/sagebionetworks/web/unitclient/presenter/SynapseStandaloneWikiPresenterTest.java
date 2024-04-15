@@ -59,7 +59,10 @@ public class SynapseStandaloneWikiPresenterTest {
 
     testPlace = new StandaloneWiki(token);
 
-    HashMap<String, WikiPageKey> pageName2WikiKeyMap = new HashMap<String, WikiPageKey>();
+    HashMap<String, WikiPageKey> pageName2WikiKeyMap = new HashMap<
+      String,
+      WikiPageKey
+    >();
 
     String entityId = "syn1113";
     String wikiId = "44442";

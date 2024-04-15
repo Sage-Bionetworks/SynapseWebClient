@@ -62,7 +62,8 @@ public class CreateDownloadPageImpl implements CreateDownloadPage {
 
           @Override
           public void onComplete(AsynchronousResponseBody response) {
-            DownloadFromTableResult results = (DownloadFromTableResult) response;
+            DownloadFromTableResult results =
+              (DownloadFromTableResult) response;
             setResults(results);
           }
 

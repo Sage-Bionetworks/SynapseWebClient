@@ -141,7 +141,8 @@ public class RestrictionWidget
     if (!isAnonymous) {
       hasAdministrativeAccess = canChangePermissions;
     }
-    RestrictionLevel restrictionLevel = restrictionInformation.getRestrictionLevel();
+    RestrictionLevel restrictionLevel =
+      restrictionInformation.getRestrictionLevel();
 
     switch (restrictionLevel) {
       case OPEN:

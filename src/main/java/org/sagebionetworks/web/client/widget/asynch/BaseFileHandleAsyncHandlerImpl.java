@@ -27,8 +27,11 @@ public abstract class BaseFileHandleAsyncHandlerImpl {
 
   protected abstract boolean isIncludePreSignedURLs();
 
-  private Map<String, List<AsyncCallback<FileResult>>> reference2Callback = new HashMap<String, List<AsyncCallback<FileResult>>>();
-  private List<FileHandleAssociation> fileHandleAssociations = new ArrayList<FileHandleAssociation>();
+  private Map<String, List<AsyncCallback<FileResult>>> reference2Callback =
+    new HashMap<String, List<AsyncCallback<FileResult>>>();
+  private List<FileHandleAssociation> fileHandleAssociations = new ArrayList<
+    FileHandleAssociation
+  >();
   SynapseJavascriptClient jsClient;
   public static final int LIMIT = 95;
 
@@ -99,9 +102,17 @@ public abstract class BaseFileHandleAsyncHandlerImpl {
 
   public void executeRequests() {
     if (!reference2Callback.isEmpty()) {
-      final Map<String, List<AsyncCallback<FileResult>>> reference2CallbackCopy = new HashMap<String, List<AsyncCallback<FileResult>>>();
+      final Map<
+        String,
+        List<AsyncCallback<FileResult>>
+      > reference2CallbackCopy = new HashMap<
+        String,
+        List<AsyncCallback<FileResult>>
+      >();
       reference2CallbackCopy.putAll(reference2Callback);
-      List<FileHandleAssociation> fileHandleAssociationsCopy = new ArrayList<FileHandleAssociation>();
+      List<FileHandleAssociation> fileHandleAssociationsCopy = new ArrayList<
+        FileHandleAssociation
+      >();
       fileHandleAssociationsCopy.addAll(fileHandleAssociations);
       reference2Callback.clear();
       fileHandleAssociations.clear();
@@ -121,9 +132,8 @@ public abstract class BaseFileHandleAsyncHandlerImpl {
           }
 
           private void callOnFailure(String fileHandleId, Throwable ex) {
-            List<AsyncCallback<FileResult>> callbacks = reference2CallbackCopy.get(
-              fileHandleId
-            );
+            List<AsyncCallback<FileResult>> callbacks =
+              reference2CallbackCopy.get(fileHandleId);
             if (callbacks != null) {
               for (AsyncCallback<FileResult> callback : callbacks) {
                 callback.onFailure(ex);
@@ -134,9 +144,8 @@ public abstract class BaseFileHandleAsyncHandlerImpl {
           public void onSuccess(BatchFileResult results) {
             // go through all results, and inform the proper callback of the success
             for (FileResult fileResult : results.getRequestedFiles()) {
-              List<AsyncCallback<FileResult>> callbacks = reference2CallbackCopy.remove(
-                fileResult.getFileHandleId()
-              );
+              List<AsyncCallback<FileResult>> callbacks =
+                reference2CallbackCopy.remove(fileResult.getFileHandleId());
               if (callbacks != null) {
                 if (fileResult.getFailureCode() != null) {
                   Exception ex = null;

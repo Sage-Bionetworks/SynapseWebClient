@@ -68,7 +68,8 @@ public class OpenTeamInvitationsWidgetViewImpl
     Widget joinButtonWidget
   ) {
     mainContainer.setVisible(true);
-    OpenTeamInvitationWidget openTeamInviteWidget = ginInjector.getOpenTeamInvitationWidget();
+    OpenTeamInvitationWidget openTeamInviteWidget =
+      ginInjector.getOpenTeamInvitationWidget();
 
     TeamBadge teamBadge = ginInjector.getTeamBadgeWidget();
     teamBadge.configure(team);

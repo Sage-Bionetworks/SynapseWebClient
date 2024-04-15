@@ -122,8 +122,7 @@ public class EntityListConfigEditor
       .setMultiSelect(true)
       .setVersionSelection(EntityFinderWidget.VersionSelection.TRACKED)
       .setSelectedMultiHandler(
-        (
-          (selected, entityFinder) -> {
+        ((selected, entityFinder) -> {
             entityFinder.hide();
             for (Reference ref : selected) {
               EntityGroupRecord record = createRecord(
@@ -134,8 +133,7 @@ public class EntityListConfigEditor
               entityListWidget.addRecord(record);
             }
             view.setButtonToolbarVisible(true);
-          }
-        )
+          })
       )
       .build()
       .show();

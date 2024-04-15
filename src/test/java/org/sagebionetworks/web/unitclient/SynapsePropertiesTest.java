@@ -73,7 +73,8 @@ public class SynapsePropertiesTest {
     assertEquals(value, synapseProperties.getSynapseProperty(key));
     assertNull(synapseProperties.getSynapseProperty("foo"));
 
-    PublicPrincipalIds publicPrincipalIds = synapseProperties.getPublicPrincipalIds();
+    PublicPrincipalIds publicPrincipalIds =
+      synapseProperties.getPublicPrincipalIds();
     assertEquals(
       publicPrincipalId,
       publicPrincipalIds.getPublicAclPrincipalId().toString()

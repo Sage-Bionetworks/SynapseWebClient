@@ -26,7 +26,10 @@ public class NChartUtil {
     JsoProvider jsoProvider,
     ProvGraph graph
   ) {
-    Map<ProvGraphNode, Integer> nodeToLayer = new HashMap<ProvGraphNode, Integer>();
+    Map<ProvGraphNode, Integer> nodeToLayer = new HashMap<
+      ProvGraphNode,
+      Integer
+    >();
 
     // identify start nodes
     List<ProvGraphNode> startNodes = new ArrayList<ProvGraphNode>();
@@ -38,7 +41,10 @@ public class NChartUtil {
 
     // build reverse lookup
     int maxLayer = 0;
-    Map<Integer, List<ProvGraphNode>> layerToNode = new HashMap<Integer, List<ProvGraphNode>>();
+    Map<Integer, List<ProvGraphNode>> layerToNode = new HashMap<
+      Integer,
+      List<ProvGraphNode>
+    >();
     for (ProvGraphNode node : nodeToLayer.keySet()) {
       int layer = nodeToLayer.get(node);
       if (layer > maxLayer) maxLayer = layer;

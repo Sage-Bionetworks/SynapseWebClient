@@ -330,19 +330,25 @@ public class EntityActionControllerImplTest {
   SynapseProperties mockSynapseProperties;
 
   @Captor
-  ArgumentCaptor<EntityFinderWidget.SelectedHandler<Reference>> entityFinderSelectedHandlerCaptor;
+  ArgumentCaptor<
+    EntityFinderWidget.SelectedHandler<Reference>
+  > entityFinderSelectedHandlerCaptor;
 
   @Captor
   ArgumentCaptor<CallbackP<List<String>>> callbackListStringCaptor;
 
   @Captor
-  ArgumentCaptor<TableUpdateTransactionRequest> tableUpdateTransactionRequestCaptor;
+  ArgumentCaptor<
+    TableUpdateTransactionRequest
+  > tableUpdateTransactionRequestCaptor;
 
   @Captor
   ArgumentCaptor<AsynchronousProgressHandler> asyncProgressHandlerCaptor;
 
   @Captor
-  ArgumentCaptor<AsyncCallback<AddBatchOfFilesToDownloadListResponse>> addToDownloadListAsyncCallbackCaptor;
+  ArgumentCaptor<
+    AsyncCallback<AddBatchOfFilesToDownloadListResponse>
+  > addToDownloadListAsyncCallbackCaptor;
 
   @Mock
   TableUpdateTransactionResponse mockTableUpdateTransactionResponse;
@@ -381,10 +387,14 @@ public class EntityActionControllerImplTest {
   ContainerClientsHelp mockContainerClientsHelp;
 
   @Captor
-  ArgumentCaptor<CreateTableViewWizardProps.OnComplete> createTableWizardOnCompleteCaptor;
+  ArgumentCaptor<
+    CreateTableViewWizardProps.OnComplete
+  > createTableWizardOnCompleteCaptor;
 
   @Captor
-  ArgumentCaptor<CreateTableViewWizardProps.OnCancel> createTableWizardOnCancelCaptor;
+  ArgumentCaptor<
+    CreateTableViewWizardProps.OnCancel
+  > createTableWizardOnCancelCaptor;
 
   PromptForValuesModalView.Configuration.Builder mockPromptModalConfigurationBuilder;
   Set<ResourceAccess> resourceAccessSet;
@@ -4595,10 +4605,16 @@ public class EntityActionControllerImplTest {
 
     controller.onAction(Action.EDIT_DEFINING_SQL, null);
 
-    ArgumentCaptor<SqlDefinedTableEditorModalProps.Callback> onUpdateArgumentCaptor =
-      ArgumentCaptor.forClass(SqlDefinedTableEditorModalProps.Callback.class);
-    ArgumentCaptor<SqlDefinedTableEditorModalProps.Callback> onCancelArgumentCaptor =
-      ArgumentCaptor.forClass(SqlDefinedTableEditorModalProps.Callback.class);
+    ArgumentCaptor<
+      SqlDefinedTableEditorModalProps.Callback
+    > onUpdateArgumentCaptor = ArgumentCaptor.forClass(
+      SqlDefinedTableEditorModalProps.Callback.class
+    );
+    ArgumentCaptor<
+      SqlDefinedTableEditorModalProps.Callback
+    > onCancelArgumentCaptor = ArgumentCaptor.forClass(
+      SqlDefinedTableEditorModalProps.Callback.class
+    );
     verify(mockSqlDefinedTableEditorModalWidget)
       .configure(
         eq(entityId),
@@ -4632,10 +4648,16 @@ public class EntityActionControllerImplTest {
 
     controller.onAction(Action.EDIT_DEFINING_SQL, null);
 
-    ArgumentCaptor<SqlDefinedTableEditorModalProps.Callback> onUpdateArgumentCaptor =
-      ArgumentCaptor.forClass(SqlDefinedTableEditorModalProps.Callback.class);
-    ArgumentCaptor<SqlDefinedTableEditorModalProps.Callback> onCancelArgumentCaptor =
-      ArgumentCaptor.forClass(SqlDefinedTableEditorModalProps.Callback.class);
+    ArgumentCaptor<
+      SqlDefinedTableEditorModalProps.Callback
+    > onUpdateArgumentCaptor = ArgumentCaptor.forClass(
+      SqlDefinedTableEditorModalProps.Callback.class
+    );
+    ArgumentCaptor<
+      SqlDefinedTableEditorModalProps.Callback
+    > onCancelArgumentCaptor = ArgumentCaptor.forClass(
+      SqlDefinedTableEditorModalProps.Callback.class
+    );
     verify(mockSqlDefinedTableEditorModalWidget)
       .configure(
         eq(entityId),

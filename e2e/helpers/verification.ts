@@ -13,8 +13,8 @@ export async function getVerificationSubmissionId(
     async ({ userId, accessToken }) => {
       // @ts-expect-error: Cannot find name 'SRC'
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
-      const mask = await SRC.SynapseConstants
-        .USER_BUNDLE_MASK_VERIFICATION_SUBMISSION
+      const mask =
+        await SRC.SynapseConstants.USER_BUNDLE_MASK_VERIFICATION_SUBMISSION
       // @ts-expect-error: Cannot find name 'SRC'
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
       return (await SRC.SynapseClient.getUserBundle(

@@ -16,7 +16,10 @@
       <b:Anchor
         addStyleNames="backToSettingsNav"
         ui:field="backToSettingsAnchor"
-      >&lt; Back to Settings</b:Anchor>
+      >
+        &lt;
+        Back to Settings
+      </b:Anchor>
       <w:ReactComponentDiv ui:field="container" addStyleNames="padding-10" />
     </div>
   </g:HTMLPanel>

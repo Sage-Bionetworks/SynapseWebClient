@@ -35,8 +35,8 @@
     "eslint": "^8.0.1",
     "husky": ">=6",
     "lint-staged": ">=10",
-    "prettier": "^3.0.0",
-    "prettier-plugin-java": "^2.2.0",
+    "prettier": "^3.2.5",
+    "prettier-plugin-java": "2.5.0",
     "typescript": "5.1.6",
     "uuid": "^9.0.0"
   },

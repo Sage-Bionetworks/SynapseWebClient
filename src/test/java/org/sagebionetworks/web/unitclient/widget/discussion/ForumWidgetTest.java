@@ -254,9 +254,8 @@ public class ForumWidgetTest {
     boolean isCurrentUserModerator = false;
     String replyId = null;
     EntityActionMenu actionMenu = null;
-    ArgumentCaptor<DiscussionThreadBundle> threadCaptor = ArgumentCaptor.forClass(
-      DiscussionThreadBundle.class
-    );
+    ArgumentCaptor<DiscussionThreadBundle> threadCaptor =
+      ArgumentCaptor.forClass(DiscussionThreadBundle.class);
     verify(mockDefaultThreadWidget)
       .configure(
         threadCaptor.capture(),
@@ -444,7 +443,8 @@ public class ForumWidgetTest {
     );
     verify(mockAvailableThreadListWidget)
       .setThreadIdClickedCallback(captorP.capture());
-    CallbackP<DiscussionThreadBundle> threadIdClickedCallback = captorP.getValue();
+    CallbackP<DiscussionThreadBundle> threadIdClickedCallback =
+      captorP.getValue();
     String threadId = "9584";
     when(mockDiscussionThreadBundle.getId()).thenReturn(threadId);
     threadIdClickedCallback.invoke(mockDiscussionThreadBundle);
@@ -495,7 +495,8 @@ public class ForumWidgetTest {
     );
     verify(mockAvailableThreadListWidget)
       .setThreadIdClickedCallback(captorP.capture());
-    CallbackP<DiscussionThreadBundle> threadIdClickedCallback = captorP.getValue();
+    CallbackP<DiscussionThreadBundle> threadIdClickedCallback =
+      captorP.getValue();
     String threadId = "9584";
     when(mockDiscussionThreadBundle.getId()).thenReturn(threadId);
     AsyncMockStubber

@@ -146,9 +146,9 @@ public class CreateOrUpdateDoiModalViewImpl
       ", so the data that someone retrieves using the DOI may change over time.";
     if (entity instanceof Table) {
       versionHelpMarkdown +=
-        "\n\nTo create a DOI that will always link to the current set of data in the " +
-        entityTypeDisplay +
-        ", create a new version and mint a DOI for that version.";
+      "\n\nTo create a DOI that will always link to the current set of data in the " +
+      entityTypeDisplay +
+      ", create a new version and mint a DOI for that version.";
     }
     versionHelpBox.setHelpMarkdown(versionHelpMarkdown);
     publicationYearField.reset();

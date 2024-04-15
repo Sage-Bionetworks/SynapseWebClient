@@ -39,7 +39,10 @@
             visible="false"
           >
             <w:LoadingSpinner size="31px" />
-            <bh:Text>&nbsp;Loading...</bh:Text>
+            <bh:Text>
+              &nbsp;
+              Loading...
+            </bh:Text>
           </bh:Div>
           <bh:Div ui:field="contentUI">
             <b:Radio

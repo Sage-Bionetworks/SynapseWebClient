@@ -76,7 +76,9 @@ public class DiscussionThreadListWidgetTest {
   @Mock
   SynapseJavascriptClient mockSynapseJavascriptClient;
 
-  List<DiscussionThreadBundle> discussionThreadBundleList = new ArrayList<DiscussionThreadBundle>();
+  List<DiscussionThreadBundle> discussionThreadBundleList = new ArrayList<
+    DiscussionThreadBundle
+  >();
   DiscussionThreadListWidget discussionThreadListWidget;
   Set<String> moderatorIds;
 

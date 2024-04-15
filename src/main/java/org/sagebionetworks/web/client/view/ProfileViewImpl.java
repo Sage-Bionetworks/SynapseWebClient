@@ -293,11 +293,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
     ProjectListSortColumn column,
     SortDirection direction
   ) {
-    org.sagebionetworks.repo.model.table.SortDirection tableSortDirection = SortDirection.ASC.equals(
-        direction
-      )
-      ? org.sagebionetworks.repo.model.table.SortDirection.ASC
-      : org.sagebionetworks.repo.model.table.SortDirection.DESC;
+    org.sagebionetworks.repo.model.table.SortDirection tableSortDirection =
+      SortDirection.ASC.equals(direction)
+        ? org.sagebionetworks.repo.model.table.SortDirection.ASC
+        : org.sagebionetworks.repo.model.table.SortDirection.DESC;
     if (ProjectListSortColumn.PROJECT_NAME.equals(column)) {
       projectNameColumnHeader.setSortDirection(tableSortDirection);
       lastActivityOnColumnHeader.setSortDirection(null);
