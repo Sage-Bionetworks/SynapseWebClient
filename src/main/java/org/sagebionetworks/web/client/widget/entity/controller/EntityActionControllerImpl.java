@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.controller;
 
 import static com.google.common.util.concurrent.Futures.whenAllComplete;
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
+import static org.sagebionetworks.repo.model.EntityType.dataset;
 import static org.sagebionetworks.web.client.EntityTypeUtils.DATASET_COLLECTION_DISPLAY_NAME;
 import static org.sagebionetworks.web.client.EntityTypeUtils.getFriendlyEntityTypeName;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
@@ -2625,9 +2626,34 @@ public class EntityActionControllerImpl
   }
 
   private void onRename() {
-    checkUpdateEntity(() -> {
-      postCheckRename();
-    });
+    if (checkIsLatestVersion()) {
+      checkUpdateEntity(() -> {
+        postCheckRename();
+      });
+    } else {
+      if (entityBundle.getEntityType() == dataset) {
+        view.showErrorMessage("Can only change the name of the draft dataset.");
+      } else {
+        view.showErrorMessage(
+          "Can only change the name of the most recent " +
+          entityBundle.getEntityType() +
+          " version."
+        );
+      }
+    }
+  }
+
+  private boolean checkIsLatestVersion() {
+    // If the entity is not a versionable entity, it should be considered as the LatestVersion
+    if (!(entityBundle.getEntity() instanceof VersionableEntity)) {
+      return true;
+    } else {
+      if (((VersionableEntity) entityBundle.getEntity()).getIsLatestVersion()) {
+        return true;
+      } else {
+        return false;
+      }
+    }
   }
 
   /**

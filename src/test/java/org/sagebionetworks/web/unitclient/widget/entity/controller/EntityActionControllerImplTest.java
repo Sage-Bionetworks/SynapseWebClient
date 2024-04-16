@@ -19,6 +19,7 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sagebionetworks.repo.model.EntityType.dataset;
 import static org.sagebionetworks.web.client.DisplayConstants.FILE_VIEW;
 import static org.sagebionetworks.web.client.DisplayConstants.MATERIALIZED_VIEW;
 import static org.sagebionetworks.web.client.DisplayConstants.SUBMISSION_VIEW;
@@ -403,6 +404,9 @@ public class EntityActionControllerImplTest {
 
   @Mock
   KeyFactory mockKeyFactory;
+
+  @Mock
+  Dataset mockDataset;
 
   @Captor
   ArgumentCaptor<
@@ -2903,6 +2907,95 @@ public class EntityActionControllerImplTest {
     verify(mockRenameEntityModalWidget, never())
       .onRename(any(Entity.class), any(Callback.class));
     verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
+  }
+
+  @Test
+  public void testRenameDatasetIsNotLatestVersion() {
+    entityBundle.setEntity(mockDataset);
+    entityBundle.setEntityType(dataset);
+    AsyncMockStubber
+      .callWithInvoke()
+      .when(mockPreflightController)
+      .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+    AsyncMockStubber
+      .callWithInvoke()
+      .when(mockRenameEntityModalWidget)
+      .onRename(any(Entity.class), any(Callback.class));
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+    when(mockDataset.getIsLatestVersion()).thenReturn(false);
+    // method under test
+    controller.onAction(Action.CHANGE_ENTITY_NAME, null);
+    verify(mockRenameEntityModalWidget, never())
+      .onRename(any(Entity.class), any(Callback.class));
+    verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
+    verify(mockView)
+      .showErrorMessage("Can only change the name of the draft dataset.");
+  }
+
+  @Test
+  public void testRenameDatasetIsLatestVersion() {
+    entityBundle.setEntity(mockDataset);
+    entityBundle.setEntityType(dataset);
+    AsyncMockStubber
+      .callWithInvoke()
+      .when(mockPreflightController)
+      .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+    AsyncMockStubber
+      .callWithInvoke()
+      .when(mockRenameEntityModalWidget)
+      .onRename(any(Entity.class), any(Callback.class));
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+    when(mockDataset.getIsLatestVersion()).thenReturn(true);
+    // method under test
+    controller.onAction(Action.CHANGE_ENTITY_NAME, null);
+    verify(mockRenameEntityModalWidget)
+      .onRename(any(Entity.class), any(Callback.class));
+    verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
+    verify(mockView, never())
+      .showErrorMessage("Can only change the name of the draft dataset.");
+  }
+
+  @Test
+  public void testRenameFolder() {
+    Folder folder = new Folder();
+    folder.setId(entityId);
+    folder.setParentId(parentId);
+    entityBundle.setEntity(folder);
+    AsyncMockStubber
+      .callWithInvoke()
+      .when(mockPreflightController)
+      .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+    AsyncMockStubber
+      .callWithInvoke()
+      .when(mockRenameEntityModalWidget)
+      .onRename(any(Entity.class), any(Callback.class));
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+    // method under test
+    controller.onAction(Action.CHANGE_ENTITY_NAME, null);
+    verify(mockRenameEntityModalWidget)
+      .onRename(any(Entity.class), any(Callback.class));
+    verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
   }
 
   @Test
