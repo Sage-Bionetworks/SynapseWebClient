@@ -237,6 +237,23 @@
       </plugin>
 
       <plugin>
+        <artifactId>maven-clean-plugin</artifactId>
+        <version>3.3.2</version>
+        <configuration>
+          <filesets>
+            <fileset>
+              <!-- Clean dir where we copy JS/CSS from node_modules -->
+              <directory>src/main/webapp/generated</directory>
+              <includes>
+                <include>**/*</include>
+              </includes>
+              <followSymlinks>false</followSymlinks>
+            </fileset>
+          </filesets>
+        </configuration>
+      </plugin>
+
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
         <version>3.3.2</version>
