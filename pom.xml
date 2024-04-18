@@ -502,14 +502,9 @@
                   file="${project.basedir}/node_modules/papaparse/papaparse.min.js"
                   tofile="src/main/webapp/generated/papaparse.min.js"
                 />
-                <copy
-                  file="${project.basedir}/node_modules/katex/dist/katex.min.js"
-                  tofile="src/main/webapp/generated/katex.min.js"
-                />
-                <copy
-                  file="${project.basedir}/node_modules/katex/dist/katex.min.css"
-                  tofile="src/main/webapp/generated/katex.min.css"
-                />
+                <copy todir="src/main/webapp/generated/katex">
+                  <fileset dir="${project.basedir}/node_modules/katex/dist" />
+                </copy>
                 <copy
                   file="${project.basedir}/node_modules/markdown-it/dist/markdown-it.min.js"
                   tofile="src/main/webapp/generated/markdown-it.js"
