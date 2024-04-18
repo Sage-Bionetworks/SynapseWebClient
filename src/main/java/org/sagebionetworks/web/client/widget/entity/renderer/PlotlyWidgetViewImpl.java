@@ -124,7 +124,7 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
   ) /*-{
 
 		try {
-			var plot = $wnd.createPlotlyComponent($wnd.Plotly);
+			var plot = $wnd.createPlotlyComponent['default']($wnd.Plotly);
 
 			// SWC-3668: We must manually construct an Object from the parent window Object prototype.  This is a general GWT js integration issue.
 			// If we define the layout in the standard way, like "xaxis: {title:"mytitle"}", then  Object.getPrototypeOf(obj) === Object.prototype is false.
