@@ -45,7 +45,7 @@ public class ChallengeTab implements ChallengeTabView.Presenter {
       "Challenge",
       "challenge",
       "Challenges are open science, collaborative competitions for evaluating and comparing computational algorithms or solutions to problems.",
-      "http://sagebionetworks.org/platforms/",
+      "https://help.synapse.org/docs/Challenges.1985184148.html",
       EntityArea.CHALLENGE
     );
     tab.configureOrientationBanner(
