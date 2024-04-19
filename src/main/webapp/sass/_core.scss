@@ -55,9 +55,7 @@ $synapse-tertiary-color-palette: (
 $page-header-min-height: 96px;
 $footer-height: 198px;
 
-$full-root-panel-height: calc(
-  100vh - #{$page-header-min-height} - #{$footer-height}
-);
+$full-root-panel-height: calc(100vh - #{$footer-height});
 
 @mixin border-radius($radius) {
   -webkit-border-radius: $radius;
