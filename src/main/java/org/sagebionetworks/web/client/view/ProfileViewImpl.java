@@ -59,7 +59,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 
   HTML noChallengesHtml = new HTML();
   public static final String NO_CHALLENGES_HTML =
-    "<p><a href=\"http://sagebionetworks.org/challenges/\" target=\"_blank\">Challenges</a> are open science, collaborative competitions for evaluating and comparing computational algorithms or solutions to problems.</p>";
+    "<p><a href=\"https://help.synapse.org/docs/Challenges.1985184148.html\" target=\"_blank\">Challenges</a> are open science, collaborative competitions for evaluating and comparing computational algorithms or solutions to problems.</p>";
 
   public static final String CHALLENGE_TAB_HELP_TEXT =
     "&#10;Challenges are open science, collaborative competitions for evaluating and comparing computational algorithms or solutions to problems.";
@@ -253,38 +253,41 @@ public class ProfileViewImpl extends Composite implements ProfileView {
       }
     });
 
-    teamSearchButton.addClickHandler(event ->
-      presenter.goTo(new TeamSearch(teamSearchTextBox.getValue()))
+    teamSearchButton.addClickHandler(
+      event -> presenter.goTo(new TeamSearch(teamSearchTextBox.getValue()))
     );
-    projectSearchButton.addClickHandler(event ->
-      presenter.goTo(new Search(projectSearchTextBox.getValue()))
+    projectSearchButton.addClickHandler(
+      event -> presenter.goTo(new Search(projectSearchTextBox.getValue()))
     );
 
-    moreChallengesButton.addClickHandler(event -> presenter.getMoreChallenges()
+    moreChallengesButton.addClickHandler(
+      event -> presenter.getMoreChallenges()
     );
     showChallengesLoading(false);
 
-    favoritesFilter.addClickHandler(event ->
-      presenter.applyFilterClicked(ProjectFilterEnum.FAVORITES, null)
+    favoritesFilter.addClickHandler(
+      event -> presenter.applyFilterClicked(ProjectFilterEnum.FAVORITES, null)
     );
-    allProjectsFilter.addClickHandler(event ->
-      presenter.applyFilterClicked(ProjectFilterEnum.ALL, null)
+    allProjectsFilter.addClickHandler(
+      event -> presenter.applyFilterClicked(ProjectFilterEnum.ALL, null)
     );
-    myProjectsFilter.addClickHandler(event ->
-      presenter.applyFilterClicked(ProjectFilterEnum.CREATED_BY_ME, null)
+    myProjectsFilter.addClickHandler(
+      event ->
+        presenter.applyFilterClicked(ProjectFilterEnum.CREATED_BY_ME, null)
     );
-    sharedDirectlyWithMeFilter.addClickHandler(event ->
-      presenter.applyFilterClicked(
-        ProjectFilterEnum.SHARED_DIRECTLY_WITH_ME,
-        null
-      )
+    sharedDirectlyWithMeFilter.addClickHandler(
+      event ->
+        presenter.applyFilterClicked(
+          ProjectFilterEnum.SHARED_DIRECTLY_WITH_ME,
+          null
+        )
     );
 
-    projectNameColumnHeader.setSortingListener(headerName ->
-      presenter.sort(ProjectListSortColumn.PROJECT_NAME)
+    projectNameColumnHeader.setSortingListener(
+      headerName -> presenter.sort(ProjectListSortColumn.PROJECT_NAME)
     );
-    lastActivityOnColumnHeader.setSortingListener(headerName ->
-      presenter.sort(ProjectListSortColumn.LAST_ACTIVITY)
+    lastActivityOnColumnHeader.setSortingListener(
+      headerName -> presenter.sort(ProjectListSortColumn.LAST_ACTIVITY)
     );
   }
 
