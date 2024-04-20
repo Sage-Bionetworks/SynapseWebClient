@@ -77,8 +77,7 @@ public class Uploader
   private SynapseJSNIUtils synapseJsniUtils;
   private GlobalApplicationState globalAppState;
   private GWTWrapper gwt;
-  MultipartUploader multiPartUploader;
-  MultipartUploader legacyMultiPartUploader;
+  private MultipartUploader multiPartUploader;
   AuthenticationController authenticationController;
 
   private String[] fileNames;
@@ -125,7 +124,6 @@ public class Uploader
     this.jsClient = jsClient;
     this.synapseProperties = synapseProperties;
     this.eventBus = eventBus;
-    legacyMultiPartUploader = ginInjector.getLegacyMultipartUploader();
     view.setPresenter(this);
   }
 
@@ -671,11 +669,8 @@ public class Uploader
         view
       );
     } else {
-      // TODO: PLFM-8252: If Google Cloud platform Synapse solution supports parallel upload, then remove legacyMultiPartUploader (and all associated code)
-      MultipartUploader currentUploader = currentUploadType == UploadType.S3
-        ? multiPartUploader
-        : legacyMultiPartUploader;
-      currentUploader.uploadFile(
+      // SWC-6765: Uses react implementation for uploading a file in all cases
+      multiPartUploader.uploadFile(
         fileName,
         contentType,
         currentFile,

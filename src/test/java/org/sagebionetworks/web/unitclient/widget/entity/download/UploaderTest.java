@@ -70,8 +70,6 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.download.S3DirectUploader;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.entity.download.UploaderView;
-import org.sagebionetworks.web.client.widget.upload.MultipartUploader;
-import org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
@@ -85,9 +83,6 @@ public class UploaderTest {
   S3DirectUploader mockS3DirectUploader;
 
   MultipartUploaderStub multipartUploader;
-
-  @Mock
-  MultipartUploaderImpl mockLegacyMultipartUploader;
 
   @Mock
   UploaderView mockView;
@@ -174,8 +169,6 @@ public class UploaderTest {
   @Before
   public void before() throws Exception {
     multipartUploader = new MultipartUploaderStub();
-    when(mockGinInjector.getLegacyMultipartUploader())
-      .thenReturn(mockLegacyMultipartUploader);
     testEntity = new FileEntity();
     testEntity.setName("test file");
     testEntity.setId("syn99");
@@ -894,39 +887,6 @@ public class UploaderTest {
         eq(storageLocationId),
         eq(mockView)
       );
-  }
-
-  @Test
-  public void testUploadToGoogleBucket() {
-    String banner = "banner";
-    String endpoint = "endpointUrl";
-    String bucket = "mr.h";
-    String keyPrefixUUID = "keyPrefixUUID";
-    UploadType uploadType = UploadType.GOOGLECLOUDSTORAGE;
-    String fileName = "f.txt";
-    when(mockExternalGoogleCloudUploadDestination.getBanner())
-      .thenReturn(banner);
-    when(mockExternalGoogleCloudUploadDestination.getStorageLocationId())
-      .thenReturn(storageLocationId);
-    when(mockExternalGoogleCloudUploadDestination.getUploadType())
-      .thenReturn(uploadType);
-    when(mockExternalGoogleCloudUploadDestination.getBucket())
-      .thenReturn(bucket);
-
-    AsyncMockStubber
-      .callSuccessWith(
-        Collections.singletonList(mockExternalGoogleCloudUploadDestination)
-      )
-      .when(mockSynapseJavascriptClient)
-      .getUploadDestinations(anyString(), any(AsyncCallback.class));
-    uploader.queryForUploadDestination();
-    assertEquals(uploader.getStorageLocationId(), storageLocationId);
-    assertEquals(uploader.getCurrentUploadType(), uploadType);
-
-    uploader.directUploadStep2(fileName);
-
-    verify(mockLegacyMultipartUploader)
-      .uploadFile(anyString(), anyString(), any(), any(), anyLong(), any());
   }
 
   @Test

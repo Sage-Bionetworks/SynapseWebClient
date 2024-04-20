@@ -257,7 +257,6 @@ import org.sagebionetworks.web.client.widget.upload.CroppedImageUploadViewImpl;
 import org.sagebionetworks.web.client.widget.upload.FileHandleLink;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.ImageUploadView;
-import org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionModalViewImpl;
 import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionRowViewImpl;
@@ -863,6 +862,4 @@ public interface PortalGinInjector extends Ginjector {
   FollowingPagePresenter getFollowingPagePresenter();
 
   ColumnModelsEditorWidget getColumnModelsEditorWidget();
-
-  MultipartUploaderImpl getLegacyMultipartUploader();
 }
