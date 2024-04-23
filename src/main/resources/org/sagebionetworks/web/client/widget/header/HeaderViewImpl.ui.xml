@@ -122,5 +122,6 @@
       primaryCTAHref="https://sagebionetworks.jira.com/servicedesk/customer/portal/9/group/26/create/162"
       addStyleNames="nihNotificationAlert"
     />
+    <bh:Div ui:field="donationBannerContainer" />
   </bh:Div>
 </ui:UiBinder>
