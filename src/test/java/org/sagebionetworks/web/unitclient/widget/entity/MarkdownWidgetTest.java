@@ -3,7 +3,6 @@ package org.sagebionetworks.web.unitclient.widget.entity;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -17,16 +16,12 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.MarkdownIt;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.SessionStorage;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.resources.ResourceLoader;
-import org.sagebionetworks.web.client.resources.WebResource;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.ElementWrapper;
@@ -41,13 +36,11 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 public class MarkdownWidgetTest {
 
   MarkdownWidget presenter;
-  CookieProvider mockCookies;
   PortalGinInjector mockInjector;
   GWTWrapper mockGwt;
   SynapseJSNIUtils mockSynapseJSNIUtils;
   MarkdownWidgetView mockView;
   WidgetRegistrar mockWidgetRegistrar;
-  ResourceLoader mockResourceLoader;
   SynapseAlert mockSynAlert;
   WikiPageKey mockWikiPageKey;
   WikiPage mockWikiPage;
@@ -88,10 +81,8 @@ public class MarkdownWidgetTest {
       .thenReturn(mockWidgetRendererPresenter);
     mockView = mock(MarkdownWidgetView.class);
     mockGwt = mock(GWTWrapper.class);
-    mockCookies = mock(CookieProvider.class);
     mockInjector = mock(PortalGinInjector.class);
     mockSynAlert = mock(SynapseAlert.class);
-    mockResourceLoader = mock(ResourceLoader.class);
     mockWikiPageKey = mock(WikiPageKey.class);
     mockWikiPage = mock(WikiPage.class);
     when(mockWikiPage.getMarkdown()).thenReturn(testMarkdown);
@@ -104,8 +95,6 @@ public class MarkdownWidgetTest {
         mockSynapseJavascriptClient,
         mockSynapseJSNIUtils,
         mockWidgetRegistrar,
-        mockCookies,
-        mockResourceLoader,
         mockGwt,
         mockInjector,
         mockView,
@@ -138,7 +127,6 @@ public class MarkdownWidgetTest {
       )
     )
       .thenReturn(mockElementWrapper);
-    when(mockResourceLoader.isLoaded(any(WebResource.class))).thenReturn(true);
     presenter.configure(testMarkdown, mockWikiPageKey, null);
     ArgumentCaptor<Callback> callbackCaptor = ArgumentCaptor.forClass(
       Callback.class
@@ -211,7 +199,6 @@ public class MarkdownWidgetTest {
       )
     )
       .thenReturn(mockElementWrapper);
-    when(mockResourceLoader.isLoaded(any(WebResource.class))).thenReturn(true);
 
     presenter.loadMarkdownFromWikiPage(mockWikiPageKey, true);
     ArgumentCaptor<Callback> callbackCaptor = ArgumentCaptor.forClass(
@@ -254,10 +241,6 @@ public class MarkdownWidgetTest {
 
   @Test
   public void testMarkdownIt2Html() {
-    when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
-    )
-      .thenReturn("true");
     String sampleHTML = "<h1>heading</h1><p>foo baz bar</p>";
     when(mockMarkdownIt.markdown2Html(anyString(), anyString()))
       .thenReturn(sampleHTML);
@@ -276,10 +259,6 @@ public class MarkdownWidgetTest {
 
   @Test
   public void testMarkdownIt2HtmlError() {
-    when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
-    )
-      .thenReturn("true");
     String errorMessage = "a js exception";
     when(mockJsException.getMessage()).thenReturn(errorMessage);
     when(mockMarkdownIt.markdown2Html(anyString(), anyString()))
