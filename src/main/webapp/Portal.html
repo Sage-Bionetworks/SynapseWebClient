@@ -204,6 +204,9 @@
       loadJs(cdnEndpoint + 'generated/react-router-dom.min.js')
       loadJs(cdnEndpoint + 'generated/universalCookie.min.js')
       loadJs(cdnEndpoint + 'generated/react-bootstrap.min.js')
+      loadJs(cdnEndpoint + 'generated/katex.min.js')
+      loadCss(cdnEndpoint + 'generated/katex.css')
+
       loadJs(srcPath) // We don't load SRC's scss because we include it in our own compiled scss
       loadJs(cdnEndpoint + 'generated/croppie.min.js')
       loadCss(cdnEndpoint + 'js/diff/diffview.css')
@@ -214,7 +217,7 @@
       )
       loadJs(cdnEndpoint + 'js/linkify.min.js')
       loadJs(cdnEndpoint + 'js/linkify-string.min.js')
-      loadCss(cdnEndpoint + 'css/katex-0.10.1.min.css')
+
       loadJs('//cdn.statuspage.io/se-v2.js')
       // loadJs("//kh896k90gyvg.statuspage.io/embed/script.js");
       loadJs(cdnEndpoint + 'generated/papaparse.min.js')
