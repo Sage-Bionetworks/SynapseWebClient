@@ -227,5 +227,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
   @Override
   public void setNIHAlertVisible(boolean visible) {
     nihNotificationAlert.setVisible(visible);
+    donationBannerContainer.setVisible(!visible);
   }
 }
