@@ -22,8 +22,8 @@ import org.sagebionetworks.web.client.jsinterop.CreateOrUpdateAccessRequirementW
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.accessrequirements.CreateAccessRequirementButton;
-import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateAccessRequirementWizard;
 import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateOrUpdateAccessRequirementWizard;
+import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.LegacyCreateAccessRequirementWizard;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.renderer.SingleButtonView;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget;
@@ -45,7 +45,7 @@ public class CreateAccessRequirementButtonTest {
   PortalGinInjector mockGinInjector;
 
   @Mock
-  CreateAccessRequirementWizard mockCreateAccessRequirementWizard;
+  LegacyCreateAccessRequirementWizard mockLegacyCreateAccessRequirementWizard;
 
   @Mock
   CreateOrUpdateAccessRequirementWizard mockCreateOrUpdateAccessRequirementWizard;
@@ -85,8 +85,8 @@ public class CreateAccessRequirementButtonTest {
         mockCookies,
         mockGinInjector
       );
-    when(mockGinInjector.getCreateAccessRequirementWizard())
-      .thenReturn(mockCreateAccessRequirementWizard);
+    when(mockGinInjector.getLegacyCreateAccessRequirementWizard())
+      .thenReturn(mockLegacyCreateAccessRequirementWizard);
     when(mockGinInjector.getCreateOrUpdateAccessRequirementWizard())
       .thenReturn(mockCreateOrUpdateAccessRequirementWizard);
   }
@@ -118,8 +118,9 @@ public class CreateAccessRequirementButtonTest {
     when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
       .thenReturn(null);
     widget.onClick();
-    verify(mockCreateAccessRequirementWizard).configure(mockAccessRequirement);
-    verify(mockCreateAccessRequirementWizard)
+    verify(mockLegacyCreateAccessRequirementWizard)
+      .configure(mockAccessRequirement);
+    verify(mockLegacyCreateAccessRequirementWizard)
       .showModal(wizardCallbackCallback.capture());
     wizardCallbackCallback.getValue().onFinished();
     verify(mockRefreshCallback).invoke();
@@ -140,8 +141,8 @@ public class CreateAccessRequirementButtonTest {
     when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
       .thenReturn(null);
     widget.onClick();
-    verify(mockCreateAccessRequirementWizard).configure(mockSubject);
-    verify(mockCreateAccessRequirementWizard)
+    verify(mockLegacyCreateAccessRequirementWizard).configure(mockSubject);
+    verify(mockLegacyCreateAccessRequirementWizard)
       .showModal(any(ModalWizardWidget.WizardCallback.class));
     verify(mockCreateOrUpdateAccessRequirementWizard, never()).setOpen(true);
   }
@@ -152,8 +153,9 @@ public class CreateAccessRequirementButtonTest {
     when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
       .thenReturn(null);
     widget.onClick();
-    verify(mockCreateAccessRequirementWizard).configure(mockAccessRequirement);
-    verify(mockCreateAccessRequirementWizard)
+    verify(mockLegacyCreateAccessRequirementWizard)
+      .configure(mockAccessRequirement);
+    verify(mockLegacyCreateAccessRequirementWizard)
       .showModal(wizardCallbackCallback.capture());
     wizardCallbackCallback.getValue().onCanceled();
     verify(mockRefreshCallback).invoke();
@@ -187,9 +189,9 @@ public class CreateAccessRequirementButtonTest {
       );
     verify(mockCreateOrUpdateAccessRequirementWizard).setOpen(true);
 
-    verify(mockCreateAccessRequirementWizard, never())
+    verify(mockLegacyCreateAccessRequirementWizard, never())
       .configure(mockAccessRequirement);
-    verify(mockCreateAccessRequirementWizard, never())
+    verify(mockLegacyCreateAccessRequirementWizard, never())
       .showModal(wizardCallbackCallback.capture());
 
     createOrUpdateArOnCompleteCaptor.getValue().onComplete();
@@ -220,8 +222,9 @@ public class CreateAccessRequirementButtonTest {
       );
     verify(mockCreateOrUpdateAccessRequirementWizard).setOpen(true);
 
-    verify(mockCreateAccessRequirementWizard, never()).configure(mockSubject);
-    verify(mockCreateAccessRequirementWizard, never())
+    verify(mockLegacyCreateAccessRequirementWizard, never())
+      .configure(mockSubject);
+    verify(mockLegacyCreateAccessRequirementWizard, never())
       .showModal(wizardCallbackCallback.capture());
 
     createOrUpdateArOnCompleteCaptor.getValue().onComplete();
@@ -248,7 +251,7 @@ public class CreateAccessRequirementButtonTest {
     createOrUpdateArOnCancelCaptor.getValue().onCancel();
     verify(mockCreateOrUpdateAccessRequirementWizard).setOpen(false);
     verify(mockRefreshCallback).invoke();
-    verify(mockCreateAccessRequirementWizard, never())
+    verify(mockLegacyCreateAccessRequirementWizard, never())
       .configure(mockAccessRequirement);
   }
 }

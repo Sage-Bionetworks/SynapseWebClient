@@ -17,6 +17,8 @@ public class CreateOrUpdateAccessRequirementWizard implements IsWidget {
   private final SynapseReactClientFullContextPropsProvider propsProvider;
 
   private final ReactComponentDiv reactComponentDiv;
+
+  private boolean open;
   private RestrictableObjectDescriptor subject;
   private String accessRequirementId;
   private CreateOrUpdateAccessRequirementWizardProps.OnComplete onComplete;
@@ -31,9 +33,16 @@ public class CreateOrUpdateAccessRequirementWizard implements IsWidget {
     reactComponentDiv = new ReactComponentDiv();
   }
 
-  private void renderComponent(
-    CreateOrUpdateAccessRequirementWizardProps props
-  ) {
+  private void renderComponent() {
+    CreateOrUpdateAccessRequirementWizardProps props =
+      CreateOrUpdateAccessRequirementWizardProps.create(
+        this.open,
+        this.subject,
+        this.accessRequirementId,
+        this.onComplete,
+        this.onCancel
+      );
+
     ReactNode reactNode = React.createElementWithSynapseContext(
       SRC.SynapseComponents.CreateOrUpdateAccessRequirementWizard,
       props,
@@ -48,19 +57,15 @@ public class CreateOrUpdateAccessRequirementWizard implements IsWidget {
     CreateOrUpdateAccessRequirementWizardProps.OnCancel onCancel
   ) {
     reactComponentDiv.clear();
+
     this.subject = subject;
     this.onComplete = onComplete;
     this.onCancel = onCancel;
-    CreateOrUpdateAccessRequirementWizardProps props =
-      CreateOrUpdateAccessRequirementWizardProps.create(
-        false,
-        subject,
-        null,
-        onComplete,
-        onCancel
-      );
 
-    renderComponent(props);
+    this.open = false;
+    this.accessRequirementId = null;
+
+    renderComponent();
   }
 
   public void configure(
@@ -69,31 +74,20 @@ public class CreateOrUpdateAccessRequirementWizard implements IsWidget {
     CreateOrUpdateAccessRequirementWizardProps.OnCancel onCancel
   ) {
     reactComponentDiv.clear();
+
     this.accessRequirementId = accessRequirement.getId().toString();
     this.onComplete = onComplete;
     this.onCancel = onCancel;
-    CreateOrUpdateAccessRequirementWizardProps props =
-      CreateOrUpdateAccessRequirementWizardProps.create(
-        false,
-        null,
-        accessRequirementId,
-        onComplete,
-        onCancel
-      );
 
-    renderComponent(props);
+    this.open = false;
+    this.subject = null;
+
+    renderComponent();
   }
 
   public void setOpen(boolean open) {
-    CreateOrUpdateAccessRequirementWizardProps props =
-      CreateOrUpdateAccessRequirementWizardProps.create(
-        open,
-        subject,
-        accessRequirementId,
-        onComplete,
-        onCancel
-      );
-    renderComponent(props);
+    this.open = open;
+    renderComponent();
   }
 
   @Override

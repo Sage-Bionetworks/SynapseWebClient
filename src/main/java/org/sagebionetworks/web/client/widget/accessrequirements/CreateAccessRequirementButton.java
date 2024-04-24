@@ -14,8 +14,8 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.jsinterop.CreateOrUpdateAccessRequirementWizardProps;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateAccessRequirementWizard;
 import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateOrUpdateAccessRequirementWizard;
+import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.LegacyCreateAccessRequirementWizard;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.renderer.SingleButtonView;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
@@ -98,8 +98,8 @@ public class CreateAccessRequirementButton
   }
 
   private void useSwcWizard() {
-    CreateAccessRequirementWizard wizard =
-      ginInjector.getCreateAccessRequirementWizard();
+    LegacyCreateAccessRequirementWizard wizard =
+      ginInjector.getLegacyCreateAccessRequirementWizard();
     if (subject != null) {
       wizard.configure(subject);
     } else if (ar != null) {
