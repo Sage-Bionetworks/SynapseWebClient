@@ -39,7 +39,7 @@ jobs:
           retention-days: 1
   playwright-tests:
     needs: [build]
-    runs-on: 'macos-latest'
+    runs-on: 'macos-12'
     timeout-minutes: 60
     # Ensure that at most one playwright-tests job will run at a time in Sage-Bionetworks repo,
     # but allow multiple playwright-test jobs to run concurrently in forked repos
