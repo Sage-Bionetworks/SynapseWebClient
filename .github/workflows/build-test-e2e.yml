@@ -70,29 +70,6 @@ jobs:
       - name: Check colima and lima version
         if: runner.os == 'macos'
         run: |
-          echo "- runner colima version: $(colima version)" >> $GITHUB_STEP_SUMMARY
-          LIMA_VERSION=$(limactl --version)
-          echo "- runner lima version: ${LIMA_VERSION}" >> $GITHUB_STEP_SUMMARY
-          if [[ !("${LIMA_VERSION}" == "limactl version 0.19.0" || "${LIMA_VERSION}" == "limactl version 0.19.1") ]]; then 
-            echo "::warning::runner lima version has changed. Consider removing lima/colima downgrade, see SWC-6655."
-          fi
-      - name: Downgrade colima/lima versions
-        if: runner.os == 'macos'
-        run: |
-          brew uninstall colima
-          brew uninstall lima
-
-          # install lima
-          LIMA_VERSION="v0.18.0"
-          LIMA_VERSION_URL="https://github.com/lima-vm/lima/releases/download/${LIMA_VERSION}/lima-${LIMA_VERSION:1}-$(uname -s)-$(uname -m).tar.gz"
-          curl -fsSL "${LIMA_VERSION_URL}" | tar Cxzvm /usr/local
-
-          # install colima
-          COLIMA_VERSION="v0.6.6"
-          COLIMA_VERSION_URL="https://github.com/abiosoft/colima/releases/download/${COLIMA_VERSION}/colima-$(uname -s)-$(uname -m)"
-          sudo mkdir -p /usr/local/bin
-          sudo curl -L -o /usr/local/bin/colima "${COLIMA_VERSION_URL}" && sudo chmod +x /usr/local/bin/colima
-
           # Get colima and lima versions
           limactl --version
           colima version
