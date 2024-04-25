@@ -96,7 +96,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn install --frozen-lockfile --network-timeout 1000000
       - name: Install Playwright Browsers
         run: yarn playwright install --with-deps
       - name: Check for common errors
