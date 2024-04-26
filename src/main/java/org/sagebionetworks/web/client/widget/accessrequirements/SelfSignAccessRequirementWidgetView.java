@@ -60,4 +60,6 @@ public interface SelfSignAccessRequirementWidgetView
   void setAccessRequirementRelatedProjectsList(
     IsWidget accessRequirementRelatedProjectsList
   );
+
+  void setSubjectsDefinedByAnnotations(Boolean subjectsDefinedByAnnotations);
 }

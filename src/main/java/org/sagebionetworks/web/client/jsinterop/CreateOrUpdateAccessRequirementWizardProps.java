@@ -14,7 +14,7 @@ public class CreateOrUpdateAccessRequirementWizardProps
   @FunctionalInterface
   @JsFunction
   public interface OnComplete {
-    void onComplete();
+    void onComplete(String accessRequirementID);
   }
 
   @FunctionalInterface

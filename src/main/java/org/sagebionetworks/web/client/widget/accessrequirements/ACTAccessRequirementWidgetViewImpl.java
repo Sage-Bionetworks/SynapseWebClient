@@ -89,6 +89,12 @@ public class ACTAccessRequirementWidgetViewImpl
   @UiField
   InlineLabel accessRequirementIDField;
 
+  @UiField
+  Div subjectsDefinedByAnnotationsUI;
+
+  @UiField
+  Div subjectsDefinedInAccessRequirementUI;
+
   public interface Binder
     extends UiBinder<Widget, ACTAccessRequirementWidgetViewImpl> {}
 
@@ -263,6 +269,17 @@ public class ACTAccessRequirementWidgetViewImpl
       );
       accessRequirementDescription.removeStyleName("boldText");
     }
+  }
+
+  @Override
+  public void setSubjectsDefinedByAnnotations(
+    Boolean subjectsDefinedByAnnotations
+  ) {
+    boolean v = subjectsDefinedByAnnotations != null
+      ? subjectsDefinedByAnnotations.booleanValue()
+      : false;
+    subjectsDefinedByAnnotationsUI.setVisible(v);
+    subjectsDefinedInAccessRequirementUI.setVisible(!v);
   }
 
   @Override
