@@ -15,7 +15,7 @@ import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidge
  * @author Jay
  *
  */
-public class CreateAccessRequirementWizard implements IsWidget {
+public class LegacyCreateAccessRequirementWizard implements IsWidget {
 
   public static final String CREATE_ACCESS_REQUIREMENT_TITLE =
     "Create Access Requirement";
@@ -26,7 +26,7 @@ public class CreateAccessRequirementWizard implements IsWidget {
   CreateAccessRequirementStep1 step1;
 
   @Inject
-  public CreateAccessRequirementWizard(
+  public LegacyCreateAccessRequirementWizard(
     ModalWizardWidget modalWizardWidget,
     CreateAccessRequirementStep1 step1
   ) {

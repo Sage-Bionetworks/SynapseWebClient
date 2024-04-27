@@ -66,7 +66,8 @@ import org.sagebionetworks.web.client.widget.accessrequirements.SelfSignAccessRe
 import org.sagebionetworks.web.client.widget.accessrequirements.TeamSubjectWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.TermsOfUseAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.approval.AccessorGroupWidget;
-import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateAccessRequirementWizard;
+import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateOrUpdateAccessRequirementWizard;
+import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.LegacyCreateAccessRequirementWizard;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.ACTDataAccessSubmissionWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.OpenSubmissionWidget;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
@@ -734,7 +735,9 @@ public interface PortalGinInjector extends Ginjector {
 
   FileHandleWidget getFileHandleWidget();
 
-  CreateAccessRequirementWizard getCreateAccessRequirementWizard();
+  LegacyCreateAccessRequirementWizard getLegacyCreateAccessRequirementWizard();
+
+  CreateOrUpdateAccessRequirementWizard getCreateOrUpdateAccessRequirementWizard();
 
   ProfileCertifiedValidatedWidget getProfileCertifiedValidatedWidget();
 
