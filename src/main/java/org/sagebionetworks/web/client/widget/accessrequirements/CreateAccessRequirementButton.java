@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.jsinterop.CreateOrUpdateAccessRequirementWizardProps;
+import org.sagebionetworks.web.client.place.AccessRequirementPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateOrUpdateAccessRequirementWizard;
@@ -126,11 +127,17 @@ public class CreateAccessRequirementButton
     CreateOrUpdateAccessRequirementWizard wizard =
       ginInjector.getCreateOrUpdateAccessRequirementWizard();
 
-    CreateOrUpdateAccessRequirementWizardProps.OnComplete onComplete = () -> {
-      wizard.setOpen(false);
-      refreshCallback.invoke();
-      view.clearWidgets();
-    };
+    CreateOrUpdateAccessRequirementWizardProps.OnComplete onComplete =
+      accessRequirementID -> {
+        wizard.setOpen(false);
+        view.clearWidgets();
+        AccessRequirementPlace target = new AccessRequirementPlace("");
+        target.putParam(
+          AccessRequirementPlace.AR_ID_PARAM,
+          accessRequirementID
+        );
+        ginInjector.getGlobalApplicationState().getPlaceChanger().goTo(target);
+      };
     CreateOrUpdateAccessRequirementWizardProps.OnCancel onCancel = () -> {
       wizard.setOpen(false);
       refreshCallback.invoke();

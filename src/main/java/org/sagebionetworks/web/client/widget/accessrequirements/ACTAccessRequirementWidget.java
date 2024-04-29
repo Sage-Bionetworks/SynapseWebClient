@@ -149,6 +149,7 @@ public class ACTAccessRequirementWidget
     convertACTAccessRequirementButton.configure(ar, refreshCallback);
     view.setAccessRequirementName(ar.getName());
     view.setAccessRequirementID(ar.getId().toString());
+    view.setSubjectsDefinedByAnnotations(ar.getSubjectsDefinedByAnnotations());
     lazyLoadHelper.setIsConfigured();
   }
 

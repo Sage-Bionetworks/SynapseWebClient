@@ -124,6 +124,12 @@ public class ManagedACTAccessRequirementWidgetViewImpl
   @UiField
   Span accessRequirementDescription;
 
+  @UiField
+  Div subjectsDefinedByAnnotationsUI;
+
+  @UiField
+  Div subjectsDefinedInAccessRequirementUI;
+
   private final JSONObjectAdapter jsonObjectAdapter;
   private final SynapseReactClientFullContextPropsProvider propsProvider;
   Callback onAttachCallback;
@@ -401,6 +407,17 @@ public class ManagedACTAccessRequirementWidgetViewImpl
         propsProvider.getJsInteropContextProps()
       )
     );
+  }
+
+  @Override
+  public void setSubjectsDefinedByAnnotations(
+    Boolean subjectsDefinedByAnnotations
+  ) {
+    boolean v = subjectsDefinedByAnnotations != null
+      ? subjectsDefinedByAnnotations.booleanValue()
+      : false;
+    subjectsDefinedByAnnotationsUI.setVisible(v);
+    subjectsDefinedInAccessRequirementUI.setVisible(!v);
   }
 
   public void hideRequestAccessModal() {

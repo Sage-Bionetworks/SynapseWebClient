@@ -74,6 +74,12 @@ public class TermsOfUseAccessRequirementWidgetViewImpl
   @UiField
   Div controlsContainer;
 
+  @UiField
+  Div subjectsDefinedByAnnotationsUI;
+
+  @UiField
+  Div subjectsDefinedInAccessRequirementUI;
+
   Callback onAttachCallback;
 
   public interface Binder
@@ -231,5 +237,16 @@ public class TermsOfUseAccessRequirementWidgetViewImpl
   @Override
   public void hideControls() {
     controlsContainer.setVisible(false);
+  }
+
+  @Override
+  public void setSubjectsDefinedByAnnotations(
+    Boolean subjectsDefinedByAnnotations
+  ) {
+    boolean v = subjectsDefinedByAnnotations != null
+      ? subjectsDefinedByAnnotations.booleanValue()
+      : false;
+    subjectsDefinedByAnnotationsUI.setVisible(v);
+    subjectsDefinedInAccessRequirementUI.setVisible(!v);
   }
 }

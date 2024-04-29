@@ -94,4 +94,6 @@ public interface ManagedACTAccessRequirementWidgetView
   void setAccessRequirementRelatedProjectsList(
     IsWidget accessRequirementRelatedProjectsList
   );
+
+  void setSubjectsDefinedByAnnotations(Boolean subjectsDefinedByAnnotations);
 }
