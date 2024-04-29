@@ -130,6 +130,10 @@ public class TermsOfUseAccessRequirementWidget
     isACTMemberAsyncHandler.isACTActionAvailable(isACT -> {
       view.setAccessRequirementIDVisible(isACT);
       view.setCoveredEntitiesHeadingVisible(isACT);
+      // show the subjects defined by annotations UI if isACT and this flag is set
+      view.setSubjectsDefinedByAnnotations(
+        isACT && ar.getSubjectsDefinedByAnnotations()
+      );
     });
     teamSubjectsWidget.configure(ar.getSubjectIds());
     entitySubjectsWidget.configure(ar.getSubjectIds());

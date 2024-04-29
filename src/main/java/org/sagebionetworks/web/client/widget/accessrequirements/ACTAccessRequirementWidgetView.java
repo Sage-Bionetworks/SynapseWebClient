@@ -67,4 +67,6 @@ public interface ACTAccessRequirementWidgetView
   void setAccessRequirementIDVisible(boolean visible);
 
   void setAccessRequirementID(String arID);
+
+  void setSubjectsDefinedByAnnotations(Boolean subjectsDefinedByAnnotations);
 }

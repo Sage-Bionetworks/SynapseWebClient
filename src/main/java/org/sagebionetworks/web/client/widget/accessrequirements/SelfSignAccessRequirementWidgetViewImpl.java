@@ -77,6 +77,12 @@ public class SelfSignAccessRequirementWidgetViewImpl
 
   Callback onAttachCallback;
 
+  @UiField
+  Div subjectsDefinedByAnnotationsUI;
+
+  @UiField
+  Div subjectsDefinedInAccessRequirementUI;
+
   public interface Binder
     extends UiBinder<Widget, SelfSignAccessRequirementWidgetViewImpl> {}
 
@@ -240,5 +246,16 @@ public class SelfSignAccessRequirementWidgetViewImpl
   @Override
   public void setAccessRequirementIDVisible(boolean visible) {
     accessRequirementIDUI.setVisible(visible);
+  }
+
+  @Override
+  public void setSubjectsDefinedByAnnotations(
+    Boolean subjectsDefinedByAnnotations
+  ) {
+    boolean v = subjectsDefinedByAnnotations != null
+      ? subjectsDefinedByAnnotations.booleanValue()
+      : false;
+    subjectsDefinedByAnnotationsUI.setVisible(v);
+    subjectsDefinedInAccessRequirementUI.setVisible(!v);
   }
 }
