@@ -575,7 +575,7 @@
   resolved "https://registry.yarnpkg.com/@plotly/d3/-/d3-3.8.1.tgz#674bf19809ffcc359e0ab388a1051f2dac5e6877"
   integrity sha512-x49ThEu1FRA00kTso4Jdfyf2byaCPLBGmLjAYQz5OzaPyLUhHesX3/Nfv2OHEhynhdy2UB39DLXq6thYe2L2kg==
 
-"@plotly/mapbox-gl@v1.13.4":
+"@plotly/mapbox-gl@1.13.4", "@plotly/mapbox-gl@v1.13.4":
   version "1.13.4"
   resolved "https://registry.yarnpkg.com/@plotly/mapbox-gl/-/mapbox-gl-1.13.4.tgz#cb854d70902dd02af753f728855152efe568524f"
   integrity sha512-sR3/Pe5LqT/fhYgp4rT4aSFf1rTsxMbGiH6Hojc7PH36ny5Bn17iVFUjpzycafETURuFbLZUfjODO8LvSI+5zQ==
@@ -798,6 +798,11 @@
     ajv-formats "^2.1.1"
     lodash "^4.17.21"
     lodash-es "^4.17.21"
+
+"@sage-bionetworks/markdown-it-container@^4.0.1":
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/@sage-bionetworks/markdown-it-container/-/markdown-it-container-4.0.1.tgz#430022ac2553a83f6c48892efe465d01e64cb3a8"
+  integrity sha512-ufgmV+kGlP7sYNanlsjzx+D+ZywmW/QE3gIolffm8H2Zix3/hpO65FrWmXPlKslz32WUdRZsmjD+2AJKOO0AFg==
 
 "@sage-bionetworks/react-base-table@1.13.4", "@sage-bionetworks/react-base-table@^1.13.4":
   version "1.13.4"
@@ -1743,6 +1748,13 @@ color-parse@1.3.8:
     color-name "^1.0.0"
     defined "^1.0.0"
     is-plain-obj "^1.1.0"
+
+color-parse@2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/color-parse/-/color-parse-2.0.0.tgz#6bcf1f0f1fafffe68cacc2dde7a19b3a8c3d7bcd"
+  integrity sha512-g2Z+QnWsdHLppAbrpcFWo629kLOnOPtpxYV69GCqm92gqSgyXbzlfyN3MXs0412fPBkFmiuS+rXposgBgBa6Kg==
+  dependencies:
+    color-name "^1.0.0"
 
 color-parse@^1.3.8, color-parse@^1.4.1, color-parse@^1.4.2:
   version "1.4.3"
@@ -3504,6 +3516,13 @@ markdown-it-inline-comments@^1.0.1:
   resolved "https://registry.yarnpkg.com/markdown-it-inline-comments/-/markdown-it-inline-comments-1.0.1.tgz#176eabe631a3e08125bd739500f43c51f525896d"
   integrity sha512-gObNM3NumcpsU66pO2LmV8MGBfdfFp7TcYME9iuUGs82+JYJWMmBQtAj6/qho4OhKqpR0UX2JTkuuA2HPgHUtQ==
 
+markdown-it-math@^4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/markdown-it-math/-/markdown-it-math-4.1.1.tgz#a63fac36d9ffe4362749749d966a84852f2ca137"
+  integrity sha512-LQ0hREgMgN4tNcy2PGyw1XypjmKJjc+ZzATMuDIVD/Bagr5SGL198uHleVdiFDrNdXpqVmL4N1KD1GYyftMakQ==
+  optionalDependencies:
+    ascii2mathml "^0.6.2"
+
 markdown-it-strikethrough-alt@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/markdown-it-strikethrough-alt/-/markdown-it-strikethrough-alt-1.0.0.tgz#b8a306784b0dc954ae41a1b356211bc7463156b1"
@@ -3513,6 +3532,11 @@ markdown-it-sub-alt@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/markdown-it-sub-alt/-/markdown-it-sub-alt-1.0.0.tgz#f893919d1364b94b60f948217ae465359b14f10c"
   integrity sha512-6tLB30PYnZkjj2a7VcBWrdkRkelMrmjzKzzhqV4LZTk18YOBm3JM/TzyL8yDJ8U6DpCESJNfflj3dCC7Df3wcA==
+
+markdown-it-sub@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/markdown-it-sub/-/markdown-it-sub-2.0.0.tgz#10f6c7bbf2faacf71ae1a64c75009c40ef9b2c94"
+  integrity sha512-iCBKgwCkfQBRg2vApy9vx1C1Tu6D8XYo8NvevI3OlwzBRmiMtsJ2sXupBgEA7PPxiDwNni3qIUkhZ6j5wofDUA==
 
 markdown-it-sup-alt@^1.0.2:
   version "1.0.2"
@@ -3525,6 +3549,11 @@ markdown-it-sup@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/markdown-it-sup/-/markdown-it-sup-1.0.0.tgz#cb9c9ff91a5255ac08f3fd3d63286e15df0a1fc3"
   integrity sha512-E32m0nV9iyhRR7CrhnzL5msqic7rL1juWre6TQNxsnApg7Uf+F97JOKxUijg5YwXz86lZ0mqfOnutoryyNdntQ==
+
+markdown-it-sup@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/markdown-it-sup/-/markdown-it-sup-2.0.0.tgz#683b9390929f3024fcd5291799c466ce3d367f44"
+  integrity sha512-5VgmdKlkBd8sgXuoDoxMpiU+BiEt3I49GItBzzw7Mxq9CxvnhE/k09HFli09zgfFDRixDQDfDxi0mgBCXtaTvA==
 
 markdown-it-synapse-heading@^1.0.1:
   version "1.0.1"
@@ -3543,7 +3572,7 @@ markdown-it-synapse-table@^1.0.6:
   resolved "https://registry.yarnpkg.com/markdown-it-synapse-table/-/markdown-it-synapse-table-1.0.6.tgz#5e14383257a6f6495d6c097388911548fe2155fb"
   integrity sha512-znhzQZhMxZ8sSQ9IBfdVv4ufW54i+P8M//rHEswcgg7SI3J0AN1s2T7T0KqYGG+9rHf/ORsdcUZst9hMiBC9xA==
 
-markdown-it-synapse@1.1.14:
+markdown-it-synapse@1.1.14, markdown-it-synapse@^1.1.14:
   version "1.1.14"
   resolved "https://registry.yarnpkg.com/markdown-it-synapse/-/markdown-it-synapse-1.1.14.tgz#68826de682e80f56e3f669778537df699baa8d0b"
   integrity sha512-2z1WJQLufwqUPkeS0YqneWtBF6nlNcShtO5k4/XbDuYQKK0o/zawREOHxV7ZZP5GsNYbJ54tWCHJ3NzAb9Fmfw==
@@ -4048,14 +4077,14 @@ plotly.js@2.28.0:
     world-calendars "^1.0.3"
 
 plotly.js@^2.28.0:
-  version "2.29.1"
-  resolved "https://registry.yarnpkg.com/plotly.js/-/plotly.js-2.29.1.tgz#9fc33a2e9413540fc929ceeb223243fe732e735b"
-  integrity sha512-+XirhgCh42JF/iVu/RtBRbhcs328ipinajy7hd3mnZdnQv2Th6F441DSXer5S+P0nNluNs10vAFTELo4k/icjg==
+  version "2.31.1"
+  resolved "https://registry.yarnpkg.com/plotly.js/-/plotly.js-2.31.1.tgz#7f7d7b4badf6119be2bd9e19df03b4b6cc9d37fd"
+  integrity sha512-KEdSZHDyd7bIj8IY/7JTenRHof5MwbhT6CLsjhbzVhy/XDw35Pju+2M7J6nbPcmnnRzmSTjoBch1gNzcJc50vA==
   dependencies:
     "@plotly/d3" "3.8.1"
     "@plotly/d3-sankey" "0.7.2"
     "@plotly/d3-sankey-circular" "0.33.1"
-    "@plotly/mapbox-gl" v1.13.4
+    "@plotly/mapbox-gl" "1.13.4"
     "@turf/area" "^6.4.0"
     "@turf/bbox" "^6.4.0"
     "@turf/centroid" "^6.0.2"
@@ -4063,7 +4092,7 @@ plotly.js@^2.28.0:
     canvas-fit "^1.5.0"
     color-alpha "1.0.4"
     color-normalize "1.5.0"
-    color-parse "1.3.8"
+    color-parse "2.0.0"
     color-rgba "2.1.1"
     country-regex "^1.1.0"
     d3-force "^1.2.1"
@@ -4077,7 +4106,6 @@ plotly.js@^2.28.0:
     fast-isnumeric "^1.1.4"
     gl-mat4 "^1.2.0"
     gl-text "^1.3.1"
-    glslify "^7.1.1"
     has-hover "^1.0.1"
     has-passive-events "^1.0.0"
     is-mobile "^4.0.0"
@@ -4091,7 +4119,7 @@ plotly.js@^2.28.0:
     probe-image-size "^7.2.3"
     regl "npm:@plotly/regl@^2.1.2"
     regl-error2d "^2.0.12"
-    regl-line2d "^3.1.2"
+    regl-line2d "^3.1.3"
     regl-scatter2d "^3.3.1"
     regl-splom "^1.0.14"
     strongly-connected-components "^1.0.1"
@@ -4582,7 +4610,7 @@ regl-error2d@^2.0.12:
     to-float32 "^1.1.0"
     update-diff "^1.1.0"
 
-regl-line2d@^3.1.2:
+regl-line2d@^3.1.2, regl-line2d@^3.1.3:
   version "3.1.3"
   resolved "https://registry.yarnpkg.com/regl-line2d/-/regl-line2d-3.1.3.tgz#03669c676a9e3a06973d34c68ada2400792724a4"
   integrity sha512-fkgzW+tTn4QUQLpFKsUIE0sgWdCmXAM3ctXcCgoGBZTSX5FE2A0M7aynz7nrZT5baaftLrk9te54B+MEq4QcSA==
