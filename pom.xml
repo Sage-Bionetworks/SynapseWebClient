@@ -518,7 +518,7 @@
                   tofile="src/main/webapp/generated/markdown-it-center-text.js"
                 />
                 <copy
-                  file="${project.basedir}/node_modules/markdown-it-container/dist/markdown-it-container.min.js"
+                  file="${project.basedir}/node_modules/@sage-bionetworks/markdown-it-container/dist/markdown-it-container.min.js"
                   tofile="src/main/webapp/generated/markdown-it-container.js"
                 />
                 <copy
