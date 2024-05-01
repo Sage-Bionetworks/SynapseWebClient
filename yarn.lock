@@ -799,6 +799,11 @@
     lodash "^4.17.21"
     lodash-es "^4.17.21"
 
+"@sage-bionetworks/markdown-it-container@4.0.1":
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/@sage-bionetworks/markdown-it-container/-/markdown-it-container-4.0.1.tgz#430022ac2553a83f6c48892efe465d01e64cb3a8"
+  integrity sha512-ufgmV+kGlP7sYNanlsjzx+D+ZywmW/QE3gIolffm8H2Zix3/hpO65FrWmXPlKslz32WUdRZsmjD+2AJKOO0AFg==
+
 "@sage-bionetworks/react-base-table@1.13.4", "@sage-bionetworks/react-base-table@^1.13.4":
   version "1.13.4"
   resolved "https://registry.yarnpkg.com/@sage-bionetworks/react-base-table/-/react-base-table-1.13.4.tgz#7b1b2ab6a60cd7144b0fc3b355ee06da9b0127fa"
@@ -3489,11 +3494,6 @@ markdown-it-center-text@^1.0.4:
   resolved "https://registry.yarnpkg.com/markdown-it-center-text/-/markdown-it-center-text-1.0.4.tgz#4e7f907b6539b62a6200fead50aebed587734b3c"
   integrity sha512-7AA0gek4FYJ6gWB2kdGNx06k3GrlO97nEMY7uovQ70/6MtfqPznrgnKoWO3V4p36m3RT5GeQIFXqBH9Wr4iL/g==
 
-markdown-it-container@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/markdown-it-container/-/markdown-it-container-2.0.0.tgz#0019b43fd02eefece2f1960a2895fba81a404695"
-  integrity sha512-IxPOaq2LzrGuFGyYq80zaorXReh2ZHGFOB1/Hen429EJL1XkPI3FJTpx9TsJeua+j2qTru4h3W1TiCRdeivMmA==
-
 markdown-it-emphasis-alt@^1.0.8:
   version "1.0.8"
   resolved "https://registry.yarnpkg.com/markdown-it-emphasis-alt/-/markdown-it-emphasis-alt-1.0.8.tgz#dfc240d05337347f8db14699901f9c9c0975e53f"
@@ -5066,10 +5066,10 @@ svg-path-sdf@^1.1.3:
     parse-svg-path "^0.1.2"
     svg-path-bounds "^1.0.1"
 
-synapse-react-client@3.2.13:
-  version "3.2.13"
-  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-3.2.13.tgz#a219c71edcc18d2869efd62159de61f9d58443c7"
-  integrity sha512-nKViR+ZSnQ3Ps8+FKo93rqmWvLRlPUtSIUDURqG+VlPK5YouSpWFu7ycTK8zj+t8Hx0vkG89q1jrmAf6DwssbQ==
+synapse-react-client@3.2.14:
+  version "3.2.14"
+  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-3.2.14.tgz#6b2290b0d78fa09f96327c5cfaed4bb7e23b9e9a"
+  integrity sha512-3+qlm6Cr3yiwimMBfg3TCw35HHpoceHQvbfGTQ2/dcwzMWzj7VlCh6BPqVz2nM6/jZ9F856az2oQyePnIQBv3w==
   dependencies:
     "@apidevtools/json-schema-ref-parser" "^9.1.2"
     "@brainhubeu/react-carousel" "1.19.26"
@@ -5089,6 +5089,7 @@ synapse-react-client@3.2.13:
     "@rjsf/mui" "5.17.1"
     "@rjsf/utils" "5.17.1"
     "@rjsf/validator-ajv8" "5.17.1"
+    "@sage-bionetworks/markdown-it-container" "4.0.1"
     "@sage-bionetworks/react-base-table" "^1.13.4"
     "@sage-bionetworks/synapse-types" "0.0.2"
     "@tanstack/query-core" "5.22.2"
@@ -5111,7 +5112,6 @@ synapse-react-client@3.2.13:
     markdown-it "^14.1.0"
     markdown-it-br "^1.0.0"
     markdown-it-center-text "^1.0.4"
-    markdown-it-container "^2.0.0"
     markdown-it-emphasis-alt "^1.0.8"
     markdown-it-inline-comments "^1.0.1"
     markdown-it-strikethrough-alt "^1.0.0"
