@@ -398,6 +398,14 @@
                   tofile="src/main/webapp/generated/jquery.min.js"
                 />
                 <copy
+                  file="${project.basedir}/node_modules/jquery-ui/dist/jquery-ui.min.js"
+                  tofile="src/main/webapp/generated/jquery-ui.min.js"
+                />
+                <copy
+                  file="${project.basedir}/node_modules/jquery-ui/dist/themes/base/jquery-ui.min.css"
+                  tofile="src/main/webapp/generated/jquery-ui.min.css"
+                />
+                <copy
                   file="${project.basedir}/node_modules/jsplumb/dist/js/jsplumb.min.js"
                   tofile="src/main/webapp/generated/jsplumb.min.js"
                 />
