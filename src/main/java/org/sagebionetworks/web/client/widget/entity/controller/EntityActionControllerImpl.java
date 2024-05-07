@@ -626,6 +626,7 @@ public class EntityActionControllerImpl
     configureChangeStorageLocation();
     configureCreateOrUpdateDoi();
     configureEditProjectMetadataAction();
+    configureProjectHelpAction();
     configureEditFileMetadataAction();
     configureTableCommands();
     configureProjectLevelTableCommands();
@@ -1549,6 +1550,13 @@ public class EntityActionControllerImpl
     }
   }
 
+  private void configureProjectHelpAction() {
+    boolean isProject =
+      entityBundle.getEntity() instanceof Project && currentArea == null;
+    actionMenu.setActionVisible(Action.PROJECT_HELP, isProject);
+    actionMenu.setActionListener(Action.EDIT_PROJECT_METADATA, this);
+  }
+
   private void configureEditFileMetadataAction() {
     if (entityBundle.getEntity() instanceof FileEntity) {
       actionMenu.setActionVisible(
@@ -1771,6 +1779,12 @@ public class EntityActionControllerImpl
         break;
       case EDIT_PROJECT_METADATA:
         onEditProjectMetadata();
+        break;
+      case PROJECT_HELP:
+        // open Synapse Service Desk
+        popupUtils.openInNewWindow(
+          "https://sagebionetworks.jira.com/servicedesk/customer/portal/9"
+        );
         break;
       case EDIT_WIKI_PAGE:
         onEditWiki();

@@ -157,6 +157,11 @@ public class DefaultEntityActionMenuLayoutUtil {
 
     switch (entityType) {
       case project:
+        layout.setButtonActions(
+          Arrays.asList(
+            ActionViewProps.create(Action.PROJECT_HELP, "helpOutlineTwoTone")
+          )
+        );
         layout.setPrimaryMenuText(
           EntityTypeUtils.getDisplayName(entityType) + TOOLS_SUFFIX
         );
