@@ -227,7 +227,8 @@ a:focus {
       }
       button.toolsMenuButton,
       .dropdown.open,
-      .MuiButton-root {
+      .MuiButton-root,
+      .MuiIconButton-root {
         @include transparent-button();
       }
     }

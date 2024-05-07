@@ -1551,10 +1551,12 @@ public class EntityActionControllerImpl
   }
 
   private void configureProjectHelpAction() {
-    boolean isProject =
-      entityBundle.getEntity() instanceof Project && currentArea == null;
+    boolean isProject = entityBundle.getEntity() instanceof Project;
     actionMenu.setActionVisible(Action.PROJECT_HELP, isProject);
-    actionMenu.setActionListener(Action.EDIT_PROJECT_METADATA, this);
+    actionMenu.setActionHref(
+      Action.PROJECT_HELP,
+      "https://sagebionetworks.jira.com/servicedesk/customer/portal/9"
+    );
   }
 
   private void configureEditFileMetadataAction() {
@@ -1779,12 +1781,6 @@ public class EntityActionControllerImpl
         break;
       case EDIT_PROJECT_METADATA:
         onEditProjectMetadata();
-        break;
-      case PROJECT_HELP:
-        // open Synapse Service Desk
-        popupUtils.openInNewWindow(
-          "https://sagebionetworks.jira.com/servicedesk/customer/portal/9"
-        );
         break;
       case EDIT_WIKI_PAGE:
         onEditWiki();
