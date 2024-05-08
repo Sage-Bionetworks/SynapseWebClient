@@ -626,6 +626,7 @@ public class EntityActionControllerImpl
     configureChangeStorageLocation();
     configureCreateOrUpdateDoi();
     configureEditProjectMetadataAction();
+    configureProjectHelpAction();
     configureEditFileMetadataAction();
     configureTableCommands();
     configureProjectLevelTableCommands();
@@ -1547,6 +1548,15 @@ public class EntityActionControllerImpl
     } else {
       actionMenu.setActionVisible(Action.EDIT_PROJECT_METADATA, false);
     }
+  }
+
+  private void configureProjectHelpAction() {
+    boolean isProject = entityBundle.getEntity() instanceof Project;
+    actionMenu.setActionVisible(Action.PROJECT_HELP, isProject);
+    actionMenu.setActionHref(
+      Action.PROJECT_HELP,
+      "https://sagebionetworks.jira.com/servicedesk/customer/portal/9"
+    );
   }
 
   private void configureEditFileMetadataAction() {

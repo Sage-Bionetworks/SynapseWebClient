@@ -160,6 +160,11 @@ public class DefaultEntityActionMenuLayoutUtil {
         layout.setPrimaryMenuText(
           EntityTypeUtils.getDisplayName(entityType) + TOOLS_SUFFIX
         );
+        layout.setButtonActions(
+          Arrays.asList(
+            ActionViewProps.create(Action.PROJECT_HELP, "helpChatBubble")
+          )
+        );
         layout.setPrimaryMenuActions(
           Arrays.asList(
             Arrays.asList(

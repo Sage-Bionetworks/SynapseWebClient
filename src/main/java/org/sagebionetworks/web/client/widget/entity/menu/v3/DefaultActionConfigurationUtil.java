@@ -27,6 +27,7 @@ public class DefaultActionConfigurationUtil {
         Action.EDIT_PROJECT_METADATA,
         "Edit Project Metadata"
       ),
+      ActionConfiguration.create(Action.PROJECT_HELP, "Project Support"),
       ActionConfiguration.create(
         Action.SHOW_PROJECT_STATS,
         "Show Project Statistics"
