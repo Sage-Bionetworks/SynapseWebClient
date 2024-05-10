@@ -140,6 +140,8 @@ public class UploaderViewImpl extends FlowPanel implements UploaderView {
 
     this.progressContainer = new Progress();
     progressContainer.setMarginTop(10);
+    // striped and animated (helps to indicate that the upload may not be stuck)
+    progressContainer.addStyleName("progress-striped active");
     this.progressBar = new ProgressBar();
     progressBar.setType(ProgressBarType.INFO);
     progressContainer.add(progressBar);
