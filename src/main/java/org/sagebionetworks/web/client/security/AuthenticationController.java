@@ -84,4 +84,5 @@ public interface AuthenticationController {
 
   void checkForUserChange();
   void checkForUserChange(Callback cb);
+  void clearLocalStorage();
 }
