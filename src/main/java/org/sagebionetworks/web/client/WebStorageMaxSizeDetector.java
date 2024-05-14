@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client;
 
 import com.google.inject.Inject;
 import org.sagebionetworks.web.client.cache.ClientCache;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 
 public class WebStorageMaxSizeDetector {
 
@@ -9,11 +10,17 @@ public class WebStorageMaxSizeDetector {
   public static final int INTERVAL_MS = 1000 * 60 * 5; // check every 5 minutes
   ClientCache clientCache;
   GWTWrapper gwt;
+  AuthenticationController authController;
 
   @Inject
-  public WebStorageMaxSizeDetector(GWTWrapper gwt, ClientCache clientCache) {
+  public WebStorageMaxSizeDetector(
+    GWTWrapper gwt,
+    ClientCache clientCache,
+    AuthenticationController authController
+  ) {
     this.gwt = gwt;
     this.clientCache = clientCache;
+    this.authController = authController;
   }
 
   public void start() {
@@ -40,7 +47,7 @@ public class WebStorageMaxSizeDetector {
     );
     if (currentSize > MAX_SIZE) {
       SynapseJSNIUtilsImpl._consoleLog("Clearing web storage due to the size");
-      clientCache.clear();
+      authController.clearLocalStorage();
     }
   }
 }
