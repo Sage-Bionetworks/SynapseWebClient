@@ -105,7 +105,7 @@ public class CrawlFilter extends OncePerRequestFilter {
 
   private static DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
 
-  private static String removeSynapseWikiWidgets(String markdown) {
+  public static String removeSynapseWikiWidgets(String markdown) {
     return wikiWidgetPattern.matcher(markdown).replaceAll("");
   }
 
