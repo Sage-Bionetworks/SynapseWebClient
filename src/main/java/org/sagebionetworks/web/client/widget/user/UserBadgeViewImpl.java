@@ -41,7 +41,7 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
   };
   private String extraCssClassStrings = "";
   public static final CallbackP<String> NEW_WINDOW_HANDLER = userId -> {
-    newWindow("Profile:" + userId, "_blank", "");
+    newWindow("/Profile:" + userId, "_blank", "");
   };
   boolean showAvatar = false;
   boolean showCardOnHover = true;
@@ -111,7 +111,7 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
       menuActionsArray.toArray(),
       pictureUrl,
       !authController.isLoggedIn(),
-      "Profile:" + userId,
+      "/Profile:" + userId,
       isCertified == null ? false : isCertified.booleanValue(),
       isValidated == null ? false : isValidated.booleanValue(),
       showAvatar,
