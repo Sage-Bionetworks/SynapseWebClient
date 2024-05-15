@@ -59,4 +59,16 @@ public class StringUtils {
 
     return output.toString();
   }
+
+  public static String getGWTPlaceTokenFromURL(String url) {
+    String placeToken = null;
+    if (url.contains(":")) {
+      // optimization - use place changer in this case as well
+      int colonIndex = url.lastIndexOf(':');
+      // Search backwards from colonIndex to find the last '/'
+      int lastSlashIndex = url.lastIndexOf('/', colonIndex);
+      placeToken = url.substring(lastSlashIndex + 1);
+    }
+    return placeToken;
+  }
 }

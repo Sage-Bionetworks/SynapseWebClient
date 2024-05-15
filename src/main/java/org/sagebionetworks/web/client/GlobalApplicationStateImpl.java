@@ -190,17 +190,19 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
         new PlaceChanger() {
           @Override
           public void goTo(Place place) {
-            synapseJSNIUtils.setIsInnerProgrammaticHistoryChange();
-            // If we are not already on this page, go there.
-            if (!placeController.getWhere().equals(place)) {
-              try {
-                placeController.goTo(place);
-              } catch (Exception e) {
-                synapseJSNIUtils.consoleError(e.getMessage());
+            if (place != null) {
+              synapseJSNIUtils.setIsInnerProgrammaticHistoryChange();
+              // If we are not already on this page, go there.
+              if (!placeController.getWhere().equals(place)) {
+                try {
+                  placeController.goTo(place);
+                } catch (Exception e) {
+                  synapseJSNIUtils.consoleError(e.getMessage());
+                }
+              } else {
+                // We are already on this page but we want to force it to reload.
+                eventBus.fireEvent(new PlaceChangeEvent(place));
               }
-            } else {
-              // We are already on this page but we want to force it to reload.
-              eventBus.fireEvent(new PlaceChangeEvent(place));
             }
           }
         };
@@ -409,15 +411,13 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
   public void refreshPage() {
     // get the place associated to the current url
     AppPlaceHistoryMapper appPlaceHistoryMapper = getAppPlaceHistoryMapper();
-    String path = synapseJSNIUtils.getLocationPath();
+    String url = synapseJSNIUtils.getCurrentURL();
 
-    String place = DEFAULT_REFRESH_PLACE;
-    String[] pathItems = path.split("/");
-
-    if (pathItems.length > 1) {
-      place = pathItems[1];
+    String placeToken = DEFAULT_REFRESH_PLACE;
+    if (url.contains(":")) {
+      placeToken = StringUtils.getGWTPlaceTokenFromURL(url);
     }
-    Place currentPlace = appPlaceHistoryMapper.getPlace(place);
+    Place currentPlace = appPlaceHistoryMapper.getPlace(placeToken);
     getPlaceChanger().goTo(currentPlace);
   }
 
