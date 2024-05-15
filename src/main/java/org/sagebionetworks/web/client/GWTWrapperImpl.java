@@ -34,9 +34,6 @@ public class GWTWrapperImpl implements GWTWrapper {
 
   @Override
   public String getHostPageBaseURL() {
-    SynapseJSNIUtilsImpl._consoleLog(
-      "GWT.getHostPageBaseURL() = " + GWT.getHostPageBaseURL()
-    );
     return GWT.getHostPageBaseURL();
   }
 
