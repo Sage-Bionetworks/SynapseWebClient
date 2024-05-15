@@ -483,6 +483,10 @@ public class SynapseJavascriptClient {
     );
   }
 
+  private Request doGet(String url, AsyncCallback callback) {
+    return doGet(url, callback);
+  }
+
   public Request doGetString(
     String url,
     boolean forceAnonymous,
@@ -3002,6 +3006,10 @@ public class SynapseJavascriptClient {
       false,
       cb
     );
+  }
+
+  public void getFeatureFlagConfig(AsyncCallback<JSONObjectAdapter> cb) {
+    doGet(jsniUtils.getAppConfigServletUrl(), OBJECT_TYPE.JSON, cb);
   }
 
   public void getAvailableEvaluations(

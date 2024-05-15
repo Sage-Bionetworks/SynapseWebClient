@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -585,6 +586,21 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
         }
       }
     );
+    //if (DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider())){
+    jsClient.getFeatureFlagConfig(
+      new AsyncCallback<JSONObjectAdapter>() {
+        @Override
+        public void onSuccess(JSONObjectAdapter configurations) {
+          GWT.log(configurations.toString()); //
+        }
+
+        @Override
+        public void onFailure(Throwable caught) {
+          GWT.log(caught.getMessage());
+        }
+      }
+    );
+    //}
     String showInUTC = cookieProvider.getCookie(SHOW_DATETIME_IN_UTC);
     if (showInUTC != null) {
       setShowUTCTime(Boolean.parseBoolean(showInUTC));

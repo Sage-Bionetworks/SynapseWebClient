@@ -135,6 +135,13 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
   }
 
   @Override
+  public String getAppConfigServletUrl() {
+    return (
+      GWTWrapperImpl.getRealGWTModuleBaseURL() + WebConstants.APPCONFIG_SERVLET
+    );
+  }
+
+  @Override
   public int randomNextInt() {
     return Random.nextInt();
   }
