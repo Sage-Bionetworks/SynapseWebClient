@@ -20,7 +20,7 @@ public class TwoFactorAuthPlace extends Place {
     return token;
   }
 
-  @Prefix("!TwoFactorAuth")
+  @Prefix("TwoFactorAuth")
   public static class Tokenizer implements PlaceTokenizer<TwoFactorAuthPlace> {
 
     @Override

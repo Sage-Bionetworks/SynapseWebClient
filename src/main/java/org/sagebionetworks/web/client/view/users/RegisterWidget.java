@@ -65,7 +65,7 @@ public class RegisterWidget
     );
     synAlert.clear();
     view.enableRegisterButton(false);
-    String callbackUrl = gwt.getHostPageBaseURL() + "#!NewAccount:";
+    String callbackUrl = gwt.getHostPageBaseURL() + "NewAccount:";
     userService.createUserStep1(
       newUser,
       callbackUrl,

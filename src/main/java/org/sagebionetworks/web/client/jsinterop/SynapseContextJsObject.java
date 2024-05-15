@@ -25,7 +25,7 @@ public class SynapseContextJsObject {
     context.accessToken = accessToken;
     context.isInExperimentalMode = isInExperimentalMode;
     context.utcTime = utcTime;
-    context.downloadCartPageUrl = "/#!DownloadCart:0";
+    context.downloadCartPageUrl = "/DownloadCart:0";
     return context;
   }
 }

@@ -108,7 +108,7 @@ public class SlackServlet extends HttpServlet {
         } else {
           Matcher m = p.matcher(text);
           if (m.matches()) {
-            entityURL = "https://www.synapse.org/#!Synapse:" + text.trim();
+            entityURL = "https://www.synapse.org/Synapse:" + text.trim();
             sb.append(entityURL);
           } else {
             throw new IllegalArgumentException(text + IS_INVALID_SYN_ID);

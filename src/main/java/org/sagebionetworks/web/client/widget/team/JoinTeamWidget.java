@@ -138,7 +138,7 @@ public class JoinTeamWidget
     view.clear();
     synAlert.clear();
     accessRequirementsUrl =
-      "#!AccessRequirements:" +
+      "AccessRequirements:" +
       AccessRequirementsPlace.ID_PARAM +
       "=" +
       teamId +

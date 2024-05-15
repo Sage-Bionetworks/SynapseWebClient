@@ -16,7 +16,7 @@ public class ErrorPlace extends Place {
     return token;
   }
 
-  @Prefix("!Error")
+  @Prefix("Error")
   public static class Tokenizer implements PlaceTokenizer<ErrorPlace> {
 
     @Override

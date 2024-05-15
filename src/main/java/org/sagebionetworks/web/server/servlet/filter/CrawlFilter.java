@@ -79,9 +79,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 /**
  * This filter detects ajax crawler (Google). If so, it takes over the renders the javascript page
  * and handles the response.
- * It used to be based on the Google AJAX crawl scheme: https://developers.google.com/search/blog/2009/10/proposal-for-making-ajax-crawlable
- * But has been rewritten to send all links through the PlacesRedirectFilter (no '#!' links are returned).
- *
  */
 public class CrawlFilter extends OncePerRequestFilter {
 

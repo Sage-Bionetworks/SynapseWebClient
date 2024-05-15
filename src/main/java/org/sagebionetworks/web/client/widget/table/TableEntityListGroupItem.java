@@ -104,7 +104,7 @@ public class TableEntityListGroupItem implements IsWidget {
     entityAnchor.addClickHandler(EntityBadgeViewImpl.STANDARD_CLICKHANDLER);
     entityAnchor.setText(header.getName());
     entityAnchor.addStyleName("link");
-    entityAnchor.setHref("#!Synapse:" + header.getId());
+    entityAnchor.setHref("Synapse:" + header.getId());
     entityAnchor
       .getElement()
       .setAttribute(EntityBadgeViewImpl.ENTITY_ID_ATTRIBUTE, header.getId());

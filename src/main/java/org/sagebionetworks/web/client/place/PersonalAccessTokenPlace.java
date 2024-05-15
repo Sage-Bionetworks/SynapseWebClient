@@ -16,7 +16,7 @@ public class PersonalAccessTokenPlace extends Place {
     return token;
   }
 
-  @Prefix("!PersonalAccessTokens")
+  @Prefix("PersonalAccessTokens")
   public static class Tokenizer
     implements PlaceTokenizer<PersonalAccessTokenPlace> {
 

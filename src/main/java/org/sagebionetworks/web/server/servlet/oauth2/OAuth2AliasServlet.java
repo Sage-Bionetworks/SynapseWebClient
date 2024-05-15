@@ -16,7 +16,7 @@ import org.sagebionetworks.web.shared.WebConstants;
 public class OAuth2AliasServlet extends OAuth2Servlet {
 
   private static final String PROFILE_BIND_SUCCESS_PLACE =
-    "/#!Profile:oauth_bound";
+    "/Profile:oauth_bound";
   private static final long serialVersionUID = 1L;
 
   @Override

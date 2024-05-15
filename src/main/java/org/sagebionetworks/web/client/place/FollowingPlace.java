@@ -16,7 +16,7 @@ public class FollowingPlace extends Place {
     return token;
   }
 
-  @Prefix("!Following")
+  @Prefix("Following")
   public static class Tokenizer implements PlaceTokenizer<FollowingPlace> {
 
     @Override

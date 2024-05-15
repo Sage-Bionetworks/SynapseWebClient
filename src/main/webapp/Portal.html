@@ -113,7 +113,7 @@
       var synapseOrgRegex = /(www|staging|tst)\.synapse\.org$/
 
       if (!synapseOrgRegex.test(location.hostname)) {
-        cdnEndpoint = ''
+        cdnEndpoint = '/'
         processEnvironment = 'development'
       }
 
@@ -259,7 +259,7 @@
           Your web browser must have JavaScript enabled in order for this
           application to display correctly.<br />
           If you are an automated web crawler from a search engine, follow this
-          <a href="https://synapse.prod.sagebase.org/Portal.html#!Home:0"
+          <a href="https://synapse.prod.sagebase.org/Home:0"
             >AJAX application crawl link</a
           >
         </div>

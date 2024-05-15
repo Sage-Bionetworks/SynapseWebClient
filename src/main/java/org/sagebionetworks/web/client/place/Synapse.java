@@ -10,7 +10,7 @@ public class Synapse extends Place {
 
   public static final String DOT_REGEX = "\\.";
   public static final String DELIMITER = "/";
-  public static final String SYNAPSE_ENTITY_PREFIX = "#!Synapse:";
+  public static final String SYNAPSE_ENTITY_PREFIX = "Synapse:";
   public static final String VERSION = "version";
 
   private String synapsePlaceToken;
@@ -141,7 +141,7 @@ public class Synapse extends Place {
     calculateToken(entityId, versionNumber, area, areaToken);
   }
 
-  @Prefix("!Synapse")
+  @Prefix("Synapse")
   public static class Tokenizer implements PlaceTokenizer<Synapse> {
 
     @Override

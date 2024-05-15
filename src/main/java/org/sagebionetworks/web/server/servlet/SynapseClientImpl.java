@@ -1600,7 +1600,7 @@ public class SynapseClientImpl
   );
 
   public static final String getSignedTokenEndpoint(String hostPageBaseURL) {
-    return hostPageBaseURL + "#!SignedToken:";
+    return hostPageBaseURL + "SignedToken:";
   }
 
   @Override
@@ -1684,13 +1684,13 @@ public class SynapseClientImpl
   }
 
   public static String getTeamEndpoint(String hostPageBaseURL) {
-    return hostPageBaseURL + "#!Team:";
+    return hostPageBaseURL + "Team:";
   }
 
   // If this method is modified, please also modify CHALLENGE_ENDPOINT in
   // org.sagebionetworks.repo.model.ServiceConstants (PLFM)
   public static String getChallengeEndpoint(String hostPageBaseURL) {
-    return hostPageBaseURL + "#!Synapse:";
+    return hostPageBaseURL + "Synapse:";
   }
 
   @Override

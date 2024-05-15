@@ -16,7 +16,7 @@ public class Help extends Place {
     return token;
   }
 
-  @Prefix("!Help")
+  @Prefix("Help")
   public static class Tokenizer implements PlaceTokenizer<Help> {
 
     @Override

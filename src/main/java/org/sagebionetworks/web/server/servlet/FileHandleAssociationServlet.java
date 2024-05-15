@@ -28,7 +28,7 @@ import org.sagebionetworks.web.shared.WebConstants;
  */
 public class FileHandleAssociationServlet extends HttpServlet {
 
-  public static final String ERROR_PLACE = "#!Error:";
+  public static final String ERROR_PLACE = "Error:";
   private static final long serialVersionUID = 1L;
   protected static final ThreadLocal<HttpServletRequest> perThreadRequest =
     new ThreadLocal<HttpServletRequest>();

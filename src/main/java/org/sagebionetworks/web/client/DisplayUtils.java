@@ -63,7 +63,6 @@ import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.CloudProviderFileHandleInterface;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactMouseEvent;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.jsinterop.ToastMessageOptions;
@@ -624,16 +623,16 @@ public class DisplayUtils {
 
   public static String getTeamHistoryToken(String teamId) {
     Team place = new Team(teamId);
-    return "#!" + getTeamPlaceString(Team.class) + ":" + place.toToken();
+    return getTeamPlaceString(Team.class) + ":" + place.toToken();
   }
 
   public static String getTrashHistoryToken(String token, Integer start) {
     Trash place = new Trash(token, start);
-    return "#!" + getTrashPlaceString(Trash.class) + ":" + place.toToken();
+    return getTrashPlaceString(Trash.class) + ":" + place.toToken();
   }
 
   public static String getSynapseHistoryToken(String entityId) {
-    return "#" + getSynapseHistoryTokenNoHash(entityId, null);
+    return getSynapseHistoryTokenNoHash(entityId, null);
   }
 
   public static String getSynapseHistoryTokenNoHash(String entityId) {
@@ -644,7 +643,7 @@ public class DisplayUtils {
     String entityId,
     Long versionNumber
   ) {
-    return "#" + getSynapseHistoryTokenNoHash(entityId, versionNumber);
+    return getSynapseHistoryTokenNoHash(entityId, versionNumber);
   }
 
   public static String getSynapseHistoryTokenNoHash(
@@ -669,7 +668,7 @@ public class DisplayUtils {
     String areaToken
   ) {
     Synapse place = new Synapse(entityId, versionNumber, area, areaToken);
-    return "!" + getPlaceString(Synapse.class) + ":" + place.toToken();
+    return getPlaceString(Synapse.class) + ":" + place.toToken();
   }
 
   /**
@@ -1251,7 +1250,7 @@ public class DisplayUtils {
       DisplayConstants.SHARED_ON_SYNAPSE +
       ":\n" +
       hostUrl +
-      "#!Synapse:" +
+      "Synapse:" +
       entityId +
       "\n"
     );

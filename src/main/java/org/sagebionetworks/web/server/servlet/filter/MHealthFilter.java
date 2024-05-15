@@ -4,7 +4,7 @@ public class MHealthFilter extends RedirectFilter {
 
   @Override
   protected String getTargetPage() {
-    return "#!StandaloneWiki:DigitalHealth";
+    return "StandaloneWiki:DigitalHealth";
   }
 
   @Override

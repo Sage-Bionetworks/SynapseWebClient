@@ -1,11 +1,14 @@
 package org.sagebionetworks.web.server.servlet.filter;
 
+import com.google.gwt.place.shared.PlaceTokenizer;
+import com.google.gwt.place.shared.WithTokenizers;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.FilterChain;
@@ -14,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.commonmark.parser.Parser;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -51,6 +55,20 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
     return dataModel;
   }
 
+  public static boolean isGWTPlace(String targetPath) {
+    // is alias a known GWT place name?  If so, do nothing
+    //  if it contains a ':', then assume it is a GWT place with token
+    return targetPath.contains(":");
+    //      Class<? extends PlaceTokenizer<?>>[] placeClasses =
+    //          AppPlaceHistoryMapper.class.getAnnotation(WithTokenizers.class).value();
+    //        for (Class<? extends PlaceTokenizer<?>> c : placeClasses) {
+    //          String simpleName = c.getEnclosingClass().getSimpleName();
+    //          if (targetPath.startsWith(simpleName+":"))
+    //              return true;
+    //        }
+    //        return false;
+  }
+
   @Override
   protected void doFilterInternal(
     HttpServletRequest request,
@@ -67,25 +85,32 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
     String userAgent = request.getHeader("User-Agent");
     boolean isLikelyBot = CrawlFilter.isLikelyBot(userAgent);
 
-    if (!isLikelyBot) {
+    // get the file path being requested
+    URL url = new URL(request.getRequestURL().toString());
+    String path = url.getPath();
+
+    if (
+      !isLikelyBot &&
+      (path.equals("/Portal.html") || path.equals("/") || isGWTPlace(path))
+    ) {
       Map<String, String> dataModel = getDataModel();
 
       try {
         // Get the components needed to construct the URL
-        String uri = request.getRequestURI();
+
         String domain = request.getServerName();
         // customize data model for this particular page
-        dataModel.put("ogUrl", uri);
+        dataModel.put("ogUrl", url.toString());
 
-        if (uri.startsWith("/Synapse")) {
+        if (path.startsWith("/Synapse")) {
           // index information about the synapse entity
-          String entityId = uri.substring(uri.indexOf(":") + 1);
-        } else if (uri.startsWith("/Team")) {
+          String entityId = path.substring(path.indexOf(":") + 1);
+        } else if (path.startsWith("/Team")) {
           // index team (including members)
-          String teamId = uri.substring(uri.indexOf(":") + 1);
-        } else if (uri.startsWith("/Profile")) {
+          String teamId = path.substring(path.indexOf(":") + 1);
+        } else if (path.startsWith("/Profile")) {
           // index team (including members)
-          String profileId = uri.substring(uri.indexOf(":") + 1);
+          String profileId = path.substring(path.indexOf(":") + 1);
         }
 
         StringWriter stringWriter = new StringWriter();
@@ -97,7 +122,6 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
 
         // Get the modified HTML string
         String modifiedHtml = stringWriter.toString();
-
         // Set response content type
         response.setContentType("text/html");
 

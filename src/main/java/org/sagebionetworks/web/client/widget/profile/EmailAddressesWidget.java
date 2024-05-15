@@ -171,7 +171,7 @@ public class EmailAddressesWidget
       return;
     }
 
-    String callbackUrl = gwt.getHostPageBaseURL() + "#!Account:";
+    String callbackUrl = gwt.getHostPageBaseURL() + "Account:";
 
     jsClient.additionalEmailValidation(
       authenticationController.getCurrentUserPrincipalId(),

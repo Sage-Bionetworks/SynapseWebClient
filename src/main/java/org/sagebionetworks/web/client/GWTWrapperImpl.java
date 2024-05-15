@@ -10,7 +10,6 @@ import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
@@ -31,9 +30,13 @@ public class GWTWrapperImpl implements GWTWrapper {
     RegExp.compile("[^a-z0-9]", "gi");
 
   public int scrollTop = -1;
+  Html5Historian historian = new Html5Historian();
 
   @Override
   public String getHostPageBaseURL() {
+    SynapseJSNIUtilsImpl._consoleLog(
+      "GWT.getHostPageBaseURL() = " + GWT.getHostPageBaseURL()
+    );
     return GWT.getHostPageBaseURL();
   }
 
@@ -163,18 +166,18 @@ public class GWTWrapperImpl implements GWTWrapper {
   @Override
   public void newItem(String historyToken, boolean issueEvent) {
     SynapseJSNIUtilsImpl._setIsInnerProgrammaticHistoryChange();
-    History.newItem(historyToken, issueEvent);
+    historian.newItem(historyToken, issueEvent);
   }
 
   @Override
   public void replaceItem(String historyToken, boolean issueEvent) {
     SynapseJSNIUtilsImpl._setIsInnerProgrammaticHistoryChange();
-    History.replaceItem(historyToken, issueEvent);
+    historian.replaceItem(historyToken, issueEvent);
   }
 
   @Override
   public String getCurrentHistoryToken() {
-    return History.getToken();
+    return historian.getToken();
   }
 
   @Override

@@ -67,7 +67,7 @@ public class RegisterTeamDialog implements RegisterTeamDialogView.Presenter {
     this.challengeId = challengeId;
     view.setRecruitmentMessage("");
     view.setNewTeamLink(
-      "#!Profile:" +
+      "Profile:" +
       authenticationController.getCurrentUserPrincipalId() +
       Profile.DELIMITER +
       Synapse.ProfileArea.TEAMS

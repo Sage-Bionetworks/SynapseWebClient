@@ -24,9 +24,9 @@ import org.sagebionetworks.web.shared.WebConstants;
  */
 public class AliasRedirectorServlet extends HttpServlet {
 
-  public static final String TEAM_PLACE = "/#!Team:";
+  public static final String TEAM_PLACE = "/Team:";
 
-  public static final String PROFILE_PLACE = "/#!Profile:";
+  public static final String PROFILE_PLACE = "/Profile:";
 
   private static final long serialVersionUID = 1L;
 

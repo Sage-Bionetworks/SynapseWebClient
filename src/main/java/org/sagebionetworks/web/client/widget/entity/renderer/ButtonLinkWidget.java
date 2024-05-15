@@ -56,9 +56,9 @@ public class ButtonLinkWidget implements WidgetRendererPresenter {
     String buttonText = descriptor.get(WidgetConstants.TEXT_KEY);
 
     // SWC-4234: if Synapse place, add entity id to entity path cache up front
-    if (url.contains("#!Synapse:")) {
+    if (url.contains("Synapse:")) {
       Synapse synapsePlace = (Synapse) appPlaceHistoryMapper.getPlace(
-        url.substring(url.indexOf('!'))
+        url.substring(url.lastIndexOf('/'))
       );
       jsClient.populateEntityBundleCache(synapsePlace.getEntityId());
     }
@@ -105,7 +105,7 @@ public class ButtonLinkWidget implements WidgetRendererPresenter {
   public boolean isOpenInNewWindow(String url) {
     return (
       url != null &&
-      !(url.startsWith("#!") || url.startsWith(gwt.getHostPrefix()))
+      !(!url.startsWith("http") || url.startsWith(gwt.getHostPrefix()))
     );
   }
 

@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.AnchorElement;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NodeList;
@@ -16,6 +15,7 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import org.gwtbootstrap3.client.ui.html.Italic;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
@@ -41,6 +41,7 @@ public class MarkdownWidgetViewImpl implements MarkdownWidgetView {
   @UiField
   Italic emptyPanel;
 
+  private GWTWrapper gwt;
   public static GlobalApplicationState globalAppState;
   public static final EventListener relativeLinkClickHandler = event -> {
     event.preventDefault();
@@ -59,10 +60,12 @@ public class MarkdownWidgetViewImpl implements MarkdownWidgetView {
   public MarkdownWidgetViewImpl(
     final Binder uiBinder,
     SynapseJSNIUtils jsniUtils,
-    GlobalApplicationState globalAppState
+    GlobalApplicationState globalAppState,
+    GWTWrapper gwt
   ) {
     widget = uiBinder.createAndBindUi(this);
     this.jsniUtils = jsniUtils;
+    this.gwt = gwt;
     MarkdownWidgetViewImpl.globalAppState = globalAppState;
   }
 
@@ -88,10 +91,10 @@ public class MarkdownWidgetViewImpl implements MarkdownWidgetView {
     NodeList<Element> anchors = contentPanel
       .getElement()
       .getElementsByTagName("a");
-    String hostPageURL = GWT.getHostPageBaseURL();
+    String hostPageURL = gwt.getHostPageBaseURL();
     for (int i = 0; i < anchors.getLength(); i++) {
       AnchorElement anchorElement = (AnchorElement) anchors.getItem(i);
-      if (anchorElement.getHref().startsWith(hostPageURL + "#!")) {
+      if (anchorElement.getHref().startsWith(hostPageURL)) {
         DOM.sinkEvents(
           anchorElement,
           Event.ONCLICK | Event.ONMOUSEOUT | Event.ONMOUSEOVER

@@ -182,7 +182,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
     entityAnchor.addStyleName(
       "text-align-left text-overflow-ellipsis inline-block whitespace-nowrap overflowHidden maxWidth100"
     );
-    entityAnchor.setHref("#!Synapse:" + entityHeader.getId());
+    entityAnchor.setHref("Synapse:" + entityHeader.getId());
     entityAnchor
       .getElement()
       .setAttribute(ENTITY_ID_ATTRIBUTE, entityHeader.getId());

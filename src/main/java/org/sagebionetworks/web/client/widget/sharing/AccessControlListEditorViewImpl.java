@@ -38,7 +38,7 @@ public class AccessControlListEditorViewImpl
   private static final String CANNOT_MODIFY_ACL_TEXT =
     "You do not have sufficient privileges to modify the sharing settings.";
   private static final String CANNOT_MODIFY_ACL_ANONYMOUS_HTML =
-    "You must be <a href=\"#!LoginPlace:0\">logged in</a> and have sufficient privileges to modify the sharing settings.";
+    "You must be <a href=\"LoginPlace:0\">logged in</a> and have sufficient privileges to modify the sharing settings.";
   private Presenter presenter;
   private Map<PermissionLevel, String> permissionDisplay;
   private Long publicAclPrincipalId, authenticatedPrincipalId;
@@ -218,7 +218,7 @@ public class AccessControlListEditorViewImpl
       EntityIdCellRenderer entityRenderer =
         ginInjector.getEntityIdCellRenderer();
       ClickHandler customClickHandler = event -> {
-        DisplayUtils.newWindow("#!Synapse:" + aclEntityId, "", "");
+        DisplayUtils.newWindow("Synapse:" + aclEntityId, "", "");
       };
       entityRenderer.setValue(aclEntityId, customClickHandler, false);
       div.add(entityRenderer);

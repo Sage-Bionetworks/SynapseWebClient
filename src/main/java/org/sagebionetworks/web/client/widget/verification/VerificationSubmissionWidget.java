@@ -103,7 +103,7 @@ public class VerificationSubmissionWidget
     initView(isModal);
     view.setProfileLink(
       verificationSubmission.getCreatedBy(),
-      "#!Profile:" + verificationSubmission.getCreatedBy()
+      "Profile:" + verificationSubmission.getCreatedBy()
     );
     return this;
   }

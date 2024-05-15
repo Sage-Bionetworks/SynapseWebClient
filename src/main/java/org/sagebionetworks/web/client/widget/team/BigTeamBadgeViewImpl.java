@@ -101,7 +101,7 @@ public class BigTeamBadgeViewImpl implements BigTeamBadgeView {
     descriptionContainer.add(new HTML(linkify.linkify(descriptionWithoutHtml)));
 
     nameLink.setText(name);
-    nameLink.setHref("#!Team:" + team.getId());
+    nameLink.setHref("Team:" + team.getId());
     pictureFocusPanel.addClickHandler(clickHandler);
   }
 

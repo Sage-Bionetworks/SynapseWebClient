@@ -28,7 +28,7 @@ public class ButtonLinkWidgetViewImpl
   private Button button;
   private static AppPlaceHistoryMapper appPlaceHistoryMapper;
   public static EventBus eventBus;
-  public static final String SYNAPSE_PLACE_FRAGMENT = "#!Synapse:";
+  public static final String SYNAPSE_PLACE_FRAGMENT = "Synapse:";
   public static final ClickHandler BUTTON_LINK_CLICK_HANDLER = event -> {
     if (!DisplayUtils.isAnyModifierKeyDown(event)) {
       event.preventDefault();

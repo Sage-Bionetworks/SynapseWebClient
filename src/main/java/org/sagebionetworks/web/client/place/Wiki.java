@@ -60,7 +60,7 @@ public class Wiki extends Place {
     this.wikiId = wikiId;
   }
 
-  @Prefix("!Wiki")
+  @Prefix("Wiki")
   public static class Tokenizer implements PlaceTokenizer<Wiki> {
 
     @Override

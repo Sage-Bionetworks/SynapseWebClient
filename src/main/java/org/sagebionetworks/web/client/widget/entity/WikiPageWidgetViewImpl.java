@@ -159,7 +159,7 @@ public class WikiPageWidgetViewImpl
     wikiHistoryButton.setIcon(IconType.CARET_SQUARE_O_RIGHT);
     wikiCompareButton.addClickHandler(event -> {
       WikiDiff place = new WikiDiff(key);
-      DisplayUtils.newWindow("#!WikiDiff:" + place.toToken(), "_blank", "");
+      DisplayUtils.newWindow("WikiDiff:" + place.toToken(), "_blank", "");
     });
   }
 

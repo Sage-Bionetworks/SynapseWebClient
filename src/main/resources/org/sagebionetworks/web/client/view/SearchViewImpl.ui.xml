@@ -57,7 +57,7 @@
         <bh:Div addStyleNames="col-md-3 col-md-pull-9">
           <bh:Italic>Searching for a user profile? Try our</bh:Italic>
           <b:Anchor
-            href="#!PeopleSearch:"
+            href="PeopleSearch:"
             addStyleNames="margin-left-5 font-italic"
           >
             People Search
