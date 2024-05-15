@@ -40,7 +40,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 
   public static final String RECENTLY_CHECKED_SYNAPSE_VERSION =
     "org.sagebionetworks.web.client.recently-checked-synapse-version";
-  public static final String DEFAULT_REFRESH_PLACE = "!Home:0";
+  public static final String DEFAULT_REFRESH_PLACE = "Home:0";
   private PlaceController placeController;
   private CookieProvider cookieProvider;
   private AppPlaceHistoryMapper appPlaceHistoryMapper;
@@ -409,11 +409,14 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
   public void refreshPage() {
     // get the place associated to the current url
     AppPlaceHistoryMapper appPlaceHistoryMapper = getAppPlaceHistoryMapper();
-    String currentUrl = synapseJSNIUtils.getCurrentURL();
+    String path = synapseJSNIUtils.getLocationPath();
+
     String place = DEFAULT_REFRESH_PLACE;
-    int index = currentUrl.indexOf("!");
-    if (index > -1) {
-      place = currentUrl.substring(index);
+    GWT.debugger();
+    String[] pathItems = path.split("/");
+
+    if (pathItems.length > 1) {
+      place = pathItems[1];
     }
     Place currentPlace = appPlaceHistoryMapper.getPlace(place);
     getPlaceChanger().goTo(currentPlace);
