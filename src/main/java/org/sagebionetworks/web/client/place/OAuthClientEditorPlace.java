@@ -9,7 +9,7 @@ public class OAuthClientEditorPlace extends ParameterizedPlace {
     super(token);
   }
 
-  @Prefix("!OAuthClientEditor")
+  @Prefix("OAuthClientEditor")
   public static class Tokenizer
     implements PlaceTokenizer<OAuthClientEditorPlace> {
 

@@ -632,36 +632,25 @@ public class DisplayUtils {
   }
 
   public static String getSynapseHistoryToken(String entityId) {
-    return getSynapseHistoryTokenNoHash(entityId, null);
-  }
-
-  public static String getSynapseHistoryTokenNoHash(String entityId) {
-    return getSynapseHistoryTokenNoHash(entityId, null);
+    return getSynapseHistoryToken(entityId, null);
   }
 
   public static String getSynapseHistoryToken(
     String entityId,
     Long versionNumber
   ) {
-    return getSynapseHistoryTokenNoHash(entityId, versionNumber);
+    return getSynapseHistoryToken(entityId, versionNumber, null);
   }
 
-  public static String getSynapseHistoryTokenNoHash(
-    String entityId,
-    Long versionNumber
-  ) {
-    return getSynapseHistoryTokenNoHash(entityId, versionNumber, null);
-  }
-
-  public static String getSynapseHistoryTokenNoHash(
+  public static String getSynapseHistoryToken(
     String entityId,
     Long versionNumber,
     Synapse.EntityArea area
   ) {
-    return getSynapseHistoryTokenNoHash(entityId, versionNumber, area, null);
+    return getSynapseHistoryToken(entityId, versionNumber, area, null);
   }
 
-  public static String getSynapseHistoryTokenNoHash(
+  public static String getSynapseHistoryToken(
     String entityId,
     Long versionNumber,
     Synapse.EntityArea area,

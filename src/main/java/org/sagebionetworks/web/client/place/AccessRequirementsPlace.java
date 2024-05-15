@@ -12,7 +12,7 @@ public class AccessRequirementsPlace extends ParameterizedPlace {
     super(token);
   }
 
-  @Prefix("!AccessRequirements")
+  @Prefix("AccessRequirements")
   public static class Tokenizer
     implements PlaceTokenizer<AccessRequirementsPlace> {
 

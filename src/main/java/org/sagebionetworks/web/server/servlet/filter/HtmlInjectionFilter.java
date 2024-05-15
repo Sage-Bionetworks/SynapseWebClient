@@ -260,22 +260,28 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
             }
           } else if (path.startsWith("/Profile")) {
             Profile place = new Profile(placeToken);
-            UserProfile profile = synapseClient.getUserProfile(
-              place.getUserId()
-            );
-            dataModel.put(
-              PAGE_TITLE_KEY,
-              CrawlFilter.getDisplayName(profile) +
-              "(" +
-              profile.getUserName() +
-              ")"
-            );
-            dataModel.put(PAGE_DESCRIPTION_KEY, profile.getSummary());
+            String userId = place.getUserId();
+            if (
+              !userId.equals(Profile.VIEW_PROFILE_TOKEN) &&
+              !userId.equals(Profile.EDIT_PROFILE_TOKEN)
+            ) {
+              UserProfile profile = synapseClient.getUserProfile(userId);
+              dataModel.put(
+                PAGE_TITLE_KEY,
+                CrawlFilter.getDisplayName(profile) +
+                "(" +
+                profile.getUserName() +
+                ")"
+              );
+              dataModel.put(PAGE_DESCRIPTION_KEY, profile.getSummary());
 
-            if (includeBotHtml) {
-              CrawlFilter.BotHtml botHtml = crawlFilter.getProfileHtml(profile);
-              dataModel.put(BOT_HEAD_HTML_KEY, botHtml.head);
-              dataModel.put(BOT_BODY_HTML_KEY, botHtml.body);
+              if (includeBotHtml) {
+                CrawlFilter.BotHtml botHtml = crawlFilter.getProfileHtml(
+                  profile
+                );
+                dataModel.put(BOT_HEAD_HTML_KEY, botHtml.head);
+                dataModel.put(BOT_BODY_HTML_KEY, botHtml.body);
+              }
             }
           }
         } catch (Exception e) {
