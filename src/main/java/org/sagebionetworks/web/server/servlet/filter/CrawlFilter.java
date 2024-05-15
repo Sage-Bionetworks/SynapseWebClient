@@ -124,10 +124,6 @@ public class CrawlFilter {
     df.setTimeZone(TimeZone.getTimeZone("UTC"));
   }
 
-  public static boolean isLikelyBot(String userAgent) {
-    return userAgent != null && userAgent.toLowerCase().contains("bot");
-  }
-
   private String getHomePageHtml()
     throws JSONObjectAdapterException, RestServiceException {
     StringBuilder html = new StringBuilder();
