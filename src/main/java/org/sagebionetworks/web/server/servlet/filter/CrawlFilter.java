@@ -291,10 +291,8 @@ public class CrawlFilter {
       response.head = META_ROBOTS_NOINDEX;
     }
 
-    // SWC-6609: removed for now
-    //    html.append(getDatasetScriptElement(bundle, plainTextWiki));
-
-    html.append("</head><body><h1>" + name + "</h1>");
+    html.append("<h1>" + name + "</h1>");
+    html.append("<h2>" + entityId + "</h2>");
     if (description != null) {
       html.append(description + "<br />");
     }
@@ -368,6 +366,10 @@ public class CrawlFilter {
       i++;
     } while (i < MAX_CHILD_PAGES && childList.getNextPageToken() != null);
     response.body = html.toString();
+
+    // SWC-6609: removed for now
+    //    response.head = getDatasetScriptElement(bundle, plainTextWiki);
+
     return response;
   }
 

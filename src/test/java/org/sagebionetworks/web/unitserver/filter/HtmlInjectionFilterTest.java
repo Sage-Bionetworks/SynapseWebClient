@@ -12,6 +12,12 @@ import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.ORIGIN_HE
 import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.SYNAPSE_ORG_SUFFIX;
 import static org.sagebionetworks.web.server.servlet.filter.CrawlFilter.META_ROBOTS_NOINDEX;
 
+import freemarker.cache.StringTemplateLoader;
+import freemarker.core.ParseException;
+import freemarker.template.Configuration;
+import freemarker.template.MalformedTemplateNameException;
+import freemarker.template.Template;
+import freemarker.template.TemplateNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
@@ -83,11 +89,25 @@ public class HtmlInjectionFilterTest {
   @Captor
   ArgumentCaptor<EntityChildrenRequest> entityChildrenRequestCaptor;
 
+  @Mock
+  CrawlFilter mockCrawlFilter;
+
+  private Template getTemplate(String html)
+    throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, IOException {
+    Configuration cfg = new Configuration(Configuration.VERSION_2_3_31);
+    StringTemplateLoader stringLoader = new StringTemplateLoader();
+    stringLoader.putTemplate("template", html);
+    cfg.setTemplateLoader(stringLoader);
+    return cfg.getTemplate("template");
+  }
+
   @Before
   public void setUp() throws RestServiceException, IOException {
     filter = new HtmlInjectionFilter();
-
-    filter.init(mockSynapseClient, mockDiscussionForumClient);
+    Template pageTitleTemplate = getTemplate(
+      "${" + HtmlInjectionFilter.PAGE_TITLE_KEY + "}"
+    );
+    filter.init(pageTitleTemplate, mockDiscussionForumClient, mockCrawlFilter);
     when(mockRequest.getHeader(ORIGIN_HEADER))
       .thenReturn("https://www" + SYNAPSE_ORG_SUFFIX);
     when(mockRequest.getServerName()).thenReturn("www" + SYNAPSE_ORG_SUFFIX);

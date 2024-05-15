@@ -47,11 +47,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
  */
 public class HtmlInjectionFilter extends OncePerRequestFilter {
 
-  private static final String OG_URL_KEY = "ogUrl";
-  private static final String PAGE_DESCRIPTION_KEY = "pageDescription";
-  private static final String PAGE_TITLE_KEY = "pageTitle";
-  private static final String BOT_HEAD_HTML_KEY = "botHeadHtml";
-  private static final String BOT_BODY_HTML_KEY = "botBodyHtml";
+  public static final String OG_URL_KEY = "ogUrl";
+  public static final String PAGE_DESCRIPTION_KEY = "pageDescription";
+  public static final String PAGE_TITLE_KEY = "pageTitle";
+  public static final String BOT_HEAD_HTML_KEY = "botHeadHtml";
+  public static final String BOT_BODY_HTML_KEY = "botBodyHtml";
   Template portalHtmlTemplate = null;
   public static final String DEFAULT_PAGE_TITLE = "Synapse | Sage Bionetworks";
   public static final String DEFAULT_PAGE_DESCRIPTION =
