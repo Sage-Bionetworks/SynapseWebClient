@@ -160,7 +160,7 @@ public class PlotlyWidget
     String queryToken = queryTokenProvider.queryToToken(query);
     view.setSourceDataLinkVisible(false);
     view.setSourceDataLink(
-      "Synapse:" +
+      "/Synapse:" +
       qbr.getEntityId() +
       "/" +
       TABLES.toString().toLowerCase() +

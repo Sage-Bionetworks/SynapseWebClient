@@ -235,12 +235,6 @@ public class CrawlFilter {
     return plainTextWiki;
   }
 
-  public class BotHtml {
-
-    public String head = "";
-    public String body = "";
-  }
-
   public BotHtml getEntityHtml(EntityBundle bundle)
     throws RestServiceException, JSONObjectAdapterException, SynapseException {
     BotHtml response = new BotHtml();
@@ -288,7 +282,7 @@ public class CrawlFilter {
     StringBuilder html = new StringBuilder();
 
     if (annotations.getAnnotations().containsKey("noindex")) {
-      response.head = META_ROBOTS_NOINDEX;
+      response.setHead(META_ROBOTS_NOINDEX);
     }
 
     html.append("<h1>" + name + "</h1>");
@@ -365,7 +359,7 @@ public class CrawlFilter {
       request.setNextPageToken(childList.getNextPageToken());
       i++;
     } while (i < MAX_CHILD_PAGES && childList.getNextPageToken() != null);
-    response.body = html.toString();
+    response.setBody(html.toString());
 
     // SWC-6609: removed for now
     //    response.head = getDatasetScriptElement(bundle, plainTextWiki);
@@ -562,8 +556,8 @@ public class CrawlFilter {
       "\" />"
     );
 
-    response.head = head.toString();
-    response.body = html.toString();
+    response.setHead(head.toString());
+    response.setBody(html.toString());
 
     return response;
   }

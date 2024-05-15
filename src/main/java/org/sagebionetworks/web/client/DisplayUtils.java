@@ -623,12 +623,7 @@ public class DisplayUtils {
 
   public static String getTeamHistoryToken(String teamId) {
     Team place = new Team(teamId);
-    return getTeamPlaceString(Team.class) + ":" + place.toToken();
-  }
-
-  public static String getTrashHistoryToken(String token, Integer start) {
-    Trash place = new Trash(token, start);
-    return getTrashPlaceString(Trash.class) + ":" + place.toToken();
+    return "/" + getTeamPlaceString(Team.class) + ":" + place.toToken();
   }
 
   public static String getSynapseHistoryToken(String entityId) {
@@ -702,22 +697,6 @@ public class DisplayUtils {
   }
 
   private static String getTeamPlaceString(Class<Team> place) {
-    return getPlaceString(place.getName());
-  }
-
-  private static String getTeamSearchPlaceString(Class<TeamSearch> place) {
-    return getPlaceString(place.getName());
-  }
-
-  private static String getPeopleSearchPlaceString(Class<PeopleSearch> place) {
-    return getPlaceString(place.getName());
-  }
-
-  private static String getTrashPlaceString(Class<Trash> place) {
-    return getPlaceString(place.getName());
-  }
-
-  private static String getSearchPlaceString(Class<Search> place) {
     return getPlaceString(place.getName());
   }
 

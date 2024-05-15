@@ -9,6 +9,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLDecoder;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
@@ -38,6 +40,7 @@ import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.SynapseProviderImpl;
 import org.sagebionetworks.web.server.servlet.UserDataProvider;
+import org.sagebionetworks.web.shared.SearchQueryUtils;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -212,27 +215,35 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
               dataModel.put(PAGE_DESCRIPTION_KEY, description);
 
               if (includeBotHtml) {
-                CrawlFilter.BotHtml botHtml = crawlFilter.getEntityHtml(bundle);
-                dataModel.put(BOT_HEAD_HTML_KEY, botHtml.head);
-                dataModel.put(BOT_BODY_HTML_KEY, botHtml.body);
+                BotHtml botHtml = crawlFilter.getEntityHtml(bundle);
+                dataModel.put(BOT_HEAD_HTML_KEY, botHtml.getHead());
+                dataModel.put(BOT_BODY_HTML_KEY, botHtml.getBody());
               }
             }
           } else if (uri.startsWith("/Search")) {
             // index all projects
-            String searchQueryJson = uri.substring(uri.indexOf(":") + 1);
-            SearchQuery inputQuery = EntityFactory.createEntityFromJSONString(
-              searchQueryJson,
-              SearchQuery.class
-            );
+            String searchQueryRawValue = uri.substring(uri.indexOf(":") + 1);
+            SearchQuery query = SearchQueryUtils.getDefaultSearchQuery();
+            try {
+              query =
+                EntityFactory.createEntityFromJSONString(
+                  URLDecoder.decode(searchQueryRawValue, "UTF-8"),
+                  SearchQuery.class
+                );
+            } catch (Exception e) {
+              query.setQueryTerm(
+                Collections.singletonList(searchQueryRawValue)
+              );
+            }
             dataModel.put(
               PAGE_TITLE_KEY,
-              "Searching for: " + inputQuery.getQueryTerm()
+              "Searching for: " + query.getQueryTerm().get(0)
             );
 
             if (includeBotHtml) {
               dataModel.put(
                 BOT_BODY_HTML_KEY,
-                crawlFilter.getAllProjectsHtml(inputQuery)
+                crawlFilter.getAllProjectsHtml(query)
               );
             }
           } else if (path.startsWith("/TeamSearch")) {
@@ -276,11 +287,9 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
               dataModel.put(PAGE_DESCRIPTION_KEY, profile.getSummary());
 
               if (includeBotHtml) {
-                CrawlFilter.BotHtml botHtml = crawlFilter.getProfileHtml(
-                  profile
-                );
-                dataModel.put(BOT_HEAD_HTML_KEY, botHtml.head);
-                dataModel.put(BOT_BODY_HTML_KEY, botHtml.body);
+                BotHtml botHtml = crawlFilter.getProfileHtml(profile);
+                dataModel.put(BOT_HEAD_HTML_KEY, botHtml.getHead());
+                dataModel.put(BOT_BODY_HTML_KEY, botHtml.getBody());
               }
             }
           }

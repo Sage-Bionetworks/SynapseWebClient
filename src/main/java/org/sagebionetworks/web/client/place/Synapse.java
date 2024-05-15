@@ -207,6 +207,6 @@ public class Synapse extends Place {
     if (dotNotation == null) {
       return null;
     }
-    return SYNAPSE_ENTITY_PREFIX + dotNotation.toLowerCase();
+    return "/" + SYNAPSE_ENTITY_PREFIX + dotNotation.toLowerCase();
   }
 }

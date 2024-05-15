@@ -134,7 +134,7 @@ public class TabViewImpl implements TabView {
 
   @Override
   public void updateHref(Synapse place) {
-    anchor.setHref("Synapse:" + place.toToken());
+    anchor.setHref("/Synapse:" + place.toToken());
   }
 
   @Override

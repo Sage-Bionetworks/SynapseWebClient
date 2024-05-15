@@ -206,7 +206,7 @@ public class PreviewWidgetViewImpl
     alert.add(new Text("No preview is available for"));
     Anchor link = new Anchor();
     link.addStyleName("margin-left-5");
-    link.setHref("Synapse:" + entityId + versionString);
+    link.setHref("/Synapse:" + entityId + versionString);
     link.addClickHandler(event -> {
       event.preventDefault();
       placeChanger.goTo(new Synapse(entityId, version, null, null));

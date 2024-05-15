@@ -33,8 +33,8 @@ import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.server.servlet.DiscussionForumClientImpl;
+import org.sagebionetworks.web.server.servlet.filter.BotHtml;
 import org.sagebionetworks.web.server.servlet.filter.CrawlFilter;
-import org.sagebionetworks.web.server.servlet.filter.CrawlFilter.BotHtml;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 @RunWith(MockitoJUnitRunner.class)
