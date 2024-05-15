@@ -55,6 +55,8 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
   public static final String PAGE_TITLE_KEY = "pageTitle";
   public static final String BOT_HEAD_HTML_KEY = "botHeadHtml";
   public static final String BOT_BODY_HTML_KEY = "botBodyHtml";
+  public static final String LOADING_DESCRIPTOR_KEY = "loadingObjectDescriptor";
+
   Template portalHtmlTemplate = null;
   public static final String DEFAULT_PAGE_TITLE = "Synapse | Sage Bionetworks";
   public static final String DEFAULT_PAGE_DESCRIPTION =
@@ -92,6 +94,7 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
     dataModel.put(OG_URL_KEY, DEFAULT_URL);
     dataModel.put(BOT_HEAD_HTML_KEY, "");
     dataModel.put(BOT_BODY_HTML_KEY, "");
+    dataModel.put(LOADING_DESCRIPTOR_KEY, "Loading");
     return dataModel;
   }
 
@@ -274,7 +277,8 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
             String userId = place.getUserId();
             if (
               !userId.equals(Profile.VIEW_PROFILE_TOKEN) &&
-              !userId.equals(Profile.EDIT_PROFILE_TOKEN)
+              !userId.equals(Profile.EDIT_PROFILE_TOKEN) &&
+              place.getArea() == Synapse.ProfileArea.PROFILE
             ) {
               UserProfile profile = synapseClient.getUserProfile(userId);
               dataModel.put(
@@ -296,7 +300,13 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
         } catch (Exception e) {
           e.printStackTrace();
         }
-
+        // if we have a descriptive page title, then indicate loading object
+        if (!dataModel.get(PAGE_TITLE_KEY).equals(DEFAULT_PAGE_TITLE)) {
+          dataModel.put(
+            LOADING_DESCRIPTOR_KEY,
+            "<q>" + dataModel.get(PAGE_TITLE_KEY) + "</q> page is loading"
+          );
+        }
         StringWriter stringWriter = new StringWriter();
         try {
           portalHtmlTemplate.process(dataModel, stringWriter);
