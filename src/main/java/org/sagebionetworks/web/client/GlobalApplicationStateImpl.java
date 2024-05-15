@@ -412,7 +412,6 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
     String path = synapseJSNIUtils.getLocationPath();
 
     String place = DEFAULT_REFRESH_PLACE;
-    GWT.debugger();
     String[] pathItems = path.split("/");
 
     if (pathItems.length > 1) {
