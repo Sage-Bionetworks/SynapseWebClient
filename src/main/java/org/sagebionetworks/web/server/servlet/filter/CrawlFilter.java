@@ -301,7 +301,7 @@ public class CrawlFilter extends OncePerRequestFilter {
     return createdByBuilder.toString();
   }
 
-  private String getDisplayName(UserProfile profile) {
+  public static String getDisplayName(UserProfile profile) {
     StringBuilder displayNameBuilder = new StringBuilder();
     if (profile.getFirstName() != null) {
       displayNameBuilder.append(profile.getFirstName() + " ");

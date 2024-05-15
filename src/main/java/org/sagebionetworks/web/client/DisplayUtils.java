@@ -668,7 +668,7 @@ public class DisplayUtils {
     String areaToken
   ) {
     Synapse place = new Synapse(entityId, versionNumber, area, areaToken);
-    return getPlaceString(Synapse.class) + ":" + place.toToken();
+    return "/" + getPlaceString(Synapse.class) + ":" + place.toToken();
   }
 
   /**

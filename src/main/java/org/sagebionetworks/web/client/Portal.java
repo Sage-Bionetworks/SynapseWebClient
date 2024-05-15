@@ -47,7 +47,8 @@ public class Portal implements EntryPoint {
   public void onModuleLoad() {
     zeroOpacity(RootPanel.get("headerPanel"), RootPanel.get("rootPanel"));
     detectProxiedWebsiteAttack();
-    // we might need to reload using the new token scheme (required for SEO)
+    // Test to see if client is instructed to load via "#!" fragment.
+    // If detected, reload using a new path-based token scheme (required for SEO).
     // The GWT History class assumes tokens begin with '#', and we used to include the '!' as the prefix for all GWT Places.
     String initToken = History.getToken();
     if (initToken.length() > 0 && initToken.startsWith("!")) {
