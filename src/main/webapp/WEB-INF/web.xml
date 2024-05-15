@@ -19,12 +19,6 @@
     </filter-class>
   </filter>
   <filter>
-    <filter-name>crawlFilter</filter-name>
-    <filter-class>
-      org.sagebionetworks.web.server.servlet.filter.CrawlFilter
-    </filter-class>
-  </filter>
-  <filter>
     <filter-name>cacheFilter</filter-name>
     <filter-class>
       org.sagebionetworks.web.server.servlet.filter.GWTCacheControlFilter
@@ -88,11 +82,6 @@
   </filter-mapping>
   <filter-mapping>
     <filter-name>htmlInjectionFilter</filter-name>
-    <url-pattern>*</url-pattern>
-  </filter-mapping>
-
-  <filter-mapping>
-    <filter-name>crawlFilter</filter-name>
     <url-pattern>*</url-pattern>
   </filter-mapping>
 

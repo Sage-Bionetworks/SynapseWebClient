@@ -242,6 +242,13 @@ public class SynapseClientImpl
     throws RestServiceException {
     org.sagebionetworks.client.SynapseClient synapseClient =
       createSynapseClient();
+    return getLatestEntityVersion(entityId, synapseClient);
+  }
+
+  public static Long getLatestEntityVersion(
+    String entityId,
+    org.sagebionetworks.client.SynapseClient synapseClient
+  ) throws RestServiceException {
     try {
       org.sagebionetworks.reflection.model.PaginatedResults<
         VersionInfo

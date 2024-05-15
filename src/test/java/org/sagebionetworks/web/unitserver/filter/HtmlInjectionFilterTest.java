@@ -39,12 +39,13 @@ import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.web.server.servlet.DiscussionForumClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.filter.CrawlFilter;
+import org.sagebionetworks.web.server.servlet.filter.HtmlInjectionFilter;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 @RunWith(MockitoJUnitRunner.class)
-public class CrawlFilterTest {
+public class HtmlInjectionFilterTest {
 
-  CrawlFilter filter;
+  HtmlInjectionFilter filter;
 
   @Mock
   HttpServletRequest mockRequest;
@@ -84,7 +85,8 @@ public class CrawlFilterTest {
 
   @Before
   public void setUp() throws RestServiceException, IOException {
-    filter = new CrawlFilter();
+    filter = new HtmlInjectionFilter();
+
     filter.init(mockSynapseClient, mockDiscussionForumClient);
     when(mockRequest.getHeader(ORIGIN_HEADER))
       .thenReturn("https://www" + SYNAPSE_ORG_SUFFIX);
