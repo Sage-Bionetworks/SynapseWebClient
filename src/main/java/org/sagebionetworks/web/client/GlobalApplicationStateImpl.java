@@ -591,12 +591,12 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
       new AsyncCallback<JSONObjectAdapter>() {
         @Override
         public void onSuccess(JSONObjectAdapter configurations) {
-          GWT.log(configurations.toString()); //
+          GWT.log("Configurations are:" + configurations.toString()); //
         }
 
         @Override
         public void onFailure(Throwable caught) {
-          GWT.log(caught.getMessage());
+          GWT.log("The error getting configurations is:" + caught.getMessage());
         }
       }
     );
