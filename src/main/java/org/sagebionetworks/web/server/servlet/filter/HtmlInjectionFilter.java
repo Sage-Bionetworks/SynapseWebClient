@@ -240,10 +240,13 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
                 Collections.singletonList(searchQueryRawValue)
               );
             }
-            dataModel.put(
-              PAGE_TITLE_KEY,
-              "Searching for: " + query.getQueryTerm().get(0)
-            );
+            String queryTerm = query.getQueryTerm().get(0);
+            if (queryTerm != null && queryTerm.trim().length() > 0) {
+              dataModel.put(
+                PAGE_TITLE_KEY,
+                "Searching for: " + query.getQueryTerm().get(0)
+              );
+            }
 
             if (includeBotHtml) {
               dataModel.put(

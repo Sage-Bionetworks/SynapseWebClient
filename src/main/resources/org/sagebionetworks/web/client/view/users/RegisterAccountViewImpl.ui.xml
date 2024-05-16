@@ -64,7 +64,7 @@
             text="Sign in"
             addStyleNames="synapse-green"
             marginLeft="10"
-            href="LoginPlace:0"
+            href="/LoginPlace:0"
           />
         </b:Heading>
       </bh:Div>

@@ -18,7 +18,7 @@
     <b:NavPills addStyleNames="margin-left-35 margin-right-10 margin-top-5">
       <b:AnchorListItem
         text="ACT data access dashboard"
-        href="ACTDataAccessSubmissionDashboard:default"
+        href="/ACTDataAccessSubmissionDashboard:default"
       />
     </b:NavPills>
     <bh:Div
