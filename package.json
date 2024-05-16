@@ -17,7 +17,7 @@
     "markdown-it-strikethrough-alt": "^1.0.0",
     "markdown-it-sub": "^2.0.0",
     "markdown-it-sup": "^2.0.0",
-    "markdown-it-synapse": "^1.1.15",
+    "markdown-it-synapse": "^1.1.14",
     "markdown-it-synapse-heading": "^1.0.1",
     "markdown-it-synapse-table": "^1.0.6",
     "moment": "^2.29.4",
