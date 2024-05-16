@@ -95,9 +95,9 @@ public class CrawlFilterTest {
 
     BotHtml response = filter.getEntityHtml(mockEntityBundle);
 
-    assertTrue(response.body.contains(synapseID));
-    assertTrue(response.body.contains(entityName));
-    assertFalse(response.head.contains(META_ROBOTS_NOINDEX));
+    assertTrue(response.getBody().contains(synapseID));
+    assertTrue(response.getBody().contains(entityName));
+    assertFalse(response.getHead().contains(META_ROBOTS_NOINDEX));
 
     // verify we are asking for all entity types, except link
     verify(mockSynapseClient)
@@ -124,7 +124,7 @@ public class CrawlFilterTest {
 
     BotHtml response = filter.getEntityHtml(mockEntityBundle);
 
-    assertTrue(response.body.contains(synapseID));
-    assertTrue(response.head.contains(META_ROBOTS_NOINDEX));
+    assertTrue(response.getBody().contains(synapseID));
+    assertTrue(response.getHead().contains(META_ROBOTS_NOINDEX));
   }
 }
