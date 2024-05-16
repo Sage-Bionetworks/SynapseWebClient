@@ -50,6 +50,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
  */
 public class HtmlInjectionFilter extends OncePerRequestFilter {
 
+  public static final String SEARCHING_FOR_TEAM = "Searching for Team: ";
   public static final String OG_URL_KEY = "ogUrl";
   public static final String PAGE_DESCRIPTION_KEY = "pageDescription";
   public static final String PAGE_TITLE_KEY = "pageTitle";
@@ -223,7 +224,7 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
                 dataModel.put(BOT_BODY_HTML_KEY, botHtml.getBody());
               }
             }
-          } else if (uri.startsWith("/Search")) {
+          } else if (path.startsWith("/Search")) {
             // index all projects
             String searchQueryRawValue = uri.substring(uri.indexOf(":") + 1);
             SearchQuery query = SearchQueryUtils.getDefaultSearchQuery();
@@ -253,7 +254,7 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
             TeamSearch place = new TeamSearch(placeToken);
             dataModel.put(
               PAGE_TITLE_KEY,
-              "Searching for Team: " + place.getSearchTerm()
+              SEARCHING_FOR_TEAM + place.getSearchTerm()
             );
             if (includeBotHtml) {
               dataModel.put(

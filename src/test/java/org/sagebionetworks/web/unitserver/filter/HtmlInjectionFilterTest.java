@@ -4,7 +4,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.ORIGIN_HEADER;
@@ -19,6 +18,8 @@ import freemarker.template.Template;
 import freemarker.template.TemplateNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URLEncoder;
+import java.util.Collections;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -35,12 +36,17 @@ import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
+import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.annotation.v2.Annotations;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
+import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
+import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.server.servlet.DiscussionForumClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.filter.BotHtml;
@@ -97,6 +103,25 @@ public class HtmlInjectionFilterTest {
 
   @Mock
   WikiPage mockWikiPage;
+
+  @Mock
+  DiscussionThreadBundle mockThreadBundle;
+
+  @Mock
+  Team mockTeam;
+
+  @Mock
+  UserProfile mockUserProfile;
+
+  public static final String USER_NAME = "reinhardt123";
+  public static final String FIRST_NAME = "Reinhardt";
+  public static final String LAST_NAME = "Wilhelm";
+  public static final String SUMMARY = "Hammer for hitting things";
+
+  public static final String TEAM_NAME = "the greatest team name";
+  public static final String TEAM_DESCRIPTION = "an average team description";
+
+  public static final String DISCUSSION_THREAD_TITLE = "my test thread title";
 
   public static final String WIKI_PAGE_MARKDOWN =
     "This is a description of the object";
@@ -159,6 +184,20 @@ public class HtmlInjectionFilterTest {
     when(mockSynapseClient.getEntityChildren(any(EntityChildrenRequest.class)))
       .thenReturn(mockEntityChildrenResponse);
     when(mockResponse.getWriter()).thenReturn(mockPrintWriter);
+    when(mockDiscussionForumClient.getThread(anyString()))
+      .thenReturn(mockThreadBundle);
+    when(mockThreadBundle.getTitle()).thenReturn(DISCUSSION_THREAD_TITLE);
+    when(mockSynapseClient.getTeam(anyString())).thenReturn(mockTeam);
+    when(mockTeam.getName()).thenReturn(TEAM_NAME);
+    when(mockTeam.getDescription()).thenReturn(TEAM_DESCRIPTION);
+    when(mockSynapseClient.getUserProfile(anyString()))
+      .thenReturn(mockUserProfile);
+    when(mockUserProfile.getUserName()).thenReturn(USER_NAME);
+    when(mockUserProfile.getFirstName()).thenReturn(FIRST_NAME);
+    when(mockUserProfile.getLastName()).thenReturn(LAST_NAME);
+    when(mockUserProfile.getSummary()).thenReturn(SUMMARY);
+    //by default, set up as a bot request since this will return more
+    when(mockRequest.getHeader("User-Agent")).thenReturn("Googlebot/2.1");
   }
 
   private void setRequestURL(String s) {
@@ -211,5 +250,144 @@ public class HtmlInjectionFilterTest {
     assertFalse(outputString.contains(META_ROBOTS_NOINDEX));
     assertFalse(outputString.contains(BOT_HEAD_HTML));
     assertFalse(outputString.contains(BOT_BODY_HTML));
+  }
+
+  @Test
+  public void testDiscussionThreadPage()
+    throws ServletException, IOException, RestServiceException, SynapseException {
+    String synapseID = "syn12345";
+    String discussionThreadId = "5555";
+    when(mockEntity.getId()).thenReturn(synapseID);
+    setRequestURL(
+      "https://www.synapse.org/Synapse:" +
+      synapseID +
+      HtmlInjectionFilter.DISCUSSION_THREAD_ID +
+      discussionThreadId
+    );
+
+    filter.testFilter(mockRequest, mockResponse, mockFilterChain);
+
+    verify(mockPrintWriter).print(stringCaptor.capture());
+    String outputString = stringCaptor.getValue();
+    assertTrue(outputString.contains(DISCUSSION_THREAD_TITLE));
+  }
+
+  @Test
+  public void testSearchPage()
+    throws ServletException, IOException, RestServiceException, SynapseException {
+    String searchTerm = "cancer";
+    setRequestURL("https://www.synapse.org/Search:" + searchTerm);
+
+    filter.testFilter(mockRequest, mockResponse, mockFilterChain);
+
+    verify(mockPrintWriter).print(stringCaptor.capture());
+    String outputString = stringCaptor.getValue();
+    assertTrue(outputString.contains(searchTerm));
+  }
+
+  @Test
+  public void testSearchPageWithQuery()
+    throws ServletException, IOException, RestServiceException, SynapseException, JSONObjectAdapterException {
+    String searchTerm = "potato";
+    SearchQuery query = new SearchQuery();
+    query.setQueryTerm(Collections.singletonList(searchTerm));
+    String queryJson = EntityFactory.createJSONStringForEntity(query);
+    String encodedQueryJson = URLEncoder.encode(queryJson, "UTF-8");
+    setRequestURL("https://www.synapse.org/Search:" + encodedQueryJson);
+
+    filter.testFilter(mockRequest, mockResponse, mockFilterChain);
+
+    verify(mockPrintWriter).print(stringCaptor.capture());
+    String outputString = stringCaptor.getValue();
+    assertTrue(outputString.contains(searchTerm));
+  }
+
+  @Test
+  public void testTeamSearchPage()
+    throws ServletException, IOException, RestServiceException, SynapseException {
+    String searchTerm = "challenge";
+    setRequestURL("https://www.synapse.org/TeamSearch:" + searchTerm);
+
+    filter.testFilter(mockRequest, mockResponse, mockFilterChain);
+
+    verify(mockPrintWriter).print(stringCaptor.capture());
+    String outputString = stringCaptor.getValue();
+    assertTrue(outputString.contains(HtmlInjectionFilter.SEARCHING_FOR_TEAM));
+    assertTrue(outputString.contains(searchTerm));
+  }
+
+  @Test
+  public void testTeamPage()
+    throws ServletException, IOException, RestServiceException, SynapseException {
+    setRequestURL("https://www.synapse.org/Team:1234");
+
+    filter.testFilter(mockRequest, mockResponse, mockFilterChain);
+
+    verify(mockPrintWriter).print(stringCaptor.capture());
+    String outputString = stringCaptor.getValue();
+    assertTrue(outputString.contains(TEAM_NAME));
+    assertTrue(outputString.contains(TEAM_DESCRIPTION));
+  }
+
+  @Test
+  public void testProfilePage()
+    throws ServletException, IOException, RestServiceException, SynapseException {
+    setRequestURL("https://www.synapse.org/Profile:1234");
+
+    filter.testFilter(mockRequest, mockResponse, mockFilterChain);
+
+    verify(mockPrintWriter).print(stringCaptor.capture());
+    String outputString = stringCaptor.getValue();
+    assertTrue(outputString.contains(USER_NAME));
+    assertTrue(outputString.contains(FIRST_NAME));
+    assertTrue(outputString.contains(LAST_NAME));
+    assertTrue(outputString.contains(SUMMARY));
+  }
+
+  @Test
+  public void testViewMyProfilePage()
+    throws ServletException, IOException, RestServiceException, SynapseException {
+    setRequestURL("https://www.synapse.org/Profile:v");
+
+    filter.testFilter(mockRequest, mockResponse, mockFilterChain);
+
+    verify(mockPrintWriter).print(stringCaptor.capture());
+    String outputString = stringCaptor.getValue();
+    assertTrue(outputString.contains(HtmlInjectionFilter.DEFAULT_PAGE_TITLE));
+    assertTrue(
+      outputString.contains(HtmlInjectionFilter.DEFAULT_PAGE_DESCRIPTION)
+    );
+  }
+
+  @Test
+  public void testEditMyProfilePage()
+    throws ServletException, IOException, RestServiceException, SynapseException {
+    setRequestURL("https://www.synapse.org/Profile:edit");
+
+    filter.testFilter(mockRequest, mockResponse, mockFilterChain);
+
+    verify(mockPrintWriter).print(stringCaptor.capture());
+    String outputString = stringCaptor.getValue();
+    assertTrue(outputString.contains(HtmlInjectionFilter.DEFAULT_PAGE_TITLE));
+    assertTrue(
+      outputString.contains(HtmlInjectionFilter.DEFAULT_PAGE_DESCRIPTION)
+    );
+  }
+
+  @Test
+  public void testMyProfileDashboardPage()
+    throws ServletException, IOException, RestServiceException, SynapseException {
+    setRequestURL(
+      "https://www.synapse.org/Profile:1131050/projects/created_by_me"
+    );
+
+    filter.testFilter(mockRequest, mockResponse, mockFilterChain);
+
+    verify(mockPrintWriter).print(stringCaptor.capture());
+    String outputString = stringCaptor.getValue();
+    assertTrue(outputString.contains(HtmlInjectionFilter.DEFAULT_PAGE_TITLE));
+    assertTrue(
+      outputString.contains(HtmlInjectionFilter.DEFAULT_PAGE_DESCRIPTION)
+    );
   }
 }
