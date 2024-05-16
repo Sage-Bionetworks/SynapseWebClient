@@ -60,8 +60,10 @@ public class StringUtils {
     return output.toString();
   }
 
-  public static String getGWTPlaceTokenFromURL(String url) {
+  public static String getGWTPlaceTokenFromURL(String inputUrl) {
     String placeToken = null;
+    // remove the protocol if provided
+    String url = inputUrl.replaceFirst("^https?://", "");
     if (url.contains(":")) {
       // optimization - use place changer in this case as well
       int colonIndex = url.lastIndexOf(':');
