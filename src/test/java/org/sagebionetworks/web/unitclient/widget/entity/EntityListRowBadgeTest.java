@@ -187,7 +187,7 @@ public class EntityListRowBadgeTest {
       );
     verify(mockView).showLoading();
     verify(mockView).setEntityType(EntityType.project);
-    verify(mockView).setEntityLink(entityName, "#!Synapse:" + entityId);
+    verify(mockView).setEntityLink(entityName, "/Synapse:" + entityId);
     verify(mockUserBadge).configure(createdByUserId);
     verify(mockView).setCreatedOn(anyString());
     verify(mockView).setDescription(description);
@@ -228,7 +228,7 @@ public class EntityListRowBadgeTest {
     verify(mockView).showLoading();
     verify(mockView).setEntityType(EntityType.file);
     verify(mockView)
-      .setEntityLink(entityName, "#!Synapse:" + entityId + "." + version);
+      .setEntityLink(entityName, "/Synapse:" + entityId + "." + version);
     verify(mockUserBadge).configure(createdByUserId);
     verify(mockView).setCreatedOn(anyString());
     verify(mockView).setDescription(description);
@@ -255,7 +255,7 @@ public class EntityListRowBadgeTest {
       );
     widget.getEntityBundle();
     verify(mockView).showErrorIcon(errorMessage);
-    verify(mockView).setEntityLink(entityId, "#!Synapse:" + entityId);
+    verify(mockView).setEntityLink(entityId, "/Synapse:" + entityId);
   }
 
   @Test
@@ -286,7 +286,7 @@ public class EntityListRowBadgeTest {
     verify(mockPopupUtils)
       .showInfo(
         entityName + EntityBadge.ADDED_TO_DOWNLOAD_LIST,
-        "#!DownloadCart:0",
+        "DownloadCart:0",
         DisplayConstants.VIEW_DOWNLOAD_LIST
       );
     verify(mockEventBus).fireEvent(any(DownloadListUpdatedEvent.class));

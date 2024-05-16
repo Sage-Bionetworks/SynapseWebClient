@@ -79,7 +79,7 @@ public class OAuth2AliasServletTest {
     assertNotNull(request);
     assertEquals(OAuthProvider.ORCID, request.getProvider());
     assertEquals(authCode, request.getAuthenticationCode());
-    verify(mockResponse).sendRedirect("/#!Profile:oauth_bound");
+    verify(mockResponse).sendRedirect("/Profile:oauth_bound");
   }
 
   @Test
@@ -96,7 +96,7 @@ public class OAuth2AliasServletTest {
     when(mockRequest.getParameter(WebConstants.OAUTH2_CODE))
       .thenReturn(authCode);
     servlet.doGet(mockRequest, mockResponse);
-    verify(mockResponse).sendRedirect(contains("/#!Error:"));
+    verify(mockResponse).sendRedirect(contains("/Error:"));
   }
 
   @Test
@@ -119,7 +119,7 @@ public class OAuth2AliasServletTest {
     ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
     verify(mockResponse).sendRedirect(captor.capture());
     String v = captor.getValue();
-    assertTrue(v.contains("#!Error:"));
+    assertTrue(v.contains("Error:"));
   }
 
   @Test
@@ -138,6 +138,6 @@ public class OAuth2AliasServletTest {
     ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
     verify(mockResponse).sendRedirect(captor.capture());
     String v = captor.getValue();
-    assertTrue(v.contains("#!Down:0"));
+    assertTrue(v.contains("Down:0"));
   }
 }

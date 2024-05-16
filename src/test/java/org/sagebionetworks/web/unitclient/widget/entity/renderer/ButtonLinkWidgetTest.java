@@ -52,7 +52,7 @@ public class ButtonLinkWidgetTest {
   WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
 
   String baseUrl = "http://my.synapse.org";
-  String subpage1 = "#!Synapse:1234";
+  String subpage1 = "Synapse:1234";
   String subpage1Full = baseUrl + "/" + subpage1;
   String validExternalUrl = "http://www.jayhodgson.com";
   String buttonText = "Click here";
@@ -287,18 +287,5 @@ public class ButtonLinkWidgetTest {
         eq(false),
         eq(true)
       );
-  }
-
-  @Test
-  public void testPopulateEntityBundleCache() {
-    String entityId = "syn9182";
-    Map<String, String> descriptor = getDefaultDescriptor();
-    when(mockAppPlaceHistoryMapper.getPlace(anyString()))
-      .thenReturn(new Synapse(entityId));
-    descriptor.put(WidgetConstants.LINK_URL_KEY, "#!Synapse:" + entityId);
-
-    widget.configure(wikiKey, descriptor, null, null);
-
-    verify(mockJsClient).populateEntityBundleCache(entityId);
   }
 }

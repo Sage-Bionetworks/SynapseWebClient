@@ -413,9 +413,9 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
     AppPlaceHistoryMapper appPlaceHistoryMapper = getAppPlaceHistoryMapper();
     String url = synapseJSNIUtils.getCurrentURL();
 
-    String placeToken = DEFAULT_REFRESH_PLACE;
-    if (url.contains(":")) {
-      placeToken = StringUtils.getGWTPlaceTokenFromURL(url);
+    String placeToken = StringUtils.getGWTPlaceTokenFromURL(url);
+    if (placeToken == null) {
+      placeToken = DEFAULT_REFRESH_PLACE;
     }
     Place currentPlace = appPlaceHistoryMapper.getPlace(placeToken);
     getPlaceChanger().goTo(currentPlace);

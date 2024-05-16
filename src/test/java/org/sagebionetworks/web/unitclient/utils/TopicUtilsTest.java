@@ -13,7 +13,7 @@ public class TopicUtilsTest {
     String threadId = "456";
     String replyId = "987";
     assertEquals(
-      "/#!Synapse:syn123/discussion/threadId=456&replyId=987",
+      "/Synapse:syn123/discussion/threadId=456&replyId=987",
       TopicUtils.buildReplyLink(projectId, threadId, replyId)
     );
   }
@@ -23,7 +23,7 @@ public class TopicUtilsTest {
     String projectId = "syn123";
     String threadId = "456";
     assertEquals(
-      "/#!Synapse:syn123/discussion/threadId=456",
+      "/Synapse:syn123/discussion/threadId=456",
       TopicUtils.buildThreadLink(projectId, threadId)
     );
   }
@@ -32,7 +32,7 @@ public class TopicUtilsTest {
   public void testBuildForumLink() {
     String projectId = "syn123";
     assertEquals(
-      "/#!Synapse:syn123/discussion/",
+      "/Synapse:syn123/discussion/",
       TopicUtils.buildForumLink(projectId)
     );
   }

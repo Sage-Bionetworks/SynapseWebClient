@@ -35,9 +35,10 @@ public class ValidationUtils {
       // url is undefined
       return isUndefinedUrlValid;
     }
+
     RegExp regEx = RegExp.compile(WebConstants.VALID_URL_REGEX, "gm");
-    MatchResult matchResult = regEx.exec(url);
-    return (matchResult != null && url.equals(matchResult.getGroup(0)));
+    boolean isMatch = regEx.test(url);
+    return (url.startsWith("/") || isMatch);
   }
 
   public static boolean isTrue(Boolean b) {
