@@ -345,6 +345,21 @@ public class HtmlInjectionFilterTest {
   }
 
   @Test
+  public void testProfilePageWithNullSummary()
+    throws ServletException, IOException, RestServiceException, SynapseException {
+    setRequestURL("https://www.synapse.org/Profile:1234");
+    when(mockUserProfile.getSummary()).thenReturn(null);
+
+    filter.testFilter(mockRequest, mockResponse, mockFilterChain);
+
+    verify(mockPrintWriter).print(stringCaptor.capture());
+    String outputString = stringCaptor.getValue();
+    assertTrue(outputString.contains(USER_NAME));
+    assertTrue(outputString.contains(FIRST_NAME));
+    assertTrue(outputString.contains(LAST_NAME));
+  }
+
+  @Test
   public void testViewMyProfilePage()
     throws ServletException, IOException, RestServiceException, SynapseException {
     setRequestURL("https://www.synapse.org/Profile:v");

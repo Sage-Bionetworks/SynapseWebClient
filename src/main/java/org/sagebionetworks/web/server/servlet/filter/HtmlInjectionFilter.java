@@ -88,14 +88,15 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
     return userAgent != null && userAgent.toLowerCase().contains("bot");
   }
 
-  private Map<String, String> getDataModel() {
-    Map<String, String> dataModel = new HashMap<>();
-    dataModel.put(PAGE_TITLE_KEY, DEFAULT_PAGE_TITLE);
-    dataModel.put(PAGE_DESCRIPTION_KEY, DEFAULT_PAGE_DESCRIPTION);
-    dataModel.put(OG_URL_KEY, DEFAULT_URL);
-    dataModel.put(BOT_HEAD_HTML_KEY, "");
-    dataModel.put(BOT_BODY_HTML_KEY, "");
-    dataModel.put(LOADING_DESCRIPTOR_KEY, "Loading");
+  private Map<String, String> addDefaultsToDataModel(
+    Map<String, String> dataModel
+  ) {
+    dataModel.putIfAbsent(PAGE_TITLE_KEY, DEFAULT_PAGE_TITLE);
+    dataModel.putIfAbsent(PAGE_DESCRIPTION_KEY, DEFAULT_PAGE_DESCRIPTION);
+    dataModel.putIfAbsent(OG_URL_KEY, DEFAULT_URL);
+    dataModel.putIfAbsent(BOT_HEAD_HTML_KEY, "");
+    dataModel.putIfAbsent(BOT_BODY_HTML_KEY, "");
+    dataModel.putIfAbsent(LOADING_DESCRIPTOR_KEY, "Loading");
     return dataModel;
   }
 
@@ -138,7 +139,7 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
       path.equals("/") ||
       path.startsWith("/Home");
     if ((isHomePage || isGWTPlace(path))) {
-      Map<String, String> dataModel = getDataModel();
+      Map<String, String> dataModel = new HashMap<>();
 
       String domain = request.getServerName();
       String lowerCaseDomain = domain.toLowerCase();
@@ -302,7 +303,7 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
           e.printStackTrace();
         }
         // if we have a descriptive page title, then indicate loading object
-        if (!dataModel.get(PAGE_TITLE_KEY).equals(DEFAULT_PAGE_TITLE)) {
+        if (dataModel.containsKey(PAGE_TITLE_KEY)) {
           dataModel.put(
             LOADING_DESCRIPTOR_KEY,
             "<q>" + dataModel.get(PAGE_TITLE_KEY) + "</q> page is loading"
@@ -310,6 +311,7 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
         }
         StringWriter stringWriter = new StringWriter();
         try {
+          addDefaultsToDataModel(dataModel);
           portalHtmlTemplate.process(dataModel, stringWriter);
         } catch (TemplateException e) {
           e.printStackTrace();
