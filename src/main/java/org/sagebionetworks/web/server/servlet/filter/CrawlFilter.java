@@ -56,6 +56,7 @@ import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
+import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
@@ -63,7 +64,6 @@ import org.sagebionetworks.schema.adapter.org.json.JSONArrayAdapterImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.place.TeamSearch;
-import org.sagebionetworks.web.server.servlet.DiscussionForumClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.SearchQueryUtils;
@@ -78,7 +78,6 @@ public class CrawlFilter {
   public static final String META_ROBOTS_NOINDEX =
     "<meta name=\"robots\" content=\"noindex\">";
   SynapseClient synapseClient = null;
-  DiscussionForumClientImpl discussionForumClient = null;
   JSONObjectAdapter jsonObjectAdapter = null;
   private final Supplier<String> homePageCached =
     Suppliers.memoizeWithExpiration(homePageSupplier(), 1, TimeUnit.DAYS);
@@ -114,12 +113,8 @@ public class CrawlFilter {
     };
   }
 
-  public void init(
-    SynapseClient synapseClient,
-    DiscussionForumClientImpl discussionForumClient
-  ) {
+  public void init(SynapseClient synapseClient) {
     this.synapseClient = synapseClient;
-    this.discussionForumClient = discussionForumClient;
 
     df.setTimeZone(TimeZone.getTimeZone("UTC"));
   }
@@ -307,20 +302,22 @@ public class CrawlFilter {
     }
     // and link to the discussion forum (all threads and replies) if this is a project.
     if (entity instanceof Project) {
-      Forum forum = discussionForumClient.getForumByProjectId(entity.getId());
+      Forum forum = synapseClient.getForumByProjectId(entity.getId());
       if (forum != null) {
         String forumId = forum.getId();
         long currentOffset = 0;
         PaginatedResults<DiscussionThreadBundle> paginatedThreads;
         do {
           paginatedThreads =
-            discussionForumClient.getThreadsForForum(
-              forumId,
-              20L,
-              currentOffset,
-              DiscussionThreadOrder.PINNED_AND_LAST_ACTIVITY,
-              false,
-              DiscussionFilter.EXCLUDE_DELETED
+            convertPaginated(
+              synapseClient.getThreadsForForum(
+                forumId,
+                20L,
+                currentOffset,
+                DiscussionThreadOrder.PINNED_AND_LAST_ACTIVITY,
+                false,
+                DiscussionFilter.EXCLUDE_DELETED
+              )
             );
           List<DiscussionThreadBundle> threadList =
             paginatedThreads.getResults();
@@ -453,7 +450,8 @@ public class CrawlFilter {
   public String getThreadHtml(
     DiscussionThreadBundle thread,
     String threadContent
-  ) throws JSONObjectAdapterException, RestServiceException, IOException {
+  )
+    throws JSONObjectAdapterException, RestServiceException, IOException, SynapseException {
     StringBuilder html = new StringBuilder();
     html.append("<h4>" + threadContent + "</h4>");
     String createdBy = null;
@@ -461,20 +459,21 @@ public class CrawlFilter {
       createdBy = getCreatedByString(thread.getCreatedBy());
     } catch (Exception e) {}
     html.append("Created by " + createdBy + "<br>");
-    PaginatedResults<DiscussionReplyBundle> replies =
-      discussionForumClient.getRepliesForThread(
+    PaginatedResults<DiscussionReplyBundle> replies = convertPaginated(
+      synapseClient.getRepliesForThread(
         thread.getId(),
         100L,
         0L,
         DiscussionReplyOrder.CREATED_ON,
         false,
         DiscussionFilter.EXCLUDE_DELETED
-      );
+      )
+    );
     for (DiscussionReplyBundle reply : replies.getResults()) {
       try {
-        String replyURL = discussionForumClient.getReplyUrl(
-          reply.getMessageKey()
-        );
+        String replyURL = synapseClient
+          .getReplyUrl(reply.getMessageKey())
+          .toString();
         html.append(getURLContents(replyURL) + "<br>");
       } catch (Exception e) {}
     }
@@ -659,5 +658,20 @@ public class CrawlFilter {
     }
     newQuery.setIncludeTypes(types);
     return newQuery;
+  }
+
+  /**
+   * Helper to convert from the non-gwt compatible PaginatedResults to the compatible type.
+   *
+   * @param in
+   * @return
+   */
+  public <T extends JSONEntity> PaginatedResults<T> convertPaginated(
+    org.sagebionetworks.reflection.model.PaginatedResults<T> in
+  ) {
+    return new PaginatedResults<T>(
+      in.getResults(),
+      in.getTotalNumberOfResults()
+    );
   }
 }

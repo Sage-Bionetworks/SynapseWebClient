@@ -47,7 +47,6 @@ import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
-import org.sagebionetworks.web.server.servlet.DiscussionForumClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.filter.BotHtml;
 import org.sagebionetworks.web.server.servlet.filter.CrawlFilter;
@@ -73,9 +72,6 @@ public class HtmlInjectionFilterTest {
 
   @Mock
   SynapseClient mockSynapseClient;
-
-  @Mock
-  DiscussionForumClientImpl mockDiscussionForumClient;
 
   @Mock
   EntityBundle mockEntityBundle;
@@ -157,7 +153,7 @@ public class HtmlInjectionFilterTest {
       HtmlInjectionFilter.BOT_HEAD_HTML_KEY +
       "}"
     );
-    filter.init(pageTitleTemplate, mockDiscussionForumClient, mockCrawlFilter);
+    filter.init(pageTitleTemplate, mockCrawlFilter);
     when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapseClient);
     filter.setSynapseProvider(mockSynapseProvider);
     when(mockRequest.getHeader(ORIGIN_HEADER))
@@ -184,8 +180,7 @@ public class HtmlInjectionFilterTest {
     when(mockSynapseClient.getEntityChildren(any(EntityChildrenRequest.class)))
       .thenReturn(mockEntityChildrenResponse);
     when(mockResponse.getWriter()).thenReturn(mockPrintWriter);
-    when(mockDiscussionForumClient.getThread(anyString()))
-      .thenReturn(mockThreadBundle);
+    when(mockSynapseClient.getThread(anyString())).thenReturn(mockThreadBundle);
     when(mockThreadBundle.getTitle()).thenReturn(DISCUSSION_THREAD_TITLE);
     when(mockSynapseClient.getTeam(anyString())).thenReturn(mockTeam);
     when(mockTeam.getName()).thenReturn(TEAM_NAME);
@@ -417,7 +412,7 @@ public class HtmlInjectionFilterTest {
       HtmlInjectionFilter.OG_PAGE_DESCRIPTION_KEY +
       "}"
     );
-    filter.init(pageTitleTemplate, mockDiscussionForumClient, mockCrawlFilter);
+    filter.init(pageTitleTemplate, mockCrawlFilter);
     setRequestURL("https://www.synapse.org/Synapse:syn123");
 
     StringBuilder markdown = new StringBuilder();

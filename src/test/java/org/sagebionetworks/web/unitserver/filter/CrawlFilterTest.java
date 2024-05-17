@@ -32,7 +32,6 @@ import org.sagebionetworks.repo.model.annotation.v2.AnnotationsValue;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.server.servlet.DiscussionForumClientImpl;
 import org.sagebionetworks.web.server.servlet.filter.BotHtml;
 import org.sagebionetworks.web.server.servlet.filter.CrawlFilter;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
@@ -45,9 +44,6 @@ public class CrawlFilterTest {
 
   @Mock
   SynapseClient mockSynapseClient;
-
-  @Mock
-  DiscussionForumClientImpl mockDiscussionForumClient;
 
   @Mock
   EntityBundle mockEntityBundle;
@@ -82,7 +78,7 @@ public class CrawlFilterTest {
     when(mockSynapseClient.getEntityChildren(any(EntityChildrenRequest.class)))
       .thenReturn(mockEntityChildrenResponse);
 
-    filter.init(mockSynapseClient, mockDiscussionForumClient);
+    filter.init(mockSynapseClient);
   }
 
   @Test

@@ -35,7 +35,6 @@ import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Team;
 import org.sagebionetworks.web.client.place.TeamSearch;
-import org.sagebionetworks.web.server.servlet.DiscussionForumClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.SynapseProviderImpl;
@@ -73,19 +72,13 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
   public static final String META_ROBOTS_NOINDEX =
     "<meta name=\"robots\" content=\"noindex\">";
   SynapseClientImpl synapseClient = null;
-  DiscussionForumClientImpl discussionForumClient = null;
   JSONObjectAdapter jsonObjectAdapter = null;
   public static final int MAX_CHILD_PAGES = 5;
   public CrawlFilter crawlFilter;
   private SynapseProvider synapseProvider = new SynapseProviderImpl();
 
-  public void init(
-    Template portalHtmlTemplate,
-    DiscussionForumClientImpl discussionForumClient,
-    CrawlFilter crawlFilter
-  ) {
+  public void init(Template portalHtmlTemplate, CrawlFilter crawlFilter) {
     this.portalHtmlTemplate = portalHtmlTemplate;
-    this.discussionForumClient = discussionForumClient;
     this.crawlFilter = crawlFilter;
   }
 
@@ -144,7 +137,7 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
       cfg.setServletContextForTemplateLoading(getServletContext(), "/");
       Template template = cfg.getTemplate("Portal.html");
       CrawlFilter crawlFilter = new CrawlFilter();
-      init(template, new DiscussionForumClientImpl(), crawlFilter);
+      init(template, crawlFilter);
     }
     String userAgent = request.getHeader("User-Agent");
     boolean isLikelyBot = isLikelyBot(userAgent);
@@ -174,7 +167,7 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
             request
           );
           SynapseClient synapseClient = synapseProvider.createNewClient();
-          crawlFilter.init(synapseClient, discussionForumClient);
+          crawlFilter.init(synapseClient);
           if (accessToken != null) synapseClient.setBearerAuthorizationToken(
             accessToken
           );
@@ -195,14 +188,13 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
                 uri.indexOf(DISCUSSION_THREAD_ID) +
                 DISCUSSION_THREAD_ID.length()
               );
-              DiscussionThreadBundle thread = discussionForumClient.getThread(
-                threadId
-              );
+
+              DiscussionThreadBundle thread = synapseClient.getThread(threadId);
               String discussionThreadContent = "";
               try {
-                String discussionThreadUrl = discussionForumClient.getThreadUrl(
-                  thread.getMessageKey()
-                );
+                String discussionThreadUrl = synapseClient
+                  .getThreadUrl(thread.getMessageKey())
+                  .toString();
                 discussionThreadContent = getURLContents(discussionThreadUrl);
               } catch (Exception e1) {}
               dataModel.put(PAGE_TITLE_KEY, thread.getTitle());
