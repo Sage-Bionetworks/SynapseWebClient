@@ -16,7 +16,7 @@ public class Account extends Place {
     return token;
   }
 
-  @Prefix("!Account")
+  @Prefix("Account")
   public static class Tokenizer implements PlaceTokenizer<Account> {
 
     @Override

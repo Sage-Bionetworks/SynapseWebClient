@@ -103,7 +103,7 @@ public class RegisterTeamDialogTest {
     verify(mockView)
       .setNewTeamLink(
         eq(
-          "#!Profile:" +
+          "/Profile:" +
           mockAuthenticationController.getCurrentUserPrincipalId() +
           Profile.DELIMITER +
           Synapse.ProfileArea.TEAMS
@@ -134,7 +134,7 @@ public class RegisterTeamDialogTest {
     verify(mockView)
       .setNewTeamLink(
         eq(
-          "#!Profile:" +
+          "/Profile:" +
           mockAuthenticationController.getCurrentUserPrincipalId() +
           Profile.DELIMITER +
           Synapse.ProfileArea.TEAMS

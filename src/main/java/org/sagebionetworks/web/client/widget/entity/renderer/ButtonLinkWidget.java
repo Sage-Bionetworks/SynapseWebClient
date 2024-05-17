@@ -9,7 +9,6 @@ import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
-import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
@@ -55,14 +54,6 @@ public class ButtonLinkWidget implements WidgetRendererPresenter {
     String url = descriptor.get(WidgetConstants.LINK_URL_KEY);
     String buttonText = descriptor.get(WidgetConstants.TEXT_KEY);
 
-    // SWC-4234: if Synapse place, add entity id to entity path cache up front
-    if (url.contains("#!Synapse:")) {
-      Synapse synapsePlace = (Synapse) appPlaceHistoryMapper.getPlace(
-        url.substring(url.indexOf('!'))
-      );
-      jsClient.populateEntityBundleCache(synapsePlace.getEntityId());
-    }
-
     if (isIncludePrincipalId(descriptor) && authController.isLoggedIn()) {
       String prefix = url.contains("?") ? "&" : "?";
       url +=
@@ -105,7 +96,7 @@ public class ButtonLinkWidget implements WidgetRendererPresenter {
   public boolean isOpenInNewWindow(String url) {
     return (
       url != null &&
-      !(url.startsWith("#!") || url.startsWith(gwt.getHostPrefix()))
+      !(!url.startsWith("http") || url.startsWith(gwt.getHostPrefix()))
     );
   }
 

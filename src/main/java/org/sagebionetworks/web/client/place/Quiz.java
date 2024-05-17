@@ -16,7 +16,7 @@ public class Quiz extends Place {
     return token;
   }
 
-  @Prefix("!Quiz")
+  @Prefix("Quiz")
   public static class Tokenizer implements PlaceTokenizer<Quiz> {
 
     @Override

@@ -242,6 +242,13 @@ public class SynapseClientImpl
     throws RestServiceException {
     org.sagebionetworks.client.SynapseClient synapseClient =
       createSynapseClient();
+    return getLatestEntityVersion(entityId, synapseClient);
+  }
+
+  public static Long getLatestEntityVersion(
+    String entityId,
+    org.sagebionetworks.client.SynapseClient synapseClient
+  ) throws RestServiceException {
     try {
       org.sagebionetworks.reflection.model.PaginatedResults<
         VersionInfo
@@ -1600,7 +1607,7 @@ public class SynapseClientImpl
   );
 
   public static final String getSignedTokenEndpoint(String hostPageBaseURL) {
-    return hostPageBaseURL + "#!SignedToken:";
+    return hostPageBaseURL + "SignedToken:";
   }
 
   @Override
@@ -1684,13 +1691,13 @@ public class SynapseClientImpl
   }
 
   public static String getTeamEndpoint(String hostPageBaseURL) {
-    return hostPageBaseURL + "#!Team:";
+    return hostPageBaseURL + "Team:";
   }
 
   // If this method is modified, please also modify CHALLENGE_ENDPOINT in
   // org.sagebionetworks.repo.model.ServiceConstants (PLFM)
   public static String getChallengeEndpoint(String hostPageBaseURL) {
-    return hostPageBaseURL + "#!Synapse:";
+    return hostPageBaseURL + "Synapse:";
   }
 
   @Override

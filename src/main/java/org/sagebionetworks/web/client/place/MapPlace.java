@@ -20,7 +20,7 @@ public class MapPlace extends Place {
     return teamId;
   }
 
-  @Prefix("!Map")
+  @Prefix("Map")
   public static class Tokenizer implements PlaceTokenizer<MapPlace> {
 
     @Override

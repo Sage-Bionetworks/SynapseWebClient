@@ -14,7 +14,7 @@ public class ACTAccessApprovalsPlace extends ParameterizedPlace {
     super(token);
   }
 
-  @Prefix("!ACTAccessApprovals")
+  @Prefix("ACTAccessApprovals")
   public static class Tokenizer
     implements PlaceTokenizer<ACTAccessApprovalsPlace> {
 

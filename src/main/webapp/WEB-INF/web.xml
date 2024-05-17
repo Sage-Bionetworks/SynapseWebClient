@@ -13,9 +13,9 @@
     </filter-class>
   </filter>
   <filter>
-    <filter-name>crawlFilter</filter-name>
+    <filter-name>htmlInjectionFilter</filter-name>
     <filter-class>
-      org.sagebionetworks.web.server.servlet.filter.CrawlFilter
+      org.sagebionetworks.web.server.servlet.filter.HtmlInjectionFilter
     </filter-class>
   </filter>
   <filter>
@@ -81,8 +81,8 @@
     <url-pattern>/*</url-pattern>
   </filter-mapping>
   <filter-mapping>
-    <filter-name>crawlFilter</filter-name>
-    <url-pattern>/*</url-pattern>
+    <filter-name>htmlInjectionFilter</filter-name>
+    <url-pattern>*</url-pattern>
   </filter-mapping>
 
   <!-- This filter allows us to use Guice for dependency injection in the 

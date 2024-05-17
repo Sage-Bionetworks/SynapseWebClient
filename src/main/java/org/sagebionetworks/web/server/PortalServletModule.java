@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.server;
 
-import com.google.gwt.place.shared.PlaceTokenizer;
-import com.google.gwt.place.shared.WithTokenizers;
 import com.google.gwt.user.server.rpc.XsrfTokenServiceServlet;
 import com.google.inject.Singleton;
 import com.google.inject.name.Names;
@@ -14,7 +12,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
-import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.server.servlet.AliasRedirectorServlet;
 import org.sagebionetworks.web.server.servlet.ChallengeClientImpl;
 import org.sagebionetworks.web.server.servlet.DataAccessClientImpl;
@@ -38,7 +35,6 @@ import org.sagebionetworks.web.server.servlet.filter.AmpADFilter;
 import org.sagebionetworks.web.server.servlet.filter.DigitalHealthFilter;
 import org.sagebionetworks.web.server.servlet.filter.DreamFilter;
 import org.sagebionetworks.web.server.servlet.filter.MHealthFilter;
-import org.sagebionetworks.web.server.servlet.filter.PlacesRedirectFilter;
 import org.sagebionetworks.web.server.servlet.filter.RPCValidationFilter;
 import org.sagebionetworks.web.server.servlet.filter.RegisterAccountFilter;
 import org.sagebionetworks.web.server.servlet.filter.TimingFilter;
@@ -183,25 +179,12 @@ public class PortalServletModule extends ServletModule {
     // JSONObjectAdapter
     bind(JSONObjectAdapter.class).to(JSONObjectAdapterImpl.class);
 
-    handleGWTPlaces();
-
     // Catch-all. Note that "/*" would override all other servlet binding, and "/" overrides the default
     // handler
     // (which we need for GWT place handling).
     // This is also where project aliases are handled.
     bind(ProjectAliasServlet.class).in(Singleton.class);
     serveRegex("^\\/\\w+$").with(ProjectAliasServlet.class);
-  }
-
-  public void handleGWTPlaces() {
-    bind(PlacesRedirectFilter.class).in(Singleton.class);
-    Class<? extends PlaceTokenizer<?>>[] placeClasses =
-      AppPlaceHistoryMapper.class.getAnnotation(WithTokenizers.class).value();
-    for (Class<? extends PlaceTokenizer<?>> c : placeClasses) {
-      String simpleName = c.getEnclosingClass().getSimpleName();
-      String filterRegEx = "/" + simpleName + ":*";
-      filter(filterRegEx).through(PlacesRedirectFilter.class);
-    }
   }
 
   /**

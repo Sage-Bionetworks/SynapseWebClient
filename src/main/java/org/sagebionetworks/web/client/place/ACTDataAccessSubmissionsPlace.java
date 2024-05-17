@@ -13,7 +13,7 @@ public class ACTDataAccessSubmissionsPlace extends ParameterizedPlace {
     super(token);
   }
 
-  @Prefix("!ACTDataAccessSubmissions")
+  @Prefix("ACTDataAccessSubmissions")
   public static class Tokenizer
     implements PlaceTokenizer<ACTDataAccessSubmissionsPlace> {
 

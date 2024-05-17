@@ -448,8 +448,8 @@ public class GlobalApplicationStateImplTest {
     when(mockPlaceController.getWhere()).thenReturn(place);
 
     Place mockPlace = mock(Place.class);
-    String historyToken = "!Synapse:syn123";
-    String currentUrl = "https://www.synapse.org/#" + historyToken;
+    String historyToken = "Synapse:syn123";
+    String currentUrl = "https://www.synapse.org/" + historyToken;
     when(mockSynapseJSNIUtils.getCurrentURL()).thenReturn(currentUrl);
     when(mockAppPlaceHistoryMapper.getPlace(historyToken))
       .thenReturn(mockPlace);
@@ -459,8 +459,8 @@ public class GlobalApplicationStateImplTest {
 
     reset(mockPlaceController);
     when(mockPlaceController.getWhere()).thenReturn(place);
-    historyToken = "!Synapse:syn123/wiki/12345";
-    currentUrl = "https://www.synapse.org/#" + historyToken;
+    historyToken = "Synapse:syn123/wiki/12345";
+    currentUrl = "https://www.synapse.org/" + historyToken;
     when(mockSynapseJSNIUtils.getCurrentURL()).thenReturn(currentUrl);
     when(mockAppPlaceHistoryMapper.getPlace(historyToken))
       .thenReturn(mockPlace);

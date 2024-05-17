@@ -201,8 +201,8 @@ public class ChallengeClientImplTest {
       .createIndividualSubmission(
         mockSubmission,
         etag,
-        TEST_HOME_PAGE_BASE + "#!Synapse:",
-        TEST_HOME_PAGE_BASE + "#!SignedToken:"
+        TEST_HOME_PAGE_BASE + "Synapse:",
+        TEST_HOME_PAGE_BASE + "SignedToken:"
       );
   }
 
@@ -223,8 +223,8 @@ public class ChallengeClientImplTest {
         mockSubmission,
         etag,
         memberStateHash,
-        TEST_HOME_PAGE_BASE + "#!Synapse:",
-        TEST_HOME_PAGE_BASE + "#!SignedToken:"
+        TEST_HOME_PAGE_BASE + "Synapse:",
+        TEST_HOME_PAGE_BASE + "SignedToken:"
       );
   }
 

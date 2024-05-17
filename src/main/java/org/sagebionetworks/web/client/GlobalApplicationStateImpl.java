@@ -40,7 +40,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 
   public static final String RECENTLY_CHECKED_SYNAPSE_VERSION =
     "org.sagebionetworks.web.client.recently-checked-synapse-version";
-  public static final String DEFAULT_REFRESH_PLACE = "!Home:0";
+  public static final String DEFAULT_REFRESH_PLACE = "Home:0";
   private PlaceController placeController;
   private CookieProvider cookieProvider;
   private AppPlaceHistoryMapper appPlaceHistoryMapper;
@@ -190,17 +190,19 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
         new PlaceChanger() {
           @Override
           public void goTo(Place place) {
-            synapseJSNIUtils.setIsInnerProgrammaticHistoryChange();
-            // If we are not already on this page, go there.
-            if (!placeController.getWhere().equals(place)) {
-              try {
-                placeController.goTo(place);
-              } catch (Exception e) {
-                synapseJSNIUtils.consoleError(e.getMessage());
+            if (place != null) {
+              synapseJSNIUtils.setIsInnerProgrammaticHistoryChange();
+              // If we are not already on this page, go there.
+              if (!placeController.getWhere().equals(place)) {
+                try {
+                  placeController.goTo(place);
+                } catch (Exception e) {
+                  synapseJSNIUtils.consoleError(e.getMessage());
+                }
+              } else {
+                // We are already on this page but we want to force it to reload.
+                eventBus.fireEvent(new PlaceChangeEvent(place));
               }
-            } else {
-              // We are already on this page but we want to force it to reload.
-              eventBus.fireEvent(new PlaceChangeEvent(place));
             }
           }
         };
@@ -409,13 +411,13 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
   public void refreshPage() {
     // get the place associated to the current url
     AppPlaceHistoryMapper appPlaceHistoryMapper = getAppPlaceHistoryMapper();
-    String currentUrl = synapseJSNIUtils.getCurrentURL();
-    String place = DEFAULT_REFRESH_PLACE;
-    int index = currentUrl.indexOf("!");
-    if (index > -1) {
-      place = currentUrl.substring(index);
+    String url = synapseJSNIUtils.getCurrentURL();
+
+    String placeToken = StringUtils.getGWTPlaceTokenFromURL(url);
+    if (placeToken == null) {
+      placeToken = DEFAULT_REFRESH_PLACE;
     }
-    Place currentPlace = appPlaceHistoryMapper.getPlace(place);
+    Place currentPlace = appPlaceHistoryMapper.getPlace(placeToken);
     getPlaceChanger().goTo(currentPlace);
   }
 

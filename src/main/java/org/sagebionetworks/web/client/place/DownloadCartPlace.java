@@ -16,7 +16,7 @@ public class DownloadCartPlace extends Place {
     return token;
   }
 
-  @Prefix("!DownloadCart")
+  @Prefix("DownloadCart")
   public static class Tokenizer implements PlaceTokenizer<DownloadCartPlace> {
 
     @Override

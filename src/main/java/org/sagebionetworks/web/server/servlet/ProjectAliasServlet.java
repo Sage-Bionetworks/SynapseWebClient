@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.EntityId;
-import org.sagebionetworks.web.server.StackEndpoints;
+import org.sagebionetworks.web.server.servlet.filter.HtmlInjectionFilter;
 import org.sagebionetworks.web.shared.WebConstants;
 
 /**
@@ -90,9 +90,16 @@ public class ProjectAliasServlet extends HttpServlet {
       perThreadRequest.set(httpRqst);
       String path = requestURL.getPath().substring(1);
       String[] tokens = path.split("/");
-      EntityId entityId = client.getEntityIdByAlias(tokens[0]);
+      String alias = tokens[0];
+
+      // is alias a known GWT place name?  If so, do nothing
+      if (HtmlInjectionFilter.isGWTPlace(alias)) {
+        return;
+      }
+
+      EntityId entityId = client.getEntityIdByAlias(alias);
       StringBuilder newPathBuilder = new StringBuilder();
-      newPathBuilder.append("/#!Synapse:");
+      newPathBuilder.append("/Synapse:");
       newPathBuilder.append(entityId.getId());
       for (int i = 1; i < tokens.length; i++) {
         newPathBuilder.append("/");

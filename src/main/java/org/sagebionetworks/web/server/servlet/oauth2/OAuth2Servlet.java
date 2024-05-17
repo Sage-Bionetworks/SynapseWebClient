@@ -116,7 +116,7 @@ public abstract class OAuth2Servlet extends HttpServlet {
             requestURL.getProtocol(),
             requestURL.getHost(),
             requestURL.getPort(),
-            "/#!Down:0"
+            "/Down:0"
           )
             .toString()
         );

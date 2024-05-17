@@ -21,8 +21,8 @@ import org.sagebionetworks.web.shared.WebConstants;
 
 public class OAuth2SessionServlet extends OAuth2Servlet {
 
-  public static final String REGISTER_ACCOUNT = "/#!RegisterAccount:0";
-  public static final String LOGIN_PLACE = "/#!LoginPlace:";
+  public static final String REGISTER_ACCOUNT = "/RegisterAccount:0";
+  public static final String LOGIN_PLACE = "/LoginPlace:";
 
   /**
    *

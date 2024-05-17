@@ -3489,10 +3489,10 @@ markdown-it-synapse-table@^1.0.6:
   resolved "https://registry.yarnpkg.com/markdown-it-synapse-table/-/markdown-it-synapse-table-1.0.6.tgz#5e14383257a6f6495d6c097388911548fe2155fb"
   integrity sha512-znhzQZhMxZ8sSQ9IBfdVv4ufW54i+P8M//rHEswcgg7SI3J0AN1s2T7T0KqYGG+9rHf/ORsdcUZst9hMiBC9xA==
 
-markdown-it-synapse@1.1.14, markdown-it-synapse@^1.1.14:
-  version "1.1.14"
-  resolved "https://registry.yarnpkg.com/markdown-it-synapse/-/markdown-it-synapse-1.1.14.tgz#68826de682e80f56e3f669778537df699baa8d0b"
-  integrity sha512-2z1WJQLufwqUPkeS0YqneWtBF6nlNcShtO5k4/XbDuYQKK0o/zawREOHxV7ZZP5GsNYbJ54tWCHJ3NzAb9Fmfw==
+markdown-it-synapse@1.1.15, markdown-it-synapse@^1.1.15:
+  version "1.1.15"
+  resolved "https://registry.yarnpkg.com/markdown-it-synapse/-/markdown-it-synapse-1.1.15.tgz#4cdb796fadad1dc038a45e82eb64670863ce25bb"
+  integrity sha512-tiH7cPS+fVKHUWpPO5vp5SpM01esOAjlLmSDDCMDT9E/nSmpspcs1TjBqxP51gDjTUmZZxyTB+nTbR/JvzVt/A==
 
 markdown-it@^14.1.0:
   version "14.1.0"
@@ -5017,10 +5017,10 @@ svg-path-sdf@^1.1.3:
     parse-svg-path "^0.1.2"
     svg-path-bounds "^1.0.1"
 
-synapse-react-client@3.2.17:
-  version "3.2.17"
-  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-3.2.17.tgz#95f1a3d7ccd008bcc4639c05ab1b37cf531621e3"
-  integrity sha512-stUkfECa89EpCONaQb7oTWtYVBDwmbYH5FPU013ECpUpm8E93L0Co2X7rkxTpIMrE6AwntXhXkcwuANJPbGicg==
+synapse-react-client@3.2.18:
+  version "3.2.18"
+  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-3.2.18.tgz#03da5f6f5d446fec116ac330639a6fd5ec6c3d84"
+  integrity sha512-B2gfTkZcuTHrtTVKb83jAQOaelX68FVyorEHJTloKIV446V6kejQ6YZSNNgSJV2H04N0OZ7vtiCm4KdgO9VdCA==
   dependencies:
     "@apidevtools/json-schema-ref-parser" "^9.1.2"
     "@brainhubeu/react-carousel" "1.19.26"
@@ -5068,7 +5068,7 @@ synapse-react-client@3.2.17:
     markdown-it-strikethrough-alt "^1.0.0"
     markdown-it-sub-alt "^1.0.0"
     markdown-it-sup-alt "^1.0.2"
-    markdown-it-synapse "1.1.14"
+    markdown-it-synapse "1.1.15"
     markdown-it-synapse-heading "^1.0.1"
     markdown-it-synapse-math "^3.0.5"
     markdown-it-synapse-table "^1.0.6"

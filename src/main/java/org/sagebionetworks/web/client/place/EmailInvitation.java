@@ -16,7 +16,7 @@ public class EmailInvitation extends Place {
     return signedEncodedToken;
   }
 
-  @Prefix("!EmailInvitation")
+  @Prefix("EmailInvitation")
   public static class Tokenizer implements PlaceTokenizer<EmailInvitation> {
 
     @Override

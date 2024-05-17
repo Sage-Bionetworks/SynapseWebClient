@@ -131,7 +131,7 @@
                 ui:field="changeEmailLink"
                 visible="false"
                 target="_blank"
-                href="#!Profile:v/settings"
+                href="/Profile:v/settings"
               >
                 Change email
               </b:Anchor>
@@ -162,7 +162,7 @@
                 addStyleNames="displayInlineBlock"
                 ui:field="changePasswordLink"
                 target="_blank"
-                href="#!Profile:v/settings"
+                href="/Profile:v/settings"
                 visible="false"
               >
                 Change password

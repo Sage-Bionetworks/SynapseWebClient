@@ -78,7 +78,7 @@ public class ProjectAliasServletTest {
     verify(mockSynapse).getEntityIdByAlias(anyString());
     ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
     verify(mockResponse).encodeRedirectURL(captor.capture());
-    assertTrue(captor.getValue().endsWith("/#!Synapse:" + testAliasSynapseId));
+    assertTrue(captor.getValue().endsWith("/Synapse:" + testAliasSynapseId));
     verify(mockResponse).sendRedirect(anyString());
   }
 
@@ -96,7 +96,7 @@ public class ProjectAliasServletTest {
     assertTrue(
       captor
         .getValue()
-        .endsWith("/#!Synapse:" + testAliasSynapseId + testFilesPath)
+        .endsWith("/Synapse:" + testAliasSynapseId + testFilesPath)
     );
     verify(mockResponse).sendRedirect(anyString());
   }
@@ -110,6 +110,6 @@ public class ProjectAliasServletTest {
     ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
     verify(mockResponse).sendRedirect(captor.capture());
     String value = captor.getValue();
-    assertTrue(value.contains("#!Error:"));
+    assertTrue(value.contains("Error:"));
   }
 }

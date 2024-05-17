@@ -6,10 +6,9 @@ import com.google.gwt.thirdparty.guava.common.base.Supplier;
 import com.google.gwt.thirdparty.guava.common.base.Suppliers;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -21,16 +20,13 @@ import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
 import org.jsoup.Jsoup;
 import org.sagebionetworks.client.SynapseClient;
+import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
@@ -39,10 +35,12 @@ import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.TeamMember;
 import org.sagebionetworks.repo.model.TeamMemberTypeFilterOptions;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.annotation.v2.Annotations;
 import org.sagebionetworks.repo.model.annotation.v2.AnnotationsValue;
+import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
@@ -58,6 +56,7 @@ import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
+import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
@@ -65,32 +64,21 @@ import org.sagebionetworks.schema.adapter.org.json.JSONArrayAdapterImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.place.TeamSearch;
-import org.sagebionetworks.web.server.servlet.DiscussionForumClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.SearchQueryUtils;
-import org.sagebionetworks.web.shared.TeamMemberBundle;
-import org.sagebionetworks.web.shared.TeamMemberPagedResults;
 import org.sagebionetworks.web.shared.WebConstants;
-import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
-import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
- * This filter detects ajax crawler (Google). If so, it takes over the renders the javascript page
- * and handles the response.
- * It used to be based on the Google AJAX crawl scheme: https://developers.google.com/search/blog/2009/10/proposal-for-making-ajax-crawlable
- * But has been rewritten to send all links through the PlacesRedirectFilter (no '#!' links are returned).
- *
+ * This class helps the HtmlInjectorFilter to provide content for crawler (bots) in the response html.
  */
-public class CrawlFilter extends OncePerRequestFilter {
+public class CrawlFilter {
 
   public static final String META_ROBOTS_NOINDEX =
     "<meta name=\"robots\" content=\"noindex\">";
-  SynapseClientImpl synapseClient = null;
-  DiscussionForumClientImpl discussionForumClient = null;
+  SynapseClient synapseClient = null;
   JSONObjectAdapter jsonObjectAdapter = null;
-  private static final String DISCUSSION_THREAD_ID = "/discussion/threadId=";
   private final Supplier<String> homePageCached =
     Suppliers.memoizeWithExpiration(homePageSupplier(), 1, TimeUnit.DAYS);
   public static final int MAX_CHILD_PAGES = 5;
@@ -105,7 +93,7 @@ public class CrawlFilter extends OncePerRequestFilter {
 
   private static DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
 
-  private static String removeSynapseWikiWidgets(String markdown) {
+  public static String removeSynapseWikiWidgets(String markdown) {
     return wikiWidgetPattern.matcher(markdown).replaceAll("");
   }
 
@@ -125,111 +113,16 @@ public class CrawlFilter extends OncePerRequestFilter {
     };
   }
 
-  public void init(
-    SynapseClientImpl synapseClient,
-    DiscussionForumClientImpl discussionForumClient
-  ) {
+  public void init(SynapseClient synapseClient) {
     this.synapseClient = synapseClient;
-    this.discussionForumClient = discussionForumClient;
 
     df.setTimeZone(TimeZone.getTimeZone("UTC"));
   }
 
-  public static boolean isLikelyBot(String userAgent) {
-    return userAgent != null && userAgent.toLowerCase().contains("bot");
-  }
-
-  @Override
-  protected void doFilterInternal(
-    HttpServletRequest request,
-    HttpServletResponse response,
-    FilterChain filterChain
-  ) throws ServletException, IOException {
-    if (synapseClient == null) {
-      init(new SynapseClientImpl(), new DiscussionForumClientImpl());
-    }
-    String userAgent = request.getHeader("User-Agent");
-    boolean isLikelyBot = isLikelyBot(userAgent);
-
-    if (isLikelyBot) {
-      try {
-        this.jsonObjectAdapter = new JSONObjectAdapterImpl();
-        // Get the components needed to construct the URL
-        String uri = request.getRequestURI();
-        String domain = request.getServerName();
-        String lowerCaseDomain = domain.toLowerCase();
-        if (
-          !(lowerCaseDomain.contains("www.synapse.org") ||
-            lowerCaseDomain.contains("127.0.0.1"))
-        ) {
-          response.setContentType("text/html");
-          response.setStatus(HttpServletResponse.SC_OK);
-          PrintWriter out = response.getWriter();
-          out.println("Synapse test site  - " + domain);
-          return;
-        }
-        // build an html page for this request
-        String html = "";
-
-        if (uri.startsWith("/Home") || uri.isEmpty()) {
-          // send back info about the site
-          html = getCachedHomePageHtml();
-        } else if (uri.startsWith("/Synapse")) {
-          if (uri.contains(DISCUSSION_THREAD_ID)) {
-            String threadId = uri.substring(
-              uri.indexOf(DISCUSSION_THREAD_ID) + DISCUSSION_THREAD_ID.length()
-            );
-            html = getThreadHtml(threadId);
-          } else {
-            // index information about the synapse entity
-            String entityId = uri.substring(uri.indexOf(":") + 1);
-            html = getEntityHtml(entityId);
-          }
-        } else if (uri.startsWith("/Search")) {
-          // index all projects
-          String searchQueryJson = uri.substring(uri.indexOf(":") + 1);
-          html = getAllProjectsHtml(URLDecoder.decode(searchQueryJson));
-        } else if (uri.startsWith("/TeamSearch")) {
-          // index all teams
-          String startIndex = uri.substring(
-            uri.indexOf(TeamSearch.START_DELIMITER) +
-            TeamSearch.START_DELIMITER.length()
-          );
-          html = getAllTeamsHtml(startIndex);
-        } else if (uri.startsWith("/Team")) {
-          // index team (including members)
-          String teamId = uri.substring(uri.indexOf(":") + 1);
-          html = getTeamHtml(teamId);
-        } else if (uri.startsWith("/Profile")) {
-          // index team (including members)
-          String profileId = uri.substring(uri.indexOf(":") + 1);
-          html = getProfileHtml(profileId);
-        }
-
-        response.setContentType("text/html");
-        HttpServletResponse httpResponse = (HttpServletResponse) response;
-        httpResponse.setStatus(HttpServletResponse.SC_OK);
-        PrintWriter out = httpResponse.getWriter();
-        out.println(html);
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-    } else {
-      filterChain.doFilter(request, response);
-    }
-  }
-
   private String getHomePageHtml()
     throws JSONObjectAdapterException, RestServiceException {
-    SynapseClient synClient = synapseClient.createAnonymousSynapseClient();
     StringBuilder html = new StringBuilder();
-    html.append(
-      "<!DOCTYPE html><html><head><title>" +
-      DisplayConstants.DEFAULT_PAGE_TITLE +
-      "</title><meta name=\"description\" content=\"" +
-      DisplayConstants.DEFAULT_PAGE_DESCRIPTION +
-      "\" /></head><body>"
-    );
+
     // add direct links to all public projects in the system
     SearchQuery query = SearchQueryUtils.getDefaultSearchQuery();
     KeyValue projectsOnly = new KeyValue();
@@ -252,7 +145,7 @@ public class CrawlFilter extends OncePerRequestFilter {
       "0\">Teams</a></h3><br />"
     );
     try {
-      SearchResults results = synClient.search(query);
+      SearchResults results = synapseClient.search(query);
       // append this set to the list
       while (results.getHits().size() > 0) {
         for (Hit hit : results.getHits()) {
@@ -277,7 +170,7 @@ public class CrawlFilter extends OncePerRequestFilter {
         }
         long newStart = results.getStart() + results.getHits().size();
         query.setStart(newStart);
-        results = synClient.search(query);
+        results = synapseClient.search(query);
       }
     } catch (Exception e) {
       e.printStackTrace();
@@ -286,7 +179,8 @@ public class CrawlFilter extends OncePerRequestFilter {
     return html.toString();
   }
 
-  private String getCreatedByString(String userId) throws RestServiceException {
+  private String getCreatedByString(String userId)
+    throws RestServiceException, SynapseException {
     UserProfile profile = synapseClient.getUserProfile(userId);
     return getUserProfileString(profile);
   }
@@ -304,7 +198,7 @@ public class CrawlFilter extends OncePerRequestFilter {
     return createdByBuilder.toString();
   }
 
-  private String getDisplayName(UserProfile profile) {
+  public static String getDisplayName(UserProfile profile) {
     StringBuilder displayNameBuilder = new StringBuilder();
     if (profile.getFirstName() != null) {
       displayNameBuilder.append(profile.getFirstName() + " ");
@@ -336,26 +230,25 @@ public class CrawlFilter extends OncePerRequestFilter {
     return plainTextWiki;
   }
 
-  private String getEntityHtml(String entityId)
-    throws RestServiceException, JSONObjectAdapterException {
-    EntityBundleRequest bundleRequest = new EntityBundleRequest();
-    bundleRequest.setIncludeEntity(true);
-    bundleRequest.setIncludeAnnotations(true);
-
-    EntityBundle bundle = synapseClient.getEntityBundle(
-      entityId,
-      bundleRequest
-    );
+  public BotHtml getEntityHtml(EntityBundle bundle)
+    throws RestServiceException, JSONObjectAdapterException, SynapseException {
+    BotHtml response = new BotHtml();
     Entity entity = bundle.getEntity();
+    String entityId = entity.getId();
     if (entity instanceof Dataset) {
       // attempt to get the latest stable version (instead of the draft)
       try {
-        Long latestEntityVersion = synapseClient.getLatestEntityVersion(
-          entity.getId()
+        Long latestEntityVersion = SynapseClientImpl.getLatestEntityVersion(
+          entity.getId(),
+          synapseClient
         );
         if (latestEntityVersion != null) {
+          EntityBundleRequest bundleRequest = new EntityBundleRequest();
+          bundleRequest.setIncludeEntity(true);
+          bundleRequest.setIncludeAnnotations(true);
+
           bundle =
-            synapseClient.getEntityBundleForVersion(
+            synapseClient.getEntityBundleV2(
               entityId,
               latestEntityVersion,
               bundleRequest
@@ -373,31 +266,22 @@ public class CrawlFilter extends OncePerRequestFilter {
     WikiPage rootPage = null;
     try {
       createdBy = getCreatedByString(entity.getCreatedBy());
-      rootPage =
-        synapseClient.getV2WikiPageAsV1(
-          new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null)
-        );
+      WikiPageKey key = new WikiPageKey();
+      key.setOwnerObjectId(entityId);
+      key.setOwnerObjectType(ObjectType.ENTITY);
+      key.setWikiPageId(null);
+      rootPage = synapseClient.getWikiPage(key);
     } catch (Exception e) {}
     String plainTextWiki = getPlainTextWiki(entity.getId(), rootPage);
 
     StringBuilder html = new StringBuilder();
 
-    // note: can't set description meta tag, since it might be markdown.
-    html.append(
-      "<!DOCTYPE html><html><head><title>" +
-      name +
-      " - " +
-      entity.getId() +
-      "</title>"
-    );
     if (annotations.getAnnotations().containsKey("noindex")) {
-      html.append(META_ROBOTS_NOINDEX);
+      response.setHead(META_ROBOTS_NOINDEX);
     }
 
-    // SWC-6609: removed for now
-    //    html.append(getDatasetScriptElement(bundle, plainTextWiki));
-
-    html.append("</head><body><h1>" + name + "</h1>");
+    html.append("<h1>" + name + "</h1>");
+    html.append("<h2>" + entityId + "</h2>");
     if (description != null) {
       html.append(description + "<br />");
     }
@@ -418,20 +302,22 @@ public class CrawlFilter extends OncePerRequestFilter {
     }
     // and link to the discussion forum (all threads and replies) if this is a project.
     if (entity instanceof Project) {
-      Forum forum = discussionForumClient.getForumByProjectId(entity.getId());
+      Forum forum = synapseClient.getForumByProjectId(entity.getId());
       if (forum != null) {
         String forumId = forum.getId();
         long currentOffset = 0;
         PaginatedResults<DiscussionThreadBundle> paginatedThreads;
         do {
           paginatedThreads =
-            discussionForumClient.getThreadsForForum(
-              forumId,
-              20L,
-              currentOffset,
-              DiscussionThreadOrder.PINNED_AND_LAST_ACTIVITY,
-              false,
-              DiscussionFilter.EXCLUDE_DELETED
+            convertPaginated(
+              synapseClient.getThreadsForForum(
+                forumId,
+                20L,
+                currentOffset,
+                DiscussionThreadOrder.PINNED_AND_LAST_ACTIVITY,
+                false,
+                DiscussionFilter.EXCLUDE_DELETED
+              )
             );
           List<DiscussionThreadBundle> threadList =
             paginatedThreads.getResults();
@@ -439,7 +325,7 @@ public class CrawlFilter extends OncePerRequestFilter {
             html.append(
               "<a href=\"https://www.synapse.org/Synapse:" +
               entity.getId() +
-              DISCUSSION_THREAD_ID +
+              HtmlInjectionFilter.DISCUSSION_THREAD_ID +
               thread.getId() +
               "\">" +
               thread.getTitle() +
@@ -470,8 +356,12 @@ public class CrawlFilter extends OncePerRequestFilter {
       request.setNextPageToken(childList.getNextPageToken());
       i++;
     } while (i < MAX_CHILD_PAGES && childList.getNextPageToken() != null);
-    html.append("</body></html>");
-    return html.toString();
+    response.setBody(html.toString());
+
+    // SWC-6609: removed for now
+    //    response.head = getDatasetScriptElement(bundle, plainTextWiki);
+
+    return response;
   }
 
   private String getDatasetScriptElement(
@@ -557,90 +447,80 @@ public class CrawlFilter extends OncePerRequestFilter {
     return html.toString();
   }
 
-  private String getThreadHtml(String threadId)
-    throws JSONObjectAdapterException, RestServiceException, IOException {
+  public String getThreadHtml(
+    DiscussionThreadBundle thread,
+    String threadContent
+  )
+    throws JSONObjectAdapterException, RestServiceException, IOException, SynapseException {
     StringBuilder html = new StringBuilder();
-    DiscussionThreadBundle thread = discussionForumClient.getThread(threadId);
-    html.append(
-      "<!DOCTYPE html><html><head><title>" +
-      thread.getTitle() +
-      "</title></head><body>"
-    );
-    html.append("<h1>" + thread.getTitle() + "</h1>");
-    try {
-      String url = discussionForumClient.getThreadUrl(thread.getMessageKey());
-      html.append("<h4>" + getURLContents(url) + "</h4>");
-    } catch (Exception e1) {}
-
+    html.append("<h4>" + threadContent + "</h4>");
     String createdBy = null;
     try {
       createdBy = getCreatedByString(thread.getCreatedBy());
     } catch (Exception e) {}
     html.append("Created by " + createdBy + "<br>");
-    PaginatedResults<DiscussionReplyBundle> replies =
-      discussionForumClient.getRepliesForThread(
+    PaginatedResults<DiscussionReplyBundle> replies = convertPaginated(
+      synapseClient.getRepliesForThread(
         thread.getId(),
         100L,
         0L,
         DiscussionReplyOrder.CREATED_ON,
         false,
         DiscussionFilter.EXCLUDE_DELETED
-      );
+      )
+    );
     for (DiscussionReplyBundle reply : replies.getResults()) {
       try {
-        String replyURL = discussionForumClient.getReplyUrl(
-          reply.getMessageKey()
-        );
+        String replyURL = synapseClient
+          .getReplyUrl(reply.getMessageKey())
+          .toString();
         html.append(getURLContents(replyURL) + "<br>");
       } catch (Exception e) {}
     }
-    html.append("</body></html>");
     return html.toString();
   }
 
-  private String getTeamHtml(String teamId)
-    throws JSONObjectAdapterException, RestServiceException, IOException {
+  public String getTeamHtml(Team team)
+    throws JSONObjectAdapterException, RestServiceException, IOException, SynapseException {
     StringBuilder html = new StringBuilder();
-    Team team = synapseClient.getTeam(teamId);
 
-    html.append(
-      "<!DOCTYPE html><html><head><title>" +
-      team.getName() +
-      "</title></head><body>"
-    );
     html.append("<h1>" + team.getName() + "</h1>");
     if (team.getDescription() != null) {
       html.append("<h3>" + team.getDescription() + "</h3>");
     }
-    TeamMemberPagedResults teamMembers = synapseClient.getTeamMembers(
+    org.sagebionetworks.reflection.model.PaginatedResults<
+      TeamMember
+    > teamMembers = synapseClient.getTeamMembers(
       team.getId(),
       "",
       TeamMemberTypeFilterOptions.ALL,
       20,
       0
     );
-    for (TeamMemberBundle teamMember : teamMembers.getResults()) {
+    List<Long> userIds = new ArrayList<Long>();
+    for (TeamMember member : teamMembers.getResults()) {
+      userIds.add(Long.parseLong(member.getMember().getOwnerId()));
+    }
+    List<UserProfile> profiles = synapseClient.listUserProfiles(userIds);
+    for (UserProfile teamMember : profiles) {
       try {
-        html.append(getUserProfileString(teamMember.getUserProfile()) + "<br>");
+        html.append(getUserProfileString(teamMember) + "<br>");
       } catch (Exception e) {}
     }
-    html.append("</body></html>");
     return html.toString();
   }
 
-  private String getProfileHtml(String profileId)
+  public BotHtml getProfileHtml(UserProfile profile)
     throws JSONObjectAdapterException, RestServiceException, IOException {
+    BotHtml response = new BotHtml();
     StringBuilder html = new StringBuilder();
-    UserProfile profile = synapseClient.getUserProfile(profileId);
     String display =
       profile.getFirstName() +
       " " +
       profile.getLastName() +
       " " +
       profile.getUserName();
-    html.append(
-      "<!DOCTYPE html><html><head><title>" + display + "</title></head><body>"
-    );
+
     html.append("<h1>" + display + "</h1>");
     if (profile.getSummary() != null) {
       html.append("<h4>" + profile.getSummary() + "</h4>");
@@ -658,8 +538,27 @@ public class CrawlFilter extends OncePerRequestFilter {
       html.append("<p>" + profile.getCompany() + "</p>");
     }
 
-    html.append("</body></html>");
-    return html.toString();
+    StringBuilder head = new StringBuilder();
+    head.append(
+      "<meta property=\"profile:first_name\" content=\"" +
+      profile.getFirstName() +
+      "\">"
+    );
+    head.append(
+      "<meta property=\"profile:last_name\" content=\"" +
+      profile.getLastName() +
+      "\">"
+    );
+    head.append(
+      "<meta property=\"profile:username\" content=\"" +
+      profile.getUserName() +
+      "\">"
+    );
+
+    response.setHead(head.toString());
+    response.setBody(html.toString());
+
+    return response;
   }
 
   private String getURLContents(String urlTarget) throws IOException {
@@ -692,21 +591,12 @@ public class CrawlFilter extends OncePerRequestFilter {
     return valueBuilder.toString();
   }
 
-  private String getAllProjectsHtml(String searchQueryJson)
-    throws RestServiceException, JSONObjectAdapterException {
-    SearchQuery inputQuery = EntityFactory.createEntityFromJSONString(
-      searchQueryJson,
-      SearchQuery.class
-    );
+  public String getAllProjectsHtml(SearchQuery inputQuery)
+    throws RestServiceException, JSONObjectAdapterException, UnsupportedEncodingException, SynapseException {
     SearchResults results = synapseClient.search(inputQuery);
 
     // append this set to the list
     StringBuilder html = new StringBuilder();
-    html.append(
-      "<!DOCTYPE html><html><head><title>Sage Synapse: All Projects - starting from " +
-      inputQuery.getStart() +
-      "</title><meta name=\"description\" content=\"\" /></head><body>"
-    );
     for (Hit hit : results.getHits()) {
       // add links
       html.append(
@@ -726,27 +616,16 @@ public class CrawlFilter extends OncePerRequestFilter {
       URLEncoder.encode(newJson) +
       "\">Next Page</a><br />"
     );
-
-    html.append("</body></html>");
     return html.toString();
   }
 
-  private String getAllTeamsHtml(String startIndex)
-    throws RestServiceException {
-    int start = Integer.parseInt(startIndex);
-    PaginatedResults<Team> teams = synapseClient.getTeamsBySearch(
-      "",
-      50,
-      start
-    );
-
+  public String getAllTeamsHtml(Integer start)
+    throws RestServiceException, SynapseException {
+    org.sagebionetworks.reflection.model.PaginatedResults<Team> teams =
+      synapseClient.getTeams("", 50, start);
     // append this set to the list
     StringBuilder html = new StringBuilder();
-    html.append(
-      "<!DOCTYPE html><html><head><title>Sage Synapse: All Teams - from " +
-      startIndex +
-      "</title><meta name=\"description\" content=\"\" /></head><body>"
-    );
+
     for (Team team : teams.getResults()) {
       // add links
       html.append(
@@ -765,8 +644,6 @@ public class CrawlFilter extends OncePerRequestFilter {
       newStart +
       "\">Next Page</a></h4><br />"
     );
-
-    html.append("</body></html>");
     return html.toString();
   }
 
@@ -783,11 +660,18 @@ public class CrawlFilter extends OncePerRequestFilter {
     return newQuery;
   }
 
-  public void testFilter(
-    HttpServletRequest mockRequest,
-    HttpServletResponse mockResponse,
-    FilterChain mockFilterChain
-  ) throws ServletException, IOException {
-    doFilterInternal(mockRequest, mockResponse, mockFilterChain);
+  /**
+   * Helper to convert from the non-gwt compatible PaginatedResults to the compatible type.
+   *
+   * @param in
+   * @return
+   */
+  public <T extends JSONEntity> PaginatedResults<T> convertPaginated(
+    org.sagebionetworks.reflection.model.PaginatedResults<T> in
+  ) {
+    return new PaginatedResults<T>(
+      in.getResults(),
+      in.getTotalNumberOfResults()
+    );
   }
 }
