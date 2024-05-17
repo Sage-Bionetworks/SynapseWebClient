@@ -72,25 +72,33 @@ public class AppConfigServlet extends HttpServlet {
             stackConfiguration.getStack() +
             "-" +
             stackConfiguration.getStackInstance() +
-            "-AppConfigApp"
+            "-portal-AppConfigApp"
           )
           .withEnvironmentIdentifier(
             stackConfiguration.getStack() +
             "-" +
             stackConfiguration.getStackInstance() +
-            "-environment"
+            "-portal-environment"
           )
           .withConfigurationProfileIdentifier(
             stackConfiguration.getStack() +
             "-" +
             stackConfiguration.getStackInstance() +
-            "-configurations"
+            "-portal-configurations"
           );
       StartConfigurationSessionResult sessionResponse =
         appConfigDataClient.startConfigurationSession(sessionRequest);
       configurationToken = sessionResponse.getInitialConfigurationToken();
     } catch (Exception e) {
-      logger.log(Level.SEVERE, "Error starting configuration session", e);
+      logger.log(
+        Level.SEVERE,
+        "Stack:" +
+        stackConfiguration.getStack() +
+        "Instance:" +
+        stackConfiguration.getStackInstance() +
+        "Error starting configuration session",
+        e
+      );
     }
   }
 
