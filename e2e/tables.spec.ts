@@ -1,4 +1,5 @@
 import { expect } from '@playwright/test'
+import { defaultExpectTimeout } from '../playwright.config'
 import { testAuth } from './fixtures/authenticatedUserPages'
 import { deleteEntity, generateEntityName } from './helpers/entities'
 import {
@@ -35,7 +36,6 @@ import {
   toggleIntoExperimentalMode,
 } from './helpers/testUser'
 import { Project } from './helpers/types'
-import { defaultExpectTimeout } from '../playwright.config'
 
 let userProject: Project
 const fileHandleIds: string[] = []
@@ -147,13 +147,18 @@ testAuth.describe('Tables', () => {
 
     await testAuth.step('User creates a table', async () => {
       await testAuth.step('open table creation modal', async () => {
+        await userPage.getByRole('button', { name: 'Add  New...' }).click()
         await userPage
-          .getByRole('button', { name: 'Add Table or View' })
+          .getByRole('menuitem', { name: 'Add Table or View' })
           .click()
-        userPage.getByRole('heading', {
-          name: 'Create Table or View',
-        })
-        await userPage
+
+        const dialog = userPage.getByRole('dialog')
+        await expect(dialog).toBeVisible()
+        await expect(
+          dialog.getByRole('heading', { name: 'Create Table or View' }),
+        ).toBeVisible()
+
+        await dialog
           .getByRole('menuitem', {
             name: 'Table',
           })

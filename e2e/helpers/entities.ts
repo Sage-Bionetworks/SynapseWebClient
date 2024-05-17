@@ -16,19 +16,19 @@ export function generateEntityName(
   return `swc-e2e-${entityType}-entity-${uuidv4()}`
 }
 
-const entityHashBang = '#!Synapse'
+const entityPlace = 'Synapse'
 
 export function entityUrlPathname(entityId: string) {
-  return `/${entityHashBang}:${entityId}`
+  return `/${entityPlace}:${entityId}`
 }
 
 export function getEntityIdFromPathname(pathname: string) {
-  if (!pathname.includes(entityHashBang)) {
+  if (!pathname.includes(entityPlace)) {
     return ''
   }
 
   return pathname
-    .replace(new RegExp(`.*${entityHashBang}:`), '')
+    .replace(new RegExp(`.*${entityPlace}:`), '')
     .replace(/\/.*/, '')
 }
 

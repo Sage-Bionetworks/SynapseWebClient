@@ -1,14 +1,14 @@
 import { Page } from '@playwright/test'
 import { BackendDestinationEnum, doDelete } from './http'
 
-export const teamHashBang = '#!Team'
+export const teamPlace = 'Team'
 
 export function getTeamIdFromPathname(pathname: string) {
-  if (!pathname.includes(teamHashBang)) {
+  if (!pathname.includes(teamPlace)) {
     return undefined
   }
 
-  return pathname.replace(new RegExp(`.*${teamHashBang}:`), '')
+  return pathname.replace(new RegExp(`.*${teamPlace}:`), '')
 }
 
 // https://rest-docs.synapse.org/rest/DELETE/team/id.html
