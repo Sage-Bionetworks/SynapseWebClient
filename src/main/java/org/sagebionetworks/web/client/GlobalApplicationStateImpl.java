@@ -76,10 +76,6 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
     String
   >();
 
-  private static final Logger logger = Logger.getLogger(
-    GlobalApplicationStateImpl.class.getName()
-  );
-
   static {
     // Benign error thrown by VideoWidget (<video>). ResizeObserver was not able to deliver all
     // observations within a single animation frame.
@@ -318,7 +314,6 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
           //synapseJSNIUtils.consoleError("Configurations are:" + configurations.toString());
           //logger.log(Level.SEVERE,"Configurations are:" + configurations.toString()); //
           synapseJSNIUtils.consoleError("Configurations are:" + configurations);
-          logger.log(Level.SEVERE, "Configurations are:" + configurations); //
           if (callback != null) {
             callback.onSuccess(configurations);
           }
@@ -328,10 +323,6 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
         public void onFailure(Throwable caught) {
           view.showGetVersionError(caught.getMessage());
           synapseJSNIUtils.consoleError(
-            "The error getting configurations is:" + caught.getMessage()
-          );
-          logger.log(
-            Level.SEVERE,
             "The error getting configurations is:" + caught.getMessage()
           );
           if (callback != null) {
@@ -597,6 +588,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
       portalUrl += "/";
     }
     view.initSRCEndpoints(repoUrl, portalUrl);
+
     // Add a global click handler.
     view.addNativePreviewHandler(
       new Event.NativePreviewHandler() {

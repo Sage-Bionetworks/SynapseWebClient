@@ -22,9 +22,9 @@ import org.sagebionetworks.aws.AwsClientFactory;
 
 public class AppConfigServlet extends HttpServlet {
 
-  private AWSAppConfigData appConfigDataClient;
-  private Supplier<String> configSupplier;
-  private String configurationToken;
+  public AWSAppConfigData appConfigDataClient;
+  public Supplier<String> configSupplier;
+  public String configurationToken;
   private StackConfiguration stackConfiguration;
   private final String defaultConfigValue =
     "{\"default configuration\":\"true\"}";
@@ -52,7 +52,7 @@ public class AppConfigServlet extends HttpServlet {
     }
   }
 
-  private void initializeAppConfigClient() {
+  public void initializeAppConfigClient() {
     if (appConfigDataClient == null) {
       logger.log(
         Level.WARNING,
@@ -64,7 +64,7 @@ public class AppConfigServlet extends HttpServlet {
     initializeConfigSupplier();
   }
 
-  private void startConfigurationSession() {
+  public void startConfigurationSession() {
     try {
       StartConfigurationSessionRequest sessionRequest =
         new StartConfigurationSessionRequest()
@@ -102,7 +102,7 @@ public class AppConfigServlet extends HttpServlet {
     }
   }
 
-  private void initializeConfigSupplier() {
+  public void initializeConfigSupplier() {
     configSupplier =
       Suppliers.memoizeWithExpiration(
         this::getLatestConfiguration,
@@ -111,7 +111,7 @@ public class AppConfigServlet extends HttpServlet {
       );
   }
 
-  private String getLatestConfiguration() {
+  public String getLatestConfiguration() {
     if (configurationToken == null) {
       logger.log(
         Level.SEVERE,
@@ -142,10 +142,8 @@ public class AppConfigServlet extends HttpServlet {
   }
 
   @Override
-  protected void doGet(
-    HttpServletRequest request,
-    HttpServletResponse response
-  ) throws ServletException, IOException {
+  public void doGet(HttpServletRequest request, HttpServletResponse response)
+    throws ServletException, IOException {
     try {
       String configValue = configSupplier.get();
       response.setContentType("text/plain");
