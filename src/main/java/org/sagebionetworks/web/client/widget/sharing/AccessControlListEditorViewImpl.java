@@ -218,7 +218,7 @@ public class AccessControlListEditorViewImpl
       EntityIdCellRenderer entityRenderer =
         ginInjector.getEntityIdCellRenderer();
       ClickHandler customClickHandler = event -> {
-        DisplayUtils.newWindow("Synapse:" + aclEntityId, "", "");
+        DisplayUtils.newWindow("/Synapse:" + aclEntityId, "", "");
       };
       entityRenderer.setValue(aclEntityId, customClickHandler, false);
       div.add(entityRenderer);

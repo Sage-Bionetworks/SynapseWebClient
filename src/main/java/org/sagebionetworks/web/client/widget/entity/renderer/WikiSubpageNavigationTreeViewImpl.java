@@ -61,7 +61,7 @@ public class WikiSubpageNavigationTreeViewImpl
     w.setWidth("100%");
     Anchor l = new Anchor(root.getPageTitle());
     l.addStyleName("subpage-link " + styleName);
-    l.setHref("Synapse:" + ((Synapse) root.getTargetPlace()).toToken());
+    l.setHref("/Synapse:" + ((Synapse) root.getTargetPlace()).toToken());
     w.add(l);
 
     ul.add(w, styleName);

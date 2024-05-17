@@ -429,7 +429,7 @@ public class PlotlyWidget
       query.setLimit(QueryBundleUtils.DEFAULT_LIMIT);
       String queryToken = queryTokenProvider.queryToToken(query);
       String url =
-        "Synapse:" +
+        "/Synapse:" +
         qbr.getEntityId() +
         "/" +
         TABLES.toString().toLowerCase() +
