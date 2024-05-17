@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.server;
 
 import com.amazonaws.services.appconfigdata.AWSAppConfigData;
+import com.amazonaws.services.kms.AWSKMS;
 import com.google.gwt.place.shared.PlaceTokenizer;
 import com.google.gwt.place.shared.WithTokenizers;
 import com.google.gwt.user.server.rpc.XsrfTokenServiceServlet;
@@ -14,13 +15,41 @@ import java.util.Iterator;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.sagebionetworks.ConfigurationProperties;
+import org.sagebionetworks.ConfigurationPropertiesImpl;
+import org.sagebionetworks.LoggerProvider;
+import org.sagebionetworks.LoggerProviderImpl;
+import org.sagebionetworks.PropertyProvider;
+import org.sagebionetworks.PropertyProviderImpl;
 import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.StackConfigurationImpl;
+import org.sagebionetworks.StackEncrypter;
+import org.sagebionetworks.StackEncrypterImpl;
 import org.sagebionetworks.aws.AwsClientFactory;
+import org.sagebionetworks.aws.SynapseS3Client;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
-import org.sagebionetworks.web.server.servlet.*;
+import org.sagebionetworks.web.server.servlet.AliasRedirectorServlet;
+import org.sagebionetworks.web.server.servlet.AppConfigServlet;
+import org.sagebionetworks.web.server.servlet.ChallengeClientImpl;
+import org.sagebionetworks.web.server.servlet.DataAccessClientImpl;
+import org.sagebionetworks.web.server.servlet.DiscussionForumClientImpl;
+import org.sagebionetworks.web.server.servlet.DiscussionMessageServlet;
+import org.sagebionetworks.web.server.servlet.FileEntityResolverServlet;
+import org.sagebionetworks.web.server.servlet.FileHandleAssociationServlet;
+import org.sagebionetworks.web.server.servlet.FileHandleServlet;
+import org.sagebionetworks.web.server.servlet.FileUploaderJnlp;
+import org.sagebionetworks.web.server.servlet.InitSessionServlet;
+import org.sagebionetworks.web.server.servlet.JsonLdContentServlet;
+import org.sagebionetworks.web.server.servlet.LinkedInServiceImpl;
+import org.sagebionetworks.web.server.servlet.ProjectAliasServlet;
+import org.sagebionetworks.web.server.servlet.SlackServlet;
+import org.sagebionetworks.web.server.servlet.StackConfigServiceImpl;
+import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
+import org.sagebionetworks.web.server.servlet.UserAccountServiceImpl;
+import org.sagebionetworks.web.server.servlet.UserProfileClientImpl;
+import org.sagebionetworks.web.server.servlet.VersionsServlet;
 import org.sagebionetworks.web.server.servlet.filter.AmpADFilter;
 import org.sagebionetworks.web.server.servlet.filter.DigitalHealthFilter;
 import org.sagebionetworks.web.server.servlet.filter.DreamFilter;
@@ -123,7 +152,7 @@ public class PortalServletModule extends ServletModule {
     // AppConfig handler
     bind(AppConfigServlet.class).in(Singleton.class);
     serve("/Portal/" + WebConstants.APPCONFIG_SERVLET)
-      .with(AppConfigServlet.class); // test in local
+      .with(AppConfigServlet.class);
 
     // Versions handler
     bind(VersionsServlet.class).in(Singleton.class);
@@ -172,6 +201,12 @@ public class PortalServletModule extends ServletModule {
     // Bind the properties from the config file
     bindPropertiesFromFile("ServerConstants.properties");
 
+    bind(LoggerProvider.class).to(LoggerProviderImpl.class);
+    bind(PropertyProvider.class).to(PropertyProviderImpl.class);
+    bind(ConfigurationProperties.class).to(ConfigurationPropertiesImpl.class);
+    bind(StackConfiguration.class).to(StackConfigurationImpl.class);
+    bind(StackEncrypter.class).to(StackEncrypterImpl.class);
+
     // JSONObjectAdapter
     bind(JSONObjectAdapter.class).to(JSONObjectAdapterImpl.class);
 
@@ -183,12 +218,21 @@ public class PortalServletModule extends ServletModule {
     // This is also where project aliases are handled.
     bind(ProjectAliasServlet.class).in(Singleton.class);
     serveRegex("^\\/\\w+$").with(ProjectAliasServlet.class);
-    bind(StackConfiguration.class).to(StackConfigurationImpl.class);
   }
 
   @Provides
   public AWSAppConfigData provideAppConfigDataClient() {
     return AwsClientFactory.createAppConfigClient();
+  }
+
+  @Provides
+  public AWSKMS provideAWSKMSClient() {
+    return AwsClientFactory.createAmazonKeyManagementServiceClient();
+  }
+
+  @Provides
+  public SynapseS3Client provideAmazonS3Client() {
+    return AwsClientFactory.createAmazonS3Client();
   }
 
   public void handleGWTPlaces() {

@@ -90,6 +90,8 @@ public interface GlobalApplicationState {
 
   public void checkVersionCompatibility(AsyncCallback<VersionState> callback);
 
+  public void getFeatureFlagConfig(AsyncCallback<String> callback);
+
   public boolean isEditing();
 
   public void setIsEditing(boolean isEditing);

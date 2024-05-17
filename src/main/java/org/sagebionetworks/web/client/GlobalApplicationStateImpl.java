@@ -21,8 +21,9 @@ import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -74,6 +75,10 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
   public static final ArrayList<String> SAFE_TO_IGNORE_ERRORS = new ArrayList<
     String
   >();
+
+  private static final Logger logger = Logger.getLogger(
+    GlobalApplicationStateImpl.class.getName()
+  );
 
   static {
     // Benign error thrown by VideoWidget (<video>). ResizeObserver was not able to deliver all
@@ -301,6 +306,40 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
   @Override
   public void setFavorites(List<EntityHeader> favorites) {
     this.favorites = favorites;
+  }
+
+  @Override
+  public void getFeatureFlagConfig(final AsyncCallback<String> callback) {
+    //if (DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider())){
+    jsClient.getFeatureFlagConfig(
+      new AsyncCallback<String>() { // <JSONObjectAdapter>() {
+        @Override
+        public void onSuccess(String configurations) { //(JSONObjectAdapter configurations) {
+          //synapseJSNIUtils.consoleError("Configurations are:" + configurations.toString());
+          //logger.log(Level.SEVERE,"Configurations are:" + configurations.toString()); //
+          synapseJSNIUtils.consoleError("Configurations are:" + configurations);
+          logger.log(Level.SEVERE, "Configurations are:" + configurations); //
+          if (callback != null) {
+            callback.onSuccess(configurations);
+          }
+        }
+
+        @Override
+        public void onFailure(Throwable caught) {
+          view.showGetVersionError(caught.getMessage());
+          synapseJSNIUtils.consoleError(
+            "The error getting configurations is:" + caught.getMessage()
+          );
+          logger.log(
+            Level.SEVERE,
+            "The error getting configurations is:" + caught.getMessage()
+          );
+          if (callback != null) {
+            callback.onFailure(caught);
+          }
+        }
+      }
+    );
   }
 
   @Override
@@ -558,7 +597,6 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
       portalUrl += "/";
     }
     view.initSRCEndpoints(repoUrl, portalUrl);
-
     // Add a global click handler.
     view.addNativePreviewHandler(
       new Event.NativePreviewHandler() {
@@ -586,21 +624,6 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
         }
       }
     );
-    //if (DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider())){
-    jsClient.getFeatureFlagConfig(
-      new AsyncCallback<JSONObjectAdapter>() {
-        @Override
-        public void onSuccess(JSONObjectAdapter configurations) {
-          GWT.log("Configurations are:" + configurations.toString()); //
-        }
-
-        @Override
-        public void onFailure(Throwable caught) {
-          GWT.log("The error getting configurations is:" + caught.getMessage());
-        }
-      }
-    );
-    //}
     String showInUTC = cookieProvider.getCookie(SHOW_DATETIME_IN_UTC);
     if (showInUTC != null) {
       setShowUTCTime(Boolean.parseBoolean(showInUTC));
@@ -608,6 +631,21 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
     if (finalCallback != null) {
       finalCallback.invoke();
     }
+    jsClient.getFeatureFlagConfig(
+      new AsyncCallback<String>() {
+        @Override
+        public void onSuccess(String config) {
+          synapseJSNIUtils.consoleLog("Configurations are: " + config);
+        }
+
+        @Override
+        public void onFailure(Throwable caught) {
+          synapseJSNIUtils.consoleError(
+            "The error getting configurations is:" + caught.getMessage()
+          );
+        }
+      }
+    );
   }
 
   @Override

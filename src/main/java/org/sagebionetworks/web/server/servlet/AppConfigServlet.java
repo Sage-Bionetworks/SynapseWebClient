@@ -22,16 +22,15 @@ import org.sagebionetworks.aws.AwsClientFactory;
 
 public class AppConfigServlet extends HttpServlet {
 
-  public AWSAppConfigData appConfigDataClient;
-  public Supplier<String> configSupplier;
-  public String configurationToken;
-  String stackInstance;
-  String stack;
-  StackConfiguration stackConfiguration;
-  private String defaultConfigValue = "{\"default configuration\":\"true\"}";
+  private AWSAppConfigData appConfigDataClient;
+  private Supplier<String> configSupplier;
+  private String configurationToken;
+  private StackConfiguration stackConfiguration;
+  private final String defaultConfigValue =
+    "{\"default configuration\":\"true\"}";
 
-  private static Logger logger = Logger.getLogger(
-    LinkedInServiceImpl.class.getName()
+  private static final Logger logger = Logger.getLogger(
+    AppConfigServlet.class.getName()
   );
 
   @Inject
@@ -43,44 +42,59 @@ public class AppConfigServlet extends HttpServlet {
     this.stackConfiguration = stackConfiguration;
   }
 
-  /*
-       Initialization Order: The code initializes the appConfigDataClient and starts the configuration
-       session in the init() method of the servlet. It should handle scenarios where the servlet may
-       be reinitialized or reloaded during the application lifecycle, potentially leading to multiple
-       configuration sessions or resource leaks.
-    */
   @Override
   public void init() throws ServletException {
     super.init();
-    stackInstance = stackConfiguration.getStackInstance();
-    stack = stackConfiguration.getStack();
-    initializeAppConfigClient();
+    try {
+      initializeAppConfigClient();
+    } catch (Exception e) {
+      logger.log(Level.SEVERE, "Failed to initialize AppConfig client", e);
+    }
   }
 
   private void initializeAppConfigClient() {
-    if (appConfigDataClient == null) { // is this even needed if I use injection?
+    if (appConfigDataClient == null) {
+      logger.log(
+        Level.WARNING,
+        "AppConfigDataClient is being created manually, despite being expected to be injected."
+      );
       appConfigDataClient = AwsClientFactory.createAppConfigClient();
     }
     startConfigurationSession();
     initializeConfigSupplier();
   }
 
-  public void startConfigurationSession() {
-    StartConfigurationSessionRequest sessionRequest =
-      new StartConfigurationSessionRequest()
-        .withApplicationIdentifier(
-          stack + "-" + stackInstance + "-AppConfigApp"
-        )
-        .withEnvironmentIdentifier(stack + "-" + stackInstance + "-environment")
-        .withConfigurationProfileIdentifier(
-          stack + "-" + stackInstance + "-configurations"
-        );
-    StartConfigurationSessionResult sessionResponse =
-      appConfigDataClient.startConfigurationSession(sessionRequest);
-    configurationToken = sessionResponse.getInitialConfigurationToken();
+  private void startConfigurationSession() {
+    try {
+      StartConfigurationSessionRequest sessionRequest =
+        new StartConfigurationSessionRequest()
+          .withApplicationIdentifier(
+            stackConfiguration.getStack() +
+            "-" +
+            stackConfiguration.getStackInstance() +
+            "-AppConfigApp"
+          )
+          .withEnvironmentIdentifier(
+            stackConfiguration.getStack() +
+            "-" +
+            stackConfiguration.getStackInstance() +
+            "-environment"
+          )
+          .withConfigurationProfileIdentifier(
+            stackConfiguration.getStack() +
+            "-" +
+            stackConfiguration.getStackInstance() +
+            "-configurations"
+          );
+      StartConfigurationSessionResult sessionResponse =
+        appConfigDataClient.startConfigurationSession(sessionRequest);
+      configurationToken = sessionResponse.getInitialConfigurationToken();
+    } catch (Exception e) {
+      logger.log(Level.SEVERE, "Error starting configuration session", e);
+    }
   }
 
-  public void initializeConfigSupplier() {
+  private void initializeConfigSupplier() {
     configSupplier =
       Suppliers.memoizeWithExpiration(
         this::getLatestConfiguration,
@@ -90,47 +104,69 @@ public class AppConfigServlet extends HttpServlet {
   }
 
   private String getLatestConfiguration() {
+    if (configurationToken == null) {
+      logger.log(
+        Level.SEVERE,
+        "Configuration token is null, returning default configuration"
+      );
+      return defaultConfigValue;
+    }
     try {
       GetLatestConfigurationRequest latestConfigRequest =
         new GetLatestConfigurationRequest()
           .withConfigurationToken(configurationToken);
-
       GetLatestConfigurationResult latestConfigResponse =
         appConfigDataClient.getLatestConfiguration(latestConfigRequest);
       configurationToken = latestConfigResponse.getNextPollConfigurationToken();
       ByteBuffer configData = latestConfigResponse.getConfiguration();
-
       return new String(
         configData.array(),
         java.nio.charset.StandardCharsets.UTF_8
-      ); //JSON String
+      );
     } catch (Exception e) {
-      // log the error
-      logger.log(Level.SEVERE, e.getMessage(), e);
+      logger.log(
+        Level.SEVERE,
+        "Failed to retrieve latest configuration, returning default",
+        e
+      );
       return defaultConfigValue;
     }
   }
 
   @Override
-  public void doGet(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
+  protected void doGet(
+    HttpServletRequest request,
+    HttpServletResponse response
+  ) throws ServletException, IOException {
     try {
-      initializeAppConfigClient();
       String configValue = configSupplier.get();
-      response.setContentType("application/json");
+      response.setContentType("text/plain");
       response.getWriter().write(configValue);
     } catch (Exception e) {
+      logger.log(
+        Level.SEVERE,
+        "Error processing GET request in AppConfigServlet",
+        e
+      );
       response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
       response
         .getWriter()
-        .write("Error retrieving configuration: " + e.getMessage());
+        .write(
+          "{\"error\":\"Error retrieving configuration: " +
+          e.getMessage() +
+          "\"}"
+        );
     }
   }
 
   @Override
   public void destroy() {
     if (appConfigDataClient != null) {
-      appConfigDataClient.shutdown();
+      try {
+        appConfigDataClient.shutdown();
+      } catch (Exception e) {
+        logger.log(Level.SEVERE, "Failed to shutdown AppConfigDataClient", e);
+      }
     }
     super.destroy();
   }
