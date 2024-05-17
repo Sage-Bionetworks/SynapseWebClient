@@ -275,10 +275,15 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
             }
           } else if (path.startsWith("/TeamSearch")) {
             TeamSearch place = new TeamSearch(placeToken);
-            dataModel.put(
-              PAGE_TITLE_KEY,
-              SEARCHING_FOR_TEAM + place.getSearchTerm()
-            );
+            if (
+              place.getSearchTerm() != null &&
+              place.getSearchTerm().length() > 0
+            ) {
+              dataModel.put(
+                PAGE_TITLE_KEY,
+                SEARCHING_FOR_TEAM + place.getSearchTerm()
+              );
+            }
             if (includeBotHtml) {
               dataModel.put(
                 BOT_BODY_HTML_KEY,

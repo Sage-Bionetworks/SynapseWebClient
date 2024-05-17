@@ -34,8 +34,8 @@ public class FileDownloadHandlerWidget
   implements FileDownloadMenuItemView.Presenter {
 
   public static final String ACCESS_REQUIREMENTS_LINK =
-    "AccessRequirements:ID=";
-  public static final String LOGIN_PLACE_LINK = "LoginPlace:0";
+    "/AccessRequirements:ID=";
+  public static final String LOGIN_PLACE_LINK = "/LoginPlace:0";
   private FileDownloadMenuItemView view;
   private EntityBundle entityBundle;
   private PortalGinInjector ginInjector;

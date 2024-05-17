@@ -830,7 +830,7 @@ public class EntityActionControllerImpl
                   public void onSuccess(
                     AddBatchOfFilesToDownloadListResponse result
                   ) {
-                    String href = "DownloadCart:0";
+                    String href = "/DownloadCart:0";
                     popupUtils.showInfo(
                       entity.getName() + EntityBadge.ADDED_TO_DOWNLOAD_LIST,
                       href,

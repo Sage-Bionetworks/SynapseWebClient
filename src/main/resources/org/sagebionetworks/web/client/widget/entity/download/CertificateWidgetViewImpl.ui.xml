@@ -9,7 +9,7 @@
       ui:field="alert"
       alertType="SUCCESS"
       primaryCTAText="View your dashboard"
-      primaryCTAHref="Profile:v/projects"
+      primaryCTAHref="/Profile:v/projects"
     />
   </bh:Div>
 </ui:UiBinder>
