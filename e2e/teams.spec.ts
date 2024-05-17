@@ -6,11 +6,7 @@ import {
   deleteTeamInvitationMessage,
   deleteTeamInviteAcceptanceMessage,
 } from './helpers/messages'
-import {
-  deleteTeam,
-  getTeamIdFromPathname,
-  teamHashBang,
-} from './helpers/teams'
+import { deleteTeam, getTeamIdFromPathname, teamPlace } from './helpers/teams'
 import {
   dismissAlert,
   getAccessTokenFromCookie,
@@ -84,7 +80,7 @@ testAuth.describe('Teams', () => {
           await userPage.getByRole('button', { name: 'OK' }).click()
 
           await testAuth.step('user should get teamId', async () => {
-            await userPage.waitForURL(`/${teamHashBang}:**`)
+            await userPage.waitForURL(`/${teamPlace}:**`)
             teamId = getTeamIdFromPathname(userPage.url())
           })
 
