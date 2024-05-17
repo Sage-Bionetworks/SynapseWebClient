@@ -405,4 +405,62 @@ public class HtmlInjectionFilterTest {
       outputString.contains(HtmlInjectionFilter.DEFAULT_PAGE_DESCRIPTION)
     );
   }
+
+  @Test
+  public void testOGPageTitleDescriptionTruncation()
+    throws ServletException, IOException, RestServiceException, SynapseException {
+    //initialize with a template that only include the Open Graph social media title and description tags
+    Template pageTitleTemplate = getTemplate(
+      "${" +
+      HtmlInjectionFilter.OG_PAGE_TITLE_KEY +
+      "} \n${" +
+      HtmlInjectionFilter.OG_PAGE_DESCRIPTION_KEY +
+      "}"
+    );
+    filter.init(pageTitleTemplate, mockDiscussionForumClient, mockCrawlFilter);
+    setRequestURL("https://www.synapse.org/Synapse:syn123");
+
+    StringBuilder markdown = new StringBuilder();
+    for (
+      int i = 0;
+      i < HtmlInjectionFilter.MAX_PAGE_DESCRIPTION_LENGTH + 10;
+      i++
+    ) {
+      markdown.append("a");
+    }
+    String markdownString = markdown.toString();
+
+    when(mockWikiPage.getMarkdown()).thenReturn(markdownString);
+
+    StringBuilder entityName = new StringBuilder();
+    for (int i = 0; i < HtmlInjectionFilter.MAX_PAGE_TITLE_LENGTH + 10; i++) {
+      entityName.append("b");
+    }
+    String entityNameString = entityName.toString();
+    when(mockEntity.getName()).thenReturn(entityNameString);
+
+    filter.testFilter(mockRequest, mockResponse, mockFilterChain);
+
+    verify(mockPrintWriter).print(stringCaptor.capture());
+    String outputString = stringCaptor.getValue();
+    assertFalse(outputString.contains(entityNameString));
+    assertTrue(
+      outputString.contains(
+        entityNameString.substring(
+          0,
+          HtmlInjectionFilter.MAX_PAGE_TITLE_LENGTH - 3
+        )
+      )
+    );
+
+    assertFalse(outputString.contains(markdownString));
+    assertTrue(
+      outputString.contains(
+        markdownString.substring(
+          0,
+          HtmlInjectionFilter.MAX_PAGE_DESCRIPTION_LENGTH - 3
+        )
+      )
+    );
+  }
 }

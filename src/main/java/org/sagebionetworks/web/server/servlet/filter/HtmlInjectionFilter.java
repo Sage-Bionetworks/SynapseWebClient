@@ -53,7 +53,9 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
   public static final String SEARCHING_FOR_TEAM = "Searching for Team: ";
   public static final String OG_URL_KEY = "ogUrl";
   public static final String PAGE_DESCRIPTION_KEY = "pageDescription";
+  public static final String OG_PAGE_DESCRIPTION_KEY = "ogPageDescription";
   public static final String PAGE_TITLE_KEY = "pageTitle";
+  public static final String OG_PAGE_TITLE_KEY = "ogPageTitle";
   public static final String BOT_HEAD_HTML_KEY = "botHeadHtml";
   public static final String BOT_BODY_HTML_KEY = "botBodyHtml";
   public static final String LOADING_DESCRIPTOR_KEY = "loadingObjectDescriptor";
@@ -64,6 +66,9 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
     "Synapse is a platform for supporting scientific collaborations centered around shared biomedical data sets.  Our goal is to make biomedical research more transparent, more reproducible, and more accessible to a broader audience of scientists.  Synapse serves as the host site for a variety of scientific collaborations, individual research projects, and DREAM challenges.";
   public static final String DEFAULT_URL = "https://www.synapse.org";
   public static final String DISCUSSION_THREAD_ID = "/discussion/threadId=";
+
+  public static final int MAX_PAGE_TITLE_LENGTH = 70;
+  public static final int MAX_PAGE_DESCRIPTION_LENGTH = 200;
 
   public static final String META_ROBOTS_NOINDEX =
     "<meta name=\"robots\" content=\"noindex\">";
@@ -88,6 +93,10 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
     return userAgent != null && userAgent.toLowerCase().contains("bot");
   }
 
+  private String truncate(String s, int maxChars) {
+    return s.length() > maxChars ? s.substring(0, maxChars - 3) + "..." : s;
+  }
+
   private Map<String, String> addDefaultsToDataModel(
     Map<String, String> dataModel
   ) {
@@ -97,6 +106,16 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
     dataModel.putIfAbsent(BOT_HEAD_HTML_KEY, "");
     dataModel.putIfAbsent(BOT_BODY_HTML_KEY, "");
     dataModel.putIfAbsent(LOADING_DESCRIPTOR_KEY, "Loading");
+
+    dataModel.put(
+      OG_PAGE_TITLE_KEY,
+      truncate(dataModel.get(PAGE_TITLE_KEY), MAX_PAGE_TITLE_LENGTH)
+    );
+    dataModel.put(
+      OG_PAGE_DESCRIPTION_KEY,
+      truncate(dataModel.get(PAGE_DESCRIPTION_KEY), MAX_PAGE_DESCRIPTION_LENGTH)
+    );
+
     return dataModel;
   }
 

@@ -543,17 +543,17 @@ public class CrawlFilter {
     head.append(
       "<meta property=\"profile:first_name\" content=\"" +
       profile.getFirstName() +
-      "\" />"
+      "\">"
     );
     head.append(
       "<meta property=\"profile:last_name\" content=\"" +
       profile.getLastName() +
-      "\" />"
+      "\">"
     );
     head.append(
       "<meta property=\"profile:username\" content=\"" +
       profile.getUserName() +
-      "\" />"
+      "\">"
     );
 
     response.setHead(head.toString());

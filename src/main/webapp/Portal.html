@@ -4,7 +4,7 @@
     <title>${pageTitle}</title>
     <meta name="description" content="${pageDescription}" />
     <meta property="og:title" content="${pageTitle}" />
-    <meta property="og:description" content="${pageDescription}" />
+    <meta property="og:description" content="${ogPageDescription}" />
     <meta name="author" content="Sage Bionetworks, info@sagebase.org" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
@@ -23,21 +23,21 @@
     <meta property="og:url" content="${ogUrl}" />
     <meta property="og:type" content="website" />
     <meta
-      name="image"
       property="og:image"
       content="https://www.synapse.org/images/synapse-logo-blue-background.png"
     />
 
     <!-- Twitter Meta Tags -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta property="twitter:domain" content="synapse.org" />
-    <meta property="twitter:url" content="${ogUrl}" />
-    <meta name="twitter:title" content="${pageTitle}" />
-    <meta name="twitter:description" content="${pageDescription}" />
     <meta
-      name="twitter:image"
+      property="twitter:image"
       content="https://www.synapse.org/images/synapse-logo-blue-background.png"
     />
+    <meta name="twitter:title" content="${ogPageTitle}" />
+    <meta name="twitter:description" content="${ogPageDescription}" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@Sagebio" />
+    <meta name="twitter:creator" content="@Sagebio" />
+
     ${botHeadHtml}
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
