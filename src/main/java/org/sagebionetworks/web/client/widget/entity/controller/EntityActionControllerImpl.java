@@ -1551,8 +1551,9 @@ public class EntityActionControllerImpl
   }
 
   private void configureProjectHelpAction() {
-    boolean isProject = entityBundle.getEntity() instanceof Project;
-    actionMenu.setActionVisible(Action.PROJECT_HELP, isProject);
+    boolean isProjectMenu =
+      entityBundle.getEntity() instanceof Project && currentArea == null;
+    actionMenu.setActionVisible(Action.PROJECT_HELP, isProjectMenu);
     actionMenu.setActionHref(
       Action.PROJECT_HELP,
       "https://sagebionetworks.jira.com/servicedesk/customer/portal/9"
