@@ -29,6 +29,8 @@ public class AppConfigServlet extends HttpServlet {
   private final String defaultConfigValue =
     "{\"default configuration\":\"true\"}";
 
+  private String lastConfigValue = "";
+
   private static final Logger logger = Logger.getLogger(
     AppConfigServlet.class.getName()
   );
@@ -107,10 +109,14 @@ public class AppConfigServlet extends HttpServlet {
         appConfigDataClient.getLatestConfiguration(latestConfigRequest);
       configurationToken = latestConfigResponse.getNextPollConfigurationToken();
       ByteBuffer configData = latestConfigResponse.getConfiguration();
-      return new String(
+      String newConfigValue = new String(
         configData.array(),
         java.nio.charset.StandardCharsets.UTF_8
-      );
+      ); // This may be empty if the client already has the latest version of the configuration.
+      if (!newConfigValue.isEmpty()) {
+        lastConfigValue = newConfigValue;
+      }
+      return lastConfigValue;
     } catch (Exception e) {
       return defaultConfigValue;
     }
