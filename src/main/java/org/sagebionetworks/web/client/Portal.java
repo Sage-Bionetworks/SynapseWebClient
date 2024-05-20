@@ -92,9 +92,6 @@ public class Portal implements EntryPoint {
                             .getCookieProvider()
                             .getCookie("PORTAL_FEATURE_FLAG")
                         );
-
-                      FeatureFlagConfig featureConfig =
-                        FeatureFlagConfigFactory.create(config); // parsed configuration
                     }
 
                     @Override

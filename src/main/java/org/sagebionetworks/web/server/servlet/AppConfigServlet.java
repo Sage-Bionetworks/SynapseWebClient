@@ -45,19 +45,11 @@ public class AppConfigServlet extends HttpServlet {
   @Override
   public void init() throws ServletException {
     super.init();
-    try {
-      initializeAppConfigClient();
-    } catch (Exception e) {
-      logger.log(Level.SEVERE, "Failed to initialize AppConfig client", e);
-    }
+    initializeAppConfigClient();
   }
 
   public void initializeAppConfigClient() {
     if (appConfigDataClient == null) {
-      logger.log(
-        Level.WARNING,
-        "AppConfigDataClient is being created manually, despite being expected to be injected."
-      );
       appConfigDataClient = AwsClientFactory.createAppConfigClient();
     }
     startConfigurationSession();
@@ -90,15 +82,7 @@ public class AppConfigServlet extends HttpServlet {
         appConfigDataClient.startConfigurationSession(sessionRequest);
       configurationToken = sessionResponse.getInitialConfigurationToken();
     } catch (Exception e) {
-      logger.log(
-        Level.SEVERE,
-        "Stack:" +
-        stackConfiguration.getStack() +
-        "Instance:" +
-        stackConfiguration.getStackInstance() +
-        "Error starting configuration session",
-        e
-      );
+      configurationToken = null;
     }
   }
 
@@ -113,10 +97,6 @@ public class AppConfigServlet extends HttpServlet {
 
   public String getLatestConfiguration() {
     if (configurationToken == null) {
-      logger.log(
-        Level.SEVERE,
-        "Configuration token is null, returning default configuration"
-      );
       return defaultConfigValue;
     }
     try {
@@ -132,11 +112,6 @@ public class AppConfigServlet extends HttpServlet {
         java.nio.charset.StandardCharsets.UTF_8
       );
     } catch (Exception e) {
-      logger.log(
-        Level.SEVERE,
-        "Failed to retrieve latest configuration, returning default",
-        e
-      );
       return defaultConfigValue;
     }
   }
@@ -149,11 +124,6 @@ public class AppConfigServlet extends HttpServlet {
       response.setContentType("text/plain");
       response.getWriter().write(configValue);
     } catch (Exception e) {
-      logger.log(
-        Level.SEVERE,
-        "Error processing GET request in AppConfigServlet",
-        e
-      );
       response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
       response
         .getWriter()

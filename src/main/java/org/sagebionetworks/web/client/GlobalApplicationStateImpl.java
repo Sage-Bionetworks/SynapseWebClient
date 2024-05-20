@@ -305,35 +305,6 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
   }
 
   @Override
-  public void getFeatureFlagConfig(final AsyncCallback<String> callback) {
-    //if (DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider())){
-    jsClient.getFeatureFlagConfig(
-      new AsyncCallback<String>() { // <JSONObjectAdapter>() {
-        @Override
-        public void onSuccess(String configurations) { //(JSONObjectAdapter configurations) {
-          //synapseJSNIUtils.consoleError("Configurations are:" + configurations.toString());
-          //logger.log(Level.SEVERE,"Configurations are:" + configurations.toString()); //
-          synapseJSNIUtils.consoleError("Configurations are:" + configurations);
-          if (callback != null) {
-            callback.onSuccess(configurations);
-          }
-        }
-
-        @Override
-        public void onFailure(Throwable caught) {
-          view.showGetVersionError(caught.getMessage());
-          synapseJSNIUtils.consoleError(
-            "The error getting configurations is:" + caught.getMessage()
-          );
-          if (callback != null) {
-            callback.onFailure(caught);
-          }
-        }
-      }
-    );
-  }
-
-  @Override
   public void checkVersionCompatibility(
     final AsyncCallback<VersionState> callback
   ) {
