@@ -10,6 +10,7 @@ import com.google.gwt.place.shared.PlaceHistoryHandler;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
@@ -70,6 +71,42 @@ public class Portal implements EntryPoint {
             try {
               // make sure jsni utils code is available to the client
               ginjector.getSynapseJSNIUtils();
+
+              ginjector
+                .getSynapseJavascriptClient()
+                .getFeatureFlagConfig(
+                  new AsyncCallback<String>() {
+                    @Override
+                    public void onSuccess(String config) {
+                      ginjector
+                        .getSynapseJSNIUtils()
+                        .consoleLog("Configurations are: " + config);
+                      ginjector
+                        .getCookieProvider()
+                        .setCookie("PORTAL_FEATURE_FLAG", config); // store into cookie
+                      ginjector
+                        .getSynapseJSNIUtils()
+                        .consoleLog(
+                          "Configurations from cookie: " +
+                          ginjector
+                            .getCookieProvider()
+                            .getCookie("PORTAL_FEATURE_FLAG")
+                        );
+
+                      FeatureFlagConfig featureConfig =
+                        FeatureFlagConfigFactory.create(config); // parsed configuration
+                    }
+
+                    @Override
+                    public void onFailure(Throwable caught) {
+                      ginjector
+                        .getSynapseJSNIUtils()
+                        .consoleError(
+                          "Error getting configurations:" + caught.getMessage()
+                        );
+                    }
+                  }
+                );
 
               ginjector
                 .getSynapseProperties()

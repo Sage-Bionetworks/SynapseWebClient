@@ -623,21 +623,6 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
     if (finalCallback != null) {
       finalCallback.invoke();
     }
-    jsClient.getFeatureFlagConfig(
-      new AsyncCallback<String>() {
-        @Override
-        public void onSuccess(String config) {
-          synapseJSNIUtils.consoleLog("Configurations are: " + config);
-        }
-
-        @Override
-        public void onFailure(Throwable caught) {
-          synapseJSNIUtils.consoleError(
-            "The error getting configurations is:" + caught.getMessage()
-          );
-        }
-      }
-    );
   }
 
   @Override
