@@ -72,25 +72,27 @@ public class Portal implements EntryPoint {
               // make sure jsni utils code is available to the client
               ginjector.getSynapseJSNIUtils();
 
-              ginjector
-                .getSynapseJavascriptClient()
-                .getFeatureFlagConfig(
-                  new AsyncCallback<String>() {
-                    @Override
-                    public void onSuccess(String config) {
-                      ginjector
-                        .getCookieProvider()
-                        .setCookie("PORTAL_FEATURE_FLAG", config);
-                    }
+              if (DisplayUtils.isInTestWebsite(ginjector.getCookieProvider())) {
+                ginjector
+                  .getSynapseJavascriptClient()
+                  .getFeatureFlagConfig(
+                    new AsyncCallback<String>() {
+                      @Override
+                      public void onSuccess(String config) {
+                        ginjector
+                          .getCookieProvider()
+                          .setCookie("PORTAL_FEATURE_FLAG", config);
+                      }
 
-                    @Override
-                    public void onFailure(Throwable reason) {
-                      _consoleError(
-                        "Error getting configurations:" + reason.getMessage()
-                      );
+                      @Override
+                      public void onFailure(Throwable reason) {
+                        _consoleError(
+                          "Error getting configurations:" + reason.getMessage()
+                        );
+                      }
                     }
-                  }
-                );
+                  );
+              }
 
               ginjector
                 .getSynapseProperties()
