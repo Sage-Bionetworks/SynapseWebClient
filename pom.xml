@@ -19,7 +19,7 @@
     <webappDirectory>
       ${project.build.directory}/${project.build.finalName}
     </webappDirectory>
-    <synapse.version>2024-05-09-214-5e0aaeec1f</synapse.version>
+    <synapse.version>499.0</synapse.version>
     <gwtVersion>2.11.0</gwtVersion>
     <org.springframework.version>5.3.33</org.springframework.version>
     <guiceVersion>3.0</guiceVersion>
@@ -635,7 +635,7 @@
     <dependency>
       <groupId>org.sagebionetworks</groupId>
       <artifactId>synapseJavaClient</artifactId>
-      <version>499.0</version>
+      <version>${synapse.version}</version>
     </dependency>
     <dependency>
       <groupId>org.sagebionetworks</groupId>
