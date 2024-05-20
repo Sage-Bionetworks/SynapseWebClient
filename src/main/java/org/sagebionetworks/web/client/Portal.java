@@ -79,28 +79,15 @@ public class Portal implements EntryPoint {
                     @Override
                     public void onSuccess(String config) {
                       ginjector
-                        .getSynapseJSNIUtils()
-                        .consoleLog("Configurations are: " + config);
-                      ginjector
                         .getCookieProvider()
-                        .setCookie("PORTAL_FEATURE_FLAG", config); // store into cookie
-                      ginjector
-                        .getSynapseJSNIUtils()
-                        .consoleLog(
-                          "Configurations from cookie: " +
-                          ginjector
-                            .getCookieProvider()
-                            .getCookie("PORTAL_FEATURE_FLAG")
-                        );
+                        .setCookie("PORTAL_FEATURE_FLAG", config);
                     }
 
                     @Override
-                    public void onFailure(Throwable caught) {
-                      ginjector
-                        .getSynapseJSNIUtils()
-                        .consoleError(
-                          "Error getting configurations:" + caught.getMessage()
-                        );
+                    public void onFailure(Throwable reason) {
+                      _consoleError(
+                        "Error getting configurations:" + reason.getMessage()
+                      );
                     }
                   }
                 );
