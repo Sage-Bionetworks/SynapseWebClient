@@ -351,7 +351,7 @@ public class SynapseJavascriptClient {
   public static final String ACTIONS = "/actions";
   public static final String PORTAL_ENDPOINT_PARAM = "portalEndpoint=";
   public static final int LIMIT_50 = 50;
-  public static final String SIGNED_TOKEN = "#!SignedToken:";
+  public static final String SIGNED_TOKEN = "SignedToken:";
   public Map<String, List<Request>> requestsMap;
 
   public String synapseVersionInfo;
@@ -2805,7 +2805,7 @@ public class SynapseJavascriptClient {
     url +=
     "?passwordResetEndpoint=" +
     gwt.encodeQueryString(
-      gwt.getHostPageBaseURL() + "#!PasswordResetSignedToken:"
+      gwt.getHostPageBaseURL() + "PasswordResetSignedToken:"
     );
     doPost(url, username, OBJECT_TYPE.None, false, cb);
   }
@@ -2824,7 +2824,7 @@ public class SynapseJavascriptClient {
     AsyncCallback<Void> cb
   ) {
     String teamEndpoint = gwt.encodeQueryString(
-      gwt.getHostPageBaseURL() + "#!Team:"
+      gwt.getHostPageBaseURL() + "Team:"
     );
     String signedTokenEndpoint = gwt.encodeQueryString(
       gwt.getHostPageBaseURL() + SIGNED_TOKEN

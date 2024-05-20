@@ -252,14 +252,11 @@ public class SynapsePlaceTest {
 
   @Test
   public void testGetTokenForDotVersionNoVersion() {
-    assertEquals("#!Synapse:syn123", Synapse.getHrefForDotVersion("SYN123"));
+    assertEquals("/Synapse:syn123", Synapse.getHrefForDotVersion("SYN123"));
   }
 
   @Test
   public void testGetTokenForDotVersionWithVersion() {
-    assertEquals(
-      "#!Synapse:syn123.3",
-      Synapse.getHrefForDotVersion("syn123.3")
-    );
+    assertEquals("/Synapse:syn123.3", Synapse.getHrefForDotVersion("syn123.3"));
   }
 }

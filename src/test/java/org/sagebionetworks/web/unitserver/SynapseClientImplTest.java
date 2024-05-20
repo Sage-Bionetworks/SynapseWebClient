@@ -1180,8 +1180,8 @@ public class SynapseClientImplTest {
       .addTeamMember(
         anyString(),
         anyString(),
-        eq(TEST_HOME_PAGE_BASE + "#!Team:"),
-        eq(TEST_HOME_PAGE_BASE + "#!SignedToken:")
+        eq(TEST_HOME_PAGE_BASE + "Team:"),
+        eq(TEST_HOME_PAGE_BASE + "SignedToken:")
       );
     ArgumentCaptor<MembershipRequest> captor = ArgumentCaptor.forClass(
       MembershipRequest.class
@@ -1205,8 +1205,8 @@ public class SynapseClientImplTest {
       .addTeamMember(
         anyString(),
         anyString(),
-        eq(TEST_HOME_PAGE_BASE + "#!Team:"),
-        eq(TEST_HOME_PAGE_BASE + "#!SignedToken:")
+        eq(TEST_HOME_PAGE_BASE + "Team:"),
+        eq(TEST_HOME_PAGE_BASE + "SignedToken:")
       );
   }
 
@@ -1231,8 +1231,8 @@ public class SynapseClientImplTest {
     verify(mockSynapse)
       .createMembershipRequest(
         captor.capture(),
-        eq(TEST_HOME_PAGE_BASE + "#!SignedToken:"),
-        eq(TEST_HOME_PAGE_BASE + "#!SignedToken:")
+        eq(TEST_HOME_PAGE_BASE + "SignedToken:"),
+        eq(TEST_HOME_PAGE_BASE + "SignedToken:")
       );
     MembershipRequest request = captor.getValue();
     assertEquals(expiresOn, request.getExpiresOn());
@@ -1261,8 +1261,8 @@ public class SynapseClientImplTest {
     verify(mockSynapse)
       .createMembershipRequest(
         captor.capture(),
-        eq(TEST_HOME_PAGE_BASE + "#!SignedToken:"),
-        eq(TEST_HOME_PAGE_BASE + "#!SignedToken:")
+        eq(TEST_HOME_PAGE_BASE + "SignedToken:"),
+        eq(TEST_HOME_PAGE_BASE + "SignedToken:")
       );
     MembershipRequest request = captor.getValue();
     assertEquals(expiresOn, request.getExpiresOn());
@@ -1682,8 +1682,8 @@ public class SynapseClientImplTest {
     verify(mockSynapse)
       .addTeamMember(
         joinTeamToken,
-        TEST_HOME_PAGE_BASE + "#!Team:",
-        TEST_HOME_PAGE_BASE + "#!SignedToken:"
+        TEST_HOME_PAGE_BASE + "Team:",
+        TEST_HOME_PAGE_BASE + "SignedToken:"
       );
   }
 

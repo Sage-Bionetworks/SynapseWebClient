@@ -1,11 +1,10 @@
 <!doctype html>
 <html id="synapse.org" dir="ltr" lang="en-US">
   <head>
-    <title>Synapse | Sage Bionetworks</title>
-    <meta
-      name="description"
-      content="Synapse is a platform for supporting scientific collaborations centered around shared biomedical data sets.  Our goal is to make biomedical research more transparent, more reproducible, and more accessible to a broader audience of scientists.  Synapse serves as the host site for a variety of scientific collaborations, individual research projects, and DREAM challenges."
-    />
+    <title>${pageTitle}</title>
+    <meta name="description" content="${pageDescription}" />
+    <meta property="og:title" content="${pageTitle}" />
+    <meta property="og:description" content="${ogPageDescription}" />
     <meta name="author" content="Sage Bionetworks, info@sagebase.org" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
@@ -21,32 +20,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <!-- Facebook Meta Tags -->
-    <meta property="og:url" content="https://www.synapse.org" />
+    <meta property="og:url" content="${ogUrl}" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Synapse | Sage Bionetworks" />
     <meta
-      property="og:description"
-      content="Synapse is a platform for supporting scientific collaborations centered around shared biomedical data sets.  Our goal is to make biomedical research more transparent, more reproducible, and more accessible to a broader audience of scientists.  Synapse serves as the host site for a variety of scientific collaborations, individual research projects, and DREAM challenges."
-    />
-    <meta
-      name="image"
       property="og:image"
       content="https://www.synapse.org/images/synapse-logo-blue-background.png"
     />
 
     <!-- Twitter Meta Tags -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta property="twitter:domain" content="synapse.org" />
-    <meta property="twitter:url" content="https://www.synapse.org" />
-    <meta name="twitter:title" content="Synapse | Sage Bionetworks" />
     <meta
-      name="twitter:description"
-      content="Synapse is a platform for supporting scientific collaborations centered around shared biomedical data sets.  Our goal is to make biomedical research more transparent, more reproducible, and more accessible to a broader audience of scientists.  Synapse serves as the host site for a variety of scientific collaborations, individual research projects, and DREAM challenges."
-    />
-    <meta
-      name="twitter:image"
+      property="twitter:image"
       content="https://www.synapse.org/images/synapse-logo-blue-background.png"
     />
+    <meta name="twitter:title" content="${ogPageTitle}" />
+    <meta name="twitter:description" content="${ogPageDescription}" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@Sagebio" />
+    <meta name="twitter:creator" content="@Sagebio" />
+
+    ${botHeadHtml}
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 10]>
@@ -67,11 +59,6 @@
     <![endif]-->
 
     <!-- SWC-6609 removed <script src="js/json-ld-element-loader.js"></script> -->
-
-    <!-- 
-    Adding the following meta tag should tell the crawler to try to crawl the ugly version of *this* URL.
-    -->
-    <meta name="fragment" content="!" />
     <meta http-equiv="x-dns-prefetch-control" content="off" />
 
     <!-- meta to instruct browser not to cache portal.html -->
@@ -81,14 +68,14 @@
     <meta http-equiv="expires" content="0" />
     <meta http-equiv="pragma" content="no-cache" />
     <!-- end cache control -->
-    <link rel="icon" href="favicon.png?v=4" />
+    <link rel="icon" href="/favicon.png?v=4" />
     <link
       href="/opensearch.xml"
       rel="search"
       title="Synapse"
       type="application/opensearchdescription+xml"
     />
-    <link rel="manifest" href="manifest.json" />
+    <link rel="manifest" href="/manifest.json" />
     <!-- Google Tag Manager -->
     <script>
       ;(function (w, d, s, l, i) {
@@ -122,7 +109,7 @@
       var synapseOrgRegex = /(www|staging|tst)\.synapse\.org$/
 
       if (!synapseOrgRegex.test(location.hostname)) {
-        cdnEndpoint = ''
+        cdnEndpoint = '/'
         processEnvironment = 'development'
       }
 
@@ -237,6 +224,7 @@
     </script>
   </head>
   <body id="body">
+    ${botBodyHtml}
     <div>
       <!-- GWT history support -->
       <iframe
@@ -268,7 +256,7 @@
           Your web browser must have JavaScript enabled in order for this
           application to display correctly.<br />
           If you are an automated web crawler from a search engine, follow this
-          <a href="https://synapse.prod.sagebase.org/Portal.html#!Home:0"
+          <a href="https://synapse.prod.sagebase.org/Home:0"
             >AJAX application crawl link</a
           >
         </div>
@@ -306,7 +294,7 @@
             text-align: center;
           "
         >
-          Loading&hellip;
+          ${loadingObjectDescriptor}&hellip;
         </h4>
       </div>
       <div id="headerPanel" class="zeroOpacity"></div>

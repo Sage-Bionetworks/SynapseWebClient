@@ -16,7 +16,7 @@ public class Challenges extends Place {
     return token;
   }
 
-  @Prefix("!Challenges")
+  @Prefix("Challenges")
   public static class Tokenizer implements PlaceTokenizer<Challenges> {
 
     @Override

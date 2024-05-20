@@ -91,4 +91,43 @@ public class StringUtilsTest {
     assertEquals("Hello World", StringUtils.toTitleCase("hello world"));
     assertEquals("Hello World", StringUtils.toTitleCase("heLLo WORLD"));
   }
+
+  @Test
+  public void testGetGWTPlaceTokenFromURL() {
+    assertNull(
+      StringUtils.getGWTPlaceTokenFromURL(
+        "https://does.not.contain.gwt/place/test/file.txt?anywhere=true"
+      )
+    );
+    //real cases
+    assertEquals(
+      "Team:3472002",
+      StringUtils.getGWTPlaceTokenFromURL(
+        "https://www.synapse.org/Team:3472002"
+      )
+    );
+    assertEquals(
+      "Profile:1131050/projects/all",
+      StringUtils.getGWTPlaceTokenFromURL(
+        "https://www.synapse.org/Profile:1131050/projects/all"
+      )
+    );
+    assertEquals(
+      "Synapse:syn5585645/discussion/threadId=50&replyId=16175",
+      StringUtils.getGWTPlaceTokenFromURL(
+        "https://www.synapse.org/Synapse:syn5585645/discussion/threadId=50&replyId=16175"
+      )
+    );
+    assertEquals(
+      "DataAccessManagement:default/Submissions?accessRequirementId=4988775",
+      StringUtils.getGWTPlaceTokenFromURL(
+        "https://www.synapse.org/DataAccessManagement:default/Submissions?accessRequirementId=4988775"
+      )
+    );
+    //relative href
+    assertEquals(
+      "Team:3472002",
+      StringUtils.getGWTPlaceTokenFromURL("/Team:3472002")
+    );
+  }
 }

@@ -728,7 +728,7 @@ public class ReplyWidgetTest {
 
     verify(mockCopyTextModal)
       .setText(
-        "https://www.synapse.org/#!Synapse:syn007/discussion/threadId=321&replyId=123"
+        "https://www.synapse.org/Synapse:syn007/discussion/threadId=321&replyId=123"
       );
     verify(mockCopyTextModal).show();
   }
@@ -764,9 +764,7 @@ public class ReplyWidgetTest {
     replyWidget.onClickReplyLink();
 
     verify(mockCopyTextModal)
-      .setText(
-        "https://www.synapse.org/#!SynapseForum:threadId=321&replyId=123"
-      );
+      .setText("https://www.synapse.org/SynapseForum:threadId=321&replyId=123");
     verify(mockCopyTextModal).show();
   }
 

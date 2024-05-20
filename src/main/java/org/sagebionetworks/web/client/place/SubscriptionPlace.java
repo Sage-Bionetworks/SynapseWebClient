@@ -13,7 +13,7 @@ public class SubscriptionPlace extends ParameterizedPlace {
     super(token);
   }
 
-  @Prefix("!Subscription")
+  @Prefix("Subscription")
   public static class Tokenizer implements PlaceTokenizer<SubscriptionPlace> {
 
     @Override

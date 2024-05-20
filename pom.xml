@@ -35,6 +35,7 @@
     <gwtvisualizationwrappers.version>
       1.6-gwt-2.7.0
     </gwtvisualizationwrappers.version>
+    <freemarker.version>2.3.32</freemarker.version>
     <gwt.module.suffix />
   </properties>
 
@@ -626,6 +627,11 @@
       <groupId>javax.mail</groupId>
       <artifactId>mail</artifactId>
       <version>1.4</version>
+    </dependency>
+    <dependency>
+      <groupId>org.freemarker</groupId>
+      <artifactId>freemarker</artifactId>
+      <version>${freemarker.version}</version>
     </dependency>
     <dependency>
       <groupId>org.sagebionetworks</groupId>

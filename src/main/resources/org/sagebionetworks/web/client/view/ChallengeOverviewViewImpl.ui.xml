@@ -19,7 +19,7 @@
     <div class="container">
       <ul class="breadcrumbs">
         <li>
-          <a href="#">Home</a>
+          <a href="/">Home</a>
         </li>
       </ul>
       <g:SimplePanel ui:field="content" />

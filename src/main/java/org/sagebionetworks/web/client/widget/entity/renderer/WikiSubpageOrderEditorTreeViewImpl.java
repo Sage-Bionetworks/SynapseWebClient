@@ -164,7 +164,7 @@ public class WikiSubpageOrderEditorTreeViewImpl
     final Anchor l = new Anchor(node.getText());
     l.addStyleName("link");
     l.setHref(
-      "#!Synapse:" +
+      "/Synapse:" +
       new Synapse(
         ownerObjectId,
         null,

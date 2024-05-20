@@ -1151,7 +1151,7 @@ public class SynapseJavascriptClientTest {
   @Test
   public void testPendingRequests()
     throws RequestException, JSONObjectAdapterException {
-    String currentUrl = "https://www.synapse.org/#!Team:9123";
+    String currentUrl = "https://www.synapse.org/Team:9123";
     when(mockRequest1.isPending()).thenReturn(false);
     when(mockRequest2.isPending()).thenReturn(true);
     when(mockGwt.getCurrentURL()).thenReturn(currentUrl);
@@ -1176,9 +1176,9 @@ public class SynapseJavascriptClientTest {
   @Test
   public void testCancelPendingRequestsForUrl()
     throws RequestException, JSONObjectAdapterException {
-    String url1 = "https://www.synapse.org/#!Team:1";
+    String url1 = "https://www.synapse.org/Team:1";
     when(mockRequest1.isPending()).thenReturn(true);
-    String url2 = "https://www.synapse.org/#!Team:2";
+    String url2 = "https://www.synapse.org/Team:2";
     when(mockRequest2.isPending()).thenReturn(true);
     when(mockGwt.getCurrentURL()).thenReturn(url1, url2);
 
@@ -1204,7 +1204,7 @@ public class SynapseJavascriptClientTest {
   @Test
   public void testDeleteRequestsCannotBeCancelled() throws RequestException {
     when(mockAuthController.isLoggedIn()).thenReturn(true);
-    String currentUrl = "https://www.synapse.org/#!Team:9123";
+    String currentUrl = "https://www.synapse.org/Team:9123";
     when(mockRequest1.isPending()).thenReturn(true);
     when(mockRequest2.isPending()).thenReturn(true);
     when(mockGwt.getCurrentURL()).thenReturn(currentUrl);
@@ -1219,7 +1219,7 @@ public class SynapseJavascriptClientTest {
 
   @Test
   public void testCreateRequestsCannotBeCancelled() throws RequestException {
-    String currentUrl = "https://www.synapse.org/#!Team:9123";
+    String currentUrl = "https://www.synapse.org/Team:9123";
     when(mockRequest1.isPending()).thenReturn(true);
     when(mockRequest2.isPending()).thenReturn(true);
     when(mockGwt.getCurrentURL()).thenReturn(currentUrl);

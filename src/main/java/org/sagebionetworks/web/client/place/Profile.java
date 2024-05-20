@@ -96,7 +96,7 @@ public class Profile extends Place {
     return teamId;
   }
 
-  @Prefix("!Profile")
+  @Prefix("Profile")
   public static class Tokenizer implements PlaceTokenizer<Profile> {
 
     @Override

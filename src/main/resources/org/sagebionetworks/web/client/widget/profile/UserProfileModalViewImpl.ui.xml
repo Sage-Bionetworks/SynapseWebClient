@@ -29,7 +29,7 @@
           <b:Anchor
             text="Settings"
             target="_blank"
-            href="#!Profile:v/settings"
+            href="/Profile:v/settings"
           />
           <bh:Text text="&nbsp;page." />
         </b:BlockQuote>

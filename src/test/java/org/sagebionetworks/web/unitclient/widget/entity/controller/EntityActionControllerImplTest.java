@@ -5204,7 +5204,7 @@ public class EntityActionControllerImplTest {
 
   @Test
   public void testReportViolation() {
-    String url = "https://www.synapse.org/#!Synapse:syn123";
+    String url = "https://www.synapse.org/Synapse:syn123";
     String ownerId = "4958725";
     String email = "email@address.com";
     String firstName = "Synapse";

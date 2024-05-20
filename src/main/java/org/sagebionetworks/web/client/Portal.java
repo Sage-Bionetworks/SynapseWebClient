@@ -48,13 +48,14 @@ public class Portal implements EntryPoint {
   public void onModuleLoad() {
     zeroOpacity(RootPanel.get("headerPanel"), RootPanel.get("rootPanel"));
     detectProxiedWebsiteAttack();
-    // we might need to reload using the new token scheme (required for SEO)
+    // Test to see if client is instructed to load via "#!" fragment.
+    // If detected, reload using a new path-based token scheme (required for SEO).
+    // The GWT History class assumes tokens begin with '#', and we used to include the '!' as the prefix for all GWT Places.
     String initToken = History.getToken();
-    if (initToken.length() > 0 && !initToken.startsWith("!")) {
+    if (initToken.length() > 0 && initToken.startsWith("!")) {
       String fullUrl = Window.Location.getHref();
-      fullUrl = fullUrl.replace("#" + initToken, "#!" + initToken);
-      Window.Location.replace(fullUrl);
-      Window.Location.reload();
+      fullUrl = fullUrl.replace("#!", "");
+      Window.Location.assign(fullUrl);
     } else {
       // This is a split point where the browser can download the first large code file.
       GWT.runAsync(
@@ -122,7 +123,10 @@ public class Portal implements EntryPoint {
                     AppPlaceHistoryMapper.class
                   );
                   final PlaceHistoryHandler historyHandler =
-                    new PlaceHistoryHandler(historyMapper);
+                    new PlaceHistoryHandler(
+                      historyMapper,
+                      new Html5Historian()
+                    );
                   historyHandler.register(
                     placeController,
                     eventBus,

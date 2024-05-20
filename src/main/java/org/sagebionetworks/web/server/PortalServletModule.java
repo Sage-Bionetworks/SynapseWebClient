@@ -2,8 +2,6 @@ package org.sagebionetworks.web.server;
 
 import com.amazonaws.services.appconfigdata.AWSAppConfigData;
 import com.amazonaws.services.kms.AWSKMS;
-import com.google.gwt.place.shared.PlaceTokenizer;
-import com.google.gwt.place.shared.WithTokenizers;
 import com.google.gwt.user.server.rpc.XsrfTokenServiceServlet;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
@@ -29,7 +27,6 @@ import org.sagebionetworks.aws.AwsClientFactory;
 import org.sagebionetworks.aws.SynapseS3Client;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
-import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.server.servlet.AliasRedirectorServlet;
 import org.sagebionetworks.web.server.servlet.AppConfigServlet;
 import org.sagebionetworks.web.server.servlet.ChallengeClientImpl;
@@ -54,7 +51,6 @@ import org.sagebionetworks.web.server.servlet.filter.AmpADFilter;
 import org.sagebionetworks.web.server.servlet.filter.DigitalHealthFilter;
 import org.sagebionetworks.web.server.servlet.filter.DreamFilter;
 import org.sagebionetworks.web.server.servlet.filter.MHealthFilter;
-import org.sagebionetworks.web.server.servlet.filter.PlacesRedirectFilter;
 import org.sagebionetworks.web.server.servlet.filter.RPCValidationFilter;
 import org.sagebionetworks.web.server.servlet.filter.RegisterAccountFilter;
 import org.sagebionetworks.web.server.servlet.filter.TimingFilter;
@@ -210,8 +206,6 @@ public class PortalServletModule extends ServletModule {
     // JSONObjectAdapter
     bind(JSONObjectAdapter.class).to(JSONObjectAdapterImpl.class);
 
-    handleGWTPlaces();
-
     // Catch-all. Note that "/*" would override all other servlet binding, and "/" overrides the default
     // handler
     // (which we need for GWT place handling).
@@ -233,17 +227,6 @@ public class PortalServletModule extends ServletModule {
   @Provides
   public SynapseS3Client provideAmazonS3Client() {
     return AwsClientFactory.createAmazonS3Client();
-  }
-
-  public void handleGWTPlaces() {
-    bind(PlacesRedirectFilter.class).in(Singleton.class);
-    Class<? extends PlaceTokenizer<?>>[] placeClasses =
-      AppPlaceHistoryMapper.class.getAnnotation(WithTokenizers.class).value();
-    for (Class<? extends PlaceTokenizer<?>> c : placeClasses) {
-      String simpleName = c.getEnclosingClass().getSimpleName();
-      String filterRegEx = "/" + simpleName + ":*";
-      filter(filterRegEx).through(PlacesRedirectFilter.class);
-    }
   }
 
   /**

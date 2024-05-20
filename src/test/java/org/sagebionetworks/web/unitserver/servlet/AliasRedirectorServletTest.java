@@ -156,6 +156,6 @@ public class AliasRedirectorServletTest {
     ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
     verify(mockResponse).sendRedirect(captor.capture());
     String v = captor.getValue();
-    assertTrue(v.contains("#!Error:"));
+    assertTrue(v.contains("Error:"));
   }
 }

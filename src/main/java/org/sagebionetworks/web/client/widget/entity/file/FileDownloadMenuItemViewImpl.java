@@ -42,7 +42,7 @@ public class FileDownloadMenuItemViewImpl implements FileDownloadMenuItemView {
   public void clear() {}
 
   private void clearClickHandlers() {
-    this.actionMenu.setActionHref(Action.DOWNLOAD_FILE, "#");
+    this.actionMenu.setActionHref(Action.DOWNLOAD_FILE, "/");
   }
 
   @Override

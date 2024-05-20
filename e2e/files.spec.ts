@@ -519,9 +519,10 @@ testAuth.describe('Files', () => {
       })
 
       await testAuth.step('remove file from trash can', async () => {
-        const fileCheckbox = userPage.getByRole('checkbox', {
-          name: `Select ${fileEntityId}`,
-        })
+        const fileCheckbox = userPage
+          .getByRole('row')
+          .filter({ hasText: fileEntityId })
+          .getByRole('checkbox')
         await expect(fileCheckbox).not.toBeChecked()
 
         // Currently programmatically dispatching the click event
@@ -540,6 +541,7 @@ testAuth.describe('Files', () => {
           userPage.getByText('Delete selected items from your Trash?'),
         ).toBeVisible()
         await userPage.getByRole('button', { name: 'Delete' }).click()
+        await expect(userPage.locator('.spinner:visible')).toHaveCount(0)
       })
 
       await testAuth.step(

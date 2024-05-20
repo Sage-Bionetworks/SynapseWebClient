@@ -51,9 +51,9 @@ public class WebConstants {
    */
   public static final String VALID_ANNOTATION_NAME_REGEX =
     "^[a-z,A-Z,0-9,_,.]+";
-  // support #!Place:token/with/delimiter, or standard http url
+  // support Place:token/with/delimiter, or standard http url
   public static final String VALID_URL_REGEX =
-    "([#]{1}[!]{1}[a-zA-Z_0-9:\\/]+)|(^((https?)|(ftp)):\\/\\/[-a-zA-Z0-9*+&@#\\/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#\\/%=~_|])";
+    "^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
   public static final String VALID_SFTP_URL_REGEX =
     "^sftp:\\/\\/[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
   // copied from org.sagebionetworks.repo.model.principal.AliasEnum.USER_NAME and USER_EMAIL, added

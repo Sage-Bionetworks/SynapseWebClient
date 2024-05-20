@@ -363,7 +363,7 @@ public class EntityBadgeTest {
     verify(mockPopupUtils)
       .showInfo(
         header.getName() + EntityBadge.ADDED_TO_DOWNLOAD_LIST,
-        "#!DownloadCart:0",
+        "DownloadCart:0",
         DisplayConstants.VIEW_DOWNLOAD_LIST
       );
     verify(mockEventBus).fireEvent(any(DownloadListUpdatedEvent.class));

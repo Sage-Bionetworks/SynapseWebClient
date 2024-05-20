@@ -24,7 +24,7 @@ public class LoginPlace extends Place {
     return token;
   }
 
-  @Prefix("!LoginPlace")
+  @Prefix("LoginPlace")
   public static class Tokenizer implements PlaceTokenizer<LoginPlace> {
 
     @Override

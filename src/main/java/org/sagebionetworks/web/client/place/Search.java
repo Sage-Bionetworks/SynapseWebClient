@@ -36,7 +36,7 @@ public class Search extends Place {
     return token;
   }
 
-  @Prefix("!Search")
+  @Prefix("Search")
   public static class Tokenizer implements PlaceTokenizer<Search> {
 
     @Override

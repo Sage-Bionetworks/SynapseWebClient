@@ -42,7 +42,7 @@ public class DownloadConfirmationProps extends ReactComponentProps {
     Callback onClose
   ) {
     DownloadConfirmationProps props = new DownloadConfirmationProps();
-    props.downloadCartPageUrl = "/#!DownloadCart:0";
+    props.downloadCartPageUrl = "/DownloadCart:0";
     props.getLastQueryRequest =
       new GetQueryRequest() {
         @Override

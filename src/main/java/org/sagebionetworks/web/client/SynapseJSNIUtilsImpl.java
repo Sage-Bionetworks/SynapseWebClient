@@ -7,7 +7,6 @@ import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.LinkElement;
 import com.google.gwt.dom.client.MetaElement;
 import com.google.gwt.dom.client.NodeList;
-import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Window.Location;
 import com.google.gwt.xhr.client.XMLHttpRequest;
@@ -24,9 +23,11 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 
   private static ProgressCallback progressCallback;
 
+  Html5Historian html5Historian = new Html5Historian();
+
   @Override
   public String getCurrentHistoryToken() {
-    return History.getToken();
+    return html5Historian.getToken();
   }
 
   @Override

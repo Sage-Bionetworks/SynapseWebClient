@@ -125,7 +125,7 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
   public void showFolderRestrictionsLink(String entityId) {
     folderViewTermsLink.setVisible(true);
     folderViewTermsLink.setHref(
-      "#!AccessRequirements:TYPE=ENTITY&ID=" + entityId
+      "/AccessRequirements:TYPE=ENTITY&ID=" + entityId
     );
     folderViewTermsLink.setTarget("_blank");
   }

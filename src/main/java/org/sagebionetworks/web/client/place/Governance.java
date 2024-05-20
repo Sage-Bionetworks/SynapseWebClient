@@ -16,7 +16,7 @@ public class Governance extends Place {
     return token;
   }
 
-  @Prefix("!Governance")
+  @Prefix("Governance")
   public static class Tokenizer implements PlaceTokenizer<Governance> {
 
     @Override
