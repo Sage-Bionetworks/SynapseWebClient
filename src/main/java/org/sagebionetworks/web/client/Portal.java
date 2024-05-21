@@ -40,10 +40,6 @@ public class Portal implements EntryPoint {
 		console.error(message);
 	}-*/;
 
-  public static final native void _consoleLog(String message) /*-{
-		console.log(message);
-	}-*/;
-
   public static PortalGinInjector getInjector() {
     return ginjector;
   }
@@ -85,7 +81,6 @@ public class Portal implements EntryPoint {
                   new AsyncCallback<JSONObjectAdapter>() {
                     @Override
                     public void onSuccess(JSONObjectAdapter config) {
-                      _consoleLog("configuration is: " + config.toJSONString());
                       ginjector
                         .getCookieProvider()
                         .setCookie(

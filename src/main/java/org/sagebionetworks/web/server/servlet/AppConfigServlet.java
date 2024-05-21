@@ -126,11 +126,11 @@ public class AppConfigServlet extends HttpServlet {
           e
         );
         return new JSONObjectAdapterImpl(DEFAULT_CONFIG_VALUE);
-      } catch (JSONObjectAdapterException exeption) {
+      } catch (JSONObjectAdapterException exception) {
         logger.log(
           Level.SEVERE,
           "JSONObjectAdapterException occurred in default configuration",
-          e
+          exception
         );
       }
     }
