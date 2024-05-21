@@ -105,40 +105,49 @@ public class AppConfigServletTest {
     servlet.doGet(mockRequest, mockResponse);
 
     // Verify the response contains the expected configuration value
+    verify(mockResponse).setContentType("application/json");
     assertEquals(mockConfiguration.toString(), responseWriter.toString());
   }
 
-  //  @Test
-  //  public void testGetLatestConfiguration_Success() {
-  //    ByteBuffer mockByteBuffer = ByteBuffer.wrap("{\"test configuration\":true}".getBytes()).asReadOnlyBuffer();
-  //    GetLatestConfigurationResult mockConfigResult = new GetLatestConfigurationResult()
-  //            .withConfiguration(mockByteBuffer)
-  //            .withNextPollConfigurationToken("new-mock-token");
-  //
-  //    when(mockAppConfigDataClient.getLatestConfiguration(any(GetLatestConfigurationRequest.class)))
-  //            .thenReturn(mockConfigResult);
-  //
-  //    servlet.configurationToken = "mockToken"; // Setting the initial configuration token
-  //    JSONObjectAdapter configValue = servlet.getLatestConfiguration();
-  //
-  //    assertEquals(mockConfiguration.toString(), configValue.toString());
-  //    assertEquals("new-mock-token", servlet.configurationToken);
-  //  }
-  //
-  //  @Test
-  //  public void testGetLatestConfiguration_Failure() {
-  //    when(
-  //      mockAppConfigDataClient.getLatestConfiguration(
-  //        any(GetLatestConfigurationRequest.class)
-  //      )
-  //    )
-  //      .thenThrow(new RuntimeException("Failed to retrieve configuration"));
-  //
-  //    servlet.configurationToken = "mockToken"; // Setting the initial configuration token
-  //    JSONObjectAdapter configValue = servlet.getLatestConfiguration();
-  //
-  //    assertEquals(mockConfiguration, configValue);
-  //  }
+  @Test
+  public void testGetLatestConfiguration_Success() {
+    ByteBuffer mockByteBuffer = ByteBuffer
+      .wrap("{\"test configuration\":true}".getBytes())
+      .asReadOnlyBuffer();
+    GetLatestConfigurationResult mockConfigResult =
+      new GetLatestConfigurationResult()
+        .withConfiguration(mockByteBuffer)
+        .withNextPollConfigurationToken("new-mock-token");
+
+    when(
+      mockAppConfigDataClient.getLatestConfiguration(
+        any(GetLatestConfigurationRequest.class)
+      )
+    )
+      .thenReturn(mockConfigResult);
+
+    servlet.configurationToken = "mockToken"; // Setting the initial configuration token
+    JSONObjectAdapter configValue = servlet.getLatestConfiguration();
+
+    assertEquals(mockConfiguration.toString(), configValue.toString());
+    assertEquals("new-mock-token", servlet.configurationToken);
+  }
+
+  @Test
+  public void testGetLatestConfiguration_Failure() {
+    String DEFAULT_CONFIG_VALUE = "{}";
+    when(
+      mockAppConfigDataClient.getLatestConfiguration(
+        any(GetLatestConfigurationRequest.class)
+      )
+    )
+      .thenThrow(new RuntimeException("Failed to retrieve configuration"));
+
+    servlet.configurationToken = "mockToken"; // Setting the initial configuration token
+    JSONObjectAdapter configValue = servlet.getLatestConfiguration();
+
+    assertEquals(DEFAULT_CONFIG_VALUE, configValue.toString());
+  }
 
   @Test
   public void testInitializeAppConfigClient() {

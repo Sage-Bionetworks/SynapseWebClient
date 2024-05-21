@@ -105,28 +105,34 @@ public class AppConfigServlet extends HttpServlet {
       GetLatestConfigurationResult latestConfigResponse =
         appConfigDataClient.getLatestConfiguration(latestConfigRequest);
       configurationToken = latestConfigResponse.getNextPollConfigurationToken();
-      ByteBuffer configData = latestConfigResponse
+      ByteBuffer readOnlyConfigData = latestConfigResponse
         .getConfiguration()
         .asReadOnlyBuffer();
+      byte[] bytes = new byte[readOnlyConfigData.remaining()];
+      readOnlyConfigData.get(bytes);
       String newConfigString = new String(
-        configData.array(),
+        bytes,
         java.nio.charset.StandardCharsets.UTF_8
-      ); // This may be empty if the client already has the latest version of the configuration.
+      );
+
       if (!newConfigString.isEmpty()) {
         lastConfigValue = new JSONObjectAdapterImpl(newConfigString);
       }
-    } catch (JSONObjectAdapterException e) {
-      logger.log(
-        Level.SEVERE,
-        "JSONObjectAdapterException occurred, returning default configuration",
-        e
-      );
     } catch (Exception e) {
-      logger.log(
-        Level.SEVERE,
-        "Failed to get or parse latest configuration",
-        e
-      );
+      try {
+        logger.log(
+          Level.SEVERE,
+          "Failed to get or parse latest configuration, returning default configuration",
+          e
+        );
+        return new JSONObjectAdapterImpl(DEFAULT_CONFIG_VALUE);
+      } catch (JSONObjectAdapterException exeption) {
+        logger.log(
+          Level.SEVERE,
+          "JSONObjectAdapterException occurred in default configuration",
+          e
+        );
+      }
     }
     return lastConfigValue;
   }
@@ -141,7 +147,7 @@ public class AppConfigServlet extends HttpServlet {
     try {
       JSONObjectAdapter configValue = configSupplier.get();
       response.setContentType("application/json");
-      response.getWriter().write(configValue.toJSONString());
+      response.getWriter().write(configValue.toString());
     } catch (Exception e) {
       response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
       response
