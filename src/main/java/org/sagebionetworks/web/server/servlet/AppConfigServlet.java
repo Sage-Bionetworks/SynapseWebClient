@@ -61,9 +61,9 @@ public class AppConfigServlet extends HttpServlet {
   }
 
   public void startConfigurationSession() {
-    String stack = stackConfiguration.getStack();
-    String stackInstance = stackConfiguration.getStackInstance();
     try {
+      String stack = stackConfiguration.getStack();
+      String stackInstance = stackConfiguration.getStackInstance();
       StartConfigurationSessionRequest sessionRequest =
         new StartConfigurationSessionRequest()
           .withApplicationIdentifier(
@@ -96,6 +96,7 @@ public class AppConfigServlet extends HttpServlet {
   public JSONObjectAdapter getLatestConfiguration() {
     try {
       if (configurationToken == null) {
+        logger.log(Level.SEVERE, "returning default config");
         return new JSONObjectAdapterImpl(DEFAULT_CONFIG_VALUE);
       }
       GetLatestConfigurationRequest latestConfigRequest =
@@ -140,7 +141,7 @@ public class AppConfigServlet extends HttpServlet {
     try {
       JSONObjectAdapter configValue = configSupplier.get();
       response.setContentType("application/json");
-      response.getWriter().write(configValue.toString());
+      response.getWriter().write(configValue.toJSONString());
     } catch (Exception e) {
       response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
       response
