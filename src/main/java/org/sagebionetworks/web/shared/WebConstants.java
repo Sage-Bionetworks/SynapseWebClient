@@ -241,7 +241,7 @@ public class WebConstants {
   public static final String ALIAS_REDIRECTOR_SERVLET = "aliasredirector";
   public static final String ALIAS_PARAM_KEY = "alias";
   public static final String SLACK_SERVLET = "slack";
-  public static final String APPCONFIG_SERVLET = "appconfig";
+  public static final String APPCONFIG_SERVLET = "feature-flags";
   public static final String VERSIONS_SERVLET = "versions";
   public static final String FILE_HANDLE_UPLOAD_SERVLET = "filehandle";
   public static final String JSON_LD_CONTENT_SERVLET = "jsonldcontent";
@@ -402,6 +402,7 @@ public class WebConstants {
     "User requests that the Synapse Access and Compliance Team send them information on how to access this data.";
   public static final String ISSUE_PRIORITY_MINOR = "4";
   public static final String ANONYMOUS = "Anonymous";
+  public static final String PORTAL_FEATURE_FLAG = "portal_feature_flag";
 
   // report Synapse error
   public static final String SWC_ISSUE_COLLECTOR_URL =

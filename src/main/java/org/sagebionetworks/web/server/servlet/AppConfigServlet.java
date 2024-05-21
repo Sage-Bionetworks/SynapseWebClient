@@ -19,17 +19,19 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.aws.AwsClientFactory;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.shared.WebConstants;
 
 public class AppConfigServlet extends HttpServlet {
 
   public AWSAppConfigData appConfigDataClient;
-  public Supplier<String> configSupplier;
+  public Supplier<JSONObjectAdapter> configSupplier;
   public String configurationToken;
   private StackConfiguration stackConfiguration;
-  private final String defaultConfigValue =
-    "{\"default configuration\":\"true\"}";
-
-  private String lastConfigValue = "";
+  private final String DEFAULT_CONFIG_VALUE = "{}";
+  private JSONObjectAdapter lastConfigValue;
 
   private static final Logger logger = Logger.getLogger(
     AppConfigServlet.class.getName()
@@ -59,31 +61,25 @@ public class AppConfigServlet extends HttpServlet {
   }
 
   public void startConfigurationSession() {
+    String stack = stackConfiguration.getStack();
+    String stackInstance = stackConfiguration.getStackInstance();
     try {
       StartConfigurationSessionRequest sessionRequest =
         new StartConfigurationSessionRequest()
           .withApplicationIdentifier(
-            stackConfiguration.getStack() +
-            "-" +
-            stackConfiguration.getStackInstance() +
-            "-portal-AppConfigApp"
+            stack + "-" + stackInstance + "-portal-AppConfigApp"
           )
           .withEnvironmentIdentifier(
-            stackConfiguration.getStack() +
-            "-" +
-            stackConfiguration.getStackInstance() +
-            "-portal-environment"
+            stack + "-" + stackInstance + "-portal-environment"
           )
           .withConfigurationProfileIdentifier(
-            stackConfiguration.getStack() +
-            "-" +
-            stackConfiguration.getStackInstance() +
-            "-portal-configurations"
+            stack + "-" + stackInstance + "-portal-configurations"
           );
       StartConfigurationSessionResult sessionResponse =
         appConfigDataClient.startConfigurationSession(sessionRequest);
       configurationToken = sessionResponse.getInitialConfigurationToken();
     } catch (Exception e) {
+      logger.log(Level.SEVERE, "Error starting configuration session", e);
       configurationToken = null;
     }
   }
@@ -97,38 +93,54 @@ public class AppConfigServlet extends HttpServlet {
       );
   }
 
-  public String getLatestConfiguration() {
-    if (configurationToken == null) {
-      return defaultConfigValue;
-    }
+  public JSONObjectAdapter getLatestConfiguration() {
     try {
+      if (configurationToken == null) {
+        return new JSONObjectAdapterImpl(DEFAULT_CONFIG_VALUE);
+      }
       GetLatestConfigurationRequest latestConfigRequest =
         new GetLatestConfigurationRequest()
           .withConfigurationToken(configurationToken);
       GetLatestConfigurationResult latestConfigResponse =
         appConfigDataClient.getLatestConfiguration(latestConfigRequest);
       configurationToken = latestConfigResponse.getNextPollConfigurationToken();
-      ByteBuffer configData = latestConfigResponse.getConfiguration();
-      String newConfigValue = new String(
+      ByteBuffer configData = latestConfigResponse
+        .getConfiguration()
+        .asReadOnlyBuffer();
+      String newConfigString = new String(
         configData.array(),
         java.nio.charset.StandardCharsets.UTF_8
       ); // This may be empty if the client already has the latest version of the configuration.
-      if (!newConfigValue.isEmpty()) {
-        lastConfigValue = newConfigValue;
+      if (!newConfigString.isEmpty()) {
+        lastConfigValue = new JSONObjectAdapterImpl(newConfigString);
       }
-      return lastConfigValue;
+    } catch (JSONObjectAdapterException e) {
+      logger.log(
+        Level.SEVERE,
+        "JSONObjectAdapterException occurred, returning default configuration",
+        e
+      );
     } catch (Exception e) {
-      return defaultConfigValue;
+      logger.log(
+        Level.SEVERE,
+        "Failed to get or parse latest configuration",
+        e
+      );
     }
+    return lastConfigValue;
   }
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
+    response.setHeader(
+      WebConstants.CACHE_CONTROL_KEY,
+      WebConstants.CACHE_CONTROL_VALUE_NO_CACHE
+    );
     try {
-      String configValue = configSupplier.get();
-      response.setContentType("text/plain");
-      response.getWriter().write(configValue);
+      JSONObjectAdapter configValue = configSupplier.get();
+      response.setContentType("application/json");
+      response.getWriter().write(configValue.toString());
     } catch (Exception e) {
       response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
       response

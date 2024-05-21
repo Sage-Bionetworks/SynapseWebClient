@@ -3004,8 +3004,8 @@ public class SynapseJavascriptClient {
     );
   }
 
-  public void getFeatureFlagConfig(AsyncCallback<String> cb) {
-    doGet(jsniUtils.getAppConfigServletUrl(), OBJECT_TYPE.String, cb);
+  public void getFeatureFlagConfig(AsyncCallback<JSONObjectAdapter> cb) {
+    doGet(jsniUtils.getAppConfigServletUrl(), OBJECT_TYPE.JSON, cb);
   }
 
   public void getAvailableEvaluations(
