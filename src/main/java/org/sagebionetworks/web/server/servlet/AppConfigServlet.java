@@ -10,6 +10,8 @@ import com.google.gwt.thirdparty.guava.common.base.Suppliers;
 import com.google.inject.Inject;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -108,12 +110,8 @@ public class AppConfigServlet extends HttpServlet {
       ByteBuffer readOnlyConfigData = latestConfigResponse
         .getConfiguration()
         .asReadOnlyBuffer();
-      byte[] bytes = new byte[readOnlyConfigData.remaining()];
-      readOnlyConfigData.get(bytes);
-      String newConfigString = new String(
-        bytes,
-        java.nio.charset.StandardCharsets.UTF_8
-      );
+      CharBuffer charBuffer = StandardCharsets.UTF_8.decode(readOnlyConfigData);
+      String newConfigString = charBuffer.toString();
 
       if (!newConfigString.isEmpty()) {
         lastConfigValue = new JSONObjectAdapterImpl(newConfigString);
