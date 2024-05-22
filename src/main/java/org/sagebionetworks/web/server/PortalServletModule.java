@@ -1,6 +1,9 @@
 package org.sagebionetworks.web.server;
 
+import com.amazonaws.services.appconfigdata.AWSAppConfigData;
+import com.amazonaws.services.kms.AWSKMS;
 import com.google.gwt.user.server.rpc.XsrfTokenServiceServlet;
+import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.name.Names;
 import com.google.inject.servlet.ServletModule;
@@ -10,9 +13,22 @@ import java.util.Iterator;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.sagebionetworks.ConfigurationProperties;
+import org.sagebionetworks.ConfigurationPropertiesImpl;
+import org.sagebionetworks.LoggerProvider;
+import org.sagebionetworks.LoggerProviderImpl;
+import org.sagebionetworks.PropertyProvider;
+import org.sagebionetworks.PropertyProviderImpl;
+import org.sagebionetworks.StackConfiguration;
+import org.sagebionetworks.StackConfigurationImpl;
+import org.sagebionetworks.StackEncrypter;
+import org.sagebionetworks.StackEncrypterImpl;
+import org.sagebionetworks.aws.AwsClientFactory;
+import org.sagebionetworks.aws.SynapseS3Client;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.server.servlet.AliasRedirectorServlet;
+import org.sagebionetworks.web.server.servlet.AppConfigServlet;
 import org.sagebionetworks.web.server.servlet.ChallengeClientImpl;
 import org.sagebionetworks.web.server.servlet.DataAccessClientImpl;
 import org.sagebionetworks.web.server.servlet.DiscussionForumClientImpl;
@@ -129,6 +145,11 @@ public class PortalServletModule extends ServletModule {
     bind(SlackServlet.class).in(Singleton.class);
     serve("/Portal/" + WebConstants.SLACK_SERVLET).with(SlackServlet.class);
 
+    // AppConfig handler
+    bind(AppConfigServlet.class).in(Singleton.class);
+    serve("/Portal/" + WebConstants.APPCONFIG_SERVLET)
+      .with(AppConfigServlet.class);
+
     // Versions handler
     bind(VersionsServlet.class).in(Singleton.class);
     serve("/Portal/" + WebConstants.VERSIONS_SERVLET)
@@ -176,6 +197,12 @@ public class PortalServletModule extends ServletModule {
     // Bind the properties from the config file
     bindPropertiesFromFile("ServerConstants.properties");
 
+    bind(LoggerProvider.class).to(LoggerProviderImpl.class);
+    bind(PropertyProvider.class).to(PropertyProviderImpl.class);
+    bind(ConfigurationProperties.class).to(ConfigurationPropertiesImpl.class);
+    bind(StackConfiguration.class).to(StackConfigurationImpl.class);
+    bind(StackEncrypter.class).to(StackEncrypterImpl.class);
+
     // JSONObjectAdapter
     bind(JSONObjectAdapter.class).to(JSONObjectAdapterImpl.class);
 
@@ -185,6 +212,21 @@ public class PortalServletModule extends ServletModule {
     // This is also where project aliases are handled.
     bind(ProjectAliasServlet.class).in(Singleton.class);
     serveRegex("^\\/\\w+$").with(ProjectAliasServlet.class);
+  }
+
+  @Provides
+  public AWSAppConfigData provideAppConfigDataClient() {
+    return AwsClientFactory.createAppConfigClient();
+  }
+
+  @Provides
+  public AWSKMS provideAWSKMSClient() {
+    return AwsClientFactory.createAmazonKeyManagementServiceClient();
+  }
+
+  @Provides
+  public SynapseS3Client provideAmazonS3Client() {
+    return AwsClientFactory.createAmazonS3Client();
   }
 
   /**

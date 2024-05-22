@@ -10,13 +10,16 @@ import com.google.gwt.place.shared.PlaceHistoryHandler;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
+import org.sagebionetworks.web.shared.WebConstants;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -71,6 +74,30 @@ public class Portal implements EntryPoint {
             try {
               // make sure jsni utils code is available to the client
               ginjector.getSynapseJSNIUtils();
+
+              ginjector
+                .getSynapseJavascriptClient()
+                .getFeatureFlagConfig(
+                  new AsyncCallback<JSONObjectAdapter>() {
+                    @Override
+                    public void onSuccess(JSONObjectAdapter config) {
+                      ginjector
+                        .getCookieProvider()
+                        .setCookie(
+                          WebConstants.PORTAL_FEATURE_FLAG,
+                          config.toString()
+                        );
+                    }
+
+                    @Override
+                    public void onFailure(Throwable reason) {
+                      _consoleError(
+                        "Error getting feature flag configuration:" +
+                        reason.getMessage()
+                      );
+                    }
+                  }
+                );
 
               ginjector
                 .getSynapseProperties()
