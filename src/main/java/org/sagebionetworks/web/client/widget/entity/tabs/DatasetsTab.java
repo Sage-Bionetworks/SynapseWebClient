@@ -8,6 +8,7 @@ import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.table.EntityRefCollectionView;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.FeatureFlagConfig;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -30,10 +31,15 @@ public class DatasetsTab extends AbstractTablesTab {
     "Use Datasets to produce and distribute an immutable set of files found across one or more Projects or Folders. ";
 
   @Inject
-  public DatasetsTab(Tab tab, PortalGinInjector ginInjector) {
-    super(tab, ginInjector);
+  public DatasetsTab(
+    Tab tab,
+    PortalGinInjector ginInjector,
+    FeatureFlagConfig featureFlagConfig
+  ) {
+    super(tab, ginInjector, featureFlagConfig);
     this.tab = tab;
     this.ginInjector = ginInjector;
+    this.featureFlagConfig = featureFlagConfig;
     String help = DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider())
       ? DATASETS_AND_COLLECTIONS_HELP
       : DATASETS_HELP;

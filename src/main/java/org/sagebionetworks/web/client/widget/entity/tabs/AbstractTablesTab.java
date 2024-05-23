@@ -25,6 +25,8 @@ import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
+import org.sagebionetworks.web.client.FeatureFlagConfig;
+import org.sagebionetworks.web.client.FeatureFlagKey;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -96,6 +98,7 @@ public abstract class AbstractTablesTab
   WikiPageWidget wikiPageWidget;
   Long latestSnapshotVersionNumber;
   SynapseJavascriptClient jsClient;
+  FeatureFlagConfig featureFlagConfig;
 
   protected abstract EntityArea getTabArea();
 
@@ -110,9 +113,14 @@ public abstract class AbstractTablesTab
   protected abstract boolean isEntityShownInTab(Entity entity);
 
   @Inject
-  public AbstractTablesTab(Tab tab, PortalGinInjector ginInjector) {
+  public AbstractTablesTab(
+    Tab tab,
+    PortalGinInjector ginInjector,
+    FeatureFlagConfig featureFlagConfig
+  ) {
     this.tab = tab;
     this.ginInjector = ginInjector;
+    this.featureFlagConfig = featureFlagConfig;
   }
 
   public void configure(
@@ -306,7 +314,11 @@ public abstract class AbstractTablesTab
       WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY,
       DisplayUtils.createEntityVersionString(entityId, newVersion)
     );
-    if (DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider())) {
+    if (
+      featureFlagConfig.isFeatureEnabled(
+        FeatureFlagKey.PROVENANCE_V2_VISUALIZATION.getKey()
+      )
+    ) {
       ProvenanceWidget provWidget = ginInjector.getProvenanceRendererV2();
       view.setProvenance(provWidget);
       provWidget.configure(configMap);
