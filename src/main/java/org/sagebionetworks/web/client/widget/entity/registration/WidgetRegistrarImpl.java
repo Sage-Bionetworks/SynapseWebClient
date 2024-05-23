@@ -73,7 +73,6 @@ import static org.sagebionetworks.web.shared.WidgetConstants.YOUTUBE_FRIENDLY_NA
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.RunAsyncCallback;
-import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.inject.Inject;
@@ -83,14 +82,13 @@ import java.util.Map;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.FeatureFlagConfigFactory;
+import org.sagebionetworks.web.client.FeatureFlagConfig;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadWikiWidgetWrapper;
-import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
@@ -103,17 +101,17 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 
   PortalGinInjector ginInjector;
   JSONObjectAdapter adapter;
-  FeatureFlagConfigFactory configFactory;
+  FeatureFlagConfig featureFlagConfig;
 
   @Inject
   public WidgetRegistrarImpl(
     PortalGinInjector ginInjector,
     JSONObjectAdapter adapter,
-    FeatureFlagConfigFactory configFactory
+    FeatureFlagConfig featureFlagConfig
   ) {
     this.ginInjector = ginInjector;
     this.adapter = adapter;
-    this.configFactory = configFactory;
+    this.featureFlagConfig = featureFlagConfig;
     initWithKnownWidgets();
   }
 
@@ -326,17 +324,12 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
     String contentTypeKey
   ) {
     WidgetRendererPresenter presenter = null;
-    configFactory.create(
-      ginInjector
-        .getCookieProvider()
-        .getCookie(WebConstants.PORTAL_FEATURE_FLAG)
-    );
     if (contentTypeKey.equals(BOOKMARK_CONTENT_TYPE)) {
       presenter = ginInjector.getBookmarkRenderer();
     } else if (contentTypeKey.equals(REFERENCE_CONTENT_TYPE)) {
       presenter = ginInjector.getReferenceRenderer();
     } else if (contentTypeKey.equals(PROVENANCE_CONTENT_TYPE)) {
-      if (configFactory.isFeatureEnabled("Provenance v2 visualization")) {
+      if (featureFlagConfig.isFeatureEnabled("Provenance v2 visualization")) {
         presenter = ginInjector.getProvenanceRendererV2();
       } else {
         presenter = ginInjector.getProvenanceRenderer();

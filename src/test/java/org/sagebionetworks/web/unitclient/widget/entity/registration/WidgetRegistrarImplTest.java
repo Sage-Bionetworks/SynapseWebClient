@@ -1,8 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.entity.registration;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -17,8 +15,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.FeatureFlagConfigFactory;
+import org.sagebionetworks.web.client.FeatureFlagConfig;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
@@ -35,7 +32,7 @@ public class WidgetRegistrarImplTest {
   PortalGinInjector mockGinInjector;
 
   @Mock
-  FeatureFlagConfigFactory mockConfigFactory;
+  FeatureFlagConfig mockFeatureFlagConfig;
 
   Map<String, String> testImageWidgetDescriptor;
   String testFileName = "testfile.png";
@@ -56,7 +53,7 @@ public class WidgetRegistrarImplTest {
       new WidgetRegistrarImpl(
         mockGinInjector,
         new JSONObjectAdapterImpl(),
-        mockConfigFactory
+        mockFeatureFlagConfig
       );
     testImageWidgetDescriptor = new HashMap<String, String>();
     when(mockGinInjector.getCookieProvider()).thenReturn(mockCookies);
@@ -91,7 +88,7 @@ public class WidgetRegistrarImplTest {
     );
     verify(mockGinInjector, times(3)).getSynapseAPICallRenderer();
 
-    when(mockConfigFactory.isFeatureEnabled("Provenance v2 visualization"))
+    when(mockFeatureFlagConfig.isFeatureEnabled("Provenance v2 visualization"))
       .thenReturn(true);
     widgetRegistrar.getWidgetRendererForWidgetDescriptorAfterLazyLoad(
       WidgetConstants.PROVENANCE_CONTENT_TYPE

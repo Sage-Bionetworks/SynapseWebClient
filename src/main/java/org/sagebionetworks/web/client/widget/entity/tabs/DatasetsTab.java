@@ -8,7 +8,7 @@ import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.table.EntityRefCollectionView;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.FeatureFlagConfigFactory;
+import org.sagebionetworks.web.client.FeatureFlagConfig;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -34,12 +34,12 @@ public class DatasetsTab extends AbstractTablesTab {
   public DatasetsTab(
     Tab tab,
     PortalGinInjector ginInjector,
-    FeatureFlagConfigFactory configFactory
+    FeatureFlagConfig featureFlagConfig
   ) {
-    super(tab, ginInjector, configFactory);
+    super(tab, ginInjector, featureFlagConfig);
     this.tab = tab;
     this.ginInjector = ginInjector;
-    this.configFactory = configFactory;
+    this.featureFlagConfig = featureFlagConfig;
     String help = DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider())
       ? DATASETS_AND_COLLECTIONS_HELP
       : DATASETS_HELP;

@@ -64,17 +64,17 @@ public class FilesTab {
   CallbackP<String> entitySelectedCallback;
   ProvenanceWidget provWidget;
   AddToDownloadListV2 addToDownloadListWidget;
-  FeatureFlagConfigFactory configFactory;
+  FeatureFlagConfig featureFlagConfig;
 
   @Inject
   public FilesTab(
     Tab tab,
     PortalGinInjector ginInjector,
-    FeatureFlagConfigFactory configFactory
+    FeatureFlagConfig featureFlagConfig
   ) {
     this.tab = tab;
     this.ginInjector = ginInjector;
-    this.configFactory = configFactory;
+    this.featureFlagConfig = featureFlagConfig;
     tab.configure(
       "Files",
       "file",
@@ -313,13 +313,8 @@ public class FilesTab {
       DisplayUtils.createEntityVersionString(currentEntityId, versionNumber)
     );
     view.setProvenanceVisible(isFile);
-    configFactory.create(
-      ginInjector
-        .getCookieProvider()
-        .getCookie(WebConstants.PORTAL_FEATURE_FLAG)
-    );
     if (isFile) {
-      if (configFactory.isFeatureEnabled("Provenance v2 visualization")) {
+      if (featureFlagConfig.isFeatureEnabled("Provenance v2 visualization")) {
         provWidget = ginInjector.getProvenanceRendererV2();
         view.setProvenance(provWidget.asWidget());
         provWidget.configure(configMap);

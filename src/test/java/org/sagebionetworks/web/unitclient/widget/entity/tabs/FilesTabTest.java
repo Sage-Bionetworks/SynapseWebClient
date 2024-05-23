@@ -13,7 +13,6 @@ import static org.mockito.Mockito.when;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.Widget;
-import java.util.Date;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,7 +31,7 @@ import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.FileHandle;
-import org.sagebionetworks.web.client.FeatureFlagConfigFactory;
+import org.sagebionetworks.web.client.FeatureFlagConfig;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -173,7 +172,7 @@ public class FilesTabTest {
   CookieProvider mockCookies;
 
   @Mock
-  FeatureFlagConfigFactory mockConfigFactory;
+  FeatureFlagConfig mockFeatureFlagConfig;
 
   FilesTab tab;
   String projectEntityId = "syn9";
@@ -197,7 +196,7 @@ public class FilesTabTest {
       .thenReturn(mockEntityRefreshAlert);
     when(mockTab.getEntityActionMenu()).thenReturn(mockActionMenuWidget);
 
-    tab = new FilesTab(mockTab, mockPortalGinInjector, mockConfigFactory);
+    tab = new FilesTab(mockTab, mockPortalGinInjector, mockFeatureFlagConfig);
 
     when(mockPortalGinInjector.getFilesTabView()).thenReturn(mockView);
     when(mockPortalGinInjector.getBasicTitleBar()).thenReturn(mockTitleBar);
