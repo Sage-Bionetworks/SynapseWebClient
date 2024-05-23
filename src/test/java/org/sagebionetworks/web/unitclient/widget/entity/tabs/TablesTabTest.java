@@ -46,6 +46,7 @@ import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.FeatureFlagConfigFactory;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -168,6 +169,9 @@ public class TablesTabTest {
   @Mock
   SynapseJavascriptClient mockJsClient;
 
+  @Mock
+  FeatureFlagConfigFactory mockConfigFactory;
+
   @Captor
   ArgumentCaptor<Map<String, String>> mapCaptor;
 
@@ -179,7 +183,7 @@ public class TablesTabTest {
 
   @Before
   public void setUp() {
-    tab = new TablesTab(mockTab, mockPortalGinInjector);
+    tab = new TablesTab(mockTab, mockPortalGinInjector, mockConfigFactory);
     when(mockTab.getEntityActionMenu()).thenReturn(mockActionMenuWidget);
     when(mockPortalGinInjector.getCookieProvider()).thenReturn(mockCookies);
     when(mockPortalGinInjector.getTablesTabView()).thenReturn(mockView);

@@ -32,6 +32,7 @@ import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.web.client.FeatureFlagConfigFactory;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -171,6 +172,9 @@ public class FilesTabTest {
   @Mock
   CookieProvider mockCookies;
 
+  @Mock
+  FeatureFlagConfigFactory mockConfigFactory;
+
   FilesTab tab;
   String projectEntityId = "syn9";
   String projectName = "proyecto";
@@ -193,7 +197,7 @@ public class FilesTabTest {
       .thenReturn(mockEntityRefreshAlert);
     when(mockTab.getEntityActionMenu()).thenReturn(mockActionMenuWidget);
 
-    tab = new FilesTab(mockTab, mockPortalGinInjector);
+    tab = new FilesTab(mockTab, mockPortalGinInjector, mockConfigFactory);
 
     when(mockPortalGinInjector.getFilesTabView()).thenReturn(mockView);
     when(mockPortalGinInjector.getBasicTitleBar()).thenReturn(mockTitleBar);

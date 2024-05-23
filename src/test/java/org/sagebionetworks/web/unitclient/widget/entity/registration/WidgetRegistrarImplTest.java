@@ -18,6 +18,7 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.FeatureFlagConfigFactory;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
@@ -32,6 +33,9 @@ public class WidgetRegistrarImplTest {
 
   @Mock
   PortalGinInjector mockGinInjector;
+
+  @Mock
+  FeatureFlagConfigFactory mockConfigFactory;
 
   Map<String, String> testImageWidgetDescriptor;
   String testFileName = "testfile.png";
@@ -49,7 +53,11 @@ public class WidgetRegistrarImplTest {
   public void setup() {
     MockitoAnnotations.initMocks(this);
     widgetRegistrar =
-      new WidgetRegistrarImpl(mockGinInjector, new JSONObjectAdapterImpl());
+      new WidgetRegistrarImpl(
+        mockGinInjector,
+        new JSONObjectAdapterImpl(),
+        mockConfigFactory
+      );
     testImageWidgetDescriptor = new HashMap<String, String>();
     when(mockGinInjector.getCookieProvider()).thenReturn(mockCookies);
   }
@@ -83,10 +91,8 @@ public class WidgetRegistrarImplTest {
     );
     verify(mockGinInjector, times(3)).getSynapseAPICallRenderer();
 
-    when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
-    )
-      .thenReturn("true");
+    when(mockConfigFactory.isFeatureEnabled("Provenance v2 visualization"))
+      .thenReturn(true);
     widgetRegistrar.getWidgetRendererForWidgetDescriptorAfterLazyLoad(
       WidgetConstants.PROVENANCE_CONTENT_TYPE
     );

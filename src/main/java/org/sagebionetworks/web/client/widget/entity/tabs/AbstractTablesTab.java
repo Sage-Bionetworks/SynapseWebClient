@@ -25,6 +25,7 @@ import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
+import org.sagebionetworks.web.client.FeatureFlagConfigFactory;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -45,6 +46,7 @@ import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.explore.TableEntityWidgetV2;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -96,6 +98,7 @@ public abstract class AbstractTablesTab
   WikiPageWidget wikiPageWidget;
   Long latestSnapshotVersionNumber;
   SynapseJavascriptClient jsClient;
+  FeatureFlagConfigFactory configFactory;
 
   protected abstract EntityArea getTabArea();
 
@@ -110,9 +113,14 @@ public abstract class AbstractTablesTab
   protected abstract boolean isEntityShownInTab(Entity entity);
 
   @Inject
-  public AbstractTablesTab(Tab tab, PortalGinInjector ginInjector) {
+  public AbstractTablesTab(
+    Tab tab,
+    PortalGinInjector ginInjector,
+    FeatureFlagConfigFactory configFactory
+  ) {
     this.tab = tab;
     this.ginInjector = ginInjector;
+    this.configFactory = configFactory;
   }
 
   public void configure(
@@ -306,7 +314,12 @@ public abstract class AbstractTablesTab
       WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY,
       DisplayUtils.createEntityVersionString(entityId, newVersion)
     );
-    if (DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider())) {
+    configFactory.create(
+      ginInjector
+        .getCookieProvider()
+        .getCookie(WebConstants.PORTAL_FEATURE_FLAG)
+    );
+    if (configFactory.isFeatureEnabled("Provenance v2 visualization")) {
       ProvenanceWidget provWidget = ginInjector.getProvenanceRendererV2();
       view.setProvenance(provWidget);
       provWidget.configure(configMap);

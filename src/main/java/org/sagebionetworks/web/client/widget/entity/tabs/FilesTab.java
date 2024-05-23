@@ -15,10 +15,7 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.VersionableEntity;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.*;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
@@ -67,11 +64,17 @@ public class FilesTab {
   CallbackP<String> entitySelectedCallback;
   ProvenanceWidget provWidget;
   AddToDownloadListV2 addToDownloadListWidget;
+  FeatureFlagConfigFactory configFactory;
 
   @Inject
-  public FilesTab(Tab tab, PortalGinInjector ginInjector) {
+  public FilesTab(
+    Tab tab,
+    PortalGinInjector ginInjector,
+    FeatureFlagConfigFactory configFactory
+  ) {
     this.tab = tab;
     this.ginInjector = ginInjector;
+    this.configFactory = configFactory;
     tab.configure(
       "Files",
       "file",
@@ -310,8 +313,13 @@ public class FilesTab {
       DisplayUtils.createEntityVersionString(currentEntityId, versionNumber)
     );
     view.setProvenanceVisible(isFile);
+    configFactory.create(
+      ginInjector
+        .getCookieProvider()
+        .getCookie(WebConstants.PORTAL_FEATURE_FLAG)
+    );
     if (isFile) {
-      if (DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider())) {
+      if (configFactory.isFeatureEnabled("Provenance v2 visualization")) {
         provWidget = ginInjector.getProvenanceRendererV2();
         view.setProvenance(provWidget.asWidget());
         provWidget.configure(configMap);

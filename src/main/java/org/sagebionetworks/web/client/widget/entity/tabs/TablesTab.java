@@ -8,6 +8,7 @@ import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.FeatureFlagConfigFactory;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -23,10 +24,15 @@ public class TablesTab extends AbstractTablesTab {
     WebConstants.DOCS_URL + "Tables.2011038095.html";
 
   @Inject
-  public TablesTab(Tab tab, PortalGinInjector ginInjector) {
-    super(tab, ginInjector);
+  public TablesTab(
+    Tab tab,
+    PortalGinInjector ginInjector,
+    FeatureFlagConfigFactory configFactory
+  ) {
+    super(tab, ginInjector, configFactory);
     this.tab = tab;
     this.ginInjector = ginInjector;
+    this.configFactory = configFactory;
     tab.configure(
       DisplayConstants.TABLES,
       "table",

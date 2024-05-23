@@ -44,6 +44,7 @@ import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.FeatureFlagConfigFactory;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -163,6 +164,9 @@ public class DatasetsTabTest {
   @Mock
   SynapseJavascriptClient mockJsClient;
 
+  @Mock
+  FeatureFlagConfigFactory mockConfigFactory;
+
   @Captor
   ArgumentCaptor<Map<String, String>> mapCaptor;
 
@@ -199,7 +203,7 @@ public class DatasetsTabTest {
     when(mockGlobalApplicationState.getPlaceChanger())
       .thenReturn(mockPlaceChanger);
 
-    tab = new DatasetsTab(mockTab, mockPortalGinInjector);
+    tab = new DatasetsTab(mockTab, mockPortalGinInjector, mockConfigFactory);
     tab.setEntitySelectedCallback(mockEntitySelectedCallback);
 
     when(mockProjectEntityBundle.getEntity()).thenReturn(mockProjectEntity);
