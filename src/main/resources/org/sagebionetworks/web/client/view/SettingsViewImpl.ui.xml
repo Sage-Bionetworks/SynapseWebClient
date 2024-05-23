@@ -174,52 +174,22 @@
             </bh:Div>
 
             <bh:Div addStyleNames="form-horizontal margin-15">
-              <b:Row ui:field="currentPassword" addStyleNames="form-group">
-                <b:Column size="SM_3" addStyleNames="control-label boldText">
-                  <bh:Text>Current password</bh:Text>
-                </b:Column>
-                <b:Column size="SM_8">
-                  <g:PasswordTextBox
-                    ui:field="currentPasswordField"
-                    addStyleNames="form-control"
-                  />
-                </b:Column>
-              </b:Row>
-              <b:Row ui:field="password1" addStyleNames="form-group">
-                <b:Column size="SM_3" addStyleNames="control-label boldText">
-                  <bh:Text>New password</bh:Text>
-                </b:Column>
-                <b:Column size="SM_8">
-                  <g:PasswordTextBox
-                    ui:field="password1Field"
-                    styleName="form-control"
-                  />
-                </b:Column>
-              </b:Row>
-              <b:Row ui:field="password2" addStyleNames="form-group">
-                <b:Column size="SM_3" addStyleNames="control-label boldText">
-                  <bh:Text>Confirm password</bh:Text>
-                </b:Column>
-                <b:Column size="SM_8">
-                  <g:PasswordTextBox
-                    ui:field="password2Field"
-                    styleName="form-control"
-                  />
-                </b:Column>
-              </b:Row>
               <b:Row>
                 <b:Column size="SM_12">
-                  <b:Button
-                    ui:field="changePasswordBtn"
-                    addStyleNames="margin-top-10 margin-bottom-10"
-                    text="Change Password"
-                  />
-                  <g:FlowPanel ui:field="forgotPasswordContainer" />
-                </b:Column>
-              </b:Row>
-              <b:Row>
-                <b:Column size="SM_12">
-                  <g:SimplePanel ui:field="passwordSynAlertPanel" />
+                  <g:FlowPanel addStyleNames="margin-top-10 margin-bottom-10">
+                    <b:Anchor
+                      target="_blank"
+                      href="https://accounts.sagebionetworks.synapse.org/authenticated/myaccount#ChangePassword"
+                      text="Change your password"
+                    />
+                  </g:FlowPanel>
+                  <g:FlowPanel addStyleNames="margin-top-10 margin-bottom-10">
+                    <b:Anchor
+                      target="_blank"
+                      href="https://accounts.sagebionetworks.synapse.org/resetPassword"
+                      text="Forgot password?"
+                    />
+                  </g:FlowPanel>
                 </b:Column>
               </b:Row>
             </bh:Div>

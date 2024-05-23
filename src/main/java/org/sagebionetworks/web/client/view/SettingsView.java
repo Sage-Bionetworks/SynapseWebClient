@@ -20,18 +20,11 @@ public interface SettingsView extends IsWidget, SynapseView {
    */
   public void render();
 
-  /**
-   * Shows the user that their password change succeeded
-   */
-  public void showPasswordChangeSuccess();
-
   public void updateNotificationCheckbox(UserProfile profile);
 
   void setEmailAddressesWidget(IsWidget w);
 
   public interface Presenter {
-    void resetPassword(String existingPassword, String newPassword);
-
     void goTo(Place place);
 
     void updateMyNotificationSettings(
@@ -44,8 +37,6 @@ public interface SettingsView extends IsWidget, SynapseView {
     void onEditProfile();
 
     void getAPIKey();
-
-    void changePassword();
 
     void setShowUTCTime(boolean isUTC);
 
@@ -66,27 +57,9 @@ public interface SettingsView extends IsWidget, SynapseView {
 
   public void setAPISynAlertWidget(IsWidget synAlert);
 
-  public void setPasswordSynAlertWidget(IsWidget synAlert);
-
   void hideAPIKey();
 
   void showConfirm(String message, Callback callback);
-
-  String getPassword1Field();
-
-  String getCurrentPasswordField();
-
-  String getPassword2Field();
-
-  void setCurrentPasswordInError(boolean inError);
-
-  void setPassword1InError(boolean inError);
-
-  void setPassword2InError(boolean inError);
-
-  void setChangePasswordEnabled(boolean isEnabled);
-
-  void resetChangePasswordUI();
 
   void setShowingUTCTime();
 

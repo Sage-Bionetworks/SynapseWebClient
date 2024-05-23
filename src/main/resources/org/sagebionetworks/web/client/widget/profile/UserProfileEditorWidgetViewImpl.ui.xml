@@ -162,7 +162,7 @@
                 addStyleNames="displayInlineBlock"
                 ui:field="changePasswordLink"
                 target="_blank"
-                href="/Profile:v/settings"
+                href="https://accounts.sagebionetworks.synapse.org/authenticated/myaccount#ChangePassword"
                 visible="false"
               >
                 Change password

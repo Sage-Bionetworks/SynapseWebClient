@@ -243,65 +243,6 @@ public class SettingsPresenterTest {
       .thenReturn(getDoneFuture(twoFactorDisabledStatus));
   }
 
-  @Test
-  public void testResetPassword() throws RestServiceException {
-    AsyncMockStubber
-      .callSuccessWith(profile)
-      .when(mockAuthenticationController)
-      .loginUser(eq(username), eq(password), any(AsyncCallback.class));
-    AsyncMockStubber
-      .callSuccessWith(null)
-      .when(mockSynapseJavascriptClient)
-      .changePassword(
-        any(ChangePasswordWithCurrentPassword.class),
-        any(AsyncCallback.class)
-      );
-    AsyncMockStubber
-      .callSuccessWith(profile)
-      .when(mockAuthenticationController)
-      .loginUser(eq(username), eq(newPassword), any(AsyncCallback.class));
-
-    presenter.resetPassword(password, newPassword);
-    verify(mockView).showPasswordChangeSuccess();
-  }
-
-  @Test
-  public void testResetPasswordFailChangePw() throws RestServiceException {
-    String errorMessage =
-      "pw change failed, could happen if user provides the incorrect current password";
-    Exception ex = new Exception(errorMessage);
-    AsyncMockStubber
-      .callFailureWith(ex)
-      .when(mockSynapseJavascriptClient)
-      .changePassword(
-        any(ChangePasswordWithCurrentPassword.class),
-        any(AsyncCallback.class)
-      );
-
-    presenter.resetPassword(password, newPassword);
-    verify(mockSynAlert).clear();
-    verify(mockSynAlert).showError(errorMessage);
-  }
-
-  @Test
-  public void testResetPasswordFailFinalLogin() throws RestServiceException {
-    AsyncMockStubber
-      .callSuccessWith(null)
-      .when(mockSynapseJavascriptClient)
-      .changePassword(
-        any(ChangePasswordWithCurrentPassword.class),
-        any(AsyncCallback.class)
-      );
-    AsyncMockStubber
-      .callFailureWith(new Exception())
-      .when(mockAuthenticationController)
-      .loginUser(eq(username), eq(newPassword), any(AsyncCallback.class));
-
-    presenter.resetPassword(password, newPassword);
-    verify(mockView).showPasswordChangeSuccess();
-    verify(mockPlaceChanger).goTo(isA(LoginPlace.class));
-  }
-
   // if notification settings are null, should still successfully update with user specified
   // notification setting
   public void testUpdateMyNotificationSettingsLazyInstantiation()
@@ -422,7 +363,7 @@ public class SettingsPresenterTest {
   public void testConfigure() {
     when(mockGlobalApplicationState.isShowingUTCTime()).thenReturn(false);
     presenter.configure();
-    verify(mockSynAlert, times(3)).clear();
+    verify(mockSynAlert, times(2)).clear();
     verify(mockView).clear();
     verify(mockView).updateNotificationCheckbox(profile);
     verify(mockAuthenticationController).updateCachedProfile(profile);
@@ -488,85 +429,6 @@ public class SettingsPresenterTest {
     presenter.changeApiKeyPostConfirmation();
     verify(mockSynapseClient).deleteApiKey(any(AsyncCallback.class));
     verify(mockSynAlert).handleException(e);
-  }
-
-  @Test
-  public void testChangePasswordCurrentPasswordFailure() {
-    when(mockView.getCurrentPasswordField()).thenReturn("");
-    presenter.changePassword();
-    verify(mockView).getCurrentPasswordField();
-    verify(mockView).getPassword1Field();
-    verify(mockView).getPassword2Field();
-    verify(mockSynAlert).showError(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
-    verify(mockView).setCurrentPasswordInError(true);
-  }
-
-  @Test
-  public void testChangePasswordPassword1Failure() {
-    when(mockView.getCurrentPasswordField()).thenReturn(password);
-    when(mockView.getPassword1Field()).thenReturn("");
-    presenter.changePassword();
-    verify(mockView).getCurrentPasswordField();
-    verify(mockView).getPassword1Field();
-    verify(mockView).getPassword2Field();
-    verify(mockSynAlert).showError(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
-    verify(mockView).setPassword1InError(true);
-  }
-
-  @Test
-  public void testChangePasswordPassword2Failure() {
-    // empty second password
-    when(mockView.getCurrentPasswordField()).thenReturn(password);
-    when(mockView.getPassword1Field()).thenReturn(newPassword);
-    when(mockView.getPassword2Field()).thenReturn("");
-    presenter.changePassword();
-    verify(mockView).getCurrentPasswordField();
-    verify(mockView).getPassword1Field();
-    verify(mockView).getPassword2Field();
-    verify(mockSynAlert).showError(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
-    verify(mockView).setPassword2InError(true);
-
-    // unmatching second password
-    Mockito.reset(mockView);
-    when(mockView.getCurrentPasswordField()).thenReturn(password);
-    when(mockView.getPassword1Field()).thenReturn(newPassword);
-    when(mockView.getPassword2Field()).thenReturn(newPassword + "abc");
-    presenter.changePassword();
-    verify(mockView).getCurrentPasswordField();
-    verify(mockView).getPassword1Field();
-    verify(mockView).getPassword2Field();
-    verify(mockSynAlert).showError(DisplayConstants.PASSWORDS_MISMATCH);
-    verify(mockView).setPassword2InError(true);
-  }
-
-  @Test
-  public void testChangePasswordPasswordSuccess() {
-    AsyncMockStubber
-      .callSuccessWith(profile)
-      .when(mockAuthenticationController)
-      .loginUser(eq(username), eq(password), any(AsyncCallback.class));
-    when(mockView.getCurrentPasswordField()).thenReturn(password);
-    when(mockView.getPassword1Field()).thenReturn(newPassword);
-    when(mockView.getPassword2Field()).thenReturn(newPassword);
-    presenter.changePassword();
-    verify(mockView).getCurrentPasswordField();
-    verify(mockView).getPassword1Field();
-    verify(mockView).getPassword2Field();
-    verify(mockView).setChangePasswordEnabled(false);
-    verify(mockSynapseJavascriptClient)
-      .changePassword(
-        any(ChangePasswordWithCurrentPassword.class),
-        any(AsyncCallback.class)
-      );
-  }
-
-  @Test
-  public void testClearPasswordErrors() {
-    presenter.clearPasswordErrors();
-    verify(mockSynAlert).clear();
-    verify(mockView).setCurrentPasswordInError(false);
-    verify(mockView).setPassword1InError(false);
-    verify(mockView).setPassword2InError(false);
   }
 
   @Test

@@ -44,7 +44,6 @@ public class SettingsPresenter implements SettingsView.Presenter {
   private SynapseClientAsync synapseClient;
   private SynapseAlert apiSynAlert;
   private SynapseAlert notificationSynAlert;
-  private SynapseAlert passwordSynAlert;
   private PortalGinInjector ginInjector;
   private EmailAddressesWidget emailAddressesWidget;
   private SynapseJavascriptClient jsClient;
@@ -86,10 +85,8 @@ public class SettingsPresenter implements SettingsView.Presenter {
   private void setSynAlertWidgets() {
     apiSynAlert = ginInjector.getSynapseAlertWidget();
     notificationSynAlert = ginInjector.getSynapseAlertWidget();
-    passwordSynAlert = ginInjector.getSynapseAlertWidget();
     view.setAPISynAlertWidget(apiSynAlert);
     view.setNotificationSynAlertWidget(notificationSynAlert);
-    view.setPasswordSynAlertWidget(passwordSynAlert);
   }
 
   @Override
@@ -108,69 +105,6 @@ public class SettingsPresenter implements SettingsView.Presenter {
       }
     };
     synapseClient.getAPIKey(callback);
-  }
-
-  @Override
-  public void resetPassword(
-    final String existingPassword,
-    final String newPassword
-  ) {
-    clearPasswordErrors();
-    if (authenticationController.isLoggedIn()) {
-      if (
-        authenticationController.getCurrentUserProfile() != null &&
-        authenticationController.getCurrentUserProfile().getUserName() != null
-      ) {
-        String username = authenticationController
-          .getCurrentUserProfile()
-          .getUserName();
-        ChangePasswordWithCurrentPassword changePasswordRequest =
-          new ChangePasswordWithCurrentPassword();
-        changePasswordRequest.setCurrentPassword(existingPassword);
-        changePasswordRequest.setNewPassword(newPassword);
-        changePasswordRequest.setUsername(
-          authenticationController.getCurrentUserProfile().getUserName()
-        );
-        jsClient.changePassword(
-          changePasswordRequest,
-          new AsyncCallback<Void>() {
-            @Override
-            public void onSuccess(Void result) {
-              view.showPasswordChangeSuccess();
-              // login user as session token
-              // has changed
-              authenticationController.loginUser(
-                username,
-                newPassword,
-                new AsyncCallback<UserProfile>() {
-                  @Override
-                  public void onSuccess(UserProfile result) {}
-
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    // if login fails, simple send them to the login page to get a new session
-                    globalApplicationState
-                      .getPlaceChanger()
-                      .goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
-                  }
-                }
-              );
-            }
-
-            @Override
-            public void onFailure(Throwable caught) {
-              passwordSynAlert.showError(caught.getMessage());
-              view.setChangePasswordEnabled(true);
-            }
-          }
-        );
-      } else {
-        view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
-      }
-    } else {
-      view.showInfo("Reset Password failed. Please Login again.");
-      goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
-    }
   }
 
   @Override
@@ -230,7 +164,6 @@ public class SettingsPresenter implements SettingsView.Presenter {
     apiSynAlert.clear();
     notificationSynAlert.clear();
     emailAddressesWidget.clear();
-    passwordSynAlert.clear();
   }
 
   public void configure() {
@@ -323,41 +256,6 @@ public class SettingsPresenter implements SettingsView.Presenter {
     globalApplicationState
       .getPlaceChanger()
       .goTo(new Profile(Profile.EDIT_PROFILE_TOKEN));
-  }
-
-  @Override
-  public void changePassword() {
-    clearPasswordErrors();
-    String currentPassword = view.getCurrentPasswordField();
-    String password1 = view.getPassword1Field();
-    String password2 = view.getPassword2Field();
-    if (!checkPasswordDefined(currentPassword)) {
-      view.setCurrentPasswordInError(true);
-      passwordSynAlert.showError(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
-    } else if (!checkPasswordDefined(password1)) {
-      view.setPassword1InError(true);
-      passwordSynAlert.showError(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
-    } else if (!checkPasswordDefined(password2)) {
-      view.setPassword2InError(true);
-      passwordSynAlert.showError(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
-    } else if (!password1.equals(password2)) {
-      view.setPassword2InError(true);
-      passwordSynAlert.showError(DisplayConstants.PASSWORDS_MISMATCH);
-    } else {
-      view.setChangePasswordEnabled(false);
-      resetPassword(currentPassword, password1);
-    }
-  }
-
-  public void clearPasswordErrors() {
-    passwordSynAlert.clear();
-    view.setCurrentPasswordInError(false);
-    view.setPassword1InError(false);
-    view.setPassword2InError(false);
-  }
-
-  private boolean checkPasswordDefined(String password) {
-    return password != null && !password.isEmpty();
   }
 
   @Override
