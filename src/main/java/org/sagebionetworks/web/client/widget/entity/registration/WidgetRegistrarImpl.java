@@ -83,6 +83,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.FeatureFlagConfig;
+import org.sagebionetworks.web.client.FeatureFlagKey;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
@@ -329,7 +330,11 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
     } else if (contentTypeKey.equals(REFERENCE_CONTENT_TYPE)) {
       presenter = ginInjector.getReferenceRenderer();
     } else if (contentTypeKey.equals(PROVENANCE_CONTENT_TYPE)) {
-      if (featureFlagConfig.isFeatureEnabled("Provenance v2 visualization")) {
+      if (
+        featureFlagConfig.isFeatureEnabled(
+          FeatureFlagKey.PROVENANCE_V2_VISUALIZATION.getKey()
+        )
+      ) {
         presenter = ginInjector.getProvenanceRendererV2();
       } else {
         presenter = ginInjector.getProvenanceRenderer();

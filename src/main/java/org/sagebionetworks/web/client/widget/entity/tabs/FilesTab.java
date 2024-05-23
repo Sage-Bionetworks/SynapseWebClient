@@ -15,7 +15,12 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.VersionableEntity;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
-import org.sagebionetworks.web.client.*;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.FeatureFlagConfig;
+import org.sagebionetworks.web.client.FeatureFlagKey;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
@@ -314,7 +319,11 @@ public class FilesTab {
     );
     view.setProvenanceVisible(isFile);
     if (isFile) {
-      if (featureFlagConfig.isFeatureEnabled("Provenance v2 visualization")) {
+      if (
+        featureFlagConfig.isFeatureEnabled(
+          FeatureFlagKey.PROVENANCE_V2_VISUALIZATION.getKey()
+        )
+      ) {
         provWidget = ginInjector.getProvenanceRendererV2();
         view.setProvenance(provWidget.asWidget());
         provWidget.configure(configMap);

@@ -46,4 +46,28 @@ public class FeatureFlagConfigTest {
 
     assertFalse(featureFlagConfig.isFeatureEnabled(FEATURE_NAME));
   }
+
+  @Test
+  public void testFeatureDisabledButExperimentalModeEnabled() {
+    when(mockCookieProvider.getCookie(eq("SynapseTestWebsite")))
+      .thenReturn("true");
+    when(mockJsonObject.get(FEATURE_NAME))
+      .thenReturn(JSONBoolean.getInstance(false));
+    featureFlagConfig =
+      new FeatureFlagConfig(mockJsonObject, mockCookieProvider);
+
+    assertTrue(featureFlagConfig.isFeatureEnabled(FEATURE_NAME));
+  }
+
+  @Test
+  public void testExperimentalModeValueReturnedOnException() {
+    when(mockJsonObject.get(FEATURE_NAME))
+      .thenThrow(new RuntimeException("Test exception"));
+    when(mockCookieProvider.getCookie(eq("SynapseTestWebsite")))
+      .thenReturn("true");
+    featureFlagConfig =
+      new FeatureFlagConfig(mockJsonObject, mockCookieProvider);
+
+    assertTrue(featureFlagConfig.isFeatureEnabled(FEATURE_NAME));
+  }
 }

@@ -16,6 +16,7 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.FeatureFlagConfig;
+import org.sagebionetworks.web.client.FeatureFlagKey;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
@@ -88,7 +89,11 @@ public class WidgetRegistrarImplTest {
     );
     verify(mockGinInjector, times(3)).getSynapseAPICallRenderer();
 
-    when(mockFeatureFlagConfig.isFeatureEnabled("Provenance v2 visualization"))
+    when(
+      mockFeatureFlagConfig.isFeatureEnabled(
+        FeatureFlagKey.PROVENANCE_V2_VISUALIZATION.getKey()
+      )
+    )
       .thenReturn(true);
     widgetRegistrar.getWidgetRendererForWidgetDescriptorAfterLazyLoad(
       WidgetConstants.PROVENANCE_CONTENT_TYPE
