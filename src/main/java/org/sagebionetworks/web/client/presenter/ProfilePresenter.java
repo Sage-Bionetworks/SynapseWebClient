@@ -1,38 +1,25 @@
 package org.sagebionetworks.web.client.presenter;
 
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
+import static org.sagebionetworks.web.shared.WebConstants.ONESAGE_ACCOUNT_SETTINGS_URL;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
-import org.sagebionetworks.repo.model.Challenge;
-import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.PaginatedTeamIds;
-import org.sagebionetworks.repo.model.Project;
-import org.sagebionetworks.repo.model.ProjectHeader;
-import org.sagebionetworks.repo.model.ProjectHeaderList;
-import org.sagebionetworks.repo.model.ProjectListSortColumn;
-import org.sagebionetworks.repo.model.ProjectListType;
-import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.repo.model.UserBundle;
+import org.sagebionetworks.repo.model.*;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.principal.AliasType;
 import org.sagebionetworks.repo.model.principal.PrincipalAliasRequest;
 import org.sagebionetworks.repo.model.principal.PrincipalAliasResponse;
-import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.*;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
@@ -72,7 +59,6 @@ public class ProfilePresenter
   private GWTWrapper gwt;
   private OpenTeamInvitationsWidget openInvitesWidget;
   private UserProfileEditorWidget userProfileEditorWidget;
-  private SettingsPresenter settingsPresenter;
   private PortalGinInjector ginInjector;
   private String currentUserId;
   private boolean isOwner;
@@ -161,14 +147,6 @@ public class ProfilePresenter
     return userProfileEditorWidget;
   }
 
-  public SettingsPresenter getSettingsPresenter() {
-    if (settingsPresenter == null) {
-      settingsPresenter = ginInjector.getSettingsPresenter();
-      view.setSettingsWidget(settingsPresenter.asWidget());
-    }
-    return settingsPresenter;
-  }
-
   @Override
   public void start(AcceptsOneWidget panel, EventBus eventBus) {
     // Install the view
@@ -246,9 +224,6 @@ public class ProfilePresenter
     }
     view.clear();
     view.showLoading();
-    if (settingsPresenter != null) {
-      settingsPresenter.clear();
-    }
     myTeamsWidget.clear();
     currentUserId =
       userId == null
@@ -335,7 +310,7 @@ public class ProfilePresenter
    * Sets the project filter. If filtered to a specific team, then the Team argument will be used.
    *
    * @param filterType
-   * @param team
+   * @param filterTeamId
    */
   public void setProjectFilterAndRefresh(
     ProjectFilterEnum filterType,
@@ -856,7 +831,7 @@ public class ProfilePresenter
         .goTo(
           new Profile(
             authenticationController.getCurrentUserPrincipalId(),
-            ProfileArea.SETTINGS
+            ProfileArea.PROFILE
           )
         );
       return;
@@ -978,7 +953,7 @@ public class ProfilePresenter
         refreshTeams();
         break;
       case SETTINGS:
-        getSettingsPresenter().configure();
+        Window.Location.replace(ONESAGE_ACCOUNT_SETTINGS_URL);
         break;
       case CHALLENGES:
         refreshChallenges();

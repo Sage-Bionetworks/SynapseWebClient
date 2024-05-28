@@ -171,6 +171,7 @@ public class Synapse extends Place {
     PROJECTS,
     CHALLENGES,
     TEAMS,
+    /* The Settings area now automatically redirects to OneSage */
     SETTINGS,
   }
 

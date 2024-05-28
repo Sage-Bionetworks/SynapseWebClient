@@ -37,7 +37,6 @@ import org.sagebionetworks.web.client.presenter.PersonalAccessTokensPresenter;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.presenter.QuizPresenter;
 import org.sagebionetworks.web.client.presenter.SearchPresenter;
-import org.sagebionetworks.web.client.presenter.SettingsPresenter;
 import org.sagebionetworks.web.client.presenter.SignedTokenPresenter;
 import org.sagebionetworks.web.client.presenter.SubscriptionPresenter;
 import org.sagebionetworks.web.client.presenter.SynapseForumPresenter;
@@ -684,8 +683,6 @@ public interface PortalGinInjector extends Ginjector {
   TablesTabView getTablesTabView();
 
   QueryTokenProvider getQueryTokenProvider();
-
-  SettingsPresenter getSettingsPresenter();
 
   PersonalAccessTokensPresenter getPersonalAccessTokensPresenter();
 

@@ -24,7 +24,6 @@ public class SRC {
     public static ReactComponentType<
       EvaluationEditorPageProps
     > EvaluationEditorPage;
-    public static ReactComponentType<AccessTokenPageProps> AccessTokenPage;
     public static ReactComponentType<DownloadCartPageProps> DownloadCartPage;
     public static ReactComponentType<
       DownloadConfirmationProps
@@ -80,15 +79,6 @@ public class SRC {
     public static ReactComponentType<
       CreatedByModifiedByProps
     > CreatedByModifiedBy;
-    public static ReactComponentType<
-      TwoFactorAuthSettingsPanelProps
-    > TwoFactorAuthSettingsPanel;
-    public static ReactComponentType<
-      TwoFactorBackupCodesProps
-    > TwoFactorBackupCodes;
-    public static ReactComponentType<
-      TwoFactorEnrollmentFormProps
-    > TwoFactorEnrollmentForm;
     public static ReactComponentType<EmptyProps> SubscriptionPage;
     public static ReactComponentType<
       AccessRequirementListProps

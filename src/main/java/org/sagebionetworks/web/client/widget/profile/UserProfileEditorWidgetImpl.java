@@ -26,13 +26,8 @@ import org.sagebionetworks.web.shared.WebConstants;
 public class UserProfileEditorWidgetImpl
   implements UserProfileEditorWidget, UserProfileEditorWidgetView.Presenter {
 
-  public static final String CONFIRM_SAVE_BEFORE_GOTO_SETTINGS_TITLE =
-    "Would you like to save your profile changes?";
-  public static final String CONFIRM_SAVE_BEFORE_GOTO_SETTINGS_MESSAGE =
-    "Select OK to save the changes to your Profile and go to the Settings tab to change your password, or select Cancel to continue editing your Profile.";
   public static final String PLEASE_ENTER_A_VALID_URL =
     "Please enter a valid URL";
-  public static final String PLEASE_SELECT_A_FILE = "Please select a file";
   public static final String CAN_ONLY_INCLUDE =
     "Can only include letters, numbers, dot (.), dash (-), and underscore (_)";
   public static final String MUST_BE_AT_LEAST_3_CHARACTERS =
@@ -53,7 +48,6 @@ public class UserProfileEditorWidgetImpl
   PopupUtilsView popupUtils;
   String orcIdHref;
   Callback callback;
-  boolean goToAccountSettingsAfterSave = false;
   boolean isEditing = false;
 
   @Inject
@@ -107,7 +101,6 @@ public class UserProfileEditorWidgetImpl
     this.callback = callback;
     this.orcIdHref = orcIdHref;
     originalProfile = profile;
-    goToAccountSettingsAfterSave = false;
     view.hideUsernameError();
     view.hideLinkError();
     synAlert.clear();
@@ -296,13 +289,6 @@ public class UserProfileEditorWidgetImpl
           authController.updateCachedProfile(originalProfile);
           setIsEditingMode(false);
           callback.invoke();
-          if (goToAccountSettingsAfterSave) {
-            globalAppState
-              .getPlaceChanger()
-              .goTo(
-                new Profile(originalProfile.getOwnerId(), ProfileArea.SETTINGS)
-              );
-          }
         }
 
         @Override

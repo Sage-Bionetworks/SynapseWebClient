@@ -25,6 +25,11 @@ public class WebConstants {
 
   public static final String INVALID_EMAIL_MESSAGE = "Invalid email address";
 
+  public static final String ONESAGE_PRODUCTION_URL =
+    "https://accounts.sagebionetworks.synapse.org";
+  public static final String ONESAGE_ACCOUNT_SETTINGS_URL =
+    ONESAGE_PRODUCTION_URL + "/authenticated/myaccount";
+
   public static final String DOCS_BASE_URL = "https://help.synapse.org/";
   public static final String DOCS_URL = DOCS_BASE_URL + "docs/";
   public static final String PROVENANCE_API_URL =

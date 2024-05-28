@@ -131,7 +131,7 @@
                 ui:field="changeEmailLink"
                 visible="false"
                 target="_blank"
-                href="/Profile:v/settings"
+                href="https://accounts.sagebionetworks.synapse.org/authenticated/myaccount"
               >
                 Change email
               </b:Anchor>

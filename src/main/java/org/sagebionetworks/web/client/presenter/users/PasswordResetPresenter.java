@@ -14,7 +14,6 @@ public class PasswordResetPresenter
 
   private static final String ONE_SAGE_RESET_PASSWORD_URL =
     "https://accounts.sagebionetworks.synapse.org/resetPassword";
-  private PasswordReset place;
 
   @Inject
   public PasswordResetPresenter() {}
