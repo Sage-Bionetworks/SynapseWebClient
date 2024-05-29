@@ -184,7 +184,7 @@ import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadWikiWidgetWrapper;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.client.widget.profile.ProfileCertifiedValidatedWidget;
-import org.sagebionetworks.web.client.widget.profile.UserProfileEditorWidget;
+import org.sagebionetworks.web.client.widget.profile.UserProfileWidget;
 import org.sagebionetworks.web.client.widget.provenance.v2.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.refresh.DiscussionThreadCountAlert;
 import org.sagebionetworks.web.client.widget.refresh.EntityRefreshAlert;
@@ -782,7 +782,7 @@ public interface PortalGinInjector extends Ginjector {
 
   CopyTextModal getCopyTextModal();
 
-  UserProfileEditorWidget getUserProfileEditorWidget();
+  UserProfileWidget getUserProfileWidget();
 
   PromptForValuesModalView getPromptForValuesModal();
 

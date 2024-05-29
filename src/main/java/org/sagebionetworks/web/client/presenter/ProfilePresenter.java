@@ -32,7 +32,7 @@ import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityBrowserUtils;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.profile.UserProfileEditorWidget;
+import org.sagebionetworks.web.client.widget.profile.UserProfileWidget;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
@@ -58,7 +58,7 @@ public class ProfilePresenter
   private GlobalApplicationState globalApplicationState;
   private GWTWrapper gwt;
   private OpenTeamInvitationsWidget openInvitesWidget;
-  private UserProfileEditorWidget userProfileEditorWidget;
+  private UserProfileWidget userProfileWidget;
   private PortalGinInjector ginInjector;
   private String currentUserId;
   private boolean isOwner;
@@ -139,12 +139,12 @@ public class ProfilePresenter
     return promptDialog;
   }
 
-  public UserProfileEditorWidget getUserProfileEditorWidget() {
-    if (userProfileEditorWidget == null) {
-      userProfileEditorWidget = ginInjector.getUserProfileEditorWidget();
-      view.setUserProfileEditorWidget(userProfileEditorWidget);
+  public UserProfileWidget getUserProfileWidget() {
+    if (userProfileWidget == null) {
+      userProfileWidget = ginInjector.getUserProfileWidget();
+      view.setUserProfileWidget(userProfileWidget);
     }
-    return userProfileEditorWidget;
+    return userProfileWidget;
   }
 
   @Override
@@ -172,15 +172,6 @@ public class ProfilePresenter
   public String mayStop() {
     view.clear();
     return null;
-  }
-
-  public void editMyProfile() {
-    if (authenticationController.isLoggedIn()) {
-      getUserProfileEditorWidget().setIsEditingMode(true);
-      viewMyProfile();
-    } else {
-      view.showLoginAlert();
-    }
   }
 
   public void viewMyProfile() {
@@ -255,8 +246,6 @@ public class ProfilePresenter
     Long currentUserIdLong = currentUserId != null
       ? Long.parseLong(currentUserId)
       : null;
-    // capture current state of user profile editor widget, to restore after reconfiguring with the current user profile.
-    boolean isEditing = getUserProfileEditorWidget().isEditingMode();
     jsClient.getUserBundle(
       currentUserIdLong,
       mask,
@@ -269,7 +258,7 @@ public class ProfilePresenter
           ginInjector
             .getSynapseJSNIUtils()
             .setPageTitle(currentUserBundle.getUserProfile().getUserName());
-          getUserProfileEditorWidget()
+          getUserProfileWidget()
             .configure(
               bundle.getUserProfile(),
               bundle.getORCID(),
@@ -277,7 +266,6 @@ public class ProfilePresenter
                 profileUpdated();
               }
             );
-          getUserProfileEditorWidget().setIsEditingMode(isEditing);
         }
 
         @Override
@@ -854,7 +842,7 @@ public class ProfilePresenter
       updateProfileView(place.getUserId());
     } else {
       if (Profile.EDIT_PROFILE_TOKEN.equals(token)) {
-        editMyProfile();
+        Window.Location.replace(ONESAGE_ACCOUNT_SETTINGS_URL);
       } else {
         // if this is a number, then treat it as a a user id
         try {

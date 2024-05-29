@@ -22,7 +22,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.*;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
@@ -44,7 +43,7 @@ import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.profile.UserProfileEditorWidget;
+import org.sagebionetworks.web.client.widget.profile.UserProfileWidget;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
@@ -88,7 +87,7 @@ public class ProfilePresenterTest {
   Profile place;
 
   @Mock
-  UserProfileEditorWidget mockUserProfileEditorWidget;
+  UserProfileWidget mockUserProfileWidget;
 
   UserSessionData testUser = new UserSessionData();
   UserProfile userProfile = new UserProfile();
@@ -179,8 +178,7 @@ public class ProfilePresenterTest {
       .thenReturn(mockPlaceChanger);
     when(mockInjector.getPromptForValuesModal())
       .thenReturn(mockPromptModalView);
-    when(mockInjector.getUserProfileEditorWidget())
-      .thenReturn(mockUserProfileEditorWidget);
+    when(mockInjector.getUserProfileWidget()).thenReturn(mockUserProfileWidget);
     when(mockInjector.getProjectBadgeWidget()).thenReturn(mockProjectBadge);
     when(mockInjector.getChallengeBadgeWidget()).thenReturn(mockChallengeBadge);
     when(mockInjector.getSynapseJSNIUtils()).thenReturn(mockJSNIUtils);
@@ -363,7 +361,7 @@ public class ProfilePresenterTest {
     verify(mockTeamListWidget, Mockito.atLeastOnce()).clear();
     verify(mockView).showLoading();
     verify(mockSynapseJavascriptClient).getFavorites(any(AsyncCallback.class));
-    verify(mockUserProfileEditorWidget)
+    verify(mockUserProfileWidget)
       .configure(eq(userProfile), eq(ORC_ID), any(Callback.class));
   }
 
@@ -1308,31 +1306,6 @@ public class ProfilePresenterTest {
     verify(mockSynapseJavascriptClient)
       .getUserTeams(anyString(), anyBoolean(), anyString());
     verify(mockView).setTeamsFilterVisible(false);
-  }
-
-  @Test
-  public void testEditMyProfile() {
-    String testUserId = "9980";
-    when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-    when(mockAuthenticationController.getCurrentUserPrincipalId())
-      .thenReturn(testUserId);
-    profilePresenter.setPlace(place);
-
-    profilePresenter.editMyProfile();
-
-    // verify flip into editing mode
-    verify(mockUserProfileEditorWidget).setIsEditingMode(true);
-  }
-
-  @Test
-  public void testEditMyProfileAsAnonymous() {
-    // verify forces login if anonymous and trying to edit own profile
-    when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
-
-    profilePresenter.editMyProfile();
-
-    verify(mockView).showLoginAlert();
-    verify(mockPlaceChanger, never()).goTo(any(Place.class));
   }
 
   @Test

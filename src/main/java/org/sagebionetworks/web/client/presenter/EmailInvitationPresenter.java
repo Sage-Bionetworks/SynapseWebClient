@@ -150,10 +150,10 @@ public class EmailInvitationPresenter
               view.showErrorMessage(
                 "This invitation was sent to an email address not associated to the current user. \"" +
                 membershipInvitation.getInviteeEmail() +
-                "\" Please add this email to your Synapse account under \"Edit Profile\", or log in with the correct Synapse account before accepting the invitation."
+                "\" Please add this email to your Synapse account by clicking \"Edit Profile\", or log in with the correct Synapse account before accepting the invitation."
               );
               // SWC-4741: invitation not associated to the current user, send user to the Profile page, where they can
-              // click 'Edit Profile', then 'Change email' to get to OneSage and add the new email address
+              // click 'Edit Profile' to get to OneSage and add the new email address
               // NOTE: We don't send the user directly to OneSage so that they have a chance to read the message first
               placeChanger.goTo(
                 new Profile(

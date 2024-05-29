@@ -3,13 +3,12 @@ package org.sagebionetworks.web.client.widget.profile;
 import static org.sagebionetworks.web.client.presenter.ProfilePresenter.IS_CERTIFIED;
 import static org.sagebionetworks.web.client.presenter.ProfilePresenter.IS_VERIFIED;
 
-import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import java.util.List;
@@ -18,16 +17,11 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.HelpBlock;
-import org.gwtbootstrap3.client.ui.Row;
-import org.gwtbootstrap3.client.ui.TextArea;
-import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.Tooltip;
-import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
@@ -37,16 +31,12 @@ import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.jsinterop.UserProfileLinksProps;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
-import org.sagebionetworks.web.client.widget.search.GooglePlacesSuggestOracle;
+import org.sagebionetworks.web.shared.WebConstants;
 
-// Want to add enter handler... What is the best way to go about this?
-public class UserProfileEditorWidgetViewImpl
-  implements UserProfileEditorWidgetView {
+public class UserProfileWidgetViewImpl implements UserProfileWidgetView {
 
-  public interface Binder
-    extends UiBinder<Widget, UserProfileEditorWidgetViewImpl> {}
+  public interface Binder extends UiBinder<Widget, UserProfileWidgetViewImpl> {}
 
   @UiField
   SimplePanel imagePanel;
@@ -61,37 +51,19 @@ public class UserProfileEditorWidgetViewImpl
   HelpBlock usernameHelpBlock;
 
   @UiField
-  TextBox username;
-
-  @UiField
   Paragraph usernameRenderer;
-
-  @UiField
-  TextBox firstName;
 
   @UiField
   Paragraph firstNameRenderer;
 
   @UiField
-  TextBox lastName;
-
-  @UiField
   Paragraph lastNameRenderer;
-
-  @UiField
-  TextBox currentPosition;
 
   @UiField
   Paragraph currentPositionRenderer;
 
   @UiField
-  TextBox currentAffiliation;
-
-  @UiField
   Paragraph currentAffiliationRenderer;
-
-  @UiField
-  TextBox industry;
 
   @UiField
   Paragraph industryRenderer;
@@ -100,16 +72,10 @@ public class UserProfileEditorWidgetViewImpl
   Div emailDiv;
 
   @UiField
-  Div locationSuggestBoxContainer;
-
-  @UiField
   Paragraph locationRenderer;
 
   @UiField
   FormGroup linkFormGroup;
-
-  @UiField
-  TextBox link;
 
   @UiField
   Anchor linkRenderer;
@@ -121,22 +87,10 @@ public class UserProfileEditorWidgetViewImpl
   Paragraph bioRenderer;
 
   @UiField
-  TextArea bioEditor;
-
-  @UiField
   Div synAlertContainer;
 
   @UiField
   Button editProfileButton;
-
-  @UiField
-  Button saveProfileButton;
-
-  @UiField
-  Button cancelButton;
-
-  @UiField
-  Anchor changeEmailLink;
 
   @UiField
   Anchor changePasswordLink;
@@ -160,32 +114,21 @@ public class UserProfileEditorWidgetViewImpl
   ReactComponentDiv userProfileLinksReactComponentContainer;
 
   @UiField
-  Row passwordContainer;
-
-  @UiField
   Column emailAddressContainer;
 
   @UiField
   Div commandsContainer;
 
-  SuggestBox locationSuggestBox;
   private Widget widget;
 
-  com.google.gwt.user.client.ui.TextBoxBase locationTextBox;
-  boolean isEditing = false;
   SynapseJSNIUtils jsniUtils;
   SynapseReactClientFullContextPropsProvider propsProvider;
-  Presenter presenter;
-  String originalButtonText;
   CookieProvider cookies;
   SynapseJavascriptClient jsClient;
 
   @Inject
-  public UserProfileEditorWidgetViewImpl(
+  public UserProfileWidgetViewImpl(
     Binder binder,
-    GooglePlacesSuggestOracle locationOracle,
-    GlobalApplicationState globalAppState,
-    AuthenticationController authController,
     SynapseJSNIUtils jsniUtils,
     SynapseReactClientFullContextPropsProvider propsProvider,
     CookieProvider cookies,
@@ -196,23 +139,10 @@ public class UserProfileEditorWidgetViewImpl
     this.propsProvider = propsProvider;
     this.cookies = cookies;
     this.jsClient = jsClient;
-    locationSuggestBox = new SuggestBox(locationOracle);
-    locationSuggestBox.setWidth("100%");
-    locationTextBox = locationSuggestBox.getTextBox();
-    locationTextBox.addStyleName("form-control");
-    locationSuggestBoxContainer.add(locationSuggestBox);
     editProfileButton.addClickHandler(event -> {
-      presenter.setIsEditingMode(true);
-    });
-    saveProfileButton.addClickHandler(event -> {
-      DisplayUtils.showLoading(saveProfileButton, true, originalButtonText);
-      presenter.onSave();
-    });
-    cancelButton.addClickHandler(event -> {
-      presenter.onCancel();
+      Window.open(WebConstants.ONESAGE_ACCOUNT_SETTINGS_URL, "_blank", "");
     });
     linkRenderer.getElement().setAttribute("rel", "noreferrer noopener");
-    originalButtonText = saveProfileButton.getText();
   }
 
   @Override
@@ -222,7 +152,6 @@ public class UserProfileEditorWidgetViewImpl
 
   @Override
   public void setUsername(String username) {
-    this.username.setText(username);
     usernameRenderer.setText(username);
   }
 
@@ -263,52 +192,17 @@ public class UserProfileEditorWidgetViewImpl
 
   @Override
   public void setFirstName(String firstName) {
-    this.firstName.setText(firstName);
     firstNameRenderer.setText(firstName);
   }
 
   @Override
-  public String getFirstName() {
-    return this.firstName.getText();
-  }
-
-  @Override
-  public String getLastName() {
-    return this.lastName.getText();
-  }
-
-  @Override
-  public String getUsername() {
-    return username.getText();
-  }
-
-  @Override
   public void setLastName(String lastName) {
-    this.lastName.setText(lastName);
     lastNameRenderer.setText(lastName);
   }
 
   @Override
   public void setBio(String summary) {
-    this.bioEditor.setText(summary);
     this.bioRenderer.setText(summary);
-  }
-
-  @Override
-  public String getBio() {
-    return this.bioEditor.getText();
-  }
-
-  @Override
-  public void showUsernameError(String error) {
-    usernameFormGroup.setValidationState(ValidationState.ERROR);
-    usernameHelpBlock.setText(error);
-  }
-
-  @Override
-  public void hideUsernameError() {
-    usernameFormGroup.setValidationState(ValidationState.NONE);
-    usernameHelpBlock.setText("");
   }
 
   @Override
@@ -322,137 +216,29 @@ public class UserProfileEditorWidgetViewImpl
   }
 
   @Override
-  public void setPresenter(Presenter presenter) {
-    this.presenter = presenter;
-  }
-
-  @Override
-  public String getLink() {
-    return link.getText();
-  }
-
-  @Override
-  public void showLinkError(String string) {
-    linkFormGroup.setValidationState(ValidationState.ERROR);
-    linkHelpBlock.setText(string);
-  }
-
-  @Override
-  public void hideLinkError() {
-    linkFormGroup.setValidationState(ValidationState.NONE);
-    linkHelpBlock.setText("");
-  }
-
-  @Override
-  public String getCurrentPosition() {
-    return currentPosition.getText();
-  }
-
-  @Override
   public void setCurrentPosition(String position) {
-    currentPosition.setText(position);
     currentPositionRenderer.setText(position);
   }
 
   @Override
   public void setCurrentAffiliation(String company) {
-    currentAffiliation.setText(company);
     currentAffiliationRenderer.setText(company);
   }
 
   @Override
-  public String getCurrentAffiliation() {
-    return currentAffiliation.getText();
-  }
-
-  @Override
   public void setIndustry(String industry) {
-    this.industry.setText(industry);
     industryRenderer.setText(industry);
   }
 
   @Override
-  public String getIndustry() {
-    return this.industry.getText();
-  }
-
-  @Override
   public void setLocation(String location) {
-    this.locationSuggestBox.setText(location);
     locationRenderer.setText(location);
   }
 
   @Override
-  public String getLocation() {
-    return this.locationSuggestBox.getText();
-  }
-
-  @Override
   public void setLink(String url) {
-    this.link.setText(url);
     this.linkRenderer.setHref(url);
     this.linkRenderer.setText(url);
-  }
-
-  @Override
-  public void addKeyDownHandlerToFields(KeyDownHandler keyDownHandler) {
-    username.addKeyDownHandler(keyDownHandler);
-    firstName.addKeyDownHandler(keyDownHandler);
-    lastName.addKeyDownHandler(keyDownHandler);
-    currentPosition.addKeyDownHandler(keyDownHandler);
-    currentAffiliation.addKeyDownHandler(keyDownHandler);
-    industry.addKeyDownHandler(keyDownHandler);
-    locationSuggestBox.addKeyDownHandler(keyDownHandler);
-    link.addKeyDownHandler(keyDownHandler);
-    bioEditor.addKeyDownHandler(keyDownHandler);
-  }
-
-  @Override
-  public void setEditMode(boolean isEditing) {
-    this.isEditing = isEditing;
-
-    bioEditor.setVisible(isEditing);
-    bioRenderer.setVisible(!isEditing);
-    locationTextBox.setReadOnly(!isEditing);
-    firstName.setVisible(isEditing);
-    firstNameRenderer.setVisible(!isEditing);
-    firstName.setPlaceholder(isEditing ? "Enter first name" : "");
-    lastName.setVisible(isEditing);
-    lastNameRenderer.setVisible(!isEditing);
-    lastName.setPlaceholder(isEditing ? "Enter last name" : "");
-    currentAffiliation.setVisible(isEditing);
-    currentAffiliationRenderer.setVisible(!isEditing);
-    currentAffiliation.setPlaceholder(
-      isEditing ? "Enter current affiliation" : ""
-    );
-
-    bioEditor.setPlaceholder("Enter bio");
-    link.setVisible(isEditing);
-    linkRenderer.setVisible(!isEditing);
-    link.setPlaceholder(isEditing ? "Enter link to more info" : "");
-    locationSuggestBoxContainer.setVisible(isEditing);
-    locationRenderer.setVisible(!isEditing);
-    locationTextBox
-      .getElement()
-      .setAttribute("placeholder", isEditing ? "Enter City, Country" : "");
-    currentPosition.setVisible(isEditing);
-    currentPositionRenderer.setVisible(!isEditing);
-    currentPosition.setPlaceholder(isEditing ? "Enter current position" : "");
-    industry.setVisible(isEditing);
-    industryRenderer.setVisible(!isEditing);
-    industry.setPlaceholder(isEditing ? "Enter industry/discipline" : "");
-
-    editProfileButton.setVisible(!isEditing);
-    saveProfileButton.setVisible(isEditing);
-    cancelButton.setVisible(isEditing);
-    changeEmailLink.setVisible(isEditing);
-    changePasswordLink.setVisible(isEditing);
-    username.setVisible(isEditing);
-    usernameRenderer.setVisible(!isEditing);
-
-    if (!isEditing) {
-      DisplayUtils.showLoading(saveProfileButton, false, originalButtonText);
-    }
   }
 
   @Override
@@ -502,13 +288,7 @@ public class UserProfileEditorWidgetViewImpl
   }
 
   @Override
-  public void resetSaveButtonState() {
-    DisplayUtils.showLoading(saveProfileButton, false, originalButtonText);
-  }
-
-  @Override
   public void setCanEdit(boolean canEdit) {
-    passwordContainer.setVisible(canEdit);
     commandsContainer.setVisible(canEdit);
   }
 

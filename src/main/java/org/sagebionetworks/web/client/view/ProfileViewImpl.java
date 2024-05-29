@@ -670,9 +670,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
   }
 
   @Override
-  public void setUserProfileEditorWidget(IsWidget userProfileEditorWidget) {
+  public void setUserProfileWidget(IsWidget userProfileWidget) {
     this.editUserProfilePanel.clear();
-    this.editUserProfilePanel.add(userProfileEditorWidget);
+    this.editUserProfilePanel.add(userProfileWidget);
   }
 
   @Override
