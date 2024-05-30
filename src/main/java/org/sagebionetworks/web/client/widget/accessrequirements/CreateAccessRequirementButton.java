@@ -9,6 +9,8 @@ import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.FeatureFlagConfig;
+import org.sagebionetworks.web.client.FeatureFlagKey;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.jsinterop.CreateOrUpdateAccessRequirementWizardProps;
@@ -36,18 +38,21 @@ public class CreateAccessRequirementButton
   RestrictableObjectDescriptor subject;
   AccessRequirement ar;
   Callback refreshCallback;
+  FeatureFlagConfig featureFlagConfig;
 
   @Inject
   public CreateAccessRequirementButton(
     SingleButtonView view,
     IsACTMemberAsyncHandler isACTMemberAsyncHandler,
     CookieProvider cookies,
+    FeatureFlagConfig featureFlagConfig,
     final PortalGinInjector ginInjector
   ) {
     this.view = view;
     this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
     this.ginInjector = ginInjector;
     this.cookies = cookies;
+    this.featureFlagConfig = featureFlagConfig;
     view.setButtonVisible(false);
     view.addStyleNames("margin-left-10");
     view.setPresenter(this);
@@ -91,7 +96,11 @@ public class CreateAccessRequirementButton
 
   @Override
   public void onClick() {
-    if (DisplayUtils.isInTestWebsite(cookies)) {
+    if (
+      featureFlagConfig.isFeatureEnabled(
+        FeatureFlagKey.SRC_BASED_AR_MODAL_WIZARD.getKey()
+      )
+    ) {
       useSrcWizard();
     } else {
       useSwcWizard();

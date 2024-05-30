@@ -28,6 +28,7 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.FeatureFlagConfig;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -102,6 +103,9 @@ public class MarkdownEditorWidgetTest {
   @Mock
   PortalGinInjector mockGinInjector;
 
+  @Mock
+  FeatureFlagConfig mockFeatureFlagConfig;
+
   @Before
   public void before() throws JSONObjectAdapterException {
     MockitoAnnotations.initMocks(this);
@@ -115,7 +119,8 @@ public class MarkdownEditorWidgetTest {
         mockEditDescriptor,
         mockWidgetRegistrar,
         mockUserSelector,
-        mockGinInjector
+        mockGinInjector,
+        mockFeatureFlagConfig
       );
     wikiPageKey =
       new WikiPageKey("syn1111", ObjectType.ENTITY.toString(), null);

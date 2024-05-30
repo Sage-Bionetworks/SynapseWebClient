@@ -21,7 +21,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMemberTypeFilterOptions;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
-import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.FeatureFlagConfig;
+import org.sagebionetworks.web.client.FeatureFlagKey;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -133,6 +134,9 @@ public class TeamPresenterTest {
   @Mock
   IsACTMemberAsyncHandler mockIsACTMemberAsyncHandler;
 
+  @Mock
+  FeatureFlagConfig mockFeatureFlagConfig;
+
   @Captor
   ArgumentCaptor<CallbackP<Boolean>> callbackPcaptor;
 
@@ -165,7 +169,8 @@ public class TeamPresenterTest {
         mockGoogleMap,
         mockCookies,
         mockIsACTMemberAsyncHandler,
-        mockGinInjector
+        mockGinInjector,
+        mockFeatureFlagConfig
       );
     when(mockTeam.getName()).thenReturn(teamName);
     AsyncMockStubber
@@ -188,8 +193,10 @@ public class TeamPresenterTest {
     when(mockTeam.getCanPublicJoin()).thenReturn(canPublicJoin);
     when(mockTeam.getId()).thenReturn(teamId);
     when(mockTeam.getIcon()).thenReturn(teamIcon);
-    when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
-      .thenReturn("true");
+    when(
+      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.GOOGLE_MAP.getKey())
+    )
+      .thenReturn(true);
   }
 
   private void setIsACT(boolean isACT) {

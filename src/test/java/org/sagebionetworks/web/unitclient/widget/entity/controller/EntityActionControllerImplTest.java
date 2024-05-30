@@ -112,6 +112,8 @@ import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.NotificationVariant;
+import org.sagebionetworks.web.client.FeatureFlagConfig;
+import org.sagebionetworks.web.client.FeatureFlagKey;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
@@ -408,6 +410,9 @@ public class EntityActionControllerImplTest {
   @Mock
   Dataset mockDataset;
 
+  @Mock
+  FeatureFlagConfig mockFeatureFlagConfig;
+
   @Captor
   ArgumentCaptor<
     CreateTableViewWizardProps.OnComplete
@@ -527,7 +532,8 @@ public class EntityActionControllerImplTest {
         mockEventBus,
         mockPopupUtils,
         mockQueryClientProvider,
-        mockKeyFactoryProvider
+        mockKeyFactoryProvider,
+        mockFeatureFlagConfig
       );
 
     parentId = "syn456";
@@ -599,9 +605,12 @@ public class EntityActionControllerImplTest {
   @Test
   public void testConfigureWithTableEntity() {
     when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+      mockFeatureFlagConfig.isFeatureEnabled(
+        FeatureFlagKey.DESCRIPTION_FIELD.getKey()
+      )
     )
-      .thenReturn("true");
+      .thenReturn(true);
+
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -663,9 +672,11 @@ public class EntityActionControllerImplTest {
     permissions.setCanChangePermissions(canChangePermission);
 
     when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+      mockFeatureFlagConfig.isFeatureEnabled(
+        FeatureFlagKey.DESCRIPTION_FIELD.getKey()
+      )
     )
-      .thenReturn("true");
+      .thenReturn(true);
 
     controller.configure(
       mockActionMenu,
@@ -711,9 +722,12 @@ public class EntityActionControllerImplTest {
     permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
 
     when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+      mockFeatureFlagConfig.isFeatureEnabled(
+        FeatureFlagKey.DESCRIPTION_FIELD.getKey()
+      )
     )
-      .thenReturn("true");
+      .thenReturn(true);
+
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -775,9 +789,12 @@ public class EntityActionControllerImplTest {
     permissions.setCanChangePermissions(canChangePermission);
 
     when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+      mockFeatureFlagConfig.isFeatureEnabled(
+        FeatureFlagKey.DESCRIPTION_FIELD.getKey()
+      )
     )
-      .thenReturn("true");
+      .thenReturn(true);
+
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -833,9 +850,12 @@ public class EntityActionControllerImplTest {
     permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
 
     when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+      mockFeatureFlagConfig.isFeatureEnabled(
+        FeatureFlagKey.DESCRIPTION_FIELD.getKey()
+      )
     )
-      .thenReturn("true");
+      .thenReturn(true);
+
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -891,9 +911,12 @@ public class EntityActionControllerImplTest {
     permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
 
     when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+      mockFeatureFlagConfig.isFeatureEnabled(
+        FeatureFlagKey.DESCRIPTION_FIELD.getKey()
+      )
     )
-      .thenReturn("true");
+      .thenReturn(true);
+
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -956,9 +979,12 @@ public class EntityActionControllerImplTest {
     permissions.setCanChangePermissions(canChangePermission);
 
     when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+      mockFeatureFlagConfig.isFeatureEnabled(
+        FeatureFlagKey.DESCRIPTION_FIELD.getKey()
+      )
     )
-      .thenReturn("true");
+      .thenReturn(true);
+
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -1015,9 +1041,12 @@ public class EntityActionControllerImplTest {
     permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
 
     when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+      mockFeatureFlagConfig.isFeatureEnabled(
+        FeatureFlagKey.DESCRIPTION_FIELD.getKey()
+      )
     )
-      .thenReturn("true");
+      .thenReturn(true);
+
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -1072,9 +1101,12 @@ public class EntityActionControllerImplTest {
     permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
 
     when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+      mockFeatureFlagConfig.isFeatureEnabled(
+        FeatureFlagKey.DESCRIPTION_FIELD.getKey()
+      )
     )
-      .thenReturn("true");
+      .thenReturn(true);
+
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -1126,9 +1158,12 @@ public class EntityActionControllerImplTest {
     permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
 
     when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+      mockFeatureFlagConfig.isFeatureEnabled(
+        FeatureFlagKey.DESCRIPTION_FIELD.getKey()
+      )
     )
-      .thenReturn("true");
+      .thenReturn(true);
+
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -1176,9 +1211,11 @@ public class EntityActionControllerImplTest {
     boolean canCertifiedUserEdit = true;
     permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
     when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+      mockFeatureFlagConfig.isFeatureEnabled(
+        FeatureFlagKey.DESCRIPTION_FIELD.getKey()
+      )
     )
-      .thenReturn("true");
+      .thenReturn(true);
 
     controller.configure(
       mockActionMenu,
@@ -1236,9 +1273,11 @@ public class EntityActionControllerImplTest {
     permissions.setCanChangePermissions(canChangePermission);
 
     when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+      mockFeatureFlagConfig.isFeatureEnabled(
+        FeatureFlagKey.DESCRIPTION_FIELD.getKey()
+      )
     )
-      .thenReturn("true");
+      .thenReturn(true);
 
     controller.configure(
       mockActionMenu,
@@ -1289,9 +1328,11 @@ public class EntityActionControllerImplTest {
     boolean canCertifiedUserEdit = true;
     permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
     when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+      mockFeatureFlagConfig.isFeatureEnabled(
+        FeatureFlagKey.DESCRIPTION_FIELD.getKey()
+      )
     )
-      .thenReturn("true");
+      .thenReturn(true);
 
     controller.configure(
       mockActionMenu,
@@ -1349,9 +1390,11 @@ public class EntityActionControllerImplTest {
     permissions.setCanChangePermissions(canChangePermission);
 
     when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+      mockFeatureFlagConfig.isFeatureEnabled(
+        FeatureFlagKey.DESCRIPTION_FIELD.getKey()
+      )
     )
-      .thenReturn("true");
+      .thenReturn(true);
 
     controller.configure(
       mockActionMenu,
@@ -1399,9 +1442,11 @@ public class EntityActionControllerImplTest {
   @Test
   public void testDisableFullTextSearch() {
     when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+      mockFeatureFlagConfig.isFeatureEnabled(
+        FeatureFlagKey.DESCRIPTION_FIELD.getKey()
+      )
     )
-      .thenReturn("true");
+      .thenReturn(true);
     ((TableEntity) entityBundle.getEntity()).setIsSearchEnabled(true);
     controller.configure(
       mockActionMenu,
@@ -1451,9 +1496,11 @@ public class EntityActionControllerImplTest {
   @Test
   public void testConfigureProjectLevelTableCommandsCanEdit() {
     when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+      mockFeatureFlagConfig.isFeatureEnabled(
+        FeatureFlagKey.DESCRIPTION_FIELD.getKey()
+      )
     )
-      .thenReturn("true");
+      .thenReturn(true);
     entityBundle.setEntity(new Project());
     currentEntityArea = EntityArea.TABLES;
     boolean canCertifiedUserEdit = true;
@@ -1518,9 +1565,11 @@ public class EntityActionControllerImplTest {
   @Test
   public void testConfigureProjectLevelDatasetCommandsCanEdit() {
     when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+      mockFeatureFlagConfig.isFeatureEnabled(
+        FeatureFlagKey.DESCRIPTION_FIELD.getKey()
+      )
     )
-      .thenReturn("true");
+      .thenReturn(true);
     entityBundle.setEntity(new Project());
     currentEntityArea = EntityArea.DATASETS;
     boolean canCertifiedUserEdit = true;
@@ -4232,9 +4281,11 @@ public class EntityActionControllerImplTest {
     // in alpha mode)
     currentEntityArea = EntityArea.WIKI;
     when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+      mockFeatureFlagConfig.isFeatureEnabled(
+        FeatureFlagKey.DESCRIPTION_FIELD.getKey()
+      )
     )
-      .thenReturn("true");
+      .thenReturn(true);
     entityBundle.setEntity(new Project());
     AsyncMockStubber
       .callFailureWith(new NotFoundException())
