@@ -53,15 +53,19 @@ import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Italic;
 import org.gwtbootstrap3.client.ui.html.Span;
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EventHandlerUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.jsinterop.ToastMessageOptions;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.JavaScriptCallback;
 import org.sagebionetworks.web.client.widget.entity.SharingAndDataUseConditionWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v3.Action;
 
 /**
  * Note on the form submission. This supports two form submission use cases. 1. Submit to Portal
@@ -348,6 +352,25 @@ public class UploaderViewImpl extends FlowPanel implements UploaderView {
   @Override
   public void showInfo(String message) {
     DisplayUtils.showInfo(message);
+  }
+
+  @Override
+  public void showSingleFileUploaded(String entityId) {
+    ToastMessageOptions toastOptions = new ToastMessageOptions.Builder()
+      .setPrimaryButton(
+        "View File",
+        () ->
+          ginInjector
+            .getGlobalApplicationState()
+            .getPlaceChanger()
+            .goTo(new Synapse(entityId))
+      )
+      .build();
+    DisplayUtils.notify(
+      DisplayConstants.TEXT_UPLOAD_SUCCESS,
+      DisplayUtils.NotificationVariant.INFO,
+      toastOptions
+    );
   }
 
   @Override
