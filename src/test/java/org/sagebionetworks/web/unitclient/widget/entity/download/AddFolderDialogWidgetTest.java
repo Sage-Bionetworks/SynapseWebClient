@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.entity.download;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -13,10 +14,12 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Folder;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.jsinterop.ToastMessageOptions;
 import org.sagebionetworks.web.client.widget.entity.SharingAndDataUseConditionWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.download.AddFolderDialogWidget;
@@ -99,6 +102,12 @@ public class AddFolderDialogWidgetTest {
     verify(mockSynapseJavascriptClient)
       .createEntity(any(Folder.class), any(AsyncCallback.class));
     verify(mockView).hide();
+    verify(mockPopupUtils)
+      .notify(
+        anyString(),
+        any(DisplayUtils.NotificationVariant.class),
+        any(ToastMessageOptions.class)
+      );
   }
 
   @Test

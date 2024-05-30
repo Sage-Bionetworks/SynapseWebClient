@@ -5,9 +5,12 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Folder;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.jsinterop.ToastMessageOptions;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.SharingAndDataUseConditionWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -70,7 +73,21 @@ public class AddFolderDialogWidget
         @Override
         public void onSuccess(Entity result) {
           view.hide();
-          popupUtils.showInfo("Folder '" + newFolderName + "' Added");
+          String message = "Folder '" + newFolderName + "' Added";
+          ToastMessageOptions toastOptions = new ToastMessageOptions.Builder()
+            .setPrimaryButton(
+              "View Folder",
+              () ->
+                globalAppState
+                  .getPlaceChanger()
+                  .goTo(new Synapse(result.getId()))
+            )
+            .build();
+          popupUtils.notify(
+            message,
+            DisplayUtils.NotificationVariant.INFO,
+            toastOptions
+          );
           globalAppState.refreshPage();
         }
 
