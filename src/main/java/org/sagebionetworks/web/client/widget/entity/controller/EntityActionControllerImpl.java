@@ -73,17 +73,8 @@ import org.sagebionetworks.repo.model.table.TableUpdateTransactionResponse;
 import org.sagebionetworks.repo.model.table.VirtualTable;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
-import org.sagebionetworks.web.client.ChallengeClientAsync;
-import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.*;
 import org.sagebionetworks.web.client.DisplayUtils.NotificationVariant;
-import org.sagebionetworks.web.client.EntityTypeUtils;
-import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.PopupUtilsView;
-import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.context.KeyFactoryProvider;
 import org.sagebionetworks.web.client.context.QueryClientProvider;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -295,6 +286,7 @@ public class EntityActionControllerImpl
   ContainerClientsHelp containerClientsHelp;
   QueryClient queryClient;
   KeyFactoryProvider keyFactoryProvider;
+  FeatureFlagConfig featureFlagConfig;
 
   @Inject
   public EntityActionControllerImpl(
@@ -308,7 +300,8 @@ public class EntityActionControllerImpl
     EventBus eventBus,
     PopupUtilsView popupUtilsView,
     QueryClientProvider queryClientProvider,
-    KeyFactoryProvider keyFactoryProvider
+    KeyFactoryProvider keyFactoryProvider,
+    FeatureFlagConfig featureFlagConfig
   ) {
     super();
     this.view = view;
@@ -322,6 +315,7 @@ public class EntityActionControllerImpl
     this.popupUtils = popupUtilsView;
     this.queryClient = queryClientProvider.getQueryClient();
     this.keyFactoryProvider = keyFactoryProvider;
+    this.featureFlagConfig = featureFlagConfig;
     entityUpdatedWizardCallback =
       new WizardCallback() {
         @Override
@@ -1584,7 +1578,9 @@ public class EntityActionControllerImpl
       String text = RENAME_PREFIX + entityTypeDisplay;
       if (
         entityBundle.getEntity() instanceof Table &&
-        DisplayUtils.isInTestWebsite(cookies)
+        featureFlagConfig.isFeatureEnabled(
+          FeatureFlagKey.DESCRIPTION_FIELD.getKey()
+        )
       ) {
         text = EDIT_NAME_AND_DESCRIPTION;
       }

@@ -32,7 +32,8 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.DateTimeUtils;
-import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.FeatureFlagConfig;
+import org.sagebionetworks.web.client.FeatureFlagKey;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -121,6 +122,9 @@ public class WikiPageWidgetTest {
   @Mock
   WikiSubpagesExpandEvent mockWikiSubpagesExpandEvent;
 
+  @Mock
+  FeatureFlagConfig mockFeatureFlagConfig;
+
   AdapterFactory adapterFactory = new AdapterFactoryImpl();
 
   WikiPageWidget presenter;
@@ -146,7 +150,8 @@ public class WikiPageWidgetTest {
         mockDateTimeUtils,
         mockSynapseJavascriptClient,
         mockCookies,
-        mockEventBus
+        mockEventBus,
+        mockFeatureFlagConfig
       );
     testPage = new WikiPage();
     testPage.setId(WIKI_PAGE_ID);
@@ -168,9 +173,11 @@ public class WikiPageWidgetTest {
         any(AsyncCallback.class)
       );
     when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+      mockFeatureFlagConfig.isFeatureEnabled(
+        FeatureFlagKey.WIKI_DIFF_TOOL.getKey()
+      )
     )
-      .thenReturn("true");
+      .thenReturn(true);
   }
 
   @Test
@@ -241,9 +248,12 @@ public class WikiPageWidgetTest {
   @Test
   public void testDiffToolHiddenInNormalMode() {
     when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+      mockFeatureFlagConfig.isFeatureEnabled(
+        FeatureFlagKey.WIKI_DIFF_TOOL.getKey()
+      )
     )
-      .thenReturn(null);
+      .thenReturn(false);
+
     WikiPageKey key = new WikiPageKey(
       "ownerId",
       ObjectType.ENTITY.toString(),

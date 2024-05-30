@@ -17,7 +17,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
-import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.FeatureFlagConfig;
+import org.sagebionetworks.web.client.FeatureFlagKey;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -86,6 +87,9 @@ public class CreateAccessRequirementButtonTest {
   @Mock
   PlaceChanger mockPlaceChanger;
 
+  @Mock
+  FeatureFlagConfig mockFeatureFlagConfig;
+
   @Captor
   ArgumentCaptor<Place> placeCaptor;
 
@@ -97,6 +101,7 @@ public class CreateAccessRequirementButtonTest {
         mockView,
         mockIsACTMemberAsyncHandler,
         mockCookies,
+        mockFeatureFlagConfig,
         mockGinInjector
       );
     when(mockGinInjector.getLegacyCreateAccessRequirementWizard())
@@ -132,8 +137,12 @@ public class CreateAccessRequirementButtonTest {
     verify(mockView).setButtonVisible(true);
 
     // configured with an AR, when clicked it should pop up the wizard with the existing AR
-    when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
-      .thenReturn(null);
+    when(
+      mockFeatureFlagConfig.isFeatureEnabled(
+        FeatureFlagKey.SRC_BASED_AR_MODAL_WIZARD.getKey()
+      )
+    )
+      .thenReturn(false);
     widget.onClick();
     verify(mockLegacyCreateAccessRequirementWizard)
       .configure(mockAccessRequirement);
@@ -155,8 +164,12 @@ public class CreateAccessRequirementButtonTest {
       .isACTActionAvailable(callbackPCaptor.capture());
 
     // configured with a subject, when clicked it should pop up the wizard pointing to the new subject
-    when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
-      .thenReturn(null);
+    when(
+      mockFeatureFlagConfig.isFeatureEnabled(
+        FeatureFlagKey.SRC_BASED_AR_MODAL_WIZARD.getKey()
+      )
+    )
+      .thenReturn(false);
     widget.onClick();
     verify(mockLegacyCreateAccessRequirementWizard).configure(mockSubject);
     verify(mockLegacyCreateAccessRequirementWizard)
@@ -167,8 +180,12 @@ public class CreateAccessRequirementButtonTest {
   @Test
   public void testOnCancelRefreshPage() {
     widget.configure(mockAccessRequirement, mockRefreshCallback);
-    when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
-      .thenReturn(null);
+    when(
+      mockFeatureFlagConfig.isFeatureEnabled(
+        FeatureFlagKey.SRC_BASED_AR_MODAL_WIZARD.getKey()
+      )
+    )
+      .thenReturn(false);
     widget.onClick();
     verify(mockLegacyCreateAccessRequirementWizard)
       .configure(mockAccessRequirement);
@@ -193,9 +210,13 @@ public class CreateAccessRequirementButtonTest {
     isACTMemberCallback.invoke(true);
     verify(mockView).setButtonVisible(true);
 
-    // experimental mode -- use SRC wizard
-    when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
-      .thenReturn("true");
+    // feature flag -- use SRC wizard
+    when(
+      mockFeatureFlagConfig.isFeatureEnabled(
+        FeatureFlagKey.SRC_BASED_AR_MODAL_WIZARD.getKey()
+      )
+    )
+      .thenReturn(true);
     widget.onClick();
 
     verify(mockCreateOrUpdateAccessRequirementWizard)
@@ -235,9 +256,13 @@ public class CreateAccessRequirementButtonTest {
     verify(mockIsACTMemberAsyncHandler)
       .isACTActionAvailable(callbackPCaptor.capture());
 
-    // experimental mode -- use SRC wizard
-    when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
-      .thenReturn("true");
+    // feature flag -- use SRC wizard
+    when(
+      mockFeatureFlagConfig.isFeatureEnabled(
+        FeatureFlagKey.SRC_BASED_AR_MODAL_WIZARD.getKey()
+      )
+    )
+      .thenReturn(true);
     widget.onClick();
 
     verify(mockCreateOrUpdateAccessRequirementWizard)
@@ -270,11 +295,15 @@ public class CreateAccessRequirementButtonTest {
   @Test
   public void testOnCancelRefreshPageInExperimentalMode() {
     widget.configure(mockAccessRequirement, mockRefreshCallback);
-    when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
-      .thenReturn("true");
+    when(
+      mockFeatureFlagConfig.isFeatureEnabled(
+        FeatureFlagKey.SRC_BASED_AR_MODAL_WIZARD.getKey()
+      )
+    )
+      .thenReturn(true);
     widget.onClick();
 
-    // experimental mode -- use SRC wizard
+    // feature flag -- use SRC wizard
     verify(mockCreateOrUpdateAccessRequirementWizard)
       .configure(
         eq(mockAccessRequirement),

@@ -17,7 +17,7 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
-import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.FeatureFlagConfig;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.docker.DockerCommitListWidget;
@@ -72,6 +72,9 @@ public class DockerRepoWidgetTest {
   @Mock
   EventBus mockEventBus;
 
+  @Mock
+  FeatureFlagConfig mockFeatureFlagConfig;
+
   DockerRepoWidget dockerRepoWidget;
   String entityId = "syn123";
   String repoName = "dockerRepoName";
@@ -95,7 +98,8 @@ public class DockerRepoWidgetTest {
         mockModifiedCreatedBy,
         mockDockerCommitListWidget,
         mockCookieProvider,
-        mockEventBus
+        mockEventBus,
+        mockFeatureFlagConfig
       );
     when(mockEntity.getId()).thenReturn(entityId);
     when(mockEntity.getRepositoryName()).thenReturn(repoName);
@@ -107,10 +111,6 @@ public class DockerRepoWidgetTest {
     when(mockEntity.getModifiedBy()).thenReturn(modifiedBy);
     when(mockEntity.getModifiedOn()).thenReturn(modifiedOn);
     when(mockEntityBundle.getRootWikiId()).thenReturn(rootWikiId);
-    when(
-      mockCookieProvider.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)
-    )
-      .thenReturn(null);
   }
 
   @Test

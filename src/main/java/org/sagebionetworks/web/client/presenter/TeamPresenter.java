@@ -12,10 +12,7 @@ import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMemberTypeFilterOptions;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.*;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -60,6 +57,7 @@ public class TeamPresenter
   private IsACTMemberAsyncHandler isACTMemberAsyncHandler;
   private TeamProjectsModalWidget teamProjectsModalWidget;
   private PortalGinInjector ginInjector;
+  private FeatureFlagConfig featureFlagConfig;
   Callback refreshCallback = () -> {
     refresh();
   };
@@ -80,7 +78,8 @@ public class TeamPresenter
     GoogleMap map,
     CookieProvider cookies,
     IsACTMemberAsyncHandler isACTMemberAsyncHandler,
-    PortalGinInjector ginInjector
+    PortalGinInjector ginInjector,
+    FeatureFlagConfig featureFlagConfig
   ) {
     this.view = view;
     this.ginInjector = ginInjector;
@@ -97,6 +96,7 @@ public class TeamPresenter
     this.openUserInvitationsWidget = openUserInvitationsWidget;
     this.map = map;
     this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
+    this.featureFlagConfig = featureFlagConfig;
     view.setPresenter(this);
     view.setSynAlertWidget(synAlert.asWidget());
     view.setInviteMemberWidget(inviteWidget.asWidget());
@@ -106,7 +106,9 @@ public class TeamPresenter
     view.setManagerListWidget(managerListWidget.asWidget());
     view.setMemberListWidget(memberListWidget.asWidget());
     view.setMap(map.asWidget());
-    view.setShowMapVisible(DisplayUtils.isInTestWebsite(cookies));
+    view.setShowMapVisible(
+      featureFlagConfig.isFeatureEnabled(FeatureFlagKey.GOOGLE_MAP.getKey())
+    );
     inviteWidget.setRefreshCallback(refreshCallback);
   }
 
