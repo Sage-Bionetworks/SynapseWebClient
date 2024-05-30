@@ -703,7 +703,7 @@ public class UploaderViewImpl extends FlowPanel implements UploaderView {
     uploadDestinationContainer.add(
       new InlineHTML(DisplayConstants.UPLOAD_DESTINATION)
     );
-    Image logo = new Image("images/logo.svg");
+    Image logo = new Image("/images/logo.svg");
     logo.setSize("35px", "35px");
     logo.addStyleName("displayInlineBlock margin-right-5 moveup-7");
     uploadDestinationContainer.add(logo);
