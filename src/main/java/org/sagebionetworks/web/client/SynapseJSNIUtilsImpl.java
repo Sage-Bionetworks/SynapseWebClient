@@ -921,4 +921,22 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 			console.error(err);
 		}
 	}-*/;
+
+  @Override
+  public String setHash(String hash) {
+    return _setHash(hash);
+  }
+
+  private static final native String _setHash(String hash) /*-{
+      $wnd.history.pushState('', '', hash)
+    }-*/;
+
+  @Override
+  public String getHash() {
+    return _getHash();
+  }
+
+  private static final native String _getHash() /*-{
+      return $wnd.location.hash
+    }-*/;
 }

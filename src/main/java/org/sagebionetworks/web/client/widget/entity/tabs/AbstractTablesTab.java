@@ -5,8 +5,10 @@ import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 import com.google.common.base.Function;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.place.shared.Place;
+import com.google.gwt.user.client.Window.Location;
 import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +30,7 @@ import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.FeatureFlagConfig;
 import org.sagebionetworks.web.client.FeatureFlagKey;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -57,7 +60,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 public abstract class AbstractTablesTab
   implements TablesTabView.Presenter, QueryChangeHandler {
 
-  public static final String TABLE_QUERY_PREFIX = "query/";
+  public static final String TABLE_QUERY_PREFIX = "#query/";
 
   private static final String VERSION_ALERT_DRAFT_DATASET_TITLE =
     "This is a Draft Version of the Dataset";
@@ -99,6 +102,7 @@ public abstract class AbstractTablesTab
   Long latestSnapshotVersionNumber;
   SynapseJavascriptClient jsClient;
   FeatureFlagConfig featureFlagConfig;
+  SynapseJSNIUtils jsniUtils;
 
   protected abstract EntityArea getTabArea();
 
@@ -116,11 +120,13 @@ public abstract class AbstractTablesTab
   public AbstractTablesTab(
     Tab tab,
     PortalGinInjector ginInjector,
-    FeatureFlagConfig featureFlagConfig
+    FeatureFlagConfig featureFlagConfig,
+    SynapseJSNIUtils jsniUtils
   ) {
     this.tab = tab;
     this.ginInjector = ginInjector;
     this.featureFlagConfig = featureFlagConfig;
+    this.jsniUtils = jsniUtils;
   }
 
   public void configure(
@@ -255,10 +261,9 @@ public abstract class AbstractTablesTab
       Long versionNumber = QueryBundleUtils.getTableVersion(newQuery.getSql());
       String synId = QueryBundleUtils.getTableIdFromSql(newQuery.getSql());
       Query defaultQuery = tableEntityWidget.getDefaultQuery();
+      // SWC-6854: update query value in the hash
       if (token != null && !newQuery.equals(defaultQuery)) {
-        areaToken = TABLE_QUERY_PREFIX + token;
-      } else {
-        areaToken = "";
+        jsniUtils.setHash(TABLE_QUERY_PREFIX + token);
       }
       updateVersionAndAreaToken(synId, versionNumber, areaToken);
       tab.showTab(true);
@@ -266,8 +271,10 @@ public abstract class AbstractTablesTab
   }
 
   public Query getQueryString() {
-    if (areaToken != null && areaToken.startsWith(TABLE_QUERY_PREFIX)) {
-      String token = areaToken.substring(TABLE_QUERY_PREFIX.length());
+    // SWC-6854:read query from hash, if present
+    String hash = jsniUtils.getHash();
+    if (hash != null && hash.startsWith(TABLE_QUERY_PREFIX)) {
+      String token = hash.substring(TABLE_QUERY_PREFIX.length());
       return queryTokenProvider.tokenToQuery(token);
     }
     return null;
