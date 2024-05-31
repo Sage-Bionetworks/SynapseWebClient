@@ -110,6 +110,8 @@ public class DisplayConstants {
     "Link successfully updated in Synapse";
   public static final String TEXT_LINK_FAILED =
     "An error occurred while creating the link.  ";
+  public static final String TEXT_UPLOAD_MULTIPLE_FILES_SUCCESS =
+    "Files successfully uploaded";
   public static final String TEXT_UPLOAD_SUCCESS = "File successfully uploaded";
   public static final String ERROR_UPLOAD_TITLE = "Upload Error";
   public static final String ERROR_SFTP_DOWNLOAD_TITLE = "SFTP Download Error";
