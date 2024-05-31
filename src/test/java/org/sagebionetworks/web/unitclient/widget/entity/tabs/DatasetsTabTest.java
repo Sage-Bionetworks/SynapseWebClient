@@ -48,6 +48,7 @@ import org.sagebionetworks.web.client.FeatureFlagConfig;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -167,11 +168,17 @@ public class DatasetsTabTest {
   @Mock
   FeatureFlagConfig mockFeatureFlagConfig;
 
+  @Mock
+  SynapseJSNIUtils mockJsniUtils;
+
   @Captor
   ArgumentCaptor<Map<String, String>> mapCaptor;
 
   @Captor
   ArgumentCaptor<Place> placeCaptor;
+
+  @Captor
+  ArgumentCaptor<String> stringCaptor;
 
   DatasetsTab tab;
   Query query;
@@ -204,7 +211,12 @@ public class DatasetsTabTest {
       .thenReturn(mockPlaceChanger);
 
     tab =
-      new DatasetsTab(mockTab, mockPortalGinInjector, mockFeatureFlagConfig);
+      new DatasetsTab(
+        mockTab,
+        mockPortalGinInjector,
+        mockFeatureFlagConfig,
+        mockJsniUtils
+      );
     tab.setEntitySelectedCallback(mockEntitySelectedCallback);
 
     when(mockProjectEntityBundle.getEntity()).thenReturn(mockProjectEntity);
@@ -390,7 +402,8 @@ public class DatasetsTabTest {
 
     Synapse place = getNewPlace(datasetName);
     assertEquals(EntityArea.DATASETS, place.getArea());
-    assertTrue(place.getAreaToken().isEmpty());
+    assertNull(place.getAreaToken());
+    verify(mockJsniUtils, never()).setHash(anyString());
   }
 
   @Test
@@ -426,8 +439,9 @@ public class DatasetsTabTest {
     verify(mockPlaceChanger).goTo(placeCaptor.capture());
     Synapse place = (Synapse) placeCaptor.getValue();
     assertEquals(EntityArea.DATASETS, place.getArea());
-    assertTrue(place.getAreaToken().isEmpty());
+    assertNull(place.getAreaToken());
     assertEquals(newVersion, place.getVersionNumber());
+    verify(mockJsniUtils, never()).setHash(anyString());
   }
 
   @Test
@@ -446,7 +460,8 @@ public class DatasetsTabTest {
     verify(mockPlaceChanger).goTo(placeCaptor.capture());
     Synapse place = (Synapse) placeCaptor.getValue();
     assertEquals(EntityArea.DATASETS, place.getArea());
-    assertTrue(place.getAreaToken().isEmpty());
+    assertNull(place.getAreaToken());
+    verify(mockJsniUtils, never()).setHash(anyString());
     assertNull(place.getVersionNumber());
     assertEquals("syn837874873843", place.getEntityId());
   }
@@ -474,7 +489,8 @@ public class DatasetsTabTest {
 
     Synapse place = getNewPlace(datasetName);
     assertEquals(EntityArea.DATASETS, place.getArea());
-    assertTrue(place.getAreaToken().contains(encodedToken));
+    verify(mockJsniUtils).setHash(stringCaptor.capture());
+    assertTrue(stringCaptor.getValue().contains(encodedToken));
   }
 
   @Test
@@ -482,27 +498,28 @@ public class DatasetsTabTest {
     Long version = null;
     tab.setProject(projectEntityId, mockProjectEntityBundle, null);
 
-    String queryAreaToken;
+    String queryToken = null;
+    when(mockJsniUtils.getHash()).thenReturn(queryToken);
     Query query1 = null;
-    queryAreaToken = null;
-    tab.configure(mockDatasetBundle, version, queryAreaToken);
+    tab.configure(mockDatasetBundle, version, null);
     query1 = tab.getQueryString();
     assertNull(query1);
 
-    queryAreaToken = "something else";
-    tab.configure(mockDatasetBundle, version, queryAreaToken);
+    tab.configure(mockDatasetBundle, version, null);
     query1 = tab.getQueryString();
     assertNull(query1);
     String token = "encoded query token";
-    queryAreaToken = "query/" + token;
+    queryToken = "#query/" + token;
+    when(mockJsniUtils.getHash()).thenReturn(queryToken);
     when(mockQueryTokenProvider.tokenToQuery(anyString())).thenReturn(query);
-    tab.configure(mockDatasetBundle, version, queryAreaToken);
+    tab.configure(mockDatasetBundle, version, null);
     query1 = tab.getQueryString();
     assertEquals(query, query1);
     query.setSql("SELECT 'query/' FROM syn123 LIMIT 1");
     token = "encoded query token 2";
-    queryAreaToken = "query/" + token;
-    tab.configure(mockDatasetBundle, version, queryAreaToken);
+    queryToken = "#query/" + token;
+    when(mockJsniUtils.getHash()).thenReturn(queryToken);
+    tab.configure(mockDatasetBundle, version, null);
     query1 = tab.getQueryString();
     assertEquals(query, query1);
   }
