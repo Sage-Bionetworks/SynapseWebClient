@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.FeatureFlagConfig;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -34,9 +35,10 @@ public class DatasetsTab extends AbstractTablesTab {
   public DatasetsTab(
     Tab tab,
     PortalGinInjector ginInjector,
-    FeatureFlagConfig featureFlagConfig
+    FeatureFlagConfig featureFlagConfig,
+    SynapseJSNIUtils jsniUtils
   ) {
-    super(tab, ginInjector, featureFlagConfig);
+    super(tab, ginInjector, featureFlagConfig, jsniUtils);
     this.tab = tab;
     this.ginInjector = ginInjector;
     this.featureFlagConfig = featureFlagConfig;
