@@ -414,7 +414,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
   ) /*-{
 		if ($wnd.Worker) {
 			if (!$wnd.calculateFileMd5Worker) {
-			  $wnd.calculateFileMd5Worker = new $wnd.Worker("workers/calculateFileMd5Worker.js");
+			  $wnd.calculateFileMd5Worker = new $wnd.Worker("/workers/calculateFileMd5Worker.js");
 			};
 			$wnd.calculateFileMd5Worker.onmessage = function(event) {
 				md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback::setMD5(Ljava/lang/String;)(event.data);
@@ -446,7 +446,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
   ) /*-{
 		if ($wnd.Worker) {
 			if (!$wnd.calculateFilePartMd5Worker) {
-			  $wnd.calculateFilePartMd5Worker = new $wnd.Worker("workers/calculateFilePartMd5Worker.js");
+			  $wnd.calculateFilePartMd5Worker = new $wnd.Worker("/workers/calculateFilePartMd5Worker.js");
 			};
 			$wnd.calculateFilePartMd5Worker.onmessage = function(event) {
 				md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback:: setMD5(Ljava/lang/String;) (event.data);
