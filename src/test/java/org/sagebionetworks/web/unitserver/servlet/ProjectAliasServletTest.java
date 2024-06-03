@@ -17,6 +17,7 @@ import org.mockito.ArgumentCaptor;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
+import org.sagebionetworks.client.exceptions.SynapseUnauthorizedException;
 import org.sagebionetworks.repo.model.EntityId;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.server.servlet.ProjectAliasServlet;
@@ -111,5 +112,17 @@ public class ProjectAliasServletTest {
     verify(mockResponse).sendRedirect(captor.capture());
     String value = captor.getValue();
     assertTrue(value.contains("Error:"));
+  }
+
+  @Test
+  public void testInvalidAccessToken() throws Exception {
+    when(mockSynapse.getMyProfile())
+      .thenThrow(
+        new SynapseUnauthorizedException(
+          ProjectAliasServlet.INVALID_ACCESS_TOKEN
+        )
+      );
+
+    testHappyCaseRedirect();
   }
 }
