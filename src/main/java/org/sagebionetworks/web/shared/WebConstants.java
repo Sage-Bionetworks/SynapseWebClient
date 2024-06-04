@@ -26,7 +26,7 @@ public class WebConstants {
   public static final String INVALID_EMAIL_MESSAGE = "Invalid email address";
 
   public static final String ONESAGE_PRODUCTION_URL =
-    "https://accounts.sagebionetworks.synapse.org";
+    "https://accounts.synapse.org";
   public static final String ONESAGE_SYNAPSE_APPID_QUERY_PARAM =
     "appId=synapse.org";
   public static final String ONESAGE_ACCOUNT_SETTINGS_URL =

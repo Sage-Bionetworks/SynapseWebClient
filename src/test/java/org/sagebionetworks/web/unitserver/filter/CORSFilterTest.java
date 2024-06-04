@@ -68,7 +68,31 @@ public class CORSFilterTest {
   }
 
   @Test
-  public void testStagingSynapseOrg() throws ServletException, IOException {
+  public void testStagingAccountsSynapseOrg()
+    throws ServletException, IOException {
+    when(mockRequest.getHeader(ORIGIN_HEADER))
+      .thenReturn("https://staging.accounts" + SYNAPSE_ORG_SUFFIX); // SWC-6399: explicitly test https://staging.accounts.synapse.org
+    filter.testFilter(mockRequest, mockResponse, mockFilterChain);
+
+    // verify allow origin header set to the specific origin
+    verify(mockResponse)
+      .addHeader(
+        eq(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER),
+        stringCaptor.capture()
+      );
+    String allowOriginHeaderValue = stringCaptor.getValue();
+    assertEquals(
+      "https://staging.accounts.synapse.org",
+      allowOriginHeaderValue
+    );
+    // and Access-Control-Allow-Credentials is set to true
+    verify(mockResponse)
+      .addHeader(ACCESS_CONTROL_ALLOW_CREDENTIALS_HEADER, "true");
+  }
+
+  @Test
+  public void testStagingAccountsSageBioSynapseOrg()
+    throws ServletException, IOException {
     when(mockRequest.getHeader(ORIGIN_HEADER))
       .thenReturn(
         "https://staging.accounts.sagebionetworks" + SYNAPSE_ORG_SUFFIX

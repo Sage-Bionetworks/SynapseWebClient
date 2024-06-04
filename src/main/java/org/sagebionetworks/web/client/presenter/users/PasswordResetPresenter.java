@@ -7,13 +7,16 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.presenter.Presenter;
+import org.sagebionetworks.web.shared.WebConstants;
 
 public class PasswordResetPresenter
   extends AbstractActivity
   implements Presenter<PasswordReset> {
 
   private static final String ONE_SAGE_RESET_PASSWORD_URL =
-    "https://accounts.sagebionetworks.synapse.org/resetPassword";
+    WebConstants.ONESAGE_PRODUCTION_URL +
+    "/resetPassword?" +
+    WebConstants.ONESAGE_SYNAPSE_APPID_QUERY_PARAM;
 
   @Inject
   public PasswordResetPresenter() {}

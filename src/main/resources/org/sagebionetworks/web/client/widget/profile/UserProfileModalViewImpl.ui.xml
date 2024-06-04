@@ -29,7 +29,7 @@
           <b:Anchor
             text="Settings"
             target="_blank"
-            href="https://accounts.sagebionetworks.synapse.org/authenticated/myaccount"
+            href="https://accounts.synapse.org/authenticated/myaccount?appId=synapse.org"
           />
           <bh:Text text="&nbsp;page." />
         </b:BlockQuote>
