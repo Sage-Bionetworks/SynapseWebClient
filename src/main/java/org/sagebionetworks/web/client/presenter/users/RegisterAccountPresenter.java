@@ -25,11 +25,17 @@ public class RegisterAccountPresenter
     if (token != null && token.contains("@")) {
       // is likely an email address
       Window.Location.replace(
-        WebConstants.ONESAGE_PRODUCTION_URL + "/register1?email=" + token
+        WebConstants.ONESAGE_PRODUCTION_URL +
+        "/register1?email=" +
+        token +
+        "&" +
+        WebConstants.ONESAGE_SYNAPSE_APPID_QUERY_PARAM
       );
     } else {
       Window.Location.replace(
-        WebConstants.ONESAGE_PRODUCTION_URL + "/register1"
+        WebConstants.ONESAGE_PRODUCTION_URL +
+        "/register1?" +
+        WebConstants.ONESAGE_SYNAPSE_APPID_QUERY_PARAM
       );
     }
   }

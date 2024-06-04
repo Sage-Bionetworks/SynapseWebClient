@@ -30,7 +30,8 @@ public class PersonalAccessTokensPresenter
   public void start(AcceptsOneWidget panel, EventBus eventBus) {
     Window.Location.replace(
       WebConstants.ONESAGE_PRODUCTION_URL +
-      "/authenticated/personalaccesstokens"
+      "/authenticated/personalaccesstokens?" +
+      WebConstants.ONESAGE_SYNAPSE_APPID_QUERY_PARAM
     );
   }
 
