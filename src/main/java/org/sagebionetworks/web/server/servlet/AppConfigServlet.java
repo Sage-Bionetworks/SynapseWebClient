@@ -81,7 +81,7 @@ public class AppConfigServlet extends HttpServlet {
         appConfigDataClient.startConfigurationSession(sessionRequest);
       configurationToken = sessionResponse.getInitialConfigurationToken();
     } catch (Exception e) {
-      logger.log(Level.SEVERE, "Error starting configuration session", e);
+      logger.log(Level.WARNING, "Error starting configuration session", e);
       configurationToken = null;
     }
   }

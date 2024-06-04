@@ -145,4 +145,8 @@ public interface SynapseJSNIUtils {
   long getLastModified(JavaScriptObject blob);
 
   void setIsInnerProgrammaticHistoryChange();
+
+  String setHash(String hash);
+
+  String getHash();
 }

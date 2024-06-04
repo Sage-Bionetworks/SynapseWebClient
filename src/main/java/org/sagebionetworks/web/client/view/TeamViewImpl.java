@@ -19,6 +19,8 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.FeatureFlagConfig;
+import org.sagebionetworks.web.client.FeatureFlagKey;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.widget.FullWidthAlert;
@@ -114,6 +116,7 @@ public class TeamViewImpl extends Composite implements TeamView {
   private GWTWrapper gwt;
   private BigTeamBadge bigTeamBadge;
   private CookieProvider cookieProvider;
+  private FeatureFlagConfig featureFlagConfig;
 
   @Inject
   public TeamViewImpl(
@@ -122,13 +125,15 @@ public class TeamViewImpl extends Composite implements TeamView {
     Header headerWidget,
     GWTWrapper gwt,
     BigTeamBadge bigTeamBadge,
-    CookieProvider cookieProvider
+    CookieProvider cookieProvider,
+    FeatureFlagConfig featureFlagConfig
   ) {
     initWidget(binder.createAndBindUi(this));
     this.headerWidget = headerWidget;
     this.gwt = gwt;
     this.bigTeamBadge = bigTeamBadge;
     this.cookieProvider = cookieProvider;
+    this.featureFlagConfig = featureFlagConfig;
     setDropdownHandlers();
     headerWidget.configure();
     teamBadgeContainer.clear();
@@ -226,7 +231,11 @@ public class TeamViewImpl extends Composite implements TeamView {
   public void showMemberMenuItems() {
     leaveTeamItem.setVisible(true);
     // TODO: remove next line to take out of alpha mode
-    teamProjectsItem.setVisible(DisplayUtils.isInTestWebsite(cookieProvider));
+    teamProjectsItem.setVisible(
+      featureFlagConfig.isFeatureEnabled(
+        FeatureFlagKey.VIEW_ASSOCIATED_PROJECTS.getKey()
+      )
+    );
 
     toolsMenu.setVisible(true);
   }
@@ -237,7 +246,11 @@ public class TeamViewImpl extends Composite implements TeamView {
     editTeamItem.setVisible(true);
     inviteMemberItem.setVisible(true);
     // TODO: remove next line to take out of alpha mode
-    teamProjectsItem.setVisible(DisplayUtils.isInTestWebsite(cookieProvider));
+    teamProjectsItem.setVisible(
+      featureFlagConfig.isFeatureEnabled(
+        FeatureFlagKey.VIEW_ASSOCIATED_PROJECTS.getKey()
+      )
+    );
 
     toolsMenu.setVisible(true);
   }

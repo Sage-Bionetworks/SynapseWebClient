@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
@@ -34,7 +33,8 @@ import org.sagebionetworks.repo.model.project.ExternalGoogleCloudStorageLocation
 import org.sagebionetworks.repo.model.project.ExternalObjectStorageLocationSetting;
 import org.sagebionetworks.repo.model.project.ExternalS3StorageLocationSetting;
 import org.sagebionetworks.repo.model.project.StorageLocationSetting;
-import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.FeatureFlagConfig;
+import org.sagebionetworks.web.client.FeatureFlagKey;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
@@ -79,6 +79,9 @@ public class StorageLocationWidgetTest {
   @Mock
   EventBus mockEventBus;
 
+  @Mock
+  FeatureFlagConfig mockFeatureFlagConfig;
+
   @Captor
   ArgumentCaptor<StorageLocationSetting> locationSettingCaptor;
 
@@ -87,9 +90,11 @@ public class StorageLocationWidgetTest {
   @Before
   public void setup() {
     when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+      mockFeatureFlagConfig.isFeatureEnabled(
+        FeatureFlagKey.CUSTOM_STORAGE_LOCATION_SETTINGS.getKey()
+      )
     )
-      .thenReturn(null);
+      .thenReturn(false);
     widget =
       new StorageLocationWidget(
         mockView,
@@ -98,7 +103,8 @@ public class StorageLocationWidgetTest {
         mockSynAlert,
         mockSynapseProperties,
         mockCookies,
-        mockEventBus
+        mockEventBus,
+        mockFeatureFlagConfig
       );
     folder = new Folder();
     folder.setId("syn420");
@@ -206,9 +212,11 @@ public class StorageLocationWidgetTest {
   @Test
   public void testGetStorageLocationSettingExternalS3() {
     when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+      mockFeatureFlagConfig.isFeatureEnabled(
+        FeatureFlagKey.CUSTOM_STORAGE_LOCATION_SETTINGS.getKey()
+      )
     )
-      .thenReturn("true");
+      .thenReturn(true);
     ExternalS3UploadDestination entityStorageLocationSetting =
       new ExternalS3UploadDestination();
     String baseKey = "key";

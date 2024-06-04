@@ -19,7 +19,7 @@
               <!--Left-aligned logo for desktop view-->
               <bh:Div>
                 <g:Image
-                  url="images/logo.svg"
+                  url="/images/logo.svg"
                   addStyleNames="margin-bottom-15 margin-right-5 moveup-2"
                   width="35px"
                   height="35px"
@@ -36,7 +36,7 @@
               <!--Acts as a max-width flex column between logo and alpha mode buttons in desktop view. Contains a centered logo in mobile view-->
               <bh:Div addStyleNames="visible-xs margin-auto" width="200px">
                 <g:Image
-                  url="images/logo.svg"
+                  url="/images/logo.svg"
                   addStyleNames="margin-bottom-15 margin-right-5 moveup-2"
                   width="35px"
                   height="35px"
@@ -178,7 +178,7 @@
                 addStyleNames="displayInline link"
               >
                 <g:Image
-                  url="images/sagebionetworks-logo.svg"
+                  url="/images/sagebionetworks-logo.svg"
                   addStyleNames="center-in-div"
                   altText="Sage Bionetworks logo"
                   height="30px"
@@ -237,7 +237,7 @@
                 addStyleNames="displayInline link"
               >
                 <g:Image
-                  url="images/sagebionetworks-logo.svg"
+                  url="/images/sagebionetworks-logo.svg"
                   addStyleNames="center-in-div"
                   altText="Sage Bionetworks logo"
                   height="30px"

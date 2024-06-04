@@ -414,7 +414,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
   ) /*-{
 		if ($wnd.Worker) {
 			if (!$wnd.calculateFileMd5Worker) {
-			  $wnd.calculateFileMd5Worker = new $wnd.Worker("workers/calculateFileMd5Worker.js");
+			  $wnd.calculateFileMd5Worker = new $wnd.Worker("/workers/calculateFileMd5Worker.js");
 			};
 			$wnd.calculateFileMd5Worker.onmessage = function(event) {
 				md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback::setMD5(Ljava/lang/String;)(event.data);
@@ -446,7 +446,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
   ) /*-{
 		if ($wnd.Worker) {
 			if (!$wnd.calculateFilePartMd5Worker) {
-			  $wnd.calculateFilePartMd5Worker = new $wnd.Worker("workers/calculateFilePartMd5Worker.js");
+			  $wnd.calculateFilePartMd5Worker = new $wnd.Worker("/workers/calculateFilePartMd5Worker.js");
 			};
 			$wnd.calculateFilePartMd5Worker.onmessage = function(event) {
 				md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback:: setMD5(Ljava/lang/String;) (event.data);
@@ -921,4 +921,22 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 			console.error(err);
 		}
 	}-*/;
+
+  @Override
+  public String setHash(String hash) {
+    return _setHash(hash);
+  }
+
+  private static final native String _setHash(String hash) /*-{
+      $wnd.history.pushState('', '', hash)
+    }-*/;
+
+  @Override
+  public String getHash() {
+    return _getHash();
+  }
+
+  private static final native String _getHash() /*-{
+      return $wnd.location.hash
+    }-*/;
 }

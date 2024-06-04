@@ -701,7 +701,6 @@ public class Uploader
 
   private void postUpload() {
     if (currIndex + 1 == fileNames.length) {
-      // to new file handle id, or create new file entity with this file handle id
       view.hideLoading();
       refreshAfterSuccessfulUpload(entityId);
     } else {
@@ -714,6 +713,7 @@ public class Uploader
     if (fileHandleId == null) {
       postUpload();
     } else if (entityId != null || currentFileParentEntityId != null) {
+      // to new file handle id, or create new file entity with this file handle id
       synapseClient.setFileEntityFileHandle(
         fileHandleId,
         entityId,
@@ -722,6 +722,7 @@ public class Uploader
           @Override
           public void onSuccess(String entityId) {
             fileHasBeenUploaded = true;
+            Uploader.this.entityId = entityId;
             postUpload();
           }
 
@@ -998,7 +999,12 @@ public class Uploader
   }
 
   private void uploadSuccess() {
-    view.showInfo(DisplayConstants.TEXT_UPLOAD_SUCCESS);
+    int fileCount = fileNames.length;
+    if (fileCount == 1) {
+      view.showSingleFileUploaded(entityId);
+    } else {
+      view.showInfo(DisplayConstants.TEXT_UPLOAD_MULTIPLE_FILES_SUCCESS);
+    }
     view.clear();
     view.resetToInitialState();
     resetUploadProgress();

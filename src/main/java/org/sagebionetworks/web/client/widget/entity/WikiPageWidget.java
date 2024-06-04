@@ -18,6 +18,8 @@ import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
+import org.sagebionetworks.web.client.FeatureFlagConfig;
+import org.sagebionetworks.web.client.FeatureFlagKey;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -69,6 +71,7 @@ public class WikiPageWidget
   private SessionStorage sessionStorage;
   private AuthenticationController authController;
   private AdapterFactory adapterFactory;
+  private FeatureFlagConfig featureFlagConfig;
   private boolean isModifiedCreatedByHistoryVisible = true;
 
   public interface Callback {
@@ -95,7 +98,8 @@ public class WikiPageWidget
     DateTimeUtils dateTimeUtils,
     SynapseJavascriptClient jsClient,
     CookieProvider cookies,
-    EventBus eventBus
+    EventBus eventBus,
+    FeatureFlagConfig featureFlagConfig
   ) {
     this.view = view;
     this.synapseClient = synapseClient;
@@ -110,6 +114,7 @@ public class WikiPageWidget
     this.dateTimeUtils = dateTimeUtils;
     this.jsClient = jsClient;
     this.cookies = cookies;
+    this.featureFlagConfig = featureFlagConfig;
     view.setPresenter(this);
     view.setSynapseAlertWidget(stuAlert.asWidget());
     view.setWikiHistoryWidget(historyWidget);
@@ -164,7 +169,9 @@ public class WikiPageWidget
     }
     reloadWikiPage();
     view.setWikiHistoryDiffToolButtonVisible(
-      DisplayUtils.isInTestWebsite(cookies),
+      featureFlagConfig.isFeatureEnabled(
+        FeatureFlagKey.WIKI_DIFF_TOOL.getKey()
+      ),
       wikiKey
     );
   }

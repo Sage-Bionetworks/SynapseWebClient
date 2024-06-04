@@ -25,7 +25,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.table.TableEntity;
-import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.FeatureFlagConfig;
+import org.sagebionetworks.web.client.FeatureFlagKey;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -49,6 +50,9 @@ public class RenameEntityModalWidgetTest {
   @Mock
   Callback mockCallback;
 
+  @Mock
+  FeatureFlagConfig mockFeatureFlagConfig;
+
   String startName;
   String startDescription;
   String entityDisplayType;
@@ -69,7 +73,12 @@ public class RenameEntityModalWidgetTest {
     entity.setName(startName);
     entityDisplayType = "Folder";
     widget =
-      new RenameEntityModalWidgetImpl(mockView, mockJsClient, mockCookies);
+      new RenameEntityModalWidgetImpl(
+        mockView,
+        mockJsClient,
+        mockCookies,
+        mockFeatureFlagConfig
+      );
 
     tableEntity = new TableEntity();
     tableEntity.setName(startName);
@@ -209,9 +218,13 @@ public class RenameEntityModalWidgetTest {
 
   @Test
   public void testOnlyShowDescriptionForTables() {
-    // Currently experimental mode only
-    when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
-      .thenReturn("true");
+    // Currently behind feature flag
+    when(
+      mockFeatureFlagConfig.isFeatureEnabled(
+        FeatureFlagKey.DESCRIPTION_FIELD.getKey()
+      )
+    )
+      .thenReturn(true);
     AsyncMockStubber
       .callSuccessWith(new TableEntity())
       .when(mockJsClient)
@@ -254,9 +267,13 @@ public class RenameEntityModalWidgetTest {
   public void testNullDescriptionWithNoUpdate() {
     tableEntity.setDescription(null);
 
-    // Currently experimental mode only
-    when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
-      .thenReturn("true");
+    // Currently behind feature flag
+    when(
+      mockFeatureFlagConfig.isFeatureEnabled(
+        FeatureFlagKey.DESCRIPTION_FIELD.getKey()
+      )
+    )
+      .thenReturn(true);
 
     String newDescription = null;
 

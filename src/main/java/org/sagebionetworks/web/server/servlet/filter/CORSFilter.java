@@ -33,6 +33,8 @@ public class CORSFilter extends OncePerRequestFilter {
     "staging-signin",
     "accounts.sagebionetworks",
     "staging.accounts.sagebionetworks",
+    "accounts",
+    "staging.accounts",
     // Data portals
     "adknowledgeportal",
     "staging.adknowledgeportal",

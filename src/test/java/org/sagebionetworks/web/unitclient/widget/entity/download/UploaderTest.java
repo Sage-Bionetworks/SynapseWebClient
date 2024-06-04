@@ -432,7 +432,8 @@ public class UploaderTest {
     verify(mockView).hideLoading();
     assertEquals(UploadType.S3, uploader.getCurrentUploadType());
     // verify upload success
-    verify(mockView).showInfo(DisplayConstants.TEXT_UPLOAD_SUCCESS);
+
+    verify(mockView).showSingleFileUploaded("entityID");
     verify(mockView).clear();
     verify(mockView, times(2)).resetToInitialState();
     verify(mockUploadSuccessHandler).onSuccessfulUpload();
@@ -695,6 +696,10 @@ public class UploaderTest {
       )
     )
       .thenReturn(fileNames);
+    AsyncMockStubber
+      .callSuccessWith(testEntity)
+      .when(mockSynapseJavascriptClient)
+      .getEntity(anyString(), any(OBJECT_TYPE.class), any(AsyncCallback.class));
 
     uploader.handleUploads();
 
@@ -720,6 +725,9 @@ public class UploaderTest {
         eq(parentEntityId),
         any(AsyncCallback.class)
       );
+
+    verify(mockView)
+      .showInfo(DisplayConstants.TEXT_UPLOAD_MULTIPLE_FILES_SUCCESS);
   }
 
   @Test

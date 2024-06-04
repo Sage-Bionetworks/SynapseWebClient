@@ -57,6 +57,13 @@ public class Portal implements EntryPoint {
     if (initToken.length() > 0 && initToken.startsWith("!")) {
       String fullUrl = Window.Location.getHref();
       fullUrl = fullUrl.replace("#!", "");
+      // SWC-6854: Also detect a tables query in the hash fragment.  If exist, move just the query to the hash fragment
+      if (
+        initToken.startsWith("!Synapse") && initToken.contains("/tables/query/")
+      ) {
+        fullUrl = fullUrl.replace("/tables/query/", "/tables/#query/");
+      }
+
       Window.Location.assign(fullUrl);
     } else {
       // This is a split point where the browser can download the first large code file.

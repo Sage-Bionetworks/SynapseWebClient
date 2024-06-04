@@ -11,6 +11,8 @@ import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.FeatureFlagConfig;
+import org.sagebionetworks.web.client.FeatureFlagKey;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.jsinterop.EntityFinderScope;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
@@ -86,14 +88,18 @@ public class EvaluationSubmissionConfigViewImpl
 
   Widget widget;
 
+  FeatureFlagConfig featureFlagConfig;
+
   @Inject
   public EvaluationSubmissionConfigViewImpl(
     EvaluationSubmissionConfigViewImplUiBinder binder,
     EntityFinderWidget.Builder entityFinderBuilder,
-    CookieProvider cookies
+    CookieProvider cookies,
+    FeatureFlagConfig featureFlagConfig
   ) {
     widget = binder.createAndBindUi(this);
     this.cookies = cookies;
+    this.featureFlagConfig = featureFlagConfig;
     findProjectButton.addClickHandler(event -> {
       entityFinderBuilder
         .setInitialScope(EntityFinderScope.ALL_PROJECTS)
@@ -185,7 +191,11 @@ public class EvaluationSubmissionConfigViewImpl
 
   @Override
   public void configure(WikiPageKey wikiKey, Map<String, String> descriptor) {
-    submissionTypeOptions.setVisible(DisplayUtils.isInTestWebsite(cookies));
+    submissionTypeOptions.setVisible(
+      featureFlagConfig.isFeatureEnabled(
+        FeatureFlagKey.CHALLENGE_SUBMISSION_SETTINGS.getKey()
+      )
+    );
 
     String text = descriptor.get(WidgetConstants.UNAVAILABLE_MESSAGE);
     if (text != null) unavailableMessageField.setValue(text);

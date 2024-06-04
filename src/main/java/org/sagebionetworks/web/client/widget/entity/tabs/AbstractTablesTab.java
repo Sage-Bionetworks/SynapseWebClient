@@ -25,7 +25,10 @@ import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
+import org.sagebionetworks.web.client.FeatureFlagConfig;
+import org.sagebionetworks.web.client.FeatureFlagKey;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -55,7 +58,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 public abstract class AbstractTablesTab
   implements TablesTabView.Presenter, QueryChangeHandler {
 
-  public static final String TABLE_QUERY_PREFIX = "query/";
+  public static final String TABLE_QUERY_PREFIX = "#query/";
 
   private static final String VERSION_ALERT_DRAFT_DATASET_TITLE =
     "This is a Draft Version of the Dataset";
@@ -96,6 +99,8 @@ public abstract class AbstractTablesTab
   WikiPageWidget wikiPageWidget;
   Long latestSnapshotVersionNumber;
   SynapseJavascriptClient jsClient;
+  FeatureFlagConfig featureFlagConfig;
+  SynapseJSNIUtils jsniUtils;
 
   protected abstract EntityArea getTabArea();
 
@@ -110,9 +115,16 @@ public abstract class AbstractTablesTab
   protected abstract boolean isEntityShownInTab(Entity entity);
 
   @Inject
-  public AbstractTablesTab(Tab tab, PortalGinInjector ginInjector) {
+  public AbstractTablesTab(
+    Tab tab,
+    PortalGinInjector ginInjector,
+    FeatureFlagConfig featureFlagConfig,
+    SynapseJSNIUtils jsniUtils
+  ) {
     this.tab = tab;
     this.ginInjector = ginInjector;
+    this.featureFlagConfig = featureFlagConfig;
+    this.jsniUtils = jsniUtils;
   }
 
   public void configure(
@@ -247,10 +259,9 @@ public abstract class AbstractTablesTab
       Long versionNumber = QueryBundleUtils.getTableVersion(newQuery.getSql());
       String synId = QueryBundleUtils.getTableIdFromSql(newQuery.getSql());
       Query defaultQuery = tableEntityWidget.getDefaultQuery();
+      // SWC-6854: update query value in the hash
       if (token != null && !newQuery.equals(defaultQuery)) {
-        areaToken = TABLE_QUERY_PREFIX + token;
-      } else {
-        areaToken = "";
+        jsniUtils.setHash(TABLE_QUERY_PREFIX + token);
       }
       updateVersionAndAreaToken(synId, versionNumber, areaToken);
       tab.showTab(true);
@@ -258,8 +269,10 @@ public abstract class AbstractTablesTab
   }
 
   public Query getQueryString() {
-    if (areaToken != null && areaToken.startsWith(TABLE_QUERY_PREFIX)) {
-      String token = areaToken.substring(TABLE_QUERY_PREFIX.length());
+    // SWC-6854:read query from hash, if present
+    String hash = jsniUtils.getHash();
+    if (hash != null && hash.startsWith(TABLE_QUERY_PREFIX)) {
+      String token = hash.substring(TABLE_QUERY_PREFIX.length());
       return queryTokenProvider.tokenToQuery(token);
     }
     return null;
@@ -306,7 +319,11 @@ public abstract class AbstractTablesTab
       WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY,
       DisplayUtils.createEntityVersionString(entityId, newVersion)
     );
-    if (DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider())) {
+    if (
+      featureFlagConfig.isFeatureEnabled(
+        FeatureFlagKey.PROVENANCE_V2_VISUALIZATION.getKey()
+      )
+    ) {
       ProvenanceWidget provWidget = ginInjector.getProvenanceRendererV2();
       view.setProvenance(provWidget);
       provWidget.configure(configMap);
