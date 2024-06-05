@@ -70,13 +70,17 @@ public class ButtonLinkWidgetViewImpl
   public void configure(
     WikiPageKey wikiKey,
     String buttonText,
-    final String url,
+    String url,
     boolean isHighlight,
     final boolean openInNewWindow
   ) {
     clear();
     button.setText(buttonText);
     if (isHighlight) button.setType(ButtonType.INFO);
+    // Detect old #!, and direct to the right place
+    if (url.startsWith("#!")) {
+      url = "/" + url.substring("#!".length());
+    }
     button.setHref(url);
     if (openInNewWindow) {
       button
