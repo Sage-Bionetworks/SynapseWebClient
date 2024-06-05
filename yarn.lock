@@ -3489,10 +3489,15 @@ markdown-it-synapse-table@^1.0.6:
   resolved "https://registry.yarnpkg.com/markdown-it-synapse-table/-/markdown-it-synapse-table-1.0.6.tgz#5e14383257a6f6495d6c097388911548fe2155fb"
   integrity sha512-znhzQZhMxZ8sSQ9IBfdVv4ufW54i+P8M//rHEswcgg7SI3J0AN1s2T7T0KqYGG+9rHf/ORsdcUZst9hMiBC9xA==
 
-markdown-it-synapse@1.1.15, markdown-it-synapse@^1.1.15:
+markdown-it-synapse@1.1.15:
   version "1.1.15"
   resolved "https://registry.yarnpkg.com/markdown-it-synapse/-/markdown-it-synapse-1.1.15.tgz#4cdb796fadad1dc038a45e82eb64670863ce25bb"
   integrity sha512-tiH7cPS+fVKHUWpPO5vp5SpM01esOAjlLmSDDCMDT9E/nSmpspcs1TjBqxP51gDjTUmZZxyTB+nTbR/JvzVt/A==
+
+markdown-it-synapse@^1.1.16:
+  version "1.1.16"
+  resolved "https://registry.yarnpkg.com/markdown-it-synapse/-/markdown-it-synapse-1.1.16.tgz#154f2db1f3fd8a6b57c483a874db717db334c8b4"
+  integrity sha512-HxfV6labUOpnoSo0DxwtgyM2AGim5htOn1P2LLJMvcm9LHvXsFOpCDBO1zsy0Myz4dF3pxzdvFIGZGxrpr7Oxw==
 
 markdown-it@^14.1.0:
   version "14.1.0"
