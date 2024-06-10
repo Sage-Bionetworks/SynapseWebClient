@@ -215,7 +215,7 @@ public class EntityBadge
         }
 
         public void onSuccess(AddBatchOfFilesToDownloadListResponse result) {
-          String href = "DownloadCart:0";
+          String href = "/DownloadCart:0";
           popupUtils.showInfo(
             entityHeader.getName() + EntityBadge.ADDED_TO_DOWNLOAD_LIST,
             href,

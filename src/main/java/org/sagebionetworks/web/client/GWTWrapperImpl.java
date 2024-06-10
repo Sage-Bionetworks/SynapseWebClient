@@ -34,7 +34,7 @@ public class GWTWrapperImpl implements GWTWrapper {
 
   @Override
   public String getHostPageBaseURL() {
-    return GWT.getHostPageBaseURL();
+    return getHostpageUrl();
   }
 
   @Override

@@ -17,7 +17,7 @@
     "markdown-it-strikethrough-alt": "^1.0.0",
     "markdown-it-sub": "^2.0.0",
     "markdown-it-sup": "^2.0.0",
-    "markdown-it-synapse": "^1.1.15",
+    "markdown-it-synapse": "^1.1.16",
     "markdown-it-synapse-heading": "^1.0.1",
     "markdown-it-synapse-table": "^1.0.6",
     "moment": "^2.29.4",
@@ -34,7 +34,7 @@
     "react-transition-group": "2.6.0",
     "sass": "^1.63.6",
     "spark-md5": "^3.0.2",
-    "synapse-react-client": "3.2.18",
+    "synapse-react-client": "3.2.19",
     "universal-cookie": "^4.0.4",
     "xss": "^1.0.15"
   },
