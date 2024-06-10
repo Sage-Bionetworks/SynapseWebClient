@@ -228,7 +228,7 @@ public class EmailInvitationPresenterTest {
     verify(mockPlaceChanger).goTo(placeCaptor.capture());
     Profile profilePlace = placeCaptor.getValue();
     assertEquals(CURRENT_USER_ID, profilePlace.getUserId());
-    assertEquals(ProfileArea.SETTINGS, profilePlace.getArea());
+    assertEquals(ProfileArea.PROFILE, profilePlace.getArea());
   }
 
   @Test

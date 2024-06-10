@@ -1,15 +1,16 @@
 package org.sagebionetworks.web.client.widget;
 
+import static org.sagebionetworks.web.shared.WebConstants.ONESAGE_ACCOUNT_SETTINGS_URL;
+
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.place.Profile;
-import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 
 public class QuarantinedEmailModal implements IsWidget {
@@ -29,14 +30,7 @@ public class QuarantinedEmailModal implements IsWidget {
   ) {
     widget = (Modal) binder.createAndBindUi(this);
     accountSettingsLink.addClickHandler(event -> {
-      globalAppState
-        .getPlaceChanger()
-        .goTo(
-          new Profile(
-            authController.getCurrentUserPrincipalId(),
-            ProfileArea.SETTINGS
-          )
-        );
+      Window.open(ONESAGE_ACCOUNT_SETTINGS_URL, "_blank", "");
       widget.hide();
     });
   }

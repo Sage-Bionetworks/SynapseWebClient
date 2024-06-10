@@ -253,41 +253,38 @@ public class ProfileViewImpl extends Composite implements ProfileView {
       }
     });
 
-    teamSearchButton.addClickHandler(
-      event -> presenter.goTo(new TeamSearch(teamSearchTextBox.getValue()))
+    teamSearchButton.addClickHandler(event ->
+      presenter.goTo(new TeamSearch(teamSearchTextBox.getValue()))
     );
-    projectSearchButton.addClickHandler(
-      event -> presenter.goTo(new Search(projectSearchTextBox.getValue()))
+    projectSearchButton.addClickHandler(event ->
+      presenter.goTo(new Search(projectSearchTextBox.getValue()))
     );
 
-    moreChallengesButton.addClickHandler(
-      event -> presenter.getMoreChallenges()
+    moreChallengesButton.addClickHandler(event -> presenter.getMoreChallenges()
     );
     showChallengesLoading(false);
 
-    favoritesFilter.addClickHandler(
-      event -> presenter.applyFilterClicked(ProjectFilterEnum.FAVORITES, null)
+    favoritesFilter.addClickHandler(event ->
+      presenter.applyFilterClicked(ProjectFilterEnum.FAVORITES, null)
     );
-    allProjectsFilter.addClickHandler(
-      event -> presenter.applyFilterClicked(ProjectFilterEnum.ALL, null)
+    allProjectsFilter.addClickHandler(event ->
+      presenter.applyFilterClicked(ProjectFilterEnum.ALL, null)
     );
-    myProjectsFilter.addClickHandler(
-      event ->
-        presenter.applyFilterClicked(ProjectFilterEnum.CREATED_BY_ME, null)
+    myProjectsFilter.addClickHandler(event ->
+      presenter.applyFilterClicked(ProjectFilterEnum.CREATED_BY_ME, null)
     );
-    sharedDirectlyWithMeFilter.addClickHandler(
-      event ->
-        presenter.applyFilterClicked(
-          ProjectFilterEnum.SHARED_DIRECTLY_WITH_ME,
-          null
-        )
+    sharedDirectlyWithMeFilter.addClickHandler(event ->
+      presenter.applyFilterClicked(
+        ProjectFilterEnum.SHARED_DIRECTLY_WITH_ME,
+        null
+      )
     );
 
-    projectNameColumnHeader.setSortingListener(
-      headerName -> presenter.sort(ProjectListSortColumn.PROJECT_NAME)
+    projectNameColumnHeader.setSortingListener(headerName ->
+      presenter.sort(ProjectListSortColumn.PROJECT_NAME)
     );
-    lastActivityOnColumnHeader.setSortingListener(
-      headerName -> presenter.sort(ProjectListSortColumn.LAST_ACTIVITY)
+    lastActivityOnColumnHeader.setSortingListener(headerName ->
+      presenter.sort(ProjectListSortColumn.LAST_ACTIVITY)
     );
   }
 
@@ -673,9 +670,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
   }
 
   @Override
-  public void setUserProfileEditorWidget(IsWidget userProfileEditorWidget) {
+  public void setUserProfileWidget(IsWidget userProfileWidget) {
     this.editUserProfilePanel.clear();
-    this.editUserProfilePanel.add(userProfileEditorWidget);
+    this.editUserProfilePanel.add(userProfileWidget);
   }
 
   @Override
