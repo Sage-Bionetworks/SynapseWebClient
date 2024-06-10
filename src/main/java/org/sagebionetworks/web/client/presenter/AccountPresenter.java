@@ -79,9 +79,7 @@ public class AccountPresenter
           view.showInfo(DisplayConstants.EMAIL_SUCCESS);
           globalAppState
             .getPlaceChanger()
-            .goTo(
-              new Profile(Profile.VIEW_PROFILE_TOKEN, ProfileArea.SETTINGS)
-            );
+            .goTo(new Profile(Profile.VIEW_PROFILE_TOKEN, ProfileArea.PROFILE));
         }
 
         @Override
