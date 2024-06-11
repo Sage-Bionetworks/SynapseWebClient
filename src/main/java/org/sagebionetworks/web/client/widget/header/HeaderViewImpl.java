@@ -110,9 +110,16 @@ public class HeaderViewImpl extends Composite implements HeaderView {
   public void clear() {}
 
   public void rerenderNavBar() {
-    SynapseNavDrawerProps props = SynapseNavDrawerProps.create(() -> {
-      ginInjector.getAuthenticationController().logoutUser();
-    });
+    SynapseNavDrawerProps props = SynapseNavDrawerProps.create(
+      () -> {
+        ginInjector.getAuthenticationController().logoutUser();
+      },
+      href -> {
+        GlobalApplicationState globalAppState =
+          ginInjector.getGlobalApplicationState();
+        globalAppState.handleRelativePathClick(href);
+      }
+    );
     ReactNode component = React.createElementWithSynapseContext(
       SRC.SynapseComponents.SynapseNavDrawer,
       props,

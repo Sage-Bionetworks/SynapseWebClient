@@ -570,18 +570,31 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
             );
             // SWC-5812: SRC has components that apply this special CSS class, and expect the app to look for these events and handle appropriately.
             // When the class name is undefined, targetElement.getClassName() still returns an object where isEmpty is false and is not equal to null.
+            boolean isSRCSignInClass = false;
             try {
-              if (
+              isSRCSignInClass =
                 targetElement.hasClassName("SRC-SIGN-IN-CLASS") &&
-                !ginInjector.getAuthenticationController().isLoggedIn()
-              ) {
-                getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
-              }
+                !ginInjector.getAuthenticationController().isLoggedIn();
             } catch (Exception e) {
               // SWC-6243: log the error if it is not the known problem of finding the className
               if (!e.getMessage().contains("indexOf")) {
                 synapseJSNIUtils.consoleError(e.getMessage());
               }
+            }
+            try {
+              if (isSRCSignInClass) {
+                getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+              } else {
+                if (targetElement.hasAttribute("href")) {
+                  String href = targetElement.getAttribute("href");
+                  boolean handled = handleRelativePathClick(href);
+                  if (handled) {
+                    event.cancel();
+                  }
+                }
+              }
+            } catch (Exception e) {
+              synapseJSNIUtils.consoleError(e.getMessage());
             }
           }
         }
@@ -594,6 +607,20 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
     if (finalCallback != null) {
       finalCallback.invoke();
     }
+  }
+
+  @Override
+  public boolean handleRelativePathClick(String href) {
+    String placeToken = StringUtils.getGWTPlaceTokenFromURL(href);
+    if (placeToken != null) {
+      AppPlaceHistoryMapper appPlaceHistoryMapper = getAppPlaceHistoryMapper();
+      Place newPlace = appPlaceHistoryMapper.getPlace(placeToken);
+      if (newPlace != null) {
+        getPlaceChanger().goTo(newPlace);
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override

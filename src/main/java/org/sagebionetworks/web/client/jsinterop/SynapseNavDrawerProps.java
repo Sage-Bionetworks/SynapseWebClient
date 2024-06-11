@@ -13,12 +13,22 @@ public class SynapseNavDrawerProps extends ReactComponentProps {
     void run();
   }
 
+  @JsFunction
+  public interface Callback2 {
+    void run(String targetHref);
+  }
+
   public Callback signoutCallback;
+  public Callback2 gotoPlace;
 
   @JsOverlay
-  public static SynapseNavDrawerProps create(Callback signoutCallback) {
+  public static SynapseNavDrawerProps create(
+    Callback signoutCallback,
+    Callback2 gotoPlace
+  ) {
     SynapseNavDrawerProps props = new SynapseNavDrawerProps();
     props.signoutCallback = signoutCallback;
+    props.gotoPlace = gotoPlace;
     return props;
   }
 }
