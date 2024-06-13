@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.ORIGIN_HEADER;
 import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.SYNAPSE_ORG_SUFFIX;
 import static org.sagebionetworks.web.server.servlet.filter.CrawlFilter.META_ROBOTS_NOINDEX;
+import static org.sagebionetworks.web.server.servlet.filter.HtmlInjectionFilter.SYNAPSE_PLATFORM_DESCRIPTION;
 
 import freemarker.cache.StringTemplateLoader;
 import freemarker.core.ParseException;
@@ -33,9 +34,11 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
+import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.annotation.v2.Annotations;
@@ -242,6 +245,43 @@ public class HtmlInjectionFilterTest {
     String outputString = stringCaptor.getValue();
     assertTrue(outputString.contains(entityName));
     assertTrue(outputString.contains(WIKI_PAGE_MARKDOWN));
+    assertFalse(outputString.contains(META_ROBOTS_NOINDEX));
+    assertFalse(outputString.contains(BOT_HEAD_HTML));
+    assertFalse(outputString.contains(BOT_BODY_HTML));
+  }
+
+  @Test
+  public void testSynapseEntityPageWithoutWikiDescriptionAsHuman()
+    throws ServletException, IOException, RestServiceException, SynapseException {
+    when(mockRequest.getHeader("User-Agent"))
+      .thenReturn(
+        "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.111 Safari/537.36"
+      );
+    String synapseID = "syn12345";
+    String entityName = "my mock entity";
+
+    // using a stub class instead of the mockEntity
+    FileEntity fileEntity = new FileEntity();
+    fileEntity.setName(entityName);
+    fileEntity.setId(synapseID);
+    when(mockEntityBundle.getEntity()).thenReturn(fileEntity);
+    when(mockSynapseClient.getWikiPage(any(WikiPageKey.class)))
+      .thenThrow(new SynapseNotFoundException());
+
+    setRequestURL("https://www.synapse.org/Synapse:" + synapseID);
+
+    filter.testFilter(mockRequest, mockResponse, mockFilterChain);
+
+    verify(mockPrintWriter).print(stringCaptor.capture());
+    String outputString = stringCaptor.getValue();
+    assertTrue(outputString.contains(entityName));
+    assertFalse(outputString.contains(WIKI_PAGE_MARKDOWN));
+    assertTrue(
+      outputString.contains(
+        "'my mock entity' (Synapse ID: syn12345) is a file on Synapse."
+      )
+    );
+    assertTrue(outputString.contains(SYNAPSE_PLATFORM_DESCRIPTION));
     assertFalse(outputString.contains(META_ROBOTS_NOINDEX));
     assertFalse(outputString.contains(BOT_HEAD_HTML));
     assertFalse(outputString.contains(BOT_BODY_HTML));
