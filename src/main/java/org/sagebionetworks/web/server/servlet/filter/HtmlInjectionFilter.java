@@ -21,6 +21,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityType;
+import org.sagebionetworks.repo.model.EntityTypeUtils;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
@@ -61,8 +63,11 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
 
   Template portalHtmlTemplate = null;
   public static final String DEFAULT_PAGE_TITLE = "Synapse | Sage Bionetworks";
+  public static final String SYNAPSE_PLATFORM_DESCRIPTION =
+    "Synapse is a platform for supporting scientific collaborations centered around shared biomedical data sets.";
   public static final String DEFAULT_PAGE_DESCRIPTION =
-    "Synapse is a platform for supporting scientific collaborations centered around shared biomedical data sets.  Our goal is to make biomedical research more transparent, more reproducible, and more accessible to a broader audience of scientists.  Synapse serves as the host site for a variety of scientific collaborations, individual research projects, and DREAM challenges.";
+    SYNAPSE_PLATFORM_DESCRIPTION +
+    "  Our goal is to make biomedical research more transparent, more reproducible, and more accessible to a broader audience of scientists.  Synapse serves as the host site for a variety of scientific collaborations, individual research projects, and DREAM challenges.";
   public static final String DEFAULT_URL = "https://www.synapse.org";
   public static final String DISCUSSION_THREAD_ID = "/discussion/threadId=";
 
@@ -227,6 +232,25 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
                 description = CrawlFilter.getPlainTextWiki(entityId, rootPage);
               } catch (Exception e) {}
 
+              if (description == null || description.trim().length() == 0) {
+                // SWC-6862: If wiki was not found or empty, then default to some generic information
+                EntityType entityType = EntityTypeUtils.getEntityTypeForClass(
+                  entity.getClass()
+                );
+                String typeDisplayName = EntityTypeUtils.getDisplayName(
+                  entityType
+                );
+                StringBuilder newDescription = new StringBuilder();
+                newDescription.append("'");
+                newDescription.append(entity.getName());
+                newDescription.append("' (Synapse ID: ");
+                newDescription.append(entity.getId());
+                newDescription.append(") is a ");
+                newDescription.append(typeDisplayName.toLowerCase());
+                newDescription.append(" on Synapse.  ");
+                newDescription.append(SYNAPSE_PLATFORM_DESCRIPTION);
+                description = newDescription.toString();
+              }
               dataModel.put(PAGE_TITLE_KEY, entity.getName());
               dataModel.put(PAGE_DESCRIPTION_KEY, description);
 
