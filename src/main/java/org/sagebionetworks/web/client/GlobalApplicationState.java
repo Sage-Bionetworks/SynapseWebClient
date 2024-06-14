@@ -130,4 +130,6 @@ public interface GlobalApplicationState {
   void back();
 
   boolean isShowingVersionAlert();
+
+  boolean handleRelativePathClick(String href);
 }
