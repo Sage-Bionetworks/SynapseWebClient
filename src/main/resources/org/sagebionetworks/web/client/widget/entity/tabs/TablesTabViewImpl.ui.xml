@@ -4,6 +4,7 @@
   xmlns:ui="urn:ui:com.google.gwt.uibinder"
   xmlns:g="urn:import:com.google.gwt.user.client.ui"
   xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
+  xmlns:MUI="urn:import:org.sagebionetworks.web.client.jsinterop.mui"
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
   xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
 >
@@ -56,8 +57,8 @@
           addStyleNames="margin-top-15"
           ui:field="tableWidgetContainer"
         />
-        <b:Row>
-          <b:Column size="XS_12" ui:field="provenanceContainer">
+        <MUI:Grid container="true">
+          <MUI:Grid xs="12" ui:field="provenanceContainer">
             <g:FlowPanel addStyleNames="margin-bottom-15 margin-top-15">
               <bh:Div addStyleNames="highlight-title">
                 <bh:Text>Provenance</bh:Text>
@@ -73,8 +74,8 @@
                 addStyleNames="margin-top-10 margin-bottom-10"
               />
             </g:FlowPanel>
-          </b:Column>
-        </b:Row>
+          </MUI:Grid>
+        </MUI:Grid>
       </g:FlowPanel>
     </bh:Div>
     <g:SimplePanel ui:field="tableModifiedAndCreatedContainer" />

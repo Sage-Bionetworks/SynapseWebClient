@@ -202,6 +202,7 @@
       loadJs(cdnEndpoint + 'generated/pica.min.js')
       loadJs(reactPath)
       loadJs(reactDomPath)
+      loadJs(cdnEndpoint + 'generated/material-ui.production.min.js')
       loadJs(cdnEndpoint + 'generated/react-transition-group.min.js')
       loadJs(cdnEndpoint + 'generated/prop-types.min.js')
       loadJs(cdnEndpoint + 'generated/react-measure.js')
@@ -224,7 +225,7 @@
     </script>
     <script type="module">
       // react-query only ships ESM. esm.sh is a CDN that will 'bundle' dependencies for us
-      import * as ReactQuery from 'https://esm.sh/@tanstack/react-query@5.22.2'
+      import * as ReactQuery from 'https://esm.sh/@tanstack/react-query@5.22.2?deps=react@18.2.0'
       window.ReactQuery = ReactQuery
     </script>
   </head>
