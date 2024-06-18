@@ -170,7 +170,8 @@
       // Load latest version of Bootstrap 3 to override the version bundled by GWTBootstrap3
       // The Bootstrap 3 custom theme CSS is loaded through swc.scss
       // Note: we alias to bootstrap3 because we rely on Bootstrap 4 to be in node_modules/bootstrap to compile our scss (via synapse-react-client).
-      loadJs(cdnEndpoint + 'node_modules/bootstrap3/dist/js/bootstrap.min.js')
+      loadJs(cdnEndpoint + 'generated/bootstrap/dist/js/bootstrap.min.js')
+      loadJs(cdnEndpoint + 'generated/bootstrap/dist/js/npm.js')
       loadJs(cdnEndpoint + 'js/back-forward-nav-handler.js')
       loadJs(cdnEndpoint + 'generated/moment.min.js')
       loadJs(cdnEndpoint + 'generated/jsplumb.min.js')
