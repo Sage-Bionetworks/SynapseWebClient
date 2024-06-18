@@ -2,6 +2,7 @@
   "dependencies": {
     "@sage-bionetworks/markdown-it-container": "^4.0.1",
     "@sage-bionetworks/react-base-table": "1.13.4",
+    "bootstrap3": "npm:bootstrap@3.4.1",
     "croppie": "2.6.5",
     "font-awesome": "4.7.0",
     "jquery": "3.7.1",
