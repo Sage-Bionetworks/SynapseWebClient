@@ -402,6 +402,9 @@
                   file="${project.basedir}/node_modules/jquery-ui/dist/jquery-ui.min.js"
                   tofile="src/main/webapp/generated/jquery-ui.min.js"
                 />
+                <copy todir="src/main/webapp/generated/bootstrap">
+                  <fileset dir="${project.basedir}/node_modules/bootstrap3" />
+                </copy>
                 <copy
                   file="${project.basedir}/node_modules/jquery-ui/dist/themes/base/jquery-ui.min.css"
                   tofile="src/main/webapp/generated/jquery-ui.min.css"
