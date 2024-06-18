@@ -31,7 +31,7 @@ import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.jsinterop.UserProfileLinksProps;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 import org.sagebionetworks.web.shared.WebConstants;
 
 public class UserProfileWidgetViewImpl implements UserProfileWidgetView {
@@ -105,13 +105,13 @@ public class UserProfileWidgetViewImpl implements UserProfileWidgetView {
   Column accountTypeContainer;
 
   @UiField
-  ReactComponentDiv accountLevelBadgesContainer;
+  ReactComponent accountLevelBadgesContainer;
 
   @UiField
   Div userProfileLinksUI;
 
   @UiField
-  ReactComponentDiv userProfileLinksReactComponentContainer;
+  ReactComponent userProfileLinksReactComponentContainer;
 
   @UiField
   Column emailAddressContainer;

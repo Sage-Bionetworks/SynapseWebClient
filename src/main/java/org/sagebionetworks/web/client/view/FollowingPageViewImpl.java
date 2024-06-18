@@ -11,7 +11,7 @@ import org.sagebionetworks.web.client.jsinterop.EmptyProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 import org.sagebionetworks.web.client.widget.header.Header;
 
 public class FollowingPageViewImpl
@@ -19,7 +19,7 @@ public class FollowingPageViewImpl
   implements FollowingPageView {
 
   @UiField
-  ReactComponentDiv reactContainer;
+  ReactComponent reactContainer;
 
   Header headerWidget;
 

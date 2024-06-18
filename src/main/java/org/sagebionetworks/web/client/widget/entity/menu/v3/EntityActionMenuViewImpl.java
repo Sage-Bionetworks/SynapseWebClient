@@ -11,15 +11,15 @@ import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.jsinterop.SkeletonButtonProps;
 import org.sagebionetworks.web.client.jsinterop.entity.actionmenu.EntityActionMenuPropsJsInterop;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 
 public class EntityActionMenuViewImpl implements EntityActionMenuView {
 
   private final SynapseReactClientFullContextPropsProvider propsProvider;
 
   private final FlowPanel panel = new FlowPanel();
-  private final ReactComponentDiv menuComponent = new ReactComponentDiv();
-  private final ReactComponentDiv loaderComponent = new ReactComponentDiv();
+  private final ReactComponent menuComponent = new ReactComponent();
+  private final ReactComponent loaderComponent = new ReactComponent();
   private final SimplePanel controllerWidgetContainer = new SimplePanel();
 
   @Inject

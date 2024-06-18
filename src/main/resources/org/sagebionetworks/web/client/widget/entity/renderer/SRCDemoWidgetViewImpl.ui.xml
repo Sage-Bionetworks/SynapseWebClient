@@ -10,11 +10,7 @@
     <w:LoadingSpinner size="16px" ui:field="loadingUI" />
     <bh:Span ui:field="loadingMessage" />
     <bh:Div>
-      <w:ReactComponentDiv
-        ui:field="demoContainer"
-        height="1000px"
-        width="100%"
-      />
+      <w:ReactComponent ui:field="demoContainer" height="1000px" width="100%" />
     </bh:Div>
     <bh:Div ui:field="synAlertContainer" />
   </bh:Div>

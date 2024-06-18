@@ -26,7 +26,7 @@ import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 
 public class ManagedACTAccessRequirementWidgetViewImpl
   implements ManagedACTAccessRequirementWidgetView {
@@ -62,7 +62,7 @@ public class ManagedACTAccessRequirementWidgetViewImpl
   Button loginButton;
 
   @UiField
-  ReactComponentDiv requestDataAccessWidget;
+  ReactComponent requestDataAccessWidget;
 
   @UiField
   Div editAccessRequirementContainer;

@@ -11,13 +11,13 @@ import org.sagebionetworks.web.client.jsinterop.DownloadConfirmationProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 
 public class AddToDownloadListV2Impl implements AddToDownloadListV2 {
 
   private SynapseReactClientFullContextPropsProvider propsProvider;
 
-  ReactComponentDiv container = new ReactComponentDiv();
+  ReactComponent container = new ReactComponent();
 
   String queryBundleRequestJson;
   String folderId;

@@ -30,7 +30,7 @@ import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 
 public class UserBadgeViewImpl extends Div implements UserBadgeView {
 
@@ -51,7 +51,7 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
   BadgeType badgeType = BadgeType.SMALL_CARD;
   AvatarSize avatarSize = AvatarSize.MEDIUM;
   FocusPanel userBadgeContainer = new FocusPanel();
-  ReactComponentDiv userBadgeReactDiv = new ReactComponentDiv();
+  ReactComponent userBadgeReactDiv = new ReactComponent();
   List<MenuAction> menuActionsArray = new ArrayList<>();
   AuthenticationController authController;
   HandlerRegistration clickHandlerRegistration;

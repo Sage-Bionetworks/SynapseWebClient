@@ -7,17 +7,17 @@ import org.sagebionetworks.web.client.jsinterop.IDUReportProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 
 public class IntendedDataUseReportWidgetViewImpl
   implements IntendedDataUseReportWidgetView {
 
-  ReactComponentDiv reactComponent;
+  ReactComponent reactComponent;
   SynapseReactClientFullContextPropsProvider propsProvider;
 
   @Inject
   public IntendedDataUseReportWidgetViewImpl(
-    ReactComponentDiv reactComponent,
+    ReactComponent reactComponent,
     SynapseReactClientFullContextPropsProvider propsProvider
   ) {
     this.reactComponent = reactComponent;

@@ -4,6 +4,7 @@
   xmlns:g="urn:import:com.google.gwt.user.client.ui"
   xmlns:c="urn:import:com.google.gwt.user.cellview.client"
   xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
+  xmlns:MUI="urn:import:org.sagebionetworks.web.client.jsinterop.mui"
   xmlns:a="urn:import:org.sagebionetworks.web.client.widget.table.v2"
   xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt"
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
@@ -24,7 +25,7 @@
       ui:field="hasAccessContainerParent"
       addStyleNames="displayInlineBlock min-width-42"
     >
-      <w:ReactComponentDiv ui:field="hasAccessContainer" height="30px" />
+      <w:ReactComponent ui:field="hasAccessContainer" height="30px" />
     </bh:Div>
 
     <bh:Span ui:field="linkUI">

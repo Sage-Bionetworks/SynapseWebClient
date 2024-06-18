@@ -9,12 +9,12 @@ import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 import org.sagebionetworks.web.client.widget.header.Header;
 
 public class DownloadCartPageViewImpl implements DownloadCartPageView {
 
-  ReactComponentDiv container;
+  ReactComponent container;
 
   private Header headerWidget;
   private SynapseReactClientFullContextPropsProvider propsProvider;
@@ -26,7 +26,7 @@ public class DownloadCartPageViewImpl implements DownloadCartPageView {
     Header headerWidget,
     SynapseReactClientFullContextPropsProvider propsProvider
   ) {
-    container = new ReactComponentDiv();
+    container = new ReactComponent();
     this.headerWidget = headerWidget;
     this.propsProvider = propsProvider;
   }

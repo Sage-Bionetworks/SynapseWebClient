@@ -14,7 +14,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsni.FullContextProviderPropsJSNIObject;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 
 public class StatisticsPlotWidgetViewImpl
   implements StatisticsPlotWidgetView, IsWidget {
@@ -30,7 +30,7 @@ public class StatisticsPlotWidgetViewImpl
     extends UiBinder<Widget, StatisticsPlotWidgetViewImpl> {}
 
   @UiField
-  ReactComponentDiv srcContainer;
+  ReactComponent srcContainer;
 
   @UiField
   Button closeButton;
@@ -72,7 +72,7 @@ public class StatisticsPlotWidgetViewImpl
   }
 
   private static native void _createSRCWidget(
-    ReactComponentDiv reactComponentDiv,
+    ReactComponent reactComponent,
     String projectId,
     String accessToken,
     String fullRepoEndpoint,
@@ -96,7 +96,7 @@ public class StatisticsPlotWidgetViewImpl
 
 			var component = $wnd.React.createElement($wnd.SRC.SynapseComponents.StatisticsPlot, props, null)
 			var wrapper = $wnd.React.createElement($wnd.SRC.SynapseContext.FullContextProvider, wrapperProps, component)
-			reactComponentDiv.@org.sagebionetworks.web.client.widget.ReactComponentDiv::render(Lorg/sagebionetworks/web/client/jsinterop/ReactNode;)(wrapper);
+			reactComponent.@org.sagebionetworks.web.client.widget.ReactComponent::render(Lorg/sagebionetworks/web/client/jsinterop/ReactNode;)(wrapper);
 		} catch (err) {
 			console.error(err);
 		}

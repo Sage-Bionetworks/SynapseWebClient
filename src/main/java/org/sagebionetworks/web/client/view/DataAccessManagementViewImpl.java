@@ -9,7 +9,7 @@ import org.sagebionetworks.web.client.context.SynapseReactClientFullContextProps
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 import org.sagebionetworks.web.client.widget.header.Header;
 
 public class DataAccessManagementViewImpl implements DataAccessManagementView {
@@ -21,7 +21,7 @@ public class DataAccessManagementViewImpl implements DataAccessManagementView {
   private Header headerWidget;
 
   @UiField
-  ReactComponentDiv reactComponent;
+  ReactComponent reactComponent;
 
   Widget widget;
 

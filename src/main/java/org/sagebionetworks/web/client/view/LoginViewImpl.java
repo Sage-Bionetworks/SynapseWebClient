@@ -20,7 +20,7 @@ import org.sagebionetworks.web.client.jsinterop.TermsAndConditionsProps;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.FullWidthAlert;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.client.widget.pageprogress.PageProgressWidget;
@@ -39,7 +39,7 @@ public class LoginViewImpl extends Composite implements LoginView {
   Div termsOfUseView;
 
   @UiField
-  ReactComponentDiv termsOfUseContainer;
+  ReactComponent termsOfUseContainer;
 
   @UiField
   FullWidthAlert acceptedTermsOfUseView;

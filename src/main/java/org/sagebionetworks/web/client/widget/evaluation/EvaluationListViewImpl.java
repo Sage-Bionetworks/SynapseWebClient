@@ -10,12 +10,12 @@ import org.sagebionetworks.web.client.jsinterop.AvailableEvaluationQueueListProp
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 
 public class EvaluationListViewImpl implements EvaluationListView {
 
   SynapseReactClientFullContextPropsProvider propsProvider;
-  ReactComponentDiv reactContainer;
+  ReactComponent reactContainer;
   Presenter presenter;
 
   @Inject
@@ -23,7 +23,7 @@ public class EvaluationListViewImpl implements EvaluationListView {
     SynapseReactClientFullContextPropsProvider propsProvider
   ) {
     this.propsProvider = propsProvider;
-    reactContainer = new ReactComponentDiv();
+    reactContainer = new ReactComponent();
   }
 
   @Override
