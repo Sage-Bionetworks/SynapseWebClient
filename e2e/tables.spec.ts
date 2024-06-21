@@ -147,9 +147,8 @@ testAuth.describe('Tables', () => {
 
     await testAuth.step('User creates a table', async () => {
       await testAuth.step('open table creation modal', async () => {
-        await userPage.getByRole('button', { name: 'Add  New...' }).click()
         await userPage
-          .getByRole('menuitem', { name: 'Add Table or View' })
+          .getByRole('button', { name: 'Add Table or View' })
           .click()
 
         const dialog = userPage.getByRole('dialog')
@@ -297,12 +296,13 @@ testAuth.describe('Tables', () => {
         await expect(tableSchemaEditorHeader).not.toBeVisible(
           { timeout: defaultExpectTimeout * 3 }, // allow time for the response to return
         )
-        await expectTablePageLoaded(userPage, tableName, tableDescription)
 
         await dismissAlert(
           userPage,
           'You made changes to the columns in this Table',
         )
+
+        await expectTablePageLoaded(userPage, tableName, tableDescription)
       })
 
       await expectTableSchemaCorrect(userPage, updatedColumnsSchemaConfig)
