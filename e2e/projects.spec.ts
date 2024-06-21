@@ -34,7 +34,7 @@ testAuth.describe('Projects', () => {
           userPage.getByRole('heading', { name: PROJECT_NAME }),
         ).toBeVisible()
         await expect(
-          userPage.getByRole('button', { name: 'Wiki Tools' }),
+          userPage.getByRole('button', { name: 'Delete Wiki Page' }),
         ).toBeVisible()
         projectId = getEntityIdFromPathname(userPage.url())
       },

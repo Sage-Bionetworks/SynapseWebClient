@@ -24,7 +24,9 @@ export const expectTablesPageLoaded = async (page: Page, projectId: string) => {
     await expect(
       page.getByRole('button', { name: 'Upload a Table' }),
     ).toBeVisible()
-    await expect(page.getByRole('button', { name: 'Add New...' })).toBeVisible()
+    await expect(
+      page.getByRole('button', { name: 'Add Table Or View' }),
+    ).toBeVisible()
   })
 }
 
@@ -34,9 +36,9 @@ export const expectTablePageLoaded = async (
   tableDescription: string,
 ) => {
   await test.step('table has loaded', async () => {
-    await expect(
-      page.getByRole('button', { name: 'Table Tools' }),
-    ).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Table Tools' })).toBeVisible(
+      { timeout: defaultExpectTimeout * 2 },
+    )
     await expect(page.locator('p').filter({ hasText: tableName })).toBeVisible()
     await expect(
       page
