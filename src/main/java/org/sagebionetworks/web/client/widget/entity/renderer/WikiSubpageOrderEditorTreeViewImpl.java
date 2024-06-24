@@ -163,16 +163,6 @@ public class WikiSubpageOrderEditorTreeViewImpl
   private Widget makeListItem(final SubpageOrderEditorTreeNode node) {
     final Anchor l = new Anchor(node.getText());
     l.addStyleName("link");
-    l.setHref(
-      "/Synapse:" +
-      new Synapse(
-        ownerObjectId,
-        null,
-        EntityArea.WIKI,
-        node.getHeader().getId()
-      )
-        .toToken()
-    );
     l.addClickHandler(
       new ClickHandler() {
         @Override
