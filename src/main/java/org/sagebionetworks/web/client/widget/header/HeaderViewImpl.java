@@ -21,6 +21,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.CookieNotificationProps;
+import org.sagebionetworks.web.client.jsinterop.EmptyProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
@@ -123,9 +124,10 @@ public class HeaderViewImpl extends Composite implements HeaderView {
   public void clear() {}
 
   private void rerenderGoogleAnalytics() {
+    EmptyProps props = EmptyProps.create();
     ReactNode component = React.createElementWithSynapseContext(
       SRC.SynapseComponents.GoogleAnalytics,
-      null,
+      props,
       propsProvider.getJsInteropContextProps()
     );
     googleAnalyticsContainer.render(component);
