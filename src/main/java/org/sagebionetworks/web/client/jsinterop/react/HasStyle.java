@@ -18,6 +18,7 @@ public abstract class HasStyle<T extends PropsWithStyle>
   }
 
   public void setStyle(JsPropertyMap<String> style) {
+    // Clone the style object so React treats it as a new prop and properly re-renders.
     this.props.style =
       (JsPropertyMap<String>) JsObject.assign(new JsObject(), (JsObject) style);
   }
@@ -27,13 +28,7 @@ public abstract class HasStyle<T extends PropsWithStyle>
     if (visible) {
       if (this.props != null && this.props.style != null) {
         this.props.style.delete("display");
-        // Clone the style object so React treats it as a new prop and properly re-renders.
-        setStyle(
-          (JsPropertyMap<String>) JsObject.assign(
-            new JsObject(),
-            (JsObject) this.props.style
-          )
-        );
+        setStyle(this.props.style);
       }
     } else {
       // Update the style prop to `display: none`.
@@ -41,13 +36,8 @@ public abstract class HasStyle<T extends PropsWithStyle>
         this.props = (T) JsPropertyMap.of();
       }
 
-      // Clone the style object so React treats it as a new prop and properly re-renders.
-      JsPropertyMap<String> newStyle = (JsPropertyMap<String>) JsObject.assign(
-        new JsObject(),
-        (JsObject) this.props.style
-      );
-      newStyle.set("display", "none");
-      setStyle(newStyle);
+      this.props.style.set("display", "none");
+      setStyle(this.props.style);
     }
 
     // Call the super method, which will trigger a re-render.
