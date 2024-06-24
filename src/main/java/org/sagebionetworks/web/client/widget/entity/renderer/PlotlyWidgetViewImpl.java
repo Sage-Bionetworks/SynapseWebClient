@@ -16,14 +16,14 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.plotly.AxisType;
 import org.sagebionetworks.web.client.plotly.PlotlyTraceWrapper;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 
 public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 
   public interface Binder extends UiBinder<Widget, PlotlyWidgetViewImpl> {}
 
   @UiField
-  ReactComponentDiv chartContainer;
+  ReactComponent chartContainer;
 
   @UiField
   Div synAlertContainer;
@@ -112,7 +112,7 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
   }
 
   private static native void _showChart(
-    ReactComponentDiv reactComponentDiv,
+    ReactComponent reactComponent,
     JavaScriptObject[] xyData,
     String barMode,
     String plotTitle,
@@ -165,7 +165,7 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 			};
 
 			var component = $wnd.React.createElement(plot, props)
-			reactComponentDiv.@org.sagebionetworks.web.client.widget.ReactComponentDiv::render(Lorg/sagebionetworks/web/client/jsinterop/ReactNode;)(component);
+			reactComponent.@org.sagebionetworks.web.client.widget.ReactComponent::render(Lorg/sagebionetworks/web/client/jsinterop/ReactNode;)(component);
 		} catch (err) {
 			console.error(err);
 		}

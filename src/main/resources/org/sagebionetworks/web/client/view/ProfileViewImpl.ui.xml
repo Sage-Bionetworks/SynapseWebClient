@@ -241,7 +241,7 @@
                     />
                   </div>
                 </div>
-                <w:ReactComponentDiv
+                <w:ReactComponent
                   addStyleNames="tab-background pageContent margin-top-40"
                   ui:field="favoritesTabContainer"
                 />

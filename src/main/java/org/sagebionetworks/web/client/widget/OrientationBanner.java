@@ -12,7 +12,7 @@ import org.sagebionetworks.web.client.jsinterop.SRC;
 
 public class OrientationBanner implements IsWidget {
 
-  ReactComponentDiv container;
+  ReactComponent container;
   String name, title, text, primaryButtonText, secondaryButtonText, secondaryButtonHref;
   AlertButtonConfig.Callback onPrimaryClick;
 
@@ -21,7 +21,7 @@ public class OrientationBanner implements IsWidget {
    *
    */
   public OrientationBanner() {
-    container = new ReactComponentDiv();
+    container = new ReactComponent();
   }
 
   private void rerender() {

@@ -9,12 +9,12 @@ import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 
 public class AccessRequirementRelatedProjectsList implements IsWidget {
 
-  ReactComponentDiv container;
+  ReactComponent container;
   public IsACTMemberAsyncHandler isACTMemberAsyncHandler;
   public SynapseReactClientFullContextPropsProvider propsProvider;
 
@@ -23,7 +23,7 @@ public class AccessRequirementRelatedProjectsList implements IsWidget {
     IsACTMemberAsyncHandler isACTMemberAsyncHandler,
     SynapseReactClientFullContextPropsProvider propsProvider
   ) {
-    container = new ReactComponentDiv();
+    container = new ReactComponent();
     this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
     this.propsProvider = propsProvider;
     container.setVisible(false);

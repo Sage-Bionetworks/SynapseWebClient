@@ -24,7 +24,7 @@ import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.FullWidthAlert;
 import org.sagebionetworks.web.client.widget.IconSvg;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 import org.sagebionetworks.web.client.widget.table.explore.QueryWrapperPlotNav;
 import org.sagebionetworks.web.client.widget.table.explore.StandaloneQueryWrapper;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityViewScopeWidget;
@@ -74,7 +74,7 @@ public class TableEntityWidgetViewImpl
   Div addToDownloadListContainer;
 
   @UiField
-  ReactComponentDiv itemsEditorContainer;
+  ReactComponent itemsEditorContainer;
 
   PortalGinInjector ginInjector;
   ColumnModelsWidget columnModelsWidget;

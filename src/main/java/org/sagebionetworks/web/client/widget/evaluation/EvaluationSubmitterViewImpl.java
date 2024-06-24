@@ -39,7 +39,7 @@ import org.sagebionetworks.web.client.jsni.FullContextProviderPropsJSNIObject;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 import org.sagebionetworks.web.client.widget.entity.RegisterTeamDialog;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidget;
@@ -161,7 +161,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
   FormGroup submissionNameUi;
 
   @UiField
-  ReactComponentDiv formDiv;
+  ReactComponent formDiv;
 
   private PortalGinInjector ginInjector;
   String originalNextButtonText, originalSubmitButtonText;
@@ -421,7 +421,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	}-*/;
 
   private static native void _showForm(
-    ReactComponentDiv reactComponentDiv,
+    ReactComponent reactComponent,
     String accessToken,
     String parentContainerSynId,
     String jsonSchemaSynId,
@@ -452,7 +452,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 
 			var component = $wnd.React.createElement($wnd.SRC.SynapseComponents.EntityForm, props, null);
 			var wrapper = $wnd.React.createElement($wnd.SRC.SynapseContext.FullContextProvider, wrapperProps, component);
-            reactComponentDiv.@org.sagebionetworks.web.client.widget.ReactComponentDiv::render(Lorg/sagebionetworks/web/client/jsinterop/ReactNode;)(wrapper);
+            reactComponent.@org.sagebionetworks.web.client.widget.ReactComponent::render(Lorg/sagebionetworks/web/client/jsinterop/ReactNode;)(wrapper);
 		} catch (err) {
 			console.error(err);
 		}

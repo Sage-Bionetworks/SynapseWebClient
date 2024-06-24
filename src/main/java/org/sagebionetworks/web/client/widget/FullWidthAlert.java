@@ -13,7 +13,7 @@ import org.sagebionetworks.web.client.jsinterop.SRC;
 
 public class FullWidthAlert implements IsWidget {
 
-  ReactComponentDiv container;
+  ReactComponent container;
   String title, message, primaryButtonText, secondaryButtonText, alertType, secondaryButtonTooltipText;
   AlertButtonConfig.Callback onPrimaryClick;
   AlertButtonConfig.Callback onSecondaryClick;
@@ -26,7 +26,7 @@ public class FullWidthAlert implements IsWidget {
    *
    */
   public FullWidthAlert() {
-    container = new ReactComponentDiv();
+    container = new ReactComponent();
   }
 
   private void rerender() {

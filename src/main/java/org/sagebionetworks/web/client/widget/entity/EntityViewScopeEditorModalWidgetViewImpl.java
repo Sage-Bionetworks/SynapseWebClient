@@ -7,13 +7,13 @@ import org.sagebionetworks.web.client.jsinterop.EntityViewScopeEditorModalProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 
 public class EntityViewScopeEditorModalWidgetViewImpl
   implements EntityViewScopeEditorModalWidgetView {
 
   private final SynapseReactClientFullContextPropsProvider propsProvider;
-  private final ReactComponentDiv reactComponentDiv;
+  private final ReactComponent reactComponent;
 
   @Inject
   public EntityViewScopeEditorModalWidgetViewImpl(
@@ -21,7 +21,7 @@ public class EntityViewScopeEditorModalWidgetViewImpl
   ) {
     super();
     this.propsProvider = propsProvider;
-    reactComponentDiv = new ReactComponentDiv();
+    reactComponent = new ReactComponent();
   }
 
   @Override
@@ -31,11 +31,11 @@ public class EntityViewScopeEditorModalWidgetViewImpl
       props,
       propsProvider.getJsInteropContextProps()
     );
-    reactComponentDiv.render(reactNode);
+    reactComponent.render(reactNode);
   }
 
   @Override
   public Widget asWidget() {
-    return reactComponentDiv.asWidget();
+    return reactComponent.asWidget();
   }
 }

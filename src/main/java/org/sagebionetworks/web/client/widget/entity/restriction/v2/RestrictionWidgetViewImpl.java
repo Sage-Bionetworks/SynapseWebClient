@@ -15,7 +15,7 @@ import org.sagebionetworks.web.client.jsinterop.HasAccessProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 
 public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 
@@ -49,7 +49,7 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
   Div hasAccessContainerParent;
 
   @UiField
-  ReactComponentDiv hasAccessContainer;
+  ReactComponent hasAccessContainer;
 
   Presenter presenter;
   // this UI widget

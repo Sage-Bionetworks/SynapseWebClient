@@ -13,7 +13,7 @@ import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 
 public class PageProgressWidgetViewImpl
   implements PageProgressWidgetView, IsWidget {
@@ -22,7 +22,7 @@ public class PageProgressWidgetViewImpl
     extends UiBinder<Widget, PageProgressWidgetViewImpl> {}
 
   @UiField
-  ReactComponentDiv srcContainer;
+  ReactComponent srcContainer;
 
   Widget widget;
   SynapseJSNIUtils jsniUtils;

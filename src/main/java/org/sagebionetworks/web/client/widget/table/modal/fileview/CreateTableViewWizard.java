@@ -8,13 +8,13 @@ import org.sagebionetworks.web.client.jsinterop.CreateTableViewWizardProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 
 public class CreateTableViewWizard implements IsWidget {
 
   private final SynapseReactClientFullContextPropsProvider propsProvider;
 
-  private final ReactComponentDiv reactComponentDiv;
+  private final ReactComponent reactComponent;
   private String parentId;
   private CreateTableViewWizardProps.OnComplete onComplete;
   private CreateTableViewWizardProps.OnCancel onCancel;
@@ -25,7 +25,7 @@ public class CreateTableViewWizard implements IsWidget {
   ) {
     super();
     this.propsProvider = propsProvider;
-    reactComponentDiv = new ReactComponentDiv();
+    reactComponent = new ReactComponent();
   }
 
   private void renderComponent(CreateTableViewWizardProps props) {
@@ -34,7 +34,7 @@ public class CreateTableViewWizard implements IsWidget {
       props,
       propsProvider.getJsInteropContextProps()
     );
-    reactComponentDiv.render(reactNode);
+    reactComponent.render(reactNode);
   }
 
   public void configure(
@@ -42,7 +42,7 @@ public class CreateTableViewWizard implements IsWidget {
     CreateTableViewWizardProps.OnComplete onComplete,
     CreateTableViewWizardProps.OnCancel onCancel
   ) {
-    reactComponentDiv.clear();
+    reactComponent.clear();
     this.parentId = parentId;
     this.onComplete = onComplete;
     this.onCancel = onCancel;
@@ -68,6 +68,6 @@ public class CreateTableViewWizard implements IsWidget {
 
   @Override
   public Widget asWidget() {
-    return reactComponentDiv.asWidget();
+    return reactComponent.asWidget();
   }
 }

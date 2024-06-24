@@ -10,10 +10,10 @@ import org.sagebionetworks.web.client.jsinterop.ProvenanceGraphProps.OnUpdateJav
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 
 public class ProvenanceWidgetViewImpl
-  extends ReactComponentDiv
+  extends ReactComponent
   implements ProvenanceWidgetView {
 
   List<Reference> refs;

@@ -9,7 +9,7 @@ import org.sagebionetworks.web.client.jsinterop.ErrorPageProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 import org.sagebionetworks.web.client.widget.header.Header;
 
 public class DownViewImpl implements DownView {
@@ -20,7 +20,7 @@ public class DownViewImpl implements DownView {
   private SynapseReactClientFullContextPropsProvider propsProvider;
 
   @UiField
-  ReactComponentDiv srcDownContainer;
+  ReactComponent srcDownContainer;
 
   String message;
 

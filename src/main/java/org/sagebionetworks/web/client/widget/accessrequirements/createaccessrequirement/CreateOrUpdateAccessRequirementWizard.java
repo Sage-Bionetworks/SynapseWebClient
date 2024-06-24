@@ -10,13 +10,13 @@ import org.sagebionetworks.web.client.jsinterop.CreateOrUpdateAccessRequirementW
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 
 public class CreateOrUpdateAccessRequirementWizard implements IsWidget {
 
   private final SynapseReactClientFullContextPropsProvider propsProvider;
 
-  private final ReactComponentDiv reactComponentDiv;
+  private final ReactComponent reactComponent;
 
   private boolean open;
   private RestrictableObjectDescriptor subject;
@@ -30,7 +30,7 @@ public class CreateOrUpdateAccessRequirementWizard implements IsWidget {
   ) {
     super();
     this.propsProvider = propsProvider;
-    reactComponentDiv = new ReactComponentDiv();
+    reactComponent = new ReactComponent();
   }
 
   private void renderComponent() {
@@ -48,7 +48,7 @@ public class CreateOrUpdateAccessRequirementWizard implements IsWidget {
       props,
       propsProvider.getJsInteropContextProps()
     );
-    reactComponentDiv.render(reactNode);
+    reactComponent.render(reactNode);
   }
 
   public void configure(
@@ -56,7 +56,7 @@ public class CreateOrUpdateAccessRequirementWizard implements IsWidget {
     CreateOrUpdateAccessRequirementWizardProps.OnComplete onComplete,
     CreateOrUpdateAccessRequirementWizardProps.OnCancel onCancel
   ) {
-    reactComponentDiv.clear();
+    reactComponent.clear();
 
     this.subject = subject;
     this.onComplete = onComplete;
@@ -73,7 +73,7 @@ public class CreateOrUpdateAccessRequirementWizard implements IsWidget {
     CreateOrUpdateAccessRequirementWizardProps.OnComplete onComplete,
     CreateOrUpdateAccessRequirementWizardProps.OnCancel onCancel
   ) {
-    reactComponentDiv.clear();
+    reactComponent.clear();
 
     this.accessRequirementId = accessRequirement.getId().toString();
     this.onComplete = onComplete;
@@ -92,6 +92,6 @@ public class CreateOrUpdateAccessRequirementWizard implements IsWidget {
 
   @Override
   public Widget asWidget() {
-    return reactComponentDiv.asWidget();
+    return reactComponent.asWidget();
   }
 }

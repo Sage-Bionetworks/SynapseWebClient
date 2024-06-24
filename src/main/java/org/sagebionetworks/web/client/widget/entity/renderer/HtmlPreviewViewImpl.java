@@ -11,7 +11,7 @@ import org.sagebionetworks.web.client.jsinterop.HtmlPreviewProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 
 public class HtmlPreviewViewImpl implements HtmlPreviewView {
 
@@ -24,7 +24,7 @@ public class HtmlPreviewViewImpl implements HtmlPreviewView {
   Div loadingUI;
 
   @UiField
-  ReactComponentDiv container;
+  ReactComponent container;
 
   Widget w;
   SynapseReactClientFullContextPropsProvider propsProvider;

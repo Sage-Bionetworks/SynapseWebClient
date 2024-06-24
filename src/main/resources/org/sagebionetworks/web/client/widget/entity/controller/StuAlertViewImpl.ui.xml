@@ -6,6 +6,6 @@
 >
   <bh:Div>
     <bh:Div ui:field="synAlertContainer" />
-    <w:ReactComponentDiv ui:field="errorPageContainer" visible="false" />
+    <w:ReactComponent ui:field="errorPageContainer" visible="false" />
   </bh:Div>
 </ui:UiBinder>

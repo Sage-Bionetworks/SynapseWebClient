@@ -46,7 +46,7 @@
         addStyleNames="container margin-top-15"
       />
       <bh:Div ui:field="termsOfUseView" addStyleNames="container margin-top-15">
-        <w:ReactComponentDiv ui:field="termsOfUseContainer" />
+        <w:ReactComponent ui:field="termsOfUseContainer" />
         <bh:Div ui:field="pageProgressContainer" />
       </bh:Div>
     </div>

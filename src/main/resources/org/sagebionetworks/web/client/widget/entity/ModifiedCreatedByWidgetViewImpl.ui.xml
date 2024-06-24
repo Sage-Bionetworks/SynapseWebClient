@@ -8,5 +8,5 @@
   xmlns:t="urn:import:org.sagebionetworks.web.client.widget.table.v2"
   xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
 >
-  <w:ReactComponentDiv ui:field="container" visible="false" />
+  <w:ReactComponent ui:field="container" visible="false" />
 </ui:UiBinder>

@@ -12,12 +12,12 @@ import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.place.Synapse;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 
 public class BreadcrumbViewImpl implements BreadcrumbView {
 
   private final SynapseReactClientFullContextPropsProvider propsProvider;
-  ReactComponentDiv container;
+  ReactComponent container;
   private Presenter presenter;
 
   @Inject
@@ -25,7 +25,7 @@ public class BreadcrumbViewImpl implements BreadcrumbView {
     SynapseReactClientFullContextPropsProvider propsProvider
   ) {
     this.propsProvider = propsProvider;
-    container = new ReactComponentDiv();
+    container = new ReactComponent();
   }
 
   @Override

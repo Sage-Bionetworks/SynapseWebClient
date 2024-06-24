@@ -1,14 +1,17 @@
 package org.sagebionetworks.web.client.widget;
 
+import com.google.gwt.dom.client.SpanElement;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.web.client.jsinterop.EntityTypeIconProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 
-public class EntityTypeIcon extends ReactComponentSpan {
+public class EntityTypeIcon extends ReactComponent {
 
-  public EntityTypeIcon() {}
+  public EntityTypeIcon() {
+    super(SpanElement.TAG);
+  }
 
   public EntityTypeIcon(EntityType type) {
     configure(type);

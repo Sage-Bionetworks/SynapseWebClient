@@ -17,7 +17,7 @@ import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 
 public class LoginWidgetViewImpl implements LoginWidgetView, IsWidget {
 
@@ -30,7 +30,7 @@ public class LoginWidgetViewImpl implements LoginWidgetView, IsWidget {
     extends UiBinder<Widget, LoginWidgetViewImpl> {}
 
   @UiField
-  ReactComponentDiv srcLoginContainer;
+  ReactComponent srcLoginContainer;
 
   Widget widget;
   SynapseJSNIUtils jsniUtils;

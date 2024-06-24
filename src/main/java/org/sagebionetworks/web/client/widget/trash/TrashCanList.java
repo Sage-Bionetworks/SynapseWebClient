@@ -4,9 +4,9 @@ import org.sagebionetworks.web.client.context.SynapseReactClientFullContextProps
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 
-public class TrashCanList extends ReactComponentDiv {
+public class TrashCanList extends ReactComponent {
 
   public TrashCanList(
     SynapseReactClientFullContextPropsProvider contextPropsProvider

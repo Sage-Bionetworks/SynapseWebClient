@@ -15,7 +15,7 @@
         addStyleNames="boldText"
       />
     </bh:Div>
-    <w:ReactComponentDiv
+    <w:ReactComponent
       ui:field="evaluationEditorContainer"
       addStyleNames="margin-top-25"
     />
