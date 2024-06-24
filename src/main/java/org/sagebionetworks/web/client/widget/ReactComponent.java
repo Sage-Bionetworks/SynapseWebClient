@@ -50,7 +50,7 @@ public class ReactComponent<T extends ReactComponentProps>
     setElement(Document.get().createElement(tag));
   }
 
-  boolean allChildrenAreReactComponents() {
+  private boolean allChildrenAreReactComponents() {
     boolean allChildrenAreReactComponents = getChildren().size() > 0;
     for (Widget w : getChildren()) {
       if (!(w instanceof ReactComponent)) {
@@ -61,7 +61,7 @@ public class ReactComponent<T extends ReactComponentProps>
     return allChildrenAreReactComponents;
   }
 
-  boolean isRenderedAsReactComponentChild() {
+  private boolean isRenderedAsReactComponentChild() {
     return (
       getParent() instanceof ReactComponent &&
       ((ReactComponent<?>) getParent()).allChildrenAreReactComponents()
@@ -71,7 +71,7 @@ public class ReactComponent<T extends ReactComponentProps>
   /**
    * This method returns the root ReactComponent widget, which is the only place where this React tree is attached to the DOM.
    */
-  ReactComponent<?> getRootReactComponentWidget() {
+  private ReactComponent<?> getRootReactComponentWidget() {
     if (isRenderedAsReactComponentChild()) {
       return ((ReactComponent<?>) getParent()).getRootReactComponentWidget();
     } else {
