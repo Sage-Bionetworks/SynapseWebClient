@@ -43,10 +43,10 @@ public class HeaderViewImpl extends Composite implements HeaderView {
   Div donationBannerContainer;
 
   @UiField
-  ReactComponentDiv cookieNotificationContainer;
+  ReactComponent cookieNotificationContainer;
 
   @UiField
-  ReactComponentDiv googleAnalyticsContainer;
+  ReactComponent googleAnalyticsContainer;
 
   @UiField
   FullWidthAlert nihNotificationAlert;
