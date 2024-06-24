@@ -42,9 +42,6 @@ public class Header implements HeaderView.Presenter, IsWidget {
     view.setPresenter(this);
     initStagingAlert();
     view.getEventBinder().bindEventHandlers(this, eventBus);
-    view.setCookieNotificationVisible(
-      !localStorage.contains(AuthenticationControllerImpl.COOKIES_ACCEPTED)
-    );
     view.setNIHAlertVisible(
       !localStorage.contains(
         AuthenticationControllerImpl.NIH_NOTIFICATION_DISMISSED
@@ -85,16 +82,6 @@ public class Header implements HeaderView.Presenter, IsWidget {
   public void refresh() {
     view.setPortalAlertVisible(isShowingPortalAlert, portalAlertJson);
     view.refresh();
-  }
-
-  @Override
-  public void onCookieNotificationDismissed() {
-    view.setCookieNotificationVisible(false);
-    localStorage.put(
-      AuthenticationControllerImpl.COOKIES_ACCEPTED,
-      Boolean.TRUE.toString(),
-      DateTimeUtilsImpl.getYearFromNow().getTime()
-    );
   }
 
   @Override
