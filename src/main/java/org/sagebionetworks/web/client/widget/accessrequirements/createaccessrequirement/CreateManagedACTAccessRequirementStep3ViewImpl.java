@@ -11,7 +11,7 @@ import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.ReactRef;
 import org.sagebionetworks.web.client.jsinterop.SRC;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 
 public class CreateManagedACTAccessRequirementStep3ViewImpl
   implements CreateManagedACTAccessRequirementStep3View {
@@ -22,7 +22,7 @@ public class CreateManagedACTAccessRequirementStep3ViewImpl
   Widget widget;
 
   @UiField
-  ReactComponentDiv reactContainer;
+  ReactComponent reactContainer;
 
   ReactRef<AccessRequirementAclEditorHandler> componentRef;
 

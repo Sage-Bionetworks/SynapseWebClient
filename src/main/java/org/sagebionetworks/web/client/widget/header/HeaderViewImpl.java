@@ -30,7 +30,7 @@ import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.widget.FullWidthAlert;
 import org.sagebionetworks.web.client.widget.OrientationBanner;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 
 public class HeaderViewImpl extends Composite implements HeaderView {
 
@@ -64,7 +64,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
   FocusPanel portalLogoFocusPanel;
 
   @UiField
-  ReactComponentDiv synapseNavDrawerContainer;
+  ReactComponent synapseNavDrawerContainer;
 
   @UiField
   Alert stagingAlert;

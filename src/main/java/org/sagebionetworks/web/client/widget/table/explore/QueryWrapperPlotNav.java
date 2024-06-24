@@ -8,9 +8,9 @@ import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnViewS
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 
-public class QueryWrapperPlotNav extends ReactComponentDiv {
+public class QueryWrapperPlotNav extends ReactComponent {
 
   public QueryWrapperPlotNav(
     SynapseReactClientFullContextPropsProvider contextPropsProvider,

@@ -51,7 +51,7 @@
     >
       <b:ModalBody>
         <bh:Div>
-          <w:ReactComponentDiv ui:field="formDiv" />
+          <w:ReactComponent ui:field="formDiv" />
           <b:FormGroup ui:field="entityFinderUI">
             <b:FormGroup>
               <b:FormLabel>

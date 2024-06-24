@@ -44,7 +44,7 @@ import org.sagebionetworks.web.client.presenter.ProjectFilterEnum;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.OrientationBanner;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.table.v2.results.SortableTableHeaderImpl;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
@@ -89,7 +89,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
   DivElement settingsTabContainer;
 
   @UiField
-  ReactComponentDiv favoritesTabContainer;
+  ReactComponent favoritesTabContainer;
 
   @UiField
   Heading pageHeaderTitle;

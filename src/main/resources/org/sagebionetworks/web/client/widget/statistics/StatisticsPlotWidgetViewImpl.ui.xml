@@ -14,7 +14,7 @@
     dataKeyboard="true"
   >
     <b:ModalBody>
-      <w:ReactComponentDiv ui:field="srcContainer" />
+      <w:ReactComponent ui:field="srcContainer" />
       <bh:Div>
         <bh:Paragraph addStyleNames="center">
           This data is collected and processed on a monthly basis.

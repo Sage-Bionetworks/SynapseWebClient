@@ -11,7 +11,7 @@ import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.jsinterop.SynapseHomepageProps;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 import org.sagebionetworks.web.client.widget.header.Header;
 
 public class HomeViewImpl extends Composite implements HomeView {
@@ -20,7 +20,7 @@ public class HomeViewImpl extends Composite implements HomeView {
     extends UiBinder<Widget, HomeViewImpl> {}
 
   @UiField
-  ReactComponentDiv container;
+  ReactComponent container;
 
   private static final String PROJECT_VIEW_ID = "syn23593547.3";
 

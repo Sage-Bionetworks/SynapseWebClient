@@ -13,7 +13,7 @@ import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.view.DownViewImpl.ErrorPageType;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 
 public class StuAlertViewImpl implements StuAlertView {
 
@@ -23,7 +23,7 @@ public class StuAlertViewImpl implements StuAlertView {
   SynapseReactClientFullContextPropsProvider propsProvider;
 
   @UiField
-  ReactComponentDiv errorPageContainer;
+  ReactComponent errorPageContainer;
 
   @UiField
   Div synAlertContainer;

@@ -6,9 +6,9 @@ import org.sagebionetworks.web.client.jsinterop.ForumSearchProps.OnSearchResults
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 
-public class ForumSearchWrapper extends ReactComponentDiv {
+public class ForumSearchWrapper extends ReactComponent {
 
   public ForumSearchWrapper(
     SynapseReactClientFullContextPropsProvider contextPropsProvider,

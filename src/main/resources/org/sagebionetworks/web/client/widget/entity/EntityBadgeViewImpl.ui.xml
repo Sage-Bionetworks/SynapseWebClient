@@ -28,7 +28,7 @@
         addStyleNames="overflow-x-hidden min-width-140"
         width="140px"
       >
-        <w:ReactComponentDiv ui:field="iconsContainer" />
+        <w:ReactComponent ui:field="iconsContainer" />
       </t:TableData>
       <t:TableData
         ui:field="sizeTableData"

@@ -8,11 +8,11 @@ import org.sagebionetworks.web.client.jsinterop.EntityHeaderTableProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 
 public class EntitySubjectsWidgetViewImpl implements EntitySubjectsWidgetView {
 
-  ReactComponentDiv reactContainer;
+  ReactComponent reactContainer;
   SynapseReactClientFullContextPropsProvider propsProvider;
   Presenter presenter;
 
@@ -20,7 +20,7 @@ public class EntitySubjectsWidgetViewImpl implements EntitySubjectsWidgetView {
   public EntitySubjectsWidgetViewImpl(
     SynapseReactClientFullContextPropsProvider propsProvider
   ) {
-    reactContainer = new ReactComponentDiv();
+    reactContainer = new ReactComponent();
     this.propsProvider = propsProvider;
   }
 

@@ -13,7 +13,7 @@ import org.sagebionetworks.web.client.jsinterop.EvaluationCardProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationRowWidget.EvaluationActionHandler;
 
 public class AdministerEvaluationsListViewImpl
@@ -77,7 +77,7 @@ public class AdministerEvaluationsListViewImpl
     Evaluation evaluation,
     EvaluationCardProps props
   ) {
-    ReactComponentDiv container = new ReactComponentDiv();
+    ReactComponent container = new ReactComponent();
     container.addStyleName("margin-top-50");
     rows.add(container);
 

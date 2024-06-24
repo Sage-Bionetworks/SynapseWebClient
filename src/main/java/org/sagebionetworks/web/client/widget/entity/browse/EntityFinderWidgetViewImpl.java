@@ -25,7 +25,7 @@ import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.jsni.ReferenceJSNIObject;
 import org.sagebionetworks.web.client.widget.HelpWidget;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 public class EntityFinderWidgetViewImpl implements EntityFinderWidgetView {
@@ -43,7 +43,7 @@ public class EntityFinderWidgetViewImpl implements EntityFinderWidgetView {
   private Modal modal;
 
   @UiField
-  ReactComponentDiv entityFinderContainer;
+  ReactComponent entityFinderContainer;
 
   @UiField
   Heading modalTitle;

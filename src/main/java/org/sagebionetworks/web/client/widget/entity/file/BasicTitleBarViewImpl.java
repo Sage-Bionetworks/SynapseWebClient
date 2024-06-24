@@ -11,14 +11,14 @@ import org.sagebionetworks.web.client.jsinterop.EntityPageTitleBarProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 
 public class BasicTitleBarViewImpl implements BasicTitleBarView {
 
   private final SynapseReactClientFullContextPropsProvider propsProvider;
 
   @UiField
-  ReactComponentDiv reactComponentContainer;
+  ReactComponent reactComponentContainer;
 
   @Override
   public void setProps(EntityPageTitleBarProps props) {

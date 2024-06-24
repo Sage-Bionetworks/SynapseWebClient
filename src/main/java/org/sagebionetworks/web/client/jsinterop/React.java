@@ -16,13 +16,7 @@ public class React {
   public static native <P extends ReactComponentProps> ReactNode createElement(
     ReactComponentType<P> component,
     P props,
-    ReactNode child
-  );
-
-  public static native <P extends ReactComponentProps> ReactNode createElement(
-    ReactComponentType<P> component,
-    P props,
-    ReactNode[] children
+    ReactNode... children
   );
 
   public static native <T> T createRef();
@@ -72,4 +66,17 @@ public class React {
       componentElement
     );
   }
+
+  public static native ReactNode cloneElement(ReactNode element);
+
+  public static native ReactNode cloneElement(
+    ReactNode element,
+    ReactComponentProps props
+  );
+
+  public static native ReactNode cloneElement(
+    ReactNode element,
+    ReactComponentProps props,
+    ReactNode... children
+  );
 }
