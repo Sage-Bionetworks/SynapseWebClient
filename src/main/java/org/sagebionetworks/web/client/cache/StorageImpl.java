@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.cache;
 
 import com.google.gwt.storage.client.Storage;
+import org.sagebionetworks.web.client.jsinterop.SRC;
 
 public class StorageImpl implements StorageWrapper {
 
@@ -27,7 +28,9 @@ public class StorageImpl implements StorageWrapper {
 
   @Override
   public void setItem(String key, String data) {
-    if (isStorageSupported()) {
+    boolean functionalStorageAllowed =
+      SRC.SynapseComponents.getCurrentCookiePreferences().functionalAllowed;
+    if (isStorageSupported() && functionalStorageAllowed) {
       try {
         storage.setItem(key, data);
       } catch (Throwable e) {

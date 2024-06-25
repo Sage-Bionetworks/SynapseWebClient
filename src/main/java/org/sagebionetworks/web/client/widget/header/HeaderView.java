@@ -18,7 +18,6 @@ public interface HeaderView extends IsWidget {
    * Presenter interface
    */
   public interface Presenter {
-    void onCookieNotificationDismissed();
     void onNIHNotificationDismissed();
   }
 
@@ -30,8 +29,6 @@ public interface HeaderView extends IsWidget {
   void clear();
 
   EventBinder<Header> getEventBinder();
-
-  void setCookieNotificationVisible(boolean visible);
 
   void setPortalAlertVisible(boolean visible, JSONObjectAdapter portalJson);
 }

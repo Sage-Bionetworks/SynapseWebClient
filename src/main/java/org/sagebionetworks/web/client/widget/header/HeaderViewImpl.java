@@ -20,6 +20,8 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
+import org.sagebionetworks.web.client.jsinterop.CookieNotificationProps;
+import org.sagebionetworks.web.client.jsinterop.EmptyProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
@@ -41,7 +43,10 @@ public class HeaderViewImpl extends Composite implements HeaderView {
   Div donationBannerContainer;
 
   @UiField
-  FullWidthAlert cookieNotificationAlert;
+  ReactComponent cookieNotificationContainer;
+
+  @UiField
+  ReactComponent googleAnalyticsContainer;
 
   @UiField
   FullWidthAlert nihNotificationAlert;
@@ -82,9 +87,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
     this.initWidget(binder.createAndBindUi(this));
     this.ginInjector = ginInjector;
     this.propsProvider = propsProvider;
-    cookieNotificationAlert.addPrimaryCTAClickHandler(event -> {
-      presenter.onCookieNotificationDismissed();
-    });
     nihNotificationAlert.setOnClose(() -> {
       presenter.onNIHNotificationDismissed();
     });
@@ -104,10 +106,32 @@ public class HeaderViewImpl extends Composite implements HeaderView {
     initClickHandlers();
     clear();
     rerenderNavBar();
+
+    CookieNotificationProps props = CookieNotificationProps.create(prefs -> {
+      rerenderGoogleAnalytics();
+    });
+    ReactNode component = React.createElementWithSynapseContext(
+      SRC.SynapseComponents.CookiesNotification,
+      props,
+      propsProvider.getJsInteropContextProps()
+    );
+    cookieNotificationContainer.render(component);
+
+    rerenderGoogleAnalytics();
   }
 
   @Override
   public void clear() {}
+
+  private void rerenderGoogleAnalytics() {
+    EmptyProps props = EmptyProps.create();
+    ReactNode component = React.createElementWithSynapseContext(
+      SRC.SynapseComponents.GoogleAnalytics,
+      props,
+      propsProvider.getJsInteropContextProps()
+    );
+    googleAnalyticsContainer.render(component);
+  }
 
   public void rerenderNavBar() {
     SynapseNavDrawerProps props = SynapseNavDrawerProps.create(
@@ -182,11 +206,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
   @Override
   public void setStagingAlertVisible(boolean visible) {
     stagingAlert.setVisible(visible);
-  }
-
-  @Override
-  public void setCookieNotificationVisible(boolean visible) {
-    cookieNotificationAlert.setVisible(visible);
   }
 
   /** Event binder code **/

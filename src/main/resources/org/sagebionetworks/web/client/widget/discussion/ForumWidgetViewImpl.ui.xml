@@ -5,7 +5,6 @@
   xmlns:g="urn:import:com.google.gwt.user.client.ui"
   xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
-  xmlns:a="urn:import:org.sagebionetworks.web.client.widget.entity.menu.v2"
 >
   <bh:Div>
     <bh:Div addStyleNames="flexcontainer-row">

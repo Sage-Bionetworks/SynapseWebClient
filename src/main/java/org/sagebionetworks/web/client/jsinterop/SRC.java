@@ -111,6 +111,10 @@ public class SRC {
     public static ReactComponentType<
       CreateOrUpdateAccessRequirementWizardProps
     > CreateOrUpdateAccessRequirementWizard;
+    public static ReactComponentType<EmptyProps> GoogleAnalytics;
+    public static ReactComponentType<
+      CookieNotificationProps
+    > CookiesNotification;
 
     /**
      * Pushes a global toast message. In SWC, you should use {@link DisplayUtils#notify}, rather than calling this method directly.
@@ -123,6 +127,8 @@ public class SRC {
       String variant,
       @JsNullable ToastMessageOptions options
     );
+
+    public static native CookiePreference getCurrentCookiePreferences();
   }
 
   @JsType(isNative = true)
