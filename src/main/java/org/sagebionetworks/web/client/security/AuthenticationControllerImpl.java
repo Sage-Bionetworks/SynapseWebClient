@@ -54,8 +54,6 @@ public class AuthenticationControllerImpl implements AuthenticationController {
     "Invalid username or password.";
   public static final String NIH_NOTIFICATION_DISMISSED =
     "nih_notification_dismissed";
-  public static String COOKIES_ACCEPTED =
-    "org.sagebionetworks.security.cookies.notification.okclicked";
   public static String FORCE_DISPLAY_ORIGINAL_COLUMN_NAMES =
     "force-display-original-column-names";
 
@@ -438,7 +436,6 @@ public class AuthenticationControllerImpl implements AuthenticationController {
     String[] swcPersistentLocalStorageKeys = new String[] {
       USER_AUTHENTICATION_RECEIPT,
       NIH_NOTIFICATION_DISMISSED,
-      COOKIES_ACCEPTED,
       FORCE_DISPLAY_ORIGINAL_COLUMN_NAMES,
     };
     String[] srcPersistentLocalStorageKeys =
