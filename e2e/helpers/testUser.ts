@@ -189,7 +189,7 @@ export async function getUserIdFromLocalStorage(page: Page) {
 }
 
 export async function acceptSiteCookies(page: Page) {
-  await page.getByRole('button', { name: 'Accept and continue' }).click()
+  await page.getByRole('button', { name: 'ALLOW ALL' }).click()
 }
 
 export const dismissAlert = async (page: Page, alertText: string) => {

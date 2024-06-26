@@ -33,7 +33,7 @@
             addStyleNames="synapse-accent-primary-bg margin-left-5"
           />
         </bh:Div>
-        <bh:Div width="100%">
+        <bh:Div width="100%" ui:field="discussionThreadMessageContainer">
           <b:Container fluid="true">
             <g:FlowPanel>
               <bh:Span

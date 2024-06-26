@@ -43,6 +43,9 @@ public class SingleDiscussionThreadWidgetViewImpl
   Div synAlertContainer;
 
   @UiField
+  Div discussionThreadMessageContainer;
+
+  @UiField
   Div refreshAlertContainer;
 
   @UiField
@@ -102,6 +105,9 @@ public class SingleDiscussionThreadWidgetViewImpl
   @Inject
   public SingleDiscussionThreadWidgetViewImpl(Binder binder) {
     widget = binder.createAndBindUi(this);
+    discussionThreadMessageContainer
+      .getElement()
+      .setAttribute("role", "article");
     deleteIcon.addClickHandler(
       new ClickHandler() {
         @Override
