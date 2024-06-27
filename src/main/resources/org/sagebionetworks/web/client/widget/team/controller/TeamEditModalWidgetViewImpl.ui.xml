@@ -2,10 +2,8 @@
 <ui:UiBinder
   xmlns:ui="urn:ui:com.google.gwt.uibinder"
   xmlns:g="urn:import:com.google.gwt.user.client.ui"
-  xmlns:c="urn:import:com.google.gwt.user.cellview.client"
   xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
-  xmlns:t="urn:import:org.sagebionetworks.web.client.widget.table.v2"
-  xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt"
+  xmlns:MUI="urn:import:org.sagebionetworks.web.client.jsinterop.mui"
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
   xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
 >
@@ -72,8 +70,8 @@
         </b:FormGroup>
         <b:FormGroup addStyleNames="margin-top-20">
           <b:FormLabel for="uploadWidget">Upload new icon</b:FormLabel>
-          <b:Row b:id="uploadWidget">
-            <b:Column size="MD_4">
+          <MUI:Grid b:id="uploadWidget">
+            <MUI:Grid md="4">
               <bh:Div ui:field="iconContainer">
                 <b:Icon
                   ui:field="defaultIcon"
@@ -104,11 +102,11 @@
                 size="16px"
                 visible="false"
               />
-            </b:Column>
-            <b:Column size="MD_8">
+            </MUI:Grid>
+            <MUI:Grid md="8">
               <g:SimplePanel ui:field="uploadWidgetPanel" />
-            </b:Column>
-          </b:Row>
+            </MUI:Grid>
+          </MUI:Grid>
         </b:FormGroup>
       </b:FieldSet>
       <g:SimplePanel ui:field="synAlertPanel" />

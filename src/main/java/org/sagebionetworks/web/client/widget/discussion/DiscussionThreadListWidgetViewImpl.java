@@ -6,11 +6,11 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
 import org.sagebionetworks.repo.model.table.SortDirection;
+import org.sagebionetworks.web.client.jsinterop.mui.Grid;
 import org.sagebionetworks.web.client.widget.table.v2.results.SortableTableHeaderImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.SortingListener;
 
@@ -21,7 +21,7 @@ public class DiscussionThreadListWidgetViewImpl
     extends UiBinder<Widget, DiscussionThreadListWidgetViewImpl> {}
 
   @UiField
-  Column threadListContainer;
+  Grid threadListContainer;
 
   @UiField
   Div synAlertContainer;
