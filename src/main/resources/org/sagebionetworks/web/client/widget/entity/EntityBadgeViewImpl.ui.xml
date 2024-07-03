@@ -13,7 +13,7 @@
         width="30px"
       >
         <g:FocusPanel ui:field="entityTypeIconContainer">
-          <w:EntityTypeIcon ui:field="entityTypeIcon" type="file" />
+          <w:EntityTypeIconImpl ui:field="entityTypeIcon" type="file" />
         </g:FocusPanel>
       </t:TableData>
       <t:TableData ui:field="entityTableData" paddingTop="6">

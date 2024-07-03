@@ -25,7 +25,7 @@ import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
-import org.sagebionetworks.web.client.widget.EntityTypeIcon;
+import org.sagebionetworks.web.client.widget.EntityTypeIconImpl;
 import org.sagebionetworks.web.client.widget.entity.EntityBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
@@ -67,7 +67,7 @@ public class TableEntityListGroupItem implements IsWidget {
   FlowPanel entityContainer;
 
   @UiField
-  EntityTypeIcon icon;
+  EntityTypeIconImpl icon;
 
   public interface Binder
     extends UiBinder<IsWidget, TableEntityListGroupItem> {}

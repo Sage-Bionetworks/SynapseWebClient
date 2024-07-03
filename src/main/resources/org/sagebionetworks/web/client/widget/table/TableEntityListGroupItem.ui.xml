@@ -11,7 +11,7 @@
       <t:TableHeader width="20px" />
       <t:TableData width="20px">
         <g:FocusPanel ui:field="iconContainer">
-          <w:EntityTypeIcon ui:field="icon" type="table" />
+          <w:EntityTypeIconImpl ui:field="icon" type="table" />
         </g:FocusPanel>
       </t:TableData>
       <t:TableData addStyleNames="overflow-x-hidden ">

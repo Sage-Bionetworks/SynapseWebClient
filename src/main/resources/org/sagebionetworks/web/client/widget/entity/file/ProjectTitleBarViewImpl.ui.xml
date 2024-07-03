@@ -14,7 +14,7 @@
         <bh:Div
           addStyleNames="flexcontainer-row flexcontainer-align-items-center overflow-x-auto"
         >
-          <w:EntityTypeIcon
+          <w:EntityTypeIconImpl
             ui:field="entityIcon"
             addStyleNames="entityIcon margin-right-10 lightGreyText flexcontainer-column"
             type="folder"

@@ -11,7 +11,7 @@
     marginBottom="9"
     paddingBottom="7"
   >
-    <w:EntityTypeIcon
+    <w:EntityTypeIconImpl
       ui:field="icon"
       type="project"
       addStyleNames="displayInline margin-right-10 lightGreyText"
