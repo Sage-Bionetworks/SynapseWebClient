@@ -18,7 +18,17 @@ public class ReactDOM {
 
   public static native boolean unmountComponentAtNode(Element container);
 
+  /**
+   * flushSync lets you force React to flush any updates inside the provided callback synchronously. This ensures that the DOM is updated immediately.
+   * Using flushSync is uncommon and can hurt the performance of your app. Most of the time, flushSync can be avoided. Use flushSync as last resort.
+   * <a href="https://react.dev/reference/react-dom/flushSync">See docs</a>
+   */
   public static native void flushSync();
 
+  /**
+   * flushSync lets you force React to flush any updates inside the provided callback synchronously. This ensures that the DOM is updated immediately.
+   * Using flushSync is uncommon and can hurt the performance of your app. Most of the time, flushSync can be avoided. Use flushSync as last resort.
+   * <a href="https://react.dev/reference/react-dom/flushSync">See docs</a>
+   */
   public static native void flushSync(Callback callback);
 }
