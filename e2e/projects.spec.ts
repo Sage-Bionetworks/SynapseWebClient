@@ -63,7 +63,7 @@ testAuth.describe('Projects', () => {
       ).toBeVisible()
       await expect(
         userPage.getByText(
-          `Are you sure you want to delete Project "${PROJECT_NAME}"?`,
+          `Are you sure you want to delete Project ${PROJECT_NAME}?`,
         ),
       ).toBeVisible()
 
