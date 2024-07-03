@@ -429,7 +429,7 @@ testAuth.describe('Tables', () => {
         ).toBeVisible()
         await expect(
           userPage.getByText(
-            `Are you sure you want to delete Table "${tableName}"?`,
+            `Are you sure you want to delete Table ${tableName}?`,
           ),
         ).toBeVisible()
         await userPage.getByRole('button', { name: 'Delete' }).click()

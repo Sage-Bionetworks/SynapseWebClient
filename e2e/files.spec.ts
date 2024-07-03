@@ -474,7 +474,7 @@ testAuth.describe('Files', () => {
         ).toBeVisible()
         await expect(
           userPage.getByText(
-            `Are you sure you want to delete File "${fileName}"?`,
+            `Are you sure you want to delete File ${fileName}?`,
           ),
         ).toBeVisible()
         await expect(
