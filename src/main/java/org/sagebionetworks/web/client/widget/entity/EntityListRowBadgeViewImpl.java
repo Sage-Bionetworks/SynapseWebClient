@@ -17,7 +17,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
-import org.sagebionetworks.web.client.widget.EntityTypeIcon;
+import org.sagebionetworks.web.client.widget.EntityTypeIconImpl;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
 public class EntityListRowBadgeViewImpl
@@ -33,7 +33,7 @@ public class EntityListRowBadgeViewImpl
   TableRow row;
 
   @UiField
-  EntityTypeIcon icon;
+  EntityTypeIconImpl icon;
 
   @UiField
   Anchor entityLink;

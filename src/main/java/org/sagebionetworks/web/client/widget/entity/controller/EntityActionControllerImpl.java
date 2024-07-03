@@ -83,6 +83,7 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.jsinterop.AlertButtonConfig;
 import org.sagebionetworks.web.client.jsinterop.EntityFinderScope;
 import org.sagebionetworks.web.client.jsinterop.KeyFactory;
+import org.sagebionetworks.web.client.jsinterop.ReactDOM;
 import org.sagebionetworks.web.client.jsinterop.ReactMouseEvent;
 import org.sagebionetworks.web.client.jsinterop.ToastMessageOptions;
 import org.sagebionetworks.web.client.jsinterop.reactquery.InvalidateQueryFilters;
@@ -96,6 +97,8 @@ import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.EntityTypeIcon;
+import org.sagebionetworks.web.client.widget.EntityTypeIconImpl;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
@@ -210,8 +213,10 @@ public class EntityActionControllerImpl
 
   public static final String ARE_YOU_SURE_YOU_WANT_TO_DELETE =
     "Are you sure you want to delete ";
-  public static final String DELETE_FOLDER_EXPLANATION =
-    " Everything contained within the Folder will also be deleted.";
+  public static final String DELETE_CONTAINER_EXPLANATION_START =
+    " Everything contained within the ";
+  public static final String DELETE_CONTAINER_EXPLANATION_END =
+    " will also be deleted.";
   public static final String CONFIRM_DELETE_TITLE = "Confirm Delete";
 
   public static final String DELETE_PREFIX = "Delete ";
@@ -2776,18 +2781,32 @@ public class EntityActionControllerImpl
       );
   }
 
+  private String getIconHTML() {
+    EntityTypeIcon icon = ginInjector.getEntityTypeIcon();
+    icon.configure(entityBundle.getEntityType());
+    // Pull the HTML out of the icon React component and inline it
+    // It's possible ReactDOM has not injected HTML to the widget yet, so use flushSync to force it to be written
+    ReactDOM.flushSync();
+    return icon.getElement().getInnerHTML();
+  }
+
   @Override
   public void onDeleteEntity() {
-    // Confirm the delete with the user. Mention that everything inside folder will also be deleted if
-    // this is a folder entity.
+    // Confirm deletion with the user. Mention that everything inside container will also be deleted if
+    // this is a container entity.
     String display =
       ARE_YOU_SURE_YOU_WANT_TO_DELETE +
       this.entityTypeDisplay +
-      " \"" +
+      " " +
+      getIconHTML() +
+      "<strong>" +
       this.entity.getName() +
-      "\"?";
-    if (this.entity instanceof Folder) {
-      display += DELETE_FOLDER_EXPLANATION;
+      "</strong>?";
+    if (this.entity instanceof Folder || this.entity instanceof Project) {
+      display +=
+      DELETE_CONTAINER_EXPLANATION_START +
+      this.entityTypeDisplay +
+      DELETE_CONTAINER_EXPLANATION_END;
     }
 
     view.showConfirmDeleteDialog(

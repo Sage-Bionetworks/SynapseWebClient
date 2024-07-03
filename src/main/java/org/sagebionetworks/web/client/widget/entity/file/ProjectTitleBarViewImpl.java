@@ -11,7 +11,7 @@ import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.widget.EntityTypeIcon;
+import org.sagebionetworks.web.client.widget.EntityTypeIconImpl;
 
 public class ProjectTitleBarViewImpl implements ProjectTitleBarView {
 
@@ -22,7 +22,7 @@ public class ProjectTitleBarViewImpl implements ProjectTitleBarView {
   SimplePanel favoritePanel;
 
   @UiField
-  EntityTypeIcon entityIcon;
+  EntityTypeIconImpl entityIcon;
 
   @UiField
   Div actionMenuContainer;

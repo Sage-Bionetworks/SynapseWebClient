@@ -53,6 +53,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.DivView;
 import org.sagebionetworks.web.client.widget.CommaSeparatedValuesParser;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
+import org.sagebionetworks.web.client.widget.EntityTypeIcon;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.QuarantinedEmailModal;
@@ -862,4 +863,6 @@ public interface PortalGinInjector extends Ginjector {
   FollowingPagePresenter getFollowingPagePresenter();
 
   ColumnModelsEditorWidget getColumnModelsEditorWidget();
+
+  EntityTypeIcon getEntityTypeIcon();
 }

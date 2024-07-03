@@ -15,7 +15,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.place.Synapse;
-import org.sagebionetworks.web.client.widget.EntityTypeIcon;
+import org.sagebionetworks.web.client.widget.EntityTypeIconImpl;
 
 public class EntityIdCellRendererViewImpl implements EntityIdCellRendererView {
 
@@ -31,7 +31,7 @@ public class EntityIdCellRendererViewImpl implements EntityIdCellRendererView {
   Icon errorIcon;
 
   @UiField
-  EntityTypeIcon entityIcon;
+  EntityTypeIconImpl entityIcon;
 
   @UiField
   Anchor entityLink;

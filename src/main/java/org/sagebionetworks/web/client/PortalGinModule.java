@@ -976,5 +976,6 @@ public class PortalGinModule extends AbstractGinModule {
     bind(FeatureFlagConfigProvider.class).in(Singleton.class);
 
     bind(FeatureFlagConfig.class).toProvider(FeatureFlagConfigProvider.class);
+    bind(EntityTypeIcon.class).to(EntityTypeIconImpl.class);
   }
 }

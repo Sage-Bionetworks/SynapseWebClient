@@ -17,4 +17,8 @@ public class ReactDOM {
   public static native ReactDOMRoot createRoot(Element container);
 
   public static native boolean unmountComponentAtNode(Element container);
+
+  public static native void flushSync();
+
+  public static native void flushSync(Callback callback);
 }

@@ -14,7 +14,7 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.EntityTypeIcon;
+import org.sagebionetworks.web.client.widget.EntityTypeIconImpl;
 
 public class DockerRepoListGroupItem extends ListGroupItem {
 
@@ -32,7 +32,7 @@ public class DockerRepoListGroupItem extends ListGroupItem {
     addStyleName("padding-10");
     Heading iconHeading = new Heading(HeadingSize.H3);
     iconHeading.setPull(Pull.LEFT);
-    EntityTypeIcon icon = new EntityTypeIcon(EntityType.dockerrepo);
+    EntityTypeIconImpl icon = new EntityTypeIconImpl(EntityType.dockerrepo);
     icon.addStyleName("lightGreyText margin-right-10 moveup-10");
     iconHeading.add(icon);
 

@@ -39,7 +39,7 @@ import org.sagebionetworks.web.client.jsinterop.SynapseReactClientFullContextPro
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
-import org.sagebionetworks.web.client.widget.EntityTypeIcon;
+import org.sagebionetworks.web.client.widget.EntityTypeIconImpl;
 import org.sagebionetworks.web.client.widget.ReactComponent;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
@@ -57,7 +57,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
   FocusPanel entityTypeIconContainer;
 
   @UiField
-  EntityTypeIcon entityTypeIcon;
+  EntityTypeIconImpl entityTypeIcon;
 
   @UiField
   FlowPanel entityContainer;

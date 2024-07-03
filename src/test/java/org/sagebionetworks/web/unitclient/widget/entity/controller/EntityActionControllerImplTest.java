@@ -27,20 +27,7 @@ import static org.sagebionetworks.web.client.DisplayConstants.VIEW_DOWNLOAD_LIST
 import static org.sagebionetworks.web.client.DisplayConstants.VIRTUAL_TABLE;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getDoneFuture;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getFailedFuture;
-import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.ACCESS_REQUIREMENT_GUIDANCE;
-import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.ARE_YOU_SURE_YOU_WANT_TO_DELETE;
-import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETE_FOLDER_EXPLANATION;
-import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETE_PREFIX;
-import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.EDIT_NAME_AND_DESCRIPTION;
-import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.EDIT_WIKI_PREFIX;
-import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.ENABLE_2FA_GUIDANCE;
-import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.MOVE_PREFIX;
-import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.NO_PERMISSION_TO_DOWNLOAD;
-import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.REQUEST_DOWNLOAD_GUIDANCE;
-import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.THE;
-import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.UPDATE_DOI_FOR;
-import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.WAS_SUCCESSFULLY_DELETED;
-import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.WIKI;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.*;
 import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_COLLECTOR_URL;
 import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_DESCRIPTION_PART_1;
 import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_PRIORITY;
@@ -48,7 +35,9 @@ import static org.sagebionetworks.web.shared.WebConstants.REVIEW_DATA_REQUEST_CO
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwtmockito.GwtMockitoTestRunner;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -65,7 +54,6 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 import org.sagebionetworks.client.exceptions.SynapseClientException;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
@@ -145,6 +133,7 @@ import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.EntityTypeIcon;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
@@ -176,7 +165,6 @@ import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModal;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
 import org.sagebionetworks.web.client.widget.team.SelectTeamModal;
@@ -192,7 +180,7 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.test.helper.CallbackMockStubber;
 import org.sagebionetworks.web.test.helper.SelfReturningAnswer;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(GwtMockitoTestRunner.class)
 public class EntityActionControllerImplTest {
 
   @Mock
@@ -413,6 +401,12 @@ public class EntityActionControllerImplTest {
   @Mock
   FeatureFlagConfig mockFeatureFlagConfig;
 
+  @Mock
+  EntityTypeIcon mockEntityTypeIcon;
+
+  @Mock
+  Element mockIconElement;
+
   @Captor
   ArgumentCaptor<
     CreateTableViewWizardProps.OnComplete
@@ -518,6 +512,11 @@ public class EntityActionControllerImplTest {
     when(mockSynapseJavascriptClient.getRestrictionInformation(any(), any()))
       .thenReturn(getDoneFuture(mockRestrictionInformation));
     when(mockQueryClientProvider.getQueryClient()).thenReturn(mockQueryClient);
+
+    when(mockPortalGinInjector.getEntityTypeIcon())
+      .thenReturn(mockEntityTypeIcon);
+    when(mockEntityTypeIcon.getElement()).thenReturn(mockIconElement);
+    when(mockIconElement.getInnerHTML()).thenReturn("");
 
     // The controller under test.
     controller =
@@ -4367,8 +4366,10 @@ public class EntityActionControllerImplTest {
     );
     String display =
       ARE_YOU_SURE_YOU_WANT_TO_DELETE +
-      "Folder \"Test\"?" +
-      DELETE_FOLDER_EXPLANATION;
+      "Folder <strong>Test</strong>?" +
+      DELETE_CONTAINER_EXPLANATION_START +
+      "Folder" +
+      DELETE_CONTAINER_EXPLANATION_END;
     // the call under tests
     controller.onAction(Action.DELETE_ENTITY, null);
     verify(mockView).showConfirmDeleteDialog(eq(display), any(Callback.class));
@@ -4379,6 +4380,37 @@ public class EntityActionControllerImplTest {
 
   @Test
   public void testNotFolderDeletionPrompt() {
+    /*
+     * The user must be shown a confirm dialog before a delete. Confirm is signaled via the
+     * Callback.invoke() in this case we do not want to confirm.
+     */
+    AsyncMockStubber
+      .callNoInvovke()
+      .when(mockView)
+      .showConfirmDeleteDialog(anyString(), any(Callback.class));
+    FileEntity f = new FileEntity();
+    f.setName("Test");
+    entityBundle.setEntity(f);
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+    String display =
+      ARE_YOU_SURE_YOU_WANT_TO_DELETE + "File <strong>Test</strong>?"; // note - this is not a container, so there is no prompt that everything within the container is deleted
+    // the call under tests
+    controller.onAction(Action.DELETE_ENTITY, null);
+    verify(mockView).showConfirmDeleteDialog(eq(display), any(Callback.class));
+    // should not make it to the pre-flight check
+    verify(mockPreflightController, never())
+      .checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
+  }
+
+  @Test
+  public void testProjectDeletionPrompt() {
     /*
      * The user must be shown a confirm dialog before a delete. Confirm is signaled via the
      * Callback.invoke() in this case we do not want to confirm.
@@ -4398,13 +4430,15 @@ public class EntityActionControllerImplTest {
       currentEntityArea,
       mockAddToDownloadListWidget
     );
-    String display = ARE_YOU_SURE_YOU_WANT_TO_DELETE + "Project \"Test\"?";
-    String folderDisplay = display + DELETE_FOLDER_EXPLANATION;
+    String display =
+      ARE_YOU_SURE_YOU_WANT_TO_DELETE +
+      "Project <strong>Test</strong>?" +
+      DELETE_CONTAINER_EXPLANATION_START +
+      "Project" +
+      DELETE_CONTAINER_EXPLANATION_END;
     // the call under tests
     controller.onAction(Action.DELETE_ENTITY, null);
     verify(mockView).showConfirmDeleteDialog(eq(display), any(Callback.class));
-    verify(mockView, times(0))
-      .showConfirmDeleteDialog(eq(folderDisplay), any(Callback.class));
     // should not make it to the pre-flight check
     verify(mockPreflightController, never())
       .checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
