@@ -484,6 +484,12 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
   }
 
   @Override
+  public void setACTCommandsVisible(boolean visible) {
+    lazyConstruct();
+    iduReportLink.setVisible(visible);
+  }
+
+  @Override
   public void setEditButtonEnabled(boolean enabled) {
     editWidgetButton.setEnabled(enabled);
   }

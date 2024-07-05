@@ -52,6 +52,11 @@
               visible="false"
             />
             <b:AnchorListItem ui:field="imageLink" text="Image" />
+            <b:AnchorListItem
+              ui:field="iduReportLink"
+              text="Intended Data Use Report"
+              visible="false"
+            />
             <b:AnchorListItem ui:field="joinTeamLink" text="Join Team Button" />
             <b:AnchorListItem ui:field="leaderboardLink" text="Leaderboard" />
             <b:AnchorListItem ui:field="linkLink" text="Link" />
@@ -135,10 +140,6 @@
             <b:AnchorListItem
               ui:field="externalWebsiteLink"
               text="External Website"
-            />
-            <b:AnchorListItem
-              ui:field="iduReportLink"
-              text="Intended Data Use Report"
             />
             <b:AnchorListItem
               ui:field="registerChallengeTeamLink"
