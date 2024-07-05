@@ -56,6 +56,7 @@ import org.sagebionetworks.repo.model.download.EnableTwoFa;
 import org.sagebionetworks.repo.model.download.MeetAccessRequirement;
 import org.sagebionetworks.repo.model.download.RequestDownload;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
+import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.DatasetCollection;
@@ -800,9 +801,25 @@ public class EntityActionControllerImpl
             );
         }
       }
-      actionMenu.setActionVisible(Action.DOWNLOAD_FILE, true);
 
-      actionMenu.setActionVisible(Action.ADD_TO_DOWNLOAD_CART, true);
+      boolean isExternalFileHandle =
+        entityBundle.getFileHandles() != null &&
+        !entityBundle.getFileHandles().isEmpty() &&
+        entityBundle.getFileHandles().get(0) instanceof ExternalFileHandle;
+
+      actionMenu.setActionVisible(Action.DOWNLOAD_FILE, !isExternalFileHandle);
+      actionMenu.setActionVisible(
+        Action.ADD_TO_DOWNLOAD_CART,
+        !isExternalFileHandle
+      );
+      actionMenu.setActionVisible(
+        Action.SHOW_PROGRAMMATIC_OPTIONS,
+        !isExternalFileHandle
+      );
+      actionMenu.setActionVisible(
+        Action.OPEN_EXTERNAL_FILE,
+        isExternalFileHandle
+      );
       actionMenu.setActionListener(
         Action.ADD_TO_DOWNLOAD_CART,
         (action, e) -> {
@@ -843,7 +860,6 @@ public class EntityActionControllerImpl
         }
       );
 
-      actionMenu.setActionVisible(Action.SHOW_PROGRAMMATIC_OPTIONS, true);
       actionMenu.setActionListener(
         Action.SHOW_PROGRAMMATIC_OPTIONS,
         (action, e) ->

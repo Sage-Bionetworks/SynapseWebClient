@@ -83,6 +83,7 @@ import org.sagebionetworks.repo.model.download.EnableTwoFa;
 import org.sagebionetworks.repo.model.download.MeetAccessRequirement;
 import org.sagebionetworks.repo.model.download.RequestDownload;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
+import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.DatasetCollection;
@@ -5173,6 +5174,34 @@ public class EntityActionControllerImplTest {
       .onAction(Action.SHOW_PROGRAMMATIC_OPTIONS, null);
 
     verify(mockFileClientsHelp).configureAndShow(entityId, 3L);
+  }
+
+  @Test
+  public void testConfigureExternalFileHandleDownload() {
+    ExternalFileHandle externalFileHandle = new ExternalFileHandle();
+    entityBundle.setFileHandles(Collections.singletonList(externalFileHandle));
+    entityBundle.setEntity(new FileEntity());
+
+    // Call under test
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+
+    verify(mockActionMenu).setDownloadMenuEnabled(true);
+    verify(mockActionMenu).setDownloadMenuTooltipText("");
+    verify(mockActionMenu).setActionVisible(Action.OPEN_EXTERNAL_FILE, true);
+    verify(mockActionMenu).setActionVisible(Action.DOWNLOAD_FILE, false);
+    verify(mockActionMenu).setActionVisible(Action.ADD_TO_DOWNLOAD_CART, false);
+    verify(mockActionMenu)
+      .setActionVisible(Action.SHOW_PROGRAMMATIC_OPTIONS, false);
+
+    verify(mockFileDownloadHandlerWidget)
+      .configure(mockActionMenu, entityBundle, mockRestrictionInformation);
   }
 
   @Test

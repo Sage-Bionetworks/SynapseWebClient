@@ -254,8 +254,12 @@ public class DefaultEntityActionMenuLayoutUtil {
         );
         layout.setDownloadMenuActions(
           Arrays.asList(
-            Collections.singletonList(
-              ActionViewProps.create(Action.DOWNLOAD_FILE)
+            Arrays.asList(
+              ActionViewProps.create(Action.DOWNLOAD_FILE),
+              ActionViewProps.create(
+                Action.OPEN_EXTERNAL_FILE,
+                "openInNewWindow"
+              )
             ),
             Arrays.asList(
               ActionViewProps.create(Action.ADD_TO_DOWNLOAD_CART),

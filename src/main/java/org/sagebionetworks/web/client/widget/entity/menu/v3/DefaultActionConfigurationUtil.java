@@ -143,6 +143,7 @@ public class DefaultActionConfigurationUtil {
         "Add to Download Cart"
       ),
       ActionConfiguration.create(Action.DOWNLOAD_FILE, "Download File"),
+      ActionConfiguration.create(Action.OPEN_EXTERNAL_FILE, "Open Link"),
       ActionConfiguration.create(Action.REPORT_VIOLATION, "Report Violation")
     );
     Map<Action, ActionConfiguration> configurationMap = new EnumMap<>(
