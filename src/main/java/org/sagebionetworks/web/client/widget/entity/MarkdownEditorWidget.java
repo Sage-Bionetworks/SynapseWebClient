@@ -57,6 +57,7 @@ import org.sagebionetworks.web.client.presenter.BaseEditWidgetDescriptorPresente
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.editor.UserTeamSelector;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.client.widget.entity.renderer.IntendedDataUseReportWidget;
@@ -94,6 +95,7 @@ public class MarkdownEditorWidget
   private PortalGinInjector ginInjector;
 
   private FeatureFlagConfig featureFlagConfig;
+  private IsACTMemberAsyncHandler isACTMemberAsyncHandler;
 
   @Inject
   public MarkdownEditorWidget(
@@ -105,7 +107,8 @@ public class MarkdownEditorWidget
     WidgetRegistrar widgetRegistrar,
     UserTeamSelector userTeamSelector,
     PortalGinInjector ginInjector,
-    FeatureFlagConfig featureFlagConfig
+    FeatureFlagConfig featureFlagConfig,
+    IsACTMemberAsyncHandler isACTMemberAsyncHandler
   ) {
     super();
     this.view = view;
@@ -119,6 +122,7 @@ public class MarkdownEditorWidget
 
     this.userTeamSelector = userTeamSelector;
     this.featureFlagConfig = featureFlagConfig;
+    this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
 
     widgetSelectionState = new WidgetSelectionState();
     view.setPresenter(this);
@@ -154,6 +158,9 @@ public class MarkdownEditorWidget
       featureFlagConfig.isFeatureEnabled(
         FeatureFlagKey.ADD_WIKI_WIDGETS.getKey()
       )
+    );
+    isACTMemberAsyncHandler.isACTMember(isACTMember ->
+      view.setACTCommandsVisible(isACTMember)
     );
     view.configure(markdown);
     view.showEditMode();

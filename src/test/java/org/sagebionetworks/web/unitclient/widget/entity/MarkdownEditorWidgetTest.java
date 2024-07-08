@@ -22,6 +22,7 @@ import org.gwtbootstrap3.client.shared.event.ModalShownHandler;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -40,6 +41,7 @@ import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
 import org.sagebionetworks.web.client.presenter.BaseEditWidgetDescriptorPresenter;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorAction;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidgetView;
@@ -106,6 +108,12 @@ public class MarkdownEditorWidgetTest {
   @Mock
   FeatureFlagConfig mockFeatureFlagConfig;
 
+  @Mock
+  IsACTMemberAsyncHandler mockIsACTMemberAsyncHandler;
+
+  @Captor
+  ArgumentCaptor<CallbackP<Boolean>> isActMemberCaptor;
+
   @Before
   public void before() throws JSONObjectAdapterException {
     MockitoAnnotations.initMocks(this);
@@ -120,7 +128,8 @@ public class MarkdownEditorWidgetTest {
         mockWidgetRegistrar,
         mockUserSelector,
         mockGinInjector,
-        mockFeatureFlagConfig
+        mockFeatureFlagConfig,
+        mockIsACTMemberAsyncHandler
       );
     wikiPageKey =
       new WikiPageKey("syn1111", ObjectType.ENTITY.toString(), null);
@@ -735,5 +744,25 @@ public class MarkdownEditorWidgetTest {
 
     verify(mockEditDescriptor)
       .editNew(eq(wikiPageKey), eq(WidgetConstants.TEAM_MEMBERS_CONTENT_TYPE));
+  }
+
+  @Test
+  public void testConfigureAsACTMember() {
+    verify(mockIsACTMemberAsyncHandler)
+      .isACTMember(isActMemberCaptor.capture());
+
+    isActMemberCaptor.getValue().invoke(true);
+
+    verify(mockView).setACTCommandsVisible(true);
+  }
+
+  @Test
+  public void testConfigureAsNonACTMember() {
+    verify(mockIsACTMemberAsyncHandler)
+      .isACTMember(isActMemberCaptor.capture());
+
+    isActMemberCaptor.getValue().invoke(false);
+
+    verify(mockView).setACTCommandsVisible(false);
   }
 }
