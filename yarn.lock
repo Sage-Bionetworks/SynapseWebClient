@@ -4756,6 +4756,11 @@ scheduler@^0.23.0, scheduler@^0.23.2:
   dependencies:
     loose-envify "^1.1.0"
 
+schema-dts@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/schema-dts/-/schema-dts-1.1.2.tgz#82ccf71b5dcb80065a1cc5941888507a4ce1e44b"
+  integrity sha512-MpNwH0dZJHinVxk9bT8XUdjKTxMYrA5bLtrrGmFA6PTLwlOKnhi67XoRd6/ty+Djt6ZC0slR57qFhZDNMI6DhQ==
+
 selectn@^1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/selectn/-/selectn-1.1.2.tgz#fc8acd91df3f45acb01891c6773ae529851d6b17"
@@ -5027,10 +5032,10 @@ svg-path-sdf@^1.1.3:
     parse-svg-path "^0.1.2"
     svg-path-bounds "^1.0.1"
 
-synapse-react-client@3.2.28:
-  version "3.2.28"
-  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-3.2.28.tgz#ce9295ee538235d2ff72bb3881e98059846e6d3d"
-  integrity sha512-z8cGCl2QcLVVA4TZ4NjJGiXUyWWwLNTgrT2Z1XAlg3v3g8oTjBmorweL6Jcdc7pB2UnFBy53GH+Iz/n8BMa4/g==
+synapse-react-client@3.3.0:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-3.3.0.tgz#9f42b840de9766bf2e6fba0e377de020bd5e712d"
+  integrity sha512-Du8+9HQpZLMaBCur5sWApdSc9EDhc3m23bwZPBO4M3YHwQpJ5kNFSbt3/hTn16xw0hZ5nfsptbT+mnPcsAz40A==
   dependencies:
     "@apidevtools/json-schema-ref-parser" "^9.1.2"
     "@brainhubeu/react-carousel" "1.19.26"
@@ -5113,6 +5118,7 @@ synapse-react-client@3.2.28:
     reactflow "^11.11.2"
     rss-parser "^3.13.0"
     sass "^1.71.1"
+    schema-dts "^1.1.2"
     shortid "^2.2.16"
     spark-md5 "^3.0.2"
     tinycolor2 "^1.6.0"
