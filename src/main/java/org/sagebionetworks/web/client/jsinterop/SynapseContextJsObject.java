@@ -15,6 +15,7 @@ public class SynapseContextJsObject {
   public boolean isInExperimentalMode;
   public boolean utcTime;
   public String appId;
+  public boolean withErrorBoundary;
 
   @JsOverlay
   public static SynapseContextJsObject create(
@@ -28,6 +29,7 @@ public class SynapseContextJsObject {
     context.utcTime = utcTime;
     context.downloadCartPageUrl = "/DownloadCart:0";
     context.appId = "synapse.org";
+    context.withErrorBoundary = true;
     return context;
   }
 }
