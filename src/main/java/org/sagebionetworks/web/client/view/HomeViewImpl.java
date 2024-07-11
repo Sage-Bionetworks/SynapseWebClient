@@ -22,8 +22,6 @@ public class HomeViewImpl extends Composite implements HomeView {
   @UiField
   ReactComponent container;
 
-  private static final String PROJECT_VIEW_ID = "syn23593547.3";
-
   private Header headerWidget;
   private SynapseReactClientFullContextPropsProvider propsProvider;
 
@@ -44,10 +42,9 @@ public class HomeViewImpl extends Composite implements HomeView {
   @Override
   public void render() {
     scrollToTop();
-    SynapseHomepageProps props = SynapseHomepageProps.create(PROJECT_VIEW_ID);
     ReactNode component = React.createElementWithSynapseContext(
-      SRC.SynapseComponents.SynapseHomepage,
-      props,
+      SRC.SynapseComponents.SynapseHomepageV2,
+      null,
       propsProvider.getJsInteropContextProps()
     );
     container.render(component);
