@@ -4,72 +4,73 @@
   xmlns:ui="urn:ui:com.google.gwt.uibinder"
   xmlns:g="urn:import:com.google.gwt.user.client.ui"
   xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
-  xmlns:MUI="urn:import:org.sagebionetworks.web.client.jsinterop.mui"
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
   xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
 >
-  <g:FlowPanel>
-    <g:SimplePanel ui:field="dockerTitlebarContainer" />
-    <g:SimplePanel ui:field="dockerMetadataContainer" />
-    <g:FlowPanel addStyleNames="entity-page-side-margins">
-      <MUI:Grid container="true" columnSpacing="15px">
-        <MUI:Grid xs="12" md="6">
-          <b:Panel addStyleNames="margin-bottom-15">
-            <bh:Div addStyleNames="highlight-title">
-              <bh:Text text="Docker Pull Command" />
-            </bh:Div>
-            <b:PanelBody addStyleNames="margin-15">
-              <g:TextBox
-                ui:field="dockerPullCommand"
-                addStyleNames="border-none noBackground"
-                readOnly="true"
-                width="100%"
+  <b:Row>
+    <b:Column size="XS_12">
+      <b:Row>
+        <bh:Div addStyleNames="margin-left-15 margin-right-15">
+          <g:SimplePanel ui:field="dockerTitlebarContainer" />
+          <g:SimplePanel ui:field="dockerMetadataContainer" />
+        </bh:Div>
+      </b:Row>
+      <g:FlowPanel addStyleNames="entity-page-side-margins">
+        <b:Row>
+          <b:Column size="XS_12, MD_6">
+            <b:Panel>
+              <bh:Div addStyleNames="highlight-title">
+                <bh:Text text="Docker Pull Command" />
+              </bh:Div>
+              <b:PanelBody addStyleNames="margin-15">
+                <g:TextBox
+                  ui:field="dockerPullCommand"
+                  addStyleNames="border-none noBackground"
+                  readOnly="true"
+                  width="100%"
+                />
+              </b:PanelBody>
+            </b:Panel>
+            <b:Panel addStyleNames="margin-top-15">
+              <b:PanelBody ui:field="dockerRepoWikiPageContainer" />
+            </b:Panel>
+          </b:Column>
+          <b:Column size="XS_12, MD_6">
+            <g:FlowPanel addStyleNames="margin-bottom-15">
+              <bh:Div addStyleNames="highlight-title">
+                <bh:Text>Tags</bh:Text>
+                <w:HelpWidget
+                  helpMarkdown="An image name is made up of slash-separated name components, optionally prefixed by a registry hostname."
+                  href="https://docs.docker.com/engine/reference/commandline/tag/"
+                  addStyleNames="margin-left-5"
+                  placement="BOTTOM"
+                />
+              </bh:Div>
+              <bh:Div
+                addStyleNames="padding-15"
+                ui:field="dockerCommitListContainer"
               />
-            </b:PanelBody>
-          </b:Panel>
-        </MUI:Grid>
-        <MUI:Grid xs="12" md="6">
-          <g:FlowPanel addStyleNames="margin-bottom-15">
-            <bh:Div addStyleNames="highlight-title">
-              <bh:Text>Tags</bh:Text>
-              <w:HelpWidget
-                helpMarkdown="An image name is made up of slash-separated name components, optionally prefixed by a registry hostname."
-                href="https://docs.docker.com/engine/reference/commandline/tag/"
-                addStyleNames="margin-left-5"
-                placement="BOTTOM"
-              />
-            </bh:Div>
-            <bh:Div
-              addStyleNames="padding-15"
-              ui:field="dockerCommitListContainer"
-            />
-          </g:FlowPanel>
-        </MUI:Grid>
-        <MUI:Grid xs="12" md="6">
-          <b:Panel>
-            <b:PanelBody ui:field="dockerRepoWikiPageContainer" />
-          </b:Panel>
-        </MUI:Grid>
-        <MUI:Grid xs="12" md="6">
-          <g:FlowPanel
-            ui:field="provenancePanel"
-            addStyleNames="margin-bottom-15"
-          >
-            <bh:Div addStyleNames="highlight-title">
-              <bh:Text>Provenance</bh:Text>
-              <w:HelpWidget
-                helpMarkdown="Provenance tracks the relationship between data, code and analytical results"
-                href="https://help.synapse.org/docs/Provenance.1972470373.html"
-                addStyleNames="margin-left-5"
-                placement="BOTTOM"
-              />
-            </bh:Div>
-            <bh:Div ui:field="dockerRepoProvenanceContainer" />
-          </g:FlowPanel>
-        </MUI:Grid>
-      </MUI:Grid>
-    </g:FlowPanel>
-    <g:SimplePanel ui:field="dockerModifiedAndCreatedContainer" />
+            </g:FlowPanel>
+            <g:FlowPanel
+              ui:field="provenancePanel"
+              addStyleNames="light-border padding-10 margin-bottom-15"
+            >
+              <bh:Div addStyleNames="highlight-title">
+                <bh:Text>Provenance</bh:Text>
+                <w:HelpWidget
+                  helpMarkdown="Provenance tracks the relationship between data, code and analytical results"
+                  href="https://help.synapse.org/docs/Provenance.1972470373.html"
+                  addStyleNames="margin-left-5"
+                  placement="BOTTOM"
+                />
+              </bh:Div>
+              <bh:Div ui:field="dockerRepoProvenanceContainer" />
+            </g:FlowPanel>
+          </b:Column>
+        </b:Row>
+      </g:FlowPanel>
+      <g:SimplePanel ui:field="dockerModifiedAndCreatedContainer" />
+    </b:Column>
     <g:SimplePanel ui:field="synapseAlertContainer" />
-  </g:FlowPanel>
+  </b:Row>
 </ui:UiBinder>

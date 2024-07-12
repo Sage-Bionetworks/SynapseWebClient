@@ -3,6 +3,7 @@
   xmlns:ui="urn:ui:com.google.gwt.uibinder"
   xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+  xmlns:g="urn:import:com.google.gwt.user.client.ui"
 >
   <bh:Div addStyleNames="inline-block">
     <b:Tooltip title="Anyone on the internet can access" placement="BOTTOM">

@@ -4,7 +4,6 @@
   xmlns:ui="urn:ui:com.google.gwt.uibinder"
   xmlns:g="urn:import:com.google.gwt.user.client.ui"
   xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
-  xmlns:MUI="urn:import:org.sagebionetworks.web.client.jsinterop.mui"
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
   xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
 >
@@ -32,13 +31,8 @@
         visible="false"
       />
       <g:SimplePanel ui:field="fileBrowserContainer" />
-      <MUI:Grid
-        container="true"
-        columnSpacing="15px"
-        rowSpacing="15px"
-        addStyleNames="margin-top-10"
-      >
-        <MUI:Grid xs="12" md="6" ui:field="filePreviewContainer">
+      <b:Row addStyleNames="margin-top-10">
+        <b:Column size="MD_6" ui:field="filePreviewContainer">
           <g:FlowPanel>
             <bh:Div addStyleNames="highlight-title">
               <bh:Text>Preview</bh:Text>
@@ -62,9 +56,9 @@
               <bh:Div ui:field="filePreviewWidgetContainer" />
             </g:ScrollPanel>
           </g:FlowPanel>
-        </MUI:Grid>
-        <MUI:Grid xs="12" md="6">
-          <g:FlowPanel ui:field="fileProvenanceContainer">
+        </b:Column>
+        <b:Column size="MD_6" ui:field="fileProvenanceContainer">
+          <g:FlowPanel>
             <bh:Div addStyleNames="highlight-title">
               <bh:Text>Provenance</bh:Text>
               <w:HelpWidget
@@ -85,14 +79,18 @@
               addStyleNames="padding-15 whiteBackground"
             />
           </g:FlowPanel>
-        </MUI:Grid>
-      </MUI:Grid>
-      <g:FlowPanel ui:field="discussionContainer" addStyleNames="margin-top-10">
-        <bh:Div addStyleNames="highlight-title">
-          <bh:Text ui:field="discussionText" />
-        </bh:Div>
-        <bh:Div ui:field="discussionThreadsContainer" />
-      </g:FlowPanel>
+        </b:Column>
+      </b:Row>
+      <b:Row addStyleNames="margin-top-10">
+        <b:Column size="MD_12" ui:field="discussionContainer">
+          <g:FlowPanel>
+            <bh:Div addStyleNames="highlight-title">
+              <bh:Text ui:field="discussionText" />
+            </bh:Div>
+            <bh:Div ui:field="discussionThreadsContainer" />
+          </g:FlowPanel>
+        </b:Column>
+      </b:Row>
     </bh:Div>
     <g:SimplePanel ui:field="fileModifiedAndCreatedContainer" />
   </g:FlowPanel>

@@ -3,7 +3,6 @@
   xmlns:ui="urn:ui:com.google.gwt.uibinder"
   xmlns:g="urn:import:com.google.gwt.user.client.ui"
   xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
-  xmlns:MUI="urn:import:org.sagebionetworks.web.client.jsinterop.mui"
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
   xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
 >
@@ -20,45 +19,44 @@
           addStyleNames="imageUploader"
         />
       </bh:Div>
-      <MUI:Grid container="true" />
       <bh:Div
         addStyleNames="profileFormContainer overflowHidden"
         paddingTop="40"
         paddingLeft="40"
         paddingRight="50"
       >
-        <MUI:Grid container="true">
-          <MUI:Grid md="12" lg="6">
+        <b:Row>
+          <b:Column size="MD_12,LG_6">
             <b:FormGroup>
               <b:FormLabel for="firstName">First Name</b:FormLabel>
               <bh:Paragraph ui:field="firstNameRenderer" />
             </b:FormGroup>
-          </MUI:Grid>
-          <MUI:Grid md="12" lg="6">
+          </b:Column>
+          <b:Column size="MD_12,LG_6">
             <b:FormGroup>
               <b:FormLabel for="lastName">Last Name</b:FormLabel>
               <bh:Paragraph ui:field="lastNameRenderer" />
             </b:FormGroup>
-          </MUI:Grid>
-        </MUI:Grid>
-        <MUI:Grid container="true">
-          <MUI:Grid md="12" lg="6">
+          </b:Column>
+        </b:Row>
+        <b:Row>
+          <b:Column size="MD_12,LG_6">
             <b:FormGroup>
               <b:FormLabel for="currentPosition">Current Position</b:FormLabel>
               <bh:Paragraph ui:field="currentPositionRenderer" />
             </b:FormGroup>
-          </MUI:Grid>
-          <MUI:Grid md="12" lg="6">
+          </b:Column>
+          <b:Column size="MD_12,LG_6">
             <b:FormGroup>
               <b:FormLabel for="currentAffiliation">
                 Current Affiliation
               </b:FormLabel>
               <bh:Paragraph ui:field="currentAffiliationRenderer" />
             </b:FormGroup>
-          </MUI:Grid>
-        </MUI:Grid>
-        <MUI:Grid container="true">
-          <MUI:Grid xs="12">
+          </b:Column>
+        </b:Row>
+        <b:Row>
+          <b:Column size="XS_12">
             <b:FormGroup>
               <b:FormLabel for="bio">Bio</b:FormLabel>
               <bh:Paragraph
@@ -66,17 +64,17 @@
                 addStyleNames="whitespace-prewrap"
               />
             </b:FormGroup>
-          </MUI:Grid>
-        </MUI:Grid>
-        <MUI:Grid container="true">
-          <MUI:Grid md="12" lg="6">
+          </b:Column>
+        </b:Row>
+        <b:Row>
+          <b:Column size="MD_12,LG_6">
             <b:FormGroup ui:field="usernameFormGroup">
               <b:FormLabel for="username">Username</b:FormLabel>
               <bh:Paragraph ui:field="usernameRenderer" />
               <b:HelpBlock ui:field="usernameHelpBlock" />
             </b:FormGroup>
-          </MUI:Grid>
-          <MUI:Grid md="12" lg="6">
+          </b:Column>
+          <b:Column size="MD_12,LG_6">
             <b:FormGroup ui:field="linkFormGroup">
               <b:FormLabel for="link">Website</b:FormLabel>
               <bh:Div>
@@ -84,24 +82,24 @@
               </bh:Div>
               <b:HelpBlock ui:field="linkHelpBlock" />
             </b:FormGroup>
-          </MUI:Grid>
-        </MUI:Grid>
-        <MUI:Grid container="true">
-          <MUI:Grid md="12" lg="6">
+          </b:Column>
+        </b:Row>
+        <b:Row>
+          <b:Column size="MD_12,LG_6">
             <b:FormGroup>
               <b:FormLabel for="industry">Industry/Discipline</b:FormLabel>
               <bh:Paragraph ui:field="industryRenderer" />
             </b:FormGroup>
-          </MUI:Grid>
-          <MUI:Grid md="12" lg="6">
+          </b:Column>
+          <b:Column size="MD_12,LG_6">
             <b:FormGroup>
               <b:FormLabel for="location">City, Country</b:FormLabel>
               <bh:Paragraph ui:field="locationRenderer" />
             </b:FormGroup>
-          </MUI:Grid>
-        </MUI:Grid>
-        <MUI:Grid container="true">
-          <MUI:Grid md="12" lg="6" ui:field="emailAddressContainer">
+          </b:Column>
+        </b:Row>
+        <b:Row>
+          <b:Column size="MD_12,LG_6" ui:field="emailAddressContainer">
             <b:FormGroup>
               <b:FormLabel>Email Address</b:FormLabel>
               <bh:Div
@@ -110,18 +108,18 @@
                 addStyleNames="truncate"
               />
             </b:FormGroup>
-          </MUI:Grid>
-          <MUI:Grid md="12" lg="6" ui:field="orcIDContainer">
+          </b:Column>
+          <b:Column size="MD_12,LG_6" ui:field="orcIDContainer">
             <b:FormGroup>
               <b:FormLabel for="orcId">ORCID</b:FormLabel>
               <bh:Div>
                 <b:Anchor ui:field="orcIdLink" target="_blank" />
               </bh:Div>
             </b:FormGroup>
-          </MUI:Grid>
-        </MUI:Grid>
-        <MUI:Grid container="true">
-          <MUI:Grid xs="12" ui:field="accountTypeContainer">
+          </b:Column>
+        </b:Row>
+        <b:Row>
+          <b:Column size="XS_12" ui:field="accountTypeContainer">
             <b:FormGroup>
               <b:FormLabel for="accountType">Account Type</b:FormLabel>
               <w:ReactComponent
@@ -129,8 +127,8 @@
                 addStyleNames="accountLevelBadgesContainer margin-top-5"
               />
             </b:FormGroup>
-          </MUI:Grid>
-        </MUI:Grid>
+          </b:Column>
+        </b:Row>
 
         <bh:Div ui:field="synAlertContainer" />
         <bh:Div marginTop="45" marginBottom="50" ui:field="commandsContainer">
