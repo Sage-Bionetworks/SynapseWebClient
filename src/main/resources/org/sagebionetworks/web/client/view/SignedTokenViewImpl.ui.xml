@@ -3,7 +3,6 @@
   xmlns:ui="urn:ui:com.google.gwt.uibinder"
   xmlns:g="urn:import:com.google.gwt.user.client.ui"
   xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
-  xmlns:MUI="urn:import:org.sagebionetworks.web.client.jsinterop.mui"
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
   xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
 >
@@ -59,24 +58,24 @@
       </b:Modal>
       <bh:Div ui:field="otherUI">
         <!-- Success UI -->
-        <MUI:Grid container="true" ui:field="successUI">
-          <MUI:Grid xs="12" md="6" mdOffset="3">
+        <b:Row ui:field="successUI">
+          <b:Column size="XS_12, MD_6" offset="MD_3">
             <bh:Div>
               <b:Alert type="SUCCESS">
                 <b:Heading size="H3" ui:field="successMessage" />
               </b:Alert>
             </bh:Div>
-          </MUI:Grid>
-        </MUI:Grid>
+          </b:Column>
+        </b:Row>
 
         <!-- Error UI and standard ok button -->
-        <MUI:Grid container="true">
-          <MUI:Grid xs="12" md="6" mdOffset="3">
+        <b:Row>
+          <b:Column size="XS_12, MD_6" offset="MD_3">
             <g:SimplePanel ui:field="synapseAlertContainer" />
-          </MUI:Grid>
-        </MUI:Grid>
-        <MUI:Grid container="true" addStyleNames="margin-top-60">
-          <MUI:Grid xs="12" md="6" mdOffset="3">
+          </b:Column>
+        </b:Row>
+        <b:Row addStyleNames="margin-top-60">
+          <b:Column size="XS_12, MD_6" offset="MD_3">
             <b:Button
               ui:field="okButton"
               type="PRIMARY"
@@ -84,8 +83,8 @@
               size="LARGE"
               pull="RIGHT"
             />
-          </MUI:Grid>
-        </MUI:Grid>
+          </b:Column>
+        </b:Row>
       </bh:Div>
     </b:Container>
   </bh:Div>
