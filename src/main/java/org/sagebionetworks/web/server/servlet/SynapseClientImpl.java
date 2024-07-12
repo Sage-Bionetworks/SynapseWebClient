@@ -548,6 +548,8 @@ public class SynapseClientImpl
     org.sagebionetworks.client.SynapseClient synapseClient =
       createSynapseClient();
     try {
+      // SWC-6941 - the description field was replaced with name
+      ar.setDescription(null);
       if (ar.getId() == null) {
         return synapseClient.createAccessRequirement(ar);
       } else {
