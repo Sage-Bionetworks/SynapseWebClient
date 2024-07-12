@@ -16,6 +16,7 @@ import java.util.Iterator;
 import java.util.List;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.extras.datetimepicker.client.ui.DateTimePicker;
@@ -25,7 +26,6 @@ import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.jsinterop.mui.Grid;
 import org.sagebionetworks.web.client.widget.header.Header;
 
 public class ACTAccessApprovalsViewImpl implements ACTAccessApprovalsView {
@@ -82,7 +82,7 @@ public class ACTAccessApprovalsViewImpl implements ACTAccessApprovalsView {
   Anchor downloadLink;
 
   @UiField
-  Grid accessorUI;
+  Column accessorUI;
 
   private Presenter presenter;
   private Header headerWidget;
