@@ -157,6 +157,7 @@
       // The Bootstrap 3 custom theme CSS is loaded through swc.scss
       // Note: we alias to bootstrap3 because we rely on Bootstrap 4 to be in node_modules/bootstrap to compile our scss (via synapse-react-client).
       loadJs(cdnEndpoint + 'generated/bootstrap/dist/js/bootstrap.min.js')
+      loadJs(cdnEndpoint + 'generated/bootstrap/dist/js/npm.js')
       loadJs(cdnEndpoint + 'js/back-forward-nav-handler.js')
       loadJs(cdnEndpoint + 'generated/moment.min.js')
       loadJs(cdnEndpoint + 'generated/jsplumb.min.js')
@@ -187,7 +188,6 @@
       loadJs(cdnEndpoint + 'generated/pica.min.js')
       loadJs(reactPath)
       loadJs(reactDomPath)
-      loadJs(cdnEndpoint + 'generated/material-ui.production.min.js')
       loadJs(cdnEndpoint + 'generated/react-transition-group.min.js')
       loadJs(cdnEndpoint + 'generated/prop-types.min.js')
       loadJs(cdnEndpoint + 'generated/react-measure.js')
