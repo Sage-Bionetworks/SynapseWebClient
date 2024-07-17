@@ -2,6 +2,9 @@
 <ui:UiBinder
   xmlns:ui="urn:ui:com.google.gwt.uibinder"
   xmlns:g="urn:import:com.google.gwt.user.client.ui"
+  xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+  xmlns:s="urn:import:org.sagebionetworks.web.client.view"
+  xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 >
   <g:HTMLPanel>
     <div class="row margin-top-left-10 margin-right-15 margin-bottom-20">
@@ -14,16 +17,20 @@
 							carefully choose yours.
             </h4>
             <g:TextBox ui:field="username" addStyleNames="form-control" />
-            <g:Button
-              ui:field="changeUsernameButton"
-              styleName="right btn btn-primary btn-lg margin-top-10"
-            />
-
-            <g:SimplePanel
-              ui:field="errorContainer"
-              addStyleNames="left margin-top-10"
-              width="100%"
-            />
+            <b:Row>
+              <b:Column size="XS_9">
+                <g:SimplePanel
+                  ui:field="errorContainer"
+                  addStyleNames="left margin-top-10"
+                />
+              </b:Column>
+              <b:Column size="XS_3">
+                <g:Button
+                  ui:field="changeUsernameButton"
+                  styleName="right btn btn-primary btn-lg margin-top-10"
+                />
+              </b:Column>
+            </b:Row>
           </div>
         </div>
       </div>
