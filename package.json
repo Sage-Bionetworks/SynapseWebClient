@@ -64,7 +64,7 @@
     "build": "mvn -B package --file pom.xml",
     "dev": "npm-run-all --parallel dev:tomcat dev:codeserver",
     "dev:tomcat": "docker pull tomcat:9.0; docker run --name swc-dev --rm -p 8888:8080 -v \"/$(pwd)/target/portal-develop-SNAPSHOT/:/usr/local/tomcat/webapps/ROOT/\" -v \"/$HOME/.m2/settings.xml\":/root/.m2/settings.xml tomcat:9.0",
-    "dev:codeserver": "mvn gwt:run-codeserver -Dgwt.compiler.skip=true -Dnoserver=true -Dwar=/home/nickgrosenbacher/dev/Sage/SynapseWebClient/target/portal-develop-SNAPSHOT -Dstyle=PRETTY",
+    "dev:codeserver": "mvn gwt:run-codeserver -Dgwt.compiler.skip=true -Dnoserver=true -Dwar=/$(pwd)/target/portal-develop-SNAPSHOT -Dstyle=PRETTY",
     "docker:start": "docker pull tomcat:9.0; docker run --name swc-tomcat -d --rm -p 8888:8080 -v \"/$(pwd)/target/portal-develop-SNAPSHOT.war:/usr/local/tomcat/webapps/ROOT.war\" -v \"/$(pwd)/e2e_workflow/settings.xml\":/root/.m2/settings.xml tomcat:9.0",
     "docker:stop": "docker stop swc-tomcat",
     "prepare": "husky install",
