@@ -138,6 +138,8 @@ public class AuthenticationControllerImplTest {
     profile = new UserProfile();
     profile.setOwnerId(USER_ID);
     when(mockJsClient.getAccessToken()).thenReturn(getDoneFuture(ACCESS_TOKEN));
+    when(mockJsClient.deleteSessionAccessToken())
+      .thenReturn(getDoneFuture(null));
     AsyncMockStubber
       .callSuccessWith(profile)
       .when(mockUserAccountService)
@@ -189,6 +191,9 @@ public class AuthenticationControllerImplTest {
       .thenReturn(true);
 
     authenticationController.logoutUser();
+
+    // revokes token
+    verify(mockJsClient).deleteSessionAccessToken();
 
     // sets session cookie
     verify(mockJsClient)

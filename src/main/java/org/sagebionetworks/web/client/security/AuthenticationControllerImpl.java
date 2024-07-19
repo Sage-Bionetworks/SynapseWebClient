@@ -311,6 +311,26 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 
   @Override
   public void logoutUser() {
+    ginInjector
+      .getSynapseJavascriptClient()
+      .deleteSessionAccessToken()
+      .addCallback(
+        new FutureCallback<Void>() {
+          @Override
+          public void onSuccess(Void result) {
+            // do nothing
+          }
+
+          @Override
+          public void onFailure(Throwable t) {
+            // This will fail if the token is already revoked/invalid, which is fine.
+            jsniUtils.consoleLog(
+              "Failed to delete session access token: " + t.getMessage()
+            );
+          }
+        },
+        directExecutor()
+      );
     // terminate the session, remove the cookie
     clearLocalStorage();
     // save last place but clear other session storage values on logout.

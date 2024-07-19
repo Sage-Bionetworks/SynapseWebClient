@@ -349,6 +349,7 @@ public class SynapseJavascriptClient {
   public static final String ACCOUNT = "/account";
   public static final String EMAIL_VALIDATION = "/emailValidation";
   public static final String ACTIONS = "/actions";
+  public static final String SESSION_ACCESS_TOKEN = "/sessionAccessToken";
   public static final String PORTAL_ENDPOINT_PARAM = "portalEndpoint=";
   public static final int LIMIT_50 = 50;
   public static final String SIGNED_TOKEN = "SignedToken:";
@@ -808,7 +809,6 @@ public class SynapseJavascriptClient {
    * called again if there's a newer version (so write your onSuccess accordingly)!
    *
    * @param entityId
-   * @param partsMask
    * @param callback
    */
   public void getEntityBundleFromCache(
@@ -3282,5 +3282,10 @@ public class SynapseJavascriptClient {
     String url =
       getRepoServiceUrl() + ENTITY + "/" + entityId + ACTIONS + DOWNLOAD;
     return getFuture(cb -> doGet(url, OBJECT_TYPE.ActionRequiredList, cb));
+  }
+
+  public FluentFuture<Void> deleteSessionAccessToken() {
+    String url = getAuthServiceUrl() + SESSION_ACCESS_TOKEN;
+    return getFuture(cb -> doDelete(url, cb));
   }
 }
