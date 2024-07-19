@@ -1,5 +1,8 @@
 ## Prettier-specific
 
+# Currently do not have a formatter for shell scripts
+*.sh
+
 # Ignore all CSS files (source files are scss)
 *.css
 
