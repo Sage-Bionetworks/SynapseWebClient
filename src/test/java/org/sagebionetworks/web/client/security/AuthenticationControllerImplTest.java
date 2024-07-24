@@ -47,6 +47,7 @@ import org.sagebionetworks.web.client.jsinterop.reactquery.QueryClient;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.QuarantinedEmailModal;
+import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
@@ -85,6 +86,9 @@ public class AuthenticationControllerImplTest {
 
   @Mock
   Header mockHeader;
+
+  @Mock
+  Footer mockFooter;
 
   @Mock
   SessionDetector mockSessionDetector;
@@ -169,6 +173,7 @@ public class AuthenticationControllerImplTest {
     when(mockGinInjector.getGlobalApplicationState())
       .thenReturn(mockGlobalApplicationState);
     when(mockGinInjector.getHeader()).thenReturn(mockHeader);
+    when(mockGinInjector.getFooter()).thenReturn(mockFooter);
     when(mockGlobalApplicationState.getPlaceChanger())
       .thenReturn(mockPlaceChanger);
     when(mockGinInjector.getSessionDetector()).thenReturn(mockSessionDetector);
@@ -229,6 +234,8 @@ public class AuthenticationControllerImplTest {
     verify(mockSessionDetector).initializeAccessTokenState();
     verify(mockGlobalApplicationState).refreshPage();
     verify(mockQueryClient).resetQueries();
+    verify(mockHeader).refresh();
+    verify(mockFooter).refresh();
   }
 
   @Test
