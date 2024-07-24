@@ -358,6 +358,8 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 
           private void afterCall() {
             resetQueryClientCache();
+            ginInjector.getFooter().refresh();
+            ginInjector.getHeader().refresh();
             ginInjector.getGlobalApplicationState().refreshPage();
           }
         }
@@ -432,6 +434,9 @@ public class AuthenticationControllerImpl implements AuthenticationController {
         @Override
         public void onSuccess(UserProfile result) {
           // is this a user session change?  if so, refresh the page.
+          ginInjector.getFooter().refresh();
+          ginInjector.getHeader().refresh();
+
           if (!Objects.equals(currentUserAccessToken, oldUserAccessToken)) {
             // we've reinitialized the app with the correct session, refresh the page (do not get rid of js state)!
             if (webAppInitializationCallback != null) {
@@ -441,7 +446,6 @@ public class AuthenticationControllerImpl implements AuthenticationController {
             }
             checkForQuarantinedEmail();
           } else {
-            ginInjector.getHeader().refresh();
             // we've determined that the session has not changed
             if (webAppInitializationCallback != null) {
               webAppInitializationCallback.invoke();
