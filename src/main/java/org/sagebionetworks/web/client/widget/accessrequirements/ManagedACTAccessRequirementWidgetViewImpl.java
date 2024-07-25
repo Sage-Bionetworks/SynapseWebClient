@@ -17,7 +17,6 @@ import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
@@ -62,7 +61,9 @@ public class ManagedACTAccessRequirementWidgetViewImpl
   Button loginButton;
 
   @UiField
-  ReactComponent requestDataAccessWidget;
+  SimplePanel requestDataAccessWidgetContainer;
+
+  ReactComponent requestDataAccessWidget = new ReactComponent();
 
   @UiField
   Div editAccessRequirementContainer;
@@ -130,7 +131,6 @@ public class ManagedACTAccessRequirementWidgetViewImpl
   @UiField
   Div subjectsDefinedInAccessRequirementUI;
 
-  private final JSONObjectAdapter jsonObjectAdapter;
   private final SynapseReactClientFullContextPropsProvider propsProvider;
   Callback onAttachCallback;
   public static final String DEFAULT_AR_DESCRIPTION = "these data";
@@ -145,11 +145,9 @@ public class ManagedACTAccessRequirementWidgetViewImpl
   public ManagedACTAccessRequirementWidgetViewImpl(
     Binder binder,
     GlobalApplicationState globalAppState,
-    JSONObjectAdapter jsonObjectAdapter,
     SynapseReactClientFullContextPropsProvider propsProvider
   ) {
     this.w = binder.createAndBindUi(this);
-    this.jsonObjectAdapter = jsonObjectAdapter;
     this.propsProvider = propsProvider;
     cancelRequestButton.addClickHandler(event -> {
       presenter.onCancelRequest();
@@ -386,7 +384,7 @@ public class ManagedACTAccessRequirementWidgetViewImpl
   ) {
     AccessRequirementListProps.Callback onHide = () -> {
       presenter.refreshApprovalState();
-      hideRequestAccessModal();
+      requestDataAccessWidgetContainer.clear();
     };
     String entityId = null;
     if (
@@ -398,8 +396,10 @@ public class ManagedACTAccessRequirementWidgetViewImpl
     AccessRequirementListProps props = AccessRequirementListProps.create(
       onHide,
       Collections.singletonList(accessRequirement),
-      entityId
+      entityId,
+      RestrictableObjectType.ENTITY
     );
+    requestDataAccessWidgetContainer.add(requestDataAccessWidget);
     requestDataAccessWidget.render(
       React.createElementWithSynapseContext(
         SRC.SynapseComponents.AccessRequirementList,
@@ -418,9 +418,5 @@ public class ManagedACTAccessRequirementWidgetViewImpl
       : false;
     subjectsDefinedByAnnotationsUI.setVisible(v);
     subjectsDefinedInAccessRequirementUI.setVisible(!v);
-  }
-
-  public void hideRequestAccessModal() {
-    requestDataAccessWidget.clear();
   }
 }
