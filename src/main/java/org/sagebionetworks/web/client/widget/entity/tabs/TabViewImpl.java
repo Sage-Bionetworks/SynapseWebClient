@@ -59,6 +59,7 @@ public class TabViewImpl implements TabView {
     TabViewImplUiBinder binder = GWT.create(TabViewImplUiBinder.class);
     widget = binder.createAndBindUi(this);
     this.helpWidget = helpWidget;
+    helpWidget.setAddStyleNames("margin-left-5");
     this.orientationBanner = orientationBanner;
     tabClickedHandler =
       new ClickHandler() {
