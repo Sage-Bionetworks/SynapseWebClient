@@ -6,6 +6,7 @@ import jsinterop.annotations.JsOverlay;
 import jsinterop.annotations.JsPackage;
 import jsinterop.annotations.JsType;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.RestrictableObjectType;
 
 @JsType(isNative = true, namespace = JsPackage.GLOBAL, name = "Object")
 public class AccessRequirementListProps extends ReactComponentProps {
@@ -18,18 +19,21 @@ public class AccessRequirementListProps extends ReactComponentProps {
   boolean renderAsModal;
   Object[] accessRequirementFromProps;
   Callback onHide;
-  String entityId;
+  String subjectId;
+  String subjectType;
 
   @JsOverlay
   public static AccessRequirementListProps create(
     Callback onHide,
     List<AccessRequirement> accessRequirements,
-    String entityId
+    String subjectId,
+    RestrictableObjectType subjectType
   ) {
     AccessRequirementListProps props = new AccessRequirementListProps();
     props.renderAsModal = true;
     props.onHide = onHide;
-    props.entityId = entityId;
+    props.subjectId = subjectId;
+    props.subjectType = subjectType.name();
     props.accessRequirementFromProps =
       accessRequirements
         .stream()
