@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import org.gwtbootstrap3.client.ui.constants.Placement;
@@ -39,7 +38,7 @@ public class HelpWidget implements IsWidget {
   String link;
   String placement;
   boolean showCloseButton = true;
-  String className = "displayInline";
+  String className = "vertical-align-middle";
 
   public HelpWidget() {
     widget.addStyleName("HelpWidget");
@@ -93,7 +92,7 @@ public class HelpWidget implements IsWidget {
   }
 
   public void setAddStyleNames(String styleNames) {
-    className += styleNames;
+    className = className + " " + styleNames;
     updateContent();
   }
 
