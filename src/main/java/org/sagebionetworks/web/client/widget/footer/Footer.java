@@ -76,6 +76,10 @@ public class Footer implements FooterView.Presenter, IsWidget {
     return view.asWidget();
   }
 
+  public void refresh() {
+    view.refresh();
+  }
+
   @Override
   public void onReportAbuseClicked() {
     // report abuse via Jira issue collector
