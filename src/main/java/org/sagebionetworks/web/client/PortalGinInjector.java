@@ -4,6 +4,7 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.inject.client.GinModules;
 import com.google.gwt.inject.client.Ginjector;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.context.QueryClientProvider;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.presenter.ACTAccessApprovalsPresenter;
@@ -584,6 +585,8 @@ public interface PortalGinInjector extends Ginjector {
   TableListWidget getTableListWidget();
 
   CookieProvider getCookieProvider();
+
+  SessionStorage getSessionStorage();
 
   Header getHeader();
 

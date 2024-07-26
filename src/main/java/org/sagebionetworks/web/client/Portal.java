@@ -89,9 +89,9 @@ public class Portal implements EntryPoint {
                     @Override
                     public void onSuccess(JSONObjectAdapter config) {
                       ginjector
-                        .getCookieProvider()
-                        .setCookie(
-                          WebConstants.PORTAL_FEATURE_FLAG,
+                        .getSessionStorage()
+                        .setItem(
+                          WebConstants.PORTAL_FEATURE_FLAG_SESSION_STORAGE_KEY,
                           config.toString()
                         );
                     }
