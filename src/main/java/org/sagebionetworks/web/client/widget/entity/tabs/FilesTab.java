@@ -321,7 +321,7 @@ public class FilesTab {
     if (isFile) {
       if (
         featureFlagConfig.isFeatureEnabled(
-          FeatureFlagKey.PROVENANCE_V2_VISUALIZATION.getKey()
+          FeatureFlagKey.PROVENANCE_V2_VISUALIZATION
         )
       ) {
         provWidget = ginInjector.getProvenanceRendererV2();

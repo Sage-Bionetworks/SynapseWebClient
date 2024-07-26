@@ -155,9 +155,7 @@ public class MarkdownEditorWidget
     // clear view state
     view.clear();
     view.setAlphaCommandsVisible(
-      featureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.ADD_WIKI_WIDGETS.getKey()
-      )
+      featureFlagConfig.isFeatureEnabled(FeatureFlagKey.ADD_WIKI_WIDGETS)
     );
     isACTMemberAsyncHandler.isACTMember(isACTMember ->
       view.setACTCommandsVisible(isACTMember)

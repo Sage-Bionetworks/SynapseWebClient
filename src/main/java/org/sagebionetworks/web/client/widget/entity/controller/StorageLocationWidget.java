@@ -73,7 +73,7 @@ public class StorageLocationWidget
     getStorageLocationSetting();
     getMyLocationSettingBanners();
     boolean isInAlpha = featureFlagConfig.isFeatureEnabled(
-      FeatureFlagKey.CUSTOM_STORAGE_LOCATION_SETTINGS.getKey()
+      FeatureFlagKey.CUSTOM_STORAGE_LOCATION_SETTINGS
     );
     view.setExternalObjectStoreVisible(isInAlpha);
   }
@@ -112,7 +112,7 @@ public class StorageLocationWidget
         public void onSuccess(UploadDestination uploadDestination) {
           // if null, then still show the default UI
           boolean isInAlpha = featureFlagConfig.isFeatureEnabled(
-            FeatureFlagKey.CUSTOM_STORAGE_LOCATION_SETTINGS.getKey()
+            FeatureFlagKey.CUSTOM_STORAGE_LOCATION_SETTINGS
           );
           view.setS3StsVisible(isInAlpha);
           Long defaultStorageId = Long.parseLong(

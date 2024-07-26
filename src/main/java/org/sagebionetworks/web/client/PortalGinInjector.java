@@ -193,6 +193,8 @@ import org.sagebionetworks.web.client.widget.refresh.EntityRefreshAlert;
 import org.sagebionetworks.web.client.widget.refresh.ReplyCountAlert;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.sharing.AclAddPeoplePanel;
+import org.sagebionetworks.web.client.widget.sharing.EntityAccessControlListModalWidget;
+import org.sagebionetworks.web.client.widget.sharing.EntityAccessControlListModalWidgetImpl;
 import org.sagebionetworks.web.client.widget.sharing.SharingPermissionsGrid;
 import org.sagebionetworks.web.client.widget.statistics.StatisticsPlotWidget;
 import org.sagebionetworks.web.client.widget.table.TableEntityListGroupItem;
@@ -691,6 +693,8 @@ public interface PortalGinInjector extends Ginjector {
   PersonalAccessTokensPresenter getPersonalAccessTokensPresenter();
 
   AccessControlListModalWidget getAccessControlListModalWidget();
+
+  EntityAccessControlListModalWidget getEntityAccessControlListModalWidget();
 
   RenameEntityModalWidget getRenameEntityModalWidget();
 

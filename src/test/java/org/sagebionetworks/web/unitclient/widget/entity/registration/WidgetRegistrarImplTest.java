@@ -91,7 +91,7 @@ public class WidgetRegistrarImplTest {
 
     when(
       mockFeatureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.PROVENANCE_V2_VISUALIZATION.getKey()
+        FeatureFlagKey.PROVENANCE_V2_VISUALIZATION
       )
     )
       .thenReturn(true);

@@ -20,7 +20,6 @@ public class FeatureFlagConfigTest {
   JSONObject mockJsonObject;
 
   private FeatureFlagConfig featureFlagConfig;
-  private static final String FEATURE_NAME = "testFeature";
 
   @Before
   public void setUp() {
@@ -29,45 +28,53 @@ public class FeatureFlagConfigTest {
 
   @Test
   public void testFeatureEnabled() {
-    when(mockJsonObject.get(FEATURE_NAME))
+    when(mockJsonObject.get(FeatureFlagKey.TEST_FLAG_ONLY.getKey()))
       .thenReturn(JSONBoolean.getInstance(true));
     featureFlagConfig =
       new FeatureFlagConfig(mockJsonObject, mockCookieProvider);
 
-    assertTrue(featureFlagConfig.isFeatureEnabled(FEATURE_NAME));
+    assertTrue(
+      featureFlagConfig.isFeatureEnabled(FeatureFlagKey.TEST_FLAG_ONLY)
+    );
   }
 
   @Test
   public void testFeatureDisabled() {
-    when(mockJsonObject.get(FEATURE_NAME))
+    when(mockJsonObject.get(FeatureFlagKey.TEST_FLAG_ONLY.getKey()))
       .thenReturn(JSONBoolean.getInstance(false));
     featureFlagConfig =
       new FeatureFlagConfig(mockJsonObject, mockCookieProvider);
 
-    assertFalse(featureFlagConfig.isFeatureEnabled(FEATURE_NAME));
+    assertFalse(
+      featureFlagConfig.isFeatureEnabled(FeatureFlagKey.TEST_FLAG_ONLY)
+    );
   }
 
   @Test
   public void testFeatureDisabledButExperimentalModeEnabled() {
     when(mockCookieProvider.getCookie(eq("SynapseTestWebsite")))
       .thenReturn("true");
-    when(mockJsonObject.get(FEATURE_NAME))
+    when(mockJsonObject.get(FeatureFlagKey.TEST_FLAG_ONLY.getKey()))
       .thenReturn(JSONBoolean.getInstance(false));
     featureFlagConfig =
       new FeatureFlagConfig(mockJsonObject, mockCookieProvider);
 
-    assertTrue(featureFlagConfig.isFeatureEnabled(FEATURE_NAME));
+    assertTrue(
+      featureFlagConfig.isFeatureEnabled(FeatureFlagKey.TEST_FLAG_ONLY)
+    );
   }
 
   @Test
   public void testExperimentalModeValueReturnedOnException() {
-    when(mockJsonObject.get(FEATURE_NAME))
+    when(mockJsonObject.get(FeatureFlagKey.TEST_FLAG_ONLY.getKey()))
       .thenThrow(new RuntimeException("Test exception"));
     when(mockCookieProvider.getCookie(eq("SynapseTestWebsite")))
       .thenReturn("true");
     featureFlagConfig =
       new FeatureFlagConfig(mockJsonObject, mockCookieProvider);
 
-    assertTrue(featureFlagConfig.isFeatureEnabled(FEATURE_NAME));
+    assertTrue(
+      featureFlagConfig.isFeatureEnabled(FeatureFlagKey.TEST_FLAG_ONLY)
+    );
   }
 }

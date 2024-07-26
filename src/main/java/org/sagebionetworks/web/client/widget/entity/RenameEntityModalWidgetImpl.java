@@ -141,9 +141,7 @@ public class RenameEntityModalWidgetImpl implements RenameEntityModalWidget {
     // Only surfacing description for Table types (behind feature flag for now)
     if (
       toRename instanceof Table &&
-      featureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.DESCRIPTION_FIELD.getKey()
-      )
+      featureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
     ) {
       prompts.add("Description");
       initialValues.add(toRename.getDescription());

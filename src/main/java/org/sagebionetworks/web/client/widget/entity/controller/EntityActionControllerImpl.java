@@ -127,6 +127,8 @@ import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTab;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
+import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidgetImpl;
+import org.sagebionetworks.web.client.widget.sharing.EntityAccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.statistics.StatisticsPlotWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
@@ -249,6 +251,7 @@ public class EntityActionControllerImpl
   FileClientsHelp fileClientsHelp;
   AuthenticationController authenticationController;
   AccessControlListModalWidget accessControlListModalWidget;
+  EntityAccessControlListModalWidget entityAccessControlListModalWidget;
   RenameEntityModalWidget renameEntityModalWidget;
   EntityFinderWidget.Builder entityFinderBuilder;
   EvaluationSubmitter submitter;
@@ -447,6 +450,15 @@ public class EntityActionControllerImpl
       this.view.addWidget(accessControlListModalWidget);
     }
     return accessControlListModalWidget;
+  }
+
+  private EntityAccessControlListModalWidget getEntityAccessControlListModalWidget() {
+    if (entityAccessControlListModalWidget == null) {
+      entityAccessControlListModalWidget =
+        ginInjector.getEntityAccessControlListModalWidget();
+      this.view.addWidget(entityAccessControlListModalWidget);
+    }
+    return entityAccessControlListModalWidget;
   }
 
   private CreateTableViewWizard getCreateTableViewWizard() {
@@ -1599,9 +1611,7 @@ public class EntityActionControllerImpl
       String text = RENAME_PREFIX + entityTypeDisplay;
       if (
         entityBundle.getEntity() instanceof Table &&
-        featureFlagConfig.isFeatureEnabled(
-          FeatureFlagKey.DESCRIPTION_FIELD.getKey()
-        )
+        featureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
       ) {
         text = EDIT_NAME_AND_DESCRIPTION;
       }
@@ -2923,12 +2933,18 @@ public class EntityActionControllerImpl
 
   @Override
   public void onShare() {
-    getAccessControlListModalWidget()
-      .configure(entity, permissions.getCanChangePermissions());
-    this.getAccessControlListModalWidget()
-      .showSharing(() -> {
-        fireEntityUpdatedEvent();
-      });
+    if (
+      featureFlagConfig.isFeatureEnabled(FeatureFlagKey.REACT_ENTITY_ACL_EDITOR)
+    ) {
+      getEntityAccessControlListModalWidget()
+        .configure(entity.getId(), this::fireEntityUpdatedEvent);
+      getEntityAccessControlListModalWidget().setOpen(true);
+    } else {
+      getAccessControlListModalWidget()
+        .configure(entity, permissions.getCanChangePermissions());
+      this.getAccessControlListModalWidget()
+        .showSharing(this::fireEntityUpdatedEvent);
+    }
   }
 
   @Override

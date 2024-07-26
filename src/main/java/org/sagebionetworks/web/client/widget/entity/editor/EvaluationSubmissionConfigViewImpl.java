@@ -193,7 +193,7 @@ public class EvaluationSubmissionConfigViewImpl
   public void configure(WikiPageKey wikiKey, Map<String, String> descriptor) {
     submissionTypeOptions.setVisible(
       featureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.CHALLENGE_SUBMISSION_SETTINGS.getKey()
+        FeatureFlagKey.CHALLENGE_SUBMISSION_SETTINGS
       )
     );
 
