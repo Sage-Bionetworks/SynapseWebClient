@@ -54,7 +54,7 @@ public class HelpWidget implements IsWidget {
       showCloseButton,
       className
     );
-    ReactNode component = React.createElement(
+    ReactNode component = React.createElementWithThemeContext(
       SRC.SynapseComponents.HelpPopover,
       props
     );
