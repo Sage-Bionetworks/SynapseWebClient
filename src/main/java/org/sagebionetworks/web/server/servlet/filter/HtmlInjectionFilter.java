@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.server.servlet.filter;
 
+import com.google.gwt.safehtml.shared.SimpleHtmlSanitizer;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -115,6 +116,24 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
     );
 
     return dataModel;
+  }
+
+  private Map<String, String> preprocess(Map<String, String> dataModel) {
+    String[] keysToClean = new String[] {
+      PAGE_TITLE_KEY,
+      PAGE_DESCRIPTION_KEY,
+      OG_PAGE_TITLE_KEY,
+      OG_PAGE_DESCRIPTION_KEY,
+    };
+    Map<String, String> sanitizedModel = new HashMap<>();
+    sanitizedModel.putAll(dataModel);
+    for (String key : keysToClean) {
+      String sanitizedValue = SimpleHtmlSanitizer
+        .sanitizeHtml(dataModel.get(key))
+        .asString();
+      sanitizedModel.put(key, sanitizedValue);
+    }
+    return sanitizedModel;
   }
 
   public static boolean isGWTPlace(String targetPath) {
@@ -355,7 +374,8 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
         StringWriter stringWriter = new StringWriter();
         try {
           addDefaultsToDataModel(dataModel);
-          portalHtmlTemplate.process(dataModel, stringWriter);
+          Map<String, String> sanitizedModel = preprocess(dataModel);
+          portalHtmlTemplate.process(sanitizedModel, stringWriter);
         } catch (TemplateException e) {
           e.printStackTrace();
         }
