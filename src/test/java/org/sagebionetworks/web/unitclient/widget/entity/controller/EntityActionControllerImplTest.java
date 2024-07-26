@@ -605,9 +605,7 @@ public class EntityActionControllerImplTest {
   @Test
   public void testConfigureWithTableEntity() {
     when(
-      mockFeatureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.DESCRIPTION_FIELD.getKey()
-      )
+      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
     )
       .thenReturn(true);
 
@@ -672,9 +670,7 @@ public class EntityActionControllerImplTest {
     permissions.setCanChangePermissions(canChangePermission);
 
     when(
-      mockFeatureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.DESCRIPTION_FIELD.getKey()
-      )
+      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
     )
       .thenReturn(true);
 
@@ -722,9 +718,7 @@ public class EntityActionControllerImplTest {
     permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
 
     when(
-      mockFeatureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.DESCRIPTION_FIELD.getKey()
-      )
+      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
     )
       .thenReturn(true);
 
@@ -789,9 +783,7 @@ public class EntityActionControllerImplTest {
     permissions.setCanChangePermissions(canChangePermission);
 
     when(
-      mockFeatureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.DESCRIPTION_FIELD.getKey()
-      )
+      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
     )
       .thenReturn(true);
 
@@ -850,9 +842,7 @@ public class EntityActionControllerImplTest {
     permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
 
     when(
-      mockFeatureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.DESCRIPTION_FIELD.getKey()
-      )
+      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
     )
       .thenReturn(true);
 
@@ -911,9 +901,7 @@ public class EntityActionControllerImplTest {
     permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
 
     when(
-      mockFeatureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.DESCRIPTION_FIELD.getKey()
-      )
+      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
     )
       .thenReturn(true);
 
@@ -979,9 +967,7 @@ public class EntityActionControllerImplTest {
     permissions.setCanChangePermissions(canChangePermission);
 
     when(
-      mockFeatureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.DESCRIPTION_FIELD.getKey()
-      )
+      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
     )
       .thenReturn(true);
 
@@ -1041,9 +1027,7 @@ public class EntityActionControllerImplTest {
     permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
 
     when(
-      mockFeatureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.DESCRIPTION_FIELD.getKey()
-      )
+      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
     )
       .thenReturn(true);
 
@@ -1101,9 +1085,7 @@ public class EntityActionControllerImplTest {
     permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
 
     when(
-      mockFeatureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.DESCRIPTION_FIELD.getKey()
-      )
+      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
     )
       .thenReturn(true);
 
@@ -1158,9 +1140,7 @@ public class EntityActionControllerImplTest {
     permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
 
     when(
-      mockFeatureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.DESCRIPTION_FIELD.getKey()
-      )
+      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
     )
       .thenReturn(true);
 
@@ -1211,9 +1191,7 @@ public class EntityActionControllerImplTest {
     boolean canCertifiedUserEdit = true;
     permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
     when(
-      mockFeatureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.DESCRIPTION_FIELD.getKey()
-      )
+      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
     )
       .thenReturn(true);
 
@@ -1273,9 +1251,7 @@ public class EntityActionControllerImplTest {
     permissions.setCanChangePermissions(canChangePermission);
 
     when(
-      mockFeatureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.DESCRIPTION_FIELD.getKey()
-      )
+      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
     )
       .thenReturn(true);
 
@@ -1328,9 +1304,7 @@ public class EntityActionControllerImplTest {
     boolean canCertifiedUserEdit = true;
     permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
     when(
-      mockFeatureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.DESCRIPTION_FIELD.getKey()
-      )
+      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
     )
       .thenReturn(true);
 
@@ -1390,9 +1364,7 @@ public class EntityActionControllerImplTest {
     permissions.setCanChangePermissions(canChangePermission);
 
     when(
-      mockFeatureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.DESCRIPTION_FIELD.getKey()
-      )
+      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
     )
       .thenReturn(true);
 
@@ -1442,9 +1414,7 @@ public class EntityActionControllerImplTest {
   @Test
   public void testDisableFullTextSearch() {
     when(
-      mockFeatureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.DESCRIPTION_FIELD.getKey()
-      )
+      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
     )
       .thenReturn(true);
     ((TableEntity) entityBundle.getEntity()).setIsSearchEnabled(true);
@@ -1496,9 +1466,7 @@ public class EntityActionControllerImplTest {
   @Test
   public void testConfigureProjectLevelTableCommandsCanEdit() {
     when(
-      mockFeatureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.DESCRIPTION_FIELD.getKey()
-      )
+      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
     )
       .thenReturn(true);
     entityBundle.setEntity(new Project());
@@ -1565,9 +1533,7 @@ public class EntityActionControllerImplTest {
   @Test
   public void testConfigureProjectLevelDatasetCommandsCanEdit() {
     when(
-      mockFeatureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.DESCRIPTION_FIELD.getKey()
-      )
+      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
     )
       .thenReturn(true);
     entityBundle.setEntity(new Project());
@@ -4281,9 +4247,7 @@ public class EntityActionControllerImplTest {
     // in alpha mode)
     currentEntityArea = EntityArea.WIKI;
     when(
-      mockFeatureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.DESCRIPTION_FIELD.getKey()
-      )
+      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
     )
       .thenReturn(true);
     entityBundle.setEntity(new Project());

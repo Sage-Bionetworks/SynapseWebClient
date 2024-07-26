@@ -98,7 +98,7 @@ public class CreateAccessRequirementButton
   public void onClick() {
     if (
       featureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.SRC_BASED_AR_MODAL_WIZARD.getKey()
+        FeatureFlagKey.SRC_BASED_AR_MODAL_WIZARD
       )
     ) {
       useSrcWizard();

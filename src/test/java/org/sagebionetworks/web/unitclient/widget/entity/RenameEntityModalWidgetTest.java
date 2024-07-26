@@ -220,9 +220,7 @@ public class RenameEntityModalWidgetTest {
   public void testOnlyShowDescriptionForTables() {
     // Currently behind feature flag
     when(
-      mockFeatureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.DESCRIPTION_FIELD.getKey()
-      )
+      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
     )
       .thenReturn(true);
     AsyncMockStubber
@@ -269,9 +267,7 @@ public class RenameEntityModalWidgetTest {
 
     // Currently behind feature flag
     when(
-      mockFeatureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.DESCRIPTION_FIELD.getKey()
-      )
+      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
     )
       .thenReturn(true);
 

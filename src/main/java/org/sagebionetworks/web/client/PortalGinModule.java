@@ -334,6 +334,8 @@ public class PortalGinModule extends AbstractGinModule {
       .to(AccessControlListEditorViewImpl.class);
     bind(AccessControlListModalWidget.class)
       .to(AccessControlListModalWidgetImpl.class);
+    bind(EntityAccessControlListModalWidget.class)
+      .to(EntityAccessControlListModalWidgetImpl.class);
 
     bind(AccessControlListModalWidgetView.class)
       .to(AccessControlListModalWidgetViewImpl.class);

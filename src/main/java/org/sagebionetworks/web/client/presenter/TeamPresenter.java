@@ -109,7 +109,7 @@ public class TeamPresenter
     view.setMemberListWidget(memberListWidget.asWidget());
     view.setMap(map.asWidget());
     view.setShowMapVisible(
-      featureFlagConfig.isFeatureEnabled(FeatureFlagKey.GOOGLE_MAP.getKey())
+      featureFlagConfig.isFeatureEnabled(FeatureFlagKey.GOOGLE_MAP)
     );
     inviteWidget.setRefreshCallback(refreshCallback);
   }

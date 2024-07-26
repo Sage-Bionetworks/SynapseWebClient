@@ -193,9 +193,7 @@ public class TeamPresenterTest {
     when(mockTeam.getCanPublicJoin()).thenReturn(canPublicJoin);
     when(mockTeam.getId()).thenReturn(teamId);
     when(mockTeam.getIcon()).thenReturn(teamIcon);
-    when(
-      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.GOOGLE_MAP.getKey())
-    )
+    when(mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.GOOGLE_MAP))
       .thenReturn(true);
   }
 

@@ -91,7 +91,7 @@ public class StorageLocationWidgetTest {
   public void setup() {
     when(
       mockFeatureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.CUSTOM_STORAGE_LOCATION_SETTINGS.getKey()
+        FeatureFlagKey.CUSTOM_STORAGE_LOCATION_SETTINGS
       )
     )
       .thenReturn(false);
@@ -213,7 +213,7 @@ public class StorageLocationWidgetTest {
   public void testGetStorageLocationSettingExternalS3() {
     when(
       mockFeatureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.CUSTOM_STORAGE_LOCATION_SETTINGS.getKey()
+        FeatureFlagKey.CUSTOM_STORAGE_LOCATION_SETTINGS
       )
     )
       .thenReturn(true);

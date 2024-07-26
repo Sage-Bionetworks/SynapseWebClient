@@ -233,7 +233,7 @@ public class TeamViewImpl extends Composite implements TeamView {
     // TODO: remove next line to take out of alpha mode
     teamProjectsItem.setVisible(
       featureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.VIEW_ASSOCIATED_PROJECTS.getKey()
+        FeatureFlagKey.VIEW_ASSOCIATED_PROJECTS
       )
     );
 
@@ -248,7 +248,7 @@ public class TeamViewImpl extends Composite implements TeamView {
     // TODO: remove next line to take out of alpha mode
     teamProjectsItem.setVisible(
       featureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.VIEW_ASSOCIATED_PROJECTS.getKey()
+        FeatureFlagKey.VIEW_ASSOCIATED_PROJECTS
       )
     );
 

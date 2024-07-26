@@ -172,11 +172,7 @@ public class WikiPageWidgetTest {
         any(WikiPage.class),
         any(AsyncCallback.class)
       );
-    when(
-      mockFeatureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.WIKI_DIFF_TOOL.getKey()
-      )
-    )
+    when(mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.WIKI_DIFF_TOOL))
       .thenReturn(true);
   }
 
@@ -247,11 +243,7 @@ public class WikiPageWidgetTest {
   // TODO: remove if exposing this outside of alpha mode
   @Test
   public void testDiffToolHiddenInNormalMode() {
-    when(
-      mockFeatureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.WIKI_DIFF_TOOL.getKey()
-      )
-    )
+    when(mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.WIKI_DIFF_TOOL))
       .thenReturn(false);
 
     WikiPageKey key = new WikiPageKey(

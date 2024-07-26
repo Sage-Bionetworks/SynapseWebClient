@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.json.client.JSONValue;
-import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 
 public class FeatureFlagConfig {
@@ -26,11 +25,11 @@ public class FeatureFlagConfig {
     this.cookieProvider = cookieProvider;
   }
 
-  public boolean isFeatureEnabled(String featureName) {
+  public boolean isFeatureEnabled(FeatureFlagKey feature) {
     try {
       return (
         DisplayUtils.isInTestWebsite(cookieProvider) ||
-        config.get(featureName).isBoolean().booleanValue()
+        config.get(feature.getKey()).isBoolean().booleanValue()
       );
     } catch (Exception e) {
       return DisplayUtils.isInTestWebsite(cookieProvider);

@@ -56,9 +56,7 @@ public class HomeViewImpl extends Composite implements HomeView {
     scrollToTop();
     ReactNode component;
 
-    if (
-      featureFlagConfig.isFeatureEnabled(FeatureFlagKey.HOMEPAGE_V2.getKey())
-    ) {
+    if (featureFlagConfig.isFeatureEnabled(FeatureFlagKey.HOMEPAGE_V2)) {
       SynapseHomepageV2Props props = SynapseHomepageV2Props.create(href -> {
         globalAppState.handleRelativePathClick(href);
       });

@@ -169,9 +169,7 @@ public class WikiPageWidget
     }
     reloadWikiPage();
     view.setWikiHistoryDiffToolButtonVisible(
-      featureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.WIKI_DIFF_TOOL.getKey()
-      ),
+      featureFlagConfig.isFeatureEnabled(FeatureFlagKey.WIKI_DIFF_TOOL),
       wikiKey
     );
   }

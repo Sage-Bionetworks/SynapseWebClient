@@ -86,7 +86,7 @@ public class DockerRepoWidget {
     dockerCommitListWidget.configure(entity.getId(), false);
     view.setProvenanceWidgetVisible(
       featureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.PROVENANCE_DOCKER_IMAGES.getKey()
+        FeatureFlagKey.PROVENANCE_DOCKER_IMAGES
       )
     );
   }
