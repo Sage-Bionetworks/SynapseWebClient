@@ -61,7 +61,6 @@ public class TeamPresenter
   private IsACTMemberAsyncHandler isACTMemberAsyncHandler;
   private TeamProjectsModalWidget teamProjectsModalWidget;
   private PortalGinInjector ginInjector;
-  private FeatureFlagConfig featureFlagConfig;
   Callback refreshCallback = () -> {
     refresh();
   };
@@ -100,7 +99,6 @@ public class TeamPresenter
     this.openUserInvitationsWidget = openUserInvitationsWidget;
     this.map = map;
     this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
-    this.featureFlagConfig = featureFlagConfig;
     view.setPresenter(this);
     view.setSynAlertWidget(synAlert.asWidget());
     view.setInviteMemberWidget(inviteWidget.asWidget());
@@ -229,6 +227,7 @@ public class TeamPresenter
           view.setTeam(team, teamMembershipStatus);
           Boolean canRequestMembership = team.getCanRequestMembership();
           boolean isLockedDown =
+            !canPublicJoin &&
             canRequestMembership != null &&
             Boolean.FALSE.equals(canRequestMembership);
           view.setTeamRequestsClosedAlertVisible(isLockedDown);

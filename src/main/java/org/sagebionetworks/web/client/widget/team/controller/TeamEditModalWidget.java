@@ -159,18 +159,23 @@ public class TeamEditModalWidget
     view.clear();
     view.configure(team);
     //SWC-6259
-    Boolean canPublicJoin = team.getCanPublicJoin();
+    //SWCZ
+    Boolean canPublicJoin = team.getCanPublicJoin() == null
+      ? false
+      : team.getCanPublicJoin();
     Boolean canRequestMembership = team.getCanRequestMembership();
+    boolean isLockedDown =
+      !canPublicJoin &&
+      canRequestMembership != null &&
+      Boolean.FALSE.equals(canRequestMembership);
+
     // default:
     view.setTeamManagerAuthRequiredOptionActive();
-    if (canRequestMembership == null) {
-      if (Boolean.TRUE.equals(canPublicJoin)) {
-        view.setNoAuthNeededOptionActive();
-      }
-    } else {
-      if (Boolean.FALSE.equals(canRequestMembership)) {
-        view.setLockedDownOptionActive();
-      }
+
+    if (canPublicJoin) {
+      view.setNoAuthNeededOptionActive();
+    } else if (isLockedDown) {
+      view.setLockedDownOptionActive();
     }
     if (team.getIcon() != null) view.setImageURL(
       jsniUtils.getFileHandleAssociationUrl(

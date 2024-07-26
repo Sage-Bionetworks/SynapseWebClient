@@ -432,6 +432,16 @@ public class TeamEditModalWidgetTest {
   }
 
   @Test
+  public void testConfigurePublicCanJoinCanRequestMembershipFalse() {
+    when(mockTeam.getCanPublicJoin()).thenReturn(true);
+    when(mockTeam.getCanRequestMembership()).thenReturn(false);
+
+    presenter.configureAndShow(mockTeam);
+
+    verify(mockView).setNoAuthNeededOptionActive();
+  }
+
+  @Test
   public void testConfigureTeamLockedDown() {
     when(mockTeam.getCanPublicJoin()).thenReturn(false);
     when(mockTeam.getCanRequestMembership()).thenReturn(false);
