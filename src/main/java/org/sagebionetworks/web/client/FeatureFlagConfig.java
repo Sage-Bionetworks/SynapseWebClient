@@ -3,12 +3,13 @@ package org.sagebionetworks.web.client;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.json.client.JSONValue;
+import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 
 public class FeatureFlagConfig {
 
-  CookieProvider cookieProvider;
-  private JSONObject config;
+  private final CookieProvider cookieProvider;
+  private final JSONObject config;
 
   public FeatureFlagConfig(String json, CookieProvider cookieProvider) {
     JSONValue parsed = JSONParser.parseStrict(json);

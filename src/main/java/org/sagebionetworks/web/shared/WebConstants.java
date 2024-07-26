@@ -411,7 +411,8 @@ public class WebConstants {
     "User requests that the Synapse Access and Compliance Team send them information on how to access this data.";
   public static final String ISSUE_PRIORITY_MINOR = "4";
   public static final String ANONYMOUS = "Anonymous";
-  public static final String PORTAL_FEATURE_FLAG = "portal_feature_flag";
+  public static final String PORTAL_FEATURE_FLAG_SESSION_STORAGE_KEY =
+    "portal_feature_flag";
 
   // report Synapse error
   public static final String SWC_ISSUE_COLLECTOR_URL =
