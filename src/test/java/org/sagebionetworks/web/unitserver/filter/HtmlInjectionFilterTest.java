@@ -120,7 +120,8 @@ public class HtmlInjectionFilterTest {
   public static final String TEAM_NAME = "the greatest team name";
   public static final String TEAM_DESCRIPTION = "an average team description";
 
-  public static final String DISCUSSION_THREAD_TITLE = "my test thread title";
+  public static final String DISCUSSION_THREAD_TITLE =
+    "</head><script>window.alert('pwned')</script>my test thread title";
 
   public static final String WIKI_PAGE_MARKDOWN =
     "This is a description of the object";
@@ -278,7 +279,7 @@ public class HtmlInjectionFilterTest {
     assertFalse(outputString.contains(WIKI_PAGE_MARKDOWN));
     assertTrue(
       outputString.contains(
-        "'my mock entity' (Synapse ID: syn12345) is a file on Synapse."
+        "&#39;my mock entity&#39; (Synapse ID: syn12345) is a file on Synapse."
       )
     );
     assertTrue(outputString.contains(SYNAPSE_PLATFORM_DESCRIPTION));
@@ -304,7 +305,12 @@ public class HtmlInjectionFilterTest {
 
     verify(mockPrintWriter).print(stringCaptor.capture());
     String outputString = stringCaptor.getValue();
-    assertTrue(outputString.contains(DISCUSSION_THREAD_TITLE));
+    // verify dangerous value has been html sanitized
+    assertTrue(
+      outputString.contains(
+        "&lt;/head&gt;&lt;script&gt;window.alert(&#39;pwned&#39;)&lt;/script&gt;my test thread title"
+      )
+    );
   }
 
   @Test
