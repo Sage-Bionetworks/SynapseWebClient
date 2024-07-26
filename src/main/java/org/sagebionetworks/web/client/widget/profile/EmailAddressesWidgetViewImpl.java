@@ -103,11 +103,10 @@ public class EmailAddressesWidgetViewImpl implements EmailAddressesWidgetView {
     emailDiv.add(new Strong(email + " (Primary)"));
     if (isQuarantined) {
       HelpWidget helpWidget = new HelpWidget();
-      helpWidget.setIconType(IconType.EXCLAMATION_CIRCLE);
       helpWidget.setHelpMarkdown(
         "#### Your email address may be invalid\n\nWe have been unable to reach you at this email address.  Please update your primary email address."
       );
-      helpWidget.setIconStyles("text-danger");
+      helpWidget.setAddStyleNames("text-danger");
       emailDiv.add(helpWidget);
     }
     emailsPanel.add(emailDiv);

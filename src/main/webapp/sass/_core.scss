@@ -3922,3 +3922,13 @@ div.border {
     }
   }
 }
+
+.HelpWidget {
+  > div {
+    display: inline-block;
+  }
+  svg {
+    height: 18px;
+    width: 18px;
+  }
+}

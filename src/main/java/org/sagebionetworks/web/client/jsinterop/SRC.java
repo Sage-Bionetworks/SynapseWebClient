@@ -59,6 +59,7 @@ public class SRC {
     public static ReactComponentType<LoginPageProps> LoginPage;
     public static ReactComponentType<HasAccessProps> HasAccess;
     public static ReactComponentType<UserCardProps> UserCard;
+    public static ReactComponentType<HelpPopoverProps> HelpPopover;
     public static ReactComponentType<
       AccountLevelBadgesProps
     > AccountLevelBadges;

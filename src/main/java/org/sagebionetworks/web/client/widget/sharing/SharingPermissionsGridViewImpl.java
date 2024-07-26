@@ -174,7 +174,6 @@ public class SharingPermissionsGridViewImpl
     data.add(permissionWidget);
     if (isInheritedACLOverwritten) {
       HelpWidget help = new HelpWidget();
-      help.setIconType(IconType.INFO_CIRCLE);
       help.setHelpMarkdown(
         "The inherited sharing settings for this entity were overridden by an administrator."
       );
