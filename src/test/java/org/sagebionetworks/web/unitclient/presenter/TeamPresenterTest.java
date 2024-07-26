@@ -503,8 +503,21 @@ public class TeamPresenterTest {
   }
 
   @Test
-  public void testCanRequestMembershipFalse() {
+  public void testPublicCanJoinAndCanRequestMembershipIsFalse() {
+    when(mockTeam.getCanPublicJoin()).thenReturn(true);
     when(mockTeam.getCanRequestMembership()).thenReturn(false);
+
+    presenter.refresh(teamId);
+
+    verify(mockView).setTeamRequestsClosedAlertVisible(false);
+    verify(mockView).setPublicJoinVisible(true);
+  }
+
+  @Test
+  public void testTeamClosedState() {
+    when(mockTeam.getCanPublicJoin()).thenReturn(false);
+    when(mockTeam.getCanRequestMembership()).thenReturn(false);
+
     presenter.refresh(teamId);
 
     verify(mockView).setTeamRequestsClosedAlertVisible(true);
@@ -515,6 +528,7 @@ public class TeamPresenterTest {
     boolean isAdmin = false;
     when(mockTeamBundle.isUserAdmin()).thenReturn(isAdmin);
     when(mockTeamMembershipStatus.getIsMember()).thenReturn(false);
+    when(mockTeam.getCanPublicJoin()).thenReturn(false);
     when(mockTeam.getCanRequestMembership()).thenReturn(false);
 
     presenter.refresh(teamId);
