@@ -159,7 +159,7 @@ public class TeamEditModalWidget
     view.clear();
     view.configure(team);
     //SWC-6259
-    //SWCZ
+    //SWC-7000
     Boolean canPublicJoin = team.getCanPublicJoin() == null
       ? false
       : team.getCanPublicJoin();
