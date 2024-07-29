@@ -2,8 +2,6 @@ package org.sagebionetworks.web.server.servlet.filter;
 
 import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
 
-import com.google.gwt.thirdparty.guava.common.base.Supplier;
-import com.google.gwt.thirdparty.guava.common.base.Suppliers;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -13,11 +11,11 @@ import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import org.apache.commons.io.IOUtils;
@@ -79,8 +77,6 @@ public class CrawlFilter {
     "<meta name=\"robots\" content=\"noindex\">";
   SynapseClient synapseClient = null;
   JSONObjectAdapter jsonObjectAdapter = null;
-  private final Supplier<String> homePageCached =
-    Suppliers.memoizeWithExpiration(homePageSupplier(), 1, TimeUnit.DAYS);
   public static final int MAX_CHILD_PAGES = 5;
 
   // Markdown processor
@@ -97,30 +93,14 @@ public class CrawlFilter {
     return wikiWidgetPattern.matcher(markdown).replaceAll("");
   }
 
-  public String getCachedHomePageHtml() {
-    return homePageCached.get();
-  }
-
-  private Supplier<String> homePageSupplier() {
-    return new Supplier<String>() {
-      public String get() {
-        try {
-          return getHomePageHtml();
-        } catch (JSONObjectAdapterException | RestServiceException e) {
-          return e.getMessage();
-        }
-      }
-    };
-  }
-
   public void init(SynapseClient synapseClient) {
     this.synapseClient = synapseClient;
 
     df.setTimeZone(TimeZone.getTimeZone("UTC"));
   }
 
-  private String getHomePageHtml()
-    throws JSONObjectAdapterException, RestServiceException {
+  public String getHomePageHtml()
+    throws JSONObjectAdapterException, RestServiceException, UnsupportedEncodingException {
     StringBuilder html = new StringBuilder();
 
     // add direct links to all public projects in the system
@@ -129,8 +109,11 @@ public class CrawlFilter {
     projectsOnly.setKey("node_type");
     projectsOnly.setValue("project");
     query.getBooleanQuery().add(projectsOnly);
-    //limit to 100 at a time
-    query.setSize(100L);
+    query.setQueryTerm(Collections.singletonList(""));
+    //limit to 50 at a time
+    query.setSize(50L);
+    query.setStart(0L);
+
     html.append(
       "<h1>" +
       DisplayConstants.DEFAULT_PAGE_TITLE +
@@ -144,37 +127,14 @@ public class CrawlFilter {
       TeamSearch.START_DELIMITER +
       "0\">Teams</a></h3><br />"
     );
-    try {
-      SearchResults results = synapseClient.search(query);
-      // append this set to the list
-      while (results.getHits().size() > 0) {
-        for (Hit hit : results.getHits()) {
-          // SWC-5149: send a Project alias link to the crawler if available.
-          if (hit.getAlias() != null) {
-            html.append(
-              "<a href=\"https://www.synapse.org/" +
-              hit.getAlias() +
-              "\">" +
-              hit.getName() +
-              "</a><br />"
-            );
-          } else {
-            html.append(
-              "<a href=\"https://www.synapse.org/Synapse:" +
-              hit.getId() +
-              "\">" +
-              hit.getName() +
-              "</a><br />"
-            );
-          }
-        }
-        long newStart = results.getStart() + results.getHits().size();
-        query.setStart(newStart);
-        results = synapseClient.search(query);
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+
+    String newJson = EntityFactory.createJSONStringForEntity(query);
+
+    html.append(
+      "<a href=\"https://www.synapse.org/Search:" +
+      URLEncoder.encode(newJson, "UTF-8") +
+      "\">Projects</a><br />"
+    );
     html.append("</body></html>");
     return html.toString();
   }
@@ -613,7 +573,7 @@ public class CrawlFilter {
     String newJson = EntityFactory.createJSONStringForEntity(inputQuery);
     html.append(
       "<a href=\"https://www.synapse.org/Search:" +
-      URLEncoder.encode(newJson) +
+      URLEncoder.encode(newJson, "UTF-8") +
       "\">Next Page</a><br />"
     );
     return html.toString();
