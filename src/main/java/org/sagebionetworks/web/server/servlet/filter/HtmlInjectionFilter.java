@@ -180,8 +180,9 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
       String domain = request.getServerName();
       String lowerCaseDomain = domain.toLowerCase();
       boolean isSynapseTestSite =
-        !(lowerCaseDomain.contains("www.synapse.org") ||
-          lowerCaseDomain.contains("127.0.0.1"));
+        (lowerCaseDomain.contains("staging.") ||
+          lowerCaseDomain.contains("dev.") ||
+          lowerCaseDomain.contains("tst."));
       boolean includeBotHtml = isLikelyBot && !isSynapseTestSite;
       try {
         // customize data model for this particular page
