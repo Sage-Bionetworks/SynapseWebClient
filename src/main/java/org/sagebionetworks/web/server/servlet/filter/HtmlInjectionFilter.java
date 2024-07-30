@@ -199,10 +199,7 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
           if (isHomePage) {
             // use defaults in the dataModel, but also get crawl data if this is a bot
             if (includeBotHtml) {
-              dataModel.put(
-                BOT_BODY_HTML_KEY,
-                crawlFilter.getCachedHomePageHtml()
-              );
+              dataModel.put(BOT_BODY_HTML_KEY, crawlFilter.getHomePageHtml());
             }
           } else if (path.startsWith("/Synapse")) {
             Synapse place = new Synapse(placeToken);
