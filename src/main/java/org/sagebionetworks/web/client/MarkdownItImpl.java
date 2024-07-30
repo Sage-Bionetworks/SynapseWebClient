@@ -30,7 +30,7 @@ public class MarkdownItImpl implements MarkdownIt {
 						$wnd.markdownitSynapseHeading,
 						$wnd.markdownitSynapseTable,
 						$wnd.markdownitStrikethroughAlt,
-						$wnd.markdownitContainer, $wnd.markdownitEmphasisAlt,
+                        $wnd.markdownitContainer,
 						$wnd.markdownitInlineComments, $wnd.markdownitBr);
 
 				$wnd.md.set({
