@@ -12,7 +12,6 @@
     "markdown-it": "^14.1.0",
     "markdown-it-br": "^1.0.0",
     "markdown-it-center-text": "^1.0.4",
-    "markdown-it-emphasis-alt": "^1.0.8",
     "markdown-it-inline-comments": "^1.0.1",
     "markdown-it-math": "^4.1.1",
     "markdown-it-strikethrough-alt": "^1.0.0",
