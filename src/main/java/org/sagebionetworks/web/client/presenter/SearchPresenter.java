@@ -292,7 +292,9 @@ public class SearchPresenter
   private SearchQuery checkForJson(String queryString) {
     SearchQuery query = getBaseSearchQuery();
 
-    query.setQueryTerm(Arrays.asList(queryString.split(" ")));
+    query.setQueryTerm(
+      Arrays.asList(queryString.replace("%20", " ").split(" "))
+    );
 
     // if query parses into SearchQuery, use that, otherwise use it as a
     // search Term
