@@ -180,9 +180,8 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
       String domain = request.getServerName();
       String lowerCaseDomain = domain.toLowerCase();
       boolean isSynapseTestSite =
-        (lowerCaseDomain.contains("staging.") ||
-          lowerCaseDomain.contains("dev.") ||
-          lowerCaseDomain.contains("tst."));
+        !(lowerCaseDomain.contains("www.synapse.org") ||
+          lowerCaseDomain.contains("127.0.0.1"));
       boolean includeBotHtml = isLikelyBot && !isSynapseTestSite;
       try {
         // customize data model for this particular page
@@ -200,10 +199,7 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
           if (isHomePage) {
             // use defaults in the dataModel, but also get crawl data if this is a bot
             if (includeBotHtml) {
-              dataModel.put(
-                BOT_BODY_HTML_KEY,
-                crawlFilter.getCachedHomePageHtml()
-              );
+              dataModel.put(BOT_BODY_HTML_KEY, crawlFilter.getHomePageHtml());
             }
           } else if (path.startsWith("/Synapse")) {
             Synapse place = new Synapse(placeToken);
