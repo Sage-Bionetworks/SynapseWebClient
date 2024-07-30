@@ -245,4 +245,15 @@ public class SearchPresenterTest {
 
     verify(mockPlaceChanger).goTo(new Synapse(term));
   }
+
+  @Test
+  public void testEncodedQueryTerm() throws Exception {
+    searchPresenter.setPlace(new Search("Alzheimer's%20Disease"));
+    SearchQuery expectedQuery = SearchQueryUtils.getDefaultSearchQuery();
+    expectedQuery.setQueryTerm(
+      Arrays.asList(new String[] { "Alzheimer's", "Disease" })
+    );
+    verify(mockJsClient)
+      .getSearchResults(eq(expectedQuery), any(AsyncCallback.class));
+  }
 }
