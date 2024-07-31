@@ -63,7 +63,7 @@ public abstract class AbstractTablesTab
   private static final String VERSION_ALERT_DRAFT_DATASET_TITLE =
     "This is a Draft Version of the Dataset";
   private static final String VERSION_ALERT_DRAFT_DATASET_MESSAGE =
-    "Administrators and Editors can edit this version and create a Stable Version for distribution. Go to the Version History to view the Stable Versions.";
+    "Administrators and Editors can edit this version and create a Stable Version for distribution. You can view Stable Versions in the Version History.";
 
   private static final String VERSION_ALERT_OLD_SNAPSHOT_DATASET_TITLE =
     "There is a newer Stable Version of this Dataset";

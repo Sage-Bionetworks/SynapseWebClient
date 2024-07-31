@@ -20,7 +20,7 @@
       <w:OrientationBanner
         name="TrashCan"
         title="Getting Started With Trash Can"
-        text="The trash can contains items that were recently deleted. You can recover deleted items in the trash can by clicking &ldquo;Restore&rdquo;. Items will remain in the trash can for 30 days before being automatically purged."
+        text="The trash can stores recently deleted items. Click 'Restore' to recover deleted items from the trash can. Items remain in the trash can for 30 days before automatic purging."
       />
       <div>
         <div class="pageContent margin-top-60">
