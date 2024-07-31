@@ -33,7 +33,7 @@ public class AccessControlListEditorViewImpl
   implements AccessControlListEditorView {
 
   public static final String CREATE_ACL_HELP_TEXT =
-    "By default the sharing settings are inherited from the parent folder or project. If you want to have different settings on a specific file, folder, or table you need to create local sharing settings and then modify them.";
+    "Sharing settings are initially inherited from the parent folder or project by default. To customize settings for a specific file, folder, or table, you must create and adjust local sharing settings.";
 
   private static final String CANNOT_MODIFY_ACL_TEXT =
     "You do not have sufficient privileges to modify the sharing settings.";
