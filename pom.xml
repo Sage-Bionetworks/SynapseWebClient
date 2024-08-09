@@ -527,10 +527,6 @@
                   tofile="src/main/webapp/generated/markdown-it-container.js"
                 />
                 <copy
-                  file="${project.basedir}/node_modules/markdown-it-emphasis-alt/dist/markdown-it-emphasis-alt.min.js"
-                  tofile="src/main/webapp/generated/markdown-it-emphasis-alt.js"
-                />
-                <copy
                   file="${project.basedir}/node_modules/markdown-it-inline-comments/dist/markdown-it-inline-comments.min.js"
                   tofile="src/main/webapp/generated/markdown-it-inline-comments.js"
                 />
