@@ -80,9 +80,6 @@ public class FooterViewImpl implements FooterView, IsWidget {
         portalVersion,
         srcVersion,
         repoVersion,
-        () -> {
-          presenter.onReportAbuseClicked();
-        },
         href -> {
           GlobalApplicationState globalAppState =
             ginInjector.getGlobalApplicationState();

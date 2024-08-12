@@ -13,9 +13,7 @@ public interface FooterView extends IsWidget {
   /**
    * Presenter interface
    */
-  public interface Presenter {
-    void onReportAbuseClicked();
-  }
+  public interface Presenter {}
 
   /**
    *

@@ -22,7 +22,6 @@ public class SynapseFooterProps extends ReactComponentProps {
     void run(String targetHref);
   }
 
-  public Callback reportViolationCallback;
   public Callback2 gotoPlace;
 
   @JsOverlay
@@ -30,14 +29,12 @@ public class SynapseFooterProps extends ReactComponentProps {
     String portalVersion,
     String srcVersion,
     String repoVersion,
-    Callback reportViolationCallback,
     Callback2 gotoPlace
   ) {
     SynapseFooterProps props = new SynapseFooterProps();
     props.portalVersion = portalVersion;
     props.srcVersion = srcVersion;
     props.repoVersion = repoVersion;
-    props.reportViolationCallback = reportViolationCallback;
     props.gotoPlace = gotoPlace;
     return props;
   }
