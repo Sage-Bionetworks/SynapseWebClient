@@ -24,7 +24,7 @@ public class SRC {
     public static ReactComponentType<
       EvaluationEditorPageProps
     > EvaluationEditorPage;
-    public static ReactComponentType<DownloadCartPageProps> DownloadCartPage;
+    public static ReactComponentType<EmptyProps> DownloadCartPage;
     public static ReactComponentType<
       DownloadConfirmationProps
     > DownloadConfirmation;

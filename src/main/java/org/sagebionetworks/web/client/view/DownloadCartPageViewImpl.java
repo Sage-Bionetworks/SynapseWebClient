@@ -4,7 +4,6 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
-import org.sagebionetworks.web.client.jsinterop.DownloadCartPageProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactNode;
 import org.sagebionetworks.web.client.jsinterop.SRC;
@@ -18,11 +17,9 @@ public class DownloadCartPageViewImpl implements DownloadCartPageView {
 
   private Header headerWidget;
   private SynapseReactClientFullContextPropsProvider propsProvider;
-  private Presenter presenter;
 
   @Inject
   public DownloadCartPageViewImpl(
-    AuthenticationController authenticationController,
     Header headerWidget,
     SynapseReactClientFullContextPropsProvider propsProvider
   ) {
@@ -32,20 +29,12 @@ public class DownloadCartPageViewImpl implements DownloadCartPageView {
   }
 
   @Override
-  public void setPresenter(Presenter presenter) {
-    this.presenter = presenter;
-  }
-
-  @Override
   public void render() {
     Window.scrollTo(0, 0); // scroll user to top of page
     headerWidget.configure();
-    DownloadCartPageProps props = DownloadCartPageProps.create(entityId -> {
-      presenter.onViewSharingSettingsClicked(entityId);
-    });
     ReactNode component = React.createElementWithSynapseContext(
       SRC.SynapseComponents.DownloadCartPage,
-      props,
+      null,
       propsProvider.getJsInteropContextProps()
     );
     container.render(component);

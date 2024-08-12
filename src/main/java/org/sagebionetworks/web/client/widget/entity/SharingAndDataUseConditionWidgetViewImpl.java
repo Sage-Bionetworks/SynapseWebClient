@@ -17,7 +17,6 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.widget.HelpWidget;
 import org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWidget;
-import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -31,7 +30,6 @@ public class SharingAndDataUseConditionWidgetViewImpl
   FlowPanel container;
   PublicPrivateBadge publicPrivateBadge;
   RestrictionWidget restrictionWidgetV2;
-  AccessControlListModalWidget accessControlListModalWidget;
   CookieProvider cookies;
 
   @Inject
@@ -40,7 +38,6 @@ public class SharingAndDataUseConditionWidgetViewImpl
     GlobalApplicationState globalApplicationState,
     IconsImageBundle iconsImageBundle,
     PublicPrivateBadge publicPrivateBadge,
-    AccessControlListModalWidget accessControlListModalWidget,
     RestrictionWidget restrictionWidgetV2,
     CookieProvider cookies
   ) {
@@ -52,7 +49,6 @@ public class SharingAndDataUseConditionWidgetViewImpl
     restrictionWidgetV2.setShowCurrentAccessUI(false);
     restrictionWidgetV2.showFolderRestrictionUI();
     this.cookies = cookies;
-    this.accessControlListModalWidget = accessControlListModalWidget;
     this.addStyleName("sharingAndDataUseConditions");
     container = new FlowPanel();
     container.addStyleName("margin-top-left-10");
