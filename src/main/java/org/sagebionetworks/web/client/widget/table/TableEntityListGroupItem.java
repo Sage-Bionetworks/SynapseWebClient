@@ -104,7 +104,7 @@ public class TableEntityListGroupItem implements IsWidget {
     entityAnchor.addClickHandler(EntityBadgeViewImpl.STANDARD_CLICKHANDLER);
     entityAnchor.setText(header.getName());
     entityAnchor.addStyleName(
-      "text-align-left text-overflow-ellipsis inline-block whitespace-nowrap overflowHidden maxWidth100"
+      "text-align-left text-overflow-ellipsis inline-block whitespace-nowrap overflowHidden maxWidth100 movedown-3"
     );
     entityAnchor.setHref("/Synapse:" + header.getId());
     entityAnchor
