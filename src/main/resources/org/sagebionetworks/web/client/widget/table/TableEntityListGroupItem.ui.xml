@@ -8,23 +8,21 @@
   xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
   xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
 >
-  <t:TableRow>
+  <t:TableRow height="40px">
     <t:TableData width="20px" minimumWidth="20px">
       <g:FocusPanel ui:field="iconContainer">
-        <w:EntityTypeIconImpl ui:field="icon" type="table" />
+        <w:EntityTypeIconImpl
+          ui:field="icon"
+          type="table"
+          addStyleNames="moveup-5"
+        />
       </g:FocusPanel>
     </t:TableData>
-    <t:TableData addStyleNames="overflow-x-hidden ">
-      <bh:Div
-        addStyleNames="margin-left-5 margin-right-5"
-        ui:field="nameContainer"
-      >
-        <g:FlowPanel
-          ui:field="entityContainer"
-          addStyleNames="displayInline pull-left"
-        />
-      </bh:Div>
-    </t:TableData>
+    <t:TableData
+      ui:field="entityContainer"
+      addStyleNames="overflow-x-hidden "
+      paddingLeft="7"
+    />
     <t:TableData
       width="150px"
       minimumWidth="150px"

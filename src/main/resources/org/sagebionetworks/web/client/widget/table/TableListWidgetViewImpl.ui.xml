@@ -35,7 +35,7 @@
         addStyleNames="table-layout-fixed"
       >
         <t:THead>
-          <t:TableRow>
+          <t:TableRow height="40px">
             <t:TableHeader width="20px" minimumWidth="20px" />
             <tr:SortableTableHeaderImpl
               ui:field="nameColumnHeader"

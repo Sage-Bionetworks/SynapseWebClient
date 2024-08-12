@@ -64,7 +64,7 @@ public class TableEntityListGroupItem implements IsWidget {
   Label createdOnField;
 
   @UiField
-  FlowPanel entityContainer;
+  TableData entityContainer;
 
   @UiField
   EntityTypeIconImpl icon;
@@ -103,7 +103,9 @@ public class TableEntityListGroupItem implements IsWidget {
     entityAnchor = new Anchor();
     entityAnchor.addClickHandler(EntityBadgeViewImpl.STANDARD_CLICKHANDLER);
     entityAnchor.setText(header.getName());
-    entityAnchor.addStyleName("link");
+    entityAnchor.addStyleName(
+      "text-align-left text-overflow-ellipsis inline-block whitespace-nowrap overflowHidden maxWidth100"
+    );
     entityAnchor.setHref("/Synapse:" + header.getId());
     entityAnchor
       .getElement()
