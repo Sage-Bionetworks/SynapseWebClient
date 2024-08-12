@@ -8,67 +8,77 @@
   xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
   xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
 >
-  <t:Table width="100%" height="36px">
-    <t:TableRow>
-      <t:TableHeader width="20px" />
-      <t:TableData width="20px">
-        <g:FocusPanel ui:field="iconContainer">
-          <w:EntityTypeIconImpl ui:field="icon" type="table" />
-        </g:FocusPanel>
-      </t:TableData>
-      <t:TableData addStyleNames="overflow-x-hidden ">
-        <bh:Div
-          addStyleNames="margin-left-5 margin-right-5"
-          ui:field="nameContainer"
-        >
-          <g:FlowPanel
-            ui:field="entityContainer"
-            addStyleNames="displayInline pull-left"
-          />
-        </bh:Div>
-      </t:TableData>
-      <t:TableData
-        width="150px"
-        addStyleNames="visible-sm visible-md visible-lg overflow-x-hidden"
+  <t:TableRow>
+    <t:TableData width="20px" minimumWidth="20px">
+      <g:FocusPanel ui:field="iconContainer">
+        <w:EntityTypeIconImpl ui:field="icon" type="table" />
+      </g:FocusPanel>
+    </t:TableData>
+    <t:TableData addStyleNames="overflow-x-hidden ">
+      <bh:Div
+        addStyleNames="margin-left-5 margin-right-5"
+        ui:field="nameContainer"
       >
-        <g:Label ui:field="typeField" />
-      </t:TableData>
-      <t:TableData
-        width="90px"
-        addStyleNames="visible-md visible-lg text-align-right padding-right-15"
-        ui:field="itemCountColumn"
-      >
-        <g:Label ui:field="itemCountField" />
-      </t:TableData>
-      <t:TableData width="270px" addStyleNames="visible-xl overflow-x-hidden">
-        <bh:Div ui:field="createdByField" />
-      </t:TableData>
-      <t:TableData width="270px" addStyleNames="visible-xl overflow-x-hidden">
-        <bh:Div ui:field="modifiedByField" />
-      </t:TableData>
-      <t:TableData
-        width="165px"
-        addStyleNames="visible-md visible-lg overflow-x-hidden"
-      >
-        <g:Label ui:field="modifiedOnField" />
-      </t:TableData>
-      <t:TableData
-        width="165px"
-        addStyleNames="visible-md visible-lg overflow-x-hidden"
-      >
-        <g:Label ui:field="createdOnField" />
-      </t:TableData>
-      <t:TableData
-        width="130px"
-        addStyleNames="visible-md visible-lg overflow-x-hidden"
-      >
-        <g:TextBox
-          ui:field="idField"
-          width="130px"
-          addStyleNames="border-none noBackground"
-          readOnly="true"
+        <g:FlowPanel
+          ui:field="entityContainer"
+          addStyleNames="displayInline pull-left"
         />
-      </t:TableData>
-    </t:TableRow>
-  </t:Table>
+      </bh:Div>
+    </t:TableData>
+    <t:TableData
+      width="150px"
+      minimumWidth="150px"
+      addStyleNames="visible-sm visible-md visible-lg overflow-x-hidden"
+    >
+      <g:Label ui:field="typeField" />
+    </t:TableData>
+    <t:TableData
+      width="90px"
+      minimumWidth="90px"
+      addStyleNames="visible-md visible-lg text-align-right padding-right-15"
+      ui:field="itemCountColumn"
+    >
+      <g:Label ui:field="itemCountField" />
+    </t:TableData>
+    <t:TableData
+      width="270px"
+      minimumWidth="270px"
+      addStyleNames="visible-xl overflow-x-hidden"
+    >
+      <bh:Div ui:field="createdByField" />
+    </t:TableData>
+    <t:TableData
+      width="270px"
+      minimumWidth="270px"
+      addStyleNames="visible-xl overflow-x-hidden"
+    >
+      <bh:Div ui:field="modifiedByField" />
+    </t:TableData>
+    <t:TableData
+      width="165px"
+      minimumWidth="165px"
+      addStyleNames="visible-md visible-lg overflow-x-hidden"
+    >
+      <g:Label ui:field="modifiedOnField" />
+    </t:TableData>
+    <t:TableData
+      width="165px"
+      minimumWidth="165px"
+      addStyleNames="visible-md visible-lg overflow-x-hidden"
+    >
+      <g:Label ui:field="createdOnField" />
+    </t:TableData>
+    <t:TableData
+      width="130px"
+      minimumWidth="130px"
+      addStyleNames="visible-md visible-lg overflow-x-hidden"
+    >
+      <g:TextBox
+        ui:field="idField"
+        width="130px"
+        addStyleNames="border-none noBackground"
+        readOnly="true"
+      />
+    </t:TableData>
+  </t:TableRow>
 </ui:UiBinder>

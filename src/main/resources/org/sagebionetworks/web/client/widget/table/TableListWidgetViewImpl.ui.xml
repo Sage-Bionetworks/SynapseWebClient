@@ -26,61 +26,82 @@
     <b:TextArea width="1px" ui:field="copyToClipboardTextbox" visible="false" />
     <bh:Div
       ui:field="tableArea"
-      addStyleNames="highlight-box padding-10"
+      addStyleNames="highlight-box padding-10 displayInlineBlock"
       marginTop="0"
     >
-      <t:Table ui:field="columnHeaders" width="100%">
-        <t:TableRow>
-          <t:TableHeader width="20px" />
-          <tr:SortableTableHeaderImpl ui:field="nameColumnHeader" text="Name" />
-          <t:TableHeader
-            width="150px"
-            addStyleNames="visible-sm visible-md visible-lg"
-          >
-            <bh:Span text="Type" />
-          </t:TableHeader>
-          <t:TableHeader
-            width="90px"
-            ui:field="itemCountColumnHeader"
-            addStyleNames="visible-md visible-lg"
-          >
-            <bh:Span text="Item Count" />
-          </t:TableHeader>
-          <t:TableHeader width="270px" addStyleNames="visible-xl">
-            <bh:Span text="Created By" />
-          </t:TableHeader>
-          <t:TableHeader width="270px" addStyleNames="visible-xl">
-            <bh:Span text="Modified By" />
-          </t:TableHeader>
-          <tr:SortableTableHeaderImpl
-            width="165px"
-            ui:field="modifiedOnColumnHeader"
-            addStyleNames="visible-md visible-lg"
-            text="Modified On"
-          />
-          <tr:SortableTableHeaderImpl
-            width="165px"
-            ui:field="createdOnColumnHeader"
-            text="Created On"
-            addStyleNames="visible-md visible-lg"
-          />
-          <t:TableHeader width="130px" addStyleNames="visible-md visible-lg">
-            <bh:Span text="ID" />
-            <b:Tooltip title="Copy IDs to the clipboard" placement="BOTTOM">
-              <b:Icon
-                ui:field="copyIDToClipboardIcon"
-                addStyleNames="imageButton margin-left-5 link"
-                type="CLIPBOARD"
-              />
-            </b:Tooltip>
-          </t:TableHeader>
-        </t:TableRow>
+      <t:Table
+        ui:field="tablesTable"
+        width="100%"
+        addStyleNames="table-layout-fixed"
+      >
+        <t:THead>
+          <t:TableRow>
+            <t:TableHeader width="20px" minimumWidth="20px" />
+            <tr:SortableTableHeaderImpl
+              ui:field="nameColumnHeader"
+              text="Name"
+            />
+            <t:TableHeader
+              width="150px"
+              minimumWidth="150px"
+              addStyleNames="visible-sm visible-md visible-lg"
+            >
+              <bh:Span text="Type" />
+            </t:TableHeader>
+            <t:TableHeader
+              width="90px"
+              minimumWidth="90px"
+              ui:field="itemCountColumnHeader"
+              addStyleNames="visible-md visible-lg"
+            >
+              <bh:Span text="Item Count" />
+            </t:TableHeader>
+            <t:TableHeader
+              width="270px"
+              minimumWidth="270px"
+              addStyleNames="visible-xl"
+            >
+              <bh:Span text="Created By" />
+            </t:TableHeader>
+            <t:TableHeader
+              width="270px"
+              minimumWidth="270px"
+              addStyleNames="visible-xl"
+            >
+              <bh:Span text="Modified By" />
+            </t:TableHeader>
+            <tr:SortableTableHeaderImpl
+              width="165px"
+              minimumWidth="165px"
+              ui:field="modifiedOnColumnHeader"
+              addStyleNames="visible-md visible-lg"
+              text="Modified On"
+            />
+            <tr:SortableTableHeaderImpl
+              width="165px"
+              minimumWidth="165px"
+              ui:field="createdOnColumnHeader"
+              text="Created On"
+              addStyleNames="visible-md visible-lg"
+            />
+            <t:TableHeader
+              width="130px"
+              minimumWidth="130px"
+              addStyleNames="visible-md visible-lg"
+            >
+              <bh:Span text="ID" />
+              <b:Tooltip title="Copy IDs to the clipboard" placement="BOTTOM">
+                <b:Icon
+                  ui:field="copyIDToClipboardIcon"
+                  addStyleNames="imageButton margin-left-5 link"
+                  type="CLIPBOARD"
+                />
+              </b:Tooltip>
+            </t:TableHeader>
+          </t:TableRow>
+        </t:THead>
+        <t:TBody ui:field="tableBody" />
       </t:Table>
-      <bh:Hr
-        ui:field="hrUnderTableHeaders"
-        addStyleNames="margin-top-5 margin-bottom-5"
-      />
-      <bh:Div ui:field="tablesListDiv" />
       <bh:Div ui:field="loadMoreWidgetContainer" />
     </bh:Div>
   </g:HTMLPanel>
