@@ -25,7 +25,7 @@
     <guiceVersion>3.0</guiceVersion>
     <ginVersion>2.1.2</ginVersion>
     <xstream.version>1.3.1</xstream.version>
-    <schema-to-pojo.version>0.6.6</schema-to-pojo.version>
+    <schema-to-pojo.version>0.6.10</schema-to-pojo.version>
     <jackson.version>2.15.2</jackson.version>
     <jackson.databind.version>2.15.2</jackson.databind.version>
     <log4j.version>2.17.1</log4j.version>
@@ -525,10 +525,6 @@
                 <copy
                   file="${project.basedir}/node_modules/@sage-bionetworks/markdown-it-container/dist/markdown-it-container.min.js"
                   tofile="src/main/webapp/generated/markdown-it-container.js"
-                />
-                <copy
-                  file="${project.basedir}/node_modules/markdown-it-emphasis-alt/dist/markdown-it-emphasis-alt.min.js"
-                  tofile="src/main/webapp/generated/markdown-it-emphasis-alt.js"
                 />
                 <copy
                   file="${project.basedir}/node_modules/markdown-it-inline-comments/dist/markdown-it-inline-comments.min.js"
