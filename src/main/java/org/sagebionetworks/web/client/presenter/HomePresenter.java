@@ -40,7 +40,10 @@ public class HomePresenter extends AbstractActivity implements Presenter<Home> {
   public void setPlace(Home place) {
     this.place = place;
     view.refresh();
-    if (authController.isLoggedIn()) {
+    if (
+      authController.isLoggedIn() &&
+      !Home.LOGGED_IN_FORCE_NO_REDIRECT_TOKEN.equals(place.toToken())
+    ) {
       globalAppState
         .getPlaceChanger()
         .goTo(new Profile(Profile.VIEW_PROFILE_TOKEN + "/projects/all"));

@@ -6,6 +6,7 @@ import com.google.gwt.place.shared.Prefix;
 
 public class Home extends Place {
 
+  public static final String LOGGED_IN_FORCE_NO_REDIRECT_TOKEN = "x";
   private String token;
 
   public Home(String token) {

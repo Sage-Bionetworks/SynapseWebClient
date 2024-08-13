@@ -87,4 +87,14 @@ public class HomePresenterTest {
     verify(mockView).refresh();
     verify(mockPlaceChanger).goTo(any(Profile.class));
   }
+
+  @Test
+  public void testForceNoRedriect() {
+    when(mockAuthController.isLoggedIn()).thenReturn(true);
+    Home place = Mockito.mock(Home.class);
+    when(place.toToken()).thenReturn(Home.LOGGED_IN_FORCE_NO_REDIRECT_TOKEN);
+    presenter.setPlace(place);
+    verify(mockView).refresh();
+    verify(mockPlaceChanger, never()).goTo(any(Profile.class));
+  }
 }
