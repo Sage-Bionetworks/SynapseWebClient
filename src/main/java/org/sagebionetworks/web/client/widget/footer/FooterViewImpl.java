@@ -84,6 +84,11 @@ public class FooterViewImpl implements FooterView, IsWidget {
           GlobalApplicationState globalAppState =
             ginInjector.getGlobalApplicationState();
           globalAppState.handleRelativePathClick(href);
+        },
+        newMode -> {
+          GlobalApplicationState globalAppState =
+            ginInjector.getGlobalApplicationState();
+          globalAppState.refreshPage();
         }
       );
       ReactNode component = React.createElementWithSynapseContext(

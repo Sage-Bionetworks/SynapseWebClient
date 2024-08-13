@@ -24,18 +24,27 @@ public class SynapseFooterProps extends ReactComponentProps {
 
   public Callback2 gotoPlace;
 
+  @JsFunction
+  public interface Callback3 {
+    void run(boolean experimentalMode);
+  }
+
+  Callback3 onExperimentalModeToggle;
+
   @JsOverlay
   public static SynapseFooterProps create(
     String portalVersion,
     String srcVersion,
     String repoVersion,
-    Callback2 gotoPlace
+    Callback2 gotoPlace,
+    Callback3 onExperimentalModeToggle
   ) {
     SynapseFooterProps props = new SynapseFooterProps();
     props.portalVersion = portalVersion;
     props.srcVersion = srcVersion;
     props.repoVersion = repoVersion;
     props.gotoPlace = gotoPlace;
+    props.onExperimentalModeToggle = onExperimentalModeToggle;
     return props;
   }
 }
