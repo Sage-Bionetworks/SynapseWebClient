@@ -17,6 +17,8 @@ import org.sagebionetworks.repo.model.entity.SortBy;
 import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
+import org.sagebionetworks.web.client.view.bootstrap.table.Table;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableHeader;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
@@ -30,10 +32,7 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
   public interface Binder
     extends UiBinder<HTMLPanel, TableListWidgetViewImpl> {}
 
-  List<TableEntityListGroupItem> tablesList;
-
-  @UiField
-  Div tablesListDiv;
+  List<TableEntityListGroupItem> tableRows;
 
   @UiField
   Div loadMoreWidgetContainer;
@@ -72,9 +71,15 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
   @UiField
   TableHeader itemCountColumnHeader;
 
+  @UiField
+  Table tablesTable;
+
+  @UiField
+  TBody tableBody;
+
   @Inject
   public TableListWidgetViewImpl(Binder binder, PortalGinInjector ginInjector) {
-    this.tablesList = new ArrayList<>();
+    this.tableRows = new ArrayList<>();
     this.panel = binder.createAndBindUi(this);
     this.ginInjector = ginInjector;
     nameColumnHeader.setSortingListener(header -> {
@@ -116,14 +121,15 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 
   @Override
   public void addTableListItem(final TableEntityListGroupItem item) {
-    tablesList.add(item);
-    tablesListDiv.add(item);
+    tableRows.add(item);
+    tableBody.add(item);
   }
 
   @Override
   public void clearTableWidgets() {
-    tablesList.clear();
-    tablesListDiv.clear();
+    tableRows.clear();
+    // clear all rows except for the header
+    tableBody.clear();
   }
 
   @Override
@@ -177,8 +183,7 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 
   @Override
   public void clear() {
-    tablesList.clear();
-    tablesListDiv.clear();
+    clearTableWidgets();
   }
 
   @Override
@@ -205,7 +210,7 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
     } else {
       itemCountColumnHeader.removeStyleName("visible-md visible-lg");
     }
-    for (TableEntityListGroupItem item : tablesList) {
+    for (TableEntityListGroupItem item : tableRows) {
       item.setItemCountVisible(visible);
     }
   }

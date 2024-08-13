@@ -4,12 +4,14 @@ import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Strong;
 import org.sagebionetworks.repo.model.table.SortDirection;
+import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableHeaderResizeGrip;
 
 /**
@@ -111,5 +113,10 @@ public class SortableTableHeaderImpl implements SortableTableHeader {
   @Override
   public void setIsResizable(boolean isResizable) {
     resizeGrip.setVisible(isResizable);
+  }
+
+  @Override
+  public void setMinimumWidth(String minWidth) {
+    DOM.setStyleAttribute(widget.getElement(), TableData.MIN_WIDTH, minWidth);
   }
 }
