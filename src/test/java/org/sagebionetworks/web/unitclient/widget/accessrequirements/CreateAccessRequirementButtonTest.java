@@ -139,7 +139,7 @@ public class CreateAccessRequirementButtonTest {
     // configured with an AR, when clicked it should pop up the wizard with the existing AR
     when(
       mockFeatureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.SRC_BASED_AR_MODAL_WIZARD.getKey()
+        FeatureFlagKey.SRC_BASED_AR_MODAL_WIZARD
       )
     )
       .thenReturn(false);
@@ -166,7 +166,7 @@ public class CreateAccessRequirementButtonTest {
     // configured with a subject, when clicked it should pop up the wizard pointing to the new subject
     when(
       mockFeatureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.SRC_BASED_AR_MODAL_WIZARD.getKey()
+        FeatureFlagKey.SRC_BASED_AR_MODAL_WIZARD
       )
     )
       .thenReturn(false);
@@ -182,7 +182,7 @@ public class CreateAccessRequirementButtonTest {
     widget.configure(mockAccessRequirement, mockRefreshCallback);
     when(
       mockFeatureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.SRC_BASED_AR_MODAL_WIZARD.getKey()
+        FeatureFlagKey.SRC_BASED_AR_MODAL_WIZARD
       )
     )
       .thenReturn(false);
@@ -213,7 +213,7 @@ public class CreateAccessRequirementButtonTest {
     // feature flag -- use SRC wizard
     when(
       mockFeatureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.SRC_BASED_AR_MODAL_WIZARD.getKey()
+        FeatureFlagKey.SRC_BASED_AR_MODAL_WIZARD
       )
     )
       .thenReturn(true);
@@ -259,7 +259,7 @@ public class CreateAccessRequirementButtonTest {
     // feature flag -- use SRC wizard
     when(
       mockFeatureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.SRC_BASED_AR_MODAL_WIZARD.getKey()
+        FeatureFlagKey.SRC_BASED_AR_MODAL_WIZARD
       )
     )
       .thenReturn(true);
@@ -297,7 +297,7 @@ public class CreateAccessRequirementButtonTest {
     widget.configure(mockAccessRequirement, mockRefreshCallback);
     when(
       mockFeatureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.SRC_BASED_AR_MODAL_WIZARD.getKey()
+        FeatureFlagKey.SRC_BASED_AR_MODAL_WIZARD
       )
     )
       .thenReturn(true);

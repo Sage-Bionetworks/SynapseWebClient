@@ -321,7 +321,7 @@ public abstract class AbstractTablesTab
     );
     if (
       featureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.PROVENANCE_V2_VISUALIZATION.getKey()
+        FeatureFlagKey.PROVENANCE_V2_VISUALIZATION
       )
     ) {
       ProvenanceWidget provWidget = ginInjector.getProvenanceRendererV2();

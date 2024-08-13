@@ -332,7 +332,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
     } else if (contentTypeKey.equals(PROVENANCE_CONTENT_TYPE)) {
       if (
         featureFlagConfig.isFeatureEnabled(
-          FeatureFlagKey.PROVENANCE_V2_VISUALIZATION.getKey()
+          FeatureFlagKey.PROVENANCE_V2_VISUALIZATION
         )
       ) {
         presenter = ginInjector.getProvenanceRendererV2();
