@@ -975,9 +975,8 @@ public class PortalGinModule extends AbstractGinModule {
 
     bind(KeyFactoryProvider.class).to(KeyFactoryProviderImpl.class);
     bind(SRCUploadFileWrapper.class).to(SRCUploadFileWrapperImpl.class);
-    bind(FeatureFlagConfigProvider.class).in(Singleton.class);
 
-    bind(FeatureFlagConfig.class).toProvider(FeatureFlagConfigProvider.class);
+    bind(FeatureFlagConfig.class).in(Singleton.class);
     bind(EntityTypeIcon.class).to(EntityTypeIconImpl.class);
   }
 }
