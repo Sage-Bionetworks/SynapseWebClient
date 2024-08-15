@@ -868,4 +868,6 @@ public interface PortalGinInjector extends Ginjector {
   ColumnModelsEditorWidget getColumnModelsEditorWidget();
 
   EntityTypeIcon getEntityTypeIcon();
+
+  FeatureFlagConfig getFeatureFlagConfig();
 }
