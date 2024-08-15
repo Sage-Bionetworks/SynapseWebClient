@@ -54,7 +54,6 @@ import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnQueryCallback;
 import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnQueryResultBundleCallback;
-import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnViewSharingSettingsHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
@@ -172,11 +171,6 @@ public class TableEntityWidgetV2Test {
 
   @Captor
   ArgumentCaptor<OnQueryResultBundleCallback> onQueryResultBundleCallbackCaptor;
-
-  @Captor
-  ArgumentCaptor<
-    OnViewSharingSettingsHandler
-  > onViewSharingSettingsHandlerCaptor;
 
   @Mock
   GlobalApplicationState mockGlobalState;
@@ -538,7 +532,6 @@ public class TableEntityWidgetV2Test {
         eq(adapter.toJSONString()),
         onQueryCallbackCaptor.capture(),
         onQueryResultBundleCallbackCaptor.capture(),
-        onViewSharingSettingsHandlerCaptor.capture(),
         eq(expectedHideSqlEditorControl)
       );
 
@@ -572,16 +565,6 @@ public class TableEntityWidgetV2Test {
       expectedQueryCount,
       widget.getCurrentQueryResultBundle().getQueryCount()
     );
-
-    // test OnViewSharingSettingsHandler
-    OnViewSharingSettingsHandler onViewSharingSettingsHandler =
-      onViewSharingSettingsHandlerCaptor.getValue();
-    String testEntityId = "syn0000001";
-    onViewSharingSettingsHandler.onViewSharingSettingsClicked(testEntityId);
-
-    verify(mockJsClient).getEntity(eq(testEntityId), any(AsyncCallback.class));
-    verify(mockACLModalWidget).configure(mockEntity, false);
-    verify(mockACLModalWidget).showSharing(any(Callback.class));
   }
 
   @Test

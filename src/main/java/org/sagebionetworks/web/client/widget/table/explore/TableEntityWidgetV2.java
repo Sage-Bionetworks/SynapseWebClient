@@ -38,7 +38,6 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.jsinterop.DatasetEditorProps;
 import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnQueryCallback;
 import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnQueryResultBundleCallback;
-import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnViewSharingSettingsHandler;
 import org.sagebionetworks.web.client.jsinterop.ToastMessageOptions;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
@@ -431,10 +430,6 @@ public class TableEntityWidgetV2
             }
           };
 
-        OnViewSharingSettingsHandler onViewSharingSettingsHandler =
-          entityId -> {
-            onViewSharingSettingsClicked(entityId);
-          };
         JSONObjectAdapter adapter = ginInjector
           .getJSONObjectAdapter()
           .createNew();
@@ -446,7 +441,6 @@ public class TableEntityWidgetV2
             adapter.toJSONString(),
             onQueryChange,
             onQueryResultBundleChange,
-            onViewSharingSettingsHandler,
             hideSqlEditorControl
           );
         } catch (JSONObjectAdapterException e) {
@@ -728,6 +722,7 @@ public class TableEntityWidgetV2
   }
 
   private AccessControlListModalWidget getAccessControlListModalWidget() {
+    // TODO: just show it in SRC :)
     if (aclModal == null) {
       aclModal = ginInjector.getAccessControlListModalWidget();
     }
