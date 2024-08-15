@@ -1,5 +1,10 @@
 package org.sagebionetworks.web.client;
 
+import static com.google.common.util.concurrent.Futures.getDone;
+import static com.google.common.util.concurrent.Futures.whenAllComplete;
+import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
+
+import com.google.common.util.concurrent.FluentFuture;
 import com.google.gwt.activity.shared.ActivityManager;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
@@ -10,9 +15,9 @@ import com.google.gwt.place.shared.PlaceHistoryHandler;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
+import java.util.HashMap;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
@@ -80,33 +85,34 @@ public class Portal implements EntryPoint {
             try {
               // make sure jsni utils code is available to the client
               ginjector.getSynapseJSNIUtils();
+              //SWC-7032: In parallel, execute RPCs for the feature flags, synapse properties, and access token to check for a user change
+              FluentFuture<JSONObjectAdapter> featureFlagConfigFuture =
+                ginjector.getSynapseJavascriptClient().getFeatureFlagConfig();
+              FluentFuture<HashMap<String, String>> synapsePropertiesFuture =
+                ginjector
+                  .getSynapseProperties()
+                  .getInitSynapsePropertiesFuture();
+              FluentFuture<Void> checkForUserChangeFuture = ginjector
+                .getAuthenticationController()
+                .getCheckForUserChangeFuture();
 
-              // initialize feature flag config
-              ginjector
-                .getSynapseJavascriptClient()
-                .getFeatureFlagConfig(
-                  new AsyncCallback<JSONObjectAdapter>() {
-                    @Override
-                    public void onSuccess(JSONObjectAdapter config) {
-                      ginjector
-                        .getFeatureFlagConfig()
-                        .setJson(config.toString());
-                      continueInit();
-                    }
+              FluentFuture
+                .from(
+                  whenAllComplete(
+                    featureFlagConfigFuture,
+                    synapsePropertiesFuture,
+                    checkForUserChangeFuture
+                  )
+                    .call(
+                      () -> {
+                        try {
+                          JSONObjectAdapter featureFlagConfig = getDone(
+                            featureFlagConfigFuture
+                          );
+                          ginjector
+                            .getFeatureFlagConfig()
+                            .setJson(featureFlagConfig.toString());
 
-                    @Override
-                    public void onFailure(Throwable reason) {
-                      _consoleError(
-                        "Error getting feature flag configuration:" +
-                        reason.getMessage()
-                      );
-                      continueInit();
-                    }
-
-                    private void continueInit() {
-                      ginjector
-                        .getSynapseProperties()
-                        .initSynapseProperties(() -> {
                           EventBus eventBus = ginjector.getEventBus();
                           PlaceController placeController = new PlaceController(
                             eventBus
@@ -161,50 +167,57 @@ public class Portal implements EntryPoint {
                           globalApplicationState.setAppPlaceHistoryMapper(
                             historyMapper
                           );
-                          ginjector
-                            .getAuthenticationController()
-                            .checkForUserChange(() -> {
-                              globalApplicationState.init(
-                                new Callback() {
-                                  @Override
-                                  public void invoke() {
-                                    // listen for window close (or navigating away)
-                                    registerWindowClosingHandler(
-                                      globalApplicationState
-                                    );
-                                    registerOnPopStateHandler(
-                                      globalApplicationState
-                                    );
+                          globalApplicationState.init(
+                            new Callback() {
+                              @Override
+                              public void invoke() {
+                                // listen for window close (or navigating away)
+                                registerWindowClosingHandler(
+                                  globalApplicationState
+                                );
+                                registerOnPopStateHandler(
+                                  globalApplicationState
+                                );
 
-                                    // start version timer
-                                    ginjector.getVersionTimer().start();
-                                    // start timer to check for Synapse outage or scheduled maintenance
-                                    ginjector
-                                      .getSynapseStatusDetector()
-                                      .start();
-                                    // Goes to place represented on URL or default place
-                                    historyHandler.handleCurrentHistory();
-                                    globalApplicationState.initializeDropZone();
-                                    globalApplicationState.initializeToastContainer();
-                                    // initialize the view default columns so that they're ready when we need them (do this by constructing that singleton object)
-                                    ginjector.getViewDefaultColumns();
+                                // start version timer
+                                ginjector.getVersionTimer().start();
+                                // start timer to check for Synapse outage or scheduled maintenance
+                                ginjector.getSynapseStatusDetector().start();
+                                // Goes to place represented on URL or default place
+                                historyHandler.handleCurrentHistory();
+                                globalApplicationState.initializeDropZone();
+                                globalApplicationState.initializeToastContainer();
+                                // initialize the view default columns so that they're ready when we need them (do this by constructing that singleton object)
+                                ginjector.getViewDefaultColumns();
 
-                                    // start timer to check for user session state change (session expired, or user explicitly logged
-                                    // out).  Backend endpoints must be set before starting this (because it attempts to get "my user profile")
-                                    ginjector.getSessionDetector().start();
+                                // start timer to check for user session state change (session expired, or user explicitly logged
+                                // out).  Backend endpoints must be set before starting this (because it attempts to get "my user profile")
+                                ginjector.getSessionDetector().start();
 
-                                    // start a timer to check to see if we're approaching the max allowable space in the web storage.
-                                    // clears out the web storage (cache) if this is the case.
-                                    ginjector
-                                      .getWebStorageMaxSizeDetector()
-                                      .start();
-                                  }
-                                }
-                              );
-                            });
-                        });
-                    }
-                  }
+                                // start a timer to check to see if we're approaching the max allowable space in the web storage.
+                                // clears out the web storage (cache) if this is the case.
+                                ginjector
+                                  .getWebStorageMaxSizeDetector()
+                                  .start();
+                              }
+                            }
+                          );
+                        } catch (Exception e1) {
+                          // TODO Auto-generated catch block
+                          e1.printStackTrace();
+                        }
+                        return null;
+                      },
+                      directExecutor()
+                    )
+                )
+                .catching(
+                  Throwable.class,
+                  e -> {
+                    onFailure(e);
+                    return null;
+                  },
+                  directExecutor()
                 );
             } catch (Throwable e) {
               onFailure(e);

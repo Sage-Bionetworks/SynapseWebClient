@@ -3004,6 +3004,12 @@ public class SynapseJavascriptClient {
     );
   }
 
+  public FluentFuture<JSONObjectAdapter> getFeatureFlagConfig() {
+    return getFuture(cb ->
+      doGet(jsniUtils.getAppConfigServletUrl(), OBJECT_TYPE.JSON, cb)
+    );
+  }
+
   public void getFeatureFlagConfig(AsyncCallback<JSONObjectAdapter> cb) {
     doGet(jsniUtils.getAppConfigServletUrl(), OBJECT_TYPE.JSON, cb);
   }

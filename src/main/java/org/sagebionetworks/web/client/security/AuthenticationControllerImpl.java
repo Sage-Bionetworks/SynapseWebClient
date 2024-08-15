@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.security;
 
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+import static org.sagebionetworks.web.client.utils.FutureUtils.getFuture;
 
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
@@ -31,7 +32,6 @@ import org.sagebionetworks.web.client.context.QueryClientProvider;
 import org.sagebionetworks.web.client.jsinterop.reactquery.QueryClient;
 import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.LoginPlace;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
@@ -409,25 +409,28 @@ public class AuthenticationControllerImpl implements AuthenticationController {
   }
 
   @Override
-  public void checkForUserChange(Callback webAppInitializationCallback) {
+  public FluentFuture<Void> getCheckForUserChangeFuture() {
+    return getFuture(cb -> checkForUserChange(cb));
+  }
+
+  public void checkForUserChange(AsyncCallback<Void> cb) {
     String oldUserAccessToken = currentUserAccessToken;
     initializeFromExistingAccessTokenCookie(
       new AsyncCallback<UserProfile>() {
         @Override
         public void onFailure(Throwable caught) {
           jsniUtils.consoleError(caught);
-          if (webAppInitializationCallback != null) {
-            webAppInitializationCallback.invoke();
-          } else {
-            // if the exception was not due to a network failure, then log the user out
-            boolean isNetworkFailure =
-              caught instanceof UnknownErrorException ||
-              caught instanceof StatusCodeException;
-            boolean isAlreadyLoggedOut =
-              oldUserAccessToken == null && currentUserAccessToken == null;
-            if (!isNetworkFailure && !isAlreadyLoggedOut) {
-              logoutUser();
-            }
+          // if the exception was not due to a network failure, then log the user out
+          boolean isNetworkFailure =
+            caught instanceof UnknownErrorException ||
+            caught instanceof StatusCodeException;
+          boolean isAlreadyLoggedOut =
+            oldUserAccessToken == null && currentUserAccessToken == null;
+          if (!isNetworkFailure && !isAlreadyLoggedOut) {
+            logoutUser();
+          }
+          if (cb != null) {
+            cb.onSuccess(null);
           }
         }
 
@@ -439,16 +442,16 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 
           if (!Objects.equals(currentUserAccessToken, oldUserAccessToken)) {
             // we've reinitialized the app with the correct session, refresh the page (do not get rid of js state)!
-            if (webAppInitializationCallback != null) {
-              webAppInitializationCallback.invoke();
+            if (cb != null) {
+              cb.onSuccess(null);
             } else {
               ginInjector.getGlobalApplicationState().refreshPage();
             }
             checkForQuarantinedEmail();
           } else {
             // we've determined that the session has not changed
-            if (webAppInitializationCallback != null) {
-              webAppInitializationCallback.invoke();
+            if (cb != null) {
+              cb.onSuccess(null);
             }
           }
         }
