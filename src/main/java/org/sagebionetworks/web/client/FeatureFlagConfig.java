@@ -3,17 +3,25 @@ package org.sagebionetworks.web.client;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.json.client.JSONValue;
+import com.google.inject.Inject;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 
 public class FeatureFlagConfig {
 
   private final CookieProvider cookieProvider;
-  private final JSONObject config;
+  private JSONObject config;
 
-  public FeatureFlagConfig(String json, CookieProvider cookieProvider) {
-    JSONValue parsed = JSONParser.parseStrict(json);
-    config = parsed.isObject();
+  @Inject
+  public FeatureFlagConfig(CookieProvider cookieProvider) {
     this.cookieProvider = cookieProvider;
+    config = new JSONObject();
+  }
+
+  public void setJson(String json) {
+    if (json != null) {
+      JSONValue parsed = JSONParser.parseStrict(json);
+      config = parsed.isObject();
+    }
   }
 
   /**
