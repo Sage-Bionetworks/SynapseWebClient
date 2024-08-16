@@ -74,7 +74,7 @@ public class LoginWidgetViewImpl implements LoginWidgetView, IsWidget {
       ProfileArea.PROJECTS
     );
     globalAppState.gotoLastPlace(defaultPlace);
-    authController.checkForUserChange(null);
+    authController.checkForUserChange();
   }
 
   @Override
