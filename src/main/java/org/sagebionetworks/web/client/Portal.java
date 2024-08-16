@@ -112,100 +112,96 @@ public class Portal implements EntryPoint {
                           ginjector
                             .getFeatureFlagConfig()
                             .setJson(featureFlagConfig.toString());
-
-                          EventBus eventBus = ginjector.getEventBus();
-                          PlaceController placeController = new PlaceController(
-                            eventBus
-                          );
-
-                          // Start ActivityManager for the main widget with our ActivityMapper
-                          AppActivityMapper activityMapper =
-                            new AppActivityMapper(
-                              ginjector,
-                              new SynapseJSNIUtilsImpl(),
-                              null
-                            );
-                          ActivityManager activityManager = new ActivityManager(
-                            activityMapper,
-                            eventBus
-                          );
-                          activityManager.setDisplay(appWidget);
-
-                          // All pages get added to the root panel
-                          appWidget.addStyleName("rootPanel");
-
-                          // Start PlaceHistoryHandler with our PlaceHistoryMapper
-                          AppPlaceHistoryMapper historyMapper = GWT.create(
-                            AppPlaceHistoryMapper.class
-                          );
-                          final PlaceHistoryHandler historyHandler =
-                            new PlaceHistoryHandler(
-                              historyMapper,
-                              new Html5Historian()
-                            );
-                          historyHandler.register(
-                            placeController,
-                            eventBus,
-                            AppActivityMapper.getDefaultPlace()
-                          );
-                          Header header = ginjector.getHeader();
-                          RootPanel.get("headerPanel").add(header);
-                          Footer footer = ginjector.getFooter();
-                          RootPanel.get("footerPanel").add(footer);
-
-                          RootPanel.get("rootPanel").add(appWidget);
-                          RootPanel.get("initialLoadingUI").setVisible(false);
-                          fullOpacity(
-                            RootPanel.get("headerPanel"),
-                            RootPanel.get("rootPanel")
-                          );
-                          final GlobalApplicationState globalApplicationState =
-                            ginjector.getGlobalApplicationState();
-                          globalApplicationState.setPlaceController(
-                            placeController
-                          );
-                          globalApplicationState.setAppPlaceHistoryMapper(
-                            historyMapper
-                          );
-                          globalApplicationState.init(
-                            new Callback() {
-                              @Override
-                              public void invoke() {
-                                // listen for window close (or navigating away)
-                                registerWindowClosingHandler(
-                                  globalApplicationState
-                                );
-                                registerOnPopStateHandler(
-                                  globalApplicationState
-                                );
-
-                                // start version timer
-                                ginjector.getVersionTimer().start();
-                                // start timer to check for Synapse outage or scheduled maintenance
-                                ginjector.getSynapseStatusDetector().start();
-                                // Goes to place represented on URL or default place
-                                historyHandler.handleCurrentHistory();
-                                globalApplicationState.initializeDropZone();
-                                globalApplicationState.initializeToastContainer();
-                                // initialize the view default columns so that they're ready when we need them (do this by constructing that singleton object)
-                                ginjector.getViewDefaultColumns();
-
-                                // start timer to check for user session state change (session expired, or user explicitly logged
-                                // out).  Backend endpoints must be set before starting this (because it attempts to get "my user profile")
-                                ginjector.getSessionDetector().start();
-
-                                // start a timer to check to see if we're approaching the max allowable space in the web storage.
-                                // clears out the web storage (cache) if this is the case.
-                                ginjector
-                                  .getWebStorageMaxSizeDetector()
-                                  .start();
-                              }
-                            }
-                          );
                         } catch (Exception e1) {
-                          // TODO Auto-generated catch block
+                          // Error in feature flag initialization
                           e1.printStackTrace();
                         }
+                        EventBus eventBus = ginjector.getEventBus();
+                        PlaceController placeController = new PlaceController(
+                          eventBus
+                        );
+
+                        // Start ActivityManager for the main widget with our ActivityMapper
+                        AppActivityMapper activityMapper =
+                          new AppActivityMapper(
+                            ginjector,
+                            new SynapseJSNIUtilsImpl(),
+                            null
+                          );
+                        ActivityManager activityManager = new ActivityManager(
+                          activityMapper,
+                          eventBus
+                        );
+                        activityManager.setDisplay(appWidget);
+
+                        // All pages get added to the root panel
+                        appWidget.addStyleName("rootPanel");
+
+                        // Start PlaceHistoryHandler with our PlaceHistoryMapper
+                        AppPlaceHistoryMapper historyMapper = GWT.create(
+                          AppPlaceHistoryMapper.class
+                        );
+                        final PlaceHistoryHandler historyHandler =
+                          new PlaceHistoryHandler(
+                            historyMapper,
+                            new Html5Historian()
+                          );
+                        historyHandler.register(
+                          placeController,
+                          eventBus,
+                          AppActivityMapper.getDefaultPlace()
+                        );
+                        Header header = ginjector.getHeader();
+                        RootPanel.get("headerPanel").add(header);
+                        Footer footer = ginjector.getFooter();
+                        RootPanel.get("footerPanel").add(footer);
+
+                        RootPanel.get("rootPanel").add(appWidget);
+                        RootPanel.get("initialLoadingUI").setVisible(false);
+                        fullOpacity(
+                          RootPanel.get("headerPanel"),
+                          RootPanel.get("rootPanel")
+                        );
+                        final GlobalApplicationState globalApplicationState =
+                          ginjector.getGlobalApplicationState();
+                        globalApplicationState.setPlaceController(
+                          placeController
+                        );
+                        globalApplicationState.setAppPlaceHistoryMapper(
+                          historyMapper
+                        );
+                        globalApplicationState.init(
+                          new Callback() {
+                            @Override
+                            public void invoke() {
+                              // listen for window close (or navigating away)
+                              registerWindowClosingHandler(
+                                globalApplicationState
+                              );
+                              registerOnPopStateHandler(globalApplicationState);
+
+                              // start version timer
+                              ginjector.getVersionTimer().start();
+                              // start timer to check for Synapse outage or scheduled maintenance
+                              ginjector.getSynapseStatusDetector().start();
+                              // Goes to place represented on URL or default place
+                              historyHandler.handleCurrentHistory();
+                              globalApplicationState.initializeDropZone();
+                              globalApplicationState.initializeToastContainer();
+                              // initialize the view default columns so that they're ready when we need them (do this by constructing that singleton object)
+                              ginjector.getViewDefaultColumns();
+
+                              // start timer to check for user session state change (session expired, or user explicitly logged
+                              // out).  Backend endpoints must be set before starting this (because it attempts to get "my user profile")
+                              ginjector.getSessionDetector().start();
+
+                              // start a timer to check to see if we're approaching the max allowable space in the web storage.
+                              // clears out the web storage (cache) if this is the case.
+                              ginjector.getWebStorageMaxSizeDetector().start();
+                            }
+                          }
+                        );
+
                         return null;
                       },
                       directExecutor()
