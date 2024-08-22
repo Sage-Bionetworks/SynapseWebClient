@@ -11,7 +11,7 @@ test.describe('Homepage - Unauthenticated', () => {
 
     await expect(
       page.getByRole('link', { name: 'Log in to Synapse' }),
-    ).toHaveCount(2)
+    ).toHaveCount(1)
     await expect(
       page.getByRole('link', { name: 'View Your Dashboard' }),
     ).toHaveCount(0)
@@ -22,7 +22,7 @@ testAuth.describe('Homepage - Authenticated', () => {
   testAuth(
     'should show View Your Dashboard button when logged in',
     async ({ userPage }) => {
-      await userPage.goto('/')
+      await userPage.goto('/Home:x')
       await waitForInitialPageLoad(userPage)
 
       await expect(
@@ -30,7 +30,7 @@ testAuth.describe('Homepage - Authenticated', () => {
       ).toHaveCount(0)
       await expect(
         userPage.getByRole('link', { name: 'View Your Dashboard' }),
-      ).toHaveCount(2)
+      ).toHaveCount(1)
     },
   )
 })
