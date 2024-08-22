@@ -36,6 +36,10 @@ public abstract class HasStyle<T extends PropsWithStyle>
         this.props = (T) JsPropertyMap.of();
       }
 
+      if (this.props.style == null) {
+        this.props.style = (JsPropertyMap<String>) new JsObject();
+      }
+
       this.props.style.set("display", "none");
       setStyle(this.props.style);
     }

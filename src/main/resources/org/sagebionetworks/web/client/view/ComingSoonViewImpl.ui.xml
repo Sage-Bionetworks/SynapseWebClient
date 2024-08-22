@@ -2,8 +2,6 @@
 <ui:UiBinder
   xmlns:ui="urn:ui:com.google.gwt.uibinder"
   xmlns:g="urn:import:com.google.gwt.user.client.ui"
-  xmlns:c="urn:import:com.google.gwt.user.cellview.client"
-  xmlns:s="urn:import:org.sagebionetworks.web.client.view"
   xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
   xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
