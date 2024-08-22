@@ -74,8 +74,19 @@ import org.sagebionetworks.repo.model.table.TableUpdateTransactionResponse;
 import org.sagebionetworks.repo.model.table.VirtualTable;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
-import org.sagebionetworks.web.client.*;
+import org.sagebionetworks.web.client.ChallengeClientAsync;
+import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.NotificationVariant;
+import org.sagebionetworks.web.client.EntityTypeUtils;
+import org.sagebionetworks.web.client.FeatureFlagConfig;
+import org.sagebionetworks.web.client.FeatureFlagKey;
+import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PopupUtilsView;
+import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.context.KeyFactoryProvider;
 import org.sagebionetworks.web.client.context.QueryClientProvider;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -99,7 +110,6 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.EntityTypeIcon;
-import org.sagebionetworks.web.client.widget.EntityTypeIconImpl;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
@@ -127,7 +137,6 @@ import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTab;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
-import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidgetImpl;
 import org.sagebionetworks.web.client.widget.sharing.EntityAccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.statistics.StatisticsPlotWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
@@ -730,7 +739,9 @@ public class EntityActionControllerImpl
   private void configureFullTextSearch() {
     if (
       entityBundle.getEntity() instanceof Table &&
-      entityBundle.getPermissions().getCanCertifiedUserEdit()
+      entityBundle.getPermissions().getCanCertifiedUserEdit() &&
+      // SWC-7033: available if table is not a VirtualTable
+      !(entityBundle.getEntity() instanceof VirtualTable)
     ) {
       Table tableEntity = (Table) entityBundle.getEntity();
       actionMenu.setActionVisible(Action.TOGGLE_FULL_TEXT_SEARCH, true);

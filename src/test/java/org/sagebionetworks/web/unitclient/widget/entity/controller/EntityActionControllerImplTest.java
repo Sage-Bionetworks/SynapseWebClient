@@ -27,7 +27,21 @@ import static org.sagebionetworks.web.client.DisplayConstants.VIEW_DOWNLOAD_LIST
 import static org.sagebionetworks.web.client.DisplayConstants.VIRTUAL_TABLE;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getDoneFuture;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getFailedFuture;
-import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.*;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.ACCESS_REQUIREMENT_GUIDANCE;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.ARE_YOU_SURE_YOU_WANT_TO_DELETE;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETE_CONTAINER_EXPLANATION_END;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETE_CONTAINER_EXPLANATION_START;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETE_PREFIX;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.EDIT_NAME_AND_DESCRIPTION;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.EDIT_WIKI_PREFIX;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.ENABLE_2FA_GUIDANCE;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.MOVE_PREFIX;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.NO_PERMISSION_TO_DOWNLOAD;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.REQUEST_DOWNLOAD_GUIDANCE;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.THE;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.UPDATE_DOI_FOR;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.WAS_SUCCESSFULLY_DELETED;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.WIKI;
 import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_COLLECTOR_URL;
 import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_DESCRIPTION_PART_1;
 import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_PRIORITY;
@@ -656,6 +670,22 @@ public class EntityActionControllerImplTest {
       .setActionVisible(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, false);
     verify(mockActionMenu).setActionVisible(Action.EDIT_DEFINING_SQL, false);
     verify(mockActionMenu).setActionVisible(Action.VIEW_DEFINING_SQL, false);
+  }
+
+  @Test
+  public void testFullTableSearchUnavailableForVirtualTableEntity() {
+    entityBundle.setEntity(new VirtualTable());
+
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+    verify(mockActionMenu)
+      .setActionVisible(Action.TOGGLE_FULL_TEXT_SEARCH, false);
   }
 
   @Test
