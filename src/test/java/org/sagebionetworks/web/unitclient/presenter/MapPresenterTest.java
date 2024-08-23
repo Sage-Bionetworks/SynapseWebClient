@@ -41,8 +41,8 @@ public class MapPresenterTest {
   @Test
   public void testConstructor() {
     verify(mockView).setPresenter(presenter);
-    verify(mockView).setMap(any(Widget.class));
-    verify(mockView).setTeamBadge(any(Widget.class));
+    verify(mockView).setMap(any());
+    verify(mockView).setTeamBadge(any());
   }
 
   @Test

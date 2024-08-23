@@ -15,7 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.ProjectHeaderList;
 import org.sagebionetworks.repo.model.ProjectListSortColumn;
@@ -31,7 +31,7 @@ import org.sagebionetworks.web.client.widget.team.controller.TeamProjectsModalWi
 import org.sagebionetworks.web.client.widget.team.controller.TeamProjectsModalWidgetView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class TeamProjectsModalWidgetTest {
 
   TeamProjectsModalWidget presenter;
@@ -93,14 +93,7 @@ public class TeamProjectsModalWidgetTest {
     AsyncMockStubber
       .callSuccessWith(mockProjectHeaderList)
       .when(mockJsClient)
-      .getProjectsForTeam(
-        anyString(),
-        anyInt(),
-        anyString(),
-        any(ProjectListSortColumn.class),
-        any(SortDirection.class),
-        any(AsyncCallback.class)
-      );
+      .getProjectsForTeam(any(), anyInt(), any(), any(), any(), any());
   }
 
   @Test
@@ -128,7 +121,7 @@ public class TeamProjectsModalWidgetTest {
       );
     // added the 2 project badges
     verify(mockGinInjector, times(2)).getProjectBadgeWidget();
-    verify(mockLoadMoreWidgetContainer, times(2)).add(any(Widget.class));
+    verify(mockLoadMoreWidgetContainer, times(2)).add(any());
   }
 
   @Test

@@ -22,7 +22,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.annotation.v2.Annotations;
 import org.sagebionetworks.repo.model.annotation.v2.AnnotationsValue;
@@ -39,7 +39,7 @@ import org.sagebionetworks.web.client.widget.entity.annotation.EditAnnotationsDi
 import org.sagebionetworks.web.client.widget.entity.annotation.EditAnnotationsDialogView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class EditAnnotationsDialogTest {
 
   private static final String ENTITY_ID = "88888888";
@@ -121,7 +121,7 @@ public class EditAnnotationsDialogTest {
 
     // verify a single annotation editor is still added by default
     verify(mockPortalGinInjector).getAnnotationEditor();
-    verify(mockView).addAnnotationEditor(any(Widget.class));
+    verify(mockView).addAnnotationEditor(any());
     verify(mockView).showEditor();
 
     assertEquals(1, dialog.getAnnotationEditors().size());
@@ -134,7 +134,7 @@ public class EditAnnotationsDialogTest {
     // verify the 3 annotation editors are created and added to the view
     verify(mockPortalGinInjector, times(3)).getAnnotationEditor();
     verify(mockView).showEditor();
-    verify(mockView, times(3)).addAnnotationEditor(any(Widget.class));
+    verify(mockView, times(3)).addAnnotationEditor(any());
 
     assertEquals(dialog.getAnnotationsCopy(), annotations);
     assertEquals(3, dialog.getAnnotationEditors().size());
@@ -168,7 +168,7 @@ public class EditAnnotationsDialogTest {
     // before delete, 2 editors
     assertEquals(2, dialog.getAnnotationEditors().size());
     deletedCallback.invoke();
-    verify(mockView).removeAnnotationEditor(any(Widget.class));
+    verify(mockView).removeAnnotationEditor(any());
 
     assertEquals(1, dialog.getAnnotationEditors().size());
   }

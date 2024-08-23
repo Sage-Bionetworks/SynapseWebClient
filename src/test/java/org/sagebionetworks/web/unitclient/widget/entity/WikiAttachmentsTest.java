@@ -91,14 +91,11 @@ public class WikiAttachmentsTest {
     AsyncMockStubber
       .callFailureWith(new Exception())
       .when(mockSynapseClient)
-      .getV2WikiAttachmentHandles(
-        any(WikiPageKey.class),
-        any(AsyncCallback.class)
-      );
+      .getV2WikiAttachmentHandles(any(), any());
     presenter.configure(
       new WikiPageKey("syn1234", ObjectType.ENTITY.toString(), "")
     );
-    verify(mockView).showErrorMessage(anyString());
+    verify(mockView).showErrorMessage(any());
   }
 
   @Test

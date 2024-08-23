@@ -16,7 +16,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
@@ -30,7 +30,7 @@ import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequiremen
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class AccessRequirementPresenterTest {
 
   AccessRequirementPresenter presenter;
@@ -89,8 +89,8 @@ public class AccessRequirementPresenterTest {
 
   @Test
   public void testConstruction() {
-    verify(mockArDiv).add(any(Widget.class));
-    verify(mockView).add(any(Widget.class));
+    verify(mockArDiv).add(any());
+    verify(mockView).add(any());
   }
 
   @Test

@@ -11,14 +11,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.internal.util.reflection.Whitebox;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.web.server.StackEndpoints;
 import org.sagebionetworks.web.server.servlet.SynapseClientBase;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
+import org.springframework.test.util.ReflectionTestUtils;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class SynapseClientBaseTest {
 
   @Mock
@@ -56,12 +56,12 @@ public class SynapseClientBaseTest {
     synapseClientBase = new SynapseClientBase();
     when(mockSynapseProvider.createNewClient(anyString()))
       .thenReturn(mockSynapseClient);
-    Whitebox.setInternalState(
+    ReflectionTestUtils.setField(
       synapseClientBase,
       "synapseProvider",
       mockSynapseProvider
     );
-    Whitebox.setInternalState(
+    ReflectionTestUtils.setField(
       synapseClientBase,
       "perThreadRequest",
       mockThreadLocal

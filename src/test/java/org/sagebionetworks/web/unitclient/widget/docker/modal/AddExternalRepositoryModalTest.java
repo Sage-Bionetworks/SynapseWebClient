@@ -48,7 +48,7 @@ public class AddExternalRepositoryModalTest {
   @Test
   public void testConstructor() {
     verify(mockView).setPresenter(modal);
-    verify(mockView).setAlert(any(Widget.class));
+    verify(mockView).setAlert(any());
     verify(mockView).setModalTitle(ADD_EXTERNAL_REPO_MODAL_TITLE);
   }
 

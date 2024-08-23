@@ -130,14 +130,11 @@ public class HtmlPreviewWidgetTest {
     RequestBuilderMockStubber
       .callOnResponseReceived(null, mockResponse)
       .when(mockRequestBuilder)
-      .sendRequest(anyString(), any(RequestCallback.class));
+      .sendRequest(any(), any());
     AsyncMockStubber
       .callSuccessWith(mockFileResult)
       .when(mockPresignedURLAsyncHandler)
-      .getFileResult(
-        any(FileHandleAssociation.class),
-        any(AsyncCallback.class)
-      );
+      .getFileResult(any(), any());
     when(mockFileResult.getPreSignedURL()).thenReturn(PRESIGNED_URL);
     when(mockFileHandle.getContentSize()).thenReturn(2L);
     when(mockFileHandle.getId()).thenReturn(FILE_HANDLE_ID);
@@ -174,10 +171,7 @@ public class HtmlPreviewWidgetTest {
     AsyncMockStubber
       .callFailureWith(ex)
       .when(mockPresignedURLAsyncHandler)
-      .getFileResult(
-        any(FileHandleAssociation.class),
-        any(AsyncCallback.class)
-      );
+      .getFileResult(any(), any());
 
     previewWidget.configure(ENTITY_ID, mockFileHandle);
 

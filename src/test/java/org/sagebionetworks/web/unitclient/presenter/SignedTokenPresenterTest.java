@@ -21,7 +21,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.JoinTeamSignedToken;
 import org.sagebionetworks.repo.model.ResponseMessage;
@@ -44,7 +44,7 @@ import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class SignedTokenPresenterTest {
 
   SignedTokenPresenter presenter;
@@ -116,28 +116,24 @@ public class SignedTokenPresenterTest {
     AsyncMockStubber
       .callSuccessWith(responseMessage)
       .when(mockSynapseClient)
-      .handleSignedToken(
-        any(SignedTokenInterface.class),
-        anyString(),
-        any(AsyncCallback.class)
-      );
+      .handleSignedToken(any(), any(), any());
 
     // by default, decode into a JoinTeamSignedToken
     AsyncMockStubber
       .callSuccessWith(defaultToken)
       .when(mockSynapseClient)
-      .hexDecodeAndDeserialize(anyString(), any(AsyncCallback.class));
+      .hexDecodeAndDeserialize(any(), any());
 
-    verify(mockView).setSynapseAlert(any(Widget.class));
+    verify(mockView).setSynapseAlert(any());
     verify(mockView).setPresenter(presenter);
-    verify(mockView).setUnsubscribingUserBadge(any(Widget.class));
+    verify(mockView).setUnsubscribingUserBadge(any());
     // by default, the team has no access requirements (so it should just handle the signed token like
     // any other signed token request).
     accessRequirements = new ArrayList<AccessRequirement>();
     AsyncMockStubber
       .callSuccessWith(accessRequirements)
       .when(mockSynapseClient)
-      .getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
+      .getTeamAccessRequirements(any(), any());
     when(mockGlobalApplicationState.getPlaceChanger())
       .thenReturn(mockPlaceChanger);
   }
@@ -232,7 +228,7 @@ public class SignedTokenPresenterTest {
     AsyncMockStubber
       .callFailureWith(ex)
       .when(mockSynapseClient)
-      .getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
+      .getTeamAccessRequirements(any(), any());
     presenter.setPlace(testPlace);
 
     verify(mockSynapseAlert).handleException(ex);
@@ -244,12 +240,12 @@ public class SignedTokenPresenterTest {
     AsyncMockStubber
       .callSuccessWith(new JoinTeamSignedToken())
       .when(mockSynapseClient)
-      .hexDecodeAndDeserialize(anyString(), any(AsyncCallback.class));
+      .hexDecodeAndDeserialize(any(), any());
     presenter.setPlace(testPlace);
 
     // verify rpc attempt, and simulate an UnauthorizedException
     verify(mockSynapseClient)
-      .getTeamAccessRequirements(anyString(), asyncCaptor.capture());
+      .getTeamAccessRequirements(any(), asyncCaptor.capture());
     Exception ex = new UnauthorizedException("bad session");
     asyncCaptor.getValue().onFailure(ex);
     verify(mockAuthenticationController).logoutUser();
@@ -257,7 +253,7 @@ public class SignedTokenPresenterTest {
 
     // verify that it tried to call rpc again
     verify(mockSynapseClient, times(2))
-      .getTeamAccessRequirements(anyString(), asyncCaptor.capture());
+      .getTeamAccessRequirements(any(), asyncCaptor.capture());
     // if the second attempt is successful, then it should try to handle the signed token.
     asyncCaptor.getAllValues().get(1).onSuccess(accessRequirements);
     verify(mockSynapseClient)
@@ -274,12 +270,12 @@ public class SignedTokenPresenterTest {
     AsyncMockStubber
       .callSuccessWith(new JoinTeamSignedToken())
       .when(mockSynapseClient)
-      .hexDecodeAndDeserialize(anyString(), any(AsyncCallback.class));
+      .hexDecodeAndDeserialize(any(), any());
     presenter.setPlace(testPlace);
 
     // verify rpc attempt, and simulate an UnauthorizedException
     verify(mockSynapseClient)
-      .getTeamAccessRequirements(anyString(), asyncCaptor.capture());
+      .getTeamAccessRequirements(any(), asyncCaptor.capture());
     Exception ex = new UnauthorizedException("bad session");
     asyncCaptor.getValue().onFailure(ex);
     verify(mockAuthenticationController).logoutUser();
@@ -287,7 +283,7 @@ public class SignedTokenPresenterTest {
 
     // verify that it tried to call rpc again
     verify(mockSynapseClient, times(2))
-      .getTeamAccessRequirements(anyString(), asyncCaptor.capture());
+      .getTeamAccessRequirements(any(), asyncCaptor.capture());
     // if it runs into another error (even if it's an UnauthorizedException) it should not try again.
     asyncCaptor.getAllValues().get(1).onFailure(ex);
     verify(mockSynapseAlert).handleException(ex);

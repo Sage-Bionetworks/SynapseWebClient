@@ -218,13 +218,13 @@ public class ForumWidgetTest {
   @SuppressWarnings({ "unchecked" })
   @Test
   public void testConstruction() {
-    verify(mockView).setThreadList(any(Widget.class));
-    verify(mockView).setNewThreadModal(any(Widget.class));
+    verify(mockView).setThreadList(any());
+    verify(mockView).setNewThreadModal(any());
     verify(mockView).setPresenter(forumWidget);
-    verify(mockView).setAlert(any(Widget.class));
-    verify(mockView).setSingleThread(any(Widget.class));
-    verify(mockView).setSubscribeButton(any(Widget.class));
-    verify(mockView).setSubscribersWidget(any(Widget.class));
+    verify(mockView).setAlert(any());
+    verify(mockView).setSingleThread(any());
+    verify(mockView).setSubscribeButton(any());
+    verify(mockView).setSubscribersWidget(any());
 
     ArgumentCaptor<Callback> captor = ArgumentCaptor.forClass(Callback.class);
     verify(mockSubscribeButtonWidget).setOnSubscribeCallback(captor.capture());
@@ -241,13 +241,7 @@ public class ForumWidgetTest {
       CallbackP.class
     );
     verify(mockAvailableThreadListWidget)
-      .configure(
-        anyString(),
-        anyBoolean(),
-        anySet(),
-        captorP.capture(),
-        any(DiscussionFilter.class)
-      );
+      .configure(any(), any(), any(), captorP.capture(), any());
 
     Set<String> moderatorIds = new HashSet<String>();
     Callback deleteCallback = null;
@@ -300,10 +294,10 @@ public class ForumWidgetTest {
     callbackCaptor.getValue().invoke();
     verify(mockAvailableThreadListWidget)
       .configure(
-        anyString(),
-        anyBoolean(),
-        anySet(),
-        any(CallbackP.class),
+        any(),
+        any(),
+        any(),
+        any(),
         eq(DiscussionFilter.EXCLUDE_DELETED)
       );
     verify(mockSubscribersWidget).configure(any(Topic.class));
@@ -316,10 +310,10 @@ public class ForumWidgetTest {
     callbackCaptor.getValue().invoke();
     verify(mockAvailableThreadListWidget)
       .configure(
-        anyString(),
-        anyBoolean(),
-        anySet(),
-        any(CallbackP.class),
+        any(),
+        any(),
+        any(),
+        any(),
         eq(DiscussionFilter.EXCLUDE_DELETED)
       );
     verify(mockSubscribersWidget).configure(any(Topic.class));
@@ -502,10 +496,9 @@ public class ForumWidgetTest {
     AsyncMockStubber
       .callSuccessWith(mockDiscussionThreadBundle)
       .when(mockSynapseJavascriptClient)
-      .getThread(anyString(), any(AsyncCallback.class));
+      .getThread(any(), any());
     threadIdClickedCallback.invoke(mockDiscussionThreadBundle);
-    verify(mockSynapseJavascriptClient)
-      .getThread(eq(threadId), any(AsyncCallback.class));
+    verify(mockSynapseJavascriptClient).getThread(eq(threadId), any());
 
     // going back to the forum should cause the thread list to reconfigure if thread was deleted
     reset(mockAvailableThreadListWidget);
@@ -515,10 +508,10 @@ public class ForumWidgetTest {
     );
     verify(mockDiscussionThreadWidget)
       .configure(
-        any(DiscussionThreadBundle.class),
-        anyString(),
+        any(),
+        any(),
         anyBoolean(),
-        anySet(),
+        any(),
         eq(mockActionMenuWidget),
         onShowAllThreadsCallback.capture()
       );

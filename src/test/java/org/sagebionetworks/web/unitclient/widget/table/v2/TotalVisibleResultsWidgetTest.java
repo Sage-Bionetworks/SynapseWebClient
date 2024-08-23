@@ -17,7 +17,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.EntityRef;
 import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.EntityView;
@@ -30,7 +30,7 @@ import org.sagebionetworks.web.client.widget.table.v2.TotalVisibleResultsWidget;
 import org.sagebionetworks.web.client.widget.table.v2.TotalVisibleResultsWidgetView;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class TotalVisibleResultsWidgetTest {
 
   TotalVisibleResultsWidget widget;

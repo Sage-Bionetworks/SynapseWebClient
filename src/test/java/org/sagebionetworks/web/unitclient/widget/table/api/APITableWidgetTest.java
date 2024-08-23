@@ -30,7 +30,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.ServiceConstants;
 import org.sagebionetworks.repo.model.table.ColumnType;
@@ -63,7 +63,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.TableUnavilableException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class APITableWidgetTest {
 
   public static final String COL_1_RESULT_VALUE_1 = "result1 value 1";
@@ -281,7 +281,7 @@ public class APITableWidgetTest {
     descriptor.remove(WidgetConstants.API_TABLE_WIDGET_PATH_KEY);
     widget.configure(testWikiKey, descriptor, null, null);
     verify(mockSynAlert).showError(DisplayConstants.API_TABLE_MISSING_URI);
-    verify(mockView).showError(any(Widget.class));
+    verify(mockView).showError(any());
   }
 
   // test uri call failure causes view to render error
@@ -295,7 +295,7 @@ public class APITableWidgetTest {
       .getJSON(anyString(), any(AsyncCallback.class));
     widget.configure(testWikiKey, descriptor, null, null);
     verify(mockSynAlert).handleException(ex);
-    verify(mockView).showError(any(Widget.class));
+    verify(mockView).showError(any());
   }
 
   @Test

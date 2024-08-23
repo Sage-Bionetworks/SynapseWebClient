@@ -149,13 +149,9 @@ public class RegisterTeamDialogTest {
     AsyncMockStubber
       .callFailureWith(new Exception())
       .when(mockChallengeClient)
-      .getRegistratableTeams(
-        anyString(),
-        anyString(),
-        any(AsyncCallback.class)
-      );
+      .getRegistratableTeams(any(), any(), any());
     widget.configure(CHALLENGE_ID, mockCallback);
-    verify(mockView).showErrorMessage(anyString());
+    verify(mockView).showErrorMessage(any());
   }
 
   @Test
@@ -196,10 +192,7 @@ public class RegisterTeamDialogTest {
     AsyncMockStubber
       .callFailureWith(new Exception())
       .when(mockChallengeClient)
-      .registerChallengeTeam(
-        any(ChallengeTeam.class),
-        any(AsyncCallback.class)
-      );
+      .registerChallengeTeam(any(), any());
     widget.configure(CHALLENGE_ID, mockCallback);
     widget.onOk();
     verify(mockChallengeClient)
@@ -207,6 +200,6 @@ public class RegisterTeamDialogTest {
         any(ChallengeTeam.class),
         any(AsyncCallback.class)
       );
-    verify(mockView).showErrorMessage(anyString());
+    verify(mockView).showErrorMessage(any());
   }
 }

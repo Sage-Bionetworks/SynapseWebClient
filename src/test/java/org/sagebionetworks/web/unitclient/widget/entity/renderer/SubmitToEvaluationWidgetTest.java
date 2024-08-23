@@ -26,7 +26,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.ObjectType;
@@ -47,7 +47,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class SubmitToEvaluationWidgetTest {
 
   private static final String EVALUATION_2_SUBMISSION_RECEIPT_MESSAGE =
@@ -162,7 +162,7 @@ public class SubmitToEvaluationWidgetTest {
         anyInt(),
         any(AsyncCallback.class)
       );
-    verify(mockView).configure(anyString());
+    verify(mockView).configure(any());
   }
 
   @Test
@@ -197,7 +197,7 @@ public class SubmitToEvaluationWidgetTest {
     verify(mockChallengeClient)
       .getChallengeEvaluationIds(anyString(), any(AsyncCallback.class));
     verify(mockCallback, never()).invoke(anySet());
-    verify(mockView).showUnavailable(anyString());
+    verify(mockView).showUnavailable(any());
   }
 
   @Test
@@ -248,7 +248,7 @@ public class SubmitToEvaluationWidgetTest {
     verify(mockChallengeClient)
       .getProjectEvaluationIds(anyString(), any(AsyncCallback.class));
     verify(mockCallback, never()).invoke(anySet());
-    verify(mockView).showUnavailable(anyString());
+    verify(mockView).showUnavailable(any());
   }
 
   @Test
@@ -322,8 +322,7 @@ public class SubmitToEvaluationWidgetTest {
     when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
     widget.submitToChallengeClicked();
     verify(mockView, times(0)).showAnonymousRegistrationMessage();
-    verify(mockEvaluationSubmitter)
-      .configure(any(Entity.class), anySet(), eq(null));
+    verify(mockEvaluationSubmitter).configure(any(), any(), eq(null));
   }
 
   @Test
@@ -345,7 +344,7 @@ public class SubmitToEvaluationWidgetTest {
     widget.submitToChallengeClicked();
 
     verify(mockEvaluationSubmitter)
-      .configure(any(Entity.class), anySet(), formParamsCaptor.capture());
+      .configure(any(), anySet(), formParamsCaptor.capture());
     FormParams formParams = formParamsCaptor.getValue();
     assertEquals(formContainerId, formParams.getContainerSynId());
     assertEquals(schemaId, formParams.getJsonSchemaSynId());

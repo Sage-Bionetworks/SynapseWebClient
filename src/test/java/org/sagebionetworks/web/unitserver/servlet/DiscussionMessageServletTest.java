@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.unitserver.servlet;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
@@ -60,10 +61,9 @@ public class DiscussionMessageServletTest {
     ReflectionTestUtils.setField(servlet, "tokenProvider", mockTokenProvider);
 
     URL resolvedUrl = new URL("http://localhost/file.png");
-    when(mockSynapse.getThreadUrl(anyString())).thenReturn(resolvedUrl);
-    when(mockSynapse.getReplyUrl(anyString())).thenReturn(resolvedUrl);
-    when(mockSynapseProvider.createNewClient(anyString()))
-      .thenReturn(mockSynapse);
+    when(mockSynapse.getThreadUrl(any())).thenReturn(resolvedUrl);
+    when(mockSynapse.getReplyUrl(any())).thenReturn(resolvedUrl);
+    when(mockSynapseProvider.createNewClient(any())).thenReturn(mockSynapse);
     when(mockResponse.getOutputStream()).thenReturn(responseOutputStream);
     when(mockRequest.getRequestURL())
       .thenReturn(new StringBuffer("https://www.synapse.org/"));
@@ -157,6 +157,6 @@ public class DiscussionMessageServletTest {
     servlet.doGet(mockRequest, mockResponse);
 
     verify(mockResponse)
-      .sendError(eq(HttpServletResponse.SC_BAD_REQUEST), anyString());
+      .sendError(eq(HttpServletResponse.SC_BAD_REQUEST), any());
   }
 }

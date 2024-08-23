@@ -121,7 +121,7 @@ public class GlobalApplicationStateImplTest {
     AsyncMockStubber
       .callSuccessWith("v1")
       .when(mockJsClient)
-      .getSynapseVersions(any(AsyncCallback.class));
+      .getSynapseVersions(any());
 
     globalApplicationState =
       new GlobalApplicationStateImpl(
@@ -398,15 +398,15 @@ public class GlobalApplicationStateImplTest {
     globalApplicationState.pushCurrentPlace(mockPlace);
     // should have set the last place (to the current), and the current place (as requested)
     verify(mockSessionStorage)
-      .setItem(eq(GlobalApplicationStateImpl.LAST_PLACE), anyString());
+      .setItem(eq(GlobalApplicationStateImpl.LAST_PLACE), any());
     verify(mockGWT).newItem(newToken, false);
 
     // if I push the same place again, it should not push the history state again
-    when(mockAppPlaceHistoryMapper.getPlace(anyString())).thenReturn(mockPlace);
+    when(mockAppPlaceHistoryMapper.getPlace(any())).thenReturn(mockPlace);
     globalApplicationState.pushCurrentPlace(mockPlace);
     // verify that these were still only called once
     verify(mockSessionStorage)
-      .setItem(eq(GlobalApplicationStateImpl.LAST_PLACE), anyString());
+      .setItem(eq(GlobalApplicationStateImpl.LAST_PLACE), any());
     verify(mockGWT).newItem(newToken, false);
   }
 
@@ -418,15 +418,15 @@ public class GlobalApplicationStateImplTest {
     globalApplicationState.replaceCurrentPlace(mockPlace);
     // should have set the last place (to the current), and the current place (as requested)
     verify(mockSessionStorage)
-      .setItem(eq(GlobalApplicationStateImpl.LAST_PLACE), anyString());
+      .setItem(eq(GlobalApplicationStateImpl.LAST_PLACE), any());
     verify(mockGWT).replaceItem(newToken, false);
 
     // if I push the same place again, it should not push the history state again
-    when(mockAppPlaceHistoryMapper.getPlace(anyString())).thenReturn(mockPlace);
+    when(mockAppPlaceHistoryMapper.getPlace(any())).thenReturn(mockPlace);
     globalApplicationState.replaceCurrentPlace(mockPlace);
     // verify that these were still only called once
     verify(mockSessionStorage)
-      .setItem(eq(GlobalApplicationStateImpl.LAST_PLACE), anyString());
+      .setItem(eq(GlobalApplicationStateImpl.LAST_PLACE), any());
     verify(mockGWT).replaceItem(newToken, false);
   }
 

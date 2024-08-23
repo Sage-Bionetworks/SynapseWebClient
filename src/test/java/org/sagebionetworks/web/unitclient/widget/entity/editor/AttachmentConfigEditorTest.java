@@ -81,8 +81,8 @@ public class AttachmentConfigEditorTest {
   @Test
   public void testConstruction() {
     verify(mockView).setPresenter(editor);
-    verify(mockView).setFileInputWidget(any(Widget.class));
-    verify(mockView).setWikiAttachmentsWidget(any(Widget.class));
+    verify(mockView).setFileInputWidget(any());
+    verify(mockView).setWikiAttachmentsWidget(any());
   }
 
   @Test

@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitserver.servlet;
 
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -47,8 +48,7 @@ public class ProjectAliasServletTest {
     // unintentionally testing those classes
     mockSynapse = mock(SynapseClient.class);
     mockSynapseProvider = mock(SynapseProvider.class);
-    when(mockSynapseProvider.createNewClient(anyString()))
-      .thenReturn(mockSynapse);
+    when(mockSynapseProvider.createNewClient(any())).thenReturn(mockSynapse);
 
     mockTokenProvider = mock(TokenProvider.class);
 
@@ -80,7 +80,7 @@ public class ProjectAliasServletTest {
     ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
     verify(mockResponse).encodeRedirectURL(captor.capture());
     assertTrue(captor.getValue().endsWith("/Synapse:" + testAliasSynapseId));
-    verify(mockResponse).sendRedirect(anyString());
+    verify(mockResponse).sendRedirect(any());
   }
 
   @Test
@@ -99,7 +99,7 @@ public class ProjectAliasServletTest {
         .getValue()
         .endsWith("/Synapse:" + testAliasSynapseId + testFilesPath)
     );
-    verify(mockResponse).sendRedirect(anyString());
+    verify(mockResponse).sendRedirect(any());
   }
 
   @Test

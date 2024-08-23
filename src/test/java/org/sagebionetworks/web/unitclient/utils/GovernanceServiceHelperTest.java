@@ -57,7 +57,7 @@ public class GovernanceServiceHelperTest {
     );
     verify(mockSynapseClient)
       .createAccessApproval(any(AccessApproval.class), eq(mockCallback));
-    verify(mockCallback).onSuccess(any(AccessApproval.class));
+    verify(mockCallback).onSuccess(any());
   }
 
   @Test
@@ -83,7 +83,7 @@ public class GovernanceServiceHelperTest {
     // also check the captured entity wrapper to verify the approval object
     verify(mockSynapseClient)
       .createAccessApproval(any(AccessApproval.class), eq(mockCallback));
-    verify(mockCallback).onSuccess(any(AccessApproval.class));
+    verify(mockCallback).onSuccess(any());
 
     AccessApproval capturedWrapper = captor.getValue();
     assertEquals(accessRequirementId, capturedWrapper.getRequirementId());

@@ -54,7 +54,7 @@ public class SelectTeamModalTest {
   @Test
   public void testConstruction() {
     verify(mockView).setPresenter(widget);
-    verify(mockView).setSuggestWidget(any(Widget.class));
+    verify(mockView).setSuggestWidget(any());
     verify(mockTeamSuggestBox).setSuggestionProvider(mockProvider);
     verify(mockTeamSuggestBox).setTypeFilter(TypeFilter.TEAMS_ONLY);
   }

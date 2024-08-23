@@ -195,8 +195,8 @@ public class ManagedACTAccessRequirementWidgetTest {
   @Test
   public void testConstruction() {
     verify(mockView).setPresenter(widget);
-    verify(mockView).setWikiTermsWidget(any(Widget.class));
-    verify(mockView).setEditAccessRequirementWidget(any(Widget.class));
+    verify(mockView).setWikiTermsWidget(any());
+    verify(mockView).setEditAccessRequirementWidget(any());
     verify(mockWikiPageWidget).setModifiedCreatedByHistoryVisible(false);
     verify(mockView).setIDUReportButton(mockIduReportButton);
   }
@@ -224,12 +224,7 @@ public class ManagedACTAccessRequirementWidgetTest {
 
     widget.setRequirement(mockManagedACTAccessRequirement, mockRefreshCallback);
 
-    verify(mockWikiPageWidget)
-      .configure(
-        any(WikiPageKey.class),
-        eq(false),
-        any(WikiPageWidget.Callback.class)
-      );
+    verify(mockWikiPageWidget).configure(any(), eq(false), any());
     verify(mockView).setWikiTermsWidgetVisible(true);
     verify(mockView).setAccessRequirementName(ACCESS_REQUIREMENT_NAME);
   }

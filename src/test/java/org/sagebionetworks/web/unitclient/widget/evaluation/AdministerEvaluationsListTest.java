@@ -157,13 +157,13 @@ public class AdministerEvaluationsListTest {
     verify(mockEvalEditor).show();
     callbackCaptor.getValue().invoke();
     verify(mockChallengeClient)
-      .getSharableEvaluations(anyString(), any(AsyncCallback.class));
+      .getSharableEvaluations(any(), any(AsyncCallback.class));
   }
 
   @Test
   public void testOnShareClicked() {
     evalList.onShareClicked(e1);
-    verify(mockAclEditor).configure(eq(e1), any(Callback.class));
+    verify(mockAclEditor).configure(eq(e1), any());
     verify(mockAclEditor).show();
   }
 
@@ -178,7 +178,7 @@ public class AdministerEvaluationsListTest {
       .deleteEvaluation(eq(e1.getId()), any(AsyncCallback.class));
     // refresh
     verify(mockChallengeClient)
-      .getSharableEvaluations(anyString(), any(AsyncCallback.class));
+      .getSharableEvaluations(any(), any(AsyncCallback.class));
   }
 
   @Test

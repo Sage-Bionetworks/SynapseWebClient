@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitserver.servlet;
 
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -63,8 +64,7 @@ public class FileEntityResolverServletTest {
     MockitoAnnotations.initMocks(this);
     servlet = new FileEntityResolverServlet();
 
-    when(mockSynapseProvider.createNewClient(anyString()))
-      .thenReturn(mockSynapse);
+    when(mockSynapseProvider.createNewClient(any())).thenReturn(mockSynapse);
 
     URL resolvedUrl = new URL(resolvedUrlString);
     when(

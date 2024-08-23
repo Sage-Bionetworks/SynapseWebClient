@@ -82,13 +82,13 @@ public class UserBadgeListTest {
     list.configure();
     list.addAccessorChange(mockChange1);
     verify(mockGinInjector).getUserBadgeItem();
-    verify(mockView).addUserBadge(any(Widget.class));
+    verify(mockView).addUserBadge(any());
 
     // verify attempting to add the same user, it should ignore.
     list.addAccessorChange(mockChange1b);
     // not called again (still a single call, from the first addAccessorChange)
     verify(mockGinInjector).getUserBadgeItem();
-    verify(mockView).addUserBadge(any(Widget.class));
+    verify(mockView).addUserBadge(any());
   }
 
   @Test
@@ -110,7 +110,7 @@ public class UserBadgeListTest {
     list.addAccessorChange(mockChange1);
     list.refreshListUI();
     verify(mockView).clearUserBadges();
-    verify(mockView, times(2)).addUserBadge(any(Widget.class));
+    verify(mockView, times(2)).addUserBadge(any());
   }
 
   @Test
@@ -128,11 +128,11 @@ public class UserBadgeListTest {
     when(mockUserBadgeItem.isSelected()).thenReturn(true);
     list.deleteSelected();
     verify(mockView).clearUserBadges();
-    verify(mockView, times(1)).addUserBadge(any(Widget.class)); // only called when user added initially
+    verify(mockView, times(1)).addUserBadge(any()); // only called when user added initially
 
     // if we add it again, it should add a new user badge
     list.addAccessorChange(mockChange1);
-    verify(mockView, times(2)).addUserBadge(any(Widget.class)); // only called when user added initially
+    verify(mockView, times(2)).addUserBadge(any()); // only called when user added initially
   }
 
   @Test
@@ -144,11 +144,11 @@ public class UserBadgeListTest {
       .thenReturn(mockUserBadgeItem, mockUserBadgeItem2);
     list.addAccessorChange(mockChange1);
     list.addAccessorChange(mockChange2);
-    verify(mockView, times(2)).addUserBadge(any(Widget.class));
+    verify(mockView, times(2)).addUserBadge(any());
     reset(mockView);
     list.deleteSelected();
     verify(mockView).clearUserBadges();
-    verify(mockView, times(1)).addUserBadge(any(Widget.class));
+    verify(mockView, times(1)).addUserBadge(any());
   }
 
   @Test

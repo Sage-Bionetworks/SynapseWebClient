@@ -89,8 +89,8 @@ public class ImageConfigEditorTest {
   @Test
   public void testConstruction() {
     verify(mockView).setPresenter(editor);
-    verify(mockView).setFileInputWidget(any(Widget.class));
-    verify(mockView).setWikiAttachmentsWidget(any(Widget.class));
+    verify(mockView).setFileInputWidget(any());
+    verify(mockView).setWikiAttachmentsWidget(any());
     verify(mockFileInputWidget).configure(any(CallbackP.class));
     verify(mockAttachments).configure(any(WikiPageKey.class));
   }

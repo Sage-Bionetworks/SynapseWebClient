@@ -76,7 +76,7 @@ public class CytoscapeWidgetTest {
     RequestBuilderMockStubber
       .callOnResponseReceived(null, mockResponse)
       .when(mockRequestBuilder)
-      .sendRequest(anyString(), any(RequestCallback.class));
+      .sendRequest(any(), any());
   }
 
   @Test
@@ -113,7 +113,7 @@ public class CytoscapeWidgetTest {
     widget.configure(wikiKey, descriptor, null, null);
 
     verify(mockRequestBuilder, times(2))
-      .configure(eq(RequestBuilder.GET), anyString());
+      .configure(eq(RequestBuilder.GET), any());
     verify(mockView)
       .configure(CYTOSCAPE_JS_JSON_TEST, CYTOSCAPE_JS_JSON_TEST, height);
     verify(mockView).setGraphVisible(true);
@@ -125,7 +125,7 @@ public class CytoscapeWidgetTest {
     RequestBuilderMockStubber
       .callOnError(null, e)
       .when(mockRequestBuilder)
-      .sendRequest(anyString(), any(RequestCallback.class));
+      .sendRequest(any(), any());
     Map<String, String> descriptor = new HashMap<String, String>();
     descriptor.put(WidgetConstants.SYNAPSE_ID_KEY, CYTOSCAPE_JS_ENTITY_ID);
 

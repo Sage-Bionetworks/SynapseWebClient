@@ -47,14 +47,11 @@ public class EditRegisterTeamDialogTest {
     AsyncMockStubber
       .callSuccessWith(challengeTeam)
       .when(mockChallengeClient)
-      .updateRegisteredChallengeTeam(
-        any(ChallengeTeam.class),
-        any(AsyncCallback.class)
-      );
+      .updateRegisteredChallengeTeam(any(), any());
     AsyncMockStubber
       .callSuccessWith(null)
       .when(mockChallengeClient)
-      .unregisterChallengeTeam(anyString(), any(AsyncCallback.class));
+      .unregisterChallengeTeam(any(), any());
   }
 
   @Test
@@ -92,9 +89,8 @@ public class EditRegisterTeamDialogTest {
 
     // click Unregister
     widget.onUnregister();
-    verify(mockChallengeClient)
-      .unregisterChallengeTeam(anyString(), any(AsyncCallback.class));
-    verify(mockView).showInfo(anyString());
+    verify(mockChallengeClient).unregisterChallengeTeam(any(), any());
+    verify(mockView).showInfo(any());
     verify(mockCallback).invoke();
     verify(mockView).hideModal();
   }

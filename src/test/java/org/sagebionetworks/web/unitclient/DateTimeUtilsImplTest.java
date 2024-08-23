@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitclient;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -20,12 +21,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.web.client.DateTimeUtilsImpl;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.Moment;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class DateTimeUtilsImplTest {
 
   @Mock
@@ -111,7 +112,7 @@ public class DateTimeUtilsImplTest {
 
     d = new Date();
     dateTimeUtils.getRelativeTime(d);
-    verify(mockMoment).getRelativeTime(anyString());
+    verify(mockMoment).getRelativeTime(any());
   }
 
   @Test

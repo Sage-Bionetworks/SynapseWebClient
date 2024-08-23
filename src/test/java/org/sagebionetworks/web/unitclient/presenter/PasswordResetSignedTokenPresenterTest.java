@@ -14,7 +14,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.JoinTeamSignedToken;
 import org.sagebionetworks.repo.model.auth.ChangePasswordWithToken;
 import org.sagebionetworks.repo.model.auth.PasswordResetSignedToken;
@@ -31,7 +31,7 @@ import org.sagebionetworks.web.client.view.PasswordResetSignedTokenView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class PasswordResetSignedTokenPresenterTest {
 
   PasswordResetSignedTokenPresenter presenter;
@@ -107,7 +107,7 @@ public class PasswordResetSignedTokenPresenterTest {
   @Test
   public void testConstruction() {
     verify(mockView).setPresenter(presenter);
-    verify(mockView).setSynAlertWidget(any(Widget.class));
+    verify(mockView).setSynAlertWidget(any());
   }
 
   @Test

@@ -270,7 +270,7 @@ public class TeamEditModalWidgetTest {
     when(mockFileUpload.getFileHandleId()).thenReturn(null);
     finishedUploadingCallback.invoke(mockFileUpload);
     verify(mockView, times(2)).hideLoading();
-    verify(mockView, times(2)).setImageURL(anyString());
+    verify(mockView, times(2)).setImageURL(any());
     verify(mockFileUpload).getFileHandleId();
 
     presenter.onConfirm();

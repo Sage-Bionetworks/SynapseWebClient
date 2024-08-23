@@ -58,6 +58,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.apache.xpath.Arg;
 import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.junit.Before;
 import org.junit.Test;
@@ -458,7 +459,7 @@ public class EntityActionControllerImplTest {
       .thenReturn(currentUserId);
     when(mockGlobalApplicationState.getPlaceChanger())
       .thenReturn(mockPlaceChanger);
-    when(mockKeyFactoryProvider.getKeyFactory(anyString()))
+    when(mockKeyFactoryProvider.getKeyFactory(any()))
       .thenReturn(mockKeyFactory);
 
     when(mockPortalGinInjector.getSynapseProperties())
@@ -585,7 +586,7 @@ public class EntityActionControllerImplTest {
 
     mockEntityView.setId(entityId);
     mockEntityView.setParentId(parentId);
-    mockEntityView.setViewTypeMask(new Long(WebConstants.FILE));
+    mockEntityView.setViewTypeMask(Long.valueOf(WebConstants.FILE));
 
     // Setup the mock entity selector to select an entity.
     Mockito
@@ -608,11 +609,11 @@ public class EntityActionControllerImplTest {
     CallbackMockStubber
       .invokeCallback()
       .when(mockGWT)
-      .scheduleExecution(any(Callback.class), anyInt());
+      .scheduleExecution(any(), anyInt());
 
     when(mockPromptModalConfigurationBuilder.buildConfiguration())
       .thenReturn(mockPromptModalConfiguration);
-    when(mockSynapseJavascriptClient.getChallengeForProject(anyString()))
+    when(mockSynapseJavascriptClient.getChallengeForProject(any()))
       .thenReturn(getDoneFuture(new Challenge()));
   }
 
@@ -1647,7 +1648,7 @@ public class EntityActionControllerImplTest {
     AsyncMockStubber
       .callSuccessWith(headers)
       .when(mockSynapseJavascriptClient)
-      .getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
+      .getV2WikiHeaderTree(any(), any(), any());
     entityBundle.setEntity(new Project());
     currentEntityArea = EntityArea.WIKI;
     boolean canEdit = true;
@@ -1668,7 +1669,7 @@ public class EntityActionControllerImplTest {
     AsyncMockStubber
       .callSuccessWith(new ArrayList<V2WikiHeader>())
       .when(mockSynapseJavascriptClient)
-      .getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
+      .getV2WikiHeaderTree(any(), any(), any());
     entityBundle.setEntity(new Project());
     currentEntityArea = EntityArea.WIKI;
     boolean canEdit = true;
@@ -2703,16 +2704,16 @@ public class EntityActionControllerImplTest {
     AsyncMockStubber
       .callWithInvoke()
       .when(mockView)
-      .showConfirmDeleteDialog(anyString(), any(Callback.class));
+      .showConfirmDeleteDialog(any(), any());
     // confirm pre-flight
     AsyncMockStubber
       .callWithInvoke()
       .when(mockPreflightController)
-      .checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
+      .checkDeleteEntity(any(), any());
     AsyncMockStubber
       .callSuccessWith(null)
       .when(mockSynapseJavascriptClient)
-      .deleteEntityById(anyString(), any(AsyncCallback.class));
+      .deleteEntityById(any(), any());
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -2739,7 +2740,7 @@ public class EntityActionControllerImplTest {
       .goTo(new Synapse(parentId, null, EntityArea.TABLES, null));
     QueryKey mockQueryKey = mock(QueryKey.class);
     when(mockKeyFactory.getTrashCanItemsQueryKey()).thenReturn(mockQueryKey);
-    verify(mockKeyFactoryProvider).getKeyFactory(anyString());
+    verify(mockKeyFactoryProvider).getKeyFactory(any());
     verify(mockKeyFactory).getTrashCanItemsQueryKey();
     verify(mockQueryClient)
       .invalidateQueries(any(InvalidateQueryFilters.class));
@@ -3088,12 +3089,7 @@ public class EntityActionControllerImplTest {
     );
     // method under test
     controller.onAction(Action.EDIT_FILE_METADATA, null);
-    verify(mockEditFileMetadataModalWidget)
-      .configure(
-        any(FileEntity.class),
-        any(FileHandle.class),
-        any(Callback.class)
-      );
+    verify(mockEditFileMetadataModalWidget).configure(any(), any(), any());
     verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
   }
 
@@ -3277,7 +3273,7 @@ public class EntityActionControllerImplTest {
     AsyncMockStubber
       .callFailureWith(new Exception())
       .when(mockSynapseJavascriptClient)
-      .getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
+      .getV2WikiPageAsV1(any(), any());
     entityBundle.setRootWikiId("111");
     controller.configure(
       mockActionMenu,
@@ -3288,7 +3284,7 @@ public class EntityActionControllerImplTest {
       mockAddToDownloadListWidget
     );
     controller.onAction(Action.VIEW_WIKI_SOURCE, null);
-    verify(mockView).showErrorMessage(anyString());
+    verify(mockView).showErrorMessage(any());
   }
 
   @Test
@@ -3690,11 +3686,11 @@ public class EntityActionControllerImplTest {
   }
 
   @Test
-  public void testOnSubmitWithUdate() {
+  public void testOnSubmitWithUpdate() {
     AsyncMockStubber
       .callWithInvoke()
       .when(mockPreflightController)
-      .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+      .checkUpdateEntity(any(), any());
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -3704,8 +3700,7 @@ public class EntityActionControllerImplTest {
       mockAddToDownloadListWidget
     );
     controller.onAction(Action.SUBMIT_TO_CHALLENGE, null);
-    verify(mockSubmitter)
-      .configure(any(Entity.class), any(Set.class), any(FormParams.class));
+    verify(mockSubmitter).configure(any(Entity.class), any(), any());
   }
 
   @Test
@@ -4211,7 +4206,7 @@ public class EntityActionControllerImplTest {
     // note that the currentArea is null (project settings)
     currentEntityArea = null;
     entityBundle.setEntity(new Project());
-    when(mockSynapseJavascriptClient.getChallengeForProject(anyString()))
+    when(mockSynapseJavascriptClient.getChallengeForProject(any()))
       .thenReturn(getFailedFuture(new NotFoundException()));
     controller.configure(
       mockActionMenu,
@@ -4240,7 +4235,7 @@ public class EntityActionControllerImplTest {
     AsyncMockStubber
       .callSuccessWith(new Challenge())
       .when(mockChallengeClient)
-      .getChallengeForProject(anyString(), any(AsyncCallback.class));
+      .getChallengeForProject(any(), any());
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -4258,7 +4253,7 @@ public class EntityActionControllerImplTest {
     // currentArea is on the challenge tab
     currentEntityArea = EntityArea.CHALLENGE;
     entityBundle.setEntity(new Project());
-    when(mockSynapseJavascriptClient.getChallengeForProject(anyString()))
+    when(mockSynapseJavascriptClient.getChallengeForProject(any()))
       .thenReturn(getDoneFuture(new Challenge()));
     controller.configure(
       mockActionMenu,
@@ -4324,7 +4319,7 @@ public class EntityActionControllerImplTest {
   public void testGetChallengeError() throws Exception {
     entityBundle.setEntity(new Project());
     String error = "an error";
-    when(mockSynapseJavascriptClient.getChallengeForProject(anyString()))
+    when(mockSynapseJavascriptClient.getChallengeForProject(any()))
       .thenReturn(getFailedFuture(new Exception(error)));
     controller.configure(
       mockActionMenu,
@@ -4667,15 +4662,15 @@ public class EntityActionControllerImplTest {
     AsyncMockStubber
       .callSuccessWith(null)
       .when(mockChallengeClient)
-      .deleteChallenge(anyString(), any(AsyncCallback.class));
+      .deleteChallenge(any(), any());
     AsyncMockStubber
       .callWithInvoke()
       .when(mockView)
-      .showConfirmDeleteDialog(anyString(), any(Callback.class));
+      .showConfirmDeleteDialog(any(), any());
     AsyncMockStubber
       .callWithInvoke()
       .when(mockPreflightController)
-      .checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
+      .checkDeleteEntity(any(), any());
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -4690,8 +4685,7 @@ public class EntityActionControllerImplTest {
     verify(mockView).showConfirmDeleteDialog(anyString(), any(Callback.class));
     verify(mockPreflightController)
       .checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
-    verify(mockChallengeClient)
-      .deleteChallenge(anyString(), any(AsyncCallback.class));
+    verify(mockChallengeClient).deleteChallenge(any(), any());
     verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
   }
 
@@ -4701,15 +4695,15 @@ public class EntityActionControllerImplTest {
     AsyncMockStubber
       .callFailureWith(new Exception(error))
       .when(mockChallengeClient)
-      .deleteChallenge(anyString(), any(AsyncCallback.class));
+      .deleteChallenge(any(), any());
     AsyncMockStubber
       .callWithInvoke()
       .when(mockView)
-      .showConfirmDeleteDialog(anyString(), any(Callback.class));
+      .showConfirmDeleteDialog(any(), any());
     AsyncMockStubber
       .callWithInvoke()
       .when(mockPreflightController)
-      .checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
+      .checkDeleteEntity(any(), any());
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -4721,8 +4715,7 @@ public class EntityActionControllerImplTest {
 
     controller.onAction(Action.DELETE_CHALLENGE, null);
 
-    verify(mockChallengeClient)
-      .deleteChallenge(anyString(), any(AsyncCallback.class));
+    verify(mockChallengeClient).deleteChallenge(any(), any());
     verify(mockView).showErrorMessage(error);
     verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
   }
@@ -4741,22 +4734,17 @@ public class EntityActionControllerImplTest {
     AsyncMockStubber
       .callWithInvoke()
       .when(mockPreflightController)
-      .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+      .checkUpdateEntity(any(), any());
     AsyncMockStubber
       .callSuccessWith(tableEntity)
       .when(mockSynapseJavascriptClient)
-      .updateEntity(
-        any(Entity.class),
-        anyString(),
-        anyBoolean(),
-        any(AsyncCallback.class)
-      );
+      .updateEntity(any(), any(), any(), any());
     assertFalse(tableEntity.getIsSearchEnabled());
 
     controller.onAction(Action.TOGGLE_FULL_TEXT_SEARCH, null);
 
     assertTrue(tableEntity.getIsSearchEnabled());
-    verify(mockView).showSuccess(anyString());
+    verify(mockView).showSuccess(any());
   }
 
   @Test
@@ -4774,16 +4762,11 @@ public class EntityActionControllerImplTest {
     AsyncMockStubber
       .callWithInvoke()
       .when(mockPreflightController)
-      .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+      .checkUpdateEntity(any(), any());
     AsyncMockStubber
       .callFailureWith(new Exception(errorMessage))
       .when(mockSynapseJavascriptClient)
-      .updateEntity(
-        any(Entity.class),
-        anyString(),
-        anyBoolean(),
-        any(AsyncCallback.class)
-      );
+      .updateEntity(any(), any(), any(), any());
     assertFalse(tableEntity.getIsSearchEnabled());
 
     controller.onAction(Action.TOGGLE_FULL_TEXT_SEARCH, null);
@@ -4943,11 +4926,7 @@ public class EntityActionControllerImplTest {
       )
     );
 
-    when(
-      mockSynapseJavascriptClient.getActionsRequiredForEntityDownload(
-        anyString()
-      )
-    )
+    when(mockSynapseJavascriptClient.getActionsRequiredForEntityDownload(any()))
       .thenReturn(getDoneFuture(actionsRequiredForDownload));
 
     entityBundle.setEntity(new FileEntity());
@@ -4964,7 +4943,9 @@ public class EntityActionControllerImplTest {
     );
 
     verify(mockActionMenu).setDownloadMenuEnabled(false);
-    ArgumentCaptor<String> tooltipCaptor = new ArgumentCaptor<>();
+    ArgumentCaptor<String> tooltipCaptor = ArgumentCaptor.forClass(
+      String.class
+    );
     verify(mockActionMenu, times(2))
       .setDownloadMenuTooltipText(tooltipCaptor.capture());
     String tooltip = tooltipCaptor.getAllValues().get(1);

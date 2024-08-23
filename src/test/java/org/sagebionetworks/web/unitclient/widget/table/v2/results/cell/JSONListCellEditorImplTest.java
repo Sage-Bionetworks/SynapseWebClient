@@ -19,7 +19,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
@@ -30,7 +30,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditorVie
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.JSONListCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.JSONListCellEditorView;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class JSONListCellEditorImplTest {
 
   @Mock

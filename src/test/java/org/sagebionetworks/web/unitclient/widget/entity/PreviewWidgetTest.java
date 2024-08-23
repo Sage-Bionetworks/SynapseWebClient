@@ -180,39 +180,25 @@ public class PreviewWidgetTest {
     RequestBuilderMockStubber
       .callOnResponseReceived(null, mockResponse)
       .when(mockRequestBuilder)
-      .sendRequest(anyString(), any(RequestCallback.class));
+      .sendRequest(any(), any());
     when(mockSynapseAlert.isUserLoggedIn()).thenReturn(true);
 
     AsyncMockStubber
       .callSuccessWith(testBundle)
       .when(mockSynapseJavascriptClient)
-      .getEntityBundle(
-        anyString(),
-        any(EntityBundleRequest.class),
-        any(AsyncCallback.class)
-      );
+      .getEntityBundle(any(), any(), any());
     AsyncMockStubber
       .callSuccessWith(testBundle)
       .when(mockSynapseJavascriptClient)
-      .getEntityBundleForVersion(
-        anyString(),
-        anyLong(),
-        any(EntityBundleRequest.class),
-        any(AsyncCallback.class)
-      );
+      .getEntityBundleForVersion(any(), any(), any(), any());
     AsyncMockStubber
       .callSuccessWith(TARGET_FILE_PRESIGNED_URL)
       .when(mockSynapseJavascriptClient)
-      .getFileEntityTemporaryUrlForVersion(
-        anyString(),
-        anyLong(),
-        anyBoolean(),
-        any(AsyncCallback.class)
-      );
+      .getFileEntityTemporaryUrlForVersion(any(), any(), anyBoolean(), any());
     AsyncMockStubber
       .callSuccessWith(mockParseResults)
       .when(mockSynapseClient)
-      .parseCsv(anyString(), anyChar(), any(AsyncCallback.class));
+      .parseCsv(any(), anyChar(), any());
     // create empty wiki descriptor
     descriptor = new HashMap<String, String>();
   }
@@ -226,7 +212,7 @@ public class PreviewWidgetTest {
     previewWidget.configure(testBundle);
     previewWidget.asWidget();
 
-    verify(mockView).addSynapseAlertWidget(any(Widget.class));
+    verify(mockView).addSynapseAlertWidget(any());
     verify(mockSynapseAlert).showError(anyString());
   }
 
@@ -273,7 +259,7 @@ public class PreviewWidgetTest {
 
     previewWidget.configure(testBundle);
 
-    verify(mockView).addSynapseAlertWidget(any(IsWidget.class));
+    verify(mockView).addSynapseAlertWidget(any());
     verify(mockSynapseAlert).showError(statusText);
   }
 
@@ -427,7 +413,7 @@ public class PreviewWidgetTest {
     testFileHandleList.add(fh);
     previewWidget.configure(testBundle);
     previewWidget.asWidget();
-    verify(mockView).setPreviewWidget(any(Widget.class));
+    verify(mockView).setPreviewWidget(any());
   }
 
   @Test
@@ -543,7 +529,7 @@ public class PreviewWidgetTest {
     descriptor.put(WidgetConstants.WIDGET_ENTITY_ID_KEY, entityId);
     previewWidget.configure(null, descriptor, null, null);
 
-    verify(mockView).addSynapseAlertWidget(any(Widget.class));
+    verify(mockView).addSynapseAlertWidget(any());
     verify(mockSynapseAlert).showError(anyString());
   }
 
@@ -563,7 +549,7 @@ public class PreviewWidgetTest {
     previewWidget.configure(null, descriptor, null, null);
 
     // verify that it tries to get the entity bundle (without version)
-    verify(mockView).addSynapseAlertWidget(any(Widget.class));
+    verify(mockView).addSynapseAlertWidget(any());
     verify(mockSynapseAlert).handleException(any(Exception.class));
   }
 
@@ -672,7 +658,7 @@ public class PreviewWidgetTest {
 
     verify(mockSynapseClient)
       .parseCsv(eq(csvPreviewText), eq(delimiter), any(AsyncCallback.class));
-    verify(mockView).addSynapseAlertWidget(any(Widget.class));
+    verify(mockView).addSynapseAlertWidget(any());
     verify(mockSynapseAlert).handleException(ex);
   }
 
@@ -683,7 +669,7 @@ public class PreviewWidgetTest {
 
     previewWidget.configure(testBundle);
 
-    verify(mockView).addSynapseAlertWidget(any(IsWidget.class));
+    verify(mockView).addSynapseAlertWidget(any());
     verify(mockSynapseAlert).showLogin();
   }
 

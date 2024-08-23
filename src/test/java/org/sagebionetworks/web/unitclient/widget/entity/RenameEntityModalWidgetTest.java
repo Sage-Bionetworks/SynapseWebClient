@@ -21,7 +21,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.table.TableEntity;
@@ -35,7 +35,7 @@ import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalView;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidgetImpl;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class RenameEntityModalWidgetTest {
 
   @Mock
@@ -157,12 +157,7 @@ public class RenameEntityModalWidgetTest {
     AsyncMockStubber
       .callSuccessWith(new TableEntity())
       .when(mockJsClient)
-      .updateEntity(
-        entityCaptor.capture(),
-        anyString(),
-        anyBoolean(),
-        any(AsyncCallback.class)
-      );
+      .updateEntity(entityCaptor.capture(), any(), any(), any());
     verify(mockView)
       .configureAndShow(
         anyString(),
@@ -192,12 +187,7 @@ public class RenameEntityModalWidgetTest {
     AsyncMockStubber
       .callFailureWith(error)
       .when(mockJsClient)
-      .updateEntity(
-        any(Entity.class),
-        anyString(),
-        anyBoolean(),
-        any(AsyncCallback.class)
-      );
+      .updateEntity(any(), any(), any(), any());
 
     verify(mockView)
       .configureAndShow(
@@ -226,12 +216,7 @@ public class RenameEntityModalWidgetTest {
     AsyncMockStubber
       .callSuccessWith(new TableEntity())
       .when(mockJsClient)
-      .updateEntity(
-        entityCaptor.capture(),
-        anyString(),
-        anyBoolean(),
-        any(AsyncCallback.class)
-      );
+      .updateEntity(entityCaptor.capture(), any(), any(), any());
 
     String newDescription = "a new description";
 

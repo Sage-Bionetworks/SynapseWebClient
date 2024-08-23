@@ -123,9 +123,9 @@ public class CreateManagedACTAccessRequirementStep2Test {
 
   @Test
   public void testConstruction() {
-    verify(mockView).setWikiPageRenderer(any(IsWidget.class));
-    verify(mockView).setDUCTemplateUploadWidget(any(IsWidget.class));
-    verify(mockView).setDUCTemplateWidget(any(IsWidget.class));
+    verify(mockView).setWikiPageRenderer(any());
+    verify(mockView).setDUCTemplateUploadWidget(any());
+    verify(mockView).setDUCTemplateWidget(any());
     verify(mockView).setPresenter(widget);
     verify(mockWikiPageRenderer).setModifiedCreatedByHistoryVisible(false);
     verify(mockWikiMarkdownEditor).setDeleteButtonVisible(false);

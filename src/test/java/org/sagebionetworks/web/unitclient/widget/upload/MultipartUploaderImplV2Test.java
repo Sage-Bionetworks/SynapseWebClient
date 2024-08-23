@@ -96,19 +96,18 @@ public class MultipartUploaderImplV2Test {
 
     when(
       mockSRCUploadFileWrapper.uploadFile(
-        anyString(),
-        anyString(),
+        any(),
+        any(),
         any(),
         anyInt(),
-        anyString(),
+        any(),
         any(),
         any()
       )
     )
       .thenReturn(mockPromise);
 
-    when(synapseJsniUtils.getFileSize(any(JavaScriptObject.class)))
-      .thenReturn(FILE_SIZE);
+    when(synapseJsniUtils.getFileSize(any())).thenReturn(FILE_SIZE);
 
     when(
       mockSynapseProperties.getSynapseProperty(
@@ -184,11 +183,11 @@ public class MultipartUploaderImplV2Test {
 
     verify(mockSRCUploadFileWrapper)
       .uploadFile(
-        anyString(),
-        anyString(),
+        any(),
+        any(),
         any(),
         eq((int) defaultStorageLocationId),
-        anyString(),
+        any(),
         any(),
         any()
       );
@@ -209,11 +208,11 @@ public class MultipartUploaderImplV2Test {
 
     verify(mockSRCUploadFileWrapper)
       .uploadFile(
-        anyString(),
-        anyString(),
+        any(),
+        any(),
         any(),
         anyInt(),
-        anyString(),
+        any(),
         any(),
         isCancelledCaptor.capture()
       );

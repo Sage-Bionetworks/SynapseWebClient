@@ -17,13 +17,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.entity.editor.EvaluationSubmissionConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.EvaluationSubmissionConfigView;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class EvaluationSubmissionConfigEditorTest {
 
   EvaluationSubmissionConfigEditor editor;

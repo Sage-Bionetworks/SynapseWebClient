@@ -74,13 +74,6 @@ public class SynapseForumPresenterTest {
     presenter.setPlace(mockPlace);
     presenter.showForum(entityId);
     verify(mockForumWidget)
-      .configure(
-        anyString(),
-        any(ParameterizedToken.class),
-        eq(DEFAULT_IS_MODERATOR),
-        any(EntityActionMenu.class),
-        any(CallbackP.class),
-        any(Callback.class)
-      );
+      .configure(any(), any(), eq(DEFAULT_IS_MODERATOR), any(), any(), any());
   }
 }

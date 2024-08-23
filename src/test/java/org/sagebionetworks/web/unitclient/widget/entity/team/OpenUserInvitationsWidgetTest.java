@@ -119,20 +119,15 @@ public class OpenUserInvitationsWidgetTest {
     AsyncMockStubber
       .callSuccessWith(testReturn)
       .when(mockSynapseClient)
-      .getOpenTeamInvitations(
-        anyString(),
-        anyInt(),
-        anyInt(),
-        any(AsyncCallback.class)
-      );
+      .getOpenTeamInvitations(any(), any(), any(), any());
     AsyncMockStubber
       .callSuccessWith(null)
       .when(mockJsClient)
-      .deleteMembershipInvitation(anyString(), any(AsyncCallback.class));
+      .deleteMembershipInvitation(any(), any());
     AsyncMockStubber
       .callSuccessWith(null)
       .when(mockSynapseClient)
-      .resendTeamInvitation(anyString(), anyString(), any(AsyncCallback.class));
+      .resendTeamInvitation(any(), any(), any());
 
     when(mockGinInjector.getUserBadgeWidget()).thenReturn(mockUserBadge);
     when(mockGinInjector.getEmailInvitationBadgeWidget())
@@ -187,7 +182,7 @@ public class OpenUserInvitationsWidgetTest {
         eq(null),
         eq(testInvite.getId()),
         eq(testInvite.getMessage()),
-        anyString()
+        any()
       );
     verify(mockGWT).restoreWindowPosition();
     verify(mockView).setVisible(true);
@@ -226,7 +221,7 @@ public class OpenUserInvitationsWidgetTest {
         eq(null),
         eq(testInvite.getId()),
         eq(testInvite.getMessage()),
-        anyString()
+        any()
       );
     verify(mockGWT).restoreWindowPosition();
   }
@@ -249,7 +244,7 @@ public class OpenUserInvitationsWidgetTest {
         eq(null),
         eq(testEmailInvite.getId()),
         eq(testEmailInvite.getMessage()),
-        anyString()
+        any()
       );
     verify(mockGWT).restoreWindowPosition();
   }
@@ -273,7 +268,7 @@ public class OpenUserInvitationsWidgetTest {
         eq(testInvite.getInviteeEmail()),
         eq(testInvite.getId()),
         eq(testInvite.getMessage()),
-        anyString()
+        any()
       );
     verify(mockView, times(emailInvitationCount))
       .addInvitation(
@@ -281,7 +276,7 @@ public class OpenUserInvitationsWidgetTest {
         eq(null),
         eq(testEmailInvite.getId()),
         eq(testEmailInvite.getMessage()),
-        anyString()
+        any()
       );
     verify(mockGWT).restoreWindowPosition();
   }
@@ -459,11 +454,7 @@ public class OpenUserInvitationsWidgetTest {
 
     verify(mockGWT).saveWindowPosition();
     verify(mockSynapseClient)
-      .resendTeamInvitation(
-        eq(invitationId),
-        anyString(),
-        any(AsyncCallback.class)
-      );
+      .resendTeamInvitation(eq(invitationId), any(), any(AsyncCallback.class));
     verify(mockPopupUtils)
       .showInfo(OpenUserInvitationsWidget.RESENT_INVITATION);
     verify(mockView, times(2)).clear();
@@ -483,17 +474,13 @@ public class OpenUserInvitationsWidgetTest {
     AsyncMockStubber
       .callFailureWith(ex)
       .when(mockSynapseClient)
-      .resendTeamInvitation(anyString(), anyString(), any(AsyncCallback.class));
+      .resendTeamInvitation(any(), any(), any());
     widget.configure(teamId, mockTeamUpdatedCallback);
 
     widget.resendInvitation(invitationId);
 
     verify(mockSynapseClient)
-      .resendTeamInvitation(
-        eq(invitationId),
-        anyString(),
-        any(AsyncCallback.class)
-      );
+      .resendTeamInvitation(eq(invitationId), any(), any(AsyncCallback.class));
     verify(mockSynapseAlert).handleException(ex);
   }
 }

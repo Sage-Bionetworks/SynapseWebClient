@@ -27,7 +27,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Matchers;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.ErrorResponseCode;
 import org.sagebionetworks.repo.model.Project;
@@ -56,7 +56,7 @@ import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class AccessControlListEditorTest {
 
   private static final String HOST_PAGE_BASE_URL = "http://www.wwu.edu/";
@@ -675,19 +675,15 @@ public class AccessControlListEditorTest {
     AsyncMockStubber
       .callSuccessWith(entityBundleTransport_localACL)
       .when(mockSynapseJavascriptClient)
-      .getEntityBundle(
-        anyString(),
-        any(EntityBundleRequest.class),
-        any(AsyncCallback.class)
-      );
+      .getEntityBundle(any(), any(), any());
     AsyncMockStubber
       .callSuccessWith(inheritedACL)
       .when(mockSynapseClient)
-      .deleteAcl(eq(ENTITY_ID), any(AsyncCallback.class));
+      .deleteAcl(eq(ENTITY_ID), any());
     AsyncMockStubber
       .callSuccessWith(inheritedACL)
       .when(mockSynapseClient)
-      .getEntityBenefactorAcl(anyString(), any(AsyncCallback.class));
+      .getEntityBenefactorAcl(any(), any());
 
     // update
     acle.refresh();

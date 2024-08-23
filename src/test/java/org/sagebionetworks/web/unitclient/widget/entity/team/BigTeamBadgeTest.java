@@ -10,7 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -21,7 +21,7 @@ import org.sagebionetworks.web.client.widget.team.BigTeamBadge;
 import org.sagebionetworks.web.client.widget.team.BigTeamBadgeView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class BigTeamBadgeTest {
 
   @Mock
@@ -66,11 +66,11 @@ public class BigTeamBadgeTest {
     AsyncMockStubber
       .callSuccessWith(TEAM_ICON_URL)
       .when(mockJsClient)
-      .getTeamPicturePreviewURL(anyString(), any(AsyncCallback.class));
+      .getTeamPicturePreviewURL(any(), any());
     AsyncMockStubber
       .callSuccessWith(mockTeam)
       .when(mockJsClient)
-      .getTeam(anyString(), any(AsyncCallback.class));
+      .getTeam(any(), any());
   }
 
   @Test
@@ -85,7 +85,7 @@ public class BigTeamBadgeTest {
     AsyncMockStubber
       .callFailureWith(new Exception("failed"))
       .when(mockJsClient)
-      .getTeamPicturePreviewURL(anyString(), any(AsyncCallback.class));
+      .getTeamPicturePreviewURL(any(), any());
 
     presenter.configure("123");
 

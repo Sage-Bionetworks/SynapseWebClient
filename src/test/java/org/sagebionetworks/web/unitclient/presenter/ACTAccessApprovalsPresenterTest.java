@@ -186,10 +186,10 @@ public class ACTAccessApprovalsPresenterTest {
     verify(mockView).setLoadMoreContainer(mockLoadMoreContainer);
     verify(mockView).setShowHideButton(mockShowHideAccessRequirementButton);
     verify(mockView).setAccessRequirementWidget(mockAccessRequirementWidget);
-    verify(mockView).setSubmitterPickerWidget(any(Widget.class));
-    verify(mockView).setSelectedSubmitterUserBadge(any(Widget.class));
-    verify(mockView).setAccessorPickerWidget(any(Widget.class));
-    verify(mockView).setSelectedAccessorUserBadge(any(Widget.class));
+    verify(mockView).setSubmitterPickerWidget(any());
+    verify(mockView).setSelectedSubmitterUserBadge(any());
+    verify(mockView).setAccessorPickerWidget(any());
+    verify(mockView).setSelectedAccessorUserBadge(any());
     verify(mockView).setPresenter(presenter);
     verify(mockSubmitterSuggestWidget)
       .addItemSelectedHandler(any(CallbackP.class));

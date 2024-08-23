@@ -115,12 +115,12 @@ public class DockerRepoWidgetTest {
 
   @Test
   public void testConstruction() {
-    verify(mockView).setWikiPage(any(Widget.class));
-    verify(mockView).setProvenance(any(Widget.class));
-    verify(mockView).setEntityMetadata(any(Widget.class));
-    verify(mockView).setModifiedCreatedBy(any(Widget.class));
-    verify(mockView).setTitlebar(any(Widget.class));
-    verify(mockView).setDockerCommitListWidget(any(Widget.class));
+    verify(mockView).setWikiPage(any());
+    verify(mockView).setProvenance(any());
+    verify(mockView).setEntityMetadata(any());
+    verify(mockView).setModifiedCreatedBy(any());
+    verify(mockView).setTitlebar(any());
+    verify(mockView).setDockerCommitListWidget(any());
   }
 
   @SuppressWarnings("unchecked")

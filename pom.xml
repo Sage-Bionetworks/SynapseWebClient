@@ -14,15 +14,15 @@
   <properties>
     <!-- Synapse Web Client -->
     <!-- GWT needs at least java 1.5 -->
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
+    <maven.compiler.source>21</maven.compiler.source>
+    <maven.compiler.target>21</maven.compiler.target>
     <webappDirectory>
       ${project.build.directory}/${project.build.finalName}
     </webappDirectory>
     <synapse.version>499.0</synapse.version>
     <gwtVersion>2.11.0</gwtVersion>
     <org.springframework.version>5.3.37</org.springframework.version>
-    <guiceVersion>3.0</guiceVersion>
+    <guiceVersion>6.0.0</guiceVersion>
     <ginVersion>2.1.2</ginVersion>
     <xstream.version>1.3.1</xstream.version>
     <schema-to-pojo.version>0.6.10</schema-to-pojo.version>
@@ -242,6 +242,12 @@
         <version>3.3.2</version>
         <configuration>
           <filesets>
+            <fileset>
+              <directory>gwt-unitCache</directory>
+              <includes>
+                <include>**/*</include>
+              </includes>
+            </fileset>
             <fileset>
               <!-- Clean dir where we copy JS/CSS from node_modules -->
               <directory>src/main/webapp/generated</directory>
@@ -587,6 +593,20 @@
       </plugin>
     </plugins>
   </build>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>com.google.inject</groupId>
+        <artifactId>guice</artifactId>
+        <version>${guiceVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.google.inject.extensions</groupId>
+        <artifactId>guice-servlet</artifactId>
+        <version>${guiceVersion}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   <dependencies>
     <dependency>
       <groupId>com.google.gwt.eventbinder</groupId>
@@ -784,16 +804,22 @@
       <version>${guiceVersion}</version>
     </dependency>
     <dependency>
+      <groupId>com.google.inject.extensions</groupId>
+      <artifactId>guice-servlet</artifactId>
+      <version>${guiceVersion}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.inject.extensions</groupId>
+      <artifactId>guice-assistedinject</artifactId>
+      <version>${guiceVersion}</version>
+    </dependency>
+    <dependency>
       <groupId>com.google.gwt.inject</groupId>
       <artifactId>gin</artifactId>
       <version>${ginVersion}</version>
       <scope>provided</scope>
     </dependency>
-    <dependency>
-      <groupId>com.google.inject.extensions</groupId>
-      <artifactId>guice-servlet</artifactId>
-      <version>${guiceVersion}</version>
-    </dependency>
+
     <!-- This provides the GWT MVP framework -->
     <dependency>
       <groupId>com.gwtplatform</groupId>
@@ -906,8 +932,8 @@
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
-      <artifactId>mockito-all</artifactId>
-      <version>1.10.19</version>
+      <artifactId>mockito-core</artifactId>
+      <version>2.28.2</version>
       <scope>test</scope>
     </dependency>
     <dependency>

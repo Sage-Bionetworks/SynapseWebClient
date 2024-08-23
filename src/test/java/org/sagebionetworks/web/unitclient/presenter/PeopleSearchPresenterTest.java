@@ -108,7 +108,7 @@ public class PeopleSearchPresenterTest {
       );
     verify(mockView).setSearchTerm(searchTerm);
     verify(mockPortalGinInjector, times(3)).getUserBadgeWidget();
-    verify(mockLoadMoreWidgetContainer, times(3)).add(any(Widget.class));
+    verify(mockLoadMoreWidgetContainer, times(3)).add(any());
   }
 
   @Test
@@ -117,13 +117,7 @@ public class PeopleSearchPresenterTest {
     AsyncMockStubber
       .callFailureWith(caught)
       .when(mockSynapseJavascriptClient)
-      .getUserGroupHeadersByPrefix(
-        anyString(),
-        any(TypeFilter.class),
-        anyLong(),
-        anyLong(),
-        any(AsyncCallback.class)
-      );
+      .getUserGroupHeadersByPrefix(any(), any(), anyLong(), anyLong(), any());
     presenter.setPlace(mockPlace);
     verify(mockSynAlert).handleException(caught);
   }

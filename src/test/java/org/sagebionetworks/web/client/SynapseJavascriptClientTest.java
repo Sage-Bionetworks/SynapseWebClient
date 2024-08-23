@@ -80,7 +80,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.client.exceptions.SynapseTooManyRequestsException;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.ErrorResponseCode;
@@ -138,7 +138,7 @@ import org.sagebionetworks.web.shared.exceptions.TooManyRequestsException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class SynapseJavascriptClientTest {
 
   SynapseJavascriptClient client;
@@ -225,9 +225,7 @@ public class SynapseJavascriptClientTest {
     when(mockJsniUtils.getAccessTokenCookieUrl())
       .thenReturn(SESSION_COOKIE_URL);
 
-    when(
-      mockRequestBuilder.sendRequest(anyString(), any(RequestCallback.class))
-    )
+    when(mockRequestBuilder.sendRequest(any(), any(RequestCallback.class)))
       .thenReturn(mockRequest1, mockRequest2);
     client =
       new SynapseJavascriptClient(
@@ -1211,7 +1209,7 @@ public class SynapseJavascriptClientTest {
 
     client.deleteEntityById("syn111", null);
 
-    verify(mockRequestBuilder).sendRequest(anyString(), any());
+    verify(mockRequestBuilder).sendRequest(any(), any());
 
     // verify no requests are associated to the current URL
     assertNull(client.getCancellableRequests(currentUrl));
