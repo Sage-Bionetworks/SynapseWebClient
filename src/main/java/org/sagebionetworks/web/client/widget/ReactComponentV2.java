@@ -72,7 +72,7 @@ public abstract class ReactComponentV2<
           getChildren()
             .forEach(w -> {
               node.appendChild(w.getElement());
-              // Keep track of child elements to ensure they are removed before the next time this component renders
+              // Keep track of child elements to ensure they are removed when the component unloads or re-renders
               nonReactChildElements.add(w.getElement());
             });
         }
@@ -86,13 +86,34 @@ public abstract class ReactComponentV2<
     }
   }
 
-  public ReactElement<T, P> createReactElement() {
-    if (!nonReactChildElements.isEmpty()) {
-      // Remove any non-React children that were previously injected
+  private void createRoot() {
+    if (root == null) {
+      root = ReactDOM.createRoot(this.getElement());
+    }
+  }
+
+  private void destroyRoot() {
+    if (root != null) {
+      root.unmount();
+      root = null;
+    }
+  }
+
+  private void detachNonReactChildElements() {
+    if (allChildrenAreReactComponents()) {
+      // No need to remove non-React child elements from this widget
+      // But a descendant contain non-React children, so recurse!
+      for (Widget w : getChildren()) {
+        ((ReactComponentV2<?, ?>) w).detachNonReactChildElements();
+      }
+    } else {
       nonReactChildElements.forEach(Element::removeFromParent);
       nonReactChildElements.clear();
     }
+  }
 
+  private ReactElement<T, P> createReactElement() {
+    detachNonReactChildElements();
     maybeUpdatePropsWithCallbackRef();
     return React.createElement(
       reactComponentType,
@@ -143,14 +164,9 @@ public abstract class ReactComponentV2<
   private void synchronizeReactDomRoot() {
     if (isRenderedAsReactComponentChild()) {
       // This component is rendered as a child of another React component, so destroy the root if one exists
-      if (root != null) {
-        root.unmount();
-        root = null;
-      }
+      destroyRoot();
     } else {
-      if (root == null) {
-        root = ReactDOM.createRoot(this.getElement());
-      }
+      createRoot();
     }
   }
 
@@ -197,10 +213,11 @@ public abstract class ReactComponentV2<
   @Override
   protected void onUnload() {
     super.onUnload();
-    if (root != null) {
-      root.unmount();
-    }
-    root = null;
+
+    // Detach any non-React descendants that were injected into the component tree
+    detachNonReactChildElements();
+
+    destroyRoot();
   }
 
   /**
@@ -244,12 +261,6 @@ public abstract class ReactComponentV2<
 
       // Logical detach.
       getChildren().remove(w);
-
-      // Re-render any ReactComponent children to physically detach them
-      if (w instanceof ReactComponentV2) {
-        GWT.debugger();
-        ((ReactComponentV2<?, ?>) w).render();
-      }
 
       // Physical detach (via React API!)
       this.render();
