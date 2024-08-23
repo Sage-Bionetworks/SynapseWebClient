@@ -7,20 +7,20 @@ import com.google.inject.Inject;
 import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.EntityAclEditorModalProps;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.widget.ReactComponent;
 
 public class EntityAccessControlListModalWidgetImpl
   implements EntityAccessControlListModalWidget {
 
-  private final ReactComponent<EntityAclEditorModalProps> reactComponent;
+  private final ReactComponent reactComponent;
   private final SynapseReactClientFullContextPropsProvider propsProvider;
 
   private EntityAclEditorModalProps componentProps;
 
   @Inject
   EntityAccessControlListModalWidgetImpl(
-    ReactComponent<EntityAclEditorModalProps> reactComponent,
+    ReactComponent reactComponent,
     SynapseReactClientFullContextPropsProvider propsProvider
   ) {
     this.reactComponent = reactComponent;
@@ -54,7 +54,7 @@ public class EntityAccessControlListModalWidgetImpl
   }
 
   private void renderComponent() {
-    ReactNode node = React.createElementWithSynapseContext(
+    ReactElement node = React.createElementWithSynapseContext(
       EntityAclEditorModal,
       componentProps,
       propsProvider.getJsInteropContextProps()

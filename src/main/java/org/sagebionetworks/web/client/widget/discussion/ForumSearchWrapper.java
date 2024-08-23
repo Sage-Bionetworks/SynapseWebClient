@@ -4,7 +4,7 @@ import org.sagebionetworks.web.client.context.SynapseReactClientFullContextProps
 import org.sagebionetworks.web.client.jsinterop.ForumSearchProps;
 import org.sagebionetworks.web.client.jsinterop.ForumSearchProps.OnSearchResultsVisibleHandler;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.widget.ReactComponent;
 
@@ -21,7 +21,7 @@ public class ForumSearchWrapper extends ReactComponent {
       projectId,
       onSearchResultsVisible
     );
-    ReactNode component = React.createElementWithSynapseContext(
+    ReactElement component = React.createElementWithSynapseContext(
       SRC.SynapseComponents.ForumSearch,
       props,
       contextPropsProvider.getJsInteropContextProps()

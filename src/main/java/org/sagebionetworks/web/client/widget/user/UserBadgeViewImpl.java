@@ -23,7 +23,7 @@ import org.sagebionetworks.web.client.context.SynapseReactClientFullContextProps
 import org.sagebionetworks.web.client.jsinterop.JSON;
 import org.sagebionetworks.web.client.jsinterop.MenuAction;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.jsinterop.UserCardProps;
 import org.sagebionetworks.web.client.place.Profile;
@@ -118,7 +118,7 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
       extraCssClassStrings
     );
 
-    ReactNode component = React.createElementWithSynapseContext(
+    ReactElement component = React.createElementWithSynapseContext(
       SRC.SynapseComponents.UserCard,
       props,
       propsProvider.getJsInteropContextProps()

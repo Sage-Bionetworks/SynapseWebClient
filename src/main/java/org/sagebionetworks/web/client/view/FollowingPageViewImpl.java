@@ -9,7 +9,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.EmptyProps;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.widget.ReactComponent;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -61,7 +61,7 @@ public class FollowingPageViewImpl
 
   private void configure() {
     headerWidget.configure();
-    ReactNode element = React.createElementWithSynapseContext(
+    ReactElement element = React.createElementWithSynapseContext(
       SRC.SynapseComponents.SubscriptionPage,
       EmptyProps.create(),
       propsProvider.getJsInteropContextProps()

@@ -6,7 +6,7 @@ import com.google.inject.Inject;
 import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.AccessRequirementRelatedProjectsListProps;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.ReactComponent;
@@ -32,7 +32,7 @@ public class AccessRequirementRelatedProjectsList implements IsWidget {
   public void configure(String accessRequirementId) {
     AccessRequirementRelatedProjectsListProps props =
       AccessRequirementRelatedProjectsListProps.create(accessRequirementId);
-    ReactNode component = React.createElementWithSynapseContext(
+    ReactElement component = React.createElementWithSynapseContext(
       SRC.SynapseComponents.AccessRequirementRelatedProjectsList,
       props,
       propsProvider.getJsInteropContextProps()

@@ -34,7 +34,7 @@ import org.sagebionetworks.web.client.context.SynapseReactClientFullContextProps
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.jsinterop.EmptyProps;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -603,7 +603,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
         "https://help.synapse.org/docs/Navigating-Synapse.2048557182.html#NavigatingSynapse-Favorites"
       );
       EmptyProps props = EmptyProps.create();
-      ReactNode component = React.createElementWithSynapseContext(
+      ReactElement component = React.createElementWithSynapseContext(
         SRC.SynapseComponents.FavoritesPage,
         props,
         propsProvider.getJsInteropContextProps()

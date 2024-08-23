@@ -12,7 +12,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.LoginPageProps;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
@@ -58,7 +58,7 @@ public class LoginWidgetViewImpl implements LoginWidgetView, IsWidget {
           null,
           () -> this.postLogin()
         );
-        ReactNode component = React.createElementWithSynapseContext(
+        ReactElement component = React.createElementWithSynapseContext(
           SRC.SynapseComponents.LoginPage,
           props,
           propsProvider.getJsInteropContextProps()

@@ -8,7 +8,7 @@ import org.sagebionetworks.web.client.context.SynapseReactClientFullContextProps
 import org.sagebionetworks.web.client.jsinterop.AccessRequirementAclEditorHandler;
 import org.sagebionetworks.web.client.jsinterop.AccessRequirementAclEditorProps;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.ReactRef;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.widget.ReactComponent;
@@ -42,7 +42,7 @@ public class CreateManagedACTAccessRequirementStep3ViewImpl
   public void configure(String accessRequirementId) {
     componentRef = React.createRef();
     reactContainer.clear();
-    ReactNode element = React.createElementWithSynapseContext(
+    ReactElement element = React.createElementWithSynapseContext(
       SRC.SynapseComponents.AccessRequirementAclEditor,
       AccessRequirementAclEditorProps.create(
         accessRequirementId,

@@ -19,7 +19,7 @@ import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnQuery
 import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnQueryResultBundleCallback;
 import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnViewSharingSettingsHandler;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.FullWidthAlert;
@@ -188,7 +188,7 @@ public class TableEntityWidgetViewImpl
   public void setItemsEditorVisible(boolean visible) {
     itemsEditorContainer.setVisible(visible);
     if (visible) {
-      ReactNode component = React.createElementWithSynapseContext(
+      ReactElement component = React.createElementWithSynapseContext(
         SRC.SynapseComponents.DatasetItemsEditor,
         this.presenter.getItemsEditorProps(),
         propsProvider.getJsInteropContextProps()

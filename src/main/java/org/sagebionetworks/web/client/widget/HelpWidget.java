@@ -7,7 +7,7 @@ import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.jsinterop.HelpPopoverProps;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 
 /**
@@ -54,7 +54,7 @@ public class HelpWidget implements IsWidget {
       showCloseButton,
       className
     );
-    ReactNode component = React.createElementWithThemeContext(
+    ReactElement component = React.createElementWithThemeContext(
       SRC.SynapseComponents.HelpPopover,
       props
     );

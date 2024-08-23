@@ -57,12 +57,12 @@ class MyView {
 
   void renderComponent() {
     MyProps props = props.create(/**/);
-    ReactNode reactNode = React.createElementWithSynapseContext(
+    ReactElement reactElement = React.createElementWithSynapseContext(
       SRC.SynapseComponents.MyComponent,
       props,
       propsProvider.getJsInteropContextProps()
     );
-    reactComponent.render(reactNode);
+    reactComponent.render(reactElement);
   }
 }
 

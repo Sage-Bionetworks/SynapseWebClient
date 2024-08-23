@@ -9,7 +9,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.DownloadConfirmationProps;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.widget.ReactComponent;
 
@@ -72,7 +72,7 @@ public class AddToDownloadListV2Impl implements AddToDownloadListV2 {
       folderId,
       onClose
     );
-    ReactNode component = React.createElementWithSynapseContext(
+    ReactElement component = React.createElementWithSynapseContext(
       SRC.SynapseComponents.DownloadConfirmation,
       editorProps,
       propsProvider.getJsInteropContextProps()
