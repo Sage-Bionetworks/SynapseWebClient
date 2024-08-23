@@ -187,13 +187,12 @@ public abstract class ReactComponentV2<
   }
 
   public void render() {
-    GWT.debugger();
     synchronizeReactDomRoot();
 
-    // This component may be a React child of another component. If so, we must rerender the ancestor component(s) so
-    // that they use the new ReactElement created in this render step.
+    // This component may be a React child of another component, so retrieve the root widget that renders this component tree.
     ReactComponentV2<?, ?> componentToRender = getRootReactComponentWidget();
     componentToRender.synchronizeReactDomRoot();
+    // Create a fresh ReactElement tree and render it
     componentToRender.root.render(componentToRender.createReactElement());
   }
 
