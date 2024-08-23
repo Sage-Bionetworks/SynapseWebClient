@@ -3,18 +3,21 @@ package org.sagebionetworks.web.client.jsinterop.react;
 import jsinterop.base.JsPropertyMap;
 import org.sagebionetworks.web.client.jsinterop.JsObject;
 import org.sagebionetworks.web.client.jsinterop.PropsWithStyle;
-import org.sagebionetworks.web.client.widget.ReactComponent;
+import org.sagebionetworks.web.client.jsinterop.ReactComponentType;
+import org.sagebionetworks.web.client.widget.ReactComponentV2;
 
 /**
  * Abstract class for React component widgets that have a style prop. The style prop for the component may be manipulated
  * to show/hide the component based on the current state of the widget.
  * @param <T> the prop type.
  */
-public abstract class HasStyle<T extends PropsWithStyle>
-  extends ReactComponent<T> {
+public abstract class HasStyle<
+  T extends ReactComponentType<P>, P extends PropsWithStyle
+>
+  extends ReactComponentV2<T, P> {
 
-  public HasStyle() {
-    super();
+  public HasStyle(T reactComponentType, P props) {
+    super(reactComponentType, props);
   }
 
   public void setStyle(JsPropertyMap<String> style) {
@@ -33,7 +36,7 @@ public abstract class HasStyle<T extends PropsWithStyle>
     } else {
       // Update the style prop to `display: none`.
       if (this.props == null) {
-        this.props = (T) JsPropertyMap.of();
+        this.props = (P) JsPropertyMap.of();
       }
 
       if (this.props.style == null) {

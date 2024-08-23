@@ -60,7 +60,7 @@ public class GridProps extends PropsWithStyle {
   @JsOverlay
   public static GridProps create(boolean container) {
     GridProps props = new GridProps();
-    props.ref = React.createRef();
+
     if (container) {
       props.container = true;
     }

@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.jsinterop;
 import com.google.gwt.dom.client.Element;
 import jsinterop.annotations.JsConstructor;
 import jsinterop.annotations.JsFunction;
-import jsinterop.annotations.JsOverlay;
 import jsinterop.annotations.JsPackage;
 import jsinterop.annotations.JsType;
 
@@ -18,29 +17,6 @@ public class ReactComponentProps {
     void run(Element element);
   }
 
-  public JsArray<ReactNode<?>> children;
-
   // Either a ComponentRef or CallbackRef may be passed. A CallbackRef will be invoked when the ref is set.
   public Object ref;
-
-  @JsOverlay
-  public final void addChild(ReactNode<?> child) {
-    if (children == null) {
-      children = new JsArray<>();
-    }
-    children.push(child);
-  }
-
-  @JsOverlay
-  public final void clearChildren() {
-    children = new JsArray<>();
-  }
-
-  @JsOverlay
-  public final JsArray<ReactNode<?>> getChildren() {
-    if (children == null) {
-      children = new JsArray<>();
-    }
-    return children;
-  }
 }

@@ -1,103 +1,91 @@
 package org.sagebionetworks.web.client.jsinterop.mui;
 
-import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.ReactComponentType;
 import org.sagebionetworks.web.client.jsinterop.react.HasStyle;
 
-public class Grid extends HasStyle<GridProps> {
+public class Grid extends HasStyle<ReactComponentType<GridProps>, GridProps> {
 
   public Grid() {
-    super();
-    this.props = GridProps.create(false);
-  }
-
-  @Override
-  protected void onLoad() {
-    renderComponent();
-  }
-
-  private void renderComponent() {
-    ReactNode component = React.createElement(MaterialUI.Unstable_Grid2, props);
-    this.render(component);
+    super(MaterialUI.Unstable_Grid2, GridProps.create(false));
   }
 
   public void setId(String id) {
     props.id = id;
-    renderComponent();
+    this.render();
   }
 
   public void setContainer(boolean container) {
     props.container = container;
-    renderComponent();
+    this.render();
   }
 
   public void setXs(int xs) {
     props.xs = xs;
-    renderComponent();
+    this.render();
   }
 
   public void setSm(int sm) {
     props.sm = sm;
-    renderComponent();
+    this.render();
   }
 
   public void setMd(int md) {
     props.md = md;
-    renderComponent();
+    this.render();
   }
 
   public void setLg(int lg) {
     props.lg = lg;
-    renderComponent();
+    this.render();
   }
 
   public void setXl(int xl) {
     props.xl = xl;
-    renderComponent();
+    this.render();
   }
 
   public void setXsOffset(int xsOffset) {
     props.xsOffset = xsOffset;
-    renderComponent();
+    this.render();
   }
 
   public void setSmOffset(int smOffset) {
     props.smOffset = smOffset;
-    renderComponent();
+    this.render();
   }
 
   public void setMdOffset(int mdOffset) {
     props.mdOffset = mdOffset;
-    renderComponent();
+    this.render();
   }
 
   public void setLgOffset(int lgOffset) {
     props.lgOffset = lgOffset;
-    renderComponent();
+    this.render();
   }
 
   public void setXlOffset(int xlOffset) {
     props.xlOffset = xlOffset;
-    renderComponent();
+    this.render();
   }
 
   public void setMt(String mt) {
     props.mt = mt;
-    renderComponent();
+    this.render();
   }
 
   public void setPl(String pl) {
     props.pl = pl;
-    renderComponent();
+    this.render();
   }
 
   public void setRowSpacing(String rowSpacing) {
     props.rowSpacing = rowSpacing;
-    renderComponent();
+    this.render();
   }
 
   public void setColumnSpacing(String columnSpacing) {
     props.columnSpacing = columnSpacing;
-    renderComponent();
+    this.render();
   }
 }
