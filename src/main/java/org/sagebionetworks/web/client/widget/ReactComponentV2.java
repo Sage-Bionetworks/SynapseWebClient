@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
@@ -8,6 +7,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.ComplexPanel;
 import com.google.gwt.user.client.ui.Widget;
 import java.util.ArrayList;
@@ -94,8 +94,16 @@ public abstract class ReactComponentV2<
 
   private void destroyRoot() {
     if (root != null) {
-      root.unmount();
-      root = null;
+      // Asynchronously schedule unmounting the root to allow React to finish the current render cycle.
+      // https://github.com/facebook/react/issues/25675
+      Timer t = new Timer() {
+        @Override
+        public void run() {
+          root.unmount();
+          root = null;
+        }
+      };
+      t.schedule(0);
     }
   }
 
