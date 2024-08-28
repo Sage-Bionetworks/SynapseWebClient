@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.entity.controller;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -72,7 +73,7 @@ public class StuAlertTest {
     widget.handleException(new ForbiddenException());
     verify(mockSynapseAlert).clear();
     verify(mockView).clearState();
-    verify(mockView).show403(anyString(), anyLong(), eq(true));
+    verify(mockView).show403(any(), any(), eq(true));
     verify(mockView).setVisible(true);
   }
 
@@ -81,7 +82,7 @@ public class StuAlertTest {
     when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
     widget.handleException(new ForbiddenException());
     verify(mockView).clearState();
-    verify(mockView).show403(anyString(), anyLong(), eq(false));
+    verify(mockView).show403(any(), any(), eq(false));
     verify(mockView).setVisible(true);
   }
 
@@ -89,7 +90,7 @@ public class StuAlertTest {
   public void testHandleServiceExceptionNotFound() {
     widget.handleException(new NotFoundException());
     verify(mockView).clearState();
-    verify(mockView).show404(anyString(), anyLong(), eq(true));
+    verify(mockView).show404(any(), any(), eq(true));
     verify(mockView).setVisible(true);
   }
 
