@@ -22,7 +22,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
@@ -47,7 +47,7 @@ import org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWi
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class RestrictionWidgetTest {
 
   RestrictionWidget widget;
@@ -157,7 +157,7 @@ public class RestrictionWidgetTest {
 
   @Test
   public void testConstruction() {
-    verify(mockView).setSynAlert(any(IsWidget.class));
+    verify(mockView).setSynAlert(any());
     verify(mockView).setPresenter(widget);
   }
 

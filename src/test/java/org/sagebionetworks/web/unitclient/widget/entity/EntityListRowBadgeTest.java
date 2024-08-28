@@ -121,7 +121,7 @@ public class EntityListRowBadgeTest {
   @Test
   public void testConstruction() {
     verify(mockView).setPresenter(widget);
-    verify(mockView).setCreatedByWidget(any(Widget.class));
+    verify(mockView).setCreatedByWidget(any());
   }
 
   private EntityBundle setupEntity(Entity entity) {
@@ -189,7 +189,7 @@ public class EntityListRowBadgeTest {
     verify(mockView).setEntityType(EntityType.project);
     verify(mockView).setEntityLink(entityName, "/Synapse:" + entityId);
     verify(mockUserBadge).configure(createdByUserId);
-    verify(mockView).setCreatedOn(anyString());
+    verify(mockView).setCreatedOn(any());
     verify(mockView).setDescription(description);
     verify(mockView, never()).showAddToDownloadList();
     verify(mockView).setVersion(EntityListRowBadge.N_A);

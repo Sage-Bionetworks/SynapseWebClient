@@ -147,7 +147,7 @@ public class WikiMarkdownEditorTest {
   public void testConfigure() {
     // configured in before, verify that view is reset
     verify(mockView).setPresenter(presenter);
-    verify(mockView).setMarkdownEditorWidget(any(Widget.class));
+    verify(mockView).setMarkdownEditorWidget(any());
     verify(mockView).clear();
     verify(mockMarkdownEditorWidget).configure(anyString());
     verify(mockView).setTitleEditorVisible(false);

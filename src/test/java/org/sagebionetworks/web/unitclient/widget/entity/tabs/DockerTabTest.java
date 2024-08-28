@@ -20,7 +20,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.Project;
@@ -42,7 +42,7 @@ import org.sagebionetworks.web.client.widget.entity.tabs.DockerTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.DockerTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class DockerTabTest {
 
   @Mock
@@ -159,10 +159,10 @@ public class DockerTabTest {
   @Test
   public void testConstruction() {
     verify(mockView).setPresenter(tab);
-    verify(mockView).setBreadcrumb(any(Widget.class));
-    verify(mockView).setDockerRepoList(any(Widget.class));
-    verify(mockView).setSynapseAlert(any(Widget.class));
-    verify(mockView).setActionMenu(any(Widget.class));
+    verify(mockView).setBreadcrumb(any());
+    verify(mockView).setDockerRepoList(any());
+    verify(mockView).setSynapseAlert(any());
+    verify(mockView).setActionMenu(any());
     verify(mockTab)
       .configure(
         anyString(),
@@ -172,7 +172,7 @@ public class DockerTabTest {
         any(EntityArea.class)
       );
     verify(mockBreadcrumb).setLinkClickedHandler(callbackPCaptor.capture());
-    verify(mockTab).setContent(any(Widget.class));
+    verify(mockTab).setContent(any());
 
     // test click on breadcrumb
     String newEntityId = "syn9898989822";
@@ -260,7 +260,7 @@ public class DockerTabTest {
       )
     );
     verify(mockGinInjector).createNewDockerRepoWidget();
-    verify(mockView).setDockerRepoWidget(any(Widget.class));
+    verify(mockView).setDockerRepoWidget(any());
     verify(mockDockerRepoListWidget, never()).configure(projectEntityId);
   }
 

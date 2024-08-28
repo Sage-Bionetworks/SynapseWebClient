@@ -45,8 +45,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.internal.util.reflection.Whitebox;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
@@ -144,6 +143,7 @@ import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
+import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * Test for the SynapseClientImpl
@@ -151,7 +151,7 @@ import org.sagebionetworks.web.shared.users.PermissionLevel;
  * @author John
  *
  */
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class SynapseClientImplTest {
 
   private static final String BANNER_2 = "Another Banner";
@@ -303,8 +303,7 @@ public class SynapseClientImplTest {
 
   @Before
   public void before() throws SynapseException, JSONObjectAdapterException {
-    when(mockSynapseProvider.createNewClient(anyString()))
-      .thenReturn(mockSynapse);
+    when(mockSynapseProvider.createNewClient(any())).thenReturn(mockSynapse);
     when(mockPaginatedMembershipRequest.getTotalNumberOfResults())
       .thenReturn(3L);
     synapseClient = new SynapseClientImpl();
@@ -370,7 +369,7 @@ public class SynapseClientImplTest {
     teamA.setName("Amplitude");
     uts.add(teamA);
     pguts.setResults(uts);
-    when(mockSynapse.getTeamsForUser(anyString(), anyInt(), anyInt()))
+    when(mockSynapse.getTeamsForUser(any(), anyInt(), anyInt()))
       .thenReturn(pguts);
 
     acl = new AccessControlList();
@@ -438,7 +437,7 @@ public class SynapseClientImplTest {
     handle.setBucketName("bucket");
     handle.setFileName(testFileName);
     handle.setKey("key");
-    when(mockSynapse.getRawFileHandle(anyString())).thenReturn(handle);
+    when(mockSynapse.getRawFileHandle(any())).thenReturn(handle);
     org.sagebionetworks.reflection.model.PaginatedResults<
       AccessRequirement
     > ars = new org.sagebionetworks.reflection.model.PaginatedResults<
@@ -493,7 +492,7 @@ public class SynapseClientImplTest {
     membershipStatus.setHasUnmetAccessRequirement(false);
     membershipStatus.setIsMember(false);
     membershipStatus.setMembershipApprovalRequired(false);
-    when(mockSynapse.getTeamMembershipStatus(anyString(), anyString()))
+    when(mockSynapse.getTeamMembershipStatus(any(), any()))
       .thenReturn(membershipStatus);
 
     sentMessage = new MessageToUser();
@@ -529,7 +528,7 @@ public class SynapseClientImplTest {
     when(mockBatchCopyResults.getCopyResults())
       .thenReturn(batchCopyResultsList);
 
-    Whitebox.setInternalState(
+    ReflectionTestUtils.setField(
       synapseClient,
       "perThreadRequest",
       mockThreadLocal
@@ -578,8 +577,8 @@ public class SynapseClientImplTest {
     paginatedInvitations.setResults(testInvitations);
     when(
       mockSynapse.getOpenMembershipInvitationSubmissions(
-        anyString(),
-        anyString(),
+        any(),
+        any(),
         anyLong(),
         anyLong()
       )
@@ -604,12 +603,7 @@ public class SynapseClientImplTest {
       new PaginatedResults<MembershipRequest>();
     paginatedInvitations.setResults(testInvitations);
     when(
-      mockSynapse.getOpenMembershipRequests(
-        anyString(),
-        anyString(),
-        anyLong(),
-        anyLong()
-      )
+      mockSynapse.getOpenMembershipRequests(any(), any(), anyLong(), anyLong())
     )
       .thenReturn(paginatedInvitations);
 
@@ -885,16 +879,14 @@ public class SynapseClientImplTest {
       TeamMember
     >();
     teamMembersPage2.setResults(new ArrayList());
-    when(
-      mockSynapse.getTeamMembers(anyString(), anyString(), anyInt(), anyInt())
-    )
+    when(mockSynapse.getTeamMembers(any(), any(), anyLong(), anyLong()))
       .thenReturn(teamMembersPage1, teamMembersPage2);
 
     assertFalse(synapseClient.isUserAllowedToRenderHTML("untrustedId"));
 
     // get both pages
     verify(mockSynapse, times(2))
-      .getTeamMembers(anyString(), anyString(), anyInt(), anyInt());
+      .getTeamMembers(any(), any(), anyLong(), anyLong());
 
     // the cache should be ready, it should not ask for the team members from the synapse client again
     // for an hour
@@ -902,7 +894,7 @@ public class SynapseClientImplTest {
 
     // only the original 2 calls
     verify(mockSynapse, times(2))
-      .getTeamMembers(anyString(), anyString(), anyInt(), anyInt());
+      .getTeamMembers(any(), any(), anyLong(), anyLong());
   }
 
   private void resetUpdateExternalFileHandleMocks(
@@ -1082,10 +1074,8 @@ public class SynapseClientImplTest {
   public void testCompleteUpload()
     throws JSONObjectAdapterException, SynapseException, RestServiceException {
     FileEntity testFileEntity = getTestFileEntity();
-    when(mockSynapse.createEntity(any(FileEntity.class)))
-      .thenReturn(testFileEntity);
-    when(mockSynapse.putEntity(any(FileEntity.class)))
-      .thenReturn(testFileEntity);
+    when(mockSynapse.createEntity(any())).thenReturn(testFileEntity);
+    when(mockSynapse.putEntity(any())).thenReturn(testFileEntity);
 
     // parent entity has no immediate children
     EntityIdList childEntities = new EntityIdList();
@@ -1282,7 +1272,7 @@ public class SynapseClientImplTest {
     verify(mockSynapse)
       .getOpenMembershipInvitationSubmissions(
         eq(teamId),
-        anyString(),
+        any(),
         eq((long) limit),
         eq((long) offset)
       );
@@ -1303,7 +1293,7 @@ public class SynapseClientImplTest {
       teamId
     );
     verify(mockSynapse)
-      .getOpenMembershipRequests(eq(teamId), anyString(), anyLong(), anyLong());
+      .getOpenMembershipRequests(eq(teamId), any(), anyLong(), anyLong());
     // we set this up so that a single request would be returned. Verify that
     // it is the one we're looking for
     assertEquals(1, bundles.size());
@@ -2159,8 +2149,7 @@ public class SynapseClientImplTest {
   public void testIsChallenge() throws RestServiceException, SynapseException {
     when(mockSynapse.getChallengeForProject(anyString()))
       .thenReturn(mockChallenge);
-    when(mockSynapse.canAccess(anyString(), eq(ACCESS_TYPE.UPDATE)))
-      .thenReturn(true);
+    when(mockSynapse.canAccess(any(), eq(ACCESS_TYPE.UPDATE))).thenReturn(true);
     assertTrue(synapseClient.isChallenge("syn123"));
 
     org.sagebionetworks.reflection.model.PaginatedResults<

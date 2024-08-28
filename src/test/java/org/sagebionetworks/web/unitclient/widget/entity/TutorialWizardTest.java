@@ -14,7 +14,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -25,7 +25,7 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 /**
  * Unit test for wiki attachments widget
  */
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class TutorialWizardTest {
 
   TutorialWizard presenter;
@@ -103,8 +103,8 @@ public class TutorialWizardTest {
     AsyncMockStubber
       .callFailureWith(new Exception())
       .when(mockJsClient)
-      .getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
+      .getV2WikiHeaderTree(any(), any(), any());
     presenter.configure("syn1234", null);
-    verify(mockView).showErrorMessage(anyString());
+    verify(mockView).showErrorMessage(any());
   }
 }

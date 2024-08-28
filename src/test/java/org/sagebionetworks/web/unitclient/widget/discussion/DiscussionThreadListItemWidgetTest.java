@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.discussion;
 
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
@@ -77,7 +78,7 @@ public class DiscussionThreadListItemWidgetTest {
   @Test
   public void testConstructor() {
     verify(mockView).setPresenter(discussionThreadWidget);
-    verify(mockView).setThreadAuthor(any(Widget.class));
+    verify(mockView).setThreadAuthor(any());
   }
 
   @Test
@@ -85,12 +86,12 @@ public class DiscussionThreadListItemWidgetTest {
     discussionThreadWidget.configure(mockThreadBundle);
     verify(mockView).setTitle(title);
     verify(mockView).clearActiveAuthors();
-    verify(mockView).addActiveAuthor(any(Widget.class));
+    verify(mockView).addActiveAuthor(any());
     verify(mockView).setNumberOfViews("2");
-    verify(mockView).setLastActivity(anyString());
+    verify(mockView).setLastActivity(any());
     verify(mockGinInjector).getUserBadgeWidget();
-    verify(mockDateTimeUtils).getRelativeTime(any(Date.class));
-    verify(mockAuthorWidget).configure(anyString());
+    verify(mockDateTimeUtils).getRelativeTime(any());
+    verify(mockAuthorWidget).configure((String) eq(null));
     verify(mockView).setPinnedIconVisible(false);
     verify(mockView)
       .setThreadUrl(TopicUtils.buildThreadLink(PROJECT_ID, THREAD_ID));
@@ -123,7 +124,6 @@ public class DiscussionThreadListItemWidgetTest {
       mockThreadIdClickedCallback
     );
     discussionThreadWidget.onClickThread();
-    verify(mockThreadIdClickedCallback)
-      .invoke(any(DiscussionThreadBundle.class));
+    verify(mockThreadIdClickedCallback).invoke(any());
   }
 }

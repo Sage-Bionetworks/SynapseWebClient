@@ -218,8 +218,8 @@ public class NewReplyWidgetTest {
 
   @Test
   public void testConstructor() {
-    verify(mockView).setAlert(any(Widget.class));
-    verify(mockView).setMarkdownEditor(any(Widget.class));
+    verify(mockView).setAlert(any());
+    verify(mockView).setMarkdownEditor(any());
     verify(mockView).setPresenter(newReplyWidget);
   }
 

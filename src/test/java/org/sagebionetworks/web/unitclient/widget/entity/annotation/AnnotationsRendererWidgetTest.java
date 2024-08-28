@@ -148,7 +148,7 @@ public class AnnotationsRendererWidgetTest {
       EntityBundle.class
     );
 
-    verify(mockView).addEditorToPage(any(Widget.class));
+    verify(mockView).addEditorToPage(any());
     verify(mockEditAnnotationsDialog).configure(bundleCaptor.capture());
 
     assertEquals(bundleCaptor.getValue(), mockBundle);

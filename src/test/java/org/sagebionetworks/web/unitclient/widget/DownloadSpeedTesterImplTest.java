@@ -89,18 +89,15 @@ public class DownloadSpeedTesterImplTest {
     AsyncMockStubber
       .callSuccessWith(mockFileEntity)
       .when(mockJsClient)
-      .getEntity(anyString(), any(AsyncCallback.class));
+      .getEntity(any(), any());
     AsyncMockStubber
       .callSuccessWith(mockFileResult)
       .when(mockFileHandleAsyncHandler)
-      .getFileResult(
-        any(FileHandleAssociation.class),
-        any(AsyncCallback.class)
-      );
+      .getFileResult(any(), any());
     RequestBuilderMockStubber
       .callOnResponseReceived(null, mockResponse)
       .when(mockRequestBuilder)
-      .sendRequest(anyString(), any(RequestCallback.class));
+      .sendRequest(any(), any());
 
     downloadSpeedTester =
       new DownloadSpeedTesterImpl(
@@ -128,7 +125,7 @@ public class DownloadSpeedTesterImplTest {
   public void testHappyCase() {
     downloadSpeedTester.testDownloadSpeed(mockCallback);
 
-    verify(mockCallback).onSuccess(anyDouble());
+    verify(mockCallback).onSuccess(any());
   }
 
   @Test
@@ -228,8 +225,7 @@ public class DownloadSpeedTesterImplTest {
 
     // verify it runs the test
     verify(mockJsClient).getEntity(anyString(), any(AsyncCallback.class));
-    verify(mockRequestBuilder)
-      .sendRequest(anyString(), any(RequestCallback.class));
-    verify(mockCallback).onSuccess(anyDouble());
+    verify(mockRequestBuilder).sendRequest(any(), any());
+    verify(mockCallback).onSuccess(any());
   }
 }

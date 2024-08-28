@@ -146,8 +146,8 @@ public class TermsOfUseAccessRequirementWidgetTest {
   @Test
   public void testConstruction() {
     verify(mockView).setPresenter(widget);
-    verify(mockView).setWikiTermsWidget(any(Widget.class));
-    verify(mockView).setEditAccessRequirementWidget(any(Widget.class));
+    verify(mockView).setWikiTermsWidget(any());
+    verify(mockView).setEditAccessRequirementWidget(any());
     verify(mockWikiPageWidget).setModifiedCreatedByHistoryVisible(false);
   }
 
@@ -171,12 +171,7 @@ public class TermsOfUseAccessRequirementWidgetTest {
   @Test
   public void testSetRequirementWithWikiTerms() {
     widget.setRequirement(mockTermsOfUseAccessRequirement, mockRefreshCallback);
-    verify(mockWikiPageWidget)
-      .configure(
-        any(WikiPageKey.class),
-        eq(false),
-        any(WikiPageWidget.Callback.class)
-      );
+    verify(mockWikiPageWidget).configure(any(), eq(false), any());
     verify(mockView, never()).setTerms(anyString());
     verify(mockView, never()).showTermsUI();
   }

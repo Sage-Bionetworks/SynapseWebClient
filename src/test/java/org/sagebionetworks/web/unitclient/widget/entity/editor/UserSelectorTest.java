@@ -81,7 +81,7 @@ public class UserSelectorTest {
     verify(mockSuggestBox)
       .setSuggestionProvider(mockUserGroupSuggestionProvider);
     verify(mockSuggestBox).setTypeFilter(TypeFilter.ALL);
-    verify(mockView).setSelectBox(any(Widget.class));
+    verify(mockView).setSelectBox(any());
     verify(mockSuggestBox).addItemSelectedHandler(any(CallbackP.class));
   }
 

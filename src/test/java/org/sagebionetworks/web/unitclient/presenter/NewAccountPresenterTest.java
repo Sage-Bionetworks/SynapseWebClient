@@ -231,9 +231,9 @@ public class NewAccountPresenterTest {
         any(AsyncCallback.class)
       );
 
-    ArgumentCaptor<AsyncCallback<UserProfile>> captor = new ArgumentCaptor<
-      AsyncCallback<UserProfile>
-    >();
+    ArgumentCaptor<AsyncCallback<UserProfile>> captor = ArgumentCaptor.forClass(
+      AsyncCallback.class
+    );
     verify(mockAuthController)
       .setNewAccessToken(eq(testSessionToken), captor.capture());
     AsyncCallback<UserProfile> onSetNewAccessToken = captor.getValue();

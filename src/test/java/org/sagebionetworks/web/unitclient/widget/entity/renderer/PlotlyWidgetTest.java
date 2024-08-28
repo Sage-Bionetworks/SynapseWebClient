@@ -452,11 +452,11 @@ public class PlotlyWidgetTest {
 
     verify(mockView)
       .showChart(
-        anyString(),
+        any(),
         eq(yAxisTitle),
         eq(xAxisTitle),
         plotlyTraceArrayCaptor.capture(),
-        anyString(),
+        any(),
         any(),
         any(),
         anyBoolean()

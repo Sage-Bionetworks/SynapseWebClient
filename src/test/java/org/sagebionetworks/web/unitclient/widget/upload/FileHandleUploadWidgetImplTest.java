@@ -68,10 +68,9 @@ public class FileHandleUploadWidgetImplTest {
 
     // The metadata returned should correspond to testFileName
     when(mockView.getInputId()).thenReturn(inputId);
-    when(jsniUtils.getMultipleUploadFileNames(any(JavaScriptObject.class)))
+    when(jsniUtils.getMultipleUploadFileNames(any()))
       .thenReturn(new String[] { "testName" });
-    when(jsniUtils.getContentType(any(JavaScriptObject.class), anyInt()))
-      .thenReturn(null);
+    when(jsniUtils.getContentType(any(), anyInt())).thenReturn(null);
   }
 
   @Test
@@ -99,11 +98,11 @@ public class FileHandleUploadWidgetImplTest {
 
     verify(mockMultipartUploader)
       .uploadFile(
-        anyString(),
-        anyString(),
-        any(JavaScriptObject.class),
+        any(),
+        any(),
+        any(),
         handleCaptor.capture(),
-        any(Long.class),
+        any(),
         eq(mockView)
       );
     handleCaptor.getValue().updateProgress(0.1, "10%", "100 KB/s");
@@ -127,7 +126,7 @@ public class FileHandleUploadWidgetImplTest {
     FileValidator mockFileValidator = mock(FileValidator.class);
     when(mockFileValidator.getInvalidFileCallback())
       .thenReturn(mockFailedValidationCallback);
-    when(jsniUtils.getMultipleUploadFileNames(any(JavaScriptObject.class)))
+    when(jsniUtils.getMultipleUploadFileNames(any()))
       .thenReturn(new String[] { "testName#($*#.jpg" });
     widget.configure("button text", mockCallback);
     widget.setValidation(mockFileValidator);
@@ -140,7 +139,7 @@ public class FileHandleUploadWidgetImplTest {
 
   @Test
   public void testSelectInvalidFileNameNoValidator() {
-    when(jsniUtils.getMultipleUploadFileNames(any(JavaScriptObject.class)))
+    when(jsniUtils.getMultipleUploadFileNames(any()))
       .thenReturn(new String[] { "testName#($*#.jpg" });
     widget.configure("button text", mockCallback);
 
@@ -152,7 +151,7 @@ public class FileHandleUploadWidgetImplTest {
   @Test
   public void testMultiFileSelected() {
     final String successFileHandle = "123";
-    when(jsniUtils.getMultipleUploadFileNames(any(JavaScriptObject.class)))
+    when(jsniUtils.getMultipleUploadFileNames(any()))
       .thenReturn(new String[] { "testName", "testName2" });
 
     // Configure before the test
@@ -168,11 +167,11 @@ public class FileHandleUploadWidgetImplTest {
     // The progress should be updated with scaled values based on the presence of two files to upload
     verify(mockMultipartUploader)
       .uploadFile(
-        anyString(),
-        anyString(),
-        any(JavaScriptObject.class),
+        any(),
+        any(),
+        any(),
         handleCaptor.capture(),
-        any(Long.class),
+        any(),
         eq(mockView)
       );
     verify(mockView).showProgress(true);

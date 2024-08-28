@@ -68,7 +68,7 @@ public class FileHandleListTest {
   @Test
   public void testConstruction() {
     verify(mockView).setPresenter(widget);
-    verify(mockView).setUploadWidget(any(Widget.class));
+    verify(mockView).setUploadWidget(any());
   }
 
   @Test
@@ -147,7 +147,7 @@ public class FileHandleListTest {
     widget.refreshLinkUI();
 
     verify(mockView).clearFileLinks();
-    verify(mockView).addFileLink(any(Widget.class));
+    verify(mockView).addFileLink(any());
     // show toolbar since we can delete and we're showing a file.
     verify(mockView).setToolbarVisible(true);
     // show that we can delete, since the single file is telling us that it's selected

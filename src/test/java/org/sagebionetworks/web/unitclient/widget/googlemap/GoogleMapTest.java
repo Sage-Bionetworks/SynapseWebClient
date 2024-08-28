@@ -63,7 +63,7 @@ public class GoogleMapTest {
 
   @Test
   public void testConstruction() {
-    verify(mockView).setSynAlert(any(Widget.class));
+    verify(mockView).setSynAlert(any());
     verify(mockView).setPresenter(map);
   }
 

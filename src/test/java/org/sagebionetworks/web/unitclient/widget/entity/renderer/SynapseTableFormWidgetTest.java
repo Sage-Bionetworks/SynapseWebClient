@@ -116,9 +116,9 @@ public class SynapseTableFormWidgetTest {
   @Test
   public void testAsWidget() {
     // test construction
-    verify(mockView).setRowFormWidget(any(Widget.class));
-    verify(mockView).setSynAlertWidget(any(Widget.class));
-    verify(mockView).setUserBadge(any(Widget.class));
+    verify(mockView).setRowFormWidget(any());
+    verify(mockView).setSynAlertWidget(any());
+    verify(mockView).setUserBadge(any());
     verify(mockView).setPresenter(widget);
 
     // and asWidget

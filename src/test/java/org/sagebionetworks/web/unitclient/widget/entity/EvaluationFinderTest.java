@@ -24,7 +24,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -37,7 +37,7 @@ import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class EvaluationFinderTest {
 
   @Mock
@@ -89,22 +89,15 @@ public class EvaluationFinderTest {
     AsyncMockStubber
       .callSuccessWith(evaluationListPage)
       .when(mockJsClient)
-      .getEvaluations(
-        anyBoolean(),
-        any(ACCESS_TYPE.class),
-        anyList(),
-        anyInt(),
-        anyInt(),
-        any(AsyncCallback.class)
-      );
+      .getEvaluations(any(), any(), any(), any(), any(), any());
   }
 
   @Test
   public void testConstructor() {
     verify(mockView).setPresenter(widget);
-    verify(mockView).setSynAlert(any(IsWidget.class));
-    verify(mockView).setEvaluationList(any(IsWidget.class));
-    verify(mockView).setPaginationWidget(any(IsWidget.class));
+    verify(mockView).setSynAlert(any());
+    verify(mockView).setEvaluationList(any());
+    verify(mockView).setPaginationWidget(any());
   }
 
   @Test
@@ -187,14 +180,7 @@ public class EvaluationFinderTest {
     AsyncMockStubber
       .callFailureWith(ex)
       .when(mockJsClient)
-      .getEvaluations(
-        anyBoolean(),
-        any(ACCESS_TYPE.class),
-        anyList(),
-        anyInt(),
-        anyInt(),
-        any(AsyncCallback.class)
-      );
+      .getEvaluations(any(), any(), any(), any(), any(), any());
 
     widget.configure(isActiveOnly, access, mockSelectedEvaluationCallback);
 

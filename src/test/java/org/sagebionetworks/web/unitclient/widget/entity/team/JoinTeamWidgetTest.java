@@ -24,6 +24,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -101,20 +102,15 @@ public class JoinTeamWidgetTest {
     AsyncMockStubber
       .callSuccessWith(new HashMap())
       .when(mockSynapseClient)
-      .getPageNameToWikiKeyMap(any(AsyncCallback.class));
+      .getPageNameToWikiKeyMap(any());
     AsyncMockStubber
       .callSuccessWith(true)
       .when(mockSynapseClient)
-      .hasAccess(
-        anyString(),
-        anyString(),
-        anyString(),
-        any(AsyncCallback.class)
-      );
+      .hasAccess(any(), any(), any(), any());
     AsyncMockStubber
       .callSuccessWith(ars)
       .when(mockSynapseClient)
-      .getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
+      .getTeamAccessRequirements(any(), any());
 
     joinWidget =
       new JoinTeamWidget(
@@ -150,22 +146,12 @@ public class JoinTeamWidgetTest {
     AsyncMockStubber
       .callSuccessWith(status)
       .when(mockSynapseClient)
-      .requestMembership(
-        anyString(),
-        anyString(),
-        anyString(),
-        anyString(),
-        any(Date.class),
-        any(AsyncCallback.class)
-      );
+      .requestMembership(any(), any(), any(), any(), any(), any());
 
     AsyncMockStubber
       .callSuccessWith(null)
       .when(mockSynapseClient)
-      .createAccessApproval(
-        any(AccessApproval.class),
-        any(AsyncCallback.class)
-      );
+      .createAccessApproval(any(), any());
     when(mockGwt.getHostPageBaseURL())
       .thenReturn(EvaluationSubmitterTest.HOST_PAGE_URL);
   }
@@ -371,12 +357,12 @@ public class JoinTeamWidgetTest {
       .configure(Mockito.anyInt(), Mockito.anyInt());
     verify(mockSynapseClient)
       .requestMembership(
-        anyString(),
-        anyString(),
-        anyString(),
+        any(),
+        any(),
+        any(),
         eq(EvaluationSubmitterTest.HOST_PAGE_URL),
-        eq((Date) null),
-        any(AsyncCallback.class)
+        eq(null),
+        any()
       );
   }
 
@@ -475,12 +461,12 @@ public class JoinTeamWidgetTest {
     joinWidget.sendJoinRequestStep3();
     verify(mockSynapseClient)
       .requestMembership(
-        anyString(),
-        anyString(),
-        anyString(),
+        any(),
+        any(),
+        any(),
         eq(EvaluationSubmitterTest.HOST_PAGE_URL),
-        eq((Date) null),
-        any(AsyncCallback.class)
+        eq(null),
+        any()
       );
     verify(mockView).showInfo(anyString());
     // verify that team updated callback is invoked
@@ -494,24 +480,17 @@ public class JoinTeamWidgetTest {
     AsyncMockStubber
       .callFailureWith(ex)
       .when(mockSynapseClient)
-      .requestMembership(
-        anyString(),
-        anyString(),
-        anyString(),
-        anyString(),
-        any(Date.class),
-        any(AsyncCallback.class)
-      );
+      .requestMembership(any(), any(), any(), any(), any(), any());
     joinWidget.sendJoinRequest("");
     verify(mockSynAlert).handleException(ex);
     verify(mockSynapseClient)
       .requestMembership(
-        anyString(),
-        anyString(),
-        anyString(),
+        any(),
+        any(),
+        any(),
         eq(EvaluationSubmitterTest.HOST_PAGE_URL),
-        eq((Date) null),
-        any(AsyncCallback.class)
+        eq(null),
+        any()
       );
   }
 
@@ -537,12 +516,12 @@ public class JoinTeamWidgetTest {
     ArgumentCaptor<Date> dateCaptor = ArgumentCaptor.forClass(Date.class);
     verify(mockSynapseClient)
       .requestMembership(
-        anyString(),
-        anyString(),
-        anyString(),
+        any(),
+        any(),
+        any(),
         eq(EvaluationSubmitterTest.HOST_PAGE_URL),
         dateCaptor.capture(),
-        any(AsyncCallback.class)
+        any()
       );
     verify(mockView).showInfo(anyString());
     // verify that wiki page refresh is invoked

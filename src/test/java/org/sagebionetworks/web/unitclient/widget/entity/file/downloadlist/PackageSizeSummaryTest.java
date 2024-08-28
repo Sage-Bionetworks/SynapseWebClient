@@ -17,7 +17,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -25,7 +25,7 @@ import org.sagebionetworks.web.client.widget.DownloadSpeedTester;
 import org.sagebionetworks.web.client.widget.entity.file.downloadlist.PackageSizeSummary;
 import org.sagebionetworks.web.client.widget.entity.file.downloadlist.PackageSizeSummaryView;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class PackageSizeSummaryTest {
 
   PackageSizeSummary widget;

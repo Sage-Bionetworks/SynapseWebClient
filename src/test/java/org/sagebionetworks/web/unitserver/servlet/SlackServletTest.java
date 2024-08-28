@@ -114,8 +114,7 @@ public class SlackServletTest {
     when(mockEntityPath.getPath()).thenReturn(entityPath);
     when(mockEntityBundle.getPath()).thenReturn(mockEntityPath);
     when(mockParentProject.getName()).thenReturn(ENTITY_PROJECT);
-    when(mockSynapseProvider.createNewClient(anyString()))
-      .thenReturn(mockSynapse);
+    when(mockSynapseProvider.createNewClient(any())).thenReturn(mockSynapse);
     when(mockResponse.getOutputStream()).thenReturn(mockOutputStream);
     when(mockEntityBundle.getThreadCount()).thenReturn(THREAD_COUNT);
     when(mockEntityBundle.getAnnotations()).thenReturn(mockAnnotations);
@@ -140,10 +139,10 @@ public class SlackServletTest {
     String requestSynId = "syn1234";
     when(mockRequest.getParameter("text")).thenReturn(requestSynId);
     when(mockRequest.getParameter("command")).thenReturn("/synapse");
+
     servlet.doGet(mockRequest, mockResponse);
 
-    verify(mockSynapse)
-      .getEntityBundleV2(anyString(), any(EntityBundleRequest.class));
+    verify(mockSynapse).getEntityBundleV2(any(), any());
 
     verify(mockOutputStream)
       .write(byteArrayCaptor.capture(), anyInt(), anyInt());
@@ -163,8 +162,7 @@ public class SlackServletTest {
     when(mockRequest.getParameter("command")).thenReturn("/synapsestaging");
     servlet.doGet(mockRequest, mockResponse);
 
-    verify(mockSynapse)
-      .getEntityBundleV2(anyString(), any(EntityBundleRequest.class));
+    verify(mockSynapse).getEntityBundleV2(any(), any());
 
     verify(mockOutputStream)
       .write(byteArrayCaptor.capture(), anyInt(), anyInt());

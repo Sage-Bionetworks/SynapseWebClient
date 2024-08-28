@@ -103,7 +103,7 @@ public class DockerRepoListWidgetTest {
   @Test
   public void testConstruction() {
     verify(mockView).setMembersContainer(mockMembersContainer);
-    verify(mockView).setSynAlert(any(Widget.class));
+    verify(mockView).setSynAlert(any());
   }
 
   @Test

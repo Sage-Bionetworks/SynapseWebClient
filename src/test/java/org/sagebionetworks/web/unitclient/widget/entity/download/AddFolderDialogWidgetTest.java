@@ -79,7 +79,7 @@ public class AddFolderDialogWidgetTest {
   @Test
   public void testConstructor() {
     verify(mockView).setSynAlert(mockSynAlert);
-    verify(mockView).setSharingAndDataUseWidget(any(IsWidget.class));
+    verify(mockView).setSharingAndDataUseWidget(any());
     verify(mockView).setPresenter(w);
   }
 

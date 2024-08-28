@@ -2,6 +2,7 @@ package org.sagebionetworks.web.unitserver.servlet;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -63,8 +64,7 @@ public class AliasRedirectorServletTest {
     throws IOException, SynapseException, JSONObjectAdapterException {
     MockitoAnnotations.initMocks(this);
     servlet = new AliasRedirectorServlet();
-    when(mockSynapseProvider.createNewClient(anyString()))
-      .thenReturn(mockSynapse);
+    when(mockSynapseProvider.createNewClient(any())).thenReturn(mockSynapse);
 
     servlet.setSynapseProvider(mockSynapseProvider);
 
@@ -148,8 +148,9 @@ public class AliasRedirectorServletTest {
   @Test
   public void testDoGetError() throws Exception {
     String errorMessage = "An error from the service call";
-    when(mockSynapse.getUserGroupHeadersByAliases(anyList()))
+    when(mockSynapse.getUserGroupHeadersByAliases(any()))
       .thenThrow(new SynapseForbiddenException(errorMessage));
+
     servlet.doGet(mockRequest, mockResponse);
 
     // redirects to an error place

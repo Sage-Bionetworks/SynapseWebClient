@@ -136,20 +136,17 @@ public class NbConvertPreviewWidgetTest {
     RequestBuilderMockStubber
       .callOnResponseReceived(null, mockResponse)
       .when(mockRequestBuilder)
-      .sendRequest(anyString(), any(RequestCallback.class));
+      .sendRequest(any(), any());
     when(mockSynapseJSNIUtils.sanitizeHtml(anyString()))
       .thenReturn(SANITIZED_HTML);
     AsyncMockStubber
       .callSuccessWith(true)
       .when(mockSynapseClient)
-      .isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
+      .isUserAllowedToRenderHTML(any(), any());
     AsyncMockStubber
       .callSuccessWith(mockFileResult)
       .when(mockPresignedURLAsyncHandler)
-      .getFileResult(
-        any(FileHandleAssociation.class),
-        any(AsyncCallback.class)
-      );
+      .getFileResult(any(), any());
     when(mockFileResult.getPreSignedURL()).thenReturn(PRESIGNED_URL);
     when(mockGwt.encodeQueryString(PRESIGNED_URL))
       .thenReturn(ENCODED_PRESIGNED_URL);
@@ -296,11 +293,7 @@ public class NbConvertPreviewWidgetTest {
     previewWidget.onShowFullContent();
 
     // verify it asks for a fresh presigned url, and opens it (to download)
-    verify(mockPresignedURLAsyncHandler)
-      .getFileResult(
-        any(FileHandleAssociation.class),
-        any(AsyncCallback.class)
-      );
+    verify(mockPresignedURLAsyncHandler).getFileResult(any(), any());
     verify(mockView).openInNewWindow(PRESIGNED_URL);
   }
 }

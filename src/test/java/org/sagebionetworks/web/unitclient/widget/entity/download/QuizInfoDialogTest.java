@@ -60,10 +60,10 @@ public class QuizInfoDialogTest {
     verify(mockQuizInfo).configure();
     verify(mockModal)
       .configure(
-        anyString(),
-        any(Widget.class),
-        anyString(),
-        anyString(),
+        any(),
+        any(),
+        any(),
+        any(),
         callbackCaptor.capture(),
         anyBoolean()
       );

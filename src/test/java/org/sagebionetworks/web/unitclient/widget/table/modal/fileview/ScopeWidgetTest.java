@@ -15,7 +15,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.EntityView;
@@ -32,7 +32,7 @@ import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class ScopeWidgetTest {
 
   @Mock
@@ -132,8 +132,8 @@ public class ScopeWidgetTest {
   @Test
   public void testConstruction() {
     verify(mockView).setPresenter(widget);
-    verify(mockView).setEditableEntityViewModalWidget(any(Widget.class));
-    verify(mockView).setEntityListWidget(any(Widget.class));
+    verify(mockView).setEditableEntityViewModalWidget(any());
+    verify(mockView).setEntityListWidget(any());
   }
 
   @Test

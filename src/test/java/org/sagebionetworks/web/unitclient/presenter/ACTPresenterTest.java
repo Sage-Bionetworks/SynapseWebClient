@@ -112,13 +112,7 @@ public class ACTPresenterTest {
     AsyncMockStubber
       .callSuccessWith(mockVerificationPagedResults)
       .when(mockUserProfileClient)
-      .listVerificationSubmissions(
-        any(VerificationStateEnum.class),
-        anyLong(),
-        anyLong(),
-        anyLong(),
-        any(AsyncCallback.class)
-      );
+      .listVerificationSubmissions(any(), any(), any(), any(), any());
     when(mockVerificationPagedResults.getResults())
       .thenReturn(Collections.singletonList(mockVerificationSubmission));
     when(mockGinInjector.getVerificationSubmissionWidget())
@@ -130,10 +124,10 @@ public class ACTPresenterTest {
   @Test
   public void testConstruction() {
     verify(mockView).setPresenter(widget);
-    verify(mockView).setSynAlert(any(Widget.class));
+    verify(mockView).setSynAlert(any());
     verify(mockView).setStates(anyList());
-    verify(mockView).setUserPickerWidget(any(Widget.class));
-    verify(mockView).setSelectedUserBadge(any(Widget.class));
+    verify(mockView).setUserPickerWidget(any());
+    verify(mockView).setSelectedUserBadge(any());
     verify(mockPeopleSuggestBox).setTypeFilter(TypeFilter.USERS_ONLY);
   }
 
@@ -142,13 +136,13 @@ public class ACTPresenterTest {
     widget.loadData();
     verify(mockLoadMoreWidgetContainer).clear();
     verify(mockSynapseAlert).clear();
-    verify(mockGlobalApplicationState).pushCurrentPlace(any(Place.class));
+    verify(mockGlobalApplicationState).pushCurrentPlace(any());
     verify(mockGinInjector).getVerificationSubmissionWidget();
     boolean isACTMember = true;
     boolean isModal = false;
     verify(mockVerificationSubmissionWidget)
       .configure(mockVerificationSubmission, isACTMember, isModal);
-    verify(mockLoadMoreWidgetContainer).add(any(Widget.class));
+    verify(mockLoadMoreWidgetContainer).add(any());
     verify(mockVerificationSubmissionWidget).show();
   }
 

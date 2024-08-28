@@ -164,20 +164,11 @@ public class VerificationSubmissionWidgetTest {
     AsyncMockStubber
       .callSuccessWith(null)
       .when(mockUserProfileClient)
-      .updateVerificationState(
-        anyLong(),
-        any(VerificationState.class),
-        anyString(),
-        any(AsyncCallback.class)
-      );
+      .updateVerificationState(anyLong(), any(), any(), any());
     AsyncMockStubber
       .callSuccessWith(null)
       .when(mockUserProfileClient)
-      .createVerificationSubmission(
-        any(VerificationSubmission.class),
-        anyString(),
-        any(AsyncCallback.class)
-      );
+      .createVerificationSubmission(any(), any(), any());
     fileHandleIds = new ArrayList<String>();
     when(mockFileHandleList.getFileHandleIds()).thenReturn(fileHandleIds);
 
@@ -213,8 +204,8 @@ public class VerificationSubmissionWidgetTest {
 
     assertFalse(widget.isNewSubmission());
     verify(mockGinInjector).getVerificationSubmissionModalViewImpl();
-    verify(mockView).setFileHandleList(any(Widget.class));
-    verify(mockView).setSynAlert(any(Widget.class));
+    verify(mockView).setFileHandleList(any());
+    verify(mockView).setSynAlert(any());
     verify(mockView).setPresenter(widget);
 
     widget.asWidget();
@@ -229,8 +220,8 @@ public class VerificationSubmissionWidgetTest {
 
     assertTrue(widget.isNewSubmission());
     verify(mockGinInjector).getVerificationSubmissionModalViewImpl();
-    verify(mockView).setFileHandleList(any(Widget.class));
-    verify(mockView).setSynAlert(any(Widget.class));
+    verify(mockView).setFileHandleList(any());
+    verify(mockView).setSynAlert(any());
     verify(mockView).setPresenter(widget);
   }
 
@@ -240,8 +231,8 @@ public class VerificationSubmissionWidgetTest {
     boolean isModal = false;
     widget.configure(mockSubmission, isACTMember, isModal);
     verify(mockGinInjector).getVerificationSubmissionRowViewImpl();
-    verify(mockRowView).setFileHandleList(any(Widget.class));
-    verify(mockRowView).setSynAlert(any(Widget.class));
+    verify(mockRowView).setFileHandleList(any());
+    verify(mockRowView).setSynAlert(any());
     verify(mockRowView).setPresenter(widget);
 
     widget.asWidget();

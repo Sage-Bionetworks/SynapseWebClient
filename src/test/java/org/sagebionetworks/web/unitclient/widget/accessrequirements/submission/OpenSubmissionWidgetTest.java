@@ -71,8 +71,7 @@ public class OpenSubmissionWidgetTest {
 
     Callback callback = captor.getValue();
     callback.invoke();
-    verify(mockClient)
-      .getAccessRequirement(anyString(), any(AsyncCallback.class));
+    verify(mockClient).getAccessRequirement(any(), any());
   }
 
   @Test
@@ -81,10 +80,9 @@ public class OpenSubmissionWidgetTest {
     AsyncMockStubber
       .callFailureWith(ex)
       .when(mockClient)
-      .getAccessRequirement(anyString(), any(AsyncCallback.class));
+      .getAccessRequirement(any(), any());
     widget.loadAccessRequirement();
-    verify(mockClient)
-      .getAccessRequirement(anyString(), any(AsyncCallback.class));
+    verify(mockClient).getAccessRequirement(any(), any());
     InOrder inOrder = inOrder(mockSynapseAlert);
     inOrder.verify(mockSynapseAlert).clear();
     inOrder.verify(mockSynapseAlert).handleException(ex);
@@ -97,13 +95,12 @@ public class OpenSubmissionWidgetTest {
     AsyncMockStubber
       .callSuccessWith(actAccessRequirement)
       .when(mockClient)
-      .getAccessRequirement(anyString(), any(AsyncCallback.class));
+      .getAccessRequirement(any(), any());
     widget.loadAccessRequirement();
-    verify(mockClient)
-      .getAccessRequirement(anyString(), any(AsyncCallback.class));
+    verify(mockClient).getAccessRequirement(any(), any());
     verify(mockSynapseAlert).clear();
     verify(mockAccessRequirementWidget)
-      .setRequirement(eq(actAccessRequirement), any(Callback.class));
+      .setRequirement(eq(actAccessRequirement), any());
   }
 
   @Test
@@ -113,10 +110,9 @@ public class OpenSubmissionWidgetTest {
     AsyncMockStubber
       .callSuccessWith(touAccessRequirement)
       .when(mockClient)
-      .getAccessRequirement(anyString(), any(AsyncCallback.class));
+      .getAccessRequirement(any(), any());
     widget.loadAccessRequirement();
-    verify(mockClient)
-      .getAccessRequirement(anyString(), any(AsyncCallback.class));
+    verify(mockClient).getAccessRequirement(any(), any());
     InOrder inOrder = inOrder(mockSynapseAlert);
     inOrder.verify(mockSynapseAlert).clear();
     ArgumentCaptor<Exception> captor = ArgumentCaptor.forClass(Exception.class);

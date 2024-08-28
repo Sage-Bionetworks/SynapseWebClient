@@ -63,8 +63,7 @@ public class FileHandleServletTest {
   public void setup() throws IOException, SynapseException {
     MockitoAnnotations.initMocks(this);
     servlet = new FileHandleServlet();
-    when(mockSynapseProvider.createNewClient(anyString()))
-      .thenReturn(mockSynapse);
+    when(mockSynapseProvider.createNewClient(any())).thenReturn(mockSynapse);
 
     WikiPage testPage = new WikiPage();
     testPage.setAttachmentFileHandleIds(new ArrayList<String>());

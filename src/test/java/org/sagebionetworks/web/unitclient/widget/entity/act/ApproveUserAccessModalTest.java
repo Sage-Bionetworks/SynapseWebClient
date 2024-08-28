@@ -450,13 +450,7 @@ public class ApproveUserAccessModalTest {
       .createAccessApproval(any(AccessApproval.class), aaCaptor.capture());
     aaCaptor.getValue().onSuccess(mockAccessApproval);
     verify(mockSynapseClient)
-      .sendMessage(
-        anySetOf(String.class),
-        anyString(),
-        anyString(),
-        anyString(),
-        sCaptor.capture()
-      );
+      .sendMessage(any(), any(), any(), any(), sCaptor.capture());
   }
 
   @Test
@@ -485,13 +479,7 @@ public class ApproveUserAccessModalTest {
     aaCaptor.getValue().onSuccess(mockAccessApproval);
 
     verify(mockSynapseClient)
-      .sendMessage(
-        anySetOf(String.class),
-        anyString(),
-        anyString(),
-        anyString(),
-        sCaptor.capture()
-      );
+      .sendMessage(any(), any(), any(), any(), sCaptor.capture());
     sCaptor.getValue().onFailure(ex);
 
     verify(mockView).setApproveProcessing(false);
@@ -523,13 +511,7 @@ public class ApproveUserAccessModalTest {
     aaCaptor.getValue().onSuccess(mockAccessApproval);
 
     verify(mockSynapseClient)
-      .sendMessage(
-        anySetOf(String.class),
-        anyString(),
-        anyString(),
-        anyString(),
-        sCaptor.capture()
-      );
+      .sendMessage(any(), any(), any(), any(), sCaptor.capture());
     sCaptor.getValue().onSuccess(anyString());
 
     verify(mockView).setApproveProcessing(false);

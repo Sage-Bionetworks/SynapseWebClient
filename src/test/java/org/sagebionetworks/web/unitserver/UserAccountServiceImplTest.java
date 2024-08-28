@@ -40,8 +40,7 @@ public class UserAccountServiceImplTest {
   public void before() throws SynapseException, JSONObjectAdapterException {
     mockSynapse = Mockito.mock(SynapseClient.class);
     mockSynapseProvider = Mockito.mock(SynapseProvider.class);
-    when(mockSynapseProvider.createNewClient(anyString()))
-      .thenReturn(mockSynapse);
+    when(mockSynapseProvider.createNewClient(any())).thenReturn(mockSynapse);
     mockTokenProvider = Mockito.mock(TokenProvider.class);
 
     testProfile = new UserProfile();

@@ -31,7 +31,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
@@ -56,7 +56,7 @@ import org.sagebionetworks.web.server.servlet.filter.CrawlFilter;
 import org.sagebionetworks.web.server.servlet.filter.HtmlInjectionFilter;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class HtmlInjectionFilterTest {
 
   HtmlInjectionFilter filter;

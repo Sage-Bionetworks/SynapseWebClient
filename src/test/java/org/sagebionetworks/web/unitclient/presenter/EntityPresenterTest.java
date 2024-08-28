@@ -18,7 +18,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
@@ -59,7 +59,7 @@ import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class EntityPresenterTest {
 
   @Mock
@@ -254,13 +254,7 @@ public class EntityPresenterTest {
     verify(mockView).setEntityPageTopVisible(true);
     verify(mockEntityPageTop, atLeastOnce()).clearState();
     verify(mockEntityPageTop)
-      .configure(
-        eq(eb),
-        eq(versionNumber),
-        any(EntityHeader.class),
-        any(EntityArea.class),
-        anyString()
-      );
+      .configure(eq(eb), eq(versionNumber), any(), any(), any());
     verify(mockView, times(2)).setEntityPageTopWidget(mockEntityPageTop);
     verify(mockView).setOpenTeamInvitesWidget(mockOpenInviteWidget);
     verify(mockHeaderWidget).refresh();
@@ -276,7 +270,7 @@ public class EntityPresenterTest {
     AsyncMockStubber
       .callSuccessWith(mockFileEntity)
       .when(mockSynapseJavascriptClient)
-      .getEntity(anyString(), any(AsyncCallback.class));
+      .getEntity(any(), any());
 
     entityPresenter.setPlace(mockPlace);
 
@@ -307,13 +301,7 @@ public class EntityPresenterTest {
     verify(mockView).setEntityPageTopVisible(true);
     verify(mockEntityPageTop, atLeastOnce()).clearState();
     verify(mockEntityPageTop)
-      .configure(
-        eq(eb),
-        eq(versionNumber),
-        any(EntityHeader.class),
-        any(EntityArea.class),
-        anyString()
-      );
+      .configure(eq(eb), eq(versionNumber), any(), any(), any());
 
     verify(mockView, times(2)).setEntityPageTopWidget(mockEntityPageTop);
   }
@@ -431,9 +419,9 @@ public class EntityPresenterTest {
       .configure(
         eq(eb),
         eq(null), // verify the draft version is loaded
-        any(EntityHeader.class),
-        any(EntityArea.class),
-        anyString()
+        any(),
+        any(),
+        any()
       );
   }
 
@@ -450,9 +438,9 @@ public class EntityPresenterTest {
       .configure(
         eq(eb),
         eq(latestSnapshotVersionNumber), // verify the latest snapshot version is loaded
-        any(EntityHeader.class),
-        any(EntityArea.class),
-        anyString()
+        any(),
+        any(),
+        any()
       );
   }
 
@@ -489,9 +477,9 @@ public class EntityPresenterTest {
       .configure(
         eq(eb),
         eq(null), // verify the draft version is loaded because there are no snapshots
-        any(EntityHeader.class),
-        any(EntityArea.class),
-        anyString()
+        any(),
+        any(),
+        any()
       );
   }
 
@@ -514,9 +502,9 @@ public class EntityPresenterTest {
       .configure(
         eq(eb),
         eq(null), // verify the draft version is loaded
-        any(EntityHeader.class),
-        any(EntityArea.class),
-        anyString()
+        any(),
+        any(),
+        any()
       );
   }
 }

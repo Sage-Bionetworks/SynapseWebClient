@@ -15,7 +15,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.Entity;
@@ -32,7 +32,7 @@ import org.sagebionetworks.web.client.widget.table.modal.fileview.SubmissionView
 import org.sagebionetworks.web.client.widget.table.modal.fileview.SubmissionViewScopeWidgetView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class SubmissionViewScopeWidgetTest {
 
   @Mock
@@ -99,31 +99,19 @@ public class SubmissionViewScopeWidgetTest {
     AsyncMockStubber
       .callSuccessWith(evaluations)
       .when(mockJsClient)
-      .getEvaluations(
-        anyBoolean(),
-        any(ACCESS_TYPE.class),
-        anyList(),
-        anyInt(),
-        anyInt(),
-        any(AsyncCallback.class)
-      );
+      .getEvaluations(any(), any(), any(), any(), any(), any());
     AsyncMockStubber
       .callSuccessWith(mockSubmissionView)
       .when(mockJsClient)
-      .updateEntity(
-        any(Entity.class),
-        anyString(),
-        anyBoolean(),
-        any(AsyncCallback.class)
-      );
+      .updateEntity(any(), any(), any(), any());
   }
 
   @Test
   public void testConstructor() {
     verify(mockView).setPresenter(widget);
-    verify(mockView).setSynAlert(any(IsWidget.class));
-    verify(mockView).setSubmissionViewScopeEditor(any(IsWidget.class));
-    verify(mockView).setEvaluationListWidget(any(IsWidget.class));
+    verify(mockView).setSynAlert(any());
+    verify(mockView).setSubmissionViewScopeEditor(any());
+    verify(mockView).setEvaluationListWidget(any());
   }
 
   @Test

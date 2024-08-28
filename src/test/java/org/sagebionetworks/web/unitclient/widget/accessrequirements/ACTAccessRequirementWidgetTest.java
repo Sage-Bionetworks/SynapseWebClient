@@ -23,7 +23,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -53,7 +53,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class ACTAccessRequirementWidgetTest {
 
   public static final String SUBJECT_OBJECT_ID = "syn981612";
@@ -198,8 +198,8 @@ public class ACTAccessRequirementWidgetTest {
   @Test
   public void testConstruction() {
     verify(mockView).setPresenter(widget);
-    verify(mockView).setWikiTermsWidget(any(Widget.class));
-    verify(mockView).setEditAccessRequirementWidget(any(Widget.class));
+    verify(mockView).setWikiTermsWidget(any());
+    verify(mockView).setEditAccessRequirementWidget(any());
     verify(mockWikiPageWidget).setModifiedCreatedByHistoryVisible(false);
   }
 
@@ -229,12 +229,7 @@ public class ACTAccessRequirementWidgetTest {
 
     widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
 
-    verify(mockWikiPageWidget)
-      .configure(
-        any(WikiPageKey.class),
-        eq(false),
-        any(WikiPageWidget.Callback.class)
-      );
+    verify(mockWikiPageWidget).configure(any(), eq(false), any());
     verify(mockView).setAccessRequirementName(ACCESS_REQUIREMENT_NAME);
     verify(mockView, never()).setTerms(anyString());
     verify(mockView, never()).showTermsUI();

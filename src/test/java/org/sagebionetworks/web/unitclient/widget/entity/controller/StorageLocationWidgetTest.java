@@ -21,7 +21,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.ExternalGoogleCloudUploadDestination;
@@ -46,7 +46,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class StorageLocationWidgetTest {
 
   @Mock
@@ -353,19 +353,10 @@ public class StorageLocationWidgetTest {
     AsyncMockStubber
       .callSuccessWith(null)
       .when(mockSynapseClient)
-      .createStorageLocationSetting(
-        anyString(),
-        any(StorageLocationSetting.class),
-        any(AsyncCallback.class)
-      );
+      .createStorageLocationSetting(any(), any(), any());
     widget.onSave();
 
-    verify(mockSynapseClient)
-      .createStorageLocationSetting(
-        anyString(),
-        any(StorageLocationSetting.class),
-        any(AsyncCallback.class)
-      );
+    verify(mockSynapseClient).createStorageLocationSetting(any(), any(), any());
     verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
     verify(mockView).hide();
   }
@@ -415,19 +406,10 @@ public class StorageLocationWidgetTest {
     AsyncMockStubber
       .callFailureWith(e)
       .when(mockSynapseClient)
-      .createStorageLocationSetting(
-        anyString(),
-        any(StorageLocationSetting.class),
-        any(AsyncCallback.class)
-      );
+      .createStorageLocationSetting(any(), any(), any());
     widget.onSave();
 
-    verify(mockSynapseClient)
-      .createStorageLocationSetting(
-        anyString(),
-        any(StorageLocationSetting.class),
-        any(AsyncCallback.class)
-      );
+    verify(mockSynapseClient).createStorageLocationSetting(any(), any(), any());
     verify(mockSynAlert).handleException(e);
   }
 

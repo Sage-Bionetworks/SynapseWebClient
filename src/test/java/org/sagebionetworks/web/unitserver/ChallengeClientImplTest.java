@@ -25,8 +25,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.internal.util.reflection.Whitebox;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
@@ -66,8 +65,9 @@ import org.sagebionetworks.web.shared.ChallengeTeamPagedResults;
 import org.sagebionetworks.web.shared.UserProfilePagedResults;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+import org.springframework.test.util.ReflectionTestUtils;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class ChallengeClientImplTest {
 
   public static final String TEST_CHALLENGE_PROJECT_NAME =
@@ -174,7 +174,7 @@ public class ChallengeClientImplTest {
     setupChallengeteamPagedResults();
     when(mockSynapse.getChallenge(anyString())).thenReturn(testChallenge);
 
-    Whitebox.setInternalState(
+    ReflectionTestUtils.setField(
       synapseClient,
       "perThreadRequest",
       mockThreadLocal

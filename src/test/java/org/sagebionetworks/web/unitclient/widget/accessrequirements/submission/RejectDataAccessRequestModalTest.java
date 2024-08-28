@@ -19,7 +19,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.file.FileResult;
@@ -36,7 +36,7 @@ import org.sagebionetworks.web.client.widget.entity.act.RejectDataAccessRequestM
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class RejectDataAccessRequestModalTest {
 
   RejectDataAccessRequestModal widget;
@@ -102,14 +102,11 @@ public class RejectDataAccessRequestModalTest {
     AsyncMockStubber
       .callSuccessWith(mockFileEntity)
       .when(mockJsClient)
-      .getEntity(anyString(), any(AsyncCallback.class));
+      .getEntity(any(), any());
     AsyncMockStubber
       .callSuccessWith(mockFileResult)
       .when(mockPresignedURLAsyncHandler)
-      .getFileResult(
-        any(FileHandleAssociation.class),
-        any(AsyncCallback.class)
-      );
+      .getFileResult(any(), any());
 
     widget =
       new RejectDataAccessRequestModal(
@@ -122,7 +119,7 @@ public class RejectDataAccessRequestModalTest {
   private void verifyRequestBuilderCall() {
     try {
       verify(mockRequestBuilder)
-        .sendRequest(anyString(), requestCallbackCaptor.capture());
+        .sendRequest(any(), requestCallbackCaptor.capture());
       requestCallbackCaptor.getValue().onResponseReceived(null, mockResponse);
     } catch (RequestException e) {
       fail("request builder sendRequest failed");
@@ -140,12 +137,8 @@ public class RejectDataAccessRequestModalTest {
     widget.show(getReasonCallback);
 
     // verify/assert
-    verify(mockJsClient).getEntity(anyString(), any(AsyncCallback.class));
-    verify(mockPresignedURLAsyncHandler)
-      .getFileResult(
-        any(FileHandleAssociation.class),
-        any(AsyncCallback.class)
-      );
+    verify(mockJsClient).getEntity(any(), any());
+    verify(mockPresignedURLAsyncHandler).getFileResult(any(), any());
     verifyRequestBuilderCall();
     verify(mockView).clear();
     verify(mockView).show();

@@ -97,7 +97,7 @@ public class ChangeUsernamePresenterTest {
     verify(mockSynapseClient)
       .updateUserProfile(any(UserProfile.class), any(AsyncCallback.class));
     verify(mockAuthenticationController).updateCachedProfile(eq(profile));
-    verify(mockCallback).onSuccess(any(Void.class));
+    verify(mockCallback).onSuccess(any());
   }
 
   @Test

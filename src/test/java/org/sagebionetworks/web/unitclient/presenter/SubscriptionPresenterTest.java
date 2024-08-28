@@ -74,8 +74,8 @@ public class SubscriptionPresenterTest {
   @Test
   public void testConstruction() {
     verify(mockView).setPresenter(presenter);
-    verify(mockView).setSynAlert(any(Widget.class));
-    verify(mockView).setTopicWidget(any(Widget.class));
+    verify(mockView).setSynAlert(any());
+    verify(mockView).setTopicWidget(any());
     verify(mockTopicWidget).addStyleNames(anyString());
   }
 

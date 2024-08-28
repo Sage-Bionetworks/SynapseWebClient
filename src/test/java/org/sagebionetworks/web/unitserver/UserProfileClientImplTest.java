@@ -12,7 +12,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.internal.util.reflection.Whitebox;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -21,6 +20,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
 import org.sagebionetworks.web.server.servlet.UserProfileClientImpl;
+import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * Test for the UserAccountServiceImpl
@@ -70,7 +70,7 @@ public class UserProfileClientImplTest {
     userProfileClient.setTokenProvider(mockTokenProvider);
     when(mockSynapse.getMyProfile()).thenReturn(testProfile);
 
-    Whitebox.setInternalState(
+    ReflectionTestUtils.setField(
       userProfileClient,
       "perThreadRequest",
       mockThreadLocal

@@ -81,11 +81,11 @@ public class SubscribersWidgetTest {
     AsyncMockStubber
       .callSuccessWith(mockSubscriberPagedResults)
       .when(mockSynapseJavascriptClient)
-      .getSubscribers(any(Topic.class), anyString(), any(AsyncCallback.class));
+      .getSubscribers(any(), any(), any());
     AsyncMockStubber
       .callSuccessWith(TEST_SUBSCRIBER_COUNT)
       .when(mockSynapseJavascriptClient)
-      .getSubscribersCount(any(Topic.class), any(AsyncCallback.class));
+      .getSubscribersCount(any(), any());
     when(mockTopic.getObjectType()).thenReturn(SubscriptionObjectType.FORUM);
     when(mockTopic.getObjectId()).thenReturn(TEST_OBJECT_ID);
     subscribers = new ArrayList<String>();
@@ -96,8 +96,8 @@ public class SubscribersWidgetTest {
   @Test
   public void testConstructor() {
     verify(mockView).setPresenter(widget);
-    verify(mockView).setSynapseAlert(any(Widget.class));
-    verify(mockView).setUserListContainer(any(Widget.class));
+    verify(mockView).setSynapseAlert(any());
+    verify(mockView).setUserListContainer(any());
   }
 
   @Test
@@ -159,7 +159,7 @@ public class SubscribersWidgetTest {
     verify(mockSynAlert).clear();
     verify(mockLoadMoreWidgetContainer).clear();
     verify(mockView).showDialog();
-    verify(mockLoadMoreWidgetContainer).add(any(Widget.class));
+    verify(mockLoadMoreWidgetContainer).add(any());
     verify(mockLoadMoreWidgetContainer).setIsMore(true);
   }
 
@@ -179,7 +179,7 @@ public class SubscribersWidgetTest {
     AsyncMockStubber
       .callFailureWith(ex)
       .when(mockSynapseJavascriptClient)
-      .getSubscribers(any(Topic.class), anyString(), any(AsyncCallback.class));
+      .getSubscribers(any(), any(), any());
 
     widget.loadMoreSubscribers();
     verify(mockSynAlert).handleException(ex);

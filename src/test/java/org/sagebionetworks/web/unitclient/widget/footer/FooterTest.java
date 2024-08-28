@@ -12,7 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -23,7 +23,7 @@ import org.sagebionetworks.web.client.widget.footer.FooterView;
 import org.sagebionetworks.web.client.widget.footer.VersionState;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class FooterTest {
 
   Footer footer;
@@ -68,7 +68,7 @@ public class FooterTest {
     AsyncMockStubber
       .callSuccessWith(versionState)
       .when(mockGlobalAppState)
-      .checkVersionCompatibility(any(AsyncCallback.class));
+      .checkVersionCompatibility(any());
     verify(mockView).setPresenter(footer);
     when(mockUserProfile.getEmails())
       .thenReturn(Collections.singletonList(EMAIL));
@@ -92,7 +92,7 @@ public class FooterTest {
     AsyncMockStubber
       .callSuccessWith(versionState)
       .when(mockGlobalAppState)
-      .checkVersionCompatibility(any(AsyncCallback.class));
+      .checkVersionCompatibility(any());
     footer =
       new Footer(
         mockView,
@@ -101,8 +101,7 @@ public class FooterTest {
         mockGwt,
         mockJsniUtils
       );
-    verify(mockView)
-      .setVersion(eq(Footer.UNKNOWN), eq(Footer.UNKNOWN), anyString());
+    verify(mockView).setVersion(eq(Footer.UNKNOWN), eq(Footer.UNKNOWN), any());
   }
 
   @Test

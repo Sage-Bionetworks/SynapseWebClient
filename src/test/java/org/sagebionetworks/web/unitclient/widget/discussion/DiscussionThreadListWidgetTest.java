@@ -23,7 +23,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
@@ -40,7 +40,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.refresh.DiscussionThreadCountAlert;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class DiscussionThreadListWidgetTest {
 
   @Mock
@@ -104,7 +104,7 @@ public class DiscussionThreadListWidgetTest {
   @Test
   public void testConstructor() {
     verify(mockView).setPresenter(discussionThreadListWidget);
-    verify(mockView).setAlert(any(Widget.class));
+    verify(mockView).setAlert(any());
   }
 
   @SuppressWarnings("unchecked")
@@ -293,7 +293,7 @@ public class DiscussionThreadListWidgetTest {
     discussionThreadListWidget.scrollToThread("invalidid");
     verify(mockView, never()).scrollIntoView(any(Widget.class));
     discussionThreadListWidget.scrollToThread(threadId);
-    verify(mockView).scrollIntoView(any(Widget.class));
+    verify(mockView).scrollIntoView(any());
     verify(mockSynapseJavascriptClient)
       .getThread(anyString(), any(AsyncCallback.class));
     verify(mockDiscussionThreadWidget).configure(mockDiscussionThreadBundle);
@@ -344,7 +344,7 @@ public class DiscussionThreadListWidgetTest {
         any(DiscussionFilter.class),
         any(AsyncCallback.class)
       );
-    verify(mockThreadsContainer).add(any(Widget.class));
+    verify(mockThreadsContainer).add(any());
     verify(mockGinInjector).createThreadListItemWidget();
     verify(mockDiscussionThreadWidget)
       .configure(any(DiscussionThreadBundle.class));
@@ -360,7 +360,7 @@ public class DiscussionThreadListWidgetTest {
       .when(mockSynapseJavascriptClient)
       .getThread(anyString(), any(AsyncCallback.class));
     discussionThreadListWidget.scrollToThread(threadId);
-    verify(mockView).scrollIntoView(any(Widget.class));
+    verify(mockView).scrollIntoView(any());
     verify(mockSynapseJavascriptClient)
       .getThread(anyString(), any(AsyncCallback.class));
     verify(mockDiscussionThreadWidget, never())
@@ -478,7 +478,7 @@ public class DiscussionThreadListWidgetTest {
         any(DiscussionFilter.class),
         any(AsyncCallback.class)
       );
-    verify(mockThreadsContainer).add(any(Widget.class));
+    verify(mockThreadsContainer).add(any());
     verify(mockGinInjector).createThreadListItemWidget();
     verify(mockDiscussionThreadWidget)
       .configure(any(DiscussionThreadBundle.class));

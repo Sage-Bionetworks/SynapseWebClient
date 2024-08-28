@@ -75,13 +75,7 @@ public class ChallengeTeamsWidgetTest {
     AsyncMockStubber
       .callSuccessWith(getTestChallengeTeamPagedResults())
       .when(mockChallengeClient)
-      .getChallengeTeams(
-        anyString(),
-        anyString(),
-        anyInt(),
-        anyInt(),
-        any(AsyncCallback.class)
-      );
+      .getChallengeTeams(any(), any(), any(), any(), any());
   }
 
   public ChallengeTeamPagedResults getTestChallengeTeamPagedResults() {
@@ -119,13 +113,7 @@ public class ChallengeTeamsWidgetTest {
     verify(mockView).showLoading();
     verify(mockView).clearTeams();
     verify(mockChallengeClient)
-      .getChallengeTeams(
-        anyString(),
-        anyString(),
-        anyInt(),
-        anyInt(),
-        any(AsyncCallback.class)
-      );
+      .getChallengeTeams(any(), any(), any(), any(), any());
     verify(mockView).hideLoading();
     verify(mockPaginationWidget)
       .configure(anyLong(), anyLong(), anyLong(), eq(widget));
@@ -139,8 +127,7 @@ public class ChallengeTeamsWidgetTest {
 
     // now edit test team
     widget.onEdit(TEST_TEAM_ID);
-    verify(mockEditRegisterTeamDialog)
-      .configure(eq(testChallengeTeam), any(Callback.class));
+    verify(mockEditRegisterTeamDialog).configure(eq(testChallengeTeam), any());
   }
 
   @Test
@@ -148,13 +135,7 @@ public class ChallengeTeamsWidgetTest {
     AsyncMockStubber
       .callSuccessWith(getEmptyTestChallengeTeamPagedResults())
       .when(mockChallengeClient)
-      .getChallengeTeams(
-        anyString(),
-        anyString(),
-        anyInt(),
-        anyInt(),
-        any(AsyncCallback.class)
-      );
+      .getChallengeTeams(any(), any(), any(), any(), any());
     widget.configure(
       new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null),
       descriptor,
@@ -166,13 +147,7 @@ public class ChallengeTeamsWidgetTest {
     verify(mockView).showLoading();
     verify(mockView).clearTeams();
     verify(mockChallengeClient)
-      .getChallengeTeams(
-        anyString(),
-        anyString(),
-        anyInt(),
-        anyInt(),
-        any(AsyncCallback.class)
-      );
+      .getChallengeTeams(any(), any(), any(), any(), any());
     verify(mockView).hideLoading();
     verify(mockView).showNoTeams();
   }
@@ -182,13 +157,7 @@ public class ChallengeTeamsWidgetTest {
     AsyncMockStubber
       .callFailureWith(new Exception("unhandled"))
       .when(mockChallengeClient)
-      .getChallengeTeams(
-        anyString(),
-        anyString(),
-        anyInt(),
-        anyInt(),
-        any(AsyncCallback.class)
-      );
+      .getChallengeTeams(any(), any(), any(), any(), any());
     widget.configure(
       new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null),
       descriptor,
@@ -200,13 +169,7 @@ public class ChallengeTeamsWidgetTest {
     verify(mockView).showLoading();
     verify(mockView).clearTeams();
     verify(mockChallengeClient)
-      .getChallengeTeams(
-        anyString(),
-        anyString(),
-        anyInt(),
-        anyInt(),
-        any(AsyncCallback.class)
-      );
+      .getChallengeTeams(any(), any(), any(), any(), any());
     verify(mockView).hideLoading();
     verify(mockView).showErrorMessage(anyString());
   }

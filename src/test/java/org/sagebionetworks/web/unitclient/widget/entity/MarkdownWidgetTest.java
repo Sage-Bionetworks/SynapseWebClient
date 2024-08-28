@@ -71,11 +71,11 @@ public class MarkdownWidgetTest {
     mockWidgetRendererPresenter = mock(WidgetRendererPresenter.class);
     when(
       mockWidgetRegistrar.getWidgetRendererForWidgetDescriptor(
-        any(WikiPageKey.class),
-        anyString(),
-        anyMap(),
-        any(Callback.class),
-        any(Long.class)
+        any(),
+        any(),
+        any(),
+        any(),
+        any()
       )
     )
       .thenReturn(mockWidgetRendererPresenter);
@@ -107,8 +107,7 @@ public class MarkdownWidgetTest {
   public void testConfigureSuccess() {
     String sampleHTML = "<h1>heading</h1><p>foo baz bar</p>";
 
-    when(mockMarkdownIt.markdown2Html(anyString(), anyString()))
-      .thenReturn(sampleHTML);
+    when(mockMarkdownIt.markdown2Html(any(), any())).thenReturn(sampleHTML);
     // only the first getElementById called by each getElementById finds its target so it doesn't look
     // forever but still can be verified
     when(
@@ -157,14 +156,14 @@ public class MarkdownWidgetTest {
     verify(mockWidgetRegistrar)
       .getWidgetRendererForWidgetDescriptor(
         Mockito.eq(mockWikiPageKey),
-        anyString(),
-        anyMap(),
-        any(Callback.class),
-        any(Long.class)
+        any(),
+        any(),
+        any(),
+        any()
       );
     verify(mockView)
       .addWidget(
-        any(Widget.class),
+        any(),
         Mockito.contains(WidgetConstants.DIV_ID_WIDGET_PREFIX + "0")
       );
     // removes text inserted by markdown processor (usually "<Synapse widget>" text node, but is
@@ -178,9 +177,8 @@ public class MarkdownWidgetTest {
     AsyncMockStubber
       .callSuccessWith(mockWikiPage)
       .when(mockSynapseJavascriptClient)
-      .getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
-    when(mockMarkdownIt.markdown2Html(anyString(), anyString()))
-      .thenReturn(sampleHTML);
+      .getV2WikiPageAsV1(any(), any());
+    when(mockMarkdownIt.markdown2Html(any(), any())).thenReturn(sampleHTML);
     // only the first getElementById called by each getElementById finds its target so it doesn't look
     // forever but still can be verified
     when(
@@ -206,7 +204,7 @@ public class MarkdownWidgetTest {
     );
     verify(mockView).callbackWhenAttached(callbackCaptor.capture());
     callbackCaptor.getValue().invoke();
-    verify(mockWikiPageKey).setWikiPageId(anyString());
+    verify(mockWikiPageKey).setWikiPageId(any());
 
     verify(mockMarkdownIt).markdown2Html(anyString(), anyString());
     verify(mockView, Mockito.times(2)).setEmptyVisible(false);
@@ -225,16 +223,10 @@ public class MarkdownWidgetTest {
     verify(mockWidgetRegistrar).getWidgetContentType(elementContentType);
     verify(mockWidgetRegistrar).getWidgetDescriptor(elementContentType);
     verify(mockWidgetRegistrar)
-      .getWidgetRendererForWidgetDescriptor(
-        any(WikiPageKey.class),
-        anyString(),
-        anyMap(),
-        any(Callback.class),
-        any(Long.class)
-      );
+      .getWidgetRendererForWidgetDescriptor(any(), any(), any(), any(), any());
     verify(mockView)
       .addWidget(
-        any(Widget.class),
+        any(),
         Mockito.contains(WidgetConstants.DIV_ID_WIDGET_PREFIX + "0")
       );
   }

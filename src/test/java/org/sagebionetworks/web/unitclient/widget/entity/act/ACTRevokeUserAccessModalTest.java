@@ -75,8 +75,8 @@ public class ACTRevokeUserAccessModalTest {
   @Test
   public void testConfigure() {
     verify(mockView).setPresenter(dialog);
-    verify(mockView).setUserPickerWidget(any(Widget.class));
-    verify(mockView).setSynAlert(any(Widget.class));
+    verify(mockView).setUserPickerWidget(any());
+    verify(mockView).setSynAlert(any());
     verify(mockSynAlert).clear();
     verify(mockPeopleSuggestWidget).setTypeFilter(TypeFilter.USERS_ONLY);
     verify(mockView).show();

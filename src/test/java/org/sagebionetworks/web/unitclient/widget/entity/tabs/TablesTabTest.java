@@ -31,7 +31,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.EntityType;
@@ -74,7 +74,7 @@ import org.sagebionetworks.web.client.widget.table.explore.TableEntityWidgetV2;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 import org.sagebionetworks.web.shared.WidgetConstants;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class TablesTabTest {
 
   @Mock
@@ -308,8 +308,7 @@ public class TablesTabTest {
   }
 
   private void verifyTableConfiguration(Long version) {
-    verify(mockBreadcrumb)
-      .configure(any(EntityPath.class), eq(EntityArea.TABLES));
+    verify(mockBreadcrumb).configure(any(), eq(EntityArea.TABLES));
     verify(mockTitleBar).configure(mockTableEntityBundle, mockActionMenuWidget);
     verify(mockEntityMetadata)
       .configure(mockTableEntityBundle, version, mockActionMenuWidget);
@@ -322,7 +321,7 @@ public class TablesTabTest {
         tab,
         mockActionMenuWidget
       );
-    verify(mockView).setTableEntityWidget(any(Widget.class));
+    verify(mockView).setTableEntityWidget(any());
     verify(mockModifiedCreatedBy).configure(tableEntityId, version);
     verify(mockProvenanceWidget).configure(mapCaptor.capture());
     // verify configuration
@@ -342,7 +341,7 @@ public class TablesTabTest {
     verify(mockView).setTitlebarVisible(true);
     verify(mockView).clearTableEntityWidget();
     verify(mockModifiedCreatedBy).setVisible(false);
-    verify(mockView).setWikiPage(any(Widget.class));
+    verify(mockView).setWikiPage(any());
     verify(mockView).setWikiPageVisible(true);
     verify(mockView).setVersionAlertVisible(false);
     verify(mockView, never()).setVersionAlertVisible(true);

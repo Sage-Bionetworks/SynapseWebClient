@@ -65,8 +65,7 @@ public class FileHandleAssociationServletTest {
     MockitoAnnotations.initMocks(this);
     servlet = new FileHandleAssociationServlet();
 
-    when(mockSynapseProvider.createNewClient(anyString()))
-      .thenReturn(mockSynapse);
+    when(mockSynapseProvider.createNewClient(any())).thenReturn(mockSynapse);
 
     resolvedUrl = new URL("http://localhost/file.png");
     when(mockSynapse.getFileURL(any(FileHandleAssociation.class)))

@@ -81,9 +81,9 @@ public class EditReplyModalTest {
   @Test
   public void testConstructor() {
     verify(mockView).setPresenter(modal);
-    verify(mockView).setAlert(any(Widget.class));
+    verify(mockView).setAlert(any());
     verify(mockView).setModalTitle(anyString());
-    verify(mockView).setMarkdownEditor(any(Widget.class));
+    verify(mockView).setMarkdownEditor(any());
   }
 
   @Test

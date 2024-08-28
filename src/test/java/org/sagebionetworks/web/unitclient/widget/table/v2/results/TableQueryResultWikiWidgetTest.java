@@ -28,7 +28,7 @@ import org.mockito.Captor;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.Query;
@@ -53,7 +53,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class TableQueryResultWikiWidgetTest {
 
   TableQueryResultWikiWidget widget;
@@ -122,7 +122,7 @@ public class TableQueryResultWikiWidgetTest {
     AsyncMockStubber
       .callSuccessWith(mockEntityBundle)
       .when(mockSynapseJavascriptClient)
-      .getEntityBundleFromCache(anyString(), any(AsyncCallback.class));
+      .getEntityBundleFromCache(any(), any());
     when(mockGinInjector.createNewTableEntityWidgetV2())
       .thenReturn(mockTableEntityWidget);
   }
@@ -131,8 +131,8 @@ public class TableQueryResultWikiWidgetTest {
   public void testConstruction() {
     // lazily loaded table query result widget
     verify(mockView, never()).setTableQueryResultWidget(any(Widget.class));
-    verify(mockView).setSynAlert(any(Widget.class));
-    verify(mockActionMenu).addControllerWidget(any(Widget.class));
+    verify(mockView).setSynAlert(any());
+    verify(mockActionMenu).addControllerWidget(any());
   }
 
   @Test
@@ -152,7 +152,7 @@ public class TableQueryResultWikiWidgetTest {
     widget.configure(wikiKey, descriptor, null, null);
 
     verifyZeroInteractions(mockGWT);
-    verify(mockView).setTableQueryResultWidget(any(Widget.class));
+    verify(mockView).setTableQueryResultWidget(any());
     verify(mockSynapseJavascriptClient)
       .getEntityBundleFromCache(eq(tableId), any(AsyncCallback.class));
     verify(mockSynAlert).clear();
@@ -199,7 +199,7 @@ public class TableQueryResultWikiWidgetTest {
     AsyncMockStubber
       .callFailureWith(new NotFoundException())
       .when(mockSynapseJavascriptClient)
-      .getEntityBundleFromCache(anyString(), any(AsyncCallback.class));
+      .getEntityBundleFromCache(any(), any());
     Map<String, String> descriptor = new HashMap<String, String>();
     String sql = "my query string";
     descriptor.put(WidgetConstants.TABLE_QUERY_KEY, sql);

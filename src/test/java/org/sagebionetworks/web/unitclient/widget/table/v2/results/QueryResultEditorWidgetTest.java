@@ -22,7 +22,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.file.BulkFileDownloadResponse;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.EntityUpdateFailureCode;
@@ -56,7 +56,7 @@ import org.sagebionetworks.web.unitclient.widget.table.v2.TableModelTestUtils;
  * @author John
  *
  */
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class QueryResultEditorWidgetTest {
 
   @Mock
@@ -379,7 +379,7 @@ public class QueryResultEditorWidgetTest {
     verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
 
     verify(mockClientCache)
-      .put(eq(ENTITY_ID + VIEW_RECENTLY_CHANGED_KEY), anyString(), anyLong());
+      .put(eq(ENTITY_ID + VIEW_RECENTLY_CHANGED_KEY), any(), anyLong());
   }
 
   @Test

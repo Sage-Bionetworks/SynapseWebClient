@@ -13,7 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -25,7 +25,7 @@ import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesOrderEd
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class WikiSubpagesOrderEditorTest {
 
   WikiSubpagesOrderEditor editor;
@@ -65,11 +65,11 @@ public class WikiSubpagesOrderEditorTest {
     AsyncMockStubber
       .callSuccessWith(mockWikiHeaders)
       .when(mockJsClient)
-      .getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
+      .getV2WikiHeaderTree(any(), any(), any());
     AsyncMockStubber
       .callSuccessWith(mockHint)
       .when(mockJsClient)
-      .getV2WikiOrderHint(any(WikiPageKey.class), any(AsyncCallback.class));
+      .getV2WikiOrderHint(any(), any());
   }
 
   @Test
@@ -78,9 +78,8 @@ public class WikiSubpagesOrderEditorTest {
     verify(mockSynAlert).clear();
     verify(mockView).setLoadingVisible(true);
     verify(mockJsClient)
-      .getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
-    verify(mockJsClient)
-      .getV2WikiOrderHint(any(WikiPageKey.class), any(AsyncCallback.class));
+      .getV2WikiHeaderTree(any(), any(), any(AsyncCallback.class));
+    verify(mockJsClient).getV2WikiOrderHint(any(), any());
     verify(mockEditorTree)
       .configure(
         eq((String) null),
@@ -99,10 +98,9 @@ public class WikiSubpagesOrderEditorTest {
     AsyncMockStubber
       .callFailureWith(ex)
       .when(mockJsClient)
-      .getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
+      .getV2WikiHeaderTree(any(), any(), any());
     editor.configure(mockPageKey, OWNER_OBJECT_NAME);
-    verify(mockJsClient)
-      .getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
+    verify(mockJsClient).getV2WikiHeaderTree(any(), any(), any());
     verify(mockSynAlert).handleException(ex);
     verify(mockJsClient, never())
       .getV2WikiOrderHint(any(WikiPageKey.class), any(AsyncCallback.class));
@@ -118,9 +116,8 @@ public class WikiSubpagesOrderEditorTest {
       .getV2WikiOrderHint(any(WikiPageKey.class), any(AsyncCallback.class));
     editor.configure(mockPageKey, OWNER_OBJECT_NAME);
     verify(mockJsClient)
-      .getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
-    verify(mockJsClient)
-      .getV2WikiOrderHint(any(WikiPageKey.class), any(AsyncCallback.class));
+      .getV2WikiHeaderTree(any(), any(), any(AsyncCallback.class));
+    verify(mockJsClient).getV2WikiOrderHint(any(), any());
     verify(mockSynAlert).handleException(ex);
     verify(mockView).setLoadingVisible(false);
   }

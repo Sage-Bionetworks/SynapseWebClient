@@ -232,7 +232,7 @@ public class MarkdownEditorWidgetTest {
     presenter.getFormattingGuideWikiKey(mockCallback);
     // service was called
     verify(mockSynapseClient).getPageNameToWikiKeyMap(any(AsyncCallback.class));
-    verify(mockView).showErrorMessage(anyString());
+    verify(mockView).showErrorMessage(any());
   }
 
   @Test
@@ -722,8 +722,7 @@ public class MarkdownEditorWidgetTest {
   @Test
   public void testPreview() throws Exception {
     presenter.previewClicked();
-    verify(mockMarkdownWidget)
-      .configure(anyString(), any(WikiPageKey.class), any(Long.class));
+    verify(mockMarkdownWidget).configure(any(), any(), any());
     verify(mockView).showPreview();
   }
 

@@ -30,7 +30,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.EntityType;
@@ -72,7 +72,7 @@ import org.sagebionetworks.web.client.widget.table.explore.TableEntityWidgetV2;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 import org.sagebionetworks.web.shared.WidgetConstants;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class DatasetsTabTest {
 
   @Mock
@@ -287,8 +287,7 @@ public class DatasetsTabTest {
   }
 
   private void verifyTableConfiguration(Long version) {
-    verify(mockBreadcrumb)
-      .configure(any(EntityPath.class), eq(EntityArea.DATASETS));
+    verify(mockBreadcrumb).configure(any(), eq(EntityArea.DATASETS));
     verify(mockTitleBar).configure(mockDatasetBundle, mockActionMenuWidget);
     verify(mockEntityMetadata)
       .configure(mockDatasetBundle, version, mockActionMenuWidget);
@@ -301,7 +300,7 @@ public class DatasetsTabTest {
         tab,
         mockActionMenuWidget
       );
-    verify(mockView).setTableEntityWidget(any(Widget.class));
+    verify(mockView).setTableEntityWidget(any());
     verify(mockModifiedCreatedBy).configure(datasetId, version);
     verify(mockProvenanceWidget).configure(mapCaptor.capture());
     // verify configuration
@@ -321,7 +320,7 @@ public class DatasetsTabTest {
     verify(mockView).setTitlebarVisible(true);
     verify(mockView).clearTableEntityWidget();
     verify(mockModifiedCreatedBy).setVisible(false);
-    verify(mockView).setWikiPage(any(Widget.class));
+    verify(mockView).setWikiPage(any());
     verify(mockView).setWikiPageVisible(true);
 
     ArgumentCaptor<Synapse> captor = ArgumentCaptor.forClass(Synapse.class);

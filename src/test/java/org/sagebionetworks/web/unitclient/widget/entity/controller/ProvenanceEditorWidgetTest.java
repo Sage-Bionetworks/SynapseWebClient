@@ -22,7 +22,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
@@ -44,7 +44,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.URLProvEntryView;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class ProvenanceEditorWidgetTest {
 
   @Mock
@@ -146,11 +146,7 @@ public class ProvenanceEditorWidgetTest {
     AsyncMockStubber
       .callSuccessWith(mockActivity)
       .when(mockJsClient)
-      .getActivityForEntityVersion(
-        anyString(),
-        anyLong(),
-        any(AsyncCallback.class)
-      );
+      .getActivityForEntityVersion(any(), any(), any());
     when(mockProvenanceList.getEntries())
       .thenReturn(new LinkedList<ProvenanceEntry>());
     presenter.configure(mockEntityBundle);
@@ -187,11 +183,7 @@ public class ProvenanceEditorWidgetTest {
     AsyncMockStubber
       .callSuccessWith(mockActivity)
       .when(mockJsClient)
-      .getActivityForEntityVersion(
-        anyString(),
-        anyLong(),
-        any(AsyncCallback.class)
-      );
+      .getActivityForEntityVersion(any(), any(), any());
     presenter.configure(mockEntityBundle);
     verify(mockView).setName(mockActivity.getName());
     verify(mockView).setDescription(mockActivity.getDescription());
@@ -214,11 +206,7 @@ public class ProvenanceEditorWidgetTest {
     AsyncMockStubber
       .callFailureWith(caught)
       .when(mockJsClient)
-      .getActivityForEntityVersion(
-        anyString(),
-        anyLong(),
-        any(AsyncCallback.class)
-      );
+      .getActivityForEntityVersion(any(), any(), any());
     presenter.configure(mockEntityBundle);
     verify(mockSynAlert).handleException(caught);
   }
@@ -263,20 +251,12 @@ public class ProvenanceEditorWidgetTest {
     AsyncMockStubber
       .callFailureWith(new NotFoundException())
       .when(mockJsClient)
-      .getActivityForEntityVersion(
-        anyString(),
-        anyLong(),
-        any(AsyncCallback.class)
-      );
+      .getActivityForEntityVersion(any(), any(), any());
     presenter.configure(mockEntityBundle);
     AsyncMockStubber
       .callSuccessWith(null)
       .when(mockJsClient)
-      .createActivityAndLinkToEntity(
-        any(Activity.class),
-        eq(mockEntity),
-        any(AsyncCallback.class)
-      );
+      .createActivityAndLinkToEntity(any(), eq(mockEntity), any());
     presenter.onSave();
     verify(mockJsClient)
       .createActivityAndLinkToEntity(
