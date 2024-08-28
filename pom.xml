@@ -378,7 +378,7 @@
                 src/main/webapp/sass:src/main/webapp/generated
               </arguments>
             </configuration>
-            <phase>compile</phase>
+            <phase>process-resources</phase>
           </execution>
         </executions>
 
