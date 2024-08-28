@@ -46,6 +46,7 @@
     "@types/uuid": "^9.0.7",
     "@typescript-eslint/eslint-plugin": "^6.4.0",
     "@typescript-eslint/parser": "^6.17.0",
+    "concurrently": "^8.2.2",
     "dotenv": "^16.3.1",
     "eslint": "^8.0.1",
     "husky": ">=6",
@@ -54,16 +55,17 @@
     "prettier": "^3.2.5",
     "prettier-plugin-java": "2.5.0",
     "typescript": "5.1.6",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "wait-on": "^8.0.0"
   },
   "lint-staged": {
     "*.{*}": "prettier --write"
   },
   "scripts": {
     "build": "mvn -B package --file pom.xml",
-    "dev": "npm-run-all --parallel dev:tomcat dev:codeserver",
-    "dev:tomcat": "docker pull tomcat:9.0; docker run --name swc-dev --rm -p 8888:8080 -v \"/$(pwd)/target/portal-develop-SNAPSHOT/:/usr/local/tomcat/webapps/ROOT/\" -v \"/$HOME/.m2/settings.xml\":/root/.m2/settings.xml tomcat:9.0",
-    "dev:codeserver": "mvn gwt:run-codeserver -Dgwt.compiler.skip=true -Dnoserver=true -Dwar=/$(pwd)/target/portal-develop-SNAPSHOT -Dstyle=PRETTY",
+    "dev": "concurrently -k -n \"CODESERVER,TOMCAT\" -c \"auto,auto\" \"yarn dev:codeserver\" \"yarn dev:tomcat\"",
+    "dev:codeserver": "mvn clean gwt:run-codeserver",
+    "dev:tomcat": "wait-on tcp:9876 && docker pull tomcat:9.0; docker run --name swc-dev --rm -p 8888:8080 -v \"/$(pwd)/target/portal-develop-SNAPSHOT/:/usr/local/tomcat/webapps/ROOT/\" -v \"/$HOME/.m2/settings.xml\":/root/.m2/settings.xml tomcat:9.0",
     "docker:start": "docker pull tomcat:9.0; docker run --name swc-tomcat -d --rm -p 8888:8080 -v \"/$(pwd)/target/portal-develop-SNAPSHOT.war:/usr/local/tomcat/webapps/ROOT.war\" -v \"/$(pwd)/e2e_workflow/settings.xml\":/root/.m2/settings.xml tomcat:9.0",
     "docker:stop": "docker stop swc-tomcat",
     "prepare": "husky install",

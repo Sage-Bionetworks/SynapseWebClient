@@ -13,9 +13,8 @@
 
   <properties>
     <!-- Synapse Web Client -->
-    <!-- GWT needs at least java 1.5 -->
-    <maven.compiler.source>21</maven.compiler.source>
-    <maven.compiler.target>21</maven.compiler.target>
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
     <webappDirectory>
       ${project.build.directory}/${project.build.finalName}
     </webappDirectory>
@@ -208,12 +207,15 @@
               <goal>compile</goal>
               <goal>test</goal>
               <goal>i18n</goal>
+              <goal>run-codeserver</goal>
             </goals>
           </execution>
         </executions>
         <!-- Plugin configuration. There are many available options, see gwt-maven-plugin 
 					documentation at codehaus.org -->
         <configuration>
+          <workDir>${project.build.directory}/gwt/codeserver</workDir>
+          <launcherDir>${webappDirectory}</launcherDir>
           <runTarget>Portal.html</runTarget>
           <hostedWebapp>${webappDirectory}</hostedWebapp>
           <i18nMessagesBundle>
