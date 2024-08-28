@@ -365,7 +365,7 @@ public class EntityPresenter
 
   public void show403() {
     if (entityId != null) {
-      synAlert.show403(entityId);
+      synAlert.show403(entityId, versionNumber);
     }
     view.setLoadingVisible(false);
     view.setEntityPageTopVisible(false);

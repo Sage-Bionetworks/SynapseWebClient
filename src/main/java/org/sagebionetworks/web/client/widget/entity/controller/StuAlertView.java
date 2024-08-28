@@ -20,9 +20,9 @@ public interface StuAlertView extends IsWidget {
    */
   void clearState();
 
-  void show403();
+  void show403(String entityId, Long entityVersion, boolean isLoggedIn);
 
-  void show404();
+  void show404(String entityId, Long entityVersion, boolean isLoggedIn);
 
   void setSynAlert(Widget w);
 

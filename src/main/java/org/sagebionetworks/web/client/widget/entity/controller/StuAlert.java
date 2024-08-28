@@ -11,6 +11,7 @@ public class StuAlert {
 
   StuAlertView view;
   String entityId;
+  Long entityVersion;
   SynapseAlert synAlert;
   GWTWrapper gwt;
   AuthenticationController authController;
@@ -37,24 +38,29 @@ public class StuAlert {
     synAlert.clear();
     view.clearState();
     entityId = null;
+    entityVersion = null;
   }
 
   public void show403() {
-    clear();
-    view.show403();
+    show403(null, null);
   }
 
-  public void show403(String entityId) {
-    show403();
+  public void show403(String entityId, Long entityVersion) {
+    clear();
     this.entityId = entityId;
-    if (!authController.isLoggedIn()) {
-      synAlert.showLogin();
-    }
+    this.entityVersion = entityVersion;
+    view.show403(entityId, entityVersion, authController.isLoggedIn());
   }
 
   public void show404() {
+    show404(null, null);
+  }
+
+  public void show404(String entityId, Long entityVersion) {
     clear();
-    view.show404();
+    this.entityId = entityId;
+    this.entityVersion = entityVersion;
+    view.show404(entityId, entityVersion, authController.isLoggedIn());
   }
 
   public String getEntityId() {
@@ -65,13 +71,9 @@ public class StuAlert {
     clear();
     // if it's something that Stu recognizes, then he should handle it.
     if (ex instanceof ForbiddenException) {
-      if (!authController.isLoggedIn()) {
-        synAlert.showLogin();
-      } else {
-        view.show403();
-      }
+      view.show403(null, null, authController.isLoggedIn());
     } else if (ex instanceof NotFoundException) {
-      view.show404();
+      view.show404(null, null, authController.isLoggedIn());
     } else {
       synAlert.handleException(ex);
     }
