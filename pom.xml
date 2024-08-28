@@ -13,8 +13,8 @@
 
   <properties>
     <!-- Synapse Web Client -->
-    <maven.compiler.source>17</maven.compiler.source>
-    <maven.compiler.target>17</maven.compiler.target>
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
     <webappDirectory>
       ${project.build.directory}/${project.build.finalName}
     </webappDirectory>
