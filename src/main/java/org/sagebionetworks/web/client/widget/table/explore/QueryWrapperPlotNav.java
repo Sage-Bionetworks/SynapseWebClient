@@ -6,7 +6,7 @@ import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnQuery
 import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnQueryResultBundleCallback;
 import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnViewSharingSettingsHandler;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.widget.ReactComponent;
 
@@ -30,7 +30,7 @@ public class QueryWrapperPlotNav extends ReactComponent {
       hideSqlEditorControl
     );
 
-    ReactNode component = React.createElementWithSynapseContext(
+    ReactElement component = React.createElementWithSynapseContext(
       SRC.SynapseComponents.QueryWrapperPlotNav,
       props,
       contextPropsProvider.getJsInteropContextProps()

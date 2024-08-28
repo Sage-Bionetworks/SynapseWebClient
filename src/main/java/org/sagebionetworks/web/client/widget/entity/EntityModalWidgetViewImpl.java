@@ -22,12 +22,12 @@ public class EntityModalWidgetViewImpl implements EntityModalWidgetView {
 
   @Override
   public void renderComponent(EntityModalProps props) {
-    ReactNode reactNode = React.createElementWithSynapseContext(
+    ReactElement reactElement = React.createElementWithSynapseContext(
       SRC.SynapseComponents.EntityModal,
       props,
       propsProvider.getJsInteropContextProps()
     );
-    reactComponent.render(reactNode);
+    reactComponent.render(reactElement);
   }
 
   @Override

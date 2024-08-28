@@ -8,15 +8,16 @@ import org.sagebionetworks.web.client.context.SynapseReactClientFullContextProps
 @JsType(isNative = true, namespace = JsPackage.GLOBAL)
 public class React {
 
-  public static native <P extends ReactComponentProps> ReactNode createElement(
-    ReactComponentType<P> component,
-    P props
-  );
+  public static native <
+    P extends ReactComponentProps
+  > ReactElement createElement(ReactComponentType<P> component, P props);
 
-  public static native <P extends ReactComponentProps> ReactNode createElement(
+  public static native <
+    P extends ReactComponentProps
+  > ReactElement createElement(
     ReactComponentType<P> component,
     P props,
-    ReactNode... children
+    ReactElement... children
   );
 
   public static native <T> T createRef();
@@ -28,7 +29,7 @@ public class React {
   @JsOverlay
   public static <
     P extends ReactComponentProps
-  > ReactNode createElementWithThemeContext(
+  > ReactElement createElementWithThemeContext(
     ReactComponentType<P> component,
     P props
   ) {
@@ -54,12 +55,12 @@ public class React {
   @JsOverlay
   public static <
     P extends ReactComponentProps
-  > ReactNode createElementWithSynapseContext(
+  > ReactElement createElementWithSynapseContext(
     ReactComponentType<P> component,
     P props,
     SynapseReactClientFullContextProviderProps wrapperProps
   ) {
-    ReactNode componentElement = createElement(component, props);
+    ReactElement componentElement = createElement(component, props);
     return createElement(
       SRC.SynapseContext.FullContextProvider,
       wrapperProps,
@@ -67,16 +68,16 @@ public class React {
     );
   }
 
-  public static native ReactNode cloneElement(ReactNode element);
+  public static native ReactElement cloneElement(ReactElement element);
 
-  public static native ReactNode cloneElement(
-    ReactNode element,
+  public static native ReactElement cloneElement(
+    ReactElement element,
     ReactComponentProps props
   );
 
-  public static native ReactNode cloneElement(
-    ReactNode element,
+  public static native ReactElement cloneElement(
+    ReactElement element,
     ReactComponentProps props,
-    ReactNode... children
+    ReactElement... children
   );
 }

@@ -165,7 +165,7 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 			};
 
 			var component = $wnd.React.createElement(plot, props)
-			reactComponent.@org.sagebionetworks.web.client.widget.ReactComponent::render(Lorg/sagebionetworks/web/client/jsinterop/ReactNode;)(component);
+			reactComponent.@org.sagebionetworks.web.client.widget.ReactComponent::render(Lorg/sagebionetworks/web/client/jsinterop/ReactElement;)(component);
 		} catch (err) {
 			console.error(err);
 		}

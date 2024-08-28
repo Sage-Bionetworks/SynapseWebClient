@@ -49,6 +49,7 @@ How you manage updating your widget's view will vary based on the scenario, but 
 ```java
 import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.React;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
 
 class MyView {
 
@@ -57,12 +58,12 @@ class MyView {
 
   void renderComponent() {
     MyProps props = props.create(/**/);
-    ReactNode reactNode = React.createElementWithSynapseContext(
+    ReactElement reactElement = React.createElementWithSynapseContext(
       SRC.SynapseComponents.MyComponent,
       props,
       propsProvider.getJsInteropContextProps()
     );
-    reactComponent.render(reactNode);
+    reactComponent.render(reactElement);
   }
 }
 

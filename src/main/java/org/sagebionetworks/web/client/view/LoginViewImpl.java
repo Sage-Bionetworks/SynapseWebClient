@@ -14,7 +14,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.jsinterop.TermsAndConditionsProps;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -168,7 +168,7 @@ public class LoginViewImpl extends Composite implements LoginView {
       TermsAndConditionsProps props = TermsAndConditionsProps.create(
         this::onFormChange
       );
-      ReactNode component = React.createElementWithSynapseContext(
+      ReactElement component = React.createElementWithSynapseContext(
         SRC.SynapseComponents.TermsAndConditions,
         props,
         propsProvider.getJsInteropContextProps()
