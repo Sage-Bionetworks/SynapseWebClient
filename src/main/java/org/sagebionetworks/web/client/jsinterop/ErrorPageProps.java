@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.jsinterop;
 
-import com.google.gwt.core.client.GWT;
 import jsinterop.annotations.JsFunction;
 import jsinterop.annotations.JsOverlay;
 import jsinterop.annotations.JsPackage;
