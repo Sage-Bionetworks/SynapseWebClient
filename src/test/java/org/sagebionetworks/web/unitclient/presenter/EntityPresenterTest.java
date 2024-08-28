@@ -349,7 +349,7 @@ public class EntityPresenterTest {
   public void testShow403() {
     entityPresenter.setEntityId("123");
     entityPresenter.show403();
-    verify(mockSynAlert).show403(anyString(), anyLong());
+    verify(mockSynAlert).show403(any(), any());
     verify(mockView).setEntityPageTopVisible(false);
     verify(mockView).setOpenTeamInvitesVisible(true);
   }
