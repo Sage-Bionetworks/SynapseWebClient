@@ -134,13 +134,11 @@ export async function loginTestUser(
 
 export async function goToDashboard(page: Page) {
   await page.goto('/')
-  await waitForInitialPageLoad(page)
-
   const authenticatedUserBundleResponsePromise =
     getAuthenticatedUserBundleResponsePromise(page)
-  await page.getByRole('link', { name: 'View Your Dashboard' }).first().click()
 
   // wait for page to load
+  await waitForInitialPageLoad(page)
   await authenticatedUserBundleResponsePromise
   await expectAuthenticatedNavDrawerLoaded(page)
 }
@@ -189,7 +187,7 @@ export async function getUserIdFromLocalStorage(page: Page) {
 }
 
 export async function acceptSiteCookies(page: Page) {
-  await page.getByRole('button', { name: 'Accept and continue' }).click()
+  await page.getByRole('button', { name: 'ALLOW ALL' }).click()
 }
 
 export const dismissAlert = async (page: Page, alertText: string) => {
@@ -260,18 +258,14 @@ export const expectDiscussionThreadLoaded = async (
 
 export const toggleIntoExperimentalMode = async (page: Page) => {
   await test.step('toggle into experimental mode', async () => {
-    await expect(
-      page.getByRole('link', { name: 'Experimental Mode Off' }),
-    ).toBeVisible()
+    const experimentalModeLabel = page.getByText('Experimental Mode')
+    const experimentalModeInput = page.getByLabel('Experimental Mode')
 
-    await page.getByRole('link', { name: 'Experimental Mode' }).click()
-    await expect(
-      page.getByRole('heading', { name: 'Experimental Mode' }),
-    ).toBeVisible()
-    await page.getByRole('button', { name: 'OK' }).click()
+    await expect(experimentalModeInput).not.toBeChecked()
 
-    await expect(
-      page.getByRole('link', { name: 'Experimental Mode On' }),
-    ).toBeVisible()
+    // Because the input element is not visible, we need to click the label
+    await experimentalModeLabel.click()
+
+    await expect(experimentalModeInput).toBeChecked()
   })
 }
