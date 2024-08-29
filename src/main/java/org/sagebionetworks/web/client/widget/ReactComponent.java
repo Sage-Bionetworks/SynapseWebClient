@@ -143,15 +143,22 @@ public class ReactComponent<T extends ReactComponentProps>
 
   public void render(ReactElement<?> reactElement) {
     this.reactElement = reactElement;
-    maybeCreateRoot();
     injectChildWidgetsIntoComponent();
 
     // This component may be a React child of another component. If so, we must rerender the ancestor component(s) so
     // that they use the new ReactElement created in this render step.
     ReactComponent<?> componentToRender = getRootReactComponentWidget();
     if (componentToRender == this) {
-      // Resynchronize with the DOM
-      root.render(this.reactElement);
+      // Asynchronously schedule creating a root in case React is still rendering and may unmount the current root
+      Timer t = new Timer() {
+        @Override
+        public void run() {
+          maybeCreateRoot();
+          // Resynchronize with the DOM
+          root.render(reactElement);
+        }
+      };
+      t.schedule(0);
     } else {
       // Walk up the tree to the parent and repeat rerendering
       componentToRender.rerender();
@@ -175,17 +182,14 @@ public class ReactComponent<T extends ReactComponentProps>
   @Override
   protected void onUnload() {
     super.onUnload();
-    ReactDOMRoot rootToUnmount = this.root;
-    // Immediately unbind this.root so synchronous attempts to re-render succeed
-    this.root = null;
-
-    // Asynchronously schedule unmounting the old root to allow React to finish a render cycle that might be in progress.
-    // https://github.com/facebook/react/issues/25675
-    if (rootToUnmount != null) {
+    if (root != null) {
+      // Asynchronously schedule unmounting the root to allow React to finish the current render cycle.
+      // https://github.com/facebook/react/issues/25675
       Timer t = new Timer() {
         @Override
         public void run() {
-          rootToUnmount.unmount();
+          root.unmount();
+          root = null;
         }
       };
       t.schedule(0);
