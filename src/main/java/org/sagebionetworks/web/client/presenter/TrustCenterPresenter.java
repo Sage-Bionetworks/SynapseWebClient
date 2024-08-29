@@ -56,6 +56,7 @@ public class TrustCenterPresenter
     this.view = view;
     this.requestBuilder = requestBuilder;
     this.synAlert = synAlert;
+    view.setSynAlert(synAlert);
   }
 
   @Override
