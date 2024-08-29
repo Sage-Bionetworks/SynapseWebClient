@@ -175,14 +175,17 @@ public class ReactComponent<T extends ReactComponentProps>
   @Override
   protected void onUnload() {
     super.onUnload();
-    if (root != null) {
-      // Asynchronously schedule unmounting the root to allow React to finish the current render cycle.
-      // https://github.com/facebook/react/issues/25675
+    ReactDOMRoot rootToUnmount = this.root;
+    // Immediately unbind this.root so synchronous attempts to re-render succeed
+    this.root = null;
+
+    // Asynchronously schedule unmounting the old root to allow React to finish a render cycle that might be in progress.
+    // https://github.com/facebook/react/issues/25675
+    if (rootToUnmount != null) {
       Timer t = new Timer() {
         @Override
         public void run() {
-          root.unmount();
-          root = null;
+          rootToUnmount.unmount();
         }
       };
       t.schedule(0);
