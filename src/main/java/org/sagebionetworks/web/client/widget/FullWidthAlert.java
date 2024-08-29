@@ -8,7 +8,7 @@ import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.sagebionetworks.web.client.jsinterop.AlertButtonConfig;
 import org.sagebionetworks.web.client.jsinterop.FullWidthAlertProps;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 
 public class FullWidthAlert implements IsWidget {
@@ -60,7 +60,7 @@ public class FullWidthAlert implements IsWidget {
       isGlobal,
       alertType
     );
-    ReactNode component = React.createElementWithThemeContext(
+    ReactElement component = React.createElementWithThemeContext(
       SRC.SynapseComponents.FullWidthAlert,
       props
     );

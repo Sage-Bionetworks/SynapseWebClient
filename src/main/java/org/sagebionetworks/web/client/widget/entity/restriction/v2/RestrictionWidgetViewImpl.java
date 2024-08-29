@@ -13,7 +13,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.HasAccessProps;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.widget.ReactComponent;
 
@@ -194,7 +194,7 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
       null,
       null
     );
-    ReactNode component = React.createElementWithSynapseContext(
+    ReactElement component = React.createElementWithSynapseContext(
       SRC.SynapseComponents.HasAccess,
       props,
       propsProvider.getJsInteropContextProps()

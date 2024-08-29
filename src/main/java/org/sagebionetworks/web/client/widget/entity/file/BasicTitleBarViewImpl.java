@@ -9,7 +9,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.EntityPageTitleBarProps;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.widget.ReactComponent;
 
@@ -22,12 +22,12 @@ public class BasicTitleBarViewImpl implements BasicTitleBarView {
 
   @Override
   public void setProps(EntityPageTitleBarProps props) {
-    ReactNode reactNode = React.createElementWithSynapseContext(
+    ReactElement reactElement = React.createElementWithSynapseContext(
       SRC.SynapseComponents.EntityPageTitleBar,
       props,
       propsProvider.getJsInteropContextProps()
     );
-    reactComponentContainer.render(reactNode);
+    reactComponentContainer.render(reactElement);
   }
 
   interface BasicTitleBarViewImplUiBinder

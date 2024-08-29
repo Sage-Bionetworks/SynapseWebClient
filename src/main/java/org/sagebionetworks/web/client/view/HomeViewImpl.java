@@ -6,14 +6,12 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.FeatureFlagConfig;
 import org.sagebionetworks.web.client.FeatureFlagKey;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.jsinterop.SynapseHomepageProps;
 import org.sagebionetworks.web.client.jsinterop.SynapseHomepageV2Props;
@@ -54,7 +52,7 @@ public class HomeViewImpl extends Composite implements HomeView {
   @Override
   public void render() {
     scrollToTop();
-    ReactNode component;
+    ReactElement component;
 
     if (featureFlagConfig.isFeatureEnabled(FeatureFlagKey.HOMEPAGE_V2)) {
       SynapseHomepageV2Props props = SynapseHomepageV2Props.create(href -> {

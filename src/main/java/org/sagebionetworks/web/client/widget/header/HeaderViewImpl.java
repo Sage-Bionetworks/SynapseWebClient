@@ -23,7 +23,7 @@ import org.sagebionetworks.web.client.context.SynapseReactClientFullContextProps
 import org.sagebionetworks.web.client.jsinterop.CookieNotificationProps;
 import org.sagebionetworks.web.client.jsinterop.EmptyProps;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.jsinterop.SynapseNavDrawerProps;
 import org.sagebionetworks.web.client.place.Home;
@@ -110,7 +110,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
     CookieNotificationProps props = CookieNotificationProps.create(prefs -> {
       rerenderGoogleAnalytics();
     });
-    ReactNode component = React.createElementWithSynapseContext(
+    ReactElement component = React.createElementWithSynapseContext(
       SRC.SynapseComponents.CookiesNotification,
       props,
       propsProvider.getJsInteropContextProps()
@@ -125,7 +125,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 
   private void rerenderGoogleAnalytics() {
     EmptyProps props = EmptyProps.create();
-    ReactNode component = React.createElementWithSynapseContext(
+    ReactElement component = React.createElementWithSynapseContext(
       SRC.SynapseComponents.GoogleAnalytics,
       props,
       propsProvider.getJsInteropContextProps()
@@ -144,7 +144,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
         globalAppState.handleRelativePathClick(href);
       }
     );
-    ReactNode component = React.createElementWithSynapseContext(
+    ReactElement component = React.createElementWithSynapseContext(
       SRC.SynapseComponents.SynapseNavDrawer,
       props,
       propsProvider.getJsInteropContextProps()

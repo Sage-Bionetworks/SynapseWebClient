@@ -9,7 +9,7 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.HtmlPreviewProps;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.widget.ReactComponent;
 
@@ -47,7 +47,7 @@ public class HtmlPreviewViewImpl implements HtmlPreviewView {
   public void configure(String createdBy, String rawHtml) {
     HtmlPreviewProps props = HtmlPreviewProps.create(createdBy, rawHtml);
 
-    ReactNode element = React.createElementWithSynapseContext(
+    ReactElement element = React.createElementWithSynapseContext(
       SRC.SynapseComponents.HtmlPreview,
       props,
       propsProvider.getJsInteropContextProps()

@@ -10,7 +10,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.jsinterop.SynapseFooterProps;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -91,7 +91,7 @@ public class FooterViewImpl implements FooterView, IsWidget {
           globalAppState.refreshPage();
         }
       );
-      ReactNode component = React.createElementWithSynapseContext(
+      ReactElement component = React.createElementWithSynapseContext(
         SRC.SynapseComponents.SynapseFooter,
         props,
         propsProvider.getJsInteropContextProps()

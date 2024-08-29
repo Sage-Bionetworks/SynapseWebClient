@@ -18,13 +18,13 @@ public class ReactComponentProps {
     void run(Element element);
   }
 
-  public JsArray<ReactNode<?>> children;
+  public JsArray<ReactElement<?>> children;
 
   // Either a ComponentRef or CallbackRef may be passed. A CallbackRef will be invoked when the ref is set.
   public Object ref;
 
   @JsOverlay
-  public final void addChild(ReactNode<?> child) {
+  public final void addChild(ReactElement<?> child) {
     if (children == null) {
       children = new JsArray<>();
     }
@@ -37,7 +37,7 @@ public class ReactComponentProps {
   }
 
   @JsOverlay
-  public final JsArray<ReactNode<?>> getChildren() {
+  public final JsArray<ReactElement<?>> getChildren() {
     if (children == null) {
       children = new JsArray<>();
     }

@@ -4,7 +4,7 @@ import com.google.gwt.dom.client.SpanElement;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.web.client.jsinterop.EntityTypeIconProps;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 
 public class EntityTypeIconImpl
@@ -23,7 +23,7 @@ public class EntityTypeIconImpl
   @Override
   public void configure(EntityType type) {
     EntityTypeIconProps props = EntityTypeIconProps.create(type);
-    ReactNode component = React.createElementWithThemeContext(
+    ReactElement component = React.createElementWithThemeContext(
       SRC.SynapseComponents.EntityTypeIcon,
       props
     );

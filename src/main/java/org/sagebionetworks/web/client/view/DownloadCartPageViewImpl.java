@@ -6,7 +6,7 @@ import com.google.inject.Inject;
 import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.DownloadCartPageProps;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.ReactComponent;
@@ -43,7 +43,7 @@ public class DownloadCartPageViewImpl implements DownloadCartPageView {
     DownloadCartPageProps props = DownloadCartPageProps.create(entityId -> {
       presenter.onViewSharingSettingsClicked(entityId);
     });
-    ReactNode component = React.createElementWithSynapseContext(
+    ReactElement component = React.createElementWithSynapseContext(
       SRC.SynapseComponents.DownloadCartPage,
       props,
       propsProvider.getJsInteropContextProps()

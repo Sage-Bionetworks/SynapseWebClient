@@ -5,7 +5,7 @@ import com.google.inject.Inject;
 import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.IDUReportProps;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.widget.ReactComponent;
 
@@ -28,7 +28,7 @@ public class IntendedDataUseReportWidgetViewImpl
   public void render(String accessRequirementId) {
     IDUReportProps props = IDUReportProps.create(accessRequirementId);
 
-    ReactNode node = React.createElementWithSynapseContext(
+    ReactElement node = React.createElementWithSynapseContext(
       SRC.SynapseComponents.IDUReport,
       props,
       propsProvider.getJsInteropContextProps()

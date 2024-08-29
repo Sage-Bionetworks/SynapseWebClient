@@ -6,7 +6,7 @@ import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.EntityHeaderTableProps;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.widget.ReactComponent;
 
@@ -44,7 +44,7 @@ public class EntitySubjectsWidgetViewImpl implements EntitySubjectsWidgetView {
     ReferenceList entityReferences,
     boolean isEditable
   ) {
-    ReactNode element = React.createElementWithSynapseContext(
+    ReactElement element = React.createElementWithSynapseContext(
       SRC.SynapseComponents.EntityHeaderTable,
       EntityHeaderTableProps.create(
         entityReferences.getReferences(),

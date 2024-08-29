@@ -7,7 +7,7 @@ import com.google.gwt.user.client.ui.Widget;
 import org.sagebionetworks.web.client.jsinterop.AlertButtonConfig;
 import org.sagebionetworks.web.client.jsinterop.OrientationBannerProps;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 
 public class OrientationBanner implements IsWidget {
@@ -43,7 +43,7 @@ public class OrientationBanner implements IsWidget {
       primaryButtonConfig,
       secondaryButtonConfig
     );
-    ReactNode component = React.createElementWithThemeContext(
+    ReactElement component = React.createElementWithThemeContext(
       SRC.SynapseComponents.OrientationBanner,
       props
     );

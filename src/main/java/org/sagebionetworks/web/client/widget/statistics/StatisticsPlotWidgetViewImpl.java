@@ -96,7 +96,7 @@ public class StatisticsPlotWidgetViewImpl
 
 			var component = $wnd.React.createElement($wnd.SRC.SynapseComponents.StatisticsPlot, props, null)
 			var wrapper = $wnd.React.createElement($wnd.SRC.SynapseContext.FullContextProvider, wrapperProps, component)
-			reactComponent.@org.sagebionetworks.web.client.widget.ReactComponent::render(Lorg/sagebionetworks/web/client/jsinterop/ReactNode;)(wrapper);
+			reactComponent.@org.sagebionetworks.web.client.widget.ReactComponent::render(Lorg/sagebionetworks/web/client/jsinterop/ReactElement;)(wrapper);
 		} catch (err) {
 			console.error(err);
 		}

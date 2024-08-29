@@ -18,14 +18,14 @@ import org.sagebionetworks.web.client.jsinterop.ReactComponentProps;
 import org.sagebionetworks.web.client.jsinterop.ReactComponentType;
 import org.sagebionetworks.web.client.jsinterop.ReactDOM;
 import org.sagebionetworks.web.client.jsinterop.ReactDOMRoot;
-import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
 
 /**
- * Widget that manages the lifecycle of a React component. To use this widget, create a {@link ReactNode} using the
- * {@link React} API and call {@link #render(ReactNode)} to render the React component.
+ * Widget that manages the lifecycle of a React component. To use this widget, create a {@link ReactElement} using the
+ * {@link React} API and call {@link #render(ReactElement)} to render the React component.
  * <p>
  * This widget also manages appending child elements if the associated React component can contain children. If all
- * child widgets use this class, then the child {@link ReactNode}s will be cloned and passed as children to the React
+ * child widgets use this class, then the child {@link ReactElement}s will be cloned and passed as children to the React
  * component. If any child of this component is a non-ReactComponent widget, then the child widgets will be injected
  * into the node found using the component's `ref`.
  * <p>
@@ -41,7 +41,7 @@ public class ReactComponent<T extends ReactComponentProps>
   private ReactComponentType<T> reactComponentType;
   public T props;
 
-  private ReactNode<?> reactElement;
+  private ReactElement<?> reactElement;
 
   public ReactComponent() {
     this(DivElement.TAG);
@@ -107,14 +107,14 @@ public class ReactComponent<T extends ReactComponentProps>
    */
   private void injectChildWidgetsIntoComponent() {
     if (this.allChildrenAreReactComponents()) {
-      // If all widget children are ReactNodes, clone the React component and add them as children
+      // If all widget children are ReactElements, clone the React component and add them as children
       List<ReactComponent<?>> childWidgets = new ArrayList<>();
       getChildren().forEach(w -> childWidgets.add(((ReactComponent<?>) w)));
 
-      ReactNode<?>[] childReactElements = childWidgets
+      ReactElement<?>[] childReactElements = childWidgets
         .stream()
         .map(ReactComponent::getReactElement)
-        .toArray(ReactNode<?>[]::new);
+        .toArray(ReactElement<?>[]::new);
 
       this.reactElement =
         React.cloneElement(reactElement, this.props, childReactElements);
@@ -141,8 +141,8 @@ public class ReactComponent<T extends ReactComponentProps>
     }
   }
 
-  public void render(ReactNode<?> reactNode) {
-    this.reactElement = reactNode;
+  public void render(ReactElement<?> reactElement) {
+    this.reactElement = reactElement;
     maybeCreateRoot();
     injectChildWidgetsIntoComponent();
 
@@ -240,7 +240,7 @@ public class ReactComponent<T extends ReactComponentProps>
     return true;
   }
 
-  public ReactNode<?> getReactElement() {
+  public ReactElement<?> getReactElement() {
     return reactElement;
   }
 

@@ -28,7 +28,7 @@ import org.sagebionetworks.web.client.context.SynapseReactClientFullContextProps
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.jsinterop.AccountLevelBadgesProps;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.jsinterop.UserProfileLinksProps;
 import org.sagebionetworks.web.client.widget.ReactComponent;
@@ -249,7 +249,7 @@ public class UserProfileWidgetViewImpl implements UserProfileWidgetView {
 
   @Override
   public void setOwnerId(String userId) {
-    ReactNode accountLevelBadgesComponent =
+    ReactElement accountLevelBadgesComponent =
       React.createElementWithSynapseContext(
         SRC.SynapseComponents.AccountLevelBadges,
         AccountLevelBadgesProps.create(userId),
@@ -259,7 +259,7 @@ public class UserProfileWidgetViewImpl implements UserProfileWidgetView {
     setAccountTypeVisibility(Long.parseLong(userId));
 
     UserProfileLinksProps props = UserProfileLinksProps.create(userId);
-    ReactNode profileLinksComponent = React.createElementWithSynapseContext(
+    ReactElement profileLinksComponent = React.createElementWithSynapseContext(
       SRC.SynapseComponents.UserProfileLinks,
       props,
       propsProvider.getJsInteropContextProps()
