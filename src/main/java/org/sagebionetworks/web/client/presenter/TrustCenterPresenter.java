@@ -11,6 +11,7 @@ import com.google.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
+import org.sagebionetworks.web.client.place.TrustCenterPlace;
 import org.sagebionetworks.web.client.view.MapView;
 import org.sagebionetworks.web.client.view.SynapseStandaloneWikiView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -30,19 +31,19 @@ public class TrustCenterPresenter
 
   static {
     documentKeyToGithubUrl.put(
-      "TermsOfService",
+      TrustCenterPlace.TERMS_OF_SERVICE_KEY,
       "https://raw.githubusercontent.com/Sage-Bionetworks/Sage-Governance-Documents/main/Terms.md"
     );
     documentKeyToGithubUrl.put(
-      "PrivacyPolicy",
+      TrustCenterPlace.PRIVACY_POLICY_KEY,
       "https://raw.githubusercontent.com/Sage-Bionetworks/Sage-Governance-Documents/main/privacy.md"
     );
     documentKeyToGithubUrl.put(
-      "Cookies",
+      TrustCenterPlace.COOKIES_KEY,
       "https://raw.githubusercontent.com/Sage-Bionetworks/Sage-Governance-Documents/main/cookies.md"
     );
     documentKeyToGithubUrl.put(
-      "Subprocessors",
+      TrustCenterPlace.SUBPROCESSORS_KEY,
       "https://raw.githubusercontent.com/Sage-Bionetworks/Sage-Governance-Documents/main/subprocessors.md"
     );
   }

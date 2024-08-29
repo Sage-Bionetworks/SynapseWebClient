@@ -6,6 +6,11 @@ import com.google.gwt.place.shared.Prefix;
 
 public class TrustCenterPlace extends Place {
 
+  public static final String SUBPROCESSORS_KEY = "Subprocessors";
+  public static final String COOKIES_KEY = "Cookies";
+  public static final String PRIVACY_POLICY_KEY = "PrivacyPolicy";
+  public static final String TERMS_OF_SERVICE_KEY = "TermsOfService";
+
   private String documentKey;
 
   public TrustCenterPlace(String token) {
