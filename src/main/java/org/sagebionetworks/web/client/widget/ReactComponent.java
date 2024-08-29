@@ -143,15 +143,22 @@ public class ReactComponent<T extends ReactComponentProps>
 
   public void render(ReactElement<?> reactElement) {
     this.reactElement = reactElement;
-    maybeCreateRoot();
     injectChildWidgetsIntoComponent();
 
     // This component may be a React child of another component. If so, we must rerender the ancestor component(s) so
     // that they use the new ReactElement created in this render step.
     ReactComponent<?> componentToRender = getRootReactComponentWidget();
     if (componentToRender == this) {
-      // Resynchronize with the DOM
-      root.render(this.reactElement);
+      // Asynchronously schedule creating a root in case React is still rendering and may unmount the current root
+      Timer t = new Timer() {
+        @Override
+        public void run() {
+          maybeCreateRoot();
+          // Resynchronize with the DOM
+          root.render(reactElement);
+        }
+      };
+      t.schedule(0);
     } else {
       // Walk up the tree to the parent and repeat rerendering
       componentToRender.rerender();

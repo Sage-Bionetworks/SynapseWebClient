@@ -134,17 +134,14 @@
       )
       loadCss('https://fonts.googleapis.com/icon?family=Material+Icons')
 
-      let reactPath, reactDomPath, srcPath
+      let reactPath, reactDomPath
 
       if (processEnvironment === 'production') {
         reactPath = cdnEndpoint + 'generated/react.production.min.js'
         reactDomPath = cdnEndpoint + 'generated/react-dom.production.min.js'
-        srcPath =
-          cdnEndpoint + 'generated/synapse-react-client.production.min.js'
       } else {
         reactPath = cdnEndpoint + 'generated/react.development.js'
         reactDomPath = cdnEndpoint + 'generated/react-dom.development.js'
-        srcPath = cdnEndpoint + 'generated/synapse-react-client.development.js'
       }
 
       // TODO: Workaround for SWC-6664
@@ -196,7 +193,7 @@
       loadJs(cdnEndpoint + 'generated/react-router-dom.min.js')
       loadJs(cdnEndpoint + 'generated/universalCookie.min.js')
       loadJs(cdnEndpoint + 'generated/react-bootstrap.min.js')
-      loadJs(srcPath) // We don't load SRC's scss because we include it in our own compiled scss
+      loadJs(cdnEndpoint + 'generated/synapse-react-client.production.min.js') // We don't load SRC's scss because we include it in our own compiled scss
       loadJs(cdnEndpoint + 'generated/croppie.min.js')
       loadCss(cdnEndpoint + 'js/diff/diffview.css')
       loadCss(cdnEndpoint + 'generated/croppie.css')
