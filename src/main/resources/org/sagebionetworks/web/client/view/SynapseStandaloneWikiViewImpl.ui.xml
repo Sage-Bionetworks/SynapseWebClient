@@ -10,7 +10,7 @@
     type='org.sagebionetworks.web.client.SageImageBundle'
   />
 
-  <bh:Div>
+  <bh:Div addStyleNames="margin-top-60">
     <b:Container>
       <b:Container fluid="true">
         <b:Row>

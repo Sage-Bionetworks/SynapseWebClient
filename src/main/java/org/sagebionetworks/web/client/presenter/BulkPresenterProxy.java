@@ -56,6 +56,7 @@ import org.sagebionetworks.web.client.place.SynapseForumPlace;
 import org.sagebionetworks.web.client.place.Team;
 import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.place.Trash;
+import org.sagebionetworks.web.client.place.TrustCenterPlace;
 import org.sagebionetworks.web.client.place.TwoFactorAuthPlace;
 import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.place.WikiDiff;
@@ -861,6 +862,24 @@ public class BulkPresenterProxy extends AbstractActivity {
             FollowingPagePresenter presenter =
               ginjector.getFollowingPagePresenter();
             presenter.setPlace((FollowingPlace) place);
+            presenter.start(panel, eventBus);
+          }
+
+          @Override
+          public void onFailure(Throwable caught) {
+            loadError(caught);
+          }
+        }
+      );
+    } else if (place instanceof TrustCenterPlace) {
+      GWT.runAsync(
+        TrustCenterPlace.class,
+        new RunAsyncCallback() {
+          @Override
+          public void onSuccess() {
+            TrustCenterPresenter presenter =
+              ginjector.getTrustCenterPresenter();
+            presenter.setPlace((TrustCenterPlace) place);
             presenter.start(panel, eventBus);
           }
 

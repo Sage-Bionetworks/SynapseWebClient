@@ -52,6 +52,11 @@ public class SynapseStandaloneWikiViewImpl
   }
 
   @Override
+  public void configure(String markdown) {
+    configure(markdown, null);
+  }
+
+  @Override
   public void setSynAlert(IsWidget w) {
     synAlertContainer.clear();
     synAlertContainer.add(w);
