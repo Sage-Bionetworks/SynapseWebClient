@@ -9,15 +9,18 @@ import org.sagebionetworks.web.client.context.SynapseReactClientFullContextProps
 public class React {
 
   public static native <
-    P extends ReactComponentProps
-  > ReactElement createElement(ReactComponentType<P> component, P props);
+    T extends ReactComponentType<P>, P extends ReactComponentProps
+  > ReactElement<T, P> createElement(
+    ReactComponentType<P> componentType,
+    P props
+  );
 
   public static native <
-    P extends ReactComponentProps
-  > ReactElement createElement(
-    ReactComponentType<P> component,
+    T extends ReactComponentType<P>, P extends ReactComponentProps
+  > ReactElement<T, P> createElement(
+    ReactComponentType<P> componentType,
     P props,
-    ReactElement... children
+    ReactElement<?, ?>... children
   );
 
   public static native <T> T createRef();
@@ -28,9 +31,9 @@ public class React {
    */
   @JsOverlay
   public static <
-    P extends ReactComponentProps
-  > ReactElement createElementWithThemeContext(
-    ReactComponentType<P> component,
+    T extends ReactComponentType<P>, P extends ReactComponentProps
+  > ReactElement<?, ?> createElementWithThemeContext(
+    ReactComponentType<P> componentType,
     P props
   ) {
     SynapseReactClientFullContextProviderProps emptyContext =
@@ -38,7 +41,7 @@ public class React {
         SynapseContextJsObject.create(null, false, false),
         null
       );
-    return createElementWithSynapseContext(component, props, emptyContext);
+    return createElementWithSynapseContext(componentType, props, emptyContext);
   }
 
   /**
@@ -46,7 +49,7 @@ public class React {
    * simplifies creating the wrapper.
    *
    * For setting props, use {@link SynapseReactClientFullContextPropsProvider}
-   * @param component
+   * @param componentType
    * @param props
    * @param wrapperProps
    * @param <P>
@@ -54,13 +57,13 @@ public class React {
    */
   @JsOverlay
   public static <
-    P extends ReactComponentProps
-  > ReactElement createElementWithSynapseContext(
-    ReactComponentType<P> component,
+    T extends ReactComponentType<P>, P extends ReactComponentProps
+  > ReactElement<?, ?> createElementWithSynapseContext(
+    T componentType,
     P props,
     SynapseReactClientFullContextProviderProps wrapperProps
   ) {
-    ReactElement componentElement = createElement(component, props);
+    ReactElement componentElement = createElement(componentType, props);
     return createElement(
       SRC.SynapseContext.FullContextProvider,
       wrapperProps,
