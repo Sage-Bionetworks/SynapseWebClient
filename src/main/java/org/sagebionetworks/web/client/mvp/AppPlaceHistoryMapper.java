@@ -40,6 +40,7 @@ import org.sagebionetworks.web.client.place.SynapseForumPlace;
 import org.sagebionetworks.web.client.place.Team;
 import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.place.Trash;
+import org.sagebionetworks.web.client.place.TrustCenterPlace;
 import org.sagebionetworks.web.client.place.TwoFactorAuthPlace;
 import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.place.WikiDiff;
@@ -96,6 +97,7 @@ import org.sagebionetworks.web.client.place.users.RegisterAccount;
     OAuthClientEditorPlace.Tokenizer.class,
     TwoFactorAuthPlace.Tokenizer.class,
     FollowingPlace.Tokenizer.class,
+    TrustCenterPlace.Tokenizer.class,
   }
 )
 public interface AppPlaceHistoryMapper extends PlaceHistoryMapper {}
