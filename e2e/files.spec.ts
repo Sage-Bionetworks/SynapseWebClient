@@ -52,12 +52,12 @@ const expectNoAccessPage = async (
   expectTimeout: number = defaultExpectTimeout,
 ) => {
   await expect(
-    page.getByRole('heading', {
-      name: 'Sorry, no access to this page.',
-    }),
+    page.getByText('You don’t have permission to view this.'),
   ).toBeVisible({ timeout: expectTimeout })
   await expect(
-    page.getByText('You are not authorized to access the page requested.'),
+    page.getByText(
+      'This account has not been granted access to view this resource.',
+    ),
   ).toBeVisible({ timeout: expectTimeout })
 }
 
