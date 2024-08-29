@@ -23,7 +23,6 @@ import com.google.inject.Inject;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ButtonGroup;
-import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.FieldSet;
 import org.gwtbootstrap3.client.ui.Form;
@@ -35,14 +34,12 @@ import org.gwtbootstrap3.client.ui.Input;
 import org.gwtbootstrap3.client.ui.NavTabs;
 import org.gwtbootstrap3.client.ui.Progress;
 import org.gwtbootstrap3.client.ui.ProgressBar;
-import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.TabContent;
 import org.gwtbootstrap3.client.ui.TabListItem;
 import org.gwtbootstrap3.client.ui.TabPane;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
-import org.gwtbootstrap3.client.ui.constants.ColumnSize;
 import org.gwtbootstrap3.client.ui.constants.HeadingSize;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.InputType;
@@ -53,7 +50,6 @@ import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Italic;
 import org.gwtbootstrap3.client.ui.html.Span;
-import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EventHandlerUtils;
@@ -61,11 +57,11 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.jsinterop.ToastMessageOptions;
+import org.sagebionetworks.web.client.jsinterop.mui.Grid;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.JavaScriptCallback;
 import org.sagebionetworks.web.client.widget.entity.SharingAndDataUseConditionWidget;
-import org.sagebionetworks.web.client.widget.entity.menu.v3.Action;
 
 /**
  * Note on the form submission. This supports two form submission use cases. 1. Submit to Portal
@@ -531,8 +527,10 @@ public class UploaderViewImpl extends FlowPanel implements UploaderView {
       container.add(sharingDataUseWidget.asWidget());
     }
 
-    Row row = new Row();
-    Column col = new Column(ColumnSize.XS_12);
+    Grid row = new Grid();
+    row.setContainer(true);
+    Grid col = new Grid();
+    col.setXs(12);
     col.add(uploadBtn);
     if (showCancelButton) {
       col.add(cancelBtn);
@@ -665,8 +663,10 @@ public class UploaderViewImpl extends FlowPanel implements UploaderView {
     uploadPanel.add(uploadDestinationContainer);
     uploadPanel.add(formPanel);
 
-    Row row = new Row();
-    Column col = new Column(ColumnSize.XS_12);
+    Grid row = new Grid();
+    row.setContainer(true);
+    Grid col = new Grid();
+    col.setXs(12);
     col.add(spinningProgressContainer);
     col.add(progressContainer);
     row.add(col);

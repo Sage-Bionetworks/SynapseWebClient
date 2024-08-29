@@ -1,12 +1,8 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder
   xmlns:ui="urn:ui:com.google.gwt.uibinder"
-  xmlns:g="urn:import:com.google.gwt.user.client.ui"
-  xmlns:c="urn:import:com.google.gwt.user.cellview.client"
   xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
-  xmlns:t="urn:import:org.sagebionetworks.web.client.widget.table.v2"
-  xmlns:a="urn:import:org.sagebionetworks.web.client.widget.table.v2"
-  xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt"
+  xmlns:MUI="urn:import:org.sagebionetworks.web.client.jsinterop.mui"
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 >
   <b:Panel>
@@ -14,45 +10,45 @@
       <bh:Div>
         <b:FormGroup>
           <b:FormLabel for="separator">Separator</b:FormLabel>
-          <b:Row>
-            <b:Column size="MD_2">
+          <MUI:Grid container="true">
+            <MUI:Grid md="2">
               <b:Radio name="separator" ui:field="commaRadio">Comma</b:Radio>
-            </b:Column>
-            <b:Column size="MD_2">
+            </MUI:Grid>
+            <MUI:Grid md="2">
               <b:Radio name="separator" ui:field="tabRadio">Tab</b:Radio>
-            </b:Column>
-            <b:Column size="MD_2">
+            </MUI:Grid>
+            <MUI:Grid md="2">
               <b:Radio name="separator" ui:field="otherRadio">Other</b:Radio>
-            </b:Column>
-            <b:Column size="MD_2">
+            </MUI:Grid>
+            <MUI:Grid md="2">
               <b:TextBox name="separator" ui:field="otherTextBox" />
-            </b:Column>
-          </b:Row>
+            </MUI:Grid>
+          </MUI:Grid>
         </b:FormGroup>
         <b:FormGroup>
           <b:FormLabel>Escape Character</b:FormLabel>
-          <b:Row>
-            <b:Column size="MD_2">
+          <MUI:Grid container="true">
+            <MUI:Grid md="2">
               <b:Radio
                 name="escapeCharacter"
                 ui:field="escapeCharacterBackslashRadio"
               >
                 Backslash
               </b:Radio>
-            </b:Column>
-            <b:Column size="MD_2">
+            </MUI:Grid>
+            <MUI:Grid md="2">
               <b:Radio
                 name="escapeCharacter"
                 ui:field="escapeCharacterOtherRadio"
               >
                 Other
               </b:Radio>
-            </b:Column>
+            </MUI:Grid>
 
-            <b:Column size="MD_2">
+            <MUI:Grid md="2">
               <b:TextBox maxLength="1" ui:field="escapeCharacterOtherTextBox" />
-            </b:Column>
-          </b:Row>
+            </MUI:Grid>
+          </MUI:Grid>
         </b:FormGroup>
         <b:FormGroup>
           <b:CheckBox ui:field="firstLineHeader">
