@@ -169,15 +169,6 @@ public abstract class ReactComponentV2<
     return addDomHandler(handler, ClickEvent.getType());
   }
 
-  private void synchronizeReactDomRoot() {
-    if (isRenderedAsReactComponentChild()) {
-      // This component is rendered as a child of another React component, so destroy the root if one exists
-      destroyRoot();
-    } else {
-      createRoot();
-    }
-  }
-
   private ReactElement<?, ?>[] getChildReactElements() {
     if (this.allChildrenAreReactComponents()) {
       // If all widget children are ReactNodes, get their ReactElements and add them as React children
@@ -195,13 +186,25 @@ public abstract class ReactComponentV2<
   }
 
   public void render() {
-    synchronizeReactDomRoot();
+    if (isRenderedAsReactComponentChild()) {
+      // This component will be rendered as a child of another React component, so destroy the root if one exists
+      destroyRoot();
+    }
 
     // This component may be a React child of another component, so retrieve the root widget that renders this component tree.
     ReactComponentV2<?, ?> componentToRender = getRootReactComponentWidget();
-    componentToRender.synchronizeReactDomRoot();
-    // Create a fresh ReactElement tree and render it
-    componentToRender.root.render(componentToRender.createReactElement());
+
+    // Asynchronously schedule creating a root in case we queued up an unmount of the current root
+    // See https://stackoverflow.com/questions/73459382
+    Timer t = new Timer() {
+      @Override
+      public void run() {
+        componentToRender.createRoot();
+        // Create a fresh ReactElement tree and render it
+        componentToRender.root.render(componentToRender.createReactElement());
+      }
+    };
+    t.schedule(0);
   }
 
   @Override
