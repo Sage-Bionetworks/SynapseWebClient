@@ -7,6 +7,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.ComplexPanel;
 import com.google.gwt.user.client.ui.Widget;
 import java.util.ArrayList;
@@ -142,15 +143,22 @@ public class ReactComponent<T extends ReactComponentProps>
 
   public void render(ReactNode<?> reactNode) {
     this.reactElement = reactNode;
-    maybeCreateRoot();
     injectChildWidgetsIntoComponent();
 
     // This component may be a React child of another component. If so, we must rerender the ancestor component(s) so
     // that they use the new ReactElement created in this render step.
     ReactComponent<?> componentToRender = getRootReactComponentWidget();
     if (componentToRender == this) {
-      // Resynchronize with the DOM
-      root.render(this.reactElement);
+      // Asynchronously schedule creating a root in case React is still rendering and may unmount the current root
+      Timer t = new Timer() {
+        @Override
+        public void run() {
+          maybeCreateRoot();
+          // Resynchronize with the DOM
+          root.render(reactElement);
+        }
+      };
+      t.schedule(0);
     } else {
       // Walk up the tree to the parent and repeat rerendering
       componentToRender.rerender();
@@ -175,9 +183,17 @@ public class ReactComponent<T extends ReactComponentProps>
   protected void onUnload() {
     super.onUnload();
     if (root != null) {
-      root.unmount();
+      // Asynchronously schedule unmounting the root to allow React to finish the current render cycle.
+      // https://github.com/facebook/react/issues/25675
+      Timer t = new Timer() {
+        @Override
+        public void run() {
+          root.unmount();
+          root = null;
+        }
+      };
+      t.schedule(0);
     }
-    root = null;
   }
 
   /**

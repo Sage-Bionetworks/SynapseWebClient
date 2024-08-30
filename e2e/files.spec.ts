@@ -356,7 +356,10 @@ testAuth.describe('Files', () => {
       await expect(
         userPage.getByRole('heading', { name: userProject.name }),
       ).toBeVisible()
-      await userPage.getByRole('link', { name: 'Files', exact: true }).click()
+      await userPage
+        .getByRole('link', { name: 'Files', exact: true })
+        .first()
+        .click()
     })
 
     await testAuth.step('upload file', async () => {
