@@ -13,14 +13,14 @@ import org.sagebionetworks.web.client.widget.ReactComponent;
 public class EntityAccessControlListModalWidgetImpl
   implements EntityAccessControlListModalWidget {
 
-  private final ReactComponent<EntityAclEditorModalProps> reactComponent;
+  private final ReactComponent reactComponent;
   private final SynapseReactClientFullContextPropsProvider propsProvider;
 
   private EntityAclEditorModalProps componentProps;
 
   @Inject
   EntityAccessControlListModalWidgetImpl(
-    ReactComponent<EntityAclEditorModalProps> reactComponent,
+    ReactComponent reactComponent,
     SynapseReactClientFullContextPropsProvider propsProvider
   ) {
     this.reactComponent = reactComponent;

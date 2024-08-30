@@ -437,6 +437,10 @@
                   file="${project.basedir}/node_modules/moment/min/moment.min.js"
                   tofile="src/main/webapp/generated/moment.min.js"
                 />
+                <copy
+                  file="${project.basedir}/node_modules/@mui/material/umd/material-ui.production.min.js"
+                  tofile="src/main/webapp/generated/material-ui.production.min.js"
+                />
                 <copy todir="src/main/webapp/generated">
                   <fileset
                     dir="${project.basedir}/node_modules/synapse-react-client/dist/umd"

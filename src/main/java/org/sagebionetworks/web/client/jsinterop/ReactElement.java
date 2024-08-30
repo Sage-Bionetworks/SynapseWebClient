@@ -5,11 +5,15 @@ import jsinterop.annotations.JsPackage;
 import jsinterop.annotations.JsType;
 
 @JsType(isNative = true, namespace = JsPackage.GLOBAL, name = "Object")
-public class ReactElement<T extends ReactComponentProps> {
+public class ReactElement<
+  T extends ReactComponentType<P>, P extends ReactComponentProps
+> {
+
+  public T type;
 
   @JsNullable
-  public T props;
+  public P props;
 
   @JsNullable
-  public ComponentRef ref;
+  public String key;
 }
