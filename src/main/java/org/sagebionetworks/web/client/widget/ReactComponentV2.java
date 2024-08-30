@@ -110,7 +110,7 @@ public abstract class ReactComponentV2<
   private void detachNonReactChildElements() {
     if (allChildrenAreReactComponents()) {
       // No need to remove non-React child elements from this widget
-      // But a descendant contain non-React children, so recurse!
+      // But a descendant may contain non-React children, so recurse!
       for (Widget w : getChildren()) {
         ((ReactComponentV2<?, ?>) w).detachNonReactChildElements();
       }
