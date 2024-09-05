@@ -52,12 +52,10 @@ $synapse-tertiary-color-palette: (
   900: #2f2814,
 );
 
-$page-header-min-height: 93px;
-$footer-height: 160px;
+$page-header-min-height: 96px;
+$footer-height: 198px;
 
-$full-root-panel-height: calc(
-  100vh - #{$page-header-min-height} - #{$footer-height}
-);
+$full-root-panel-height: calc(100vh - #{$footer-height});
 
 @mixin border-radius($radius) {
   -webkit-border-radius: $radius;
@@ -229,7 +227,8 @@ a:focus {
       }
       button.toolsMenuButton,
       .dropdown.open,
-      .MuiButton-root {
+      .MuiButton-root,
+      .MuiIconButton-root {
         @include transparent-button();
       }
     }
@@ -2605,12 +2604,6 @@ Looks for any child element under .modal-fullscreen that has a class that contai
 
 #body .inline-user-badge {
   display: inline-flex;
-  .SRC-userImgSmall,
-  .SRC-userImgMedium,
-  .SRC-userImgLarge,
-  .SRC-centerContentInline {
-    display: inline-flex;
-  }
 }
 
 /* seamless attribute is not yet supported on most browsers, so define the style here for all iframes with this attribute */
@@ -3205,6 +3198,10 @@ div.border {
   border-right: 1px solid #eee;
 }
 
+.with-bottom-border {
+  border-bottom: 1px solid #eee;
+}
+
 .notopmargin {
   margin-top: 0px !important;
 }
@@ -3397,10 +3394,6 @@ div.border {
   }
   .UserBadge {
     display: inline-flex;
-    .SRC-userImgSmall,
-    .SRC-userImgMedium {
-      padding: 0px;
-    }
   }
 }
 #body {
@@ -3508,8 +3501,8 @@ div.border {
     font-size: 15px;
   }
 }
-.lato {
-  font-family: Lato;
+.dmsans {
+  font-family: 'DM Sans';
 }
 
 .letter-spacing-1 {
@@ -3793,8 +3786,8 @@ div.border {
 }
 
 .TeamManagerBadge {
+  width: 100%;
   margin-left: 2px;
-  margin-right: 2px;
   padding-left: 15px;
   position: relative;
   z-index: 1;
@@ -3911,5 +3904,35 @@ div.border {
       padding-bottom: 4px;
       margin-left: 0px;
     }
+  }
+}
+
+// markdown list styles override MUI list styles
+// Re-specify MUI list style here
+.AvailableEvaluationQueueList
+  > .MuiAutocomplete-popper
+  > .MuiAutocomplete-paper,
+.AvailableEvaluationQueueList > .MuiBox-root {
+  p {
+    margin-bottom: 0px;
+    padding-bottom: 0px;
+  }
+  ul {
+    margin: 0;
+    padding: 8px 0;
+    li {
+      padding: 6px 16px;
+      margin: 0;
+    }
+  }
+}
+
+.HelpWidget {
+  > div {
+    display: inline-block;
+  }
+  svg {
+    height: 18px;
+    width: 18px;
   }
 }

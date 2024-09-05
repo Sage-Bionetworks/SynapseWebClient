@@ -6,7 +6,10 @@
   xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
 >
   <g:HTMLPanel>
-    <t:Table ui:field="table" styleName="table table-striped table-condensed">
+    <t:Table
+      ui:field="table"
+      styleName="table table-striped table-condensed whiteBackground"
+    >
       <!-- <t:THead> <t:TableRow> <t:TableHeader> <b.html:Text>Key</b.html:Text> 
 				</t:TableHeader> <t:TableHeader> <b.html:Text>Value</b.html:Text> </t:TableHeader> 
 				</t:TableRow> </t:THead> -->

@@ -4,12 +4,13 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.ErrorPageProps;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 import org.sagebionetworks.web.client.widget.header.Header;
 
 public class DownViewImpl implements DownView {
@@ -20,25 +21,27 @@ public class DownViewImpl implements DownView {
   private SynapseReactClientFullContextPropsProvider propsProvider;
 
   @UiField
-  ReactComponentDiv srcDownContainer;
+  ReactComponent srcDownContainer;
 
   String message;
 
   public static enum ErrorPageType {
-    maintenance,
-    noAccess,
-    unavailable,
+    DOWN,
+    ACCESS_DENIED,
+    NOT_FOUND,
   }
 
   public interface Binder extends UiBinder<Widget, DownViewImpl> {}
 
+  GlobalApplicationState globalAppState;
   Widget widget;
 
   @Inject
   public DownViewImpl(
     Binder uiBinder,
     Header headerWidget,
-    final SynapseReactClientFullContextPropsProvider propsProvider
+    final SynapseReactClientFullContextPropsProvider propsProvider,
+    GlobalApplicationState globalAppState
   ) {
     widget = uiBinder.createAndBindUi(this);
     this.headerWidget = headerWidget;
@@ -49,6 +52,7 @@ public class DownViewImpl implements DownView {
         renderMaintenancePage();
       }
     });
+    this.globalAppState = globalAppState;
   }
 
   @Override
@@ -77,11 +81,15 @@ public class DownViewImpl implements DownView {
 
   public void renderMaintenancePage() {
     ErrorPageProps props = ErrorPageProps.create(
-      ErrorPageType.maintenance.name(),
-      SYNAPSE_DOWN_MAINTENANCE_TITLE,
-      message
+      ErrorPageType.DOWN.name(),
+      message,
+      null, //entity ID
+      null, //entity version
+      href -> {
+        globalAppState.handleRelativePathClick(href);
+      }
     );
-    ReactNode component = React.createElementWithSynapseContext(
+    ReactElement component = React.createElementWithSynapseContext(
       SRC.SynapseComponents.ErrorPage,
       props,
       propsProvider.getJsInteropContextProps()

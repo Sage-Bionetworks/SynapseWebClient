@@ -76,31 +76,7 @@ public class Footer implements FooterView.Presenter, IsWidget {
     return view.asWidget();
   }
 
-  @Override
-  public void onReportAbuseClicked() {
-    // report abuse via Jira issue collector
-    String userId = WebConstants.ANONYMOUS, email =
-      WebConstants.ANONYMOUS, displayName = WebConstants.ANONYMOUS;
-    UserProfile userProfile = authController.getCurrentUserProfile();
-    if (userProfile != null) {
-      userId = userProfile.getOwnerId();
-      displayName = DisplayUtils.getDisplayName(userProfile);
-      email = DisplayUtils.getPrimaryEmail(userProfile);
-    }
-
-    jsniUtils.showJiraIssueCollector(
-      "", // summary
-      FLAG_ISSUE_DESCRIPTION_PART_1 +
-      gwt.getCurrentURL() +
-      WebConstants.FLAG_ISSUE_DESCRIPTION_PART_2, // description
-      FLAG_ISSUE_COLLECTOR_URL,
-      userId,
-      displayName,
-      email,
-      null, // Synapse data object ID
-      REVIEW_ABUSIVE_CONTENT_REQUEST_COMPONENT_ID,
-      null, // Access requirement ID
-      FLAG_ISSUE_PRIORITY
-    );
+  public void refresh() {
+    view.refresh();
   }
 }

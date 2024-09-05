@@ -7,7 +7,8 @@ public class ServiceEntryPointUtils {
 
   public static void fixServiceEntryPoint(Object serviceDefTargetObject) {
     if (serviceDefTargetObject instanceof ServiceDefTarget) {
-      ServiceDefTarget serviceDefTarget = (ServiceDefTarget) serviceDefTargetObject;
+      ServiceDefTarget serviceDefTarget =
+        (ServiceDefTarget) serviceDefTargetObject;
       String oldUrl = serviceDefTarget.getServiceEntryPoint();
       if (oldUrl.startsWith(GWT.getModuleBaseURL())) {
         String serviceEntryPoint =

@@ -54,7 +54,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.MarkdownIt;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.widget.EntityTypeIcon;
+import org.sagebionetworks.web.client.widget.EntityTypeIconImpl;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.SearchQueryUtils;
@@ -473,11 +473,12 @@ public class SearchViewImpl extends Composite implements SearchView {
     Heading h4 = new Heading(HeadingSize.H4);
     FlowPanel headingPanel = new FlowPanel();
     h4.add(headingPanel);
-    org.gwtbootstrap3.client.ui.Anchor link = new org.gwtbootstrap3.client.ui.Anchor(
-      hit.getName(),
-      DisplayUtils.getSynapseHistoryToken(hit.getId())
-    );
-    EntityTypeIcon icon = new EntityTypeIcon(entityType);
+    org.gwtbootstrap3.client.ui.Anchor link =
+      new org.gwtbootstrap3.client.ui.Anchor(
+        hit.getName(),
+        DisplayUtils.getSynapseHistoryToken(hit.getId())
+      );
+    EntityTypeIconImpl icon = new EntityTypeIconImpl(entityType);
     icon.addStyleName("lightGreyText margin-right-10 margin-left-5");
     headingPanel.add(icon);
     headingPanel.add(link);
@@ -528,7 +529,7 @@ public class SearchViewImpl extends Composite implements SearchView {
         safeLink += " class=\"hitBreadcrumbParent\"";
       }
       safeLink +=
-        ">" + SafeHtmlUtils.fromString(header.getName()).asString() + "</a>";
+      ">" + SafeHtmlUtils.fromString(header.getName()).asString() + "</a>";
       pathBuilder.appendHtmlConstant(safeLink);
 
       if (i < headers.size() - 1) {

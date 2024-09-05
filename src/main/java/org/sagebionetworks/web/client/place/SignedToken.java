@@ -44,7 +44,7 @@ public class SignedToken extends Place {
     this.signedEncodedToken = signedEncodedToken;
   }
 
-  @Prefix("!SignedToken")
+  @Prefix("SignedToken")
   public static class Tokenizer implements PlaceTokenizer<SignedToken> {
 
     @Override

@@ -3,7 +3,6 @@ package org.sagebionetworks.web.unitclient.widget.entity;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -17,16 +16,12 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.MarkdownIt;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.SessionStorage;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.resources.ResourceLoader;
-import org.sagebionetworks.web.client.resources.WebResource;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.ElementWrapper;
@@ -41,13 +36,11 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 public class MarkdownWidgetTest {
 
   MarkdownWidget presenter;
-  CookieProvider mockCookies;
   PortalGinInjector mockInjector;
   GWTWrapper mockGwt;
   SynapseJSNIUtils mockSynapseJSNIUtils;
   MarkdownWidgetView mockView;
   WidgetRegistrar mockWidgetRegistrar;
-  ResourceLoader mockResourceLoader;
   SynapseAlert mockSynAlert;
   WikiPageKey mockWikiPageKey;
   WikiPage mockWikiPage;
@@ -78,20 +71,18 @@ public class MarkdownWidgetTest {
     mockWidgetRendererPresenter = mock(WidgetRendererPresenter.class);
     when(
       mockWidgetRegistrar.getWidgetRendererForWidgetDescriptor(
-        any(WikiPageKey.class),
-        anyString(),
-        anyMap(),
-        any(Callback.class),
-        any(Long.class)
+        any(),
+        any(),
+        any(),
+        any(),
+        any()
       )
     )
       .thenReturn(mockWidgetRendererPresenter);
     mockView = mock(MarkdownWidgetView.class);
     mockGwt = mock(GWTWrapper.class);
-    mockCookies = mock(CookieProvider.class);
     mockInjector = mock(PortalGinInjector.class);
     mockSynAlert = mock(SynapseAlert.class);
-    mockResourceLoader = mock(ResourceLoader.class);
     mockWikiPageKey = mock(WikiPageKey.class);
     mockWikiPage = mock(WikiPage.class);
     when(mockWikiPage.getMarkdown()).thenReturn(testMarkdown);
@@ -104,8 +95,6 @@ public class MarkdownWidgetTest {
         mockSynapseJavascriptClient,
         mockSynapseJSNIUtils,
         mockWidgetRegistrar,
-        mockCookies,
-        mockResourceLoader,
         mockGwt,
         mockInjector,
         mockView,
@@ -118,8 +107,7 @@ public class MarkdownWidgetTest {
   public void testConfigureSuccess() {
     String sampleHTML = "<h1>heading</h1><p>foo baz bar</p>";
 
-    when(mockMarkdownIt.markdown2Html(anyString(), anyString()))
-      .thenReturn(sampleHTML);
+    when(mockMarkdownIt.markdown2Html(any(), any())).thenReturn(sampleHTML);
     // only the first getElementById called by each getElementById finds its target so it doesn't look
     // forever but still can be verified
     when(
@@ -138,7 +126,6 @@ public class MarkdownWidgetTest {
       )
     )
       .thenReturn(mockElementWrapper);
-    when(mockResourceLoader.isLoaded(any(WebResource.class))).thenReturn(true);
     presenter.configure(testMarkdown, mockWikiPageKey, null);
     ArgumentCaptor<Callback> callbackCaptor = ArgumentCaptor.forClass(
       Callback.class
@@ -169,14 +156,14 @@ public class MarkdownWidgetTest {
     verify(mockWidgetRegistrar)
       .getWidgetRendererForWidgetDescriptor(
         Mockito.eq(mockWikiPageKey),
-        anyString(),
-        anyMap(),
-        any(Callback.class),
-        any(Long.class)
+        any(),
+        any(),
+        any(),
+        any()
       );
     verify(mockView)
       .addWidget(
-        any(Widget.class),
+        any(),
         Mockito.contains(WidgetConstants.DIV_ID_WIDGET_PREFIX + "0")
       );
     // removes text inserted by markdown processor (usually "<Synapse widget>" text node, but is
@@ -190,9 +177,8 @@ public class MarkdownWidgetTest {
     AsyncMockStubber
       .callSuccessWith(mockWikiPage)
       .when(mockSynapseJavascriptClient)
-      .getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
-    when(mockMarkdownIt.markdown2Html(anyString(), anyString()))
-      .thenReturn(sampleHTML);
+      .getV2WikiPageAsV1(any(), any());
+    when(mockMarkdownIt.markdown2Html(any(), any())).thenReturn(sampleHTML);
     // only the first getElementById called by each getElementById finds its target so it doesn't look
     // forever but still can be verified
     when(
@@ -211,7 +197,6 @@ public class MarkdownWidgetTest {
       )
     )
       .thenReturn(mockElementWrapper);
-    when(mockResourceLoader.isLoaded(any(WebResource.class))).thenReturn(true);
 
     presenter.loadMarkdownFromWikiPage(mockWikiPageKey, true);
     ArgumentCaptor<Callback> callbackCaptor = ArgumentCaptor.forClass(
@@ -219,7 +204,7 @@ public class MarkdownWidgetTest {
     );
     verify(mockView).callbackWhenAttached(callbackCaptor.capture());
     callbackCaptor.getValue().invoke();
-    verify(mockWikiPageKey).setWikiPageId(anyString());
+    verify(mockWikiPageKey).setWikiPageId(any());
 
     verify(mockMarkdownIt).markdown2Html(anyString(), anyString());
     verify(mockView, Mockito.times(2)).setEmptyVisible(false);
@@ -238,26 +223,16 @@ public class MarkdownWidgetTest {
     verify(mockWidgetRegistrar).getWidgetContentType(elementContentType);
     verify(mockWidgetRegistrar).getWidgetDescriptor(elementContentType);
     verify(mockWidgetRegistrar)
-      .getWidgetRendererForWidgetDescriptor(
-        any(WikiPageKey.class),
-        anyString(),
-        anyMap(),
-        any(Callback.class),
-        any(Long.class)
-      );
+      .getWidgetRendererForWidgetDescriptor(any(), any(), any(), any(), any());
     verify(mockView)
       .addWidget(
-        any(Widget.class),
+        any(),
         Mockito.contains(WidgetConstants.DIV_ID_WIDGET_PREFIX + "0")
       );
   }
 
   @Test
   public void testMarkdownIt2Html() {
-    when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
-    )
-      .thenReturn("true");
     String sampleHTML = "<h1>heading</h1><p>foo baz bar</p>";
     when(mockMarkdownIt.markdown2Html(anyString(), anyString()))
       .thenReturn(sampleHTML);
@@ -276,10 +251,6 @@ public class MarkdownWidgetTest {
 
   @Test
   public void testMarkdownIt2HtmlError() {
-    when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
-    )
-      .thenReturn("true");
     String errorMessage = "a js exception";
     when(mockJsException.getMessage()).thenReturn(errorMessage);
     when(mockMarkdownIt.markdown2Html(anyString(), anyString()))

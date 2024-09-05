@@ -198,7 +198,8 @@ public class NewAccountPresenterTest {
     String lastName = " Jade     ";
     String userName = "skywalker290";
     String password = "  farfaraway";
-    final AccountCreationToken accountCreationToken = new AccountCreationToken();
+    final AccountCreationToken accountCreationToken =
+      new AccountCreationToken();
     accountCreationToken.setEmailValidationSignedToken(
       new EmailValidationSignedToken()
     );
@@ -230,7 +231,9 @@ public class NewAccountPresenterTest {
         any(AsyncCallback.class)
       );
 
-    ArgumentCaptor<AsyncCallback<UserProfile>> captor = new ArgumentCaptor<AsyncCallback<UserProfile>>();
+    ArgumentCaptor<AsyncCallback<UserProfile>> captor = ArgumentCaptor.forClass(
+      AsyncCallback.class
+    );
     verify(mockAuthController)
       .setNewAccessToken(eq(testSessionToken), captor.capture());
     AsyncCallback<UserProfile> onSetNewAccessToken = captor.getValue();
@@ -250,7 +253,8 @@ public class NewAccountPresenterTest {
     String lastName = " Jade     ";
     String userName = "skywalker290";
     String password = "  farfaraway";
-    final AccountCreationToken accountCreationToken = new AccountCreationToken();
+    final AccountCreationToken accountCreationToken =
+      new AccountCreationToken();
     accountCreationToken.setEmailValidationSignedToken(
       new EmailValidationSignedToken()
     );

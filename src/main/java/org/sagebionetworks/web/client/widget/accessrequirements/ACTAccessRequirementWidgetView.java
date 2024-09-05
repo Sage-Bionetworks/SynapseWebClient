@@ -35,8 +35,6 @@ public interface ACTAccessRequirementWidgetView
 
   void setEditAccessRequirementWidget(IsWidget w);
 
-  void setDeleteAccessRequirementWidget(IsWidget w);
-
   void setTeamSubjectsWidget(IsWidget w);
   void setEntitySubjectsWidget(IsWidget w);
 
@@ -69,4 +67,6 @@ public interface ACTAccessRequirementWidgetView
   void setAccessRequirementIDVisible(boolean visible);
 
   void setAccessRequirementID(String arID);
+
+  void setSubjectsDefinedByAnnotations(Boolean subjectsDefinedByAnnotations);
 }

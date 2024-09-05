@@ -1,4 +1,4 @@
-import { Page, expect, test } from '@playwright/test'
+import { Page, expect } from '@playwright/test'
 import { v4 as uuidv4 } from 'uuid'
 import { testAuth } from './fixtures/authenticatedUserPages'
 import { deleteProject, getEntityIdFromPathname } from './helpers/entities'
@@ -21,9 +21,9 @@ async function createProject(page: Page, projectName: string) {
 // Run multiple describes in parallel, but run tests inside each describe in order
 // ...tests within describe expect afterAll to be run with the same users, i.e. on the same worker
 // https://playwright.dev/docs/api/class-test#test-describe-configure
-test.describe.configure({ mode: 'serial' })
+testAuth.describe.configure({ mode: 'serial' })
 
-test.describe('Projects', () => {
+testAuth.describe('Projects', () => {
   testAuth('should create a project', async ({ userPage }) => {
     await testAuth.step(
       'should create a project with a unique name',
@@ -63,7 +63,7 @@ test.describe('Projects', () => {
       ).toBeVisible()
       await expect(
         userPage.getByText(
-          `Are you sure you want to delete Project "${PROJECT_NAME}"?`,
+          `Are you sure you want to delete Project ${PROJECT_NAME}?`,
         ),
       ).toBeVisible()
 
@@ -80,7 +80,7 @@ test.describe('Projects', () => {
   })
 
   testAuth.afterAll(async ({ browser }) => {
-    test.slow()
+    testAuth.slow()
     // if test failed before project was deleted, then delete project here
     if (projectId) {
       const context = await browser.newContext()

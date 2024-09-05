@@ -19,7 +19,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InOrder;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -33,7 +33,7 @@ import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class ChallengeWidgetTest {
 
   ChallengeWidget widget;
@@ -88,9 +88,9 @@ public class ChallengeWidgetTest {
   @Test
   public void testConstruction() {
     verify(mockView).setPresenter(widget);
-    verify(mockView).add(any(Widget.class));
-    verify(mockView).setChallengeTeamWidget(any(Widget.class));
-    verify(mockView).setSelectTeamModal(any(Widget.class));
+    verify(mockView).add(any());
+    verify(mockView).setChallengeTeamWidget(any());
+    verify(mockView).setSelectTeamModal(any());
   }
 
   @Test

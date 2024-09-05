@@ -17,7 +17,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
@@ -26,7 +26,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEdi
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEditorView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellRenderer;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class UserIdCellEditorImplTest {
 
   @Mock
@@ -70,8 +70,8 @@ public class UserIdCellEditorImplTest {
 
   @Test
   public void testConstruction() {
-    verify(mockView).setSynapseSuggestBoxWidget(any(Widget.class));
-    verify(mockView).setUserIdCellRenderer(any(Widget.class));
+    verify(mockView).setSynapseSuggestBoxWidget(any());
+    verify(mockView).setUserIdCellRenderer(any());
     verify(mockSynapseSuggestBox)
       .setSuggestionProvider(mockUserGroupSuggestionProvider);
     verify(mockSynapseSuggestBox).addItemSelectedHandler(any(CallbackP.class));

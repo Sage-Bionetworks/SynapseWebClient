@@ -56,6 +56,7 @@ import org.sagebionetworks.web.client.place.SynapseForumPlace;
 import org.sagebionetworks.web.client.place.Team;
 import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.place.Trash;
+import org.sagebionetworks.web.client.place.TrustCenterPlace;
 import org.sagebionetworks.web.client.place.TwoFactorAuthPlace;
 import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.place.WikiDiff;
@@ -191,7 +192,8 @@ public class BulkPresenterProxy extends AbstractActivity {
         new RunAsyncCallback() {
           @Override
           public void onSuccess() {
-            PasswordResetPresenter presenter = ginjector.getPasswordResetPresenter();
+            PasswordResetPresenter presenter =
+              ginjector.getPasswordResetPresenter();
             presenter.setPlace((PasswordReset) place);
             presenter.start(panel, eventBus);
           }
@@ -208,7 +210,8 @@ public class BulkPresenterProxy extends AbstractActivity {
         new RunAsyncCallback() {
           @Override
           public void onSuccess() {
-            RegisterAccountPresenter presenter = ginjector.getRegisterAccountPresenter();
+            RegisterAccountPresenter presenter =
+              ginjector.getRegisterAccountPresenter();
             presenter.setPlace((RegisterAccount) place);
             presenter.start(panel, eventBus);
           }
@@ -242,7 +245,8 @@ public class BulkPresenterProxy extends AbstractActivity {
         new RunAsyncCallback() {
           @Override
           public void onSuccess() {
-            ChallengeOverviewPresenter presenter = ginjector.getChallengeOverviewPresenter();
+            ChallengeOverviewPresenter presenter =
+              ginjector.getChallengeOverviewPresenter();
             presenter.setPlace((Challenges) place);
             presenter.start(panel, eventBus);
           }
@@ -293,7 +297,8 @@ public class BulkPresenterProxy extends AbstractActivity {
         new RunAsyncCallback() {
           @Override
           public void onSuccess() {
-            SynapseWikiPresenter presenter = ginjector.getSynapseWikiPresenter();
+            SynapseWikiPresenter presenter =
+              ginjector.getSynapseWikiPresenter();
             presenter.setPlace((Wiki) place);
             presenter.start(panel, eventBus);
           }
@@ -378,7 +383,8 @@ public class BulkPresenterProxy extends AbstractActivity {
         new RunAsyncCallback() {
           @Override
           public void onSuccess() {
-            PeopleSearchPresenter presenter = ginjector.getPeopleSearchPresenter();
+            PeopleSearchPresenter presenter =
+              ginjector.getPeopleSearchPresenter();
             presenter.setPlace((PeopleSearch) place);
             presenter.start(panel, eventBus);
           }
@@ -429,7 +435,8 @@ public class BulkPresenterProxy extends AbstractActivity {
         new RunAsyncCallback() {
           @Override
           public void onSuccess() {
-            ChangeUsernamePresenter presenter = ginjector.getChangeUsernamePresenter();
+            ChangeUsernamePresenter presenter =
+              ginjector.getChangeUsernamePresenter();
             presenter.setPlace((ChangeUsername) place);
             presenter.start(panel, eventBus);
           }
@@ -480,7 +487,8 @@ public class BulkPresenterProxy extends AbstractActivity {
         new RunAsyncCallback() {
           @Override
           public void onSuccess() {
-            SynapseStandaloneWikiPresenter presenter = ginjector.getSynapseStandaloneWikiPresenter();
+            SynapseStandaloneWikiPresenter presenter =
+              ginjector.getSynapseStandaloneWikiPresenter();
             presenter.setPlace((StandaloneWiki) place);
             presenter.start(panel, eventBus);
           }
@@ -497,7 +505,8 @@ public class BulkPresenterProxy extends AbstractActivity {
         new RunAsyncCallback() {
           @Override
           public void onSuccess() {
-            SignedTokenPresenter presenter = ginjector.getSignedTokenPresenter();
+            SignedTokenPresenter presenter =
+              ginjector.getSignedTokenPresenter();
             presenter.setPlace((SignedToken) place);
             presenter.start(panel, eventBus);
           }
@@ -531,7 +540,8 @@ public class BulkPresenterProxy extends AbstractActivity {
         new RunAsyncCallback() {
           @Override
           public void onSuccess() {
-            DownloadCartPresenter presenter = ginjector.getDownloadCartPresenter();
+            DownloadCartPresenter presenter =
+              ginjector.getDownloadCartPresenter();
             presenter.setPlace((DownloadCartPlace) place);
             presenter.start(panel, eventBus);
           }
@@ -565,7 +575,8 @@ public class BulkPresenterProxy extends AbstractActivity {
         new RunAsyncCallback() {
           @Override
           public void onSuccess() {
-            AccessRequirementsPresenter presenter = ginjector.getAccessRequirementsPresenter();
+            AccessRequirementsPresenter presenter =
+              ginjector.getAccessRequirementsPresenter();
             presenter.setPlace((AccessRequirementsPlace) place);
             presenter.start(panel, eventBus);
           }
@@ -582,7 +593,8 @@ public class BulkPresenterProxy extends AbstractActivity {
         new RunAsyncCallback() {
           @Override
           public void onSuccess() {
-            AccessRequirementPresenter presenter = ginjector.getAccessRequirementPresenter();
+            AccessRequirementPresenter presenter =
+              ginjector.getAccessRequirementPresenter();
             presenter.setPlace((AccessRequirementPlace) place);
             presenter.start(panel, eventBus);
           }
@@ -599,7 +611,8 @@ public class BulkPresenterProxy extends AbstractActivity {
         new RunAsyncCallback() {
           @Override
           public void onSuccess() {
-            ACTDataAccessSubmissionsPresenter presenter = ginjector.getACTDataAccessSubmissionsPresenter();
+            ACTDataAccessSubmissionsPresenter presenter =
+              ginjector.getACTDataAccessSubmissionsPresenter();
             presenter.setPlace((ACTDataAccessSubmissionsPlace) place);
             presenter.start(panel, eventBus);
           }
@@ -616,7 +629,8 @@ public class BulkPresenterProxy extends AbstractActivity {
         new RunAsyncCallback() {
           @Override
           public void onSuccess() {
-            SynapseForumPresenter presenter = ginjector.getSynapseForumPresenter();
+            SynapseForumPresenter presenter =
+              ginjector.getSynapseForumPresenter();
             presenter.setPlace((SynapseForumPlace) place);
             presenter.start(panel, eventBus);
           }
@@ -633,7 +647,8 @@ public class BulkPresenterProxy extends AbstractActivity {
         new RunAsyncCallback() {
           @Override
           public void onSuccess() {
-            SubscriptionPresenter presenter = ginjector.getSubscriptionPresenter();
+            SubscriptionPresenter presenter =
+              ginjector.getSubscriptionPresenter();
             presenter.setPlace((SubscriptionPlace) place);
             presenter.start(panel, eventBus);
           }
@@ -684,7 +699,8 @@ public class BulkPresenterProxy extends AbstractActivity {
         new RunAsyncCallback() {
           @Override
           public void onSuccess() {
-            PasswordResetSignedTokenPresenter presenter = ginjector.getPasswordResetSignedTokenPresenter();
+            PasswordResetSignedTokenPresenter presenter =
+              ginjector.getPasswordResetSignedTokenPresenter();
             presenter.setPlace((PasswordResetSignedTokenPlace) place);
             presenter.start(panel, eventBus);
           }
@@ -701,7 +717,8 @@ public class BulkPresenterProxy extends AbstractActivity {
         new RunAsyncCallback() {
           @Override
           public void onSuccess() {
-            ACTDataAccessSubmissionDashboardPresenter presenter = ginjector.getACTDataAccessSubmissionDashboardPresenter();
+            ACTDataAccessSubmissionDashboardPresenter presenter =
+              ginjector.getACTDataAccessSubmissionDashboardPresenter();
             presenter.setPlace((ACTDataAccessSubmissionDashboardPlace) place);
             presenter.start(panel, eventBus);
           }
@@ -718,7 +735,8 @@ public class BulkPresenterProxy extends AbstractActivity {
         new RunAsyncCallback() {
           @Override
           public void onSuccess() {
-            ACTAccessApprovalsPresenter presenter = ginjector.getACTAccessApprovalsPresenter();
+            ACTAccessApprovalsPresenter presenter =
+              ginjector.getACTAccessApprovalsPresenter();
             presenter.setPlace((ACTAccessApprovalsPlace) place);
             presenter.start(panel, eventBus);
           }
@@ -735,7 +753,8 @@ public class BulkPresenterProxy extends AbstractActivity {
         new RunAsyncCallback() {
           @Override
           public void onSuccess() {
-            EmailInvitationPresenter presenter = ginjector.getEmailInvitationPresenter();
+            EmailInvitationPresenter presenter =
+              ginjector.getEmailInvitationPresenter();
             presenter.setPlace((EmailInvitation) place);
             presenter.start(panel, eventBus);
           }
@@ -752,7 +771,8 @@ public class BulkPresenterProxy extends AbstractActivity {
         new RunAsyncCallback() {
           @Override
           public void onSuccess() {
-            DataAccessApprovalTokenPresenter presenter = ginjector.getDataAccessApprovalTokenPresenter();
+            DataAccessApprovalTokenPresenter presenter =
+              ginjector.getDataAccessApprovalTokenPresenter();
             presenter.setPlace((DataAccessApprovalTokenPlace) place);
             presenter.start(panel, eventBus);
           }
@@ -769,7 +789,8 @@ public class BulkPresenterProxy extends AbstractActivity {
         new RunAsyncCallback() {
           @Override
           public void onSuccess() {
-            PersonalAccessTokensPresenter presenter = ginjector.getPersonalAccessTokensPresenter();
+            PersonalAccessTokensPresenter presenter =
+              ginjector.getPersonalAccessTokensPresenter();
             presenter.setPlace((PersonalAccessTokenPlace) place);
             presenter.start(panel, eventBus);
           }
@@ -786,7 +807,8 @@ public class BulkPresenterProxy extends AbstractActivity {
         new RunAsyncCallback() {
           @Override
           public void onSuccess() {
-            DataAccessManagementPresenter presenter = ginjector.getDataAccessManagementPresenter();
+            DataAccessManagementPresenter presenter =
+              ginjector.getDataAccessManagementPresenter();
             presenter.setPlace((DataAccessManagementPlace) place);
             presenter.start(panel, eventBus);
           }
@@ -803,7 +825,8 @@ public class BulkPresenterProxy extends AbstractActivity {
         new RunAsyncCallback() {
           @Override
           public void onSuccess() {
-            OAuthClientEditorPresenter presenter = ginjector.getOAuthClientEditorPresenter();
+            OAuthClientEditorPresenter presenter =
+              ginjector.getOAuthClientEditorPresenter();
             presenter.setPlace((OAuthClientEditorPlace) place);
             presenter.start(panel, eventBus);
           }
@@ -819,7 +842,8 @@ public class BulkPresenterProxy extends AbstractActivity {
         new RunAsyncCallback() {
           @Override
           public void onSuccess() {
-            TwoFactorAuthPresenter presenter = ginjector.getTwoFactorAuthPresenter();
+            TwoFactorAuthPresenter presenter =
+              ginjector.getTwoFactorAuthPresenter();
             presenter.setPlace((TwoFactorAuthPlace) place);
             presenter.start(panel, eventBus);
           }
@@ -835,8 +859,27 @@ public class BulkPresenterProxy extends AbstractActivity {
         new RunAsyncCallback() {
           @Override
           public void onSuccess() {
-            FollowingPagePresenter presenter = ginjector.getFollowingPagePresenter();
+            FollowingPagePresenter presenter =
+              ginjector.getFollowingPagePresenter();
             presenter.setPlace((FollowingPlace) place);
+            presenter.start(panel, eventBus);
+          }
+
+          @Override
+          public void onFailure(Throwable caught) {
+            loadError(caught);
+          }
+        }
+      );
+    } else if (place instanceof TrustCenterPlace) {
+      GWT.runAsync(
+        TrustCenterPlace.class,
+        new RunAsyncCallback() {
+          @Override
+          public void onSuccess() {
+            TrustCenterPresenter presenter =
+              ginjector.getTrustCenterPresenter();
+            presenter.setPlace((TrustCenterPlace) place);
             presenter.start(panel, eventBus);
           }
 

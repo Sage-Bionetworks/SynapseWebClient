@@ -43,8 +43,6 @@ public interface ManagedACTAccessRequirementWidgetView
 
   void setEditAccessRequirementWidget(IsWidget w);
 
-  void setDeleteAccessRequirementWidget(IsWidget w);
-
   void setIDUReportButton(IsWidget w);
 
   void setSubmitterUserBadge(IsWidget w);
@@ -96,4 +94,6 @@ public interface ManagedACTAccessRequirementWidgetView
   void setAccessRequirementRelatedProjectsList(
     IsWidget accessRequirementRelatedProjectsList
   );
+
+  void setSubjectsDefinedByAnnotations(Boolean subjectsDefinedByAnnotations);
 }

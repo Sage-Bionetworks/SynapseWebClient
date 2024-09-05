@@ -62,7 +62,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 
   void setFavoritesHelpPanelVisible(boolean isVisible);
 
-  void setUserProfileEditorWidget(IsWidget userProfileEditorWidget);
+  void setUserProfileWidget(IsWidget userProfileWidget);
 
   void setSettingsWidget(Widget w);
 

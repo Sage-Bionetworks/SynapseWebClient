@@ -275,7 +275,7 @@ html {
   -webkit-tap-highlight-color: transparent;
 }
 body {
-  font-family: Lato, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;
   font-size: 16px;
   line-height: 1.5;
@@ -356,7 +356,7 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: Lato, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;
   font-weight: 500;
   line-height: 1.1;

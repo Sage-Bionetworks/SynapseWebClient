@@ -28,7 +28,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -51,7 +51,7 @@ import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserView
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class EntityTreeBrowserTest {
 
   public static final String TEST_RESULT_ID = "testResultId";
@@ -216,10 +216,8 @@ public class EntityTreeBrowserTest {
   @Test
   public void testCreateGetChildrenQuery() {
     String parentId = "9";
-    EntityChildrenRequest query = entityTreeBrowser.createGetEntityChildrenRequest(
-      parentId,
-      null
-    );
+    EntityChildrenRequest query =
+      entityTreeBrowser.createGetEntityChildrenRequest(parentId, null);
 
     // verify sort
     assertEquals(SortBy.NAME, query.getSortBy());

@@ -10,7 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.web.client.events.CancelHandler;
 import org.sagebionetworks.web.client.events.UploadSuccessHandler;
@@ -19,7 +19,7 @@ import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidgetView;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class UploadDialogTest {
 
   @Mock
@@ -52,7 +52,7 @@ public class UploadDialogTest {
 
     verify(mockUploader)
       .configure(entity, parentEntityId, fileHandleIdCallback, isEntity);
-    verify(view).configureDialog(eq(title), any(Widget.class));
+    verify(view).configureDialog(eq(title), any());
 
     verify(mockUploader).setSuccessHandler(any(UploadSuccessHandler.class));
     verify(mockUploader).setCancelHandler(any(CancelHandler.class));

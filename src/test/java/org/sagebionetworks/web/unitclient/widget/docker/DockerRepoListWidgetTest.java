@@ -103,7 +103,7 @@ public class DockerRepoListWidgetTest {
   @Test
   public void testConstruction() {
     verify(mockView).setMembersContainer(mockMembersContainer);
-    verify(mockView).setSynAlert(any(Widget.class));
+    verify(mockView).setSynAlert(any());
   }
 
   @Test
@@ -114,9 +114,8 @@ public class DockerRepoListWidgetTest {
 
   @Test
   public void testCreateDockerRepoEntityQuery() {
-    EntityChildrenRequest query = dockerRepoListWidget.createDockerRepoEntityQuery(
-      projectId
-    );
+    EntityChildrenRequest query =
+      dockerRepoListWidget.createDockerRepoEntityQuery(projectId);
     assertEquals(projectId, query.getParentId());
     assertEquals(
       Collections.singletonList(EntityType.dockerrepo),

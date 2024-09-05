@@ -16,7 +16,7 @@ public class Down extends Place {
     return token;
   }
 
-  @Prefix("!Down")
+  @Prefix("Down")
   public static class Tokenizer implements PlaceTokenizer<Down> {
 
     @Override

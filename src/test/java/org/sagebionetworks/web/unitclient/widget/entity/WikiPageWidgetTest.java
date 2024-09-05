@@ -32,7 +32,8 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.DateTimeUtils;
-import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.FeatureFlagConfig;
+import org.sagebionetworks.web.client.FeatureFlagKey;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -121,6 +122,9 @@ public class WikiPageWidgetTest {
   @Mock
   WikiSubpagesExpandEvent mockWikiSubpagesExpandEvent;
 
+  @Mock
+  FeatureFlagConfig mockFeatureFlagConfig;
+
   AdapterFactory adapterFactory = new AdapterFactoryImpl();
 
   WikiPageWidget presenter;
@@ -146,7 +150,8 @@ public class WikiPageWidgetTest {
         mockDateTimeUtils,
         mockSynapseJavascriptClient,
         mockCookies,
-        mockEventBus
+        mockEventBus,
+        mockFeatureFlagConfig
       );
     testPage = new WikiPage();
     testPage.setId(WIKI_PAGE_ID);
@@ -155,22 +160,15 @@ public class WikiPageWidgetTest {
     AsyncMockStubber
       .callSuccessWith(testPage)
       .when(mockSynapseJavascriptClient)
-      .getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
+      .getV2WikiPageAsV1(any(), any());
     WikiPage fakeWiki = new WikiPage();
     fakeWiki.setMarkdown("Fake wiki");
     AsyncMockStubber
       .callSuccessWith(fakeWiki)
       .when(mockSynapseClient)
-      .createV2WikiPageWithV1(
-        anyString(),
-        anyString(),
-        any(WikiPage.class),
-        any(AsyncCallback.class)
-      );
-    when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
-    )
-      .thenReturn("true");
+      .createV2WikiPageWithV1(any(), any(), any(), any());
+    when(mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.WIKI_DIFF_TOOL))
+      .thenReturn(true);
   }
 
   @Test
@@ -184,8 +182,7 @@ public class WikiPageWidgetTest {
     boolean canEdit = true;
     String suffix = "-test-suffix";
     String formattedDate = "today";
-    when(mockDateTimeUtils.getDateTimeString(any(Date.class)))
-      .thenReturn(formattedDate);
+    when(mockDateTimeUtils.getDateTimeString(any())).thenReturn(formattedDate);
     WikiPageKey key = new WikiPageKey(
       "ownerId",
       ObjectType.ENTITY.toString(),
@@ -196,8 +193,7 @@ public class WikiPageWidgetTest {
     verify(mockView).setLoadingVisible(true);
     verify(mockSynapseJavascriptClient)
       .getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
-    verify(mockMarkdownWidget)
-      .configure(anyString(), any(WikiPageKey.class), any(Long.class));
+    verify(mockMarkdownWidget).configure(any(), any(), any());
     verify(mockView).setNoWikiCanEditMessageVisible(false);
     verify(mockView).setNoWikiCannotEditMessageVisible(false);
     verify(mockView).setWikiHistoryWidget(any(IsWidget.class));
@@ -240,10 +236,9 @@ public class WikiPageWidgetTest {
   // TODO: remove if exposing this outside of alpha mode
   @Test
   public void testDiffToolHiddenInNormalMode() {
-    when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
-    )
-      .thenReturn(null);
+    when(mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.WIKI_DIFF_TOOL))
+      .thenReturn(false);
+
     WikiPageKey key = new WikiPageKey(
       "ownerId",
       ObjectType.ENTITY.toString(),
@@ -400,8 +395,8 @@ public class WikiPageWidgetTest {
     verify(mockView, times(2)).scrollWikiHeadingIntoView();
     verify(mockCallbackP).invoke(anyString());
     // also verify that the created by and modified by are updated when wiki page is reloaded
-    verify(mockView, times(2)).setModifiedOn(anyString());
-    verify(mockView, times(2)).setCreatedOn(anyString());
+    verify(mockView, times(2)).setModifiedOn(any());
+    verify(mockView, times(2)).setCreatedOn(any());
 
     // verify response for a different wiki is ignored (if it does not match the current wiki page id,
     // then the markdown widget is not updated).
@@ -469,7 +464,7 @@ public class WikiPageWidgetTest {
     presenter.configure(wikiPageKey, false, null);
     verify(mockSynapseJavascriptClient, never())
       .getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
-    verify(mockMarkdownWidget).configure(eq(md), eq(wikiPageKey), anyLong());
+    verify(mockMarkdownWidget).configure(eq(md), eq(wikiPageKey), any());
   }
 
   @Test
@@ -500,13 +495,13 @@ public class WikiPageWidgetTest {
     AsyncMockStubber
       .callSuccessWith(currentV2WikiPage)
       .when(mockSynapseJavascriptClient)
-      .getV2WikiPage(eq(wikiPageKey), any(AsyncCallback.class));
+      .getV2WikiPage(eq(wikiPageKey), any());
 
     presenter.configure(wikiPageKey, false, null);
     verify(mockSynapseJavascriptClient)
       .getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
     verify(mockMarkdownWidget)
-      .configure(eq(testPage.getMarkdown()), eq(wikiPageKey), anyLong());
+      .configure(eq(testPage.getMarkdown()), eq(wikiPageKey), any());
   }
 
   @Test

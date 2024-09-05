@@ -16,6 +16,8 @@ import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.VersionableEntity;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.FeatureFlagConfig;
+import org.sagebionetworks.web.client.FeatureFlagKey;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -67,11 +69,17 @@ public class FilesTab {
   CallbackP<String> entitySelectedCallback;
   ProvenanceWidget provWidget;
   AddToDownloadListV2 addToDownloadListWidget;
+  FeatureFlagConfig featureFlagConfig;
 
   @Inject
-  public FilesTab(Tab tab, PortalGinInjector ginInjector) {
+  public FilesTab(
+    Tab tab,
+    PortalGinInjector ginInjector,
+    FeatureFlagConfig featureFlagConfig
+  ) {
     this.tab = tab;
     this.ginInjector = ginInjector;
+    this.featureFlagConfig = featureFlagConfig;
     tab.configure(
       "Files",
       "file",
@@ -311,12 +319,17 @@ public class FilesTab {
     );
     view.setProvenanceVisible(isFile);
     if (isFile) {
-      if (DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider())) {
+      if (
+        featureFlagConfig.isFeatureEnabled(
+          FeatureFlagKey.PROVENANCE_V2_VISUALIZATION
+        )
+      ) {
         provWidget = ginInjector.getProvenanceRendererV2();
         view.setProvenance(provWidget.asWidget());
         provWidget.configure(configMap);
       } else {
-        org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget provWidget = ginInjector.getProvenanceRenderer();
+        org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget provWidget =
+          ginInjector.getProvenanceRenderer();
         view.setProvenance(provWidget.asWidget());
         provWidget.configure(configMap);
       }
@@ -329,21 +342,22 @@ public class FilesTab {
     view.setWikiPageWidgetVisible(isWikiPageVisible);
     if (isWikiPageVisible) {
       final boolean canEdit = bundle.getPermissions().getCanCertifiedUserEdit();
-      final WikiPageWidget.Callback wikiCallback = new WikiPageWidget.Callback() {
-        @Override
-        public void pageUpdated() {
-          ginInjector
-            .getEventBus()
-            .fireEvent(
-              new EntityUpdatedEvent(entityBundle.getEntity().getId())
-            );
-        }
+      final WikiPageWidget.Callback wikiCallback =
+        new WikiPageWidget.Callback() {
+          @Override
+          public void pageUpdated() {
+            ginInjector
+              .getEventBus()
+              .fireEvent(
+                new EntityUpdatedEvent(entityBundle.getEntity().getId())
+              );
+          }
 
-        @Override
-        public void noWikiFound() {
-          view.setWikiPageWidgetVisible(false);
-        }
-      };
+          @Override
+          public void noWikiFound() {
+            view.setWikiPageWidgetVisible(false);
+          }
+        };
       wikiPageWidget.configure(
         new WikiPageKey(
           currentEntityId,

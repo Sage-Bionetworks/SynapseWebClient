@@ -41,7 +41,8 @@ public class APITableColumnManager
     columns = new ArrayList<APITableColumnConfigView>();
     if (configs != null) {
       for (APITableColumnConfig data : configs) {
-        APITableColumnConfigView column = ginInjector.getAPITableColumnConfigView();
+        APITableColumnConfigView column =
+          ginInjector.getAPITableColumnConfigView();
         column.setSelectionChangedCallback(selectionChangedCallback);
         column.configure(data);
         columns.add(column);
@@ -178,7 +179,9 @@ public class APITableColumnManager
 
   // expose for unit testing purposes
   public List<APITableColumnConfig> getColumnConfigs() {
-    List<APITableColumnConfig> newConfigs = new ArrayList<APITableColumnConfig>();
+    List<APITableColumnConfig> newConfigs = new ArrayList<
+      APITableColumnConfig
+    >();
     for (APITableColumnConfigView column : columns) {
       newConfigs.add(column.getConfig());
     }

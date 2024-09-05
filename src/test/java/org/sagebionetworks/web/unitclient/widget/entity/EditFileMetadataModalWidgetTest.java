@@ -16,7 +16,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.file.FileHandle;
@@ -30,7 +30,7 @@ import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalView;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidgetImpl;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class EditFileMetadataModalWidgetTest {
 
   @Mock
@@ -168,25 +168,14 @@ public class EditFileMetadataModalWidgetTest {
     AsyncMockStubber
       .callSuccessWith(null)
       .when(mockJsClient)
-      .updateEntity(
-        any(Entity.class),
-        anyString(),
-        anyBoolean(),
-        any(AsyncCallback.class)
-      );
+      .updateEntity(any(), any(), any(), any());
 
     // save button
     widget.onPrimary();
     verify(mockView).setLoading(true);
     verify(mockView).hide();
     verify(mockCallback).invoke();
-    verify(mockJsClient)
-      .updateEntity(
-        any(Entity.class),
-        anyString(),
-        anyBoolean(),
-        any(AsyncCallback.class)
-      );
+    verify(mockJsClient).updateEntity(any(), any(), any(), any());
     verify(mockFileEntity).setName(NEW_NAME);
   }
 
@@ -241,12 +230,7 @@ public class EditFileMetadataModalWidgetTest {
     AsyncMockStubber
       .callFailureWith(error)
       .when(mockJsClient)
-      .updateEntity(
-        any(Entity.class),
-        anyString(),
-        anyBoolean(),
-        any(AsyncCallback.class)
-      );
+      .updateEntity(any(), any(), any(), any());
     // save button
     widget.onPrimary();
     verify(mockView).setLoading(true);

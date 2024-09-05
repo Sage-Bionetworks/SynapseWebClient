@@ -49,9 +49,6 @@ public class SelfSignAccessRequirementWidgetViewImpl
   Div editAccessRequirementContainer;
 
   @UiField
-  Div deleteAccessRequirementContainer;
-
-  @UiField
   Div teamSubjectsWidgetContainer;
 
   @UiField
@@ -79,6 +76,12 @@ public class SelfSignAccessRequirementWidgetViewImpl
   Div controlsContainer;
 
   Callback onAttachCallback;
+
+  @UiField
+  Div subjectsDefinedByAnnotationsUI;
+
+  @UiField
+  Div subjectsDefinedInAccessRequirementUI;
 
   public interface Binder
     extends UiBinder<Widget, SelfSignAccessRequirementWidgetViewImpl> {}
@@ -182,12 +185,6 @@ public class SelfSignAccessRequirementWidgetViewImpl
   }
 
   @Override
-  public void setDeleteAccessRequirementWidget(IsWidget w) {
-    deleteAccessRequirementContainer.clear();
-    deleteAccessRequirementContainer.add(w);
-  }
-
-  @Override
   public void setTeamSubjectsWidget(IsWidget w) {
     teamSubjectsWidgetContainer.clear();
     teamSubjectsWidgetContainer.add(w);
@@ -249,5 +246,16 @@ public class SelfSignAccessRequirementWidgetViewImpl
   @Override
   public void setAccessRequirementIDVisible(boolean visible) {
     accessRequirementIDUI.setVisible(visible);
+  }
+
+  @Override
+  public void setSubjectsDefinedByAnnotations(
+    Boolean subjectsDefinedByAnnotations
+  ) {
+    boolean v = subjectsDefinedByAnnotations != null
+      ? subjectsDefinedByAnnotations.booleanValue()
+      : false;
+    subjectsDefinedByAnnotationsUI.setVisible(v);
+    subjectsDefinedInAccessRequirementUI.setVisible(!v);
   }
 }

@@ -46,9 +46,6 @@ public class ACTAccessRequirementWidgetViewImpl
   Div editAccessRequirementContainer;
 
   @UiField
-  Div deleteAccessRequirementContainer;
-
-  @UiField
   Div teamSubjectsWidgetContainer;
 
   @UiField
@@ -91,6 +88,12 @@ public class ACTAccessRequirementWidgetViewImpl
 
   @UiField
   InlineLabel accessRequirementIDField;
+
+  @UiField
+  Div subjectsDefinedByAnnotationsUI;
+
+  @UiField
+  Div subjectsDefinedInAccessRequirementUI;
 
   public interface Binder
     extends UiBinder<Widget, ACTAccessRequirementWidgetViewImpl> {}
@@ -185,12 +188,6 @@ public class ACTAccessRequirementWidgetViewImpl
   }
 
   @Override
-  public void setDeleteAccessRequirementWidget(IsWidget w) {
-    deleteAccessRequirementContainer.clear();
-    deleteAccessRequirementContainer.add(w);
-  }
-
-  @Override
   public void setTeamSubjectsWidget(IsWidget w) {
     teamSubjectsWidgetContainer.clear();
     teamSubjectsWidgetContainer.add(w);
@@ -272,6 +269,17 @@ public class ACTAccessRequirementWidgetViewImpl
       );
       accessRequirementDescription.removeStyleName("boldText");
     }
+  }
+
+  @Override
+  public void setSubjectsDefinedByAnnotations(
+    Boolean subjectsDefinedByAnnotations
+  ) {
+    boolean v = subjectsDefinedByAnnotations != null
+      ? subjectsDefinedByAnnotations.booleanValue()
+      : false;
+    subjectsDefinedByAnnotationsUI.setVisible(v);
+    subjectsDefinedInAccessRequirementUI.setVisible(!v);
   }
 
   @Override

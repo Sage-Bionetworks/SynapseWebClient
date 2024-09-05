@@ -14,7 +14,7 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.EntityTypeIcon;
+import org.sagebionetworks.web.client.widget.EntityTypeIconImpl;
 
 public class DockerRepoListGroupItem extends ListGroupItem {
 
@@ -32,13 +32,13 @@ public class DockerRepoListGroupItem extends ListGroupItem {
     addStyleName("padding-10");
     Heading iconHeading = new Heading(HeadingSize.H3);
     iconHeading.setPull(Pull.LEFT);
-    EntityTypeIcon icon = new EntityTypeIcon(EntityType.dockerrepo);
+    EntityTypeIconImpl icon = new EntityTypeIconImpl(EntityType.dockerrepo);
     icon.addStyleName("lightGreyText margin-right-10 moveup-10");
     iconHeading.add(icon);
 
     Heading heading = new Heading(size);
     anchor.setText("Loading...");
-    anchor.setHref("#!Synapse:" + entityHeader.getId());
+    anchor.setHref("/Synapse:" + entityHeader.getId());
     anchor.addClickHandler(event -> {
       if (!DisplayUtils.isAnyModifierKeyDown(event)) {
         event.preventDefault();
@@ -52,7 +52,7 @@ public class DockerRepoListGroupItem extends ListGroupItem {
     text.setText(
       LAST_UPDATED + DATE_FORMAT.format(entityHeader.getModifiedOn())
     );
-    Anchor anchor = new Anchor("#!Synapse:" + entityHeader.getId());
+    Anchor anchor = new Anchor("Synapse:" + entityHeader.getId());
     anchor.setTarget("_blank");
     anchor.setIcon(IconType.ANGLE_RIGHT);
     anchor.addStyleName("margin-right-10 moveup-2 pull-right h3");

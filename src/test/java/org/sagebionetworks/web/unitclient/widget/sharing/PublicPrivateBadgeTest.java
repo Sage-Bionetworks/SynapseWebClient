@@ -100,13 +100,9 @@ public class PublicPrivateBadgeTest {
     AsyncMockStubber
       .callFailureWith(new IllegalArgumentException())
       .when(mockSynapseJavascriptClient)
-      .getEntityBundle(
-        anyString(),
-        any(EntityBundleRequest.class),
-        any(AsyncCallback.class)
-      );
+      .getEntityBundle(any(), any(), any());
     publicPrivateBadge.configure(testEntity);
-    verify(mockView).showErrorMessage(anyString());
+    verify(mockView).showErrorMessage(any());
   }
 
   @Test

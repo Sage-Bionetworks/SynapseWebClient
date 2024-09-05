@@ -13,7 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -22,7 +22,7 @@ import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalView
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidgetImpl;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class EditProjectMetadataModalWidgetTest {
 
   @Mock
@@ -61,12 +61,7 @@ public class EditProjectMetadataModalWidgetTest {
     AsyncMockStubber
       .callSuccessWith(new Project())
       .when(mockSynapseJavascriptClient)
-      .updateEntity(
-        any(Entity.class),
-        anyString(),
-        anyBoolean(),
-        any(AsyncCallback.class)
-      );
+      .updateEntity(any(), any(), any(), any());
   }
 
   @Test
@@ -153,12 +148,7 @@ public class EditProjectMetadataModalWidgetTest {
     AsyncMockStubber
       .callFailureWith(error)
       .when(mockSynapseJavascriptClient)
-      .updateEntity(
-        any(Entity.class),
-        anyString(),
-        anyBoolean(),
-        any(AsyncCallback.class)
-      );
+      .updateEntity(any(), any(), any(), any());
     // save button
     widget.onPrimary();
     verify(mockView).setLoading(true);

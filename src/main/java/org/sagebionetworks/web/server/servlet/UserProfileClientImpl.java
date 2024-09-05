@@ -21,7 +21,8 @@ public class UserProfileClientImpl
     VerificationSubmission verificationSubmission,
     String hostPageBaseURL
   ) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       // update user profile
       UserProfile myProfile = synapseClient.getMyProfile();
@@ -50,7 +51,8 @@ public class UserProfileClientImpl
     Long limit,
     Long offset
   ) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       return synapseClient.listVerificationSubmissions(
         currentState,
@@ -69,7 +71,8 @@ public class UserProfileClientImpl
     VerificationState verificationState,
     String hostPageBaseURL
   ) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       String signedTokenEndpoint = SynapseClientImpl.getSignedTokenEndpoint(
         hostPageBaseURL
@@ -86,7 +89,8 @@ public class UserProfileClientImpl
 
   @Override
   public UserBundle getMyOwnUserBundle(int mask) throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    org.sagebionetworks.client.SynapseClient synapseClient =
+      createSynapseClient();
     try {
       return synapseClient.getMyOwnUserBundle(mask);
     } catch (SynapseException e) {

@@ -1,7 +1,9 @@
 package org.sagebionetworks.web.client;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+import static org.sagebionetworks.web.client.utils.FutureUtils.getFuture;
 
+import com.google.common.util.concurrent.FluentFuture;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 import java.util.HashMap;
@@ -27,23 +29,27 @@ public class SynapsePropertiesImpl implements SynapseProperties {
   }
 
   @Override
-  public void initSynapseProperties(Callback c) {
-    stackConfigService.getSynapseProperties(
-      new AsyncCallback<HashMap<String, String>>() {
-        @Override
-        public void onSuccess(HashMap<String, String> properties) {
-          for (String key : properties.keySet()) {
-            synapseProperties.put(key, properties.get(key));
+  public FluentFuture<
+    HashMap<String, String>
+  > getInitSynapsePropertiesFuture() {
+    return getFuture(cb ->
+      stackConfigService.getSynapseProperties(
+        new AsyncCallback<HashMap<String, String>>() {
+          @Override
+          public void onSuccess(HashMap<String, String> properties) {
+            for (String key : properties.keySet()) {
+              synapseProperties.put(key, properties.get(key));
+            }
+            cb.onSuccess(properties);
           }
-          c.invoke();
-        }
 
-        @Override
-        public void onFailure(Throwable caught) {
-          synapseJSNIUtils.consoleError(caught.getMessage());
-          c.invoke();
+          @Override
+          public void onFailure(Throwable caught) {
+            synapseJSNIUtils.consoleError(caught.getMessage());
+            cb.onFailure(caught);
+          }
         }
-      }
+      )
     );
   }
 

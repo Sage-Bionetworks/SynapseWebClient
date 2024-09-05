@@ -58,7 +58,7 @@
       global="false"
     />
 
-    <w:ReactComponentDiv ui:field="itemsEditorContainer" />
+    <w:ReactComponent ui:field="itemsEditorContainer" />
 
     <bh:Div ui:field="addToDownloadListContainer" />
     <bh:Div styleName="margin-top-5" />

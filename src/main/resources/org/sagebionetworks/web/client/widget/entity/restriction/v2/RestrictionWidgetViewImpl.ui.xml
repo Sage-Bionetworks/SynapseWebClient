@@ -24,7 +24,7 @@
       ui:field="hasAccessContainerParent"
       addStyleNames="displayInlineBlock min-width-42"
     >
-      <w:ReactComponentDiv ui:field="hasAccessContainer" height="30px" />
+      <w:ReactComponent ui:field="hasAccessContainer" height="30px" />
     </bh:Div>
 
     <bh:Span ui:field="linkUI">

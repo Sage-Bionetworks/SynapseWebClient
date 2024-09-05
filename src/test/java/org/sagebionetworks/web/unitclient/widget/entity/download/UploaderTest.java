@@ -30,11 +30,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -54,6 +55,7 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -75,7 +77,7 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.upload.MultipartUploaderStub;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class UploaderTest {
 
   @Mock
@@ -156,6 +158,9 @@ public class UploaderTest {
   @Captor
   ArgumentCaptor<Callback> callbackCaptor;
 
+  @Mock
+  PortalGinInjector mockGinInjector;
+
   S3UploadDestination defaultUploadDestination;
 
   private final Long defaultSynapseStorageId = 1L;
@@ -190,19 +195,12 @@ public class UploaderTest {
     AsyncMockStubber
       .callSuccessWith(destinations)
       .when(mockSynapseJavascriptClient)
-      .getUploadDestinations(anyString(), any(AsyncCallback.class));
+      .getUploadDestinations(any(), any());
 
     AsyncMockStubber
       .callSuccessWith("entityID")
       .when(mockSynapseClient)
-      .setFileEntityFileHandle(
-        anyString(),
-        anyString(),
-        anyString(),
-        any(AsyncCallback.class)
-      );
-
-    when(mockGwt.createXMLHttpRequest()).thenReturn(null);
+      .setFileEntityFileHandle(any(), any(), any(), any());
 
     String[] fileNames = { "newFile.txt" };
     when(
@@ -215,37 +213,33 @@ public class UploaderTest {
       .callSuccessWith(testEntity)
       .when(mockSynapseClient)
       .updateExternalFile(
-        anyString(),
-        anyString(),
-        anyString(),
-        anyString(),
-        anyLong(),
-        anyString(),
-        anyLong(),
-        any(AsyncCallback.class)
+        any(),
+        any(),
+        any(),
+        any(),
+        any(),
+        any(),
+        any(),
+        any()
       );
     AsyncMockStubber
       .callSuccessWith(testEntity)
       .when(mockSynapseClient)
       .createExternalFile(
-        anyString(),
-        anyString(),
-        anyString(),
-        anyString(),
-        anyLong(),
-        anyString(),
-        anyLong(),
-        any(AsyncCallback.class)
+        any(),
+        any(),
+        any(),
+        any(),
+        any(),
+        any(),
+        any(),
+        any()
       );
     // by default, there is no name conflict
     AsyncMockStubber
       .callFailureWith(new NotFoundException())
       .when(mockSynapseClient)
-      .getFileEntityIdWithSameName(
-        anyString(),
-        anyString(),
-        any(AsyncCallback.class)
-      );
+      .getFileEntityIdWithSameName(any(), any(), any());
     uploader =
       new Uploader(
         mockView,
@@ -258,7 +252,8 @@ public class UploaderTest {
         mockS3DirectUploader,
         mockSynapseJavascriptClient,
         mockSynapseProperties,
-        mockEventBus
+        mockEventBus,
+        mockGinInjector
       );
     uploader.setCancelHandler(mockCancelHandler);
     uploader.setSuccessHandler(mockUploadSuccessHandler);
@@ -303,14 +298,14 @@ public class UploaderTest {
     );
     verify(mockSynapseClient)
       .createExternalFile(
-        anyString(),
-        anyString(),
-        anyString(),
-        anyString(),
-        eq((Long) null),
-        eq((String) null),
+        any(),
+        any(),
+        any(),
+        any(),
+        eq(null),
+        eq(null),
         eq(storageLocationId),
-        any(AsyncCallback.class)
+        any()
       );
     verify(mockView).showInfo(anyString());
     verify(mockUploadSuccessHandler).onSuccessfulUpload();
@@ -322,14 +317,14 @@ public class UploaderTest {
       .callFailureWith(new Exception("failed to create"))
       .when(mockSynapseClient)
       .createExternalFile(
-        anyString(),
-        anyString(),
-        anyString(),
-        anyString(),
-        eq((Long) null),
-        eq((String) null),
-        anyLong(),
-        any(AsyncCallback.class)
+        any(),
+        any(),
+        any(),
+        any(),
+        eq(null),
+        eq(null),
+        any(),
+        any()
       );
     uploader.setExternalFilePath(
       "http://fakepath.url/blah.xml",
@@ -345,21 +340,21 @@ public class UploaderTest {
       .callFailureWith(new Exception("failed to update path"))
       .when(mockSynapseClient)
       .createExternalFile(
-        anyString(),
-        anyString(),
-        anyString(),
-        anyString(),
-        eq((Long) null),
-        eq((String) null),
-        anyLong(),
-        any(AsyncCallback.class)
+        any(),
+        any(),
+        any(),
+        any(),
+        eq(null),
+        eq(null),
+        any(),
+        any()
       );
     uploader.setExternalFilePath(
       "http://fakepath.url/blah.xml",
       "",
       storageLocationId
     );
-    verify(mockView).showErrorMessage(anyString());
+    verify(mockView).showErrorMessage(any());
   }
 
   @Test
@@ -370,14 +365,14 @@ public class UploaderTest {
     uploader.setExternalFilePath(url, "", storageLocationId);
     verify(mockSynapseClient)
       .createExternalFile(
-        anyString(),
+        any(),
         eq(encodedUrl),
-        anyString(),
-        anyString(),
-        eq((Long) null),
-        eq((String) null),
+        any(),
+        any(),
+        eq(null),
+        eq(null),
         eq(storageLocationId),
-        any(AsyncCallback.class)
+        any()
       );
     verify(mockView).showInfo(anyString());
   }
@@ -392,14 +387,14 @@ public class UploaderTest {
     );
     verify(mockSynapseClient)
       .updateExternalFile(
-        anyString(),
-        anyString(),
-        anyString(),
-        anyString(),
-        eq((Long) null),
-        eq((String) null),
+        any(),
+        any(),
+        any(),
+        any(),
+        eq(null),
+        eq(null),
         eq(storageLocationId),
-        any(AsyncCallback.class)
+        any()
       );
     verify(mockView).showInfo(anyString());
   }
@@ -420,16 +415,12 @@ public class UploaderTest {
     verify(mockGlobalApplicationState).clearDropZoneHandler(); // SWC-5161 (cleared on handleUploads)
     verify(mockView).disableSelectionDuringUpload();
     verify(mockSynapseClient)
-      .setFileEntityFileHandle(
-        anyString(),
-        anyString(),
-        anyString(),
-        any(AsyncCallback.class)
-      );
+      .setFileEntityFileHandle(any(), any(), any(), any());
     verify(mockView).hideLoading();
     assertEquals(UploadType.S3, uploader.getCurrentUploadType());
     // verify upload success
-    verify(mockView).showInfo(DisplayConstants.TEXT_UPLOAD_SUCCESS);
+
+    verify(mockView).showSingleFileUploaded("entityID");
     verify(mockView).clear();
     verify(mockView, times(2)).resetToInitialState();
     verify(mockUploadSuccessHandler).onSuccessfulUpload();
@@ -557,7 +548,7 @@ public class UploaderTest {
   }
 
   private void verifyUploadError() {
-    verify(mockView).showErrorMessage(anyString(), anyString());
+    verify(mockView).showErrorMessage(any(), any());
     verify(mockCancelHandler).onCancel();
   }
 
@@ -692,6 +683,10 @@ public class UploaderTest {
       )
     )
       .thenReturn(fileNames);
+    AsyncMockStubber
+      .callSuccessWith(testEntity)
+      .when(mockSynapseJavascriptClient)
+      .getEntity(anyString(), any(OBJECT_TYPE.class), any(AsyncCallback.class));
 
     uploader.handleUploads();
 
@@ -717,6 +712,9 @@ public class UploaderTest {
         eq(parentEntityId),
         any(AsyncCallback.class)
       );
+
+    verify(mockView)
+      .showInfo(DisplayConstants.TEXT_UPLOAD_MULTIPLE_FILES_SUCCESS);
   }
 
   @Test
@@ -790,7 +788,8 @@ public class UploaderTest {
 
   @Test
   public void testUploadToValidExternalGoogleCloud() {
-    ExternalGoogleCloudUploadDestination d = new ExternalGoogleCloudUploadDestination();
+    ExternalGoogleCloudUploadDestination d =
+      new ExternalGoogleCloudUploadDestination();
     d.setUploadType(UploadType.GOOGLECLOUDSTORAGE);
     d.setStorageLocationId(storageLocationId);
     List<UploadDestination> destinations = new ArrayList<>();
@@ -875,9 +874,9 @@ public class UploaderTest {
       .configure(accessKey, secretKey, bucket, endpoint);
     verify(mockS3DirectUploader)
       .uploadFile(
-        anyString(),
-        anyString(),
-        any(JavaScriptObject.class),
+        any(),
+        any(),
+        any(),
         eq(uploader),
         eq(keyPrefixUUID),
         eq(storageLocationId),
@@ -909,12 +908,7 @@ public class UploaderTest {
     dragAndDropHandlerCaptor.getValue().invoke(mockDroppedFileList);
 
     verify(mockSynapseClient)
-      .setFileEntityFileHandle(
-        anyString(),
-        anyString(),
-        anyString(),
-        any(AsyncCallback.class)
-      );
+      .setFileEntityFileHandle(any(), any(), any(), any());
   }
 
   @Test
@@ -972,12 +966,7 @@ public class UploaderTest {
     r.setMessage(fileHandleId);
     uploader.handleSubmitResult(r);
     verify(mockSynapseClient)
-      .setFileEntityFileHandle(
-        anyString(),
-        anyString(),
-        anyString(),
-        any(AsyncCallback.class)
-      );
+      .setFileEntityFileHandle(any(), any(), any(), any());
   }
 
   @Test
@@ -1041,11 +1030,7 @@ public class UploaderTest {
   @Test
   public void testGetSelectedFilesText() {
     String fileName = "single file.txt";
-    when(
-      mockSynapseJsniUtils.getMultipleUploadFileNames(
-        any(JavaScriptObject.class)
-      )
-    )
+    when(mockSynapseJsniUtils.getMultipleUploadFileNames(any()))
       .thenReturn(new String[] { fileName });
     assertEquals(fileName, uploader.getSelectedFilesText());
   }
@@ -1063,11 +1048,7 @@ public class UploaderTest {
 
   @Test
   public void testGetSelectedFilesTextMultipleFiles() {
-    when(
-      mockSynapseJsniUtils.getMultipleUploadFileNames(
-        any(JavaScriptObject.class)
-      )
-    )
+    when(mockSynapseJsniUtils.getMultipleUploadFileNames(any()))
       .thenReturn(new String[] { "file1", "file2" });
     assertEquals("2 files", uploader.getSelectedFilesText());
   }

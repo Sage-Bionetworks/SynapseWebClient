@@ -12,6 +12,7 @@
 >
   <g:HTMLPanel>
     <g:SimplePanel ui:field="viewScopeContainer" />
+    <g:SimplePanel ui:field="editScopeContainer" />
     <b:Button
       ui:field="editButton"
       icon="EDIT"
@@ -20,44 +21,5 @@
       text="Edit Scope"
       type="INFO"
     />
-
-    <b:Modal
-      ui:field="editModal"
-      closable="true"
-      dataBackdrop="STATIC"
-      dataKeyboard="true"
-      b:id="editScopeModal"
-      size="LARGE"
-    >
-      <b:ModalHeader>
-        <b:Heading size="H4" text="Edit Scope" addStyleNames="displayInline" />
-        <w:HelpWidget
-          helpMarkdown="Change what items appear in this View, based on the contents of the Scope"
-          href="https://help.synapse.org/docs/Views.2011070739.html#Views-UpdatingtheScopeorContentofaView"
-          addStyleNames="margin-left-5"
-        />
-      </b:ModalHeader>
-      <b:ModalBody>
-        <bh:Span>Find containers to include in the View scope</bh:Span>
-        <g:SimplePanel
-          ui:field="editScopeContainer"
-          addStyleNames="light-border padding-10"
-        />
-        <g:SimplePanel ui:field="editScopeAlertContainer" />
-        <bh:Div ui:field="viewOptionsContainer" />
-      </b:ModalBody>
-      <b:ModalFooter>
-        <b:Button
-          ui:field="saveButton"
-          type="PRIMARY"
-          dataLoadingText="Saving..."
-        >
-          Save
-        </b:Button>
-        <b:Button ui:field="cancelButton" type="LINK" dataDismiss="MODAL">
-          Cancel
-        </b:Button>
-      </b:ModalFooter>
-    </b:Modal>
   </g:HTMLPanel>
 </ui:UiBinder>

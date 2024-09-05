@@ -9,15 +9,15 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.DownloadConfirmationProps;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 
 public class AddToDownloadListV2Impl implements AddToDownloadListV2 {
 
   private SynapseReactClientFullContextPropsProvider propsProvider;
 
-  ReactComponentDiv container = new ReactComponentDiv();
+  ReactComponent container = new ReactComponent();
 
   String queryBundleRequestJson;
   String folderId;
@@ -60,18 +60,19 @@ public class AddToDownloadListV2Impl implements AddToDownloadListV2 {
 
   private void init() {
     container.setVisible(true);
-    DownloadConfirmationProps.Callback onClose = new DownloadConfirmationProps.Callback() {
-      @Override
-      public void run() {
-        container.setVisible(false);
-      }
-    };
+    DownloadConfirmationProps.Callback onClose =
+      new DownloadConfirmationProps.Callback() {
+        @Override
+        public void run() {
+          container.setVisible(false);
+        }
+      };
     DownloadConfirmationProps editorProps = DownloadConfirmationProps.create(
       queryBundleRequestJson,
       folderId,
       onClose
     );
-    ReactNode component = React.createElementWithSynapseContext(
+    ReactElement component = React.createElementWithSynapseContext(
       SRC.SynapseComponents.DownloadConfirmation,
       editorProps,
       propsProvider.getJsInteropContextProps()

@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.controller;
 
 import static com.google.common.util.concurrent.Futures.whenAllComplete;
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
+import static org.sagebionetworks.repo.model.EntityType.dataset;
 import static org.sagebionetworks.web.client.EntityTypeUtils.DATASET_COLLECTION_DISPLAY_NAME;
 import static org.sagebionetworks.web.client.EntityTypeUtils.getFriendlyEntityTypeName;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
@@ -55,6 +56,7 @@ import org.sagebionetworks.repo.model.download.EnableTwoFa;
 import org.sagebionetworks.repo.model.download.MeetAccessRequirement;
 import org.sagebionetworks.repo.model.download.RequestDownload;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
+import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.DatasetCollection;
@@ -77,19 +79,27 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.NotificationVariant;
 import org.sagebionetworks.web.client.EntityTypeUtils;
+import org.sagebionetworks.web.client.FeatureFlagConfig;
+import org.sagebionetworks.web.client.FeatureFlagKey;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.context.KeyFactoryProvider;
+import org.sagebionetworks.web.client.context.QueryClientProvider;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.jsinterop.AlertButtonConfig;
 import org.sagebionetworks.web.client.jsinterop.EntityFinderScope;
+import org.sagebionetworks.web.client.jsinterop.KeyFactory;
+import org.sagebionetworks.web.client.jsinterop.ReactDOM;
 import org.sagebionetworks.web.client.jsinterop.ReactMouseEvent;
 import org.sagebionetworks.web.client.jsinterop.ToastMessageOptions;
+import org.sagebionetworks.web.client.jsinterop.reactquery.InvalidateQueryFilters;
+import org.sagebionetworks.web.client.jsinterop.reactquery.QueryClient;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
@@ -99,6 +109,7 @@ import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.EntityTypeIcon;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
@@ -111,6 +122,7 @@ import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidg
 import org.sagebionetworks.web.client.widget.entity.EntityBadge;
 import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalView;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
+import org.sagebionetworks.web.client.widget.entity.SqlDefinedEditorModalWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
 import org.sagebionetworks.web.client.widget.entity.WikiPageDeleteConfirmationDialog;
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal;
@@ -125,9 +137,9 @@ import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTab;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
+import org.sagebionetworks.web.client.widget.sharing.EntityAccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.statistics.StatisticsPlotWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.SqlDefinedTableEditor;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
@@ -213,8 +225,10 @@ public class EntityActionControllerImpl
 
   public static final String ARE_YOU_SURE_YOU_WANT_TO_DELETE =
     "Are you sure you want to delete ";
-  public static final String DELETE_FOLDER_EXPLANATION =
-    " Everything contained within the Folder will also be deleted.";
+  public static final String DELETE_CONTAINER_EXPLANATION_START =
+    " Everything contained within the ";
+  public static final String DELETE_CONTAINER_EXPLANATION_END =
+    " will also be deleted.";
   public static final String CONFIRM_DELETE_TITLE = "Confirm Delete";
 
   public static final String DELETE_PREFIX = "Delete ";
@@ -246,6 +260,7 @@ public class EntityActionControllerImpl
   FileClientsHelp fileClientsHelp;
   AuthenticationController authenticationController;
   AccessControlListModalWidget accessControlListModalWidget;
+  EntityAccessControlListModalWidget entityAccessControlListModalWidget;
   RenameEntityModalWidget renameEntityModalWidget;
   EntityFinderWidget.Builder entityFinderBuilder;
   EvaluationSubmitter submitter;
@@ -275,7 +290,7 @@ public class EntityActionControllerImpl
   AddFolderDialogWidget addFolderDialogWidget;
   CreateTableViewWizard createTableViewWizard;
   CreateDatasetOrCollection createDatasetOrCollection;
-  SqlDefinedTableEditor sqlDefinedTableEditor;
+  SqlDefinedEditorModalWidget sqlDefinedEditorModalWidget;
   boolean isShowingVersion = false;
   WizardCallback entityUpdatedWizardCallback;
   UploadTableModalWidget uploadTableModalWidget;
@@ -287,6 +302,9 @@ public class EntityActionControllerImpl
   ChallengeTab challengeTab;
   PopupUtilsView popupUtils;
   ContainerClientsHelp containerClientsHelp;
+  QueryClient queryClient;
+  KeyFactoryProvider keyFactoryProvider;
+  FeatureFlagConfig featureFlagConfig;
 
   @Inject
   public EntityActionControllerImpl(
@@ -298,7 +316,10 @@ public class EntityActionControllerImpl
     IsACTMemberAsyncHandler isACTMemberAsyncHandler,
     GWTWrapper gwt,
     EventBus eventBus,
-    PopupUtilsView popupUtilsView
+    PopupUtilsView popupUtilsView,
+    QueryClientProvider queryClientProvider,
+    KeyFactoryProvider keyFactoryProvider,
+    FeatureFlagConfig featureFlagConfig
   ) {
     super();
     this.view = view;
@@ -310,6 +331,9 @@ public class EntityActionControllerImpl
     this.gwt = gwt;
     this.eventBus = eventBus;
     this.popupUtils = popupUtilsView;
+    this.queryClient = queryClientProvider.getQueryClient();
+    this.keyFactoryProvider = keyFactoryProvider;
+    this.featureFlagConfig = featureFlagConfig;
     entityUpdatedWizardCallback =
       new WizardCallback() {
         @Override
@@ -437,12 +461,13 @@ public class EntityActionControllerImpl
     return accessControlListModalWidget;
   }
 
-  private SqlDefinedTableEditor getSqlDefinedTableEditor() {
-    if (sqlDefinedTableEditor == null) {
-      sqlDefinedTableEditor = ginInjector.getSqlDefinedTableEditor();
-      this.view.addWidget(sqlDefinedTableEditor.asWidget());
+  private EntityAccessControlListModalWidget getEntityAccessControlListModalWidget() {
+    if (entityAccessControlListModalWidget == null) {
+      entityAccessControlListModalWidget =
+        ginInjector.getEntityAccessControlListModalWidget();
+      this.view.addWidget(entityAccessControlListModalWidget);
     }
-    return sqlDefinedTableEditor;
+    return entityAccessControlListModalWidget;
   }
 
   private CreateTableViewWizard getCreateTableViewWizard() {
@@ -467,6 +492,15 @@ public class EntityActionControllerImpl
       view.addWidget(uploadTableModalWidget);
     }
     return uploadTableModalWidget;
+  }
+
+  private SqlDefinedEditorModalWidget getSqlDefinedEditorModalWidget() {
+    if (sqlDefinedEditorModalWidget == null) {
+      sqlDefinedEditorModalWidget =
+        ginInjector.getSqlDefinedEditorModalWidget();
+      view.addWidget(sqlDefinedEditorModalWidget);
+    }
+    return sqlDefinedEditorModalWidget;
   }
 
   private AddExternalRepoModal getAddExternalRepoModal() {
@@ -613,6 +647,7 @@ public class EntityActionControllerImpl
     configureChangeStorageLocation();
     configureCreateOrUpdateDoi();
     configureEditProjectMetadataAction();
+    configureProjectHelpAction();
     configureEditFileMetadataAction();
     configureTableCommands();
     configureProjectLevelTableCommands();
@@ -704,7 +739,9 @@ public class EntityActionControllerImpl
   private void configureFullTextSearch() {
     if (
       entityBundle.getEntity() instanceof Table &&
-      entityBundle.getPermissions().getCanCertifiedUserEdit()
+      entityBundle.getPermissions().getCanCertifiedUserEdit() &&
+      // SWC-7033: available if table is not a VirtualTable
+      !(entityBundle.getEntity() instanceof VirtualTable)
     ) {
       Table tableEntity = (Table) entityBundle.getEntity();
       actionMenu.setActionVisible(Action.TOGGLE_FULL_TEXT_SEARCH, true);
@@ -751,16 +788,21 @@ public class EntityActionControllerImpl
                     );
                     // There may be multiple actions of the same class, but we only want to show one message for each type
                     // Get the unique set of action classes.
-                    Set<Class<? extends org.sagebionetworks.repo.model.download.Action>> uniqueClasses =
-                      result
-                        .getActions()
-                        .stream()
-                        .map(
-                          org.sagebionetworks.repo.model.download.Action::getClass
-                        )
-                        .collect(Collectors.toSet());
+                    Set<
+                      Class<
+                        ? extends org.sagebionetworks.repo.model.download.Action
+                      >
+                    > uniqueClasses = result
+                      .getActions()
+                      .stream()
+                      .map(
+                        org.sagebionetworks.repo.model.download.Action::getClass
+                      )
+                      .collect(Collectors.toSet());
 
-                    for (Class<? extends org.sagebionetworks.repo.model.download.Action> clazz : uniqueClasses) {
+                    for (Class<
+                      ? extends org.sagebionetworks.repo.model.download.Action
+                    > clazz : uniqueClasses) {
                       downloadMenuTooltipText
                         .append("\n\n")
                         .append(
@@ -782,9 +824,25 @@ public class EntityActionControllerImpl
             );
         }
       }
-      actionMenu.setActionVisible(Action.DOWNLOAD_FILE, true);
 
-      actionMenu.setActionVisible(Action.ADD_TO_DOWNLOAD_CART, true);
+      boolean isExternalFileHandle =
+        entityBundle.getFileHandles() != null &&
+        !entityBundle.getFileHandles().isEmpty() &&
+        entityBundle.getFileHandles().get(0) instanceof ExternalFileHandle;
+
+      actionMenu.setActionVisible(Action.DOWNLOAD_FILE, !isExternalFileHandle);
+      actionMenu.setActionVisible(
+        Action.ADD_TO_DOWNLOAD_CART,
+        !isExternalFileHandle
+      );
+      actionMenu.setActionVisible(
+        Action.SHOW_PROGRAMMATIC_OPTIONS,
+        !isExternalFileHandle
+      );
+      actionMenu.setActionVisible(
+        Action.OPEN_EXTERNAL_FILE,
+        isExternalFileHandle
+      );
       actionMenu.setActionListener(
         Action.ADD_TO_DOWNLOAD_CART,
         (action, e) -> {
@@ -811,7 +869,7 @@ public class EntityActionControllerImpl
                   public void onSuccess(
                     AddBatchOfFilesToDownloadListResponse result
                   ) {
-                    String href = "#!DownloadCart:0";
+                    String href = "/DownloadCart:0";
                     popupUtils.showInfo(
                       entity.getName() + EntityBadge.ADDED_TO_DOWNLOAD_LIST,
                       href,
@@ -825,7 +883,6 @@ public class EntityActionControllerImpl
         }
       );
 
-      actionMenu.setActionVisible(Action.SHOW_PROGRAMMATIC_OPTIONS, true);
       actionMenu.setActionListener(
         Action.SHOW_PROGRAMMATIC_OPTIONS,
         (action, e) ->
@@ -1254,8 +1311,8 @@ public class EntityActionControllerImpl
 
   private void configureTableCommands() {
     if (entityBundle.getEntity() instanceof Table) {
-      boolean isEntityRefCollectionView =
-        entityBundle.getEntity() instanceof EntityRefCollectionView;
+      boolean isEntityRefCollectionView = entityBundle.getEntity() instanceof
+      EntityRefCollectionView;
       boolean canEditResults =
         permissions.getCanCertifiedUserEdit() &&
         isEditCellValuesSupported(entityBundle.getEntity());
@@ -1531,6 +1588,16 @@ public class EntityActionControllerImpl
     }
   }
 
+  private void configureProjectHelpAction() {
+    boolean isProjectMenu =
+      entityBundle.getEntity() instanceof Project && currentArea == null;
+    actionMenu.setActionVisible(Action.PROJECT_HELP, isProjectMenu);
+    actionMenu.setActionHref(
+      Action.PROJECT_HELP,
+      "https://sagebionetworks.jira.com/servicedesk/customer/portal/9"
+    );
+  }
+
   private void configureEditFileMetadataAction() {
     if (entityBundle.getEntity() instanceof FileEntity) {
       actionMenu.setActionVisible(
@@ -1555,7 +1622,7 @@ public class EntityActionControllerImpl
       String text = RENAME_PREFIX + entityTypeDisplay;
       if (
         entityBundle.getEntity() instanceof Table &&
-        DisplayUtils.isInTestWebsite(cookies)
+        featureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
       ) {
         text = EDIT_NAME_AND_DESCRIPTION;
       }
@@ -1956,35 +2023,6 @@ public class EntityActionControllerImpl
       TableEntity.class.getName(),
       () -> {
         postCheckCreateTableOrView(TableType.table);
-      }
-    );
-  }
-
-  public void onAddMaterializedView() {
-    preflightController.checkCreateEntity(
-      entityBundle,
-      MaterializedView.class.getName(),
-      () -> {
-        // to create a MaterializedView, we need to know the definingSQL
-        getSqlDefinedTableEditor()
-          .configure(
-            entityBundle.getEntity().getId(),
-            EntityType.materializedview
-          )
-          .show();
-      }
-    );
-  }
-
-  public void onAddVirtualTable() {
-    preflightController.checkCreateEntity(
-      entityBundle,
-      VirtualTable.class.getName(),
-      () -> {
-        // to create a MaterializedView, we need to know the definingSQL
-        getSqlDefinedTableEditor()
-          .configure(entityBundle.getEntity().getId(), EntityType.virtualtable)
-          .show();
       }
     );
   }
@@ -2637,9 +2675,34 @@ public class EntityActionControllerImpl
   }
 
   private void onRename() {
-    checkUpdateEntity(() -> {
-      postCheckRename();
-    });
+    if (checkIsLatestVersion()) {
+      checkUpdateEntity(() -> {
+        postCheckRename();
+      });
+    } else {
+      if (entityBundle.getEntityType() == dataset) {
+        view.showErrorMessage("Can only change the name of the draft dataset.");
+      } else {
+        view.showErrorMessage(
+          "Can only change the name of the most recent " +
+          entityBundle.getEntityType() +
+          " version."
+        );
+      }
+    }
+  }
+
+  private boolean checkIsLatestVersion() {
+    // If the entity is not a versionable entity, it should be considered as the LatestVersion
+    if (!(entityBundle.getEntity() instanceof VersionableEntity)) {
+      return true;
+    } else {
+      if (((VersionableEntity) entityBundle.getEntity()).getIsLatestVersion()) {
+        return true;
+      } else {
+        return false;
+      }
+    }
   }
 
   /**
@@ -2709,13 +2772,19 @@ public class EntityActionControllerImpl
   }
 
   private void postCheckEditDefiningSql() {
-    // prompt for defining sql
-    view.showPromptDialog(
-      "Update SQL",
-      ((HasDefiningSql) entity).getDefiningSQL(),
-      getUpdateDefiningSqlCallback(),
-      PromptForValuesModalView.InputType.TEXTAREA
-    );
+    String entityId = entity.getId();
+    getSqlDefinedEditorModalWidget()
+      .configure(
+        entityId,
+        () -> {
+          getSqlDefinedEditorModalWidget().setOpen(false);
+          eventBus.fireEvent(new EntityUpdatedEvent(entity.getId()));
+        },
+        () -> {
+          getSqlDefinedEditorModalWidget().setOpen(false);
+        }
+      );
+    getSqlDefinedEditorModalWidget().setOpen(true);
   }
 
   private void onViewDefiningSql() {
@@ -2749,18 +2818,32 @@ public class EntityActionControllerImpl
       );
   }
 
+  private String getIconHTML() {
+    EntityTypeIcon icon = ginInjector.getEntityTypeIcon();
+    icon.configure(entityBundle.getEntityType());
+    // Pull the HTML out of the icon React component and inline it
+    // It's possible ReactDOM has not injected HTML to the widget yet, so use flushSync to force it to be written
+    ReactDOM.flushSync();
+    return icon.getElement().getInnerHTML();
+  }
+
   @Override
   public void onDeleteEntity() {
-    // Confirm the delete with the user. Mention that everything inside folder will also be deleted if
-    // this is a folder entity.
+    // Confirm deletion with the user. Mention that everything inside container will also be deleted if
+    // this is a container entity.
     String display =
       ARE_YOU_SURE_YOU_WANT_TO_DELETE +
       this.entityTypeDisplay +
-      " \"" +
+      " " +
+      getIconHTML() +
+      "<strong>" +
       this.entity.getName() +
-      "\"?";
-    if (this.entity instanceof Folder) {
-      display += DELETE_FOLDER_EXPLANATION;
+      "</strong>?";
+    if (this.entity instanceof Folder || this.entity instanceof Project) {
+      display +=
+      DELETE_CONTAINER_EXPLANATION_START +
+      this.entityTypeDisplay +
+      DELETE_CONTAINER_EXPLANATION_END;
     }
 
     view.showConfirmDeleteDialog(
@@ -2805,6 +2888,14 @@ public class EntityActionControllerImpl
             // Go to entity's parent
             Place gotoPlace = createDeletePlace();
             getGlobalApplicationState().getPlaceChanger().goTo(gotoPlace);
+            KeyFactory keyFactory = keyFactoryProvider.getKeyFactory(
+              authenticationController.getCurrentUserAccessToken()
+            );
+            queryClient.invalidateQueries(
+              InvalidateQueryFilters.create(
+                keyFactory.getTrashCanItemsQueryKey()
+              )
+            );
           }
 
           @Override
@@ -2853,12 +2944,18 @@ public class EntityActionControllerImpl
 
   @Override
   public void onShare() {
-    getAccessControlListModalWidget()
-      .configure(entity, permissions.getCanChangePermissions());
-    this.getAccessControlListModalWidget()
-      .showSharing(() -> {
-        fireEntityUpdatedEvent();
-      });
+    if (
+      featureFlagConfig.isFeatureEnabled(FeatureFlagKey.REACT_ENTITY_ACL_EDITOR)
+    ) {
+      getEntityAccessControlListModalWidget()
+        .configure(entity.getId(), this::fireEntityUpdatedEvent);
+      getEntityAccessControlListModalWidget().setOpen(true);
+    } else {
+      getAccessControlListModalWidget()
+        .configure(entity, permissions.getCanChangePermissions());
+      this.getAccessControlListModalWidget()
+        .showSharing(this::fireEntityUpdatedEvent);
+    }
   }
 
   @Override

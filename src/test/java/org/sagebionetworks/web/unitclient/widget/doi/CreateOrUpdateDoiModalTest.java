@@ -26,7 +26,7 @@ import org.mockito.Captor;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.ObjectType;
@@ -53,7 +53,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class CreateOrUpdateDoiModalTest {
 
   private static final String objectId = "syn123";
@@ -710,9 +710,8 @@ public class CreateOrUpdateDoiModalTest {
   public void testGetSuggestedResourceTypeGeneral() {
     for (EntityType entityType : EntityType.values()) {
       // Call under test
-      DoiResourceTypeGeneral actual = CreateOrUpdateDoiModal.getSuggestedResourceTypeGeneral(
-        entityType
-      );
+      DoiResourceTypeGeneral actual =
+        CreateOrUpdateDoiModal.getSuggestedResourceTypeGeneral(entityType);
       if (
         entityType.equals(EntityType.project) ||
         entityType.equals(EntityType.folder)

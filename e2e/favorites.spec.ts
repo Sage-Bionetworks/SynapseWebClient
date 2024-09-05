@@ -1,4 +1,4 @@
-import { Page, expect, test } from '@playwright/test'
+import { Page, expect } from '@playwright/test'
 import { testAuth } from './fixtures/authenticatedUserPages'
 import { entityUrlPathname } from './helpers/entities'
 import {
@@ -41,7 +41,7 @@ function getFavoriteStarSpiner(page: Page) {
   return page.locator('.pageHeader').locator('.spinner:visible')
 }
 
-test.describe('Favorites', () => {
+testAuth.describe('Favorites', () => {
   testAuth('should be visible', async ({ userPage }) => {
     await goToDashboard(userPage)
     await goToFavorites(userPage)

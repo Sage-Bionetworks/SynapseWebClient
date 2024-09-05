@@ -35,7 +35,6 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequirementRelatedProjectsList;
 import org.sagebionetworks.web.client.widget.accessrequirements.CreateAccessRequirementButton;
-import org.sagebionetworks.web.client.widget.accessrequirements.DeleteAccessRequirementButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.EntitySubjectsWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.IntendedDataUseReportButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccessRequirementWidget;
@@ -79,9 +78,6 @@ public class ManagedACTAccessRequirementWidgetTest {
 
   @Mock
   CreateAccessRequirementButton mockCreateAccessRequirementButton;
-
-  @Mock
-  DeleteAccessRequirementButton mockDeleteAccessRequirementButton;
 
   @Mock
   ReviewAccessRequestsButton mockReviewAccessRequestsButton;
@@ -161,7 +157,6 @@ public class ManagedACTAccessRequirementWidgetTest {
         mockEntitySubjectsWidget,
         mockAccessRequirementRelatedProjectsList,
         mockCreateAccessRequirementButton,
-        mockDeleteAccessRequirementButton,
         mockReviewAccessRequestsButton,
         mockIduReportButton,
         mockDataAccessClient,
@@ -200,8 +195,8 @@ public class ManagedACTAccessRequirementWidgetTest {
   @Test
   public void testConstruction() {
     verify(mockView).setPresenter(widget);
-    verify(mockView).setWikiTermsWidget(any(Widget.class));
-    verify(mockView).setEditAccessRequirementWidget(any(Widget.class));
+    verify(mockView).setWikiTermsWidget(any());
+    verify(mockView).setEditAccessRequirementWidget(any());
     verify(mockWikiPageWidget).setModifiedCreatedByHistoryVisible(false);
     verify(mockView).setIDUReportButton(mockIduReportButton);
   }
@@ -211,8 +206,6 @@ public class ManagedACTAccessRequirementWidgetTest {
     widget.setRequirement(mockManagedACTAccessRequirement, mockRefreshCallback);
 
     verify(mockCreateAccessRequirementButton)
-      .configure(eq(mockManagedACTAccessRequirement), any(Callback.class));
-    verify(mockDeleteAccessRequirementButton)
       .configure(eq(mockManagedACTAccessRequirement), any(Callback.class));
     verify(mockIduReportButton).configure(mockManagedACTAccessRequirement);
     verify(mockReviewAccessRequestsButton)
@@ -231,12 +224,7 @@ public class ManagedACTAccessRequirementWidgetTest {
 
     widget.setRequirement(mockManagedACTAccessRequirement, mockRefreshCallback);
 
-    verify(mockWikiPageWidget)
-      .configure(
-        any(WikiPageKey.class),
-        eq(false),
-        any(WikiPageWidget.Callback.class)
-      );
+    verify(mockWikiPageWidget).configure(any(), eq(false), any());
     verify(mockView).setWikiTermsWidgetVisible(true);
     verify(mockView).setAccessRequirementName(ACCESS_REQUIREMENT_NAME);
   }

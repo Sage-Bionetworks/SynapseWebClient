@@ -7,13 +7,14 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.ErrorPageProps;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.view.DownViewImpl.ErrorPageType;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 
 public class StuAlertViewImpl implements StuAlertView {
 
@@ -23,7 +24,7 @@ public class StuAlertViewImpl implements StuAlertView {
   SynapseReactClientFullContextPropsProvider propsProvider;
 
   @UiField
-  ReactComponentDiv errorPageContainer;
+  ReactComponent errorPageContainer;
 
   @UiField
   Div synAlertContainer;
@@ -31,12 +32,18 @@ public class StuAlertViewImpl implements StuAlertView {
   Widget synAlertWidget;
   Div container = new Div();
   boolean is404, is403;
+  String entityId;
+  Long entityVersion;
+  boolean isLoggedIn;
+  GlobalApplicationState globalAppState;
 
   @Inject
   public StuAlertViewImpl(
-    SynapseReactClientFullContextPropsProvider propsProvider
+    SynapseReactClientFullContextPropsProvider propsProvider,
+    GlobalApplicationState globalAppState
   ) {
     this.propsProvider = propsProvider;
+    this.globalAppState = globalAppState;
   }
 
   @Override
@@ -53,6 +60,8 @@ public class StuAlertViewImpl implements StuAlertView {
   public void clearState() {
     container.setVisible(false);
     if (widget != null) {
+      entityId = null;
+      entityVersion = null;
       is404 = false;
       is403 = false;
       errorPageContainer.setVisible(false);
@@ -73,13 +82,17 @@ public class StuAlertViewImpl implements StuAlertView {
     }
   }
 
-  private void renderErrorPage(
-    ErrorPageType type,
-    String title,
-    String message
-  ) {
-    ErrorPageProps props = ErrorPageProps.create(type.name(), title, message);
-    ReactNode component = React.createElementWithSynapseContext(
+  private void renderErrorPage(ErrorPageType type) {
+    ErrorPageProps props = ErrorPageProps.create(
+      type.name(),
+      null, //custom message
+      entityId,
+      entityVersion,
+      href -> {
+        globalAppState.handleRelativePathClick(href);
+      }
+    );
+    ReactElement component = React.createElementWithSynapseContext(
       SRC.SynapseComponents.ErrorPage,
       props,
       propsProvider.getJsInteropContextProps()
@@ -90,32 +103,30 @@ public class StuAlertViewImpl implements StuAlertView {
 
   private void updateErrorPage() {
     if (is404) {
-      renderErrorPage(
-        ErrorPageType.unavailable,
-        "Sorry, this page isn’t available.",
-        "The link you followed may be broken, or the page may have been removed."
-      );
+      renderErrorPage(ErrorPageType.NOT_FOUND);
     }
     if (is403) {
-      renderErrorPage(
-        ErrorPageType.noAccess,
-        "Sorry, no access to this page.",
-        "You are not authorized to access the page requested."
-      );
+      renderErrorPage(ErrorPageType.ACCESS_DENIED);
     }
   }
 
   @Override
-  public void show403() {
+  public void show403(String entityId, Long entityVersion, boolean isLoggedIn) {
     is403 = true;
+    this.isLoggedIn = isLoggedIn;
+    this.entityId = entityId;
+    this.entityVersion = entityVersion;
     lazyConstruct();
     container.setVisible(true);
     updateErrorPage();
   }
 
   @Override
-  public void show404() {
+  public void show404(String entityId, Long entityVersion, boolean isLoggedIn) {
     is404 = true;
+    this.isLoggedIn = isLoggedIn;
+    this.entityId = entityId;
+    this.entityVersion = entityVersion;
     lazyConstruct();
     container.setVisible(true);
     updateErrorPage();

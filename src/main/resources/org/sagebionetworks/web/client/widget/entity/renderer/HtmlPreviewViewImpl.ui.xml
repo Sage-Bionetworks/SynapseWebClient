@@ -11,7 +11,7 @@
       <w:LoadingSpinner size="31px" />
       <bh:Text ui:field="loadingMessage" />
     </bh:Div>
-    <w:ReactComponentDiv ui:field="container" />
+    <w:ReactComponent ui:field="container" />
     <bh:Div ui:field="synAlertContainer" />
   </bh:Div>
 </ui:UiBinder>

@@ -8,21 +8,19 @@ import org.sagebionetworks.web.client.context.SynapseReactClientFullContextProps
 @JsType(isNative = true, namespace = JsPackage.GLOBAL)
 public class React {
 
-  public static native <P extends ReactComponentProps> ReactNode createElement(
-    ReactComponentType<P> component,
+  public static native <
+    T extends ReactComponentType<P>, P extends ReactComponentProps
+  > ReactElement<T, P> createElement(
+    ReactComponentType<P> componentType,
     P props
   );
 
-  public static native <P extends ReactComponentProps> ReactNode createElement(
-    ReactComponentType<P> component,
+  public static native <
+    T extends ReactComponentType<P>, P extends ReactComponentProps
+  > ReactElement<T, P> createElement(
+    ReactComponentType<P> componentType,
     P props,
-    ReactNode child
-  );
-
-  public static native <P extends ReactComponentProps> ReactNode createElement(
-    ReactComponentType<P> component,
-    P props,
-    ReactNode[] children
+    ReactElement<?, ?>... children
   );
 
   public static native <T> T createRef();
@@ -33,9 +31,9 @@ public class React {
    */
   @JsOverlay
   public static <
-    P extends ReactComponentProps
-  > ReactNode createElementWithThemeContext(
-    ReactComponentType<P> component,
+    T extends ReactComponentType<P>, P extends ReactComponentProps
+  > ReactElement<?, ?> createElementWithThemeContext(
+    ReactComponentType<P> componentType,
     P props
   ) {
     SynapseReactClientFullContextProviderProps emptyContext =
@@ -43,7 +41,7 @@ public class React {
         SynapseContextJsObject.create(null, false, false),
         null
       );
-    return createElementWithSynapseContext(component, props, emptyContext);
+    return createElementWithSynapseContext(componentType, props, emptyContext);
   }
 
   /**
@@ -51,7 +49,7 @@ public class React {
    * simplifies creating the wrapper.
    *
    * For setting props, use {@link SynapseReactClientFullContextPropsProvider}
-   * @param component
+   * @param componentType
    * @param props
    * @param wrapperProps
    * @param <P>
@@ -59,17 +57,30 @@ public class React {
    */
   @JsOverlay
   public static <
-    P extends ReactComponentProps
-  > ReactNode createElementWithSynapseContext(
-    ReactComponentType<P> component,
+    T extends ReactComponentType<P>, P extends ReactComponentProps
+  > ReactElement<?, ?> createElementWithSynapseContext(
+    T componentType,
     P props,
     SynapseReactClientFullContextProviderProps wrapperProps
   ) {
-    ReactNode componentElement = createElement(component, props);
+    ReactElement componentElement = createElement(componentType, props);
     return createElement(
       SRC.SynapseContext.FullContextProvider,
       wrapperProps,
       componentElement
     );
   }
+
+  public static native ReactElement cloneElement(ReactElement element);
+
+  public static native ReactElement cloneElement(
+    ReactElement element,
+    ReactComponentProps props
+  );
+
+  public static native ReactElement cloneElement(
+    ReactElement element,
+    ReactComponentProps props,
+    ReactElement... children
+  );
 }

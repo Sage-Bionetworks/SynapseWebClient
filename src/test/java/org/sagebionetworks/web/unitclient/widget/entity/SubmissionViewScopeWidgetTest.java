@@ -8,7 +8,6 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,7 +15,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.Entity;
@@ -25,14 +24,15 @@ import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.SubmissionView;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
+import org.sagebionetworks.web.client.jsinterop.SubmissionViewScopeEditorModalProps;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationList;
-import org.sagebionetworks.web.client.widget.evaluation.SubmissionViewScopeEditor;
+import org.sagebionetworks.web.client.widget.evaluation.SubmissionViewScopeEditorModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.SubmissionViewScopeWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.SubmissionViewScopeWidgetView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class SubmissionViewScopeWidgetTest {
 
   @Mock
@@ -45,7 +45,7 @@ public class SubmissionViewScopeWidgetTest {
   EvaluationList mockViewScopeWidget;
 
   @Mock
-  SubmissionViewScopeEditor mockEditScopeWidget;
+  SubmissionViewScopeEditorModalWidget mockEditScopeWidget;
 
   @Mock
   SynapseAlert mockSynAlert;
@@ -99,31 +99,19 @@ public class SubmissionViewScopeWidgetTest {
     AsyncMockStubber
       .callSuccessWith(evaluations)
       .when(mockJsClient)
-      .getEvaluations(
-        anyBoolean(),
-        any(ACCESS_TYPE.class),
-        anyList(),
-        anyInt(),
-        anyInt(),
-        any(AsyncCallback.class)
-      );
+      .getEvaluations(any(), any(), any(), any(), any(), any());
     AsyncMockStubber
       .callSuccessWith(mockSubmissionView)
       .when(mockJsClient)
-      .updateEntity(
-        any(Entity.class),
-        anyString(),
-        anyBoolean(),
-        any(AsyncCallback.class)
-      );
+      .updateEntity(any(), any(), any(), any());
   }
 
   @Test
   public void testConstructor() {
     verify(mockView).setPresenter(widget);
-    verify(mockView).setSynAlert(any(IsWidget.class));
-    verify(mockView).setSubmissionViewScopeEditor(any(IsWidget.class));
-    verify(mockView).setEvaluationListWidget(any(IsWidget.class));
+    verify(mockView).setSynAlert(any());
+    verify(mockView).setSubmissionViewScopeEditor(any());
+    verify(mockView).setEvaluationListWidget(any());
   }
 
   @Test
@@ -162,68 +150,58 @@ public class SubmissionViewScopeWidgetTest {
   }
 
   @Test
-  public void testOnEdit() {
+  public void testOnEditAndOnUpdate() {
     boolean isEditable = true;
 
     widget.configure(mockEntityBundle, isEditable);
     widget.onEdit();
 
-    verify(mockEditScopeWidget).configure(evaluationListCaptor.capture());
-    verifyEvaluationListContainsMockEvaluations(
-      evaluationListCaptor.getValue()
+    ArgumentCaptor<
+      SubmissionViewScopeEditorModalProps.Callback
+    > onUpdateArgumentCaptor = ArgumentCaptor.forClass(
+      SubmissionViewScopeEditorModalProps.Callback.class
     );
-  }
-
-  @Test
-  public void testOnSave() {
-    boolean isEditable = true;
-    List<String> newScopeIds = Collections.singletonList(EVAL_ID_2);
-    when(mockEditScopeWidget.getEvaluationIds()).thenReturn(newScopeIds);
-
-    widget.configure(mockEntityBundle, isEditable);
-    widget.onSave();
-
-    verify(mockView).setLoading(true);
-    verify(mockView).setLoading(false);
-    verify(mockView).hideModal();
+    ArgumentCaptor<
+      SubmissionViewScopeEditorModalProps.Callback
+    > onCancelArgumentCaptor = ArgumentCaptor.forClass(
+      SubmissionViewScopeEditorModalProps.Callback.class
+    );
+    verify(mockEditScopeWidget)
+      .configure(
+        eq(mockEntityBundle.getEntity().getId()),
+        onUpdateArgumentCaptor.capture(),
+        onCancelArgumentCaptor.capture()
+      );
+    onUpdateArgumentCaptor.getValue().run();
+    verify(mockEditScopeWidget).setOpen(false);
     verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
   }
 
   @Test
-  public void testOnSaveError() {
+  public void testOnEditAndOnCancel() {
     boolean isEditable = true;
-    Exception ex = new Exception();
-    AsyncMockStubber
-      .callFailureWith(ex)
-      .when(mockJsClient)
-      .updateEntity(
-        any(Entity.class),
-        anyString(),
-        anyBoolean(),
-        any(AsyncCallback.class)
+
+    widget.configure(mockEntityBundle, isEditable);
+    widget.onEdit();
+
+    ArgumentCaptor<
+      SubmissionViewScopeEditorModalProps.Callback
+    > onUpdateArgumentCaptor = ArgumentCaptor.forClass(
+      SubmissionViewScopeEditorModalProps.Callback.class
+    );
+    ArgumentCaptor<
+      SubmissionViewScopeEditorModalProps.Callback
+    > onCancelArgumentCaptor = ArgumentCaptor.forClass(
+      SubmissionViewScopeEditorModalProps.Callback.class
+    );
+    verify(mockEditScopeWidget)
+      .configure(
+        eq(mockEntityBundle.getEntity().getId()),
+        onUpdateArgumentCaptor.capture(),
+        onCancelArgumentCaptor.capture()
       );
-    List<String> newScopeIds = Collections.singletonList(EVAL_ID_2);
-    when(mockEditScopeWidget.getEvaluationIds()).thenReturn(newScopeIds);
-
-    widget.configure(mockEntityBundle, isEditable);
-    widget.onSave();
-
-    verify(mockView).setLoading(true);
-    verify(mockView).setLoading(false);
-    verify(mockView, never()).hideModal();
-    verify(mockSynAlert).handleException(ex);
-  }
-
-  @Test
-  public void testOnSaveEmptyScope() {
-    boolean isEditable = true;
-    when(mockEditScopeWidget.getEvaluationIds())
-      .thenReturn(new ArrayList<String>());
-
-    widget.configure(mockEntityBundle, isEditable);
-    widget.onSave();
-
-    verify(mockSynAlert)
-      .showError(SubmissionViewScopeWidget.EMPTY_SCOPE_MESSAGE);
+    onCancelArgumentCaptor.getValue().run();
+    verify(mockEditScopeWidget).setOpen(false);
+    verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
   }
 }

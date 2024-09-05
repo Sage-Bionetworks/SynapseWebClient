@@ -28,7 +28,7 @@ import org.mockito.Captor;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
@@ -73,7 +73,7 @@ import org.sagebionetworks.web.client.widget.entity.tabs.Tabs;
 import org.sagebionetworks.web.client.widget.entity.tabs.WikiTab;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class EntityPageTopTest {
 
   @Mock
@@ -249,16 +249,11 @@ public class EntityPageTopTest {
     AsyncMockStubber
       .callSuccessWith(mockProjectBundle)
       .when(mockSynapseJavascriptClient)
-      .getEntityBundleFromCache(anyString(), any(AsyncCallback.class));
+      .getEntityBundleFromCache(any(), any());
     AsyncMockStubber
       .callSuccessWith(mockEntityBundle)
       .when(mockSynapseJavascriptClient)
-      .getEntityBundleForVersion(
-        anyString(),
-        anyLong(),
-        any(EntityBundleRequest.class),
-        any(AsyncCallback.class)
-      );
+      .getEntityBundleForVersion(any(), any(), any(), any());
 
     when(mockProjectBundle.getEntity()).thenReturn(mockProjectEntity);
     when(mockProjectEntity.getId()).thenReturn(projectEntityId);
@@ -279,27 +274,27 @@ public class EntityPageTopTest {
     AsyncMockStubber
       .callSuccessWith(true)
       .when(mockSynapseJavascriptClient)
-      .isWiki(anyString(), any(AsyncCallback.class));
+      .isWiki(any(), any());
     AsyncMockStubber
       .callSuccessWith(true)
       .when(mockSynapseJavascriptClient)
-      .isFileOrFolder(anyString(), any(AsyncCallback.class));
+      .isFileOrFolder(any(), any());
     AsyncMockStubber
       .callSuccessWith(true)
       .when(mockSynapseJavascriptClient)
-      .isTable(anyString(), any(AsyncCallback.class));
+      .isTable(any(), any());
     AsyncMockStubber
       .callSuccessWith(true)
       .when(mockSynapseJavascriptClient)
-      .isEntityRefCollectionView(anyString(), any(AsyncCallback.class));
+      .isEntityRefCollectionView(any(), any());
     AsyncMockStubber
       .callSuccessWith(true)
       .when(mockSynapseClientAsync)
-      .isChallenge(anyString(), any(AsyncCallback.class));
+      .isChallenge(any(), any());
     AsyncMockStubber
       .callSuccessWith(true)
       .when(mockSynapseJavascriptClient)
-      .isDocker(anyString(), any(AsyncCallback.class));
+      .isDocker(any(), any());
 
     when(mockWikiInnerTab.isTabListItemVisible()).thenReturn(true);
     when(mockFilesInnerTab.isTabListItemVisible()).thenReturn(true);
@@ -322,9 +317,9 @@ public class EntityPageTopTest {
 
   @Test
   public void testConstruction() {
-    verify(mockView).setTabs(any(Widget.class));
-    verify(mockView).setProjectMetadata(any(Widget.class));
-    verify(mockView).setProjectActionMenu(any(Widget.class));
+    verify(mockView).setTabs(any());
+    verify(mockView).setProjectMetadata(any());
+    verify(mockView).setProjectActionMenu(any());
     verify(mockTabs).addTab(mockFilesInnerTab);
     verify(mockTabs).addTab(mockWikiInnerTab);
     verify(mockTabs).addTab(mockTablesInnerTab);
@@ -715,7 +710,7 @@ public class EntityPageTopTest {
     AsyncMockStubber
       .callFailureWith(projectLoadError)
       .when(mockSynapseJavascriptClient)
-      .getEntityBundleFromCache(anyString(), any(AsyncCallback.class));
+      .getEntityBundleFromCache(any(), any());
     Synapse.EntityArea area = null;
     String areaToken = null;
     Long versionNumber = 5L;
@@ -753,11 +748,9 @@ public class EntityPageTopTest {
         any(WikiPageWidget.Callback.class)
       );
     verify(mockTablesTab).setProject(projectEntityId, null, projectLoadError);
-    verify(mockTablesTab)
-      .configure(any(EntityBundle.class), eq(null), eq(areaToken));
+    verify(mockTablesTab).configure(any(), eq(null), eq(areaToken));
     verify(mockDatasetsTab).setProject(projectEntityId, null, projectLoadError);
-    verify(mockDatasetsTab)
-      .configure(any(EntityBundle.class), eq(null), eq(areaToken));
+    verify(mockDatasetsTab).configure(any(), eq(null), eq(areaToken));
     verify(mockChallengeTab).configure(projectEntityId, projectName, null);
     verify(mockDiscussionTab)
       .configure(projectEntityId, projectName, null, null, canModerate);

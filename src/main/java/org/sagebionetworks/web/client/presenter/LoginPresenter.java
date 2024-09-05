@@ -9,6 +9,7 @@ import static org.sagebionetworks.web.client.place.LoginPlace.SHOW_SIGNED_TOU;
 import static org.sagebionetworks.web.client.place.LoginPlace.SHOW_TOU;
 import static org.sagebionetworks.web.shared.WebConstants.OPEN_ID_ERROR_TOKEN;
 import static org.sagebionetworks.web.shared.WebConstants.OPEN_ID_UNKNOWN_USER_ERROR_TOKEN;
+import static org.sagebionetworks.web.shared.WebConstants.ORCID_NOT_LINKED;
 import static org.sagebionetworks.web.shared.WebConstants.REDIRECT_TO_LAST_PLACE;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -127,6 +128,7 @@ public class LoginPresenter
   public void setPlace(final LoginPlace place) {
     view.setPresenter(this);
     view.clear();
+    synAlert.clear();
     showView(place);
   }
 
@@ -168,6 +170,11 @@ public class LoginPresenter
       authenticationController.getCurrentUserAccessToken() != null
     ) {
       showTermsOfUse(true);
+    } else if (ORCID_NOT_LINKED.equals(token)) {
+      view.showLogin();
+      synAlert.showError(
+        "The ORCiD you entered isn't linked to a Synapse account: To sign in with ORCiD, first log in with a valid Synapse account, then link it to your ORCiD account on your Account Settings Page.  If you don't have a Synapse account, it is fast, free, and easy register today."
+      );
     } else {
       if (authenticationController.isLoggedIn()) {
         Place defaultPlace = new Profile(

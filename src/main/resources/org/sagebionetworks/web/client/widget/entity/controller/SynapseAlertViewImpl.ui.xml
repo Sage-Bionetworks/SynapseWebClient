@@ -10,7 +10,7 @@
       <w:FullWidthAlert
         message="You will need to sign in to access this resource."
         primaryCTAText="Sign In"
-        primaryCTAHrefTargetSelf="/#!LoginPlace:0"
+        primaryCTAHrefTargetSelf="/LoginPlace:0"
         alertType="INFO"
         global="false"
       />

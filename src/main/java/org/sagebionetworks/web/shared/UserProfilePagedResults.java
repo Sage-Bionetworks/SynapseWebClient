@@ -45,8 +45,7 @@ public class UserProfilePagedResults implements Serializable {
     int result = 1;
     result = prime * result + ((results == null) ? 0 : results.hashCode());
     result =
-      prime *
-      result +
+      prime * result +
       ((totalNumberOfResults == null) ? 0 : totalNumberOfResults.hashCode());
     return result;
   }

@@ -53,7 +53,7 @@ public class QueryWrapperPlotNavProps extends ReactComponentProps {
   SynapseTableProps tableConfiguration;
 
   @JsNullable
-  boolean defaultShowFacetVisualization;
+  boolean defaultShowPlots;
 
   boolean showLastUpdatedOn;
 
@@ -76,10 +76,10 @@ public class QueryWrapperPlotNavProps extends ReactComponentProps {
     props.tableConfiguration = SynapseTableProps.create();
     props.shouldDeepLink = false;
     props.name = "Items";
-    props.downloadCartPageUrl = "#!DownloadCart:0";
+    props.downloadCartPageUrl = "DownloadCart:0";
     props.showLastUpdatedOn = false;
     // SWC-6138 - hide charts by default
-    props.defaultShowFacetVisualization = false;
+    props.defaultShowPlots = false;
     return props;
   }
 }

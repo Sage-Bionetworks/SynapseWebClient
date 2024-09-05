@@ -12,7 +12,7 @@ public class ACTPlace extends ParameterizedPlace {
     super(token);
   }
 
-  @Prefix("!ACT")
+  @Prefix("ACT")
   public static class Tokenizer implements PlaceTokenizer<ACTPlace> {
 
     @Override

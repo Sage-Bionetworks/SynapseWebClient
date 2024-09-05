@@ -24,7 +24,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -37,7 +37,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class WikiPageDeleteConfirmationDialogTest {
 
   private static final String WIKI_TREE_PAGE_A2_TITLE = "title(A2)";
@@ -78,7 +78,7 @@ public class WikiPageDeleteConfirmationDialogTest {
     AsyncMockStubber
       .callSuccessWith(getWikiHeaderTree())
       .when(mockJsClient)
-      .getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
+      .getV2WikiHeaderTree(any(), any(), any());
     when(mockWikiPageKey.getWikiPageId()).thenReturn(WIKI_TREE_PAGE_A2_ID);
     dialog =
       new WikiPageDeleteConfirmationDialog(
@@ -175,10 +175,8 @@ public class WikiPageDeleteConfirmationDialogTest {
     // the call under tests
     dialog.show(mockWikiPageKey, mockAfterDeleteCallback);
 
-    verify(mockJsClient)
-      .getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
-    verify(mockView)
-      .showModal(eq(WIKI_TREE_ROOT_ID), any(Map.class), any(Map.class));
+    verify(mockJsClient).getV2WikiHeaderTree(any(), any(), any());
+    verify(mockView).showModal(eq(WIKI_TREE_ROOT_ID), any(), any());
 
     // should not make it to the delete wiki page call
     verify(mockSynapseClient, never())
@@ -210,18 +208,16 @@ public class WikiPageDeleteConfirmationDialogTest {
     AsyncMockStubber
       .callSuccessWith(null)
       .when(mockSynapseClient)
-      .deleteV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
+      .deleteV2WikiPage(any(), any());
 
     dialog.show(mockWikiPageKey, mockAfterDeleteCallback);
 
     // did not make it to the delete wiki page call
-    verify(mockSynapseClient, never())
-      .deleteV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
+    verify(mockSynapseClient, never()).deleteV2WikiPage(any(), any());
 
     dialog.onDeleteWiki();
 
-    verify(mockView)
-      .showModal(eq(WIKI_TREE_PAGE_A2_ID), any(Map.class), any(Map.class));
+    verify(mockView).showModal(eq(WIKI_TREE_PAGE_A2_ID), any(), any());
     verify(mockSynapseClient)
       .deleteV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
     verify(mockView).showInfo(THE + WIKI + WAS_SUCCESSFULLY_DELETED);
@@ -237,11 +233,11 @@ public class WikiPageDeleteConfirmationDialogTest {
     AsyncMockStubber
       .callSuccessWith(headers)
       .when(mockJsClient)
-      .getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
+      .getV2WikiHeaderTree(any(), any(), any());
     AsyncMockStubber
       .callSuccessWith(null)
       .when(mockSynapseClient)
-      .deleteV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
+      .deleteV2WikiPage(any(), any());
 
     dialog.show(mockWikiPageKey, mockAfterDeleteCallback);
 
@@ -270,7 +266,7 @@ public class WikiPageDeleteConfirmationDialogTest {
     AsyncMockStubber
       .callFailureWith(new NotFoundException())
       .when(mockJsClient)
-      .getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
+      .getV2WikiHeaderTree(any(), any(), any());
 
     dialog.show(mockWikiPageKey, mockAfterDeleteCallback);
 

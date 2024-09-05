@@ -173,18 +173,18 @@ public class ACTDataAccessSubmissionsPresenterTest {
     AsyncMockStubber
       .callSuccessWith(mockACTAccessRequirement)
       .when(mockJsClient)
-      .getAccessRequirement(anyString(), any(AsyncCallback.class));
+      .getAccessRequirement(any(), any());
     AsyncMockStubber
       .callSuccessWith(mockDataAccessSubmissionPage)
       .when(mockJsClient)
       .getDataAccessSubmissions(
-        anyString(),
-        anyString(),
-        anyString(),
-        any(SubmissionState.class),
-        any(SubmissionOrder.class),
+        any(),
+        any(),
+        any(),
+        any(),
+        any(),
         anyBoolean(),
-        any(AsyncCallback.class)
+        any()
       );
     when(mockDataAccessSubmissionPage.getResults())
       .thenReturn(Collections.singletonList(mockDataAccessSubmission));
@@ -267,13 +267,13 @@ public class ACTDataAccessSubmissionsPresenterTest {
     verify(mockLoadMoreContainer).setIsProcessing(true);
     verify(mockJsClient)
       .getDataAccessSubmissions(
-        anyString(),
+        any(),
         eq(ACCESSOR_ID),
-        eq((String) null),
-        any(SubmissionState.class),
-        any(SubmissionOrder.class),
+        eq(null),
+        any(),
+        any(),
         anyBoolean(),
-        any(AsyncCallback.class)
+        any()
       );
 
     // verify DataAccessSubmission widget is created/configured for the submission (based on the
@@ -293,13 +293,13 @@ public class ACTDataAccessSubmissionsPresenterTest {
     presenter.loadMore();
     verify(mockJsClient)
       .getDataAccessSubmissions(
-        anyString(),
+        any(),
         eq(ACCESSOR_ID),
         eq(NEXT_PAGE_TOKEN),
-        any(SubmissionState.class),
-        any(SubmissionOrder.class),
+        any(),
+        any(),
         anyBoolean(),
-        any(AsyncCallback.class)
+        any()
       );
     verify(mockLoadMoreContainer).setIsMore(false);
     verify(mockView).setProjectedExpirationDateVisible(false);
@@ -334,13 +334,13 @@ public class ACTDataAccessSubmissionsPresenterTest {
     verify(mockPlace).removeParam(ACCESSOR_ID_PARAM);
     verify(mockJsClient)
       .getDataAccessSubmissions(
-        anyString(),
-        eq((String) null),
-        eq((String) null),
-        any(SubmissionState.class),
-        any(SubmissionOrder.class),
+        any(),
+        eq(null),
+        eq(null),
+        any(),
+        any(),
         anyBoolean(),
-        any(AsyncCallback.class)
+        any()
       );
   }
 
@@ -356,13 +356,13 @@ public class ACTDataAccessSubmissionsPresenterTest {
 
     verify(mockJsClient)
       .getDataAccessSubmissions(
-        anyString(),
+        any(),
         eq(USER_ID_SELECTED),
-        eq((String) null),
-        any(SubmissionState.class),
-        any(SubmissionOrder.class),
+        eq(null),
+        any(),
+        any(),
         anyBoolean(),
-        any(AsyncCallback.class)
+        any()
       );
   }
 
@@ -373,13 +373,13 @@ public class ACTDataAccessSubmissionsPresenterTest {
       .callFailureWith(ex)
       .when(mockJsClient)
       .getDataAccessSubmissions(
-        anyString(),
-        anyString(),
-        anyString(),
-        any(SubmissionState.class),
-        any(SubmissionOrder.class),
+        any(),
+        any(),
+        any(),
+        any(),
+        any(),
         anyBoolean(),
-        any(AsyncCallback.class)
+        any()
       );
     presenter.loadData();
     verify(mockSynAlert).handleException(ex);

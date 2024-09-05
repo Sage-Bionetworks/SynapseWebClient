@@ -94,11 +94,11 @@ public class EvaluationEditorModalTest {
     AsyncMockStubber
       .callSuccessWith(null)
       .when(mockChallengeClient)
-      .updateEvaluation(any(Evaluation.class), any(AsyncCallback.class));
+      .updateEvaluation(any(), any());
     AsyncMockStubber
       .callSuccessWith(null)
       .when(mockChallengeClient)
-      .createEvaluation(any(Evaluation.class), any(AsyncCallback.class));
+      .createEvaluation(any(), any());
 
     when(mockView.getSubmissionLimit()).thenReturn(null);
     when(mockView.getNumberOfRounds()).thenReturn(null);
@@ -114,7 +114,7 @@ public class EvaluationEditorModalTest {
 
   @Test
   public void testConstruction() {
-    verify(mockView).setSynAlert(any(IsWidget.class));
+    verify(mockView).setSynAlert(any());
     verify(mockView).setPresenter(modal);
   }
 
@@ -143,7 +143,7 @@ public class EvaluationEditorModalTest {
     verify(mockView).setSubmissionInstructionsMessage(submissionInstruction);
     verify(mockView).setSubmissionReceiptMessage(submissionReceiptMessage);
     verify(mockView).setDescription(description);
-    verify(mockView).setCreatedOn(anyString());
+    verify(mockView).setCreatedOn(any());
     // verify no quota
     verify(mockView, never()).setRoundStart(any(Date.class));
     verify(mockView, never()).setNumberOfRounds(anyLong());
@@ -169,7 +169,7 @@ public class EvaluationEditorModalTest {
     verify(mockView).setSubmissionInstructionsMessage(submissionInstruction);
     verify(mockView).setSubmissionReceiptMessage(submissionReceiptMessage);
     verify(mockView).setDescription(description);
-    verify(mockView).setCreatedOn(anyString());
+    verify(mockView).setCreatedOn(any());
     // verify quota
     verify(mockView).setRoundStart(quotaRoundStart);
     verify(mockView).setNumberOfRounds(numberOfRounds);

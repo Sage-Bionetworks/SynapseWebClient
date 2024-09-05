@@ -12,9 +12,9 @@ import org.sagebionetworks.web.client.context.SynapseReactClientFullContextProps
 import org.sagebionetworks.web.client.jsinterop.EvaluationEditorPageProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactDOM;
-import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 
 public class EvaluationEditorReactComponentPage extends Composite {
 
@@ -27,7 +27,7 @@ public class EvaluationEditorReactComponentPage extends Composite {
   Anchor backToChallenge;
 
   @UiField
-  ReactComponentDiv evaluationEditorContainer;
+  ReactComponent evaluationEditorContainer;
 
   String evaluationId;
   String accessToken;
@@ -66,7 +66,7 @@ public class EvaluationEditorReactComponentPage extends Composite {
       entityId,
       this.onPageBack
     );
-    ReactNode component = React.createElementWithSynapseContext(
+    ReactElement component = React.createElementWithSynapseContext(
       SRC.SynapseComponents.EvaluationEditorPage,
       editorProps,
       propsProvider.getJsInteropContextProps()

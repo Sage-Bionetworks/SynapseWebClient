@@ -25,7 +25,7 @@ import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
-import org.sagebionetworks.web.client.widget.EntityTypeIcon;
+import org.sagebionetworks.web.client.widget.EntityTypeIconImpl;
 import org.sagebionetworks.web.client.widget.entity.EntityBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
@@ -64,10 +64,10 @@ public class TableEntityListGroupItem implements IsWidget {
   Label createdOnField;
 
   @UiField
-  FlowPanel entityContainer;
+  TableData entityContainer;
 
   @UiField
-  EntityTypeIcon icon;
+  EntityTypeIconImpl icon;
 
   public interface Binder
     extends UiBinder<IsWidget, TableEntityListGroupItem> {}
@@ -103,8 +103,10 @@ public class TableEntityListGroupItem implements IsWidget {
     entityAnchor = new Anchor();
     entityAnchor.addClickHandler(EntityBadgeViewImpl.STANDARD_CLICKHANDLER);
     entityAnchor.setText(header.getName());
-    entityAnchor.addStyleName("link");
-    entityAnchor.setHref("#!Synapse:" + header.getId());
+    entityAnchor.addStyleName(
+      "text-align-left text-overflow-ellipsis inline-block whitespace-nowrap overflowHidden maxWidth100 movedown-3"
+    );
+    entityAnchor.setHref("/Synapse:" + header.getId());
     entityAnchor
       .getElement()
       .setAttribute(EntityBadgeViewImpl.ENTITY_ID_ATTRIBUTE, header.getId());

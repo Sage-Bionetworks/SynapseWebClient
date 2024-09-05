@@ -25,7 +25,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.auth.LoginRequest;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
@@ -47,13 +47,14 @@ import org.sagebionetworks.web.client.jsinterop.reactquery.QueryClient;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.QuarantinedEmailModal;
+import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class AuthenticationControllerImplTest {
 
   public static final String ACCESS_TOKEN = "1111";
@@ -85,6 +86,9 @@ public class AuthenticationControllerImplTest {
 
   @Mock
   Header mockHeader;
+
+  @Mock
+  Footer mockFooter;
 
   @Mock
   SessionDetector mockSessionDetector;
@@ -138,6 +142,8 @@ public class AuthenticationControllerImplTest {
     profile = new UserProfile();
     profile.setOwnerId(USER_ID);
     when(mockJsClient.getAccessToken()).thenReturn(getDoneFuture(ACCESS_TOKEN));
+    when(mockJsClient.deleteSessionAccessToken())
+      .thenReturn(getDoneFuture(null));
     AsyncMockStubber
       .callSuccessWith(profile)
       .when(mockUserAccountService)
@@ -167,6 +173,7 @@ public class AuthenticationControllerImplTest {
     when(mockGinInjector.getGlobalApplicationState())
       .thenReturn(mockGlobalApplicationState);
     when(mockGinInjector.getHeader()).thenReturn(mockHeader);
+    when(mockGinInjector.getFooter()).thenReturn(mockFooter);
     when(mockGlobalApplicationState.getPlaceChanger())
       .thenReturn(mockPlaceChanger);
     when(mockGinInjector.getSessionDetector()).thenReturn(mockSessionDetector);
@@ -189,6 +196,9 @@ public class AuthenticationControllerImplTest {
       .thenReturn(true);
 
     authenticationController.logoutUser();
+
+    // revokes token
+    verify(mockJsClient).deleteSessionAccessToken();
 
     // sets session cookie
     verify(mockJsClient)
@@ -224,6 +234,8 @@ public class AuthenticationControllerImplTest {
     verify(mockSessionDetector).initializeAccessTokenState();
     verify(mockGlobalApplicationState).refreshPage();
     verify(mockQueryClient).resetQueries();
+    verify(mockHeader).refresh();
+    verify(mockFooter).refresh();
   }
 
   @Test

@@ -43,8 +43,10 @@ public class SearchPresenter
 
   private SearchQuery currentSearch;
   private SearchResults currentResult;
-  private Map<String, String> timeValueToDisplay =
-    new HashMap<String, String>();
+  private Map<String, String> timeValueToDisplay = new HashMap<
+    String,
+    String
+  >();
   private Date searchStartTime;
   private SynapseJavascriptClient jsClient;
 
@@ -290,7 +292,9 @@ public class SearchPresenter
   private SearchQuery checkForJson(String queryString) {
     SearchQuery query = getBaseSearchQuery();
 
-    query.setQueryTerm(Arrays.asList(queryString.split(" ")));
+    query.setQueryTerm(
+      Arrays.asList(queryString.replace("%20", " ").split(" "))
+    );
 
     // if query parses into SearchQuery, use that, otherwise use it as a
     // search Term
@@ -383,22 +387,14 @@ public class SearchPresenter
 
   private boolean isEmptyQuery() {
     return (
-      (
-        currentSearch.getQueryTerm() == null ||
+      (currentSearch.getQueryTerm() == null ||
         currentSearch.getQueryTerm().size() == 0 ||
-        (
-          currentSearch.getQueryTerm().size() == 1 &&
-          "".equals(currentSearch.getQueryTerm().get(0))
-        )
-      ) &&
-      (
-        currentSearch.getBooleanQuery() == null ||
-        currentSearch.getBooleanQuery().size() == 0
-      ) &&
-      (
-        currentSearch.getRangeQuery() == null ||
-        currentSearch.getRangeQuery().size() == 0
-      )
+        (currentSearch.getQueryTerm().size() == 1 &&
+          "".equals(currentSearch.getQueryTerm().get(0)))) &&
+      (currentSearch.getBooleanQuery() == null ||
+        currentSearch.getBooleanQuery().size() == 0) &&
+      (currentSearch.getRangeQuery() == null ||
+        currentSearch.getRangeQuery().size() == 0)
     );
   }
 

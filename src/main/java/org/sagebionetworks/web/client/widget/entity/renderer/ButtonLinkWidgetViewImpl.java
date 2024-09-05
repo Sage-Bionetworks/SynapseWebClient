@@ -4,7 +4,6 @@ import static org.sagebionetworks.web.client.DisplayUtils.newWindow;
 
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.HTMLPanel;
@@ -16,9 +15,7 @@ import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.events.ChangeSynapsePlaceEvent;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
-import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 public class ButtonLinkWidgetViewImpl
@@ -28,7 +25,7 @@ public class ButtonLinkWidgetViewImpl
   private Button button;
   private static AppPlaceHistoryMapper appPlaceHistoryMapper;
   public static EventBus eventBus;
-  public static final String SYNAPSE_PLACE_FRAGMENT = "#!Synapse:";
+  public static final String SYNAPSE_PLACE_FRAGMENT = "Synapse:";
   public static final ClickHandler BUTTON_LINK_CLICK_HANDLER = event -> {
     if (!DisplayUtils.isAnyModifierKeyDown(event)) {
       event.preventDefault();
@@ -41,17 +38,11 @@ public class ButtonLinkWidgetViewImpl
       if (openInNewWindow) {
         newWindow(href, "_blank", "");
       } else {
-        if (
-          href.contains(SYNAPSE_PLACE_FRAGMENT) &&
-          Window.Location.getHref().contains(SYNAPSE_PLACE_FRAGMENT)
-        ) {
-          Place newPlace = appPlaceHistoryMapper.getPlace(
-            href.substring(href.indexOf('!'))
-          );
-          eventBus.fireEvent(new ChangeSynapsePlaceEvent((Synapse) newPlace));
-        } else {
-          Window.Location.assign(href);
-        }
+        //TODO: optimize to get the page based on the GWT place token and use the Placechanger.
+        // Or detect the Synapse place and do this:
+
+        //        eventBus.fireEvent(new ChangeSynapsePlaceEvent((Synapse) newPlace));
+        Window.Location.assign(href);
       }
       Timer timer = new Timer() {
         public void run() {
@@ -79,13 +70,17 @@ public class ButtonLinkWidgetViewImpl
   public void configure(
     WikiPageKey wikiKey,
     String buttonText,
-    final String url,
+    String url,
     boolean isHighlight,
     final boolean openInNewWindow
   ) {
     clear();
     button.setText(buttonText);
     if (isHighlight) button.setType(ButtonType.INFO);
+    // Detect old #!, and direct to the right place
+    if (url.startsWith("#!")) {
+      url = "/" + url.substring("#!".length());
+    }
     button.setHref(url);
     if (openInNewWindow) {
       button

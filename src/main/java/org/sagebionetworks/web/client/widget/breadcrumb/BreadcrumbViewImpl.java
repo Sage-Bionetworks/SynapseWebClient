@@ -9,15 +9,15 @@ import org.sagebionetworks.web.client.context.SynapseReactClientFullContextProps
 import org.sagebionetworks.web.client.jsinterop.BreadcrumbItem;
 import org.sagebionetworks.web.client.jsinterop.EntityPageBreadcrumbsProps;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.place.Synapse;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 
 public class BreadcrumbViewImpl implements BreadcrumbView {
 
   private final SynapseReactClientFullContextPropsProvider propsProvider;
-  ReactComponentDiv container;
+  ReactComponent container;
   private Presenter presenter;
 
   @Inject
@@ -25,7 +25,7 @@ public class BreadcrumbViewImpl implements BreadcrumbView {
     SynapseReactClientFullContextPropsProvider propsProvider
   ) {
     this.propsProvider = propsProvider;
-    container = new ReactComponentDiv();
+    container = new ReactComponent();
   }
 
   @Override
@@ -52,15 +52,12 @@ public class BreadcrumbViewImpl implements BreadcrumbView {
         if (data.getPlace() instanceof Synapse) {
           Synapse synapsePlace = (Synapse) data.getPlace();
           href =
-            (
-              "#" +
-              DisplayUtils.getSynapseHistoryTokenNoHash(
+            (DisplayUtils.getSynapseHistoryToken(
                 synapsePlace.getEntityId(),
                 synapsePlace.getVersionNumber(),
                 synapsePlace.getArea(),
                 synapsePlace.getAreaToken()
-              )
-            );
+              ));
         }
         BreadcrumbItem.OnClick clickHandler = null;
         if (data.getPlace() != null) {
@@ -84,7 +81,7 @@ public class BreadcrumbViewImpl implements BreadcrumbView {
       items.toArray(new BreadcrumbItem[0])
     );
 
-    ReactNode element = React.createElementWithSynapseContext(
+    ReactElement element = React.createElementWithSynapseContext(
       SRC.SynapseComponents.EntityPageBreadcrumbs,
       props,
       propsProvider.getJsInteropContextProps()

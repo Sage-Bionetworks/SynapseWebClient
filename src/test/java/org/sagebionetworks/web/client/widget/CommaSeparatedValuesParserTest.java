@@ -9,11 +9,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.web.client.widget.csv.PapaCSVParser;
 import org.sagebionetworks.web.client.widget.csv.PapaParseResult;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class CommaSeparatedValuesParserTest extends TestCase {
 
   @Mock

@@ -28,7 +28,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityRef;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
@@ -83,7 +83,7 @@ import org.sagebionetworks.web.unitclient.widget.table.v2.TableModelTestUtils;
  * Business logic tests for the TableEntityPlotsWidget
  *
  */
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class TableEntityWidgetV2Test {
 
   AdapterFactory adapterFactory;
@@ -174,7 +174,9 @@ public class TableEntityWidgetV2Test {
   ArgumentCaptor<OnQueryResultBundleCallback> onQueryResultBundleCallbackCaptor;
 
   @Captor
-  ArgumentCaptor<OnViewSharingSettingsHandler> onViewSharingSettingsHandlerCaptor;
+  ArgumentCaptor<
+    OnViewSharingSettingsHandler
+  > onViewSharingSettingsHandlerCaptor;
 
   @Mock
   GlobalApplicationState mockGlobalState;
@@ -717,8 +719,7 @@ public class TableEntityWidgetV2Test {
     );
     widget.onEditResults();
     // proceed to edit
-    verify(mockQueryResultEditorWidget)
-      .showEditor(any(QueryResultBundle.class), any(TableType.class));
+    verify(mockQueryResultEditorWidget).showEditor(any(), any());
   }
 
   @Test

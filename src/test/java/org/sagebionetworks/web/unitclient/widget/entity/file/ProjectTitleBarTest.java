@@ -9,7 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.Folder;
@@ -20,7 +20,7 @@ import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.entity.file.ProjectTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.ProjectTitleBarView;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class ProjectTitleBarTest {
 
   ProjectTitleBar titleBar;
@@ -49,7 +49,7 @@ public class ProjectTitleBarTest {
     entity.setId(entityId);
     entity.setName(testEntityName);
     when(mockBundle.getEntity()).thenReturn(entity);
-    verify(mockView).setFavoritesWidget(any(Widget.class));
+    verify(mockView).setFavoritesWidget(any());
     verify(mockFavoriteWidget).asWidget();
     when(mockAuthController.isLoggedIn()).thenReturn(true);
   }

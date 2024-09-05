@@ -34,12 +34,10 @@ public class ActionConfiguration {
     config.tooltipText = "";
     config._actionListeners = new ArrayList<>();
     config.onClick =
-      (
-        event ->
+      (event ->
           config._actionListeners.forEach(listener ->
             listener.onAction(action, event)
-          )
-      );
+          ));
     return config;
   }
 

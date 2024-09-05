@@ -1,10 +1,13 @@
 package org.sagebionetworks.web.unitclient;
 
+import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 
+import com.google.common.util.concurrent.FluentFuture;
+import com.google.common.util.concurrent.FutureCallback;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import java.util.HashMap;
 import org.junit.Before;
@@ -15,7 +18,6 @@ import org.sagebionetworks.web.client.StackConfigServiceAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.SynapsePropertiesImpl;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -32,7 +34,7 @@ public class SynapsePropertiesTest {
   SynapseJSNIUtils mockSynapseJSNIUtils;
 
   @Mock
-  Callback mockCallback;
+  FutureCallback mockFutureCallback;
 
   @Before
   public void setUp() throws Exception {
@@ -66,14 +68,16 @@ public class SynapsePropertiesTest {
       authenticatedPrincipalId
     );
 
-    synapseProperties.initSynapseProperties(mockCallback);
-
+    FluentFuture initPropsFuture =
+      synapseProperties.getInitSynapsePropertiesFuture();
+    initPropsFuture.addCallback(mockFutureCallback, directExecutor());
     verify(mockStackConfigService)
       .getSynapseProperties(any(AsyncCallback.class));
     assertEquals(value, synapseProperties.getSynapseProperty(key));
     assertNull(synapseProperties.getSynapseProperty("foo"));
 
-    PublicPrincipalIds publicPrincipalIds = synapseProperties.getPublicPrincipalIds();
+    PublicPrincipalIds publicPrincipalIds =
+      synapseProperties.getPublicPrincipalIds();
     assertEquals(
       publicPrincipalId,
       publicPrincipalIds.getPublicAclPrincipalId().toString()
@@ -86,20 +90,23 @@ public class SynapsePropertiesTest {
       authenticatedPrincipalId,
       publicPrincipalIds.getAuthenticatedAclPrincipalId().toString()
     );
-    verify(mockCallback).invoke();
+    verify(mockFutureCallback).onSuccess(testProps);
   }
 
   @Test
   public void testInitSynapsePropertiesFailure() {
     String errorMessage = "unable to get properties";
+    Exception ex = new Exception(errorMessage);
     AsyncMockStubber
-      .callFailureWith(new Exception(errorMessage))
+      .callFailureWith(ex)
       .when(mockStackConfigService)
       .getSynapseProperties(any(AsyncCallback.class));
 
-    synapseProperties.initSynapseProperties(mockCallback);
+    FluentFuture initPropsFuture =
+      synapseProperties.getInitSynapsePropertiesFuture();
+    initPropsFuture.addCallback(mockFutureCallback, directExecutor());
 
     verify(mockSynapseJSNIUtils).consoleError(errorMessage);
-    verify(mockCallback).invoke();
+    verify(mockFutureCallback).onFailure(ex);
   }
 }

@@ -116,9 +116,9 @@ public class SynapseTableFormWidgetTest {
   @Test
   public void testAsWidget() {
     // test construction
-    verify(mockView).setRowFormWidget(any(Widget.class));
-    verify(mockView).setSynAlertWidget(any(Widget.class));
-    verify(mockView).setUserBadge(any(Widget.class));
+    verify(mockView).setRowFormWidget(any());
+    verify(mockView).setSynAlertWidget(any());
+    verify(mockView).setUserBadge(any());
     verify(mockView).setPresenter(widget);
 
     // and asWidget
@@ -194,9 +194,8 @@ public class SynapseTableFormWidgetTest {
 
     widget.onSubmit();
 
-    ArgumentCaptor<UpdatingAsynchProgressHandler> captor = ArgumentCaptor.forClass(
-      UpdatingAsynchProgressHandler.class
-    );
+    ArgumentCaptor<UpdatingAsynchProgressHandler> captor =
+      ArgumentCaptor.forClass(UpdatingAsynchProgressHandler.class);
     verify(mockAsynchronousJobTracker)
       .startAndTrack(
         any(AsynchType.class),
@@ -216,9 +215,8 @@ public class SynapseTableFormWidgetTest {
   public void testOnSubmitOnCancel() throws RequestException {
     widget.configure(wikiKey, descriptor, null, null);
     widget.onSubmit();
-    ArgumentCaptor<UpdatingAsynchProgressHandler> captor = ArgumentCaptor.forClass(
-      UpdatingAsynchProgressHandler.class
-    );
+    ArgumentCaptor<UpdatingAsynchProgressHandler> captor =
+      ArgumentCaptor.forClass(UpdatingAsynchProgressHandler.class);
     verify(mockAsynchronousJobTracker)
       .startAndTrack(
         any(AsynchType.class),
@@ -237,9 +235,8 @@ public class SynapseTableFormWidgetTest {
   public void testOnSubmitOnComplete() throws RequestException {
     widget.configure(wikiKey, descriptor, null, null);
     widget.onSubmit();
-    ArgumentCaptor<UpdatingAsynchProgressHandler> captor = ArgumentCaptor.forClass(
-      UpdatingAsynchProgressHandler.class
-    );
+    ArgumentCaptor<UpdatingAsynchProgressHandler> captor =
+      ArgumentCaptor.forClass(UpdatingAsynchProgressHandler.class);
     verify(mockAsynchronousJobTracker)
       .startAndTrack(
         any(AsynchType.class),

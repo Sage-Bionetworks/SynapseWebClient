@@ -93,7 +93,7 @@ public class CreateBasicAccessRequirementStep2Test {
 
   @Test
   public void testConstruction() {
-    verify(mockView).setWikiPageRenderer(any(IsWidget.class));
+    verify(mockView).setWikiPageRenderer(any());
     verify(mockView).setPresenter(widget);
     verify(mockWikiPageRenderer).setModifiedCreatedByHistoryVisible(false);
     verify(mockWikiMarkdownEditor).setDeleteButtonVisible(false);

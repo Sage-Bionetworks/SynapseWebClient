@@ -33,12 +33,12 @@ public class AccessControlListEditorViewImpl
   implements AccessControlListEditorView {
 
   public static final String CREATE_ACL_HELP_TEXT =
-    "By default the sharing settings are inherited from the parent folder or project. If you want to have different settings on a specific file, folder, or table you need to create local sharing settings and then modify them.";
+    "Sharing settings are initially inherited from the parent folder or project by default. To customize settings for a specific file, folder, or table, you must create and adjust local sharing settings.";
 
   private static final String CANNOT_MODIFY_ACL_TEXT =
     "You do not have sufficient privileges to modify the sharing settings.";
   private static final String CANNOT_MODIFY_ACL_ANONYMOUS_HTML =
-    "You must be <a href=\"#!LoginPlace:0\">logged in</a> and have sufficient privileges to modify the sharing settings.";
+    "You must be <a href=\"LoginPlace:0\">logged in</a> and have sufficient privileges to modify the sharing settings.";
   private Presenter presenter;
   private Map<PermissionLevel, String> permissionDisplay;
   private Long publicAclPrincipalId, authenticatedPrincipalId;
@@ -218,7 +218,7 @@ public class AccessControlListEditorViewImpl
       EntityIdCellRenderer entityRenderer =
         ginInjector.getEntityIdCellRenderer();
       ClickHandler customClickHandler = event -> {
-        DisplayUtils.newWindow("#!Synapse:" + aclEntityId, "", "");
+        DisplayUtils.newWindow("/Synapse:" + aclEntityId, "", "");
       };
       entityRenderer.setValue(aclEntityId, customClickHandler, false);
       div.add(entityRenderer);
@@ -270,13 +270,14 @@ public class AccessControlListEditorViewImpl
         add(helpWidget);
       } else {
         // Configure AddPeopleToAclPanel.
-        CallbackP<UserGroupSuggestion> addPersonCallback =
-          new CallbackP<UserGroupSuggestion>() {
-            @Override
-            public void invoke(UserGroupSuggestion param) {
-              addPersonToAcl(param);
-            }
-          };
+        CallbackP<UserGroupSuggestion> addPersonCallback = new CallbackP<
+          UserGroupSuggestion
+        >() {
+          @Override
+          public void invoke(UserGroupSuggestion param) {
+            addPersonToAcl(param);
+          }
+        };
 
         CallbackP<Void> makePublicCallback = new CallbackP<Void>() {
           @Override

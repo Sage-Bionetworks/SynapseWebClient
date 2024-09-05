@@ -26,4 +26,6 @@ public interface SortableTableHeader extends IsWidget {
   public void setSortDirection(SortDirection direction);
 
   public void setIsResizable(boolean isResizable);
+
+  public void setMinimumWidth(String minWidth);
 }

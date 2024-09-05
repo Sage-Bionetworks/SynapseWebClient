@@ -18,7 +18,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.InviteeVerificationSignedToken;
 import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.repo.model.MembershipInvtnSignedToken;
@@ -40,7 +40,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class EmailInvitationPresenterTest {
 
   public static final String CURRENT_USER_ID = "987387483";
@@ -89,7 +89,9 @@ public class EmailInvitationPresenterTest {
   private ArgumentCaptor<Profile> placeCaptor;
 
   @Captor
-  private ArgumentCaptor<org.sagebionetworks.web.client.place.Team> teamPlaceCaptor;
+  private ArgumentCaptor<
+    org.sagebionetworks.web.client.place.Team
+  > teamPlaceCaptor;
 
   private EmailInvitationPresenter presenter;
   private String encodedMISignedToken;
@@ -161,7 +163,8 @@ public class EmailInvitationPresenterTest {
       .getInviteeVerificationSignedToken(mockMembershipInvitation.getId());
     verify(mockJsClient).updateInviteeId(mockInviteeVerificationSignedToken);
     verify(mockPlaceChanger).goTo(teamPlaceCaptor.capture());
-    org.sagebionetworks.web.client.place.Team teamPlace = teamPlaceCaptor.getValue();
+    org.sagebionetworks.web.client.place.Team teamPlace =
+      teamPlaceCaptor.getValue();
     assertEquals(TEAM_ID, teamPlace.getTeamId());
   }
 
@@ -225,7 +228,7 @@ public class EmailInvitationPresenterTest {
     verify(mockPlaceChanger).goTo(placeCaptor.capture());
     Profile profilePlace = placeCaptor.getValue();
     assertEquals(CURRENT_USER_ID, profilePlace.getUserId());
-    assertEquals(ProfileArea.SETTINGS, profilePlace.getArea());
+    assertEquals(ProfileArea.PROFILE, profilePlace.getArea());
   }
 
   @Test

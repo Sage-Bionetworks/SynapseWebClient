@@ -10,7 +10,6 @@
 # These artifacts were generated and/or pre-minified and then checked in
 src/main/webapp/css/**/*
 src/main/webapp/js/**/*
-src/main/webapp/offline/**/*
 src/main/webapp/pdf.js/**/*
 src/main/webapp/research/**/*
 

@@ -82,7 +82,8 @@ import java.util.Map;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.FeatureFlagConfig;
+import org.sagebionetworks.web.client.FeatureFlagKey;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
@@ -94,18 +95,24 @@ import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 public class WidgetRegistrarImpl implements WidgetRegistrar {
 
-  private HashMap<String, String> contentType2FriendlyName = new HashMap<String, String>();
+  private HashMap<String, String> contentType2FriendlyName = new HashMap<
+    String,
+    String
+  >();
 
   PortalGinInjector ginInjector;
   JSONObjectAdapter adapter;
+  FeatureFlagConfig featureFlagConfig;
 
   @Inject
   public WidgetRegistrarImpl(
     PortalGinInjector ginInjector,
-    JSONObjectAdapter adapter
+    JSONObjectAdapter adapter,
+    FeatureFlagConfig featureFlagConfig
   ) {
     this.ginInjector = ginInjector;
     this.adapter = adapter;
+    this.featureFlagConfig = featureFlagConfig;
     initWithKnownWidgets();
   }
 
@@ -254,7 +261,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
     Callback widgetRefreshRequired,
     Long wikiVersionInView
   ) {
-    LazyLoadWikiWidgetWrapper wrapper = ginInjector.getLazyLoadWikiWidgetWrapper();
+    LazyLoadWikiWidgetWrapper wrapper =
+      ginInjector.getLazyLoadWikiWidgetWrapper();
     wrapper.configure(
       contentTypeKey,
       wikiKey,
@@ -294,9 +302,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
     String contentTypeKey,
     AsyncCallback<WidgetRendererPresenter> callback
   ) {
-    WidgetRendererPresenter presenter = getWidgetRendererForWidgetDescriptorAfterLazyLoad(
-      contentTypeKey
-    );
+    WidgetRendererPresenter presenter =
+      getWidgetRendererForWidgetDescriptorAfterLazyLoad(contentTypeKey);
     if (presenter == null) {
       callback.onFailure(
         new NotFoundException(
@@ -323,7 +330,11 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
     } else if (contentTypeKey.equals(REFERENCE_CONTENT_TYPE)) {
       presenter = ginInjector.getReferenceRenderer();
     } else if (contentTypeKey.equals(PROVENANCE_CONTENT_TYPE)) {
-      if (DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider())) {
+      if (
+        featureFlagConfig.isFeatureEnabled(
+          FeatureFlagKey.PROVENANCE_V2_VISUALIZATION
+        )
+      ) {
         presenter = ginInjector.getProvenanceRendererV2();
       } else {
         presenter = ginInjector.getProvenanceRenderer();

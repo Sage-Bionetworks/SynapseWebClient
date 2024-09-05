@@ -18,7 +18,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.file.FileResult;
@@ -35,7 +35,7 @@ import org.sagebionetworks.web.client.widget.entity.act.RejectReasonWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class RejectReasonWidgetTest {
 
   RejectReasonWidget widget;
@@ -117,7 +117,7 @@ public class RejectReasonWidgetTest {
   private void verifyRequestBuilderCall() {
     try {
       verify(mockRequestBuilder)
-        .sendRequest(anyString(), requestCallbackCaptor.capture());
+        .sendRequest(any(), requestCallbackCaptor.capture());
       requestCallbackCaptor.getValue().onResponseReceived(null, mockResponse);
     } catch (RequestException e) {
       fail("request builder sendRequest failed");

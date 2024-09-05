@@ -97,7 +97,10 @@ public class AclUtils {
     for (ACCESS_TYPE type : ACCESS_TYPE.values()) {
       TreeSet<PermissionLevel> levels = new TreeSet<PermissionLevel>();
 
-      for (Entry<PermissionLevel, Set<ACCESS_TYPE>> entry : permToACCESS_TYPE.entrySet()) {
+      for (Entry<
+        PermissionLevel,
+        Set<ACCESS_TYPE>
+      > entry : permToACCESS_TYPE.entrySet()) {
         if (entry.getValue().contains(type)) {
           levels.add(entry.getKey());
         }

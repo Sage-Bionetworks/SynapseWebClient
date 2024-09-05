@@ -23,14 +23,14 @@ import org.sagebionetworks.web.client.context.SynapseReactClientFullContextProps
 import org.sagebionetworks.web.client.jsinterop.JSON;
 import org.sagebionetworks.web.client.jsinterop.MenuAction;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.jsinterop.UserCardProps;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 
 public class UserBadgeViewImpl extends Div implements UserBadgeView {
 
@@ -41,7 +41,7 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
   };
   private String extraCssClassStrings = "";
   public static final CallbackP<String> NEW_WINDOW_HANDLER = userId -> {
-    newWindow("#!Profile:" + userId, "_blank", "");
+    newWindow("/Profile:" + userId, "_blank", "");
   };
   boolean showAvatar = false;
   boolean showCardOnHover = true;
@@ -51,7 +51,7 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
   BadgeType badgeType = BadgeType.SMALL_CARD;
   AvatarSize avatarSize = AvatarSize.MEDIUM;
   FocusPanel userBadgeContainer = new FocusPanel();
-  ReactComponentDiv userBadgeReactDiv = new ReactComponentDiv();
+  ReactComponent userBadgeReactDiv = new ReactComponent();
   List<MenuAction> menuActionsArray = new ArrayList<>();
   AuthenticationController authController;
   HandlerRegistration clickHandlerRegistration;
@@ -111,14 +111,14 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
       menuActionsArray.toArray(),
       pictureUrl,
       !authController.isLoggedIn(),
-      "#!Profile:" + userId,
+      "/Profile:" + userId,
       isCertified == null ? false : isCertified.booleanValue(),
       isValidated == null ? false : isValidated.booleanValue(),
       showAvatar,
       extraCssClassStrings
     );
 
-    ReactNode component = React.createElementWithSynapseContext(
+    ReactElement component = React.createElementWithSynapseContext(
       SRC.SynapseComponents.UserCard,
       props,
       propsProvider.getJsInteropContextProps()

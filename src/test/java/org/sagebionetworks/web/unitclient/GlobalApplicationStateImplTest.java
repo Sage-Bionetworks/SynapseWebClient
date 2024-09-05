@@ -32,7 +32,6 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -50,6 +49,7 @@ import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
+import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.footer.VersionState;
@@ -61,12 +61,24 @@ public class GlobalApplicationStateImplTest {
   @Mock
   StackConfigServiceAsync mockStackConfigService;
 
+  @Mock
   CookieProvider mockCookieProvider;
+
+  @Mock
   PlaceController mockPlaceController;
+
+  @Mock
   EventBus mockEventBus;
+
   GlobalApplicationStateImpl globalApplicationState;
+
+  @Mock
   AppPlaceHistoryMapper mockAppPlaceHistoryMapper;
+
+  @Mock
   SynapseJSNIUtils mockSynapseJSNIUtils;
+
+  @Mock
   GlobalApplicationStateView mockView;
 
   @Mock
@@ -96,6 +108,9 @@ public class GlobalApplicationStateImplTest {
   @Mock
   SessionStorage mockSessionStorage;
 
+  @Captor
+  ArgumentCaptor<Place> placeCaptor;
+
   public static final String REPO_ENDPOINT =
     "https://repo-staging.prod.sagebase.org/";
   public static final String SWC_ENDPOINT = "https://staging.synapse.org/";
@@ -103,16 +118,10 @@ public class GlobalApplicationStateImplTest {
   @Before
   public void before() {
     MockitoAnnotations.initMocks(this);
-    mockCookieProvider = Mockito.mock(CookieProvider.class);
-    mockPlaceController = Mockito.mock(PlaceController.class);
-    mockEventBus = Mockito.mock(EventBus.class);
-    mockAppPlaceHistoryMapper = mock(AppPlaceHistoryMapper.class);
-    mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
-    mockView = mock(GlobalApplicationStateView.class);
     AsyncMockStubber
       .callSuccessWith("v1")
       .when(mockJsClient)
-      .getSynapseVersions(any(AsyncCallback.class));
+      .getSynapseVersions(any());
 
     globalApplicationState =
       new GlobalApplicationStateImpl(
@@ -209,9 +218,8 @@ public class GlobalApplicationStateImplTest {
     Throwable actualException = new Exception("I am dead, Horatio");
     Set<Throwable> causes = new LinkedHashSet<Throwable>();
     causes.add(actualException);
-    com.google.web.bindery.event.shared.UmbrellaException umbrellaException = new com.google.web.bindery.event.shared.UmbrellaException(
-      causes
-    );
+    com.google.web.bindery.event.shared.UmbrellaException umbrellaException =
+      new com.google.web.bindery.event.shared.UmbrellaException(causes);
     Set<Throwable> umbrellaUmbrellaCauses = new HashSet<Throwable>();
     umbrellaUmbrellaCauses.add(umbrellaException);
     UmbrellaException umbrellaUmbrellaException = new UmbrellaException(
@@ -390,15 +398,15 @@ public class GlobalApplicationStateImplTest {
     globalApplicationState.pushCurrentPlace(mockPlace);
     // should have set the last place (to the current), and the current place (as requested)
     verify(mockSessionStorage)
-      .setItem(eq(GlobalApplicationStateImpl.LAST_PLACE), anyString());
+      .setItem(eq(GlobalApplicationStateImpl.LAST_PLACE), any());
     verify(mockGWT).newItem(newToken, false);
 
     // if I push the same place again, it should not push the history state again
-    when(mockAppPlaceHistoryMapper.getPlace(anyString())).thenReturn(mockPlace);
+    when(mockAppPlaceHistoryMapper.getPlace(any())).thenReturn(mockPlace);
     globalApplicationState.pushCurrentPlace(mockPlace);
     // verify that these were still only called once
     verify(mockSessionStorage)
-      .setItem(eq(GlobalApplicationStateImpl.LAST_PLACE), anyString());
+      .setItem(eq(GlobalApplicationStateImpl.LAST_PLACE), any());
     verify(mockGWT).newItem(newToken, false);
   }
 
@@ -410,15 +418,15 @@ public class GlobalApplicationStateImplTest {
     globalApplicationState.replaceCurrentPlace(mockPlace);
     // should have set the last place (to the current), and the current place (as requested)
     verify(mockSessionStorage)
-      .setItem(eq(GlobalApplicationStateImpl.LAST_PLACE), anyString());
+      .setItem(eq(GlobalApplicationStateImpl.LAST_PLACE), any());
     verify(mockGWT).replaceItem(newToken, false);
 
     // if I push the same place again, it should not push the history state again
-    when(mockAppPlaceHistoryMapper.getPlace(anyString())).thenReturn(mockPlace);
+    when(mockAppPlaceHistoryMapper.getPlace(any())).thenReturn(mockPlace);
     globalApplicationState.replaceCurrentPlace(mockPlace);
     // verify that these were still only called once
     verify(mockSessionStorage)
-      .setItem(eq(GlobalApplicationStateImpl.LAST_PLACE), anyString());
+      .setItem(eq(GlobalApplicationStateImpl.LAST_PLACE), any());
     verify(mockGWT).replaceItem(newToken, false);
   }
 
@@ -449,8 +457,8 @@ public class GlobalApplicationStateImplTest {
     when(mockPlaceController.getWhere()).thenReturn(place);
 
     Place mockPlace = mock(Place.class);
-    String historyToken = "!Synapse:syn123";
-    String currentUrl = "https://www.synapse.org/#" + historyToken;
+    String historyToken = "Synapse:syn123";
+    String currentUrl = "https://www.synapse.org/" + historyToken;
     when(mockSynapseJSNIUtils.getCurrentURL()).thenReturn(currentUrl);
     when(mockAppPlaceHistoryMapper.getPlace(historyToken))
       .thenReturn(mockPlace);
@@ -460,8 +468,8 @@ public class GlobalApplicationStateImplTest {
 
     reset(mockPlaceController);
     when(mockPlaceController.getWhere()).thenReturn(place);
-    historyToken = "!Synapse:syn123/wiki/12345";
-    currentUrl = "https://www.synapse.org/#" + historyToken;
+    historyToken = "Synapse:syn123/wiki/12345";
+    currentUrl = "https://www.synapse.org/" + historyToken;
     when(mockSynapseJSNIUtils.getCurrentURL()).thenReturn(currentUrl);
     when(mockAppPlaceHistoryMapper.getPlace(historyToken))
       .thenReturn(mockPlace);
@@ -512,5 +520,56 @@ public class GlobalApplicationStateImplTest {
         eq(Boolean.TRUE.toString()),
         any(Date.class)
       );
+  }
+
+  @Test
+  public void testHandleClickSynapsePlace() {
+    when(mockPlaceController.getWhere()).thenReturn(mock(Home.class));
+    Synapse mockSynapsePlace = mock(Synapse.class);
+    when(mockAppPlaceHistoryMapper.getPlace("Synapse:syn123"))
+      .thenReturn(mockSynapsePlace);
+    String href = "http://www.synapse.org/Synapse:syn123";
+
+    boolean isHandled = globalApplicationState.handleRelativePathClick(href);
+
+    assertTrue(isHandled);
+    verify(mockPlaceController).goTo(mockSynapsePlace);
+  }
+
+  @Test
+  public void testHandleRelativePathClickSynapsePlace() {
+    when(mockPlaceController.getWhere()).thenReturn(mock(Home.class));
+    Synapse mockSynapsePlace = mock(Synapse.class);
+    when(mockAppPlaceHistoryMapper.getPlace("Synapse:syn123"))
+      .thenReturn(mockSynapsePlace);
+    String href = "/Synapse:syn123";
+
+    boolean isHandled = globalApplicationState.handleRelativePathClick(href);
+
+    assertTrue(isHandled);
+    verify(mockPlaceController).goTo(mockSynapsePlace);
+  }
+
+  @Test
+  public void testHandleRelativePathClickInvalidFormat() {
+    when(mockPlaceController.getWhere()).thenReturn(mock(Home.class));
+    String href = "https://www.synapse.org/notaplace";
+
+    boolean isHandled = globalApplicationState.handleRelativePathClick(href);
+
+    assertFalse(isHandled);
+    verify(mockPlaceController, never()).goTo(any(Place.class));
+  }
+
+  @Test
+  public void testHandleRelativePathNotAGWTPlace() {
+    when(mockPlaceController.getWhere()).thenReturn(mock(Home.class));
+    String href =
+      "https://www.synapse.org/AppearsToBeCorrectFormatButNotAPlace:syn1234";
+
+    boolean isHandled = globalApplicationState.handleRelativePathClick(href);
+
+    assertFalse(isHandled);
+    verify(mockPlaceController, never()).goTo(any(Place.class));
   }
 }

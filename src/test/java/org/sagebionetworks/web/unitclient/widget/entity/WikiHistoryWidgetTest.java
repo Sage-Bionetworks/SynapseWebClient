@@ -69,7 +69,9 @@ public class WikiHistoryWidgetTest {
         mockSynAlert
       );
 
-    PaginatedResults<JSONEntity> paginatedHistory = new PaginatedResults<JSONEntity>();
+    PaginatedResults<JSONEntity> paginatedHistory = new PaginatedResults<
+      JSONEntity
+    >();
     paginatedHistory.setTotalNumberOfResults(1);
     List<JSONEntity> results = new ArrayList<JSONEntity>();
     V2WikiHistorySnapshot snapshot = new V2WikiHistorySnapshot();
@@ -80,14 +82,10 @@ public class WikiHistoryWidgetTest {
     AsyncMockStubber
       .callSuccessWith(paginatedHistory)
       .when(mockSynapseClient)
-      .getV2WikiHistory(
-        any(WikiPageKey.class),
-        any(Long.class),
-        any(Long.class),
-        any(AsyncCallback.class)
-      );
+      .getV2WikiHistory(any(), any(), any(), any());
 
-    UserGroupHeaderResponsePage responsePage = new UserGroupHeaderResponsePage();
+    UserGroupHeaderResponsePage responsePage =
+      new UserGroupHeaderResponsePage();
     responsePage.setChildren(new ArrayList<UserGroupHeader>());
 
     AsyncMockStubber
@@ -139,13 +137,8 @@ public class WikiHistoryWidgetTest {
     AsyncMockStubber
       .callFailureWith(ex)
       .when(mockSynapseClient)
-      .getV2WikiHistory(
-        any(WikiPageKey.class),
-        any(Long.class),
-        any(Long.class),
-        any(AsyncCallback.class)
-      );
-    presenter.configureNextPage(new Long(0), new Long(10));
+      .getV2WikiHistory(any(), any(), any(), any());
+    presenter.configureNextPage(0L, 10L);
     verify(mockSynAlert).handleException(ex);
   }
 
@@ -158,31 +151,23 @@ public class WikiHistoryWidgetTest {
         )
       )
       .when(mockSynapseClient)
-      .getV2WikiHistory(
-        any(WikiPageKey.class),
-        any(Long.class),
-        any(Long.class),
-        any(AsyncCallback.class)
-      );
-    presenter.configureNextPage(new Long(0), new Long(10));
+      .getV2WikiHistory(any(), any(), any(), any());
+    presenter.configureNextPage(0L, 10L);
     verify(mockView).hideLoadMoreButton();
   }
 
   @Test
   public void testConfigureNextPageEmptyResults() {
-    PaginatedResults<JSONEntity> paginatedHistory = new PaginatedResults<JSONEntity>();
+    PaginatedResults<JSONEntity> paginatedHistory = new PaginatedResults<
+      JSONEntity
+    >();
     paginatedHistory.setTotalNumberOfResults(0);
     paginatedHistory.setResults(new ArrayList<JSONEntity>());
     AsyncMockStubber
       .callSuccessWith(paginatedHistory)
       .when(mockSynapseClient)
-      .getV2WikiHistory(
-        any(WikiPageKey.class),
-        any(Long.class),
-        any(Long.class),
-        any(AsyncCallback.class)
-      );
-    presenter.configureNextPage(new Long(10), new Long(10));
+      .getV2WikiHistory(any(), any(), any(), any());
+    presenter.configureNextPage(10L, 10L);
     verify(mockView).hideLoadMoreButton();
   }
 
@@ -193,13 +178,13 @@ public class WikiHistoryWidgetTest {
       .callFailureWith(ex)
       .when(mockSynapseJavascriptClient)
       .getUserGroupHeadersById(any(ArrayList.class), any(AsyncCallback.class));
-    presenter.configureNextPage(new Long(0), new Long(10));
+    presenter.configureNextPage(0L, 10L);
     verify(mockSynAlert).handleException(ex);
   }
 
   @Test
   public void testConfigureNextPage() {
-    presenter.configureNextPage(new Long(0), new Long(10));
+    presenter.configureNextPage(0L, 10L);
     verify(mockView).updateHistoryList(any(List.class));
     verify(mockView).buildHistoryWidget();
   }

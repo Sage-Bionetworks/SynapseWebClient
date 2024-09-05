@@ -78,10 +78,9 @@ public class ImageUploadWidgetImplTest {
 
     // The metadata returned should correspond to testFileName
     when(mockView.getInputId()).thenReturn(inputId);
-    when(mockJSNIUtils.getMultipleUploadFileNames(any(JavaScriptObject.class)))
+    when(mockJSNIUtils.getMultipleUploadFileNames(any()))
       .thenReturn(new String[] { "testName.png" });
-    when(mockJSNIUtils.getContentType(any(JavaScriptObject.class), anyInt()))
-      .thenReturn("image/png");
+    when(mockJSNIUtils.getContentType(any(), anyInt())).thenReturn("image/png");
     when(mockPortalGinInjector.getImageUploadView()).thenReturn(mockView);
   }
 
@@ -110,11 +109,11 @@ public class ImageUploadWidgetImplTest {
 
     verify(mockMultipartUploader)
       .uploadFile(
-        anyString(),
+        any(),
         eq("image/png"),
-        any(JavaScriptObject.class),
+        any(),
         handleCaptor.capture(),
-        any(Long.class),
+        any(),
         eq(mockView)
       );
     handleCaptor.getValue().updateProgress(0.1, "10%", "100 KB/s");
@@ -139,11 +138,11 @@ public class ImageUploadWidgetImplTest {
     widget.onFileProcessed(mockBlob, "image/jpeg");
     verify(mockMultipartUploader)
       .uploadFile(
-        anyString(),
+        any(),
         eq("image/jpeg"),
-        any(JavaScriptObject.class),
+        any(),
         handleCaptor.capture(),
-        any(Long.class),
+        any(),
         eq(mockView)
       );
   }
@@ -160,9 +159,9 @@ public class ImageUploadWidgetImplTest {
 
   @Test
   public void testFileSelectedFailed() {
-    when(mockJSNIUtils.getMultipleUploadFileNames(any(JavaScriptObject.class)))
+    when(mockJSNIUtils.getMultipleUploadFileNames(any()))
       .thenReturn(new String[] { "testName.raw" });
-    when(mockJSNIUtils.getContentType(any(JavaScriptObject.class), anyInt()))
+    when(mockJSNIUtils.getContentType(any(), anyInt()))
       .thenReturn("notanimage/raw");
 
     // Configure before the test
@@ -178,6 +177,6 @@ public class ImageUploadWidgetImplTest {
     verify(mockView, never()).updateProgress(90, "90%");
 
     // Failure should trigger the following:
-    verify(mockSynAlert).showError(anyString());
+    verify(mockSynAlert).showError(any());
   }
 }

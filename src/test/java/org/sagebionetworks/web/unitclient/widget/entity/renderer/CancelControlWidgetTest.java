@@ -81,7 +81,7 @@ public class CancelControlWidgetTest {
     verify(mockView).setButtonText(DisplayConstants.BUTTON_CANCEL);
     verify(mockView).setButtonType(ButtonType.DANGER);
     verify(mockView).setPresenter(widget);
-    verify(mockView).addWidget(any(Widget.class));
+    verify(mockView).addWidget(any());
   }
 
   @Test

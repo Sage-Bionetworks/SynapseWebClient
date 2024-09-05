@@ -31,7 +31,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -59,7 +59,7 @@ import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class VersionHistoryWidgetTest {
 
   public static final Long CURRENT_FILE_VERSION = 8888L;
@@ -112,7 +112,7 @@ public class VersionHistoryWidgetTest {
     doAnswer(invocationOnMock -> {
         // when setVisible is called, update the isVisible mock to return the last value passed to setVisible
         return when(mockView.isVisible())
-          .thenReturn(invocationOnMock.getArgumentAt(0, Boolean.class));
+          .thenReturn(invocationOnMock.getArgument(0));
       })
       .when(mockView)
       .setVisible(anyBoolean());
@@ -130,7 +130,7 @@ public class VersionHistoryWidgetTest {
 
     vb = new FileEntity();
     vb.setId(entityId);
-    vb.setVersionNumber(new Long(1));
+    vb.setVersionNumber(1L);
     vb.setVersionLabel("");
     vb.setVersionComment("");
     vb.setIsLatestVersion(true);
@@ -138,8 +138,9 @@ public class VersionHistoryWidgetTest {
     when(bundle.getPermissions().getCanCertifiedUserEdit()).thenReturn(true);
     when(bundle.getEntity()).thenReturn(vb);
 
-    List<AccessRequirement> accessRequirements =
-      new ArrayList<AccessRequirement>();
+    List<AccessRequirement> accessRequirements = new ArrayList<
+      AccessRequirement
+    >();
     TermsOfUseAccessRequirement accessRequirement =
       new TermsOfUseAccessRequirement();
     accessRequirement.setId(101L);
@@ -149,7 +150,7 @@ public class VersionHistoryWidgetTest {
     AsyncMockStubber
       .callSuccessWith(vb)
       .when(mockSynapseJavascriptClient)
-      .getEntity(anyString(), any(AsyncCallback.class));
+      .getEntity(any(), any());
 
     List<VersionInfo> versions = new ArrayList<VersionInfo>();
     VersionInfo v1 = new VersionInfo();
@@ -161,23 +162,13 @@ public class VersionHistoryWidgetTest {
     AsyncMockStubber
       .callSuccessWith(versions)
       .when(mockJsClient)
-      .getEntityVersions(
-        anyString(),
-        anyInt(),
-        anyInt(),
-        any(AsyncCallback.class)
-      );
+      .getEntityVersions(any(), anyInt(), anyInt(), any());
     when(mockGlobalApplicationState.getPlaceChanger())
       .thenReturn(mockPlaceChanger);
     AsyncMockStubber
       .callSuccessWith(vb)
       .when(mockJsClient)
-      .updateEntity(
-        any(Entity.class),
-        anyString(),
-        anyBoolean(),
-        any(AsyncCallback.class)
-      );
+      .updateEntity(any(), any(), any(), any());
   }
 
   @Test
@@ -210,18 +201,19 @@ public class VersionHistoryWidgetTest {
         anyInt(),
         any(AsyncCallback.class)
       );
-    AsyncCallback<PaginatedResults<VersionInfo>> callback =
-      new AsyncCallback<PaginatedResults<VersionInfo>>() {
-        @Override
-        public void onFailure(Throwable caught) {
-          assertTrue(caught instanceof IllegalArgumentException);
-        }
+    AsyncCallback<PaginatedResults<VersionInfo>> callback = new AsyncCallback<
+      PaginatedResults<VersionInfo>
+    >() {
+      @Override
+      public void onFailure(Throwable caught) {
+        assertTrue(caught instanceof IllegalArgumentException);
+      }
 
-        @Override
-        public void onSuccess(PaginatedResults<VersionInfo> result) {
-          fail("Called onSuccess on a failure");
-        }
-      };
+      @Override
+      public void onSuccess(PaginatedResults<VersionInfo> result) {
+        fail("Called onSuccess on a failure");
+      }
+    };
     versionHistoryWidget.setEntityBundle(bundle, null);
   }
 
@@ -233,12 +225,7 @@ public class VersionHistoryWidgetTest {
     versionHistoryWidget.updateVersionInfo(testLabel, testComment);
     ArgumentCaptor<Entity> entityCaptor = ArgumentCaptor.forClass(Entity.class);
     verify(mockJsClient)
-      .updateEntity(
-        entityCaptor.capture(),
-        anyString(),
-        anyBoolean(),
-        (AsyncCallback<Entity>) any()
-      );
+      .updateEntity(entityCaptor.capture(), any(), any(), any());
     VersionableEntity capturedEntity =
       (VersionableEntity) entityCaptor.getValue();
     assertEquals(testComment, capturedEntity.getVersionComment());
@@ -274,18 +261,13 @@ public class VersionHistoryWidgetTest {
     AsyncMockStubber
       .callFailureWith(ex)
       .when(mockJsClient)
-      .updateEntity(
-        any(Entity.class),
-        anyString(),
-        anyBoolean(),
-        any(AsyncCallback.class)
-      );
+      .updateEntity(any(Entity.class), any(), any(), any(AsyncCallback.class));
     versionHistoryWidget.updateVersionInfo(testLabel, testComment);
     verify(mockJsClient)
       .updateEntity(
         any(Entity.class),
-        anyString(),
-        anyBoolean(),
+        any(),
+        any(),
         (AsyncCallback<Entity>) any()
       );
     verify(mockSynAlert).handleException(ex);

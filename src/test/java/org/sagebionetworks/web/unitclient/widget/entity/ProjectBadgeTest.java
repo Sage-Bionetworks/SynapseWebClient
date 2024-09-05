@@ -141,8 +141,8 @@ public class ProjectBadgeTest {
     widget.configure(header);
     verify(mockView).configure(eq(name), anyString());
     verify(mockView).setLastActivityVisible(true);
-    verify(mockView).setLastActivityText(anyString());
-    verify(mockView).setFavoritesWidget(any(Widget.class));
+    verify(mockView).setLastActivityText(any());
+    verify(mockView).setFavoritesWidget(any());
     verify(mockFavoriteWidget).asWidget();
   }
 

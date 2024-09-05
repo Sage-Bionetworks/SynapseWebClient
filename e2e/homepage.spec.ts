@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test'
 import { testAuth } from './fixtures/authenticatedUserPages'
 import { waitForInitialPageLoad } from './helpers/utils'
 
-test.describe('Homepage', () => {
+test.describe('Homepage - Unauthenticated', () => {
   test('should show Log In To Synapse button when logged out', async ({
     page,
   }) => {
@@ -11,16 +11,18 @@ test.describe('Homepage', () => {
 
     await expect(
       page.getByRole('link', { name: 'Log in to Synapse' }),
-    ).toHaveCount(2)
+    ).toHaveCount(1)
     await expect(
       page.getByRole('link', { name: 'View Your Dashboard' }),
     ).toHaveCount(0)
   })
+})
 
+testAuth.describe('Homepage - Authenticated', () => {
   testAuth(
     'should show View Your Dashboard button when logged in',
     async ({ userPage }) => {
-      await userPage.goto('/')
+      await userPage.goto('/Home:x')
       await waitForInitialPageLoad(userPage)
 
       await expect(
@@ -28,7 +30,7 @@ test.describe('Homepage', () => {
       ).toHaveCount(0)
       await expect(
         userPage.getByRole('link', { name: 'View Your Dashboard' }),
-      ).toHaveCount(2)
+      ).toHaveCount(1)
     },
   )
 })

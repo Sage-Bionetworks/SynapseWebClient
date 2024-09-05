@@ -12,7 +12,8 @@ import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMemberTypeFilterOptions;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
-import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.FeatureFlagConfig;
+import org.sagebionetworks.web.client.FeatureFlagKey;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -80,7 +81,8 @@ public class TeamPresenter
     GoogleMap map,
     CookieProvider cookies,
     IsACTMemberAsyncHandler isACTMemberAsyncHandler,
-    PortalGinInjector ginInjector
+    PortalGinInjector ginInjector,
+    FeatureFlagConfig featureFlagConfig
   ) {
     this.view = view;
     this.ginInjector = ginInjector;
@@ -106,7 +108,9 @@ public class TeamPresenter
     view.setManagerListWidget(managerListWidget.asWidget());
     view.setMemberListWidget(memberListWidget.asWidget());
     view.setMap(map.asWidget());
-    view.setShowMapVisible(DisplayUtils.isInTestWebsite(cookies));
+    view.setShowMapVisible(
+      featureFlagConfig.isFeatureEnabled(FeatureFlagKey.GOOGLE_MAP)
+    );
     inviteWidget.setRefreshCallback(refreshCallback);
   }
 
@@ -223,6 +227,7 @@ public class TeamPresenter
           view.setTeam(team, teamMembershipStatus);
           Boolean canRequestMembership = team.getCanRequestMembership();
           boolean isLockedDown =
+            !canPublicJoin &&
             canRequestMembership != null &&
             Boolean.FALSE.equals(canRequestMembership);
           view.setTeamRequestsClosedAlertVisible(isLockedDown);
@@ -242,10 +247,8 @@ public class TeamPresenter
           openMembershipRequestsWidget.setVisible(isAdmin);
 
           if (
-            (
-              teamMembershipStatus == null ||
-              !teamMembershipStatus.getIsMember()
-            )
+            (teamMembershipStatus == null ||
+              !teamMembershipStatus.getIsMember())
           ) {
             // not a member, show the Join Team button if the team is not locked down, or if the user has an open team invitation
             boolean hasOpenInvitation =

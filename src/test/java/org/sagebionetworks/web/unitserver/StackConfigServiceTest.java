@@ -10,7 +10,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.internal.util.reflection.Whitebox;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -23,6 +22,7 @@ import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+import org.springframework.test.util.ReflectionTestUtils;
 
 public class StackConfigServiceTest {
 
@@ -76,7 +76,7 @@ public class StackConfigServiceTest {
     when(mockUserSessionData.getSession()).thenReturn(testSession);
     when(mockSynapse.getMyProfile()).thenReturn(testProfile);
 
-    Whitebox.setInternalState(
+    ReflectionTestUtils.setField(
       stackConfigService,
       "perThreadRequest",
       mockThreadLocal

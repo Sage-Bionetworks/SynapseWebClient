@@ -63,7 +63,6 @@ import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.CloudProviderFileHandleInterface;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactMouseEvent;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.jsinterop.ToastMessageOptions;
@@ -119,10 +118,11 @@ public class DisplayUtils {
 
   public static final Integer DEFAULT_TOAST_TIMEOUT_MS = 1000 * 15;
 
-  public static final ClickHandler TEXTBOX_SELECT_ALL_FIELD_CLICKHANDLER = event -> {
-    TextBox source = (TextBox) event.getSource();
-    source.selectAll();
-  };
+  public static final ClickHandler TEXTBOX_SELECT_ALL_FIELD_CLICKHANDLER =
+    event -> {
+      TextBox source = (TextBox) event.getSource();
+      source.selectAll();
+    };
   public static final ClickHandler DO_NOTHING_CLICKHANDLER = event -> {
     if (!DisplayUtils.isAnyModifierKeyDown(event)) {
       if (event != null) {
@@ -623,52 +623,36 @@ public class DisplayUtils {
 
   public static String getTeamHistoryToken(String teamId) {
     Team place = new Team(teamId);
-    return "#!" + getTeamPlaceString(Team.class) + ":" + place.toToken();
-  }
-
-  public static String getTrashHistoryToken(String token, Integer start) {
-    Trash place = new Trash(token, start);
-    return "#!" + getTrashPlaceString(Trash.class) + ":" + place.toToken();
+    return "/" + getTeamPlaceString(Team.class) + ":" + place.toToken();
   }
 
   public static String getSynapseHistoryToken(String entityId) {
-    return "#" + getSynapseHistoryTokenNoHash(entityId, null);
-  }
-
-  public static String getSynapseHistoryTokenNoHash(String entityId) {
-    return getSynapseHistoryTokenNoHash(entityId, null);
+    return getSynapseHistoryToken(entityId, null);
   }
 
   public static String getSynapseHistoryToken(
     String entityId,
     Long versionNumber
   ) {
-    return "#" + getSynapseHistoryTokenNoHash(entityId, versionNumber);
+    return getSynapseHistoryToken(entityId, versionNumber, null);
   }
 
-  public static String getSynapseHistoryTokenNoHash(
-    String entityId,
-    Long versionNumber
-  ) {
-    return getSynapseHistoryTokenNoHash(entityId, versionNumber, null);
-  }
-
-  public static String getSynapseHistoryTokenNoHash(
+  public static String getSynapseHistoryToken(
     String entityId,
     Long versionNumber,
     Synapse.EntityArea area
   ) {
-    return getSynapseHistoryTokenNoHash(entityId, versionNumber, area, null);
+    return getSynapseHistoryToken(entityId, versionNumber, area, null);
   }
 
-  public static String getSynapseHistoryTokenNoHash(
+  public static String getSynapseHistoryToken(
     String entityId,
     Long versionNumber,
     Synapse.EntityArea area,
     String areaToken
   ) {
     Synapse place = new Synapse(entityId, versionNumber, area, areaToken);
-    return "!" + getPlaceString(Synapse.class) + ":" + place.toToken();
+    return "/" + getPlaceString(Synapse.class) + ":" + place.toToken();
   }
 
   /**
@@ -713,22 +697,6 @@ public class DisplayUtils {
   }
 
   private static String getTeamPlaceString(Class<Team> place) {
-    return getPlaceString(place.getName());
-  }
-
-  private static String getTeamSearchPlaceString(Class<TeamSearch> place) {
-    return getPlaceString(place.getName());
-  }
-
-  private static String getPeopleSearchPlaceString(Class<PeopleSearch> place) {
-    return getPlaceString(place.getName());
-  }
-
-  private static String getTrashPlaceString(Class<Trash> place) {
-    return getPlaceString(place.getName());
-  }
-
-  private static String getSearchPlaceString(Class<Search> place) {
     return getPlaceString(place.getName());
   }
 
@@ -1201,7 +1169,8 @@ public class DisplayUtils {
     ButtonType type,
     String iconClass
   ) {
-    com.google.gwt.user.client.ui.Button btn = new com.google.gwt.user.client.ui.Button();
+    com.google.gwt.user.client.ui.Button btn =
+      new com.google.gwt.user.client.ui.Button();
     relabelIconButton(btn, title, iconClass);
     btn.removeStyleName("gwt-Button");
     btn.addStyleName("btn btn-" + type.toString().toLowerCase());
@@ -1249,7 +1218,7 @@ public class DisplayUtils {
       DisplayConstants.SHARED_ON_SYNAPSE +
       ":\n" +
       hostUrl +
-      "#!Synapse:" +
+      "Synapse:" +
       entityId +
       "\n"
     );

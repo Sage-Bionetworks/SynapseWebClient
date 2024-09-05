@@ -25,7 +25,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
@@ -49,7 +49,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class WikiSubpagesWidgetTest {
 
   @Mock
@@ -157,7 +157,7 @@ public class WikiSubpagesWidgetTest {
         any(EntityBundleRequest.class),
         any(AsyncCallback.class)
       );
-    verify(mockView).showErrorMessage(anyString());
+    verify(mockView).showErrorMessage(any());
   }
 
   @Test
@@ -174,7 +174,7 @@ public class WikiSubpagesWidgetTest {
     );
     verify(mockSynapseJavascriptClient)
       .getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
-    verify(mockView).showErrorMessage(anyString());
+    verify(mockView).showErrorMessage(any());
   }
 
   @Test
@@ -368,7 +368,7 @@ public class WikiSubpagesWidgetTest {
         any(Place.class),
         any(),
         anyBoolean(),
-        any(CallbackP.class),
+        any(),
         any(EntityActionMenu.class)
       );
     // hidden initially in configure, and called again because only a single WikiPage is in the header
@@ -393,7 +393,7 @@ public class WikiSubpagesWidgetTest {
         any(Place.class),
         any(),
         anyBoolean(),
-        any(CallbackP.class),
+        any(),
         any(EntityActionMenu.class)
       );
   }
@@ -421,7 +421,7 @@ public class WikiSubpagesWidgetTest {
         any(Place.class),
         any(),
         anyBoolean(),
-        any(CallbackP.class),
+        any(),
         any(EntityActionMenu.class)
       );
 
@@ -449,7 +449,7 @@ public class WikiSubpagesWidgetTest {
         any(Place.class),
         any(),
         anyBoolean(),
-        any(CallbackP.class),
+        any(),
         any(EntityActionMenu.class)
       );
   }
@@ -478,7 +478,7 @@ public class WikiSubpagesWidgetTest {
         any(Place.class),
         any(),
         anyBoolean(),
-        any(CallbackP.class),
+        any(),
         any(EntityActionMenu.class)
       );
 
@@ -510,7 +510,7 @@ public class WikiSubpagesWidgetTest {
         any(Place.class),
         any(),
         anyBoolean(),
-        any(CallbackP.class),
+        any(),
         any(EntityActionMenu.class)
       );
   }

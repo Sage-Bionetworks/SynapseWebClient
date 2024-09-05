@@ -18,7 +18,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.web.client.jsinterop.ReactMouseEvent;
 import org.sagebionetworks.web.client.jsinterop.entity.actionmenu.ActionConfiguration;
 import org.sagebionetworks.web.client.jsinterop.entity.actionmenu.EntityActionMenuDropdownMap;
@@ -29,7 +29,7 @@ import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenuImpl
 import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenuProps;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenuView;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class EntityActionMenuImplTest {
 
   @Mock
@@ -62,7 +62,8 @@ public class EntityActionMenuImplTest {
     verify(mockView).configure(propsCaptor.capture());
 
     EntityActionMenuProps props = propsCaptor.getValue();
-    Map<Action, ActionConfiguration> actionConfiguration = props.getActionConfiguration();
+    Map<Action, ActionConfiguration> actionConfiguration =
+      props.getActionConfiguration();
     // Every action should be configured
     assertEquals(Action.values().length, actionConfiguration.keySet().size());
     // All actions should not be visible

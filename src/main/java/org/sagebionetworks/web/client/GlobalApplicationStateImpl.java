@@ -27,7 +27,7 @@ import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactDOM;
-import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
@@ -40,7 +40,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 
   public static final String RECENTLY_CHECKED_SYNAPSE_VERSION =
     "org.sagebionetworks.web.client.recently-checked-synapse-version";
-  public static final String DEFAULT_REFRESH_PLACE = "!Home:0";
+  public static final String DEFAULT_REFRESH_PLACE = "Home:0";
   private PlaceController placeController;
   private CookieProvider cookieProvider;
   private AppPlaceHistoryMapper appPlaceHistoryMapper;
@@ -70,8 +70,9 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
    */
   public static String LAST_PLACE =
     "org.sagebionetworks.synapse.place.last.place";
-  public static final ArrayList<String> SAFE_TO_IGNORE_ERRORS =
-    new ArrayList<String>();
+  public static final ArrayList<String> SAFE_TO_IGNORE_ERRORS = new ArrayList<
+    String
+  >();
 
   static {
     // Benign error thrown by VideoWidget (<video>). ResizeObserver was not able to deliver all
@@ -189,17 +190,19 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
         new PlaceChanger() {
           @Override
           public void goTo(Place place) {
-            synapseJSNIUtils.setIsInnerProgrammaticHistoryChange();
-            // If we are not already on this page, go there.
-            if (!placeController.getWhere().equals(place)) {
-              try {
-                placeController.goTo(place);
-              } catch (Exception e) {
-                synapseJSNIUtils.consoleError(e.getMessage());
+            if (place != null) {
+              synapseJSNIUtils.setIsInnerProgrammaticHistoryChange();
+              // If we are not already on this page, go there.
+              if (!placeController.getWhere().equals(place)) {
+                try {
+                  placeController.goTo(place);
+                } catch (Exception e) {
+                  synapseJSNIUtils.consoleError(e.getMessage());
+                }
+              } else {
+                // We are already on this page but we want to force it to reload.
+                eventBus.fireEvent(new PlaceChangeEvent(place));
               }
-            } else {
-              // We are already on this page but we want to force it to reload.
-              eventBus.fireEvent(new PlaceChangeEvent(place));
             }
           }
         };
@@ -408,13 +411,13 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
   public void refreshPage() {
     // get the place associated to the current url
     AppPlaceHistoryMapper appPlaceHistoryMapper = getAppPlaceHistoryMapper();
-    String currentUrl = synapseJSNIUtils.getCurrentURL();
-    String place = DEFAULT_REFRESH_PLACE;
-    int index = currentUrl.indexOf("!");
-    if (index > -1) {
-      place = currentUrl.substring(index);
+    String url = synapseJSNIUtils.getCurrentURL();
+
+    String placeToken = StringUtils.getGWTPlaceTokenFromURL(url);
+    if (placeToken == null) {
+      placeToken = DEFAULT_REFRESH_PLACE;
     }
-    Place currentPlace = appPlaceHistoryMapper.getPlace(place);
+    Place currentPlace = appPlaceHistoryMapper.getPlace(placeToken);
     getPlaceChanger().goTo(currentPlace);
   }
 
@@ -464,7 +467,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
       isToastContainerInitialized = true;
 
       Element toastContainer = RootPanel.get("toastContainer").getElement();
-      ReactNode component = React.createElementWithThemeContext(
+      ReactElement component = React.createElementWithThemeContext(
         SRC.SynapseComponents.SynapseToastContainer,
         null
       );
@@ -567,18 +570,31 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
             );
             // SWC-5812: SRC has components that apply this special CSS class, and expect the app to look for these events and handle appropriately.
             // When the class name is undefined, targetElement.getClassName() still returns an object where isEmpty is false and is not equal to null.
+            boolean isSRCSignInClass = false;
             try {
-              if (
+              isSRCSignInClass =
                 targetElement.hasClassName("SRC-SIGN-IN-CLASS") &&
-                !ginInjector.getAuthenticationController().isLoggedIn()
-              ) {
-                getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
-              }
+                !ginInjector.getAuthenticationController().isLoggedIn();
             } catch (Exception e) {
               // SWC-6243: log the error if it is not the known problem of finding the className
               if (!e.getMessage().contains("indexOf")) {
                 synapseJSNIUtils.consoleError(e.getMessage());
               }
+            }
+            try {
+              if (isSRCSignInClass) {
+                getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+              } else {
+                if (targetElement.hasAttribute("href")) {
+                  String href = targetElement.getAttribute("href");
+                  boolean handled = handleRelativePathClick(href);
+                  if (handled) {
+                    event.cancel();
+                  }
+                }
+              }
+            } catch (Exception e) {
+              synapseJSNIUtils.consoleError(e.getMessage());
             }
           }
         }
@@ -591,6 +607,20 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
     if (finalCallback != null) {
       finalCallback.invoke();
     }
+  }
+
+  @Override
+  public boolean handleRelativePathClick(String href) {
+    String placeToken = StringUtils.getGWTPlaceTokenFromURL(href);
+    if (placeToken != null) {
+      AppPlaceHistoryMapper appPlaceHistoryMapper = getAppPlaceHistoryMapper();
+      Place newPlace = appPlaceHistoryMapper.getPlace(placeToken);
+      if (newPlace != null) {
+        getPlaceChanger().goTo(newPlace);
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override

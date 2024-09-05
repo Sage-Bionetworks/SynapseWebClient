@@ -103,6 +103,6 @@ public class LazyLoadWikiWidgetWrapperTest {
         wikiVersionInView
       );
     String className = mockWikiWidget.getClass().getSimpleName();
-    verify(mockView).showWidget(any(Widget.class), eq(className));
+    verify(mockView).showWidget(any(), eq(className));
   }
 }

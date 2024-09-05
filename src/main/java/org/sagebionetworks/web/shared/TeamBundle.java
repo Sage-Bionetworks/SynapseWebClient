@@ -74,12 +74,10 @@ public class TeamBundle implements IsSerializable {
     result = prime * result + (isUserAdmin ? 1231 : 1237);
     result = prime * result + ((team == null) ? 0 : team.hashCode());
     result =
-      prime *
-      result +
+      prime * result +
       ((teamMembershipStatus == null) ? 0 : teamMembershipStatus.hashCode());
     result =
-      prime *
-      result +
+      prime * result +
       ((totalMemberCount == null) ? 0 : totalMemberCount.hashCode());
     return result;
   }

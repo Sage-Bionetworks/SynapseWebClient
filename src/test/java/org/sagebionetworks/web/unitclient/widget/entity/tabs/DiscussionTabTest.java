@@ -18,7 +18,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
@@ -37,7 +37,7 @@ import org.sagebionetworks.web.client.widget.entity.tabs.DiscussionTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.shared.WebConstants;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class DiscussionTabTest {
 
   @Mock
@@ -97,7 +97,7 @@ public class DiscussionTabTest {
   @Test
   public void testConstruction() {
     verify(mockView).setPresenter(tab);
-    verify(mockView).setForum(any(Widget.class));
+    verify(mockView).setForum(any());
   }
 
   @Test

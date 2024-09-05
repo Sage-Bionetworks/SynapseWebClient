@@ -37,7 +37,7 @@ public class Trash extends Place {
     return start;
   }
 
-  @Prefix("!Trash")
+  @Prefix("Trash")
   public static class Tokenizer implements PlaceTokenizer<Trash> {
 
     @Override

@@ -1,17 +1,16 @@
 <!doctype html>
 <html id="synapse.org" dir="ltr" lang="en-US">
   <head>
-    <title>Synapse | Sage Bionetworks</title>
-    <meta
-      name="description"
-      content="Synapse is a platform for supporting scientific collaborations centered around shared biomedical data sets.  Our goal is to make biomedical research more transparent, more reproducible, and more accessible to a broader audience of scientists.  Synapse serves as the host site for a variety of scientific collaborations, individual research projects, and DREAM challenges."
-    />
+    <title>${pageTitle}</title>
+    <meta name="description" content="${pageDescription}" />
+    <meta property="og:title" content="${pageTitle}" />
+    <meta property="og:description" content="${ogPageDescription}" />
     <meta name="author" content="Sage Bionetworks, info@sagebase.org" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self' data: blob: 'unsafe-inline' 'unsafe-eval' *.synapse.org *.sagebase.org *.googleapis.com *.gstatic.com *.googletagmanager.com cdn.statuspage.io s3.amazonaws.com www.google-analytics.com kh896k90gyvg.statuspage.io *.youtube.com *.rstudio.com *.google.com *.shinyapps.io *.smartsheet.com 127.0.0.1:9876; img-src * data: blob:; connect-src https://* http://127.0.0.1:8888"
+      content="default-src 'self' data: blob: 'unsafe-inline' 'unsafe-eval' *.synapse.org *.sagebase.org *.googleapis.com *.gstatic.com *.googletagmanager.com cdn.statuspage.io s3.amazonaws.com www.google-analytics.com kh896k90gyvg.statuspage.io *.youtube.com *.rstudio.com *.google.com *.shinyapps.io *.smartsheet.com sagebionetworks.jira.com 127.0.0.1:9876 esm.sh; img-src * data: blob:; connect-src https://* http://127.0.0.1:8888"
     />
     <meta
       name="google-site-verification"
@@ -21,32 +20,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <!-- Facebook Meta Tags -->
-    <meta property="og:url" content="https://www.synapse.org" />
+    <meta property="og:url" content="${ogUrl}" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Synapse | Sage Bionetworks" />
     <meta
-      property="og:description"
-      content="Synapse is a platform for supporting scientific collaborations centered around shared biomedical data sets.  Our goal is to make biomedical research more transparent, more reproducible, and more accessible to a broader audience of scientists.  Synapse serves as the host site for a variety of scientific collaborations, individual research projects, and DREAM challenges."
-    />
-    <meta
-      name="image"
       property="og:image"
-      content="https://www.synapse.org/images/synapse-logo-blue-background.png"
+      content="https://www.synapse.org/images/ogimage.png"
     />
 
     <!-- Twitter Meta Tags -->
+    <meta
+      property="twitter:image"
+      content="https://www.synapse.org/images/ogimage.png"
+    />
+    <meta name="twitter:title" content="${ogPageTitle}" />
+    <meta name="twitter:description" content="${ogPageDescription}" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta property="twitter:domain" content="synapse.org" />
-    <meta property="twitter:url" content="https://www.synapse.org" />
-    <meta name="twitter:title" content="Synapse | Sage Bionetworks" />
-    <meta
-      name="twitter:description"
-      content="Synapse is a platform for supporting scientific collaborations centered around shared biomedical data sets.  Our goal is to make biomedical research more transparent, more reproducible, and more accessible to a broader audience of scientists.  Synapse serves as the host site for a variety of scientific collaborations, individual research projects, and DREAM challenges."
-    />
-    <meta
-      name="twitter:image"
-      content="https://www.synapse.org/images/synapse-logo-blue-background.png"
-    />
+    <meta name="twitter:site" content="@Sagebio" />
+    <meta name="twitter:creator" content="@Sagebio" />
+
+    ${botHeadHtml}
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 10]>
@@ -67,11 +59,6 @@
     <![endif]-->
 
     <!-- SWC-6609 removed <script src="js/json-ld-element-loader.js"></script> -->
-
-    <!-- 
-    Adding the following meta tag should tell the crawler to try to crawl the ugly version of *this* URL.
-    -->
-    <meta name="fragment" content="!" />
     <meta http-equiv="x-dns-prefetch-control" content="off" />
 
     <!-- meta to instruct browser not to cache portal.html -->
@@ -81,28 +68,14 @@
     <meta http-equiv="expires" content="0" />
     <meta http-equiv="pragma" content="no-cache" />
     <!-- end cache control -->
-    <link rel="icon" href="favicon.png?v=4" />
+    <link rel="icon" href="/favicon.png?v=4" />
     <link
       href="/opensearch.xml"
       rel="search"
       title="Synapse"
       type="application/opensearchdescription+xml"
     />
-    <link rel="manifest" href="manifest.json" />
-    <!-- Google Tag Manager -->
-    <script>
-      ;(function (w, d, s, l, i) {
-        w[l] = w[l] || []
-        w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' })
-        var f = d.getElementsByTagName(s)[0],
-          j = d.createElement(s),
-          dl = l != 'dataLayer' ? '&l=' + l : ''
-        j.async = true
-        j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl
-        f.parentNode.insertBefore(j, f)
-      })(window, document, 'script', 'dataLayer', 'GTM-KPW4KS62')
-    </script>
-    <!-- End Google Tag Manager -->
+    <link rel="manifest" href="/manifest.json" />
     <script>
       // Modern browsers natively support this function.
       if (typeof Object.assign !== 'function') {
@@ -122,7 +95,7 @@
       var synapseOrgRegex = /(www|staging|tst)\.synapse\.org$/
 
       if (!synapseOrgRegex.test(location.hostname)) {
-        cdnEndpoint = ''
+        cdnEndpoint = '/'
         processEnvironment = 'development'
       }
 
@@ -156,388 +129,90 @@
       loadCss(cdnEndpoint + 'loadinglogo.css')
       loadJs(cdnEndpoint + 'js/compiled-closure-lib.js')
       loadJs(cdnEndpoint + 'Portal/Portal.nocache.js')
-      loadCss('//fonts.googleapis.com/css?family=Lato')
+      loadCss(
+        'https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap',
+      )
       loadCss('https://fonts.googleapis.com/icon?family=Material+Icons')
 
-      /*! head.load.min.js - v1.0.3 */
-      ;(function (n, t) {
-        'use strict'
-        function w() {}
-        function u(n, t) {
-          if (n) {
-            typeof n == 'object' && (n = [].slice.call(n))
-            for (var i = 0, r = n.length; i < r; i++) t.call(n, n[i], i)
-          }
-        }
-        function it(n, i) {
-          var r = Object.prototype.toString.call(i).slice(8, -1)
-          return i !== t && i !== null && r === n
-        }
-        function s(n) {
-          return it('Function', n)
-        }
-        function a(n) {
-          return it('Array', n)
-        }
-        function et(n) {
-          var i = n.split('/'),
-            t = i[i.length - 1],
-            r = t.indexOf('?')
-          return r !== -1 ? t.substring(0, r) : t
-        }
-        function f(n) {
-          ;((n = n || w), n._done) || (n(), (n._done = 1))
-        }
-        function ot(n, t, r, u) {
-          var f =
-              typeof n == 'object'
-                ? n
-                : {
-                    test: n,
-                    success: !t ? !1 : a(t) ? t : [t],
-                    failure: !r ? !1 : a(r) ? r : [r],
-                    callback: u || w,
-                  },
-            e = !!f.test
-          return (
-            e && !!f.success
-              ? (f.success.push(f.callback), i.load.apply(null, f.success))
-              : e || !f.failure
-              ? u()
-              : (f.failure.push(f.callback), i.load.apply(null, f.failure)),
-            i
-          )
-        }
-        function v(n) {
-          var t = {},
-            i,
-            r
-          if (typeof n == 'object')
-            for (i in n) !n[i] || (t = { name: i, url: n[i] })
-          else t = { name: et(n), url: n }
-          return ((r = c[t.name]), r && r.url === t.url)
-            ? r
-            : ((c[t.name] = t), t)
-        }
-        function y(n) {
-          n = n || c
-          for (var t in n)
-            if (n.hasOwnProperty(t) && n[t].state !== l) return !1
-          return !0
-        }
-        function st(n) {
-          n.state = ft
-          u(n.onpreload, function (n) {
-            n.call()
-          })
-        }
-        function ht(n) {
-          n.state === t &&
-            ((n.state = nt),
-            (n.onpreload = []),
-            rt({ url: n.url, type: 'cache' }, function () {
-              st(n)
-            }))
-        }
-        function ct() {
-          var n = arguments,
-            t = n[n.length - 1],
-            r = [].slice.call(n, 1),
-            f = r[0]
-          return (s(t) || (t = null), a(n[0]))
-            ? (n[0].push(t), i.load.apply(null, n[0]), i)
-            : (f
-                ? (u(r, function (n) {
-                    s(n) || !n || ht(v(n))
-                  }),
-                  b(
-                    v(n[0]),
-                    s(f)
-                      ? f
-                      : function () {
-                          i.load.apply(null, r)
-                        },
-                  ))
-                : b(v(n[0])),
-              i)
-        }
-        function lt() {
-          var n = arguments,
-            t = n[n.length - 1],
-            r = {}
-          return (s(t) || (t = null), a(n[0]))
-            ? (n[0].push(t), i.load.apply(null, n[0]), i)
-            : (u(n, function (n) {
-                n !== t && ((n = v(n)), (r[n.name] = n))
-              }),
-              u(n, function (n) {
-                n !== t &&
-                  ((n = v(n)),
-                  b(n, function () {
-                    y(r) && f(t)
-                  }))
-              }),
-              i)
-        }
-        function b(n, t) {
-          if (((t = t || w), n.state === l)) {
-            t()
-            return
-          }
-          if (n.state === tt) {
-            i.ready(n.name, t)
-            return
-          }
-          if (n.state === nt) {
-            n.onpreload.push(function () {
-              b(n, t)
-            })
-            return
-          }
-          n.state = tt
-          rt(n, function () {
-            n.state = l
-            t()
-            u(h[n.name], function (n) {
-              f(n)
-            })
-            o &&
-              y() &&
-              u(h.ALL, function (n) {
-                f(n)
-              })
-          })
-        }
-        function at(n) {
-          n = n || ''
-          var t = n.split('?')[0].split('.')
-          return t[t.length - 1].toLowerCase()
-        }
-        function rt(t, i) {
-          function e(t) {
-            t = t || n.event
-            u.onload = u.onreadystatechange = u.onerror = null
-            i()
-          }
-          function o(f) {
-            f = f || n.event
-            ;(f.type === 'load' ||
-              (/loaded|complete/.test(u.readyState) &&
-                (!r.documentMode || r.documentMode < 9))) &&
-              (n.clearTimeout(t.errorTimeout),
-              n.clearTimeout(t.cssTimeout),
-              (u.onload = u.onreadystatechange = u.onerror = null),
-              i())
-          }
-          function s() {
-            if (t.state !== l && t.cssRetries <= 20) {
-              for (var i = 0, f = r.styleSheets.length; i < f; i++)
-                if (r.styleSheets[i].href === u.href) {
-                  o({ type: 'load' })
-                  return
-                }
-              t.cssRetries++
-              t.cssTimeout = n.setTimeout(s, 250)
-            }
-          }
-          var u, h, f
-          i = i || w
-          h = at(t.url)
-          h === 'css'
-            ? ((u = r.createElement('link')),
-              (u.type = 'text/' + (t.type || 'css')),
-              (u.rel = 'stylesheet'),
-              (u.href = t.url),
-              (t.cssRetries = 0),
-              (t.cssTimeout = n.setTimeout(s, 500)))
-            : ((u = r.createElement('script')),
-              (u.type = 'text/' + (t.type || 'javascript')),
-              (u.src = t.url))
-          u.onload = u.onreadystatechange = o
-          u.onerror = e
-          u.async = !1
-          u.defer = !1
-          t.errorTimeout = n.setTimeout(function () {
-            e({ type: 'timeout' })
-          }, 7e3)
-          f = r.head || r.getElementsByTagName('head')[0]
-          f.insertBefore(u, f.lastChild)
-        }
-        function vt() {
-          for (
-            var t, u = r.getElementsByTagName('script'), n = 0, f = u.length;
-            n < f;
-            n++
-          )
-            if (((t = u[n].getAttribute('data-headjs-load')), !!t)) {
-              i.load(t)
-              return
-            }
-        }
-        function yt(n, t) {
-          var v, p, e
-          return n === r
-            ? (o ? f(t) : d.push(t), i)
-            : (s(n) && ((t = n), (n = 'ALL')), a(n))
-            ? ((v = {}),
-              u(n, function (n) {
-                v[n] = c[n]
-                i.ready(n, function () {
-                  y(v) && f(t)
-                })
-              }),
-              i)
-            : typeof n != 'string' || !s(t)
-            ? i
-            : ((p = c[n]), (p && p.state === l) || (n === 'ALL' && y() && o))
-            ? (f(t), i)
-            : ((e = h[n]), e ? e.push(t) : (e = h[n] = [t]), i)
-        }
-        function e() {
-          if (!r.body) {
-            n.clearTimeout(i.readyTimeout)
-            i.readyTimeout = n.setTimeout(e, 50)
-            return
-          }
-          o ||
-            ((o = !0),
-            vt(),
-            u(d, function (n) {
-              f(n)
-            }))
-        }
-        function k() {
-          r.addEventListener
-            ? (r.removeEventListener('DOMContentLoaded', k, !1), e())
-            : r.readyState === 'complete' &&
-              (r.detachEvent('onreadystatechange', k), e())
-        }
-        var r = n.document,
-          d = [],
-          h = {},
-          c = {},
-          ut =
-            'async' in r.createElement('script') ||
-            'MozAppearance' in r.documentElement.style ||
-            n.opera,
-          o,
-          g = (n.head_conf && n.head_conf.head) || 'head',
-          i = (n[g] =
-            n[g] ||
-            function () {
-              i.ready.apply(null, arguments)
-            }),
-          nt = 1,
-          ft = 2,
-          tt = 3,
-          l = 4,
-          p
-        if (r.readyState === 'complete') e()
-        else if (r.addEventListener)
-          r.addEventListener('DOMContentLoaded', k, !1),
-            n.addEventListener('load', e, !1)
-        else {
-          r.attachEvent('onreadystatechange', k)
-          n.attachEvent('onload', e)
-          p = !1
-          try {
-            p = !n.frameElement && r.documentElement
-          } catch (wt) {}
-          p &&
-            p.doScroll &&
-            (function pt() {
-              if (!o) {
-                try {
-                  p.doScroll('left')
-                } catch (t) {
-                  n.clearTimeout(i.readyTimeout)
-                  i.readyTimeout = n.setTimeout(pt, 50)
-                  return
-                }
-                e()
-              }
-            })()
-        }
-        i.load = i.js = ut ? lt : ct
-        i.test = ot
-        i.ready = yt
-        i.ready(r, function () {
-          y() &&
-            u(h.ALL, function (n) {
-              f(n)
-            })
-          i.feature && i.feature('domloaded', !0)
-        })
-      })(window)
-
-      let reactPath, reactDomPath, reactQueryPath, srcPath
+      let reactPath, reactDomPath
 
       if (processEnvironment === 'production') {
         reactPath = cdnEndpoint + 'generated/react.production.min.js'
         reactDomPath = cdnEndpoint + 'generated/react-dom.production.min.js'
-        // reactQueryPath = cdnEndpoint + 'generated/react-query.production.min.js'
-        srcPath =
-          cdnEndpoint + 'generated/synapse-react-client.production.min.js'
       } else {
         reactPath = cdnEndpoint + 'generated/react.development.js'
         reactDomPath = cdnEndpoint + 'generated/react-dom.development.js'
-        // reactQueryPath = cdnEndpoint + 'generated/react-query.development.js'
-        srcPath = cdnEndpoint + 'generated/synapse-react-client.development.js'
       }
 
       // TODO: Workaround for SWC-6664
       // Override the conditional above and just use the production distribution
-      reactQueryPath = cdnEndpoint + 'generated/react-query.production.min.js'
 
-      head.load(cdnEndpoint + 'generated/swc.css')
-      head.load(cdnEndpoint + 'generated/jquery.min.js')
-      head.load(
-        '//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js',
-      )
-      head.load(cdnEndpoint + 'js/back-forward-nav-handler.js')
-      head.load(cdnEndpoint + 'generated/moment.min.js')
-      head.load(cdnEndpoint + 'generated/jsplumb.min.js')
-      head.load(cdnEndpoint + 'js/jquery.tablesorter.min.js')
-      head.load(cdnEndpoint + 'js/jquery.tablesorter.scinot.js')
-      head.load(cdnEndpoint + 'icons/font/synapseicons.css?v=1')
-      head.load(cdnEndpoint + 'generated/font-awesome.css')
-      head.load(cdnEndpoint + 'js/highlight.pack.js')
-      head.load(cdnEndpoint + 'js/init-nchart.js')
-      head.load(cdnEndpoint + 'js/markdown-it.min.js')
-      head.load(cdnEndpoint + 'js/markdown-it-plugins-18.min.js')
-      head.load(cdnEndpoint + 'js/polyfill-2.js')
-      head.load(cdnEndpoint + 'js/details-shim.min.js')
-      head.load(cdnEndpoint + 'js/xss.min.js')
-      head.load(cdnEndpoint + 'generated/pica.min.js')
-      head.load(reactPath)
-      head.load(reactDomPath)
-      head.load(reactQueryPath)
-      head.load(cdnEndpoint + 'generated/react-transition-group.min.js')
-      head.load(cdnEndpoint + 'generated/prop-types.min.js')
-      head.load(cdnEndpoint + 'generated/react-measure.js')
-      head.load(cdnEndpoint + 'generated/plotly.min.js')
-      head.load(cdnEndpoint + 'generated/create-plotly-component.min.js')
-      head.load(cdnEndpoint + 'generated/react-router-dom.min.js')
-      head.load(cdnEndpoint + 'generated/universalCookie.min.js')
-      head.load(cdnEndpoint + 'generated/react-bootstrap.min.js')
-      head.load(srcPath) // We don't load SRC's scss because we include it in our own compiled scss
-      head.load(cdnEndpoint + 'generated/croppie.min.js')
-      head.load(cdnEndpoint + 'js/diff/diffview.css')
-      head.load(cdnEndpoint + 'css/details-shim.min.css')
-      head.load(cdnEndpoint + 'generated/croppie.css')
-      head.load(cdnEndpoint + 'css/highlight-js-default.css')
-      head.load(
-        '//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/base/jquery-ui.css',
-      )
-      head.load(cdnEndpoint + 'js/linkify.min.js')
-      head.load(cdnEndpoint + 'js/linkify-string.min.js')
-      head.load(cdnEndpoint + 'css/katex-0.10.1.min.css')
-      head.load('//cdn.statuspage.io/se-v2.js')
-      // head.load("//kh896k90gyvg.statuspage.io/embed/script.js");
-      head.load(cdnEndpoint + 'generated/papaparse.min.js')
+      loadCss(cdnEndpoint + 'generated/swc.css')
+      loadJs(cdnEndpoint + 'generated/jquery.min.js')
+      loadJs(cdnEndpoint + 'generated/jquery-ui.min.js')
+      // Load latest version of Bootstrap 3 to override the version bundled by GWTBootstrap3
+      // The Bootstrap 3 custom theme CSS is loaded through swc.scss
+      // Note: we alias to bootstrap3 because we rely on Bootstrap 4 to be in node_modules/bootstrap to compile our scss (via synapse-react-client).
+      loadJs(cdnEndpoint + 'generated/bootstrap/dist/js/bootstrap.min.js')
+      loadJs(cdnEndpoint + 'js/back-forward-nav-handler.js')
+      loadJs(cdnEndpoint + 'generated/moment.min.js')
+      loadJs(cdnEndpoint + 'generated/jsplumb.min.js')
+      loadJs(cdnEndpoint + 'js/jquery.tablesorter.min.js')
+      loadJs(cdnEndpoint + 'js/jquery.tablesorter.scinot.js')
+      loadCss(cdnEndpoint + 'icons/font/synapseicons.css?v=1')
+      loadCss(cdnEndpoint + 'generated/font-awesome.css')
+      loadJs(cdnEndpoint + 'js/highlight.pack.js')
+      loadJs(cdnEndpoint + 'js/init-nchart.js')
+      loadJs(cdnEndpoint + 'generated/markdown-it.js')
+      loadJs(cdnEndpoint + 'generated/markdown-it-br.js')
+      loadJs(cdnEndpoint + 'generated/markdown-it-center-text.js')
+      loadJs(cdnEndpoint + 'generated/markdown-it-container.js')
+      loadJs(cdnEndpoint + 'generated/markdown-it-emphasis-alt.js')
+      loadJs(cdnEndpoint + 'generated/markdown-it-inline-comments.js')
+      loadJs(cdnEndpoint + 'generated/markdown-it-math.js')
+      loadJs(cdnEndpoint + 'generated/markdown-it-strikethrough-alt.js')
+      loadJs(cdnEndpoint + 'generated/markdown-it-sub.js')
+      loadJs(cdnEndpoint + 'generated/markdown-it-sup.js')
+      loadJs(cdnEndpoint + 'generated/markdown-it-synapse.js')
+      loadJs(cdnEndpoint + 'generated/markdown-it-synapse-heading.js')
+      loadJs(cdnEndpoint + 'generated/markdown-it-synapse-math.js')
+      loadJs(cdnEndpoint + 'generated/markdown-it-synapse-table.js')
+      loadJs(cdnEndpoint + 'generated/katex/katex.min.js')
+      loadCss(cdnEndpoint + 'generated/katex/katex.min.css')
+      loadJs(cdnEndpoint + 'js/polyfill-2.js')
+      loadJs(cdnEndpoint + 'generated/xss.min.js')
+      loadJs(cdnEndpoint + 'generated/pica.min.js')
+      loadJs(reactPath)
+      loadJs(reactDomPath)
+      loadJs(cdnEndpoint + 'generated/material-ui.production.min.js')
+      loadJs(cdnEndpoint + 'generated/react-transition-group.min.js')
+      loadJs(cdnEndpoint + 'generated/prop-types.min.js')
+      loadJs(cdnEndpoint + 'generated/react-measure.js')
+      loadJs(cdnEndpoint + 'generated/plotly.min.js')
+      loadJs(cdnEndpoint + 'generated/create-plotly-component.min.js')
+      loadJs(cdnEndpoint + 'generated/react-router-dom.min.js')
+      loadJs(cdnEndpoint + 'generated/universalCookie.min.js')
+      loadJs(cdnEndpoint + 'generated/react-bootstrap.min.js')
+      loadJs(cdnEndpoint + 'generated/synapse-react-client.production.min.js') // We don't load SRC's scss because we include it in our own compiled scss
+      loadJs(cdnEndpoint + 'generated/croppie.min.js')
+      loadCss(cdnEndpoint + 'js/diff/diffview.css')
+      loadCss(cdnEndpoint + 'generated/croppie.css')
+      loadCss(cdnEndpoint + 'css/highlight-js-default.css')
+      loadCss(cdnEndpoint + 'generated/jquery-ui.min.css')
+      loadJs(cdnEndpoint + 'js/linkify.min.js')
+      loadJs(cdnEndpoint + 'js/linkify-string.min.js')
+      loadJs('//cdn.statuspage.io/se-v2.js')
+      // loadJs("//kh896k90gyvg.statuspage.io/embed/script.js");
+      loadJs(cdnEndpoint + 'generated/papaparse.min.js')
+    </script>
+    <script type="module">
+      // react-query only ships ESM. esm.sh is a CDN that will 'bundle' dependencies for us
+      import * as ReactQuery from 'https://esm.sh/@tanstack/react-query@5.22.2'
+      window.ReactQuery = ReactQuery
     </script>
   </head>
   <body id="body">
+    ${botBodyHtml}
     <div>
       <!-- GWT history support -->
       <iframe
@@ -569,20 +244,20 @@
           Your web browser must have JavaScript enabled in order for this
           application to display correctly.<br />
           If you are an automated web crawler from a search engine, follow this
-          <a href="https://synapse.prod.sagebase.org/Portal.html#!Home:0"
+          <a href="https://synapse.prod.sagebase.org/Home:0"
             >AJAX application crawl link</a
           >
         </div>
       </noscript>
       <!-- Google Tag Manager (noscript) -->
-      <noscript
-        ><iframe
+      <noscript>
+        <iframe
           src="https://www.googletagmanager.com/ns.html?id=GTM-KPW4KS62"
           height="0"
           width="0"
           style="display: none; visibility: hidden"
-        ></iframe
-      ></noscript>
+        ></iframe>
+      </noscript>
       <!-- End Google Tag Manager (noscript) -->
       <!-- This is the GWT-generated body -->
       <div id="alertWrapper">
@@ -607,7 +282,7 @@
             text-align: center;
           "
         >
-          Loading&hellip;
+          ${loadingObjectDescriptor}&hellip;
         </h4>
       </div>
       <div id="headerPanel" class="zeroOpacity"></div>

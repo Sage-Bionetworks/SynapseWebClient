@@ -23,7 +23,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -41,7 +41,6 @@ import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequire
 import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequirementRelatedProjectsList;
 import org.sagebionetworks.web.client.widget.accessrequirements.ConvertACTAccessRequirementButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.CreateAccessRequirementButton;
-import org.sagebionetworks.web.client.widget.accessrequirements.DeleteAccessRequirementButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.EntitySubjectsWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.ReviewAccessorsButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.TeamSubjectsWidget;
@@ -54,7 +53,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class ACTAccessRequirementWidgetTest {
 
   public static final String SUBJECT_OBJECT_ID = "syn981612";
@@ -91,9 +90,6 @@ public class ACTAccessRequirementWidgetTest {
 
   @Mock
   CreateAccessRequirementButton mockCreateAccessRequirementButton;
-
-  @Mock
-  DeleteAccessRequirementButton mockDeleteAccessRequirementButton;
 
   @Mock
   TeamSubjectsWidget mockTeamSubjectsWidget;
@@ -163,7 +159,6 @@ public class ACTAccessRequirementWidgetTest {
         mockEntitySubjectsWidget,
         mockAccessRequirementRelatedProjectsList,
         mockCreateAccessRequirementButton,
-        mockDeleteAccessRequirementButton,
         mockDataAccessClient,
         mockLazyLoadHelper,
         mockAuthController,
@@ -203,8 +198,8 @@ public class ACTAccessRequirementWidgetTest {
   @Test
   public void testConstruction() {
     verify(mockView).setPresenter(widget);
-    verify(mockView).setWikiTermsWidget(any(Widget.class));
-    verify(mockView).setEditAccessRequirementWidget(any(Widget.class));
+    verify(mockView).setWikiTermsWidget(any());
+    verify(mockView).setEditAccessRequirementWidget(any());
     verify(mockWikiPageWidget).setModifiedCreatedByHistoryVisible(false);
   }
 
@@ -221,8 +216,6 @@ public class ACTAccessRequirementWidgetTest {
     verify(mockView).showTermsUI();
     verify(mockCreateAccessRequirementButton)
       .configure(mockACTAccessRequirement, mockRefreshCallback);
-    verify(mockDeleteAccessRequirementButton)
-      .configure(mockACTAccessRequirement, mockRefreshCallback);
     verify(mockTeamSubjectsWidget).configure(mockSubjectIds);
     verify(mockEntitySubjectsWidget).configure(mockSubjectIds);
     verify(mockLazyLoadHelper).setIsConfigured();
@@ -236,12 +229,7 @@ public class ACTAccessRequirementWidgetTest {
 
     widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
 
-    verify(mockWikiPageWidget)
-      .configure(
-        any(WikiPageKey.class),
-        eq(false),
-        any(WikiPageWidget.Callback.class)
-      );
+    verify(mockWikiPageWidget).configure(any(), eq(false), any());
     verify(mockView).setAccessRequirementName(ACCESS_REQUIREMENT_NAME);
     verify(mockView, never()).setTerms(anyString());
     verify(mockView, never()).showTermsUI();

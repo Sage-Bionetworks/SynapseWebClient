@@ -138,7 +138,7 @@ public class TeamSearchPresenterTest {
     verify(mockView).setSearchTerm(searchTerm);
     // add both test teams
     verify(mockPortalGinInjector, times(2)).getBigTeamBadgeWidget();
-    verify(mockLoadMoreWidgetContainer, times(2)).add(any(Widget.class));
+    verify(mockLoadMoreWidgetContainer, times(2)).add(any());
   }
 
   @Test

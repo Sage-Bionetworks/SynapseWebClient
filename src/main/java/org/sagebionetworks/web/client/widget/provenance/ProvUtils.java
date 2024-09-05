@@ -45,9 +45,18 @@ public class ProvUtils {
     Set<ProvGraphNode> nodeHasExpandNode = new HashSet<ProvGraphNode>();
 
     // maps for local building retrieval
-    Map<Reference, EntityGraphNode> entityNodes = new HashMap<Reference, EntityGraphNode>();
-    Map<UsedURL, ExternalGraphNode> externalGraphNodes = new HashMap<UsedURL, ExternalGraphNode>();
-    Map<Activity, ActivityGraphNode> activityNodes = new HashMap<Activity, ActivityGraphNode>();
+    Map<Reference, EntityGraphNode> entityNodes = new HashMap<
+      Reference,
+      EntityGraphNode
+    >();
+    Map<UsedURL, ExternalGraphNode> externalGraphNodes = new HashMap<
+      UsedURL,
+      ExternalGraphNode
+    >();
+    Map<Activity, ActivityGraphNode> activityNodes = new HashMap<
+      Activity,
+      ActivityGraphNode
+    >();
 
     // create ProvGraphNodes for the entities
     for (Reference ref : refToHeader.keySet()) {
@@ -189,7 +198,10 @@ public class ProvUtils {
   public static Map<Reference, EntityHeader> mapReferencesToHeaders(
     ArrayList<EntityHeader> headers
   ) {
-    Map<Reference, EntityHeader> refToHeader = new HashMap<Reference, EntityHeader>();
+    Map<Reference, EntityHeader> refToHeader = new HashMap<
+      Reference,
+      EntityHeader
+    >();
     for (EntityHeader header : headers) {
       Reference equivalentRef = new Reference();
       equivalentRef.setTargetId(header.getId());

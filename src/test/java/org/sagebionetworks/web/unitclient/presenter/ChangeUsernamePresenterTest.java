@@ -37,7 +37,8 @@ public class ChangeUsernamePresenterTest {
   SynapseClientAsync mockSynapseClient;
   SynapseAlert mockSynAlert;
   AdapterFactory adapterFactory = new AdapterFactoryImpl();
-  private static JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
+  private static JSONObjectAdapter jsonObjectAdapter =
+    new JSONObjectAdapterImpl();
   PlaceChanger mockPlaceChanger;
   AcceptsOneWidget mockPanel;
   EventBus mockEventBus;
@@ -96,7 +97,7 @@ public class ChangeUsernamePresenterTest {
     verify(mockSynapseClient)
       .updateUserProfile(any(UserProfile.class), any(AsyncCallback.class));
     verify(mockAuthenticationController).updateCachedProfile(eq(profile));
-    verify(mockCallback).onSuccess(any(Void.class));
+    verify(mockCallback).onSuccess(any());
   }
 
   @Test

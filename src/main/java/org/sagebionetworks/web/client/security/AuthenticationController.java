@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.client.security;
 
+import com.google.common.util.concurrent.FluentFuture;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.web.client.utils.Callback;
 
 public interface AuthenticationController {
   /**
@@ -83,5 +83,6 @@ public interface AuthenticationController {
   public void updateCachedProfile(UserProfile updatedProfile);
 
   void checkForUserChange();
-  void checkForUserChange(Callback cb);
+  void clearLocalStorage();
+  FluentFuture<Void> getCheckForUserChangeFuture();
 }

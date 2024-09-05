@@ -7,7 +7,6 @@ import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.LinkElement;
 import com.google.gwt.dom.client.MetaElement;
 import com.google.gwt.dom.client.NodeList;
-import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Window.Location;
 import com.google.gwt.xhr.client.XMLHttpRequest;
@@ -24,9 +23,11 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 
   private static ProgressCallback progressCallback;
 
+  Html5Historian html5Historian = new Html5Historian();
+
   @Override
   public String getCurrentHistoryToken() {
-    return History.getToken();
+    return html5Historian.getToken();
   }
 
   @Override
@@ -131,6 +132,13 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
   public String getVersionsServletUrl() {
     return (
       GWTWrapperImpl.getRealGWTModuleBaseURL() + WebConstants.VERSIONS_SERVLET
+    );
+  }
+
+  @Override
+  public String getAppConfigServletUrl() {
+    return (
+      GWTWrapperImpl.getRealGWTModuleBaseURL() + WebConstants.APPCONFIG_SERVLET
     );
   }
 
@@ -406,7 +414,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
   ) /*-{
 		if ($wnd.Worker) {
 			if (!$wnd.calculateFileMd5Worker) {
-			  $wnd.calculateFileMd5Worker = new $wnd.Worker("workers/calculateFileMd5Worker.js");
+			  $wnd.calculateFileMd5Worker = new $wnd.Worker("/workers/calculateFileMd5Worker.js");
 			};
 			$wnd.calculateFileMd5Worker.onmessage = function(event) {
 				md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback::setMD5(Ljava/lang/String;)(event.data);
@@ -438,7 +446,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
   ) /*-{
 		if ($wnd.Worker) {
 			if (!$wnd.calculateFilePartMd5Worker) {
-			  $wnd.calculateFilePartMd5Worker = new $wnd.Worker("workers/calculateFilePartMd5Worker.js");
+			  $wnd.calculateFilePartMd5Worker = new $wnd.Worker("/workers/calculateFilePartMd5Worker.js");
 			};
 			$wnd.calculateFilePartMd5Worker.onmessage = function(event) {
 				md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback:: setMD5(Ljava/lang/String;) (event.data);
@@ -697,21 +705,25 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 						return html;
 					}
 				},
-				safeAttrValue : function(tag, name, value) {
-					// returning nothing removes the value
-					if (tag === 'img' && name === 'src') {
-						if (value
-								&& (value.startsWith('data:image/') || value
-										.startsWith('http'))) {
-							return value;
-						}
-					} else {
-						return value;
-					}
-				}
-			};
-			$wnd.xss = new $wnd.filterXSS.FilterXSS(options);
-			return true;
+                safeAttrValue: function(tag, name, value) {
+                  // Apply default safeAttrValue filtering:
+                  value = $wnd.filterXSS.safeAttrValue(tag, name, value);
+                  if (tag === 'img' && name === 'src') {
+                    if (
+                      !(
+                        value &&
+                        (value.startsWith('data:image/') || value.startsWith('http'))
+                      )
+                    ) {
+                      return ''
+                    }
+                  }
+                  value = $wnd.filterXSS.escapeAttrValue(value)
+                  return value
+                }
+              }
+			$wnd.xss = new $wnd.filterXSS.FilterXSS(options)
+			return true
 		} catch (err) {
 			console.error(err);
 			return false;
@@ -909,4 +921,22 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 			console.error(err);
 		}
 	}-*/;
+
+  @Override
+  public String setHash(String hash) {
+    return _setHash(hash);
+  }
+
+  private static final native String _setHash(String hash) /*-{
+      $wnd.history.pushState('', '', hash)
+    }-*/;
+
+  @Override
+  public String getHash() {
+    return _getHash();
+  }
+
+  private static final native String _getHash() /*-{
+      return $wnd.location.hash
+    }-*/;
 }

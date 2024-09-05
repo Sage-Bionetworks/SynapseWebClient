@@ -4,6 +4,7 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.inject.client.GinModules;
 import com.google.gwt.inject.client.Ginjector;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.context.QueryClientProvider;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.presenter.ACTAccessApprovalsPresenter;
@@ -35,10 +36,8 @@ import org.sagebionetworks.web.client.presenter.PasswordResetSignedTokenPresente
 import org.sagebionetworks.web.client.presenter.PeopleSearchPresenter;
 import org.sagebionetworks.web.client.presenter.PersonalAccessTokensPresenter;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
-import org.sagebionetworks.web.client.presenter.QuestionContainerWidget;
 import org.sagebionetworks.web.client.presenter.QuizPresenter;
 import org.sagebionetworks.web.client.presenter.SearchPresenter;
-import org.sagebionetworks.web.client.presenter.SettingsPresenter;
 import org.sagebionetworks.web.client.presenter.SignedTokenPresenter;
 import org.sagebionetworks.web.client.presenter.SubscriptionPresenter;
 import org.sagebionetworks.web.client.presenter.SynapseForumPresenter;
@@ -47,6 +46,7 @@ import org.sagebionetworks.web.client.presenter.SynapseWikiPresenter;
 import org.sagebionetworks.web.client.presenter.TeamPresenter;
 import org.sagebionetworks.web.client.presenter.TeamSearchPresenter;
 import org.sagebionetworks.web.client.presenter.TrashPresenter;
+import org.sagebionetworks.web.client.presenter.TrustCenterPresenter;
 import org.sagebionetworks.web.client.presenter.TwoFactorAuthPresenter;
 import org.sagebionetworks.web.client.presenter.WikiDiffPresenter;
 import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
@@ -55,6 +55,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.DivView;
 import org.sagebionetworks.web.client.widget.CommaSeparatedValuesParser;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
+import org.sagebionetworks.web.client.widget.EntityTypeIcon;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.QuarantinedEmailModal;
@@ -67,7 +68,8 @@ import org.sagebionetworks.web.client.widget.accessrequirements.SelfSignAccessRe
 import org.sagebionetworks.web.client.widget.accessrequirements.TeamSubjectWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.TermsOfUseAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.approval.AccessorGroupWidget;
-import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateAccessRequirementWizard;
+import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateOrUpdateAccessRequirementWizard;
+import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.LegacyCreateAccessRequirementWizard;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.ACTDataAccessSubmissionWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.OpenSubmissionWidget;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
@@ -104,6 +106,7 @@ import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalView;
 import org.sagebionetworks.web.client.widget.entity.RegisterTeamDialog;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
+import org.sagebionetworks.web.client.widget.entity.SqlDefinedEditorModalWidget;
 import org.sagebionetworks.web.client.widget.entity.TutorialWizard;
 import org.sagebionetworks.web.client.widget.entity.VersionHistoryRowView;
 import org.sagebionetworks.web.client.widget.entity.VersionHistoryWidget;
@@ -204,13 +207,14 @@ import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadWikiWidgetWrapper;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.client.widget.profile.ProfileCertifiedValidatedWidget;
-import org.sagebionetworks.web.client.widget.profile.UserProfileEditorWidget;
+import org.sagebionetworks.web.client.widget.profile.UserProfileWidget;
 import org.sagebionetworks.web.client.widget.provenance.v2.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.refresh.DiscussionThreadCountAlert;
 import org.sagebionetworks.web.client.widget.refresh.EntityRefreshAlert;
 import org.sagebionetworks.web.client.widget.refresh.ReplyCountAlert;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.sharing.AclAddPeoplePanel;
+import org.sagebionetworks.web.client.widget.sharing.EntityAccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.sharing.SharingPermissionsGrid;
 import org.sagebionetworks.web.client.widget.statistics.StatisticsPlotWidget;
 import org.sagebionetworks.web.client.widget.table.TableEntityListGroupItem;
@@ -219,7 +223,6 @@ import org.sagebionetworks.web.client.widget.table.api.APITableWidget;
 import org.sagebionetworks.web.client.widget.table.explore.TableEntityWidgetV2;
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQueryModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.SqlDefinedTableEditor;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.ViewDefaultColumns;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
@@ -509,8 +512,6 @@ public interface PortalGinInjector extends Ginjector {
 
   SynapseStatusDetector getSynapseStatusDetector();
 
-  QuestionContainerWidget getQuestionContainerWidget();
-
   SynapseAlert getSynapseAlertWidget();
 
   EntityRefProvEntryView getEntityRefEntry();
@@ -606,6 +607,8 @@ public interface PortalGinInjector extends Ginjector {
   TableListWidget getTableListWidget();
 
   CookieProvider getCookieProvider();
+
+  SessionStorage getSessionStorage();
 
   Header getHeader();
 
@@ -707,11 +710,11 @@ public interface PortalGinInjector extends Ginjector {
 
   QueryTokenProvider getQueryTokenProvider();
 
-  SettingsPresenter getSettingsPresenter();
-
   PersonalAccessTokensPresenter getPersonalAccessTokensPresenter();
 
   AccessControlListModalWidget getAccessControlListModalWidget();
+
+  EntityAccessControlListModalWidget getEntityAccessControlListModalWidget();
 
   RenameEntityModalWidget getRenameEntityModalWidget();
 
@@ -757,7 +760,9 @@ public interface PortalGinInjector extends Ginjector {
 
   FileHandleWidget getFileHandleWidget();
 
-  CreateAccessRequirementWizard getCreateAccessRequirementWizard();
+  LegacyCreateAccessRequirementWizard getLegacyCreateAccessRequirementWizard();
+
+  CreateOrUpdateAccessRequirementWizard getCreateOrUpdateAccessRequirementWizard();
 
   ProfileCertifiedValidatedWidget getProfileCertifiedValidatedWidget();
 
@@ -785,9 +790,9 @@ public interface PortalGinInjector extends Ginjector {
 
   CreateDatasetOrCollection getCreateDatasetOrCollection();
 
-  SqlDefinedTableEditor getSqlDefinedTableEditor();
-
   UploadTableModalWidget getUploadTableModalWidget();
+
+  SqlDefinedEditorModalWidget getSqlDefinedEditorModalWidget();
 
   AddExternalRepoModal getAddExternalRepoModal();
 
@@ -805,7 +810,7 @@ public interface PortalGinInjector extends Ginjector {
 
   CopyTextModal getCopyTextModal();
 
-  UserProfileEditorWidget getUserProfileEditorWidget();
+  UserProfileWidget getUserProfileWidget();
 
   PromptForValuesModalView getPromptForValuesModal();
 
@@ -885,4 +890,10 @@ public interface PortalGinInjector extends Ginjector {
   FollowingPagePresenter getFollowingPagePresenter();
 
   ColumnModelsEditorWidget getColumnModelsEditorWidget();
+
+  EntityTypeIcon getEntityTypeIcon();
+
+  FeatureFlagConfig getFeatureFlagConfig();
+
+  TrustCenterPresenter getTrustCenterPresenter();
 }

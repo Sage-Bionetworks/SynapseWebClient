@@ -17,7 +17,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -32,7 +32,7 @@ import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.test.helper.SelfReturningAnswer;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class EntityListConfigEditorTest {
 
   EntityListConfigEditor editor;
@@ -68,7 +68,9 @@ public class EntityListConfigEditorTest {
   ArgumentCaptor<CallbackP<String>> promptCallbackCaptor;
 
   @Captor
-  ArgumentCaptor<EntityFinderWidget.SelectedHandler<List<Reference>>> entityFinderCaptor;
+  ArgumentCaptor<
+    EntityFinderWidget.SelectedHandler<List<Reference>>
+  > entityFinderCaptor;
 
   @Before
   public void setup() throws Exception {

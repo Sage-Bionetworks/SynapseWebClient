@@ -31,8 +31,6 @@ public interface SelfSignAccessRequirementWidgetView
 
   void setEditAccessRequirementWidget(IsWidget w);
 
-  void setDeleteAccessRequirementWidget(IsWidget w);
-
   void setTeamSubjectsWidget(IsWidget w);
 
   void setManageAccessWidget(IsWidget w);
@@ -62,4 +60,6 @@ public interface SelfSignAccessRequirementWidgetView
   void setAccessRequirementRelatedProjectsList(
     IsWidget accessRequirementRelatedProjectsList
   );
+
+  void setSubjectsDefinedByAnnotations(Boolean subjectsDefinedByAnnotations);
 }

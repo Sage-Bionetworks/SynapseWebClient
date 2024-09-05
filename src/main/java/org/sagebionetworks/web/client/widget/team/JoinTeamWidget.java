@@ -138,7 +138,7 @@ public class JoinTeamWidget
     view.clear();
     synAlert.clear();
     accessRequirementsUrl =
-      "#!AccessRequirements:" +
+      "/AccessRequirements:" +
       AccessRequirementsPlace.ID_PARAM +
       "=" +
       teamId +
@@ -503,7 +503,9 @@ public class JoinTeamWidget
   }
 
   public void setLicenseAccepted(AccessRequirement ar) {
-    AsyncCallback<AccessApproval> callback = new AsyncCallback<AccessApproval>() {
+    AsyncCallback<AccessApproval> callback = new AsyncCallback<
+      AccessApproval
+    >() {
       @Override
       public void onSuccess(AccessApproval result) {
         // ToU signed, now try to register for the challenge (will check for other access restrictions

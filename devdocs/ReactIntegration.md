@@ -17,7 +17,7 @@ Using JsInterop to call your React component can be summarized in these basic st
 
 1. Create a class to represent your components' props
 1. Add your component to the SRC JsInterop type
-1. Add a ReactComponentDiv to your View
+1. Add a ReactComponent to your View
 1. In the View, use React and ReactDOM to render the element.
 
 ### Create a Prop Class
@@ -34,9 +34,9 @@ The [SRC class](../src/main/java/org/sagebionetworks/web/client/jsinterop/SRC.ja
 
 Make sure you specify your prop type in the type parameter, and also make sure that your object name exactly matches the named export in `SynapseComponents`.
 
-### Add a ReactComponentDiv or ReactComponentSpan to your View
+### Add a ReactComponent to your View
 
-While you can append your React component to any element, we have [ReactComponentDiv](../src/main/java/org/sagebionetworks/web/client/widget/ReactComponentDiv.java) and [ReactComponentSpan](../src/main/java/org/sagebionetworks/web/client/widget/ReactComponentDiv.java) that contain logic that simplifies managing the lifecycle of a React component. Add this to your View in code or `*.ui.xml` file, and make sure you can reference it for the next step.
+While you can append your React component to any element, we have [ReactComponent](../src/main/java/org/sagebionetworks/web/client/widget/ReactComponent.java) that contains logic that simplifies managing the lifecycle of a React component. Add this to your View in code or `*.ui.xml` file, and make sure you can reference it for the next step.
 
 ### Passing Synapse context
 
@@ -49,6 +49,7 @@ How you manage updating your widget's view will vary based on the scenario, but 
 ```java
 import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.React;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
 
 class MyView {
 
@@ -57,12 +58,12 @@ class MyView {
 
   void renderComponent() {
     MyProps props = props.create(/**/);
-    ReactNode reactNode = React.createElementWithSynapseContext(
+    ReactElement reactElement = React.createElementWithSynapseContext(
       SRC.SynapseComponents.MyComponent,
       props,
       propsProvider.getJsInteropContextProps()
     );
-    reactComponentDiv.render(reactNode);
+    reactComponent.render(reactElement);
   }
 }
 

@@ -129,7 +129,7 @@ public class WikiDiffPresenterTest {
   @Test
   public void testConstructor() {
     verify(mockView).setPresenter(presenter);
-    verify(mockView).setSynAlert(any(IsWidget.class));
+    verify(mockView).setSynAlert(any());
     verify(mockResourceLoader).isLoaded(DIFF_LIB_JS);
     verify(mockResourceLoader).requires(anyList(), any(AsyncCallback.class));
 

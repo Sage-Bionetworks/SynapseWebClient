@@ -43,8 +43,7 @@ public class OpenTeamInvitationBundle implements IsSerializable {
     final int prime = 31;
     int result = 1;
     result =
-      prime *
-      result +
+      prime * result +
       ((membershipInvitation == null) ? 0 : membershipInvitation.hashCode());
     result =
       prime * result + ((userProfile == null) ? 0 : userProfile.hashCode());

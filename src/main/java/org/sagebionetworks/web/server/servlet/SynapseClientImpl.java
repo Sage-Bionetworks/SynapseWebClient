@@ -155,13 +155,14 @@ public class SynapseClientImpl
           long currentOffset = 0;
           List<TeamMember> teamMembers = null;
           do {
-            org.sagebionetworks.reflection.model.PaginatedResults<TeamMember> teamMembersPaginatedResults =
-              synapseClient.getTeamMembers(
-                htmlTeamId,
-                null,
-                LIMIT_50,
-                currentOffset
-              );
+            org.sagebionetworks.reflection.model.PaginatedResults<
+              TeamMember
+            > teamMembersPaginatedResults = synapseClient.getTeamMembers(
+              htmlTeamId,
+              null,
+              LIMIT_50,
+              currentOffset
+            );
             teamMembers = teamMembersPaginatedResults.getResults();
             for (TeamMember teamMember : teamMembers) {
               userIdSet.add(teamMember.getMember().getOwnerId());
@@ -177,7 +178,10 @@ public class SynapseClientImpl
   }
 
   AdapterFactory adapterFactory = new AdapterFactoryImpl();
-  private volatile HashMap<String, org.sagebionetworks.web.shared.WikiPageKey> pageName2WikiKeyMap;
+  private volatile HashMap<
+    String,
+    org.sagebionetworks.web.shared.WikiPageKey
+  > pageName2WikiKeyMap;
   private volatile HashSet<String> wikiBasedEntities;
 
   public Project getProject(String projectId) throws RestServiceException {
@@ -238,9 +242,17 @@ public class SynapseClientImpl
     throws RestServiceException {
     org.sagebionetworks.client.SynapseClient synapseClient =
       createSynapseClient();
+    return getLatestEntityVersion(entityId, synapseClient);
+  }
+
+  public static Long getLatestEntityVersion(
+    String entityId,
+    org.sagebionetworks.client.SynapseClient synapseClient
+  ) throws RestServiceException {
     try {
-      org.sagebionetworks.reflection.model.PaginatedResults<VersionInfo> paginatedResults =
-        synapseClient.getEntityVersions(entityId, 0, 1);
+      org.sagebionetworks.reflection.model.PaginatedResults<
+        VersionInfo
+      > paginatedResults = synapseClient.getEntityVersions(entityId, 0, 1);
       List<VersionInfo> results = paginatedResults.getResults();
       if (results.size() > 0) {
         return results.get(0).getVersionNumber();
@@ -536,6 +548,8 @@ public class SynapseClientImpl
     org.sagebionetworks.client.SynapseClient synapseClient =
       createSynapseClient();
     try {
+      // SWC-6941 - the description field was replaced with name
+      ar.setDescription(null);
       if (ar.getId() == null) {
         return synapseClient.createAccessRequirement(ar);
       } else {
@@ -551,8 +565,9 @@ public class SynapseClientImpl
     ACCESS_TYPE accessType,
     org.sagebionetworks.client.SynapseClient synapseClient
   ) throws SynapseException {
-    List<AccessRequirement> allAccessRequirements =
-      new ArrayList<AccessRequirement>();
+    List<AccessRequirement> allAccessRequirements = new ArrayList<
+      AccessRequirement
+    >();
     long offset = ZERO_OFFSET;
     boolean isDone = false;
     while (!isDone) {
@@ -990,14 +1005,15 @@ public class SynapseClientImpl
     org.sagebionetworks.client.SynapseClient synapseClient =
       createSynapseClient();
     try {
-      org.sagebionetworks.reflection.model.PaginatedResults<TeamMember> members =
-        synapseClient.getTeamMembers(
-          teamId,
-          fragment,
-          memberType,
-          limit,
-          offset
-        );
+      org.sagebionetworks.reflection.model.PaginatedResults<
+        TeamMember
+      > members = synapseClient.getTeamMembers(
+        teamId,
+        fragment,
+        memberType,
+        limit,
+        offset
+      );
       List<TeamMember> teamMembers = members.getResults();
 
       // gather user ids to ask for all user profiles in bulk
@@ -1006,8 +1022,9 @@ public class SynapseClientImpl
         userIds.add(Long.parseLong(member.getMember().getOwnerId()));
       }
       List<UserProfile> profiles = synapseClient.listUserProfiles(userIds);
-      List<TeamMemberBundle> teamMemberBundles =
-        new ArrayList<TeamMemberBundle>();
+      List<TeamMemberBundle> teamMemberBundles = new ArrayList<
+        TeamMemberBundle
+      >();
       for (int i = 0; i < userIds.size(); i++) {
         teamMemberBundles.add(
           new TeamMemberBundle(
@@ -1248,13 +1265,14 @@ public class SynapseClientImpl
     org.sagebionetworks.client.SynapseClient synapseClient =
       createSynapseClient();
     try {
-      org.sagebionetworks.reflection.model.PaginatedResults<MembershipRequest> requests =
-        synapseClient.getOpenMembershipRequests(
-          teamId,
-          null,
-          MAX_LIMIT,
-          ZERO_OFFSET
-        );
+      org.sagebionetworks.reflection.model.PaginatedResults<
+        MembershipRequest
+      > requests = synapseClient.getOpenMembershipRequests(
+        teamId,
+        null,
+        MAX_LIMIT,
+        ZERO_OFFSET
+      );
       // and ask for the team info for each invite, and fill that in the
       // bundle
       List<Long> userIds = new ArrayList<>();
@@ -1265,8 +1283,9 @@ public class SynapseClientImpl
         userIds,
         synapseClient
       );
-      ArrayList<MembershipRequestBundle> returnList =
-        new ArrayList<MembershipRequestBundle>();
+      ArrayList<MembershipRequestBundle> returnList = new ArrayList<
+        MembershipRequestBundle
+      >();
       // now go through and create a MembershipRequestBundle for each pair
       for (MembershipRequest request : requests.getResults()) {
         UserProfile profile = userId2UserProfile.get(request.getUserId());
@@ -1300,18 +1319,20 @@ public class SynapseClientImpl
     org.sagebionetworks.client.SynapseClient synapseClient =
       createSynapseClient();
     try {
-      org.sagebionetworks.reflection.model.PaginatedResults<MembershipInvitation> invitations =
-        synapseClient.getOpenMembershipInvitations(
-          userId,
-          null,
-          MAX_LIMIT,
-          ZERO_OFFSET
-        );
+      org.sagebionetworks.reflection.model.PaginatedResults<
+        MembershipInvitation
+      > invitations = synapseClient.getOpenMembershipInvitations(
+        userId,
+        null,
+        MAX_LIMIT,
+        ZERO_OFFSET
+      );
       // and ask for the team info for each invite, and fill that in the
       // bundle
 
-      ArrayList<OpenUserInvitationBundle> returnList =
-        new ArrayList<OpenUserInvitationBundle>();
+      ArrayList<OpenUserInvitationBundle> returnList = new ArrayList<
+        OpenUserInvitationBundle
+      >();
       // now go through and create a MembershipInvitationBundle for each
       // pair
 
@@ -1373,18 +1394,20 @@ public class SynapseClientImpl
     org.sagebionetworks.client.SynapseClient synapseClient =
       createSynapseClient();
     try {
-      org.sagebionetworks.reflection.model.PaginatedResults<MembershipInvitation> invitations =
-        synapseClient.getOpenMembershipInvitationSubmissions(
-          teamId,
-          null,
-          limit,
-          offset
-        );
+      org.sagebionetworks.reflection.model.PaginatedResults<
+        MembershipInvitation
+      > invitations = synapseClient.getOpenMembershipInvitationSubmissions(
+        teamId,
+        null,
+        limit,
+        offset
+      );
       // and ask for the team info for each invite, and fill that in the
       // bundle
 
-      ArrayList<OpenTeamInvitationBundle> returnList =
-        new ArrayList<OpenTeamInvitationBundle>();
+      ArrayList<OpenTeamInvitationBundle> returnList = new ArrayList<
+        OpenTeamInvitationBundle
+      >();
       // now go through and create a MembershipInvitationBundle for each
       // pair
 
@@ -1586,7 +1609,7 @@ public class SynapseClientImpl
   );
 
   public static final String getSignedTokenEndpoint(String hostPageBaseURL) {
-    return hostPageBaseURL + "#!SignedToken:";
+    return hostPageBaseURL + "SignedToken:";
   }
 
   @Override
@@ -1670,13 +1693,13 @@ public class SynapseClientImpl
   }
 
   public static String getTeamEndpoint(String hostPageBaseURL) {
-    return hostPageBaseURL + "#!Team:";
+    return hostPageBaseURL + "Team:";
   }
 
   // If this method is modified, please also modify CHALLENGE_ENDPOINT in
   // org.sagebionetworks.repo.model.ServiceConstants (PLFM)
   public static String getChallengeEndpoint(String hostPageBaseURL) {
-    return hostPageBaseURL + "#!Synapse:";
+    return hostPageBaseURL + "Synapse:";
   }
 
   @Override
@@ -1772,8 +1795,10 @@ public class SynapseClientImpl
   }
 
   @Override
-  public HashMap<String, org.sagebionetworks.web.shared.WikiPageKey> getPageNameToWikiKeyMap()
-    throws RestServiceException {
+  public HashMap<
+    String,
+    org.sagebionetworks.web.shared.WikiPageKey
+  > getPageNameToWikiKeyMap() throws RestServiceException {
     initHelpPagesMap();
     return pageName2WikiKeyMap;
   }
@@ -1850,8 +1875,10 @@ public class SynapseClientImpl
       createSynapseClient();
     try {
       // Create any models that do not have an ID, or that have changed
-      Map<String, ColumnModel> oldColumnModelId2Model =
-        new HashMap<String, ColumnModel>();
+      Map<String, ColumnModel> oldColumnModelId2Model = new HashMap<
+        String,
+        ColumnModel
+      >();
       for (ColumnModel columnModel : oldSchema) {
         oldColumnModelId2Model.put(columnModel.getId(), columnModel);
       }
@@ -1899,8 +1926,9 @@ public class SynapseClientImpl
       TableUpdateTransactionRequest request =
         new TableUpdateTransactionRequest();
       request.setEntityId(tableId);
-      List<TableUpdateRequest> requestChangeList =
-        new ArrayList<TableUpdateRequest>();
+      List<TableUpdateRequest> requestChangeList = new ArrayList<
+        TableUpdateRequest
+      >();
       TableSchemaChangeRequest newTableSchemaChangeRequest =
         new TableSchemaChangeRequest();
       newTableSchemaChangeRequest.setEntityId(tableId);

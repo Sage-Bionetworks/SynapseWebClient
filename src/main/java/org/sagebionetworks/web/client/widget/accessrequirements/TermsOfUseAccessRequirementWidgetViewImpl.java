@@ -54,9 +54,6 @@ public class TermsOfUseAccessRequirementWidgetViewImpl
   Div editAccessRequirementContainer;
 
   @UiField
-  Div deleteAccessRequirementContainer;
-
-  @UiField
   Div teamSubjectsWidgetContainer;
 
   @UiField
@@ -76,6 +73,12 @@ public class TermsOfUseAccessRequirementWidgetViewImpl
 
   @UiField
   Div controlsContainer;
+
+  @UiField
+  Div subjectsDefinedByAnnotationsUI;
+
+  @UiField
+  Div subjectsDefinedInAccessRequirementUI;
 
   Callback onAttachCallback;
 
@@ -183,12 +186,6 @@ public class TermsOfUseAccessRequirementWidgetViewImpl
   }
 
   @Override
-  public void setDeleteAccessRequirementWidget(IsWidget w) {
-    deleteAccessRequirementContainer.clear();
-    deleteAccessRequirementContainer.add(w);
-  }
-
-  @Override
   public void setTeamSubjectsWidget(IsWidget w) {
     teamSubjectsWidgetContainer.clear();
     teamSubjectsWidgetContainer.add(w);
@@ -240,5 +237,16 @@ public class TermsOfUseAccessRequirementWidgetViewImpl
   @Override
   public void hideControls() {
     controlsContainer.setVisible(false);
+  }
+
+  @Override
+  public void setSubjectsDefinedByAnnotations(
+    Boolean subjectsDefinedByAnnotations
+  ) {
+    boolean v = subjectsDefinedByAnnotations != null
+      ? subjectsDefinedByAnnotations.booleanValue()
+      : false;
+    subjectsDefinedByAnnotationsUI.setVisible(v);
+    subjectsDefinedInAccessRequirementUI.setVisible(!v);
   }
 }

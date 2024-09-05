@@ -35,6 +35,8 @@ public interface MarkdownEditorWidgetView extends IsWidget, SynapseView {
 
   void setAlphaCommandsVisible(boolean visible);
 
+  void setACTCommandsVisible(boolean visible);
+
   boolean isEditorAttachedAndVisible();
 
   int getClientHeight();

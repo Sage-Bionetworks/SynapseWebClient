@@ -16,7 +16,7 @@ public class DataAccessManagementPlace extends Place {
     return token;
   }
 
-  @Prefix("!DataAccessManagement")
+  @Prefix("DataAccessManagement")
   public static class Tokenizer
     implements PlaceTokenizer<DataAccessManagementPlace> {
 

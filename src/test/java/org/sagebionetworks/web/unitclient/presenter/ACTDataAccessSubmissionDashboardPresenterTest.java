@@ -81,7 +81,7 @@ public class ACTDataAccessSubmissionDashboardPresenterTest {
 
   @Test
   public void testConstructor() {
-    verify(mockView, times(3)).add(any(Widget.class));
+    verify(mockView, times(3)).add(any());
     verify(mockView).addTitle(TITLE);
     verify(mockNoResultsDiv).setText(NO_RESULTS);
     verify(mockNoResultsDiv).addStyleName("min-height-400");
@@ -92,8 +92,7 @@ public class ACTDataAccessSubmissionDashboardPresenterTest {
     Callback callback = captor.getValue();
     callback.invoke();
     verify(mockSynAlert).clear();
-    verify(mockDataAccessClient)
-      .getOpenSubmissions(anyString(), any(AsyncCallback.class));
+    verify(mockDataAccessClient).getOpenSubmissions(any(), any());
   }
 
   @Test
@@ -103,7 +102,7 @@ public class ACTDataAccessSubmissionDashboardPresenterTest {
     verify(mockLoadMoreContainer).clear();
     verify(mockSynAlert).clear();
     verify(mockDataAccessClient)
-      .getOpenSubmissions(anyString(), any(AsyncCallback.class));
+      .getOpenSubmissions(any(), any(AsyncCallback.class));
   }
 
   @Test
@@ -112,10 +111,12 @@ public class ACTDataAccessSubmissionDashboardPresenterTest {
     AsyncMockStubber
       .callFailureWith(ex)
       .when(mockDataAccessClient)
-      .getOpenSubmissions(anyString(), any(AsyncCallback.class));
+      .getOpenSubmissions(any(), any());
+
     presenter.loadMore();
+
     verify(mockDataAccessClient)
-      .getOpenSubmissions(anyString(), any(AsyncCallback.class));
+      .getOpenSubmissions(any(), any(AsyncCallback.class));
     InOrder inOrder = inOrder(mockSynAlert);
     inOrder.verify(mockSynAlert).clear();
     inOrder.verify(mockSynAlert).handleException(ex);
@@ -129,10 +130,12 @@ public class ACTDataAccessSubmissionDashboardPresenterTest {
     AsyncMockStubber
       .callSuccessWith(page)
       .when(mockDataAccessClient)
-      .getOpenSubmissions(anyString(), any(AsyncCallback.class));
+      .getOpenSubmissions(any(), any());
+
     presenter.loadMore();
+
     verify(mockDataAccessClient)
-      .getOpenSubmissions(anyString(), any(AsyncCallback.class));
+      .getOpenSubmissions(any(), any(AsyncCallback.class));
     verify(mockSynAlert).clear();
     verify(mockNoResultsDiv).setVisible(true);
     verify(mockLoadMoreContainer, never()).add(any(Widget.class));
@@ -149,17 +152,19 @@ public class ACTDataAccessSubmissionDashboardPresenterTest {
     AsyncMockStubber
       .callSuccessWith(page)
       .when(mockDataAccessClient)
-      .getOpenSubmissions(anyString(), any(AsyncCallback.class));
+      .getOpenSubmissions(any(), any());
     when(mockGinInjector.getOpenSubmissionWidget())
       .thenReturn(mockOpenSubmissionWidget);
+
     presenter.loadMore();
+
     verify(mockDataAccessClient)
-      .getOpenSubmissions(anyString(), any(AsyncCallback.class));
+      .getOpenSubmissions(any(), any(AsyncCallback.class));
     verify(mockSynAlert).clear();
     verify(mockNoResultsDiv, atLeastOnce()).setVisible(false);
     verify(mockGinInjector).getOpenSubmissionWidget();
     verify(mockOpenSubmissionWidget).configure(openSubmission);
-    verify(mockLoadMoreContainer).add(any(Widget.class));
+    verify(mockLoadMoreContainer).add(any());
     verify(mockLoadMoreContainer).setIsMore(true);
   }
 }

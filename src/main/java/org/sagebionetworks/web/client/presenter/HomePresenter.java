@@ -4,17 +4,28 @@ import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.place.Home;
+import org.sagebionetworks.web.client.place.Profile;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.HomeView;
 
 public class HomePresenter extends AbstractActivity implements Presenter<Home> {
 
   private Home place;
   private HomeView view;
+  private AuthenticationController authController;
+  private GlobalApplicationState globalAppState;
 
   @Inject
-  public HomePresenter(HomeView view) {
+  public HomePresenter(
+    HomeView view,
+    AuthenticationController authController,
+    GlobalApplicationState globalAppState
+  ) {
     this.view = view;
+    this.authController = authController;
+    this.globalAppState = globalAppState;
     view.scrollToTop();
   }
 
@@ -29,5 +40,13 @@ public class HomePresenter extends AbstractActivity implements Presenter<Home> {
   public void setPlace(Home place) {
     this.place = place;
     view.refresh();
+    if (
+      authController.isLoggedIn() &&
+      !Home.LOGGED_IN_FORCE_NO_REDIRECT_TOKEN.equals(place.toToken())
+    ) {
+      globalAppState
+        .getPlaceChanger()
+        .goTo(new Profile(Profile.VIEW_PROFILE_TOKEN + "/projects/all"));
+    }
   }
 }

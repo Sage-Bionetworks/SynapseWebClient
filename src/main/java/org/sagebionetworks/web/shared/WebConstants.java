@@ -25,6 +25,15 @@ public class WebConstants {
 
   public static final String INVALID_EMAIL_MESSAGE = "Invalid email address";
 
+  public static final String ONESAGE_PRODUCTION_URL =
+    "https://accounts.synapse.org";
+  public static final String ONESAGE_SYNAPSE_APPID_QUERY_PARAM =
+    "appId=synapse.org";
+  public static final String ONESAGE_ACCOUNT_SETTINGS_URL =
+    ONESAGE_PRODUCTION_URL +
+    "/authenticated/myaccount?" +
+    ONESAGE_SYNAPSE_APPID_QUERY_PARAM;
+
   public static final String DOCS_BASE_URL = "https://help.synapse.org/";
   public static final String DOCS_URL = DOCS_BASE_URL + "docs/";
   public static final String PROVENANCE_API_URL =
@@ -51,9 +60,9 @@ public class WebConstants {
    */
   public static final String VALID_ANNOTATION_NAME_REGEX =
     "^[a-z,A-Z,0-9,_,.]+";
-  // support #!Place:token/with/delimiter, or standard http url
+  // support Place:token/with/delimiter, or standard http url
   public static final String VALID_URL_REGEX =
-    "([#]{1}[!]{1}[a-zA-Z_0-9:\\/]+)|(^((https?)|(ftp)):\\/\\/[-a-zA-Z0-9*+&@#\\/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#\\/%=~_|])";
+    "^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
   public static final String VALID_SFTP_URL_REGEX =
     "^sftp:\\/\\/[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
   // copied from org.sagebionetworks.repo.model.principal.AliasEnum.USER_NAME and USER_EMAIL, added
@@ -85,6 +94,7 @@ public class WebConstants {
   public static final String OPEN_ID_UNKNOWN_USER_ERROR_TOKEN =
     "OpenIDUnknownUser";
   public static final String REDIRECT_TO_LAST_PLACE = "RedirectToLastPlace";
+  public static final String ORCID_NOT_LINKED = "ORCiDNotLinked";
 
   public static final String OPEN_ID_URI = "/Portal/openid";
 
@@ -240,6 +250,7 @@ public class WebConstants {
   public static final String ALIAS_REDIRECTOR_SERVLET = "aliasredirector";
   public static final String ALIAS_PARAM_KEY = "alias";
   public static final String SLACK_SERVLET = "slack";
+  public static final String APPCONFIG_SERVLET = "featureflags";
   public static final String VERSIONS_SERVLET = "versions";
   public static final String FILE_HANDLE_UPLOAD_SERVLET = "filehandle";
   public static final String JSON_LD_CONTENT_SERVLET = "jsonldcontent";

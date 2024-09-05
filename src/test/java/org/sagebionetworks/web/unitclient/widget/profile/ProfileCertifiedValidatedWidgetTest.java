@@ -67,7 +67,7 @@ public class ProfileCertifiedValidatedWidgetTest {
     AsyncMockStubber
       .callFailureWith(new Exception(errorMessage))
       .when(mockSynapseJavascriptClient)
-      .getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
+      .getUserBundle(any(), anyInt(), any());
     widget.loadData();
     verify(mockView).setError(errorMessage);
   }

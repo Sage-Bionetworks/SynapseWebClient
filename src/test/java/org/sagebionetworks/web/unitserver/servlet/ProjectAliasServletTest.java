@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitserver.servlet;
 
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -17,6 +18,7 @@ import org.mockito.ArgumentCaptor;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
+import org.sagebionetworks.client.exceptions.SynapseUnauthorizedException;
 import org.sagebionetworks.repo.model.EntityId;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.server.servlet.ProjectAliasServlet;
@@ -46,8 +48,7 @@ public class ProjectAliasServletTest {
     // unintentionally testing those classes
     mockSynapse = mock(SynapseClient.class);
     mockSynapseProvider = mock(SynapseProvider.class);
-    when(mockSynapseProvider.createNewClient(anyString()))
-      .thenReturn(mockSynapse);
+    when(mockSynapseProvider.createNewClient(any())).thenReturn(mockSynapse);
 
     mockTokenProvider = mock(TokenProvider.class);
 
@@ -78,8 +79,8 @@ public class ProjectAliasServletTest {
     verify(mockSynapse).getEntityIdByAlias(anyString());
     ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
     verify(mockResponse).encodeRedirectURL(captor.capture());
-    assertTrue(captor.getValue().endsWith("/#!Synapse:" + testAliasSynapseId));
-    verify(mockResponse).sendRedirect(anyString());
+    assertTrue(captor.getValue().endsWith("/Synapse:" + testAliasSynapseId));
+    verify(mockResponse).sendRedirect(any());
   }
 
   @Test
@@ -96,9 +97,9 @@ public class ProjectAliasServletTest {
     assertTrue(
       captor
         .getValue()
-        .endsWith("/#!Synapse:" + testAliasSynapseId + testFilesPath)
+        .endsWith("/Synapse:" + testAliasSynapseId + testFilesPath)
     );
-    verify(mockResponse).sendRedirect(anyString());
+    verify(mockResponse).sendRedirect(any());
   }
 
   @Test
@@ -110,6 +111,18 @@ public class ProjectAliasServletTest {
     ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
     verify(mockResponse).sendRedirect(captor.capture());
     String value = captor.getValue();
-    assertTrue(value.contains("#!Error:"));
+    assertTrue(value.contains("Error:"));
+  }
+
+  @Test
+  public void testInvalidAccessToken() throws Exception {
+    when(mockSynapse.getMyProfile())
+      .thenThrow(
+        new SynapseUnauthorizedException(
+          ProjectAliasServlet.INVALID_ACCESS_TOKEN
+        )
+      );
+
+    testHappyCaseRedirect();
   }
 }

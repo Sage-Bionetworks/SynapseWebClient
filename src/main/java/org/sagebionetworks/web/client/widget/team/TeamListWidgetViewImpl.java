@@ -19,7 +19,10 @@ public class TeamListWidgetViewImpl
   implements TeamListWidgetView {
 
   private PortalGinInjector ginInjector;
-  private Map<String, HasNotificationUI> team2Badge = new HashMap<String, HasNotificationUI>();
+  private Map<String, HasNotificationUI> team2Badge = new HashMap<
+    String,
+    HasNotificationUI
+  >();
   Widget emptyHTML;
 
   @Inject

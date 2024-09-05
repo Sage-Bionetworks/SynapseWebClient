@@ -24,7 +24,7 @@ public class PasswordResetSignedTokenPlace extends Place {
     this.token = token;
   }
 
-  @Prefix("!PasswordResetSignedToken")
+  @Prefix("PasswordResetSignedToken")
   public static class Tokenizer
     implements PlaceTokenizer<PasswordResetSignedTokenPlace> {
 

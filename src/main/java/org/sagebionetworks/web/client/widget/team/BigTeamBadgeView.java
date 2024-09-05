@@ -17,5 +17,6 @@ public interface BigTeamBadgeView extends IsWidget, SynapseView {
 
   void setMemberCountWidget(IsWidget widget);
 
+  void setTeamEmailVisible(boolean visible);
   void setTeamEmailAddress(String teamEmail);
 }

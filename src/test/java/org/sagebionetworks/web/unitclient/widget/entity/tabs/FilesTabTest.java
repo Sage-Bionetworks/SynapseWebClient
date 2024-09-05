@@ -13,7 +13,6 @@ import static org.mockito.Mockito.when;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.Widget;
-import java.util.Date;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,7 +20,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
@@ -32,6 +31,7 @@ import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.web.client.FeatureFlagConfig;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -60,7 +60,7 @@ import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.provenance.v2.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.refresh.EntityRefreshAlert;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class FilesTabTest {
 
   @Mock
@@ -171,6 +171,9 @@ public class FilesTabTest {
   @Mock
   CookieProvider mockCookies;
 
+  @Mock
+  FeatureFlagConfig mockFeatureFlagConfig;
+
   FilesTab tab;
   String projectEntityId = "syn9";
   String projectName = "proyecto";
@@ -193,7 +196,7 @@ public class FilesTabTest {
       .thenReturn(mockEntityRefreshAlert);
     when(mockTab.getEntityActionMenu()).thenReturn(mockActionMenuWidget);
 
-    tab = new FilesTab(mockTab, mockPortalGinInjector);
+    tab = new FilesTab(mockTab, mockPortalGinInjector, mockFeatureFlagConfig);
 
     when(mockPortalGinInjector.getFilesTabView()).thenReturn(mockView);
     when(mockPortalGinInjector.getBasicTitleBar()).thenReturn(mockTitleBar);
@@ -247,15 +250,15 @@ public class FilesTabTest {
 
   @Test
   public void testConstruction() {
-    verify(mockView).setTitlebar(any(Widget.class));
-    verify(mockView).setFolderTitlebar(any(Widget.class));
-    verify(mockView).setBreadcrumb(any(Widget.class));
-    verify(mockView).setPreview(any(Widget.class));
-    verify(mockView).setMetadata(any(Widget.class));
-    verify(mockView).setWikiPage(any(Widget.class));
-    verify(mockView).setSynapseAlert(any(Widget.class));
+    verify(mockView).setTitlebar(any());
+    verify(mockView).setFolderTitlebar(any());
+    verify(mockView).setBreadcrumb(any());
+    verify(mockView).setPreview(any());
+    verify(mockView).setMetadata(any());
+    verify(mockView).setWikiPage(any());
+    verify(mockView).setSynapseAlert(any());
     verify(mockBreadcrumb).setLinkClickedHandler(any(CallbackP.class));
-    verify(mockView).setDiscussionThreadListWidget(any(Widget.class));
+    verify(mockView).setDiscussionThreadListWidget(any());
     ArgumentCaptor<CallbackP> captor = ArgumentCaptor.forClass(CallbackP.class);
     verify(mockDiscussionThreadListWidget)
       .setThreadIdClickedCallback(captor.capture());
@@ -361,8 +364,7 @@ public class FilesTabTest {
     verify(mockEntityMetadata)
       .configure(mockEntityBundle, version, mockActionMenuWidget);
 
-    verify(mockBreadcrumb)
-      .configure(any(EntityPath.class), eq(EntityArea.FILES));
+    verify(mockBreadcrumb).configure(any(), eq(EntityArea.FILES));
 
     verify(mockView).setProvenanceVisible(true);
     verify(mockModifiedCreatedBy).configure(fileEntityId, version);
@@ -371,7 +373,7 @@ public class FilesTabTest {
     verify(mockView, times(2)).setFileBrowserVisible(false);
     verify(mockPortalGinInjector).getProvenanceRenderer();
 
-    verify(mockView).setRefreshAlert(any(Widget.class));
+    verify(mockView).setRefreshAlert(any());
     verify(mockView).setDiscussionText(fileName);
     verify(mockEntityRefreshAlert).configure(fileEntityId);
 
@@ -410,7 +412,7 @@ public class FilesTabTest {
     verify(mockView).setWikiPageWidgetVisible(false);
     verify(mockView).setWikiPageWidgetVisible(true);
 
-    verify(mockView).setRefreshAlert(any(Widget.class));
+    verify(mockView).setRefreshAlert(any());
     verify(mockEntityRefreshAlert).configure(folderEntityId);
 
     verify(mockProjectTitleBar, never()).configure(mockEntityBundle);
@@ -418,8 +420,7 @@ public class FilesTabTest {
     verify(mockEntityMetadata)
       .configure(mockEntityBundle, version, mockActionMenuWidget);
 
-    verify(mockBreadcrumb)
-      .configure(any(EntityPath.class), eq(EntityArea.FILES));
+    verify(mockBreadcrumb).configure(any(), eq(EntityArea.FILES));
 
     verify(mockView, times(2)).setProvenanceVisible(false);
     verify(mockModifiedCreatedBy).configure(folderEntityId, null);

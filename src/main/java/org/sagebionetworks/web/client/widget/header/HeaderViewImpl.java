@@ -20,14 +20,17 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
+import org.sagebionetworks.web.client.jsinterop.CookieNotificationProps;
+import org.sagebionetworks.web.client.jsinterop.EmptyProps;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.jsinterop.SynapseNavDrawerProps;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.widget.FullWidthAlert;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.OrientationBanner;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 
 public class HeaderViewImpl extends Composite implements HeaderView {
 
@@ -37,7 +40,13 @@ public class HeaderViewImpl extends Composite implements HeaderView {
   Div header;
 
   @UiField
-  FullWidthAlert cookieNotificationAlert;
+  Div donationBannerContainer;
+
+  @UiField
+  ReactComponent cookieNotificationContainer;
+
+  @UiField
+  ReactComponent googleAnalyticsContainer;
 
   @UiField
   FullWidthAlert nihNotificationAlert;
@@ -55,7 +64,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
   FocusPanel portalLogoFocusPanel;
 
   @UiField
-  ReactComponentDiv synapseNavDrawerContainer;
+  ReactComponent synapseNavDrawerContainer;
 
   @UiField
   Alert stagingAlert;
@@ -72,31 +81,70 @@ public class HeaderViewImpl extends Composite implements HeaderView {
   public HeaderViewImpl(
     Binder binder,
     SynapseReactClientFullContextPropsProvider propsProvider,
-    PortalGinInjector ginInjector
+    PortalGinInjector ginInjector,
+    OrientationBanner donationBanner
   ) {
     this.initWidget(binder.createAndBindUi(this));
     this.ginInjector = ginInjector;
     this.propsProvider = propsProvider;
-    cookieNotificationAlert.addPrimaryCTAClickHandler(event -> {
-      presenter.onCookieNotificationDismissed();
-    });
     nihNotificationAlert.setOnClose(() -> {
       presenter.onNIHNotificationDismissed();
     });
 
+    donationBanner.configure(
+      "Donate",
+      "Support Open Science and Radical Collaboration with Sage Bionetworks",
+      "Join us as we advance collaborative biomedical research tackling today's most pressing health challenges. Your contribution is crucial to breaking down barriers and accelerating the creation of transformative treatments and technologies. Thank you for being a part of this vital mission and helping us drive innovation forward.",
+      "Donate to Sage",
+      event -> {
+        Window.open("https://sagebionetworks.org/donate", "_blank", "");
+      },
+      null,
+      null
+    );
+    donationBannerContainer.add(donationBanner.asWidget());
     initClickHandlers();
     clear();
     rerenderNavBar();
+
+    CookieNotificationProps props = CookieNotificationProps.create(prefs -> {
+      rerenderGoogleAnalytics();
+    });
+    ReactElement component = React.createElementWithSynapseContext(
+      SRC.SynapseComponents.CookiesNotification,
+      props,
+      propsProvider.getJsInteropContextProps()
+    );
+    cookieNotificationContainer.render(component);
+
+    rerenderGoogleAnalytics();
   }
 
   @Override
   public void clear() {}
 
+  private void rerenderGoogleAnalytics() {
+    EmptyProps props = EmptyProps.create();
+    ReactElement component = React.createElementWithSynapseContext(
+      SRC.SynapseComponents.GoogleAnalytics,
+      props,
+      propsProvider.getJsInteropContextProps()
+    );
+    googleAnalyticsContainer.render(component);
+  }
+
   public void rerenderNavBar() {
-    SynapseNavDrawerProps props = SynapseNavDrawerProps.create(() -> {
-      ginInjector.getAuthenticationController().logoutUser();
-    });
-    ReactNode component = React.createElementWithSynapseContext(
+    SynapseNavDrawerProps props = SynapseNavDrawerProps.create(
+      () -> {
+        ginInjector.getAuthenticationController().logoutUser();
+      },
+      href -> {
+        GlobalApplicationState globalAppState =
+          ginInjector.getGlobalApplicationState();
+        globalAppState.handleRelativePathClick(href);
+      }
+    );
+    ReactElement component = React.createElementWithSynapseContext(
       SRC.SynapseComponents.SynapseNavDrawer,
       props,
       propsProvider.getJsInteropContextProps()
@@ -134,7 +182,8 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 
   @Override
   public void refresh() {
-    GlobalApplicationState globalAppState = ginInjector.getGlobalApplicationState();
+    GlobalApplicationState globalAppState =
+      ginInjector.getGlobalApplicationState();
     if (
       globalAppState.getCurrentPlace() == null ||
       globalAppState.getCurrentPlace() instanceof Home ||
@@ -157,11 +206,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
   @Override
   public void setStagingAlertVisible(boolean visible) {
     stagingAlert.setVisible(visible);
-  }
-
-  @Override
-  public void setCookieNotificationVisible(boolean visible) {
-    cookieNotificationAlert.setVisible(visible);
   }
 
   /** Event binder code **/
@@ -209,5 +253,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
   @Override
   public void setNIHAlertVisible(boolean visible) {
     nihNotificationAlert.setVisible(visible);
+    donationBannerContainer.setVisible(!visible);
   }
 }

@@ -11,8 +11,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.client.exceptions.SynapseUnauthorizedException;
 import org.sagebionetworks.repo.model.EntityId;
-import org.sagebionetworks.web.server.StackEndpoints;
+import org.sagebionetworks.web.server.servlet.filter.HtmlInjectionFilter;
 import org.sagebionetworks.web.shared.WebConstants;
 
 /**
@@ -23,9 +24,12 @@ import org.sagebionetworks.web.shared.WebConstants;
  */
 public class ProjectAliasServlet extends HttpServlet {
 
+  public static final String INVALID_ACCESS_TOKEN = "Invalid access token";
+
   private static final long serialVersionUID = 1L;
 
-  protected static final ThreadLocal<HttpServletRequest> perThreadRequest = new ThreadLocal<HttpServletRequest>();
+  protected static final ThreadLocal<HttpServletRequest> perThreadRequest =
+    new ThreadLocal<HttpServletRequest>();
 
   private SynapseProvider synapseProvider = new SynapseProviderImpl();
   private TokenProvider tokenProvider = () ->
@@ -89,9 +93,16 @@ public class ProjectAliasServlet extends HttpServlet {
       perThreadRequest.set(httpRqst);
       String path = requestURL.getPath().substring(1);
       String[] tokens = path.split("/");
-      EntityId entityId = client.getEntityIdByAlias(tokens[0]);
+      String alias = tokens[0];
+
+      // is alias a known GWT place name?  If so, do nothing
+      if (HtmlInjectionFilter.isGWTPlace(alias)) {
+        return;
+      }
+
+      EntityId entityId = client.getEntityIdByAlias(alias);
       StringBuilder newPathBuilder = new StringBuilder();
-      newPathBuilder.append("/#!Synapse:");
+      newPathBuilder.append("/Synapse:");
       newPathBuilder.append(entityId.getId());
       for (int i = 1; i < tokens.length; i++) {
         newPathBuilder.append("/");
@@ -126,12 +137,23 @@ public class ProjectAliasServlet extends HttpServlet {
    * Create a new Synapse client.
    *
    * @return
+   * @throws SynapseException
    */
-  private SynapseClient createNewClient(String accessToken) {
+  private SynapseClient createNewClient(String accessToken)
+    throws SynapseException {
     SynapseClient client = synapseProvider.createNewClient(
       requestHostProvider.getRequestHost()
     );
     if (accessToken != null) client.setBearerAuthorizationToken(accessToken);
+    try {
+      // SWC-6859: test the bearer auth token.  If invalid, fall back to an unauthenticated client
+      client.getMyProfile();
+    } catch (SynapseUnauthorizedException e) {
+      if (e.getMessage().contains(INVALID_ACCESS_TOKEN)) {
+        client =
+          synapseProvider.createNewClient(requestHostProvider.getRequestHost());
+      }
+    }
     return client;
   }
 }

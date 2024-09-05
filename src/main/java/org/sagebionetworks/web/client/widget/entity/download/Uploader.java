@@ -29,6 +29,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -62,8 +63,8 @@ public class Uploader
     SynapseWidgetPresenter,
     ProgressingFileUploadHandler {
 
-  public static final long OLD_BROWSER_MAX_SIZE = (long) ClientProperties.MB *
-  5; // 5MB
+  public static final long OLD_BROWSER_MAX_SIZE =
+    (long) ClientProperties.MB * 5; // 5MB
   private UploaderView view;
   private UploadSuccessHandler successHandler;
   private CancelHandler cancelHandler;
@@ -76,7 +77,7 @@ public class Uploader
   private SynapseJSNIUtils synapseJsniUtils;
   private GlobalApplicationState globalAppState;
   private GWTWrapper gwt;
-  MultipartUploader multiPartUploader;
+  private MultipartUploader multiPartUploader;
   AuthenticationController authenticationController;
 
   private String[] fileNames;
@@ -107,7 +108,8 @@ public class Uploader
     S3DirectUploader s3DirectUploader,
     SynapseJavascriptClient jsClient,
     SynapseProperties synapseProperties,
-    EventBus eventBus
+    EventBus eventBus,
+    PortalGinInjector ginInjector
   ) {
     this.view = view;
     this.synapseClient = synapseClient;
@@ -261,9 +263,8 @@ public class Uploader
                 uploadDestinations.get(0).getStorageLocationId();
               updateUploadBannerView(uploadDestinations.get(0));
             } else if (
-              uploadDestinations.get(
-                0
-              ) instanceof ExternalGoogleCloudUploadDestination
+              uploadDestinations.get(0) instanceof
+              ExternalGoogleCloudUploadDestination
             ) {
               currentUploadType = UploadType.GOOGLECLOUDSTORAGE;
               storageLocationId =
@@ -301,9 +302,8 @@ public class Uploader
               updateUploadBannerView(externalUploadDestination);
               // direct to s3(-like) storage
             } else if (
-              uploadDestinations.get(
-                0
-              ) instanceof ExternalObjectStoreUploadDestination
+              uploadDestinations.get(0) instanceof
+              ExternalObjectStoreUploadDestination
             ) {
               ExternalObjectStoreUploadDestination externalUploadDestination =
                 (ExternalObjectStoreUploadDestination) uploadDestinations.get(
@@ -669,14 +669,15 @@ public class Uploader
         view
       );
     } else {
-      this.multiPartUploader.uploadFile(
-          fileName,
-          contentType,
-          currentFile,
-          this,
-          storageLocationId,
-          view
-        );
+      // SWC-6765: Uses react implementation for uploading a file in all cases
+      multiPartUploader.uploadFile(
+        fileName,
+        contentType,
+        currentFile,
+        this,
+        storageLocationId,
+        view
+      );
     }
   }
 
@@ -700,7 +701,6 @@ public class Uploader
 
   private void postUpload() {
     if (currIndex + 1 == fileNames.length) {
-      // to new file handle id, or create new file entity with this file handle id
       view.hideLoading();
       refreshAfterSuccessfulUpload(entityId);
     } else {
@@ -713,6 +713,7 @@ public class Uploader
     if (fileHandleId == null) {
       postUpload();
     } else if (entityId != null || currentFileParentEntityId != null) {
+      // to new file handle id, or create new file entity with this file handle id
       synapseClient.setFileEntityFileHandle(
         fileHandleId,
         entityId,
@@ -721,6 +722,7 @@ public class Uploader
           @Override
           public void onSuccess(String entityId) {
             fileHasBeenUploaded = true;
+            Uploader.this.entityId = entityId;
             postUpload();
           }
 
@@ -997,7 +999,12 @@ public class Uploader
   }
 
   private void uploadSuccess() {
-    view.showInfo(DisplayConstants.TEXT_UPLOAD_SUCCESS);
+    int fileCount = fileNames.length;
+    if (fileCount == 1) {
+      view.showSingleFileUploaded(entityId);
+    } else {
+      view.showInfo(DisplayConstants.TEXT_UPLOAD_MULTIPLE_FILES_SUCCESS);
+    }
     view.clear();
     view.resetToInitialState();
     resetUploadProgress();
@@ -1067,8 +1074,7 @@ public class Uploader
   ) {
     double percentPerFile = 1.0 / (double) numberFiles;
     double percentOfAllFiles =
-      percentPerFile *
-      percentOfCurrentFile +
+      percentPerFile * percentOfCurrentFile +
       (percentPerFile * currentFileIndex);
     return percentOfAllFiles;
   }

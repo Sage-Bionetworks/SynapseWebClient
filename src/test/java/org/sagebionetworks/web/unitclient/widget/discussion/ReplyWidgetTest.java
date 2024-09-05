@@ -140,9 +140,9 @@ public class ReplyWidgetTest {
   @Test
   public void testConstructor() {
     verify(mockView).setPresenter(replyWidget);
-    verify(mockView).setAuthor(any(Widget.class));
-    verify(mockView).setAlert(any(Widget.class));
-    verify(mockView).setEditReplyModal(any(Widget.class));
+    verify(mockView).setAuthor(any());
+    verify(mockView).setAlert(any());
+    verify(mockView).setEditReplyModal(any());
     verify(mockCopyTextModal).setTitle(ReplyWidget.REPLY_URL);
   }
 
@@ -396,11 +396,11 @@ public class ReplyWidgetTest {
     AsyncMockStubber
       .callSuccessWith(url)
       .when(mockSynapseJavascriptClient)
-      .getReplyUrl(anyString(), any(AsyncCallback.class));
+      .getReplyUrl(any(), any());
     RequestBuilderMockStubber
       .callOnError(null, new Exception())
       .when(mockRequestBuilder)
-      .sendRequest(anyString(), any(RequestCallback.class));
+      .sendRequest(any(), any());
     replyWidget.configure(
       bundle,
       canModerate,
@@ -415,7 +415,7 @@ public class ReplyWidgetTest {
         WebConstants.CONTENT_TYPE,
         WebConstants.TEXT_PLAIN_CHARSET_UTF8
       );
-    verify(mockSynAlert).handleException(any(Throwable.class));
+    verify(mockSynAlert).handleException(any());
     verify(mockMarkdownWidget, never()).configure(anyString());
     verify(mockView).setDeleteIconVisibility(false);
     verify(mockView).setLoadingMessageVisible(true);
@@ -445,11 +445,11 @@ public class ReplyWidgetTest {
     AsyncMockStubber
       .callSuccessWith(url)
       .when(mockSynapseJavascriptClient)
-      .getReplyUrl(anyString(), any(AsyncCallback.class));
+      .getReplyUrl(any(), any());
     RequestBuilderMockStubber
       .callOnResponseReceived(null, mockResponse)
       .when(mockRequestBuilder)
-      .sendRequest(anyString(), any(RequestCallback.class));
+      .sendRequest(any(), any());
     replyWidget.configure(
       bundle,
       canModerate,
@@ -458,7 +458,7 @@ public class ReplyWidgetTest {
       isThreadDeleted
     );
     verify(mockSynAlert).clear();
-    verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), anyString());
+    verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), any());
     verify(mockRequestBuilder)
       .setHeader(
         WebConstants.CONTENT_TYPE,
@@ -728,7 +728,7 @@ public class ReplyWidgetTest {
 
     verify(mockCopyTextModal)
       .setText(
-        "https://www.synapse.org/#!Synapse:syn007/discussion/threadId=321&replyId=123"
+        "https://www.synapse.org/Synapse:syn007/discussion/threadId=321&replyId=123"
       );
     verify(mockCopyTextModal).show();
   }
@@ -764,9 +764,7 @@ public class ReplyWidgetTest {
     replyWidget.onClickReplyLink();
 
     verify(mockCopyTextModal)
-      .setText(
-        "https://www.synapse.org/#!SynapseForum:threadId=321&replyId=123"
-      );
+      .setText("https://www.synapse.org/SynapseForum:threadId=321&replyId=123");
     verify(mockCopyTextModal).show();
   }
 

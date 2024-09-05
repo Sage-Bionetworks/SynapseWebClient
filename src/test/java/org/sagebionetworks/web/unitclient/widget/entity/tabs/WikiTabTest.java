@@ -15,7 +15,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -29,7 +29,7 @@ import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.entity.tabs.WikiTab;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class WikiTabTest {
 
   @Mock
@@ -127,7 +127,8 @@ public class WikiTabTest {
 
     verify(mockWikiPageWidget)
       .setWikiReloadHandler(mockWikiReloadHandlerCaptor.capture());
-    CallbackP<String> mockWikiReloadHandler = mockWikiReloadHandlerCaptor.getValue();
+    CallbackP<String> mockWikiReloadHandler =
+      mockWikiReloadHandlerCaptor.getValue();
 
     // simulate reload of a different wiki page ID
     String newSubWikiPageId = "10";

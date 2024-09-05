@@ -111,10 +111,8 @@ public class ShinySiteWidget implements WidgetRendererPresenter {
       String hostName = jsniUtils.getHostname(siteUrl.toLowerCase());
       if (
         hostName != null &&
-        (
-          hostName.endsWith(".synapse.org") ||
-          hostName.endsWith(".sagebase.org")
-        )
+        (hostName.endsWith(".synapse.org") ||
+          hostName.endsWith(".sagebase.org"))
       ) {
         return true;
       }

@@ -1,4 +1,4 @@
-import { Page, expect, test } from '@playwright/test'
+import { Page, expect } from '@playwright/test'
 import path from 'path'
 import { defaultExpectTimeout } from '../playwright.config'
 import { testAuth } from './fixtures/authenticatedUserPages'
@@ -52,12 +52,12 @@ const expectNoAccessPage = async (
   expectTimeout: number = defaultExpectTimeout,
 ) => {
   await expect(
-    page.getByRole('heading', {
-      name: 'Sorry, no access to this page.',
-    }),
+    page.getByText('You don’t have permission to view this.'),
   ).toBeVisible({ timeout: expectTimeout })
   await expect(
-    page.getByText('You are not authorized to access the page requested.'),
+    page.getByText(
+      'This account has not been granted access to view this resource.',
+    ),
   ).toBeVisible({ timeout: expectTimeout })
 }
 
@@ -178,13 +178,13 @@ const getFileMD5 = async (page: Page) => {
 let userProject: Project
 const fileHandleIds: string[] = []
 
-test.describe('Files', () => {
+testAuth.describe('Files', () => {
   testAuth.beforeAll(async ({ browser, storageStatePaths }) => {
     userProject = await setupProject(browser, 'swc-e2e-user', storageStatePaths)
   })
 
   testAuth.afterAll(async ({ browser }) => {
-    test.slow()
+    testAuth.slow()
     if (userProject.id) {
       await teardownProjectsAndFileHandles(
         browser,
@@ -201,7 +201,7 @@ test.describe('Files', () => {
       // when there is a test timeout. Since test timeouts are expensive,
       // Playwright recommends skipping the test entirely with test.fixme.
       // See: https://github.com/microsoft/playwright/issues/16317
-      test.fixme(
+      testAuth.fixme(
         browserName === 'webkit' && !!process.env.CI,
         `Very slow in webkit in CI only (passes after 6min in macos-latest runner, 
           times out after 10min in Sage ubuntu-22.04-4core-16GBRAM-150GBSSD runner). 
@@ -345,7 +345,7 @@ test.describe('Files', () => {
   )
 
   testAuth('should create and delete a file', async ({ userPage }) => {
-    test.slow()
+    testAuth.slow()
 
     const fileName = 'test_file.csv'
     const filePath = `data/${fileName}`
@@ -356,7 +356,10 @@ test.describe('Files', () => {
       await expect(
         userPage.getByRole('heading', { name: userProject.name }),
       ).toBeVisible()
-      await userPage.getByRole('link', { name: 'Files', exact: true }).click()
+      await userPage
+        .getByRole('link', { name: 'Files', exact: true })
+        .first()
+        .click()
     })
 
     await testAuth.step('upload file', async () => {
@@ -474,7 +477,7 @@ test.describe('Files', () => {
         ).toBeVisible()
         await expect(
           userPage.getByText(
-            `Are you sure you want to delete File "${fileName}"?`,
+            `Are you sure you want to delete File ${fileName}?`,
           ),
         ).toBeVisible()
         await expect(
@@ -519,9 +522,10 @@ test.describe('Files', () => {
       })
 
       await testAuth.step('remove file from trash can', async () => {
-        const fileCheckbox = userPage.getByRole('checkbox', {
-          name: `Select ${fileEntityId}`,
-        })
+        const fileCheckbox = userPage
+          .getByRole('row')
+          .filter({ hasText: fileEntityId })
+          .getByRole('checkbox')
         await expect(fileCheckbox).not.toBeChecked()
 
         // Currently programmatically dispatching the click event
@@ -540,6 +544,7 @@ test.describe('Files', () => {
           userPage.getByText('Delete selected items from your Trash?'),
         ).toBeVisible()
         await userPage.getByRole('button', { name: 'Delete' }).click()
+        await expect(userPage.locator('.spinner:visible')).toHaveCount(0)
       })
 
       await testAuth.step(

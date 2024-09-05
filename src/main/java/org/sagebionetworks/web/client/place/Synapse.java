@@ -10,7 +10,7 @@ public class Synapse extends Place {
 
   public static final String DOT_REGEX = "\\.";
   public static final String DELIMITER = "/";
-  public static final String SYNAPSE_ENTITY_PREFIX = "#!Synapse:";
+  public static final String SYNAPSE_ENTITY_PREFIX = "Synapse:";
   public static final String VERSION = "version";
 
   private String synapsePlaceToken;
@@ -141,7 +141,7 @@ public class Synapse extends Place {
     calculateToken(entityId, versionNumber, area, areaToken);
   }
 
-  @Prefix("!Synapse")
+  @Prefix("Synapse")
   public static class Tokenizer implements PlaceTokenizer<Synapse> {
 
     @Override
@@ -171,6 +171,7 @@ public class Synapse extends Place {
     PROJECTS,
     CHALLENGES,
     TEAMS,
+    /* The Settings area now automatically redirects to OneSage */
     SETTINGS,
   }
 
@@ -179,8 +180,7 @@ public class Synapse extends Place {
     final int prime = 31;
     int result = 1;
     result =
-      prime *
-      result +
+      prime * result +
       ((synapsePlaceToken == null) ? 0 : synapsePlaceToken.hashCode());
     return result;
   }
@@ -208,6 +208,6 @@ public class Synapse extends Place {
     if (dotNotation == null) {
       return null;
     }
-    return SYNAPSE_ENTITY_PREFIX + dotNotation.toLowerCase();
+    return "/" + SYNAPSE_ENTITY_PREFIX + dotNotation.toLowerCase();
   }
 }

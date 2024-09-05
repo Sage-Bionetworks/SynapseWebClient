@@ -27,6 +27,7 @@ public class DefaultActionConfigurationUtil {
         Action.EDIT_PROJECT_METADATA,
         "Edit Project Metadata"
       ),
+      ActionConfiguration.create(Action.PROJECT_HELP, "Project Support"),
       ActionConfiguration.create(
         Action.SHOW_PROJECT_STATS,
         "Show Project Statistics"
@@ -142,6 +143,7 @@ public class DefaultActionConfigurationUtil {
         "Add to Download Cart"
       ),
       ActionConfiguration.create(Action.DOWNLOAD_FILE, "Download File"),
+      ActionConfiguration.create(Action.OPEN_EXTERNAL_FILE, "Open Link"),
       ActionConfiguration.create(Action.REPORT_VIOLATION, "Report Violation")
     );
     Map<Action, ActionConfiguration> configurationMap = new EnumMap<>(
@@ -153,7 +155,10 @@ public class DefaultActionConfigurationUtil {
     return configurationMap;
   }
 
-  public static Map<Action, ActionConfiguration> getDefaultActionConfiguration() {
+  public static Map<
+    Action,
+    ActionConfiguration
+  > getDefaultActionConfiguration() {
     return createMap();
   }
 }

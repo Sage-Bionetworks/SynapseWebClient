@@ -57,7 +57,7 @@ public class GovernanceServiceHelperTest {
     );
     verify(mockSynapseClient)
       .createAccessApproval(any(AccessApproval.class), eq(mockCallback));
-    verify(mockCallback).onSuccess(any(AccessApproval.class));
+    verify(mockCallback).onSuccess(any());
   }
 
   @Test
@@ -65,7 +65,8 @@ public class GovernanceServiceHelperTest {
     final String principalId = "101";
     final Long accessRequirementId = 102L;
 
-    PostMessageContentAccessRequirement ar = new PostMessageContentAccessRequirement();
+    PostMessageContentAccessRequirement ar =
+      new PostMessageContentAccessRequirement();
     ar.setId(accessRequirementId);
 
     // verify get access requirement text now just returns the url
@@ -82,7 +83,7 @@ public class GovernanceServiceHelperTest {
     // also check the captured entity wrapper to verify the approval object
     verify(mockSynapseClient)
       .createAccessApproval(any(AccessApproval.class), eq(mockCallback));
-    verify(mockCallback).onSuccess(any(AccessApproval.class));
+    verify(mockCallback).onSuccess(any());
 
     AccessApproval capturedWrapper = captor.getValue();
     assertEquals(accessRequirementId, capturedWrapper.getRequirementId());

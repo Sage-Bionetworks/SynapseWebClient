@@ -25,7 +25,7 @@
           </b:Tooltip>
         </t:TableData>
         <t:TableData width="20px" ui:field="iconTableData">
-          <w:EntityTypeIcon ui:field="icon" type="file" />
+          <w:EntityTypeIconImpl ui:field="icon" type="file" />
         </t:TableData>
         <t:TableData addStyleNames="maxWidth50px overflow-x-hidden ">
           <bh:Div addStyleNames="margin-right-5">

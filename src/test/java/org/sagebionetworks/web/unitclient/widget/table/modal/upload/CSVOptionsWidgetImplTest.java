@@ -9,7 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.table.CsvTableDescriptor;
 import org.sagebionetworks.repo.model.table.UploadToTablePreviewRequest;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -18,7 +18,7 @@ import org.sagebionetworks.web.client.widget.table.modal.upload.CSVOptionsWidget
 import org.sagebionetworks.web.client.widget.table.modal.upload.Delimiter;
 import org.sagebionetworks.web.client.widget.table.modal.upload.EscapeCharacter;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class CSVOptionsWidgetImplTest {
 
   @Mock

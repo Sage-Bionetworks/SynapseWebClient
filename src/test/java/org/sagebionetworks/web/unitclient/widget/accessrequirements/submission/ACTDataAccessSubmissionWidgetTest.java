@@ -131,7 +131,7 @@ public class ACTDataAccessSubmissionWidgetTest {
     when(mockResearchProjectSnapshot.getIntendedDataUseStatement())
       .thenReturn(INTENDED_DATA_USE);
     when(mockResearchProjectSnapshot.getProjectLead()).thenReturn(PROJECT_LEAD);
-    when(mockDateTimeUtils.getDateTimeString(any(Date.class)))
+    when(mockDateTimeUtils.getDateTimeString(any()))
       .thenReturn(SMALL_DATE_STRING);
 
     widget =
@@ -151,16 +151,11 @@ public class ACTDataAccessSubmissionWidgetTest {
     AsyncMockStubber
       .callSuccessWith(mockDataAccessSubmission)
       .when(mockClient)
-      .updateDataAccessSubmissionState(
-        anyString(),
-        any(SubmissionState.class),
-        anyString(),
-        any(AsyncCallback.class)
-      );
+      .updateDataAccessSubmissionState(any(), any(), any(), any());
     AsyncMockStubber
       .callSuccessWith(mockUserProfile)
       .when(mockUserProfileAsyncHandler)
-      .getUserProfile(anyString(), any(AsyncCallback.class));
+      .getUserProfile(any(), any());
   }
 
   @Test
@@ -216,7 +211,7 @@ public class ACTDataAccessSubmissionWidgetTest {
     verify(mockUserBadge).configure(change1, mockUserProfile);
     verify(mockUserBadge).configure(change2, mockUserProfile);
 
-    verify(mockView, times(2)).addAccessors(any(IsWidget.class), anyString());
+    verify(mockView, times(2)).addAccessors(any(), any());
     // verify other documents
     verify(mockFileHandleList).clear();
     verify(mockFileHandleList, times(2)).addFileLink(fhaCaptor.capture());
@@ -285,7 +280,7 @@ public class ACTDataAccessSubmissionWidgetTest {
     verify(mockView).clearAccessors();
     verify(mockGinInjector).getUserBadgeItem();
     verify(mockUserBadge).configure(change1, mockUserProfile);
-    verify(mockView).addAccessors(any(IsWidget.class), anyString());
+    verify(mockView).addAccessors(any(), any());
     // verify view
     verify(mockView).setIsRenewal(true);
     verify(mockView).setRenewalColumnsVisible(true);

@@ -5,11 +5,6 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.web.shared.WebConstants.ANONYMOUS;
-import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_COLLECTOR_URL;
-import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_DESCRIPTION_PART_1;
-import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_PRIORITY;
-import static org.sagebionetworks.web.shared.WebConstants.REVIEW_ABUSIVE_CONTENT_REQUEST_COMPONENT_ID;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import java.util.Collections;
@@ -17,9 +12,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -27,10 +21,9 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.footer.FooterView;
 import org.sagebionetworks.web.client.widget.footer.VersionState;
-import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class FooterTest {
 
   Footer footer;
@@ -75,7 +68,7 @@ public class FooterTest {
     AsyncMockStubber
       .callSuccessWith(versionState)
       .when(mockGlobalAppState)
-      .checkVersionCompatibility(any(AsyncCallback.class));
+      .checkVersionCompatibility(any());
     verify(mockView).setPresenter(footer);
     when(mockUserProfile.getEmails())
       .thenReturn(Collections.singletonList(EMAIL));
@@ -99,7 +92,7 @@ public class FooterTest {
     AsyncMockStubber
       .callSuccessWith(versionState)
       .when(mockGlobalAppState)
-      .checkVersionCompatibility(any(AsyncCallback.class));
+      .checkVersionCompatibility(any());
     footer =
       new Footer(
         mockView,
@@ -108,56 +101,12 @@ public class FooterTest {
         mockGwt,
         mockJsniUtils
       );
-    verify(mockView)
-      .setVersion(eq(Footer.UNKNOWN), eq(Footer.UNKNOWN), anyString());
+    verify(mockView).setVersion(eq(Footer.UNKNOWN), eq(Footer.UNKNOWN), any());
   }
 
   @Test
   public void testAsWidget() {
     footer.asWidget();
     verify(mockView).asWidget();
-  }
-
-  @Test
-  public void testOnReportAbuse() {
-    when(mockAuthController.getCurrentUserProfile())
-      .thenReturn(mockUserProfile);
-    footer.onReportAbuseClicked();
-    verify(mockJsniUtils)
-      .showJiraIssueCollector(
-        "", // summary
-        FLAG_ISSUE_DESCRIPTION_PART_1 +
-        CURRENT_URL +
-        WebConstants.FLAG_ISSUE_DESCRIPTION_PART_2, // description
-        FLAG_ISSUE_COLLECTOR_URL,
-        OWNER_ID,
-        DisplayUtils.getDisplayName(FIRST_NAME, LAST_NAME, USERNAME),
-        EMAIL,
-        null, // Synapse data object ID
-        REVIEW_ABUSIVE_CONTENT_REQUEST_COMPONENT_ID,
-        null, // Access requirement ID
-        FLAG_ISSUE_PRIORITY
-      );
-  }
-
-  @Test
-  public void testOnReportAbuseAnonymous() {
-    // current user profile is null
-    footer.onReportAbuseClicked();
-    verify(mockJsniUtils)
-      .showJiraIssueCollector(
-        "", // summary
-        FLAG_ISSUE_DESCRIPTION_PART_1 +
-        CURRENT_URL +
-        WebConstants.FLAG_ISSUE_DESCRIPTION_PART_2, // description
-        FLAG_ISSUE_COLLECTOR_URL,
-        ANONYMOUS,
-        ANONYMOUS,
-        ANONYMOUS,
-        null, // Synapse data object ID
-        REVIEW_ABUSIVE_CONTENT_REQUEST_COMPONENT_ID,
-        null, // Access requirement ID
-        FLAG_ISSUE_PRIORITY
-      );
   }
 }

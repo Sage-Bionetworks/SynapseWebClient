@@ -17,6 +17,7 @@ import org.sagebionetworks.repo.model.table.SubmissionView;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.VirtualTable;
+import org.sagebionetworks.web.client.widget.EntityTypeIconImpl;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 
 public class EntityTypeUtils {
@@ -122,7 +123,7 @@ public class EntityTypeUtils {
   }
 
   /**
-   * @deprecated use {@link org.sagebionetworks.web.client.widget.EntityTypeIcon}
+   * @deprecated use {@link EntityTypeIconImpl}
    * @param className
    * @return
    */

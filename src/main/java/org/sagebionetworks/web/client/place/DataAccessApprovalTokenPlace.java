@@ -16,7 +16,7 @@ public class DataAccessApprovalTokenPlace extends Place {
     return token;
   }
 
-  @Prefix("!DataAccessApprovalToken")
+  @Prefix("DataAccessApprovalToken")
   public static class Tokenizer
     implements PlaceTokenizer<DataAccessApprovalTokenPlace> {
 

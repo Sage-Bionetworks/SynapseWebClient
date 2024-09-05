@@ -372,13 +372,13 @@ public class TableModelTestUtils {
       case FILEHANDLEID:
         return "" + (i + 5000 + (isUpdate ? 10000 : 0));
       case BOOLEAN:
-        if (i % 2 > 0 ^ isUpdate) {
+        if ((i % 2 > 0) ^ isUpdate) {
           return Boolean.TRUE.toString();
         } else {
           return Boolean.FALSE.toString();
         }
       case BOOLEAN_LIST:
-        if (i % 2 > 0 ^ isUpdate) {
+        if ((i % 2 > 0) ^ isUpdate) {
           return Boolean.TRUE.toString() + "," + Boolean.FALSE.toString();
         } else {
           return Boolean.FALSE.toString() + "," + Boolean.TRUE.toString();
@@ -404,7 +404,7 @@ public class TableModelTestUtils {
       case USERID_LIST:
         return "111, 112" + i;
       case JSON:
-        if (i % 2 > 0 ^ isUpdate) {
+        if ((i % 2 > 0) ^ isUpdate) {
           return "{\"foo\": \"bar\", \"i\": " + i + "}";
         } else {
           return "[\"foo\", \"bar\", " + i + "]";

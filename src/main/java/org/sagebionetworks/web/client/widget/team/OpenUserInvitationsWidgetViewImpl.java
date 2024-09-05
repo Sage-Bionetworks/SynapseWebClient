@@ -93,7 +93,8 @@ public class OpenUserInvitationsWidgetViewImpl
     String message,
     String createdOn
   ) {
-    OpenUserInvitationWidget openUserInvitationWidget = ginInjector.getOpenUserInvitationWidget();
+    OpenUserInvitationWidget openUserInvitationWidget =
+      ginInjector.getOpenUserInvitationWidget();
 
     boolean isInviteeEmail = inviteeEmail != null;
     openUserInvitationWidget.badgeTableData.setVisible(!isInviteeEmail);

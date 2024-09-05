@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.HTMLPanel;
@@ -12,7 +11,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
-import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -20,8 +18,6 @@ import org.sagebionetworks.web.client.MarkdownIt;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -41,12 +37,10 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
   private MarkdownIt markdownIt;
   private SynapseJSNIUtils synapseJSNIUtils;
   private WidgetRegistrar widgetRegistrar;
-  private CookieProvider cookies;
   AuthenticationController authenticationController;
   GWTWrapper gwt;
 
   PortalGinInjector ginInjector;
-  private ResourceLoader resourceLoader;
   private String md;
   private MarkdownWidgetView view;
   private SynapseAlert synAlert;
@@ -58,8 +52,6 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
     SynapseJavascriptClient jsClient,
     SynapseJSNIUtils synapseJSNIUtils,
     WidgetRegistrar widgetRegistrar,
-    CookieProvider cookies,
-    ResourceLoader resourceLoader,
     GWTWrapper gwt,
     PortalGinInjector ginInjector,
     MarkdownWidgetView view,
@@ -70,8 +62,6 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
     this.jsClient = jsClient;
     this.synapseJSNIUtils = synapseJSNIUtils;
     this.widgetRegistrar = widgetRegistrar;
-    this.cookies = cookies;
-    this.resourceLoader = resourceLoader;
     this.gwt = gwt;
     this.ginInjector = ginInjector;
     this.view = view;
@@ -143,10 +133,6 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
   }
 
   public void loadMath(String suffix) {
-    ClientProperties.fixResourceToCdnEndpoint(
-      ClientProperties.MATH_PROCESSOR_JS,
-      synapseJSNIUtils.getCdnEndpoint()
-    );
     // look for every element that has the right format
     int i = 0;
     String currentWidgetDiv =
@@ -154,21 +140,7 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
     ElementWrapper el = view.getElementById(currentWidgetDiv);
     while (el != null) {
       final Element loadElement = el.getElement();
-      final AsyncCallback<Void> mathProcessorLoadedCallback = new AsyncCallback<Void>() {
-        @Override
-        public void onSuccess(Void result) {
-          synapseJSNIUtils.processMath(loadElement);
-        }
-
-        @Override
-        public void onFailure(Throwable caught) {}
-      };
-      if (
-        resourceLoader.isLoaded(ClientProperties.MATH_PROCESSOR_JS)
-      ) synapseJSNIUtils.processMath(loadElement); else resourceLoader.requires( // already loaded
-        ClientProperties.MATH_PROCESSOR_JS,
-        mathProcessorLoadedCallback
-      );
+      synapseJSNIUtils.processMath(loadElement);
       i++;
       currentWidgetDiv = WidgetConstants.DIV_ID_MATHJAX_PREFIX + i + suffix;
       el = view.getElementById(currentWidgetDiv);
@@ -193,21 +165,21 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
         try {
           innerText = innerText.trim();
           String contentType = widgetRegistrar.getWidgetContentType(innerText);
-          Map<String, String> widgetDescriptor = widgetRegistrar.getWidgetDescriptor(
-            innerText
-          );
-          IsWidget presenter = widgetRegistrar.getWidgetRendererForWidgetDescriptor(
-            wikiKey,
-            contentType,
-            widgetDescriptor,
-            new Callback() {
-              @Override
-              public void invoke() {
-                refresh();
-              }
-            },
-            wikiVersionInView
-          );
+          Map<String, String> widgetDescriptor =
+            widgetRegistrar.getWidgetDescriptor(innerText);
+          IsWidget presenter =
+            widgetRegistrar.getWidgetRendererForWidgetDescriptor(
+              wikiKey,
+              contentType,
+              widgetDescriptor,
+              new Callback() {
+                @Override
+                public void invoke() {
+                  refresh();
+                }
+              },
+              wikiVersionInView
+            );
           if (presenter == null) throw new IllegalArgumentException(
             "Unable to render widget from the specified markdown."
           );

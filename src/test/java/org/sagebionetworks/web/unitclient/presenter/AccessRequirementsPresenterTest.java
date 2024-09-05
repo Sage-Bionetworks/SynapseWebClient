@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.eq;
@@ -176,9 +177,9 @@ public class AccessRequirementsPresenterTest {
 
   @Test
   public void testConstruction() {
-    verify(mockView, atLeastOnce()).add(any(Widget.class));
-    verify(mockView, atLeastOnce()).addTitle(any(Widget.class));
-    verify(mockView, atLeastOnce()).addAboveBody(any(Widget.class));
+    verify(mockView, atLeastOnce()).add(any());
+    verify(mockView, atLeastOnce()).addTitle(anyString());
+    verify(mockView, atLeastOnce()).addAboveBody(any());
   }
 
   @Test

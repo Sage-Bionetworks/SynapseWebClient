@@ -8,18 +8,23 @@ import java.util.List;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
-public class EvaluationList implements SynapseWidgetPresenter, IsWidget {
+public class EvaluationList
+  implements SynapseWidgetPresenter, EvaluationListView.Presenter, IsWidget {
 
   private EvaluationListView view;
   List<Evaluation> evaluationList;
+  Evaluation selectedEvaluation;
 
   @Inject
   public EvaluationList(EvaluationListView view) {
     this.view = view;
+    view.setPresenter(this);
   }
 
   public void configure(List<Evaluation> list, boolean isSelectable) {
     this.evaluationList = list;
+    this.selectedEvaluation = null;
+
     view.configure(list, isSelectable);
   }
 
@@ -32,13 +37,12 @@ public class EvaluationList implements SynapseWidgetPresenter, IsWidget {
     return view.asWidget();
   }
 
-  public Evaluation getSelectedEvaluation() {
-    if (evaluationList.size() == 1) {
-      return evaluationList.get(0);
-    } // else
-    Integer selectedEvaluationIndex = view.getSelectedEvaluationIndex();
-    if (selectedEvaluationIndex == null) return null;
+  @Override
+  public void onChangeSelectedEvaluation(Evaluation evaluation) {
+    this.selectedEvaluation = evaluation;
+  }
 
-    return evaluationList.get(selectedEvaluationIndex);
+  public Evaluation getSelectedEvaluation() {
+    return this.selectedEvaluation;
   }
 }

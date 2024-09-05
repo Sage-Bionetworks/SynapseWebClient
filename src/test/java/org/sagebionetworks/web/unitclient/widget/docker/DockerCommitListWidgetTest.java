@@ -101,21 +101,14 @@ public class DockerCommitListWidgetTest {
   public void testConstructor() {
     verify(mockView).setPresenter(dockerCommitListWidget);
     verify(mockView).setCommitsContainer(mockCommitsContainer);
-    verify(mockView).setSynAlert(any(Widget.class));
+    verify(mockView).setSynAlert(any());
     ArgumentCaptor<Callback> captor = ArgumentCaptor.forClass(Callback.class);
     verify(mockCommitsContainer).configure(captor.capture());
     Callback callback = captor.getValue();
     callback.invoke();
     verify(mockSynAlert).clear();
     verify(mockJsClient)
-      .getDockerTaggedCommits(
-        anyString(),
-        anyLong(),
-        anyLong(),
-        any(DockerCommitSortBy.class),
-        anyBoolean(),
-        any(AsyncCallback.class)
-      );
+      .getDockerTaggedCommits(any(), any(), any(), any(), any(), any());
   }
 
   @Test
@@ -175,7 +168,7 @@ public class DockerCommitListWidgetTest {
         anyBoolean(),
         any(AsyncCallback.class)
       );
-    verify(mockCommitsContainer).add(any(Widget.class));
+    verify(mockCommitsContainer).add(any());
     // only a single value was returned, so there must not be more
     verify(mockCommitsContainer).setIsMore(false);
     verify(mockCommitsContainer, never()).setIsMore(true);
@@ -207,7 +200,7 @@ public class DockerCommitListWidgetTest {
     dockerCommitList.add(commit);
     dockerCommitListWidget.configure(entityId, withRadio);
     verify(mockCommitRow).configure(commit);
-    verify(mockRadioWidget).add(any(Widget.class));
+    verify(mockRadioWidget).add(any());
     verify(mockRadioWidget).setGroupName(id);
     verify(mockRadioWidget).addClickHandler(any(ClickHandler.class));
     verify(mockCommitsContainer).clear();
@@ -221,7 +214,7 @@ public class DockerCommitListWidgetTest {
         anyBoolean(),
         any(AsyncCallback.class)
       );
-    verify(mockCommitsContainer).add(any(Widget.class));
+    verify(mockCommitsContainer).add(any());
     verify(mockCommitsContainer).setIsMore(false);
   }
 

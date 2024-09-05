@@ -33,6 +33,8 @@ public class CORSFilter extends OncePerRequestFilter {
     "staging-signin",
     "accounts.sagebionetworks",
     "staging.accounts.sagebionetworks",
+    "accounts",
+    "staging.accounts",
     // Data portals
     "adknowledgeportal",
     "staging.adknowledgeportal",
@@ -63,7 +65,9 @@ public class CORSFilter extends OncePerRequestFilter {
     "shiny",
     "shinypro",
     "stopadportal",
-    "staging.stopadportal"
+    "staging.stopadportal",
+    "genie",
+    "staging.genie"
   );
 
   public static final String SYNAPSE_ORG_SUFFIX = ".synapse.org";

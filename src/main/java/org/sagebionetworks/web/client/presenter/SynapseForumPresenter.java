@@ -52,7 +52,9 @@ public class SynapseForumPresenter
   }
 
   public void showForum(String entityId) {
-    CallbackP<ParameterizedToken> paramChangeCallback = new CallbackP<ParameterizedToken>() {
+    CallbackP<ParameterizedToken> paramChangeCallback = new CallbackP<
+      ParameterizedToken
+    >() {
       @Override
       public void invoke(ParameterizedToken token) {
         // handle token changes

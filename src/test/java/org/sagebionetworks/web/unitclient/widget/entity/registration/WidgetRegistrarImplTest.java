@@ -1,8 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.entity.registration;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -17,7 +15,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
-import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.FeatureFlagConfig;
+import org.sagebionetworks.web.client.FeatureFlagKey;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
@@ -32,6 +31,9 @@ public class WidgetRegistrarImplTest {
 
   @Mock
   PortalGinInjector mockGinInjector;
+
+  @Mock
+  FeatureFlagConfig mockFeatureFlagConfig;
 
   Map<String, String> testImageWidgetDescriptor;
   String testFileName = "testfile.png";
@@ -49,7 +51,11 @@ public class WidgetRegistrarImplTest {
   public void setup() {
     MockitoAnnotations.initMocks(this);
     widgetRegistrar =
-      new WidgetRegistrarImpl(mockGinInjector, new JSONObjectAdapterImpl());
+      new WidgetRegistrarImpl(
+        mockGinInjector,
+        new JSONObjectAdapterImpl(),
+        mockFeatureFlagConfig
+      );
     testImageWidgetDescriptor = new HashMap<String, String>();
     when(mockGinInjector.getCookieProvider()).thenReturn(mockCookies);
   }
@@ -84,9 +90,11 @@ public class WidgetRegistrarImplTest {
     verify(mockGinInjector, times(3)).getSynapseAPICallRenderer();
 
     when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+      mockFeatureFlagConfig.isFeatureEnabled(
+        FeatureFlagKey.PROVENANCE_V2_VISUALIZATION
+      )
     )
-      .thenReturn("true");
+      .thenReturn(true);
     widgetRegistrar.getWidgetRendererForWidgetDescriptorAfterLazyLoad(
       WidgetConstants.PROVENANCE_CONTENT_TYPE
     );
@@ -137,9 +145,10 @@ public class WidgetRegistrarImplTest {
   @Test
   public void testGetWidgetDescriptor() throws JSONObjectAdapterException {
     // from MD representation, verify that various widget descriptors can be constructed
-    Map<String, String> actualWidgetDescriptor = widgetRegistrar.getWidgetDescriptor(
-      WidgetConstants.IMAGE_CONTENT_TYPE + "?fileName=" + testFileName
-    );
+    Map<String, String> actualWidgetDescriptor =
+      widgetRegistrar.getWidgetDescriptor(
+        WidgetConstants.IMAGE_CONTENT_TYPE + "?fileName=" + testFileName
+      );
     Assert.assertEquals(
       testFileName,
       actualWidgetDescriptor.get(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY)

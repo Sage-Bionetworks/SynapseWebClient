@@ -9,7 +9,8 @@ import java.util.Objects;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityTypeUtils;
 import org.sagebionetworks.repo.model.table.Table;
-import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.FeatureFlagConfig;
+import org.sagebionetworks.web.client.FeatureFlagKey;
 import org.sagebionetworks.web.client.StringUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -36,17 +37,20 @@ public class RenameEntityModalWidgetImpl implements RenameEntityModalWidget {
   String startingName;
   String startingDescription;
   Callback handler;
+  FeatureFlagConfig featureFlagConfig;
 
   @Inject
   public RenameEntityModalWidgetImpl(
     PromptForValuesModalView view,
     SynapseJavascriptClient jsClient,
-    CookieProvider cookieProvider
+    CookieProvider cookieProvider,
+    FeatureFlagConfig featureFlagConfig
   ) {
     super();
     this.view = view;
     this.jsClient = jsClient;
     this.cookies = cookieProvider;
+    this.featureFlagConfig = featureFlagConfig;
   }
 
   /**
@@ -134,8 +138,11 @@ public class RenameEntityModalWidgetImpl implements RenameEntityModalWidget {
     List<PromptForValuesModalView.InputType> inputTypes = new ArrayList<>();
     inputTypes.add(PromptForValuesModalView.InputType.TEXTBOX);
 
-    // Only surfacing description for Table types (in experimental mode for now)
-    if (toRename instanceof Table && DisplayUtils.isInTestWebsite(cookies)) {
+    // Only surfacing description for Table types (behind feature flag for now)
+    if (
+      toRename instanceof Table &&
+      featureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
+    ) {
       prompts.add("Description");
       initialValues.add(toRename.getDescription());
       inputTypes.add(PromptForValuesModalView.InputType.TEXTAREA);

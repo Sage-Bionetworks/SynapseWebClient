@@ -2,11 +2,11 @@ package org.sagebionetworks.web.unitserver.servlet.oaut;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.contains;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.server.servlet.oauth2.OAuth2SessionServlet.*;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -20,8 +20,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseBadRequestException;
 import org.sagebionetworks.client.exceptions.SynapseException;
@@ -33,12 +32,11 @@ import org.sagebionetworks.repo.model.oauth.OAuthUrlRequest;
 import org.sagebionetworks.repo.model.oauth.OAuthUrlResponse;
 import org.sagebionetworks.repo.model.oauth.OAuthValidationRequest;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
-import org.sagebionetworks.web.server.servlet.InitSessionServlet;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.oauth2.OAuth2SessionServlet;
 import org.sagebionetworks.web.shared.WebConstants;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class OAuth2SessionServletTest {
 
   @Mock
@@ -137,7 +135,7 @@ public class OAuth2SessionServletTest {
     assertEquals(OAuthProvider.GOOGLE_OAUTH_2_0, request.getProvider());
     assertEquals(authCode, request.getAuthenticationCode());
     verify(mockResponse)
-      .sendRedirect("/#!LoginPlace:" + WebConstants.REDIRECT_TO_LAST_PLACE);
+      .sendRedirect("/LoginPlace:" + WebConstants.REDIRECT_TO_LAST_PLACE);
     verify(mockResponse).addCookie(cookieCaptor.capture());
     Cookie cookie = cookieCaptor.getValue();
     assertEquals(CookieKeys.USER_LOGIN_TOKEN, cookie.getName());
@@ -148,9 +146,8 @@ public class OAuth2SessionServletTest {
   public void testCreateAccountViaOAuth()
     throws ServletException, IOException, SynapseException {
     String testAccessToken = "accessToken";
-    ArgumentCaptor<OAuthAccountCreationRequest> argument = ArgumentCaptor.forClass(
-      OAuthAccountCreationRequest.class
-    );
+    ArgumentCaptor<OAuthAccountCreationRequest> argument =
+      ArgumentCaptor.forClass(OAuthAccountCreationRequest.class);
     LoginResponse resp = new LoginResponse();
     String state = "my-username";
     resp.setAccessToken(testAccessToken);
@@ -177,7 +174,7 @@ public class OAuth2SessionServletTest {
     assertEquals(CookieKeys.USER_LOGIN_TOKEN, cookie.getName());
     assertEquals(testAccessToken, cookie.getValue());
     verify(mockResponse)
-      .sendRedirect("/#!LoginPlace:" + WebConstants.REDIRECT_TO_LAST_PLACE);
+      .sendRedirect("/LoginPlace:" + WebConstants.REDIRECT_TO_LAST_PLACE);
   }
 
   @Test
@@ -222,6 +219,27 @@ public class OAuth2SessionServletTest {
     when(mockRequest.getParameter(WebConstants.OAUTH2_CODE))
       .thenReturn("auth code");
     servlet.doGet(mockRequest, mockResponse);
-    verify(mockResponse).sendRedirect(OAuth2SessionServlet.REGISTER_ACCOUNT);
+    verify(mockResponse).sendRedirect(REGISTER_ACCOUNT);
+  }
+
+  @Test
+  public void testValidateNotFoundORCiD()
+    throws ServletException, IOException, SynapseException {
+    ArgumentCaptor<OAuthValidationRequest> argument = ArgumentCaptor.forClass(
+      OAuthValidationRequest.class
+    );
+    when(
+      mockClient.validateOAuthAuthenticationCodeForAccessToken(
+        argument.capture()
+      )
+    )
+      .thenThrow(new SynapseNotFoundException("an error message"));
+    when(mockRequest.getParameter(WebConstants.OAUTH2_PROVIDER))
+      .thenReturn(OAuthProvider.ORCID.name());
+    when(mockRequest.getParameter(WebConstants.OAUTH2_CODE))
+      .thenReturn("auth code");
+    servlet.doGet(mockRequest, mockResponse);
+    verify(mockResponse)
+      .sendRedirect(LOGIN_PLACE + WebConstants.ORCID_NOT_LINKED);
   }
 }

@@ -49,10 +49,7 @@ import com.google.inject.Inject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.*;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
@@ -60,6 +57,7 @@ import org.sagebionetworks.web.client.presenter.BaseEditWidgetDescriptorPresente
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.editor.UserTeamSelector;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.client.widget.entity.renderer.IntendedDataUseReportWidget;
@@ -96,6 +94,9 @@ public class MarkdownEditorWidget
   MarkdownEditorAction currentAction;
   private PortalGinInjector ginInjector;
 
+  private FeatureFlagConfig featureFlagConfig;
+  private IsACTMemberAsyncHandler isACTMemberAsyncHandler;
+
   @Inject
   public MarkdownEditorWidget(
     MarkdownEditorWidgetView view,
@@ -105,7 +106,9 @@ public class MarkdownEditorWidget
     BaseEditWidgetDescriptorPresenter widgetDescriptorEditor,
     WidgetRegistrar widgetRegistrar,
     UserTeamSelector userTeamSelector,
-    PortalGinInjector ginInjector
+    PortalGinInjector ginInjector,
+    FeatureFlagConfig featureFlagConfig,
+    IsACTMemberAsyncHandler isACTMemberAsyncHandler
   ) {
     super();
     this.view = view;
@@ -118,6 +121,8 @@ public class MarkdownEditorWidget
     this.ginInjector = ginInjector;
 
     this.userTeamSelector = userTeamSelector;
+    this.featureFlagConfig = featureFlagConfig;
+    this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
 
     widgetSelectionState = new WidgetSelectionState();
     view.setPresenter(this);
@@ -149,7 +154,12 @@ public class MarkdownEditorWidget
   public void configure(String markdown) {
     // clear view state
     view.clear();
-    view.setAlphaCommandsVisible(DisplayUtils.isInTestWebsite(cookies));
+    view.setAlphaCommandsVisible(
+      featureFlagConfig.isFeatureEnabled(FeatureFlagKey.ADD_WIKI_WIDGETS)
+    );
+    isACTMemberAsyncHandler.isACTMember(isACTMember ->
+      view.setACTCommandsVisible(isACTMember)
+    );
     view.configure(markdown);
     view.showEditMode();
     if (formattingGuideWikiPageKey == null) {
@@ -545,9 +555,8 @@ public class MarkdownEditorWidget
       String innerText = widgetSelectionState.getInnerWidgetText();
       view.setSelectionRange(widgetStartIndex, innerText.length());
       String contentTypeKey = widgetRegistrar.getWidgetContentType(innerText);
-      Map<String, String> widgetDescriptor = widgetRegistrar.getWidgetDescriptor(
-        innerText
-      );
+      Map<String, String> widgetDescriptor =
+        widgetRegistrar.getWidgetDescriptor(innerText);
 
       WidgetDescriptorUpdatedHandler handler = event -> {
         // replace old widget text

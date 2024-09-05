@@ -44,7 +44,7 @@ public class TeamSearch extends Place {
     return token;
   }
 
-  @Prefix("!TeamSearch")
+  @Prefix("TeamSearch")
   public static class Tokenizer implements PlaceTokenizer<TeamSearch> {
 
     @Override

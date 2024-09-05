@@ -34,7 +34,6 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequirementRelatedProjectsList;
 import org.sagebionetworks.web.client.widget.accessrequirements.CreateAccessRequirementButton;
-import org.sagebionetworks.web.client.widget.accessrequirements.DeleteAccessRequirementButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.EntitySubjectsWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.ReviewAccessorsButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.SelfSignAccessRequirementWidget;
@@ -75,9 +74,6 @@ public class SelfSignAccessRequirementWidgetTest {
 
   @Mock
   CreateAccessRequirementButton mockCreateAccessRequirementButton;
-
-  @Mock
-  DeleteAccessRequirementButton mockDeleteAccessRequirementButton;
 
   @Mock
   TeamSubjectsWidget mockTeamSubjectsWidget;
@@ -146,7 +142,6 @@ public class SelfSignAccessRequirementWidgetTest {
         mockEntitySubjectsWidget,
         mockAccessRequirementRelatedProjectsList,
         mockCreateAccessRequirementButton,
-        mockDeleteAccessRequirementButton,
         mockLazyLoadHelper,
         mockManageAccessButton,
         mockPopupUtils,
@@ -179,20 +174,15 @@ public class SelfSignAccessRequirementWidgetTest {
   @Test
   public void testConstruction() {
     verify(mockView).setPresenter(widget);
-    verify(mockView).setWikiTermsWidget(any(Widget.class));
-    verify(mockView).setEditAccessRequirementWidget(any(Widget.class));
+    verify(mockView).setWikiTermsWidget(any());
+    verify(mockView).setEditAccessRequirementWidget(any());
     verify(mockWikiPageWidget).setModifiedCreatedByHistoryVisible(false);
   }
 
   @Test
   public void testSetRequirementWithWikiTerms() {
     widget.setRequirement(mockAccessRequirement, mockRefreshCallback);
-    verify(mockWikiPageWidget)
-      .configure(
-        any(WikiPageKey.class),
-        eq(false),
-        any(WikiPageWidget.Callback.class)
-      );
+    verify(mockWikiPageWidget).configure(any(), eq(false), any());
     verify(mockTeamSubjectsWidget).configure(mockSubjectIds);
     verify(mockEntitySubjectsWidget).configure(mockSubjectIds);
   }

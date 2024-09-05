@@ -140,7 +140,13 @@ public interface SynapseJSNIUtils {
 
   String getVersionsServletUrl();
 
+  String getAppConfigServletUrl();
+
   long getLastModified(JavaScriptObject blob);
 
   void setIsInnerProgrammaticHistoryChange();
+
+  String setHash(String hash);
+
+  String getHash();
 }

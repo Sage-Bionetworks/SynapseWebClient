@@ -1,21 +1,9 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyList;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getDoneFuture;
 
 import com.google.common.util.concurrent.FluentFuture;
@@ -23,17 +11,14 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.web.bindery.event.shared.binder.EventBinder;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
@@ -58,7 +43,9 @@ import org.sagebionetworks.web.client.context.QueryClientProvider;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.jsinterop.KeyFactory;
+import org.sagebionetworks.web.client.jsinterop.reactquery.InvalidateQueryFilters;
 import org.sagebionetworks.web.client.jsinterop.reactquery.QueryClient;
+import org.sagebionetworks.web.client.jsinterop.reactquery.QueryKey;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
@@ -72,7 +59,7 @@ import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class EntityPresenterTest {
 
   @Mock
@@ -267,13 +254,7 @@ public class EntityPresenterTest {
     verify(mockView).setEntityPageTopVisible(true);
     verify(mockEntityPageTop, atLeastOnce()).clearState();
     verify(mockEntityPageTop)
-      .configure(
-        eq(eb),
-        eq(versionNumber),
-        any(EntityHeader.class),
-        any(EntityArea.class),
-        anyString()
-      );
+      .configure(eq(eb), eq(versionNumber), any(), any(), any());
     verify(mockView, times(2)).setEntityPageTopWidget(mockEntityPageTop);
     verify(mockView).setOpenTeamInvitesWidget(mockOpenInviteWidget);
     verify(mockHeaderWidget).refresh();
@@ -289,7 +270,7 @@ public class EntityPresenterTest {
     AsyncMockStubber
       .callSuccessWith(mockFileEntity)
       .when(mockSynapseJavascriptClient)
-      .getEntity(anyString(), any(AsyncCallback.class));
+      .getEntity(any(), any());
 
     entityPresenter.setPlace(mockPlace);
 
@@ -320,13 +301,7 @@ public class EntityPresenterTest {
     verify(mockView).setEntityPageTopVisible(true);
     verify(mockEntityPageTop, atLeastOnce()).clearState();
     verify(mockEntityPageTop)
-      .configure(
-        eq(eb),
-        eq(versionNumber),
-        any(EntityHeader.class),
-        any(EntityArea.class),
-        anyString()
-      );
+      .configure(eq(eb), eq(versionNumber), any(), any(), any());
 
     verify(mockView, times(2)).setEntityPageTopWidget(mockEntityPageTop);
   }
@@ -374,46 +349,51 @@ public class EntityPresenterTest {
   public void testShow403() {
     entityPresenter.setEntityId("123");
     entityPresenter.show403();
-    verify(mockSynAlert).show403(anyString());
+    verify(mockSynAlert).show403(any(), any());
     verify(mockView).setEntityPageTopVisible(false);
     verify(mockView).setOpenTeamInvitesVisible(true);
   }
 
   @Test
   public void testEntityUpdatedHandlerWithoutId() {
+    QueryKey mockQueryKey = mock(QueryKey.class);
     when(mockKeyFactory.getEntityQueryKey(anyString()))
-      .thenReturn(new ArrayList<>());
+      .thenReturn(mockQueryKey);
     entityPresenter.onEntityUpdatedEvent(new EntityUpdatedEvent());
 
     verify(mockKeyFactoryProvider).getKeyFactory(anyString());
     verify(mockKeyFactory).getEntityQueryKey(null);
-    verify(mockQueryClient).invalidateQueries(anyList());
+    verify(mockQueryClient)
+      .invalidateQueries(any(InvalidateQueryFilters.class));
     verify(mockGlobalApplicationState).refreshPage();
   }
 
   @Test
   public void testEntityUpdatedHandlerWithId() {
+    QueryKey mockQueryKey = mock(QueryKey.class);
     when(mockKeyFactory.getEntityQueryKey(anyString()))
-      .thenReturn(new ArrayList<>());
+      .thenReturn(mockQueryKey);
     entityPresenter.onEntityUpdatedEvent(new EntityUpdatedEvent(entityId));
 
     verify(mockKeyFactoryProvider).getKeyFactory(anyString());
     verify(mockKeyFactory).getEntityQueryKey(entityId);
-    verify(mockQueryClient).invalidateQueries(anyList());
+    verify(mockQueryClient)
+      .invalidateQueries(any(InvalidateQueryFilters.class));
     verify(mockGlobalApplicationState).refreshPage();
   }
 
   @Test
   public void testDownloadListUpdatedUpdatedEvent() {
-    when(mockKeyFactory.getDownloadListBaseQueryKey())
-      .thenReturn(new ArrayList<>());
+    QueryKey mockQueryKey = mock(QueryKey.class);
+    when(mockKeyFactory.getDownloadListBaseQueryKey()).thenReturn(mockQueryKey);
     entityPresenter.onDownloadListUpdatedUpdatedEvent(
       new DownloadListUpdatedEvent()
     );
 
     verify(mockKeyFactoryProvider).getKeyFactory(anyString());
     verify(mockKeyFactory).getDownloadListBaseQueryKey();
-    verify(mockQueryClient).invalidateQueries(anyList());
+    verify(mockQueryClient)
+      .invalidateQueries(any(InvalidateQueryFilters.class));
   }
 
   @Test
@@ -439,9 +419,9 @@ public class EntityPresenterTest {
       .configure(
         eq(eb),
         eq(null), // verify the draft version is loaded
-        any(EntityHeader.class),
-        any(EntityArea.class),
-        anyString()
+        any(),
+        any(),
+        any()
       );
   }
 
@@ -458,9 +438,9 @@ public class EntityPresenterTest {
       .configure(
         eq(eb),
         eq(latestSnapshotVersionNumber), // verify the latest snapshot version is loaded
-        any(EntityHeader.class),
-        any(EntityArea.class),
-        anyString()
+        any(),
+        any(),
+        any()
       );
   }
 
@@ -497,9 +477,9 @@ public class EntityPresenterTest {
       .configure(
         eq(eb),
         eq(null), // verify the draft version is loaded because there are no snapshots
-        any(EntityHeader.class),
-        any(EntityArea.class),
-        anyString()
+        any(),
+        any(),
+        any()
       );
   }
 
@@ -522,9 +502,9 @@ public class EntityPresenterTest {
       .configure(
         eq(eb),
         eq(null), // verify the draft version is loaded
-        any(EntityHeader.class),
-        any(EntityArea.class),
-        anyString()
+        any(),
+        any(),
+        any()
       );
   }
 }

@@ -158,8 +158,6 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
     projectActionMenu.addControllerWidget(projectActionController.asWidget());
     view.setProjectActionMenu(projectActionMenu.asWidget());
 
-    projectMetadata.setAnnotationsTitleText("Project Annotations");
-
     view.getEventBinder().bindEventHandlers(this, eventBus);
   }
 

@@ -5,6 +5,6 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 
 public interface SynapseStandaloneWikiView extends IsWidget {
   void configure(String markdown, WikiPageKey wikiKey);
-
+  void configure(String markdown);
   void setSynAlert(IsWidget w);
 }

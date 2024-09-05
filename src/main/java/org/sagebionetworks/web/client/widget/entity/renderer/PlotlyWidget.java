@@ -160,7 +160,7 @@ public class PlotlyWidget
     String queryToken = queryTokenProvider.queryToToken(query);
     view.setSourceDataLinkVisible(false);
     view.setSourceDataLink(
-      "#!Synapse:" +
+      "/Synapse:" +
       qbr.getEntityId() +
       "/" +
       TABLES.toString().toLowerCase() +
@@ -329,9 +329,9 @@ public class PlotlyWidget
     String[] xData = ArrayUtils.getStringArray(
       graphData.remove(xAxisColumnName)
     );
-    List<PlotlyTraceWrapper> plotlyGraphData = new ArrayList<PlotlyTraceWrapper>(
-      graphData.size()
-    );
+    List<PlotlyTraceWrapper> plotlyGraphData = new ArrayList<
+      PlotlyTraceWrapper
+    >(graphData.size());
     for (String columnName : graphData.keySet()) {
       PlotlyTraceWrapper trace = new PlotlyTraceWrapper();
       trace.setX(xData);
@@ -429,7 +429,7 @@ public class PlotlyWidget
       query.setLimit(QueryBundleUtils.DEFAULT_LIMIT);
       String queryToken = queryTokenProvider.queryToToken(query);
       String url =
-        "#!Synapse:" +
+        "/Synapse:" +
         qbr.getEntityId() +
         "/" +
         TABLES.toString().toLowerCase() +

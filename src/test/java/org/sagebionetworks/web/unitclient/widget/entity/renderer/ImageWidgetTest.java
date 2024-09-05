@@ -134,7 +134,7 @@ public class ImageWidgetTest {
     AsyncMockStubber
       .callSuccessWith(mockFileEntity)
       .when(mockSynapseJavascriptClient)
-      .getEntityForVersion(anyString(), anyLong(), any(AsyncCallback.class));
+      .getEntityForVersion(any(), any(), any());
     String synId = "syn239";
     descriptor.put(IMAGE_WIDGET_SYNAPSE_ID_KEY, synId);
     String dataFileHandleId = "8765";
@@ -160,8 +160,8 @@ public class ImageWidgetTest {
       .configure(
         eq(PRESIGNED_URL),
         eq(FILE_NAME),
-        anyString(),
-        anyString(),
+        any(),
+        any(),
         eq(ALT_TEXT),
         eq(synId),
         eq(isLoggedIn)
@@ -201,8 +201,8 @@ public class ImageWidgetTest {
       .configure(
         eq(PRESIGNED_URL),
         eq(FILE_NAME),
-        anyString(),
-        anyString(),
+        any(),
+        any(),
         eq(ALT_TEXT),
         eq(synId),
         eq(isLoggedIn)
@@ -215,7 +215,7 @@ public class ImageWidgetTest {
     AsyncMockStubber
       .callFailureWith(ex)
       .when(mockSynapseJavascriptClient)
-      .getEntityForVersion(anyString(), anyLong(), any(AsyncCallback.class));
+      .getEntityForVersion(any(), any(), any());
     String synId = "syn239";
     descriptor.put(IMAGE_WIDGET_SYNAPSE_ID_KEY, synId);
 
@@ -269,10 +269,10 @@ public class ImageWidgetTest {
       .configure(
         eq(PRESIGNED_URL),
         eq(FILE_NAME),
-        anyString(),
-        anyString(),
+        any(),
+        any(),
         eq(ALT_TEXT),
-        eq((String) null),
+        eq(null),
         eq(isLoggedIn)
       );
   }
@@ -283,11 +283,7 @@ public class ImageWidgetTest {
     AsyncMockStubber
       .callFailureWith(ex)
       .when(mockSynapseJavascriptClient)
-      .getWikiAttachmentFileHandles(
-        any(WikiPageKey.class),
-        anyLong(),
-        any(AsyncCallback.class)
-      );
+      .getWikiAttachmentFileHandles(any(), any(), any());
 
     widget.configure(wikiKey, descriptor, null, null);
 

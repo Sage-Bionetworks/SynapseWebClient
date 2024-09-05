@@ -33,14 +33,14 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.jsinterop.EntityBadgeIconsProps;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.jsinterop.SynapseReactClientFullContextProviderProps;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
-import org.sagebionetworks.web.client.widget.EntityTypeIcon;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.EntityTypeIconImpl;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
@@ -57,7 +57,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
   FocusPanel entityTypeIconContainer;
 
   @UiField
-  EntityTypeIcon entityTypeIcon;
+  EntityTypeIconImpl entityTypeIcon;
 
   @UiField
   FlowPanel entityContainer;
@@ -99,7 +99,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
   TableData modifiedByTableData;
 
   @UiField
-  ReactComponentDiv iconsContainer;
+  ReactComponent iconsContainer;
 
   @UiField
   TableData downloadTableData;
@@ -182,7 +182,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
     entityAnchor.addStyleName(
       "text-align-left text-overflow-ellipsis inline-block whitespace-nowrap overflowHidden maxWidth100"
     );
-    entityAnchor.setHref("#!Synapse:" + entityHeader.getId());
+    entityAnchor.setHref("/Synapse:" + entityHeader.getId());
     entityAnchor
       .getElement()
       .setAttribute(ENTITY_ID_ATTRIBUTE, entityHeader.getId());
@@ -285,13 +285,13 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
     EntityBadgeIconsProps props,
     SynapseReactClientFullContextProviderProps providerProps
   ) {
-    ReactNode reactNode = React.createElementWithSynapseContext(
+    ReactElement reactElement = React.createElementWithSynapseContext(
       SRC.SynapseComponents.EntityBadgeIcons,
       props,
       providerProps
     );
 
-    iconsContainer.render(reactNode);
+    iconsContainer.render(reactElement);
   }
 
   @Override

@@ -11,7 +11,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -24,7 +24,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.renderer.IntendedDataUseReportWidget;
 import org.sagebionetworks.web.client.widget.modal.DialogView;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class IntendedDataUseReportButtonTest {
 
   public static final Long AR_ID = 8888L;

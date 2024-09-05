@@ -20,7 +20,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.search.query.KeyRange;
 import org.sagebionetworks.repo.model.search.query.KeyValue;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
@@ -41,7 +41,7 @@ import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.SearchQueryUtils;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class SearchPresenterTest {
 
   SearchPresenter searchPresenter;
@@ -244,5 +244,16 @@ public class SearchPresenterTest {
     searchPresenter.setPlace(new Search(searchQueryJson));
 
     verify(mockPlaceChanger).goTo(new Synapse(term));
+  }
+
+  @Test
+  public void testEncodedQueryTerm() throws Exception {
+    searchPresenter.setPlace(new Search("Alzheimer's%20Disease"));
+    SearchQuery expectedQuery = SearchQueryUtils.getDefaultSearchQuery();
+    expectedQuery.setQueryTerm(
+      Arrays.asList(new String[] { "Alzheimer's", "Disease" })
+    );
+    verify(mockJsClient)
+      .getSearchResults(eq(expectedQuery), any(AsyncCallback.class));
   }
 }

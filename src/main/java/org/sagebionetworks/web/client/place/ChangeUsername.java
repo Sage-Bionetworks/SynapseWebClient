@@ -16,7 +16,7 @@ public class ChangeUsername extends Place {
     return token;
   }
 
-  @Prefix("!ChangeUsername")
+  @Prefix("ChangeUsername")
   public static class Tokenizer implements PlaceTokenizer<ChangeUsername> {
 
     @Override

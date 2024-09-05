@@ -13,14 +13,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.view.DivView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumFormCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.ListCellEditorView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.RadioCellEditorView;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class EnumFormCellEditorImplTest {
 
   @Mock

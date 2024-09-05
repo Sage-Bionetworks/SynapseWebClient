@@ -34,8 +34,8 @@ public class FileDownloadHandlerWidget
   implements FileDownloadMenuItemView.Presenter {
 
   public static final String ACCESS_REQUIREMENTS_LINK =
-    "#!AccessRequirements:ID=";
-  public static final String LOGIN_PLACE_LINK = "#!LoginPlace:0";
+    "/AccessRequirements:ID=";
+  public static final String LOGIN_PLACE_LINK = "/LoginPlace:0";
   private FileDownloadMenuItemView view;
   private EntityBundle entityBundle;
   private PortalGinInjector ginInjector;
@@ -199,7 +199,8 @@ public class FileDownloadHandlerWidget
   @Override
   public void onUnauthenticatedS3DirectDownloadClicked() {
     // ask for credentials, use bucket/endpoint info from storage location
-    ExternalObjectStoreFileHandle objectStoreFileHandle = (ExternalObjectStoreFileHandle) dataFileHandle;
+    ExternalObjectStoreFileHandle objectStoreFileHandle =
+      (ExternalObjectStoreFileHandle) dataFileHandle;
     view.showLoginS3DirectDownloadDialog(
       objectStoreFileHandle.getEndpointUrl()
     );
@@ -210,7 +211,8 @@ public class FileDownloadHandlerWidget
     String accessKeyId,
     String secretAccessKey
   ) {
-    final ExternalObjectStoreFileHandle objectStoreFileHandle = (ExternalObjectStoreFileHandle) dataFileHandle;
+    final ExternalObjectStoreFileHandle objectStoreFileHandle =
+      (ExternalObjectStoreFileHandle) dataFileHandle;
     CallbackP<JavaScriptObject> s3Callback = s3JsObject -> {
       s3 = s3JsObject;
       // NOTE: most browsers block the popup because the button click event is not directly associated to
@@ -229,7 +231,8 @@ public class FileDownloadHandlerWidget
 
   @Override
   public void onAuthenticatedS3DirectDownloadClicked() {
-    ExternalObjectStoreFileHandle objectStoreFileHandle = (ExternalObjectStoreFileHandle) dataFileHandle;
+    ExternalObjectStoreFileHandle objectStoreFileHandle =
+      (ExternalObjectStoreFileHandle) dataFileHandle;
     String presignedUrl = awsSdk.getPresignedURL(
       objectStoreFileHandle.getFileKey(),
       objectStoreFileHandle.getBucket(),

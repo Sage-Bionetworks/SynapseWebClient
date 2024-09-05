@@ -34,7 +34,6 @@ public class TermsOfUseAccessRequirementWidget
   TermsOfUseAccessRequirement ar;
   AuthenticationController authController;
   CreateAccessRequirementButton createAccessRequirementButton;
-  DeleteAccessRequirementButton deleteAccessRequirementButton;
   TeamSubjectsWidget teamSubjectsWidget;
   EntitySubjectsWidget entitySubjectsWidget;
   AccessRequirementRelatedProjectsList accessRequirementRelatedProjectsList;
@@ -56,7 +55,6 @@ public class TermsOfUseAccessRequirementWidget
     EntitySubjectsWidget entitySubjectsWidget,
     AccessRequirementRelatedProjectsList accessRequirementRelatedProjectsList,
     CreateAccessRequirementButton createAccessRequirementButton,
-    DeleteAccessRequirementButton deleteAccessRequirementButton,
     LazyLoadHelper lazyLoadHelper,
     ReviewAccessorsButton manageAccessButton,
     IsACTMemberAsyncHandler isACTMemberAsyncHandler
@@ -75,7 +73,6 @@ public class TermsOfUseAccessRequirementWidget
     this.accessRequirementRelatedProjectsList =
       accessRequirementRelatedProjectsList;
     this.createAccessRequirementButton = createAccessRequirementButton;
-    this.deleteAccessRequirementButton = deleteAccessRequirementButton;
     this.lazyLoadHelper = lazyLoadHelper;
     this.manageAccessButton = manageAccessButton;
     this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
@@ -83,7 +80,6 @@ public class TermsOfUseAccessRequirementWidget
     view.setPresenter(this);
     view.setWikiTermsWidget(wikiPageWidget.asWidget());
     view.setEditAccessRequirementWidget(createAccessRequirementButton);
-    view.setDeleteAccessRequirementWidget(deleteAccessRequirementButton);
     view.setTeamSubjectsWidget(teamSubjectsWidget);
     view.setEntitySubjectsWidget(entitySubjectsWidget);
     view.setAccessRequirementRelatedProjectsList(
@@ -130,11 +126,14 @@ public class TermsOfUseAccessRequirementWidget
       }
     );
     createAccessRequirementButton.configure(ar, refreshCallback);
-    deleteAccessRequirementButton.configure(ar, refreshCallback);
     view.setAccessRequirementID(ar.getId().toString());
     isACTMemberAsyncHandler.isACTActionAvailable(isACT -> {
       view.setAccessRequirementIDVisible(isACT);
       view.setCoveredEntitiesHeadingVisible(isACT);
+      // show the subjects defined by annotations UI if isACT and this flag is set
+      view.setSubjectsDefinedByAnnotations(
+        isACT && ar.getSubjectsDefinedByAnnotations()
+      );
     });
     teamSubjectsWidget.configure(ar.getSubjectIds());
     entitySubjectsWidget.configure(ar.getSubjectIds());
@@ -186,18 +185,19 @@ public class TermsOfUseAccessRequirementWidget
   public void onSignTerms() {
     // create the self-signed access approval, then update this object
     synAlert.clear();
-    AsyncCallback<AccessApproval> callback =
-      new AsyncCallback<AccessApproval>() {
-        @Override
-        public void onFailure(Throwable t) {
-          synAlert.handleException(t);
-        }
+    AsyncCallback<AccessApproval> callback = new AsyncCallback<
+      AccessApproval
+    >() {
+      @Override
+      public void onFailure(Throwable t) {
+        synAlert.handleException(t);
+      }
 
-        @Override
-        public void onSuccess(AccessApproval result) {
-          refreshCallback.invoke();
-        }
-      };
+      @Override
+      public void onSuccess(AccessApproval result) {
+        refreshCallback.invoke();
+      }
+    };
     AccessApproval approval = new AccessApproval();
     approval.setAccessorId(authController.getCurrentUserPrincipalId());
     approval.setRequirementId(ar.getId());

@@ -109,8 +109,8 @@ public class ChallengeTabTest {
 
   @Test
   public void testConstruction() {
-    verify(mockView).setEvaluationList(any(Widget.class));
-    verify(mockView).setChallengeWidget(any(Widget.class));
+    verify(mockView).setEvaluationList(any());
+    verify(mockView).setChallengeWidget(any());
   }
 
   @Test
@@ -145,8 +145,8 @@ public class ChallengeTabTest {
     verify(mockEvaluationEditorReactComponentPage)
       .configure(
         eq(evaluationId),
-        anyString(),
-        anyString(),
+        any(),
+        any(),
         anyBoolean(),
         callbackCaptor.capture()
       );

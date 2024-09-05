@@ -23,7 +23,7 @@ public class WikiDiff extends ParameterizedPlace {
     putParam(WIKI_ID, key.getWikiPageId());
   }
 
-  @Prefix("!WikiDiff")
+  @Prefix("WikiDiff")
   public static class Tokenizer implements PlaceTokenizer<WikiDiff> {
 
     @Override

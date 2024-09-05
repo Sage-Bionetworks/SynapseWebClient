@@ -22,12 +22,14 @@ import org.gwtbootstrap3.client.shared.event.ModalShownHandler;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.FeatureFlagConfig;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -39,6 +41,7 @@ import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
 import org.sagebionetworks.web.client.presenter.BaseEditWidgetDescriptorPresenter;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorAction;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidgetView;
@@ -102,6 +105,15 @@ public class MarkdownEditorWidgetTest {
   @Mock
   PortalGinInjector mockGinInjector;
 
+  @Mock
+  FeatureFlagConfig mockFeatureFlagConfig;
+
+  @Mock
+  IsACTMemberAsyncHandler mockIsACTMemberAsyncHandler;
+
+  @Captor
+  ArgumentCaptor<CallbackP<Boolean>> isActMemberCaptor;
+
   @Before
   public void before() throws JSONObjectAdapterException {
     MockitoAnnotations.initMocks(this);
@@ -115,7 +127,9 @@ public class MarkdownEditorWidgetTest {
         mockEditDescriptor,
         mockWidgetRegistrar,
         mockUserSelector,
-        mockGinInjector
+        mockGinInjector,
+        mockFeatureFlagConfig,
+        mockIsACTMemberAsyncHandler
       );
     wikiPageKey =
       new WikiPageKey("syn1111", ObjectType.ENTITY.toString(), null);
@@ -181,7 +195,10 @@ public class MarkdownEditorWidgetTest {
   @Test
   public void testGetFormattingGuide() throws Exception {
     reset(mockSynapseClient);
-    Map<String, WikiPageKey> testHelpPagesMap = new HashMap<String, WikiPageKey>();
+    Map<String, WikiPageKey> testHelpPagesMap = new HashMap<
+      String,
+      WikiPageKey
+    >();
     WikiPageKey formattingGuideWikiKey = new WikiPageKey(
       "syn1234",
       ObjectType.ENTITY.toString(),
@@ -215,7 +232,7 @@ public class MarkdownEditorWidgetTest {
     presenter.getFormattingGuideWikiKey(mockCallback);
     // service was called
     verify(mockSynapseClient).getPageNameToWikiKeyMap(any(AsyncCallback.class));
-    verify(mockView).showErrorMessage(anyString());
+    verify(mockView).showErrorMessage(any());
   }
 
   @Test
@@ -329,9 +346,8 @@ public class MarkdownEditorWidgetTest {
 
     // verify that a widget descriptor update handler is added, and when fired it sends back to our
     // handler that we passed as input to the configure.
-    ArgumentCaptor<WidgetDescriptorUpdatedHandler> captor = ArgumentCaptor.forClass(
-      WidgetDescriptorUpdatedHandler.class
-    );
+    ArgumentCaptor<WidgetDescriptorUpdatedHandler> captor =
+      ArgumentCaptor.forClass(WidgetDescriptorUpdatedHandler.class);
     verify(mockEditDescriptor)
       .addWidgetDescriptorUpdatedHandler(captor.capture());
     WidgetDescriptorUpdatedEvent event = new WidgetDescriptorUpdatedEvent();
@@ -381,9 +397,8 @@ public class MarkdownEditorWidgetTest {
 
     // verify that a widget descriptor update handler is added, and when fired it removes the old widget
     // markdown (to replace it with the updated value)
-    ArgumentCaptor<WidgetDescriptorUpdatedHandler> captor = ArgumentCaptor.forClass(
-      WidgetDescriptorUpdatedHandler.class
-    );
+    ArgumentCaptor<WidgetDescriptorUpdatedHandler> captor =
+      ArgumentCaptor.forClass(WidgetDescriptorUpdatedHandler.class);
     verify(mockEditDescriptor)
       .addWidgetDescriptorUpdatedHandler(captor.capture());
     WidgetDescriptorUpdatedEvent event = new WidgetDescriptorUpdatedEvent();
@@ -707,8 +722,7 @@ public class MarkdownEditorWidgetTest {
   @Test
   public void testPreview() throws Exception {
     presenter.previewClicked();
-    verify(mockMarkdownWidget)
-      .configure(anyString(), any(WikiPageKey.class), any(Long.class));
+    verify(mockMarkdownWidget).configure(any(), any(), any());
     verify(mockView).showPreview();
   }
 
@@ -729,5 +743,25 @@ public class MarkdownEditorWidgetTest {
 
     verify(mockEditDescriptor)
       .editNew(eq(wikiPageKey), eq(WidgetConstants.TEAM_MEMBERS_CONTENT_TYPE));
+  }
+
+  @Test
+  public void testConfigureAsACTMember() {
+    verify(mockIsACTMemberAsyncHandler)
+      .isACTMember(isActMemberCaptor.capture());
+
+    isActMemberCaptor.getValue().invoke(true);
+
+    verify(mockView).setACTCommandsVisible(true);
+  }
+
+  @Test
+  public void testConfigureAsNonACTMember() {
+    verify(mockIsACTMemberAsyncHandler)
+      .isACTMember(isActMemberCaptor.capture());
+
+    isActMemberCaptor.getValue().invoke(false);
+
+    verify(mockView).setACTCommandsVisible(false);
   }
 }

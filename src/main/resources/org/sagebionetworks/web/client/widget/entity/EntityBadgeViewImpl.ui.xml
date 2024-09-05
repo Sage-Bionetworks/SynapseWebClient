@@ -15,7 +15,7 @@
         width="30px"
       >
         <g:FocusPanel ui:field="entityTypeIconContainer">
-          <w:EntityTypeIcon ui:field="entityTypeIcon" type="file" />
+          <w:EntityTypeIconImpl ui:field="entityTypeIcon" type="file" />
         </g:FocusPanel>
       </t:TableData>
       <t:TableData ui:field="entityTableData" paddingTop="6">
@@ -28,7 +28,7 @@
         addStyleNames="overflow-x-hidden min-width-140"
         width="140px"
       >
-        <w:ReactComponentDiv ui:field="iconsContainer" />
+        <w:ReactComponent ui:field="iconsContainer" />
       </t:TableData>
       <t:TableData
         ui:field="sizeTableData"

@@ -123,7 +123,7 @@ public class SubscribeButtonWidgetTest {
   @Test
   public void testConstruction() {
     verify(mockView).setPresenter(widget);
-    verify(mockView).setSynAlert(any(Widget.class));
+    verify(mockView).setSynAlert(any());
     assertFalse(widget.isIconOnly());
   }
 

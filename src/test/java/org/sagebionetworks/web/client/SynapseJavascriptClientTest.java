@@ -80,7 +80,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.client.exceptions.SynapseTooManyRequestsException;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.ErrorResponseCode;
@@ -138,12 +138,14 @@ import org.sagebionetworks.web.shared.exceptions.TooManyRequestsException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class SynapseJavascriptClientTest {
 
   SynapseJavascriptClient client;
-  private static SynapseJavascriptFactory synapseJsFactory = new SynapseJavascriptFactory();
-  private static JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
+  private static SynapseJavascriptFactory synapseJsFactory =
+    new SynapseJavascriptFactory();
+  private static JSONObjectAdapter jsonObjectAdapter =
+    new JSONObjectAdapterImpl();
   public static final String REPO_ENDPOINT = "http://repo-endpoint/v1";
   public static final String FILE_ENDPOINT = "http://file-endpoint/v1";
   public static final String AUTH_ENDPOINT = "http://auth-endpoint/v1";
@@ -223,9 +225,7 @@ public class SynapseJavascriptClientTest {
     when(mockJsniUtils.getAccessTokenCookieUrl())
       .thenReturn(SESSION_COOKIE_URL);
 
-    when(
-      mockRequestBuilder.sendRequest(anyString(), any(RequestCallback.class))
-    )
+    when(mockRequestBuilder.sendRequest(any(), any(RequestCallback.class)))
       .thenReturn(mockRequest1, mockRequest2);
     client =
       new SynapseJavascriptClient(
@@ -244,81 +244,52 @@ public class SynapseJavascriptClientTest {
     String reason = "error message";
     ErrorResponseCode errorResponseCode = null;
     assertTrue(
-      getException(
-        SC_UNAUTHORIZED,
-        reason,
-        errorResponseCode
-      ) instanceof UnauthorizedException
+      getException(SC_UNAUTHORIZED, reason, errorResponseCode) instanceof
+      UnauthorizedException
     );
     assertTrue(
-      getException(
-        SC_FORBIDDEN,
-        reason,
-        errorResponseCode
-      ) instanceof ForbiddenException
+      getException(SC_FORBIDDEN, reason, errorResponseCode) instanceof
+      ForbiddenException
     );
     assertTrue(
-      getException(
-        SC_NOT_FOUND,
-        reason,
-        errorResponseCode
-      ) instanceof NotFoundException
+      getException(SC_NOT_FOUND, reason, errorResponseCode) instanceof
+      NotFoundException
     );
     assertTrue(
-      getException(
-        SC_BAD_REQUEST,
-        reason,
-        errorResponseCode
-      ) instanceof BadRequestException
+      getException(SC_BAD_REQUEST, reason, errorResponseCode) instanceof
+      BadRequestException
     );
     assertTrue(
-      getException(
-        SC_LOCKED,
-        reason,
-        errorResponseCode
-      ) instanceof LockedException
+      getException(SC_LOCKED, reason, errorResponseCode) instanceof
+      LockedException
     );
     assertTrue(
-      getException(
-        SC_PRECONDITION_FAILED,
-        reason,
-        errorResponseCode
-      ) instanceof ConflictingUpdateException
+      getException(SC_PRECONDITION_FAILED, reason, errorResponseCode) instanceof
+      ConflictingUpdateException
     );
     assertTrue(
-      getException(
-        SC_GONE,
-        reason,
-        errorResponseCode
-      ) instanceof DeprecatedServiceException
+      getException(SC_GONE, reason, errorResponseCode) instanceof
+      DeprecatedServiceException
     );
     assertTrue(
       getException(
         SynapseTooManyRequestsException.TOO_MANY_REQUESTS_STATUS_CODE,
         reason,
         errorResponseCode
-      ) instanceof TooManyRequestsException
+      ) instanceof
+      TooManyRequestsException
     );
     assertTrue(
-      getException(
-        SC_SERVICE_UNAVAILABLE,
-        reason,
-        errorResponseCode
-      ) instanceof SynapseDownException
+      getException(SC_SERVICE_UNAVAILABLE, reason, errorResponseCode) instanceof
+      SynapseDownException
     );
     assertTrue(
-      getException(
-        SC_CONFLICT,
-        reason,
-        errorResponseCode
-      ) instanceof ConflictException
+      getException(SC_CONFLICT, reason, errorResponseCode) instanceof
+      ConflictException
     );
     assertTrue(
-      getException(
-        -1,
-        reason,
-        errorResponseCode
-      ) instanceof UnknownErrorException
+      getException(-1, reason, errorResponseCode) instanceof
+      UnknownErrorException
     );
 
     assertNull(
@@ -783,46 +754,36 @@ public class SynapseJavascriptClientTest {
     JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
     new FileEntity().writeToJSONObject(adapter);
     assertTrue(
-      synapseJsFactory.newInstance(
-        OBJECT_TYPE.Entity,
-        adapter
-      ) instanceof FileEntity
+      synapseJsFactory.newInstance(OBJECT_TYPE.Entity, adapter) instanceof
+      FileEntity
     );
 
     adapter = jsonObjectAdapter.createNew();
     new Folder().writeToJSONObject(adapter);
     assertTrue(
-      synapseJsFactory.newInstance(
-        OBJECT_TYPE.Entity,
-        adapter
-      ) instanceof Folder
+      synapseJsFactory.newInstance(OBJECT_TYPE.Entity, adapter) instanceof
+      Folder
     );
 
     adapter = jsonObjectAdapter.createNew();
     new EntityView().writeToJSONObject(adapter);
     assertTrue(
-      synapseJsFactory.newInstance(
-        OBJECT_TYPE.Entity,
-        adapter
-      ) instanceof EntityView
+      synapseJsFactory.newInstance(OBJECT_TYPE.Entity, adapter) instanceof
+      EntityView
     );
 
     adapter = jsonObjectAdapter.createNew();
     new TableEntity().writeToJSONObject(adapter);
     assertTrue(
-      synapseJsFactory.newInstance(
-        OBJECT_TYPE.Entity,
-        adapter
-      ) instanceof TableEntity
+      synapseJsFactory.newInstance(OBJECT_TYPE.Entity, adapter) instanceof
+      TableEntity
     );
 
     adapter = jsonObjectAdapter.createNew();
     new Project().writeToJSONObject(adapter);
     assertTrue(
-      synapseJsFactory.newInstance(
-        OBJECT_TYPE.Entity,
-        adapter
-      ) instanceof Project
+      synapseJsFactory.newInstance(OBJECT_TYPE.Entity, adapter) instanceof
+      Project
     );
 
     adapter = jsonObjectAdapter.createNew();
@@ -834,19 +795,15 @@ public class SynapseJavascriptClientTest {
     adapter = jsonObjectAdapter.createNew();
     new Preview().writeToJSONObject(adapter);
     assertTrue(
-      synapseJsFactory.newInstance(
-        OBJECT_TYPE.Entity,
-        adapter
-      ) instanceof Preview
+      synapseJsFactory.newInstance(OBJECT_TYPE.Entity, adapter) instanceof
+      Preview
     );
 
     adapter = jsonObjectAdapter.createNew();
     new DockerRepository().writeToJSONObject(adapter);
     assertTrue(
-      synapseJsFactory.newInstance(
-        OBJECT_TYPE.Entity,
-        adapter
-      ) instanceof DockerRepository
+      synapseJsFactory.newInstance(OBJECT_TYPE.Entity, adapter) instanceof
+      DockerRepository
     );
   }
 
@@ -1082,10 +1039,11 @@ public class SynapseJavascriptClientTest {
     JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
     resultBundle.writeToJSONObject(adapter);
 
-    QueryResultBundle newResultBundleInstance = (QueryResultBundle) synapseJsFactory.newInstance(
-      OBJECT_TYPE.AsyncResponse,
-      adapter
-    );
+    QueryResultBundle newResultBundleInstance =
+      (QueryResultBundle) synapseJsFactory.newInstance(
+        OBJECT_TYPE.AsyncResponse,
+        adapter
+      );
 
     assertEquals(resultBundle, newResultBundleInstance);
   }
@@ -1191,7 +1149,7 @@ public class SynapseJavascriptClientTest {
   @Test
   public void testPendingRequests()
     throws RequestException, JSONObjectAdapterException {
-    String currentUrl = "https://www.synapse.org/#!Team:9123";
+    String currentUrl = "https://www.synapse.org/Team:9123";
     when(mockRequest1.isPending()).thenReturn(false);
     when(mockRequest2.isPending()).thenReturn(true);
     when(mockGwt.getCurrentURL()).thenReturn(currentUrl);
@@ -1216,9 +1174,9 @@ public class SynapseJavascriptClientTest {
   @Test
   public void testCancelPendingRequestsForUrl()
     throws RequestException, JSONObjectAdapterException {
-    String url1 = "https://www.synapse.org/#!Team:1";
+    String url1 = "https://www.synapse.org/Team:1";
     when(mockRequest1.isPending()).thenReturn(true);
-    String url2 = "https://www.synapse.org/#!Team:2";
+    String url2 = "https://www.synapse.org/Team:2";
     when(mockRequest2.isPending()).thenReturn(true);
     when(mockGwt.getCurrentURL()).thenReturn(url1, url2);
 
@@ -1244,14 +1202,14 @@ public class SynapseJavascriptClientTest {
   @Test
   public void testDeleteRequestsCannotBeCancelled() throws RequestException {
     when(mockAuthController.isLoggedIn()).thenReturn(true);
-    String currentUrl = "https://www.synapse.org/#!Team:9123";
+    String currentUrl = "https://www.synapse.org/Team:9123";
     when(mockRequest1.isPending()).thenReturn(true);
     when(mockRequest2.isPending()).thenReturn(true);
     when(mockGwt.getCurrentURL()).thenReturn(currentUrl);
 
     client.deleteEntityById("syn111", null);
 
-    verify(mockRequestBuilder).sendRequest(anyString(), any());
+    verify(mockRequestBuilder).sendRequest(any(), any());
 
     // verify no requests are associated to the current URL
     assertNull(client.getCancellableRequests(currentUrl));
@@ -1259,7 +1217,7 @@ public class SynapseJavascriptClientTest {
 
   @Test
   public void testCreateRequestsCannotBeCancelled() throws RequestException {
-    String currentUrl = "https://www.synapse.org/#!Team:9123";
+    String currentUrl = "https://www.synapse.org/Team:9123";
     when(mockRequest1.isPending()).thenReturn(true);
     when(mockRequest2.isPending()).thenReturn(true);
     when(mockGwt.getCurrentURL()).thenReturn(currentUrl);

@@ -6,6 +6,7 @@ import com.google.gwt.place.shared.Prefix;
 
 public class Home extends Place {
 
+  public static final String LOGGED_IN_FORCE_NO_REDIRECT_TOKEN = "x";
   private String token;
 
   public Home(String token) {
@@ -16,7 +17,7 @@ public class Home extends Place {
     return token;
   }
 
-  @Prefix("!Home")
+  @Prefix("Home")
   public static class Tokenizer implements PlaceTokenizer<Home> {
 
     @Override

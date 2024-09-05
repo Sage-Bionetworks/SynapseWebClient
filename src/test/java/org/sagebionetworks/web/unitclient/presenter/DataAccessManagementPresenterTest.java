@@ -8,12 +8,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.web.client.place.DataAccessManagementPlace;
 import org.sagebionetworks.web.client.presenter.DataAccessManagementPresenter;
 import org.sagebionetworks.web.client.view.DataAccessManagementView;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class DataAccessManagementPresenterTest {
 
   @Mock

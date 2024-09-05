@@ -86,7 +86,6 @@ public class HeaderTest {
   public void testConstructor() {
     verify(mockView).setPresenter(header);
     verify(mockView).setStagingAlertVisible(false);
-    verify(mockView).setCookieNotificationVisible(true);
   }
 
   @Test
@@ -122,40 +121,6 @@ public class HeaderTest {
     header.refresh();
 
     verify(mockView).refresh();
-  }
-
-  @Test
-  public void testInitWithAcceptCookies() {
-    when(
-      mockLocalStorage.contains(AuthenticationControllerImpl.COOKIES_ACCEPTED)
-    )
-      .thenReturn(true);
-    reset(mockView);
-    when(mockView.getEventBinder()).thenReturn(mockEventBinder);
-
-    header =
-      new Header(
-        mockView,
-        mockSynapseJSNIUtils,
-        mockEventBus,
-        mockCookies,
-        mockLocalStorage,
-        jsonObjectAdapter
-      );
-
-    verify(mockView).setCookieNotificationVisible(false);
-  }
-
-  @Test
-  public void testOnCookieNotificationDismissed() {
-    header.onCookieNotificationDismissed();
-
-    verify(mockLocalStorage)
-      .put(
-        eq(AuthenticationControllerImpl.COOKIES_ACCEPTED),
-        eq(Boolean.TRUE.toString()),
-        any(Long.class)
-      );
   }
 
   @Test

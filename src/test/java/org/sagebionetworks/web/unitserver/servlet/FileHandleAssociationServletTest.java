@@ -65,8 +65,7 @@ public class FileHandleAssociationServletTest {
     MockitoAnnotations.initMocks(this);
     servlet = new FileHandleAssociationServlet();
 
-    when(mockSynapseProvider.createNewClient(anyString()))
-      .thenReturn(mockSynapse);
+    when(mockSynapseProvider.createNewClient(any())).thenReturn(mockSynapse);
 
     resolvedUrl = new URL("http://localhost/file.png");
     when(mockSynapse.getFileURL(any(FileHandleAssociation.class)))
@@ -163,6 +162,6 @@ public class FileHandleAssociationServletTest {
     ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
     verify(mockResponse).sendRedirect(captor.capture());
     String v = captor.getValue();
-    assertTrue(v.contains("#!Error:"));
+    assertTrue(v.contains("Error:"));
   }
 }

@@ -146,22 +146,11 @@ public class EvaluationSubmitterTest {
     AsyncMockStubber
       .callSuccessWith(returnSubmission)
       .when(mockChallengeClient)
-      .createIndividualSubmission(
-        any(Submission.class),
-        anyString(),
-        anyString(),
-        any(AsyncCallback.class)
-      );
+      .createIndividualSubmission(any(), any(), any(), any());
     AsyncMockStubber
       .callSuccessWith(returnSubmission)
       .when(mockChallengeClient)
-      .createTeamSubmission(
-        any(Submission.class),
-        anyString(),
-        anyString(),
-        anyString(),
-        any(AsyncCallback.class)
-      );
+      .createTeamSubmission(any(), any(), any(), any(), any());
 
     ArrayList<Evaluation> evaluationList = new ArrayList<Evaluation>();
     e1 = new Evaluation();
@@ -177,13 +166,7 @@ public class EvaluationSubmitterTest {
     AsyncMockStubber
       .callSuccessWith(evaluationList)
       .when(mockSynapseJavascriptClient)
-      .getAvailableEvaluations(
-        anySet(),
-        anyBoolean(),
-        anyInt(),
-        anyInt(),
-        any(AsyncCallback.class)
-      );
+      .getAvailableEvaluations(any(), anyBoolean(), any(), any(), any());
 
     entity = new FileEntity();
     entity.setVersionNumber(5l);
@@ -194,18 +177,20 @@ public class EvaluationSubmitterTest {
     AsyncMockStubber
       .callSuccessWith(entity)
       .when(mockSynapseJavascriptClient)
-      .getEntity(anyString(), any(AsyncCallback.class));
+      .getEntity(any(), any());
 
     requirements = new PaginatedResults<TermsOfUseAccessRequirement>();
     requirements.setTotalNumberOfResults(0);
-    List<TermsOfUseAccessRequirement> ars = new ArrayList<TermsOfUseAccessRequirement>();
+    List<TermsOfUseAccessRequirement> ars = new ArrayList<
+      TermsOfUseAccessRequirement
+    >();
     requirements.setResults(ars);
 
     // by default, this is a standard evaluation (no challenge)
     AsyncMockStubber
       .callFailureWith(new NotFoundException())
       .when(mockChallengeClient)
-      .getChallengeForProject(anyString(), any(AsyncCallback.class));
+      .getChallengeForProject(any(), any());
 
     setupTeamSubmissionEligibility();
     when(mockGWTWrapper.getHostPageBaseURL()).thenReturn(HOST_PAGE_URL);
@@ -225,11 +210,7 @@ public class EvaluationSubmitterTest {
     AsyncMockStubber
       .callSuccessWith(testTeamSubmissionEligibility)
       .when(mockChallengeClient)
-      .getTeamSubmissionEligibility(
-        anyString(),
-        anyString(),
-        any(AsyncCallback.class)
-      );
+      .getTeamSubmissionEligibility(any(), any(), any());
   }
 
   @Test
@@ -241,12 +222,7 @@ public class EvaluationSubmitterTest {
     submitter.onNextClicked(null, null, e1);
     // should invoke submission directly without terms of use
     verify(mockChallengeClient)
-      .createIndividualSubmission(
-        any(Submission.class),
-        anyString(),
-        eq(HOST_PAGE_URL),
-        any(AsyncCallback.class)
-      );
+      .createIndividualSubmission(any(), any(), eq(HOST_PAGE_URL), any());
 
     ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
     // submitted status shown
@@ -268,7 +244,8 @@ public class EvaluationSubmitterTest {
     // also set contributors, and verify on individual submission that this is not set in the submission
     // add eligible member
     Long eligibleMemberId = 60L;
-    MemberSubmissionEligibility memberEligibility = new MemberSubmissionEligibility();
+    MemberSubmissionEligibility memberEligibility =
+      new MemberSubmissionEligibility();
     memberEligibility.setPrincipalId(eligibleMemberId);
     memberEligibility.setIsEligible(true);
     memberEligibilityList.add(memberEligibility);
@@ -282,9 +259,9 @@ public class EvaluationSubmitterTest {
     verify(mockChallengeClient)
       .createIndividualSubmission(
         captor.capture(),
-        anyString(),
+        any(),
         eq(HOST_PAGE_URL),
-        any(AsyncCallback.class)
+        any()
       );
     Submission submission = captor.getValue();
     assertNull(submission.getContributors());
@@ -300,22 +277,12 @@ public class EvaluationSubmitterTest {
     AsyncMockStubber
       .callFailureWith(new Exception("unhandled exception"))
       .when(mockChallengeClient)
-      .createIndividualSubmission(
-        any(Submission.class),
-        anyString(),
-        anyString(),
-        any(AsyncCallback.class)
-      );
+      .createIndividualSubmission(any(), any(), any(), any());
 
     submitter.onNextClicked(null, null, e1);
     // Should invoke once directly without terms of use
     verify(mockChallengeClient)
-      .createIndividualSubmission(
-        any(Submission.class),
-        anyString(),
-        eq(HOST_PAGE_URL),
-        any(AsyncCallback.class)
-      );
+      .createIndividualSubmission(any(), any(), eq(HOST_PAGE_URL), any());
 
     // submitted status shown
     verify(mockView).showErrorMessage(anyString());
@@ -329,24 +296,11 @@ public class EvaluationSubmitterTest {
     AsyncMockStubber
       .callSuccessWith(evaluationList)
       .when(mockSynapseJavascriptClient)
-      .getAvailableEvaluations(
-        anySet(),
-        anyBoolean(),
-        anyInt(),
-        anyInt(),
-        any(AsyncCallback.class)
-      );
+      .getAvailableEvaluations(any(), anyBoolean(), any(), any(), any());
     submitter.configure(entity, null, null);
     verify(mockSynapseJavascriptClient)
-      .getAvailableEvaluations(
-        anySet(),
-        anyBoolean(),
-        anyInt(),
-        anyInt(),
-        any(AsyncCallback.class)
-      );
-    verify(mockView)
-      .showModal1(anyBoolean(), any(FormParams.class), any(List.class));
+      .getAvailableEvaluations(any(), anyBoolean(), any(), any(), any());
+    verify(mockView).showModal1(anyBoolean(), any(), any());
   }
 
   @Test
@@ -358,24 +312,11 @@ public class EvaluationSubmitterTest {
     AsyncMockStubber
       .callSuccessWith(evaluationList)
       .when(mockSynapseJavascriptClient)
-      .getAvailableEvaluations(
-        anySet(),
-        anyBoolean(),
-        anyInt(),
-        anyInt(),
-        any(AsyncCallback.class)
-      );
+      .getAvailableEvaluations(any(), anyBoolean(), any(), any(), any());
     submitter.configure(entity, null, null);
     verify(mockSynapseJavascriptClient)
-      .getAvailableEvaluations(
-        anySet(),
-        anyBoolean(),
-        anyInt(),
-        anyInt(),
-        any(AsyncCallback.class)
-      );
-    verify(mockView)
-      .showModal1(anyBoolean(), any(FormParams.class), any(List.class));
+      .getAvailableEvaluations(any(), anyBoolean(), any(), any(), any());
+    verify(mockView).showModal1(anyBoolean(), any(), any());
   }
 
   @Test
@@ -386,22 +327,10 @@ public class EvaluationSubmitterTest {
     AsyncMockStubber
       .callSuccessWith(evaluationList)
       .when(mockSynapseJavascriptClient)
-      .getAvailableEvaluations(
-        anySet(),
-        anyBoolean(),
-        anyInt(),
-        anyInt(),
-        any(AsyncCallback.class)
-      );
+      .getAvailableEvaluations(any(), anyBoolean(), any(), any(), any());
     submitter.configure(entity, null, null);
     verify(mockSynapseJavascriptClient)
-      .getAvailableEvaluations(
-        anySet(),
-        anyBoolean(),
-        anyInt(),
-        anyInt(),
-        any(AsyncCallback.class)
-      );
+      .getAvailableEvaluations(any(), anyBoolean(), any(), any(), any());
     // no evaluations to join error message
     verify(mockView).showErrorMessage(anyString());
   }
@@ -413,22 +342,10 @@ public class EvaluationSubmitterTest {
     AsyncMockStubber
       .callFailureWith(caught)
       .when(mockSynapseJavascriptClient)
-      .getAvailableEvaluations(
-        anySet(),
-        anyBoolean(),
-        anyInt(),
-        anyInt(),
-        any(AsyncCallback.class)
-      );
+      .getAvailableEvaluations(any(), anyBoolean(), any(), any(), any());
     submitter.configure(entity, null, null);
     verify(mockSynapseJavascriptClient)
-      .getAvailableEvaluations(
-        anySet(),
-        anyBoolean(),
-        anyInt(),
-        anyInt(),
-        any(AsyncCallback.class)
-      );
+      .getAvailableEvaluations(any(), anyBoolean(), any(), any(), any());
     // no evaluations to join error message
     verify(mockSynAlert).handleException(caught);
   }
@@ -454,7 +371,7 @@ public class EvaluationSubmitterTest {
     AsyncMockStubber
       .callSuccessWith(testChallenge)
       .when(mockChallengeClient)
-      .getChallengeForProject(anyString(), any(AsyncCallback.class));
+      .getChallengeForProject(any(), any());
     Team testTeam = new Team();
     testTeam.setId("80");
     testTeam.setName("test team");
@@ -462,7 +379,7 @@ public class EvaluationSubmitterTest {
     AsyncMockStubber
       .callSuccessWith(submissionTeams)
       .when(mockChallengeClient)
-      .getSubmissionTeams(anyString(), anyString(), any(AsyncCallback.class));
+      .getSubmissionTeams(any(), any(), any());
 
     Evaluation testEvaluation = new Evaluation();
     testEvaluation.setContentSource("syn9999");
@@ -505,7 +422,8 @@ public class EvaluationSubmitterTest {
 
     // set contributor list
     Long eligibleMemberId = 60L;
-    MemberSubmissionEligibility memberEligibility = new MemberSubmissionEligibility();
+    MemberSubmissionEligibility memberEligibility =
+      new MemberSubmissionEligibility();
     memberEligibility.setPrincipalId(eligibleMemberId);
     memberEligibility.setIsEligible(true);
     memberEligibilityList.add(memberEligibility);
@@ -514,13 +432,7 @@ public class EvaluationSubmitterTest {
     submitter.onDoneClicked();
     verify(mockView).setSubmitButtonLoading();
     verify(mockChallengeClient)
-      .createTeamSubmission(
-        any(Submission.class),
-        anyString(),
-        anyString(),
-        eq(HOST_PAGE_URL),
-        any(AsyncCallback.class)
-      );
+      .createTeamSubmission(any(), any(), any(), eq(HOST_PAGE_URL), any());
   }
 
   private void configureSubmitter() {
@@ -536,12 +448,12 @@ public class EvaluationSubmitterTest {
     AsyncMockStubber
       .callSuccessWith(testChallenge)
       .when(mockChallengeClient)
-      .getChallengeForProject(anyString(), any(AsyncCallback.class));
+      .getChallengeForProject(any(), any());
     List<Team> submissionTeams = Collections.emptyList();
     AsyncMockStubber
       .callSuccessWith(submissionTeams)
       .when(mockChallengeClient)
-      .getSubmissionTeams(anyString(), anyString(), any(AsyncCallback.class));
+      .getSubmissionTeams(any(), any(), any());
 
     Evaluation testEvaluation = new Evaluation();
     testEvaluation.setContentSource("syn9999");
@@ -576,7 +488,8 @@ public class EvaluationSubmitterTest {
 
     // add eligible member
     Long eligibleMemberId = 60L;
-    MemberSubmissionEligibility memberEligibility = new MemberSubmissionEligibility();
+    MemberSubmissionEligibility memberEligibility =
+      new MemberSubmissionEligibility();
     memberEligibility.setPrincipalId(eligibleMemberId);
     memberEligibility.setIsEligible(true);
     memberEligibilityList.add(memberEligibility);
@@ -629,7 +542,7 @@ public class EvaluationSubmitterTest {
     AsyncMockStubber
       .callFailureWith(new ForbiddenException())
       .when(mockChallengeClient)
-      .getChallengeForProject(anyString(), any(AsyncCallback.class));
+      .getChallengeForProject(any(), any());
     submitter.onNextClicked(
       new Reference(),
       "named submission",
@@ -637,12 +550,7 @@ public class EvaluationSubmitterTest {
     );
     verify(mockView).hideModal1();
     verify(mockChallengeClient)
-      .createIndividualSubmission(
-        any(Submission.class),
-        anyString(),
-        eq(HOST_PAGE_URL),
-        any(AsyncCallback.class)
-      );
+      .createIndividualSubmission(any(), any(), eq(HOST_PAGE_URL), any());
   }
 
   @Test
@@ -708,7 +616,7 @@ public class EvaluationSubmitterTest {
     AsyncMockStubber
       .callSuccessWith(testChallenge)
       .when(mockChallengeClient)
-      .getChallengeForProject(anyString(), any(AsyncCallback.class));
+      .getChallengeForProject(any(), any());
     Team testTeam = new Team();
     testTeam.setId("80");
     testTeam.setName("test team");
@@ -716,7 +624,7 @@ public class EvaluationSubmitterTest {
     AsyncMockStubber
       .callSuccessWith(submissionTeams)
       .when(mockChallengeClient)
-      .getSubmissionTeams(anyString(), anyString(), any(AsyncCallback.class));
+      .getSubmissionTeams(any(), any(), any());
 
     Evaluation testEvaluation = new Evaluation();
     testEvaluation.setContentSource("syn9999");
@@ -729,7 +637,8 @@ public class EvaluationSubmitterTest {
     submitter.onTeamSubmissionOptionClicked();
     submitter.onTeamSelected(0);
     Long eligibleMemberId = 60L;
-    MemberSubmissionEligibility memberEligibility = new MemberSubmissionEligibility();
+    MemberSubmissionEligibility memberEligibility =
+      new MemberSubmissionEligibility();
     memberEligibility.setPrincipalId(eligibleMemberId);
     memberEligibility.setIsEligible(true);
     memberEligibilityList.add(memberEligibility);
@@ -743,10 +652,10 @@ public class EvaluationSubmitterTest {
     verify(mockChallengeClient)
       .createTeamSubmission(
         captor.capture(),
-        anyString(),
-        anyString(),
+        any(),
+        any(),
         eq(HOST_PAGE_URL),
-        any(AsyncCallback.class)
+        any()
       );
     assertNotNull(captor.getValue().getDockerDigest());
   }

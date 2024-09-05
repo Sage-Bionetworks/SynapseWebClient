@@ -9,7 +9,7 @@ public class SynapseForumPlace extends ParameterizedPlace {
     super(token);
   }
 
-  @Prefix("!SynapseForum")
+  @Prefix("SynapseForum")
   public static class Tokenizer implements PlaceTokenizer<SynapseForumPlace> {
 
     @Override

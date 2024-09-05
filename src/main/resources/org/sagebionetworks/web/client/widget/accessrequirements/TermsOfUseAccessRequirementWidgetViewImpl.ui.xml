@@ -39,23 +39,35 @@
           <g:HTML ui:field="terms" styleName="font-size-14" />
         </bh:Paragraph>
       </b:BlockQuote>
-      <bh:Div
-        ui:field="coveredEntitiesHeadingUI"
-        visible="false"
-        styleName="margin-top-10"
-      >
-        <g:InlineLabel styleName="boldText" text="Entities Covered" />
-        <bh:Hr addStyleNames="margin-top-5 margin-bottom-5" />
+      <bh:Div ui:field="subjectsDefinedByAnnotationsUI" visible="false">
+        <bh:Strong>
+          Subjects controlled by this Access Requirement are defined by
+          annotations on individual entities.
+        </bh:Strong>
       </bh:Div>
-      <bh:Div
-        ui:field="accessRequirementRelatedProjectsListContainer"
-        addStyleNames="margin-left-5 margin-right-5 accessRequirementRelatedProjectsListContainer"
-      />
-      <bh:Div
-        ui:field="entitySubjectsWidgetContainer"
-        addStyleNames="margin-left-5 margin-right-5"
-      />
-
+      <bh:Div ui:field="subjectsDefinedInAccessRequirementUI">
+        <bh:Div
+          ui:field="coveredEntitiesHeadingUI"
+          visible="false"
+          styleName="margin-top-10"
+        >
+          <g:InlineLabel styleName="boldText" text="Entities Covered" />
+          <bh:Hr addStyleNames="margin-top-5 margin-bottom-5" />
+        </bh:Div>
+        <bh:Div
+          ui:field="accessRequirementRelatedProjectsListContainer"
+          addStyleNames="margin-left-5 margin-right-5 accessRequirementRelatedProjectsListContainer"
+        />
+        <bh:Div
+          ui:field="entitySubjectsWidgetContainer"
+          addStyleNames="margin-left-5 margin-right-5"
+        />
+        <bh:Div
+          ui:field="teamSubjectsWidgetContainer"
+          pull="LEFT"
+          addStyleNames="margin-left-5 margin-right-5"
+        />
+      </bh:Div>
       <bh:ClearFix />
       <bh:Div addStyleNames="margin-top-5" ui:field="controlsContainer">
         <bh:Div
@@ -80,17 +92,7 @@
           addStyleNames="margin-right-5"
         />
         <bh:Div
-          ui:field="teamSubjectsWidgetContainer"
-          pull="LEFT"
-          addStyleNames="margin-left-5 margin-right-5"
-        />
-        <bh:Div
           ui:field="editAccessRequirementContainer"
-          pull="RIGHT"
-          addStyleNames="margin-right-5"
-        />
-        <bh:Div
-          ui:field="deleteAccessRequirementContainer"
           pull="RIGHT"
           addStyleNames="margin-right-5"
         />

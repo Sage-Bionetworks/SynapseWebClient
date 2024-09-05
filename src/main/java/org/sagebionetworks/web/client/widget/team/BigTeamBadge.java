@@ -68,7 +68,7 @@ public class BigTeamBadge implements SynapseWidgetPresenter, HasNotificationUI {
     }
   }
 
-  private void setViewTeam(
+  public void setViewTeam(
     Team team,
     String description,
     TeamMembershipStatus teamMembershipStatus,
@@ -76,8 +76,13 @@ public class BigTeamBadge implements SynapseWidgetPresenter, HasNotificationUI {
   ) {
     view.setTeam(team, description, teamIconUrl);
     boolean canSendEmail =
-      teamMembershipStatus != null && teamMembershipStatus.getCanSendEmail();
-    view.setTeamEmailAddress(getTeamEmail(team.getName(), canSendEmail));
+      teamMembershipStatus != null &&
+      teamMembershipStatus.getCanSendEmail() &&
+      authController.isLoggedIn();
+    view.setTeamEmailVisible(canSendEmail);
+    if (canSendEmail) {
+      view.setTeamEmailAddress(getTeamEmail(team.getName()));
+    }
   }
 
   public void configure(final String teamId) {
@@ -121,12 +126,8 @@ public class BigTeamBadge implements SynapseWidgetPresenter, HasNotificationUI {
     view.setHeight(height);
   }
 
-  public String getTeamEmail(String teamName, boolean canSendEmail) {
-    if (authController.isLoggedIn() && canSendEmail) {
-      // strip out any non-word character. Not a (letter, number, underscore)
-      return teamName.replaceAll("\\W", "") + "@synapse.org";
-    } else {
-      return "";
-    }
+  public String getTeamEmail(String teamName) {
+    // strip out any non-word character. Not a (letter, number, underscore)
+    return teamName.replaceAll("\\W", "") + "@synapse.org";
   }
 }

@@ -97,7 +97,7 @@ public class EntityListWidgetTest {
     verify(mockEntityListRowBadge).setIsSelectable(false);
     verify(mockEntityListRowBadge)
       .setSelectionChangedCallback(any(Callback.class));
-    verify(mockView).addRow(any(Widget.class));
+    verify(mockView).addRow(any());
 
     assertEquals(mockEntityListRowBadge, widget.getRowWidgets().get(0));
   }
@@ -136,7 +136,7 @@ public class EntityListWidgetTest {
 
     reset(mockView);
     widget.addRecord(new EntityGroupRecord());
-    verify(mockView).addRow(any(Widget.class));
+    verify(mockView).addRow(any());
     verify(mockView).setTableVisible(true);
     verify(mockView).setEmptyUiVisible(false);
   }

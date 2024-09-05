@@ -21,10 +21,8 @@ import org.sagebionetworks.repo.model.MembershipInvtnSignedToken;
 import org.sagebionetworks.repo.model.SignedTokenInterface;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.PlaceChanger;
-import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.*;
+import org.sagebionetworks.web.client.jsinterop.ToastMessageOptions;
 import org.sagebionetworks.web.client.place.EmailInvitation;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
@@ -90,9 +88,10 @@ public class EmailInvitationPresenter
         }
 
         public void onSuccess(SignedTokenInterface token) {
-          FluentFuture<MembershipInvitation> invitationFuture = jsClient.getMembershipInvitation(
-            (MembershipInvtnSignedToken) token
-          );
+          FluentFuture<MembershipInvitation> invitationFuture =
+            jsClient.getMembershipInvitation(
+              (MembershipInvtnSignedToken) token
+            );
           invitationFuture.addCallback(
             new FutureCallback<MembershipInvitation>() {
               @Override
@@ -147,18 +146,19 @@ public class EmailInvitationPresenter
             view.hideLoading();
             if (t instanceof ForbiddenException) {
               // SWC-4721: fix message in the case where membership invitation email is not associated to the
-              // currently logged in user
+              // currently logged-in user
               view.showErrorMessage(
                 "This invitation was sent to an email address not associated to the current user. \"" +
                 membershipInvitation.getInviteeEmail() +
-                "\" Please add this email to your Synapse account under \"Settings\", or log in with the correct Synapse account before accepting the invitation."
+                "\" Please add this email to your Synapse account by clicking \"Edit Profile\", or log in with the correct Synapse account before accepting the invitation."
               );
-              // SWC-4741: invitation not associated to the current user, send user to the Settings page to add
-              // the new email address
+              // SWC-4741: invitation not associated to the current user, send user to the Profile page, where they can
+              // click 'Edit Profile' to get to OneSage and add the new email address
+              // NOTE: We don't send the user directly to OneSage so that they have a chance to read the message first
               placeChanger.goTo(
                 new Profile(
                   authController.getCurrentUserPrincipalId(),
-                  ProfileArea.SETTINGS
+                  ProfileArea.PROFILE
                 )
               );
             } else {

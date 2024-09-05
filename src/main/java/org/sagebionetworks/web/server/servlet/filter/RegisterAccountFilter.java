@@ -6,7 +6,7 @@ public class RegisterAccountFilter extends RedirectFilter {
 
   @Override
   protected String getTargetPage() {
-    return "#!RegisterAccount:0";
+    return "RegisterAccount:0";
   }
 
   @Override

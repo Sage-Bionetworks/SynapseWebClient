@@ -16,7 +16,7 @@ public class ComingSoon extends Place {
     return token;
   }
 
-  @Prefix("!ComingSoon")
+  @Prefix("ComingSoon")
   public static class Tokenizer implements PlaceTokenizer<ComingSoon> {
 
     @Override

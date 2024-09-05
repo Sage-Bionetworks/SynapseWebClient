@@ -19,6 +19,7 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sagebionetworks.repo.model.EntityType.dataset;
 import static org.sagebionetworks.web.client.DisplayConstants.FILE_VIEW;
 import static org.sagebionetworks.web.client.DisplayConstants.MATERIALIZED_VIEW;
 import static org.sagebionetworks.web.client.DisplayConstants.SUBMISSION_VIEW;
@@ -28,7 +29,8 @@ import static org.sagebionetworks.web.client.utils.FutureUtils.getDoneFuture;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getFailedFuture;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.ACCESS_REQUIREMENT_GUIDANCE;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.ARE_YOU_SURE_YOU_WANT_TO_DELETE;
-import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETE_FOLDER_EXPLANATION;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETE_CONTAINER_EXPLANATION_END;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETE_CONTAINER_EXPLANATION_START;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETE_PREFIX;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.EDIT_NAME_AND_DESCRIPTION;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.EDIT_WIKI_PREFIX;
@@ -47,13 +49,16 @@ import static org.sagebionetworks.web.shared.WebConstants.REVIEW_DATA_REQUEST_CO
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwtmockito.GwtMockitoTestRunner;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.apache.xpath.Arg;
 import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.junit.Before;
 import org.junit.Test;
@@ -64,7 +69,6 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 import org.sagebionetworks.client.exceptions.SynapseClientException;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
@@ -94,6 +98,7 @@ import org.sagebionetworks.repo.model.download.EnableTwoFa;
 import org.sagebionetworks.repo.model.download.MeetAccessRequirement;
 import org.sagebionetworks.repo.model.download.RequestDownload;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
+import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.DatasetCollection;
@@ -111,6 +116,8 @@ import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.NotificationVariant;
+import org.sagebionetworks.web.client.FeatureFlagConfig;
+import org.sagebionetworks.web.client.FeatureFlagKey;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
@@ -121,11 +128,18 @@ import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
+import org.sagebionetworks.web.client.context.KeyFactoryProvider;
+import org.sagebionetworks.web.client.context.QueryClientProvider;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.jsinterop.CreateTableViewWizardProps;
+import org.sagebionetworks.web.client.jsinterop.KeyFactory;
+import org.sagebionetworks.web.client.jsinterop.SqlDefinedTableEditorModalProps;
 import org.sagebionetworks.web.client.jsinterop.ToastMessageOptions;
+import org.sagebionetworks.web.client.jsinterop.reactquery.InvalidateQueryFilters;
+import org.sagebionetworks.web.client.jsinterop.reactquery.QueryClient;
+import org.sagebionetworks.web.client.jsinterop.reactquery.QueryKey;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
@@ -135,6 +149,7 @@ import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.EntityTypeIcon;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
@@ -145,6 +160,7 @@ import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalView;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
+import org.sagebionetworks.web.client.widget.entity.SqlDefinedEditorModalWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
@@ -165,8 +181,6 @@ import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModal;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.SqlDefinedTableEditor;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
 import org.sagebionetworks.web.client.widget.team.SelectTeamModal;
@@ -182,7 +196,7 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.test.helper.CallbackMockStubber;
 import org.sagebionetworks.web.test.helper.SelfReturningAnswer;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(GwtMockitoTestRunner.class)
 public class EntityActionControllerImplTest {
 
   @Mock
@@ -216,7 +230,7 @@ public class EntityActionControllerImplTest {
   EditProjectMetadataModalWidget mockEditProjectMetadataModalWidget;
 
   @Mock
-  SqlDefinedTableEditor mockSqlDefinedTableEditor;
+  SqlDefinedEditorModalWidget mockSqlDefinedTableEditorModalWidget;
 
   EntityFinderWidget.Builder mockEntityFinderBuilder;
 
@@ -329,19 +343,25 @@ public class EntityActionControllerImplTest {
   SynapseProperties mockSynapseProperties;
 
   @Captor
-  ArgumentCaptor<EntityFinderWidget.SelectedHandler<Reference>> entityFinderSelectedHandlerCaptor;
+  ArgumentCaptor<
+    EntityFinderWidget.SelectedHandler<Reference>
+  > entityFinderSelectedHandlerCaptor;
 
   @Captor
   ArgumentCaptor<CallbackP<List<String>>> callbackListStringCaptor;
 
   @Captor
-  ArgumentCaptor<TableUpdateTransactionRequest> tableUpdateTransactionRequestCaptor;
+  ArgumentCaptor<
+    TableUpdateTransactionRequest
+  > tableUpdateTransactionRequestCaptor;
 
   @Captor
   ArgumentCaptor<AsynchronousProgressHandler> asyncProgressHandlerCaptor;
 
   @Captor
-  ArgumentCaptor<AsyncCallback<AddBatchOfFilesToDownloadListResponse>> addToDownloadListAsyncCallbackCaptor;
+  ArgumentCaptor<
+    AsyncCallback<AddBatchOfFilesToDownloadListResponse>
+  > addToDownloadListAsyncCallbackCaptor;
 
   @Mock
   TableUpdateTransactionResponse mockTableUpdateTransactionResponse;
@@ -379,11 +399,39 @@ public class EntityActionControllerImplTest {
   @Mock
   ContainerClientsHelp mockContainerClientsHelp;
 
-  @Captor
-  ArgumentCaptor<CreateTableViewWizardProps.OnComplete> createTableWizardOnCompleteCaptor;
+  @Mock
+  QueryClientProvider mockQueryClientProvider;
+
+  @Mock
+  QueryClient mockQueryClient;
+
+  @Mock
+  KeyFactoryProvider mockKeyFactoryProvider;
+
+  @Mock
+  KeyFactory mockKeyFactory;
+
+  @Mock
+  Dataset mockDataset;
+
+  @Mock
+  FeatureFlagConfig mockFeatureFlagConfig;
+
+  @Mock
+  EntityTypeIcon mockEntityTypeIcon;
+
+  @Mock
+  Element mockIconElement;
 
   @Captor
-  ArgumentCaptor<CreateTableViewWizardProps.OnCancel> createTableWizardOnCancelCaptor;
+  ArgumentCaptor<
+    CreateTableViewWizardProps.OnComplete
+  > createTableWizardOnCompleteCaptor;
+
+  @Captor
+  ArgumentCaptor<
+    CreateTableViewWizardProps.OnCancel
+  > createTableWizardOnCancelCaptor;
 
   PromptForValuesModalView.Configuration.Builder mockPromptModalConfigurationBuilder;
   Set<ResourceAccess> resourceAccessSet;
@@ -411,6 +459,8 @@ public class EntityActionControllerImplTest {
       .thenReturn(currentUserId);
     when(mockGlobalApplicationState.getPlaceChanger())
       .thenReturn(mockPlaceChanger);
+    when(mockKeyFactoryProvider.getKeyFactory(any()))
+      .thenReturn(mockKeyFactory);
 
     when(mockPortalGinInjector.getSynapseProperties())
       .thenReturn(mockSynapseProperties);
@@ -424,8 +474,8 @@ public class EntityActionControllerImplTest {
       .thenReturn(mockEditProjectMetadataModalWidget);
     when(mockPortalGinInjector.getEntityFinderBuilder())
       .thenReturn(mockEntityFinderBuilder);
-    when(mockPortalGinInjector.getSqlDefinedTableEditor())
-      .thenReturn(mockSqlDefinedTableEditor);
+    when(mockPortalGinInjector.getSqlDefinedEditorModalWidget())
+      .thenReturn(mockSqlDefinedTableEditorModalWidget);
     when(mockEntityFinderBuilder.build()).thenReturn(mockEntityFinder);
 
     when(mockPortalGinInjector.getUploadDialogWidget())
@@ -477,6 +527,12 @@ public class EntityActionControllerImplTest {
       .thenReturn(getDoneFuture(false));
     when(mockSynapseJavascriptClient.getRestrictionInformation(any(), any()))
       .thenReturn(getDoneFuture(mockRestrictionInformation));
+    when(mockQueryClientProvider.getQueryClient()).thenReturn(mockQueryClient);
+
+    when(mockPortalGinInjector.getEntityTypeIcon())
+      .thenReturn(mockEntityTypeIcon);
+    when(mockEntityTypeIcon.getElement()).thenReturn(mockIconElement);
+    when(mockIconElement.getInnerHTML()).thenReturn("");
 
     // The controller under test.
     controller =
@@ -489,7 +545,10 @@ public class EntityActionControllerImplTest {
         mockIsACTMemberAsyncHandler,
         mockGWT,
         mockEventBus,
-        mockPopupUtils
+        mockPopupUtils,
+        mockQueryClientProvider,
+        mockKeyFactoryProvider,
+        mockFeatureFlagConfig
       );
 
     parentId = "syn456";
@@ -527,7 +586,7 @@ public class EntityActionControllerImplTest {
 
     mockEntityView.setId(entityId);
     mockEntityView.setParentId(parentId);
-    mockEntityView.setViewTypeMask(new Long(WebConstants.FILE));
+    mockEntityView.setViewTypeMask(Long.valueOf(WebConstants.FILE));
 
     // Setup the mock entity selector to select an entity.
     Mockito
@@ -550,20 +609,21 @@ public class EntityActionControllerImplTest {
     CallbackMockStubber
       .invokeCallback()
       .when(mockGWT)
-      .scheduleExecution(any(Callback.class), anyInt());
+      .scheduleExecution(any(), anyInt());
 
     when(mockPromptModalConfigurationBuilder.buildConfiguration())
       .thenReturn(mockPromptModalConfiguration);
-    when(mockSynapseJavascriptClient.getChallengeForProject(anyString()))
+    when(mockSynapseJavascriptClient.getChallengeForProject(any()))
       .thenReturn(getDoneFuture(new Challenge()));
   }
 
   @Test
   public void testConfigureWithTableEntity() {
     when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
     )
-      .thenReturn("true");
+      .thenReturn(true);
+
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -614,6 +674,22 @@ public class EntityActionControllerImplTest {
   }
 
   @Test
+  public void testFullTableSearchUnavailableForVirtualTableEntity() {
+    entityBundle.setEntity(new VirtualTable());
+
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+    verify(mockActionMenu)
+      .setActionVisible(Action.TOGGLE_FULL_TEXT_SEARCH, false);
+  }
+
+  @Test
   public void testConfigureWithTableEntityNoPermission() {
     boolean canEdit = false;
     boolean canCertifiedUserEdit = false;
@@ -625,9 +701,9 @@ public class EntityActionControllerImplTest {
     permissions.setCanChangePermissions(canChangePermission);
 
     when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
     )
-      .thenReturn("true");
+      .thenReturn(true);
 
     controller.configure(
       mockActionMenu,
@@ -673,9 +749,10 @@ public class EntityActionControllerImplTest {
     permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
 
     when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
     )
-      .thenReturn("true");
+      .thenReturn(true);
+
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -737,9 +814,10 @@ public class EntityActionControllerImplTest {
     permissions.setCanChangePermissions(canChangePermission);
 
     when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
     )
-      .thenReturn("true");
+      .thenReturn(true);
+
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -795,9 +873,10 @@ public class EntityActionControllerImplTest {
     permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
 
     when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
     )
-      .thenReturn("true");
+      .thenReturn(true);
+
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -853,9 +932,10 @@ public class EntityActionControllerImplTest {
     permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
 
     when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
     )
-      .thenReturn("true");
+      .thenReturn(true);
+
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -918,9 +998,10 @@ public class EntityActionControllerImplTest {
     permissions.setCanChangePermissions(canChangePermission);
 
     when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
     )
-      .thenReturn("true");
+      .thenReturn(true);
+
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -977,9 +1058,10 @@ public class EntityActionControllerImplTest {
     permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
 
     when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
     )
-      .thenReturn("true");
+      .thenReturn(true);
+
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -1034,9 +1116,10 @@ public class EntityActionControllerImplTest {
     permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
 
     when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
     )
-      .thenReturn("true");
+      .thenReturn(true);
+
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -1088,9 +1171,10 @@ public class EntityActionControllerImplTest {
     permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
 
     when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
     )
-      .thenReturn("true");
+      .thenReturn(true);
+
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -1138,9 +1222,9 @@ public class EntityActionControllerImplTest {
     boolean canCertifiedUserEdit = true;
     permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
     when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
     )
-      .thenReturn("true");
+      .thenReturn(true);
 
     controller.configure(
       mockActionMenu,
@@ -1198,9 +1282,9 @@ public class EntityActionControllerImplTest {
     permissions.setCanChangePermissions(canChangePermission);
 
     when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
     )
-      .thenReturn("true");
+      .thenReturn(true);
 
     controller.configure(
       mockActionMenu,
@@ -1251,9 +1335,9 @@ public class EntityActionControllerImplTest {
     boolean canCertifiedUserEdit = true;
     permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
     when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
     )
-      .thenReturn("true");
+      .thenReturn(true);
 
     controller.configure(
       mockActionMenu,
@@ -1311,9 +1395,9 @@ public class EntityActionControllerImplTest {
     permissions.setCanChangePermissions(canChangePermission);
 
     when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
     )
-      .thenReturn("true");
+      .thenReturn(true);
 
     controller.configure(
       mockActionMenu,
@@ -1361,9 +1445,9 @@ public class EntityActionControllerImplTest {
   @Test
   public void testDisableFullTextSearch() {
     when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
     )
-      .thenReturn("true");
+      .thenReturn(true);
     ((TableEntity) entityBundle.getEntity()).setIsSearchEnabled(true);
     controller.configure(
       mockActionMenu,
@@ -1413,9 +1497,9 @@ public class EntityActionControllerImplTest {
   @Test
   public void testConfigureProjectLevelTableCommandsCanEdit() {
     when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
     )
-      .thenReturn("true");
+      .thenReturn(true);
     entityBundle.setEntity(new Project());
     currentEntityArea = EntityArea.TABLES;
     boolean canCertifiedUserEdit = true;
@@ -1480,9 +1564,9 @@ public class EntityActionControllerImplTest {
   @Test
   public void testConfigureProjectLevelDatasetCommandsCanEdit() {
     when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
     )
-      .thenReturn("true");
+      .thenReturn(true);
     entityBundle.setEntity(new Project());
     currentEntityArea = EntityArea.DATASETS;
     boolean canCertifiedUserEdit = true;
@@ -1564,7 +1648,7 @@ public class EntityActionControllerImplTest {
     AsyncMockStubber
       .callSuccessWith(headers)
       .when(mockSynapseJavascriptClient)
-      .getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
+      .getV2WikiHeaderTree(any(), any(), any());
     entityBundle.setEntity(new Project());
     currentEntityArea = EntityArea.WIKI;
     boolean canEdit = true;
@@ -1585,7 +1669,7 @@ public class EntityActionControllerImplTest {
     AsyncMockStubber
       .callSuccessWith(new ArrayList<V2WikiHeader>())
       .when(mockSynapseJavascriptClient)
-      .getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
+      .getV2WikiHeaderTree(any(), any(), any());
     entityBundle.setEntity(new Project());
     currentEntityArea = EntityArea.WIKI;
     boolean canEdit = true;
@@ -2606,6 +2690,12 @@ public class EntityActionControllerImplTest {
       .deleteEntityById(anyString(), any(AsyncCallback.class));
     verify(mockView)
       .showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE + error);
+    QueryKey mockQueryKey = mock(QueryKey.class);
+    when(mockKeyFactory.getTrashCanItemsQueryKey()).thenReturn(mockQueryKey);
+    verify(mockKeyFactoryProvider, never()).getKeyFactory(anyString());
+    verify(mockKeyFactory, never()).getTrashCanItemsQueryKey();
+    verify(mockQueryClient, never())
+      .invalidateQueries(any(InvalidateQueryFilters.class));
   }
 
   @Test
@@ -2614,16 +2704,16 @@ public class EntityActionControllerImplTest {
     AsyncMockStubber
       .callWithInvoke()
       .when(mockView)
-      .showConfirmDeleteDialog(anyString(), any(Callback.class));
+      .showConfirmDeleteDialog(any(), any());
     // confirm pre-flight
     AsyncMockStubber
       .callWithInvoke()
       .when(mockPreflightController)
-      .checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
+      .checkDeleteEntity(any(), any());
     AsyncMockStubber
       .callSuccessWith(null)
       .when(mockSynapseJavascriptClient)
-      .deleteEntityById(anyString(), any(AsyncCallback.class));
+      .deleteEntityById(any(), any());
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -2648,6 +2738,12 @@ public class EntityActionControllerImplTest {
       );
     verify(mockPlaceChanger)
       .goTo(new Synapse(parentId, null, EntityArea.TABLES, null));
+    QueryKey mockQueryKey = mock(QueryKey.class);
+    when(mockKeyFactory.getTrashCanItemsQueryKey()).thenReturn(mockQueryKey);
+    verify(mockKeyFactoryProvider).getKeyFactory(any());
+    verify(mockKeyFactory).getTrashCanItemsQueryKey();
+    verify(mockQueryClient)
+      .invalidateQueries(any(InvalidateQueryFilters.class));
   }
 
   @Test
@@ -2860,6 +2956,95 @@ public class EntityActionControllerImplTest {
   }
 
   @Test
+  public void testRenameDatasetIsNotLatestVersion() {
+    entityBundle.setEntity(mockDataset);
+    entityBundle.setEntityType(dataset);
+    AsyncMockStubber
+      .callWithInvoke()
+      .when(mockPreflightController)
+      .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+    AsyncMockStubber
+      .callWithInvoke()
+      .when(mockRenameEntityModalWidget)
+      .onRename(any(Entity.class), any(Callback.class));
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+    when(mockDataset.getIsLatestVersion()).thenReturn(false);
+    // method under test
+    controller.onAction(Action.CHANGE_ENTITY_NAME, null);
+    verify(mockRenameEntityModalWidget, never())
+      .onRename(any(Entity.class), any(Callback.class));
+    verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
+    verify(mockView)
+      .showErrorMessage("Can only change the name of the draft dataset.");
+  }
+
+  @Test
+  public void testRenameDatasetIsLatestVersion() {
+    entityBundle.setEntity(mockDataset);
+    entityBundle.setEntityType(dataset);
+    AsyncMockStubber
+      .callWithInvoke()
+      .when(mockPreflightController)
+      .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+    AsyncMockStubber
+      .callWithInvoke()
+      .when(mockRenameEntityModalWidget)
+      .onRename(any(Entity.class), any(Callback.class));
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+    when(mockDataset.getIsLatestVersion()).thenReturn(true);
+    // method under test
+    controller.onAction(Action.CHANGE_ENTITY_NAME, null);
+    verify(mockRenameEntityModalWidget)
+      .onRename(any(Entity.class), any(Callback.class));
+    verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
+    verify(mockView, never())
+      .showErrorMessage("Can only change the name of the draft dataset.");
+  }
+
+  @Test
+  public void testRenameFolder() {
+    Folder folder = new Folder();
+    folder.setId(entityId);
+    folder.setParentId(parentId);
+    entityBundle.setEntity(folder);
+    AsyncMockStubber
+      .callWithInvoke()
+      .when(mockPreflightController)
+      .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+    AsyncMockStubber
+      .callWithInvoke()
+      .when(mockRenameEntityModalWidget)
+      .onRename(any(Entity.class), any(Callback.class));
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+    // method under test
+    controller.onAction(Action.CHANGE_ENTITY_NAME, null);
+    verify(mockRenameEntityModalWidget)
+      .onRename(any(Entity.class), any(Callback.class));
+    verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
+  }
+
+  @Test
   public void testHasCustomRenameEditor() {
     assertTrue(controller.hasCustomRenameEditor(new FileEntity()));
     assertFalse(controller.hasCustomRenameEditor(new TableEntity()));
@@ -2904,12 +3089,7 @@ public class EntityActionControllerImplTest {
     );
     // method under test
     controller.onAction(Action.EDIT_FILE_METADATA, null);
-    verify(mockEditFileMetadataModalWidget)
-      .configure(
-        any(FileEntity.class),
-        any(FileHandle.class),
-        any(Callback.class)
-      );
+    verify(mockEditFileMetadataModalWidget).configure(any(), any(), any());
     verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
   }
 
@@ -3093,7 +3273,7 @@ public class EntityActionControllerImplTest {
     AsyncMockStubber
       .callFailureWith(new Exception())
       .when(mockSynapseJavascriptClient)
-      .getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
+      .getV2WikiPageAsV1(any(), any());
     entityBundle.setRootWikiId("111");
     controller.configure(
       mockActionMenu,
@@ -3104,7 +3284,7 @@ public class EntityActionControllerImplTest {
       mockAddToDownloadListWidget
     );
     controller.onAction(Action.VIEW_WIKI_SOURCE, null);
-    verify(mockView).showErrorMessage(anyString());
+    verify(mockView).showErrorMessage(any());
   }
 
   @Test
@@ -3506,11 +3686,11 @@ public class EntityActionControllerImplTest {
   }
 
   @Test
-  public void testOnSubmitWithUdate() {
+  public void testOnSubmitWithUpdate() {
     AsyncMockStubber
       .callWithInvoke()
       .when(mockPreflightController)
-      .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+      .checkUpdateEntity(any(), any());
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -3520,8 +3700,7 @@ public class EntityActionControllerImplTest {
       mockAddToDownloadListWidget
     );
     controller.onAction(Action.SUBMIT_TO_CHALLENGE, null);
-    verify(mockSubmitter)
-      .configure(any(Entity.class), any(Set.class), any(FormParams.class));
+    verify(mockSubmitter).configure(any(Entity.class), any(), any());
   }
 
   @Test
@@ -4027,7 +4206,7 @@ public class EntityActionControllerImplTest {
     // note that the currentArea is null (project settings)
     currentEntityArea = null;
     entityBundle.setEntity(new Project());
-    when(mockSynapseJavascriptClient.getChallengeForProject(anyString()))
+    when(mockSynapseJavascriptClient.getChallengeForProject(any()))
       .thenReturn(getFailedFuture(new NotFoundException()));
     controller.configure(
       mockActionMenu,
@@ -4056,7 +4235,7 @@ public class EntityActionControllerImplTest {
     AsyncMockStubber
       .callSuccessWith(new Challenge())
       .when(mockChallengeClient)
-      .getChallengeForProject(anyString(), any(AsyncCallback.class));
+      .getChallengeForProject(any(), any());
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -4074,7 +4253,7 @@ public class EntityActionControllerImplTest {
     // currentArea is on the challenge tab
     currentEntityArea = EntityArea.CHALLENGE;
     entityBundle.setEntity(new Project());
-    when(mockSynapseJavascriptClient.getChallengeForProject(anyString()))
+    when(mockSynapseJavascriptClient.getChallengeForProject(any()))
       .thenReturn(getDoneFuture(new Challenge()));
     controller.configure(
       mockActionMenu,
@@ -4093,9 +4272,9 @@ public class EntityActionControllerImplTest {
     // in alpha mode)
     currentEntityArea = EntityArea.WIKI;
     when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.DESCRIPTION_FIELD)
     )
-      .thenReturn("true");
+      .thenReturn(true);
     entityBundle.setEntity(new Project());
     AsyncMockStubber
       .callFailureWith(new NotFoundException())
@@ -4140,7 +4319,7 @@ public class EntityActionControllerImplTest {
   public void testGetChallengeError() throws Exception {
     entityBundle.setEntity(new Project());
     String error = "an error";
-    when(mockSynapseJavascriptClient.getChallengeForProject(anyString()))
+    when(mockSynapseJavascriptClient.getChallengeForProject(any()))
       .thenReturn(getFailedFuture(new Exception(error)));
     controller.configure(
       mockActionMenu,
@@ -4177,8 +4356,10 @@ public class EntityActionControllerImplTest {
     );
     String display =
       ARE_YOU_SURE_YOU_WANT_TO_DELETE +
-      "Folder \"Test\"?" +
-      DELETE_FOLDER_EXPLANATION;
+      "Folder <strong>Test</strong>?" +
+      DELETE_CONTAINER_EXPLANATION_START +
+      "Folder" +
+      DELETE_CONTAINER_EXPLANATION_END;
     // the call under tests
     controller.onAction(Action.DELETE_ENTITY, null);
     verify(mockView).showConfirmDeleteDialog(eq(display), any(Callback.class));
@@ -4189,6 +4370,37 @@ public class EntityActionControllerImplTest {
 
   @Test
   public void testNotFolderDeletionPrompt() {
+    /*
+     * The user must be shown a confirm dialog before a delete. Confirm is signaled via the
+     * Callback.invoke() in this case we do not want to confirm.
+     */
+    AsyncMockStubber
+      .callNoInvovke()
+      .when(mockView)
+      .showConfirmDeleteDialog(anyString(), any(Callback.class));
+    FileEntity f = new FileEntity();
+    f.setName("Test");
+    entityBundle.setEntity(f);
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+    String display =
+      ARE_YOU_SURE_YOU_WANT_TO_DELETE + "File <strong>Test</strong>?"; // note - this is not a container, so there is no prompt that everything within the container is deleted
+    // the call under tests
+    controller.onAction(Action.DELETE_ENTITY, null);
+    verify(mockView).showConfirmDeleteDialog(eq(display), any(Callback.class));
+    // should not make it to the pre-flight check
+    verify(mockPreflightController, never())
+      .checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
+  }
+
+  @Test
+  public void testProjectDeletionPrompt() {
     /*
      * The user must be shown a confirm dialog before a delete. Confirm is signaled via the
      * Callback.invoke() in this case we do not want to confirm.
@@ -4208,13 +4420,15 @@ public class EntityActionControllerImplTest {
       currentEntityArea,
       mockAddToDownloadListWidget
     );
-    String display = ARE_YOU_SURE_YOU_WANT_TO_DELETE + "Project \"Test\"?";
-    String folderDisplay = display + DELETE_FOLDER_EXPLANATION;
+    String display =
+      ARE_YOU_SURE_YOU_WANT_TO_DELETE +
+      "Project <strong>Test</strong>?" +
+      DELETE_CONTAINER_EXPLANATION_START +
+      "Project" +
+      DELETE_CONTAINER_EXPLANATION_END;
     // the call under tests
     controller.onAction(Action.DELETE_ENTITY, null);
     verify(mockView).showConfirmDeleteDialog(eq(display), any(Callback.class));
-    verify(mockView, times(0))
-      .showConfirmDeleteDialog(eq(folderDisplay), any(Callback.class));
     // should not make it to the pre-flight check
     verify(mockPreflightController, never())
       .checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
@@ -4448,15 +4662,15 @@ public class EntityActionControllerImplTest {
     AsyncMockStubber
       .callSuccessWith(null)
       .when(mockChallengeClient)
-      .deleteChallenge(anyString(), any(AsyncCallback.class));
+      .deleteChallenge(any(), any());
     AsyncMockStubber
       .callWithInvoke()
       .when(mockView)
-      .showConfirmDeleteDialog(anyString(), any(Callback.class));
+      .showConfirmDeleteDialog(any(), any());
     AsyncMockStubber
       .callWithInvoke()
       .when(mockPreflightController)
-      .checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
+      .checkDeleteEntity(any(), any());
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -4471,8 +4685,7 @@ public class EntityActionControllerImplTest {
     verify(mockView).showConfirmDeleteDialog(anyString(), any(Callback.class));
     verify(mockPreflightController)
       .checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
-    verify(mockChallengeClient)
-      .deleteChallenge(anyString(), any(AsyncCallback.class));
+    verify(mockChallengeClient).deleteChallenge(any(), any());
     verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
   }
 
@@ -4482,15 +4695,15 @@ public class EntityActionControllerImplTest {
     AsyncMockStubber
       .callFailureWith(new Exception(error))
       .when(mockChallengeClient)
-      .deleteChallenge(anyString(), any(AsyncCallback.class));
+      .deleteChallenge(any(), any());
     AsyncMockStubber
       .callWithInvoke()
       .when(mockView)
-      .showConfirmDeleteDialog(anyString(), any(Callback.class));
+      .showConfirmDeleteDialog(any(), any());
     AsyncMockStubber
       .callWithInvoke()
       .when(mockPreflightController)
-      .checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
+      .checkDeleteEntity(any(), any());
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -4502,8 +4715,7 @@ public class EntityActionControllerImplTest {
 
     controller.onAction(Action.DELETE_CHALLENGE, null);
 
-    verify(mockChallengeClient)
-      .deleteChallenge(anyString(), any(AsyncCallback.class));
+    verify(mockChallengeClient).deleteChallenge(any(), any());
     verify(mockView).showErrorMessage(error);
     verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
   }
@@ -4522,22 +4734,17 @@ public class EntityActionControllerImplTest {
     AsyncMockStubber
       .callWithInvoke()
       .when(mockPreflightController)
-      .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+      .checkUpdateEntity(any(), any());
     AsyncMockStubber
       .callSuccessWith(tableEntity)
       .when(mockSynapseJavascriptClient)
-      .updateEntity(
-        any(Entity.class),
-        anyString(),
-        anyBoolean(),
-        any(AsyncCallback.class)
-      );
+      .updateEntity(any(), any(), any(), any());
     assertFalse(tableEntity.getIsSearchEnabled());
 
     controller.onAction(Action.TOGGLE_FULL_TEXT_SEARCH, null);
 
     assertTrue(tableEntity.getIsSearchEnabled());
-    verify(mockView).showSuccess(anyString());
+    verify(mockView).showSuccess(any());
   }
 
   @Test
@@ -4555,16 +4762,11 @@ public class EntityActionControllerImplTest {
     AsyncMockStubber
       .callWithInvoke()
       .when(mockPreflightController)
-      .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+      .checkUpdateEntity(any(), any());
     AsyncMockStubber
       .callFailureWith(new Exception(errorMessage))
       .when(mockSynapseJavascriptClient)
-      .updateEntity(
-        any(Entity.class),
-        anyString(),
-        anyBoolean(),
-        any(AsyncCallback.class)
-      );
+      .updateEntity(any(), any(), any(), any());
     assertFalse(tableEntity.getIsSearchEnabled());
 
     controller.onAction(Action.TOGGLE_FULL_TEXT_SEARCH, null);
@@ -4574,7 +4776,8 @@ public class EntityActionControllerImplTest {
   }
 
   @Test
-  public void testOnEditDefiningSql() {
+  public void testOnEditDefiningSqlOnCancel() {
+    when(mockMaterializedView.getId()).thenReturn(entityId);
     String oldSql = "select everything";
     entityBundle.setEntity(mockMaterializedView);
     when(mockMaterializedView.getDefiningSQL()).thenReturn(oldSql);
@@ -4593,30 +4796,70 @@ public class EntityActionControllerImplTest {
 
     controller.onAction(Action.EDIT_DEFINING_SQL, null);
 
-    // user is prompted for the new SQL
-    ArgumentCaptor<PromptCallback> callbackCaptor = ArgumentCaptor.forClass(
-      PromptCallback.class
+    ArgumentCaptor<
+      SqlDefinedTableEditorModalProps.Callback
+    > onUpdateArgumentCaptor = ArgumentCaptor.forClass(
+      SqlDefinedTableEditorModalProps.Callback.class
     );
-    verify(mockView)
-      .showPromptDialog(
-        anyString(),
-        anyString(),
-        callbackCaptor.capture(),
-        eq(PromptForValuesModalView.InputType.TEXTAREA)
+    ArgumentCaptor<
+      SqlDefinedTableEditorModalProps.Callback
+    > onCancelArgumentCaptor = ArgumentCaptor.forClass(
+      SqlDefinedTableEditorModalProps.Callback.class
+    );
+    verify(mockSqlDefinedTableEditorModalWidget)
+      .configure(
+        eq(entityId),
+        onUpdateArgumentCaptor.capture(),
+        onCancelArgumentCaptor.capture()
       );
-    PromptCallback capturedCallback = callbackCaptor.getValue();
-    String newSql = "select nothing";
 
-    capturedCallback.callback(newSql);
+    onCancelArgumentCaptor.getValue().run();
+    verify(mockSqlDefinedTableEditorModalWidget).setOpen(false);
+    verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
+  }
 
-    verify(mockMaterializedView).setDefiningSQL(newSql);
-    verify(mockSynapseJavascriptClient)
-      .updateEntity(
-        eq(mockMaterializedView),
-        anyString(),
-        anyBoolean(),
-        any(AsyncCallback.class)
+  @Test
+  public void testOnEditDefiningSqlOnUpdate() {
+    when(mockMaterializedView.getId()).thenReturn(entityId);
+    String oldSql = "select everything";
+    entityBundle.setEntity(mockMaterializedView);
+    when(mockMaterializedView.getDefiningSQL()).thenReturn(oldSql);
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+    AsyncMockStubber
+      .callWithInvoke()
+      .when(mockPreflightController)
+      .checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+
+    controller.onAction(Action.EDIT_DEFINING_SQL, null);
+
+    ArgumentCaptor<
+      SqlDefinedTableEditorModalProps.Callback
+    > onUpdateArgumentCaptor = ArgumentCaptor.forClass(
+      SqlDefinedTableEditorModalProps.Callback.class
+    );
+    ArgumentCaptor<
+      SqlDefinedTableEditorModalProps.Callback
+    > onCancelArgumentCaptor = ArgumentCaptor.forClass(
+      SqlDefinedTableEditorModalProps.Callback.class
+    );
+    verify(mockSqlDefinedTableEditorModalWidget)
+      .configure(
+        eq(entityId),
+        onUpdateArgumentCaptor.capture(),
+        onCancelArgumentCaptor.capture()
       );
+
+    onUpdateArgumentCaptor.getValue().run();
+    verify(mockSqlDefinedTableEditorModalWidget).setOpen(false);
+
+    verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
   }
 
   @Test
@@ -4683,11 +4926,7 @@ public class EntityActionControllerImplTest {
       )
     );
 
-    when(
-      mockSynapseJavascriptClient.getActionsRequiredForEntityDownload(
-        anyString()
-      )
-    )
+    when(mockSynapseJavascriptClient.getActionsRequiredForEntityDownload(any()))
       .thenReturn(getDoneFuture(actionsRequiredForDownload));
 
     entityBundle.setEntity(new FileEntity());
@@ -4704,7 +4943,9 @@ public class EntityActionControllerImplTest {
     );
 
     verify(mockActionMenu).setDownloadMenuEnabled(false);
-    ArgumentCaptor<String> tooltipCaptor = new ArgumentCaptor<>();
+    ArgumentCaptor<String> tooltipCaptor = ArgumentCaptor.forClass(
+      String.class
+    );
     verify(mockActionMenu, times(2))
       .setDownloadMenuTooltipText(tooltipCaptor.capture());
     String tooltip = tooltipCaptor.getAllValues().get(1);
@@ -4911,6 +5152,34 @@ public class EntityActionControllerImplTest {
   }
 
   @Test
+  public void testConfigureExternalFileHandleDownload() {
+    ExternalFileHandle externalFileHandle = new ExternalFileHandle();
+    entityBundle.setFileHandles(Collections.singletonList(externalFileHandle));
+    entityBundle.setEntity(new FileEntity());
+
+    // Call under test
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+
+    verify(mockActionMenu).setDownloadMenuEnabled(true);
+    verify(mockActionMenu).setDownloadMenuTooltipText("");
+    verify(mockActionMenu).setActionVisible(Action.OPEN_EXTERNAL_FILE, true);
+    verify(mockActionMenu).setActionVisible(Action.DOWNLOAD_FILE, false);
+    verify(mockActionMenu).setActionVisible(Action.ADD_TO_DOWNLOAD_CART, false);
+    verify(mockActionMenu)
+      .setActionVisible(Action.SHOW_PROGRAMMATIC_OPTIONS, false);
+
+    verify(mockFileDownloadHandlerWidget)
+      .configure(mockActionMenu, entityBundle, mockRestrictionInformation);
+  }
+
+  @Test
   public void testConfigureContainerDownload() {
     EntityChildrenResponse fileChildrenResponse = new EntityChildrenResponse();
     fileChildrenResponse.setPage(Collections.singletonList(new EntityHeader()));
@@ -5024,7 +5293,7 @@ public class EntityActionControllerImplTest {
 
   @Test
   public void testReportViolation() {
-    String url = "https://www.synapse.org/#!Synapse:syn123";
+    String url = "https://www.synapse.org/Synapse:syn123";
     String ownerId = "4958725";
     String email = "email@address.com";
     String firstName = "Synapse";

@@ -16,7 +16,7 @@ public class ACTDataAccessSubmissionDashboardPlace extends Place {
     return token;
   }
 
-  @Prefix("!ACTDataAccessSubmissionDashboard")
+  @Prefix("ACTDataAccessSubmissionDashboard")
   public static class Tokenizer
     implements PlaceTokenizer<ACTDataAccessSubmissionDashboardPlace> {
 

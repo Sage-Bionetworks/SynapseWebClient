@@ -6,7 +6,7 @@ import jsinterop.annotations.JsType;
 @JsType(isNative = true, namespace = JsPackage.GLOBAL, name = "Object")
 public class ReactDOMRoot {
 
-  public native void render(ReactNode element);
+  public native void render(ReactElement element);
 
   public native void unmount();
 }

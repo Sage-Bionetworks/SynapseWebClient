@@ -58,13 +58,8 @@ public class SynapseWikiPresenterTest {
     AsyncMockStubber
       .callFailureWith(new Exception())
       .when(mockSynapseClient)
-      .hasAccess(
-        anyString(),
-        anyString(),
-        anyString(),
-        any(AsyncCallback.class)
-      );
+      .hasAccess(any(), any(), any(), any());
     presenter.setPlace(testPlace);
-    verify(mockView).showErrorMessage(anyString());
+    verify(mockView).showErrorMessage(any());
   }
 }

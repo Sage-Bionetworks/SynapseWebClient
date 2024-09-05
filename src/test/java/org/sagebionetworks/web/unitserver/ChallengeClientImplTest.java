@@ -25,8 +25,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.internal.util.reflection.Whitebox;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
@@ -66,8 +65,9 @@ import org.sagebionetworks.web.shared.ChallengeTeamPagedResults;
 import org.sagebionetworks.web.shared.UserProfilePagedResults;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+import org.springframework.test.util.ReflectionTestUtils;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class ChallengeClientImplTest {
 
   public static final String TEST_CHALLENGE_PROJECT_NAME =
@@ -110,7 +110,8 @@ public class ChallengeClientImplTest {
 
   private static final String HTTP_REQUEST_URL =
     "https://www.synapse.org/Portal/challenge";
-  private static JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
+  private static JSONObjectAdapter jsonObjectAdapter =
+    new JSONObjectAdapterImpl();
   private static AdapterFactory adapterFactory = new AdapterFactoryImpl();
   ChallengeTeam testChallengeTeam1, testChallengeTeam2;
   Challenge testChallenge;
@@ -146,7 +147,11 @@ public class ChallengeClientImplTest {
     when(mockSynapse.getUserEvaluationPermissions(EVAL_ID_2))
       .thenReturn(userEvaluationPermissions);
 
-    org.sagebionetworks.reflection.model.PaginatedResults<EntityHeader> batchHeaders = new org.sagebionetworks.reflection.model.PaginatedResults<EntityHeader>();
+    org.sagebionetworks.reflection.model.PaginatedResults<
+      EntityHeader
+    > batchHeaders = new org.sagebionetworks.reflection.model.PaginatedResults<
+      EntityHeader
+    >();
     batchHeaderResults = new ArrayList<EntityHeader>();
     for (int i = 0; i < 10; i++) {
       EntityHeader h = new EntityHeader();
@@ -169,7 +174,7 @@ public class ChallengeClientImplTest {
     setupChallengeteamPagedResults();
     when(mockSynapse.getChallenge(anyString())).thenReturn(testChallenge);
 
-    Whitebox.setInternalState(
+    ReflectionTestUtils.setField(
       synapseClient,
       "perThreadRequest",
       mockThreadLocal
@@ -196,8 +201,8 @@ public class ChallengeClientImplTest {
       .createIndividualSubmission(
         mockSubmission,
         etag,
-        TEST_HOME_PAGE_BASE + "#!Synapse:",
-        TEST_HOME_PAGE_BASE + "#!SignedToken:"
+        TEST_HOME_PAGE_BASE + "Synapse:",
+        TEST_HOME_PAGE_BASE + "SignedToken:"
       );
   }
 
@@ -218,8 +223,8 @@ public class ChallengeClientImplTest {
         mockSubmission,
         etag,
         memberStateHash,
-        TEST_HOME_PAGE_BASE + "#!Synapse:",
-        TEST_HOME_PAGE_BASE + "#!SignedToken:"
+        TEST_HOME_PAGE_BASE + "Synapse:",
+        TEST_HOME_PAGE_BASE + "SignedToken:"
       );
   }
 
@@ -474,9 +479,9 @@ public class ChallengeClientImplTest {
 
   public void setupGetEvaluationsForEntity(String sharedEntityId)
     throws SynapseException {
-    org.sagebionetworks.reflection.model.PaginatedResults<Evaluation> testResults = getTestEvaluations(
-      sharedEntityId
-    );
+    org.sagebionetworks.reflection.model.PaginatedResults<
+      Evaluation
+    > testResults = getTestEvaluations(sharedEntityId);
     when(
       mockSynapse.getEvaluationByContentSource(anyString(), anyInt(), anyInt())
     )
@@ -491,18 +496,28 @@ public class ChallengeClientImplTest {
       .thenReturn(testResults);
   }
 
-  private org.sagebionetworks.reflection.model.PaginatedResults<Evaluation> getEmptyPaginatedResults() {
-    org.sagebionetworks.reflection.model.PaginatedResults<Evaluation> testResults = new org.sagebionetworks.reflection.model.PaginatedResults<Evaluation>();
+  private org.sagebionetworks.reflection.model.PaginatedResults<
+    Evaluation
+  > getEmptyPaginatedResults() {
+    org.sagebionetworks.reflection.model.PaginatedResults<
+      Evaluation
+    > testResults = new org.sagebionetworks.reflection.model.PaginatedResults<
+      Evaluation
+    >();
     List<Evaluation> evaluationList = new ArrayList<Evaluation>();
     testResults.setTotalNumberOfResults(0);
     testResults.setResults(evaluationList);
     return testResults;
   }
 
-  private org.sagebionetworks.reflection.model.PaginatedResults<Evaluation> getTestEvaluations(
-    String sharedEntityId
-  ) {
-    org.sagebionetworks.reflection.model.PaginatedResults<Evaluation> testResults = new org.sagebionetworks.reflection.model.PaginatedResults<Evaluation>();
+  private org.sagebionetworks.reflection.model.PaginatedResults<
+    Evaluation
+  > getTestEvaluations(String sharedEntityId) {
+    org.sagebionetworks.reflection.model.PaginatedResults<
+      Evaluation
+    > testResults = new org.sagebionetworks.reflection.model.PaginatedResults<
+      Evaluation
+    >();
     List<Evaluation> evaluationList = new ArrayList<Evaluation>();
     Evaluation e = new Evaluation();
     e.setId(EVAL_ID_1);
@@ -519,9 +534,9 @@ public class ChallengeClientImplTest {
 
   public void setupGetAvailableEvaluations(String sharedEntityId)
     throws SynapseException {
-    org.sagebionetworks.reflection.model.PaginatedResults<Evaluation> testResults = getTestEvaluations(
-      sharedEntityId
-    );
+    org.sagebionetworks.reflection.model.PaginatedResults<
+      Evaluation
+    > testResults = getTestEvaluations(sharedEntityId);
     when(mockSynapse.getAvailableEvaluationsPaginated(anyInt(), anyInt()))
       .thenReturn(testResults);
   }
@@ -603,7 +618,8 @@ public class ChallengeClientImplTest {
   }
 
   public void setupChallengeteamPagedResults() throws SynapseException {
-    org.sagebionetworks.repo.model.ChallengeTeamPagedResults results = new org.sagebionetworks.repo.model.ChallengeTeamPagedResults();
+    org.sagebionetworks.repo.model.ChallengeTeamPagedResults results =
+      new org.sagebionetworks.repo.model.ChallengeTeamPagedResults();
     List<ChallengeTeam> resultList = new ArrayList<ChallengeTeam>();
     resultList.add(testChallengeTeam1);
     resultList.add(testChallengeTeam2);
@@ -631,7 +647,8 @@ public class ChallengeClientImplTest {
   }
 
   public org.sagebionetworks.repo.model.ChallengePagedResults getTestChallengePagedResults() {
-    org.sagebionetworks.repo.model.ChallengePagedResults results = new org.sagebionetworks.repo.model.ChallengePagedResults();
+    org.sagebionetworks.repo.model.ChallengePagedResults results =
+      new org.sagebionetworks.repo.model.ChallengePagedResults();
     results.setResults(Collections.singletonList(testChallenge));
     results.setTotalNumberOfResults(1L);
     return results;
@@ -646,7 +663,11 @@ public class ChallengeClientImplTest {
       )
     )
       .thenReturn(getTestChallengePagedResults());
-    org.sagebionetworks.reflection.model.PaginatedResults<EntityHeader> headers = new org.sagebionetworks.reflection.model.PaginatedResults<EntityHeader>();
+    org.sagebionetworks.reflection.model.PaginatedResults<
+      EntityHeader
+    > headers = new org.sagebionetworks.reflection.model.PaginatedResults<
+      EntityHeader
+    >();
     EntityHeader header = new EntityHeader();
     header.setId(testChallengeProject);
     header.setName(TEST_CHALLENGE_PROJECT_NAME);

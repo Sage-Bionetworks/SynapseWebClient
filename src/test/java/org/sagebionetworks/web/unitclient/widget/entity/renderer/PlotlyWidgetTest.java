@@ -326,7 +326,8 @@ public class PlotlyWidgetTest {
         eq(AsynchronousProgressWidget.WAIT_MS),
         jobTrackerCallbackCaptor.capture()
       );
-    UpdatingAsynchProgressHandler progressHandler = jobTrackerCallbackCaptor.getValue();
+    UpdatingAsynchProgressHandler progressHandler =
+      jobTrackerCallbackCaptor.getValue();
 
     // also verify attachment state is based on view
     when(mockView.isAttached()).thenReturn(true);
@@ -352,7 +353,8 @@ public class PlotlyWidgetTest {
         eq(AsynchronousProgressWidget.WAIT_MS),
         jobTrackerCallbackCaptor.capture()
       );
-    UpdatingAsynchProgressHandler progressHandler = jobTrackerCallbackCaptor.getValue();
+    UpdatingAsynchProgressHandler progressHandler =
+      jobTrackerCallbackCaptor.getValue();
 
     Exception error = new Exception();
     progressHandler.onFailure(error);
@@ -450,11 +452,11 @@ public class PlotlyWidgetTest {
 
     verify(mockView)
       .showChart(
-        anyString(),
+        any(),
         eq(yAxisTitle),
         eq(xAxisTitle),
         plotlyTraceArrayCaptor.capture(),
-        anyString(),
+        any(),
         any(),
         any(),
         anyBoolean()

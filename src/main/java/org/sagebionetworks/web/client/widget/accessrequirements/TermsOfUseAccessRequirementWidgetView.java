@@ -33,8 +33,6 @@ public interface TermsOfUseAccessRequirementWidgetView
 
   void setEditAccessRequirementWidget(IsWidget w);
 
-  void setDeleteAccessRequirementWidget(IsWidget w);
-
   void setTeamSubjectsWidget(IsWidget w);
 
   void setManageAccessWidget(IsWidget w);
@@ -60,4 +58,6 @@ public interface TermsOfUseAccessRequirementWidgetView
   void setAccessRequirementRelatedProjectsList(
     IsWidget accessRequirementRelatedProjectsList
   );
+
+  void setSubjectsDefinedByAnnotations(Boolean subjectsDefinedByAnnotations);
 }

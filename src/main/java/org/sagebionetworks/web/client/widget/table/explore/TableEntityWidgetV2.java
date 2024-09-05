@@ -82,13 +82,11 @@ public class TableEntityWidgetV2
       "This " +
       tableType.getDisplayName() +
       " does not have any columns." +
-      (
-        editable
+      (editable
           ? " Edit the Schema to add columns to this " +
           tableType.getDisplayName() +
           "."
-          : ""
-      )
+          : "")
     );
   }
 
@@ -104,30 +102,24 @@ public class TableEntityWidgetV2
         "This " +
         tableType.getDisplayName() +
         " does not have any items." +
-        (
-          editable
-            ? (
-              " Select \"Edit " +
+        (editable
+            ? (" Select \"Edit " +
               tableType.getDisplayName() +
               " Items\" from the Tools Menu to add items to this " +
               tableType.getDisplayName() +
-              "."
-            )
-            : ""
-        )
+              ".")
+            : "")
       );
     } else {
       return (
         "This " +
         tableType.getDisplayName() +
         " does not have a defined scope." +
-        (
-          editable
+        (editable
             ? " Edit the scope to populate the " +
             tableType.getDisplayName() +
             "."
-            : ""
-        )
+            : "")
       );
     }
   }
@@ -682,8 +674,9 @@ public class TableEntityWidgetV2
           DisplayUtils.NotificationVariant.SUCCESS,
           toastOptions
         );
-        eventBus.fireEvent(new EntityUpdatedEvent(tableId));
+        ginInjector.getGlobalApplicationState().setIsEditing(false);
         closeItemsEditor();
+        eventBus.fireEvent(new EntityUpdatedEvent(tableId));
       },
       () -> closeItemsEditor(),
       hasUnsavedChanges ->

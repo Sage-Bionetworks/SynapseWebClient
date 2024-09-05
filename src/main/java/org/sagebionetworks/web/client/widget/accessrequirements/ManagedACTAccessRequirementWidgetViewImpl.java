@@ -17,7 +17,6 @@ import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
@@ -26,7 +25,7 @@ import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 
 public class ManagedACTAccessRequirementWidgetViewImpl
   implements ManagedACTAccessRequirementWidgetView {
@@ -62,13 +61,12 @@ public class ManagedACTAccessRequirementWidgetViewImpl
   Button loginButton;
 
   @UiField
-  ReactComponentDiv requestDataAccessWidget;
+  SimplePanel requestDataAccessWidgetContainer;
+
+  ReactComponent requestDataAccessWidget = new ReactComponent();
 
   @UiField
   Div editAccessRequirementContainer;
-
-  @UiField
-  Div deleteAccessRequirementContainer;
 
   @UiField
   Div reviewAccessRequestsContainer;
@@ -127,7 +125,12 @@ public class ManagedACTAccessRequirementWidgetViewImpl
   @UiField
   Span accessRequirementDescription;
 
-  private final JSONObjectAdapter jsonObjectAdapter;
+  @UiField
+  Div subjectsDefinedByAnnotationsUI;
+
+  @UiField
+  Div subjectsDefinedInAccessRequirementUI;
+
   private final SynapseReactClientFullContextPropsProvider propsProvider;
   Callback onAttachCallback;
   public static final String DEFAULT_AR_DESCRIPTION = "these data";
@@ -142,11 +145,9 @@ public class ManagedACTAccessRequirementWidgetViewImpl
   public ManagedACTAccessRequirementWidgetViewImpl(
     Binder binder,
     GlobalApplicationState globalAppState,
-    JSONObjectAdapter jsonObjectAdapter,
     SynapseReactClientFullContextPropsProvider propsProvider
   ) {
     this.w = binder.createAndBindUi(this);
-    this.jsonObjectAdapter = jsonObjectAdapter;
     this.propsProvider = propsProvider;
     cancelRequestButton.addClickHandler(event -> {
       presenter.onCancelRequest();
@@ -268,12 +269,6 @@ public class ManagedACTAccessRequirementWidgetViewImpl
   }
 
   @Override
-  public void setDeleteAccessRequirementWidget(IsWidget w) {
-    deleteAccessRequirementContainer.clear();
-    deleteAccessRequirementContainer.add(w);
-  }
-
-  @Override
   public void setTeamSubjectsWidget(IsWidget w) {
     teamSubjectsWidgetContainer.clear();
     teamSubjectsWidgetContainer.add(w);
@@ -389,7 +384,7 @@ public class ManagedACTAccessRequirementWidgetViewImpl
   ) {
     AccessRequirementListProps.Callback onHide = () -> {
       presenter.refreshApprovalState();
-      hideRequestAccessModal();
+      requestDataAccessWidgetContainer.clear();
     };
     String entityId = null;
     if (
@@ -401,8 +396,10 @@ public class ManagedACTAccessRequirementWidgetViewImpl
     AccessRequirementListProps props = AccessRequirementListProps.create(
       onHide,
       Collections.singletonList(accessRequirement),
-      entityId
+      entityId,
+      RestrictableObjectType.ENTITY
     );
+    requestDataAccessWidgetContainer.add(requestDataAccessWidget);
     requestDataAccessWidget.render(
       React.createElementWithSynapseContext(
         SRC.SynapseComponents.AccessRequirementList,
@@ -412,7 +409,14 @@ public class ManagedACTAccessRequirementWidgetViewImpl
     );
   }
 
-  public void hideRequestAccessModal() {
-    requestDataAccessWidget.clear();
+  @Override
+  public void setSubjectsDefinedByAnnotations(
+    Boolean subjectsDefinedByAnnotations
+  ) {
+    boolean v = subjectsDefinedByAnnotations != null
+      ? subjectsDefinedByAnnotations.booleanValue()
+      : false;
+    subjectsDefinedByAnnotationsUI.setVisible(v);
+    subjectsDefinedInAccessRequirementUI.setVisible(!v);
   }
 }

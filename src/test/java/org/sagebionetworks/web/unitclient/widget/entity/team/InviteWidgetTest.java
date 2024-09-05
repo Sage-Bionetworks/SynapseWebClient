@@ -21,7 +21,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.repo.model.Team;
@@ -47,7 +47,7 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.entity.EvaluationSubmitterTest;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class InviteWidgetTest {
 
   @Mock
@@ -311,7 +311,8 @@ public class InviteWidgetTest {
         membershipInvitationCaptor.capture(),
         any(AsyncCallback.class)
       );
-    List<MembershipInvitation> invites = membershipInvitationCaptor.getAllValues();
+    List<MembershipInvitation> invites =
+      membershipInvitationCaptor.getAllValues();
     assertEquals(email1, invites.get(0).getInviteeEmail());
     assertEquals(teamId, invites.get(0).getTeamId());
     assertEquals(invitationMessage, invites.get(0).getMessage());

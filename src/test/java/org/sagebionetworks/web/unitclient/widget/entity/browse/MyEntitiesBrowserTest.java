@@ -102,14 +102,7 @@ public class MyEntitiesBrowserTest {
     AsyncMockStubber
       .callSuccessWith(mockProjectHeaderList)
       .when(mockSynapseJavascriptClient)
-      .getMyProjects(
-        any(ProjectListType.class),
-        anyInt(),
-        anyString(),
-        any(ProjectListSortColumn.class),
-        any(SortDirection.class),
-        any(AsyncCallback.class)
-      );
+      .getMyProjects(any(), anyInt(), any(), any(), any(), any());
   }
 
   @Test
@@ -117,28 +110,14 @@ public class MyEntitiesBrowserTest {
     when(mockProjectHeaderList.getNextPageToken()).thenReturn("abc", null);
     widget.loadMoreUserUpdateable();
     verify(mockSynapseJavascriptClient)
-      .getMyProjects(
-        any(ProjectListType.class),
-        anyInt(),
-        anyString(),
-        any(ProjectListSortColumn.class),
-        any(SortDirection.class),
-        any(AsyncCallback.class)
-      );
-    verify(mockView).addUpdatableEntities(anyList());
+      .getMyProjects(any(), anyInt(), any(), any(), any(), any());
+    verify(mockView).addUpdatableEntities(any());
     verify(mockView).setIsMoreUpdatableEntities(true);
 
     entities.clear();
     widget.loadMoreUserUpdateable();
     verify(mockSynapseJavascriptClient, times(2))
-      .getMyProjects(
-        any(ProjectListType.class),
-        anyInt(),
-        anyString(),
-        any(ProjectListSortColumn.class),
-        any(SortDirection.class),
-        any(AsyncCallback.class)
-      );
+      .getMyProjects(any(), anyInt(), any(), any(), any(), any());
     verify(mockView).setIsMoreUpdatableEntities(false);
   }
 
@@ -155,14 +134,7 @@ public class MyEntitiesBrowserTest {
     AsyncMockStubber
       .callFailureWith(new Exception(errorMessage))
       .when(mockSynapseJavascriptClient)
-      .getMyProjects(
-        any(ProjectListType.class),
-        anyInt(),
-        anyString(),
-        any(ProjectListSortColumn.class),
-        any(SortDirection.class),
-        any(AsyncCallback.class)
-      );
+      .getMyProjects(any(), anyInt(), any(), any(), any(), any());
     widget.loadMoreUserUpdateable();
     verify(mockView, never()).addUpdatableEntities(anyList());
     verify(mockView).showErrorMessage(errorMessage);
@@ -214,14 +186,7 @@ public class MyEntitiesBrowserTest {
     verify(mockEntityTreeBrowser).clear();
     verify(mockView, times(2)).setIsMoreUpdatableEntities(true);
     verify(mockSynapseJavascriptClient)
-      .getMyProjects(
-        any(ProjectListType.class),
-        anyInt(),
-        anyString(),
-        any(ProjectListSortColumn.class),
-        any(SortDirection.class),
-        any(AsyncCallback.class)
-      );
+      .getMyProjects(any(), anyInt(), any(), any(), any(), any());
 
     // test clearState() when context has changed
     when(mockGlobalApplicationState.getCurrentPlace())

@@ -89,7 +89,8 @@ public class CellFactory {
         case DATE_LIST:
         case ENTITYID_LIST:
         case USERID_LIST:
-          JSONListCellEditor listEditor = ginInjector.createJSONListCellEditor();
+          JSONListCellEditor listEditor =
+            ginInjector.createJSONListCellEditor();
           listEditor.setColumnModel(model);
           editor = listEditor;
           break;
@@ -140,7 +141,8 @@ public class CellFactory {
         case DATE_LIST:
           //				case ENTITYID_LIST:
           //				case USERID_LIST:
-          JSONListCellEditor listEditor = ginInjector.createJSONListCellEditor();
+          JSONListCellEditor listEditor =
+            ginInjector.createJSONListCellEditor();
           listEditor.setColumnModel(model);
           editor = listEditor;
           break;

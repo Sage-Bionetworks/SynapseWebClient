@@ -81,7 +81,7 @@ public class APITableColumnManagerTest {
     manager.configure(configs);
 
     verify(mockView).clearColumns();
-    verify(mockView, times(2)).addColumn(any(Widget.class));
+    verify(mockView, times(2)).addColumn(any());
     verify(mockView).setButtonToolbarVisible(true);
     verify(mockView).setHeaderColumnsVisible(true);
     verify(mockView).setNoColumnsUIVisible(false);
@@ -109,7 +109,7 @@ public class APITableColumnManagerTest {
       .setSelectionChangedCallback(any(Callback.class));
     verify(mockColumnConfigEditor).configure(any(APITableColumnConfig.class));
 
-    verify(mockView).addColumn(any(Widget.class));
+    verify(mockView).addColumn(any());
     verify(mockView).setButtonToolbarVisible(true);
     verify(mockView).setHeaderColumnsVisible(true);
     verify(mockView).setNoColumnsUIVisible(false);

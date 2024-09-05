@@ -37,7 +37,6 @@ public class ManagedACTAccessRequirementWidget
   ManagedACTAccessRequirement ar;
   PortalGinInjector ginInjector;
   CreateAccessRequirementButton createAccessRequirementButton;
-  DeleteAccessRequirementButton deleteAccessRequirementButton;
   IntendedDataUseReportButton iduReportButton;
   TeamSubjectsWidget teamSubjectsWidget;
   EntitySubjectsWidget entitySubjectsWidget;
@@ -63,7 +62,6 @@ public class ManagedACTAccessRequirementWidget
     EntitySubjectsWidget entitySubjectsWidget,
     AccessRequirementRelatedProjectsList accessRequirementRelatedProjectsList,
     CreateAccessRequirementButton createAccessRequirementButton,
-    DeleteAccessRequirementButton deleteAccessRequirementButton,
     ReviewAccessRequestsButton reviewAccessRequestsButton,
     IntendedDataUseReportButton iduReportButton,
     DataAccessClientAsync dataAccessClient,
@@ -84,7 +82,6 @@ public class ManagedACTAccessRequirementWidget
     this.accessRequirementRelatedProjectsList =
       accessRequirementRelatedProjectsList;
     this.createAccessRequirementButton = createAccessRequirementButton;
-    this.deleteAccessRequirementButton = deleteAccessRequirementButton;
     this.reviewAccessRequestsButton = reviewAccessRequestsButton;
     this.iduReportButton = iduReportButton;
     this.manageAccessButton = manageAccessButton;
@@ -100,7 +97,6 @@ public class ManagedACTAccessRequirementWidget
     view.setPresenter(this);
     view.setWikiTermsWidget(wikiPageWidget.asWidget());
     view.setEditAccessRequirementWidget(createAccessRequirementButton);
-    view.setDeleteAccessRequirementWidget(deleteAccessRequirementButton);
     view.setReviewAccessRequestsWidget(reviewAccessRequestsButton);
     view.setManageAccessWidget(manageAccessButton);
     view.setTeamSubjectsWidget(teamSubjectsWidget);
@@ -152,7 +148,6 @@ public class ManagedACTAccessRequirementWidget
       }
     );
     createAccessRequirementButton.configure(ar, refreshCallback);
-    deleteAccessRequirementButton.configure(ar, refreshCallback);
     iduReportButton.configure(ar);
     reviewAccessRequestsButton.configure(ar);
     manageAccessButton.configure(ar);
@@ -164,6 +159,10 @@ public class ManagedACTAccessRequirementWidget
     isACTMemberAsyncHandler.isACTActionAvailable(isACT -> {
       view.setAccessRequirementIDVisible(isACT);
       view.setCoveredEntitiesHeadingVisible(isACT);
+      // show the subjects defined by annotations UI if isACT and this flag is set
+      view.setSubjectsDefinedByAnnotations(
+        isACT && ar.getSubjectsDefinedByAnnotations()
+      );
     });
     view.setAccessRequirementName(ar.getName());
   }

@@ -95,8 +95,7 @@
             <w:HelpWidget
               helpMarkdown="Teams are a way to easily manage groups of users for the purposes of project access, communication, and challenge participation."
               href="https://help.synapse.org/docs/Teams.1985446029.html"
-              iconStyles="lightGreyText font-size-18 displayInlineBlock"
-              addStyleNames="margin-top-15 margin-bottom-10 margin-right-10"
+              addStyleNames="margin-top-15 margin-bottom-10 margin-right-10 font-size-18 lightGreyText"
               placement="LEFT"
             />
           </bh:Div>

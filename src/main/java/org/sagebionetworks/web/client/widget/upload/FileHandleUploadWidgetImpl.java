@@ -81,10 +81,11 @@ public class FileHandleUploadWidgetImpl
       results = new FileMetadata[fileNames.length];
       for (int i = 0; i < fileNames.length; i++) {
         String name = fileNames[i];
-        String contentType = org.sagebionetworks.web.client.ContentTypeUtils.fixDefaultContentType(
-          synapseJsniUtils.getContentType(fileList, i),
-          name
-        );
+        String contentType =
+          org.sagebionetworks.web.client.ContentTypeUtils.fixDefaultContentType(
+            synapseJsniUtils.getContentType(fileList, i),
+            name
+          );
         double fileSize = synapseJsniUtils.getFileSize(
           synapseJsniUtils.getFileBlob(i, fileList)
         );
@@ -147,7 +148,7 @@ public class FileHandleUploadWidgetImpl
   private void uploadNext() {
     count++;
     if (count != fileMetaArr.length) {
-      int progress = count * 100 / fileMetaArr.length;
+      int progress = (count * 100) / fileMetaArr.length;
       view.updateProgress(progress, progress + "%");
       doMultipartUpload();
     } else {
@@ -192,10 +193,8 @@ public class FileHandleUploadWidgetImpl
           String uploadSpeed
         ) {
           int totalProgress =
-            count *
-            100 /
-            fileMetaArr.length +
-            (int) (currentProgress * 100 / fileMetaArr.length);
+            (count * 100) / fileMetaArr.length +
+            (int) ((currentProgress * 100) / fileMetaArr.length);
           view.updateProgress(totalProgress, totalProgress + "%");
         }
       },

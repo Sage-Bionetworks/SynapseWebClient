@@ -18,7 +18,7 @@ import org.mockito.AdditionalMatchers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -32,7 +32,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceURLDial
 import org.sagebionetworks.web.client.widget.entity.controller.URLProvEntryView;
 import org.sagebionetworks.web.test.helper.SelfReturningAnswer;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class ProvenanceListWidgetTest {
 
   @Mock

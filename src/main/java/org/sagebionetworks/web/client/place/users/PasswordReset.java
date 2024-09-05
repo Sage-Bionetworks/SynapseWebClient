@@ -16,7 +16,7 @@ public class PasswordReset extends Place {
     return token;
   }
 
-  @Prefix("!PasswordReset")
+  @Prefix("PasswordReset")
   public static class Tokenizer implements PlaceTokenizer<PasswordReset> {
 
     @Override

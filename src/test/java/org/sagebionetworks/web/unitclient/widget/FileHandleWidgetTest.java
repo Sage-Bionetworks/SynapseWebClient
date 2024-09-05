@@ -85,7 +85,7 @@ public class FileHandleWidgetTest {
     // loading shown first
     order.verify(mockView).setLoadingVisible(true);
     order.verify(mockView).setLoadingVisible(false);
-    verify(mockView).setAnchor(eq(FILE_NAME), anyString());
+    verify(mockView).setAnchor(eq(FILE_NAME), any());
   }
 
   @Test

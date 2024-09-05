@@ -3,6 +3,8 @@ package org.sagebionetworks.web.client.widget.entity.file;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import java.util.Arrays;
+import java.util.List;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.jsinterop.ReactMouseEvent;
 import org.sagebionetworks.web.client.jsinterop.ReactMouseEventHandler;
@@ -42,7 +44,7 @@ public class FileDownloadMenuItemViewImpl implements FileDownloadMenuItemView {
   public void clear() {}
 
   private void clearClickHandlers() {
-    this.actionMenu.setActionHref(Action.DOWNLOAD_FILE, "#");
+    this.actionMenu.setActionHref(Action.DOWNLOAD_FILE, "/");
   }
 
   @Override
@@ -72,12 +74,18 @@ public class FileDownloadMenuItemViewImpl implements FileDownloadMenuItemView {
   public void setIsDirectDownloadLink(String href) {
     clearClickHandlers();
     this.href = href;
-    actionMenu.setActionHref(Action.DOWNLOAD_FILE, href);
-    actionMenu.addActionListener(
+    List<Action> actionsToConfigure = Arrays.asList(
       Action.DOWNLOAD_FILE,
-      (Action action, ReactMouseEvent event) ->
-        directDownloadClickHandler.onClick(event)
+      Action.OPEN_EXTERNAL_FILE
     );
+    actionsToConfigure.forEach(action -> {
+      actionMenu.setActionHref(action, href);
+      actionMenu.addActionListener(
+        action,
+        (Action _action, ReactMouseEvent event) ->
+          directDownloadClickHandler.onClick(event)
+      );
+    });
   }
 
   @Override

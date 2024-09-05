@@ -11,10 +11,10 @@ public class WidgetEncodingUtilTest {
   public void testRoundTripEncodeDecode() {
     // round trip tests
     String in =
-      "[#!/Synapse:syn123{value1:\"10%\" \nvalue2:[{v2a=\"1 and %0A\"},{v2b=\"2\"}]}]";
+      "[/Synapse:syn123{value1:\"10%\" \nvalue2:[{v2a=\"1 and %0A\"},{v2b=\"2\"}]}]";
     String encoded = WidgetEncodingUtil.encodeValue(in);
     assertEquals(
-      "%5B#!/Synapse:syn123%7Bvalue1:\"10%25\" %0Avalue2:%5B%7Bv2a%3D\"1 and %250A\"%7D%2C%7Bv2b%3D\"2\"%7D%5D%7D%5D",
+      "%5B/Synapse:syn123%7Bvalue1:\"10%25\" %0Avalue2:%5B%7Bv2a%3D\"1 and %250A\"%7D%2C%7Bv2b%3D\"2\"%7D%5D%7D%5D",
       encoded
     );
     String out = WidgetEncodingUtil.decodeValue(encoded);

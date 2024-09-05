@@ -4,5 +4,5 @@
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
   xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
 >
-  <w:ReactComponentDiv ui:field="srcLoginContainer" />
+  <w:ReactComponent ui:field="srcLoginContainer" />
 </ui:UiBinder>

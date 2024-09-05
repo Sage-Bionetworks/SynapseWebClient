@@ -30,7 +30,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.EntityType;
@@ -44,9 +44,11 @@ import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.FeatureFlagConfig;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -70,7 +72,7 @@ import org.sagebionetworks.web.client.widget.table.explore.TableEntityWidgetV2;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 import org.sagebionetworks.web.shared.WidgetConstants;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class DatasetsTabTest {
 
   @Mock
@@ -163,11 +165,20 @@ public class DatasetsTabTest {
   @Mock
   SynapseJavascriptClient mockJsClient;
 
+  @Mock
+  FeatureFlagConfig mockFeatureFlagConfig;
+
+  @Mock
+  SynapseJSNIUtils mockJsniUtils;
+
   @Captor
   ArgumentCaptor<Map<String, String>> mapCaptor;
 
   @Captor
   ArgumentCaptor<Place> placeCaptor;
+
+  @Captor
+  ArgumentCaptor<String> stringCaptor;
 
   DatasetsTab tab;
   Query query;
@@ -199,7 +210,13 @@ public class DatasetsTabTest {
     when(mockGlobalApplicationState.getPlaceChanger())
       .thenReturn(mockPlaceChanger);
 
-    tab = new DatasetsTab(mockTab, mockPortalGinInjector);
+    tab =
+      new DatasetsTab(
+        mockTab,
+        mockPortalGinInjector,
+        mockFeatureFlagConfig,
+        mockJsniUtils
+      );
     tab.setEntitySelectedCallback(mockEntitySelectedCallback);
 
     when(mockProjectEntityBundle.getEntity()).thenReturn(mockProjectEntity);
@@ -270,8 +287,7 @@ public class DatasetsTabTest {
   }
 
   private void verifyTableConfiguration(Long version) {
-    verify(mockBreadcrumb)
-      .configure(any(EntityPath.class), eq(EntityArea.DATASETS));
+    verify(mockBreadcrumb).configure(any(), eq(EntityArea.DATASETS));
     verify(mockTitleBar).configure(mockDatasetBundle, mockActionMenuWidget);
     verify(mockEntityMetadata)
       .configure(mockDatasetBundle, version, mockActionMenuWidget);
@@ -284,7 +300,7 @@ public class DatasetsTabTest {
         tab,
         mockActionMenuWidget
       );
-    verify(mockView).setTableEntityWidget(any(Widget.class));
+    verify(mockView).setTableEntityWidget(any());
     verify(mockModifiedCreatedBy).configure(datasetId, version);
     verify(mockProvenanceWidget).configure(mapCaptor.capture());
     // verify configuration
@@ -304,7 +320,7 @@ public class DatasetsTabTest {
     verify(mockView).setTitlebarVisible(true);
     verify(mockView).clearTableEntityWidget();
     verify(mockModifiedCreatedBy).setVisible(false);
-    verify(mockView).setWikiPage(any(Widget.class));
+    verify(mockView).setWikiPage(any());
     verify(mockView).setWikiPageVisible(true);
 
     ArgumentCaptor<Synapse> captor = ArgumentCaptor.forClass(Synapse.class);
@@ -385,7 +401,8 @@ public class DatasetsTabTest {
 
     Synapse place = getNewPlace(datasetName);
     assertEquals(EntityArea.DATASETS, place.getArea());
-    assertTrue(place.getAreaToken().isEmpty());
+    assertNull(place.getAreaToken());
+    verify(mockJsniUtils, never()).setHash(anyString());
   }
 
   @Test
@@ -421,8 +438,9 @@ public class DatasetsTabTest {
     verify(mockPlaceChanger).goTo(placeCaptor.capture());
     Synapse place = (Synapse) placeCaptor.getValue();
     assertEquals(EntityArea.DATASETS, place.getArea());
-    assertTrue(place.getAreaToken().isEmpty());
+    assertNull(place.getAreaToken());
     assertEquals(newVersion, place.getVersionNumber());
+    verify(mockJsniUtils, never()).setHash(anyString());
   }
 
   @Test
@@ -441,7 +459,8 @@ public class DatasetsTabTest {
     verify(mockPlaceChanger).goTo(placeCaptor.capture());
     Synapse place = (Synapse) placeCaptor.getValue();
     assertEquals(EntityArea.DATASETS, place.getArea());
-    assertTrue(place.getAreaToken().isEmpty());
+    assertNull(place.getAreaToken());
+    verify(mockJsniUtils, never()).setHash(anyString());
     assertNull(place.getVersionNumber());
     assertEquals("syn837874873843", place.getEntityId());
   }
@@ -469,7 +488,8 @@ public class DatasetsTabTest {
 
     Synapse place = getNewPlace(datasetName);
     assertEquals(EntityArea.DATASETS, place.getArea());
-    assertTrue(place.getAreaToken().contains(encodedToken));
+    verify(mockJsniUtils).setHash(stringCaptor.capture());
+    assertTrue(stringCaptor.getValue().contains(encodedToken));
   }
 
   @Test
@@ -477,27 +497,28 @@ public class DatasetsTabTest {
     Long version = null;
     tab.setProject(projectEntityId, mockProjectEntityBundle, null);
 
-    String queryAreaToken;
+    String queryToken = null;
+    when(mockJsniUtils.getHash()).thenReturn(queryToken);
     Query query1 = null;
-    queryAreaToken = null;
-    tab.configure(mockDatasetBundle, version, queryAreaToken);
+    tab.configure(mockDatasetBundle, version, null);
     query1 = tab.getQueryString();
     assertNull(query1);
 
-    queryAreaToken = "something else";
-    tab.configure(mockDatasetBundle, version, queryAreaToken);
+    tab.configure(mockDatasetBundle, version, null);
     query1 = tab.getQueryString();
     assertNull(query1);
     String token = "encoded query token";
-    queryAreaToken = "query/" + token;
+    queryToken = "#query/" + token;
+    when(mockJsniUtils.getHash()).thenReturn(queryToken);
     when(mockQueryTokenProvider.tokenToQuery(anyString())).thenReturn(query);
-    tab.configure(mockDatasetBundle, version, queryAreaToken);
+    tab.configure(mockDatasetBundle, version, null);
     query1 = tab.getQueryString();
     assertEquals(query, query1);
     query.setSql("SELECT 'query/' FROM syn123 LIMIT 1");
     token = "encoded query token 2";
-    queryAreaToken = "query/" + token;
-    tab.configure(mockDatasetBundle, version, queryAreaToken);
+    queryToken = "#query/" + token;
+    when(mockJsniUtils.getHash()).thenReturn(queryToken);
+    tab.configure(mockDatasetBundle, version, null);
     query1 = tab.getQueryString();
     assertEquals(query, query1);
   }

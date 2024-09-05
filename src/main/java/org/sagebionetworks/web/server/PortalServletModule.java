@@ -1,8 +1,9 @@
 package org.sagebionetworks.web.server;
 
-import com.google.gwt.place.shared.PlaceTokenizer;
-import com.google.gwt.place.shared.WithTokenizers;
+import com.amazonaws.services.appconfigdata.AWSAppConfigData;
+import com.amazonaws.services.kms.AWSKMS;
 import com.google.gwt.user.server.rpc.XsrfTokenServiceServlet;
+import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.name.Names;
 import com.google.inject.servlet.ServletModule;
@@ -12,10 +13,22 @@ import java.util.Iterator;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.sagebionetworks.ConfigurationProperties;
+import org.sagebionetworks.ConfigurationPropertiesImpl;
+import org.sagebionetworks.LoggerProvider;
+import org.sagebionetworks.LoggerProviderImpl;
+import org.sagebionetworks.PropertyProvider;
+import org.sagebionetworks.PropertyProviderImpl;
+import org.sagebionetworks.StackConfiguration;
+import org.sagebionetworks.StackConfigurationImpl;
+import org.sagebionetworks.StackEncrypter;
+import org.sagebionetworks.StackEncrypterImpl;
+import org.sagebionetworks.aws.AwsClientFactory;
+import org.sagebionetworks.aws.SynapseS3Client;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
-import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.server.servlet.AliasRedirectorServlet;
+import org.sagebionetworks.web.server.servlet.AppConfigServlet;
 import org.sagebionetworks.web.server.servlet.ChallengeClientImpl;
 import org.sagebionetworks.web.server.servlet.DataAccessClientImpl;
 import org.sagebionetworks.web.server.servlet.DiscussionForumClientImpl;
@@ -38,7 +51,6 @@ import org.sagebionetworks.web.server.servlet.filter.AmpADFilter;
 import org.sagebionetworks.web.server.servlet.filter.DigitalHealthFilter;
 import org.sagebionetworks.web.server.servlet.filter.DreamFilter;
 import org.sagebionetworks.web.server.servlet.filter.MHealthFilter;
-import org.sagebionetworks.web.server.servlet.filter.PlacesRedirectFilter;
 import org.sagebionetworks.web.server.servlet.filter.RPCValidationFilter;
 import org.sagebionetworks.web.server.servlet.filter.RegisterAccountFilter;
 import org.sagebionetworks.web.server.servlet.filter.TimingFilter;
@@ -133,6 +145,11 @@ public class PortalServletModule extends ServletModule {
     bind(SlackServlet.class).in(Singleton.class);
     serve("/Portal/" + WebConstants.SLACK_SERVLET).with(SlackServlet.class);
 
+    // AppConfig handler
+    bind(AppConfigServlet.class).in(Singleton.class);
+    serve("/Portal/" + WebConstants.APPCONFIG_SERVLET)
+      .with(AppConfigServlet.class);
+
     // Versions handler
     bind(VersionsServlet.class).in(Singleton.class);
     serve("/Portal/" + WebConstants.VERSIONS_SERVLET)
@@ -180,10 +197,14 @@ public class PortalServletModule extends ServletModule {
     // Bind the properties from the config file
     bindPropertiesFromFile("ServerConstants.properties");
 
+    bind(LoggerProvider.class).to(LoggerProviderImpl.class);
+    bind(PropertyProvider.class).to(PropertyProviderImpl.class);
+    bind(ConfigurationProperties.class).to(ConfigurationPropertiesImpl.class);
+    bind(StackConfiguration.class).to(StackConfigurationImpl.class);
+    bind(StackEncrypter.class).to(StackEncrypterImpl.class);
+
     // JSONObjectAdapter
     bind(JSONObjectAdapter.class).to(JSONObjectAdapterImpl.class);
-
-    handleGWTPlaces();
 
     // Catch-all. Note that "/*" would override all other servlet binding, and "/" overrides the default
     // handler
@@ -193,15 +214,19 @@ public class PortalServletModule extends ServletModule {
     serveRegex("^\\/\\w+$").with(ProjectAliasServlet.class);
   }
 
-  public void handleGWTPlaces() {
-    bind(PlacesRedirectFilter.class).in(Singleton.class);
-    Class<? extends PlaceTokenizer<?>>[] placeClasses =
-      AppPlaceHistoryMapper.class.getAnnotation(WithTokenizers.class).value();
-    for (Class<? extends PlaceTokenizer<?>> c : placeClasses) {
-      String simpleName = c.getEnclosingClass().getSimpleName();
-      String filterRegEx = "/" + simpleName + ":*";
-      filter(filterRegEx).through(PlacesRedirectFilter.class);
-    }
+  @Provides
+  public AWSAppConfigData provideAppConfigDataClient() {
+    return AwsClientFactory.createAppConfigClient();
+  }
+
+  @Provides
+  public AWSKMS provideAWSKMSClient() {
+    return AwsClientFactory.createAmazonKeyManagementServiceClient();
+  }
+
+  @Provides
+  public SynapseS3Client provideAmazonS3Client() {
+    return AwsClientFactory.createAmazonS3Client();
   }
 
   /**

@@ -34,7 +34,7 @@ import org.sagebionetworks.web.client.context.SynapseReactClientFullContextProps
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.jsinterop.EmptyProps;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -44,7 +44,7 @@ import org.sagebionetworks.web.client.presenter.ProjectFilterEnum;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.OrientationBanner;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.table.v2.results.SortableTableHeaderImpl;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
@@ -59,7 +59,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 
   HTML noChallengesHtml = new HTML();
   public static final String NO_CHALLENGES_HTML =
-    "<p><a href=\"http://sagebionetworks.org/challenges/\" target=\"_blank\">Challenges</a> are open science, collaborative competitions for evaluating and comparing computational algorithms or solutions to problems.</p>";
+    "<p><a href=\"https://help.synapse.org/docs/Challenges.1985184148.html\" target=\"_blank\">Challenges</a> are open science, collaborative competitions for evaluating and comparing computational algorithms or solutions to problems.</p>";
 
   public static final String CHALLENGE_TAB_HELP_TEXT =
     "&#10;Challenges are open science, collaborative competitions for evaluating and comparing computational algorithms or solutions to problems.";
@@ -89,7 +89,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
   DivElement settingsTabContainer;
 
   @UiField
-  ReactComponentDiv favoritesTabContainer;
+  ReactComponent favoritesTabContainer;
 
   @UiField
   Heading pageHeaderTitle;
@@ -293,11 +293,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
     ProjectListSortColumn column,
     SortDirection direction
   ) {
-    org.sagebionetworks.repo.model.table.SortDirection tableSortDirection = SortDirection.ASC.equals(
-        direction
-      )
-      ? org.sagebionetworks.repo.model.table.SortDirection.ASC
-      : org.sagebionetworks.repo.model.table.SortDirection.DESC;
+    org.sagebionetworks.repo.model.table.SortDirection tableSortDirection =
+      SortDirection.ASC.equals(direction)
+        ? org.sagebionetworks.repo.model.table.SortDirection.ASC
+        : org.sagebionetworks.repo.model.table.SortDirection.DESC;
     if (ProjectListSortColumn.PROJECT_NAME.equals(column)) {
       projectNameColumnHeader.setSortDirection(tableSortDirection);
       lastActivityOnColumnHeader.setSortDirection(null);
@@ -552,7 +551,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
       configureOrientationBanner(
         "Projects",
         "Getting Started With Your Projects",
-        "Projects are the main \"containers\" where information is stored and organized in Synapse. They are online workspaces where you can collaborate and share your work with teammates. Projects can be shared with individuals, small teams, or large consortia. Projects can be private so only you and your team can see what\'s inside, or they can be shared publicly for anyone to browse.",
+        "Projects are your primary workspaces, where information is stored and organized. Collaborate seamlessly with teammates, sharing your work securely. Projects can be private for exclusive access by your team, or publicly shared for broader visibility.",
         null,
         null,
         "Learn More About Projects",
@@ -564,7 +563,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
       configureOrientationBanner(
         "Teams",
         "Getting Started With Your Teams",
-        "Teams allow you to easily manage groups of users to control access to projects, communicate with colleagues, and participate in challenges.",
+        "Teams empower you to effortlessly manage user groups, ensuring controlled access to projects, seamless communication with colleagues, and active participation in challenges.",
         "Search Teams",
         new ClickHandler() {
           @Override
@@ -585,7 +584,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
       configureOrientationBanner(
         "Challenges",
         "Getting Started With Your Challenges",
-        "Challenges are open science, collaborative competitions for evaluating and comparing computational algorithms or solutions to problems.",
+        "Challenges are collaborative, open-science competitions where computational algorithms or solutions are evaluated and compared.",
         null,
         null,
         "Learn More About Challenges",
@@ -597,14 +596,14 @@ public class ProfileViewImpl extends Composite implements ProfileView {
       configureOrientationBanner(
         "Favorites",
         "Getting Started With Your Favorites",
-        "Throughout Synapse, you can favorite pretty much any item (project, file, folder, table, dataset, etc.) by clicking the star icon next to its name. This will add that item to your favorites list.",
+        "In Synapse, easily mark any item—whether it's a project, file, folder, table, dataset, and more—as a favorite by clicking the star icon next to its name. This ensures quick access by adding it to your favorites list.",
         null,
         null,
         "Learn More About Favorites",
         "https://help.synapse.org/docs/Navigating-Synapse.2048557182.html#NavigatingSynapse-Favorites"
       );
       EmptyProps props = EmptyProps.create();
-      ReactNode component = React.createElementWithSynapseContext(
+      ReactElement component = React.createElementWithSynapseContext(
         SRC.SynapseComponents.FavoritesPage,
         props,
         propsProvider.getJsInteropContextProps()
@@ -671,9 +670,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
   }
 
   @Override
-  public void setUserProfileEditorWidget(IsWidget userProfileEditorWidget) {
+  public void setUserProfileWidget(IsWidget userProfileWidget) {
     this.editUserProfilePanel.clear();
-    this.editUserProfilePanel.add(userProfileEditorWidget);
+    this.editUserProfilePanel.add(userProfileWidget);
   }
 
   @Override

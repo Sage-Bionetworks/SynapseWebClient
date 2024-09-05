@@ -14,13 +14,13 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactNode;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.jsinterop.TermsAndConditionsProps;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.FullWidthAlert;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
-import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.client.widget.pageprogress.PageProgressWidget;
@@ -39,7 +39,7 @@ public class LoginViewImpl extends Composite implements LoginView {
   Div termsOfUseView;
 
   @UiField
-  ReactComponentDiv termsOfUseContainer;
+  ReactComponent termsOfUseContainer;
 
   @UiField
   FullWidthAlert acceptedTermsOfUseView;
@@ -168,7 +168,7 @@ public class LoginViewImpl extends Composite implements LoginView {
       TermsAndConditionsProps props = TermsAndConditionsProps.create(
         this::onFormChange
       );
-      ReactNode component = React.createElementWithSynapseContext(
+      ReactElement component = React.createElementWithSynapseContext(
         SRC.SynapseComponents.TermsAndConditions,
         props,
         propsProvider.getJsInteropContextProps()

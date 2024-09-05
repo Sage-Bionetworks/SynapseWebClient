@@ -3,7 +3,8 @@
 @use '../css/bootstrap-custom-theme.min.css';
 
 // We load the minified CSS for SRC because it contains styles that are not in the SCSS build. These missing styles were
-// imported in JSX/TSX and loaded through Webpack. Our esbuild config identifies these loaded CSS files and puts them into CSS.
+// imported in JSX/TSX and loaded through Webpack. The synapse-react-client UMD bundler identifies these loaded CSS files
+// and includes them in this minified CSS file. This is why
 // We **do** use the UMD JavaScript build, so we rely on these styles to be loaded.
 @use 'synapse-react-client/dist/umd/synapse-react-client.production.min.css';
 

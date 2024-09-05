@@ -54,7 +54,7 @@ public class TopicUtils {
     String replyId
   ) {
     String link =
-      "/#!SynapseForum:" +
+      "/SynapseForum:" +
       THREAD_ID_KEY +
       "=" +
       threadId +

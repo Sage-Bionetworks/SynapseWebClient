@@ -107,8 +107,7 @@ public class OpenTeamInvitationsWidgetTest {
     testInvite.setMessage("This is a test invite");
     testInvite.setCreatedOn(new Date());
 
-    when(mockDateTimeUtils.getRelativeTime(any(Date.class)))
-      .thenReturn(FORMATTED_DATE);
+    when(mockDateTimeUtils.getRelativeTime(any())).thenReturn(FORMATTED_DATE);
     testReturn = new ArrayList<OpenUserInvitationBundle>();
     OpenUserInvitationBundle mib = new OpenUserInvitationBundle();
     mib.setTeam(testTeam);
@@ -118,7 +117,7 @@ public class OpenTeamInvitationsWidgetTest {
     AsyncMockStubber
       .callSuccessWith(testReturn)
       .when(mockSynapseClient)
-      .getOpenInvitations(anyString(), any(AsyncCallback.class));
+      .getOpenInvitations(any(), any());
 
     mockOpenTeamInvitationsCallback = mock(CallbackP.class);
     mockTeamUpdatedCallback = mock(Callback.class);
@@ -127,23 +126,16 @@ public class OpenTeamInvitationsWidgetTest {
     when(mockPortalGinInjector.getJoinTeamWidget())
       .thenReturn(mockJoinTeamWidget);
 
-    when(mockJsClient.deleteMembershipInvitation(anyString()))
+    when(mockJsClient.deleteMembershipInvitation(any()))
       .thenReturn(getDoneFuture(null));
   }
 
   @Test
   public void testConfigure() throws Exception {
     widget.configure(mockTeamUpdatedCallback, mockOpenTeamInvitationsCallback);
-    verify(mockSynapseClient)
-      .getOpenInvitations(anyString(), any(AsyncCallback.class));
+    verify(mockSynapseClient).getOpenInvitations(any(), any());
     verify(mockView)
-      .addTeamInvite(
-        any(Team.class),
-        any(String.class),
-        eq(RECEIVED + FORMATTED_DATE),
-        anyString(),
-        any(Widget.class)
-      );
+      .addTeamInvite(any(), any(), eq(RECEIVED + FORMATTED_DATE), any(), any());
     verify(mockPortalGinInjector).getJoinTeamWidget();
     ArgumentCaptor<Callback> refreshCallbackCaptor = ArgumentCaptor.forClass(
       Callback.class
@@ -159,16 +151,9 @@ public class OpenTeamInvitationsWidgetTest {
     Callback refreshCallback = refreshCallbackCaptor.getValue();
     refreshCallback.invoke();
     verify(mockTeamUpdatedCallback).invoke();
-    verify(mockSynapseClient, times(2))
-      .getOpenInvitations(anyString(), any(AsyncCallback.class));
+    verify(mockSynapseClient, times(2)).getOpenInvitations(any(), any());
     verify(mockView, times(2))
-      .addTeamInvite(
-        any(Team.class),
-        anyString(),
-        eq(RECEIVED + FORMATTED_DATE),
-        anyString(),
-        any(Widget.class)
-      );
+      .addTeamInvite(any(), any(), eq(RECEIVED + FORMATTED_DATE), any(), any());
     verify(mockPortalGinInjector, times(2)).getJoinTeamWidget();
     verify(mockJoinTeamWidget, times(2))
       .configure(eq(teamId), any(Callback.class));
@@ -180,10 +165,9 @@ public class OpenTeamInvitationsWidgetTest {
     AsyncMockStubber
       .callFailureWith(ex)
       .when(mockSynapseClient)
-      .getOpenInvitations(anyString(), any(AsyncCallback.class));
+      .getOpenInvitations(any(), any());
     widget.configure(mockTeamUpdatedCallback, mockOpenTeamInvitationsCallback);
-    verify(mockSynapseClient)
-      .getOpenInvitations(anyString(), any(AsyncCallback.class));
+    verify(mockSynapseClient).getOpenInvitations(any(), any());
     verify(mockSynapseAlert).handleException(ex);
   }
 
@@ -198,8 +182,7 @@ public class OpenTeamInvitationsWidgetTest {
     verify(mockPopupUtils)
       .showInfo(OpenTeamInvitationsWidget.DELETED_INVITATION_MESSAGE);
     verify(mockTeamUpdatedCallback).invoke();
-    verify(mockSynapseClient, times(2))
-      .getOpenInvitations(anyString(), any(AsyncCallback.class));
+    verify(mockSynapseClient, times(2)).getOpenInvitations(any(), any());
   }
 
   @Test

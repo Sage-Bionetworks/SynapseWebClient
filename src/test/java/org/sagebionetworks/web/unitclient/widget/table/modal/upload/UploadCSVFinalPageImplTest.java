@@ -15,7 +15,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.ColumnModel;
@@ -38,7 +38,7 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.asynch.JobTrackingWidgetStub;
 import org.sagebionetworks.web.unitclient.widget.table.v2.schema.ColumnModelTableRowEditorStub;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class UploadCSVFinalPageImplTest {
 
   @Mock
@@ -185,9 +185,8 @@ public class UploadCSVFinalPageImplTest {
     request.setLinesToSkip(null);
     page.configure(fileName, parentId, request, schema);
 
-    UploadToTableRequest expected = UploadRequestUtils.cloneUploadToTableRequest(
-      request
-    );
+    UploadToTableRequest expected =
+      UploadRequestUtils.cloneUploadToTableRequest(request);
     expected.getCsvTableDescriptor().setIsFirstLineHeader(Boolean.FALSE);
     expected.setLinesToSkip(1L);
 
@@ -205,9 +204,8 @@ public class UploadCSVFinalPageImplTest {
     request.setLinesToSkip(startLinesToSkip);
     page.configure(fileName, parentId, request, schema);
 
-    UploadToTableRequest expected = UploadRequestUtils.cloneUploadToTableRequest(
-      request
-    );
+    UploadToTableRequest expected =
+      UploadRequestUtils.cloneUploadToTableRequest(request);
     expected.getCsvTableDescriptor().setIsFirstLineHeader(Boolean.FALSE);
     expected.setLinesToSkip(startLinesToSkip + 1);
 
@@ -224,9 +222,8 @@ public class UploadCSVFinalPageImplTest {
     request.setLinesToSkip(null);
     page.configure(fileName, parentId, request, schema);
 
-    UploadToTableRequest expected = UploadRequestUtils.cloneUploadToTableRequest(
-      request
-    );
+    UploadToTableRequest expected =
+      UploadRequestUtils.cloneUploadToTableRequest(request);
 
     UploadToTableRequest result = page.getUploadToTableRequest();
     assertEquals(expected, result);

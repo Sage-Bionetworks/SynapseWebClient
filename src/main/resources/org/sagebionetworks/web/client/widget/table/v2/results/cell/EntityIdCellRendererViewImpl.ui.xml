@@ -10,7 +10,7 @@
 >
   <bh:Span addStyleNames="whitespace-nowrap">
     <bh:Span ui:field="loadingUI" visible="false">Loading...</bh:Span>
-    <w:EntityTypeIcon
+    <w:EntityTypeIconImpl
       ui:field="entityIcon"
       visible="false"
       styleName="margin-right-5"

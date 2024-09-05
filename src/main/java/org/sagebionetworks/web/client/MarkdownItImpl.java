@@ -30,7 +30,7 @@ public class MarkdownItImpl implements MarkdownIt {
 						$wnd.markdownitSynapseHeading,
 						$wnd.markdownitSynapseTable,
 						$wnd.markdownitStrikethroughAlt,
-						$wnd.markdownitContainer, $wnd.markdownitEmphasisAlt,
+                        $wnd.markdownitContainer,
 						$wnd.markdownitInlineComments, $wnd.markdownitBr);
 
 				$wnd.md.set({
@@ -42,8 +42,12 @@ public class MarkdownItImpl implements MarkdownIt {
 								console.error(_err);
 							}
 						} else {
-							return $wnd.hljs.highlightAuto(str).value;
-						}						
+							try {
+								return $wnd.hljs.highlightAuto(str).value;
+							} catch (_err) {
+								console.error(_err);
+							}
+						}
 						return ''; // use external highlight
 					}
 				});
