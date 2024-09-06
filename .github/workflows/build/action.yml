@@ -1,5 +1,13 @@
 name: 'Build SWC'
 description: 'Build SWC'
+inputs:
+  mvn_goal:
+    description: the goal that maven needs to run
+    required: true
+  pom_version:
+    description: the version for the generated artifact
+    required: false
+    default: ''
 runs:
   using: 'composite'
   steps:
@@ -9,6 +17,13 @@ runs:
         java-version: '11'
         distribution: 'corretto'
         cache: maven
+        server-id: sagebionetworks
+        server-username: ${{ env.MAVEN_USERNAME }}
+        server-password: ${{ env.MAVEN_USERPWD }}
+    - name: Version pom.xml
+      shell: bash
+      if: ${{ inputs.pom_version != '' }}
+      run: mvn versions:set -DnewVersion=${{ inputs.pom_version }}
     - name: Build with Maven
       shell: bash
-      run: mvn -B package --file pom.xml
+      run: echo mvn -B ${{ inputs.mvn_goal }} --file pom.xml
