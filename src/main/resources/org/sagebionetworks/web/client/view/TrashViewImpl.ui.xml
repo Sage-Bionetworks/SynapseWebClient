@@ -2,11 +2,7 @@
 <ui:UiBinder
   xmlns:ui="urn:ui:com.google.gwt.uibinder"
   xmlns:g="urn:import:com.google.gwt.user.client.ui"
-  xmlns:c="urn:import:com.google.gwt.user.cellview.client"
-  xmlns:s="urn:import:org.sagebionetworks.web.client.view"
-  xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
   xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
-  xmlns:bb="urn:import:org.gwtbootstrap3.client.ui"
 >
   <g:HTMLPanel>
     <div>

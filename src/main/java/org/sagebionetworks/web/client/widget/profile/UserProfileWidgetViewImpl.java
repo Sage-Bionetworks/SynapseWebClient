@@ -14,7 +14,6 @@ import com.google.inject.Inject;
 import java.util.List;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.HelpBlock;
 import org.gwtbootstrap3.client.ui.Tooltip;
@@ -31,6 +30,7 @@ import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.jsinterop.UserProfileLinksProps;
+import org.sagebionetworks.web.client.jsinterop.mui.Grid;
 import org.sagebionetworks.web.client.widget.ReactComponent;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -96,13 +96,13 @@ public class UserProfileWidgetViewImpl implements UserProfileWidgetView {
   Anchor changePasswordLink;
 
   @UiField
-  Column orcIDContainer;
+  Grid orcIDContainer;
 
   @UiField
   Anchor orcIdLink;
 
   @UiField
-  Column accountTypeContainer;
+  Grid accountTypeContainer;
 
   @UiField
   ReactComponent accountLevelBadgesContainer;
@@ -114,7 +114,7 @@ public class UserProfileWidgetViewImpl implements UserProfileWidgetView {
   ReactComponent userProfileLinksReactComponentContainer;
 
   @UiField
-  Column emailAddressContainer;
+  Grid emailAddressContainer;
 
   @UiField
   Div commandsContainer;
@@ -134,11 +134,11 @@ public class UserProfileWidgetViewImpl implements UserProfileWidgetView {
     CookieProvider cookies,
     SynapseJavascriptClient jsClient
   ) {
-    widget = binder.createAndBindUi(this);
     this.jsniUtils = jsniUtils;
     this.propsProvider = propsProvider;
     this.cookies = cookies;
     this.jsClient = jsClient;
+    widget = binder.createAndBindUi(this);
     editProfileButton.addClickHandler(event -> {
       Window.open(WebConstants.ONESAGE_ACCOUNT_SETTINGS_URL, "_blank", "");
     });

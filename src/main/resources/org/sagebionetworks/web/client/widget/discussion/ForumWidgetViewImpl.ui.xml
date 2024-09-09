@@ -69,66 +69,57 @@
       <bh:Div addStyleNames="highlight-title">
         <bh:Text>Deleted Threads</bh:Text>
       </bh:Div>
-      <b:Row>
-        <b:Column size="XS_12">
-          <g:SimplePanel
-            addStyleNames="margin-15"
-            ui:field="deletedThreadListContainer"
-            visible="false"
-          />
-        </b:Column>
-      </b:Row>
+      <g:SimplePanel
+        addStyleNames="margin-15"
+        ui:field="deletedThreadListContainer"
+        visible="false"
+      />
     </bh:Div>
     <bh:Div
       ui:field="mainContainer"
       addStyleNames="padding-top-0-imp margin-bottom-20 "
     >
-      <b:Row>
-        <b:Column size="XS_12">
-          <g:SimplePanel
-            addStyleNames="margin-top-10 light-border"
-            ui:field="threadListContainer"
+      <g:SimplePanel
+        addStyleNames="margin-top-10 light-border"
+        width="100%"
+        ui:field="threadListContainer"
+      />
+      <bh:Div
+        ui:field="singleThreadAndSortContainer"
+        addStyleNames="light-border"
+        width="100%"
+        paddingTop="15"
+        paddingRight="30"
+        paddingBottom="15"
+        paddingLeft="30"
+      >
+        <b:ButtonGroup
+          ui:field="repliesSortButtonGroup"
+          addStyleNames="flexcontainer-row flexcontainer-justify-center"
+          visible="false"
+        >
+          <b:Button
+            ui:field="sortRepliesAscendingButton"
+            text="Date Posted"
+            addStyleNames="margin-top-10"
           />
-        </b:Column>
-        <b:Column size="XS_12">
-          <bh:Div
-            ui:field="singleThreadAndSortContainer"
-            addStyleNames="light-border"
-            paddingTop="15"
-            paddingRight="30"
-            paddingBottom="15"
-            paddingLeft="30"
-          >
-            <b:ButtonGroup
-              ui:field="repliesSortButtonGroup"
-              addStyleNames="flexcontainer-row flexcontainer-justify-center"
-              visible="false"
-            >
-              <b:Button
-                ui:field="sortRepliesAscendingButton"
-                text="Date Posted"
-                addStyleNames="margin-top-10"
-              />
-              <b:Button
-                ui:field="sortRepliesDescendingButton"
-                text="Most Recent"
-                addStyleNames="margin-top-10"
-              />
-            </b:ButtonGroup>
-            <g:SimplePanel
-              addStyleNames="margin-top-10"
-              ui:field="singleThreadContainer"
-            />
-          </bh:Div>
-        </b:Column>
-        <b:Column size="XS_12">
-          <g:SimplePanel
-            addStyleNames="margin-top-10 light-border"
-            ui:field="defaultThreadContainer"
-            visible="false"
+          <b:Button
+            ui:field="sortRepliesDescendingButton"
+            text="Most Recent"
+            addStyleNames="margin-top-10"
           />
-        </b:Column>
-      </b:Row>
+        </b:ButtonGroup>
+        <g:SimplePanel
+          addStyleNames="margin-top-10"
+          ui:field="singleThreadContainer"
+        />
+      </bh:Div>
+      <g:SimplePanel
+        width="100%"
+        addStyleNames="margin-top-10 light-border"
+        ui:field="defaultThreadContainer"
+        visible="false"
+      />
     </bh:Div>
     <g:SimplePanel ui:field="newThreadModalContainer" />
     <bh:Div ui:field="synAlertContainer" />
