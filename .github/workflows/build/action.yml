@@ -17,13 +17,13 @@ runs:
         java-version: '11'
         distribution: 'corretto'
         cache: maven
-        server-id: sagebionetworks
-        server-username: ${{ env.MAVEN_USERNAME }}
-        server-password: ${{ env.MAVEN_USERPWD }}
+
     - name: Version pom.xml
       shell: bash
-      if: ${{ inputs.pom_version != '' }}
-      run: mvn versions:set -DnewVersion=${{ inputs.pom_version }}
+      run: |
+        if  [ "${{ inputs.pom_version }}" != "" ]; then
+          mvn versions:set -DnewVersion=${{ inputs.pom_version }}
+        fi
     - name: Build with Maven
       shell: bash
-      run: echo mvn -B ${{ inputs.mvn_goal }} --file pom.xml
+      run: mvn -B ${{ inputs.mvn_goal }} --file pom.xml

@@ -47,3 +47,10 @@ jobs:
           new_tag="${next_release_number}.0"
           git tag -a $new_tag -m stack-${next_release_number}-staging
           git push origin $new_branch
+          echo "pomversion=$new_tag" >> $GITHUB_ENV
+
+      - id: build_new_release_branch
+        uses: ./.github/workflows/build
+        with:
+          mvn_goal: package
+          pom_version: ${{ env.pomversion }}
