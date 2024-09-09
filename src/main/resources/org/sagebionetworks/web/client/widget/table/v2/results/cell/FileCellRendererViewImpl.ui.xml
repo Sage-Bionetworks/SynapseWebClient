@@ -4,7 +4,6 @@
   xmlns:g="urn:import:com.google.gwt.user.client.ui"
   xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
-  xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
 >
   <g:HTMLPanel>
     <bh:Span ui:field="loadingUI">Loading...</bh:Span>

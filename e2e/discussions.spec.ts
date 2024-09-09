@@ -82,7 +82,7 @@ const expectThreadReplyVisible = async (
 const getDiscussionParentActionButtons = (page: Page, threadTitle: string) => {
   const parentPost = page
     .locator(discussionThreadSelector)
-    .locator('.row')
+    .getByRole('article')
     .filter({ hasText: threadTitle })
   return {
     PIN: parentPost.locator(discussionActionIconClasses.PIN),
@@ -96,8 +96,7 @@ const getDiscussionParentActionButtons = (page: Page, threadTitle: string) => {
 
 const getDiscussionReplyActionButtons = (page: Page, threadReply: string) => {
   const replyPost = page
-    .locator(discussionThreadSelector)
-    .locator('.row')
+    .locator(discussionReplySelector)
     .filter({ hasText: threadReply })
   return {
     EDIT: replyPost.locator(discussionActionIconClasses.EDIT),
