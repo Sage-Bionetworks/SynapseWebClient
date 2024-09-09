@@ -290,7 +290,6 @@ public class EntityTreeBrowserViewImpl
     final String nextPageToken
   ) {
     childToCreate.setClickHandler(event -> {
-      setLoadingVisible(true);
       presenter.getChildren(parentId, null, nextPageToken);
       childToCreate.setVisible(false);
     });
