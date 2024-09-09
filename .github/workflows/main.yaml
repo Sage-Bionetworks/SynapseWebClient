@@ -27,6 +27,9 @@ jobs:
         with:
           mvn_goal: package
           pom_version: ${{ env.pomversion }}
+        env:
+          MAVEN_USERNAME: ${{ secrets.PLATFORM_ARTIFACTORY_USER }}
+          MAVEN_USERPWD: ${{ secrets.PLATFORM_ARTIFACTORY_PWD }}
 
   call-test:
     runs-on: ubuntu:latest
