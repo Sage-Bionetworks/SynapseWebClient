@@ -94,16 +94,8 @@ public abstract class ReactComponentV2<
 
   private void destroyRoot() {
     if (root != null) {
-      // Asynchronously schedule unmounting the root to allow React to finish the current render cycle.
-      // https://github.com/facebook/react/issues/25675
-      Timer t = new Timer() {
-        @Override
-        public void run() {
-          root.unmount();
-          root = null;
-        }
-      };
-      t.schedule(0);
+      root.unmount();
+      root = null;
     }
   }
 
@@ -186,21 +178,23 @@ public abstract class ReactComponentV2<
   }
 
   public void render() {
-    if (isRenderedAsReactComponentChild()) {
-      // This component will be rendered as a child of another React component, so destroy the root if one exists
-      destroyRoot();
-    }
+    // This component will be rendered as a child of another React component, so destroy the root if one exists
+    boolean shouldDestroyRoot = isRenderedAsReactComponentChild();
 
     // This component may be a React child of another component, so retrieve the root widget that renders this component tree.
     ReactComponentV2<?, ?> componentToRender = getRootReactComponentWidget();
 
-    // Asynchronously schedule creating a root in case we queued up an unmount of the current root
+    // Asynchronously schedule root operations in case the component is in the middle of an asynchronous render cycle
     // See https://stackoverflow.com/questions/73459382
     Timer t = new Timer() {
       @Override
       public void run() {
-        componentToRender.createRoot();
+        if (shouldDestroyRoot) {
+          destroyRoot();
+        }
+
         // Create a fresh ReactElement tree and render it
+        componentToRender.createRoot();
         componentToRender.root.render(componentToRender.createReactElement());
       }
     };
@@ -227,7 +221,15 @@ public abstract class ReactComponentV2<
     // Detach any non-React descendants that were injected into the component tree
     detachNonReactChildElements();
 
-    destroyRoot();
+    // Asynchronously schedule unmounting the root to allow React to finish the current render cycle.
+    // https://github.com/facebook/react/issues/25675
+    Timer t = new Timer() {
+      @Override
+      public void run() {
+        destroyRoot();
+      }
+    };
+    t.schedule(0);
   }
 
   /**
