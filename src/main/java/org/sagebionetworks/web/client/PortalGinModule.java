@@ -393,7 +393,7 @@ public class PortalGinModule extends AbstractGinModule {
     bind(FileHandleUploadWidget.class).to(FileHandleUploadWidgetImpl.class);
 
     // LocationableUploader
-    bind(UploaderView.class).to(UploaderViewImpl.class);
+    bind(UploaderView.class).to(UploaderViewImpl.class).in(Singleton.class);
     bind(QuizInfoWidgetView.class).to(QuizInfoViewImpl.class);
 
     // EntityTreeBrowser
