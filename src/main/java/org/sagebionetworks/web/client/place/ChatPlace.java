@@ -5,7 +5,7 @@ import com.google.gwt.place.shared.Prefix;
 
 public class ChatPlace extends ParameterizedPlace {
 
-  public static final String INITIAL_MESSAGE = "initalMessage";
+  public static final String INITIAL_MESSAGE = "initialMessage";
   public static final String AGENT_ID = "agentId";
   public static final String CHATBOT_NAME = "chatbotName";
 
