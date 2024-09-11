@@ -577,7 +577,7 @@
                 />
 
                 <copy
-                  file="${project.basedir}/node_modules/markdown-it-synapse-table/dist/markdown-it-synapse-table.min.js"
+                  file="${project.basedir}/node_modules/markdown-it-synapse-table/dist/index.umd.cjs"
                   tofile="src/main/webapp/generated/markdown-it-synapse-table.js"
                 />
                 <copy
