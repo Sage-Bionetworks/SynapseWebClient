@@ -31,6 +31,8 @@ jobs:
       - uses: actions/checkout@v3
       - name: Build SWC
         uses: ./.github/workflows/build
+        with:
+          mvn_goal: package
       - name: Upload build to GitHub Actions Artifacts
         uses: actions/upload-artifact@v3
         with:

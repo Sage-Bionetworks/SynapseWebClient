@@ -1,0 +1,56 @@
+name: release
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          fetch-depth: 0
+
+      - id: extract_release
+        run: |
+          branch_name="${GITHUB_REF#refs/heads/}"
+          if [[ $branch_name =~ ^release-([0-9]+)$ ]]; then
+            release_number=${BASH_REMATCH[1]}
+            echo "release_number=$release_number" >> $GITHUB_ENV
+          else
+            echo "Invalid branch name format"
+            exit 1
+          fi
+
+      - id: git_config
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+
+      - id: push_prod_tag
+        run: |
+          tag_name="${release_number}.1"
+          git tag -a $tag_name -m stack-${release_number}-prod
+          git push origin $tag_name
+
+      - id: create_new_release_branch
+        run: |
+          git checkout develop
+          next_release_number=$((release_number + 1))
+          new_branch="release-${next_release_number}"
+          git checkout -b $new_branch
+
+          new_tag="${next_release_number}.0"
+          git tag -a $new_tag -m stack-${next_release_number}-staging
+          git push origin $new_branch
+          echo "pomversion=$new_tag" >> $GITHUB_ENV
+
+      - id: build_new_release_branch
+        uses: ./.github/workflows/build
+        with:
+          mvn_goal: package
+          pom_version: ${{ env.pomversion }}
