@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.presenter.AccountPresenter;
 import org.sagebionetworks.web.client.presenter.BulkPresenterProxy;
 import org.sagebionetworks.web.client.presenter.ChallengeOverviewPresenter;
 import org.sagebionetworks.web.client.presenter.ChangeUsernamePresenter;
+import org.sagebionetworks.web.client.presenter.ChatPresenter;
 import org.sagebionetworks.web.client.presenter.ComingSoonPresenter;
 import org.sagebionetworks.web.client.presenter.DataAccessApprovalTokenPresenter;
 import org.sagebionetworks.web.client.presenter.DataAccessManagementPresenter;
@@ -896,4 +897,5 @@ public interface PortalGinInjector extends Ginjector {
   FeatureFlagConfig getFeatureFlagConfig();
 
   TrustCenterPresenter getTrustCenterPresenter();
+  ChatPresenter getChatPresenter();
 }
