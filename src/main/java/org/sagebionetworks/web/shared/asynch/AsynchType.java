@@ -3,6 +3,8 @@ package org.sagebionetworks.web.shared.asynch;
 import static org.sagebionetworks.web.client.SynapseJavascriptClient.*;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
+import org.sagebionetworks.repo.model.agent.AgentChatRequest;
+import org.sagebionetworks.repo.model.agent.AgentChatResponse;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.doi.v2.DoiRequest;
@@ -123,7 +125,8 @@ public enum AsynchType implements IsSerializable {
     FILE_HANDLE_RESTORE,
     FileHandleRestoreRequest.class,
     FileHandleRestoreResponse.class
-  );
+  ),
+  AgentChat(AGENT_CHAT, AgentChatRequest.class, AgentChatResponse.class);
 
   String prefix;
   Class<? extends AsynchronousRequestBody> requestClass;
