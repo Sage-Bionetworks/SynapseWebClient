@@ -321,6 +321,7 @@ public class SynapseJavascriptClient {
   public static final String DOWNLOAD_LIST_MANIFEST_V2 =
     "/download/list/package/";
   public static final String FILE_HANDLE_RESTORE = "/fileHandle/restore/";
+  public static final String AGENT_CHAT = "/agent/chat/";
 
   public static final String ASYNC_START = "/async/start";
   public static final String ASYNC_GET = "/async/get/";

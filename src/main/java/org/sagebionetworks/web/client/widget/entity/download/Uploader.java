@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity.download;
 
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
-import static org.sagebionetworks.repo.model.util.ModelConstants.VALID_ENTITY_NAME_REGEX;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+import static org.sagebionetworks.web.shared.WebConstants.VALID_ENTITY_NAME_REGEX;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.gwt.core.client.JavaScriptObject;
