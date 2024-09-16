@@ -7,6 +7,8 @@
 *.svg
 *.png
 
+*.properties
+
 # These artifacts were generated and/or pre-minified and then checked in
 src/main/webapp/css/**/*
 src/main/webapp/js/**/*

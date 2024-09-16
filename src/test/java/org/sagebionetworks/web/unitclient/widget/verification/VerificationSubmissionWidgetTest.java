@@ -16,7 +16,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Widget;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,7 +35,10 @@ import org.sagebionetworks.repo.model.verification.VerificationSubmission;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
+import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
+import org.sagebionetworks.web.client.jsinterop.RejectProfileValidationRequestModalProps;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalView;
@@ -85,6 +87,12 @@ public class VerificationSubmissionWidgetTest {
   GWTWrapper mockGWT;
 
   @Mock
+  SynapseReactClientFullContextPropsProvider mockPropsProvider;
+
+  @Mock
+  SynapseProperties mockSynapseProperties;
+
+  @Mock
   HashMap<String, WikiPageKey> mockWikiPageMap;
 
   @Mock
@@ -92,6 +100,11 @@ public class VerificationSubmissionWidgetTest {
 
   @Captor
   ArgumentCaptor<CallbackP<String>> promptModalPresenterCaptor;
+
+  @Captor
+  ArgumentCaptor<
+    RejectProfileValidationRequestModalProps.Callback
+  > onRejectSuccessCaptor;
 
   CallbackP<String> confirmRejectionCallback;
 
@@ -131,7 +144,9 @@ public class VerificationSubmissionWidgetTest {
         mockSynapseAlert,
         mockFileHandleList,
         mockGlobalApplicationState,
-        mockGWT
+        mockGWT,
+        mockPropsProvider,
+        mockSynapseProperties
       );
 
     when(mockGWT.getHostPageBaseURL()).thenReturn(hostPageURL);
@@ -456,41 +471,24 @@ public class VerificationSubmissionWidgetTest {
   public void testRejectVerification() {
     boolean isACTMember = true;
     boolean isModal = true;
+
+    setCurrentMockState(VerificationStateEnum.SUBMITTED, null);
     widget.configure(mockSubmission, isACTMember, isModal);
 
     widget.rejectVerification();
 
-    verify(mockPromptModalWidget).show(promptModalPresenterCaptor.capture());
+    verify(mockView)
+      .showRejectModal(
+        eq(mockSubmission.getId()),
+        eq(VerificationStateEnum.SUBMITTED),
+        onRejectSuccessCaptor.capture()
+      );
 
     // simulate save reject
-    String rejectMessage = "wrong wrong wrong";
-    confirmRejectionCallback = promptModalPresenterCaptor.getValue();
-    confirmRejectionCallback.invoke(rejectMessage);
+    onRejectSuccessCaptor.getValue().run();
 
-    String actNotes = "user missed something";
-    verify(mockPromptForValuesModal)
-      .configureAndShow(
-        anyString(),
-        anyString(),
-        anyString(),
-        promptModalPresenterCaptor.capture()
-      );
-    confirmRejectionCallback = promptModalPresenterCaptor.getValue();
-    confirmRejectionCallback.invoke(actNotes);
-
-    verify(mockUserProfileClient)
-      .updateVerificationState(
-        anyLong(),
-        verificationStateCaptor.capture(),
-        anyString(),
-        any(AsyncCallback.class)
-      );
-    assertEquals(
-      VerificationStateEnum.REJECTED,
-      verificationStateCaptor.getValue().getState()
-    );
-    assertEquals(rejectMessage, verificationStateCaptor.getValue().getReason());
-    assertEquals(actNotes, verificationStateCaptor.getValue().getNotes());
+    verify(mockView).hide();
+    verify(mockGlobalApplicationState).refreshPage();
   }
 
   @Test

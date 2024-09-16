@@ -6,6 +6,7 @@ import java.util.List;
 import org.sagebionetworks.repo.model.verification.VerificationState;
 import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
 import org.sagebionetworks.web.client.SynapseView;
+import org.sagebionetworks.web.client.jsinterop.RejectProfileValidationRequestModalProps;
 
 public interface VerificationSubmissionWidgetView
   extends SynapseView, IsWidget {
@@ -82,6 +83,12 @@ public interface VerificationSubmissionWidgetView
   void setPromptModal(Widget w);
 
   void setProfileFieldsEditable(boolean editable);
+
+  void showRejectModal(
+    String submissionId,
+    VerificationStateEnum currentState,
+    RejectProfileValidationRequestModalProps.Callback onRejectSuccess
+  );
 
   /**
    * Presenter interface

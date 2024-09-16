@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.verification;
 
+import static org.sagebionetworks.web.shared.WebConstants.ACT_PROFILE_VALIDATION_REJECTION_REASONS_TABLE_PROPERTY_KEY;
+
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -21,10 +23,16 @@ import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.verification.VerificationState;
 import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.SynapseProperties;
+import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
+import org.sagebionetworks.web.client.jsinterop.React;
+import org.sagebionetworks.web.client.jsinterop.RejectProfileValidationRequestModalProps;
+import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.view.bootstrap.table.Table;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableHeader;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.Cell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
 
@@ -120,7 +128,10 @@ public class VerificationSubmissionModalViewImpl
   Table actStateHistoryTable;
 
   TableRow actStateHistoryTableHeaderRow;
-  CellFactory cellFactory;
+
+  private final CellFactory cellFactory;
+  private final SynapseProperties synapseProperties;
+  private final SynapseReactClientFullContextPropsProvider propsProvider;
 
   @Override
   public void setPresenter(Presenter presenter) {
@@ -130,10 +141,14 @@ public class VerificationSubmissionModalViewImpl
   @Inject
   public VerificationSubmissionModalViewImpl(
     Binder binder,
-    CellFactory cellFactory
+    CellFactory cellFactory,
+    SynapseProperties synapseProperties,
+    SynapseReactClientFullContextPropsProvider propsProvider
   ) {
     widget = binder.createAndBindUi(this);
     this.cellFactory = cellFactory;
+    this.synapseProperties = synapseProperties;
+    this.propsProvider = propsProvider;
 
     // click handlers
     submitButton.addClickHandler(event -> {
@@ -353,6 +368,33 @@ public class VerificationSubmissionModalViewImpl
     lastName.setEnabled(editable);
     currentAffiliation.setEnabled(editable);
     location.setEnabled(editable);
+  }
+
+  @Override
+  public void showRejectModal(
+    String submissionId,
+    VerificationStateEnum currentState,
+    RejectProfileValidationRequestModalProps.Callback onRejectSuccess
+  ) {
+    final ReactComponent promptModalV2 = new ReactComponent();
+    RejectProfileValidationRequestModalProps props =
+      RejectProfileValidationRequestModalProps.create(
+        submissionId,
+        currentState,
+        synapseProperties.getSynapseProperty(
+          ACT_PROFILE_VALIDATION_REJECTION_REASONS_TABLE_PROPERTY_KEY
+        ),
+        true,
+        onRejectSuccess,
+        promptModalV2::clear
+      );
+    promptModalV2.render(
+      React.createElementWithSynapseContext(
+        SRC.SynapseComponents.RejectProfileValidationRequestModal,
+        props,
+        propsProvider.getJsInteropContextProps()
+      )
+    );
   }
 
   @Override
