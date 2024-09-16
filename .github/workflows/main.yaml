@@ -21,7 +21,7 @@ jobs:
         run: echo "pomversion=$(date +%Y-%m-%d)-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
       - name: Set POM version for release branch
         if: ${{ startsWith(github.ref, 'refs/heads/release-') }}
-        run: echo "pomversion=$(date +%Y-%m-%d)-$(git describe --tags)" >> $GITHUB_ENV
+        run: echo "pomversion=$(git describe --tags)" >> $GITHUB_ENV
 
       - uses: ./.github/workflows/build
         with:
