@@ -52,7 +52,6 @@ public class SRC {
     public static ReactComponentType SynapseToastContainer;
     public static ReactComponentType<EmptyProps> OAuthManagement;
     public static ReactComponentType TrashCanList;
-    public static ReactComponentType<SynapseHomepageProps> SynapseHomepage;
     public static ReactComponentType<SynapseHomepageV2Props> SynapseHomepageV2;
     public static ReactComponentType<SynapseFooterProps> SynapseFooter;
     public static ReactComponentType<ErrorPageProps> ErrorPage;

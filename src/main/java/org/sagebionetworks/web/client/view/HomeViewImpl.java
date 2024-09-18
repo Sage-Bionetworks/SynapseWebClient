@@ -6,14 +6,11 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import org.sagebionetworks.web.client.FeatureFlagConfig;
-import org.sagebionetworks.web.client.FeatureFlagKey;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
-import org.sagebionetworks.web.client.jsinterop.SynapseHomepageProps;
 import org.sagebionetworks.web.client.jsinterop.SynapseHomepageV2Props;
 import org.sagebionetworks.web.client.widget.ReactComponent;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -29,23 +26,19 @@ public class HomeViewImpl extends Composite implements HomeView {
   private Header headerWidget;
   private SynapseReactClientFullContextPropsProvider propsProvider;
   private GlobalApplicationState globalAppState;
-  private FeatureFlagConfig featureFlagConfig;
-  private static final String PROJECT_VIEW_ID = "syn23593547.3";
 
   @Inject
   public HomeViewImpl(
     HomeViewImplUiBinder binder,
     Header headerWidget,
     final SynapseReactClientFullContextPropsProvider propsProvider,
-    GlobalApplicationState globalAppState,
-    FeatureFlagConfig featureFlagConfig
+    GlobalApplicationState globalAppState
   ) {
     initWidget(binder.createAndBindUi(this));
 
     this.headerWidget = headerWidget;
     this.propsProvider = propsProvider;
     this.globalAppState = globalAppState;
-    this.featureFlagConfig = featureFlagConfig;
     headerWidget.configure();
   }
 
@@ -54,26 +47,15 @@ public class HomeViewImpl extends Composite implements HomeView {
     scrollToTop();
     ReactElement component;
 
-    if (featureFlagConfig.isFeatureEnabled(FeatureFlagKey.HOMEPAGE_V2)) {
-      SynapseHomepageV2Props props = SynapseHomepageV2Props.create(href -> {
-        globalAppState.handleRelativePathClick(href);
-      });
-      component =
-        React.createElementWithSynapseContext(
-          SRC.SynapseComponents.SynapseHomepageV2,
-          props,
-          propsProvider.getJsInteropContextProps()
-        );
-    } else {
-      //TODO: SWC-6999: Once V2 is released, delete this conditional
-      SynapseHomepageProps props = SynapseHomepageProps.create(PROJECT_VIEW_ID);
-      component =
-        React.createElementWithSynapseContext(
-          SRC.SynapseComponents.SynapseHomepage,
-          props,
-          propsProvider.getJsInteropContextProps()
-        );
-    }
+    SynapseHomepageV2Props props = SynapseHomepageV2Props.create(href -> {
+      globalAppState.handleRelativePathClick(href);
+    });
+    component =
+      React.createElementWithSynapseContext(
+        SRC.SynapseComponents.SynapseHomepageV2,
+        props,
+        propsProvider.getJsInteropContextProps()
+      );
 
     container.render(component);
   }
