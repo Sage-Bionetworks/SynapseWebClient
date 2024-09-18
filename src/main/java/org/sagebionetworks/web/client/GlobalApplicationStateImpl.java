@@ -587,9 +587,12 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
               } else {
                 if (targetElement.hasAttribute("href")) {
                   String href = targetElement.getAttribute("href");
-                  boolean handled = handleRelativePathClick(href);
-                  if (handled) {
-                    event.cancel();
+                  String target = targetElement.getAttribute("target");
+                  if (target == null || target.equals("_self")) {
+                    boolean handled = handleRelativePathClick(href);
+                    if (handled) {
+                      event.cancel();
+                    }
                   }
                 }
               }
