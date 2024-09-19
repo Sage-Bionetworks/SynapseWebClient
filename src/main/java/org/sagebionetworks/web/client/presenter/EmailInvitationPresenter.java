@@ -25,6 +25,7 @@ import org.sagebionetworks.web.client.*;
 import org.sagebionetworks.web.client.jsinterop.ToastMessageOptions;
 import org.sagebionetworks.web.client.place.EmailInvitation;
 import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.place.ParameterizedToken;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
@@ -285,6 +286,12 @@ public class EmailInvitationPresenter
 
   @Override
   public void onRegisterClick() {
-    placeChanger.goTo(new RegisterAccount(email));
+    RegisterAccount place = new RegisterAccount("");
+    place.putParam(
+      RegisterAccount.MEMBERSHIP_INVTN_QUERY_PARAM,
+      encodedMISignedToken
+    );
+    place.putParam(RegisterAccount.EMAIL_QUERY_PARAM, email);
+    placeChanger.goTo(place);
   }
 }
