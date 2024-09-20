@@ -121,6 +121,9 @@ public class SRC {
       EntityAclEditorModalProps
     > EntityAclEditorModal;
     public static ReactComponentType<SynapseChatProps> SynapseChat;
+    public static ReactComponentType<
+      RejectProfileValidationRequestModalProps
+    > RejectProfileValidationRequestModal;
 
     /**
      * Pushes a global toast message. In SWC, you should use {@link DisplayUtils#notify}, rather than calling this method directly.

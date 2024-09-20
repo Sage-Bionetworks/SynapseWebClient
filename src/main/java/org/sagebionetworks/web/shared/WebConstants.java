@@ -216,8 +216,11 @@ public class WebConstants {
     "org.sagebionetworks.portal.forum_project_id";
   public static final String DEFAULT_STORAGE_ID_PROPERTY_KEY =
     "org.sagebionetworks.portal.synapse_storage_id";
+  /** @deprecated  */
   public static final String ACT_PROFILE_VALIDATION_REJECTION_REASONS_PROPERTY_KEY =
     "org.sagebionetworks.portal.ACT_profile_validation_rejection_reasons_json";
+  public static final String ACT_PROFILE_VALIDATION_REJECTION_REASONS_TABLE_PROPERTY_KEY =
+    "org.sagebionetworks.portal.ACT_profile_validation_rejection_reasons_table";
   public static final String ACT_DATA_ACCESS_REJECTION_REASONS_PROPERTY_KEY =
     "org.sagebionetworks.portal.ACT_data_access_rejection_reasons_json";
 

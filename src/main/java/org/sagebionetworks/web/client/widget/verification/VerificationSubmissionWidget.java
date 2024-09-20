@@ -19,10 +19,11 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
+import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalView;
-import org.sagebionetworks.web.client.widget.entity.act.RejectReasonWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.upload.FileHandleList;
 
@@ -32,17 +33,19 @@ public class VerificationSubmissionWidget
   private static final String ACT_NOTES_PROMPT = "ACT notes (optional)";
   public static final String FILL_IN_PROFILE_FIELDS_MESSAGE =
     "Please edit your profile to fill in your first name, last name, affiliation, and city/country before requesting profile validation.";
-  private UserProfileClientAsync userProfileClient;
-  private SynapseAlert synAlert;
-  private FileHandleList fileHandleList;
+  private final UserProfileClientAsync userProfileClient;
+  private final SynapseAlert synAlert;
+  private final FileHandleList fileHandleList;
   private UserProfile profile;
   private VerificationSubmission submission;
   private String orcId;
   private List<AttachmentMetadata> existingAttachments;
   private VerificationSubmissionWidgetView view;
-  private GlobalApplicationState globalAppState;
-  private PortalGinInjector ginInjector;
-  private GWTWrapper gwt;
+  private final GlobalApplicationState globalAppState;
+  private final PortalGinInjector ginInjector;
+  private final GWTWrapper gwt;
+  private final SynapseReactClientFullContextPropsProvider propsProvider;
+  private final SynapseProperties synapseProperties;
   // this could be Reject or Suspend. We store this state while the reason is being collected from the
   // ACT user
   private VerificationStateEnum actRejectState;
@@ -58,7 +61,9 @@ public class VerificationSubmissionWidget
     SynapseAlert synAlert,
     FileHandleList fileHandleList,
     GlobalApplicationState globalAppState,
-    GWTWrapper gwt
+    GWTWrapper gwt,
+    SynapseReactClientFullContextPropsProvider propsProvider,
+    SynapseProperties synapseProperties
   ) {
     this.ginInjector = ginInjector;
     this.userProfileClient = userProfileClient;
@@ -67,6 +72,8 @@ public class VerificationSubmissionWidget
     this.fileHandleList = fileHandleList;
     this.globalAppState = globalAppState;
     this.gwt = gwt;
+    this.propsProvider = propsProvider;
+    this.synapseProperties = synapseProperties;
   }
 
   public void initView(boolean isModal) {
@@ -361,7 +368,9 @@ public class VerificationSubmissionWidget
   }
 
   public void handleSuccess(String message) {
-    view.showInfo(message);
+    if (message != null) {
+      view.showInfo(message);
+    }
     view.hide();
     globalAppState.refreshPage();
   }
@@ -425,22 +434,14 @@ public class VerificationSubmissionWidget
   }
 
   private void rejectSuspendVerification() {
-    RejectReasonWidget promptModal = ginInjector.getRejectReasonWidget();
-    view.setPromptModal(promptModal.asWidget());
-    promptModal.show(rejectionReason -> {
-      PromptForValuesModalView promptForValuesModal =
-        ginInjector.getPromptForValuesModal();
-      view.setPromptModal(promptForValuesModal.asWidget());
-      promptForValuesModal.configureAndShow(
-        getConfirmationDialogTitle(actRejectState),
-        ACT_NOTES_PROMPT,
-        "",
-        actNotes -> {
-          promptForValuesModal.hide();
-          updateVerificationState(actRejectState, rejectionReason, actNotes);
-        }
+    this.view.showRejectModal(
+        this.submission.getId(),
+        submission
+          .getStateHistory()
+          .get(submission.getStateHistory().size() - 1)
+          .getState(),
+        () -> handleSuccess(null)
       );
-    });
   }
 
   @Override

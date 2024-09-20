@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.verification;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
+import static org.sagebionetworks.web.shared.WebConstants.ACT_PROFILE_VALIDATION_REJECTION_REASONS_TABLE_PROPERTY_KEY;
+
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
@@ -15,6 +15,12 @@ import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.verification.VerificationState;
 import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.SynapseProperties;
+import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
+import org.sagebionetworks.web.client.jsinterop.React;
+import org.sagebionetworks.web.client.jsinterop.RejectProfileValidationRequestModalProps;
+import org.sagebionetworks.web.client.jsinterop.SRC;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 
 public class VerificationSubmissionRowViewImpl
   implements VerificationSubmissionWidgetView {
@@ -25,6 +31,9 @@ public class VerificationSubmissionRowViewImpl
   VerificationSubmissionWidgetView.Presenter presenter;
 
   Widget widget;
+
+  private final SynapseProperties synapseProperties;
+  private final SynapseReactClientFullContextPropsProvider propsProvider;
 
   @UiField
   Span firstName;
@@ -83,7 +92,14 @@ public class VerificationSubmissionRowViewImpl
   }
 
   @Inject
-  public VerificationSubmissionRowViewImpl(Binder binder) {
+  public VerificationSubmissionRowViewImpl(
+    Binder binder,
+    SynapseProperties synapseProperties,
+    SynapseReactClientFullContextPropsProvider propsProvider
+  ) {
+    this.synapseProperties = synapseProperties;
+    this.propsProvider = propsProvider;
+
     widget = binder.createAndBindUi(this);
 
     approveButton.addClickHandler(event -> {
@@ -274,6 +290,33 @@ public class VerificationSubmissionRowViewImpl
   @Override
   public void setProfileFieldsEditable(boolean editable) {
     // Not used in this view implementation
+  }
+
+  @Override
+  public void showRejectModal(
+    String submissionId,
+    VerificationStateEnum currentState,
+    RejectProfileValidationRequestModalProps.Callback onRejectSuccess
+  ) {
+    final ReactComponent promptModalV2 = new ReactComponent();
+    RejectProfileValidationRequestModalProps props =
+      RejectProfileValidationRequestModalProps.create(
+        submissionId,
+        currentState,
+        synapseProperties.getSynapseProperty(
+          ACT_PROFILE_VALIDATION_REJECTION_REASONS_TABLE_PROPERTY_KEY
+        ),
+        true,
+        onRejectSuccess,
+        promptModalV2::clear
+      );
+    promptModalV2.render(
+      React.createElementWithSynapseContext(
+        SRC.SynapseComponents.RejectProfileValidationRequestModal,
+        props,
+        propsProvider.getJsInteropContextProps()
+      )
+    );
   }
 
   @Override
