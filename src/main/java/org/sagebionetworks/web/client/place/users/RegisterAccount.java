@@ -1,19 +1,17 @@
 package org.sagebionetworks.web.client.place.users;
 
-import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceTokenizer;
 import com.google.gwt.place.shared.Prefix;
+import org.sagebionetworks.web.client.place.ParameterizedPlace;
 
-public class RegisterAccount extends Place {
+public class RegisterAccount extends ParameterizedPlace {
 
-  private String token;
+  public static final String EMAIL_QUERY_PARAM = "email";
+  public static final String MEMBERSHIP_INVTN_QUERY_PARAM =
+    "membershipInvtnSignedToken";
 
   public RegisterAccount(String token) {
-    this.token = token;
-  }
-
-  public String toToken() {
-    return token;
+    super(token);
   }
 
   @Prefix("RegisterAccount")

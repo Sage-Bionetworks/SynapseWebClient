@@ -21,22 +21,21 @@ public class RegisterAccountPresenter
 
   @Override
   public void setPlace(RegisterAccount place) {
-    String token = place.toToken();
-    if (token != null && token.contains("@")) {
-      // is likely an email address
-      Window.Location.replace(
-        WebConstants.ONESAGE_PRODUCTION_URL +
-        "/register1?email=" +
-        token +
-        "&" +
-        WebConstants.ONESAGE_SYNAPSE_APPID_QUERY_PARAM
-      );
-    } else {
-      Window.Location.replace(
-        WebConstants.ONESAGE_PRODUCTION_URL +
-        "/register1?" +
-        WebConstants.ONESAGE_SYNAPSE_APPID_QUERY_PARAM
-      );
+    String emailInvitationToken = place.getParam(
+      RegisterAccount.MEMBERSHIP_INVTN_QUERY_PARAM
+    );
+    String email = place.getParam(RegisterAccount.EMAIL_QUERY_PARAM);
+    StringBuilder targetUrl = new StringBuilder();
+    targetUrl.append(WebConstants.ONESAGE_PRODUCTION_URL);
+    targetUrl.append("/register1?");
+    targetUrl.append(WebConstants.ONESAGE_SYNAPSE_APPID_QUERY_PARAM);
+
+    if (emailInvitationToken != null) {
+      targetUrl.append("&signedToken=" + emailInvitationToken);
     }
+    if (email != null) {
+      targetUrl.append("&email=" + email);
+    }
+    Window.Location.replace(targetUrl.toString());
   }
 }

@@ -280,7 +280,14 @@ public class EmailInvitationPresenterTest {
       RegisterAccount.class
     );
     verify(mockPlaceChanger).goTo(captor.capture());
-    assertEquals("invitee@email.com", captor.getValue().toToken());
+    assertEquals(
+      "invitee@email.com",
+      captor.getValue().getParam(RegisterAccount.EMAIL_QUERY_PARAM)
+    );
+    assertEquals(
+      encodedMISignedToken,
+      captor.getValue().getParam(RegisterAccount.MEMBERSHIP_INVTN_QUERY_PARAM)
+    );
   }
 
   @Test
