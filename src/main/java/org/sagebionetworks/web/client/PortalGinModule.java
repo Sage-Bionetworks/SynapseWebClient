@@ -969,6 +969,7 @@ public class PortalGinModule extends AbstractGinModule {
       .to(IntendedDataUseReportWidgetViewImpl.class);
     bind(DialogView.class).to(Dialog.class);
     bind(ChatView.class).to(ChatViewImpl.class);
+    bind(PlanView.class).to(PlanViewImpl.class);
 
     bind(FollowingPageView.class)
       .to(FollowingPageViewImpl.class)
