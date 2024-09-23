@@ -12,6 +12,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import java.util.List;
+import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
@@ -790,7 +791,22 @@ public class Uploader
         entity = result;
         view.showInfo(DisplayConstants.TEXT_LINK_SUCCESS);
         if (successHandler != null) {
-          successHandler.onSuccessfulUpload();
+          synapseClient.getEntityBenefactorAcl(
+            result.getId(),
+            new AsyncCallback<AccessControlList>() {
+              @Override
+              public void onSuccess(AccessControlList benefactorAcl) {
+                successHandler.onSuccessfulUpload(benefactorAcl.getId());
+              }
+
+              @Override
+              public void onFailure(Throwable caught) {
+                view.showErrorMessage(caught.getMessage());
+                // Upload was still a success, benefactor ID is not required to continue
+                successHandler.onSuccessfulUpload(null);
+              }
+            }
+          );
         }
 
         entityUpdated();
@@ -1009,7 +1025,22 @@ public class Uploader
     view.resetToInitialState();
     resetUploadProgress();
     if (successHandler != null) {
-      successHandler.onSuccessfulUpload();
+      synapseClient.getEntityBenefactorAcl(
+        parentEntityId,
+        new AsyncCallback<AccessControlList>() {
+          @Override
+          public void onSuccess(AccessControlList benefactorAcl) {
+            successHandler.onSuccessfulUpload(benefactorAcl.getId());
+          }
+
+          @Override
+          public void onFailure(Throwable caught) {
+            view.showErrorMessage(caught.getMessage());
+            // Upload was still a success, benefactor ID is not required to continue.
+            successHandler.onSuccessfulUpload(null);
+          }
+        }
+      );
     }
     entityUpdated();
   }
