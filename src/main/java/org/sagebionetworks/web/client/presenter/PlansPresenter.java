@@ -4,18 +4,18 @@ import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
-import org.sagebionetworks.web.client.place.PlanPlace;
-import org.sagebionetworks.web.client.view.PlanView;
+import org.sagebionetworks.web.client.place.PlansPlace;
+import org.sagebionetworks.web.client.view.PlansView;
 
-public class PlanPresenter
+public class PlansPresenter
   extends AbstractActivity
-  implements Presenter<PlanPlace> {
+  implements Presenter<PlansPlace> {
 
-  private PlanPlace place;
-  private PlanView view;
+  private PlansPlace place;
+  private PlansView view;
 
   @Inject
-  public PlanPresenter(PlanView view) {
+  public PlansPresenter(PlansView view) {
     this.view = view;
   }
 
@@ -26,7 +26,7 @@ public class PlanPresenter
   }
 
   @Override
-  public void setPlace(PlanPlace place) {
+  public void setPlace(PlansPlace place) {
     this.place = place;
     view.render();
   }

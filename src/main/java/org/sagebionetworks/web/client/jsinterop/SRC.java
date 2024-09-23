@@ -121,7 +121,7 @@ public class SRC {
       EntityAclEditorModalProps
     > EntityAclEditorModal;
     public static ReactComponentType<SynapseChatProps> SynapseChat;
-    public static ReactComponentType<EmptyProps> SynapsePlans;
+    public static ReactComponentType<SynapseHomepageV2Props> SynapsePlansPage;
     public static ReactComponentType<
       RejectProfileValidationRequestModalProps
     > RejectProfileValidationRequestModal;
