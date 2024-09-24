@@ -30,6 +30,7 @@ import org.sagebionetworks.web.client.place.OAuthClientEditorPlace;
 import org.sagebionetworks.web.client.place.PasswordResetSignedTokenPlace;
 import org.sagebionetworks.web.client.place.PeopleSearch;
 import org.sagebionetworks.web.client.place.PersonalAccessTokenPlace;
+import org.sagebionetworks.web.client.place.PlansPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Quiz;
 import org.sagebionetworks.web.client.place.Search;
@@ -100,6 +101,7 @@ import org.sagebionetworks.web.client.place.users.RegisterAccount;
     FollowingPlace.Tokenizer.class,
     TrustCenterPlace.Tokenizer.class,
     ChatPlace.Tokenizer.class,
+    PlansPlace.Tokenizer.class,
   }
 )
 public interface AppPlaceHistoryMapper extends PlaceHistoryMapper {}

@@ -36,6 +36,7 @@ import org.sagebionetworks.web.client.presenter.OAuthClientEditorPresenter;
 import org.sagebionetworks.web.client.presenter.PasswordResetSignedTokenPresenter;
 import org.sagebionetworks.web.client.presenter.PeopleSearchPresenter;
 import org.sagebionetworks.web.client.presenter.PersonalAccessTokensPresenter;
+import org.sagebionetworks.web.client.presenter.PlansPresenter;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.presenter.QuizPresenter;
 import org.sagebionetworks.web.client.presenter.SearchPresenter;
@@ -898,4 +899,5 @@ public interface PortalGinInjector extends Ginjector {
 
   TrustCenterPresenter getTrustCenterPresenter();
   ChatPresenter getChatPresenter();
+  PlansPresenter getPlansPresenter();
 }

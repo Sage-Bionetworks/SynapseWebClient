@@ -28,6 +28,7 @@ import org.sagebionetworks.web.client.place.MapPlace;
 import org.sagebionetworks.web.client.place.NewAccount;
 import org.sagebionetworks.web.client.place.PasswordResetSignedTokenPlace;
 import org.sagebionetworks.web.client.place.PeopleSearch;
+import org.sagebionetworks.web.client.place.PlansPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.SignedToken;
@@ -103,6 +104,7 @@ public class AppActivityMapper implements ActivityMapper {
     openAccessPlaces.add(AccessRequirementsPlace.class);
     openAccessPlaces.add(AccessRequirementPlace.class);
     openAccessPlaces.add(TrustCenterPlace.class);
+    openAccessPlaces.add(PlansPlace.class);
 
     excludeFromLastPlace = new ArrayList<Class>();
     excludeFromLastPlace.add(Home.class);
