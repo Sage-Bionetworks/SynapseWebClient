@@ -28,6 +28,7 @@ import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.jsinterop.SynapseNavDrawerProps;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.place.PlansPlace;
 import org.sagebionetworks.web.client.widget.FullWidthAlert;
 import org.sagebionetworks.web.client.widget.OrientationBanner;
 import org.sagebionetworks.web.client.widget.ReactComponent;
@@ -187,7 +188,8 @@ public class HeaderViewImpl extends Composite implements HeaderView {
     if (
       globalAppState.getCurrentPlace() == null ||
       globalAppState.getCurrentPlace() instanceof Home ||
-      globalAppState.getCurrentPlace() instanceof LoginPlace
+      globalAppState.getCurrentPlace() instanceof LoginPlace ||
+      globalAppState.getCurrentPlace() instanceof PlansPlace
     ) {
       hideNavBar();
     } else {
