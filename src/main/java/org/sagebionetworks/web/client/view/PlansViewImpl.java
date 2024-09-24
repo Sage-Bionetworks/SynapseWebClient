@@ -12,7 +12,7 @@ import org.sagebionetworks.web.client.jsinterop.SynapseHomepageV2Props;
 import org.sagebionetworks.web.client.widget.ReactComponent;
 import org.sagebionetworks.web.client.widget.header.Header;
 
-public class PlanViewImpl extends Composite implements PlansView {
+public class PlansViewImpl extends Composite implements PlansView {
 
   ReactComponent container;
 
@@ -21,7 +21,7 @@ public class PlanViewImpl extends Composite implements PlansView {
   private GlobalApplicationState globalAppState;
 
   @Inject
-  public PlanViewImpl(
+  public PlansViewImpl(
     Header headerWidget,
     final SynapseReactClientFullContextPropsProvider propsProvider,
     GlobalApplicationState globalAppState
