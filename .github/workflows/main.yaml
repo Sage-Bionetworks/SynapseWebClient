@@ -25,7 +25,7 @@ jobs:
 
       - uses: ./.github/workflows/build
         with:
-          mvn_goal: deploy
+          mvn_goal: package
           pom_version: ${{ env.pomversion }}
         env:
           MAVEN_USERNAME: ${{ secrets.PLATFORM_ARTIFACTORY_USER }}
