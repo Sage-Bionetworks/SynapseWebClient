@@ -18,8 +18,8 @@ runs:
         distribution: 'corretto'
         cache: maven
         server-id: sagebionetworks
-        server-username: ${{ env.MAVEN_USERNAME }}
-        server-password: ${{ env.MAVEN_USERPWD }}
+        server-username: MAVEN_USERNAME
+        server-password: MAVEN_USERPWD
 
     - name: Version pom.xml
       shell: bash
