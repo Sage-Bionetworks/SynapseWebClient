@@ -8,14 +8,6 @@ inputs:
     description: the version for the generated artifact
     required: false
     default: ''
-  maven_username:
-    description: the username for artifactory
-    required: false
-    default: ''
-  maven_userpwd:
-    description: the password for artifactory
-    required: false
-    default: ''
 runs:
   using: 'composite'
   steps:
@@ -26,8 +18,8 @@ runs:
         distribution: 'corretto'
         cache: maven
         server-id: sagebionetworks
-        server-username: ${{ inputs.maven_username }}
-        server-password: ${{ inputs.maven_userpwd }}
+        server-username: ${{ env.MAVEN_USERNAME }}
+        server-password: ${{ env.MAVEN_USERPWD }}
 
     - name: Version pom.xml
       shell: bash

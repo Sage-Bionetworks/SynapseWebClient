@@ -27,8 +27,9 @@ jobs:
         with:
           mvn_goal: deploy
           pom_version: ${{ env.pomversion }}
-          maven_username: ${{ secrets.PLATFORM_ARTIFACTORY_USER }}
-          maven_userpwd: ${{ secrets.PLATFORM_ARTIFACTORY_PWD }}
+        env:
+          MAVEN_USERNAME: ${{ secrets.PLATFORM_ARTIFACTORY_USER }}
+          MAVEN_USERPWD: ${{ secrets.PLATFORM_ARTIFACTORY_PWD }}
 
   call-test:
     runs-on: ubuntu-latest
