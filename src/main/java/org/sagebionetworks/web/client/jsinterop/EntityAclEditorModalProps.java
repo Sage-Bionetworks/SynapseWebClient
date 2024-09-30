@@ -17,15 +17,13 @@ public class EntityAclEditorModalProps extends ReactComponentProps {
   public boolean open;
   public Callback onUpdateSuccess;
   public Callback onClose;
-  public boolean isAfterUpload;
 
   @JsOverlay
   public static EntityAclEditorModalProps create(
     String entityId,
     boolean open,
     Callback onUpdateSuccess,
-    Callback onClose,
-    boolean isAfterUpload
+    Callback onClose
   ) {
     EntityAclEditorModalProps props = new EntityAclEditorModalProps();
 
@@ -33,7 +31,6 @@ public class EntityAclEditorModalProps extends ReactComponentProps {
     props.open = open;
     props.onUpdateSuccess = onUpdateSuccess;
     props.onClose = onClose;
-    props.isAfterUpload = isAfterUpload;
     return props;
   }
 }
