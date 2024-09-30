@@ -12,11 +12,5 @@ public interface EntityAccessControlListModalWidget extends IsWidget {
     EntityAclEditorModalProps.Callback onUpdateSuccess
   );
 
-  void configure(
-    String entityId,
-    EntityAclEditorModalProps.Callback onUpdateSuccess,
-    boolean isAfterUpload
-  );
-
   void setOpen(boolean open);
 }
