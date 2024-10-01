@@ -125,6 +125,7 @@ public class SRC {
     public static ReactComponentType<
       RejectProfileValidationRequestModalProps
     > RejectProfileValidationRequestModal;
+    public static ReactComponentType<MarkdownGithubProps> MarkdownGithub;
 
     /**
      * Pushes a global toast message. In SWC, you should use {@link DisplayUtils#notify}, rather than calling this method directly.

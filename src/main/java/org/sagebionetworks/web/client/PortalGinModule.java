@@ -250,6 +250,9 @@ public class PortalGinModule extends AbstractGinModule {
     bind(HelpView.class).to(HelpViewImpl.class).in(Singleton.class);
     // SearchView
     bind(SearchView.class).to(SearchViewImpl.class).in(Singleton.class);
+    bind(TrustCenterView.class)
+      .to(TrustCenterViewImpl.class)
+      .in(Singleton.class);
 
     // Down
     bind(DownView.class).to(DownViewImpl.class).in(Singleton.class);
