@@ -4,7 +4,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.inject.Inject;
 import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
-import org.sagebionetworks.web.client.jsinterop.MarkdownGithubProps;
+import org.sagebionetworks.web.client.jsinterop.GovernanceMarkdownGithubProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
@@ -35,14 +35,14 @@ public class TrustCenterViewImpl extends Composite implements TrustCenterView {
     scrollToTop();
     ReactElement component;
 
-    MarkdownGithubProps props = MarkdownGithubProps.create(
+    GovernanceMarkdownGithubProps props = GovernanceMarkdownGithubProps.create(
       repoOwner,
       repoName,
       filePath
     );
     component =
       React.createElementWithSynapseContext(
-        SRC.SynapseComponents.MarkdownGithub,
+        SRC.SynapseComponents.GovernanceMarkdownGithub,
         props,
         propsProvider.getJsInteropContextProps()
       );

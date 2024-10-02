@@ -6,7 +6,7 @@ import jsinterop.annotations.JsPackage;
 import jsinterop.annotations.JsType;
 
 @JsType(isNative = true, namespace = JsPackage.GLOBAL, name = "Object")
-public class MarkdownGithubProps extends ReactComponentProps {
+public class GovernanceMarkdownGithubProps extends ReactComponentProps {
 
   @JsNullable
   public String repoOwner;
@@ -18,12 +18,12 @@ public class MarkdownGithubProps extends ReactComponentProps {
   public String filePath;
 
   @JsOverlay
-  public static MarkdownGithubProps create(
+  public static GovernanceMarkdownGithubProps create(
     String repoOwner,
     String repoName,
     String filePath
   ) {
-    MarkdownGithubProps props = new MarkdownGithubProps();
+    GovernanceMarkdownGithubProps props = new GovernanceMarkdownGithubProps();
     props.repoOwner = repoOwner;
     props.repoName = repoName;
     props.filePath = filePath;
