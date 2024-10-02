@@ -583,7 +583,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
             }
             try {
               if (isSRCSignInClass) {
-                getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+                gotoLoginPage();
               } else {
                 if (targetElement.hasAttribute("href")) {
                   String href = targetElement.getAttribute("href");
@@ -610,6 +610,11 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
     if (finalCallback != null) {
       finalCallback.invoke();
     }
+  }
+
+  @Override
+  public void gotoLoginPage() {
+    gwt.assignThisWindowWith(gwt.getOneSageURL());
   }
 
   @Override

@@ -78,4 +78,5 @@ public interface GWTWrapper {
   boolean isValidJSONArray(String json);
 
   JSONValue parseJSONStrict(String json);
+  String getOneSageURL();
 }

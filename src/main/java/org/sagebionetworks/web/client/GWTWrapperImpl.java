@@ -242,6 +242,16 @@ public class GWTWrapperImpl implements GWTWrapper {
   }
 
   @Override
+  public String getOneSageURL() {
+    boolean isStaging = Window.Location
+      .getHostName()
+      .equalsIgnoreCase("staging.synapse.org");
+    return isStaging
+      ? "https://staging.accounts.synapse.org/?appId=staging.synapse.org"
+      : "https://accounts.synapse.org/?appId=synapse.org";
+  }
+
+  @Override
   public DateTimeFormat getFormat(String formatPattern) {
     return DateTimeFormat.getFormat(formatPattern);
   }
