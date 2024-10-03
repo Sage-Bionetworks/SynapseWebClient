@@ -791,26 +791,29 @@ public class Uploader
         entity = result;
         view.showInfo(DisplayConstants.TEXT_LINK_SUCCESS);
         if (successHandler != null) {
-          jsClient
-            .getEntityBenefactorAcl(result.getId())
-            .addCallback(
-              new FutureCallback<AccessControlList>() {
-                @Override
-                public void onSuccess(AccessControlList benefactorAcl) {
-                  successHandler.onSuccessfulUpload(benefactorAcl.getId());
-                  entityUpdated();
-                }
-
-                @Override
-                public void onFailure(Throwable caught) {
-                  view.showErrorMessage(caught.getMessage());
-                  // Upload was still a success, benefactor ID is not required to continue
+          jsClient.getEntityBenefactorAcl(
+            result.getId(),
+            new AsyncCallback<AccessControlList>() {
+              @Override
+              public void onSuccess(AccessControlList benefactorAcl) {
+                if (benefactorAcl.getId().equals(entity.getId())) {
+                  // Don't show the ACL modal if the entity is its own benefactor
                   successHandler.onSuccessfulUpload(null);
-                  entityUpdated();
+                } else {
+                  successHandler.onSuccessfulUpload(benefactorAcl.getId());
                 }
-              },
-              directExecutor()
-            );
+                entityUpdated();
+              }
+
+              @Override
+              public void onFailure(Throwable caught) {
+                view.showErrorMessage(caught.getMessage());
+                // Upload was still a success, benefactor ID is not required to continue
+                successHandler.onSuccessfulUpload(null);
+                entityUpdated();
+              }
+            }
+          );
         }
       }
 
@@ -1027,26 +1030,29 @@ public class Uploader
     view.resetToInitialState();
     resetUploadProgress();
     if (successHandler != null) {
-      jsClient
-        .getEntityBenefactorAcl(entityId)
-        .addCallback(
-          new FutureCallback<AccessControlList>() {
-            @Override
-            public void onSuccess(AccessControlList benefactorAcl) {
-              successHandler.onSuccessfulUpload(benefactorAcl.getId());
-              entityUpdated();
-            }
-
-            @Override
-            public void onFailure(Throwable caught) {
-              view.showErrorMessage(caught.getMessage());
-              // Upload was still a success, benefactor ID is not required to continue.
+      jsClient.getEntityBenefactorAcl(
+        entityId,
+        new AsyncCallback<AccessControlList>() {
+          @Override
+          public void onSuccess(AccessControlList benefactorAcl) {
+            if (benefactorAcl.getId().equals(entityId)) {
+              // Don't show the ACL modal if the entity is its own benefactor
               successHandler.onSuccessfulUpload(null);
-              entityUpdated();
+            } else {
+              successHandler.onSuccessfulUpload(benefactorAcl.getId());
             }
-          },
-          directExecutor()
-        );
+            entityUpdated();
+          }
+
+          @Override
+          public void onFailure(Throwable caught) {
+            view.showErrorMessage(caught.getMessage());
+            // Upload was still a success, benefactor ID is not required to continue.
+            successHandler.onSuccessfulUpload(null);
+            entityUpdated();
+          }
+        }
+      );
     }
   }
 

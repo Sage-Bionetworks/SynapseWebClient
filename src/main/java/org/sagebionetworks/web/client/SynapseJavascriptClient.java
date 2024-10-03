@@ -3296,32 +3296,31 @@ public class SynapseJavascriptClient {
     return getFuture(cb -> doDelete(url, cb));
   }
 
-  public FluentFuture<AccessControlList> getEntityBenefactorAcl(
-    String entityId
+  public void getEntityBenefactorAcl(
+    String entityId,
+    AsyncCallback<AccessControlList> cb
   ) {
     // Retrieving the benefactor ACL is always permitted regardless of permissions, so only retrieve that part of the bundle.
     EntityBundleRequest request = new EntityBundleRequest();
     request.setIncludeBenefactorACL(true);
     String url = getRepoServiceUrl() + ENTITY + "/" + entityId + BUNDLE2;
 
-    return getFuture(cb ->
-      doPost(
-        url,
-        request,
-        OBJECT_TYPE.EntityBundle,
-        true,
-        new AsyncCallback<EntityBundle>() {
-          @Override
-          public void onFailure(Throwable caught) {
-            cb.onFailure(caught);
-          }
-
-          @Override
-          public void onSuccess(EntityBundle result) {
-            cb.onSuccess(result.getBenefactorAcl());
-          }
+    doPost(
+      url,
+      request,
+      OBJECT_TYPE.EntityBundle,
+      true,
+      new AsyncCallback<EntityBundle>() {
+        @Override
+        public void onSuccess(EntityBundle result) {
+          cb.onSuccess(result.getBenefactorAcl());
         }
-      )
+
+        @Override
+        public void onFailure(Throwable caught) {
+          cb.onFailure(caught);
+        }
+      }
     );
   }
 }
