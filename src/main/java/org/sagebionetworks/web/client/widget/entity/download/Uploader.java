@@ -791,25 +791,27 @@ public class Uploader
         entity = result;
         view.showInfo(DisplayConstants.TEXT_LINK_SUCCESS);
         if (successHandler != null) {
-          synapseClient.getEntityBenefactorAcl(
-            result.getId(),
-            new AsyncCallback<AccessControlList>() {
-              @Override
-              public void onSuccess(AccessControlList benefactorAcl) {
-                successHandler.onSuccessfulUpload(benefactorAcl.getId());
-              }
+          jsClient
+            .getEntityBenefactorAcl(result.getId())
+            .addCallback(
+              new FutureCallback<AccessControlList>() {
+                @Override
+                public void onSuccess(AccessControlList benefactorAcl) {
+                  successHandler.onSuccessfulUpload(benefactorAcl.getId());
+                  entityUpdated();
+                }
 
-              @Override
-              public void onFailure(Throwable caught) {
-                view.showErrorMessage(caught.getMessage());
-                // Upload was still a success, benefactor ID is not required to continue
-                successHandler.onSuccessfulUpload(null);
-              }
-            }
-          );
+                @Override
+                public void onFailure(Throwable caught) {
+                  view.showErrorMessage(caught.getMessage());
+                  // Upload was still a success, benefactor ID is not required to continue
+                  successHandler.onSuccessfulUpload(null);
+                  entityUpdated();
+                }
+              },
+              directExecutor()
+            );
         }
-
-        entityUpdated();
       }
 
       @Override
@@ -1025,24 +1027,27 @@ public class Uploader
     view.resetToInitialState();
     resetUploadProgress();
     if (successHandler != null) {
-      synapseClient.getEntityBenefactorAcl(
-        parentEntityId,
-        new AsyncCallback<AccessControlList>() {
-          @Override
-          public void onSuccess(AccessControlList benefactorAcl) {
-            successHandler.onSuccessfulUpload(benefactorAcl.getId());
-          }
+      jsClient
+        .getEntityBenefactorAcl(entityId)
+        .addCallback(
+          new FutureCallback<AccessControlList>() {
+            @Override
+            public void onSuccess(AccessControlList benefactorAcl) {
+              successHandler.onSuccessfulUpload(benefactorAcl.getId());
+              entityUpdated();
+            }
 
-          @Override
-          public void onFailure(Throwable caught) {
-            view.showErrorMessage(caught.getMessage());
-            // Upload was still a success, benefactor ID is not required to continue.
-            successHandler.onSuccessfulUpload(null);
-          }
-        }
-      );
+            @Override
+            public void onFailure(Throwable caught) {
+              view.showErrorMessage(caught.getMessage());
+              // Upload was still a success, benefactor ID is not required to continue.
+              successHandler.onSuccessfulUpload(null);
+              entityUpdated();
+            }
+          },
+          directExecutor()
+        );
     }
-    entityUpdated();
   }
 
   private void resetUploadProgress() {
