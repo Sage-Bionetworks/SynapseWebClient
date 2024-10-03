@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+import static org.sagebionetworks.web.client.cookie.CookieKeys.ONESAGE_REDIRECT_COOKIE_KEY;
 import static org.sagebionetworks.web.client.cookie.CookieKeys.SHOW_DATETIME_IN_UTC;
 import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
 
@@ -614,6 +615,9 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 
   @Override
   public void gotoLoginPage() {
+    //tell One Sage to return to the current url
+    cookieProvider.setCookie(ONESAGE_REDIRECT_COOKIE_KEY, gwt.getCurrentURL());
+    //go to One Sage to log in
     gwt.assignThisWindowWith(gwt.getOneSageURL());
   }
 

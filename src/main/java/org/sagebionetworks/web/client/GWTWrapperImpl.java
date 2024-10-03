@@ -20,6 +20,8 @@ import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import org.sagebionetworks.web.client.utils.Callback;
 
 public class GWTWrapperImpl implements GWTWrapper {
@@ -241,14 +243,34 @@ public class GWTWrapperImpl implements GWTWrapper {
     return DisplayUtils.getFriendlySize(size, abbreviatedUnits);
   }
 
+  private static Map<String, String> hostName2OneSageSite = new HashMap<>();
+
+  static {
+    hostName2OneSageSite.put(
+      "staging.synapse.org",
+      "https://staging.accounts.synapse.org/?appId=staging.synapse.org"
+    );
+    hostName2OneSageSite.put(
+      "portal-dev.dev.sagebase.org",
+      "https://accounts-dev.dev.sagebase.org/?appId=dev.synapse.org"
+    );
+    hostName2OneSageSite.put(
+      "localhost",
+      "http://localhost:3000/?appId=localhost"
+    );
+    hostName2OneSageSite.put(
+      "127.0.0.1",
+      "http://127.0.0.1:3000/?appId=localhost"
+    );
+  }
+
   @Override
   public String getOneSageURL() {
-    boolean isStaging = Window.Location
-      .getHostName()
-      .equalsIgnoreCase("staging.synapse.org");
-    return isStaging
-      ? "https://staging.accounts.synapse.org/?appId=staging.synapse.org"
-      : "https://accounts.synapse.org/?appId=synapse.org";
+    String hostName = Window.Location.getHostName().toLowerCase();
+    return hostName2OneSageSite.getOrDefault(
+      hostName,
+      "https://accounts.synapse.org/?appId=synapse.org"
+    );
   }
 
   @Override
