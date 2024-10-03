@@ -615,13 +615,13 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
   @Override
   public void gotoLoginPage() {
     //tell One Sage to return to the current url
-    Date hourFromNow = new Date();
-    hourFromNow.setTime(hourFromNow.getTime() + (60 * 60 * 1000));
+    Date twoHoursFromNow = new Date();
+    twoHoursFromNow.setTime(twoHoursFromNow.getTime() + (2 * 60 * 60 * 1000));
 
     cookieProvider.setCookie(
       ONESAGE_REDIRECT_COOKIE_KEY,
       gwt.getCurrentURL(),
-      hourFromNow
+      twoHoursFromNow
     );
     //go to One Sage to log in
     gwt.assignThisWindowWith(gwt.getOneSageURL());
