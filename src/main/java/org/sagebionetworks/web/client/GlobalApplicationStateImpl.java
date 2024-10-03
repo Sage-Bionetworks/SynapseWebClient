@@ -32,7 +32,6 @@ import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
-import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.footer.VersionState;
@@ -616,7 +615,14 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
   @Override
   public void gotoLoginPage() {
     //tell One Sage to return to the current url
-    cookieProvider.setCookie(ONESAGE_REDIRECT_COOKIE_KEY, gwt.getCurrentURL());
+    Date hourFromNow = new Date();
+    hourFromNow.setTime(hourFromNow.getTime() + (60 * 60 * 1000));
+
+    cookieProvider.setCookie(
+      ONESAGE_REDIRECT_COOKIE_KEY,
+      gwt.getCurrentURL(),
+      hourFromNow
+    );
     //go to One Sage to log in
     gwt.assignThisWindowWith(gwt.getOneSageURL());
   }
