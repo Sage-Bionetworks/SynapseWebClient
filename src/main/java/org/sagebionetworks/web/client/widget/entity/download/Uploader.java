@@ -12,6 +12,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import java.util.List;
+import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
@@ -790,10 +791,30 @@ public class Uploader
         entity = result;
         view.showInfo(DisplayConstants.TEXT_LINK_SUCCESS);
         if (successHandler != null) {
-          successHandler.onSuccessfulUpload();
-        }
+          jsClient.getEntityBenefactorAcl(
+            result.getId(),
+            new AsyncCallback<AccessControlList>() {
+              @Override
+              public void onSuccess(AccessControlList benefactorAcl) {
+                if (benefactorAcl.getId().equals(entity.getId())) {
+                  // Don't show the ACL modal if the entity is its own benefactor
+                  successHandler.onSuccessfulUpload(null);
+                } else {
+                  successHandler.onSuccessfulUpload(benefactorAcl.getId());
+                }
+                entityUpdated();
+              }
 
-        entityUpdated();
+              @Override
+              public void onFailure(Throwable caught) {
+                view.showErrorMessage(caught.getMessage());
+                // Upload was still a success, benefactor ID is not required to continue
+                successHandler.onSuccessfulUpload(null);
+                entityUpdated();
+              }
+            }
+          );
+        }
       }
 
       @Override
@@ -1009,9 +1030,30 @@ public class Uploader
     view.resetToInitialState();
     resetUploadProgress();
     if (successHandler != null) {
-      successHandler.onSuccessfulUpload();
+      jsClient.getEntityBenefactorAcl(
+        entityId,
+        new AsyncCallback<AccessControlList>() {
+          @Override
+          public void onSuccess(AccessControlList benefactorAcl) {
+            if (benefactorAcl.getId().equals(entityId)) {
+              // Don't show the ACL modal if the entity is its own benefactor
+              successHandler.onSuccessfulUpload(null);
+            } else {
+              successHandler.onSuccessfulUpload(benefactorAcl.getId());
+            }
+            entityUpdated();
+          }
+
+          @Override
+          public void onFailure(Throwable caught) {
+            view.showErrorMessage(caught.getMessage());
+            // Upload was still a success, benefactor ID is not required to continue.
+            successHandler.onSuccessfulUpload(null);
+            entityUpdated();
+          }
+        }
+      );
     }
-    entityUpdated();
   }
 
   private void resetUploadProgress() {
