@@ -1,9 +1,12 @@
 package org.sagebionetworks.web.unitclient.widget.entity.download;
 
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.google.gwt.event.shared.EventBus;
 import org.junit.Before;
@@ -14,6 +17,8 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.web.client.FeatureFlagConfig;
+import org.sagebionetworks.web.client.FeatureFlagKey;
 import org.sagebionetworks.web.client.events.CancelHandler;
 import org.sagebionetworks.web.client.events.UploadSuccessHandler;
 import org.sagebionetworks.web.client.jsinterop.EntityAclEditorModalProps;
@@ -38,6 +43,9 @@ public class UploadDialogTest {
   @Mock
   EntityAccessControlListModalWidget mockEntityAccessControlListModalWidget;
 
+  @Mock
+  FeatureFlagConfig mockFeatureFlagConfig;
+
   @Captor
   ArgumentCaptor<UploadSuccessHandler> uploadSuccessCaptor;
 
@@ -55,12 +63,58 @@ public class UploadDialogTest {
         view,
         mockUploader,
         mockEventBus,
-        mockEntityAccessControlListModalWidget
+        mockEntityAccessControlListModalWidget,
+        mockFeatureFlagConfig
       );
   }
 
   @Test
   public void testConfigure() {
+    when(
+      mockFeatureFlagConfig.isFeatureEnabled(
+        FeatureFlagKey.SHOW_SHARING_SETTINGS_AFTER_UPLOAD
+      )
+    )
+      .thenReturn(false);
+
+    String title = "dialog title";
+    Entity entity = mock(Entity.class);
+    String parentEntityId = "parent";
+    CallbackP<String> fileHandleIdCallback = mock(CallbackP.class);
+    boolean isEntity = true;
+    widget.configure(
+      title,
+      entity,
+      parentEntityId,
+      fileHandleIdCallback,
+      isEntity
+    );
+
+    verify(mockUploader)
+      .configure(entity, parentEntityId, fileHandleIdCallback, isEntity);
+    verify(view).configureDialog(eq(title), any());
+
+    verify(mockUploader).setSuccessHandler(uploadSuccessCaptor.capture());
+    verify(mockUploader).setCancelHandler(any(CancelHandler.class));
+
+    // simulate a successful upload
+    String benefactorId = "syn123";
+    uploadSuccessCaptor.getValue().onSuccessfulUpload(benefactorId);
+    verify(view).hideDialog();
+    verify(mockEntityAccessControlListModalWidget, never())
+      .configure(eq(benefactorId), any(), anyBoolean());
+    verify(mockEntityAccessControlListModalWidget, never()).setOpen(true);
+  }
+
+  @Test
+  public void testSharingSettingsFeatureEnabled() {
+    when(
+      mockFeatureFlagConfig.isFeatureEnabled(
+        FeatureFlagKey.SHOW_SHARING_SETTINGS_AFTER_UPLOAD
+      )
+    )
+      .thenReturn(true);
+
     String title = "dialog title";
     Entity entity = mock(Entity.class);
     String parentEntityId = "parent";

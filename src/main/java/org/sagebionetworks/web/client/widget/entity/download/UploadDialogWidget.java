@@ -4,6 +4,8 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.web.client.FeatureFlagConfig;
+import org.sagebionetworks.web.client.FeatureFlagKey;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
@@ -16,18 +18,21 @@ public class UploadDialogWidget
   private Uploader uploader;
   private final EventBus eventBus;
   private final EntityAccessControlListModalWidget entityAclEditor;
+  private final FeatureFlagConfig featureFlagConfig;
 
   @Inject
   public UploadDialogWidget(
     UploadDialogWidgetView view,
     Uploader uploader,
     EventBus eventBus,
-    EntityAccessControlListModalWidget entityAccessControlListModalWidget
+    EntityAccessControlListModalWidget entityAccessControlListModalWidget,
+    FeatureFlagConfig featureFlagConfig
   ) {
     this.view = view;
     this.uploader = uploader;
     this.eventBus = eventBus;
     this.entityAclEditor = entityAccessControlListModalWidget;
+    this.featureFlagConfig = featureFlagConfig;
     view.setPresenter(this);
   }
 
@@ -54,7 +59,12 @@ public class UploadDialogWidget
     // add handlers for closing the window
     uploader.setSuccessHandler(benefactorId -> {
       view.hideDialog();
-      if (benefactorId != null) {
+      if (
+        benefactorId != null &&
+        featureFlagConfig.isFeatureEnabled(
+          FeatureFlagKey.SHOW_SHARING_SETTINGS_AFTER_UPLOAD
+        )
+      ) {
         entityAclEditor.configure(
           benefactorId,
           () -> eventBus.fireEvent(new EntityUpdatedEvent(benefactorId)),
