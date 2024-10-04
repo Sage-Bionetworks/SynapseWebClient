@@ -293,7 +293,7 @@ public class UploaderTest {
     // associate the path.
     AsyncMockStubber
       .callSuccessWith(new AccessControlList().setId(UPLOAD_BENEFACTOR_ID))
-      .when(mockSynapseClient)
+      .when(mockSynapseJavascriptClient)
       .getEntityBenefactorAcl(anyString(), any(AsyncCallback.class));
 
     uploader.setExternalFilePath(
@@ -312,7 +312,7 @@ public class UploaderTest {
         eq(storageLocationId),
         any()
       );
-    verify(mockSynapseClient)
+    verify(mockSynapseJavascriptClient)
       .getEntityBenefactorAcl(anyString(), any(AsyncCallback.class));
     verify(mockView).showInfo(anyString());
     verify(mockUploadSuccessHandler).onSuccessfulUpload(UPLOAD_BENEFACTOR_ID);
@@ -420,14 +420,14 @@ public class UploaderTest {
       .getEntity(anyString(), any(OBJECT_TYPE.class), any(AsyncCallback.class));
     AsyncMockStubber
       .callSuccessWith(new AccessControlList().setId(UPLOAD_BENEFACTOR_ID))
-      .when(mockSynapseClient)
+      .when(mockSynapseJavascriptClient)
       .getEntityBenefactorAcl(anyString(), any(AsyncCallback.class));
     uploader.handleUploads();
     verify(mockGlobalApplicationState).clearDropZoneHandler(); // SWC-5161 (cleared on handleUploads)
     verify(mockView).disableSelectionDuringUpload();
     verify(mockSynapseClient)
       .setFileEntityFileHandle(any(), any(), any(), any());
-    verify(mockSynapseClient)
+    verify(mockSynapseJavascriptClient)
       .getEntityBenefactorAcl(anyString(), any(AsyncCallback.class));
     verify(mockView).hideLoading();
     assertEquals(UploadType.S3, uploader.getCurrentUploadType());
