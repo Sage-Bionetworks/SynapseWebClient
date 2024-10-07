@@ -32,12 +32,22 @@ public class EntityAccessControlListModalWidgetImpl
     String entityId,
     EntityAclEditorModalProps.Callback onUpdateSuccess
   ) {
+    configure(entityId, onUpdateSuccess, false);
+  }
+
+  @Override
+  public void configure(
+    String entityId,
+    EntityAclEditorModalProps.Callback onUpdateSuccess,
+    boolean isAfterUpload
+  ) {
     componentProps =
       EntityAclEditorModalProps.create(
         entityId,
         false,
         onUpdateSuccess,
-        () -> setOpen(false)
+        () -> setOpen(false),
+        isAfterUpload
       );
     renderComponent();
   }

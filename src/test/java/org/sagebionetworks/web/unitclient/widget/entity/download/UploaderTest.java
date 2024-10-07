@@ -6,7 +6,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doAnswer;
@@ -30,13 +29,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
+import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
@@ -166,6 +165,7 @@ public class UploaderTest {
   private final Long defaultSynapseStorageId = 1L;
 
   public static final String SUCCESS_FILE_HANDLE = "99999";
+  public static final String UPLOAD_BENEFACTOR_ID = "syn12345";
 
   @Before
   public void before() throws Exception {
@@ -291,6 +291,11 @@ public class UploaderTest {
     // this is the full success test
     // if entity is null, it should call synapseClient.createExternalFile() to create the FileEntity and
     // associate the path.
+    AsyncMockStubber
+      .callSuccessWith(new AccessControlList().setId(UPLOAD_BENEFACTOR_ID))
+      .when(mockSynapseJavascriptClient)
+      .getEntityBenefactorAcl(anyString(), any(AsyncCallback.class));
+
     uploader.setExternalFilePath(
       "http://fakepath.url/blah.xml",
       "",
@@ -307,8 +312,10 @@ public class UploaderTest {
         eq(storageLocationId),
         any()
       );
+    verify(mockSynapseJavascriptClient)
+      .getEntityBenefactorAcl(anyString(), any(AsyncCallback.class));
     verify(mockView).showInfo(anyString());
-    verify(mockUploadSuccessHandler).onSuccessfulUpload();
+    verify(mockUploadSuccessHandler).onSuccessfulUpload(UPLOAD_BENEFACTOR_ID);
   }
 
   @Test
@@ -411,11 +418,17 @@ public class UploaderTest {
       .callSuccessWith(testEntity)
       .when(mockSynapseJavascriptClient)
       .getEntity(anyString(), any(OBJECT_TYPE.class), any(AsyncCallback.class));
+    AsyncMockStubber
+      .callSuccessWith(new AccessControlList().setId(UPLOAD_BENEFACTOR_ID))
+      .when(mockSynapseJavascriptClient)
+      .getEntityBenefactorAcl(anyString(), any(AsyncCallback.class));
     uploader.handleUploads();
     verify(mockGlobalApplicationState).clearDropZoneHandler(); // SWC-5161 (cleared on handleUploads)
     verify(mockView).disableSelectionDuringUpload();
     verify(mockSynapseClient)
       .setFileEntityFileHandle(any(), any(), any(), any());
+    verify(mockSynapseJavascriptClient)
+      .getEntityBenefactorAcl(anyString(), any(AsyncCallback.class));
     verify(mockView).hideLoading();
     assertEquals(UploadType.S3, uploader.getCurrentUploadType());
     // verify upload success
@@ -423,7 +436,7 @@ public class UploaderTest {
     verify(mockView).showSingleFileUploaded("entityID");
     verify(mockView).clear();
     verify(mockView, times(2)).resetToInitialState();
-    verify(mockUploadSuccessHandler).onSuccessfulUpload();
+    verify(mockUploadSuccessHandler).onSuccessfulUpload(UPLOAD_BENEFACTOR_ID);
     verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
   }
 
