@@ -39,7 +39,7 @@
     "xss": "^1.0.15"
   },
   "devDependencies": {
-    "@playwright/test": "^1.44.0",
+    "@playwright/test": "^1.48.0",
     "@prettier/plugin-xml": "^3.1.0",
     "@sage-bionetworks/synapse-types": "^0.0.2",
     "@types/node": "18.6.5",
