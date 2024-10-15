@@ -33,13 +33,15 @@ public class ChatPresenter
   public void setPlace(ChatPlace place) {
     this.place = place;
     // SWC-7109: Decode place parameters
-    String initialMessage = gwt.decodeQueryString(
-      place.getParam(ChatPlace.INITIAL_MESSAGE)
-    );
+    String initialMessage = place.getParam(ChatPlace.INITIAL_MESSAGE);
+    if (initialMessage != null) {
+      initialMessage = gwt.decodeQueryString(initialMessage);
+    }
     String agentId = place.getParam(ChatPlace.AGENT_ID);
-    String chatbotName = gwt.decodeQueryString(
-      place.getParam(ChatPlace.CHATBOT_NAME)
-    );
+    String chatbotName = place.getParam(ChatPlace.CHATBOT_NAME);
+    if (chatbotName != null) {
+      chatbotName = gwt.decodeQueryString(chatbotName);
+    }
 
     view.render(initialMessage, agentId, chatbotName);
   }
