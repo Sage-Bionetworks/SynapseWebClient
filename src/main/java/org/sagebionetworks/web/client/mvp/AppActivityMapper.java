@@ -153,6 +153,10 @@ public class AppActivityMapper implements ActivityMapper {
         LoginPlace loginPlace = new LoginPlace(
           ClientProperties.DEFAULT_PLACE_TOKEN
         );
+        // SWC-7093: before redirecting to the login place, set the last place to the intended target!
+        if (!excludeFromLastPlace.contains(place.getClass())) {
+          globalApplicationState.setLastPlace(place);
+        }
         return getActivity(loginPlace);
       }
     }

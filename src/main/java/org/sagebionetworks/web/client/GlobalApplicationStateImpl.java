@@ -31,6 +31,7 @@ import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
+import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -263,6 +264,9 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
   public Place getCurrentPlace() {
     // get the current place based on the current browser window history token
     String token = gwt.getCurrentHistoryToken();
+    if (token == null || token.isEmpty()) {
+      return new Home(ClientProperties.DEFAULT_PLACE_TOKEN);
+    }
     if (appPlaceHistoryMapper != null) {
       return appPlaceHistoryMapper.getPlace(token);
     }
