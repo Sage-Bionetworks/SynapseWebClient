@@ -2,13 +2,9 @@ package org.sagebionetworks.web.unitclient.presenter;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isA;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.never;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -22,13 +18,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
-import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.place.ChangeUsername;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -83,9 +75,6 @@ public class LoginPresenterTest {
   ArgumentCaptor<AsyncCallback<UserProfile>> asyncCallbackCaptor;
 
   @Mock
-  PopupUtilsView mockPopupUtils;
-
-  @Mock
   UserProfile mockUserProfile;
 
   String userId = "007";
@@ -103,8 +92,7 @@ public class LoginPresenterTest {
         mockView,
         mockAuthenticationController,
         mockGlobalApplicationState,
-        mockSynAlert,
-        mockPopupUtils
+        mockSynAlert
       );
     loginPresenter.start(mockPanel, mockEventBus);
     verify(mockView).setPresenter(loginPresenter);
@@ -149,99 +137,6 @@ public class LoginPresenterTest {
     when(mockLoginPlace.toToken()).thenReturn(WebConstants.OPEN_ID_ERROR_TOKEN);
     loginPresenter.setPlace(mockLoginPlace);
     verify(mockView).showErrorMessage(anyString());
-    verify(mockView).showLogin();
-  }
-
-  @Test
-  public void testSetPlaceShowAndAcceptToU() {
-    when(mockLoginPlace.toToken()).thenReturn(LoginPlace.SHOW_TOU);
-    when(mockAuthenticationController.getCurrentUserAccessToken())
-      .thenReturn("valid session token");
-
-    // method under test
-    loginPresenter.setPlace(mockLoginPlace);
-
-    verify(mockView).showTermsOfUse(eq(false));
-    AsyncMockStubber
-      .callSuccessWith(null)
-      .when(mockAuthenticationController)
-      .signTermsOfUse(any(AsyncCallback.class));
-
-    loginPresenter.onAcceptTermsOfUse();
-
-    // Verify the AuthenticationController method was called and invoke the passed callback
-    verify(mockAuthenticationController)
-      .initializeFromExistingAccessTokenCookie(
-        asyncCallbackCaptor.capture(),
-        eq(true)
-      );
-    asyncCallbackCaptor.getValue().onSuccess(mockUserProfile);
-
-    verify(mockAuthenticationController)
-      .signTermsOfUse(any(AsyncCallback.class));
-    verify(mockAuthenticationController)
-      .initializeFromExistingAccessTokenCookie(
-        any(AsyncCallback.class),
-        eq(true)
-      );
-    // verify we only showed this once:
-    verify(mockView).showTermsOfUse(eq(false));
-    // go to the last place (or the user dashboard Profile place if last place is not set)
-    verify(mockGlobalApplicationState).gotoLastPlace(any(Profile.class));
-  }
-
-  @Test
-  public void testCancelToU() {
-    when(mockLoginPlace.toToken()).thenReturn(LoginPlace.SHOW_TOU);
-    when(mockAuthenticationController.getCurrentUserAccessToken())
-      .thenReturn("valid session token");
-
-    loginPresenter.setPlace(mockLoginPlace);
-    loginPresenter.onCancelAcceptTermsOfUse();
-
-    // verify confirmation popup
-    verify(mockPopupUtils)
-      .showConfirmDialog(
-        eq(LoginPresenter.ARE_YOU_SURE_YOU_WANT_TO_CANCEL),
-        eq(LoginPresenter.CANCEL_TERMS_OF_USE_CONFIRM_MESSAGE),
-        callbackCaptor.capture()
-      );
-
-    // simulate confirm
-    callbackCaptor.getValue().invoke();
-
-    verify(mockAuthenticationController, never())
-      .signTermsOfUse(any(AsyncCallback.class));
-    verify(mockPlaceChanger).goTo(any(LoginPlace.class));
-  }
-
-  @Test
-  public void testSetPlaceShowAcceptedToU() {
-    when(mockLoginPlace.toToken()).thenReturn(LoginPlace.SHOW_SIGNED_TOU);
-    when(mockAuthenticationController.getCurrentUserAccessToken())
-      .thenReturn("valid session token");
-
-    // method under test
-    loginPresenter.setPlace(mockLoginPlace);
-
-    verify(mockView).showTermsOfUse(eq(true));
-  }
-
-  // note: if user has already accepted Synapse ToU and they go to the ToU page, no need to block
-  // (show ToU).
-
-  @Test
-  public void testSetPlaceSSOLogin() throws JSONObjectAdapterException {
-    String fakeToken = "0e79b99-4bf8-4999-b3a2-5f8c0a9499eb";
-    when(mockLoginPlace.toToken()).thenReturn(fakeToken);
-    when(mockAuthenticationController.getCurrentUserAccessToken())
-      .thenReturn(fakeToken);
-
-    loginPresenter.setPlace(mockLoginPlace);
-
-    // SWC-6192: We no longer support setting the access token in the URL
-    verify(mockAuthenticationController, never())
-      .setNewAccessToken(eq(fakeToken), any(AsyncCallback.class));
   }
 
   @Test
@@ -278,7 +173,7 @@ public class LoginPresenterTest {
     when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
     loginPresenter.userAuthenticated();
     verify(mockView).showErrorMessage(anyString());
-    verify(mockView).showLogin();
+    verify(mockGlobalApplicationState).gotoLoginPage();
   }
 
   @Test

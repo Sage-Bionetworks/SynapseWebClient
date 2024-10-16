@@ -132,4 +132,5 @@ public interface GlobalApplicationState {
   boolean isShowingVersionAlert();
 
   boolean handleRelativePathClick(String href);
+  void gotoLoginPage();
 }

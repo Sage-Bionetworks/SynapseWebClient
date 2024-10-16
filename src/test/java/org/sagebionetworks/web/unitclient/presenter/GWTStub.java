@@ -171,4 +171,9 @@ public class GWTStub implements GWTWrapper {
   public JSONValue parseJSONStrict(String json) {
     return null;
   }
+
+  @Override
+  public String getOneSageURL() {
+    return null;
+  }
 }

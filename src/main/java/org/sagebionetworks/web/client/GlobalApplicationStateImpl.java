@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+import static org.sagebionetworks.web.client.cookie.CookieKeys.ONESAGE_REDIRECT_COOKIE_KEY;
 import static org.sagebionetworks.web.client.cookie.CookieKeys.SHOW_DATETIME_IN_UTC;
 import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
 
@@ -31,7 +32,6 @@ import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
-import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.footer.VersionState;
@@ -583,7 +583,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
             }
             try {
               if (isSRCSignInClass) {
-                getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+                gotoLoginPage();
               } else {
                 if (targetElement.hasAttribute("href")) {
                   String href = targetElement.getAttribute("href");
@@ -610,6 +610,21 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
     if (finalCallback != null) {
       finalCallback.invoke();
     }
+  }
+
+  @Override
+  public void gotoLoginPage() {
+    //tell One Sage to return to the current url
+    Date twoHoursFromNow = new Date();
+    twoHoursFromNow.setTime(twoHoursFromNow.getTime() + (2 * 60 * 60 * 1000));
+
+    cookieProvider.setCookie(
+      ONESAGE_REDIRECT_COOKIE_KEY,
+      gwt.getCurrentURL(),
+      twoHoursFromNow
+    );
+    //go to One Sage to log in
+    gwt.assignThisWindowWith(gwt.getOneSageURL());
   }
 
   @Override
