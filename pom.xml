@@ -214,7 +214,6 @@
         <!-- Plugin configuration. There are many available options, see gwt-maven-plugin 
 					documentation at codehaus.org -->
         <configuration>
-          <workDir>${project.build.directory}/gwt/codeserver</workDir>
           <launcherDir>${webappDirectory}</launcherDir>
           <runTarget>Portal.html</runTarget>
           <hostedWebapp>${webappDirectory}</hostedWebapp>
@@ -453,10 +452,6 @@
                 <copy
                   file="${project.basedir}/node_modules/react-dom/umd/react-dom.production.min.js"
                   tofile="src/main/webapp/generated/react-dom.production.min.js"
-                />
-                <copy
-                  file="${project.basedir}/node_modules/react-router-dom/umd/react-router-dom.min.js"
-                  tofile="src/main/webapp/generated/react-router-dom.min.js"
                 />
                 <copy
                   file="${project.basedir}/node_modules/react-transition-group/dist/react-transition-group.min.js"

@@ -47,7 +47,7 @@ public class SRC {
       StandaloneQueryWrapperProps
     > StandaloneQueryWrapper;
     public static ReactComponentType<ForumSearchProps> ForumSearch;
-    public static ReactComponentType ReviewerDashboard;
+    public static ReactComponentType<ReviewerDashboardProps> ReviewerDashboard;
     public static ReactComponentType<ProvenanceGraphProps> ProvenanceGraph;
     public static ReactComponentType SynapseToastContainer;
     public static ReactComponentType<EmptyProps> OAuthManagement;
