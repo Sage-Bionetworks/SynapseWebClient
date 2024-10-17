@@ -61,14 +61,18 @@ public class ReactComponent extends FlowPanel implements HasClickHandlers {
 
   @Override
   protected void onUnload() {
-    if (root != null) {
-      // Asynchronously schedule unmounting the root to allow React to finish the current render cycle.
+    // An unmounted root cannot be re-used, so first clear out this.root. If this widget is re-loaded, a new root will be created.
+    // Save a reference to the old root and schedule unmount asynchronously.
+    ReactDOMRoot oldRoot = this.root;
+    this.root = null;
+
+    if (oldRoot != null) {
+      // Asynchronously schedule unmounting the old root to allow React to finish the current render cycle.
       // https://github.com/facebook/react/issues/25675
       Timer t = new Timer() {
         @Override
         public void run() {
-          root.unmount();
-          root = null;
+          oldRoot.unmount();
         }
       };
       t.schedule(0);
