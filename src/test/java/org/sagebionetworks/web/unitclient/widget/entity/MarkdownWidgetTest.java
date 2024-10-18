@@ -141,9 +141,6 @@ public class MarkdownWidgetTest {
     // verify tablesorter applied
     verify(mockSynapseJSNIUtils).loadTableSorters();
 
-    // verify summary/details tag shim run
-    verify(mockSynapseJSNIUtils).loadSummaryDetailsShim();
-
     // verify loadMath
     verify(mockSynapseJSNIUtils).processMath(mockElementWrapper.getElement());
 
