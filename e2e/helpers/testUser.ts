@@ -99,7 +99,7 @@ export async function loginTestUser(
   await acceptSiteCookies(page)
 
   // Login
-  await page.getByRole('link', { name: 'Log in to Synapse' }).first().click()
+  await page.getByRole('button', { name: 'Login' }).first().click()
   await page.getByRole('button', { name: 'Sign in with your email' }).click()
 
   const usernameInput = page.getByLabel('Username or Email Address')
