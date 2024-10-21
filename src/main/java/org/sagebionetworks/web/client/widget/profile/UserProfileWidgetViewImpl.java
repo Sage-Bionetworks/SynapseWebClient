@@ -21,6 +21,7 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.OneSageUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
@@ -32,7 +33,6 @@ import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.jsinterop.UserProfileLinksProps;
 import org.sagebionetworks.web.client.jsinterop.mui.Grid;
 import org.sagebionetworks.web.client.widget.ReactComponent;
-import org.sagebionetworks.web.shared.WebConstants;
 
 public class UserProfileWidgetViewImpl implements UserProfileWidgetView {
 
@@ -140,9 +140,12 @@ public class UserProfileWidgetViewImpl implements UserProfileWidgetView {
     this.jsClient = jsClient;
     widget = binder.createAndBindUi(this);
     editProfileButton.addClickHandler(event -> {
-      Window.open(WebConstants.ONESAGE_ACCOUNT_SETTINGS_URL, "_blank", "");
+      Window.open(OneSageUtils.getAccountSettingsURL(), "_blank", "");
     });
     linkRenderer.getElement().setAttribute("rel", "noreferrer noopener");
+    changePasswordLink.setHref(
+      OneSageUtils.getAccountSettingsURL() + "#ChangePassword"
+    );
   }
 
   @Override
