@@ -5,8 +5,8 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
+import org.sagebionetworks.web.client.OneSageUtils;
 import org.sagebionetworks.web.client.place.TwoFactorAuthPlace;
-import org.sagebionetworks.web.shared.WebConstants;
 
 public class TwoFactorAuthPresenter
   extends AbstractActivity
@@ -17,7 +17,7 @@ public class TwoFactorAuthPresenter
 
   @Override
   public void start(AcceptsOneWidget panel, EventBus eventBus) {
-    Window.Location.replace(WebConstants.ONESAGE_ACCOUNT_SETTINGS_URL);
+    Window.Location.replace(OneSageUtils.getAccountSettingsURL());
   }
 
   @Override

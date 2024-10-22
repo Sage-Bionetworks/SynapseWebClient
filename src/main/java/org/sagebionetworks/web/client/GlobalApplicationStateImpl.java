@@ -623,8 +623,8 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
       gwt.getCurrentURL(),
       twoHoursFromNow
     );
-    //go to One Sage to log in
-    gwt.assignThisWindowWith(gwt.getOneSageURL());
+    // SWC-6533: Sending all to One Sage for login
+    gwt.assignThisWindowWith(OneSageUtils.getOneSageURL());
   }
 
   @Override

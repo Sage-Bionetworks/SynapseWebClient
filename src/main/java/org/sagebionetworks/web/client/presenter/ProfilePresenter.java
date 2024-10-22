@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.presenter;
 
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
-import static org.sagebionetworks.web.shared.WebConstants.ONESAGE_ACCOUNT_SETTINGS_URL;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -14,12 +13,28 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
-import org.sagebionetworks.repo.model.*;
+import org.sagebionetworks.repo.model.Challenge;
+import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.PaginatedTeamIds;
+import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.ProjectHeader;
+import org.sagebionetworks.repo.model.ProjectHeaderList;
+import org.sagebionetworks.repo.model.ProjectListSortColumn;
+import org.sagebionetworks.repo.model.ProjectListType;
+import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.principal.AliasType;
 import org.sagebionetworks.repo.model.principal.PrincipalAliasRequest;
 import org.sagebionetworks.repo.model.principal.PrincipalAliasResponse;
-import org.sagebionetworks.web.client.*;
+import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.OneSageUtils;
+import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
@@ -842,7 +857,7 @@ public class ProfilePresenter
       updateProfileView(place.getUserId());
     } else {
       if (Profile.EDIT_PROFILE_TOKEN.equals(token)) {
-        Window.Location.replace(ONESAGE_ACCOUNT_SETTINGS_URL);
+        Window.Location.replace(OneSageUtils.getAccountSettingsURL());
       } else {
         // if this is a number, then treat it as a a user id
         try {
@@ -941,7 +956,7 @@ public class ProfilePresenter
         refreshTeams();
         break;
       case SETTINGS:
-        Window.Location.replace(ONESAGE_ACCOUNT_SETTINGS_URL);
+        Window.Location.replace(OneSageUtils.getAccountSettingsURL());
         break;
       case CHALLENGES:
         refreshChallenges();
