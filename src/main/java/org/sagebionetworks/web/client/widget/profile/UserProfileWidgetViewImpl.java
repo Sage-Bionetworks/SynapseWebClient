@@ -132,7 +132,8 @@ public class UserProfileWidgetViewImpl implements UserProfileWidgetView {
     SynapseJSNIUtils jsniUtils,
     SynapseReactClientFullContextPropsProvider propsProvider,
     CookieProvider cookies,
-    SynapseJavascriptClient jsClient
+    SynapseJavascriptClient jsClient,
+    OneSageUtils oneSageUtils
   ) {
     this.jsniUtils = jsniUtils;
     this.propsProvider = propsProvider;
@@ -140,11 +141,11 @@ public class UserProfileWidgetViewImpl implements UserProfileWidgetView {
     this.jsClient = jsClient;
     widget = binder.createAndBindUi(this);
     editProfileButton.addClickHandler(event -> {
-      Window.open(OneSageUtils.getAccountSettingsURL(), "_blank", "");
+      Window.open(oneSageUtils.getAccountSettingsURL(), "_blank", "");
     });
     linkRenderer.getElement().setAttribute("rel", "noreferrer noopener");
     changePasswordLink.setHref(
-      OneSageUtils.getAccountSettingsURL() + "#ChangePassword"
+      oneSageUtils.getAccountSettingsURL() + "#ChangePassword"
     );
   }
 

@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.jsinterop;
 
-import static org.sagebionetworks.web.client.OneSageUtils.getAppIdForOneSage;
-
 import jsinterop.annotations.JsNullable;
 import jsinterop.annotations.JsOverlay;
 import jsinterop.annotations.JsPackage;
@@ -23,14 +21,15 @@ public class SynapseContextJsObject {
   public static SynapseContextJsObject create(
     String accessToken,
     boolean isInExperimentalMode,
-    boolean utcTime
+    boolean utcTime,
+    String appId
   ) {
     SynapseContextJsObject context = new SynapseContextJsObject();
     context.accessToken = accessToken;
     context.isInExperimentalMode = isInExperimentalMode;
     context.utcTime = utcTime;
     context.downloadCartPageUrl = "/DownloadCart:0";
-    context.appId = getAppIdForOneSage();
+    context.appId = appId;
     context.withErrorBoundary = true;
     return context;
   }

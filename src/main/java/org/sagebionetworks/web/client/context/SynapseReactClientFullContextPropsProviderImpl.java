@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.context;
 import javax.inject.Inject;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.OneSageUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.jsinterop.SynapseContextJsObject;
 import org.sagebionetworks.web.client.jsinterop.SynapseReactClientFullContextProviderProps;
@@ -14,22 +15,25 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 public class SynapseReactClientFullContextPropsProviderImpl
   implements SynapseReactClientFullContextPropsProvider {
 
-  private AuthenticationController authController;
-  private GlobalApplicationState globalApplicationState;
-  private CookieProvider cookies;
-  private QueryClientProvider queryClientProvider;
+  private final AuthenticationController authController;
+  private final GlobalApplicationState globalApplicationState;
+  private final CookieProvider cookies;
+  private final QueryClientProvider queryClientProvider;
+  private final OneSageUtils oneSageUtils;
 
   @Inject
   SynapseReactClientFullContextPropsProviderImpl(
     final AuthenticationController authController,
     final GlobalApplicationState globalApplicationState,
     final CookieProvider cookies,
-    final QueryClientProvider queryClientProvider
+    final QueryClientProvider queryClientProvider,
+    final OneSageUtils oneSageUtils
   ) {
     this.authController = authController;
     this.globalApplicationState = globalApplicationState;
     this.cookies = cookies;
     this.queryClientProvider = queryClientProvider;
+    this.oneSageUtils = oneSageUtils;
   }
 
   @Override
@@ -38,7 +42,8 @@ public class SynapseReactClientFullContextPropsProviderImpl
       SynapseContextJsObject.create(
         authController.getCurrentUserAccessToken(),
         DisplayUtils.isInTestWebsite(cookies),
-        globalApplicationState.isShowingUTCTime()
+        globalApplicationState.isShowingUTCTime(),
+        oneSageUtils.getAppIdForOneSage()
       ),
       queryClientProvider.getQueryClient()
     );

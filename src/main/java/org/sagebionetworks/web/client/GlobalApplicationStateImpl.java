@@ -32,6 +32,7 @@ import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
+import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.footer.VersionState;
@@ -62,6 +63,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
   private CallbackP<JavaScriptObject> fileListCallback;
   private SynapseProperties synapseProperties;
   private PortalGinInjector ginInjector;
+  private final OneSageUtils oneSageUtils;
 
   boolean isDragDropInitialized = false;
   boolean isToastContainerInitialized = false;
@@ -106,7 +108,8 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
     SynapseJavascriptClient jsClient,
     SynapseProperties synapseProperties,
     SessionStorage sessionStorage,
-    PortalGinInjector ginInjector
+    PortalGinInjector ginInjector,
+    OneSageUtils oneSageUtils
   ) {
     this.cookieProvider = cookieProvider;
     this.eventBus = eventBus;
@@ -123,6 +126,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
     this.synapseProperties = synapseProperties;
     this.sessionStorage = sessionStorage;
     this.ginInjector = ginInjector;
+    this.oneSageUtils = oneSageUtils;
     initUncaughtExceptionHandler();
   }
 
@@ -618,13 +622,20 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
     Date twoHoursFromNow = new Date();
     twoHoursFromNow.setTime(twoHoursFromNow.getTime() + (2 * 60 * 60 * 1000));
 
+    String returnUrl = gwt.getCurrentURL();
+    String lastPlacePath = sessionStorage.getItem(
+      GlobalApplicationStateImpl.LAST_PLACE
+    );
+    if (getCurrentPlace() instanceof LoginPlace && lastPlacePath != null) {
+      returnUrl = gwt.getHostPageBaseURL() + lastPlacePath;
+    }
     cookieProvider.setCookie(
       ONESAGE_REDIRECT_COOKIE_KEY,
-      gwt.getCurrentURL(),
+      returnUrl,
       twoHoursFromNow
     );
     // SWC-6533: Sending all to One Sage for login
-    gwt.assignThisWindowWith(OneSageUtils.getOneSageURL());
+    gwt.assignThisWindowWith(oneSageUtils.getOneSageURL());
   }
 
   @Override

@@ -14,13 +14,16 @@ public class PersonalAccessTokensPresenter
   extends AbstractActivity
   implements Presenter<PersonalAccessTokenPlace> {
 
-  private GlobalApplicationState globalApplicationState;
+  private final GlobalApplicationState globalApplicationState;
+  private final OneSageUtils oneSageUtils;
 
   @Inject
   public PersonalAccessTokensPresenter(
-    GlobalApplicationState globalApplicationState
+    GlobalApplicationState globalApplicationState,
+    OneSageUtils oneSageUtils
   ) {
     this.globalApplicationState = globalApplicationState;
+    this.oneSageUtils = oneSageUtils;
   }
 
   @Override
@@ -29,7 +32,7 @@ public class PersonalAccessTokensPresenter
   @Override
   public void start(AcceptsOneWidget panel, EventBus eventBus) {
     Window.Location.replace(
-      OneSageUtils.getOneSageURL("/authenticated/personalaccesstokens")
+      oneSageUtils.getOneSageURL("/authenticated/personalaccesstokens")
     );
   }
 

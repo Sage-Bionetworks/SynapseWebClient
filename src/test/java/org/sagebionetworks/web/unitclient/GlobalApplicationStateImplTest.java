@@ -14,7 +14,9 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.client.GlobalApplicationStateImpl.LAST_PLACE;
 import static org.sagebionetworks.web.client.GlobalApplicationStateImpl.isIgnoredErrorMessage;
+import static org.sagebionetworks.web.client.cookie.CookieKeys.ONESAGE_REDIRECT_COOKIE_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
 
 import com.google.gwt.event.shared.EventBus;
@@ -37,6 +39,7 @@ import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationStateImpl;
 import org.sagebionetworks.web.client.GlobalApplicationStateView;
+import org.sagebionetworks.web.client.OneSageUtils;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.StackConfigServiceAsync;
@@ -50,6 +53,7 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.place.Home;
+import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.footer.VersionState;
@@ -108,6 +112,9 @@ public class GlobalApplicationStateImplTest {
   @Mock
   SessionStorage mockSessionStorage;
 
+  @Mock
+  OneSageUtils mockOneSageUtils;
+
   @Captor
   ArgumentCaptor<Place> placeCaptor;
 
@@ -136,7 +143,8 @@ public class GlobalApplicationStateImplTest {
         mockJsClient,
         mockSynapseProperties,
         mockSessionStorage,
-        mockGinInjector
+        mockGinInjector,
+        mockOneSageUtils
       );
     when(mockGinInjector.getHeader()).thenReturn(mockHeader);
     globalApplicationState.setPlaceController(mockPlaceController);
@@ -571,5 +579,51 @@ public class GlobalApplicationStateImplTest {
 
     assertFalse(isHandled);
     verify(mockPlaceController, never()).goTo(any(Place.class));
+  }
+
+  @Test
+  public void testGoToLoginPage() {
+    when(mockGWT.getHostPageBaseURL())
+      .thenReturn("https://staging.synapse.org/");
+    when(mockSessionStorage.getItem(LAST_PLACE)).thenReturn(null);
+    when(mockGWT.getCurrentURL())
+      .thenReturn("https://staging.synapse.org/Synapse:syn1234");
+    when(mockOneSageUtils.getOneSageURL())
+      .thenReturn("https://accounts.synapse.org/");
+
+    globalApplicationState.gotoLoginPage();
+
+    // The cookie should match the current place
+    verify(mockCookieProvider)
+      .setCookie(
+        eq(ONESAGE_REDIRECT_COOKIE_KEY),
+        eq("https://staging.synapse.org/Synapse:syn1234"),
+        any(Date.class)
+      );
+
+    verify(mockGWT).assignThisWindowWith("https://accounts.synapse.org/");
+  }
+
+  @Test
+  public void testGoToLoginPageFromLoginPlace() {
+    when(mockGWT.getHostPageBaseURL()).thenReturn("https://synapse.org/");
+    when(mockSessionStorage.getItem(LAST_PLACE)).thenReturn("Synapse:syn4321");
+    when(mockGWT.getCurrentHistoryToken()).thenReturn("LoginPlace:0");
+    when(mockAppPlaceHistoryMapper.getPlace("LoginPlace:0"))
+      .thenReturn(new LoginPlace("0"));
+    when(mockOneSageUtils.getOneSageURL())
+      .thenReturn("https://accounts.synapse.org/");
+
+    globalApplicationState.gotoLoginPage();
+
+    // The cookie should match the last place
+    verify(mockCookieProvider)
+      .setCookie(
+        eq(ONESAGE_REDIRECT_COOKIE_KEY),
+        eq("https://synapse.org/Synapse:syn4321"),
+        any(Date.class)
+      );
+
+    verify(mockGWT).assignThisWindowWith("https://accounts.synapse.org/");
   }
 }

@@ -29,6 +29,8 @@ public interface GWTWrapper {
 
   String getHostPrefix();
 
+  String getHostName();
+
   String getCurrentURL();
 
   DateTimeFormat getDateTimeFormat(PredefinedFormat format);
