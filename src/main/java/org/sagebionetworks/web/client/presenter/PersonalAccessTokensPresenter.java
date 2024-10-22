@@ -7,8 +7,8 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.OneSageUtils;
 import org.sagebionetworks.web.client.place.PersonalAccessTokenPlace;
-import org.sagebionetworks.web.shared.WebConstants;
 
 public class PersonalAccessTokensPresenter
   extends AbstractActivity
@@ -29,9 +29,7 @@ public class PersonalAccessTokensPresenter
   @Override
   public void start(AcceptsOneWidget panel, EventBus eventBus) {
     Window.Location.replace(
-      WebConstants.ONESAGE_PRODUCTION_URL +
-      "/authenticated/personalaccesstokens?" +
-      WebConstants.ONESAGE_SYNAPSE_APPID_QUERY_PARAM
+      OneSageUtils.getOneSageURL("/authenticated/personalaccesstokens")
     );
   }
 
