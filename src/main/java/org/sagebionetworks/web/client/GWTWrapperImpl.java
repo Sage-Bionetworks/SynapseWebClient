@@ -91,6 +91,11 @@ public class GWTWrapperImpl implements GWTWrapper {
   }
 
   @Override
+  public String getHostName() {
+    return Window.Location.getHostName();
+  }
+
+  @Override
   public DateTimeFormat getDateTimeFormat(PredefinedFormat format) {
     return DateTimeFormat.getFormat(format);
   }

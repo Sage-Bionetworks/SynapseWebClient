@@ -101,6 +101,7 @@ public class ProfilePresenter
 
   public PromptForValuesModalView promptDialog;
   public SynapseJavascriptClient jsClient;
+  private final OneSageUtils oneSageUtils;
 
   @Inject
   public ProfilePresenter(
@@ -111,7 +112,8 @@ public class ProfilePresenter
     TeamListWidget myTeamsWidget,
     OpenTeamInvitationsWidget openInvitesWidget,
     PortalGinInjector ginInjector,
-    SynapseJavascriptClient jsClient
+    SynapseJavascriptClient jsClient,
+    OneSageUtils oneSageUtils
   ) {
     this.view = view;
     this.authenticationController = authenticationController;
@@ -121,6 +123,7 @@ public class ProfilePresenter
     this.myTeamsWidget = myTeamsWidget;
     this.openInvitesWidget = openInvitesWidget;
     this.jsClient = jsClient;
+    this.oneSageUtils = oneSageUtils;
     profileSynAlert = ginInjector.getSynapseAlertWidget();
     projectSynAlert = ginInjector.getSynapseAlertWidget();
     teamSynAlert = ginInjector.getSynapseAlertWidget();
@@ -857,7 +860,7 @@ public class ProfilePresenter
       updateProfileView(place.getUserId());
     } else {
       if (Profile.EDIT_PROFILE_TOKEN.equals(token)) {
-        Window.Location.replace(OneSageUtils.getAccountSettingsURL());
+        Window.Location.replace(oneSageUtils.getAccountSettingsURL());
       } else {
         // if this is a number, then treat it as a a user id
         try {
@@ -956,7 +959,7 @@ public class ProfilePresenter
         refreshTeams();
         break;
       case SETTINGS:
-        Window.Location.replace(OneSageUtils.getAccountSettingsURL());
+        Window.Location.replace(oneSageUtils.getAccountSettingsURL());
         break;
       case CHALLENGES:
         refreshChallenges();

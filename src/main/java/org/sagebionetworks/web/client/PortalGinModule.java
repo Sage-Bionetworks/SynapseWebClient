@@ -983,5 +983,6 @@ public class PortalGinModule extends AbstractGinModule {
 
     bind(FeatureFlagConfig.class).in(Singleton.class);
     bind(EntityTypeIcon.class).to(EntityTypeIconImpl.class);
+    bind(OneSageUtils.class).to(OneSageUtilsImpl.class);
   }
 }
