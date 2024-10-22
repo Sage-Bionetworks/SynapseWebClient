@@ -627,6 +627,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
       GlobalApplicationStateImpl.LAST_PLACE
     );
     if (getCurrentPlace() instanceof LoginPlace && lastPlacePath != null) {
+      // if at the LoginPlace, redirect to the current last place after login
       returnUrl = gwt.getHostPageBaseURL() + lastPlacePath;
     }
     cookieProvider.setCookie(
