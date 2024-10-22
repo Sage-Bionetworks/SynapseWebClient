@@ -12,12 +12,16 @@ public class TwoFactorAuthPresenter
   extends AbstractActivity
   implements Presenter<TwoFactorAuthPlace> {
 
+  private final OneSageUtils oneSageUtils;
+
   @Inject
-  public TwoFactorAuthPresenter() {}
+  public TwoFactorAuthPresenter(OneSageUtils oneSageUtils) {
+    this.oneSageUtils = oneSageUtils;
+  }
 
   @Override
   public void start(AcceptsOneWidget panel, EventBus eventBus) {
-    Window.Location.replace(OneSageUtils.getAccountSettingsURL());
+    Window.Location.replace(oneSageUtils.getAccountSettingsURL());
   }
 
   @Override

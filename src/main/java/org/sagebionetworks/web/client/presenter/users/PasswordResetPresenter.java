@@ -13,15 +13,16 @@ public class PasswordResetPresenter
   extends AbstractActivity
   implements Presenter<PasswordReset> {
 
-  private static final String ONE_SAGE_RESET_PASSWORD_URL =
-    OneSageUtils.getOneSageURL("/resetPassword");
+  private final OneSageUtils oneSageUtils;
 
   @Inject
-  public PasswordResetPresenter() {}
+  public PasswordResetPresenter(OneSageUtils oneSageUtils) {
+    this.oneSageUtils = oneSageUtils;
+  }
 
   @Override
   public void start(AcceptsOneWidget acceptsOneWidget, EventBus eventBus) {
-    Window.Location.replace(ONE_SAGE_RESET_PASSWORD_URL);
+    Window.Location.replace(oneSageUtils.getOneSageURL("/resetPassword"));
   }
 
   @Override

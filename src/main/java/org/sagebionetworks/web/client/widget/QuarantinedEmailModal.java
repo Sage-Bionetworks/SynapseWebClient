@@ -25,11 +25,12 @@ public class QuarantinedEmailModal implements IsWidget {
   public QuarantinedEmailModal(
     Binder binder,
     AuthenticationController authController,
-    GlobalApplicationState globalAppState
+    GlobalApplicationState globalAppState,
+    OneSageUtils oneSageUtils
   ) {
     widget = (Modal) binder.createAndBindUi(this);
     accountSettingsLink.addClickHandler(event -> {
-      Window.open(OneSageUtils.getAccountSettingsURL(), "_blank", "");
+      Window.open(oneSageUtils.getAccountSettingsURL(), "_blank", "");
       widget.hide();
     });
   }

@@ -13,8 +13,12 @@ public class RegisterAccountPresenter
   extends AbstractActivity
   implements Presenter<RegisterAccount> {
 
+  private final OneSageUtils oneSageUtils;
+
   @Inject
-  public RegisterAccountPresenter() {}
+  public RegisterAccountPresenter(OneSageUtils oneSageUtils) {
+    this.oneSageUtils = oneSageUtils;
+  }
 
   @Override
   public void start(AcceptsOneWidget panel, EventBus eventBus) {}
@@ -26,7 +30,7 @@ public class RegisterAccountPresenter
     );
     String email = place.getParam(RegisterAccount.EMAIL_QUERY_PARAM);
     StringBuilder targetUrl = new StringBuilder();
-    targetUrl.append(OneSageUtils.getOneSageURL("/register1"));
+    targetUrl.append(oneSageUtils.getOneSageURL("/register1"));
 
     if (emailInvitationToken != null) {
       targetUrl.append("&signedToken=" + emailInvitationToken);
