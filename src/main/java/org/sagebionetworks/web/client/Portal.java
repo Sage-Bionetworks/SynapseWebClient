@@ -18,6 +18,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import java.util.HashMap;
+import java.util.function.Consumer;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
@@ -92,16 +93,12 @@ public class Portal implements EntryPoint {
                 ginjector
                   .getSynapseProperties()
                   .getInitSynapsePropertiesFuture();
-              FluentFuture<Void> checkForUserChangeFuture = ginjector
-                .getAuthenticationController()
-                .getCheckForUserChangeFuture();
 
               FluentFuture
                 .from(
                   whenAllComplete(
                     featureFlagConfigFuture,
-                    synapsePropertiesFuture,
-                    checkForUserChangeFuture
+                    synapsePropertiesFuture
                   )
                     .call(
                       () -> {
@@ -170,38 +167,67 @@ public class Portal implements EntryPoint {
                         globalApplicationState.setAppPlaceHistoryMapper(
                           historyMapper
                         );
-                        globalApplicationState.init(
-                          new Callback() {
-                            @Override
-                            public void invoke() {
-                              // listen for window close (or navigating away)
-                              registerWindowClosingHandler(
-                                globalApplicationState
-                              );
-                              registerOnPopStateHandler(globalApplicationState);
 
-                              // start version timer
-                              ginjector.getVersionTimer().start();
-                              // start timer to check for Synapse outage or scheduled maintenance
-                              ginjector.getSynapseStatusDetector().start();
-                              // Goes to place represented on URL or default place
-                              historyHandler.handleCurrentHistory();
-                              globalApplicationState.initializeDropZone();
-                              globalApplicationState.initializeToastContainer();
-                              // initialize the view default columns so that they're ready when we need them (do this by constructing that singleton object)
-                              ginjector.getViewDefaultColumns();
+                        FluentFuture
+                          .from(
+                            whenAllComplete(
+                              // Checking the session may result in a redirect, so this must be invoked after `setPlaceController`
+                              ginjector
+                                .getAuthenticationController()
+                                .getCheckForUserChangeFuture()
+                            )
+                              .call(
+                                () -> {
+                                  globalApplicationState.init(
+                                    new Callback() {
+                                      @Override
+                                      public void invoke() {
+                                        // listen for window close (or navigating away)
+                                        registerWindowClosingHandler(
+                                          globalApplicationState
+                                        );
+                                        registerOnPopStateHandler(
+                                          globalApplicationState
+                                        );
 
-                              // start timer to check for user session state change (session expired, or user explicitly logged
-                              // out).  Backend endpoints must be set before starting this (because it attempts to get "my user profile")
-                              ginjector.getSessionDetector().start();
+                                        // start version timer
+                                        ginjector.getVersionTimer().start();
+                                        // start timer to check for Synapse outage or scheduled maintenance
+                                        ginjector
+                                          .getSynapseStatusDetector()
+                                          .start();
+                                        // Goes to place represented on URL or default place
+                                        historyHandler.handleCurrentHistory();
+                                        globalApplicationState.initializeDropZone();
+                                        globalApplicationState.initializeToastContainer();
+                                        // initialize the view default columns so that they're ready when we need them (do this by constructing that singleton object)
+                                        ginjector.getViewDefaultColumns();
 
-                              // start a timer to check to see if we're approaching the max allowable space in the web storage.
-                              // clears out the web storage (cache) if this is the case.
-                              ginjector.getWebStorageMaxSizeDetector().start();
-                            }
-                          }
-                        );
+                                        // start timer to check for user session state change (session expired, or user explicitly logged
+                                        // out).  Backend endpoints must be set before starting this (because it attempts to get "my user profile")
+                                        ginjector.getSessionDetector().start();
 
+                                        // start a timer to check to see if we're approaching the max allowable space in the web storage.
+                                        // clears out the web storage (cache) if this is the case.
+                                        ginjector
+                                          .getWebStorageMaxSizeDetector()
+                                          .start();
+                                      }
+                                    }
+                                  );
+                                  return null;
+                                },
+                                directExecutor()
+                              )
+                          )
+                          .catching(
+                            Throwable.class,
+                            e -> {
+                              onFailure(e);
+                              return null;
+                            },
+                            directExecutor()
+                          );
                         return null;
                       },
                       directExecutor()
