@@ -94,8 +94,17 @@ public abstract class ReactComponentV2<
 
   private void destroyRoot() {
     if (root != null) {
-      root.unmount();
-      root = null;
+      ReactDOMRoot oldRoot = this.root;
+      this.root = null;
+      // Asynchronously schedule unmounting the root to allow React to finish the current render cycle.
+      // https://github.com/facebook/react/issues/25675
+      Timer t = new Timer() {
+        @Override
+        public void run() {
+          oldRoot.unmount();
+        }
+      };
+      t.schedule(0);
     }
   }
 
@@ -184,21 +193,12 @@ public abstract class ReactComponentV2<
     // This component may be a React child of another component, so retrieve the root widget that renders this component tree.
     ReactComponentV2<?, ?> componentToRender = getRootReactComponentWidget();
 
-    // Asynchronously schedule root operations in case the component is in the middle of an asynchronous render cycle
-    // See https://stackoverflow.com/questions/73459382
-    Timer t = new Timer() {
-      @Override
-      public void run() {
-        if (shouldDestroyRoot) {
-          destroyRoot();
-        }
+    if (shouldDestroyRoot) {
+      destroyRoot();
+    }
 
-        // Create a fresh ReactElement tree and render it
-        componentToRender.createRoot();
-        componentToRender.root.render(componentToRender.createReactElement());
-      }
-    };
-    t.schedule(0);
+    componentToRender.createRoot();
+    componentToRender.root.render(componentToRender.createReactElement());
   }
 
   @Override
@@ -221,15 +221,7 @@ public abstract class ReactComponentV2<
     // Detach any non-React descendants that were injected into the component tree
     detachNonReactChildElements();
 
-    // Asynchronously schedule unmounting the root to allow React to finish the current render cycle.
-    // https://github.com/facebook/react/issues/25675
-    Timer t = new Timer() {
-      @Override
-      public void run() {
-        destroyRoot();
-      }
-    };
-    t.schedule(0);
+    destroyRoot();
   }
 
   /**

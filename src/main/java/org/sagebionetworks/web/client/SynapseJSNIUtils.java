@@ -15,8 +15,6 @@ public interface SynapseJSNIUtils {
 
   public void highlightCodeBlocks();
 
-  void loadSummaryDetailsShim();
-
   public void loadTableSorters();
 
   public String getBaseFileHandleUrl();
