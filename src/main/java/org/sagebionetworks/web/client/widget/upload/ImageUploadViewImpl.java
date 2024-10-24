@@ -143,55 +143,58 @@ public class ImageUploadViewImpl implements ImageUploadView {
     CanvasElement originalCanvas,
     CanvasElement resizedCanvas
   ) /*-{
-        var fileToUploadElement = $doc.getElementById(fileFieldId)
-        var file
-        var canResize = true
-        if (fileToUploadElement && 'files' in fileToUploadElement) {
-          file = fileToUploadElement.files[0]
-          var ext = file.name.split('.').pop()
-          // resize if it is a supported file type, and the file size > 3MB
-          canResize = ['bmp', 'jpg', 'jpeg', 'png'].indexOf(ext) > -1 && file.size > 3145728
-        }
-        var imgElement = $doc.createElement('img')
-        var onImageLoad = function() {
-  // Create an empty canvas element of the same dimensions as the original
-          originalCanvas.width = imgElement.width
-          originalCanvas.height = imgElement.height
-  // Copy the image contents to the canvas
-          var ctx = originalCanvas.getContext('2d')
-          ctx.drawImage(imgElement, 0, 0)
-          var maxWidth = 2048
-          var maxHeight = 2048
-          if (imgElement.width > maxWidth) {
-  // continue resize based on width
-            var ratio = maxWidth / imgElement.width // get ratio for scaling image
-            resizedCanvas.width = maxWidth
-            resizedCanvas.height = imgElement.height * ratio
-          } else {
-  // continue resize based on height
-            var ratio = maxHeight / imgElement.height // get ratio for scaling image
-            resizedCanvas.height = maxHeight
-            resizedCanvas.width = imgElement.width * ratio
-          }
-          // Resize & convert to blob
-          $wnd.resizer.resize(originalCanvas, resizedCanvas)
-            .then(
-              function(result) {
-                $wnd.resizer.toBlob(result, 'image/jpeg', 90)
-                  .then(
-                    function(blob) {
-                      v.@org.sagebionetworks.web.client.widget.upload.ImageUploadViewImpl::resizeComplete(Lelemental2/dom/Blob;)(blob)
-                    })
-              })
-        }
-        imgElement.addEventListener('load', onImageLoad, false)
-        if (file && canResize) {
-          imgElement.src = $wnd.URL.createObjectURL(file)
-        } else {
-          // send back original content
-          v.@org.sagebionetworks.web.client.widget.upload.ImageUploadViewImpl::noResizeNecessary(Lelemental2/dom/Blob;)(file)
-        }
-      }-*/;
+																																																																							var fileToUploadElement = $doc.getElementById(fileFieldId);
+																																																																							var file;
+																																																																							var canResize = true;
+																																																																							if (fileToUploadElement && 'files' in fileToUploadElement) {
+																																																																							file = fileToUploadElement.files[0];
+																																																																							var ext = file.name.split('.').pop();
+																																																																							// resize if it is a supported file type, and the file size > 3MB
+																																																																							canResize = [ 'bmp', 'jpg', 'jpeg', 'png' ].indexOf(ext) > -1 && file.size > 3145728;
+																																																																							}
+																																																																							
+																																																																							var imgElement = $doc.createElement('img');
+																																																																							var onImageLoad = function() {
+																																																																							// Create an empty canvas element of the same dimensions as the original
+																																																																							originalCanvas.width = imgElement.width;
+																																																																							originalCanvas.height = imgElement.height;
+																																																																							// Copy the image contents to the canvas
+																																																																							var ctx = originalCanvas.getContext("2d");
+																																																																							ctx.drawImage(imgElement, 0, 0);
+																																																																							var maxWidth = 2048;
+																																																																							var maxHeight = 2048;
+																																																																							if (imgElement.width > maxWidth) {
+																																																																							// continue resize based on width
+																																																																							var ratio = maxWidth / imgElement.width; // get ratio for scaling image
+																																																																							resizedCanvas.width = maxWidth;
+																																																																							resizedCanvas.height = imgElement.height * ratio;
+																																																																							} else {
+																																																																							// continue resize based on height
+																																																																							var ratio = maxHeight / imgElement.height; // get ratio for scaling image
+																																																																							resizedCanvas.height = maxHeight;
+																																																																							resizedCanvas.width = imgElement.width * ratio;
+																																																																							}
+																																																																							
+																																																																							// Resize & convert to blob
+																																																																							$wnd.resizer.resize(originalCanvas, resizedCanvas)
+																																																																							.then (
+																																																																							function(result) {
+																																																																							$wnd.resizer.toBlob(result, 'image/jpeg', 90)
+																																																																							.then(
+																																																																							function(blob) {
+																																																																							v.@org.sagebionetworks.web.client.widget.upload.ImageUploadViewImpl::resizeComplete(Lelemental2/dom/Blob;)(blob);
+																																																																							});
+																																																																							});
+																																																																							};
+																																																																							imgElement.addEventListener('load', onImageLoad, false);
+																																																																							
+																																																																							if (file && canResize) {
+																																																																							imgElement.src = $wnd.URL.createObjectURL(file);
+																																																																							} else {
+																																																																							// send back original content
+																																																																							v.@org.sagebionetworks.web.client.widget.upload.ImageUploadViewImpl::noResizeNecessary(Lelemental2/dom/Blob;)(file);
+																																																																							}
+																																																																							}-*/;
 
   private static native void _initResizer() /*-{
 		console.log('initializing pica resizer');

@@ -520,7 +520,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			function handleDrop(e) {
 				e.preventDefault();
 				hideDropZone();
-  				globalAppState.@org.sagebionetworks.web.client.GlobalApplicationStateImpl::onDrop(Lelemental2/dom/FileList;)(e.dataTransfer.files);
+				globalAppState.@org.sagebionetworks.web.client.GlobalApplicationStateImpl::onDrop(Lelemental2/dom/FileList;)(e.dataTransfer.files);
 			}
 
 			dropZone.addEventListener('dragenter', allowDrag);
