@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.upload;
 
-import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.logical.shared.HasAttachHandlers;
+import elemental2.dom.Blob;
 
 /**
  * Abstraction for a muti-part file uploader.
@@ -20,7 +20,7 @@ public interface MultipartUploader {
   void uploadFile(
     String fileName,
     String contentType,
-    JavaScriptObject blob,
+    Blob blob,
     ProgressingFileUploadHandler handler,
     Long storageLocationId,
     HasAttachHandlers view

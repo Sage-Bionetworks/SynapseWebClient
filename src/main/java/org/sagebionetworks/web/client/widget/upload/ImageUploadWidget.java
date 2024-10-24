@@ -1,14 +1,15 @@
 package org.sagebionetworks.web.client.widget.upload;
 
-import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import elemental2.dom.Blob;
+import elemental2.dom.FileList;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJsInteropUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -20,7 +21,7 @@ public class ImageUploadWidget implements ImageUploadView.Presenter, IsWidget {
   private SynapseAlert synAlert;
   private CallbackP<FileUpload> finishedUploadingCallback;
   private Callback startedUploadingCallback;
-  private SynapseJSNIUtils synapseJsniUtils;
+  private SynapseJsInteropUtils synapseJsInteropUtils;
   private FileMetadata fileMeta;
   private ImageFileValidator validator = new ImageFileValidator();
   private PortalGinInjector ginInjector;
@@ -28,14 +29,14 @@ public class ImageUploadWidget implements ImageUploadView.Presenter, IsWidget {
   @Inject
   public ImageUploadWidget(
     MultipartUploader multipartUploader,
-    SynapseJSNIUtils synapseJsniUtils,
+    SynapseJsInteropUtils synapseJsInteropUtils,
     SynapseAlert synAlert,
     PortalGinInjector ginInjector
   ) {
     super();
     this.synAlert = synAlert;
     this.multipartUploader = multipartUploader;
-    this.synapseJsniUtils = synapseJsniUtils;
+    this.synapseJsInteropUtils = synapseJsInteropUtils;
     this.ginInjector = ginInjector;
   }
 
@@ -81,14 +82,14 @@ public class ImageUploadWidget implements ImageUploadView.Presenter, IsWidget {
 
   public FileMetadata getSelectedFileMetadata() {
     String inputId = getView().getInputId();
-    JavaScriptObject fileList = synapseJsniUtils.getFileList(inputId);
-    String[] fileNames = synapseJsniUtils.getMultipleUploadFileNames(fileList);
+    FileList fileList = synapseJsInteropUtils.getFileList(inputId);
+    String[] fileNames = synapseJsInteropUtils.getMultipleUploadFileNames(
+      fileList
+    );
     if (fileNames != null && fileNames.length > 0) {
       String name = fileNames[0];
-      double fileSize = synapseJsniUtils.getFileSize(
-        synapseJsniUtils.getFileBlob(0, fileList)
-      );
-      String contentType = synapseJsniUtils.getContentType(fileList, 0);
+      double fileSize = fileList.item(0).size;
+      String contentType = fileList.item(0).type;
       return new FileMetadata(name, contentType, fileSize);
     }
     return null;
@@ -118,10 +119,7 @@ public class ImageUploadWidget implements ImageUploadView.Presenter, IsWidget {
   }
 
   @Override
-  public void onFileProcessed(
-    JavaScriptObjectWrapper blob,
-    String forcedContentType
-  ) {
+  public void onFileProcessed(Blob blob, String forcedContentType) {
     synAlert.clear();
     fileMeta = getSelectedFileMetadata();
     if (fileMeta != null && blob != null) {
@@ -161,15 +159,12 @@ public class ImageUploadWidget implements ImageUploadView.Presenter, IsWidget {
     getView().setButtonIcon(iconType);
   }
 
-  private void doMultipartUpload(
-    final FileMetadata fileMeta,
-    JavaScriptObjectWrapper blob
-  ) {
+  private void doMultipartUpload(final FileMetadata fileMeta, Blob blob) {
     // The uploader does the real work
     multipartUploader.uploadFile(
       fileMeta.getFileName(),
       fileMeta.getContentType(),
-      blob.get(),
+      blob,
       new ProgressingFileUploadHandler() {
         @Override
         public void uploadSuccess(String fileHandleId) {

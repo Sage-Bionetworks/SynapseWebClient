@@ -4,8 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doAnswer;
@@ -19,9 +19,11 @@ import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getDoneFuture;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getFailedFuture;
 
-import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import elemental2.dom.Blob;
+import elemental2.dom.File;
+import elemental2.dom.FileList;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -59,6 +61,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
+import org.sagebionetworks.web.client.SynapseJsInteropUtils;
 import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.events.CancelHandler;
@@ -75,6 +78,7 @@ import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.upload.MultipartUploaderStub;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class UploaderTest {
@@ -95,6 +99,9 @@ public class UploaderTest {
 
   @Mock
   SynapseJSNIUtils mockSynapseJsniUtils;
+
+  @Mock
+  SynapseJsInteropUtils mockSynapseJsInteropUtils;
 
   @Mock
   GlobalApplicationState mockGlobalApplicationState;
@@ -134,16 +141,19 @@ public class UploaderTest {
   SynapseJavascriptClient mockSynapseJavascriptClient;
 
   @Mock
-  JavaScriptObject mockFileList;
+  FileList mockFileList;
 
   @Mock
-  JavaScriptObject mockDroppedFileList;
+  File mockFile;
+
+  @Mock
+  FileList mockDroppedFileList;
 
   @Mock
   SynapseProperties mockSynapseProperties;
 
   @Captor
-  ArgumentCaptor<CallbackP<JavaScriptObject>> dragAndDropHandlerCaptor;
+  ArgumentCaptor<CallbackP<FileList>> dragAndDropHandlerCaptor;
 
   @Mock
   Callback mockCallback;
@@ -177,10 +187,9 @@ public class UploaderTest {
     when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
     when(mockAuthenticationController.getCurrentUserProfile())
       .thenReturn(profile);
-    when(
-      mockSynapseJsniUtils.getContentType(any(JavaScriptObject.class), anyInt())
-    )
-      .thenReturn("image/png");
+    when(mockFileList.item(anyDouble())).thenReturn(mockFile);
+    when(mockDroppedFileList.item(anyDouble())).thenReturn(mockFile);
+    ReflectionTestUtils.setField(mockFile, "type", "image/png");
     when(
       mockSynapseProperties.getSynapseProperty(
         eq(WebConstants.DEFAULT_STORAGE_ID_PROPERTY_KEY)
@@ -204,9 +213,7 @@ public class UploaderTest {
 
     String[] fileNames = { "newFile.txt" };
     when(
-      mockSynapseJsniUtils.getMultipleUploadFileNames(
-        any(JavaScriptObject.class)
-      )
+      mockSynapseJsInteropUtils.getMultipleUploadFileNames(any(FileList.class))
     )
       .thenReturn(fileNames);
     AsyncMockStubber
@@ -245,6 +252,7 @@ public class UploaderTest {
         mockView,
         mockSynapseClient,
         mockSynapseJsniUtils,
+        mockSynapseJsInteropUtils,
         mockGwt,
         mockAuthenticationController,
         multipartUploader,
@@ -263,8 +271,7 @@ public class UploaderTest {
     // Simulate success.
     multipartUploader.setFileHandle(SUCCESS_FILE_HANDLE);
 
-    when(mockSynapseJsniUtils.getFileSize(any(JavaScriptObject.class)))
-      .thenReturn(1.0);
+    ReflectionTestUtils.setField(mockFile, "size", 1);
     when(mockSynapseJsniUtils.isFileAPISupported()).thenReturn(true);
     storageLocationId = 9090L;
 
@@ -280,9 +287,9 @@ public class UploaderTest {
       }
     )
       .when(mockSynapseJsniUtils)
-      .getFileMd5(any(JavaScriptObject.class), any(MD5Callback.class));
+      .getFileMd5(any(Blob.class), any(MD5Callback.class));
 
-    when(mockSynapseJsniUtils.getFileList(anyString()))
+    when(mockSynapseJsInteropUtils.getFileList(anyString()))
       .thenReturn(mockFileList);
   }
 
@@ -412,7 +419,7 @@ public class UploaderTest {
     verify(mockView).enableMultipleFileUploads(true);
     final String file1 = "file1.txt";
     String[] fileNames = { file1 };
-    when(mockSynapseJsniUtils.getMultipleUploadFileNames(mockFileList))
+    when(mockSynapseJsInteropUtils.getMultipleUploadFileNames(mockFileList))
       .thenReturn(fileNames);
     AsyncMockStubber
       .callSuccessWith(testEntity)
@@ -541,7 +548,7 @@ public class UploaderTest {
   @Test
   public void testDirectUploadNoFilesSelected() throws Exception {
     uploader.setFileNames(null);
-    when(mockSynapseJsniUtils.getMultipleUploadFileNames(mockFileList))
+    when(mockSynapseJsInteropUtils.getMultipleUploadFileNames(mockFileList))
       .thenReturn(null);
     uploader.handleUploads();
     verify(mockView).hideLoading();
@@ -614,9 +621,7 @@ public class UploaderTest {
     String file2 = "file2.txt";
     String[] fileNames = { file1, file2 };
     when(
-      mockSynapseJsniUtils.getMultipleUploadFileNames(
-        any(JavaScriptObject.class)
-      )
+      mockSynapseJsInteropUtils.getMultipleUploadFileNames(any(FileList.class))
     )
       .thenReturn(fileNames);
     String duplicateNameEntityId = "syn128";
@@ -691,9 +696,7 @@ public class UploaderTest {
     final String file3 = "file3.txt";
     String[] fileNames = { file1, file2, file3 };
     when(
-      mockSynapseJsniUtils.getMultipleUploadFileNames(
-        any(JavaScriptObject.class)
-      )
+      mockSynapseJsInteropUtils.getMultipleUploadFileNames(any(FileList.class))
     )
       .thenReturn(fileNames);
     AsyncMockStubber
@@ -881,6 +884,8 @@ public class UploaderTest {
     when(mockView.getS3DirectAccessKey()).thenReturn(accessKey);
     when(mockView.getS3DirectSecretKey()).thenReturn(secretKey);
 
+    uploader.setFileList(mockFileList);
+
     uploader.directUploadStep2(fileName);
 
     verify(mockS3DirectUploader)
@@ -913,9 +918,7 @@ public class UploaderTest {
     // simulate drop
     String fileName = "single file.txt";
     when(
-      mockSynapseJsniUtils.getMultipleUploadFileNames(
-        any(JavaScriptObject.class)
-      )
+      mockSynapseJsInteropUtils.getMultipleUploadFileNames(any(FileList.class))
     )
       .thenReturn(new String[] { fileName });
     dragAndDropHandlerCaptor.getValue().invoke(mockDroppedFileList);
@@ -1043,7 +1046,7 @@ public class UploaderTest {
   @Test
   public void testGetSelectedFilesText() {
     String fileName = "single file.txt";
-    when(mockSynapseJsniUtils.getMultipleUploadFileNames(any()))
+    when(mockSynapseJsInteropUtils.getMultipleUploadFileNames(any()))
       .thenReturn(new String[] { fileName });
     assertEquals(fileName, uploader.getSelectedFilesText());
   }
@@ -1051,9 +1054,7 @@ public class UploaderTest {
   @Test
   public void testGetSelectedFilesTextNoFiles() {
     when(
-      mockSynapseJsniUtils.getMultipleUploadFileNames(
-        any(JavaScriptObject.class)
-      )
+      mockSynapseJsInteropUtils.getMultipleUploadFileNames(any(FileList.class))
     )
       .thenReturn(null);
     assert (uploader.getSelectedFilesText().isEmpty());
@@ -1061,7 +1062,7 @@ public class UploaderTest {
 
   @Test
   public void testGetSelectedFilesTextMultipleFiles() {
-    when(mockSynapseJsniUtils.getMultipleUploadFileNames(any()))
+    when(mockSynapseJsInteropUtils.getMultipleUploadFileNames(any()))
       .thenReturn(new String[] { "file1", "file2" });
     assertEquals("2 files", uploader.getSelectedFilesText());
   }
@@ -1109,12 +1110,13 @@ public class UploaderTest {
     String folder2NewSynId = "syn500";
     String folder2 = "f1a";
     String relativePath = folder1 + "/" + folder2 + "/test.txt";
-    when(mockSynapseJsniUtils.getWebkitRelativePath(any(), anyInt()))
+    when(mockSynapseJsInteropUtils.getWebkitRelativePath(any(), anyDouble()))
       .thenReturn(relativePath);
     when(mockFolder.getId()).thenReturn(folder2NewSynId);
     when(mockSynapseJavascriptClient.createEntity(any(Entity.class)))
       .thenReturn(getDoneFuture(mockFolder));
     String[] files = { "test.txt" };
+    uploader.setFileList(mockFileList);
     uploader.setFileNames(files);
 
     uploader.uploadBasedOnConfiguration();
@@ -1145,9 +1147,11 @@ public class UploaderTest {
     String folder1 = "f1";
     String folder2 = "f1a";
     String relativePath = folder1 + "/" + folder2 + "/test.txt";
-    when(mockSynapseJsniUtils.getWebkitRelativePath(any(), anyInt()))
+
+    when(mockSynapseJsInteropUtils.getWebkitRelativePath(any(), anyDouble()))
       .thenReturn(relativePath);
     String[] files = { "test.txt" };
+    uploader.setFileList(mockFileList);
     uploader.setFileNames(files);
 
     uploader.uploadBasedOnConfiguration();
@@ -1168,7 +1172,7 @@ public class UploaderTest {
     String folder1 = "f1";
     String folder2 = "f1a";
     String relativePath = folder1 + "/" + folder2 + "/test.txt";
-    when(mockSynapseJsniUtils.getWebkitRelativePath(any(), anyInt()))
+    when(mockSynapseJsInteropUtils.getWebkitRelativePath(any(), anyDouble()))
       .thenReturn(relativePath);
     String[] files = { "test.txt" };
     uploader.setFileNames(files);

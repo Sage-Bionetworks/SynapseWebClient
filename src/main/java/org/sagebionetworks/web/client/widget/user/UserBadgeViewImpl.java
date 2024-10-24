@@ -7,6 +7,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.inject.Inject;
+import elemental2.core.Global;
 import java.util.ArrayList;
 import java.util.List;
 import org.gwtbootstrap3.client.ui.constants.Emphasis;
@@ -20,7 +21,6 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
-import org.sagebionetworks.web.client.jsinterop.JSON;
 import org.sagebionetworks.web.client.jsinterop.MenuAction;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
@@ -101,7 +101,7 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
       jsniUtils.consoleError(e);
     }
 
-    Object userProfileObject = JSON.parse(profileJson);
+    Object userProfileObject = Global.JSON.parse(profileJson);
 
     UserCardProps props = UserCardProps.create(
       userProfileObject,

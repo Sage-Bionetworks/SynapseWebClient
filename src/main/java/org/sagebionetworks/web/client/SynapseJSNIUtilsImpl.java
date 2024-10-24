@@ -10,6 +10,7 @@ import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Window.Location;
 import com.google.gwt.xhr.client.XMLHttpRequest;
+import elemental2.dom.Blob;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.jsinterop.SRC;
@@ -219,9 +220,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
   @Override
   public void setPageDescription(String newDescription) {
     if (Document.get() != null) {
-      NodeList<com.google.gwt.dom.client.Element> tags = Document
-        .get()
-        .getElementsByTagName("meta");
+      NodeList<Element> tags = Document.get().getElementsByTagName("meta");
       for (int i = 0; i < tags.getLength(); i++) {
         MetaElement metaTag = ((MetaElement) tags.getItem(i));
         if (metaTag.getName().equals("description")) {
@@ -245,33 +244,6 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
     SynapseJSNIUtilsImpl.progressCallback = callback;
     _directUploadBlob(contentType, blob, startByte, endByte, url, xhr);
   }
-
-  @Override
-  public JavaScriptObject getFileList(String fileFieldId) {
-    return _getFileList(fileFieldId);
-  }
-
-  private static final native JavaScriptObject _getFileList(
-    String fileFieldId
-  ) /*-{
-		var fileToUploadElement = $doc.getElementById(fileFieldId);
-		if (fileToUploadElement && 'files' in fileToUploadElement) {
-			return fileToUploadElement.files;
-		}
-		return null;
-	}-*/;
-
-  @Override
-  public JavaScriptObject getFileBlob(int index, JavaScriptObject fileList) {
-    return _getFileBlob(index, fileList);
-  }
-
-  private static final native JavaScriptObject _getFileBlob(
-    int index,
-    JavaScriptObject fileList
-  ) /*-{
-		return fileList[index];
-	}-*/;
 
   private static final native void _directUploadBlob(
     String contentType,
@@ -324,62 +296,8 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		return 0;
 	}-*/;
 
-  @Override
-  public String getContentType(JavaScriptObject fileList, int index) {
-    return _getContentType(fileList, index);
-  }
-
-  private static final native String _getContentType(
-    JavaScriptObject fileList,
-    int index
-  ) /*-{
-		return fileList[index].type;
-	}-*/;
-
-  @Override
-  public String getWebkitRelativePath(JavaScriptObject fileList, int index) {
-    return _getWebkitRelativePath(fileList, index);
-  }
-
-  private static final native String _getWebkitRelativePath(
-    JavaScriptObject fileList,
-    int index
-  ) /*-{
-		return fileList[index].webkitRelativePath;
-	}-*/;
-
-  @Override
-  public double getFileSize(JavaScriptObject blob) {
-    return _getFileSize(blob);
-  }
-
-  private static final native double _getFileSize(JavaScriptObject blob) /*-{
-		return blob.size;
-	}-*/;
-
-  @Override
-  public String[] getMultipleUploadFileNames(JavaScriptObject fileList) {
-    String unSplitNames = _getFilesSelected(fileList);
-    if (unSplitNames.equals("")) return null;
-    return unSplitNames.split(";");
-  }
-
-  private static native String _getFilesSelected(JavaScriptObject fileList) /*-{
-		var out = "";
-		for (i = 0; i < fileList.length; i++) {
-			var file = fileList[i];
-			out += file.name + ';';
-		}
-		return out;
-	}-*/;
-
   public boolean isElementExists(String elementId) {
     return Document.get().getElementById(elementId) != null;
-  }
-
-  @Override
-  public Element getElementById(String elementId) {
-    return Document.get().getElementById(elementId);
   }
 
   /**
@@ -404,12 +322,12 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
    * calculate the md5.
    */
   @Override
-  public void getFileMd5(JavaScriptObject blob, MD5Callback md5Callback) {
-    _getFileMd5(blob, md5Callback);
+  public void getFileMd5(Blob file, MD5Callback md5Callback) {
+    _getFileMd5(file, md5Callback);
   }
 
   private static final native void _getFileMd5(
-    JavaScriptObject file,
+    Blob file,
     MD5Callback md5Callback
   ) /*-{
 		if ($wnd.Worker) {

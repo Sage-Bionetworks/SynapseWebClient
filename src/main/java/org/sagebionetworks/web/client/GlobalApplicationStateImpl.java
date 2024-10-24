@@ -6,7 +6,6 @@ import static org.sagebionetworks.web.client.cookie.CookieKeys.SHOW_DATETIME_IN_
 import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.UmbrellaException;
@@ -19,6 +18,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.inject.Inject;
+import elemental2.dom.FileList;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -60,7 +60,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
   private DateTimeUtils dateTimeUtils;
   private SynapseJavascriptClient jsClient;
   private SessionStorage sessionStorage;
-  private CallbackP<JavaScriptObject> fileListCallback;
+  private CallbackP<FileList> fileListCallback;
   private SynapseProperties synapseProperties;
   private PortalGinInjector ginInjector;
   private final OneSageUtils oneSageUtils;
@@ -459,7 +459,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
     return fileListCallback != null;
   }
 
-  public void onDrop(JavaScriptObject fileList) {
+  public void onDrop(FileList fileList) {
     if (isDragAndDropListenerSet()) {
       fileListCallback.invoke(fileList);
     }
@@ -520,7 +520,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			function handleDrop(e) {
 				e.preventDefault();
 				hideDropZone();
-				globalAppState.@org.sagebionetworks.web.client.GlobalApplicationStateImpl::onDrop(Lcom/google/gwt/core/client/JavaScriptObject;)(e.dataTransfer.files);
+				globalAppState.@org.sagebionetworks.web.client.GlobalApplicationStateImpl::onDrop(Lelemental2/dom/FileList;)(e.dataTransfer.files);
 			}
 
 			dropZone.addEventListener('dragenter', allowDrag);
@@ -540,7 +540,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	}-*/;
 
   @Override
-  public void setDropZoneHandler(CallbackP<JavaScriptObject> fileListCallback) {
+  public void setDropZoneHandler(CallbackP<FileList> fileListCallback) {
     this.fileListCallback = fileListCallback;
   }
 

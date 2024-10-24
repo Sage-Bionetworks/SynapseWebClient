@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.jsinterop;
 
+import elemental2.core.Global;
 import org.sagebionetworks.gwt.client.schema.adapter.JSONObjectGwt;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -20,6 +21,6 @@ public interface JSONEntityUtils {
     }
     // This is a quick-and-dirty implementation--serialize the object to a string and use JSON.parse to deserialize it
     // It would be more efficient to update the JSONObjectGwt instance to directly create and return a native object.
-    return JSON.parse(adapter.toJSONString());
+    return Global.JSON.parse(adapter.toJSONString());
   }
 }
