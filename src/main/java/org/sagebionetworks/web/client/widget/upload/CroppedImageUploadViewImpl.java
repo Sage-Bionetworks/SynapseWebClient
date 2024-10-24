@@ -184,22 +184,22 @@ public class CroppedImageUploadViewImpl implements ImageUploadView {
   private static native void _getCroppedImageBlob(
     CroppedImageUploadViewImpl v
   ) /*-{
-  		try {
-  			$wnd.cropping
-  					.result({
-  						type : 'blob',
-  						format : 'png',
-  						quality : 1,
-  						circle : true
-  					})
-  					.then(
-  							function(blob) {
-  								v.@org.sagebionetworks.web.client.widget.upload.CroppedImageUploadViewImpl::saveCroppedImage(Lelemental2/dom/File;)(blob);
-  							});
-  		} catch (err) {
-  			console.error(err);
-  		}
-  	}-*/;
+		try {
+			$wnd.cropping
+					.result({
+						type : 'blob',
+						format : 'png',
+						quality : 1,
+						circle : true
+					})
+					.then(
+							function(blob) {
+								v.@org.sagebionetworks.web.client.widget.upload.CroppedImageUploadViewImpl::saveCroppedImage(Lelemental2/dom/File;)(blob);
+							});
+		} catch (err) {
+			console.error(err);
+		}
+	}-*/;
 
   public void saveCroppedImage() {
     // get the blob from the cropper

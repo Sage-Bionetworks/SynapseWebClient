@@ -330,18 +330,18 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
     Blob file,
     MD5Callback md5Callback
   ) /*-{
-  		if ($wnd.Worker) {
-  			if (!$wnd.calculateFileMd5Worker) {
-  			  $wnd.calculateFileMd5Worker = new $wnd.Worker("/workers/calculateFileMd5Worker.js");
-  			};
-  			$wnd.calculateFileMd5Worker.onmessage = function(event) {
-  				md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback::setMD5(Ljava/lang/String;)(event.data);
-  			};
-  			$wnd.calculateFileMd5Worker.postMessage(file);
-  	  } else {
-  			md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback::setMD5(Ljava/lang/String;)(null);
-    	}
-  	}-*/;
+		if ($wnd.Worker) {
+			if (!$wnd.calculateFileMd5Worker) {
+			  $wnd.calculateFileMd5Worker = new $wnd.Worker("/workers/calculateFileMd5Worker.js");
+			};
+			$wnd.calculateFileMd5Worker.onmessage = function(event) {
+				md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback::setMD5(Ljava/lang/String;)(event.data);
+			};
+			$wnd.calculateFileMd5Worker.postMessage(file);
+	  } else {
+			md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback::setMD5(Ljava/lang/String;)(null);
+  	}
+	}-*/;
 
   /**
    * Using SparkMD5 (https://github.com/satazor/SparkMD5) to calculate the md5 of part of a file.

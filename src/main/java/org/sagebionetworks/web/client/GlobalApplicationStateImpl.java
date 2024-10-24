@@ -494,50 +494,50 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
     Element dropZone,
     Element rootPanel
   ) /*-{
-  		try {
-  			function showDropZone() {
-  				dropZone.style.display = "block";
-  			}
+		try {
+			function showDropZone() {
+				dropZone.style.display = "block";
+			}
 
-  			function hideDropZone() {
-  				dropZone.style.display = "none";
-  			}
+			function hideDropZone() {
+				dropZone.style.display = "none";
+			}
 
-  			$wnd
-  					.addEventListener(
-  							'dragenter',
-  							function(e) {
-  								if (globalAppState.@org.sagebionetworks.web.client.GlobalApplicationStateImpl::isDragAndDropListenerSet()()) {
-  									showDropZone();
-  								}
-  							});
+			$wnd
+					.addEventListener(
+							'dragenter',
+							function(e) {
+								if (globalAppState.@org.sagebionetworks.web.client.GlobalApplicationStateImpl::isDragAndDropListenerSet()()) {
+									showDropZone();
+								}
+							});
 
-  			function allowDrag(e) {
-  				e.dataTransfer.dropEffect = 'copy';
-  				e.preventDefault();
-  			}
+			function allowDrag(e) {
+				e.dataTransfer.dropEffect = 'copy';
+				e.preventDefault();
+			}
 
-  			function handleDrop(e) {
-  				e.preventDefault();
-  				hideDropZone();
+			function handleDrop(e) {
+				e.preventDefault();
+				hideDropZone();
   				globalAppState.@org.sagebionetworks.web.client.GlobalApplicationStateImpl::onDrop(Lelemental2/dom/FileList;)(e.dataTransfer.files);
-  			}
+			}
 
-  			dropZone.addEventListener('dragenter', allowDrag);
-  			dropZone.addEventListener('dragover', allowDrag);
+			dropZone.addEventListener('dragenter', allowDrag);
+			dropZone.addEventListener('dragover', allowDrag);
 
-  			dropZone.addEventListener('drop', handleDrop);
+			dropZone.addEventListener('drop', handleDrop);
 
-  			//if files are dropped into the root panel, then ignore the event (do not open file contents if user does not have the upload dialog open).
-  			rootPanel.addEventListener('drop', function(e) {
-  				e.preventDefault();
-  			});
-  			rootPanel.addEventListener('dragenter', allowDrag);
-  			rootPanel.addEventListener('dragover', allowDrag);
-  		} catch (err) {
-  			console.error(err);
-  		}
-  	}-*/;
+			//if files are dropped into the root panel, then ignore the event (do not open file contents if user does not have the upload dialog open).
+			rootPanel.addEventListener('drop', function(e) {
+				e.preventDefault();
+			});
+			rootPanel.addEventListener('dragenter', allowDrag);
+			rootPanel.addEventListener('dragover', allowDrag);
+		} catch (err) {
+			console.error(err);
+		}
+	}-*/;
 
   @Override
   public void setDropZoneHandler(CallbackP<FileList> fileListCallback) {

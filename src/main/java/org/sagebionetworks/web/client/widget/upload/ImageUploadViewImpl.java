@@ -194,12 +194,14 @@ public class ImageUploadViewImpl implements ImageUploadView {
       }-*/;
 
   private static native void _initResizer() /*-{
-      console.log('initializing pica resizer');
-      $wnd.resizer = $wnd.pica({
-        features: ['js', 'wasm', 'ww']
-      });
-      console.log('pica resizer initialized');
-    }-*/;
+		console.log('initializing pica resizer');
+		$wnd.resizer = $wnd.pica({
+			features : [ 'js', 'wasm', 'ww' ]
+		});
+		console.log('pica resizer initialized');
+	}-*/;
+
+
 
   public void resizeComplete(Blob blob) {
     loadingUI.setVisible(false);
