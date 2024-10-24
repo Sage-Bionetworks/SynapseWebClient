@@ -1,7 +1,8 @@
 package org.sagebionetworks.web.client.jsinterop;
 
-import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArrayString;
+import elemental2.dom.Blob;
+import elemental2.promise.Promise;
 import jsinterop.annotations.JsFunction;
 import jsinterop.annotations.JsNullable;
 import jsinterop.annotations.JsPackage;
@@ -192,7 +193,7 @@ public class SRC {
     public static native Promise<FileUploadComplete> uploadFile(
       String accessToken,
       String filename,
-      JavaScriptObject file, // blob
+      Blob file,
       int storageLocationId,
       String contentType,
       Progress progressCallback,

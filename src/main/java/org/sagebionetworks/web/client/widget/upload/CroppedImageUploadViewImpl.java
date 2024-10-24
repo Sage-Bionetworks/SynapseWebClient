@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.upload;
 
-import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.InputElement;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -15,6 +14,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import elemental2.dom.File;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Form;
 import org.gwtbootstrap3.client.ui.Image;
@@ -184,33 +184,33 @@ public class CroppedImageUploadViewImpl implements ImageUploadView {
   private static native void _getCroppedImageBlob(
     CroppedImageUploadViewImpl v
   ) /*-{
-		try {
-			$wnd.cropping
-					.result({
-						type : 'blob',
-						format : 'png',
-						quality : 1,
-						circle : true
-					})
-					.then(
-							function(blob) {
-								v.@org.sagebionetworks.web.client.widget.upload.CroppedImageUploadViewImpl::saveCroppedImage(Lcom/google/gwt/core/client/JavaScriptObject;)(blob);
-							});
-		} catch (err) {
-			console.error(err);
-		}
-	}-*/;
+  		try {
+  			$wnd.cropping
+  					.result({
+  						type : 'blob',
+  						format : 'png',
+  						quality : 1,
+  						circle : true
+  					})
+  					.then(
+  							function(blob) {
+  								v.@org.sagebionetworks.web.client.widget.upload.CroppedImageUploadViewImpl::saveCroppedImage(Lelemental2/dom/File;)(blob);
+  							});
+  		} catch (err) {
+  			console.error(err);
+  		}
+  	}-*/;
 
   public void saveCroppedImage() {
     // get the blob from the cropper
     _getCroppedImageBlob(this);
   }
 
-  public void saveCroppedImage(JavaScriptObject blob) {
+  public void saveCroppedImage(File blob) {
     // get the blob from the cropper
     loadingUI.setVisible(false);
     previewModal.hide();
-    presenter.onFileProcessed(new JavaScriptObjectWrapper(blob), "image/png");
+    presenter.onFileProcessed(blob, "image/png");
   }
 
   public void cancelCropImage() {

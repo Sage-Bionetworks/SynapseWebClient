@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.upload;
 
-import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.logical.shared.HasAttachHandlers;
+import elemental2.dom.Blob;
 import org.sagebionetworks.web.client.widget.upload.MultipartUploader;
 import org.sagebionetworks.web.client.widget.upload.ProgressingFileUploadHandler;
 
@@ -59,7 +59,7 @@ public class MultipartUploaderStub implements MultipartUploader {
   public void uploadFile(
     String fileName,
     String contentType,
-    JavaScriptObject blob,
+    Blob blob,
     ProgressingFileUploadHandler handler,
     Long storageLocationId,
     HasAttachHandlers view

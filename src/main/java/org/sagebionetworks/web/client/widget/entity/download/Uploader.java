@@ -5,12 +5,13 @@ import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEn
 import static org.sagebionetworks.web.shared.WebConstants.VALID_ENTITY_NAME_REGEX;
 
 import com.google.common.util.concurrent.FutureCallback;
-import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import elemental2.dom.File;
+import elemental2.dom.FileList;
 import java.util.List;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.Entity;
@@ -35,6 +36,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
+import org.sagebionetworks.web.client.SynapseJsInteropUtils;
 import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.events.CancelHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -76,6 +78,7 @@ public class Uploader
   private CallbackP<String> fileHandleIdCallback;
   private SynapseClientAsync synapseClient;
   private SynapseJSNIUtils synapseJsniUtils;
+  private SynapseJsInteropUtils synapseJsInteropUtils;
   private GlobalApplicationState globalAppState;
   private GWTWrapper gwt;
   private MultipartUploader multiPartUploader;
@@ -85,7 +88,7 @@ public class Uploader
   private String[] currentFilePath;
   private int currentFilePathElement;
   private int currIndex;
-  private JavaScriptObject fileList;
+  private FileList fileList;
   private NumberFormat percentFormat;
   private boolean fileHasBeenUploaded = false;
   private UploadType currentUploadType;
@@ -102,6 +105,7 @@ public class Uploader
     UploaderView view,
     SynapseClientAsync synapseClient,
     SynapseJSNIUtils synapseJsniUtils,
+    SynapseJsInteropUtils jsInteropUtils,
     GWTWrapper gwt,
     AuthenticationController authenticationController,
     MultipartUploader multiPartUploader,
@@ -116,6 +120,7 @@ public class Uploader
     this.synapseClient = synapseClient;
     fixServiceEntryPoint(synapseClient);
     this.synapseJsniUtils = synapseJsniUtils;
+    this.synapseJsInteropUtils = jsInteropUtils;
     this.gwt = gwt;
     this.percentFormat = gwt.getNumberFormat("##");
     this.authenticationController = authenticationController;
@@ -182,7 +187,7 @@ public class Uploader
   }
 
   public String[] getSelectedFileNames() {
-    return synapseJsniUtils.getMultipleUploadFileNames(fileList);
+    return synapseJsInteropUtils.getMultipleUploadFileNames(fileList);
   }
 
   public String getSelectedFilesText() {
@@ -199,7 +204,8 @@ public class Uploader
     // field validation
     if (fileList == null) {
       // setup upload process.
-      fileList = synapseJsniUtils.getFileList(UploaderViewImpl.FILE_FIELD_ID);
+      fileList =
+        synapseJsInteropUtils.getFileList(UploaderViewImpl.FILE_FIELD_ID);
       fileHasBeenUploaded = false;
       currIndex = 0;
       if ((fileNames = getSelectedFileNames()) == null) {
@@ -215,13 +221,13 @@ public class Uploader
     this.handleUploads(fileList);
   }
 
-  public void handleUploads(JavaScriptObject fileList) {
+  public void handleUploads(FileList fileList) {
     // SWC-5161: can't drag/drop another file set while this file list is being uploaded.
     globalAppState.clearDropZoneHandler();
     view.disableSelectionDuringUpload();
     this.fileList = fileList;
     view.setSelectedFilenames(getSelectedFilesText());
-    fileNames = synapseJsniUtils.getMultipleUploadFileNames(fileList);
+    fileNames = synapseJsInteropUtils.getMultipleUploadFileNames(fileList);
     this.uploadBasedOnConfiguration();
   }
 
@@ -245,7 +251,7 @@ public class Uploader
       currentUploadType = UploadType.S3;
       view.showUploadingToSynapseStorage();
     } else {
-      // we have a parent entity, check to see where we are suppose to upload the file(s)
+      // we have a parent entity, check to see where we are supposed to upload the file(s)
       String uploadDestinationsEntityId = parentEntityId != null
         ? parentEntityId
         : entity.getId();
@@ -349,7 +355,7 @@ public class Uploader
     // create necessary folders based on webkitRelativePath for the current item, and set parent entity
     // id to correct parent
     // reset the current file parent entity id to the original.
-    String relativePath = synapseJsniUtils.getWebkitRelativePath(
+    String relativePath = synapseJsInteropUtils.getWebkitRelativePath(
       fileList,
       currIndex
     );
@@ -421,7 +427,7 @@ public class Uploader
           } else {
             uploadError(
               "Unable to create target folder structure: " +
-              synapseJsniUtils.getWebkitRelativePath(fileList, currIndex),
+              synapseJsInteropUtils.getWebkitRelativePath(fileList, currIndex),
               caught
             );
           }
@@ -455,7 +461,7 @@ public class Uploader
           public void onFailure(Throwable caught) {
             uploadError(
               "Unable to create target folder structure: " +
-              synapseJsniUtils.getWebkitRelativePath(fileList, currIndex),
+              synapseJsInteropUtils.getWebkitRelativePath(fileList, currIndex),
               caught
             );
           }
@@ -564,11 +570,8 @@ public class Uploader
   }
 
   public void checkFileSize() throws IllegalArgumentException {
-    JavaScriptObject blob = synapseJsniUtils.getFileBlob(
-      this.currIndex,
-      fileList
-    );
-    long fileSize = (long) synapseJsniUtils.getFileSize(blob);
+    File blob = fileList.item(this.currIndex);
+    long fileSize = blob.size;
     // check
     if (fileSize > OLD_BROWSER_MAX_SIZE) {
       throw new IllegalArgumentException(
@@ -647,11 +650,8 @@ public class Uploader
 
   public void directUploadStep2(String fileName) {
     // use S3 direct uploader
-    JavaScriptObject currentFile = synapseJsniUtils.getFileBlob(
-      currIndex,
-      fileList
-    );
-    String contentType = synapseJsniUtils.getContentType(fileList, currIndex);
+    File currentFile = fileList.item(currIndex);
+    String contentType = currentFile.type;
     contentType = ContentTypeUtils.fixDefaultContentType(contentType, fileName);
     if (endpointUrl != null) {
       s3DirectUploader.configure(
@@ -1069,6 +1069,15 @@ public class Uploader
    */
   public void setFileNames(String[] fileNames) {
     this.fileNames = fileNames;
+  }
+
+  /**
+   * For testing purposes
+   *
+   * @return
+   */
+  public void setFileList(FileList fileList) {
+    this.fileList = fileList;
   }
 
   @Override

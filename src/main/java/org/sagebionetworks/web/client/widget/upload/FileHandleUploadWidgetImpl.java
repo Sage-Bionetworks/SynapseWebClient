@@ -1,9 +1,10 @@
 package org.sagebionetworks.web.client.widget.upload;
 
-import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import elemental2.dom.Blob;
+import elemental2.dom.FileList;
+import org.sagebionetworks.web.client.SynapseJsInteropUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -16,21 +17,21 @@ public class FileHandleUploadWidgetImpl
   private MultipartUploader multipartUploader;
   private CallbackP<FileUpload> finishedUploadingCallback;
   private Callback startedUploadingCallback;
-  private SynapseJSNIUtils synapseJsniUtils;
+  private SynapseJsInteropUtils jsInteropUtils;
   private int count;
   private FileMetadata[] fileMetaArr;
-  private JavaScriptObject fileList;
+  private FileList fileList;
 
   @Inject
   public FileHandleUploadWidgetImpl(
     FileHandleUploadView view,
     MultipartUploader multipartUploader,
-    SynapseJSNIUtils synapseJsniUtils
+    SynapseJsInteropUtils jsInteropUtils
   ) {
     super();
     this.view = view;
     this.multipartUploader = multipartUploader;
-    this.synapseJsniUtils = synapseJsniUtils;
+    this.jsInteropUtils = jsInteropUtils;
     this.view.setPresenter(this);
     this.view.allowMultipleFileUpload(false);
   }
@@ -75,20 +76,18 @@ public class FileHandleUploadWidgetImpl
   public FileMetadata[] getSelectedFileMetadata() {
     String inputId = view.getInputId();
     FileMetadata[] results = null;
-    fileList = synapseJsniUtils.getFileList(inputId);
-    String[] fileNames = synapseJsniUtils.getMultipleUploadFileNames(fileList);
+    fileList = jsInteropUtils.getFileList(inputId);
+    String[] fileNames = jsInteropUtils.getMultipleUploadFileNames(fileList);
     if (fileNames != null) {
       results = new FileMetadata[fileNames.length];
       for (int i = 0; i < fileNames.length; i++) {
         String name = fileNames[i];
         String contentType =
           org.sagebionetworks.web.client.ContentTypeUtils.fixDefaultContentType(
-            synapseJsniUtils.getContentType(fileList, i),
+            fileList.item(i).type,
             name
           );
-        double fileSize = synapseJsniUtils.getFileSize(
-          synapseJsniUtils.getFileBlob(i, fileList)
-        );
+        double fileSize = fileList.item(i).size;
         results[i] = new FileMetadata(name, contentType, fileSize);
       }
     }
@@ -161,7 +160,7 @@ public class FileHandleUploadWidgetImpl
 
   private void doMultipartUpload() {
     // The uploader does the real work
-    JavaScriptObject blob = synapseJsniUtils.getFileBlob(count, fileList);
+    Blob blob = fileList.item(count);
     FileMetadata fileMetadata = fileMetaArr[count];
 
     multipartUploader.uploadFile(

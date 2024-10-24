@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.jsinterop.react;
 
+import elemental2.core.JsObject;
 import jsinterop.base.JsPropertyMap;
-import org.sagebionetworks.web.client.jsinterop.JsObject;
 import org.sagebionetworks.web.client.jsinterop.PropsWithStyle;
 import org.sagebionetworks.web.client.jsinterop.ReactComponentType;
 import org.sagebionetworks.web.client.widget.ReactComponentV2;

@@ -1,9 +1,9 @@
 package org.sagebionetworks.web.client;
 
-import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import elemental2.dom.FileList;
 import java.util.List;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
@@ -120,7 +120,7 @@ public interface GlobalApplicationState {
 
   void initializeToastContainer();
 
-  void setDropZoneHandler(CallbackP<JavaScriptObject> fileListCallback);
+  void setDropZoneHandler(CallbackP<FileList> fileListCallback);
 
   void clearDropZoneHandler();
 

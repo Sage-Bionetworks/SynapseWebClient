@@ -1,14 +1,14 @@
 package org.sagebionetworks.web.client.widget.upload;
 
-import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.logical.shared.HasAttachHandlers;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.inject.Inject;
+import elemental2.dom.Blob;
+import elemental2.promise.Promise;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseProperties;
-import org.sagebionetworks.web.client.jsinterop.Promise;
 import org.sagebionetworks.web.client.jsinterop.SRC.SynapseClient.FileUploadComplete;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -32,7 +32,7 @@ public class MultipartUploaderImplV2 implements MultipartUploader {
   private SynapseJSNIUtils synapseJsniUtils;
   private NumberFormat percentFormat;
 
-  JavaScriptObject blob;
+  Blob blob;
   HasAttachHandlers view;
   boolean isCanceled;
   DateTimeUtils dateTimeUtils;
@@ -62,7 +62,7 @@ public class MultipartUploaderImplV2 implements MultipartUploader {
   public void uploadFile(
     final String fileName,
     final String contentType,
-    final JavaScriptObject blob,
+    final Blob blob,
     ProgressingFileUploadHandler handler,
     final Long storageLocationId,
     HasAttachHandlers view
@@ -80,7 +80,7 @@ public class MultipartUploaderImplV2 implements MultipartUploader {
     this.view = view;
     isCanceled = false;
 
-    long fileSize = (long) synapseJsniUtils.getFileSize(blob);
+    long fileSize = blob.size;
     if (fileSize <= 0) {
       handler.uploadSuccess(null);
       return;
@@ -104,9 +104,11 @@ public class MultipartUploaderImplV2 implements MultipartUploader {
     );
     p.then(fileUploadResolve -> {
       handler.uploadSuccess(fileUploadResolve.fileHandleId);
+      return null;
     });
     p.catch_(error -> {
       handler.uploadFailed(error.toString());
+      return null;
     });
   }
 

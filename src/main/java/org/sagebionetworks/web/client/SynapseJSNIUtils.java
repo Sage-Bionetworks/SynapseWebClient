@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.xhr.client.XMLHttpRequest;
+import elemental2.dom.Blob;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
@@ -43,10 +44,6 @@ public interface SynapseJSNIUtils {
 
   public void setPageDescription(String newDescription);
 
-  public JavaScriptObject getFileList(String fileFieldId);
-
-  public JavaScriptObject getFileBlob(int index, JavaScriptObject fileList);
-
   public void uploadFileChunk(
     String contentType,
     JavaScriptObject blob,
@@ -57,15 +54,13 @@ public interface SynapseJSNIUtils {
     ProgressCallback callback
   );
 
-  public String getContentType(JavaScriptObject fileList, int index);
-
   public boolean isFileAPISupported();
 
   public boolean isElementExists(String elementId);
 
   public String getFileUrl(String fileFieldId);
 
-  public void getFileMd5(JavaScriptObject blob, MD5Callback callback);
+  public void getFileMd5(Blob blob, MD5Callback callback);
 
   public void getFilePartMd5(
     JavaScriptObject blob,
@@ -73,12 +68,6 @@ public interface SynapseJSNIUtils {
     Long chunkSize,
     MD5Callback md5Callback
   );
-
-  public double getFileSize(JavaScriptObject blob);
-
-  String[] getMultipleUploadFileNames(JavaScriptObject fileList);
-
-  String getWebkitRelativePath(JavaScriptObject fileList, int index);
 
   public void consoleLog(String message);
 
@@ -116,8 +105,6 @@ public interface SynapseJSNIUtils {
   String sanitizeHtml(String html);
 
   boolean elementSupportsAttribute(Element el, String attribute);
-
-  Element getElementById(String elementId);
 
   String getCdnEndpoint();
 

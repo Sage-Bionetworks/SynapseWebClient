@@ -5,6 +5,7 @@ import static org.sagebionetworks.web.client.ClientProperties.AWS_SDK_JS;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
+import elemental2.dom.Blob;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
@@ -52,7 +53,7 @@ public class AwsSdk {
    */
   public void upload(
     final String key,
-    JavaScriptObject file,
+    Blob file,
     String contentType,
     JavaScriptObject s3,
     S3DirectUploadHandler callback
@@ -62,43 +63,43 @@ public class AwsSdk {
 
   private static native void _upload(
     String key,
-    JavaScriptObject file,
+    Blob file,
     String contentType,
     JavaScriptObject s3,
     S3DirectUploadHandler callback
   ) /*-{
-		var parameters = {
-			Key : key,
-			ContentType : contentType,
-			Body : file
-		};
-		var upload = new $wnd.AWS.S3.ManagedUpload({
-			//			partSize: 10 * 1024 * 1024,  //default 5MB
-			//			queueSize: 1, // default 4
-			leavePartsOnError : true,
-			params : parameters,
-			service : s3
-		});
-		upload
-				.on(
-						'httpUploadProgress',
-						function(evt) {
-							// report progress
-							callback.@org.sagebionetworks.web.client.widget.upload.S3DirectUploadHandler::updateProgress(D)(evt.loaded/evt.total);
-						});
-		var listener = function(err, data) {
-			if (err) {
-				//error
-				console.log("Upload error", err.code, err.message);
-				upload.abort();
-				callback.@org.sagebionetworks.web.client.widget.upload.S3DirectUploadHandler::uploadFailed(Ljava/lang/String;)(err.message);
-			} else {
-				//success
-				callback.@org.sagebionetworks.web.client.widget.upload.S3DirectUploadHandler::uploadSuccess()();
-			}
-		};
-		upload.send(listener);
-	}-*/;
+  		var parameters = {
+  			Key : key,
+  			ContentType : contentType,
+  			Body : file
+  		};
+  		var upload = new $wnd.AWS.S3.ManagedUpload({
+  			//			partSize: 10 * 1024 * 1024,  //default 5MB
+  			//			queueSize: 1, // default 4
+  			leavePartsOnError : true,
+  			params : parameters,
+  			service : s3
+  		});
+  		upload
+  				.on(
+  						'httpUploadProgress',
+  						function(evt) {
+  							// report progress
+  							callback.@org.sagebionetworks.web.client.widget.upload.S3DirectUploadHandler::updateProgress(D)(evt.loaded/evt.total);
+  						});
+  		var listener = function(err, data) {
+  			if (err) {
+  				//error
+  				console.log("Upload error", err.code, err.message);
+  				upload.abort();
+  				callback.@org.sagebionetworks.web.client.widget.upload.S3DirectUploadHandler::uploadFailed(Ljava/lang/String;)(err.message);
+  			} else {
+  				//success
+  				callback.@org.sagebionetworks.web.client.widget.upload.S3DirectUploadHandler::uploadSuccess()();
+  			}
+  		};
+  		upload.send(listener);
+  	}-*/;
 
   public String getPresignedURL(
     String key,

@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.entity.download;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
@@ -11,6 +10,7 @@ import static org.mockito.Mockito.when;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.logical.shared.HasAttachHandlers;
+import elemental2.dom.Blob;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -21,6 +21,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJsInteropUtils;
 import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.aws.AwsSdk;
@@ -38,6 +39,9 @@ public class S3DirectUploaderTest {
   SynapseJSNIUtils mockSynapseJsniUtils;
 
   @Mock
+  SynapseJsInteropUtils mockSynapseJsInteropUtils;
+
+  @Mock
   GWTWrapper mockGwt;
 
   @Mock
@@ -47,7 +51,7 @@ public class S3DirectUploaderTest {
   ArgumentCaptor<MD5Callback> md5Captor;
 
   @Mock
-  JavaScriptObject mockBlob;
+  Blob mockBlob;
 
   @Mock
   JavaScriptObject mockS3;
@@ -77,18 +81,14 @@ public class S3DirectUploaderTest {
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
     when(mockView.isAttached()).thenReturn(true);
-    when(
-      mockSynapseJsniUtils.getFileBlob(anyInt(), any(JavaScriptObject.class))
-    )
-      .thenReturn(mockBlob);
-    when(
-      mockSynapseJsniUtils.getContentType(any(JavaScriptObject.class), anyInt())
-    )
-      .thenReturn(CONTENT_TYPE);
+
+    mockBlob.type = CONTENT_TYPE;
+
     uploader =
       new S3DirectUploader(
         mockAwsSdk,
         mockSynapseJsniUtils,
+        mockSynapseJsInteropUtils,
         mockGwt,
         mockSynapseClient
       );
@@ -107,7 +107,7 @@ public class S3DirectUploaderTest {
       mockView
     );
     verify(mockSynapseJsniUtils)
-      .getFileMd5(any(JavaScriptObject.class), md5Captor.capture());
+      .getFileMd5(any(Blob.class), md5Captor.capture());
     MD5Callback md5Callback = md5Captor.getValue();
     String md5 = "8782672c";
     md5Callback.setMD5(md5);
@@ -124,7 +124,7 @@ public class S3DirectUploaderTest {
     verify(mockAwsSdk)
       .upload(
         eq(KEY_PREFIX_UUID + "/" + FILE_NAME),
-        any(JavaScriptObject.class),
+        any(Blob.class),
         eq(CONTENT_TYPE),
         any(JavaScriptObject.class),
         eq(uploader)
@@ -143,7 +143,7 @@ public class S3DirectUploaderTest {
       mockView
     );
     verify(mockSynapseJsniUtils)
-      .getFileMd5(any(JavaScriptObject.class), md5Captor.capture());
+      .getFileMd5(any(Blob.class), md5Captor.capture());
     MD5Callback md5Callback = md5Captor.getValue();
     // md5 calculation will fail if a directory is dropped into the uploader
     String md5 = null;

@@ -6,7 +6,6 @@ import static org.sagebionetworks.web.client.cookie.CookieKeys.SHOW_DATETIME_IN_
 import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.UmbrellaException;
@@ -19,6 +18,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.inject.Inject;
+import elemental2.dom.FileList;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -60,7 +60,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
   private DateTimeUtils dateTimeUtils;
   private SynapseJavascriptClient jsClient;
   private SessionStorage sessionStorage;
-  private CallbackP<JavaScriptObject> fileListCallback;
+  private CallbackP<FileList> fileListCallback;
   private SynapseProperties synapseProperties;
   private PortalGinInjector ginInjector;
   private final OneSageUtils oneSageUtils;
@@ -459,7 +459,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
     return fileListCallback != null;
   }
 
-  public void onDrop(JavaScriptObject fileList) {
+  public void onDrop(FileList fileList) {
     if (isDragAndDropListenerSet()) {
       fileListCallback.invoke(fileList);
     }
@@ -494,53 +494,53 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
     Element dropZone,
     Element rootPanel
   ) /*-{
-		try {
-			function showDropZone() {
-				dropZone.style.display = "block";
-			}
+  		try {
+  			function showDropZone() {
+  				dropZone.style.display = "block";
+  			}
 
-			function hideDropZone() {
-				dropZone.style.display = "none";
-			}
+  			function hideDropZone() {
+  				dropZone.style.display = "none";
+  			}
 
-			$wnd
-					.addEventListener(
-							'dragenter',
-							function(e) {
-								if (globalAppState.@org.sagebionetworks.web.client.GlobalApplicationStateImpl::isDragAndDropListenerSet()()) {
-									showDropZone();
-								}
-							});
+  			$wnd
+  					.addEventListener(
+  							'dragenter',
+  							function(e) {
+  								if (globalAppState.@org.sagebionetworks.web.client.GlobalApplicationStateImpl::isDragAndDropListenerSet()()) {
+  									showDropZone();
+  								}
+  							});
 
-			function allowDrag(e) {
-				e.dataTransfer.dropEffect = 'copy';
-				e.preventDefault();
-			}
+  			function allowDrag(e) {
+  				e.dataTransfer.dropEffect = 'copy';
+  				e.preventDefault();
+  			}
 
-			function handleDrop(e) {
-				e.preventDefault();
-				hideDropZone();
-				globalAppState.@org.sagebionetworks.web.client.GlobalApplicationStateImpl::onDrop(Lcom/google/gwt/core/client/JavaScriptObject;)(e.dataTransfer.files);
-			}
+  			function handleDrop(e) {
+  				e.preventDefault();
+  				hideDropZone();
+  				globalAppState.@org.sagebionetworks.web.client.GlobalApplicationStateImpl::onDrop(Lelemental2/dom/FileList;)(e.dataTransfer.files);
+  			}
 
-			dropZone.addEventListener('dragenter', allowDrag);
-			dropZone.addEventListener('dragover', allowDrag);
+  			dropZone.addEventListener('dragenter', allowDrag);
+  			dropZone.addEventListener('dragover', allowDrag);
 
-			dropZone.addEventListener('drop', handleDrop);
+  			dropZone.addEventListener('drop', handleDrop);
 
-			//if files are dropped into the root panel, then ignore the event (do not open file contents if user does not have the upload dialog open).
-			rootPanel.addEventListener('drop', function(e) {
-				e.preventDefault();
-			});
-			rootPanel.addEventListener('dragenter', allowDrag);
-			rootPanel.addEventListener('dragover', allowDrag);
-		} catch (err) {
-			console.error(err);
-		}
-	}-*/;
+  			//if files are dropped into the root panel, then ignore the event (do not open file contents if user does not have the upload dialog open).
+  			rootPanel.addEventListener('drop', function(e) {
+  				e.preventDefault();
+  			});
+  			rootPanel.addEventListener('dragenter', allowDrag);
+  			rootPanel.addEventListener('dragover', allowDrag);
+  		} catch (err) {
+  			console.error(err);
+  		}
+  	}-*/;
 
   @Override
-  public void setDropZoneHandler(CallbackP<JavaScriptObject> fileListCallback) {
+  public void setDropZoneHandler(CallbackP<FileList> fileListCallback) {
     this.fileListCallback = fileListCallback;
   }
 
