@@ -28,11 +28,11 @@
     <jackson.version>2.15.2</jackson.version>
     <jackson.databind.version>2.15.2</jackson.databind.version>
     <log4j.version>2.17.1</log4j.version>
-    <gwtbootstrap3.version>1.5.10</gwtbootstrap3.version>
-    <gwtbootstrap3.extras.version>1.5.2</gwtbootstrap3.extras.version>
+    <gwtbootstrap3.version>1.5.11</gwtbootstrap3.version>
+    <gwtbootstrap3.extras.version>1.5.11</gwtbootstrap3.extras.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <gwtvisualizationwrappers.version>
-      1.6-gwt-2.7.0
+      1.6-gwt-2.7.1
     </gwtvisualizationwrappers.version>
     <freemarker.version>2.3.32</freemarker.version>
     <gwt.module.suffix />
