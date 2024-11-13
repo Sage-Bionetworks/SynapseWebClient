@@ -399,11 +399,6 @@ public class AuthenticationControllerImpl implements AuthenticationController {
   }
 
   @Override
-  public void signTermsOfUse(AsyncCallback<Void> callback) {
-    userAccountService.signTermsOfUse(getCurrentUserAccessToken(), callback);
-  }
-
-  @Override
   public void checkForUserChange() {
     checkForUserChange(null);
   }

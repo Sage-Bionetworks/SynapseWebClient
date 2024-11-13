@@ -50,8 +50,7 @@ public class EntityMetadata {
     SynapseJavascriptClient jsClient,
     SynapseJSNIUtils jsni,
     PortalGinInjector ginInjector,
-    EntityModalWidget entityModalWidget,
-    ProjectDataAvaiilability projectDataAvailabilityWidget
+    EntityModalWidget entityModalWidget
   ) {
     this.view = view;
     this.doiWidgetV2 = doiWidgetV2;
@@ -59,10 +58,8 @@ public class EntityMetadata {
     this.jsni = jsni;
     this.ginInjector = ginInjector;
     this.entityModalWidget = entityModalWidget;
-    this.projectDataAvailabilityWidget = projectDataAvailabilityWidget;
     this.view.setDoiWidget(doiWidgetV2);
     this.view.setEntityModalWidget(entityModalWidget);
-    this.view.setProjectDataAvailabilityWidget(projectDataAvailabilityWidget);
   }
 
   public Widget asWidget() {
@@ -75,6 +72,15 @@ public class EntityMetadata {
       view.setVersionHistoryWidget(versionHistoryWidget);
     }
     return versionHistoryWidget;
+  }
+
+  public ProjectDataAvaiilability getProjectDataAvailabilityWidget() {
+    if (projectDataAvailabilityWidget == null) {
+      this.projectDataAvailabilityWidget =
+        ginInjector.getProjectDataAvaiilability();
+      this.view.setProjectDataAvailabilityWidget(projectDataAvailabilityWidget);
+    }
+    return projectDataAvailabilityWidget;
   }
 
   public void configure(
@@ -131,7 +137,7 @@ public class EntityMetadata {
     }
     configureStorageLocation(en);
 
-    projectDataAvailabilityWidget.setProjectId(en.getId());
+    getProjectDataAvailabilityWidget().setProjectId(en.getId());
     // An unversioned DOI may not have been included in the (versioned) entity bundle, so we should see if one exists
     if (
       bundle.getDoiAssociation() == null && // If a versioned DOI exists, we should show that

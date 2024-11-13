@@ -7,8 +7,6 @@ import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 
 public interface UserAccountServiceAsync {
-  void signTermsOfUse(String accessToken, AsyncCallback<Void> callback);
-
   void createUserStep1(
     NewUser newUser,
     String portalEndpoint,

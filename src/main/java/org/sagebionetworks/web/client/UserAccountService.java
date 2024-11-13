@@ -10,8 +10,6 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 @RemoteServiceRelativePath("users")
 public interface UserAccountService extends RemoteService {
-  void signTermsOfUse(String accessToken) throws RestServiceException;
-
   void createUserStep1(NewUser newUser, String portalEndpoint)
     throws RestServiceException;
 

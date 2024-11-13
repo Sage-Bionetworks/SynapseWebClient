@@ -96,6 +96,8 @@ public class EntityMetadataTest {
   public void before() {
     when(mockGinInjector.getVersionHistoryWidget())
       .thenReturn(mockFileHistoryWidget);
+    when(mockGinInjector.getProjectDataAvaiilability())
+      .thenReturn(mockProjectDataAvaiilability);
     when(mockGinInjector.getCookieProvider()).thenReturn(mockCookies);
     widget =
       new EntityMetadata(
@@ -104,8 +106,7 @@ public class EntityMetadataTest {
         mockJsClient,
         mockJSNI,
         mockGinInjector,
-        mockEntityModalWidget,
-        mockProjectDataAvaiilability
+        mockEntityModalWidget
       );
   }
 
