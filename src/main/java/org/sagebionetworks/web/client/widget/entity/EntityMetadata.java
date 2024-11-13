@@ -29,7 +29,7 @@ import org.sagebionetworks.web.client.widget.doi.DoiWidgetV2;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
-import org.sagebionetworks.web.client.widget.projectdataavailability.ProjectDataAvaiilability;
+import org.sagebionetworks.web.client.widget.projectdataavailability.ProjectDataAvailability;
 
 public class EntityMetadata {
 
@@ -40,7 +40,7 @@ public class EntityMetadata {
   private final SynapseJSNIUtils jsni;
   private final PortalGinInjector ginInjector;
   private final EntityModalWidget entityModalWidget;
-  private ProjectDataAvaiilability projectDataAvailabilityWidget;
+  private ProjectDataAvailability projectDataAvailabilityWidget;
   private boolean annotationsAreVisible = false;
 
   @Inject
@@ -74,10 +74,10 @@ public class EntityMetadata {
     return versionHistoryWidget;
   }
 
-  public ProjectDataAvaiilability getProjectDataAvailabilityWidget() {
+  public ProjectDataAvailability getProjectDataAvailabilityWidget() {
     if (projectDataAvailabilityWidget == null) {
       this.projectDataAvailabilityWidget =
-        ginInjector.getProjectDataAvaiilability();
+        ginInjector.getProjectDataAvailability();
       this.view.setProjectDataAvailabilityWidget(projectDataAvailabilityWidget);
     }
     return projectDataAvailabilityWidget;

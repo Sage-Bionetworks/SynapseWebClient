@@ -4,12 +4,12 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class ProjectDataAvaiilability implements IsWidget {
+public class ProjectDataAvailability implements IsWidget {
 
   ProjectDataAvailabilityView view;
 
   @Inject
-  public ProjectDataAvaiilability(ProjectDataAvailabilityView view) {
+  public ProjectDataAvailability(ProjectDataAvailabilityView view) {
     this.view = view;
   }
 

@@ -47,7 +47,7 @@ import org.sagebionetworks.web.client.widget.doi.DoiWidgetV2;
 import org.sagebionetworks.web.client.widget.entity.*;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWidget;
-import org.sagebionetworks.web.client.widget.projectdataavailability.ProjectDataAvaiilability;
+import org.sagebionetworks.web.client.widget.projectdataavailability.ProjectDataAvailability;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
@@ -84,7 +84,7 @@ public class EntityMetadataTest {
   EntityModalWidget mockEntityModalWidget;
 
   @Mock
-  ProjectDataAvaiilability mockProjectDataAvaiilability;
+  ProjectDataAvailability mockProjectDataAvailability;
 
   String entityId = "syn123";
   String entityName = "testEntity";
@@ -96,8 +96,8 @@ public class EntityMetadataTest {
   public void before() {
     when(mockGinInjector.getVersionHistoryWidget())
       .thenReturn(mockFileHistoryWidget);
-    when(mockGinInjector.getProjectDataAvaiilability())
-      .thenReturn(mockProjectDataAvaiilability);
+    when(mockGinInjector.getProjectDataAvailability())
+      .thenReturn(mockProjectDataAvailability);
     when(mockGinInjector.getCookieProvider()).thenReturn(mockCookies);
     widget =
       new EntityMetadata(
@@ -139,7 +139,7 @@ public class EntityMetadataTest {
     widget.configure(bundle, null, mockActionMenuWidget);
     verify(mockView).setDetailedMetadataVisible(true);
     verify(mockDoiWidgetV2).configure(mockDoiAssociation);
-    verify(mockProjectDataAvaiilability).setProjectId(entityId);
+    verify(mockProjectDataAvailability).setProjectId(entityId);
   }
 
   @Test
@@ -166,7 +166,7 @@ public class EntityMetadataTest {
     widget.configure(bundle, null, mockActionMenuWidget);
     verify(mockView).setDetailedMetadataVisible(true);
     verify(mockDoiWidgetV2).configure(mockDoiAssociation);
-    verify(mockProjectDataAvaiilability).setProjectId(entityId);
+    verify(mockProjectDataAvailability).setProjectId(entityId);
   }
 
   @Test
