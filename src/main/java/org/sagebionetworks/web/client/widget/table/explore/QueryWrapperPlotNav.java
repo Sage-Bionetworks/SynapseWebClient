@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client.widget.table.explore;
 
+import java.util.Map;
 import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
+import org.sagebionetworks.web.client.jsinterop.CardConfiguration;
 import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps;
 import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnQueryCallback;
 import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnQueryResultBundleCallback;
@@ -19,7 +21,14 @@ public class QueryWrapperPlotNav extends ReactComponent {
     OnQueryCallback onQueryChange,
     OnQueryResultBundleCallback onQueryResultBundleChange,
     OnViewSharingSettingsHandler onViewSharingSettingsHandler,
-    boolean hideSqlEditorControl
+    boolean hideSqlEditorControl,
+    Boolean defaultShowPlots,
+    Boolean defaultShowSearchBox,
+    Boolean hideCopyToClipboard,
+    Boolean hideDownload,
+    Map<String, String> columnAliases,
+    CardConfiguration cardConfiguration,
+    String name
   ) {
     QueryWrapperPlotNavProps props = QueryWrapperPlotNavProps.create(
       sql,
@@ -27,7 +36,14 @@ public class QueryWrapperPlotNav extends ReactComponent {
       onQueryChange,
       onQueryResultBundleChange,
       onViewSharingSettingsHandler,
-      hideSqlEditorControl
+      hideSqlEditorControl,
+      defaultShowPlots,
+      defaultShowSearchBox,
+      hideCopyToClipboard,
+      hideDownload,
+      columnAliases,
+      cardConfiguration,
+      name
     );
 
     ReactElement component = React.createElementWithSynapseContext(

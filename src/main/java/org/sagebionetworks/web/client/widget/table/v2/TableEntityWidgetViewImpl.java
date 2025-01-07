@@ -225,7 +225,14 @@ public class TableEntityWidgetViewImpl
       onQueryChange,
       onQueryResultBundleChange,
       onViewSharingSettingsHandler,
-      hideSqlEditorControl
+      hideSqlEditorControl,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
     );
     plotNavContainer.clear();
     plotNavContainer.add(plotNav);

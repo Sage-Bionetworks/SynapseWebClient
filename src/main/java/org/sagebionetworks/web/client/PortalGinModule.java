@@ -61,6 +61,8 @@ import org.sagebionetworks.web.client.view.DataAccessApprovalTokenView;
 import org.sagebionetworks.web.client.view.DataAccessApprovalTokenViewImpl;
 import org.sagebionetworks.web.client.view.DataAccessManagementView;
 import org.sagebionetworks.web.client.view.DataAccessManagementViewImpl;
+import org.sagebionetworks.web.client.view.DataCatalogPageView;
+import org.sagebionetworks.web.client.view.DataCatalogPageViewImpl;
 import org.sagebionetworks.web.client.view.DivView;
 import org.sagebionetworks.web.client.view.DivViewImpl;
 import org.sagebionetworks.web.client.view.DownView;
@@ -1368,6 +1370,7 @@ public class PortalGinModule extends AbstractGinModule {
     bind(PreviewConfigView.class).to(PreviewConfigViewImpl.class);
     bind(SynapseFormConfigView.class).to(SynapseFormConfigViewImpl.class);
     bind(DownloadCartPageView.class).to(DownloadCartPageViewImpl.class);
+    bind(DataCatalogPageView.class).to(DataCatalogPageViewImpl.class);
     bind(EditFileMetadataModalView.class)
       .to(EditFileMetadataModalViewImpl.class);
     bind(EditFileMetadataModalWidget.class)
