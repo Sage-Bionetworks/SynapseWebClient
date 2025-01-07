@@ -102,6 +102,7 @@ import org.sagebionetworks.web.client.place.users.RegisterAccount;
     TrustCenterPlace.Tokenizer.class,
     ChatPlace.Tokenizer.class,
     PlansPlace.Tokenizer.class,
+    DataCatalogPagePlace.Tokenizer.class,
   }
 )
 public interface AppPlaceHistoryMapper extends PlaceHistoryMapper {}
