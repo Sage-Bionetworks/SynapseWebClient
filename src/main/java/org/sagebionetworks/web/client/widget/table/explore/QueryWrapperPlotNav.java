@@ -27,7 +27,6 @@ public class QueryWrapperPlotNav extends ReactComponent {
     Boolean defaultShowSearchBox,
     Boolean hideCopyToClipboard,
     Boolean hideDownload,
-    Map<String, String> columnAliases,
     SynapseTableProps tableConfiguration,
     CardConfiguration cardConfiguration,
     String name
@@ -43,7 +42,6 @@ public class QueryWrapperPlotNav extends ReactComponent {
       defaultShowSearchBox,
       hideCopyToClipboard,
       hideDownload,
-      columnAliases,
       tableConfiguration,
       cardConfiguration,
       name

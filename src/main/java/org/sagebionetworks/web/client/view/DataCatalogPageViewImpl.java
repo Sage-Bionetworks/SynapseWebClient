@@ -34,8 +34,6 @@ public class DataCatalogPageViewImpl implements DataCatalogPageView {
   public void render() {
     Window.scrollTo(0, 0); // scroll user to top of page
     headerWidget.configure();
-    Map<String, String> columnAliases = new HashMap<String, String>();
-    columnAliases.put("id", "On Synapse");
 
     String[] secondaryLabels = { "contributors", "individuals", "id", "link" };
     GenericCardSchema genericCardSchema = GenericCardSchema.create(
@@ -63,7 +61,6 @@ public class DataCatalogPageViewImpl implements DataCatalogPageView {
       true,
       true,
       true,
-      columnAliases,
       null,
       cardConfiguration,
       "Data Catalog"

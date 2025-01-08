@@ -231,7 +231,6 @@ public class TableEntityWidgetViewImpl
       null,
       null,
       null,
-      null,
       SynapseTableProps.create(),
       null,
       null
