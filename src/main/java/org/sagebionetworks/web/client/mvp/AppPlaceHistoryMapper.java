@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.place.DataAccessApprovalTokenPlace;
 import org.sagebionetworks.web.client.place.DataAccessManagementPlace;
 import org.sagebionetworks.web.client.place.DataCatalogPagePlace;
 import org.sagebionetworks.web.client.place.Down;
+import org.sagebionetworks.web.client.place.DownloadCartPlace;
 import org.sagebionetworks.web.client.place.EmailInvitation;
 import org.sagebionetworks.web.client.place.ErrorPlace;
 import org.sagebionetworks.web.client.place.FollowingPlace;
@@ -94,7 +95,7 @@ import org.sagebionetworks.web.client.place.users.RegisterAccount;
     PasswordResetSignedTokenPlace.Tokenizer.class,
     DataAccessApprovalTokenPlace.Tokenizer.class,
     PersonalAccessTokenPlace.Tokenizer.class,
-    DataCatalogPagePlace.Tokenizer.class,
+    DownloadCartPlace.Tokenizer.class,
     DataAccessManagementPlace.Tokenizer.class,
     OAuthClientEditorPlace.Tokenizer.class,
     TwoFactorAuthPlace.Tokenizer.class,

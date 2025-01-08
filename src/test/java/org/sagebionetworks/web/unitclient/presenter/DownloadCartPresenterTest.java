@@ -32,7 +32,7 @@ import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.place.DataCatalogPagePlace;
+import org.sagebionetworks.web.client.place.DownloadCartPlace;
 import org.sagebionetworks.web.client.place.PeopleSearch;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -92,7 +92,7 @@ public class DownloadCartPresenterTest {
 
   @Test
   public void testSetPlace() {
-    presenter.setPlace(new DataCatalogPagePlace(""));
+    presenter.setPlace(new DownloadCartPlace(""));
 
     verify(mockView).render();
   }
