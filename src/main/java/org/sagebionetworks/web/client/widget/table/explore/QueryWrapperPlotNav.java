@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnViewS
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
+import org.sagebionetworks.web.client.jsinterop.SynapseTableProps;
 import org.sagebionetworks.web.client.widget.ReactComponent;
 
 public class QueryWrapperPlotNav extends ReactComponent {
@@ -27,6 +28,7 @@ public class QueryWrapperPlotNav extends ReactComponent {
     Boolean hideCopyToClipboard,
     Boolean hideDownload,
     Map<String, String> columnAliases,
+    SynapseTableProps tableConfiguration,
     CardConfiguration cardConfiguration,
     String name
   ) {
@@ -42,6 +44,7 @@ public class QueryWrapperPlotNav extends ReactComponent {
       hideCopyToClipboard,
       hideDownload,
       columnAliases,
+      tableConfiguration,
       cardConfiguration,
       name
     );

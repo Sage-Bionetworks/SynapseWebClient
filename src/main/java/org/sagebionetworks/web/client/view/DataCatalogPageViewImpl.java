@@ -25,6 +25,7 @@ public class DataCatalogPageViewImpl implements DataCatalogPageView {
     SynapseReactClientFullContextPropsProvider propsProvider
   ) {
     container = new SimplePanel();
+    container.addStyleName("padding-30");
     this.headerWidget = headerWidget;
     this.propsProvider = propsProvider;
   }
@@ -38,7 +39,7 @@ public class DataCatalogPageViewImpl implements DataCatalogPageView {
 
     String[] secondaryLabels = { "contributors", "individuals", "id", "link" };
     GenericCardSchema genericCardSchema = GenericCardSchema.create(
-      "DATASET",
+      "dataset",
       "name",
       "community",
       "description",
@@ -55,7 +56,7 @@ public class DataCatalogPageViewImpl implements DataCatalogPageView {
       "SELECT * FROM syn61609402 WHERE includedInDataCatalog = 'true'",
       null,
       null,
-      null,
+      newBundle -> {},
       null,
       true,
       false,
@@ -63,6 +64,7 @@ public class DataCatalogPageViewImpl implements DataCatalogPageView {
       true,
       true,
       columnAliases,
+      null,
       cardConfiguration,
       "Data Catalog"
     );

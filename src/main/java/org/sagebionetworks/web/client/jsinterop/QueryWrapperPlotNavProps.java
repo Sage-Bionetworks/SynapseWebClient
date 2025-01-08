@@ -88,6 +88,7 @@ public class QueryWrapperPlotNavProps extends ReactComponentProps {
     Boolean hideCopyToClipboard,
     Boolean hideDownload,
     Map<String, String> columnAliases,
+    SynapseTableProps tableConfiguration,
     CardConfiguration cardConfiguration,
     String name
   ) {
@@ -98,7 +99,9 @@ public class QueryWrapperPlotNavProps extends ReactComponentProps {
     props.onQueryChange = onQueryChange;
     props.onQueryResultBundleChange = onQueryResultBundleChange;
     props.onViewSharingSettingsClicked = onViewSharingSettingsClicked;
-    props.tableConfiguration = SynapseTableProps.create();
+    if (tableConfiguration != null) {
+      props.tableConfiguration = tableConfiguration;
+    }
     props.shouldDeepLink = false;
     props.name = "Items";
     if (name != null) {
