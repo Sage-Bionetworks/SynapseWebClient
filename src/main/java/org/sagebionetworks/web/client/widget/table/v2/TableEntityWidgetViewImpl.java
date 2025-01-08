@@ -21,6 +21,7 @@ import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnViewS
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
+import org.sagebionetworks.web.client.jsinterop.SynapseTableProps;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.FullWidthAlert;
 import org.sagebionetworks.web.client.widget.IconSvg;
@@ -225,7 +226,14 @@ public class TableEntityWidgetViewImpl
       onQueryChange,
       onQueryResultBundleChange,
       onViewSharingSettingsHandler,
-      hideSqlEditorControl
+      hideSqlEditorControl,
+      null,
+      null,
+      null,
+      null,
+      SynapseTableProps.create(),
+      null,
+      null
     );
     plotNavContainer.clear();
     plotNavContainer.add(plotNav);

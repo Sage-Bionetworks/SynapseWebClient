@@ -32,6 +32,7 @@ import org.sagebionetworks.web.client.place.ChatPlace;
 import org.sagebionetworks.web.client.place.ComingSoon;
 import org.sagebionetworks.web.client.place.DataAccessApprovalTokenPlace;
 import org.sagebionetworks.web.client.place.DataAccessManagementPlace;
+import org.sagebionetworks.web.client.place.DataCatalogPagePlace;
 import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.DownloadCartPlace;
 import org.sagebionetworks.web.client.place.EmailInvitation;
@@ -545,6 +546,24 @@ public class BulkPresenterProxy extends AbstractActivity {
             DownloadCartPresenter presenter =
               ginjector.getDownloadCartPresenter();
             presenter.setPlace((DownloadCartPlace) place);
+            presenter.start(panel, eventBus);
+          }
+
+          @Override
+          public void onFailure(Throwable caught) {
+            loadError(caught);
+          }
+        }
+      );
+    } else if (place instanceof DataCatalogPagePlace) {
+      GWT.runAsync(
+        DataCatalogPagePlace.class,
+        new RunAsyncCallback() {
+          @Override
+          public void onSuccess() {
+            DataCatalogPagePresenter presenter =
+              ginjector.getDataCatalogPagePresenter();
+            presenter.setPlace((DataCatalogPagePlace) place);
             presenter.start(panel, eventBus);
           }
 
