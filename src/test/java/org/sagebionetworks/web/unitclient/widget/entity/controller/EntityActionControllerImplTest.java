@@ -42,10 +42,6 @@ import static org.sagebionetworks.web.client.widget.entity.controller.EntityActi
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.UPDATE_DOI_FOR;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.WAS_SUCCESSFULLY_DELETED;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.WIKI;
-import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_COLLECTOR_URL;
-import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_DESCRIPTION_PART_1;
-import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_PRIORITY;
-import static org.sagebionetworks.web.shared.WebConstants.REVIEW_DATA_REQUEST_COMPONENT_ID;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
@@ -58,7 +54,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.apache.xpath.Arg;
 import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.junit.Before;
 import org.junit.Test;
@@ -114,7 +109,6 @@ import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.NotificationVariant;
 import org.sagebionetworks.web.client.FeatureFlagConfig;
 import org.sagebionetworks.web.client.FeatureFlagKey;
@@ -134,6 +128,7 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.jsinterop.CreateTableViewWizardProps;
+import org.sagebionetworks.web.client.jsinterop.EntityUploadModalProps;
 import org.sagebionetworks.web.client.jsinterop.KeyFactory;
 import org.sagebionetworks.web.client.jsinterop.SqlDefinedTableEditorModalProps;
 import org.sagebionetworks.web.client.jsinterop.ToastMessageOptions;
@@ -171,7 +166,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.PreflightControll
 import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.StorageLocationWidget;
 import org.sagebionetworks.web.client.widget.entity.download.AddFolderDialogWidget;
-import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
+import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidgetV2;
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
 import org.sagebionetworks.web.client.widget.entity.file.FileDownloadHandlerWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.Action;
@@ -241,7 +236,7 @@ public class EntityActionControllerImplTest {
   EvaluationSubmitter mockSubmitter;
 
   @Mock
-  UploadDialogWidget mockUploader;
+  UploadDialogWidgetV2 mockUploader;
 
   @Mock
   EntityActionMenu mockActionMenu;
@@ -422,6 +417,9 @@ public class EntityActionControllerImplTest {
 
   @Mock
   Element mockIconElement;
+
+  @Captor
+  ArgumentCaptor<EntityUploadModalProps.Callback> mockOnUploadModalReadyCaptor;
 
   @Captor
   ArgumentCaptor<
@@ -3762,6 +3760,11 @@ public class EntityActionControllerImplTest {
 
   @Test
   public void testOnUploadNewFileWithUpload() {
+    FileEntity fileEntity = new FileEntity();
+    fileEntity.setId(entityId);
+    entityBundle.setEntity(fileEntity);
+    permissions.setCanCertifiedUserEdit(true);
+    entityBundle.setPermissions(permissions);
     AsyncMockStubber
       .callWithInvoke()
       .when(mockPreflightController)
@@ -3775,8 +3778,8 @@ public class EntityActionControllerImplTest {
       mockAddToDownloadListWidget
     );
     controller.onAction(Action.UPLOAD_NEW_FILE, null);
+    verify(mockUploader).configure(entityId);
     verify(mockUploader).show();
-    verify(mockUploader).setUploaderLinkNameVisible(false);
   }
 
   @Test
@@ -4516,18 +4519,8 @@ public class EntityActionControllerImplTest {
       mockAddToDownloadListWidget
     );
     controller.onAction(Action.UPLOAD_FILE, null);
-    boolean isEntity = true;
-    Entity currentFileEntity = null;
-    CallbackP<String> fileHandleIdCallback = null;
-    verify(mockUploader)
-      .configure(
-        DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK,
-        currentFileEntity,
-        folderId,
-        fileHandleIdCallback,
-        isEntity
-      );
-    verify(mockUploader).setUploaderLinkNameVisible(true);
+
+    verify(mockUploader).configure(folderId);
     verify(mockUploader).show();
   }
 
@@ -5334,5 +5327,80 @@ public class EntityActionControllerImplTest {
       .openInNewWindow(
         WebConstants.PRIVACY_SECURITY_COMPLIANCE_HELP_CENTER_URL
       );
+  }
+
+  @Test
+  public void testConfigureUploaderFile() {
+    FileEntity fileEntity = new FileEntity();
+    fileEntity.setId(entityId);
+    entityBundle.setEntity(fileEntity);
+
+    boolean canCertifiedUserEdit = true;
+    permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
+    entityBundle.setPermissions(permissions);
+
+    currentEntityArea = EntityArea.FILES;
+
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+
+    verify(mockUploader).configure(entityId);
+    verify(mockUploader, never()).clearDragAndDropHandlers();
+  }
+
+  @Test
+  public void testConfigureUploaderProject() {
+    Project project = new Project();
+    project.setId(entityId);
+    entityBundle.setEntity(project);
+
+    boolean canCertifiedUserEdit = true;
+    permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
+    entityBundle.setPermissions(permissions);
+
+    currentEntityArea = EntityArea.FILES;
+
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+
+    verify(mockUploader).configure(entityId);
+    verify(mockUploader, never()).clearDragAndDropHandlers();
+  }
+
+  @Test
+  public void testConfigureUploaderProjectNotFilesTab() {
+    Project project = new Project();
+    project.setId(entityId);
+    entityBundle.setEntity(project);
+
+    boolean canCertifiedUserEdit = true;
+    permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
+    entityBundle.setPermissions(permissions);
+
+    currentEntityArea = EntityArea.WIKI;
+
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+
+    verify(mockUploader, never()).configure(entityId);
+    verify(mockUploader).clearDragAndDropHandlers();
   }
 }

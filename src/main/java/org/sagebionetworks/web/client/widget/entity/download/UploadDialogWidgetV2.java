@@ -3,6 +3,8 @@ package org.sagebionetworks.web.client.widget.entity.download;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import elemental2.dom.DomGlobal;
+import elemental2.dom.FileList;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -18,6 +20,7 @@ public class UploadDialogWidgetV2 extends Widget {
   private final GlobalApplicationState globalApplicationState;
   private final EventBus eventBus;
   private final SynapseReactClientFullContextPropsProvider contextProvider;
+  private int keyCounter = 0;
 
   private final ReactComponent reactComponent;
 
@@ -33,25 +36,30 @@ public class UploadDialogWidgetV2 extends Widget {
     this.globalApplicationState = globalApplicationState;
     this.eventBus = eventBus;
     this.contextProvider = contextProvider;
-
     this.reactComponent = new ReactComponent();
   }
 
   public void configure(String entityId) {
     this.entityId = entityId;
-    globalApplicationState.setDropZoneHandler(fileList ->
-      this.ref.current.handleUploads(fileList)
-    );
-
+    this.ref = React.createRef();
     renderComponent(false);
   }
 
   private void renderComponent(boolean open) {
-    this.ref = React.createRef();
+    EntityUploadModalProps props = EntityUploadModalProps.create(
+      entityId,
+      open,
+      this::onClose,
+      this.ref,
+      this::onUploadReady
+    );
+
+    props.key = String.valueOf(keyCounter);
+
     reactComponent.render(
       React.createElementWithSynapseContext(
         SRC.SynapseComponents.EntityUploadModal,
-        EntityUploadModalProps.create(entityId, open, this::onClose, this.ref),
+        props,
         contextProvider.getJsInteropContextProps()
       )
     );
@@ -61,9 +69,31 @@ public class UploadDialogWidgetV2 extends Widget {
     renderComponent(true);
   }
 
+  private void handleDrop(FileList fileList) {
+    if (this.ref != null && this.ref.current != null) {
+      this.ref.current.handleUploads(fileList);
+      // Show the uploader
+      this.show();
+    } else {
+      DomGlobal.console.error(
+        "EntityUploadHandle ref is null, aborting handleDrop"
+      );
+    }
+  }
+
+  private void onUploadReady() {
+    globalApplicationState.setDropZoneHandler(this::handleDrop);
+  }
+
   private void onClose() {
     eventBus.fireEvent(new EntityUpdatedEvent(entityId));
+    // Re-render the component with a new key to reset the state so it no longer shows the previous set of uploads
+    keyCounter++;
     renderComponent(false);
+  }
+
+  public void clearDragAndDropHandlers() {
+    globalApplicationState.clearDropZoneHandler();
   }
 
   @Override
@@ -73,7 +103,7 @@ public class UploadDialogWidgetV2 extends Widget {
 
   @Override
   public void onUnload() {
-    globalApplicationState.clearDropZoneHandler();
+    clearDragAndDropHandlers();
 
     super.onUnload();
   }
