@@ -98,6 +98,15 @@ public class StackEndpoints {
         // None of these hosts match and no configuration was loaded from settings, fall back to prod
         endpointPrefix = "https://repo-prod.prod.sagebase.org";
       }
+
+      logger.warning(
+        "No configuration found for " +
+        REPO_ENDPOINT_KEY +
+        ", so servlet request will defer to the host header. Host: " +
+        host +
+        ", endpointPrefix: " +
+        endpointPrefix
+      );
     }
 
     return endpointPrefix;

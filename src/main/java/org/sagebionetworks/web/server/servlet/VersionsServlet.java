@@ -1,10 +1,7 @@
 package org.sagebionetworks.web.server.servlet;
 
-import com.google.gwt.thirdparty.guava.common.base.Supplier;
-import com.google.gwt.thirdparty.guava.common.base.Suppliers;
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.util.concurrent.TimeUnit;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -16,7 +13,6 @@ import org.apache.commons.logging.LogFactory;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.versionInfo.SynapseVersionInfo;
-import org.sagebionetworks.web.server.StackEndpoints;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl.PortalVersionHolder;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
@@ -35,11 +31,14 @@ public class VersionsServlet extends HttpServlet {
       VersionsServlet.perThreadRequest.get()
     );
 
-  private final Supplier<SynapseVersionInfo> synapseVersionCache =
-    Suppliers.memoizeWithExpiration(versionSupplier(), 5, TimeUnit.MINUTES);
-
   public SynapseVersionInfo getSynapseVersionInfo() {
-    return synapseVersionCache.get();
+    try {
+      SynapseClient synapseClient = createNewClient();
+      return synapseClient.getVersionInfo();
+    } catch (SynapseException e) {
+      log.error(e);
+      return null;
+    }
   }
 
   private SynapseProvider synapseProvider = new SynapseProviderImpl();
@@ -48,21 +47,6 @@ public class VersionsServlet extends HttpServlet {
     return synapseProvider.createNewClient(
       this.requestHostProvider.getRequestHost()
     );
-  }
-
-  private Supplier<SynapseVersionInfo> versionSupplier() {
-    return new Supplier<SynapseVersionInfo>() {
-      public SynapseVersionInfo get() {
-        try {
-          org.sagebionetworks.client.SynapseClient synapseClient =
-            createNewClient();
-          return synapseClient.getVersionInfo();
-        } catch (SynapseException e) {
-          log.error(e);
-          return null;
-        }
-      }
-    };
   }
 
   public String getSynapseVersions() throws RestServiceException {
