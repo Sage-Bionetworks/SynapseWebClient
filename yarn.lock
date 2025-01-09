@@ -1446,7 +1446,7 @@
   resolved "https://registry.yarnpkg.com/@sage-bionetworks/markdown-it-container/-/markdown-it-container-4.0.1.tgz#430022ac2553a83f6c48892efe465d01e64cb3a8"
   integrity sha512-ufgmV+kGlP7sYNanlsjzx+D+ZywmW/QE3gIolffm8H2Zix3/hpO65FrWmXPlKslz32WUdRZsmjD+2AJKOO0AFg==
 
-"@sage-bionetworks/react-base-table@1.13.4", "@sage-bionetworks/react-base-table@^1.13.4":
+"@sage-bionetworks/react-base-table@^1.13.4":
   version "1.13.4"
   resolved "https://registry.yarnpkg.com/@sage-bionetworks/react-base-table/-/react-base-table-1.13.4.tgz#7b1b2ab6a60cd7144b0fc3b355ee06da9b0127fa"
   integrity sha512-gbzTq6aso1iWr4n11omcq9PtClEWRaqYC01LR2JoTnsg8Y3/UyQZ5HAtZUn/QCinfZlbwMu/VjlMBjKGIcpyMw==
