@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.jsinterop;
 
 import jsinterop.annotations.JsFunction;
+import jsinterop.annotations.JsNullable;
 import jsinterop.annotations.JsOverlay;
 import jsinterop.annotations.JsPackage;
 import jsinterop.annotations.JsType;
@@ -20,6 +21,10 @@ public class EntityUploadModalProps extends ReactComponentProps {
 
   public Callback onClose;
 
+  @JsNullable
+  public Callback onUploadReady;
+
+  @JsNullable
   public ReactRef<EntityUploadHandle> ref;
 
   @JsOverlay
@@ -27,13 +32,15 @@ public class EntityUploadModalProps extends ReactComponentProps {
     String containerId,
     boolean open,
     Callback onClose,
-    ReactRef<EntityUploadHandle> ref
+    ReactRef<EntityUploadHandle> ref,
+    Callback onUploadReady
   ) {
     EntityUploadModalProps props = new EntityUploadModalProps();
     props.entityId = containerId;
     props.open = open;
     props.onClose = onClose;
     props.ref = ref;
+    props.onUploadReady = onUploadReady;
     return props;
   }
 }

@@ -135,7 +135,6 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.controller.URLProvEntryView;
 import org.sagebionetworks.web.client.widget.entity.download.AddFolderDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.download.QuizInfoDialog;
-import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidgetV2;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfigEditor;
@@ -730,9 +729,7 @@ public interface PortalGinInjector extends Ginjector {
 
   EntityFinderWidgetView getEntityFinderWidgetView();
 
-  UploadDialogWidget getUploadDialogWidget();
-
-  UploadDialogWidgetV2 getUploadDialogWidgetV2();
+  UploadDialogWidgetV2 getUploadDialogWidget();
 
   WikiMarkdownEditor getWikiMarkdownEditor();
 

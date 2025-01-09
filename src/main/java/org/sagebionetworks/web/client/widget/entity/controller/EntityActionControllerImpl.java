@@ -40,7 +40,6 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
-import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.VersionableEntity;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
@@ -123,7 +122,6 @@ import org.sagebionetworks.web.client.widget.entity.WikiPageDeleteConfirmationDi
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidget;
 import org.sagebionetworks.web.client.widget.entity.download.AddFolderDialogWidget;
-import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidgetV2;
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.Action;
@@ -259,6 +257,7 @@ public class EntityActionControllerImpl
   EntityAccessControlListModalWidget entityAccessControlListModalWidget;
   RenameEntityModalWidget renameEntityModalWidget;
   EntityFinderWidget.Builder entityFinderBuilder;
+  UploadDialogWidgetV2 uploadDialogWidgetV2;
   EvaluationSubmitter submitter;
   EditFileMetadataModalWidget editFileMetadataModalWidget;
   EditProjectMetadataModalWidget editProjectMetadataModalWidget;
@@ -545,16 +544,12 @@ public class EntityActionControllerImpl
     return submitter;
   }
 
-  private UploadDialogWidget getNewUploadDialogWidget() {
-    UploadDialogWidget uploadDialogWidget = ginInjector.getUploadDialogWidget();
-    view.setUploadDialogWidget(uploadDialogWidget.asWidget());
-    return uploadDialogWidget;
-  }
-
-  private UploadDialogWidgetV2 getNewUploadDialogWidgetV2() {
-    UploadDialogWidgetV2 uploadDialogWidgetV2 =
-      ginInjector.getUploadDialogWidgetV2();
-    view.setUploadDialogWidget(uploadDialogWidgetV2.asWidget());
+  private UploadDialogWidgetV2 getUploadDialogWidget() {
+    // Note: there must only be one UploadDialogWidget
+    if (uploadDialogWidgetV2 == null) {
+      uploadDialogWidgetV2 = ginInjector.getUploadDialogWidget();
+      view.setUploadDialogWidget(uploadDialogWidgetV2.asWidget());
+    }
     return uploadDialogWidgetV2;
   }
 
@@ -619,6 +614,18 @@ public class EntityActionControllerImpl
     this.addToDownloadListWidget = addToDownloadListWidget;
 
     reconfigureActions();
+
+    // SWC-4693 - Always configure the upload dialog to support drag-n-drop from the files tab without opening the modal
+    configureUploader();
+  }
+
+  private void configureUploader() {
+    UploadDialogWidgetV2 uploadDialogWidgetV2 = getUploadDialogWidget();
+    if (canUploadNewFileVersion() || canUploadFileToContainer()) {
+      uploadDialogWidgetV2.configure(entity.getId());
+    } else {
+      uploadDialogWidgetV2.clearDragAndDropHandlers();
+    }
   }
 
   private void reconfigureActions() {
@@ -1340,28 +1347,31 @@ public class EntityActionControllerImpl
     }
   }
 
+  private boolean canUploadNewFileVersion() {
+    return (
+      entityBundle.getEntity() instanceof FileEntity &&
+      permissions.getCanCertifiedUserEdit()
+    );
+  }
+
   private void configureFileUpload() {
-    if (entityBundle.getEntity() instanceof FileEntity) {
-      actionMenu.setActionVisible(
-        Action.UPLOAD_NEW_FILE,
-        permissions.getCanCertifiedUserEdit()
-      );
-      actionMenu.setActionListener(Action.UPLOAD_NEW_FILE, this);
-    } else {
-      actionMenu.setActionVisible(Action.UPLOAD_NEW_FILE, false);
-    }
+    actionMenu.setActionVisible(
+      Action.UPLOAD_NEW_FILE,
+      canUploadNewFileVersion()
+    );
+    actionMenu.setActionListener(Action.UPLOAD_NEW_FILE, this);
+  }
+
+  private boolean canUploadFileToContainer() {
+    return (
+      isContainerOnFilesTab(entityBundle.getEntity(), currentArea) &&
+      permissions.getCanCertifiedUserEdit()
+    );
   }
 
   private void configureUploadNewFileEntity() {
-    if (isContainerOnFilesTab(entityBundle.getEntity(), currentArea)) {
-      actionMenu.setActionVisible(
-        Action.UPLOAD_FILE,
-        permissions.getCanCertifiedUserEdit()
-      );
-      actionMenu.setActionListener(Action.UPLOAD_FILE, this);
-    } else {
-      actionMenu.setActionVisible(Action.UPLOAD_FILE, false);
-    }
+    actionMenu.setActionVisible(Action.UPLOAD_FILE, canUploadFileToContainer());
+    actionMenu.setActionListener(Action.UPLOAD_FILE, this);
   }
 
   private void configureAddFolder() {
@@ -1830,6 +1840,7 @@ public class EntityActionControllerImpl
         onSubmit();
         break;
       case UPLOAD_NEW_FILE:
+      case UPLOAD_FILE:
         onUploadFile();
         break;
       case EDIT_PROVENANCE:
@@ -1852,9 +1863,6 @@ public class EntityActionControllerImpl
         break;
       case MANAGE_ACCESS_REQUIREMENTS:
         onManageAccessRequirements();
-        break;
-      case UPLOAD_FILE:
-        onUploadNewFileEntity();
         break;
       case CREATE_FOLDER:
         onCreateFolder();
@@ -2025,28 +2033,6 @@ public class EntityActionControllerImpl
     wizard.setOpen(true);
   }
 
-  private void onUploadNewFileEntity() {
-    checkUploadEntity(() -> {
-      if (featureFlagConfig.isFeatureEnabled(FeatureFlagKey.UPLOADER_V2)) {
-        UploadDialogWidgetV2 uploadDialogWidgetV2 =
-          getNewUploadDialogWidgetV2();
-        uploadDialogWidgetV2.configure(entityBundle.getEntity().getId());
-        uploadDialogWidgetV2.show();
-      } else {
-        UploadDialogWidget uploader = getNewUploadDialogWidget();
-        uploader.configure(
-          DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK,
-          null,
-          entityBundle.getEntity().getId(),
-          null,
-          true
-        );
-        uploader.setUploaderLinkNameVisible(true);
-        uploader.show();
-      }
-    });
-  }
-
   private void onCreateFolder() {
     checkUploadEntity(() -> {
       AddFolderDialogWidget w = getAddFolderDialogWidget();
@@ -2101,29 +2087,11 @@ public class EntityActionControllerImpl
   }
 
   private void onUploadFile() {
-    checkUploadEntity(() -> {
-      postCheckUploadFile();
-    });
+    checkUploadEntity(this::postCheckUploadEntity);
   }
 
-  private void postCheckUploadFile() {
-    if (featureFlagConfig.isFeatureEnabled(FeatureFlagKey.UPLOADER_V2)) {
-      UploadDialogWidgetV2 uploadDialogWidgetV2 = getNewUploadDialogWidgetV2();
-      uploadDialogWidgetV2.configure(entityBundle.getEntity().getId());
-      uploadDialogWidgetV2.show();
-    } else {
-      UploadDialogWidget uploadDialogWidget = getNewUploadDialogWidget();
-      uploadDialogWidget.configure(
-        DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK,
-        entityBundle.getEntity(),
-        null,
-        null,
-        true
-      );
-      uploadDialogWidget.disableMultipleFileUploads();
-      uploadDialogWidget.setUploaderLinkNameVisible(false);
-      uploadDialogWidget.show();
-    }
+  private void postCheckUploadEntity() {
+    getUploadDialogWidget().show();
   }
 
   private void onSubmit() {

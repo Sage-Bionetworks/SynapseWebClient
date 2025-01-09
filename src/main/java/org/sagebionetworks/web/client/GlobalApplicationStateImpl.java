@@ -18,7 +18,11 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.inject.Inject;
+import elemental2.dom.DomGlobal;
+import elemental2.dom.DragEvent;
+import elemental2.dom.EventListener;
 import elemental2.dom.FileList;
+import elemental2.dom.HTMLDivElement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -483,61 +487,61 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
   public void initializeDropZone() {
     if (!isDragDropInitialized) {
       isDragDropInitialized = true;
-      Element dropZoneElement = RootPanel.get("dropzone").getElement();
-      Element rootPanelElement = RootPanel.get("rootPanel").getElement();
-      _initializeDragDrop(this, dropZoneElement, rootPanelElement);
+      HTMLDivElement dropZoneElement =
+        (HTMLDivElement) DomGlobal.document.querySelector("[id=\"dropzone\"]");
+      HTMLDivElement rootPanelElement =
+        (HTMLDivElement) DomGlobal.document.querySelector("[id=\"rootPanel\"]");
+      initializeDragDrop(this, dropZoneElement, rootPanelElement);
     }
   }
 
-  private static final native void _initializeDragDrop(
+  private static void initializeDragDrop(
     GlobalApplicationStateImpl globalAppState,
-    Element dropZone,
-    Element rootPanel
-  ) /*-{
-		try {
-			function showDropZone() {
-				dropZone.style.display = "block";
-			}
+    HTMLDivElement dropZone,
+    HTMLDivElement rootPanel
+  ) {
+    try {
+      Runnable showDropZone = () -> dropZone.style.set("display", "block");
+      Runnable hideDropZone = () -> dropZone.style.set("display", "none");
 
-			function hideDropZone() {
-				dropZone.style.display = "none";
-			}
+      DomGlobal.window.addEventListener(
+        "dragenter",
+        e -> {
+          if (globalAppState.isDragAndDropListenerSet()) {
+            showDropZone.run();
+          }
+        }
+      );
 
-			$wnd
-					.addEventListener(
-							'dragenter',
-							function(e) {
-								if (globalAppState.@org.sagebionetworks.web.client.GlobalApplicationStateImpl::isDragAndDropListenerSet()()) {
-									showDropZone();
-								}
-							});
+      EventListener allowDrag = e -> {
+        if (e instanceof DragEvent) {
+          ((DragEvent) e).dataTransfer.dropEffect = "copy";
+          e.preventDefault();
+        }
+      };
+      EventListener handleDrop = e -> {
+        if (e instanceof DragEvent) {
+          e.preventDefault();
+          hideDropZone.run();
+          globalAppState.onDrop(((DragEvent) e).dataTransfer.files);
+        }
+      };
 
-			function allowDrag(e) {
-				e.dataTransfer.dropEffect = 'copy';
-				e.preventDefault();
-			}
+      dropZone.addEventListener("dragenter", allowDrag);
+      dropZone.addEventListener("dragover", allowDrag);
 
-			function handleDrop(e) {
-				e.preventDefault();
-				hideDropZone();
-				globalAppState.@org.sagebionetworks.web.client.GlobalApplicationStateImpl::onDrop(Lelemental2/dom/FileList;)(e.dataTransfer.files);
-			}
+      dropZone.addEventListener("drop", handleDrop);
+      dropZone.addEventListener("dragend", e -> hideDropZone.run());
+      dropZone.addEventListener("dragleave", e -> hideDropZone.run());
 
-			dropZone.addEventListener('dragenter', allowDrag);
-			dropZone.addEventListener('dragover', allowDrag);
-
-			dropZone.addEventListener('drop', handleDrop);
-
-			//if files are dropped into the root panel, then ignore the event (do not open file contents if user does not have the upload dialog open).
-			rootPanel.addEventListener('drop', function(e) {
-				e.preventDefault();
-			});
-			rootPanel.addEventListener('dragenter', allowDrag);
-			rootPanel.addEventListener('dragover', allowDrag);
-		} catch (err) {
-			console.error(err);
-		}
-	}-*/;
+      //if files are dropped into the root panel, then ignore the event (do not open file contents if user does not have the upload dialog open).
+      rootPanel.addEventListener("drop", elemental2.dom.Event::preventDefault);
+      rootPanel.addEventListener("dragenter", allowDrag);
+      rootPanel.addEventListener("dragover", allowDrag);
+    } catch (Exception e) {
+      DomGlobal.console.error("Error on drag-and-drop initialization", e);
+    }
+  }
 
   @Override
   public void setDropZoneHandler(CallbackP<FileList> fileListCallback) {
