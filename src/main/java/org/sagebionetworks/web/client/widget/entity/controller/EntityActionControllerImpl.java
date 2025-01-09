@@ -545,7 +545,6 @@ public class EntityActionControllerImpl
   }
 
   private UploadDialogWidgetV2 getUploadDialogWidget() {
-    // Note: there must only be one UploadDialogWidget
     if (uploadDialogWidgetV2 == null) {
       uploadDialogWidgetV2 = ginInjector.getUploadDialogWidget();
       view.setUploadDialogWidget(uploadDialogWidgetV2.asWidget());
