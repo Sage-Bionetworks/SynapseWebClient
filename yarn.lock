@@ -677,7 +677,7 @@
   resolved "https://registry.yarnpkg.com/@babel/parser/-/parser-7.25.0.tgz#9fdc9237504d797b6e7b8f66e78ea7f570d256ad"
   integrity sha512-CzdIU9jdP0dg7HdyB+bHvDJGagUv+qtzZt5rYCWwW6tITNqV9odjp6Qu41gkG0ca5UfdDUWrKkiAnHHdGRnOrA==
 
-"@babel/runtime@^7.0.0", "@babel/runtime@^7.1.2", "@babel/runtime@^7.11.0", "@babel/runtime@^7.12.0", "@babel/runtime@^7.12.5", "@babel/runtime@^7.13.8", "@babel/runtime@^7.14.0", "@babel/runtime@^7.14.8", "@babel/runtime@^7.18.3", "@babel/runtime@^7.2.0", "@babel/runtime@^7.22.6", "@babel/runtime@^7.23.2", "@babel/runtime@^7.23.9", "@babel/runtime@^7.5.5", "@babel/runtime@^7.6.3", "@babel/runtime@^7.8.7":
+"@babel/runtime@^7.0.0", "@babel/runtime@^7.1.2", "@babel/runtime@^7.11.0", "@babel/runtime@^7.12.0", "@babel/runtime@^7.12.5", "@babel/runtime@^7.13.8", "@babel/runtime@^7.14.0", "@babel/runtime@^7.14.8", "@babel/runtime@^7.18.3", "@babel/runtime@^7.2.0", "@babel/runtime@^7.23.2", "@babel/runtime@^7.23.9", "@babel/runtime@^7.5.5", "@babel/runtime@^7.6.3", "@babel/runtime@^7.8.7":
   version "7.25.0"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.25.0.tgz#3af9a91c1b739c569d5d80cc917280919c544ecb"
   integrity sha512-7dRy4DwXwtzBrPbZflqxnvfxLF8kdZXPkhymtDeFoFqE6ldzjQFgYTtYIFARcLEYDrqfBfYcZt1WqFxRoyC9Rw==
@@ -1446,18 +1446,6 @@
   resolved "https://registry.yarnpkg.com/@sage-bionetworks/markdown-it-container/-/markdown-it-container-4.0.1.tgz#430022ac2553a83f6c48892efe465d01e64cb3a8"
   integrity sha512-ufgmV+kGlP7sYNanlsjzx+D+ZywmW/QE3gIolffm8H2Zix3/hpO65FrWmXPlKslz32WUdRZsmjD+2AJKOO0AFg==
 
-"@sage-bionetworks/react-base-table@^1.13.4":
-  version "1.13.4"
-  resolved "https://registry.yarnpkg.com/@sage-bionetworks/react-base-table/-/react-base-table-1.13.4.tgz#7b1b2ab6a60cd7144b0fc3b355ee06da9b0127fa"
-  integrity sha512-gbzTq6aso1iWr4n11omcq9PtClEWRaqYC01LR2JoTnsg8Y3/UyQZ5HAtZUn/QCinfZlbwMu/VjlMBjKGIcpyMw==
-  dependencies:
-    "@babel/runtime" "^7.22.6"
-    classnames "^2.3.2"
-    memoize-one "^6.0.0"
-    prop-types "^15.8.1"
-    react-virtualized-auto-sizer "^1.0.20"
-    react-window "^1.8.9"
-
 "@sage-bionetworks/synapse-client@0.0.1":
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/@sage-bionetworks/synapse-client/-/synapse-client-0.0.1.tgz#7466df20b44bc53fd07f01135daff0df1f2b214e"
@@ -2004,17 +1992,29 @@
   dependencies:
     "@tanstack/query-core" "5.22.2"
 
-"@tanstack/react-table@^8.20.5":
-  version "8.20.5"
-  resolved "https://registry.yarnpkg.com/@tanstack/react-table/-/react-table-8.20.5.tgz#19987d101e1ea25ef5406dce4352cab3932449d8"
-  integrity sha512-WEHopKw3znbUZ61s9i0+i9g8drmDo6asTWbrQh8Us63DAk/M0FkmIqERew6P71HI75ksZ2Pxyuf4vvKh9rAkiA==
+"@tanstack/react-table@^8.20.6":
+  version "8.20.6"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-table/-/react-table-8.20.6.tgz#a1f3103327aa59aa621931f4087a7604a21054d0"
+  integrity sha512-w0jluT718MrOKthRcr2xsjqzx+oEM7B7s/XXyfs19ll++hlId3fjTm+B2zrR3ijpANpkzBAr15j1XGVOMxpggQ==
   dependencies:
     "@tanstack/table-core" "8.20.5"
+
+"@tanstack/react-virtual@^3.11.1":
+  version "3.11.2"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-virtual/-/react-virtual-3.11.2.tgz#d6b9bd999c181f0a2edce270c87a2febead04322"
+  integrity sha512-OuFzMXPF4+xZgx8UzJha0AieuMihhhaWG0tCqpp6tDzlFwOmNBPYMuLOtMJ1Tr4pXLHmgjcWhG6RlknY2oNTdQ==
+  dependencies:
+    "@tanstack/virtual-core" "3.11.2"
 
 "@tanstack/table-core@8.20.5":
   version "8.20.5"
   resolved "https://registry.yarnpkg.com/@tanstack/table-core/-/table-core-8.20.5.tgz#3974f0b090bed11243d4107283824167a395cf1d"
   integrity sha512-P9dF7XbibHph2PFRz8gfBKEXEY/HJPOhym8CHmjF8y3q5mWpKx9xtZapXQUWCgkqvsK0R46Azuz+VaxD4Xl+Tg==
+
+"@tanstack/virtual-core@3.11.2":
+  version "3.11.2"
+  resolved "https://registry.yarnpkg.com/@tanstack/virtual-core/-/virtual-core-3.11.2.tgz#00409e743ac4eea9afe5b7708594d5fcebb00212"
+  integrity sha512-vTtpNt7mKCiZ1pwU9hfKPhpdVO2sVzFQsxoVBGtOSHxlrRRzYr8iQ2TlwbAcRYCcEiZ9ECAM8kBzH0v2+VzfKw==
 
 "@turf/area@^6.4.0":
   version "6.5.0"
@@ -2865,7 +2865,7 @@ classcat@^5.0.3, classcat@^5.0.4:
   resolved "https://registry.yarnpkg.com/classcat/-/classcat-5.0.5.tgz#8c209f359a93ac302404a10161b501eba9c09c77"
   integrity sha512-JhZUT7JFcQy/EzW605k/ktHtncoo9vnyW/2GspNYwFlN1C/WmjuV/xtS04e9SOkL2sTdw0VAZ2UGCcQ9lR6p6w==
 
-classnames@^2.3.1, classnames@^2.3.2, classnames@^2.5.1:
+classnames@^2.3.1, classnames@^2.5.1:
   version "2.5.1"
   resolved "https://registry.yarnpkg.com/classnames/-/classnames-2.5.1.tgz#ba774c614be0f016da105c858e7159eae8e7687b"
   integrity sha512-saHYOzhIQs6wy2sVxTM6bUDsQO4F50V9RQ22qBpEdCW+I+/Wmke2HOl6lS6dTpdxVhb88/I6+Hs+438c3lfUow==
@@ -6273,7 +6273,7 @@ react-type-animation@^3.2.0:
   resolved "https://registry.yarnpkg.com/react-type-animation/-/react-type-animation-3.2.0.tgz#6863d5d60e3beb237f2bd690cceb585402c47e6a"
   integrity sha512-WXTe0i3rRNKjmggPvT5ntye1QBt0ATGbijeW6V3cQe2W0jaMABXXlPPEdtofnS9tM7wSRHchEvI9SUw+0kUohw==
 
-react-virtualized-auto-sizer@^1.0.20, react-virtualized-auto-sizer@^1.0.24:
+react-virtualized-auto-sizer@^1.0.24:
   version "1.0.24"
   resolved "https://registry.yarnpkg.com/react-virtualized-auto-sizer/-/react-virtualized-auto-sizer-1.0.24.tgz#3ebdc92f4b05ad65693b3cc8e7d8dd54924c0227"
   integrity sha512-3kCn7N9NEb3FlvJrSHWGQ4iVl+ydQObq2fHMn12i5wbtm74zHOPhz/i64OL3c1S1vi9i2GXtZqNqUJTQ+BnNfg==
@@ -6286,7 +6286,7 @@ react-vtree@3.0.0-beta.3:
     "@babel/runtime" "^7.11.0"
     react-merge-refs "^1.1.0"
 
-react-window@^1.8.10, react-window@^1.8.9:
+react-window@^1.8.10:
   version "1.8.10"
   resolved "https://registry.yarnpkg.com/react-window/-/react-window-1.8.10.tgz#9e6b08548316814b443f7002b1cf8fd3a1bdde03"
   integrity sha512-Y0Cx+dnU6NLa5/EvoHukUD0BklJ8qITCtVEPY1C/nL8wwoZ0b5aEw8Ff1dOVHw7fCzMt55XfJDd8S8W8LCaUCg==
@@ -7060,10 +7060,10 @@ svg-path-sdf@^1.1.3:
     parse-svg-path "^0.1.2"
     svg-path-bounds "^1.0.1"
 
-synapse-react-client@3.3.34:
-  version "3.3.34"
-  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-3.3.34.tgz#34187daabdcbd30b4c2fa4924f07de83f9106d38"
-  integrity sha512-4Wb0zRrS2iL4gughXv0RCu57A0eK7gU+fiwbOu5+RMabUx+AT+2MTIACsPLJR22R29kEO6Lh3Y+DwJfUvG1COA==
+synapse-react-client@3.3.35:
+  version "3.3.35"
+  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-3.3.35.tgz#a00eeb0423d0d87f1ae0410c893dc25a6c105039"
+  integrity sha512-ug1qJagUCYY56hzdnd0pGyra/FJsT2HT8nDvwK/zv+zszqJ4jZfMHe79poyKmhZKw8SWhzDObLF4Lkc2C8WBRw==
   dependencies:
     "@apidevtools/json-schema-ref-parser" "^9.1.2"
     "@aws-sdk/client-s3" "^3.682.0"
@@ -7086,13 +7086,13 @@ synapse-react-client@3.3.34:
     "@rjsf/utils" "5.17.1"
     "@rjsf/validator-ajv8" "5.17.1"
     "@sage-bionetworks/markdown-it-container" "4.0.1"
-    "@sage-bionetworks/react-base-table" "^1.13.4"
     "@sage-bionetworks/synapse-client" "0.0.1"
     "@sage-bionetworks/synapse-types" "0.0.4"
     "@tanstack/query-core" "5.22.2"
     "@tanstack/react-query" "5.22.2"
     "@tanstack/react-query-devtools" "5.24.0"
-    "@tanstack/react-table" "^8.20.5"
+    "@tanstack/react-table" "^8.20.6"
+    "@tanstack/react-virtual" "^3.11.1"
     "@upsetjs/react" "^1.11.0"
     animate.css "^4.1.1"
     bootstrap "^4.6.2"
