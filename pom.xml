@@ -314,7 +314,6 @@
               <directory>
                 ${project.basedir}/node_modules/synapse-react-client/dist/umd
               </directory>
-              <!--              <directory>${project.basedir}/node_modules</directory>-->
             </watch>
           </watches>
           <goals>
