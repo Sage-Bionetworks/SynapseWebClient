@@ -422,6 +422,12 @@ end sticky footer
     color: $synapse-dark-text;
   }
 
+  @media (max-width: 500px) {
+    .btn-default-wide {
+      width: 100%;
+    }
+  }
+
   .btn {
     @include border-radius(2px);
     font-weight: bold;
