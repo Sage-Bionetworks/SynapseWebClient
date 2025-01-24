@@ -33,6 +33,7 @@ import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
@@ -93,6 +94,9 @@ public class EntityPageTopTest {
 
   @Mock
   FileEntity mockFileEntity;
+
+  @Mock
+  Folder mockFolderEntity;
 
   @Mock
   TableEntity mockTableEntity;
@@ -1270,6 +1274,54 @@ public class EntityPageTopTest {
     verify(mockChallengeInnerTab, atLeastOnce()).setTabListItemVisible(false);
     verify(mockDiscussionInnerTab, atLeastOnce()).setTabListItemVisible(false);
     verify(mockDockerInnerTab, atLeastOnce()).setTabListItemVisible(false);
+  }
+
+  // SWC-7233 (File test)
+  @Test
+  public void testFilesTabShownIfFileConfigured() {
+    Synapse.EntityArea area = null;
+    String areaToken = null;
+    Long versionNumber = null;
+    AsyncMockStubber
+      .callSuccessWith(false)
+      .when(mockSynapseJavascriptClient)
+      .isFileOrFolder(anyString(), any(AsyncCallback.class));
+
+    when(mockEntityBundle.getEntity()).thenReturn(mockFileEntity);
+    pageTop.configure(
+      mockEntityBundle,
+      versionNumber,
+      mockProjectHeader,
+      area,
+      areaToken
+    );
+    verify(mockSynapseJavascriptClient, never())
+      .isFileOrFolder(anyString(), any(AsyncCallback.class));
+    verify(mockFilesInnerTab, atLeastOnce()).setTabListItemVisible(true);
+  }
+
+  // SWC-7233 (Folder test)
+  @Test
+  public void testFilesTabShownIfFolderConfigured() {
+    Synapse.EntityArea area = null;
+    String areaToken = null;
+    Long versionNumber = null;
+    AsyncMockStubber
+      .callSuccessWith(false)
+      .when(mockSynapseJavascriptClient)
+      .isFileOrFolder(anyString(), any(AsyncCallback.class));
+
+    when(mockEntityBundle.getEntity()).thenReturn(mockFolderEntity);
+    pageTop.configure(
+      mockEntityBundle,
+      versionNumber,
+      mockProjectHeader,
+      area,
+      areaToken
+    );
+    verify(mockSynapseJavascriptClient, never())
+      .isFileOrFolder(anyString(), any(AsyncCallback.class));
+    verify(mockFilesInnerTab, atLeastOnce()).setTabListItemVisible(true);
   }
 
   @Test

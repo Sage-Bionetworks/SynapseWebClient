@@ -675,10 +675,21 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
         projectHeader.getId(),
         getTabVisibilityCallback(EntityArea.WIKI, wikiTab.asTab())
       );
-      synapseJavascriptClient.isFileOrFolder(
-        projectHeader.getId(),
+      // SWC-7233: It's possible that the Project has no children visible to the current user.
+      // But show the tab if the filesEntityBundle points to a target FileEntity or Folder
+      if (
+        currentTargetEntityBundle != null &&
+        (currentTargetEntityBundle.getEntity() instanceof FileEntity ||
+          currentTargetEntityBundle.getEntity() instanceof Folder)
+      ) {
         getTabVisibilityCallback(EntityArea.FILES, filesTab.asTab())
-      );
+          .onSuccess(true);
+      } else {
+        synapseJavascriptClient.isFileOrFolder(
+          projectHeader.getId(),
+          getTabVisibilityCallback(EntityArea.FILES, filesTab.asTab())
+        );
+      }
       synapseJavascriptClient.isEntityRefCollectionView(
         projectHeader.getId(),
         getTabVisibilityCallback(EntityArea.DATASETS, datasetsTab.asTab())
