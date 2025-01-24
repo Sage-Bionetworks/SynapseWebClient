@@ -12,7 +12,7 @@ public class SynapseChatProps extends ReactComponentProps {
   public String initialMessage;
 
   @JsNullable
-  public String agentId;
+  public String agentRegistrationId;
 
   @JsNullable
   public String chatbotName;
@@ -20,15 +20,15 @@ public class SynapseChatProps extends ReactComponentProps {
   @JsOverlay
   public static SynapseChatProps create(
     String initialMessage,
-    String agentId,
+    String agentRegistrationId,
     String chatbotName
   ) {
     SynapseChatProps props = new SynapseChatProps();
     if (initialMessage != null) {
       props.initialMessage = initialMessage;
     }
-    if (agentId != null) {
-      props.agentId = agentId;
+    if (agentRegistrationId != null) {
+      props.agentRegistrationId = agentRegistrationId;
     }
     if (chatbotName != null) {
       props.chatbotName = chatbotName;

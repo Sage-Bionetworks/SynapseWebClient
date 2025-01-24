@@ -1,8 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.upload;
 
+import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
@@ -10,7 +9,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.google.gwt.core.client.JavaScriptObject;
+import elemental2.dom.File;
+import elemental2.dom.FileList;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -18,21 +18,21 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJsInteropUtils;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
 import org.sagebionetworks.web.client.widget.upload.ImageUploadView;
 import org.sagebionetworks.web.client.widget.upload.ImageUploadWidget;
-import org.sagebionetworks.web.client.widget.upload.JavaScriptObjectWrapper;
 import org.sagebionetworks.web.client.widget.upload.MultipartUploader;
 import org.sagebionetworks.web.client.widget.upload.ProgressingFileUploadHandler;
+import org.springframework.test.util.ReflectionTestUtils;
 
 public class ImageUploadWidgetImplTest {
 
   @Mock
-  SynapseJSNIUtils mockJSNIUtils;
+  SynapseJsInteropUtils mockJsInteropUtils;
 
   @Mock
   ImageUploadView mockView;
@@ -50,6 +50,9 @@ public class ImageUploadWidgetImplTest {
   FileMetadata mockMetadata;
 
   @Mock
+  FileList mockFileList;
+
+  @Mock
   PortalGinInjector mockPortalGinInjector;
 
   @Captor
@@ -59,7 +62,7 @@ public class ImageUploadWidgetImplTest {
   SynapseAlert mockSynAlert;
 
   @Mock
-  JavaScriptObjectWrapper mockBlob;
+  File mockFile;
 
   String fileHandleId = "222";
   String testFileName = "testing.txt";
@@ -70,7 +73,7 @@ public class ImageUploadWidgetImplTest {
     widget =
       new ImageUploadWidget(
         mockMultipartUploader,
-        mockJSNIUtils,
+        mockJsInteropUtils,
         mockSynAlert,
         mockPortalGinInjector
       );
@@ -78,9 +81,11 @@ public class ImageUploadWidgetImplTest {
 
     // The metadata returned should correspond to testFileName
     when(mockView.getInputId()).thenReturn(inputId);
-    when(mockJSNIUtils.getMultipleUploadFileNames(any()))
+    when(mockJsInteropUtils.getFileList(inputId)).thenReturn(mockFileList);
+    when(mockFileList.item(anyDouble())).thenReturn(mockFile);
+    when(mockJsInteropUtils.getMultipleUploadFileNames(any()))
       .thenReturn(new String[] { "testName.png" });
-    when(mockJSNIUtils.getContentType(any(), anyInt())).thenReturn("image/png");
+    ReflectionTestUtils.setField(mockFile, "type", "image/png");
     when(mockPortalGinInjector.getImageUploadView()).thenReturn(mockView);
   }
 
@@ -101,7 +106,7 @@ public class ImageUploadWidgetImplTest {
     widget.configure(mockCallback);
 
     // method under test.
-    widget.onFileProcessed(mockBlob, null);
+    widget.onFileProcessed(mockFile, null);
     verify(mockView).updateProgress(1, "1%");
     verify(mockView).showProgress(true);
     verify(mockView).setInputEnabled(false);
@@ -135,7 +140,7 @@ public class ImageUploadWidgetImplTest {
   @Test
   public void testFileSelectedForceContentType() {
     widget.configure(mockCallback);
-    widget.onFileProcessed(mockBlob, "image/jpeg");
+    widget.onFileProcessed(mockFile, "image/jpeg");
     verify(mockMultipartUploader)
       .uploadFile(
         any(),
@@ -159,10 +164,9 @@ public class ImageUploadWidgetImplTest {
 
   @Test
   public void testFileSelectedFailed() {
-    when(mockJSNIUtils.getMultipleUploadFileNames(any()))
+    when(mockJsInteropUtils.getMultipleUploadFileNames(any()))
       .thenReturn(new String[] { "testName.raw" });
-    when(mockJSNIUtils.getContentType(any(), anyInt()))
-      .thenReturn("notanimage/raw");
+    ReflectionTestUtils.setField(mockFile, "type", "notanimage/raw");
 
     // Configure before the test
     widget.configure(mockCallback);

@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -44,6 +47,7 @@ import org.sagebionetworks.web.client.widget.doi.DoiWidgetV2;
 import org.sagebionetworks.web.client.widget.entity.*;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWidget;
+import org.sagebionetworks.web.client.widget.projectdataavailability.ProjectDataAvailability;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
@@ -54,9 +58,6 @@ public class EntityMetadataTest {
 
   @Mock
   DoiWidgetV2 mockDoiWidgetV2;
-
-  @Mock
-  RestrictionWidget mockRestrictionWidgetV2;
 
   @Mock
   VersionHistoryWidget mockFileHistoryWidget;
@@ -77,13 +78,13 @@ public class EntityMetadataTest {
   CookieProvider mockCookies;
 
   @Mock
-  ContainerItemCountWidget mockItemCountWidget;
-
-  @Mock
   PortalGinInjector mockGinInjector;
 
   @Mock
   EntityModalWidget mockEntityModalWidget;
+
+  @Mock
+  ProjectDataAvailability mockProjectDataAvailability;
 
   String entityId = "syn123";
   String entityName = "testEntity";
@@ -95,6 +96,8 @@ public class EntityMetadataTest {
   public void before() {
     when(mockGinInjector.getVersionHistoryWidget())
       .thenReturn(mockFileHistoryWidget);
+    when(mockGinInjector.getProjectDataAvailability())
+      .thenReturn(mockProjectDataAvailability);
     when(mockGinInjector.getCookieProvider()).thenReturn(mockCookies);
     widget =
       new EntityMetadata(
@@ -102,8 +105,6 @@ public class EntityMetadataTest {
         mockDoiWidgetV2,
         mockJsClient,
         mockJSNI,
-        mockRestrictionWidgetV2,
-        mockItemCountWidget,
         mockGinInjector,
         mockEntityModalWidget
       );
@@ -113,9 +114,6 @@ public class EntityMetadataTest {
   public void testConstruction() {
     verify(mockView).setDoiWidget(any(IsWidget.class));
     verify(mockView, never()).setVersionHistoryWidget(any(IsWidget.class)); // lazily created
-    verify(mockView).setRestrictionWidgetV2(any(IsWidget.class));
-    verify(mockRestrictionWidgetV2).setShowChangeLink(true);
-    verify(mockView).setRestrictionWidgetV2Visible(true);
   }
 
   @Test
@@ -127,7 +125,6 @@ public class EntityMetadataTest {
     UserEntityPermissions permissions = mock(UserEntityPermissions.class);
     boolean canChangePermissions = false;
     boolean canCertifiedUserEdit = true;
-    boolean isCurrentVersion = true;
     when(permissions.getCanChangePermissions())
       .thenReturn(canChangePermissions);
     when(permissions.getCanCertifiedUserEdit())
@@ -141,11 +138,8 @@ public class EntityMetadataTest {
     bundle.setDoiAssociation(mockDoiAssociation);
     widget.configure(bundle, null, mockActionMenuWidget);
     verify(mockView).setDetailedMetadataVisible(true);
-    verify(mockView).setRestrictionPanelVisible(false);
     verify(mockDoiWidgetV2).configure(mockDoiAssociation);
-    verify(mockRestrictionWidgetV2).configure(project, canChangePermissions);
-    verify(mockView, never()).setRestrictionWidgetV2Visible(false);
-    verify(mockItemCountWidget, never()).configure(anyString());
+    verify(mockProjectDataAvailability).setProjectId(entityId);
   }
 
   @Test
@@ -158,7 +152,6 @@ public class EntityMetadataTest {
     UserEntityPermissions permissions = mock(UserEntityPermissions.class);
     boolean canChangePermissions = false;
     boolean canCertifiedUserEdit = true;
-    boolean isCurrentVersion = true;
     when(permissions.getCanChangePermissions())
       .thenReturn(canChangePermissions);
     when(permissions.getCanCertifiedUserEdit())
@@ -172,11 +165,8 @@ public class EntityMetadataTest {
     bundle.setDoiAssociation(mockDoiAssociation);
     widget.configure(bundle, null, mockActionMenuWidget);
     verify(mockView).setDetailedMetadataVisible(true);
-    verify(mockView).setRestrictionPanelVisible(false);
     verify(mockDoiWidgetV2).configure(mockDoiAssociation);
-    verify(mockRestrictionWidgetV2).configure(project, canChangePermissions);
-    verify(mockView, never()).setRestrictionWidgetV2Visible(false);
-    verify(mockItemCountWidget, never()).configure(anyString());
+    verify(mockProjectDataAvailability).setProjectId(entityId);
   }
 
   @Test
@@ -184,7 +174,6 @@ public class EntityMetadataTest {
     UserEntityPermissions permissions = mock(UserEntityPermissions.class);
     boolean canChangePermissions = true;
     boolean canCertifiedUserEdit = false;
-    boolean isCurrentVersion = true;
     when(permissions.getCanChangePermissions())
       .thenReturn(canChangePermissions);
     when(permissions.getCanCertifiedUserEdit())
@@ -202,7 +191,6 @@ public class EntityMetadataTest {
     verify(mockFileHistoryWidget, never())
       .setEntityBundle(bundle, versionNumber);
     verify(mockDoiWidgetV2).configure(mockDoiAssociation);
-    verify(mockItemCountWidget, never()).configure(anyString());
   }
 
   @Test
@@ -502,7 +490,6 @@ public class EntityMetadataTest {
     UserEntityPermissions permissions = mock(UserEntityPermissions.class);
     boolean canChangePermissions = false;
     boolean canCertifiedUserEdit = true;
-    boolean isCurrentVersion = true;
     when(permissions.getCanChangePermissions())
       .thenReturn(canChangePermissions);
     when(permissions.getCanCertifiedUserEdit())
@@ -515,10 +502,6 @@ public class EntityMetadataTest {
     widget.configure(bundle, null, mockActionMenuWidget);
     verify(mockView).setDetailedMetadataVisible(false);
     verify(mockDoiWidgetV2).configure(mockDoiAssociation);
-    verify(mockRestrictionWidgetV2)
-      .configure(folderEntity, canChangePermissions);
-    verify(mockView, never()).setRestrictionWidgetV2Visible(false);
-    verify(mockItemCountWidget).configure(entityId);
   }
 
   @Test

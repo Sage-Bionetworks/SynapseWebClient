@@ -4,13 +4,14 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Widget;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
@@ -109,6 +110,57 @@ public class PeopleSearchPresenterTest {
     verify(mockView).setSearchTerm(searchTerm);
     verify(mockPortalGinInjector, times(3)).getUserBadgeWidget();
     verify(mockLoadMoreWidgetContainer, times(3)).add(any());
+    verify(mockView).setShowNoResults(false);
+
+    // Call loadMore with no results in the 2nd page
+    AsyncMockStubber
+      .callSuccessWith(
+        new UserGroupHeaderResponsePage().setChildren(Collections.emptyList())
+      )
+      .when(mockSynapseJavascriptClient)
+      .getUserGroupHeadersByPrefix(
+        anyString(),
+        any(TypeFilter.class),
+        anyLong(),
+        anyLong(),
+        any(AsyncCallback.class)
+      );
+
+    presenter.loadMore();
+
+    verify(mockView, never()).setShowNoResults(true);
+  }
+
+  @Test
+  public void testEmptySearch() throws RestServiceException {
+    AsyncMockStubber
+      .callSuccessWith(
+        new UserGroupHeaderResponsePage().setChildren(Collections.emptyList())
+      )
+      .when(mockSynapseJavascriptClient)
+      .getUserGroupHeadersByPrefix(
+        anyString(),
+        any(TypeFilter.class),
+        anyLong(),
+        anyLong(),
+        any(AsyncCallback.class)
+      );
+
+    String searchTerm = "test";
+    when(mockPlace.getSearchTerm()).thenReturn(searchTerm);
+    presenter.setPlace(mockPlace);
+    verify(mockSynapseJavascriptClient)
+      .getUserGroupHeadersByPrefix(
+        eq(searchTerm),
+        eq(TypeFilter.USERS_ONLY),
+        anyLong(),
+        anyLong(),
+        any(AsyncCallback.class)
+      );
+    verify(mockView).setSearchTerm(searchTerm);
+    verify(mockPortalGinInjector, never()).getUserBadgeWidget();
+    verify(mockLoadMoreWidgetContainer, never()).add(any());
+    verify(mockView).setShowNoResults(true);
   }
 
   @Test

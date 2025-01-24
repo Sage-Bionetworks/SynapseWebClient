@@ -118,7 +118,6 @@ public class EntityFinderWidgetViewImpl implements EntityFinderWidgetView {
     EntityFilter selectableEntityTypes,
     EntityFilter visibleTypesInList,
     EntityFilter visibleTypesInTree,
-    EntityFinderProps.SelectedCopyHandler selectedCopy,
     boolean treeOnly
   ) {
     entityFinderContainer.clear();
@@ -154,7 +153,6 @@ public class EntityFinderWidgetViewImpl implements EntityFinderWidgetView {
       visibleTypesInList.getEntityQueryValues(),
       visibleTypesInTree.getEntityQueryValues(),
       selectableEntityTypes.getEntityQueryValues(),
-      selectedCopy,
       treeOnly
     );
 

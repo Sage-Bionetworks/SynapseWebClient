@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.upload;
 
-import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.CanvasElement;
 import com.google.gwt.dom.client.InputElement;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -15,6 +14,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import elemental2.dom.Blob;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Form;
 import org.gwtbootstrap3.client.ui.Input;
@@ -182,7 +182,7 @@ public class ImageUploadViewImpl implements ImageUploadView {
 																																																																							$wnd.resizer.toBlob(result, 'image/jpeg', 90)
 																																																																							.then(
 																																																																							function(blob) {
-																																																																							v.@org.sagebionetworks.web.client.widget.upload.ImageUploadViewImpl::resizeComplete(Lcom/google/gwt/core/client/JavaScriptObject;)(blob);
+																																																																							v.@org.sagebionetworks.web.client.widget.upload.ImageUploadViewImpl::resizeComplete(Lelemental2/dom/Blob;)(blob);
 																																																																							});
 																																																																							});
 																																																																							};
@@ -192,7 +192,7 @@ public class ImageUploadViewImpl implements ImageUploadView {
 																																																																							imgElement.src = $wnd.URL.createObjectURL(file);
 																																																																							} else {
 																																																																							// send back original content
-																																																																							v.@org.sagebionetworks.web.client.widget.upload.ImageUploadViewImpl::noResizeNecessary(Lcom/google/gwt/core/client/JavaScriptObject;)(file);
+																																																																							v.@org.sagebionetworks.web.client.widget.upload.ImageUploadViewImpl::noResizeNecessary(Lelemental2/dom/Blob;)(file);
 																																																																							}
 																																																																							}-*/;
 
@@ -204,14 +204,16 @@ public class ImageUploadViewImpl implements ImageUploadView {
 		console.log('pica resizer initialized');
 	}-*/;
 
-  public void resizeComplete(JavaScriptObject blob) {
+
+
+  public void resizeComplete(Blob blob) {
     loadingUI.setVisible(false);
-    presenter.onFileProcessed(new JavaScriptObjectWrapper(blob), "image/jpeg");
+    presenter.onFileProcessed(blob, "image/jpeg");
   }
 
-  public void noResizeNecessary(JavaScriptObject blob) {
+  public void noResizeNecessary(Blob blob) {
     loadingUI.setVisible(false);
-    presenter.onFileProcessed(new JavaScriptObjectWrapper(blob), null);
+    presenter.onFileProcessed(blob, null);
   }
 
   @Override

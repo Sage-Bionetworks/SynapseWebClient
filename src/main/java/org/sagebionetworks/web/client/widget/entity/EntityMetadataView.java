@@ -13,10 +13,6 @@ public interface EntityMetadataView extends IsWidget {
 
   void clear();
 
-  public void setRestrictionPanelVisible(boolean visible);
-
-  void setRestrictionWidgetV2(IsWidget restrictionWidget);
-
   void setEntityModalWidget(IsWidget widget);
 
   void setEntityId(String text);
@@ -25,9 +21,7 @@ public interface EntityMetadataView extends IsWidget {
 
   void setUploadDestinationText(String text);
 
-  void setRestrictionWidgetV2Visible(boolean visible);
-
-  void setContainerItemCountWidget(IsWidget w);
-
   void setDescription(String description);
+
+  void setProjectDataAvailabilityWidget(IsWidget widget);
 }

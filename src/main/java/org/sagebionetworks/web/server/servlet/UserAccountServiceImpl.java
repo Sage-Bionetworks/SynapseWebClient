@@ -55,18 +55,6 @@ public class UserAccountServiceImpl
   }
 
   @Override
-  public void signTermsOfUse(String accessToken) throws RestServiceException {
-    validateService();
-
-    SynapseClient synapseClient = createSynapseClient();
-    try {
-      synapseClient.signTermsOfUse(accessToken);
-    } catch (SynapseException e) {
-      throw ExceptionUtil.convertSynapseException(e);
-    }
-  }
-
-  @Override
   public void createUserStep1(NewUser newUser, String portalEndpoint)
     throws RestServiceException {
     validateService();

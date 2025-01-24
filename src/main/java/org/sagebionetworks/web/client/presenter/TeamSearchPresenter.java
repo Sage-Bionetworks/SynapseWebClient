@@ -108,6 +108,9 @@ public class TeamSearchPresenter
     >() {
       @Override
       public void onSuccess(PaginatedResults<Team> result) {
+        boolean hasNoResults = offset == 0 && result.getResults().isEmpty();
+        view.setShowNoResults(hasNoResults);
+
         for (Team team : result.getResults()) {
           BigTeamBadge teamBadge = ginInjector.getBigTeamBadgeWidget();
           teamBadge.configure(team, "");

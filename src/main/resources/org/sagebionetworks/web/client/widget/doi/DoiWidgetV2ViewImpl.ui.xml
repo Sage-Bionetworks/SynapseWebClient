@@ -2,16 +2,16 @@
 <ui:UiBinder
   xmlns:ui="urn:ui:com.google.gwt.uibinder"
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
-  xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
+  xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 >
-  <bh:Span marginRight="15">
+  <bh:Div addStyleNames="flexcontainer-column">
     <bh:Span ui:field="synAlertContainer" />
     <bh:Span
       ui:field="doiLabel"
       addStyleNames="boldText margin-right-5"
-      text="DOI: "
+      text="DOI"
       visible="false"
     />
-    <w:TextBoxWithCopyToClipboardWidget ui:field="copyToClipboardWidget" />
-  </bh:Span>
+    <b:Anchor ui:field="viewDoiLink">View DOI</b:Anchor>
+  </bh:Div>
 </ui:UiBinder>

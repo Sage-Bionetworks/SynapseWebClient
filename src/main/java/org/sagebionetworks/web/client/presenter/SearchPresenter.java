@@ -293,7 +293,7 @@ public class SearchPresenter
     SearchQuery query = getBaseSearchQuery();
 
     query.setQueryTerm(
-      Arrays.asList(queryString.replace("%20", " ").split(" "))
+      Arrays.asList(queryString.replace("%20", " ").split("\\s+"))
     );
 
     // if query parses into SearchQuery, use that, otherwise use it as a
@@ -302,7 +302,7 @@ public class SearchPresenter
       String fixedQueryString = queryString;
       // check for url encoded
       if (queryString.startsWith("%7B")) {
-        fixedQueryString = URL.decode(queryString);
+        fixedQueryString = URL.decodePathSegment(queryString);
       }
       if (fixedQueryString.startsWith("{")) {
         try {

@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.place.Challenges;
 import org.sagebionetworks.web.client.place.ChangeUsername;
 import org.sagebionetworks.web.client.place.ComingSoon;
+import org.sagebionetworks.web.client.place.DataCatalogPagePlace;
 import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.EmailInvitation;
 import org.sagebionetworks.web.client.place.ErrorPlace;
@@ -105,6 +106,7 @@ public class AppActivityMapper implements ActivityMapper {
     openAccessPlaces.add(AccessRequirementPlace.class);
     openAccessPlaces.add(TrustCenterPlace.class);
     openAccessPlaces.add(PlansPlace.class);
+    openAccessPlaces.add(DataCatalogPagePlace.class);
 
     excludeFromLastPlace = new ArrayList<Class>();
     excludeFromLastPlace.add(Home.class);
@@ -153,6 +155,10 @@ public class AppActivityMapper implements ActivityMapper {
         LoginPlace loginPlace = new LoginPlace(
           ClientProperties.DEFAULT_PLACE_TOKEN
         );
+        // SWC-7093: before redirecting to the login place, set the last place to the intended target!
+        if (!excludeFromLastPlace.contains(place.getClass())) {
+          globalApplicationState.setLastPlace(place);
+        }
         return getActivity(loginPlace);
       }
     }

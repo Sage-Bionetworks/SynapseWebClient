@@ -9,6 +9,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -38,6 +39,9 @@ public class PeopleSearchViewImpl
 
   @UiField
   TextBox searchField;
+
+  @UiField
+  HTMLPanel noSearchResultsContainer;
 
   private Header headerWidget;
   private Presenter presenter;
@@ -102,5 +106,10 @@ public class PeopleSearchViewImpl
   @Override
   public void setSynAlertWidgetVisible(boolean isVisible) {
     synAlertPanel.setVisible(isVisible);
+  }
+
+  @Override
+  public void setShowNoResults(boolean show) {
+    noSearchResultsContainer.setVisible(show);
   }
 }

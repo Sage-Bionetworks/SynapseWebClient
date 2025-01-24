@@ -18,7 +18,7 @@
     <webappDirectory>
       ${project.build.directory}/${project.build.finalName}
     </webappDirectory>
-    <synapse.version>514.0</synapse.version>
+    <synapse.version>521.0</synapse.version>
     <gwtVersion>2.11.0</gwtVersion>
     <org.springframework.version>5.3.37</org.springframework.version>
     <guiceVersion>6.0.0</guiceVersion>
@@ -214,7 +214,6 @@
         <!-- Plugin configuration. There are many available options, see gwt-maven-plugin 
 					documentation at codehaus.org -->
         <configuration>
-          <workDir>${project.build.directory}/gwt/codeserver</workDir>
           <launcherDir>${webappDirectory}</launcherDir>
           <runTarget>Portal.html</runTarget>
           <hostedWebapp>${webappDirectory}</hostedWebapp>
@@ -455,10 +454,6 @@
                   tofile="src/main/webapp/generated/react-dom.production.min.js"
                 />
                 <copy
-                  file="${project.basedir}/node_modules/react-router-dom/umd/react-router-dom.min.js"
-                  tofile="src/main/webapp/generated/react-router-dom.min.js"
-                />
-                <copy
                   file="${project.basedir}/node_modules/react-transition-group/dist/react-transition-group.min.js"
                   tofile="src/main/webapp/generated/react-transition-group.min.js"
                 />
@@ -533,6 +528,10 @@
                 <copy
                   file="${project.basedir}/node_modules/markdown-it-center-text/dist/markdown-it-center-text.min.js"
                   tofile="src/main/webapp/generated/markdown-it-center-text.js"
+                />
+                <copy
+                  file="${project.basedir}/node_modules/markdown-it-emphasis-alt/dist/markdown-it-emphasis-alt.min.js"
+                  tofile="src/main/webapp/generated/markdown-it-emphasis-alt.js"
                 />
                 <copy
                   file="${project.basedir}/node_modules/@sage-bionetworks/markdown-it-container/dist/markdown-it-container.min.js"
@@ -950,7 +949,19 @@
     <dependency>
       <groupId>com.google.jsinterop</groupId>
       <artifactId>base</artifactId>
-      <version>1.0.0</version>
+      <version>1.0.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.google.elemental2</groupId>
+      <artifactId>elemental2-core</artifactId>
+      <version>1.2.2</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.google.elemental2</groupId>
+      <artifactId>elemental2-dom</artifactId>
+      <version>1.2.2</version>
     </dependency>
   </dependencies>
 

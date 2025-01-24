@@ -352,10 +352,7 @@ public class EntityPresenter
     headerWidget.configure();
     if (caught instanceof NotFoundException) {
       show404();
-    } else if (
-      caught instanceof ForbiddenException &&
-      authenticationController.isLoggedIn()
-    ) {
+    } else if (caught instanceof ForbiddenException) {
       show403();
     } else {
       view.clear();
@@ -364,35 +361,35 @@ public class EntityPresenter
   }
 
   public void show403() {
-    if (entityId != null) {
-      synAlert.show403(entityId, versionNumber);
-    }
+    synAlert.show403(entityId, versionNumber);
     view.setLoadingVisible(false);
     view.setEntityPageTopVisible(false);
-    // also add the open team invitations widget (accepting may gain access to this project)
-    openTeamInvitesWidget.configure(
-      new Callback() {
-        @Override
-        public void invoke() {
-          // when team is updated, refresh to see if we can now access
-          refresh();
-        }
-      },
-      new CallbackP<List<OpenUserInvitationBundle>>() {
-        @Override
-        public void invoke(List<OpenUserInvitationBundle> invites) {
-          // if there are any, then also add the title text to the panel
-          if (invites != null && invites.size() > 0) {
-            view.setAccessDependentMessageVisible(true);
+    if (authenticationController.isLoggedIn()) {
+      // also add the open team invitations widget (accepting may gain access to this project)
+      openTeamInvitesWidget.configure(
+        new Callback() {
+          @Override
+          public void invoke() {
+            // when team is updated, refresh to see if we can now access
+            refresh();
+          }
+        },
+        new CallbackP<List<OpenUserInvitationBundle>>() {
+          @Override
+          public void invoke(List<OpenUserInvitationBundle> invites) {
+            // if there are any, then also add the title text to the panel
+            if (invites != null && invites.size() > 0) {
+              view.setAccessDependentMessageVisible(true);
+            }
           }
         }
-      }
-    );
-    view.setOpenTeamInvitesVisible(true);
+      );
+      view.setOpenTeamInvitesVisible(true);
+    }
   }
 
   public void show404() {
-    synAlert.show404();
+    synAlert.show404(entityId, versionNumber);
     view.setLoadingVisible(false);
     view.setEntityPageTopVisible(false);
     view.setOpenTeamInvitesVisible(false);

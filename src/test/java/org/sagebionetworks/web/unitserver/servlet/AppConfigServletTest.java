@@ -2,9 +2,14 @@ package org.sagebionetworks.web.unitserver.servlet;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.amazonaws.services.appconfigdata.AWSAppConfigData;
+import com.amazonaws.services.appconfigdata.model.BadRequestException;
 import com.amazonaws.services.appconfigdata.model.GetLatestConfigurationRequest;
 import com.amazonaws.services.appconfigdata.model.GetLatestConfigurationResult;
 import com.amazonaws.services.appconfigdata.model.StartConfigurationSessionRequest;
@@ -20,7 +25,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.server.servlet.AppConfigServlet;
 
@@ -134,7 +138,7 @@ public class AppConfigServletTest {
   }
 
   @Test
-  public void testGetLatestConfiguration_Failure() {
+  public void testGetLatestConfiguration_Failure_ReturnDefaultValueWhenNoLastValue() {
     String DEFAULT_CONFIG_VALUE = "{}";
     when(
       mockAppConfigDataClient.getLatestConfiguration(
@@ -143,10 +147,85 @@ public class AppConfigServletTest {
     )
       .thenThrow(new RuntimeException("Failed to retrieve configuration"));
 
-    servlet.configurationToken = "mockToken"; // Setting the initial configuration token
     JSONObjectAdapter configValue = servlet.getLatestConfiguration();
 
     assertEquals(DEFAULT_CONFIG_VALUE, configValue.toString());
+  }
+
+  @Test
+  public void testGetLatestConfiguration_Failure_ReturnLastValue() {
+    // Set the initial configuration token
+    servlet.configurationToken = "mockToken";
+
+    // Set up a successful response
+    ByteBuffer mockByteBuffer = ByteBuffer
+      .wrap("{\"test configuration\":true}".getBytes())
+      .asReadOnlyBuffer();
+    GetLatestConfigurationResult mockConfigResult =
+      new GetLatestConfigurationResult()
+        .withConfiguration(mockByteBuffer)
+        .withNextPollConfigurationToken("new-mock-token");
+
+    when(
+      mockAppConfigDataClient.getLatestConfiguration(
+        any(GetLatestConfigurationRequest.class)
+      )
+    )
+      .thenReturn(mockConfigResult);
+
+    // Initial call succeeds
+    servlet.getLatestConfiguration();
+
+    // Next call will fail, but should return the old value
+    when(
+      mockAppConfigDataClient.getLatestConfiguration(
+        any(GetLatestConfigurationRequest.class)
+      )
+    )
+      .thenThrow(new RuntimeException("Failed to retrieve configuration"));
+
+    JSONObjectAdapter configValue = servlet.getLatestConfiguration();
+
+    assertEquals(mockConfiguration.toString(), configValue.toString());
+
+    // Do not attempt to re-initialize the client
+    verify(mockAppConfigDataClient, never()).startConfigurationSession(any());
+
+    // Try again, but with a recoverable exception
+    when(
+      mockAppConfigDataClient.getLatestConfiguration(
+        any(GetLatestConfigurationRequest.class)
+      )
+    )
+      .thenThrow(new BadRequestException("Token is invalid"));
+
+    configValue = servlet.getLatestConfiguration();
+
+    assertEquals(mockConfiguration.toString(), configValue.toString());
+
+    // We should attempt to re-initialize the client
+    verify(mockAppConfigDataClient).startConfigurationSession(any());
+  }
+
+  @Test
+  public void testGetLatestConfiguration_Failure_NullToken() {
+    String DEFAULT_CONFIG_VALUE = "{}";
+    servlet.configurationToken = null;
+
+    when(
+      mockAppConfigDataClient.getLatestConfiguration(
+        any(GetLatestConfigurationRequest.class)
+      )
+    )
+      .thenThrow(new RuntimeException("Failed to retrieve configuration"));
+
+    JSONObjectAdapter configValue = servlet.getLatestConfiguration();
+
+    assertEquals(DEFAULT_CONFIG_VALUE, configValue.toString());
+    // Verify we never called getLatestConfiguration
+    verify(mockAppConfigDataClient, never()).getLatestConfiguration(any());
+    // Verify we do not try to reinitialize the client
+    verify(mockAppConfigDataClient, never()).startConfigurationSession(any());
   }
 
   @Test

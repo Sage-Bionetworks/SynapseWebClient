@@ -3,15 +3,16 @@ package org.sagebionetworks.web.unitclient.widget.upload;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.ContentTypeUtils.fixDefaultContentType;
 
-import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.logical.shared.HasAttachHandlers;
+import elemental2.dom.Blob;
+import elemental2.promise.IThenable;
+import elemental2.promise.Promise;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -24,8 +25,6 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.ProgressCallback;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseProperties;
-import org.sagebionetworks.web.client.jsinterop.Promise;
-import org.sagebionetworks.web.client.jsinterop.Promise.FunctionParam;
 import org.sagebionetworks.web.client.jsinterop.SRC.SynapseClient.FileUploadComplete;
 import org.sagebionetworks.web.client.jsinterop.SRC.SynapseClient.IsCancelled;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -63,7 +62,7 @@ public class MultipartUploaderImplV2Test {
   ArgumentCaptor<ProgressCallback> progressCaptor;
 
   @Mock
-  JavaScriptObject mockFileBlob;
+  Blob mockFileBlob;
 
   @Mock
   SRCUploadFileWrapper mockSRCUploadFileWrapper;
@@ -81,11 +80,14 @@ public class MultipartUploaderImplV2Test {
   FileUploadComplete mockFileUploadComplete;
 
   @Captor
-  ArgumentCaptor<FunctionParam> promiseHandlerCaptor;
+  ArgumentCaptor<IThenable.ThenOnFulfilledCallbackFn> promiseThenCaptor;
+
+  @Captor
+  ArgumentCaptor<Promise.CatchOnRejectedCallbackFn> promiseCatchCaptor;
 
   public static final String UPLOAD_ID = "39282";
   public static final String RESULT_FILE_HANDLE_ID = "999999";
-  public static final double FILE_SIZE = 9281;
+  public static final int FILE_SIZE = 9281;
   public static final String FILE_NAME = "file.txt";
   public static final String CONTENT_TYPE = "text/plain";
   public static final long defaultStorageLocationId = 1L;
@@ -107,7 +109,7 @@ public class MultipartUploaderImplV2Test {
     )
       .thenReturn(mockPromise);
 
-    when(synapseJsniUtils.getFileSize(any())).thenReturn(FILE_SIZE);
+    mockFileBlob.size = FILE_SIZE;
 
     when(
       mockSynapseProperties.getSynapseProperty(
@@ -132,8 +134,7 @@ public class MultipartUploaderImplV2Test {
 
   @Test
   public void testDirectUploadEmptyFile() throws Exception {
-    when(synapseJsniUtils.getFileSize(any(JavaScriptObject.class)))
-      .thenReturn(0.0);
+    mockFileBlob.size = 0;
     uploader.uploadFile(
       FILE_NAME,
       CONTENT_TYPE,
@@ -156,10 +157,11 @@ public class MultipartUploaderImplV2Test {
       mockView
     );
 
-    verify(mockPromise).then(promiseHandlerCaptor.capture());
-    FunctionParam thenHandler = promiseHandlerCaptor.getValue();
+    verify(mockPromise).then(promiseThenCaptor.capture());
+    IThenable.ThenOnFulfilledCallbackFn thenHandler =
+      promiseThenCaptor.getValue();
 
-    thenHandler.exec(mockFileUploadComplete);
+    thenHandler.onInvoke(mockFileUploadComplete);
 
     // the handler should get the id.
     verify(mockHandler).uploadSuccess(RESULT_FILE_HANDLE_ID);
@@ -176,10 +178,11 @@ public class MultipartUploaderImplV2Test {
       mockView
     );
 
-    verify(mockPromise).then(promiseHandlerCaptor.capture());
-    FunctionParam thenHandler = promiseHandlerCaptor.getValue();
+    verify(mockPromise).then(promiseThenCaptor.capture());
+    IThenable.ThenOnFulfilledCallbackFn thenHandler =
+      promiseThenCaptor.getValue();
 
-    thenHandler.exec(mockFileUploadComplete);
+    thenHandler.onInvoke(mockFileUploadComplete);
 
     verify(mockSRCUploadFileWrapper)
       .uploadFile(
@@ -240,10 +243,11 @@ public class MultipartUploaderImplV2Test {
       mockView
     );
 
-    verify(mockPromise).catch_(promiseHandlerCaptor.capture());
-    FunctionParam errorHandler = promiseHandlerCaptor.getValue();
+    verify(mockPromise).catch_(promiseCatchCaptor.capture());
+    Promise.CatchOnRejectedCallbackFn errorHandler =
+      promiseCatchCaptor.getValue();
 
-    errorHandler.exec(error);
+    errorHandler.onInvoke(error);
 
     verify(mockHandler).uploadFailed(error);
   }

@@ -52,7 +52,6 @@ public class EntityFinderWidgetImpl
 
   private String modalTitle;
   private String promptCopy;
-  private EntityFinderProps.SelectedCopyHandler selectedCopy;
   private String confirmButtonCopy;
 
   @Inject
@@ -104,7 +103,6 @@ public class EntityFinderWidgetImpl
     treeOnly = builder.treeOnly;
     modalTitle = builder.modalTitle;
     promptCopy = builder.promptCopy;
-    selectedCopy = builder.selectedCopy;
     modalTitle = builder.modalTitle;
     multiSelect = builder.multiSelect;
     initialContainer = builder.initialContainer;
@@ -164,8 +162,6 @@ public class EntityFinderWidgetImpl
     private EntityFinderScope initialScope = EntityFinderScope.CREATED_BY_ME;
     private String modalTitle = "Find in Synapse";
     private String promptCopy = "";
-    private EntityFinderProps.SelectedCopyHandler selectedCopy = count ->
-      "Selected";
     private String confirmButtonCopy = "Select";
     private String helpMarkdown =
       "Finding items in Synapse can be done by either “browsing”, “searching,” or directly entering the Synapse ID.&#10;Alternatively, navigate to the desired location in the current project, favorite projects or projects you own.";
@@ -257,14 +253,6 @@ public class EntityFinderWidgetImpl
     @Override
     public EntityFinderWidget.Builder setHelpMarkdown(String helpMarkdown) {
       this.helpMarkdown = helpMarkdown;
-      return this;
-    }
-
-    @Override
-    public EntityFinderWidget.Builder setSelectedCopy(
-      EntityFinderProps.SelectedCopyHandler selectedCopy
-    ) {
-      this.selectedCopy = selectedCopy;
       return this;
     }
 
@@ -378,7 +366,6 @@ public class EntityFinderWidgetImpl
               selectableTypes,
               visibleTypesInList,
               visibleTypesInTree,
-              selectedCopy,
               treeOnly
             );
           }
@@ -395,7 +382,6 @@ public class EntityFinderWidgetImpl
         selectableTypes,
         visibleTypesInList,
         visibleTypesInTree,
-        selectedCopy,
         treeOnly
       );
     }

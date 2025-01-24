@@ -31,6 +31,10 @@ jobs:
           MAVEN_USERNAME: ${{ secrets.PLATFORM_ARTIFACTORY_USER }}
           MAVEN_USERPWD: ${{ secrets.PLATFORM_ARTIFACTORY_PWD }}
 
+      - name: setup-job-summary
+        run: |
+          echo "| version | ${{ env.pomversion }} |" > $GITHUB_STEP_SUMMARY
+
   call-test:
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'pull_request' }}

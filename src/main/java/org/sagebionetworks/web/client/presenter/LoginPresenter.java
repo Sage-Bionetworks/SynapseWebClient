@@ -46,77 +46,20 @@ public class LoginPresenter
   private AuthenticationController authenticationController;
   private GlobalApplicationState globalApplicationState;
   private SynapseAlert synAlert;
-  private PopupUtilsView popupUtils;
 
   @Inject
   public LoginPresenter(
     LoginView view,
     AuthenticationController authenticationController,
     GlobalApplicationState globalApplicationState,
-    SynapseAlert synAlert,
-    PopupUtilsView popupUtils
+    SynapseAlert synAlert
   ) {
     this.view = view;
     this.authenticationController = authenticationController;
     this.globalApplicationState = globalApplicationState;
     this.synAlert = synAlert;
-    this.popupUtils = popupUtils;
     view.setSynAlert(synAlert);
     view.setPresenter(this);
-  }
-
-  @Override
-  public void onAcceptTermsOfUse() {
-    synAlert.clear();
-    view.showLoggingInLoader();
-    authenticationController.signTermsOfUse(
-      new AsyncCallback<Void>() {
-        @Override
-        public void onFailure(Throwable caught) {
-          synAlert.handleException(caught);
-          view.showLogin();
-        }
-
-        @Override
-        public void onSuccess(Void result) {
-          // Have to get the UserSessionData again,
-          // since it won't contain the UserProfile if the terms haven't been signed
-          // We also need to force-reset the QueryClient so the React components know to refetch
-          boolean forceResetQueryClient = true;
-          synAlert.clear();
-          authenticationController.initializeFromExistingAccessTokenCookie(
-            new AsyncCallback<UserProfile>() {
-              @Override
-              public void onFailure(Throwable caught) {
-                synAlert.handleException(caught);
-                view.showLogin();
-              }
-
-              @Override
-              public void onSuccess(UserProfile result) {
-                // Signed ToU. Check for temp username, passing record, and then forward
-                userAuthenticated();
-              }
-            },
-            forceResetQueryClient
-          );
-        }
-      }
-    );
-  }
-
-  @Override
-  public void onCancelAcceptTermsOfUse() {
-    // confirm
-    popupUtils.showConfirmDialog(
-      ARE_YOU_SURE_YOU_WANT_TO_CANCEL,
-      CANCEL_TERMS_OF_USE_CONFIRM_MESSAGE,
-      () -> {
-        globalApplicationState
-          .getPlaceChanger()
-          .goTo(new LoginPlace(LoginPlace.LOGOUT_TOKEN));
-      }
-    );
   }
 
   @Override
@@ -154,24 +97,14 @@ public class LoginPresenter
         .getPlaceChanger()
         .goTo(new LoginPlace(DEFAULT_PLACE_TOKEN));
       view.showErrorMessage(SSO_ERROR_UNKNOWN);
-      view.showLogin();
+      globalApplicationState.gotoLoginPage();
     } else if (
       CHANGE_USERNAME.equals(token) && authenticationController.isLoggedIn()
     ) {
       // go to the change username page
       gotoChangeUsernamePlace();
-    } else if (
-      SHOW_TOU.equals(token) &&
-      authenticationController.getCurrentUserAccessToken() != null
-    ) {
-      showTermsOfUse(false);
-    } else if (
-      SHOW_SIGNED_TOU.equals(token) &&
-      authenticationController.getCurrentUserAccessToken() != null
-    ) {
-      showTermsOfUse(true);
     } else if (ORCID_NOT_LINKED.equals(token)) {
-      view.showLogin();
+      globalApplicationState.gotoLoginPage();
       synAlert.showError(
         "The ORCiD you entered isn't linked to a Synapse account: To sign in with ORCiD, first log in with a valid Synapse account, then link it to your ORCiD account on your Account Settings Page.  If you don't have a Synapse account, it is fast, free, and easy register today."
       );
@@ -183,8 +116,7 @@ public class LoginPresenter
         );
         globalApplicationState.gotoLastPlace(defaultPlace);
       } else {
-        // standard view
-        view.showLogin();
+        globalApplicationState.gotoLoginPage();
       }
     }
   }
@@ -232,12 +164,6 @@ public class LoginPresenter
     globalApplicationState.gotoLastPlace(defaultPlace);
   }
 
-  public void showTermsOfUse(boolean isSigned) {
-    synAlert.clear();
-    view.hideLoggingInLoader();
-    view.showTermsOfUse(isSigned);
-  }
-
   public void userAuthenticated() {
     view.hideLoggingInLoader();
     // the user should be logged in now.
@@ -245,7 +171,7 @@ public class LoginPresenter
       view.showErrorMessage(
         "An error occurred during login. Please try logging in again."
       );
-      view.showLogin();
+      globalApplicationState.gotoLoginPage();
     } else {
       checkForTempUsername();
     }

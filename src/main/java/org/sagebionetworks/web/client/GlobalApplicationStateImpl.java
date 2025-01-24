@@ -1,11 +1,11 @@
 package org.sagebionetworks.web.client;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+import static org.sagebionetworks.web.client.cookie.CookieKeys.ONESAGE_REDIRECT_COOKIE_KEY;
 import static org.sagebionetworks.web.client.cookie.CookieKeys.SHOW_DATETIME_IN_UTC;
 import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.UmbrellaException;
@@ -18,6 +18,11 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.inject.Inject;
+import elemental2.dom.DomGlobal;
+import elemental2.dom.DragEvent;
+import elemental2.dom.EventListener;
+import elemental2.dom.FileList;
+import elemental2.dom.HTMLDivElement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -59,9 +64,10 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
   private DateTimeUtils dateTimeUtils;
   private SynapseJavascriptClient jsClient;
   private SessionStorage sessionStorage;
-  private CallbackP<JavaScriptObject> fileListCallback;
+  private CallbackP<FileList> fileListCallback;
   private SynapseProperties synapseProperties;
   private PortalGinInjector ginInjector;
+  private final OneSageUtils oneSageUtils;
 
   boolean isDragDropInitialized = false;
   boolean isToastContainerInitialized = false;
@@ -106,7 +112,8 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
     SynapseJavascriptClient jsClient,
     SynapseProperties synapseProperties,
     SessionStorage sessionStorage,
-    PortalGinInjector ginInjector
+    PortalGinInjector ginInjector,
+    OneSageUtils oneSageUtils
   ) {
     this.cookieProvider = cookieProvider;
     this.eventBus = eventBus;
@@ -123,6 +130,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
     this.synapseProperties = synapseProperties;
     this.sessionStorage = sessionStorage;
     this.ginInjector = ginInjector;
+    this.oneSageUtils = oneSageUtils;
     initUncaughtExceptionHandler();
   }
 
@@ -455,7 +463,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
     return fileListCallback != null;
   }
 
-  public void onDrop(JavaScriptObject fileList) {
+  public void onDrop(FileList fileList) {
     if (isDragAndDropListenerSet()) {
       fileListCallback.invoke(fileList);
     }
@@ -479,64 +487,64 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
   public void initializeDropZone() {
     if (!isDragDropInitialized) {
       isDragDropInitialized = true;
-      Element dropZoneElement = RootPanel.get("dropzone").getElement();
-      Element rootPanelElement = RootPanel.get("rootPanel").getElement();
-      _initializeDragDrop(this, dropZoneElement, rootPanelElement);
+      HTMLDivElement dropZoneElement =
+        (HTMLDivElement) DomGlobal.document.querySelector("[id=\"dropzone\"]");
+      HTMLDivElement rootPanelElement =
+        (HTMLDivElement) DomGlobal.document.querySelector("[id=\"rootPanel\"]");
+      initializeDragDrop(this, dropZoneElement, rootPanelElement);
     }
   }
 
-  private static final native void _initializeDragDrop(
+  private static void initializeDragDrop(
     GlobalApplicationStateImpl globalAppState,
-    Element dropZone,
-    Element rootPanel
-  ) /*-{
-		try {
-			function showDropZone() {
-				dropZone.style.display = "block";
-			}
+    HTMLDivElement dropZone,
+    HTMLDivElement rootPanel
+  ) {
+    try {
+      Runnable showDropZone = () -> dropZone.style.set("display", "block");
+      Runnable hideDropZone = () -> dropZone.style.set("display", "none");
 
-			function hideDropZone() {
-				dropZone.style.display = "none";
-			}
+      DomGlobal.window.addEventListener(
+        "dragenter",
+        e -> {
+          if (globalAppState.isDragAndDropListenerSet()) {
+            showDropZone.run();
+          }
+        }
+      );
 
-			$wnd
-					.addEventListener(
-							'dragenter',
-							function(e) {
-								if (globalAppState.@org.sagebionetworks.web.client.GlobalApplicationStateImpl::isDragAndDropListenerSet()()) {
-									showDropZone();
-								}
-							});
+      EventListener allowDrag = e -> {
+        if (e instanceof DragEvent) {
+          ((DragEvent) e).dataTransfer.dropEffect = "copy";
+          e.preventDefault();
+        }
+      };
+      EventListener handleDrop = e -> {
+        if (e instanceof DragEvent) {
+          e.preventDefault();
+          hideDropZone.run();
+          globalAppState.onDrop(((DragEvent) e).dataTransfer.files);
+        }
+      };
 
-			function allowDrag(e) {
-				e.dataTransfer.dropEffect = 'copy';
-				e.preventDefault();
-			}
+      dropZone.addEventListener("dragenter", allowDrag);
+      dropZone.addEventListener("dragover", allowDrag);
 
-			function handleDrop(e) {
-				e.preventDefault();
-				hideDropZone();
-				globalAppState.@org.sagebionetworks.web.client.GlobalApplicationStateImpl::onDrop(Lcom/google/gwt/core/client/JavaScriptObject;)(e.dataTransfer.files);
-			}
+      dropZone.addEventListener("drop", handleDrop);
+      dropZone.addEventListener("dragend", e -> hideDropZone.run());
+      dropZone.addEventListener("dragleave", e -> hideDropZone.run());
 
-			dropZone.addEventListener('dragenter', allowDrag);
-			dropZone.addEventListener('dragover', allowDrag);
-
-			dropZone.addEventListener('drop', handleDrop);
-
-			//if files are dropped into the root panel, then ignore the event (do not open file contents if user does not have the upload dialog open).
-			rootPanel.addEventListener('drop', function(e) {
-				e.preventDefault();
-			});
-			rootPanel.addEventListener('dragenter', allowDrag);
-			rootPanel.addEventListener('dragover', allowDrag);
-		} catch (err) {
-			console.error(err);
-		}
-	}-*/;
+      //if files are dropped into the root panel, then ignore the event (do not open file contents if user does not have the upload dialog open).
+      rootPanel.addEventListener("drop", elemental2.dom.Event::preventDefault);
+      rootPanel.addEventListener("dragenter", allowDrag);
+      rootPanel.addEventListener("dragover", allowDrag);
+    } catch (Exception e) {
+      DomGlobal.console.error("Error on drag-and-drop initialization", e);
+    }
+  }
 
   @Override
-  public void setDropZoneHandler(CallbackP<JavaScriptObject> fileListCallback) {
+  public void setDropZoneHandler(CallbackP<FileList> fileListCallback) {
     this.fileListCallback = fileListCallback;
   }
 
@@ -583,7 +591,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
             }
             try {
               if (isSRCSignInClass) {
-                getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+                gotoLoginPage();
               } else {
                 if (targetElement.hasAttribute("href")) {
                   String href = targetElement.getAttribute("href");
@@ -610,6 +618,29 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
     if (finalCallback != null) {
       finalCallback.invoke();
     }
+  }
+
+  @Override
+  public void gotoLoginPage() {
+    //tell One Sage to return to the current url
+    Date twoHoursFromNow = new Date();
+    twoHoursFromNow.setTime(twoHoursFromNow.getTime() + (2 * 60 * 60 * 1000));
+
+    String returnUrl = gwt.getCurrentURL();
+    String lastPlacePath = sessionStorage.getItem(
+      GlobalApplicationStateImpl.LAST_PLACE
+    );
+    if (getCurrentPlace() instanceof LoginPlace && lastPlacePath != null) {
+      // if at the LoginPlace, redirect to the current last place after login
+      returnUrl = gwt.getHostPageBaseURL() + lastPlacePath;
+    }
+    cookieProvider.setCookie(
+      ONESAGE_REDIRECT_COOKIE_KEY,
+      returnUrl,
+      twoHoursFromNow
+    );
+    // SWC-6533: Sending all to One Sage for login
+    gwt.assignThisWindowWith(oneSageUtils.getOneSageURL());
   }
 
   @Override

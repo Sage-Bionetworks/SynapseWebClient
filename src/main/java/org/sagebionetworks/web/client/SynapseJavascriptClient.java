@@ -3295,4 +3295,32 @@ public class SynapseJavascriptClient {
     String url = getAuthServiceUrl() + SESSION_ACCESS_TOKEN;
     return getFuture(cb -> doDelete(url, cb));
   }
+
+  public void getEntityBenefactorAcl(
+    String entityId,
+    AsyncCallback<AccessControlList> cb
+  ) {
+    // Retrieving the benefactor ACL is always permitted regardless of permissions, so only retrieve that part of the bundle.
+    EntityBundleRequest request = new EntityBundleRequest();
+    request.setIncludeBenefactorACL(true);
+    String url = getRepoServiceUrl() + ENTITY + "/" + entityId + BUNDLE2;
+
+    doPost(
+      url,
+      request,
+      OBJECT_TYPE.EntityBundle,
+      true,
+      new AsyncCallback<EntityBundle>() {
+        @Override
+        public void onSuccess(EntityBundle result) {
+          cb.onSuccess(result.getBenefactorAcl());
+        }
+
+        @Override
+        public void onFailure(Throwable caught) {
+          cb.onFailure(caught);
+        }
+      }
+    );
+  }
 }

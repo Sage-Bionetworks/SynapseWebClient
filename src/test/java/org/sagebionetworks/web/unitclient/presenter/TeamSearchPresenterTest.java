@@ -2,9 +2,11 @@ package org.sagebionetworks.web.unitclient.presenter;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -139,6 +141,7 @@ public class TeamSearchPresenterTest {
     // add both test teams
     verify(mockPortalGinInjector, times(2)).getBigTeamBadgeWidget();
     verify(mockLoadMoreWidgetContainer, times(2)).add(any());
+    verify(mockView).setShowNoResults(false);
   }
 
   @Test
@@ -155,6 +158,7 @@ public class TeamSearchPresenterTest {
       );
     presenter.setPlace(mockPlace);
     verify(mockSynAlert).handleException(caught);
+    verify(mockView, never()).setShowNoResults(anyBoolean());
   }
 
   @Test
@@ -192,6 +196,8 @@ public class TeamSearchPresenterTest {
         anyInt(),
         any(AsyncCallback.class)
       );
+
+    verify(mockView).setShowNoResults(true);
   }
 
   @Test

@@ -35,6 +35,17 @@
       </bh:Div>
     </bh:Div>
     <g:SimplePanel ui:field="synAlertPanel" />
+    <g:HTMLPanel
+      ui:field="noSearchResultsContainer"
+      visible="false"
+      addStyleNames="margin-top-40 text-align-center"
+    >
+      <img
+        src="https://s3.us-east-1.amazonaws.com/static.synapse.org/images/NoSearchResults.svg"
+        width="300px"
+      />
+      <bh:Paragraph addStyleNames="margin-top-15" text="No teams found." />
+    </g:HTMLPanel>
     <g:FlowPanel ui:field="mainContainer" addStyleNames="margin-top-10" />
     <g:SimplePanel ui:field="paginationPanel" />
   </bh:Div>

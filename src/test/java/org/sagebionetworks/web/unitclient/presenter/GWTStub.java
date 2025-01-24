@@ -61,6 +61,11 @@ public class GWTStub implements GWTWrapper {
   }
 
   @Override
+  public String getHostName() {
+    return null;
+  }
+
+  @Override
   public String getCurrentURL() {
     return null;
   }

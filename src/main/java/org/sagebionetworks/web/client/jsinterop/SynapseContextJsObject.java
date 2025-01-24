@@ -21,14 +21,15 @@ public class SynapseContextJsObject {
   public static SynapseContextJsObject create(
     String accessToken,
     boolean isInExperimentalMode,
-    boolean utcTime
+    boolean utcTime,
+    String appId
   ) {
     SynapseContextJsObject context = new SynapseContextJsObject();
     context.accessToken = accessToken;
     context.isInExperimentalMode = isInExperimentalMode;
     context.utcTime = utcTime;
     context.downloadCartPageUrl = "/DownloadCart:0";
-    context.appId = "synapse.org";
+    context.appId = appId;
     context.withErrorBoundary = true;
     return context;
   }

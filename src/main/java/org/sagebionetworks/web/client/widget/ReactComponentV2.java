@@ -92,11 +92,40 @@ public abstract class ReactComponentV2<
     }
   }
 
+  /**
+   * Asynchronously (in the task queue, via setTimeout) unmounts the root and sets it to null.
+   */
   private void destroyRoot() {
-    if (root != null) {
-      root.unmount();
-      root = null;
-    }
+    // React itself may have fired this method in its render cycle. If that's the case, we cannot unmount synchronously.
+    // We can asynchronously schedule unmounting the root to allow React to finish the current render cycle.
+    // https://github.com/facebook/react/issues/25675
+    Timer t = new Timer() {
+      @Override
+      public void run() {
+        if (root != null) {
+          root.unmount();
+          root = null;
+        }
+      }
+    };
+    t.schedule(0);
+  }
+
+  /**
+   * Asynchronously (in the task queue, via setTimeout) creates a root (if necessary) and renders the current reactElement.
+   */
+  private void createRootAndRender() {
+    // This component may be a React child of another component, so retrieve the root widget that renders this component tree.
+    ReactComponentV2<?, ?> componentToRender = getRootReactComponentWidget();
+    // Schedule creating a root and rendering. This will necessarily run after the `destroyRoot` completes, if it was invoked.
+    Timer t = new Timer() {
+      @Override
+      public void run() {
+        componentToRender.createRoot();
+        componentToRender.root.render(componentToRender.createReactElement());
+      }
+    };
+    t.schedule(0);
   }
 
   private void detachNonReactChildElements() {
@@ -170,6 +199,8 @@ public abstract class ReactComponentV2<
 
       return childWidgets
         .stream()
+        // SWC-7131: Visibility via style: {display: "none"} may not work in production
+        .filter(ReactComponentV2::isVisible)
         .map(ReactComponentV2::createReactElement)
         .toArray(ReactElement<?, ?>[]::new);
     } else {
@@ -181,24 +212,13 @@ public abstract class ReactComponentV2<
     // This component will be rendered as a child of another React component, so destroy the root if one exists
     boolean shouldDestroyRoot = isRenderedAsReactComponentChild();
 
-    // This component may be a React child of another component, so retrieve the root widget that renders this component tree.
-    ReactComponentV2<?, ?> componentToRender = getRootReactComponentWidget();
+    // Schedule destroying the root, if necessary
+    if (shouldDestroyRoot) {
+      destroyRoot();
+    }
 
-    // Asynchronously schedule root operations in case the component is in the middle of an asynchronous render cycle
-    // See https://stackoverflow.com/questions/73459382
-    Timer t = new Timer() {
-      @Override
-      public void run() {
-        if (shouldDestroyRoot) {
-          destroyRoot();
-        }
-
-        // Create a fresh ReactElement tree and render it
-        componentToRender.createRoot();
-        componentToRender.root.render(componentToRender.createReactElement());
-      }
-    };
-    t.schedule(0);
+    // Schedule rendering
+    createRootAndRender();
   }
 
   @Override
@@ -216,20 +236,10 @@ public abstract class ReactComponentV2<
 
   @Override
   protected void onUnload() {
-    super.onUnload();
-
     // Detach any non-React descendants that were injected into the component tree
     detachNonReactChildElements();
 
-    // Asynchronously schedule unmounting the root to allow React to finish the current render cycle.
-    // https://github.com/facebook/react/issues/25675
-    Timer t = new Timer() {
-      @Override
-      public void run() {
-        destroyRoot();
-      }
-    };
-    t.schedule(0);
+    destroyRoot();
   }
 
   /**

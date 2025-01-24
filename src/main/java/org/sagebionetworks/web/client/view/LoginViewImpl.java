@@ -13,18 +13,11 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
-import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactElement;
-import org.sagebionetworks.web.client.jsinterop.SRC;
-import org.sagebionetworks.web.client.jsinterop.TermsAndConditionsProps;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.FullWidthAlert;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.ReactComponent;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
-import org.sagebionetworks.web.client.widget.pageprogress.PageProgressWidget;
-import org.sagebionetworks.web.shared.WebConstants;
 
 public class LoginViewImpl extends Composite implements LoginView {
 
@@ -61,8 +54,6 @@ public class LoginViewImpl extends Composite implements LoginView {
   private Header headerWidget;
   SynapseJSNIUtils jsniUtils;
   SynapseReactClientFullContextPropsProvider propsProvider;
-  PageProgressWidget pageProgressWidget;
-  Callback backBtnCallback, forwardBtnCallback;
 
   public interface LoginViewImplBinder
     extends UiBinder<Widget, LoginViewImpl> {}
@@ -73,37 +64,14 @@ public class LoginViewImpl extends Composite implements LoginView {
     Header headerWidget,
     LoginWidget loginWidget,
     SynapseJSNIUtils jsniUtils,
-    PageProgressWidget pageProgressWidget,
     SynapseReactClientFullContextPropsProvider propsProvider
   ) {
     initWidget(uiBinder.createAndBindUi(this));
     this.loginWidget = loginWidget;
     this.headerWidget = headerWidget;
-    this.pageProgressWidget = pageProgressWidget;
     this.jsniUtils = jsniUtils;
     this.propsProvider = propsProvider;
     headerWidget.configure();
-    pageProgressContainer.add(pageProgressWidget);
-    backBtnCallback =
-      () -> {
-        presenter.onCancelAcceptTermsOfUse();
-      };
-    forwardBtnCallback =
-      () -> {
-        presenter.onAcceptTermsOfUse();
-      };
-  }
-
-  private void reconfigurePageProgress(boolean enableForward) {
-    pageProgressWidget.configure(
-      WebConstants.SYNAPSE_GREEN,
-      75,
-      "Cancel",
-      backBtnCallback,
-      "Next",
-      forwardBtnCallback,
-      enableForward
-    );
   }
 
   @Override
@@ -128,18 +96,6 @@ public class LoginViewImpl extends Composite implements LoginView {
   }
 
   @Override
-  public void showLogin() {
-    clear();
-    hideViews();
-    loginView.setVisible(true);
-    headerWidget.refresh();
-
-    // Add the widget to the panel
-    loginWidget.asWidget().removeFromParent();
-    loginWidgetPanel.setWidget(loginWidget.asWidget());
-  }
-
-  @Override
   public void showErrorMessage(String message) {
     DisplayUtils.showErrorMessage(message);
   }
@@ -156,31 +112,6 @@ public class LoginViewImpl extends Composite implements LoginView {
   public void clear() {
     loginWidget.clear();
     loginWidgetPanel.clear();
-  }
-
-  @Override
-  public void showTermsOfUse(boolean hasAccepted) {
-    hideViews();
-
-    if (!hasAccepted) {
-      termsOfUseView.setVisible(true);
-      reconfigurePageProgress(false);
-      TermsAndConditionsProps props = TermsAndConditionsProps.create(
-        this::onFormChange
-      );
-      ReactElement component = React.createElementWithSynapseContext(
-        SRC.SynapseComponents.TermsAndConditions,
-        props,
-        propsProvider.getJsInteropContextProps()
-      );
-      termsOfUseContainer.render(component);
-    } else {
-      acceptedTermsOfUseView.setVisible(true);
-    }
-  }
-
-  public void onFormChange(boolean completed) {
-    reconfigurePageProgress(completed);
   }
 
   private void hideViews() {

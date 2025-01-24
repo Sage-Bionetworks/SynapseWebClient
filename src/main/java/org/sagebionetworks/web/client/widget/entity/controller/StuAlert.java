@@ -41,10 +41,6 @@ public class StuAlert {
     entityVersion = null;
   }
 
-  public void show403() {
-    show403(null, null);
-  }
-
   public void show403(String entityId, Long entityVersion) {
     clear();
     this.entityId = entityId;

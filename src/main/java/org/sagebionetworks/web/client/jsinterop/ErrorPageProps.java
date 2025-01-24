@@ -11,7 +11,7 @@ public class ErrorPageProps extends ReactComponentProps {
   String type;
   String message;
   String entityId;
-  Double entityVersionNumber;
+  double entityVersion;
 
   @JsFunction
   public interface Callback {
@@ -32,8 +32,9 @@ public class ErrorPageProps extends ReactComponentProps {
     props.type = type;
     props.message = message;
     props.entityId = entityId;
-    props.entityVersionNumber =
-      entityVersion != null ? entityVersion.doubleValue() : null;
+    if (entityVersion != null) {
+      props.entityVersion = entityVersion.doubleValue();
+    }
     props.gotoPlace = gotoPlace;
     return props;
   }

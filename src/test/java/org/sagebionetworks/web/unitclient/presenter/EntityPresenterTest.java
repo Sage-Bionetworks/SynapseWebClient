@@ -346,12 +346,23 @@ public class EntityPresenterTest {
   }
 
   @Test
-  public void testShow403() {
+  public void testShow403LoggedIn() {
+    when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
     entityPresenter.setEntityId("123");
     entityPresenter.show403();
     verify(mockSynAlert).show403(any(), any());
     verify(mockView).setEntityPageTopVisible(false);
     verify(mockView).setOpenTeamInvitesVisible(true);
+  }
+
+  @Test
+  public void testShow403Anonymous() {
+    when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+    entityPresenter.setEntityId("123");
+    entityPresenter.show403();
+    verify(mockSynAlert).show403(any(), any());
+    verify(mockView).setEntityPageTopVisible(false);
+    verify(mockView, never()).setOpenTeamInvitesVisible(anyBoolean());
   }
 
   @Test

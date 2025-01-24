@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.sagebionetworks.web.client.ClientProperties;
+import org.sagebionetworks.web.client.OneSageUtils;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 
@@ -22,9 +23,12 @@ public class PasswordResetPresenterTest {
   @Mock
   PasswordReset place;
 
+  @Mock
+  OneSageUtils oneSageUtils;
+
   @Before
   public void setup() {
-    presenter = new PasswordResetPresenter();
+    presenter = new PasswordResetPresenter(oneSageUtils);
     when(place.toToken()).thenReturn(ClientProperties.DEFAULT_PLACE_TOKEN);
   }
 

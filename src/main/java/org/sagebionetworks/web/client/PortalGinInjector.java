@@ -21,6 +21,7 @@ import org.sagebionetworks.web.client.presenter.ChatPresenter;
 import org.sagebionetworks.web.client.presenter.ComingSoonPresenter;
 import org.sagebionetworks.web.client.presenter.DataAccessApprovalTokenPresenter;
 import org.sagebionetworks.web.client.presenter.DataAccessManagementPresenter;
+import org.sagebionetworks.web.client.presenter.DataCatalogPagePresenter;
 import org.sagebionetworks.web.client.presenter.DownPresenter;
 import org.sagebionetworks.web.client.presenter.DownloadCartPresenter;
 import org.sagebionetworks.web.client.presenter.EmailInvitationPresenter;
@@ -135,7 +136,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.controller.URLProvEntryView;
 import org.sagebionetworks.web.client.widget.entity.download.AddFolderDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.download.QuizInfoDialog;
-import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
+import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidgetV2;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.AttachmentConfigEditor;
@@ -210,6 +211,7 @@ import org.sagebionetworks.web.client.widget.lazyload.LazyLoadWikiWidgetWrapper;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.client.widget.profile.ProfileCertifiedValidatedWidget;
 import org.sagebionetworks.web.client.widget.profile.UserProfileWidget;
+import org.sagebionetworks.web.client.widget.projectdataavailability.ProjectDataAvailability;
 import org.sagebionetworks.web.client.widget.provenance.v2.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.refresh.DiscussionThreadCountAlert;
 import org.sagebionetworks.web.client.widget.refresh.EntityRefreshAlert;
@@ -343,6 +345,8 @@ public interface PortalGinInjector extends Ginjector {
   ErrorPresenter getErrorPresenter();
 
   DownloadCartPresenter getDownloadCartPresenter();
+
+  DataCatalogPagePresenter getDataCatalogPagePresenter();
 
   ChangeUsernamePresenter getChangeUsernamePresenter();
 
@@ -728,7 +732,7 @@ public interface PortalGinInjector extends Ginjector {
 
   EntityFinderWidgetView getEntityFinderWidgetView();
 
-  UploadDialogWidget getUploadDialogWidget();
+  UploadDialogWidgetV2 getUploadDialogWidget();
 
   WikiMarkdownEditor getWikiMarkdownEditor();
 
@@ -900,4 +904,5 @@ public interface PortalGinInjector extends Ginjector {
   TrustCenterPresenter getTrustCenterPresenter();
   ChatPresenter getChatPresenter();
   PlansPresenter getPlansPresenter();
+  ProjectDataAvailability getProjectDataAvailability();
 }

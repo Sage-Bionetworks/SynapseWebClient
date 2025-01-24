@@ -10,11 +10,6 @@ import static org.sagebionetworks.web.client.utils.FutureUtils.getDoneFuture;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getFuture;
 import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.CONTAINER;
 import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.PROJECT;
-import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_COLLECTOR_URL;
-import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_DESCRIPTION_PART_1;
-import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_DESCRIPTION_PART_2;
-import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_PRIORITY;
-import static org.sagebionetworks.web.shared.WebConstants.REVIEW_DATA_REQUEST_COMPONENT_ID;
 
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
@@ -45,7 +40,6 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
-import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.VersionableEntity;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
@@ -128,7 +122,7 @@ import org.sagebionetworks.web.client.widget.entity.WikiPageDeleteConfirmationDi
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidget;
 import org.sagebionetworks.web.client.widget.entity.download.AddFolderDialogWidget;
-import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
+import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidgetV2;
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.ActionListener;
@@ -263,6 +257,7 @@ public class EntityActionControllerImpl
   EntityAccessControlListModalWidget entityAccessControlListModalWidget;
   RenameEntityModalWidget renameEntityModalWidget;
   EntityFinderWidget.Builder entityFinderBuilder;
+  UploadDialogWidgetV2 uploadDialogWidgetV2;
   EvaluationSubmitter submitter;
   EditFileMetadataModalWidget editFileMetadataModalWidget;
   EditProjectMetadataModalWidget editProjectMetadataModalWidget;
@@ -549,10 +544,12 @@ public class EntityActionControllerImpl
     return submitter;
   }
 
-  private UploadDialogWidget getNewUploadDialogWidget() {
-    UploadDialogWidget uploadDialogWidget = ginInjector.getUploadDialogWidget();
-    view.setUploadDialogWidget(uploadDialogWidget.asWidget());
-    return uploadDialogWidget;
+  private UploadDialogWidgetV2 getUploadDialogWidget() {
+    if (uploadDialogWidgetV2 == null) {
+      uploadDialogWidgetV2 = ginInjector.getUploadDialogWidget();
+      view.setUploadDialogWidget(uploadDialogWidgetV2.asWidget());
+    }
+    return uploadDialogWidgetV2;
   }
 
   private WikiMarkdownEditor getWikiMarkdownEditor() {
@@ -616,6 +613,18 @@ public class EntityActionControllerImpl
     this.addToDownloadListWidget = addToDownloadListWidget;
 
     reconfigureActions();
+
+    // SWC-4693 - Always configure the upload dialog to support drag-n-drop from the files tab without opening the modal
+    configureUploader();
+  }
+
+  private void configureUploader() {
+    UploadDialogWidgetV2 uploadDialogWidgetV2 = getUploadDialogWidget();
+    if (canUploadNewFileVersion() || canUploadFileToContainer()) {
+      uploadDialogWidgetV2.configure(entity.getId());
+    } else {
+      uploadDialogWidgetV2.clearDragAndDropHandlers();
+    }
   }
 
   private void reconfigureActions() {
@@ -704,34 +713,9 @@ public class EntityActionControllerImpl
     actionMenu.setActionListener(
       Action.REPORT_VIOLATION,
       (action, event) -> {
-        // report abuse via Jira issue collector
-        String userId = WebConstants.ANONYMOUS, email =
-          WebConstants.ANONYMOUS, displayName = WebConstants.ANONYMOUS, synId =
-          entity.getId();
-        UserProfile userProfile =
-          authenticationController.getCurrentUserProfile();
-        if (userProfile != null) {
-          userId = userProfile.getOwnerId();
-          displayName = DisplayUtils.getDisplayName(userProfile);
-          email = DisplayUtils.getPrimaryEmail(userProfile);
-        }
-
-        ginInjector
-          .getSynapseJSNIUtils()
-          .showJiraIssueCollector(
-            "", // summary
-            FLAG_ISSUE_DESCRIPTION_PART_1 +
-            gwt.getCurrentURL() +
-            FLAG_ISSUE_DESCRIPTION_PART_2,
-            FLAG_ISSUE_COLLECTOR_URL,
-            userId,
-            displayName,
-            email,
-            synId, // Synapse data object ID
-            REVIEW_DATA_REQUEST_COMPONENT_ID,
-            null, // AR ID
-            FLAG_ISSUE_PRIORITY
-          );
+        popupUtils.openInNewWindow(
+          WebConstants.PRIVACY_SECURITY_COMPLIANCE_HELP_CENTER_URL
+        );
       }
     );
   }
@@ -1362,28 +1346,31 @@ public class EntityActionControllerImpl
     }
   }
 
+  private boolean canUploadNewFileVersion() {
+    return (
+      entityBundle.getEntity() instanceof FileEntity &&
+      permissions.getCanCertifiedUserEdit()
+    );
+  }
+
   private void configureFileUpload() {
-    if (entityBundle.getEntity() instanceof FileEntity) {
-      actionMenu.setActionVisible(
-        Action.UPLOAD_NEW_FILE,
-        permissions.getCanCertifiedUserEdit()
-      );
-      actionMenu.setActionListener(Action.UPLOAD_NEW_FILE, this);
-    } else {
-      actionMenu.setActionVisible(Action.UPLOAD_NEW_FILE, false);
-    }
+    actionMenu.setActionVisible(
+      Action.UPLOAD_NEW_FILE,
+      canUploadNewFileVersion()
+    );
+    actionMenu.setActionListener(Action.UPLOAD_NEW_FILE, this);
+  }
+
+  private boolean canUploadFileToContainer() {
+    return (
+      isContainerOnFilesTab(entityBundle.getEntity(), currentArea) &&
+      permissions.getCanCertifiedUserEdit()
+    );
   }
 
   private void configureUploadNewFileEntity() {
-    if (isContainerOnFilesTab(entityBundle.getEntity(), currentArea)) {
-      actionMenu.setActionVisible(
-        Action.UPLOAD_FILE,
-        permissions.getCanCertifiedUserEdit()
-      );
-      actionMenu.setActionListener(Action.UPLOAD_FILE, this);
-    } else {
-      actionMenu.setActionVisible(Action.UPLOAD_FILE, false);
-    }
+    actionMenu.setActionVisible(Action.UPLOAD_FILE, canUploadFileToContainer());
+    actionMenu.setActionListener(Action.UPLOAD_FILE, this);
   }
 
   private void configureAddFolder() {
@@ -1852,6 +1839,7 @@ public class EntityActionControllerImpl
         onSubmit();
         break;
       case UPLOAD_NEW_FILE:
+      case UPLOAD_FILE:
         onUploadFile();
         break;
       case EDIT_PROVENANCE:
@@ -1874,9 +1862,6 @@ public class EntityActionControllerImpl
         break;
       case MANAGE_ACCESS_REQUIREMENTS:
         onManageAccessRequirements();
-        break;
-      case UPLOAD_FILE:
-        onUploadNewFileEntity();
         break;
       case CREATE_FOLDER:
         onCreateFolder();
@@ -2047,21 +2032,6 @@ public class EntityActionControllerImpl
     wizard.setOpen(true);
   }
 
-  private void onUploadNewFileEntity() {
-    checkUploadEntity(() -> {
-      UploadDialogWidget uploader = getNewUploadDialogWidget();
-      uploader.configure(
-        DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK,
-        null,
-        entityBundle.getEntity().getId(),
-        null,
-        true
-      );
-      uploader.setUploaderLinkNameVisible(true);
-      uploader.show();
-    });
-  }
-
   private void onCreateFolder() {
     checkUploadEntity(() -> {
       AddFolderDialogWidget w = getAddFolderDialogWidget();
@@ -2116,23 +2086,11 @@ public class EntityActionControllerImpl
   }
 
   private void onUploadFile() {
-    checkUploadEntity(() -> {
-      postCheckUploadFile();
-    });
+    checkUploadEntity(this::postCheckUploadEntity);
   }
 
-  private void postCheckUploadFile() {
-    UploadDialogWidget uploadDialogWidget = getNewUploadDialogWidget();
-    uploadDialogWidget.configure(
-      DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK,
-      entityBundle.getEntity(),
-      null,
-      null,
-      true
-    );
-    uploadDialogWidget.disableMultipleFileUploads();
-    uploadDialogWidget.setUploaderLinkNameVisible(false);
-    uploadDialogWidget.show();
+  private void postCheckUploadEntity() {
+    getUploadDialogWidget().show();
   }
 
   private void onSubmit() {
@@ -2173,7 +2131,6 @@ public class EntityActionControllerImpl
         entity.getId() +
         ")"
       )
-      .setSelectedCopy(count -> "Destination")
       .setConfirmButtonCopy("Create Link")
       .build()
       .show();
@@ -2277,7 +2234,6 @@ public class EntityActionControllerImpl
         entity.getId() +
         ")"
       )
-      .setSelectedCopy(count -> "Destination")
       .setConfirmButtonCopy("Move")
       .setVersionSelection(EntityFinderWidget.VersionSelection.DISALLOWED)
       .setTreeOnly(true)

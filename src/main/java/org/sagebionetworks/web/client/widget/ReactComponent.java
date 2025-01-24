@@ -7,6 +7,7 @@ import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.FlowPanel;
+import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactDOM;
 import org.sagebionetworks.web.client.jsinterop.ReactDOMRoot;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
@@ -33,12 +34,30 @@ public class ReactComponent extends FlowPanel implements HasClickHandlers {
     }
   }
 
-  public void render(ReactElement<?, ?> reactElement) {
-    this.reactElement = reactElement;
+  /**
+   * Asynchronously (in the task queue, via setTimeout) unmounts the root and sets it to null.
+   */
+  private void destroyRoot() {
+    // React itself may have fired this method in its render cycle. If that's the case, we cannot unmount synchronously.
+    // We can asynchronously schedule unmounting the root to allow React to finish the current render cycle.
+    // https://github.com/facebook/react/issues/25675
+    Timer t = new Timer() {
+      @Override
+      public void run() {
+        if (root != null) {
+          root.unmount();
+          root = null;
+        }
+      }
+    };
+    t.schedule(0);
+  }
 
-    // This component may be a React child of another component. If so, we must rerender the ancestor component(s) so
-    // that they use the new ReactElement created in this render step.
-    // Asynchronously schedule creating a root in case React is still rendering and may unmount the current root
+  /**
+   * Asynchronously (in the task queue, via setTimeout) creates a root (if necessary) and renders the current reactElement.
+   */
+  private void createRootAndRender() {
+    // Asynchronously schedule createRoot and render to ensure any prequeued `destroyRoot` task completes first
     Timer t = new Timer() {
       @Override
       public void run() {
@@ -50,10 +69,16 @@ public class ReactComponent extends FlowPanel implements HasClickHandlers {
     t.schedule(0);
   }
 
+  public void render(ReactElement<?, ?> reactElement) {
+    this.reactElement = reactElement;
+    createRootAndRender();
+  }
+
   @Override
   protected void onLoad() {
     super.onLoad();
     createRoot();
+
     if (reactElement != null) {
       this.render(reactElement);
     }
@@ -61,26 +86,15 @@ public class ReactComponent extends FlowPanel implements HasClickHandlers {
 
   @Override
   protected void onUnload() {
-    if (root != null) {
-      // Asynchronously schedule unmounting the root to allow React to finish the current render cycle.
-      // https://github.com/facebook/react/issues/25675
-      Timer t = new Timer() {
-        @Override
-        public void run() {
-          root.unmount();
-          root = null;
-        }
-      };
-      t.schedule(0);
-    }
+    destroyRoot();
     super.onUnload();
   }
 
   @Override
   public void clear() {
-    // clear doesn't typically call onUnload, but we want to for this element.
-    this.onUnload();
-    super.clear();
+    if (root != null) {
+      root.render(React.createElement(React.Fragment));
+    }
   }
 
   @Override

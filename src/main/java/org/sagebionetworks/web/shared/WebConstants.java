@@ -25,17 +25,14 @@ public class WebConstants {
 
   public static final String INVALID_EMAIL_MESSAGE = "Invalid email address";
 
-  public static final String ONESAGE_PRODUCTION_URL =
-    "https://accounts.synapse.org";
-  public static final String ONESAGE_SYNAPSE_APPID_QUERY_PARAM =
-    "appId=synapse.org";
-  public static final String ONESAGE_ACCOUNT_SETTINGS_URL =
-    ONESAGE_PRODUCTION_URL +
-    "/authenticated/myaccount?" +
-    ONESAGE_SYNAPSE_APPID_QUERY_PARAM;
+  public static final String ONESAGE_SYNAPSE_APPID_QUERY_PARAM_KEY = "appId";
+  public static final String ONESAGE_ACCOUNT_SETTINGS_PATH =
+    "/authenticated/myaccount";
 
   public static final String DOCS_BASE_URL = "https://help.synapse.org/";
   public static final String DOCS_URL = DOCS_BASE_URL + "docs/";
+  public static final String PRIVACY_SECURITY_COMPLIANCE_HELP_CENTER_URL =
+    "https://sagebionetworks.jira.com/servicedesk/customer/portal/20";
   public static final String PROVENANCE_API_URL =
     DOCS_URL + "Provenance.1972470373.html";
   public static final String SHARING_SETTINGS_URL =

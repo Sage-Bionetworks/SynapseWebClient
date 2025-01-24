@@ -1,7 +1,8 @@
 package org.sagebionetworks.web.client.jsinterop;
 
-import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArrayString;
+import elemental2.dom.Blob;
+import elemental2.promise.Promise;
 import jsinterop.annotations.JsFunction;
 import jsinterop.annotations.JsNullable;
 import jsinterop.annotations.JsPackage;
@@ -20,6 +21,7 @@ public class SRC {
     public static ReactComponentType<EntityBadgeIconsProps> EntityBadgeIcons;
     public static ReactComponentType<DatasetEditorProps> DatasetItemsEditor;
     public static ReactComponentType<EntityFinderProps> EntityFinder;
+    public static ReactComponentType<EntityFileBrowserProps> EntityFileBrowser;
     public static ReactComponentType<EvaluationCardProps> EvaluationCard;
     public static ReactComponentType<
       EvaluationEditorPageProps
@@ -47,7 +49,7 @@ public class SRC {
       StandaloneQueryWrapperProps
     > StandaloneQueryWrapper;
     public static ReactComponentType<ForumSearchProps> ForumSearch;
-    public static ReactComponentType ReviewerDashboard;
+    public static ReactComponentType<ReviewerDashboardProps> ReviewerDashboard;
     public static ReactComponentType<ProvenanceGraphProps> ProvenanceGraph;
     public static ReactComponentType SynapseToastContainer;
     public static ReactComponentType<EmptyProps> OAuthManagement;
@@ -125,6 +127,13 @@ public class SRC {
     public static ReactComponentType<
       RejectProfileValidationRequestModalProps
     > RejectProfileValidationRequestModal;
+    public static ReactComponentType<
+      GovernanceMarkdownGithubProps
+    > GovernanceMarkdownGithub;
+    public static ReactComponentType<
+      ProjectDataAvailabilityProps
+    > ProjectDataAvailability;
+    public static ReactComponentType<EntityUploadModalProps> EntityUploadModal;
 
     /**
      * Pushes a global toast message. In SWC, you should use {@link DisplayUtils#notify}, rather than calling this method directly.
@@ -189,7 +198,7 @@ public class SRC {
     public static native Promise<FileUploadComplete> uploadFile(
       String accessToken,
       String filename,
-      JavaScriptObject file, // blob
+      Blob file,
       int storageLocationId,
       String contentType,
       Progress progressCallback,

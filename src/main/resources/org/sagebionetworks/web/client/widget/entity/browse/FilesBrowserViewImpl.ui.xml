@@ -22,6 +22,7 @@
       />
     </bh:Div>
     <bh:Div ui:field="addToDownloadListContainer" />
+    <bh:Div ui:field="reactFileBrowserContainer" />
     <bh:Div
       ui:field="files"
       styleName="highlight-box padding-top-0-imp overflow-auto"

@@ -123,9 +123,6 @@ public class EntityContainerListWidget
         .setInitialContainer(EntityFinderWidget.InitialContainer.PROJECT)
         .setSelectableTypes(EntityFilter.FILE)
         .setVersionSelection(EntityFinderWidget.VersionSelection.REQUIRED)
-        .setSelectedCopy(count ->
-          count + " File" + ((count > 1) ? "s" : "") + " Selected"
-        )
         .setHelpMarkdown(
           "Search or Browse Synapse to find " +
           EntityTypeUtils.getDisplayName(EntityType.file) +

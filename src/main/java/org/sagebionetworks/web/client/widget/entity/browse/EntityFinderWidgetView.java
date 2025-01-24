@@ -27,7 +27,6 @@ public interface EntityFinderWidgetView extends SynapseView {
     EntityFilter selectableEntityTypes,
     EntityFilter visibleTypesInList,
     EntityFilter visibleTypesInTree,
-    EntityFinderProps.SelectedCopyHandler selectedCopy,
     boolean treeOnly
   );
 

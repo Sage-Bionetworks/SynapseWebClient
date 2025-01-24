@@ -96,6 +96,9 @@ public class PeopleSearchPresenter
     >() {
       @Override
       public void onSuccess(UserGroupHeaderResponsePage result) {
+        boolean hasNoResults = offset == 0 && result.getChildren().isEmpty();
+        view.setShowNoResults(hasNoResults);
+
         for (UserGroupHeader header : result.getChildren()) {
           if (header.getIsIndividual()) {
             UserBadge badge = ginInjector.getUserBadgeWidget();

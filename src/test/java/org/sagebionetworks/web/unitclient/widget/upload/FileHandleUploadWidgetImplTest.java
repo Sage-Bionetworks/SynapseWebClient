@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.upload;
 
+import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doAnswer;
@@ -11,16 +11,19 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.google.gwt.core.client.JavaScriptObject;
+import elemental2.dom.Blob;
+import elemental2.dom.File;
+import elemental2.dom.FileList;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.internal.verification.VerificationModeFactory;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJsInteropUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.upload.AbstractFileValidator;
@@ -32,17 +35,37 @@ import org.sagebionetworks.web.client.widget.upload.FileValidator;
 import org.sagebionetworks.web.client.widget.upload.MultipartUploader;
 import org.sagebionetworks.web.client.widget.upload.ProgressingFileUploadHandler;
 import org.sagebionetworks.web.shared.WebConstants;
+import org.springframework.test.util.ReflectionTestUtils;
 
 public class FileHandleUploadWidgetImplTest {
 
-  SynapseJSNIUtils jsniUtils;
+  @Mock
+  SynapseJsInteropUtils jsinteropUtils;
+
+  @Mock
   FileHandleUploadView mockView;
+
+  @Mock
   MultipartUploader mockMultipartUploader;
+
+  @Mock
   CallbackP<FileUpload> mockCallback;
+
   FileHandleUploadWidgetImpl widget;
-  String inputId;
+
+  String inputId = "987";
+
+  @Mock
   FileMetadata mockMetadata;
+
+  @Mock
   Callback mockFailedValidationCallback;
+
+  @Mock
+  FileList mockFileList;
+
+  @Mock
+  File mockFile;
 
   @Captor
   ArgumentCaptor<ProgressingFileUploadHandler> handleCaptor;
@@ -53,24 +76,21 @@ public class FileHandleUploadWidgetImplTest {
   @Before
   public void before() {
     MockitoAnnotations.initMocks(this);
-    jsniUtils = mock(SynapseJSNIUtils.class);
-    mockView = mock(FileHandleUploadView.class);
-    mockMultipartUploader = mock(MultipartUploader.class);
-    mockCallback = mock(CallbackP.class);
-    mockFailedValidationCallback = mock(Callback.class);
+
+    // The metadata returned should correspond to testFileName
+    when(mockView.getInputId()).thenReturn(inputId);
+    when(jsinteropUtils.getFileList(anyString())).thenReturn(mockFileList);
+    when(mockFileList.item(anyDouble())).thenReturn(mockFile);
+    when(jsinteropUtils.getMultipleUploadFileNames(any()))
+      .thenReturn(new String[] { "testName" });
+    ReflectionTestUtils.setField(mockFile, "type", null);
+
     widget =
       new FileHandleUploadWidgetImpl(
         mockView,
         mockMultipartUploader,
-        jsniUtils
+        jsinteropUtils
       );
-    inputId = "987";
-
-    // The metadata returned should correspond to testFileName
-    when(mockView.getInputId()).thenReturn(inputId);
-    when(jsniUtils.getMultipleUploadFileNames(any()))
-      .thenReturn(new String[] { "testName" });
-    when(jsniUtils.getContentType(any(), anyInt())).thenReturn(null);
   }
 
   @Test
@@ -89,6 +109,7 @@ public class FileHandleUploadWidgetImplTest {
     // Configure before the test
     widget.configure("button text", mockCallback);
     reset(mockView);
+    when(mockView.getInputId()).thenReturn(inputId);
     // method under test.
     widget.onFileSelected();
     verify(mockView).updateProgress(1, "1%");
@@ -126,7 +147,7 @@ public class FileHandleUploadWidgetImplTest {
     FileValidator mockFileValidator = mock(FileValidator.class);
     when(mockFileValidator.getInvalidFileCallback())
       .thenReturn(mockFailedValidationCallback);
-    when(jsniUtils.getMultipleUploadFileNames(any()))
+    when(jsinteropUtils.getMultipleUploadFileNames(any()))
       .thenReturn(new String[] { "testName#($*#.jpg" });
     widget.configure("button text", mockCallback);
     widget.setValidation(mockFileValidator);
@@ -139,7 +160,7 @@ public class FileHandleUploadWidgetImplTest {
 
   @Test
   public void testSelectInvalidFileNameNoValidator() {
-    when(jsniUtils.getMultipleUploadFileNames(any()))
+    when(jsinteropUtils.getMultipleUploadFileNames(any()))
       .thenReturn(new String[] { "testName#($*#.jpg" });
     widget.configure("button text", mockCallback);
 
@@ -151,12 +172,14 @@ public class FileHandleUploadWidgetImplTest {
   @Test
   public void testMultiFileSelected() {
     final String successFileHandle = "123";
-    when(jsniUtils.getMultipleUploadFileNames(any()))
+    when(jsinteropUtils.getMultipleUploadFileNames(any()))
       .thenReturn(new String[] { "testName", "testName2" });
 
     // Configure before the test
     widget.configure("button text", mockCallback);
     reset(mockView);
+    when(mockView.getInputId()).thenReturn(inputId);
+
     // method under test.
     widget.onFileSelected();
     verify(mockView).updateProgress(1, "1%");
@@ -215,7 +238,7 @@ public class FileHandleUploadWidgetImplTest {
       .uploadFile(
         anyString(),
         anyString(),
-        any(JavaScriptObject.class),
+        any(Blob.class),
         handleCaptor.capture(),
         any(Long.class),
         eq(mockView)
@@ -237,6 +260,7 @@ public class FileHandleUploadWidgetImplTest {
     validator.setInvalidFileCallback(mockFailedValidationCallback);
     widget.setValidation(validator);
     reset(mockView);
+    when(mockView.getInputId()).thenReturn(inputId);
     // method under test.
     widget.onFileSelected();
     verify(mockView, never()).updateProgress(1, "1%");
@@ -274,7 +298,7 @@ public class FileHandleUploadWidgetImplTest {
       .uploadFile(
         anyString(),
         anyString(),
-        any(JavaScriptObject.class),
+        any(Blob.class),
         handleCaptor.capture(),
         any(Long.class),
         eq(mockView)
@@ -294,6 +318,7 @@ public class FileHandleUploadWidgetImplTest {
     };
     widget.setValidation(validator);
     reset(mockView);
+    when(mockView.getInputId()).thenReturn(inputId);
     // method under test.
     widget.onFileSelected();
     verify(mockView, never()).updateProgress(1, "1%");

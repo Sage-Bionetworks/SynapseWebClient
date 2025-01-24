@@ -14,6 +14,8 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import java.util.Arrays;
+import java.util.Collections;
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
@@ -29,6 +31,11 @@ import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
+import org.sagebionetworks.repo.model.search.query.KeyValue;
+import org.sagebionetworks.repo.model.search.query.SearchQuery;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -48,6 +55,7 @@ import org.sagebionetworks.web.client.widget.ReactComponent;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.table.v2.results.SortableTableHeaderImpl;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
+import org.sagebionetworks.web.shared.SearchQueryUtils;
 
 public class ProfileViewImpl extends Composite implements ProfileView {
 
@@ -220,6 +228,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 
   CookieProvider cookies;
   SynapseReactClientFullContextPropsProvider propsProvider;
+  JSONObjectAdapter jsonObjectAdapter;
 
   @Inject
   public ProfileViewImpl(
@@ -227,13 +236,15 @@ public class ProfileViewImpl extends Composite implements ProfileView {
     Header headerWidget,
     CookieProvider cookies,
     SynapseReactClientFullContextPropsProvider propsProvider,
-    OrientationBanner orientationBanner
+    OrientationBanner orientationBanner,
+    JSONObjectAdapter jsonObjectAdapter
   ) {
     initWidget(binder.createAndBindUi(this));
     this.headerWidget = headerWidget;
     this.cookies = cookies;
     this.propsProvider = propsProvider;
     this.orientationBanner = orientationBanner;
+    this.jsonObjectAdapter = jsonObjectAdapter;
     headerWidget.configure();
     projectSearchTextBox
       .getElement()
@@ -257,7 +268,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
       presenter.goTo(new TeamSearch(teamSearchTextBox.getValue()))
     );
     projectSearchButton.addClickHandler(event ->
-      presenter.goTo(new Search(projectSearchTextBox.getValue()))
+      presenter.goTo(new Search(getCurrentProjectSearchJSON()))
     );
 
     moreChallengesButton.addClickHandler(event -> presenter.getMoreChallenges()
@@ -286,6 +297,27 @@ public class ProfileViewImpl extends Composite implements ProfileView {
     lastActivityOnColumnHeader.setSortingListener(headerName ->
       presenter.sort(ProjectListSortColumn.LAST_ACTIVITY)
     );
+  }
+
+  private String getCurrentProjectSearchJSON() {
+    String searchJSON = "";
+    JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
+    try {
+      SearchQuery query = SearchQueryUtils.getDefaultSearchQuery();
+      KeyValue projectsOnly = new KeyValue();
+      projectsOnly.setKey("node_type");
+      projectsOnly.setValue("project");
+      query.getBooleanQuery().add(projectsOnly);
+
+      query.setQueryTerm(
+        Arrays.asList(projectSearchTextBox.getValue().split("\\s+"))
+      );
+      query.writeToJSONObject(adapter);
+      searchJSON = adapter.toJSONString();
+    } catch (JSONObjectAdapterException e) {
+      showErrorMessage(DisplayConstants.ERROR_GENERIC);
+    }
+    return searchJSON;
   }
 
   @Override

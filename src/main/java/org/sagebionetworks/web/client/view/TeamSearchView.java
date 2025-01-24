@@ -21,4 +21,6 @@ public interface TeamSearchView extends IsWidget {
   public void setSynAlertWidget(Widget asWidget);
 
   void setLoadMoreContainer(Widget w);
+
+  public void setShowNoResults(boolean show);
 }

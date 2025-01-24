@@ -8,35 +8,35 @@
   <g:HTMLPanel addStyleNames="entityMetadata entity-page-side-margins">
     <g:HTMLPanel ui:field="detailedMetadata">
       <g:SimplePanel ui:field="entityModalWidgetContainer" />
-      <bh:Div>
-        <bh:Span
-          addStyleNames="boldText margin-right-5"
-          text="Project SynID:"
-        />
-        <g:TextBox
-          ui:field="idField"
-          width="115px"
-          addStyleNames="border-none noBackground"
-          readOnly="true"
-        />
-        <w:HelpWidget
-          helpMarkdown="The Synapse ID (e.g. syn123) is a unique identifier assigned to all content."
-          addStyleNames="margin-right-15"
-        />
-        <bh:Br addStyleNames="visible-xs visible-sm" />
+      <bh:Div addStyleNames="flexcontainer-row-unless-xs gap-20px-40px">
+        <bh:Div addStyleNames="flexcontainer-column">
+          <bh:Div addStyleNames="flexcontainer-row">
+            <bh:Span
+              addStyleNames="boldText margin-right-5"
+              text="Project SynID"
+            />
+            <w:HelpWidget
+              helpMarkdown="The Synapse ID (e.g. syn123) is a unique identifier assigned to all content."
+              addStyleNames="margin-right-15 moveup-5"
+            />
+          </bh:Div>
+          <g:TextBox
+            ui:field="idField"
+            width="115px"
+            addStyleNames="border-none noBackground"
+            readOnly="true"
+          />
+        </bh:Div>
         <bh:Span ui:field="doiPanel" />
-        <bh:Br addStyleNames="visible-xs visible-sm" />
-        <bh:Span ui:field="containerItemCountContainer" />
-        <bh:Br addStyleNames="visible-xs visible-sm" />
-        <bh:Span ui:field="dataUseContainer" addStyleNames="margin-right-5">
-          <bh:Span addStyleNames="margin-right-5 boldText">Access:</bh:Span>
-          <bh:Span ui:field="restrictionPanelV2" />
-        </bh:Span>
-        <bh:Br addStyleNames="visible-xs visible-sm" />
-        <bh:Span ui:field="uploadDestinationPanel" visible="false">
-          <bh:Span addStyleNames="boldText">Project Storage Location:</bh:Span>
+        <bh:Span
+          ui:field="uploadDestinationPanel"
+          addStyleNames="flexcontainer-column"
+          visible="false"
+        >
+          <bh:Span addStyleNames="boldText">Project Storage Location</bh:Span>
           <bh:Span ui:field="uploadDestinationField" />
         </bh:Span>
+        <bh:Span ui:field="projectDataAvailabilityPanel" />
       </bh:Div>
     </g:HTMLPanel>
     <bh:Div ui:field="descriptionContainer">

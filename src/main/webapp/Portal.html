@@ -10,7 +10,7 @@
 
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self' data: blob: 'unsafe-inline' 'unsafe-eval' *.synapse.org *.sagebase.org *.googleapis.com *.gstatic.com *.googletagmanager.com cdn.statuspage.io s3.amazonaws.com www.google-analytics.com kh896k90gyvg.statuspage.io *.youtube.com *.rstudio.com *.google.com *.shinyapps.io *.smartsheet.com sagebionetworks.jira.com 127.0.0.1:9876 esm.sh; img-src * data: blob:; connect-src https://* http://127.0.0.1:8888"
+      content="default-src 'self' data: blob: 'unsafe-inline' 'unsafe-eval' *.synapse.org *.sagebase.org *.googleapis.com *.gstatic.com *.googletagmanager.com cdn.statuspage.io s3.amazonaws.com www.google-analytics.com kh896k90gyvg.statuspage.io *.youtube.com *.rstudio.com *.google.com *.shinyapps.io *.smartsheet.com sagebionetworks.jira.com 127.0.0.1:9876 esm.sh; frame-ancestors 'self' https://*.synapse.org localhost; img-src * data: blob:; connect-src https://* http://127.0.0.1:8888"
     />
     <meta
       name="google-site-verification"
@@ -195,7 +195,6 @@
       loadJs(cdnEndpoint + 'generated/react-measure.js')
       loadJs(cdnEndpoint + 'generated/plotly.min.js')
       loadJs(cdnEndpoint + 'generated/create-plotly-component.min.js')
-      loadJs(cdnEndpoint + 'generated/react-router-dom.min.js')
       loadJs(cdnEndpoint + 'generated/universalCookie.min.js')
       loadJs(cdnEndpoint + 'generated/react-bootstrap.min.js')
       loadJs(cdnEndpoint + 'generated/synapse-react-client.production.min.js') // We don't load SRC's scss because we include it in our own compiled scss

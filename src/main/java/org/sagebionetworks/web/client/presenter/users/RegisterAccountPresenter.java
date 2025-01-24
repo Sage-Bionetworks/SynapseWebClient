@@ -5,16 +5,20 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
+import org.sagebionetworks.web.client.OneSageUtils;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.presenter.Presenter;
-import org.sagebionetworks.web.shared.WebConstants;
 
 public class RegisterAccountPresenter
   extends AbstractActivity
   implements Presenter<RegisterAccount> {
 
+  private final OneSageUtils oneSageUtils;
+
   @Inject
-  public RegisterAccountPresenter() {}
+  public RegisterAccountPresenter(OneSageUtils oneSageUtils) {
+    this.oneSageUtils = oneSageUtils;
+  }
 
   @Override
   public void start(AcceptsOneWidget panel, EventBus eventBus) {}
@@ -26,9 +30,7 @@ public class RegisterAccountPresenter
     );
     String email = place.getParam(RegisterAccount.EMAIL_QUERY_PARAM);
     StringBuilder targetUrl = new StringBuilder();
-    targetUrl.append(WebConstants.ONESAGE_PRODUCTION_URL);
-    targetUrl.append("/register1?");
-    targetUrl.append(WebConstants.ONESAGE_SYNAPSE_APPID_QUERY_PARAM);
+    targetUrl.append(oneSageUtils.getOneSageURL("/register1"));
 
     if (emailInvitationToken != null) {
       targetUrl.append("&signedToken=" + emailInvitationToken);

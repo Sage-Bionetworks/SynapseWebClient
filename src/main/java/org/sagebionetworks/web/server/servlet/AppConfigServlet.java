@@ -1,8 +1,10 @@
 package org.sagebionetworks.web.server.servlet;
 
 import com.amazonaws.services.appconfigdata.AWSAppConfigData;
+import com.amazonaws.services.appconfigdata.model.BadRequestException;
 import com.amazonaws.services.appconfigdata.model.GetLatestConfigurationRequest;
 import com.amazonaws.services.appconfigdata.model.GetLatestConfigurationResult;
+import com.amazonaws.services.appconfigdata.model.InternalServerException;
 import com.amazonaws.services.appconfigdata.model.StartConfigurationSessionRequest;
 import com.amazonaws.services.appconfigdata.model.StartConfigurationSessionResult;
 import com.google.gwt.thirdparty.guava.common.base.Supplier;
@@ -95,11 +97,31 @@ public class AppConfigServlet extends HttpServlet {
       );
   }
 
+  public JSONObjectAdapter getLastConfigValueOrDefault() {
+    if (lastConfigValue != null) {
+      return lastConfigValue;
+    }
+    try {
+      return new JSONObjectAdapterImpl(DEFAULT_CONFIG_VALUE);
+    } catch (JSONObjectAdapterException e) {
+      logger.log(
+        Level.SEVERE,
+        "JSONObjectAdapterException occurred in default configuration",
+        e
+      );
+      throw new RuntimeException(e);
+    }
+  }
+
   public JSONObjectAdapter getLatestConfiguration() {
     try {
       if (configurationToken == null) {
-        logger.log(Level.SEVERE, "returning default config");
-        return new JSONObjectAdapterImpl(DEFAULT_CONFIG_VALUE);
+        logger.log(
+          Level.SEVERE,
+          "The configuration token is null, the last config value will be returned." +
+          " This usually means that the initial call to initialize the configuration session failed."
+        );
+        return getLastConfigValueOrDefault();
       }
       GetLatestConfigurationRequest latestConfigRequest =
         new GetLatestConfigurationRequest()
@@ -116,21 +138,22 @@ public class AppConfigServlet extends HttpServlet {
       if (!newConfigString.isEmpty()) {
         lastConfigValue = new JSONObjectAdapterImpl(newConfigString);
       }
+    } catch (BadRequestException | InternalServerException e) {
+      // Invalid token or server error, re-initialize the session to try to recover.
+      logger.log(
+        Level.SEVERE,
+        "Failed to get latest configuration, returning last or default configuration and attempting to re-initialize the session.",
+        e
+      );
+      initializeAppConfigClient();
+      return getLastConfigValueOrDefault();
     } catch (Exception e) {
-      try {
-        logger.log(
-          Level.SEVERE,
-          "Failed to get or parse latest configuration, returning default configuration",
-          e
-        );
-        return new JSONObjectAdapterImpl(DEFAULT_CONFIG_VALUE);
-      } catch (JSONObjectAdapterException exception) {
-        logger.log(
-          Level.SEVERE,
-          "JSONObjectAdapterException occurred in default configuration",
-          exception
-        );
-      }
+      logger.log(
+        Level.SEVERE,
+        "Failed to get or parse latest configuration, returning last or default configuration.",
+        e
+      );
+      return getLastConfigValueOrDefault();
     }
     return lastConfigValue;
   }

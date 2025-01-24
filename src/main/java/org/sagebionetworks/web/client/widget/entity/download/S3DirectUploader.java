@@ -7,11 +7,13 @@ import com.google.gwt.event.logical.shared.HasAttachHandlers;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
+import elemental2.dom.Blob;
 import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJsInteropUtils;
 import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.aws.AwsSdk;
@@ -28,6 +30,7 @@ public class S3DirectUploader implements S3DirectUploadHandler {
 
   AwsSdk awsSdk;
   SynapseJSNIUtils synapseJsniUtils;
+  SynapseJsInteropUtils jsinteropUtils;
   String accessKeyId;
   String secretAccessKey;
   String bucketName;
@@ -35,7 +38,7 @@ public class S3DirectUploader implements S3DirectUploadHandler {
   String fileName;
   String contentType;
   String md5;
-  JavaScriptObject blob;
+  Blob blob;
   ProgressingFileUploadHandler handler;
   Long storageLocationId;
   HasAttachHandlers view;
@@ -47,11 +50,13 @@ public class S3DirectUploader implements S3DirectUploadHandler {
   public S3DirectUploader(
     AwsSdk awsSdk,
     SynapseJSNIUtils synapseJsniUtils,
+    SynapseJsInteropUtils jsinteropUtils,
     GWTWrapper gwt,
     SynapseClientAsync synapseClient
   ) {
     this.awsSdk = awsSdk;
     this.synapseJsniUtils = synapseJsniUtils;
+    this.jsinteropUtils = jsinteropUtils;
     this.synapseClient = synapseClient;
     fixServiceEntryPoint(synapseClient);
     this.percentFormat = gwt.getNumberFormat("##");
@@ -80,8 +85,8 @@ public class S3DirectUploader implements S3DirectUploadHandler {
       ExternalObjectStoreFileHandle fileHandle =
         new ExternalObjectStoreFileHandle();
       fileHandle.setContentMd5(md5);
-      Double fileSize = synapseJsniUtils.getFileSize(blob);
-      fileHandle.setContentSize(fileSize.longValue());
+      long fileSize = blob.size;
+      fileHandle.setContentSize(fileSize);
       fileHandle.setContentType(contentType);
       fileHandle.setFileKey(keyPrefixUUID + "/" + fileName);
       fileHandle.setFileName(fileName);
@@ -118,7 +123,7 @@ public class S3DirectUploader implements S3DirectUploadHandler {
   public void uploadFile(
     String fileName,
     String contentType,
-    JavaScriptObject blob,
+    Blob blob,
     final ProgressingFileUploadHandler handler,
     final String keyPrefixUUID,
     final Long storageLocationId,

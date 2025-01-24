@@ -108,8 +108,6 @@ public class EntityFinderWidgetImplTest {
 
     String title = "Custom modal title";
     String prompt = "Custom prompt text";
-    EntityFinderProps.SelectedCopyHandler selected = count ->
-      "Custom selected text";
     String confirmCopy = "Custom Action";
     String helpText = "Custom Instructions and Guidance";
 
@@ -125,7 +123,6 @@ public class EntityFinderWidgetImplTest {
     // Copy text
     builder.setModalTitle(title);
     builder.setPromptCopy(prompt);
-    builder.setSelectedCopy(selected);
     builder.setConfirmButtonCopy(confirmCopy);
     builder.setHelpMarkdown(helpText);
 
@@ -153,7 +150,6 @@ public class EntityFinderWidgetImplTest {
         selectableTypes,
         visibleTypesInList,
         visibleTypesInTree,
-        selected,
         treeOnly
       );
   }
@@ -216,7 +212,6 @@ public class EntityFinderWidgetImplTest {
         any(EntityFilter.class),
         any(EntityFilter.class),
         any(EntityFilter.class),
-        any(),
         anyBoolean()
       );
   }

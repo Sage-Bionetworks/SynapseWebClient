@@ -40,7 +40,7 @@ public class GWTCookieImpl implements CookieProvider {
       .toLowerCase()
       .startsWith("https");
     String domain = CookieUtils.getDomain(Window.Location.getHostName());
-    setCookie(name, value, expires, domain, null, isSecure);
+    setCookie(name, value, expires, domain, "/", isSecure);
   }
 
   @Override

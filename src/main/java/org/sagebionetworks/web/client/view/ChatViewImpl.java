@@ -9,7 +9,6 @@ import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.jsinterop.SynapseChatProps;
-import org.sagebionetworks.web.client.jsinterop.SynapseHomepageV2Props;
 import org.sagebionetworks.web.client.widget.ReactComponent;
 import org.sagebionetworks.web.client.widget.header.Header;
 
@@ -36,13 +35,17 @@ public class ChatViewImpl extends Composite implements ChatView {
   }
 
   @Override
-  public void render(String initMessage, String agentId, String chatbotName) {
+  public void render(
+    String initMessage,
+    String agentRegistrationId,
+    String chatbotName
+  ) {
     headerWidget.configure();
     headerWidget.refresh();
     scrollToTop();
     SynapseChatProps props = SynapseChatProps.create(
       initMessage,
-      agentId,
+      agentRegistrationId,
       chatbotName
     );
     ReactElement component = React.createElementWithSynapseContext(

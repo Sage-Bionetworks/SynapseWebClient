@@ -203,6 +203,9 @@ public class SearchViewImpl extends Composite implements SearchView {
         new HTMLPanel(
           new SafeHtmlBuilder()
             .appendHtmlConstant(
+              "<img src=\"https://s3.us-east-1.amazonaws.com/static.synapse.org/images/NoSearchResults.svg\" width=\"300px\" />"
+            )
+            .appendHtmlConstant(
               "<h4>" + DisplayConstants.LABEL_NO_SEARCH_RESULTS_PART1
             )
             .appendEscaped(searchTerm)
@@ -211,6 +214,7 @@ public class SearchViewImpl extends Composite implements SearchView {
             )
             .toSafeHtml()
         );
+      searchResultsPanel.addStyleName("text-align-center");
       facetPanel.clear();
     } else {
       searchResultsPanel = new SimplePanel();

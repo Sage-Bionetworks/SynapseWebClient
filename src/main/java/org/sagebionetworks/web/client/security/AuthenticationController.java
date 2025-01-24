@@ -75,11 +75,6 @@ public interface AuthenticationController {
    */
   public UserProfile getCurrentUserProfile();
 
-  /**
-   * Signs the terms of use for a user
-   */
-  public void signTermsOfUse(AsyncCallback<Void> callback);
-
   public void updateCachedProfile(UserProfile updatedProfile);
 
   void checkForUserChange();

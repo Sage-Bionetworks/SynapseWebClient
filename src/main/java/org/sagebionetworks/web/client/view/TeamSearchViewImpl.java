@@ -10,6 +10,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -38,6 +39,9 @@ public class TeamSearchViewImpl extends Composite implements TeamSearchView {
 
   @UiField
   SimplePanel synAlertPanel;
+
+  @UiField
+  HTMLPanel noSearchResultsContainer;
 
   private Header headerWidget;
   private Presenter presenter;
@@ -104,5 +108,10 @@ public class TeamSearchViewImpl extends Composite implements TeamSearchView {
   @Override
   public void setSynAlertWidget(Widget synAlert) {
     synAlertPanel.setWidget(synAlert);
+  }
+
+  @Override
+  public void setShowNoResults(boolean show) {
+    noSearchResultsContainer.setVisible(show);
   }
 }

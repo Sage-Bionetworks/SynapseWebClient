@@ -36,6 +36,17 @@
           visible="false"
         />
       </bh:Div>
+      <g:HTMLPanel
+        ui:field="noSearchResultsContainer"
+        visible="false"
+        addStyleNames="margin-top-40 text-align-center"
+      >
+        <img
+          src="https://s3.us-east-1.amazonaws.com/static.synapse.org/images/NoSearchResults.svg"
+          width="300px"
+        />
+        <bh:Paragraph addStyleNames="margin-top-15" text="No people found." />
+      </g:HTMLPanel>
       <bh:Div>
         <g:SimplePanel
           ui:field="peopleListPanel"

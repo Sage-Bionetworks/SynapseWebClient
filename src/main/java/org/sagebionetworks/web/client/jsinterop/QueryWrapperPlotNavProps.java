@@ -55,7 +55,19 @@ public class QueryWrapperPlotNavProps extends ReactComponentProps {
   @JsNullable
   boolean defaultShowPlots;
 
+  @JsNullable
+  boolean defaultShowSearchBox;
+
+  @JsNullable
+  boolean hideCopyToClipboard;
+
+  @JsNullable
+  boolean hideDownload;
+
   boolean showLastUpdatedOn;
+
+  @JsNullable
+  CardConfiguration cardConfiguration;
 
   @JsOverlay
   public static QueryWrapperPlotNavProps create(
@@ -64,7 +76,14 @@ public class QueryWrapperPlotNavProps extends ReactComponentProps {
     OnQueryCallback onQueryChange,
     OnQueryResultBundleCallback onQueryResultBundleChange,
     OnViewSharingSettingsHandler onViewSharingSettingsClicked,
-    boolean hideSqlEditorControl
+    boolean hideSqlEditorControl,
+    Boolean defaultShowPlots,
+    Boolean defaultShowSearchBox,
+    Boolean hideCopyToClipboard,
+    Boolean hideDownload,
+    SynapseTableProps tableConfiguration,
+    CardConfiguration cardConfiguration,
+    String name
   ) {
     QueryWrapperPlotNavProps props = new QueryWrapperPlotNavProps();
     props.sql = sql;
@@ -73,13 +92,35 @@ public class QueryWrapperPlotNavProps extends ReactComponentProps {
     props.onQueryChange = onQueryChange;
     props.onQueryResultBundleChange = onQueryResultBundleChange;
     props.onViewSharingSettingsClicked = onViewSharingSettingsClicked;
-    props.tableConfiguration = SynapseTableProps.create();
+    if (tableConfiguration != null) {
+      props.tableConfiguration = tableConfiguration;
+    }
     props.shouldDeepLink = false;
     props.name = "Items";
+    if (name != null) {
+      props.name = name;
+    }
     props.downloadCartPageUrl = "DownloadCart:0";
     props.showLastUpdatedOn = false;
     // SWC-6138 - hide charts by default
     props.defaultShowPlots = false;
+    if (defaultShowPlots != null) {
+      //unbox
+      props.defaultShowPlots = defaultShowPlots;
+    }
+    if (defaultShowSearchBox != null) {
+      //unbox
+      props.defaultShowSearchBox = defaultShowSearchBox;
+    }
+    if (hideCopyToClipboard != null) {
+      //unbox
+      props.hideCopyToClipboard = hideCopyToClipboard;
+    }
+    if (hideDownload != null) {
+      //unbox
+      props.hideDownload = hideDownload;
+    }
+    props.cardConfiguration = cardConfiguration;
     return props;
   }
 }

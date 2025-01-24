@@ -57,8 +57,6 @@ public interface EntityFinderWidget {
 
     Builder setHelpMarkdown(String helpMarkdown);
 
-    Builder setSelectedCopy(EntityFinderProps.SelectedCopyHandler selectedCopy);
-
     Builder setInitialScope(EntityFinderScope initialScope);
 
     Builder setConfirmButtonCopy(String confirmButtonCopy);

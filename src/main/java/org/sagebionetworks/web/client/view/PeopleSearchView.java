@@ -23,4 +23,6 @@ public interface PeopleSearchView extends IsWidget {
   public void setSynAlertWidget(Widget asWidget);
 
   public void setSynAlertWidgetVisible(boolean b);
+
+  public void setShowNoResults(boolean show);
 }

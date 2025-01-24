@@ -154,6 +154,9 @@ public class ProfilePresenterTest {
   @Mock
   ProjectHeaderList mockProjectHeaderList;
 
+  @Mock
+  OneSageUtils mockOneSageUtils;
+
   List<Team> myTeams;
   List<String> teamIds;
   public static final String NEXT_PAGE_TOKEN = "19282";
@@ -171,7 +174,8 @@ public class ProfilePresenterTest {
         mockTeamListWidget,
         mockTeamInviteWidget,
         mockInjector,
-        mockSynapseJavascriptClient
+        mockSynapseJavascriptClient,
+        mockOneSageUtils
       );
     verify(mockView).setPresenter(profilePresenter);
     when(mockGlobalApplicationState.getPlaceChanger())
