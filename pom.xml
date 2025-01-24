@@ -382,7 +382,7 @@
         </executions>
 
         <configuration>
-          <nodeVersion>v18.16.0</nodeVersion>
+          <nodeVersion>v20.18.2</nodeVersion>
           <yarnVersion>v1.22.17</yarnVersion>
         </configuration>
       </plugin>
