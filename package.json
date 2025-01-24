@@ -62,9 +62,10 @@
   },
   "scripts": {
     "build": "mvn -B package --file pom.xml",
-    "dev": "concurrently -k -n \"CODESERVER,TOMCAT\" -c \"auto,auto\" \"yarn dev:codeserver\" \"yarn dev:tomcat\"",
+    "dev": "concurrently -k -n \"CODESERVER,WATCHER,TOMCAT\" -c \"auto,auto,auto\" \"yarn dev:codeserver\" \"yarn dev:watcher\" \"yarn dev:tomcat\"",
     "dev:codeserver": "mvn clean gwt:run-codeserver",
-    "dev:tomcat": "wait-on tcp:9876 && docker pull tomcat:9.0; docker run --name swc-dev --rm -p 8888:8080 -v \"/$(pwd)/target/portal-develop-SNAPSHOT/:/usr/local/tomcat/webapps/ROOT/\" -v \"/$HOME/.m2/settings.xml\":/root/.m2/settings.xml tomcat:9.0",
+    "dev:watcher": "wait-on tcp:9876 && mvn fizzed-watcher:run",
+    "dev:tomcat": "wait-on tcp:9876 && docker pull tomcat:9.0; docker run --name swc-dev --rm -p 8888:8080 -v \"/$(pwd)/src/main/webapp/:/usr/local/tomcat/webapps/ROOT/\" -v \"/$HOME/.m2/settings.xml\":/root/.m2/settings.xml tomcat:9.0",
     "docker:start": "docker pull tomcat:9.0; docker run --name swc-tomcat -d --rm -p 8888:8080 -v \"/$(pwd)/target/portal-develop-SNAPSHOT.war:/usr/local/tomcat/webapps/ROOT.war\" -v \"/$(pwd)/e2e_workflow/settings.xml\":/root/.m2/settings.xml tomcat:9.0",
     "docker:stop": "docker stop swc-tomcat",
     "prepare": "husky install",
