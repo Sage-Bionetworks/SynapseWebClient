@@ -279,7 +279,7 @@
               <attachClasses>true</attachClasses>
             </configuration>
           </execution>
-          <!-- This next section is to copy the source maps into the WEB-INF directory 
+          <!-- This next section is to copy the source maps into the WEB-INF directory
 						(during the package phase, from junit output) -->
           <execution>
             <id>execution2</id>
@@ -301,8 +301,34 @@
         </executions>
       </plugin>
 
-      <!-- We use this assembly to package the GWT RPC dependencies so they 
-				are aviablible fore integration testing. -->
+      <plugin>
+        <groupId>com.fizzed</groupId>
+        <artifactId>fizzed-watcher-maven-plugin</artifactId>
+        <version>1.0.6</version>
+        <!-- This configuration is used to watch the node_modules directory for changes and copy those to the static assets folder when they change -->
+        <!-- Then those assets are copied into the exploded WAR -->
+        <configuration>
+          <touchFile>target/classes/watcher_explode_war.txt</touchFile>
+          <watches>
+            <watch>
+              <directory>
+                ${project.basedir}/node_modules/synapse-react-client/dist/umd
+              </directory>
+            </watch>
+            <watch>
+              <directory>${project.basedir}/src/main/webapp/css</directory>
+              <directory>${project.basedir}/src/main/webapp/sass</directory>
+            </watch>
+          </watches>
+          <goals>
+            <goal>process-resources</goal>
+            <goal>war:exploded</goal>
+          </goals>
+        </configuration>
+      </plugin>
+
+      <!-- We use this assembly to compile the GWT RPC dependencies so they
+				are available for integration testing. -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
@@ -316,7 +342,7 @@
           <execution>
             <id>make-assembly</id>
             <!-- this is used for inheritance merges -->
-            <phase>package</phase>
+            <phase>compile</phase>
             <!-- bind to the packaging phase -->
             <goals>
               <goal>single</goal>
