@@ -315,6 +315,10 @@
                 ${project.basedir}/node_modules/synapse-react-client/dist/umd
               </directory>
             </watch>
+            <watch>
+              <directory>${project.basedir}/src/main/webapp/css</directory>
+              <directory>${project.basedir}/src/main/webapp/sass</directory>
+            </watch>
           </watches>
           <goals>
             <goal>process-resources</goal>
