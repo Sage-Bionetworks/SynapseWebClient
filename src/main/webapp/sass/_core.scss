@@ -422,7 +422,7 @@ end sticky footer
     color: $synapse-dark-text;
   }
 
-  @media (max-width: 500px) {
+  @media (max-width: 768px) {
     .btn-default-wide {
       width: 100%;
     }
