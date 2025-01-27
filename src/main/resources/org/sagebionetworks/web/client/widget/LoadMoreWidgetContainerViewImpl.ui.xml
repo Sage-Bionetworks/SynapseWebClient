@@ -8,7 +8,11 @@
   <bh:Div marginBottom="5" width="100%">
     <bh:Div ui:field="container" />
     <bh:ClearFix />
-    <b:Button ui:field="loadMoreButton" text="Show more results" />
+    <b:Button
+      ui:field="loadMoreButton"
+      text="Show more results"
+      addStyleNames="btn-default-wide"
+    />
     <w:LoadingSpinner
       ui:field="loadMoreImage"
       size="31px"
