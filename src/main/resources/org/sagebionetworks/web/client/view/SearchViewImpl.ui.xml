@@ -16,7 +16,7 @@
           <div class="row">
             <div class="col-md-12">
               <MUI:Grid container="true">
-                <MUI:Grid md="9">
+                <MUI:Grid xs="10" md="9">
                   <b:InputGroup width="100%">
                     <b:TextBox
                       ui:field="searchField"
@@ -24,13 +24,21 @@
                     />
                   </b:InputGroup>
                 </MUI:Grid>
-                <MUI:Grid md="3">
+                <MUI:Grid xs="2" md="3">
                   <b:Button
                     ui:field="searchButton"
                     block="true"
                     size="LARGE"
                     text="Search"
                     icon="SEARCH"
+                    visibleOn="SM_MD_LG"
+                  />
+                  <b:Button
+                    ui:field="searchButtonSmall"
+                    block="false"
+                    size="LARGE"
+                    icon="SEARCH"
+                    visibleOn="XS"
                   />
                 </MUI:Grid>
               </MUI:Grid>

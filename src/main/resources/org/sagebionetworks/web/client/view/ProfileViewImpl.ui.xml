@@ -68,6 +68,12 @@
                             ui:field="projectSearchButton"
                             text="Search All Projects"
                             icon="SEARCH"
+                            visibleOn="SM_MD_LG"
+                          />
+                          <b:Button
+                            ui:field="projectSearchButtonSmall"
+                            icon="SEARCH"
+                            visibleOn="XS"
                           />
                         </b:InputGroupButton>
                       </b:InputGroup>
@@ -214,6 +220,12 @@
                             ui:field="teamSearchButton"
                             text="Search All Teams"
                             icon="SEARCH"
+                            visibleOn="SM_MD_LG"
+                          />
+                          <b:Button
+                            ui:field="teamSearchButtonSmall"
+                            icon="SEARCH"
+                            visibleOn="XS"
                           />
                         </b:InputGroupButton>
                       </b:InputGroup>

@@ -106,6 +106,9 @@ public class SearchViewImpl extends Composite implements SearchView {
   @UiField
   Button searchButton;
 
+  @UiField
+  Button searchButtonSmall;
+
   private List<Button> facetButtons;
   private SynapseJSNIUtils synapseJSNIUtils;
   private PortalGinInjector ginInjector;
@@ -130,14 +133,10 @@ public class SearchViewImpl extends Composite implements SearchView {
     this.dateTimeUtils = dateTimeUtils;
     this.markdownIt = markdownIt;
     headerWidget.configure();
-    searchButton.addClickHandler(
-      new ClickHandler() {
-        @Override
-        public void onClick(ClickEvent event) {
-          presenter.setSearchTerm(searchField.getText());
-        }
-      }
-    );
+    ClickHandler searchHandler = event ->
+      presenter.setSearchTerm(searchField.getValue());
+    searchButton.addClickHandler(searchHandler);
+    searchButtonSmall.addClickHandler(searchHandler);
     searchField.addKeyDownHandler(
       new KeyDownHandler() {
         @Override

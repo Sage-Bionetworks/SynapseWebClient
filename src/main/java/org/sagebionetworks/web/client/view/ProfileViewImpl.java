@@ -167,7 +167,13 @@ public class ProfileViewImpl extends Composite implements ProfileView {
   Button teamSearchButton;
 
   @UiField
+  Button teamSearchButtonSmall;
+
+  @UiField
   Button projectSearchButton;
+
+  @UiField
+  Button projectSearchButtonSmall;
 
   // Challenges
   @UiField
@@ -264,12 +270,15 @@ public class ProfileViewImpl extends Composite implements ProfileView {
       }
     });
 
-    teamSearchButton.addClickHandler(event ->
-      presenter.goTo(new TeamSearch(teamSearchTextBox.getValue()))
-    );
-    projectSearchButton.addClickHandler(event ->
-      presenter.goTo(new Search(getCurrentProjectSearchJSON()))
-    );
+    ClickHandler teamSearchHandler = event ->
+      presenter.goTo(new TeamSearch(teamSearchTextBox.getValue()));
+    teamSearchButton.addClickHandler(teamSearchHandler);
+    teamSearchButtonSmall.addClickHandler(teamSearchHandler);
+
+    ClickHandler projectSearchHandler = event ->
+      presenter.goTo(new Search(projectSearchTextBox.getValue()));
+    projectSearchButton.addClickHandler(projectSearchHandler);
+    projectSearchButtonSmall.addClickHandler(projectSearchHandler);
 
     moreChallengesButton.addClickHandler(event -> presenter.getMoreChallenges()
     );
