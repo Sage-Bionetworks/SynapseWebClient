@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import javax.servlet.FilterChain;
@@ -25,6 +26,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
+import org.sagebionetworks.PropertyProvider;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityType;
@@ -47,7 +49,8 @@ import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.SynapseProviderImpl;
 import org.sagebionetworks.web.server.servlet.UserDataProvider;
-import org.sagebionetworks.web.server.servlet.ViteHTMLProvider;
+import org.sagebionetworks.web.server.servlet.ViteHTMLGenerator;
+import org.sagebionetworks.web.server.servlet.ViteHTMLGeneratorImpl;
 import org.sagebionetworks.web.server.servlet.ViteManifestProvider;
 import org.sagebionetworks.web.shared.SearchQueryUtils;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -59,11 +62,19 @@ import org.springframework.web.filter.OncePerRequestFilter;
  */
 public class HtmlInjectionFilter extends OncePerRequestFilter {
 
+  PropertyProvider propertyProvider;
   ViteManifestProvider viteManifestProvider;
+  ViteHTMLGenerator viteHTMLGenerator;
 
   @Inject
-  public HtmlInjectionFilter(ViteManifestProvider viteManifestProvider) {
+  public HtmlInjectionFilter(
+    PropertyProvider propertyProvider,
+    ViteManifestProvider viteManifestProvider,
+    ViteHTMLGenerator viteHTMLGenerator
+  ) {
+    this.propertyProvider = propertyProvider;
     this.viteManifestProvider = viteManifestProvider;
+    this.viteHTMLGenerator = viteHTMLGenerator;
   }
 
   public static final String SEARCHING_FOR_TEAM = "Searching for Team: ";
@@ -99,7 +110,7 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
   public static final List<String> VITE_IMPORTED_FILES = List.of("js/main.js");
 
   Pattern CDN_ORIGINS_REGEX = Pattern.compile(
-    "(www|staging|tst)\\.synapse\\.org$"
+    "https?://((www|staging|tst)\\.synapse\\.org)$"
   );
 
   public static final String META_ROBOTS_NOINDEX =
@@ -182,29 +193,36 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
     HttpServletRequest request
   ) {
     String origin = request.getHeader("origin");
-    if (origin != null && CDN_ORIGINS_REGEX.matcher(origin).matches()) {
-      dataModel.put(CDN_ENDPOINT_KEY, "//cdn-" + request.getHeader("origin"));
-    } else {
-      dataModel.put(CDN_ENDPOINT_KEY, "");
+    if (origin != null) {
+      Matcher matcher = CDN_ORIGINS_REGEX.matcher(origin);
+      if (matcher.matches()) {
+        String hostnameAndPort = matcher.group(1);
+        dataModel.put(CDN_ENDPOINT_KEY, "//cdn-" + hostnameAndPort);
+        return;
+      }
     }
+    dataModel.put(CDN_ENDPOINT_KEY, "");
   }
 
   /**
-   * Adds Vite imports to the data model based on the request origin.
+   * Adds Vite imports to the data model based on the current mode.
    * This must be called AFTER the CDN_ENDPOINT_KEY is added to the data model
    * @param dataModel
    */
   private void addViteImports(Map<String, String> dataModel) {
-    boolean isDev = "true".equals(System.getProperty(IS_DEV_MODE));
+    boolean isDev =
+      "true".equals(
+          propertyProvider.getSystemProperties().getProperty(IS_DEV_MODE)
+        );
     if (isDev) {
       dataModel.put(
         VITE_IMPORTS_INJECTION_KEY,
-        ViteHTMLProvider.getViteDevelopmentHTML(VITE_IMPORTED_FILES)
+        viteHTMLGenerator.getViteDevelopmentHTML(VITE_IMPORTED_FILES)
       );
     } else {
       dataModel.put(
         VITE_IMPORTS_INJECTION_KEY,
-        ViteHTMLProvider.getViteProductionHTML(
+        viteHTMLGenerator.getViteProductionHTML(
           VITE_IMPORTED_FILES,
           viteManifestProvider.getManifest(),
           dataModel.get(CDN_ENDPOINT_KEY) + "/generated/vite/"

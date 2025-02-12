@@ -47,6 +47,8 @@ import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.UserAccountServiceImpl;
 import org.sagebionetworks.web.server.servlet.UserProfileClientImpl;
 import org.sagebionetworks.web.server.servlet.VersionsServlet;
+import org.sagebionetworks.web.server.servlet.ViteHTMLGenerator;
+import org.sagebionetworks.web.server.servlet.ViteHTMLGeneratorImpl;
 import org.sagebionetworks.web.server.servlet.ViteManifestProvider;
 import org.sagebionetworks.web.server.servlet.ViteManifestProviderImpl;
 import org.sagebionetworks.web.server.servlet.filter.AmpADFilter;
@@ -98,6 +100,8 @@ public class PortalServletModule extends ServletModule {
 
     // JSONObjectAdapter
     bind(JSONObjectAdapter.class).to(JSONObjectAdapterImpl.class);
+
+    bind(ViteHTMLGenerator.class).to(ViteHTMLGeneratorImpl.class);
   }
 
   private void bindFilters() {

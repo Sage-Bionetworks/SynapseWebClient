@@ -9,7 +9,7 @@ import org.json.JSONObject;
 /**
  * This class is used to provide the HTML scripts required by Vite.
  */
-public class ViteHTMLProvider {
+public class ViteHTMLGeneratorImpl implements ViteHTMLGenerator {
 
   private static final String VITE_DEV_SERVER_URL = "http://localhost:5173";
 
@@ -22,7 +22,8 @@ public class ViteHTMLProvider {
    *
    * @return the HTML script required by Vite
    */
-  public static String getViteDevelopmentHTML(List<String> filesToImport) {
+  @Override
+  public String getViteDevelopmentHTML(List<String> filesToImport) {
     StringBuilder html = new StringBuilder();
     html.append(
       "<script type=\"module\" src=\"" +
@@ -45,7 +46,7 @@ public class ViteHTMLProvider {
     return html.toString();
   }
 
-  private static List<JSONObject> getImportedChunks(
+  private List<JSONObject> getImportedChunks(
     JSONObject chunk,
     JSONObject manifest,
     Set<String> seen
@@ -68,10 +69,7 @@ public class ViteHTMLProvider {
     return chunks;
   }
 
-  private static List<JSONObject> importedChunks(
-    JSONObject manifest,
-    String name
-  ) {
+  private List<JSONObject> importedChunks(JSONObject manifest, String name) {
     return getImportedChunks(
       manifest.getJSONObject(name),
       manifest,
@@ -79,7 +77,8 @@ public class ViteHTMLProvider {
     );
   }
 
-  public static String getViteProductionHTML(
+  @Override
+  public String getViteProductionHTML(
     List<String> filesToImport,
     JSONObject manifest,
     String assetPath

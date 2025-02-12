@@ -1,11 +1,14 @@
 package org.sagebionetworks.web.unitserver.filter;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.server.StackEndpoints.IS_DEV_MODE;
 import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.ORIGIN_HEADER;
 import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.SYNAPSE_ORG_SUFFIX;
 import static org.sagebionetworks.web.server.servlet.filter.CrawlFilter.META_ROBOTS_NOINDEX;
@@ -21,6 +24,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URLEncoder;
 import java.util.Collections;
+import java.util.List;
+import java.util.Properties;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -33,6 +38,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.sagebionetworks.PropertyProvider;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
@@ -52,6 +58,7 @@ import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
+import org.sagebionetworks.web.server.servlet.ViteHTMLGenerator;
 import org.sagebionetworks.web.server.servlet.ViteManifestProvider;
 import org.sagebionetworks.web.server.servlet.filter.BotHtml;
 import org.sagebionetworks.web.server.servlet.filter.CrawlFilter;
@@ -138,6 +145,18 @@ public class HtmlInjectionFilterTest {
   @Mock
   ViteManifestProvider mockViteManifestProvider;
 
+  @Mock
+  ViteHTMLGenerator mockViteHTMLGenerator;
+
+  @Mock
+  PropertyProvider mockPropertyProvider;
+
+  @Mock
+  Properties mockProperties;
+
+  @Mock
+  JSONObject mockViteManifest;
+
   private Template getTemplate(String html)
     throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, IOException {
     Configuration cfg = new Configuration(Configuration.VERSION_2_3_31);
@@ -150,7 +169,12 @@ public class HtmlInjectionFilterTest {
   @Before
   public void setUp()
     throws RestServiceException, IOException, SynapseException, JSONObjectAdapterException {
-    filter = new HtmlInjectionFilter(mockViteManifestProvider);
+    filter =
+      new HtmlInjectionFilter(
+        mockPropertyProvider,
+        mockViteManifestProvider,
+        mockViteHTMLGenerator
+      );
     Template pageTitleTemplate = getTemplate(
       "${" +
       HtmlInjectionFilter.PAGE_TITLE_KEY +
@@ -202,22 +226,12 @@ public class HtmlInjectionFilterTest {
     when(mockUserProfile.getSummary()).thenReturn(SUMMARY);
     //by default, set up as a bot request since this will return more
     when(mockRequest.getHeader("User-Agent")).thenReturn("Googlebot/2.1");
-    when(mockViteManifestProvider.getManifest())
-      .thenReturn(
-        new JSONObject(
-          "{\n" +
-          "  \"js/main.js\": {\n" +
-          "    \"file\": \"assets/main-CYMHVCPO.js\",\n" +
-          "    \"name\": \"main\",\n" +
-          "    \"src\": \"js/main.js\",\n" +
-          "    \"isEntry\": true,\n" +
-          "    \"css\": [\n" +
-          "      \"assets/main-Dh3K2nay.css\"\n" +
-          "    ]\n" +
-          "  }\n" +
-          "}"
-        )
-      );
+    when(mockPropertyProvider.getSystemProperties()).thenReturn(mockProperties);
+    when(mockProperties.getProperty(anyString())).thenReturn(null);
+    when(mockViteManifestProvider.getManifest()).thenReturn(mockViteManifest);
+    when(mockViteHTMLGenerator.getViteDevelopmentHTML(any())).thenReturn("");
+    when(mockViteHTMLGenerator.getViteProductionHTML(any(), any(), any()))
+      .thenReturn("");
   }
 
   private void setRequestURL(String s) {
@@ -527,8 +541,137 @@ public class HtmlInjectionFilterTest {
   }
 
   @Test
-  public void testConfigureViteDev() {}
+  public void testConfigureCdnWww()
+    throws ServletException, IOException, RestServiceException, SynapseException {
+    Template template = getTemplate(
+      "${" + HtmlInjectionFilter.CDN_ENDPOINT_KEY + "}"
+    );
+
+    setRequestURL("https://www.synapse.org/");
+    when(mockRequest.getHeader("origin")).thenReturn("https://www.synapse.org");
+
+    filter.init(template, mockCrawlFilter);
+
+    filter.testFilter(mockRequest, mockResponse, mockFilterChain);
+
+    verify(mockPrintWriter).print(stringCaptor.capture());
+    String outputString = stringCaptor.getValue();
+    assertEquals("//cdn-www.synapse.org", outputString);
+  }
 
   @Test
-  public void testConfigureViteProd() {}
+  public void testConfigureCdnStaging()
+    throws ServletException, IOException, RestServiceException, SynapseException {
+    Template template = getTemplate(
+      "${" + HtmlInjectionFilter.CDN_ENDPOINT_KEY + "}"
+    );
+
+    setRequestURL("https://staging.synapse.org/");
+    when(mockRequest.getHeader("origin"))
+      .thenReturn("https://staging.synapse.org");
+
+    filter.init(template, mockCrawlFilter);
+
+    filter.testFilter(mockRequest, mockResponse, mockFilterChain);
+
+    verify(mockPrintWriter).print(stringCaptor.capture());
+    String outputString = stringCaptor.getValue();
+    assertEquals("//cdn-staging.synapse.org", outputString);
+  }
+
+  @Test
+  public void testConfigureCdnTst()
+    throws ServletException, IOException, RestServiceException, SynapseException {
+    Template template = getTemplate(
+      "${" + HtmlInjectionFilter.CDN_ENDPOINT_KEY + "}"
+    );
+
+    setRequestURL("https://tst.synapse.org/");
+    when(mockRequest.getHeader("origin")).thenReturn("https://tst.synapse.org");
+
+    filter.init(template, mockCrawlFilter);
+
+    filter.testFilter(mockRequest, mockResponse, mockFilterChain);
+
+    verify(mockPrintWriter).print(stringCaptor.capture());
+    String outputString = stringCaptor.getValue();
+    assertEquals("//cdn-tst.synapse.org", outputString);
+  }
+
+  @Test
+  public void testConfigureCdnLocalhost()
+    throws ServletException, IOException, RestServiceException, SynapseException {
+    Template template = getTemplate(
+      "${" + HtmlInjectionFilter.CDN_ENDPOINT_KEY + "}"
+    );
+
+    setRequestURL("https://localhost:8888/");
+    when(mockRequest.getHeader("origin")).thenReturn("https://localhost:8888");
+
+    filter.init(template, mockCrawlFilter);
+
+    filter.testFilter(mockRequest, mockResponse, mockFilterChain);
+
+    verify(mockPrintWriter).print(stringCaptor.capture());
+    String outputString = stringCaptor.getValue();
+    assertEquals("", outputString);
+  }
+
+  @Test
+  public void testConfigureViteDev()
+    throws ServletException, IOException, RestServiceException, SynapseException {
+    Template template = getTemplate(
+      "${" + HtmlInjectionFilter.VITE_IMPORTS_INJECTION_KEY + "}"
+    );
+
+    setRequestURL("https://www.synapse.org/");
+
+    String injectedValue = "<script src=\"some-vite-dev-asset.js\"></script>";
+    when(mockProperties.getProperty(IS_DEV_MODE)).thenReturn("true");
+    when(mockViteHTMLGenerator.getViteDevelopmentHTML(any()))
+      .thenReturn(injectedValue);
+
+    filter.init(template, mockCrawlFilter);
+
+    filter.testFilter(mockRequest, mockResponse, mockFilterChain);
+
+    verify(mockPrintWriter).print(stringCaptor.capture());
+    String outputString = stringCaptor.getValue();
+    assertEquals(injectedValue, outputString);
+
+    verify(mockViteHTMLGenerator).getViteDevelopmentHTML(List.of("js/main.js"));
+    verify(mockViteHTMLGenerator, never())
+      .getViteProductionHTML(any(), any(), any());
+  }
+
+  @Test
+  public void testConfigureViteProd()
+    throws ServletException, IOException, RestServiceException, SynapseException {
+    Template template = getTemplate(
+      "${" + HtmlInjectionFilter.VITE_IMPORTS_INJECTION_KEY + "}"
+    );
+
+    setRequestURL("https://www.synapse.org/");
+
+    String injectedValue = "<script src=\"some-vite-prod-asset.js\"></script>";
+    when(mockProperties.getProperty(IS_DEV_MODE)).thenReturn(null);
+    when(mockViteHTMLGenerator.getViteProductionHTML(any(), any(), anyString()))
+      .thenReturn(injectedValue);
+
+    filter.init(template, mockCrawlFilter);
+
+    filter.testFilter(mockRequest, mockResponse, mockFilterChain);
+
+    verify(mockPrintWriter).print(stringCaptor.capture());
+    String outputString = stringCaptor.getValue();
+    assertEquals(injectedValue, outputString);
+
+    verify(mockViteHTMLGenerator, never()).getViteDevelopmentHTML(any());
+    verify(mockViteHTMLGenerator)
+      .getViteProductionHTML(
+        List.of("js/main.js"),
+        mockViteManifest,
+        "//cdn-www.synapse.org/generated/vite/"
+      );
+  }
 }

@@ -6,12 +6,11 @@ import junit.framework.TestCase;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-public class ViteHTMLProviderTest extends TestCase {
+public class ViteHTMLGeneratorImplTest extends TestCase {
 
   public void testGetViteDevelopmentHTML() {
-    String html = ViteHTMLProvider.getViteDevelopmentHTML(
-      List.of("js/main.js")
-    );
+    ViteHTMLGeneratorImpl generator = new ViteHTMLGeneratorImpl();
+    String html = generator.getViteDevelopmentHTML(List.of("js/main.js"));
 
     assertEquals(
       "<script type=\"module\" src=\"http://localhost:5173/@vite/client\"></script>\n" +
@@ -23,6 +22,8 @@ public class ViteHTMLProviderTest extends TestCase {
   public void testGetViteProductionHTML() {
     // Test matches the example at https://vite.dev/guide/backend-integration
 
+    ViteHTMLGeneratorImpl generator = new ViteHTMLGeneratorImpl();
+
     InputStream exampleManifestAsStream = getClass()
       .getClassLoader()
       .getResourceAsStream("example-manifest.json");
@@ -30,7 +31,7 @@ public class ViteHTMLProviderTest extends TestCase {
       new JSONTokener(exampleManifestAsStream)
     );
 
-    String fooHtml = ViteHTMLProvider.getViteProductionHTML(
+    String fooHtml = generator.getViteProductionHTML(
       List.of("views/foo.js"),
       manifest,
       ""
@@ -44,7 +45,7 @@ public class ViteHTMLProviderTest extends TestCase {
       fooHtml
     );
 
-    String barHtml = ViteHTMLProvider.getViteProductionHTML(
+    String barHtml = generator.getViteProductionHTML(
       List.of("views/bar.js"),
       manifest,
       ""
