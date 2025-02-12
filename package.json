@@ -73,10 +73,6 @@
   },
   "scripts": {
     "build": "mvn -B package --file pom.xml",
-    "build:js": "pnpm build:js:vite",
-    "build:js:vite": "vite build",
-    "build:js:esbuild": "esbuild js/**.ts --bundle --platform=browser --format=iife --outdir=./src/main/webapp/generated",
-    "build:js:rolldown": "rolldown js/main.js --platform browser --format esm --file ./src/main/webapp/generated/swc-modules.js",
     "dev": "pnpm concurrently -k -n \"CODESERVER,WATCHER,TOMCAT,VITE\" -c \"auto,auto,auto,auto\" \"pnpm dev:codeserver\" \"pnpm dev:watcher\" \"pnpm dev:tomcat\" \"pnpm dev:vite\"",
     "dev:codeserver": "mvn clean gwt:run-codeserver",
     "dev:watcher": "wait-on tcp:127.0.0.1:9876 && mvn fizzed-watcher:run",
