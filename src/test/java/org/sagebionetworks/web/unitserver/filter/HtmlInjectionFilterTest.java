@@ -25,6 +25,7 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -51,6 +52,7 @@ import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
+import org.sagebionetworks.web.server.servlet.ViteManifestProvider;
 import org.sagebionetworks.web.server.servlet.filter.BotHtml;
 import org.sagebionetworks.web.server.servlet.filter.CrawlFilter;
 import org.sagebionetworks.web.server.servlet.filter.HtmlInjectionFilter;
@@ -133,6 +135,9 @@ public class HtmlInjectionFilterTest {
   @Mock
   BotHtml mockBotHtml;
 
+  @Mock
+  ViteManifestProvider mockViteManifestProvider;
+
   private Template getTemplate(String html)
     throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, IOException {
     Configuration cfg = new Configuration(Configuration.VERSION_2_3_31);
@@ -145,7 +150,7 @@ public class HtmlInjectionFilterTest {
   @Before
   public void setUp()
     throws RestServiceException, IOException, SynapseException, JSONObjectAdapterException {
-    filter = new HtmlInjectionFilter();
+    filter = new HtmlInjectionFilter(mockViteManifestProvider);
     Template pageTitleTemplate = getTemplate(
       "${" +
       HtmlInjectionFilter.PAGE_TITLE_KEY +
@@ -197,6 +202,22 @@ public class HtmlInjectionFilterTest {
     when(mockUserProfile.getSummary()).thenReturn(SUMMARY);
     //by default, set up as a bot request since this will return more
     when(mockRequest.getHeader("User-Agent")).thenReturn("Googlebot/2.1");
+    when(mockViteManifestProvider.getManifest())
+      .thenReturn(
+        new JSONObject(
+          "{\n" +
+          "  \"js/main.js\": {\n" +
+          "    \"file\": \"assets/main-CYMHVCPO.js\",\n" +
+          "    \"name\": \"main\",\n" +
+          "    \"src\": \"js/main.js\",\n" +
+          "    \"isEntry\": true,\n" +
+          "    \"css\": [\n" +
+          "      \"assets/main-Dh3K2nay.css\"\n" +
+          "    ]\n" +
+          "  }\n" +
+          "}"
+        )
+      );
   }
 
   private void setRequestURL(String s) {
@@ -504,4 +525,10 @@ public class HtmlInjectionFilterTest {
       )
     );
   }
+
+  @Test
+  public void testConfigureViteDev() {}
+
+  @Test
+  public void testConfigureViteProd() {}
 }

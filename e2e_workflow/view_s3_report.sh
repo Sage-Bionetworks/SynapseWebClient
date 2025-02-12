@@ -37,4 +37,4 @@ aws s3 sync \
   --delete
 
 # Merge blob reports, then serve as HTML report
-yarn e2e:report:blob
+pnpm e2e:report:blob

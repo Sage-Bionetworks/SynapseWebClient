@@ -26,6 +26,13 @@ public class StackEndpoints {
   public static final String STACK_BEANSTALK_NUMBER_PROPERTY_NAME =
     "org.sagebionetworks.stack.repo.beanstalk.number";
 
+  /*
+    Indicates if the app is running in 'development' mode, i.e. one or more local development servers are dynamically
+     serving assets (i.e. GWT Code Server & Vite).
+   */
+  public static final String IS_DEV_MODE =
+    "org.sagebionetworks.web.client.dev.mode";
+
   public static final String PARAM3 = "PARAM3";
   public static final String PARAM4 = "PARAM4";
   public static final String PARAM5 = "PARAM5";
@@ -98,6 +105,15 @@ public class StackEndpoints {
         // None of these hosts match and no configuration was loaded from settings, fall back to prod
         endpointPrefix = "https://repo-prod.prod.sagebase.org";
       }
+
+      logger.warning(
+        "No configuration found for " +
+        REPO_ENDPOINT_KEY +
+        ", so servlet request will defer to the host header. Host: " +
+        host +
+        ", endpointPrefix: " +
+        endpointPrefix
+      );
     }
 
     return endpointPrefix;

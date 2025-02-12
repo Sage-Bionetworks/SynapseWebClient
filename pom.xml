@@ -312,10 +312,8 @@
           <watches>
             <watch>
               <directory>
-                ${project.basedir}/node_modules/synapse-react-client/dist/umd
+                ${project.basedir}/src/main/webapp/generated/vite
               </directory>
-            </watch>
-            <watch>
               <directory>${project.basedir}/src/main/webapp/css</directory>
               <directory>${project.basedir}/src/main/webapp/sass</directory>
             </watch>
@@ -367,25 +365,25 @@
       <plugin>
         <groupId>com.github.eirslett</groupId>
         <artifactId>frontend-maven-plugin</artifactId>
-        <version>1.11.0</version>
+        <version>1.15.1</version>
         <executions>
-          <!--We can install node/yarn as a part of the build process-->
+          <!--We can install node as a part of the build process, and corepack will procure the package manager -->
           <execution>
-            <id>Install node and yarn</id>
+            <id>install-node-and-corepack</id>
             <goals>
-              <goal>install-node-and-yarn</goal>
+              <goal>install-node-and-corepack</goal>
             </goals>
             <phase>generate-resources</phase>
           </execution>
 
           <!--Install dependencies specified in package.json, including SRC-->
           <execution>
-            <id>yarn install</id>
+            <id>install</id>
             <goals>
-              <goal>yarn</goal>
+              <goal>corepack</goal>
             </goals>
             <configuration>
-              <arguments>install</arguments>
+              <arguments>pnpm install</arguments>
             </configuration>
             <phase>generate-resources</phase>
           </execution>
@@ -395,21 +393,35 @@
           <execution>
             <id>compile sass</id>
             <goals>
-              <goal>yarn</goal>
+              <goal>corepack</goal>
             </goals>
             <configuration>
               <arguments>
+                pnpm
                 sass --no-source-map --style=compressed --unicode --stop-on-error --update --load-path=node_modules
                 src/main/webapp/sass:src/main/webapp/generated
               </arguments>
             </configuration>
             <phase>process-resources</phase>
           </execution>
+
+          <execution>
+            <id>Vite compile</id>
+            <goals>
+              <goal>corepack</goal>
+            </goals>
+            <configuration>
+              <arguments>
+                pnpm
+                vite build
+              </arguments>
+            </configuration>
+            <phase>package</phase>
+          </execution>
         </executions>
 
         <configuration>
           <nodeVersion>v20.18.2</nodeVersion>
-          <yarnVersion>v1.22.17</yarnVersion>
         </configuration>
       </plugin>
 
@@ -472,22 +484,6 @@
                   />
                 </copy>
                 <copy
-                  file="${project.basedir}/node_modules/react/umd/react.production.min.js"
-                  tofile="src/main/webapp/generated/react.production.min.js"
-                />
-                <copy
-                  file="${project.basedir}/node_modules/react-dom/umd/react-dom.production.min.js"
-                  tofile="src/main/webapp/generated/react-dom.production.min.js"
-                />
-                <copy
-                  file="${project.basedir}/node_modules/react-transition-group/dist/react-transition-group.min.js"
-                  tofile="src/main/webapp/generated/react-transition-group.min.js"
-                />
-                <copy
-                  file="${project.basedir}/node_modules/react-measure/dist/index.umd.js"
-                  tofile="src/main/webapp/generated/react-measure.js"
-                />
-                <copy
                   file="${project.basedir}/node_modules/universal-cookie/umd/universalCookie.min.js"
                   tofile="src/main/webapp/generated/universalCookie.min.js"
                 />
@@ -514,15 +510,6 @@
                 <copy
                   file="${project.basedir}/node_modules/plotly.js/dist/plotly.min.js"
                   tofile="src/main/webapp/generated/plotly.min.js"
-                />
-                <!-- Copy development versions of some key dependencies for devmode debugging -->
-                <copy
-                  file="${project.basedir}/node_modules/react/umd/react.development.js"
-                  tofile="src/main/webapp/generated/react.development.js"
-                />
-                <copy
-                  file="${project.basedir}/node_modules/react-dom/umd/react-dom.development.js"
-                  tofile="src/main/webapp/generated/react-dom.development.js"
                 />
                 <copy
                   file="${project.basedir}/node_modules/react-plotly.js/dist/create-plotly-component.min.js"

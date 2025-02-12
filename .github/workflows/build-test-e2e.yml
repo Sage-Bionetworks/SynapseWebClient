@@ -19,9 +19,9 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
       - name: Lint E2E tests
-        run: yarn e2e:lint
+        run: pnpm e2e:lint
   build:
     # Run in Sage repo on develop or release- branches
     # and on all branches in user-owned forks
@@ -98,9 +98,9 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: Install dependencies
-        run: yarn install --frozen-lockfile --network-timeout 1000000
+        run: pnpm install --frozen-lockfile --network-timeout 1000000
       - name: Install Playwright Browsers
-        run: yarn playwright install --with-deps
+        run: pnpm playwright install --with-deps
       - name: Check for common errors
         run: |
           if [ ! -e "/$(pwd)/${{ env.BUILD_DIR }}/${{ env.BUILD_NAME }}" ]; then
@@ -135,7 +135,7 @@ jobs:
         env:
           ADMIN_PAT: ${{ secrets.ADMIN_PAT }}
           TRACE_TOGGLE: ${{ github.repository_owner == 'Sage-Bionetworks' && 'on' || 'off'}}
-        run: yarn playwright test --shard ${{ matrix.shard }} --trace=${{ env.TRACE_TOGGLE }}
+        run: pnpm playwright test --shard ${{ matrix.shard }} --trace=${{ env.TRACE_TOGGLE }}
       - name: Assume AWS Role
         if: ${{ github.repository_owner == 'Sage-Bionetworks' && always() }}
         uses: aws-actions/configure-aws-credentials@v2
@@ -173,14 +173,14 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
       - name: Download blob reports from GitHub Actions Artifacts
         uses: actions/download-artifact@v3
         with:
           name: ${{ env.PW_ALL_BLOBS_DIR }}
           path: ${{ env.PW_ALL_BLOBS_DIR }}
       - name: Merge into HTML Report
-        run: yarn playwright merge-reports --reporter html ./"${{ env.PW_ALL_BLOBS_DIR }}"
+        run: pnpm playwright merge-reports --reporter html ./"${{ env.PW_ALL_BLOBS_DIR }}"
       - name: Upload HTML report
         uses: actions/upload-artifact@v3
         with:
