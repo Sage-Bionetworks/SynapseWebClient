@@ -421,7 +421,7 @@
         </executions>
 
         <configuration>
-          <nodeVersion>v20.18.2</nodeVersion>
+          <nodeVersion>v22.14.0</nodeVersion>
         </configuration>
       </plugin>
 
