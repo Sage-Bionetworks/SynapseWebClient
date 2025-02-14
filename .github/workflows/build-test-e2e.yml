@@ -5,7 +5,7 @@ env:
   BUILD_ARTIFACT_NAME: swc-war
   BUILD_DIR: target
   BUILD_NAME: portal-develop-SNAPSHOT.war
-  NODE_VERSION: 18.16.0
+  NODE_VERSION: 20
   PW_ALL_BLOBS_DIR: all-blob-reports
 jobs:
   lint-e2e:
