@@ -27,21 +27,21 @@
     <bh:Div addStyleNames="margin-top-15 entity-page-side-margins">
       <bh:Div
         ui:field="projectLevelUI"
-        addStyleNames="flexcontainer-row flexcontainer-align-items-center"
+        addStyleNames="flexcontainer-row-unless-xs margin-bottom-20 flexcontainer-align-items-center"
       >
         <bh:Div
           addStyleNames="flexcontainer-column flexcontainer-column-fill-width"
         >
           <bh:Div>
             <b:Heading size="H3" ui:field="title" />
-            <bh:Div addStyleNames="margin-bottom-20">
+            <bh:Div>
               <bh:Span ui:field="tableDescription" />
               <b:Anchor ui:field="helpLink" />
             </bh:Div>
           </bh:Div>
         </bh:Div>
         <bh:Div
-          addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end min-width-70"
+          addStyleNames="full-width-xs-only"
           ui:field="actionMenuContainer"
         />
       </bh:Div>

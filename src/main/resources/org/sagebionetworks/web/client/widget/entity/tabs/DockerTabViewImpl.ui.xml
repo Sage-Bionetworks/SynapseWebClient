@@ -13,7 +13,7 @@
       ui:field="projectLevelUi"
       addStyleNames="margin-top-15 entity-page-side-margins"
     >
-      <bh:Div addStyleNames="flexcontainer-row">
+      <bh:Div addStyleNames="flexcontainer-row-unless-xs margin-bottom-20">
         <bh:Div
           addStyleNames="flexcontainer-column flexcontainer-column-fill-width"
         >
@@ -24,10 +24,7 @@
             addStyleNames="margin-bottom-20"
           />
         </bh:Div>
-        <bh:Div
-          addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end min-width-70"
-          ui:field="actionMenuContainer"
-        />
+        <bh:Div ui:field="actionMenuContainer" />
       </bh:Div>
       <g:SimplePanel ui:field="dockerRepoListWidgetContainer" />
     </g:FlowPanel>
