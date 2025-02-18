@@ -936,6 +936,14 @@ input[type='text'][readonly].border-none,
   }
 }
 
+@media (max-width: 768px) {
+  .full-width-button-xs {
+    button {
+      width: 100%;
+    }
+  }
+}
+
 .min-height-400 {
   min-height: 400px;
 }
@@ -2038,6 +2046,18 @@ input[type='text'].padding-0 {
     align-items: flex-end;
   }
 
+  @media (min-width: 768px) {
+    .flexcontainer-xs-align-end {
+      align-items: flex-end;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .flexcontainer-xs-gap {
+      gap: 20px;
+    }
+  }
+
   .flexcontainer-column {
     display: -webkit-flex;
     display: flex;
@@ -2054,10 +2074,6 @@ input[type='text'].padding-0 {
     -webkit-justify-content: flex-end;
     justify-content: flex-end;
   }
-
-  // .flexcontainer-center-xs-justify-end {
-
-  // }
 
   @media (min-width: 768px) {
     .flexcontainer-center-xs-justify-end {

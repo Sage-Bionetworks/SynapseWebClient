@@ -7,7 +7,9 @@
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 >
   <bh:Div>
-    <bh:Div addStyleNames="flexcontainer-row">
+    <bh:Div
+      addStyleNames="flexcontainer-row-unless-xs full-width-xs-only flexcontainer-xs-gap margin-bottom-20"
+    >
       <bh:Div
         ui:field="headingFlexContainer"
         addStyleNames="flexcontainer-column flexcontainer-column-fill-width"
@@ -25,30 +27,35 @@
           Show All Threads
         </b:Button>
       </bh:Div>
+      <!--         addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end min-width-70"
+ -->
       <bh:Div
         ui:field="subscribersFlexContainer"
-        addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end min-width-70"
+        addStyleNames="flexcontainer-column flexcontainer-xs-align-end"
         marginRight="10"
       >
         <bh:Span ui:field="subscribersContainer" addStyleNames="movedown-7" />
       </bh:Div>
       <bh:Div
         ui:field="forumSearchFlexContainer"
-        addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end"
+        addStyleNames="flexcontainer-column flexcontainer-xs-align-end"
         marginRight="10"
       >
         <bh:Div ui:field="forumSearchContainer" />
       </bh:Div>
       <bh:Div
         ui:field="subscribeButtonFlexContainer"
-        addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end min-width-70"
+        addStyleNames="flexcontainer-column flexcontainer-xs-align-end"
         marginRight="10"
       >
-        <bh:Span ui:field="subscribeButtonContainer" />
+        <bh:Span
+          ui:field="subscribeButtonContainer"
+          addStyleNames="full-width-button-xs"
+        />
       </bh:Div>
       <bh:Div
         ui:field="newThreadButtonFlexContainer"
-        addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end min-width-70"
+        addStyleNames="flexcontainer-column flexcontainer-xs-align-end"
         marginRight="10"
       >
         <b:Button ui:field="newThreadButton" type="PRIMARY">
@@ -57,7 +64,7 @@
       </bh:Div>
 
       <bh:Div
-        addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end min-width-70"
+        addStyleNames="flexcontainer-column flexcontainer-xs-align-end"
         ui:field="actionMenuContainer"
       />
     </bh:Div>
