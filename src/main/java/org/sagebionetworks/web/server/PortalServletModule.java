@@ -43,7 +43,11 @@ import org.sagebionetworks.web.server.servlet.LinkedInServiceImpl;
 import org.sagebionetworks.web.server.servlet.ProjectAliasServlet;
 import org.sagebionetworks.web.server.servlet.SlackServlet;
 import org.sagebionetworks.web.server.servlet.StackConfigServiceImpl;
+import org.sagebionetworks.web.server.servlet.StackVersionProvider;
+import org.sagebionetworks.web.server.servlet.StackVersionProviderImpl;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
+import org.sagebionetworks.web.server.servlet.SynapseProvider;
+import org.sagebionetworks.web.server.servlet.SynapseProviderImpl;
 import org.sagebionetworks.web.server.servlet.UserAccountServiceImpl;
 import org.sagebionetworks.web.server.servlet.UserProfileClientImpl;
 import org.sagebionetworks.web.server.servlet.VersionsServlet;
@@ -97,6 +101,10 @@ public class PortalServletModule extends ServletModule {
     bind(ConfigurationProperties.class).to(ConfigurationPropertiesImpl.class);
     bind(StackConfiguration.class).to(StackConfigurationImpl.class);
     bind(StackEncrypter.class).to(StackEncrypterImpl.class);
+    bind(SynapseProvider.class).to(SynapseProviderImpl.class);
+    bind(StackVersionProvider.class)
+      .to(StackVersionProviderImpl.class)
+      .in(Singleton.class);
 
     // JSONObjectAdapter
     bind(JSONObjectAdapter.class).to(JSONObjectAdapterImpl.class);
