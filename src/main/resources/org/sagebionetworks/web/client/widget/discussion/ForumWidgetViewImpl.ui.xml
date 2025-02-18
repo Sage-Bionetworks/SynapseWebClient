@@ -7,9 +7,7 @@
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 >
   <bh:Div>
-    <bh:Div
-      addStyleNames="flexcontainer-row-unless-xs full-width-xs-only flexcontainer-xs-gap margin-bottom-20"
-    >
+    <bh:Div addStyleNames="flexcontainer-row-unless-xs margin-bottom-20">
       <bh:Div
         ui:field="headingFlexContainer"
         addStyleNames="flexcontainer-column flexcontainer-column-fill-width"
@@ -27,8 +25,6 @@
           Show All Threads
         </b:Button>
       </bh:Div>
-      <!--         addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end min-width-70"
- -->
       <bh:Div
         ui:field="subscribersFlexContainer"
         addStyleNames="flexcontainer-column flexcontainer-xs-align-end"
@@ -59,9 +55,8 @@
           New Thread
         </b:Button>
       </bh:Div>
-
       <bh:Div
-        addStyleNames="flexcontainer-column flexcontainer-xs-align-end"
+        addStyleNames="flexcontainer-column flexcontainer-xs-align-end full-width-button full-width-xs-only"
         ui:field="actionMenuContainer"
       />
     </bh:Div>

@@ -936,6 +936,13 @@ input[type='text'][readonly].border-none,
   }
 }
 
+@media (max-width: 768px) {
+  .full-width-button .MuiButton-root,
+  .full-width-button .MuiBox-root {
+    width: 100%;
+  }
+}
+
 .min-height-400 {
   min-height: 400px;
 }
@@ -2013,17 +2020,19 @@ input[type='text'].padding-0 {
     flex-direction: row;
   }
 
-  @media (min-width: 769px) {
-    .flexcontainer-row-unless-xs {
-      display: flex;
-      flex-direction: row;
-    }
-  }
-  @media (max-width: 768px) {
-    .flexcontainer-row-unless-xs {
+  .flexcontainer-row-unless-xs {
+    display: flex;
+    flex-direction: row;
+
+    @media (max-width: 900px) {
       display: flex;
       flex-direction: column;
+      gap: 20px;
     }
+  }
+
+  .flexcontainer-wrap {
+    flex-wrap: wrap;
   }
 
   .flexcontainer-align-items-center {
@@ -2038,7 +2047,7 @@ input[type='text'].padding-0 {
     align-items: flex-end;
   }
 
-  @media (min-width: 768px) {
+  @media (min-width: 900px) {
     .flexcontainer-xs-align-end {
       align-items: flex-end;
     }
@@ -2047,6 +2056,7 @@ input[type='text'].padding-0 {
   @media (max-width: 768px) {
     .flexcontainer-xs-gap {
       gap: 20px;
+      flex-wrap: wrap;
     }
   }
 

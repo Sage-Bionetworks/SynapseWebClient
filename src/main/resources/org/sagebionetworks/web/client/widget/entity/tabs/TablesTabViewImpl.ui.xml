@@ -27,7 +27,7 @@
     <bh:Div addStyleNames="margin-top-15 entity-page-side-margins">
       <bh:Div
         ui:field="projectLevelUI"
-        addStyleNames="flexcontainer-row-unless-xs margin-bottom-20 flexcontainer-align-items-center"
+        addStyleNames="flexcontainer-row-unless-xs margin-bottom-20"
       >
         <bh:Div
           addStyleNames="flexcontainer-column flexcontainer-column-fill-width"
