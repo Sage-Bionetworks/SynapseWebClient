@@ -2023,10 +2023,12 @@ input[type='text'].padding-0 {
   .flexcontainer-row-unless-xs {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
 
-    @media (max-width: 900px) {
+    @media (max-width: 768px) {
       display: flex;
       flex-direction: column;
+      flex-wrap: nowrap;
       gap: 20px;
     }
   }
@@ -2092,6 +2094,7 @@ input[type='text'].padding-0 {
   .flexcontainer-column-fill-width {
     flex-grow: 1;
   }
+
   .flexcontainer-column-flow-reset {
     flex-flow: inherit;
   }

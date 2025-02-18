@@ -29,6 +29,7 @@
         ui:field="subscribersFlexContainer"
         addStyleNames="flexcontainer-column flexcontainer-xs-align-end"
         marginRight="10"
+        marginLeft="10"
       >
         <bh:Span ui:field="subscribersContainer" addStyleNames="movedown-7" />
       </bh:Div>
