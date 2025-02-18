@@ -936,14 +936,6 @@ input[type='text'][readonly].border-none,
   }
 }
 
-@media (max-width: 768px) {
-  .full-width-button-xs {
-    button {
-      width: 100%;
-    }
-  }
-}
-
 .min-height-400 {
   min-height: 400px;
 }

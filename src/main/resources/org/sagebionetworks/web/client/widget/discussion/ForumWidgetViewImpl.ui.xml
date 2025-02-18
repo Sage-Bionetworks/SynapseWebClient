@@ -48,10 +48,7 @@
         addStyleNames="flexcontainer-column flexcontainer-xs-align-end"
         marginRight="10"
       >
-        <bh:Span
-          ui:field="subscribeButtonContainer"
-          addStyleNames="full-width-button-xs"
-        />
+        <bh:Span ui:field="subscribeButtonContainer" />
       </bh:Div>
       <bh:Div
         ui:field="newThreadButtonFlexContainer"
