@@ -27,7 +27,7 @@
       </bh:Div>
       <bh:Div
         ui:field="subscribersFlexContainer"
-        addStyleNames="flexcontainer-column flexcontainer-xs-align-end"
+        addStyleNames="flexcontainer-column flexcontainer-xs-align-end min-width-70"
         marginRight="10"
         marginLeft="10"
       >
@@ -35,21 +35,21 @@
       </bh:Div>
       <bh:Div
         ui:field="forumSearchFlexContainer"
-        addStyleNames="flexcontainer-column flexcontainer-xs-align-end"
+        addStyleNames="flexcontainer-column flexcontainer-xs-align-end min-width-70"
         marginRight="10"
       >
         <bh:Div ui:field="forumSearchContainer" />
       </bh:Div>
       <bh:Div
         ui:field="subscribeButtonFlexContainer"
-        addStyleNames="flexcontainer-column flexcontainer-xs-align-end"
+        addStyleNames="flexcontainer-column flexcontainer-xs-align-end min-width-70"
         marginRight="10"
       >
         <bh:Span ui:field="subscribeButtonContainer" />
       </bh:Div>
       <bh:Div
         ui:field="newThreadButtonFlexContainer"
-        addStyleNames="flexcontainer-column flexcontainer-xs-align-end"
+        addStyleNames="flexcontainer-column flexcontainer-xs-align-end min-width-70"
         marginRight="10"
       >
         <b:Button ui:field="newThreadButton" type="PRIMARY">
@@ -57,7 +57,7 @@
         </b:Button>
       </bh:Div>
       <bh:Div
-        addStyleNames="flexcontainer-column flexcontainer-xs-align-end full-width-button full-width-xs-only"
+        addStyleNames="flexcontainer-column flexcontainer-xs-align-end full-width-button full-width-xs-only min-width-70"
         ui:field="actionMenuContainer"
       />
     </bh:Div>
