@@ -416,7 +416,7 @@
                 vite build
               </arguments>
             </configuration>
-            <phase>package</phase>
+            <phase>compile</phase>
           </execution>
         </executions>
 

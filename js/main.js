@@ -17,10 +17,10 @@ import './mui.js'
 
 // Append to global scope so these libraries can be accessed in JsInterop classes
 
-self.React = React
-self.ReactDOM = ReactDOM
-self.ReactDOMClient = ReactDOMClient
+window.React = React
+window.ReactDOM = ReactDOM
+window.ReactDOMClient = ReactDOMClient
 
-self.ReactQuery = ReactQuery
+window.ReactQuery = ReactQuery
 
-self.SRC = SRC
+window.SRC = SRC

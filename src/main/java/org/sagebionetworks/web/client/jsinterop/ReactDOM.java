@@ -5,7 +5,7 @@ import jsinterop.annotations.JsFunction;
 import jsinterop.annotations.JsPackage;
 import jsinterop.annotations.JsType;
 
-@JsType(isNative = true, namespace = JsPackage.GLOBAL, name = "ReactDOMClient")
+@JsType(isNative = true, namespace = JsPackage.GLOBAL, name = "ReactDOM")
 public class ReactDOM {
 
   @JsFunction
@@ -13,8 +13,6 @@ public class ReactDOM {
   public interface Callback {
     void run();
   }
-
-  public static native ReactDOMRoot createRoot(Element container);
 
   public static native boolean unmountComponentAtNode(Element container);
 

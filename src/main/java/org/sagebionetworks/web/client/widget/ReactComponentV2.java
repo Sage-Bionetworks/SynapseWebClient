@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactComponentProps;
 import org.sagebionetworks.web.client.jsinterop.ReactComponentType;
 import org.sagebionetworks.web.client.jsinterop.ReactDOM;
+import org.sagebionetworks.web.client.jsinterop.ReactDOMClient;
 import org.sagebionetworks.web.client.jsinterop.ReactDOMRoot;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
 
@@ -88,7 +89,7 @@ public abstract class ReactComponentV2<
 
   private void createRoot() {
     if (root == null) {
-      root = ReactDOM.createRoot(this.getElement());
+      root = ReactDOMClient.createRoot(this.getElement());
     }
   }
 

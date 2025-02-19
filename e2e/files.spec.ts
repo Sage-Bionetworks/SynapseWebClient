@@ -120,37 +120,41 @@ const uploadFile = async (
         : 'Upload a New Version of File'
     await page.getByRole('button', { name: uploadButtonText }).click()
 
-    await expect(page.getByRole('link', { name: 'Upload File' })).toBeVisible()
-    await expect(page.getByRole('link', { name: 'Link to URL' })).toBeVisible()
-    await expect(page.getByRole('button', { name: 'Browse...' })).toBeVisible()
+    await expect(page.getByRole('tab', { name: 'Upload File' })).toBeVisible()
+    await expect(page.getByRole('tab', { name: 'Link to URL' })).toBeVisible()
+    await expect(page.getByText('Click to upload')).toBeVisible()
   })
 
   await testAuth.step('choose file', async () => {
     // Ensure that upload type is specified before attempting upload
     // to prevent upload error: "Unsupported external upload type specified: undefined"
     await expect(
-      page.getByText(/all uploaded files will be stored in synapsestorage/i),
+      page.getByText(/All uploaded files will be stored in Synapse storage/i),
     ).toBeVisible()
 
     const fileChooserPromise = page.waitForEvent('filechooser')
-    await page.getByRole('button', { name: 'Browse...' }).click()
+    await page.getByText('Click to upload').click()
     if (uploadType === 'initialUpload') {
       await page
         .getByRole('menu')
-        .getByRole('link')
+        .getByRole('menuitem')
         .filter({ hasText: 'Files' })
         .click()
     }
     const fileChooser = await fileChooserPromise
-    await fileChooser.setFiles(path.join(__dirname, filePath))
+    await fileChooser.setFiles(path.join(import.meta.dirname, filePath))
   })
 
-  await testAuth.step('wait for file upload modal to close', async () => {
-    await expect(page.getByText('Initializing......')).not.toBeVisible()
-    await expect(
-      page.getByRole('heading', { name: 'Upload or Link to File' }),
-    ).not.toBeVisible()
-  })
+  await testAuth.step(
+    'wait for file upload to finish and close modal',
+    async () => {
+      await expect(page.getByText('Uploaded 1 Item')).toBeVisible()
+      await page.getByRole('button', { name: 'Finish' }).click()
+      await expect(
+        page.getByRole('heading', { name: 'Upload or Link to File' }),
+      ).not.toBeVisible()
+    },
+  )
 
   await testAuth.step('ensure there was not an upload error', async () => {
     const uploadError = page.getByRole('heading', { name: 'Upload Error' })
@@ -158,12 +162,6 @@ const uploadFile = async (
       const uploadErrorText = await page.getByRole('dialog').textContent()
       throw new Error(`Upload Error: ${uploadErrorText}`)
     }
-  })
-}
-
-const dismissFileUploadAlert = async (page: Page) => {
-  await testAuth.step('dismiss file upload alert', async () => {
-    await dismissAlert(page, 'File successfully uploaded')
   })
 }
 
@@ -364,7 +362,6 @@ testAuth.describe('Files', () => {
 
     await testAuth.step('upload file', async () => {
       await uploadFile(userPage, filePath, 'initialUpload')
-      await dismissFileUploadAlert(userPage)
     })
 
     const fileLink = await testAuth.step('get link to file', async () => {
@@ -408,32 +405,9 @@ testAuth.describe('Files', () => {
       },
     )
 
-    // Upload success alert intermittently appears when re-uploading the same file
-    await testAuth.step(
-      'dismiss file upload alert for re-uploaded file, if visible',
-      async () => {
-        if (
-          await userPage.getByText('File successfully uploaded').isVisible()
-        ) {
-          await dismissFileUploadAlert(userPage)
-        }
-      },
-    )
-
     await testAuth.step('upload a new file', async () => {
       await uploadFile(userPage, updatedFilePath, 'newVersion')
       await expectFilePageLoaded(fileName, fileEntityId, userPage)
-      // Upload success alert intermittently appears when uploading a new version of the same file
-      await testAuth.step(
-        'dismiss file upload alert for new version of file, if visible',
-        async () => {
-          if (
-            await userPage.getByText('File successfully uploaded').isVisible()
-          ) {
-            await dismissFileUploadAlert(userPage)
-          }
-        },
-      )
     })
 
     await testAuth.step(
