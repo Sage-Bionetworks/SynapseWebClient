@@ -934,9 +934,7 @@ input[type='text'][readonly].border-none,
   .full-width-xs-only {
     min-width: 100%;
   }
-}
 
-@media (max-width: 768px) {
   .full-width-button .MuiButton-root,
   .full-width-button .MuiBox-root {
     width: 100%;
@@ -2052,13 +2050,6 @@ input[type='text'].padding-0 {
   @media (min-width: 900px) {
     .flexcontainer-xs-align-end {
       align-items: flex-end;
-    }
-  }
-
-  @media (max-width: 768px) {
-    .flexcontainer-xs-gap {
-      gap: 20px;
-      flex-wrap: wrap;
     }
   }
 
