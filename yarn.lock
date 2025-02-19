@@ -6938,10 +6938,10 @@ svg-path-sdf@^1.1.3:
     parse-svg-path "^0.1.2"
     svg-path-bounds "^1.0.1"
 
-synapse-react-client@3.4.1:
-  version "3.4.1"
-  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-3.4.1.tgz#efb7dfb687a97849199bec18ded61ec323a9629e"
-  integrity sha512-2Rgk0CYOT21tLXqT/Fn03FCWsZgn/1syL+l0ouc0n4pS2heOm5sFa5gJ3mLIfK+/Rf85nBvqrpy6hR/A33/+Hg==
+synapse-react-client@3.4.2:
+  version "3.4.2"
+  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-3.4.2.tgz#0dad3058f56928e9c77c0e81b1ebe4a95d0e5d59"
+  integrity sha512-B3aZyZRW9oHRzA50idctyQKZ87jCqKhcoLOeopVVN4MDMwncl1DGGgkKrgvyJclMGHOhh5fqF5TXNKmwWiPWgw==
   dependencies:
     "@apidevtools/json-schema-ref-parser" "^9.1.2"
     "@aws-sdk/client-s3" "^3.682.0"
