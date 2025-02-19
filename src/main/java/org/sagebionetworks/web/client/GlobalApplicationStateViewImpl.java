@@ -50,9 +50,9 @@ public class GlobalApplicationStateViewImpl
     String portalEndpoint
   ) /*-{
 		try {
-			$wnd.SRC.OVERRIDE_ENDPOINT_CONFIG = {
-				REPO : repoEndpoint,
-				PORTAL : portalEndpoint,
+			$wnd.SRC_OVERRIDE_ENDPOINT_CONFIG = {
+				REPO : repoEndpoint.trim(),
+				PORTAL : portalEndpoint.trim(),
 			}
 		} catch (err) {
 			console.error(err);

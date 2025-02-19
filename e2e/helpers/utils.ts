@@ -6,7 +6,7 @@ export async function waitForSrcEndpointConfig(page: Page) {
   // ensure that endpoint config is set,
   // ...so API calls point to the correct stack
   await expect(async () => {
-    const response = await page.evaluate('window.SRC.OVERRIDE_ENDPOINT_CONFIG')
+    const response = await page.evaluate('window.SRC_OVERRIDE_ENDPOINT_CONFIG')
     expect(response).not.toBeUndefined()
   }).toPass()
 }
