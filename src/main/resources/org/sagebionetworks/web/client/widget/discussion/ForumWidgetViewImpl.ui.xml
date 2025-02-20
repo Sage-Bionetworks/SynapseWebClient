@@ -7,7 +7,7 @@
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 >
   <bh:Div>
-    <bh:Div addStyleNames="flexcontainer-row">
+    <bh:Div addStyleNames="flexcontainer-row-unless-xs margin-bottom-20">
       <bh:Div
         ui:field="headingFlexContainer"
         addStyleNames="flexcontainer-column flexcontainer-column-fill-width"
@@ -27,37 +27,37 @@
       </bh:Div>
       <bh:Div
         ui:field="subscribersFlexContainer"
-        addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end min-width-70"
+        addStyleNames="flexcontainer-column flexcontainer-xs-align-end"
         marginRight="10"
+        marginLeft="10"
       >
         <bh:Span ui:field="subscribersContainer" addStyleNames="movedown-7" />
       </bh:Div>
       <bh:Div
         ui:field="forumSearchFlexContainer"
-        addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end"
+        addStyleNames="flexcontainer-column flexcontainer-xs-align-end"
         marginRight="10"
       >
         <bh:Div ui:field="forumSearchContainer" />
       </bh:Div>
       <bh:Div
         ui:field="subscribeButtonFlexContainer"
-        addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end min-width-70"
+        addStyleNames="flexcontainer-column flexcontainer-xs-align-end"
         marginRight="10"
       >
         <bh:Span ui:field="subscribeButtonContainer" />
       </bh:Div>
       <bh:Div
         ui:field="newThreadButtonFlexContainer"
-        addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end min-width-70"
+        addStyleNames="flexcontainer-column flexcontainer-xs-align-end"
         marginRight="10"
       >
         <b:Button ui:field="newThreadButton" type="PRIMARY">
           New Thread
         </b:Button>
       </bh:Div>
-
       <bh:Div
-        addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end min-width-70"
+        addStyleNames="flexcontainer-column flexcontainer-xs-align-end full-width-button full-width-xs-only"
         ui:field="actionMenuContainer"
       />
     </bh:Div>

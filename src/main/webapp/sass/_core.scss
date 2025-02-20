@@ -930,6 +930,17 @@ input[type='text'][readonly].border-none,
   vertical-align: bottom;
 }
 
+@media (max-width: 768px) {
+  .full-width-xs-only {
+    min-width: 100%;
+  }
+
+  .full-width-button .MuiButton-root,
+  .full-width-button .MuiBox-root {
+    width: 100%;
+  }
+}
+
 .min-height-400 {
   min-height: 400px;
 }
@@ -2007,17 +2018,21 @@ input[type='text'].padding-0 {
     flex-direction: row;
   }
 
-  @media (min-width: 769px) {
-    .flexcontainer-row-unless-xs {
-      display: flex;
-      flex-direction: row;
-    }
-  }
-  @media (max-width: 768px) {
-    .flexcontainer-row-unless-xs {
+  .flexcontainer-row-unless-xs {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+
+    @media (max-width: 768px) {
       display: flex;
       flex-direction: column;
+      flex-wrap: nowrap;
+      gap: 20px;
     }
+  }
+
+  .flexcontainer-wrap {
+    flex-wrap: wrap;
   }
 
   .flexcontainer-align-items-center {
@@ -2030,6 +2045,12 @@ input[type='text'].padding-0 {
 
   .flexcontainer-align-items-flex-end {
     align-items: flex-end;
+  }
+
+  @media (min-width: 900px) {
+    .flexcontainer-xs-align-end {
+      align-items: flex-end;
+    }
   }
 
   .flexcontainer-column {
@@ -2049,6 +2070,13 @@ input[type='text'].padding-0 {
     justify-content: flex-end;
   }
 
+  @media (min-width: 768px) {
+    .flexcontainer-center-xs-justify-end {
+      -webkit-justify-content: flex-end;
+      justify-content: flex-end;
+    }
+  }
+
   .flexcontainer-justify-space-between {
     -webkit-justify-content: space-between;
     justify-content: space-between;
@@ -2057,6 +2085,7 @@ input[type='text'].padding-0 {
   .flexcontainer-column-fill-width {
     flex-grow: 1;
   }
+
   .flexcontainer-column-flow-reset {
     flex-flow: inherit;
   }
