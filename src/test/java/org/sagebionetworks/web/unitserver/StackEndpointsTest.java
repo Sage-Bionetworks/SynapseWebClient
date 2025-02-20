@@ -125,7 +125,7 @@ public class StackEndpointsTest {
 
   @Test
   public void testEndpointConstructionDev() {
-    String requestHostName = "portal-dev.dev.sagebase.org";
+    String requestHostName = "dev.synapse.org";
     String expected = "https://repo-dev.dev.sagebase.org";
 
     assertEquals(

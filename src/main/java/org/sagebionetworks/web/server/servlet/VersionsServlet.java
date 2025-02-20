@@ -1,23 +1,13 @@
 package org.sagebionetworks.web.server.servlet;
 
-import com.google.gwt.thirdparty.guava.common.base.Supplier;
-import com.google.gwt.thirdparty.guava.common.base.Suppliers;
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.util.concurrent.TimeUnit;
+import java.nio.charset.StandardCharsets;
+import javax.inject.Inject;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.sagebionetworks.client.SynapseClient;
-import org.sagebionetworks.client.exceptions.SynapseException;
-import org.sagebionetworks.repo.model.versionInfo.SynapseVersionInfo;
-import org.sagebionetworks.web.server.StackEndpoints;
-import org.sagebionetworks.web.server.servlet.SynapseClientImpl.PortalVersionHolder;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
@@ -26,65 +16,14 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
  */
 public class VersionsServlet extends HttpServlet {
 
-  private static Log log = LogFactory.getLog(VersionsServlet.class);
+  private final StackVersionProvider stackVersionProvider;
+
+  @Inject
+  public VersionsServlet(StackVersionProvider stackVersionProvider) {
+    this.stackVersionProvider = stackVersionProvider;
+  }
+
   private static final long serialVersionUID = 1L;
-  protected static final ThreadLocal<HttpServletRequest> perThreadRequest =
-    new ThreadLocal<HttpServletRequest>();
-  private final RequestHostProvider requestHostProvider = () ->
-    UserDataProvider.getThreadLocalRequestHost(
-      VersionsServlet.perThreadRequest.get()
-    );
-
-  private final Supplier<SynapseVersionInfo> synapseVersionCache =
-    Suppliers.memoizeWithExpiration(versionSupplier(), 5, TimeUnit.MINUTES);
-
-  public SynapseVersionInfo getSynapseVersionInfo() {
-    return synapseVersionCache.get();
-  }
-
-  private SynapseProvider synapseProvider = new SynapseProviderImpl();
-
-  private SynapseClient createNewClient() {
-    return synapseProvider.createNewClient(
-      this.requestHostProvider.getRequestHost()
-    );
-  }
-
-  private Supplier<SynapseVersionInfo> versionSupplier() {
-    return new Supplier<SynapseVersionInfo>() {
-      public SynapseVersionInfo get() {
-        try {
-          org.sagebionetworks.client.SynapseClient synapseClient =
-            createNewClient();
-          return synapseClient.getVersionInfo();
-        } catch (SynapseException e) {
-          log.error(e);
-          return null;
-        }
-      }
-    };
-  }
-
-  public String getSynapseVersions() throws RestServiceException {
-    return (
-      PortalVersionHolder.getVersionInfo() +
-      "," +
-      getSynapseVersionInfo().getVersion()
-    );
-  }
-
-  @Override
-  protected void service(HttpServletRequest arg0, HttpServletResponse arg1)
-    throws ServletException, IOException {
-    VersionsServlet.perThreadRequest.set(arg0);
-    super.service(arg0, arg1);
-  }
-
-  @Override
-  public void service(ServletRequest arg0, ServletResponse arg1)
-    throws ServletException, IOException {
-    super.service(arg0, arg1);
-  }
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -101,7 +40,13 @@ public class VersionsServlet extends HttpServlet {
     response.setStatus(HttpServletResponse.SC_OK);
 
     try {
-      response.getOutputStream().write(getSynapseVersions().getBytes("UTF-8"));
+      response
+        .getOutputStream()
+        .write(
+          stackVersionProvider
+            .get(UserDataProvider.getThreadLocalRequestHost(request))
+            .getBytes(StandardCharsets.UTF_8)
+        );
       response.getOutputStream().flush();
     } catch (RestServiceException e) {
       // redirect to error place with an entry
