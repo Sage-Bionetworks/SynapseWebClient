@@ -8,7 +8,7 @@ public class StackEndpoints {
 
   public static final String STAGING_SYNAPSE_ORG = "staging.synapse.org";
   public static final String TST_SYNAPSE_ORG = "tst.synapse.org";
-  public static final String PORTAL_DEV_HOST = "portal-dev.dev.sagebase.org";
+  public static final String PORTAL_DEV_HOST = "dev.synapse.org";
   private static Logger logger = Logger.getLogger(
     StackEndpoints.class.getName()
   );

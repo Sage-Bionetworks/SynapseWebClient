@@ -20,8 +20,8 @@ public class OneSageUtilsImpl implements OneSageUtils {
     switch (gwtWrapper.getHostName().toLowerCase()) {
       case "staging.synapse.org":
         return "https://staging.accounts.synapse.org";
-      case "portal-dev.dev.sagebase.org":
-        return "https://accounts-dev.dev.sagebase.org";
+      case "dev.synapse.org":
+        return "https://dev.accounts.synapse.org";
       case "localhost":
       case "127.0.0.1":
         return "http://" + Window.Location.getHostName() + ":3000";
@@ -34,7 +34,7 @@ public class OneSageUtilsImpl implements OneSageUtils {
     switch (gwtWrapper.getHostName().toLowerCase()) {
       case "staging.synapse.org":
         return "staging.synapse.org";
-      case "portal-dev.dev.sagebase.org":
+      case "dev.synapse.org":
         return "dev.synapse.org";
       case "localhost":
       case "127.0.0.1":
