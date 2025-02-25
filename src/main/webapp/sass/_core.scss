@@ -1552,6 +1552,12 @@ h6 {
   resize: none;
 }
 
+@media (min-width: 769px) {
+  .markdown-text-area-size-xs-only {
+    height: 20vh !important;
+  }
+}
+
 .scroll-auto {
   overflow: auto;
 }
@@ -2059,6 +2065,18 @@ input[type='text'].padding-0 {
   }
   .flexcontainer-column-flow-reset {
     flex-flow: inherit;
+  }
+
+  @media (max-width: 768px) {
+    .full-size-modal-xs-only .modal-dialog {
+      height: 100%;
+      width: 100%;
+      margin: 0;
+    }
+
+    .full-size-modal-xs-only .modal-content {
+      height: 100%;
+    }
   }
 
   .glyphicon {

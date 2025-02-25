@@ -27,6 +27,7 @@ public class UploadTableModalWidgetImpl implements UploadTableModalWidget {
     this.modalWizarWidget.setModalSize(ModalSize.LARGE);
     this.uploadCSVFileWidget = uploadCSVFileWidget;
     this.modalWizarWidget.configure(this.uploadCSVFileWidget);
+    this.modalWizarWidget.asWidget().addStyleName("full-size-modal-xs-only");
   }
 
   @Override

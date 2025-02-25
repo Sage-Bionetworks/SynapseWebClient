@@ -3,44 +3,6 @@ package org.sagebionetworks.web.client.widget.entity;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import static org.sagebionetworks.web.shared.WebConstants.FORMATTING_GUIDE;
 import static org.sagebionetworks.web.shared.WidgetConstants.*;
-import static org.sagebionetworks.web.shared.WidgetConstants.API_TABLE_CONTENT_TYPE;
-import static org.sagebionetworks.web.shared.WidgetConstants.ATTACHMENT_PREVIEW_CONTENT_TYPE;
-import static org.sagebionetworks.web.shared.WidgetConstants.BIODALLIANCE13_CONTENT_TYPE;
-import static org.sagebionetworks.web.shared.WidgetConstants.BUTTON_LINK_CONTENT_TYPE;
-import static org.sagebionetworks.web.shared.WidgetConstants.CHALLENGE_ID_KEY;
-import static org.sagebionetworks.web.shared.WidgetConstants.CHALLENGE_PARTICIPANTS_CONTENT_TYPE;
-import static org.sagebionetworks.web.shared.WidgetConstants.CHALLENGE_TEAMS_CONTENT_TYPE;
-import static org.sagebionetworks.web.shared.WidgetConstants.CYTOSCAPE_CONTENT_TYPE;
-import static org.sagebionetworks.web.shared.WidgetConstants.DETAILS_SUMMARY_CONTENT_TYPE;
-import static org.sagebionetworks.web.shared.WidgetConstants.ENTITYLIST_CONTENT_TYPE;
-import static org.sagebionetworks.web.shared.WidgetConstants.IMAGE_CONTENT_TYPE;
-import static org.sagebionetworks.web.shared.WidgetConstants.IMAGE_LINK_EDITOR_CONTENT_TYPE;
-import static org.sagebionetworks.web.shared.WidgetConstants.IS_IN_CHALLENGE_TEAM_KEY;
-import static org.sagebionetworks.web.shared.WidgetConstants.JOIN_TEAM_CONTENT_TYPE;
-import static org.sagebionetworks.web.shared.WidgetConstants.LEADERBOARD_CONTENT_TYPE;
-import static org.sagebionetworks.web.shared.WidgetConstants.LINK_CONTENT_TYPE;
-import static org.sagebionetworks.web.shared.WidgetConstants.PLOT_CONTENT_TYPE;
-import static org.sagebionetworks.web.shared.WidgetConstants.PREVIEW_CONTENT_TYPE;
-import static org.sagebionetworks.web.shared.WidgetConstants.PROVENANCE_CONTENT_TYPE;
-import static org.sagebionetworks.web.shared.WidgetConstants.QUERY_TABLE_CONTENT_TYPE;
-import static org.sagebionetworks.web.shared.WidgetConstants.REFERENCE_CONTENT_TYPE;
-import static org.sagebionetworks.web.shared.WidgetConstants.REGISTER_CHALLENGE_TEAM_CONTENT_TYPE;
-import static org.sagebionetworks.web.shared.WidgetConstants.SHINYSITE_CONTENT_TYPE;
-import static org.sagebionetworks.web.shared.WidgetConstants.SUBMIT_TO_EVALUATION_CONTENT_TYPE;
-import static org.sagebionetworks.web.shared.WidgetConstants.SYNAPSE_FORM_CONTENT_TYPE;
-import static org.sagebionetworks.web.shared.WidgetConstants.SYNAPSE_TABLE_CONTENT_TYPE;
-import static org.sagebionetworks.web.shared.WidgetConstants.TABBED_TABLE_CONTENT_TYPE;
-import static org.sagebionetworks.web.shared.WidgetConstants.TEAM_MEMBERS_CONTENT_TYPE;
-import static org.sagebionetworks.web.shared.WidgetConstants.TEAM_MEMBER_COUNT_CONTENT_TYPE;
-import static org.sagebionetworks.web.shared.WidgetConstants.TEXT_KEY;
-import static org.sagebionetworks.web.shared.WidgetConstants.TOC_CONTENT_TYPE;
-import static org.sagebionetworks.web.shared.WidgetConstants.TUTORIAL_WIZARD_CONTENT_TYPE;
-import static org.sagebionetworks.web.shared.WidgetConstants.USER_TEAM_BADGE_CONTENT_TYPE;
-import static org.sagebionetworks.web.shared.WidgetConstants.VIDEO_CONTENT_TYPE;
-import static org.sagebionetworks.web.shared.WidgetConstants.WIDGET_END_MARKDOWN;
-import static org.sagebionetworks.web.shared.WidgetConstants.WIDGET_ENTITY_ID_KEY;
-import static org.sagebionetworks.web.shared.WidgetConstants.WIDGET_START_MARKDOWN;
-import static org.sagebionetworks.web.shared.WidgetConstants.WIKI_FILES_PREVIEW_CONTENT_TYPE;
 
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -75,6 +37,7 @@ public class MarkdownEditorWidget
   // units are px
   public static final int MIN_TEXTAREA_HEIGHT = 100;
   public static final int OTHER_EDITOR_COMPONENTS_HEIGHT = 270;
+  private static final int XS_BREAKPOINT = 796;
 
   private SynapseClientAsync synapseClient;
   private CookieProvider cookies;
@@ -203,9 +166,14 @@ public class MarkdownEditorWidget
   }
 
   public void resizeMarkdownTextArea() {
+    int viewportWidth = view.getClientHeight();
     int newHeight = view.getClientHeight() - OTHER_EDITOR_COMPONENTS_HEIGHT;
-    newHeight =
-      newHeight > MIN_TEXTAREA_HEIGHT ? newHeight : MIN_TEXTAREA_HEIGHT;
+    if (viewportWidth < XS_BREAKPOINT) {
+      newHeight = (int) (view.getClientHeight() * 0.5);
+    } else {
+      newHeight =
+        newHeight > MIN_TEXTAREA_HEIGHT ? newHeight : MIN_TEXTAREA_HEIGHT;
+    }
     view.setMarkdownTextAreaHeight(newHeight);
   }
 

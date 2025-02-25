@@ -9,7 +9,7 @@
     closable="true"
     dataBackdrop="STATIC"
     dataKeyboard="false"
-    addStyleNames="modal-fullscreen"
+    addStyleNames="modal-fullscreen full-size-modal-xs-only"
   >
     <b:ModalBody>
       <b:TextBox

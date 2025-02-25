@@ -10,6 +10,7 @@
     closable="true"
     dataBackdrop="STATIC"
     dataKeyboard="true"
+    addStyleNames="full-size-modal-xs-only"
   >
     <b:ModalHeader closable="true">
       <b:Heading
