@@ -132,16 +132,12 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 
     if (searchResultsVisible) {
       forumSearchFlexContainer.addStyleName("flexcontainer-column-fill-width");
-      forumSearchFlexContainer.removeStyleName(
-        "flexcontainer-align-items-flex-end"
-      );
+      forumSearchFlexContainer.removeStyleName("flexcontainer-xs-align-end");
     } else {
       forumSearchFlexContainer.removeStyleName(
         "flexcontainer-column-fill-width"
       );
-      forumSearchFlexContainer.addStyleName(
-        "flexcontainer-align-items-flex-end"
-      );
+      forumSearchFlexContainer.addStyleName("flexcontainer-xs-align-end");
     }
   }
 
