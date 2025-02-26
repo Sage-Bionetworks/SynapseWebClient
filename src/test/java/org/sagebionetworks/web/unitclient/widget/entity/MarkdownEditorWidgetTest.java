@@ -293,12 +293,13 @@ public class MarkdownEditorWidgetTest {
         1000 - MarkdownEditorWidget.OTHER_EDITOR_COMPONENTS_HEIGHT
       );
 
-    // For mobile screen sizes (below XS_BREAKPOINT), set height to 50% of client height
+    // For mobile screen sizes (below XS_BREAKPOINT), set height to 40% of client height
     reset(mockView);
-    when(mockView.getClientWidth()).thenReturn(400);
+    when(mockView.getClientWidth())
+      .thenReturn(MarkdownEditorWidget.XS_BREAKPOINT - 100);
     when(mockView.getClientHeight()).thenReturn(1000);
     presenter.resizeMarkdownTextArea();
-    verify(mockView).setMarkdownTextAreaHeight(500);
+    verify(mockView).setMarkdownTextAreaHeight(400);
   }
 
   @Test

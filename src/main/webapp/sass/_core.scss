@@ -1563,12 +1563,6 @@ h6 {
   resize: none;
 }
 
-@media (min-width: 769px) {
-  .markdown-text-area-size-xs-only {
-    height: 20vh !important;
-  }
-}
-
 .scroll-auto {
   overflow: auto;
 }
@@ -2098,13 +2092,17 @@ input[type='text'].padding-0 {
 
   @media (max-width: 768px) {
     .full-size-modal-xs-only .modal-dialog {
-      height: 100%;
-      width: 100%;
-      margin: 0;
+      width: 95%;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      margin: auto;
+      max-height: 90vh;
     }
 
     .full-size-modal-xs-only .modal-content {
-      height: 100%;
+      max-height: 90vh;
     }
   }
 

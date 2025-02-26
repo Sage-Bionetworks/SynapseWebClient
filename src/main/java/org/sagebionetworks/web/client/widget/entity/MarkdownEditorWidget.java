@@ -75,7 +75,7 @@ public class MarkdownEditorWidget
   // units are px
   public static final int MIN_TEXTAREA_HEIGHT = 100;
   public static final int OTHER_EDITOR_COMPONENTS_HEIGHT = 270;
-  private static final int XS_BREAKPOINT = 796;
+  public static final int XS_BREAKPOINT = 796;
 
   private SynapseClientAsync synapseClient;
   private CookieProvider cookies;
@@ -208,7 +208,7 @@ public class MarkdownEditorWidget
     int clientHeight = view.getClientHeight();
     int newHeight = view.getClientHeight() - OTHER_EDITOR_COMPONENTS_HEIGHT;
     if (viewportWidth < XS_BREAKPOINT) {
-      newHeight = (int) (clientHeight * 0.5);
+      newHeight = (int) (clientHeight * 0.4);
     } else {
       newHeight =
         newHeight > MIN_TEXTAREA_HEIGHT ? newHeight : MIN_TEXTAREA_HEIGHT;
