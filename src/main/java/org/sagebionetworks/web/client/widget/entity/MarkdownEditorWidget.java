@@ -204,10 +204,11 @@ public class MarkdownEditorWidget
   }
 
   public void resizeMarkdownTextArea() {
-    int viewportWidth = view.getClientHeight();
+    int viewportWidth = view.getClientWidth();
+    int clientHeight = view.getClientHeight();
     int newHeight = view.getClientHeight() - OTHER_EDITOR_COMPONENTS_HEIGHT;
     if (viewportWidth < XS_BREAKPOINT) {
-      newHeight = (int) (view.getClientHeight() * 0.5);
+      newHeight = (int) (clientHeight * 0.5);
     } else {
       newHeight =
         newHeight > MIN_TEXTAREA_HEIGHT ? newHeight : MIN_TEXTAREA_HEIGHT;

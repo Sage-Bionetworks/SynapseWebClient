@@ -565,6 +565,11 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
   }
 
   @Override
+  public int getClientWidth() {
+    return Window.getClientWidth();
+  }
+
+  @Override
   public void setMarkdownTextAreaHeight(int heightPx) {
     lazyConstruct();
     markdownTextArea.setHeight(heightPx + "px");
