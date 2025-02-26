@@ -10,7 +10,7 @@
       closable="true"
       dataBackdrop="STATIC"
       dataKeyboard="true"
-      addStyleNames="modal-fullscreen"
+      addStyleNames="modal-fullscreen full-size-modal-xs-only"
     >
       <b:ModalBody>
         <b:Pre ui:field="infoDialogText" />

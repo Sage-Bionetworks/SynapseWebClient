@@ -2090,6 +2090,22 @@ input[type='text'].padding-0 {
     flex-flow: inherit;
   }
 
+  @media (max-width: 768px) {
+    .full-size-modal-xs-only .modal-dialog {
+      width: 95%;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      margin: auto;
+      max-height: 90vh;
+    }
+
+    .full-size-modal-xs-only .modal-content {
+      max-height: 90vh;
+    }
+  }
+
   .glyphicon {
     display: inline-block;
     font: normal normal normal 14px/1 FontAwesome;

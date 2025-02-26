@@ -11,7 +11,7 @@
     dataBackdrop="STATIC"
     dataKeyboard="false"
     size="LARGE"
-    addStyleNames="newFolderDialog"
+    addStyleNames="newFolderDialog full-size-modal-xs-only"
   >
     <b:ModalBody>
       <b:FormGroup>
