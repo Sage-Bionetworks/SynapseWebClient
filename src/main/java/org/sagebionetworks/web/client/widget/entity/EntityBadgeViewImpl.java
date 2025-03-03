@@ -180,7 +180,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
       entityAnchor.addClickHandler(STANDARD_CLICKHANDLER);
     entityAnchor.setText(entityHeader.getName());
     entityAnchor.addStyleName(
-      "text-align-left text-overflow-ellipsis inline-block whitespace-nowrap overflowHidden max-width-100-unless-xs"
+      "text-align-left text-overflow-ellipsis inline-block whitespace-nowrap overflowHidden max-width-100percent-unless-xs"
     );
     entityAnchor.setHref("/Synapse:" + entityHeader.getId());
     entityAnchor
