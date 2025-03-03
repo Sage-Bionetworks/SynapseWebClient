@@ -2501,6 +2501,9 @@ i.fa.small-icon {
   .min-width-200-unless-xs {
     min-width: 200px;
   }
+  .max-width-100-unless-xs {
+    max-width: 100%;
+  }
 }
 @media (max-width: 500px) {
   .hidden-xxs {
