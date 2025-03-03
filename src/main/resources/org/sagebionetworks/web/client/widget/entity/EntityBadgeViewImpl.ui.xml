@@ -9,7 +9,7 @@
   <t:Table width="100%" height="36px" addStyleNames="entityBadge">
     <t:TableRow>
       <t:TableData
-        addStyleNames="min-width-30 text-align-center overflow-x-hidden"
+        addStyleNames="min-width-30 text-align-center overflow-x-hidden hidden-xs"
         width="30px"
       >
         <g:FocusPanel ui:field="entityTypeIconContainer">
@@ -23,7 +23,7 @@
         />
       </t:TableData>
       <t:TableData
-        addStyleNames="overflow-x-hidden min-width-140"
+        addStyleNames="overflow-x-hidden min-width-140 hidden-xs"
         width="140px"
       >
         <w:ReactComponent ui:field="iconsContainer" />
