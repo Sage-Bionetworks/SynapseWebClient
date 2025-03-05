@@ -11,12 +11,11 @@ import static org.sagebionetworks.web.client.SynapseJavascriptClient.ACCEPT;
 import static org.sagebionetworks.web.client.widget.entity.renderer.NbConvertPreviewWidget.HTML_PREFIX;
 import static org.sagebionetworks.web.client.widget.entity.renderer.NbConvertPreviewWidget.HTML_SUFFIX;
 import static org.sagebionetworks.web.shared.WebConstants.NBCONVERT_ENDPOINT_PROPERTY;
-import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.TEXT_HTML_CHARSET_UTF8;
 
+import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import org.checkerframework.checker.units.qual.N;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -113,14 +112,25 @@ public class NbConvertPreviewWidgetTest {
     "https%3A%2F%2Fs3.path%2Ftest.ipynb";
 
   public static final String NBCONVERT_ENDPOINT =
-    "https://api-%s.synapse.org/nbconvert?file=";
-  public static final String REPO_URL_DEV = "repo-dev.dev.sagebase.org";
-  public static final String REPO_URL_PROD = "repo-prod.prod.sagebase.org";
-  public static final String REPO_URL_LOCAL = "localhost";
+    "https://api.synapse.org/nbconvert?file=";
 
   @Before
   public void before() throws Exception {
     MockitoAnnotations.initMocks(this);
+    when(mockSynapseProperties.getSynapseProperty(NBCONVERT_ENDPOINT_PROPERTY))
+      .thenReturn(NBCONVERT_ENDPOINT);
+    previewWidget =
+      new NbConvertPreviewWidget(
+        mockView,
+        mockPresignedURLAsyncHandler,
+        mockSynapseJSNIUtils,
+        mockRequestBuilder,
+        mockSynapseAlert,
+        mockSynapseClient,
+        mockPopupUtils,
+        mockSynapseProperties,
+        mockGwt
+      );
     when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK);
     when(mockResponse.getText()).thenReturn(HTML);
     RequestBuilderMockStubber
@@ -145,28 +155,8 @@ public class NbConvertPreviewWidgetTest {
     when(mockFileHandle.getCreatedBy()).thenReturn(CREATED_BY);
   }
 
-  private NbConvertPreviewWidget setupPreviewWidget(String repoUrl) {
-    when(mockSynapseProperties.getSynapseProperty(NBCONVERT_ENDPOINT_PROPERTY))
-      .thenReturn(NBCONVERT_ENDPOINT);
-    when(mockSynapseProperties.getSynapseProperty(REPO_SERVICE_URL_KEY))
-      .thenReturn(repoUrl);
-    NbConvertPreviewWidget previewWidget = new NbConvertPreviewWidget(
-      mockView,
-      mockPresignedURLAsyncHandler,
-      mockSynapseJSNIUtils,
-      mockRequestBuilder,
-      mockSynapseAlert,
-      mockSynapseClient,
-      mockPopupUtils,
-      mockSynapseProperties,
-      mockGwt
-    );
-    return previewWidget;
-  }
-
   @Test
   public void testFileHandleAssociation() {
-    previewWidget = setupPreviewWidget(REPO_URL_DEV);
     previewWidget.configure(ENTITY_ID, mockFileHandle);
 
     verify(mockPresignedURLAsyncHandler)
@@ -181,40 +171,16 @@ public class NbConvertPreviewWidgetTest {
   }
 
   @Test
-  public void testRequestBuilderConfigureDev() {
-    previewWidget = setupPreviewWidget(REPO_URL_DEV);
-    previewWidget.configure(ENTITY_ID, mockFileHandle);
-    String actualNbConvertEndpoint = String.format(NBCONVERT_ENDPOINT, "dev");
-    verify(mockRequestBuilder)
-      .configure(GET, actualNbConvertEndpoint + ENCODED_PRESIGNED_URL);
-    verify(mockRequestBuilder).setHeader(ACCEPT, TEXT_HTML_CHARSET_UTF8);
-  }
-
-  @Test
-  public void testRequestBuilderConfigureProd() {
-    previewWidget = setupPreviewWidget(REPO_URL_PROD);
-    String actualNbConvertEndpoint = String.format(NBCONVERT_ENDPOINT, "prod");
+  public void testRequestBuilderConfigure() {
     previewWidget.configure(ENTITY_ID, mockFileHandle);
 
     verify(mockRequestBuilder)
-      .configure(GET, actualNbConvertEndpoint + ENCODED_PRESIGNED_URL);
-    verify(mockRequestBuilder).setHeader(ACCEPT, TEXT_HTML_CHARSET_UTF8);
-  }
-
-  @Test
-  public void testRequestBuilderConfigureLocal() {
-    previewWidget = setupPreviewWidget(REPO_URL_LOCAL);
-    String actualNbConvertEndpoint = String.format(NBCONVERT_ENDPOINT, "dev");
-    previewWidget.configure(ENTITY_ID, mockFileHandle);
-
-    verify(mockRequestBuilder)
-      .configure(GET, actualNbConvertEndpoint + ENCODED_PRESIGNED_URL);
+      .configure(GET, NBCONVERT_ENDPOINT + ENCODED_PRESIGNED_URL);
     verify(mockRequestBuilder).setHeader(ACCEPT, TEXT_HTML_CHARSET_UTF8);
   }
 
   @Test
   public void testGetFileResultFailure() {
-    previewWidget = setupPreviewWidget(REPO_URL_DEV);
     Exception ex = new Exception("error");
     AsyncMockStubber
       .callFailureWith(ex)
@@ -236,7 +202,6 @@ public class NbConvertPreviewWidgetTest {
 
   @Test
   public void testDownloadFailure() {
-    previewWidget = setupPreviewWidget(REPO_URL_DEV);
     String error = "no connection";
     when(mockResponse.getStatusCode()).thenReturn(Response.SC_GATEWAY_TIMEOUT);
     when(mockResponse.getStatusText()).thenReturn(error);
@@ -252,7 +217,6 @@ public class NbConvertPreviewWidgetTest {
 
   @Test
   public void testRenderHtmlTrusted() {
-    previewWidget = setupPreviewWidget(REPO_URL_DEV);
     previewWidget.configure(ENTITY_ID, mockFileHandle);
 
     verify(mockSynapseClient)
@@ -265,7 +229,6 @@ public class NbConvertPreviewWidgetTest {
 
   @Test
   public void testRenderHtmlUntrustedButSafe() {
-    previewWidget = setupPreviewWidget(REPO_URL_DEV);
     AsyncMockStubber
       .callSuccessWith(false)
       .when(mockSynapseClient)
@@ -287,7 +250,6 @@ public class NbConvertPreviewWidgetTest {
 
   @Test
   public void testBlockRenderHtmlUntrusted() {
-    previewWidget = setupPreviewWidget(REPO_URL_DEV);
     AsyncMockStubber
       .callSuccessWith(false)
       .when(mockSynapseClient)
@@ -307,7 +269,6 @@ public class NbConvertPreviewWidgetTest {
 
   @Test
   public void testIsTrustedCheckFailure() {
-    previewWidget = setupPreviewWidget(REPO_URL_DEV);
     String errorMessage = "unable to determine if user is on the team";
     Exception ex = new Exception(errorMessage);
     AsyncMockStubber
@@ -329,7 +290,6 @@ public class NbConvertPreviewWidgetTest {
 
   @Test
   public void testOnShowFullContent() {
-    previewWidget = setupPreviewWidget(REPO_URL_DEV);
     previewWidget.onShowFullContent();
 
     // verify it asks for a fresh presigned url, and opens it (to download)
