@@ -107,7 +107,6 @@
         <filtering>true</filtering>
         <includes>
           <include>**/*.properties</include>
-          <include>**/*.gwt.xml</include>
         </includes>
       </resource>
       <resource>
