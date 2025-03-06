@@ -18,6 +18,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.inject.Inject;
+import elemental2.dom.DataTransferItem;
+import elemental2.dom.DataTransferItemList;
 import elemental2.dom.DomGlobal;
 import elemental2.dom.DragEvent;
 import elemental2.dom.EventListener;
@@ -495,6 +497,18 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
     }
   }
 
+  private static boolean containsFile(DataTransferItemList items) {
+    if (items == null || items.length == 0) return false;
+    List<DataTransferItem> itemList = items.asList();
+    for (int i = 0; i < itemList.size(); i++) {
+      DataTransferItem item = itemList.get(i);
+      if ("file".equals(item.kind)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   private static void initializeDragDrop(
     GlobalApplicationStateImpl globalAppState,
     HTMLDivElement dropZone,
@@ -508,14 +522,26 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
         "dragenter",
         e -> {
           if (globalAppState.isDragAndDropListenerSet()) {
-            showDropZone.run();
+            // Show the drop zone
+            // SWC-7263: But only if there are files associated to the drag (not an anchor!)
+            if (e instanceof DragEvent) {
+              DragEvent dragEvent = (DragEvent) e;
+              DataTransferItemList itemList = dragEvent.dataTransfer.items;
+              boolean isDraggingFiles = containsFile(itemList);
+              if (isDraggingFiles) {
+                showDropZone.run();
+              }
+            }
           }
         }
       );
 
       EventListener allowDrag = e -> {
+        // Allow drag if this is a drag event.
+
         if (e instanceof DragEvent) {
-          ((DragEvent) e).dataTransfer.dropEffect = "copy";
+          DragEvent dragEvent = (DragEvent) e;
+          dragEvent.dataTransfer.dropEffect = "copy";
           e.preventDefault();
         }
       };
