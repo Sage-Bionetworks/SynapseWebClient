@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import static org.sagebionetworks.web.client.SynapseJavascriptClient.ACCEPT;
 import static org.sagebionetworks.web.shared.WebConstants.NBCONVERT_ENDPOINT_PROPERTY;
+import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.TEXT_HTML_CHARSET_UTF8;
 
 import com.google.gwt.http.client.Request;
@@ -75,8 +76,23 @@ public class NbConvertPreviewWidget
       friendlyMaxFileSize =
         gwt.getFriendlySize(HtmlPreviewWidget.MAX_HTML_FILE_SIZE, true);
     }
+    String repoUrl = synapseProperties.getSynapseProperty(REPO_SERVICE_URL_KEY);
+    String stack = stackFromRepoEndpoint(repoUrl);
     nbConvertEndpoint =
-      synapseProperties.getSynapseProperty(NBCONVERT_ENDPOINT_PROPERTY);
+      String.format(
+        synapseProperties.getSynapseProperty(NBCONVERT_ENDPOINT_PROPERTY),
+        stack
+      );
+  }
+
+  protected String stackFromRepoEndpoint(String endpoint) {
+    // deployed endpoint should be "repo-xxx.stack.sagebase.org"
+    String stack = "dev";
+    String[] parts = endpoint.split("\\.");
+    if (parts.length == 4) {
+      stack = parts[1];
+    }
+    return stack;
   }
 
   public void configure(String synapseId, FileHandle fileHandle) {
