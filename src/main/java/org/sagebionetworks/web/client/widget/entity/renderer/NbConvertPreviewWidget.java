@@ -79,10 +79,9 @@ public class NbConvertPreviewWidget
     String repoUrl = synapseProperties.getSynapseProperty(REPO_SERVICE_URL_KEY);
     String stack = stackFromRepoEndpoint(repoUrl);
     nbConvertEndpoint =
-      String.format(
-        synapseProperties.getSynapseProperty(NBCONVERT_ENDPOINT_PROPERTY),
-        stack
-      );
+      synapseProperties
+        .getSynapseProperty(NBCONVERT_ENDPOINT_PROPERTY)
+        .replaceAll("%s", stack);
   }
 
   protected String stackFromRepoEndpoint(String endpoint) {
