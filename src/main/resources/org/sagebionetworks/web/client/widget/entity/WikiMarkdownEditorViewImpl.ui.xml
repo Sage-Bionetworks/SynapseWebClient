@@ -7,7 +7,7 @@
   <bh:Div>
     <b:Modal
       ui:field="editorDialog"
-      addStyleNames="modal-fullscreen"
+      addStyleNames="modal-fullscreen full-size-modal-xs-only"
       closable="true"
       dataBackdrop="STATIC"
       dataKeyboard="false"

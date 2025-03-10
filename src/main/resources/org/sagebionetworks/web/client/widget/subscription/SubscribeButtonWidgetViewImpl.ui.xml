@@ -10,6 +10,7 @@
       type="PRIMARY"
       visible="false"
       dataLoadingText="Updating..."
+      addStyleNames="full-width-xs-only"
     >
       Follow
     </b:Button>
@@ -18,6 +19,7 @@
       type="DEFAULT"
       visible="false"
       dataLoadingText="Updating..."
+      addStyleNames="full-width-xs-only"
     >
       Unfollow
     </b:Button>

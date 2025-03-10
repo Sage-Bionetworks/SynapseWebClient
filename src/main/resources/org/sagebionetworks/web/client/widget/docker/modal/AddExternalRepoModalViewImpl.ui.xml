@@ -9,7 +9,7 @@
     closable="true"
     dataBackdrop="STATIC"
     dataKeyboard="true"
-    addStyleNames="modal"
+    addStyleNames="modal-fullscreen full-size-modal-xs-only"
   >
     <b:ModalBody>
       <bh:Span addStyleNames="font-size-18">Repository Name</bh:Span>

@@ -11,6 +11,7 @@
     </g:FocusPanel>
     <b:Modal
       ui:field="modal"
+      addStyleNames="full-size-modal-xs-only"
       closable="true"
       dataBackdrop="STATIC"
       dataKeyboard="true"

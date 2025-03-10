@@ -8,7 +8,7 @@
   <bh:Div addStyleNames="filesBrowser margin-top-15">
     <bh:Div
       ui:field="commandsContainer"
-      addStyleNames="flexcontainer-row"
+      addStyleNames="flexcontainer-row-unless-xs"
       marginBottom="10"
     >
       <bh:Div
@@ -16,10 +16,7 @@
       >
         <b:Heading size="H3" ui:field="title" text="Files" visible="false" />
       </bh:Div>
-      <bh:Div
-        addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end"
-        ui:field="actionMenuContainer"
-      />
+      <bh:Div ui:field="actionMenuContainer" />
     </bh:Div>
     <bh:Div ui:field="addToDownloadListContainer" />
     <bh:Div ui:field="reactFileBrowserContainer" />

@@ -11,12 +11,11 @@
     <g:FlowPanel ui:field="mainPanel">
       <g:FlowPanel ui:field="wikiSubpagesPanel" />
       <g:FlowPanel ui:field="wikiPagePanel">
-        <bh:Div addStyleNames="flexcontainer-row margin-bottom-10">
+        <bh:Div
+          addStyleNames="flexcontainer-row margin-bottom-20 flexcontainer-center-xs-justify-end"
+        >
           <bh:Div
-            addStyleNames="flexcontainer-column flexcontainer-column-fill-width"
-          />
-          <bh:Div
-            addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end min-width-70"
+            addStyleNames="full-width-xs-only"
             ui:field="actionMenuContainer"
           />
         </bh:Div>
