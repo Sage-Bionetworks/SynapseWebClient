@@ -69,7 +69,9 @@ public class CORSFilter extends OncePerRequestFilter {
     "stopadportal",
     "staging.stopadportal",
     "genie",
-    "staging.genie"
+    "staging.genie",
+    "standards",
+    "staging.standards"
   );
 
   public static final String SYNAPSE_ORG_SUFFIX = ".synapse.org";
