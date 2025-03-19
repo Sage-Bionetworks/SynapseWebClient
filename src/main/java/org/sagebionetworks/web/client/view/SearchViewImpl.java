@@ -481,6 +481,7 @@ public class SearchViewImpl extends Composite implements SearchView {
         hit.getName(),
         DisplayUtils.getSynapseHistoryToken(hit.getId())
       );
+    link.addClickHandler(presenter.getSearchResultClickedHandler(hit));
     EntityTypeIconImpl icon = new EntityTypeIconImpl(entityType);
     icon.addStyleName("lightGreyText margin-right-10 margin-left-5");
     headingPanel.add(icon);

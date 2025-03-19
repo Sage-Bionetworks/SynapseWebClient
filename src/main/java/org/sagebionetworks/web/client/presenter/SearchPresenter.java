@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.presenter;
 
 import com.google.gwt.activity.shared.AbstractActivity;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.place.shared.Place;
@@ -19,11 +20,19 @@ import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.KeyRange;
 import org.sagebionetworks.repo.model.search.query.KeyValue;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
+import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.analytics.SearchAnalyticsClient;
+import org.sagebionetworks.web.client.jsinterop.analytics.SearchContext;
+import org.sagebionetworks.web.client.jsinterop.analytics.SearchItemType;
+import org.sagebionetworks.web.client.jsinterop.analytics.SearchQueryEventData;
+import org.sagebionetworks.web.client.jsinterop.analytics.SearchResultEventData;
+import org.sagebionetworks.web.client.jsinterop.analytics.SearchResultPageReturnedEventData;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.SearchView;
@@ -36,21 +45,25 @@ public class SearchPresenter
   extends AbstractActivity
   implements SearchView.Presenter, Presenter<Search> {
 
-  private SearchView view;
-  private GlobalApplicationState globalApplicationState;
-  private JSONObjectAdapter jsonObjectAdapter;
-  private SynapseAlert synAlert;
+  private final SearchView view;
+  private final GlobalApplicationState globalApplicationState;
+  private final JSONObjectAdapter jsonObjectAdapter;
+  private final SynapseAlert synAlert;
 
   private SearchQuery currentSearch;
   private SearchResults currentResult;
-  private Map<String, String> timeValueToDisplay = new HashMap<
+  private final Map<String, String> timeValueToDisplay = new HashMap<
     String,
     String
   >();
   private Date searchStartTime;
-  private SynapseJavascriptClient jsClient;
+  private final SynapseJavascriptClient jsClient;
 
-  private LoadMoreWidgetContainer loadMoreWidgetContainer;
+  private final LoadMoreWidgetContainer loadMoreWidgetContainer;
+  private final SearchAnalyticsClient searchAnalyticsClient;
+  private final SynapseJSNIUtils jsniUtils;
+
+  private final List<SearchResults> allPagesOfResults;
 
   @Inject
   public SearchPresenter(
@@ -59,7 +72,9 @@ public class SearchPresenter
     SynapseJavascriptClient jsClient,
     JSONObjectAdapter jsonObjectAdapter,
     SynapseAlert synAlert,
-    LoadMoreWidgetContainer loadMoreWidgetContainer
+    LoadMoreWidgetContainer loadMoreWidgetContainer,
+    SearchAnalyticsClient searchAnalyticsClient,
+    SynapseJSNIUtils jsniUtils
   ) {
     this.view = view;
     this.globalApplicationState = globalApplicationState;
@@ -67,6 +82,9 @@ public class SearchPresenter
     this.synAlert = synAlert;
     this.loadMoreWidgetContainer = loadMoreWidgetContainer;
     this.jsClient = jsClient;
+    this.searchAnalyticsClient = searchAnalyticsClient;
+    this.jsniUtils = jsniUtils;
+    allPagesOfResults = new ArrayList<>();
     currentSearch = getBaseSearchQuery();
     view.setPresenter(this);
     view.setSynAlertWidget(synAlert.asWidget());
@@ -150,6 +168,7 @@ public class SearchPresenter
   private void executeNewSearch() {
     currentSearch.setStart(0L);
     view.clear();
+    allPagesOfResults.clear();
     loadMoreWidgetContainer.clear();
     Search searchPlace = new Search(getCurrentSearchJSON());
     globalApplicationState.pushCurrentPlace(searchPlace);
@@ -349,16 +368,27 @@ public class SearchPresenter
         if (isFirstPage) {
           view.setSearchResults(currentResult, searchTerm);
         }
-        Long limit = currentSearch.getSize() == null
-          ? 10L
-          : currentSearch.getSize();
+        Long limit = getLimit();
         currentSearch.setStart(currentResult.getStart() + limit);
+        allPagesOfResults.add(currentResult);
         loadMoreWidgetContainer.add(
           view.getResults(currentResult, searchTerm, isFirstPage)
         );
         List<Hit> hits = currentResult.getHits();
         boolean isMore = limit.equals(new Long(hits.size()));
         loadMoreWidgetContainer.setIsMore(isMore);
+
+        // Send search analytics data for results
+        SearchResultPageReturnedEventData eventData =
+          addSearchPageResultToAnalyticsEventData(
+            new SearchResultPageReturnedEventData()
+          );
+        eventData.total_results = Double.valueOf(currentResult.getFound());
+        searchAnalyticsClient.sendSearchResultPageReturnedEvent(eventData);
+        hits.forEach(hit -> {
+          SearchResultEventData resultEventData = getSearchResultEventData(hit);
+          searchAnalyticsClient.sendSearchResultReturnedEvent(resultEventData);
+        });
       }
 
       @Override
@@ -383,6 +413,11 @@ public class SearchPresenter
     };
     loadMoreWidgetContainer.setIsProcessing(true);
     jsClient.getSearchResults(currentSearch, callback);
+
+    // Submit analytics event for search query submission
+    searchAnalyticsClient.sendSearchQuerySubmittedEvent(
+      addSearchRequestToAnalyticsEventData(new SearchQueryEventData())
+    );
   }
 
   private boolean isEmptyQuery() {
@@ -413,5 +448,155 @@ public class SearchPresenter
 
   private String createTimeValueKey(String facetName, String facetValue) {
     return facetName + facetValue;
+  }
+
+  private long getLimit() {
+    return currentSearch.getSize() == null ? 10L : currentSearch.getSize();
+  }
+
+  private int getIndexOfHit(Hit targetHit) {
+    int cumulativeIndex = 0; // Note: 0-indexed
+    for (SearchResults results : allPagesOfResults) {
+      List<Hit> hits = results.getHits();
+      int indexInPage = hits.indexOf(targetHit);
+      if (indexInPage != -1) {
+        return cumulativeIndex + indexInPage;
+      }
+      cumulativeIndex += hits.size();
+    }
+    return -1; // Hit not found
+  }
+
+  private int getIndexOfPageContainingHit(Hit targetHit) {
+    // Note: 0-indexed
+    for (int pageIndex = 0; pageIndex < allPagesOfResults.size(); pageIndex++) {
+      List<Hit> hits = allPagesOfResults.get(pageIndex).getHits();
+      if (hits.contains(targetHit)) {
+        return pageIndex;
+      }
+    }
+    return -1; // Hit not found
+  }
+
+  /**
+   * Get event data for an individual search result
+   * @param hit
+   * @return
+   */
+  private SearchResultEventData getSearchResultEventData(Hit hit) {
+    SearchResultEventData resultEventData =
+      addSearchPageResultToAnalyticsEventData(new SearchResultEventData());
+    resultEventData.page_index =
+      Double.valueOf(1 + getIndexOfPageContainingHit(hit));
+    resultEventData.rank = Double.valueOf(1 + getIndexOfHit(hit));
+    resultEventData.item_type = SearchItemType.entity.toString();
+    resultEventData.item_id = hit.getId();
+    return resultEventData;
+  }
+
+  @Override
+  public ClickHandler getSearchResultClickedHandler(Hit hit) {
+    return event -> {
+      SearchResultEventData resultEventData = getSearchResultEventData(hit);
+      searchAnalyticsClient.sendSearchResultClickedEvent(resultEventData);
+    };
+  }
+
+  /**
+   * Adds data related to the latest search request that is not dependent on page
+   * @param eventData
+   */
+  private <T extends SearchQueryEventData> T addSearchToAnalyticsEventData(
+    T eventData
+  ) {
+    eventData.search_context = SearchContext.synapse_entity.toString();
+
+    JSONObjectAdapter adapter = this.jsonObjectAdapter.createNew();
+    try {
+      JSONArrayAdapter queryTermJSON = currentSearch
+        .writeToJSONObject(adapter)
+        .getJSONArray("queryTerm");
+      if (queryTermJSON != null) {
+        eventData.query_term = queryTermJSON.toJSONString();
+      }
+    } catch (JSONObjectAdapterException e) {
+      jsniUtils.consoleError(
+        "Error serializing queryTerm. It will be omitted from the analytics event."
+      );
+      jsniUtils.consoleError(e);
+    }
+
+    if (
+      currentSearch.getBooleanQuery() != null &&
+      !currentSearch.getBooleanQuery().isEmpty()
+    ) {
+      try {
+        JSONArrayAdapter booleanQueryJSON = currentSearch
+          .writeToJSONObject(adapter)
+          .getJSONArray("booleanQuery");
+        if (booleanQueryJSON != null) {
+          eventData.serialized_boolean_query = booleanQueryJSON.toJSONString();
+        }
+      } catch (JSONObjectAdapterException e) {
+        jsniUtils.consoleError(
+          "Error serializing boolean query. It will be omitted from the analytics event."
+        );
+        jsniUtils.consoleError(e);
+      }
+    }
+    if (
+      currentSearch.getRangeQuery() != null &&
+      !currentSearch.getRangeQuery().isEmpty()
+    ) {
+      try {
+        JSONArrayAdapter rangeQueryJSON = currentSearch
+          .writeToJSONObject(adapter)
+          .getJSONArray("rangeQuery");
+        if (rangeQueryJSON != null) {
+          eventData.serialized_range_query = rangeQueryJSON.toJSONString();
+        }
+      } catch (JSONObjectAdapterException e) {
+        jsniUtils.consoleError(
+          "Error serializing range query. It will be omitted from the analytics event."
+        );
+        jsniUtils.consoleError(e);
+      }
+    }
+    return eventData;
+  }
+
+  /**
+   * Adds data related to the latest search request
+   * @param eventData
+   */
+  private <
+    T extends SearchQueryEventData
+  > T addSearchRequestToAnalyticsEventData(T eventData) {
+    eventData = addSearchToAnalyticsEventData(eventData);
+    eventData.start_index =
+      (double) (currentSearch.getStart() == null
+          ? 0
+          : currentSearch.getStart());
+    eventData.page_index =
+      (double) (currentSearch.getStart() == null
+          ? 1
+          : 1 + (currentSearch.getStart() / getLimit()));
+    return eventData;
+  }
+
+  /**
+   * Adds data related to the latest search result
+   * @param eventData
+   */
+  private <
+    T extends SearchQueryEventData
+  > T addSearchPageResultToAnalyticsEventData(T eventData) {
+    eventData = addSearchToAnalyticsEventData(eventData);
+
+    eventData.start_index = Double.valueOf(currentResult.getStart());
+    eventData.page_index =
+      Double.valueOf(1 + (currentResult.getStart() / getLimit()));
+
+    return eventData;
   }
 }

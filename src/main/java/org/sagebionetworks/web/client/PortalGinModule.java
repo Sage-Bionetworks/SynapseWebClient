@@ -10,6 +10,8 @@ import org.sagebionetworks.gwt.client.schema.adapter.JSONObjectGwt;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.web.client.analytics.SearchAnalyticsClient;
+import org.sagebionetworks.web.client.analytics.SearchAnalyticsClientImpl;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cache.ClientCacheImpl;
 import org.sagebionetworks.web.client.cache.EntityId2BundleCache;
@@ -1627,5 +1629,7 @@ public class PortalGinModule extends AbstractGinModule {
     bind(ProjectDataAvailabilityView.class)
       .to(ProjectDataAvailabilityViewImpl.class)
       .in(Singleton.class);
+
+    bind(SearchAnalyticsClient.class).to(SearchAnalyticsClientImpl.class);
   }
 }
