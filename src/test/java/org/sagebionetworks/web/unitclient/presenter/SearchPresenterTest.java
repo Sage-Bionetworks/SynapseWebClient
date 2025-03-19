@@ -47,7 +47,6 @@ import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.presenter.SearchPresenter;
 import org.sagebionetworks.web.client.presenter.SearchUtil;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.SearchView;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
@@ -64,9 +63,6 @@ public class SearchPresenterTest {
 
   @Mock
   GlobalApplicationState mockGlobalApplicationState;
-
-  @Mock
-  AuthenticationController mockAuthenticationController;
 
   @Mock
   SynapseJavascriptClient mockJsClient;
@@ -193,7 +189,7 @@ public class SearchPresenterTest {
 
     SearchQueryEventData searchSubmittedEventData =
       searchQuerySubmittedEventDataCaptor.getValue();
-    assertEquals("searchQueryTerm", searchSubmittedEventData.query_term);
+    assertEquals("[\"searchQueryTerm\"]", searchSubmittedEventData.query_term);
     assertEquals("synapse_entity", searchSubmittedEventData.search_context);
     assertEquals(null, searchSubmittedEventData.serialized_boolean_query);
     assertEquals(null, searchSubmittedEventData.serialized_range_query);
@@ -223,7 +219,7 @@ public class SearchPresenterTest {
     SearchResultPageReturnedEventData pageReturnedEventData =
       searchResultPageReturnedEventDataCaptor.getValue();
 
-    assertEquals("searchQueryTerm", pageReturnedEventData.query_term);
+    assertEquals("[\"searchQueryTerm\"]", pageReturnedEventData.query_term);
     assertEquals("synapse_entity", pageReturnedEventData.search_context);
     assertNull(pageReturnedEventData.serialized_boolean_query);
     assertNull(pageReturnedEventData.serialized_range_query);
@@ -240,7 +236,7 @@ public class SearchPresenterTest {
       searchResultEventDataArgumentCaptor.getAllValues();
 
     resultReturnedEventData.forEach(eventData -> {
-      assertEquals("searchQueryTerm", eventData.query_term);
+      assertEquals("[\"searchQueryTerm\"]", eventData.query_term);
       assertEquals("synapse_entity", eventData.search_context);
       assertNull(eventData.serialized_boolean_query);
       assertNull(eventData.serialized_range_query);
@@ -272,7 +268,7 @@ public class SearchPresenterTest {
       );
 
     searchSubmittedEventData = searchQuerySubmittedEventDataCaptor.getValue();
-    assertEquals("searchQueryTerm", searchSubmittedEventData.query_term);
+    assertEquals("[\"searchQueryTerm\"]", searchSubmittedEventData.query_term);
     assertEquals("synapse_entity", searchSubmittedEventData.search_context);
     assertEquals(null, searchSubmittedEventData.serialized_boolean_query);
     assertEquals(null, searchSubmittedEventData.serialized_range_query);
@@ -302,7 +298,7 @@ public class SearchPresenterTest {
 
     pageReturnedEventData = searchResultPageReturnedEventDataCaptor.getValue();
 
-    assertEquals("searchQueryTerm", pageReturnedEventData.query_term);
+    assertEquals("[\"searchQueryTerm\"]", pageReturnedEventData.query_term);
     assertEquals("synapse_entity", pageReturnedEventData.search_context);
     assertNull(pageReturnedEventData.serialized_boolean_query);
     assertNull(pageReturnedEventData.serialized_range_query);
@@ -313,7 +309,10 @@ public class SearchPresenterTest {
     SearchResultEventData lastResultReturnedEventData =
       searchResultEventDataArgumentCaptor.getValue();
 
-    assertEquals("searchQueryTerm", lastResultReturnedEventData.query_term);
+    assertEquals(
+      "[\"searchQueryTerm\"]",
+      lastResultReturnedEventData.query_term
+    );
     assertEquals("synapse_entity", lastResultReturnedEventData.search_context);
     assertNull(lastResultReturnedEventData.serialized_boolean_query);
     assertNull(lastResultReturnedEventData.serialized_range_query);
@@ -335,7 +334,7 @@ public class SearchPresenterTest {
 
     SearchResultEventData clickedEventData =
       searchResultEventDataArgumentCaptor.getValue();
-    assertEquals("searchQueryTerm", clickedEventData.query_term);
+    assertEquals("[\"searchQueryTerm\"]", clickedEventData.query_term);
     assertEquals("synapse_entity", clickedEventData.search_context);
     assertEquals("entity", clickedEventData.item_type);
     assertEquals("syn123", clickedEventData.item_id);
@@ -352,7 +351,7 @@ public class SearchPresenterTest {
       );
 
     clickedEventData = searchResultEventDataArgumentCaptor.getValue();
-    assertEquals("searchQueryTerm", clickedEventData.query_term);
+    assertEquals("[\"searchQueryTerm\"]", clickedEventData.query_term);
     assertEquals("synapse_entity", clickedEventData.search_context);
     assertEquals("entity", clickedEventData.item_type);
     assertEquals("syn789", clickedEventData.item_id);
@@ -378,7 +377,7 @@ public class SearchPresenterTest {
 
     SearchQueryEventData searchSubmittedEventData =
       searchQuerySubmittedEventDataCaptor.getValue();
-    assertEquals("searchQueryTerm", searchSubmittedEventData.query_term);
+    assertEquals("[\"searchQueryTerm\"]", searchSubmittedEventData.query_term);
     assertEquals("synapse_entity", searchSubmittedEventData.search_context);
     assertEquals(null, searchSubmittedEventData.serialized_boolean_query);
     assertEquals(null, searchSubmittedEventData.serialized_range_query);
@@ -402,7 +401,7 @@ public class SearchPresenterTest {
     SearchResultPageReturnedEventData pageReturnedEventData =
       searchResultPageReturnedEventDataCaptor.getValue();
 
-    assertEquals("searchQueryTerm", pageReturnedEventData.query_term);
+    assertEquals("[\"searchQueryTerm\"]", pageReturnedEventData.query_term);
     assertEquals("synapse_entity", pageReturnedEventData.search_context);
     assertNull(pageReturnedEventData.serialized_boolean_query);
     assertNull(pageReturnedEventData.serialized_range_query);
@@ -556,15 +555,5 @@ public class SearchPresenterTest {
     );
     verify(mockJsClient)
       .getSearchResults(eq(expectedQuery), any(AsyncCallback.class));
-  }
-
-  @Test
-  public void testGetSearchResultClickedHandler() throws Exception {
-    Search place = new Search(getTermSearchQueryJson(exampleTermSearchQuery));
-    searchPresenter.setPlace(place);
-
-    Hit hit = new Hit();
-    hit.setId("syn123");
-    hit.setName("name1");
   }
 }

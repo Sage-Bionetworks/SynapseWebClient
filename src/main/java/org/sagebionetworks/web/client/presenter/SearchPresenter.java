@@ -509,10 +509,23 @@ public class SearchPresenter
   private <T extends SearchQueryEventData> T addSearchToAnalyticsEventData(
     T eventData
   ) {
-    eventData.query_term = join(currentSearch.getQueryTerm(), " ");
     eventData.search_context = SearchContext.synapse_entity.toString();
 
     JSONObjectAdapter adapter = this.jsonObjectAdapter.createNew();
+    try {
+      JSONArrayAdapter queryTermJSON = currentSearch
+        .writeToJSONObject(adapter)
+        .getJSONArray("queryTerm");
+      if (queryTermJSON != null) {
+        eventData.query_term = queryTermJSON.toJSONString();
+      }
+    } catch (JSONObjectAdapterException e) {
+      jsniUtils.consoleError(
+        "Error serializing queryTerm. It will be omitted from the analytics event."
+      );
+      jsniUtils.consoleError(e);
+    }
+
     if (
       currentSearch.getBooleanQuery() != null &&
       !currentSearch.getBooleanQuery().isEmpty()
