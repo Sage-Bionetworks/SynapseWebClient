@@ -87,9 +87,6 @@ public class PortalServletModule extends ServletModule {
     PortalServletModule.class.getName()
   );
 
-  // ViteManifestProviderImpl requires ServletContext, which cannot be injected, so we create the singleton here.
-  private ViteManifestProvider viteManifestProviderSingleton;
-
   private void bindDependencies() {
     // The Rest template provider should be a singleton.
     bind(RestTemplateProvider.class)
@@ -109,6 +106,9 @@ public class PortalServletModule extends ServletModule {
     // JSONObjectAdapter
     bind(JSONObjectAdapter.class).to(JSONObjectAdapterImpl.class);
 
+    bind(ViteManifestProvider.class)
+      .to(ViteManifestProviderImpl.class)
+      .in(Singleton.class);
     bind(ViteHTMLGenerator.class).to(ViteHTMLGeneratorImpl.class);
   }
 
@@ -290,15 +290,6 @@ public class PortalServletModule extends ServletModule {
   @Provides
   public SynapseS3Client provideAmazonS3Client() {
     return AwsClientFactory.createAmazonS3Client();
-  }
-
-  @Provides
-  public ViteManifestProvider provideViteManifestProvider() {
-    if (this.viteManifestProviderSingleton == null) {
-      this.viteManifestProviderSingleton =
-        new ViteManifestProviderImpl(this.getServletContext());
-    }
-    return this.viteManifestProviderSingleton;
   }
 
   /**

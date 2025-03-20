@@ -411,12 +411,9 @@
               <goal>corepack</goal>
             </goals>
             <configuration>
-              <arguments>
-                pnpm
-                vite build
-              </arguments>
+              <arguments>pnpm vite build</arguments>
             </configuration>
-            <phase>compile</phase>
+            <phase>generate-resources</phase>
           </execution>
         </executions>
 
@@ -590,6 +587,21 @@
                 <copy
                   file="${project.basedir}/node_modules/katex/dist/katex.css"
                   tofile="src/main/webapp/generated/katex.css"
+                />
+              </target>
+            </configuration>
+          </execution>
+          <execution>
+            <id>Copy Vite manifest to WEB-INF</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+                <copy
+                  file="${project.basedir}/src/main/webapp/generated/vite/.vite/manifest.json"
+                  tofile="src/main/webapp/WEB-INF/classes/vite/manifest.json"
                 />
               </target>
             </configuration>
