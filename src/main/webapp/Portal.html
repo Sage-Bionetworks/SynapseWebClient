@@ -10,7 +10,7 @@
 
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self' data: blob: 'unsafe-inline' 'unsafe-eval' *.synapse.org *.sagebase.org *.googleapis.com *.gstatic.com *.googletagmanager.com cdn.statuspage.io s3.amazonaws.com www.google-analytics.com kh896k90gyvg.statuspage.io *.youtube.com *.rstudio.com *.google.com *.shinyapps.io *.smartsheet.com sagebionetworks.jira.com 127.0.0.1:9876 esm.sh; frame-ancestors 'self' https://*.synapse.org localhost; img-src * data: blob:; connect-src https://* http://127.0.0.1:8888"
+      content="default-src 'self' data: blob: 'unsafe-inline' 'unsafe-eval' *.synapse.org *.sagebase.org *.googleapis.com *.gstatic.com *.googletagmanager.com cdn.statuspage.io s3.amazonaws.com www.google-analytics.com kh896k90gyvg.statuspage.io *.youtube.com *.rstudio.com *.google.com *.shinyapps.io *.smartsheet.com sagebionetworks.jira.com 127.0.0.1:9876 localhost:5173; frame-ancestors 'self' https://*.synapse.org localhost; img-src * data: blob:; connect-src https://* http://127.0.0.1:8888 http://localhost:5173 ws://localhost:5173"
     />
     <meta
       name="google-site-verification"
@@ -93,126 +93,109 @@
       // SWC-5959: Before loading the SRC library, set value so actual column names are shown in Synapse.org
       window.localStorage.setItem('force-display-original-column-names', 'true')
     </script>
-    <script>
-      // determine cdn endpoint (staging or prod, do not use a cdn for local or dev builds)
-      var cdnEndpoint = '//cdn-' + location.hostname + '/'
-      var processEnvironment = 'production'
-      var synapseOrgRegex = /(www|staging|tst)\.synapse\.org$/
+    <link
+      rel="stylesheet"
+      href="${cdnEndpoint}/loadinglogo.css"
+      type="text/css"
+    />
+    <script src="${cdnEndpoint}/js/compiled-closure-lib.js"></script>
+    <script src="${cdnEndpoint}/Portal/Portal.nocache.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap"
+      type="text/css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      type="text/css"
+    />
+    <link
+      rel="stylesheet"
+      href="${cdnEndpoint}/generated/swc.css"
+      type="text/css"
+    />
+    <script src="${cdnEndpoint}/generated/jquery.min.js"></script>
+    <script src="${cdnEndpoint}/generated/jquery-ui.min.js"></script>
 
-      if (!synapseOrgRegex.test(location.hostname)) {
-        cdnEndpoint = '/'
-        processEnvironment = 'development'
-      }
+    ${viteImports}
 
-      // define process.env.NODE_ENV for any library that fails to export
-      process = {
-        env: {
-          NODE_ENV: processEnvironment, // production or development
-        },
-      }
-
-      window.cdnEndpoint = cdnEndpoint
-
-      function loadJs(src) {
-        // these are dynamically added, so they do not block rendering while being downloaded
-        let scriptElement = document.createElement('script')
-        scriptElement.src = src
-        scriptElement.async = false // in order
-        document.head.appendChild(scriptElement)
-      }
-      function loadCss(src) {
-        if (document.createStyleSheet) document.createStyleSheet(src)
-        else {
-          var linkElement = document.createElement('link')
-          linkElement.href = src
-          linkElement.rel = 'stylesheet'
-          linkElement.type = 'text/css'
-          document.head.appendChild(linkElement)
-        }
-      }
-
-      loadCss(cdnEndpoint + 'loadinglogo.css')
-      loadJs(cdnEndpoint + 'js/compiled-closure-lib.js')
-      loadJs(cdnEndpoint + 'Portal/Portal.nocache.js')
-      loadCss(
-        'https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap',
-      )
-      loadCss('https://fonts.googleapis.com/icon?family=Material+Icons')
-
-      let reactPath, reactDomPath
-
-      if (processEnvironment === 'production') {
-        reactPath = cdnEndpoint + 'generated/react.production.min.js'
-        reactDomPath = cdnEndpoint + 'generated/react-dom.production.min.js'
-      } else {
-        reactPath = cdnEndpoint + 'generated/react.development.js'
-        reactDomPath = cdnEndpoint + 'generated/react-dom.development.js'
-      }
-
-      // TODO: Workaround for SWC-6664
-      // Override the conditional above and just use the production distribution
-
-      loadCss(cdnEndpoint + 'generated/swc.css')
-      loadJs(cdnEndpoint + 'generated/jquery.min.js')
-      loadJs(cdnEndpoint + 'generated/jquery-ui.min.js')
-      // Load latest version of Bootstrap 3 to override the version bundled by GWTBootstrap3
-      // The Bootstrap 3 custom theme CSS is loaded through swc.scss
-      // Note: we alias to bootstrap3 because we rely on Bootstrap 4 to be in node_modules/bootstrap to compile our scss (via synapse-react-client).
-      loadJs(cdnEndpoint + 'generated/bootstrap/dist/js/bootstrap.min.js')
-      loadJs(cdnEndpoint + 'js/back-forward-nav-handler.js')
-      loadJs(cdnEndpoint + 'generated/moment.min.js')
-      loadJs(cdnEndpoint + 'generated/jsplumb.min.js')
-      loadJs(cdnEndpoint + 'js/jquery.tablesorter.min.js')
-      loadJs(cdnEndpoint + 'js/jquery.tablesorter.scinot.js')
-      loadCss(cdnEndpoint + 'icons/font/synapseicons.css?v=1')
-      loadCss(cdnEndpoint + 'generated/font-awesome.css')
-      loadJs(cdnEndpoint + 'js/highlight.pack.js')
-      loadJs(cdnEndpoint + 'js/init-nchart.js')
-      loadJs(cdnEndpoint + 'generated/markdown-it.js')
-      loadJs(cdnEndpoint + 'generated/markdown-it-br.js')
-      loadJs(cdnEndpoint + 'generated/markdown-it-center-text.js')
-      loadJs(cdnEndpoint + 'generated/markdown-it-container.js')
-      loadJs(cdnEndpoint + 'generated/markdown-it-emphasis-alt.js')
-      loadJs(cdnEndpoint + 'generated/markdown-it-inline-comments.js')
-      loadJs(cdnEndpoint + 'generated/markdown-it-math.js')
-      loadJs(cdnEndpoint + 'generated/markdown-it-strikethrough-alt.js')
-      loadJs(cdnEndpoint + 'generated/markdown-it-sub.js')
-      loadJs(cdnEndpoint + 'generated/markdown-it-sup.js')
-      loadJs(cdnEndpoint + 'generated/markdown-it-synapse.js')
-      loadJs(cdnEndpoint + 'generated/markdown-it-synapse-heading.js')
-      loadJs(cdnEndpoint + 'generated/markdown-it-synapse-math.js')
-      loadJs(cdnEndpoint + 'generated/markdown-it-synapse-table.js')
-      loadJs(cdnEndpoint + 'generated/katex/katex.min.js')
-      loadCss(cdnEndpoint + 'generated/katex/katex.min.css')
-      loadJs(cdnEndpoint + 'js/polyfill-2.js')
-      loadJs(cdnEndpoint + 'generated/xss.min.js')
-      loadJs(cdnEndpoint + 'generated/pica.min.js')
-      loadJs(reactPath)
-      loadJs(reactDomPath)
-      loadJs(cdnEndpoint + 'generated/material-ui.production.min.js')
-      loadJs(cdnEndpoint + 'generated/react-transition-group.min.js')
-      loadJs(cdnEndpoint + 'generated/prop-types.min.js')
-      loadJs(cdnEndpoint + 'generated/react-measure.js')
-      loadJs(cdnEndpoint + 'generated/plotly.min.js')
-      loadJs(cdnEndpoint + 'generated/create-plotly-component.min.js')
-      loadJs(cdnEndpoint + 'generated/universalCookie.min.js')
-      loadJs(cdnEndpoint + 'generated/synapse-react-client.production.min.js') // We don't load SRC's scss because we include it in our own compiled scss
-      loadJs(cdnEndpoint + 'generated/croppie.min.js')
-      loadCss(cdnEndpoint + 'js/diff/diffview.css')
-      loadCss(cdnEndpoint + 'generated/croppie.css')
-      loadCss(cdnEndpoint + 'css/highlight-js-default.css')
-      loadCss(cdnEndpoint + 'generated/jquery-ui.min.css')
-      loadJs(cdnEndpoint + 'js/linkify.min.js')
-      loadJs(cdnEndpoint + 'js/linkify-string.min.js')
-      loadJs('//cdn.statuspage.io/se-v2.js')
-      // loadJs("//kh896k90gyvg.statuspage.io/embed/script.js");
-      loadJs(cdnEndpoint + 'generated/papaparse.min.js')
-    </script>
-    <script type="module">
-      // react-query only ships ESM. esm.sh is a CDN that will 'bundle' dependencies for us
-      import * as ReactQuery from 'https://esm.sh/@tanstack/react-query@5.22.2'
-      window.ReactQuery = ReactQuery
-    </script>
+    <!--
+    Load latest version of Bootstrap 3 to override the version bundled by GWTBootstrap3
+    The Bootstrap 3 custom theme CSS is loaded through swc.scss
+    -->
+    <script src="${cdnEndpoint}/generated/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="${cdnEndpoint}/js/back-forward-nav-handler.js"></script>
+    <script src="${cdnEndpoint}/generated/moment.min.js"></script>
+    <script src="${cdnEndpoint}/generated/jsplumb.min.js"></script>
+    <script src="${cdnEndpoint}/js/jquery.tablesorter.min.js"></script>
+    <script src="${cdnEndpoint}/js/jquery.tablesorter.scinot.js"></script>
+    <link
+      rel="stylesheet"
+      href="${cdnEndpoint}/icons/font/synapseicons.css?v=1"
+      type="text/css"
+    />
+    <link
+      rel="stylesheet"
+      href="${cdnEndpoint}/generated/font-awesome.css"
+      type="text/css"
+    />
+    <script src="${cdnEndpoint}/js/highlight.pack.js"></script>
+    <script src="${cdnEndpoint}/js/init-nchart.js"></script>
+    <script src="${cdnEndpoint}/generated/markdown-it.js"></script>
+    <script src="${cdnEndpoint}/generated/markdown-it-br.js"></script>
+    <script src="${cdnEndpoint}/generated/markdown-it-center-text.js"></script>
+    <script src="${cdnEndpoint}/generated/markdown-it-container.js"></script>
+    <script src="${cdnEndpoint}/generated/markdown-it-emphasis-alt.js"></script>
+    <script src="${cdnEndpoint}/generated/markdown-it-inline-comments.js"></script>
+    <script src="${cdnEndpoint}/generated/markdown-it-math.js"></script>
+    <script src="${cdnEndpoint}/generated/markdown-it-strikethrough-alt.js"></script>
+    <script src="${cdnEndpoint}/generated/markdown-it-sub.js"></script>
+    <script src="${cdnEndpoint}/generated/markdown-it-sup.js"></script>
+    <script src="${cdnEndpoint}/generated/markdown-it-synapse.js"></script>
+    <script src="${cdnEndpoint}/generated/markdown-it-synapse-heading.js"></script>
+    <script src="${cdnEndpoint}/generated/markdown-it-synapse-math.js"></script>
+    <script src="${cdnEndpoint}/generated/markdown-it-synapse-table.js"></script>
+    <script src="${cdnEndpoint}/generated/katex/katex.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="${cdnEndpoint}/generated/katex/katex.min.css"
+      type="text/css"
+    />
+    <script src="${cdnEndpoint}/js/polyfill-2.js"></script>
+    <script src="${cdnEndpoint}/generated/xss.min.js"></script>
+    <script src="${cdnEndpoint}/generated/pica.min.js"></script>
+    <script src="${cdnEndpoint}/generated/prop-types.min.js"></script>
+    <script src="${cdnEndpoint}/generated/plotly.min.js"></script>
+    <script src="${cdnEndpoint}/generated/create-plotly-component.min.js"></script>
+    <script src="${cdnEndpoint}/generated/universalCookie.min.js"></script>
+    <!-- We don't load SRC's scss because we include it in our own compiled scss -->
+    <script src="${cdnEndpoint}/generated/croppie.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="${cdnEndpoint}/js/diff/diffview.css"
+      type="text/css"
+    />
+    <link
+      rel="stylesheet"
+      href="${cdnEndpoint}/generated/croppie.css"
+      type="text/css"
+    />
+    <link
+      rel="stylesheet"
+      href="${cdnEndpoint}/css/highlight-js-default.css"
+      type="text/css"
+    />
+    <link
+      rel="stylesheet"
+      href="${cdnEndpoint}/generated/jquery-ui.min.css"
+      type="text/css"
+    />
+    <script src="${cdnEndpoint}/js/linkify.min.js"></script>
+    <script src="${cdnEndpoint}/js/linkify-string.min.js"></script>
+    <script src="//cdn.statuspage.io/se-v2.js"></script>
+    <!-- script src="//kh896k90gyvg.statuspage.io/embed/script.js"></script -->
+    <script src="${cdnEndpoint}/generated/papaparse.min.js"></script>
   </head>
   <body id="body">
     ${botBodyHtml}

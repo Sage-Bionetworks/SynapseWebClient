@@ -51,13 +51,25 @@ import org.sagebionetworks.web.server.servlet.SynapseProviderImpl;
 import org.sagebionetworks.web.server.servlet.UserAccountServiceImpl;
 import org.sagebionetworks.web.server.servlet.UserProfileClientImpl;
 import org.sagebionetworks.web.server.servlet.VersionsServlet;
+import org.sagebionetworks.web.server.servlet.ViteHTMLGenerator;
+import org.sagebionetworks.web.server.servlet.ViteHTMLGeneratorImpl;
+import org.sagebionetworks.web.server.servlet.ViteManifestProvider;
+import org.sagebionetworks.web.server.servlet.ViteManifestProviderImpl;
 import org.sagebionetworks.web.server.servlet.filter.AmpADFilter;
+import org.sagebionetworks.web.server.servlet.filter.CORSFilter;
 import org.sagebionetworks.web.server.servlet.filter.DigitalHealthFilter;
 import org.sagebionetworks.web.server.servlet.filter.DreamFilter;
+import org.sagebionetworks.web.server.servlet.filter.GWTAllCacheFilter;
+import org.sagebionetworks.web.server.servlet.filter.GWTCacheControlFilter;
+import org.sagebionetworks.web.server.servlet.filter.HSTSFilter;
+import org.sagebionetworks.web.server.servlet.filter.HtmlInjectionFilter;
+import org.sagebionetworks.web.server.servlet.filter.JavaScriptContentTypeFilter;
 import org.sagebionetworks.web.server.servlet.filter.MHealthFilter;
 import org.sagebionetworks.web.server.servlet.filter.RPCValidationFilter;
 import org.sagebionetworks.web.server.servlet.filter.RegisterAccountFilter;
+import org.sagebionetworks.web.server.servlet.filter.SSLFilter;
 import org.sagebionetworks.web.server.servlet.filter.TimingFilter;
+import org.sagebionetworks.web.server.servlet.filter.XFrameOptionsFilter;
 import org.sagebionetworks.web.server.servlet.oauth2.OAuth2AliasServlet;
 import org.sagebionetworks.web.server.servlet.oauth2.OAuth2SessionServlet;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -75,8 +87,58 @@ public class PortalServletModule extends ServletModule {
     PortalServletModule.class.getName()
   );
 
-  @Override
-  protected void configureServlets() {
+  private void bindDependencies() {
+    // The Rest template provider should be a singleton.
+    bind(RestTemplateProvider.class)
+      .to(RestTemplateProviderImpl.class)
+      .in(Singleton.class);
+
+    bind(LoggerProvider.class).to(LoggerProviderImpl.class);
+    bind(PropertyProvider.class).to(PropertyProviderImpl.class);
+    bind(ConfigurationProperties.class).to(ConfigurationPropertiesImpl.class);
+    bind(StackConfiguration.class).to(StackConfigurationImpl.class);
+    bind(StackEncrypter.class).to(StackEncrypterImpl.class);
+    bind(SynapseProvider.class).to(SynapseProviderImpl.class);
+    bind(StackVersionProvider.class)
+      .to(StackVersionProviderImpl.class)
+      .in(Singleton.class);
+
+    // JSONObjectAdapter
+    bind(JSONObjectAdapter.class).to(JSONObjectAdapterImpl.class);
+
+    bind(ViteManifestProvider.class)
+      .to(ViteManifestProviderImpl.class)
+      .in(Singleton.class);
+    bind(ViteHTMLGenerator.class).to(ViteHTMLGeneratorImpl.class);
+  }
+
+  private void bindFilters() {
+    filter("/*").through(SSLFilter.class);
+    bind(SSLFilter.class).in(Singleton.class);
+
+    filter("*").through(HtmlInjectionFilter.class);
+    bind(HtmlInjectionFilter.class).in(Singleton.class);
+
+    filter("/*").through(GWTCacheControlFilter.class);
+    bind(GWTCacheControlFilter.class).in(Singleton.class);
+
+    filter("/js/*").through(GWTAllCacheFilter.class);
+    filter("/images/*").through(GWTAllCacheFilter.class);
+    filter("/research/*").through(GWTAllCacheFilter.class);
+    bind(GWTAllCacheFilter.class).in(Singleton.class);
+
+    filter("/*").through(JavaScriptContentTypeFilter.class);
+    bind(JavaScriptContentTypeFilter.class).in(Singleton.class);
+
+    filter("/*").through(HSTSFilter.class);
+    bind(HSTSFilter.class).in(Singleton.class);
+
+    filter("/*").through(CORSFilter.class);
+    bind(CORSFilter.class).in(Singleton.class);
+
+    filter("/*").through(XFrameOptionsFilter.class);
+    bind(XFrameOptionsFilter.class).in(Singleton.class);
+
     // filter all call through this filter
     filter("/Portal/*").through(TimingFilter.class);
     bind(TimingFilter.class).in(Singleton.class);
@@ -98,7 +160,9 @@ public class PortalServletModule extends ServletModule {
     bind(RegisterAccountFilter.class).in(Singleton.class);
     filter("/" + RegisterAccountFilter.URL_PATH)
       .through(RegisterAccountFilter.class);
+  }
 
+  private void bindServices() {
     // Setup the Synapse service
     bind(SynapseClientImpl.class).in(Singleton.class);
     serve("/Portal/synapseclient").with(SynapseClientImpl.class);
@@ -195,31 +259,22 @@ public class PortalServletModule extends ServletModule {
     serve("/Portal/" + WebConstants.JSON_LD_CONTENT_SERVLET)
       .with(JsonLdContentServlet.class);
 
-    // The Rest template provider should be a singleton.
-    bind(RestTemplateProviderImpl.class).in(Singleton.class);
-    bind(RestTemplateProvider.class).to(RestTemplateProviderImpl.class);
-    // Bind the properties from the config file
-    bindPropertiesFromFile("ServerConstants.properties");
-
-    bind(LoggerProvider.class).to(LoggerProviderImpl.class);
-    bind(PropertyProvider.class).to(PropertyProviderImpl.class);
-    bind(ConfigurationProperties.class).to(ConfigurationPropertiesImpl.class);
-    bind(StackConfiguration.class).to(StackConfigurationImpl.class);
-    bind(StackEncrypter.class).to(StackEncrypterImpl.class);
-    bind(SynapseProvider.class).to(SynapseProviderImpl.class);
-    bind(StackVersionProvider.class)
-      .to(StackVersionProviderImpl.class)
-      .in(Singleton.class);
-
-    // JSONObjectAdapter
-    bind(JSONObjectAdapter.class).to(JSONObjectAdapterImpl.class);
-
     // Catch-all. Note that "/*" would override all other servlet binding, and "/" overrides the default
     // handler
     // (which we need for GWT place handling).
     // This is also where project aliases are handled.
     bind(ProjectAliasServlet.class).in(Singleton.class);
     serveRegex("^\\/\\w+$").with(ProjectAliasServlet.class);
+  }
+
+  @Override
+  protected void configureServlets() {
+    // Bind the properties from the config file
+    bindPropertiesFromFile("ServerConstants.properties");
+
+    bindDependencies();
+    bindFilters();
+    bindServices();
   }
 
   @Provides

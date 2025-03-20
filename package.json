@@ -1,6 +1,13 @@
 {
+  "type": "module",
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/material": "^5.16.14",
     "@sage-bionetworks/markdown-it-container": "^4.0.1",
+    "@sage-bionetworks/synapse-types": "0.0.4",
+    "@tanstack/react-query": "5.22.2",
+    "animate.css": "^4.1.1",
     "bootstrap3": "npm:bootstrap@3.4.1",
     "croppie": "2.6.5",
     "font-awesome": "4.7.0",
@@ -15,10 +22,11 @@
     "markdown-it-inline-comments": "^1.0.1",
     "markdown-it-math": "^4.1.1",
     "markdown-it-strikethrough-alt": "^1.0.0",
-    "markdown-it-sub": "^2.0.0",
-    "markdown-it-sup": "^2.0.0",
+    "markdown-it-sub-alt": "^1.0.0",
+    "markdown-it-sup-alt": "^1.0.2",
     "markdown-it-synapse": "^1.1.17",
     "markdown-it-synapse-heading": "^1.0.1",
+    "markdown-it-synapse-math": "^3.0.5",
     "markdown-it-synapse-table": "^1.0.8",
     "moment": "^2.29.4",
     "papaparse": "^5.4.1",
@@ -27,14 +35,16 @@
     "prop-types": "^15.8.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "react-measure": "2.5.2",
     "react-plotly.js": "^2.6.0",
-    "react-transition-group": "2.6.0",
     "sass": "^1.63.6",
     "spark-md5": "^3.0.2",
     "synapse-react-client": "3.4.7",
     "universal-cookie": "^4.0.4",
     "xss": "^1.0.15"
+  },
+  "resolutions": {
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.48.0",
@@ -54,6 +64,8 @@
     "prettier-plugin-java": "2.5.0",
     "typescript": "5.1.6",
     "uuid": "^9.0.0",
+    "vite": "^6.0.11",
+    "vite-plugin-node-polyfills": "0.17.0",
     "wait-on": "^8.0.0"
   },
   "lint-staged": {
@@ -61,20 +73,22 @@
   },
   "scripts": {
     "build": "mvn -B package --file pom.xml",
-    "dev": "concurrently -k -n \"CODESERVER,WATCHER,TOMCAT\" -c \"auto,auto,auto\" \"yarn dev:codeserver\" \"yarn dev:watcher\" \"yarn dev:tomcat\"",
+    "dev": "pnpm concurrently -k -n \"CODESERVER,WATCHER,TOMCAT,VITE\" -c \"auto,auto,auto,auto\" \"pnpm dev:codeserver\" \"pnpm dev:watcher\" \"pnpm dev:tomcat\" \"pnpm dev:vite\"",
     "dev:codeserver": "mvn clean gwt:run-codeserver",
     "dev:watcher": "wait-on tcp:127.0.0.1:9876 && mvn fizzed-watcher:run",
-    "dev:tomcat": "wait-on tcp:127.0.0.1:9876 && docker pull tomcat:9.0; docker run --name swc-dev --rm -p 8888:8080 -v \"/$(pwd)/target/portal-develop-SNAPSHOT/:/usr/local/tomcat/webapps/ROOT/\" -v \"/$HOME/.m2/settings.xml\":/root/.m2/settings.xml tomcat:9.0",
+    "dev:tomcat": "wait-on tcp:127.0.0.1:9876 && docker pull tomcat:9.0; docker run --name swc-dev --rm -p 8888:8080 -v \"/$(pwd)/target/portal-develop-SNAPSHOT/:/usr/local/tomcat/webapps/ROOT/\" -v \"/$HOME/.m2/settings.xml\":/root/.m2/settings.xml -e CATALINA_OPTS=\"-Dorg.sagebionetworks.web.client.dev.mode=true\" tomcat:9.0",
+    "dev:vite": "vite dev",
     "docker:start": "docker pull tomcat:9.0; docker run --name swc-tomcat -d --rm -p 8888:8080 -v \"/$(pwd)/target/portal-develop-SNAPSHOT.war:/usr/local/tomcat/webapps/ROOT.war\" -v \"/$(pwd)/e2e_workflow/settings.xml\":/root/.m2/settings.xml tomcat:9.0",
     "docker:stop": "docker stop swc-tomcat",
     "prepare": "husky install",
-    "e2e": "yarn playwright test",
-    "e2e:chromium": "yarn playwright test --project=chromium",
+    "e2e": "pnpm playwright test",
+    "e2e:chromium": "pnpm playwright test --project=chromium",
     "e2e:lint": "eslint e2e",
-    "e2e:ui": "yarn playwright test --ui",
-    "e2e:codegen": "yarn playwright codegen",
-    "e2e:report": "yarn playwright show-report",
-    "e2e:report:blob": "yarn playwright merge-reports --reporter html ./blob-report && yarn e2e:report",
-    "playwright:update": "yarn add -D @playwright/test@latest; yarn playwright install"
-  }
+    "e2e:ui": "pnpm playwright test --ui",
+    "e2e:codegen": "pnpm playwright codegen",
+    "e2e:report": "pnpm playwright show-report",
+    "e2e:report:blob": "pnpm playwright merge-reports --reporter html ./blob-report && pnpm e2e:report",
+    "playwright:update": "pnpm add -D @playwright/test@latest; pnpm playwright install"
+  },
+  "packageManager": "pnpm@9.15.4+sha512.b2dc20e2fc72b3e18848459b37359a32064663e5627a51e4c74b2c29dd8e8e0491483c3abb40789cfd578bf362fb6ba8261b05f0387d76792ed6e23ea3b1b6a0"
 }

@@ -12,11 +12,11 @@
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "module": "esnext",
-    "target": "es5",
+    "target": "esnext",
     "lib": ["esnext", "dom"],
     "sourceMap": true,
-    "jsx": "react",
-    "moduleResolution": "node",
+    "jsx": "react-jsx",
+    "moduleResolution": "Bundler",
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
@@ -27,5 +27,5 @@
     "noUnusedLocals": true,
     "useUnknownInCatchVariables": false
   },
-  "include": ["e2e/**.ts", "e2e/**/**.ts"]
+  "include": ["js/**/*.ts", "e2e/**.ts", "e2e/**/**.ts"]
 }

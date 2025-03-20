@@ -39,7 +39,7 @@ export const expectTablePageLoaded = async (
     await expect(page.getByRole('button', { name: 'Table Tools' })).toBeVisible(
       { timeout: defaultExpectTimeout * 2 },
     )
-    await expect(page.locator('p').filter({ hasText: tableName })).toBeVisible()
+    await expect(page.getByRole('heading', { name: tableName })).toBeVisible()
     await expect(
       page
         .locator('div')

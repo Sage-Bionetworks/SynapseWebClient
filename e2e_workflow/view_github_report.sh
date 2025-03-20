@@ -54,4 +54,4 @@ gh api \
 unzip "${ARTIFACT_ZIP}" -d "${REPORT_DIR}"
 
 # Show report
-yarn e2e:report
+pnpm e2e:report

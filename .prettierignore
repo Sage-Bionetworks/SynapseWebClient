@@ -17,6 +17,7 @@ src/main/webapp/research/**/*
 
 # Other checked-in files that can/should not be formatted.
 yarn.lock
+pnpm-lock.yaml
 .prettierignore
 .gitignore
 .git-blame-ignore-revs

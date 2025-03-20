@@ -8,7 +8,7 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.FlowPanel;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactDOM;
+import org.sagebionetworks.web.client.jsinterop.ReactDOMClient;
 import org.sagebionetworks.web.client.jsinterop.ReactDOMRoot;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
 
@@ -30,7 +30,7 @@ public class ReactComponent extends FlowPanel implements HasClickHandlers {
 
   private void createRoot() {
     if (root == null) {
-      root = ReactDOM.createRoot(this.getElement());
+      root = ReactDOMClient.createRoot(this.getElement());
     }
   }
 

@@ -26,6 +26,13 @@ public class StackEndpoints {
   public static final String STACK_BEANSTALK_NUMBER_PROPERTY_NAME =
     "org.sagebionetworks.stack.repo.beanstalk.number";
 
+  /*
+    Indicates if the app is running in 'development' mode, i.e. one or more local development servers are dynamically
+     serving assets (i.e. GWT Code Server & Vite).
+   */
+  public static final String IS_DEV_MODE =
+    "org.sagebionetworks.web.client.dev.mode";
+
   public static final String PARAM3 = "PARAM3";
   public static final String PARAM4 = "PARAM4";
   public static final String PARAM5 = "PARAM5";
