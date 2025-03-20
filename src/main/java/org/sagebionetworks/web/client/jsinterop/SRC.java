@@ -8,6 +8,9 @@ import jsinterop.annotations.JsNullable;
 import jsinterop.annotations.JsPackage;
 import jsinterop.annotations.JsType;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.jsinterop.analytics.SearchQueryEventData;
+import org.sagebionetworks.web.client.jsinterop.analytics.SearchResultEventData;
+import org.sagebionetworks.web.client.jsinterop.analytics.SearchResultPageReturnedEventData;
 import org.sagebionetworks.web.client.jsinterop.entity.actionmenu.EntityActionMenuPropsJsInterop;
 
 @JsType(isNative = true, namespace = JsPackage.GLOBAL)
@@ -137,6 +140,7 @@ public class SRC {
 
     /**
      * Pushes a global toast message. In SWC, you should use {@link DisplayUtils#notify}, rather than calling this method directly.
+     *
      * @param message
      * @param variant
      * @param options
@@ -203,6 +207,55 @@ public class SRC {
       String contentType,
       Progress progressCallback,
       IsCancelled getIsCancelled
+    );
+  }
+
+  @JsType(isNative = true)
+  public static class Analytics {
+
+    /**
+     * Submits an event to Google Analytics. This is a noop if gtag is not available, which is possible
+     * if the user has not consented to analytics tracking or their browser blocks trackers.
+     */
+    public static native void sendAnalyticsEvent(
+      String eventName,
+      Object eventData
+    );
+
+    /**
+     * Submits an event to Google Analytics corresponding to a submitted search query.
+     *
+     * @param eventData - The event data associated with the search query
+     */
+    public static native void sendSearchQuerySubmittedEvent(
+      SearchQueryEventData eventData
+    );
+
+    /**
+     * Submits an event to Google Analytics corresponding to a returned page of search results.
+     *
+     * @param eventData - The event data associated with the search results
+     */
+    public static native void sendSearchResultsReturnedEvent(
+      SearchResultPageReturnedEventData eventData
+    );
+
+    /**
+     * Submits an event to Google Analytics corresponding to an individual returned search result.
+     *
+     * @param eventData - The event data associated with the search result
+     */
+    public static native void sendSearchResultReturnedEvent(
+      SearchResultEventData eventData
+    );
+
+    /**
+     * Submits an event to Google Analytics corresponding to a clicked search result.
+     *
+     * @param eventData - The event data associated with the search result
+     */
+    public static native void sendSearchResultClickedEvent(
+      SearchResultEventData eventData
     );
   }
 }

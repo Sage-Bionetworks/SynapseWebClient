@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.view;
 
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import java.util.Date;
@@ -66,6 +67,8 @@ public interface SearchView extends IsWidget, SynapseView {
     String getCurrentSearchJSON();
 
     Long getStart();
+
+    ClickHandler getSearchResultClickedHandler(Hit hit);
   }
 
   public void setSynAlertWidget(Widget asWidget);
