@@ -415,4 +415,8 @@ public class WebConstants {
   // report Synapse error
   public static final String SWC_ISSUE_COLLECTOR_URL =
     "https://sagebionetworks.jira.com/s/d41d8cd98f00b204e9800998ecf8427e-T/-bhcm7i/b/6/e73395c53c3b10fde2303f4bf74ffbf6/_/download/batch/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector-embededjs/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector-embededjs.js?locale=en-US&collectorId=ddc881b3";
+
+  public static final String DATA_CATALOG_PAGE_TITLE = "Synapse Data Catalog";
+  public static final String DATA_CATALOG_PAGE_DESCRIPTION =
+    "Explore a diverse collection of biomedical datasets contributed by renowned research initiatives.  Access genomics data, proteomics data, disease progression, and clinical studies across conditions like Alzheimer’s, Parkinson’s, cardiovascular disease, cancer, autoimmune disorders, and rare genetic disorders such as neurofibromatosis.";
 }

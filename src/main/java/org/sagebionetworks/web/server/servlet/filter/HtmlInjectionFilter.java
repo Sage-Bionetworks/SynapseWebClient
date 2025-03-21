@@ -50,7 +50,6 @@ import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.SynapseProviderImpl;
 import org.sagebionetworks.web.server.servlet.UserDataProvider;
 import org.sagebionetworks.web.server.servlet.ViteHTMLGenerator;
-import org.sagebionetworks.web.server.servlet.ViteHTMLGeneratorImpl;
 import org.sagebionetworks.web.server.servlet.ViteManifestProvider;
 import org.sagebionetworks.web.shared.SearchQueryUtils;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -285,6 +284,12 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
             if (includeBotHtml) {
               dataModel.put(BOT_BODY_HTML_KEY, crawlFilter.getHomePageHtml());
             }
+          } else if (path.startsWith("/DataCatalog")) {
+            dataModel.put(PAGE_TITLE_KEY, WebConstants.DATA_CATALOG_PAGE_TITLE);
+            dataModel.put(
+              PAGE_DESCRIPTION_KEY,
+              WebConstants.DATA_CATALOG_PAGE_DESCRIPTION
+            );
           } else if (path.startsWith("/Synapse")) {
             Synapse place = new Synapse(placeToken);
             String entityId = place.getEntityId();
