@@ -124,8 +124,8 @@ importers:
         specifier: ^3.0.2
         version: 3.0.2
       synapse-react-client:
-        specifier: 3.4.7
-        version: 3.4.7(@types/react@17.0.83)(csstype@3.1.3)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.30.1)(prop-types@15.8.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+        specifier: 3.4.8
+        version: 3.4.8(@types/react@17.0.83)(csstype@3.1.3)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.30.1)(prop-types@15.8.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       universal-cookie:
         specifier: ^4.0.4
         version: 4.0.4
@@ -4608,8 +4608,8 @@ packages:
   svg-path-sdf@1.1.3:
     resolution: {integrity: sha512-vJJjVq/R5lSr2KLfVXVAStktfcfa1pNFjFOgyJnzZFXlO/fDZ5DmM8FpnSKKzLPfEYTVeXuVBTHF296TpxuJVg==}
 
-  synapse-react-client@3.4.7:
-    resolution: {integrity: sha512-uZpWp5XRkkhSwqZyaYGXA4aqZDg1ccBlTY8W+Jd+NBiPlkdvuL/NxijE8CLp90qkZx3SgPvirx4vG5LOE2sRlA==}
+  synapse-react-client@3.4.8:
+    resolution: {integrity: sha512-/vy9mGC2zp5cZumRqoZZZkdnl0m89uwCB2p/bpS7cPCYAt7oqfJW0nUb70MiT5MhbtCUMY7jJcNX1YGV05pBbQ==}
     peerDependencies:
       react: 18.2.0
       react-dom: 18.2.0
@@ -10478,7 +10478,7 @@ snapshots:
       parse-svg-path: 0.1.2
       svg-path-bounds: 1.0.2
 
-  synapse-react-client@3.4.7(@types/react@17.0.83)(csstype@3.1.3)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.30.1)(prop-types@15.8.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0):
+  synapse-react-client@3.4.8(@types/react@17.0.83)(csstype@3.1.3)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.30.1)(prop-types@15.8.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0):
     dependencies:
       '@apidevtools/json-schema-ref-parser': 9.1.2
       '@aws-sdk/client-s3': 3.758.0
