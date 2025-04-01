@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -69,6 +70,9 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 
   @UiField
   Div forumSearchContainer;
+
+  @UiField
+  Div discussionThreadContainer;
 
   // flex containers
   @UiField
@@ -272,6 +276,7 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 
   @Override
   public void configureForumSearch(String forumId, String projectId) {
+    GWT.log("configureForumSearch called with ID: " + forumId);
     OnSearchResultsVisibleHandler onSearchUIVisible = visible -> {
       setSearchResultsVisible(visible);
     };
@@ -283,5 +288,28 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
     );
     forumSearchContainer.clear();
     forumSearchContainer.add(widget);
+  }
+
+  @Override
+  public void setDiscussionThreadVisible(boolean visible) {
+    discussionThreadContainer.setVisible(visible);
+  }
+
+  @Override
+  public void configureDiscussionThread(String threadId, int limit) {
+    GWT.log(
+      "configureDiscussionThread called with ID: " +
+      threadId +
+      " and limit: " +
+      limit
+    );
+
+    DiscussionThreadViewImpl widget = new DiscussionThreadViewImpl(
+      propsProvider,
+      threadId,
+      limit
+    );
+    discussionThreadContainer.clear();
+    discussionThreadContainer.add(widget);
   }
 }

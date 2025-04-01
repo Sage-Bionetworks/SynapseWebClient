@@ -58,5 +58,9 @@ public interface ForumWidgetView extends IsWidget {
 
   void configureForumSearch(String forumId, String projectId);
 
+  void configureDiscussionThread(String threadId, int limit);
+
+  void setDiscussionThreadVisible(boolean visible);
+
   void setActionMenu(IsWidget w);
 }

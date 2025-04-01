@@ -61,6 +61,9 @@
         ui:field="actionMenuContainer"
       />
     </bh:Div>
+    <bh:Div addStyleNames="margin-bottom-20">
+      <bh:Div ui:field="discussionThreadContainer" />
+    </bh:Div>
     <bh:Div
       ui:field="deleteThreadsArea"
       addStyleNames="padding-top-0-imp margin-top-20 margin-bottom-20"

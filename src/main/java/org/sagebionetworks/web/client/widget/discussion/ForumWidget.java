@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.discussion;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -334,6 +335,7 @@ public class ForumWidget implements ForumWidgetView.Presenter {
     view.setThreadListUIVisible(false);
     view.setShowAllThreadsButtonVisible(false);
     view.setSortRepliesButtonVisible(false);
+    view.setDiscussionThreadVisible(false);
     view.setDefaultThreadWidgetVisible(false);
     view.setDeletedThreadListVisible(false);
     view.setSubscribersWidgetVisible(false);
@@ -347,6 +349,7 @@ public class ForumWidget implements ForumWidgetView.Presenter {
     stuAlert.clear();
     subscribeToForumButton.clear();
     updatePlaceToSingleThread(threadId);
+
     jsClient.getThread(
       threadId,
       new AsyncCallback<DiscussionThreadBundle>() {
@@ -357,7 +360,9 @@ public class ForumWidget implements ForumWidgetView.Presenter {
 
         @Override
         public void onSuccess(DiscussionThreadBundle result) {
+          GWT.log("onSuccess threadId: " + threadId);
           currentThreadBundle = result;
+          GWT.log("onSuccess currentThreadBundle: " + currentThreadBundle);
           singleThreadWidget.configure(
             result,
             replyId,
@@ -373,6 +378,10 @@ public class ForumWidget implements ForumWidgetView.Presenter {
               }
             }
           );
+
+          GWT.debugger();
+          view.configureDiscussionThread(threadId, 1);
+          view.setDiscussionThreadVisible(true);
 
           view.setSingleThreadUIVisible(true);
           view.setShowAllThreadsButtonVisible(true);
