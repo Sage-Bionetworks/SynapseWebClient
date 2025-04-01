@@ -222,7 +222,7 @@ public class ForumWidgetTest {
     verify(mockView).setNewThreadModal(any());
     verify(mockView).setPresenter(forumWidget);
     verify(mockView).setAlert(any());
-    verify(mockView).setSingleThread(any());
+    // verify(mockView).setSingleThread(any());
     verify(mockView).setSubscribeButton(any());
     verify(mockView).setSubscribersWidget(any());
 
@@ -388,7 +388,7 @@ public class ForumWidgetTest {
     verify(mockStuAlert, atLeastOnce()).clear();
     InOrder inOrder = inOrder(mockView);
     inOrder.verify(mockView).setMainContainerVisible(false);
-    inOrder.verify(mockView).setSingleThreadUIVisible(false);
+    // inOrder.verify(mockView).setSingleThreadUIVisible(false);
     inOrder.verify(mockView).setThreadListUIVisible(false);
     inOrder.verify(mockView).setShowAllThreadsButtonVisible(false);
     inOrder.verify(mockView).setDefaultThreadWidgetVisible(false);
@@ -679,12 +679,12 @@ public class ForumWidgetTest {
 
     InOrder inOrder = inOrder(mockView);
     inOrder.verify(mockView).setMainContainerVisible(false);
-    inOrder.verify(mockView).setSingleThreadUIVisible(false);
+    // inOrder.verify(mockView).setSingleThreadUIVisible(false);
     inOrder.verify(mockView).setThreadListUIVisible(false);
     inOrder.verify(mockView).setShowAllThreadsButtonVisible(false);
     inOrder.verify(mockView).setDefaultThreadWidgetVisible(false);
     inOrder.verify(mockView).setDeletedThreadListVisible(false);
-    inOrder.verify(mockView).setSingleThreadUIVisible(true);
+    // inOrder.verify(mockView).setSingleThreadUIVisible(true);
     inOrder.verify(mockView).setShowAllThreadsButtonVisible(true);
     inOrder.verify(mockView).setMainContainerVisible(true);
 
@@ -792,12 +792,12 @@ public class ForumWidgetTest {
 
     InOrder inOrder = inOrder(mockView);
     inOrder.verify(mockView).setMainContainerVisible(false);
-    inOrder.verify(mockView).setSingleThreadUIVisible(false);
+    // inOrder.verify(mockView).setSingleThreadUIVisible(false);
     inOrder.verify(mockView).setThreadListUIVisible(false);
     inOrder.verify(mockView).setShowAllThreadsButtonVisible(false);
     inOrder.verify(mockView).setDefaultThreadWidgetVisible(false);
     inOrder.verify(mockView).setDeletedThreadListVisible(false);
-    inOrder.verify(mockView).setSingleThreadUIVisible(true);
+    // inOrder.verify(mockView).setSingleThreadUIVisible(true);
     inOrder.verify(mockView).setShowAllThreadsButtonVisible(true);
     inOrder.verify(mockView).setMainContainerVisible(true);
 
@@ -871,12 +871,12 @@ public class ForumWidgetTest {
 
     InOrder inOrder = inOrder(mockView);
     inOrder.verify(mockView).setMainContainerVisible(false);
-    inOrder.verify(mockView).setSingleThreadUIVisible(false);
+    // inOrder.verify(mockView).setSingleThreadUIVisible(false);
     inOrder.verify(mockView).setThreadListUIVisible(false);
     inOrder.verify(mockView).setShowAllThreadsButtonVisible(false);
     inOrder.verify(mockView).setDefaultThreadWidgetVisible(false);
     inOrder.verify(mockView).setDeletedThreadListVisible(false);
-    verify(mockView, never()).setSingleThreadUIVisible(true);
+    // verify(mockView, never()).setSingleThreadUIVisible(true);
     verify(mockView, never()).setShowAllThreadsButtonVisible(true);
     verify(mockView, never()).setMainContainerVisible(true);
   }
@@ -905,7 +905,7 @@ public class ForumWidgetTest {
 
     InOrder inOrder = inOrder(mockView);
     inOrder.verify(mockView).setMainContainerVisible(false);
-    inOrder.verify(mockView).setSingleThreadUIVisible(false);
+    // inOrder.verify(mockView).setSingleThreadUIVisible(false);
     inOrder.verify(mockView).setThreadListUIVisible(false);
     inOrder.verify(mockView).setShowAllThreadsButtonVisible(false);
     inOrder.verify(mockView).setDefaultThreadWidgetVisible(false);

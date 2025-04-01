@@ -107,7 +107,6 @@ public class ForumWidget implements ForumWidgetView.Presenter {
     view.setThreadList(threadListWidget.asWidget());
     view.setNewThreadModal(newThreadModal.asWidget());
     view.setAlert(stuAlert.asWidget());
-    view.setSingleThread(singleThreadWidget.asWidget());
     view.setSubscribeButton(subscribeToForumButton.asWidget());
     view.setDefaultThreadWidget(defaultThreadWidget.asWidget());
     view.setDeletedThreadList(deletedThreadListWidget.asWidget());
@@ -330,11 +329,9 @@ public class ForumWidget implements ForumWidgetView.Presenter {
 
   public void resetView() {
     view.setMainContainerVisible(false);
-    view.setSingleThreadUIVisible(false);
     view.setNewThreadButtonVisible(false);
     view.setThreadListUIVisible(false);
     view.setShowAllThreadsButtonVisible(false);
-    view.setSortRepliesButtonVisible(false);
     view.setDiscussionThreadVisible(false);
     view.setDefaultThreadWidgetVisible(false);
     view.setDeletedThreadListVisible(false);
@@ -383,9 +380,7 @@ public class ForumWidget implements ForumWidgetView.Presenter {
           view.configureDiscussionThread(threadId, 1);
           view.setDiscussionThreadVisible(true);
 
-          view.setSingleThreadUIVisible(true);
           view.setShowAllThreadsButtonVisible(true);
-          view.setSortRepliesButtonVisible(true);
           view.setMainContainerVisible(true);
           updateActionMenuCommands();
         }
