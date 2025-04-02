@@ -357,9 +357,7 @@ public class ForumWidget implements ForumWidgetView.Presenter {
 
         @Override
         public void onSuccess(DiscussionThreadBundle result) {
-          GWT.log("onSuccess threadId: " + threadId);
           currentThreadBundle = result;
-          GWT.log("onSuccess currentThreadBundle: " + currentThreadBundle);
           singleThreadWidget.configure(
             result,
             replyId,
@@ -376,8 +374,7 @@ public class ForumWidget implements ForumWidgetView.Presenter {
             }
           );
 
-          GWT.debugger();
-          view.configureDiscussionThread(threadId, 1);
+          view.configureDiscussionThread(threadId, 20);
           view.setDiscussionThreadVisible(true);
 
           view.setShowAllThreadsButtonVisible(true);

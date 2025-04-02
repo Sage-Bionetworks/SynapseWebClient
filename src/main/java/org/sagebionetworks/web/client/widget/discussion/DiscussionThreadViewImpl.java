@@ -15,8 +15,6 @@ public class DiscussionThreadViewImpl extends ReactComponent {
     String threadId,
     int limit
   ) {
-    // GWT.log("Thread ID: " + threadId + ", Limit: " + limit);
-    GWT.debugger();
     DiscussionThreadProps props = DiscussionThreadProps.create(threadId, limit);
     ReactElement component = React.createElementWithSynapseContext(
       SRC.SynapseComponents.DiscussionThread,

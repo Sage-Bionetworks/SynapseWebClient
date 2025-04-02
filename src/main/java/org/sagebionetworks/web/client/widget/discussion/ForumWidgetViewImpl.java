@@ -226,7 +226,6 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 
   @Override
   public void configureForumSearch(String forumId, String projectId) {
-    GWT.log("configureForumSearch called with ID: " + forumId);
     OnSearchResultsVisibleHandler onSearchUIVisible = visible -> {
       setSearchResultsVisible(visible);
     };
@@ -247,13 +246,6 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 
   @Override
   public void configureDiscussionThread(String threadId, int limit) {
-    GWT.log(
-      "configureDiscussionThread called with ID: " +
-      threadId +
-      " and limit: " +
-      limit
-    );
-
     DiscussionThreadViewImpl widget = new DiscussionThreadViewImpl(
       propsProvider,
       threadId,
