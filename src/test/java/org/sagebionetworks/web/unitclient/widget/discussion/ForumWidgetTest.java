@@ -882,7 +882,6 @@ public class ForumWidgetTest {
     inOrder.verify(mockView).setShowAllThreadsButtonVisible(false);
     inOrder.verify(mockView).setDefaultThreadWidgetVisible(false);
     inOrder.verify(mockView).setDeletedThreadListVisible(false);
-    verify(mockView, never()).setDiscussionThreadVisible(true);
     verify(mockView, never()).setShowAllThreadsButtonVisible(true);
     verify(mockView, never()).setMainContainerVisible(true);
   }

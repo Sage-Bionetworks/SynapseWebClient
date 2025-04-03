@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
-import com.google.gwt.core.client.GWT;
 import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.DiscussionThreadProps;
 import org.sagebionetworks.web.client.jsinterop.React;

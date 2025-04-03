@@ -345,6 +345,8 @@ public class ForumWidget implements ForumWidgetView.Presenter {
     stuAlert.clear();
     subscribeToForumButton.clear();
     updatePlaceToSingleThread(threadId);
+    view.configureDiscussionThread(threadId, 20);
+    view.setDiscussionThreadVisible(true);
 
     jsClient.getThread(
       threadId,
@@ -372,9 +374,6 @@ public class ForumWidget implements ForumWidgetView.Presenter {
               }
             }
           );
-
-          view.configureDiscussionThread(threadId, 20);
-          view.setDiscussionThreadVisible(true);
 
           view.setShowAllThreadsButtonVisible(true);
           view.setMainContainerVisible(true);
