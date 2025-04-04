@@ -8,9 +8,7 @@ import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.FeatureFlagConfig;
-import org.sagebionetworks.web.client.FeatureFlagKey;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.jsinterop.CreateOrUpdateAccessRequirementWizardProps;
@@ -18,10 +16,8 @@ import org.sagebionetworks.web.client.place.AccessRequirementPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateOrUpdateAccessRequirementWizard;
-import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.LegacyCreateAccessRequirementWizard;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.renderer.SingleButtonView;
-import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
 
 public class CreateAccessRequirementButton
   implements SingleButtonView.Presenter, IsWidget {
@@ -96,43 +92,6 @@ public class CreateAccessRequirementButton
 
   @Override
   public void onClick() {
-    if (
-      featureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.SRC_BASED_AR_MODAL_WIZARD
-      )
-    ) {
-      useSrcWizard();
-    } else {
-      useSwcWizard();
-    }
-  }
-
-  private void useSwcWizard() {
-    LegacyCreateAccessRequirementWizard wizard =
-      ginInjector.getLegacyCreateAccessRequirementWizard();
-    if (subject != null) {
-      wizard.configure(subject);
-    } else if (ar != null) {
-      wizard.configure(ar);
-    }
-    wizard.showModal(
-      new WizardCallback() {
-        @Override
-        public void onFinished() {
-          refreshCallback.invoke();
-          view.clearWidgets();
-        }
-
-        @Override
-        public void onCanceled() {
-          refreshCallback.invoke();
-          view.clearWidgets();
-        }
-      }
-    );
-  }
-
-  private void useSrcWizard() {
     CreateOrUpdateAccessRequirementWizard wizard =
       ginInjector.getCreateOrUpdateAccessRequirementWizard();
 

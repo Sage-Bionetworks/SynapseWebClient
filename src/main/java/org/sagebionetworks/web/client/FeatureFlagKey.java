@@ -28,9 +28,6 @@ public enum FeatureFlagKey {
   // Allow creating a challenge submission button and form with a JSON Schema
   CHALLENGE_SUBMISSION_SETTINGS("CHALLENGE_SUBMISSION_SETTINGS"),
 
-  // If enabled, use the new ACL editor for Access Requirements
-  SRC_BASED_AR_MODAL_WIZARD("SRC_BASED_AR_MODAL_WIZARD"),
-
   // If enabled, show the new homepage
   HOMEPAGE_V2("HOMEPAGE_V2"),
 
