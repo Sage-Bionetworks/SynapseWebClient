@@ -106,7 +106,6 @@ public class ForumWidget implements ForumWidgetView.Presenter {
     view.setThreadList(threadListWidget.asWidget());
     view.setNewThreadModal(newThreadModal.asWidget());
     view.setAlert(stuAlert.asWidget());
-    view.setSingleThread(singleThreadWidget.asWidget());
     view.setSubscribeButton(subscribeToForumButton.asWidget());
     view.setDefaultThreadWidget(defaultThreadWidget.asWidget());
     view.setDeletedThreadList(deletedThreadListWidget.asWidget());
@@ -329,11 +328,10 @@ public class ForumWidget implements ForumWidgetView.Presenter {
 
   public void resetView() {
     view.setMainContainerVisible(false);
-    view.setSingleThreadUIVisible(false);
     view.setNewThreadButtonVisible(false);
     view.setThreadListUIVisible(false);
     view.setShowAllThreadsButtonVisible(false);
-    view.setSortRepliesButtonVisible(false);
+    view.setDiscussionThreadVisible(false);
     view.setDefaultThreadWidgetVisible(false);
     view.setDeletedThreadListVisible(false);
     view.setSubscribersWidgetVisible(false);
@@ -347,6 +345,9 @@ public class ForumWidget implements ForumWidgetView.Presenter {
     stuAlert.clear();
     subscribeToForumButton.clear();
     updatePlaceToSingleThread(threadId);
+    view.configureDiscussionThread(threadId, 20);
+    view.setDiscussionThreadVisible(true);
+
     jsClient.getThread(
       threadId,
       new AsyncCallback<DiscussionThreadBundle>() {
@@ -374,9 +375,7 @@ public class ForumWidget implements ForumWidgetView.Presenter {
             }
           );
 
-          view.setSingleThreadUIVisible(true);
           view.setShowAllThreadsButtonVisible(true);
-          view.setSortRepliesButtonVisible(true);
           view.setMainContainerVisible(true);
           updateActionMenuCommands();
         }

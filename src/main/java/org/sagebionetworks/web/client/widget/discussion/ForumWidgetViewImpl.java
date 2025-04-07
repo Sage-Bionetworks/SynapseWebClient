@@ -7,7 +7,6 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.ButtonGroup;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -32,12 +31,6 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
   Button showAllThreadsButton;
 
   @UiField
-  ButtonGroup repliesSortButtonGroup;
-
-  @UiField
-  SimplePanel singleThreadContainer;
-
-  @UiField
   SimplePanel defaultThreadContainer;
 
   @UiField
@@ -56,19 +49,13 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
   Span subscribersContainer;
 
   @UiField
-  Button sortRepliesAscendingButton;
-
-  @UiField
-  Button sortRepliesDescendingButton;
-
-  @UiField
-  Div singleThreadAndSortContainer;
-
-  @UiField
   Div actionMenuContainer;
 
   @UiField
   Div forumSearchContainer;
+
+  @UiField
+  Div discussionThreadContainer;
 
   // flex containers
   @UiField
@@ -105,21 +92,6 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
     showAllThreadsButton.addClickHandler(event -> {
       presenter.onClickShowAllThreads();
     });
-    sortRepliesAscendingButton.addClickHandler(event -> {
-      clearSelectedSort();
-      sortRepliesAscendingButton.setActive(true);
-      presenter.onSortReplies(true);
-    });
-    sortRepliesDescendingButton.addClickHandler(event -> {
-      clearSelectedSort();
-      sortRepliesDescendingButton.setActive(true);
-      presenter.onSortReplies(false);
-    });
-  }
-
-  private void clearSelectedSort() {
-    sortRepliesAscendingButton.setActive(false);
-    sortRepliesDescendingButton.setActive(false);
   }
 
   private void setSearchResultsVisible(boolean searchResultsVisible) {
@@ -139,11 +111,6 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
       );
       forumSearchFlexContainer.addStyleName("flexcontainer-xs-align-end");
     }
-  }
-
-  @Override
-  public void setSingleThread(Widget w) {
-    singleThreadContainer.setWidget(w);
   }
 
   @Override
@@ -178,11 +145,6 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
   }
 
   @Override
-  public void setSingleThreadUIVisible(boolean visible) {
-    singleThreadAndSortContainer.setVisible(visible);
-  }
-
-  @Override
   public void setThreadListUIVisible(boolean visible) {
     threadListContainer.setVisible(visible);
   }
@@ -195,16 +157,6 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
   @Override
   public void setShowAllThreadsButtonVisible(boolean visible) {
     showAllThreadsButton.setVisible(visible);
-  }
-
-  @Override
-  public void setSortRepliesButtonVisible(boolean visible) {
-    repliesSortButtonGroup.setVisible(visible);
-    if (!visible) {
-      // reset
-      clearSelectedSort();
-      sortRepliesAscendingButton.setActive(true);
-    }
   }
 
   @Override
@@ -283,5 +235,21 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
     );
     forumSearchContainer.clear();
     forumSearchContainer.add(widget);
+  }
+
+  @Override
+  public void setDiscussionThreadVisible(boolean visible) {
+    discussionThreadContainer.setVisible(visible);
+  }
+
+  @Override
+  public void configureDiscussionThread(String threadId, int limit) {
+    DiscussionThreadViewImpl widget = new DiscussionThreadViewImpl(
+      propsProvider,
+      threadId,
+      limit
+    );
+    discussionThreadContainer.clear();
+    discussionThreadContainer.add(widget);
   }
 }

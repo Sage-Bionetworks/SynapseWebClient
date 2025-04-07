@@ -21,6 +21,7 @@ public class SRC {
   @JsType(isNative = true)
   public static class SynapseComponents {
 
+    public static ReactComponentType<DiscussionThreadProps> DiscussionThread;
     public static ReactComponentType<EntityBadgeIconsProps> EntityBadgeIcons;
     public static ReactComponentType<DatasetEditorProps> DatasetItemsEditor;
     public static ReactComponentType<EntityFinderProps> EntityFinder;
