@@ -694,6 +694,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
         projectHeader.getId(),
         getTabVisibilityCallback(EntityArea.DATASETS, datasetsTab.asTab())
       );
+      // check to see if the Project contains any "Table" type entity children
       synapseJavascriptClient.isTable(
         projectHeader.getId(),
         getTabVisibilityCallback(EntityArea.TABLES, tablesTab.asTab())

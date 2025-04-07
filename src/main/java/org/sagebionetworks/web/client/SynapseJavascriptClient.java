@@ -1430,7 +1430,10 @@ public class SynapseJavascriptClient {
     EntityChildrenRequest request = getEntityChildrenRequest(
       projectId,
       EntityType.table,
-      EntityType.entityview
+      EntityType.entityview,
+      EntityType.materializedview,
+      EntityType.submissionview,
+      EntityType.virtualtable
     );
     getEntityChildren(request, getEntityChildrenExistCallback(callback));
   }
