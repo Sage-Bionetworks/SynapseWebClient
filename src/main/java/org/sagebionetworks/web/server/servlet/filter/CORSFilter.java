@@ -70,8 +70,8 @@ public class CORSFilter extends OncePerRequestFilter {
     "staging.stopadportal",
     "genie",
     "staging.genie",
-    "standards",
-    "staging.standards",
+    "b2ai.standards",
+    "staging.b2ai.standards",
     "ampals",
     "staging.ampals"
   );
