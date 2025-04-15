@@ -1240,11 +1240,7 @@ public class EntityActionControllerImpl
 
   private void onCreateOrUpdateDoi() {
     getCreateOrUpdateDoiModal()
-      .configureAndShow(
-        entity,
-        getVersionIfNotLatest(),
-        authenticationController.getCurrentUserProfile()
-      );
+      .configure(entity, getVersionIfNotLatest().orElse(null), true);
   }
 
   private void onCreateChallenge() {
