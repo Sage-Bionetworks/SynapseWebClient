@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.server.servlet.filter;
 
 import static org.sagebionetworks.web.server.StackEndpoints.IS_DEV_MODE;
+import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.HOST_HEADER;
 
 import com.google.gwt.safehtml.shared.SimpleHtmlSanitizer;
 import com.google.inject.Inject;
@@ -108,8 +109,8 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
   // that Vite generates.
   public static final List<String> VITE_IMPORTED_FILES = List.of("js/main.js");
 
-  Pattern CDN_ORIGINS_REGEX = Pattern.compile(
-    "https?://((www|staging|tst)\\.synapse\\.org)$"
+  Pattern CDN_HOSTS_REGEX = Pattern.compile(
+    "^(www|staging|tst)\\.synapse\\.org$"
   );
 
   public static final String META_ROBOTS_NOINDEX =
@@ -191,12 +192,11 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
     Map<String, String> dataModel,
     HttpServletRequest request
   ) {
-    String origin = request.getHeader("origin");
-    if (origin != null) {
-      Matcher matcher = CDN_ORIGINS_REGEX.matcher(origin);
+    String host = request.getHeader(HOST_HEADER);
+    if (host != null) {
+      Matcher matcher = CDN_HOSTS_REGEX.matcher(host);
       if (matcher.matches()) {
-        String hostnameAndPort = matcher.group(1);
-        dataModel.put(CDN_ENDPOINT_KEY, "//cdn-" + hostnameAndPort);
+        dataModel.put(CDN_ENDPOINT_KEY, "//cdn-" + host);
         return;
       }
     }
