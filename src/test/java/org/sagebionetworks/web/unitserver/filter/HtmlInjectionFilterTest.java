@@ -9,6 +9,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.server.StackEndpoints.IS_DEV_MODE;
+import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.HOST_HEADER;
 import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.ORIGIN_HEADER;
 import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.SYNAPSE_ORG_SUFFIX;
 import static org.sagebionetworks.web.server.servlet.filter.CrawlFilter.META_ROBOTS_NOINDEX;
@@ -189,8 +190,8 @@ public class HtmlInjectionFilterTest {
     filter.init(pageTitleTemplate, mockCrawlFilter);
     when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapseClient);
     filter.setSynapseProvider(mockSynapseProvider);
-    when(mockRequest.getHeader(ORIGIN_HEADER))
-      .thenReturn("https://www" + SYNAPSE_ORG_SUFFIX);
+    when(mockRequest.getHeader(HOST_HEADER))
+      .thenReturn("www" + SYNAPSE_ORG_SUFFIX);
     when(mockRequest.getServerName()).thenReturn("www" + SYNAPSE_ORG_SUFFIX);
     when(mockRequest.getScheme()).thenReturn("https");
     when(
@@ -548,7 +549,7 @@ public class HtmlInjectionFilterTest {
     );
 
     setRequestURL("https://www.synapse.org/");
-    when(mockRequest.getHeader("origin")).thenReturn("https://www.synapse.org");
+    when(mockRequest.getHeader(HOST_HEADER)).thenReturn("www.synapse.org");
 
     filter.init(template, mockCrawlFilter);
 
@@ -567,8 +568,7 @@ public class HtmlInjectionFilterTest {
     );
 
     setRequestURL("https://staging.synapse.org/");
-    when(mockRequest.getHeader("origin"))
-      .thenReturn("https://staging.synapse.org");
+    when(mockRequest.getHeader(HOST_HEADER)).thenReturn("staging.synapse.org");
 
     filter.init(template, mockCrawlFilter);
 
@@ -587,7 +587,7 @@ public class HtmlInjectionFilterTest {
     );
 
     setRequestURL("https://tst.synapse.org/");
-    when(mockRequest.getHeader("origin")).thenReturn("https://tst.synapse.org");
+    when(mockRequest.getHeader(HOST_HEADER)).thenReturn("tst.synapse.org");
 
     filter.init(template, mockCrawlFilter);
 
@@ -606,7 +606,7 @@ public class HtmlInjectionFilterTest {
     );
 
     setRequestURL("https://localhost:8888/");
-    when(mockRequest.getHeader("origin")).thenReturn("https://localhost:8888");
+    when(mockRequest.getHeader(HOST_HEADER)).thenReturn("localhost:8888");
 
     filter.init(template, mockCrawlFilter);
 

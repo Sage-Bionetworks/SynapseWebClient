@@ -15,6 +15,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
  */
 public class CORSFilter extends OncePerRequestFilter {
 
+  public static final String HOST_HEADER = "Host";
   public static final String ORIGIN_HEADER = "origin";
   public static final String DEFAULT_ALLOW_ORIGIN = "*";
   public static final String ACCESS_CONTROL_ALLOW_ORIGIN_HEADER =
