@@ -1198,9 +1198,12 @@ public class EntityActionControllerImplTest {
       .setActionListener(Action.CHANGE_ENTITY_NAME, controller);
     // upload
     verify(mockActionMenu).setActionVisible(Action.UPLOAD_NEW_FILE, false);
-    // Submission views are not versionable/snapshottable
-    verify(mockActionMenu).setActionVisible(Action.SHOW_VERSION_HISTORY, false);
-    verify(mockActionMenu).setActionVisible(Action.CREATE_TABLE_VERSION, false);
+    // version history
+    verify(mockActionMenu).setActionVisible(Action.SHOW_VERSION_HISTORY, true);
+    // create table version (snapshot)
+    verify(mockActionMenu).setActionVisible(Action.CREATE_TABLE_VERSION, true);
+    verify(mockActionMenu)
+      .setActionListener(Action.CREATE_TABLE_VERSION, controller);
 
     // Edit/upload are not possible for a submission view
     verify(mockActionMenu).setActionVisible(Action.EDIT_TABLE_DATA, false);
