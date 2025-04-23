@@ -121,6 +121,8 @@ import org.sagebionetworks.web.client.view.TrashView;
 import org.sagebionetworks.web.client.view.TrashViewImpl;
 import org.sagebionetworks.web.client.view.TrustCenterView;
 import org.sagebionetworks.web.client.view.TrustCenterViewImpl;
+import org.sagebionetworks.web.client.view.UserAccessRequestHistoryView;
+import org.sagebionetworks.web.client.view.UserAccessRequestHistoryViewImpl;
 import org.sagebionetworks.web.client.view.WikiDiffView;
 import org.sagebionetworks.web.client.view.WikiDiffViewImpl;
 import org.sagebionetworks.web.client.view.users.PasswordResetView;
@@ -939,6 +941,10 @@ public class PortalGinModule extends AbstractGinModule {
     // DataAccessManagement
     bind(DataAccessManagementView.class)
       .to(DataAccessManagementViewImpl.class)
+      .in(Singleton.class);
+
+    bind(UserAccessRequestHistoryView.class)
+      .to(UserAccessRequestHistoryViewImpl.class)
       .in(Singleton.class);
 
     // OAuthClientEditor

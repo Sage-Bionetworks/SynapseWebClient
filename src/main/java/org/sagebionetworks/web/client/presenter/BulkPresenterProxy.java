@@ -61,6 +61,7 @@ import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.place.TrustCenterPlace;
 import org.sagebionetworks.web.client.place.TwoFactorAuthPlace;
+import org.sagebionetworks.web.client.place.UserAccessRequestHistoryPlace;
 import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.place.WikiDiff;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
@@ -831,6 +832,24 @@ public class BulkPresenterProxy extends AbstractActivity {
             DataAccessManagementPresenter presenter =
               ginjector.getDataAccessManagementPresenter();
             presenter.setPlace((DataAccessManagementPlace) place);
+            presenter.start(panel, eventBus);
+          }
+
+          @Override
+          public void onFailure(Throwable caught) {
+            loadError(caught);
+          }
+        }
+      );
+    } else if (place instanceof UserAccessRequestHistoryPlace) {
+      GWT.runAsync(
+        UserAccessRequestHistoryPlace.class,
+        new RunAsyncCallback() {
+          @Override
+          public void onSuccess() {
+            UserAccessRequestHistoryPresenter presenter =
+              ginjector.getUserAccessRequestHistoryPresenter();
+            presenter.setPlace((UserAccessRequestHistoryPlace) place);
             presenter.start(panel, eventBus);
           }
 
