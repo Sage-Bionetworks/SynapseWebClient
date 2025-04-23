@@ -45,6 +45,7 @@ import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.place.TrustCenterPlace;
 import org.sagebionetworks.web.client.place.TwoFactorAuthPlace;
+import org.sagebionetworks.web.client.place.UserAccessRequestHistoryPlace;
 import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.place.WikiDiff;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
@@ -97,6 +98,7 @@ import org.sagebionetworks.web.client.place.users.RegisterAccount;
     PersonalAccessTokenPlace.Tokenizer.class,
     DownloadCartPlace.Tokenizer.class,
     DataAccessManagementPlace.Tokenizer.class,
+    UserAccessRequestHistoryPlace.Tokenizer.class,
     OAuthClientEditorPlace.Tokenizer.class,
     TwoFactorAuthPlace.Tokenizer.class,
     FollowingPlace.Tokenizer.class,
