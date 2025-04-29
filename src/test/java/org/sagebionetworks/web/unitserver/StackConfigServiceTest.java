@@ -1,6 +1,10 @@
 package org.sagebionetworks.web.unitserver;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import javax.servlet.http.HttpServletRequest;
@@ -15,6 +19,7 @@ import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.Session;
+import org.sagebionetworks.repo.model.status.StackStatus;
 import org.sagebionetworks.repo.model.versionInfo.SynapseVersionInfo;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.server.servlet.StackConfigServiceImpl;
@@ -49,6 +54,9 @@ public class StackConfigServiceTest {
   @Mock
   SynapseVersionInfo mockSynapseVersionInfo;
 
+  @Mock
+  StackStatus mockStackStatus;
+
   @Captor
   ArgumentCaptor<String> stringCaptor;
 
@@ -61,7 +69,8 @@ public class StackConfigServiceTest {
   @Before
   public void before() throws SynapseException, JSONObjectAdapterException {
     MockitoAnnotations.initMocks(this);
-    when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
+    when(mockSynapseProvider.createNewClient(anyString()))
+      .thenReturn(mockSynapse);
 
     UserProfile testProfile = new UserProfile();
     testProfile.setOwnerId("123");
@@ -88,6 +97,7 @@ public class StackConfigServiceTest {
 
     when(mockSynapseVersionInfo.getVersion()).thenReturn(REPO_VERSION);
     when(mockSynapse.getVersionInfo()).thenReturn(mockSynapseVersionInfo);
+    when(mockSynapse.getCurrentStackStatus()).thenReturn(mockStackStatus);
   }
 
   @Test
@@ -97,5 +107,17 @@ public class StackConfigServiceTest {
       .getSynapseProperties()
       .get(SynapseClientImpl.DEFAULT_STORAGE_ID_PROPERTY_KEY);
     assertNotNull(defaultStorageId);
+  }
+
+  @Test
+  public void testStackStatusCache() throws Exception {
+    verify(mockSynapse, times(0)).getCurrentStackStatus();
+
+    StackStatus status = stackConfigService.getCurrentStatus();
+    // call twice, and verify the backend is only called once due to cache
+    stackConfigService.getCurrentStatus();
+
+    assertEquals(mockStackStatus, status);
+    verify(mockSynapse, times(1)).getCurrentStackStatus();
   }
 }
