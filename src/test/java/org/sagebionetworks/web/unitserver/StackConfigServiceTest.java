@@ -2,6 +2,7 @@ package org.sagebionetworks.web.unitserver;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -16,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.client.exceptions.SynapseServiceUnavailable;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.Session;
@@ -119,5 +121,21 @@ public class StackConfigServiceTest {
 
     assertEquals(mockStackStatus, status);
     verify(mockSynapse, times(1)).getCurrentStackStatus();
+  }
+
+  @Test
+  public void testStackStatusErrorHandling() throws Exception {
+    String errorMessage = "this is a test error";
+    when(mockSynapse.getCurrentStackStatus())
+      .thenThrow(new SynapseServiceUnavailable(errorMessage));
+
+    StackStatus status = null;
+    try {
+      status = stackConfigService.getCurrentStatus();
+    } catch (Exception e) {
+      assertEquals(errorMessage, e.getMessage());
+    }
+
+    assertNull(status);
   }
 }
