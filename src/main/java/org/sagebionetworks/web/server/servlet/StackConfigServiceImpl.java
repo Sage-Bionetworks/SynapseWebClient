@@ -45,11 +45,12 @@ public class StackConfigServiceImpl
         org.sagebionetworks.client.SynapseClient synapseClient =
           createAnonymousSynapseClient();
         try {
-          SupplierCachedResult.success(synapseClient.getCurrentStackStatus());
+          return SupplierCachedResult.success(
+            synapseClient.getCurrentStackStatus()
+          );
         } catch (SynapseException e) {
-          SupplierCachedResult.failure(e);
+          return SupplierCachedResult.failure(e);
         }
-        return null;
       }
     };
   }
