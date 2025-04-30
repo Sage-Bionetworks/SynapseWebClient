@@ -134,11 +134,10 @@ public class SynapseClientBase
     synapseClient.appendUserAgent(PORTAL_USER_AGENT);
     if (this.getThreadLocalRequest() != null) {
       // SWC-7311 - Do not add the user IP address (X-Forwarded-For header) if the request is made to a local instance
-      if (
-        !LOCAL_HOSTS_REGEX
-          .matcher(this.getThreadLocalRequest().getHeader(HOST_HEADER))
-          .matches()
-      ) {
+      String host = this.getThreadLocalRequest().getHeader(HOST_HEADER);
+      boolean isRequestToLocalIp =
+        host != null && LOCAL_HOSTS_REGEX.matcher(host).matches();
+      if (!isRequestToLocalIp) {
         synapseClient.setUserIpAddress(
           getIpAddress(this.getThreadLocalRequest())
         );
