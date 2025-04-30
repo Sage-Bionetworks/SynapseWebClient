@@ -34,10 +34,15 @@ public class TrustCenterPresenter
       TrustCenterPlace.PRIVACY_POLICY_KEY,
       "privacy.md"
     );
+
     documentKeyToGithubFilename.put(TrustCenterPlace.COOKIES_KEY, "cookies.md");
     documentKeyToGithubFilename.put(
       TrustCenterPlace.SUBPROCESSORS_KEY,
       "subprocessors.md"
+    );
+    documentKeyToGithubFilename.put(
+      TrustCenterPlace.CHILD_MINOR_ADDENDUM_KEY,
+      "ChildMinorAddendum.md"
     );
   }
 
