@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.server.servlet;
 
+import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.HOST_HEADER;
+
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.gwt.user.server.rpc.SerializationPolicy;
 import java.io.IOException;
@@ -7,10 +9,10 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Properties;
+import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
-import org.sagebionetworks.web.server.StackEndpoints;
 
 @SuppressWarnings("serial")
 public class SynapseClientBase
@@ -22,6 +24,10 @@ public class SynapseClientBase
     "Synapse-Web-Client/" + PortalVersionHolder.getVersionInfo();
 
   public static final String X_FORWARDED_FOR_HEADER = "X-Forwarded-For";
+
+  Pattern LOCAL_HOSTS_REGEX = Pattern.compile(
+    "^(localhost|127\\.0\\.0\\.1)(:\\d+)?$"
+  );
 
   private static class PortalVersionHolder {
 
@@ -127,9 +133,16 @@ public class SynapseClientBase
     // Append the portal's version information to the user agent.
     synapseClient.appendUserAgent(PORTAL_USER_AGENT);
     if (this.getThreadLocalRequest() != null) {
-      synapseClient.setUserIpAddress(
-        getIpAddress(this.getThreadLocalRequest())
-      );
+      // SWC-7311 - Do not add the user IP address (X-Forwarded-For header) if the request is made to a local instance
+      if (
+        !LOCAL_HOSTS_REGEX
+          .matcher(this.getThreadLocalRequest().getHeader(HOST_HEADER))
+          .matches()
+      ) {
+        synapseClient.setUserIpAddress(
+          getIpAddress(this.getThreadLocalRequest())
+        );
+      }
     }
     return synapseClient;
   }
