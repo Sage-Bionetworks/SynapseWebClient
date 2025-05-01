@@ -10,6 +10,7 @@ public class TrustCenterPlace extends Place {
   public static final String COOKIES_KEY = "Cookies";
   public static final String PRIVACY_POLICY_KEY = "PrivacyPolicy";
   public static final String TERMS_OF_SERVICE_KEY = "TermsOfService";
+  public static final String CHILD_MINOR_ADDENDUM_KEY = "ChildMinorAddendum";
 
   private String documentKey;
 
