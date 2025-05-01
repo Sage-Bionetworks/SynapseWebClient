@@ -470,6 +470,7 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
         String modifiedHtml = stringWriter.toString();
         // Set response content type
         response.setContentType("text/html");
+        response.setCharacterEncoding("UTF-8");
 
         // Write the modified HTML string to the response
         PrintWriter out = response.getWriter();
