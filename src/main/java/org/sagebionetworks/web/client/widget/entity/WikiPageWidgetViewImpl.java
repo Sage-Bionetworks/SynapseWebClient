@@ -23,7 +23,6 @@ import org.gwtbootstrap3.client.ui.html.Italic;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.place.WikiDiff;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -73,9 +72,6 @@ public class WikiPageWidgetViewImpl
 
   @UiField
   Button wikiHistoryButton;
-
-  @UiField
-  Button wikiCompareButton;
 
   @UiField
   Button restoreButton;
@@ -157,10 +153,6 @@ public class WikiPageWidgetViewImpl
     );
     historyCollapse.hide();
     wikiHistoryButton.setIcon(IconType.CARET_SQUARE_O_RIGHT);
-    wikiCompareButton.addClickHandler(event -> {
-      WikiDiff place = new WikiDiff(key);
-      DisplayUtils.newWindow("/WikiDiff:" + place.toToken(), "_blank", "");
-    });
   }
 
   @Override
@@ -344,15 +336,6 @@ public class WikiPageWidgetViewImpl
   @Override
   public void setModifiedOn(String date) {
     modifiedOnText.setText(date);
-  }
-
-  @Override
-  public void setWikiHistoryDiffToolButtonVisible(
-    boolean visible,
-    WikiPageKey key
-  ) {
-    this.key = key;
-    wikiCompareButton.setVisible(visible);
   }
 
   @Override

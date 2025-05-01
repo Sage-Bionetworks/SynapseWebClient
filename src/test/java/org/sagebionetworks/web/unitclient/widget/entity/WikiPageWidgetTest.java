@@ -122,9 +122,6 @@ public class WikiPageWidgetTest {
   @Mock
   WikiSubpagesExpandEvent mockWikiSubpagesExpandEvent;
 
-  @Mock
-  FeatureFlagConfig mockFeatureFlagConfig;
-
   AdapterFactory adapterFactory = new AdapterFactoryImpl();
 
   WikiPageWidget presenter;
@@ -150,8 +147,7 @@ public class WikiPageWidgetTest {
         mockDateTimeUtils,
         mockSynapseJavascriptClient,
         mockCookies,
-        mockEventBus,
-        mockFeatureFlagConfig
+        mockEventBus
       );
     testPage = new WikiPage();
     testPage.setId(WIKI_PAGE_ID);
@@ -167,8 +163,6 @@ public class WikiPageWidgetTest {
       .callSuccessWith(fakeWiki)
       .when(mockSynapseClient)
       .createV2WikiPageWithV1(any(), any(), any(), any());
-    when(mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.WIKI_DIFF_TOOL))
-      .thenReturn(true);
   }
 
   @Test
@@ -229,24 +223,6 @@ public class WikiPageWidgetTest {
         anyBoolean(),
         any(ActionHandler.class)
       );
-    // in alpha mode, so show diff tool button
-    verify(mockView).setWikiHistoryDiffToolButtonVisible(true, key);
-  }
-
-  // TODO: remove if exposing this outside of alpha mode
-  @Test
-  public void testDiffToolHiddenInNormalMode() {
-    when(mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.WIKI_DIFF_TOOL))
-      .thenReturn(false);
-
-    WikiPageKey key = new WikiPageKey(
-      "ownerId",
-      ObjectType.ENTITY.toString(),
-      WIKI_PAGE_ID,
-      null
-    );
-    presenter.configure(key, false, null);
-    verify(mockView).setWikiHistoryDiffToolButtonVisible(false, key);
   }
 
   @Test

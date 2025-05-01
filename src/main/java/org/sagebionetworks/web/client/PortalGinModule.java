@@ -123,8 +123,6 @@ import org.sagebionetworks.web.client.view.TrustCenterView;
 import org.sagebionetworks.web.client.view.TrustCenterViewImpl;
 import org.sagebionetworks.web.client.view.UserAccessRequestHistoryView;
 import org.sagebionetworks.web.client.view.UserAccessRequestHistoryViewImpl;
-import org.sagebionetworks.web.client.view.WikiDiffView;
-import org.sagebionetworks.web.client.view.WikiDiffViewImpl;
 import org.sagebionetworks.web.client.view.users.PasswordResetView;
 import org.sagebionetworks.web.client.view.users.PasswordResetViewImpl;
 import org.sagebionetworks.web.client.view.users.RegisterWidgetView;
@@ -1581,7 +1579,6 @@ public class PortalGinModule extends AbstractGinModule {
 
     bind(WikiPageDeleteConfirmationDialogView.class)
       .to(WikiPageDeleteConfirmationDialogViewImpl.class);
-    bind(WikiDiffView.class).to(WikiDiffViewImpl.class);
     bind(SynapseProperties.class)
       .to(SynapsePropertiesImpl.class)
       .in(Singleton.class);
