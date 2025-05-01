@@ -10,7 +10,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.server.StackEndpoints.IS_DEV_MODE;
 import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.HOST_HEADER;
-import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.ORIGIN_HEADER;
 import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.SYNAPSE_ORG_SUFFIX;
 import static org.sagebionetworks.web.server.servlet.filter.CrawlFilter.META_ROBOTS_NOINDEX;
 import static org.sagebionetworks.web.server.servlet.filter.HtmlInjectionFilter.SYNAPSE_PLATFORM_DESCRIPTION;
@@ -285,6 +284,8 @@ public class HtmlInjectionFilterTest {
     assertFalse(outputString.contains(META_ROBOTS_NOINDEX));
     assertFalse(outputString.contains(BOT_HEAD_HTML));
     assertFalse(outputString.contains(BOT_BODY_HTML));
+    verify(mockResponse).setContentType("text/html");
+    verify(mockResponse).setCharacterEncoding("UTF-8");
   }
 
   @Test
