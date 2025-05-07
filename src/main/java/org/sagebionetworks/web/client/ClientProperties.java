@@ -74,13 +74,6 @@ public class ClientProperties {
   public static final String EVALUATION_QUERY_SERVICE_PREFIX =
     "/evaluation/submission/query?query=";
 
-  public static final WebResource DIFF_LIB_JS = new WebResource(
-    "js/diff/difflib.js"
-  );
-  public static final WebResource DIFF_VIEW_JS = new WebResource(
-    "js/diff/diffview.js"
-  );
-
   public static final WebResource UTIF_JS = new WebResource("js/UTIF.js");
 
   public static void fixResourceToCdnEndpoint(

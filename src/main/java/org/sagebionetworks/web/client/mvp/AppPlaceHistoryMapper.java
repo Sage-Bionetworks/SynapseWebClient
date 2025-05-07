@@ -47,7 +47,6 @@ import org.sagebionetworks.web.client.place.TrustCenterPlace;
 import org.sagebionetworks.web.client.place.TwoFactorAuthPlace;
 import org.sagebionetworks.web.client.place.UserAccessRequestHistoryPlace;
 import org.sagebionetworks.web.client.place.Wiki;
-import org.sagebionetworks.web.client.place.WikiDiff;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 
@@ -92,7 +91,6 @@ import org.sagebionetworks.web.client.place.users.RegisterAccount;
     ACTDataAccessSubmissionDashboardPlace.Tokenizer.class,
     ACTAccessApprovalsPlace.Tokenizer.class,
     EmailInvitation.Tokenizer.class,
-    WikiDiff.Tokenizer.class,
     PasswordResetSignedTokenPlace.Tokenizer.class,
     DataAccessApprovalTokenPlace.Tokenizer.class,
     PersonalAccessTokenPlace.Tokenizer.class,
