@@ -138,6 +138,9 @@ public class SRC {
       ProjectDataAvailabilityProps
     > ProjectDataAvailability;
     public static ReactComponentType<EntityUploadModalProps> EntityUploadModal;
+    public static ReactComponentType<
+      CreateOrUpdateDoiModalProps
+    > CreateOrUpdateDoiModal;
     public static ReactComponentType UserAccessRequestHistoryPlace;
 
     /**
