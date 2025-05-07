@@ -1680,9 +1680,7 @@ public class EntityActionControllerImpl
     // The following table types inherit Versionable, but do not actually support snapshot versioning
     boolean isMaterializedView = entity instanceof MaterializedView;
     boolean isVirtualTable = entity instanceof VirtualTable;
-    boolean isSubmissionView = entity instanceof SubmissionView;
-    boolean isNonSnapshottableTable =
-      isMaterializedView || isVirtualTable || isSubmissionView;
+    boolean isNonSnapshottableTable = isMaterializedView || isVirtualTable;
     return entity instanceof Versionable && !isNonSnapshottableTable;
   }
 

@@ -1,16 +1,18 @@
 package org.sagebionetworks.web.server.servlet;
 
+import com.google.gwt.thirdparty.guava.common.base.Supplier;
+import com.google.gwt.thirdparty.guava.common.base.Suppliers;
 import java.util.HashMap;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.util.concurrent.TimeUnit;
+import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.status.StackStatus;
 import org.sagebionetworks.web.client.StackConfigService;
 import org.sagebionetworks.web.server.StackEndpoints;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl.PortalPropertiesHolder;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl.PortalVersionHolder;
 import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
-import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 /**
  *
@@ -22,10 +24,36 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
  */
 public class StackConfigServiceImpl
   extends SynapseClientBase
-  implements StackConfigService, RequestHostProvider {
+  implements StackConfigService {
 
-  private static Log log = LogFactory.getLog(StackConfigServiceImpl.class);
   public static final long serialVersionUID = 46893767375462651L;
+
+  private final Supplier<SupplierCachedResult<StackStatus>> stackStatusCache =
+    Suppliers.memoizeWithExpiration(
+      stackStatusSupplier(),
+      10,
+      TimeUnit.SECONDS
+    );
+
+  public SupplierCachedResult<StackStatus> getStackStatus() {
+    return stackStatusCache.get();
+  }
+
+  private Supplier<SupplierCachedResult<StackStatus>> stackStatusSupplier() {
+    return new Supplier<SupplierCachedResult<StackStatus>>() {
+      public SupplierCachedResult<StackStatus> get() {
+        org.sagebionetworks.client.SynapseClient synapseClient =
+          createAnonymousSynapseClient();
+        try {
+          return SupplierCachedResult.success(
+            synapseClient.getCurrentStackStatus()
+          );
+        } catch (SynapseException e) {
+          return SupplierCachedResult.failure(e);
+        }
+      }
+    };
+  }
 
   @Override
   public String getRequestHost() {
@@ -36,12 +64,11 @@ public class StackConfigServiceImpl
 
   @Override
   public StackStatus getCurrentStatus() throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient =
-      createAnonymousSynapseClient();
-    try {
-      return synapseClient.getCurrentStackStatus();
-    } catch (Exception e) {
-      throw new UnknownErrorException(e.getMessage());
+    SupplierCachedResult<StackStatus> currentStatus = getStackStatus();
+    if (currentStatus.isSuccess()) {
+      return currentStatus.getValue();
+    } else {
+      throw ExceptionUtil.convertSynapseException(currentStatus.getError());
     }
   }
 

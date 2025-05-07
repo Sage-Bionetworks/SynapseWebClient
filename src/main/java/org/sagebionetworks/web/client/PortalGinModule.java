@@ -121,8 +121,8 @@ import org.sagebionetworks.web.client.view.TrashView;
 import org.sagebionetworks.web.client.view.TrashViewImpl;
 import org.sagebionetworks.web.client.view.TrustCenterView;
 import org.sagebionetworks.web.client.view.TrustCenterViewImpl;
-import org.sagebionetworks.web.client.view.WikiDiffView;
-import org.sagebionetworks.web.client.view.WikiDiffViewImpl;
+import org.sagebionetworks.web.client.view.UserAccessRequestHistoryView;
+import org.sagebionetworks.web.client.view.UserAccessRequestHistoryViewImpl;
 import org.sagebionetworks.web.client.view.users.PasswordResetView;
 import org.sagebionetworks.web.client.view.users.PasswordResetViewImpl;
 import org.sagebionetworks.web.client.view.users.RegisterWidgetView;
@@ -939,6 +939,10 @@ public class PortalGinModule extends AbstractGinModule {
       .to(DataAccessManagementViewImpl.class)
       .in(Singleton.class);
 
+    bind(UserAccessRequestHistoryView.class)
+      .to(UserAccessRequestHistoryViewImpl.class)
+      .in(Singleton.class);
+
     // OAuthClientEditor
     bind(OAuthClientEditorView.class)
       .to(OAuthClientEditorViewImpl.class)
@@ -1570,7 +1574,6 @@ public class PortalGinModule extends AbstractGinModule {
 
     bind(WikiPageDeleteConfirmationDialogView.class)
       .to(WikiPageDeleteConfirmationDialogViewImpl.class);
-    bind(WikiDiffView.class).to(WikiDiffViewImpl.class);
     bind(SynapseProperties.class)
       .to(SynapsePropertiesImpl.class)
       .in(Singleton.class);

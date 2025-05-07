@@ -19,9 +19,6 @@ public enum FeatureFlagKey {
   // Shows options to create various experimental wiki widgets
   ADD_WIKI_WIDGETS("ADD_WIKI_WIDGETS"),
 
-  // Allow viewing diffs between wiki page versions
-  WIKI_DIFF_TOOL("WIKI_DIFF_TOOL"),
-
   // Allow using STS and ExternalObjectStore options as custom Storage Locations
   CUSTOM_STORAGE_LOCATION_SETTINGS("CUSTOM_STORAGE_LOCATION_SETTINGS"),
 

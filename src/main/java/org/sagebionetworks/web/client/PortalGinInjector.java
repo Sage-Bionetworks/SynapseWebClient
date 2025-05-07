@@ -51,7 +51,7 @@ import org.sagebionetworks.web.client.presenter.TeamSearchPresenter;
 import org.sagebionetworks.web.client.presenter.TrashPresenter;
 import org.sagebionetworks.web.client.presenter.TrustCenterPresenter;
 import org.sagebionetworks.web.client.presenter.TwoFactorAuthPresenter;
-import org.sagebionetworks.web.client.presenter.WikiDiffPresenter;
+import org.sagebionetworks.web.client.presenter.UserAccessRequestHistoryPresenter;
 import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -376,12 +376,12 @@ public interface PortalGinInjector extends Ginjector {
 
   ACTAccessApprovalsPresenter getACTAccessApprovalsPresenter();
 
-  WikiDiffPresenter getWikiDiffPresenter();
-
   EmailInvitationPresenter getEmailInvitationPresenter();
   DataAccessApprovalTokenPresenter getDataAccessApprovalTokenPresenter();
 
   DataAccessManagementPresenter getDataAccessManagementPresenter();
+
+  UserAccessRequestHistoryPresenter getUserAccessRequestHistoryPresenter();
 
   OAuthClientEditorPresenter getOAuthClientEditorPresenter();
 

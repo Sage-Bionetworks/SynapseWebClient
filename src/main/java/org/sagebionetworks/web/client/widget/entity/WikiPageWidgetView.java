@@ -86,8 +86,6 @@ public interface WikiPageWidgetView extends IsWidget {
 
   void addStyleName(String style);
 
-  void setWikiHistoryDiffToolButtonVisible(boolean visible, WikiPageKey key);
-
   void expandWikiSubpages();
 
   void collapseWikiSubpages();

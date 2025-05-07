@@ -5,6 +5,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.HOST_HEADER;
 
 import javax.servlet.http.HttpServletRequest;
 import org.junit.Before;
@@ -36,7 +37,7 @@ public class SynapseClientBaseTest {
   HttpServletRequest mockRequest;
 
   String userIp = "127.0.0.1";
-  String requestHost = "www.synapse.org";
+  String prodRequestHost = "www.synapse.org";
   public static final String ENDPOINT_PREFIX =
     "https://repo-test.prod.sagebase.org";
   public static final String FILE_BASE = ENDPOINT_PREFIX + "/file/v1";
@@ -69,6 +70,7 @@ public class SynapseClientBaseTest {
     userIp = "127.0.0.1";
     when(mockThreadLocal.get()).thenReturn(mockRequest);
     when(mockRequest.getRemoteAddr()).thenReturn(userIp);
+    when(mockRequest.getHeader(HOST_HEADER)).thenReturn(prodRequestHost);
     SynapseClientBaseTest.setupTestEndpoints();
   }
 
@@ -76,7 +78,7 @@ public class SynapseClientBaseTest {
   public void testCreateSynapseClient() {
     String sessionToken = "fakeSessionToken";
     SynapseClient createdClient = synapseClientBase.createSynapseClient(
-      requestHost,
+      prodRequestHost,
       sessionToken
     );
     assertEquals(mockSynapseClient, createdClient);
@@ -87,11 +89,59 @@ public class SynapseClientBaseTest {
   }
 
   @Test
+  public void testRequestToLocalIp() {
+    String localIp = "127.0.0.1";
+    when(mockRequest.getHeader(HOST_HEADER)).thenReturn(localIp);
+    String sessionToken = "fakeSessionToken";
+    SynapseClient createdClient = synapseClientBase.createSynapseClient(
+      localIp,
+      sessionToken
+    );
+    verify(mockSynapseClient, never()).setUserIpAddress(anyString());
+  }
+
+  @Test
+  public void testRequestToLocalIpWithPort() {
+    String localIpWithPort = "127.0.0.1:8888";
+    when(mockRequest.getHeader(HOST_HEADER)).thenReturn(localIpWithPort);
+    String sessionToken = "fakeSessionToken";
+    SynapseClient createdClient = synapseClientBase.createSynapseClient(
+      localIpWithPort,
+      sessionToken
+    );
+    verify(mockSynapseClient, never()).setUserIpAddress(anyString());
+  }
+
+  @Test
+  public void testRequestToLocalhost() {
+    String localhost = "localhost";
+    when(mockRequest.getHeader(HOST_HEADER)).thenReturn(localhost);
+    String sessionToken = "fakeSessionToken";
+    SynapseClient createdClient = synapseClientBase.createSynapseClient(
+      localhost,
+      sessionToken
+    );
+    verify(mockSynapseClient, never()).setUserIpAddress(anyString());
+  }
+
+  @Test
+  public void testRequestToLocalhostWithPort() {
+    String localhostWithPort = "localhost:8888";
+    when(mockRequest.getHeader(HOST_HEADER)).thenReturn(localhostWithPort);
+    String sessionToken = "fakeSessionToken";
+    SynapseClient createdClient = synapseClientBase.createSynapseClient(
+      localhostWithPort,
+      sessionToken
+    );
+    verify(mockSynapseClient, never()).setUserIpAddress(anyString());
+  }
+
+  @Test
   public void testNullThreadLocalRequest() {
     when(mockThreadLocal.get()).thenReturn(null);
     String sessionToken = "fakeSessionToken";
     SynapseClient createdClient = synapseClientBase.createSynapseClient(
-      requestHost,
+      prodRequestHost,
       sessionToken
     );
     verify(mockSynapseClient, never()).setUserIpAddress(userIp);
