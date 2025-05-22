@@ -8,8 +8,6 @@ import com.google.inject.Inject;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.FeatureFlagConfig;
-import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.utils.CallbackP;
 
 public class FilesBrowserViewImpl implements FilesBrowserView {
@@ -19,7 +17,6 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 
   private EntityTreeBrowser entityTreeBrowser;
   private Widget widget;
-  SynapseReactClientFullContextPropsProvider propsProvider;
 
   @UiField
   Div files;
@@ -41,12 +38,9 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
   @Inject
   public FilesBrowserViewImpl(
     FilesBrowserViewImplUiBinder binder,
-    EntityTreeBrowser entityTreeBrowser,
-    SynapseReactClientFullContextPropsProvider propsProvider,
-    FeatureFlagConfig featureFlagConfig
+    EntityTreeBrowser entityTreeBrowser
   ) {
     widget = binder.createAndBindUi(this);
-    this.propsProvider = propsProvider;
     this.entityTreeBrowser = entityTreeBrowser;
     Widget etbW = entityTreeBrowser.asWidget();
     etbW.addStyleName("margin-top-10");
