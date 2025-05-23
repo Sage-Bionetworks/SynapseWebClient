@@ -1,0 +1,14 @@
+# Compose file for SynapseWebClient E2E tests
+services:
+  swc-e2e-tomcat:
+    image: tomcat:9
+    ports:
+      - '8888:8080' # Adjust as needed
+    volumes:
+      - ./target/portal-develop-SNAPSHOT.war:/usr/local/tomcat/webapps/ROOT.war
+      - ./e2e_workflow/settings.xml:/root/.m2/settings.xml:ro
+
+  sage-account-web:
+    image: ghcr.io/sage-bionetworks/sage-account-web:latest-development
+    ports:
+      - 3000:80
