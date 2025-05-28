@@ -7,5 +7,5 @@ import org.sagebionetworks.web.client.jsinterop.ReactComponentType;
 @JsType(isNative = true, namespace = JsPackage.GLOBAL)
 public class MaterialUI {
 
-  public static ReactComponentType<GridProps> Unstable_Grid2;
+  public static ReactComponentType<GridProps> Grid;
 }

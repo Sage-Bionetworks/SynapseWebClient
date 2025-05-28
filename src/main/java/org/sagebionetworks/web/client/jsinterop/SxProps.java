@@ -7,8 +7,13 @@ import jsinterop.annotations.JsType;
 @JsType(isNative = true, namespace = JsPackage.GLOBAL, name = "Object")
 public class SxProps {
 
-  private String color;
-  private long fontWeight;
+  public String color;
+
+  public long fontWeight;
+
+  public String mt;
+
+  public String pl;
 
   @JsOverlay
   public static SxProps create() {
