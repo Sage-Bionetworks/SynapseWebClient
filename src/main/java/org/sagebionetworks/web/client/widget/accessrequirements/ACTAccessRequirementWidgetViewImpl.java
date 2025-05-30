@@ -9,7 +9,6 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import org.gwtbootstrap3.client.ui.Alert;
-import org.gwtbootstrap3.client.ui.BlockQuote;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
@@ -28,13 +27,13 @@ public class ACTAccessRequirementWidgetViewImpl
   Div unapprovedHeading;
 
   @UiField
-  BlockQuote wikiTermsUI;
+  Div wikiTermsUI;
 
   @UiField
   SimplePanel wikiContainer;
 
   @UiField
-  BlockQuote termsUI;
+  Div termsUI;
 
   @UiField
   HTML terms;

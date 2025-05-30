@@ -9,7 +9,7 @@
     field='icons'
     type='org.sagebionetworks.web.client.IconsImageBundle'
   />
-  <b:Panel marginBottom="0">
+  <b:Panel marginBottom="0" marginLeft="40" marginRight="40">
     <b:PanelBody>
       <bh:Div ui:field="accessRequirementIDUI" visible="false">
         <g:InlineLabel
@@ -31,14 +31,22 @@
         />
       </bh:Div>
       <!-- terms -->
-      <b:BlockQuote ui:field="wikiTermsUI" visible="false">
+      <bh:Div
+        addStyleNames="AccessRequirementPageWikiContainer"
+        ui:field="wikiTermsUI"
+        visible="false"
+      >
         <g:SimplePanel ui:field="wikiContainer" />
-      </b:BlockQuote>
-      <b:BlockQuote ui:field="termsUI" visible="false">
+      </bh:Div>
+      <bh:Div
+        addStyleNames="AccessRequirementPageWikiContainer"
+        ui:field="termsUI"
+        visible="false"
+      >
         <bh:Paragraph>
           <g:HTML ui:field="terms" styleName="font-size-14" />
         </bh:Paragraph>
-      </b:BlockQuote>
+      </bh:Div>
       <bh:Div ui:field="subjectsDefinedByAnnotationsUI" visible="false">
         <bh:Strong>
           Subjects controlled by this Access Requirement are defined by
@@ -49,7 +57,7 @@
         <bh:Div
           ui:field="coveredEntitiesHeadingUI"
           visible="false"
-          styleName="margin-top-10"
+          styleName="margin-top-20"
         >
           <g:InlineLabel styleName="boldText" text="Entities Covered" />
           <bh:Hr addStyleNames="margin-top-5 margin-bottom-5" />
