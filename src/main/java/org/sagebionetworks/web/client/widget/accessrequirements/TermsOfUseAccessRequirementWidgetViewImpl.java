@@ -9,7 +9,6 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import org.gwtbootstrap3.client.ui.Alert;
-import org.gwtbootstrap3.client.ui.BlockQuote;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -30,7 +29,7 @@ public class TermsOfUseAccessRequirementWidgetViewImpl
   SimplePanel wikiContainer;
 
   @UiField
-  BlockQuote wikiTermsUI;
+  Div wikiTermsUI;
 
   @UiField
   InlineLabel accessRequirementIDField;
@@ -39,7 +38,7 @@ public class TermsOfUseAccessRequirementWidgetViewImpl
   Div accessRequirementIDUI;
 
   @UiField
-  BlockQuote termsUI;
+  Div termsUI;
 
   @UiField
   HTML terms;

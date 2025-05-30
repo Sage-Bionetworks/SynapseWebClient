@@ -9,7 +9,7 @@
     field='icons'
     type='org.sagebionetworks.web.client.IconsImageBundle'
   />
-  <b:Panel marginBottom="0">
+  <b:Panel marginBottom="0" marginLeft="40" marginRight="40">
     <b:PanelBody>
       <bh:Div ui:field="accessRequirementIDUI" visible="false">
         <g:InlineLabel
@@ -30,9 +30,10 @@
           text="Access to the data requires that you are a registered Synapse user and agree to the following terms and conditions:"
         />
       </bh:Div>
-      <b:BlockQuote>
-        <g:SimplePanel ui:field="wikiContainer" />
-      </b:BlockQuote>
+      <g:SimplePanel
+        addStyleNames="AccessRequirementPageWikiContainer"
+        ui:field="wikiContainer"
+      />
       <bh:Div ui:field="subjectsDefinedByAnnotationsUI" visible="false">
         <bh:Strong>
           Subjects controlled by this Access Requirement are defined by
@@ -43,7 +44,7 @@
         <bh:Div
           ui:field="coveredEntitiesHeadingUI"
           visible="false"
-          styleName="margin-top-10"
+          styleName="margin-top-20"
         >
           <g:InlineLabel styleName="boldText" text="Entities Covered" />
           <bh:Hr addStyleNames="margin-top-5 margin-bottom-5" />

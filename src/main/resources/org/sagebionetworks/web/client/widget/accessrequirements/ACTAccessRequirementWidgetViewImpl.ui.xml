@@ -9,7 +9,7 @@
     field='icons'
     type='org.sagebionetworks.web.client.IconsImageBundle'
   />
-  <b:Panel marginBottom="0">
+  <b:Panel marginBottom="0" marginLeft="40" marginRight="40">
     <b:PanelBody>
       <b:Heading size="H4" addStyleNames="margin-bottom-20">
         <g:Image
@@ -35,15 +35,23 @@
         />
       </bh:Div>
       <!-- terms -->
-      <b:BlockQuote ui:field="wikiTermsUI" visible="false">
+      <bh:Div
+        addStyleNames="AccessRequirementPageWikiContainer"
+        ui:field="wikiTermsUI"
+        visible="false"
+      >
         <g:SimplePanel ui:field="wikiContainer" />
-      </b:BlockQuote>
+      </bh:Div>
 
-      <b:BlockQuote ui:field="termsUI" visible="false">
+      <bh:Div
+        addStyleNames="AccessRequirementPageWikiContainer"
+        ui:field="termsUI"
+        visible="false"
+      >
         <bh:Paragraph>
           <g:HTML ui:field="terms" styleName="font-size-14" />
         </bh:Paragraph>
-      </b:BlockQuote>
+      </bh:Div>
       <bh:Div>
         <bh:Text>
           For more information on use conditions, please read about
@@ -77,7 +85,7 @@
         </bh:Strong>
       </bh:Div>
       <bh:Div ui:field="subjectsDefinedInAccessRequirementUI">
-        <bh:Div ui:field="coveredEntitiesHeadingUI" styleName="margin-top-10">
+        <bh:Div ui:field="coveredEntitiesHeadingUI" styleName="margin-top-20">
           <g:InlineLabel styleName="boldText" text="Entities Covered" />
           <bh:Hr addStyleNames="margin-top-5 margin-bottom-5" />
         </bh:Div>
