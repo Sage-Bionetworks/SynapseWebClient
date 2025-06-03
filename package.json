@@ -38,7 +38,7 @@
     "react-plotly.js": "^2.6.0",
     "sass": "^1.87.0",
     "spark-md5": "^3.0.2",
-    "synapse-react-client": "3.4.23",
+    "synapse-react-client": "3.4.25",
     "universal-cookie": "^4.0.4",
     "xss": "^1.0.15"
   },
@@ -69,17 +69,20 @@
     "wait-on": "^8.0.3"
   },
   "lint-staged": {
-    "*.{*}": "prettier --write"
+    "*.{java,tsx,ts,scss,xml,yml,json}": "prettier --write"
   },
   "scripts": {
     "build": "mvn -B package --file pom.xml",
+    "start:production": "docker compose --env-file .env.production up",
+    "start:staging": "docker compose --env-file .env.staging up",
+    "start:dev": "docker compose --env-file .env.development up",
     "dev": "pnpm concurrently -k -n \"CODESERVER,WATCHER,TOMCAT,VITE\" -c \"auto,auto,auto,auto\" \"pnpm dev:codeserver\" \"pnpm dev:watcher\" \"pnpm dev:tomcat\" \"pnpm dev:vite\"",
     "dev:codeserver": "mvn clean gwt:run-codeserver",
     "dev:watcher": "wait-on tcp:127.0.0.1:9876 && mvn fizzed-watcher:run",
     "dev:tomcat": "wait-on tcp:127.0.0.1:9876 && docker pull tomcat:9.0; docker run --name swc-dev --rm -p 8888:8080 -v \"/$(pwd)/target/portal-develop-SNAPSHOT/:/usr/local/tomcat/webapps/ROOT/\" -v \"/$HOME/.m2/settings.xml\":/root/.m2/settings.xml -e CATALINA_OPTS=\"-Dorg.sagebionetworks.web.client.dev.mode=true\" tomcat:9.0",
     "dev:vite": "vite dev",
-    "docker:start": "docker pull tomcat:9.0; docker run --name swc-tomcat -d --rm -p 8888:8080 -v \"/$(pwd)/target/portal-develop-SNAPSHOT.war:/usr/local/tomcat/webapps/ROOT.war\" -v \"/$(pwd)/e2e_workflow/settings.xml\":/root/.m2/settings.xml tomcat:9.0",
-    "docker:stop": "docker stop swc-tomcat",
+    "docker:start": "docker compose -f compose-e2e.yml up -d",
+    "docker:stop": "docker compose -f compose-e2e.yml down",
     "prepare": "husky install",
     "e2e": "pnpm playwright test",
     "e2e:chromium": "pnpm playwright test --project=chromium",

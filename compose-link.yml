@@ -1,0 +1,20 @@
+# Supplemental Docker Compose file to support linking synapse-web-monorepo packages with pnpm link in SynapseWebClient
+#
+# When using `pnpm link` to load one or more local instances of a package, the Docker container(s) that build SWC must
+#  be able to access those directories. This file adds synapse-web-monorepo as a volume to the gwt-codeserver and
+#  vite-codeserver services so that linked packages in the synapse-web-monorepo project can be accessed.
+# Note: this assumes that the synapse-web-monorepo project is located in the parent directory of the SynapseWebClient,
+#  i.e. your directory structure looks like this:
+#  .
+#  ├── synapse-web-monorepo
+#  └── SynapseWebClient
+#
+# This file can be used like `docker-compose -f docker-compose.yml -f compose-link.yml up`
+# See https://docs.docker.com/reference/cli/docker/compose/#specifying-multiple-compose-files
+services:
+  gwt-codeserver:
+    volumes:
+      - ../synapse-web-monorepo:/usr/src/synapse-web-monorepo
+  vite-codeserver:
+    volumes:
+      - ../synapse-web-monorepo:/synapse-web-monorepo
