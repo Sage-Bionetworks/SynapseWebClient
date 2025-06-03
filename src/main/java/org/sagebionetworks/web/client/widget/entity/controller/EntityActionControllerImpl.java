@@ -2894,10 +2894,9 @@ public class EntityActionControllerImpl
 
   @Override
   public void onShare() {
-    getAccessControlListModalWidget()
-      .configure(entity, permissions.getCanChangePermissions());
-    this.getAccessControlListModalWidget()
-      .showSharing(this::fireEntityUpdatedEvent);
+    getEntityAccessControlListModalWidget()
+      .configure(entity.getId(), this::fireEntityUpdatedEvent);
+    getEntityAccessControlListModalWidget().setOpen(true);
   }
 
   @Override
