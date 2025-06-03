@@ -1,0 +1,88 @@
+# Compose file for SynapseWebClient development server
+services:
+  # The GWT Codeserver compiles Java assets and serves an exploded WAR to be served by Tomcat
+  gwt-codeserver:
+    # Use corretto 17 as in production. We use the Amazon Linux 2023 variant because it has a recent enough version of glibc required to run Node
+    image: maven:3.9.9-amazoncorretto-17-al2023
+    environment:
+      - ORG_SAGEBIONETWORKS_REPOSITORYSERVICE_ENDPOINT=${ORG_SAGEBIONETWORKS_REPOSITORYSERVICE_ENDPOINT}
+    command: mvn -Dorg.sagebionetworks.repositoryservice.endpoint=${ORG_SAGEBIONETWORKS_REPOSITORYSERVICE_ENDPOINT} gwt:run-codeserver
+    working_dir: /usr/src/mymaven
+    volumes:
+      - ./:/usr/src/mymaven
+      - target_artifacts:/usr/src/mymaven/target
+      - node:/usr/src/mymaven/node
+      - pnpm-store:/usr/src/mymaven/.pnpm-store
+      - node_modules:/usr/src/mymaven/node_modules
+      - maven-repo:/root/.m2
+      - ${HOME}/.m2/settings.xml:/root/.m2/settings.xml:ro
+      - generated_artifacts:/usr/src/mymaven/src/main/webapp/generated
+    network_mode: host
+    ports:
+      - '9876:9876'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:9876']
+      interval: 5s
+      retries: 999999
+
+  # The Vite Codeserver bundles and serves JavaScript frontend assets
+  vite-codeserver:
+    image: node:22-slim
+    command: sh -c "corepack enable && corepack pnpm vite dev"
+    working_dir: /app
+    volumes:
+      - ./:/app
+      - pnpm-store:/app/.pnpm-store
+      - node_modules:/app/node_modules
+      - generated_artifacts:/app/src/main/webapp/generated
+    network_mode: host
+    depends_on:
+      gwt-codeserver:
+        condition: service_healthy
+
+  # The Tomcat server serves the exploded WAR as a web application
+  swc-dev-tomcat:
+    image: tomcat:9
+    ports:
+      - '8888:8080' # Adjust as needed
+    environment:
+      CATALINA_OPTS: '-Dorg.sagebionetworks.web.client.dev.mode=true -Dorg.sagebionetworks.repositoryservice.endpoint=${ORG_SAGEBIONETWORKS_REPOSITORYSERVICE_ENDPOINT}'
+    volumes:
+      - ${HOME}/.m2/settings.xml:/root/.m2/settings.xml:ro
+      - type: volume
+        source: target_artifacts
+        target: /usr/local/tomcat/webapps/ROOT/
+        volume:
+          subpath: portal-develop-SNAPSHOT
+    depends_on:
+      gwt-codeserver:
+        condition: service_healthy
+
+  # The sage-account-web service is a simple HTTP server that serves the SageAccountWeb static site as a convenience for local development
+  sage-account-web:
+    environment:
+      - SAGE_ACCOUNT_WEB_IMAGE_TAG=${SAGE_ACCOUNT_WEB_IMAGE_TAG}
+    # Parameterize the image using an environment variable
+    image: ghcr.io/sage-bionetworks/sage-account-web:${SAGE_ACCOUNT_WEB_IMAGE_TAG}
+    ports:
+      - '3000:80'
+
+volumes:
+  # Generated artifacts from the Maven build in the src/main/webapp/generated folder
+  generated_artifacts:
+    name: generated_artifacts
+  # target folder for the maven build
+  target_artifacts:
+    name: target_artifacts
+  # Store for pnpm packages which are symlinked into the node_modules folder
+  pnpm-store:
+    name: pnpm-store
+  # Store for Node.js & package manager binaries installed by frontend-maven-plugin
+  node:
+    name: node
+  # JavaScript packages installed by pnpm
+  node_modules:
+    name: node_modules
+  # Local Maven repository, dependency cache
+  maven-repo:
+    name: maven-repo
