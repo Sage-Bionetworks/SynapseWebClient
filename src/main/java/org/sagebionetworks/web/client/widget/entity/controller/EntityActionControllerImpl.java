@@ -2894,18 +2894,10 @@ public class EntityActionControllerImpl
 
   @Override
   public void onShare() {
-    if (
-      featureFlagConfig.isFeatureEnabled(FeatureFlagKey.REACT_ENTITY_ACL_EDITOR)
-    ) {
-      getEntityAccessControlListModalWidget()
-        .configure(entity.getId(), this::fireEntityUpdatedEvent);
-      getEntityAccessControlListModalWidget().setOpen(true);
-    } else {
-      getAccessControlListModalWidget()
-        .configure(entity, permissions.getCanChangePermissions());
-      this.getAccessControlListModalWidget()
-        .showSharing(this::fireEntityUpdatedEvent);
-    }
+    getAccessControlListModalWidget()
+      .configure(entity, permissions.getCanChangePermissions());
+    this.getAccessControlListModalWidget()
+      .showSharing(this::fireEntityUpdatedEvent);
   }
 
   @Override
