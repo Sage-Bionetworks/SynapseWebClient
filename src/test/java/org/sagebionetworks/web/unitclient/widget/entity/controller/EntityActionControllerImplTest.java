@@ -2834,54 +2834,6 @@ public class EntityActionControllerImplTest {
   }
 
   @Test
-  public void testOnShareNoChange() {
-    /*
-     * Share change is confirmed by calling Callback.invoke(), in this case it must not be invoked.
-     */
-    AsyncMockStubber
-      .callNoInvovke()
-      .when(mockAccessControlListModalWidget)
-      .showSharing(any(Callback.class));
-    controller.configure(
-      mockActionMenu,
-      entityBundle,
-      true,
-      wikiPageId,
-      currentEntityArea,
-      mockAddToDownloadListWidget
-    );
-    // method under test
-    controller.onAction(Action.VIEW_SHARING_SETTINGS, null);
-    verify(mockAccessControlListModalWidget).showSharing(any(Callback.class));
-    verify(mockAccessControlListModalWidget)
-      .configure(any(Entity.class), anyBoolean());
-    verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
-  }
-
-  @Test
-  public void testOnShareWithChange() {
-    // invoke this time
-    AsyncMockStubber
-      .callWithInvoke()
-      .when(mockAccessControlListModalWidget)
-      .showSharing(any(Callback.class));
-    controller.configure(
-      mockActionMenu,
-      entityBundle,
-      true,
-      wikiPageId,
-      currentEntityArea,
-      mockAddToDownloadListWidget
-    );
-    // method under test
-    controller.onAction(Action.VIEW_SHARING_SETTINGS, null);
-    verify(mockAccessControlListModalWidget)
-      .configure(any(Entity.class), anyBoolean());
-    verify(mockAccessControlListModalWidget).showSharing(any(Callback.class));
-    verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
-  }
-
-  @Test
   public void testRenameHappy() {
     AsyncMockStubber
       .callWithInvoke()
