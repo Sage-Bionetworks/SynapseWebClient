@@ -175,6 +175,7 @@ import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModal;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
+import org.sagebionetworks.web.client.widget.sharing.EntityAccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
@@ -211,9 +212,6 @@ public class EntityActionControllerImplTest {
 
   @Mock
   AuthenticationController mockAuthenticationController;
-
-  @Mock
-  AccessControlListModalWidget mockAccessControlListModalWidget;
 
   @Mock
   RenameEntityModalWidget mockRenameEntityModalWidget;
@@ -418,6 +416,9 @@ public class EntityActionControllerImplTest {
   @Mock
   Element mockIconElement;
 
+  @Mock
+  EntityAccessControlListModalWidget mockEntityAclModalWidget;
+
   @Captor
   ArgumentCaptor<EntityUploadModalProps.Callback> mockOnUploadModalReadyCaptor;
 
@@ -462,8 +463,6 @@ public class EntityActionControllerImplTest {
 
     when(mockPortalGinInjector.getSynapseProperties())
       .thenReturn(mockSynapseProperties);
-    when(mockPortalGinInjector.getAccessControlListModalWidget())
-      .thenReturn(mockAccessControlListModalWidget);
     when(mockPortalGinInjector.getRenameEntityModalWidget())
       .thenReturn(mockRenameEntityModalWidget);
     when(mockPortalGinInjector.getEditFileMetadataModalWidget())
@@ -526,6 +525,8 @@ public class EntityActionControllerImplTest {
     when(mockSynapseJavascriptClient.getRestrictionInformation(any(), any()))
       .thenReturn(getDoneFuture(mockRestrictionInformation));
     when(mockQueryClientProvider.getQueryClient()).thenReturn(mockQueryClient);
+    when(mockPortalGinInjector.getEntityAccessControlListModalWidget()) //new
+      .thenReturn(mockEntityAclModalWidget);
 
     when(mockPortalGinInjector.getEntityTypeIcon())
       .thenReturn(mockEntityTypeIcon);
@@ -2834,37 +2835,13 @@ public class EntityActionControllerImplTest {
   }
 
   @Test
-  public void testOnShareNoChange() {
+  public void testUsesEntityAccessControlListModalWidget() {
     /*
-     * Share change is confirmed by calling Callback.invoke(), in this case it must not be invoked.
+     * This test now verifies that EntityAccessControlListModalWidget is used.
      */
-    AsyncMockStubber
-      .callNoInvovke()
-      .when(mockAccessControlListModalWidget)
-      .showSharing(any(Callback.class));
-    controller.configure(
-      mockActionMenu,
-      entityBundle,
-      true,
-      wikiPageId,
-      currentEntityArea,
-      mockAddToDownloadListWidget
-    );
-    // method under test
-    controller.onAction(Action.VIEW_SHARING_SETTINGS, null);
-    verify(mockAccessControlListModalWidget).showSharing(any(Callback.class));
-    verify(mockAccessControlListModalWidget)
-      .configure(any(Entity.class), anyBoolean());
-    verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
-  }
+    when(mockPortalGinInjector.getEntityAccessControlListModalWidget())
+      .thenReturn(mockEntityAclModalWidget);
 
-  @Test
-  public void testOnShareWithChange() {
-    // invoke this time
-    AsyncMockStubber
-      .callWithInvoke()
-      .when(mockAccessControlListModalWidget)
-      .showSharing(any(Callback.class));
     controller.configure(
       mockActionMenu,
       entityBundle,
@@ -2873,12 +2850,15 @@ public class EntityActionControllerImplTest {
       currentEntityArea,
       mockAddToDownloadListWidget
     );
+
     // method under test
     controller.onAction(Action.VIEW_SHARING_SETTINGS, null);
-    verify(mockAccessControlListModalWidget)
-      .configure(any(Entity.class), anyBoolean());
-    verify(mockAccessControlListModalWidget).showSharing(any(Callback.class));
-    verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
+
+    // Verify EntityAccessControlListModalWidget is configured and shown
+    verify(mockPortalGinInjector).getEntityAccessControlListModalWidget();
+    verify(mockEntityAclModalWidget).configure(eq(entityId), any());
+    verify(mockEntityAclModalWidget).setOpen(true);
+    verify(mockView).addWidget(mockEntityAclModalWidget);
   }
 
   @Test

@@ -447,15 +447,6 @@ public class EntityActionControllerImpl
     return fileClientsHelp;
   }
 
-  private AccessControlListModalWidget getAccessControlListModalWidget() {
-    if (accessControlListModalWidget == null) {
-      accessControlListModalWidget =
-        ginInjector.getAccessControlListModalWidget();
-      this.view.addWidget(accessControlListModalWidget);
-    }
-    return accessControlListModalWidget;
-  }
-
   private EntityAccessControlListModalWidget getEntityAccessControlListModalWidget() {
     if (entityAccessControlListModalWidget == null) {
       entityAccessControlListModalWidget =
@@ -2894,18 +2885,9 @@ public class EntityActionControllerImpl
 
   @Override
   public void onShare() {
-    if (
-      featureFlagConfig.isFeatureEnabled(FeatureFlagKey.REACT_ENTITY_ACL_EDITOR)
-    ) {
-      getEntityAccessControlListModalWidget()
-        .configure(entity.getId(), this::fireEntityUpdatedEvent);
-      getEntityAccessControlListModalWidget().setOpen(true);
-    } else {
-      getAccessControlListModalWidget()
-        .configure(entity, permissions.getCanChangePermissions());
-      this.getAccessControlListModalWidget()
-        .showSharing(this::fireEntityUpdatedEvent);
-    }
+    getEntityAccessControlListModalWidget()
+      .configure(entity.getId(), this::fireEntityUpdatedEvent);
+    getEntityAccessControlListModalWidget().setOpen(true);
   }
 
   @Override
