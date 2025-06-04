@@ -447,15 +447,6 @@ public class EntityActionControllerImpl
     return fileClientsHelp;
   }
 
-  private AccessControlListModalWidget getAccessControlListModalWidget() {
-    if (accessControlListModalWidget == null) {
-      accessControlListModalWidget =
-        ginInjector.getAccessControlListModalWidget();
-      this.view.addWidget(accessControlListModalWidget);
-    }
-    return accessControlListModalWidget;
-  }
-
   private EntityAccessControlListModalWidget getEntityAccessControlListModalWidget() {
     if (entityAccessControlListModalWidget == null) {
       entityAccessControlListModalWidget =

@@ -175,6 +175,7 @@ import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModal;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
+import org.sagebionetworks.web.client.widget.sharing.EntityAccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
@@ -418,6 +419,9 @@ public class EntityActionControllerImplTest {
   @Mock
   Element mockIconElement;
 
+  @Mock
+  EntityAccessControlListModalWidget mockEntityAclModalWidget;
+
   @Captor
   ArgumentCaptor<EntityUploadModalProps.Callback> mockOnUploadModalReadyCaptor;
 
@@ -526,6 +530,8 @@ public class EntityActionControllerImplTest {
     when(mockSynapseJavascriptClient.getRestrictionInformation(any(), any()))
       .thenReturn(getDoneFuture(mockRestrictionInformation));
     when(mockQueryClientProvider.getQueryClient()).thenReturn(mockQueryClient);
+    when(mockPortalGinInjector.getEntityAccessControlListModalWidget()) //new
+      .thenReturn(mockEntityAclModalWidget);
 
     when(mockPortalGinInjector.getEntityTypeIcon())
       .thenReturn(mockEntityTypeIcon);
@@ -2831,6 +2837,33 @@ public class EntityActionControllerImplTest {
     Place result = controller.createDeletePlace();
     Place expected = new Synapse(parentId, null, EntityArea.DOCKER, null);
     assertEquals(expected, result);
+  }
+
+  @Test
+  public void testUsesEntityAccessControlListModalWidget() {
+    /*
+     * This test now verifies that EntityAccessControlListModalWidget is used.
+     */
+    when(mockPortalGinInjector.getEntityAccessControlListModalWidget())
+      .thenReturn(mockEntityAclModalWidget);
+
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+
+    // method under test
+    controller.onAction(Action.VIEW_SHARING_SETTINGS, null);
+
+    // Verify EntityAccessControlListModalWidget is configured and shown
+    verify(mockPortalGinInjector).getEntityAccessControlListModalWidget();
+    verify(mockEntityAclModalWidget).configure(eq(entityId), any());
+    verify(mockEntityAclModalWidget).setOpen(true);
+    verify(mockView).addWidget(mockEntityAclModalWidget);
   }
 
   @Test
