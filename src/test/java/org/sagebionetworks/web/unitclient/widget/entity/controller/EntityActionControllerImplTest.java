@@ -214,9 +214,6 @@ public class EntityActionControllerImplTest {
   AuthenticationController mockAuthenticationController;
 
   @Mock
-  AccessControlListModalWidget mockAccessControlListModalWidget;
-
-  @Mock
   RenameEntityModalWidget mockRenameEntityModalWidget;
 
   @Mock
@@ -466,8 +463,6 @@ public class EntityActionControllerImplTest {
 
     when(mockPortalGinInjector.getSynapseProperties())
       .thenReturn(mockSynapseProperties);
-    when(mockPortalGinInjector.getAccessControlListModalWidget())
-      .thenReturn(mockAccessControlListModalWidget);
     when(mockPortalGinInjector.getRenameEntityModalWidget())
       .thenReturn(mockRenameEntityModalWidget);
     when(mockPortalGinInjector.getEditFileMetadataModalWidget())
