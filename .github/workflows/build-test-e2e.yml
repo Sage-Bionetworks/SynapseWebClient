@@ -76,10 +76,10 @@ jobs:
         with:
           name: ${{ env.BUILD_ARTIFACT_NAME }}
           path: ${{ env.BUILD_DIR }}
-      - name: Run app containers
-        run: pnpm docker:start
       - name: Install pnpm
         uses: pnpm/action-setup@v4
+      - name: Run app containers
+        run: pnpm docker:start
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
