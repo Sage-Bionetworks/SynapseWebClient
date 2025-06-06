@@ -14,8 +14,8 @@ jobs:
     if: ${{ github.ref_name == 'develop' || startsWith(github.ref_name, 'release-') || github.actor == github.repository_owner }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: Install dependencies
@@ -28,13 +28,13 @@ jobs:
     if: ${{ github.ref_name == 'develop' || startsWith(github.ref_name, 'release-') || github.actor == github.repository_owner }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Build SWC
         uses: ./.github/workflows/build
         with:
           mvn_goal: package
       - name: Upload build to GitHub Actions Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ env.BUILD_ARTIFACT_NAME }}
           path: '${{ env.BUILD_DIR }}/${{ env.BUILD_NAME }}'
@@ -68,7 +68,7 @@ jobs:
       id-token: write
       contents: read
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Check colima and lima version
         if: runner.os == 'macos'
         run: |
@@ -94,7 +94,7 @@ jobs:
             -v "/$(pwd)/${{ env.BUILD_DIR }}/${{ env.BUILD_NAME }}:/usr/local/tomcat/webapps/ROOT.war" \
             -v "/$(pwd)/e2e_workflow/settings.xml":/root/.m2/settings.xml \
             tomcat:9.0
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: Install dependencies
@@ -149,10 +149,10 @@ jobs:
         run: |
           aws s3 sync ./blob-report --region us-east-1 s3://${{ env.DESTINATION_BUCKET }}/${{ env.REPORT_ID }}/
       - name: Upload blob report to GitHub Actions Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ github.repository_owner != 'Sage-Bionetworks' && always() }}
         with:
-          name: ${{ env.PW_ALL_BLOBS_DIR }}
+          name: ${{ env.PW_ALL_BLOBS_DIR }}-${{ github.job }}
           path: blob-report
           retention-days: 1
       - name: Stop Tomcat
@@ -168,21 +168,22 @@ jobs:
     needs: [playwright-tests]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Download blob reports from GitHub Actions Artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          name: ${{ env.PW_ALL_BLOBS_DIR }}
           path: ${{ env.PW_ALL_BLOBS_DIR }}
+          pattern: ${{ env.PW_ALL_BLOBS_DIR }}-*
+          merge-multiple: true
       - name: Merge into HTML Report
         run: pnpm playwright merge-reports --reporter html ./"${{ env.PW_ALL_BLOBS_DIR }}"
       - name: Upload HTML report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: html-report--attempt-${{ github.run_attempt }}
           path: playwright-report
