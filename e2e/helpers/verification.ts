@@ -11,9 +11,9 @@ export async function getVerificationSubmissionId(
   await waitForSrcEndpointConfig(page)
   const bundle = await page.evaluate(
     async ({ userId, accessToken }) => {
-      // @ts-expect-error: Cannot find name 'SRC'
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const mask =
+        // @ts-expect-error: Cannot find name 'SRC'
         await SRC.SynapseConstants.USER_BUNDLE_MASK_VERIFICATION_SUBMISSION
       // @ts-expect-error: Cannot find name 'SRC'
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
