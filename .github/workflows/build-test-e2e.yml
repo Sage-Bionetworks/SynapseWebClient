@@ -71,17 +71,6 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
-      #      - name: Check colima and lima version
-      #        if: runner.os == 'macos'
-      #        run: |
-      #          # Get colima and lima versions
-      #          limactl --version
-      #          colima version
-      #      - name: Setup docker (missing on MacOS)
-      #        if: runner.os == 'macos'
-      #        run: |
-      #          brew install docker
-      #          colima start
       - name: Download build from GitHub Actions Artifacts
         uses: actions/download-artifact@v4
         with:
@@ -162,9 +151,6 @@ jobs:
       - name: Stop Tomcat
         if: always()
         run: docker stop "${{ env.CONTAINER_NAME }}"
-  #      - name: Stop Colima
-  #        if: runner.os == 'macos'
-  #        run: colima stop
   merge-reports:
     # Merge reports after playwright-tests, even if some shards have failed
     # But skip this job if the previous job was cancelled or skipped
