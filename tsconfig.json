@@ -1,5 +1,5 @@
 {
-  "files": [".eslintrc.js"],
+  "files": ["eslint.config.js"],
   "compilerOptions": {
     "rootDir": ".",
     "outDir": "build",
@@ -25,7 +25,8 @@
     "skipLibCheck": true,
     "strictNullChecks": true,
     "noUnusedLocals": true,
-    "useUnknownInCatchVariables": false
+    "useUnknownInCatchVariables": false,
+    "allowJs": true
   },
   "include": ["js/**/*.ts", "e2e/**.ts", "e2e/**/**.ts"]
 }
