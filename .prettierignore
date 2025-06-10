@@ -9,6 +9,9 @@
 
 *.properties
 
+# Ignore GWT ui.xml files, where whitespace is significant (see SWC-7286)
+*.ui.xml
+
 # These artifacts were generated and/or pre-minified and then checked in
 src/main/webapp/css/**/*
 src/main/webapp/js/**/*
@@ -54,3 +57,4 @@ src/main/webapp/fonts/*
 # Ignore e2e mock data files and scripts
 /e2e/data/*.csv
 /e2e_workflow/*.sh
+
