@@ -49,9 +49,7 @@
                   <br />
                   syn.login(authToken="")
                   <br />
-                  files = synapseutils.syncFromSynapse(syn, '
-                  <span ui:field="id2" />
-                  ')
+                  files = synapseutils.syncFromSynapse(syn, '<span ui:field="id2" />')
                   <br />
                 </code>
               </pre>
@@ -68,11 +66,7 @@
                   <br />
                   synLogin(authToken="")
                   <br />
-                  files
-                  &#60;
-                  - synapserutils::syncFromSynapse('
-                  <span ui:field="id3" />
-                  ')
+                  files &#60;- synapserutils::syncFromSynapse('<span ui:field="id3" />')
                   <br />
                 </code>
               </pre>
