@@ -12,6 +12,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.GlobalApplicationStateImpl.LAST_PLACE;
@@ -118,6 +119,9 @@ public class GlobalApplicationStateImplTest {
   @Captor
   ArgumentCaptor<Place> placeCaptor;
 
+  @Mock
+  Runnable mockRunnable;
+
   public static final String REPO_ENDPOINT =
     "https://repo-staging.prod.sagebase.org/";
   public static final String SWC_ENDPOINT = "https://staging.synapse.org/";
@@ -202,6 +206,32 @@ public class GlobalApplicationStateImplTest {
 
     assertTrue(globalApplicationState.isEditing());
     verify(mockHeader).refresh();
+  }
+
+  @Test
+  public void testSubscribeToIsEditingChange() {
+    globalApplicationState.setIsEditing(false);
+
+    Runnable mockCallback = mockRunnable;
+    Runnable unsubscribe = globalApplicationState.subscribeToIsEditingChange(
+      mockCallback
+    );
+    verify(mockCallback, never()).run();
+
+    globalApplicationState.setIsEditing(true);
+    verify(mockCallback, times(1)).run();
+
+    // it should not run if the value does not change
+    globalApplicationState.setIsEditing(true);
+    verify(mockCallback, times(1)).run();
+
+    globalApplicationState.setIsEditing(false);
+    verify(mockCallback, times(2)).run();
+
+    // Verify that unsubscribe works
+    unsubscribe.run();
+    globalApplicationState.setIsEditing(true);
+    verify(mockCallback, times(2)).run();
   }
 
   @Test

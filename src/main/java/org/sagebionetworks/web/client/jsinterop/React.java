@@ -36,6 +36,7 @@ public class React {
     SynapseReactClientFullContextProviderProps emptyContext =
       SynapseReactClientFullContextProviderProps.create(
         SynapseContextJsObject.create(null, false, false, "synapse.org"),
+        null,
         null
       );
     return createElementWithSynapseContext(componentType, props, emptyContext);

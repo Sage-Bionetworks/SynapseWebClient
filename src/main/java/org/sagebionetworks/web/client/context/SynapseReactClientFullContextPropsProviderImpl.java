@@ -5,6 +5,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.OneSageUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.jsinterop.IsEditingStore;
 import org.sagebionetworks.web.client.jsinterop.SynapseContextJsObject;
 import org.sagebionetworks.web.client.jsinterop.SynapseReactClientFullContextProviderProps;
 import org.sagebionetworks.web.client.jsni.FullContextProviderPropsJSNIObject;
@@ -45,7 +46,16 @@ public class SynapseReactClientFullContextPropsProviderImpl
         globalApplicationState.isShowingUTCTime(),
         oneSageUtils.getAppIdForOneSage()
       ),
-      queryClientProvider.getQueryClient()
+      queryClientProvider.getQueryClient(),
+      IsEditingStore.create(
+        callback -> {
+          Runnable unsubscribe =
+            globalApplicationState.subscribeToIsEditingChange(callback::run);
+          return unsubscribe::run;
+        },
+        globalApplicationState::isEditing,
+        globalApplicationState::setIsEditing
+      )
     );
   }
 

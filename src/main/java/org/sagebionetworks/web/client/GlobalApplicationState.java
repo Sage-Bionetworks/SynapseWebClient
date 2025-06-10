@@ -94,6 +94,13 @@ public interface GlobalApplicationState {
 
   public void setIsEditing(boolean isEditing);
 
+  /**
+   * Subscribes to changes in the editing state. When `isEditing` changes, the provided callback will be invoked.
+   *
+   * @return a Runnable that can be used to unsubscribe from the changes.
+   */
+  public Runnable subscribeToIsEditingChange(Runnable callback);
+
   void clearLastPlace();
 
   /**

@@ -71,6 +71,8 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
   private PortalGinInjector ginInjector;
   private final OneSageUtils oneSageUtils;
 
+  private final List<Runnable> isEditingSubscriptions = new ArrayList<>();
+
   boolean isDragDropInitialized = false;
   boolean isToastContainerInitialized = false;
   /**
@@ -376,8 +378,21 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 
   @Override
   public void setIsEditing(boolean isEditing) {
+    boolean isChanged = this.isEditing != isEditing;
     this.isEditing = isEditing;
     ginInjector.getHeader().refresh();
+    if (isChanged) {
+      // notify subscribers of the change
+      for (Runnable callback : isEditingSubscriptions) {
+        callback.run();
+      }
+    }
+  }
+
+  @Override
+  public Runnable subscribeToIsEditingChange(Runnable callback) {
+    isEditingSubscriptions.add(callback);
+    return () -> isEditingSubscriptions.remove(callback);
   }
 
   @Override
