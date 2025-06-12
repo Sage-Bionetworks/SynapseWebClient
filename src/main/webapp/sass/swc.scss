@@ -6,7 +6,7 @@
 // CSS for SRC because it contains styles that are not in the distributed source SCSS. The missing styles were imported
 // in TypeScript/TSX files and loaded + compiled by Vite, so Sass never compiled them. The synapse-react-client bundle
 // step includes these styles in this minified CSS file.
-@use 'synapse-react-client/dist/style.css';
+@use 'synapse-react-client/dist/index.css';
 
 // Include the source synapse-react-client SCSS files after the minified build so styles that include our variable
 // overrides take higher priority
