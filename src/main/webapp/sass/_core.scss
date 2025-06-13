@@ -213,6 +213,7 @@ a:focus {
       margin: 0px;
     }
     .projectMetadata {
+      display: flex;
       .projectTitle {
         > *,
         .syn-star-o,
@@ -230,6 +231,14 @@ a:focus {
       .MuiButton-root,
       .MuiIconButton-root {
         @include transparent-button();
+      }
+      @media (max-width: 1200px) {
+        flex-direction: column;
+      }
+      .projectSettings {
+        @media (min-width: 1200px) {
+          margin-left: auto;
+        }
       }
     }
   }
