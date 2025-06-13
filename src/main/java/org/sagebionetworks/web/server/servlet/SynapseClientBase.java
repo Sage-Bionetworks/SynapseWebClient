@@ -25,7 +25,7 @@ public class SynapseClientBase
 
   public static final String X_FORWARDED_FOR_HEADER = "X-Forwarded-For";
 
-  Pattern LOCAL_HOSTS_REGEX = Pattern.compile(
+  public static Pattern LOCAL_HOSTS_REGEX = Pattern.compile(
     "^(localhost|127\\.0\\.0\\.1)(:\\d+)?$"
   );
 
