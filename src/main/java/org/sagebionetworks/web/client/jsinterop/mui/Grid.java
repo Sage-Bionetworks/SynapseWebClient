@@ -1,12 +1,11 @@
 package org.sagebionetworks.web.client.jsinterop.mui;
 
 import org.sagebionetworks.web.client.jsinterop.ReactComponentType;
-import org.sagebionetworks.web.client.jsinterop.react.HasStyle;
 
-public class Grid extends HasStyle<ReactComponentType<GridProps>, GridProps> {
+public class Grid extends HasSx<ReactComponentType<GridProps>, GridProps> {
 
   public Grid() {
-    super(MaterialUI.Unstable_Grid2, GridProps.create(false));
+    super(MaterialUI.Grid, GridProps.create(false));
   }
 
   public void setId(String id) {
@@ -19,63 +18,133 @@ public class Grid extends HasStyle<ReactComponentType<GridProps>, GridProps> {
     this.render();
   }
 
+  public void setSize(BreakpointMap size) {
+    props.size = size;
+    this.render();
+  }
+
+  public void setOffset(BreakpointMap offset) {
+    props.offset = offset;
+    this.render();
+  }
+
+  /**
+   * @deprecated Use {@link #setSize(BreakpointMap)} instead.
+   */
+  @Deprecated
   public void setXs(int xs) {
-    props.xs = xs;
+    if (props.size == null) {
+      props.size = BreakpointMap.create();
+    }
+    props.size.xs = xs;
     this.render();
   }
 
+  /**
+   * @deprecated Use {@link #setSize(BreakpointMap)} instead.
+   */
+  @Deprecated
   public void setSm(int sm) {
-    props.sm = sm;
+    if (props.size == null) {
+      props.size = BreakpointMap.create();
+    }
+    props.size.sm = sm;
     this.render();
   }
 
+  /**
+   * @deprecated Use {@link #setSize(BreakpointMap)} instead.
+   */
+  @Deprecated
   public void setMd(int md) {
-    props.md = md;
+    if (props.size == null) {
+      props.size = BreakpointMap.create();
+    }
+    props.size.md = md;
     this.render();
   }
 
+  /**
+   * @deprecated Use {@link #setSize(BreakpointMap)} instead.
+   */
+  @Deprecated
   public void setLg(int lg) {
-    props.lg = lg;
+    if (props.size == null) {
+      props.size = BreakpointMap.create();
+    }
+    props.size.lg = lg;
     this.render();
   }
 
+  /**
+   * @deprecated Use {@link #setSize(BreakpointMap)} instead.
+   */
+  @Deprecated
   public void setXl(int xl) {
-    props.xl = xl;
+    if (props.size == null) {
+      props.size = BreakpointMap.create();
+    }
+    props.size.xl = xl;
     this.render();
   }
 
+  /**
+   * @deprecated Use {@link #setOffset(BreakpointMap)} instead.
+   */
+  @Deprecated
   public void setXsOffset(int xsOffset) {
-    props.xsOffset = xsOffset;
+    if (props.offset == null) {
+      props.offset = BreakpointMap.create();
+    }
+    props.offset.xs = xsOffset;
     this.render();
   }
 
+  /**
+   * @deprecated Use {@link #setOffset(BreakpointMap)} instead.
+   */
+  @Deprecated
   public void setSmOffset(int smOffset) {
-    props.smOffset = smOffset;
+    if (props.offset == null) {
+      props.offset = BreakpointMap.create();
+    }
+    props.offset.sm = smOffset;
     this.render();
   }
 
+  /**
+   * @deprecated Use {@link #setOffset(BreakpointMap)} instead.
+   */
+  @Deprecated
   public void setMdOffset(int mdOffset) {
-    props.mdOffset = mdOffset;
+    if (props.offset == null) {
+      props.offset = BreakpointMap.create();
+    }
+    props.offset.md = mdOffset;
     this.render();
   }
 
+  /**
+   * @deprecated Use {@link #setOffset(BreakpointMap)} instead.
+   */
+  @Deprecated
   public void setLgOffset(int lgOffset) {
-    props.lgOffset = lgOffset;
+    if (props.offset == null) {
+      props.offset = BreakpointMap.create();
+    }
+    props.offset.lg = lgOffset;
     this.render();
   }
 
+  /**
+   * @deprecated Use {@link #setOffset(BreakpointMap)} instead.
+   */
+  @Deprecated
   public void setXlOffset(int xlOffset) {
-    props.xlOffset = xlOffset;
-    this.render();
-  }
-
-  public void setMt(String mt) {
-    props.mt = mt;
-    this.render();
-  }
-
-  public void setPl(String pl) {
-    props.pl = pl;
+    if (props.offset == null) {
+      props.offset = BreakpointMap.create();
+    }
+    props.offset.xl = xlOffset;
     this.render();
   }
 

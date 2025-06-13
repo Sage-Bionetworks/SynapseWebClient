@@ -9,7 +9,7 @@
 #  ├── synapse-web-monorepo
 #  └── SynapseWebClient
 #
-# This file can be used like `docker-compose -f docker-compose.yml -f compose-link.yml up`
+# This file can be used like `docker-compose --env-file .env.development -f docker-compose.yml -f compose-link.yml up`
 # See https://docs.docker.com/reference/cli/docker/compose/#specifying-multiple-compose-files
 services:
   gwt-codeserver:

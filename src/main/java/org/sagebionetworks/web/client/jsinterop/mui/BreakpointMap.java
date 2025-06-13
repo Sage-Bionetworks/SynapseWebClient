@@ -4,34 +4,28 @@ import jsinterop.annotations.JsNullable;
 import jsinterop.annotations.JsOverlay;
 import jsinterop.annotations.JsPackage;
 import jsinterop.annotations.JsType;
+import org.sagebionetworks.web.client.jsinterop.PropsWithStyle;
 
 @JsType(isNative = true, namespace = JsPackage.GLOBAL, name = "Object")
-public class GridProps extends PropsWithSx {
+public class BreakpointMap {
 
   @JsNullable
-  String id;
-
-  boolean container;
+  int xs;
 
   @JsNullable
-  BreakpointMap size;
+  int sm;
 
   @JsNullable
-  BreakpointMap offset;
+  int md;
 
   @JsNullable
-  String rowSpacing;
+  int lg;
 
   @JsNullable
-  String columnSpacing;
+  int xl;
 
   @JsOverlay
-  public static GridProps create(boolean container) {
-    GridProps props = new GridProps();
-
-    if (container) {
-      props.container = true;
-    }
-    return props;
+  public static BreakpointMap create() {
+    return new BreakpointMap();
   }
 }
