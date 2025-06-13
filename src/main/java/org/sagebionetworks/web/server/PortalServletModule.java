@@ -134,7 +134,7 @@ public class PortalServletModule extends ServletModule {
     filter("/*").through(JavaScriptContentTypeFilter.class);
     bind(JavaScriptContentTypeFilter.class).in(Singleton.class);
 
-    filter("/*").through(HSTSFilter.class);
+    filter("*").through(HSTSFilter.class);
     bind(HSTSFilter.class).in(Singleton.class);
 
     filter("/*").through(CORSFilter.class);
