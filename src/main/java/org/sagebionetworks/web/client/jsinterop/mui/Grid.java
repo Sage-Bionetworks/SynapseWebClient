@@ -1,10 +1,8 @@
 package org.sagebionetworks.web.client.jsinterop.mui;
 
 import org.sagebionetworks.web.client.jsinterop.ReactComponentType;
-import org.sagebionetworks.web.client.jsinterop.SxProps;
-import org.sagebionetworks.web.client.jsinterop.react.HasStyle;
 
-public class Grid extends HasStyle<ReactComponentType<GridProps>, GridProps> {
+public class Grid extends HasSx<ReactComponentType<GridProps>, GridProps> {
 
   public Grid() {
     super(MaterialUI.Grid, GridProps.create(false));
@@ -147,24 +145,6 @@ public class Grid extends HasStyle<ReactComponentType<GridProps>, GridProps> {
       props.offset = BreakpointMap.create();
     }
     props.offset.xl = xlOffset;
-    this.render();
-  }
-
-  public void setSx(SxProps sx) {
-    props.sx = sx;
-    this.render();
-  }
-
-  public void setMt(String mt) {
-    if (props.sx == null) {
-      props.sx = SxProps.create();
-    }
-    props.sx.mt = mt;
-    this.render();
-  }
-
-  public void setPl(String pl) {
-    props.sx.pl = pl;
     this.render();
   }
 
