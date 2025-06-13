@@ -73,8 +73,16 @@ public class HostValidationFilterTest {
   }
 
   @Test
+  public void testHomeHost() throws ServletException, IOException {
+    when(mockRequest.getHeader(HOST_HEADER)).thenReturn("127.0.0.1:8888");
+    filter.testFilter(mockRequest, mockResponse, mockFilterChain);
+
+    verify(mockResponse, never()).sendError(anyInt(), anyString());
+  }
+
+  @Test
   public void testLocalhost() throws ServletException, IOException {
-    when(mockRequest.getHeader(HOST_HEADER)).thenReturn("127.0.0.1");
+    when(mockRequest.getHeader(HOST_HEADER)).thenReturn("localhost");
     filter.testFilter(mockRequest, mockResponse, mockFilterChain);
 
     verify(mockResponse, never()).sendError(anyInt(), anyString());
