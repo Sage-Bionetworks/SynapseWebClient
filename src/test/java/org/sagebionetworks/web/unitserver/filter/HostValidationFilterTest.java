@@ -73,7 +73,7 @@ public class HostValidationFilterTest {
   }
 
   @Test
-  public void testHomeHost() throws ServletException, IOException {
+  public void testLocalhostWithPort() throws ServletException, IOException {
     when(mockRequest.getHeader(HOST_HEADER)).thenReturn("127.0.0.1:8888");
     filter.testFilter(mockRequest, mockResponse, mockFilterChain);
 
