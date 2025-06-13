@@ -5,8 +5,8 @@ export const storageStateDir = 'playwright/.auth/'
 
 export const userPrefix = 'swc-e2e-user'
 export const userValidatedPrefix = 'swc-e2e-user-validated'
-const userPrefixes = [userPrefix, userValidatedPrefix] as const
-export type UserPrefix = (typeof userPrefixes)[number]
+const _userPrefixes = [userPrefix, userValidatedPrefix] as const
+export type UserPrefix = (typeof _userPrefixes)[number]
 
 const generateUserName = (prefix: string) => {
   // uncomment to use static username for troubleshooting:

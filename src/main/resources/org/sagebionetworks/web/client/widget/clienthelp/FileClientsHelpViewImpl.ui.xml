@@ -47,27 +47,19 @@
                     <br />
                     syn = synapseclient.Synapse()
                     <br />
-                    syn.login(authToken="")
+                    syn.login(authToken="YOUR_TOKEN_HERE")
                     <br />
                     <br />
                     # Obtain a pointer and download the data
                     <br />
                     <span ui:field="id2" />
-                    = syn.get(entity='
-                    <span ui:field="id3" />
-                    '
-                    <span ui:field="versionUI2">
-                      , version=
-                      <span ui:field="version2" />
-                    </span>
-                    )
+                    = syn.get(entity='<span ui:field="id3" />'<span ui:field="versionUI2">, version=<span ui:field="version2" /></span>)
                     <br />
                     <br />
                     # Get the path to the local copy of the data file
                     <br />
                     filepath =
-                    <span ui:field="id4" />
-                    .path
+                    <span ui:field="id4" />.path
                   </code>
                 </pre>
               </g:HTMLPanel>
@@ -78,21 +70,13 @@
                   <code class="nohighlight">
                     library(synapser)
                     <br />
-                    synLogin(authToken="")
+                    synLogin(authToken="YOUR_TOKEN_HERE")
                     <br />
                     <br />
                     # Obtain a pointer and download the data
                     <br />
                     <span ui:field="id5" />
-                    &#60;
-                    - synGet(entity='
-                    <span ui:field="id6" />
-                    '
-                    <span ui:field="versionUI3">
-                      , version=
-                      <span ui:field="version3" />
-                    </span>
-                    )
+                    &#60;- synGet(entity='<span ui:field="id6" />'<span ui:field="versionUI3">, version=<span ui:field="version3" /></span>)
                   </code>
                 </pre>
               </g:HTMLPanel>

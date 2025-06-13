@@ -238,7 +238,7 @@ export async function deleteFileHandleWithRetry(
         try {
           await deleteFileHandle(accessToken, fileHandleId, page)
           return true
-        } catch (error) {
+        } catch (_error) {
           return false
         }
       },

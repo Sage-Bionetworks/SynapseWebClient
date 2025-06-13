@@ -47,11 +47,9 @@
                   <br />
                   syn = synapseclient.Synapse()
                   <br />
-                  syn.login(authToken="")
+                  syn.login(authToken="YOUR_TOKEN_HERE")
                   <br />
-                  files = synapseutils.syncFromSynapse(syn, '
-                  <span ui:field="id2" />
-                  ')
+                  files = synapseutils.syncFromSynapse(syn, '<span ui:field="id2" />')
                   <br />
                 </code>
               </pre>
@@ -66,13 +64,9 @@
                   library(synapserutils)
                   <br />
                   <br />
-                  synLogin(authToken="")
+                  synLogin(authToken="YOUR_TOKEN_HERE")
                   <br />
-                  files
-                  &#60;
-                  - synapserutils::syncFromSynapse('
-                  <span ui:field="id3" />
-                  ')
+                  files &#60;- synapserutils::syncFromSynapse('<span ui:field="id3" />')
                   <br />
                 </code>
               </pre>

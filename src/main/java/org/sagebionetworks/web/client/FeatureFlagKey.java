@@ -28,9 +28,6 @@ public enum FeatureFlagKey {
   // If enabled, show the new homepage
   HOMEPAGE_V2("HOMEPAGE_V2"),
 
-  // If enabled, use the re-implemented ACL Editor for entities
-  REACT_ENTITY_ACL_EDITOR("REACT_ENTITY_ACL_EDITOR"),
-
   // If enabled, sharing settings will appear in a dialog immediately after uploading one or more files.
   SHOW_SHARING_SETTINGS_AFTER_UPLOAD("SHOW_SHARING_SETTINGS_AFTER_UPLOAD"),
 

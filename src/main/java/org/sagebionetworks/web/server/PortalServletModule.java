@@ -62,6 +62,7 @@ import org.sagebionetworks.web.server.servlet.filter.DreamFilter;
 import org.sagebionetworks.web.server.servlet.filter.GWTAllCacheFilter;
 import org.sagebionetworks.web.server.servlet.filter.GWTCacheControlFilter;
 import org.sagebionetworks.web.server.servlet.filter.HSTSFilter;
+import org.sagebionetworks.web.server.servlet.filter.HostValidationFilter;
 import org.sagebionetworks.web.server.servlet.filter.HtmlInjectionFilter;
 import org.sagebionetworks.web.server.servlet.filter.JavaScriptContentTypeFilter;
 import org.sagebionetworks.web.server.servlet.filter.MHealthFilter;
@@ -119,6 +120,9 @@ public class PortalServletModule extends ServletModule {
     filter("*").through(HtmlInjectionFilter.class);
     bind(HtmlInjectionFilter.class).in(Singleton.class);
 
+    filter("*").through(HostValidationFilter.class);
+    bind(HostValidationFilter.class).in(Singleton.class);
+
     filter("/*").through(GWTCacheControlFilter.class);
     bind(GWTCacheControlFilter.class).in(Singleton.class);
 
@@ -130,7 +134,7 @@ public class PortalServletModule extends ServletModule {
     filter("/*").through(JavaScriptContentTypeFilter.class);
     bind(JavaScriptContentTypeFilter.class).in(Singleton.class);
 
-    filter("/*").through(HSTSFilter.class);
+    filter("*").through(HSTSFilter.class);
     bind(HSTSFilter.class).in(Singleton.class);
 
     filter("/*").through(CORSFilter.class);

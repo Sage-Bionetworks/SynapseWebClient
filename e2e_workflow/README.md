@@ -189,7 +189,7 @@ on: workflow_dispatch
 5. Change the checkout step to point at the branch in your forked repo, e.g.:
 
 ```yml
-- uses: actions/checkout@v3
+- uses: actions/checkout@v4
   with:
     repository: hallieswan/SynapseWebClient
     ref: SWC-6514
