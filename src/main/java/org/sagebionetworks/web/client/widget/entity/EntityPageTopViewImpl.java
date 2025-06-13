@@ -32,6 +32,12 @@ public class EntityPageTopViewImpl
   Div projectTitleBar;
 
   @UiField
+  Div entityCitation;
+
+  @UiField
+  Div linkWithIcon;
+
+  @UiField
   SimplePanel projectMetadataContainer;
 
   @UiField
@@ -49,6 +55,16 @@ public class EntityPageTopViewImpl
   public void setProjectTitleBar(IsWidget w) {
     projectTitleBar.clear();
     projectTitleBar.add(w);
+  }
+
+  @Override
+  public void setEntityCitation(IsWidget w) {
+    entityCitation.add(w);
+  }
+
+  @Override
+  public void setLinkWithIcon(IsWidget w) {
+    linkWithIcon.add(w);
   }
 
   @Override

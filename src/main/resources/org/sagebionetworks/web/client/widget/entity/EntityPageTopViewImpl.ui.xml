@@ -9,11 +9,13 @@
     <!--Project level information -->
     <bh:Div addStyleNames="pageHeader min-height-48">
       <g:FlowPanel addStyleNames="projectMetadata" ui:field="projectUI">
-        <bh:Span
-          ui:field="projectActionMenuContainer"
-          addStyleNames="right"
-          paddingTop="20"
-        />
+        <bh:Div
+          addStyleNames="projectSettings flexcontainer-row-unless-xs margin-top-20 gap-10px flexcontainer-align-items-center"
+        >
+          <bh:Div ui:field="linkWithIcon" />
+          <bh:Div ui:field="entityCitation" />
+          <bh:Span ui:field="projectActionMenuContainer" />
+        </bh:Div>
         <bh:Div addStyleNames="projectTitle">
           <bh:Div ui:field="projectTitleBar" />
           <g:SimplePanel ui:field="projectMetadataContainer" />

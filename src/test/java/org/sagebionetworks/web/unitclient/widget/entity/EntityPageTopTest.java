@@ -56,6 +56,8 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.EntityCitationImpl;
+import org.sagebionetworks.web.client.widget.LinkWithIconImpl;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTopView;
@@ -177,6 +179,12 @@ public class EntityPageTopTest {
   ProjectTitleBar mockProjectTitleBar;
 
   @Mock
+  EntityCitationImpl mockEntityCitation;
+
+  @Mock
+  LinkWithIconImpl mockLinkWithIcon;
+
+  @Mock
   SynapseJavascriptClient mockSynapseJavascriptClient;
 
   @Mock
@@ -234,6 +242,8 @@ public class EntityPageTopTest {
         mockSynapseClientAsync,
         mockTabs,
         mockProjectTitleBar,
+        mockEntityCitation,
+        mockLinkWithIcon,
         mockProjectMetadata,
         mockWikiTab,
         mockFilesTab,
