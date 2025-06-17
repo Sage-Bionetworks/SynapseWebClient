@@ -30,6 +30,7 @@ public class CORSFilter extends OncePerRequestFilter {
     "www",
     "staging",
     "tst",
+    "dev",
     "signin",
     "staging-signin",
     "dev-signin",
