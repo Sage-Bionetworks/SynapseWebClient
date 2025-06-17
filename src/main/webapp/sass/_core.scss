@@ -212,6 +212,11 @@ a:focus {
     .entityMetadata {
       margin: 0px;
     }
+    .actionMenuButtonStyle div[role='group'] button {
+      font-size: 16px;
+      line-height: 20px;
+      padding: 4px 16px;
+    }
     .projectMetadata {
       display: flex;
       .projectTitle {

@@ -22,7 +22,7 @@
           addStyleNames="projectSettings flexcontainer-row-unless-xs margin-top-20 gap-10px"
         >
           <bh:Div ui:field="linkWithIcon" />
-          <bh:Div ui:field="entityCitation" />
+          <bh:Div ui:field="entityCitation" addStyleNames="actionMenuButtonStyle"/>
           <bh:Span ui:field="projectActionMenuContainer" />
         </bh:Div>
       </g:FlowPanel>
