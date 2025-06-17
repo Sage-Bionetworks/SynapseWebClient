@@ -73,6 +73,15 @@ public class HostValidationFilterTest {
   }
 
   @Test
+  public void testDevSite() throws ServletException, IOException {
+    when(mockRequest.getHeader(HOST_HEADER))
+      .thenReturn("dev" + SYNAPSE_ORG_SUFFIX); // dev.synapse.org
+    filter.testFilter(mockRequest, mockResponse, mockFilterChain);
+
+    verify(mockResponse, never()).sendError(anyInt(), anyString());
+  }
+
+  @Test
   public void testLocalhostWithPort() throws ServletException, IOException {
     when(mockRequest.getHeader(HOST_HEADER)).thenReturn("127.0.0.1:8888");
     filter.testFilter(mockRequest, mockResponse, mockFilterChain);
