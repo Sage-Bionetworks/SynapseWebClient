@@ -23,7 +23,6 @@ public class SRC {
 
     public static ReactComponentType<DiscussionThreadProps> DiscussionThread;
     public static ReactComponentType<EntityCitationProps> EntityCitation;
-    public static ReactComponentType<LinkWithIconProps> LinkWithIcon;
     public static ReactComponentType<EntityBadgeIconsProps> EntityBadgeIcons;
     public static ReactComponentType<DatasetEditorProps> DatasetItemsEditor;
     public static ReactComponentType<EntityFinderProps> EntityFinder;
