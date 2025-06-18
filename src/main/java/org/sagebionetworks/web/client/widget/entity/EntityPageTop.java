@@ -38,7 +38,6 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.EntityCitationImpl;
-import org.sagebionetworks.web.client.widget.LinkWithIconImpl;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl;
@@ -78,7 +77,6 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
   private final DockerTab dockerTab;
   private final ProjectTitleBar projectTitleBar;
   private final EntityCitationImpl entityCitation;
-  private final LinkWithIconImpl linkWithIcon;
   private final EntityMetadata projectMetadata;
   private final SynapseClientAsync synapseClient;
   // how many tabs have been marked as visible
@@ -121,7 +119,6 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
     Tabs tabs,
     ProjectTitleBar projectTitleBar,
     EntityCitationImpl entityCitation,
-    LinkWithIconImpl linkWithIcon,
     EntityMetadata projectMetadata,
     WikiTab wikiTab,
     FilesTab filesTab,
@@ -151,7 +148,6 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
     this.dockerTab = dockerTab;
     this.projectTitleBar = projectTitleBar;
     this.entityCitation = entityCitation;
-    this.linkWithIcon = linkWithIcon;
     this.projectMetadata = projectMetadata;
     this.projectActionController = projectActionController;
     this.projectActionMenu = projectActionMenu;
@@ -166,7 +162,6 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
     view.setProjectMetadata(projectMetadata.asWidget());
     view.setProjectTitleBar(projectTitleBar.asWidget());
     view.setEntityCitation(entityCitation.asWidget());
-    view.setLinkWithIcon(linkWithIcon.asWidget());
     projectActionMenu.addControllerWidget(projectActionController.asWidget());
     view.setProjectActionMenu(projectActionMenu.asWidget());
 
@@ -440,11 +435,6 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
               datasetsEntityBundle = dockerEntityBundle = bundle;
         projectTitleBar.configure(projectBundle);
         projectMetadata.configure(projectBundle, null, projectActionMenu);
-        linkWithIcon.configure(
-          "Project support",
-          "helpChatBubble",
-          "https://sagebionetworks.jira.com/servicedesk/customer/portal/9"
-        );
         view.setProjectUIVisible(true);
         initAreaToken();
         showSelectedTabs();

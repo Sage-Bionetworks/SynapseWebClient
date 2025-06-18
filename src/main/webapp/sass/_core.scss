@@ -212,11 +212,29 @@ a:focus {
     .entityMetadata {
       margin: 0px;
     }
-    .actionMenuButtonStyle div[role='group'] button {
-      font-size: 16px;
-      line-height: 20px;
-      padding: 4px 16px;
+
+    .actionMenuButtonStyle {
+      button {
+        font-size: 16px;
+        line-height: 20px;
+      }
+      div[role='group'] button {
+        padding: 4px 16px;
+      }
     }
+
+    .projectSupport {
+      .MuiButton-root {
+        font-size: 16px;
+        line-height: 20px;
+        font-weight: 700;
+        text-transform: none;
+      }
+    }
+    .projectSupport .MuiButton-root:hover {
+      text-decoration: underline;
+    }
+
     .projectMetadata {
       display: flex;
       .projectTitle {

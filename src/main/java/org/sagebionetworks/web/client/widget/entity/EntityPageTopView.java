@@ -12,7 +12,6 @@ public interface EntityPageTopView extends IsWidget, SynapseView {
   void setProjectTitleBar(IsWidget w);
 
   void setEntityCitation(IsWidget w);
-  void setLinkWithIcon(IsWidget w);
   void setProjectActionMenu(Widget w);
 
   void setProjectLoadingVisible(boolean visible);

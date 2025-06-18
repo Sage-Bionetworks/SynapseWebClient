@@ -4,6 +4,7 @@
   xmlns:g="urn:import:com.google.gwt.user.client.ui"
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
   xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
+  xmlns:MUI="urn:import:org.sagebionetworks.web.client.jsinterop.mui"
 >
   <g:HTMLPanel>
     <!--Project level information -->
@@ -21,7 +22,13 @@
         <bh:Div
           addStyleNames="projectSettings flexcontainer-row-unless-xs margin-top-20 gap-10px"
         >
-          <bh:Div ui:field="linkWithIcon" />
+          <MUI:Button
+            ui:field="button"
+            target="_blank"
+            variant="text"
+            href="https://sagebionetworks.jira.com/servicedesk/customer/portal/9"
+            addStyleNames="projectSupport"
+             />
           <bh:Div ui:field="entityCitation" addStyleNames="actionMenuButtonStyle"/>
           <bh:Span ui:field="projectActionMenuContainer" />
         </bh:Div>
