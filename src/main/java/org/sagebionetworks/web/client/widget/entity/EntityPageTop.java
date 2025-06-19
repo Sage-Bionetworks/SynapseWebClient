@@ -1047,11 +1047,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
       dockerTab.configure(dockerEntityBundle, dockerAreaToken);
       dockerTab.asTab().setContentStale(false);
     }
-    entityCitation.configure(
-      projectHeader.getId(),
-      dockerEntityBundle.getEntity().getId(),
-      null
-    );
+    configureEntityCitationForTab(dockerEntityBundle, null);
   }
 
   public String getWikiPageId(String areaToken, String rootWikiId) {

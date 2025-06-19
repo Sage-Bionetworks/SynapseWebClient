@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.jsinterop.mui;
 import org.sagebionetworks.web.client.jsinterop.IconSvgProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactComponentType;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 
 public class Button
@@ -32,10 +33,20 @@ public class Button
     this.render();
   }
 
-  public void setStartIcon(String iconName) {
-    IconSvgProps iconProps = IconSvgProps.create(iconName, null);
-    props.startIcon =
-      React.createElement(SRC.SynapseComponents.IconSvg, iconProps);
+  /**
+   * Convenience wrapper that uses synapse-react-client's IconSvg
+   */
+  public void setStartIcon(String iconSvgName) {
+    IconSvgProps iconProps = IconSvgProps.create(iconSvgName, null);
+    ReactElement icon = React.createElement(
+      SRC.SynapseComponents.IconSvg,
+      iconProps
+    );
+    this.setStartIcon(icon);
+  }
+
+  public void setStartIcon(ReactElement icon) {
+    props.startIcon = icon;
     this.render();
   }
 
