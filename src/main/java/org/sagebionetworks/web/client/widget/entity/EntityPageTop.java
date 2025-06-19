@@ -620,13 +620,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
         dockerChanged(bundle);
       }
     }
-    String projectId = projectHeader != null ? projectHeader.getId() : null;
-    String entityId = entity != null ? entity.getId() : null;
-    Double versionNum = currentTargetVersionNumber != null
-      ? currentTargetVersionNumber.doubleValue()
-      : null;
-    entityCitation.configure(projectId, entityId, versionNum);
-
+    configureEntityCitationForTab(bundle, currentTargetVersionNumber);
     reconfigureCurrentArea();
   }
 
@@ -1053,7 +1047,11 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
       dockerTab.configure(dockerEntityBundle, dockerAreaToken);
       dockerTab.asTab().setContentStale(false);
     }
-    entityCitation.configure(projectHeader.getId(), null, null);
+    entityCitation.configure(
+      projectHeader.getId(),
+      dockerEntityBundle.getEntity().getId(),
+      null
+    );
   }
 
   public String getWikiPageId(String areaToken, String rootWikiId) {
