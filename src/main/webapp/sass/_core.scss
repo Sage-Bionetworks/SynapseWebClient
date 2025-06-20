@@ -212,7 +212,31 @@ a:focus {
     .entityMetadata {
       margin: 0px;
     }
+
+    .actionMenuButtonStyle {
+      button {
+        font-size: 16px;
+        line-height: 20px;
+      }
+      div[role='group'] button {
+        padding: 4px 16px;
+      }
+    }
+
+    .projectSupport {
+      .MuiButton-root {
+        font-size: 16px;
+        line-height: 20px;
+        font-weight: 700;
+        text-transform: none;
+      }
+    }
+    .projectSupport .MuiButton-root:hover {
+      text-decoration: underline;
+    }
+
     .projectMetadata {
+      display: flex;
       .projectTitle {
         > *,
         .syn-star-o,
@@ -230,6 +254,14 @@ a:focus {
       .MuiButton-root,
       .MuiIconButton-root {
         @include transparent-button();
+      }
+      @media (max-width: 1200px) {
+        flex-direction: column;
+      }
+      .projectSettings {
+        @media (min-width: 1200px) {
+          margin-left: auto;
+        }
       }
     }
   }
@@ -2011,6 +2043,11 @@ input[type='text'].padding-0 {
   .gap-20px-40px {
     gap: 20px 40px;
   }
+
+  .gap-10px {
+    gap: 10px;
+  }
+
   .flexcontainer-row {
     display: -webkit-flex;
     display: flex;

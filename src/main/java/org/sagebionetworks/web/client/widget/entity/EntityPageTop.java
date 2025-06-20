@@ -35,6 +35,7 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.EntityCitationImpl;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl;
@@ -73,6 +74,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
   private final DiscussionTab discussionTab;
   private final DockerTab dockerTab;
   private final ProjectTitleBar projectTitleBar;
+  private final EntityCitationImpl entityCitation;
   private final EntityMetadata projectMetadata;
   private final SynapseClientAsync synapseClient;
   // how many tabs have been marked as visible
@@ -114,6 +116,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
     SynapseClientAsync synapseClient,
     Tabs tabs,
     ProjectTitleBar projectTitleBar,
+    EntityCitationImpl entityCitation,
     EntityMetadata projectMetadata,
     WikiTab wikiTab,
     FilesTab filesTab,
@@ -142,6 +145,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
     this.discussionTab = discussionTab;
     this.dockerTab = dockerTab;
     this.projectTitleBar = projectTitleBar;
+    this.entityCitation = entityCitation;
     this.projectMetadata = projectMetadata;
     this.projectActionController = projectActionController;
     this.projectActionMenu = projectActionMenu;
@@ -155,6 +159,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
     view.setTabs(tabs.asWidget());
     view.setProjectMetadata(projectMetadata.asWidget());
     view.setProjectTitleBar(projectTitleBar.asWidget());
+    view.setEntityCitation(entityCitation.asWidget());
     projectActionMenu.addControllerWidget(projectActionController.asWidget());
     view.setProjectActionMenu(projectActionMenu.asWidget());
 
@@ -615,6 +620,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
         dockerChanged(bundle);
       }
     }
+    configureEntityCitationForTab(bundle, currentTargetVersionNumber);
     reconfigureCurrentArea();
   }
 
@@ -881,6 +887,18 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
     return null;
   }
 
+  private void configureEntityCitationForTab(
+    EntityBundle bundle,
+    Long versionNumber
+  ) {
+    String projectId = projectHeader != null ? projectHeader.getId() : null;
+    String entityId = bundle != null ? bundle.getEntity().getId() : null;
+    Double versionNum = versionNumber != null
+      ? versionNumber.doubleValue()
+      : null;
+    entityCitation.configure(projectId, entityId, versionNum);
+  }
+
   public void configureDatasetsTab() {
     if (datasetsTab.asTab().isContentStale()) {
       datasetsTab.setProject(
@@ -895,6 +913,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
       );
       datasetsTab.asTab().setContentStale(false);
     }
+    configureEntityCitationForTab(datasetsEntityBundle, datasetsVersionNumber);
   }
 
   public void configureTablesTab() {
@@ -911,6 +930,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
       );
       tablesTab.asTab().setContentStale(false);
     }
+    configureEntityCitationForTab(tablesEntityBundle, tablesVersionNumber);
   }
 
   public void configureFilesTab() {
@@ -923,6 +943,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
       filesTab.configure(filesEntityBundle, filesVersionNumber);
       filesTab.asTab().setContentStale(false);
     }
+    configureEntityCitationForTab(filesEntityBundle, filesVersionNumber);
   }
 
   public void fireEntityUpdatedEvent() {
@@ -984,6 +1005,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
     if (projectBundle != null) {
       entity = projectBundle.getEntity();
     }
+    entityCitation.configure(projectHeader.getId(), null, null);
   }
 
   public void configureChallengeTab() {
@@ -1012,6 +1034,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
       discussionTab.asTab().setContentStale(false);
     }
     discussionTab.updateActionMenuCommands();
+    entityCitation.configure(projectHeader.getId(), null, null);
   }
 
   public void configureDockerTab() {
@@ -1024,6 +1047,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
       dockerTab.configure(dockerEntityBundle, dockerAreaToken);
       dockerTab.asTab().setContentStale(false);
     }
+    configureEntityCitationForTab(dockerEntityBundle, null);
   }
 
   public String getWikiPageId(String areaToken, String rootWikiId) {
