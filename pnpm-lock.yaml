@@ -129,8 +129,8 @@ importers:
         specifier: ^3.0.2
         version: 3.0.2
       synapse-react-client:
-        specifier: 3.4.28
-        version: 3.4.28(@types/react@17.0.85)(csstype@3.1.3)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.30.1)(prop-types@15.8.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+        specifier: 3.4.29
+        version: 3.4.29(@types/react@17.0.85)(csstype@3.1.3)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.30.1)(prop-types@15.8.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       universal-cookie:
         specifier: ^4.0.4
         version: 4.0.4
@@ -4607,8 +4607,8 @@ packages:
   svg-path-sdf@1.1.3:
     resolution: {integrity: sha512-vJJjVq/R5lSr2KLfVXVAStktfcfa1pNFjFOgyJnzZFXlO/fDZ5DmM8FpnSKKzLPfEYTVeXuVBTHF296TpxuJVg==}
 
-  synapse-react-client@3.4.28:
-    resolution: {integrity: sha512-CEhrUdHHFOCdADT+RNpwOm9J3KSrIMNtLtqxXYcd6sxBwhrpuMdTHmZGq6DQDJ90Y2a3L27a/A6SoBE04RX0Uw==}
+  synapse-react-client@3.4.29:
+    resolution: {integrity: sha512-pbXsrTZtiPOSqxRdL+FT0BlMA6gJ5EU0ussvFW+KRp4nhhJjKHGBUuB4x4wOSWPRKPTpAj/sDZ7ue6HtMGqujA==}
     peerDependencies:
       react: 18.2.0
       react-dom: 18.2.0
@@ -5891,7 +5891,7 @@ snapshots:
 
   '@mui/icons-material@7.1.1(@mui/material@7.1.1(@emotion/react@11.14.0(@types/react@17.0.85)(react@18.2.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@17.0.85)(react@18.2.0))(@types/react@17.0.85)(react@18.2.0))(@types/react@17.0.85)(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(@types/react@17.0.85)(react@18.2.0)':
     dependencies:
-      '@babel/runtime': 7.27.1
+      '@babel/runtime': 7.27.6
       '@mui/material': 7.1.1(@emotion/react@11.14.0(@types/react@17.0.85)(react@18.2.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@17.0.85)(react@18.2.0))(@types/react@17.0.85)(react@18.2.0))(@types/react@17.0.85)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       react: 18.2.0
     optionalDependencies:
@@ -9765,7 +9765,7 @@ snapshots:
 
   react-error-boundary@3.1.4(react@18.2.0):
     dependencies:
-      '@babel/runtime': 7.27.1
+      '@babel/runtime': 7.27.6
       react: 18.2.0
 
   react-fast-compare@3.2.2: {}
@@ -9805,7 +9805,7 @@ snapshots:
 
   react-measure@2.5.2(react-dom@18.2.0(react@18.2.0))(react@18.2.0):
     dependencies:
-      '@babel/runtime': 7.27.1
+      '@babel/runtime': 7.27.6
       get-node-dimensions: 1.2.1
       prop-types: 15.8.1
       react: 18.2.0
@@ -9836,7 +9836,7 @@ snapshots:
 
   react-reflex@4.2.7(react-dom@18.2.0(react@18.2.0))(react@18.2.0):
     dependencies:
-      '@babel/runtime': 7.27.1
+      '@babel/runtime': 7.27.6
       lodash.throttle: 4.1.1
       prop-types: 15.8.1
       react: 18.2.0
@@ -9854,7 +9854,7 @@ snapshots:
 
   react-select@5.10.1(@types/react@17.0.85)(react-dom@18.2.0(react@18.2.0))(react@18.2.0):
     dependencies:
-      '@babel/runtime': 7.27.1
+      '@babel/runtime': 7.27.6
       '@emotion/cache': 11.14.0
       '@emotion/react': 11.14.0(@types/react@17.0.85)(react@18.2.0)
       '@floating-ui/dom': 1.7.0
@@ -9897,7 +9897,7 @@ snapshots:
 
   react-vtree@3.0.0-beta.3(react-dom@18.2.0(react@18.2.0))(react-window@1.8.11(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react@18.2.0):
     dependencies:
-      '@babel/runtime': 7.27.1
+      '@babel/runtime': 7.27.6
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
       react-merge-refs: 1.1.0
@@ -9905,7 +9905,7 @@ snapshots:
 
   react-window@1.8.11(react-dom@18.2.0(react@18.2.0))(react@18.2.0):
     dependencies:
-      '@babel/runtime': 7.27.1
+      '@babel/runtime': 7.27.6
       memoize-one: 5.2.1
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
@@ -10464,7 +10464,7 @@ snapshots:
       parse-svg-path: 0.1.2
       svg-path-bounds: 1.0.2
 
-  synapse-react-client@3.4.28(@types/react@17.0.85)(csstype@3.1.3)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.30.1)(prop-types@15.8.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0):
+  synapse-react-client@3.4.29(@types/react@17.0.85)(csstype@3.1.3)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.30.1)(prop-types@15.8.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0):
     dependencies:
       '@apidevtools/json-schema-ref-parser': 9.1.2
       '@aws-sdk/client-s3': 3.817.0
@@ -10743,7 +10743,7 @@ snapshots:
 
   use-deep-compare-effect@1.8.1(react@18.2.0):
     dependencies:
-      '@babel/runtime': 7.27.1
+      '@babel/runtime': 7.27.6
       dequal: 2.0.3
       react: 18.2.0
 
