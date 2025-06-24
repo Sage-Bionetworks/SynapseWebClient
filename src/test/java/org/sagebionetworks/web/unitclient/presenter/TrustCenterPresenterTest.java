@@ -63,7 +63,7 @@ public class TrustCenterPresenterTest {
       .render(
         TrustCenterPresenter.REPO_OWNER,
         TrustCenterPresenter.REPO_NAME,
-        "child_minor_addendum.md",
+        "ChildMinorAddendum.md",
         true
       );
   }
