@@ -39,6 +39,10 @@ public class CreateOrUpdateDoiModalProps extends ReactComponentProps {
     props.objectType = objectType.toString();
     props.objectId = objectId;
     props.defaultVersionNumber = defaultVersionNumber;
+
+    // Reset the modal state when it is closed
+    props.key = Boolean.toString(open);
+
     return props;
   }
 }
