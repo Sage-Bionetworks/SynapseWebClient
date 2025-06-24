@@ -8,6 +8,7 @@ import com.google.inject.Inject;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
+import org.sagebionetworks.web.client.widget.TextBoxWithCopyToClipboardWidget;
 
 public class EntityMetadataViewImpl
   extends Composite
@@ -24,7 +25,7 @@ public class EntityMetadataViewImpl
   HTMLPanel detailedMetadata;
 
   @UiField
-  TextBox idField;
+  TextBoxWithCopyToClipboardWidget idField;
 
   @UiField
   Span doiPanel;
@@ -53,7 +54,6 @@ public class EntityMetadataViewImpl
   @Inject
   public EntityMetadataViewImpl() {
     initWidget(uiBinder.createAndBindUi(this));
-    idField.addClickHandler(event -> idField.selectAll());
   }
 
   @Override
