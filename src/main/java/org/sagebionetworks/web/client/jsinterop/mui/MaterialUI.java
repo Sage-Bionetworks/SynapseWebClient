@@ -8,4 +8,5 @@ import org.sagebionetworks.web.client.jsinterop.ReactComponentType;
 public class MaterialUI {
 
   public static ReactComponentType<GridProps> Grid;
+  public static ReactComponentType<ButtonProps> Button;
 }
