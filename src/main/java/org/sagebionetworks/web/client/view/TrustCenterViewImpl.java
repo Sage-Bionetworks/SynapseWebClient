@@ -31,14 +31,20 @@ public class TrustCenterViewImpl extends Composite implements TrustCenterView {
   }
 
   @Override
-  public void render(String repoOwner, String repoName, String filePath) {
+  public void render(
+    String repoOwner,
+    String repoName,
+    String filePath,
+    boolean showDownloadButton
+  ) {
     scrollToTop();
     ReactElement component;
 
     GovernanceMarkdownGithubProps props = GovernanceMarkdownGithubProps.create(
       repoOwner,
       repoName,
-      filePath
+      filePath,
+      showDownloadButton
     );
     component =
       React.createElementWithSynapseContext(

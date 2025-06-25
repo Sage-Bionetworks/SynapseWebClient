@@ -54,10 +54,7 @@ public class SynapseReactClientFullContextPropsProviderImpl
           return unsubscribe::run;
         },
         globalApplicationState::isEditing,
-        // globalApplicationState::setIsEditing
-        isEditing -> {
-          //SWC-7380: intermittent issue, must be fixed before we give the context globalApplicationState::setIsEditing
-        }
+        globalApplicationState::setIsEditing
       )
     );
   }
