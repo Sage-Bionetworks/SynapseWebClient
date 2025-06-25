@@ -17,16 +17,21 @@ public class GovernanceMarkdownGithubProps extends ReactComponentProps {
   @JsNullable
   public String filePath;
 
+  @JsNullable
+  public boolean showDownloadButton;
+
   @JsOverlay
   public static GovernanceMarkdownGithubProps create(
     String repoOwner,
     String repoName,
-    String filePath
+    String filePath,
+    boolean showDownloadButton
   ) {
     GovernanceMarkdownGithubProps props = new GovernanceMarkdownGithubProps();
     props.repoOwner = repoOwner;
     props.repoName = repoName;
     props.filePath = filePath;
+    props.showDownloadButton = showDownloadButton;
     return props;
   }
 }

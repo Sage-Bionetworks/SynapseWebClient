@@ -66,7 +66,10 @@ public class TrustCenterPresenter
     if (fileName == null) {
       popupUtils.showErrorMessage("Unrecognized document key: " + documentKey);
     } else {
-      view.render(REPO_OWNER, REPO_NAME, fileName);
+      // If this is the CHILD_MINOR_ADDENDUM, we show a download button
+      boolean showDownloadButton =
+        documentKey == TrustCenterPlace.CHILD_MINOR_ADDENDUM_KEY;
+      view.render(REPO_OWNER, REPO_NAME, fileName, showDownloadButton);
     }
   }
 
