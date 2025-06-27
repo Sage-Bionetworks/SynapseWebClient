@@ -46,7 +46,25 @@ public class TrustCenterPresenterTest {
       .render(
         TrustCenterPresenter.REPO_OWNER,
         TrustCenterPresenter.REPO_NAME,
-        "privacy.md"
+        "privacy.md",
+        false
+      );
+  }
+
+  @Test
+  public void testShowDownloadButton() throws RequestException {
+    when(mockPlace.getDocumentKey())
+      .thenReturn(TrustCenterPlace.CHILD_MINOR_ADDENDUM_KEY);
+
+    presenter.setPlace(mockPlace);
+
+    verify(mockPopupUtils, never()).showErrorMessage(anyString());
+    verify(mockView)
+      .render(
+        TrustCenterPresenter.REPO_OWNER,
+        TrustCenterPresenter.REPO_NAME,
+        "ChildMinorAddendum.md",
+        true
       );
   }
 

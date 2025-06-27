@@ -20,11 +20,8 @@
               addStyleNames="margin-right-15 moveup-5"
             />
           </bh:Div>
-          <g:TextBox
-            ui:field="idField"
-            width="115px"
-            addStyleNames="border-none noBackground"
-            readOnly="true"
+          <w:TextBoxWithCopyToClipboardWidget 
+            ui:field="idField" 
           />
         </bh:Div>
         <bh:Span ui:field="doiPanel" />
