@@ -37,9 +37,6 @@ public class SRC {
     > DownloadConfirmation;
     public static ReactComponentType<FullWidthAlertProps> FullWidthAlert;
     public static ReactComponentType<OrientationBannerProps> OrientationBanner;
-    public static ReactComponentType<
-      SchemaDrivenAnnotationEditorProps
-    > SchemaDrivenAnnotationEditor;
     public static ReactComponentType<SynapseNavDrawerProps> SynapseNavDrawer;
     public static ReactComponentType<EmptyProps> FavoritesPage;
     public static ReactComponentType<EntityModalProps> EntityModal;
@@ -70,9 +67,6 @@ public class SRC {
       AccountLevelBadgesProps
     > AccountLevelBadges;
     public static ReactComponentType<PageProgressProps> PageProgress;
-    public static ReactComponentType<
-      TermsAndConditionsProps
-    > TermsAndConditions;
     public static ReactComponentType<IDUReportProps> IDUReport;
     public static ReactComponentType CertificationQuiz;
     public static ReactComponentType<
