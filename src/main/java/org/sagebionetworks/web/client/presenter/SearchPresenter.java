@@ -509,6 +509,7 @@ public class SearchPresenter
   private <T extends SearchQueryEventData> T addSearchToAnalyticsEventData(
     T eventData
   ) {
+    eventData.opensearch_enabled = false;
     eventData.search_context = SearchContext.synapse_entity.toString();
 
     JSONObjectAdapter adapter = this.jsonObjectAdapter.createNew();
