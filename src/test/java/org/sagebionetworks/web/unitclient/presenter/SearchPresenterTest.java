@@ -195,6 +195,7 @@ public class SearchPresenterTest {
     assertEquals(null, searchSubmittedEventData.serialized_range_query);
     assertEquals(Double.valueOf(1), searchSubmittedEventData.page_index);
     assertEquals(Double.valueOf(0), searchSubmittedEventData.start_index);
+    assertEquals(false, searchSubmittedEventData.opensearch_enabled);
 
     // Simulate first page of results
     List<Hit> hits = new ArrayList<Hit>();
@@ -226,6 +227,7 @@ public class SearchPresenterTest {
     assertEquals(Double.valueOf(1), pageReturnedEventData.page_index);
     assertEquals(Double.valueOf(0), pageReturnedEventData.start_index);
     assertEquals(Double.valueOf(3), pageReturnedEventData.total_results);
+    assertEquals(false, pageReturnedEventData.opensearch_enabled);
 
     verify(mockSearchAnalyticsClient, times(2))
       .sendSearchResultReturnedEvent(
@@ -243,12 +245,15 @@ public class SearchPresenterTest {
 
       assertEquals("entity", eventData.item_type);
       assertEquals(Double.valueOf(1), eventData.page_index);
+      assertEquals(false, eventData.opensearch_enabled);
     });
 
     assertEquals("syn123", resultReturnedEventData.get(0).item_id);
     assertEquals(Double.valueOf(1), resultReturnedEventData.get(0).rank);
+    assertEquals(false, resultReturnedEventData.get(0).opensearch_enabled);
     assertEquals("syn456", resultReturnedEventData.get(1).item_id);
     assertEquals(Double.valueOf(2), resultReturnedEventData.get(1).rank);
+    assertEquals(false, resultReturnedEventData.get(1).opensearch_enabled);
 
     // Request a second page of results
     verify(mockLoadMoreWidgetContainer)
@@ -274,6 +279,7 @@ public class SearchPresenterTest {
     assertEquals(null, searchSubmittedEventData.serialized_range_query);
     assertEquals(Double.valueOf(2), searchSubmittedEventData.page_index);
     assertEquals(Double.valueOf(2), searchSubmittedEventData.start_index);
+    assertEquals(false, searchSubmittedEventData.opensearch_enabled);
 
     // Second page of results is returned
     List<Hit> hitsPage2 = Collections.singletonList(new Hit());
@@ -305,6 +311,7 @@ public class SearchPresenterTest {
     assertEquals(Double.valueOf(2), pageReturnedEventData.page_index);
     assertEquals(Double.valueOf(2), pageReturnedEventData.start_index);
     assertEquals(Double.valueOf(3), pageReturnedEventData.total_results);
+    assertEquals(false, pageReturnedEventData.opensearch_enabled);
 
     SearchResultEventData lastResultReturnedEventData =
       searchResultEventDataArgumentCaptor.getValue();
@@ -320,6 +327,7 @@ public class SearchPresenterTest {
     assertEquals(Double.valueOf(3), lastResultReturnedEventData.rank);
     assertEquals("entity", lastResultReturnedEventData.item_type);
     assertEquals(Double.valueOf(2), lastResultReturnedEventData.page_index);
+    assertEquals(false, lastResultReturnedEventData.opensearch_enabled);
 
     // Verify that clicking the results sends expected events
 
@@ -340,6 +348,7 @@ public class SearchPresenterTest {
     assertEquals("syn123", clickedEventData.item_id);
     assertEquals(Double.valueOf(1), clickedEventData.rank);
     assertEquals(Double.valueOf(1), clickedEventData.page_index);
+    assertEquals(false, clickedEventData.opensearch_enabled);
 
     searchPresenter
       .getSearchResultClickedHandler(hitsPage2.get(0))
@@ -357,6 +366,7 @@ public class SearchPresenterTest {
     assertEquals("syn789", clickedEventData.item_id);
     assertEquals(Double.valueOf(3), clickedEventData.rank);
     assertEquals(Double.valueOf(2), clickedEventData.page_index);
+    assertEquals(false, clickedEventData.opensearch_enabled);
   }
 
   @SuppressWarnings("unchecked")
@@ -383,6 +393,7 @@ public class SearchPresenterTest {
     assertEquals(null, searchSubmittedEventData.serialized_range_query);
     assertEquals(Double.valueOf(1), searchSubmittedEventData.page_index);
     assertEquals(Double.valueOf(0), searchSubmittedEventData.start_index);
+    assertEquals(false, searchSubmittedEventData.opensearch_enabled);
 
     // Simulate first page of results
     SearchResults searchResults = new SearchResults();
@@ -408,6 +419,7 @@ public class SearchPresenterTest {
     assertEquals(Double.valueOf(1), pageReturnedEventData.page_index);
     assertEquals(Double.valueOf(0), pageReturnedEventData.start_index);
     assertEquals(Double.valueOf(0), pageReturnedEventData.total_results);
+    assertEquals(false, pageReturnedEventData.opensearch_enabled);
 
     verify(mockSearchAnalyticsClient, never())
       .sendSearchResultReturnedEvent(

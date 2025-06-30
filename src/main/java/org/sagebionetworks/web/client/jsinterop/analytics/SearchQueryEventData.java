@@ -25,4 +25,7 @@ public class SearchQueryEventData {
 
   /** The page number of the displayed search results. 1-indexed */
   public Double page_index;
+
+  /** True if the search was performed using the AWS OpenSearch backend */
+  public boolean opensearch_enabled;
 }
