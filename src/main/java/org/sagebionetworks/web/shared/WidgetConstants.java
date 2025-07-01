@@ -35,6 +35,12 @@ public class WidgetConstants {
   public static final String SYNAPSE_FORM_CONTENT_TYPE = "synapseForm";
   public static final String SYNAPSE_FORM_FRIENDLY_NAME = "Synapse Form";
 
+  public static final String JSONSCHEMA_FORM_CONTENT_TYPE = "jsonSchemaForm";
+  public static final String JSONSCHEMA_FORM_FRIENDLY_NAME = "JSON Schema Form";
+  public static final String JSONSCHEMA_FORM_SCHEMA_URL_KEY = "schemaUrl";
+  public static final String JSONSCHEMA_FORM_UI_SCHEMA_URL_KEY = "uiSchemaUrl";
+  public static final String JSONSCHEMA_FORM_POST_URL_KEY = "postUrl";
+
   public static final String CYTOSCAPE_CONTENT_TYPE = "cytoscapeJs25";
   public static final String CYTOSCAPE_FRIENDLY_NAME = "Cytoscape JS";
 

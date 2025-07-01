@@ -141,6 +141,7 @@
               ui:field="externalWebsiteLink"
               text="External Website"
             />
+            <b:AnchorListItem ui:field="jsonSchemaFormLink" text="JSON Schema Form" />
             <b:AnchorListItem
               ui:field="registerChallengeTeamLink"
               text="Register Challenge Team Button"

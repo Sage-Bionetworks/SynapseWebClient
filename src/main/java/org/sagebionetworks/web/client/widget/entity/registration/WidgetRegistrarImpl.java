@@ -24,6 +24,8 @@ import static org.sagebionetworks.web.shared.WidgetConstants.IMAGE_LINK_EDITOR_C
 import static org.sagebionetworks.web.shared.WidgetConstants.IMAGE_LINK_FRIENDLY_NAME;
 import static org.sagebionetworks.web.shared.WidgetConstants.JOIN_TEAM_CONTENT_TYPE;
 import static org.sagebionetworks.web.shared.WidgetConstants.JOIN_TEAM_FRIENDLY_NAME;
+import static org.sagebionetworks.web.shared.WidgetConstants.JSONSCHEMA_FORM_CONTENT_TYPE;
+import static org.sagebionetworks.web.shared.WidgetConstants.JSONSCHEMA_FORM_FRIENDLY_NAME;
 import static org.sagebionetworks.web.shared.WidgetConstants.LEADERBOARD_CONTENT_TYPE;
 import static org.sagebionetworks.web.shared.WidgetConstants.LEADERBOARD_FRIENDLY_NAME;
 import static org.sagebionetworks.web.shared.WidgetConstants.LINK_CONTENT_TYPE;
@@ -230,6 +232,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
       presenter = ginInjector.getPlotlyConfigEditor();
     } else if (contentTypeKey.equals(SYNAPSE_FORM_CONTENT_TYPE)) {
       presenter = ginInjector.getSynapseFormConfigEditor();
+    } else if (contentTypeKey.equals(JSONSCHEMA_FORM_CONTENT_TYPE)) {
+      presenter = ginInjector.getJSONSchemaFormConfigEditor();
     } else if (
       contentTypeKey.equals(TEAM_MEMBER_COUNT_CONTENT_TYPE) ||
       contentTypeKey.equals(TEAM_MEMBERS_CONTENT_TYPE)
@@ -404,6 +408,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
       presenter = ginInjector.getCytoscapeRenderer();
     } else if (contentTypeKey.equals(SYNAPSE_FORM_CONTENT_TYPE)) {
       presenter = ginInjector.getSynapseTableFormWidget();
+    } else if (contentTypeKey.equals(JSONSCHEMA_FORM_CONTENT_TYPE)) {
+      presenter = ginInjector.getDynamicForm();
     } else if (contentTypeKey.equals(TEAM_MEMBERS_CONTENT_TYPE)) {
       presenter = ginInjector.getTeamMembersWidget();
     } else if (contentTypeKey.equals(TEAM_MEMBER_COUNT_CONTENT_TYPE)) {
@@ -516,6 +522,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
     registerWidget(BIODALLIANCE13_CONTENT_TYPE, BIODALLIANCE_FRIENDLY_NAME);
     registerWidget(CYTOSCAPE_CONTENT_TYPE, CYTOSCAPE_FRIENDLY_NAME);
     registerWidget(SYNAPSE_FORM_CONTENT_TYPE, SYNAPSE_FORM_FRIENDLY_NAME);
+    registerWidget(JSONSCHEMA_FORM_CONTENT_TYPE, JSONSCHEMA_FORM_FRIENDLY_NAME);
     registerWidget(PLOT_CONTENT_TYPE, PLOT_FRIENDLY_NAME);
     registerWidget(
       TEAM_MEMBER_COUNT_CONTENT_TYPE,

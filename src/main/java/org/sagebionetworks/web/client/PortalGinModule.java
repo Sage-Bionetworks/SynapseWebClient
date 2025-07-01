@@ -410,6 +410,8 @@ import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageParamsPanelView;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageParamsPanelViewImpl;
+import org.sagebionetworks.web.client.widget.entity.editor.JSONSchemaFormConfigView;
+import org.sagebionetworks.web.client.widget.entity.editor.JSONSchemaFormConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.LinkConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.LinkConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.PlotlyConfigView;
@@ -1370,6 +1372,7 @@ public class PortalGinModule extends AbstractGinModule {
     bind(ErrorView.class).to(ErrorViewImpl.class);
     bind(PreviewConfigView.class).to(PreviewConfigViewImpl.class);
     bind(SynapseFormConfigView.class).to(SynapseFormConfigViewImpl.class);
+    bind(JSONSchemaFormConfigView.class).to(JSONSchemaFormConfigViewImpl.class);
     bind(DownloadCartPageView.class).to(DownloadCartPageViewImpl.class);
     bind(DataCatalogPageView.class).to(DataCatalogPageViewImpl.class);
     bind(EditFileMetadataModalView.class)

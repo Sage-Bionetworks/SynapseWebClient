@@ -437,6 +437,9 @@ public class MarkdownEditorWidget
       case INSERT_SYNAPSE_FORM:
         insertNewWidget(SYNAPSE_FORM_CONTENT_TYPE);
         break;
+      case INSERT_JSONSCHEMA_FORM:
+        insertNewWidget(JSONSCHEMA_FORM_CONTENT_TYPE);
+        break;
       case INSERT_PREVIEW:
         insertNewWidget(PREVIEW_CONTENT_TYPE);
         break;

@@ -58,6 +58,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.DivView;
 import org.sagebionetworks.web.client.widget.CommaSeparatedValuesParser;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
+import org.sagebionetworks.web.client.widget.DynamicForm;
 import org.sagebionetworks.web.client.widget.EntityTypeIcon;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
@@ -146,6 +147,7 @@ import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigEdito
 import org.sagebionetworks.web.client.widget.entity.editor.EvaluationSubmissionConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageLinkConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.editor.JSONSchemaFormConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.LeaderboardConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.LinkConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.PlotlyConfigEditor;
@@ -432,6 +434,8 @@ public interface PortalGinInjector extends Ginjector {
   PreviewConfigEditor getPreviewConfigEditor();
 
   SynapseFormConfigEditor getSynapseFormConfigEditor();
+
+  JSONSchemaFormConfigEditor getJSONSchemaFormConfigEditor();
 
   BiodallianceEditor getBiodallianceEditor();
 
@@ -902,4 +906,5 @@ public interface PortalGinInjector extends Ginjector {
   ChatPresenter getChatPresenter();
   PlansPresenter getPlansPresenter();
   ProjectDataAvailability getProjectDataAvailability();
+  DynamicForm getDynamicForm();
 }

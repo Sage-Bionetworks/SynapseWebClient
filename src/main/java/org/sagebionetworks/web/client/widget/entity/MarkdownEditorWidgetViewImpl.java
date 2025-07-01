@@ -122,6 +122,9 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
   public AnchorListItem synapseFormLink;
 
   @UiField
+  public AnchorListItem jsonSchemaFormLink;
+
+  @UiField
   public AnchorListItem videoLink;
 
   @UiField
@@ -320,6 +323,9 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
       );
       synapseFormLink.addClickHandler(
         getClickHandler(MarkdownEditorAction.INSERT_SYNAPSE_FORM)
+      );
+      jsonSchemaFormLink.addClickHandler(
+        getClickHandler(MarkdownEditorAction.INSERT_JSONSCHEMA_FORM)
       );
       videoLink.addClickHandler(
         getClickHandler(MarkdownEditorAction.INSERT_VIDEO)
