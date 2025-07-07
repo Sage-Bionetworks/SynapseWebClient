@@ -137,6 +137,9 @@ public class SRC {
       CreateOrUpdateDoiModalProps
     > CreateOrUpdateDoiModal;
     public static ReactComponentType UserAccessRequestHistoryPlace;
+    public static ReactComponentType<
+      SynapsePortalBannersProps
+    > SynapsePortalBanners;
 
     /**
      * Pushes a global toast message. In SWC, you should use {@link DisplayUtils#notify}, rather than calling this method directly.
