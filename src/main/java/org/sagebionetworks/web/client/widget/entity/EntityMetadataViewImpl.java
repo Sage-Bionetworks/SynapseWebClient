@@ -8,12 +8,7 @@ import com.google.inject.Inject;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
-import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
-import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactElement;
-import org.sagebionetworks.web.client.jsinterop.SRC;
-import org.sagebionetworks.web.client.jsinterop.SynapsePortalBannersProps;
-import org.sagebionetworks.web.client.widget.ReactComponent;
+import org.sagebionetworks.web.client.widget.PortalBannersWidget;
 import org.sagebionetworks.web.client.widget.TextBoxWithCopyToClipboardWidget;
 
 public class EntityMetadataViewImpl
@@ -60,17 +55,13 @@ public class EntityMetadataViewImpl
   @UiField
   SimplePanel portalBannersContainer;
 
-  ReactComponent portalBannersReactContainer;
-  SynapseReactClientFullContextPropsProvider propsProvider;
+  PortalBannersWidget portalBannersWidget;
 
   @Inject
-  public EntityMetadataViewImpl(
-    SynapseReactClientFullContextPropsProvider propsProvider
-  ) {
+  public EntityMetadataViewImpl() {
     initWidget(uiBinder.createAndBindUi(this));
-    this.propsProvider = propsProvider;
-    portalBannersReactContainer = new ReactComponent();
-    portalBannersContainer.setWidget(portalBannersReactContainer);
+    this.portalBannersWidget = new PortalBannersWidget();
+    portalBannersContainer.setWidget(portalBannersWidget);
   }
 
   @Override
@@ -114,16 +105,7 @@ public class EntityMetadataViewImpl
   @Override
   public void setEntityId(String entityId) {
     idField.setText(entityId);
-    SynapsePortalBannersProps props = SynapsePortalBannersProps.create(
-      entityId
-    );
-    ReactElement component = React.createElementWithSynapseContext(
-      SRC.SynapseComponents.SynapsePortalBanners,
-      props,
-      propsProvider.getJsInteropContextProps()
-    );
-
-    portalBannersReactContainer.render(component);
+    portalBannersWidget.configure(entityId);
   }
 
   @Override
