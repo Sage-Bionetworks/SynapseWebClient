@@ -13,8 +13,8 @@ public class ViteHTMLGeneratorImplTest extends TestCase {
     String html = generator.getViteDevelopmentHTML(List.of("js/main.js"));
 
     assertEquals(
-      "<script type=\"module\" src=\"http://localhost:5173/@vite/client\"></script>\n" +
-      "<script type=\"module\" src=\"http://localhost:5173/js/main.js\"></script>\n",
+      "<script type=\"module\" src=\"http://localhost:5173/Portal/cdn/generated/vite/@vite/client\"></script>\n" +
+      "<script type=\"module\" src=\"http://localhost:5173/Portal/cdn/generated/vite/js/main.js\"></script>\n",
       html
     );
   }

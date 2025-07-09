@@ -29,6 +29,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.server.servlet.AliasRedirectorServlet;
 import org.sagebionetworks.web.server.servlet.AppConfigServlet;
+import org.sagebionetworks.web.server.servlet.CdnRedirectorServlet;
 import org.sagebionetworks.web.server.servlet.ChallengeClientImpl;
 import org.sagebionetworks.web.server.servlet.DataAccessClientImpl;
 import org.sagebionetworks.web.server.servlet.DiscussionForumClientImpl;
@@ -197,6 +198,11 @@ public class PortalServletModule extends ServletModule {
     // Setup the File Uploader JNLP mapping
     bind(FileUploaderJnlp.class).in(Singleton.class);
     serve("/Portal/fileUploaderJnlp").with(FileUploaderJnlp.class);
+
+    // Redirector to CDN
+    bind(CdnRedirectorServlet.class).in(Singleton.class);
+    serve("/Portal/" + WebConstants.CDN_REDIRECTOR_SERVLET + "/*")
+      .with(CdnRedirectorServlet.class);
 
     // FileHandle upload
     bind(FileHandleServlet.class).in(Singleton.class);

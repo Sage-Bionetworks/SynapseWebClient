@@ -5,6 +5,7 @@ import { nodePolyfills } from 'vite-plugin-node-polyfills'
  * Vite config to generate the ESM & CJS bundles for Synapse React Client.
  */
 const config = defineConfig({
+  base: '/Portal/cdn/generated/vite/',
   server: {
     cors: {
       origin: ['http://localhost:8888', 'http://127.0.0.1:8888'],

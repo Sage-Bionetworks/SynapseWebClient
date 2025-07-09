@@ -11,7 +11,8 @@ import org.json.JSONObject;
  */
 public class ViteHTMLGeneratorImpl implements ViteHTMLGenerator {
 
-  private static final String VITE_DEV_SERVER_URL = "http://localhost:5173";
+  private static final String VITE_DEV_SERVER_URL =
+    "http://localhost:5173/Portal/cdn/generated/vite";
 
   private static final String VITE_CLIENT_PACKAGE = "@vite/client";
 
