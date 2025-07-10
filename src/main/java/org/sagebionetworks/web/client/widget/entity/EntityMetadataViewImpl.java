@@ -8,6 +8,7 @@ import com.google.inject.Inject;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
+import org.sagebionetworks.web.client.widget.PortalBannersWidget;
 import org.sagebionetworks.web.client.widget.TextBoxWithCopyToClipboardWidget;
 
 public class EntityMetadataViewImpl
@@ -51,9 +52,16 @@ public class EntityMetadataViewImpl
   @UiField
   Span projectDataAvailabilityPanel;
 
+  @UiField
+  SimplePanel portalBannersContainer;
+
+  PortalBannersWidget portalBannersWidget;
+
   @Inject
   public EntityMetadataViewImpl() {
     initWidget(uiBinder.createAndBindUi(this));
+    this.portalBannersWidget = new PortalBannersWidget();
+    portalBannersContainer.setWidget(portalBannersWidget);
   }
 
   @Override
@@ -97,6 +105,7 @@ public class EntityMetadataViewImpl
   @Override
   public void setEntityId(String entityId) {
     idField.setText(entityId);
+    portalBannersWidget.configure(entityId);
   }
 
   @Override

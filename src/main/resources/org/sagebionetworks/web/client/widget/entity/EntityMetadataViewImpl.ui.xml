@@ -42,6 +42,7 @@
       </bh:Paragraph>
       <bh:Paragraph ui:field="descriptionText" />
     </bh:Div>
+    <g:SimplePanel ui:field="portalBannersContainer" />
     <bh:Div ui:field="fileHistoryContainer" />
   </g:HTMLPanel>
 </ui:UiBinder>
