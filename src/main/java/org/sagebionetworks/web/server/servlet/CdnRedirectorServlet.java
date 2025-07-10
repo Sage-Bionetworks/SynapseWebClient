@@ -45,7 +45,8 @@ public class CdnRedirectorServlet extends HttpServlet {
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-    // Check the origin - if the origin is `subdomain.synapse.org`, then redirect to the CDN at `cdn-<subdomain>.synapse.org`.
+    // Check the server name in the request - if it matches a subdomain with a CDN (www, staging, tst), then redirect to
+    // the CDN at `cdn-<subdomain>.synapse.org`.
     // Otherwise, redirect to the asset hosted by the servlet.
 
     URL requestUrl = new URL(request.getRequestURL().toString());

@@ -224,9 +224,9 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
         viteHTMLGenerator.getViteProductionHTML(
           VITE_IMPORTED_FILES,
           viteManifestProvider.getManifest(),
-          // Fetch the first assets through the CDN (if available) directly.
-          // If these assets are fetched through the CDN redirect servlet, then
-          // the browser will download multiple copies of this script via circular references, and everything will break!
+          // The initial Vite assets should be fetched through the CDN (if available) directly.
+          // If these assets are instead fetched through the CDN redirect servlet (/Portal/cdn), then the browser will
+          // download multiple copies of the initial assets, and everything will break!
           dataModel.get(CDN_ENDPOINT_KEY) + "/generated/vite/"
         )
       );
