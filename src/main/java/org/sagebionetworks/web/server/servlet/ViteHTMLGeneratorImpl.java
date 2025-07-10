@@ -11,7 +11,7 @@ import org.json.JSONObject;
  */
 public class ViteHTMLGeneratorImpl implements ViteHTMLGenerator {
 
-  private static final String VITE_DEV_SERVER_ORIGIN = "http://localhost:5713";
+  private static final String VITE_DEV_SERVER_ORIGIN = "http://localhost:5173";
   // The base path should match the value in the Vite config.
   private static final String VITE_BASE_PATH = "/Portal/cdn/generated/vite";
 
