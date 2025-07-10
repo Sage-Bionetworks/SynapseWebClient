@@ -109,7 +109,7 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
   // that Vite generates.
   public static final List<String> VITE_IMPORTED_FILES = List.of("js/main.js");
 
-  Pattern CDN_HOSTS_REGEX = Pattern.compile(
+  public static final Pattern CDN_HOSTS_REGEX = Pattern.compile(
     "^(www|staging|tst)\\.synapse\\.org$"
   );
 
@@ -224,6 +224,9 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
         viteHTMLGenerator.getViteProductionHTML(
           VITE_IMPORTED_FILES,
           viteManifestProvider.getManifest(),
+          // The initial Vite assets should be fetched through the CDN (if available) directly.
+          // If these assets are instead fetched through the CDN redirect servlet (/Portal/cdn), then the browser will
+          // download multiple copies of the initial assets, and everything will break!
           dataModel.get(CDN_ENDPOINT_KEY) + "/generated/vite/"
         )
       );

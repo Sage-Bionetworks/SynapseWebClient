@@ -252,6 +252,7 @@ public class WebConstants {
   public static final String SLACK_SERVLET = "slack";
   public static final String APPCONFIG_SERVLET = "featureflags";
   public static final String VERSIONS_SERVLET = "versions";
+  public static final String CDN_REDIRECTOR_SERVLET = "cdn";
   public static final String FILE_HANDLE_UPLOAD_SERVLET = "filehandle";
   public static final String JSON_LD_CONTENT_SERVLET = "jsonldcontent";
   public static final String SESSION_COOKIE_SERVLET = "sessioncookie";
