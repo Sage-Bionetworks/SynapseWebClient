@@ -14,10 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Handles file handler uploads.
- *
- * @author jay
- *
+ * Redirects a request for an asset to the correct path, referencing the CDN if one exists.
  */
 public class CdnRedirectorServlet extends HttpServlet {
 
