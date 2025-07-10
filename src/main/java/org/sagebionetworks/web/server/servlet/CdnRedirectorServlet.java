@@ -12,7 +12,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.sagebionetworks.web.shared.WebConstants;
 
 /**
  * Handles file handler uploads.
@@ -29,15 +28,6 @@ public class CdnRedirectorServlet extends HttpServlet {
 
   protected static final ThreadLocal<HttpServletRequest> perThreadRequest =
     new ThreadLocal<HttpServletRequest>();
-
-  private RequestHostProvider requestHostProvider = () ->
-    UserDataProvider.getThreadLocalRequestHost(
-      CdnRedirectorServlet.perThreadRequest.get()
-    );
-
-  public void setRequestHostProvider(RequestHostProvider requestHostProvider) {
-    this.requestHostProvider = requestHostProvider;
-  }
 
   @Override
   protected void service(HttpServletRequest arg0, HttpServletResponse arg1)
@@ -58,23 +48,16 @@ public class CdnRedirectorServlet extends HttpServlet {
     // Check the origin - if the origin is `subdomain.synapse.org`, then redirect to the CDN at `cdn-<subdomain>.synapse.org`.
     // Otherwise, redirect to the asset hosted by the servlet.
 
-    URL requestUrl = new URL(getFullURL(request));
+    URL requestUrl = new URL(request.getRequestURL().toString());
     String scheme = getOriginalScheme(request);
     String pathToAsset = request.getPathInfo();
-    logger.info(
-      "Request received on " + request.getRequestURL() + " for " + pathToAsset
-    );
 
     Matcher matcher = CDN_HOSTS_REGEX.matcher(request.getServerName());
 
-    URL redirectUrl = new URL(
-      scheme,
-      request.getServerName(),
-      requestUrl.getPort(),
-      pathToAsset
-    );
+    URL redirectUrl;
 
     if (matcher.matches()) {
+      // Redirect to asset served by CDN
       redirectUrl =
         new URL(
           scheme,
@@ -83,37 +66,23 @@ public class CdnRedirectorServlet extends HttpServlet {
           pathToAsset
         );
     } else {
-      logger.info(
+      // There is no CDN, redirect to the asset served by the Portal
+      redirectUrl =
+        new URL(
+          scheme,
+          request.getServerName(),
+          requestUrl.getPort(),
+          pathToAsset
+        );
+      logger.warning(
+        "Not redirecting to CDN, server name \"" +
         request.getServerName() +
-        " does not match ^(www|staging|tst)\\.synapse\\.org$"
+        "\" does not match known CDN server names. This is expected in development."
       );
     }
 
-    response.setHeader( // instruct not to cache
-      WebConstants.CACHE_CONTROL_KEY,
-      WebConstants.CACHE_CONTROL_VALUE_NO_CACHE
-    );
-    // Set standard HTTP/1.1 no-cache headers.
-    response.setHeader(WebConstants.PRAGMA_KEY, WebConstants.NO_CACHE_VALUE); // Set standard HTTP/1.0 no-cache header.
-    response.setDateHeader(WebConstants.EXPIRES_KEY, 0L); // Proxy
-
-    logger.info("Redirecting " + pathToAsset + " to " + redirectUrl);
-
-    // redirect
+    // Redirect with 302 Found
     response.sendRedirect(redirectUrl.toString());
-  }
-
-  public static String getFullURL(HttpServletRequest request) {
-    StringBuilder requestURL = new StringBuilder(
-      request.getRequestURL().toString()
-    );
-    String queryString = request.getQueryString();
-
-    if (queryString == null) {
-      return requestURL.toString();
-    } else {
-      return requestURL.append('?').append(queryString).toString();
-    }
   }
 
   private static String getOriginalScheme(HttpServletRequest request) {
