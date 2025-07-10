@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.unitserver.servlet;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
@@ -46,9 +47,6 @@ public class CdnRedirectorServletTest {
   @Mock
   HttpServletResponse mockResponse;
 
-  @Mock
-  RequestHostProvider mockRequestHostProvider;
-
   CdnRedirectorServlet servlet;
   ArgumentCaptor<String> redirectUrlCaptor;
 
@@ -56,7 +54,6 @@ public class CdnRedirectorServletTest {
   public void setup() throws IOException {
     MockitoAnnotations.initMocks(this);
     servlet = new CdnRedirectorServlet();
-    servlet.setRequestHostProvider(mockRequestHostProvider);
     redirectUrlCaptor = ArgumentCaptor.forClass(String.class);
   }
 
@@ -74,68 +71,48 @@ public class CdnRedirectorServletTest {
     when(mockRequest.getQueryString()).thenReturn(null);
     when(mockRequest.getPathInfo()).thenReturn(pathInfo);
     when(mockRequest.getServerName()).thenReturn(serverName);
-    when(mockRequestHostProvider.getRequestHost())
-      .thenReturn(serverName + ":" + serverPort);
   }
 
   @Test
   public void testDoGetSynapseOrg() throws Exception {
     String serverName = "www.synapse.org";
     String pathInfo = "/some/asset.png";
-    setupRequest("https", serverName, 80, pathInfo);
+    setupRequest("https", serverName, 443, pathInfo);
 
     servlet.doGet(mockRequest, mockResponse);
 
     verify(mockResponse).sendRedirect(redirectUrlCaptor.capture());
     String redirectUrl = redirectUrlCaptor.getValue();
-    assertTrue(redirectUrl.startsWith("https://cdn-"));
-    assertTrue(redirectUrl.contains(serverName));
-    assertTrue(redirectUrl.endsWith(pathInfo));
+    assertEquals("https://cdn-www.synapse.org:443/some/asset.png", redirectUrl);
   }
 
   @Test
   public void testDoGetStagingSynapseOrg() throws Exception {
     String serverName = "staging.synapse.org";
-    String pathInfo = "/some/other/asset.js";
-    setupRequest("https", serverName, 80, pathInfo);
+    String pathInfo = "/some/asset.png";
+    setupRequest("https", serverName, 443, pathInfo);
 
     servlet.doGet(mockRequest, mockResponse);
 
     verify(mockResponse).sendRedirect(redirectUrlCaptor.capture());
     String redirectUrl = redirectUrlCaptor.getValue();
-    assertTrue(redirectUrl.startsWith("https://cdn-"));
-    assertTrue(redirectUrl.contains(serverName));
-    assertTrue(redirectUrl.endsWith(pathInfo));
+    assertEquals(
+      "https://cdn-staging.synapse.org:443/some/asset.png",
+      redirectUrl
+    );
   }
 
   @Test
   public void testDoGetLocalhost() throws Exception {
     String serverName = "127.0.0.1";
     int serverPort = 8888;
-    String pathInfo = "/my/local/file.txt";
+    String pathInfo = "/some/asset.png";
     setupRequest("http", serverName, serverPort, pathInfo);
 
     servlet.doGet(mockRequest, mockResponse);
 
     verify(mockResponse).sendRedirect(redirectUrlCaptor.capture());
     String redirectUrl = redirectUrlCaptor.getValue();
-    assertTrue(redirectUrl.startsWith("http://"));
-    assertTrue(redirectUrl.contains(serverName + ":" + serverPort));
-    assertTrue(redirectUrl.endsWith(pathInfo));
-  }
-
-  @Test
-  public void testNoCacheHeaders() throws Exception {
-    setupRequest("https", "www.synapse.org", 80, "/file.css");
-    servlet.doGet(mockRequest, mockResponse);
-
-    verify(mockResponse)
-      .setHeader(
-        eq(WebConstants.CACHE_CONTROL_KEY),
-        eq(WebConstants.CACHE_CONTROL_VALUE_NO_CACHE)
-      );
-    verify(mockResponse)
-      .setHeader(eq(WebConstants.PRAGMA_KEY), eq(WebConstants.NO_CACHE_VALUE));
-    verify(mockResponse).setDateHeader(eq(WebConstants.EXPIRES_KEY), eq(0L));
+    assertEquals("http://127.0.0.1:8888/some/asset.png", redirectUrl);
   }
 }

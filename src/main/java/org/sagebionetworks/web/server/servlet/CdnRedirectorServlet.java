@@ -75,9 +75,9 @@ public class CdnRedirectorServlet extends HttpServlet {
           pathToAsset
         );
       logger.warning(
-        "Not redirecting to CDN, server name \"" +
+        "Not redirecting to CDN: server name \"" +
         request.getServerName() +
-        "\" does not match known CDN server names. This is expected in development."
+        "\" does not match known server names with CDNs. This is expected in development."
       );
     }
 
