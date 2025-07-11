@@ -201,7 +201,7 @@ public class EntityActionControllerImpl
   public static final String VERSIONING_HELP_MARKDOWN =
     "This will create an immutable version, which will be available in your version history.";
   public static final String VERSIONING_HELP_HREF =
-    "https://help.synapse.org/docs/Versioning.2003730726.html";
+    "https://help.synapse.org/docs/Versioning-Tables,-Views,-and-Datasets.2667675758.html";
 
   public static final String TOOLS = " Tools";
 
