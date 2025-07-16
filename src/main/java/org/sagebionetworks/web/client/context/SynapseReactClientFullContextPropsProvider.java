@@ -21,4 +21,9 @@ public interface SynapseReactClientFullContextPropsProvider {
    * using JsInterop before using JSNI.
    */
   FullContextProviderPropsJSNIObject getJsniContextProps();
+
+  /**
+   * Synchronizes the context retrieved in GWT with the global store that is passed to React components
+   */
+  void synchronizeContextWithGlobalStore();
 }

@@ -14,6 +14,7 @@ import ReactDOMClient from 'react-dom/client'
 import * as ReactQuery from '@tanstack/react-query'
 import * as SRC from 'synapse-react-client'
 import './mui.js'
+import './globalContext.js'
 
 // Append to global scope so these libraries can be accessed in JsInterop classes
 

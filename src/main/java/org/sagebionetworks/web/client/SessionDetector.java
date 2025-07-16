@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client;
 import com.google.inject.Inject;
 import java.util.Objects;
 import org.sagebionetworks.web.client.cache.ClientCache;
+import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 
 public class SessionDetector {
@@ -15,18 +16,21 @@ public class SessionDetector {
   public static final String SESSION_MARKER = "SESSION_MARKER";
   public static final int FORCE_CHECK_EVERY_X_ITERATIONS = 7;
   private int loopCount = 0;
+  private SynapseReactClientFullContextPropsProvider propsProvider;
 
   @Inject
   public SessionDetector(
     AuthenticationController authController,
     GlobalApplicationState globalAppState,
     GWTWrapper gwt,
-    ClientCache clientCache
+    ClientCache clientCache,
+    SynapseReactClientFullContextPropsProvider propsProvider
   ) {
     this.clientCache = clientCache;
     this.authController = authController;
     this.globalAppState = globalAppState;
     this.gwt = gwt;
+    this.propsProvider = propsProvider;
     initializeAccessTokenState();
   }
 
@@ -38,6 +42,8 @@ public class SessionDetector {
     // SWC-4947: check for user change immediately (don't wait 10 seconds to discover the existing
     // session token).
     authController.checkForUserChange();
+    // SWC-7004: Update global store with current React context
+    propsProvider.synchronizeContextWithGlobalStore();
     checkForUserChangeLater();
   }
 

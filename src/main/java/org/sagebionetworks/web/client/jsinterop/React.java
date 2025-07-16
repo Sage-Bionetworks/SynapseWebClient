@@ -3,7 +3,7 @@ package org.sagebionetworks.web.client.jsinterop;
 import jsinterop.annotations.JsOverlay;
 import jsinterop.annotations.JsPackage;
 import jsinterop.annotations.JsType;
-import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
+import org.sagebionetworks.web.client.jsinterop.context.ContextUtils;
 
 @JsType(isNative = true, namespace = JsPackage.GLOBAL)
 public class React {
@@ -23,34 +23,27 @@ public class React {
   public static native <T> T createRef();
 
   /**
-   * Similar to {@link #createElementWithSynapseContext} but only includes the theme. Any components rendered will NOT get the full Synapse context, including
-   * access token + auth state, experimental mode status, and time display settings.
+   * Wraps a component in SynapseContextProvider. Nearly all Synapse React Client components must be wrapped in this context, so this utility
+   * simplifies creating the wrapper.
+   *
+   * @param <P>
+   * @param componentType
+   * @return
    */
   @JsOverlay
   public static <
     T extends ReactComponentType<P>, P extends ReactComponentProps
-  > ReactElement<?, ?> createElementWithThemeContext(
-    ReactComponentType<P> componentType,
-    P props
-  ) {
-    SynapseReactClientFullContextProviderProps emptyContext =
-      SynapseReactClientFullContextProviderProps.create(
-        SynapseContextJsObject.create(null, false, false, "synapse.org"),
-        null,
-        null
-      );
-    return createElementWithSynapseContext(componentType, props, emptyContext);
+  > ReactElement<?, ?> createElementWithSynapseContext(T componentType) {
+    return createElementWithSynapseContext(componentType, null);
   }
 
   /**
    * Wraps a component in SynapseContextProvider. Nearly all Synapse React Client components must be wrapped in this context, so this utility
    * simplifies creating the wrapper.
    *
-   * For setting props, use {@link SynapseReactClientFullContextPropsProvider}
+   * @param <P>
    * @param componentType
    * @param props
-   * @param wrapperProps
-   * @param <P>
    * @return
    */
   @JsOverlay
@@ -59,12 +52,16 @@ public class React {
   > ReactElement<?, ?> createElementWithSynapseContext(
     T componentType,
     P props,
-    SynapseReactClientFullContextProviderProps wrapperProps
+    ReactElement<?, ?>... children
   ) {
-    ReactElement componentElement = createElement(componentType, props);
+    ReactElement<T, P> componentElement = createElement(
+      componentType,
+      props,
+      children
+    );
     return createElement(
-      SRC.SynapseContext.FullContextProvider,
-      wrapperProps,
+      ContextUtils.SynapseContextProviderFromStore,
+      null,
       componentElement
     );
   }
