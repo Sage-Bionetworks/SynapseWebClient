@@ -2,25 +2,22 @@ import { atom, createStore, Provider, useAtomValue } from 'jotai'
 import { createElement } from 'react'
 import { SynapseContext } from 'synapse-react-client'
 
+/* A store that will be used across all React elements in the app */
 const contextStore = createStore()
-const contextAtom = atom({})
 
-function _SynapseContextProviderFromStore({ children }) {
-  const context = useAtomValue(contextAtom)
+/* Atom that can store the props for SynapseContextProvider */
+const contextProviderPropsAtom = atom({})
+
+/* Wraps children in a FullContextProvider, reading the global context store to configure the context */
+function SynapseContextProviderFromStore({ children }) {
+  const context = useAtomValue(contextProviderPropsAtom, {
+    store: contextStore,
+  })
 
   return createElement(SynapseContext.FullContextProvider, context, children)
 }
 
-function SynapseContextProviderFromStore(props) {
-  return createElement(
-    Provider,
-    { store: contextStore },
-    createElement(_SynapseContextProviderFromStore, props),
-  )
-}
-
 window.ContextUtils = {
-  setGlobalContext: ctx => contextStore.set(contextAtom, ctx),
-  contextStore: contextStore,
+  setGlobalContext: ctx => contextStore.set(contextProviderPropsAtom, ctx),
   SynapseContextProviderFromStore: SynapseContextProviderFromStore,
 }
