@@ -130,7 +130,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
   TextBox projectSearchTextBox;
 
   @UiField
-  Button createProjectButton;
+  org.sagebionetworks.web.client.jsinterop.mui.Button createProjectButton;
 
   @UiField
   DivElement createProjectUI;
