@@ -4,7 +4,6 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.inject.Inject;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
@@ -17,17 +16,14 @@ public class PlansViewImpl extends Composite implements PlansView {
   ReactComponent container;
 
   private Header headerWidget;
-  private SynapseReactClientFullContextPropsProvider propsProvider;
   private GlobalApplicationState globalAppState;
 
   @Inject
   public PlansViewImpl(
     Header headerWidget,
-    final SynapseReactClientFullContextPropsProvider propsProvider,
     GlobalApplicationState globalAppState
   ) {
     this.headerWidget = headerWidget;
-    this.propsProvider = propsProvider;
     this.globalAppState = globalAppState;
     headerWidget.configure();
     container = new ReactComponent();
@@ -45,8 +41,7 @@ public class PlansViewImpl extends Composite implements PlansView {
 
     ReactElement component = React.createElementWithSynapseContext(
       SRC.SynapseComponents.SynapsePlansPage,
-      props,
-      propsProvider.getJsInteropContextProps()
+      props
     );
 
     container.render(component);

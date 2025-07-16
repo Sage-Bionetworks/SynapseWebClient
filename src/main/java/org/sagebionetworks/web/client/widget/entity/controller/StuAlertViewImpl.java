@@ -8,7 +8,6 @@ import com.google.inject.Inject;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.ErrorPageProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
@@ -21,7 +20,6 @@ public class StuAlertViewImpl implements StuAlertView {
   public interface Binder extends UiBinder<Widget, StuAlertViewImpl> {}
 
   Widget widget;
-  SynapseReactClientFullContextPropsProvider propsProvider;
 
   @UiField
   ReactComponent errorPageContainer;
@@ -38,11 +36,7 @@ public class StuAlertViewImpl implements StuAlertView {
   GlobalApplicationState globalAppState;
 
   @Inject
-  public StuAlertViewImpl(
-    SynapseReactClientFullContextPropsProvider propsProvider,
-    GlobalApplicationState globalAppState
-  ) {
-    this.propsProvider = propsProvider;
+  public StuAlertViewImpl(GlobalApplicationState globalAppState) {
     this.globalAppState = globalAppState;
   }
 
@@ -94,8 +88,7 @@ public class StuAlertViewImpl implements StuAlertView {
     );
     ReactElement component = React.createElementWithSynapseContext(
       SRC.SynapseComponents.ErrorPage,
-      props,
-      propsProvider.getJsInteropContextProps()
+      props
     );
     errorPageContainer.render(component);
     errorPageContainer.setVisible(true);

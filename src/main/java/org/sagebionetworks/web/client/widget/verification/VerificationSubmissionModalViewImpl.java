@@ -24,7 +24,6 @@ import org.sagebionetworks.repo.model.verification.VerificationState;
 import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseProperties;
-import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.RejectProfileValidationRequestModalProps;
 import org.sagebionetworks.web.client.jsinterop.SRC;
@@ -131,7 +130,6 @@ public class VerificationSubmissionModalViewImpl
 
   private final CellFactory cellFactory;
   private final SynapseProperties synapseProperties;
-  private final SynapseReactClientFullContextPropsProvider propsProvider;
 
   @Override
   public void setPresenter(Presenter presenter) {
@@ -142,13 +140,11 @@ public class VerificationSubmissionModalViewImpl
   public VerificationSubmissionModalViewImpl(
     Binder binder,
     CellFactory cellFactory,
-    SynapseProperties synapseProperties,
-    SynapseReactClientFullContextPropsProvider propsProvider
+    SynapseProperties synapseProperties
   ) {
     widget = binder.createAndBindUi(this);
     this.cellFactory = cellFactory;
     this.synapseProperties = synapseProperties;
-    this.propsProvider = propsProvider;
 
     // click handlers
     submitButton.addClickHandler(event -> {
@@ -391,8 +387,7 @@ public class VerificationSubmissionModalViewImpl
     promptModalV2.render(
       React.createElementWithSynapseContext(
         SRC.SynapseComponents.RejectProfileValidationRequestModal,
-        props,
-        propsProvider.getJsInteropContextProps()
+        props
       )
     );
   }

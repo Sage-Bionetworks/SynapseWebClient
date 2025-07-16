@@ -23,7 +23,7 @@ public class EntityTypeIconImpl
   @Override
   public void configure(EntityType type) {
     EntityTypeIconProps props = EntityTypeIconProps.create(type);
-    ReactElement component = React.createElementWithThemeContext(
+    ReactElement component = React.createElementWithSynapseContext(
       SRC.SynapseComponents.EntityTypeIcon,
       props
     );

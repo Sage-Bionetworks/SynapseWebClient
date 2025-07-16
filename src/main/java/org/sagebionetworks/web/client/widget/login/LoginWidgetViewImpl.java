@@ -9,7 +9,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.LoginPageProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
@@ -36,21 +35,18 @@ public class LoginWidgetViewImpl implements LoginWidgetView, IsWidget {
   SynapseJSNIUtils jsniUtils;
   GlobalApplicationState globalAppState;
   AuthenticationController authController;
-  SynapseReactClientFullContextPropsProvider propsProvider;
 
   @Inject
   public LoginWidgetViewImpl(
     LoginWidgetViewImplUiBinder binder,
     SynapseJSNIUtils jsniUtils,
     GlobalApplicationState globalAppState,
-    AuthenticationController authController,
-    SynapseReactClientFullContextPropsProvider propsProvider
+    AuthenticationController authController
   ) {
     widget = binder.createAndBindUi(this);
     this.jsniUtils = jsniUtils;
     this.globalAppState = globalAppState;
     this.authController = authController;
-    this.propsProvider = propsProvider;
     widget.addAttachHandler(event -> {
       if (event.isAttached()) {
         LoginPageProps props = LoginPageProps.create(
@@ -60,8 +56,7 @@ public class LoginWidgetViewImpl implements LoginWidgetView, IsWidget {
         );
         ReactElement component = React.createElementWithSynapseContext(
           SRC.SynapseComponents.LoginPage,
-          props,
-          propsProvider.getJsInteropContextProps()
+          props
         );
         srcLoginContainer.render(component);
       }

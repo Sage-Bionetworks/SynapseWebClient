@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.table.explore;
 
-import java.util.Map;
-import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.CardConfiguration;
 import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps;
 import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnQueryCallback;
@@ -16,7 +14,6 @@ import org.sagebionetworks.web.client.widget.ReactComponent;
 public class QueryWrapperPlotNav extends ReactComponent {
 
   public QueryWrapperPlotNav(
-    SynapseReactClientFullContextPropsProvider contextPropsProvider,
     String sql,
     String initQueryJson,
     OnQueryCallback onQueryChange,
@@ -49,8 +46,7 @@ public class QueryWrapperPlotNav extends ReactComponent {
 
     ReactElement component = React.createElementWithSynapseContext(
       SRC.SynapseComponents.QueryWrapperPlotNav,
-      props,
-      contextPropsProvider.getJsInteropContextProps()
+      props
     );
     this.render(component);
   }

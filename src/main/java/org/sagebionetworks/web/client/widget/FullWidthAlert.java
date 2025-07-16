@@ -60,7 +60,7 @@ public class FullWidthAlert implements IsWidget {
       isGlobal,
       alertType
     );
-    ReactElement component = React.createElementWithThemeContext(
+    ReactElement component = React.createElementWithSynapseContext(
       SRC.SynapseComponents.FullWidthAlert,
       props
     );

@@ -5,7 +5,6 @@ import com.google.inject.Inject;
 import java.util.List;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.AvailableEvaluationQueueListProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
@@ -14,15 +13,11 @@ import org.sagebionetworks.web.client.widget.ReactComponent;
 
 public class EvaluationListViewImpl implements EvaluationListView {
 
-  SynapseReactClientFullContextPropsProvider propsProvider;
   ReactComponent reactContainer;
   Presenter presenter;
 
   @Inject
-  public EvaluationListViewImpl(
-    SynapseReactClientFullContextPropsProvider propsProvider
-  ) {
-    this.propsProvider = propsProvider;
+  public EvaluationListViewImpl() {
     reactContainer = new ReactComponent();
   }
 
@@ -36,8 +31,7 @@ public class EvaluationListViewImpl implements EvaluationListView {
         evaluation -> {
           presenter.onChangeSelectedEvaluation(evaluation);
         }
-      ),
-      propsProvider.getJsInteropContextProps()
+      )
     );
     reactContainer.render(element);
   }

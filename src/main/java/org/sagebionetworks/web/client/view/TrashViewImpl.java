@@ -6,7 +6,6 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.trash.TrashCanList;
 
@@ -28,10 +27,8 @@ public class TrashViewImpl extends Composite implements TrashView {
   }
 
   @Override
-  public void createReactComponentWidget(
-    SynapseReactClientFullContextPropsProvider propsProvider
-  ) {
-    TrashCanList component = new TrashCanList(propsProvider);
+  public void createReactComponentWidget() {
+    TrashCanList component = new TrashCanList();
     componentContainer.clear();
     componentContainer.add(component);
   }

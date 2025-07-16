@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.table.modal.fileview;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.CreateTableViewWizardProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
@@ -12,27 +11,21 @@ import org.sagebionetworks.web.client.widget.ReactComponent;
 
 public class CreateTableViewWizard implements IsWidget {
 
-  private final SynapseReactClientFullContextPropsProvider propsProvider;
-
   private final ReactComponent reactComponent;
   private String parentId;
   private CreateTableViewWizardProps.OnComplete onComplete;
   private CreateTableViewWizardProps.OnCancel onCancel;
 
   @Inject
-  public CreateTableViewWizard(
-    SynapseReactClientFullContextPropsProvider propsProvider
-  ) {
+  public CreateTableViewWizard() {
     super();
-    this.propsProvider = propsProvider;
     reactComponent = new ReactComponent();
   }
 
   private void renderComponent(CreateTableViewWizardProps props) {
     ReactElement reactElement = React.createElementWithSynapseContext(
       SRC.SynapseComponents.CreateTableViewWizard,
-      props,
-      propsProvider.getJsInteropContextProps()
+      props
     );
     reactComponent.render(reactElement);
   }

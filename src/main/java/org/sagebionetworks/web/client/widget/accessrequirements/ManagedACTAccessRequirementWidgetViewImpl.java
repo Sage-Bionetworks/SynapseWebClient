@@ -19,7 +19,6 @@ import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.AccessRequirementListProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.SRC;
@@ -131,7 +130,6 @@ public class ManagedACTAccessRequirementWidgetViewImpl
   @UiField
   Div subjectsDefinedInAccessRequirementUI;
 
-  private final SynapseReactClientFullContextPropsProvider propsProvider;
   Callback onAttachCallback;
   public static final String DEFAULT_AR_DESCRIPTION = "these data";
 
@@ -144,11 +142,9 @@ public class ManagedACTAccessRequirementWidgetViewImpl
   @Inject
   public ManagedACTAccessRequirementWidgetViewImpl(
     Binder binder,
-    GlobalApplicationState globalAppState,
-    SynapseReactClientFullContextPropsProvider propsProvider
+    GlobalApplicationState globalAppState
   ) {
     this.w = binder.createAndBindUi(this);
-    this.propsProvider = propsProvider;
     cancelRequestButton.addClickHandler(event -> {
       presenter.onCancelRequest();
     });
@@ -403,8 +399,7 @@ public class ManagedACTAccessRequirementWidgetViewImpl
     requestDataAccessWidget.render(
       React.createElementWithSynapseContext(
         SRC.SynapseComponents.AccessRequirementList,
-        props,
-        propsProvider.getJsInteropContextProps()
+        props
       )
     );
   }

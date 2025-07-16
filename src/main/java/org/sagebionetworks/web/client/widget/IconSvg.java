@@ -24,7 +24,7 @@ public class IconSvg extends ReactComponent {
 
   private void renderComponent() {
     IconSvgProps props = IconSvgProps.create(icon, label);
-    ReactElement component = React.createElementWithThemeContext(
+    ReactElement component = React.createElementWithSynapseContext(
       SRC.SynapseComponents.IconSvg,
       props
     );

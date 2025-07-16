@@ -5,9 +5,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.SynapseProperties;
-import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.PageProgressProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
@@ -25,20 +22,11 @@ public class PageProgressWidgetViewImpl
   ReactComponent srcContainer;
 
   Widget widget;
-  SynapseJSNIUtils jsniUtils;
-  SynapseReactClientFullContextPropsProvider propsProvider;
   boolean isConfigured = false;
 
   @Inject
-  public PageProgressWidgetViewImpl(
-    PageProgressWidgetViewImplUiBinder binder,
-    SynapseJSNIUtils jsniUtils,
-    SynapseProperties synapseProperties,
-    SynapseReactClientFullContextPropsProvider propsProvider
-  ) {
+  public PageProgressWidgetViewImpl(PageProgressWidgetViewImplUiBinder binder) {
     widget = binder.createAndBindUi(this);
-    this.jsniUtils = jsniUtils;
-    this.propsProvider = propsProvider;
   }
 
   @Override
@@ -62,8 +50,7 @@ public class PageProgressWidgetViewImpl
     );
     ReactElement component = React.createElementWithSynapseContext(
       SRC.SynapseComponents.PageProgress,
-      props,
-      propsProvider.getJsInteropContextProps()
+      props
     );
     srcContainer.render(component);
     isConfigured = true;

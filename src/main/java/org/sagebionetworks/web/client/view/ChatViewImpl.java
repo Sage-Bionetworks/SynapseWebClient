@@ -3,8 +3,6 @@ package org.sagebionetworks.web.client.view;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.inject.Inject;
-import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
@@ -17,18 +15,10 @@ public class ChatViewImpl extends Composite implements ChatView {
   ReactComponent container;
 
   private Header headerWidget;
-  private SynapseReactClientFullContextPropsProvider propsProvider;
-  private GlobalApplicationState globalAppState;
 
   @Inject
-  public ChatViewImpl(
-    Header headerWidget,
-    final SynapseReactClientFullContextPropsProvider propsProvider,
-    GlobalApplicationState globalAppState
-  ) {
+  public ChatViewImpl(Header headerWidget) {
     this.headerWidget = headerWidget;
-    this.propsProvider = propsProvider;
-    this.globalAppState = globalAppState;
     headerWidget.configure();
     container = new ReactComponent();
     initWidget(container);
@@ -50,8 +40,7 @@ public class ChatViewImpl extends Composite implements ChatView {
     );
     ReactElement component = React.createElementWithSynapseContext(
       SRC.SynapseComponents.SynapseChat,
-      props,
-      propsProvider.getJsInteropContextProps()
+      props
     );
 
     container.render(component);

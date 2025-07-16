@@ -19,7 +19,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.CookieNotificationProps;
 import org.sagebionetworks.web.client.jsinterop.EmptyProps;
 import org.sagebionetworks.web.client.jsinterop.React;
@@ -75,19 +74,16 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 
   private Presenter presenter;
   String portalHref = "";
-  SynapseReactClientFullContextPropsProvider propsProvider;
   PortalGinInjector ginInjector;
 
   @Inject
   public HeaderViewImpl(
     Binder binder,
-    SynapseReactClientFullContextPropsProvider propsProvider,
     PortalGinInjector ginInjector,
     OrientationBanner donationBanner
   ) {
     this.initWidget(binder.createAndBindUi(this));
     this.ginInjector = ginInjector;
-    this.propsProvider = propsProvider;
     nihNotificationAlert.setOnClose(() -> {
       presenter.onNIHNotificationDismissed();
     });
@@ -113,8 +109,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
     });
     ReactElement component = React.createElementWithSynapseContext(
       SRC.SynapseComponents.CookiesNotification,
-      props,
-      propsProvider.getJsInteropContextProps()
+      props
     );
     cookieNotificationContainer.render(component);
 
@@ -128,8 +123,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
     EmptyProps props = EmptyProps.create();
     ReactElement component = React.createElementWithSynapseContext(
       SRC.SynapseComponents.GoogleAnalytics,
-      props,
-      propsProvider.getJsInteropContextProps()
+      props
     );
     googleAnalyticsContainer.render(component);
   }
@@ -147,8 +141,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
     );
     ReactElement component = React.createElementWithSynapseContext(
       SRC.SynapseComponents.SynapseNavDrawer,
-      props,
-      propsProvider.getJsInteropContextProps()
+      props
     );
     synapseNavDrawerContainer.render(component);
   }

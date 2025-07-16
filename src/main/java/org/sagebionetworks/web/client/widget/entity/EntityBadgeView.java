@@ -20,10 +20,7 @@ public interface EntityBadgeView extends IsWidget, SupportsLazyLoadInterface {
 
   void setMd5(String s);
 
-  void setIcons(
-    EntityBadgeIconsProps props,
-    SynapseReactClientFullContextProviderProps contextProps
-  );
+  void setIcons(EntityBadgeIconsProps props);
 
   void setError(String error);
 

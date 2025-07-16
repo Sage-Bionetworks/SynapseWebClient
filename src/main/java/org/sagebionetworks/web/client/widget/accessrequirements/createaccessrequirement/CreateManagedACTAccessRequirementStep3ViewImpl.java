@@ -4,7 +4,6 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.AccessRequirementAclEditorHandler;
 import org.sagebionetworks.web.client.jsinterop.AccessRequirementAclEditorProps;
 import org.sagebionetworks.web.client.jsinterop.React;
@@ -26,16 +25,11 @@ public class CreateManagedACTAccessRequirementStep3ViewImpl
 
   ReactRef<AccessRequirementAclEditorHandler> componentRef;
 
-  SynapseReactClientFullContextPropsProvider propsProvider;
   Presenter presenter;
 
   @Inject
-  public CreateManagedACTAccessRequirementStep3ViewImpl(
-    Binder binder,
-    SynapseReactClientFullContextPropsProvider propsProvider
-  ) {
+  public CreateManagedACTAccessRequirementStep3ViewImpl(Binder binder) {
     widget = binder.createAndBindUi(this);
-    this.propsProvider = propsProvider;
   }
 
   @Override
@@ -50,8 +44,7 @@ public class CreateManagedACTAccessRequirementStep3ViewImpl
           presenter.onSaveComplete(saveSuccessful);
         },
         componentRef
-      ),
-      propsProvider.getJsInteropContextProps()
+      )
     );
     reactContainer.render(element);
   }

@@ -23,7 +23,7 @@ public class PortalBannersWidget extends ReactComponent {
     SynapsePortalBannersProps props = SynapsePortalBannersProps.create(
       entityId
     );
-    ReactElement component = React.createElementWithThemeContext(
+    ReactElement component = React.createElementWithSynapseContext(
       SRC.SynapseComponents.SynapsePortalBanners,
       props
     );

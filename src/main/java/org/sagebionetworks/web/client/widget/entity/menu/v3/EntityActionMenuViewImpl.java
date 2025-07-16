@@ -5,7 +5,6 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
@@ -15,19 +14,13 @@ import org.sagebionetworks.web.client.widget.ReactComponent;
 
 public class EntityActionMenuViewImpl implements EntityActionMenuView {
 
-  private final SynapseReactClientFullContextPropsProvider propsProvider;
-
   private final FlowPanel panel = new FlowPanel();
   private final ReactComponent menuComponent = new ReactComponent();
   private final ReactComponent loaderComponent = new ReactComponent();
   private final SimplePanel controllerWidgetContainer = new SimplePanel();
 
   @Inject
-  private EntityActionMenuViewImpl(
-    SynapseReactClientFullContextPropsProvider propsProvider
-  ) {
-    this.propsProvider = propsProvider;
-
+  private EntityActionMenuViewImpl() {
     renderLoaderComponent();
 
     panel.add(menuComponent);
@@ -54,8 +47,7 @@ public class EntityActionMenuViewImpl implements EntityActionMenuView {
   private void renderMenuComponent(EntityActionMenuPropsJsInterop props) {
     ReactElement node = React.createElementWithSynapseContext(
       SRC.SynapseComponents.EntityActionMenu,
-      props,
-      propsProvider.getJsInteropContextProps()
+      props
     );
     menuComponent.render(node);
   }
@@ -63,8 +55,7 @@ public class EntityActionMenuViewImpl implements EntityActionMenuView {
   private void renderLoaderComponent() {
     ReactElement node = React.createElementWithSynapseContext(
       SRC.SynapseComponents.SkeletonButton,
-      SkeletonButtonProps.create("Tools Menu Placeholder"),
-      propsProvider.getJsInteropContextProps()
+      SkeletonButtonProps.create("Tools Menu Placeholder")
     );
     loaderComponent.render(node);
   }

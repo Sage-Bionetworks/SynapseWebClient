@@ -281,14 +281,10 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
   }
 
   @Override
-  public void setIcons(
-    EntityBadgeIconsProps props,
-    SynapseReactClientFullContextProviderProps providerProps
-  ) {
+  public void setIcons(EntityBadgeIconsProps props) {
     ReactElement reactElement = React.createElementWithSynapseContext(
       SRC.SynapseComponents.EntityBadgeIcons,
-      props,
-      providerProps
+      props
     );
 
     iconsContainer.render(reactElement);

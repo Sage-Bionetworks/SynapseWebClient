@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.accessrequirements;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import org.sagebionetworks.repo.model.request.ReferenceList;
-import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.EntityHeaderTableProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
@@ -13,15 +12,11 @@ import org.sagebionetworks.web.client.widget.ReactComponent;
 public class EntitySubjectsWidgetViewImpl implements EntitySubjectsWidgetView {
 
   ReactComponent reactContainer;
-  SynapseReactClientFullContextPropsProvider propsProvider;
   Presenter presenter;
 
   @Inject
-  public EntitySubjectsWidgetViewImpl(
-    SynapseReactClientFullContextPropsProvider propsProvider
-  ) {
+  public EntitySubjectsWidgetViewImpl() {
     reactContainer = new ReactComponent();
-    this.propsProvider = propsProvider;
   }
 
   @Override
@@ -56,8 +51,7 @@ public class EntitySubjectsWidgetViewImpl implements EntitySubjectsWidgetView {
         newEntityIDsValue -> {
           presenter.onChangeEntityIDsValue(newEntityIDsValue);
         }
-      ),
-      propsProvider.getJsInteropContextProps()
+      )
     );
     reactContainer.render(element);
   }

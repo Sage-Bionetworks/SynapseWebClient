@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.view;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.inject.Inject;
-import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.GovernanceMarkdownGithubProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
@@ -16,17 +15,12 @@ public class TrustCenterViewImpl extends Composite implements TrustCenterView {
   ReactComponent container = new ReactComponent();
 
   private Header headerWidget;
-  private SynapseReactClientFullContextPropsProvider propsProvider;
 
   @Inject
-  public TrustCenterViewImpl(
-    Header headerWidget,
-    final SynapseReactClientFullContextPropsProvider propsProvider
-  ) {
+  public TrustCenterViewImpl(Header headerWidget) {
     initWidget(container);
 
     this.headerWidget = headerWidget;
-    this.propsProvider = propsProvider;
     headerWidget.configure();
   }
 
@@ -49,8 +43,7 @@ public class TrustCenterViewImpl extends Composite implements TrustCenterView {
     component =
       React.createElementWithSynapseContext(
         SRC.SynapseComponents.GovernanceMarkdownGithub,
-        props,
-        propsProvider.getJsInteropContextProps()
+        props
       );
 
     container.render(component);

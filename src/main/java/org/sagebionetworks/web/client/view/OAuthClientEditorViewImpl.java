@@ -6,7 +6,6 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.oauthclient.OAuthClientEditor;
 
@@ -21,23 +20,20 @@ public class OAuthClientEditorViewImpl
   SimplePanel componentContainer;
 
   private Header headerWidget;
-  private SynapseReactClientFullContextPropsProvider propsProvider;
 
   @Inject
   public OAuthClientEditorViewImpl(
     OAuthClientEditorViewImplUiBinder binder,
-    Header headerWidget,
-    SynapseReactClientFullContextPropsProvider propsProvider
+    Header headerWidget
   ) {
     initWidget(binder.createAndBindUi(this));
     this.headerWidget = headerWidget;
-    this.propsProvider = propsProvider;
     headerWidget.configure();
   }
 
   @Override
   public void createReactComponentWidget() {
-    OAuthClientEditor component = new OAuthClientEditor(this.propsProvider);
+    OAuthClientEditor component = new OAuthClientEditor();
     componentContainer.clear();
     componentContainer.add(component);
   }

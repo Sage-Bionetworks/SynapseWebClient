@@ -6,7 +6,6 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.EmptyProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
@@ -23,19 +22,15 @@ public class FollowingPageViewImpl
 
   Header headerWidget;
 
-  SynapseReactClientFullContextPropsProvider propsProvider;
-
   public interface LoginViewImplBinder
     extends UiBinder<Widget, FollowingPageViewImpl> {}
 
   @Inject
   public FollowingPageViewImpl(
     LoginViewImplBinder uiBinder,
-    Header headerWidget,
-    SynapseReactClientFullContextPropsProvider propsProvider
+    Header headerWidget
   ) {
     initWidget(uiBinder.createAndBindUi(this));
-    this.propsProvider = propsProvider;
     this.headerWidget = headerWidget;
     configure();
   }
@@ -63,8 +58,7 @@ public class FollowingPageViewImpl
     headerWidget.configure();
     ReactElement element = React.createElementWithSynapseContext(
       SRC.SynapseComponents.SubscriptionPage,
-      EmptyProps.create(),
-      propsProvider.getJsInteropContextProps()
+      EmptyProps.create()
     );
     reactContainer.render(element);
   }

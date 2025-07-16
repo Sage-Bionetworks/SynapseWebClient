@@ -10,7 +10,6 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.ForumSearchProps.OnSearchResultsVisibleHandler;
 
 public class ForumWidgetViewImpl implements ForumWidgetView {
@@ -74,18 +73,13 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
   Div newThreadButtonFlexContainer;
 
   private Presenter presenter;
-  private SynapseReactClientFullContextPropsProvider propsProvider;
   Widget widget;
 
   public interface Binder extends UiBinder<Widget, ForumWidgetViewImpl> {}
 
   @Inject
-  public ForumWidgetViewImpl(
-    Binder binder,
-    SynapseReactClientFullContextPropsProvider propsProvider
-  ) {
+  public ForumWidgetViewImpl(Binder binder) {
     widget = binder.createAndBindUi(this);
-    this.propsProvider = propsProvider;
     newThreadButton.addClickHandler(event -> {
       presenter.onClickNewThread();
     });
@@ -228,7 +222,6 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
       setSearchResultsVisible(visible);
     };
     ForumSearchWrapper widget = new ForumSearchWrapper(
-      propsProvider,
       forumId,
       projectId,
       onSearchUIVisible
@@ -245,7 +238,6 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
   @Override
   public void configureDiscussionThread(String threadId, int limit) {
     DiscussionThreadViewImpl widget = new DiscussionThreadViewImpl(
-      propsProvider,
       threadId,
       limit
     );

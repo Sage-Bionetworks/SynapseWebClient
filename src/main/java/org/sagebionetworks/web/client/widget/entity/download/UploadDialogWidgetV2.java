@@ -6,7 +6,6 @@ import com.google.inject.Inject;
 import elemental2.dom.DomGlobal;
 import elemental2.dom.FileList;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.jsinterop.EntityUploadHandle;
 import org.sagebionetworks.web.client.jsinterop.EntityUploadModalProps;
@@ -19,7 +18,6 @@ public class UploadDialogWidgetV2 extends Widget {
 
   private final GlobalApplicationState globalApplicationState;
   private final EventBus eventBus;
-  private final SynapseReactClientFullContextPropsProvider contextProvider;
   private int keyCounter = 0;
 
   private final ReactComponent reactComponent;
@@ -30,12 +28,10 @@ public class UploadDialogWidgetV2 extends Widget {
   @Inject
   public UploadDialogWidgetV2(
     GlobalApplicationState globalApplicationState,
-    EventBus eventBus,
-    SynapseReactClientFullContextPropsProvider contextProvider
+    EventBus eventBus
   ) {
     this.globalApplicationState = globalApplicationState;
     this.eventBus = eventBus;
-    this.contextProvider = contextProvider;
     this.reactComponent = new ReactComponent();
   }
 
@@ -59,8 +55,7 @@ public class UploadDialogWidgetV2 extends Widget {
     reactComponent.render(
       React.createElementWithSynapseContext(
         SRC.SynapseComponents.EntityUploadModal,
-        props,
-        contextProvider.getJsInteropContextProps()
+        props
       )
     );
   }

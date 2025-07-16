@@ -8,7 +8,6 @@ import com.google.inject.Inject;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.EvaluationCardProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
@@ -23,7 +22,6 @@ public class AdministerEvaluationsListViewImpl
     extends UiBinder<Widget, AdministerEvaluationsListViewImpl> {}
 
   private EvaluationActionHandler presenter;
-  private SynapseReactClientFullContextPropsProvider contextPropsProvider;
 
   @UiField
   Div rows;
@@ -37,12 +35,10 @@ public class AdministerEvaluationsListViewImpl
   @Inject
   public AdministerEvaluationsListViewImpl(
     Binder binder,
-    PortalGinInjector ginInjector,
-    final SynapseReactClientFullContextPropsProvider contextPropsProvider
+    PortalGinInjector ginInjector
   ) {
     this.ginInjector = ginInjector;
     widget = binder.createAndBindUi(this);
-    this.contextPropsProvider = contextPropsProvider;
   }
 
   @Override
@@ -83,8 +79,7 @@ public class AdministerEvaluationsListViewImpl
 
     ReactElement element = React.createElementWithSynapseContext(
       SRC.SynapseComponents.EvaluationCard,
-      props,
-      contextPropsProvider.getJsInteropContextProps()
+      props
     );
     container.render(element);
   }

@@ -35,9 +35,7 @@ import org.sagebionetworks.repo.model.verification.VerificationSubmission;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
-import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.RejectProfileValidationRequestModalProps;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -85,12 +83,6 @@ public class VerificationSubmissionWidgetTest {
 
   @Mock
   GWTWrapper mockGWT;
-
-  @Mock
-  SynapseReactClientFullContextPropsProvider mockPropsProvider;
-
-  @Mock
-  SynapseProperties mockSynapseProperties;
 
   @Mock
   HashMap<String, WikiPageKey> mockWikiPageMap;
@@ -144,9 +136,7 @@ public class VerificationSubmissionWidgetTest {
         mockSynapseAlert,
         mockFileHandleList,
         mockGlobalApplicationState,
-        mockGWT,
-        mockPropsProvider,
-        mockSynapseProperties
+        mockGWT
       );
 
     when(mockGWT.getHostPageBaseURL()).thenReturn(hostPageURL);

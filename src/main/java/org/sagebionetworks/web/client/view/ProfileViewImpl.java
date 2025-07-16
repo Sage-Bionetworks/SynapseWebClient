@@ -15,7 +15,6 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import java.util.Arrays;
-import java.util.Collections;
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
@@ -37,7 +36,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.jsinterop.EmptyProps;
 import org.sagebionetworks.web.client.jsinterop.React;
@@ -233,7 +231,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
   AnchorListItem loadingTeamsListItem = new AnchorListItem("Loading...");
 
   CookieProvider cookies;
-  SynapseReactClientFullContextPropsProvider propsProvider;
   JSONObjectAdapter jsonObjectAdapter;
 
   @Inject
@@ -241,14 +238,12 @@ public class ProfileViewImpl extends Composite implements ProfileView {
     ProfileViewImplUiBinder binder,
     Header headerWidget,
     CookieProvider cookies,
-    SynapseReactClientFullContextPropsProvider propsProvider,
     OrientationBanner orientationBanner,
     JSONObjectAdapter jsonObjectAdapter
   ) {
     initWidget(binder.createAndBindUi(this));
     this.headerWidget = headerWidget;
     this.cookies = cookies;
-    this.propsProvider = propsProvider;
     this.orientationBanner = orientationBanner;
     this.jsonObjectAdapter = jsonObjectAdapter;
     headerWidget.configure();
@@ -646,8 +641,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
       EmptyProps props = EmptyProps.create();
       ReactElement component = React.createElementWithSynapseContext(
         SRC.SynapseComponents.FavoritesPage,
-        props,
-        propsProvider.getJsInteropContextProps()
+        props
       );
       favoritesTabContainer.render(component);
 
