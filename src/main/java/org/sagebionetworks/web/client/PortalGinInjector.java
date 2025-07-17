@@ -6,6 +6,7 @@ import com.google.gwt.inject.client.Ginjector;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.context.QueryClientProvider;
+import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.presenter.ACTAccessApprovalsPresenter;
 import org.sagebionetworks.web.client.presenter.ACTDataAccessSubmissionDashboardPresenter;
@@ -902,4 +903,5 @@ public interface PortalGinInjector extends Ginjector {
   ChatPresenter getChatPresenter();
   PlansPresenter getPlansPresenter();
   ProjectDataAvailability getProjectDataAvailability();
+  SynapseReactClientFullContextPropsProvider getReactContextPropsProvider();
 }

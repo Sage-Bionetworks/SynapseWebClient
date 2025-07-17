@@ -212,6 +212,9 @@ public class Portal implements EntryPoint {
                                         ginjector
                                           .getWebStorageMaxSizeDetector()
                                           .start();
+
+                                        // SWC-7004: Update global store with current React context
+                                        globalApplicationState.synchronizeReactContextWithGlobalStore();
                                       }
                                     }
                                   );
