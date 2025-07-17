@@ -248,6 +248,11 @@ a:focus {
             color: $synapse-dark-text;
           }
         }
+        .portal-banners-widget {
+          a:not(.btn) {
+            color: $synapse-blue;
+          }
+        }
       }
       button.toolsMenuButton,
       .dropdown.open,
