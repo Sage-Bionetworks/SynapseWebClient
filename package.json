@@ -14,6 +14,7 @@
     "bootstrap3": "npm:bootstrap@3.4.1",
     "croppie": "2.6.5",
     "font-awesome": "4.7.0",
+    "jotai": "^2.12.5",
     "jquery": "3.7.1",
     "jquery-ui": "1.13.3",
     "jsplumb": "2.13.2",

@@ -22,10 +22,7 @@ import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.OneSageUtils;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.jsinterop.AccountLevelBadgesProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
@@ -121,23 +118,14 @@ public class UserProfileWidgetViewImpl implements UserProfileWidgetView {
 
   private Widget widget;
 
-  SynapseJSNIUtils jsniUtils;
-  SynapseReactClientFullContextPropsProvider propsProvider;
-  CookieProvider cookies;
   SynapseJavascriptClient jsClient;
 
   @Inject
   public UserProfileWidgetViewImpl(
     Binder binder,
-    SynapseJSNIUtils jsniUtils,
-    SynapseReactClientFullContextPropsProvider propsProvider,
-    CookieProvider cookies,
     SynapseJavascriptClient jsClient,
     OneSageUtils oneSageUtils
   ) {
-    this.jsniUtils = jsniUtils;
-    this.propsProvider = propsProvider;
-    this.cookies = cookies;
     this.jsClient = jsClient;
     widget = binder.createAndBindUi(this);
     editProfileButton.addClickHandler(event -> {
@@ -256,8 +244,7 @@ public class UserProfileWidgetViewImpl implements UserProfileWidgetView {
     ReactElement accountLevelBadgesComponent =
       React.createElementWithSynapseContext(
         SRC.SynapseComponents.AccountLevelBadges,
-        AccountLevelBadgesProps.create(userId),
-        propsProvider.getJsInteropContextProps()
+        AccountLevelBadgesProps.create(userId)
       );
     accountLevelBadgesContainer.render(accountLevelBadgesComponent);
     setAccountTypeVisibility(Long.parseLong(userId));
@@ -265,8 +252,7 @@ public class UserProfileWidgetViewImpl implements UserProfileWidgetView {
     UserProfileLinksProps props = UserProfileLinksProps.create(userId);
     ReactElement profileLinksComponent = React.createElementWithSynapseContext(
       SRC.SynapseComponents.UserProfileLinks,
-      props,
-      propsProvider.getJsInteropContextProps()
+      props
     );
     userProfileLinksReactComponentContainer.render(profileLinksComponent);
   }

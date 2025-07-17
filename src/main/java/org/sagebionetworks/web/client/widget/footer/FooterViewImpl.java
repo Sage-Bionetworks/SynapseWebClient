@@ -8,7 +8,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
@@ -24,16 +23,10 @@ public class FooterViewImpl implements FooterView, IsWidget {
 
   String portalVersion, repoVersion, srcVersion;
   PortalGinInjector ginInjector;
-  SynapseReactClientFullContextPropsProvider propsProvider;
 
   @Inject
-  public FooterViewImpl(
-    PortalGinInjector ginInjector,
-    GWTWrapper gwt,
-    SynapseReactClientFullContextPropsProvider propsProvider
-  ) {
+  public FooterViewImpl(PortalGinInjector ginInjector, GWTWrapper gwt) {
     this.ginInjector = ginInjector;
-    this.propsProvider = propsProvider;
     // defer constructing this view (to give a chance for other page components to load first)
     Callback constructViewCallback = () -> {
       wrapper.add(container);
@@ -93,8 +86,7 @@ public class FooterViewImpl implements FooterView, IsWidget {
       );
       ReactElement component = React.createElementWithSynapseContext(
         SRC.SynapseComponents.SynapseFooter,
-        props,
-        propsProvider.getJsInteropContextProps()
+        props
       );
       container.render(component);
     }

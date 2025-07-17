@@ -6,7 +6,6 @@ import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.DownloadConfirmationProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
@@ -15,8 +14,6 @@ import org.sagebionetworks.web.client.widget.ReactComponent;
 
 public class AddToDownloadListV2Impl implements AddToDownloadListV2 {
 
-  private SynapseReactClientFullContextPropsProvider propsProvider;
-
   ReactComponent container = new ReactComponent();
 
   String queryBundleRequestJson;
@@ -24,11 +21,7 @@ public class AddToDownloadListV2Impl implements AddToDownloadListV2 {
   JSONObjectAdapter adapter;
 
   @Inject
-  public AddToDownloadListV2Impl(
-    SynapseReactClientFullContextPropsProvider propsProvider,
-    JSONObjectAdapter adapter
-  ) {
-    this.propsProvider = propsProvider;
+  public AddToDownloadListV2Impl(JSONObjectAdapter adapter) {
     this.adapter = adapter;
   }
 
@@ -74,8 +67,7 @@ public class AddToDownloadListV2Impl implements AddToDownloadListV2 {
     );
     ReactElement component = React.createElementWithSynapseContext(
       SRC.SynapseComponents.DownloadConfirmation,
-      editorProps,
-      propsProvider.getJsInteropContextProps()
+      editorProps
     );
     container.render(component);
   }

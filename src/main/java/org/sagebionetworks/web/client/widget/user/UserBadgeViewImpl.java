@@ -20,7 +20,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.MenuAction;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
@@ -47,7 +46,6 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
   boolean showCardOnHover = true;
   AdapterFactory adapterFactory;
   SynapseJSNIUtils jsniUtils;
-  SynapseReactClientFullContextPropsProvider propsProvider;
   BadgeType badgeType = BadgeType.SMALL_CARD;
   AvatarSize avatarSize = AvatarSize.MEDIUM;
   FocusPanel userBadgeContainer = new FocusPanel();
@@ -61,14 +59,12 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
     GlobalApplicationState globalAppState,
     SynapseJSNIUtils jsniUtils,
     AdapterFactory adapterFactory,
-    AuthenticationController authController,
-    final SynapseReactClientFullContextPropsProvider propsProvider
+    AuthenticationController authController
   ) {
     placeChanger = globalAppState.getPlaceChanger();
     this.adapterFactory = adapterFactory;
     this.jsniUtils = jsniUtils;
     this.authController = authController;
-    this.propsProvider = propsProvider;
     setMarginRight(2);
     setMarginLeft(2);
     addStyleName("UserBadge");
@@ -120,8 +116,7 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 
     ReactElement component = React.createElementWithSynapseContext(
       SRC.SynapseComponents.UserCard,
-      props,
-      propsProvider.getJsInteropContextProps()
+      props
     );
     userBadgeReactDiv.render(component);
   }

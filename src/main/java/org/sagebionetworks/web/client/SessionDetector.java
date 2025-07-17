@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client;
 import com.google.inject.Inject;
 import java.util.Objects;
 import org.sagebionetworks.web.client.cache.ClientCache;
+import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 
 public class SessionDetector {

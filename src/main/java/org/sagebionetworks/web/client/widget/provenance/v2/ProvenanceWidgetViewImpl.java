@@ -4,7 +4,6 @@ import com.google.gwt.core.client.JavaScriptObject;
 import com.google.inject.Inject;
 import java.util.List;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.ProvenanceGraphProps;
 import org.sagebionetworks.web.client.jsinterop.ProvenanceGraphProps.OnUpdateJavaScriptObject;
 import org.sagebionetworks.web.client.jsinterop.React;
@@ -24,14 +23,9 @@ public class ProvenanceWidgetViewImpl
   OnUpdateJavaScriptObject nodesListener;
   OnUpdateJavaScriptObject edgesListener;
 
-  SynapseReactClientFullContextPropsProvider contextPropsProvider;
-
   @Inject
-  public ProvenanceWidgetViewImpl(
-    SynapseReactClientFullContextPropsProvider contextPropsProvider
-  ) {
+  public ProvenanceWidgetViewImpl() {
     addStyleName("overflowHidden");
-    this.contextPropsProvider = contextPropsProvider;
     this.nodesListener =
       jsObject -> {
         initialNodes = jsObject;
@@ -59,8 +53,7 @@ public class ProvenanceWidgetViewImpl
     );
     ReactElement component = React.createElementWithSynapseContext(
       SRC.SynapseComponents.ProvenanceGraph,
-      props,
-      contextPropsProvider.getJsInteropContextProps()
+      props
     );
     this.render(component);
   }

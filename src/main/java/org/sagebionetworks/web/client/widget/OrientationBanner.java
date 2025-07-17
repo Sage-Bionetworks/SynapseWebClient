@@ -43,7 +43,7 @@ public class OrientationBanner implements IsWidget {
       primaryButtonConfig,
       secondaryButtonConfig
     );
-    ReactElement component = React.createElementWithThemeContext(
+    ReactElement component = React.createElementWithSynapseContext(
       SRC.SynapseComponents.OrientationBanner,
       props
     );

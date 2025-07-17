@@ -12,7 +12,6 @@ import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.widget.FullWidthAlert;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.ReactComponent;
@@ -53,7 +52,6 @@ public class LoginViewImpl extends Composite implements LoginView {
   private LoginWidget loginWidget;
   private Header headerWidget;
   SynapseJSNIUtils jsniUtils;
-  SynapseReactClientFullContextPropsProvider propsProvider;
 
   public interface LoginViewImplBinder
     extends UiBinder<Widget, LoginViewImpl> {}
@@ -63,14 +61,12 @@ public class LoginViewImpl extends Composite implements LoginView {
     LoginViewImplBinder uiBinder,
     Header headerWidget,
     LoginWidget loginWidget,
-    SynapseJSNIUtils jsniUtils,
-    SynapseReactClientFullContextPropsProvider propsProvider
+    SynapseJSNIUtils jsniUtils
   ) {
     initWidget(uiBinder.createAndBindUi(this));
     this.loginWidget = loginWidget;
     this.headerWidget = headerWidget;
     this.jsniUtils = jsniUtils;
-    this.propsProvider = propsProvider;
     headerWidget.configure();
   }
 

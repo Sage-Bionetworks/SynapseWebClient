@@ -7,7 +7,6 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
@@ -24,20 +23,17 @@ public class HomeViewImpl extends Composite implements HomeView {
   ReactComponent container;
 
   private Header headerWidget;
-  private SynapseReactClientFullContextPropsProvider propsProvider;
   private GlobalApplicationState globalAppState;
 
   @Inject
   public HomeViewImpl(
     HomeViewImplUiBinder binder,
     Header headerWidget,
-    final SynapseReactClientFullContextPropsProvider propsProvider,
     GlobalApplicationState globalAppState
   ) {
     initWidget(binder.createAndBindUi(this));
 
     this.headerWidget = headerWidget;
-    this.propsProvider = propsProvider;
     this.globalAppState = globalAppState;
     headerWidget.configure();
   }
@@ -53,8 +49,7 @@ public class HomeViewImpl extends Composite implements HomeView {
     component =
       React.createElementWithSynapseContext(
         SRC.SynapseComponents.SynapseHomepageV2,
-        props,
-        propsProvider.getJsInteropContextProps()
+        props
       );
 
     container.render(component);

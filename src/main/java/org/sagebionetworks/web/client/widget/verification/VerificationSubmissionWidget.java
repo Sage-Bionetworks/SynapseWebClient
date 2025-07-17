@@ -19,9 +19,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
-import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -44,8 +42,6 @@ public class VerificationSubmissionWidget
   private final GlobalApplicationState globalAppState;
   private final PortalGinInjector ginInjector;
   private final GWTWrapper gwt;
-  private final SynapseReactClientFullContextPropsProvider propsProvider;
-  private final SynapseProperties synapseProperties;
   // this could be Reject or Suspend. We store this state while the reason is being collected from the
   // ACT user
   private VerificationStateEnum actRejectState;
@@ -61,9 +57,7 @@ public class VerificationSubmissionWidget
     SynapseAlert synAlert,
     FileHandleList fileHandleList,
     GlobalApplicationState globalAppState,
-    GWTWrapper gwt,
-    SynapseReactClientFullContextPropsProvider propsProvider,
-    SynapseProperties synapseProperties
+    GWTWrapper gwt
   ) {
     this.ginInjector = ginInjector;
     this.userProfileClient = userProfileClient;
@@ -72,8 +66,6 @@ public class VerificationSubmissionWidget
     this.fileHandleList = fileHandleList;
     this.globalAppState = globalAppState;
     this.gwt = gwt;
-    this.propsProvider = propsProvider;
-    this.synapseProperties = synapseProperties;
   }
 
   public void initView(boolean isModal) {

@@ -49,6 +49,9 @@ importers:
       font-awesome:
         specifier: 4.7.0
         version: 4.7.0
+      jotai:
+        specifier: ^2.12.5
+        version: 2.12.5(@types/react@19.1.8)(react@19.1.0)
       jquery:
         specifier: 3.7.1
         version: 3.7.1

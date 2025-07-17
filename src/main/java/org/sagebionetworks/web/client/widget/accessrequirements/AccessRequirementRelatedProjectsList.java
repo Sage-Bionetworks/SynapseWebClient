@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.accessrequirements;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.AccessRequirementRelatedProjectsListProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
@@ -16,16 +15,13 @@ public class AccessRequirementRelatedProjectsList implements IsWidget {
 
   ReactComponent container;
   public IsACTMemberAsyncHandler isACTMemberAsyncHandler;
-  public SynapseReactClientFullContextPropsProvider propsProvider;
 
   @Inject
   public AccessRequirementRelatedProjectsList(
-    IsACTMemberAsyncHandler isACTMemberAsyncHandler,
-    SynapseReactClientFullContextPropsProvider propsProvider
+    IsACTMemberAsyncHandler isACTMemberAsyncHandler
   ) {
     container = new ReactComponent();
     this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
-    this.propsProvider = propsProvider;
     container.setVisible(false);
   }
 
@@ -34,8 +30,7 @@ public class AccessRequirementRelatedProjectsList implements IsWidget {
       AccessRequirementRelatedProjectsListProps.create(accessRequirementId);
     ReactElement component = React.createElementWithSynapseContext(
       SRC.SynapseComponents.AccessRequirementRelatedProjectsList,
-      props,
-      propsProvider.getJsInteropContextProps()
+      props
     );
     container.render(component);
     showIfACTMember();

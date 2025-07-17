@@ -14,7 +14,6 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnQueryCallback;
 import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnQueryResultBundleCallback;
 import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnViewSharingSettingsHandler;
@@ -82,15 +81,13 @@ public class TableEntityWidgetViewImpl
   EntityViewScopeWidget scopeWidget;
   SubmissionViewScopeWidget submissionViewScopeWidget;
   TableEntityWidgetView.Presenter presenter;
-  SynapseReactClientFullContextPropsProvider propsProvider;
 
   @Inject
   public TableEntityWidgetViewImpl(
     final Binder uiBinder,
     PortalGinInjector ginInjector,
     EntityViewScopeWidget scopeWidget,
-    SubmissionViewScopeWidget submissionViewScopeWidget,
-    SynapseReactClientFullContextPropsProvider propsProvider
+    SubmissionViewScopeWidget submissionViewScopeWidget
   ) {
     initWidget(uiBinder.createAndBindUi(this));
     this.ginInjector = ginInjector;
@@ -100,7 +97,6 @@ public class TableEntityWidgetViewImpl
     this.submissionViewScopeWidget = submissionViewScopeWidget;
     this.scopePanel.add(scopeWidget.asWidget());
     this.scopePanel.add(submissionViewScopeWidget.asWidget());
-    this.propsProvider = propsProvider;
     schemaCollapseCloseButton.addClickHandler(event ->
       this.presenter.toggleSchemaCollapse()
     );
@@ -191,8 +187,7 @@ public class TableEntityWidgetViewImpl
     if (visible) {
       ReactElement component = React.createElementWithSynapseContext(
         SRC.SynapseComponents.DatasetItemsEditor,
-        this.presenter.getItemsEditorProps(),
-        propsProvider.getJsInteropContextProps()
+        this.presenter.getItemsEditorProps()
       );
       itemsEditorContainer.render(component);
     } else {
@@ -202,10 +197,7 @@ public class TableEntityWidgetViewImpl
 
   @Override
   public void configureTableOnly(String sql) {
-    StandaloneQueryWrapper widget = new StandaloneQueryWrapper(
-      propsProvider,
-      sql
-    );
+    StandaloneQueryWrapper widget = new StandaloneQueryWrapper(sql);
     plotNavContainer.clear();
     plotNavContainer.add(widget);
   }
@@ -220,7 +212,6 @@ public class TableEntityWidgetViewImpl
     boolean hideSqlEditorControl
   ) {
     QueryWrapperPlotNav plotNav = new QueryWrapperPlotNav(
-      propsProvider,
       sql,
       initQueryJson,
       onQueryChange,

@@ -11,7 +11,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.presenter.TrashPresenter;
 import org.sagebionetworks.web.client.view.TrashView;
@@ -25,9 +24,6 @@ public class TrashPresenterTest {
   TrashView mockView;
 
   @Mock
-  SynapseReactClientFullContextPropsProvider mockPropsProvider;
-
-  @Mock
   Trash mockPlace;
 
   @Mock
@@ -39,14 +35,14 @@ public class TrashPresenterTest {
   @Before
   public void setup() throws JSONObjectAdapterException {
     mockView = mock(TrashView.class);
-    presenter = new TrashPresenter(mockView, mockPropsProvider);
+    presenter = new TrashPresenter(mockView);
   }
 
   @Test
   public void testStart() {
     presenter.start(mockPanel, mockEventBus);
     verify(mockPanel).setWidget(mockView);
-    verify(mockView).createReactComponentWidget(mockPropsProvider);
+    verify(mockView).createReactComponentWidget();
   }
 
   @Test

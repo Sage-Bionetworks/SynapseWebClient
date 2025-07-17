@@ -15,9 +15,6 @@ import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.PopupUtilsView;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.EntityFinderProps;
 import org.sagebionetworks.web.client.jsinterop.EntityFinderScope;
 import org.sagebionetworks.web.client.jsinterop.React;
@@ -35,9 +32,7 @@ public class EntityFinderWidgetViewImpl implements EntityFinderWidgetView {
 
   private Presenter presenter;
 
-  private SynapseJSNIUtils jsniUtils;
   private SynapseAlert synAlert;
-  private SynapseReactClientFullContextPropsProvider contextPropsProvider;
 
   // the modal dialog
   private Modal modal;
@@ -64,18 +59,10 @@ public class EntityFinderWidgetViewImpl implements EntityFinderWidgetView {
   SimplePanel synAlertPanel;
 
   @Inject
-  public EntityFinderWidgetViewImpl(
-    Binder uiBinder,
-    SynapseJSNIUtils jsniUtils,
-    SynapseAlert synAlert,
-    final SynapseReactClientFullContextPropsProvider propsProvider,
-    final PopupUtilsView popupUtils
-  ) {
+  public EntityFinderWidgetViewImpl(Binder uiBinder, SynapseAlert synAlert) {
     this.modal = (Modal) uiBinder.createAndBindUi(this);
 
-    this.jsniUtils = jsniUtils;
     this.synAlert = synAlert;
-    this.contextPropsProvider = propsProvider;
 
     synAlertPanel.setWidget(synAlert);
 
@@ -158,8 +145,7 @@ public class EntityFinderWidgetViewImpl implements EntityFinderWidgetView {
 
     ReactElement component = React.createElementWithSynapseContext(
       SRC.SynapseComponents.EntityFinder,
-      props,
-      contextPropsProvider.getJsInteropContextProps()
+      props
     );
     entityFinderContainer.render(component);
     modal.show();

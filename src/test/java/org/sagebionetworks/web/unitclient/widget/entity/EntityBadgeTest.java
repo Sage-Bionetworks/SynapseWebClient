@@ -43,7 +43,6 @@ import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
-import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.jsinterop.EntityBadgeIconsProps;
@@ -105,9 +104,6 @@ public class EntityBadgeTest {
   @Mock
   CookieProvider mockCookies;
 
-  @Mock
-  SynapseReactClientFullContextPropsProvider propsProvider;
-
   @Captor
   ArgumentCaptor<EntityBadgeIconsProps> iconsPropsArgumentCaptor;
 
@@ -128,8 +124,7 @@ public class EntityBadgeTest {
         mockLazyLoadHelper,
         mockPopupUtils,
         mockEventBus,
-        mockAuthController,
-        propsProvider
+        mockAuthController
       );
 
     when(mockAuthController.isLoggedIn()).thenReturn(true);
@@ -202,7 +197,7 @@ public class EntityBadgeTest {
         entityBundleRequestCaptor.capture(),
         any(AsyncCallback.class)
       );
-    verify(mockView).setIcons(any(), any());
+    verify(mockView).setIcons(any());
     verify(mockView, never()).showAddToDownloadList();
     EntityBundleRequest request = entityBundleRequestCaptor.getValue();
     assertTrue(request.getIncludeEntity());
@@ -231,7 +226,7 @@ public class EntityBadgeTest {
         any(AsyncCallback.class)
       );
     verify(mockView).clearIcons();
-    verify(mockView).setIcons(any(), any());
+    verify(mockView).setIcons(any());
     verify(mockView).showAddToDownloadList();
   }
 
@@ -280,7 +275,7 @@ public class EntityBadgeTest {
     widget.setEntityBundle(bundle);
 
     // Simulate successful delete of Link entity by invoking the prop passed to the React component
-    verify(mockView).setIcons(iconsPropsArgumentCaptor.capture(), any());
+    verify(mockView).setIcons(iconsPropsArgumentCaptor.capture());
     iconsPropsArgumentCaptor
       .getValue()
       .getOnUnlinkSuccess()
@@ -301,7 +296,7 @@ public class EntityBadgeTest {
     widget.setEntityBundle(bundle);
 
     // Simulate the error by invoking the prop passed to the React component
-    verify(mockView).setIcons(iconsPropsArgumentCaptor.capture(), any());
+    verify(mockView).setIcons(iconsPropsArgumentCaptor.capture());
     iconsPropsArgumentCaptor
       .getValue()
       .getOnUnlinkError()

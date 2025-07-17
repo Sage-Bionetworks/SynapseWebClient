@@ -4,7 +4,6 @@ import com.google.inject.Inject;
 import javax.annotation.Nullable;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.ObjectType;
-import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.CreateOrUpdateDoiModalProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
@@ -13,20 +12,13 @@ import org.sagebionetworks.web.client.widget.ReactComponent;
 
 public class CreateOrUpdateDoiModal extends ReactComponent {
 
-  private final SynapseReactClientFullContextPropsProvider propsProvider;
-
   @Inject
-  public CreateOrUpdateDoiModal(
-    SynapseReactClientFullContextPropsProvider propsProvider
-  ) {
-    this.propsProvider = propsProvider;
-  }
+  public CreateOrUpdateDoiModal() {}
 
   private void renderComponent(CreateOrUpdateDoiModalProps props) {
     ReactElement component = React.createElementWithSynapseContext(
       SRC.SynapseComponents.CreateOrUpdateDoiModal,
-      props,
-      propsProvider.getJsInteropContextProps()
+      props
     );
     this.render(component);
   }

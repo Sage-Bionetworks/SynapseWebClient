@@ -56,7 +56,11 @@ public abstract class ReactComponentV2<
   public ReactComponentV2(T reactComponentType, P props, String tag) {
     this.reactComponentType = reactComponentType;
     this.props = props;
-    setElement(Document.get().createElement(tag));
+    Element el = Document.get().createElement(tag);
+    // For the element that wraps this React root, `display: contents;`, which causes an element's children to appear
+    // as if they were direct children of the element's parent
+    el.setAttribute("style", "display: contents;");
+    setElement(el);
   }
 
   /**
@@ -142,10 +146,10 @@ public abstract class ReactComponentV2<
     }
   }
 
-  private ReactElement<T, P> createReactElement() {
+  private ReactElement<?, ?> createReactElement() {
     detachNonReactChildElements();
     maybeUpdatePropsWithCallbackRef();
-    return React.createElement(
+    return React.createElementWithSynapseContext(
       reactComponentType,
       props,
       getChildReactElements()
@@ -248,7 +252,7 @@ public abstract class ReactComponentV2<
    *
    * @param child the widget to be added
    * @throws UnsupportedOperationException if this method is not supported (most
-   *           often this means that a specific overload must be called)
+   *                                       often this means that a specific overload must be called)
    */
   @Override
   public void add(Widget child) {

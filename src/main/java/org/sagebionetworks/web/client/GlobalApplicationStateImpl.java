@@ -36,6 +36,7 @@ import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactDOMClient;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
+import org.sagebionetworks.web.client.jsinterop.context.ContextUtils;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -492,7 +493,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
       isToastContainerInitialized = true;
 
       Element toastContainer = RootPanel.get("toastContainer").getElement();
-      ReactElement component = React.createElementWithThemeContext(
+      ReactElement component = React.createElementWithSynapseContext(
         SRC.SynapseComponents.SynapseToastContainer,
         null
       );
@@ -706,5 +707,12 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
   @Override
   public boolean isShowingVersionAlert() {
     return isShowingVersionAlert;
+  }
+
+  @Override
+  public void synchronizeReactContextWithGlobalStore() {
+    ContextUtils.setGlobalContext(
+      ginInjector.getReactContextPropsProvider().getJsInteropContextProps()
+    );
   }
 }

@@ -38,33 +38,27 @@ Make sure you specify your prop type in the type parameter, and also make sure t
 
 While you can append your React component to any element, we have [ReactComponent](../src/main/java/org/sagebionetworks/web/client/widget/ReactComponent.java) that contains logic that simplifies managing the lifecycle of a React component. Add this to your View in code or `*.ui.xml` file, and make sure you can reference it for the next step.
 
-### Passing Synapse context
+### Synapse context
 
-If your application uses Synapse context (e.g. uses authentication to call the Synapse API), then you will also need to pass a context provider. To do so, you can inject [SynapseReactClientFullContextPropsProvider](../src/main/java/org/sagebionetworks/web/client/context/SynapseReactClientFullContextPropsProvider.java), which will create the wrapping context for you.
+The SynapseContext (which includes authentication state, experimental mode state, etc.) will be automatically passed to components through a global store when using the method `createElementWithSynapseContext` defined in our `React` overlay class.
 
 ### Render the element
 
 How you manage updating your widget's view will vary based on the scenario, but when you're ready to render the component, this is all you have to do:
 
 ```java
-import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
 
 class MyView {
-
-  // Typically injected
-  SynapseReactClientFullContextPropsProvider propsProvider;
-
-  void renderComponent() {
-    MyProps props = props.create(/**/);
-    ReactElement reactElement = React.createElementWithSynapseContext(
-      SRC.SynapseComponents.MyComponent,
-      props,
-      propsProvider.getJsInteropContextProps()
-    );
-    reactComponent.render(reactElement);
-  }
+    void renderComponent() {
+        MyProps props = props.create(/**/);
+        ReactElement reactElement = React.createElementWithSynapseContext(
+                SRC.SynapseComponents.MyComponent,
+                props
+        );
+        reactComponent.render(reactElement);
+    }
 }
 
 ```

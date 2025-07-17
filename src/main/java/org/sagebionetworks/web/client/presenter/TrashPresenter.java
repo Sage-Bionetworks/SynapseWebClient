@@ -4,7 +4,6 @@ import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
-import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.view.TrashView;
 
@@ -14,22 +13,17 @@ public class TrashPresenter
 
   private Trash place;
   private TrashView view;
-  private SynapseReactClientFullContextPropsProvider propsProvider;
 
   @Inject
-  public TrashPresenter(
-    TrashView view,
-    SynapseReactClientFullContextPropsProvider propsProvider
-  ) {
+  public TrashPresenter(TrashView view) {
     this.view = view;
-    this.propsProvider = propsProvider;
   }
 
   @Override
   public void start(AcceptsOneWidget panel, EventBus eventBus) {
     // Install the view
     panel.setWidget(view);
-    view.createReactComponentWidget(propsProvider);
+    view.createReactComponentWidget();
   }
 
   @Override

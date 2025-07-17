@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.jsinterop.IsEditingStore;
 import org.sagebionetworks.web.client.jsinterop.SynapseContextJsObject;
 import org.sagebionetworks.web.client.jsinterop.SynapseReactClientFullContextProviderProps;
+import org.sagebionetworks.web.client.jsinterop.context.ContextUtils;
 import org.sagebionetworks.web.client.jsni.FullContextProviderPropsJSNIObject;
 import org.sagebionetworks.web.client.jsni.QueryClientJSNIObject;
 import org.sagebionetworks.web.client.jsni.SynapseReactClientFullContextJSNIObject;
