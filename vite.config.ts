@@ -8,9 +8,7 @@ const config = defineConfig({
   // Assets will be served from the `/Portal/cdn` servlet, which will redirect requests to the CDN when appropriate
   base: '/Portal/cdn/generated/vite/',
   server: {
-    cors: {
-      origin: ['http://localhost:8888', 'http://127.0.0.1:8888'],
-    },
+    cors: true,
   },
   build: {
     manifest: true,

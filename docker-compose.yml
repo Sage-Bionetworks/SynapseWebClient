@@ -6,7 +6,17 @@ services:
     image: maven:3.9.9-amazoncorretto-17-al2023
     environment:
       - ORG_SAGEBIONETWORKS_REPOSITORYSERVICE_ENDPOINT=${ORG_SAGEBIONETWORKS_REPOSITORYSERVICE_ENDPOINT}
-    command: mvn -Dorg.sagebionetworks.repositoryservice.endpoint=${ORG_SAGEBIONETWORKS_REPOSITORYSERVICE_ENDPOINT} gwt:run-codeserver
+      - DOCKER_BIND_IP
+    command: |
+      sh -c '
+        # If DOCKER_BIND_IP is set, pass it to the gwt-codeserver
+        BIND_ADDRESS_ARG=""
+        if [ -n "$DOCKER_BIND_IP" ]; then
+          BIND_ADDRESS_ARG="-Dgwt.bindAddress=$DOCKER_BIND_IP"
+        fi
+        # Run the GWT codeserver
+        mvn $$BIND_ADDRESS_ARG -Dorg.sagebionetworks.repositoryservice.endpoint=${ORG_SAGEBIONETWORKS_REPOSITORYSERVICE_ENDPOINT} gwt:run-codeserver
+      '
     working_dir: /usr/src/mymaven
     volumes:
       - ./:/usr/src/mymaven
@@ -28,13 +38,24 @@ services:
   # The Vite Codeserver bundles and serves JavaScript frontend assets
   vite-codeserver:
     image: node:22-slim
-    command: sh -c "corepack enable && corepack pnpm vite dev"
+    command: |
+      sh -c '
+        # If DOCKER_BIND_IP is set, pass it to the vite dev server
+        HOST_ARG=""
+        if [ -n "$DOCKER_BIND_IP" ]; then
+          HOST_ARG="--host $DOCKER_BIND_IP"
+        fi
+        # Run the vite dev server
+        corepack enable && corepack pnpm vite dev $$HOST_ARG
+      '
     working_dir: /app
     volumes:
       - ./:/app
       - pnpm-store:/app/.pnpm-store
       - node_modules:/app/node_modules
       - generated_artifacts:/app/src/main/webapp/generated
+    environment:
+      - DOCKER_BIND_IP
     network_mode: host
     depends_on:
       gwt-codeserver:

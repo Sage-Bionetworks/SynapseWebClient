@@ -18,7 +18,6 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import java.util.HashMap;
-import java.util.function.Consumer;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
@@ -54,7 +53,6 @@ public class Portal implements EntryPoint {
    */
   public void onModuleLoad() {
     zeroOpacity(RootPanel.get("headerPanel"), RootPanel.get("rootPanel"));
-    detectProxiedWebsiteAttack();
     // Test to see if client is instructed to load via "#!" fragment.
     // If detected, reload using a new path-based token scheme (required for SEO).
     // The GWT History class assumes tokens begin with '#', and we used to include the '!' as the prefix for all GWT Places.
@@ -102,6 +100,9 @@ public class Portal implements EntryPoint {
                   )
                     .call(
                       () -> {
+                        // Depends on synapseProperties to be loaded
+                        detectProxiedWebsiteAttack();
+
                         try {
                           JSONObjectAdapter featureFlagConfig = getDone(
                             featureFlagConfigFuture
@@ -281,9 +282,12 @@ public class Portal implements EntryPoint {
    */
   public void detectProxiedWebsiteAttack() {
     String hostName = Window.Location.getHostName().toLowerCase();
+    boolean isDevMode = ginjector.getSynapseProperties().getIsDevMode();
+
     if (
+      !isDevMode && // do not redirect if in dev mode
       !hostName.endsWith(".synapse.org") &&
-      !hostName.equals("127.0.0.1") &&
+      !hostName.equals("127.0.0.1") && // Not all developers are using isDevMode, so check local IPs
       !hostName.equals("localhost") &&
       !hostName.endsWith(".sagebase.org")
     ) {
