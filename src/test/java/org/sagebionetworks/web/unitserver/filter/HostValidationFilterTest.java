@@ -111,4 +111,13 @@ public class HostValidationFilterTest {
     verify(mockResponse)
       .sendError(HttpServletResponse.SC_FORBIDDEN, INVALID_HOST_HEADER_MESSAGE);
   }
+
+  @Test
+  public void testDevMode() throws ServletException, IOException {
+    when(mockPropertyProvider.getIsDevMode()).thenReturn(true);
+    when(mockRequest.getHeader(HOST_HEADER)).thenReturn("100.100.100.100");
+    filter.testFilter(mockRequest, mockResponse, mockFilterChain);
+
+    verify(mockResponse, never()).sendError(anyInt(), anyString());
+  }
 }

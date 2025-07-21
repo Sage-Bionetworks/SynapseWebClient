@@ -80,6 +80,17 @@ public class SynapseClientBase
   }
 
   /**
+   * This allows tests to override the propertiesProvider.
+   *
+   * @param propertiesProvider
+   */
+  public void setPortalPropertiesProvider(
+    PortalPropertiesProvider propertiesProvider
+  ) {
+    this.propertiesProvider = propertiesProvider;
+  }
+
+  /**
    * Validate that the service is ready to go. If any of the injected data is missing then it cannot
    * run. Public for tests.
    */
