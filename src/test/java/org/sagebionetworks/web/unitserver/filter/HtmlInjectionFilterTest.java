@@ -230,6 +230,7 @@ public class HtmlInjectionFilterTest {
       .thenReturn("");
     when(mockViteHTMLGenerator.getViteProductionHTML(any(), any(), any()))
       .thenReturn("");
+    when(mockPropertyProvider.getIsDevMode()).thenReturn(false);
   }
 
   private void setRequestURL(String s) throws MalformedURLException {
@@ -657,7 +658,6 @@ public class HtmlInjectionFilterTest {
     setRequestURL("https://www.synapse.org/");
 
     String injectedValue = "<script src=\"some-vite-prod-asset.js\"></script>";
-    when(mockPropertyProvider.getIsDevMode()).thenReturn(false);
     when(mockViteHTMLGenerator.getViteProductionHTML(any(), any(), anyString()))
       .thenReturn(injectedValue);
 

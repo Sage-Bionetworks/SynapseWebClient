@@ -20,16 +20,15 @@ public class OneSageUtilsImpl implements OneSageUtils {
     this.synapseProperties = synapseProperties;
   }
 
-  private String getHostForOneSage() {
+  private String getOriginForOneSage() {
     // SWC-6533: We do not want to stack hop for Prod and Staging
 
     if (synapseProperties.getIsDevMode()) {
       // If in dev mode, redirect to port 3000 (might be remote host)
-      return (
-        Window.Location.getProtocol() +
-        "//" +
-        Window.Location.getHostName() +
-        ":3000"
+      return getOrigin(
+        Window.Location.getProtocol(),
+        Window.Location.getHostName(),
+        "3000"
       );
     }
 
@@ -40,11 +39,10 @@ public class OneSageUtilsImpl implements OneSageUtils {
         return "https://dev.accounts.synapse.org";
       case "localhost":
       case "127.0.0.1":
-        return (
-          Window.Location.getProtocol() +
-          "//" +
-          Window.Location.getHostName() +
-          ":3000"
+        return getOrigin(
+          Window.Location.getProtocol(),
+          Window.Location.getHostName(),
+          "3000"
         );
       default:
         return "https://accounts.synapse.org";
@@ -81,7 +79,7 @@ public class OneSageUtilsImpl implements OneSageUtils {
    */
   public String getOneSageURL(String path) {
     return (
-      getHostForOneSage() +
+      getOriginForOneSage() +
       path +
       "?" +
       WebConstants.ONESAGE_SYNAPSE_APPID_QUERY_PARAM_KEY +
@@ -92,5 +90,17 @@ public class OneSageUtilsImpl implements OneSageUtils {
 
   public String getAccountSettingsURL() {
     return getOneSageURL(ONESAGE_ACCOUNT_SETTINGS_PATH);
+  }
+
+  private String getOrigin(String protocol, String hostname, String port) {
+    StringBuilder origin = new StringBuilder();
+    origin.append(protocol);
+    origin.append("//");
+    origin.append(hostname);
+    if (port != null) {
+      origin.append(":");
+      origin.append(port);
+    }
+    return origin.toString();
   }
 }
