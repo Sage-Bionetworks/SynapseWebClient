@@ -16,21 +16,18 @@ public class SessionDetector {
   public static final String SESSION_MARKER = "SESSION_MARKER";
   public static final int FORCE_CHECK_EVERY_X_ITERATIONS = 7;
   private int loopCount = 0;
-  private SynapseReactClientFullContextPropsProvider propsProvider;
 
   @Inject
   public SessionDetector(
     AuthenticationController authController,
     GlobalApplicationState globalAppState,
     GWTWrapper gwt,
-    ClientCache clientCache,
-    SynapseReactClientFullContextPropsProvider propsProvider
+    ClientCache clientCache
   ) {
     this.clientCache = clientCache;
     this.authController = authController;
     this.globalAppState = globalAppState;
     this.gwt = gwt;
-    this.propsProvider = propsProvider;
     initializeAccessTokenState();
   }
 
@@ -42,8 +39,6 @@ public class SessionDetector {
     // SWC-4947: check for user change immediately (don't wait 10 seconds to discover the existing
     // session token).
     authController.checkForUserChange();
-    // SWC-7004: Update global store with current React context
-    propsProvider.synchronizeContextWithGlobalStore();
     checkForUserChangeLater();
   }
 

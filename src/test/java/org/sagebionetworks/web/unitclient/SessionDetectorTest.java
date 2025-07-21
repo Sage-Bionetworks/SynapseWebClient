@@ -16,7 +16,6 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SessionDetector;
 import org.sagebionetworks.web.client.cache.ClientCache;
-import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProvider;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 
@@ -37,9 +36,6 @@ public class SessionDetectorTest {
   @Mock
   ClientCache mockClientCache;
 
-  @Mock
-  SynapseReactClientFullContextPropsProvider mockPropsProvider;
-
   @Captor
   ArgumentCaptor<Callback> callbackCaptor;
 
@@ -50,8 +46,7 @@ public class SessionDetectorTest {
         mockAuthController,
         mockGlobalAppState,
         mockGWT,
-        mockClientCache,
-        mockPropsProvider
+        mockClientCache
       );
   }
 
@@ -59,7 +54,6 @@ public class SessionDetectorTest {
   public void testSessionChanges() {
     sessionDetector.start();
 
-    verify(mockPropsProvider).synchronizeContextWithGlobalStore();
     verify(mockGWT)
       .scheduleExecution(
         callbackCaptor.capture(),

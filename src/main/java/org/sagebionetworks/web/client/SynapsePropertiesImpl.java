@@ -7,7 +7,6 @@ import com.google.common.util.concurrent.FluentFuture;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 import java.util.HashMap;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -51,6 +50,11 @@ public class SynapsePropertiesImpl implements SynapseProperties {
         }
       )
     );
+  }
+
+  @Override
+  public boolean getIsDevMode() {
+    return "true".equals(synapseProperties.get(WebConstants.IS_DEV_MODE_KEY));
   }
 
   @Override

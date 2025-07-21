@@ -12,6 +12,7 @@ public class PortalBannersWidget extends ReactComponent {
 
   public PortalBannersWidget() {
     super(DivElement.TAG);
+    addStyleName("portal-banners-widget");
   }
 
   public void configure(String entityId) {

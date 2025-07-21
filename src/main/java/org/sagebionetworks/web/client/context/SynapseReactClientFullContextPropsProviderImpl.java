@@ -77,9 +77,4 @@ public class SynapseReactClientFullContextPropsProviderImpl
     props.setQueryClient(QueryClientJSNIObject.getQueryClientSingleton());
     return props;
   }
-
-  @Override
-  public void synchronizeContextWithGlobalStore() {
-    ContextUtils.setGlobalContext(this.getJsInteropContextProps());
-  }
 }

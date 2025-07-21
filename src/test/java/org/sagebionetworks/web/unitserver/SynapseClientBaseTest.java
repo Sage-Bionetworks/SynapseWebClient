@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.web.server.StackEndpoints;
+import org.sagebionetworks.web.server.servlet.PortalPropertiesProvider;
 import org.sagebionetworks.web.server.servlet.SynapseClientBase;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -32,6 +33,9 @@ public class SynapseClientBaseTest {
 
   @Mock
   ThreadLocal<HttpServletRequest> mockThreadLocal;
+
+  @Mock
+  PortalPropertiesProvider mockPortalPropertiesProvider;
 
   @Mock
   HttpServletRequest mockRequest;
@@ -67,10 +71,12 @@ public class SynapseClientBaseTest {
       "perThreadRequest",
       mockThreadLocal
     );
+    synapseClientBase.setPortalPropertiesProvider(mockPortalPropertiesProvider);
     userIp = "127.0.0.1";
     when(mockThreadLocal.get()).thenReturn(mockRequest);
     when(mockRequest.getRemoteAddr()).thenReturn(userIp);
     when(mockRequest.getHeader(HOST_HEADER)).thenReturn(prodRequestHost);
+    when(mockPortalPropertiesProvider.getIsDevMode()).thenReturn(false);
     SynapseClientBaseTest.setupTestEndpoints();
   }
 
@@ -133,6 +139,42 @@ public class SynapseClientBaseTest {
       localhostWithPort,
       sessionToken
     );
+    verify(mockSynapseClient, never()).setUserIpAddress(anyString());
+  }
+
+  @Test
+  public void testSynapseHostInDevMode() {
+    // In dev mode, do not call `setUserIpAddress` regardless of the IP
+    when(mockPortalPropertiesProvider.getIsDevMode()).thenReturn(true);
+
+    String host = "www.synapse.org";
+    when(mockRequest.getHeader(HOST_HEADER)).thenReturn(host);
+    String sessionToken = "fakeSessionToken";
+    synapseClientBase.createSynapseClient(host, sessionToken);
+    verify(mockSynapseClient, never()).setUserIpAddress(anyString());
+  }
+
+  @Test
+  public void testRemoteIpInDevMode() {
+    // In dev mode, do not call `setUserIpAddress` regardless of the IP
+    when(mockPortalPropertiesProvider.getIsDevMode()).thenReturn(true);
+
+    String remoteIp = "100.100.100.100";
+    when(mockRequest.getHeader(HOST_HEADER)).thenReturn(remoteIp);
+    String sessionToken = "fakeSessionToken";
+    synapseClientBase.createSynapseClient(remoteIp, sessionToken);
+    verify(mockSynapseClient, never()).setUserIpAddress(anyString());
+  }
+
+  @Test
+  public void testLocalIpInDevMode() {
+    // In dev mode, do not call `setUserIpAddress` regardless of the IP
+    when(mockPortalPropertiesProvider.getIsDevMode()).thenReturn(true);
+
+    String remoteIp = "127.0.0.1";
+    when(mockRequest.getHeader(HOST_HEADER)).thenReturn(remoteIp);
+    String sessionToken = "fakeSessionToken";
+    synapseClientBase.createSynapseClient(remoteIp, sessionToken);
     verify(mockSynapseClient, never()).setUserIpAddress(anyString());
   }
 

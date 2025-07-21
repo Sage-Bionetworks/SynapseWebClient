@@ -140,4 +140,9 @@ public interface GlobalApplicationState {
 
   boolean handleRelativePathClick(String href);
   void gotoLoginPage();
+
+  /**
+   * Synchronizes the context retrieved in GWT with the global store that is passed to React components
+   */
+  void synchronizeReactContextWithGlobalStore();
 }
