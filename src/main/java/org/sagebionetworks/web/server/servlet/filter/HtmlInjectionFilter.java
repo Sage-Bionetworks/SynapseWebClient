@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.server.servlet.filter;
 
-import static org.sagebionetworks.web.server.StackEndpoints.IS_DEV_MODE;
 import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.HOST_HEADER;
 
 import com.google.gwt.safehtml.shared.SimpleHtmlSanitizer;
@@ -27,7 +26,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
-import org.sagebionetworks.PropertyProvider;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityType;
@@ -46,6 +44,7 @@ import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Team;
 import org.sagebionetworks.web.client.place.TeamSearch;
+import org.sagebionetworks.web.server.servlet.PortalPropertiesProvider;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.SynapseProviderImpl;
@@ -62,13 +61,13 @@ import org.springframework.web.filter.OncePerRequestFilter;
  */
 public class HtmlInjectionFilter extends OncePerRequestFilter {
 
-  PropertyProvider propertyProvider;
-  ViteManifestProvider viteManifestProvider;
-  ViteHTMLGenerator viteHTMLGenerator;
+  private final PortalPropertiesProvider propertyProvider;
+  private final ViteManifestProvider viteManifestProvider;
+  private final ViteHTMLGenerator viteHTMLGenerator;
 
   @Inject
   public HtmlInjectionFilter(
-    PropertyProvider propertyProvider,
+    PortalPropertiesProvider propertyProvider,
     ViteManifestProvider viteManifestProvider,
     ViteHTMLGenerator viteHTMLGenerator
   ) {
@@ -86,6 +85,12 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
   public static final String BOT_HEAD_HTML_KEY = "botHeadHtml";
   public static final String BOT_BODY_HTML_KEY = "botBodyHtml";
   public static final String LOADING_DESCRIPTOR_KEY = "loadingObjectDescriptor";
+  public static final String GWT_CODESERVER_HOST_INJECTION_KEY =
+    "gwtCodeserverHost";
+  public static final String VITE_CODESERVER_HOST_INJECTION_KEY =
+    "viteCodeserverHost";
+  public static final String CURRENT_ORIGIN_INJECTION_KEY = "currentOrigin";
+  public static final String CURRENT_HOST_INJECTION_KEY = "currentHost";
   // Used to inject the endpoint of the CDN where static resources are hosted
   public static final String CDN_ENDPOINT_KEY = "cdnEndpoint";
   // Used to inject imports for Vite, which are dynamic based on development/production mode
@@ -143,6 +148,13 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
     dataModel.putIfAbsent(BOT_HEAD_HTML_KEY, "");
     dataModel.putIfAbsent(BOT_BODY_HTML_KEY, "");
     dataModel.putIfAbsent(LOADING_DESCRIPTOR_KEY, "Loading");
+    dataModel.putIfAbsent(GWT_CODESERVER_HOST_INJECTION_KEY, "127.0.0.1:9876");
+    dataModel.putIfAbsent(VITE_CODESERVER_HOST_INJECTION_KEY, "127.0.0.1:5173");
+    dataModel.putIfAbsent(
+      CURRENT_ORIGIN_INJECTION_KEY,
+      "http://127.0.0.1:8888"
+    );
+    dataModel.putIfAbsent(CURRENT_HOST_INJECTION_KEY, "127.0.0.1:8888");
     dataModel.putIfAbsent(CDN_ENDPOINT_KEY, "/");
 
     dataModel.put(
@@ -208,15 +220,18 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
    * This must be called AFTER the CDN_ENDPOINT_KEY is added to the data model
    * @param dataModel
    */
-  private void addViteImports(Map<String, String> dataModel) {
-    boolean isDev =
-      "true".equals(
-          propertyProvider.getSystemProperties().getProperty(IS_DEV_MODE)
-        );
+  private void addViteImports(
+    String viteOrigin,
+    Map<String, String> dataModel
+  ) {
+    boolean isDev = propertyProvider.getIsDevMode();
     if (isDev) {
       dataModel.put(
         VITE_IMPORTS_INJECTION_KEY,
-        viteHTMLGenerator.getViteDevelopmentHTML(VITE_IMPORTED_FILES)
+        viteHTMLGenerator.getViteDevelopmentHTML(
+          viteOrigin,
+          VITE_IMPORTED_FILES
+        )
       );
     } else {
       dataModel.put(
@@ -268,9 +283,27 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
           lowerCaseDomain.contains("127.0.0.1"));
       boolean includeBotHtml = isLikelyBot && !isSynapseTestSite;
       try {
+        String origin = String.format(
+          "%s://%s",
+          url.getProtocol(),
+          url.getAuthority()
+        );
+
+        String viteHost = domain + ":5173";
+        String viteOrigin = String.format(
+          "%s://%s",
+          url.getProtocol(),
+          viteHost
+        );
+
+        dataModel.put(GWT_CODESERVER_HOST_INJECTION_KEY, domain + ":9876");
+        dataModel.put(VITE_CODESERVER_HOST_INJECTION_KEY, viteHost);
+
+        dataModel.put(CURRENT_ORIGIN_INJECTION_KEY, origin);
+        dataModel.put(CURRENT_HOST_INJECTION_KEY, url.getAuthority());
         // customize data model for this particular page
         addCdnEndpoint(dataModel, request);
-        addViteImports(dataModel);
+        addViteImports(viteOrigin, dataModel);
         dataModel.put(OG_URL_KEY, url.toString());
         try {
           String accessToken = UserDataProvider.getThreadLocalUserToken(

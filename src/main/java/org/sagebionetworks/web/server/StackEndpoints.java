@@ -26,13 +26,6 @@ public class StackEndpoints {
   public static final String STACK_BEANSTALK_NUMBER_PROPERTY_NAME =
     "org.sagebionetworks.stack.repo.beanstalk.number";
 
-  /*
-    Indicates if the app is running in 'development' mode, i.e. one or more local development servers are dynamically
-     serving assets (i.e. GWT Code Server & Vite).
-   */
-  public static final String IS_DEV_MODE =
-    "org.sagebionetworks.web.client.dev.mode";
-
   public static final String PARAM3 = "PARAM3";
   public static final String PARAM4 = "PARAM4";
   public static final String PARAM5 = "PARAM5";
@@ -63,8 +56,10 @@ public class StackEndpoints {
 
   private static String getEndpointPrefix(String host) {
     if (!hasLoadedConfiguration) {
-      // init endpointPrefix
-      if (loadSettingsFile) {
+      // init endpointPrefix from system properties
+      String repoEndpoint = System.getProperty(REPO_ENDPOINT_KEY);
+
+      if (repoEndpoint == null && loadSettingsFile) {
         // fallback to loading from settings
         try {
           // override any properties with the m2 settings property values (if set)
@@ -82,7 +77,7 @@ public class StackEndpoints {
         }
       }
 
-      String repoEndpoint = System.getProperty(REPO_ENDPOINT_KEY);
+      repoEndpoint = System.getProperty(REPO_ENDPOINT_KEY);
       if (repoEndpoint != null) {
         // done, overwriting using old params
         endpointPrefixFromConfiguration =

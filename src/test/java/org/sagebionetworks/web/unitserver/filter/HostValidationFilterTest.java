@@ -20,6 +20,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.sagebionetworks.PropertyProvider;
+import org.sagebionetworks.web.server.servlet.PortalPropertiesProvider;
 import org.sagebionetworks.web.server.servlet.filter.HostValidationFilter;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
@@ -39,9 +41,12 @@ public class HostValidationFilterTest {
   @Captor
   ArgumentCaptor<String> stringCaptor;
 
+  @Mock
+  PortalPropertiesProvider mockPropertyProvider;
+
   @Before
   public void setUp() {
-    filter = new HostValidationFilter();
+    filter = new HostValidationFilter(mockPropertyProvider);
     when(mockRequest.getHeader(HOST_HEADER))
       .thenReturn("www" + SYNAPSE_ORG_SUFFIX); // www.synapse.org
   }
@@ -105,5 +110,14 @@ public class HostValidationFilterTest {
 
     verify(mockResponse)
       .sendError(HttpServletResponse.SC_FORBIDDEN, INVALID_HOST_HEADER_MESSAGE);
+  }
+
+  @Test
+  public void testDevMode() throws ServletException, IOException {
+    when(mockPropertyProvider.getIsDevMode()).thenReturn(true);
+    when(mockRequest.getHeader(HOST_HEADER)).thenReturn("100.100.100.100");
+    filter.testFilter(mockRequest, mockResponse, mockFilterChain);
+
+    verify(mockResponse, never()).sendError(anyInt(), anyString());
   }
 }

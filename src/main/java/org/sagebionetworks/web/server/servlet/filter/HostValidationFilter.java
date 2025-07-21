@@ -5,11 +5,13 @@ import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.ALLOWED_S
 import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.HOST_HEADER;
 import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.SYNAPSE_ORG_SUFFIX;
 
+import com.google.inject.Inject;
 import java.io.IOException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.sagebionetworks.web.server.servlet.PortalPropertiesProvider;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
@@ -23,35 +25,46 @@ public class HostValidationFilter extends OncePerRequestFilter {
   public static final String INVALID_HOST_HEADER_MESSAGE =
     "Invalid Host Header";
 
+  private final PortalPropertiesProvider propertiesProvider;
+
+  @Inject
+  public HostValidationFilter(PortalPropertiesProvider propertiesProvider) {
+    this.propertiesProvider = propertiesProvider;
+  }
+
   @Override
   protected void doFilterInternal(
     HttpServletRequest request,
     HttpServletResponse response,
     FilterChain filterChain
   ) throws ServletException, IOException {
-    String host = request.getHeader(HOST_HEADER);
-    boolean allowed = false;
-    if (host != null) {
-      if (LOCAL_HOSTS_REGEX.matcher(host).matches()) {
-        allowed = true;
-      } else if (host.toLowerCase().endsWith(SYNAPSE_ORG_SUFFIX)) {
-        String subdomain = host.substring(
-          0,
-          host.length() - SYNAPSE_ORG_SUFFIX.length()
-        );
-        if (subdomain.startsWith("cdn-")) {
-          subdomain = subdomain.substring("cdn-".length()); // Remove 'cdn-' prefix
+    // Only filter if not in dev mode
+    if (!propertiesProvider.getIsDevMode()) {
+      String host = request.getHeader(HOST_HEADER);
+      boolean allowed = false;
+      if (host != null) {
+        if (LOCAL_HOSTS_REGEX.matcher(host).matches()) {
+          allowed = true;
+        } else if (host.toLowerCase().endsWith(SYNAPSE_ORG_SUFFIX)) {
+          String subdomain = host.substring(
+            0,
+            host.length() - SYNAPSE_ORG_SUFFIX.length()
+          );
+          if (subdomain.startsWith("cdn-")) {
+            subdomain = subdomain.substring("cdn-".length()); // Remove 'cdn-' prefix
+          }
+          allowed =
+            ALLOWED_SYNAPSE_SUBDOMAINS.contains(subdomain.toLowerCase());
         }
-        allowed = ALLOWED_SYNAPSE_SUBDOMAINS.contains(subdomain.toLowerCase());
       }
-    }
-    if (!allowed) {
-      // If the host is not allowed, return a 403 Forbidden response
-      response.sendError(
-        HttpServletResponse.SC_FORBIDDEN,
-        INVALID_HOST_HEADER_MESSAGE
-      );
-      return;
+      if (!allowed) {
+        // If the host is not allowed, return a 403 Forbidden response
+        response.sendError(
+          HttpServletResponse.SC_FORBIDDEN,
+          INVALID_HOST_HEADER_MESSAGE
+        );
+        return;
+      }
     }
     filterChain.doFilter(request, response);
   }

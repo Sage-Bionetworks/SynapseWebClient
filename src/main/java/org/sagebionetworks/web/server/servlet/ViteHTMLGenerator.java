@@ -10,7 +10,7 @@ import org.json.JSONObject;
  * into HTML scripts that allow the browser to access the correct assets.
  */
 public interface ViteHTMLGenerator {
-  String getViteDevelopmentHTML(List<String> filesToImport);
+  String getViteDevelopmentHTML(String viteOrigin, List<String> filesToImport);
 
   String getViteProductionHTML(
     List<String> filesToImport,

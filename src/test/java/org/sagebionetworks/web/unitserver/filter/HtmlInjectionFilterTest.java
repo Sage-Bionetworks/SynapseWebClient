@@ -8,7 +8,6 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.web.server.StackEndpoints.IS_DEV_MODE;
 import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.HOST_HEADER;
 import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.SYNAPSE_ORG_SUFFIX;
 import static org.sagebionetworks.web.server.servlet.filter.CrawlFilter.META_ROBOTS_NOINDEX;
@@ -22,6 +21,8 @@ import freemarker.template.Template;
 import freemarker.template.TemplateNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.List;
@@ -57,6 +58,7 @@ import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
+import org.sagebionetworks.web.server.servlet.PortalPropertiesProvider;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.ViteHTMLGenerator;
 import org.sagebionetworks.web.server.servlet.ViteManifestProvider;
@@ -149,10 +151,7 @@ public class HtmlInjectionFilterTest {
   ViteHTMLGenerator mockViteHTMLGenerator;
 
   @Mock
-  PropertyProvider mockPropertyProvider;
-
-  @Mock
-  Properties mockProperties;
+  PortalPropertiesProvider mockPropertyProvider;
 
   @Mock
   JSONObject mockViteManifest;
@@ -226,19 +225,22 @@ public class HtmlInjectionFilterTest {
     when(mockUserProfile.getSummary()).thenReturn(SUMMARY);
     //by default, set up as a bot request since this will return more
     when(mockRequest.getHeader("User-Agent")).thenReturn("Googlebot/2.1");
-    when(mockPropertyProvider.getSystemProperties()).thenReturn(mockProperties);
-    when(mockProperties.getProperty(anyString())).thenReturn(null);
     when(mockViteManifestProvider.getManifest()).thenReturn(mockViteManifest);
-    when(mockViteHTMLGenerator.getViteDevelopmentHTML(any())).thenReturn("");
+    when(mockViteHTMLGenerator.getViteDevelopmentHTML(any(), any()))
+      .thenReturn("");
     when(mockViteHTMLGenerator.getViteProductionHTML(any(), any(), any()))
       .thenReturn("");
+    when(mockPropertyProvider.getIsDevMode()).thenReturn(false);
   }
 
-  private void setRequestURL(String s) {
+  private void setRequestURL(String s) throws MalformedURLException {
+    URL url = new URL(s);
     StringBuffer sb = new StringBuffer();
     sb.append(s);
-    when(mockRequest.getRequestURL()).thenReturn(sb);
-    when(mockRequest.getRequestURI()).thenReturn(sb.toString());
+    when(mockRequest.getRequestURL())
+      .thenReturn(new StringBuffer(url.toString()));
+    when(mockRequest.getRequestURI()).thenReturn(url.getPath());
+    when(mockRequest.getServerName()).thenReturn(url.getHost());
   }
 
   @Test
@@ -625,11 +627,11 @@ public class HtmlInjectionFilterTest {
       "${" + HtmlInjectionFilter.VITE_IMPORTS_INJECTION_KEY + "}"
     );
 
-    setRequestURL("https://www.synapse.org/");
+    setRequestURL("http://127.0.0.1:8888/");
 
     String injectedValue = "<script src=\"some-vite-dev-asset.js\"></script>";
-    when(mockProperties.getProperty(IS_DEV_MODE)).thenReturn("true");
-    when(mockViteHTMLGenerator.getViteDevelopmentHTML(any()))
+    when(mockPropertyProvider.getIsDevMode()).thenReturn(true);
+    when(mockViteHTMLGenerator.getViteDevelopmentHTML(any(), any()))
       .thenReturn(injectedValue);
 
     filter.init(template, mockCrawlFilter);
@@ -640,7 +642,8 @@ public class HtmlInjectionFilterTest {
     String outputString = stringCaptor.getValue();
     assertEquals(injectedValue, outputString);
 
-    verify(mockViteHTMLGenerator).getViteDevelopmentHTML(List.of("js/main.js"));
+    verify(mockViteHTMLGenerator)
+      .getViteDevelopmentHTML("http://127.0.0.1:5173", List.of("js/main.js"));
     verify(mockViteHTMLGenerator, never())
       .getViteProductionHTML(any(), any(), any());
   }
@@ -655,7 +658,6 @@ public class HtmlInjectionFilterTest {
     setRequestURL("https://www.synapse.org/");
 
     String injectedValue = "<script src=\"some-vite-prod-asset.js\"></script>";
-    when(mockProperties.getProperty(IS_DEV_MODE)).thenReturn(null);
     when(mockViteHTMLGenerator.getViteProductionHTML(any(), any(), anyString()))
       .thenReturn(injectedValue);
 
@@ -667,7 +669,7 @@ public class HtmlInjectionFilterTest {
     String outputString = stringCaptor.getValue();
     assertEquals(injectedValue, outputString);
 
-    verify(mockViteHTMLGenerator, never()).getViteDevelopmentHTML(any());
+    verify(mockViteHTMLGenerator, never()).getViteDevelopmentHTML(any(), any());
     verify(mockViteHTMLGenerator)
       .getViteProductionHTML(
         List.of("js/main.js"),

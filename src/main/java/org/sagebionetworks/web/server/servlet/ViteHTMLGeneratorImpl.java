@@ -28,11 +28,16 @@ public class ViteHTMLGeneratorImpl implements ViteHTMLGenerator {
    * @return the HTML script required by Vite
    */
   @Override
-  public String getViteDevelopmentHTML(List<String> filesToImport) {
+  public String getViteDevelopmentHTML(
+    String viteOrigin,
+    List<String> filesToImport
+  ) {
+    String viteDevServerUrl = viteOrigin + VITE_BASE_PATH;
+
     StringBuilder html = new StringBuilder();
     html.append(
       "<script type=\"module\" src=\"" +
-      VITE_DEV_SERVER_URL +
+      viteDevServerUrl +
       "/" +
       VITE_CLIENT_PACKAGE +
       "\"></script>\n"
@@ -41,7 +46,7 @@ public class ViteHTMLGeneratorImpl implements ViteHTMLGenerator {
     filesToImport.forEach(file ->
       html.append(
         "<script type=\"module\" src=\"" +
-        VITE_DEV_SERVER_URL +
+        viteDevServerUrl +
         "/" +
         file +
         "\"></script>\n"
