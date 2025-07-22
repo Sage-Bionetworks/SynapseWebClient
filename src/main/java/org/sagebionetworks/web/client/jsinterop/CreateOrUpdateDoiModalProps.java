@@ -23,7 +23,7 @@ public class CreateOrUpdateDoiModalProps extends ReactComponentProps {
   /** The ID of the object */
   String objectId;
   /** The optional version number of the object used to populate the form. */
-  Long defaultVersionNumber;
+  long defaultVersionNumber;
 
   @JsOverlay
   public static CreateOrUpdateDoiModalProps create(
@@ -38,7 +38,9 @@ public class CreateOrUpdateDoiModalProps extends ReactComponentProps {
     props.onClose = onClose;
     props.objectType = objectType.toString();
     props.objectId = objectId;
-    props.defaultVersionNumber = defaultVersionNumber;
+    if (defaultVersionNumber != null) {
+      props.defaultVersionNumber = defaultVersionNumber.longValue();
+    }
 
     // Reset the modal state when it is closed
     props.key = Boolean.toString(open);
