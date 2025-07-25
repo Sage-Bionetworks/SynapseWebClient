@@ -357,6 +357,9 @@ public class AuthenticationControllerImpl implements AuthenticationController {
           }
 
           private void afterCall() {
+            ginInjector
+              .getGlobalApplicationState()
+              .synchronizeReactContextWithGlobalStore();
             resetQueryClientCache();
             ginInjector.getFooter().refresh();
             ginInjector.getHeader().refresh();
