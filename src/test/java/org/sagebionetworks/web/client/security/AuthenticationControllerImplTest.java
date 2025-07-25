@@ -233,6 +233,7 @@ public class AuthenticationControllerImplTest {
     verify(mockGlobalApplicationState).setLastPlace(mockPlace);
     verify(mockSessionDetector).initializeAccessTokenState();
     verify(mockGlobalApplicationState).refreshPage();
+    verify(mockGlobalApplicationState).synchronizeReactContextWithGlobalStore();
     verify(mockQueryClient).resetQueries();
     verify(mockHeader).refresh();
     verify(mockFooter).refresh();
