@@ -10,10 +10,7 @@ public class ViteHTMLGeneratorImplTest extends TestCase {
 
   public void testGetViteDevelopmentHTML() {
     ViteHTMLGeneratorImpl generator = new ViteHTMLGeneratorImpl();
-    String html = generator.getViteDevelopmentHTML(
-      "http://localhost:5173",
-      List.of("js/main.js")
-    );
+    String html = generator.getViteDevelopmentHTML(List.of("js/main.js"));
 
     assertEquals(
       "<script type=\"module\" src=\"http://localhost:5173/Portal/cdn/generated/vite/@vite/client\"></script>\n" +

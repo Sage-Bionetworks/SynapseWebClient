@@ -41,8 +41,6 @@ import org.sagebionetworks.web.server.servlet.FileUploaderJnlp;
 import org.sagebionetworks.web.server.servlet.InitSessionServlet;
 import org.sagebionetworks.web.server.servlet.JsonLdContentServlet;
 import org.sagebionetworks.web.server.servlet.LinkedInServiceImpl;
-import org.sagebionetworks.web.server.servlet.PortalPropertiesProvider;
-import org.sagebionetworks.web.server.servlet.PortalPropertiesProviderImpl;
 import org.sagebionetworks.web.server.servlet.ProjectAliasServlet;
 import org.sagebionetworks.web.server.servlet.SlackServlet;
 import org.sagebionetworks.web.server.servlet.StackConfigServiceImpl;
@@ -99,7 +97,6 @@ public class PortalServletModule extends ServletModule {
 
     bind(LoggerProvider.class).to(LoggerProviderImpl.class);
     bind(PropertyProvider.class).to(PropertyProviderImpl.class);
-    bind(PortalPropertiesProvider.class).to(PortalPropertiesProviderImpl.class);
     bind(ConfigurationProperties.class).to(ConfigurationPropertiesImpl.class);
     bind(StackConfiguration.class).to(StackConfigurationImpl.class);
     bind(StackEncrypter.class).to(StackEncrypterImpl.class);
