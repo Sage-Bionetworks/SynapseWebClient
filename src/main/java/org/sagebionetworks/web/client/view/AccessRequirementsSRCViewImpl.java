@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.view;
 
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.web.client.jsinterop.AccessRequirementListProps;
@@ -12,10 +12,11 @@ import org.sagebionetworks.web.client.widget.ReactComponent;
 public class AccessRequirementsSRCViewImpl
   implements AccessRequirementsSRCView {
 
-  ReactComponent requestDataAccessWidget = new ReactComponent();
+  ReactComponent requestDataAccessWidget;
 
-  @Inject
-  public AccessRequirementsSRCViewImpl() {}
+  public AccessRequirementsSRCViewImpl() {
+    requestDataAccessWidget = new ReactComponent();
+  }
 
   @Override
   public void configure(
@@ -23,7 +24,9 @@ public class AccessRequirementsSRCViewImpl
     RestrictableObjectDescriptor subject
   ) {
     AccessRequirementListProps props = AccessRequirementListProps.create(
-      null,
+      () -> {
+        Window.Location.reload();
+      },
       null,
       subject.getId(),
       type,

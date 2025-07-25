@@ -9,4 +9,5 @@ public class MaterialUI {
 
   public static ReactComponentType<GridProps> Grid;
   public static ReactComponentType<ButtonProps> Button;
+  public static ReactComponentType<ContainerProps> Container;
 }
