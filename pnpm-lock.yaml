@@ -134,8 +134,8 @@ importers:
         specifier: ^3.0.2
         version: 3.0.2
       synapse-react-client:
-        specifier: 3.4.35
-        version: 3.4.35(@hyperjump/browser@1.3.1)(@types/react@19.1.8)(csstype@3.1.3)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.30.1)(prop-types@15.8.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(rxjs@7.8.2)
+        specifier: 3.4.36
+        version: 3.4.36(@hyperjump/browser@1.3.1)(@types/react@19.1.8)(csstype@3.1.3)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.30.1)(prop-types@15.8.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(rxjs@7.8.2)
       universal-cookie:
         specifier: ^4.0.4
         version: 4.0.4
@@ -4783,8 +4783,8 @@ packages:
   svg-path-sdf@1.1.3:
     resolution: {integrity: sha512-vJJjVq/R5lSr2KLfVXVAStktfcfa1pNFjFOgyJnzZFXlO/fDZ5DmM8FpnSKKzLPfEYTVeXuVBTHF296TpxuJVg==}
 
-  synapse-react-client@3.4.35:
-    resolution: {integrity: sha512-gZB640M0w6jHXpuGC3uI7VvdaC/IS6YXmMWUgnmUHsJq6uz/7HjsMbvAisBZkXhgS8r2CD3ABEmLAJiuLQqGOA==}
+  synapse-react-client@3.4.36:
+    resolution: {integrity: sha512-d29Vn2e1KrgzKAoazfCdDhxOjrv0F0jw6FCHH0d7TkfZ/8pZRlf5s0VyBbuD9KXyKsvPVnHVYJehSN36QURQsg==}
     peerDependencies:
       react: ^19.1.0
       react-dom: ^19.1.0
@@ -10863,7 +10863,7 @@ snapshots:
       parse-svg-path: 0.1.2
       svg-path-bounds: 1.0.2
 
-  synapse-react-client@3.4.35(@hyperjump/browser@1.3.1)(@types/react@19.1.8)(csstype@3.1.3)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.30.1)(prop-types@15.8.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(rxjs@7.8.2):
+  synapse-react-client@3.4.36(@hyperjump/browser@1.3.1)(@types/react@19.1.8)(csstype@3.1.3)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.30.1)(prop-types@15.8.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(rxjs@7.8.2):
     dependencies:
       '@apidevtools/json-schema-ref-parser': 9.1.2
       '@aws-sdk/client-s3': 3.844.0

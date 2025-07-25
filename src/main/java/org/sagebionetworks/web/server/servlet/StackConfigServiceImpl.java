@@ -8,6 +8,7 @@ import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.status.StackStatus;
 import org.sagebionetworks.web.client.StackConfigService;
 import org.sagebionetworks.web.server.StackEndpoints;
+import org.sagebionetworks.web.server.servlet.SynapseClientImpl.PortalPropertiesHolder;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl.PortalVersionHolder;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
@@ -93,11 +94,6 @@ public class StackConfigServiceImpl
       WebConstants.SYNAPSE_VERSION_KEY,
       PortalVersionHolder.getVersionInfo()
     );
-    properties.put(
-      WebConstants.IS_DEV_MODE_KEY,
-      PortalPropertiesHolder.getProperty(WebConstants.IS_DEV_MODE_KEY)
-    );
-
     return properties;
   }
 }

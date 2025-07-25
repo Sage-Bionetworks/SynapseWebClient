@@ -58,8 +58,6 @@ public class SynapseClientBase
    * Injected with Gin
    */
   private SynapseProvider synapseProvider = new SynapseProviderImpl();
-  private PortalPropertiesProvider propertiesProvider =
-    new PortalPropertiesProviderImpl();
 
   /**
    * This allows tests provide mock org.sagebionetworks.client.SynapseClient ojbects
@@ -77,17 +75,6 @@ public class SynapseClientBase
    */
   public void setTokenProvider(TokenProvider tokenProvider) {
     this.tokenProvider = tokenProvider;
-  }
-
-  /**
-   * This allows tests to override the propertiesProvider.
-   *
-   * @param propertiesProvider
-   */
-  public void setPortalPropertiesProvider(
-    PortalPropertiesProvider propertiesProvider
-  ) {
-    this.propertiesProvider = propertiesProvider;
   }
 
   /**
@@ -146,11 +133,10 @@ public class SynapseClientBase
     // Append the portal's version information to the user agent.
     synapseClient.appendUserAgent(PORTAL_USER_AGENT);
     if (this.getThreadLocalRequest() != null) {
-      // SWC-7311 - Do not add the user IP address (X-Forwarded-For header) if the request is made to a local instance/in dev mode
+      // SWC-7311 - Do not add the user IP address (X-Forwarded-For header) if the request is made to a local instance
       String host = this.getThreadLocalRequest().getHeader(HOST_HEADER);
       boolean isRequestToLocalIp =
-        propertiesProvider.getIsDevMode() ||
-        (host != null && LOCAL_HOSTS_REGEX.matcher(host).matches());
+        host != null && LOCAL_HOSTS_REGEX.matcher(host).matches();
       if (!isRequestToLocalIp) {
         synapseClient.setUserIpAddress(
           getIpAddress(this.getThreadLocalRequest())

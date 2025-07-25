@@ -420,7 +420,4 @@ public class WebConstants {
   public static final String DATA_CATALOG_PAGE_TITLE = "Synapse Data Catalog";
   public static final String DATA_CATALOG_PAGE_DESCRIPTION =
     "Explore a diverse collection of biomedical datasets contributed by renowned research initiatives.  Access genomics data, proteomics data, disease progression, and clinical studies across conditions like Alzheimer’s, Parkinson’s, cardiovascular disease, cancer, autoimmune disorders, and rare genetic disorders such as neurofibromatosis.";
-
-  public static final String IS_DEV_MODE_KEY =
-    "org.sagebionetworks.web.client.dev.mode";
 }
