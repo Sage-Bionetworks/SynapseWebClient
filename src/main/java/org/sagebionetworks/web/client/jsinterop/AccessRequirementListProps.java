@@ -27,18 +27,22 @@ public class AccessRequirementListProps extends ReactComponentProps {
     Callback onHide,
     List<AccessRequirement> accessRequirements,
     String subjectId,
-    RestrictableObjectType subjectType
+    RestrictableObjectType subjectType,
+    boolean renderAsModal
   ) {
     AccessRequirementListProps props = new AccessRequirementListProps();
-    props.renderAsModal = true;
+    props.renderAsModal = renderAsModal;
     props.onHide = onHide;
     props.subjectId = subjectId;
     props.subjectType = subjectType.name();
-    props.accessRequirementFromProps =
-      accessRequirements
-        .stream()
-        .map(JSONEntityUtils::toJsInteropCompatibleObject)
-        .toArray();
+    if (accessRequirements != null) {
+      props.accessRequirementFromProps =
+        accessRequirements
+          .stream()
+          .map(JSONEntityUtils::toJsInteropCompatibleObject)
+          .toArray();
+    }
+
     return props;
   }
 }

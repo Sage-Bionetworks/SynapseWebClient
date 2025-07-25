@@ -2,11 +2,9 @@ package org.sagebionetworks.web.client.presenter;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
-import com.google.gwt.activity.shared.AbstractActivity;
-import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,12 +27,8 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
 
-//TODO: Use a DivView only.  Configure and use AccessRequirementsForACT if ACT, a new AR view if not ACT.
-public class AccessRequirementsPresenter
-  extends AbstractActivity
-  implements Presenter<AccessRequirementsPlace> {
+public class AccessRequirementsForACT implements IsWidget {
 
-  private AccessRequirementsPlace place;
   private PlaceView view;
   private PortalGinInjector ginInjector;
   private SynapseAlert synAlert;
@@ -53,7 +47,7 @@ public class AccessRequirementsPresenter
   Callback refreshCallback;
 
   @Inject
-  public AccessRequirementsPresenter(
+  public AccessRequirementsForACT(
     PlaceView view,
     DataAccessClientAsync dataAccessClient,
     SynapseAlert synAlert,
@@ -100,15 +94,11 @@ public class AccessRequirementsPresenter
       };
   }
 
-  @Override
-  public void start(AcceptsOneWidget panel, EventBus eventBus) {
-    // Install the view
-    panel.setWidget(view);
+  public Widget asWidget() {
+    return view.asWidget();
   }
 
-  @Override
-  public void setPlace(AccessRequirementsPlace place) {
-    this.place = place;
+  public void configure(AccessRequirementsPlace place) {
     view.initHeaderAndFooter();
     String id = place.getParam(AccessRequirementsPlace.ID_PARAM);
     String typeString = place.getParam(AccessRequirementsPlace.TYPE_PARAM);
@@ -220,14 +210,5 @@ public class AccessRequirementsPresenter
         }
       }
     );
-  }
-
-  public AccessRequirementsPlace getPlace() {
-    return place;
-  }
-
-  @Override
-  public String mayStop() {
-    return null;
   }
 }
