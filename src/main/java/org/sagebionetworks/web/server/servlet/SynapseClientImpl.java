@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
@@ -1566,6 +1567,38 @@ public class SynapseClientImpl
 
   private String getSynapseProperty(String key) {
     return PortalPropertiesHolder.getProperty(key);
+  }
+
+  public static class PortalPropertiesHolder {
+
+    private static Properties props;
+    private static HashMap<String, String> propsMap;
+
+    static {
+      InputStream s =
+        SynapseClientImpl.class.getResourceAsStream("/portal.properties");
+      props = new Properties();
+      try {
+        props.load(s);
+      } catch (IOException e) {
+        throw new RuntimeException("portal.properties file not found", e);
+      }
+    }
+
+    public static String getProperty(String key) {
+      return props.getProperty(key);
+    }
+
+    public static HashMap<String, String> getPropertiesMap() {
+      if (propsMap == null) {
+        propsMap = new HashMap<String, String>();
+        for (Entry<Object, Object> entry : props.entrySet()) {
+          propsMap.put(entry.getKey().toString(), entry.getValue().toString());
+        }
+      }
+
+      return propsMap;
+    }
   }
 
   public static Long defaultStorageLocation = Long.parseLong(
