@@ -16,7 +16,6 @@ import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.DivView;
@@ -98,25 +97,21 @@ public class AccessRequirementsForACT implements IsWidget {
     return view.asWidget();
   }
 
-  public void configure(AccessRequirementsPlace place) {
+  public void configure(
+    RestrictableObjectType type,
+    RestrictableObjectDescriptor subject
+  ) {
     view.initHeaderAndFooter();
-    String id = place.getParam(AccessRequirementsPlace.ID_PARAM);
-    String typeString = place.getParam(AccessRequirementsPlace.TYPE_PARAM);
-    RestrictableObjectType type = RestrictableObjectType.valueOf(
-      typeString.toUpperCase()
-    );
     synAlert.clear();
-    subject = new RestrictableObjectDescriptor();
-    subject.setType(type);
-    subject.setId(id);
+    this.subject = subject;
     if (RestrictableObjectType.ENTITY.equals(type)) {
       teamBadge.setVisible(false);
       entityIdRenderer.setVisible(true);
-      entityIdRenderer.setValue(id);
+      entityIdRenderer.setValue(subject.getId());
     } else {
       teamBadge.setVisible(true);
       entityIdRenderer.setVisible(false);
-      teamBadge.configure(id);
+      teamBadge.configure(subject.getId());
     }
     loadData();
   }

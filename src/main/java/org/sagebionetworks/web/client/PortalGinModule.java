@@ -47,6 +47,8 @@ import org.sagebionetworks.web.client.view.ACTDataAccessSubmissionsView;
 import org.sagebionetworks.web.client.view.ACTDataAccessSubmissionsViewImpl;
 import org.sagebionetworks.web.client.view.ACTView;
 import org.sagebionetworks.web.client.view.ACTViewImpl;
+import org.sagebionetworks.web.client.view.AccessRequirementsSRCView;
+import org.sagebionetworks.web.client.view.AccessRequirementsSRCViewImpl;
 import org.sagebionetworks.web.client.view.AccountView;
 import org.sagebionetworks.web.client.view.AccountViewImpl;
 import org.sagebionetworks.web.client.view.CertificationQuizView;
@@ -1553,6 +1555,8 @@ public class PortalGinModule extends AbstractGinModule {
     bind(PlotlyConfigView.class).to(PlotlyConfigViewImpl.class);
     bind(DateTimeUtils.class).to(DateTimeUtilsImpl.class).in(Singleton.class);
     bind(ACTAccessApprovalsView.class).to(ACTAccessApprovalsViewImpl.class);
+    bind(AccessRequirementsSRCView.class)
+      .to(AccessRequirementsSRCViewImpl.class);
 
     bind(AccessorGroupView.class).to(AccessorGroupViewImpl.class);
     bind(SelfSignAccessRequirementWidgetView.class)
