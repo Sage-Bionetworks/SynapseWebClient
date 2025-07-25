@@ -1,10 +1,10 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -13,7 +13,6 @@ import static org.mockito.Mockito.when;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Widget;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Before;
@@ -35,7 +34,7 @@ import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
-import org.sagebionetworks.web.client.presenter.AccessRequirementsPresenter;
+import org.sagebionetworks.web.client.presenter.AccessRequirementsForACT;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.DivView;
@@ -47,9 +46,9 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellR
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-public class AccessRequirementsPresenterTest {
+public class AccessRequirementsForACTTest {
 
-  AccessRequirementsPresenter presenter;
+  AccessRequirementsForACT presenter;
 
   @Mock
   PlaceView mockView;
@@ -80,9 +79,6 @@ public class AccessRequirementsPresenterTest {
 
   @Mock
   LockAccessRequirement mockLockAccessRequirement;
-
-  @Mock
-  AccessRequirementsPlace mockPlace;
 
   List<AccessRequirement> accessRequirements;
   List<AccessApprovalInfo> accessRequirementApprovalStatus;
@@ -118,11 +114,13 @@ public class AccessRequirementsPresenterTest {
   public static final String TEAM_ID = "45678";
   public static final String CURRENT_USER_ID = "11111";
 
+  RestrictableObjectDescriptor testSubject;
+
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
     presenter =
-      new AccessRequirementsPresenter(
+      new AccessRequirementsForACT(
         mockView,
         mockDataAccessClient,
         mockSynAlert,
@@ -173,6 +171,9 @@ public class AccessRequirementsPresenterTest {
     when(mockAuthController.getCurrentUserPrincipalId())
       .thenReturn(CURRENT_USER_ID);
     when(mockAuthController.isLoggedIn()).thenReturn(true);
+    testSubject = new RestrictableObjectDescriptor();
+    testSubject.setId(ENTITY_ID);
+    testSubject.setType(RestrictableObjectType.ENTITY);
   }
 
   @Test
@@ -184,16 +185,11 @@ public class AccessRequirementsPresenterTest {
 
   @Test
   public void testLoadDataEntity() {
-    when(mockPlace.getParam(AccessRequirementsPlace.ID_PARAM))
-      .thenReturn(ENTITY_ID);
-    when(mockPlace.getParam(AccessRequirementsPlace.TYPE_PARAM))
-      .thenReturn(RestrictableObjectType.ENTITY.toString());
-
-    presenter.setPlace(mockPlace);
+    presenter.configure(testSubject);
     verify(mockDataAccessClient)
       .getAccessRequirements(
         subjectCaptor.capture(),
-        eq(AccessRequirementsPresenter.LIMIT),
+        eq(AccessRequirementsForACT.LIMIT),
         eq(0L),
         any(AsyncCallback.class)
       );
@@ -221,8 +217,8 @@ public class AccessRequirementsPresenterTest {
     verify(mockDataAccessClient)
       .getAccessRequirements(
         any(RestrictableObjectDescriptor.class),
-        eq(AccessRequirementsPresenter.LIMIT),
-        eq(AccessRequirementsPresenter.LIMIT),
+        eq(AccessRequirementsForACT.LIMIT),
+        eq(AccessRequirementsForACT.LIMIT),
         any(AsyncCallback.class)
       );
   }
@@ -231,15 +227,13 @@ public class AccessRequirementsPresenterTest {
   public void testLoadDataEntityEmptyResults() {
     accessRequirements.clear();
     accessRequirementApprovalStatus.clear();
-    when(mockPlace.getParam(AccessRequirementsPlace.ID_PARAM))
-      .thenReturn(ENTITY_ID);
-    when(mockPlace.getParam(AccessRequirementsPlace.TYPE_PARAM))
-      .thenReturn(RestrictableObjectType.ENTITY.toString());
-    presenter.setPlace(mockPlace);
+
+    presenter.configure(testSubject);
+
     verify(mockDataAccessClient)
       .getAccessRequirements(
         subjectCaptor.capture(),
-        eq(AccessRequirementsPresenter.LIMIT),
+        eq(AccessRequirementsForACT.LIMIT),
         eq(0L),
         any(AsyncCallback.class)
       );
@@ -258,26 +252,20 @@ public class AccessRequirementsPresenterTest {
         anyLong(),
         any(AsyncCallback.class)
       );
-    when(mockPlace.getParam(AccessRequirementsPlace.ID_PARAM))
-      .thenReturn(ENTITY_ID);
-    when(mockPlace.getParam(AccessRequirementsPlace.TYPE_PARAM))
-      .thenReturn(RestrictableObjectType.ENTITY.toString());
 
-    presenter.setPlace(mockPlace);
+    presenter.configure(testSubject);
     verify(mockSynAlert).handleException(ex);
   }
 
   @Test
   public void testLoadDataTeam() {
-    when(mockPlace.getParam(AccessRequirementsPlace.ID_PARAM))
-      .thenReturn(TEAM_ID);
-    when(mockPlace.getParam(AccessRequirementsPlace.TYPE_PARAM))
-      .thenReturn(RestrictableObjectType.TEAM.toString());
-    presenter.setPlace(mockPlace);
+    testSubject.setId(TEAM_ID);
+    testSubject.setType(RestrictableObjectType.TEAM);
+    presenter.configure(testSubject);
     verify(mockDataAccessClient)
       .getAccessRequirements(
         subjectCaptor.capture(),
-        eq(AccessRequirementsPresenter.LIMIT),
+        eq(AccessRequirementsForACT.LIMIT),
         eq(0L),
         any(AsyncCallback.class)
       );
@@ -290,16 +278,12 @@ public class AccessRequirementsPresenterTest {
   @Test
   public void testAnonymous() {
     when(mockAuthController.isLoggedIn()).thenReturn(false);
-    when(mockPlace.getParam(AccessRequirementsPlace.ID_PARAM))
-      .thenReturn(ENTITY_ID);
-    when(mockPlace.getParam(AccessRequirementsPlace.TYPE_PARAM))
-      .thenReturn(RestrictableObjectType.ENTITY.toString());
 
-    presenter.setPlace(mockPlace);
+    presenter.configure(testSubject);
     verify(mockDataAccessClient)
       .getAccessRequirements(
         subjectCaptor.capture(),
-        eq(AccessRequirementsPresenter.LIMIT),
+        eq(AccessRequirementsForACT.LIMIT),
         eq(0L),
         any(AsyncCallback.class)
       );

@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.view;
 
 import com.google.gwt.user.client.ui.Widget;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
-import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.web.client.jsinterop.AccessRequirementListProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.SRC;
@@ -15,7 +14,6 @@ public class AccessRequirementsSRCViewImpl
 
   Container container;
   ReactComponent requestDataAccessWidget;
-  RestrictableObjectType type;
   RestrictableObjectDescriptor subject;
 
   public AccessRequirementsSRCViewImpl() {
@@ -27,11 +25,7 @@ public class AccessRequirementsSRCViewImpl
   }
 
   @Override
-  public void configure(
-    RestrictableObjectType type,
-    RestrictableObjectDescriptor subject
-  ) {
-    this.type = type;
+  public void configure(RestrictableObjectDescriptor subject) {
     this.subject = subject;
     rerender();
   }
@@ -46,7 +40,7 @@ public class AccessRequirementsSRCViewImpl
       },
       null,
       subject.getId(),
-      type,
+      subject.getType(),
       false
     );
     requestDataAccessWidget.render(

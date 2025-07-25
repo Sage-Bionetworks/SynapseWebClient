@@ -97,14 +97,11 @@ public class AccessRequirementsForACT implements IsWidget {
     return view.asWidget();
   }
 
-  public void configure(
-    RestrictableObjectType type,
-    RestrictableObjectDescriptor subject
-  ) {
+  public void configure(RestrictableObjectDescriptor subject) {
     view.initHeaderAndFooter();
     synAlert.clear();
     this.subject = subject;
-    if (RestrictableObjectType.ENTITY.equals(type)) {
+    if (RestrictableObjectType.ENTITY.equals(subject.getType())) {
       teamBadge.setVisible(false);
       entityIdRenderer.setVisible(true);
       entityIdRenderer.setValue(subject.getId());

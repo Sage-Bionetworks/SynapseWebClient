@@ -56,10 +56,10 @@ public class AccessRequirementsPresenter
     isACTMemberAsyncHandler.isACTMember(isACT -> {
       if (isACT) {
         view.add(accessRequirementsForACT.asWidget());
-        accessRequirementsForACT.configure(type, subject);
+        accessRequirementsForACT.configure(subject);
       } else {
         view.add(accessRequirementsSRCView.asWidget());
-        accessRequirementsSRCView.configure(type, subject);
+        accessRequirementsSRCView.configure(subject);
       }
     });
   }
