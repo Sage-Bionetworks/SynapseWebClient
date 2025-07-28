@@ -7,7 +7,6 @@ import static org.sagebionetworks.web.client.place.ACTAccessApprovalsPlace.EXPIR
 import static org.sagebionetworks.web.client.place.ACTAccessApprovalsPlace.SUBMITTER_ID_PARAM;
 
 import com.google.gwt.activity.shared.AbstractActivity;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;

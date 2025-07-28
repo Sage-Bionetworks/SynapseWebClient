@@ -15,6 +15,7 @@ public class SxProps extends JsObject {
   public String mt;
 
   public String pl;
+  public String pb;
 
   @JsOverlay
   public static SxProps create() {

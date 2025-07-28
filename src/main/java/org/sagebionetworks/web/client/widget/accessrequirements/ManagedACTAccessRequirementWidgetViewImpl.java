@@ -393,7 +393,8 @@ public class ManagedACTAccessRequirementWidgetViewImpl
       onHide,
       Collections.singletonList(accessRequirement),
       entityId,
-      RestrictableObjectType.ENTITY
+      RestrictableObjectType.ENTITY,
+      true
     );
     requestDataAccessWidgetContainer.add(requestDataAccessWidget);
     requestDataAccessWidget.render(
