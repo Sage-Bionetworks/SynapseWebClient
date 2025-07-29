@@ -105,6 +105,7 @@ public class EntityMetadataViewImpl
   @Override
   public void setEntityId(String entityId) {
     idField.setText(entityId);
+    idField.setCopyIconVisible(true);
     portalBannersWidget.configure(entityId);
   }
 

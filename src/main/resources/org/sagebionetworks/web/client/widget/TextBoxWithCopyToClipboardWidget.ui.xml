@@ -4,9 +4,16 @@
   xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 >
-  <bh:Span>
+  <bh:Span addStyleNames="inline-flex align-items-center">
+    <b:Anchor ui:field="textAnchor"  />
+    <bh:Span ui:field="textLabel" />
     <b:Tooltip title="Copy to clipboard">
-      <b:Anchor ui:field="textAnchor" text="" />
+      <b:Anchor
+          ui:field="copyIcon"
+          icon="CLIPBOARD"
+          visible="false"            
+          addStyleNames="margin-left-3 cursor-pointer"
+      />
     </b:Tooltip>
   </bh:Span>
 </ui:UiBinder>
