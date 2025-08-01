@@ -57,6 +57,7 @@ public class SRC {
     public static ReactComponentType<EmptyProps> OAuthManagement;
     public static ReactComponentType TrashCanList;
     public static ReactComponentType<SynapseHomepageV2Props> SynapseHomepageV2;
+    public static ReactComponentType<SynapseGridProps> SynapseGrid;
     public static ReactComponentType<SynapseFooterProps> SynapseFooter;
     public static ReactComponentType<ErrorPageProps> ErrorPage;
     public static ReactComponentType<LoginPageProps> LoginPage;
