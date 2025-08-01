@@ -1862,11 +1862,6 @@ h6 {
   text-decoration: none;
 }
 
-.no-underline {
-  text-decoration: none !important;
-  cursor: default !important;
-}
-
 /** SWC-4059: fix focus by changing tree items to block (so that top and left positions are set properly) **/
 .gwt-TreeItem {
   display: block !important;
