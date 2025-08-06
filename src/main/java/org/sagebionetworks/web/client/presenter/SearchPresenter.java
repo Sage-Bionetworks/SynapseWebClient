@@ -24,6 +24,8 @@ import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.FeatureFlagConfig;
+import org.sagebionetworks.web.client.FeatureFlagKey;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -74,7 +76,8 @@ public class SearchPresenter
     SynapseAlert synAlert,
     LoadMoreWidgetContainer loadMoreWidgetContainer,
     SearchAnalyticsClient searchAnalyticsClient,
-    SynapseJSNIUtils jsniUtils
+    SynapseJSNIUtils jsniUtils,
+    FeatureFlagConfig featureFlagConfig
   ) {
     this.view = view;
     this.globalApplicationState = globalApplicationState;
@@ -84,6 +87,7 @@ public class SearchPresenter
     this.jsClient = jsClient;
     this.searchAnalyticsClient = searchAnalyticsClient;
     this.jsniUtils = jsniUtils;
+    this.featureFlagConfig = featureFlagConfig;
     allPagesOfResults = new ArrayList<>();
     currentSearch = getBaseSearchQuery();
     view.setPresenter(this);
@@ -509,7 +513,10 @@ public class SearchPresenter
   private <T extends SearchQueryEventData> T addSearchToAnalyticsEventData(
     T eventData
   ) {
-    eventData.opensearch_enabled = false;
+    eventData.opensearch_enabled =
+      featureFlagConfig.isFeatureEnabled(
+        FeatureFlagKey.OPENSEARCH_ENABLED.getKey()
+      );
     eventData.search_context = SearchContext.synapse_entity.toString();
 
     JSONObjectAdapter adapter = this.jsonObjectAdapter.createNew();
