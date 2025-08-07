@@ -2584,9 +2584,13 @@ public class SynapseJavascriptClient {
 
   public void getSearchResults(
     SearchQuery request,
+    Boolean isOpenSearchEnable,
     AsyncCallback<SearchResults> callback
   ) {
     String url = getRepoServiceUrl() + SEARCH;
+    if (isOpenSearchEnable != null) {
+      url = url + "?isOpenSearchEnable=" + isOpenSearchEnable;
+    }
     doPost(url, request, OBJECT_TYPE.SearchResults, true, callback);
   }
 
