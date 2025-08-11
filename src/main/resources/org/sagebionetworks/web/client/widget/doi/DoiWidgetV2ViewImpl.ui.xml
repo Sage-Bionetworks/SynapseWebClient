@@ -3,6 +3,7 @@
   xmlns:ui="urn:ui:com.google.gwt.uibinder"
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
   xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
+  xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
 >
   <bh:Div addStyleNames="flexcontainer-column">
     <bh:Span ui:field="synAlertContainer" />
@@ -12,6 +13,6 @@
       text="DOI"
       visible="false"
     />
-    <b:Anchor ui:field="viewDoiLink">View DOI</b:Anchor>
+    <w:TextBoxWithCopyToClipboardWidget ui:field="copyToClipboardWidget" />
   </bh:Div>
 </ui:UiBinder>

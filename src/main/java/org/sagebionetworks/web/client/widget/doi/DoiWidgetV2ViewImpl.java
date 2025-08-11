@@ -4,18 +4,18 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
+import org.sagebionetworks.web.client.widget.TextBoxWithCopyToClipboardWidget;
 
 public class DoiWidgetV2ViewImpl implements DoiWidgetV2View {
 
   @UiField
-  Anchor viewDoiLink;
+  Span doiLabel;
 
   @UiField
-  Span doiLabel;
+  TextBoxWithCopyToClipboardWidget copyToClipboardWidget;
 
   @UiField
   Span synAlertContainer;
@@ -38,10 +38,8 @@ public class DoiWidgetV2ViewImpl implements DoiWidgetV2View {
   @Override
   public void showDoi(String doiText) {
     widget.setVisible(true);
-    copyTextModal.setText(doiText);
-    viewDoiLink.addClickHandler(clickEvent -> {
-      copyTextModal.show();
-    });
+    copyToClipboardWidget.setText(doiText);
+    copyToClipboardWidget.setCopyIconVisible(true);
     doiLabel.setVisible(isLabelVisible);
   }
 
@@ -55,7 +53,7 @@ public class DoiWidgetV2ViewImpl implements DoiWidgetV2View {
 
   @Override
   public void clear() {
-    copyTextModal.setText("");
+    copyToClipboardWidget.setText("");
     doiLabel.setVisible(false);
   }
 

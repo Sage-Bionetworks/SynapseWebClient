@@ -35,7 +35,13 @@ public class TextBoxWithCopyToClipboardWidget implements IsWidget {
   @UiField
   Anchor textAnchor;
 
+  @UiField
+  Span textLabel;
+
   Widget widget;
+
+  @UiField
+  Anchor copyIcon;
 
   public interface Binder
     extends UiBinder<Widget, TextBoxWithCopyToClipboardWidget> {}
@@ -44,7 +50,26 @@ public class TextBoxWithCopyToClipboardWidget implements IsWidget {
 
   public TextBoxWithCopyToClipboardWidget() {
     widget = uiBinder.createAndBindUi(this);
-    textAnchor.addClickHandler(event -> copyContentsToClipboard());
+    copyIcon.addClickHandler(e -> copyContentsToClipboard());
+
+    textAnchor.addClickHandler(e -> {
+      if (!copyIcon.isVisible()) {
+        copyContentsToClipboard();
+      }
+    });
+  }
+
+  public void setCopyIconVisible(boolean visible) {
+    copyIcon.setVisible(visible);
+    if (visible) {
+      textAnchor.setVisible(false);
+      textLabel.setVisible(true);
+      textLabel.setText(textAnchor.getText());
+    } else {
+      textLabel.setVisible(false);
+      textAnchor.setVisible(true);
+      textAnchor.addClickHandler(event -> copyContentsToClipboard());
+    }
   }
 
   public void setText(String text) {
