@@ -64,6 +64,7 @@ public class SearchPresenter
   private final LoadMoreWidgetContainer loadMoreWidgetContainer;
   private final SearchAnalyticsClient searchAnalyticsClient;
   private final SynapseJSNIUtils jsniUtils;
+  private final FeatureFlagConfig featureFlagConfig;
 
   private final List<SearchResults> allPagesOfResults;
 
@@ -416,7 +417,11 @@ public class SearchPresenter
       }
     };
     loadMoreWidgetContainer.setIsProcessing(true);
-    jsClient.getSearchResults(currentSearch, callback);
+    jsClient.getSearchResults(
+      currentSearch,
+      featureFlagConfig.isFeatureEnabled(FeatureFlagKey.OPENSEARCH_ENABLED),
+      callback
+    );
 
     // Submit analytics event for search query submission
     searchAnalyticsClient.sendSearchQuerySubmittedEvent(
@@ -514,9 +519,7 @@ public class SearchPresenter
     T eventData
   ) {
     eventData.opensearch_enabled =
-      featureFlagConfig.isFeatureEnabled(
-        FeatureFlagKey.OPENSEARCH_ENABLED.getKey()
-      );
+      featureFlagConfig.isFeatureEnabled(FeatureFlagKey.OPENSEARCH_ENABLED);
     eventData.search_context = SearchContext.synapse_entity.toString();
 
     JSONObjectAdapter adapter = this.jsonObjectAdapter.createNew();
