@@ -16,7 +16,7 @@
               text="Project SynID"
             />
             <w:HelpWidget
-              helpMarkdown="The Synapse ID (e.g. syn123) is a unique identifier assigned to all content."
+              helpMarkdown="The Synapse ID (e.g. `syn123`) is a unique identifier assigned to all content."
               addStyleNames="margin-right-15 moveup-5"
             />
           </bh:Div>
