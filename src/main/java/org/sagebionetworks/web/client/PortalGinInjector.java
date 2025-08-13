@@ -110,6 +110,7 @@ import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalView;
 import org.sagebionetworks.web.client.widget.entity.RegisterTeamDialog;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
 import org.sagebionetworks.web.client.widget.entity.SqlDefinedEditorModalWidget;
+import org.sagebionetworks.web.client.widget.entity.SynapseGridImpl;
 import org.sagebionetworks.web.client.widget.entity.TutorialWizard;
 import org.sagebionetworks.web.client.widget.entity.VersionHistoryRowView;
 import org.sagebionetworks.web.client.widget.entity.VersionHistoryWidget;
@@ -904,4 +905,5 @@ public interface PortalGinInjector extends Ginjector {
   PlansPresenter getPlansPresenter();
   ProjectDataAvailability getProjectDataAvailability();
   SynapseReactClientFullContextPropsProvider getReactContextPropsProvider();
+  SynapseGridImpl getSynapseGridImpl();
 }

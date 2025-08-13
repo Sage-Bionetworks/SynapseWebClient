@@ -269,6 +269,7 @@ public class TableEntityWidgetV2
     // Listen to action events.
     view.setScopeVisible(false);
     view.setSchemaVisible(false);
+    view.setSynapseGridVisible(false);
     actionMenu.setActionText(
       Action.SHOW_TABLE_SCHEMA,
       SHOW + entityTypeDisplay + SCHEMA
@@ -299,6 +300,20 @@ public class TableEntityWidgetV2
             Action.SHOW_TABLE_SCHEMA,
             showHide + entityTypeDisplay + SCHEMA
           );
+        }
+      );
+    this.actionMenu.setActionListener(
+        Action.SHOW_GRID,
+        (action, e) -> {
+          boolean isVisible = !view.isSynapseGridVisible();
+          view.setSynapseGridVisible(isVisible);
+          // Toggle QueryWrapperPlotNav visibility - hide when grid is shown, show when grid is hidden
+          view.setQueryWrapperPlotNavVisible(!isVisible);
+          if (isVisible && currentQuery != null) {
+            view.configureSynapseGrid(currentQuery.getSql());
+          }
+          String showHide = isVisible ? HIDE : SHOW;
+          actionMenu.setActionText(Action.SHOW_GRID, showHide + "Synapse Grid");
         }
       );
 

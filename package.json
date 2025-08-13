@@ -46,12 +46,6 @@
     "universal-cookie": "^4.0.4",
     "xss": "^1.0.15"
   },
-  "resolutions": {
-    "@types/react": "19.1.8",
-    "@types/react-dom": "19.1.6",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0"
-  },
   "devDependencies": {
     "@eslint/js": "^9.28.0",
     "@playwright/test": "^1.52.0",
@@ -73,6 +67,15 @@
     "vite": "^6.3.5",
     "vite-plugin-node-polyfills": "0.17.0",
     "wait-on": "^8.0.3"
+  },
+  "pnpm": {
+    "overrides": {
+      "@types/react": "19.1.8",
+      "@types/react-dom": "19.1.6",
+      "react": "^19.1.0",
+      "react-dom": "^19.1.0",
+      "synapse-react-client": "link:../synapse-web-monorepo/packages/synapse-react-client"
+    }
   },
   "lint-staged": {
     "*.{java,tsx,ts,scss,xml,yml,json}": "prettier --write"

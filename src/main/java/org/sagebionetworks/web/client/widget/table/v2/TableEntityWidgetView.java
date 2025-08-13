@@ -61,6 +61,10 @@ public interface TableEntityWidgetView extends IsWidget {
 
   boolean isSchemaVisible();
 
+  void setSynapseGridVisible(boolean visible);
+
+  boolean isSynapseGridVisible();
+
   void showErrorMessage(String message);
 
   void showConfirmDialog(
@@ -97,6 +101,8 @@ public interface TableEntityWidgetView extends IsWidget {
   );
 
   void configureTableOnly(String sql);
+
+  void configureSynapseGrid(String sql);
 
   void setQueryWrapperPlotNavVisible(boolean visible);
 }

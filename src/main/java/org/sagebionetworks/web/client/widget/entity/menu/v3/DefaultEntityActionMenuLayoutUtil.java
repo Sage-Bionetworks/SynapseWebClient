@@ -299,6 +299,7 @@ public class DefaultEntityActionMenuLayoutUtil {
         );
         layout.setButtonActions(
           Arrays.asList(
+            ActionViewProps.create(Action.SHOW_GRID, "tableRows"),
             ActionViewProps.create(Action.EDIT_TABLE_DATA, "edit"),
             ActionViewProps.create(Action.SHOW_ANNOTATIONS, "label"),
             ActionViewProps.create(Action.SHOW_TABLE_SCHEMA, "columns")
@@ -350,6 +351,7 @@ public class DefaultEntityActionMenuLayoutUtil {
         );
         layout.setButtonActions(
           Arrays.asList(
+            ActionViewProps.create(Action.SHOW_GRID, "tableRows"),
             ActionViewProps.create(Action.EDIT_TABLE_DATA, "edit"),
             ActionViewProps.create(Action.SHOW_ANNOTATIONS, "label"),
             ActionViewProps.create(Action.SHOW_TABLE_SCHEMA, "columns")
