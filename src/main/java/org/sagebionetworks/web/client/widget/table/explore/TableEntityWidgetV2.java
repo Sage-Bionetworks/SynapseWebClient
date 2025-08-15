@@ -151,6 +151,7 @@ public class TableEntityWidgetV2
   public static final String HIDE = "Hide ";
   public static final String SCOPE = "Scope of ";
   public static final String SCHEMA = " Schema";
+  private static final int GRID_INITIALIZATION_DELAY = 200; // Delay to ensure React component is mounted
   String entityTypeDisplay;
   QueryResultEditorWidget queryResultEditor;
   PortalGinInjector ginInjector;
@@ -309,8 +310,19 @@ public class TableEntityWidgetV2
           view.setSynapseGridVisible(isVisible);
           // Toggle QueryWrapperPlotNav visibility - hide when grid is shown, show when grid is hidden
           view.setQueryWrapperPlotNavVisible(!isVisible);
+
           if (isVisible && currentQuery != null) {
             view.configureSynapseGrid(currentQuery.getSql());
+
+            // Imperative call to instantiate the grid
+            com.google.gwt.user.client.Timer timer =
+              new com.google.gwt.user.client.Timer() {
+                @Override
+                public void run() {
+                  view.initializeSynapseGrid();
+                }
+              };
+            timer.schedule(GRID_INITIALIZATION_DELAY);
           }
           String showHide = isVisible ? HIDE : SHOW;
           actionMenu.setActionText(Action.SHOW_GRID, showHide + "Synapse Grid");

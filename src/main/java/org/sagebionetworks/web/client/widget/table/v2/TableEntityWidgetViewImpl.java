@@ -228,6 +228,13 @@ public class TableEntityWidgetViewImpl
   }
 
   @Override
+  public void initializeSynapseGrid() {
+    if (synapseGrid != null) {
+      synapseGrid.initializeGrid();
+    }
+  }
+
+  @Override
   public void configureQueryWrapperPlotNav(
     String sql,
     String initQueryJson,

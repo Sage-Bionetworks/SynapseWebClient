@@ -9,12 +9,18 @@ public class SynapseGridProps extends ReactComponentProps {
 
   public String query;
   public boolean showDebugInfo;
+  public ReactRef<SynapseGridHandle> ref;
 
   @JsOverlay
-  public static SynapseGridProps create(String query, Boolean showDebugInfo) {
+  public static SynapseGridProps create(
+    String query,
+    Boolean showDebugInfo,
+    ReactRef<SynapseGridHandle> ref
+  ) {
     SynapseGridProps props = new SynapseGridProps();
     props.query = query;
     props.showDebugInfo = showDebugInfo;
+    props.ref = ref;
     return props;
   }
 }

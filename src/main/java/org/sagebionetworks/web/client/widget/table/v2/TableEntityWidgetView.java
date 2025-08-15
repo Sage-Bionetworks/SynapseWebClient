@@ -104,5 +104,7 @@ public interface TableEntityWidgetView extends IsWidget {
 
   void configureSynapseGrid(String sql);
 
+  void initializeSynapseGrid();
+
   void setQueryWrapperPlotNavVisible(boolean visible);
 }
