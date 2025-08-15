@@ -129,8 +129,8 @@ importers:
         specifier: ^3.0.2
         version: 3.0.2
       synapse-react-client:
-        specifier: 3.4.37
-        version: 3.4.37(@hyperjump/browser@1.3.1)(@types/react@19.1.8)(csstype@3.1.3)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.30.1)(prop-types@15.8.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(rxjs@7.8.2)
+        specifier: 3.4.38
+        version: 3.4.38(@hyperjump/browser@1.3.1)(@types/react@19.1.8)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.30.1)(prop-types@15.8.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(rxjs@7.8.2)
       universal-cookie:
         specifier: ^4.0.4
         version: 4.0.4
@@ -4227,8 +4227,8 @@ packages:
     peerDependencies:
       react: ^19.1.0
 
-  react-hot-toast@2.2.0:
-    resolution: {integrity: sha512-248rXw13uhf/6TNDVzagX+y7R8J183rp7MwUMNkcrBRyHj/jWOggfXTGlM8zAOuh701WyVW+eUaWG2LeSufX9g==}
+  react-hot-toast@2.6.0:
+    resolution: {integrity: sha512-bH+2EBMZ4sdyou/DPrfgIouFpcRLCJ+HoCA32UoAYHn6T3Ur5yfcDCeSr5mwldl6pFOsiocmrXMuoCJ1vV8bWg==}
     engines: {node: '>=10'}
     peerDependencies:
       react: ^19.1.0
@@ -4794,8 +4794,8 @@ packages:
   svg-path-sdf@1.1.3:
     resolution: {integrity: sha512-vJJjVq/R5lSr2KLfVXVAStktfcfa1pNFjFOgyJnzZFXlO/fDZ5DmM8FpnSKKzLPfEYTVeXuVBTHF296TpxuJVg==}
 
-  synapse-react-client@3.4.37:
-    resolution: {integrity: sha512-An9V0cmqBLzv+HvZAc11n+94BP12db9df/8pjAZGffVRjZnHad0PwdqKRHMmng6YruUIkXKZ/UNHLn5KymO3XA==}
+  synapse-react-client@3.4.38:
+    resolution: {integrity: sha512-kvmmpsjyjk0eK48zu6FKNRf/WdTqkyfTxRzjz7W8lDXkTrd1cbrni3eKt+2R2VocDInxjO6FqGy2IwCGZeddwA==}
     peerDependencies:
       react: ^19.1.0
       react-dom: ^19.1.0
@@ -10171,16 +10171,15 @@ snapshots:
 
   react-error-boundary@3.1.4(react@19.1.0):
     dependencies:
-      '@babel/runtime': 7.27.6
+      '@babel/runtime': 7.28.2
       react: 19.1.0
 
-  react-hot-toast@2.2.0(csstype@3.1.3)(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
+  react-hot-toast@2.6.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
     dependencies:
+      csstype: 3.1.3
       goober: 2.1.16(csstype@3.1.3)
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
-    transitivePeerDependencies:
-      - csstype
 
   react-inspector@6.0.2(react@19.1.0):
     dependencies:
@@ -10209,7 +10208,7 @@ snapshots:
 
   react-measure@2.5.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
     dependencies:
-      '@babel/runtime': 7.27.6
+      '@babel/runtime': 7.28.2
       get-node-dimensions: 1.2.1
       prop-types: 15.8.1
       react: 19.1.0
@@ -10232,7 +10231,7 @@ snapshots:
 
   react-reflex@4.2.7(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
     dependencies:
-      '@babel/runtime': 7.27.6
+      '@babel/runtime': 7.28.2
       lodash.throttle: 4.1.1
       prop-types: 15.8.1
       react: 19.1.0
@@ -10250,7 +10249,7 @@ snapshots:
 
   react-select@5.10.2(@types/react@19.1.8)(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
     dependencies:
-      '@babel/runtime': 7.27.6
+      '@babel/runtime': 7.28.2
       '@emotion/cache': 11.14.0
       '@emotion/react': 11.14.0(@types/react@19.1.8)(react@19.1.0)
       '@floating-ui/dom': 1.7.3
@@ -10293,7 +10292,7 @@ snapshots:
 
   react-vtree@3.0.0-beta.3(react-dom@19.1.0(react@19.1.0))(react-window@1.8.11(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0):
     dependencies:
-      '@babel/runtime': 7.27.6
+      '@babel/runtime': 7.28.2
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
       react-merge-refs: 1.1.0
@@ -10301,7 +10300,7 @@ snapshots:
 
   react-window@1.8.11(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
     dependencies:
-      '@babel/runtime': 7.27.6
+      '@babel/runtime': 7.28.2
       memoize-one: 5.2.1
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
@@ -10510,7 +10509,7 @@ snapshots:
 
   rtl-css-js@1.16.1:
     dependencies:
-      '@babel/runtime': 7.27.6
+      '@babel/runtime': 7.28.2
 
   run-parallel@1.2.0:
     dependencies:
@@ -10891,7 +10890,7 @@ snapshots:
       parse-svg-path: 0.1.2
       svg-path-bounds: 1.0.2
 
-  synapse-react-client@3.4.37(@hyperjump/browser@1.3.1)(@types/react@19.1.8)(csstype@3.1.3)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.30.1)(prop-types@15.8.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(rxjs@7.8.2):
+  synapse-react-client@3.4.38(@hyperjump/browser@1.3.1)(@types/react@19.1.8)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.30.1)(prop-types@15.8.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(rxjs@7.8.2):
     dependencies:
       '@apidevtools/json-schema-ref-parser': 14.1.1
       '@aws-sdk/client-s3': 3.864.0
@@ -10955,7 +10954,7 @@ snapshots:
       react-datetime: 3.3.1(moment@2.30.1)(react@19.1.0)
       react-dom: 19.1.0(react@19.1.0)
       react-error-boundary: 3.1.4(react@19.1.0)
-      react-hot-toast: 2.2.0(csstype@3.1.3)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      react-hot-toast: 2.6.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       react-inspector: 6.0.2(react@19.1.0)
       react-intersection-observer: 9.16.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       react-mailchimp-subscribe: 2.1.3(react@19.1.0)
@@ -10987,7 +10986,6 @@ snapshots:
       - '@mui/material-pigment-css'
       - '@types/react'
       - aws-crt
-      - csstype
       - date-fns
       - date-fns-jalali
       - immer
@@ -11187,7 +11185,7 @@ snapshots:
 
   use-deep-compare-effect@1.8.1(react@19.1.0):
     dependencies:
-      '@babel/runtime': 7.27.6
+      '@babel/runtime': 7.28.2
       dequal: 2.0.3
       react: 19.1.0
 
