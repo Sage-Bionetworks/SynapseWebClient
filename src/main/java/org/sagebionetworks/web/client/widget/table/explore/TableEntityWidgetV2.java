@@ -151,7 +151,7 @@ public class TableEntityWidgetV2
   public static final String HIDE = "Hide ";
   public static final String SCOPE = "Scope of ";
   public static final String SCHEMA = " Schema";
-  private static final int GRID_INITIALIZATION_DELAY = 200; // Delay to ensure React component is mounted
+  private static final int GRID_INITIALIZATION_DELAY = 150; // Delay to ensure React component is mounted
   String entityTypeDisplay;
   QueryResultEditorWidget queryResultEditor;
   PortalGinInjector ginInjector;
