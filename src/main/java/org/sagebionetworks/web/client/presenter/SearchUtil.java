@@ -6,6 +6,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.place.PeopleSearch;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.shared.WebConstants;
 
 /**
  * This logic was removed from the search presenter so we could make a clean SearchPresenterProxy.
@@ -34,17 +35,13 @@ public class SearchUtil {
    * @return
    */
   public static Place willRedirect(String queryTerm) {
+    queryTerm = queryTerm.toLowerCase().trim();
     if (queryTerm == null || queryTerm.trim().length() == 0) {
       return null;
     }
-    if (queryTerm.startsWith(ClientProperties.SYNAPSE_ID_PREFIX)) {
-      String remainder = queryTerm.replaceFirst(
-        ClientProperties.SYNAPSE_ID_PREFIX,
-        ""
-      );
-      if (remainder.matches("^[0-9]+$")) {
-        return new Synapse(queryTerm);
-      }
+
+    if (queryTerm.matches(WebConstants.SYNAPSE_ENTITY_ID_REGEX)) {
+      return new Synapse(queryTerm);
     } else if (queryTerm.charAt(0) == '@') {
       return new PeopleSearch(queryTerm.substring(1));
     }
