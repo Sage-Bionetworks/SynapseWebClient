@@ -35,10 +35,11 @@ public class SearchUtil {
    * @return
    */
   public static Place willRedirect(String queryTerm) {
-    queryTerm = queryTerm.toLowerCase().trim();
     if (queryTerm == null || queryTerm.trim().length() == 0) {
       return null;
     }
+
+    queryTerm = queryTerm.toLowerCase().trim();
 
     if (queryTerm.matches(WebConstants.SYNAPSE_ENTITY_ID_REGEX)) {
       return new Synapse(queryTerm);

@@ -453,7 +453,10 @@ public class SearchPresenterTest {
     String userName = "VaderLabTech";
     Place redirectPlace = SearchUtil.willRedirect("@" + userName);
     assertTrue(redirectPlace instanceof PeopleSearch);
-    assertEquals(userName, ((PeopleSearch) redirectPlace).getSearchTerm());
+    assertEquals(
+      userName.toLowerCase(),
+      ((PeopleSearch) redirectPlace).getSearchTerm()
+    );
   }
 
   private List<KeyValue> getFacet(String facetName) {
