@@ -334,6 +334,14 @@ public class SearchPresenter
       }
     }
 
+    // Clean up query terms to handle whitespace issues and empty strings
+    if (query.getQueryTerm() != null) {
+      List<String> terms = new ArrayList<>(query.getQueryTerm());
+      terms.removeIf(term -> term == null || term.trim().isEmpty());
+      terms.replaceAll(s -> s.trim());
+      query.setQueryTerm(terms);
+    }
+
     return query;
   }
 
