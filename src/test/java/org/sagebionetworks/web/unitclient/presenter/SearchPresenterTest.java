@@ -448,6 +448,53 @@ public class SearchPresenterTest {
     assertEquals(new Synapse(term), SearchUtil.willRedirect(new Search(term)));
   }
 
+  @SuppressWarnings("unchecked")
+  @Test
+  public void testSetPlaceSynapseIdPrefixWithVersion() throws Exception {
+    // test for a versioned synapse ID
+    String term = ClientProperties.SYNAPSE_ID_PREFIX + "1234567890.5"; // # 'syn1234567890.5'
+    assertEquals(new Synapse(term), SearchUtil.willRedirect(new Search(term)));
+  }
+
+  @SuppressWarnings("unchecked")
+  @Test
+  public void testSearchUtilWillRedirectWithWhitespace() throws Exception {
+    String termWithWhitespace = " syn1234567890 ";
+    assertEquals(
+      new Synapse("syn1234567890"),
+      SearchUtil.willRedirect(termWithWhitespace)
+    );
+  }
+
+  @SuppressWarnings("unchecked")
+  @Test
+  public void testSearchTermsWithEmptyStringsFromJson() throws Exception {
+    // Test JSON query with empty strings in queryTerm array
+    SearchQuery queryWithEmptyTerms = SearchQueryUtils.getDefaultSearchQuery();
+    queryWithEmptyTerms.setQueryTerm(Arrays.asList("syn1234567890", "", "  "));
+
+    String jsonQuery = queryWithEmptyTerms
+      .writeToJSONObject(jsonObjectAdapter.createNew())
+      .toJSONString();
+
+    searchPresenter.setPlace(new Search(jsonQuery));
+
+    // Should redirect to Synapse place since only one valid term remains after cleanup
+    verify(mockPlaceChanger).goTo(new Synapse("syn1234567890"));
+    verify(mockJsClient, never())
+      .getSearchResults(any(SearchQuery.class), any(AsyncCallback.class));
+  }
+
+  @SuppressWarnings("unchecked")
+  @Test
+  public void testSearchTermsWithWhitespaceOnly() throws Exception {
+    // Test search term that contains only whitespace characters
+    String whitespaceOnlyTerm = "   \t  \n  ";
+
+    // Should return null since no valid terms remain after cleanup
+    assertNull(SearchUtil.willRedirect(whitespaceOnlyTerm));
+  }
+
   @Test
   public void testSetPlaceUsernamePrefix() throws Exception {
     String userName = "VaderLabTech";

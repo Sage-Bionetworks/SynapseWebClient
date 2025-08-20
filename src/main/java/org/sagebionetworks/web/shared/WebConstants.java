@@ -74,7 +74,7 @@ public class WebConstants {
   public static final String VALID_ENTITY_ID_REGEX =
     "^[Ss]{1}[Yy]{1}[Nn]{1}\\d+";
   // Regex that matches Synapse entity ID with optional version (e.g., syn123 or syn123.4)
-  // Equivalent to client-side SYNAPSE_ENTITY_ID_REGEX = /^(syn\d+)(?:\.(\d+))?$/i
+  // Equivalent to client-side SYNAPSE_ENTITY_ID_REGEX = /^(syn\d+)(?:\.(\d+))?$/i but without the 'i' (since case is not ignored in this regex)
   public static final String SYNAPSE_ENTITY_ID_REGEX =
     "^(syn\\d+)(?:\\.(\\d+))?$";
   public static final String VALID_POSITIVE_NUMBER_REGEX = "^[0-9]+";
