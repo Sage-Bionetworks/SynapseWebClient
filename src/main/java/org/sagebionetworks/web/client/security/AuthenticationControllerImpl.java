@@ -60,7 +60,6 @@ public class AuthenticationControllerImpl implements AuthenticationController {
   private List<String> persistentLocalStorageKeys;
   private String currentUserAccessToken;
   private UserProfile currentUserProfile;
-  private UserAccountServiceAsync userAccountService;
   private ClientCache localStorage;
   private SessionStorage sessionStorage;
   private PortalGinInjector ginInjector;
@@ -69,15 +68,12 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 
   @Inject
   public AuthenticationControllerImpl(
-    UserAccountServiceAsync userAccountService,
     ClientCache localStorage,
     SessionStorage sessionStorage,
     PortalGinInjector ginInjector,
     SynapseJSNIUtils jsniUtils,
     QueryClientProvider queryClientProvider
   ) {
-    this.userAccountService = userAccountService;
-    fixServiceEntryPoint(userAccountService);
     this.localStorage = localStorage;
     this.sessionStorage = sessionStorage;
     this.ginInjector = ginInjector;
@@ -215,8 +211,11 @@ public class AuthenticationControllerImpl implements AuthenticationController {
           } else if (forceResetQueryClientCache) {
             resetQueryClientCache();
           }
-          userAccountService.getMyProfile(
-            new AsyncCallback<UserProfile>() {
+          FluentFuture<UserProfile> userProfileFuture = ginInjector
+            .getSynapseJavascriptClient()
+            .getMyUserProfile();
+          userProfileFuture.addCallback(
+            new FutureCallback<UserProfile>() {
               @Override
               public void onSuccess(UserProfile profile) {
                 currentUserProfile = profile;
@@ -229,9 +228,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
                 currentUserProfile = null;
                 if (
                   t instanceof ForbiddenException &&
-                  ((ForbiddenException) t).getMessage()
-                    .toLowerCase()
-                    .contains("terms of use")
+                  t.getMessage().toLowerCase().contains("terms of service")
                 ) {
                   ginInjector.getSessionDetector().initializeAccessTokenState();
                   ginInjector
@@ -244,7 +241,8 @@ public class AuthenticationControllerImpl implements AuthenticationController {
                   callback.onFailure(t);
                 }
               }
-            }
+            },
+            directExecutor()
           );
         }
 
