@@ -1293,6 +1293,10 @@ public class EntityActionControllerImpl
         "Upload Data to " + entityTypeDisplay
       );
       actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, canEditResults);
+      actionMenu.setActionVisible(
+        Action.SHOW_GRID,
+        featureFlagConfig.isFeatureEnabled(FeatureFlagKey.SYNAPSE_GRID)
+      );
       actionMenu.setActionVisible(Action.SHOW_TABLE_SCHEMA, true);
       actionMenu.setActionVisible(
         Action.SHOW_VIEW_SCOPE,
@@ -1322,6 +1326,7 @@ public class EntityActionControllerImpl
     } else {
       actionMenu.setActionVisible(Action.UPLOAD_TABLE_DATA, false);
       actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, false);
+      actionMenu.setActionVisible(Action.SHOW_GRID, false);
       actionMenu.setActionVisible(Action.SHOW_TABLE_SCHEMA, false);
       actionMenu.setActionVisible(Action.SHOW_VIEW_SCOPE, false);
       actionMenu.setActionVisible(
