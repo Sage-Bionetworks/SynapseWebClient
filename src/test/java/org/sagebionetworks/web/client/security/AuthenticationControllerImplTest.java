@@ -39,7 +39,6 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SessionDetector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.context.QueryClientProvider;
@@ -59,9 +58,6 @@ public class AuthenticationControllerImplTest {
 
   public static final String ACCESS_TOKEN = "1111";
   AuthenticationControllerImpl authenticationController;
-
-  @Mock
-  UserAccountServiceAsync mockUserAccountService;
 
   @Mock
   ClientCache mockClientCache;
@@ -144,10 +140,7 @@ public class AuthenticationControllerImplTest {
     when(mockJsClient.getAccessToken()).thenReturn(getDoneFuture(ACCESS_TOKEN));
     when(mockJsClient.deleteSessionAccessToken())
       .thenReturn(getDoneFuture(null));
-    AsyncMockStubber
-      .callSuccessWith(profile)
-      .when(mockUserAccountService)
-      .getMyProfile(any(AsyncCallback.class));
+    when(mockJsClient.getMyUserProfile()).thenReturn(getDoneFuture(profile));
     AsyncMockStubber
       .callSuccessWith(mockNotificationEmail)
       .when(mockJsClient)
@@ -163,7 +156,6 @@ public class AuthenticationControllerImplTest {
       );
     authenticationController =
       new AuthenticationControllerImpl(
-        mockUserAccountService,
         mockClientCache,
         mockSessionStorage,
         mockGinInjector,
@@ -310,12 +302,14 @@ public class AuthenticationControllerImplTest {
   @Test
   public void testLoginUserNotAcceptedTermsOfUse() {
     // access token is returned without error (it's set and valid), but getMyProfile() fails with a special ForbiddenException
-    AsyncMockStubber
-      .callFailureWith(
-        new ForbiddenException("Terms of use have not been signed.")
-      )
-      .when(mockUserAccountService)
-      .getMyProfile(any(AsyncCallback.class));
+    when(mockJsClient.getMyUserProfile())
+      .thenReturn(
+        getFailedFuture(
+          new ForbiddenException(
+            "Login to https://synapse.org to accept the latest Terms of Service."
+          )
+        )
+      );
 
     authenticationController.initializeFromExistingAccessTokenCookie(
       mockUserProfileCallback
