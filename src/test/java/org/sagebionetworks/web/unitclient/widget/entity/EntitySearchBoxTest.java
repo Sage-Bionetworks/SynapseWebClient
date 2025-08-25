@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
 import static junit.framework.Assert.assertNull;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
@@ -21,6 +22,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.search.Hit;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
+import org.sagebionetworks.web.client.FeatureFlagConfig;
+import org.sagebionetworks.web.client.FeatureFlagKey;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -54,19 +57,32 @@ public class EntitySearchBoxTest {
   @Mock
   SynapseJavascriptClient mockJsClient;
 
+  @Mock
+  FeatureFlagConfig mockFeatureFlagConfig;
+
   @Before
   public void before() {
-    suggestBox = new EntitySearchBox(mockView, mockJsClient);
+    suggestBox =
+      new EntitySearchBox(mockView, mockJsClient, mockFeatureFlagConfig);
     suggestBox.setOracle(mockOracle);
   }
 
   @Test
   public void testGetSuggestions() throws RestServiceException {
+    when(
+      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.OPENSEARCH_ENABLED)
+    )
+      .thenReturn(false);
+
     SearchResults testPage = getResponsePage();
     AsyncMockStubber
       .callSuccessWith(testPage)
       .when(mockJsClient)
-      .getSearchResults(any(SearchQuery.class), any(AsyncCallback.class));
+      .getSearchResults(
+        any(SearchQuery.class),
+        anyBoolean(),
+        any(AsyncCallback.class)
+      );
     when(mockOracle.makeEntitySuggestion(any(Hit.class), anyString()))
       .thenReturn(null);
 
@@ -78,7 +94,11 @@ public class EntitySearchBoxTest {
 
     verify(mockRequest).getQuery();
     verify(mockJsClient)
-      .getSearchResults(any(SearchQuery.class), any(AsyncCallback.class));
+      .getSearchResults(
+        any(SearchQuery.class),
+        anyBoolean(),
+        any(AsyncCallback.class)
+      );
     verify(mockView)
       .updateFieldStateForSuggestions(any(SearchResults.class), anyLong());
     verify(mockCallback)

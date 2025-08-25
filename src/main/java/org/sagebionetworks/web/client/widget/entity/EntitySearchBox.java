@@ -14,6 +14,8 @@ import org.sagebionetworks.repo.model.search.Hit;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.FeatureFlagConfig;
+import org.sagebionetworks.web.client.FeatureFlagKey;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.entity.EntitySearchBoxOracle.EntitySearchBoxSuggestion;
 import org.sagebionetworks.web.shared.SearchQueryUtils;
@@ -37,6 +39,7 @@ public class EntitySearchBox
   private boolean retrieveVersions = false;
   private EntitySearchBoxSuggestion selectedSuggestion;
   private long offset;
+  private FeatureFlagConfig featureFlagConfig;
 
   /**
    *
@@ -46,11 +49,13 @@ public class EntitySearchBox
   @Inject
   public EntitySearchBox(
     EntitySearchBoxView view,
-    SynapseJavascriptClient jsClient
+    SynapseJavascriptClient jsClient,
+    FeatureFlagConfig featureFlagConfig
   ) {
     super();
     this.view = view;
     this.jsClient = jsClient;
+    this.featureFlagConfig = featureFlagConfig;
     oracle = view.getOracle();
     view.setPresenter(this);
   }
@@ -136,6 +141,7 @@ public class EntitySearchBox
     final List<Suggestion> suggestions = new LinkedList<Suggestion>();
     jsClient.getSearchResults(
       query,
+      featureFlagConfig.isFeatureEnabled(FeatureFlagKey.OPENSEARCH_ENABLED),
       new AsyncCallback<SearchResults>() {
         @Override
         public void onSuccess(SearchResults result) {
