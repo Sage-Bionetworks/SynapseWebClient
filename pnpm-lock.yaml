@@ -18,10 +18,10 @@ importers:
         specifier: ^11.14.0
         version: 11.14.0(@types/react@19.1.8)(react@19.1.1)
       '@emotion/styled':
-        specifier: ^11.14.1
+        specifier: ^11.14.0
         version: 11.14.1(@emotion/react@11.14.0(@types/react@19.1.8)(react@19.1.1))(@types/react@19.1.8)(react@19.1.1)
       '@mui/material':
-        specifier: ^7.3.1
+        specifier: ^7.1.1
         version: 7.3.1(@emotion/react@11.14.0(@types/react@19.1.8)(react@19.1.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.1.8)(react@19.1.1))(@types/react@19.1.8)(react@19.1.1))(@types/react@19.1.8)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       '@sage-bionetworks/markdown-it-container':
         specifier: ^4.0.1
@@ -45,7 +45,7 @@ importers:
         specifier: 4.7.0
         version: 4.7.0
       jotai:
-        specifier: ^2.13.1
+        specifier: ^2.12.5
         version: 2.13.1(@babel/template@7.27.2)(@types/react@19.1.8)(react@19.1.1)
       jquery:
         specifier: 3.7.1
@@ -102,7 +102,7 @@ importers:
         specifier: ^2.30.1
         version: 2.30.1
       papaparse:
-        specifier: ^5.5.3
+        specifier: ^5.5.2
         version: 5.5.3
       pica:
         specifier: 6.0.0
@@ -123,7 +123,7 @@ importers:
         specifier: ^2.6.0
         version: 2.6.0(plotly.js@2.35.3(mapbox-gl@1.13.3)(webpack@5.97.1))(react@19.1.1)
       sass:
-        specifier: ^1.90.0
+        specifier: ^1.87.0
         version: 1.90.0
       spark-md5:
         specifier: ^3.0.2
@@ -139,16 +139,16 @@ importers:
         version: 1.0.15
     devDependencies:
       '@eslint/js':
-        specifier: ^9.34.0
+        specifier: ^9.28.0
         version: 9.34.0
       '@playwright/test':
-        specifier: ^1.55.0
+        specifier: ^1.52.0
         version: 1.55.0
       '@prettier/plugin-xml':
-        specifier: ^3.4.2
+        specifier: ^3.4.1
         version: 3.4.2(prettier@3.6.2)
       '@types/node':
-        specifier: ^22.17.2
+        specifier: ^22.15.30
         version: 22.17.2
       '@types/uuid':
         specifier: ^9.0.8
@@ -157,10 +157,10 @@ importers:
         specifier: ^8.2.2
         version: 8.2.2
       dotenv:
-        specifier: ^16.6.1
+        specifier: ^16.5.0
         version: 16.6.1
       eslint:
-        specifier: ^9.34.0
+        specifier: ^9.28.0
         version: 9.34.0
       husky:
         specifier: ^9.1.7
@@ -172,7 +172,7 @@ importers:
         specifier: ^4.1.5
         version: 4.1.5
       prettier:
-        specifier: ^3.6.2
+        specifier: ^3.5.3
         version: 3.6.2
       prettier-plugin-java:
         specifier: 2.5.0
@@ -181,7 +181,7 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       typescript-eslint:
-        specifier: ^8.40.0
+        specifier: ^8.33.1
         version: 8.40.0(eslint@9.34.0)(typescript@5.8.3)
       uuid:
         specifier: ^9.0.1
@@ -193,7 +193,7 @@ importers:
         specifier: 0.17.0
         version: 0.17.0(rollup@4.47.1)(vite@6.3.5(@types/node@22.17.2)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.1))
       wait-on:
-        specifier: ^8.0.4
+        specifier: ^8.0.3
         version: 8.0.4
 
 packages:
