@@ -3,6 +3,7 @@ package org.sagebionetworks.web.unitclient.presenter;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
@@ -34,6 +35,8 @@ import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.ClientProperties;
+import org.sagebionetworks.web.client.FeatureFlagConfig;
+import org.sagebionetworks.web.client.FeatureFlagKey;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -87,6 +90,9 @@ public class SearchPresenterTest {
   @Mock
   ClickEvent mockClickEvent;
 
+  @Mock
+  FeatureFlagConfig mockFeatureFlagConfig;
+
   @Captor
   ArgumentCaptor<Callback> loadMoreCallbackCaptor;
 
@@ -122,7 +128,8 @@ public class SearchPresenterTest {
         mockSynAlert,
         mockLoadMoreWidgetContainer,
         mockSearchAnalyticsClient,
-        mockJsniUtils
+        mockJsniUtils,
+        mockFeatureFlagConfig
       );
 
     exampleTerm = "searchQueryTerm";
@@ -162,9 +169,43 @@ public class SearchPresenterTest {
   @SuppressWarnings("unchecked")
   @Test
   public void testQueryTerm() throws Exception {
+    when(
+      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.OPENSEARCH_ENABLED)
+    )
+      .thenReturn(false);
     searchPresenter.setPlace(new Search(exampleTerm));
+
     verify(mockJsClient)
-      .getSearchResults(eq(exampleTermSearchQuery), any(AsyncCallback.class));
+      .getSearchResults(
+        eq(exampleTermSearchQuery),
+        eq(false),
+        any(AsyncCallback.class)
+      );
+  }
+
+  @SuppressWarnings("unchecked")
+  @Test
+  public void testQueryTermOpenSearch() throws Exception {
+    when(
+      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.OPENSEARCH_ENABLED)
+    )
+      .thenReturn(true);
+    searchPresenter.setPlace(new Search(exampleTerm));
+
+    verify(mockJsClient)
+      .getSearchResults(
+        eq(exampleTermSearchQuery),
+        eq(true),
+        any(AsyncCallback.class)
+      );
+
+    verify(mockSearchAnalyticsClient)
+      .sendSearchQuerySubmittedEvent(
+        searchQuerySubmittedEventDataCaptor.capture()
+      );
+    SearchQueryEventData searchSubmittedEventData =
+      searchQuerySubmittedEventDataCaptor.getValue();
+    assertEquals(true, searchSubmittedEventData.opensearch_enabled);
   }
 
   @SuppressWarnings("unchecked")
@@ -173,12 +214,18 @@ public class SearchPresenterTest {
     // Use a smaller initial page size to simplify test setup
     exampleTermSearchQuery.setSize(2L);
 
+    when(
+      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.OPENSEARCH_ENABLED)
+    )
+      .thenReturn(false);
+
     Search place = new Search(getTermSearchQueryJson(exampleTermSearchQuery));
     searchPresenter.setPlace(place);
 
     verify(mockJsClient)
       .getSearchResults(
         eq(exampleTermSearchQuery),
+        eq(false),
         asyncCallbackCaptor.capture()
       );
 
@@ -264,6 +311,7 @@ public class SearchPresenterTest {
     verify(mockJsClient, times(2))
       .getSearchResults(
         eq(exampleTermSearchQuery),
+        eq(false),
         asyncCallbackCaptor.capture()
       );
 
@@ -372,11 +420,17 @@ public class SearchPresenterTest {
   @SuppressWarnings("unchecked")
   @Test
   public void testSearchQueryEmptyFirstPage() throws Exception {
+    when(
+      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.OPENSEARCH_ENABLED)
+    )
+      .thenReturn(false);
+
     Search place = new Search(getTermSearchQueryJson(exampleTermSearchQuery));
     searchPresenter.setPlace(place);
     verify(mockJsClient)
       .getSearchResults(
         eq(exampleTermSearchQuery),
+        eq(false),
         asyncCallbackCaptor.capture()
       );
 
@@ -437,7 +491,8 @@ public class SearchPresenterTest {
     query.setQueryTerm(Arrays.asList(new String[] { term }));
 
     searchPresenter.setPlace(new Search(term));
-    verify(mockJsClient).getSearchResults(eq(query), any(AsyncCallback.class));
+    verify(mockJsClient)
+      .getSearchResults(eq(query), eq(false), any(AsyncCallback.class));
   }
 
   @SuppressWarnings("unchecked")
@@ -469,6 +524,10 @@ public class SearchPresenterTest {
   @SuppressWarnings("unchecked")
   @Test
   public void testSearchTermsWithEmptyStringsFromJson() throws Exception {
+    when(
+      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.OPENSEARCH_ENABLED)
+    )
+      .thenReturn(false);
     // Test JSON query with empty strings in queryTerm array
     SearchQuery queryWithEmptyTerms = SearchQueryUtils.getDefaultSearchQuery();
     queryWithEmptyTerms.setQueryTerm(Arrays.asList("syn1234567890", "", "  "));
@@ -482,7 +541,11 @@ public class SearchPresenterTest {
     // Should redirect to Synapse place since only one valid term remains after cleanup
     verify(mockPlaceChanger).goTo(new Synapse("syn1234567890"));
     verify(mockJsClient, never())
-      .getSearchResults(any(SearchQuery.class), any(AsyncCallback.class));
+      .getSearchResults(
+        any(SearchQuery.class),
+        eq(false),
+        any(AsyncCallback.class)
+      );
   }
 
   @SuppressWarnings("unchecked")
@@ -530,6 +593,10 @@ public class SearchPresenterTest {
 
   @Test
   public void testTimeFacets() {
+    when(
+      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.OPENSEARCH_ENABLED)
+    )
+      .thenReturn(false);
     String facetName = "createdOn";
     String facetValue = "1";
     assertTrue(getFacet(facetName).isEmpty());
@@ -551,7 +618,11 @@ public class SearchPresenterTest {
     verify(mockGlobalApplicationState).pushCurrentPlace(any(Search.class)); // 3
     verify(mockLoadMoreWidgetContainer).setIsProcessing(true); // 4
     verify(mockJsClient)
-      .getSearchResults(any(SearchQuery.class), any(AsyncCallback.class)); // 4
+      .getSearchResults(
+        any(SearchQuery.class),
+        eq(false),
+        any(AsyncCallback.class)
+      ); // 4
     verify(mockSearchAnalyticsClient)
       .sendSearchQuerySubmittedEvent(
         searchQuerySubmittedEventDataCaptor.capture()
@@ -567,7 +638,11 @@ public class SearchPresenterTest {
     facetValue = "2";
     searchPresenter.addTimeFacet(facetName, facetValue, "Yesterday");
     verify(mockJsClient, times(2))
-      .getSearchResults(any(SearchQuery.class), any(AsyncCallback.class)); // 4
+      .getSearchResults(
+        any(SearchQuery.class),
+        eq(false),
+        any(AsyncCallback.class)
+      ); // 4
     facetValues = getTimeFacet(facetName);
     assertEquals(1, facetValues.size());
     assertEquals(facetValue, facetValues.get(0).getMin());
@@ -576,7 +651,11 @@ public class SearchPresenterTest {
     // optimization. if search is empty (no search term and no facets) then a search is not performed
     // (empty results are shown).
     verify(mockJsClient, times(2))
-      .getSearchResults(any(SearchQuery.class), any(AsyncCallback.class)); // 4
+      .getSearchResults(
+        any(SearchQuery.class),
+        eq(false),
+        any(AsyncCallback.class)
+      ); // 4
     assertTrue(getTimeFacet(facetName).isEmpty());
 
     verify(mockSearchAnalyticsClient, times(2))
@@ -610,12 +689,17 @@ public class SearchPresenterTest {
 
   @Test
   public void testEncodedQueryTerm() throws Exception {
+    when(
+      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.OPENSEARCH_ENABLED)
+    )
+      .thenReturn(false);
+
     searchPresenter.setPlace(new Search("Alzheimer's%20Disease"));
     SearchQuery expectedQuery = SearchQueryUtils.getDefaultSearchQuery();
     expectedQuery.setQueryTerm(
       Arrays.asList(new String[] { "Alzheimer's", "Disease" })
     );
     verify(mockJsClient)
-      .getSearchResults(eq(expectedQuery), any(AsyncCallback.class));
+      .getSearchResults(eq(expectedQuery), eq(false), any(AsyncCallback.class));
   }
 }
