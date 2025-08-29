@@ -129,8 +129,8 @@ importers:
         specifier: ^3.0.2
         version: 3.0.2
       synapse-react-client:
-        specifier: 3.4.39
-        version: 3.4.39(@hyperjump/browser@1.3.1)(@types/react@19.1.8)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.30.1)(prop-types@15.8.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(rxjs@7.8.2)
+        specifier: 3.4.40
+        version: 3.4.40(@hyperjump/browser@1.3.1)(@types/react@19.1.8)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.30.1)(prop-types@15.8.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(rxjs@7.8.2)
       universal-cookie:
         specifier: ^4.0.4
         version: 4.0.4
@@ -737,9 +737,6 @@ packages:
 
   '@jridgewell/sourcemap-codec@1.5.0':
     resolution: {integrity: sha512-gv3ZRaISU3fjPAgNsriBRqGWQL6quFx04YMPW/zD8XMLsU32mhCCbfbO6KZFLjvYpCZ8zyDEgqsgf+PwPaM7GQ==}
-
-  '@jridgewell/sourcemap-codec@1.5.4':
-    resolution: {integrity: sha512-VT2+G1VQs/9oz078bLrYbecdZKs912zQlkelYpuf+SXF+QvZDYJlbx/LSx+meSAwdDFnF8FVXW92AVjjkVmgFw==}
 
   '@jridgewell/sourcemap-codec@1.5.5':
     resolution: {integrity: sha512-cYQ9310grqxueWbl+WuIUIaiUaDcj7WOq5fVhEljNVgRfOUhY9fy2zTvfoqWsnebh8Sl70VScFbICvJnLKB0Og==}
@@ -1356,8 +1353,8 @@ packages:
   '@sage-bionetworks/markdown-it-container@4.0.1':
     resolution: {integrity: sha512-ufgmV+kGlP7sYNanlsjzx+D+ZywmW/QE3gIolffm8H2Zix3/hpO65FrWmXPlKslz32WUdRZsmjD+2AJKOO0AFg==}
 
-  '@sage-bionetworks/synapse-client@0.0.5':
-    resolution: {integrity: sha512-70lMipM70i9PUEAtn+JUSXW+fSo75DdV5ynxwrNIOOU90qZnUq/eNTx042NK/Dca7clE6VxEJhus92qqr+J5AA==}
+  '@sage-bionetworks/synapse-client@0.0.6':
+    resolution: {integrity: sha512-u3bt2b6sx2nHPJbD97r5AhVtF+ilcsQheA+1HNT85Ad0vYhCyXRf/btn/qR1V94E7WA3tuxDNFNRLrDadi24Ww==}
 
   '@sage-bionetworks/synapse-types@0.0.4':
     resolution: {integrity: sha512-uezI0I4qGgHSC0z6SaxSuVCOnVdFx/+F5603ViEeQ1vAWdBzty+UHmMYW3G0EJlilX8vQqppJTNjR048e1YjIQ==}
@@ -4227,6 +4224,12 @@ packages:
     peerDependencies:
       react: ^19.1.0
 
+  react-draggable@4.5.0:
+    resolution: {integrity: sha512-VC+HBLEZ0XJxnOxVAZsdRi8rD04Iz3SiiKOoYzamjylUcju/hP9np/aZdLHf/7WOD268WMoNJMvYfB5yAK45cw==}
+    peerDependencies:
+      react: ^19.1.0
+      react-dom: ^19.1.0
+
   react-error-boundary@3.1.4:
     resolution: {integrity: sha512-uM9uPzZJTF6wRQORmSrvOIgt4lJ9MC1sNgEOj2XGsDTRE4kmpWxg7ENK9EWNKJRMAOY9z0MuF4yIfl6gp4sotA==}
     engines: {node: '>=10', npm: '>=6'}
@@ -4800,8 +4803,8 @@ packages:
   svg-path-sdf@1.1.3:
     resolution: {integrity: sha512-vJJjVq/R5lSr2KLfVXVAStktfcfa1pNFjFOgyJnzZFXlO/fDZ5DmM8FpnSKKzLPfEYTVeXuVBTHF296TpxuJVg==}
 
-  synapse-react-client@3.4.39:
-    resolution: {integrity: sha512-ITQliytJuMfL0WQK+BCe1ZwGoJ21hHDAVuU4fhiumC78bm7tXco0HZmUGenUq4cOM0SgX9WFcJ+YKUGpXFyICQ==}
+  synapse-react-client@3.4.40:
+    resolution: {integrity: sha512-fhCcYU2oYtwD+d0IAOMd6UFA26rAaktPjxq0NfX1lGAdrA1Efrq/SWgLVv/dTg7+V90cb6RHU9xiF75tnelQsw==}
     peerDependencies:
       react: ^19.1.0
       react-dom: ^19.1.0
@@ -6086,8 +6089,6 @@ snapshots:
 
   '@jridgewell/sourcemap-codec@1.5.0': {}
 
-  '@jridgewell/sourcemap-codec@1.5.4': {}
-
   '@jridgewell/sourcemap-codec@1.5.5': {}
 
   '@jridgewell/trace-mapping@0.3.25':
@@ -6714,7 +6715,7 @@ snapshots:
 
   '@sage-bionetworks/markdown-it-container@4.0.1': {}
 
-  '@sage-bionetworks/synapse-client@0.0.5': {}
+  '@sage-bionetworks/synapse-client@0.0.6': {}
 
   '@sage-bionetworks/synapse-types@0.0.4': {}
 
@@ -9634,7 +9635,7 @@ snapshots:
 
   nano-css@5.6.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
     dependencies:
-      '@jridgewell/sourcemap-codec': 1.5.4
+      '@jridgewell/sourcemap-codec': 1.5.5
       css-tree: 1.1.3
       csstype: 3.1.3
       fastest-stable-stringify: 2.0.2
@@ -10179,6 +10180,13 @@ snapshots:
     dependencies:
       react: 19.1.0
       scheduler: 0.26.0
+
+  react-draggable@4.5.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
+    dependencies:
+      clsx: 2.1.1
+      prop-types: 15.8.1
+      react: 19.1.0
+      react-dom: 19.1.0(react@19.1.0)
 
   react-error-boundary@3.1.4(react@19.1.0):
     dependencies:
@@ -10901,7 +10909,7 @@ snapshots:
       parse-svg-path: 0.1.2
       svg-path-bounds: 1.0.2
 
-  synapse-react-client@3.4.39(@hyperjump/browser@1.3.1)(@types/react@19.1.8)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.30.1)(prop-types@15.8.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(rxjs@7.8.2):
+  synapse-react-client@3.4.40(@hyperjump/browser@1.3.1)(@types/react@19.1.8)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.30.1)(prop-types@15.8.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(rxjs@7.8.2):
     dependencies:
       '@apidevtools/json-schema-ref-parser': 14.1.1
       '@aws-sdk/client-s3': 3.864.0
@@ -10923,7 +10931,7 @@ snapshots:
       '@rjsf/utils': 6.0.0-beta.10(react@19.1.0)
       '@rjsf/validator-ajv8': 6.0.0-beta.10(@rjsf/utils@6.0.0-beta.10(react@19.1.0))
       '@sage-bionetworks/markdown-it-container': 4.0.1
-      '@sage-bionetworks/synapse-client': 0.0.5
+      '@sage-bionetworks/synapse-client': 0.0.6
       '@sage-bionetworks/synapse-types': 0.0.5
       '@tanstack/query-core': 5.80.10
       '@tanstack/react-query': 5.80.10(react@19.1.0)
@@ -10964,6 +10972,7 @@ snapshots:
       react: 19.1.0
       react-datetime: 3.3.1(moment@2.30.1)(react@19.1.0)
       react-dom: 19.1.0(react@19.1.0)
+      react-draggable: 4.5.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       react-error-boundary: 3.1.4(react@19.1.0)
       react-hot-toast: 2.6.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       react-inspector: 6.0.2(react@19.1.0)
