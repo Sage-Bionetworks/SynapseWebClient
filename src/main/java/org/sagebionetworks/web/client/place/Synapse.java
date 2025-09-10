@@ -125,8 +125,8 @@ public class Synapse extends Place {
   }
 
   /**
-   * Convenience overload for calculateToken that defaults draft support to false.
-   * Calls the main calculateToken method with isDraftRequested set to false (non-draft version).
+   * Calculate token without draft support.
+   * Defaults to non-draft version (isDraftRequested = false).
    */
   private void calculateToken(
     String entityId,
