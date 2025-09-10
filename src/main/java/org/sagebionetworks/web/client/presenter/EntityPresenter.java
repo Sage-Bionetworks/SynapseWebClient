@@ -61,6 +61,7 @@ public class EntityPresenter
   private Long versionNumber;
   private Synapse.EntityArea area;
   private String areaToken;
+  private boolean isDraftRequested;
   private Header headerWidget;
   private EntityPageTop entityPageTop;
   private OpenTeamInvitationsWidget openTeamInvitesWidget;
@@ -120,6 +121,7 @@ public class EntityPresenter
     this.versionNumber = place.getVersionNumber();
     this.area = place.getArea();
     this.areaToken = place.getAreaToken();
+    this.isDraftRequested = place.isDraftRequested();
     refresh();
   }
 
@@ -272,16 +274,18 @@ public class EntityPresenter
     >() {
       @Override
       public void onSuccess(EntityBundle bundle) {
-        //SWC-6551: If entity is the draft version of a Dataset, the current user cannot edit, and we are not told to force load the draft version, then load the latest stable version (if available)
+        //SWC-6551: If entity is the draft version of a Dataset, we are not told to force load the draft version, and the user didn't explicitly request draft via URL, then load the latest stable version (if available)
         String forceLoadDraftDataset = clientCache.get(
           bundle.getEntity().getId() +
           WebConstants.FORCE_LOAD_DRAFT_DATASET_SUFFIX
         );
+        boolean isDraftRequestedInUrl =
+          isDraftRequested && area == Synapse.EntityArea.DATASETS;
         if (
           bundle.getEntity() instanceof Dataset &&
-          !bundle.getPermissions().getCanCertifiedUserEdit() &&
           versionNumber == null &&
-          forceLoadDraftDataset == null
+          forceLoadDraftDataset == null &&
+          !isDraftRequestedInUrl
         ) {
           loadStableDatasetIfAvailable(bundle.getEntity().getId());
           return;

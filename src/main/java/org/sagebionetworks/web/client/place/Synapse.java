@@ -12,11 +12,13 @@ public class Synapse extends Place {
   public static final String DELIMITER = "/";
   public static final String SYNAPSE_ENTITY_PREFIX = "Synapse:";
   public static final String VERSION = "version";
+  public static final String DRAFT = "draft";
 
   private String synapsePlaceToken;
   private String entityId, areaToken;
   private Long versionNumber;
   private Synapse.EntityArea area;
+  private boolean isDraftRequested;
 
   public Synapse(String token) {
     // SWC-6646: strip any trailing ',' or '.'
@@ -32,14 +34,18 @@ public class Synapse extends Place {
     // first token should be the entity id
     entityId = tokens.poll();
 
-    // look for dot version syntax in this token
+    // look for dot version or draft syntax in this token
     String[] entityIdTokens = entityId.split(DOT_REGEX);
     if (entityIdTokens.length > 1) {
       entityId = entityIdTokens[0];
-      try {
-        versionNumber = Long.parseLong(entityIdTokens[1]);
-      } catch (NumberFormatException e) {
-        // invalid version, ignore
+      if (DRAFT.equals(entityIdTokens[1])) {
+        isDraftRequested = true;
+      } else {
+        try {
+          versionNumber = Long.parseLong(entityIdTokens[1]);
+        } catch (NumberFormatException e) {
+          // invalid version, ignore
+        }
       }
     }
 
@@ -82,6 +88,29 @@ public class Synapse extends Place {
     return "/" + tab.toString().toLowerCase() + "/";
   }
 
+  /**
+   * Constructor for creating draft Synapse places.
+   *
+   * @param isDraftRequested true to generate URLs like "syn123.draft/datasets/", false for normal URLs
+   */
+  public Synapse(
+    String entityId,
+    Long versionNumber,
+    Synapse.EntityArea area,
+    String areaToken,
+    boolean isDraftRequested
+  ) {
+    this.entityId = entityId;
+    this.versionNumber = versionNumber;
+    this.area = area;
+    this.areaToken = areaToken;
+    this.isDraftRequested = isDraftRequested;
+    calculateToken(entityId, versionNumber, area, areaToken, isDraftRequested);
+  }
+
+  /**
+   * Constructor for creating non-draft Synapse places.
+   */
   public Synapse(
     String entityId,
     Long versionNumber,
@@ -92,17 +121,39 @@ public class Synapse extends Place {
     this.versionNumber = versionNumber;
     this.area = area;
     this.areaToken = areaToken;
-    calculateToken(entityId, versionNumber, area, areaToken);
+    calculateToken(entityId, versionNumber, area, areaToken, false);
   }
 
+  /**
+   * Calculate token without draft support.
+   * Defaults to non-draft version (isDraftRequested = false).
+   */
   private void calculateToken(
     String entityId,
     Long versionNumber,
     Synapse.EntityArea area,
     String areaToken
   ) {
+    calculateToken(entityId, versionNumber, area, areaToken, false);
+  }
+
+  /**
+   * Main token calculation method that generates the URL token string.
+   * Handles version numbers (syn123.1) and draft tokens (syn123.draft) for datasets.
+   */
+  private void calculateToken(
+    String entityId,
+    Long versionNumber,
+    Synapse.EntityArea area,
+    String areaToken,
+    boolean isDraftRequested
+  ) {
     this.synapsePlaceToken = entityId;
-    if (versionNumber != null) this.synapsePlaceToken += "." + versionNumber;
+    if (versionNumber != null) {
+      this.synapsePlaceToken += "." + versionNumber;
+    } else if (isDraftRequested) {
+      this.synapsePlaceToken += "." + DRAFT;
+    }
     if (area != null) {
       this.synapsePlaceToken += getDelimiter(area);
       if (areaToken != null) {
@@ -123,6 +174,10 @@ public class Synapse extends Place {
     return versionNumber;
   }
 
+  public boolean isDraftRequested() {
+    return isDraftRequested;
+  }
+
   public Synapse.EntityArea getArea() {
     return area;
   }
@@ -133,12 +188,12 @@ public class Synapse extends Place {
 
   public void setArea(Synapse.EntityArea area) {
     this.area = area;
-    calculateToken(entityId, versionNumber, area, areaToken);
+    calculateToken(entityId, versionNumber, area, areaToken, isDraftRequested);
   }
 
   public void setAreaToken(String areaToken) {
     this.areaToken = areaToken;
-    calculateToken(entityId, versionNumber, area, areaToken);
+    calculateToken(entityId, versionNumber, area, areaToken, isDraftRequested);
   }
 
   @Prefix("Synapse")

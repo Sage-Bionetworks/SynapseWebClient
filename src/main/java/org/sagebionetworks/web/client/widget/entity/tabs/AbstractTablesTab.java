@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityType;
@@ -64,6 +65,10 @@ public abstract class AbstractTablesTab
     "This is a Draft Version of the Dataset";
   private static final String VERSION_ALERT_DRAFT_DATASET_MESSAGE =
     "Administrators and Editors can edit this version and create a Stable Version for distribution. You can view Stable Versions in the Version History.";
+  private static final String VERSION_ALERT_STABLE_DATASET_TITLE =
+    "This is the latest Stable Version of the Dataset";
+  private static final String VERSION_ALERT_STABLE_DATASET_MESSAGE =
+    "Administrators and Editors can edit the Draft Version and update the latest Stable Version for distribution.";
 
   private static final String VERSION_ALERT_OLD_SNAPSHOT_DATASET_TITLE =
     "There is a newer Stable Version of this Dataset";
@@ -71,6 +76,7 @@ public abstract class AbstractTablesTab
     "Go to the latest Stable Version, or view the Version History for all versions.";
   public static final String GO_TO_LATEST_STABLE_VERSION =
     "Go to Latest Stable Version";
+  public static final String GO_TO_DRAFT = "Go to Draft version";
   public static final String NO_STABLE_VERSIONS_OF_THIS_DATASET =
     "There are currently no Stable Versions of this Dataset";
 
@@ -101,6 +107,7 @@ public abstract class AbstractTablesTab
   SynapseJavascriptClient jsClient;
   FeatureFlagConfig featureFlagConfig;
   SynapseJSNIUtils jsniUtils;
+  boolean isDraftRequested;
 
   protected abstract EntityArea getTabArea();
 
@@ -292,11 +299,20 @@ public abstract class AbstractTablesTab
       entityBundle.getEntity()
     );
     Long newVersion = isVersionSupported ? versionNumber : null;
+
+    // Preserve draft flag from current URL if we're in datasets area
+    boolean isDraftRequested = false;
+    if (getTabArea() == EntityArea.DATASETS) {
+      String currentUrl = jsniUtils.getCurrentURL();
+      isDraftRequested = currentUrl != null && currentUrl.contains(".draft");
+    }
+
     Synapse newPlace = new Synapse(
       entityId,
       newVersion,
       getTabArea(),
-      areaToken
+      areaToken,
+      isDraftRequested
     );
     // SWC-4942: if versions are supported, and the version has changed (the version in the query does
     // not match the entity bundle, for example),
@@ -475,6 +491,7 @@ public abstract class AbstractTablesTab
       // This is the 'draft' version of the dataset
       // Show an alert pointing to the most recent snapshot (if it exists)
       this.view.setVersionAlertVisible(true);
+      this.view.setVersionAlertType(AlertType.WARNING);
       this.view.setVersionAlertCopy(
           VERSION_ALERT_DRAFT_DATASET_TITLE,
           VERSION_ALERT_DRAFT_DATASET_MESSAGE
@@ -517,14 +534,41 @@ public abstract class AbstractTablesTab
       // This is a snapshot or "stable version", but a more recent snapshot exists than the one the user is looking at.
       // Notify that a more recent snapshot exists
       this.view.setVersionAlertVisible(true);
+      this.view.setVersionAlertType(AlertType.WARNING);
       this.view.setVersionAlertCopy(
           VERSION_ALERT_OLD_SNAPSHOT_DATASET_TITLE,
           VERSION_ALERT_OLD_SNAPSHOT_DATASET_MESSAGE
         );
     } else {
-      // The user is looking at the most recent snapshot or "Stable Version" of the dataset
-      // Don't show a version alert
-      this.view.setVersionAlertVisible(false);
+      // If a user with edit permissions is looking at the latest stable version of the dataset, show informational alert notifying them that a draft version exists.
+      if (entityBundle.getPermissions().getCanCertifiedUserEdit()) {
+        this.view.setVersionAlertVisible(true);
+        this.view.setVersionAlertType(AlertType.INFO);
+        this.view.setVersionAlertCopy(
+            VERSION_ALERT_STABLE_DATASET_TITLE,
+            VERSION_ALERT_STABLE_DATASET_MESSAGE
+          );
+      } else {
+        this.view.setVersionAlertVisible(false);
+      }
+      this.view.setVersionAlertSecondaryAction(
+          GO_TO_DRAFT,
+          e ->
+            ginInjector
+              .getGlobalApplicationState()
+              .getPlaceChanger()
+              .goTo(
+                new Synapse(
+                  entityBundle.getEntity().getId(),
+                  null,
+                  EntityArea.DATASETS,
+                  null,
+                  true
+                )
+              ),
+          true,
+          null
+        );
     }
   }
 

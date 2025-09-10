@@ -423,13 +423,36 @@ public class EntityPresenterTest {
     when(mockUserEntityPermissions.getCanCertifiedUserEdit()).thenReturn(true);
     when(mockPlace.getVersionNumber()).thenReturn(null);
     when(mockPlace.getEntityId()).thenReturn(entityId);
+    when(mockPlace.isDraftRequested()).thenReturn(false); // No draft token in URL
+    when(mockPlace.getArea()).thenReturn(EntityArea.DATASETS);
 
     entityPresenter.setPlace(mockPlace);
 
     verify(mockEntityPageTop)
       .configure(
         eq(eb),
-        eq(null), // verify the draft version is loaded
+        eq(latestSnapshotVersionNumber), // verify that the stable version is loaded
+        any(),
+        any(),
+        any()
+      );
+  }
+
+  @Test
+  public void testLoadDraftDatasetViaUrlToken() {
+    eb.setEntity(mockDataset);
+    when(mockUserEntityPermissions.getCanCertifiedUserEdit()).thenReturn(true);
+    when(mockPlace.getVersionNumber()).thenReturn(null);
+    when(mockPlace.getEntityId()).thenReturn(entityId);
+    when(mockPlace.isDraftRequested()).thenReturn(true); // User explicitly requested draft
+    when(mockPlace.getArea()).thenReturn(EntityArea.DATASETS);
+
+    entityPresenter.setPlace(mockPlace);
+
+    verify(mockEntityPageTop)
+      .configure(
+        eq(eb),
+        eq(null), // verify the draft version is loaded when explicitly requested
         any(),
         any(),
         any()
@@ -442,6 +465,8 @@ public class EntityPresenterTest {
     when(mockUserEntityPermissions.getCanCertifiedUserEdit()).thenReturn(false);
     when(mockPlace.getVersionNumber()).thenReturn(null);
     when(mockPlace.getEntityId()).thenReturn(entityId);
+    when(mockPlace.isDraftRequested()).thenReturn(false);
+    when(mockPlace.getArea()).thenReturn(EntityArea.DATASETS);
 
     entityPresenter.setPlace(mockPlace);
 
@@ -472,6 +497,8 @@ public class EntityPresenterTest {
     when(mockUserEntityPermissions.getCanCertifiedUserEdit()).thenReturn(false);
     when(mockPlace.getVersionNumber()).thenReturn(null);
     when(mockPlace.getEntityId()).thenReturn(entityId);
+    when(mockPlace.isDraftRequested()).thenReturn(false);
+    when(mockPlace.getArea()).thenReturn(EntityArea.DATASETS);
     // From the client cache, initially return null, and then "true" (we will verify that we try to set this value during the process)
     when(
       mockClientCache.get(
@@ -500,6 +527,8 @@ public class EntityPresenterTest {
     when(mockUserEntityPermissions.getCanCertifiedUserEdit()).thenReturn(false);
     when(mockPlace.getVersionNumber()).thenReturn(null);
     when(mockPlace.getEntityId()).thenReturn(entityId);
+    when(mockPlace.isDraftRequested()).thenReturn(false);
+    when(mockPlace.getArea()).thenReturn(EntityArea.DATASETS);
     when(
       mockClientCache.get(
         entityId + WebConstants.FORCE_LOAD_DRAFT_DATASET_SUFFIX
