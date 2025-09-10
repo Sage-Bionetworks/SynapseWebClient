@@ -303,7 +303,8 @@ public abstract class AbstractTablesTab
     // Preserve draft flag from current URL if we're in datasets area
     boolean isDraftRequested = false;
     if (getTabArea() == EntityArea.DATASETS) {
-      isDraftRequested = jsniUtils.isCurrentUrlRequestingDraft();
+      String currentUrl = jsniUtils.getCurrentURL();
+      isDraftRequested = currentUrl != null && currentUrl.contains(".draft");
     }
 
     Synapse newPlace = new Synapse(
