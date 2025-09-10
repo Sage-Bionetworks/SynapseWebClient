@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
+import static org.sagebionetworks.web.client.DisplayConstants.GO_TO_DRAFT_VERSION;
 
 import com.google.common.base.Function;
 import com.google.common.util.concurrent.FluentFuture;
@@ -76,7 +77,6 @@ public abstract class AbstractTablesTab
     "Go to the latest Stable Version, or view the Version History for all versions.";
   public static final String GO_TO_LATEST_STABLE_VERSION =
     "Go to Latest Stable Version";
-  public static final String GO_TO_DRAFT = "Go to Draft version";
   public static final String NO_STABLE_VERSIONS_OF_THIS_DATASET =
     "There are currently no Stable Versions of this Dataset";
 
@@ -303,8 +303,7 @@ public abstract class AbstractTablesTab
     // Preserve draft flag from current URL if we're in datasets area
     boolean isDraftRequested = false;
     if (getTabArea() == EntityArea.DATASETS) {
-      String currentUrl = jsniUtils.getCurrentURL();
-      isDraftRequested = currentUrl != null && currentUrl.contains(".draft");
+      isDraftRequested = jsniUtils.isCurrentUrlRequestingDraft();
     }
 
     Synapse newPlace = new Synapse(
@@ -552,7 +551,7 @@ public abstract class AbstractTablesTab
         this.view.setVersionAlertVisible(false);
       }
       this.view.setVersionAlertSecondaryAction(
-          GO_TO_DRAFT,
+          GO_TO_DRAFT_VERSION,
           e ->
             ginInjector
               .getGlobalApplicationState()
