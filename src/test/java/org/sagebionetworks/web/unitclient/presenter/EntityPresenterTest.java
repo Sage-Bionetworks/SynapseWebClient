@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
@@ -16,6 +18,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -499,45 +502,34 @@ public class EntityPresenterTest {
     when(mockPlace.getEntityId()).thenReturn(entityId);
     when(mockPlace.isDraftRequested()).thenReturn(false);
     when(mockPlace.getArea()).thenReturn(EntityArea.DATASETS);
-    // From the client cache, initially return null, and then "true" (we will verify that we try to set this value during the process)
-    when(
-      mockClientCache.get(
-        entityId + WebConstants.FORCE_LOAD_DRAFT_DATASET_SUFFIX
-      )
-    )
-      .thenReturn((String) null, "true");
 
     entityPresenter.setPlace(mockPlace);
 
-    verify(mockClientCache)
-      .put(entityId + WebConstants.FORCE_LOAD_DRAFT_DATASET_SUFFIX, "true");
-    verify(mockEntityPageTop)
-      .configure(
-        eq(eb),
-        eq(null), // verify the draft version is loaded because there are no snapshots
-        any(),
-        any(),
-        any()
-      );
+    // Verify that when no snapshots exist, we redirect to the draft version via URL
+    ArgumentCaptor<Synapse> synapseCaptor = ArgumentCaptor.forClass(
+      Synapse.class
+    );
+    verify(mockPlaceChanger).goTo(synapseCaptor.capture());
+
+    Synapse redirectPlace = synapseCaptor.getValue();
+    assertEquals(entityId, redirectPlace.getEntityId());
+    assertNull(redirectPlace.getVersionNumber()); // draft = no version
+    assertEquals(EntityArea.DATASETS, redirectPlace.getArea());
+    assertTrue(redirectPlace.isDraftRequested()); // should have .draft in URL
   }
 
   @Test
-  public void testLoadDraftDatasetCannotEditForceLoad() {
+  public void testLoadDraftDatasetCannotEditDraftRequested() {
     eb.setEntity(mockDataset);
     when(mockUserEntityPermissions.getCanCertifiedUserEdit()).thenReturn(false);
     when(mockPlace.getVersionNumber()).thenReturn(null);
     when(mockPlace.getEntityId()).thenReturn(entityId);
-    when(mockPlace.isDraftRequested()).thenReturn(false);
+    when(mockPlace.isDraftRequested()).thenReturn(true); // User explicitly requested draft via URL
     when(mockPlace.getArea()).thenReturn(EntityArea.DATASETS);
-    when(
-      mockClientCache.get(
-        entityId + WebConstants.FORCE_LOAD_DRAFT_DATASET_SUFFIX
-      )
-    )
-      .thenReturn("true");
 
     entityPresenter.setPlace(mockPlace);
 
+    // Verify that when draft is explicitly requested via URL, we load it directly
     verify(mockEntityPageTop)
       .configure(
         eq(eb),

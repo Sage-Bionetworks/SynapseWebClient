@@ -37,6 +37,7 @@ import org.sagebionetworks.web.client.jsinterop.KeyFactory;
 import org.sagebionetworks.web.client.jsinterop.reactquery.InvalidateQueryFilters;
 import org.sagebionetworks.web.client.jsinterop.reactquery.QueryClient;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -247,11 +248,16 @@ public class EntityPresenter
           @Override
           public void onSuccess(@Nullable Long result) {
             if (result == null) {
-              // no stable versions found, force load the draft version
-              clientCache.put(
-                entityId + WebConstants.FORCE_LOAD_DRAFT_DATASET_SUFFIX,
-                "true"
+              // no stable versions found, redirect to draft version via URL
+              Synapse draftPlace = new Synapse(
+                entityId,
+                null,
+                EntityArea.DATASETS,
+                null,
+                true
               );
+              globalAppState.getPlaceChanger().goTo(draftPlace);
+              return;
             } else {
               // stable version found, load that instead
               versionNumber = result;
@@ -274,26 +280,17 @@ public class EntityPresenter
     >() {
       @Override
       public void onSuccess(EntityBundle bundle) {
-        //SWC-6551: If entity is the draft version of a Dataset, we are not told to force load the draft version, and the user didn't explicitly request draft via URL, then load the latest stable version (if available)
-        String forceLoadDraftDataset = clientCache.get(
-          bundle.getEntity().getId() +
-          WebConstants.FORCE_LOAD_DRAFT_DATASET_SUFFIX
-        );
+        //SWC-6932: If entity is the draft version of a Dataset and the user didn't explicitly request draft via URL, then load the latest stable version (if available)
         boolean isDraftRequestedInUrl =
           isDraftRequested && area == Synapse.EntityArea.DATASETS;
         if (
           bundle.getEntity() instanceof Dataset &&
           versionNumber == null &&
-          forceLoadDraftDataset == null &&
           !isDraftRequestedInUrl
         ) {
           loadStableDatasetIfAvailable(bundle.getEntity().getId());
           return;
         }
-        clientCache.remove(
-          bundle.getEntity().getId() +
-          WebConstants.FORCE_LOAD_DRAFT_DATASET_SUFFIX
-        );
         synAlert.clear();
         view.setLoadingVisible(false);
         // Redirect if Entity is a Link

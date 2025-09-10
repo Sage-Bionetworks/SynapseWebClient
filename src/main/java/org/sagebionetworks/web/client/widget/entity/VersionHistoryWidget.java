@@ -186,13 +186,8 @@ public class VersionHistoryWidget
     Long targetVersion = null;
     Synapse synapse;
 
-    // if this is a Dataset, force load the draft version
+    // Navigate to draft version for Datasets, current version for other entities
     if (bundle.getEntity() instanceof Dataset) {
-      clientCache.put(
-        bundle.getEntity().getId() +
-        WebConstants.FORCE_LOAD_DRAFT_DATASET_SUFFIX,
-        "true"
-      );
       synapse =
         new Synapse(
           bundle.getEntity().getId(),
