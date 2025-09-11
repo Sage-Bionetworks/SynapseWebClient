@@ -9,6 +9,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Heading;
+import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.jsinterop.mui.Grid;
@@ -225,5 +226,10 @@ public class TablesTabViewImpl implements TablesTabView {
     versionAlert.addSecondaryCTAClickHandler(handler);
     versionAlert.setSecondaryButtonEnabled(enabled);
     versionAlert.setSecondaryButtonTooltipText(tooltipText);
+  }
+
+  @Override
+  public void setVersionAlertType(AlertType alertType) {
+    versionAlert.setAlertType(alertType);
   }
 }

@@ -183,21 +183,28 @@ public class VersionHistoryWidget
 
   @Override
   public void gotoCurrentVersion() {
-    // if this is a Dataset, force load the draft version
-    if (bundle.getEntity() instanceof Dataset) {
-      clientCache.put(
-        bundle.getEntity().getId() +
-        WebConstants.FORCE_LOAD_DRAFT_DATASET_SUFFIX,
-        "true"
-      );
-    }
     Long targetVersion = null;
-    Synapse synapse = new Synapse(
-      bundle.getEntity().getId(),
-      targetVersion,
-      EntityArea.FILES,
-      null
-    );
+    Synapse synapse;
+
+    // Navigate to draft version for Datasets, current version for other entities
+    if (bundle.getEntity() instanceof Dataset) {
+      synapse =
+        new Synapse(
+          bundle.getEntity().getId(),
+          targetVersion,
+          EntityArea.DATASETS,
+          null,
+          true
+        );
+    } else {
+      synapse =
+        new Synapse(
+          bundle.getEntity().getId(),
+          targetVersion,
+          EntityArea.FILES,
+          null
+        );
+    }
     globalApplicationState.getPlaceChanger().goTo(synapse);
   }
 

@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.tabs;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import org.gwtbootstrap3.client.ui.constants.AlertType;
 
 public interface TablesTabView extends IsWidget {
   void setProjectLevelUIVisible(boolean visible);
@@ -63,4 +64,6 @@ public interface TablesTabView extends IsWidget {
     boolean enabled,
     String tooltipText
   );
+
+  void setVersionAlertType(AlertType alertType);
 }
