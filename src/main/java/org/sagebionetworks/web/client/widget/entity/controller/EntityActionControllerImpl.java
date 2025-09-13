@@ -109,6 +109,7 @@ import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.clienthelp.ContainerClientsHelp;
 import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelp;
+import org.sagebionetworks.web.client.widget.docker.modal.AddDockerCommitModal;
 import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModal;
 import org.sagebionetworks.web.client.widget.doi.CreateOrUpdateDoiModal;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
@@ -290,6 +291,7 @@ public class EntityActionControllerImpl
   WizardCallback entityUpdatedWizardCallback;
   UploadTableModalWidget uploadTableModalWidget;
   AddExternalRepoModal addExternalRepoModal;
+  AddDockerCommitModal addDockerCommitModal;
   String currentChallengeId;
   GWTWrapper gwt;
   WikiPageDeleteConfirmationDialog wikiPageDeleteConfirmationDialog;
@@ -497,6 +499,14 @@ public class EntityActionControllerImpl
     return addExternalRepoModal;
   }
 
+  private AddDockerCommitModal getAddDockerCommitModal() {
+    if (addDockerCommitModal == null) {
+      addDockerCommitModal = ginInjector.getAddDockerCommitModal();
+      view.addWidget(addDockerCommitModal.asWidget());
+    }
+    return addDockerCommitModal;
+  }
+
   private RenameEntityModalWidget getRenameEntityModalWidget() {
     if (renameEntityModalWidget == null) {
       renameEntityModalWidget = ginInjector.getRenameEntityModalWidget();
@@ -647,6 +657,7 @@ public class EntityActionControllerImpl
     configureChangeStorageLocation();
     configureCreateOrUpdateDoi();
     configureEditProjectMetadataAction();
+    configureAddDockerCommit();
     configureEditFileMetadataAction();
     configureTableCommands();
     configureProjectLevelTableCommands();
@@ -978,6 +989,18 @@ public class EntityActionControllerImpl
       actionMenu.setActionListener(Action.CREATE_EXTERNAL_DOCKER_REPO, this);
     } else {
       actionMenu.setActionVisible(Action.CREATE_EXTERNAL_DOCKER_REPO, false);
+    }
+  }
+
+  private void configureAddDockerCommit() {
+    if (entityBundle.getEntity() instanceof DockerRepository) {
+      actionMenu.setActionVisible(
+        Action.ADD_DOCKER_COMMIT,
+        permissions.getCanEdit()
+      );
+      actionMenu.setActionListener(Action.ADD_DOCKER_COMMIT, this);
+    } else {
+      actionMenu.setActionVisible(Action.ADD_DOCKER_COMMIT, false);
     }
   }
 
@@ -1860,6 +1883,9 @@ public class EntityActionControllerImpl
       case CREATE_EXTERNAL_DOCKER_REPO:
         onCreateExternalDockerRepo();
         break;
+      case ADD_DOCKER_COMMIT:
+        onAddDockerCommit();
+        break;
       case SHOW_PROJECT_STATS:
         onShowProjectStats();
         break;
@@ -1924,6 +1950,11 @@ public class EntityActionControllerImpl
         }
       }
     );
+  }
+
+  public void onAddDockerCommit() {
+    getAddDockerCommitModal().configure(entityBundle.getEntity().getId());
+    getAddDockerCommitModal().show();
   }
 
   public void onShowProjectStats() {

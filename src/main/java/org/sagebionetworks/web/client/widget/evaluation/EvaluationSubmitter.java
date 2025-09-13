@@ -46,7 +46,7 @@ public class EvaluationSubmitter implements Presenter {
   public static final String NO_COMMITS_SELECTED_MSG =
     "Please select a commit to submit.";
   public static final String ZERO_COMMITS_ERROR =
-    "This repo does not have any commit. Please add commits to repo before submit to challenge.";
+    "This repository has no commits.  You must add at least one commit before submitting it to a challenge.";
   private EvaluationSubmitterView view;
   private SynapseJavascriptClient jsClient;
   private ChallengeClientAsync challengeClient;
