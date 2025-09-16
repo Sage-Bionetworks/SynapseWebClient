@@ -122,6 +122,7 @@ public class DefaultActionConfigurationUtil {
         Action.CREATE_EXTERNAL_DOCKER_REPO,
         "Add External Repository"
       ),
+      ActionConfiguration.create(Action.ADD_DOCKER_COMMIT, "Add a Commit"),
       ActionConfiguration.create(
         Action.APPROVE_USER_ACCESS,
         "Change User Access (ACT)"

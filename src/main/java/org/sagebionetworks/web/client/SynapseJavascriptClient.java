@@ -2219,6 +2219,16 @@ public class SynapseJavascriptClient {
     doGet(url, OBJECT_TYPE.PaginatedDockerCommit, callback);
   }
 
+  public void addDockerCommit(
+    String entityId,
+    DockerCommit dockerCommit,
+    AsyncCallback<Void> callback
+  ) {
+    String url =
+      getRepoServiceUrl() + ENTITY + "/" + entityId + "/dockerCommit";
+    doPost(url, dockerCommit, OBJECT_TYPE.None, false, callback);
+  }
+
   public void startMultipartUpload(
     MultipartUploadRequest request,
     Boolean forceRestart,

@@ -407,7 +407,8 @@ public class DefaultEntityActionMenuLayoutUtil {
             Arrays.asList(
               ActionViewProps.create(Action.VIEW_SHARING_SETTINGS),
               ActionViewProps.create(Action.EDIT_PROVENANCE),
-              ActionViewProps.create(Action.SUBMIT_TO_CHALLENGE)
+              ActionViewProps.create(Action.SUBMIT_TO_CHALLENGE),
+              ActionViewProps.create(Action.ADD_DOCKER_COMMIT)
             ),
             Arrays.asList(
               ActionViewProps.create(Action.VIEW_WIKI_SOURCE),
