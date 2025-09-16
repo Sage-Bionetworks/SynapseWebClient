@@ -40,22 +40,8 @@ public class AddDockerCommitModalViewImpl implements AddDockerCommitModalView {
   @Inject
   public AddDockerCommitModalViewImpl(Binder binder) {
     widget = binder.createAndBindUi(this);
-    saveButton.addClickHandler(
-      new ClickHandler() {
-        @Override
-        public void onClick(ClickEvent event) {
-          presenter.onSave();
-        }
-      }
-    );
-    cancelButton.addClickHandler(
-      new ClickHandler() {
-        @Override
-        public void onClick(ClickEvent event) {
-          presenter.onCancel();
-        }
-      }
-    );
+    saveButton.addClickHandler(event -> presenter.onSave());
+    cancelButton.addClickHandler(event -> presenter.onCancel());
   }
 
   @Override
