@@ -23,6 +23,12 @@ import org.sagebionetworks.repo.model.file.BulkFileDownloadRequest;
 import org.sagebionetworks.repo.model.file.BulkFileDownloadResponse;
 import org.sagebionetworks.repo.model.file.FileHandleRestoreRequest;
 import org.sagebionetworks.repo.model.file.FileHandleRestoreResponse;
+import org.sagebionetworks.repo.model.grid.CreateGridRequest;
+import org.sagebionetworks.repo.model.grid.CreateGridResponse;
+import org.sagebionetworks.repo.model.grid.DownloadFromGridRequest;
+import org.sagebionetworks.repo.model.grid.DownloadFromGridResult;
+import org.sagebionetworks.repo.model.grid.GridRecordSetExportRequest;
+import org.sagebionetworks.repo.model.grid.GridRecordSetExportResponse;
 import org.sagebionetworks.repo.model.report.DownloadStorageReportRequest;
 import org.sagebionetworks.repo.model.report.DownloadStorageReportResponse;
 import org.sagebionetworks.repo.model.schema.CreateSchemaRequest;
@@ -126,7 +132,23 @@ public enum AsynchType implements IsSerializable {
     FileHandleRestoreRequest.class,
     FileHandleRestoreResponse.class
   ),
-  AgentChat(AGENT_CHAT, AgentChatRequest.class, AgentChatResponse.class);
+  AgentChat(AGENT_CHAT, AgentChatRequest.class, AgentChatResponse.class),
+  TablePFBDownload(
+    TABLE_PFB_DOWNLOAD,
+    DownloadPFBRequest.class,
+    DownloadPFBResult.class
+  ),
+  CreateGrid(GRID_SESSION, CreateGridRequest.class, CreateGridResponse.class),
+  GridCsvDownload(
+    GRID_DOWNLOAD_CSV,
+    DownloadFromGridRequest.class,
+    DownloadFromGridResult.class
+  ),
+  GridExportRecordSet(
+    GRID_EXPORT_RECORDSET,
+    GridRecordSetExportRequest.class,
+    GridRecordSetExportResponse.class
+  );
 
   String prefix;
   Class<? extends AsynchronousRequestBody> requestClass;

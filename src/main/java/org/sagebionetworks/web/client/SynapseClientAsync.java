@@ -308,8 +308,6 @@ public interface SynapseClientAsync {
     AsyncCallback<HashMap<String, WikiPageKey>> callback
   );
 
-  void deleteApiKey(AsyncCallback<String> callback);
-
   /**
    * Set a table's schema. Creates any necessary ColumnModels (for create and update), and figures out
    * necessary ColumnChanges to transform oldSchema into newSchema.

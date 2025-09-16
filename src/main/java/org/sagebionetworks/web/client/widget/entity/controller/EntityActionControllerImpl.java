@@ -37,6 +37,7 @@ import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.RecordSet;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
@@ -1340,6 +1341,8 @@ public class EntityActionControllerImpl
   private boolean canUploadNewFileVersion() {
     return (
       entityBundle.getEntity() instanceof FileEntity &&
+      // In the UI, a RecordSet's dataFileHandle can only be updated via a Grid export
+      !(entityBundle.getEntity() instanceof RecordSet) &&
       permissions.getCanCertifiedUserEdit()
     );
   }
@@ -1573,6 +1576,10 @@ public class EntityActionControllerImpl
         permissions.getCanEdit()
       );
       actionMenu.setActionListener(Action.EDIT_FILE_METADATA, this);
+      actionMenu.setActionText(
+        Action.EDIT_FILE_METADATA,
+        "Edit " + entityTypeDisplay + " Metadata"
+      );
     } else {
       actionMenu.setActionVisible(Action.EDIT_FILE_METADATA, false);
     }
