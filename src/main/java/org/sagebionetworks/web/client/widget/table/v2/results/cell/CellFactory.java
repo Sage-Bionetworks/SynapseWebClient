@@ -4,14 +4,10 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.inject.Inject;
 import java.util.function.Consumer;
-import org.gwtbootstrap3.client.ui.Anchor;
-import org.gwtbootstrap3.client.ui.AnchorButton;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
-import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -114,6 +110,13 @@ public class CellFactory {
           break;
         case USERID:
           editor = ginInjector.createUserIdCellEditor();
+          break;
+        case MEDIUMTEXT:
+        case LARGETEXT:
+          LargeStringCellEditor largeStringCellEditor =
+            ginInjector.createLargeTextFormCellEditor();
+          largeStringCellEditor.setVisibleLines(1);
+          editor = largeStringCellEditor;
           break;
         default:
           StringEditorCell stringEditor = ginInjector.createStringEditorCell();

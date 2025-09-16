@@ -125,4 +125,9 @@ public class LargeStringCellEditorViewImpl
   public String getPlaceholder() {
     return textArea.getPlaceholder();
   }
+
+  @Override
+  public void setVisibleLines(int lines) {
+    textArea.setVisibleLines(lines);
+  }
 }
