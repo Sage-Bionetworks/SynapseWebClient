@@ -323,6 +323,13 @@ public class SynapseJavascriptClient {
   public static final String FILE_HANDLE_RESTORE = "/fileHandle/restore/";
   public static final String AGENT_CHAT = "/agent/chat/";
 
+  public static final String TABLE_PFB_DOWNLOAD = TABLE + "/download/pfb";
+
+  public static final String GRID = "/grid";
+  public static final String GRID_SESSION = GRID + "/session";
+  public static final String GRID_DOWNLOAD_CSV = GRID + "/download/csv";
+  public static final String GRID_EXPORT_RECORDSET = GRID + "/export/recordset";
+
   public static final String ASYNC_START = "/async/start";
   public static final String ASYNC_GET = "/async/get/";
   public static final String AUTH_OAUTH_2 = "/oauth2";

@@ -238,6 +238,7 @@ public class DefaultEntityActionMenuLayoutUtil {
         );
         break;
       case file:
+      case recordset:
         layout.setPrimaryMenuText(
           EntityTypeUtils.getDisplayName(entityType) + TOOLS_SUFFIX
         );

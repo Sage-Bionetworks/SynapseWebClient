@@ -8,6 +8,7 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.RecordSet;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.DatasetCollection;
@@ -67,6 +68,8 @@ public class EntityTypeUtils {
         entityType.equalsIgnoreCase(EntityType.datasetcollection.name())
       ) {
         className = DatasetCollection.class.getName();
+      } else if (entityType.equalsIgnoreCase(EntityType.recordset.name())) {
+        className = RecordSet.class.getName();
       }
     }
     return className;

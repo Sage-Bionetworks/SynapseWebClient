@@ -14,12 +14,13 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.RecordSet;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 
 public class EntityFilterTest {
 
   List<EntityHeader> headers;
-  EntityHeader projectHeader, folderHeader, fileHeader, linkHeader;
+  EntityHeader projectHeader, folderHeader, fileHeader, linkHeader, recordSetHeader;
 
   @Before
   public void setUp() {
@@ -33,6 +34,9 @@ public class EntityFilterTest {
     fileHeader = new EntityHeader();
     fileHeader.setType(FileEntity.class.getName());
     headers.add(fileHeader);
+    recordSetHeader = new EntityHeader();
+    recordSetHeader.setType(RecordSet.class.getName());
+    headers.add(recordSetHeader);
     linkHeader = new EntityHeader();
     linkHeader.setType(Link.class.getName());
     headers.add(linkHeader);
@@ -47,6 +51,7 @@ public class EntityFilterTest {
     assertTrue(queryValues.contains(EntityType.folder));
     assertTrue(queryValues.contains(EntityType.file));
     assertTrue(queryValues.contains(EntityType.link));
+    assertTrue(queryValues.contains(EntityType.recordset));
 
     List<EntityHeader> filteredHeaders = filter.filterForBrowsing(headers);
 
@@ -112,12 +117,14 @@ public class EntityFilterTest {
     assertFalse(queryValues.contains(EntityType.project));
     assertFalse(queryValues.contains(EntityType.folder));
     assertTrue(queryValues.contains(EntityType.file));
+    assertTrue(queryValues.contains(EntityType.recordset));
     assertFalse(queryValues.contains(EntityType.link));
 
     List<EntityHeader> filteredHeaders = filter.filterForBrowsing(headers);
     assertFalse(filteredHeaders.contains(projectHeader));
     assertFalse(filteredHeaders.contains(folderHeader));
     assertTrue(filteredHeaders.contains(fileHeader));
+    assertTrue(filteredHeaders.contains(recordSetHeader));
     assertFalse(filteredHeaders.contains(linkHeader));
   }
 

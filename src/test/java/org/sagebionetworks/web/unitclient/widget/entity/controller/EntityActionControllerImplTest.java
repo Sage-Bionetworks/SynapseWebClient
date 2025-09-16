@@ -78,6 +78,7 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.RecordSet;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
@@ -5385,5 +5386,49 @@ public class EntityActionControllerImplTest {
 
     verify(mockUploader, never()).configure(entityId);
     verify(mockUploader).clearDragAndDropHandlers();
+  }
+
+  @Test
+  public void testConfigureWithRecordSet() {
+    RecordSet recordSet = new RecordSet();
+    recordSet.setId(entityId);
+    entityBundle.setEntity(recordSet);
+
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+
+    // delete
+    verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, true);
+    verify(mockActionMenu)
+      .setActionText(
+        Action.DELETE_ENTITY,
+        DELETE_PREFIX + EntityTypeUtils.getDisplayName(EntityType.recordset)
+      );
+    verify(mockActionMenu).setActionListener(Action.DELETE_ENTITY, controller);
+    // share
+    verify(mockActionMenu).setActionVisible(Action.VIEW_SHARING_SETTINGS, true);
+    verify(mockActionMenu)
+      .setActionListener(Action.VIEW_SHARING_SETTINGS, controller);
+    // edit metadata
+    verify(mockActionMenu).setActionVisible(Action.EDIT_FILE_METADATA, true);
+    verify(mockActionMenu)
+      .setActionText(
+        Action.EDIT_FILE_METADATA,
+        "Edit " +
+        EntityTypeUtils.getDisplayName(EntityType.recordset) +
+        " Metadata"
+      );
+    verify(mockActionMenu)
+      .setActionListener(Action.EDIT_FILE_METADATA, controller);
+    // version history
+    verify(mockActionMenu).setActionVisible(Action.SHOW_VERSION_HISTORY, true);
+    // upload new version (should be disabled for RecordSet)
+    verify(mockActionMenu).setActionVisible(Action.UPLOAD_NEW_FILE, false);
   }
 }

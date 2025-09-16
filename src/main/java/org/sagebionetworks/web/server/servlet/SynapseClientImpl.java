@@ -1854,18 +1854,6 @@ public class SynapseClientImpl
   }
 
   @Override
-  public String deleteApiKey() throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient =
-      createSynapseClient();
-    try {
-      synapseClient.invalidateApiKey();
-      return getAPIKey();
-    } catch (SynapseException e) {
-      throw ExceptionUtil.convertSynapseException(e);
-    }
-  }
-
-  @Override
   public TableUpdateTransactionRequest getTableUpdateTransactionRequest(
     String tableId,
     List<ColumnModel> oldSchema,

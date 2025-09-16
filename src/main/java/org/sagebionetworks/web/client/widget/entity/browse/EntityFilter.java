@@ -8,6 +8,7 @@ import static org.sagebionetworks.repo.model.EntityType.folder;
 import static org.sagebionetworks.repo.model.EntityType.link;
 import static org.sagebionetworks.repo.model.EntityType.materializedview;
 import static org.sagebionetworks.repo.model.EntityType.project;
+import static org.sagebionetworks.repo.model.EntityType.recordset;
 import static org.sagebionetworks.repo.model.EntityType.submissionview;
 import static org.sagebionetworks.repo.model.EntityType.table;
 import static org.sagebionetworks.repo.model.EntityType.virtualtable;
@@ -29,11 +30,11 @@ public enum EntityFilter {
       .filter(entityType -> !link.equals(entityType))
       .toArray(EntityType[]::new)
   ),
-  PROJECT_FOLDER_FILE_LINK(project, folder, file, link),
+  PROJECT_FOLDER_FILE_LINK(project, folder, file, link, recordset),
   CONTAINER(project, folder),
   PROJECT(project),
   FOLDER(folder),
-  FILE(file),
+  FILE(file, recordset),
   TABLE(table),
   ALL_TABLES(
     table,

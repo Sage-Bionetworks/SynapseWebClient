@@ -225,8 +225,6 @@ public interface SynapseClient extends RemoteService {
   HashMap<String, WikiPageKey> getPageNameToWikiKeyMap()
     throws RestServiceException;
 
-  String deleteApiKey() throws RestServiceException;
-
   TableUpdateTransactionRequest getTableUpdateTransactionRequest(
     String tableId,
     List<ColumnModel> oldSchema,
