@@ -10,7 +10,7 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.jsinterop.EntityUploadHandle;
 import org.sagebionetworks.web.client.jsinterop.EntityUploadModalProps;
 import org.sagebionetworks.web.client.jsinterop.React;
-import org.sagebionetworks.web.client.jsinterop.ReactRef;
+import org.sagebionetworks.web.client.jsinterop.ReactRefObject;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.widget.ReactComponent;
 
@@ -23,7 +23,7 @@ public class UploadDialogWidgetV2 extends Widget {
   private final ReactComponent reactComponent;
 
   private String entityId;
-  private ReactRef<EntityUploadHandle> ref;
+  private ReactRefObject<EntityUploadHandle> ref;
 
   @Inject
   public UploadDialogWidgetV2(

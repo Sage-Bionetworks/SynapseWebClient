@@ -1,8 +1,6 @@
 package org.sagebionetworks.web.client.jsinterop;
 
-import com.google.gwt.dom.client.Element;
 import jsinterop.annotations.JsConstructor;
-import jsinterop.annotations.JsFunction;
 import jsinterop.annotations.JsNullable;
 import jsinterop.annotations.JsPackage;
 import jsinterop.annotations.JsType;
@@ -12,11 +10,6 @@ public class ReactComponentProps {
 
   @JsConstructor
   public ReactComponentProps() {}
-
-  @JsFunction
-  public interface CallbackRef {
-    void run(Element element);
-  }
 
   @JsNullable
   public String key;

@@ -245,7 +245,8 @@ public class DefaultEntityActionMenuLayoutUtil {
         layout.setButtonActions(
           Arrays.asList(
             ActionViewProps.create(Action.UPLOAD_NEW_FILE, "upload"),
-            ActionViewProps.create(Action.SHOW_ANNOTATIONS, "label")
+            ActionViewProps.create(Action.SHOW_ANNOTATIONS, "label"),
+            ActionViewProps.create(Action.CREATE_NEW_GRID, "tableRows")
           )
         );
         layout.setDownloadMenuActions(
@@ -300,10 +301,10 @@ public class DefaultEntityActionMenuLayoutUtil {
         );
         layout.setButtonActions(
           Arrays.asList(
-            ActionViewProps.create(Action.SHOW_GRID, "tableRows"),
             ActionViewProps.create(Action.EDIT_TABLE_DATA, "edit"),
             ActionViewProps.create(Action.SHOW_ANNOTATIONS, "label"),
-            ActionViewProps.create(Action.SHOW_TABLE_SCHEMA, "columns")
+            ActionViewProps.create(Action.SHOW_TABLE_SCHEMA, "columns"),
+            ActionViewProps.create(Action.CREATE_NEW_GRID, "tableRows")
           )
         );
         // Note that download actions for tables are currently inlined in the QueryWrapperPlotNav
@@ -354,7 +355,8 @@ public class DefaultEntityActionMenuLayoutUtil {
           Arrays.asList(
             ActionViewProps.create(Action.EDIT_TABLE_DATA, "edit"),
             ActionViewProps.create(Action.SHOW_ANNOTATIONS, "label"),
-            ActionViewProps.create(Action.SHOW_TABLE_SCHEMA, "columns")
+            ActionViewProps.create(Action.SHOW_TABLE_SCHEMA, "columns"),
+            ActionViewProps.create(Action.CREATE_NEW_GRID, "tableRows")
           )
         );
         // Note that download actions for tables are currently inlined in the QueryWrapperPlotNav

@@ -8,7 +8,7 @@ import org.sagebionetworks.web.client.jsinterop.AccessRequirementAclEditorHandle
 import org.sagebionetworks.web.client.jsinterop.AccessRequirementAclEditorProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
-import org.sagebionetworks.web.client.jsinterop.ReactRef;
+import org.sagebionetworks.web.client.jsinterop.ReactRefObject;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.widget.ReactComponent;
 
@@ -23,7 +23,7 @@ public class CreateManagedACTAccessRequirementStep3ViewImpl
   @UiField
   ReactComponent reactContainer;
 
-  ReactRef<AccessRequirementAclEditorHandler> componentRef;
+  ReactRefObject<AccessRequirementAclEditorHandler> componentRef;
 
   Presenter presenter;
 

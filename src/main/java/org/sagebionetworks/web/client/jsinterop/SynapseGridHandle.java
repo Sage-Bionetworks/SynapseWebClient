@@ -9,5 +9,5 @@ public class SynapseGridHandle {
   /**
    * The SynapseGrid component exposes an imperative handle to initialize the grid session
    */
-  public native void initializeGrid();
+  public native void loadExistingSession(String sessionId);
 }

@@ -25,7 +25,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.FullWidthAlert;
 import org.sagebionetworks.web.client.widget.IconSvg;
 import org.sagebionetworks.web.client.widget.ReactComponent;
-import org.sagebionetworks.web.client.widget.entity.SynapseGridImpl;
 import org.sagebionetworks.web.client.widget.table.explore.QueryWrapperPlotNav;
 import org.sagebionetworks.web.client.widget.table.explore.StandaloneQueryWrapper;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityViewScopeWidget;
@@ -72,7 +71,7 @@ public class TableEntityWidgetViewImpl
   Div plotNavContainer;
 
   @UiField
-  Div synapseGridContainer;
+  Div createGridSessionDialogContainer;
 
   @UiField
   Div addToDownloadListContainer;
@@ -84,7 +83,6 @@ public class TableEntityWidgetViewImpl
   ColumnModelsWidget columnModelsWidget;
   EntityViewScopeWidget scopeWidget;
   SubmissionViewScopeWidget submissionViewScopeWidget;
-  SynapseGridImpl synapseGrid;
   TableEntityWidgetView.Presenter presenter;
 
   @Inject
@@ -153,16 +151,6 @@ public class TableEntityWidgetViewImpl
   }
 
   @Override
-  public void setSynapseGridVisible(boolean visible) {
-    synapseGridContainer.setVisible(visible);
-  }
-
-  @Override
-  public boolean isSynapseGridVisible() {
-    return synapseGridContainer.isVisible();
-  }
-
-  @Override
   public void setScopeVisible(boolean visible) {
     if (visible) {
       scopeCollapse.show();
@@ -215,23 +203,6 @@ public class TableEntityWidgetViewImpl
     StandaloneQueryWrapper widget = new StandaloneQueryWrapper(sql);
     plotNavContainer.clear();
     plotNavContainer.add(widget);
-  }
-
-  @Override
-  public void configureSynapseGrid(String sql) {
-    if (synapseGrid == null) {
-      synapseGrid = ginInjector.getSynapseGridImpl();
-      synapseGridContainer.clear();
-      synapseGridContainer.add(synapseGrid);
-    }
-    synapseGrid.configure(sql, false);
-  }
-
-  @Override
-  public void initializeSynapseGrid() {
-    if (synapseGrid != null) {
-      synapseGrid.initializeGrid();
-    }
   }
 
   @Override

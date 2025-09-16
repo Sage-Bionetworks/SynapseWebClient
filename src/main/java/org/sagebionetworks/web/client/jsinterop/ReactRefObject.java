@@ -4,4 +4,7 @@ import jsinterop.annotations.JsPackage;
 import jsinterop.annotations.JsType;
 
 @JsType(isNative = true, namespace = JsPackage.GLOBAL, name = "Object")
-public interface ReactRef<T> {}
+public class ReactRefObject<T> implements ReactRef<T> {
+
+  public T current;
+}
