@@ -1,3 +1,5 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
-public interface LargeStringCellEditorView extends CellEditorView {}
+public interface LargeStringCellEditorView extends CellEditorView {
+  void setVisibleLines(int lines);
+}

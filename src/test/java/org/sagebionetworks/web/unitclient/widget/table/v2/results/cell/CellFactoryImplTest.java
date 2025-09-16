@@ -407,6 +407,33 @@ public class CellFactoryImplTest {
   }
 
   @Test
+  public void testGetMediumTextEditor() {
+    ColumnModel cm = new ColumnModel();
+    cm.setColumnType(ColumnType.MEDIUMTEXT);
+    assertEquals(mockLargeStringCellEditor, cellFactory.createEditor(cm));
+    // For editor (not form editor), visible lines should be set to 1
+    verify(mockLargeStringCellEditor).setVisibleLines(1);
+  }
+
+  @Test
+  public void testGetLargeTextEditor() {
+    ColumnModel cm = new ColumnModel();
+    cm.setColumnType(ColumnType.LARGETEXT);
+    assertEquals(mockLargeStringCellEditor, cellFactory.createEditor(cm));
+    // For editor (not form editor), visible lines should be set to 1
+    verify(mockLargeStringCellEditor).setVisibleLines(1);
+  }
+
+  @Test
+  public void testGetMediumTextFormEditor() {
+    ColumnModel cm = new ColumnModel();
+    cm.setColumnType(ColumnType.MEDIUMTEXT);
+    assertEquals(mockLargeStringCellEditor, cellFactory.createFormEditor(cm));
+    // For form editor, do not force setVisibleLines in createFormEditor (it should not be called here)
+    verify(mockLargeStringCellEditor, never()).setVisibleLines(1);
+  }
+
+  @Test
   public void testGetFileCellRenderer() {
     ColumnModel cm = new ColumnModel();
     cm.setColumnType(ColumnType.FILEHANDLEID);
