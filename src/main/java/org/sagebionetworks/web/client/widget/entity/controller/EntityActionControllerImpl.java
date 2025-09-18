@@ -265,7 +265,7 @@ public class EntityActionControllerImpl
   EditFileMetadataModalWidget editFileMetadataModalWidget;
   EditProjectMetadataModalWidget editProjectMetadataModalWidget;
   EventBus eventBus;
-  JobTrackingWidget versionDialogJobTrackingWidget;
+  JobTrackingWidget jobTrackingWidget;
   CreateGridSessionDialog createGridSessionDialogWidget;
   EntityBundle entityBundle;
   String wikiPageId;
@@ -372,15 +372,12 @@ public class EntityActionControllerImpl
     return approveUserAccessModal;
   }
 
-  private JobTrackingWidget getVersionDialogJobTrackingWidget() {
-    if (versionDialogJobTrackingWidget == null) {
-      versionDialogJobTrackingWidget =
-        ginInjector.creatNewAsynchronousProgressWidget();
-      view.setCreateVersionDialogJobTrackingWidget(
-        versionDialogJobTrackingWidget
-      );
+  private JobTrackingWidget getJobTrackingWidget() {
+    if (jobTrackingWidget == null) {
+      jobTrackingWidget = ginInjector.creatNewAsynchronousProgressWidget();
+      view.setCreateVersionDialogJobTrackingWidget(jobTrackingWidget);
     }
-    return versionDialogJobTrackingWidget;
+    return jobTrackingWidget;
   }
 
   private CreateGridSessionDialog getCreateGridSessionDialogWidget() {
@@ -2472,7 +2469,7 @@ public class EntityActionControllerImpl
         String message = entity instanceof EntityView
           ? CREATING_A_NEW_VIEW_VERSION_MESSAGE
           : CREATING_A_NEW_DATASET_VERSION_MESSAGE;
-        getVersionDialogJobTrackingWidget()
+        getJobTrackingWidget()
           .startAndTrackJob(
             message,
             false,
