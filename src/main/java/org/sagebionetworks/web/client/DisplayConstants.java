@@ -401,4 +401,7 @@ public class DisplayConstants {
   public static final String AUTOCOMPLETE_VALUE_CURRENT_PASSWORD =
     "current-password";
   public static final String AUTOCOMPLETE_VALUE_NEW_PASSWORD = "new-password";
+
+  // In the UI, we refer to the 'Grid Sessions' as "working copies"
+  public static final String WORKING_COPY = "Working Copy";
 }

@@ -4,13 +4,18 @@
   xmlns:g="urn:import:com.google.gwt.user.client.ui"
   xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+  xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 >
   <g:HTMLPanel>
     <div>
       <div class="pageHeader">
-        <h3 class="pageHeaderTitle">Working Draft</h3>
+        <b:Heading
+          addStyleNames="pageHeaderTitle"
+          ui:field="pageHeaderTitle"
+          size="H3"
+        />
         <h4 class="description">
-          Session ID:
+          ID:
           <bh:Span ui:field="gridSessionNameContainer" addStyleNames="margin-left-3" />
         </h4>
       </div>
