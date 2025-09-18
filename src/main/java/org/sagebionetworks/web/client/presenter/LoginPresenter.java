@@ -5,8 +5,6 @@ import static org.sagebionetworks.web.client.DisplayConstants.CREATE_ACCOUNT_MES
 import static org.sagebionetworks.web.client.DisplayConstants.SSO_ERROR_UNKNOWN;
 import static org.sagebionetworks.web.client.place.LoginPlace.CHANGE_USERNAME;
 import static org.sagebionetworks.web.client.place.LoginPlace.LOGOUT_TOKEN;
-import static org.sagebionetworks.web.client.place.LoginPlace.SHOW_SIGNED_TOU;
-import static org.sagebionetworks.web.client.place.LoginPlace.SHOW_TOU;
 import static org.sagebionetworks.web.shared.WebConstants.OPEN_ID_ERROR_TOKEN;
 import static org.sagebionetworks.web.shared.WebConstants.OPEN_ID_UNKNOWN_USER_ERROR_TOKEN;
 import static org.sagebionetworks.web.shared.WebConstants.ORCID_NOT_LINKED;
@@ -15,7 +13,6 @@ import static org.sagebionetworks.web.shared.WebConstants.REDIRECT_TO_LAST_PLACE
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -23,7 +20,6 @@ import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.place.ChangeUsername;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -97,6 +93,7 @@ public class LoginPresenter
         .getPlaceChanger()
         .goTo(new LoginPlace(DEFAULT_PLACE_TOKEN));
       view.showErrorMessage(SSO_ERROR_UNKNOWN);
+      view.showLoggingInLoader();
       globalApplicationState.gotoLoginPage();
     } else if (
       CHANGE_USERNAME.equals(token) && authenticationController.isLoggedIn()
@@ -116,6 +113,7 @@ public class LoginPresenter
         );
         globalApplicationState.gotoLastPlace(defaultPlace);
       } else {
+        view.showLoggingInLoader();
         globalApplicationState.gotoLoginPage();
       }
     }
