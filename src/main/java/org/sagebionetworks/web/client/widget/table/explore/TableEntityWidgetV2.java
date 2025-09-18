@@ -185,6 +185,8 @@ public class TableEntityWidgetV2
     this.createGridSessionDialog = createGridSessionDialog;
     this.view.setPresenter(this);
     view.setQueryWrapperPlotNavVisible(true);
+
+    view.addModalWidget(createGridSessionDialog);
   }
 
   public UploadTableModalWidget getUploadTableModalWidget() {
