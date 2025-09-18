@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget;
 
+import static org.sagebionetworks.web.client.DisplayConstants.WORKING_COPY;
+
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -46,7 +48,7 @@ public class CreateGridSessionDialogImpl implements CreateGridSessionDialog {
     this.modal.show();
 
     jobTrackingWidget.startAndTrackJob(
-      "Starting draft session",
+      "Creating " + WORKING_COPY + "...",
       false,
       AsynchType.CreateGrid,
       request,

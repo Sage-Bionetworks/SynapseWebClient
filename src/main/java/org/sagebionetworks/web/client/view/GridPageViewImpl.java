@@ -8,7 +8,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Span;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.widget.entity.SynapseGridImpl;
 
 public class GridPageViewImpl extends Composite implements GridPageView {
@@ -32,8 +31,12 @@ public class GridPageViewImpl extends Composite implements GridPageView {
 
     this.synapseGrid = synapseGrid;
 
-    pageHeaderTitle.setText(DisplayConstants.WORKING_COPY);
     componentContainer.add(synapseGrid.asWidget());
+  }
+
+  @Override
+  public void setTitle(String title) {
+    pageHeaderTitle.setText(title);
   }
 
   @Override

@@ -71,9 +71,6 @@ public class TableEntityWidgetViewImpl
   Div plotNavContainer;
 
   @UiField
-  Div createGridSessionDialogContainer;
-
-  @UiField
   Div addToDownloadListContainer;
 
   @UiField

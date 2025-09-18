@@ -41,9 +41,6 @@ public class EntityActionControllerViewImpl
   @UiField
   Div createVersionJobTrackingWidgetContainer;
 
-  @UiField
-  Div createGridSessionDialogContainer;
-
   Span widget = new Span();
   Widget viewWidget = null;
   PromptForValuesModalView promptForValuesDialog;

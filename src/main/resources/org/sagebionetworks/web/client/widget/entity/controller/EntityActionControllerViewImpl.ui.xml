@@ -33,7 +33,6 @@
         <bh:Div ui:field="createVersionJobTrackingWidgetContainer" />
       </b:ModalBody>
     </b:Modal>
-    <bh:Div ui:field="createGridSessionDialogContainer" />
     <bh:Div ui:field="extraWidgetsContainer" />
   </bh:Span>
 </ui:UiBinder>

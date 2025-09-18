@@ -735,7 +735,7 @@ public class EntityActionControllerImpl
         }
       );
     }
-    // For TableEntity and EntityView types, the CREATE_NEW_GRID action listener is attached by TableEntityWidget, which has access to the current query SQL for grid initialization.
+    // For TableEntity and EntityView types, the CREATE_NEW_GRID action listener is attached by TableEntityWidgetV2, which has access to the current query SQL for grid initialization.
 
     actionMenu.setActionVisible(
       Action.CREATE_NEW_GRID,
