@@ -96,6 +96,7 @@ import org.sagebionetworks.repo.model.download.RequestDownload;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.grid.CreateGridRequest;
 import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.DatasetCollection;
 import org.sagebionetworks.repo.model.table.EntityView;
@@ -145,6 +146,7 @@ import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.CreateGridSessionDialog;
 import org.sagebionetworks.web.client.widget.EntityTypeIcon;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
@@ -175,7 +177,6 @@ import org.sagebionetworks.web.client.widget.entity.menu.v3.ActionListener;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModal;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
-import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.sharing.EntityAccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
@@ -423,6 +424,9 @@ public class EntityActionControllerImplTest {
   @Captor
   ArgumentCaptor<EntityUploadModalProps.Callback> mockOnUploadModalReadyCaptor;
 
+  @Mock
+  CreateGridSessionDialog mockCreateGridSessionDialog;
+
   @Captor
   ArgumentCaptor<
     CreateTableViewWizardProps.OnComplete
@@ -528,6 +532,8 @@ public class EntityActionControllerImplTest {
     when(mockQueryClientProvider.getQueryClient()).thenReturn(mockQueryClient);
     when(mockPortalGinInjector.getEntityAccessControlListModalWidget()) //new
       .thenReturn(mockEntityAclModalWidget);
+    when(mockPortalGinInjector.getCreateGridSessionDialog())
+      .thenReturn(mockCreateGridSessionDialog);
 
     when(mockPortalGinInjector.getEntityTypeIcon())
       .thenReturn(mockEntityTypeIcon);
@@ -5390,6 +5396,9 @@ public class EntityActionControllerImplTest {
 
   @Test
   public void testConfigureWithRecordSet() {
+    when(mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.SYNAPSE_GRID))
+      .thenReturn(true);
+
     RecordSet recordSet = new RecordSet();
     recordSet.setId(entityId);
     entityBundle.setEntity(recordSet);
@@ -5403,6 +5412,8 @@ public class EntityActionControllerImplTest {
       mockAddToDownloadListWidget
     );
 
+    // show grid
+    verify(mockActionMenu).setActionVisible(Action.CREATE_NEW_GRID, true);
     // delete
     verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, true);
     verify(mockActionMenu)
@@ -5430,5 +5441,59 @@ public class EntityActionControllerImplTest {
     verify(mockActionMenu).setActionVisible(Action.SHOW_VERSION_HISTORY, true);
     // upload new version (should be disabled for RecordSet)
     verify(mockActionMenu).setActionVisible(Action.UPLOAD_NEW_FILE, false);
+  }
+
+  @Test
+  public void testConfigureWithRecordSetHideCreateNewGridWithNoEdit() {
+    when(mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.SYNAPSE_GRID))
+      .thenReturn(true);
+
+    boolean canEdit = false;
+
+    RecordSet recordSet = new RecordSet();
+    recordSet.setId(entityId);
+    entityBundle.setEntity(recordSet);
+    entityBundle.getPermissions().setCanEdit(canEdit);
+
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+
+    verify(mockActionMenu).setActionVisible(Action.CREATE_NEW_GRID, false);
+  }
+
+  @Test
+  public void testCreateNewGridForRecordSet() {
+    when(mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.SYNAPSE_GRID))
+      .thenReturn(true);
+
+    RecordSet recordSet = new RecordSet();
+    recordSet.setId(entityId);
+    entityBundle.setEntity(recordSet);
+
+    controller.configure(
+      mockActionMenu,
+      entityBundle,
+      true,
+      wikiPageId,
+      currentEntityArea,
+      mockAddToDownloadListWidget
+    );
+
+    verify(mockActionMenu)
+      .setActionListener(
+        eq(Action.CREATE_NEW_GRID),
+        actionListenerCaptor.capture()
+      );
+
+    actionListenerCaptor.getValue().onAction(Action.CREATE_NEW_GRID, null);
+
+    verify(mockCreateGridSessionDialog)
+      .createGridSession(new CreateGridRequest().setRecordSetId(entityId));
   }
 }

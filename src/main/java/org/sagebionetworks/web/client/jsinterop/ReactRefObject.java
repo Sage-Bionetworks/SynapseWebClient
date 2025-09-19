@@ -4,10 +4,7 @@ import jsinterop.annotations.JsPackage;
 import jsinterop.annotations.JsType;
 
 @JsType(isNative = true, namespace = JsPackage.GLOBAL, name = "Object")
-public class SynapseGridHandle {
+public class ReactRefObject<T> implements ReactRef<T> {
 
-  /**
-   * The SynapseGrid component exposes an imperative handle to initialize the grid session
-   */
-  public native void loadExistingSession(String sessionId);
+  public T current;
 }

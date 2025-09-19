@@ -20,6 +20,7 @@ import org.sagebionetworks.web.client.jsinterop.ReactDOM;
 import org.sagebionetworks.web.client.jsinterop.ReactDOMClient;
 import org.sagebionetworks.web.client.jsinterop.ReactDOMRoot;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
+import org.sagebionetworks.web.client.jsinterop.ReactRefCallback;
 
 /**
  * Abstract widget that manages the lifecycle of a {@link React} component tree mounted with {@link ReactDOM}.
@@ -71,7 +72,7 @@ public abstract class ReactComponentV2<
   private void maybeUpdatePropsWithCallbackRef() {
     if (!this.allChildrenAreReactComponents() && getChildren().size() > 0) {
       // Create a callback ref that will allow us to inject the GWT children into the DOM
-      ReactComponentProps.CallbackRef callbackRef = (Element node) -> {
+      ReactRefCallback<Element> callbackRef = (Element node) -> {
         if (node != null) {
           // Once the DOM node is defined, inject each child
           getChildren()

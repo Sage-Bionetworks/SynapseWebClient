@@ -29,6 +29,7 @@ import org.sagebionetworks.web.client.presenter.EmailInvitationPresenter;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
 import org.sagebionetworks.web.client.presenter.ErrorPresenter;
 import org.sagebionetworks.web.client.presenter.FollowingPagePresenter;
+import org.sagebionetworks.web.client.presenter.GridPagePresenter;
 import org.sagebionetworks.web.client.presenter.HelpPresenter;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
@@ -59,6 +60,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.DivView;
 import org.sagebionetworks.web.client.widget.CommaSeparatedValuesParser;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
+import org.sagebionetworks.web.client.widget.CreateGridSessionDialog;
 import org.sagebionetworks.web.client.widget.EntityTypeIcon;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
@@ -349,6 +351,8 @@ public interface PortalGinInjector extends Ginjector {
   DownloadCartPresenter getDownloadCartPresenter();
 
   DataCatalogPagePresenter getDataCatalogPagePresenter();
+
+  GridPagePresenter getGridPagePresenter();
 
   ChangeUsernamePresenter getChangeUsernamePresenter();
 
@@ -909,4 +913,5 @@ public interface PortalGinInjector extends Ginjector {
   ProjectDataAvailability getProjectDataAvailability();
   SynapseReactClientFullContextPropsProvider getReactContextPropsProvider();
   SynapseGridImpl getSynapseGridImpl();
+  CreateGridSessionDialog getCreateGridSessionDialog();
 }

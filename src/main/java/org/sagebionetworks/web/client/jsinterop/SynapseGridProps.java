@@ -7,20 +7,30 @@ import jsinterop.annotations.JsType;
 @JsType(isNative = true, namespace = JsPackage.GLOBAL, name = "Object")
 public class SynapseGridProps extends ReactComponentProps {
 
-  public String query;
   public boolean showDebugInfo;
-  public ReactRef<SynapseGridHandle> ref;
+  public Object ref; // ref may be a RefObject or a RefCallback, but we can't express that in Java!
 
   @JsOverlay
-  public static SynapseGridProps create(
-    String query,
-    Boolean showDebugInfo,
-    ReactRef<SynapseGridHandle> ref
-  ) {
+  private static SynapseGridProps create(Boolean showDebugInfo, Object ref) {
     SynapseGridProps props = new SynapseGridProps();
-    props.query = query;
     props.showDebugInfo = showDebugInfo;
     props.ref = ref;
     return props;
+  }
+
+  @JsOverlay
+  public static SynapseGridProps create(
+    Boolean showDebugInfo,
+    ReactRefCallback<SynapseGridHandle> ref
+  ) {
+    return create(showDebugInfo, (Object) ref);
+  }
+
+  @JsOverlay
+  public static SynapseGridProps create(
+    Boolean showDebugInfo,
+    ReactRefObject<SynapseGridHandle> ref
+  ) {
+    return create(showDebugInfo, (Object) ref);
   }
 }

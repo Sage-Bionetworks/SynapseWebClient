@@ -32,6 +32,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityRef;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
+import org.sagebionetworks.repo.model.grid.CreateGridRequest;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.DatasetCollection;
@@ -58,6 +59,7 @@ import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnViewS
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
+import org.sagebionetworks.web.client.widget.CreateGridSessionDialog;
 import org.sagebionetworks.web.client.widget.clienthelp.FileViewClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
@@ -181,6 +183,9 @@ public class TableEntityWidgetV2Test {
   @Mock
   GlobalApplicationState mockGlobalState;
 
+  @Mock
+  CreateGridSessionDialog mockCreateGridSessionDialog;
+
   JSONObjectAdapterImpl portalJson = new JSONObjectAdapterImpl();
 
   @Before
@@ -227,7 +232,8 @@ public class TableEntityWidgetV2Test {
         mockFileViewClientsHelp,
         mockPortalGinInjector,
         mockSessionStorage,
-        mockEventBus
+        mockEventBus,
+        mockCreateGridSessionDialog
       );
 
     // The test bundle
@@ -1009,5 +1015,33 @@ public class TableEntityWidgetV2Test {
     verify(mockView).setItemsEditorVisible(false);
     verify(mockActionMenu)
       .setActionVisible(Action.EDIT_ENTITYREF_COLLECTION_ITEMS, true);
+  }
+
+  @Test
+  public void testCreateGridSession() {
+    boolean canEdit = true;
+    String sql = "SELECT * FROM " + tableEntity.getId();
+    Query query = new Query();
+    query.setSql(sql);
+    when(mockQueryChangeHandler.getQueryString()).thenReturn(query);
+    configureBundleWithView(ViewType.file);
+    widget.configure(
+      entityBundle,
+      versionNumber,
+      canEdit,
+      false,
+      mockQueryChangeHandler,
+      mockActionMenu
+    );
+    verify(mockActionMenu)
+      .setActionListener(
+        eq(Action.CREATE_NEW_GRID),
+        actionListenerCaptor.capture()
+      );
+    ActionListener listener = actionListenerCaptor.getValue();
+
+    listener.onAction(Action.CREATE_NEW_GRID, null);
+    verify(mockCreateGridSessionDialog)
+      .createGridSession(new CreateGridRequest().setInitialQuery(query));
   }
 }

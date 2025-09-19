@@ -15,6 +15,7 @@ import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityRef;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
+import org.sagebionetworks.repo.model.grid.CreateGridRequest;
 import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.EntityRefCollectionView;
 import org.sagebionetworks.repo.model.table.EntityView;
@@ -42,6 +43,7 @@ import org.sagebionetworks.web.client.jsinterop.QueryWrapperPlotNavProps.OnViewS
 import org.sagebionetworks.web.client.jsinterop.ToastMessageOptions;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
+import org.sagebionetworks.web.client.widget.CreateGridSessionDialog;
 import org.sagebionetworks.web.client.widget.clienthelp.FileViewClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
@@ -133,6 +135,7 @@ public class TableEntityWidgetV2
   private AccessControlListModalWidget aclModal;
   private PopupUtilsView popupUtils;
   EventBus eventBus;
+  private final CreateGridSessionDialog createGridSessionDialog;
 
   EntityBundle entityBundle;
   String tableId;
@@ -167,7 +170,8 @@ public class TableEntityWidgetV2
     FileViewClientsHelp fileViewClientsHelp,
     PortalGinInjector ginInjector,
     SessionStorage sessionStorage,
-    EventBus eventBus
+    EventBus eventBus,
+    CreateGridSessionDialog createGridSessionDialog
   ) {
     this.view = view;
     this.preflightController = preflightController;
@@ -178,8 +182,11 @@ public class TableEntityWidgetV2
     this.sessionStorage = sessionStorage;
     this.eventBus = eventBus;
     this.popupUtils = ginInjector.getPopupUtils();
+    this.createGridSessionDialog = createGridSessionDialog;
     this.view.setPresenter(this);
     view.setQueryWrapperPlotNavVisible(true);
+
+    view.addModalWidget(createGridSessionDialog);
   }
 
   public UploadTableModalWidget getUploadTableModalWidget() {
@@ -270,7 +277,6 @@ public class TableEntityWidgetV2
     // Listen to action events.
     view.setScopeVisible(false);
     view.setSchemaVisible(false);
-    view.setSynapseGridVisible(false);
     actionMenu.setActionText(
       Action.SHOW_TABLE_SCHEMA,
       SHOW + entityTypeDisplay + SCHEMA
@@ -304,28 +310,11 @@ public class TableEntityWidgetV2
         }
       );
     this.actionMenu.setActionListener(
-        Action.SHOW_GRID,
+        Action.CREATE_NEW_GRID,
         (action, e) -> {
-          boolean isVisible = !view.isSynapseGridVisible();
-          view.setSynapseGridVisible(isVisible);
-          // Toggle QueryWrapperPlotNav visibility - hide when grid is shown, show when grid is hidden
-          view.setQueryWrapperPlotNavVisible(!isVisible);
-
-          if (isVisible && currentQuery != null) {
-            view.configureSynapseGrid(currentQuery.getSql());
-
-            // Imperative call to instantiate the grid
-            com.google.gwt.user.client.Timer timer =
-              new com.google.gwt.user.client.Timer() {
-                @Override
-                public void run() {
-                  view.initializeSynapseGrid();
-                }
-              };
-            timer.schedule(GRID_INITIALIZATION_DELAY);
-          }
-          String showHide = isVisible ? HIDE : SHOW;
-          actionMenu.setActionText(Action.SHOW_GRID, showHide + "Synapse Grid");
+          createGridSessionDialog.createGridSession(
+            new CreateGridRequest().setInitialQuery(currentQuery)
+          );
         }
       );
 

@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.menu.v3;
 
+import static org.sagebionetworks.web.client.DisplayConstants.WORKING_COPY;
+
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
@@ -39,7 +41,10 @@ public class DefaultActionConfigurationUtil {
       ActionConfiguration.create(Action.EDIT_DEFINING_SQL, "Edit Defining SQL"),
       ActionConfiguration.create(Action.VIEW_DEFINING_SQL, "View Defining SQL"),
       ActionConfiguration.create(Action.SHOW_ANNOTATIONS, "Annotations"),
-      ActionConfiguration.create(Action.SHOW_GRID, "Start Grid Session"),
+      ActionConfiguration.create(
+        Action.CREATE_NEW_GRID,
+        "Create New " + WORKING_COPY
+      ),
       ActionConfiguration.create(
         Action.UPLOAD_FILE,
         "Upload or Link to a File"

@@ -65,6 +65,7 @@ import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.MultipartUploadStatus;
 import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.file.UploadDestinationInstanceFactory;
+import org.sagebionetworks.repo.model.grid.GridSession;
 import org.sagebionetworks.repo.model.principal.NotificationEmail;
 import org.sagebionetworks.repo.model.principal.PrincipalAliasResponse;
 import org.sagebionetworks.repo.model.principal.UserGroupHeaderResponse;
@@ -93,6 +94,7 @@ import org.sagebionetworks.web.shared.exceptions.ResultNotReadyException;
 public class SynapseJavascriptFactory {
 
   public enum OBJECT_TYPE {
+    GridSession,
     ActionRequiredList,
     TwoFactorAuthStatus,
     ValidationResults,
@@ -245,6 +247,8 @@ public class SynapseJavascriptFactory {
         return new UserBundle(json);
       case ActionRequiredList:
         return new ActionRequiredList(json);
+      case GridSession:
+        return new GridSession(json);
       case TwoFactorAuthStatus:
         return new TwoFactorAuthStatus(json);
       case Count:

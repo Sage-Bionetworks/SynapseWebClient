@@ -53,6 +53,7 @@ import org.sagebionetworks.repo.model.download.RequestDownload;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.grid.CreateGridRequest;
 import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.DatasetCollection;
 import org.sagebionetworks.repo.model.table.EntityRefCollectionView;
@@ -104,6 +105,7 @@ import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.CreateGridSessionDialog;
 import org.sagebionetworks.web.client.widget.EntityTypeIcon;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
@@ -265,6 +267,7 @@ public class EntityActionControllerImpl
   EditProjectMetadataModalWidget editProjectMetadataModalWidget;
   EventBus eventBus;
   JobTrackingWidget jobTrackingWidget;
+  CreateGridSessionDialog createGridSessionDialogWidget;
   EntityBundle entityBundle;
   String wikiPageId;
   Entity entity;
@@ -377,6 +380,14 @@ public class EntityActionControllerImpl
       view.setCreateVersionDialogJobTrackingWidget(jobTrackingWidget);
     }
     return jobTrackingWidget;
+  }
+
+  private CreateGridSessionDialog getCreateGridSessionDialogWidget() {
+    if (createGridSessionDialogWidget == null) {
+      createGridSessionDialogWidget = ginInjector.getCreateGridSessionDialog();
+      view.addWidget(createGridSessionDialogWidget);
+    }
+    return createGridSessionDialogWidget;
   }
 
   private SelectTeamModal getSelectTeamModal() {
@@ -669,6 +680,7 @@ public class EntityActionControllerImpl
     configureStatisticsPlotAction();
     configureFullTextSearch();
     configureReportViolation();
+    configureGridActions();
 
     // These configuration methods are asynchronous
     FluentFuture fileDownloadFuture = configureFileDownload();
@@ -719,6 +731,28 @@ public class EntityActionControllerImpl
           WebConstants.PRIVACY_SECURITY_COMPLIANCE_HELP_CENTER_URL
         );
       }
+    );
+  }
+
+  private void configureGridActions() {
+    if (entity instanceof RecordSet) {
+      actionMenu.setActionListener(
+        Action.CREATE_NEW_GRID,
+        (action, event) -> {
+          this.getCreateGridSessionDialogWidget()
+            .createGridSession(
+              new CreateGridRequest().setRecordSetId(entity.getId())
+            );
+        }
+      );
+    }
+    // For TableEntity and EntityView types, the CREATE_NEW_GRID action listener is attached by TableEntityWidgetV2, which has access to the current query SQL for grid initialization.
+
+    actionMenu.setActionVisible(
+      Action.CREATE_NEW_GRID,
+      canBeGridSource(this.entity) &&
+      permissions.getCanEdit() &&
+      featureFlagConfig.isFeatureEnabled(FeatureFlagKey.SYNAPSE_GRID)
     );
   }
 
@@ -1317,10 +1351,6 @@ public class EntityActionControllerImpl
         "Upload Data to " + entityTypeDisplay
       );
       actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, canEditResults);
-      actionMenu.setActionVisible(
-        Action.SHOW_GRID,
-        featureFlagConfig.isFeatureEnabled(FeatureFlagKey.SYNAPSE_GRID)
-      );
       actionMenu.setActionVisible(Action.SHOW_TABLE_SCHEMA, true);
       actionMenu.setActionVisible(
         Action.SHOW_VIEW_SCOPE,
@@ -1350,7 +1380,6 @@ public class EntityActionControllerImpl
     } else {
       actionMenu.setActionVisible(Action.UPLOAD_TABLE_DATA, false);
       actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, false);
-      actionMenu.setActionVisible(Action.SHOW_GRID, false);
       actionMenu.setActionVisible(Action.SHOW_TABLE_SCHEMA, false);
       actionMenu.setActionVisible(Action.SHOW_VIEW_SCOPE, false);
       actionMenu.setActionVisible(
@@ -1701,6 +1730,14 @@ public class EntityActionControllerImpl
 
   public static boolean isDefinedByScope(Entity entity) {
     return entity instanceof EntityView || entity instanceof SubmissionView;
+  }
+
+  public static boolean canBeGridSource(Entity entity) {
+    return (
+      entity instanceof TableEntity ||
+      entity instanceof EntityView ||
+      entity instanceof RecordSet
+    );
   }
 
   public static boolean isDefinedBySql(Entity entity) {

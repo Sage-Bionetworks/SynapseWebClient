@@ -81,6 +81,8 @@ import org.sagebionetworks.web.client.view.ErrorView;
 import org.sagebionetworks.web.client.view.ErrorViewImpl;
 import org.sagebionetworks.web.client.view.FollowingPageView;
 import org.sagebionetworks.web.client.view.FollowingPageViewImpl;
+import org.sagebionetworks.web.client.view.GridPageView;
+import org.sagebionetworks.web.client.view.GridPageViewImpl;
 import org.sagebionetworks.web.client.view.HelpView;
 import org.sagebionetworks.web.client.view.HelpViewImpl;
 import org.sagebionetworks.web.client.view.HomeView;
@@ -135,6 +137,8 @@ import org.sagebionetworks.web.client.widget.CommaSeparatedValuesParserView;
 import org.sagebionetworks.web.client.widget.CommaSeparatedValuesParserViewImpl;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
 import org.sagebionetworks.web.client.widget.CopyTextModalImpl;
+import org.sagebionetworks.web.client.widget.CreateGridSessionDialog;
+import org.sagebionetworks.web.client.widget.CreateGridSessionDialogImpl;
 import org.sagebionetworks.web.client.widget.DownloadSpeedTester;
 import org.sagebionetworks.web.client.widget.DownloadSpeedTesterImpl;
 import org.sagebionetworks.web.client.widget.EntityTypeIcon;
@@ -1633,5 +1637,8 @@ public class PortalGinModule extends AbstractGinModule {
       .in(Singleton.class);
 
     bind(SearchAnalyticsClient.class).to(SearchAnalyticsClientImpl.class);
+
+    bind(GridPageView.class).to(GridPageViewImpl.class).in(Singleton.class);
+    bind(CreateGridSessionDialog.class).to(CreateGridSessionDialogImpl.class);
   }
 }

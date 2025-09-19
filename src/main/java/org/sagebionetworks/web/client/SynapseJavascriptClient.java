@@ -127,6 +127,7 @@ import org.sagebionetworks.repo.model.file.FileHandleAssociationList;
 import org.sagebionetworks.repo.model.file.MultipartUploadRequest;
 import org.sagebionetworks.repo.model.file.MultipartUploadStatus;
 import org.sagebionetworks.repo.model.file.UploadDestination;
+import org.sagebionetworks.repo.model.grid.GridSession;
 import org.sagebionetworks.repo.model.oauth.OAuthProvider;
 import org.sagebionetworks.repo.model.principal.AliasList;
 import org.sagebionetworks.repo.model.principal.NotificationEmail;
@@ -3346,5 +3347,11 @@ public class SynapseJavascriptClient {
         }
       }
     );
+  }
+
+  public FluentFuture<GridSession> getGridSession(String sessionId) {
+    String url = getRepoServiceUrl() + GRID_SESSION + "/" + sessionId;
+
+    return getFuture(cb -> doGet(url, OBJECT_TYPE.GridSession, cb));
   }
 }
