@@ -68,7 +68,9 @@ public class GridPagePresenter
                 @Override
                 public void onSuccess(Entity sourceEntity) {
                   jsniUtils.setPageTitle(
-                    "Working Copy - " + sourceEntity.getName()
+                    DisplayConstants.WORKING_COPY +
+                    " - " +
+                    sourceEntity.getName()
                   );
                   view.setTitle(
                     DisplayConstants.WORKING_COPY +
