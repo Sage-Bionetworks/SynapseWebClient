@@ -59,7 +59,7 @@
     <bh:Div ui:field="synapseGridContainer" />
     <bh:Div ui:field="addToDownloadListContainer" />
     <bh:Div styleName="margin-top-5" />
-    <bh:Div ui:field="plotNavContainer" />
+    <bh:Div ui:field="plotNavContainer" addStyleNames="min-height-400"/>
     <bh:Div ui:field="modalContainer" />
   </g:HTMLPanel>
 </ui:UiBinder>
