@@ -141,6 +141,8 @@ import org.sagebionetworks.web.client.widget.CreateGridSessionDialog;
 import org.sagebionetworks.web.client.widget.CreateGridSessionDialogImpl;
 import org.sagebionetworks.web.client.widget.DownloadSpeedTester;
 import org.sagebionetworks.web.client.widget.DownloadSpeedTesterImpl;
+import org.sagebionetworks.web.client.widget.EntityCitation;
+import org.sagebionetworks.web.client.widget.EntityCitationImpl;
 import org.sagebionetworks.web.client.widget.EntityTypeIcon;
 import org.sagebionetworks.web.client.widget.EntityTypeIconImpl;
 import org.sagebionetworks.web.client.widget.FileHandleWidgetView;
@@ -528,6 +530,8 @@ import org.sagebionetworks.web.client.widget.entity.tabs.DockerTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.DockerTabViewImpl;
 import org.sagebionetworks.web.client.widget.entity.tabs.FilesTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.FilesTabViewImpl;
+import org.sagebionetworks.web.client.widget.entity.tabs.MetadataTabView;
+import org.sagebionetworks.web.client.widget.entity.tabs.MetadataTabViewImpl;
 import org.sagebionetworks.web.client.widget.entity.tabs.TabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.TabViewImpl;
 import org.sagebionetworks.web.client.widget.entity.tabs.TablesTabView;
@@ -1640,5 +1644,7 @@ public class PortalGinModule extends AbstractGinModule {
 
     bind(GridPageView.class).to(GridPageViewImpl.class).in(Singleton.class);
     bind(CreateGridSessionDialog.class).to(CreateGridSessionDialogImpl.class);
+    bind(EntityCitation.class).to(EntityCitationImpl.class);
+    bind(MetadataTabView.class).to(MetadataTabViewImpl.class);
   }
 }

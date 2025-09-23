@@ -17,6 +17,8 @@ import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.curation.ListCurationTaskRequest;
+import org.sagebionetworks.repo.model.curation.ListCurationTaskResponse;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
@@ -24,6 +26,8 @@ import org.sagebionetworks.repo.model.table.EntityRefCollectionView;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.FeatureFlagConfig;
+import org.sagebionetworks.web.client.FeatureFlagKey;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -35,6 +39,7 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.EntityCitation;
 import org.sagebionetworks.web.client.widget.EntityCitationImpl;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
@@ -46,6 +51,7 @@ import org.sagebionetworks.web.client.widget.entity.tabs.DatasetsTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.DiscussionTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.DockerTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.FilesTab;
+import org.sagebionetworks.web.client.widget.entity.tabs.MetadataTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.entity.tabs.TablesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tabs;
@@ -73,8 +79,9 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
   private final ChallengeTab challengeTab;
   private final DiscussionTab discussionTab;
   private final DockerTab dockerTab;
+  private final MetadataTab metadataTab;
   private final ProjectTitleBar projectTitleBar;
-  private final EntityCitationImpl entityCitation;
+  private final EntityCitation entityCitation;
   private final EntityMetadata projectMetadata;
   private final SynapseClientAsync synapseClient;
   // how many tabs have been marked as visible
@@ -85,6 +92,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
   private final PlaceChanger placeChanger;
   private final CookieProvider cookies;
   private final EventBus eventBus;
+  private final FeatureFlagConfig featureFlagConfig;
   private final EntityId2BundleCache entityId2BundleCache;
   public boolean pushTabUrlToBrowserHistory = false;
   public static final EntityBundleRequest ALL_PARTS_REQUEST =
@@ -116,7 +124,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
     SynapseClientAsync synapseClient,
     Tabs tabs,
     ProjectTitleBar projectTitleBar,
-    EntityCitationImpl entityCitation,
+    EntityCitation entityCitation,
     EntityMetadata projectMetadata,
     WikiTab wikiTab,
     FilesTab filesTab,
@@ -125,13 +133,15 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
     ChallengeTab challengeTab,
     DiscussionTab discussionTab,
     DockerTab dockerTab,
+    MetadataTab metadataTab,
     EntityActionController projectActionController,
     EntityActionMenu projectActionMenu,
     CookieProvider cookies,
     SynapseJavascriptClient synapseJavascriptClient,
     GlobalApplicationState globalAppState,
     EntityId2BundleCache entityId2BundleCache,
-    EventBus eventBus
+    EventBus eventBus,
+    FeatureFlagConfig featureFlagConfig
   ) {
     this.view = view;
     this.synapseClient = synapseClient;
@@ -144,6 +154,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
     this.challengeTab = challengeTab;
     this.discussionTab = discussionTab;
     this.dockerTab = dockerTab;
+    this.metadataTab = metadataTab;
     this.projectTitleBar = projectTitleBar;
     this.entityCitation = entityCitation;
     this.projectMetadata = projectMetadata;
@@ -154,6 +165,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
     this.placeChanger = globalAppState.getPlaceChanger();
     this.entityId2BundleCache = entityId2BundleCache;
     this.eventBus = eventBus;
+    this.featureFlagConfig = featureFlagConfig;
 
     initTabs();
     view.setTabs(tabs.asWidget());
@@ -232,6 +244,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
     tabs.addTab(challengeTab.asTab());
     tabs.addTab(discussionTab.asTab());
     tabs.addTab(dockerTab.asTab());
+    tabs.addTab(metadataTab.asTab());
 
     filesTab.setEntitySelectedCallback(
       getEntitySelectedCallback(EntityArea.FILES)
@@ -306,6 +319,11 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 
       area = EntityArea.DOCKER;
       configureDockerTab();
+    });
+
+    metadataTab.setTabClickedCallback(tab -> {
+      area = EntityArea.METADATA;
+      configureMetadataTab();
     });
   }
 
@@ -414,6 +432,12 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
             dockerAreaToken
           )
         );
+      metadataTab
+        .asTab()
+        .setEntityNameAndPlace(
+          projectName,
+          new Synapse(projectId, versionNumber, EntityArea.METADATA, null)
+        );
     }
   }
 
@@ -521,6 +545,9 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
     if (dockerTab.asTab().isTabListItemVisible()) {
       visibleTabs.add(EntityArea.DOCKER);
     }
+    if (metadataTab.asTab().isTabListItemVisible()) {
+      visibleTabs.add(EntityArea.METADATA);
+    }
     visibleTabs.add(EntityArea.DISCUSSION);
     return visibleTabs;
   }
@@ -566,6 +593,9 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
         configureDockerTab();
         tabs.showTab(dockerTab.asTab(), pushTabUrlToBrowserHistory);
         break;
+      case METADATA:
+        configureMetadataTab();
+        tabs.showTab(metadataTab.asTab(), pushTabUrlToBrowserHistory);
       default:
     }
     pushTabUrlToBrowserHistory = false;
@@ -714,6 +744,24 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
       projectHeader.getId(),
       getTabVisibilityCallback(EntityArea.CHALLENGE, challengeTab.asTab())
     );
+
+    if (featureFlagConfig.isFeatureEnabled(FeatureFlagKey.METADATA_TAB)) {
+      synapseJavascriptClient.getCurationTasks(
+        new ListCurationTaskRequest().setProjectId(projectHeader.getId()),
+        new AsyncCallback<ListCurationTaskResponse>() {
+          @Override
+          public void onFailure(Throwable throwable) {}
+
+          @Override
+          public void onSuccess(ListCurationTaskResponse response) {
+            if (!response.getPage().isEmpty()) {
+              getTabVisibilityCallback(EntityArea.METADATA, metadataTab.asTab())
+                .onSuccess(true);
+            }
+          }
+        }
+      );
+    }
   }
 
   public AsyncCallback<Boolean> getTabVisibilityCallback(
@@ -1048,6 +1096,10 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
       dockerTab.asTab().setContentStale(false);
     }
     configureEntityCitationForTab(dockerEntityBundle, null);
+  }
+
+  public void configureMetadataTab() {
+    metadataTab.configure(projectBundle);
   }
 
   public String getWikiPageId(String areaToken, String rootWikiId) {

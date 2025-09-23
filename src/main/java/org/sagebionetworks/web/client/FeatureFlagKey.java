@@ -33,9 +33,12 @@ public enum FeatureFlagKey {
 
   // If enabled, search bar uses OpenSearch
   OPENSEARCH_ENABLED("OPENSEARCH_ENABLED"),
-  
+
   // If enabled, show the 'Start Grid Session' button in the action menu for table entities
   SYNAPSE_GRID("SYNAPSE_GRID"),
+
+  // If enabled, show the 'Metadata Tab' on project entity pages
+  METADATA_TAB("METADATA_TAB"),
 
   // Last flag is used only for tests
   TEST_FLAG_ONLY("TEST_FLAG_ONLY");

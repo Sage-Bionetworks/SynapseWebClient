@@ -13,6 +13,7 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.client.FeatureFlagKey.METADATA_TAB;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
@@ -38,12 +39,15 @@ import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
+import org.sagebionetworks.repo.model.curation.CurationTask;
+import org.sagebionetworks.repo.model.curation.ListCurationTaskResponse;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.repo.model.table.Dataset;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.FeatureFlagConfig;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -56,6 +60,7 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.EntityCitation;
 import org.sagebionetworks.web.client.widget.EntityCitationImpl;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
@@ -69,6 +74,7 @@ import org.sagebionetworks.web.client.widget.entity.tabs.DatasetsTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.DiscussionTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.DockerTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.FilesTab;
+import org.sagebionetworks.web.client.widget.entity.tabs.MetadataTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.entity.tabs.TablesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tabs;
@@ -151,13 +157,19 @@ public class EntityPageTopTest {
   DiscussionTab mockDiscussionTab;
 
   @Mock
-  DockerTab mockDockerTab;
-
-  @Mock
   Tab mockDiscussionInnerTab;
 
   @Mock
+  DockerTab mockDockerTab;
+
+  @Mock
   Tab mockDockerInnerTab;
+
+  @Mock
+  MetadataTab mockMetadataTab;
+
+  @Mock
+  Tab mockMetadataInnerTab;
 
   @Mock
   UserEntityPermissions mockPermissions;
@@ -178,7 +190,7 @@ public class EntityPageTopTest {
   ProjectTitleBar mockProjectTitleBar;
 
   @Mock
-  EntityCitationImpl mockEntityCitation;
+  EntityCitation mockEntityCitation;
 
   @Mock
   SynapseJavascriptClient mockSynapseJavascriptClient;
@@ -210,6 +222,12 @@ public class EntityPageTopTest {
   @Mock
   EntityHeader mockProjectEntityHeader;
 
+  @Mock
+  FeatureFlagConfig mockFeatureFlagConfig;
+
+  @Mock
+  ListCurationTaskResponse mockCurationTaskList;
+
   EntityId2BundleCache entityId2BundleCache;
   EntityPageTop pageTop;
   String projectEntityId = "syn123";
@@ -228,6 +246,7 @@ public class EntityPageTopTest {
     when(mockChallengeTab.asTab()).thenReturn(mockChallengeInnerTab);
     when(mockDiscussionTab.asTab()).thenReturn(mockDiscussionInnerTab);
     when(mockDockerTab.asTab()).thenReturn(mockDockerInnerTab);
+    when(mockMetadataTab.asTab()).thenReturn(mockMetadataInnerTab);
     when(mockGlobalApplicationState.getPlaceChanger())
       .thenReturn(mockPlaceChanger);
     when(mockView.getEventBinder()).thenReturn(mockEventBinder);
@@ -247,13 +266,15 @@ public class EntityPageTopTest {
         mockChallengeTab,
         mockDiscussionTab,
         mockDockerTab,
+        mockMetadataTab,
         mockProjectActionController,
         mockProjectActionMenuWidget,
         mockCookies,
         mockSynapseJavascriptClient,
         mockGlobalApplicationState,
         entityId2BundleCache,
-        mockEventBus
+        mockEventBus,
+        mockFeatureFlagConfig
       );
     AsyncMockStubber
       .callSuccessWith(mockProjectBundle)
@@ -275,10 +296,13 @@ public class EntityPageTopTest {
     when(mockProjectBundle.getAccessControlList()).thenReturn(mockACL);
     when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
       .thenReturn("true");
+    when(mockFeatureFlagConfig.isFeatureEnabled(any())).thenReturn(true);
     EntityPath path = new EntityPath();
     path.setPath(Collections.singletonList(mockProjectEntityHeader));
     when(mockProjectEntityHeader.getType()).thenReturn(Project.class.getName());
     when(mockProjectBundle.getPath()).thenReturn(path);
+    when(mockCurationTaskList.getPage())
+      .thenReturn(Collections.singletonList(new CurationTask()));
 
     AsyncMockStubber
       .callSuccessWith(true)
@@ -304,6 +328,10 @@ public class EntityPageTopTest {
       .callSuccessWith(true)
       .when(mockSynapseJavascriptClient)
       .isDocker(any(), any());
+    AsyncMockStubber
+      .callSuccessWith(mockCurationTaskList)
+      .when(mockSynapseJavascriptClient)
+      .getCurationTasks(any(), any());
 
     when(mockWikiInnerTab.isTabListItemVisible()).thenReturn(true);
     when(mockFilesInnerTab.isTabListItemVisible()).thenReturn(true);
@@ -312,6 +340,7 @@ public class EntityPageTopTest {
     when(mockChallengeInnerTab.isTabListItemVisible()).thenReturn(true);
     when(mockDiscussionInnerTab.isTabListItemVisible()).thenReturn(true);
     when(mockDockerInnerTab.isTabListItemVisible()).thenReturn(true);
+    when(mockMetadataInnerTab.isTabListItemVisible()).thenReturn(true);
 
     when(mockWikiInnerTab.isContentStale()).thenReturn(true);
     when(mockFilesInnerTab.isContentStale()).thenReturn(true);
@@ -320,7 +349,8 @@ public class EntityPageTopTest {
     when(mockDiscussionInnerTab.isContentStale()).thenReturn(true);
     when(mockDockerInnerTab.isContentStale()).thenReturn(true);
     when(mockChallengeInnerTab.isContentStale()).thenReturn(true);
-    when(mockTabs.getTabCount()).thenReturn(6);
+    when(mockMetadataInnerTab.isContentStale()).thenReturn(true);
+    when(mockTabs.getTabCount()).thenReturn(7);
     when(mockLinkEntity.getLinksTo()).thenReturn(mockLinkReference);
   }
 
@@ -538,6 +568,7 @@ public class EntityPageTopTest {
     verify(mockChallengeTab).updateActionMenuCommands();
     verify(mockDiscussionTab).updateActionMenuCommands();
     verify(mockDockerTab).configure(mockProjectBundle, areaToken);
+    verify(mockMetadataTab).configure(mockProjectBundle);
   }
 
   private void clickAllTabs() {
@@ -568,6 +599,9 @@ public class EntityPageTopTest {
     tabCaptor.getValue().invoke(null);
     // click on the docker tab
     verify(mockDockerTab).setTabClickedCallback(tabCaptor.capture());
+    tabCaptor.getValue().invoke(null);
+
+    verify(mockMetadataTab).setTabClickedCallback(tabCaptor.capture());
     tabCaptor.getValue().invoke(null);
   }
 
@@ -902,6 +936,11 @@ public class EntityPageTopTest {
     reset(mockProjectMetadata);
     verify(mockDockerTab).setTabClickedCallback(tabCaptor.capture());
     tabCaptor.getValue().invoke(null);
+
+    // click on the metadata tab
+    reset(mockProjectMetadata);
+    verify(mockMetadataTab).setTabClickedCallback(tabCaptor.capture());
+    tabCaptor.getValue().invoke(null);
   }
 
   @Test
@@ -1097,6 +1136,8 @@ public class EntityPageTopTest {
     verify(mockChallengeInnerTab, atLeastOnce()).setTabListItemVisible(true);
     verify(mockDiscussionInnerTab, atLeastOnce()).setTabListItemVisible(true);
     verify(mockDockerInnerTab, atLeastOnce()).setTabListItemVisible(true);
+    verify(mockChallengeInnerTab, atLeastOnce()).setTabListItemVisible(true);
+    verify(mockMetadataInnerTab, atLeastOnce()).setTabListItemVisible(true);
   }
 
   @Test
@@ -1279,6 +1320,7 @@ public class EntityPageTopTest {
     verify(mockChallengeInnerTab, atLeastOnce()).setTabListItemVisible(false);
     verify(mockDiscussionInnerTab, atLeastOnce()).setTabListItemVisible(false);
     verify(mockDockerInnerTab, atLeastOnce()).setTabListItemVisible(false);
+    verify(mockMetadataInnerTab, atLeastOnce()).setTabListItemVisible(true);
   }
 
   // SWC-7233 (File test)
@@ -1435,5 +1477,43 @@ public class EntityPageTopTest {
 
     // verify we did not change place, but instead reconfigured for target entity under the same project
     verify(mockPlaceChanger, never()).goTo(newPlace);
+  }
+
+  @Test
+  public void testHideMetadataTabWhenFeatureDisabled() {
+    when(mockFeatureFlagConfig.isFeatureEnabled(METADATA_TAB))
+      .thenReturn(false);
+    Synapse.EntityArea area = null;
+    String areaToken = null;
+    Long versionNumber = null;
+    pageTop.configure(
+      mockProjectBundle,
+      versionNumber,
+      mockProjectHeader,
+      area,
+      areaToken
+    );
+    verify(mockMetadataInnerTab, never()).setTabListItemVisible(true);
+  }
+
+  @Test
+  public void testHideMetadataTabWhenNoCurationTasks() {
+    AsyncMockStubber
+      .callSuccessWith(
+        new ListCurationTaskResponse().setPage(Collections.emptyList())
+      )
+      .when(mockSynapseJavascriptClient)
+      .getCurationTasks(any(), any());
+    Synapse.EntityArea area = null;
+    String areaToken = null;
+    Long versionNumber = null;
+    pageTop.configure(
+      mockProjectBundle,
+      versionNumber,
+      mockProjectHeader,
+      area,
+      areaToken
+    );
+    verify(mockMetadataInnerTab, never()).setTabListItemVisible(true);
   }
 }

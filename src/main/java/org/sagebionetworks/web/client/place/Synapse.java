@@ -218,6 +218,7 @@ public class Synapse extends Place {
     CHALLENGE,
     DISCUSSION,
     DOCKER,
+    METADATA,
   }
 
   public static enum ProfileArea {
