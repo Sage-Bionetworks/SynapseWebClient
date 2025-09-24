@@ -6,7 +6,9 @@ import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
 
-public class EntityCitationImpl extends ReactComponent {
+public class EntityCitationImpl
+  extends ReactComponent
+  implements EntityCitation {
 
   @Inject
   public EntityCitationImpl() {}

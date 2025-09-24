@@ -39,6 +39,7 @@ import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBodyInstanceFactory;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.repo.model.auth.TwoFactorAuthStatus;
+import org.sagebionetworks.repo.model.curation.ListCurationTaskResponse;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.dataaccess.AccessApprovalNotificationResponse;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionInfoPage;
@@ -182,6 +183,7 @@ public class SynapseJavascriptFactory {
     SubmissionInfoPage,
     UploadDestination,
     AddBatchOfFilesToDownloadListResponse,
+    ListCurationTaskResponse,
     AccessControlList,
     None,
     String,
@@ -273,6 +275,8 @@ public class SynapseJavascriptFactory {
         return new Evaluation(json);
       case AddBatchOfFilesToDownloadListResponse:
         return new AddBatchOfFilesToDownloadListResponse(json);
+      case ListCurationTaskResponse:
+        return new ListCurationTaskResponse(json);
       case Link:
         return new Link(json);
       case Preview:

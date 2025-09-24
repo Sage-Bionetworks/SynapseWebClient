@@ -34,7 +34,13 @@ const config = defineConfig({
     ],
   },
   resolve: {
-    dedupe: ['@emotion/react', '@emotion/styled', 'react', 'react-dom'],
+    dedupe: [
+      '@emotion/react',
+      '@emotion/styled',
+      'jotai',
+      'react',
+      'react-dom',
+    ],
   },
   plugins: [nodePolyfills()],
   define: {

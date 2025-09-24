@@ -83,6 +83,8 @@ import org.sagebionetworks.repo.model.auth.LoginRequest;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.repo.model.auth.TwoFactorAuthStatus;
 import org.sagebionetworks.repo.model.auth.Username;
+import org.sagebionetworks.repo.model.curation.ListCurationTaskRequest;
+import org.sagebionetworks.repo.model.curation.ListCurationTaskResponse;
 import org.sagebionetworks.repo.model.dataaccess.AccessApprovalNotificationRequest;
 import org.sagebionetworks.repo.model.dataaccess.AccessApprovalNotificationResponse;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionInfoPage;
@@ -3353,5 +3355,13 @@ public class SynapseJavascriptClient {
     String url = getRepoServiceUrl() + GRID_SESSION + "/" + sessionId;
 
     return getFuture(cb -> doGet(url, OBJECT_TYPE.GridSession, cb));
+  }
+
+  public void getCurationTasks(
+    ListCurationTaskRequest request,
+    AsyncCallback<ListCurationTaskResponse> cb
+  ) {
+    String url = getRepoServiceUrl() + "/curation/task/list";
+    doPost(url, request, OBJECT_TYPE.ListCurationTaskResponse, false, cb);
   }
 }
