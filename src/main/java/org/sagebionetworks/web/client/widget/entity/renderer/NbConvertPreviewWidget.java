@@ -2,6 +2,8 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import static org.sagebionetworks.web.client.SynapseJavascriptClient.ACCEPT;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.AUTHORIZATION_HEADER;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.BEARER_PREFIX;
 import static org.sagebionetworks.web.shared.WebConstants.NBCONVERT_ENDPOINT_PROPERTY;
 import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.TEXT_HTML_CHARSET_UTF8;
@@ -24,6 +26,7 @@ import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseProperties;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.asynch.PresignedURLAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
@@ -48,6 +51,7 @@ public class NbConvertPreviewWidget
   protected PopupUtilsView popupUtils;
   protected GWTWrapper gwt;
   public static String friendlyMaxFileSize = null;
+  AuthenticationController authController;
 
   @Inject
   public NbConvertPreviewWidget(
@@ -59,7 +63,8 @@ public class NbConvertPreviewWidget
     SynapseClientAsync synapseClient,
     PopupUtilsView popupUtils,
     SynapseProperties synapseProperties,
-    GWTWrapper gwt
+    GWTWrapper gwt,
+    AuthenticationController authController
   ) {
     this.view = view;
     this.presignedURLAsyncHandler = presignedURLAsyncHandler;
@@ -70,6 +75,7 @@ public class NbConvertPreviewWidget
     fixServiceEntryPoint(synapseClient);
     this.popupUtils = popupUtils;
     this.gwt = gwt;
+    this.authController = authController;
     view.setSynAlert(synAlert);
     view.setPresenter(this);
     if (friendlyMaxFileSize == null) {
@@ -183,6 +189,12 @@ public class NbConvertPreviewWidget
       nbConvertEndpoint + encodedUrl
     );
     requestBuilder.setHeader(ACCEPT, TEXT_HTML_CHARSET_UTF8);
+    if (authController.isLoggedIn()) {
+      requestBuilder.setHeader(
+        AUTHORIZATION_HEADER,
+        BEARER_PREFIX + authController.getCurrentUserAccessToken()
+      );
+    }
     try {
       requestBuilder.sendRequest(null, getRequestCallback());
     } catch (final Exception e) {
