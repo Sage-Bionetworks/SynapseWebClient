@@ -8,6 +8,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.SynapseJavascriptClient.ACCEPT;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.AUTHORIZATION_HEADER;
 import static org.sagebionetworks.web.client.widget.entity.renderer.NbConvertPreviewWidget.HTML_PREFIX;
 import static org.sagebionetworks.web.client.widget.entity.renderer.NbConvertPreviewWidget.HTML_SUFFIX;
 import static org.sagebionetworks.web.shared.WebConstants.NBCONVERT_ENDPOINT_PROPERTY;
@@ -143,6 +144,9 @@ public class NbConvertPreviewWidgetTest {
     when(mockFileHandle.getContentSize()).thenReturn(2L);
     when(mockFileHandle.getId()).thenReturn(FILE_HANDLE_ID);
     when(mockFileHandle.getCreatedBy()).thenReturn(CREATED_BY);
+    when(mockAuthController.isLoggedIn()).thenReturn(true);
+    when(mockAuthController.getCurrentUserAccessToken())
+      .thenReturn("userAccessToken");
   }
 
   private NbConvertPreviewWidget setupPreviewWidget(String repoUrl) {
@@ -159,7 +163,8 @@ public class NbConvertPreviewWidgetTest {
       mockSynapseClient,
       mockPopupUtils,
       mockSynapseProperties,
-      mockGwt
+      mockGwt,
+      mockAuthController
     );
     return previewWidget;
   }
@@ -188,6 +193,8 @@ public class NbConvertPreviewWidgetTest {
     verify(mockRequestBuilder)
       .configure(GET, actualNbConvertEndpoint + ENCODED_PRESIGNED_URL);
     verify(mockRequestBuilder).setHeader(ACCEPT, TEXT_HTML_CHARSET_UTF8);
+    verify(mockRequestBuilder)
+      .setHeader(AUTHORIZATION_HEADER, "Bearer userAccessToken");
   }
 
   @Test
@@ -199,6 +206,8 @@ public class NbConvertPreviewWidgetTest {
     verify(mockRequestBuilder)
       .configure(GET, actualNbConvertEndpoint + ENCODED_PRESIGNED_URL);
     verify(mockRequestBuilder).setHeader(ACCEPT, TEXT_HTML_CHARSET_UTF8);
+    verify(mockRequestBuilder)
+      .setHeader(AUTHORIZATION_HEADER, "Bearer userAccessToken");
   }
 
   @Test
@@ -210,6 +219,8 @@ public class NbConvertPreviewWidgetTest {
     verify(mockRequestBuilder)
       .configure(GET, actualNbConvertEndpoint + ENCODED_PRESIGNED_URL);
     verify(mockRequestBuilder).setHeader(ACCEPT, TEXT_HTML_CHARSET_UTF8);
+    verify(mockRequestBuilder)
+      .setHeader(AUTHORIZATION_HEADER, "Bearer userAccessToken");
   }
 
   @Test
