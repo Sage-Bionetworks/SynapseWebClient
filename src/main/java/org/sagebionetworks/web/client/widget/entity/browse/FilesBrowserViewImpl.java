@@ -8,7 +8,15 @@ import com.google.inject.Inject;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.FeatureFlagConfig;
+import org.sagebionetworks.web.client.FeatureFlagKey;
+import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.jsinterop.EntityTreeTableProps;
+import org.sagebionetworks.web.client.jsinterop.React;
+import org.sagebionetworks.web.client.jsinterop.ReactElement;
+import org.sagebionetworks.web.client.jsinterop.SRC;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.ReactComponent;
 
 public class FilesBrowserViewImpl implements FilesBrowserView {
 
@@ -16,6 +24,7 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
     extends UiBinder<Widget, FilesBrowserViewImpl> {}
 
   private EntityTreeBrowser entityTreeBrowser;
+  private ReactComponent entityTreeTable;
   private Widget widget;
 
   @UiField
@@ -34,33 +43,66 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
   Heading title;
 
   CallbackP<String> entityClickedCallback;
+  FeatureFlagConfig featureFlagConfig;
+  PortalGinInjector ginInjector;
 
   @Inject
   public FilesBrowserViewImpl(
     FilesBrowserViewImplUiBinder binder,
-    EntityTreeBrowser entityTreeBrowser
+    FeatureFlagConfig featureFlagConfig,
+    PortalGinInjector ginInjector
   ) {
     widget = binder.createAndBindUi(this);
-    this.entityTreeBrowser = entityTreeBrowser;
-    Widget etbW = entityTreeBrowser.asWidget();
-    etbW.addStyleName("margin-top-10");
-    files.add(etbW);
+    this.featureFlagConfig = featureFlagConfig;
+    this.ginInjector = ginInjector;
   }
 
   @Override
   public void configure(String entityId) {
     title.setVisible(false);
     files.setVisible(true);
-    entityTreeBrowser.configure(entityId);
+
+    files.clear();
+    // TODO: clean the following block when EntityTreeTable is released
+    if (featureFlagConfig.isFeatureEnabled(FeatureFlagKey.ENTITY_TREE_TABLE)) {
+      if (entityTreeTable == null) {
+        this.entityTreeTable = new ReactComponent();
+      }
+      EntityTreeTableProps.Callback callback = id -> {
+        if (entityClickedCallback != null) {
+          entityClickedCallback.invoke(id);
+        }
+      };
+      EntityTreeTableProps props = EntityTreeTableProps.create(
+        entityId,
+        callback
+      );
+      ReactElement component = React.createElementWithSynapseContext(
+        SRC.SynapseComponents.EntityTreeTable,
+        props
+      );
+      entityTreeTable.render(component);
+      files.add(entityTreeTable.asWidget());
+    } else {
+      if (entityTreeBrowser == null) {
+        this.entityTreeBrowser = ginInjector.getEntityTreeBrowser();
+        entityTreeBrowser.asWidget().addStyleName("margin-top-10");
+      }
+      files.add(entityTreeBrowser.asWidget());
+      entityTreeBrowser.configure(entityId);
+    }
   }
 
   @Override
   public void setEntityClickedHandler(CallbackP<String> callback) {
     this.entityClickedCallback = callback;
-    entityTreeBrowser.setEntityClickedHandler(entityId -> {
-      entityTreeBrowser.setLoadingVisible(true);
-      entityClickedCallback.invoke(entityId);
-    });
+    // TODO: remove the following block when EntityTreeTable is released
+    if (entityTreeBrowser != null) {
+      entityTreeBrowser.setEntityClickedHandler(entityId -> {
+        entityTreeBrowser.setLoadingVisible(true);
+        entityClickedCallback.invoke(entityId);
+      });
+    }
   }
 
   @Override
@@ -83,7 +125,9 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 
   @Override
   public void clear() {
-    entityTreeBrowser.clear();
+    if (entityTreeBrowser != null) {
+      entityTreeBrowser.clear();
+    }
   }
 
   @Override
