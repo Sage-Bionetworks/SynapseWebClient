@@ -18,19 +18,19 @@ public class EntityTreeTableProps extends ReactComponentProps {
     void run(String entityId);
   }
 
-  public Callback entityIdClicked;
+  public Callback onEntityIdClicked;
 
   @JsOverlay
   private static EntityTreeTableProps create(
     String rootEntityId,
-    Callback entityIdClicked,
+    Callback onEntityIdClicked,
     boolean expandRootByDefault,
     boolean showRootNode,
     boolean enableSorting
   ) {
     EntityTreeTableProps props = new EntityTreeTableProps();
     props.rootId = rootEntityId;
-    props.entityIdClicked = entityIdClicked;
+    props.onEntityIdClicked = onEntityIdClicked;
     props.expandRootByDefault = expandRootByDefault;
     props.showRootNode = showRootNode;
     props.enableSorting = enableSorting;
@@ -40,8 +40,8 @@ public class EntityTreeTableProps extends ReactComponentProps {
   @JsOverlay
   public static EntityTreeTableProps create(
     String rootEntityId,
-    Callback entityIdClicked
+    Callback onEntityIdClicked
   ) {
-    return create(rootEntityId, entityIdClicked, true, false, true);
+    return create(rootEntityId, onEntityIdClicked, true, false, true);
   }
 }
