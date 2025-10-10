@@ -103,10 +103,8 @@ import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EntityListRowBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
-import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
-import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalView;
@@ -128,7 +126,6 @@ import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationEditor;
 import org.sagebionetworks.web.client.widget.entity.annotation.EditAnnotationsDialog;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidgetView;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.controller.CreateDatasetOrCollection;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityRefProvEntryView;
@@ -418,8 +415,6 @@ public interface PortalGinInjector extends Ginjector {
 
   TabbedTableConfigEditor getTabbedTableConfigEditor();
 
-  EntityTreeBrowser getEntityTreeBrowser();
-
   EntityListConfigEditor getEntityListConfigEditor();
 
   ShinySiteConfigEditor getShinySiteConfigEditor();
@@ -611,10 +606,6 @@ public interface PortalGinInjector extends Ginjector {
   ChallengeBadge getChallengeBadgeWidget();
 
   ProjectBadge getProjectBadgeWidget();
-
-  EntityTreeItem getEntityTreeItemWidget();
-
-  MoreTreeItem getMoreTreeWidget();
 
   TableListWidget getTableListWidget();
 

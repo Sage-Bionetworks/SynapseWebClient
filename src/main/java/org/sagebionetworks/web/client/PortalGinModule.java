@@ -293,8 +293,6 @@ import org.sagebionetworks.web.client.widget.entity.MarkdownWidgetView;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidgetView;
 import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.entity.MoreTreeItemView;
-import org.sagebionetworks.web.client.widget.entity.MoreTreeItemViewImpl;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetView;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadgeView;
@@ -350,12 +348,8 @@ import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidgetImpl;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidgetView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserView;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowserView;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowserViewImpl;
-import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserView;
-import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.CertifiedUserController;
 import org.sagebionetworks.web.client.widget.entity.controller.CertifiedUserControllerImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
@@ -1049,12 +1043,6 @@ public class PortalGinModule extends AbstractGinModule {
     bind(UploaderView.class).to(UploaderViewImpl.class).in(Singleton.class);
     bind(QuizInfoWidgetView.class).to(QuizInfoViewImpl.class);
 
-    // EntityTreeBrowser
-    bind(EntityTreeBrowserView.class).to(EntityTreeBrowserViewImpl.class);
-
-    // MyEntitiesBrowser
-    bind(MyEntitiesBrowserView.class).to(MyEntitiesBrowserViewImpl.class);
-
     // Wiki Attachments
     bind(WikiAttachmentsView.class).to(WikiAttachmentsViewImpl.class);
 
@@ -1164,9 +1152,6 @@ public class PortalGinModule extends AbstractGinModule {
 
     // FilesBrowser
     bind(FilesBrowserView.class).to(FilesBrowserViewImpl.class);
-
-    // MoreTreeItem
-    bind(MoreTreeItemView.class).to(MoreTreeItemViewImpl.class);
 
     bind(EvaluationSubmitterView.class).to(EvaluationSubmitterViewImpl.class);
 

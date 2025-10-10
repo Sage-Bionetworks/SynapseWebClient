@@ -4,7 +4,6 @@ import com.google.gwt.user.client.ui.Widget;
 import java.util.List;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.SynapseView;
-import org.sagebionetworks.web.client.jsinterop.EntityFinderProps;
 import org.sagebionetworks.web.client.jsinterop.EntityFinderScope;
 
 public interface EntityFinderWidgetView extends SynapseView {

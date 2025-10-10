@@ -9,10 +9,10 @@ import com.google.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
 import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.HasNotificationUI;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserViewImpl;
 
 public class TeamListWidgetViewImpl
   extends FlowPanel
@@ -24,6 +24,8 @@ public class TeamListWidgetViewImpl
     HasNotificationUI
   >();
   Widget emptyHTML;
+  public static final String EMPTY_DISPLAY =
+    "&#8212" + " " + DisplayConstants.EMPTY;
 
   @Inject
   public TeamListWidgetViewImpl(PortalGinInjector ginInjector) {
@@ -32,9 +34,7 @@ public class TeamListWidgetViewImpl
       new HTML(
         SafeHtmlUtils
           .fromSafeConstant(
-            "<div class=\"smallGreyText\">" +
-            EntityTreeBrowserViewImpl.EMPTY_DISPLAY +
-            "</div>"
+            "<div class=\"smallGreyText\">" + EMPTY_DISPLAY + "</div>"
           )
           .asString()
       );
