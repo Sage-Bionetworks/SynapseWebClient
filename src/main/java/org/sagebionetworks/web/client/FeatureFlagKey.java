@@ -40,6 +40,9 @@ public enum FeatureFlagKey {
   // If enabled, show the 'Metadata Tab' on project entity pages
   METADATA_TAB("METADATA_TAB"),
 
+  // If enabled, show the SRC 'EntityTreeTable' for the "file browser"
+  ENTITY_TREE_TABLE("ENTITY_TREE_TABLE"),
+
   // Last flag is used only for tests
   TEST_FLAG_ONLY("TEST_FLAG_ONLY");
 
