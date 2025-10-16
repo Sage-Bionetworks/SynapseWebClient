@@ -75,7 +75,11 @@ public class CORSFilter extends OncePerRequestFilter {
     "b2ai.standards",
     "staging.b2ai.standards",
     "ampals",
-    "staging.ampals"
+    "staging.ampals",
+    "classicportal",
+    "staging.classicportal",
+    "arcusbio",
+    "staging.arcusbio"
   );
 
   public static final String SYNAPSE_ORG_SUFFIX = ".synapse.org";
