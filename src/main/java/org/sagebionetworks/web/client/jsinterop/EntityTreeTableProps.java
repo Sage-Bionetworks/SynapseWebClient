@@ -12,6 +12,11 @@ public class EntityTreeTableProps extends ReactComponentProps {
   public boolean expandRootByDefault;
   public boolean showRootNode;
   public boolean enableSorting;
+  /**
+   * Changes to this token trigger the table to reset local state and invalidate any cached
+   * `getEntityChildren` query results associated with the current tree.
+   */
+  public int invalidateCacheToken;
 
   @JsFunction
   public interface Callback {
@@ -26,7 +31,8 @@ public class EntityTreeTableProps extends ReactComponentProps {
     Callback onEntityIdClicked,
     boolean expandRootByDefault,
     boolean showRootNode,
-    boolean enableSorting
+    boolean enableSorting,
+    int invalidateCacheToken
   ) {
     EntityTreeTableProps props = new EntityTreeTableProps();
     props.rootId = rootEntityId;
@@ -34,14 +40,23 @@ public class EntityTreeTableProps extends ReactComponentProps {
     props.expandRootByDefault = expandRootByDefault;
     props.showRootNode = showRootNode;
     props.enableSorting = enableSorting;
+    props.invalidateCacheToken = invalidateCacheToken;
     return props;
   }
 
   @JsOverlay
   public static EntityTreeTableProps create(
     String rootEntityId,
-    Callback onEntityIdClicked
+    Callback onEntityIdClicked,
+    int invalidateCacheToken
   ) {
-    return create(rootEntityId, onEntityIdClicked, true, false, true);
+    return create(
+      rootEntityId,
+      onEntityIdClicked,
+      true,
+      false,
+      true,
+      invalidateCacheToken
+    );
   }
 }

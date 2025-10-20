@@ -46,6 +46,9 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
   FeatureFlagConfig featureFlagConfig;
   PortalGinInjector ginInjector;
 
+  private String entityId = null;
+  private int lastCacheToken = 0;
+
   @Inject
   public FilesBrowserViewImpl(
     FilesBrowserViewImplUiBinder binder,
@@ -59,6 +62,7 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 
   @Override
   public void configure(String entityId) {
+    this.entityId = entityId;
     title.setVisible(false);
     files.setVisible(true);
 
@@ -75,7 +79,8 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
       };
       EntityTreeTableProps props = EntityTreeTableProps.create(
         entityId,
-        callback
+        callback,
+        lastCacheToken
       );
       ReactElement component = React.createElementWithSynapseContext(
         SRC.SynapseComponents.EntityTreeTable,
@@ -125,8 +130,13 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 
   @Override
   public void clear() {
+    // on clear, increment the cache token to invalidate SRC entity children cache
+    lastCacheToken++;
     if (entityTreeBrowser != null) {
       entityTreeBrowser.clear();
+    }
+    if (entityId != null) {
+      configure(entityId);
     }
   }
 
