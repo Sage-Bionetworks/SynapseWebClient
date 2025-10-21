@@ -427,7 +427,7 @@ public class SearchPresenter
     loadMoreWidgetContainer.setIsProcessing(true);
     jsClient.getSearchResults(
       currentSearch,
-      featureFlagConfig.isFeatureEnabled(FeatureFlagKey.OPENSEARCH_ENABLED),
+      false, // force to use CloudSearch on stack 564 due to AWS outage
       callback
     );
 

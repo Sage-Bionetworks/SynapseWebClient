@@ -169,10 +169,10 @@ public class SearchPresenterTest {
   @SuppressWarnings("unchecked")
   @Test
   public void testQueryTerm() throws Exception {
-    when(
-      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.OPENSEARCH_ENABLED)
-    )
-      .thenReturn(false);
+    // when(
+    //   mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.OPENSEARCH_ENABLED)
+    // )
+    //   .thenReturn(false);
     searchPresenter.setPlace(new Search(exampleTerm));
 
     verify(mockJsClient)
@@ -181,31 +181,6 @@ public class SearchPresenterTest {
         eq(false),
         any(AsyncCallback.class)
       );
-  }
-
-  @SuppressWarnings("unchecked")
-  @Test
-  public void testQueryTermOpenSearch() throws Exception {
-    when(
-      mockFeatureFlagConfig.isFeatureEnabled(FeatureFlagKey.OPENSEARCH_ENABLED)
-    )
-      .thenReturn(true);
-    searchPresenter.setPlace(new Search(exampleTerm));
-
-    verify(mockJsClient)
-      .getSearchResults(
-        eq(exampleTermSearchQuery),
-        eq(true),
-        any(AsyncCallback.class)
-      );
-
-    verify(mockSearchAnalyticsClient)
-      .sendSearchQuerySubmittedEvent(
-        searchQuerySubmittedEventDataCaptor.capture()
-      );
-    SearchQueryEventData searchSubmittedEventData =
-      searchQuerySubmittedEventDataCaptor.getValue();
-    assertEquals(true, searchSubmittedEventData.opensearch_enabled);
   }
 
   @SuppressWarnings("unchecked")
