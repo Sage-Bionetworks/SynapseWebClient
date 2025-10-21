@@ -141,7 +141,7 @@ public class EntitySearchBox
     final List<Suggestion> suggestions = new LinkedList<Suggestion>();
     jsClient.getSearchResults(
       query,
-      false, // force to use CloudSearch on stack 564 due to AWS outage
+      featureFlagConfig.isFeatureEnabled(FeatureFlagKey.OPENSEARCH_ENABLED),
       new AsyncCallback<SearchResults>() {
         @Override
         public void onSuccess(SearchResults result) {
