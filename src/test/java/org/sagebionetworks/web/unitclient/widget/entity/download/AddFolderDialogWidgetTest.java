@@ -6,8 +6,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.IsWidget;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -52,6 +52,9 @@ public class AddFolderDialogWidgetTest {
   @Mock
   Folder mockFolder;
 
+  @Mock
+  EventBus mockEventBus;
+
   AddFolderDialogWidget w;
 
   public static final String PARENT_ENTITY_ID = "syn98208";
@@ -67,7 +70,8 @@ public class AddFolderDialogWidgetTest {
         mockSynapseJavascriptClient,
         mockGlobalAppState,
         mockPopupUtils,
-        mockSynAlert
+        mockSynAlert,
+        mockEventBus
       );
     when(mockFolder.getId()).thenReturn(NEW_FOLDER_ID);
     AsyncMockStubber
@@ -108,6 +112,7 @@ public class AddFolderDialogWidgetTest {
         any(DisplayUtils.NotificationVariant.class),
         any(ToastMessageOptions.class)
       );
+    verify(mockEventBus).fireEvent(any());
   }
 
   @Test
