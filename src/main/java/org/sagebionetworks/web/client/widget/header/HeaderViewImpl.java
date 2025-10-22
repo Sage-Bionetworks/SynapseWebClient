@@ -29,7 +29,6 @@ import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.PlansPlace;
 import org.sagebionetworks.web.client.widget.FullWidthAlert;
-import org.sagebionetworks.web.client.widget.OrientationBanner;
 import org.sagebionetworks.web.client.widget.ReactComponent;
 
 public class HeaderViewImpl extends Composite implements HeaderView {
@@ -38,9 +37,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 
   @UiField
   Div header;
-
-  @UiField
-  Div donationBannerContainer;
 
   @UiField
   ReactComponent cookieNotificationContainer;
@@ -77,29 +73,12 @@ public class HeaderViewImpl extends Composite implements HeaderView {
   PortalGinInjector ginInjector;
 
   @Inject
-  public HeaderViewImpl(
-    Binder binder,
-    PortalGinInjector ginInjector,
-    OrientationBanner donationBanner
-  ) {
+  public HeaderViewImpl(Binder binder, PortalGinInjector ginInjector) {
     this.initWidget(binder.createAndBindUi(this));
     this.ginInjector = ginInjector;
     nihNotificationAlert.setOnClose(() -> {
       presenter.onNIHNotificationDismissed();
     });
-
-    donationBanner.configure(
-      "Donate",
-      "Support Open Science and Radical Collaboration with Sage Bionetworks",
-      "Join us as we advance collaborative biomedical research tackling today's most pressing health challenges. Your contribution is crucial to breaking down barriers and accelerating the creation of transformative treatments and technologies. Thank you for being a part of this vital mission and helping us drive innovation forward.",
-      "Donate to Sage",
-      event -> {
-        Window.open("https://sagebionetworks.org/donate", "_blank", "");
-      },
-      null,
-      null
-    );
-    donationBannerContainer.add(donationBanner.asWidget());
     initClickHandlers();
     clear();
     rerenderNavBar();
@@ -248,6 +227,5 @@ public class HeaderViewImpl extends Composite implements HeaderView {
   @Override
   public void setNIHAlertVisible(boolean visible) {
     nihNotificationAlert.setVisible(visible);
-    donationBannerContainer.setVisible(!visible);
   }
 }
