@@ -30,8 +30,10 @@ public class XFrameOptionsFilter extends OncePerRequestFilter {
     String origin = request.getHeader(ORIGIN_HEADER);
     // if allowed synapse subdomain, do not add X-Frame-Options header
     if (!isAllowedSynapseSubdomain(origin)) {
-      String requestWithQueryString =
-        request.getRequestURL().toString() + "?" + request.getQueryString();
+      String queryString = request.getQueryString();
+      String requestWithQueryString = queryString == null
+        ? request.getRequestURL().toString()
+        : request.getRequestURL().toString() + "?" + queryString;
       if (requestWithQueryString.contains(PDF_JS_VIEWER_PREFIX)) {
         response.addHeader(X_FRAME_OPTIONS_HEADER, SAMEORIGIN);
       } else {
