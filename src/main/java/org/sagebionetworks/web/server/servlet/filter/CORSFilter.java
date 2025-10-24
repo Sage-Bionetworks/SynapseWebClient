@@ -93,7 +93,7 @@ public class CORSFilter extends OncePerRequestFilter {
           .getHost()
           .substring(0, url.getHost().length() - SYNAPSE_ORG_SUFFIX.length());
         return ALLOWED_SYNAPSE_SUBDOMAINS.contains(subdomain);
-      } catch (Exception e) {
+      } catch (java.net.MalformedURLException e) {
         // ignore malformed URL
       }
     }
