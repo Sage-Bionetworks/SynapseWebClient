@@ -22,6 +22,7 @@ public class SRC {
   public static class SynapseComponents {
 
     public static ReactComponentType<DiscussionThreadProps> DiscussionThread;
+    public static ReactComponentType<ShareThisPageProps> ShareThisPage;
     public static ReactComponentType<EntityCitationProps> EntityCitation;
     public static ReactComponentType<EntityBadgeIconsProps> EntityBadgeIcons;
     public static ReactComponentType<DatasetEditorProps> DatasetItemsEditor;

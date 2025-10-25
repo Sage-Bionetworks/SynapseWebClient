@@ -107,6 +107,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.CreateGridSessionDialog;
 import org.sagebionetworks.web.client.widget.EntityTypeIcon;
+import org.sagebionetworks.web.client.widget.ShareThisPage;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
@@ -152,6 +153,9 @@ import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
 public class EntityActionControllerImpl
   implements EntityActionController, ActionListener {
+
+  private boolean isShareThisPageDialogOpen = false;
+  private ShareThisPage shareThisPage;
 
   public static final String AVAILABLE_IN_VERSION_HISTORY =
     "This will be available within your version history.";
@@ -653,6 +657,7 @@ public class EntityActionControllerImpl
     // Setup the actions
     configureDeleteAction();
     configureShareAction();
+    configureShareThisPage();
     configureRenameAction();
     configureEditWiki();
     configureViewWikiSource();
@@ -1619,6 +1624,39 @@ public class EntityActionControllerImpl
     } else {
       actionMenu.setActionVisible(Action.EDIT_PROJECT_METADATA, false);
     }
+  }
+
+  private void configureShareThisPage() {
+    boolean showShare = !(entityBundle.getEntity() instanceof Project);
+    actionMenu.setActionVisible(Action.SHARE_THIS_PAGE, showShare);
+
+    if (showShare) {
+      actionMenu.setActionListener(
+        Action.SHARE_THIS_PAGE,
+        (action, event) -> {
+          isShareThisPageDialogOpen = true;
+          showShareThisPageDialog();
+        }
+      );
+    }
+  }
+
+  private void showShareThisPageDialog() {
+    if (shareThisPage == null) {
+      shareThisPage = ginInjector.getShareThisPage();
+    }
+    shareThisPage.configure(
+      "",
+      "",
+      "sageb.io",
+      isShareThisPageDialogOpen,
+      () -> {
+        isShareThisPageDialogOpen = false;
+        showShareThisPageDialog();
+      },
+      "icon"
+    );
+    view.addWidget(shareThisPage);
   }
 
   private void configureEditFileMetadataAction() {

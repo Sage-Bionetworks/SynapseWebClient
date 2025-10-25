@@ -66,6 +66,7 @@ import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.QuarantinedEmailModal;
 import org.sagebionetworks.web.client.widget.RadioWidget;
+import org.sagebionetworks.web.client.widget.ShareThisPage;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.LockAccessRequirementWidget;
@@ -361,6 +362,8 @@ public interface PortalGinInjector extends Ginjector {
   TeamSearchPresenter getTeamSearchPresenter();
 
   PeopleSearchPresenter getPeopleSearchPresenter();
+
+  ShareThisPage getShareThisPage();
 
   SynapseStandaloneWikiPresenter getSynapseStandaloneWikiPresenter();
 
