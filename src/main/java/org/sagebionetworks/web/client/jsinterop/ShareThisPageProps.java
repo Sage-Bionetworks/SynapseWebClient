@@ -14,7 +14,6 @@ public class ShareThisPageProps extends ReactComponentProps {
     void run();
   }
 
-  public String variant;
   public String shortIoPublicApiKey;
   public String domain;
   public Boolean open;
@@ -38,7 +37,6 @@ public class ShareThisPageProps extends ReactComponentProps {
     String domain
   ) {
     ShareThisPageProps props = new ShareThisPageProps();
-    props.variant = variant;
     props.shortIoPublicApiKey = shortIoPublicApiKey;
     props.domain = domain;
     return props;
@@ -47,11 +45,6 @@ public class ShareThisPageProps extends ReactComponentProps {
   @JsOverlay
   public static ShareThisPageProps create() {
     return create(null, null, null);
-  }
-
-  @JsOverlay
-  public final void setVariant(String variant) {
-    this.variant = variant;
   }
 
   @JsOverlay

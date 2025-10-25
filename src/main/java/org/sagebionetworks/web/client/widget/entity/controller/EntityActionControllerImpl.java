@@ -156,6 +156,8 @@ public class EntityActionControllerImpl
 
   private boolean isShareThisPageDialogOpen = false;
   private ShareThisPage shareThisPage;
+  private static final String SHORT_IO_PUBLIC_API_KEY = "pk_y4sPMLrxonM7kNQV";
+  private static final String SHORT_IO_DOMAIN = "sageb.io"; // <-- Add this line
 
   public static final String AVAILABLE_IN_VERSION_HISTORY =
     "This will be available within your version history.";
@@ -1646,9 +1648,8 @@ public class EntityActionControllerImpl
       shareThisPage = ginInjector.getShareThisPage();
     }
     shareThisPage.configure(
-      "",
-      "",
-      "sageb.io",
+      SHORT_IO_PUBLIC_API_KEY,
+      SHORT_IO_DOMAIN,
       isShareThisPageDialogOpen,
       () -> {
         isShareThisPageDialogOpen = false;

@@ -13,7 +13,6 @@ public class ShareThisPageImpl extends ReactComponent implements ShareThisPage {
   public ShareThisPageImpl() {}
 
   public void configure(
-    String variant,
     String shortIoPublicApiKey,
     String domain,
     boolean open,
@@ -23,7 +22,6 @@ public class ShareThisPageImpl extends ReactComponent implements ShareThisPage {
     ShareThisPageProps props = ShareThisPageProps.create();
     props.setOpen(open);
     props.setOnClose(onClose);
-    props.setVariant(variant);
     props.setShortIoPublicApiKey(shortIoPublicApiKey);
     props.setDomain(domain);
     props.setTriggerMode(triggerMode);
