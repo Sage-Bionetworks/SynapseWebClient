@@ -1,11 +1,8 @@
 package org.sagebionetworks.web.unitclient.widget.header;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -13,20 +10,14 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.web.bindery.event.shared.binder.EventBinder;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
-import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cache.ClientCache;
-import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.security.AuthenticationControllerImpl;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -59,11 +50,6 @@ public class HeaderTest {
   @Mock
   EventBinder<Header> mockEventBinder;
 
-  JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
-
-  @Captor
-  ArgumentCaptor<JSONObjectAdapter> jsonObjectAdapterCaptor;
-
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
@@ -77,8 +63,7 @@ public class HeaderTest {
         mockSynapseJSNIUtils,
         mockEventBus,
         mockCookies,
-        mockLocalStorage,
-        jsonObjectAdapter
+        mockLocalStorage
       );
   }
 
@@ -140,8 +125,7 @@ public class HeaderTest {
         mockSynapseJSNIUtils,
         mockEventBus,
         mockCookies,
-        mockLocalStorage,
-        jsonObjectAdapter
+        mockLocalStorage
       );
 
     verify(mockView).setNIHAlertVisible(false);
@@ -157,57 +141,5 @@ public class HeaderTest {
         eq(Boolean.TRUE.toString()),
         any(Long.class)
       );
-  }
-
-  @Test
-  public void testRefreshNoPortalBanner() {
-    String cookieValue = null;
-    when(mockCookies.getCookie(CookieKeys.PORTAL_CONFIG))
-      .thenReturn(cookieValue);
-
-    header =
-      new Header(
-        mockView,
-        mockSynapseJSNIUtils,
-        mockEventBus,
-        mockCookies,
-        mockLocalStorage,
-        jsonObjectAdapter
-      );
-
-    // should be hidden
-    boolean isVisible = false;
-    verify(mockView, times(2)).setPortalAlertVisible(isVisible, null);
-  }
-
-  @Test
-  public void testRefreshWithPortalBanner() throws JSONObjectAdapterException {
-    String cookieValue =
-      "{\"isInvokingDownloadTable\":true,\"foregroundColor\":\"rgb(255, 255, 255)\",\"backgroundColor\":\"rgb(77, 84, 145)\",\"callbackUrl\":\"https://staging.adknowledgeportal.synapse.org/#/Explore/Data\",\"logoUrl\":\"https://staging.adknowledgeportal.synapse.org/static/media/amp-footer-logo.0e5d7cab.svg\",\"portalName\":\"  \"}";
-    when(mockCookies.getCookie(CookieKeys.PORTAL_CONFIG))
-      .thenReturn(cookieValue);
-
-    header =
-      new Header(
-        mockView,
-        mockSynapseJSNIUtils,
-        mockEventBus,
-        mockCookies,
-        mockLocalStorage,
-        jsonObjectAdapter
-      );
-
-    // should be shown
-    boolean isVisible = true;
-    verify(mockView)
-      .setPortalAlertVisible(eq(isVisible), jsonObjectAdapterCaptor.capture());
-
-    // verify json values
-    JSONObjectAdapter json = jsonObjectAdapterCaptor.getValue();
-    assertTrue(json.getBoolean("isInvokingDownloadTable"));
-    assertEquals(
-      "https://staging.adknowledgeportal.synapse.org/static/media/amp-footer-logo.0e5d7cab.svg",
-      json.getString("logoUrl")
-    );
   }
 }

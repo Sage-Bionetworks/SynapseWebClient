@@ -4,12 +4,9 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DateTimeUtilsImpl;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cache.ClientCache;
-import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.security.AuthenticationControllerImpl;
 
@@ -21,8 +18,6 @@ public class Header implements HeaderView.Presenter, IsWidget {
   private SynapseJSNIUtils synapseJSNIUtils;
   CookieProvider cookies;
   private ClientCache localStorage;
-  public static boolean isShowingPortalAlert = false;
-  public static JSONObjectAdapter portalAlertJson = null;
 
   @Inject
   public Header(
@@ -30,8 +25,7 @@ public class Header implements HeaderView.Presenter, IsWidget {
     SynapseJSNIUtils synapseJSNIUtils,
     EventBus eventBus,
     CookieProvider cookies,
-    ClientCache localStorage,
-    JSONObjectAdapter jsonObjectAdapter
+    ClientCache localStorage
   ) {
     this.view = view;
     this.cookies = cookies;
@@ -47,21 +41,6 @@ public class Header implements HeaderView.Presenter, IsWidget {
         AuthenticationControllerImpl.NIH_NOTIFICATION_DISMISSED
       )
     );
-
-    // portal alert state sticks around for entire app session
-    String portalAlertString = cookies.getCookie(CookieKeys.PORTAL_CONFIG);
-    isShowingPortalAlert = portalAlertString != null;
-    if (isShowingPortalAlert) {
-      cookies.removeCookie(CookieKeys.PORTAL_CONFIG);
-      try {
-        portalAlertJson = jsonObjectAdapter.createNew(portalAlertString);
-      } catch (JSONObjectAdapterException e) {
-        synapseJSNIUtils.consoleError(e);
-      }
-    } else {
-      portalAlertJson = null;
-    }
-    view.setPortalAlertVisible(isShowingPortalAlert, portalAlertJson);
   }
 
   public void initStagingAlert() {
@@ -80,7 +59,6 @@ public class Header implements HeaderView.Presenter, IsWidget {
   }
 
   public void refresh() {
-    view.setPortalAlertVisible(isShowingPortalAlert, portalAlertJson);
     view.refresh();
   }
 

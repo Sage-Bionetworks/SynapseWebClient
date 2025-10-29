@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.header;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.web.bindery.event.shared.binder.EventBinder;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 
 public interface HeaderView extends IsWidget {
   /**
@@ -29,6 +28,4 @@ public interface HeaderView extends IsWidget {
   void clear();
 
   EventBinder<Header> getEventBinder();
-
-  void setPortalAlertVisible(boolean visible, JSONObjectAdapter portalJson);
 }

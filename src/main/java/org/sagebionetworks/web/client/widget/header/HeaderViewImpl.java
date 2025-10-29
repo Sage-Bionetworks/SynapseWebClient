@@ -4,18 +4,13 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FocusPanel;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.binder.EventBinder;
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Span;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -48,18 +43,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
   FullWidthAlert nihNotificationAlert;
 
   @UiField
-  Div portalAlert;
-
-  @UiField
-  Image portalLogo;
-
-  @UiField
-  Span portalName;
-
-  @UiField
-  FocusPanel portalLogoFocusPanel;
-
-  @UiField
   ReactComponent synapseNavDrawerContainer;
 
   @UiField
@@ -69,7 +52,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
   FocusPanel editModeNavBarClickBlocker;
 
   private Presenter presenter;
-  String portalHref = "";
   PortalGinInjector ginInjector;
 
   @Inject
@@ -130,11 +112,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
       event.preventDefault();
       event.stopPropagation();
     });
-    portalLogoFocusPanel.addClickHandler(event -> {
-      if (DisplayUtils.isDefined(portalHref)) {
-        Window.Location.assign(portalHref);
-      }
-    });
   }
 
   @Override
@@ -190,38 +167,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
   @Override
   public EventBinder<Header> getEventBinder() {
     return eventBinder;
-  }
-
-  @Override
-  public void setPortalAlertVisible(boolean visible, JSONObjectAdapter json) {
-    if (visible) {
-      try {
-        if (json.has("callbackUrl")) {
-          String href = json.getString("callbackUrl");
-          portalHref = href;
-        }
-        if (json.has("portalName")) {
-          String name = json.getString("portalName");
-          if (!name.trim().isEmpty()) {
-            portalName.setText(name);
-            portalName.setVisible(true);
-            portalLogo.setVisible(false);
-          }
-        }
-        if (json.has("logoUrl")) {
-          String logoUrl = json.getString("logoUrl");
-          if (!logoUrl.trim().isEmpty()) {
-            portalLogo.setUrl(logoUrl);
-            portalName.setVisible(false);
-            portalLogo.setVisible(true);
-          }
-        }
-        portalAlert.setVisible(true);
-      } catch (JSONObjectAdapterException e) {
-        e.printStackTrace();
-      }
-    }
-    portalAlert.setVisible(visible);
   }
 
   @Override
