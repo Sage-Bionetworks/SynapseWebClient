@@ -359,7 +359,8 @@ public class DefaultEntityActionMenuLayoutUtil {
             ActionViewProps.create(Action.EDIT_TABLE_DATA, "edit"),
             ActionViewProps.create(Action.SHOW_ANNOTATIONS, "label"),
             ActionViewProps.create(Action.SHOW_TABLE_SCHEMA, "columns"),
-            ActionViewProps.create(Action.CREATE_NEW_GRID, "tableRows")
+            ActionViewProps.create(Action.CREATE_NEW_GRID, "tableRows"),
+            ActionViewProps.create(Action.SHARE_THIS_PAGE, "share")
           )
         );
         // Note that download actions for tables are currently inlined in the QueryWrapperPlotNav
