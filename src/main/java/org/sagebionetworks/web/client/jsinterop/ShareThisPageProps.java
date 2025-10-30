@@ -18,7 +18,7 @@ public class ShareThisPageProps extends ReactComponentProps {
   public String domain;
   public Boolean open;
   public Callback onClose;
-  public String triggerMode;
+  public String renderAs;
 
   @JsOverlay
   public final void setOpen(Boolean open) {
@@ -58,7 +58,7 @@ public class ShareThisPageProps extends ReactComponentProps {
   }
 
   @JsOverlay
-  public final void setTriggerMode(String triggerMode) {
-    this.triggerMode = triggerMode;
+  public final void setRenderAs(String renderAs) {
+    this.renderAs = renderAs;
   }
 }
