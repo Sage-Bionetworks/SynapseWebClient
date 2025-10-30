@@ -49,6 +49,7 @@ public class DefaultActionConfigurationUtil {
         Action.UPLOAD_FILE,
         "Upload or Link to a File"
       ),
+      ActionConfiguration.create(Action.SHARE_THIS_PAGE, "Share this page"),
       ActionConfiguration.create(Action.CREATE_FOLDER, "Add New Folder"),
       ActionConfiguration.create(Action.SHOW_TABLE_SCHEMA, "Schema"),
       ActionConfiguration.create(Action.SHOW_VIEW_SCOPE, "Scope"),
