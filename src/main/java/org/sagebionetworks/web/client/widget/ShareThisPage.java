@@ -9,6 +9,6 @@ public interface ShareThisPage extends IsWidget {
     String domain,
     boolean open,
     Callback onClose,
-    String triggerMode
+    String renderAs
   );
 }
