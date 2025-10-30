@@ -17,14 +17,14 @@ public class ShareThisPageImpl extends ReactComponent implements ShareThisPage {
     String domain,
     boolean open,
     Callback onClose,
-    String triggerMode
+    String renderAs
   ) {
     ShareThisPageProps props = ShareThisPageProps.create();
     props.setOpen(open);
     props.setOnClose(onClose);
     props.setShortIoPublicApiKey(shortIoPublicApiKey);
     props.setDomain(domain);
-    props.setTriggerMode(triggerMode);
+    props.setRenderAs(renderAs);
     ReactElement component = React.createElementWithSynapseContext(
       SRC.SynapseComponents.ShareThisPage,
       props
