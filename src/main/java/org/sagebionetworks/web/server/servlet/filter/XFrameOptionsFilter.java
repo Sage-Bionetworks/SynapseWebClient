@@ -19,6 +19,7 @@ public class XFrameOptionsFilter extends OncePerRequestFilter {
   public static final String X_FRAME_OPTIONS_HEADER = "X-Frame-Options";
   public static final String DENY = "DENY";
   public static final String SAMEORIGIN = "SAMEORIGIN";
+  public static final String REFERER_HEADER = "Referer";
 
   @Override
   protected void doFilterInternal(
@@ -30,7 +31,7 @@ public class XFrameOptionsFilter extends OncePerRequestFilter {
     String origin = request.getHeader(ORIGIN_HEADER);
     // SWC-7536: if no origin header, use referer
     if (origin == null) {
-      origin = request.getHeader("Referer");
+      origin = request.getHeader(REFERER_HEADER);
     }
     // if allowed synapse subdomain, do not add X-Frame-Options header
     if (!isAllowedSynapseSubdomain(origin)) {

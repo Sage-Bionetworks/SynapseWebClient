@@ -7,6 +7,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.ORIGIN_HEADER;
 import static org.sagebionetworks.web.server.servlet.filter.XFrameOptionsFilter.DENY;
+import static org.sagebionetworks.web.server.servlet.filter.XFrameOptionsFilter.REFERER_HEADER;
 import static org.sagebionetworks.web.server.servlet.filter.XFrameOptionsFilter.SAMEORIGIN;
 import static org.sagebionetworks.web.server.servlet.filter.XFrameOptionsFilter.X_FRAME_OPTIONS_HEADER;
 
@@ -103,7 +104,7 @@ public class XFrameOptionsFilterTest {
     // Origin header is not set
     when(mockRequest.getHeader(ORIGIN_HEADER)).thenReturn(null);
     // Referer header contains allowed synapse subdomain
-    when(mockRequest.getHeader("Referer"))
+    when(mockRequest.getHeader(REFERER_HEADER))
       .thenReturn("https://eliteportal.synapse.org");
 
     filter.testFilter(mockRequest, mockResponse, mockFilterChain);
