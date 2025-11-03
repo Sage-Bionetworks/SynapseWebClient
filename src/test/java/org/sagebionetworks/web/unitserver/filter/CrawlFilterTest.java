@@ -6,6 +6,8 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.server.servlet.filter.CrawlFilter.META_ROBOTS_NOINDEX;
@@ -137,11 +139,11 @@ public class CrawlFilterTest {
     String asyncToken = "asyncJobToken";
     when(
       mockSynapseClient.queryTableEntityBundleAsyncStart(
-        WebConstants.DATA_CATALOG_CRAWL_RESPONSE_SQL,
-        null,
+        eq(WebConstants.DATA_CATALOG_CRAWL_RESPONSE_SQL),
+        isNull(),
         anyLong(),
-        QUERY_RESULTS_PART_MASK,
-        WebConstants.DATA_CATALOG_TABLE_ID_ON_PRODUCTION
+        eq(QUERY_RESULTS_PART_MASK),
+        eq(WebConstants.DATA_CATALOG_TABLE_ID_ON_PRODUCTION)
       )
     )
       .thenReturn(asyncToken);
