@@ -92,4 +92,24 @@ public class XFrameOptionsFilterTest {
     verify(mockResponse, never())
       .addHeader(eq(X_FRAME_OPTIONS_HEADER), anyString());
   }
+
+  @Test
+  public void testFallbackToRefererHeader()
+    throws ServletException, IOException {
+    StringBuffer sb = new StringBuffer();
+    sb.append("https://www.synapse.org/index.html");
+    when(mockRequest.getRequestURL()).thenReturn(sb);
+    when(mockRequest.getQueryString()).thenReturn(null);
+    // Origin header is not set
+    when(mockRequest.getHeader(ORIGIN_HEADER)).thenReturn(null);
+    // Referer header contains allowed synapse subdomain
+    when(mockRequest.getHeader("Referer"))
+      .thenReturn("https://eliteportal.synapse.org");
+
+    filter.testFilter(mockRequest, mockResponse, mockFilterChain);
+
+    // verify x frame options header is not added when referer is an allowed origin
+    verify(mockResponse, never())
+      .addHeader(eq(X_FRAME_OPTIONS_HEADER), anyString());
+  }
 }
