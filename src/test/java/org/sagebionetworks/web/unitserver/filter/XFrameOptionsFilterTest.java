@@ -7,6 +7,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.ORIGIN_HEADER;
 import static org.sagebionetworks.web.server.servlet.filter.XFrameOptionsFilter.DENY;
+import static org.sagebionetworks.web.server.servlet.filter.XFrameOptionsFilter.REFERER_HEADER;
 import static org.sagebionetworks.web.server.servlet.filter.XFrameOptionsFilter.SAMEORIGIN;
 import static org.sagebionetworks.web.server.servlet.filter.XFrameOptionsFilter.X_FRAME_OPTIONS_HEADER;
 
@@ -89,6 +90,28 @@ public class XFrameOptionsFilterTest {
     filter.testFilter(mockRequest, mockResponse, mockFilterChain);
 
     // verify x frame options header is not added for an allowed origin
+    verify(mockResponse, never())
+      .addHeader(eq(X_FRAME_OPTIONS_HEADER), anyString());
+  }
+
+  @Test
+  public void testFallbackToRefererHeader()
+    throws ServletException, IOException {
+    StringBuffer sb = new StringBuffer();
+    sb.append("https://www.synapse.org/index.html");
+    when(mockRequest.getRequestURL()).thenReturn(sb);
+    when(mockRequest.getQueryString()).thenReturn(null);
+    // Origin header is not set
+    when(mockRequest.getHeader(ORIGIN_HEADER)).thenReturn(null);
+    // Referer header contains allowed synapse subdomain
+    when(mockRequest.getHeader(REFERER_HEADER))
+      .thenReturn(
+        "https://eliteportal.synapse.org/Data%20Access/AI_ML_Acceptable_Use_Policy"
+      );
+
+    filter.testFilter(mockRequest, mockResponse, mockFilterChain);
+
+    // verify x frame options header is not added when referer is an allowed origin
     verify(mockResponse, never())
       .addHeader(eq(X_FRAME_OPTIONS_HEADER), anyString());
   }
