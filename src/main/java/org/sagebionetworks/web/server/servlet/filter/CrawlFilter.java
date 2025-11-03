@@ -19,6 +19,8 @@ import java.util.TimeZone;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
@@ -77,12 +79,15 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
  */
 public class CrawlFilter {
 
+  private static final Log log = LogFactory.getLog(CrawlFilter.class);
+
   public static final String META_ROBOTS_NOINDEX =
     "<meta name=\"robots\" content=\"noindex\">";
   SynapseClient synapseClient = null;
   JSONObjectAdapter jsonObjectAdapter = null;
   public static final int MAX_CHILD_PAGES = 5;
-  private static final int QUERY_RESULTS_PART_MASK = 0x1;
+  public static final int QUERY_RESULTS_PART_MASK = 0x1;
+  private static final long MAX_QUERY_ROWS = 1000L;
   // max wait of 9 seconds for async query results (time spent between attempts, each attempt also takes time)
   private static final int MAX_ASYNC_QUERY_ATTEMPTS = 30;
   private static final long ASYNC_QUERY_DELAY_MS = 300L;
@@ -663,7 +668,7 @@ public class CrawlFilter {
         String asyncJobToken = synapseClient.queryTableEntityBundleAsyncStart(
           WebConstants.DATA_CATALOG_CRAWL_RESPONSE_SQL,
           null,
-          1000L,
+          MAX_QUERY_ROWS,
           QUERY_RESULTS_PART_MASK,
           WebConstants.DATA_CATALOG_TABLE_ID_ON_PRODUCTION
         );
@@ -708,11 +713,10 @@ public class CrawlFilter {
             }
           }
         }
-      } catch (SynapseResultNotReadyException e) {
-        e.printStackTrace();
       } catch (SynapseException e) {
-        e.printStackTrace();
+        log.error("Failed to query data catalog table", e);
       } catch (InterruptedException e) {
+        log.warn("Data catalog query interrupted", e);
         Thread.currentThread().interrupt();
       }
     }

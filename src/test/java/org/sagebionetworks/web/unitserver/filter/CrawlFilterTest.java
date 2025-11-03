@@ -4,10 +4,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.server.servlet.filter.CrawlFilter.META_ROBOTS_NOINDEX;
+import static org.sagebionetworks.web.server.servlet.filter.CrawlFilter.QUERY_RESULTS_PART_MASK;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -137,8 +139,8 @@ public class CrawlFilterTest {
       mockSynapseClient.queryTableEntityBundleAsyncStart(
         WebConstants.DATA_CATALOG_CRAWL_RESPONSE_SQL,
         null,
-        1000L,
-        0x1,
+        anyLong(),
+        QUERY_RESULTS_PART_MASK,
         WebConstants.DATA_CATALOG_TABLE_ID_ON_PRODUCTION
       )
     )
