@@ -86,12 +86,17 @@ public class CORSFilter extends OncePerRequestFilter {
 
   // given an origin header, return true if it ends with .synapse.org and ALLOWED_SYNAPSE_SUBDOMAINS contains the subdomain
   public static boolean isAllowedSynapseSubdomain(String origin) {
-    if (origin != null && origin.toLowerCase().endsWith(SYNAPSE_ORG_SUFFIX)) {
+    if (origin != null) {
       try {
         URL url = new URL(origin.toLowerCase());
-        String subdomain = url
-          .getHost()
-          .substring(0, url.getHost().length() - SYNAPSE_ORG_SUFFIX.length());
+        String host = url.getHost();
+        if (!host.endsWith(SYNAPSE_ORG_SUFFIX)) {
+          return false;
+        }
+        String subdomain = host.substring(
+          0,
+          url.getHost().length() - SYNAPSE_ORG_SUFFIX.length()
+        );
         return ALLOWED_SYNAPSE_SUBDOMAINS.contains(subdomain);
       } catch (java.net.MalformedURLException e) {
         // ignore malformed URL

@@ -105,7 +105,9 @@ public class XFrameOptionsFilterTest {
     when(mockRequest.getHeader(ORIGIN_HEADER)).thenReturn(null);
     // Referer header contains allowed synapse subdomain
     when(mockRequest.getHeader(REFERER_HEADER))
-      .thenReturn("https://eliteportal.synapse.org");
+      .thenReturn(
+        "https://eliteportal.synapse.org/Data%20Access/AI_ML_Acceptable_Use_Policy"
+      );
 
     filter.testFilter(mockRequest, mockResponse, mockFilterChain);
 
