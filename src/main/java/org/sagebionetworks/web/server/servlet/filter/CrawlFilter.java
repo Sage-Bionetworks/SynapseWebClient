@@ -25,6 +25,7 @@ import org.commonmark.renderer.html.HtmlRenderer;
 import org.jsoup.Jsoup;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.client.exceptions.SynapseResultNotReadyException;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
@@ -52,6 +53,9 @@ import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.KeyValue;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.table.Dataset;
+import org.sagebionetworks.repo.model.table.QueryResultBundle;
+import org.sagebionetworks.repo.model.table.Row;
+import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONEntity;
@@ -78,6 +82,10 @@ public class CrawlFilter {
   SynapseClient synapseClient = null;
   JSONObjectAdapter jsonObjectAdapter = null;
   public static final int MAX_CHILD_PAGES = 5;
+  private static final int QUERY_RESULTS_PART_MASK = 0x1;
+  // max wait of 9 seconds for async query results (time spent between attempts, each attempt also takes time)
+  private static final int MAX_ASYNC_QUERY_ATTEMPTS = 30;
+  private static final long ASYNC_QUERY_DELAY_MS = 300L;
 
   // Markdown processor
   private static Parser parser = Parser.builder().build();
@@ -128,12 +136,17 @@ public class CrawlFilter {
       "0\">Teams</a></h3><br />"
     );
 
+    // SWC-7552 : link to data catalog
+    html.append(
+      "<h3><a href=\"https://www.synapse.org/DataCatalog:0\">Data Catalog</a></h3><br />"
+    );
+
     String newJson = EntityFactory.createJSONStringForEntity(query);
 
     html.append(
-      "<a href=\"https://www.synapse.org/Search:" +
+      "<h3><a href=\"https://www.synapse.org/Search:" +
       URLEncoder.encode(newJson, "UTF-8") +
-      "\">Projects</a><br />"
+      "\">Projects</a></h3><br />"
     );
     html.append("</body></html>");
     return html.toString();
@@ -633,5 +646,106 @@ public class CrawlFilter {
       in.getResults(),
       in.getTotalNumberOfResults()
     );
+  }
+
+  // SWC-7552
+  public String getDataCatalogHtml() {
+    StringBuilder html = new StringBuilder();
+    html.append(
+      "<h1>" +
+      WebConstants.DATA_CATALOG_PAGE_TITLE +
+      "</h1>" +
+      WebConstants.DATA_CATALOG_PAGE_DESCRIPTION +
+      "<br />"
+    );
+    if (synapseClient != null) {
+      try {
+        String asyncJobToken = synapseClient.queryTableEntityBundleAsyncStart(
+          WebConstants.DATA_CATALOG_CRAWL_RESPONSE_SQL,
+          null,
+          1000L,
+          QUERY_RESULTS_PART_MASK,
+          WebConstants.DATA_CATALOG_TABLE_ID_ON_PRODUCTION
+        );
+        QueryResultBundle queryResultBundle = waitForQueryResultBundle(
+          asyncJobToken,
+          WebConstants.DATA_CATALOG_TABLE_ID_ON_PRODUCTION
+        );
+        if (
+          queryResultBundle != null &&
+          queryResultBundle.getQueryResult() != null &&
+          queryResultBundle.getQueryResult().getQueryResults() != null
+        ) {
+          RowSet rowSet = queryResultBundle.getQueryResult().getQueryResults();
+          List<Row> rows = rowSet.getRows();
+          if (rows != null && !rows.isEmpty()) {
+            for (Row row : rows) {
+              List<String> values = row.getValues();
+              String name = getRowValue(values, 0);
+              if (name == null || name.isEmpty()) {
+                continue;
+              }
+              String description = getRowValue(values, 1);
+              String link = getRowValue(values, 2);
+              html.append("<div>");
+              html.append("<h3>");
+              if (link != null && !link.isEmpty()) {
+                String escapedLink = escapeHtml(link);
+                html.append("<a href=\"");
+                html.append(escapedLink);
+                html.append("\">");
+                html.append(escapeHtml(name));
+                html.append("</a>");
+              } else {
+                html.append(escapeHtml(name));
+              }
+              html.append("</h3>");
+              if (description != null && !description.isEmpty()) {
+                html.append(escapeHtml(description));
+                html.append("<br />");
+              }
+              html.append("</div><br />");
+            }
+          }
+        }
+      } catch (SynapseResultNotReadyException e) {
+        e.printStackTrace();
+      } catch (SynapseException e) {
+        e.printStackTrace();
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+      }
+    }
+    return html.toString();
+  }
+
+  private QueryResultBundle waitForQueryResultBundle(
+    String asyncJobToken,
+    String tableId
+  )
+    throws SynapseException, SynapseResultNotReadyException, InterruptedException {
+    int attempt = 0;
+    while (attempt < MAX_ASYNC_QUERY_ATTEMPTS) {
+      try {
+        return synapseClient.queryTableEntityBundleAsyncGet(
+          asyncJobToken,
+          tableId
+        );
+      } catch (SynapseResultNotReadyException e) {
+        attempt++;
+        if (attempt >= MAX_ASYNC_QUERY_ATTEMPTS) {
+          throw e;
+        }
+        Thread.sleep(ASYNC_QUERY_DELAY_MS);
+      }
+    }
+    return null;
+  }
+
+  private static String getRowValue(List<String> values, int index) {
+    if (values == null || values.size() <= index) {
+      return null;
+    }
+    return values.get(index);
   }
 }

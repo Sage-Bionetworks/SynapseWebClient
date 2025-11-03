@@ -422,4 +422,14 @@ public class WebConstants {
   public static final String DATA_CATALOG_PAGE_TITLE = "Synapse Data Catalog";
   public static final String DATA_CATALOG_PAGE_DESCRIPTION =
     "Explore a diverse collection of biomedical datasets contributed by renowned research initiatives.  Access genomics data, proteomics data, disease progression, and clinical studies across conditions like Alzheimer’s, Parkinson’s, cardiovascular disease, cancer, autoimmune disorders, and rare genetic disorders such as neurofibromatosis.";
+  public static final String DATA_CATALOG_TABLE_ID_ON_PRODUCTION =
+    "syn61609402";
+  private static final String DATA_CATALOG_FROM_SQL =
+    "FROM " +
+    DATA_CATALOG_TABLE_ID_ON_PRODUCTION +
+    " WHERE includedInDataCatalog = 'true'";
+  public static final String DATA_CATALOG_SQL =
+    "SELECT * " + DATA_CATALOG_FROM_SQL;
+  public static final String DATA_CATALOG_CRAWL_RESPONSE_SQL =
+    "SELECT name, description, link " + DATA_CATALOG_FROM_SQL;
 }
