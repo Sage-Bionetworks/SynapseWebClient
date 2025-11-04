@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.jsinterop.CardConfiguration;
 import org.sagebionetworks.web.client.jsinterop.GenericCardSchema;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.table.explore.QueryWrapperPlotNav;
+import org.sagebionetworks.web.shared.WebConstants;
 
 public class DataCatalogPageViewImpl implements DataCatalogPageView {
 
@@ -42,7 +43,7 @@ public class DataCatalogPageViewImpl implements DataCatalogPageView {
     );
 
     QueryWrapperPlotNav plotNav = new QueryWrapperPlotNav(
-      "SELECT * FROM syn61609402 WHERE includedInDataCatalog = 'true'",
+      WebConstants.DATA_CATALOG_SQL,
       null,
       null,
       newBundle -> {},
