@@ -430,6 +430,10 @@ public class WebConstants {
     " WHERE includedInDataCatalog = 'true'";
   public static final String DATA_CATALOG_SQL =
     "SELECT * " + DATA_CATALOG_FROM_SQL;
+  // create constants for the column indexes we expect in the data catalog table
+  public static final int DATA_CATALOG_NAME_COLUMN_INDEX = 0;
+  public static final int DATA_CATALOG_DESCRIPTION_COLUMN_INDEX = 1;
+  public static final int DATA_CATALOG_LINK_COLUMN_INDEX = 2;
   public static final String DATA_CATALOG_CRAWL_RESPONSE_SQL =
     "SELECT name, description, link " + DATA_CATALOG_FROM_SQL;
 }

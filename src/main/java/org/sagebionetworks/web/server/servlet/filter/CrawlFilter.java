@@ -686,12 +686,21 @@ public class CrawlFilter {
           if (rows != null && !rows.isEmpty()) {
             for (Row row : rows) {
               List<String> values = row.getValues();
-              String name = getRowValue(values, 0);
+              String name = getRowValue(
+                values,
+                WebConstants.DATA_CATALOG_NAME_COLUMN_INDEX
+              );
               if (name == null || name.isEmpty()) {
                 continue;
               }
-              String description = getRowValue(values, 1);
-              String link = getRowValue(values, 2);
+              String description = getRowValue(
+                values,
+                WebConstants.DATA_CATALOG_DESCRIPTION_COLUMN_INDEX
+              );
+              String link = getRowValue(
+                values,
+                WebConstants.DATA_CATALOG_LINK_COLUMN_INDEX
+              );
               html.append("<div>");
               html.append("<h3>");
               if (link != null && !link.isEmpty()) {
