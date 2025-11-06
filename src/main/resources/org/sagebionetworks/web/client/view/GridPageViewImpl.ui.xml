@@ -7,23 +7,6 @@
   xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 >
   <g:HTMLPanel>
-    <div>
-      <div class="pageHeader">
-        <b:Heading
-          addStyleNames="pageHeaderTitle"
-          ui:field="pageHeaderTitle"
-          size="H3"
-        />
-        <h4 class="description">
-          ID:
-          <bh:Span ui:field="gridSessionNameContainer" addStyleNames="margin-left-3" />
-        </h4>
-      </div>
-      <div>
-        <div class="pageContent margin-top-60">
-          <g:SimplePanel ui:field="componentContainer" />
-        </div>
-      </div>
-    </div>
+    <g:SimplePanel ui:field="componentContainer" />
   </g:HTMLPanel>
 </ui:UiBinder>

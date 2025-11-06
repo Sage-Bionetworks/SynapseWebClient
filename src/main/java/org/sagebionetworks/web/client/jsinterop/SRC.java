@@ -144,6 +144,7 @@ public class SRC {
       SynapsePortalBannersProps
     > SynapsePortalBanners;
     public static ReactComponentType<MetadataTasksPageProps> MetadataTasksPage;
+    public static ReactComponentType GridPage;
 
     /**
      * Pushes a global toast message. In SWC, you should use {@link DisplayUtils#notify}, rather than calling this method directly.
