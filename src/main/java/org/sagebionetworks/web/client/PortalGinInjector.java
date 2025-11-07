@@ -105,6 +105,7 @@ import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidg
 import org.sagebionetworks.web.client.widget.entity.EntityListRowBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
+import org.sagebionetworks.web.client.widget.entity.GridPageImpl;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
@@ -916,5 +917,6 @@ public interface PortalGinInjector extends Ginjector {
   ProjectDataAvailability getProjectDataAvailability();
   SynapseReactClientFullContextPropsProvider getReactContextPropsProvider();
   SynapseGridImpl getSynapseGridImpl();
+  GridPageImpl getGridPageImpl();
   CreateGridSessionDialog getCreateGridSessionDialog();
 }

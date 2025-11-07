@@ -6,42 +6,28 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import org.gwtbootstrap3.client.ui.Heading;
-import org.gwtbootstrap3.client.ui.html.Span;
-import org.sagebionetworks.web.client.widget.entity.SynapseGridImpl;
+import org.sagebionetworks.web.client.widget.entity.GridPageImpl;
 
 public class GridPageViewImpl extends Composite implements GridPageView {
 
-  SynapseGridImpl synapseGrid;
+  GridPageImpl gridPage;
 
   public interface Binder extends UiBinder<Widget, GridPageViewImpl> {}
-
-  @UiField
-  Heading pageHeaderTitle;
-
-  @UiField
-  Span gridSessionNameContainer;
 
   @UiField
   SimplePanel componentContainer;
 
   @Inject
-  public GridPageViewImpl(final Binder uiBinder, SynapseGridImpl synapseGrid) {
+  public GridPageViewImpl(final Binder uiBinder, GridPageImpl gridPage) {
     initWidget(uiBinder.createAndBindUi(this));
 
-    this.synapseGrid = synapseGrid;
+    this.gridPage = gridPage;
 
-    componentContainer.add(synapseGrid.asWidget());
+    componentContainer.add(gridPage.asWidget());
   }
 
   @Override
-  public void setTitle(String title) {
-    pageHeaderTitle.setText(title);
-  }
-
-  @Override
-  public void render(String sessionId) {
-    this.gridSessionNameContainer.setText(sessionId);
-    this.synapseGrid.configure(sessionId, false);
+  public void render() {
+    this.gridPage.configure();
   }
 }
