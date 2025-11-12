@@ -206,6 +206,15 @@ a:focus {
         color: white;
       }
     }
+
+    a {
+      color: white;
+      &:hover {
+        color: white;
+        text-decoration-color: white;
+      }
+    }
+
     .description {
       color: white;
     }

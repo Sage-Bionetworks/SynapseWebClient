@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.table.explore;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -46,7 +45,6 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -66,7 +64,6 @@ import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.ActionListener;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
-import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.explore.TableEntityWidgetV2;
@@ -245,8 +242,6 @@ public class TableEntityWidgetV2Test {
     Query query = new Query();
     query.setSql(sql);
     when(mockQueryChangeHandler.getQueryString()).thenReturn(query);
-    Header.isShowingPortalAlert = false;
-    Header.portalAlertJson = null;
   }
 
   private void configureBundleWithView(ViewType viewType) {
@@ -726,83 +721,6 @@ public class TableEntityWidgetV2Test {
     widget.onEditResults();
     // proceed to edit
     verify(mockQueryResultEditorWidget).showEditor(any(), any());
-  }
-
-  @Test
-  public void testAutoAddToDownloadListV2() throws JSONObjectAdapterException {
-    when(
-      mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
-    )
-      .thenReturn("true");
-    when(mockAuthController.isLoggedIn()).thenReturn(true);
-    configureBundleWithView(ViewType.file);
-    when(mockQueryChangeHandler.getQueryString()).thenReturn(new Query());
-    Header.isShowingPortalAlert = true;
-    Header.portalAlertJson = portalJson;
-    portalJson.put(TableEntityWidgetV2.IS_INVOKING_DOWNLOAD_TABLE, true);
-
-    widget.configure(
-      entityBundle,
-      versionNumber,
-      true,
-      false,
-      mockQueryChangeHandler,
-      mockActionMenu
-    );
-    widget.queryExecutionFinished(true, false);
-
-    verify(mockAddToDownloadListV2).configure(anyString(), any(Query.class));
-    assertFalse(
-      portalJson.getBoolean(TableEntityWidgetV2.IS_INVOKING_DOWNLOAD_TABLE)
-    );
-  }
-
-  @Test
-  public void testAutoAddToDownloadListFalse()
-    throws JSONObjectAdapterException {
-    when(mockAuthController.isLoggedIn()).thenReturn(true);
-    configureBundleWithView(ViewType.file);
-    when(mockQueryChangeHandler.getQueryString()).thenReturn(new Query());
-    Header.isShowingPortalAlert = true;
-    Header.portalAlertJson = portalJson;
-    portalJson.put(TableEntityWidgetV2.IS_INVOKING_DOWNLOAD_TABLE, false);
-
-    widget.configure(
-      entityBundle,
-      versionNumber,
-      true,
-      false,
-      mockQueryChangeHandler,
-      mockActionMenu
-    );
-    widget.queryExecutionFinished(true, false);
-
-    verify(mockAddToDownloadListV2, never())
-      .configure(anyString(), any(Query.class));
-  }
-
-  @Test
-  public void testAutoAddToDownloadListNotLoggedIn()
-    throws JSONObjectAdapterException {
-    when(mockAuthController.isLoggedIn()).thenReturn(false);
-    configureBundleWithView(ViewType.file);
-    when(mockQueryChangeHandler.getQueryString()).thenReturn(new Query());
-    Header.isShowingPortalAlert = true;
-    Header.portalAlertJson = portalJson;
-    portalJson.put(TableEntityWidgetV2.IS_INVOKING_DOWNLOAD_TABLE, true);
-
-    widget.configure(
-      entityBundle,
-      versionNumber,
-      true,
-      false,
-      mockQueryChangeHandler,
-      mockActionMenu
-    );
-    widget.queryExecutionFinished(true, false);
-
-    verify(mockAddToDownloadListV2, never())
-      .configure(anyString(), any(Query.class));
   }
 
   @Test

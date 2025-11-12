@@ -4,12 +4,17 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.server.servlet.filter.CrawlFilter.META_ROBOTS_NOINDEX;
+import static org.sagebionetworks.web.server.servlet.filter.CrawlFilter.QUERY_RESULTS_PART_MASK;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,9 +36,14 @@ import org.sagebionetworks.repo.model.annotation.v2.Annotations;
 import org.sagebionetworks.repo.model.annotation.v2.AnnotationsValue;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
+import org.sagebionetworks.repo.model.table.QueryResult;
+import org.sagebionetworks.repo.model.table.QueryResultBundle;
+import org.sagebionetworks.repo.model.table.Row;
+import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.server.servlet.filter.BotHtml;
 import org.sagebionetworks.web.server.servlet.filter.CrawlFilter;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
@@ -122,5 +132,52 @@ public class CrawlFilterTest {
 
     assertTrue(response.getBody().contains(synapseID));
     assertTrue(response.getHead().contains(META_ROBOTS_NOINDEX));
+  }
+
+  @Test
+  public void testGetDataCatalogHtml() throws SynapseException {
+    String asyncToken = "asyncJobToken";
+    when(
+      mockSynapseClient.queryTableEntityBundleAsyncStart(
+        eq(WebConstants.DATA_CATALOG_CRAWL_RESPONSE_SQL),
+        isNull(),
+        anyLong(),
+        eq(QUERY_RESULTS_PART_MASK),
+        eq(WebConstants.DATA_CATALOG_TABLE_ID_ON_PRODUCTION)
+      )
+    )
+      .thenReturn(asyncToken);
+
+    Row row = new Row();
+    row.setValues(
+      Arrays.asList(
+        "Example Dataset",
+        "Example description",
+        "https://example.org/dataset"
+      )
+    );
+    RowSet rowSet = new RowSet();
+    rowSet.setRows(Arrays.asList(row));
+    QueryResult queryResult = new QueryResult();
+    queryResult.setQueryResults(rowSet);
+    QueryResultBundle bundle = new QueryResultBundle();
+    bundle.setQueryResult(queryResult);
+
+    when(
+      mockSynapseClient.queryTableEntityBundleAsyncGet(
+        asyncToken,
+        WebConstants.DATA_CATALOG_TABLE_ID_ON_PRODUCTION
+      )
+    )
+      .thenReturn(bundle);
+
+    String html = filter.getDataCatalogHtml();
+
+    assertTrue(
+      html.contains(
+        "<a href=\"https://example.org/dataset\">Example Dataset</a>"
+      )
+    );
+    assertTrue(html.contains("Example description"));
   }
 }

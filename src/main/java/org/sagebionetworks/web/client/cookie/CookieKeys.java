@@ -25,9 +25,6 @@ public class CookieKeys {
   public static String SHOW_DATETIME_IN_UTC =
     "org.sagebionetworks.synapse.datetime.utc";
 
-  public static String PORTAL_CONFIG =
-    "org.sagebionetworks.security.cookies.portal.config";
-
   public static String ONESAGE_REDIRECT_COOKIE_KEY =
     "org.sagebionetworks.cookies.redirect-after-login";
 }

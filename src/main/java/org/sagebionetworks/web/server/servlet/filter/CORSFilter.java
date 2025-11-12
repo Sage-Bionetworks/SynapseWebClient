@@ -75,10 +75,35 @@ public class CORSFilter extends OncePerRequestFilter {
     "b2ai.standards",
     "staging.b2ai.standards",
     "ampals",
-    "staging.ampals"
+    "staging.ampals",
+    "classicportal",
+    "staging.classicportal",
+    "arcusbio",
+    "staging.arcusbio"
   );
 
   public static final String SYNAPSE_ORG_SUFFIX = ".synapse.org";
+
+  // given an origin header, return true if it ends with .synapse.org and ALLOWED_SYNAPSE_SUBDOMAINS contains the subdomain
+  public static boolean isAllowedSynapseSubdomain(String origin) {
+    if (origin != null) {
+      try {
+        URL url = new URL(origin.toLowerCase());
+        String host = url.getHost();
+        if (!host.endsWith(SYNAPSE_ORG_SUFFIX)) {
+          return false;
+        }
+        String subdomain = host.substring(
+          0,
+          url.getHost().length() - SYNAPSE_ORG_SUFFIX.length()
+        );
+        return ALLOWED_SYNAPSE_SUBDOMAINS.contains(subdomain);
+      } catch (java.net.MalformedURLException e) {
+        // ignore malformed URL
+      }
+    }
+    return false;
+  }
 
   @Override
   protected void doFilterInternal(
@@ -88,15 +113,9 @@ public class CORSFilter extends OncePerRequestFilter {
   ) throws ServletException, IOException {
     String allowOrigin = DEFAULT_ALLOW_ORIGIN;
     String origin = request.getHeader(ORIGIN_HEADER);
-    if (origin != null && origin.toLowerCase().endsWith(SYNAPSE_ORG_SUFFIX)) {
-      URL url = new URL(origin.toLowerCase());
-      String subdomain = url
-        .getHost()
-        .substring(0, url.getHost().length() - SYNAPSE_ORG_SUFFIX.length());
-      if (ALLOWED_SYNAPSE_SUBDOMAINS.contains(subdomain)) {
-        allowOrigin = origin;
-        response.addHeader(ACCESS_CONTROL_ALLOW_CREDENTIALS_HEADER, "true");
-      }
+    if (isAllowedSynapseSubdomain(origin)) {
+      allowOrigin = origin;
+      response.addHeader(ACCESS_CONTROL_ALLOW_CREDENTIALS_HEADER, "true");
     }
 
     response.addHeader(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER, allowOrigin);

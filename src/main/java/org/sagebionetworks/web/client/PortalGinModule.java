@@ -152,6 +152,8 @@ import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainerViewImpl;
 import org.sagebionetworks.web.client.widget.QuarantinedEmailModal;
 import org.sagebionetworks.web.client.widget.RadioWidget;
 import org.sagebionetworks.web.client.widget.RadioWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.ShareThisPage;
+import org.sagebionetworks.web.client.widget.ShareThisPageImpl;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidgetView;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.accessrequirements.EntitySubjectsWidgetView;
@@ -1630,6 +1632,7 @@ public class PortalGinModule extends AbstractGinModule {
     bind(GridPageView.class).to(GridPageViewImpl.class).in(Singleton.class);
     bind(CreateGridSessionDialog.class).to(CreateGridSessionDialogImpl.class);
     bind(EntityCitation.class).to(EntityCitationImpl.class);
+    bind(ShareThisPage.class).to(ShareThisPageImpl.class);
     bind(MetadataTabView.class).to(MetadataTabViewImpl.class);
   }
 }

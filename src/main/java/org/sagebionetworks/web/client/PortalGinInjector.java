@@ -66,6 +66,7 @@ import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.QuarantinedEmailModal;
 import org.sagebionetworks.web.client.widget.RadioWidget;
+import org.sagebionetworks.web.client.widget.ShareThisPage;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.LockAccessRequirementWidget;
@@ -103,6 +104,7 @@ import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EntityListRowBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
+import org.sagebionetworks.web.client.widget.entity.GridPageImpl;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
@@ -358,6 +360,8 @@ public interface PortalGinInjector extends Ginjector {
   TeamSearchPresenter getTeamSearchPresenter();
 
   PeopleSearchPresenter getPeopleSearchPresenter();
+
+  ShareThisPage getShareThisPage();
 
   SynapseStandaloneWikiPresenter getSynapseStandaloneWikiPresenter();
 
@@ -904,5 +908,6 @@ public interface PortalGinInjector extends Ginjector {
   ProjectDataAvailability getProjectDataAvailability();
   SynapseReactClientFullContextPropsProvider getReactContextPropsProvider();
   SynapseGridImpl getSynapseGridImpl();
+  GridPageImpl getGridPageImpl();
   CreateGridSessionDialog getCreateGridSessionDialog();
 }

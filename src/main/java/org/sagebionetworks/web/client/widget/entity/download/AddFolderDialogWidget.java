@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.download;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -9,6 +10,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.jsinterop.ToastMessageOptions;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
@@ -27,6 +29,7 @@ public class AddFolderDialogWidget
   private PopupUtilsView popupUtils;
   private GlobalApplicationState globalAppState;
   private String parentEntityId;
+  private final EventBus eventBus;
 
   @Inject
   public AddFolderDialogWidget(
@@ -35,7 +38,8 @@ public class AddFolderDialogWidget
     SynapseJavascriptClient jsClient,
     GlobalApplicationState globalAppState,
     PopupUtilsView popupUtils,
-    SynapseAlert synAlert
+    SynapseAlert synAlert,
+    EventBus eventBus
   ) {
     this.view = view;
     this.sharingAndDataUseWidget = sharingAndDataUseWidget;
@@ -43,6 +47,7 @@ public class AddFolderDialogWidget
     this.synAlert = synAlert;
     this.globalAppState = globalAppState;
     this.popupUtils = popupUtils;
+    this.eventBus = eventBus;
     view.setSynAlert(synAlert);
     view.setSharingAndDataUseWidget(sharingAndDataUseWidget.asWidget());
     view.setPresenter(this);
@@ -88,6 +93,8 @@ public class AddFolderDialogWidget
             DisplayUtils.NotificationVariant.INFO,
             toastOptions
           );
+
+          eventBus.fireEvent(new EntityUpdatedEvent(parentEntityId));
           globalAppState.refreshPage();
         }
 

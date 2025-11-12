@@ -195,7 +195,8 @@ public class DefaultEntityActionMenuLayoutUtil {
           Arrays.asList(
             ActionViewProps.create(Action.CREATE_FOLDER, "newFolder"),
             ActionViewProps.create(Action.UPLOAD_FILE, "upload"),
-            ActionViewProps.create(Action.SHOW_ANNOTATIONS, "label")
+            ActionViewProps.create(Action.SHOW_ANNOTATIONS, "label"),
+            ActionViewProps.create(Action.SHARE_THIS_PAGE, "share")
           )
         );
         layout.setDownloadMenuActions(
@@ -246,7 +247,8 @@ public class DefaultEntityActionMenuLayoutUtil {
           Arrays.asList(
             ActionViewProps.create(Action.UPLOAD_NEW_FILE, "upload"),
             ActionViewProps.create(Action.SHOW_ANNOTATIONS, "label"),
-            ActionViewProps.create(Action.CREATE_NEW_GRID, "tableRows")
+            ActionViewProps.create(Action.CREATE_NEW_GRID, "tableRows"),
+            ActionViewProps.create(Action.SHARE_THIS_PAGE, "share")
           )
         );
         layout.setDownloadMenuActions(
@@ -304,7 +306,8 @@ public class DefaultEntityActionMenuLayoutUtil {
             ActionViewProps.create(Action.EDIT_TABLE_DATA, "edit"),
             ActionViewProps.create(Action.SHOW_ANNOTATIONS, "label"),
             ActionViewProps.create(Action.SHOW_TABLE_SCHEMA, "columns"),
-            ActionViewProps.create(Action.CREATE_NEW_GRID, "tableRows")
+            ActionViewProps.create(Action.CREATE_NEW_GRID, "tableRows"),
+            ActionViewProps.create(Action.SHARE_THIS_PAGE, "share")
           )
         );
         // Note that download actions for tables are currently inlined in the QueryWrapperPlotNav
@@ -356,7 +359,8 @@ public class DefaultEntityActionMenuLayoutUtil {
             ActionViewProps.create(Action.EDIT_TABLE_DATA, "edit"),
             ActionViewProps.create(Action.SHOW_ANNOTATIONS, "label"),
             ActionViewProps.create(Action.SHOW_TABLE_SCHEMA, "columns"),
-            ActionViewProps.create(Action.CREATE_NEW_GRID, "tableRows")
+            ActionViewProps.create(Action.CREATE_NEW_GRID, "tableRows"),
+            ActionViewProps.create(Action.SHARE_THIS_PAGE, "share")
           )
         );
         // Note that download actions for tables are currently inlined in the QueryWrapperPlotNav
@@ -401,8 +405,9 @@ public class DefaultEntityActionMenuLayoutUtil {
           EntityTypeUtils.getDisplayName(entityType) + TOOLS_SUFFIX
         );
         layout.setButtonActions(
-          Collections.singletonList(
-            ActionViewProps.create(Action.SHOW_ANNOTATIONS, "label")
+          Arrays.asList(
+            ActionViewProps.create(Action.SHOW_ANNOTATIONS, "label"),
+            ActionViewProps.create(Action.SHARE_THIS_PAGE, "share")
           )
         );
         layout.setPrimaryMenuActions(
@@ -451,7 +456,8 @@ public class DefaultEntityActionMenuLayoutUtil {
               "createVersion"
             ),
             ActionViewProps.create(Action.SHOW_ANNOTATIONS, "label"),
-            ActionViewProps.create(Action.SHOW_TABLE_SCHEMA, "columns")
+            ActionViewProps.create(Action.SHOW_TABLE_SCHEMA, "columns"),
+            ActionViewProps.create(Action.SHARE_THIS_PAGE, "share")
           )
         );
         // Note that download actions for tables are currently inlined in the QueryWrapperPlotNav
@@ -496,7 +502,8 @@ public class DefaultEntityActionMenuLayoutUtil {
             ActionViewProps.create(Action.EDIT_DEFINING_SQL, "edit"),
             ActionViewProps.create(Action.VIEW_DEFINING_SQL, "article"),
             ActionViewProps.create(Action.SHOW_ANNOTATIONS, "label"),
-            ActionViewProps.create(Action.SHOW_TABLE_SCHEMA, "columns")
+            ActionViewProps.create(Action.SHOW_TABLE_SCHEMA, "columns"),
+            ActionViewProps.create(Action.SHARE_THIS_PAGE, "share")
           )
         );
         // Note that download actions for tables are currently inlined in the QueryWrapperPlotNav

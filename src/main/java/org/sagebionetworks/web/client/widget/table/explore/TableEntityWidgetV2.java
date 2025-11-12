@@ -49,7 +49,6 @@ import org.sagebionetworks.web.client.widget.entity.controller.PreflightControll
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
-import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQueryModalWidget;
@@ -546,25 +545,6 @@ public class TableEntityWidgetV2
     // Set this as the query if it was successful
     if (wasSuccessful) {
       this.queryChangeHandler.onQueryChange(this.currentQuery);
-
-      // PORTALS-596: if being directed to Synapse.org to download a file set, then automatically show the
-      // "Add To Download List" UI.
-      if (
-        Header.isShowingPortalAlert &&
-        ginInjector.getAuthenticationController().isLoggedIn()
-      ) {
-        try {
-          boolean isDownloadTable = Header.portalAlertJson.getBoolean(
-            IS_INVOKING_DOWNLOAD_TABLE
-          );
-          if (isDownloadTable) {
-            onAddToDownloadList();
-          }
-          Header.portalAlertJson.put(IS_INVOKING_DOWNLOAD_TABLE, false);
-        } catch (Exception e) {
-          ginInjector.getSynapseJSNIUtils().consoleError(e);
-        }
-      }
     }
   }
 

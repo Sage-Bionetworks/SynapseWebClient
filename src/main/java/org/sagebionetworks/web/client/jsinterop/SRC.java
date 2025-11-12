@@ -22,6 +22,7 @@ public class SRC {
   public static class SynapseComponents {
 
     public static ReactComponentType<DiscussionThreadProps> DiscussionThread;
+    public static ReactComponentType<ShareThisPageProps> ShareThisPage;
     public static ReactComponentType<EntityCitationProps> EntityCitation;
     public static ReactComponentType<EntityBadgeIconsProps> EntityBadgeIcons;
     public static ReactComponentType<DatasetEditorProps> DatasetItemsEditor;
@@ -143,6 +144,7 @@ public class SRC {
       SynapsePortalBannersProps
     > SynapsePortalBanners;
     public static ReactComponentType<MetadataTasksPageProps> MetadataTasksPage;
+    public static ReactComponentType GridPage;
 
     /**
      * Pushes a global toast message. In SWC, you should use {@link DisplayUtils#notify}, rather than calling this method directly.

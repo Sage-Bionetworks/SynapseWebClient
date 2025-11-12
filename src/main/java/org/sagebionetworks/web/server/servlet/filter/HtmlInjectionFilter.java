@@ -293,6 +293,12 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
               PAGE_DESCRIPTION_KEY,
               WebConstants.DATA_CATALOG_PAGE_DESCRIPTION
             );
+            if (includeBotHtml) {
+              dataModel.put(
+                BOT_BODY_HTML_KEY,
+                crawlFilter.getDataCatalogHtml()
+              );
+            }
           } else if (path.startsWith("/Synapse")) {
             Synapse place = new Synapse(placeToken);
             String entityId = place.getEntityId();
