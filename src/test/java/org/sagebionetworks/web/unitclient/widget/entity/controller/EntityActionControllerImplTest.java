@@ -3287,7 +3287,7 @@ public class EntityActionControllerImplTest {
   }
 
   @Test
-  public void testhasProjectAreaContext() {
+  public void testHasProjectAreaContext() {
     // is a top level tools menu if the target entity is a Project, and the area is set
     assertTrue(
       controller.hasProjectAreaContext(new Project(), EntityArea.FILES)
