@@ -1629,10 +1629,10 @@ public class EntityActionControllerImpl
   }
 
   private void configureShareThisPage() {
-    boolean showShare = !(entityBundle.getEntity() instanceof Project);
-    actionMenu.setActionVisible(Action.SHARE_THIS_PAGE, showShare);
-
-    if (showShare) {
+    if (isTopLevelProjectToolsMenu(entityBundle.getEntity(), currentArea)) {
+      actionMenu.setActionVisible(Action.SHARE_THIS_PAGE, false);
+    } else {
+      actionMenu.setActionVisible(Action.SHARE_THIS_PAGE, true);
       actionMenu.setActionListener(
         Action.SHARE_THIS_PAGE,
         (action, event) -> {
