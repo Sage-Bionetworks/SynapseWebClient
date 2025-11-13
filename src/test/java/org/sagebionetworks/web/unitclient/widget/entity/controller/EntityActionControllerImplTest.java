@@ -3287,22 +3287,19 @@ public class EntityActionControllerImplTest {
   }
 
   @Test
-  public void testIsTopLevelProjectToolsMenu() {
+  public void testhasProjectAreaContext() {
     // is a top level tools menu if the target entity is a Project, and the area is set
     assertTrue(
-      controller.isTopLevelProjectToolsMenu(new Project(), EntityArea.FILES)
+      controller.hasProjectAreaContext(new Project(), EntityArea.FILES)
     );
     assertTrue(
-      controller.isTopLevelProjectToolsMenu(
-        new Project(),
-        EntityArea.DISCUSSION
-      )
+      controller.hasProjectAreaContext(new Project(), EntityArea.DISCUSSION)
     );
     // if the area is not set, then it's the Project Settings)
-    assertFalse(controller.isTopLevelProjectToolsMenu(new Project(), null));
+    assertFalse(controller.hasProjectAreaContext(new Project(), null));
     // if looking at a specific child (file/table/...), then it is not a top level project tools menu
     // for that area.
-    assertFalse(controller.isTopLevelProjectToolsMenu(new FileEntity(), null));
+    assertFalse(controller.hasProjectAreaContext(new FileEntity(), null));
   }
 
   @Test
