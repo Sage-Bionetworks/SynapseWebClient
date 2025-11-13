@@ -172,7 +172,8 @@ public class DefaultEntityActionMenuLayoutUtil {
             ),
             Arrays.asList(
               ActionViewProps.create(Action.CREATE_OR_UPDATE_DOI),
-              ActionViewProps.create(Action.CREATE_LINK)
+              ActionViewProps.create(Action.CREATE_LINK),
+              ActionViewProps.create(Action.SHARE_THIS_PAGE)
             ),
             Collections.singletonList(
               ActionViewProps.create(
