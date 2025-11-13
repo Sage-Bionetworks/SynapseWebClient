@@ -1627,6 +1627,9 @@ public class EntityActionControllerImpl
     }
   }
 
+  /**
+   * Applies to both Project Tools menu and non-Project entity Tools menu.
+   **/
   private void configureShareThisPage() {
     if (hasProjectAreaContext(entityBundle.getEntity(), currentArea)) {
       actionMenu.setActionVisible(Action.SHARE_THIS_PAGE, false);
