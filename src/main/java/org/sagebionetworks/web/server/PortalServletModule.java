@@ -1,12 +1,18 @@
 package org.sagebionetworks.web.server;
 
+import com.amazonaws.services.appconfigdata.AWSAppConfigData;
+import com.amazonaws.services.kms.AWSKMS;
+import com.google.gwt.user.server.rpc.XsrfTokenServiceServlet;
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
+import com.google.inject.name.Names;
+import com.google.inject.servlet.ServletModule;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import org.sagebionetworks.ConfigurationProperties;
 import org.sagebionetworks.ConfigurationPropertiesImpl;
 import org.sagebionetworks.LoggerProvider;
@@ -68,14 +74,6 @@ import org.sagebionetworks.web.server.servlet.filter.XFrameOptionsFilter;
 import org.sagebionetworks.web.server.servlet.oauth2.OAuth2AliasServlet;
 import org.sagebionetworks.web.server.servlet.oauth2.OAuth2SessionServlet;
 import org.sagebionetworks.web.shared.WebConstants;
-
-import com.amazonaws.services.appconfigdata.AWSAppConfigData;
-import com.amazonaws.services.kms.AWSKMS;
-import com.google.gwt.user.server.rpc.XsrfTokenServiceServlet;
-import com.google.inject.Provides;
-import com.google.inject.Singleton;
-import com.google.inject.name.Names;
-import com.google.inject.servlet.ServletModule;
 
 /**
  * Binds the service servlets to their paths and any other Guice binding required on the server
