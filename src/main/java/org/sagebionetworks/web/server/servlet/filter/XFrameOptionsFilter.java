@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.server.servlet.filter;
 
-import static org.sagebionetworks.web.client.widget.entity.renderer.PDFPreviewWidget.PDF_JS_VIEWER_PREFIX;
 import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.ORIGIN_HEADER;
 import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.isAllowedSynapseSubdomain;
 
@@ -27,7 +26,6 @@ public class XFrameOptionsFilter extends OncePerRequestFilter {
     HttpServletResponse response,
     FilterChain filterChain
   ) throws ServletException, IOException {
-    // SWC-4915: if pdf.js, the allow iframe from the same origin
     String origin = request.getHeader(ORIGIN_HEADER);
     // SWC-7536: if no origin header, use referer
     if (origin == null) {
@@ -35,15 +33,11 @@ public class XFrameOptionsFilter extends OncePerRequestFilter {
     }
     // if allowed synapse subdomain, do not add X-Frame-Options header
     if (!isAllowedSynapseSubdomain(origin)) {
-      String queryString = request.getQueryString();
-      String requestWithQueryString = queryString == null
-        ? request.getRequestURL().toString()
-        : request.getRequestURL().toString() + "?" + queryString;
-      if (requestWithQueryString.contains(PDF_JS_VIEWER_PREFIX)) {
-        response.addHeader(X_FRAME_OPTIONS_HEADER, SAMEORIGIN);
-      } else {
-        response.addHeader(X_FRAME_OPTIONS_HEADER, DENY);
-      }
+      response.addHeader(X_FRAME_OPTIONS_HEADER, DENY);
+    } else {
+      // set to deprecated ALLOW-FROM value because app server will set if empty:
+      // https://github.com/Sage-Bionetworks/Synapse-Stack-Builder/blob/develop/src/main/resources/templates/repo/ebextensions/security.conf#L1
+      response.addHeader(X_FRAME_OPTIONS_HEADER, "ALLOW-FROM " + origin);
     }
 
     filterChain.doFilter(request, response);
