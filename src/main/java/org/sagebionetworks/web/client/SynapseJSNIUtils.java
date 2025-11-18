@@ -134,6 +134,4 @@ public interface SynapseJSNIUtils {
   String setHash(String hash);
 
   String getHash();
-
-  void consoleDebug(String message);
 }
