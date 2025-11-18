@@ -34,6 +34,8 @@ public class NbConvertPreviewWidget
   implements IsWidget, NbConvertPreviewView.Presenter {
 
   String nbConvertEndpoint;
+  public static final String UNSAFE_HTML_SANITIZED_MESSAGE =
+    "NbConvertPreviewWidget: Unsafe HTML content was sanitized and rendered. Raw HTML (before sanitization): ";
   public static final String HTML_PREFIX =
     "<html><head>" +
     "<link rel=\"stylesheet\" type=\"text/css\" href=\"css\\notebook.css\">" +
@@ -174,7 +176,9 @@ public class NbConvertPreviewWidget
             view.setHtml(wrappedRawHtml);
           } else {
             view.setHtml(sanitizedHtml);
-            view.setRawHtml(wrappedRawHtml);
+            jsniUtils.consoleDebug(
+              UNSAFE_HTML_SANITIZED_MESSAGE + wrappedRawHtml
+            );
           }
         }
       }

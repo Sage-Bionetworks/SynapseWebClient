@@ -414,6 +414,15 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		console.error(ob);
 	}-*/;
 
+  @Override
+  public void consoleDebug(String message) {
+    _consoleDebug(message);
+  }
+
+  public static final native void _consoleDebug(String message) /*-{
+		console.debug(message);
+	}-*/;
+
   public void processMath(Element element) {
     // remove \(, \), \[, \]
     String tex = element.getInnerText();

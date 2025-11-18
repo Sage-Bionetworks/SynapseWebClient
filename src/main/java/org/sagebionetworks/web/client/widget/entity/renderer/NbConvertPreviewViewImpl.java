@@ -14,7 +14,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 
 public class NbConvertPreviewViewImpl implements NbConvertPreviewView {
@@ -35,9 +34,6 @@ public class NbConvertPreviewViewImpl implements NbConvertPreviewView {
 
   @UiField
   Anchor showContentLink;
-
-  @UiField
-  Span storeRawHtmlSpan;
 
   Presenter p;
   SynapseJSNIUtils jsniUtils;
@@ -73,19 +69,6 @@ public class NbConvertPreviewViewImpl implements NbConvertPreviewView {
     synAlertContainer.clear();
     synAlertContainer.add(w);
   }
-
-  @Override
-  public void openRawHtmlInNewWindow() {
-    String html = storeRawHtmlSpan.getText();
-    _openHtmlInNewWindow(html);
-  }
-
-  private static final native void _openHtmlInNewWindow(String html) /*-{
-		var wnd = $wnd.open("", "");
-		wnd.document.write(html);
-		// close document, to run scripts inside html string 
-		wnd.document.close();
-	}-*/;
 
   public static Frame getFrame(
     final String htmlContent,
@@ -173,11 +156,6 @@ public class NbConvertPreviewViewImpl implements NbConvertPreviewView {
   @Override
   public void setPresenter(Presenter p) {
     this.p = p;
-  }
-
-  @Override
-  public void setRawHtml(String rawHtml) {
-    storeRawHtmlSpan.setText(rawHtml);
   }
 
   @Override

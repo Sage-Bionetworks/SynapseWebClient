@@ -3,8 +3,8 @@ package org.sagebionetworks.web.unitclient.widget.entity;
 import static com.google.gwt.http.client.RequestBuilder.GET;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.SynapseJavascriptClient.ACCEPT;
@@ -15,7 +15,6 @@ import static org.sagebionetworks.web.shared.WebConstants.NBCONVERT_ENDPOINT_PRO
 import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.TEXT_HTML_CHARSET_UTF8;
 
-import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import org.junit.Before;
@@ -311,7 +310,10 @@ public class NbConvertPreviewWidgetTest {
     // user is not allowed to render. show sanitized version
     verify(mockSynapseJSNIUtils).sanitizeHtml(WRAPPED_HTML);
     verify(mockView).setHtml(SANITIZED_HTML);
-    verify(mockView).setRawHtml(WRAPPED_HTML);
+    verify(mockSynapseJSNIUtils)
+      .consoleDebug(
+        NbConvertPreviewWidget.UNSAFE_HTML_SANITIZED_MESSAGE + WRAPPED_HTML
+      );
     verify(mockView).setLoadingVisible(true);
     verify(mockView).setLoadingVisible(false);
   }
@@ -332,7 +334,10 @@ public class NbConvertPreviewWidgetTest {
       .isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
     verify(mockSynapseJSNIUtils).sanitizeHtml(WRAPPED_HTML);
     verify(mockView).setHtml(SANITIZED_HTML);
-    verify(mockView).setRawHtml(WRAPPED_HTML);
+    verify(mockSynapseJSNIUtils)
+      .consoleDebug(
+        NbConvertPreviewWidget.UNSAFE_HTML_SANITIZED_MESSAGE + WRAPPED_HTML
+      );
     verify(mockView).setLoadingVisible(true);
     verify(mockView).setLoadingVisible(false);
     verify(mockSynapseJSNIUtils).consoleError(errorMessage);
