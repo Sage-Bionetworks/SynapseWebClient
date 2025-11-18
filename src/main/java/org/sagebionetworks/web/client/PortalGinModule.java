@@ -482,8 +482,6 @@ import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.IntendedDataUseReportWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.IntendedDataUseReportWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.entity.renderer.NbConvertPreviewView;
-import org.sagebionetworks.web.client.widget.entity.renderer.NbConvertPreviewViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.PlotlyWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.PlotlyWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.ReferenceWidgetView;
@@ -1568,7 +1566,6 @@ public class PortalGinModule extends AbstractGinModule {
     bind(SynapseJavascriptFactory.class).in(Singleton.class);
 
     bind(HtmlPreviewView.class).to(HtmlPreviewViewImpl.class);
-    bind(NbConvertPreviewView.class).to(NbConvertPreviewViewImpl.class);
     bind(S3DirectLoginDialog.class).to(S3DirectLoginDialogImpl.class);
 
     bind(WikiPageDeleteConfirmationDialogView.class)

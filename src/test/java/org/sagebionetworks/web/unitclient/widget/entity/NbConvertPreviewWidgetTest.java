@@ -37,7 +37,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.asynch.PresignedURLAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.entity.renderer.NbConvertPreviewView;
+import org.sagebionetworks.web.client.widget.entity.renderer.HtmlPreviewView;
 import org.sagebionetworks.web.client.widget.entity.renderer.NbConvertPreviewWidget;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.test.helper.RequestBuilderMockStubber;
@@ -53,7 +53,7 @@ public class NbConvertPreviewWidgetTest {
   NbConvertPreviewWidget previewWidget;
 
   @Mock
-  NbConvertPreviewView mockView;
+  HtmlPreviewView mockView;
 
   @Mock
   RequestBuilderWrapper mockRequestBuilder;
@@ -129,10 +129,6 @@ public class NbConvertPreviewWidgetTest {
       .sendRequest(any(), any());
     when(mockSynapseJSNIUtils.sanitizeHtml(anyString()))
       .thenReturn(SANITIZED_HTML);
-    AsyncMockStubber
-      .callSuccessWith(true)
-      .when(mockSynapseClient)
-      .isUserAllowedToRenderHTML(any(), any());
     AsyncMockStubber
       .callSuccessWith(mockFileResult)
       .when(mockPresignedURLAsyncHandler)
@@ -265,91 +261,9 @@ public class NbConvertPreviewWidgetTest {
     previewWidget = setupPreviewWidget(REPO_URL_DEV);
     previewWidget.configure(ENTITY_ID, mockFileHandle);
 
-    verify(mockSynapseClient)
-      .isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
     // user is allowed to render html, so raw html is rendered
-    verify(mockView).setHtml(WRAPPED_HTML);
+    verify(mockView).configure(CREATED_BY, WRAPPED_HTML);
     verify(mockView).setLoadingVisible(true);
     verify(mockView).setLoadingVisible(false);
-  }
-
-  @Test
-  public void testRenderHtmlUntrustedButSafe() {
-    previewWidget = setupPreviewWidget(REPO_URL_DEV);
-    AsyncMockStubber
-      .callSuccessWith(false)
-      .when(mockSynapseClient)
-      .isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
-
-    when(mockSynapseJSNIUtils.sanitizeHtml(WRAPPED_HTML))
-      .thenReturn(WRAPPED_HTML);
-
-    previewWidget.configure(ENTITY_ID, mockFileHandle);
-
-    verify(mockSynapseClient)
-      .isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
-    // user is not allowed to render, but sanitized version is the same as raw
-    verify(mockSynapseJSNIUtils).sanitizeHtml(WRAPPED_HTML);
-    verify(mockView).setHtml(WRAPPED_HTML);
-    verify(mockView).setLoadingVisible(true);
-    verify(mockView).setLoadingVisible(false);
-  }
-
-  @Test
-  public void testBlockRenderHtmlUntrusted() {
-    previewWidget = setupPreviewWidget(REPO_URL_DEV);
-    AsyncMockStubber
-      .callSuccessWith(false)
-      .when(mockSynapseClient)
-      .isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
-
-    previewWidget.configure(ENTITY_ID, mockFileHandle);
-
-    verify(mockSynapseClient)
-      .isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
-    // user is not allowed to render. show sanitized version
-    verify(mockSynapseJSNIUtils).sanitizeHtml(WRAPPED_HTML);
-    verify(mockView).setHtml(SANITIZED_HTML);
-    verify(mockSynapseJSNIUtils)
-      .consoleDebug(
-        NbConvertPreviewWidget.UNSAFE_HTML_SANITIZED_MESSAGE + WRAPPED_HTML
-      );
-    verify(mockView).setLoadingVisible(true);
-    verify(mockView).setLoadingVisible(false);
-  }
-
-  @Test
-  public void testIsTrustedCheckFailure() {
-    previewWidget = setupPreviewWidget(REPO_URL_DEV);
-    String errorMessage = "unable to determine if user is on the team";
-    Exception ex = new Exception(errorMessage);
-    AsyncMockStubber
-      .callFailureWith(ex)
-      .when(mockSynapseClient)
-      .isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
-
-    previewWidget.configure(ENTITY_ID, mockFileHandle);
-
-    verify(mockSynapseClient)
-      .isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
-    verify(mockSynapseJSNIUtils).sanitizeHtml(WRAPPED_HTML);
-    verify(mockView).setHtml(SANITIZED_HTML);
-    verify(mockSynapseJSNIUtils)
-      .consoleDebug(
-        NbConvertPreviewWidget.UNSAFE_HTML_SANITIZED_MESSAGE + WRAPPED_HTML
-      );
-    verify(mockView).setLoadingVisible(true);
-    verify(mockView).setLoadingVisible(false);
-    verify(mockSynapseJSNIUtils).consoleError(errorMessage);
-  }
-
-  @Test
-  public void testOnShowFullContent() {
-    previewWidget = setupPreviewWidget(REPO_URL_DEV);
-    previewWidget.onShowFullContent();
-
-    // verify it asks for a fresh presigned url, and opens it (to download)
-    verify(mockPresignedURLAsyncHandler).getFileResult(any(), any());
-    verify(mockView).openInNewWindow(PRESIGNED_URL);
   }
 }
