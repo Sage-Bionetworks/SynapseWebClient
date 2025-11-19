@@ -4,7 +4,6 @@ import static com.google.gwt.http.client.RequestBuilder.GET;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.SynapseJavascriptClient.ACCEPT;
@@ -103,7 +102,6 @@ public class NbConvertPreviewWidgetTest {
   public static final String HTML =
     "<!--converted ipynb into html --><img src=a onerror=\"javascript:alert('running my js')\" /><p>hello</p>";
   public static final String WRAPPED_HTML = HTML_PREFIX + HTML + HTML_SUFFIX;
-  public static final String SANITIZED_HTML = "<p>hello</p>";
 
   public static final String ENTITY_ID = "syn20923";
   public static final String FILE_HANDLE_ID = "9992782";
@@ -127,8 +125,6 @@ public class NbConvertPreviewWidgetTest {
       .callOnResponseReceived(null, mockResponse)
       .when(mockRequestBuilder)
       .sendRequest(any(), any());
-    when(mockSynapseJSNIUtils.sanitizeHtml(anyString()))
-      .thenReturn(SANITIZED_HTML);
     AsyncMockStubber
       .callSuccessWith(mockFileResult)
       .when(mockPresignedURLAsyncHandler)
