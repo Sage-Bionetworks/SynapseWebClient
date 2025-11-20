@@ -4,6 +4,7 @@ import static org.sagebionetworks.web.client.jsinterop.SRC.SynapseComponents.Ent
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.jsinterop.EntityAclEditorModalProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
@@ -13,12 +14,17 @@ public class EntityAccessControlListModalWidgetImpl
   implements EntityAccessControlListModalWidget {
 
   private final ReactComponent reactComponent;
+  private final GlobalApplicationState globalApplicationState;
 
   private EntityAclEditorModalProps componentProps;
 
   @Inject
-  EntityAccessControlListModalWidgetImpl(ReactComponent reactComponent) {
+  EntityAccessControlListModalWidgetImpl(
+    ReactComponent reactComponent,
+    GlobalApplicationState globalApplicationState
+  ) {
     this.reactComponent = reactComponent;
+    this.globalApplicationState = globalApplicationState;
   }
 
   @Override
@@ -40,7 +46,10 @@ public class EntityAccessControlListModalWidgetImpl
         entityId,
         false,
         onUpdateSuccess,
-        () -> setOpen(false),
+        () -> {
+          setOpen(false);
+          globalApplicationState.setIsEditing(false);
+        },
         isAfterUpload
       );
     renderComponent();
