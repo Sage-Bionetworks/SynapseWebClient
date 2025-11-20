@@ -354,6 +354,7 @@ public class EntityActionControllerImpl
   }
 
   private void fireEntityUpdatedEvent() {
+    getGlobalApplicationState().setIsEditing(false);
     eventBus.fireEvent(new EntityUpdatedEvent(entity.getId()));
   }
 

@@ -45,12 +45,7 @@ public class EntityAccessControlListModalWidgetImpl
       EntityAclEditorModalProps.create(
         entityId,
         false,
-        () -> {
-          globalApplicationState.setIsEditing(false);
-          if (onUpdateSuccess != null) {
-            onUpdateSuccess.run();
-          }
-        },
+        onUpdateSuccess,
         () -> {
           setOpen(false);
           globalApplicationState.setIsEditing(false);
