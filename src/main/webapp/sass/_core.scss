@@ -207,7 +207,7 @@ a:focus {
       }
     }
 
-    a {
+    a:not(.dropdown-menu a) {
       color: white;
       &:hover {
         color: white;
