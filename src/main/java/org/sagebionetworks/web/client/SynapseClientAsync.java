@@ -27,7 +27,6 @@ import org.sagebionetworks.repo.model.project.StorageLocationSetting;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.repo.model.quiz.QuizResponse;
 import org.sagebionetworks.repo.model.table.ColumnModel;
-import org.sagebionetworks.repo.model.table.FacetColumnRequest;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
@@ -279,8 +278,6 @@ public interface SynapseClientAsync {
     String tokenString,
     AsyncCallback<AccountCreationToken> callback
   );
-
-  void getAPIKey(AsyncCallback<String> callback);
 
   void sendMessage(
     Set<String> recipients,

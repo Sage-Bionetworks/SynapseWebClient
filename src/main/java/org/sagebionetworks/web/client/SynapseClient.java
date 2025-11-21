@@ -191,8 +191,6 @@ public interface SynapseClient extends RemoteService {
     String parentEntityId
   ) throws RestServiceException;
 
-  String getAPIKey() throws RestServiceException;
-
   ResponseMessage handleSignedToken(
     SignedTokenInterface signedToken,
     String hostPageBaseURL

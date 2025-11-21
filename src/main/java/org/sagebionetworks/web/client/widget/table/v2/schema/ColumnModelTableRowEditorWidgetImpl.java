@@ -521,4 +521,9 @@ public class ColumnModelTableRowEditorWidgetImpl
   public void setMaxListLength(String maxListLength) {
     view.setMaxListLength(maxListLength);
   }
+
+  @Override
+  public void setFacetSortConfig(FacetSortConfigViewEnum viewForConfig) {
+    view.setFacetSortConfig(viewForConfig);
+  }
 }
