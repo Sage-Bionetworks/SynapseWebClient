@@ -5,6 +5,7 @@ import java.util.List;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnFacetTypeViewEnum;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRow;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnTypeViewEnum;
+import org.sagebionetworks.web.client.widget.table.v2.schema.FacetSortConfigViewEnum;
 
 /**
  * Test helper stub of ColumnModelTableRow
@@ -24,6 +25,7 @@ public class ColumnModelTableRowStub implements ColumnModelTableRow {
   private SelectionPresenter selectionPresenter;
   private List<String> enumValues;
   private ColumnFacetTypeViewEnum facetType;
+  private FacetSortConfigViewEnum facetSortConfig;
 
   public String getColumnName() {
     return columnName;
@@ -173,5 +175,10 @@ public class ColumnModelTableRowStub implements ColumnModelTableRow {
   @Override
   public void setFacetType(ColumnFacetTypeViewEnum type) {
     this.facetType = type;
+  }
+
+  @Override
+  public void setFacetSortConfig(FacetSortConfigViewEnum viewForConfig) {
+    this.facetSortConfig = viewForConfig;
   }
 }
