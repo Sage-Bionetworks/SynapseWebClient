@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.v2.schema;
 
+import java.util.Objects;
 import org.sagebionetworks.repo.model.table.FacetColumnSortConfig;
 import org.sagebionetworks.repo.model.table.FacetColumnSortDirection;
 import org.sagebionetworks.repo.model.table.FacetColumnSortProperty;
@@ -56,10 +57,11 @@ public enum FacetSortConfigViewEnum {
   }
 
   /**
-   * Lookup the view for a type.
+   * Lookup the view for a facet column sort configuration.
    *
-   * @param type
-   * @return
+   * @param config the facet column sort configuration
+   * @return the corresponding FacetSortConfigViewEnum for the given configuration,
+   *         or FacetSortConfigViewEnum.None if the configuration is null
    */
   public static FacetSortConfigViewEnum getViewForConfig(
     FacetColumnSortConfig config
@@ -69,8 +71,8 @@ public enum FacetSortConfigViewEnum {
     }
     for (FacetSortConfigViewEnum view : FacetSortConfigViewEnum.values()) {
       if (
-        config.getDirection().equals(view.getDirection()) &&
-        config.getProperty().equals(view.getProperty())
+        Objects.equals(config.getDirection(), view.getDirection()) &&
+        Objects.equals(config.getProperty(), view.getProperty())
       ) {
         return view;
       }
