@@ -309,4 +309,9 @@ public class ColumnModelTableRowEditorViewImpl
     this.maxListLengthHelp.setVisible(false);
     this.maxListLengthHelp.setText("");
   }
+
+  @Override
+  public void setFacetSortConfig(FacetSortConfigViewEnum viewForConfig) {
+    // not yet implementing in GWT-based editor
+  }
 }

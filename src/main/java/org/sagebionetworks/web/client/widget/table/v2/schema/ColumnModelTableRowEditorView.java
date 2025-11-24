@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.table.v2.schema;
 
-import java.util.ArrayList;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
 
 /**

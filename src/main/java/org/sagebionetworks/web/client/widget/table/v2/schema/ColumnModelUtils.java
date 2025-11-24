@@ -52,6 +52,11 @@ public class ColumnModelUtils {
     row.setFacetType(
       ColumnFacetTypeViewEnum.getViewForType(model.getFacetType())
     );
+    if (model.getFacetSortConfig() != null) {
+      row.setFacetSortConfig(
+        FacetSortConfigViewEnum.getViewForConfig(model.getFacetSortConfig())
+      );
+    }
   }
 
   /**

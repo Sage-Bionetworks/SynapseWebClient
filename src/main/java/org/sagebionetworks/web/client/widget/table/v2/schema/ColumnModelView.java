@@ -106,4 +106,9 @@ public interface ColumnModelView {
    * @return
    */
   public List<String> getEnumValues();
+
+  /**
+   * See ColumnModel.facetSortConfig
+   */
+  public void setFacetSortConfig(FacetSortConfigViewEnum viewForConfig);
 }
