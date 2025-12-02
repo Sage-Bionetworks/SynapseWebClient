@@ -3965,7 +3965,8 @@ div.border {
 }
 
 @media (max-width: 768px) {
-  .MuiAlert-message .MuiTypography-root {
+  .FullWidthAlertDescription,
+  .FullWidthAlertDescription * {
     font-size: 12px !important;
     line-height: 16px !important;
   }
@@ -4020,11 +4021,9 @@ div.border {
   }
 }
 
-.cookieNotificationContainer {
-  .MuiAlert-message .MuiTypography-root:last-of-type {
-    @media (max-width: 768px) {
-      display: none;
-    }
+.child-minor-addendum {
+  @media (max-width: 768px) {
+    display: none;
   }
 }
 
