@@ -1703,17 +1703,6 @@ public class SynapseClientImpl
   }
 
   @Override
-  public String getAPIKey() throws RestServiceException {
-    org.sagebionetworks.client.SynapseClient synapseClient =
-      createSynapseClient();
-    try {
-      return synapseClient.retrieveApiKey();
-    } catch (SynapseException e) {
-      throw ExceptionUtil.convertSynapseException(e);
-    }
-  }
-
-  @Override
   public String sendMessage(
     Set<String> recipients,
     String subject,

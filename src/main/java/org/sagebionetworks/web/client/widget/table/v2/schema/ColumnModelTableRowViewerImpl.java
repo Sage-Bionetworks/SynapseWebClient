@@ -45,6 +45,9 @@ public class ColumnModelTableRowViewerImpl
   @UiField
   FormControlStatic restrictValues;
 
+  @UiField
+  FormControlStatic sortFacetValues;
+
   @Inject
   public ColumnModelTableRowViewerImpl(Binder uiBinder) {
     row = uiBinder.createAndBindUi(this);
@@ -138,5 +141,10 @@ public class ColumnModelTableRowViewerImpl
   @Override
   public void setFacetType(ColumnFacetTypeViewEnum type) {
     this.facetType.setText(type.toString());
+  }
+
+  @Override
+  public void setFacetSortConfig(FacetSortConfigViewEnum viewForConfig) {
+    sortFacetValues.setText(viewForConfig.toString());
   }
 }

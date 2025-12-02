@@ -112,14 +112,6 @@ pdfjs-document-properties-size-kb = { NUMBER($kb, maximumSignificantDigits: 3) }
 #   $mb (Number) - the PDF file size in megabytes
 #   $b (Number) - the PDF file size in bytes
 pdfjs-document-properties-size-mb = { NUMBER($mb, maximumSignificantDigits: 3) } МБ ({ $b } байт)
-# Variables:
-#   $size_kb (Number) - the PDF file size in kilobytes
-#   $size_b (Number) - the PDF file size in bytes
-pdfjs-document-properties-kb = { $size_kb } КБ ({ $size_b } байт)
-# Variables:
-#   $size_mb (Number) - the PDF file size in megabytes
-#   $size_b (Number) - the PDF file size in bytes
-pdfjs-document-properties-mb = { $size_mb } МБ ({ $size_b } байт)
 pdfjs-document-properties-title = Тақырыбы:
 pdfjs-document-properties-author = Авторы:
 pdfjs-document-properties-subject = Тақырыбы:
@@ -129,10 +121,6 @@ pdfjs-document-properties-modification-date = Түзету күні:
 # Variables:
 #   $dateObj (Date) - the creation/modification date and time of the PDF file
 pdfjs-document-properties-date-time-string = { DATETIME($dateObj, dateStyle: "short", timeStyle: "medium") }
-# Variables:
-#   $date (Date) - the creation/modification date of the PDF file
-#   $time (Time) - the creation/modification time of the PDF file
-pdfjs-document-properties-date-string = { $date }, { $time }
 pdfjs-document-properties-creator = Жасаған:
 pdfjs-document-properties-producer = PDF өндірген:
 pdfjs-document-properties-version = PDF нұсқасы:
@@ -275,10 +263,6 @@ pdfjs-rendering-error = Парақты өңдеу кезінде қате кет
 
 ## Annotations
 
-# Variables:
-#   $date (Date) - the modification date of the annotation
-#   $time (Time) - the modification time of the annotation
-pdfjs-annotation-date-string = { $date }, { $time }
 # .alt: This is used as a tooltip.
 # Variables:
 #   $type (String) - an annotation type from a list defined in the PDF spec
@@ -302,9 +286,13 @@ pdfjs-web-fonts-disabled = Веб қаріптері сөндірілген: қ�
 
 pdfjs-editor-free-text-button =
     .title = Мәтін
+pdfjs-editor-color-picker-free-text-input =
+    .title = Мәтін түсін өзгерту
 pdfjs-editor-free-text-button-label = Мәтін
 pdfjs-editor-ink-button =
     .title = Сурет салу
+pdfjs-editor-color-picker-ink-input =
+    .title = Сызба түсін өзгерту
 pdfjs-editor-ink-button-label = Сурет салу
 pdfjs-editor-stamp-button =
     .title = Суреттерді қосу немесе түзету
@@ -316,6 +304,27 @@ pdfjs-highlight-floating-button1 =
     .title = Ерекшелеу
     .aria-label = Ерекшелеу
 pdfjs-highlight-floating-button-label = Ерекшелеу
+pdfjs-comment-floating-button =
+    .title = Түсіндірме
+    .aria-label = Түсіндірме
+pdfjs-comment-floating-button-label = Түсіндірме
+pdfjs-editor-comment-button =
+    .title = Түсіндірме
+    .aria-label = Түсіндірме
+pdfjs-editor-comment-button-label = Түсіндірме
+pdfjs-editor-signature-button =
+    .title = Қолтаңбаны қосу
+pdfjs-editor-signature-button-label = Қолтаңбаны қосу
+
+## Default editor aria labels
+
+# Used when a signature editor is selected/hovered.
+# Variables:
+#   $description (String) - a string describing/labeling the signature.
+pdfjs-editor-signature-editor1 =
+    .aria-description = Қолтаңба түзеткіші: { $description }
+pdfjs-editor-stamp-editor =
+    .aria-label = Сурет редакторы
 
 ## Remove button for the various kind of editor.
 
@@ -327,6 +336,8 @@ pdfjs-editor-remove-stamp-button =
     .title = Суретті өшіру
 pdfjs-editor-remove-highlight-button =
     .title = Түспен ерекшелеуді өшіру
+pdfjs-editor-remove-signature-button =
+    .title = Қолтаңбаны өшіру
 
 ##
 
@@ -343,24 +354,39 @@ pdfjs-editor-stamp-add-image-button-label = Суретті қосу
 pdfjs-editor-free-highlight-thickness-input = Қалыңдығы
 pdfjs-editor-free-highlight-thickness-title =
     .title = Мәтіннен басқа элементтерді ерекшелеу кезінде қалыңдықты өзгерту
+pdfjs-editor-add-signature-container =
+    .aria-label = Қолтаңбаларды басқару және сақталған қолтаңбалар
+pdfjs-editor-signature-add-signature-button =
+    .title = Жаңа қолтаңбаны қосу
+pdfjs-editor-signature-add-signature-button-label = Жаңа қолтаңбаны қосу
+# Used on the button to use an already saved signature.
+# Variables:
+#   $description (String) - a string describing/labeling the signature.
+pdfjs-editor-add-saved-signature-button =
+    .title = Сақталған қолтаңба: { $description }
 # .default-content is used as a placeholder in an empty text editor.
 pdfjs-free-text2 =
     .aria-label = Мәтін түзеткіші
     .default-content = Теріп бастаңыз…
-pdfjs-free-text =
-    .aria-label = Мәтін түзеткіші
-pdfjs-free-text-default-content = Теруді бастау…
-pdfjs-ink =
-    .aria-label = Сурет түзеткіші
-pdfjs-ink-canvas =
-    .aria-label = Пайдаланушы жасаған сурет
+# Used to show how many comments are present in the pdf file.
+# Variables:
+#   $count (Number) - the number of comments.
+pdfjs-editor-comments-sidebar-title =
+    { $count ->
+        [one] Түсіндірмелер
+       *[other] Түсіндірмелер
+    }
+pdfjs-editor-comments-sidebar-close-button =
+    .title = Бүйір панелін жабу
+    .aria-label = Бүйір панелін жабу
+pdfjs-editor-comments-sidebar-close-button-label = Бүйір панелін жабу
+pdfjs-editor-comments-sidebar-no-comments-link = Көбірек білу
 
 ## Alt-text dialog
 
 pdfjs-editor-alt-text-button-label = Балама мәтін
 pdfjs-editor-alt-text-edit-button =
     .aria-label = Балама мәтінді өңдеу
-pdfjs-editor-alt-text-edit-button-label = Балама мәтінді өңдеу
 pdfjs-editor-alt-text-dialog-label = Опцияны таңдау
 pdfjs-editor-alt-text-dialog-description = Балама мәтін адамдар суретті көре алмағанда немесе ол жүктелмегенде көмектеседі.
 pdfjs-editor-alt-text-add-description-label = Сипаттаманы қосу
@@ -380,14 +406,6 @@ pdfjs-editor-alt-text-button =
 ## Editor resizers
 ## This is used in an aria label to help to understand the role of the resizer.
 
-pdfjs-editor-resizer-label-top-left = Жоғарғы сол жақ бұрыш — өлшемін өзгерту
-pdfjs-editor-resizer-label-top-middle = Жоғарғы ортасы — өлшемін өзгерту
-pdfjs-editor-resizer-label-top-right = Жоғарғы оң жақ бұрыш — өлшемін өзгерту
-pdfjs-editor-resizer-label-middle-right = Ортаңғы оң жақ — өлшемін өзгерту
-pdfjs-editor-resizer-label-bottom-right = Төменгі оң жақ бұрыш — өлшемін өзгерту
-pdfjs-editor-resizer-label-bottom-middle = Төменгі ортасы — өлшемін өзгерту
-pdfjs-editor-resizer-label-bottom-left = Төменгі сол жақ бұрыш — өлшемін өзгерту
-pdfjs-editor-resizer-label-middle-left = Ортаңғы сол жақ — өлшемін өзгерту
 pdfjs-editor-resizer-top-left =
     .aria-label = Жоғарғы сол жақ бұрыш — өлшемін өзгерту
 pdfjs-editor-resizer-top-middle =
@@ -453,7 +471,6 @@ pdfjs-editor-new-alt-text-error-close-button = Жабу
 # Variables:
 #   $totalSize (Number) - the total size (in MB) of the AI model.
 #   $downloadedSize (Number) - the downloaded size (in MB) of the AI model.
-#   $percent (Number) - the percentage of the downloaded size.
 pdfjs-editor-new-alt-text-ai-model-downloading-progress = Балама мәтін үшін ЖИ моделі жүктеп алынуда ({ $downloadedSize }/{ $totalSize } МБ)
     .aria-valuetext = Балама мәтін үшін ЖИ моделі жүктеп алынуда ({ $downloadedSize }/{ $totalSize } МБ)
 # This is a button that users can click to edit the alt text they have already added.
@@ -493,3 +510,122 @@ pdfjs-editor-alt-text-settings-editor-title = Баламалы мәтін ред
 pdfjs-editor-alt-text-settings-show-dialog-button-label = Суретті қосқанда балама мәтін редакторын бірден көрсету
 pdfjs-editor-alt-text-settings-show-dialog-description = Барлық суреттерде балама мәтін бар екеніне көз жеткізуге көмектеседі.
 pdfjs-editor-alt-text-settings-close-button = Жабу
+
+## Accessibility labels (announced by screen readers) for objects added to the editor.
+
+pdfjs-editor-freetext-added-alert = Мәтін қосылды
+pdfjs-editor-ink-added-alert = Сызба қосылды
+pdfjs-editor-stamp-added-alert = Сурет қосылды
+pdfjs-editor-signature-added-alert = Қолтаңба қосылды
+
+## "Annotations removed" bar
+
+pdfjs-editor-undo-bar-message-highlight = Ерекшелеу өшірілді
+pdfjs-editor-undo-bar-message-freetext = Мәтін өшірілді
+pdfjs-editor-undo-bar-message-ink = Сызба өшірілді
+pdfjs-editor-undo-bar-message-stamp = Сурет өшірілді
+pdfjs-editor-undo-bar-message-signature = Қолтаңба өшірілді
+# Variables:
+#   $count (Number) - the number of removed annotations.
+pdfjs-editor-undo-bar-message-multiple =
+    { $count ->
+        [one] { $count } анимация өшірілді
+       *[other] { $count } анимация өшірілді
+    }
+pdfjs-editor-undo-bar-undo-button =
+    .title = Болдырмау
+pdfjs-editor-undo-bar-undo-button-label = Болдырмау
+pdfjs-editor-undo-bar-close-button =
+    .title = Жабу
+pdfjs-editor-undo-bar-close-button-label = Жабу
+
+## Add a signature dialog
+
+pdfjs-editor-add-signature-dialog-label = Бұл модальді терезе пайдаланушыға PDF құжатына қосу үшін қолтаңба жасауға мүмкіндік береді. Пайдаланушы өз атын (ол балама мәтін ретінде де қолданылады) өңдей алады және қолтаңбаны кейін қайта пайдалану үшін сақтай алады.
+pdfjs-editor-add-signature-dialog-title = Қолтаңба қосу
+
+## Tab names
+
+# Type is a verb (you can type your name as signature)
+pdfjs-editor-add-signature-type-button = Енгізу
+    .title = Енгізу
+# Draw is a verb (you can draw your signature)
+pdfjs-editor-add-signature-draw-button = Сурет салу
+    .title = Сурет салу
+pdfjs-editor-add-signature-image-button = Сурет
+    .title = Сурет
+
+## Tab panels
+
+pdfjs-editor-add-signature-type-input =
+    .aria-label = Қолтаңбаңызды теріңіз
+    .placeholder = Қолтаңбаңызды теріңіз
+pdfjs-editor-add-signature-draw-placeholder = Қолтаңбаңызды сызыңыз
+pdfjs-editor-add-signature-draw-thickness-range-label = Қалыңдығы
+# Variables:
+#   $thickness (Number) - the thickness (in pixels) of the line used to draw a signature.
+pdfjs-editor-add-signature-draw-thickness-range =
+    .title = Сызба қалыңздығы: { $thickness }
+pdfjs-editor-add-signature-image-placeholder = Жүктеп жіберу үшін файлды осы жерге сүйреңіз
+pdfjs-editor-add-signature-image-browse-link =
+    { PLATFORM() ->
+        [macos] Немесе сурет файлдарын таңдаңыз
+       *[other] Немесе сурет файлдарын шолыңыз
+    }
+
+## Controls
+
+pdfjs-editor-add-signature-description-label = Сипаттама (балама мәтін)
+pdfjs-editor-add-signature-description-input =
+    .title = Сипаттама (балама мәтін)
+pdfjs-editor-add-signature-description-default-when-drawing = Қолтаңба
+pdfjs-editor-add-signature-clear-button-label = Қолтаңбаны өшіру
+pdfjs-editor-add-signature-clear-button =
+    .title = Қолтаңбаны өшіру
+pdfjs-editor-add-signature-save-checkbox = Қолтаңбаны сақтау
+pdfjs-editor-add-signature-save-warning-message = Сақталған 5 қолтаңбаның шегіне жеттіңіз. Көбірек сақтау үшін біреуін алып тастаңыз.
+pdfjs-editor-add-signature-image-upload-error-title = Суретті жүктеп жіберу мүмкін емес.
+pdfjs-editor-add-signature-image-upload-error-description = Желі байланысын тексеріңіз немесе басқа бейнені қолданып көріңіз.
+pdfjs-editor-add-signature-error-close-button = Жабу
+
+## Dialog buttons
+
+pdfjs-editor-add-signature-cancel-button = Бас тарту
+pdfjs-editor-add-signature-add-button = Қосу
+pdfjs-editor-edit-signature-update-button = Жаңарту
+
+##  Edit a comment dialog
+
+pdfjs-editor-edit-comment-actions-button-label = Әрекеттер
+pdfjs-editor-edit-comment-actions-button =
+    .title = Әрекеттер
+pdfjs-editor-edit-comment-close-button-label = Жабу
+pdfjs-editor-edit-comment-close-button =
+    .title = Жабу
+pdfjs-editor-edit-comment-actions-edit-button-label = Түзету
+pdfjs-editor-edit-comment-actions-delete-button-label = Өшіру
+pdfjs-editor-edit-comment-manager-text-input =
+    .placeholder = Пікіріңізді енгізіңіз
+pdfjs-editor-edit-comment-manager-cancel-button = Бас тарту
+pdfjs-editor-edit-comment-manager-save-button = Сақтау
+pdfjs-editor-edit-comment-dialog-save-button-when-editing = Жаңарту
+pdfjs-editor-edit-comment-dialog-cancel-button = Бас тарту
+
+## Edit a comment button in the editor toolbar
+
+pdfjs-editor-edit-comment-button =
+    .title = Пікірді түзету
+
+## Main menu for adding/removing signatures
+
+pdfjs-editor-delete-signature-button1 =
+    .title = Сақталған қолтаңбаны өшіру
+pdfjs-editor-delete-signature-button-label1 = Сақталған қолтаңбаны өшіру
+
+## Editor toolbar
+
+pdfjs-editor-add-signature-edit-button-label = Сипаттаманы түзету
+
+## Edit signature description dialog
+
+pdfjs-editor-edit-signature-dialog-title = Сипаттаманы түзету

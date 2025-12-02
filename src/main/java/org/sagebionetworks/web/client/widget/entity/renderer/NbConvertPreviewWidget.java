@@ -30,8 +30,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.asynch.PresignedURLAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
-public class NbConvertPreviewWidget
-  implements IsWidget, NbConvertPreviewView.Presenter {
+public class NbConvertPreviewWidget implements IsWidget {
 
   String nbConvertEndpoint;
   public static final String HTML_PREFIX =
@@ -40,7 +39,7 @@ public class NbConvertPreviewWidget
     "</head><body>";
   public static final String HTML_SUFFIX = "</body></html>";
 
-  protected NbConvertPreviewView view;
+  protected HtmlPreviewView view;
   protected PresignedURLAsyncHandler presignedURLAsyncHandler;
   protected FileHandleAssociation fha;
   protected SynapseAlert synAlert;
@@ -55,7 +54,7 @@ public class NbConvertPreviewWidget
 
   @Inject
   public NbConvertPreviewWidget(
-    NbConvertPreviewView view,
+    HtmlPreviewView view,
     PresignedURLAsyncHandler presignedURLAsyncHandler,
     SynapseJSNIUtils jsniUtils,
     RequestBuilderWrapper requestBuilder,
@@ -77,7 +76,6 @@ public class NbConvertPreviewWidget
     this.gwt = gwt;
     this.authController = authController;
     view.setSynAlert(synAlert);
-    view.setPresenter(this);
     if (friendlyMaxFileSize == null) {
       friendlyMaxFileSize =
         gwt.getFriendlySize(HtmlPreviewWidget.MAX_HTML_FILE_SIZE, true);
@@ -147,38 +145,8 @@ public class NbConvertPreviewWidget
 
   public void renderHTML(String rawHtml) {
     String wrappedRawHtml = HTML_PREFIX + rawHtml + HTML_SUFFIX;
-    synapseClient.isUserAllowedToRenderHTML(
-      createdBy,
-      new AsyncCallback<Boolean>() {
-        @Override
-        public void onFailure(Throwable caught) {
-          view.setLoadingVisible(false);
-          showSanitizedHtml();
-          jsniUtils.consoleError(caught.getMessage());
-        }
-
-        @Override
-        public void onSuccess(Boolean trustedUser) {
-          view.setLoadingVisible(false);
-          if (trustedUser) {
-            view.setHtml(wrappedRawHtml);
-          } else {
-            showSanitizedHtml();
-          }
-        }
-
-        private void showSanitizedHtml() {
-          // is the sanitized version the same as the original??
-          String sanitizedHtml = jsniUtils.sanitizeHtml(wrappedRawHtml);
-          if (wrappedRawHtml.equals(sanitizedHtml)) {
-            view.setHtml(wrappedRawHtml);
-          } else {
-            view.setHtml(sanitizedHtml);
-            view.setRawHtml(wrappedRawHtml);
-          }
-        }
-      }
-    );
+    view.setLoadingVisible(false);
+    view.configure(createdBy, wrappedRawHtml);
   }
 
   public void setPresignedUrl(String url) {
@@ -201,27 +169,6 @@ public class NbConvertPreviewWidget
       view.setLoadingVisible(false);
       synAlert.handleException(e);
     }
-  }
-
-  @Override
-  public void onShowFullContent() {
-    // in this case (ipynb), to show the full content they need to download the ipynb file and view it
-    // locally
-    presignedURLAsyncHandler.getFileResult(
-      fha,
-      new AsyncCallback<FileResult>() {
-        @Override
-        public void onSuccess(FileResult fileResult) {
-          view.openInNewWindow(fileResult.getPreSignedURL());
-        }
-
-        @Override
-        public void onFailure(Throwable ex) {
-          view.setLoadingVisible(false);
-          synAlert.handleException(ex);
-        }
-      }
-    );
   }
 
   protected RequestCallback getRequestCallback() {

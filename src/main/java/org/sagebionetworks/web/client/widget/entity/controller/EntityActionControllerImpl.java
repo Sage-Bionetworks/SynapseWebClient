@@ -1097,7 +1097,7 @@ public class EntityActionControllerImpl
     // (looking at a child entity)
     if (
       authenticationController.isLoggedIn() &&
-      !isTopLevelProjectToolsMenu(entityBundle.getEntity(), currentArea)
+      !hasProjectAreaContext(entityBundle.getEntity(), currentArea)
     ) {
       FluentFuture future = isACTMemberAsyncHandler.isACTActionAvailable();
       future.addCallback(
@@ -1274,8 +1274,7 @@ public class EntityActionControllerImpl
     boolean canEdit = permissions.getCanEdit();
     actionMenu.setActionVisible(Action.CREATE_OR_UPDATE_DOI, false);
     if (
-      canEdit &&
-      !isTopLevelProjectToolsMenu(entityBundle.getEntity(), currentArea)
+      canEdit && !hasProjectAreaContext(entityBundle.getEntity(), currentArea)
     ) {
       actionMenu.setActionListener(Action.CREATE_OR_UPDATE_DOI, this);
       actionMenu.setActionVisible(Action.CREATE_OR_UPDATE_DOI, true);
@@ -1574,7 +1573,7 @@ public class EntityActionControllerImpl
   private void configureLink() {
     if (
       isLinkType(entityBundle.getEntity()) &&
-      !isTopLevelProjectToolsMenu(entityBundle.getEntity(), currentArea)
+      !hasProjectAreaContext(entityBundle.getEntity(), currentArea)
     ) {
       actionMenu.setActionVisible(Action.CREATE_LINK, true);
       actionMenu.setActionListener(Action.CREATE_LINK, this);
@@ -1588,7 +1587,7 @@ public class EntityActionControllerImpl
   }
 
   private void configureAnnotations() {
-    if (isTopLevelProjectToolsMenu(entityBundle.getEntity(), currentArea)) {
+    if (hasProjectAreaContext(entityBundle.getEntity(), currentArea)) {
       actionMenu.setActionVisible(Action.SHOW_ANNOTATIONS, false);
     } else {
       actionMenu.setActionVisible(Action.SHOW_ANNOTATIONS, true);
@@ -1629,11 +1628,14 @@ public class EntityActionControllerImpl
     }
   }
 
+  /**
+   * Applies to both Project Tools menu and non-Project entity Tools menu.
+   **/
   private void configureShareThisPage() {
-    boolean showShare = !(entityBundle.getEntity() instanceof Project);
-    actionMenu.setActionVisible(Action.SHARE_THIS_PAGE, showShare);
-
-    if (showShare) {
+    if (hasProjectAreaContext(entityBundle.getEntity(), currentArea)) {
+      actionMenu.setActionVisible(Action.SHARE_THIS_PAGE, false);
+    } else {
+      actionMenu.setActionVisible(Action.SHARE_THIS_PAGE, true);
       actionMenu.setActionListener(
         Action.SHARE_THIS_PAGE,
         (action, event) -> {
@@ -1701,7 +1703,7 @@ public class EntityActionControllerImpl
   }
 
   private void configureActionMenuLayout() {
-    if (isTopLevelProjectToolsMenu(entity, currentArea)) {
+    if (hasProjectAreaContext(entity, currentArea)) {
       // use Area layout
       actionMenu.setLayout(
         DefaultEntityActionMenuLayoutUtil.getLayout(currentArea)
@@ -1717,7 +1719,7 @@ public class EntityActionControllerImpl
   }
 
   private void configureDeleteAction() {
-    if (isTopLevelProjectToolsMenu(entityBundle.getEntity(), currentArea)) {
+    if (hasProjectAreaContext(entityBundle.getEntity(), currentArea)) {
       actionMenu.setActionVisible(Action.DELETE_ENTITY, false);
     } else {
       actionMenu.setActionVisible(
@@ -1748,7 +1750,7 @@ public class EntityActionControllerImpl
   }
 
   private void configureShareAction() {
-    if (isTopLevelProjectToolsMenu(entityBundle.getEntity(), currentArea)) {
+    if (hasProjectAreaContext(entityBundle.getEntity(), currentArea)) {
       actionMenu.setActionVisible(Action.VIEW_SHARING_SETTINGS, false);
     } else {
       actionMenu.setActionVisible(Action.VIEW_SHARING_SETTINGS, true);
@@ -1791,7 +1793,7 @@ public class EntityActionControllerImpl
     );
   }
 
-  public boolean isTopLevelProjectToolsMenu(Entity entity, EntityArea area) {
+  public boolean hasProjectAreaContext(Entity entity, EntityArea area) {
     return entity instanceof Project && area != null;
   }
 

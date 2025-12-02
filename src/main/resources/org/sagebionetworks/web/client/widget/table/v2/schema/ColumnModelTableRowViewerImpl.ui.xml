@@ -31,5 +31,8 @@
     <t:TableData>
       <b:FormControlStatic ui:field="facetType" />
     </t:TableData>
+    <t:TableData>
+      <b:FormControlStatic ui:field="sortFacetValues" />
+    </t:TableData>
   </t:TableRow>
 </ui:UiBinder>
