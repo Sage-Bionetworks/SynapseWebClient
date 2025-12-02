@@ -3964,6 +3964,13 @@ div.border {
   }
 }
 
+@media (max-width: 768px) {
+  .MuiAlert-message .MuiTypography-root {
+    font-size: 12px !important;
+    line-height: 16px !important;
+  }
+}
+
 .FacetColumnResultValueWidget {
   display: grid;
   grid-template-columns: 25px auto 50px;
@@ -4007,6 +4014,18 @@ div.border {
 #body .nihNotificationAlert .FullWidthAlert {
   margin: 0px;
   padding: 15px;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+}
+
+.cookieNotificationContainer {
+  .MuiAlert-message .MuiTypography-root:last-of-type {
+    @media (max-width: 768px) {
+      display: none;
+    }
+  }
 }
 
 // swc.css list styles override MUI list styles
