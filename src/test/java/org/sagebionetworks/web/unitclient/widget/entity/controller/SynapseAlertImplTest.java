@@ -198,19 +198,7 @@ public class SynapseAlertImplTest {
     verify(mockView).clearState();
     verify(mockView).showError(errorMessage);
 
-    verify(mockJsniUtils)
-      .showJiraIssueCollector(
-        eq(""),
-        anyString(),
-        eq(SWC_ISSUE_COLLECTOR_URL),
-        eq(USER_ID),
-        eq(DisplayUtils.getDisplayName(FIRST_NAME, LAST_NAME, USERNAME)),
-        eq(WebConstants.ANONYMOUS), // not included
-        eq(""),
-        eq(""),
-        eq(""),
-        eq(ISSUE_PRIORITY_MINOR)
-      );
+    verify(mockView).setServiceDeskButtonVisible(true);
   }
 
   @Test
