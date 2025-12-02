@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Widget;
 
 /**
  * Abstraction for the view
@@ -28,4 +27,6 @@ public interface SynapseAlertView extends IsWidget {
   void reload();
 
   void setRetryButtonVisible(boolean visible);
+
+  void setServiceDeskButtonVisible(boolean visible);
 }
