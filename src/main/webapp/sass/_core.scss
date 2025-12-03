@@ -4021,12 +4021,6 @@ div.border {
   }
 }
 
-.child-minor-addendum {
-  @media (max-width: 768px) {
-    display: none;
-  }
-}
-
 // swc.css list styles override MUI list styles
 // Re-specify MUI list style here
 .accessRequirementRelatedProjectsListContainer > div {
