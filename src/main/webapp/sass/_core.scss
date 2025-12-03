@@ -3964,14 +3964,6 @@ div.border {
   }
 }
 
-@media (max-width: 768px) {
-  .FullWidthAlertDescription,
-  .FullWidthAlertDescription * {
-    font-size: 12px !important;
-    line-height: 16px !important;
-  }
-}
-
 .FacetColumnResultValueWidget {
   display: grid;
   grid-template-columns: 25px auto 50px;
