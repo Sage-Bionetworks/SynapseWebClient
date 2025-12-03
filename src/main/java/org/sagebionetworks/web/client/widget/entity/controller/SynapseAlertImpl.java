@@ -1,13 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
 import static org.sagebionetworks.web.client.ClientProperties.DEFAULT_PLACE_TOKEN;
-import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_DESCRIPTION_PART_1;
-import static org.sagebionetworks.web.shared.WebConstants.ISSUE_PRIORITY_MINOR;
 
 import com.google.gwt.user.client.rpc.StatusCodeException;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -18,7 +15,6 @@ import org.sagebionetworks.web.client.exceptions.WebClientConfigurationException
 import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ConflictingUpdateException;
 import org.sagebionetworks.web.shared.exceptions.DeprecatedServiceException;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
@@ -118,9 +114,7 @@ public class SynapseAlertImpl implements SynapseAlert {
       // An unknown error occurred.
       // Exception handling on the backend now throws the reason into the exception message. Easy!
       view.showError(message);
-      if (isLoggedIn) {
-        onCreateJiraIssue(message);
-      }
+      view.setServiceDeskButtonVisible(true);
     } else {
       // not recognized
       if (message == null || message.isEmpty() || message.equals("0")) {
@@ -139,34 +133,6 @@ public class SynapseAlertImpl implements SynapseAlert {
 
       view.showError(message);
     }
-  }
-
-  public void onCreateJiraIssue(String errorMessage) {
-    String userId = WebConstants.ANONYMOUS, email =
-      WebConstants.ANONYMOUS, displayName = WebConstants.ANONYMOUS;
-    UserProfile userProfile = authController.getCurrentUserProfile();
-    if (userProfile != null) {
-      userId = userProfile.getOwnerId();
-      displayName = DisplayUtils.getDisplayName(userProfile);
-    }
-    String description =
-      FLAG_ISSUE_DESCRIPTION_PART_1 +
-      gwt.getCurrentURL() +
-      "\n\n" +
-      errorMessage;
-
-    jsniUtils.showJiraIssueCollector(
-      "",
-      description,
-      WebConstants.SWC_ISSUE_COLLECTOR_URL,
-      userId,
-      displayName,
-      email,
-      "",
-      "",
-      "",
-      ISSUE_PRIORITY_MINOR
-    );
   }
 
   @Override

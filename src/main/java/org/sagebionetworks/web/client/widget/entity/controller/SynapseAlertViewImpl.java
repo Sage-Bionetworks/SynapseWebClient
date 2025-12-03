@@ -29,19 +29,16 @@ public class SynapseAlertViewImpl implements SynapseAlertView {
 
   public SynapseAlertViewImpl() {}
 
+  public ClickHandler reloadClickHandler = event -> {
+    reload();
+  };
+
   private void lazyConstruct() {
     if (widget == null) {
       synapseAlertContainer.setVisible(false);
       widget = uiBinder.createAndBindUi(this);
       synapseAlertContainer.add(widget);
-      alert.addPrimaryCTAClickHandler(
-        new ClickHandler() {
-          @Override
-          public void onClick(ClickEvent event) {
-            reload();
-          }
-        }
-      );
+      alert.addPrimaryCTAClickHandler(reloadClickHandler);
 
       clearState();
     }
@@ -51,6 +48,20 @@ public class SynapseAlertViewImpl implements SynapseAlertView {
   public void setRetryButtonVisible(boolean visible) {
     lazyConstruct();
     alert.setPrimaryCTAText(visible ? "Retry" : null);
+    alert.addPrimaryCTAClickHandler(reloadClickHandler);
+  }
+
+  @Override
+  public void setServiceDeskButtonVisible(boolean visible) {
+    lazyConstruct();
+    alert.setPrimaryCTAText(visible ? "Report Issue" : null);
+    alert.addPrimaryCTAClickHandler(event -> {
+      Window.open(
+        "https://sagebionetworks.jira.com/servicedesk/customer/portal/9/group/16/create/84",
+        "_blank",
+        ""
+      );
+    });
   }
 
   @Override
