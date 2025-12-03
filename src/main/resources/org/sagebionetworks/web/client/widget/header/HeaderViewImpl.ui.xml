@@ -52,7 +52,7 @@
         />
       </bh:Div>
     </b:Alert>
-    <w:ReactComponent ui:field="cookieNotificationContainer"  />
+    <w:ReactComponent ui:field="cookieNotificationContainer" />
     <w:ReactComponent ui:field="googleAnalyticsContainer" />
     <w:FullWidthAlert
       ui:field="nihNotificationAlert"
