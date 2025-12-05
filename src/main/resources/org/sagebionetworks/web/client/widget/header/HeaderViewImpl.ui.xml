@@ -21,6 +21,7 @@
       marginLeft="0"
       marginBottom="0"
       marginTop="0"
+      addStyleNames="FullWidthAlertDescription"
     >
       <bh:Div width="100%" addStyleNames="flexcontainer-row" marginTop="5">
         <bh:Span

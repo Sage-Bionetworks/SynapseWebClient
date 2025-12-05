@@ -15,6 +15,7 @@ import * as ReactQuery from '@tanstack/react-query'
 import * as SRC from 'synapse-react-client'
 import './mui.js'
 import './globalContext.js'
+// import '../src/main/webapp/sass/swc.scss' TODO: SWC-7502
 
 // Append to global scope so these libraries can be accessed in JsInterop classes
 

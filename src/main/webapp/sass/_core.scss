@@ -4007,6 +4007,10 @@ div.border {
 #body .nihNotificationAlert .FullWidthAlert {
   margin: 0px;
   padding: 15px;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 }
 
 // swc.css list styles override MUI list styles
