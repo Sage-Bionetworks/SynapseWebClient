@@ -15,7 +15,8 @@ import * as ReactQuery from '@tanstack/react-query'
 import * as SRC from 'synapse-react-client'
 import './mui.js'
 import './globalContext.js'
-// import '../src/main/webapp/sass/swc.scss' TODO: SWC-7502
+// Import SWC styles. Vite will compile and handle SCSS now.
+import '../src/main/webapp/sass/swc.scss'
 
 // Append to global scope so these libraries can be accessed in JsInterop classes
 
