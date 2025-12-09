@@ -11,6 +11,7 @@ extras/
 /.externalToolBuilders/
 /.sass-cache/
 .idea/*
+e2e/**/*-snapshots/
 
 src/main/main.iml
 src/test/test.iml
