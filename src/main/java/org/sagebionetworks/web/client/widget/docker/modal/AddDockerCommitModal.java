@@ -1,10 +1,12 @@
 package org.sagebionetworks.web.client.widget.docker.modal;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.inject.Inject;
 import org.sagebionetworks.repo.model.docker.DockerCommit;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
@@ -17,6 +19,7 @@ public class AddDockerCommitModal
   private AddDockerCommitModalView view;
   private SynapseAlert synAlert;
   private SynapseJavascriptClient jsClient;
+  private EventBus eventBus;
   private String dockerRepoId;
   private Callback commitAddedCallback;
 
@@ -24,11 +27,13 @@ public class AddDockerCommitModal
   public AddDockerCommitModal(
     AddDockerCommitModalViewImpl view,
     SynapseAlert synAlert,
-    SynapseJavascriptClient jsClient
+    SynapseJavascriptClient jsClient,
+    EventBus eventBus
   ) {
     this.view = view;
     this.synAlert = synAlert;
     this.jsClient = jsClient;
+    this.eventBus = eventBus;
     view.setPresenter(this);
     view.setAlert(synAlert.asWidget());
     view.setModalTitle(ADD_DOCKER_COMMIT_MODAL_TITLE);
@@ -67,6 +72,7 @@ public class AddDockerCommitModal
         @Override
         public void onSuccess(Void result) {
           view.hide();
+          eventBus.fireEvent(new EntityUpdatedEvent(dockerRepoId));
           if (commitAddedCallback != null) {
             commitAddedCallback.invoke();
           }
