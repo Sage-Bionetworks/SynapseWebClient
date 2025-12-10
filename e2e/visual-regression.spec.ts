@@ -22,7 +22,7 @@ import { waitForInitialPageLoad } from './helpers/utils'
  *    pnpm playwright test visual-regression
  *
  * 3. View differences:
- *    pnpm e2e:report
+ *    pnpm e2e:report or pnpm exec playwright show-report
  *
  * NOTE: Accessibility snapshots track violations to ensure no NEW violations
  * are introduced by your changes. Existing violations are preserved.

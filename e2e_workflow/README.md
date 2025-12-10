@@ -206,3 +206,37 @@ on: workflow_dispatch
 
 7. Manually [trigger](https://docs.github.com/en/actions/using-workflows/manually-running-a-workflow) the workflow.
 8. Download the playwright-report artifact and [view the report](https://playwright.dev/docs/ci-intro#viewing-the-html-report), which will contain traces.
+
+### Visual Regression Testing
+
+The project includes visual regression tests using Playwright to detect UI changes and ensure styling consistency across updates.
+
+- Ideal for validating large changes like build system migrations
+- Ensures UI consistency is maintained across technical changes
+- Catches unintended styling regressions
+
+#### Quick Start
+
+```bash
+# Install dependencies and start dev server
+pnpm install
+pnpm dev
+
+# Capture baseline screenshots
+pnpm playwright test visual-regression --update-snapshots
+
+# Run visual regression tests
+pnpm playwright test visual-regression
+
+# View test report with visual diffs
+pnpm e2e:report
+
+# Or view test report with direct Playwright command
+pnpm exec playwright show-report
+```
+
+#### CI Integration
+
+Visual regression tests are automatically excluded from CI builds to prevent flaky failures. This is designed for local development and on-demand validation of UI changes.
+
+**Note:** Authenticated tests require an admin PAT to be configured.

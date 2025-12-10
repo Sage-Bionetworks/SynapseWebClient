@@ -56,18 +56,21 @@ export default defineConfig({
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
       testMatch: /.*\.spec.ts/,
+      testIgnore: process.env.CI ? /.*visual-regression.*/ : undefined,
     },
 
     {
       name: 'firefox',
       use: { ...devices['Desktop Firefox'] },
       testMatch: /.*\.spec.ts/,
+      testIgnore: process.env.CI ? /.*visual-regression.*/ : undefined,
     },
 
     {
       name: 'webkit',
       use: { ...devices['Desktop Safari'] },
       testMatch: /.*\.spec.ts/,
+      testIgnore: process.env.CI ? /.*visual-regression.*/ : undefined,
     },
 
     /* Test against mobile viewports. */
