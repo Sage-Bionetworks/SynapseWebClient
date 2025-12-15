@@ -19,7 +19,7 @@ public class SearchV2Presenter
   public SearchV2Presenter(SearchV2View view, SynapseJSNIUtils jsniUtils) {
     this.view = view;
 
-    jsniUtils.setPageTitle(DisplayConstants.WORKING_COPY);
+    jsniUtils.setPageTitle(DisplayConstants.LABEL_SEARCH);
   }
 
   @Override
