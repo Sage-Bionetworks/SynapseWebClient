@@ -105,6 +105,8 @@ import org.sagebionetworks.web.client.view.PlansView;
 import org.sagebionetworks.web.client.view.PlansViewImpl;
 import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.client.view.ProfileViewImpl;
+import org.sagebionetworks.web.client.view.SearchV2View;
+import org.sagebionetworks.web.client.view.SearchV2ViewImpl;
 import org.sagebionetworks.web.client.view.SearchView;
 import org.sagebionetworks.web.client.view.SearchViewImpl;
 import org.sagebionetworks.web.client.view.SignedTokenView;
@@ -1627,6 +1629,7 @@ public class PortalGinModule extends AbstractGinModule {
     bind(SearchAnalyticsClient.class).to(SearchAnalyticsClientImpl.class);
 
     bind(GridPageView.class).to(GridPageViewImpl.class).in(Singleton.class);
+    bind(SearchV2View.class).to(SearchV2ViewImpl.class).in(Singleton.class);
     bind(CreateGridSessionDialog.class).to(CreateGridSessionDialogImpl.class);
     bind(EntityCitation.class).to(EntityCitationImpl.class);
     bind(ShareThisPage.class).to(ShareThisPageImpl.class);

@@ -43,6 +43,7 @@ import org.sagebionetworks.web.client.presenter.PlansPresenter;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.presenter.QuizPresenter;
 import org.sagebionetworks.web.client.presenter.SearchPresenter;
+import org.sagebionetworks.web.client.presenter.SearchV2Presenter;
 import org.sagebionetworks.web.client.presenter.SignedTokenPresenter;
 import org.sagebionetworks.web.client.presenter.SubscriptionPresenter;
 import org.sagebionetworks.web.client.presenter.SynapseForumPresenter;
@@ -328,6 +329,8 @@ public interface PortalGinInjector extends Ginjector {
   HelpPresenter getHelpPresenter();
 
   SearchPresenter getSearchPresenter();
+
+  SearchV2Presenter getSearchV2Presenter();
 
   SynapseWikiPresenter getSynapseWikiPresenter();
 
