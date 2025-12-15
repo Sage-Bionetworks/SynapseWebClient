@@ -11,7 +11,7 @@ public class SearchV2Place extends Place {
 
   public SearchV2Place(String token) {
     if (token != null && !token.startsWith("default")) {
-      // Redirect /SearchV2:{token} to /SearchV2:default
+      // Redirect /SearchV2:{token} to /SearchV2:default?query={token}
       Window.Location.assign("/SearchV2:default?" + QUERY + "=" + token);
     }
   }
