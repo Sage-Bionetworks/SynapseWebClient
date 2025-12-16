@@ -3,6 +3,8 @@ import AxeBuilder from '@axe-core/playwright'
 import { testAuth } from './fixtures/authenticatedUserPages'
 import { getUserIdFromLocalStorage } from './helpers/testUser'
 import { waitForInitialPageLoad } from './helpers/utils'
+import { Project } from './helpers/types'
+import { setupProjectWithPermissions } from './helpers/setupTeardown'
 
 /**
  *
@@ -35,19 +37,28 @@ async function testPageVisualAndAccessibility(
   page: Page,
   url: string,
   name: string,
-  options: { fullPage?: boolean; waitTime?: number } = {},
+  options: { fullPage?: boolean; waitTime?: number; selector?: string } = {},
 ) {
-  const { fullPage = true, waitTime = 500 } = options
+  const { fullPage = true, waitTime = 500, selector } = options
+  console.log('url:', url)
 
   await page.goto(url)
   await waitForInitialPageLoad(page)
   await page.waitForTimeout(waitTime)
 
   // Visual regression test
-  await expect(page).toHaveScreenshot(`${name}.png`, {
-    fullPage,
-    maxDiffPixelRatio: 0.01,
-  })
+  if (selector) {
+    // Wait for the specific element and take screenshot of it
+    await page.waitForSelector(selector, { timeout: 10000 })
+    const element = page.locator(selector)
+    await expect(element).toHaveScreenshot(`${name}.png`)
+  } else {
+    // Take full page or partial page screenshot
+    await expect(page).toHaveScreenshot(`${name}.png`, {
+      fullPage,
+      maxDiffPixelRatio: 0.01,
+    })
+  }
 
   // Accessibility snapshot
   const accessibilityScanResults = await new AxeBuilder({ page }).analyze()
@@ -102,6 +113,17 @@ test.describe('Visual Regression & Accessibility - Unauthenticated Pages', () =>
 testAuth.describe(
   'Visual Regression & Accessibility - Authenticated Pages',
   () => {
+    let userProject: Project
+
+    testAuth.beforeAll(async ({ browser, storageStatePaths }) => {
+      userProject = await setupProjectWithPermissions(
+        browser,
+        'swc-e2e-user',
+        'swc-e2e-user-validated',
+        storageStatePaths,
+      )
+    })
+
     // To test the below, you need an admin account for the dev stack.
     testAuth('dashboard', async ({ userPage }) => {
       await testPageVisualAndAccessibility(
@@ -111,35 +133,37 @@ testAuth.describe(
       )
     })
 
-    testAuth('projects page', async ({ userPage }) => {
-      const userId = await getUserIdFromLocalStorage(userPage)
-      await testPageVisualAndAccessibility(
-        userPage,
-        `/Profile:${userId}/projects/all`,
-        'projects',
-        { waitTime: longerWaitTime },
-      )
-    })
-
     // Helper to capture screenshots of various button interactions
     const pageButtonInteractions = async (
       userPage: Page,
       name: string,
       screenshotName: string,
+      selector?: string,
     ) => {
-      const button = userPage.getByRole('button', {
-        name: `${name}`,
-        exact: true,
-      })
+      // If selector is provided, scope button search to that area to avoid navigation conflicts
+      const button = selector
+        ? userPage.locator(selector).getByRole('button', {
+            name: new RegExp(`${name}`, 'i'),
+          })
+        : userPage.getByRole('button', {
+            name: new RegExp(`${name}`, 'i'),
+          })
 
       // Check if button exists before trying to click
       if (await button.isVisible({ timeout: 3000 })) {
         await button.click()
         await userPage.waitForTimeout(500)
 
-        await expect(userPage).toHaveScreenshot(screenshotName, {
-          maxDiffPixelRatio: 0.01,
-        })
+        if (selector) {
+          // Focus screenshot on the specified element
+          const element = userPage.locator(selector)
+          await expect(element).toHaveScreenshot(screenshotName)
+        } else {
+          // Take full page screenshot
+          await expect(userPage).toHaveScreenshot(screenshotName, {
+            maxDiffPixelRatio: 0.01,
+          })
+        }
 
         await userPage.keyboard.press('Escape')
         await userPage.waitForTimeout(300)
@@ -150,24 +174,96 @@ testAuth.describe(
       }
     }
 
-    testAuth('projects page interactions', async ({ userPage }) => {
+    testAuth('projects page', async ({ userPage }) => {
       const userId = await getUserIdFromLocalStorage(userPage)
-      await userPage.goto(`/Profile:${userId}/projects/all`)
-      await waitForInitialPageLoad(userPage)
-      await userPage.waitForTimeout(longerWaitTime)
+      await testPageVisualAndAccessibility(
+        userPage,
+        `/Profile:${userId}/projects/all`,
+        'projects',
+        {
+          waitTime: longerWaitTime,
+          selector: '#rootPanel .rootPanel .ProfileViewImpl',
+        },
+      )
 
+      // Test button interactions
       const pageButtons = [
         'Created by me',
-        'Favorites', // clicking the wrong fav rn, in nav bar
-        'Shared with me',
-        'By Team',
-        'Create a new project',
+        'Favorites',
+        'Shared directly with me',
+        'Create a New Project',
       ]
 
       for (const buttonName of pageButtons) {
         const screenshotName = `projects-${buttonName.toLowerCase().replace(/\s+/g, '-')}-clicked.png`
 
-        await pageButtonInteractions(userPage, buttonName, screenshotName)
+        await pageButtonInteractions(
+          userPage,
+          buttonName,
+          screenshotName,
+          '#rootPanel .rootPanel .ProfileViewImpl',
+        )
+      }
+    })
+
+    testAuth('project page', async ({ userPage }) => {
+      // Navigate to the created project page
+      await testPageVisualAndAccessibility(
+        userPage,
+        `/Synapse:${userProject.id}/wiki/`,
+        'project-page',
+        {
+          waitTime: longerWaitTime,
+          selector: '#rootPanel .rootPanel',
+        },
+      )
+
+      // Test project tab interactions
+      const projectTabs = [
+        'Wiki',
+        'Files',
+        'Datasets',
+        'Tables',
+        'Discussion',
+        'Docker',
+      ]
+
+      for (const tabName of projectTabs) {
+        const screenshotName = `project-${tabName.toLowerCase()}-tab.png`
+
+        await pageButtonInteractions(
+          userPage,
+          tabName,
+          screenshotName,
+          '#rootPanel .rootPanel',
+        )
+      }
+
+      // Test project tools dropdown if present
+      const projectToolsButton = userPage
+        .locator('#rootPanel .rootPanel')
+        .getByRole('button', {
+          name: /Project Tools/i,
+        })
+
+      if (await projectToolsButton.isVisible({ timeout: 3000 })) {
+        await projectToolsButton.click()
+        await userPage.waitForTimeout(500)
+
+        const element = userPage.locator('#rootPanel .rootPanel')
+        await expect(element).toHaveScreenshot('project-tools-dropdown.png')
+
+        await userPage.keyboard.press('Escape')
+        await userPage.waitForTimeout(300)
+      }
+    })
+
+    testAuth.afterAll(async ({ browser }) => {
+      if (userProject?.id) {
+        const { teardownProjectsAndFileHandles } = await import(
+          './helpers/setupTeardown'
+        )
+        await teardownProjectsAndFileHandles(browser, [userProject], [])
       }
     })
 
