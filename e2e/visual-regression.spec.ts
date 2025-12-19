@@ -91,11 +91,19 @@ async function testPageVisualAndAccessibility(
   // Accessibility snapshot
   const accessibilityScanResults = await new AxeBuilder({ page }).analyze()
 
-  const violationsJson = JSON.stringify(
-    accessibilityScanResults.violations,
-    null,
-    2,
+  // Normalize dynamic CSS class names to prevent false failures between builds
+  const normalizedViolations = accessibilityScanResults.violations.map(
+    violation => ({
+      ...violation,
+      nodes: violation.nodes.map(node => ({
+        ...node,
+        html:
+          node.html?.replace(/css-[a-z0-9]+-/g, 'css-NORMALIZED-') || node.html,
+      })),
+    }),
   )
+
+  const violationsJson = JSON.stringify(normalizedViolations, null, 2)
 
   expect(violationsJson).toMatchSnapshot(`${name}-a11y.json`)
 }
@@ -683,6 +691,16 @@ testAuth.describe('Authenticated Pages', () => {
     await userPage.getByRole('button', { name: 'Your Account' }).click()
     await userPage.waitForSelector('[role="button"]', { state: 'visible' })
     await userPage.waitForTimeout(500)
+
+    // Hide dynamic username text to prevent false failures
+    await userPage.addStyleTag({
+      content: `
+        /* Hide username text that varies between test runs */
+        .header {
+          visibility: hidden !important;
+        }
+      `,
+    })
 
     await expect(userPage).toHaveScreenshot('your-account-sidebar.png', {
       maxDiffPixelRatio: MAX_DIFF_PIXEL_RATIO,
