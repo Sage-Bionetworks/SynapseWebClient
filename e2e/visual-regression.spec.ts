@@ -1,5 +1,6 @@
 import { expect, Page, test } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
+import { v4 as uuidv4 } from 'uuid'
 import { testAuth } from './fixtures/authenticatedUserPages'
 import { getUserIdFromLocalStorage } from './helpers/testUser'
 import { waitForInitialPageLoad } from './helpers/utils'
@@ -7,9 +8,12 @@ import { Project } from './helpers/types'
 import { setupProjectWithPermissions } from './helpers/setupTeardown'
 
 /**
+ * ======================================================
+ * Visual Regression & Accessibility Tests
+ * ======================================================
  *
- * Visual regression and accessibility tests to detect styling and UI differences
- * between branches.
+ * Visual regression testing is used to identify unintended visual and accessibility
+ * differences in the UI by comparing screenshots across branches.
  *
  * USAGE:
  *
@@ -30,9 +34,35 @@ import { setupProjectWithPermissions } from './helpers/setupTeardown'
  * are introduced by your changes. Existing violations are preserved.
  */
 
-/**
- * Reusable helper to test a page for visual and accessibility regressions
- */
+// ======================================================
+// Constants
+// ======================================================
+const LONGER_WAIT_TIME = 2000
+const PAGE_SELECTOR = '#rootPanel .rootPanel'
+const MAX_DIFF_PIXEL_RATIO = 0.01
+
+// ======================================================
+// Shared Test Helpers
+// ======================================================
+
+const formatScreenshotName = (
+  prefix: string,
+  action: string,
+  suffix = 'png',
+) => {
+  return `${prefix}-${action.toLowerCase().replace(/\s+/g, '-')}.${suffix}`
+}
+
+const navigateToProjectTab = async (
+  page: Page,
+  projectId: string,
+  tab: string,
+) => {
+  await page.goto(`/Synapse:${projectId}/${tab}/`)
+  await waitForInitialPageLoad(page)
+  await page.waitForTimeout(LONGER_WAIT_TIME)
+}
+
 async function testPageVisualAndAccessibility(
   page: Page,
   url: string,
@@ -40,13 +70,11 @@ async function testPageVisualAndAccessibility(
   options: { fullPage?: boolean; waitTime?: number; selector?: string } = {},
 ) {
   const { fullPage = true, waitTime = 500, selector } = options
-  console.log('url:', url)
 
   await page.goto(url)
   await waitForInitialPageLoad(page)
   await page.waitForTimeout(waitTime)
 
-  // Visual regression test
   if (selector) {
     // Wait for the specific element and take screenshot of it
     await page.waitForSelector(selector, { timeout: 10000 })
@@ -56,7 +84,7 @@ async function testPageVisualAndAccessibility(
     // Take full page or partial page screenshot
     await expect(page).toHaveScreenshot(`${name}.png`, {
       fullPage,
-      maxDiffPixelRatio: 0.01,
+      maxDiffPixelRatio: MAX_DIFF_PIXEL_RATIO,
     })
   }
 
@@ -72,9 +100,122 @@ async function testPageVisualAndAccessibility(
   expect(violationsJson).toMatchSnapshot(`${name}-a11y.json`)
 }
 
-const longerWaitTime = 2000
+const pageElementInteractions = async (
+  userPage: Page,
+  name: string,
+  screenshotName: string,
+  options: {
+    selector?: string
+    elementType?: 'button' | 'link' | 'menuitem'
+    exact?: boolean
+    needsEscape?: boolean
+  } = {},
+) => {
+  const {
+    selector,
+    elementType = 'button',
+    exact = false,
+    needsEscape = elementType === 'button',
+  } = options
 
-test.describe('Visual Regression & Accessibility - Unauthenticated Pages', () => {
+  // If selector is provided, scope element search to that area to avoid navigation conflicts
+  const element = selector
+    ? userPage.locator(selector).getByRole(elementType, {
+        name: exact ? name : new RegExp(`${name}`, 'i'),
+        exact,
+      })
+    : userPage.getByRole(elementType, {
+        name: exact ? name : new RegExp(`${name}`, 'i'),
+        exact,
+      })
+
+  // Use first() for links to avoid strict mode violations with multiple matches
+  const targetElement = elementType === 'link' ? element.first() : element
+
+  // Check if element exists before trying to click
+  if (await targetElement.isVisible({ timeout: 3000 })) {
+    await targetElement.click()
+    await userPage.waitForTimeout(500)
+
+    if (selector) {
+      const screenshotElement = userPage.locator(selector)
+      await expect(screenshotElement).toHaveScreenshot(screenshotName)
+    } else {
+      // Take full page screenshot
+      await expect(userPage).toHaveScreenshot(screenshotName, {
+        maxDiffPixelRatio: MAX_DIFF_PIXEL_RATIO,
+      })
+    }
+
+    if (needsEscape) {
+      await userPage.keyboard.press('Escape')
+      await userPage.waitForTimeout(300)
+    }
+
+    return true
+  } else {
+    console.log(`${elementType} "${name}" not found or not visible`)
+    return false
+  }
+}
+
+const testDropdownActions = async (
+  page: Page,
+  triggerButton: string,
+  actions: string[],
+  options: {
+    selector?: string
+    screenshotPrefix: string
+    elementType?: 'button' | 'link' | 'menuitem'
+    exact?: boolean
+  },
+) => {
+  for (const actionName of actions) {
+    // Click trigger button to open dropdown
+    const triggerElement = options.selector
+      ? page
+          .locator(options.selector)
+          .getByRole('button', { name: triggerButton })
+      : page.getByRole('button', { name: triggerButton })
+
+    await triggerElement.click()
+    await page.waitForTimeout(500) // Longer wait for dropdown to appear
+
+    // Generate proper screenshot name
+    const screenshotName = `${options.screenshotPrefix}-${actionName.toLowerCase().replace(/\s+/g, '-')}.png`
+
+    // Find and click dropdown item
+    const dropdownElement = page.getByRole(options.elementType || 'link', {
+      name: options.exact ? actionName : new RegExp(actionName, 'i'),
+      exact: options.exact,
+    })
+
+    if (await dropdownElement.isVisible({ timeout: 3000 })) {
+      await dropdownElement.click()
+      await page.waitForTimeout(500)
+
+      // Take screenshot
+      if (options.selector) {
+        const screenshotElement = page.locator(options.selector)
+        await expect(screenshotElement).toHaveScreenshot(screenshotName)
+      } else {
+        await expect(page).toHaveScreenshot(screenshotName, {
+          maxDiffPixelRatio: MAX_DIFF_PIXEL_RATIO,
+        })
+      }
+
+      // Close any modals/dropdowns
+      await page.keyboard.press('Escape')
+      await page.waitForTimeout(300)
+    } else {
+      console.log(
+        `${options.elementType || 'link'} "${actionName}" not found or not visible`,
+      )
+    }
+  }
+}
+
+test.describe('Unauthenticated Pages', () => {
   test('homepage', async ({ page }) => {
     await testPageVisualAndAccessibility(page, '/', 'homepage')
   })
@@ -83,7 +224,7 @@ test.describe('Visual Regression & Accessibility - Unauthenticated Pages', () =>
     await testPageVisualAndAccessibility(page, '/Plans:default', 'plans')
   })
 
-  test('portals popover should match baseline', async ({ page }) => {
+  test('portals popover', async ({ page }) => {
     await page.goto('/')
     await waitForInitialPageLoad(page)
 
@@ -92,11 +233,11 @@ test.describe('Visual Regression & Accessibility - Unauthenticated Pages', () =>
     await page.waitForTimeout(500)
 
     await expect(page).toHaveScreenshot('portals-dropdown.png', {
-      maxDiffPixelRatio: 0.01,
+      maxDiffPixelRatio: MAX_DIFF_PIXEL_RATIO,
     })
   })
 
-  test('applications dropdown should match baseline', async ({ page }) => {
+  test('applications popover', async ({ page }) => {
     await page.goto('/')
     await waitForInitialPageLoad(page)
 
@@ -105,260 +246,476 @@ test.describe('Visual Regression & Accessibility - Unauthenticated Pages', () =>
     await page.waitForTimeout(500)
 
     await expect(page).toHaveScreenshot('applications-dropdown.png', {
-      maxDiffPixelRatio: 0.01,
+      maxDiffPixelRatio: MAX_DIFF_PIXEL_RATIO,
     })
   })
 })
 
-testAuth.describe(
-  'Visual Regression & Accessibility - Authenticated Pages',
-  () => {
-    let userProject: Project
+testAuth.describe('Authenticated Pages', () => {
+  let userProject: Project
 
-    testAuth.beforeAll(async ({ browser, storageStatePaths }) => {
-      userProject = await setupProjectWithPermissions(
-        browser,
-        'swc-e2e-user',
-        'swc-e2e-user-validated',
-        storageStatePaths,
+  testAuth.beforeAll(async ({ browser, storageStatePaths }) => {
+    userProject = await setupProjectWithPermissions(
+      browser,
+      'swc-e2e-user',
+      'swc-e2e-user-validated',
+      storageStatePaths,
+    )
+  })
+
+  // To test the below, you need an admin account for the dev stack.
+  testAuth('dashboard', async ({ userPage }) => {
+    await testPageVisualAndAccessibility(
+      userPage,
+      '/Home:x',
+      'authenticated-homepage',
+    )
+  })
+
+  testAuth('projects page', async ({ userPage }) => {
+    const userId = await getUserIdFromLocalStorage(userPage)
+    await testPageVisualAndAccessibility(
+      userPage,
+      `/Profile:${userId}/projects/all`,
+      'projects',
+      {
+        waitTime: LONGER_WAIT_TIME,
+        selector: '#rootPanel .rootPanel .ProfileViewImpl',
+      },
+    )
+
+    // Test button interactions
+    const pageButtons = [
+      'Created by me',
+      'Favorites',
+      'Shared directly with me',
+      'Create a New Project',
+    ]
+
+    for (const buttonName of pageButtons) {
+      const screenshotName = formatScreenshotName(
+        'projects',
+        `${buttonName}-clicked`,
       )
-    })
 
-    // To test the below, you need an admin account for the dev stack.
-    testAuth('dashboard', async ({ userPage }) => {
-      await testPageVisualAndAccessibility(
-        userPage,
-        '/Home:x',
-        'authenticated-homepage',
-      )
-    })
+      await pageElementInteractions(userPage, buttonName, screenshotName, {
+        selector: '#rootPanel .rootPanel .ProfileViewImpl',
+      })
+    }
+  })
 
-    // Helper to capture screenshots of various button interactions
-    const pageButtonInteractions = async (
-      userPage: Page,
-      name: string,
-      screenshotName: string,
-      selector?: string,
-    ) => {
-      // If selector is provided, scope button search to that area to avoid navigation conflicts
-      const button = selector
-        ? userPage.locator(selector).getByRole('button', {
-            name: new RegExp(`${name}`, 'i'),
-          })
-        : userPage.getByRole('button', {
-            name: new RegExp(`${name}`, 'i'),
-          })
+  testAuth('project page', async ({ userPage }) => {
+    await testPageVisualAndAccessibility(
+      userPage,
+      `/Synapse:${userProject.id}/wiki/`,
+      'project-page',
+      {
+        waitTime: LONGER_WAIT_TIME,
+        selector: PAGE_SELECTOR,
+      },
+    )
 
-      // Check if button exists before trying to click
-      if (await button.isVisible({ timeout: 3000 })) {
-        await button.click()
-        await userPage.waitForTimeout(500)
+    const projectTabs = [
+      'Wiki',
+      'Files',
+      'Tables',
+      'Discussion',
+      'Docker',
+      'Datasets',
+    ]
 
-        if (selector) {
-          // Focus screenshot on the specified element
-          const element = userPage.locator(selector)
-          await expect(element).toHaveScreenshot(screenshotName)
-        } else {
-          // Take full page screenshot
-          await expect(userPage).toHaveScreenshot(screenshotName, {
-            maxDiffPixelRatio: 0.01,
-          })
-        }
+    for (const tabName of projectTabs) {
+      const screenshotName = `project-page-${tabName.toLowerCase()}-tab.png`
 
-        await userPage.keyboard.press('Escape')
-        await userPage.waitForTimeout(300)
-        return true
-      } else {
-        console.log(`Button "${name}" not found or not visible`)
-        return false
-      }
+      await pageElementInteractions(userPage, tabName, screenshotName, {
+        selector: PAGE_SELECTOR,
+        elementType: 'link',
+        exact: true,
+        needsEscape: false,
+      })
     }
 
-    testAuth('projects page', async ({ userPage }) => {
-      const userId = await getUserIdFromLocalStorage(userPage)
-      await testPageVisualAndAccessibility(
+    // Test various header actions
+    await pageElementInteractions(
+      userPage,
+      'Project Tools',
+      'project-page-project-tools-dropdown.png',
+      {
+        selector: PAGE_SELECTOR,
+      },
+    )
+  })
+
+  // Test various Wiki tab actions
+  const wikiTabActions = ['Edit Project Wiki', 'View Wiki Source']
+
+  for (const actionName of wikiTabActions) {
+    const screenshotName = formatScreenshotName(
+      'project-page-wiki-tab',
+      actionName,
+    )
+
+    testAuth(
+      `project wiki tab actions - ${actionName}`,
+      async ({ userPage }) => {
+        // Navigate to wiki tab first
+        await navigateToProjectTab(userPage, userProject.id, 'wiki')
+
+        await pageElementInteractions(userPage, actionName, screenshotName, {
+          selector: PAGE_SELECTOR,
+        })
+      },
+    )
+  }
+
+  // Test various Files tab actions
+  const filesTabActions = ['Upload or Link to a File', 'Add New Folder']
+
+  for (const actionName of filesTabActions) {
+    const screenshotName = formatScreenshotName(
+      'project-page-files-tab',
+      actionName,
+    )
+
+    testAuth(
+      `project files tab actions - ${actionName}`,
+      async ({ userPage }) => {
+        // Navigate to files tab first
+        await navigateToProjectTab(userPage, userProject.id, 'files')
+
+        await pageElementInteractions(userPage, actionName, screenshotName, {
+          selector: PAGE_SELECTOR,
+        })
+      },
+    )
+  }
+
+  testAuth(
+    'project datasets tab actions - Add New...',
+    async ({ userPage }) => {
+      // Navigate to datasets tab first
+      await navigateToProjectTab(userPage, userProject.id, 'datasets')
+
+      await pageElementInteractions(
         userPage,
-        `/Profile:${userId}/projects/all`,
-        'projects',
+        'Add New...',
+        'project-page-datasets-tab-add-new.png',
         {
-          waitTime: longerWaitTime,
-          selector: '#rootPanel .rootPanel .ProfileViewImpl',
+          selector: PAGE_SELECTOR,
         },
       )
+    },
+  )
 
-      // Test button interactions
-      const pageButtons = [
-        'Created by me',
-        'Favorites',
-        'Shared directly with me',
-        'Create a New Project',
-      ]
+  // Test datasets dropdown actions using helper
+  testAuth('project datasets tab dropdown actions', async ({ userPage }) => {
+    // Navigate to datasets tab first
+    await navigateToProjectTab(userPage, userProject.id, 'datasets')
 
-      for (const buttonName of pageButtons) {
-        const screenshotName = `projects-${buttonName.toLowerCase().replace(/\s+/g, '-')}-clicked.png`
+    // Wait for dropdown menu to be detached if it was previously open
+    await userPage
+      .waitForSelector('[role="menu"]', {
+        state: 'detached',
+        timeout: 1000,
+      })
+      .catch(() => {}) // Ignore if already detached
 
-        await pageButtonInteractions(
-          userPage,
-          buttonName,
-          screenshotName,
-          '#rootPanel .rootPanel .ProfileViewImpl',
-        )
-      }
+    const datasetsDropdownActions = ['Add Dataset', 'Add Dataset Collection']
+    await testDropdownActions(userPage, 'Add New...', datasetsDropdownActions, {
+      selector: PAGE_SELECTOR,
+      screenshotPrefix: 'project-page-datasets-tab',
+      elementType: 'menuitem',
+      exact: true,
+    })
+  })
+
+  // Test various Tables tab actions
+  const tablesTabActions = ['Upload a Table', 'Add Table or View']
+
+  for (const actionName of tablesTabActions) {
+    const screenshotName = formatScreenshotName(
+      'project-page-tables-tab',
+      actionName,
+    )
+
+    testAuth(
+      `project tables tab actions - ${actionName}`,
+      async ({ userPage }) => {
+        // Navigate to tables tab first
+        await navigateToProjectTab(userPage, userProject.id, 'tables')
+
+        await pageElementInteractions(userPage, actionName, screenshotName, {
+          selector: PAGE_SELECTOR,
+        })
+      },
+    )
+  }
+
+  // Test various Discussion tab actions
+  const discussionTabActions = ['New Thread', 'Discussion Tools']
+
+  for (const actionName of discussionTabActions) {
+    const screenshotName = formatScreenshotName(
+      'project-page-discussion-tab',
+      actionName,
+    )
+
+    testAuth(
+      `project discussion tab actions - ${actionName}`,
+      async ({ userPage }) => {
+        // Navigate to discussion tab first
+        await navigateToProjectTab(userPage, userProject.id, 'discussion')
+
+        await pageElementInteractions(userPage, actionName, screenshotName, {
+          selector: PAGE_SELECTOR,
+        })
+      },
+    )
+  }
+
+  // Test Discussion Tools dropdown items
+  testAuth('project discussion tab dropdown actions', async ({ userPage }) => {
+    // Navigate to discussion tab first
+    await navigateToProjectTab(userPage, userProject.id, 'discussion')
+
+    const discussionDropdownActions = ['Show Deleted Threads']
+    await testDropdownActions(
+      userPage,
+      'Discussion Tools',
+      discussionDropdownActions,
+      {
+        selector: PAGE_SELECTOR,
+        screenshotPrefix: 'project-page-discussion-tab',
+        elementType: 'menuitem',
+      },
+    )
+  })
+
+  // Test various Docker tab actions
+  const dockerTabActions = ['Add External Repository']
+
+  for (const actionName of dockerTabActions) {
+    const screenshotName = formatScreenshotName(
+      'project-page-docker-tab',
+      actionName,
+    )
+
+    testAuth(
+      `project docker tab actions - ${actionName}`,
+      async ({ userPage }) => {
+        // Navigate to docker tab first
+        await navigateToProjectTab(userPage, userProject.id, 'docker')
+
+        await pageElementInteractions(userPage, actionName, screenshotName, {
+          selector: PAGE_SELECTOR,
+        })
+      },
+    )
+  }
+
+  testAuth.afterAll(async ({ browser }) => {
+    if (userProject?.id) {
+      const { teardownProjectsAndFileHandles } = await import(
+        './helpers/setupTeardown'
+      )
+      await teardownProjectsAndFileHandles(browser, [userProject], [])
+    }
+  })
+
+  testAuth('favorites page', async ({ userPage }) => {
+    const userId = await getUserIdFromLocalStorage(userPage)
+    await testPageVisualAndAccessibility(
+      userPage,
+      `/Profile:${userId}/favorites`,
+      'favorites-page',
+      { waitTime: LONGER_WAIT_TIME },
+    )
+  })
+
+  testAuth('teams page', async ({ userPage }) => {
+    const TEAM_NAME = 'test-team-' + uuidv4()
+    const userId = await getUserIdFromLocalStorage(userPage)
+    await testPageVisualAndAccessibility(
+      userPage,
+      `/Profile:${userId}/teams`,
+      'teams-page',
+      { waitTime: LONGER_WAIT_TIME },
+    )
+
+    // Create a team first so we have something to interact with
+    await pageElementInteractions(
+      userPage,
+      'Create a New Team',
+      'teams-page-create-a-new-team-clicked.png',
+      {
+        selector: PAGE_SELECTOR,
+        needsEscape: false,
+      },
+    )
+
+    // Fill in team name (using nth(1) like in teams.spec.ts)
+    const teamNameInput = userPage.getByRole('textbox').nth(1)
+    await teamNameInput.fill(TEAM_NAME)
+    await userPage.getByRole('button', { name: 'OK' }).click()
+
+    // after clicking OK, wait for navigation to team page
+    await userPage.waitForURL('**/Team:*')
+    await waitForInitialPageLoad(userPage)
+    await userPage.waitForTimeout(LONGER_WAIT_TIME)
+
+    // Screenshot of the created team page
+    const screenshotName = `teams-page-test-team-created.png`
+    await expect(userPage).toHaveScreenshot(screenshotName, {
+      maxDiffPixelRatio: MAX_DIFF_PIXEL_RATIO,
     })
 
-    testAuth('project page', async ({ userPage }) => {
-      // Navigate to the created project page
-      await testPageVisualAndAccessibility(
-        userPage,
-        `/Synapse:${userProject.id}/wiki/`,
-        'project-page',
-        {
-          waitTime: longerWaitTime,
-          selector: '#rootPanel .rootPanel',
-        },
+    // click team actions dropdown button
+    await pageElementInteractions(
+      userPage,
+      'Team Actions',
+      'teams-page-test-team-clicked-team-actions-dropdown.png',
+      {
+        selector: PAGE_SELECTOR,
+        needsEscape: false,
+      },
+    )
+
+    const dropdownActions = [
+      'Invite User',
+      'Edit Team',
+      'Delete Team',
+      'Leave Team',
+    ]
+
+    await testDropdownActions(userPage, 'Team Actions', dropdownActions, {
+      selector: PAGE_SELECTOR,
+      screenshotPrefix: 'teams-page',
+      elementType: 'link',
+    })
+  })
+
+  testAuth('challenges page', async ({ userPage }) => {
+    const userId = await getUserIdFromLocalStorage(userPage)
+    await testPageVisualAndAccessibility(
+      userPage,
+      `/Profile:${userId}/challenges`,
+      'challenges-page',
+      { waitTime: LONGER_WAIT_TIME },
+    )
+  })
+
+  testAuth('download cart page', async ({ userPage }) => {
+    // Defaults to Download List tab
+    await testPageVisualAndAccessibility(
+      userPage,
+      '/DownloadCart:0',
+      'download-cart-page',
+    )
+
+    // Test button interactions
+    const downloadCartButtons = ['Access Actions Required']
+
+    for (const buttonName of downloadCartButtons) {
+      const screenshotName = formatScreenshotName(
+        'download-cart-page',
+        `${buttonName}-clicked`,
       )
 
-      // Test project tab interactions
-      const projectTabs = [
-        'Wiki',
-        'Files',
-        'Datasets',
-        'Tables',
-        'Discussion',
-        'Docker',
-      ]
+      await pageElementInteractions(userPage, buttonName, screenshotName, {
+        selector: PAGE_SELECTOR,
+      })
+    }
+  })
 
-      for (const tabName of projectTabs) {
-        const screenshotName = `project-${tabName.toLowerCase()}-tab.png`
+  testAuth('trash can page', async ({ userPage }) => {
+    await testPageVisualAndAccessibility(userPage, '/Trash:0', 'trash-can-page')
+  })
 
-        await pageButtonInteractions(
-          userPage,
-          tabName,
-          screenshotName,
-          '#rootPanel .rootPanel',
-        )
-      }
+  testAuth('search page', async ({ userPage }) => {
+    const searchQuery = {
+      queryTerm: [],
+      booleanQuery: [],
+      facetOptions: [
+        { name: 'EntityType', maxResultCount: 300, sortType: 'COUNT' },
+        { name: 'Consortium', maxResultCount: 300, sortType: 'COUNT' },
+        { name: 'ModifiedOn', maxResultCount: 300, sortType: 'COUNT' },
+        { name: 'ModifiedBy', maxResultCount: 300, sortType: 'COUNT' },
+        { name: 'CreatedOn', maxResultCount: 300, sortType: 'COUNT' },
+        { name: 'Tissue', maxResultCount: 300, sortType: 'COUNT' },
+        { name: 'CreatedBy', maxResultCount: 300, sortType: 'COUNT' },
+      ],
+      size: 30,
+    }
+    const searchUrl = `/Search:${encodeURIComponent(JSON.stringify(searchQuery))}`
 
-      // Test project tools dropdown if present
-      const projectToolsButton = userPage
-        .locator('#rootPanel .rootPanel')
-        .getByRole('button', {
-          name: /Project Tools/i,
+    await testPageVisualAndAccessibility(userPage, searchUrl, 'search-page', {
+      waitTime: LONGER_WAIT_TIME,
+    })
+    const searchInput = userPage.locator('.search-textbox')
+    await searchInput.fill('test')
+    await userPage.keyboard.press('Enter')
+    await userPage.waitForTimeout(1000)
+    await expect(userPage).toHaveScreenshot('search-page-with-query.png', {
+      maxDiffPixelRatio: MAX_DIFF_PIXEL_RATIO,
+    })
+  })
+
+  testAuth('help button', async ({ userPage }) => {
+    await userPage.goto('/projects/all')
+    await waitForInitialPageLoad(userPage)
+
+    await userPage.getByRole('button', { name: 'Help' }).click()
+    await userPage.waitForSelector('[role="button"]', { state: 'visible' })
+    await userPage.waitForTimeout(500)
+
+    await expect(userPage).toHaveScreenshot('help-sidebar.png', {
+      maxDiffPixelRatio: MAX_DIFF_PIXEL_RATIO,
+    })
+  })
+
+  testAuth('your account button', async ({ userPage }) => {
+    const SIDEBAR_SELECTOR = '.linkList a'
+    const YOUR_ACCOUNT_BUTTON = '[role="button"][aria-label="Your Account"]'
+
+    await userPage.goto('/projects/all')
+    await waitForInitialPageLoad(userPage)
+
+    await userPage.getByRole('button', { name: 'Your Account' }).click()
+    await userPage.waitForSelector('[role="button"]', { state: 'visible' })
+    await userPage.waitForTimeout(500)
+
+    await expect(userPage).toHaveScreenshot('your-account-sidebar.png', {
+      maxDiffPixelRatio: MAX_DIFF_PIXEL_RATIO,
+    })
+
+    const accountSidebarLinks = ['View Profile', 'Access Requests', 'Following']
+
+    for (const linkName of accountSidebarLinks) {
+      const screenshotName = formatScreenshotName(
+        'your-account-sidebar',
+        `${linkName}-clicked`,
+      )
+
+      const sidebarLink = userPage
+        .locator(SIDEBAR_SELECTOR)
+        .filter({ hasText: linkName })
+
+      if (await sidebarLink.isVisible({ timeout: 3000 })) {
+        await sidebarLink.click()
+        await userPage.waitForTimeout(500)
+        await expect(userPage).toHaveScreenshot(screenshotName, {
+          maxDiffPixelRatio: MAX_DIFF_PIXEL_RATIO,
         })
 
-      if (await projectToolsButton.isVisible({ timeout: 3000 })) {
-        await projectToolsButton.click()
-        await userPage.waitForTimeout(500)
-
-        const element = userPage.locator('#rootPanel .rootPanel')
-        await expect(element).toHaveScreenshot('project-tools-dropdown.png')
-
-        await userPage.keyboard.press('Escape')
-        await userPage.waitForTimeout(300)
+        // Reopen Your Account sidebar for next item
+        const yourAccountBtn = userPage.locator(YOUR_ACCOUNT_BUTTON)
+        if (await yourAccountBtn.isVisible({ timeout: 3000 })) {
+          await yourAccountBtn.click()
+          await userPage.waitForTimeout(500)
+        }
+      } else {
+        console.log(`Sidebar link "${linkName}" not found`)
       }
-    })
-
-    testAuth.afterAll(async ({ browser }) => {
-      if (userProject?.id) {
-        const { teardownProjectsAndFileHandles } = await import(
-          './helpers/setupTeardown'
-        )
-        await teardownProjectsAndFileHandles(browser, [userProject], [])
-      }
-    })
-
-    testAuth('favorites page', async ({ userPage }) => {
-      const userId = await getUserIdFromLocalStorage(userPage)
-      await testPageVisualAndAccessibility(
-        userPage,
-        `/Profile:${userId}/favorites`,
-        'favorites-page',
-        { waitTime: longerWaitTime },
-      )
-    })
-
-    testAuth('teams page', async ({ userPage }) => {
-      const userId = await getUserIdFromLocalStorage(userPage)
-      await testPageVisualAndAccessibility(
-        userPage,
-        `/Profile:${userId}/teams`,
-        'teams-page',
-        { waitTime: longerWaitTime },
-      )
-    })
-
-    testAuth('challenges page', async ({ userPage }) => {
-      const userId = await getUserIdFromLocalStorage(userPage)
-      await testPageVisualAndAccessibility(
-        userPage,
-        `/Profile:${userId}/challenges`,
-        'challenges-page',
-        { waitTime: longerWaitTime },
-      )
-    })
-
-    testAuth('download cart page', async ({ userPage }) => {
-      await testPageVisualAndAccessibility(
-        userPage,
-        '/DownloadCart:0',
-        'download-cart-page',
-      )
-    })
-
-    testAuth('trash can page', async ({ userPage }) => {
-      await testPageVisualAndAccessibility(
-        userPage,
-        '/Trash:0',
-        'trash-can-page',
-      )
-    })
-
-    testAuth('search page', async ({ userPage }) => {
-      const searchQuery = {
-        queryTerm: [],
-        booleanQuery: [],
-        facetOptions: [
-          { name: 'EntityType', maxResultCount: 300, sortType: 'COUNT' },
-          { name: 'Consortium', maxResultCount: 300, sortType: 'COUNT' },
-          { name: 'ModifiedOn', maxResultCount: 300, sortType: 'COUNT' },
-          { name: 'ModifiedBy', maxResultCount: 300, sortType: 'COUNT' },
-          { name: 'CreatedOn', maxResultCount: 300, sortType: 'COUNT' },
-          { name: 'Tissue', maxResultCount: 300, sortType: 'COUNT' },
-          { name: 'CreatedBy', maxResultCount: 300, sortType: 'COUNT' },
-        ],
-        size: 30,
-      }
-      const searchUrl = `/Search:${encodeURIComponent(JSON.stringify(searchQuery))}`
-
-      await testPageVisualAndAccessibility(userPage, searchUrl, 'search-page', {
-        waitTime: longerWaitTime,
-      })
-    })
-
-    testAuth('help button', async ({ userPage }) => {
-      await userPage.goto('/projects/all')
-      await waitForInitialPageLoad(userPage)
-
-      await userPage.getByRole('button', { name: 'Help' }).click()
-      await userPage.waitForSelector('[role="button"]', { state: 'visible' })
-      await userPage.waitForTimeout(500)
-
-      await expect(userPage).toHaveScreenshot('help-sidebar.png', {
-        maxDiffPixelRatio: 0.01,
-      })
-    })
-
-    testAuth('your account button', async ({ userPage }) => {
-      await userPage.goto('/projects/all')
-      await waitForInitialPageLoad(userPage)
-
-      await userPage.getByRole('button', { name: 'Your Account' }).click()
-      await userPage.waitForSelector('[role="button"]', { state: 'visible' })
-      await userPage.waitForTimeout(500)
-
-      await expect(userPage).toHaveScreenshot('your-account-sidebar.png', {
-        maxDiffPixelRatio: 0.01,
-      })
-    })
-  },
-)
+    }
+  })
+})
