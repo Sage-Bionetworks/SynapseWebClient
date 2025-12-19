@@ -38,7 +38,9 @@ import { setupProjectWithPermissions } from './helpers/setupTeardown'
 // Constants
 // ======================================================
 const LONGER_WAIT_TIME = 2000
-const PAGE_SELECTOR = '#rootPanel .rootPanel'
+// const PAGE_SELECTOR = '#rootPanel .rootPanel'
+const PROJECT_HEADER_SELECTOR = '.pageHeader'
+const PAGE_SELECTOR = '.tab-content'
 const MAX_DIFF_PIXEL_RATIO = 0.01
 
 // ======================================================
@@ -280,7 +282,7 @@ testAuth.describe('Authenticated Pages', () => {
     )
   })
 
-  testAuth('projects page', async ({ userPage }) => {
+  testAuth('all projects page', async ({ userPage }) => {
     const userId = await getUserIdFromLocalStorage(userPage)
     await testPageVisualAndAccessibility(
       userPage,
@@ -302,7 +304,7 @@ testAuth.describe('Authenticated Pages', () => {
 
     for (const buttonName of pageButtons) {
       const screenshotName = formatScreenshotName(
-        'projects',
+        'all-projects',
         `${buttonName}-clicked`,
       )
 
@@ -320,6 +322,16 @@ testAuth.describe('Authenticated Pages', () => {
       {
         waitTime: LONGER_WAIT_TIME,
         selector: PAGE_SELECTOR,
+      },
+    )
+
+    // Test various header actions
+    await pageElementInteractions(
+      userPage,
+      'Project Tools',
+      'project-page-project-tools-dropdown.png',
+      {
+        selector: PROJECT_HEADER_SELECTOR,
       },
     )
 
@@ -342,16 +354,6 @@ testAuth.describe('Authenticated Pages', () => {
         needsEscape: false,
       })
     }
-
-    // Test various header actions
-    await pageElementInteractions(
-      userPage,
-      'Project Tools',
-      'project-page-project-tools-dropdown.png',
-      {
-        selector: PAGE_SELECTOR,
-      },
-    )
   })
 
   // Test various Wiki tab actions
