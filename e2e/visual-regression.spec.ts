@@ -294,6 +294,16 @@ testAuth.describe('Authenticated Pages', () => {
       },
     )
 
+    // Hide dynamic project names to prevent false failures
+    await userPage.addStyleTag({
+      content: `
+        /* Hide project names that vary between test runs */
+        a.gwt-Anchor.displayInline[data-project-id] {
+          visibility: hidden !important;
+        }
+      `,
+    })
+
     // Test button interactions
     const pageButtons = [
       'Created by me',
@@ -392,6 +402,16 @@ testAuth.describe('Authenticated Pages', () => {
       async ({ userPage }) => {
         // Navigate to files tab first
         await navigateToProjectTab(userPage, userProject.id, 'files')
+
+        // Hide dynamic usernames to prevent false failures
+        await userPage.addStyleTag({
+          content: `
+            /* Hide usernames that vary between test runs */
+            a.SRC-userCard.UserBadge {
+              visibility: hidden !important;
+            }
+          `,
+        })
 
         await pageElementInteractions(userPage, actionName, screenshotName, {
           selector: PAGE_SELECTOR,
@@ -552,13 +572,26 @@ testAuth.describe('Authenticated Pages', () => {
       { waitTime: LONGER_WAIT_TIME },
     )
 
+    // Hide dynamic content to prevent false failures
+    await userPage.addStyleTag({
+      content: `
+        /* Hide dynamic content that varies between test runs */
+        a.highlight-link,
+        h3.pageHeaderTitle,
+        .SRC-cardContent a[href^="/Profile:"],
+        .SRC-emailText a.link,
+        .SRC-cardContent .SRC-emailText {
+          visibility: hidden !important;
+        }
+      `,
+    })
+
     // Create a team first so we have something to interact with
     await pageElementInteractions(
       userPage,
       'Create a New Team',
       'teams-page-create-a-new-team-clicked.png',
       {
-        selector: PAGE_SELECTOR,
         needsEscape: false,
       },
     )
@@ -584,10 +617,6 @@ testAuth.describe('Authenticated Pages', () => {
       userPage,
       'Team Actions',
       'teams-page-test-team-clicked-team-actions-dropdown.png',
-      {
-        selector: PAGE_SELECTOR,
-        needsEscape: false,
-      },
     )
 
     const dropdownActions = [
@@ -598,7 +627,6 @@ testAuth.describe('Authenticated Pages', () => {
     ]
 
     await testDropdownActions(userPage, 'Team Actions', dropdownActions, {
-      selector: PAGE_SELECTOR,
       screenshotPrefix: 'teams-page',
       elementType: 'link',
     })
