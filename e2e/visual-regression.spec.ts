@@ -298,7 +298,7 @@ testAuth.describe('Authenticated Pages', () => {
     await userPage.addStyleTag({
       content: `
         /* Hide project names that vary between test runs */
-        a.gwt-Anchor.displayInline[data-project-id] {
+        gwt-Anchor {
           visibility: hidden !important;
         }
       `,
@@ -403,11 +403,11 @@ testAuth.describe('Authenticated Pages', () => {
         // Navigate to files tab first
         await navigateToProjectTab(userPage, userProject.id, 'files')
 
-        // Hide dynamic usernames to prevent false failures
+        // Hide dynamic usernames and timestamps to prevent false failures
         await userPage.addStyleTag({
           content: `
-            /* Hide usernames that vary between test runs */
-            a.SRC-userCard.UserBadge {
+            /* Hide breadcrumbs that contain dynamic usernames and timestamps */
+            nav.MuiBreadcrumbs-root {
               visibility: hidden !important;
             }
           `,
