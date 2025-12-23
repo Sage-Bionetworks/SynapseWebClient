@@ -2,10 +2,24 @@ import { expect, Page, test } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
 import { v4 as uuidv4 } from 'uuid'
 import { testAuth } from './fixtures/authenticatedUserPages'
-import { getUserIdFromLocalStorage } from './helpers/testUser'
+import {
+  getUserIdFromLocalStorage,
+  toggleIntoExperimentalMode,
+} from './helpers/testUser'
 import { waitForInitialPageLoad } from './helpers/utils'
 import { Project } from './helpers/types'
 import { setupProjectWithPermissions } from './helpers/setupTeardown'
+import { defaultExpectTimeout } from '../playwright.config'
+import { generateEntityName } from './helpers/entities'
+import {
+  ColumnSchemaConfig,
+  addColumnsFromColumnSchemaConfig,
+} from './helpers/tableColumnSchemaEditor'
+import {
+  enterTableValue,
+  getTableEditorRows,
+  openTableEditor,
+} from './helpers/tables'
 
 /**
  * ======================================================
@@ -420,6 +434,96 @@ testAuth.describe('Authenticated Pages', () => {
     )
   }
 
+  // Test complete file upload workflow with screenshots
+  testAuth('project files tab - complete file upload', async ({ userPage }) => {
+    // Navigate to files tab
+    await navigateToProjectTab(userPage, userProject.id, 'files')
+
+    // Hide dynamic usernames and timestamps to prevent false failures
+    await userPage.addStyleTag({
+      content: `
+        /* Hide breadcrumbs that contain dynamic usernames and timestamps */
+        nav.MuiBreadcrumbs-root {
+          visibility: hidden !important;
+        }
+      `,
+    })
+
+    // Step 1: Open upload modal
+    await userPage
+      .getByRole('button', { name: 'Upload or Link to a File' })
+      .click()
+    await expect(
+      userPage.getByRole('tab', { name: 'Upload File' }),
+    ).toBeVisible()
+    await userPage.waitForTimeout(500)
+
+    await expect(userPage.locator(PAGE_SELECTOR)).toHaveScreenshot(
+      'project-page-files-tab-upload-modal.png',
+    )
+
+    // Step 2: Select file to upload
+    await expect(
+      userPage.getByText(
+        /All uploaded files will be stored in Synapse storage/i,
+      ),
+    ).toBeVisible()
+
+    const fileChooserPromise = userPage.waitForEvent('filechooser')
+    await userPage.getByText('Click to upload').click()
+    await userPage
+      .getByRole('menu')
+      .getByRole('menuitem')
+      .filter({ hasText: 'Files' })
+      .click()
+
+    const fileChooser = await fileChooserPromise
+    const filePath = 'data/test_file.csv'
+    await fileChooser.setFiles(`${import.meta.dirname}/../e2e/${filePath}`)
+
+    // Step 3: File selected, ready to upload
+    await userPage.waitForTimeout(500)
+    await expect(userPage.locator(PAGE_SELECTOR)).toHaveScreenshot(
+      'project-page-files-tab-uploading-file.png',
+    )
+
+    // Step 4: Wait for upload completion
+    await expect(userPage.getByText('Uploaded 1 Item')).toBeVisible()
+    await userPage.waitForTimeout(500)
+    await expect(userPage.locator(PAGE_SELECTOR)).toHaveScreenshot(
+      'project-page-files-tab-upload-complete.png',
+    )
+
+    // Step 5: Close modal
+    await userPage.getByRole('button', { name: 'Finish' }).click()
+    await expect(
+      userPage.getByRole('heading', { name: 'Upload or Link to File' }),
+    ).not.toBeVisible()
+
+    // Step 6: View uploaded file in file list
+    const fileLink = userPage.getByRole('link', { name: 'test_file.csv' })
+    await expect(fileLink).toBeVisible({
+      timeout: defaultExpectTimeout * 3,
+    })
+    await userPage.waitForTimeout(500)
+
+    await expect(userPage.locator(PAGE_SELECTOR)).toHaveScreenshot(
+      'project-page-files-tab-file-in-list.png',
+    )
+
+    // Step 7: Open file details page
+    await fileLink.click()
+    await userPage.waitForTimeout(LONGER_WAIT_TIME)
+    await expect(
+      userPage.getByText('Discussion about test_file.csv'),
+    ).toBeVisible()
+    await expect(userPage.getByText('Loading provenance...')).not.toBeVisible()
+
+    await expect(userPage.locator(PAGE_SELECTOR)).toHaveScreenshot(
+      'project-page-file-details.png',
+    )
+  })
+
   testAuth(
     'project datasets tab actions - Add New...',
     async ({ userPage }) => {
@@ -480,6 +584,154 @@ testAuth.describe('Authenticated Pages', () => {
       },
     )
   }
+
+  // Test complete table creation workflow with screenshots
+  testAuth(
+    'project tables tab - complete table creation',
+    async ({ userPage }) => {
+      // Navigate to tables tab
+      await navigateToProjectTab(userPage, userProject.id, 'tables')
+
+      // Toggle into experimental mode for React-based table column schema editor
+      await toggleIntoExperimentalMode(userPage)
+      await navigateToProjectTab(userPage, userProject.id, 'tables')
+
+      const tableName = generateEntityName('table')
+      const tableDescription = 'Visual regression test table'
+
+      const columnsSchemaConfig: ColumnSchemaConfig[] = [
+        { name: 'item', type: 'String', size: 20 },
+        { name: 'quantity', type: 'Integer', defaultValue: '100' },
+        { name: 'in_stock', type: 'Boolean', defaultValue: 'true' },
+        { name: 'date_added', type: 'Date' },
+      ]
+
+      // Open table creation modal
+      await userPage.getByRole('button', { name: 'Add Table or View' }).click()
+      const dialog = userPage.getByRole('dialog')
+      await expect(dialog).toBeVisible()
+      await userPage.waitForTimeout(500)
+
+      await expect(dialog).toHaveScreenshot(
+        'project-page-tables-tab-create-modal.png',
+      )
+
+      // Select "Table" option
+      await dialog.getByRole('menuitem', { name: 'Table' }).click()
+      await userPage.waitForTimeout(500)
+
+      await expect(dialog).toHaveScreenshot(
+        'project-page-tables-tab-schema-editor-empty.png',
+      )
+
+      // Add columns to schema
+      await addColumnsFromColumnSchemaConfig(userPage, columnsSchemaConfig)
+      await userPage.waitForTimeout(500)
+
+      await expect(dialog).toHaveScreenshot(
+        'project-page-tables-tab-schema-editor-with-columns.png',
+      )
+
+      // Table name and description step
+      await userPage.getByRole('button', { name: 'Next' }).click()
+      await userPage.waitForTimeout(500)
+
+      await expect(dialog).toHaveScreenshot(
+        'project-page-tables-tab-name-description-step.png',
+      )
+
+      await userPage.getByLabel('Name').fill(tableName)
+      await userPage.getByLabel('Description').fill(tableDescription)
+      await userPage.waitForTimeout(500)
+
+      // Create table
+      await userPage.getByRole('button', { name: 'Finish' }).click()
+
+      // Wait for table page to load
+      await expect(
+        userPage.getByRole('heading', { name: tableName }),
+      ).toBeVisible({ timeout: defaultExpectTimeout * 3 })
+      await expect(
+        userPage.getByText('Loading provenance...'),
+      ).not.toBeVisible()
+      await userPage.waitForTimeout(LONGER_WAIT_TIME)
+
+      // Wait for table to be in empty state (same as tables.spec.ts)
+      await expect(
+        userPage.getByRole('heading', { name: 'Items (0)' }),
+      ).toBeVisible()
+      await expect(
+        userPage.getByText('This table is currently empty'),
+      ).toBeVisible()
+
+      // Hide dynamic table name to prevent false failures
+      await userPage.addStyleTag({
+        content: `
+          /* Hide table name that varies between test runs */
+          .MuiTypography-headline2 {
+            visibility: hidden !important;
+          }
+          /* Hide breadcrumbs with dynamic usernames and timestamps */
+          nav.MuiBreadcrumbs-root {
+            visibility: hidden !important;
+          }
+        `,
+      })
+
+      // Wait for styles to be applied and page to re-render
+      await userPage.waitForTimeout(1000)
+
+      await expect(userPage.locator(PAGE_SELECTOR)).toHaveScreenshot(
+        'project-page-table-created-empty.png',
+      )
+
+      // Wait for edit button to be ready and visible
+      const editButton = userPage.getByRole('button', {
+        name: 'Bulk Edit Table Cell Values',
+      })
+      await expect(editButton).toBeVisible({ timeout: defaultExpectTimeout })
+      await userPage.waitForTimeout(1000)
+
+      // Hide dynamic "Last updated on" timestamp before opening editor
+      await userPage.addStyleTag({
+        content: `
+          /* Hide last updated timestamp that varies between test runs */
+          .flexcontainer-column.flexcontainer-align-items-flex-end span.em {
+            visibility: hidden !important;
+          }
+        `,
+      })
+
+      await openTableEditor(userPage)
+
+      await expect(userPage.locator(PAGE_SELECTOR)).toHaveScreenshot(
+        'project-page-table-editor-opened.png',
+      )
+
+      // Add a row
+      await userPage.getByRole('button', { name: 'Add Row' }).click()
+      await userPage.waitForTimeout(500)
+
+      await expect(userPage.locator(PAGE_SELECTOR)).toHaveScreenshot(
+        'project-page-table-row-added.png',
+      )
+
+      const tableRows = getTableEditorRows(userPage)
+      const firstDataRow = tableRows.nth(1) // Skip header row
+
+      const dateCell = firstDataRow.getByRole('cell').nth(4)
+      await dateCell.click()
+      await userPage.waitForTimeout(500)
+
+      // Enter date value
+      await enterTableValue(dateCell, '2024-01-15')
+      await userPage.waitForTimeout(500)
+
+      await expect(userPage.locator(PAGE_SELECTOR)).toHaveScreenshot(
+        'project-page-table-date-entered.png',
+      )
+    },
+  )
 
   // Test various Discussion tab actions
   const discussionTabActions = ['New Thread', 'Discussion Tools']
