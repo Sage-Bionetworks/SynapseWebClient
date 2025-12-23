@@ -675,7 +675,21 @@ testAuth.describe('Authenticated Pages', () => {
           nav.MuiBreadcrumbs-root {
             visibility: hidden !important;
           }
+          /* Hide favorite button to prevent flakiness */
+          button[aria-label="Add to favorites"] {
+            visibility: hidden !important;
+          }
         `,
+      })
+
+      // Hide dynamic SynID values
+      await userPage.evaluate(() => {
+        const spans = document.querySelectorAll('span.MuiTypography-smallText1')
+        spans.forEach(span => {
+          if (span.textContent?.startsWith('syn')) {
+            ;(span as HTMLElement).style.visibility = 'hidden'
+          }
+        })
       })
 
       // Wait for styles to be applied and page to re-render
