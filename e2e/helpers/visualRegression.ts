@@ -41,9 +41,14 @@ export async function testPageVisualAndAccessibility(
 ) {
   const { fullPage = true, waitTime = 500, selector } = options
 
-  await page.goto(url)
-  await waitForInitialPageLoad(page)
-  await page.waitForTimeout(waitTime)
+  const currentUrl = page.url()
+
+  // Avoid reloading if we're already on the target page
+  if (!currentUrl.endsWith(url)) {
+    await page.goto(url)
+    await waitForInitialPageLoad(page)
+    await page.waitForTimeout(waitTime)
+  }
 
   if (selector) {
     // Wait for the specific element and take screenshot of it

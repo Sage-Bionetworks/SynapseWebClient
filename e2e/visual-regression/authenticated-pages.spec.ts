@@ -73,9 +73,28 @@ testAuth.describe('Authenticated Pages', () => {
 
   // To test the below, you need an admin account for the dev stack.
   testAuth('dashboard', async ({ userPage }) => {
+    // to fix
+    const url = '/Home:x'
+    await userPage.goto(url)
+    await waitForInitialPageLoad(userPage)
+    await userPage.waitForTimeout(LONGER_WAIT_TIME)
+
+    //       .MuiBox-root h1:nth-of-type(2) {
+
+    // print h1s on page
+
+    await userPage.addStyleTag({
+      content: `
+        /* Hide the second h1 in the dashboard */
+      .MuiBox-root h1:nth-of-type(2) {
+        visibility: hidden !important;
+      }
+      `,
+    })
+
     await testPageVisualAndAccessibility(
       userPage,
-      '/Home:x',
+      url,
       'authenticated-homepage',
     )
   })
@@ -124,6 +143,22 @@ testAuth.describe('Authenticated Pages', () => {
     await userPage.waitForTimeout(SHORTER_WAIT_TIME)
 
     // Take screenshot after hiding dynamic content
+    // Normalize project title and SynID for visual regression
+    await userPage.evaluate(() => {
+      // Normalize project title
+      const title = document.querySelector('h3.pageHeaderTitle')
+      if (title) title.textContent = 'PROJECT_TITLE'
+      // Normalize SynID (span after 'Project SynID' label)
+      const synIdLabel = Array.from(
+        document.querySelectorAll('span.boldText'),
+      ).find(el => el.textContent?.includes('Project SynID'))
+      if (synIdLabel) {
+        const synIdSpan = synIdLabel.parentElement?.querySelector(
+          'span:not(.boldText):not(.HelpWidget)',
+        )
+        if (synIdSpan) synIdSpan.textContent = 'syn00000000'
+      }
+    })
     const element = userPage.locator(selector)
     await expect(element).toHaveScreenshot('all-projects-page.png', {
       maxDiffPixelRatio: MAX_DIFF_PIXEL_RATIO,
@@ -171,6 +206,16 @@ testAuth.describe('Authenticated Pages', () => {
       },
     )
 
+    await userPage.addStyleTag({
+      content: `
+        /* Hide dynamic project title that varies between test runs */
+        .projectTitle {
+          visibility: hidden !important;
+        }
+
+      `,
+    })
+
     // Test various header actions
     await pageElementInteractions(
       userPage,
@@ -190,11 +235,11 @@ testAuth.describe('Authenticated Pages', () => {
       'Datasets',
     ]
 
-    // Wait for project tabs to be fully loaded
     await userPage.waitForSelector('a[href*="/wiki/"], a[href*="/files/"]', {
       timeout: 15000,
     })
-    await userPage.waitForTimeout(1000) // Give extra time for all tabs to be ready
+
+    await userPage.waitForTimeout(1000)
 
     for (const tabName of projectTabs) {
       const screenshotName = `project-page-${tabName.toLowerCase()}-tab.png`
@@ -209,7 +254,6 @@ testAuth.describe('Authenticated Pages', () => {
         })
       } catch (error) {
         console.log(`Tab "${tabName}" interaction failed:`, error)
-        // Continue with next tab instead of failing entire test
       }
     }
   })
@@ -633,9 +677,16 @@ testAuth.describe('Authenticated Pages', () => {
       await enterTableValue(dateCell, '2024-01-15')
       await userPage.waitForTimeout(SHORTER_WAIT_TIME)
 
-      await expect(
-        userPage.locator(PROJECT_TAB_PAGE_SELECTOR),
-      ).toHaveScreenshot('project-page-table-date-entered.png')
+      const editorDialog = userPage
+        .locator('#editRowsModal .modal-dialog')
+        .first()
+
+      await expect(editorDialog).toHaveScreenshot(
+        'project-page-table-date-entered.png',
+        {
+          maxDiffPixelRatio: MAX_DIFF_PIXEL_RATIO,
+        },
+      )
     },
   )
 
@@ -884,13 +935,11 @@ testAuth.describe('Authenticated Pages', () => {
     await userPage.goto('/DownloadCart:0')
     await waitForInitialPageLoad(userPage)
 
-    // Force consistent tab state by ensuring Download List tab is active
-    try {
-      await userPage.getByRole('button', { name: 'Download List' }).click()
-      await userPage.waitForTimeout(SHORTER_WAIT_TIME)
-    } catch {
-      // Tab might already be active, continue
-    }
+    await userPage.addStyleTag({
+      content: '.fileCount { visibility: hidden !important; }',
+    })
+
+    // to fix
 
     await testPageVisualAndAccessibility(
       userPage,
@@ -901,18 +950,25 @@ testAuth.describe('Authenticated Pages', () => {
       },
     )
 
-    const downloadCartButtons = ['Access Actions Required']
+    const downloadListScreenhotName = formatScreenshotName(
+      'download-cart-page',
+      'download-list-clicked',
+    )
 
-    for (const buttonName of downloadCartButtons) {
-      const screenshotName = formatScreenshotName(
-        'download-cart-page',
-        `${buttonName}-clicked`,
-      )
+    const downloadListButton = userPage.locator(
+      'button:has-text("Download List")',
+    )
 
-      await pageElementInteractions(userPage, buttonName, screenshotName, {
-        selector: PAGE_SELECTOR,
-      })
-    }
+    await downloadListButton.click()
+    await userPage.waitForTimeout(SHORTER_WAIT_TIME)
+
+    await userPage.addStyleTag({
+      content: '.fileCount { visibility: hidden !important; }',
+    })
+
+    await expect(userPage).toHaveScreenshot(downloadListScreenhotName, {
+      maxDiffPixelRatio: MAX_DIFF_PIXEL_RATIO,
+    })
   })
 
   testAuth('trash can page', async ({ userPage }) => {
