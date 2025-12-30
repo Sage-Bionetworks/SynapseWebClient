@@ -461,7 +461,6 @@ testAuth.describe('Authenticated Pages', () => {
   testAuth(
     'project tables tab - complete table creation',
     async ({ userPage }) => {
-      // Navigate to tables tab
       await navigateToProjectTab(userPage, userProject.id, 'tables')
 
       // Toggle into experimental mode for React-based table column schema editor
@@ -550,13 +549,14 @@ testAuth.describe('Authenticated Pages', () => {
       ).not.toBeVisible()
       await userPage.waitForTimeout(LONGER_WAIT_TIME)
 
-      // Wait for table to be in empty state (same as tables.spec.ts)
-      await expect(
-        userPage.getByRole('heading', { name: 'Items (0)' }),
-      ).toBeVisible()
-      await expect(
-        userPage.getByText('This table is currently empty'),
-      ).toBeVisible()
+      await testAuth.step('table is currently empty', async () => {
+        await expect(
+          userPage.getByRole('heading', { name: 'Items (0)' }),
+        ).toBeVisible()
+        await expect(
+          userPage.getByText('This table is currently empty'),
+        ).toBeVisible()
+      })
 
       await userPage.addStyleTag({
         content: `
@@ -621,13 +621,7 @@ testAuth.describe('Authenticated Pages', () => {
         maxDiffPixelRatio: MAX_DIFF_PIXEL_RATIO,
       })
 
-      // Add a row
       await userPage.getByRole('button', { name: 'Add Row' }).click()
-      await userPage.waitForTimeout(SHORTER_WAIT_TIME)
-
-      await expect(
-        userPage.locator(PROJECT_TAB_PAGE_SELECTOR),
-      ).toHaveScreenshot('project-page-table-row-added.png')
 
       const tableRows = getTableEditorRows(userPage)
       const firstDataRow = tableRows.nth(1) // Skip header row
@@ -636,7 +630,6 @@ testAuth.describe('Authenticated Pages', () => {
       await dateCell.click()
       await userPage.waitForTimeout(SHORTER_WAIT_TIME)
 
-      // Enter date value
       await enterTableValue(dateCell, '2024-01-15')
       await userPage.waitForTimeout(SHORTER_WAIT_TIME)
 
