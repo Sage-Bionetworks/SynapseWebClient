@@ -73,15 +73,10 @@ testAuth.describe('Authenticated Pages', () => {
 
   // To test the below, you need an admin account for the dev stack.
   testAuth('dashboard', async ({ userPage }) => {
-    // to fix
     const url = '/Home:x'
     await userPage.goto(url)
     await waitForInitialPageLoad(userPage)
     await userPage.waitForTimeout(LONGER_WAIT_TIME)
-
-    //       .MuiBox-root h1:nth-of-type(2) {
-
-    // print h1s on page
 
     await userPage.addStyleTag({
       content: `
@@ -139,11 +134,9 @@ testAuth.describe('Authenticated Pages', () => {
       `,
     })
 
-    // Wait for styles to be applied
     await userPage.waitForTimeout(SHORTER_WAIT_TIME)
 
-    // Take screenshot after hiding dynamic content
-    // Normalize project title and SynID for visual regression
+    // Normalize project title and SynID
     await userPage.evaluate(() => {
       // Normalize project title
       const title = document.querySelector('h3.pageHeaderTitle')
@@ -164,8 +157,7 @@ testAuth.describe('Authenticated Pages', () => {
       maxDiffPixelRatio: MAX_DIFF_PIXEL_RATIO,
     })
 
-    // Test button interactions - wait for buttons to be available
-    const pageButtons = [
+    const allProjectsPageButtons = [
       'Created by me',
       'Favorites',
       'Shared directly with me',
@@ -175,7 +167,7 @@ testAuth.describe('Authenticated Pages', () => {
     // Wait for at least one of the buttons to be available
     try {
       await userPage.waitForSelector('button', { timeout: 10000 })
-      await userPage.waitForTimeout(1000) // Give extra time for all buttons to load
+      await userPage.waitForTimeout(1000)
     } catch (e) {
       console.log(
         e,
@@ -183,7 +175,7 @@ testAuth.describe('Authenticated Pages', () => {
       )
     }
 
-    for (const buttonName of pageButtons) {
+    for (const buttonName of allProjectsPageButtons) {
       const screenshotName = formatScreenshotName(
         'all-projects',
         `${buttonName}-clicked`,
@@ -216,7 +208,6 @@ testAuth.describe('Authenticated Pages', () => {
       `,
     })
 
-    // Test various header actions
     await pageElementInteractions(
       userPage,
       'Project Tools',
@@ -226,6 +217,7 @@ testAuth.describe('Authenticated Pages', () => {
       },
     )
 
+    // Test project tabs
     const projectTabs = [
       'Wiki',
       'Files',
@@ -244,7 +236,6 @@ testAuth.describe('Authenticated Pages', () => {
     for (const tabName of projectTabs) {
       const screenshotName = `project-page-${tabName.toLowerCase()}-tab.png`
 
-      // Try to find the tab link with more flexible timing
       try {
         await pageElementInteractions(userPage, tabName, screenshotName, {
           selector: PROJECT_TAB_PAGE_SELECTOR,
@@ -293,7 +284,6 @@ testAuth.describe('Authenticated Pages', () => {
     testAuth(
       `project files tab actions - ${actionName}`,
       async ({ userPage }) => {
-        // Navigate to files tab first
         await navigateToProjectTab(userPage, userProject.id, 'files')
 
         await userPage.addStyleTag({
@@ -305,10 +295,8 @@ testAuth.describe('Authenticated Pages', () => {
           `,
         })
 
-        // Wait for files tab to fully load and stabilize in its final state
         await userPage.waitForTimeout(LONGER_WAIT_TIME)
 
-        // Wait for either the file table or empty message to appear
         try {
           await userPage.waitForSelector(
             'table, .gwt-Label:has-text("There is currently no content here")',
@@ -327,7 +315,6 @@ testAuth.describe('Authenticated Pages', () => {
 
   // Test complete file upload workflow with screenshots
   testAuth('project files tab - complete file upload', async ({ userPage }) => {
-    // Navigate to files tab
     await navigateToProjectTab(userPage, userProject.id, 'files')
 
     await userPage.addStyleTag({
@@ -491,7 +478,6 @@ testAuth.describe('Authenticated Pages', () => {
     testAuth(
       `project tables tab actions - ${actionName}`,
       async ({ userPage }) => {
-        // Navigate to tables tab first
         await navigateToProjectTab(userPage, userProject.id, 'tables')
 
         await pageElementInteractions(userPage, actionName, screenshotName, {
@@ -501,19 +487,17 @@ testAuth.describe('Authenticated Pages', () => {
     )
   }
 
-  // Test complete table creation workflow with screenshots
+  // Test complete table creation workflow
   testAuth(
     'project tables tab - complete table creation',
     async ({ userPage }) => {
       await navigateToProjectTab(userPage, userProject.id, 'tables')
 
-      // Toggle into experimental mode for React-based table column schema editor
       await toggleIntoExperimentalMode(userPage)
       await navigateToProjectTab(userPage, userProject.id, 'tables')
 
       // Hide dynamic content in tables list view (Modified On, Created On, syn ID)
       await userPage.evaluate(() => {
-        // Hide Modified On and Created On timestamp columns (date format)
         const allTdCells = document.querySelectorAll('td')
         allTdCells.forEach(cell => {
           if (cell.textContent?.match(/\d{1,2}\/\d{1,2}\/\d{4}/)) {
@@ -632,7 +616,6 @@ testAuth.describe('Authenticated Pages', () => {
         })
       })
 
-      // Wait for styles to be applied and page to re-render
       await userPage.waitForTimeout(1000)
 
       await expect(
@@ -645,6 +628,7 @@ testAuth.describe('Authenticated Pages', () => {
       const editButton = userPage.getByRole('button', {
         name: 'Bulk Edit Table Cell Values',
       })
+
       await expect(editButton).toBeVisible({ timeout: defaultExpectTimeout })
       await userPage.waitForTimeout(1000)
 
@@ -702,10 +686,8 @@ testAuth.describe('Authenticated Pages', () => {
     testAuth(
       `project discussion tab actions - ${actionName}`,
       async ({ userPage }) => {
-        // Navigate to discussion tab first
         await navigateToProjectTab(userPage, userProject.id, 'discussion')
 
-        // Wait for discussion tab content to be fully loaded
         try {
           await userPage.waitForSelector(
             'button:has-text("New Thread"), button:has-text("Discussion Tools")',
@@ -734,6 +716,7 @@ testAuth.describe('Authenticated Pages', () => {
       await userPage.waitForSelector('button:has-text("Discussion Tools")', {
         timeout: 10000,
       })
+
       await userPage.waitForTimeout(1000)
     } catch {
       console.log('Discussion Tools button not found, skipping dropdown test')
@@ -770,7 +753,6 @@ testAuth.describe('Authenticated Pages', () => {
         timeout: 3000,
       })
     } catch {
-      // If "Deleted Threads" text doesn't appear, just continue
       await userPage.waitForTimeout(1000)
     }
   })
@@ -938,8 +920,6 @@ testAuth.describe('Authenticated Pages', () => {
     await userPage.addStyleTag({
       content: '.fileCount { visibility: hidden !important; }',
     })
-
-    // to fix
 
     await testPageVisualAndAccessibility(
       userPage,
