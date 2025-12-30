@@ -35,7 +35,6 @@ src/main/webapp/fonts/*
 /playwright/.auth/
 /blob-report/
 /all-blob-reports/
-# hide snapshot folders, unhide when in use
 e2e/**/*-snapshots/
 
 # dotenv
