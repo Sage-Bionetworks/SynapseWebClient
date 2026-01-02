@@ -355,7 +355,7 @@ public class CrawlFilter {
     return html.toString();
   }
 
-  public String getDatasetScriptElementContent(
+  private String getDatasetScriptElementContent(
     EntityBundle bundle,
     String plainTextWiki
   ) {
