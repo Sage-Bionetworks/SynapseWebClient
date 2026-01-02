@@ -39,7 +39,6 @@ import org.sagebionetworks.web.server.servlet.FileHandleAssociationServlet;
 import org.sagebionetworks.web.server.servlet.FileHandleServlet;
 import org.sagebionetworks.web.server.servlet.FileUploaderJnlp;
 import org.sagebionetworks.web.server.servlet.InitSessionServlet;
-import org.sagebionetworks.web.server.servlet.JsonLdContentServlet;
 import org.sagebionetworks.web.server.servlet.LinkedInServiceImpl;
 import org.sagebionetworks.web.server.servlet.ProjectAliasServlet;
 import org.sagebionetworks.web.server.servlet.SlackServlet;
@@ -259,11 +258,6 @@ public class PortalServletModule extends ServletModule {
 
     bind(OAuth2AliasServlet.class).in(Singleton.class);
     serve("/Portal/oauth2AliasCallback").with(OAuth2AliasServlet.class);
-
-    // (Dataset) JSON-LD element
-    bind(JsonLdContentServlet.class).in(Singleton.class);
-    serve("/Portal/" + WebConstants.JSON_LD_CONTENT_SERVLET)
-      .with(JsonLdContentServlet.class);
 
     // Catch-all. Note that "/*" would override all other servlet binding, and "/" overrides the default
     // handler

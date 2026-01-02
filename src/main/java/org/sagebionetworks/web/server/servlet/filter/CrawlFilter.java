@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
@@ -59,13 +58,10 @@ import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
-import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
-import org.sagebionetworks.schema.adapter.org.json.JSONArrayAdapterImpl;
-import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
@@ -335,94 +331,89 @@ public class CrawlFilter {
       i++;
     } while (i < MAX_CHILD_PAGES && childList.getNextPageToken() != null);
     response.setBody(html.toString());
-
-    // SWC-6609: removed for now
-    //    response.head = getDatasetScriptElement(bundle, plainTextWiki);
-
+    response.setHead(getDatasetScriptElement(bundle, plainTextWiki));
     return response;
   }
 
   private String getDatasetScriptElement(
     EntityBundle bundle,
     String plainTextWiki
-  ) throws JSONObjectAdapterException {
+  ) {
     StringBuilder html = new StringBuilder();
     html.append("<script type=\"application/ld+json\">");
     html.append(getDatasetScriptElementContent(bundle, plainTextWiki));
-    html.append("\"</script>\"");
+    html.append("</script>");
     return html.toString();
   }
 
-  public static String getDatasetScriptElementContent(
+  public String getDatasetScriptElementContent(
     EntityBundle bundle,
     String plainTextWiki
-  ) throws JSONObjectAdapterException {
-    StringBuilder html = new StringBuilder();
-    if (bundle.getEntity() instanceof Dataset) {
-      Dataset ds = (Dataset) bundle.getEntity();
-      JSONObjectAdapter json = new JSONObjectAdapterImpl();
-      json.put("@context", "http://schema.org/");
-      json.put("@type", "Dataset");
-      json.put("name", ds.getName());
-      if (plainTextWiki != null) {
-        json.put("description", plainTextWiki);
-      } else {
-        json.put("description", ds.getDescription());
-      }
-      json.put(
-        "url",
-        "https://www.synapse.org/Synapse:" +
-        ds.getId() +
-        "." +
-        ds.getVersionNumber()
-      );
-      json.put("version", ds.getVersionNumber());
-
-      // add annotations
-      JSONArrayAdapter array = new JSONArrayAdapterImpl();
-      Map<String, AnnotationsValue> annotations = bundle
-        .getAnnotations()
-        .getAnnotations();
-      Set<String> annotationKeys = annotations.keySet();
-      int index = 0;
-      for (String key : annotationKeys) {
-        List<String> keyValuePairList = new ArrayList<String>();
-        keyValuePairList.add(key);
-        List<String> values = annotations.get(key).getValue();
-        for (String value : values) {
-          keyValuePairList.add(value);
+  ) {
+    // If entity id is in the croissant mapping table, then add the JSON-LD script element
+    if (synapseClient != null) {
+      try {
+        // get all rows from the croissant mapping table as the anonymous user to utilize server cached result
+        String asyncJobToken = synapseClient.queryTableEntityBundleAsyncStart(
+          WebConstants.DATASET_MINIMAL_CROISSANT_FILE_CRAWL_RESPONSE_SQL,
+          null,
+          MAX_QUERY_ROWS,
+          QUERY_RESULTS_PART_MASK,
+          WebConstants.DATASET_MINIMAL_CROISSANT_TABLE_ID
+        );
+        QueryResultBundle queryResultBundle = waitForQueryResultBundle(
+          asyncJobToken,
+          WebConstants.DATASET_MINIMAL_CROISSANT_TABLE_ID
+        );
+        if (
+          queryResultBundle != null &&
+          queryResultBundle.getQueryResult() != null &&
+          queryResultBundle.getQueryResult().getQueryResults() != null
+        ) {
+          RowSet rowSet = queryResultBundle.getQueryResult().getQueryResults();
+          List<Row> rows = rowSet.getRows();
+          if (rows != null && !rows.isEmpty()) {
+            for (Row row : rows) {
+              List<String> values = row.getValues();
+              String entityId = getRowValue(
+                values,
+                WebConstants.DATASET_MINIMAL_CROISSANT_DATASET_COLUMN_INDEX
+              );
+              // check for matching entity id
+              if (
+                entityId == null ||
+                entityId.isEmpty() ||
+                !entityId.equals(bundle.getEntity().getId())
+              ) {
+                continue;
+              }
+              String s3FileURL = getRowValue(
+                values,
+                WebConstants.DATASET_MINIMAL_CROISSANT_MINIMAL_CROISSANT_FILE_S3_OBJECT_COLUMN_INDEX
+              );
+              // read file content from s3FileURL
+              try {
+                String fileContent = getURLContents(s3FileURL, false);
+                // append to html
+                return fileContent;
+              } catch (IOException e) {
+                log.error(
+                  "Dataset croissant file content read from S3 URL failed: " +
+                  s3FileURL,
+                  e
+                );
+              }
+            }
+          }
         }
-        array.put(index++, String.join(", ", keyValuePairList));
+      } catch (SynapseException e) {
+        log.error("Dataset croissant file mapping table", e);
+      } catch (InterruptedException e) {
+        log.warn("Dataset croissant file mapping table query interrupted", e);
+        Thread.currentThread().interrupt();
       }
-      json.put("keywords", array);
-
-      // include identifier if there is a DOI association?
-
-      JSONObjectAdapter object = new JSONObjectAdapterImpl();
-      object.put("@type", "DataCatalog");
-      object.put("name", "Synapse");
-      object.put("url", "https://www.synapse.org");
-      json.put("includedInDataCatalog", object);
-
-      json.put("isAccessibleForFree", true);
-
-      json.put("dateModified", df.format(ds.getModifiedOn()));
-
-      //      TODO: Proper attribution is critical to our mission, so the creator must be updatable
-      //            by administrators of the Dataset (not hard-coded to the entity creator)
-      //      object = new JSONObjectAdapterImpl();
-      //      object.put("@type", "Person");
-      //      UserProfile profile = synapseClient.getUserProfile(ds.getCreatedBy());
-      //      object.put("name", getDisplayName(profile));
-      //      object.put(
-      //        "url",
-      //        "https://www.synapse.org/Profile:" + ds.getCreatedBy()
-      //      );
-      //      json.put("creator", object);
-
-      html.append(json.toJSONString());
     }
-    return html.toString();
+    return "";
   }
 
   public String getThreadHtml(
@@ -452,7 +443,7 @@ public class CrawlFilter {
         String replyURL = synapseClient
           .getReplyUrl(reply.getMessageKey())
           .toString();
-        html.append(getURLContents(replyURL) + "<br>");
+        html.append(getURLContents(replyURL, true) + "<br>");
       } catch (Exception e) {}
     }
     return html.toString();
@@ -539,7 +530,8 @@ public class CrawlFilter {
     return response;
   }
 
-  private String getURLContents(String urlTarget) throws IOException {
+  private String getURLContents(String urlTarget, boolean useGzip)
+    throws IOException {
     URL url = new URL(urlTarget);
     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
     try {
@@ -547,7 +539,9 @@ public class CrawlFilter {
         WebConstants.CONTENT_TYPE,
         WebConstants.TEXT_PLAIN_CHARSET_UTF8
       );
-      InputStream in = new GZIPInputStream(conn.getInputStream());
+      InputStream in = useGzip
+        ? new GZIPInputStream(conn.getInputStream())
+        : conn.getInputStream();
       try {
         return IOUtils.toString(in, "UTF-8");
       } finally {
