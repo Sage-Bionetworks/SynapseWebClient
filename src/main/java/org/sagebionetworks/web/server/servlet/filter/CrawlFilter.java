@@ -331,7 +331,12 @@ public class CrawlFilter {
       i++;
     } while (i < MAX_CHILD_PAGES && childList.getNextPageToken() != null);
     response.setBody(html.toString());
-    response.setHead(getDatasetScriptElement(bundle, plainTextWiki));
+    String datasetScript = getDatasetScriptElement(bundle, plainTextWiki);
+    if (response.getHead() != null && !response.getHead().isEmpty()) {
+      response.setHead(response.getHead() + datasetScript);
+    } else {
+      response.setHead(datasetScript);
+    }
     return response;
   }
 
@@ -339,9 +344,13 @@ public class CrawlFilter {
     EntityBundle bundle,
     String plainTextWiki
   ) {
+    String content = getDatasetScriptElementContent(bundle, plainTextWiki);
+    if (content == null || content.isEmpty()) {
+      return "";
+    }
     StringBuilder html = new StringBuilder();
     html.append("<script type=\"application/ld+json\">");
-    html.append(getDatasetScriptElementContent(bundle, plainTextWiki));
+    html.append(content);
     html.append("</script>");
     return html.toString();
   }
@@ -352,6 +361,7 @@ public class CrawlFilter {
   ) {
     // If entity id is in the croissant mapping table, then add the JSON-LD script element
     if (synapseClient != null) {
+      String s3FileURL = "";
       try {
         // get all rows from the croissant mapping table as the anonymous user to utilize server cached result
         String asyncJobToken = synapseClient.queryTableEntityBundleAsyncStart(
@@ -387,30 +397,32 @@ public class CrawlFilter {
               ) {
                 continue;
               }
-              String s3FileURL = getRowValue(
-                values,
-                WebConstants.DATASET_MINIMAL_CROISSANT_MINIMAL_CROISSANT_FILE_S3_OBJECT_COLUMN_INDEX
-              );
-              // read file content from s3FileURL
-              try {
-                String fileContent = getURLContents(s3FileURL, false);
-                // append to html
-                return fileContent;
-              } catch (IOException e) {
-                log.error(
-                  "Dataset croissant file content read from S3 URL failed: " +
-                  s3FileURL,
-                  e
+              s3FileURL =
+                getRowValue(
+                  values,
+                  WebConstants.DATASET_MINIMAL_CROISSANT_MINIMAL_CROISSANT_FILE_S3_OBJECT_COLUMN_INDEX
                 );
+              if (s3FileURL == null || s3FileURL.isEmpty()) {
+                continue;
               }
+              // read file content from s3FileURL
+              String fileContent = getURLContents(s3FileURL, false);
+              // append to html
+              return fileContent;
             }
           }
         }
       } catch (SynapseException e) {
-        log.error("Dataset croissant file mapping table", e);
+        log.error("Failed to query dataset croissant file mapping table", e);
       } catch (InterruptedException e) {
         log.warn("Dataset croissant file mapping table query interrupted", e);
         Thread.currentThread().interrupt();
+      } catch (IOException e) {
+        log.error(
+          "Dataset croissant file content read from S3 URL failed: " +
+          s3FileURL,
+          e
+        );
       }
     }
     return "";
