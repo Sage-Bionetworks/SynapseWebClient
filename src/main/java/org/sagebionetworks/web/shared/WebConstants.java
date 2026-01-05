@@ -258,7 +258,6 @@ public class WebConstants {
   public static final String VERSIONS_SERVLET = "versions";
   public static final String CDN_REDIRECTOR_SERVLET = "cdn";
   public static final String FILE_HANDLE_UPLOAD_SERVLET = "filehandle";
-  public static final String JSON_LD_CONTENT_SERVLET = "jsonldcontent";
   public static final String SESSION_COOKIE_SERVLET = "sessioncookie";
   public static final String FILE_ENTITY_RESOLVER_SERVLET = "fileresolver";
   public static final String SFTP_PROXY_ENDPOINT =
@@ -436,4 +435,14 @@ public class WebConstants {
   public static final int DATA_CATALOG_LINK_COLUMN_INDEX = 2;
   public static final String DATA_CATALOG_CRAWL_RESPONSE_SQL =
     "SELECT name, description, link " + DATA_CATALOG_FROM_SQL;
+
+  public static final String DATASET_MINIMAL_CROISSANT_TABLE_ID = "syn72041138";
+  private static final String DATASET_MINIMAL_CROISSANT_FROM_SQL =
+    "FROM " + DATASET_MINIMAL_CROISSANT_TABLE_ID;
+  public static final String DATASET_MINIMAL_CROISSANT_FILE_CRAWL_RESPONSE_SQL =
+    "SELECT dataset, minimal_croissant_file_s3_object " +
+    DATASET_MINIMAL_CROISSANT_FROM_SQL;
+  public static final int DATASET_MINIMAL_CROISSANT_DATASET_COLUMN_INDEX = 0;
+  public static final int DATASET_MINIMAL_CROISSANT_MINIMAL_CROISSANT_FILE_S3_OBJECT_COLUMN_INDEX =
+    1;
 }
