@@ -53,7 +53,7 @@
             />
           </b:Heading>
         </g:FlowPanel>
-        <g:FlowPanel>
+        <g:FlowPanel addStyleNames="margin-top-15">
           <b:FormLabel>WebVTT Captions File (.vtt) </b:FormLabel>
           <b:InputGroup>
             <b:TextBox
