@@ -83,7 +83,7 @@ public class VideoConfigViewImpl implements VideoConfigView {
         .setInitialContainer(EntityFinderWidget.InitialContainer.PROJECT)
         .setMultiSelect(false)
         .setSelectableTypes(EntityFilter.FILE)
-        .setVersionSelection(EntityFinderWidget.VersionSelection.TRACKED)
+        .setVersionSelection(EntityFinderWidget.VersionSelection.UNTRACKED)
         .setSelectedHandler(
           ((selected, finder) -> presenter.validateSelection(selected))
         )
@@ -101,7 +101,7 @@ public class VideoConfigViewImpl implements VideoConfigView {
         .setInitialContainer(EntityFinderWidget.InitialContainer.PROJECT)
         .setMultiSelect(false)
         .setSelectableTypes(EntityFilter.FILE)
-        .setVersionSelection(EntityFinderWidget.VersionSelection.TRACKED)
+        .setVersionSelection(EntityFinderWidget.VersionSelection.UNTRACKED)
         .setSelectedHandler(
           ((selected, finder) -> {
               vttEntity.setValue(selected.getTargetId());
