@@ -10,6 +10,7 @@ import java.util.Map;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
@@ -111,6 +112,13 @@ public class VideoConfigEditor
           descriptor.get(WidgetConstants.VIDEO_WIDGET_WEBM_SYNAPSE_ID_KEY)
         );
       }
+      if (
+        descriptor.get(WidgetConstants.VIDEO_WIDGET_VTT_SYNAPSE_ID_KEY) != null
+      ) {
+        view.setVttEntity(
+          descriptor.get(WidgetConstants.VIDEO_WIDGET_VTT_SYNAPSE_ID_KEY)
+        );
+      }
     }
   }
 
@@ -210,6 +218,13 @@ public class VideoConfigEditor
     view.checkParams();
     descriptor.clear();
     if (view.isSynapseEntity()) {
+      String vttEntityId = view.getVttEntity();
+      if (DisplayUtils.isDefined(vttEntityId)) {
+        descriptor.put(
+          WidgetConstants.VIDEO_WIDGET_VTT_SYNAPSE_ID_KEY,
+          vttEntityId
+        );
+      }
       String entityId = view.getEntity();
       if (VIDEO_TYPE.MP4.equals(currentType)) {
         descriptor.put(
