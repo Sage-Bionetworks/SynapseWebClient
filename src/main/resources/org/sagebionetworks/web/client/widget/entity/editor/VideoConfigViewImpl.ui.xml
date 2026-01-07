@@ -53,6 +53,20 @@
             />
           </b:Heading>
         </g:FlowPanel>
+        <g:FlowPanel addStyleNames="margin-top-15">
+          <b:FormLabel>WebVTT Captions File (.vtt) </b:FormLabel>
+          <b:InputGroup>
+            <b:TextBox
+              ui:field="vttEntity"
+              autoComplete="false"
+              enabled="false"
+              height="34px"
+            />
+            <b:InputGroupButton>
+              <b:Button ui:field="vttButton" icon="SEARCH" height="34px" />
+            </b:InputGroupButton>
+          </b:InputGroup>
+        </g:FlowPanel>
       </b:TabPane>
       <b:TabPane b:id="tab2" addStyleNames="margin-top-15" ui:field="tab2">
         <b:FieldSet>

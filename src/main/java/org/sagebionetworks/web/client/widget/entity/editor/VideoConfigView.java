@@ -16,6 +16,10 @@ public interface VideoConfigView extends IsWidget, WidgetEditorView {
 
   String getEntity();
 
+  void setVttEntity(String entity);
+
+  String getVttEntity();
+
   void hideFinder();
 
   void setVideoFormatWarningVisible(boolean visible);

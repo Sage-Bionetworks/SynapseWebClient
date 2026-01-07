@@ -7,6 +7,7 @@ public interface VideoWidgetView extends IsWidget {
     String mp4SynapseId,
     String oggSynapseId,
     String webmSynapseId,
+    String vttSynapseId,
     String width,
     String height
   );
