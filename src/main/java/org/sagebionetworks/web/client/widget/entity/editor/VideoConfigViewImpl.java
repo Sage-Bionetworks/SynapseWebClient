@@ -29,9 +29,16 @@ public class VideoConfigViewImpl implements VideoConfigView {
   Button button;
 
   @UiField
+  TextBox vttEntity;
+
+  @UiField
+  Button vttButton;
+
+  @UiField
   Heading videoFormatWarning;
 
   EntityFinderWidget entityFinder;
+  EntityFinderWidget vttEntityFinder;
 
   @UiField
   TabListItem synapseTabListItem;
@@ -82,6 +89,27 @@ public class VideoConfigViewImpl implements VideoConfigView {
         )
         .build();
     button.addClickHandler(event -> entityFinder.show());
+
+    this.vttEntityFinder =
+      entityFinderBuilder
+        .setModalTitle("Find WebVTT (.vtt) File")
+        .setHelpMarkdown(
+          "Search or Browse Synapse to find a Web Video Text Tracks (WebVTT) file to display timed text with this video content."
+        )
+        .setPromptCopy("Find WebVTT File to display with this video")
+        .setInitialScope(EntityFinderScope.CURRENT_PROJECT)
+        .setInitialContainer(EntityFinderWidget.InitialContainer.PROJECT)
+        .setMultiSelect(false)
+        .setSelectableTypes(EntityFilter.FILE)
+        .setVersionSelection(EntityFinderWidget.VersionSelection.TRACKED)
+        .setSelectedHandler(
+          ((selected, finder) -> {
+              vttEntity.setValue(selected.getTargetId());
+              finder.hide();
+            })
+        )
+        .build();
+    vttButton.addClickHandler(event -> vttEntityFinder.show());
   }
 
   @Override
@@ -139,6 +167,16 @@ public class VideoConfigViewImpl implements VideoConfigView {
   @Override
   public void setEntity(String entityString) {
     entity.setValue(entityString);
+  }
+
+  @Override
+  public String getVttEntity() {
+    return vttEntity.getValue();
+  }
+
+  @Override
+  public void setVttEntity(String entityString) {
+    vttEntity.setValue(entityString);
   }
 
   @Override

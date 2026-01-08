@@ -68,6 +68,10 @@ public class VideoWidget implements WidgetRendererPresenter {
     String webmSynapseId = descriptor.get(
       WidgetConstants.VIDEO_WIDGET_WEBM_SYNAPSE_ID_KEY
     );
+    String vttSynapseId = descriptor.get(
+      WidgetConstants.VIDEO_WIDGET_VTT_SYNAPSE_ID_KEY
+    );
+
     String width = descriptor.get(WidgetConstants.VIDEO_WIDGET_WIDTH_KEY);
     String height = descriptor.get(WidgetConstants.HEIGHT_KEY);
     if (youTubeVideoId != null) {
@@ -79,6 +83,7 @@ public class VideoWidget implements WidgetRendererPresenter {
         mp4SynapseId,
         oggSynapseId,
         webmSynapseId,
+        vttSynapseId,
         width,
         height
       );
@@ -105,6 +110,7 @@ public class VideoWidget implements WidgetRendererPresenter {
       mp4SynapseId,
       oggSynapseId,
       webmSynapseId,
+      null,
       Integer.toString(width),
       Integer.toString(height)
     );
@@ -114,6 +120,7 @@ public class VideoWidget implements WidgetRendererPresenter {
     String mp4SynapseId,
     String oggSynapseId,
     String webmSynapseId,
+    String vttSynapseId,
     String width,
     String height
   ) {
@@ -130,6 +137,9 @@ public class VideoWidget implements WidgetRendererPresenter {
     }
     if (webmSynapseId != null) {
       entityBundleCalls.add(jsClient.getEntityBundle(webmSynapseId, request));
+    }
+    if (vttSynapseId != null) {
+      entityBundleCalls.add(jsClient.getEntityBundle(vttSynapseId, request));
     }
 
     FluentFuture
@@ -153,6 +163,7 @@ public class VideoWidget implements WidgetRendererPresenter {
                 mp4SynapseId,
                 oggSynapseId,
                 webmSynapseId,
+                vttSynapseId,
                 width,
                 height
               );

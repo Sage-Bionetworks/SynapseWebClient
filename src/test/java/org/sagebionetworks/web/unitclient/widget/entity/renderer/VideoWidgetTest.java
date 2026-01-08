@@ -91,6 +91,38 @@ public class VideoWidgetTest {
         eq(mp4VideoId),
         eq(oggVideoId),
         eq(webMVideoId),
+        eq((String) null),
+        eq(width),
+        eq(height)
+      );
+  }
+
+  @Test
+  public void testConfigureWithVtt() {
+    Map<String, String> descriptor = new HashMap<String, String>();
+    String mp4VideoId = "syn123";
+    String webMVideoId = "syn456";
+    String oggVideoId = "syn789";
+    String vttVideoId = "syn999";
+    String width = "400px";
+    String height = "600px";
+    descriptor.put(WidgetConstants.VIDEO_WIDGET_MP4_SYNAPSE_ID_KEY, mp4VideoId);
+    descriptor.put(
+      WidgetConstants.VIDEO_WIDGET_WEBM_SYNAPSE_ID_KEY,
+      webMVideoId
+    );
+    descriptor.put(WidgetConstants.VIDEO_WIDGET_OGG_SYNAPSE_ID_KEY, oggVideoId);
+    descriptor.put(WidgetConstants.VIDEO_WIDGET_VTT_SYNAPSE_ID_KEY, vttVideoId);
+    descriptor.put(WidgetConstants.VIDEO_WIDGET_WIDTH_KEY, width);
+    descriptor.put(WidgetConstants.HEIGHT_KEY, height);
+
+    widget.configure(wikiKey, descriptor, null, null);
+    verify(mockView)
+      .configure(
+        eq(mp4VideoId),
+        eq(oggVideoId),
+        eq(webMVideoId),
+        eq(vttVideoId),
         eq(width),
         eq(height)
       );
@@ -110,6 +142,7 @@ public class VideoWidgetTest {
     String mp4VideoId = "syn123";
     String oggVideoId = null;
     String webMVideoId = null;
+    String vttVideoId = null;
     String width = "400";
     String height = "600";
     widget.configure(mp4VideoId, "filename.mp4", 400, 600);
@@ -118,6 +151,7 @@ public class VideoWidgetTest {
         eq(mp4VideoId),
         eq(oggVideoId),
         eq(webMVideoId),
+        eq(vttVideoId),
         eq(width),
         eq(height)
       );
@@ -128,6 +162,7 @@ public class VideoWidgetTest {
     String mp4VideoId = null;
     String oggVideoId = null;
     String webMVideoId = "syn456";
+    String vttVideoId = null;
     String width = "400";
     String height = "600";
     widget.configure(webMVideoId, "filename.webm", 400, 600);
@@ -136,6 +171,7 @@ public class VideoWidgetTest {
         eq(mp4VideoId),
         eq(oggVideoId),
         eq(webMVideoId),
+        eq(vttVideoId),
         eq(width),
         eq(height)
       );
@@ -146,6 +182,7 @@ public class VideoWidgetTest {
     String mp4VideoId = null;
     String oggVideoId = "syn789";
     String webMVideoId = null;
+    String vttVideoId = null;
     String width = "400";
     String height = "600";
     widget.configure(oggVideoId, "filename.ogg", 400, 600);
@@ -154,6 +191,7 @@ public class VideoWidgetTest {
         eq(mp4VideoId),
         eq(oggVideoId),
         eq(webMVideoId),
+        eq(vttVideoId),
         eq(width),
         eq(height)
       );
@@ -169,6 +207,7 @@ public class VideoWidgetTest {
 
     verify(mockView, never())
       .configure(
+        anyString(),
         anyString(),
         anyString(),
         anyString(),
@@ -192,6 +231,7 @@ public class VideoWidgetTest {
         anyString(),
         anyString(),
         anyString(),
+        anyString(),
         anyString()
       );
     verify(mockView).showError(DisplayConstants.ERROR_FAILURE_PRIVLEDGES);
@@ -204,6 +244,7 @@ public class VideoWidgetTest {
     String mp4VideoId = null;
     String oggVideoId = null;
     String webMVideoId = "syn456";
+    String vttVideoId = null;
     String width = "400";
     String height = "600";
 
@@ -214,6 +255,7 @@ public class VideoWidgetTest {
         eq(mp4VideoId),
         eq(oggVideoId),
         eq(webMVideoId),
+        eq(vttVideoId),
         eq(width),
         eq(height)
       );
