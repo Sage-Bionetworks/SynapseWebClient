@@ -129,8 +129,8 @@ importers:
         specifier: ^3.0.2
         version: 3.0.2
       synapse-react-client:
-        specifier: 3.4.58
-        version: 3.4.58(@babel/template@7.27.2)(@hyperjump/browser@1.3.1)(@types/json-schema@7.0.15)(@types/react@19.1.8)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.30.1)(prop-types@15.8.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(rxjs@7.8.2)
+        specifier: 3.4.59
+        version: 3.4.59(@babel/template@7.27.2)(@hyperjump/browser@1.3.1)(@types/json-schema@7.0.15)(@types/react@19.1.8)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.30.1)(prop-types@15.8.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(rxjs@7.8.2)
       universal-cookie:
         specifier: ^7.2.2
         version: 7.2.2
@@ -1329,6 +1329,7 @@ packages:
     resolution: {integrity: sha512-MR8c0+UxAlB22Fq4R+aQSPBayvYa3+9DrwG/i1TKQXFYEaoW3B5b/rkSRIypcZDdWjWnpcvxbNaAJDcSbJU3Lw==}
     cpu: [loong64]
     os: [linux]
+    libc: [musl]
 
   '@rollup/rollup-linux-ppc64-gnu@4.55.1':
     resolution: {integrity: sha512-3KhoECe1BRlSYpMTeVrD4sh2Pw2xgt4jzNSZIIPLFEsnQn9gAnZagW9+VqDqAHgm1Xc77LzJOo2LdigS5qZ+gw==}
@@ -1340,6 +1341,7 @@ packages:
     resolution: {integrity: sha512-ziR1OuZx0vdYZZ30vueNZTg73alF59DicYrPViG0NEgDVN8/Jl87zkAPu4u6VjZST2llgEUjaiNl9JM6HH1Vdw==}
     cpu: [ppc64]
     os: [linux]
+    libc: [musl]
 
   '@rollup/rollup-linux-riscv64-gnu@4.55.1':
     resolution: {integrity: sha512-uW0Y12ih2XJRERZ4jAfKamTyIHVMPQnTZcQjme2HMVDAHY4amf5u414OqNYC+x+LzRdRcnIG1YodLrrtA8xsxw==}
@@ -1698,9 +1700,6 @@ packages:
 
   '@turf/meta@7.3.1':
     resolution: {integrity: sha512-NWsfOE5RVtWpLQNkfOF/RrYvLRPwwruxhZUV0UFIzHqfiRJ50aO9Y6uLY4bwCUe2TumLJQSR4yaoA72Rmr2mnQ==}
-
-  '@types/cookie@0.3.3':
-    resolution: {integrity: sha512-LKVP3cgXBT9RYj+t+9FDKwS5tdI+rPBXaNSkma7hvqy35lc7mAokC2zsqWJH0LaqIt3B962nuYI77hsJoT1gow==}
 
   '@types/cookie@0.6.0':
     resolution: {integrity: sha512-4Kh9a6B2bQciAhf7FSuMRRkUWecJgJu9nPnx3yzpsfXX/c50REIqpHY4C82bXP90qrLtXtkDxTZosYO3UpOwlA==}
@@ -2391,10 +2390,6 @@ packages:
 
   convert-source-map@1.9.0:
     resolution: {integrity: sha512-ASFBup0Mz1uyiIjANan1jzLQami9z1PoYSZCiiYW2FczPbenXc45FZdBZLzOT+r6+iciuEModtmCti+hjaAk0A==}
-
-  cookie@0.4.2:
-    resolution: {integrity: sha512-aSWTXFzaKWkvHO1Ny/s+ePFpvKsPnjc551iI41v3ny/ow6tBG5Vd+FuqGNhh1LxOmVzOlGUriIlOaokOvhaStA==}
-    engines: {node: '>= 0.6'}
 
   cookie@0.7.2:
     resolution: {integrity: sha512-yki5XnKuf750l50uGTllt6kKILY4nQ1eNIQatoXEByZ5dWgnKqbnqmTrBE5B4N7lrMJKQ2ytWMiTO2o0v6Ew/w==}
@@ -4840,8 +4835,8 @@ packages:
   svg-path-sdf@1.1.3:
     resolution: {integrity: sha512-vJJjVq/R5lSr2KLfVXVAStktfcfa1pNFjFOgyJnzZFXlO/fDZ5DmM8FpnSKKzLPfEYTVeXuVBTHF296TpxuJVg==}
 
-  synapse-react-client@3.4.58:
-    resolution: {integrity: sha512-AZKwXfJbQ0mN38YdMeJLn06uwuos8ogove1ogaecCnKPG7SFwpTWnQnhMhgP8B06G35zx3SsxXMDJDPqJu2mNA==}
+  synapse-react-client@3.4.59:
+    resolution: {integrity: sha512-4IUJR9bQoPJtXnMq6w4IM1htdq9887wAVNcu/3HjiR0Uks16D+t9aobwEMQ5IevXOiDSyCPtX6N8pR6LK5PYGw==}
     peerDependencies:
       react: ^19.1.0
       react-dom: ^19.1.0
@@ -4997,9 +4992,6 @@ packages:
 
   undici-types@6.21.0:
     resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
-
-  universal-cookie@4.0.4:
-    resolution: {integrity: sha512-lbRVHoOMtItjWbM7TwDLdl8wug7izB0tq3/YVKhT/ahB4VDvWMyvnADfnJI8y6fSvsjh51Ix7lTGC6Tn4rMPhw==}
 
   universal-cookie@7.2.2:
     resolution: {integrity: sha512-fMiOcS3TmzP2x5QV26pIH3mvhexLIT0HmPa3V7Q7knRfT9HG6kTwq02HZGLPw0sAOXrAmotElGRvTLCMbJsvxQ==}
@@ -7206,8 +7198,6 @@ snapshots:
       '@turf/helpers': 7.3.1
       '@types/geojson': 7946.0.16
 
-  '@types/cookie@0.3.3': {}
-
   '@types/cookie@0.6.0': {}
 
   '@types/d3-array@3.2.2': {}
@@ -8026,8 +8016,6 @@ snapshots:
   content-type@1.0.5: {}
 
   convert-source-map@1.9.0: {}
-
-  cookie@0.4.2: {}
 
   cookie@0.7.2: {}
 
@@ -10942,7 +10930,7 @@ snapshots:
       parse-svg-path: 0.1.2
       svg-path-bounds: 1.0.2
 
-  synapse-react-client@3.4.58(@babel/template@7.27.2)(@hyperjump/browser@1.3.1)(@types/json-schema@7.0.15)(@types/react@19.1.8)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.30.1)(prop-types@15.8.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(rxjs@7.8.2):
+  synapse-react-client@3.4.59(@babel/template@7.27.2)(@hyperjump/browser@1.3.1)(@types/json-schema@7.0.15)(@types/react@19.1.8)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.30.1)(prop-types@15.8.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(rxjs@7.8.2):
     dependencies:
       '@apidevtools/json-schema-ref-parser': 14.2.1(@types/json-schema@7.0.15)
       '@aws-sdk/client-s3': 3.965.0
@@ -11032,7 +11020,7 @@ snapshots:
       tinycolor2: 1.6.0
       tslib: 2.8.1
       ua-parser-js: 1.0.41
-      universal-cookie: 4.0.4
+      universal-cookie: 7.2.2
       use-deep-compare-effect: 1.8.1(react@19.2.3)
       xss: 1.0.15
       zod: 3.25.76
@@ -11211,11 +11199,6 @@ snapshots:
       which-boxed-primitive: 1.1.1
 
   undici-types@6.21.0: {}
-
-  universal-cookie@4.0.4:
-    dependencies:
-      '@types/cookie': 0.3.3
-      cookie: 0.4.2
 
   universal-cookie@7.2.2:
     dependencies:
