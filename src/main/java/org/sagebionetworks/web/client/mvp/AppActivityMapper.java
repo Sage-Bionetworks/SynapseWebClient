@@ -32,6 +32,7 @@ import org.sagebionetworks.web.client.place.PeopleSearch;
 import org.sagebionetworks.web.client.place.PlansPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Search;
+import org.sagebionetworks.web.client.place.SearchV2Place;
 import org.sagebionetworks.web.client.place.SignedToken;
 import org.sagebionetworks.web.client.place.StandaloneWiki;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -91,6 +92,7 @@ public class AppActivityMapper implements ActivityMapper {
     openAccessPlaces.add(Challenges.class);
     openAccessPlaces.add(Help.class);
     openAccessPlaces.add(Search.class);
+    openAccessPlaces.add(SearchV2Place.class);
     openAccessPlaces.add(Team.class);
     openAccessPlaces.add(MapPlace.class);
     openAccessPlaces.add(TeamSearch.class);
