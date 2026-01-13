@@ -131,6 +131,7 @@ public class WidgetConstants {
   public static final String VIDEO_WIDGET_MP4_SYNAPSE_ID_KEY = "mp4SynapseId";
   public static final String VIDEO_WIDGET_OGG_SYNAPSE_ID_KEY = "oggSynapseId";
   public static final String VIDEO_WIDGET_WEBM_SYNAPSE_ID_KEY = "webmSynapseId";
+  public static final String VIDEO_WIDGET_VTT_SYNAPSE_ID_KEY = "vttSynapseId";
   public static final String VIDEO_WIDGET_WIDTH_KEY = "width";
 
   public static final String EVALUATION_ID_KEY = "evaluationId";

@@ -23,6 +23,7 @@ public class VideoWidgetViewImpl extends FlowPanel implements VideoWidgetView {
     String mp4SynapseId,
     String oggSynapseId,
     String webmSynapseId,
+    String vttSynapseId,
     String width,
     String height
   ) {
@@ -40,7 +41,7 @@ public class VideoWidgetViewImpl extends FlowPanel implements VideoWidgetView {
       SafeHtmlUtils.htmlEscape(height)
     ); else builder.append("480");
 
-    builder.append("\" controls>");
+    builder.append("\" controls crossorigin=\"anonymous\">");
     if (mp4SynapseId != null) {
       builder.append("<source src=\"");
       builder.append(
@@ -80,9 +81,23 @@ public class VideoWidgetViewImpl extends FlowPanel implements VideoWidgetView {
       builder.append("\" type=\"video/webm\">");
     }
 
-    // and finally, alt text if the browser does not support
-    builder.append("Your browser does not support the video tag. </video>");
+    // track item for captions, if vtt is provided
+    if (vttSynapseId != null) {
+      builder.append("<track kind=\"subtitles\" src=\"");
+      builder.append(
+        DisplayUtils.createFileEntityUrl(
+          synapseJsniUtils.getBaseFileHandleUrl(),
+          vttSynapseId,
+          null,
+          false
+        )
+      );
+      builder.append("\" srclang=\"en\" label=\"English\" default>");
+    }
+    // alt text if the browser does not support
+    builder.append("Your browser does not support the video tag.");
 
+    builder.append("</video>");
     add(new HTML(builder.toString()));
   }
 
