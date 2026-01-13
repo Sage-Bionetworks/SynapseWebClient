@@ -8,14 +8,18 @@ public class SearchV2Place extends Place {
 
   public static final String QUERY = "query";
 
-  public SearchV2Place(String token) {}
+  private String token;
+
+  public SearchV2Place(String token) {
+    this.token = token;
+  }
 
   @Prefix("SearchV2")
   public static class Tokenizer implements PlaceTokenizer<SearchV2Place> {
 
     @Override
     public String getToken(SearchV2Place place) {
-      return "default";
+      return place.token;
     }
 
     @Override
