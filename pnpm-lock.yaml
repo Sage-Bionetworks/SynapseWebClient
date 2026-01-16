@@ -129,8 +129,8 @@ importers:
         specifier: ^3.0.2
         version: 3.0.2
       synapse-react-client:
-        specifier: 3.4.65
-        version: 3.4.65(@babel/template@7.27.2)(@hyperjump/browser@1.3.1)(@types/json-schema@7.0.15)(@types/react@19.1.8)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.30.1)(prop-types@15.8.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(rxjs@7.8.2)
+        specifier: 3.4.66
+        version: 3.4.66(@babel/template@7.27.2)(@hyperjump/browser@1.3.1)(@types/json-schema@7.0.15)(@types/react@19.1.8)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.30.1)(prop-types@15.8.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(rxjs@7.8.2)
       universal-cookie:
         specifier: ^7.2.2
         version: 7.2.2
@@ -4583,8 +4583,8 @@ packages:
   svg-path-sdf@1.1.3:
     resolution: {integrity: sha512-vJJjVq/R5lSr2KLfVXVAStktfcfa1pNFjFOgyJnzZFXlO/fDZ5DmM8FpnSKKzLPfEYTVeXuVBTHF296TpxuJVg==}
 
-  synapse-react-client@3.4.65:
-    resolution: {integrity: sha512-wZ58xhiivduOsIXAhW8aep/VxRd8lCFsYCp+HA6Q2ZJHvPfh4gJ+u/6RqqNIbNw5OxPOhxqhYqjHID9tGv2hJg==}
+  synapse-react-client@3.4.66:
+    resolution: {integrity: sha512-twk3JvwWVrwIEkdMwT8WruBTnvJjrbMJbmFGtzeghyxXM+n+aOaX7rVFuLOLVuARG9IRvq1VazefAE5PaBov6Q==}
     peerDependencies:
       react: ^19.1.0
       react-dom: ^19.1.0
@@ -10289,7 +10289,7 @@ snapshots:
       parse-svg-path: 0.1.2
       svg-path-bounds: 1.0.2
 
-  synapse-react-client@3.4.65(@babel/template@7.27.2)(@hyperjump/browser@1.3.1)(@types/json-schema@7.0.15)(@types/react@19.1.8)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.30.1)(prop-types@15.8.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(rxjs@7.8.2):
+  synapse-react-client@3.4.66(@babel/template@7.27.2)(@hyperjump/browser@1.3.1)(@types/json-schema@7.0.15)(@types/react@19.1.8)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.30.1)(prop-types@15.8.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(rxjs@7.8.2):
     dependencies:
       '@apidevtools/json-schema-ref-parser': 14.2.1(@types/json-schema@7.0.15)
       '@aws-sdk/client-s3': 3.966.0
