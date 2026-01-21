@@ -6,7 +6,7 @@ services:
     image: maven:3.9.9-amazoncorretto-17-al2023
     environment:
       - ORG_SAGEBIONETWORKS_REPOSITORYSERVICE_ENDPOINT=${ORG_SAGEBIONETWORKS_REPOSITORYSERVICE_ENDPOINT}
-    command: mvn -Dorg.sagebionetworks.repositoryservice.endpoint=${ORG_SAGEBIONETWORKS_REPOSITORYSERVICE_ENDPOINT} gwt:run-codeserver
+    command: mvn -Dorg.sagebionetworks.repositoryservice.endpoint=${ORG_SAGEBIONETWORKS_REPOSITORYSERVICE_ENDPOINT} -Dgwt.bindAddress=0.0.0.0 gwt:run-codeserver
     working_dir: /usr/src/mymaven
     volumes:
       - ./:/usr/src/mymaven
@@ -17,7 +17,6 @@ services:
       - maven-repo:/root/.m2
       - ${HOME}/.m2/settings.xml:/root/.m2/settings.xml:ro
       - generated_artifacts:/usr/src/mymaven/src/main/webapp/generated
-    network_mode: host
     ports:
       - '9876:9876'
     healthcheck:
@@ -35,7 +34,8 @@ services:
       - pnpm-store:/app/.pnpm-store
       - node_modules:/app/node_modules
       - generated_artifacts:/app/src/main/webapp/generated
-    network_mode: host
+    ports:
+      - '5173:5173'
     depends_on:
       gwt-codeserver:
         condition: service_healthy
