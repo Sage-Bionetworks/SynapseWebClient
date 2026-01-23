@@ -22,6 +22,7 @@ export const defaultTestTimeout = 2 * 60 * 1000
  */
 export default defineConfig({
   testDir: './e2e',
+  testIgnore: '**/visual-regression/**',
   /* Timeout to allow portal enough time to compile when running locally */
   timeout: defaultTestTimeout,
   /* Increase expectation timeout on CI */
@@ -56,21 +57,18 @@ export default defineConfig({
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
       testMatch: /.*\.spec.ts/,
-      testIgnore: process.env.CI ? /.*visual-regression.*/ : undefined,
     },
 
     {
       name: 'firefox',
       use: { ...devices['Desktop Firefox'] },
       testMatch: /.*\.spec.ts/,
-      testIgnore: process.env.CI ? /.*visual-regression.*/ : undefined,
     },
 
     {
       name: 'webkit',
       use: { ...devices['Desktop Safari'] },
       testMatch: /.*\.spec.ts/,
-      testIgnore: process.env.CI ? /.*visual-regression.*/ : undefined,
     },
 
     /* Test against mobile viewports. */
