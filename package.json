@@ -47,7 +47,6 @@
     "xss": "^1.0.15"
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.11.0",
     "@eslint/js": "^9.39.2",
     "@playwright/test": "^1.57.0",
     "@prettier/plugin-xml": "^3.4.2",

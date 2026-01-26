@@ -35,7 +35,6 @@ src/main/webapp/fonts/*
 /playwright/.auth/
 /blob-report/
 /all-blob-reports/
-e2e/**/*-snapshots/
 
 # dotenv
 .env

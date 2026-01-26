@@ -22,7 +22,6 @@ export const defaultTestTimeout = 2 * 60 * 1000
  */
 export default defineConfig({
   testDir: './e2e',
-  testIgnore: '**/visual-regression/**',
   /* Timeout to allow portal enough time to compile when running locally */
   timeout: defaultTestTimeout,
   /* Increase expectation timeout on CI */
