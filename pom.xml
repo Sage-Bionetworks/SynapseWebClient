@@ -315,7 +315,6 @@
                 ${project.basedir}/src/main/webapp/generated/vite
               </directory>
               <directory>${project.basedir}/src/main/webapp/css</directory>
-              <directory>${project.basedir}/src/main/webapp/sass</directory>
             </watch>
           </watches>
           <goals>
@@ -386,23 +385,6 @@
               <arguments>pnpm install</arguments>
             </configuration>
             <phase>generate-resources</phase>
-          </execution>
-
-          <!--Compile SCSS (using `sass` - a Dart Sass compatible compiler from npm)-->
-          <!--Our SCSS also depends on Synapse React Client SCSS-->
-          <execution>
-            <id>compile sass</id>
-            <goals>
-              <goal>corepack</goal>
-            </goals>
-            <configuration>
-              <arguments>
-                pnpm
-                sass --no-source-map --style=compressed --unicode --stop-on-error --update --load-path=node_modules
-                src/main/webapp/sass:src/main/webapp/generated
-              </arguments>
-            </configuration>
-            <phase>process-resources</phase>
           </execution>
 
           <execution>
