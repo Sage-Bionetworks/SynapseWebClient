@@ -12,18 +12,21 @@ public class SynapseReactClientFullContextProviderProps
   public SynapseContextJsObject synapseContext;
   public QueryClient queryClient;
   public IsEditingStore isEditingStore;
+  public ApplicationSessionContextJsObject applicationSessionContext;
 
   @JsOverlay
   public static SynapseReactClientFullContextProviderProps create(
     SynapseContextJsObject synapseContext,
     QueryClient queryClient,
-    IsEditingStore isEditingStore
+    IsEditingStore isEditingStore,
+    ApplicationSessionContextJsObject applicationSessionContext
   ) {
     SynapseReactClientFullContextProviderProps props =
       new SynapseReactClientFullContextProviderProps();
     props.synapseContext = synapseContext;
     props.queryClient = queryClient;
     props.isEditingStore = isEditingStore;
+    props.applicationSessionContext = applicationSessionContext;
     return props;
   }
 }

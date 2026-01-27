@@ -4,11 +4,13 @@ import javax.inject.Inject;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.OneSageUtils;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.jsinterop.ApplicationSessionContextJsObject;
 import org.sagebionetworks.web.client.jsinterop.IsEditingStore;
 import org.sagebionetworks.web.client.jsinterop.SynapseContextJsObject;
 import org.sagebionetworks.web.client.jsinterop.SynapseReactClientFullContextProviderProps;
-import org.sagebionetworks.web.client.jsinterop.context.ContextUtils;
 import org.sagebionetworks.web.client.jsni.FullContextProviderPropsJSNIObject;
 import org.sagebionetworks.web.client.jsni.QueryClientJSNIObject;
 import org.sagebionetworks.web.client.jsni.SynapseReactClientFullContextJSNIObject;
@@ -56,7 +58,18 @@ public class SynapseReactClientFullContextPropsProviderImpl
         },
         globalApplicationState::isEditing,
         globalApplicationState::setIsEditing
-      )
+      ),
+      ApplicationSessionContextJsObject.create(
+        authController.getCurrentUserAccessToken(),
+        true, // hasInitializedSession
+        () -> {
+          authController.checkForUserChange();
+        },
+        () -> {
+          authController.logoutUser();
+        },
+        false
+      ) // isLoadingSSO
     );
   }
 
