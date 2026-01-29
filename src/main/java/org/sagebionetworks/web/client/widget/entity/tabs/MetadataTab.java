@@ -16,9 +16,9 @@ public class MetadataTab {
     this.view = view;
 
     tab.configure(
-      "Metadata",
-      "label",
-      "The metadata tab organizes curation tasks by data type. Each task can be used to guide the process of providing additional metadata to the project.",
+      "Tasks and Actions",
+      "tasks",
+      "Track what needs attention and open Curator to add or update metadata.",
       null,
       EntityArea.METADATA
     );
