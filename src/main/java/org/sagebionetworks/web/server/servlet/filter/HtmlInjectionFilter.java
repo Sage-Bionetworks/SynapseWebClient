@@ -3,6 +3,8 @@ package org.sagebionetworks.web.server.servlet.filter;
 import static org.sagebionetworks.web.server.StackEndpoints.IS_DEV_MODE;
 import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.HOST_HEADER;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.shared.SimpleHtmlSanitizer;
 import com.google.inject.Inject;
 import freemarker.template.Configuration;
@@ -261,6 +263,8 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
     if ((isHomePage || isGWTPlace(path))) {
       Map<String, String> dataModel = new HashMap<>();
 
+      System.out.println("hi");
+
       String domain = request.getServerName();
       String lowerCaseDomain = domain.toLowerCase();
       boolean isSynapseTestSite =
@@ -374,6 +378,37 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
                 dataModel.put(BOT_BODY_HTML_KEY, botHtml.getBody());
               }
             }
+          } else if (path.startsWith("/SearchV2")) {
+            String queryParamJson = request.getParameter("query");
+
+            if (queryParamJson != null && !queryParamJson.isEmpty()) {
+              try {
+                SearchQuery query = EntityFactory.createEntityFromJSONString(
+                  queryParamJson,
+                  SearchQuery.class
+                );
+
+                if (
+                  query.getQueryTerm() != null &&
+                  !query.getQueryTerm().isEmpty()
+                ) {
+                  String cleanTerms = String.join(" ", query.getQueryTerm());
+                  dataModel.put(PAGE_TITLE_KEY, "Searching for: " + cleanTerms);
+
+                  if (includeBotHtml) {
+                    dataModel.put(
+                      BOT_BODY_HTML_KEY,
+                      crawlFilter.getAllProjectsHtml(query)
+                    );
+                  }
+                }
+              } catch (Exception e) {
+                dataModel.put(
+                  PAGE_TITLE_KEY,
+                  "Searching for: " + queryParamJson
+                );
+              }
+            }
           } else if (path.startsWith("/Search")) {
             // index all projects
             String searchQueryRawValue = uri.substring(uri.indexOf(":") + 1);
@@ -393,7 +428,7 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
             if (queryTerm != null && queryTerm.trim().length() > 0) {
               dataModel.put(
                 PAGE_TITLE_KEY,
-                "Searching for: " + query.getQueryTerm().get(0)
+                "Searching for test: " + query.getQueryTerm().get(0)
               );
             }
 
