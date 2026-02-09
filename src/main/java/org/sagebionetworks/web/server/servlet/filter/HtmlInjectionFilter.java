@@ -424,7 +424,7 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
             if (queryTerm != null && queryTerm.trim().length() > 0) {
               dataModel.put(
                 PAGE_TITLE_KEY,
-                "Searching for test: " + query.getQueryTerm().get(0)
+                "Searching for: " + query.getQueryTerm().get(0)
               );
             }
 
