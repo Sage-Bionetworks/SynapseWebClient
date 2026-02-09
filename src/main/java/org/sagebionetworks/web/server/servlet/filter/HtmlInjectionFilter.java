@@ -374,6 +374,37 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
                 dataModel.put(BOT_BODY_HTML_KEY, botHtml.getBody());
               }
             }
+          } else if (path.startsWith("/SearchV2")) {
+            String queryParamJson = request.getParameter("query");
+
+            if (queryParamJson != null && !queryParamJson.isEmpty()) {
+              try {
+                SearchQuery query = EntityFactory.createEntityFromJSONString(
+                  queryParamJson,
+                  SearchQuery.class
+                );
+
+                if (
+                  query.getQueryTerm() != null &&
+                  !query.getQueryTerm().isEmpty()
+                ) {
+                  String cleanTerms = String.join(" ", query.getQueryTerm());
+                  dataModel.put(PAGE_TITLE_KEY, "Searching for: " + cleanTerms);
+
+                  if (includeBotHtml) {
+                    dataModel.put(
+                      BOT_BODY_HTML_KEY,
+                      crawlFilter.getAllProjectsHtml(query)
+                    );
+                  }
+                }
+              } catch (Exception e) {
+                dataModel.put(
+                  PAGE_TITLE_KEY,
+                  "Searching for: " + queryParamJson
+                );
+              }
+            }
           } else if (path.startsWith("/Search")) {
             // index all projects
             String searchQueryRawValue = uri.substring(uri.indexOf(":") + 1);
