@@ -3,8 +3,6 @@ package org.sagebionetworks.web.server.servlet.filter;
 import static org.sagebionetworks.web.server.StackEndpoints.IS_DEV_MODE;
 import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.HOST_HEADER;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.shared.SimpleHtmlSanitizer;
 import com.google.inject.Inject;
 import freemarker.template.Configuration;
