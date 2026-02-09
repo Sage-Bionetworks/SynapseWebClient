@@ -261,8 +261,6 @@ public class HtmlInjectionFilter extends OncePerRequestFilter {
     if ((isHomePage || isGWTPlace(path))) {
       Map<String, String> dataModel = new HashMap<>();
 
-      System.out.println("hi");
-
       String domain = request.getServerName();
       String lowerCaseDomain = domain.toLowerCase();
       boolean isSynapseTestSite =
