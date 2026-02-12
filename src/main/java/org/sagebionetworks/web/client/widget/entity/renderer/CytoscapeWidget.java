@@ -108,8 +108,7 @@ public class CytoscapeWidget
       synapseJsniUtils.getBaseFileHandleUrl(),
       entityId,
       version,
-      false,
-      true
+      false
     );
     requestBuilder.configure(RequestBuilder.GET, url);
     try {
