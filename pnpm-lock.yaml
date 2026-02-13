@@ -27,8 +27,8 @@ importers:
         specifier: ^4.0.1
         version: 4.0.1
       '@sage-bionetworks/synapse-types':
-        specifier: 0.0.4
-        version: 0.0.4
+        specifier: 0.0.6
+        version: 0.0.6
       '@tanstack/react-query':
         specifier: 5.80.10
         version: 5.80.10(react@19.2.3)
@@ -129,8 +129,8 @@ importers:
         specifier: ^3.0.2
         version: 3.0.2
       synapse-react-client:
-        specifier: 3.4.70
-        version: 3.4.70(@babel/template@7.27.2)(@hyperjump/browser@1.3.1)(@types/json-schema@7.0.15)(@types/react@19.1.8)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.30.1)(prop-types@15.8.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(rxjs@7.8.2)
+        specifier: 3.4.72
+        version: 3.4.72(@babel/template@7.27.2)(@hyperjump/browser@1.3.1)(@types/json-schema@7.0.15)(@types/react@19.1.8)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.30.1)(prop-types@15.8.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(rxjs@7.8.2)
       universal-cookie:
         specifier: ^7.2.2
         version: 7.2.2
@@ -421,6 +421,10 @@ packages:
   '@choojs/findup@0.2.1':
     resolution: {integrity: sha512-YstAqNb0MCN8PjdLCDfRsBcGVRN41f3vgLvaI0IrIcBp4AqILRSS0DeWNGkicC+f/zRIPJLc+9RURVSepwvfBw==}
     hasBin: true
+
+  '@cto.af/wtf8@0.0.4':
+    resolution: {integrity: sha512-GbVy/i3DNrlp6klsqA7MatSERqp338xeWdMDHSGMxUKE19hC2Yk2dydLL0LtNC9Kjbb5bXbdwHHKa/mtnIRTZw==}
+    engines: {node: '>=20'}
 
   '@emotion/babel-plugin@11.13.5':
     resolution: {integrity: sha512-pxHCpT2ex+0q+HH91/zsdHkw/lXd468DIN2zvfvLtPKLLMo6gQj7oLObq8PhkrxOZb/gGCq03S3Z7PDhS8pduQ==}
@@ -1393,14 +1397,11 @@ packages:
   '@sage-bionetworks/markdown-it-container@4.0.1':
     resolution: {integrity: sha512-ufgmV+kGlP7sYNanlsjzx+D+ZywmW/QE3gIolffm8H2Zix3/hpO65FrWmXPlKslz32WUdRZsmjD+2AJKOO0AFg==}
 
-  '@sage-bionetworks/synapse-client@0.0.10':
-    resolution: {integrity: sha512-oxb7XELVQAhu8A+TXl2nKMDSvv8kH2RQVeGfZm9a9iNvqM5lAetg5LLNTQPPg0Lvw7ZdV0dBAnn/o0KH7mPtww==}
+  '@sage-bionetworks/synapse-client@0.0.11':
+    resolution: {integrity: sha512-l80uykr4IH0W3geXIoH08ev/6+PwvfhspoRy6xCl23m6yvp2PBbuu5C/I7G3v93pFMfo41fj/y3+VWzbk/RQcQ==}
 
-  '@sage-bionetworks/synapse-types@0.0.4':
-    resolution: {integrity: sha512-uezI0I4qGgHSC0z6SaxSuVCOnVdFx/+F5603ViEeQ1vAWdBzty+UHmMYW3G0EJlilX8vQqppJTNjR048e1YjIQ==}
-
-  '@sage-bionetworks/synapse-types@0.0.5':
-    resolution: {integrity: sha512-aucTMNRjmG8JM9h3eM99OEi+V++tJB8QuHehzNtvkiuDTMhBJMrRv+hWJw5yL14QlSmAix1WPK2lnG255VSzmw==}
+  '@sage-bionetworks/synapse-types@0.0.6':
+    resolution: {integrity: sha512-zPIwkVU1FRR4BYmYP3IL4J/mgd3QzH4Ty1r3GwPsieiR7TKy5+7WaWyqWdOW8f9KVrtdlaoHEY7pMP/GnTQlMg==}
 
   '@smithy/abort-controller@4.2.7':
     resolution: {integrity: sha512-rzMY6CaKx2qxrbYbqjXWS0plqEy7LOdKHS0bg4ixJ6aoGDPNUcLWk/FRNuCILh7GKLG9TFUXYYeQQldMBBwuyw==}
@@ -2120,6 +2121,10 @@ packages:
 
   canvas-fit@1.5.0:
     resolution: {integrity: sha512-onIcjRpz69/Hx5bB5HGbYKUF2uC6QT6Gp+pfpGm3A7mPfcluSLV5v4Zu+oflDUwLdUw0rLIBhUbi0v8hM4FJQQ==}
+
+  cbor2@2.2.1:
+    resolution: {integrity: sha512-gZrpQweRAfue3Gmd4pG+AakX1zqVrOmXsu+2FwfUfFyYujNGSAOp81iPbHgnG212Xr3KV5vZXxxCXQRbWjZCWw==}
+    engines: {node: '>=20'}
 
   chalk@2.4.2:
     resolution: {integrity: sha512-Mti+f9lpJNcwF4tWV8/OrTTtF1gZi+f8FqlyAdouralcFWFQWF2+NgCHShjkCb+IFBLq9buZwE1xckQU4peSuQ==}
@@ -4583,8 +4588,8 @@ packages:
   svg-path-sdf@1.1.3:
     resolution: {integrity: sha512-vJJjVq/R5lSr2KLfVXVAStktfcfa1pNFjFOgyJnzZFXlO/fDZ5DmM8FpnSKKzLPfEYTVeXuVBTHF296TpxuJVg==}
 
-  synapse-react-client@3.4.70:
-    resolution: {integrity: sha512-MbnzKjYDYDYagdhS3ECHXc/W73tpT1fq1xR0mpFTTZuybkpQi2qRUHo8fxvaKS2sleaYyvYwsB5H0oVkkcamWg==}
+  synapse-react-client@3.4.72:
+    resolution: {integrity: sha512-vzZbAgfUcaeXHHVPdjhwYRvZ6CurqpG8Y0XBScjcNSDatOix5Tuzh7BrryTTHhqcdaCsb3d/3+Q0ugBBvKlvSg==}
     peerDependencies:
       '@sage-bionetworks/aridhia-client': '*'
       react: ^19.1.0
@@ -5537,6 +5542,8 @@ snapshots:
     dependencies:
       commander: 2.20.3
 
+  '@cto.af/wtf8@0.0.4': {}
+
   '@emotion/babel-plugin@11.13.5':
     dependencies:
       '@babel/helper-module-imports': 7.27.1
@@ -6445,11 +6452,11 @@ snapshots:
 
   '@sage-bionetworks/markdown-it-container@4.0.1': {}
 
-  '@sage-bionetworks/synapse-client@0.0.10': {}
+  '@sage-bionetworks/synapse-client@0.0.11': {}
 
-  '@sage-bionetworks/synapse-types@0.0.4': {}
-
-  '@sage-bionetworks/synapse-types@0.0.5': {}
+  '@sage-bionetworks/synapse-types@0.0.6':
+    dependencies:
+      '@sage-bionetworks/synapse-client': 0.0.11
 
   '@smithy/abort-controller@4.2.7':
     dependencies:
@@ -7363,6 +7370,10 @@ snapshots:
   canvas-fit@1.5.0:
     dependencies:
       element-size: 1.1.1
+
+  cbor2@2.2.1:
+    dependencies:
+      '@cto.af/wtf8': 0.0.4
 
   chalk@2.4.2:
     dependencies:
@@ -10293,7 +10304,7 @@ snapshots:
       parse-svg-path: 0.1.2
       svg-path-bounds: 1.0.2
 
-  synapse-react-client@3.4.70(@babel/template@7.27.2)(@hyperjump/browser@1.3.1)(@types/json-schema@7.0.15)(@types/react@19.1.8)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.30.1)(prop-types@15.8.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(rxjs@7.8.2):
+  synapse-react-client@3.4.72(@babel/template@7.27.2)(@hyperjump/browser@1.3.1)(@types/json-schema@7.0.15)(@types/react@19.1.8)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.30.1)(prop-types@15.8.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(rxjs@7.8.2):
     dependencies:
       '@apidevtools/json-schema-ref-parser': 14.2.1(@types/json-schema@7.0.15)
       '@aws-sdk/client-s3': 3.966.0
@@ -10315,8 +10326,8 @@ snapshots:
       '@rjsf/utils': 6.0.0-beta.10(react@19.2.3)
       '@rjsf/validator-ajv8': 6.0.0-beta.10(@rjsf/utils@6.0.0-beta.10(react@19.2.3))
       '@sage-bionetworks/markdown-it-container': 4.0.1
-      '@sage-bionetworks/synapse-client': 0.0.10
-      '@sage-bionetworks/synapse-types': 0.0.5
+      '@sage-bionetworks/synapse-client': 0.0.11
+      '@sage-bionetworks/synapse-types': 0.0.6
       '@tanstack/query-core': 5.80.10
       '@tanstack/react-query': 5.80.10(react@19.2.3)
       '@tanstack/react-query-devtools': 5.80.10(@tanstack/react-query@5.80.10(react@19.2.3))(react@19.2.3)
@@ -10325,6 +10336,7 @@ snapshots:
       '@upsetjs/react': 1.11.0(react@19.2.3)
       '@x0k/json-schema-merge': 1.0.2
       animate.css: 4.1.1
+      cbor2: 2.2.1
       classnames: 2.5.1
       dagre: 0.8.5
       dayjs: 1.11.19
