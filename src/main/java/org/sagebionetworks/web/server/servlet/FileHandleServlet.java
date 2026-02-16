@@ -6,7 +6,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.Enumeration;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -14,12 +13,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
@@ -33,7 +27,6 @@ import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.RowReference;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
-import org.sagebionetworks.web.server.StackEndpoints;
 import org.sagebionetworks.web.shared.WebConstants;
 
 /**
@@ -109,9 +102,6 @@ public class FileHandleServlet extends HttpServlet {
 
     String token = getToken(request);
     SynapseClient client = createNewClient(token);
-    boolean isProxy = false;
-    String proxy = request.getParameter(WebConstants.PROXY_PARAM_KEY);
-    if (proxy != null) isProxy = Boolean.parseBoolean(proxy);
 
     String teamId = request.getParameter(WebConstants.TEAM_PARAM_KEY);
 
@@ -150,7 +140,6 @@ public class FileHandleServlet extends HttpServlet {
         request,
         response,
         client,
-        isProxy,
         teamId,
         entityId,
         entityVersion,
@@ -174,7 +163,6 @@ public class FileHandleServlet extends HttpServlet {
             request,
             response,
             client,
-            isProxy,
             teamId,
             entityId,
             entityVersion,
@@ -196,7 +184,6 @@ public class FileHandleServlet extends HttpServlet {
           doRedirect(
             request,
             response,
-            isProxy,
             new URL(getBaseUrl(request) + WebConstants.PREVIEW_UNAVAILABLE_PATH)
           );
         } catch (SynapseException e1) {
@@ -217,7 +204,6 @@ public class FileHandleServlet extends HttpServlet {
     HttpServletRequest request,
     HttpServletResponse response,
     SynapseClient client,
-    boolean isProxy,
     String teamId,
     String entityId,
     String entityVersion,
@@ -354,39 +340,16 @@ public class FileHandleServlet extends HttpServlet {
       }
     }
 
-    doRedirect(request, response, isProxy, resolvedUrl);
+    doRedirect(request, response, resolvedUrl);
   }
 
   private void doRedirect(
     HttpServletRequest request,
     HttpServletResponse response,
-    boolean isProxy,
     URL resolvedUrl
   ) throws ClientProtocolException, IOException {
     if (resolvedUrl != null) {
-      if (isProxy) {
-        CloseableHttpClient client = HttpClients.createDefault();
-        try {
-          // do the get
-          HttpGet httpGet = new HttpGet(resolvedUrl.toString());
-          // copy headers
-          Enumeration<?> headerValues = request.getHeaders("Cookie");
-          while (headerValues.hasMoreElements()) {
-            String headerValue = (String) headerValues.nextElement();
-            httpGet.addHeader("Cookie", headerValue);
-          }
-          HttpResponse newResponse = client.execute(httpGet);
-          HttpEntity responseEntity = (null != newResponse.getEntity())
-            ? newResponse.getEntity()
-            : null;
-          if (responseEntity != null) {
-            responseEntity.writeTo(response.getOutputStream());
-            response.setContentType(responseEntity.getContentType().getValue());
-          }
-        } finally {
-          client.close();
-        }
-      } else response.sendRedirect(resolvedUrl.toString());
+      response.sendRedirect(resolvedUrl.toString());
     }
   }
 

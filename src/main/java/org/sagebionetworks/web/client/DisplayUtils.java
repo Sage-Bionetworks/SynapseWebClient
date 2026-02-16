@@ -864,33 +864,6 @@ public class DisplayUtils {
     Long versionNumber,
     boolean preview
   ) {
-    return createFileEntityUrl(
-      baseFileHandleUrl,
-      entityId,
-      versionNumber,
-      preview,
-      false
-    );
-  }
-
-  public static String getParamForNoCaching() {
-    return WebConstants.NOCACHE_PARAM + new Date().getTime();
-  }
-
-  /**
-   * Create the url to a FileEntity filehandle.
-   *
-   * @param baseURl
-   * @param entityid
-   * @return
-   */
-  public static String createFileEntityUrl(
-    String baseFileHandleUrl,
-    String entityId,
-    Long versionNumber,
-    boolean preview,
-    boolean proxy
-  ) {
     String versionParam = versionNumber == null
       ? ""
       : "&" +
@@ -907,12 +880,12 @@ public class DisplayUtils {
       WebConstants.FILE_HANDLE_PREVIEW_PARAM_KEY +
       "=" +
       Boolean.toString(preview) +
-      "&" +
-      WebConstants.PROXY_PARAM_KEY +
-      "=" +
-      Boolean.toString(proxy) +
       versionParam
     );
+  }
+
+  public static String getParamForNoCaching() {
+    return WebConstants.NOCACHE_PARAM + new Date().getTime();
   }
 
   /**

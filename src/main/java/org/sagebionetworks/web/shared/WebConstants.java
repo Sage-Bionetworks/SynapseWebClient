@@ -124,7 +124,6 @@ public class WebConstants {
   public static final int MAX_COLUMNS_IN_GRID = 100;
   public static final int DESCRIPTION_SUMMARY_LENGTH = 450; // characters for summary
 
-  public static final String PROXY_PARAM_KEY = "proxy";
   public static final String REDIRECT_URL_KEY = "redirect";
 
   public static final String ENTITY_PARENT_ID_KEY = "parentId";
