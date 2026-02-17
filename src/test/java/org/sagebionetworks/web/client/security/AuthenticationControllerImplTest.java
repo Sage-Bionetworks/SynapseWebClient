@@ -90,12 +90,6 @@ public class AuthenticationControllerImplTest {
   SessionDetector mockSessionDetector;
 
   @Mock
-  Callback mockCallback;
-
-  @Captor
-  ArgumentCaptor<String> stringCaptor;
-
-  @Mock
   AsyncCallback<UserProfile> mockUserProfileCallback;
 
   @Captor
@@ -258,48 +252,6 @@ public class AuthenticationControllerImplTest {
   }
 
   @Test
-  public void testLoginUser() {
-    String username = "testusername";
-    String password = "pw";
-    String oldAuthReceipt = "1234";
-    String newAccessToken = "abcdzxcvbn";
-    String newAuthReceipt = "5678";
-    when(mockClientCache.get(USER_AUTHENTICATION_RECEIPT))
-      .thenReturn(oldAuthReceipt);
-    LoginResponse loginResponse = new LoginResponse();
-    loginResponse.setAcceptsTermsOfUse(true);
-    loginResponse.setAuthenticationReceipt(newAuthReceipt);
-    loginResponse.setAccessToken(newAccessToken);
-    AsyncMockStubber
-      .callSuccessWith(loginResponse)
-      .when(mockJsClient)
-      .login(any(LoginRequest.class), any(AsyncCallback.class));
-    AsyncCallback loginCallback = mock(AsyncCallback.class);
-
-    // make the actual call
-    authenticationController.loginUser(username, password, loginCallback);
-
-    // verify input arguments (including the cached receipt)
-    ArgumentCaptor<LoginRequest> loginRequestCaptor = ArgumentCaptor.forClass(
-      LoginRequest.class
-    );
-    verify(mockJsClient)
-      .login(loginRequestCaptor.capture(), any(AsyncCallback.class));
-    LoginRequest request = loginRequestCaptor.getValue();
-    assertEquals(username, request.getUsername());
-    assertEquals(password, request.getPassword());
-    assertEquals(oldAuthReceipt, request.getAuthenticationReceipt());
-
-    // verify the new receipt is cached
-    verify(mockClientCache)
-      .put(eq(USER_AUTHENTICATION_RECEIPT), eq(newAuthReceipt), anyLong());
-
-    verify(loginCallback).onSuccess(any(UserProfile.class));
-    verify(mockSessionDetector).initializeAccessTokenState();
-    verify(mockQueryClient).resetQueries();
-  }
-
-  @Test
   public void testLoginUserNotAcceptedTermsOfUse() {
     // access token is returned without error (it's set and valid), but getMyProfile() fails with a special ForbiddenException
     when(mockJsClient.getMyUserProfile())
@@ -322,23 +274,6 @@ public class AuthenticationControllerImplTest {
     Place place = placeCaptor.getValue();
     assertTrue(place instanceof LoginPlace);
     assertEquals(LoginPlace.SHOW_TOU, ((LoginPlace) place).toToken());
-  }
-
-  @Test
-  public void testLoginUserFailure() {
-    Exception ex = new Exception("invalid login");
-    AsyncMockStubber
-      .callFailureWith(ex)
-      .when(mockJsClient)
-      .login(any(LoginRequest.class), any(AsyncCallback.class));
-    String username = "testusername";
-    String password = "pw";
-    AsyncCallback loginCallback = mock(AsyncCallback.class);
-
-    // make the actual call
-    authenticationController.loginUser(username, password, loginCallback);
-
-    verify(loginCallback).onFailure(ex);
   }
 
   // Note: We do not update the access token cookie expiration (since the access token will expire)

@@ -6,19 +6,6 @@ import org.sagebionetworks.repo.model.UserProfile;
 
 public interface AuthenticationController {
   /**
-   * Login the user
-   *
-   * @param username
-   * @param password
-   * @return
-   */
-  public void loginUser(
-    String username,
-    String password,
-    AsyncCallback<UserProfile> callback
-  );
-
-  /**
    * sets a new access token
    *
    * @param token
