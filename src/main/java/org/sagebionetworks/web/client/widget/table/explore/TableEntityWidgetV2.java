@@ -5,7 +5,6 @@ import static org.sagebionetworks.web.client.widget.table.v2.results.QueryBundle
 import static org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils.DEFAULT_OFFSET;
 
 import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -49,7 +48,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.PreflightControll
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
-import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
+import org.sagebionetworks.web.client.widget.sharing.EntityAccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQueryModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
@@ -131,7 +130,7 @@ public class TableEntityWidgetV2
   EntityActionMenu actionMenu;
   PreflightController preflightController;
   SessionStorage sessionStorage;
-  private AccessControlListModalWidget aclModal;
+  private EntityAccessControlListModalWidget aclModal;
   private PopupUtilsView popupUtils;
   EventBus eventBus;
   private final CreateGridSessionDialog createGridSessionDialog;
@@ -723,32 +722,15 @@ public class TableEntityWidgetV2
     return currentQueryResultBundle;
   }
 
-  private AccessControlListModalWidget getAccessControlListModalWidget() {
+  private EntityAccessControlListModalWidget getAccessControlListModalWidget() {
     if (aclModal == null) {
-      aclModal = ginInjector.getAccessControlListModalWidget();
+      aclModal = ginInjector.getEntityAccessControlListModalWidget();
     }
     return aclModal;
   }
 
   public void onViewSharingSettingsClicked(String benefactorEntityId) {
-    ginInjector
-      .getSynapseJavascriptClient()
-      .getEntity(
-        benefactorEntityId,
-        new AsyncCallback<Entity>() {
-          @Override
-          public void onSuccess(Entity entity) {
-            boolean canChangePermission = false;
-            getAccessControlListModalWidget()
-              .configure(entity, canChangePermission);
-            getAccessControlListModalWidget().showSharing(() -> {});
-          }
-
-          @Override
-          public void onFailure(Throwable caught) {
-            popupUtils.showErrorMessage(caught.getMessage());
-          }
-        }
-      );
+    getAccessControlListModalWidget().configure(benefactorEntityId, () -> {});
+    getAccessControlListModalWidget().setOpen(true);
   }
 }

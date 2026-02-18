@@ -64,7 +64,7 @@ import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListV2;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.ActionListener;
 import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
-import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
+import org.sagebionetworks.web.client.widget.sharing.EntityAccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.explore.TableEntityWidgetV2;
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQueryModalWidget;
@@ -128,7 +128,7 @@ public class TableEntityWidgetV2Test {
   SynapseJavascriptClient mockJsClient;
 
   @Mock
-  AccessControlListModalWidget mockACLModalWidget;
+  EntityAccessControlListModalWidget mockACLModalWidget;
 
   @Mock
   Entity mockEntity;
@@ -213,7 +213,7 @@ public class TableEntityWidgetV2Test {
     when(mockPortalGinInjector.createNewQueryResultEditorWidget())
       .thenReturn(mockQueryResultEditorWidget);
     when(mockPortalGinInjector.getJSONObjectAdapter()).thenReturn(portalJson);
-    when(mockPortalGinInjector.getAccessControlListModalWidget())
+    when(mockPortalGinInjector.getEntityAccessControlListModalWidget())
       .thenReturn(mockACLModalWidget);
     when(mockPortalGinInjector.getSynapseJavascriptClient())
       .thenReturn(mockJsClient);
@@ -580,9 +580,8 @@ public class TableEntityWidgetV2Test {
     String testEntityId = "syn0000001";
     onViewSharingSettingsHandler.onViewSharingSettingsClicked(testEntityId);
 
-    verify(mockJsClient).getEntity(eq(testEntityId), any(AsyncCallback.class));
-    verify(mockACLModalWidget).configure(mockEntity, false);
-    verify(mockACLModalWidget).showSharing(any(Callback.class));
+    verify(mockACLModalWidget).configure(eq(testEntityId), any());
+    verify(mockACLModalWidget).setOpen(true);
   }
 
   @Test

@@ -594,8 +594,6 @@ import org.sagebionetworks.web.client.widget.search.SynapseSuggestBoxView;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBoxViewImpl;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditorView;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditorViewImpl;
-import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
-import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidgetImpl;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidgetView;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.sharing.EntityAccessControlListModalWidget;
@@ -981,8 +979,6 @@ public class PortalGinModule extends AbstractGinModule {
     // ACL Editor
     bind(AccessControlListEditorView.class)
       .to(AccessControlListEditorViewImpl.class);
-    bind(AccessControlListModalWidget.class)
-      .to(AccessControlListModalWidgetImpl.class);
     bind(EntityAccessControlListModalWidget.class)
       .to(EntityAccessControlListModalWidgetImpl.class);
 
