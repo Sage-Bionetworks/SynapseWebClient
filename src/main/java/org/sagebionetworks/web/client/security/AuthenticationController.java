@@ -3,31 +3,14 @@ package org.sagebionetworks.web.client.security;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.web.client.jsinterop.SynapseSessionManagerJs;
 
 public interface AuthenticationController {
   /**
-   * sets a new access token
-   *
-   * @param token
+   * Bind to the JS session manager singleton. Must be called once after the JS
+   * bundle has loaded.
    */
-  void setNewAccessToken(
-    String token,
-    final AsyncCallback<UserProfile> callback
-  );
-
-  /**
-   * attempts to load from an existing session cookie
-   *
-   * @param callback
-   */
-  void initializeFromExistingAccessTokenCookie(
-    final AsyncCallback<UserProfile> callback
-  );
-
-  void initializeFromExistingAccessTokenCookie(
-    final AsyncCallback<UserProfile> callback,
-    boolean forceResetQueryClient
-  );
+  void bindToSessionManager(SynapseSessionManagerJs manager);
 
   /**
    * Terminates the session of the current user
@@ -37,34 +20,46 @@ public interface AuthenticationController {
   /**
    * Is the user logged in?
    *
-   * @return
+   * @return true if the session manager reports isAuthenticated AND a cached UserProfile exists
    */
   public boolean isLoggedIn();
 
   /**
-   * Get the OwnerId/Principal id out of the UserProfile / UserSessionData in a lightweight fashion
-   *
-   * @return
+   * Get the current user's principal id. May return the session manager's userId
+   * even before the full profile is fetched.
    */
   public String getCurrentUserPrincipalId();
 
+  public String getCurrentUserRealmId();
+
   /**
-   * Get the current session token, if there is one
-   *
-   * @return
+   * Get the current access token from the session manager snapshot.
    */
   public String getCurrentUserAccessToken();
 
   /**
-   * Get the UserProfile object
-   *
-   * @return
+   * Get the cached UserProfile object, or null if not yet fetched / not logged in.
    */
   public UserProfile getCurrentUserProfile();
 
   public void updateCachedProfile(UserProfile updatedProfile);
 
+  /**
+   * Ask the session manager to refresh. The subscription callback handles
+   * detecting changes and updating GWT state.
+   */
   void checkForUserChange();
+
   void clearLocalStorage();
+
+  /**
+   * Returns a future that completes after the session manager refreshes and
+   * the user profile is fetched (if authenticated).
+   */
   FluentFuture<Void> getCheckForUserChangeFuture();
+
+  /**
+   * Get the underlying JS session manager.
+   */
+  SynapseSessionManagerJs getSessionManager();
 }

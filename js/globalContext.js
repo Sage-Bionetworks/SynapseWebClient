@@ -1,6 +1,10 @@
-import { atom, createStore, Provider, useAtomValue } from 'jotai'
+import { atom, createStore, useAtomValue } from 'jotai'
 import { createElement } from 'react'
-import { SynapseContext } from 'synapse-react-client'
+import { SynapseContext, SynapseSessionManager } from 'synapse-react-client'
+
+/* Singleton session manager */
+const sessionManager = new SynapseSessionManager()
+window.SynapseSessionManager = sessionManager
 
 /* A store that will be used across all React elements in the app */
 const contextStore = createStore()

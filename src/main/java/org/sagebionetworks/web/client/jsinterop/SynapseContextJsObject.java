@@ -12,6 +12,7 @@ public class SynapseContextJsObject {
   public String accessToken;
 
   public String downloadCartPageUrl;
+  public boolean isAuthenticated;
   public boolean isInExperimentalMode;
   public boolean utcTime;
   public String appId;
@@ -20,12 +21,14 @@ public class SynapseContextJsObject {
   @JsOverlay
   public static SynapseContextJsObject create(
     String accessToken,
+    boolean isAuthenticated,
     boolean isInExperimentalMode,
     boolean utcTime,
     String appId
   ) {
     SynapseContextJsObject context = new SynapseContextJsObject();
     context.accessToken = accessToken;
+    context.isAuthenticated = isAuthenticated;
     context.isInExperimentalMode = isInExperimentalMode;
     context.utcTime = utcTime;
     context.downloadCartPageUrl = "/DownloadCart:0";

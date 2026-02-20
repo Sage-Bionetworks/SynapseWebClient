@@ -383,8 +383,14 @@ public class GlobalApplicationStateImplTest {
     globalApplicationState.init(mockCallback);
 
     verify(mockView).initGlobalViewProperties();
-    verify(mockView).initSRCEndpoints(REPO_ENDPOINT, SWC_ENDPOINT);
     verify(mockCallback).invoke();
+  }
+
+  @Test
+  public void testInitSRCEndpoints() {
+    globalApplicationState.initSRCEndpoints();
+
+    verify(mockView).initSRCEndpoints(REPO_ENDPOINT, SWC_ENDPOINT);
   }
 
   @Test

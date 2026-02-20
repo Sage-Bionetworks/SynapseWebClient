@@ -34,7 +34,6 @@ import org.sagebionetworks.web.client.presenter.HelpPresenter;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
 import org.sagebionetworks.web.client.presenter.MapPresenter;
-import org.sagebionetworks.web.client.presenter.NewAccountPresenter;
 import org.sagebionetworks.web.client.presenter.OAuthClientEditorPresenter;
 import org.sagebionetworks.web.client.presenter.PasswordResetSignedTokenPresenter;
 import org.sagebionetworks.web.client.presenter.PeopleSearchPresenter;
@@ -344,8 +343,6 @@ public interface PortalGinInjector extends Ginjector {
 
   AccountPresenter getAccountPresenter();
 
-  NewAccountPresenter getNewAccountPresenter();
-
   SignedTokenPresenter getSignedTokenPresenter();
 
   ErrorPresenter getErrorPresenter();
@@ -519,8 +516,6 @@ public interface PortalGinInjector extends Ginjector {
   EmailInvitationBadge getEmailInvitationBadgeWidget();
 
   VersionTimer getVersionTimer();
-
-  SessionDetector getSessionDetector();
 
   WebStorageMaxSizeDetector getWebStorageMaxSizeDetector();
 

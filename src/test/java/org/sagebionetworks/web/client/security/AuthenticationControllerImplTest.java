@@ -1,24 +1,21 @@
 package org.sagebionetworks.web.client.security;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.web.client.security.AuthenticationControllerImpl.USER_AUTHENTICATION_RECEIPT;
-import static org.sagebionetworks.web.client.utils.FutureUtils.getDoneFuture;
-import static org.sagebionetworks.web.client.utils.FutureUtils.getFailedFuture;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.rpc.StatusCodeException;
+import elemental2.promise.IThenable;
+import elemental2.promise.Promise;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,36 +24,30 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.auth.LoginRequest;
-import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.repo.model.principal.EmailQuarantineReason;
 import org.sagebionetworks.repo.model.principal.EmailQuarantineStatus;
 import org.sagebionetworks.repo.model.principal.NotificationEmail;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SessionDetector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.context.QueryClientProvider;
+import org.sagebionetworks.web.client.jsinterop.SessionStateJsObject;
+import org.sagebionetworks.web.client.jsinterop.SynapseSessionManagerJs;
 import org.sagebionetworks.web.client.jsinterop.reactquery.QueryClient;
-import org.sagebionetworks.web.client.place.LoginPlace;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.QuarantinedEmailModal;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
-import org.sagebionetworks.web.shared.WebConstants;
-import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
-import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-@RunWith(MockitoJUnitRunner.Silent.class)
+@RunWith(MockitoJUnitRunner.class)
 public class AuthenticationControllerImplTest {
 
   public static final String ACCESS_TOKEN = "1111";
+  public static final String USER_ID = "98208";
   AuthenticationControllerImpl authenticationController;
 
   @Mock
@@ -87,15 +78,6 @@ public class AuthenticationControllerImplTest {
   Footer mockFooter;
 
   @Mock
-  SessionDetector mockSessionDetector;
-
-  @Mock
-  AsyncCallback<UserProfile> mockUserProfileCallback;
-
-  @Captor
-  ArgumentCaptor<Place> placeCaptor;
-
-  @Mock
   NotificationEmail mockNotificationEmail;
 
   @Mock
@@ -113,9 +95,22 @@ public class AuthenticationControllerImplTest {
   @Mock
   QueryClient mockQueryClient;
 
+  @Mock
+  SynapseSessionManagerJs mockSessionManager;
+
+  @Mock
+  Promise<Void> mockClearSessionPromise;
+
+  @Captor
+  ArgumentCaptor<
+    IThenable.ThenOnFulfilledCallbackFn<Void, ?>
+  > clearSessionThenCaptor;
+
+  @Captor
+  ArgumentCaptor<Place> placeCaptor;
+
   UserProfile profile;
-  public static final String USER_ID = "98208";
-  public static final String USER_AUTHENTICATION_RECEIPT_VALUE = "abc-def-ghi";
+
   public static final String ORIENTATION_BANNER_STORAGE_VALUE = "true";
   public static final String ORIENTATION_BANNER_DISMISSED =
     "orientation_banner_dismissed";
@@ -123,23 +118,9 @@ public class AuthenticationControllerImplTest {
     "orientation_banner_not_dismissed";
 
   @Before
-  public void before() throws JSONObjectAdapterException {
-    // by default, return a valid user session data if asked
-    AsyncMockStubber
-      .callSuccessWith(null)
-      .when(mockJsClient)
-      .initSession(anyString(), any(AsyncCallback.class));
+  public void before() {
     profile = new UserProfile();
     profile.setOwnerId(USER_ID);
-    when(mockJsClient.getAccessToken()).thenReturn(getDoneFuture(ACCESS_TOKEN));
-    when(mockJsClient.deleteSessionAccessToken())
-      .thenReturn(getDoneFuture(null));
-    when(mockJsClient.getMyUserProfile()).thenReturn(getDoneFuture(profile));
-    AsyncMockStubber
-      .callSuccessWith(mockNotificationEmail)
-      .when(mockJsClient)
-      .getNotificationEmail(any(AsyncCallback.class));
-    when(mockGinInjector.getSynapseJavascriptClient()).thenReturn(mockJsClient);
     when(mockQueryClientProvider.getQueryClient()).thenReturn(mockQueryClient);
     when(mockSynapseJSNIUtils.getSrcPersistentLocalStorageKeys())
       .thenReturn(
@@ -156,51 +137,124 @@ public class AuthenticationControllerImplTest {
         mockSynapseJSNIUtils,
         mockQueryClientProvider
       );
-    when(mockGinInjector.getGlobalApplicationState())
-      .thenReturn(mockGlobalApplicationState);
-    when(mockGinInjector.getHeader()).thenReturn(mockHeader);
-    when(mockGinInjector.getFooter()).thenReturn(mockFooter);
-    when(mockGlobalApplicationState.getPlaceChanger())
-      .thenReturn(mockPlaceChanger);
-    when(mockGinInjector.getSessionDetector()).thenReturn(mockSessionDetector);
-    when(mockGinInjector.getQuarantinedEmailModal())
-      .thenReturn(mockQuarantinedEmailModal);
-    when(mockNotificationEmail.getQuarantineStatus())
-      .thenReturn(mockEmailQuarantineStatus);
+
+    // Set up session manager mock with an authenticated state by default
+    SessionStateJsObject authenticatedState = createSessionState(
+      ACCESS_TOKEN,
+      USER_ID,
+      true,
+      true
+    );
+    when(mockSessionManager.getSnapshot()).thenReturn(authenticatedState);
+    authenticationController.bindToSessionManager(mockSessionManager);
+  }
+
+  private static SessionStateJsObject createSessionState(
+    String token,
+    String userId,
+    boolean isAuthenticated,
+    boolean hasInitializedSession
+  ) {
+    SessionStateJsObject state = new SessionStateJsObject();
+    state.token = token;
+    state.userId = userId;
+    state.isAuthenticated = isAuthenticated;
+    state.hasInitializedSession = hasInitializedSession;
+    return state;
+  }
+
+  @Test
+  public void testIsLoggedInWhenAuthenticatedWithProfile() {
+    authenticationController.updateCachedProfile(profile);
+    assertTrue(authenticationController.isLoggedIn());
+  }
+
+  @Test
+  public void testIsLoggedInWhenNotAuthenticated() {
+    SessionStateJsObject anonState = createSessionState(
+      null,
+      null,
+      false,
+      true
+    );
+    when(mockSessionManager.getSnapshot()).thenReturn(anonState);
+    assertFalse(authenticationController.isLoggedIn());
+  }
+
+  @Test
+  public void testGetCurrentUserPrincipalIdFromSessionManager() {
+    // userId comes from the session manager snapshot
+    assertEquals(USER_ID, authenticationController.getCurrentUserPrincipalId());
+  }
+
+  @Test
+  public void testGetCurrentUserPrincipalIdFallsBackToProfile() {
+    SessionStateJsObject noUserIdState = createSessionState(
+      ACCESS_TOKEN,
+      null,
+      true,
+      true
+    );
+    when(mockSessionManager.getSnapshot()).thenReturn(noUserIdState);
+    authenticationController.updateCachedProfile(profile);
+    assertEquals(USER_ID, authenticationController.getCurrentUserPrincipalId());
+  }
+
+  @Test
+  public void testGetCurrentUserPrincipalIdReturnsNullWhenAnonymous() {
+    SessionStateJsObject anonState = createSessionState(
+      null,
+      null,
+      false,
+      true
+    );
+    when(mockSessionManager.getSnapshot()).thenReturn(anonState);
+    assertNull(authenticationController.getCurrentUserPrincipalId());
+  }
+
+  @Test
+  public void testGetCurrentUserAccessTokenReadsFromSnapshot() {
+    assertEquals(
+      ACCESS_TOKEN,
+      authenticationController.getCurrentUserAccessToken()
+    );
+  }
+
+  @Test
+  public void testGetCurrentUserAccessTokenReturnsNullWhenAnonymous() {
+    SessionStateJsObject anonState = createSessionState(
+      null,
+      null,
+      false,
+      true
+    );
+    when(mockSessionManager.getSnapshot()).thenReturn(anonState);
+    assertNull(authenticationController.getCurrentUserAccessToken());
   }
 
   @Test
   public void testLogout() {
+    when(mockGinInjector.getGlobalApplicationState())
+      .thenReturn(mockGlobalApplicationState);
+    when(mockGinInjector.getHeader()).thenReturn(mockHeader);
+    when(mockGinInjector.getFooter()).thenReturn(mockFooter);
     when(mockGlobalApplicationState.getLastPlace()).thenReturn(mockPlace);
-    when(mockClientCache.get(USER_AUTHENTICATION_RECEIPT))
-      .thenReturn(USER_AUTHENTICATION_RECEIPT_VALUE);
-    when(mockClientCache.contains(USER_AUTHENTICATION_RECEIPT))
+    when(mockClientCache.contains(ORIENTATION_BANNER_DISMISSED))
       .thenReturn(true);
     when(mockClientCache.get(ORIENTATION_BANNER_DISMISSED))
       .thenReturn(ORIENTATION_BANNER_STORAGE_VALUE);
-    when(mockClientCache.contains(ORIENTATION_BANNER_DISMISSED))
-      .thenReturn(true);
+    when(mockSessionManager.clearSession()).thenReturn(mockClearSessionPromise);
 
+    authenticationController.updateCachedProfile(profile);
     authenticationController.logoutUser();
 
-    // revokes token
-    verify(mockJsClient).deleteSessionAccessToken();
+    // Verify the then callback is registered and invoke it to simulate resolution
+    verify(mockClearSessionPromise).then(clearSessionThenCaptor.capture());
+    clearSessionThenCaptor.getValue().onInvoke(null);
 
-    // sets session cookie
-    verify(mockJsClient)
-      .initSession(
-        eq(WebConstants.EXPIRE_SESSION_TOKEN),
-        any(AsyncCallback.class)
-      );
+    // Clears local storage (preserving persistent keys)
     verify(mockClientCache).clear();
     verify(mockSessionStorage).clear();
-    // verify that authentication receipt is restored
-    verify(mockClientCache)
-      .put(
-        eq(USER_AUTHENTICATION_RECEIPT),
-        eq(USER_AUTHENTICATION_RECEIPT_VALUE),
-        anyLong()
-      );
     // verify that dismissed orientation banner is restored
     verify(mockClientCache)
       .put(
@@ -208,7 +262,7 @@ public class AuthenticationControllerImplTest {
         eq(ORIENTATION_BANNER_STORAGE_VALUE),
         anyLong()
       );
-    // verify that non-dimissed orientation banner is not restored
+    // verify that non-dismissed orientation banner is not restored
     verify(mockClientCache, never())
       .put(
         eq(ORIENTATION_BANNER_NOT_DISMISSED),
@@ -217,134 +271,31 @@ public class AuthenticationControllerImplTest {
       );
     // verify last place is restored
     verify(mockGlobalApplicationState).setLastPlace(mockPlace);
-    verify(mockSessionDetector).initializeAccessTokenState();
-    verify(mockGlobalApplicationState).refreshPage();
+    // Delegates to JS session manager
+    verify(mockSessionManager).clearSession();
+    // Profile should be cleared
+    assertNull(authenticationController.getCurrentUserProfile());
+    // Verify post-clearSession actions from the .then() callback
     verify(mockGlobalApplicationState).synchronizeReactContextWithGlobalStore();
     verify(mockQueryClient).resetQueries();
-    verify(mockHeader).refresh();
     verify(mockFooter).refresh();
+    verify(mockHeader).refresh();
+    verify(mockGlobalApplicationState).refreshPage();
   }
 
   @Test
-  public void testStoreLoginReceipt() {
-    String receipt = "31416";
-    authenticationController.storeAuthenticationReceipt(receipt);
-    verify(mockClientCache)
-      .put(eq(USER_AUTHENTICATION_RECEIPT), eq(receipt), anyLong());
-  }
-
-  @Test
-  public void testGetLoginRequest() {
-    String username = "testusername";
-    String password = "pw";
-
-    LoginRequest request = authenticationController.getLoginRequest(
-      username,
-      password
-    );
-    assertNull(request.getAuthenticationReceipt());
-
-    String cachedReceipt = "12345";
-    when(mockClientCache.get(USER_AUTHENTICATION_RECEIPT))
-      .thenReturn(cachedReceipt);
-    request = authenticationController.getLoginRequest(username, password);
-    assertEquals(cachedReceipt, request.getAuthenticationReceipt());
-  }
-
-  @Test
-  public void testLoginUserNotAcceptedTermsOfUse() {
-    // access token is returned without error (it's set and valid), but getMyProfile() fails with a special ForbiddenException
-    when(mockJsClient.getMyUserProfile())
-      .thenReturn(
-        getFailedFuture(
-          new ForbiddenException(
-            "Login to https://synapse.org to accept the latest Terms of Service."
-          )
-        )
-      );
-
-    authenticationController.initializeFromExistingAccessTokenCookie(
-      mockUserProfileCallback
-    );
-
-    assertNull(authenticationController.getCurrentUserProfile());
-    verify(mockSessionDetector).initializeAccessTokenState();
-    verify(mockQueryClient).resetQueries();
-    verify(mockPlaceChanger).goTo(placeCaptor.capture());
-    Place place = placeCaptor.getValue();
-    assertTrue(place instanceof LoginPlace);
-    assertEquals(LoginPlace.SHOW_TOU, ((LoginPlace) place).toToken());
-  }
-
-  // Note: We do not update the access token cookie expiration (since the access token will expire)
-
-  @Test
-  public void testCheckForUserChangeWithoutNetwork() {
-    // if we invoke checkForUserChange(), if the user does not change we should update the session
-    authenticationController.initializeFromExistingAccessTokenCookie(
-      mockUserProfileCallback
-    );
-    verify(mockJsClient, never())
-      .initSession(anyString(), any(AsyncCallback.class));
-    verify(mockQueryClient).resetQueries();
-    Exception scEx = new StatusCodeException(0, "0 ");
-    when(mockJsClient.getAccessToken()).thenReturn(getFailedFuture(scEx));
-
+  public void testCheckForUserChangeDelegatesToSessionManager() {
     authenticationController.checkForUserChange();
-
-    verify(mockSynapseJSNIUtils).consoleError(scEx);
-
-    Exception unknownEx = new UnknownErrorException(
-      "Unexpected transient error"
-    );
-    when(mockJsClient.getAccessToken()).thenReturn(getFailedFuture(unknownEx));
-
-    authenticationController.checkForUserChange();
-    verify(mockSynapseJSNIUtils).consoleError(unknownEx);
-  }
-
-  // Note. If login when the stack is in READ_ONLY mode, then the widgets SynapseAlert should send
-  // user to the Down page.
-
-  @Test
-  public void testInitializeFromExistingAccessTokenCookieSameToken() {
-    verify(mockQueryClient, never()).resetQueries();
-
-    // invoke the method twice, verify that we don't blow away the cache the second time
-    authenticationController.initializeFromExistingAccessTokenCookie(
-      mockUserProfileCallback
-    );
-
-    verify(mockQueryClient, times(1)).resetQueries();
-
-    authenticationController.initializeFromExistingAccessTokenCookie(
-      mockUserProfileCallback
-    );
-
-    verify(mockQueryClient, times(1)).resetQueries();
-  }
-
-  @Test
-  public void testInitializeFromExistingAccessTokenCookieSameTokenForceQueryClientReset() {
-    verify(mockQueryClient, never()).resetQueries();
-
-    // invoke the method twice, verify that the queryclient is cleared the second time when we force it
-    authenticationController.initializeFromExistingAccessTokenCookie(
-      mockUserProfileCallback
-    );
-
-    verify(mockQueryClient, times(1)).resetQueries();
-
-    authenticationController.initializeFromExistingAccessTokenCookie(
-      mockUserProfileCallback,
-      true
-    );
-
-    verify(mockQueryClient, times(2)).resetQueries();
+    verify(mockSessionManager).refreshSession();
   }
 
   @Test
   public void testCheckForQuarantinedEmailNullStatus() {
+    when(mockGinInjector.getSynapseJavascriptClient()).thenReturn(mockJsClient);
+    AsyncMockStubber
+      .callSuccessWith(mockNotificationEmail)
+      .when(mockJsClient)
+      .getNotificationEmail(any(AsyncCallback.class));
     when(mockNotificationEmail.getQuarantineStatus()).thenReturn(null);
 
     authenticationController.checkForQuarantinedEmail();
@@ -354,6 +305,13 @@ public class AuthenticationControllerImplTest {
 
   @Test
   public void testCheckForQuarantinedEmailTransientBounceStatus() {
+    when(mockGinInjector.getSynapseJavascriptClient()).thenReturn(mockJsClient);
+    AsyncMockStubber
+      .callSuccessWith(mockNotificationEmail)
+      .when(mockJsClient)
+      .getNotificationEmail(any(AsyncCallback.class));
+    when(mockNotificationEmail.getQuarantineStatus())
+      .thenReturn(mockEmailQuarantineStatus);
     when(mockEmailQuarantineStatus.getReason())
       .thenReturn(EmailQuarantineReason.TRANSIENT_BOUNCE);
 
@@ -364,6 +322,15 @@ public class AuthenticationControllerImplTest {
 
   @Test
   public void testCheckForQuarantinedEmailPermanentBounceStatus() {
+    when(mockGinInjector.getSynapseJavascriptClient()).thenReturn(mockJsClient);
+    AsyncMockStubber
+      .callSuccessWith(mockNotificationEmail)
+      .when(mockJsClient)
+      .getNotificationEmail(any(AsyncCallback.class));
+    when(mockNotificationEmail.getQuarantineStatus())
+      .thenReturn(mockEmailQuarantineStatus);
+    when(mockGinInjector.getQuarantinedEmailModal())
+      .thenReturn(mockQuarantinedEmailModal);
     String detailedReason = "server does not recognize this email address";
     when(mockEmailQuarantineStatus.getReason())
       .thenReturn(EmailQuarantineReason.PERMANENT_BOUNCE);
@@ -373,5 +340,13 @@ public class AuthenticationControllerImplTest {
     authenticationController.checkForQuarantinedEmail();
 
     verify(mockQuarantinedEmailModal).show(detailedReason);
+  }
+
+  @Test
+  public void testGetSessionManager() {
+    assertEquals(
+      mockSessionManager,
+      authenticationController.getSessionManager()
+    );
   }
 }

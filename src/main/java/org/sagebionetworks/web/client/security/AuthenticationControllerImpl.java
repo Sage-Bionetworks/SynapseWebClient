@@ -1,14 +1,14 @@
 package org.sagebionetworks.web.client.security;
 
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
-import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getFuture;
 
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.place.shared.Place;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.rpc.StatusCodeException;
 import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,55 +16,48 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.auth.LoginRequest;
-import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.repo.model.principal.EmailQuarantineReason;
 import org.sagebionetworks.repo.model.principal.EmailQuarantineStatus;
 import org.sagebionetworks.repo.model.principal.NotificationEmail;
-import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DateTimeUtilsImpl;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.context.QueryClientProvider;
+import org.sagebionetworks.web.client.jsinterop.SessionStateJsObject;
+import org.sagebionetworks.web.client.jsinterop.SynapseSessionManagerJs;
 import org.sagebionetworks.web.client.jsinterop.reactquery.QueryClient;
-import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.LoginPlace;
-import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
-import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
-import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
-import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 /**
- * A util class for authentication
+ * A thin GWT facade over {@code SynapseSessionManager} (JS singleton).
+ *
+ * Session state (token, userId, isAuthenticated) is owned by the JS session
+ * manager. This class subscribes to state changes and handles the GWT-specific
+ * concern of caching a {@link UserProfile}.
  *
  * CODE SPLITTING NOTE: this class should be kept small
- *
- * @author dburdick
- *
  */
 public class AuthenticationControllerImpl implements AuthenticationController {
 
-  public static final String USER_AUTHENTICATION_RECEIPT =
-    "last_user_authentication_receipt";
-  private static final String AUTHENTICATION_MESSAGE =
-    "Invalid username or password.";
   public static final String NIH_NOTIFICATION_DISMISSED =
     "nih_notification_dismissed";
   public static String FORCE_DISPLAY_ORIGINAL_COLUMN_NAMES =
     "force-display-original-column-names";
 
   private List<String> persistentLocalStorageKeys;
-  private String currentUserAccessToken;
   private UserProfile currentUserProfile;
   private ClientCache localStorage;
   private SessionStorage sessionStorage;
   private PortalGinInjector ginInjector;
   private SynapseJSNIUtils jsniUtils;
   private QueryClient queryClient;
+
+  private SynapseSessionManagerJs sessionManager;
+  /** Tracks the last token we saw, so we can detect changes in the subscription callback. */
+  private String lastKnownToken;
 
   @Inject
   public AuthenticationControllerImpl(
@@ -82,152 +75,89 @@ public class AuthenticationControllerImpl implements AuthenticationController {
     setPersistentLocalStorageKeys();
   }
 
-  public void resetQueryClientCache() {
-    queryClient.resetQueries();
-  }
-
-  public void storeAuthenticationReceipt(String receipt) {
-    localStorage.put(
-      USER_AUTHENTICATION_RECEIPT,
-      receipt,
-      DateTimeUtilsImpl.getYearFromNow().getTime()
-    );
-  }
-
-  public LoginRequest getLoginRequest(String username, String password) {
-    LoginRequest request = new LoginRequest();
-    request.setUsername(username);
-    request.setPassword(password);
-    String authenticationReceipt = localStorage.get(
-      USER_AUTHENTICATION_RECEIPT
-    );
-    request.setAuthenticationReceipt(authenticationReceipt);
-    return request;
-  }
-
   /**
-   * Called to update the access token.
-   *
-   * @param token
-   * @param callback
+   * Bind to the JS session manager singleton (window.SynapseSessionManager).
+   * Must be called once after the JS bundle has loaded. Subscribes to state
+   * changes so that GWT state stays in sync.
    */
-  public void setNewAccessToken(
-    String token,
-    AsyncCallback<UserProfile> callback
-  ) {
-    if (token == null) {
-      callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
-      return;
+  public void bindToSessionManager(SynapseSessionManagerJs manager) {
+    this.sessionManager = manager;
+    this.lastKnownToken = getTokenFromSnapshot();
+
+    manager.subscribe(() -> onSessionStateChanged());
+  }
+
+  /** Called by the JS session manager subscription whenever state changes. */
+  private void onSessionStateChanged() {
+    SessionStateJsObject state = sessionManager.getSnapshot();
+    String newToken = state.token;
+
+    boolean tokenChanged = !Objects.equals(lastKnownToken, newToken);
+    lastKnownToken = newToken;
+
+    if (tokenChanged) {
+      resetQueryClientCache();
     }
+
+    if (state.isAuthenticated) {
+      if (tokenChanged || currentUserProfile == null) {
+        // Fetch the user profile for the (potentially new) authenticated user
+        fetchUserProfile();
+      }
+    } else {
+      if (currentUserProfile != null) {
+        currentUserProfile = null;
+      }
+    }
+
+    // Always keep the UI in sync
+    ginInjector
+      .getGlobalApplicationState()
+      .synchronizeReactContextWithGlobalStore();
+    ginInjector.getFooter().refresh();
+    ginInjector.getHeader().refresh();
+  }
+
+  private void fetchUserProfile() {
     ginInjector
       .getSynapseJavascriptClient()
-      .initSession(
-        token,
-        new AsyncCallback<Void>() {
+      .getMyUserProfile()
+      .addCallback(
+        new FutureCallback<UserProfile>() {
           @Override
-          public void onFailure(Throwable caught) {
-            logoutUser();
+          public void onSuccess(UserProfile profile) {
+            currentUserProfile = profile;
+          }
+
+          @Override
+          public void onFailure(Throwable t) {
+            currentUserProfile = null;
             if (
-              caught instanceof SynapseDownException ||
-              caught instanceof ReadOnlyModeException
+              t instanceof ForbiddenException &&
+              t.getMessage().toLowerCase().contains("terms of service")
             ) {
               ginInjector
                 .getGlobalApplicationState()
                 .getPlaceChanger()
-                .goTo(new Down(ClientProperties.DEFAULT_PLACE_TOKEN));
+                .goTo(new LoginPlace(LoginPlace.SHOW_TOU));
             } else {
-              callback.onFailure(caught);
+              jsniUtils.consoleError(t);
             }
           }
-
-          @Override
-          public void onSuccess(Void result) {
-            initializeFromExistingAccessTokenCookie(callback);
-          }
-        }
+        },
+        directExecutor()
       );
   }
 
-  /**
-   * Access token cookie should be set before this call
-   *
-   * @param callback
-   */
-  public void initializeFromExistingAccessTokenCookie(
-    AsyncCallback<UserProfile> callback
-  ) {
-    initializeFromExistingAccessTokenCookie(callback, false);
+  private String getTokenFromSnapshot() {
+    if (sessionManager == null) {
+      return null;
+    }
+    return sessionManager.getSnapshot().token;
   }
 
-  /**
-   * Access token cookie should be set before this call
-   *
-   * @param callback
-   */
-  public void initializeFromExistingAccessTokenCookie(
-    AsyncCallback<UserProfile> callback,
-    boolean forceResetQueryClientCache
-  ) {
-    // attempt to detect the current access token.  if found, get the associated user profile.  if forbidden (due to ToU), send to ToU page.
-    FluentFuture<String> accessTokenFuture = ginInjector
-      .getSynapseJavascriptClient()
-      .getAccessToken();
-    accessTokenFuture.addCallback(
-      new FutureCallback<String>() {
-        @Override
-        public void onSuccess(String accessToken) {
-          if (!Objects.equals(currentUserAccessToken, accessToken)) {
-            resetQueryClientCache();
-            currentUserAccessToken = accessToken;
-          } else if (forceResetQueryClientCache) {
-            resetQueryClientCache();
-          }
-          FluentFuture<UserProfile> userProfileFuture = ginInjector
-            .getSynapseJavascriptClient()
-            .getMyUserProfile();
-          userProfileFuture.addCallback(
-            new FutureCallback<UserProfile>() {
-              @Override
-              public void onSuccess(UserProfile profile) {
-                currentUserProfile = profile;
-                ginInjector.getSessionDetector().initializeAccessTokenState();
-                callback.onSuccess(currentUserProfile);
-              }
-
-              @Override
-              public void onFailure(Throwable t) {
-                currentUserProfile = null;
-                if (
-                  t instanceof ForbiddenException &&
-                  t.getMessage().toLowerCase().contains("terms of service")
-                ) {
-                  ginInjector.getSessionDetector().initializeAccessTokenState();
-                  ginInjector
-                    .getGlobalApplicationState()
-                    .getPlaceChanger()
-                    .goTo(new LoginPlace(LoginPlace.SHOW_TOU));
-                } else {
-                  logoutUser();
-                  ginInjector.getSessionDetector().initializeAccessTokenState();
-                  callback.onFailure(t);
-                }
-              }
-            },
-            directExecutor()
-          );
-        }
-
-        @Override
-        public void onFailure(Throwable t) {
-          currentUserAccessToken = null;
-          currentUserProfile = null;
-          resetQueryClientCache();
-          ginInjector.getSessionDetector().initializeAccessTokenState();
-          callback.onFailure(t);
-        }
-      },
-      directExecutor()
-    );
+  public void resetQueryClientCache() {
+    queryClient.resetQueries();
   }
 
   public void checkForQuarantinedEmail() {
@@ -280,62 +210,27 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 
   @Override
   public void logoutUser() {
-    ginInjector
-      .getSynapseJavascriptClient()
-      .deleteSessionAccessToken()
-      .addCallback(
-        new FutureCallback<Void>() {
-          @Override
-          public void onSuccess(Void result) {
-            // do nothing
-          }
-
-          @Override
-          public void onFailure(Throwable t) {
-            // This will fail if the token is already revoked/invalid, which is fine.
-            jsniUtils.consoleLog(
-              "Failed to delete session access token: " + t.getMessage()
-            );
-          }
-        },
-        directExecutor()
-      );
-    // terminate the session, remove the cookie
+    // Clear local/session storage
     clearLocalStorage();
-    // save last place but clear other session storage values on logout.
     Place lastPlace = ginInjector.getGlobalApplicationState().getLastPlace();
     sessionStorage.clear();
     ginInjector.getGlobalApplicationState().setLastPlace(lastPlace);
-    currentUserAccessToken = null;
+
     currentUserProfile = null;
-    ginInjector.getSessionDetector().initializeAccessTokenState();
-    ginInjector
-      .getSynapseJavascriptClient()
-      .initSession(
-        WebConstants.EXPIRE_SESSION_TOKEN,
-        new AsyncCallback<Void>() {
-          @Override
-          public void onFailure(Throwable caught) {
-            ginInjector.getSynapseJSNIUtils().consoleError(caught);
-            afterCall();
-          }
 
-          @Override
-          public void onSuccess(Void result) {
-            afterCall();
-          }
-
-          private void afterCall() {
-            ginInjector
-              .getGlobalApplicationState()
-              .synchronizeReactContextWithGlobalStore();
-            resetQueryClientCache();
-            ginInjector.getFooter().refresh();
-            ginInjector.getHeader().refresh();
-            ginInjector.getGlobalApplicationState().refreshPage();
-          }
-        }
-      );
+    // Delegate to the JS session manager to clear the session (signs out, initializes anonymous session)
+    sessionManager
+      .clearSession()
+      .then(v -> {
+        ginInjector
+          .getGlobalApplicationState()
+          .synchronizeReactContextWithGlobalStore();
+        resetQueryClientCache();
+        ginInjector.getFooter().refresh();
+        ginInjector.getHeader().refresh();
+        ginInjector.getGlobalApplicationState().refreshPage();
+        return null;
+      });
   }
 
   @Override
@@ -345,17 +240,30 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 
   @Override
   public boolean isLoggedIn() {
-    return (
-      currentUserAccessToken != null &&
-      !currentUserAccessToken.isEmpty() &&
-      currentUserProfile != null
-    );
+    SessionStateJsObject state = sessionManager.getSnapshot();
+    GWT.log("isLoggedIn? session manager snapshot: " + state.isAuthenticated);
+    return state.isAuthenticated;
   }
 
   @Override
   public String getCurrentUserPrincipalId() {
+    // Prefer the session manager's userId (available immediately, no profile needed)
+    SessionStateJsObject state = sessionManager.getSnapshot();
+    if (state.userId != null) {
+      return state.userId;
+    }
     if (currentUserProfile != null) {
       return currentUserProfile.getOwnerId();
+    }
+    return null;
+  }
+
+  @Override
+  public String getCurrentUserRealmId() {
+    // Prefer the session manager's userId (available immediately, no profile needed)
+    SessionStateJsObject state = sessionManager.getSnapshot();
+    if (state.realmId != null) {
+      return state.realmId;
     }
     return null;
   }
@@ -367,68 +275,70 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 
   @Override
   public String getCurrentUserAccessToken() {
-    return currentUserAccessToken;
+    return getTokenFromSnapshot();
   }
 
   @Override
   public void checkForUserChange() {
-    checkForUserChange(null);
+    // Delegate to the JS session manager. The subscription callback
+    // (onSessionStateChanged) handles detecting changes and updating GWT state.
+    sessionManager.refreshSession();
   }
 
   @Override
   public FluentFuture<Void> getCheckForUserChangeFuture() {
-    return getFuture(cb -> checkForUserChange(cb));
-  }
+    return getFuture(cb -> {
+      sessionManager
+        .refreshSession()
+        .then(v -> {
+          // After refresh, fetch the profile if authenticated
+          SessionStateJsObject state = sessionManager.getSnapshot();
+          lastKnownToken = state.token;
+          if (state.isAuthenticated) {
+            ginInjector
+              .getSynapseJavascriptClient()
+              .getMyUserProfile()
+              .addCallback(
+                new FutureCallback<UserProfile>() {
+                  @Override
+                  public void onSuccess(UserProfile profile) {
+                    currentUserProfile = profile;
+                    checkForQuarantinedEmail();
+                    cb.onSuccess(null);
+                  }
 
-  public void checkForUserChange(AsyncCallback<Void> cb) {
-    String oldUserAccessToken = currentUserAccessToken;
-    initializeFromExistingAccessTokenCookie(
-      new AsyncCallback<UserProfile>() {
-        @Override
-        public void onFailure(Throwable caught) {
-          jsniUtils.consoleError(caught);
-          // if the exception was not due to a network failure, then log the user out
-          boolean isNetworkFailure =
-            caught instanceof UnknownErrorException ||
-            caught instanceof StatusCodeException;
-          boolean isAlreadyLoggedOut =
-            oldUserAccessToken == null && currentUserAccessToken == null;
-          if (!isNetworkFailure && !isAlreadyLoggedOut) {
-            logoutUser();
-          }
-          if (cb != null) {
+                  @Override
+                  public void onFailure(Throwable t) {
+                    currentUserProfile = null;
+                    if (
+                      t instanceof ForbiddenException &&
+                      t.getMessage().toLowerCase().contains("terms of service")
+                    ) {
+                      ginInjector
+                        .getGlobalApplicationState()
+                        .getPlaceChanger()
+                        .goTo(new LoginPlace(LoginPlace.SHOW_TOU));
+                    }
+                    cb.onSuccess(null);
+                  }
+                },
+                directExecutor()
+              );
+          } else {
+            currentUserProfile = null;
             cb.onSuccess(null);
           }
-        }
+          return null;
+        });
+    });
+  }
 
-        @Override
-        public void onSuccess(UserProfile result) {
-          // is this a user session change?  if so, refresh the page.
-          ginInjector.getFooter().refresh();
-          ginInjector.getHeader().refresh();
-
-          if (!Objects.equals(currentUserAccessToken, oldUserAccessToken)) {
-            // we've reinitialized the app with the correct session, refresh the page (do not get rid of js state)!
-            if (cb != null) {
-              cb.onSuccess(null);
-            } else {
-              ginInjector.getGlobalApplicationState().refreshPage();
-            }
-            checkForQuarantinedEmail();
-          } else {
-            // we've determined that the session has not changed
-            if (cb != null) {
-              cb.onSuccess(null);
-            }
-          }
-        }
-      }
-    );
+  public SynapseSessionManagerJs getSessionManager() {
+    return sessionManager;
   }
 
   private void setPersistentLocalStorageKeys() {
     String[] swcPersistentLocalStorageKeys = new String[] {
-      USER_AUTHENTICATION_RECEIPT,
       NIH_NOTIFICATION_DISMISSED,
       FORCE_DISPLAY_ORIGINAL_COLUMN_NAMES,
     };
