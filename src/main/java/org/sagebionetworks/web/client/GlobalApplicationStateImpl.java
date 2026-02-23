@@ -596,9 +596,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
   }
 
   @Override
-  public void init(final Callback finalCallback) {
-    view.initGlobalViewProperties();
-
+  public void initSRCEndpoints() {
     String repoServiceUrl = synapseProperties.getSynapseProperty(
       REPO_SERVICE_URL_KEY
     );
@@ -609,6 +607,13 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
       portalUrl += "/";
     }
     view.initSRCEndpoints(repoUrl, portalUrl);
+  }
+
+  @Override
+  public void init(final Callback finalCallback) {
+    view.initGlobalViewProperties();
+
+    // SRC endpoints are already initialized by Portal.java before this is called.
 
     // Add a global click handler.
     view.addNativePreviewHandler(

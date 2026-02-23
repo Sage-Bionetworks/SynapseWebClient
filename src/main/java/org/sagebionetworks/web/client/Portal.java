@@ -18,8 +18,8 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import java.util.HashMap;
-import java.util.function.Consumer;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.web.client.jsinterop.SynapseSessionManagerJs;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -168,6 +168,15 @@ public class Portal implements EntryPoint {
                           historyMapper
                         );
 
+                        // Init SRC endpoints (needs synapseProperties to be loaded)
+                        globalApplicationState.initSRCEndpoints();
+
+                        // Bind + start the session manager
+                        ginjector
+                          .getAuthenticationController()
+                          .bindToSessionManager(getSynapseSessionManager());
+                        getSynapseSessionManager().start();
+
                         FluentFuture
                           .from(
                             whenAllComplete(
@@ -202,10 +211,6 @@ public class Portal implements EntryPoint {
                                         globalApplicationState.initializeToastContainer();
                                         // initialize the view default columns so that they're ready when we need them (do this by constructing that singleton object)
                                         ginjector.getViewDefaultColumns();
-
-                                        // start timer to check for user session state change (session expired, or user explicitly logged
-                                        // out).  Backend endpoints must be set before starting this (because it attempts to get "my user profile")
-                                        ginjector.getSessionDetector().start();
 
                                         // start a timer to check to see if we're approaching the max allowable space in the web storage.
                                         // clears out the web storage (cache) if this is the case.
@@ -310,4 +315,12 @@ public class Portal implements EntryPoint {
   ) {
     globalApplicationState.initOnPopStateHandler();
   }
+
+  /**
+   * Access the SynapseSessionManager singleton that was created in globalContext.js
+   * and assigned to window.SynapseSessionManager.
+   */
+  private static native SynapseSessionManagerJs getSynapseSessionManager() /*-{
+    return $wnd.SynapseSessionManager;
+  }-*/;
 }

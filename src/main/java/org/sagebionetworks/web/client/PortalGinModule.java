@@ -91,8 +91,6 @@ import org.sagebionetworks.web.client.view.LoginView;
 import org.sagebionetworks.web.client.view.LoginViewImpl;
 import org.sagebionetworks.web.client.view.MapView;
 import org.sagebionetworks.web.client.view.MapViewImpl;
-import org.sagebionetworks.web.client.view.NewAccountView;
-import org.sagebionetworks.web.client.view.NewAccountViewImpl;
 import org.sagebionetworks.web.client.view.OAuthClientEditorView;
 import org.sagebionetworks.web.client.view.OAuthClientEditorViewImpl;
 import org.sagebionetworks.web.client.view.PasswordResetSignedTokenView;
@@ -131,8 +129,6 @@ import org.sagebionetworks.web.client.view.UserAccessRequestHistoryView;
 import org.sagebionetworks.web.client.view.UserAccessRequestHistoryViewImpl;
 import org.sagebionetworks.web.client.view.users.PasswordResetView;
 import org.sagebionetworks.web.client.view.users.PasswordResetViewImpl;
-import org.sagebionetworks.web.client.view.users.RegisterWidgetView;
-import org.sagebionetworks.web.client.view.users.RegisterWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.Button;
 import org.sagebionetworks.web.client.widget.ButtonImpl;
 import org.sagebionetworks.web.client.widget.CommaSeparatedValuesParserView;
@@ -828,7 +824,6 @@ public class PortalGinModule extends AbstractGinModule {
     bind(GWTWrapper.class).to(GWTWrapperImpl.class).in(Singleton.class);
 
     bind(GWTTimer.class).to(GWTTimerImpl.class);
-    bind(SessionDetector.class).in(Singleton.class);
 
     bind(WebStorageMaxSizeDetector.class).in(Singleton.class);
     // RequestBuilder
@@ -872,11 +867,6 @@ public class PortalGinModule extends AbstractGinModule {
     bind(PasswordResetView.class)
       .to(PasswordResetViewImpl.class)
       .in(Singleton.class);
-
-    // NewAccountView
-    bind(NewAccountView.class).to(NewAccountViewImpl.class).in(Singleton.class);
-
-    bind(RegisterWidgetView.class).to(RegisterWidgetViewImpl.class);
 
     // ProfileView
     bind(ProfileView.class).to(ProfileViewImpl.class).in(Singleton.class);

@@ -13,10 +13,18 @@ public class ApplicationSessionContextJsObject {
   public String token;
 
   @JsNullable
+  public String realmId;
+
+  @JsNullable
+  public String userId;
+
+  @JsNullable
   public String termsOfServiceStatus;
 
   @JsNullable
   public String twoFactorStatus;
+
+  public boolean isAuthenticated;
 
   public boolean hasInitializedSession;
 
@@ -51,6 +59,9 @@ public class ApplicationSessionContextJsObject {
   @JsOverlay
   public static ApplicationSessionContextJsObject create(
     String token,
+    String realmId,
+    String userId,
+    boolean isAuthenticated,
     boolean hasInitializedSession,
     RefreshSessionFunction refreshSession,
     ClearSessionFunction clearSession,
@@ -59,6 +70,9 @@ public class ApplicationSessionContextJsObject {
     ApplicationSessionContextJsObject context =
       new ApplicationSessionContextJsObject();
     context.token = token;
+    context.realmId = realmId;
+    context.userId = userId;
+    context.isAuthenticated = isAuthenticated;
     context.hasInitializedSession = hasInitializedSession;
     context.refreshSession = refreshSession;
     context.clearSession = clearSession;

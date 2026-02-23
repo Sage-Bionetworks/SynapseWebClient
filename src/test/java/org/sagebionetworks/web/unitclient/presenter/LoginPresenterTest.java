@@ -99,10 +99,6 @@ public class LoginPresenterTest {
     when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
     when(mockAuthenticationController.getCurrentUserPrincipalId())
       .thenReturn(userId);
-    AsyncMockStubber
-      .callSuccessWith(mockUserProfile)
-      .when(mockAuthenticationController)
-      .setNewAccessToken(anyString(), any(AsyncCallback.class));
   }
 
   @Test

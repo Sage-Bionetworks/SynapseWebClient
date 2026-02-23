@@ -27,7 +27,6 @@ import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.MapPlace;
-import org.sagebionetworks.web.client.place.NewAccount;
 import org.sagebionetworks.web.client.place.OAuthClientEditorPlace;
 import org.sagebionetworks.web.client.place.PasswordResetSignedTokenPlace;
 import org.sagebionetworks.web.client.place.PeopleSearch;
@@ -77,7 +76,6 @@ import org.sagebionetworks.web.client.place.users.RegisterAccount;
     TeamSearch.Tokenizer.class,
     Quiz.Tokenizer.class,
     Account.Tokenizer.class,
-    NewAccount.Tokenizer.class,
     ChangeUsername.Tokenizer.class,
     Trash.Tokenizer.class,
     PeopleSearch.Tokenizer.class,

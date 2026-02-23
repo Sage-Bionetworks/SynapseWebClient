@@ -43,7 +43,6 @@ import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.MapPlace;
-import org.sagebionetworks.web.client.place.NewAccount;
 import org.sagebionetworks.web.client.place.OAuthClientEditorPlace;
 import org.sagebionetworks.web.client.place.PasswordResetSignedTokenPlace;
 import org.sagebionetworks.web.client.place.PeopleSearch;
@@ -130,9 +129,8 @@ public class BulkPresenterProxy extends AbstractActivity {
   @Override
   public void start(final AcceptsOneWidget panel, final EventBus eventBus) {
     globalApplicationState.checkVersionCompatibility(versionCheckCallback);
-    // Note1: SessionDetector checks for a user change every 10 seconds (and on initial app load). Do not
-    // call authController.checkForUserChange();
-    // Note2: We used to refresh the session token on place change, but there's no way to refresh an access token (your session now has a set expiration time).
+    // Note: SynapseSessionManager refreshes the session every 60s via OAuth2 introspection.
+    // Do not call authController.checkForUserChange() on place change.
     globalApplicationState.setIsEditing(false);
     // detect prefetch
     if (panel == null && eventBus == null) return;
@@ -477,23 +475,6 @@ public class BulkPresenterProxy extends AbstractActivity {
           public void onSuccess() {
             TrashPresenter presenter = ginjector.getTrashPresenter();
             presenter.setPlace((Trash) place);
-            presenter.start(panel, eventBus);
-          }
-
-          @Override
-          public void onFailure(Throwable caught) {
-            loadError(caught);
-          }
-        }
-      );
-    } else if (place instanceof NewAccount) {
-      GWT.runAsync(
-        NewAccount.class,
-        new RunAsyncCallback() {
-          @Override
-          public void onSuccess() {
-            NewAccountPresenter presenter = ginjector.getNewAccountPresenter();
-            presenter.setPlace((NewAccount) place);
             presenter.start(panel, eventBus);
           }
 
