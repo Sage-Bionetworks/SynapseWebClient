@@ -241,7 +241,6 @@ public class AuthenticationControllerImpl implements AuthenticationController {
   @Override
   public boolean isLoggedIn() {
     SessionStateJsObject state = sessionManager.getSnapshot();
-    GWT.log("isLoggedIn? session manager snapshot: " + state.isAuthenticated);
     return state.isAuthenticated;
   }
 
