@@ -17,7 +17,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.widget.HelpWidget;
 import org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWidget;
-import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
+import org.sagebionetworks.web.client.widget.sharing.EntityAccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -31,7 +31,7 @@ public class SharingAndDataUseConditionWidgetViewImpl
   FlowPanel container;
   PublicPrivateBadge publicPrivateBadge;
   RestrictionWidget restrictionWidgetV2;
-  AccessControlListModalWidget accessControlListModalWidget;
+  EntityAccessControlListModalWidget accessControlListModalWidget;
   CookieProvider cookies;
 
   @Inject
@@ -40,7 +40,7 @@ public class SharingAndDataUseConditionWidgetViewImpl
     GlobalApplicationState globalApplicationState,
     IconsImageBundle iconsImageBundle,
     PublicPrivateBadge publicPrivateBadge,
-    AccessControlListModalWidget accessControlListModalWidget,
+    EntityAccessControlListModalWidget accessControlListModalWidget,
     RestrictionWidget restrictionWidgetV2,
     CookieProvider cookies
   ) {

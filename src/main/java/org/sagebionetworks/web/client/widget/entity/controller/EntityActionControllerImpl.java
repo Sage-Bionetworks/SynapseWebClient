@@ -135,7 +135,6 @@ import org.sagebionetworks.web.client.widget.entity.menu.v3.DefaultEntityActionM
 import org.sagebionetworks.web.client.widget.entity.menu.v3.EntityActionMenu;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTab;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
-import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.sharing.EntityAccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.statistics.StatisticsPlotWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
@@ -263,7 +262,6 @@ public class EntityActionControllerImpl
   GlobalApplicationState globalApplicationState;
   FileClientsHelp fileClientsHelp;
   AuthenticationController authenticationController;
-  AccessControlListModalWidget accessControlListModalWidget;
   EntityAccessControlListModalWidget entityAccessControlListModalWidget;
   RenameEntityModalWidget renameEntityModalWidget;
   EntityFinderWidget.Builder entityFinderBuilder;

@@ -2,14 +2,11 @@ package org.sagebionetworks.web.client.presenter;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
-import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.view.DownloadCartPageView;
-import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
+import org.sagebionetworks.web.client.widget.sharing.EntityAccessControlListModalWidget;
 
 public class DownloadCartPresenter
   extends AbstractActivity
@@ -18,20 +15,17 @@ public class DownloadCartPresenter
     Presenter<org.sagebionetworks.web.client.place.DownloadCartPlace> {
 
   private DownloadCartPageView view;
-  private AccessControlListModalWidget aclModal;
+  private EntityAccessControlListModalWidget aclModal;
   private PortalGinInjector ginInjector;
-  private PopupUtilsView popupUtils;
 
   @Inject
   public DownloadCartPresenter(
     DownloadCartPageView view,
-    PortalGinInjector ginInjector,
-    PopupUtilsView popupUtils
+    PortalGinInjector ginInjector
   ) {
     this.view = view;
     view.setPresenter(this);
     this.ginInjector = ginInjector;
-    this.popupUtils = popupUtils;
   }
 
   @Override
@@ -46,33 +40,16 @@ public class DownloadCartPresenter
     view.render();
   }
 
-  private AccessControlListModalWidget getAccessControlListModalWidget() {
+  private EntityAccessControlListModalWidget getAccessControlListModalWidget() {
     if (aclModal == null) {
-      aclModal = ginInjector.getAccessControlListModalWidget();
+      aclModal = ginInjector.getEntityAccessControlListModalWidget();
     }
     return aclModal;
   }
 
   @Override
   public void onViewSharingSettingsClicked(String benefactorEntityId) {
-    ginInjector
-      .getSynapseJavascriptClient()
-      .getEntity(
-        benefactorEntityId,
-        new AsyncCallback<Entity>() {
-          @Override
-          public void onSuccess(Entity entity) {
-            boolean canChangePermission = false;
-            getAccessControlListModalWidget()
-              .configure(entity, canChangePermission);
-            getAccessControlListModalWidget().showSharing(() -> {});
-          }
-
-          @Override
-          public void onFailure(Throwable caught) {
-            popupUtils.showErrorMessage(caught.getMessage());
-          }
-        }
-      );
+    getAccessControlListModalWidget().configure(benefactorEntityId, () -> {});
+    getAccessControlListModalWidget().setOpen(true);
   }
 }
