@@ -12,6 +12,9 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.footer.VersionState;
 
 public interface GlobalApplicationState {
+  /** Configure SRC endpoint overrides. Must be called after SynapseProperties are loaded. */
+  void initSRCEndpoints();
+
   public void init(final Callback c);
 
   /**

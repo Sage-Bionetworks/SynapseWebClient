@@ -4,13 +4,12 @@ import javax.inject.Inject;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.OneSageUtils;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.jsinterop.ApplicationSessionContextJsObject;
 import org.sagebionetworks.web.client.jsinterop.IsEditingStore;
 import org.sagebionetworks.web.client.jsinterop.SynapseContextJsObject;
 import org.sagebionetworks.web.client.jsinterop.SynapseReactClientFullContextProviderProps;
+import org.sagebionetworks.web.client.jsinterop.SynapseSessionManagerJs;
 import org.sagebionetworks.web.client.jsni.FullContextProviderPropsJSNIObject;
 import org.sagebionetworks.web.client.jsni.QueryClientJSNIObject;
 import org.sagebionetworks.web.client.jsni.SynapseReactClientFullContextJSNIObject;
@@ -45,6 +44,7 @@ public class SynapseReactClientFullContextPropsProviderImpl
     return SynapseReactClientFullContextProviderProps.create(
       SynapseContextJsObject.create(
         authController.getCurrentUserAccessToken(),
+        authController.isLoggedIn(),
         DisplayUtils.isInTestWebsite(cookies),
         globalApplicationState.isShowingUTCTime(),
         oneSageUtils.getAppIdForOneSage()
@@ -61,16 +61,23 @@ public class SynapseReactClientFullContextPropsProviderImpl
       ),
       ApplicationSessionContextJsObject.create(
         authController.getCurrentUserAccessToken(),
-        true, // hasInitializedSession
-        () -> {
-          authController.checkForUserChange();
-        },
-        () -> {
-          authController.logoutUser();
-        },
+        authController.getCurrentUserRealmId(),
+        authController.getCurrentUserPrincipalId(),
+        authController.isLoggedIn(),
+        sessionManagerHasInitialized(),
+        () -> authController.getSessionManager().refreshSession(),
+        authController::logoutUser,
         false
       ) // isLoadingSSO
     );
+  }
+
+  private boolean sessionManagerHasInitialized() {
+    SynapseSessionManagerJs mgr = authController.getSessionManager();
+    if (mgr == null) {
+      return false;
+    }
+    return mgr.getSnapshot().hasInitializedSession;
   }
 
   @Override

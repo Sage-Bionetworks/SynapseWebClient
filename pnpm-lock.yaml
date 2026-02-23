@@ -132,8 +132,8 @@ importers:
         specifier: ^3.0.2
         version: 3.0.2
       synapse-react-client:
-        specifier: 3.4.74
-        version: 3.4.74(@babel/template@7.27.2)(@hyperjump/browser@1.3.1)(@types/json-schema@7.0.15)(@types/react@19.1.8)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.30.1)(prop-types@15.8.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(rxjs@7.8.2)
+        specifier: 3.4.75
+        version: 3.4.75(@babel/template@7.27.2)(@hyperjump/browser@1.3.1)(@types/json-schema@7.0.15)(@types/react@19.1.8)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.30.1)(prop-types@15.8.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(rxjs@7.8.2)
       universal-cookie:
         specifier: ^7.2.2
         version: 7.2.2
@@ -1408,8 +1408,8 @@ packages:
   '@sage-bionetworks/synapse-client@0.0.11':
     resolution: {integrity: sha512-l80uykr4IH0W3geXIoH08ev/6+PwvfhspoRy6xCl23m6yvp2PBbuu5C/I7G3v93pFMfo41fj/y3+VWzbk/RQcQ==}
 
-  '@sage-bionetworks/synapse-client@0.0.12':
-    resolution: {integrity: sha512-Flvt4IztYi4g/6goMFK80AJwbwRDhvtz2vU5MdPqN89nWvYkSuN791R5NWQzRfMPaXyC52M7W2vMO5yloZBbow==}
+  '@sage-bionetworks/synapse-client@0.0.13':
+    resolution: {integrity: sha512-g5xjkQfSNWs2F9gRyTziGg0xjCZlB9axkJMG8nCBIookaachGyKZIOoqPmHGgpI+H7DnJDSVD9Dmi3E8YghgIQ==}
 
   '@sage-bionetworks/synapse-types@0.0.6':
     resolution: {integrity: sha512-zPIwkVU1FRR4BYmYP3IL4J/mgd3QzH4Ty1r3GwPsieiR7TKy5+7WaWyqWdOW8f9KVrtdlaoHEY7pMP/GnTQlMg==}
@@ -4605,8 +4605,8 @@ packages:
   svg-path-sdf@1.1.3:
     resolution: {integrity: sha512-vJJjVq/R5lSr2KLfVXVAStktfcfa1pNFjFOgyJnzZFXlO/fDZ5DmM8FpnSKKzLPfEYTVeXuVBTHF296TpxuJVg==}
 
-  synapse-react-client@3.4.74:
-    resolution: {integrity: sha512-dZWoMEfQOIP/ELVVYQL2vl8OteLuJ+eCIbuXiDpOS8sw5gS2AbO9d+5kULqkOIrtjgwAj7blXnqEngcubldP3Q==}
+  synapse-react-client@3.4.75:
+    resolution: {integrity: sha512-2nhhRpuPv3viFf2VsMf9kprTL/2P4/C0jHctvLO8XxKOmC3ADg6GuAD/8VGcbBn8aQwjScRpTGl6buj1GUee0Q==}
     peerDependencies:
       '@sage-bionetworks/aridhia-client': '*'
       react: ^19.1.0
@@ -6486,7 +6486,7 @@ snapshots:
 
   '@sage-bionetworks/synapse-client@0.0.11': {}
 
-  '@sage-bionetworks/synapse-client@0.0.12': {}
+  '@sage-bionetworks/synapse-client@0.0.13': {}
 
   '@sage-bionetworks/synapse-types@0.0.6':
     dependencies:
@@ -10344,7 +10344,7 @@ snapshots:
       parse-svg-path: 0.1.2
       svg-path-bounds: 1.0.2
 
-  synapse-react-client@3.4.74(@babel/template@7.27.2)(@hyperjump/browser@1.3.1)(@types/json-schema@7.0.15)(@types/react@19.1.8)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.30.1)(prop-types@15.8.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(rxjs@7.8.2):
+  synapse-react-client@3.4.75(@babel/template@7.27.2)(@hyperjump/browser@1.3.1)(@types/json-schema@7.0.15)(@types/react@19.1.8)(date-fns@2.30.0)(mapbox-gl@1.13.3)(moment@2.30.1)(prop-types@15.8.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(rxjs@7.8.2):
     dependencies:
       '@apidevtools/json-schema-ref-parser': 14.2.1(@types/json-schema@7.0.15)
       '@aws-sdk/client-s3': 3.966.0
@@ -10367,7 +10367,7 @@ snapshots:
       '@rjsf/validator-ajv8': 6.0.0-beta.10(@rjsf/utils@6.0.0-beta.10(react@19.2.3))
       '@sage-bionetworks/markdown-it-container': 4.0.1
       '@sage-bionetworks/react-datasheet-grid': 4.11.5-sage.3(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
-      '@sage-bionetworks/synapse-client': 0.0.12
+      '@sage-bionetworks/synapse-client': 0.0.13
       '@sage-bionetworks/synapse-types': 0.0.6
       '@tanstack/query-core': 5.80.10
       '@tanstack/react-query': 5.80.10(react@19.2.3)
