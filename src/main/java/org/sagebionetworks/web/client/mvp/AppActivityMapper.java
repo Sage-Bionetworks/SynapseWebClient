@@ -18,7 +18,6 @@ import org.sagebionetworks.web.client.place.Challenges;
 import org.sagebionetworks.web.client.place.ChangeUsername;
 import org.sagebionetworks.web.client.place.ComingSoon;
 import org.sagebionetworks.web.client.place.DataCatalogPagePlace;
-import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.EmailInvitation;
 import org.sagebionetworks.web.client.place.ErrorPlace;
 import org.sagebionetworks.web.client.place.Governance;
@@ -95,7 +94,6 @@ public class AppActivityMapper implements ActivityMapper {
     openAccessPlaces.add(MapPlace.class);
     openAccessPlaces.add(TeamSearch.class);
     openAccessPlaces.add(PeopleSearch.class);
-    openAccessPlaces.add(Down.class);
     openAccessPlaces.add(Profile.class);
     openAccessPlaces.add(StandaloneWiki.class);
     openAccessPlaces.add(SignedToken.class);
@@ -118,7 +116,6 @@ public class AppActivityMapper implements ActivityMapper {
     excludeFromLastPlace.add(Trash.class);
     excludeFromLastPlace.add(SignedToken.class);
     excludeFromLastPlace.add(PasswordResetSignedTokenPlace.class);
-    excludeFromLastPlace.add(Down.class);
   }
 
   @Override
