@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
-import static org.sagebionetworks.web.client.ClientProperties.DEFAULT_PLACE_TOKEN;
-
 import com.google.gwt.user.client.rpc.StatusCodeException;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -12,7 +10,6 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.exceptions.WebClientConfigurationException;
-import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.shared.exceptions.ConflictingUpdateException;
@@ -75,9 +72,8 @@ public class SynapseAlertImpl implements SynapseAlert {
     } else if (
       ex instanceof ReadOnlyModeException || ex instanceof SynapseDownException
     ) {
-      globalApplicationState
-        .getPlaceChanger()
-        .goTo(new Down(DEFAULT_PLACE_TOKEN));
+      // Stack status detector will redirect to the ServerDown.html in time, just show an error message for now
+      view.showError(message);
     } else if (ex instanceof UnauthorizedException) {
       // send user to login page
       // invalid session token. log out user and send to login place

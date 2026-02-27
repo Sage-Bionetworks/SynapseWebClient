@@ -28,7 +28,6 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertImpl;
@@ -116,14 +115,16 @@ public class SynapseAlertImplTest {
   public void testHandleServiceExceptionReadOnly() {
     widget.handleException(new ReadOnlyModeException());
     verify(mockView).clearState();
-    verify(mockPlaceChanger).goTo(isA(Down.class));
+    // Stack status detector will redirect to ServerDown.html
+    verify(mockView).showError(anyString());
   }
 
   @Test
   public void testHandleServiceExceptionDown() {
     widget.handleException(new SynapseDownException());
     verify(mockView).clearState();
-    verify(mockPlaceChanger).goTo(isA(Down.class));
+    // Stack status detector will redirect to ServerDown.html
+    verify(mockView).showError(anyString());
   }
 
   @Test

@@ -68,7 +68,6 @@ public class Portal implements EntryPoint {
       ) {
         fullUrl = fullUrl.replace("/tables/query/", "/tables/#query/");
       }
-
       Window.Location.assign(fullUrl);
     } else {
       // This is a split point where the browser can download the first large code file.
@@ -170,7 +169,8 @@ public class Portal implements EntryPoint {
 
                         // Init SRC endpoints (needs synapseProperties to be loaded)
                         globalApplicationState.initSRCEndpoints();
-
+                        // start timer to check for Synapse outage or scheduled maintenance
+                        ginjector.getSynapseStatusDetector().start();
                         // Bind + start the session manager
                         ginjector
                           .getAuthenticationController()
@@ -201,10 +201,6 @@ public class Portal implements EntryPoint {
 
                                         // start version timer
                                         ginjector.getVersionTimer().start();
-                                        // start timer to check for Synapse outage or scheduled maintenance
-                                        ginjector
-                                          .getSynapseStatusDetector()
-                                          .start();
                                         // Goes to place represented on URL or default place
                                         historyHandler.handleCurrentHistory();
                                         globalApplicationState.initializeDropZone();

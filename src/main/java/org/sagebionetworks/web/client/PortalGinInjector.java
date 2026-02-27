@@ -23,7 +23,6 @@ import org.sagebionetworks.web.client.presenter.ComingSoonPresenter;
 import org.sagebionetworks.web.client.presenter.DataAccessApprovalTokenPresenter;
 import org.sagebionetworks.web.client.presenter.DataAccessManagementPresenter;
 import org.sagebionetworks.web.client.presenter.DataCatalogPagePresenter;
-import org.sagebionetworks.web.client.presenter.DownPresenter;
 import org.sagebionetworks.web.client.presenter.DownloadCartPresenter;
 import org.sagebionetworks.web.client.presenter.EmailInvitationPresenter;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
@@ -331,8 +330,6 @@ public interface PortalGinInjector extends Ginjector {
   SearchV2Presenter getSearchV2Presenter();
 
   SynapseWikiPresenter getSynapseWikiPresenter();
-
-  DownPresenter getDownPresenter();
 
   TeamPresenter getTeamPresenter();
 
