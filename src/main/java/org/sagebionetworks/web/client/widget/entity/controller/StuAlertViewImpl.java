@@ -12,10 +12,14 @@ import org.sagebionetworks.web.client.jsinterop.ErrorPageProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
-import org.sagebionetworks.web.client.view.DownViewImpl.ErrorPageType;
 import org.sagebionetworks.web.client.widget.ReactComponent;
 
 public class StuAlertViewImpl implements StuAlertView {
+
+  public static enum ErrorPageType {
+    ACCESS_DENIED,
+    NOT_FOUND,
+  }
 
   public interface Binder extends UiBinder<Widget, StuAlertViewImpl> {}
 

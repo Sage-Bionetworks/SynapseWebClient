@@ -28,7 +28,6 @@ import org.sagebionetworks.web.client.context.SynapseReactClientFullContextProps
 import org.sagebionetworks.web.client.context.SynapseReactClientFullContextPropsProviderImpl;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.cookie.GWTCookieImpl;
-import org.sagebionetworks.web.client.presenter.DownPresenter;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
 import org.sagebionetworks.web.client.presenter.EntityPresenterEventBinder;
 import org.sagebionetworks.web.client.presenter.EntityPresenterEventBinderImpl;
@@ -69,8 +68,6 @@ import org.sagebionetworks.web.client.view.DataCatalogPageView;
 import org.sagebionetworks.web.client.view.DataCatalogPageViewImpl;
 import org.sagebionetworks.web.client.view.DivView;
 import org.sagebionetworks.web.client.view.DivViewImpl;
-import org.sagebionetworks.web.client.view.DownView;
-import org.sagebionetworks.web.client.view.DownViewImpl;
 import org.sagebionetworks.web.client.view.DownloadCartPageView;
 import org.sagebionetworks.web.client.view.DownloadCartPageViewImpl;
 import org.sagebionetworks.web.client.view.EmailInvitationView;
@@ -813,7 +810,6 @@ public class PortalGinModule extends AbstractGinModule {
     bind(ProfilePresenter.class).in(Singleton.class);
 
     bind(EntityPresenter.class).in(Singleton.class);
-    bind(DownPresenter.class).in(Singleton.class);
     bind(SignedTokenPresenter.class).in(Singleton.class);
     bind(PersonalAccessTokensPresenter.class).in(Singleton.class);
     bind(AnnotationsRendererWidgetView.class)
@@ -886,9 +882,6 @@ public class PortalGinModule extends AbstractGinModule {
     bind(TrustCenterView.class)
       .to(TrustCenterViewImpl.class)
       .in(Singleton.class);
-
-    // Down
-    bind(DownView.class).to(DownViewImpl.class).in(Singleton.class);
 
     // Synapse Wiki Pages
     bind(SynapseWikiView.class).to(SynapseWikiViewImpl.class);

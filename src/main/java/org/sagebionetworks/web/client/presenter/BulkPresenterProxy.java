@@ -33,7 +33,6 @@ import org.sagebionetworks.web.client.place.ComingSoon;
 import org.sagebionetworks.web.client.place.DataAccessApprovalTokenPlace;
 import org.sagebionetworks.web.client.place.DataAccessManagementPlace;
 import org.sagebionetworks.web.client.place.DataCatalogPagePlace;
-import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.DownloadCartPlace;
 import org.sagebionetworks.web.client.place.EmailInvitation;
 import org.sagebionetworks.web.client.place.ErrorPlace;
@@ -320,23 +319,6 @@ public class BulkPresenterProxy extends AbstractActivity {
             SynapseWikiPresenter presenter =
               ginjector.getSynapseWikiPresenter();
             presenter.setPlace((Wiki) place);
-            presenter.start(panel, eventBus);
-          }
-
-          @Override
-          public void onFailure(Throwable caught) {
-            loadError(caught);
-          }
-        }
-      );
-    } else if (place instanceof Down) {
-      GWT.runAsync(
-        Down.class,
-        new RunAsyncCallback() {
-          @Override
-          public void onSuccess() {
-            DownPresenter presenter = ginjector.getDownPresenter();
-            presenter.setPlace((Down) place);
             presenter.start(panel, eventBus);
           }
 
