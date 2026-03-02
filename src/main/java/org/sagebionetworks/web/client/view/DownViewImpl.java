@@ -81,6 +81,7 @@ public class DownViewImpl implements DownView {
       message,
       null, //entity ID
       null, //entity version
+      null, //object type
       href -> {
         globalAppState.handleRelativePathClick(href);
       }
