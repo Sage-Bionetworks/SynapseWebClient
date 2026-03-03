@@ -10,8 +10,9 @@ public class ErrorPageProps extends ReactComponentProps {
 
   String type;
   String message;
-  String entityId;
-  double entityVersion;
+  String id;
+  double version;
+  String objectType;
 
   @JsFunction
   public interface Callback {
@@ -24,18 +25,20 @@ public class ErrorPageProps extends ReactComponentProps {
   public static ErrorPageProps create(
     String type,
     String message,
-    String entityId,
-    Long entityVersion,
+    String id,
+    Long version,
+    String objectType,
     Callback gotoPlace
   ) {
     ErrorPageProps props = new ErrorPageProps();
     props.type = type;
     props.message = message;
-    props.entityId = entityId;
-    if (entityVersion != null) {
-      props.entityVersion = entityVersion.doubleValue();
+    props.id = id;
+    if (version != null) {
+      props.version = version.doubleValue();
     }
     props.gotoPlace = gotoPlace;
+    props.objectType = objectType;
     return props;
   }
 }

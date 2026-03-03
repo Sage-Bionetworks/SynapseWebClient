@@ -86,6 +86,7 @@ public class StuAlertViewImpl implements StuAlertView {
       null, //custom message
       entityId,
       entityVersion,
+      "ENTITY",
       href -> {
         globalAppState.handleRelativePathClick(href);
       }
