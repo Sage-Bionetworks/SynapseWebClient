@@ -16,7 +16,6 @@ import org.sagebionetworks.web.client.place.ComingSoon;
 import org.sagebionetworks.web.client.place.DataAccessApprovalTokenPlace;
 import org.sagebionetworks.web.client.place.DataAccessManagementPlace;
 import org.sagebionetworks.web.client.place.DataCatalogPagePlace;
-import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.DownloadCartPlace;
 import org.sagebionetworks.web.client.place.EmailInvitation;
 import org.sagebionetworks.web.client.place.ErrorPlace;
@@ -70,7 +69,6 @@ import org.sagebionetworks.web.client.place.users.RegisterAccount;
     Challenges.Tokenizer.class,
     Help.Tokenizer.class,
     Governance.Tokenizer.class,
-    Down.Tokenizer.class,
     Team.Tokenizer.class,
     MapPlace.Tokenizer.class,
     TeamSearch.Tokenizer.class,

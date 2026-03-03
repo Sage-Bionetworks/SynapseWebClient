@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Synapse - Service Unavailable</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap"
+      type="text/css"
+    />
+    <style>
+      body {
+        font-family: 'DM Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        background: linear-gradient(135deg, #1e7098 0%, #47889e 100%);
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        color: #666666;
+        font-size: 1em;
+        line-height: 1.6em;
+      }
+
+      .container {
+        background: white;
+        border-radius: 4px;
+        box-shadow: 0 1px 2px #aaa;
+        padding: 40px;
+        max-width: 600px;
+        text-align: center;
+        margin: 20px;
+      }
+
+      h1 {
+        color: #1e7098;
+        margin-bottom: 20px;
+        font-size: 32px;
+        font-weight: 200;
+        line-height: 40px;
+      }
+
+      .message {
+        font-size: 1.1em;
+        color: #666666;
+        margin-bottom: 30px;
+        line-height: 1.6;
+      }
+
+      .status-info {
+        background: #f8f9fa;
+        border-left: 4px solid #1e7098;
+        padding: 15px;
+        margin: 20px 0;
+        border-radius: 4px;
+        text-align: left;
+      }
+
+      .status-info strong {
+        color: #1e7098;
+      }
+
+      .spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #1e7098;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+        margin: 20px auto;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .checking-status {
+        font-size: 0.9em;
+        color: #717171;
+        margin-top: 20px;
+      }
+
+      .error-message {
+        color: #d9534f;
+        font-size: 0.9em;
+        margin-top: 10px;
+      }
+
+      .logo {
+        margin-bottom: 30px;
+        padding-top: 9px;
+        background-color: #1e7098;
+        border-radius: 4px;
+      }
+
+      .logo img {
+        max-width: 200px;
+        height: auto;
+      }
+
+      .links {
+        margin-top: 30px;
+        font-size: 0.95em;
+      }
+
+      .links a {
+        color: #1e7098;
+        text-decoration: none;
+        margin: 0 10px;
+        font-weight: 500;
+      }
+
+      .links a:hover {
+        text-decoration: underline;
+        color: #1e7098;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="logo">
+        <img
+          src="https://www.synapse.org/images/synapselogo.png"
+          alt="Synapse"
+        />
+      </div>
+
+      <h1>Service Temporarily Unavailable</h1>
+
+      <div class="message">
+        Synapse is currently undergoing maintenance or experiencing issues.
+        We're working to restore service as quickly as possible.
+      </div>
+
+      <div class="status-info" id="statusInfo" style="display: none">
+        <strong>Status:</strong> <span id="statusMessage"></span>
+      </div>
+
+      <div class="spinner" id="spinner"></div>
+
+      <div class="checking-status" id="checkingStatus">
+        Checking service status...
+      </div>
+
+      <div class="error-message" id="errorMessage" style="display: none"></div>
+
+      <div class="links">
+        <a
+          href="http://status.synapse.org/"
+          target="_blank"
+          rel="noopener noreferrer"
+          >Status Page</a
+        >
+        <a
+          href="https://sagebionetworks.jira.com/servicedesk/customer/portals"
+          target="_blank"
+          rel="noopener noreferrer"
+          >Support</a
+        >
+      </div>
+    </div>
+
+    <script>
+      ;(function () {
+        const CHECK_INTERVAL_MS = 30000 // Check every 30 seconds
+        let checkCount = 0
+
+        function getRepoServiceUrl() {
+          try {
+            return sessionStorage.getItem('repoServiceUrl')
+          } catch (e) {
+            console.error('Error accessing sessionStorage:', e)
+            return null
+          }
+        }
+
+        function checkStatus() {
+          const repoServiceUrl = getRepoServiceUrl()
+
+          if (!repoServiceUrl) {
+            document.getElementById('errorMessage').textContent =
+              'Unable to retrieve service URL. Please try refreshing the page.'
+            document.getElementById('errorMessage').style.display = 'block'
+            document.getElementById('spinner').style.display = 'none'
+            return
+          }
+
+          checkCount++
+          document.getElementById('checkingStatus').textContent =
+            'Checking service status... (Attempt ' + checkCount + ')'
+
+          const statusUrl = repoServiceUrl + '/status'
+
+          fetch(statusUrl, {
+            method: 'GET',
+            headers: {
+              Accept: 'application/json',
+            },
+            cache: 'no-cache',
+          })
+            .then(function (response) {
+              if (!response.ok) {
+                throw new Error('HTTP status ' + response.status)
+              }
+              return response.json()
+            })
+            .then(function (data) {
+              document.getElementById('statusInfo').style.display = 'block'
+              document.getElementById('statusMessage').textContent =
+                data.currentMessage || ''
+
+              if (data.status === 'READ_WRITE') {
+                document.getElementById('checkingStatus').textContent =
+                  'Service restored! Returning to previous page...'
+                document.getElementById('spinner').style.display = 'none'
+
+                // Clear the error message if any
+                document.getElementById('errorMessage').style.display = 'none'
+
+                // Navigate back to the stored URL or home page
+                setTimeout(function () {
+                  var returnUrl = sessionStorage.getItem('returnUrl')
+                  if (returnUrl) {
+                    sessionStorage.removeItem('returnUrl')
+                    window.location.href = returnUrl
+                  } else {
+                    window.location.href = '/'
+                  }
+                }, 1000)
+              } else {
+                // Service still down, continue checking
+                setTimeout(checkStatus, CHECK_INTERVAL_MS)
+              }
+            })
+            .catch(function (error) {
+              console.error('Error checking status:', error)
+              document.getElementById('errorMessage').textContent =
+                'Error checking service status. Will retry shortly...'
+              document.getElementById('errorMessage').style.display = 'block'
+
+              // Retry after the interval even if there's an error
+              setTimeout(checkStatus, CHECK_INTERVAL_MS)
+            })
+        }
+
+        // Start checking status when page loads
+        window.addEventListener('DOMContentLoaded', function () {
+          checkStatus()
+        })
+      })()
+    </script>
+  </body>
+</html>
