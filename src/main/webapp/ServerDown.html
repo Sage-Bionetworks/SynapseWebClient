@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Synapse - Service Unavailable</title>
+    <link rel="icon" href="/favicon.png?v=4" />
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap"
@@ -121,6 +122,19 @@
         text-decoration: underline;
         color: #1e7098;
       }
+
+      .version-info {
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #e0e0e0;
+        font-size: 0.85em;
+        color: #999999;
+      }
+
+      .version-info .version-label {
+        font-weight: 500;
+        color: #666666;
+      }
     </style>
   </head>
   <body>
@@ -165,6 +179,17 @@
           >Support</a
         >
       </div>
+
+      <div class="version-info" id="versionInfo" style="display: none">
+        <div>
+          <span class="version-label">Portal:</span>
+          <span id="portalVersion">-</span>
+        </div>
+        <div>
+          <span class="version-label">Repo:</span>
+          <span id="repoVersion">-</span>
+        </div>
+      </div>
     </div>
 
     <script>
@@ -179,6 +204,35 @@
             console.error('Error accessing sessionStorage:', e)
             return null
           }
+        }
+
+        function fetchVersions() {
+          const versionsUrl = window.location.origin + '/Portal/versions'
+
+          fetch(versionsUrl, {
+            method: 'GET',
+            cache: 'no-cache',
+          })
+            .then(function (response) {
+              if (!response.ok) {
+                throw new Error('HTTP status ' + response.status)
+              }
+              return response.text()
+            })
+            .then(function (data) {
+              const versions = data.split(',')
+              if (versions.length === 2) {
+                document.getElementById('portalVersion').textContent =
+                  versions[0].trim()
+                document.getElementById('repoVersion').textContent =
+                  versions[1].trim()
+                document.getElementById('versionInfo').style.display = 'block'
+              }
+            })
+            .catch(function (error) {
+              console.error('Error fetching versions:', error)
+              // Silently fail - versions are not critical information
+            })
         }
 
         function checkStatus() {
@@ -252,6 +306,7 @@
 
         // Start checking status when page loads
         window.addEventListener('DOMContentLoaded', function () {
+          fetchVersions()
           checkStatus()
         })
       })()

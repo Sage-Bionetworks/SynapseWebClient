@@ -18,7 +18,6 @@ import static org.sagebionetworks.web.client.FeatureFlagKey.METADATA_TAB;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.web.bindery.event.shared.binder.EventBinder;
 import java.util.Collections;
 import org.junit.Before;
@@ -59,9 +58,9 @@ import org.sagebionetworks.web.client.events.ChangeSynapsePlaceEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.EntityCitation;
-import org.sagebionetworks.web.client.widget.EntityCitationImpl;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTopView;
@@ -228,6 +227,9 @@ public class EntityPageTopTest {
   @Mock
   ListCurationTaskResponse mockCurationTaskList;
 
+  @Mock
+  AuthenticationController mockAuthenticationController;
+
   EntityId2BundleCache entityId2BundleCache;
   EntityPageTop pageTop;
   String projectEntityId = "syn123";
@@ -274,7 +276,8 @@ public class EntityPageTopTest {
         mockGlobalApplicationState,
         entityId2BundleCache,
         mockEventBus,
-        mockFeatureFlagConfig
+        mockFeatureFlagConfig,
+        mockAuthenticationController
       );
     AsyncMockStubber
       .callSuccessWith(mockProjectBundle)
@@ -301,6 +304,7 @@ public class EntityPageTopTest {
     path.setPath(Collections.singletonList(mockProjectEntityHeader));
     when(mockProjectEntityHeader.getType()).thenReturn(Project.class.getName());
     when(mockProjectBundle.getPath()).thenReturn(path);
+    when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
     when(mockCurationTaskList.getPage())
       .thenReturn(Collections.singletonList(new CurationTask()));
 
@@ -1504,6 +1508,22 @@ public class EntityPageTopTest {
       )
       .when(mockSynapseJavascriptClient)
       .getCurationTasks(any(), any());
+    Synapse.EntityArea area = null;
+    String areaToken = null;
+    Long versionNumber = null;
+    pageTop.configure(
+      mockProjectBundle,
+      versionNumber,
+      mockProjectHeader,
+      area,
+      areaToken
+    );
+    verify(mockMetadataInnerTab, never()).setTabListItemVisible(true);
+  }
+
+  @Test
+  public void testHideMetadataTabWhenUnauthenticated() {
+    when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
     Synapse.EntityArea area = null;
     String areaToken = null;
     Long versionNumber = null;

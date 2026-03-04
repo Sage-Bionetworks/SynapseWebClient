@@ -38,9 +38,9 @@ import org.sagebionetworks.web.client.events.ChangeSynapsePlaceEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.EntityCitation;
-import org.sagebionetworks.web.client.widget.EntityCitationImpl;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl;
@@ -84,6 +84,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
   private final EntityCitation entityCitation;
   private final EntityMetadata projectMetadata;
   private final SynapseClientAsync synapseClient;
+  private final AuthenticationController authenticationController;
   // how many tabs have been marked as visible
   private int visibleTabCount;
 
@@ -141,7 +142,8 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
     GlobalApplicationState globalAppState,
     EntityId2BundleCache entityId2BundleCache,
     EventBus eventBus,
-    FeatureFlagConfig featureFlagConfig
+    FeatureFlagConfig featureFlagConfig,
+    AuthenticationController authenticationController
   ) {
     this.view = view;
     this.synapseClient = synapseClient;
@@ -166,6 +168,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
     this.entityId2BundleCache = entityId2BundleCache;
     this.eventBus = eventBus;
     this.featureFlagConfig = featureFlagConfig;
+    this.authenticationController = authenticationController;
 
     initTabs();
     view.setTabs(tabs.asWidget());
@@ -745,7 +748,10 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
       getTabVisibilityCallback(EntityArea.CHALLENGE, challengeTab.asTab())
     );
 
-    if (featureFlagConfig.isFeatureEnabled(FeatureFlagKey.METADATA_TAB)) {
+    if (
+      this.authenticationController.isLoggedIn() &&
+      featureFlagConfig.isFeatureEnabled(FeatureFlagKey.METADATA_TAB)
+    ) {
       synapseJavascriptClient.getCurationTasks(
         new ListCurationTaskRequest().setProjectId(projectHeader.getId()),
         new AsyncCallback<ListCurationTaskResponse>() {
